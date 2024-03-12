@@ -31,14 +31,31 @@ let store2 = signal({
   storeConfigurationAndInititalizationObject
 });
 
-store2().storeConfigurationAndInititalizationObject.prop2.nested1 = 'text';
+//Depricated
+store2.mutate(store => store.storeConfigurationAndInititalizationObject.prop2.nested2.nested3.deeplyNestedUndefinedStringTyped = 'text');
 
-store2().storeConfigurationAndInititalizationObject.prop2.nested1;
+store2.update(store => {
+  let tempStore = { ...store };
+  tempStore.storeConfigurationAndInititalizationObject.prop2.nested2.nested3.deeplyNestedUndefinedStringTyped = "text";
+  return tempStore;
+});
+
+store2.update(store => {
+  let tempStore = { ...store };
+  tempStore.storeConfigurationAndInititalizationObject.prop2.nested2['nested4'] = 'test';
+  return tempStore;
+});
+
+//Not typechecked, but works
+let valuex: string = store2().storeConfigurationAndInititalizationObject.prop2.nested2['nested4'];
 
 const store = signalStore(storeConfigurationAndInititalizationObject);
 
 // Accessing the properties with type inference using signals
 const value1: number = store.prop1();
+// Works the same here
+const value1x: number = store2().storeConfigurationAndInititalizationObject.prop1;
+
 const value2: string = store.prop2.nested1();
 const value3: boolean = store.prop2.nested2.deeplyNested();
 const value4: string[] = store.prop2.nested2.deeplyNestedArray();
