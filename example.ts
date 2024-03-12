@@ -1,6 +1,6 @@
 // Example Usage:
 
-import { WritableSignal } from "@angular/core";
+import { WritableSignal, signal } from "@angular/core";
 import { Terminant, signalStore } from "./signal-store";
 
 const storeConfigurationAndInititalizationObject = {
@@ -26,6 +26,14 @@ const storeConfigurationAndInititalizationObject = {
     },
   },
 };
+
+let store2 = signal({
+  storeConfigurationAndInititalizationObject
+});
+
+store2().storeConfigurationAndInititalizationObject.prop2.nested1 = 'text';
+
+store2().storeConfigurationAndInititalizationObject.prop2.nested1;
 
 const store = signalStore(storeConfigurationAndInititalizationObject);
 
