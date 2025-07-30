@@ -1,1 +1,1 @@
-export * from './lib/ngx-signal-store/ngx-signal-store';
+export * from './lib/signal-store/signal-store';

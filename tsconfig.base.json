@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "ngx-signal-store": ["libs/ngx-signal-store/src/index.ts"]
+      "signal-store": ["libs/signal-store/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

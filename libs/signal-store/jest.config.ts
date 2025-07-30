@@ -1,8 +1,8 @@
 export default {
-  displayName: 'ngx-signal-store',
+  displayName: 'signal-store',
   preset: '../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
-  coverageDirectory: '../../coverage/libs/ngx-signal-store',
+  coverageDirectory: '../../coverage/libs/signal-store',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
       'jest-preset-angular',

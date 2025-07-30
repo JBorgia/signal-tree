@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgxSignalStore } from './ngx-signal-store';
+import { NgxSignalStore } from './signal-store';
 
 describe('NgxSignalStore', () => {
   let component: NgxSignalStore;
