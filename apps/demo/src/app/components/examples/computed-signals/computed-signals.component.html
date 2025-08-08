@@ -1,0 +1,316 @@
+<div class="computed-signals">
+  <div class="header">
+    <h2>🧮 Computed Signals & Memoization</h2>
+    <p class="subtitle">
+      Smart memoization with automatic dependency tracking and cache
+      invalidation
+    </p>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <h3>🔍 Smart Filters</h3>
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="category">Category:</label>
+        <select
+          id="category"
+          (change)="updateCategory($event)"
+          [value]="shopTree.$.filters.category()"
+        >
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories()" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="search">Search:</label>
+        <input
+          id="search"
+          type="text"
+          placeholder="Search products..."
+          [value]="shopTree.$.filters.searchTerm()"
+          (input)="updateSearchTerm($event)"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="price-min">Price Range:</label>
+        <div class="price-range">
+          <input
+            id="price-min"
+            type="number"
+            placeholder="Min"
+            [value]="shopTree.$.filters.priceRange().min"
+            (change)="
+              updatePriceRange(
+                +$any($event.target).value,
+                shopTree.$.filters.priceRange().max
+              )
+            "
+          />
+          <span>to</span>
+          <input
+            type="number"
+            placeholder="Max"
+            [value]="shopTree.$.filters.priceRange().max"
+            (change)="
+              updatePriceRange(
+                shopTree.$.filters.priceRange().min,
+                +$any($event.target).value
+              )
+            "
+          />
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            [checked]="shopTree.$.filters.inStockOnly()"
+            (change)="toggleInStockOnly()"
+          />
+          In Stock Only
+        </label>
+      </div>
+
+      <div class="filter-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            [checked]="shopTree.$.ui.showOnlyAffordable()"
+            (change)="toggleAffordableOnly()"
+          />
+          Within Budget (${{ shopTree.$.ui.budget() }})
+        </label>
+      </div>
+
+      <div class="filter-group">
+        <label for="budget">Budget:</label>
+        <input
+          id="budget"
+          type="range"
+          min="0"
+          max="1000"
+          step="50"
+          [value]="shopTree.$.ui.budget()"
+          (input)="updateBudget($event)"
+        />
+        <span class="budget-value">${{ shopTree.$.ui.budget() }}</span>
+      </div>
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn btn-secondary" (click)="resetFilters()">
+        Reset Filters
+      </button>
+      <button class="btn btn-primary" (click)="forceRecalculation()">
+        Force Recalculation
+      </button>
+    </div>
+  </div>
+
+  <!-- Products & Cart -->
+  <div class="main-content">
+    <!-- Products Grid -->
+    <div class="products-section">
+      <h3>📦 Products ({{ filteredProducts().length }} shown)</h3>
+      <div class="products-grid">
+        <div
+          *ngFor="let product of filteredProducts(); trackBy: trackByProductId"
+          class="product-card"
+          [class.out-of-stock]="!product.inStock"
+        >
+          <div class="product-info">
+            <h4>{{ product.name }}</h4>
+            <p class="category">{{ product.category }}</p>
+            <p class="price">${{ product.price }}</p>
+            <p class="stock" [class.low-stock]="product.quantity < 5">
+              {{
+                product.inStock
+                  ? product.quantity + ' in stock'
+                  : 'Out of Stock'
+              }}
+            </p>
+          </div>
+          <button
+            class="btn btn-sm"
+            [class.btn-primary]="product.inStock"
+            [class.btn-disabled]="!product.inStock"
+            [disabled]="!product.inStock"
+            (click)="addToCart(product.id)"
+          >
+            {{ product.inStock ? 'Add to Cart' : 'Unavailable' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shopping Cart -->
+    <div class="cart-section">
+      <h3>🛒 Shopping Cart</h3>
+      <div class="cart-summary">
+        <div class="summary-stat">
+          <span class="label">Items:</span>
+          <span class="value">{{ cartSummary().totalItems }}</span>
+        </div>
+        <div class="summary-stat">
+          <span class="label">Total:</span>
+          <span class="value">${{ cartSummary().totalPrice.toFixed(2) }}</span>
+        </div>
+        <div class="summary-stat" *ngIf="cartSummary().hasDiscount">
+          <span class="label">Discount:</span>
+          <span class="value discount"
+            >-${{ cartSummary().discountAmount.toFixed(2) }}</span
+          >
+        </div>
+        <div class="summary-stat" *ngIf="!cartSummary().isEmpty">
+          <span class="label">Avg Price:</span>
+          <span class="value"
+            >${{ cartSummary().averageItemPrice.toFixed(2) }}</span
+          >
+        </div>
+      </div>
+
+      <div class="cart-items" *ngIf="!cartSummary().isEmpty; else emptyCart">
+        <div *ngFor="let item of cartItems()" class="cart-item">
+          <div class="item-info">
+            <h5>{{ item.product?.name }}</h5>
+            <p>
+              {{ item.quantity }} × ${{ item.product?.price }} = ${{
+                item.subtotal.toFixed(2)
+              }}
+            </p>
+          </div>
+          <button
+            class="btn btn-sm btn-danger"
+            (click)="removeFromCart(item.productId)"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <ng-template #emptyCart>
+        <p class="empty-message">Your cart is empty</p>
+      </ng-template>
+
+      <div class="cart-actions" *ngIf="!cartSummary().isEmpty">
+        <button class="btn btn-danger" (click)="clearCart()">Clear Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Metrics -->
+  <div class="metrics-section">
+    <h3>📊 Performance Metrics</h3>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <h4>Cache Efficiency</h4>
+        <div class="cache-stats">
+          <div class="stat">
+            <span class="label">Cache Hits:</span>
+            <span class="value">{{ getCacheMetrics().cacheHits }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Cache Misses:</span>
+            <span class="value">{{ getCacheMetrics().cacheMisses }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Hit Ratio:</span>
+            <span class="value hit-ratio">
+              {{
+                (
+                  (getCacheMetrics().cacheHits /
+                    (getCacheMetrics().cacheHits +
+                      getCacheMetrics().cacheMisses)) *
+                    100 || 0
+                ).toFixed(1)
+              }}%
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <h4>Product Statistics</h4>
+        <div class="product-stats">
+          <div class="stat">
+            <span class="label">Total Products:</span>
+            <span class="value">{{ productStats().total }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">In Stock:</span>
+            <span class="value">{{ productStats().inStock }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Average Price:</span>
+            <span class="value"
+              >${{ productStats().averagePrice.toFixed(2) }}</span
+            >
+          </div>
+          <div class="stat">
+            <span class="label">Inventory Value:</span>
+            <span class="value"
+              >${{ productStats().totalValue.toFixed(2) }}</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <h4>Computation Log</h4>
+        <div class="computation-log">
+          <button class="btn btn-sm btn-secondary" (click)="clearLog()">
+            Clear Log
+          </button>
+          <div class="log-entries">
+            <div
+              *ngFor="let entry of computationLog; trackBy: trackByIndex"
+              class="log-entry"
+            >
+              <span class="timestamp">{{
+                entry.timestamp.toLocaleTimeString()
+              }}</span>
+              <span class="computation">{{ entry.computation }}</span>
+              <span class="result">{{ entry.result }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Comparison -->
+  <div class="comparison-section">
+    <h3>⚡ Memoized vs Non-Memoized</h3>
+    <div class="comparison-grid">
+      <div class="comparison-item">
+        <h4>Memoized (Cached)</h4>
+        <p>Products shown: {{ filteredProducts().length }}</p>
+        <p class="cache-info">✅ Smart caching with dependency tracking</p>
+      </div>
+      <div class="comparison-item">
+        <h4>Non-Memoized</h4>
+        <p>Products shown: {{ nonMemoizedFiltered().length }}</p>
+        <p class="cache-info">❌ Recomputes on every access</p>
+      </div>
+    </div>
+    <p class="comparison-note">
+      Watch the computation log to see the difference in computation frequency.
+      Memoized computed values are cached and only recalculated when
+      dependencies change.
+    </p>
+  </div>
+
+  <!-- Code Example -->
+  <div class="code-section">
+    <h2 class="section-title">💻 Code Example</h2>
+    <div class="code-block">
+      <pre><code>{{ codeExample }}</code></pre>
+    </div>
+  </div>
+</div>
