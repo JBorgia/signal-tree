@@ -1,97 +1,124 @@
+/**
+ * SignalTree Core Types - Recursive Typing System
+ *
+ * COPYRIGHT NOTICE:
+ * This file contains proprietary recursive typing innovations protected under
+ * the SignalTree license. The DeepSignalify<T> recursive type system and
+ * related implementations are exclusive intellectual property of Jonathan D Borgia.
+ *
+ * Unauthorized extraction, copying, or reimplementation of these recursive typing
+ * concepts is strictly prohibited and constitutes copyright infringement.
+ *
+ * Licensed under Fair Source License - see LICENSE file for complete terms.
+ */
+
 import { WritableSignal, Signal } from '@angular/core';
 
+// ============================================
+// PROPRIETARY RECURSIVE TYPING SYSTEM
+// Copyright (c) 2025 Jonathan D Borgia
+// ============================================
+
 /**
- * @fileoverview Core types for SignalTree modular architecture
- *
- * Contains only the essential types needed for the basic signalTree functionality.
- * This keeps the core package minimal (~5KB) while other features are added via composition.
+ * NO MORE StateObject constraint!
+ * We don't need this at all - remove it or make it accept anything
  */
+// DELETE THIS: export type StateObject = Record<PropertyKey, unknown>;
+// REPLACE WITH: Just use generic T with no constraints
 
-// ============================================
-// CORE TYPES AND INTERFACES
-// ============================================
+/**
+ * Primitive types for type checking
+ */
+export type Primitive =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | bigint
+  | symbol;
 
-// Branded type for better type safety
-declare const __treeId: unique symbol;
-export type TreeId = string & { readonly [__treeId]: never };
+/**
+ * Built-in object types that should be treated as primitive values
+ * These should not be deeply signalified
+ */
+export type BuiltInObject =
+  | Date
+  | RegExp
+  | ((...args: unknown[]) => unknown)
+  | Map<unknown, unknown>
+  | Set<unknown>
+  | WeakMap<object, unknown>
+  | WeakSet<object>
+  | ArrayBuffer
+  | DataView
+  | Error
+  | Promise<unknown>;
 
-// Define primitive types for better type constraints
-type Primitive = string | number | boolean | null | undefined | bigint | symbol;
+export type IsPrimitive<T> = T extends Primitive ? true : false;
+export type IsBuiltInObject<T> = T extends BuiltInObject ? true : false;
 
-// Serializable types - more flexible like the monolith
-export type SerializableValue = unknown;
+/**
+ * Signal detection
+ */
+export type IsSignal<T> = T extends Signal<unknown> ? true : false;
+export type IsWritableSignal<T> = T extends WritableSignal<unknown>
+  ? true
+  : false;
 
-// Valid state object constraint - flexible like monolith
-export type StateObject = Record<string | number | symbol, unknown>;
-
-// Helper type to check if a type is a primitive
-type IsPrimitive<T> = T extends Primitive ? true : false;
-
-// Deep signalify type with proper generic constraints
-export type DeepSignalify<T> = IsPrimitive<T> extends true
+/**
+ * Superior recursive signalification that maintains complete type information
+ * Key insight from signal-store.ts: Use the same type T throughout recursion
+ *
+ * Enhanced with better primitive detection, built-in object handling, and array handling
+ */
+export type DeepSignalify<T> = IsSignal<T> extends true
+  ? T // Never double-wrap signals
+  : T extends Primitive
   ? WritableSignal<T>
-  : T extends (infer U)[]
+  : T extends BuiltInObject
+  ? WritableSignal<T> // Treat built-in objects as primitive values
+  : T extends readonly (infer U)[]
   ? WritableSignal<U[]>
-  : T extends Record<string, unknown>
-  ? T extends Signal<infer TSignal>
-    ? WritableSignal<TSignal>
-    : { [K in keyof T]: DeepSignalify<T[K]> }
+  : T extends object
+  ? {
+      [K in keyof T]: T[K] extends (infer U)[]
+        ? WritableSignal<U[]>
+        : T[K] extends BuiltInObject
+        ? WritableSignal<T[K]>
+        : T[K] extends object
+        ? T[K] extends Signal<infer TK>
+          ? WritableSignal<TK>
+          : DeepSignalify<T[K]> // 🎯 Recursive call preserves original type structure
+        : WritableSignal<T[K]>;
+    }
   : WritableSignal<T>;
 
-// Helper type for unwrapping signal states back to original types
-export type UnwrapSignalState<T> = T extends WritableSignal<infer U>
-  ? U
-  : T extends Record<string, unknown>
-  ? { [K in keyof T]: UnwrapSignalState<T[K]> }
-  : T;
-
 /**
- * Main signal tree type that preserves hierarchical structure
+ * SignalTree type - NO CONSTRAINTS on T
  */
-export type SignalState<T extends StateObject> = DeepSignalify<T>;
-
-/**
- * Core SignalTree interface with only essential functionality.
- * Additional features are added via composition using the .pipe() method.
- */
-export interface SignalTree<T extends StateObject> {
+export type SignalTree<T> = {
   /**
-   * The reactive state object with deep signal conversion.
+   * The reactive state object with deep signal conversion
    */
-  state: SignalState<T>;
+  state: DeepSignalify<T>;
 
   /**
-   * Shorthand alias for `state`.
+   * Shorthand alias for state
    */
-  $: SignalState<T>;
+  $: DeepSignalify<T>;
 
   /**
-   * Extracts the current plain object value from the signal tree.
+   * Core methods
    */
   unwrap(): T;
-
-  /**
-   * Updates the tree state using a partial update function.
-   */
   update(updater: (current: T) => Partial<T>): void;
-
-  /**
-   * Creates a side effect that runs when the tree state changes.
-   */
   effect(fn: (tree: T) => void): void;
-
-  /**
-   * Subscribes to tree state changes with manual unsubscribe control.
-   */
   subscribe(fn: (tree: T) => void): () => void;
-
-  /**
-   * Completely destroys the tree and cleans up all resources.
-   */
   destroy(): void;
 
   /**
-   * Fluent API for composing features using function composition with strong typing
+   * Pipe method for composition
    */
   pipe(): SignalTree<T>;
   pipe<R1>(fn1: (tree: SignalTree<T>) => R1): R1;
@@ -101,21 +128,8 @@ export interface SignalTree<T extends StateObject> {
     fn2: (arg: R1) => R2,
     fn3: (arg: R2) => R3
   ): R3;
-  pipe<R1, R2, R3, R4>(
-    fn1: (tree: SignalTree<T>) => R1,
-    fn2: (arg: R1) => R2,
-    fn3: (arg: R2) => R3,
-    fn4: (arg: R3) => R4
-  ): R4;
-  pipe<R1, R2, R3, R4, R5>(
-    fn1: (tree: SignalTree<T>) => R1,
-    fn2: (arg: R1) => R2,
-    fn3: (arg: R2) => R3,
-    fn4: (arg: R3) => R4,
-    fn5: (arg: R4) => R5
-  ): R5;
 
-  // Extended features (provided by feature packages)
+  // Extended features
   batchUpdate(updater: (current: T) => Partial<T>): void;
   memoize<R>(fn: (tree: T) => R, cacheKey?: string): Signal<R>;
   optimize(): void;
@@ -135,10 +149,10 @@ export interface SignalTree<T extends StateObject> {
   redo(): void;
   getHistory(): TimeTravelEntry<T>[];
   resetHistory(): void;
-}
+};
 
 // ============================================
-// CONFIGURATION TYPES
+// OTHER TYPES (keep as-is but update generics)
 // ============================================
 
 export type TreePreset = 'basic' | 'performance' | 'development' | 'production';
@@ -157,19 +171,11 @@ export interface TreeConfig {
   useStructuralSharing?: boolean;
 }
 
-// ============================================
-// MIDDLEWARE TYPES
-// ============================================
-
 export interface Middleware<T> {
   id: string;
   before?: (action: string, payload: unknown, state: T) => boolean;
   after?: (action: string, payload: unknown, state: T, newState: T) => void;
 }
-
-// ============================================
-// PERFORMANCE TYPES
-// ============================================
 
 export interface PerformanceMetrics {
   updates: number;
@@ -178,10 +184,6 @@ export interface PerformanceMetrics {
   cacheMisses: number;
   averageUpdateTime: number;
 }
-
-// ============================================
-// ENTITY TYPES
-// ============================================
 
 export interface EntityHelpers<E extends { id: string | number }> {
   add(entity: E): void;
@@ -193,13 +195,9 @@ export interface EntityHelpers<E extends { id: string | number }> {
   selectIds(): Signal<Array<string | number>>;
   selectAll(): Signal<E[]>;
   selectTotal(): Signal<number>;
-  findAll(): Signal<E[]>; // Alias for selectAll for backward compatibility
+  findAll(): Signal<E[]>;
   clear(): void;
 }
-
-// ============================================
-// ASYNC TYPES
-// ============================================
 
 export interface AsyncActionConfig<T, TResult> {
   onStart?: (state: T) => Partial<T>;
@@ -214,10 +212,6 @@ export interface AsyncAction<TInput, TResult> {
   error: Signal<Error | null>;
   result: Signal<TResult | null>;
 }
-
-// ============================================
-// TIME TRAVEL TYPES
-// ============================================
 
 export interface TimeTravelEntry<T> {
   action: string;
