@@ -108,7 +108,7 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
     };
 
     // Add initial state to history
-    this.addEntry('INIT', this.tree.unwrap());
+    this.addEntry('INIT', this.tree.$());
   }
 
   /**
@@ -168,7 +168,7 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
   }
 
   resetHistory(): void {
-    const currentState = this.tree.unwrap();
+    const currentState = this.tree.$();
     this.history = [];
     this.currentIndex = -1;
     this.addEntry('RESET', currentState);
@@ -205,7 +205,7 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
       this.restoreStateFn(state);
     } else {
       // Fallback if no restoration function provided
-      this.tree.update(() => state);
+      this.tree.$.update(() => state);
     }
   }
 }
@@ -274,9 +274,6 @@ export function withTimeTravel<T>(
   tree: SignalTree<T>
 ) => SignalTree<T> & { __timeTravel: TimeTravelInterface<T> } {
   return (tree: SignalTree<T>) => {
-    // Store original update method
-    const originalUpdate = tree.update.bind(tree);
-
     // Flag to prevent time travel during restoration
     let isRestoring = false;
 
@@ -287,34 +284,100 @@ export function withTimeTravel<T>(
       (state: T) => {
         isRestoring = true;
         try {
-          originalUpdate(() => state);
+          (tree.$ as unknown as { set: (value: T) => void }).set(state);
         } finally {
           isRestoring = false;
         }
       }
     );
 
-    // Add middleware to track state changes
-    tree.update = (updater: (current: T) => Partial<T>) => {
-      if (isRestoring) {
-        // During restoration, just call original update
-        return originalUpdate(updater);
-      }
+    // Create intercepted proxy that wraps update and set methods
+    function createInterceptedProxy(originalTree: SignalTree<T>) {
+      return new Proxy(originalTree, {
+        get(target, prop) {
+          const value = (target as Record<string | symbol, unknown>)[prop];
+          if (prop === '$') {
+            const originalCallable = value as (...args: unknown[]) => unknown;
+            return new Proxy(originalCallable, {
+              get(callableTarget, callableProp) {
+                const callableValue = (
+                  callableTarget as unknown as Record<string | symbol, unknown>
+                )[callableProp];
 
-      const beforeState = tree.unwrap();
-      originalUpdate(updater);
-      const afterState = tree.unwrap();
+                if (
+                  callableProp === 'update' &&
+                  typeof callableValue === 'function'
+                ) {
+                  return (updater: (current: T) => Partial<T>) => {
+                    if (isRestoring) {
+                      // During restoration, just call original update
+                      return (
+                        callableValue as (...args: unknown[]) => unknown
+                      ).call(callableTarget, updater);
+                    }
 
-      // Only add to history if state actually changed
-      const statesEqual = deepEqual(beforeState, afterState);
+                    const beforeState = target.$();
+                    const result = (
+                      callableValue as (...args: unknown[]) => unknown
+                    ).call(callableTarget, updater);
+                    const afterState = target.$();
 
-      if (!statesEqual) {
-        timeTravelManager.addEntry('update', afterState);
-      }
-    };
+                    // Only add to history if state actually changed
+                    const statesEqual = deepEqual(beforeState, afterState);
+
+                    if (!statesEqual) {
+                      timeTravelManager.addEntry('update', afterState);
+                    }
+
+                    return result;
+                  };
+                }
+
+                if (
+                  callableProp === 'set' &&
+                  typeof callableValue === 'function'
+                ) {
+                  return (newState: Partial<T>) => {
+                    if (isRestoring) {
+                      // During restoration, just call original set
+                      return (
+                        callableValue as (...args: unknown[]) => unknown
+                      ).call(callableTarget, newState);
+                    }
+
+                    const beforeState = target.$();
+                    const result = (
+                      callableValue as (...args: unknown[]) => unknown
+                    ).call(callableTarget, newState);
+                    const afterState = target.$();
+
+                    // Only add to history if state actually changed
+                    const statesEqual = deepEqual(beforeState, afterState);
+
+                    if (!statesEqual) {
+                      timeTravelManager.addEntry('set', afterState);
+                    }
+
+                    return result;
+                  };
+                }
+
+                return callableValue;
+              },
+              apply(callableTarget, thisArg, args) {
+                return callableTarget.apply(thisArg, args);
+              },
+            });
+          }
+          return value;
+        },
+      });
+    }
+
+    const enhancedTree = createInterceptedProxy(tree);
 
     return {
-      ...tree,
+      ...enhancedTree,
       __timeTravel: timeTravelManager,
     } as SignalTree<T> & { __timeTravel: TimeTravelInterface<T> };
   };
