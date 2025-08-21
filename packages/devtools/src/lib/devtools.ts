@@ -379,36 +379,87 @@ export function withDevTools<T>(
       browserDevTools = { send: connection.send };
     }
 
-    // Wrap tree methods to track activity by storing original and replacing
-    const originalUpdate = tree.$.update.bind(tree.$);
-    tree.$.update = (updater: ((current: T) => Partial<T>) | Partial<T>) => {
-      console.log('[DevTools] Update method called');
-      const startTime = performance.now();
+    // Wrap tree.$ with a callable proxy so we can intercept reads of `.update`.
+    // Assigning directly to `tree.$.update` is brittle because the callable
+    // proxy's get trap often returns values from the nested store instead of
+    // the function target. A wrapper proxy preserves callability while
+    // intercepting property access safely.
+    const originalState = tree.$ as unknown as Record<string | symbol, any> &
+      ((() => T) | Function);
 
-      // Call the original update method with proper binding
-      originalUpdate(updater);
+    const originalUpdate =
+      typeof originalState.update === 'function'
+        ? originalState.update.bind(originalState)
+        : undefined;
 
-      const duration = performance.now() - startTime;
-      const newState = tree.$();
+    const stateProxy = new Proxy(originalState as any, {
+      apply(target, thisArg, args) {
+        // Preserve callable behavior
+        return (originalState as any)();
+      },
+      get(target, prop, receiver) {
+        if (prop === 'update') {
+          return (updater: ((current: T) => Partial<T>) | Partial<T>) => {
+            // Instrumented update wrapper
+            if (typeof console !== 'undefined') {
+              console.log('[DevTools] Update method called');
+            }
 
-      console.log('[DevTools] Tracking update with duration:', duration);
-      // Track performance
-      metrics.trackModuleUpdate('core', duration);
+            const startTime = performance.now();
+            const result = originalUpdate ? originalUpdate(updater) : undefined;
+            const duration = performance.now() - startTime;
+            const newState = (originalState as any)();
 
-      if (duration > performanceThreshold) {
-        logger.logPerformanceWarning(
-          'core',
-          'update',
-          duration,
-          performanceThreshold
-        );
-      }
+            // Track performance
+            try {
+              metrics.trackModuleUpdate('core', duration);
+            } catch (e) {
+              // Swallow to avoid interfering with app behavior
+            }
 
-      // Send to browser DevTools
-      if (browserDevTools) {
-        browserDevTools.send('UPDATE', newState);
-      }
-    };
+            if (duration > performanceThreshold) {
+              try {
+                logger.logPerformanceWarning(
+                  'core',
+                  'update',
+                  duration,
+                  performanceThreshold
+                );
+              } catch {}
+            }
+
+            if (browserDevTools) {
+              try {
+                browserDevTools.send('UPDATE', newState);
+              } catch {}
+            }
+
+            return result;
+          };
+        }
+
+        const val = Reflect.get(originalState as any, prop);
+        if (typeof val === 'function') return val.bind(originalState);
+        return val;
+      },
+      has() {
+        return true;
+      },
+      ownKeys() {
+        return Reflect.ownKeys(originalState as any);
+      },
+      getOwnPropertyDescriptor(target, prop) {
+        return Reflect.getOwnPropertyDescriptor(originalState as any, prop);
+      },
+    });
+
+    // Replace the callable state proxy on the tree with our wrapper
+    try {
+      (tree as any).$ = stateProxy;
+    } catch (e) {
+      // If assignment fails for any reason, fall back to best-effort
+      // instrumentation by leaving the original state in place.
+    }
     const devToolsInterface: ModularDevToolsInterface<T> = {
       activityTracker,
       logger,
