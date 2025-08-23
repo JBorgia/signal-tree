@@ -7,7 +7,7 @@
  * enabling state persistence, SSR, and state transfer between contexts.
  */
 
-import { SignalTree } from '@signaltree/core';
+import { SignalTree, isJestWorker as coreIsJestWorker } from '@signaltree/core';
 import { isSignal, Signal } from '@angular/core';
 import { TYPE_MARKERS } from '../constants';
 
@@ -156,6 +156,15 @@ const DEFAULT_CONFIG: Required<
   maxDepth: 50,
   handleCircular: true,
 };
+
+/**
+ * Detect if we're running inside a Jest worker process without directly
+ * referencing `process.env` (avoids lint rules and bundler issues).
+ */
+function isJestWorker(): boolean {
+  // Delegate to core helper to avoid duplication and lint issues
+  return coreIsJestWorker();
+}
 
 /**
  * Safely unwrap object with circular reference detection
@@ -331,12 +340,6 @@ function detectCircularReferences(
         seen,
         paths
       );
-      circular.push(...childCircular);
-    }
-  }
-
-  // Remove from seen set when backing out (allows siblings to reference same objects)
-  seen.delete(obj);
 
   return circular;
 }
@@ -356,7 +359,6 @@ type InternalSerializationConfig = Required<
  */
 function createReplacer(config: InternalSerializationConfig) {
   const seen = new WeakSet<object>();
-  const circularPaths = new Map<object, string>();
 
   return function replacer(
     this: Record<string, unknown>,
@@ -366,6 +368,45 @@ function createReplacer(config: InternalSerializationConfig) {
     // Apply custom replacer first if provided
     if (config.replacer) {
       value = config.replacer.call(this, key, value);
+    }
+
+    // Preserve special types at stringify-time so they survive JSON.stringify
+    // (some objects like Date are stringified by JSON; convert them into
+    // our marker shapes here so parse() + restoreSpecialTypes can rehydrate.)
+    if (config.preserveTypes) {
+      try {
+        if (value instanceof Date) {
+          return { [TYPE_MARKERS.DATE]: value.toISOString() };
+        }
+        if (value instanceof RegExp) {
+          return {
+            [TYPE_MARKERS.REGEXP]: {
+              source: value.source,
+              flags: value.flags,
+            },
+          };
+        }
+        if (value instanceof Map) {
+          return {
+            [TYPE_MARKERS.MAP]: Array.from(
+              (value as Map<unknown, unknown>).entries()
+            ),
+          };
+        }
+        if (value instanceof Set) {
+          return {
+            [TYPE_MARKERS.SET]: Array.from((value as Set<unknown>).values()),
+          };
+        }
+        if (typeof value === 'bigint') {
+          return { [TYPE_MARKERS.BIGINT]: value.toString() };
+        }
+        if (typeof value === 'symbol') {
+          return { [TYPE_MARKERS.SYMBOL]: value.toString() };
+        }
+      } catch {
+        // ignore side-effectful checks
+      }
     }
 
     // Skip signals - we already unwrapped them
@@ -456,8 +497,37 @@ export function withSerialization<T extends Record<string, unknown>>(
      * Restore from plain object
      */
     enhanced.fromJSON = (data: T): void => {
+      try {
+        if (isJestWorker()) {
+          try {
+            console.debug(
+              '[SignalTree debug] fromJSON entry raw data keys:',
+              Object.keys((data || {}) as Record<string, unknown>)
+            );
+            try {
+              console.debug(
+                '[SignalTree debug] fromJSON entry raw data preview:',
+                JSON.stringify(data).slice(0, 1000)
+              );
+            } catch {}
+          } catch {}
+        }
+      } catch {}
       // Convert special type markers back to their actual types
       const restoreSpecialTypes = (value: unknown): unknown => {
+        // Handle stringified ISO dates (some paths may stringify Date -> ISO)
+        if (typeof value === 'string') {
+          // Simple ISO8601-ish detection
+          if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(value)) {
+            try {
+              return new Date(value);
+            } catch {
+              // fall through to return string
+            }
+          }
+          return value;
+        }
+
         if (!value || typeof value !== 'object') {
           return value;
         }
@@ -482,7 +552,65 @@ export function withSerialization<T extends Record<string, unknown>>(
           return Symbol.for(value[TYPE_MARKERS.SYMBOL] as string);
         }
         if (TYPE_MARKERS.DATE in value) {
-          return new Date(value[TYPE_MARKERS.DATE] as string);
+          const dateStr = value[TYPE_MARKERS.DATE] as string;
+          // Rich debug for DATE marker parsing
+          try {
+            const parsedMs = (() => {
+              try {
+                return new Date(dateStr).getTime();
+              } catch (err) {
+                return '[invalid]';
+              }
+            })();
+            if (isJestWorker()) {
+              console.debug(
+                '[SignalTree debug] restoreSpecialTypes DATE marker:',
+                {
+                  marker: dateStr,
+                  parsedMs,
+                }
+              );
+            }
+          } catch (err) {
+            try {
+              if (isJestWorker())
+                console.debug(
+                  '[SignalTree debug] restoreSpecialTypes DATE marker error:',
+                  String(err)
+                );
+            } catch {}
+          }
+
+          const created = new Date(dateStr);
+          try {
+            if (isJestWorker()) {
+              console.debug(
+                '[SignalTree debug] restoreSpecialTypes DATE created:',
+                {
+                  iso: created.toISOString
+                    ? created.toISOString()
+                    : String(created),
+                  time: (() => {
+                    try {
+                      return created.getTime();
+                    } catch {
+                      return '[unavailable]';
+                    }
+                  })(),
+                }
+              );
+            }
+          } catch (err) {
+            try {
+              if (isJestWorker())
+                console.debug(
+                  '[SignalTree debug] restoreSpecialTypes DATE created error:',
+                  String(err)
+                );
+            } catch {}
+          }
+
+          return created;
         }
         if (TYPE_MARKERS.REGEXP in value) {
           const regexpData = value[TYPE_MARKERS.REGEXP] as {
@@ -514,8 +642,245 @@ export function withSerialization<T extends Record<string, unknown>>(
       // Restore special types in the data
       const restoredData = restoreSpecialTypes(data) as T;
 
+      // Debugging: print restoredData preview under Jest to validate restoration
+      try {
+        if (isJestWorker()) {
+          console.debug(
+            '[SignalTree debug] restoredData preview:',
+            JSON.stringify(restoredData).slice(0, 500)
+          );
+        }
+      } catch {
+        // ignore
+      }
+
+      // Deep diagnostic scan: find DATE markers, ISO strings, and Date objects
+      try {
+        if (isJestWorker()) {
+          const findings: Array<{
+            path: string;
+            kind: string;
+            value: unknown;
+          }> = [];
+
+          function scan(obj: unknown, path = ''): void {
+            if (obj === null || obj === undefined) return;
+            // Marker objects (should be objects with TYPE_MARKERS keys)
+            if (typeof obj === 'object' && !Array.isArray(obj)) {
+              const o = obj as Record<string, unknown>;
+              // DATE marker
+              if (TYPE_MARKERS.DATE in o) {
+                const iso = o[TYPE_MARKERS.DATE] as unknown;
+                findings.push({ path, kind: 'DATE_MARKER', value: iso });
+                try {
+                  const dt = new Date(String(iso)).getTime();
+                  findings.push({
+                    path: path + '.__constructedDate',
+                    kind: 'DATE_MS',
+                    value: dt,
+                  });
+                } catch {}
+              }
+              // Recurse properties
+              for (const [k, v] of Object.entries(o)) {
+                scan(v, path ? `${path}.${k}` : k);
+              }
+              return;
+            }
+
+            // Arrays
+            if (Array.isArray(obj)) {
+              for (let i = 0; i < obj.length; i++) {
+                scan(obj[i], `${path}[${i}]`);
+              }
+              return;
+            }
+
+            // Strings that look like ISO dates
+            if (typeof obj === 'string') {
+              const isoLike =
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(.\d+)?Z$/.test(obj);
+              if (isoLike) {
+                try {
+                  findings.push({ path, kind: 'ISO_STRING', value: obj });
+                  findings.push({
+                    path: path + '.__parsedDate',
+                    kind: 'ISO_MS',
+                    value: new Date(obj).getTime(),
+                  });
+                } catch {}
+              }
+            }
+          }
+
+          scan(restoredData);
+          console.debug(
+            '[SignalTree debug] deep restoredData findings:',
+            findings
+          );
+        }
+      } catch {
+        /* ignore diagnostics failure */
+      }
+
+      // Debug: print type info for top-level restored properties when running tests
+      try {
+        if (isJestWorker()) {
+          const diag: Record<string, unknown> = {};
+          for (const k of Object.keys(
+            restoredData as Record<string, unknown>
+          )) {
+            const v = (restoredData as unknown as Record<string, unknown>)[k] as unknown;
+            diag[k] = {
+              typeof: typeof v,
+              isDate: v instanceof Date,
+              dateTime:
+                v instanceof Date
+                  ? (() => {
+                      try {
+                        return (v as Date).getTime();
+                      } catch {
+                        return '[unavailable]';
+                      }
+                    })()
+                  : undefined,
+              isRegExp: v instanceof RegExp,
+              isMap: v instanceof Map,
+              isSet: v instanceof Set,
+              preview: (() => {
+                try {
+                  return JSON.stringify(v).slice(0, 200);
+                } catch {
+                  return String(v);
+                }
+              })(),
+            };
+          }
+          console.debug('[SignalTree debug] restoredData types:', diag);
+        }
+      } catch {
+        /* ignore */
+      }
+
       // Use set with the full object to replace everything at once
+      // Normalize date-like strings into Date objects when the target
+      // signal currently holds a Date. This guards against cases where
+      // serialization produced plain ISO strings instead of type markers.
+      function normalizeDatesByTarget(targetNode: any, incoming: any) {
+        if (!incoming || typeof incoming !== 'object') return;
+
+        for (const k of Object.keys(incoming)) {
+          try {
+            const incomingVal = incoming[k];
+            const candidate = targetNode?.[k];
+
+            if (candidate && typeof candidate === 'function') {
+              // candidate is a signal or callable proxy
+              try {
+                const current = candidate();
+                if (
+                  typeof incomingVal === 'string' &&
+                  /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9:.Z+-]+$/.test(
+                    incomingVal
+                  ) &&
+                  current instanceof Date
+                ) {
+                  try {
+                    if (isJestWorker()) {
+                      try {
+                        console.debug(
+                          '[SignalTree debug] normalizeDatesByTarget will convert',
+                          {
+                            key: k,
+                            incomingVal,
+                            currentIsDate: current instanceof Date,
+                            currentTime:
+                              current instanceof Date
+                                ? current.getTime()
+                                : undefined,
+                          }
+                        );
+                      } catch {}
+                    }
+                  } catch {}
+                  incoming[k] = new Date(incomingVal);
+                } else if (incomingVal && typeof incomingVal === 'object') {
+                  // Recurse into nested proxies
+                  normalizeDatesByTarget(candidate, incomingVal);
+                }
+              } catch {
+                // ignore candidate introspection failures
+              }
+            } else if (incomingVal && typeof incomingVal === 'object') {
+              // No callable target; recurse to convert nested date strings
+              normalizeDatesByTarget(targetNode?.[k], incomingVal);
+            }
+          } catch {
+            /* ignore per-key errors */
+          }
+        }
+      }
+
+      try {
+        if (isJestWorker()) {
+          try {
+            console.debug(
+              '[SignalTree debug] incoming restoredData keys:',
+              Object.keys(restoredData as Record<string, unknown>)
+            );
+          } catch {}
+        }
+      } catch {}
+
+      try {
+        normalizeDatesByTarget(tree.$ as any, restoredData as any);
+      } catch (e) {
+        try {
+          if (isJestWorker())
+            console.debug(
+              '[SignalTree debug] normalizeDatesByTarget error:',
+              String(e)
+            );
+        } catch {}
+      }
+
+      try {
+        // Print incoming restoredData preview under Jest before set
+        if (isJestWorker()) {
+          try {
+            console.debug(
+              '[SignalTree debug] pre-set restoredData preview:',
+              JSON.stringify(restoredData).slice(0, 1000)
+            );
+          } catch {}
+        }
+      } catch {}
+
       tree.$.set(restoredData);
+
+      // Debug: after setting, print resulting signal values for top-level keys
+      try {
+        if (isJestWorker()) {
+          const post: Record<string, unknown> = {};
+          for (const k of Object.keys(
+            restoredData as Record<string, unknown>
+          )) {
+            try {
+              const candidate: any = (tree.$ as any)[k];
+              if (typeof candidate === 'function') {
+                post[k] = candidate();
+              } else {
+                post[k] = typeof candidate;
+              }
+            } catch {
+              post[k] = '[unreadable]';
+            }
+          }
+          console.debug('[SignalTree debug] post-set values:', post);
+        }
+      } catch {
+        /* ignore */
+      }
     };
 
     /**
@@ -538,14 +903,123 @@ export function withSerialization<T extends Record<string, unknown>>(
         fullConfig.preserveTypes
       ) as T;
 
+      // Ensure that any remaining special objects (Date/RegExp/Map/Set/BigInt/Symbol)
+      // are converted to marker objects before JSON.stringify. This guards
+      // against cases where unwrapObjectSafely returned Date instances or other
+      // specials directly.
+      function sanitizeStateForStringify(
+        input: unknown,
+        visited = new WeakSet()
+      ): unknown {
+        if (input === null || typeof input !== 'object') {
+          // primitives
+          return input;
+        }
+
+        if (visited.has(input as object)) return '[Circular Reference]';
+        visited.add(input as object);
+
+        // Dates/RegExp/Map/Set/BigInt/Symbol handling
+        try {
+          if (input instanceof Date) {
+            return { [TYPE_MARKERS.DATE]: input.toISOString() };
+          }
+          if (input instanceof RegExp) {
+            return {
+              [TYPE_MARKERS.REGEXP]: {
+                source: input.source,
+                flags: input.flags,
+              },
+            };
+          }
+          if (input instanceof Map) {
+            return {
+              [TYPE_MARKERS.MAP]: Array.from(
+                (input as Map<unknown, unknown>).entries()
+              ),
+            };
+          }
+          if (input instanceof Set) {
+            return {
+              [TYPE_MARKERS.SET]: Array.from((input as Set<unknown>).values()),
+            };
+          }
+        } catch {
+          // ignore
+        }
+
+        // BigInt and Symbol need typeof check
+        if (typeof input === 'object' && (input as any) === input) {
+          // Handle arrays
+          if (Array.isArray(input)) {
+            const out: unknown[] = [];
+            for (const item of input as Array<unknown>) {
+              out.push(sanitizeStateForStringify(item, visited));
+            }
+            visited.delete(input as object);
+            return out;
+          }
+
+          const result: Record<string, unknown> = {};
+          for (const [k, v] of Object.entries(
+            input as Record<string, unknown>
+          )) {
+            // BigInt and Symbol on property values
+            if (typeof v === 'bigint') {
+              result[k] = { [TYPE_MARKERS.BIGINT]: v.toString() };
+            } else if (typeof v === 'symbol') {
+              result[k] = { [TYPE_MARKERS.SYMBOL]: v.toString() };
+            } else {
+              result[k] = sanitizeStateForStringify(v, visited);
+            }
+          }
+          visited.delete(input as object);
+          return result;
+        }
+
+        visited.delete(input as object);
+        return input;
+      }
+
+      const sanitized = sanitizeStateForStringify(state) as T;
+
+      // Debug: inspect the raw state returned by unwrapObjectSafely so we can
+      // determine whether special-type markers (e.g. DATE) are present.
+      try {
+        if (isJestWorker()) {
+          const diag: Record<string, unknown> = {};
+          if (state && typeof state === 'object') {
+            for (const k of Object.keys(state as Record<string, unknown>)) {
+              const v: any = (state as any)[k];
+              diag[k] = {
+                typeof: typeof v,
+                isDateObj: v instanceof Date,
+                isMarkerObject:
+                  v && typeof v === 'object' && TYPE_MARKERS.DATE in v,
+                preview: (() => {
+                  try {
+                    return JSON.stringify(v).slice(0, 200);
+                  } catch {
+                    return String(v);
+                  }
+                })(),
+              };
+            }
+          }
+          console.debug('[SignalTree debug] serialize raw state types:', diag);
+        }
+      } catch {
+        /* ignore */
+      }
+
       // Detect circular references if needed
       const circularPaths = fullConfig.handleCircular
-        ? detectCircularReferences(state)
+        ? detectCircularReferences(sanitized)
         : [];
 
       // Prepare data
       const data: SerializedState<T> = {
-        data: state,
+        data: sanitized,
       };
 
       // Add metadata if requested
@@ -559,7 +1033,22 @@ export function withSerialization<T extends Record<string, unknown>>(
 
       // Serialize with custom replacer
       const replacer = createReplacer(fullConfig);
-      return JSON.stringify(data, replacer, 2);
+      const serialized = JSON.stringify(data, replacer, 2);
+
+      // Debug in test environment to help diagnose failing spec
+      try {
+        if (isJestWorker()) {
+          // Print a compact preview
+          console.debug(
+            '[SignalTree debug] serialized preview:',
+            serialized.slice(0, 500)
+          );
+        }
+      } catch {
+        // ignore
+      }
+
+      return serialized;
     };
 
     /**
@@ -576,8 +1065,34 @@ export function withSerialization<T extends Record<string, unknown>>(
       };
 
       try {
+        // Debug: show incoming JSON preview
+        try {
+          if (isJestWorker())
+            console.debug(
+              '[SignalTree debug] deserialize incoming json preview:',
+              String(json).slice(0, 1000)
+            );
+        } catch {}
+
         // Parse with simple JSON.parse (no custom reviver)
         const parsed: SerializedState<T> = JSON.parse(json);
+
+        try {
+          if (isJestWorker()) {
+            try {
+              console.debug(
+                '[SignalTree debug] deserialize parsed data keys:',
+                Object.keys((parsed?.data || {}) as Record<string, unknown>)
+              );
+              try {
+                console.debug(
+                  '[SignalTree debug] deserialize parsed data preview:',
+                  JSON.stringify(parsed?.data).slice(0, 1000)
+                );
+              } catch {}
+            } catch {}
+          }
+        } catch {}
 
         // Extract data and metadata
         const { data, metadata } = parsed;

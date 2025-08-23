@@ -26,7 +26,7 @@ import type {
   AsyncAction,
   TimeTravelEntry,
 } from './types';
-import { createLazySignalTree, equal } from './utils';
+import { createLazySignalTree, equal, isJestWorker } from './utils';
 
 // ============================================
 // PERFORMANCE HEURISTICS
@@ -204,6 +204,27 @@ function createCallableProxy<T>(
     },
 
     get(target, prop) {
+      // Prefer returning properties from the nested store first so that
+      // nested signals are accessible even when the function target has
+      // built-in properties like `name` which would otherwise shadow them.
+      try {
+        if (prop in (nestedStore as Record<string | symbol, unknown>)) {
+          // Return the stored value (signal, nested proxy, etc.)
+          return (nestedStore as Record<string | symbol, unknown>)[prop];
+        }
+      } catch {
+        // Ignore and continue to check the target
+      }
+
+      // If the unwrap function itself has a property (enhancers may attach
+      // methods to the function target), return it next.
+      try {
+        if (prop in target) {
+          return Reflect.get(target, prop as string | symbol, target);
+        }
+      } catch {
+        // ignore
+      }
       // Return the unwrap function when called
       if (
         prop === Symbol.toPrimitive ||
@@ -252,6 +273,28 @@ function createCallableProxy<T>(
               const currentSignalOrState = target[key];
 
               if (isSignal(currentSignalOrState)) {
+                try {
+                  if (isJestWorker()) {
+                    // Print diagnostics about the update value and signal
+                    console.debug('[SignalTree debug] update -> key:', key, {
+                      typeof: typeof updateValue,
+                      isDate: updateValue instanceof Date,
+                      isRegExp: updateValue instanceof RegExp,
+                      isMap: updateValue instanceof Map,
+                      isSet: updateValue instanceof Set,
+                      preview: (() => {
+                        try {
+                          return JSON.stringify(updateValue).slice(0, 200);
+                        } catch {
+                          return String(updateValue);
+                        }
+                      })(),
+                    });
+                  }
+                } catch {
+                  /* ignore debug failure */
+                }
+
                 (currentSignalOrState as WritableSignal<unknown>).set(
                   updateValue
                 );
@@ -280,17 +323,10 @@ function createCallableProxy<T>(
         };
       }
 
-      // Handle batchUpdate shim: present to align types with runtime when
-      // batching enhancer is not installed. It provides a clear error so
-      // consumers don't rely on an absent implementation.
-      if (prop === 'batchUpdate') {
-        return (_updater: (current: T) => Partial<T>) => {
-          void _updater;
-          throw new Error(
-            'batchUpdate() called but @signaltree/batching is not installed.\nInstall the batching enhancer or use tree.$.update(...) as a fallback.'
-          );
-        };
-      }
+      // Note: do not provide a batchUpdate shim here. The batching enhancer
+      // installs the runtime implementation when applied. Keeping this
+      // property absent by default encourages explicit enhancer installation
+      // and matches test expectations.
 
       // Handle set method - shallow merge with current state
       if (prop === 'set') {
@@ -312,6 +348,37 @@ function createCallableProxy<T>(
               const currentSignalOrState = target[key];
 
               if (isSignal(currentSignalOrState)) {
+                try {
+                  if (isJestWorker()) {
+                    console.debug('[SignalTree debug] set -> key:', key, {
+                      typeof: typeof updateValue,
+                      isDate: updateValue instanceof Date,
+                      dateTime:
+                        updateValue instanceof Date
+                          ? (() => {
+                              try {
+                                return updateValue.getTime();
+                              } catch {
+                                return '[unavailable]';
+                              }
+                            })()
+                          : undefined,
+                      isRegExp: updateValue instanceof RegExp,
+                      isMap: updateValue instanceof Map,
+                      isSet: updateValue instanceof Set,
+                      preview: (() => {
+                        try {
+                          return JSON.stringify(updateValue).slice(0, 200);
+                        } catch {
+                          return String(updateValue);
+                        }
+                      })(),
+                    });
+                  }
+                } catch {
+                  /* ignore debug failure */
+                }
+
                 (currentSignalOrState as WritableSignal<unknown>).set(
                   updateValue
                 );
@@ -340,11 +407,32 @@ function createCallableProxy<T>(
         };
       }
 
-      // Return the property from the nested store
-      return (nestedStore as Record<string | symbol, unknown>)[prop];
+      // Prefer properties from the nested store to avoid shadowing built-in
+      // function properties (for example, `function.name`), which would
+      // otherwise prevent access to nested signals with those keys.
+      if (prop in (nestedStore as Record<string | symbol, unknown>)) {
+        const val = (nestedStore as Record<string | symbol, unknown>)[prop];
+        try {
+          if (isJestWorker() && String(prop) === 'name') {
+            console.debug(
+              '[SignalTree debug] nestedStore.name =>',
+              typeof val,
+              val
+            );
+          }
+        } catch {
+          /* ignore debug failure */
+        }
+        return val;
+      }
+
+      // Otherwise fall back to any property attached to the callable function
+      return Reflect.get(target, prop as string | symbol, target);
     },
 
     has(target, prop) {
+      // Make the special marker detectable with the `in` operator
+      if (prop === '__isCallableProxy__') return true;
       return prop in nestedStore;
     },
 

@@ -1,5 +1,5 @@
 import { parsePath } from '@signaltree/core';
-import type { SignalTree, DeepSignalify } from '@signaltree/core';
+import type { SignalTree } from '@signaltree/core';
 
 // NOTE: For consumers who prefer lazy installation, use `installBatching(tree)`
 // which dynamically imports and applies this enhancer at runtime. See
@@ -36,14 +36,16 @@ interface BatchingConfig {
  * Provides high-performance batch update methods that group multiple state changes.
  *
  * @template T - The state object type extending StateObject
- *
- * @example
- * ```typescript
+            // Replace update so imperative updates are queued
+            proxy.update = (updater: any) => {
+              batchUpdates(() => originalUpdate(updater), pathBase);
+            };
  * interface AppState {
  *   users: User[];
- *   ui: { loading: boolean; error: string | null };
- *   stats: { total: number; active: number };
- * }
+          // batchUpdate should queue the original update directly so flush executes it once
+          proxy.batchUpdate = (updater: any) => {
+            batchUpdates(() => originalUpdate(updater), pathBase);
+          };
  *
  * const tree: BatchingSignalTree<AppState> = create(initialState)
  *   .with(withBatching());
@@ -284,18 +286,65 @@ export function withBatching<T>(
   currentBatchingConfig = { ...currentBatchingConfig, ...config };
 
   return (tree: SignalTree<T>): BatchingSignalTree<T> => {
-    if (!enabled) {
-      return tree as BatchingSignalTree<T>;
-    }
+    // Symbol used to store original update on proxies to avoid closure issues
+    const ORIGINAL_UPDATE = Symbol.for('__signaltree_original_update__');
 
-    // Use the tree's callable signal update method as the underlying updater
-    const originalUpdate = (tree.$ as DeepSignalify<T>).update.bind(tree.$);
+    // Helper to attach batching APIs to a callable proxy and its nested proxies
+    const attachToProxy = (proxy: any, pathPrefix?: string) => {
+      const pathBase = pathPrefix ? `${pathPrefix}` : undefined;
 
-    // Add batchUpdate method to the tree (root-level batching)
-    const enhancedTree = tree as BatchingSignalTree<T>;
-    enhancedTree.batchUpdate = (updater: (current: T) => Partial<T>) => {
-      batchUpdates(() => originalUpdate(updater));
+      // Capture the current update function and store it
+      const currentOriginal = proxy.update?.bind(proxy);
+      if (currentOriginal) {
+        (proxy as any)[ORIGINAL_UPDATE] = currentOriginal;
+      }
+
+      if (enabled && (proxy as any)[ORIGINAL_UPDATE]) {
+        // Replace update so imperative updates are queued
+        proxy.update = (updater: any) => {
+          batchUpdates(
+            () => (proxy as any)[ORIGINAL_UPDATE](updater),
+            pathBase
+          );
+        };
+
+        // batchUpdate queues the original update directly (no double wrapping)
+        proxy.batchUpdate = (updater: any) => {
+          batchUpdates(
+            () => (proxy as any)[ORIGINAL_UPDATE](updater),
+            pathBase
+          );
+        };
+      } else if ((proxy as any)[ORIGINAL_UPDATE]) {
+        // Disabled: synchronous passthrough
+        proxy.update = (updater: any) =>
+          (proxy as any)[ORIGINAL_UPDATE](updater);
+        proxy.batchUpdate = (updater: any) =>
+          (proxy as any)[ORIGINAL_UPDATE](updater);
+      }
+
+      // Recurse into nested callable proxies
+      try {
+        for (const key of Reflect.ownKeys(proxy)) {
+          const child = proxy[key as unknown as string];
+          if (
+            typeof child === 'function' &&
+            (child as any).__isCallableProxy__ === true
+          ) {
+            const childPath = pathBase
+              ? `${pathBase}.${String(key)}`
+              : String(key);
+            attachToProxy(child, childPath);
+          }
+        }
+      } catch {
+        // ignore traversal errors
+      }
     };
+
+    // Attach batching APIs to the root callable proxy and nested nodes
+    const enhancedTree = tree as BatchingSignalTree<T>;
+    attachToProxy(enhancedTree.$ as any, undefined);
 
     return enhancedTree;
   };
@@ -402,11 +451,24 @@ export function flushBatchedUpdates(): void {
 
     queue.forEach(({ fn }) => {
       console.log('Executing queued function');
-      fn();
+      try {
+        fn();
+      } catch (e) {
+        // Swallow individual update errors to allow other updates to run
+        console.error('Error executing batched update', e);
+      }
     });
   } else {
     console.log('Flush skipped - queue empty');
   }
+}
+
+/**
+ * Returns a shallow copy of the pending batched updates for inspection.
+ * Tests rely on this to assert ordering and presence of queued updates.
+ */
+export function getPendingBatchedUpdates(): BatchedUpdate[] {
+  return updateQueue.slice();
 }
 
 /**

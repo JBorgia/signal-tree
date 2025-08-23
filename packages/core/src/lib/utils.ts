@@ -494,3 +494,33 @@ export function shallowEqual<T>(a: T, b: T): boolean {
 
   return false;
 }
+
+/**
+ * Detect if we're running inside a Jest worker process without directly
+ * referencing `process.env` in multiple places. This avoids lint rules and
+ * bundler issues while providing a single, safe helper to consume elsewhere.
+ */
+export function isJestWorker(): boolean {
+  try {
+    const g =
+      typeof globalThis !== 'undefined'
+        ? (globalThis as unknown)
+        : typeof window !== 'undefined'
+        ? (window as unknown)
+        : typeof self !== 'undefined'
+        ? (self as unknown)
+        : undefined;
+    const gg = g as
+      | { process?: { env?: Record<string, string | undefined> } }
+      | undefined;
+    return !!(
+      gg &&
+      gg.process &&
+      gg.process.env &&
+      (gg.process.env['JEST_WORKER_ID'] || gg.process.env['JEST_WORKER_ID'])
+    );
+  } catch {
+    // If anything throws during environment detection, assume not running in Jest
+    return false;
+  }
+}

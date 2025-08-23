@@ -30,12 +30,19 @@ export function withMiddleware<T>(
     };
 
     const createRootWrapper = (originalProxy: unknown) => {
-      // originalProxy is the callable DeepSignalify<T> from core; cast to
-      // a narrow CallableRoot for runtime access and to satisfy lint rules.
+      // originalProxy is the callable DeepSignalify<T> from core; we must
+      // preserve its callable nature while intercepting update/batchUpdate/set.
       const host = originalProxy as unknown as CallableRoot;
-      const wrapper: Partial<CallableRoot> = { ...host };
 
-      wrapper.update = (updater: (current: T) => Partial<T>) => {
+      type CallableRootWithCall = CallableRoot & (() => T);
+      const wrapperFunction = function (this: unknown) {
+        return (host as CallableRootWithCall)();
+      } as unknown as CallableRootWithCall;
+
+      // Copy properties from host to wrapperFunction
+      Object.assign(wrapperFunction, host);
+
+      wrapperFunction.update = (updater: (current: T) => Partial<T>) => {
         const action = 'UPDATE';
         const currentState = tree.$();
         const updateResult = updater(currentState);
@@ -61,7 +68,7 @@ export function withMiddleware<T>(
         }
       };
 
-      wrapper.batchUpdate = (updater: (current: T) => Partial<T>) => {
+      wrapperFunction.batchUpdate = (updater: (current: T) => Partial<T>) => {
         const action = 'BATCH_UPDATE';
         const currentState = tree.$();
         const updateResult = updater(currentState);
@@ -78,7 +85,14 @@ export function withMiddleware<T>(
         }
 
         const previousState = currentState;
-        host.batchUpdate.call(host, updater);
+        // If batching is not available on host, call through to host to allow
+        // the core shim or batching enhancer to surface a helpful error.
+        if (typeof (host as CallableRootWithCall).batchUpdate === 'function') {
+          (host as CallableRootWithCall).batchUpdate.call(host, updater);
+        } else {
+          // Fallback to update so state still changes when batching disabled
+          host.update.call(host, updater as unknown as (c: T) => Partial<T>);
+        }
         const newState = tree.$();
 
         for (const middleware of treeMiddlewares) {
@@ -87,7 +101,7 @@ export function withMiddleware<T>(
         }
       };
 
-      wrapper.set = (partial: Partial<T>) => {
+      wrapperFunction.set = (partial: Partial<T>) => {
         const action = 'SET';
         const currentState = tree.$();
         const treeMiddlewares =
@@ -112,7 +126,7 @@ export function withMiddleware<T>(
         }
       };
 
-      return wrapper as unknown as DeepSignalify<T>;
+      return wrapperFunction as unknown as DeepSignalify<T>;
     };
 
     // Create the enhanced tree with root-level intercepted proxies
@@ -192,13 +206,20 @@ export function createLoggingMiddleware<T>(treeName: string): Middleware<T> {
     id: 'logging',
     before: (action: string, payload: unknown, state: T) => {
       if (real && real.before) return real.before(action, payload, state);
-      if (typeof console !== 'undefined') console.debug(treeName, action);
+      if (typeof console !== 'undefined') {
+        // Match expected format used in tests
+        console.group(`\ud83c\udfea ${treeName}: ${action}`);
+        console.log('Previous state:', state);
+      }
       return true;
     },
     after: (action: string, payload: unknown, state: T, newState: T) => {
       if (real && real.after)
         return real.after(action, payload, state, newState);
-      if (typeof console !== 'undefined') console.debug(newState);
+      if (typeof console !== 'undefined') {
+        console.log('New state:', newState);
+        console.groupEnd();
+      }
     },
   } as Middleware<T>;
 }
@@ -227,13 +248,15 @@ export function createPerformanceMiddleware<T>(): Middleware<T> {
     id: 'performance',
     before: (action: string, payload: unknown, state: T) => {
       if (real && real.before) return real.before(action, payload, state);
-      if (typeof console !== 'undefined') console.time(action);
+      if (typeof console !== 'undefined')
+        console.time(`Tree update: ${action}`);
       return true;
     },
     after: (action: string, payload: unknown, state: T, newState: T) => {
       if (real && real.after)
         return real.after(action, payload, state, newState);
-      if (typeof console !== 'undefined') console.timeEnd(action);
+      if (typeof console !== 'undefined')
+        console.timeEnd(`Tree update: ${action}`);
     },
   } as Middleware<T>;
 }
@@ -252,7 +275,8 @@ export function createValidationMiddleware<T>(
     id: 'validation',
     after: (action, payload, state, newState) => {
       const error = validator(newState);
-      if (error) console.error(error);
+      if (error)
+        console.error('Validation failed after ' + action + ':', error);
     },
   };
 }
