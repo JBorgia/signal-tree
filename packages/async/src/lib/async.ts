@@ -488,8 +488,8 @@ export function withAsync<T>(
       stateProxy.asyncAction = enhancedTree.asyncAction.bind(tree);
       stateProxy.loadData = enhancedTree.loadData.bind(tree);
       stateProxy.submitForm = enhancedTree.submitForm.bind(tree);
-    } catch {
-      // ignore - best-effort only
+    } catch (err) {
+      void err;
     }
 
     return enhancedTree;

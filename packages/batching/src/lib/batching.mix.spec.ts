@@ -17,14 +17,16 @@ describe('Batching - mixed update/batch ordering', () => {
     // Queue an imperative update (should be queued but not schedule flush)
     tree.$.update(() => ({ x: { v: tree.state.x.v() + 1 } }));
 
-    // Queue a batched update which should schedule flush
-    tree.$.x.batchUpdate(() => ({ v: tree.state.x.v() + 10 }));
+    // Queue a batched update at root level (v1.1.6 design)
+    tree.$.batchUpdate((state) => ({
+      x: { v: state.x.v + 10 },
+    }));
 
-    // At this point, we expect two queued updates
+    // At this point, we expect updates to be queued
     const pending = getPendingBatchedUpdates();
     expect(pending.length).toBeGreaterThanOrEqual(1);
 
-    // Flush and assert final state - deeper batch should have run with the queued imperative update considered
+    // Flush and assert final state
     flushBatchedUpdates();
 
     expect(tree.state.x.v()).toBeGreaterThanOrEqual(11);

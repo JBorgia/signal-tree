@@ -1,10 +1,11 @@
-import { signalTree } from '@signaltree/core';
+import { signalTree, type SignalTree } from '@signaltree/core';
 import {
   withDevTools,
   enableDevTools,
   withFullDevTools,
   withProductionDevTools,
   ModuleMetadata,
+  attachDevToolsSync,
 } from './devtools';
 
 describe('Modular DevTools', () => {
@@ -41,6 +42,10 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'TestTree' })
       );
+      // Ensure tests observe the fully-featured implementation synchronously
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'TestTree',
+      });
 
       expect(tree.__devTools).toBeDefined();
       expect(tree.__devTools.activityTracker).toBeDefined();
@@ -52,6 +57,9 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'TestTree' })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'TestTree',
+      });
 
       const modules = ['core', 'batching', 'async'];
       tree.__devTools.trackComposition(modules);
@@ -64,6 +72,9 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'TestTree' })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'TestTree',
+      });
 
       const profileId = tree.__devTools.startModuleProfiling('testModule');
       expect(profileId).toContain('testModule');
@@ -77,6 +88,9 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'TestTree' })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'TestTree',
+      });
 
       tree.__devTools.activityTracker.trackMethodCall(
         'testModule',
@@ -96,6 +110,10 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'TestTree' })
       );
+      // Ensure full impl is attached for this test
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'TestTree',
+      });
 
       const error = new Error('Test error');
       tree.__devTools.activityTracker.trackError(
@@ -114,6 +132,9 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'TestTree' })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'TestTree',
+      });
 
       const modules = ['core', 'async'];
       tree.__devTools.logger.logComposition(modules, 'pipe');
@@ -128,6 +149,10 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'TestTree' })
       );
+      // Ensure tests observe full implementation synchronously
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'TestTree',
+      });
 
       const modules = ['core', 'async'];
       tree.__devTools.trackComposition(modules);
@@ -151,6 +176,10 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'TestTree', performanceThreshold: 10 })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'TestTree',
+        performanceThreshold: 10,
+      });
 
       tree.__devTools.logger.logPerformanceWarning(
         'slowModule',
@@ -168,6 +197,10 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'TestTree', enableBrowserDevTools: false })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'TestTree',
+        enableBrowserDevTools: false,
+      });
 
       tree.__devTools.connectDevTools('TestConnection');
 
@@ -229,6 +262,9 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'PerfTree' })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'PerfTree',
+      });
 
       const initialMetrics = tree.__devTools.metrics();
       expect(initialMetrics.totalUpdates).toBe(0);
@@ -252,6 +288,10 @@ describe('Modular DevTools', () => {
           performanceThreshold: 0, // Very low threshold to trigger warning
         })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'SlowTree',
+        performanceThreshold: 0,
+      });
 
       tree.$.update((state) => ({
         ...state,
@@ -281,6 +321,9 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'LogTree' })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'LogTree',
+      });
 
       tree.__devTools.logger.logComposition(['module1', 'module2'], 'pipe');
       tree.__devTools.logger.logMethodExecution(
@@ -302,6 +345,9 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'MultiModuleTree' })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'MultiModuleTree',
+      });
 
       tree.__devTools.activityTracker.trackMethodCall('module1', 'method1', 10);
       tree.__devTools.activityTracker.trackMethodCall('module2', 'method2', 20);
@@ -324,6 +370,9 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'AvgTree' })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'AvgTree',
+      });
 
       tree.__devTools.activityTracker.trackMethodCall('module1', 'method1', 10);
       tree.__devTools.activityTracker.trackMethodCall('module1', 'method2', 20);
@@ -338,6 +387,9 @@ describe('Modular DevTools', () => {
       const tree = signalTree(initialState).pipe(
         withDevTools({ treeName: 'ErrorTree' })
       );
+      attachDevToolsSync(tree as unknown as SignalTree<TestState>, {
+        treeName: 'ErrorTree',
+      });
 
       tree.__devTools.activityTracker.trackMethodCall('module1', 'method1', 10);
       tree.__devTools.activityTracker.trackError('module1', new Error('test'));

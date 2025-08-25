@@ -277,7 +277,8 @@ function unwrapObjectSafely(
 
     visited.delete(obj);
     return result;
-  } catch {
+  } catch (err) {
+    void err;
     visited.delete(obj);
     return '[Serialization Error]';
   }

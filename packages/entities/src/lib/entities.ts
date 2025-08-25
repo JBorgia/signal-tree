@@ -215,8 +215,8 @@ export function withEntities(config: EntityConfig = {}) {
       >(key: keyof T) {
         return createEntityHelpers<T, E>(tree, key);
       };
-    } catch {
-      // best-effort only
+    } catch (err) {
+      void err;
     }
 
     return enhancedTree;

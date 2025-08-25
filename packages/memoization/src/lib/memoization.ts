@@ -293,7 +293,8 @@ export function withMemoization<T>(
       stateProxy.memoizedUpdate = treeHelpers.memoizedUpdate.bind(tree);
       stateProxy.clearMemoCache = treeHelpers.clearMemoCache.bind(tree);
       stateProxy.getCacheStats = treeHelpers.getCacheStats.bind(tree);
-    } catch {
+    } catch (err) {
+      void err;
       // best-effort only; don't block runtime if the callable proxy shape
       // doesn't accept extra properties in some environments.
     }

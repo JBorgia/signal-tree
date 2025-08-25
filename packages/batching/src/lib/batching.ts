@@ -180,7 +180,26 @@ function flushUpdates(): void {
     queue.sort((a, b) => (b.depth ?? 0) - (a.depth ?? 0));
 
     try {
-      queue.forEach(({ fn }) => fn());
+      queue.forEach(({ fn }) => {
+        const started =
+          typeof performance !== 'undefined' && performance.now
+            ? performance.now()
+            : Date.now();
+        fn();
+        const duration =
+          (typeof performance !== 'undefined' && performance.now
+            ? performance.now()
+            : Date.now()) - started;
+        try {
+          const g = globalThis as unknown as {
+            __signaltree_devtools_track?: (m: string, d: number) => void;
+          };
+          const hook = g.__signaltree_devtools_track;
+          if (typeof hook === 'function') hook('core', duration);
+        } catch (err) {
+          void err;
+        }
+      });
     } finally {
       isUpdating = false;
     }
@@ -284,18 +303,219 @@ export function withBatching<T>(
   currentBatchingConfig = { ...currentBatchingConfig, ...config };
 
   return (tree: SignalTree<T>): BatchingSignalTree<T> => {
-    if (!enabled) {
-      return tree as BatchingSignalTree<T>;
-    }
-
-    // Use the tree's callable signal update method as the underlying updater
-    const originalUpdate = (tree.$ as DeepSignalify<T>).update.bind(tree.$);
-
     // Add batchUpdate method to the tree (root-level batching)
     const enhancedTree = tree as BatchingSignalTree<T>;
+
+    // Do not capture the underlying update implementation at install time.
+    // Look up the current `update` on `tree.$` at call-time so enhancers
+    // that wrap or replace `tree.$` remain compatible.
+    type CallableState = (() => T) & Record<PropertyKey, unknown>;
+
+    type UpdateFn = (
+      updaterOrPartial: ((current: T) => Partial<T>) | Partial<T>
+    ) => void;
+
     enhancedTree.batchUpdate = (updater: (current: T) => Partial<T>) => {
-      batchUpdates(() => originalUpdate(updater));
+      const rootProxy = enhancedTree.$ as unknown as CallableState;
+      const maybeUpdate = Reflect.get(rootProxy, 'update');
+      const updateFn =
+        typeof maybeUpdate === 'function'
+          ? (maybeUpdate as UpdateFn).bind(rootProxy)
+          : undefined;
+
+      if (!enabled) {
+        if (updateFn) {
+          updateFn(updater);
+        } else {
+          const root = tree.$ as unknown as DeepSignalify<T>;
+          if (typeof root.update === 'function') {
+            const u = root.update as UpdateFn;
+            u(updater);
+          }
+        }
+        return;
+      }
+
+      if (updateFn) {
+        batchUpdates(() => updateFn(updater));
+      } else {
+        const root = tree.$ as unknown as DeepSignalify<T>;
+        if (typeof root.update === 'function') {
+          const u = root.update as UpdateFn;
+          batchUpdates(() => u(updater));
+        }
+      }
     };
+
+    // Add batchUpdate to tree.$ (root callable proxy) only, following v1.1.6 approach
+    // for optimal performance and bundle size
+
+    // Since tree.$ is a callable proxy that may not support direct property assignment,
+    // we need to wrap it with our own proxy that intercepts batchUpdate access
+    try {
+      const originalProxy = tree.$;
+      // If the original callable proxy exposes an `update` function, store
+      // a non-enumerable reference to the raw update on the proxy object so
+      // downstream enhancers (for example devtools) can instrument the
+      // actual update implementation even when wrappers/proxies are used.
+      try {
+        const possibleUpdate = Reflect.get(originalProxy as object, 'update');
+        if (typeof possibleUpdate === 'function') {
+          try {
+            Object.defineProperty(originalProxy as object, '__rawUpdate', {
+              value: (
+                possibleUpdate as (
+                  u: ((c: T) => Partial<T>) | Partial<T>
+                ) => unknown
+              ).bind(originalProxy),
+              configurable: true,
+              enumerable: false,
+              writable: false,
+            });
+          } catch (err) {
+            void err;
+          }
+        }
+      } catch (err) {
+        void err;
+      }
+      const wrappedProxy = new Proxy(originalProxy as CallableState, {
+        apply(target, thisArg, args) {
+          return Reflect.apply(
+            target as CallableState,
+            thisArg,
+            args as unknown[]
+          );
+        },
+        get(target, prop, receiver) {
+          if (prop === 'batchUpdate') {
+            return (updater: (current: T) => Partial<T>) => {
+              // Use the proxy target (the original callable state) when
+              // resolving the underlying update implementation. Accessing
+              // `enhancedTree.$` here would return the wrapped proxy and
+              // create a recursive loop.
+              const maybeUpdate = Reflect.get(target as object, 'update');
+              const updateFn =
+                typeof maybeUpdate === 'function'
+                  ? (maybeUpdate as UpdateFn).bind(target)
+                  : undefined;
+
+              if (enabled) {
+                if (updateFn) {
+                  batchUpdates(() => updateFn(updater));
+                } else {
+                  const root = (
+                    enhancedTree as unknown as { $: DeepSignalify<T> }
+                  ).$;
+                  if (typeof (root as DeepSignalify<T>).update === 'function') {
+                    const u = (root as DeepSignalify<T>).update as UpdateFn;
+                    batchUpdates(() => u(updater));
+                  }
+                }
+              } else {
+                if (updateFn) {
+                  updateFn(updater);
+                } else {
+                  const root = (
+                    enhancedTree as unknown as { $: DeepSignalify<T> }
+                  ).$;
+                  if (typeof (root as DeepSignalify<T>).update === 'function') {
+                    const u = (root as DeepSignalify<T>).update as UpdateFn;
+                    u(updater);
+                  }
+                }
+              }
+            };
+          }
+          if (prop === 'update') {
+            return (updater: ((current: T) => Partial<T>) | Partial<T>) => {
+              // Resolve the actual underlying update on the original target
+              // to avoid re-entering this same trap.
+              const maybeUpdate = Reflect.get(target as object, 'update');
+              const updateFn =
+                typeof maybeUpdate === 'function'
+                  ? (maybeUpdate as UpdateFn).bind(target)
+                  : undefined;
+
+              if (!enabled) {
+                if (updateFn) return updateFn(updater);
+                return;
+              }
+
+              if (updateFn) {
+                // Queue the actual update via batchUpdates
+                batchUpdates(() => updateFn(updater));
+              } else {
+                const root = (
+                  enhancedTree as unknown as { $: DeepSignalify<T> }
+                ).$;
+                if (typeof (root as DeepSignalify<T>).update === 'function') {
+                  const u = (root as DeepSignalify<T>).update as UpdateFn;
+                  batchUpdates(() => u(updater));
+                }
+              }
+            };
+          }
+          const val = Reflect.get(target, prop, receiver);
+          return val;
+        },
+        has(target, prop) {
+          if (prop === 'batchUpdate') return true;
+          return Reflect.has(target, prop);
+        },
+        ownKeys(target) {
+          const keys = Reflect.ownKeys(target);
+          // Don't include batchUpdate in enumeration to keep it non-enumerable
+          return keys;
+        },
+        getOwnPropertyDescriptor(target, prop) {
+          if (prop === 'batchUpdate') {
+            return {
+              configurable: true,
+              enumerable: false,
+              writable: true,
+              value: (updater: (current: T) => Partial<T>) => {
+                // Read the underlying update directly from the original proxy
+                // target to avoid triggering the wrapper's traps.
+                const maybeUpdate = Reflect.get(target, 'update');
+                const updateFn =
+                  typeof maybeUpdate === 'function'
+                    ? (maybeUpdate as UpdateFn).bind(target)
+                    : undefined;
+
+                if (enabled) {
+                  if (updateFn) {
+                    batchUpdates(() => updateFn(updater));
+                  } else {
+                    const root = tree.$ as unknown as DeepSignalify<T>;
+                    if (typeof root.update === 'function') {
+                      const u = root.update as UpdateFn;
+                      batchUpdates(() => u(updater));
+                    }
+                  }
+                } else {
+                  if (updateFn) {
+                    updateFn(updater);
+                  } else {
+                    const root = tree.$ as unknown as DeepSignalify<T>;
+                    if (typeof root.update === 'function') {
+                      const u = root.update as UpdateFn;
+                      u(updater);
+                    }
+                  }
+                }
+              },
+            } as PropertyDescriptor;
+          }
+          return Reflect.getOwnPropertyDescriptor(target, prop);
+        },
+      });
+
+      // Replace tree.$ with our wrapped proxy
+      (enhancedTree as unknown as { $: unknown }).$ = wrappedProxy;
+    } catch (err) {
+      void err;
+    }
 
     return enhancedTree;
   };
@@ -384,28 +604,40 @@ export function withHighPerformanceBatching<T>() {
  * ```
  */
 export function flushBatchedUpdates(): void {
-  console.log(
-    'flushBatchedUpdates called, queue length:',
-    updateQueue.length,
-    'isUpdating:',
-    isUpdating
-  );
   if (updateQueue.length > 0) {
     // Force flush regardless of isUpdating state
     const queue = updateQueue.slice();
     updateQueue = [];
     isUpdating = false; // Reset the updating flag
-    console.log('Flushing', queue.length, 'updates');
+    // Clear any scheduled flush so we don't leave timers running during tests
+    if (flushTimeoutId !== undefined) {
+      clearTimeout(flushTimeoutId);
+      flushTimeoutId = undefined;
+    }
 
     // Sort by depth (deepest first) for optimal update propagation
     queue.sort((a, b) => (b.depth ?? 0) - (a.depth ?? 0));
 
     queue.forEach(({ fn }) => {
-      console.log('Executing queued function');
+      const started =
+        typeof performance !== 'undefined' && performance.now
+          ? performance.now()
+          : Date.now();
       fn();
+      const duration =
+        (typeof performance !== 'undefined' && performance.now
+          ? performance.now()
+          : Date.now()) - started;
+      try {
+        const g = globalThis as unknown as {
+          __signaltree_devtools_track?: (m: string, d: number) => void;
+        };
+        const hook = g.__signaltree_devtools_track;
+        if (typeof hook === 'function') hook('core', duration);
+      } catch (err) {
+        void err;
+      }
     });
-  } else {
-    console.log('Flush skipped - queue empty');
   }
 }
 
@@ -421,7 +653,6 @@ export function flushBatchedUpdates(): void {
  * tree.batchUpdate(() => ({ loading: true }));
  *
  * if (hasPendingUpdates()) {
- *   console.log('Updates are queued for processing');
  *   flushBatchedUpdates(); // Process them now if needed
  * }
  *
@@ -485,4 +716,22 @@ export function hasPendingUpdates(): boolean {
  */
 export function getBatchQueueSize(): number {
   return updateQueue.length;
+}
+
+/**
+ * Test helper: expose pending batched updates for unit tests.
+ * Returns a shallow copy of the queued update metadata so tests can assert
+ * ordering/depth/path without mutating the internal queue.
+ */
+export function getPendingBatchedUpdates() {
+  return updateQueue.slice();
+}
+
+/** Test helper to clear pending updates in between tests. */
+export function clearPendingBatchedUpdates() {
+  updateQueue = [];
+  if (flushTimeoutId !== undefined) {
+    clearTimeout(flushTimeoutId);
+    flushTimeoutId = undefined;
+  }
 }

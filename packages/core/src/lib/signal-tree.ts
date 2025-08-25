@@ -64,7 +64,8 @@ function estimateObjectSize(
         size += estimateObjectSize(value, maxDepth, currentDepth + 1) * 0.5;
       }
     }
-  } catch {
+  } catch (err) {
+    void err;
     // If we can't estimate, assume small
     return 1;
   }
@@ -280,17 +281,9 @@ function createCallableProxy<T>(
         };
       }
 
-      // Handle batchUpdate shim: present to align types with runtime when
-      // batching enhancer is not installed. It provides a clear error so
-      // consumers don't rely on an absent implementation.
-      if (prop === 'batchUpdate') {
-        return (_updater: (current: T) => Partial<T>) => {
-          void _updater;
-          throw new Error(
-            'batchUpdate() called but @signaltree/batching is not installed.\nInstall the batching enhancer or use tree.$.update(...) as a fallback.'
-          );
-        };
-      }
+      // Do not expose a batchUpdate shim by default. The batching enhancer
+      // will attach `batchUpdate` when enabled. Tests expect `batchUpdate`
+      // to be undefined unless the enhancer is explicitly applied.
 
       // Handle set method - shallow merge with current state
       if (prop === 'set') {

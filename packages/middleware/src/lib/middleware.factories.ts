@@ -22,7 +22,17 @@ export function createLoggingMiddleware<T>(treeName: string): Middleware<T> {
       }
       if (impl && impl.before) return impl.before(action, payload, state);
       if (typeof console !== 'undefined') {
-        console.log(`🏪 ${treeName}: ${action}`, payload);
+        // Provide the same shape as the full impl so tests can spy on group/log
+        try {
+          console.group(`🏪 ${treeName}: ${action}`);
+          console.log('Previous state:', state);
+          console.log(
+            'Payload:',
+            typeof payload === 'function' ? 'Function' : payload
+          );
+        } catch (err) {
+          void err;
+        }
       }
       return true;
     },
@@ -30,7 +40,12 @@ export function createLoggingMiddleware<T>(treeName: string): Middleware<T> {
       if (impl && impl.after)
         return impl.after(action, payload, state, newState);
       if (typeof console !== 'undefined') {
-        console.log('New state:', newState);
+        try {
+          console.log('New state:', newState);
+          console.groupEnd();
+        } catch (err) {
+          void err;
+        }
       }
     },
   };

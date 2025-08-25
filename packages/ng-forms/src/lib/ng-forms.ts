@@ -300,7 +300,8 @@ export function createFormTree<T extends Record<string, unknown>>(
           if (error) {
             asyncErrors[fieldPath] = error;
           }
-        } catch {
+        } catch (err) {
+          void err;
           asyncErrors[fieldPath] = 'Validation error';
         }
 

@@ -57,6 +57,7 @@
     "test:all": "nx run-many -t test --projects=core,async,batching,memoization,devtools,entities,middleware,ng-forms,presets,time-travel,serialization",
     "test:core": "nx test core",
     "test:serialization": "nx test serialization",
+    "test:middleware": "nx test middleware",
     "test:performance": "nx test core --testNamePattern=\"performance\"",
     "test:recursive": "nx test core --testNamePattern=\"recursive\"",
     "test:coverage": "nx run-many -t test --codeCoverage --projects=core,async,batching,memoization,devtools,entities,middleware,ng-forms,presets,time-travel,serialization",

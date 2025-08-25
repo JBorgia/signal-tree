@@ -1,7 +1,10 @@
-import { Signal, signal } from '@angular/core';
+import { signal, Signal } from '@angular/core';
 import { SignalTree } from '@signaltree/core';
 
-export type ModuleMetadata = {
+/**
+ * Module metadata for tracking in the composition chain
+ */
+export interface ModuleMetadata {
   name: string;
   methods: string[];
   addedAt: Date;
@@ -9,9 +12,12 @@ export type ModuleMetadata = {
   operationCount: number;
   averageExecutionTime: number;
   errorCount: number;
-};
+}
 
-export type ModularPerformanceMetrics = {
+/**
+ * Performance metrics optimized for modular composition
+ */
+export interface ModularPerformanceMetrics {
   totalUpdates: number;
   moduleUpdates: Record<string, number>;
   modulePerformance: Record<string, number>;
@@ -19,16 +25,16 @@ export type ModularPerformanceMetrics = {
   signalGrowth: Record<string, number>;
   memoryDelta: Record<string, number>;
   moduleCacheStats: Record<string, { hits: number; misses: number }>;
-};
+}
 
-export type ModuleActivityTracker = {
+export interface ModuleActivityTracker {
   trackMethodCall: (module: string, method: string, duration: number) => void;
   trackError: (module: string, error: Error, context?: string) => void;
   getModuleActivity: (module: string) => ModuleMetadata | undefined;
   getAllModules: () => ModuleMetadata[];
-};
+}
 
-export type CompositionLogger = {
+export interface CompositionLogger {
   logComposition: (modules: string[], action: 'pipe' | 'enhance') => void;
   logMethodExecution: (
     module: string,
@@ -54,12 +60,16 @@ export type CompositionLogger = {
     type: 'composition' | 'method' | 'state' | 'performance';
     data: unknown;
   }>;
-};
+}
 
-export type ModularDevToolsInterface<T> = {
+export interface ModularDevToolsInterface<T> {
   activityTracker: ModuleActivityTracker;
   logger: CompositionLogger;
+  // Real-time readonly signal carrying performance metrics
   metrics: Signal<ModularPerformanceMetrics>;
+  // Phantom property to tie the interface to the tree's state type T and
+  // satisfy strict compiler rules about unused generics.
+  _treeType?: T;
   trackComposition: (modules: string[]) => void;
   startModuleProfiling: (module: string) => string;
   endModuleProfiling: (profileId: string) => void;
@@ -69,22 +79,15 @@ export type ModularDevToolsInterface<T> = {
     modules: ModuleMetadata[];
     logs: Array<unknown>;
     compositionHistory: Array<{ timestamp: Date; chain: string[] }>;
-    lastState?: T;
   };
-};
+}
 
 function createActivityTracker(): ModuleActivityTracker {
-  let modules: Map<string, ModuleMetadata> | null = null;
-
-  const ensureModules = () => {
-    if (!modules) modules = new Map<string, ModuleMetadata>();
-  };
+  const modules = new Map<string, ModuleMetadata>();
 
   return {
     trackMethodCall: (module: string, method: string, duration: number) => {
-      ensureModules();
-      const m = modules as Map<string, ModuleMetadata>;
-      const existing = m.get(module);
+      const existing = modules.get(module);
       if (existing) {
         existing.lastActivity = new Date();
         existing.operationCount++;
@@ -93,7 +96,7 @@ function createActivityTracker(): ModuleActivityTracker {
             duration) /
           existing.operationCount;
       } else {
-        m.set(module, {
+        modules.set(module, {
           name: module,
           methods: [method],
           addedAt: new Date(),
@@ -106,21 +109,20 @@ function createActivityTracker(): ModuleActivityTracker {
     },
 
     trackError: (module: string, error: Error, context?: string) => {
-      ensureModules();
-      const m = modules as Map<string, ModuleMetadata>;
-      const existing = m.get(module);
-      if (existing) {
-        existing.errorCount++;
+      const existing = modules.get(module);
+      if (existing) existing.errorCount++;
+      if (typeof console !== 'undefined') {
+        if (context) {
+          console.error(`❌ [${module}] Error in ${context}:`, error);
+        } else {
+          console.error(`❌ [${module}]`, error);
+        }
       }
-      console.error(
-        ` [${module}] Error${context ? ` in ${context}` : ''}:`,
-        error
-      );
     },
 
-    getModuleActivity: (module: string) => modules?.get(module),
+    getModuleActivity: (module: string) => modules.get(module),
 
-    getAllModules: () => (modules ? Array.from(modules.values()) : []),
+    getAllModules: () => Array.from(modules.values()),
   };
 }
 
@@ -138,9 +140,7 @@ function createCompositionLogger(): CompositionLogger {
     data: unknown
   ) => {
     logs.push({ timestamp: new Date(), module, type, data });
-    if (logs.length > 1000) {
-      logs.splice(0, logs.length - 1000);
-    }
+    if (logs.length > 1000) logs.splice(0, logs.length - 1000);
   };
 
   return {
@@ -148,7 +148,6 @@ function createCompositionLogger(): CompositionLogger {
       addLog('core', 'composition', { modules, action });
       console.log(`🔗 Composition ${action}:`, modules.join(' → '));
     },
-
     logMethodExecution: (
       module: string,
       method: string,
@@ -158,7 +157,6 @@ function createCompositionLogger(): CompositionLogger {
       addLog(module, 'method', { method, args, result });
       console.debug(`🔧 [${module}] ${method}`, { args, result });
     },
-
     logStateChange: (
       module: string,
       path: string,
@@ -171,7 +169,6 @@ function createCompositionLogger(): CompositionLogger {
         to: newValue,
       });
     },
-
     logPerformanceWarning: (
       module: string,
       operation: string,
@@ -185,7 +182,6 @@ function createCompositionLogger(): CompositionLogger {
         )}ms (threshold: ${threshold}ms)`
       );
     },
-
     exportLogs: () => [...logs],
   };
 }
@@ -214,16 +210,13 @@ function createModularMetrics() {
           ...current.moduleUpdates,
           [module]: (current.moduleUpdates[module] || 0) + 1,
         },
-        modulePerformance: {
-          ...current.modulePerformance,
-          [module]: duration,
-        },
+        modulePerformance: { ...current.modulePerformance, [module]: duration },
       }));
     },
   };
 }
 
-export async function attachDevTools<T>(
+function createDevToolsInterface<T>(
   tree: SignalTree<T>,
   config: {
     enabled?: boolean;
@@ -232,12 +225,12 @@ export async function attachDevTools<T>(
     enableLogging?: boolean;
     performanceThreshold?: number;
   } = {}
-): Promise<ModularDevToolsInterface<T>> {
+): ModularDevToolsInterface<T> {
   const {
     enabled = true,
     treeName = 'ModularSignalTree',
     enableBrowserDevTools = true,
-    enableLogging = false,
+    enableLogging = true,
     performanceThreshold = 16,
   } = config;
 
@@ -299,6 +292,19 @@ export async function attachDevTools<T>(
       };
   const metrics = createModularMetrics();
 
+  // Expose a small global hook so other enhancers (like batching) can
+  // notify the devtools metrics when they execute grouped updates. This
+  // keeps the instrumentation robust across proxy/wrapper ordering.
+  try {
+    (
+      globalThis as {
+        __signaltree_devtools_track?: (m: string, d: number) => void;
+      }
+    ).__signaltree_devtools_track = metrics.trackModuleUpdate;
+  } catch (err) {
+    void err;
+  }
+
   const compositionHistory: Array<{ timestamp: Date; chain: string[] }> = [];
 
   const activeProfiles = new Map<
@@ -328,42 +334,117 @@ export async function attachDevTools<T>(
     browserDevTools = { send: connection.send };
   }
 
+  // Callable state shape: the callable proxy exposes an updater and may expose
+  // an unwrap method. Keep this narrow to avoid `any` usage in instrumentation.
+  type CallableStateWithUpdate<U> = (() => U) & {
+    update?: (updater: ((current: U) => Partial<U>) | Partial<U>) => unknown;
+    unwrap?: () => U;
+    [k: string]: unknown;
+  };
+
+  // Instrument the callable state's update method (tree.$.update) when
+  // available. Core places update on the callable proxy (`tree.$`), not on
+  // the tree root, so we try to instrument the proxy-aware update method.
+  try {
+    const callableState = (tree as unknown as { $?: unknown }).$ ?? tree;
+    // Prefer a previously-stored raw update (set by batching) so we can
+    // instrument the actual implementation even when `tree.$` is wrapped.
+    const maybeRaw = (callableState as Record<string, unknown>)['__rawUpdate'];
+    const maybeOriginalUpdate =
+      typeof maybeRaw === 'function'
+        ? (maybeRaw as CallableStateWithUpdate<T>['update'])
+        : (callableState as CallableStateWithUpdate<T>).update;
+    if (typeof maybeOriginalUpdate === 'function') {
+      const originalUpdate = maybeOriginalUpdate.bind(
+        callableState as CallableStateWithUpdate<T>
+      );
+      (callableState as CallableStateWithUpdate<T>).update = (
+        updater: ((current: T) => Partial<T>) | Partial<T>
+      ) => {
+        const start =
+          typeof performance !== 'undefined' && performance.now
+            ? performance.now()
+            : Date.now();
+        const result = (
+          originalUpdate as (u: ((c: T) => Partial<T>) | Partial<T>) => unknown
+        )(updater as ((current: T) => Partial<T>) | Partial<T>);
+        const duration =
+          (typeof performance !== 'undefined' && performance.now
+            ? performance.now()
+            : Date.now()) - start;
+        try {
+          metrics.trackModuleUpdate('core', duration);
+        } catch (err) {
+          console.debug('devtools: metrics.trackModuleUpdate failed', err);
+        }
+        if (duration > performanceThreshold) {
+          try {
+            logger.logPerformanceWarning(
+              'core',
+              'update',
+              duration,
+              performanceThreshold
+            );
+          } catch (err) {
+            console.debug('devtools: logger.logPerformanceWarning failed', err);
+          }
+        }
+        if (browserDevTools) {
+          try {
+            const currentState =
+              typeof callableState === 'function'
+                ? (callableState as CallableStateWithUpdate<T>)()
+                : (tree as unknown as { unwrap?: () => T }).unwrap?.();
+            browserDevTools.send('UPDATE', currentState as T);
+          } catch (err) {
+            console.debug('devtools: browserDevTools.send failed', err);
+          }
+        }
+        return result;
+      };
+    }
+  } catch (err) {
+    // best-effort instrumentation
+    void err;
+  }
+
   type CallableState<S> = (() => S) & Record<PropertyKey, unknown>;
 
-  const originalState = tree.$ as unknown as CallableState<T>;
+  const initialStateProxy = tree.$ as unknown as CallableState<T>;
 
-  const maybeUpdate = originalState['update'];
-
-  const originalUpdate =
-    typeof maybeUpdate === 'function'
-      ? (maybeUpdate as (u: unknown) => unknown).bind(originalState)
-      : undefined;
-
-  const stateProxy = new Proxy(originalState, {
-    apply() {
-      return originalState();
+  const stateProxy = new Proxy(initialStateProxy, {
+    apply(target: CallableState<T>, thisArg, args) {
+      return Reflect.apply(target as CallableState<T>, thisArg, args);
     },
-    get(_target, prop) {
+    get(target, prop, receiver) {
       if (prop === 'update') {
         return (updater: ((current: T) => Partial<T>) | Partial<T>) => {
-          if (typeof console !== 'undefined') {
-            console.log('[DevTools] Update method called');
+          if (enableLogging && typeof console !== 'undefined') {
+            console.debug('[DevTools] Update method called');
           }
           const startTime =
             typeof performance !== 'undefined' && performance.now
               ? performance.now()
               : Date.now();
 
-          const result = originalUpdate
-            ? (originalUpdate as (u: unknown) => unknown)(updater)
-            : undefined;
+          const maybeUpdate = Reflect.get(target, 'update');
+          const updateFn =
+            typeof maybeUpdate === 'function'
+              ? (maybeUpdate as (u: unknown) => unknown).bind(target)
+              : undefined;
+
+          const result = updateFn ? updateFn(updater) : undefined;
 
           const duration =
             typeof performance !== 'undefined' && performance.now
               ? performance.now() - startTime
               : Date.now() - startTime;
 
-          const newState = originalState();
+          const newState = (
+            typeof target === 'function'
+              ? (target as CallableState<T>)()
+              : undefined
+          ) as T;
 
           try {
             metrics.trackModuleUpdate('core', duration);
@@ -389,7 +470,7 @@ export async function attachDevTools<T>(
 
           if (browserDevTools) {
             try {
-              browserDevTools.send('UPDATE', newState);
+              browserDevTools.send('UPDATE', newState as T);
             } catch (err) {
               console.debug('devtools: browserDevTools.send failed', err);
             }
@@ -399,19 +480,21 @@ export async function attachDevTools<T>(
         };
       }
 
-      const val = Reflect.get(originalState, prop);
+      const val = Reflect.get(target, prop, receiver);
       if (typeof val === 'function')
-        return (val as (...a: unknown[]) => unknown).bind(originalState);
+        return (val as (...a: unknown[]) => unknown).bind(
+          target as CallableState<T>
+        );
       return val;
     },
-    has() {
-      return true;
+    has(target, prop) {
+      return Reflect.has(target, prop);
     },
-    ownKeys() {
-      return Reflect.ownKeys(originalState);
+    ownKeys(target) {
+      return Reflect.ownKeys(target);
     },
     getOwnPropertyDescriptor(target, prop) {
-      return Reflect.getOwnPropertyDescriptor(originalState, prop);
+      return Reflect.getOwnPropertyDescriptor(target, prop);
     },
   });
 
@@ -458,7 +541,7 @@ export async function attachDevTools<T>(
     connectDevTools: (name: string) => {
       if (browserDevTools) {
         browserDevTools.send('@@INIT', tree.$());
-        console.log(`🔗 Connected to Redux DevTools as "${name}"`);
+        console.log(`\ud83d\udd17 Connected to Redux DevTools as "${name}"`);
       }
     },
 
@@ -471,4 +554,44 @@ export async function attachDevTools<T>(
   };
 
   return devToolsInterface;
+}
+
+export function attachDevToolsSync<T>(
+  tree: SignalTree<T>,
+  config: {
+    enabled?: boolean;
+    treeName?: string;
+    enableBrowserDevTools?: boolean;
+    enableLogging?: boolean;
+    performanceThreshold?: number;
+  } = {}
+): ModularDevToolsInterface<T> {
+  const impl = createDevToolsInterface(tree, config);
+  try {
+    Object.assign(tree, { __devTools: impl });
+  } catch (e) {
+    // best-effort assignment; swallow errors intentionally
+    void e;
+  }
+  return impl;
+}
+
+export async function attachDevTools<T>(
+  tree: SignalTree<T>,
+  config: {
+    enabled?: boolean;
+    treeName?: string;
+    enableBrowserDevTools?: boolean;
+    enableLogging?: boolean;
+    performanceThreshold?: number;
+  } = {}
+): Promise<ModularDevToolsInterface<T>> {
+  const impl = createDevToolsInterface(tree, config);
+  try {
+    Object.assign(tree, { __devTools: impl });
+  } catch (e) {
+    // best-effort assignment; swallow errors intentionally
+    void e;
+  }
+  return impl;
 }

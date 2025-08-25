@@ -12,7 +12,8 @@ const hasStructuredClone =
 function jsonClone<T>(v: T): T {
   try {
     return JSON.parse(JSON.stringify(v));
-  } catch {
+  } catch (err) {
+    void err;
     return v;
   }
 }
