@@ -6,17 +6,25 @@ export function createLoggingMiddlewareImpl<T>(
   return {
     id: 'logging',
     before: (action, payload, state) => {
-      console.group(`🏪 ${treeName}: ${action}`);
-      console.log('Previous state:', state);
-      console.log(
-        'Payload:',
-        typeof payload === 'function' ? 'Function' : payload
-      );
+      try {
+        console.group(`${treeName}: ${action}`);
+        console.log('Prev:', state);
+        console.log(
+          'Payload:',
+          typeof payload === 'function' ? 'Function' : payload
+        );
+      } catch (err) {
+        void err;
+      }
       return true;
     },
     after: (action, payload, state, newState) => {
-      console.log('New state:', newState);
-      console.groupEnd();
+      try {
+        console.log('Next:', newState);
+        console.groupEnd();
+      } catch (err) {
+        void err;
+      }
     },
   };
 }
@@ -25,11 +33,19 @@ export function createPerformanceMiddlewareImpl<T>(): Middleware<T> {
   return {
     id: 'performance',
     before: (action) => {
-      console.time(`Tree update: ${action}`);
+      try {
+        console.time(`Update: ${action}`);
+      } catch (err) {
+        void err;
+      }
       return true;
     },
     after: (action) => {
-      console.timeEnd(`Tree update: ${action}`);
+      try {
+        console.timeEnd(`Update: ${action}`);
+      } catch (err) {
+        void err;
+      }
     },
   };
 }
@@ -56,8 +72,7 @@ export function createPersistenceMiddlewareImpl<T>(config: {
     timeoutId = setTimeout(() => {
       try {
         activeStorage?.setItem(key, JSON.stringify(state));
-        if (typeof console !== 'undefined')
-          console.log(`\ud83d\udcbe State auto-saved to ${key}`);
+        if (typeof console !== 'undefined') console.log(`State saved: ${key}`);
       } catch (err) {
         if (typeof console !== 'undefined')
           console.error('Failed to save state:', err);

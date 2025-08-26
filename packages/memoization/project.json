@@ -12,6 +12,7 @@
     }
   },
   "tags": [],
+  "implicitDependencies": ["@signaltree/utils"],
   "targets": {
     "build": {
       "executor": "@nx/angular:package",

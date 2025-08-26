@@ -238,11 +238,13 @@ export function withDevTools<T>(
           if (active)
             metricsSignal.update((m) => ({ ...m, compositionChain: modules }));
           compositionHistory.push({ timestamp: new Date(), chain: modules });
-          if (effectiveEnableLogging && typeof console !== 'undefined')
-            console.log(
-              '\ud83d\udd17 Composition ' + action + ':',
-              modules.join(' \u2192 ')
-            );
+          if (effectiveEnableLogging && typeof console !== 'undefined') {
+            try {
+              console.log('Composition ' + action + ':', modules.join(' -> '));
+            } catch (err) {
+              void err;
+            }
+          }
         },
         logMethodExecution: (
           module: string,
@@ -256,11 +258,13 @@ export function withDevTools<T>(
             type: 'method',
             data: { method, args, result },
           });
-          if (effectiveEnableLogging && typeof console !== 'undefined')
-            console.debug(`\ud83d\udd27 [${module}] ${method}`, {
-              args,
-              result,
-            });
+          if (effectiveEnableLogging && typeof console !== 'undefined') {
+            try {
+              console.debug(`[${module}] ${method}`, { args, result });
+            } catch (err) {
+              void err;
+            }
+          }
         },
         logStateChange: (
           module: string,
@@ -274,11 +278,16 @@ export function withDevTools<T>(
             type: 'state',
             data: { path, oldValue, newValue },
           });
-          if (effectiveEnableLogging && typeof console !== 'undefined')
-            console.debug(`\ud83d\udcdd [${module}] State change at ${path}:`, {
-              from: oldValue,
-              to: newValue,
-            });
+          if (effectiveEnableLogging && typeof console !== 'undefined') {
+            try {
+              console.debug(`[${module}] State ${path}:`, {
+                from: oldValue,
+                to: newValue,
+              });
+            } catch (err) {
+              void err;
+            }
+          }
         },
         logPerformanceWarning: (
           module: string,
@@ -292,12 +301,17 @@ export function withDevTools<T>(
             type: 'performance',
             data: { operation, duration, threshold },
           });
-          if (effectiveEnableLogging && typeof console !== 'undefined')
-            console.warn(
-              `\u26a0\ufe0f [${module}] Slow ${operation}: ${duration.toFixed(
-                2
-              )}ms (threshold: ${threshold}ms)`
-            );
+          if (effectiveEnableLogging && typeof console !== 'undefined') {
+            try {
+              console.warn(
+                `[${module}] Slow ${operation}: ${duration.toFixed(
+                  2
+                )}ms (th:${threshold}ms)`
+              );
+            } catch (err) {
+              void err;
+            }
+          }
         },
         exportLogs: () => [...logs],
       };

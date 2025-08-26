@@ -112,10 +112,16 @@ function createActivityTracker(): ModuleActivityTracker {
       const existing = modules.get(module);
       if (existing) existing.errorCount++;
       if (typeof console !== 'undefined') {
-        if (context) {
-          console.error(`❌ [${module}] Error in ${context}:`, error);
-        } else {
-          console.error(`❌ [${module}]`, error);
+        try {
+          // Include the same emoji prefix used by the noop shim so tests
+          // observing console output receive a consistent string.
+          if (context) {
+            console.error(`\u274c [${module}] Error in ${context}:`, error);
+          } else {
+            console.error(`\u274c [${module}]`, error);
+          }
+        } catch (err) {
+          void err;
         }
       }
     },
@@ -127,6 +133,9 @@ function createActivityTracker(): ModuleActivityTracker {
 }
 
 function createCompositionLogger(): CompositionLogger {
+  // Minimal synchronous logger used in the main bundle. Heavy, human-
+  // friendly templates live in `devtools.logging.impl` and are loaded
+  // asynchronously only when `enableLogging` is true.
   const logs: Array<{
     timestamp: Date;
     module: string;
@@ -143,10 +152,16 @@ function createCompositionLogger(): CompositionLogger {
     if (logs.length > 1000) logs.splice(0, logs.length - 1000);
   };
 
+  // Minimal console output to keep bundle size small. Tests that need
+  // verbose output can rely on the heavy logger which is lazy-loaded.
   return {
     logComposition: (modules: string[], action: 'pipe' | 'enhance') => {
       addLog('core', 'composition', { modules, action });
-      console.log(`🔗 Composition ${action}:`, modules.join(' → '));
+      try {
+        console.log('🔗 Composition ' + action + ':', modules.join(' → '));
+      } catch (err) {
+        void err;
+      }
     },
     logMethodExecution: (
       module: string,
@@ -155,7 +170,11 @@ function createCompositionLogger(): CompositionLogger {
       result: unknown
     ) => {
       addLog(module, 'method', { method, args, result });
-      console.debug(`🔧 [${module}] ${method}`, { args, result });
+      try {
+        console.debug(`🔧 [${module}] ${method}`, { args, result });
+      } catch (err) {
+        void err;
+      }
     },
     logStateChange: (
       module: string,
@@ -164,10 +183,14 @@ function createCompositionLogger(): CompositionLogger {
       newValue: unknown
     ) => {
       addLog(module, 'state', { path, oldValue, newValue });
-      console.debug(`📝 [${module}] State change at ${path}:`, {
-        from: oldValue,
-        to: newValue,
-      });
+      try {
+        console.debug(`📝 [${module}] State change at ${path}:`, {
+          from: oldValue,
+          to: newValue,
+        });
+      } catch (err) {
+        void err;
+      }
     },
     logPerformanceWarning: (
       module: string,
@@ -176,11 +199,15 @@ function createCompositionLogger(): CompositionLogger {
       threshold: number
     ) => {
       addLog(module, 'performance', { operation, duration, threshold });
-      console.warn(
-        `⚠️ [${module}] Slow ${operation}: ${duration.toFixed(
-          2
-        )}ms (threshold: ${threshold}ms)`
-      );
+      try {
+        console.warn(
+          `⚠️ [${module}] Slow ${operation}: ${duration.toFixed(
+            2
+          )}ms (threshold: ${threshold}ms)`
+        );
+      } catch (err) {
+        void err;
+      }
     },
     exportLogs: () => [...logs],
   };
@@ -291,6 +318,32 @@ function createDevToolsInterface<T>(
         exportLogs: () => [],
       };
   const metrics = createModularMetrics();
+
+  // If verbose logging is requested, asynchronously load the heavy
+  // composition logger implementation to keep the main bundle small.
+  if (enableLogging) {
+    (async () => {
+      try {
+        const mod = await import('./devtools.logging.impl');
+        // Replace the lightweight logger with the heavy one.
+        // Keep existing logs by copying exported logs if provided.
+        const heavy = mod.createHeavyCompositionLogger();
+        // No direct mutation of `logger` (const) — update via indirection
+        // by copying methods onto the existing object reference.
+        try {
+          (Object.keys(heavy) as Array<keyof typeof heavy>).forEach((k) => {
+            (logger as unknown as Record<string, unknown>)[k as string] = (
+              heavy as unknown as Record<string, unknown>
+            )[k as string];
+          });
+        } catch (e) {
+          void e;
+        }
+      } catch (err) {
+        console.debug('devtools: lazy-load logger failed', err);
+      }
+    })();
+  }
 
   // Expose a small global hook so other enhancers (like batching) can
   // notify the devtools metrics when they execute grouped updates. This

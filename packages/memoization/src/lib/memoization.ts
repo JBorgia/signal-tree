@@ -1,4 +1,5 @@
 import { SignalTree } from '@signaltree/core';
+import { deepEqual } from '@signaltree/utils';
 
 /**
  * Extended SignalTree interface with memoization capabilities
@@ -63,37 +64,6 @@ interface MemoizationConfig {
   enabled?: boolean;
   maxCacheSize?: number;
   ttl?: number; // Time to live in milliseconds
-}
-
-/**
- * Deep equality check for dependency comparison
- */
-function deepEqual(a: unknown, b: unknown): boolean {
-  if (a === b) return true;
-  if (a == null || b == null) return false;
-  if (typeof a !== typeof b) return false;
-
-  if (typeof a === 'object') {
-    const keysA = Object.keys(a as Record<string, unknown>);
-    const keysB = Object.keys(b as Record<string, unknown>);
-
-    if (keysA.length !== keysB.length) return false;
-
-    for (const key of keysA) {
-      if (!keysB.includes(key)) return false;
-      if (
-        !deepEqual(
-          (a as Record<string, unknown>)[key],
-          (b as Record<string, unknown>)[key]
-        )
-      ) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  return false;
 }
 
 /**

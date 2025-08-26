@@ -28,7 +28,8 @@
       "@signaltree/monolith": ["signaltree/src/index.ts"],
       "@signaltree/presets": ["packages/presets/src/index.ts"],
       "@signaltree/serialization": ["packages/serialization/src/index.ts"],
-      "@signaltree/time-travel": ["packages/time-travel/src/index.ts"]
+      "@signaltree/time-travel": ["packages/time-travel/src/index.ts"],
+      "@signaltree/utils": ["packages/utils/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
