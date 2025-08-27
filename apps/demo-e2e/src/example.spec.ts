@@ -3,6 +3,8 @@ import { test, expect } from '@playwright/test';
 test('has title', async ({ page }) => {
   await page.goto('/');
 
-  // Expect h1 to contain a substring.
-  expect(await page.locator('h1').innerText()).toContain('Welcome');
+  // There may be multiple h1 elements; ensure one contains the demo heading text.
+  const headings = await page.locator('h1').allInnerTexts();
+  const combined = headings.join(' ');
+  expect(combined).toContain('Signal Tree');
 });

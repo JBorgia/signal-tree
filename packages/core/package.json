@@ -2,8 +2,27 @@
   "name": "@signaltree/core",
   "version": "1.1.9",
   "description": "Lightweight, type-safe signal-based state management for Angular. Core package providing hierarchical signal trees, basic entity management, and async actions.",
+  "type": "module",
+  "sideEffects": false,
   "peerDependencies": {
     "@angular/core": "^20.1.0"
   },
-  "sideEffects": false
+  "dependencies": {
+    "tslib": "^2.6.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./fesm2022/signaltree-core.mjs",
+      "default": "./fesm2022/signaltree-core.mjs"
+    }
+  },
+  "module": "./fesm2022/signaltree-core.mjs",
+  "types": "./index.d.ts",
+  "files": [
+    "dist/packages/core"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  }
 }

@@ -38,7 +38,7 @@ for (const f of files) {
     const map = new Map();
     let m;
     while ((m = re.exec(s))) {
-      let raw = m[0].slice(1, -1);
+      const raw = m[0].slice(1, -1);
       if (raw.length < 6) continue;
       map.set(raw, (map.get(raw) || 0) + 1);
     }

@@ -1,12 +1,8 @@
-export { 
+export {
   createLoggingMiddleware,
   createPerformanceMiddleware,
   createValidationMiddleware,
   createPersistenceMiddleware,
-  loggingMiddleware,
-  performanceMiddleware,
-  persistenceMiddleware,
-  validationMiddleware,
 } from './lib/middleware';
 
 /**

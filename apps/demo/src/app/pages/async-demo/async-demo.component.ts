@@ -356,7 +356,7 @@ export class AsyncDemoComponent {
     loading: false,
     error: null as string | null,
     searchQuery: '',
-  }).pipe(withAsync());
+  }).with(withAsync());
 
   private apiService = new MockApiService();
 

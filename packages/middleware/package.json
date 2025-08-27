@@ -2,8 +2,24 @@
   "name": "@signaltree/middleware",
   "version": "1.1.9",
   "description": "Middleware system for SignalTree. Intercept state changes with before/after hooks, logging, performance tracking, and validation middleware.",
+  "type": "module",
+  "sideEffects": false,
+  "dependencies": {
+    "tslib": "^2.6.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js"
+    }
+  },
+  "files": [
+    "dist/esm"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
   "peerDependencies": {
     "@signaltree/core": "^1.1.9"
-  },
-  "sideEffects": false
+  }
 }

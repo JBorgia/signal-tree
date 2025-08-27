@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist/esm",
+    "rootDir": "src",
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "module": "ES2022",
+    "target": "ES2022",
+    "moduleResolution": "Bundler",
+    "importHelpers": true,
+    "stripInternal": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "noEmitOnError": true,
+    "baseUrl": "..",
+    "paths": {
+      "@signaltree/runtime-utils": ["runtime-utils/dist/esm"],
+      "@signaltree/runtime-utils/*": ["runtime-utils/dist/esm/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/*.spec.ts", "src/**/*.test.ts"]
+}

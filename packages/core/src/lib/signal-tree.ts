@@ -26,7 +26,17 @@ import type {
   AsyncAction,
   TimeTravelEntry,
 } from './types';
-import { createLazySignalTree, equal } from './utils';
+import { equal } from './utils';
+
+// runtime flag for dev logs (typed to avoid any)
+const ENABLE_DEV_LOGS_CORE =
+  typeof ngDevMode !== 'undefined'
+    ? Boolean(ngDevMode as unknown as boolean)
+    : typeof process !== 'undefined' &&
+      (process as { env?: { NODE_ENV?: string } })
+    ? (process as { env?: { NODE_ENV?: string } }).env?.NODE_ENV !==
+      'production'
+    : false;
 
 // ============================================
 // PERFORMANCE HEURISTICS
@@ -40,37 +50,19 @@ function estimateObjectSize(
   maxDepth = 3,
   currentDepth = 0
 ): number {
-  if (currentDepth >= maxDepth) return 1;
+  // Lightweight heuristic: avoid deep recursion to keep runtime footprint tiny.
   if (obj === null || obj === undefined) return 0;
   if (typeof obj !== 'object') return 1;
 
-  let size = 0;
-
   try {
-    if (Array.isArray(obj)) {
-      size = obj.length;
-      // Sample first few items for nested size estimation
-      const sampleSize = Math.min(3, obj.length);
-      for (let i = 0; i < sampleSize; i++) {
-        size += estimateObjectSize(obj[i], maxDepth, currentDepth + 1) * 0.1;
-      }
-    } else {
-      const keys = Object.keys(obj);
-      size = keys.length;
-      // Sample first few properties for nested size estimation
-      const sampleSize = Math.min(5, keys.length);
-      for (let i = 0; i < sampleSize; i++) {
-        const value = (obj as Record<string, unknown>)[keys[i]];
-        size += estimateObjectSize(value, maxDepth, currentDepth + 1) * 0.5;
-      }
-    }
+    if (Array.isArray(obj)) return Math.min(1000, obj.length);
+    const keys = Object.keys(obj);
+    // Count top-level keys only; this gives a quick approximation used for strategy.
+    return Math.min(1000, keys.length);
   } catch (err) {
     void err;
-    // If we can't estimate, assume small
     return 1;
   }
-
-  return Math.floor(size);
 }
 
 /**
@@ -491,8 +483,18 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
   const equalityFn = createEqualityFn(config.useShallowComparison ?? false);
   const useLazy = shouldUseLazy(obj, config);
 
+  // runtime flag for dev logs (typed to avoid any)
+  const ENABLE_DEV_LOGS_CORE =
+    typeof ngDevMode !== 'undefined'
+      ? Boolean(ngDevMode as unknown as boolean)
+      : typeof process !== 'undefined' &&
+        (process as { env?: { NODE_ENV?: string } })
+      ? (process as { env?: { NODE_ENV?: string } }).env?.NODE_ENV !==
+        'production'
+      : false;
+
   // Log strategy selection in debug mode
-  if (config.debugMode) {
+  if (config.debugMode && ENABLE_DEV_LOGS_CORE) {
     const estimatedSize = estimateObjectSize(obj);
     console.log(
       `[SignalTree] Creating tree with ${
@@ -506,10 +508,27 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
 
   try {
     if (useLazy && typeof obj === 'object') {
-      signalState = createLazySignalTree(
-        obj as object,
-        equalityFn
-      ) as unknown as DeepSignalify<T>;
+      // Try runtime-registered lazy factory exposed on globalThis
+      const factory = (globalThis as any).__signaltree_lazy_factory__ as
+        | undefined
+        | ((
+            o: object,
+            eq: (a: unknown, b: unknown) => boolean,
+            p?: string
+          ) => unknown);
+
+      if (typeof factory === 'function') {
+        signalState = factory(
+          obj as object,
+          equalityFn
+        ) as unknown as DeepSignalify<T>;
+      } else {
+        // No lazy factory available at runtime; fall back to eager creation
+        signalState = createSignalStore(
+          obj,
+          equalityFn
+        ) as unknown as DeepSignalify<T>;
+      }
     } else {
       signalState = createSignalStore(
         obj,
@@ -542,13 +561,13 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
 }
 
 /**
- * Enhances a tree with basic functionality (pipe, destroy).
+ * Enhances a tree with basic functionality ('with', destroy).
  * The state itself (tree.$) provides the callable unwrapping and update functionality.
  *
  * @template T - The state object type
  * @param tree - The tree to enhance with basic functionality
  * @param config - Configuration used during tree creation
- * @returns The enhanced tree with pipe and destroy methods
+ * @returns The enhanced tree with composition ('with') and destroy methods
  */
 function enhanceTree<T>(
   tree: SignalTree<T>,
@@ -557,8 +576,43 @@ function enhanceTree<T>(
   // Track if this tree uses lazy signals for proper cleanup
   const isLazy = config.useLazySignals ?? shouldUseLazy(tree.state, config);
 
-  // Pipe implementation for function composition
-  tree.pipe = (<TResult = SignalTree<T>>(
+  // Private cleanup registry for enhancers and internals to register teardown
+  const CLEANUP_REGISTRY = Symbol.for('__signaltree_cleanup_registry__');
+  // Idempotent destroyed flag
+  const DESTROYED_FLAG = Symbol.for('__signaltree_destroyed__');
+
+  // Initialize registry if not present
+  try {
+    if (!(CLEANUP_REGISTRY in tree)) {
+      Object.defineProperty(tree, CLEANUP_REGISTRY, {
+        value: [] as Array<() => void>,
+        configurable: true,
+        enumerable: false,
+        writable: false,
+      });
+    }
+    // Provide a non-enumerable register helper for enhancers
+    if (!('__registerCleanup' in tree)) {
+      Object.defineProperty(tree, '__registerCleanup', {
+        value: (fn: () => void) => {
+          try {
+            const reg = (tree as any)[CLEANUP_REGISTRY] as Array<() => void>;
+            reg.push(fn);
+          } catch (err) {
+            void err;
+          }
+        },
+        configurable: true,
+        enumerable: false,
+        writable: false,
+      });
+    }
+  } catch (err) {
+    void err;
+  }
+
+  // 'with' implementation for function composition
+  tree.with = (<TResult = SignalTree<T>>(
     ...fns: Array<(input: unknown) => unknown>
   ): TResult => {
     if (fns.length === 0) {
@@ -567,33 +621,97 @@ function enhanceTree<T>(
 
     return fns.reduce((acc, fn) => {
       if (typeof fn !== 'function') {
-        throw new Error('All pipe arguments must be functions');
+        throw new Error("All 'with' arguments must be functions");
       }
       try {
         return fn(acc);
       } catch (error) {
-        console.error('[SignalTree] Pipe function failed:', error);
+        console.error("[SignalTree] 'with' function failed:", error);
         throw error;
       }
     }, tree as unknown) as TResult;
-  }) as SignalTree<T>['pipe'];
+  }) as SignalTree<T>['with'];
 
   // Enhanced destroy with proper cleanup
   tree.destroy = () => {
     try {
-      // Clean up lazy signal proxies if they exist
+      // Ensure idempotent destroy
+      if ((tree as any)[DESTROYED_FLAG]) return;
+      try {
+        Object.defineProperty(tree, DESTROYED_FLAG, {
+          value: true,
+          configurable: true,
+          enumerable: false,
+          writable: false,
+        });
+      } catch (err) {
+        void err;
+      }
+
+      // Run registered cleanup functions from enhancers and internals
+      try {
+        const reg = (tree as any)[CLEANUP_REGISTRY] as Array<() => void>;
+        if (Array.isArray(reg)) {
+          for (const fn of reg.slice()) {
+            try {
+              fn();
+            } catch (err) {
+              console.warn('[SignalTree] cleanup error:', err);
+            }
+          }
+          reg.length = 0;
+        }
+      } catch (err) {
+        void err;
+      }
+
+      // Clean up lazy signal proxies if they exist (backwards compat)
       if (isLazy) {
         const state = tree.state as unknown;
         if (state && typeof state === 'object' && '__cleanup__' in state) {
           const cleanup = (state as { __cleanup__: unknown }).__cleanup__;
           if (typeof cleanup === 'function') {
-            cleanup();
+            try {
+              cleanup();
+            } catch (err) {
+              console.warn('[SignalTree] lazy cleanup error:', err);
+            }
           }
         }
       }
 
-      // Clear any effects or subscriptions
-      // (This would be tracked if we maintain a list of active effects)
+      // Clear pending batched updates if available
+      try {
+        // Import function at runtime to avoid circular static import
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const { clearPendingBatchedUpdates } = require('@signaltree/batching');
+        if (typeof clearPendingBatchedUpdates === 'function') {
+          try {
+            clearPendingBatchedUpdates();
+          } catch (err) {
+            void err;
+          }
+        }
+      } catch (err) {
+        void err;
+      }
+
+      // Clear core caches
+      try {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const { clearCaches } = require('./utils');
+        if (typeof clearCaches === 'function') {
+          try {
+            clearCaches();
+          } catch (err) {
+            void err;
+          }
+        }
+      } catch (err) {
+        void err;
+      }
 
       if (config.debugMode) {
         console.log('[SignalTree] Tree destroyed');
@@ -636,7 +754,7 @@ function addStubMethods<T>(tree: SignalTree<T>, config: TreeConfig): void {
       effect(() => fn(tree.$()));
     } catch (error) {
       // Fallback for test environments without injection context
-      if (config.debugMode) {
+      if (config.debugMode && ENABLE_DEV_LOGS_CORE) {
         console.warn('Effect requires Angular injection context', error);
       }
     }
@@ -662,7 +780,7 @@ function addStubMethods<T>(tree: SignalTree<T>, config: TreeConfig): void {
       return unsubscribe;
     } catch (error) {
       // Fallback for test environment
-      if (config.debugMode) {
+      if (config.debugMode && ENABLE_DEV_LOGS_CORE) {
         console.warn('Subscribe requires Angular injection context', error);
       }
       fn(tree.$());
@@ -674,7 +792,7 @@ function addStubMethods<T>(tree: SignalTree<T>, config: TreeConfig): void {
 
   // Performance stubs
   tree.optimize = () => {
-    if (config.debugMode) {
+    if (config.debugMode && ENABLE_DEV_LOGS_CORE) {
       console.warn(
         '⚠️ optimize() called but tree optimization is not available.'
       );

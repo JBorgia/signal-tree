@@ -145,12 +145,12 @@ export type SignalTree<T> = {
   destroy(): void;
 
   /**
-   * Pipe method for composition
+   * with method for composition
    */
-  pipe(): SignalTree<T>;
-  pipe<R1>(fn1: (tree: SignalTree<T>) => R1): R1;
-  pipe<R1, R2>(fn1: (tree: SignalTree<T>) => R1, fn2: (arg: R1) => R2): R2;
-  pipe<R1, R2, R3>(
+  with(): SignalTree<T>;
+  with<R1>(fn1: (tree: SignalTree<T>) => R1): R1;
+  with<R1, R2>(fn1: (tree: SignalTree<T>) => R1, fn2: (arg: R1) => R2): R2;
+  with<R1, R2, R3>(
     fn1: (tree: SignalTree<T>) => R1,
     fn2: (arg: R1) => R2,
     fn3: (arg: R2) => R3

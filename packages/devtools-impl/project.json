@@ -1,0 +1,20 @@
+{
+  "name": "devtools-impl",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/devtools-impl/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:package",
+      "options": {
+        "project": "packages/devtools-impl/ng-package.json"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "packages/devtools-impl/jest.config.ts"
+      }
+    }
+  }
+}

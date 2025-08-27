@@ -16,7 +16,7 @@ describe('Batching - node-level path behavior', () => {
     const tree = signalTree({
       a: { b: { count: 0 } },
       events: [] as string[],
-    }).pipe(withBatching());
+    }).with(withBatching());
 
     // In v1.1.6 design, batchUpdate is only available on tree.$ (root)
     // Enqueue multiple batchUpdate calls that update the same nested path
@@ -70,7 +70,7 @@ describe('Batching - node-level path behavior', () => {
     const tree = signalTree({
       a: { b: { v: 0 }, v: 0 },
       events: [] as string[],
-    }).pipe(withBatching());
+    }).with(withBatching());
 
     // In v1.1.6 design, all batchUpdate calls go through tree.$ (root)
     // Child update

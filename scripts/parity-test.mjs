@@ -152,9 +152,9 @@ function testAPICompatibility() {
   console.log('    tree.subscribe(fn) ✓');
 
   console.log('  ✅ Enhanced composition available:');
-  console.log('    tree.pipe(withBatching()) ✓');
-  console.log('    tree.pipe(withMemoization()) ✓');
-  console.log('    tree.pipe(enhancement1, enhancement2) ✓');
+  console.log('    tree.with(withBatching()) ✓');
+  console.log('    tree.with(withMemoization()) ✓');
+  console.log('    tree.with(enhancement1, enhancement2) ✓');
 
   return true;
 }

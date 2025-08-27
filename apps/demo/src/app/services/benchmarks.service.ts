@@ -206,7 +206,7 @@ export class BenchmarkService {
     });
 
     // Batch updates
-    const batchTree = signalTree(state).pipe(withBatching());
+    const batchTree = signalTree(state).with(withBatching());
 
     results.batch10 = BenchmarkService.measureTime(() => {
       batchTree.$.batchUpdate((state) => {
@@ -239,7 +239,7 @@ export class BenchmarkService {
     const tree = signalTree({
       entities,
       filter: { category: 'A', active: true },
-    }).pipe(withMemoization());
+    }).with(withMemoization());
 
     const results = {
       withoutMemo: { first: 0, second: 0 },

@@ -210,7 +210,7 @@ const tree = signalTree({
   posts: [] as Post[],
   ui: { loading: false, theme: 'light' },
   filters: { search: '', category: 'all' },
-}).pipe(
+}).with(
   withBatching(), // Batch updates for performance
   withMemoization(), // Intelligent caching
   withMiddleware(), // State interceptors
@@ -285,7 +285,7 @@ const tree = signalTree({
   user: { name: 'John', preferences: { theme: 'dark' } },
   settings: { language: 'en', notifications: true },
   cart: { items: [], total: 0 },
-}).pipe(
+}).with(
   withSerialization({
     preserveTypes: true, // Handle Date, Map, Set, etc.
     handleCircular: true, // Detect and resolve circular references
@@ -298,7 +298,7 @@ const serialized = tree.serialize();
 console.log(serialized); // JSON string with metadata
 
 // Deserialize and restore state
-const newTree = signalTree({}).pipe(withSerialization());
+const newTree = signalTree({}).with(withSerialization());
 newTree.deserialize(serialized);
 
 // Snapshots for debugging and state management
@@ -313,7 +313,7 @@ tree.fromJSON(plainState);
 const persistentTree = signalTree({
   user: { name: 'John' },
   settings: { theme: 'dark' },
-}).pipe(
+}).with(
   withPersistence({
     key: 'app-state',
     autoSave: true, // Automatically save on updates
@@ -356,7 +356,7 @@ SignalTree uses a modular architecture where each feature is an optional package
   - Hierarchical signal trees with type safety
   - Basic state updates with `.update()` method
   - Signal unwrapping with `.unwrap()` method
-  - Composition support with `.pipe()` method
+  - Composition support with `.with()` method
   - Stub implementations that warn when features not installed
 
 ### Optional Feature Packages
@@ -424,7 +424,7 @@ import { withBatching } from '@signaltree/batching';
 import { withMemoization } from '@signaltree/memoization';
 
 // Same API, now composable
-const tree = signalTree(state).pipe(withBatching(), withMemoization());
+const tree = signalTree(state).with(withBatching(), withMemoization());
 ```
 
 The API remains 100% compatible - only the import statements change!
@@ -684,7 +684,7 @@ const counterStore = createStore({ name: 'counter' }, withProps<{ count: number 
   template: `<button (click)="increment()">{{ count$ | async }}</button>`,
 })
 class CounterComponent {
-  count$ = counterStore.pipe(select((state) => state.count));
+  count$ = counterStore.with(select((state) => state.count));
   increment() {
     counterStore.update((state) => ({ count: state.count + 1 }));
   }
@@ -807,7 +807,7 @@ import { withAsync } from '@signaltree/async';
 
 const tree = signalTree({
   users: [] as User[],
-}).pipe(withAsync());
+}).with(withAsync());
 
 const loadUsers = tree.asyncAction(async () => await api.getUsers(), {
   loadingKey: 'loading', // Auto-managed loading state
@@ -836,10 +836,10 @@ export const loadUsersFailure = createAction('[Users] Load Failure', props<{ err
 @Injectable()
 export class UsersEffects {
   loadUsers$ = createEffect(() =>
-    this.actions$.pipe(
+    this.actions$.with(
       ofType(loadUsers),
       switchMap(() =>
-        this.api.getUsers().pipe(
+        this.api.getUsers().with(
           map((users) => loadUsersSuccess({ users })),
           catchError((error) => of(loadUsersFailure({ error })))
         )
@@ -897,7 +897,7 @@ export class UsersService {
 
   loadUsers() {
     this.usersStore.setLoading(true);
-    return this.api.getUsers().pipe(
+    return this.api.getUsers().with(
       tap((users) => {
         this.usersStore.set(users);
         this.usersStore.setLoading(false);
@@ -945,7 +945,7 @@ const usersStore = createStore(
 class UsersService {
   loadUsers() {
     usersStore.update(setRequestStatus('loading'));
-    return this.api.getUsers().pipe(
+    return this.api.getUsers().with(
       tap((users) => usersStore.update((state) => ({ ...state, users }), setRequestStatus('success'))),
       catchError((error) => {
         usersStore.update(setRequestStatus('error'));
@@ -963,8 +963,8 @@ class UsersService {
   `,
 })
 class UsersComponent {
-  users$ = usersStore.pipe(select((state) => state.users));
-  loading$ = usersStore.pipe(
+  users$ = usersStore.with(select((state) => state.users));
+  loading$ = usersStore.with(
     selectRequestStatus(),
     map((status) => status === 'loading')
   );
@@ -1033,7 +1033,7 @@ export class UsersState {
   @Action(LoadUsers)
   loadUsers(ctx: StateContext<UsersStateModel>) {
     ctx.patchState({ loading: true });
-    return this.api.getUsers().pipe(
+    return this.api.getUsers().with(
       tap((users) => ctx.patchState({ users, loading: false, error: null })),
       catchError((error) => {
         ctx.patchState({ loading: false, error: error.message });
@@ -1057,8 +1057,8 @@ export class LoadUsers {
 })
 class UsersComponent {
   @Select(UsersState) state$: Observable<UsersStateModel>;
-  users$ = this.state$.pipe(map((state) => state.users));
-  loading$ = this.state$.pipe(map((state) => state.loading));
+  users$ = this.state$.with(map((state) => state.users));
+  loading$ = this.state$.with(map((state) => state.loading));
   constructor(private store: Store) {}
   ngOnInit() {
     this.store.dispatch(new LoadUsers());
@@ -1133,7 +1133,7 @@ class TodosComponent {
 import { signalTree } from '@signaltree/core';
 import { withEntities } from '@signaltree/entities';
 
-const todoTree = signalTree({ todos: [] as Todo[] }).pipe(withEntities());
+const todoTree = signalTree({ todos: [] as Todo[] }).with(withEntities());
 const todos = todoTree.asCrud<Todo>('todos');
 
 // Advanced entity operations
@@ -1259,12 +1259,12 @@ const todosStore = createStore({ name: 'todos' }, withEntities<Todo>());
 
 // Repository
 const todosRepo = {
-  todos$: todosStore.pipe(selectAllEntities()),
-  activeTodos$: todosStore.pipe(
+  todos$: todosStore.with(selectAllEntities()),
+  activeTodos$: todosStore.with(
     selectAllEntities(),
     map((todos) => todos.filter((t) => !t.done))
   ),
-  total$: todosStore.pipe(selectEntitiesCount()),
+  total$: todosStore.with(selectEntitiesCount()),
 
   add: (todo: Todo) => todosStore.update(addEntities(todo)),
   update: (id: string, changes: Partial<Todo>) => todosStore.update(updateEntities(id, changes)),
@@ -1691,8 +1691,8 @@ const formLogic = {
   `,
 })
 class FormComponent {
-  values$ = formStore.pipe(select((state) => state.values));
-  errors$ = formStore.pipe(select((state) => state.errors));
+  values$ = formStore.with(select((state) => state.values));
+  errors$ = formStore.with(select((state) => state.errors));
   formLogic = formLogic;
 
   get hasErrors() {
@@ -1848,7 +1848,7 @@ const action = tree.asyncAction(async () => api.call());
 import { signalTree } from '@signaltree/core';
 import { withBatching } from '@signaltree/batching';
 
-const tree = signalTree(data).pipe(withBatching());
+const tree = signalTree(data).with(withBatching());
 
 // Batch multiple updates for optimal performance
 tree.batchUpdate((state) => ({
@@ -1863,7 +1863,7 @@ tree.batchUpdate((state) => ({
 ```typescript
 import { withMemoization } from '@signaltree/memoization';
 
-const tree = signalTree(data).pipe(withMemoization());
+const tree = signalTree(data).with(withMemoization());
 
 // Intelligent caching with automatic invalidation
 const expensiveComputation = tree.memoize((state) => heavyCalculation(state.data), 'cache-key');
@@ -1880,7 +1880,7 @@ tree.optimize(); // Selective cleanup
 ```typescript
 import { withTimeTravel } from '@signaltree/time-travel';
 
-const tree = signalTree(data).pipe(withTimeTravel());
+const tree = signalTree(data).with(withTimeTravel());
 
 // Undo/redo functionality
 tree.undo();
@@ -1924,7 +1924,7 @@ import { withTimeTravel } from '@signaltree/time-travel';
 import { withDevTools } from '@signaltree/devtools';
 
 // Compose multiple features
-const tree = signalTree(initialState).pipe(withBatching(), withMemoization({ maxCacheSize: 200 }), withTimeTravel({ maxHistorySize: 50 }), withDevTools({ name: 'MyApp' }));
+const tree = signalTree(initialState).with(withBatching(), withMemoization({ maxCacheSize: 200 }), withTimeTravel({ maxHistorySize: 50 }), withDevTools({ name: 'MyApp' }));
 ```
 
 ### Preset Configurations
@@ -1940,7 +1940,7 @@ const prodConfig = createPresetConfig('production', {
 });
 
 // Apply via composition (requires installing preset packages)
-const tree = signalTree(data).pipe(
+const tree = signalTree(data).with(
   ...applyPreset('development')
 );
 
@@ -1996,7 +1996,7 @@ const shopTree = signalTree({
     profile: null as User | null,
     isAuthenticated: false,
   },
-}).pipe(withBatching(), withMemoization({ maxCacheSize: 100 }), withDevTools({ name: 'ShopApp' }));
+}).with(withBatching(), withMemoization({ maxCacheSize: 100 }), withDevTools({ name: 'ShopApp' }));
 
 // Computed values with intelligent caching
 const cartTotal = shopTree.memoize((state) => {
@@ -2061,7 +2061,7 @@ const registrationForm = createFormTree(
       },
     },
   }
-).pipe(withTimeTravel()); // Add form undo/redo
+).with(withTimeTravel()); // Add form undo/redo
 
 // Component usage with enhanced features
 @Component({
@@ -2132,7 +2132,7 @@ appTree.effect((state) => {
     },
 
 }
-).pipe(withTimeTravel()); // Add form undo/redo
+).with(withTimeTravel()); // Add form undo/redo
 
 // Component usage with enhanced features
 @Component({
@@ -2216,7 +2216,7 @@ appTree.effect((state) => {
 import { signalTree } from '@signaltree/core';
 import { withTimeTravel } from '@signaltree/time-travel';
 
-const appTree = signalTree({ count: 0 }).pipe(
+const appTree = signalTree({ count: 0 }).with(
   withTimeTravel({
     maxHistorySize: 50,
     enabled: process.env['NODE_ENV'] === 'development',
@@ -2242,7 +2242,7 @@ import { withBatching, withMemoization } from '@signaltree/batching';
 const optimizedTree = signalTree({
   users: [] as User[],
   filters: { name: '', role: '' },
-}).pipe(
+}).with(
   withBatching({ debounceMs: 16 }), // Batch rapid updates
   withMemoization({ maxCacheSize: 100 }) // Cache expensive computations
 );
@@ -2260,7 +2260,7 @@ optimizedTree.batchUpdate((state) => ({
 import { signalTree } from '@signaltree/core';
 import { withLogging, withPersistence } from '@signaltree/middleware';
 
-const appTree = signalTree({ theme: 'dark', user: null }).pipe(
+const appTree = signalTree({ theme: 'dark', user: null }).with(
   withLogging({ logLevel: 'debug' }),
   withPersistence({
     key: 'app-state',
@@ -2459,7 +2459,7 @@ users = this.tree.$.users;
 // Step 3: Replace effects with async actions
 // Before
 loadUsers$ = createEffect(() =>
-  this.actions$.pipe(
+  this.actions$.with(
     ofType(loadUsers),
     switchMap(() => this.api.getUsers())
   )
@@ -2570,7 +2570,7 @@ const tree = signalTree(state);
 // Includes: signals, hierarchical state, full TypeScript inference
 
 // SignalTree with Persistence (8.7KB) - Add state serialization
-const tree = signalTree(state).pipe(withSerialization());
+const tree = signalTree(state).with(withSerialization());
 // Adds: SSR support, state debugging, persistence, time-travel ready
 
 // SignalTree Smart Auto-Enable (5.1-23KB) - Features enable as needed

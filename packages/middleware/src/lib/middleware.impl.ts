@@ -1,5 +1,15 @@
 import type { Middleware } from '@signaltree/core';
 
+// runtime flag for dev logs
+const ENABLE_DEV_LOGS_MW =
+  typeof ngDevMode !== 'undefined'
+    ? Boolean(ngDevMode as unknown as boolean)
+    : typeof process !== 'undefined' &&
+      (process as { env?: { NODE_ENV?: string } })
+    ? (process as { env?: { NODE_ENV?: string } }).env?.NODE_ENV !==
+      'production'
+    : false;
+
 export function createLoggingMiddlewareImpl<T>(
   treeName: string
 ): Middleware<T> {
@@ -7,12 +17,14 @@ export function createLoggingMiddlewareImpl<T>(
     id: 'logging',
     before: (action, payload, state) => {
       try {
-        console.group(`${treeName}: ${action}`);
-        console.log('Prev:', state);
-        console.log(
-          'Payload:',
-          typeof payload === 'function' ? 'Function' : payload
-        );
+        if (ENABLE_DEV_LOGS_MW) {
+          console.group(`${treeName}: ${action}`);
+          console.log('Prev:', state);
+          console.log(
+            'Payload:',
+            typeof payload === 'function' ? 'Function' : payload
+          );
+        }
       } catch (err) {
         void err;
       }
@@ -20,8 +32,10 @@ export function createLoggingMiddlewareImpl<T>(
     },
     after: (action, payload, state, newState) => {
       try {
-        console.log('Next:', newState);
-        console.groupEnd();
+        if (ENABLE_DEV_LOGS_MW) {
+          console.log('Next:', newState);
+          console.groupEnd();
+        }
       } catch (err) {
         void err;
       }

@@ -53,7 +53,7 @@ export interface ModuleActivityTracker {
  */
 export interface CompositionLogger {
   /** Log module composition events */
-  logComposition: (modules: string[], action: 'pipe' | 'enhance') => void;
+  logComposition: (modules: string[], action: 'with' | 'enhance') => void;
   /** Log method execution with module context */
   logMethodExecution: (
     module: string,
@@ -227,7 +227,7 @@ export function withDevTools<T>(
       };
 
       const logger = {
-        logComposition: (modules: string[], action: 'pipe' | 'enhance') => {
+        logComposition: (modules: string[], action: 'with' | 'enhance') => {
           logs.push({
             timestamp: new Date(),
             module: 'core',
@@ -321,7 +321,7 @@ export function withDevTools<T>(
         logger,
         metrics: metricsSignal.asReadonly(),
         trackComposition: (modules: string[]) => {
-          logger.logComposition(modules, 'pipe');
+          logger.logComposition(modules, 'with');
         },
         startModuleProfiling: (module: string) => `${module}_${Date.now()}`,
         endModuleProfiling: (_id: string) => undefined,
@@ -339,41 +339,105 @@ export function withDevTools<T>(
     // immediately. The noop interface is non-mutating when `enabled` is false.
     Object.assign(tree, { __devTools: createNoopInterface(enabled) });
 
+    // Register cleanup with the core registry so we remove any global hooks
+    // and reset the devtools interface when the tree is destroyed.
+    try {
+      const register = (
+        tree as unknown as {
+          __registerCleanup?: (fn: () => void) => void;
+        }
+      ).__registerCleanup;
+      if (typeof register === 'function') {
+        register(() => {
+          try {
+            const g = globalThis as unknown as Record<string, unknown>;
+            if (g && '__signaltree_devtools_track' in g) {
+              try {
+                Reflect.deleteProperty(
+                  g as Record<string, unknown>,
+                  '__signaltree_devtools_track'
+                );
+              } catch {
+                // best-effort: fallback to undefined using safe index access
+                try {
+                  (g as Record<string, unknown>)[
+                    '__signaltree_devtools_track'
+                  ] = undefined;
+                } catch {
+                  // ignore
+                }
+              }
+            }
+          } catch {
+            // ignore
+          }
+
+          try {
+            // Reset the devtools interface on the tree to a disabled noop
+            Object.assign(tree, { __devTools: createNoopInterface(false) });
+          } catch {
+            // ignore
+          }
+        });
+      }
+    } catch {
+      // ignore
+    }
+
     // When enabled, instrument the tree's update/set methods so the noop
     // interface reflects immediate metrics updates without loading the heavy
     // implementation. Do not introduce test-only checks; behavior is driven
     // solely by the `enabled` flag.
     if (enabled) {
       try {
-        const dev = (tree as any).__devTools;
-        const signalRoot: any = (tree as any).$;
+        type CallableStateWithUpdate = (() => T) & {
+          update?: (
+            updaterOrPartial: ((current: T) => Partial<T>) | Partial<T>
+          ) => unknown;
+          set?: (p: Partial<T>) => unknown;
+          [k: string]: unknown;
+        };
+
+        const dev = (
+          tree as unknown as {
+            __devTools?: ModularDevToolsInterface<T>;
+          }
+        ).__devTools;
+        const signalRoot = (tree as unknown as { $?: CallableStateWithUpdate })
+          .$;
 
         if (signalRoot && typeof signalRoot.update === 'function') {
-          const origUpdate = signalRoot.update.bind(signalRoot);
-          signalRoot.update = function (fn: any) {
+          const origUpdate = signalRoot.update.bind(signalRoot) as (
+            u: ((current: T) => Partial<T>) | Partial<T>
+          ) => unknown;
+          signalRoot.update = function (
+            fn: ((current: T) => Partial<T>) | Partial<T>
+          ) {
             const start = Date.now();
             const res = origUpdate(fn);
             try {
-              dev.activityTracker.trackMethodCall(
+              dev?.activityTracker?.trackMethodCall(
                 'core',
                 'update',
                 Date.now() - start
               );
-            } catch (err) {
-              void err;
+            } catch {
+              // ignore
             }
             return res;
           };
         }
 
         if (signalRoot && typeof signalRoot.set === 'function') {
-          const origSet = signalRoot.set.bind(signalRoot);
-          signalRoot.set = function (value: any) {
+          const origSet = signalRoot.set.bind(signalRoot) as (
+            v: Partial<T>
+          ) => unknown;
+          signalRoot.set = function (value: Partial<T>) {
             const res = origSet(value);
             try {
-              dev.activityTracker.trackMethodCall('core', 'set', 0);
-            } catch (err) {
-              void err;
+              dev?.activityTracker?.trackMethodCall('core', 'set', 0);
+            } catch {
+              // ignore
             }
             return res;
           };
@@ -391,10 +455,22 @@ export function withDevTools<T>(
       // full implementation will replace the devtools interface and the
       // attached proxy when it loads.
       try {
-        const stateAny = (tree as any).$;
+        type CallableStateWithUpdate = (() => T) & {
+          update?: (
+            updaterOrPartial: ((current: T) => Partial<T>) | Partial<T>
+          ) => unknown;
+          unwrap?: () => T;
+          [k: string]: unknown;
+        };
+
+        const stateAny = (tree as unknown as { $?: CallableStateWithUpdate }).$;
         if (stateAny && typeof stateAny.update === 'function') {
-          const originalUpdate = stateAny.update.bind(stateAny);
-          stateAny.update = (updater: any) => {
+          const originalUpdate = stateAny.update.bind(stateAny) as (
+            u: ((current: T) => Partial<T>) | Partial<T>
+          ) => unknown;
+          stateAny.update = (
+            updater: ((current: T) => Partial<T>) | Partial<T>
+          ) => {
             const start =
               typeof performance !== 'undefined' && performance.now
                 ? performance.now()
@@ -410,14 +486,15 @@ export function withDevTools<T>(
             try {
               // Inform the noop activity tracker which will update the
               // in-memory metrics signal created above.
-              (tree as any).__devTools?.activityTracker?.trackMethodCall(
-                'core',
-                'update',
-                duration
-              );
+              const dev = (
+                tree as unknown as {
+                  __devTools?: ModularDevToolsInterface<T>;
+                }
+              ).__devTools;
+              dev?.activityTracker?.trackMethodCall('core', 'update', duration);
 
               if (duration > performanceThreshold) {
-                (tree as any).__devTools?.logger?.logPerformanceWarning(
+                dev?.logger?.logPerformanceWarning(
                   'core',
                   'update',
                   duration,
@@ -438,7 +515,13 @@ export function withDevTools<T>(
       // Fire-and-forget: load heavy impl asynchronously.
       (async () => {
         try {
-          const mod = await import('./devtools.impl');
+          let mod: any;
+          try {
+            mod = await import('@signaltree/devtools-impl');
+          } catch (e) {
+            // Fallback to local impl during build or when devtools-impl isn't installed
+            mod = await import('./devtools.impl');
+          }
           const real = await mod.attachDevTools(tree, {
             enabled,
             treeName,
@@ -489,7 +572,38 @@ export function withProductionDevTools<T>() {
   });
 }
 
-// Re-export the concrete implementations so tests and consumers can opt into
-// attaching the full devtools synchronously. These are simple forwards and
-// intentionally do not introduce any test-only branching into this file.
-export { attachDevToolsSync, attachDevTools } from './devtools.impl';
+// Provide wrapper accessors for the full implementation so bundles that
+// import the compact shim don't statically pull the heavy implementation.
+// `attachDevTools` is asynchronous and will dynamic import the heavy module.
+// `attachDevToolsSync` is provided for Node-based tests and will `require`
+// the module at call-time (best-effort synchronous access).
+export function attachDevToolsSync<T>(
+  tree: import('@signaltree/core').SignalTree<T>,
+  config?: Record<string, unknown>
+) {
+  try {
+    // Prefer the published package if available
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require('@signaltree/devtools-impl');
+    return mod.attachDevToolsSync(tree, config);
+  } catch (e) {
+    // Fallback to local implementation during build/tests
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require('./devtools.impl');
+    return mod.attachDevToolsSync(tree, config);
+  }
+}
+
+export async function attachDevTools<T>(
+  tree: import('@signaltree/core').SignalTree<T>,
+  config?: Record<string, unknown>
+) {
+  try {
+    return (await import('@signaltree/devtools-impl')).attachDevTools(
+      tree,
+      config
+    );
+  } catch (e) {
+    return (await import('./devtools.impl')).attachDevTools(tree, config);
+  }
+}

@@ -35,6 +35,21 @@ importers:
       '@ngrx/signals':
         specifier: ^20.0.0
         version: 20.0.0(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2)
+      '@signaltree/batching':
+        specifier: file:packages/batching/dist/esm/signaltree-batching-1.1.9.tgz
+        version: file:packages/batching/dist/esm/signaltree-batching-1.1.9.tgz(@signaltree/core@file:dist/packages/core/signaltree-core-1.1.9.tgz(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1)))
+      '@signaltree/batching-impl':
+        specifier: file:/tmp/signaltree-batching-impl-1.1.9.tgz
+        version: file:../../../../tmp/signaltree-batching-impl-1.1.9.tgz
+      '@signaltree/lazy-tree':
+        specifier: file:/tmp/signaltree-lazy-tree-1.1.9.tgz
+        version: file:../../../../tmp/signaltree-lazy-tree-1.1.9.tgz
+      '@signaltree/middleware':
+        specifier: file:packages/middleware/dist/esm/signaltree-middleware-1.1.9.tgz
+        version: file:packages/middleware/dist/esm/signaltree-middleware-1.1.9.tgz(@signaltree/core@file:dist/packages/core/signaltree-core-1.1.9.tgz(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1)))
+      '@signaltree/runtime-utils':
+        specifier: file:/tmp/signaltree-runtime-utils-1.1.9.tgz
+        version: file:../../../../tmp/signaltree-runtime-utils-1.1.9.tgz
       '@tanstack/store':
         specifier: ^0.7.2
         version: 0.7.2
@@ -105,6 +120,9 @@ importers:
       '@schematics/angular':
         specifier: ~20.1.0
         version: 20.1.4(chokidar@4.0.3)
+      '@signaltree/core':
+        specifier: file:/Users/jonathanborgia/code/signaltree alt/dist/packages/core/signaltree-core-1.1.9.tgz
+        version: file:dist/packages/core/signaltree-core-1.1.9.tgz(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1))
       '@swc-node/register':
         specifier: ~1.9.1
         version: 1.9.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@swc/types@0.1.23)(typescript@5.8.3)
@@ -2708,6 +2726,36 @@ packages:
 
   '@shikijs/vscode-textmate@10.0.2':
     resolution: {integrity: sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg==}
+
+  '@signaltree/batching-impl@file:../../../../tmp/signaltree-batching-impl-1.1.9.tgz':
+    resolution: {integrity: sha512-r7mOWjH6RpTtZ1k1OaN0tUPt83r0UTZtP9ZlyDw+tOBb+zxeC/w0WGaw/r7z8gaLBMWGcU22Dtejh/xnXWIVOg==, tarball: file:../../../../tmp/signaltree-batching-impl-1.1.9.tgz}
+    version: 1.1.9
+
+  '@signaltree/batching@file:packages/batching/dist/esm/signaltree-batching-1.1.9.tgz':
+    resolution: {integrity: sha512-wG5V8h9iAPqsyO9xPC7na73oNG1gC40pZMRNkkBBtB3CE3sACJbEVFNiI6rQyhxyW6oH1q4ILky942FgBTMTLg==, tarball: file:packages/batching/dist/esm/signaltree-batching-1.1.9.tgz}
+    version: 1.1.9
+    peerDependencies:
+      '@signaltree/core': ^1.0.0
+
+  '@signaltree/core@file:dist/packages/core/signaltree-core-1.1.9.tgz':
+    resolution: {integrity: sha512-HbNoDu/exNyeCgz0vW9C9EMjtAqdM7tZB+cplGY0QsWjqycNkbq6qAbs/aIQSBY36cpBGl9UUtIjr8btqsbgfg==, tarball: file:dist/packages/core/signaltree-core-1.1.9.tgz}
+    version: 1.1.9
+    peerDependencies:
+      '@angular/core': ^20.1.0
+
+  '@signaltree/lazy-tree@file:../../../../tmp/signaltree-lazy-tree-1.1.9.tgz':
+    resolution: {integrity: sha512-gEYWfvix+ZVfEovO3ZVxzPvP5Ta1wPCUR0lOWwYUVrYVhYb1CGpoV1uq32EBk6eXSOFompWnUIz/v2Yrd/W13Q==, tarball: file:../../../../tmp/signaltree-lazy-tree-1.1.9.tgz}
+    version: 1.1.9
+
+  '@signaltree/middleware@file:packages/middleware/dist/esm/signaltree-middleware-1.1.9.tgz':
+    resolution: {integrity: sha512-1E7iRT+Cgv9ZrW/1kl8FhRWzNMQcQnI9NzS3cqr9MpWFZbiu4sYxWr5aqfu64UEwkfRxGF4IeHoKFa9Fd/jcSQ==, tarball: file:packages/middleware/dist/esm/signaltree-middleware-1.1.9.tgz}
+    version: 1.1.9
+    peerDependencies:
+      '@signaltree/core': ^1.1.9
+
+  '@signaltree/runtime-utils@file:../../../../tmp/signaltree-runtime-utils-1.1.9.tgz':
+    resolution: {integrity: sha512-18q1uBMN2AaaoMttu+N936GXxU7cBlLcrG/0sfWh8FRt+RX96dHqsbwYO3j1VCFDH/S5XtObIuAD+Y3lO+ZcDw==, tarball: file:../../../../tmp/signaltree-runtime-utils-1.1.9.tgz}
+    version: 1.1.9
 
   '@sigstore/bundle@3.1.0':
     resolution: {integrity: sha512-Mm1E3/CmDDCz3nDhFKTuYdB47EdRFRQMOE/EAbiG1MJW77/w1b3P7Qx7JSrVJs8PfwOLOVcKQCHErIwCTyPbag==}
@@ -11231,6 +11279,27 @@ snapshots:
       '@types/hast': 3.0.4
 
   '@shikijs/vscode-textmate@10.0.2': {}
+
+  '@signaltree/batching-impl@file:../../../../tmp/signaltree-batching-impl-1.1.9.tgz': {}
+
+  '@signaltree/batching@file:packages/batching/dist/esm/signaltree-batching-1.1.9.tgz(@signaltree/core@file:dist/packages/core/signaltree-core-1.1.9.tgz(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1)))':
+    dependencies:
+      '@signaltree/core': file:dist/packages/core/signaltree-core-1.1.9.tgz(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1))
+      tslib: 2.8.1
+
+  '@signaltree/core@file:dist/packages/core/signaltree-core-1.1.9.tgz(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1))':
+    dependencies:
+      '@angular/core': 20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1)
+      tslib: 2.8.1
+
+  '@signaltree/lazy-tree@file:../../../../tmp/signaltree-lazy-tree-1.1.9.tgz': {}
+
+  '@signaltree/middleware@file:packages/middleware/dist/esm/signaltree-middleware-1.1.9.tgz(@signaltree/core@file:dist/packages/core/signaltree-core-1.1.9.tgz(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1)))':
+    dependencies:
+      '@signaltree/core': file:dist/packages/core/signaltree-core-1.1.9.tgz(@angular/core@20.1.4(@angular/compiler@20.1.4)(rxjs@7.8.2)(zone.js@0.15.1))
+      tslib: 2.8.1
+
+  '@signaltree/runtime-utils@file:../../../../tmp/signaltree-runtime-utils-1.1.9.tgz': {}
 
   '@sigstore/bundle@3.1.0':
     dependencies:

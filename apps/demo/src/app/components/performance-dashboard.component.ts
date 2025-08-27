@@ -646,7 +646,7 @@ export class PerformanceDashboardComponent {
     const tree = signalTree({
       counter: 0,
       data: { value: Math.random() },
-    }).pipe(withBatching(), withMemoization());
+    }).with(withBatching(), withMemoization());
 
     const results: number[] = [];
 

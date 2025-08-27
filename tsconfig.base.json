@@ -20,8 +20,11 @@
       "@signaltree/ng-forms": ["packages/ng-forms/src/index.ts"],
       "@signaltree/async": ["packages/async/src/index.ts"],
       "@signaltree/batching": ["packages/batching/src/index.ts"],
-      "@signaltree/core": ["packages/core/src/index.ts"],
-      "@signaltree/devtools": ["packages/devtools/src/index.ts"],
+      "@signaltree/core": ["packages/core/src/index.ts", "dist/packages/core"],
+      "@signaltree/devtools": [
+        "packages/devtools/src/index.ts",
+        "dist/packages/devtools"
+      ],
       "@signaltree/entities": ["packages/entities/src/index.ts"],
       "@signaltree/memoization": ["packages/memoization/src/index.ts"],
       "@signaltree/middleware": ["packages/middleware/src/index.ts"],
@@ -29,7 +32,15 @@
       "@signaltree/presets": ["packages/presets/src/index.ts"],
       "@signaltree/serialization": ["packages/serialization/src/index.ts"],
       "@signaltree/time-travel": ["packages/time-travel/src/index.ts"],
-      "@signaltree/utils": ["packages/utils/src/index.ts"]
+      "@signaltree/utils": ["packages/utils/src/index.ts"],
+      "@signaltree/devtools-impl": [
+        "packages/devtools-impl/src/index.ts",
+        "dist/packages/devtools-impl"
+      ],
+      "@signaltree/runtime-utils": [
+        "packages/runtime-utils/src/index.ts",
+        "dist/packages/runtime-utils"
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

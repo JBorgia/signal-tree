@@ -43,6 +43,43 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint"
+    },
+    "pack-and-build-others": {
+      "executor": "@nx/workspace:run-commands",
+      "options": {
+        "commands": [
+          "npx ng-packagr -p packages/core/ng-package.json",
+          "rm -rf node_modules/@signaltree/core || true",
+          "mkdir -p node_modules/@signaltree",
+          "cp -R dist/packages/core node_modules/@signaltree/core",
+          "npx ng-packagr -p packages/batching/ng-package.json",
+          "npx ng-packagr -p packages/devtools/ng-package.json",
+          "npx ng-packagr -p packages/middleware/ng-package.json",
+          "node scripts/bundle-size-report.js",
+          "rm -rf node_modules/@signaltree/core"
+        ],
+        "parallel": false
+      }
+    },
+    "build:esm": {
+      "executor": "@nx/workspace:run-commands",
+      "options": {
+        "commands": ["npx tsc -p packages/core/tsconfig.build.json"],
+        "parallel": false
+      }
+    },
+    "pack-esm": {
+      "executor": "@nx/workspace:run-commands",
+      "options": {
+        "commands": [
+          "npx tsc -p packages/core/tsconfig.build.json",
+          "rm -rf packages/core/dist/esm/package.json || true",
+          "cp packages/core/package.json packages/core/dist/esm/package.json",
+          "cd packages/core/dist/esm && npm pack"
+        ],
+        "cwd": ".",
+        "parallel": false
+      }
     }
   }
 }

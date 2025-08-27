@@ -261,7 +261,7 @@ export class EntitiesDemoComponent {
     posts: [],
     selectedUserId: null,
     searchTerm: '',
-  }).pipe(withEntities());
+  }).with(withEntities());
 
   // Entity helpers using @signaltree/entities
   userHelpers = this.store.asCrud<User>('users');

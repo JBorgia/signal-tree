@@ -485,7 +485,7 @@ export class BatchingDemoComponent {
     autoProcess: true,
     batchSize: 5,
     processingDelay: 1000,
-  }).pipe(
+  }).with(
     withBatching({
       enabled: true,
       maxBatchSize: 50,

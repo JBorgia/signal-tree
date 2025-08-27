@@ -72,11 +72,11 @@ describe('signalTree', () => {
     const tree = signalTree({ count: 0 });
 
     // Test pipe with no arguments returns the tree
-    const result = tree.pipe();
+    const result = tree.with();
     expect(result).toBe(tree);
 
     // Test pipe with a function
-    const result2 = tree.pipe((t) => t.$());
+    const result2 = tree.with((t) => t.$());
     expect(result2).toEqual({ count: 0 });
   });
 
@@ -106,11 +106,11 @@ describe('signalTree', () => {
     const tree = signalTree({ count: 0 });
 
     // Test pipe method exists
-    expect(tree.pipe).toBeDefined();
-    expect(typeof tree.pipe).toBe('function');
+    expect(tree.with).toBeDefined();
+    expect(typeof tree.with).toBe('function');
 
     // Test empty pipe returns same tree
-    const piped = tree.pipe();
+    const piped = tree.with();
     expect(piped).toBe(tree);
   });
 
@@ -125,7 +125,7 @@ describe('signalTree', () => {
       };
     };
 
-    const enhanced = tree.pipe(addCustomMethod);
+    const enhanced = tree.with(addCustomMethod);
     expect(enhanced.customMethod).toBeDefined();
     expect(enhanced.customMethod()).toBe('custom');
   });
@@ -143,7 +143,7 @@ describe('signalTree', () => {
       method2: () => 'method2',
     });
 
-    const enhanced = tree.pipe(addMethod1, addMethod2);
+    const enhanced = tree.with(addMethod1, addMethod2);
     expect(enhanced.method1).toBeDefined();
     expect(enhanced.method2).toBeDefined();
     expect(enhanced.method1()).toBe('method1');

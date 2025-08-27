@@ -39,17 +39,51 @@ function validatePackages() {
   let totalClaimedSize = 0;
 
   packages.forEach((pkg) => {
-    const distPath = path.join(
-      __dirname,
-      `../dist/packages/${pkg.name}/fesm2022/signaltree-${pkg.name}.mjs`
-    );
+    // Resolve the runtime entry for this package from the generated dist package.json
+    const pkgDistDir = path.join(__dirname, `../dist/packages/${pkg.name}`);
+    let runtimeEntry;
 
-    if (!fs.existsSync(distPath)) {
-      console.log(`⚠️  ${pkg.name}: Build not found (${distPath})`);
+    try {
+      const generatedPkgJsonPath = path.join(pkgDistDir, 'package.json');
+      if (fs.existsSync(generatedPkgJsonPath)) {
+        const generatedPkg = JSON.parse(
+          fs.readFileSync(generatedPkgJsonPath, 'utf8')
+        );
+        // Prefer explicit module field, then exports import/default, then fallback
+        if (generatedPkg.module) {
+          runtimeEntry = path.join(pkgDistDir, generatedPkg.module);
+        } else if (generatedPkg.exports && generatedPkg.exports['.']) {
+          const exp = generatedPkg.exports['.'];
+          const candidate = exp.import || exp.default || exp;
+          if (typeof candidate === 'string')
+            runtimeEntry = path.join(
+              pkgDistDir,
+              candidate.replace(/^\.\//, '')
+            );
+        }
+      }
+    } catch (err) {
+      console.warn(
+        `Could not read generated package.json for ${pkg.name}: ${
+          err && err.message
+        }`
+      );
+    }
+
+    // Fallback to conventional fesm2022 path
+    if (!runtimeEntry) {
+      runtimeEntry = path.join(
+        pkgDistDir,
+        `fesm2022/signaltree-${pkg.name}.mjs`
+      );
+    }
+
+    if (!fs.existsSync(runtimeEntry)) {
+      console.log(`⚠️  ${pkg.name}: Build not found (${runtimeEntry})`);
       return;
     }
 
-    const content = fs.readFileSync(distPath);
+    const content = fs.readFileSync(runtimeEntry);
     const rawSize = content.length;
     const gzipSize = getGzipSize(content);
 

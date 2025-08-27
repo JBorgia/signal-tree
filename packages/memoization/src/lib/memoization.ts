@@ -167,6 +167,46 @@ export function withMemoization<T>(
     const cache = new Map<string, CacheEntry<unknown>>();
     memoizationCache.set(tree as object, cache);
 
+    // If core provides a cleanup registry, register per-tree cleanup so
+    // intervals and caches are cleared when the tree is destroyed.
+    try {
+      const register = (
+        tree as unknown as {
+          __registerCleanup?: (fn: () => void) => void;
+          _memoCleanupInterval?: ReturnType<typeof setInterval>;
+        }
+      ).__registerCleanup;
+      if (typeof register === 'function') {
+        register(() => {
+          try {
+            // Clear this tree's cache
+            memoizationCache.delete(tree as object);
+          } catch {
+            // ignore
+          }
+          try {
+            // Clear per-tree interval if set
+            const id = (
+              tree as unknown as {
+                _memoCleanupInterval?: ReturnType<typeof setInterval>;
+              }
+            )._memoCleanupInterval;
+            if (id) {
+              try {
+                clearInterval(id as unknown as number);
+              } catch {
+                // ignore
+              }
+            }
+          } catch {
+            // ignore
+          }
+        });
+      }
+    } catch {
+      // ignore
+    }
+
     // Limit cache size function
     const enforceCacheLimit = () => {
       if (cache.size > maxCacheSize) {

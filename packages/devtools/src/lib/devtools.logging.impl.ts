@@ -1,5 +1,16 @@
 import { CompositionLogger } from './devtools.impl';
 
+// Runtime flag to enable dev-only logging. Prefer Angular's ngDevMode when
+// available, otherwise fall back to checking NODE_ENV != 'production'. This
+// avoids referencing process.env directly in browser-only builds unless it's
+// available at bundle time.
+const ENABLE_DEV_LOGS =
+  typeof ngDevMode !== 'undefined'
+    ? Boolean(ngDevMode as unknown as boolean)
+    : typeof process !== 'undefined' && (process as any).env
+    ? (process as any).env.NODE_ENV !== 'production'
+    : false;
+
 // Heavy composition logger moved to a separate module so it can be lazy-loaded
 // and keep the main devtools bundle small. The heavy logger contains verbose
 // templates and human-friendly messages that are not required synchronously
@@ -23,10 +34,12 @@ export function createHeavyCompositionLogger(): CompositionLogger {
   };
 
   return {
-    logComposition: (modules: string[], action: 'pipe' | 'enhance') => {
+    logComposition: (modules: string[], action: 'with' | 'enhance') => {
       addLog('core', 'composition', { modules, action });
       try {
-        console.log('🔗 Composition ' + action + ':', modules.join(' → '));
+        if (ENABLE_DEV_LOGS) {
+          console.log('🔗 Composition ' + action + ':', modules.join(' → '));
+        }
       } catch (err) {
         void err;
       }
@@ -39,7 +52,9 @@ export function createHeavyCompositionLogger(): CompositionLogger {
     ) => {
       addLog(module, 'method', { method, args, result });
       try {
-        console.debug(`🔧 [${module}] ${method}`, { args, result });
+        if (ENABLE_DEV_LOGS) {
+          console.debug(`🔧 [${module}] ${method}`, { args, result });
+        }
       } catch (err) {
         void err;
       }
@@ -52,10 +67,12 @@ export function createHeavyCompositionLogger(): CompositionLogger {
     ) => {
       addLog(module, 'state', { path, oldValue, newValue });
       try {
-        console.debug(`📝 [${module}] State change at ${path}:`, {
-          from: oldValue,
-          to: newValue,
-        });
+        if (ENABLE_DEV_LOGS) {
+          console.debug(`📝 [${module}] State change at ${path}:`, {
+            from: oldValue,
+            to: newValue,
+          });
+        }
       } catch (err) {
         void err;
       }
@@ -68,11 +85,13 @@ export function createHeavyCompositionLogger(): CompositionLogger {
     ) => {
       addLog(module, 'performance', { operation, duration, threshold });
       try {
-        console.warn(
-          `⚠️ [${module}] Slow ${operation}: ${duration.toFixed(
-            2
-          )}ms (threshold: ${threshold}ms)`
-        );
+        if (ENABLE_DEV_LOGS) {
+          console.warn(
+            `⚠️ [${module}] Slow ${operation}: ${duration.toFixed(
+              2
+            )}ms (threshold: ${threshold}ms)`
+          );
+        }
       } catch (err) {
         void err;
       }

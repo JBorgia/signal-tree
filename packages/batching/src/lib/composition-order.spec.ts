@@ -12,7 +12,7 @@ describe('Enhancer composition order (batching <-> devtools)', () => {
 
   it('works when batching is applied before devtools', () => {
     const initial = { count: 0 };
-    const tree = signalTree(initial).pipe(
+    const tree = signalTree(initial).with(
       withBatching(),
       withDevTools({ enableBrowserDevTools: false })
     );
@@ -48,7 +48,7 @@ describe('Enhancer composition order (batching <-> devtools)', () => {
 
   it('works when devtools is applied before batching', () => {
     const initial = { count: 0 };
-    const tree = signalTree(initial).pipe(
+    const tree = signalTree(initial).with(
       withDevTools({ enableBrowserDevTools: false }),
       withBatching()
     );
