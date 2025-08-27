@@ -3,7 +3,7 @@
  * @see https://github.com/JBorgia/signaltree/blob/main/LICENSE
  */
 
-import { signal, WritableSignal, isSignal } from '@angular/core';
+import { signal, WritableSignal, isSignal, Signal } from '@angular/core';
 import type { DeepSignalify } from './types';
 
 /**
@@ -493,4 +493,121 @@ export function shallowEqual<T>(a: T, b: T): boolean {
   }
 
   return false;
+}
+
+/**
+ * Unwraps the current value from a signal or signal tree.
+ *
+ * This utility function safely extracts the current value from signals,
+ * handling both individual signals and complex signal trees. It recursively
+ * unwraps nested signal structures to return plain JavaScript values.
+ *
+ * @template T - The type of the unwrapped value
+ * @param signalOrTree - A signal, signal tree, or any value to unwrap
+ * @returns The unwrapped value(s)
+ *
+ * @example
+ * ```typescript
+ * const tree = signalTree({ user: { name: 'John' }, count: 5 });
+ *
+ * // Unwrap individual signals
+ * const name = unwrap(tree.$.user.name); // 'John'
+ * const count = unwrap(tree.$.count);    // 5
+ *
+ * // Unwrap nested signal objects
+ * const user = unwrap(tree.$.user);      // { name: 'John' }
+ *
+ * // Unwrap entire tree
+ * const state = unwrap(tree.$);
+ * console.log(state); // { user: { name: 'John', age: 30 } }
+ *
+ * // Unwrap sub-branch
+ * const user = unwrap(tree.$.user);
+ * console.log(user); // { name: 'John', age: 30 }
+ * ```
+ */
+export function unwrap<T>(node: unknown): T {
+  // Handle null/undefined
+  if (node === null || node === undefined) {
+    return node as T;
+  }
+
+  // Handle signals directly
+  if (isSignal(node)) {
+    return (node as Signal<T>)();
+  }
+
+  // Handle primitives
+  if (typeof node !== 'object') {
+    return node as T;
+  }
+
+  // Handle arrays (which are signals in our structure)
+  if (isSignal(node)) {
+    return (node as Signal<T>)();
+  }
+
+  // Build result object, filtering out methods
+  const result = {} as Record<string, unknown>;
+  const skipKeys = new Set(['set', 'update']);
+
+  for (const key in node) {
+    if (skipKeys.has(key)) continue;
+    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+
+    const value = (node as Record<string, unknown>)[key];
+
+    if (isSignal(value)) {
+      result[key] = (value as Signal<unknown>)();
+    } else if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      !isBuiltInObject(value)
+    ) {
+      // Nested signal state - recurse
+      result[key] = unwrap(value);
+    } else {
+      result[key] = value;
+    }
+  }
+
+  // Handle symbol properties
+  const symbols = Object.getOwnPropertySymbols(node);
+  for (const sym of symbols) {
+    const value = (node as Record<symbol, unknown>)[sym];
+    if (isSignal(value)) {
+      (result as Record<symbol, unknown>)[sym] = (value as Signal<unknown>)();
+    } else {
+      (result as Record<symbol, unknown>)[sym] = value;
+    }
+  }
+
+  return result as T;
+}
+
+/**
+ * Helper to check if a value is a built-in object
+ */
+function isBuiltInObject(v: unknown): boolean {
+  if (v === null || v === undefined) return false;
+
+  return (
+    v instanceof Date ||
+    v instanceof RegExp ||
+    typeof v === 'function' ||
+    v instanceof Map ||
+    v instanceof Set ||
+    v instanceof WeakMap ||
+    v instanceof WeakSet ||
+    v instanceof ArrayBuffer ||
+    v instanceof DataView ||
+    v instanceof Error ||
+    v instanceof Promise ||
+    v instanceof URL ||
+    v instanceof URLSearchParams ||
+    v instanceof FormData ||
+    v instanceof Blob ||
+    (typeof File !== 'undefined' && v instanceof File)
+  );
 }

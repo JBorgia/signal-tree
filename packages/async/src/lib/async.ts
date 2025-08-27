@@ -69,7 +69,7 @@ interface ExtendedAsyncActionConfig<T, TResult>
  * );
  * ```
  */
-interface AsyncSignalTree<T> extends SignalTree<T> {
+export interface AsyncSignalTree<T> extends SignalTree<T> {
   /**
    * Creates an async action with comprehensive state management and lifecycle hooks.
    *
@@ -445,8 +445,8 @@ export function withAsync<T>(
       return tree as AsyncSignalTree<T>;
     }
 
-    // Override the asyncAction stub with real implementation
-    tree.asyncAction = <TInput, TResult>(
+    // Create the async action function first
+    const asyncAction = <TInput, TResult>(
       operation: (input: TInput) => Promise<TResult>,
       actionConfig?: ExtendedAsyncActionConfig<T, TResult>
     ): AsyncAction<TInput, TResult> => {
@@ -457,40 +457,23 @@ export function withAsync<T>(
       );
     };
 
-    // Add convenience methods
-    const enhancedTree = tree as AsyncSignalTree<T>;
-
-    enhancedTree.loadData = <TResult>(
-      loader: () => Promise<TResult>,
-      actionConfig?: ExtendedAsyncActionConfig<T, TResult>
-    ): AsyncAction<void, TResult> => {
-      return enhancedTree.asyncAction(() => loader(), actionConfig);
+    // Create enhanced tree with async capabilities
+    const enhancedTree: AsyncSignalTree<T> = {
+      ...tree,
+      asyncAction,
+      loadData: <TResult>(
+        loader: () => Promise<TResult>,
+        actionConfig?: ExtendedAsyncActionConfig<T, TResult>
+      ): AsyncAction<void, TResult> => {
+        return asyncAction(() => loader(), actionConfig);
+      },
+      submitForm: <TInput, TResult>(
+        submitter: (input: TInput) => Promise<TResult>,
+        actionConfig?: ExtendedAsyncActionConfig<T, TResult>
+      ): AsyncAction<TInput, TResult> => {
+        return asyncAction(submitter, actionConfig);
+      },
     };
-
-    enhancedTree.submitForm = <TInput, TResult>(
-      submitter: (input: TInput) => Promise<TResult>,
-      actionConfig?: ExtendedAsyncActionConfig<T, TResult>
-    ): AsyncAction<TInput, TResult> => {
-      return enhancedTree.asyncAction(submitter, actionConfig);
-    };
-
-    // Also expose async helpers on the callable proxy (`tree.$`) so callers
-    // can use `tree.$.asyncAction(...)`, `tree.$.loadData(...)` and
-    // `tree.$.submitForm(...)`. Wrapped in try/catch as a best-effort
-    // non-breaking migration step.
-    try {
-      const stateProxy = tree.$ as unknown as {
-        asyncAction?: typeof enhancedTree.asyncAction;
-        loadData?: typeof enhancedTree.loadData;
-        submitForm?: typeof enhancedTree.submitForm;
-      };
-
-      stateProxy.asyncAction = enhancedTree.asyncAction.bind(tree);
-      stateProxy.loadData = enhancedTree.loadData.bind(tree);
-      stateProxy.submitForm = enhancedTree.submitForm.bind(tree);
-    } catch {
-      // ignore - best-effort only
-    }
 
     return enhancedTree;
   };

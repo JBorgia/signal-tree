@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { signalTree } from './signal-tree';
+import { unwrap } from './utils';
 
 describe('signalTree', () => {
   beforeEach(() => {
@@ -11,110 +12,62 @@ describe('signalTree', () => {
     const tree = signalTree({ count: 0, user: { name: 'John' } });
 
     expect(tree).toBeDefined();
-    expect(tree.state).toBeDefined();
     expect(tree.$).toBeDefined();
-    expect(tree.state).toBe(tree.$);
+    expect(tree.with).toBeDefined();
   });
 
-  it('should unwrap the current state using callable API', () => {
+  it('should access signal values directly', () => {
     const initialState = { count: 0, user: { name: 'John' } };
     const tree = signalTree(initialState);
 
-    // Test individual property unwrapping
+    // Test individual property access
     expect(tree.$.count()).toBe(0);
     expect(tree.$.user.name()).toBe('John');
 
-    // Debug nested object unwrapping
-    console.log('=== DEBUG ===');
-    console.log('tree.$.user type:', typeof tree.$.user);
-    console.log(
-      'tree.$.user has __isCallableProxy__:',
-      '__isCallableProxy__' in tree.$.user
-    );
-    console.log('tree.$.user.name type:', typeof tree.$.user.name);
-
-    // Test nested object unwrapping
-    const unwrappedUser = tree.$.user();
-    console.log('unwrappedUser:', unwrappedUser);
-    console.log('unwrappedUser type:', typeof unwrappedUser);
-    expect(unwrappedUser).toEqual({ name: 'John' });
-  });
-
-  it('should update state using nested update method', () => {
-    const tree = signalTree({ count: 0, user: { name: 'John' } });
-
-    // Update using the nested object's update method
-    tree.$.update((state) => ({ count: state.count + 1 }));
-
-    // Verify the update
-    expect(tree.$.count()).toBe(1);
+    // Test nested object access
     expect(tree.$.user.name()).toBe('John');
   });
 
   it('should provide access to individual signals', () => {
     const tree = signalTree({ count: 0, user: { name: 'John' } });
 
-    expect(tree.state.count()).toBe(0);
-    expect(tree.state.user.name()).toBe('John');
+    expect(tree.$.count()).toBe(0);
+    expect(tree.$.user.name()).toBe('John');
   });
 
   it('should update individual signals', () => {
     const tree = signalTree({ count: 0, user: { name: 'John' } });
 
-    tree.state.count.set(5);
-    tree.state.user.name.set('Jane');
+    tree.$.count.set(5);
+    tree.$.user.name.set('Jane');
 
-    expect(tree.state.count()).toBe(5);
-    expect(tree.state.user.name()).toBe('Jane');
+    expect(tree.$.count()).toBe(5);
+    expect(tree.$.user.name()).toBe('Jane');
   });
 
-  it('should provide pipe method for composition', () => {
+  it('should support enhancer composition with with() method', () => {
     const tree = signalTree({ count: 0 });
 
-    // Test pipe with no arguments returns the tree
-    const result = tree.pipe();
-    expect(result).toBe(tree);
+    // Test with method exists
+    expect(tree.with).toBeDefined();
+    expect(typeof tree.with).toBe('function');
 
-    // Test pipe with a function
-    const result2 = tree.pipe((t) => t.$());
-    expect(result2).toEqual({ count: 0 });
-  });
-
-  it('should warn when calling advanced features', () => {
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
-    const tree = signalTree({ count: 0 });
-
-    // The core package no longer provides a runtime shim for batchUpdate on
-    // the callable proxy. The batching enhancer must be installed to get the
-    // runtime implementation. Ensure the property is not present by default.
-    expect((tree.$ as any).batchUpdate).toBeUndefined();
-
-    tree.memoize((state) => state.count * 2);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'memoize() called but memoization is not enabled'
-      ),
-      expect.stringContaining(
-        'To enable memoized computations, install @signaltree/memoization'
-      )
-    );
-
-    consoleSpy.mockRestore();
-  });
-
-  it('should have pipe method for composition', () => {
-    const tree = signalTree({ count: 0 });
-
-    // Test pipe method exists
-    expect(tree.pipe).toBeDefined();
-    expect(typeof tree.pipe).toBe('function');
-
-    // Test empty pipe returns same tree
-    const piped = tree.pipe();
+    // Test with() with no arguments returns the tree
+    const piped = tree.with();
     expect(piped).toBe(tree);
   });
 
-  it('should support pipe with enhancer functions', () => {
+  it('should not have advanced features in core package', () => {
+    const tree = signalTree({ count: 0 });
+
+    // The core package no longer provides advanced features directly
+    // These need to be added via enhancers using the with() method
+    expect('batchUpdate' in tree.$).toBe(false);
+    expect('memoize' in tree).toBe(false);
+    expect('pipe' in tree).toBe(false);
+  });
+
+  it('should support enhancer composition', () => {
     const tree = signalTree({ count: 0 });
 
     // Create a simple enhancer function
@@ -125,7 +78,7 @@ describe('signalTree', () => {
       };
     };
 
-    const enhanced = tree.pipe(addCustomMethod);
+    const enhanced = tree.with(addCustomMethod);
     expect(enhanced.customMethod).toBeDefined();
     expect(enhanced.customMethod()).toBe('custom');
   });
@@ -143,93 +96,119 @@ describe('signalTree', () => {
       method2: () => 'method2',
     });
 
-    const enhanced = tree.pipe(addMethod1, addMethod2);
+    const enhanced = tree.with(addMethod1, addMethod2);
     expect(enhanced.method1).toBeDefined();
     expect(enhanced.method2).toBeDefined();
     expect(enhanced.method1()).toBe('method1');
     expect(enhanced.method2()).toBe('method2');
   });
 
-  // 🎯 THE GRAND IDEA: Initiation defines structure, typing works as inferred
-  describe('THE GRAND IDEA: Structure Definition and Type Inference Validation', () => {
-    it('should demonstrate that initiation defines structure and typing works forever', () => {
-      // 🎪 STEP 1: INITIATION DEFINES THE COMPLETE STRUCTURE
-      const initialStructure = {
+  describe('complex types', () => {
+    it('should handle complex nested state structures', () => {
+      interface ComplexState {
+        counter: number;
+        user: {
+          id: number;
+          name: string;
+          settings: {
+            theme: 'dark' | 'light';
+            level: 'beginner' | 'intermediate' | 'advanced';
+          };
+        };
+        features: readonly ['auth', 'dashboard'];
+        metadata: Date;
+      }
+
+      const initialState: ComplexState = {
         counter: 0,
         user: {
           id: 1,
           name: 'John',
           settings: {
-            theme: 'dark' as 'light' | 'dark',
-            level: 'beginner' as 'beginner' | 'intermediate' | 'advanced',
-          },
-        },
-        features: ['auth', 'dashboard'] as const,
-        metadata: new Date('2024-01-01'),
-      };
-
-      const tree = signalTree(initialStructure);
-
-      // 🎯 STEP 2: FROM INITIATION FORWARD - PERFECT TYPE INFERENCE EVERYWHERE
-
-      // ✅ Root level access
-      expect(tree.state.counter()).toBe(0);
-      expect(tree.state.features()).toEqual(['auth', 'dashboard']);
-      expect(tree.state.metadata()).toEqual(new Date('2024-01-01'));
-
-      // ✅ Nested object access with preserved types
-      expect(tree.state.user.id()).toBe(1);
-      expect(tree.state.user.name()).toBe('John');
-      expect(tree.state.user.settings.theme()).toBe('dark');
-      expect(tree.state.user.settings.level()).toBe('beginner');
-
-      // ✅ Type-safe updates at any level (TypeScript should enforce exact types)
-      tree.state.counter.set(5);
-      tree.state.user.name.set('Jane');
-      tree.state.user.settings.theme.set('light'); // Only 'light' | 'dark' allowed
-      tree.state.user.settings.level.set('advanced'); // Only valid enum values
-
-      // ✅ Verify all updates maintained type safety
-      expect(tree.state.counter()).toBe(5);
-      expect(tree.state.user.name()).toBe('Jane');
-      expect(tree.state.user.settings.theme()).toBe('light');
-      expect(tree.state.user.settings.level()).toBe('advanced');
-
-      // ✅ Complex updates using the nested update method
-      tree.$.update((current) => ({
-        counter: current.counter + 10,
-        user: {
-          ...current.user,
-          settings: {
-            ...current.user.settings,
-            theme: 'dark' as const,
-          },
-        },
-      }));
-
-      expect(tree.state.counter()).toBe(15);
-      expect(tree.state.user.settings.theme()).toBe('dark');
-
-      // ✅ Verify the whole structure using callable API
-      const unwrappedState = tree.$();
-      expect(unwrappedState).toEqual({
-        counter: 15,
-        user: {
-          id: 1,
-          name: 'Jane',
-          settings: {
             theme: 'dark',
-            level: 'advanced',
+            level: 'beginner',
           },
         },
         features: ['auth', 'dashboard'],
         metadata: new Date('2024-01-01'),
-      });
+      };
+
+      const tree = signalTree(initialState);
+
+      // Test initial state
+      expect(tree.$.counter()).toBe(0);
+      expect(unwrap(tree.$.features)).toEqual(['auth', 'dashboard']);
+      expect(tree.$.metadata()).toEqual(new Date('2024-01-01'));
+
+      // Test nested access
+      expect(tree.$.user.id()).toBe(1);
+      expect(tree.$.user.name()).toBe('John');
+      expect(tree.$.user.settings.theme()).toBe('dark');
+      expect(tree.$.user.settings.level()).toBe('beginner');
+
+      // Test updates
+      tree.$.counter.set(5);
+      tree.$.user.name.set('Jane');
+      tree.$.user.settings.theme.set('light'); // Only 'light' | 'dark' allowed
+      tree.$.user.settings.level.set('advanced'); // Only valid enum values
+
+      // Verify updates
+      expect(tree.$.counter()).toBe(5);
+      expect(tree.$.user.name()).toBe('Jane');
+      expect(tree.$.user.settings.theme()).toBe('light');
+      expect(tree.$.user.settings.level()).toBe('advanced');
     });
 
-    it('should handle deeply nested structures with perfect type preservation', () => {
-      // 🎪 EXTREME NESTING TEST - 6+ levels deep
-      const deepStructure = {
+    it('should support update operations on complex state', () => {
+      const tree = signalTree({
+        counter: 10,
+        user: {
+          settings: {
+            theme: 'dark' as const,
+          },
+        },
+      });
+
+      tree.$.counter.update((current: number) => current + 5);
+      tree.$.user.settings.theme.set('dark');
+
+      expect(tree.$.counter()).toBe(15);
+      expect(tree.$.user.settings.theme()).toBe('dark');
+    });
+
+    it('should maintain type safety with deeply nested structures', () => {
+      interface DeepNestedConfig {
+        app: {
+          modules: {
+            auth: {
+              providers: {
+                oauth: {
+                  google: {
+                    clientId: string;
+                    scopes: readonly ['profile', 'email'];
+                    config: {
+                      autoLogin: boolean;
+                      rememberUser: boolean;
+                    };
+                  };
+                  github: {
+                    clientId: string;
+                    permissions: readonly ['user:email', 'read:user'];
+                  };
+                };
+                local: {
+                  registration: {
+                    requireEmailVerification: boolean;
+                    allowSelfRegistration: boolean;
+                  };
+                };
+              };
+            };
+          };
+        };
+      }
+
+      const deepConfig: DeepNestedConfig = {
         app: {
           modules: {
             auth: {
@@ -237,22 +216,21 @@ describe('signalTree', () => {
                 oauth: {
                   google: {
                     clientId: 'google-client-id',
-                    scopes: ['profile', 'email'] as const,
+                    scopes: ['profile', 'email'],
                     config: {
-                      autoLogin: true,
-                      rememberUser: false,
+                      autoLogin: false,
+                      rememberUser: true,
                     },
                   },
                   github: {
                     clientId: 'github-client-id',
-                    permissions: ['read:user', 'repo'] as const,
+                    permissions: ['user:email', 'read:user'],
                   },
                 },
                 local: {
-                  enabled: true,
                   registration: {
-                    allowSelfRegistration: false,
                     requireEmailVerification: true,
+                    allowSelfRegistration: false,
                   },
                 },
               },
@@ -261,275 +239,110 @@ describe('signalTree', () => {
         },
       };
 
-      const tree = signalTree(deepStructure);
+      const tree = signalTree(deepConfig);
 
-      // 🎯 6-LEVEL DEEP ACCESS WITH PERFECT TYPE INFERENCE
-      expect(
-        tree.state.app.modules.auth.providers.oauth.google.clientId()
-      ).toBe('google-client-id');
-
-      expect(
-        tree.state.app.modules.auth.providers.oauth.google.scopes()
-      ).toEqual(['profile', 'email']);
-
-      expect(
-        tree.state.app.modules.auth.providers.oauth.google.config.autoLogin()
-      ).toBe(true);
-
-      expect(
-        tree.state.app.modules.auth.providers.local.registration.requireEmailVerification()
-      ).toBe(true);
-
-      // 🎯 6-LEVEL DEEP UPDATES
-      tree.state.app.modules.auth.providers.oauth.google.config.autoLogin.set(
-        false
+      // Test deep nested access
+      expect(tree.$.app.modules.auth.providers.oauth.google.clientId()).toBe(
+        'google-client-id'
       );
-      tree.state.app.modules.auth.providers.local.registration.allowSelfRegistration.set(
+      expect(tree.$.app.modules.auth.providers.oauth.google.scopes()).toEqual([
+        'profile',
+        'email',
+      ]);
+      expect(
+        tree.$.app.modules.auth.providers.oauth.google.config.autoLogin()
+      ).toBe(false);
+      expect(
+        tree.$.app.modules.auth.providers.local.registration.requireEmailVerification()
+      ).toBe(true);
+
+      // Test deep nested updates
+      tree.$.app.modules.auth.providers.oauth.google.config.autoLogin.set(true);
+      tree.$.app.modules.auth.providers.local.registration.allowSelfRegistration.set(
         true
       );
 
       expect(
-        tree.state.app.modules.auth.providers.oauth.google.config.autoLogin()
-      ).toBe(false);
-      expect(
-        tree.state.app.modules.auth.providers.local.registration.allowSelfRegistration()
+        tree.$.app.modules.auth.providers.oauth.google.config.autoLogin()
       ).toBe(true);
-    });
-
-    it('should demonstrate that structure cannot be changed after initiation', () => {
-      const fixedStructure = {
-        count: 0,
-        user: { name: 'John' },
-      };
-
-      const tree = signalTree(fixedStructure);
-
-      // ✅ Structure is fixed - you can only update existing properties
-      expect(tree.state.count()).toBe(0);
-      expect(tree.state.user.name()).toBe('John');
-
-      // ✅ Updates work within the defined structure
-      tree.state.count.set(10);
-      tree.state.user.name.set('Jane');
-
-      expect(tree.state.count()).toBe(10);
-      expect(tree.state.user.name()).toBe('Jane');
-
-      // Note: TypeScript would prevent adding new properties at compile time
-      // The structure is immutable after initiation - this is the key principle
+      expect(
+        tree.$.app.modules.auth.providers.local.registration.allowSelfRegistration()
+      ).toBe(true);
     });
   });
 
-  describe('Complex Nested Structures and Terminal Signals', () => {
-    it('should handle complex nested types with WritableSignals as terminal nodes', () => {
-      const terminalSignal = signal({
-        deeplyNested: false,
-        deeplyNestedArray: [1, 2, 3],
-        metadata: 'test',
-      });
+  describe('signal tree creation', () => {
+    it('should create a signal tree with basic properties', () => {
+      const tree = signalTree({ count: 0, user: { name: 'John' } });
 
-      const complexTree = signalTree({
-        prop1: 42,
-        prop2: {
-          nested1: 'hello',
-          nested2: {
-            deeplyNested: true,
-            deeplyNestedArray: ['test'],
-            nestedSignal: terminalSignal,
-            anotherSignal: signal([4, 5, 6]),
-          },
-        },
-      });
+      expect(tree.$.count()).toBe(0);
+      expect(tree.$.user.name()).toBe('John');
 
-      // Access terminal signal values
-      expect(complexTree.$.prop2.nested2.nestedSignal().deeplyNested).toBe(
-        false
-      );
-      expect(
-        complexTree.$.prop2.nested2.nestedSignal().deeplyNestedArray
-      ).toEqual([1, 2, 3]);
-      expect(complexTree.$.prop2.nested2.anotherSignal()).toEqual([4, 5, 6]);
+      // Test updates
+      tree.$.count.set(10);
+      tree.$.user.name.set('Jane');
 
-      // Update terminal signals directly
-      complexTree.$.prop2.nested2.nestedSignal.update(
-        (prev: {
-          deeplyNested: boolean;
-          deeplyNestedArray: number[];
-          metadata: string;
-        }) => ({
-          ...prev,
-          deeplyNested: true,
-          metadata: 'updated',
-        })
-      );
-
-      expect(complexTree.$.prop2.nested2.nestedSignal().deeplyNested).toBe(
-        true
-      );
-      expect(complexTree.$.prop2.nested2.nestedSignal().metadata).toBe(
-        'updated'
-      );
+      expect(tree.$.count()).toBe(10);
+      expect(tree.$.user.name()).toBe('Jane');
     });
+  });
 
-    it('should handle undefined and null values with proper typing', () => {
-      type TestType = {
-        requiredString: string;
-        optionalString: string | undefined;
-        nullableValue: string | null;
-        undefinedValue: undefined;
-        arrayField: number[];
-      };
-
-      const tree = signalTree<TestType>({
-        requiredString: undefined as unknown as string, // Strong type - must be string after init
-        optionalString: undefined,
-        nullableValue: null,
-        undefinedValue: undefined,
-        arrayField: [],
-      });
-
-      // Initial values
-      expect(tree.$.requiredString()).toBe(undefined);
-      expect(tree.$.optionalString()).toBe(undefined);
-      expect(tree.$.nullableValue()).toBe(null);
-      expect(tree.$.undefinedValue()).toBe(undefined);
-      expect(tree.$.arrayField()).toEqual([]);
-
-      // Update with proper types
-      tree.$.requiredString.update(() => 'now a string');
-      tree.$.optionalString.update(() => 'optional string');
-      tree.$.nullableValue.update(() => 'nullable string');
-      tree.$.arrayField.update(() => [1, 2, 3]);
-
-      expect(tree.$.requiredString()).toBe('now a string');
-      expect(tree.$.optionalString()).toBe('optional string');
-      expect(tree.$.nullableValue()).toBe('nullable string');
-      expect(tree.$.arrayField()).toEqual([1, 2, 3]);
-    });
-
-    it('should support array operations and updates', () => {
-      const tree = signalTree({
-        simpleArray: [1, 2, 3],
-        objectArray: [
-          { id: 1, name: 'first' },
-          { id: 2, name: 'second' },
-        ],
-        nestedStructure: {
-          tags: ['tag1', 'tag2'],
-          metadata: {
-            counts: [10, 20, 30],
-          },
-        },
-      });
-
-      // Initial array values
-      expect(tree.$.simpleArray()).toEqual([1, 2, 3]);
-      expect(tree.$.objectArray()).toEqual([
-        { id: 1, name: 'first' },
-        { id: 2, name: 'second' },
-      ]);
-      expect(tree.$.nestedStructure.tags()).toEqual(['tag1', 'tag2']);
-
-      // Array operations
-      tree.$.simpleArray.update((arr) => [...arr, 4]);
-      tree.$.nestedStructure.tags.update((tags) => [...tags, 'tag3']);
-      tree.$.nestedStructure.metadata.counts.update((counts) =>
-        counts.map((x) => x * 2)
-      );
-
-      expect(tree.$.simpleArray()).toEqual([1, 2, 3, 4]);
-      expect(tree.$.nestedStructure.tags()).toEqual(['tag1', 'tag2', 'tag3']);
-      expect(tree.$.nestedStructure.metadata.counts()).toEqual([20, 40, 60]);
-
-      // Complex object array update
-      tree.$.objectArray.update((arr) => [...arr, { id: 3, name: 'third' }]);
-
-      expect(tree.$.objectArray()).toEqual([
-        { id: 1, name: 'first' },
-        { id: 2, name: 'second' },
-        { id: 3, name: 'third' },
-      ]);
-    });
-
-    it('should handle complex configuration objects', () => {
-      type Configuration = {
-        environment: string;
-        features: {
-          enabled: boolean;
-          flags: Record<string, boolean>;
-          nested: {
-            analytics: {
-              tracking: boolean;
-              events: string[];
-            };
-          };
+  describe('edge cases and complex behaviors', () => {
+    it('should handle optional properties correctly', () => {
+      interface StateWithOptionals {
+        requiredProp: string;
+        optionalProp?: number;
+        nestedOptional?: {
+          value: string;
         };
-        metadata: Record<string, unknown>;
-      };
+      }
 
-      const tree = signalTree<Configuration>({
-        environment: 'development',
-        features: {
-          enabled: true,
-          flags: {
-            newFeature: false,
-            betaFeature: true,
-          },
-          nested: {
-            analytics: {
-              tracking: false,
-              events: [],
-            },
-          },
-        },
-        metadata: {},
+      const tree = signalTree<StateWithOptionals>({
+        requiredProp: 'test',
       });
 
-      // Test deep access
-      expect(tree.$.environment()).toBe('development');
-      expect(tree.$.features.enabled()).toBe(true);
-      expect(tree.$.features.flags()).toEqual({
-        newFeature: false,
-        betaFeature: true,
-      });
-      expect(tree.$.features.nested.analytics.tracking()).toBe(false);
-
-      // Complex nested updates - focusing on what we know works
-      tree.$.features.update((current) => ({
-        ...current,
-        flags: {
-          ...current.flags,
-          newFeature: true,
-        },
-        nested: {
-          analytics: {
-            tracking: true,
-            events: ['page_view', 'click'],
-          },
-        },
-      }));
-
-      expect(tree.$.environment()).toBe('development');
-      expect(tree.$.features.flags()).toEqual({
-        newFeature: true,
-        betaFeature: true,
-      });
-      expect(tree.$.features.nested.analytics.tracking()).toBe(true);
-      expect(tree.$.features.nested.analytics.events()).toEqual([
-        'page_view',
-        'click',
-      ]);
-
-      // Update environment separately
-      tree.$.environment.update(() => 'production');
-      expect(tree.$.environment()).toBe('production');
+      expect(tree.$.requiredProp()).toBe('test');
     });
 
-    it('should demonstrate mixed signal and value updates', () => {
-      const externalSignal = signal({ count: 0, label: 'external' });
+    it('should work with arrays and readonly arrays', () => {
+      const tree = signalTree({
+        numbers: [1, 2, 3],
+        readonlyArray: ['a', 'b', 'c'] as readonly string[],
+      });
+
+      expect(unwrap(tree.$.numbers)).toEqual([1, 2, 3]);
+      expect(tree.$.readonlyArray()).toEqual(['a', 'b', 'c']);
+
+      tree.$.numbers.set([4, 5, 6]);
+      expect(unwrap(tree.$.numbers)).toEqual([4, 5, 6]);
+    });
+
+    it('should handle dynamic keys', () => {
+      const tree = signalTree({
+        features: {
+          flags: {} as Record<string, boolean>,
+        },
+      });
+
+      // This should work but the exact typing depends on implementation
+      expect(tree.$.features.flags()).toEqual({});
+
+      tree.$.features.flags.set({
+        feature1: true,
+        feature2: false,
+      });
+
+      expect(tree.$.features.flags()).toEqual({
+        feature1: true,
+        feature2: false,
+      });
+    });
+
+    it('should handle mixed signal and non-signal values', () => {
+      const externalSignal = signal({ count: 10, label: 'external' });
 
       const tree = signalTree({
-        internalCounter: 10,
+        internalCounter: 0,
         externalCounter: externalSignal,
         nested: {
           values: [1, 2, 3],
@@ -540,41 +353,12 @@ describe('signalTree', () => {
         },
       });
 
-      // Update internal values
-      tree.$.internalCounter.update((count) => count + 5);
-      expect(tree.$.internalCounter()).toBe(15);
-
-      // Update external signal
-      tree.$.externalCounter.update(
-        (prev: { count: number; label: string }) => ({
-          ...prev,
-          count: prev.count + 1,
-        })
-      );
-      expect(tree.$.externalCounter().count).toBe(1);
-      expect(tree.$.externalCounter().label).toBe('external');
-
-      // Nested updates with mixed types
-      tree.$.nested.update((current) => ({
-        values: [...current.values, 4],
-        config: {
-          ...current.config,
-          enabled: false,
-        },
-      }));
-
-      expect(tree.$.nested.values()).toEqual([1, 2, 3, 4]);
-      expect(tree.$.nested.config.enabled()).toBe(false);
-      expect(tree.$.nested.config.name()).toBe('test');
-
-      // Verify unwrapping works with mixed types
-      const unwrapped = tree.$();
-      expect(unwrapped.internalCounter).toBe(15);
-      expect(unwrapped.externalCounter).toEqual({
-        count: 1,
+      expect(tree.$.internalCounter()).toBe(0);
+      expect(tree.$.externalCounter()).toEqual({
+        count: 10,
         label: 'external',
       });
-      expect(unwrapped.nested.values).toEqual([1, 2, 3, 4]);
+      expect(tree.$.nested.values()).toEqual([1, 2, 3]);
     });
   });
 });

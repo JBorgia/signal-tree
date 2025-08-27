@@ -1,5 +1,5 @@
 /**
- * SignalTree Core Types - Recursive Typing System
+ * SignalTree Core Types - Simplified Architecture
  *
  * MIT License
  * Copyright (c) 2025 Jonathan D Borgia
@@ -25,7 +25,6 @@ export type Primitive =
 
 /**
  * Built-in object types that should be treated as primitive values
- * Enhanced detection for better edge case handling
  */
 export type BuiltInObject =
   | Date
@@ -45,145 +44,50 @@ export type BuiltInObject =
   | Blob
   | File;
 
-export type IsPrimitive<T> = T extends Primitive ? true : false;
-export type IsBuiltInObject<T> = T extends BuiltInObject ? true : false;
-
 /**
- * Signal detection
- */
-export type IsSignal<T> = T extends Signal<unknown> ? true : false;
-export type IsWritableSignal<T> = T extends WritableSignal<unknown>
-  ? true
-  : false;
-
-/**
- * Enhanced DeepSignalify type that makes nested objects callable
- * Just like the classic implementation
+ * DeepSignalify type - recursively converts objects to signals
+ * Branch nodes have set/update methods, leaf nodes are just signals
  */
 export type DeepSignalify<T> = {
   [K in keyof T]: T[K] extends (infer U)[]
     ? WritableSignal<U[]>
     : T[K] extends object
     ? T[K] extends Signal<unknown>
-      ? T[K] // Don't double-wrap signals - keep original
+      ? T[K] // Don't double-wrap signals
       : T[K] extends BuiltInObject
       ? WritableSignal<T[K]>
       : T[K] extends (...args: unknown[]) => unknown
       ? WritableSignal<T[K]>
-      : DeepSignalify<T[K]>
+      : DeepSignalify<T[K]> & {
+          set(partial: Partial<T[K]>): void;
+          update(updater: (current: T[K]) => Partial<T[K]>): void;
+        }
     : WritableSignal<T[K]>;
-} & (() => T) & {
-    update(updaterOrPartial: ((current: T) => Partial<T>) | Partial<T>): void;
-    set(partial: Partial<T>): void;
-    // batchUpdate lives on the callable proxy. The core runtime will install
-    // a harmless stub when the batching enhancer isn't enabled so callers
-    // can safely invoke `tree.$.batchUpdate(...)` without runtime checks.
-    batchUpdate(updater: (current: T) => Partial<T>): void;
-    // Helpers that enhancers attach to the callable proxy. These are now
-    // considered part of the public callable proxy API for a smoother
-    // developer experience.
-    memoizedUpdate: (
-      updater: (current: T) => Partial<T>,
-      cacheKey?: string
-    ) => void;
-    clearMemoCache: (key?: string) => void;
-    getCacheStats: () => {
-      size?: number;
-      hitRate?: number;
-      totalHits?: number;
-      totalMisses?: number;
-      keys?: string[];
-    };
-    asyncAction: <TInput = void, TResult = void>(
-      operation: (input: TInput) => Promise<TResult>,
-      config?: AsyncActionConfig<T, TResult>
-    ) => AsyncAction<TInput, TResult>;
-    loadData: <TResult = void>(
-      loader: () => Promise<TResult>,
-      config?: AsyncActionConfig<T, TResult>
-    ) => AsyncAction<void, TResult>;
-    submitForm: <TInput = void, TResult = void>(
-      submitter: (input: TInput) => Promise<TResult>,
-      config?: AsyncActionConfig<T, TResult>
-    ) => AsyncAction<TInput, TResult>;
-    asCrud: <E extends { id: string | number } = { id: string | number }>(
-      entityKey?: keyof T
-    ) => EntityHelpers<E>;
-    // Time-travel helpers
-    undo: () => boolean;
-    redo: () => boolean;
-    getHistory: () => TimeTravelEntry<T>[];
-    resetHistory: () => void;
-    jumpTo: (index: number) => boolean;
-    getCurrentIndex: () => number;
-    canUndo: () => boolean;
-    canRedo: () => boolean;
-    // DevTools interface attached by the devtools enhancer. Typed as unknown
-    // here to avoid introducing a hard dependency from core -> devtools.
-    __devTools: unknown;
-  };
+};
 
 /**
- * SignalTree type - NO CONSTRAINTS on T
+ * Minimal SignalTree with composable enhancers
  */
 export type SignalTree<T> = {
   /**
    * The reactive state object with deep signal conversion
    */
-  state: DeepSignalify<T>;
-
-  /**
-   * Shorthand alias for state
-   */
   $: DeepSignalify<T>;
 
   /**
-   * Core methods
+   * Alias for $ - backward compatibility
    */
-  effect(fn: (tree: T) => void): void;
-  subscribe(fn: (tree: T) => void): () => void;
-  destroy(): void;
+  state: DeepSignalify<T>;
 
   /**
-   * Pipe method for composition
+   * Compose enhancers to add functionality
    */
-  pipe(): SignalTree<T>;
-  pipe<R1>(fn1: (tree: SignalTree<T>) => R1): R1;
-  pipe<R1, R2>(fn1: (tree: SignalTree<T>) => R1, fn2: (arg: R1) => R2): R2;
-  pipe<R1, R2, R3>(
-    fn1: (tree: SignalTree<T>) => R1,
-    fn2: (arg: R1) => R2,
-    fn3: (arg: R2) => R3
-  ): R3;
-
-  // Note: `update` and `unwrap` are provided on the `DeepSignalify` state
-  // (`tree.$`) rather than the tree object itself. This keeps the recursive
-  // typing architecture consistent: the callable state proxy exposes the
-  // unwrapping and update APIs for the nested signals.
-
-  // Extended features
-  memoize<R>(fn: (tree: T) => R, cacheKey?: string): Signal<R>;
-  optimize(): void;
-  clearCache(): void;
-  invalidatePattern(pattern: string): number;
-  getMetrics(): PerformanceMetrics;
-  addTap(middleware: Middleware<T>): void;
-  removeTap(id: string): void;
-  asCrud<E extends { id: string | number }>(
-    entityKey?: keyof T
-  ): EntityHelpers<E>;
-  asyncAction<TInput, TResult>(
-    operation: (input: TInput) => Promise<TResult>,
-    config?: AsyncActionConfig<T, TResult>
-  ): AsyncAction<TInput, TResult>;
-  undo(): void;
-  redo(): void;
-  getHistory(): TimeTravelEntry<T>[];
-  resetHistory(): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  with<R>(...enhancers: Array<(tree: any) => any>): R;
 };
 
 // ============================================
-// OTHER TYPES
+// CONFIGURATION TYPES
 // ============================================
 
 export type TreePreset = 'basic' | 'performance' | 'development' | 'production';
@@ -201,6 +105,10 @@ export interface TreeConfig {
   debugMode?: boolean;
   useStructuralSharing?: boolean;
 }
+
+// ============================================
+// ENHANCER TYPES
+// ============================================
 
 export interface Middleware<T> {
   id: string;

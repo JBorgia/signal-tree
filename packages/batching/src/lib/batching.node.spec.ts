@@ -16,7 +16,7 @@ describe('Batching - node-level path behavior', () => {
     const tree = signalTree({
       a: { b: { count: 0 } },
       events: [] as string[],
-    }).pipe(withBatching());
+    }).with(withBatching());
 
     // Enqueue multiple batchUpdate calls on the same nested node path
     tree.$.a.b.batchUpdate((cur: any) => {
@@ -52,7 +52,7 @@ describe('Batching - node-level path behavior', () => {
     const tree = signalTree({
       a: { b: { v: 0 }, v: 0 },
       events: [] as string[],
-    }).pipe(withBatching());
+    }).with(withBatching());
 
     // Parent update depends on child's value; child increments itself.
     tree.$.a.batchUpdate(() => {

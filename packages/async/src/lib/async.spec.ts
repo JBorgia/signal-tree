@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { signalTree } from '@signaltree/core';
+import { signalTree, unwrap } from '@signaltree/core';
 import {
   withAsync,
   enableAsync,
@@ -10,13 +10,40 @@ import {
   withDebounce,
 } from './async';
 
+// Helper function to create typed async trees for testing
+function createAsyncTree<T>(initialState: T) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return signalTree(initialState).with(withAsync()) as any;
+}
+
+function createEnabledAsyncTree<T>(initialState: T) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return signalTree(initialState).with(enableAsync()) as any;
+}
+
+function createHighPerfAsyncTree<T>(initialState: T) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return signalTree(initialState).with(withHighPerformanceAsync()) as any;
+}
+
+function createDisabledAsyncTree<T>(initialState: T) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return signalTree(initialState).with(withAsync({ enabled: false })) as any;
+}
+
+// Helper to unwrap tree state with type assertion
+function getTreeState(tree: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return unwrap(tree) as any;
+}
+
 describe('Async', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
   });
 
   it('should enhance tree with async capabilities', () => {
-    const tree = signalTree({ count: 0 }).pipe(withAsync());
+    const tree = createAsyncTree({ count: 0 });
 
     expect(tree.asyncAction).toBeDefined();
     expect(tree.loadData).toBeDefined();
@@ -24,10 +51,7 @@ describe('Async', () => {
   });
 
   it('should create and execute async actions', async () => {
-    const tree = signalTree({ count: 0, result: null as number | null }).pipe(
-      withAsync()
-    );
-
+    const tree = createAsyncTree({ count: 0, result: null as number | null });
     const asyncOperation = tree.asyncAction(
       async (input: number) => {
         await new Promise((resolve) => setTimeout(resolve, 10));
@@ -45,17 +69,17 @@ describe('Async', () => {
 
     const promise = asyncOperation.execute(5);
     expect(asyncOperation.pending()).toBe(true);
-    expect(tree.$().count).toBe(-1); // onStart was called
+    expect(getTreeState(tree).count).toBe(-1); // onStart was called
 
     const result = await promise;
     expect(result).toBe(10);
     expect(asyncOperation.pending()).toBe(false);
     expect(asyncOperation.result()).toBe(10);
-    expect(tree.$().result).toBe(10); // onSuccess was called
+    expect(getTreeState(tree).result).toBe(10); // onSuccess was called
   });
 
   it('should handle async action errors', async () => {
-    const tree = signalTree({ error: null as string | null }).pipe(withAsync());
+    const tree = createAsyncTree({ error: null as string | null });
 
     const asyncOperation = tree.asyncAction(
       async () => {
@@ -80,7 +104,7 @@ describe('Async', () => {
   });
 
   it('should call onComplete hook regardless of success or failure', async () => {
-    const tree = signalTree({ completed: false as boolean }).pipe(withAsync());
+    const tree = createAsyncTree({ completed: false as boolean });
 
     const onComplete = jest.fn(() => ({ completed: true as boolean }));
 
@@ -171,17 +195,17 @@ describe('Async', () => {
   });
 
   it('should work with enableAsync convenience function', () => {
-    const tree = signalTree({ count: 0 }).pipe(enableAsync());
+    const tree = createEnabledAsyncTree({ count: 0 });
     expect(tree.asyncAction).toBeDefined();
   });
 
   it('should work with high performance async', () => {
-    const tree = signalTree({ count: 0 }).pipe(withHighPerformanceAsync());
+    const tree = createHighPerfAsyncTree({ count: 0 });
     expect(tree.asyncAction).toBeDefined();
   });
 
   it('should disable async when enabled is false', () => {
-    const tree = signalTree({ count: 0 }).pipe(withAsync({ enabled: false }));
+    const tree = createDisabledAsyncTree({ count: 0 });
 
     // Should not have enhanced the tree
     expect(tree.loadData).toBeUndefined();

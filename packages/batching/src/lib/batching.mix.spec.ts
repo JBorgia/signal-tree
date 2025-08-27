@@ -10,7 +10,7 @@ describe('Batching - mixed update/batch ordering', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('ensures updates queued with update() and batchUpdate() maintain expected ordering', () => {
-    const tree = signalTree({ x: { v: 0 }, log: [] as string[] }).pipe(
+    const tree = signalTree({ x: { v: 0 }, log: [] as string[] }).with(
       withBatching()
     );
 

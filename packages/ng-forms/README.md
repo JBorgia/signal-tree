@@ -139,7 +139,7 @@ const tree = signalTree({
 
 // Custom validators that can access SignalTree state
 const usernameAsyncValidator = (control: AbstractControl) => {
-  return of(control.value).pipe(
+  return of(control.value).with(
     delay(300), // Debounce
     switchMap((username) =>
       // Check if username exists (can access tree state)
@@ -821,7 +821,7 @@ import { signalTree } from '@signaltree/core';
 import { createFormTree } from '@signaltree/ng-forms';
 import { withDevTools } from '@signaltree/devtools';
 
-const tree = signalTree(state).pipe(
+const tree = signalTree(state).with(
   withDevTools() // Debug form state changes
 );
 

@@ -35,7 +35,7 @@ const loggingMiddleware = {
 const tree = signalTree({
   user: { name: '', email: '' },
   settings: { theme: 'dark' },
-}).pipe(withMiddleware([loggingMiddleware]));
+}).with(withMiddleware([loggingMiddleware]));
 
 // All state changes now logged automatically
 tree.$.user.name.set('John'); // Logs: "[signalTree] user.name = John"
@@ -70,7 +70,7 @@ const validationMiddleware = (context) => ({
   },
 });
 
-const tree = signalTree(state).pipe(withMiddleware([validationMiddleware]));
+const tree = signalTree(state).with(withMiddleware([validationMiddleware]));
 ```
 
 ### Built-in Middleware
@@ -102,7 +102,7 @@ const validationMiddleware = {
   },
 };
 
-const tree = signalTree(state).pipe(withMiddleware([performanceMiddleware, validationMiddleware]));
+const tree = signalTree(state).with(withMiddleware([performanceMiddleware, validationMiddleware]));
 ```
 
 ### Runtime Middleware Management
@@ -149,7 +149,7 @@ const audit: Middleware<any> = {
 const tree = signalTree({
   user: { id: '', name: '', email: '' },
   settings: { theme: 'dark', notifications: true },
-}).pipe(withMiddleware([audit]));
+}).with(withMiddleware([audit]));
 ```
 
 ### Permission-Based Updates
@@ -174,7 +174,7 @@ const permissionMiddleware = {
   },
 };
 
-const tree = signalTree(state).pipe(withMiddleware([permissionMiddleware]));
+const tree = signalTree(state).with(withMiddleware([permissionMiddleware]));
 
 // Updates blocked if user lacks permissions
 tree.$.admin.settings.set(newSettings); // Blocked if not admin
@@ -290,7 +290,7 @@ const debugMiddleware = {
 };
 
 // Only in development
-const tree = signalTree(state).pipe(withMiddleware(process.env['NODE_ENV'] === 'development' ? [debugMiddleware] : []));
+const tree = signalTree(state).with(withMiddleware(process.env['NODE_ENV'] === 'development' ? [debugMiddleware] : []));
 ```
 
 ## 🎯 When to Use Middleware
@@ -313,7 +313,7 @@ import { withMiddleware } from '@signaltree/middleware';
 import { withBatching } from '@signaltree/batching';
 import { withDevTools } from '@signaltree/devtools';
 
-const tree = signalTree(state).pipe(withBatching(), withMiddleware([loggingMiddleware, audit]), withDevTools());
+const tree = signalTree(state).with(withBatching(), withMiddleware([loggingMiddleware, audit]), withDevTools());
 ```
 
 ## 📈 Performance Considerations
