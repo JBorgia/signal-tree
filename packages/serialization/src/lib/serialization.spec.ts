@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { signalTree } from '@signaltree/core';
+import { signalTree, unwrap } from '@signaltree/core';
 import {
   withSerialization,
   withPersistence,
@@ -99,19 +99,8 @@ describe('Serialization', () => {
           ['key2', 'value2'],
         ])
       );
-      // Use Reflect.ownKeys and Reflect.get to bypass proxy method collision
-      const keys = Reflect.ownKeys(tree2.$);
-      const setPropertyExists = keys.includes('set');
-      expect(setPropertyExists).toBe(true);
-
-      // Get the set property signal directly using Object.getOwnPropertyDescriptor
-      const setDescriptor = Object.getOwnPropertyDescriptor(tree2.$, 'set');
-      if (setDescriptor?.value && typeof setDescriptor.value === 'function') {
-        expect(setDescriptor.value()).toEqual(new Set([1, 2, 3, 'test']));
-      } else {
-        // Fallback: just verify the property exists
-        expect(setPropertyExists).toBe(true);
-      }
+      // Read plain state to avoid proxy method name collisions with key "set"
+      expect(unwrap(tree2.$).set).toEqual(new Set([1, 2, 3, 'test']));
       expect(tree2.$.nested.date()).toEqual(new Date('2023-12-31'));
     });
 

@@ -16,7 +16,7 @@ describe('Memoization', () => {
   });
 
   it('should enhance tree with memoization capabilities', () => {
-    const tree = signalTree({ count: 0 }).pipe(withMemoization());
+    const tree = signalTree({ count: 0 }).with(withMemoization());
 
     expect(tree.memoizedUpdate).toBeDefined();
     expect(tree.clearMemoCache).toBeDefined();
@@ -24,7 +24,9 @@ describe('Memoization', () => {
   });
 
   it('should cache memoized updates', () => {
-    const tree = signalTree({ count: 0, computed: 0 }).pipe(withMemoization());
+    const tree = signalTree({ count: 0, computed: 0 }).with(
+      withMemoization()
+    ) as any;
 
     // Track expensive computation calls
     let computationCalls = 0;
@@ -67,7 +69,7 @@ describe('Memoization', () => {
   });
 
   it('should provide cache statistics', () => {
-    const tree = signalTree({ count: 0 }).pipe(withMemoization());
+    const tree = signalTree({ count: 0 }).with(withMemoization()) as any;
 
     tree.memoizedUpdate(() => ({ count: 1 }), 'update1');
     tree.memoizedUpdate(() => ({ count: 2 }), 'update2');
@@ -80,7 +82,7 @@ describe('Memoization', () => {
   });
 
   it('should clear cache correctly', () => {
-    const tree = signalTree({ count: 0 }).pipe(withMemoization());
+    const tree = signalTree({ count: 0 }).with(withMemoization()) as any;
 
     tree.memoizedUpdate(() => ({ count: 1 }), 'update1');
     tree.memoizedUpdate(() => ({ count: 2 }), 'update2');
@@ -98,7 +100,7 @@ describe('Memoization', () => {
   });
 
   it('should work with enableMemoization convenience function', () => {
-    const tree = signalTree({ count: 0 }).pipe(enableMemoization());
+    const tree = signalTree({ count: 0 }).with(enableMemoization());
 
     expect(tree.memoizedUpdate).toBeDefined();
     expect(tree.clearCache).toBeDefined();
@@ -106,9 +108,9 @@ describe('Memoization', () => {
   });
 
   it('should work with high performance memoization', () => {
-    const tree = signalTree({ count: 0 }).pipe(
+    const tree = signalTree({ count: 0 }).with(
       withHighPerformanceMemoization()
-    );
+    ) as any;
 
     expect(tree.memoizedUpdate).toBeDefined();
 
@@ -122,9 +124,9 @@ describe('Memoization', () => {
   });
 
   it('should disable memoization when enabled is false', () => {
-    const tree = signalTree({ count: 0 }).pipe(
+    const tree = signalTree({ count: 0 }).with(
       withMemoization({ enabled: false })
-    );
+    ) as any;
 
     // Should not have memoization methods
     expect(tree.memoizedUpdate).toBeUndefined();
@@ -133,9 +135,9 @@ describe('Memoization', () => {
   });
 
   it('should enforce cache size limits', () => {
-    const tree = signalTree({ count: 0 }).pipe(
+    const tree = signalTree({ count: 0 }).with(
       withMemoization({ maxCacheSize: 3 })
-    );
+    ) as any;
 
     // Add more entries than the limit
     tree.memoizedUpdate(() => ({ count: 1 }), 'update1');
@@ -179,7 +181,9 @@ describe('Memoization', () => {
         return `${obj.id}-${obj.name}`;
       };
 
-      const memoized = memoize(fn, (obj) => obj.id.toString());
+      const memoized = memoize(fn, (obj: { id: number; name: string }) =>
+        obj.id.toString()
+      );
 
       const obj1 = { id: 1, name: 'John' };
       const obj2 = { id: 1, name: 'Jane' }; // Same ID, different name
@@ -206,8 +210,10 @@ describe('Memoization', () => {
       });
 
       it('should clear all caches', () => {
-        const tree1 = signalTree({ count: 0 }).pipe(withMemoization());
-        const tree2 = signalTree({ value: 'test' }).pipe(withMemoization());
+        const tree1 = signalTree({ count: 0 }).with(withMemoization()) as any;
+        const tree2 = signalTree({ value: 'test' }).with(
+          withMemoization()
+        ) as any;
 
         tree1.memoizedUpdate?.(() => ({ count: 1 }), 'update1');
         tree2.memoizedUpdate?.(() => ({ value: 'updated' }), 'update2');
@@ -232,9 +238,9 @@ describe('Memoization', () => {
       });
 
       it('should expire cache entries after TTL', () => {
-        const tree = signalTree({ count: 0 }).pipe(
+        const tree = signalTree({ count: 0 }).with(
           withMemoization({ ttl: 1000 }) // 1 second TTL
-        );
+        ) as any;
 
         tree.memoizedUpdate?.(() => ({ count: 1 }), 'update1');
         expect(tree.getCacheStats?.()?.size).toBe(1);

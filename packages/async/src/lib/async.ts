@@ -1,10 +1,10 @@
 import { signal } from '@angular/core';
 import type { Signal } from '@angular/core';
-import { parsePath } from '@signaltree/core';
+import { unwrap, parsePath } from '@signaltree/core';
 import type {
-  SignalTree,
-  AsyncAction,
   AsyncActionConfig,
+  AsyncAction,
+  SignalTree,
 } from '@signaltree/core';
 
 /**
@@ -13,17 +13,6 @@ import type {
  *
  * @template T - The state object type
  * @template TResult - The result type of the async operation
- *
- * @example
- * ```typescript
- * const config: ExtendedAsyncActionConfig<AppState, User> = {
- *   loadingKey: 'user.loading',
- *   errorKey: 'user.error',
- *   onStart: (state) => ({ ui: { ...state.ui, loading: true } }),
- *   onSuccess: (user, state) => ({ user, ui: { ...state.ui, loading: false } }),
- *   onFinally: (state) => ({ ui: { ...state.ui, lastUpdate: Date.now() } })
- * };
- * ```
  */
 interface ExtendedAsyncActionConfig<T, TResult>
   extends AsyncActionConfig<T, TResult> {
@@ -40,34 +29,6 @@ interface ExtendedAsyncActionConfig<T, TResult>
  * Provides convenient methods for common async patterns with full TypeScript inference.
  *
  * @template T - The state object type extending StateObject
- *
- * @example
- * ```typescript
- * interface AppState {
- *   user: User | null;
- *   products: Product[];
- *   ui: { loading: boolean; error: string | null };
- * }
- *
- * const tree: AsyncSignalTree<AppState> = create(initialState).with(withAsync());
- *
- * // Generic async action
- * const fetchUser = tree.asyncAction(
- *   async (id: string) => userService.getUser(id),
- *   { loadingKey: 'ui.loading', errorKey: 'ui.error' }
- * );
- *
- * // Convenience methods for common patterns
- * const loadProducts = tree.loadData(
- *   () => productService.getAll(),
- *   { onSuccess: (products) => ({ products }) }
- * );
- *
- * const saveUser = tree.submitForm(
- *   async (userData: UserForm) => userService.save(userData),
- *   { loadingKey: 'ui.saving' }
- * );
- * ```
  */
 export interface AsyncSignalTree<T> extends SignalTree<T> {
   /**
@@ -87,24 +48,6 @@ export interface AsyncSignalTree<T> extends SignalTree<T> {
   /**
    * Convenience method for data loading operations (no input parameters).
    * Perfect for initial data fetching and refresh operations.
-   *
-   * @template TResult - The type of data being loaded
-   * @param loader - Function that returns a Promise of the data
-   * @param config - Configuration for state management and lifecycle hooks
-   * @returns AsyncAction instance that can be executed with no parameters
-   *
-   * @example
-   * ```typescript
-   * const loadUserProfile = tree.loadData(
-   *   () => api.getCurrentUser(),
-   *   {
-   *     loadingKey: 'user.loading',
-   *     onSuccess: (user) => ({ user })
-   *   }
-   * );
-   *
-   * await loadUserProfile.execute();
-   * ```
    */
   loadData<TResult>(
     loader: () => Promise<TResult>,
@@ -114,26 +57,6 @@ export interface AsyncSignalTree<T> extends SignalTree<T> {
   /**
    * Convenience method for form submission operations.
    * Handles form data processing with built-in state management.
-   *
-   * @template TInput - The form data type
-   * @template TResult - The submission result type
-   * @param submitter - Function that processes form data and returns a Promise
-   * @param config - Configuration for state management and lifecycle hooks
-   * @returns AsyncAction instance for form submission
-   *
-   * @example
-   * ```typescript
-   * const submitRegistration = tree.submitForm(
-   *   async (formData: RegistrationForm) => auth.register(formData),
-   *   {
-   *     loadingKey: 'registration.submitting',
-   *     errorKey: 'registration.error',
-   *     onSuccess: (result) => ({ user: result.user, isAuthenticated: true })
-   *   }
-   * );
-   *
-   * await submitRegistration.execute(formData);
-   * ```
    */
   submitForm<TInput, TResult>(
     submitter: (input: TInput) => Promise<TResult>,
@@ -142,34 +65,13 @@ export interface AsyncSignalTree<T> extends SignalTree<T> {
 }
 
 /**
- * Sets nested values in state using dot-notation paths with immutable updates.
- * Safely navigates and updates deeply nested state properties while preserving immutability.
+ * Sets nested values in state using dot-notation paths.
+ * Updated to work with the new v2.0 architecture where branch nodes have set/update methods.
  *
- * @template T - The state object type extending StateObject
-
-/**
- * Sets nested values in state using dot-notation paths with immutable updates.
- * Safely navigates and updates deeply nested state properties while preserving immutability.
- *
- * @template T - The state object type extending StateObject
+ * @template T - The state object type
  * @param tree - The SignalTree instance to update
  * @param path - Dot-notation path to the property (e.g., 'user.profile.name')
  * @param value - The value to set at the specified path
- *
- * @example
- * ```typescript
- * // Simple property update
- * setNestedValue(tree, 'loading', true);
- * // Result: { ...state, loading: true }
- *
- * // Nested property update
- * setNestedValue(tree, 'user.profile.name', 'John Doe');
- * // Result: { ...state, user: { ...state.user, profile: { ...state.user.profile, name: 'John Doe' } } }
- *
- * // Deep nesting with error handling
- * setNestedValue(tree, 'api.cache.users.12345', userData);
- * // Safely creates intermediate objects if they don't exist
- * ```
  */
 function setNestedValue<T>(
   tree: SignalTree<T>,
@@ -177,42 +79,83 @@ function setNestedValue<T>(
   value: unknown
 ): void {
   const keys = parsePath(path);
-  if (keys.length === 1) {
-    tree.$.update(() => ({ [path]: value } as Partial<T>));
+
+  // Navigate to the target location
+  let current: any = tree.$;
+
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    if (!current[key]) {
+      console.warn(`Path ${path} does not exist at key ${key}`);
+      return;
+    }
+    current = current[key];
+  }
+
+  const lastKey = keys[keys.length - 1];
+  const target = current[lastKey];
+
+  // Check if it's a signal (leaf node)
+  if (target && typeof target === 'function' && 'set' in target) {
+    // It's a signal - update it directly
+    target.set(value);
+  } else if (target && typeof target === 'object' && 'set' in target) {
+    // It's a branch node with set method
+    if (typeof value === 'object' && value !== null) {
+      target.set(value);
+    } else {
+      // Trying to set a primitive value on a branch - not supported
+      console.warn(`Cannot set primitive value on branch node at ${path}`);
+    }
   } else {
-    tree.$.update((state) => {
-      const newState = { ...state } as Record<string, unknown>;
-      let current = newState;
-      for (let i = 0; i < keys.length - 1; i++) {
-        if (
-          current[keys[i]] &&
-          typeof current[keys[i]] === 'object' &&
-          !Array.isArray(current[keys[i]])
-        ) {
-          current[keys[i]] = {
-            ...(current[keys[i]] as Record<string, unknown>),
-          };
-          current = current[keys[i]] as Record<string, unknown>;
-        }
+    console.warn(`Cannot set value at ${path} - no signal or set method found`);
+  }
+}
+
+/**
+ * Helper function to apply partial updates to a SignalTree using the v2.0 architecture.
+ * Works with both top-level updates and nested updates through the branch set methods.
+ */
+function applyPartialUpdate<T>(tree: SignalTree<T>, update: Partial<T>): void {
+  const signals = tree.$ as any;
+
+  for (const [key, value] of Object.entries(update)) {
+    const target = signals[key];
+
+    if (!target) {
+      console.warn(`Property ${key} does not exist on tree`);
+      continue;
+    }
+
+    // Check if it's a signal (leaf node)
+    if (typeof target === 'function' && 'set' in target) {
+      target.set(value);
+    }
+    // Check if it's a branch node with set method
+    else if (typeof target === 'object' && 'set' in target) {
+      if (typeof value === 'object' && value !== null) {
+        // Use the branch's set method for partial updates
+        target.set(value);
+      } else {
+        console.warn(`Cannot set primitive value ${value} on branch ${key}`);
       }
-      current[keys[keys.length - 1]] = value;
-      return newState as Partial<T>;
-    });
+    }
+    // Otherwise, it might be a nested structure - try recursive update
+    else if (
+      typeof target === 'object' &&
+      typeof value === 'object' &&
+      value !== null
+    ) {
+      // For deeply nested updates without set method (shouldn't happen in v2.0)
+      console.warn(
+        `Branch ${key} missing set method - this shouldn't happen in v2.0`
+      );
+    }
   }
 }
 
 /**
  * Configuration options for async functionality with performance and retry settings.
- *
- * @example
- * ```typescript
- * const config: AsyncConfig = {
- *   enabled: true,
- *   defaultTimeout: 10000, // 10 seconds
- *   retryAttempts: 3,
- *   retryDelay: 1000 // 1 second base delay
- * };
- * ```
  */
 interface AsyncConfig {
   /** Whether async functionality is enabled */
@@ -227,44 +170,7 @@ interface AsyncConfig {
 
 /**
  * Enhanced async action implementation with comprehensive state management and lifecycle control.
- * Provides path-based state updates, error handling, and complete operation lifecycle tracking.
- *
- * @template TInput - Input parameter type for the operation
- * @template TResult - Return type of the async operation
- * @template T - State object type extending StateObject
- *
- * @example
- * ```typescript
- * // Create an async action for user authentication
- * const loginAction = new AsyncActionImpl(
- *   async (credentials: LoginForm) => authService.login(credentials),
- *   tree,
- *   {
- *     loadingKey: 'auth.logging_in',
- *     errorKey: 'auth.error',
- *     onStart: (state) => ({ auth: { ...state.auth, error: null } }),
- *     onSuccess: (user, state) => ({
- *       auth: { ...state.auth, user, isAuthenticated: true }
- *     }),
- *     onError: (error, state) => ({
- *       auth: { ...state.auth, lastError: error.message }
- *     })
- *   }
- * );
- *
- * // Execute the action
- * try {
- *   const user = await loginAction.execute({ email, password });
- *   console.log('Logged in:', user);
- * } catch (error) {
- *   console.error('Login failed:', error);
- * }
- *
- * // Access state signals
- * console.log('Pending:', loginAction.pending());
- * console.log('Error:', loginAction.error());
- * console.log('Result:', loginAction.result());
- * ```
+ * Updated to work with the new SignalTree v2.0 architecture.
  */
 class AsyncActionImpl<TInput, TResult, T>
   implements AsyncAction<TInput, TResult>
@@ -285,30 +191,6 @@ class AsyncActionImpl<TInput, TResult, T>
   /**
    * Executes the async operation with complete lifecycle management and error handling.
    * Manages loading states, executes lifecycle hooks, and handles both success and error cases.
-   *
-   * @param input - Input parameters for the operation
-   * @returns Promise resolving to the operation result
-   * @throws Error if the operation fails after executing error handling hooks
-   *
-   * @example
-   * ```typescript
-   * // Basic execution
-   * const result = await action.execute(inputData);
-   *
-   * // With error handling
-   * try {
-   *   const result = await action.execute(inputData);
-   *   // Handle success
-   * } catch (error) {
-   *   // Error has been processed through onError hook
-   *   // and stored in error signal and errorKey path
-   * }
-   *
-   * // Monitor state during execution
-   * action.pending.subscribe(pending => {
-   *   if (pending) console.log('Operation in progress...');
-   * });
-   * ```
    */
   async execute(input: TInput): Promise<TResult> {
     const {
@@ -336,8 +218,10 @@ class AsyncActionImpl<TInput, TResult, T>
 
       // Execute onStart hook
       if (onStart) {
-        const startUpdate = onStart(this.tree.$());
-        this.tree.$.update(() => startUpdate);
+        const startUpdate = onStart(unwrap(this.tree.$) as T);
+        if (startUpdate) {
+          applyPartialUpdate(this.tree, startUpdate);
+        }
       }
 
       // Execute the operation
@@ -348,8 +232,10 @@ class AsyncActionImpl<TInput, TResult, T>
 
       // Execute onSuccess hook
       if (onSuccess) {
-        const successUpdate = onSuccess(result, this.tree.$());
-        this.tree.$.update(() => successUpdate);
+        const successUpdate = onSuccess(result, unwrap(this.tree.$) as T);
+        if (successUpdate) {
+          applyPartialUpdate(this.tree, successUpdate);
+        }
       }
 
       return result;
@@ -364,8 +250,10 @@ class AsyncActionImpl<TInput, TResult, T>
 
       // Execute onError hook
       if (onError) {
-        const errorUpdate = onError(err, this.tree.$());
-        this.tree.$.update(() => errorUpdate);
+        const errorUpdate = onError(err, unwrap(this.tree.$) as T);
+        if (errorUpdate) {
+          applyPartialUpdate(this.tree, errorUpdate);
+        }
       }
 
       throw err;
@@ -379,14 +267,18 @@ class AsyncActionImpl<TInput, TResult, T>
 
       // Execute onComplete hook
       if (onComplete) {
-        const completeUpdate = onComplete(this.tree.$());
-        this.tree.$.update(() => completeUpdate);
+        const completeUpdate = onComplete(unwrap(this.tree.$) as T);
+        if (completeUpdate) {
+          applyPartialUpdate(this.tree, completeUpdate);
+        }
       }
 
       // Execute onFinally hook
       if (onFinally) {
-        const finallyUpdate = onFinally(this.tree.$());
-        this.tree.$.update(() => finallyUpdate);
+        const finallyUpdate = onFinally(unwrap(this.tree.$) as T);
+        if (finallyUpdate) {
+          applyPartialUpdate(this.tree, finallyUpdate);
+        }
       }
     }
   }
@@ -397,43 +289,9 @@ class AsyncActionImpl<TInput, TResult, T>
  * Creates an AsyncSignalTree with advanced async operation management, path-based state updates,
  * and convenient methods for common async patterns.
  *
- * @template T - The state object type extending StateObject
+ * @template T - The state object type
  * @param config - Configuration options for async behavior and performance settings
  * @returns Function that enhances a SignalTree with async capabilities
- *
- * @example
- * ```typescript
- * interface AppState {
- *   user: User | null;
- *   loading: { [key: string]: boolean };
- *   errors: { [key: string]: string | null };
- * }
- *
- * // Basic async enhancement
- * const tree = create(initialState).with(withAsync());
- *
- * // Enhanced async with configuration
- * const tree = create(initialState).with(withAsync({
- *   enabled: true,
- *   defaultTimeout: 30000,
- *   retryAttempts: 3,
- *   retryDelay: 1000
- * }));
- *
- * // Create async actions with path-based state management
- * const fetchUser = tree.asyncAction(
- *   async (userId: string) => userService.getUser(userId),
- *   {
- *     loadingKey: 'loading.user',
- *     errorKey: 'errors.user',
- *     onSuccess: (user) => ({ user })
- *   }
- * );
- *
- * // Use convenience methods
- * const loadData = tree.loadData(() => dataService.getAll());
- * const submitForm = tree.submitForm(async (data: FormData) => api.submit(data));
- * ```
  */
 export function withAsync<T>(
   config: AsyncConfig = {}
@@ -445,7 +303,7 @@ export function withAsync<T>(
       return tree as AsyncSignalTree<T>;
     }
 
-    // Create the async action function first
+    // Create the async action function
     const asyncAction = <TInput, TResult>(
       operation: (input: TInput) => Promise<TResult>,
       actionConfig?: ExtendedAsyncActionConfig<T, TResult>
@@ -481,23 +339,6 @@ export function withAsync<T>(
 
 /**
  * Convenience function to enable async functionality with default settings.
- * Equivalent to withAsync({ enabled: true }) but more concise for common usage.
- *
- * @template T - The state object type extending StateObject
- * @returns Function that enhances a SignalTree with async capabilities using default settings
- *
- * @example
- * ```typescript
- * // Simple async enablement
- * const tree = create(initialState).with(enableAsync());
- *
- * // Equivalent to:
- * const tree = create(initialState).with(withAsync({ enabled: true }));
- *
- * // Use the enhanced tree
- * const loadUser = tree.loadData(() => userService.getCurrentUser());
- * await loadUser.execute();
- * ```
  */
 export function enableAsync<T>() {
   return withAsync<T>({ enabled: true });
@@ -505,30 +346,6 @@ export function enableAsync<T>() {
 
 /**
  * High-performance async enhancement with aggressive optimizations and resilience features.
- * Provides enhanced timeout, retry logic, and performance optimizations for production applications.
- *
- * @template T - The state object type extending StateObject
- * @returns Function that enhances a SignalTree with high-performance async capabilities
- *
- * @example
- * ```typescript
- * // For production applications requiring resilience
- * const tree = create(initialState).with(withHighPerformanceAsync());
- *
- * // Automatically includes:
- * // - 30 second timeout
- * // - 3 retry attempts
- * // - 1 second base retry delay
- * // - Exponential backoff for retries
- *
- * const criticalOperation = tree.asyncAction(
- *   async (data) => criticalService.process(data),
- *   { loadingKey: 'critical.loading' }
- * );
- *
- * // Will automatically retry on failure with exponential backoff
- * await criticalOperation.execute(data);
- * ```
  */
 export function withHighPerformanceAsync<T>() {
   return withAsync<T>({
@@ -541,40 +358,6 @@ export function withHighPerformanceAsync<T>() {
 
 /**
  * Creates a retry wrapper for async operations with exponential backoff.
- * Automatically retries failed operations with configurable attempts and delay strategy.
- *
- * @template TInput - Input parameter type for the operation
- * @template TResult - Return type of the async operation
- * @param operation - The async function to wrap with retry logic
- * @param attempts - Number of retry attempts (default: 3)
- * @param delay - Base delay between retries in milliseconds (default: 1000)
- * @returns Wrapped function with retry capability
- *
- * @example
- * ```typescript
- * // Basic retry wrapper
- * const reliableFetch = withRetry(
- *   async (url: string) => fetch(url).then(r => r.json()),
- *   3, // 3 attempts
- *   1000 // 1 second base delay
- * );
- *
- * // Usage in async action
- * const fetchData = tree.asyncAction(
- *   withRetry(async (id: string) => api.getData(id), 5, 2000)
- * );
- *
- * // Retry with exponential backoff:
- * // Attempt 1: immediate
- * // Attempt 2: after 1000ms
- * // Attempt 3: after 2000ms
- * // Attempt 4: after 3000ms
- * try {
- *   const result = await reliableFetch('/api/data');
- * } catch (error) {
- *   // All retry attempts failed
- * }
- * ```
  */
 export function withRetry<TInput, TResult>(
   operation: (input: TInput) => Promise<TResult>,
@@ -599,50 +382,12 @@ export function withRetry<TInput, TResult>(
       }
     }
 
-    // This should never be reached, but TypeScript needs it
     throw lastError || new Error('Operation failed after all retry attempts');
   };
 }
 
 /**
  * Creates a timeout wrapper for async operations with automatic cancellation.
- * Prevents operations from running indefinitely by racing against a timeout.
- *
- * @template TInput - Input parameter type for the operation
- * @template TResult - Return type of the async operation
- * @param operation - The async function to wrap with timeout logic
- * @param timeoutMs - Timeout duration in milliseconds
- * @returns Wrapped function with timeout capability
- *
- * @example
- * ```typescript
- * // Basic timeout wrapper
- * const timedFetch = withTimeout(
- *   async (url: string) => fetch(url).then(r => r.json()),
- *   5000 // 5 second timeout
- * );
- *
- * // Usage in async action
- * const quickFetch = tree.asyncAction(
- *   withTimeout(async (id: string) => api.getData(id), 3000)
- * );
- *
- * // Combine with retry for robust operations
- * const robustFetch = withRetry(
- *   withTimeout(async (url: string) => fetch(url), 5000),
- *   3,
- *   1000
- * );
- *
- * try {
- *   const result = await timedFetch('/api/slow-endpoint');
- * } catch (error) {
- *   // Either network error or timeout after 5 seconds
- *   if (error.message.includes('timed out')) {
- *     console.log('Operation was too slow');
- *   }
- * }
- * ```
  */
 export function withTimeout<TInput, TResult>(
   operation: (input: TInput) => Promise<TResult>,
@@ -663,58 +408,6 @@ export function withTimeout<TInput, TResult>(
 
 /**
  * Creates a cancellable async operation with manual cancellation control.
- * Provides fine-grained control over operation lifecycle with abort signals.
- *
- * @template TInput - Input parameter type for the operation
- * @template TResult - Return type of the async operation
- * @param operation - The async function that accepts an AbortSignal
- * @returns Object with execute, cancel methods and cancelled signal
- *
- * @example
- * ```typescript
- * // Create cancellable file upload
- * const fileUpload = withCancellation(
- *   async (file: File, signal: AbortSignal) => {
- *     const formData = new FormData();
- *     formData.append('file', file);
- *
- *     const response = await fetch('/api/upload', {
- *       method: 'POST',
- *       body: formData,
- *       signal // Pass abort signal to fetch
- *     });
- *
- *     return response.json();
- *   }
- * );
- *
- * // Start upload
- * const uploadPromise = fileUpload.execute(selectedFile);
- *
- * // Cancel if needed
- * document.getElementById('cancel').onclick = () => {
- *   fileUpload.cancel();
- *   console.log('Upload cancelled:', fileUpload.cancelled());
- * };
- *
- * // Handle completion or cancellation
- * try {
- *   const result = await uploadPromise;
- *   console.log('Upload successful:', result);
- * } catch (error) {
- *   if (fileUpload.cancelled()) {
- *     console.log('Upload was cancelled by user');
- *   } else {
- *     console.error('Upload failed:', error);
- *   }
- * }
- *
- * // Use with SignalTree async action
- * const uploadAction = tree.asyncAction(
- *   fileUpload.execute,
- *   { loadingKey: 'upload.progress' }
- * );
- * ```
  */
 export function withCancellation<TInput, TResult>(
   operation: (input: TInput, signal: AbortSignal) => Promise<TResult>
@@ -738,13 +431,10 @@ export function withCancellation<TInput, TResult>(
       cancelled.set(false);
 
       try {
-        if (!controller) {
-          throw new Error('Controller initialization failed');
-        }
         const result = await operation(input, controller.signal);
         return result;
       } catch (error) {
-        if (controller && controller.signal.aborted) {
+        if (controller?.signal.aborted) {
           cancelled.set(true);
           throw new Error('Operation was cancelled');
         }
@@ -762,53 +452,6 @@ export function withCancellation<TInput, TResult>(
 
 /**
  * Creates a debounced async operation that delays execution until after a specified wait time.
- * Perfect for search inputs, auto-save functionality, and rate-limiting API calls.
- *
- * @template TInput - Input parameter type for the operation
- * @template TResult - Return type of the async operation
- * @param operation - The async function to debounce
- * @param delayMs - Delay in milliseconds before execution
- * @returns Debounced function that cancels previous calls
- *
- * @example
- * ```typescript
- * // Debounced search function
- * const debouncedSearch = withDebounce(
- *   async (query: string) => searchService.search(query),
- *   300 // 300ms delay
- * );
- *
- * // Usage in search input
- * const searchAction = tree.asyncAction(debouncedSearch, {
- *   loadingKey: 'search.loading',
- *   onSuccess: (results) => ({ searchResults: results })
- * });
- *
- * // Auto-save with debouncing
- * const autoSave = withDebounce(
- *   async (formData: FormData) => api.saveDraft(formData),
- *   2000 // Save 2 seconds after user stops typing
- * );
- *
- * const saveAction = tree.asyncAction(autoSave, {
- *   onSuccess: () => ({ lastSaved: Date.now() })
- * });
- *
- * // Multiple rapid calls - only the last one executes
- * searchAction.execute('a');     // Cancelled
- * searchAction.execute('ap');    // Cancelled
- * searchAction.execute('app');   // Cancelled
- * searchAction.execute('apple'); // Executes after 300ms
- *
- * // Error handling for cancelled operations
- * try {
- *   await debouncedSearch('quick query');
- * } catch (error) {
- *   if (error.message === 'Debounced') {
- *     console.log('Search was superseded by newer query');
- *   }
- * }
- * ```
  */
 export function withDebounce<TInput, TResult>(
   operation: (input: TInput) => Promise<TResult>,

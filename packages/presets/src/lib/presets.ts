@@ -35,6 +35,7 @@ export const TREE_PRESETS: Record<TreePreset, Partial<TreeConfig>> = {
     debugMode: false,
     useShallowComparison: true,
     maxCacheSize: 200,
+    useStructuralSharing: true,
   },
   development: {
     batchUpdates: true,
@@ -54,6 +55,7 @@ export const TREE_PRESETS: Record<TreePreset, Partial<TreeConfig>> = {
     debugMode: false,
     useShallowComparison: true,
     maxCacheSize: 200,
+    useStructuralSharing: true,
   },
 };
 

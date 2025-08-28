@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { signalTree } from '@signaltree/core';
+import { signalTree, unwrap } from '@signaltree/core';
 import {
   withMiddleware,
   createLoggingMiddleware,
@@ -60,7 +60,7 @@ describe('Middleware', () => {
 
     tree.$.update((state) => ({ count: state.count + 1 }));
 
-    expect(tree.$().count).toBe(0); // Should not have changed
+    expect(unwrap(tree.$).count).toBe(0); // Should not have changed
   });
 
   it('should allow adding middleware at runtime', () => {
@@ -237,7 +237,7 @@ describe('Middleware', () => {
 
       tree.$.set({ a: 2 });
 
-      expect(tree.$()).toEqual({ a: 1, b: 2 });
+      expect(unwrap(tree.$)).toEqual({ a: 1, b: 2 });
       expect(afterSpy).not.toHaveBeenCalled();
     });
 
@@ -270,7 +270,7 @@ describe('Middleware', () => {
         }
       ).batchUpdate((s) => ({ a: s.a + 1 }));
 
-      expect(tree.$()).toEqual({ a: 1, b: 2 });
+      expect(unwrap(tree.$)).toEqual({ a: 1, b: 2 });
       expect(afterSpy).not.toHaveBeenCalled();
     });
 

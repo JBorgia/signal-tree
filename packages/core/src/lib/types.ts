@@ -46,7 +46,7 @@ export type BuiltInObject =
 
 /**
  * DeepSignalify type - recursively converts objects to signals
- * Branch nodes have set/update methods, leaf nodes are just signals
+ * Methods (set/update) are added at runtime as non-enumerable properties
  */
 export type DeepSignalify<T> = {
   [K in keyof T]: T[K] extends (infer U)[]
@@ -58,10 +58,7 @@ export type DeepSignalify<T> = {
       ? WritableSignal<T[K]>
       : T[K] extends (...args: unknown[]) => unknown
       ? WritableSignal<T[K]>
-      : DeepSignalify<T[K]> & {
-          set(partial: Partial<T[K]>): void;
-          update(updater: (current: T[K]) => Partial<T[K]>): void;
-        }
+      : DeepSignalify<T[K]> // No methods in type - added at runtime
     : WritableSignal<T[K]>;
 };
 

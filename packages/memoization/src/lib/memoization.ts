@@ -1,23 +1,30 @@
-import { SignalTree } from '@signaltree/core';
+import { computed, Signal, isSignal } from '@angular/core';
+import { unwrap } from '@signaltree/core';
+import type { DeepSignalify, SignalTree } from '@signaltree/core';
 
 /**
  * Extended SignalTree interface with memoization capabilities
- * Uses the same unconstrained recursive typing approach as core
  */
 interface MemoizedSignalTree<T> extends SignalTree<T> {
   memoizedUpdate: (
     updater: (current: T) => Partial<T>,
     cacheKey?: string
   ) => void;
+  memoizedComputed: <TResult>(
+    computation: () => TResult,
+    deps?: unknown[]
+  ) => Signal<TResult>;
   clearMemoCache: (key?: string) => void;
   getCacheStats: () => {
     size: number;
+    hitRate: number;
     totalHits: number;
+    totalMisses: number;
     keys: string[];
   };
 }
 
-// Cache entry interface with proper timestamp tracking
+// Cache entry interface
 interface CacheEntry<T> {
   value: T;
   deps: readonly unknown[];
@@ -25,28 +32,21 @@ interface CacheEntry<T> {
   hitCount: number;
 }
 
-// Global memoization cache with size limits and TTL
-const MAX_CACHE_SIZE = 1000;
+// Global memoization cache
 const DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes
-
-// Use Map for global cache management (WeakMap doesn't support iteration)
 const memoizationCache = new Map<object, Map<string, CacheEntry<unknown>>>();
 
-// Track cache for cleanup
+// Cleanup interval
 const cacheCleanupInterval = setInterval(() => {
   const now = Date.now();
-  for (const [obj, cache] of memoizationCache.entries()) {
+  for (const [, cache] of memoizationCache.entries()) {
     for (const [key, entry] of cache.entries()) {
       if (now - entry.timestamp > DEFAULT_TTL) {
         cache.delete(key);
       }
     }
-    // Remove empty caches
-    if (cache.size === 0) {
-      memoizationCache.delete(obj);
-    }
   }
-}, 60000); // Clean up every minute
+}, 60000);
 
 /**
  * Cleanup the cache interval on app shutdown
@@ -57,16 +57,16 @@ export function cleanupMemoizationCache(): void {
 }
 
 /**
- * Memoization configuration options
+ * Configuration options
  */
 interface MemoizationConfig {
   enabled?: boolean;
   maxCacheSize?: number;
-  ttl?: number; // Time to live in milliseconds
+  ttl?: number;
 }
 
 /**
- * Deep equality check for dependency comparison
+ * Deep equality check
  */
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
@@ -97,91 +97,8 @@ function deepEqual(a: unknown, b: unknown): boolean {
 }
 
 /**
- * Generate cache key for memoization
- */
-function generateCacheKey(
-  fn: (...args: unknown[]) => unknown,
-  args: unknown[]
-): string {
-  return `${fn.name || 'anonymous'}_${JSON.stringify(args)}`;
-}
-
-/**
- * Memoization function that caches expensive computations with enhanced cache management
- */
-export function memoize<TArgs extends unknown[], TReturn>(
-  fn: (...args: TArgs) => TReturn,
-  keyFn?: (...args: TArgs) => string,
-  config: MemoizationConfig = {}
-): (...args: TArgs) => TReturn {
-  const cache = new Map<string, CacheEntry<TReturn>>();
-  const maxSize = config.maxCacheSize ?? MAX_CACHE_SIZE;
-  const ttl = config.ttl ?? DEFAULT_TTL;
-
-  const cleanExpiredEntries = () => {
-    const now = Date.now();
-    for (const [key, entry] of cache.entries()) {
-      if (now - entry.timestamp > ttl) {
-        cache.delete(key);
-      }
-    }
-  };
-
-  const evictLRUEntries = () => {
-    if (cache.size >= maxSize) {
-      // Find the least recently used entry (lowest hitCount)
-      let lruKey = '';
-      let minHitCount = Infinity;
-
-      for (const [key, entry] of cache.entries()) {
-        if (entry.hitCount < minHitCount) {
-          minHitCount = entry.hitCount;
-          lruKey = key;
-        }
-      }
-
-      if (lruKey) {
-        cache.delete(lruKey);
-      }
-    }
-  };
-
-  return (...args: TArgs): TReturn => {
-    // Clean expired entries periodically
-    cleanExpiredEntries();
-
-    const key = keyFn
-      ? keyFn(...args)
-      : generateCacheKey(
-          fn as (...args: unknown[]) => unknown,
-          args as unknown[]
-        );
-    const cached = cache.get(key);
-
-    // If using custom key function, trust the key; otherwise check deep equality
-    if (cached && (keyFn || deepEqual(cached.deps, args))) {
-      cached.hitCount += 1;
-      return cached.value;
-    }
-
-    // Evict entries if cache is too large
-    evictLRUEntries();
-
-    const result = fn(...args);
-    cache.set(key, {
-      value: result,
-      deps: args as readonly unknown[],
-      timestamp: Date.now(),
-      hitCount: 1,
-    });
-
-    return result;
-  };
-}
-
-/**
  * Enhances a SignalTree with memoization capabilities
- * Uses unconstrained recursive typing - no limitations on T
+ * Properly handles v2.0 architecture with recursive proxying
  */
 export function withMemoization<T>(
   config: MemoizationConfig = {}
@@ -190,42 +107,191 @@ export function withMemoization<T>(
 
   return (tree: SignalTree<T>): MemoizedSignalTree<T> => {
     if (!enabled) {
-      return tree as MemoizedSignalTree<T>;
+      // When disabled, add no-op methods
+      const enhanced = tree as MemoizedSignalTree<T>;
+      enhanced.memoizedUpdate = (updater) => {
+        // Just apply the update directly through root branch
+        applyRootUpdate(tree, updater);
+      };
+      enhanced.memoizedComputed = (computation) => computed(computation);
+      enhanced.clearMemoCache = () => {
+        // No-op when disabled
+      };
+      enhanced.getCacheStats = () => ({
+        size: 0,
+        hitRate: 0,
+        totalHits: 0,
+        totalMisses: 0,
+        keys: [],
+      });
+      return enhanced;
     }
 
     // Initialize cache for this tree
     const cache = new Map<string, CacheEntry<unknown>>();
     memoizationCache.set(tree as object, cache);
 
-    // Limit cache size function
+    // Enforce cache size limits
     const enforceCacheLimit = () => {
       if (cache.size > maxCacheSize) {
-        // Remove oldest entries (simple LRU)
         const entries = Array.from(cache.entries());
-        entries.sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
-
+        entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
         const toRemove = entries.slice(0, cache.size - maxCacheSize + 1);
         toRemove.forEach(([key]) => cache.delete(key));
       }
     };
 
-    // Store original update method on the callable state
-    const originalUpdate = tree.$.update.bind(tree.$);
+    // Keep track of whether we're in a cached operation
+    let applyingCached = false;
+
+    /**
+     * Create memoization proxy that recursively wraps nested objects
+     * This properly intercepts set/update methods at all levels
+     */
+    function createMemoizationProxy(target: any, path = ''): any {
+      // Don't proxy signals
+      if (isSignal(target)) {
+        return target;
+      }
+
+      // Don't proxy non-objects
+      if (!target || typeof target !== 'object') {
+        return target;
+      }
+
+      return new Proxy(target, {
+        get(obj, prop) {
+          const value = obj[prop];
+
+          // Intercept 'set' method on branch nodes
+          if (prop === 'set' && typeof value === 'function') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return function (partial: any) {
+              if (applyingCached) {
+                // If we're applying a cached result, just call original
+                return value.call(obj, partial);
+              }
+
+              // For memoization, we cache based on the input
+              const cacheKey = `set_${path}_${JSON.stringify(partial)}`;
+
+              // Check if we've seen this exact update before
+              const cached = cache.get(cacheKey);
+              if (cached) {
+                cached.hitCount++;
+                // Apply the cached update
+                applyingCached = true;
+                try {
+                  return value.call(obj, cached.value);
+                } finally {
+                  applyingCached = false;
+                }
+              }
+
+              // Not cached, apply and store
+              cache.set(cacheKey, {
+                value: partial,
+                deps: [partial],
+                timestamp: Date.now(),
+                hitCount: 1,
+              });
+
+              enforceCacheLimit();
+              return value.call(obj, partial);
+            };
+          }
+
+          // Intercept 'update' method on branch nodes
+          if (prop === 'update' && typeof value === 'function') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return function (updater: any) {
+              if (applyingCached) {
+                // If we're applying a cached result, just call original
+                return value.call(obj, updater);
+              }
+
+              // Get current state for this branch
+              const currentBranchState = unwrapBranch(obj);
+              const cacheKey = `update_${path}_${JSON.stringify(
+                currentBranchState
+              )}`;
+
+              // Check cache
+              const cached = cache.get(cacheKey);
+              if (cached && deepEqual(cached.deps, [currentBranchState])) {
+                cached.hitCount++;
+                // Apply cached result
+                applyingCached = true;
+                try {
+                  return value.call(obj, () => cached.value);
+                } finally {
+                  applyingCached = false;
+                }
+              }
+
+              // Compute and cache
+              const result = updater(currentBranchState);
+              cache.set(cacheKey, {
+                value: result,
+                deps: [currentBranchState],
+                timestamp: Date.now(),
+                hitCount: 1,
+              });
+
+              enforceCacheLimit();
+              return value.call(obj, updater);
+            };
+          }
+
+          // Recursively proxy nested objects (but not signals)
+          if (value && typeof value === 'object' && !isSignal(value)) {
+            const nestedPath = path ? `${path}.${String(prop)}` : String(prop);
+            return createMemoizationProxy(value, nestedPath);
+          }
+
+          return value;
+        },
+      });
+    }
+
+    // Helper to unwrap a branch (not the whole tree)
+    function unwrapBranch(branch: any): any {
+      const result: any = {};
+      for (const key in branch) {
+        if (key === 'set' || key === 'update') continue;
+        if (!Object.prototype.hasOwnProperty.call(branch, key)) continue;
+
+        const value = branch[key];
+        if (isSignal(value)) {
+          result[key] = (value as Signal<unknown>)();
+        } else if (value && typeof value === 'object') {
+          result[key] = unwrapBranch(value);
+        } else {
+          result[key] = value;
+        }
+      }
+      return result;
+    }
+
+    // Apply proxy to the tree's state
+    const originalState = tree.$;
+    tree.$ = createMemoizationProxy(originalState) as DeepSignalify<T>;
+    tree.state = tree.$;
 
     // Add memoized update method
-    // Add memoization methods to the tree
     (tree as MemoizedSignalTree<T>).memoizedUpdate = (
       updater: (current: T) => Partial<T>,
       cacheKey?: string
     ) => {
-      const key = cacheKey || `update_${Date.now()}`;
-      const currentState = tree.$();
+      const key = cacheKey || `manual_${Date.now()}`;
+      const currentState = unwrap(tree.$);
 
       // Check cache
       const cached = cache.get(key);
       if (cached && deepEqual(cached.deps, [currentState])) {
+        cached.hitCount++;
         // Apply cached result
-        originalUpdate(() => cached.value as Partial<T>);
+        applyRootUpdate(tree, () => cached.value as Partial<T>);
         return;
       }
 
@@ -241,10 +307,37 @@ export function withMemoization<T>(
       });
 
       // Apply update
-      originalUpdate(() => result);
-
-      // Enforce cache limits after adding new entry
+      applyRootUpdate(tree, () => result);
       enforceCacheLimit();
+    };
+
+    // Add memoized computed
+    (tree as MemoizedSignalTree<T>).memoizedComputed = <TResult>(
+      computation: () => TResult,
+      deps?: unknown[]
+    ) => {
+      return computed(() => {
+        const currentState = unwrap(tree.$);
+        const allDeps = deps ? [currentState, ...deps] : [currentState];
+        const key = `computed_${JSON.stringify(allDeps)}`;
+
+        const cached = cache.get(key);
+        if (cached && deepEqual(cached.deps, allDeps)) {
+          cached.hitCount++;
+          return cached.value as TResult;
+        }
+
+        const result = computation();
+        cache.set(key, {
+          value: result,
+          deps: allDeps,
+          timestamp: Date.now(),
+          hitCount: 1,
+        });
+
+        enforceCacheLimit();
+        return result;
+      });
     };
 
     // Add cache management methods
@@ -262,7 +355,6 @@ export function withMemoization<T>(
 
       for (const entry of cache.values()) {
         totalHits += entry.hitCount || 0;
-        // For simplicity, we'll estimate misses as half of hits
         totalMisses += Math.floor((entry.hitCount || 0) / 2);
       }
 
@@ -278,103 +370,90 @@ export function withMemoization<T>(
       };
     };
 
-    // Also expose these helpers on the callable state proxy (`tree.$`) so
-    // consumer code can call `tree.$.memoizedUpdate(...)` and related methods
-    // as part of the callable proxy API. This is a non-destructive migration
-    // step; we keep the existing tree-level methods for backward compatibility.
-    try {
-      const treeHelpers = tree as MemoizedSignalTree<T>;
-      const stateProxy = tree.$ as unknown as {
-        memoizedUpdate?: typeof treeHelpers.memoizedUpdate;
-        clearMemoCache?: typeof treeHelpers.clearMemoCache;
-        getCacheStats?: typeof treeHelpers.getCacheStats;
-      };
-
-      stateProxy.memoizedUpdate = treeHelpers.memoizedUpdate.bind(tree);
-      stateProxy.clearMemoCache = treeHelpers.clearMemoCache.bind(tree);
-      stateProxy.getCacheStats = treeHelpers.getCacheStats.bind(tree);
-    } catch {
-      // best-effort only; don't block runtime if the callable proxy shape
-      // doesn't accept extra properties in some environments.
-    }
-
-    // Clean up expired entries if TTL is set
+    // Setup TTL cleanup if configured
     if (ttl) {
       const cleanup = () => {
         const now = Date.now();
         for (const [key, entry] of cache.entries()) {
-          if (entry.timestamp && now - entry.timestamp > ttl) {
+          if (now - entry.timestamp > ttl) {
             cache.delete(key);
           }
         }
       };
 
-      // Run cleanup periodically
       const intervalId = setInterval(cleanup, ttl);
-
-      // Store interval ID for cleanup (handle Node.js vs browser differences)
-      (
-        tree as unknown as {
-          _memoCleanupInterval?: ReturnType<typeof setInterval>;
-        }
-      )._memoCleanupInterval = intervalId;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (tree as any)._memoCleanupInterval = intervalId;
     }
-
-    // Wrap the callable state's update to enforce cache limits
-    const enhancedUpdate = tree.$.update.bind(tree.$);
-    tree.$.update = (updater: (current: T) => Partial<T>) => {
-      const result = enhancedUpdate(updater);
-      enforceCacheLimit();
-      return result;
-    };
 
     return tree as MemoizedSignalTree<T>;
   };
 }
 
 /**
- * Convenience function to enable memoization with default settings
- * Uses unconstrained recursive typing - no limitations on T
+ * Helper to apply update at root level
+ * In v2.0, we need to handle the fact that root may or may not have update/set
+ */
+function applyRootUpdate<T>(
+  tree: SignalTree<T>,
+  updater: (current: T) => Partial<T>
+): void {
+  const root = tree.$ as any;
+
+  // Check if root has update method (it should if it's a branch)
+  if ('update' in root && typeof root.update === 'function') {
+    root.update(updater);
+  }
+  // Fallback: try set with the full update
+  else if ('set' in root && typeof root.set === 'function') {
+    const current = unwrap(tree.$);
+    const update = updater(current);
+    root.set(update);
+  }
+  // Last resort: manually update properties
+  else {
+    const current = unwrap(tree.$);
+    const updates = updater(current);
+    for (const [key, value] of Object.entries(updates)) {
+      if (key in root) {
+        const prop = root[key];
+        if (isSignal(prop)) {
+          (prop as any).set(value);
+        } else if (prop && typeof prop === 'object' && 'set' in prop) {
+          prop.set(value);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Convenience functions
  */
 export function enableMemoization<T>() {
   return withMemoization<T>({ enabled: true });
 }
 
-/**
- * High-performance memoization with aggressive caching
- * Uses unconstrained recursive typing - no limitations on T
- */
 export function withHighPerformanceMemoization<T>() {
   return withMemoization<T>({
     enabled: true,
     maxCacheSize: 10000,
-    ttl: 300000, // 5 minutes
+    ttl: 300000,
   });
 }
 
-/**
- * Clear all memoization caches
- */
 export function clearAllCaches(): void {
-  // Clear all tree caches
-  memoizationCache.forEach((cache: Map<string, CacheEntry<unknown>>) => {
-    cache.clear();
-  });
+  memoizationCache.forEach((cache) => cache.clear());
 }
 
-/**
- * Get global cache statistics
- */
 export function getGlobalCacheStats() {
   let totalSize = 0;
   let totalHits = 0;
   let treeCount = 0;
 
-  // Type the cache parameter properly
-  memoizationCache.forEach((cache: Map<string, CacheEntry<unknown>>) => {
+  memoizationCache.forEach((cache) => {
     treeCount++;
     totalSize += cache.size;
-
     for (const entry of cache.values()) {
       totalHits += entry.hitCount || 0;
     }

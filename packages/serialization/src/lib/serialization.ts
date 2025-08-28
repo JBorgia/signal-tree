@@ -7,8 +7,8 @@
  * enabling state persistence, SSR, and state transfer between contexts.
  */
 
-import { SignalTree } from '@signaltree/core';
-import { isSignal, Signal } from '@angular/core';
+import { SignalTree, unwrap } from '@signaltree/core';
+import { isSignal, Signal, WritableSignal } from '@angular/core';
 import { TYPE_MARKERS } from '../constants';
 
 /**
@@ -111,34 +111,17 @@ export interface SerializedState<T = unknown> {
  * Enhanced SignalTree interface with serialization capabilities
  */
 export interface SerializableSignalTree<T> extends SignalTree<T> {
-  /**
-   * Serialize the current state to a JSON string
-   */
+  /** Serialize the current state to a JSON string */
   serialize(config?: SerializationConfig): string;
-
-  /**
-   * Deserialize and apply state from a JSON string
-   */
+  /** Deserialize and apply state from a JSON string */
   deserialize(json: string, config?: SerializationConfig): void;
-
-  /**
-   * Get a plain object representation of the current state
-   */
+  /** Get a plain object representation of the current state */
   toJSON(): T;
-
-  /**
-   * Restore state from a plain object
-   */
+  /** Restore state from a plain object */
   fromJSON(data: T): void;
-
-  /**
-   * Create a snapshot of the current state
-   */
+  /** Create a snapshot of the current state */
   snapshot(): SerializedState<T>;
-
-  /**
-   * Restore state from a snapshot
-   */
+  /** Restore state from a snapshot */
   restore(snapshot: SerializedState<T>): void;
 }
 
@@ -432,6 +415,9 @@ export function withSerialization<T extends Record<string, unknown>>(
 ): (tree: SignalTree<T>) => SerializableSignalTree<T> {
   return (tree: SignalTree<T>): SerializableSignalTree<T> => {
     const enhanced = tree as SerializableSignalTree<T>;
+    // Helper: narrow Angular signals that support .set
+    const isWritableSignal = (v: unknown): v is WritableSignal<unknown> =>
+      isSignal(v) && typeof (v as { set?: unknown }).set === 'function';
 
     /**
      * Get plain object representation
@@ -441,10 +427,9 @@ export function withSerialization<T extends Record<string, unknown>>(
         ...DEFAULT_CONFIG,
         ...defaultConfig,
       };
-      // Use the unwrapped state via the callable API to avoid serializing
-      // proxy objects or internal wrappers.
+      // Use unwrap(tree.$) to avoid serializing proxy objects or internal wrappers.
       return unwrapObjectSafely(
-        tree.$(),
+        unwrap(tree.$),
         new WeakSet(),
         0,
         fullConfig.maxDepth,
@@ -463,27 +448,16 @@ export function withSerialization<T extends Record<string, unknown>>(
         }
 
         // Check for type markers
-        if (TYPE_MARKERS.UNDEFINED in value) {
-          return undefined;
-        }
-        if (TYPE_MARKERS.NAN in value) {
-          return NaN;
-        }
-        if (TYPE_MARKERS.INFINITY in value) {
-          return Infinity;
-        }
-        if (TYPE_MARKERS.NEG_INFINITY in value) {
-          return -Infinity;
-        }
-        if (TYPE_MARKERS.BIGINT in value) {
+        if (TYPE_MARKERS.UNDEFINED in value) return undefined;
+        if (TYPE_MARKERS.NAN in value) return NaN;
+        if (TYPE_MARKERS.INFINITY in value) return Infinity;
+        if (TYPE_MARKERS.NEG_INFINITY in value) return -Infinity;
+        if (TYPE_MARKERS.BIGINT in value)
           return BigInt(value[TYPE_MARKERS.BIGINT] as string);
-        }
-        if (TYPE_MARKERS.SYMBOL in value) {
+        if (TYPE_MARKERS.SYMBOL in value)
           return Symbol.for(value[TYPE_MARKERS.SYMBOL] as string);
-        }
-        if (TYPE_MARKERS.DATE in value) {
+        if (TYPE_MARKERS.DATE in value)
           return new Date(value[TYPE_MARKERS.DATE] as string);
-        }
         if (TYPE_MARKERS.REGEXP in value) {
           const regexpData = value[TYPE_MARKERS.REGEXP] as {
             source: string;
@@ -491,12 +465,10 @@ export function withSerialization<T extends Record<string, unknown>>(
           };
           return new RegExp(regexpData.source, regexpData.flags);
         }
-        if (TYPE_MARKERS.MAP in value) {
+        if (TYPE_MARKERS.MAP in value)
           return new Map(value[TYPE_MARKERS.MAP] as Array<[unknown, unknown]>);
-        }
-        if (TYPE_MARKERS.SET in value) {
+        if (TYPE_MARKERS.SET in value)
           return new Set(value[TYPE_MARKERS.SET] as Array<unknown>);
-        }
 
         // Handle arrays
         if (Array.isArray(value)) {
@@ -514,8 +486,35 @@ export function withSerialization<T extends Record<string, unknown>>(
       // Restore special types in the data
       const restoredData = restoreSpecialTypes(data) as T;
 
-      // Use set with the full object to replace everything at once
-      tree.$.set(restoredData);
+      // In v2, don't assume a root-level set; walk the DeepSignalify tree and set per-branch
+      const applyRestored = (
+        current: Record<string, unknown>,
+        restored: Record<string, unknown>
+      ): void => {
+        for (const [key, value] of Object.entries(restored)) {
+          const target = current[key];
+          if (isWritableSignal(target)) {
+            (target as WritableSignal<unknown>).set(value);
+          } else if (
+            target &&
+            typeof target === 'object' &&
+            !isSignal(target) &&
+            value &&
+            typeof value === 'object' &&
+            !Array.isArray(value)
+          ) {
+            applyRestored(
+              target as Record<string, unknown>,
+              value as Record<string, unknown>
+            );
+          }
+        }
+      };
+
+      applyRestored(
+        tree.$ as unknown as Record<string, unknown>,
+        restoredData as unknown as Record<string, unknown>
+      );
     };
 
     /**
@@ -527,11 +526,9 @@ export function withSerialization<T extends Record<string, unknown>>(
         ...defaultConfig,
         ...config,
       };
-
-      // Use the unwrapped callable state to avoid serializing internal
-      // proxy wrappers.
+      // Use the unwrapped state to avoid serializing internal wrappers
       const state = unwrapObjectSafely(
-        tree.$(),
+        unwrap(tree.$),
         new WeakSet(),
         0,
         fullConfig.maxDepth,

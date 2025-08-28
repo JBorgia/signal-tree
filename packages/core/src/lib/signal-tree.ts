@@ -1,93 +1,161 @@
 /**
- * SignalTree Core v2.0.0 - MIT License
+ * SignalTree Core v2.0.0 - Simplified Architecture
  * Copyright (c) 2025 Jonathan D Borgia
- * @see https://github.com/JBorgia/signaltree/blob/main/LICENSE
+ * MIT License
  */
 
 import { signal, WritableSignal, isSignal } from '@angular/core';
-import type {
-  SignalTree,
-  DeepSignalify,
-  TreeConfig,
-  TreePreset,
-} from './types';
-import { createLazySignalTree, equal } from './utils';
-
-// ============================================
-// PERFORMANCE HEURISTICS
-// ============================================
+import type { SignalTree, DeepSignalify } from './types';
 
 /**
- * Estimates the size of an object for strategy selection
+ * Creates a reactive signal tree with the simplified v2.0 architecture.
+ *
+ * @template T - The state object type
+ * @param initialState - The initial state object
+ * @returns A SignalTree with reactive state and enhancer composition
  */
-function estimateObjectSize(
-  obj: unknown,
-  maxDepth = 3,
-  currentDepth = 0
-): number {
-  if (currentDepth >= maxDepth) return 1;
-  if (obj === null || obj === undefined) return 0;
-  if (typeof obj !== 'object') return 1;
+export function signalTree<T extends Record<string, unknown>>(
+  initialState: T
+): SignalTree<T> {
+  // Create the deep signal structure
+  const signalState = createDeepSignals(initialState);
 
-  let size = 0;
+  // Create the core tree structure
+  const tree: SignalTree<T> = {
+    $: signalState,
+    state: signalState, // Alias for backward compatibility
 
-  try {
-    if (Array.isArray(obj)) {
-      size = obj.length;
-      const sampleSize = Math.min(3, obj.length);
-      for (let i = 0; i < sampleSize; i++) {
-        size += estimateObjectSize(obj[i], maxDepth, currentDepth + 1) * 0.1;
-      }
+    with<R>(...enhancers: Array<(tree: SignalTree<T>) => R>): R {
+      return enhancers.reduce((currentTree, enhancer) => {
+        return enhancer(currentTree as SignalTree<T>);
+      }, tree as unknown) as R;
+    },
+  };
+
+  return tree;
+}
+
+/**
+ * Creates deep signal structure with proper typing and methods
+ */
+function createDeepSignals<T>(obj: T): DeepSignalify<T> {
+  if (obj === null || obj === undefined || typeof obj !== 'object') {
+    return signal(obj) as DeepSignalify<T>;
+  }
+
+  if (Array.isArray(obj) || isBuiltInObject(obj)) {
+    return signal(obj) as DeepSignalify<T>;
+  }
+
+  // Create signals for each property
+  const result = {} as Record<string, unknown>;
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      !isBuiltInObject(value)
+    ) {
+      // Nested object - create recursive structure
+      const nestedSignals = createDeepSignals(value);
+      result[key] = nestedSignals;
+
+      // Add set and update methods as non-enumerable properties
+      Object.defineProperty(result[key], 'set', {
+        enumerable: false,
+        configurable: true,
+        value: function (partial: Partial<typeof value>) {
+          applyPartialUpdate(this, partial);
+        },
+      });
+
+      Object.defineProperty(result[key], 'update', {
+        enumerable: false,
+        configurable: true,
+        value: function (
+          updater: (current: typeof value) => Partial<typeof value>
+        ) {
+          const current = unwrapBranch(this);
+          const update = updater(current);
+          applyPartialUpdate(this, update);
+        },
+      });
     } else {
-      const keys = Object.keys(obj);
-      size = keys.length;
-      const sampleSize = Math.min(5, keys.length);
-      for (let i = 0; i < sampleSize; i++) {
-        const value = (obj as Record<string, unknown>)[keys[i]];
-        size += estimateObjectSize(value, maxDepth, currentDepth + 1) * 0.5;
+      // Leaf node - just a signal
+      result[key] = signal(value);
+    }
+  }
+
+  return result as DeepSignalify<T>;
+}
+
+/**
+ * Helper to apply partial updates to nested signal structures
+ */
+function applyPartialUpdate<T>(
+  target: Record<string, unknown>,
+  update: Partial<T>
+): void {
+  for (const [key, value] of Object.entries(
+    update as Record<string, unknown>
+  )) {
+    const targetProp = target[key];
+
+    if (isSignal(targetProp)) {
+      // It's a signal - update it
+      (targetProp as WritableSignal<unknown>).set(value);
+    } else if (
+      targetProp &&
+      typeof targetProp === 'object' &&
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      !isBuiltInObject(value)
+    ) {
+      // Nested object with set method - recursively update
+      if ('set' in targetProp && typeof targetProp.set === 'function') {
+        targetProp.set(value);
+      } else {
+        applyPartialUpdate(targetProp as Record<string, unknown>, value);
       }
     }
-  } catch {
-    return 1;
   }
-
-  return Math.floor(size);
 }
 
 /**
- * Determines whether to use lazy signal creation based on object characteristics
+ * Helper to unwrap a branch node to plain object (for update method)
  */
-function shouldUseLazy(obj: unknown, config: TreeConfig): boolean {
-  if (config.useLazySignals !== undefined) {
-    return config.useLazySignals;
+function unwrapBranch<T>(branch: Record<string, unknown>): T {
+  const result = {} as Record<string, unknown>;
+
+  for (const key in branch) {
+    // Skip methods
+    if (key === 'set' || key === 'update') continue;
+    if (!Object.prototype.hasOwnProperty.call(branch, key)) continue;
+
+    const value = branch[key];
+
+    if (isSignal(value)) {
+      result[key] = value();
+    } else if (value && typeof value === 'object') {
+      // Nested branch - recurse
+      result[key] = unwrapBranch(value as Record<string, unknown>);
+    } else {
+      result[key] = value;
+    }
   }
 
-  if (config.debugMode || config.enableDevTools) {
-    return false;
-  }
-
-  if (config.batchUpdates && config.useMemoization) {
-    return true;
-  }
-
-  const estimatedSize = estimateObjectSize(obj);
-  return estimatedSize > 50;
+  return result as T;
 }
 
 /**
- * Creates an equality function based on configuration
- */
-function createEqualityFn(useShallowComparison: boolean) {
-  return useShallowComparison ? Object.is : equal;
-}
-
-/**
- * Enhanced built-in object detection
+ * Helper to check if a value is a built-in object that should be treated as primitive
  */
 function isBuiltInObject(v: unknown): boolean {
   if (v === null || v === undefined) return false;
 
-  if (
+  return (
     v instanceof Date ||
     v instanceof RegExp ||
     typeof v === 'function' ||
@@ -98,324 +166,14 @@ function isBuiltInObject(v: unknown): boolean {
     v instanceof ArrayBuffer ||
     v instanceof DataView ||
     v instanceof Error ||
-    v instanceof Promise
-  ) {
-    return true;
-  }
-  return false;
+    v instanceof Promise ||
+    (typeof URL !== 'undefined' && v instanceof URL) ||
+    (typeof URLSearchParams !== 'undefined' && v instanceof URLSearchParams) ||
+    (typeof FormData !== 'undefined' && v instanceof FormData) ||
+    (typeof Blob !== 'undefined' && v instanceof Blob) ||
+    (typeof File !== 'undefined' && v instanceof File)
+  );
 }
 
-/**
- * Adds set and update methods to branch nodes
- */
-function enhanceBranchNode<T>(node: DeepSignalify<T>): DeepSignalify<T> {
-  // Only add methods to object nodes (not signals or primitives)
-  if (!node || typeof node !== 'object' || isSignal(node)) {
-    return node;
-  }
-
-  // Add non-enumerable set method
-  Object.defineProperty(node, 'set', {
-    configurable: true,
-    enumerable: false,
-    value: (partial: Partial<T>) => {
-      if (!partial || typeof partial !== 'object') {
-        throw new Error('Set must be called with a partial object');
-      }
-
-      for (const key in partial) {
-        if (!Object.prototype.hasOwnProperty.call(partial, key)) continue;
-
-        const value = partial[key];
-        const currentNode = (node as Record<string, unknown>)[key];
-
-        if (isSignal(currentNode)) {
-          (currentNode as WritableSignal<unknown>).set(value);
-        } else if (
-          typeof currentNode === 'object' &&
-          currentNode !== null &&
-          'set' in currentNode &&
-          typeof (currentNode as { set?: unknown }).set === 'function' &&
-          typeof value === 'object' &&
-          value !== null &&
-          !Array.isArray(value) &&
-          !isBuiltInObject(value)
-        ) {
-          // Nested branch node - recursive set
-          (currentNode as { set: (value: unknown) => void }).set(value);
-        }
-      }
-    },
-  });
-
-  // Add non-enumerable update method
-  Object.defineProperty(node, 'update', {
-    configurable: true,
-    enumerable: false,
-    value: (updater: (current: T) => Partial<T>) => {
-      // Get current state by unwrapping signals
-      const current = {} as T;
-      for (const key in node) {
-        const value = (node as Record<string, unknown>)[key];
-        if (isSignal(value)) {
-          (current as Record<string, unknown>)[key] = value();
-        } else if (typeof value === 'object' && value !== null) {
-          // For nested objects, we'd need recursive unwrap
-          // For now, pass the node itself
-          (current as Record<string, unknown>)[key] = value;
-        } else {
-          (current as Record<string, unknown>)[key] = value;
-        }
-      }
-
-      const partial = updater(current);
-      (node as { set: (partial: Partial<T>) => void }).set(partial);
-    },
-  });
-
-  return node;
-}
-
-/**
- * Creates signals using signal-store pattern for perfect type inference.
- * Eager creation - all signals created immediately.
- */
-function createSignalStore<T>(
-  obj: T,
-  equalityFn: (a: unknown, b: unknown) => boolean
-): DeepSignalify<T> {
-  // Handle primitives and null/undefined
-  if (obj === null || obj === undefined || typeof obj !== 'object') {
-    return signal(obj, { equal: equalityFn }) as unknown as DeepSignalify<T>;
-  }
-
-  // Handle arrays - treat as primitive signal
-  if (Array.isArray(obj)) {
-    return signal(obj, { equal: equalityFn }) as unknown as DeepSignalify<T>;
-  }
-
-  // Handle built-in objects - treat as primitive signal
-  if (isBuiltInObject(obj)) {
-    return signal(obj, { equal: equalityFn }) as unknown as DeepSignalify<T>;
-  }
-
-  const store: Partial<DeepSignalify<T>> = {};
-  const processedObjects = new WeakSet<object>();
-
-  // Prevent circular references
-  if (processedObjects.has(obj as object)) {
-    console.warn(
-      '[SignalTree] Circular reference detected, creating reference signal'
-    );
-    return signal(obj, { equal: equalityFn }) as unknown as DeepSignalify<T>;
-  }
-  processedObjects.add(obj as object);
-
-  try {
-    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
-      try {
-        if (typeof key === 'symbol') continue;
-
-        if (isSignal(value)) {
-          (store as Record<string, unknown>)[key] = value;
-          continue;
-        }
-
-        if (value === null || value === undefined) {
-          (store as Record<string, unknown>)[key] = signal(value, {
-            equal: equalityFn,
-          });
-        } else if (typeof value !== 'object') {
-          // Primitives
-          (store as Record<string, unknown>)[key] = signal(value, {
-            equal: equalityFn,
-          });
-        } else if (Array.isArray(value) || isBuiltInObject(value)) {
-          // Arrays and built-in objects
-          (store as Record<string, unknown>)[key] = signal(value, {
-            equal: equalityFn,
-          });
-        } else {
-          // Nested objects - recurse and enhance
-          const nestedStore = createSignalStore(value, equalityFn);
-          (store as Record<string, unknown>)[key] =
-            enhanceBranchNode(nestedStore);
-        }
-      } catch (error) {
-        console.warn(
-          `[SignalTree] Failed to create signal for key "${key}":`,
-          error
-        );
-        (store as Record<string, unknown>)[key] = signal(value, {
-          equal: equalityFn,
-        });
-      }
-    }
-
-    // Handle symbol properties if present
-    const symbols = Object.getOwnPropertySymbols(obj);
-    for (const sym of symbols) {
-      const value = (obj as Record<symbol, unknown>)[sym];
-      try {
-        if (isSignal(value)) {
-          (store as Record<symbol, unknown>)[sym] = value;
-        } else {
-          (store as Record<symbol, unknown>)[sym] = signal(value, {
-            equal: equalityFn,
-          });
-        }
-      } catch (error) {
-        console.warn(
-          `[SignalTree] Failed to create signal for symbol key:`,
-          error
-        );
-      }
-    }
-  } catch (error) {
-    throw new Error(
-      `Failed to create signal store: ${
-        error instanceof Error ? error.message : 'Unknown error'
-      }`
-    );
-  }
-
-  // Enhance the root store with set/update methods
-  return enhanceBranchNode(store as DeepSignalify<T>);
-}
-
-/**
- * Core function to create a minimal SignalTree with composable enhancers
- */
-function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
-  // Validate input
-  if (obj === null || obj === undefined) {
-    throw new Error('Cannot create SignalTree from null or undefined');
-  }
-
-  const equalityFn = createEqualityFn(config.useShallowComparison ?? false);
-  const useLazy = shouldUseLazy(obj, config);
-
-  if (config.debugMode) {
-    const estimatedSize = estimateObjectSize(obj);
-    console.log(
-      `[SignalTree] Creating tree with ${
-        useLazy ? 'lazy' : 'eager'
-      } strategy (estimated size: ${estimatedSize})`
-    );
-  }
-
-  // Create signals using appropriate strategy
-  let signalState: DeepSignalify<T>;
-
-  try {
-    if (useLazy && typeof obj === 'object') {
-      signalState = createLazySignalTree(
-        obj as object,
-        equalityFn
-      ) as unknown as DeepSignalify<T>;
-    } else {
-      signalState = createSignalStore(obj, equalityFn);
-    }
-  } catch (error) {
-    if (useLazy) {
-      console.warn(
-        '[SignalTree] Lazy creation failed, falling back to eager:',
-        error
-      );
-      signalState = createSignalStore(obj, equalityFn);
-    } else {
-      throw error;
-    }
-  }
-
-  // Create minimal tree with just $ and with
-  const tree: SignalTree<T> = {
-    $: signalState,
-    state: signalState, // Alias for backward compatibility
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    with<R>(...enhancers: Array<(tree: any) => any>): R {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return enhancers.reduce((acc, enhance) => enhance(acc), this as any) as R;
-    },
-  };
-
-  return tree;
-}
-
-// ============================================
-// PUBLIC API
-// ============================================
-
-/**
- * Creates a minimal reactive signal tree with composable enhancers
- */
-export function signalTree<T>(obj: T): SignalTree<T>;
-
-/**
- * Creates a reactive signal tree with preset configuration
- */
-export function signalTree<T>(obj: T, preset: TreePreset): SignalTree<T>;
-
-/**
- * Creates a reactive signal tree with custom configuration
- */
-export function signalTree<T>(obj: T, config: TreeConfig): SignalTree<T>;
-
-/**
- * Main SignalTree factory function
- */
-export function signalTree<T extends Record<string, unknown>>(
-  obj: Required<T>,
-  configOrPreset?: TreeConfig | TreePreset
-): SignalTree<Required<T>>;
-
-export function signalTree<T>(
-  obj: T,
-  configOrPreset?: TreeConfig | TreePreset
-): SignalTree<T>;
-
-export function signalTree<T>(
-  obj: T,
-  configOrPreset?: TreeConfig | TreePreset
-): SignalTree<T> {
-  // Handle preset strings
-  if (typeof configOrPreset === 'string') {
-    const presetConfigs: Record<TreePreset, Partial<TreeConfig>> = {
-      basic: {
-        useLazySignals: false,
-        debugMode: false,
-      },
-      performance: {
-        useLazySignals: true,
-        batchUpdates: true,
-        useMemoization: true,
-        useShallowComparison: true,
-      },
-      development: {
-        useLazySignals: false,
-        debugMode: true,
-        enableDevTools: true,
-        trackPerformance: true,
-      },
-      production: {
-        useLazySignals: true,
-        batchUpdates: true,
-        useMemoization: true,
-        debugMode: false,
-      },
-    };
-
-    const config = presetConfigs[configOrPreset];
-    if (!config) {
-      console.warn(
-        `Unknown preset: ${configOrPreset}, using default configuration`
-      );
-      return create(obj, {});
-    }
-    return create(obj, config);
-  }
-
-  // Handle configuration objects or default
-  const config = configOrPreset || {};
-  return create(obj, config);
-}
+// Export utilities that work with the tree
+export { unwrap } from './utils';

@@ -1,4 +1,4 @@
-import { signalTree, type SignalTree } from '@signaltree/core';
+import { signalTree, unwrap, type SignalTree } from '@signaltree/core';
 import {
   withTimeTravel,
   enableTimeTravel,
@@ -98,17 +98,17 @@ describe('Time Travel', () => {
       tree.$.update((state: TestState) => ({ ...state, count: 2 }));
       tree.$.update((state: TestState) => ({ ...state, count: 3 }));
 
-      expect(tree.$().count).toBe(3);
+      expect(unwrap(tree.$).count).toBe(3);
 
       const undoResult = tree.__timeTravel.undo();
       expect(undoResult).toBe(true);
-      expect(tree.$().count).toBe(2);
+      expect(unwrap(tree.$).count).toBe(2);
 
       tree.__timeTravel.undo();
-      expect(tree.$().count).toBe(1);
+      expect(unwrap(tree.$).count).toBe(1);
 
       tree.__timeTravel.undo();
-      expect(tree.$().count).toBe(0);
+      expect(unwrap(tree.$).count).toBe(0);
     });
 
     it('should support redo operations', () => {
@@ -118,11 +118,11 @@ describe('Time Travel', () => {
       tree.$.update((state: TestState) => ({ ...state, count: 2 }));
 
       tree.__timeTravel.undo();
-      expect(tree.$().count).toBe(1);
+      expect(unwrap(tree.$).count).toBe(1);
 
       const redoResult = tree.__timeTravel.redo();
       expect(redoResult).toBe(true);
-      expect(tree.$().count).toBe(2);
+      expect(unwrap(tree.$).count).toBe(2);
     });
 
     it('should handle undo/redo boundaries correctly', () => {
@@ -154,7 +154,7 @@ describe('Time Travel', () => {
 
       const jumpResult = tree.__timeTravel.jumpTo(1);
       expect(jumpResult).toBe(true);
-      expect(tree.$().count).toBe(1);
+      expect(unwrap(tree.$).count).toBe(1);
       expect(tree.__timeTravel.getCurrentIndex()).toBe(1);
 
       // Invalid index
@@ -201,7 +201,7 @@ describe('Time Travel', () => {
       // Go back and create new branch
       tree.__timeTravel.undo();
       tree.__timeTravel.undo();
-      expect(tree.$().count).toBe(1);
+      expect(unwrap(tree.$).count).toBe(1);
 
       tree.$.update((state: TestState) => ({ ...state, count: 10 }));
 
@@ -235,13 +235,13 @@ describe('Time Travel', () => {
     it('should not track identical state changes', () => {
       const tree = createTimeTravelTree(initialState);
 
-      const beforeState = tree.$();
+      const beforeState = unwrap(tree.$);
       console.log('Before state:', beforeState);
 
-      const currentCount = tree.$().count;
+      const currentCount = unwrap(tree.$).count;
       tree.$.update((state: TestState) => ({ ...state, count: currentCount })); // Same value
 
-      const afterState = tree.$();
+      const afterState = unwrap(tree.$);
       console.log('After state:', afterState);
       console.log(
         'States equal?',
@@ -338,12 +338,12 @@ describe('Time Travel', () => {
       }));
 
       tree.__timeTravel.undo();
-      expect(tree.$().user.name).toBe('Alice');
-      expect(tree.$().items).toEqual(['a', 'b']);
+      expect(unwrap(tree.$).user.name).toBe('Alice');
+      expect(unwrap(tree.$).items).toEqual(['a', 'b']);
 
       tree.__timeTravel.redo();
-      expect(tree.$().user.name).toBe('Bob');
-      expect(tree.$().items).toEqual(['a', 'b', 'c']);
+      expect(unwrap(tree.$).user.name).toBe('Bob');
+      expect(unwrap(tree.$).items).toEqual(['a', 'b', 'c']);
     });
 
     it('should handle multiple rapid updates', () => {
@@ -353,7 +353,7 @@ describe('Time Travel', () => {
         tree.$.update((state: TestState) => ({ ...state, count: i }));
       }
 
-      expect(tree.$().count).toBe(10);
+      expect(unwrap(tree.$).count).toBe(10);
       expect(tree.__timeTravel.getHistory().length).toBe(11); // INIT + 10 updates
 
       // Undo 5 times
@@ -361,7 +361,7 @@ describe('Time Travel', () => {
         tree.__timeTravel.undo();
       }
 
-      expect(tree.$().count).toBe(5);
+      expect(unwrap(tree.$).count).toBe(5);
     });
   });
 });

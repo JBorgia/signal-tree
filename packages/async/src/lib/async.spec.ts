@@ -11,30 +11,30 @@ import {
 } from './async';
 
 // Helper function to create typed async trees for testing
-function createAsyncTree<T>(initialState: T) {
+function createAsyncTree<T extends Record<string, unknown>>(initialState: T) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return signalTree(initialState).with(withAsync()) as any;
 }
 
-function createEnabledAsyncTree<T>(initialState: T) {
+function createEnabledAsyncTree<T extends Record<string, unknown>>(
+  initialState: T
+) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return signalTree(initialState).with(enableAsync()) as any;
 }
 
-function createHighPerfAsyncTree<T>(initialState: T) {
+function createHighPerfAsyncTree<T extends Record<string, unknown>>(
+  initialState: T
+) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return signalTree(initialState).with(withHighPerformanceAsync()) as any;
 }
 
-function createDisabledAsyncTree<T>(initialState: T) {
+function createDisabledAsyncTree<T extends Record<string, unknown>>(
+  initialState: T
+) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return signalTree(initialState).with(withAsync({ enabled: false })) as any;
-}
-
-// Helper to unwrap tree state with type assertion
-function getTreeState(tree: any) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return unwrap(tree) as any;
 }
 
 describe('Async', () => {
@@ -59,7 +59,7 @@ describe('Async', () => {
       },
       {
         onStart: () => ({ count: -1 }),
-        onSuccess: (result) => ({ result }),
+        onSuccess: (result: number) => ({ result }),
       }
     );
 
@@ -69,13 +69,13 @@ describe('Async', () => {
 
     const promise = asyncOperation.execute(5);
     expect(asyncOperation.pending()).toBe(true);
-    expect(getTreeState(tree).count).toBe(-1); // onStart was called
+    expect(unwrap(tree).count).toBe(-1); // onStart was called
 
     const result = await promise;
     expect(result).toBe(10);
     expect(asyncOperation.pending()).toBe(false);
     expect(asyncOperation.result()).toBe(10);
-    expect(getTreeState(tree).result).toBe(10); // onSuccess was called
+    expect(unwrap(tree).result).toBe(10); // onSuccess was called
   });
 
   it('should handle async action errors', async () => {
@@ -86,7 +86,7 @@ describe('Async', () => {
         throw new Error('Test error');
       },
       {
-        onError: (error) => ({ error: error.message }),
+        onError: (error: Error) => ({ error: error.message }),
       }
     );
 
@@ -100,7 +100,7 @@ describe('Async', () => {
 
     expect(asyncOperation.pending()).toBe(false);
     expect(asyncOperation.error()?.message).toBe('Test error');
-    expect(tree.$().error).toBe('Test error'); // onError was called
+    expect(unwrap(tree).error).toBe('Test error'); // onError was called
   });
 
   it('should call onComplete hook regardless of success or failure', async () => {
@@ -115,7 +115,7 @@ describe('Async', () => {
 
     await successOperation.execute(undefined);
     expect(onComplete).toHaveBeenCalledTimes(1);
-    expect(tree.$().completed).toBe(true);
+    expect(unwrap(tree).completed).toBe(true);
 
     // Reset and test failed completion
     tree.$.update(() => ({ completed: false }));
@@ -135,14 +135,14 @@ describe('Async', () => {
     }
 
     expect(onComplete).toHaveBeenCalledTimes(1);
-    expect(tree.$().completed).toBe(true);
+    expect(unwrap(tree).completed).toBe(true);
   });
 
   it('should work with loadData convenience method', async () => {
-    const tree = signalTree({
+    const tree = createAsyncTree({
       data: null as { users: string[] } | null,
       loading: false as boolean,
-    }).pipe(withAsync());
+    });
 
     const loadAction = tree.loadData(
       async () => {
@@ -151,7 +151,10 @@ describe('Async', () => {
       },
       {
         onStart: () => ({ loading: true as boolean }),
-        onSuccess: (result) => ({ data: result, loading: false as boolean }),
+        onSuccess: (result: { users: string[] }) => ({
+          data: result,
+          loading: false as boolean,
+        }),
       }
     );
 
@@ -159,20 +162,20 @@ describe('Async', () => {
 
     const promise = loadAction.execute();
     expect(loadAction.pending()).toBe(true);
-    expect(tree.$().loading).toBe(true);
+    expect(unwrap(tree).loading).toBe(true);
 
     const result = await promise;
     expect(result).toEqual({ users: ['Alice', 'Bob'] });
     expect(loadAction.pending()).toBe(false);
-    expect(tree.$().data).toEqual({ users: ['Alice', 'Bob'] });
-    expect(tree.$().loading).toBe(false);
+    expect(unwrap(tree).data).toEqual({ users: ['Alice', 'Bob'] });
+    expect(unwrap(tree).loading).toBe(false);
   });
 
   it('should work with submitForm convenience method', async () => {
-    const tree = signalTree({
+    const tree = createAsyncTree({
       submitting: false as boolean,
       submitResult: null as { id: number; name: string } | null,
-    }).pipe(withAsync());
+    });
 
     const submitAction = tree.submitForm(
       async (formData: { name: string }) => {
@@ -181,7 +184,7 @@ describe('Async', () => {
       },
       {
         onStart: () => ({ submitting: true as boolean }),
-        onSuccess: (result) => ({
+        onSuccess: (result: { id: number; name: string }) => ({
           submitResult: result,
           submitting: false as boolean,
         }),
@@ -190,8 +193,8 @@ describe('Async', () => {
 
     const result = await submitAction.execute({ name: 'John' });
     expect(result).toEqual({ id: 1, name: 'John' });
-    expect(tree.$().submitResult).toEqual({ id: 1, name: 'John' });
-    expect(tree.$().submitting).toBe(false);
+    expect(unwrap(tree).submitResult).toEqual({ id: 1, name: 'John' });
+    expect(unwrap(tree).submitting).toBe(false);
   });
 
   it('should work with enableAsync convenience function', () => {

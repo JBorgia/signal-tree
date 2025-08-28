@@ -33,7 +33,7 @@ import type {
   DeepSignalify,
   Middleware,
 } from '@signaltree/core';
-import { signalTree, parsePath } from '@signaltree/core';
+import { signalTree, parsePath, unwrap } from '@signaltree/core';
 
 // ============================================
 // FORM TREE TYPES
@@ -148,13 +148,13 @@ export function createFormTree<T extends Record<string, unknown>>(
     asyncValidators?: Record<string, AsyncValidatorFn<unknown>>;
   } & TreeConfig = {}
 ): FormTree<T> {
-  const { validators = {}, asyncValidators = {}, ...treeConfig } = config;
+  const { validators = {}, asyncValidators = {} } = config;
 
   // Create the underlying signal tree
-  const valuesTree = signalTree(initialValues, treeConfig);
+  const valuesTree = signalTree(initialValues);
 
   // Ensure the state has the correct type - this is the key fix
-  const flattenedState = valuesTree.state as DeepSignalify<T>;
+  const flattenedState = valuesTree.$ as DeepSignalify<T>;
 
   // Create form-specific signals
   const formSignals = {
@@ -245,9 +245,8 @@ export function createFormTree<T extends Record<string, unknown>>(
 
   // Helper functions for nested paths
   const getNestedValue = (obj: DeepSignalify<T>, path: string): unknown => {
-    // Prefer using a plain snapshot from valuesTree to avoid relying on
-    // isSignal detection in different environments.
-    const snapshot = valuesTree.$() as unknown as Record<string, unknown>;
+    // Prefer using a plain snapshot from valuesTree (v2.0 unwrap)
+    const snapshot = unwrap(valuesTree.$) as unknown as Record<string, unknown>;
     const keys = parsePath(path);
     let current: unknown = snapshot;
     for (const key of keys) {
@@ -389,7 +388,7 @@ export function createFormTree<T extends Record<string, unknown>>(
     ...formSignals,
 
     // Core methods
-    unwrap: () => valuesTree.$(),
+    unwrap: () => unwrap(valuesTree.$),
 
     setValue: (field: string, value: unknown) => {
       setNestedValue(field, value);
@@ -428,7 +427,9 @@ export function createFormTree<T extends Record<string, unknown>>(
     },
 
     setValues: (values: Partial<T>) => {
-      valuesTree.$.update((v) => ({ ...v, ...values }));
+      for (const [k, v] of Object.entries(values)) {
+        setNestedValue(k, v);
+      }
       markDirty();
       void validate();
     },
@@ -491,7 +492,7 @@ export function createFormTree<T extends Record<string, unknown>>(
           throw new Error('Form is invalid');
         }
 
-        const currentValues = valuesTree.$();
+        const currentValues = unwrap(valuesTree.$) as unknown as T;
         const result = await submitFn(currentValues);
         return result;
       } finally {

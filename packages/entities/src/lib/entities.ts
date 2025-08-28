@@ -32,7 +32,7 @@ interface EntityConfig {
  * This properly handles the SignalTree's DeepSignalify type structure
  *
  * CRITICAL: In SignalTree, arrays become WritableSignal<Array>
- * So `users: User[]` in the original state becomes `users: WritableSignal<User[]>` in tree.state
+ * So `users: User[]` in the original state becomes `users: WritableSignal<User[]>` in tree.$
  */
 function createEntityHelpers<T, E extends { id: string | number }>(
   tree: SignalTree<T>,
@@ -41,9 +41,8 @@ function createEntityHelpers<T, E extends { id: string | number }>(
   // Get the signal from the deeply signalified state
   // The state property is of type DeepSignalify<T>
   const getEntitySignal = (): WritableSignal<E[]> => {
-    // Access the state property - it's already a signal due to DeepSignalify
-    // Use DeepSignalify<T> to represent the deeply-signalified shape and avoid `any`.
-    const stateProperty = (tree.state as unknown as DeepSignalify<T>)[
+    // Access via tree.$ - it's already a signal due to DeepSignalify
+    const stateProperty = (tree.$ as unknown as DeepSignalify<T>)[
       entityKey as keyof DeepSignalify<T>
     ];
 

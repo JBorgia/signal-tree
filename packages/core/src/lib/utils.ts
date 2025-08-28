@@ -502,30 +502,33 @@ export function shallowEqual<T>(a: T, b: T): boolean {
  * handling both individual signals and complex signal trees. It recursively
  * unwraps nested signal structures to return plain JavaScript values.
  *
- * @template T - The type of the unwrapped value
+ * @template T - The signal tree type to unwrap
  * @param signalOrTree - A signal, signal tree, or any value to unwrap
- * @returns The unwrapped value(s)
+ * @returns The unwrapped value(s) with proper type inference
  *
  * @example
  * ```typescript
  * const tree = signalTree({ user: { name: 'John' }, count: 5 });
  *
- * // Unwrap individual signals
- * const name = unwrap(tree.$.user.name); // 'John'
- * const count = unwrap(tree.$.count);    // 5
+ * // Unwrap individual signals - types are inferred!
+ * const name = unwrap(tree.$.user.name); // string (inferred)
+ * const count = unwrap(tree.$.count);    // number (inferred)
  *
- * // Unwrap nested signal objects
- * const user = unwrap(tree.$.user);      // { name: 'John' }
+ * // Unwrap nested signal objects - full type inference
+ * const user = unwrap(tree.$.user);      // { name: string } (inferred)
  *
- * // Unwrap entire tree
- * const state = unwrap(tree.$);
- * console.log(state); // { user: { name: 'John', age: 30 } }
+ * // Unwrap entire tree - complete state type inferred
+ * const state = unwrap(tree.$);          // { user: { name: string }, count: number }
+ * console.log(state); // { user: { name: 'John' }, count: 5 }
  *
- * // Unwrap sub-branch
- * const user = unwrap(tree.$.user);
- * console.log(user); // { name: 'John', age: 30 }
+ * // Unwrap sub-branch with full typing
+ * const user = unwrap(tree.$.user);      // { name: string } (inferred)
+ * console.log(user); // { name: 'John' }
  * ```
  */
+export function unwrap<T>(node: DeepSignalify<T>): T;
+export function unwrap<T>(node: WritableSignal<T>): T;
+export function unwrap<T>(node: T): T;
 export function unwrap<T>(node: unknown): T {
   // Handle null/undefined
   if (node === null || node === undefined) {
@@ -534,7 +537,7 @@ export function unwrap<T>(node: unknown): T {
 
   // Handle signals directly
   if (isSignal(node)) {
-    return (node as Signal<T>)();
+    return (node as Signal<unknown>)() as T;
   }
 
   // Handle primitives
@@ -544,7 +547,7 @@ export function unwrap<T>(node: unknown): T {
 
   // Handle arrays (which are signals in our structure)
   if (isSignal(node)) {
-    return (node as Signal<T>)();
+    return (node as Signal<unknown>)() as T;
   }
 
   // Build result object, filtering out methods
@@ -578,6 +581,13 @@ export function unwrap<T>(node: unknown): T {
     const value = (node as Record<symbol, unknown>)[sym];
     if (isSignal(value)) {
       (result as Record<symbol, unknown>)[sym] = (value as Signal<unknown>)();
+    } else if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      !isBuiltInObject(value)
+    ) {
+      (result as Record<symbol, unknown>)[sym] = unwrap(value);
     } else {
       (result as Record<symbol, unknown>)[sym] = value;
     }

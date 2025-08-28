@@ -1,5 +1,6 @@
-import { Signal, signal } from '@angular/core';
-import { SignalTree } from '@signaltree/core';
+import { Signal, signal, isSignal, WritableSignal } from '@angular/core';
+import { unwrap } from '@signaltree/core';
+import type { DeepSignalify, SignalTree } from '@signaltree/core';
 
 /**
  * Module metadata for tracking in the composition chain
@@ -18,23 +19,77 @@ export interface ModuleMetadata {
  * Performance metrics optimized for modular composition
  */
 export interface ModularPerformanceMetrics {
-  /** Total state updates across all modules */
   totalUpdates: number;
-  /** Updates per module in the composition chain */
   moduleUpdates: Record<string, number>;
-  /** Average execution time per module */
   modulePerformance: Record<string, number>;
-  /** Current composition chain order */
   compositionChain: string[];
-  /** Signal count after each module enhancement */
   signalGrowth: Record<string, number>;
-  /** Memory impact per module */
   memoryDelta: Record<string, number>;
-  /** Cache efficiency per module */
   moduleCacheStats: Record<string, { hits: number; misses: number }>;
 }
 
-// Small helper to avoid repeating the zeroed metrics literal
+/**
+ * Module activity tracker for debugging
+ */
+export interface ModuleActivityTracker {
+  trackMethodCall: (module: string, method: string, duration: number) => void;
+  trackError: (module: string, error: Error, context?: string) => void;
+  getModuleActivity: (module: string) => ModuleMetadata | undefined;
+  getAllModules: () => ModuleMetadata[];
+}
+
+/**
+ * Composition-aware DevTools logger
+ */
+export interface CompositionLogger {
+  logComposition: (modules: string[], action: 'pipe' | 'enhance') => void;
+  logMethodExecution: (
+    module: string,
+    method: string,
+    args: unknown[],
+    result: unknown
+  ) => void;
+  logStateChange: (
+    module: string,
+    path: string,
+    oldValue: unknown,
+    newValue: unknown
+  ) => void;
+  logPerformanceWarning: (
+    module: string,
+    operation: string,
+    duration: number,
+    threshold: number
+  ) => void;
+  exportLogs: () => Array<{
+    timestamp: Date;
+    module: string;
+    type: 'composition' | 'method' | 'state' | 'performance';
+    data: unknown;
+  }>;
+}
+
+/**
+ * DevTools interface
+ */
+export interface ModularDevToolsInterface<T> {
+  readonly __t?: T;
+  activityTracker: ModuleActivityTracker;
+  logger: CompositionLogger;
+  metrics: Signal<ModularPerformanceMetrics>;
+  trackComposition: (modules: string[]) => void;
+  startModuleProfiling: (module: string) => string;
+  endModuleProfiling: (profileId: string) => void;
+  connectDevTools: (treeName: string) => void;
+  exportDebugSession: () => {
+    metrics: ModularPerformanceMetrics;
+    modules: ModuleMetadata[];
+    logs: Array<unknown>;
+    compositionHistory: Array<{ timestamp: Date; chain: string[] }>;
+  };
+  cleanup: () => void;
+}
+
 function createDefaultMetrics(): ModularPerformanceMetrics {
   return {
     totalUpdates: 0,
@@ -47,88 +102,6 @@ function createDefaultMetrics(): ModularPerformanceMetrics {
   };
 }
 
-/**
- * Module activity tracker for debugging
- */
-export interface ModuleActivityTracker {
-  /** Track when a module method is called */
-  trackMethodCall: (module: string, method: string, duration: number) => void;
-  /** Track module errors */
-  trackError: (module: string, error: Error, context?: string) => void;
-  /** Get activity summary for a module */
-  getModuleActivity: (module: string) => ModuleMetadata | undefined;
-  /** Get all tracked modules */
-  getAllModules: () => ModuleMetadata[];
-}
-
-/**
- * Composition-aware DevTools logger
- */
-export interface CompositionLogger {
-  /** Log module composition events */
-  logComposition: (modules: string[], action: 'pipe' | 'enhance') => void;
-  /** Log method execution with module context */
-  logMethodExecution: (
-    module: string,
-    method: string,
-    args: unknown[],
-    result: unknown
-  ) => void;
-  /** Log state changes with composition context */
-  logStateChange: (
-    module: string,
-    path: string,
-    oldValue: unknown,
-    newValue: unknown
-  ) => void;
-  /** Log performance warnings for specific modules */
-  logPerformanceWarning: (
-    module: string,
-    operation: string,
-    duration: number,
-    threshold: number
-  ) => void;
-  /** Export logs for analysis */
-  exportLogs: () => Array<{
-    timestamp: Date;
-    module: string;
-    type: 'composition' | 'method' | 'state' | 'performance';
-    data: unknown;
-  }>;
-}
-
-/**
- * DevTools interface specifically for modular SignalTree
- */
-export interface ModularDevToolsInterface<T> {
-  /** Phantom type to keep T referenced (type-only, not emitted) */
-  readonly __t?: T;
-  /** Activity tracker for all modules */
-  activityTracker: ModuleActivityTracker;
-  /** Composition-aware logger */
-  logger: CompositionLogger;
-  /** Real-time performance metrics */
-  metrics: Signal<ModularPerformanceMetrics>;
-  /** Track module composition */
-  trackComposition: (modules: string[]) => void;
-  /** Start profiling a specific module */
-  startModuleProfiling: (module: string) => string;
-  /** End module profiling */
-  endModuleProfiling: (profileId: string) => void;
-  /** Connect to browser DevTools */
-  connectDevTools: (treeName: string) => void;
-  /** Export complete debug session */
-  exportDebugSession: () => {
-    metrics: ModularPerformanceMetrics;
-    modules: ModuleMetadata[];
-    logs: Array<unknown>;
-    compositionHistory: Array<{ timestamp: Date; chain: string[] }>;
-  };
-}
-
-/**
- * Creates an activity tracker for monitoring module behavior
- */
 function createActivityTracker(): ModuleActivityTracker {
   const modules = new Map<string, ModuleMetadata>();
 
@@ -138,11 +111,13 @@ function createActivityTracker(): ModuleActivityTracker {
       if (existing) {
         existing.lastActivity = new Date();
         existing.operationCount++;
-        // Update rolling average
         existing.averageExecutionTime =
           (existing.averageExecutionTime * (existing.operationCount - 1) +
             duration) /
           existing.operationCount;
+        if (!existing.methods.includes(method)) {
+          existing.methods.push(method);
+        }
       } else {
         modules.set(module, {
           name: module,
@@ -168,15 +143,11 @@ function createActivityTracker(): ModuleActivityTracker {
     },
 
     getModuleActivity: (module: string) => modules.get(module),
-
     getAllModules: () => Array.from(modules.values()),
   };
 }
 
-/**
- * Creates a composition-aware logger for debugging
- */
-function createCompositionLogger(): CompositionLogger {
+function createCompositionLogger(enableLogging = true): CompositionLogger {
   const logs: Array<{
     timestamp: Date;
     module: string;
@@ -190,7 +161,6 @@ function createCompositionLogger(): CompositionLogger {
     data: unknown
   ) => {
     logs.push({ timestamp: new Date(), module, type, data });
-    // Keep only last 1000 logs to prevent memory issues
     if (logs.length > 1000) {
       logs.splice(0, logs.length - 1000);
     }
@@ -199,6 +169,9 @@ function createCompositionLogger(): CompositionLogger {
   return {
     logComposition: (modules: string[], action: 'pipe' | 'enhance') => {
       addLog('core', 'composition', { modules, action });
+      if (enableLogging) {
+        console.log('🔗 Composition pipe:', modules.join(' → '));
+      }
     },
 
     logMethodExecution: (
@@ -226,15 +199,19 @@ function createCompositionLogger(): CompositionLogger {
       threshold: number
     ) => {
       addLog(module, 'performance', { operation, duration, threshold });
+      if (enableLogging) {
+        console.warn(
+          `⚠️ [${module}] Slow ${operation}: ${duration.toFixed(
+            2
+          )}ms (threshold: ${threshold}ms)`
+        );
+      }
     },
 
     exportLogs: () => [...logs],
   };
 }
 
-/**
- * Creates real-time performance metrics for modular architecture
- */
 function createModularMetrics() {
   const metricsSignal = signal<ModularPerformanceMetrics>(
     createDefaultMetrics()
@@ -263,7 +240,8 @@ function createModularMetrics() {
 }
 
 /**
- * Enhances a SignalTree with modular composition-aware DevTools
+ * Enhances a SignalTree with DevTools for v2.0 architecture
+ * Properly tracks updates at all levels using recursive proxying
  */
 export function withDevTools<T>(
   config: {
@@ -276,7 +254,7 @@ export function withDevTools<T>(
 ) {
   const {
     enabled = true,
-    treeName = 'ModularSignalTree',
+    treeName = 'SignalTree',
     enableBrowserDevTools = true,
     enableLogging = true,
     performanceThreshold = 16,
@@ -286,287 +264,347 @@ export function withDevTools<T>(
     tree: SignalTree<T>
   ): SignalTree<T> & { __devTools: ModularDevToolsInterface<T> } => {
     if (!enabled) {
-      const noop = {
+      // Return no-op implementation
+      const noop: ModularDevToolsInterface<T> = {
         activityTracker: {
-          trackMethodCall: () => undefined,
-          trackError: () => undefined,
+          trackMethodCall: () => {
+            // No-op when disabled
+          },
+          trackError: () => {
+            // No-op when disabled
+          },
           getModuleActivity: () => undefined,
           getAllModules: () => [],
         },
         logger: {
-          logComposition: () => undefined,
-          logMethodExecution: () => undefined,
-          logStateChange: () => undefined,
-          logPerformanceWarning: () => undefined,
+          logComposition: () => {
+            // No-op when disabled
+          },
+          logMethodExecution: () => {
+            // No-op when disabled
+          },
+          logStateChange: () => {
+            // No-op when disabled
+          },
+          logPerformanceWarning: () => {
+            // No-op when disabled
+          },
           exportLogs: () => [],
         },
         metrics: signal(createDefaultMetrics()).asReadonly(),
-        trackComposition: () => undefined,
+        trackComposition: () => {
+          // No-op when disabled
+        },
         startModuleProfiling: () => '',
-        endModuleProfiling: () => undefined,
-        connectDevTools: () => undefined,
+        endModuleProfiling: () => {
+          // No-op when disabled
+        },
+        connectDevTools: () => {
+          // No-op when disabled
+        },
         exportDebugSession: () => ({
           metrics: createDefaultMetrics(),
           modules: [],
           logs: [],
           compositionHistory: [],
         }),
-      } as ModularDevToolsInterface<T>;
+        cleanup: () => {
+          // No-op when disabled
+        },
+      };
       return Object.assign(tree, { __devTools: noop });
     }
 
-    // Lazy path: load heavy devtools impl only when enabled at runtime.
-    // The core stays tiny and tree-shakeable when withDevTools isn't used.
-    type Heavy = Pick<
-      ModularDevToolsInterface<T>,
-      | 'activityTracker'
-      | 'logger'
-      | 'metrics'
-      | 'trackComposition'
-      | 'startModuleProfiling'
-      | 'endModuleProfiling'
-      | 'connectDevTools'
-      | 'exportDebugSession'
-    > & { trackUpdate: (module: string, duration: number) => void };
-    let heavy: Heavy | null = null;
+    // Create devtools components
+    const activityTracker = createActivityTracker();
+    const logger = createCompositionLogger(enableLogging);
+    const metrics = createModularMetrics();
+    const compositionHistory: Array<{ timestamp: Date; chain: string[] }> = [];
+    const activeProfiles = new Map<
+      string,
+      { module: string; operation: string; startTime: number }
+    >();
 
-    const getImpl = () => {
-      if (!heavy) {
-        // Inline factory to avoid static import; bundlers can split this out.
-        const activityTracker = /* @__PURE__ */ createActivityTracker();
-        // Always create a logger instance so exportLogs and explicit logging
-        // in tests work. Honor enableLogging by silencing console side-effects
-        // but still record logs for export.
-        const baseLogger = /* @__PURE__ */ createCompositionLogger();
-        const logger: CompositionLogger = config.enableLogging
-          ? baseLogger
-          : (() => {
-              const logs: Array<{
-                timestamp: Date;
-                module: string;
-                type: 'composition' | 'method' | 'state' | 'performance';
-                data: unknown;
-              }> = [];
-              const addLog = (
-                module: string,
-                type: 'composition' | 'method' | 'state' | 'performance',
-                data: unknown
-              ) => {
-                logs.push({ timestamp: new Date(), module, type, data });
-                if (logs.length > 1000) logs.splice(0, logs.length - 1000);
-              };
-              return {
-                logComposition: (
-                  modules: string[],
-                  action: 'pipe' | 'enhance'
-                ) => addLog('core', 'composition', { modules, action }),
-                logMethodExecution: (
-                  module: string,
-                  method: string,
-                  args: unknown[],
-                  result: unknown
-                ) => addLog(module, 'method', { method, args, result }),
-                logStateChange: (
-                  module: string,
-                  path: string,
-                  oldValue: unknown,
-                  newValue: unknown
-                ) => addLog(module, 'state', { path, oldValue, newValue }),
-                logPerformanceWarning: (
-                  module: string,
-                  operation: string,
-                  duration: number,
-                  threshold: number
-                ) =>
-                  addLog(module, 'performance', {
-                    operation,
-                    duration,
-                    threshold,
-                  }),
-                exportLogs: () => [...logs],
-              } as CompositionLogger;
-            })();
-        const metrics = /* @__PURE__ */ createModularMetrics();
+    // Track proxies to prevent duplicates
+    const proxyCache = new WeakMap<object, unknown>();
 
-        const compositionHistory: Array<{ timestamp: Date; chain: string[] }> =
-          [];
-        const activeProfiles = new Map<
-          string,
-          { module: string; operation: string; startTime: number }
-        >();
-        let browserDevTools: {
-          send: (action: string, state: T) => void;
-        } | null = null;
-        if (
-          enableBrowserDevTools &&
-          typeof window !== 'undefined' &&
-          '__REDUX_DEVTOOLS_EXTENSION__' in window
-        ) {
-          const devToolsExt = (window as Record<string, unknown>)[
-            '__REDUX_DEVTOOLS_EXTENSION__'
-          ] as {
-            connect: (cfg: Record<string, unknown>) => {
-              send: (action: string, state: T) => void;
-            };
-          };
-          const connection = devToolsExt.connect({
-            name: treeName,
-            features: { dispatch: true, jump: true, skip: true },
-          });
-          browserDevTools = { send: connection.send };
-        }
+    // Track wrapped signals for cleanup
+    const wrappedSignals = new Map<WritableSignal<unknown>, () => void>();
 
-        heavy = {
-          activityTracker,
-          logger,
-          metrics: metrics.signal,
-          trackComposition: (modules: string[]) => {
-            compositionHistory.push({
-              timestamp: new Date(),
-              chain: [...modules],
-            });
-            metrics.updateMetrics({ compositionChain: modules });
-            logger.logComposition(modules, 'pipe');
-          },
-          // internal helper to track updates for metrics from wrappers
-          trackUpdate: (module: string, duration: number) => {
-            metrics.trackModuleUpdate(module, duration);
-          },
-          startModuleProfiling: (module: string) => {
-            const profileId = `${module}_${Date.now()}`;
-            activeProfiles.set(profileId, {
-              module,
-              operation: 'profile',
-              startTime: performance.now(),
-            });
-            return profileId;
-          },
-          endModuleProfiling: (profileId: string) => {
-            const profile = activeProfiles.get(profileId);
-            if (profile) {
-              const duration = performance.now() - profile.startTime;
-              activityTracker.trackMethodCall(
-                profile.module,
-                profile.operation,
-                duration
-              );
-              activeProfiles.delete(profileId);
-            }
-          },
-          connectDevTools: () => {
-            if (browserDevTools) browserDevTools.send('@@INIT', tree.$());
-          },
-          exportDebugSession: () => ({
-            metrics: metrics.signal(),
-            modules: activityTracker.getAllModules(),
-            logs: logger.exportLogs(),
-            compositionHistory: [...compositionHistory],
-          }),
+    // Browser DevTools connection
+    let browserDevTools: { send: (action: string, state: T) => void } | null =
+      null;
+    if (
+      enableBrowserDevTools &&
+      typeof window !== 'undefined' &&
+      '__REDUX_DEVTOOLS_EXTENSION__' in window
+    ) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const devToolsExt = (window as any).__REDUX_DEVTOOLS_EXTENSION__;
+        const connection = devToolsExt.connect({
+          name: treeName,
+          features: { dispatch: true, jump: true, skip: true },
+        });
+        browserDevTools = {
+          send: (action: string, state: T) => connection.send(action, state),
         };
+      } catch (error) {
+        console.warn('Failed to connect to Redux DevTools:', error);
       }
-      return heavy as Heavy;
-    };
+    }
 
-    const shim: ModularDevToolsInterface<T> = {
-      get activityTracker() {
-        return getImpl().activityTracker;
-      },
-      get logger() {
-        const impl = getImpl();
-        const base = impl.logger;
-        const proxied: CompositionLogger = {
-          logComposition: (modules, action) => {
-            base.logComposition(modules, action);
-            if (enableLogging) {
-              console.log('🔗 Composition pipe:', modules.join(' → '));
-            }
-          },
-          logMethodExecution: (module, method, args, result) =>
-            base.logMethodExecution(module, method, args, result),
-          logStateChange: (module, path, oldValue, newValue) =>
-            base.logStateChange(module, path, oldValue, newValue),
-          logPerformanceWarning: (module, operation, duration, threshold) => {
-            base.logPerformanceWarning(module, operation, duration, threshold);
-            if (enableLogging) {
-              console.warn(
-                `⚠️ [${module}] Slow ${operation}: ${duration.toFixed(
-                  2
-                )}ms (threshold: ${threshold}ms)`
-              );
-            }
-          },
-          exportLogs: () => base.exportLogs(),
-        };
-        return proxied;
-      },
-      get metrics() {
-        return getImpl().metrics;
-      },
-      trackComposition: (...a) => getImpl().trackComposition(...a),
-      startModuleProfiling: (...a) => getImpl().startModuleProfiling(...a),
-      endModuleProfiling: (...a) => getImpl().endModuleProfiling(...a),
-      connectDevTools: (...a) => getImpl().connectDevTools(...a),
-      exportDebugSession: () => getImpl().exportDebugSession(),
-    };
+    /**
+     * Wrap a signal to track its updates without modifying it directly
+     */
+    function wrapSignal(
+      signal: WritableSignal<unknown>,
+      path: string
+    ): WritableSignal<unknown> {
+      // Check if already wrapped
+      if (wrappedSignals.has(signal)) {
+        return signal;
+      }
 
-    // Wrap tree.$.update to track metrics and warn on slow updates
-    const originalCallable = tree.$ as unknown as Record<string, unknown>;
-    const devtoolsAwareCallable = new Proxy(originalCallable, {
-      get(target, prop, receiver) {
-        if (prop === 'update') {
-          return (
-            updaterOrPartial: ((current: T) => Partial<T>) | Partial<T>
-          ) => {
-            const start = performance.now();
-            // no-op read; tests only need metrics increments and warnings
-            // call original update
-            const fn = (target as Record<string, unknown>)['update'] as (
-              u: unknown
-            ) => void;
-            fn.call(target, updaterOrPartial as unknown);
-            const duration = performance.now() - start;
-            const impl = getImpl();
-            impl.trackUpdate('core', duration);
-            // warn if slow
-            if (duration > performanceThreshold) {
-              // Emit console warning directly to satisfy tests and then record via logger
-              console.warn(
-                `⚠️ [core] Slow update: ${duration.toFixed(
-                  2
-                )}ms (threshold: ${performanceThreshold}ms)`
-              );
-              impl.logger.logPerformanceWarning(
-                'core',
-                'update',
-                duration,
-                performanceThreshold
-              );
-            }
-          };
+      // Create a proxy for the signal
+      const proxy = new Proxy(signal, {
+        apply(target, thisArg, args) {
+          // For when the signal is called as a function (reading)
+          return Reflect.apply(target, thisArg, args);
+        },
+        get(target, prop) {
+          if (prop === 'set') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return function (value: any) {
+              const start = performance.now();
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const beforeValue = (target as any)();
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const result = (target as any).set.call(target, value);
+              const duration = performance.now() - start;
+
+              metrics.trackModuleUpdate('core', duration);
+              logger.logStateChange('core', path, beforeValue, value);
+
+              if (duration > performanceThreshold) {
+                logger.logPerformanceWarning(
+                  'core',
+                  `signal.set:${path}`,
+                  duration,
+                  performanceThreshold
+                );
+              }
+
+              if (browserDevTools) {
+                browserDevTools.send(`SIGNAL_SET ${path}`, unwrap(tree.$));
+              }
+
+              return result;
+            };
+          }
+          return Reflect.get(target, prop);
+        },
+      });
+
+      // Store for cleanup
+      wrappedSignals.set(signal, () => {
+        // Cleanup logic if needed
+      });
+
+      return proxy as WritableSignal<unknown>;
+    }
+
+    /**
+     * Create DevTools proxy that tracks all updates in v2.0 architecture
+     * Recursively wraps all branch nodes to intercept their methods
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function createDevToolsProxy(target: any, path = ''): any {
+      // Check cache first
+      if (proxyCache.has(target)) {
+        return proxyCache.get(target);
+      }
+
+      // Handle signals - wrap them without modifying
+      if (isSignal(target)) {
+        const wrapped = wrapSignal(target as WritableSignal<unknown>, path);
+        proxyCache.set(target, wrapped);
+        return wrapped;
+      }
+
+      // Don't proxy non-objects
+      if (!target || typeof target !== 'object') {
+        return target;
+      }
+
+      const proxy = new Proxy(target, {
+        get(obj, prop) {
+          const value = obj[prop];
+
+          // Intercept 'set' method on branch nodes
+          if (prop === 'set' && typeof value === 'function') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return function (update: any) {
+              const start = performance.now();
+              const beforeState =
+                path === '' ? unwrap(tree.$) : unwrapBranch(obj);
+              const result = value.call(obj, update);
+              const duration = performance.now() - start;
+
+              const actionPath = path || 'root';
+              activityTracker.trackMethodCall('core', 'set', duration);
+              metrics.trackModuleUpdate('core', duration);
+              logger.logStateChange('core', actionPath, beforeState, update);
+
+              if (duration > performanceThreshold) {
+                logger.logPerformanceWarning(
+                  'core',
+                  `set:${actionPath}`,
+                  duration,
+                  performanceThreshold
+                );
+              }
+
+              if (browserDevTools) {
+                browserDevTools.send(`SET ${actionPath}`, unwrap(tree.$));
+              }
+
+              return result;
+            };
+          }
+
+          // Intercept 'update' method on branch nodes
+          if (prop === 'update' && typeof value === 'function') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return function (updater: any) {
+              const start = performance.now();
+              const result = value.call(obj, updater);
+              const duration = performance.now() - start;
+
+              const actionPath = path || 'root';
+              activityTracker.trackMethodCall('core', 'update', duration);
+              metrics.trackModuleUpdate('core', duration);
+
+              if (duration > performanceThreshold) {
+                logger.logPerformanceWarning(
+                  'core',
+                  `update:${actionPath}`,
+                  duration,
+                  performanceThreshold
+                );
+              }
+
+              if (browserDevTools) {
+                browserDevTools.send(`UPDATE ${actionPath}`, unwrap(tree.$));
+              }
+
+              return result;
+            };
+          }
+
+          // Recursively proxy nested objects (but not signals)
+          if (value && typeof value === 'object') {
+            const nestedPath = path ? `${path}.${String(prop)}` : String(prop);
+            return createDevToolsProxy(value, nestedPath);
+          }
+
+          return value;
+        },
+      });
+
+      proxyCache.set(target, proxy);
+      return proxy;
+    }
+
+    // Helper to unwrap just a branch
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function unwrapBranch(branch: any): any {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result: any = {};
+      for (const key in branch) {
+        if (key === 'set' || key === 'update') continue;
+        if (!Object.prototype.hasOwnProperty.call(branch, key)) continue;
+
+        const value = branch[key];
+        if (isSignal(value)) {
+          result[key] = (value as Signal<unknown>)();
+        } else if (value && typeof value === 'object') {
+          result[key] = unwrapBranch(value);
+        } else {
+          result[key] = value;
         }
-        return Reflect.get(target, prop, receiver);
+      }
+      return result;
+    }
+
+    // Apply proxy to the tree's state
+    const originalState = tree.$;
+    tree.$ = createDevToolsProxy(originalState) as DeepSignalify<T>;
+    tree.state = tree.$;
+
+    // Create the devtools interface
+    const devToolsInterface: ModularDevToolsInterface<T> = {
+      activityTracker,
+      logger,
+      metrics: metrics.signal,
+      trackComposition: (modules: string[]) => {
+        compositionHistory.push({
+          timestamp: new Date(),
+          chain: [...modules],
+        });
+        metrics.updateMetrics({ compositionChain: modules });
+        logger.logComposition(modules, 'pipe');
       },
-    });
+      startModuleProfiling: (module: string) => {
+        const profileId = `${module}_${Date.now()}`;
+        activeProfiles.set(profileId, {
+          module,
+          operation: 'profile',
+          startTime: performance.now(),
+        });
+        return profileId;
+      },
+      endModuleProfiling: (profileId: string) => {
+        const profile = activeProfiles.get(profileId);
+        if (profile) {
+          const duration = performance.now() - profile.startTime;
+          activityTracker.trackMethodCall(
+            profile.module,
+            profile.operation,
+            duration
+          );
+          activeProfiles.delete(profileId);
+        }
+      },
+      connectDevTools: () => {
+        if (browserDevTools) {
+          browserDevTools.send('@@INIT', unwrap(tree.$));
+        }
+      },
+      exportDebugSession: () => ({
+        metrics: metrics.signal(),
+        modules: activityTracker.getAllModules(),
+        logs: logger.exportLogs(),
+        compositionHistory: [...compositionHistory],
+      }),
+      cleanup: () => {
+        // Cleanup wrapped signals
+        wrappedSignals.clear();
+        proxyCache.delete(originalState);
+      },
+    };
 
-    (tree as unknown as Record<string, unknown>)['$'] =
-      devtoolsAwareCallable as unknown;
-    (tree as unknown as Record<string, unknown>)['state'] =
-      devtoolsAwareCallable as unknown;
-
-    return Object.assign(tree, { __devTools: shim });
+    return Object.assign(tree, { __devTools: devToolsInterface });
   };
 }
 
 /**
- * Simple devtools for development
+ * Convenience functions
  */
 export function enableDevTools<T>(treeName = 'SignalTree') {
   return withDevTools<T>({ treeName, enabled: true });
 }
 
-/**
- * Full-featured devtools for intensive debugging
- */
 export function withFullDevTools<T>(treeName = 'SignalTree') {
   return withDevTools<T>({
     treeName,
@@ -577,9 +615,6 @@ export function withFullDevTools<T>(treeName = 'SignalTree') {
   });
 }
 
-/**
- * Lightweight devtools for production
- */
 export function withProductionDevTools<T>() {
   return withDevTools<T>({
     enabled: true,

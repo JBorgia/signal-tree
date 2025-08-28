@@ -8,6 +8,7 @@ import {
   SIGNAL_FORM_DIRECTIVES,
   type AuditEntry,
 } from './ng-forms';
+import { unwrap } from '@signaltree/core';
 
 interface TestFormData extends Record<string, unknown> {
   username: string;
@@ -62,18 +63,21 @@ describe('NgForms', () => {
       form.setValue('username', '');
       await new Promise((resolve) => setTimeout(resolve, 0)); // Allow async validation
 
-      expect(form.errors()['username']).toBe('Username is required');
+      expect(unwrap(form.errors)).toHaveProperty(
+        'username',
+        'Username is required'
+      );
       expect(form.valid()).toBe(false);
     });
 
     it('should track touched fields', () => {
       const form = createFormTree(initialFormData);
 
-      expect(form.touched()['username']).toBeUndefined();
+      expect(unwrap(form.touched)['username']).toBeUndefined();
 
       form.setValue('username', 'test');
 
-      expect(form.touched()['username']).toBe(true);
+      expect(unwrap(form.touched)['username']).toBe(true);
     });
 
     it('should mark form as dirty when values change', () => {
