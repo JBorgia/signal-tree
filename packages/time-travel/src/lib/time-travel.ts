@@ -3,13 +3,48 @@ import { unwrap } from '@signaltree/core';
 import { isSignal, WritableSignal } from '@angular/core';
 
 /**
- * Deep equality check
+ * Deep equality check - properly handles all types
  */
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (a == null || b == null) return false;
   if (typeof a !== typeof b) return false;
 
+  // Handle arrays
+  if (Array.isArray(a)) {
+    if (!Array.isArray(b) || a.length !== b.length) return false;
+    return a.every((item, index) => deepEqual(item, b[index]));
+  }
+
+  // Handle Date objects
+  if (a instanceof Date && b instanceof Date) {
+    return a.getTime() === b.getTime();
+  }
+
+  // Handle RegExp objects
+  if (a instanceof RegExp && b instanceof RegExp) {
+    return a.source === b.source && a.flags === b.flags;
+  }
+
+  // Handle Set objects
+  if (a instanceof Set && b instanceof Set) {
+    if (a.size !== b.size) return false;
+    for (const value of a) {
+      if (!b.has(value)) return false;
+    }
+    return true;
+  }
+
+  // Handle Map objects
+  if (a instanceof Map && b instanceof Map) {
+    if (a.size !== b.size) return false;
+    for (const [key, value] of a) {
+      if (!b.has(key) || !deepEqual(value, b.get(key))) return false;
+    }
+    return true;
+  }
+
+  // Handle objects
   if (typeof a === 'object') {
     const keysA = Object.keys(a as Record<string, unknown>);
     const keysB = Object.keys(b as Record<string, unknown>);
@@ -32,17 +67,22 @@ function deepEqual(a: unknown, b: unknown): boolean {
 }
 
 /**
- * Deep clone helper
+ * Deep clone helper - properly handles all types
  */
 function deepClone<T>(obj: T): T {
   if (obj === null || typeof obj !== 'object') return obj;
+
   if (obj instanceof Date) return new Date(obj.getTime()) as T;
+  if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags) as T;
+
   if (obj instanceof Array) {
     return obj.map((item) => deepClone(item)) as unknown as T;
   }
+
   if (obj instanceof Set) {
     return new Set(Array.from(obj).map((item) => deepClone(item))) as T;
   }
+
   if (obj instanceof Map) {
     return new Map(
       Array.from(obj.entries()).map(([k, v]) => [deepClone(k), deepClone(v)])
@@ -80,6 +120,7 @@ export interface TimeTravelInterface<T> {
   getCurrentIndex(): number;
   canUndo(): boolean;
   canRedo(): boolean;
+  dispose(): void;
 }
 
 /**
@@ -105,6 +146,7 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
   private maxHistorySize: number;
   private includePayload: boolean;
   private actionNames: Record<string, string>;
+  private isDisposed = false;
 
   constructor(
     private tree: SignalTree<T>,
@@ -125,6 +167,8 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
   }
 
   addEntry(action: string, state: T, payload?: unknown): void {
+    if (this.isDisposed) return;
+
     // If not at end of history, remove everything after current position
     if (this.currentIndex < this.history.length - 1) {
       this.history = this.history.slice(0, this.currentIndex + 1);
@@ -149,7 +193,7 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
   }
 
   undo(): boolean {
-    if (!this.canUndo()) return false;
+    if (this.isDisposed || !this.canUndo()) return false;
     this.currentIndex--;
     const entry = this.history[this.currentIndex];
     this.restoreState(entry.state);
@@ -157,7 +201,7 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
   }
 
   redo(): boolean {
-    if (!this.canRedo()) return false;
+    if (this.isDisposed || !this.canRedo()) return false;
     this.currentIndex++;
     const entry = this.history[this.currentIndex];
     this.restoreState(entry.state);
@@ -172,6 +216,7 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
   }
 
   resetHistory(): void {
+    if (this.isDisposed) return;
     const currentState = unwrap(this.tree.$);
     this.history = [];
     this.currentIndex = -1;
@@ -179,7 +224,8 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
   }
 
   jumpTo(index: number): boolean {
-    if (index < 0 || index >= this.history.length) return false;
+    if (this.isDisposed || index < 0 || index >= this.history.length)
+      return false;
     this.currentIndex = index;
     const entry = this.history[index];
     this.restoreState(entry.state);
@@ -191,14 +237,20 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
   }
 
   canUndo(): boolean {
-    return this.currentIndex > 0;
+    return !this.isDisposed && this.currentIndex > 0;
   }
 
   canRedo(): boolean {
-    return this.currentIndex < this.history.length - 1;
+    return !this.isDisposed && this.currentIndex < this.history.length - 1;
+  }
+
+  dispose(): void {
+    this.isDisposed = true;
+    this.history = [];
   }
 
   private restoreState(state: T): void {
+    if (this.isDisposed) return;
     if (this.restoreStateFn) {
       this.restoreStateFn(state);
     }
@@ -207,19 +259,25 @@ class TimeTravelManager<T> implements TimeTravelInterface<T> {
 
 /**
  * Restore state to the tree using v2.0 architecture
- * This needs to properly handle the deeply signalified structure
  */
 function restoreStateToTree<T>(tree: SignalTree<T>, state: T): void {
-  // Helper to apply state recursively
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function applyState(target: any, source: any): void {
+  function applyState(target: any, source: any, path: string[] = []): void {
+    if (!source || typeof source !== 'object') return;
+
     for (const key in source) {
       if (!Object.prototype.hasOwnProperty.call(source, key)) continue;
 
       const targetProp = target[key];
       const sourceValue = source[key];
 
-      if (targetProp === undefined) continue;
+      if (targetProp === undefined) {
+        console.warn(
+          `Cannot restore property at ${[...path, key].join(
+            '.'
+          )}: property does not exist`
+        );
+        continue;
+      }
 
       // If it's a signal, set its value
       if (isSignal(targetProp)) {
@@ -229,18 +287,20 @@ function restoreStateToTree<T>(tree: SignalTree<T>, state: T): void {
       else if (
         targetProp &&
         typeof targetProp === 'object' &&
-        'set' in targetProp
+        'set' in targetProp &&
+        typeof targetProp.set === 'function'
       ) {
         targetProp.set(sourceValue);
       }
-      // If both are objects, recurse
+      // If both are objects (nested branches), recurse
       else if (
         targetProp &&
         typeof targetProp === 'object' &&
         sourceValue &&
-        typeof sourceValue === 'object'
+        typeof sourceValue === 'object' &&
+        !Array.isArray(sourceValue)
       ) {
-        applyState(targetProp, sourceValue);
+        applyState(targetProp, sourceValue, [...path, key]);
       }
     }
   }
@@ -249,8 +309,102 @@ function restoreStateToTree<T>(tree: SignalTree<T>, state: T): void {
 }
 
 /**
+ * Intercept state changes for time travel tracking
+ */
+function interceptStateChanges<T>(
+  tree: SignalTree<T>,
+  manager: TimeTravelManager<T>,
+  isRestoring: { value: boolean }
+): void {
+  let lastState = deepClone(unwrap(tree.$));
+  const originalMethods = new WeakMap<any, any>();
+
+  // Track changes and record if different
+  function checkAndRecord(action: string, payload?: unknown): void {
+    if (isRestoring.value) return;
+
+    const newState = unwrap(tree.$);
+    if (!deepEqual(lastState, newState)) {
+      manager.addEntry(action, newState, payload);
+      lastState = deepClone(newState);
+    }
+  }
+
+  // Recursively intercept all signals and branch methods
+  function interceptNode(node: any, path: string[] = []): void {
+    if (!node || typeof node !== 'object') return;
+
+    for (const key in node) {
+      if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+
+      const value = node[key];
+      const currentPath = [...path, key];
+
+      if (isSignal(value)) {
+        // Intercept signal.set() method
+        const signal = value as WritableSignal<unknown> & { set?: any };
+        if (signal.set && !originalMethods.has(signal)) {
+          const originalSet = signal.set.bind(signal);
+          originalMethods.set(signal, originalSet);
+
+          signal.set = function (newValue: unknown) {
+            const result = originalSet(newValue);
+            checkAndRecord('SET', {
+              path: currentPath.join('.'),
+              value: newValue,
+            });
+            return result;
+          };
+        }
+      } else if (value && typeof value === 'object') {
+        // Intercept branch node methods
+        if (
+          'set' in value &&
+          typeof value.set === 'function' &&
+          !originalMethods.has(value)
+        ) {
+          const originalSet = value.set.bind(value);
+          originalMethods.set(value, { set: originalSet });
+
+          Object.defineProperty(value, 'set', {
+            value: function (updates: any) {
+              const result = originalSet(updates);
+              checkAndRecord('SET', { path: currentPath.join('.'), updates });
+              return result;
+            },
+            configurable: true,
+            enumerable: false,
+          });
+        }
+
+        if (
+          'update' in value &&
+          typeof value.update === 'function' &&
+          !originalMethods.has(value)
+        ) {
+          const current = originalMethods.get(value) || {};
+          const originalUpdate = value.update.bind(value);
+          originalMethods.set(value, { ...current, update: originalUpdate });
+
+          value.update = function (updater: any) {
+            const result = originalUpdate(updater);
+            checkAndRecord('UPDATE', { path: currentPath.join('.') });
+            return result;
+          };
+        }
+
+        // Recurse into nested objects
+        interceptNode(value, currentPath);
+      }
+    }
+  }
+
+  // Start interception from root
+  interceptNode(tree.$);
+}
+
+/**
  * Enhances a SignalTree with time travel capabilities
- * Properly handles v2.0 architecture with recursive proxying
  */
 export function withTimeTravel<T>(
   config: TimeTravelConfig = {}
@@ -259,140 +413,24 @@ export function withTimeTravel<T>(
 ) => SignalTree<T> & { __timeTravel: TimeTravelInterface<T> } {
   return (tree: SignalTree<T>) => {
     // Flag to prevent recording during restoration
-    let isRestoring = false;
+    const isRestoring = { value: false };
 
     // Create time travel manager
     const timeTravelManager = new TimeTravelManager(
       tree,
       config,
       (state: T) => {
-        isRestoring = true;
+        isRestoring.value = true;
         try {
           restoreStateToTree(tree, state);
         } finally {
-          isRestoring = false;
+          isRestoring.value = false;
         }
       }
     );
 
-    // Track the last state to detect changes
-    let lastState = unwrap(tree.$);
-
-    /**
-     * Create time travel proxy that recursively wraps all branch nodes
-     * This ensures we capture ALL updates at any level
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function createTimeTravelProxy(target: any, path = ''): any {
-      // Don't proxy signals
-      if (isSignal(target)) {
-        return target;
-      }
-
-      // Don't proxy non-objects
-      if (!target || typeof target !== 'object') {
-        return target;
-      }
-
-      return new Proxy(target, {
-        get(obj, prop) {
-          const value = obj[prop];
-
-          // Intercept 'set' method on branch nodes
-          if (prop === 'set' && typeof value === 'function') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return function (update: any) {
-              const result = value.call(obj, update);
-
-              if (!isRestoring) {
-                // Check if state changed
-                const newState = unwrap(tree.$);
-                if (!deepEqual(lastState, newState)) {
-                  timeTravelManager.addEntry('set', newState, update);
-                  lastState = deepClone(newState);
-                }
-              }
-
-              return result;
-            };
-          }
-
-          // Intercept 'update' method on branch nodes
-          if (prop === 'update' && typeof value === 'function') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            return function (updater: any) {
-              const result = value.call(obj, updater);
-
-              if (!isRestoring) {
-                // Check if state changed
-                const newState = unwrap(tree.$);
-                if (!deepEqual(lastState, newState)) {
-                  timeTravelManager.addEntry('update', newState);
-                  lastState = deepClone(newState);
-                }
-              }
-
-              return result;
-            };
-          }
-
-          // Recursively proxy nested objects (but not signals)
-          if (value && typeof value === 'object' && !isSignal(value)) {
-            const nestedPath = path ? `${path}.${String(prop)}` : String(prop);
-            return createTimeTravelProxy(value, nestedPath);
-          }
-
-          return value;
-        },
-      });
-    }
-
-    // Also need to intercept direct signal updates for leaf nodes
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function wrapSignals(target: any): any {
-      for (const key in target) {
-        if (!Object.prototype.hasOwnProperty.call(target, key)) continue;
-
-        const value = target[key];
-
-        if (isSignal(value)) {
-          // Only wrap WritableSignals that expose a set method
-          const sig = value as unknown as WritableSignal<unknown>;
-          if (sig && typeof (sig as { set?: unknown }).set === 'function') {
-            const originalSet = sig.set.bind(sig);
-            sig.set = function (newValue: unknown) {
-              const result = originalSet(newValue);
-
-              if (!isRestoring) {
-                const newState = unwrap(tree.$);
-                if (!deepEqual(lastState, newState)) {
-                  timeTravelManager.addEntry('set', newState, {
-                    [key]: newValue,
-                  });
-                  lastState = deepClone(newState);
-                }
-              }
-
-              return result;
-            };
-          }
-        } else if (value && typeof value === 'object' && !isSignal(value)) {
-          // Recurse for nested objects
-          wrapSignals(value);
-        }
-      }
-      return target;
-    }
-
-    // Apply proxy to the tree's state
-    const originalState = tree.$;
-    const proxiedState = createTimeTravelProxy(originalState);
-
-    // Also wrap direct signal updates
-    wrapSignals(proxiedState);
-
-    tree.$ = proxiedState as DeepSignalify<T>;
-    tree.state = tree.$;
+    // Set up interception of state changes
+    interceptStateChanges(tree, timeTravelManager, isRestoring);
 
     // Return enhanced tree
     return {

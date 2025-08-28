@@ -431,6 +431,11 @@ export function withCancellation<TInput, TResult>(
       cancelled.set(false);
 
       try {
+        if (!controller) {
+          throw new Error(
+            'AbortController is required but was not initialized'
+          );
+        }
         const result = await operation(input, controller.signal);
         return result;
       } catch (error) {

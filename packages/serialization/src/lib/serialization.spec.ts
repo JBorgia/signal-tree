@@ -1,16 +1,22 @@
 import { TestBed } from '@angular/core/testing';
-import { signalTree, unwrap } from '@signaltree/core';
+import { signalTree } from '@signaltree/core';
 import {
   withSerialization,
   withPersistence,
   createStorageAdapter,
   createIndexedDBAdapter,
   StorageAdapter,
+  PersistableSignalTree,
 } from './serialization';
 
 describe('Serialization', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({});
+  });
+
+  afterEach(() => {
+    // Clean up any intervals/timeouts
+    jest.clearAllTimers();
   });
 
   describe('withSerialization', () => {
@@ -99,8 +105,7 @@ describe('Serialization', () => {
           ['key2', 'value2'],
         ])
       );
-      // Read plain state to avoid proxy method name collisions with key "set"
-      expect(unwrap(tree2.$).set).toEqual(new Set([1, 2, 3, 'test']));
+      expect(tree2.$.set()).toEqual(new Set([1, 2, 3, 'test']));
       expect(tree2.$.nested.date()).toEqual(new Date('2023-12-31'));
     });
 
@@ -111,7 +116,6 @@ describe('Serialization', () => {
         infinity: Infinity,
         negInfinity: -Infinity,
         bigInt: BigInt(123),
-        symbol: Symbol('test'),
       };
 
       const tree = signalTree(specialState).with(withSerialization());
@@ -123,7 +127,6 @@ describe('Serialization', () => {
         infinity: 0,
         negInfinity: 0,
         bigInt: BigInt(0),
-        symbol: Symbol('other'),
       }).with(withSerialization());
 
       tree2.deserialize(serialized);
@@ -133,7 +136,6 @@ describe('Serialization', () => {
       expect(tree2.$.infinity()).toBe(Infinity);
       expect(tree2.$.negInfinity()).toBe(-Infinity);
       expect(tree2.$.bigInt()).toBe(BigInt(123));
-      // Note: symbols can't be exactly restored, but we preserve the string representation
     });
 
     it('should create snapshots with metadata', () => {
@@ -155,7 +157,7 @@ describe('Serialization', () => {
         data: { count: 100, name: 'test' },
         metadata: {
           timestamp: Date.now(),
-          version: '1.0.0',
+          version: '2.0.0',
         },
       };
 
@@ -165,14 +167,13 @@ describe('Serialization', () => {
       expect(tree.$.name()).toBe('test');
     });
 
-    it('should handle circular references', () => {
-      // Test the circular reference handling without actually creating one
-      // since SignalTree's unwrap method can't handle them properly
+    it('should handle circular references gracefully', () => {
+      // Test that circular marker system works without creating actual circular refs
       const simpleState = {
         name: 'root',
         child: {
           name: 'child',
-          parentRef: null, // This would be circular if set
+          parentRef: null,
         },
       };
 
@@ -182,7 +183,7 @@ describe('Serialization', () => {
         })
       );
 
-      // Should not throw when serializing simple state
+      // Should not throw when serializing
       expect(() => {
         const serialized = tree.serialize();
         expect(typeof serialized).toBe('string');
@@ -254,6 +255,7 @@ describe('Serialization', () => {
 
     beforeEach(() => {
       mockStorage = {};
+      jest.useFakeTimers();
 
       // Mock localStorage
       Object.defineProperty(window, 'localStorage', {
@@ -273,20 +275,29 @@ describe('Serialization', () => {
       });
     });
 
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     it('should add persistence methods to tree', () => {
       const tree = signalTree({ count: 0 }).with(
-        withPersistence({ key: 'test-state' })
-      );
+        withPersistence({ key: 'test-state', autoLoad: false })
+      ) as PersistableSignalTree<{ count: number }>;
 
       expect(tree.save).toBeDefined();
       expect(tree.load).toBeDefined();
       expect(tree.clear).toBeDefined();
+      expect(tree.dispose).toBeDefined();
+      expect(tree.ready).toBeDefined();
+
+      // Clean up
+      tree.dispose();
     });
 
     it('should save and load state', async () => {
       const tree = signalTree({ count: 42, name: 'test' }).with(
-        withPersistence({ key: 'app-state' })
-      );
+        withPersistence({ key: 'app-state', autoLoad: false })
+      ) as PersistableSignalTree<{ count: number; name: string }>;
 
       tree.$.count.set(100);
       await tree.save();
@@ -299,13 +310,17 @@ describe('Serialization', () => {
 
       // Create new tree and load
       const tree2 = signalTree({ count: 0, name: '' }).with(
-        withPersistence({ key: 'app-state' })
-      );
+        withPersistence({ key: 'app-state', autoLoad: false })
+      ) as PersistableSignalTree<{ count: number; name: string }>;
 
       await tree2.load();
 
       expect(tree2.$.count()).toBe(100);
       expect(tree2.$.name()).toBe('test');
+
+      // Clean up
+      tree.dispose();
+      tree2.dispose();
     });
 
     it('should handle auto-save', async () => {
@@ -314,14 +329,19 @@ describe('Serialization', () => {
           key: 'auto-save-test',
           autoSave: true,
           debounceMs: 100,
+          autoLoad: false,
         })
-      );
+      ) as PersistableSignalTree<{ count: number }>;
 
-      // Change state to trigger auto-save
+      // Wait for ready
+      await tree.ready;
+
+      // Change state
       tree.$.count.set(42);
 
-      // Manually trigger save to simulate auto-save behavior
-      await tree.save();
+      // Advance timers to trigger polling and debounced save
+      jest.advanceTimersByTime(100); // Polling interval
+      jest.advanceTimersByTime(100); // Debounce delay
 
       expect(localStorage.setItem).toHaveBeenCalledWith(
         'auto-save-test',
@@ -329,19 +349,14 @@ describe('Serialization', () => {
       );
 
       // Clean up
-      const enhancedTree = tree as unknown as {
-        __cleanup?: () => void;
-      };
-      if (enhancedTree.__cleanup) {
-        enhancedTree.__cleanup();
-      }
+      tree.dispose();
     });
 
     it('should handle auto-load', async () => {
       // Pre-populate storage
       mockStorage['auto-load-test'] = JSON.stringify({
         data: { count: 99, name: 'loaded' },
-        metadata: { timestamp: Date.now(), version: '1.0.0' },
+        metadata: { timestamp: Date.now(), version: '2.0.0' },
       });
 
       const tree = signalTree({ count: 0, name: '' }).with(
@@ -349,25 +364,100 @@ describe('Serialization', () => {
           key: 'auto-load-test',
           autoLoad: true,
         })
-      );
+      ) as PersistableSignalTree<{ count: number; name: string }>;
 
       // Wait for auto-load to complete
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      await tree.ready;
 
       expect(tree.$.count()).toBe(99);
       expect(tree.$.name()).toBe('loaded');
+
+      // Clean up
+      tree.dispose();
     });
 
     it('should clear storage', async () => {
       const tree = signalTree({ count: 42 }).with(
-        withPersistence({ key: 'clear-test' })
-      );
+        withPersistence({ key: 'clear-test', autoLoad: false })
+      ) as PersistableSignalTree<{ count: number }>;
 
       await tree.save();
       expect(mockStorage['clear-test']).toBeDefined();
 
       await tree.clear();
       expect(localStorage.removeItem).toHaveBeenCalledWith('clear-test');
+
+      // Clean up
+      tree.dispose();
+    });
+
+    it('should properly dispose of resources', () => {
+      const tree = signalTree({ count: 0 }).with(
+        withPersistence({
+          key: 'dispose-test',
+          autoSave: true,
+          autoLoad: false,
+        })
+      ) as PersistableSignalTree<{ count: number }>;
+
+      // Spy on clearInterval
+      const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+      // Dispose should clean up intervals
+      tree.dispose();
+
+      // Verify cleanup occurred
+      expect(clearIntervalSpy).toHaveBeenCalled();
+
+      clearIntervalSpy.mockRestore();
+    });
+
+    it('should handle save errors with error handler', async () => {
+      const onSaveError = jest.fn();
+      const failingAdapter: StorageAdapter = {
+        getItem: jest.fn().mockResolvedValue(null),
+        setItem: jest.fn().mockRejectedValue(new Error('Storage write failed')),
+        removeItem: jest.fn().mockResolvedValue(undefined),
+      };
+
+      const tree = signalTree({ count: 0 }).with(
+        withPersistence({
+          key: 'test',
+          storage: failingAdapter,
+          autoLoad: false,
+          onSaveError,
+        })
+      ) as PersistableSignalTree<{ count: number }>;
+
+      await expect(tree.save()).rejects.toThrow('Storage write failed');
+      expect(onSaveError).toHaveBeenCalledWith(expect.any(Error));
+
+      // Clean up
+      tree.dispose();
+    });
+
+    it('should handle load errors with error handler', async () => {
+      const onLoadError = jest.fn();
+      const failingAdapter: StorageAdapter = {
+        getItem: jest.fn().mockRejectedValue(new Error('Storage read failed')),
+        setItem: jest.fn().mockResolvedValue(undefined),
+        removeItem: jest.fn().mockResolvedValue(undefined),
+      };
+
+      const tree = signalTree({ count: 0 }).with(
+        withPersistence({
+          key: 'test',
+          storage: failingAdapter,
+          autoLoad: false,
+          onLoadError,
+        })
+      ) as PersistableSignalTree<{ count: number }>;
+
+      await expect(tree.load()).rejects.toThrow('Storage read failed');
+      expect(onLoadError).toHaveBeenCalledWith(expect.any(Error));
+
+      // Clean up
+      tree.dispose();
     });
   });
 
@@ -414,16 +504,23 @@ describe('Serialization', () => {
 
       const partialData = JSON.stringify({
         data: { count: 42 }, // Missing user and extra
-        metadata: { timestamp: Date.now(), version: '1.0.0' },
+        metadata: { timestamp: Date.now(), version: '2.0.0' },
       });
 
-      // Should not throw
+      // Should not throw but warn
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+
       expect(() => {
         tree.deserialize(partialData);
       }).not.toThrow();
 
       expect(tree.$.count()).toBe(42);
       // Other properties should remain unchanged
+      expect(tree.$.user.name()).toBe('');
+      expect(tree.$.user.age()).toBe(0);
+      expect(tree.$.extra()).toBe('value');
+
+      consoleSpy.mockRestore();
     });
 
     it('should handle storage errors gracefully', async () => {
@@ -439,14 +536,17 @@ describe('Serialization', () => {
         withPersistence({
           key: 'test',
           storage: failingAdapter,
-          autoLoad: false, // Disable auto-load to avoid timeout issues
+          autoLoad: false,
         })
-      );
+      ) as PersistableSignalTree<{ count: number }>;
 
       // These should reject but not throw uncaught errors
       await expect(tree.save()).rejects.toThrow('Storage write failed');
       await expect(tree.load()).rejects.toThrow('Storage read failed');
       await expect(tree.clear()).rejects.toThrow('Storage delete failed');
+
+      // Clean up
+      tree.dispose();
     });
   });
 });

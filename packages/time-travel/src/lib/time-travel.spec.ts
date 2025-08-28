@@ -14,9 +14,6 @@ interface TestState {
     id: number;
   };
   items: string[];
-  [key: string]: unknown;
-  [key: number]: unknown;
-  [key: symbol]: unknown;
 }
 
 type TimeTravelTree = SignalTree<TestState> & {
@@ -29,7 +26,7 @@ function createTimeTravelTree(
   config?: {
     maxHistorySize?: number;
     includePayload?: boolean;
-    actionNames?: { update?: string };
+    actionNames?: { update?: string; set?: string };
   }
 ): TimeTravelTree {
   if (config) {
@@ -67,6 +64,11 @@ describe('Time Travel', () => {
     };
   });
 
+  afterEach(() => {
+    // Clean up any trees created during tests
+    jest.clearAllTimers();
+  });
+
   describe('withTimeTravel', () => {
     it('should enhance tree with time travel interface', () => {
       const tree = createTimeTravelTree(initialState);
@@ -76,27 +78,62 @@ describe('Time Travel', () => {
       expect(typeof tree.__timeTravel.redo).toBe('function');
       expect(typeof tree.__timeTravel.getHistory).toBe('function');
       expect(typeof tree.__timeTravel.resetHistory).toBe('function');
+      expect(typeof tree.__timeTravel.dispose).toBe('function');
+
+      tree.__timeTravel.dispose();
     });
 
     it('should track state changes in history', () => {
       const tree = createTimeTravelTree(initialState);
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 2 }));
+      // Use signal.set() for leaf nodes
+      tree.$.count.set(1);
+      tree.$.count.set(2);
 
       const history = tree.__timeTravel.getHistory();
       expect(history.length).toBe(3); // INIT + 2 updates
       expect(history[0].action).toBe('INIT');
-      expect(history[1].action).toBe('UPDATE');
-      expect(history[2].action).toBe('UPDATE');
+      expect(history[1].action).toBe('SET');
+      expect(history[2].action).toBe('SET');
+
+      tree.__timeTravel.dispose();
+    });
+
+    it('should track nested state changes', () => {
+      const tree = createTimeTravelTree(initialState);
+
+      // Update nested values
+      tree.$.user.name.set('Bob');
+      tree.$.user.id.set(2);
+
+      const history = tree.__timeTravel.getHistory();
+      expect(history.length).toBe(3); // INIT + 2 updates
+      expect(history[1].state.user.name).toBe('Bob');
+      expect(history[2].state.user.id).toBe(2);
+
+      tree.__timeTravel.dispose();
+    });
+
+    it('should track branch-level updates', () => {
+      const tree = createTimeTravelTree(initialState);
+
+      // Use branch.set() method with proper type assertion
+      (tree.$.user as any).set({ name: 'Bob', id: 2 });
+
+      const history = tree.__timeTravel.getHistory();
+      expect(history.length).toBe(2); // INIT + 1 update
+      expect(history[1].action).toBe('SET');
+      expect(history[1].state.user).toEqual({ name: 'Bob', id: 2 });
+
+      tree.__timeTravel.dispose();
     });
 
     it('should support undo operations', () => {
       const tree = createTimeTravelTree(initialState);
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 2 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 3 }));
+      tree.$.count.set(1);
+      tree.$.count.set(2);
+      tree.$.count.set(3);
 
       expect(unwrap(tree.$).count).toBe(3);
 
@@ -109,13 +146,15 @@ describe('Time Travel', () => {
 
       tree.__timeTravel.undo();
       expect(unwrap(tree.$).count).toBe(0);
+
+      tree.__timeTravel.dispose();
     });
 
     it('should support redo operations', () => {
       const tree = createTimeTravelTree(initialState);
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 2 }));
+      tree.$.count.set(1);
+      tree.$.count.set(2);
 
       tree.__timeTravel.undo();
       expect(unwrap(tree.$).count).toBe(1);
@@ -123,6 +162,8 @@ describe('Time Travel', () => {
       const redoResult = tree.__timeTravel.redo();
       expect(redoResult).toBe(true);
       expect(unwrap(tree.$).count).toBe(2);
+
+      tree.__timeTravel.dispose();
     });
 
     it('should handle undo/redo boundaries correctly', () => {
@@ -132,7 +173,7 @@ describe('Time Travel', () => {
       expect(tree.__timeTravel.canUndo()).toBe(false);
       expect(tree.__timeTravel.undo()).toBe(false);
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
+      tree.$.count.set(1);
       expect(tree.__timeTravel.canUndo()).toBe(true);
 
       // Can't redo when at latest state
@@ -141,14 +182,16 @@ describe('Time Travel', () => {
 
       tree.__timeTravel.undo();
       expect(tree.__timeTravel.canRedo()).toBe(true);
+
+      tree.__timeTravel.dispose();
     });
 
     it('should support jumping to specific history index', () => {
       const tree = createTimeTravelTree(initialState);
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 2 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 3 }));
+      tree.$.count.set(1);
+      tree.$.count.set(2);
+      tree.$.count.set(3);
 
       expect(tree.__timeTravel.getCurrentIndex()).toBe(3);
 
@@ -160,13 +203,15 @@ describe('Time Travel', () => {
       // Invalid index
       expect(tree.__timeTravel.jumpTo(-1)).toBe(false);
       expect(tree.__timeTravel.jumpTo(10)).toBe(false);
+
+      tree.__timeTravel.dispose();
     });
 
     it('should reset history', () => {
       const tree = createTimeTravelTree(initialState);
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 2 }));
+      tree.$.count.set(1);
+      tree.$.count.set(2);
 
       expect(tree.__timeTravel.getHistory().length).toBe(3);
 
@@ -175,35 +220,39 @@ describe('Time Travel', () => {
       expect(history.length).toBe(1);
       expect(history[0].action).toBe('RESET');
       expect(tree.__timeTravel.getCurrentIndex()).toBe(0);
+
+      tree.__timeTravel.dispose();
     });
 
     it('should respect max history size', () => {
       const tree = createTimeTravelTree(initialState, { maxHistorySize: 3 });
 
       // Add more entries than max size
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 2 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 3 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 4 }));
+      tree.$.count.set(1);
+      tree.$.count.set(2);
+      tree.$.count.set(3);
+      tree.$.count.set(4);
 
       const history = tree.__timeTravel.getHistory();
       expect(history.length).toBe(3); // Max size enforced
       expect(history[history.length - 1].state.count).toBe(4); // Latest state preserved
+
+      tree.__timeTravel.dispose();
     });
 
     it('should handle branching history correctly', () => {
       const tree = createTimeTravelTree(initialState);
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 2 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 3 }));
+      tree.$.count.set(1);
+      tree.$.count.set(2);
+      tree.$.count.set(3);
 
       // Go back and create new branch
       tree.__timeTravel.undo();
       tree.__timeTravel.undo();
       expect(unwrap(tree.$).count).toBe(1);
 
-      tree.$.update((state: TestState) => ({ ...state, count: 10 }));
+      tree.$.count.set(10);
 
       const history = tree.__timeTravel.getHistory();
       // Should have INIT, first update, and new branch update
@@ -212,15 +261,14 @@ describe('Time Travel', () => {
 
       // Can't redo the discarded future
       expect(tree.__timeTravel.canRedo()).toBe(false);
+
+      tree.__timeTravel.dispose();
     });
 
     it('should deep clone state snapshots', () => {
       const tree = createTimeTravelTree(initialState);
 
-      tree.$.update((state: TestState) => ({
-        ...state,
-        user: { ...state.user, name: 'Bob' },
-      }));
+      (tree.$.user as any).set({ name: 'Bob', id: 2 });
 
       const history = tree.__timeTravel.getHistory();
       const firstEntry = history[0];
@@ -230,59 +278,70 @@ describe('Time Travel', () => {
 
       const freshHistory = tree.__timeTravel.getHistory();
       expect(freshHistory[0].state.user.name).toBe('Alice'); // Original preserved
+
+      tree.__timeTravel.dispose();
     });
 
     it('should not track identical state changes', () => {
       const tree = createTimeTravelTree(initialState);
 
-      const beforeState = unwrap(tree.$);
-      console.log('Before state:', beforeState);
-
       const currentCount = unwrap(tree.$).count;
-      tree.$.update((state: TestState) => ({ ...state, count: currentCount })); // Same value
-
-      const afterState = unwrap(tree.$);
-      console.log('After state:', afterState);
-      console.log(
-        'States equal?',
-        JSON.stringify(beforeState) === JSON.stringify(afterState)
-      );
+      tree.$.count.set(currentCount); // Same value
 
       const history = tree.__timeTravel.getHistory();
-      console.log(
-        'History entries:',
-        history.map((h) => ({ action: h.action, count: h.state.count }))
-      );
       expect(history.length).toBe(1); // Only INIT, no update recorded
+
+      tree.__timeTravel.dispose();
     });
 
     it('should include payload when configured', () => {
       const tree = createTimeTravelTree(initialState, { includePayload: true });
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
+      tree.$.count.set(1);
 
       const history = tree.__timeTravel.getHistory();
       const updateEntry = history.find(
-        (h: TimeTravelEntry<TestState>) => h.action === 'UPDATE'
+        (h: TimeTravelEntry<TestState>) => h.action === 'SET'
       );
       expect(updateEntry).toBeDefined();
-      // Payload would be included if we passed it to addEntry
+      expect(updateEntry?.payload).toBeDefined();
+
+      tree.__timeTravel.dispose();
     });
 
     it('should handle custom action names', () => {
       const tree = createTimeTravelTree(initialState, {
         actionNames: {
-          update: 'CUSTOM_UPDATE',
+          set: 'CUSTOM_SET',
         },
       });
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
+      tree.$.count.set(1);
 
       const history = tree.__timeTravel.getHistory();
       const updateEntry = history.find(
-        (h: TimeTravelEntry<TestState>) => h.action === 'CUSTOM_UPDATE'
+        (h: TimeTravelEntry<TestState>) => h.action === 'CUSTOM_SET'
       );
       expect(updateEntry).toBeDefined();
+
+      tree.__timeTravel.dispose();
+    });
+
+    it('should properly dispose resources', () => {
+      const tree = createTimeTravelTree(initialState);
+
+      tree.$.count.set(1);
+      tree.$.count.set(2);
+
+      expect(tree.__timeTravel.canUndo()).toBe(true);
+
+      tree.__timeTravel.dispose();
+
+      // After disposal, operations should fail gracefully
+      expect(tree.__timeTravel.undo()).toBe(false);
+      expect(tree.__timeTravel.redo()).toBe(false);
+      expect(tree.__timeTravel.canUndo()).toBe(false);
+      expect(tree.__timeTravel.canRedo()).toBe(false);
     });
   });
 
@@ -291,18 +350,22 @@ describe('Time Travel', () => {
       const tree = createEnabledTimeTravelTree(initialState);
 
       expect(tree.__timeTravel).toBeDefined();
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
+      tree.$.count.set(1);
       expect(tree.__timeTravel.getHistory().length).toBe(2);
+
+      tree.__timeTravel.dispose();
     });
 
     it('should accept max history size parameter', () => {
       const tree = createEnabledTimeTravelTree(initialState, 2);
 
-      tree.$.update((state: TestState) => ({ ...state, count: 1 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 2 }));
-      tree.$.update((state: TestState) => ({ ...state, count: 3 }));
+      tree.$.count.set(1);
+      tree.$.count.set(2);
+      tree.$.count.set(3);
 
       expect(tree.__timeTravel.getHistory().length).toBe(2);
+
+      tree.__timeTravel.dispose();
     });
   });
 
@@ -313,6 +376,8 @@ describe('Time Travel', () => {
 
       expect(timeTravel).toBeDefined();
       expect(timeTravel).toBe(tree.__timeTravel);
+
+      tree.__timeTravel.dispose();
     });
 
     it('should return undefined for non-enhanced tree', () => {
@@ -331,11 +396,8 @@ describe('Time Travel', () => {
     it('should handle complex nested state changes', () => {
       const tree = createTimeTravelTree(initialState);
 
-      tree.$.update((state: TestState) => ({
-        ...state,
-        user: { ...state.user, name: 'Bob' },
-        items: [...state.items, 'c'],
-      }));
+      (tree.$.user as any).set({ name: 'Bob', id: 2 });
+      tree.$.items.set(['a', 'b', 'c']);
 
       tree.__timeTravel.undo();
       expect(unwrap(tree.$).user.name).toBe('Alice');
@@ -344,13 +406,15 @@ describe('Time Travel', () => {
       tree.__timeTravel.redo();
       expect(unwrap(tree.$).user.name).toBe('Bob');
       expect(unwrap(tree.$).items).toEqual(['a', 'b', 'c']);
+
+      tree.__timeTravel.dispose();
     });
 
     it('should handle multiple rapid updates', () => {
       const tree = createTimeTravelTree(initialState);
 
       for (let i = 1; i <= 10; i++) {
-        tree.$.update((state: TestState) => ({ ...state, count: i }));
+        tree.$.count.set(i);
       }
 
       expect(unwrap(tree.$).count).toBe(10);
@@ -362,6 +426,68 @@ describe('Time Travel', () => {
       }
 
       expect(unwrap(tree.$).count).toBe(5);
+
+      tree.__timeTravel.dispose();
+    });
+
+    it('should handle array mutations correctly', () => {
+      const tree = createTimeTravelTree(initialState);
+
+      // Arrays are signals in v2, so we set the whole array
+      tree.$.items.set(['x', 'y', 'z']);
+
+      expect(unwrap(tree.$).items).toEqual(['x', 'y', 'z']);
+
+      tree.__timeTravel.undo();
+      expect(unwrap(tree.$).items).toEqual(['a', 'b']);
+
+      tree.__timeTravel.redo();
+      expect(unwrap(tree.$).items).toEqual(['x', 'y', 'z']);
+
+      tree.__timeTravel.dispose();
+    });
+
+    it('should not record changes during restore', () => {
+      const tree = createTimeTravelTree(initialState);
+
+      tree.$.count.set(1);
+      tree.$.count.set(2);
+      tree.$.count.set(3);
+
+      const historyBefore = tree.__timeTravel.getHistory().length;
+
+      // Undo should not create new history entries
+      tree.__timeTravel.undo();
+      tree.__timeTravel.undo();
+      tree.__timeTravel.redo();
+
+      const historyAfter = tree.__timeTravel.getHistory().length;
+      expect(historyAfter).toBe(historyBefore);
+
+      tree.__timeTravel.dispose();
+    });
+
+    it('should handle mixed branch and leaf updates', () => {
+      const tree = createTimeTravelTree(initialState);
+
+      // Mix of branch-level and leaf-level updates
+      tree.$.user.name.set('Bob');
+      (tree.$.user as any).set({ name: 'Charlie', id: 3 });
+      tree.$.count.set(5);
+
+      const history = tree.__timeTravel.getHistory();
+      expect(history.length).toBe(4); // INIT + 3 updates
+
+      // Undo all
+      tree.__timeTravel.jumpTo(0);
+      expect(unwrap(tree.$)).toEqual(initialState);
+
+      // Redo to end
+      tree.__timeTravel.jumpTo(3);
+      expect(unwrap(tree.$).user).toEqual({ name: 'Charlie', id: 3 });
+      expect(unwrap(tree.$).count).toBe(5);
+
+      tree.__timeTravel.dispose();
     });
   });
 });

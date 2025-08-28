@@ -1,5 +1,3 @@
-// packages/serialization/src/lib/serialization.ts
-
 /**
  * SignalTree Serialization Module
  *
@@ -7,7 +5,7 @@
  * enabling state persistence, SSR, and state transfer between contexts.
  */
 
-import { SignalTree, unwrap } from '@signaltree/core';
+import { SignalTree } from '@signaltree/core';
 import { isSignal, Signal, WritableSignal } from '@angular/core';
 import { TYPE_MARKERS } from '../constants';
 
@@ -18,14 +16,6 @@ interface SignalTreeWithConfig<T = unknown> extends SignalTree<T> {
   __config?: {
     debugMode?: boolean;
   };
-}
-
-/**
- * Interface for enhanced SignalTree with auto-save functionality
- */
-interface EnhancedSignalTree {
-  __flushAutoSave?: () => Promise<void>;
-  __checkAutoSave?: () => void;
 }
 
 /**
@@ -96,14 +86,9 @@ export interface SerializedState<T = unknown> {
     appVersion?: string;
 
     /**
-     * Type information for special objects
+     * Circular reference markers
      */
-    types?: Record<string, string>;
-
-    /**
-     * Circular reference paths
-     */
-    circularRefs?: Array<{ path: string; targetPath: string }>;
+    circularRefs?: Record<string, string>;
   };
 }
 
@@ -126,6 +111,22 @@ export interface SerializableSignalTree<T> extends SignalTree<T> {
 }
 
 /**
+ * Enhanced SignalTree with persistence capabilities
+ */
+export interface PersistableSignalTree<T> extends SerializableSignalTree<T> {
+  /** Save current state to storage */
+  save(): Promise<void>;
+  /** Load state from storage */
+  load(): Promise<void>;
+  /** Clear state from storage */
+  clear(): Promise<void>;
+  /** Dispose of resources (cleanup) */
+  dispose(): void;
+  /** Promise that resolves when initial load is complete */
+  ready: Promise<void>;
+}
+
+/**
  * Default serialization config
  */
 const DEFAULT_CONFIG: Required<
@@ -141,190 +142,6 @@ const DEFAULT_CONFIG: Required<
 };
 
 /**
- * Safely unwrap object with circular reference detection
- */
-function unwrapObjectSafely(
-  obj: unknown,
-  visited = new WeakSet<object>(),
-  depth = 0,
-  maxDepth = 50,
-  preserveTypes = true
-): unknown {
-  // Prevent infinite recursion
-  if (depth > maxDepth) {
-    return '[Max Depth Exceeded]';
-  }
-
-  // Handle primitives and special values
-  if (obj === null || typeof obj !== 'object') {
-    // Handle special values when preserveTypes is enabled
-    if (preserveTypes) {
-      if (obj === undefined) {
-        return { [TYPE_MARKERS.UNDEFINED]: true };
-      }
-      if (typeof obj === 'number') {
-        if (isNaN(obj)) {
-          return { [TYPE_MARKERS.NAN]: true };
-        }
-        if (obj === Infinity) {
-          return { [TYPE_MARKERS.INFINITY]: true };
-        }
-        if (obj === -Infinity) {
-          return { [TYPE_MARKERS.NEG_INFINITY]: true };
-        }
-      }
-      if (typeof obj === 'bigint') {
-        return { [TYPE_MARKERS.BIGINT]: obj.toString() };
-      }
-      if (typeof obj === 'symbol') {
-        return { [TYPE_MARKERS.SYMBOL]: obj.toString() };
-      }
-    }
-    return obj;
-  }
-
-  // Handle circular references
-  if (visited.has(obj)) {
-    return '[Circular Reference]';
-  }
-
-  // Handle signals
-  if (isSignal(obj)) {
-    return (obj as Signal<unknown>)();
-  }
-
-  // Preserve special types if requested - convert them to marker format
-  if (preserveTypes) {
-    if (obj instanceof Date) {
-      return { [TYPE_MARKERS.DATE]: obj.toISOString() };
-    }
-    if (obj instanceof RegExp) {
-      return {
-        [TYPE_MARKERS.REGEXP]: {
-          source: obj.source,
-          flags: obj.flags,
-        },
-      };
-    }
-    if (obj instanceof Map) {
-      return {
-        [TYPE_MARKERS.MAP]: Array.from(obj.entries()),
-      };
-    }
-    if (obj instanceof Set) {
-      return {
-        [TYPE_MARKERS.SET]: Array.from(obj.values()),
-      };
-    }
-  } else {
-    // When preserveTypes is false, let special objects (Date, RegExp, etc.)
-    // be handled by JSON.stringify naturally
-    if (obj instanceof Date || obj instanceof RegExp) {
-      return obj;
-    }
-  }
-  visited.add(obj);
-
-  try {
-    // Handle arrays
-    if (Array.isArray(obj)) {
-      const result = obj.map((item) =>
-        unwrapObjectSafely(item, visited, depth + 1, maxDepth, preserveTypes)
-      );
-      visited.delete(obj);
-      return result;
-    }
-
-    // Handle plain objects
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(obj)) {
-      if (isSignal(value)) {
-        const signalValue = (value as Signal<unknown>)();
-        result[key] = unwrapObjectSafely(
-          signalValue,
-          visited,
-          depth + 1,
-          maxDepth,
-          preserveTypes
-        );
-      } else {
-        result[key] = unwrapObjectSafely(
-          value,
-          visited,
-          depth + 1,
-          maxDepth,
-          preserveTypes
-        );
-      }
-    }
-
-    visited.delete(obj);
-    return result;
-  } catch {
-    visited.delete(obj);
-    return '[Serialization Error]';
-  }
-}
-
-/**
- * Detects circular references in an object
- */
-function detectCircularReferences(
-  obj: unknown,
-  path = '',
-  seen = new WeakSet<object>(),
-  paths = new Map<object, string>()
-): Array<{ path: string; targetPath: string }> {
-  const circular: Array<{ path: string; targetPath: string }> = [];
-
-  if (obj === null || typeof obj !== 'object') {
-    return circular;
-  }
-
-  // Check if we've seen this object before
-  if (seen.has(obj)) {
-    // Found a circular reference
-    const targetPath = paths.get(obj) || '';
-    circular.push({ path, targetPath });
-    return circular; // Don't recurse into circular references
-  }
-
-  // Mark this object as seen
-  seen.add(obj);
-  paths.set(obj, path);
-
-  // Recursively check children
-  if (Array.isArray(obj)) {
-    for (let i = 0; i < obj.length; i++) {
-      const itemPath = path ? `${path}[${i}]` : `[${i}]`;
-      const childCircular = detectCircularReferences(
-        obj[i],
-        itemPath,
-        seen,
-        paths
-      );
-      circular.push(...childCircular);
-    }
-  } else {
-    for (const [key, value] of Object.entries(obj)) {
-      const propPath = path ? `${path}.${key}` : key;
-      const childCircular = detectCircularReferences(
-        value,
-        propPath,
-        seen,
-        paths
-      );
-      circular.push(...childCircular);
-    }
-  }
-
-  // Remove from seen set when backing out (allows siblings to reference same objects)
-  seen.delete(obj);
-
-  return circular;
-}
-
-/**
  * Internal config with all required properties but nullable functions
  */
 type InternalSerializationConfig = Required<
@@ -335,74 +152,215 @@ type InternalSerializationConfig = Required<
 };
 
 /**
- * Custom replacer that handles circular references only
+ * Helper to check if a value is a built-in object that should be treated as primitive
  */
-function createReplacer(config: InternalSerializationConfig) {
-  const seen = new WeakSet<object>();
-  const circularPaths = new Map<object, string>();
+function isBuiltInObject(v: unknown): boolean {
+  if (v === null || v === undefined) return false;
 
-  return function replacer(
-    this: Record<string, unknown>,
-    key: string,
-    value: unknown
-  ): unknown {
-    // Apply custom replacer first if provided
-    if (config.replacer) {
-      value = config.replacer.call(this, key, value);
-    }
-
-    // Skip signals - we already unwrapped them
-    if (isSignal(value)) {
-      return (value as Signal<unknown>)();
-    }
-
-    // Handle circular references
-    if (value && typeof value === 'object') {
-      if (seen.has(value)) {
-        if (config.handleCircular) {
-          const targetPath = circularPaths.get(value) || '';
-          return { [TYPE_MARKERS.CIRCULAR]: targetPath };
-        }
-        return undefined;
-      }
-      seen.add(value);
-      const currentPath = key || '';
-      circularPaths.set(value, currentPath);
-    }
-
-    // All special type handling is now done in unwrapObjectSafely
-    return value;
-  };
+  return (
+    v instanceof Date ||
+    v instanceof RegExp ||
+    typeof v === 'function' ||
+    v instanceof Map ||
+    v instanceof Set ||
+    v instanceof WeakMap ||
+    v instanceof WeakSet ||
+    v instanceof ArrayBuffer ||
+    v instanceof DataView ||
+    v instanceof Error ||
+    v instanceof Promise ||
+    (typeof URL !== 'undefined' && v instanceof URL) ||
+    (typeof URLSearchParams !== 'undefined' && v instanceof URLSearchParams) ||
+    (typeof FormData !== 'undefined' && v instanceof FormData) ||
+    (typeof Blob !== 'undefined' && v instanceof Blob) ||
+    (typeof File !== 'undefined' && v instanceof File)
+  );
 }
 
 /**
- * Resolves circular references after parsing
+ * Convert special types to marker format for serialization
  */
-function resolveCircularReferences(
-  obj: Record<string, unknown>,
-  circularPaths: Array<{ path: string; targetPath: string }>
+function convertToTypeMarker(value: unknown): unknown {
+  if (value === undefined) return { [TYPE_MARKERS.UNDEFINED]: true };
+  if (typeof value === 'number') {
+    if (isNaN(value)) return { [TYPE_MARKERS.NAN]: true };
+    if (value === Infinity) return { [TYPE_MARKERS.INFINITY]: true };
+    if (value === -Infinity) return { [TYPE_MARKERS.NEG_INFINITY]: true };
+  }
+  if (typeof value === 'bigint')
+    return { [TYPE_MARKERS.BIGINT]: value.toString() };
+  if (typeof value === 'symbol')
+    return { [TYPE_MARKERS.SYMBOL]: value.toString() };
+  if (value instanceof Date)
+    return { [TYPE_MARKERS.DATE]: value.toISOString() };
+  if (value instanceof RegExp) {
+    return {
+      [TYPE_MARKERS.REGEXP]: {
+        source: value.source,
+        flags: value.flags,
+      },
+    };
+  }
+  if (value instanceof Map)
+    return { [TYPE_MARKERS.MAP]: Array.from(value.entries()) };
+  if (value instanceof Set)
+    return { [TYPE_MARKERS.SET]: Array.from(value.values()) };
+  return value;
+}
+
+/**
+ * Restore special types from marker format
+ */
+function restoreSpecialTypes(value: unknown): unknown {
+  if (!value || typeof value !== 'object') {
+    return value;
+  }
+
+  // Check for type markers
+  const obj = value as Record<string, unknown>;
+  if (TYPE_MARKERS.UNDEFINED in obj) return undefined;
+  if (TYPE_MARKERS.NAN in obj) return NaN;
+  if (TYPE_MARKERS.INFINITY in obj) return Infinity;
+  if (TYPE_MARKERS.NEG_INFINITY in obj) return -Infinity;
+  if (TYPE_MARKERS.BIGINT in obj)
+    return BigInt(obj[TYPE_MARKERS.BIGINT] as string);
+  if (TYPE_MARKERS.SYMBOL in obj)
+    return Symbol.for(obj[TYPE_MARKERS.SYMBOL] as string);
+  if (TYPE_MARKERS.DATE in obj)
+    return new Date(obj[TYPE_MARKERS.DATE] as string);
+  if (TYPE_MARKERS.REGEXP in obj) {
+    const regexpData = obj[TYPE_MARKERS.REGEXP] as {
+      source: string;
+      flags: string;
+    };
+    return new RegExp(regexpData.source, regexpData.flags);
+  }
+  if (TYPE_MARKERS.MAP in obj)
+    return new Map(obj[TYPE_MARKERS.MAP] as Array<[unknown, unknown]>);
+  if (TYPE_MARKERS.SET in obj)
+    return new Set(obj[TYPE_MARKERS.SET] as Array<unknown>);
+
+  // Handle arrays
+  if (Array.isArray(value)) {
+    return value.map(restoreSpecialTypes);
+  }
+
+  // Handle objects
+  const result: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value)) {
+    result[k] = restoreSpecialTypes(v);
+  }
+  return result;
+}
+
+/**
+ * Serialize a SignalTree to a plain object
+ */
+function serializeSignalTree<T>(
+  tree: SignalTree<T>,
+  config: InternalSerializationConfig
+): T {
+  const visited = new WeakSet<object>();
+  const circularRefs: Record<string, string> = {};
+  let refCounter = 0;
+  const refMap = new WeakMap<object, string>();
+
+  function serialize(node: unknown, depth = 0): unknown {
+    // Depth check
+    if (depth > config.maxDepth) {
+      return '[Max Depth]';
+    }
+
+    // Handle primitives
+    if (node === null || typeof node !== 'object') {
+      return config.preserveTypes ? convertToTypeMarker(node) : node;
+    }
+
+    // Handle circular references
+    if (visited.has(node)) {
+      if (config.handleCircular) {
+        const existingRef = refMap.get(node);
+        if (existingRef) {
+          return { [TYPE_MARKERS.CIRCULAR]: existingRef };
+        }
+        const newRef = `ref_${refCounter++}`;
+        refMap.set(node, newRef);
+        return { [TYPE_MARKERS.CIRCULAR]: newRef };
+      }
+      return undefined;
+    }
+    visited.add(node);
+
+    // Handle signals - unwrap them
+    if (isSignal(node)) {
+      const value = (node as Signal<unknown>)();
+      return serialize(value, depth);
+    }
+
+    // Handle built-in types
+    if (isBuiltInObject(node)) {
+      return config.preserveTypes ? convertToTypeMarker(node) : node;
+    }
+
+    // Handle arrays
+    if (Array.isArray(node)) {
+      const result = node.map((item) => serialize(item, depth + 1));
+      visited.delete(node);
+      return result;
+    }
+
+    // Handle objects - skip methods and internal properties
+    const result: Record<string, unknown> = {};
+    const skipKeys = new Set(['set', 'update', '__cleanup__', '__config']);
+
+    for (const key in node) {
+      if (skipKeys.has(key)) continue;
+      if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+
+      const value = (node as Record<string, unknown>)[key];
+      result[key] = serialize(value, depth + 1);
+    }
+
+    visited.delete(node);
+    return result;
+  }
+
+  return serialize(tree.$) as T;
+}
+
+/**
+ * Apply restored data to a SignalTree
+ */
+function applyToSignalTree<T>(
+  target: any,
+  source: T,
+  path: string[] = []
 ): void {
-  for (const { path, targetPath } of circularPaths) {
-    const pathParts = path.split(/\.|\[|\]/).filter(Boolean);
-    const targetParts = targetPath.split(/\.|\[|\]/).filter(Boolean);
+  if (!source || typeof source !== 'object') return;
 
-    // Navigate to the circular reference location
-    let current: Record<string, unknown> = obj;
-    for (let i = 0; i < pathParts.length - 1; i++) {
-      current = current[pathParts[i]] as Record<string, unknown>;
-      if (!current) break;
-    }
+  for (const [key, value] of Object.entries(source)) {
+    const targetProp = target[key];
 
-    // Navigate to the target
-    let target: Record<string, unknown> = obj;
-    for (const part of targetParts) {
-      target = target[part] as Record<string, unknown>;
-      if (!target) break;
-    }
-
-    // Set the circular reference
-    if (current && target) {
-      current[pathParts[pathParts.length - 1]] = target;
+    if (isSignal(targetProp)) {
+      // It's a signal - set it directly
+      (targetProp as WritableSignal<unknown>).set(value);
+    } else if (
+      targetProp &&
+      typeof targetProp === 'object' &&
+      value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      !isBuiltInObject(value)
+    ) {
+      // It's a nested branch - recurse
+      applyToSignalTree(targetProp, value, [...path, key]);
+    } else if (targetProp === undefined && value !== undefined) {
+      // Property doesn't exist in target - skip with warning
+      console.warn(
+        `Cannot restore property at ${[...path, key].join(
+          '.'
+        )}: property does not exist in target`
+      );
     }
   }
 }
@@ -415,9 +373,6 @@ export function withSerialization<T extends Record<string, unknown>>(
 ): (tree: SignalTree<T>) => SerializableSignalTree<T> {
   return (tree: SignalTree<T>): SerializableSignalTree<T> => {
     const enhanced = tree as SerializableSignalTree<T>;
-    // Helper: narrow Angular signals that support .set
-    const isWritableSignal = (v: unknown): v is WritableSignal<unknown> =>
-      isSignal(v) && typeof (v as { set?: unknown }).set === 'function';
 
     /**
      * Get plain object representation
@@ -427,94 +382,15 @@ export function withSerialization<T extends Record<string, unknown>>(
         ...DEFAULT_CONFIG,
         ...defaultConfig,
       };
-      // Use unwrap(tree.$) to avoid serializing proxy objects or internal wrappers.
-      return unwrapObjectSafely(
-        unwrap(tree.$),
-        new WeakSet(),
-        0,
-        fullConfig.maxDepth,
-        fullConfig.preserveTypes
-      ) as T;
+      return serializeSignalTree(tree, fullConfig);
     };
 
     /**
      * Restore from plain object
      */
     enhanced.fromJSON = (data: T): void => {
-      // Convert special type markers back to their actual types
-      const restoreSpecialTypes = (value: unknown): unknown => {
-        if (!value || typeof value !== 'object') {
-          return value;
-        }
-
-        // Check for type markers
-        if (TYPE_MARKERS.UNDEFINED in value) return undefined;
-        if (TYPE_MARKERS.NAN in value) return NaN;
-        if (TYPE_MARKERS.INFINITY in value) return Infinity;
-        if (TYPE_MARKERS.NEG_INFINITY in value) return -Infinity;
-        if (TYPE_MARKERS.BIGINT in value)
-          return BigInt(value[TYPE_MARKERS.BIGINT] as string);
-        if (TYPE_MARKERS.SYMBOL in value)
-          return Symbol.for(value[TYPE_MARKERS.SYMBOL] as string);
-        if (TYPE_MARKERS.DATE in value)
-          return new Date(value[TYPE_MARKERS.DATE] as string);
-        if (TYPE_MARKERS.REGEXP in value) {
-          const regexpData = value[TYPE_MARKERS.REGEXP] as {
-            source: string;
-            flags: string;
-          };
-          return new RegExp(regexpData.source, regexpData.flags);
-        }
-        if (TYPE_MARKERS.MAP in value)
-          return new Map(value[TYPE_MARKERS.MAP] as Array<[unknown, unknown]>);
-        if (TYPE_MARKERS.SET in value)
-          return new Set(value[TYPE_MARKERS.SET] as Array<unknown>);
-
-        // Handle arrays
-        if (Array.isArray(value)) {
-          return value.map(restoreSpecialTypes);
-        }
-
-        // Handle objects
-        const result: Record<string, unknown> = {};
-        for (const [k, v] of Object.entries(value)) {
-          result[k] = restoreSpecialTypes(v);
-        }
-        return result;
-      };
-
-      // Restore special types in the data
       const restoredData = restoreSpecialTypes(data) as T;
-
-      // In v2, don't assume a root-level set; walk the DeepSignalify tree and set per-branch
-      const applyRestored = (
-        current: Record<string, unknown>,
-        restored: Record<string, unknown>
-      ): void => {
-        for (const [key, value] of Object.entries(restored)) {
-          const target = current[key];
-          if (isWritableSignal(target)) {
-            (target as WritableSignal<unknown>).set(value);
-          } else if (
-            target &&
-            typeof target === 'object' &&
-            !isSignal(target) &&
-            value &&
-            typeof value === 'object' &&
-            !Array.isArray(value)
-          ) {
-            applyRestored(
-              target as Record<string, unknown>,
-              value as Record<string, unknown>
-            );
-          }
-        }
-      };
-
-      applyRestored(
-        tree.$ as unknown as Record<string, unknown>,
-        restoredData as unknown as Record<string, unknown>
-      );
+      applyToSignalTree(tree.$, restoredData);
     };
 
     /**
@@ -526,36 +402,23 @@ export function withSerialization<T extends Record<string, unknown>>(
         ...defaultConfig,
         ...config,
       };
-      // Use the unwrapped state to avoid serializing internal wrappers
-      const state = unwrapObjectSafely(
-        unwrap(tree.$),
-        new WeakSet(),
-        0,
-        fullConfig.maxDepth,
-        fullConfig.preserveTypes
-      ) as T;
 
-      // Detect circular references if needed
-      const circularPaths = fullConfig.handleCircular
-        ? detectCircularReferences(state)
-        : [];
+      const state = serializeSignalTree(tree, fullConfig);
 
-      // Prepare data
+      // Prepare data with metadata
       const data: SerializedState<T> = {
         data: state,
       };
 
-      // Add metadata if requested
       if (fullConfig.includeMetadata) {
         data.metadata = {
           timestamp: Date.now(),
-          version: '1.0.0',
-          ...(circularPaths.length > 0 && { circularRefs: circularPaths }),
+          version: '2.0.0',
         };
       }
 
-      // Serialize with custom replacer
-      const replacer = createReplacer(fullConfig);
+      // Custom replacer if provided
+      const replacer = fullConfig.replacer || undefined;
       return JSON.stringify(data, replacer, 2);
     };
 
@@ -573,24 +436,14 @@ export function withSerialization<T extends Record<string, unknown>>(
       };
 
       try {
-        // Parse with simple JSON.parse (no custom reviver)
-        const parsed: SerializedState<T> = JSON.parse(json);
-
-        // Extract data and metadata
+        const parsed: SerializedState<T> = JSON.parse(json, fullConfig.reviver);
         const { data, metadata } = parsed;
 
-        // Resolve circular references if present
-        if (metadata?.circularRefs && fullConfig.handleCircular) {
-          resolveCircularReferences(data, metadata.circularRefs);
-        }
-
-        // Apply the data to the tree (fromJSON will handle type restoration)
+        // Apply the data to the tree
         enhanced.fromJSON(data);
 
         // Log restoration if in debug mode
-        if (
-          (tree as { __config?: { debugMode?: boolean } }).__config?.debugMode
-        ) {
+        if ((tree as SignalTreeWithConfig).__config?.debugMode) {
           console.log('[SignalTree] State restored from serialized data', {
             timestamp: metadata?.timestamp,
             version: metadata?.version,
@@ -611,14 +464,11 @@ export function withSerialization<T extends Record<string, unknown>>(
      */
     enhanced.snapshot = (): SerializedState<T> => {
       const state = enhanced.toJSON();
-      const circularPaths = detectCircularReferences(state);
-
       return {
         data: JSON.parse(JSON.stringify(state)), // Deep clone
         metadata: {
           timestamp: Date.now(),
-          version: '1.0.0',
-          ...(circularPaths.length > 0 && { circularRefs: circularPaths }),
+          version: '2.0.0',
         },
       };
     };
@@ -627,29 +477,11 @@ export function withSerialization<T extends Record<string, unknown>>(
      * Restore from snapshot
      */
     enhanced.restore = (snapshot: SerializedState<T>): void => {
-      const { data, metadata } = snapshot;
-
-      // Resolve circular references if present
-      if (metadata?.circularRefs) {
-        resolveCircularReferences(data, metadata.circularRefs);
-      }
-
-      enhanced.fromJSON(data);
+      enhanced.fromJSON(snapshot.data);
     };
 
     return enhanced;
   };
-}
-
-/**
- * Convenience function to enable serialization with defaults
- */
-export function enableSerialization<T extends Record<string, unknown>>() {
-  return withSerialization<T>({
-    includeMetadata: true,
-    preserveTypes: true,
-    handleCircular: true,
-  });
 }
 
 /**
@@ -692,6 +524,16 @@ export interface PersistenceConfig extends SerializationConfig {
    * @default true
    */
   autoLoad?: boolean;
+
+  /**
+   * Error handler for save operations
+   */
+  onSaveError?: (error: Error) => void;
+
+  /**
+   * Error handler for load operations
+   */
+  onLoadError?: (error: Error) => void;
 }
 
 /**
@@ -699,17 +541,15 @@ export interface PersistenceConfig extends SerializationConfig {
  */
 export function withPersistence<T extends Record<string, unknown>>(
   config: PersistenceConfig
-): (tree: SignalTree<T>) => SerializableSignalTree<T> & {
-  save(): Promise<void>;
-  load(): Promise<void>;
-  clear(): Promise<void>;
-} {
+): (tree: SignalTree<T>) => PersistableSignalTree<T> {
   const {
     key,
     storage = typeof window !== 'undefined' ? window.localStorage : undefined,
     autoSave = true,
     debounceMs = 1000,
     autoLoad = true,
+    onSaveError,
+    onLoadError,
     ...serializationConfig
   } = config;
 
@@ -724,17 +564,21 @@ export function withPersistence<T extends Record<string, unknown>>(
     const serializable = withSerialization<T>(serializationConfig)(tree);
 
     // Add persistence methods
-    const enhanced = serializable as SerializableSignalTree<T> & {
-      save(): Promise<void>;
-      load(): Promise<void>;
-      clear(): Promise<void>;
-    };
+    const enhanced = serializable as PersistableSignalTree<T>;
 
-    // Whether auto-save should be suppressed (useful during load)
+    // Track resources for cleanup
+    let pollInterval: ReturnType<typeof setInterval> | undefined;
+    let saveTimeout: ReturnType<typeof setTimeout> | undefined;
     let suppressAutoSave = false;
-    // Baseline snapshot used to diff for auto-save. Promoted to outer
-    // scope so load() can reset it after restoring state.
     let prevSnapshot: string | undefined;
+
+    // Create ready promise
+    let readyResolve: () => void = () => {
+      // intenstionally blank
+    };
+    enhanced.ready = new Promise<void>((resolve) => {
+      readyResolve = resolve;
+    });
 
     /**
      * Save current state to storage
@@ -748,8 +592,13 @@ export function withPersistence<T extends Record<string, unknown>>(
           console.log(`[SignalTree] State saved to storage key: ${key}`);
         }
       } catch (error) {
-        console.error('[SignalTree] Failed to save state:', error);
-        throw error; // Re-throw for tests to catch
+        const err = error instanceof Error ? error : new Error(String(error));
+        if (onSaveError) {
+          onSaveError(err);
+        } else {
+          console.error('[SignalTree] Failed to save state:', error);
+        }
+        throw err;
       }
     };
 
@@ -758,17 +607,17 @@ export function withPersistence<T extends Record<string, unknown>>(
      */
     enhanced.load = async (): Promise<void> => {
       try {
-        // Suppress auto-save while we read and restore state to avoid
-        // scheduling a debounced save from the load path.
         suppressAutoSave = true;
         const data = await Promise.resolve(storage.getItem(key));
+
         if (data) {
           enhanced.deserialize(data, serializationConfig);
 
           if ((tree as SignalTreeWithConfig).__config?.debugMode) {
             console.log(`[SignalTree] State loaded from storage key: ${key}`);
           }
-          // After a load, reset the baseline snapshot (without metadata)
+
+          // Reset baseline snapshot after load
           try {
             prevSnapshot = serializable.serialize({
               ...serializationConfig,
@@ -779,8 +628,13 @@ export function withPersistence<T extends Record<string, unknown>>(
           }
         }
       } catch (error) {
-        console.error('[SignalTree] Failed to load state:', error);
-        throw error; // Re-throw for tests to catch
+        const err = error instanceof Error ? error : new Error(String(error));
+        if (onLoadError) {
+          onLoadError(err);
+        } else {
+          console.error('[SignalTree] Failed to load state:', error);
+        }
+        throw err;
       } finally {
         suppressAutoSave = false;
       }
@@ -798,14 +652,26 @@ export function withPersistence<T extends Record<string, unknown>>(
         }
       } catch (error) {
         console.error('[SignalTree] Failed to clear state:', error);
-        throw error; // Re-throw for tests to catch
+        throw error;
+      }
+    };
+
+    /**
+     * Dispose of resources
+     */
+    enhanced.dispose = (): void => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = undefined;
+      }
+      if (saveTimeout) {
+        clearTimeout(saveTimeout);
+        saveTimeout = undefined;
       }
     };
 
     // Auto-load on creation if enabled
     if (autoLoad) {
-      // Run load immediately (microtask) so tests relying on auto-load don't
-      // need to wait on timers. Errors are caught and logged.
       (async () => {
         try {
           suppressAutoSave = true;
@@ -814,28 +680,32 @@ export function withPersistence<T extends Record<string, unknown>>(
           console.warn('[SignalTree] Auto-load failed:', error);
         } finally {
           suppressAutoSave = false;
+          readyResolve();
         }
       })();
+    } else {
+      readyResolve();
     }
 
-    // Auto-save on updates if enabled. Use polling to detect changes
-    // and debounce saves. This approach works reliably with Jest/Zone
-    // without requiring Angular DI setup.
+    // Auto-save on updates if enabled
     if (autoSave) {
-      let saveTimeout: ReturnType<typeof setTimeout> | undefined;
-      let pollInterval: ReturnType<typeof setInterval> | undefined;
-
       const triggerSave = () => {
         if (saveTimeout) clearTimeout(saveTimeout);
         saveTimeout = setTimeout(() => {
           enhanced.save().catch((error) => {
-            console.error('[SignalTree] Auto-save failed:', error);
+            if (onSaveError) {
+              onSaveError(
+                error instanceof Error ? error : new Error(String(error))
+              );
+            } else {
+              console.error('[SignalTree] Auto-save failed:', error);
+            }
           });
           saveTimeout = undefined;
         }, debounceMs);
       };
 
-      // Initial snapshot to compare (do not include metadata in diff)
+      // Initial snapshot
       try {
         prevSnapshot = serializable.serialize({
           ...serializationConfig,
@@ -845,49 +715,40 @@ export function withPersistence<T extends Record<string, unknown>>(
         prevSnapshot = undefined;
       }
 
-      // Poll for changes every 100ms
+      // Poll for changes
       const checkForChanges = () => {
+        if (suppressAutoSave) return;
+
         try {
           const current = serializable.serialize({
             ...serializationConfig,
             includeMetadata: false,
           });
-          if (suppressAutoSave) {
-            // If suppression is active (e.g., during load), reset baseline
-            // and avoid scheduling saves triggered by load.
-            prevSnapshot = current;
-            return;
-          }
           if (prevSnapshot === undefined || current !== prevSnapshot) {
             prevSnapshot = current;
             triggerSave();
           }
         } catch {
-          // swallow serialization errors during polling
+          // Swallow serialization errors during polling
         }
       };
 
-      // Start polling every 100ms
       pollInterval = setInterval(checkForChanges, 100);
-
-      // For testing: manually trigger change check
-      (enhanced as EnhancedSignalTree).__checkAutoSave = checkForChanges;
-
-      (enhanced as EnhancedSignalTree).__flushAutoSave = async () => {
-        if (saveTimeout) {
-          clearTimeout(saveTimeout);
-          saveTimeout = undefined;
-        }
-        if (pollInterval) {
-          clearInterval(pollInterval);
-          pollInterval = undefined;
-        }
-        return enhanced.save();
-      };
     }
 
     return enhanced;
   };
+}
+
+/**
+ * Convenience function to enable serialization with defaults
+ */
+export function enableSerialization<T extends Record<string, unknown>>() {
+  return withSerialization<T>({
+    includeMetadata: true,
+    preserveTypes: true,
+    handleCircular: true,
+  });
 }
 
 /**

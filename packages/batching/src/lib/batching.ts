@@ -6,7 +6,7 @@ import { isSignal, WritableSignal } from '@angular/core';
  * Configuration options for intelligent batching behavior.
  * Controls how updates are grouped and processed for optimal performance.
  */
-interface BatchingConfig {
+export interface BatchingConfig {
   /** Whether batching is enabled (default: true) */
   enabled?: boolean;
   /** Maximum number of updates per batch (default: 100) */
@@ -23,7 +23,7 @@ interface BatchingConfig {
  *
  * @template T - The state object type
  */
-interface BatchingSignalTree<T> extends SignalTree<T> {
+export interface BatchedSignalTree<T> extends SignalTree<T> {
   /**
    * Batches multiple state updates into a single change cycle for optimal performance.
    * Groups related updates to prevent UI thrashing and improve rendering efficiency.
@@ -46,6 +46,11 @@ interface BatchingSignalTree<T> extends SignalTree<T> {
    * Returns the number of pending updates in the batch queue
    */
   getBatchSize(): number;
+
+  /**
+   * Dispose of batching resources
+   */
+  disposeBatching(): void;
 }
 
 /**
@@ -63,7 +68,6 @@ interface BatchedUpdate {
 }
 
 // Global batching manager registry for testing
-// Use Map instead of WeakMap since we need to iterate
 const batchingManagers = new Map<SignalTree<unknown>, BatchingManager>();
 
 interface BatchingManager {
@@ -71,6 +75,7 @@ interface BatchingManager {
   getSize: () => number;
   hasPending: () => boolean;
   getQueue: () => BatchedUpdate[];
+  dispose: () => void;
 }
 
 /**
@@ -83,7 +88,6 @@ function applyPartialUpdate<T>(
   basePath = ''
 ): void {
   for (const [key, value] of Object.entries(update)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const target = (signals as any)[key];
     const currentPath = basePath ? `${basePath}.${key}` : key;
 
@@ -140,81 +144,14 @@ function applyPartialUpdate<T>(
       typeof value === 'object' &&
       value !== null
     ) {
-      applyPartialUpdate(target, value, addToQueue, currentPath);
+      applyPartialUpdate(
+        target,
+        value as Partial<any>,
+        addToQueue,
+        currentPath
+      );
     }
   }
-}
-
-/**
- * Creates a proxy wrapper that intercepts set/update methods for batching
- */
-function createBatchingProxy(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  target: any,
-  addToQueue: (update: BatchedUpdate) => void,
-  path = ''
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any {
-  // Cache for nested proxies
-  const proxyCache = new WeakMap();
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const createProxy = (obj: any, currentPath: string): any => {
-    if (!obj || typeof obj !== 'object') return obj;
-    if (isSignal(obj)) return obj;
-
-    // Check cache first
-    if (proxyCache.has(obj)) {
-      return proxyCache.get(obj);
-    }
-
-    const proxy = new Proxy(obj, {
-      get(target, prop) {
-        const value = target[prop];
-
-        // Intercept 'set' method on branch nodes
-        if (prop === 'set' && typeof value === 'function') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return function (update: any) {
-            addToQueue({
-              fn: () => value.call(target, update),
-              startTime: performance.now(),
-              depth: parsePath(currentPath).length,
-              path: currentPath,
-            });
-          };
-        }
-
-        // Intercept 'update' method on branch nodes
-        if (prop === 'update' && typeof value === 'function') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return function (updater: any) {
-            addToQueue({
-              fn: () => value.call(target, updater),
-              startTime: performance.now(),
-              depth: parsePath(currentPath).length,
-              path: currentPath,
-            });
-          };
-        }
-
-        // For nested objects, create nested proxies
-        if (value && typeof value === 'object' && !isSignal(value)) {
-          const nestedPath = currentPath
-            ? `${currentPath}.${String(prop)}`
-            : String(prop);
-          return createProxy(value, nestedPath);
-        }
-
-        return value;
-      },
-    });
-
-    proxyCache.set(obj, proxy);
-    return proxy;
-  };
-
-  return createProxy(target, path);
 }
 
 /**
@@ -225,9 +162,9 @@ function createBatchingProxy(
  * @param config - Configuration options for batching behavior
  * @returns Function that enhances a SignalTree with batching capabilities
  */
-export function withBatching<T>(
+export function withBatching<T extends Record<string, unknown>>(
   config: BatchingConfig = {}
-): (tree: SignalTree<T>) => BatchingSignalTree<T> {
+): (tree: SignalTree<T>) => BatchedSignalTree<T> {
   const {
     enabled = true,
     maxBatchSize = 100,
@@ -235,7 +172,7 @@ export function withBatching<T>(
     batchTimeoutMs = 100,
   } = config;
 
-  return (tree: SignalTree<T>): BatchingSignalTree<T> => {
+  return (tree: SignalTree<T>): BatchedSignalTree<T> => {
     if (!enabled) {
       // When disabled, provide pass-through implementations
       return {
@@ -250,6 +187,9 @@ export function withBatching<T>(
         },
         hasPendingBatch: () => false,
         getBatchSize: () => 0,
+        disposeBatching: () => {
+          // No-op when batching is disabled
+        },
       };
     }
 
@@ -258,28 +198,35 @@ export function withBatching<T>(
     let isProcessing = false;
     let flushTimeoutId: ReturnType<typeof setTimeout> | undefined;
     let batchStartTime: number | null = null;
+    let isDisposed = false;
 
     const scheduleFlush = () => {
+      if (isDisposed) return;
+
       if (flushTimeoutId !== undefined) {
         clearTimeout(flushTimeoutId);
       }
 
       // Use microtask for immediate flush when possible
       if (typeof queueMicrotask === 'function') {
-        queueMicrotask(() => flushUpdates());
+        queueMicrotask(() => {
+          if (!isDisposed) flushUpdates();
+        });
       } else {
-        Promise.resolve().then(() => flushUpdates());
+        Promise.resolve().then(() => {
+          if (!isDisposed) flushUpdates();
+        });
       }
 
       // Fallback timeout to ensure flush happens
       flushTimeoutId = setTimeout(() => {
         flushTimeoutId = undefined;
-        flushUpdates();
+        if (!isDisposed) flushUpdates();
       }, autoFlushDelay);
     };
 
     const flushUpdates = () => {
-      if (isProcessing || queue.length === 0) return;
+      if (isDisposed || isProcessing || queue.length === 0) return;
 
       isProcessing = true;
       const currentQueue = queue;
@@ -308,13 +255,15 @@ export function withBatching<T>(
         isProcessing = false;
 
         // Process any updates that were queued during flush
-        if (queue.length > 0) {
+        if (!isDisposed && queue.length > 0) {
           scheduleFlush();
         }
       }
     };
 
     const addToQueue = (update: BatchedUpdate) => {
+      if (isDisposed) return;
+
       // Start batch timer
       if (batchStartTime === null) {
         batchStartTime = performance.now();
@@ -336,34 +285,49 @@ export function withBatching<T>(
       }
     };
 
-    // Create the batching proxy for the state
-    const batchingProxy = createBatchingProxy(tree.$, addToQueue);
-
     // Create the batch manager
     const manager: BatchingManager = {
       flush: flushUpdates,
       getSize: () => queue.length,
       hasPending: () => queue.length > 0,
       getQueue: () => [...queue],
+      dispose: () => {
+        isDisposed = true;
+        if (flushTimeoutId !== undefined) {
+          clearTimeout(flushTimeoutId);
+          flushTimeoutId = undefined;
+        }
+        queue = [];
+        batchingManagers.delete(tree as SignalTree<unknown>);
+      },
     };
 
-    // Register the manager for testing (cast to unknown first)
+    // Register the manager for testing
     batchingManagers.set(tree as SignalTree<unknown>, manager);
 
-    // Create enhanced tree
-    const enhancedTree: BatchingSignalTree<T> = {
-      ...tree,
-      $: batchingProxy,
-      state: batchingProxy,
-      batchUpdate: (updater: (current: T) => Partial<T>) => {
-        const current = unwrap(tree.$);
-        const update = updater(current);
-        applyPartialUpdate(tree.$, update, addToQueue);
-      },
-      flushBatch: flushUpdates,
-      hasPendingBatch: () => queue.length > 0,
-      getBatchSize: () => queue.length,
+    // Create enhanced tree with proper v2.0 architecture methods
+    const enhancedTree = tree as BatchedSignalTree<T>;
+
+    // Add batchUpdate method directly to the $ property
+    (enhancedTree.$ as any).batchUpdate = (
+      updater: (current: T) => Partial<T>
+    ) => {
+      const current = unwrap(tree.$);
+      const update = updater(current);
+      applyPartialUpdate(tree.$, update, addToQueue);
     };
+
+    // Add batch methods to the tree itself
+    enhancedTree.batchUpdate = (updater: (current: T) => Partial<T>) => {
+      const current = unwrap(tree.$);
+      const update = updater(current);
+      applyPartialUpdate(tree.$, update, addToQueue);
+    };
+
+    enhancedTree.flushBatch = flushUpdates;
+    enhancedTree.hasPendingBatch = () => queue.length > 0;
+    enhancedTree.getBatchSize = () => queue.length;
+    enhancedTree.disposeBatching = () => manager.dispose();
 
     return enhancedTree;
   };
@@ -372,14 +336,16 @@ export function withBatching<T>(
 /**
  * Convenience function to enable batching with default settings.
  */
-export function enableBatching<T>() {
+export function enableBatching<T extends Record<string, unknown>>() {
   return withBatching<T>({ enabled: true });
 }
 
 /**
  * Creates high-performance batching configuration optimized for demanding applications.
  */
-export function withHighPerformanceBatching<T>() {
+export function withHighPerformanceBatching<
+  T extends Record<string, unknown>
+>() {
   return withBatching<T>({
     enabled: true,
     maxBatchSize: 200,
@@ -429,4 +395,14 @@ export function getPendingBatchedUpdates(): BatchedUpdate[] {
     allUpdates.push(...manager.getQueue());
   }
   return allUpdates;
+}
+
+/**
+ * Clears all batching managers (useful for test cleanup)
+ */
+export function clearAllBatchingManagers(): void {
+  for (const manager of batchingManagers.values()) {
+    manager.dispose();
+  }
+  batchingManagers.clear();
 }

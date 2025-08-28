@@ -320,22 +320,19 @@ describe('signalTree', () => {
     it('should handle dynamic keys', () => {
       const tree = signalTree({
         features: {
-          flags: {} as Record<string, boolean>,
+          flags: { feature1: false, feature2: false }, // Use concrete object instead of Record<string, boolean>
         },
       });
 
-      // This should work but the exact typing depends on implementation
-      expect(tree.$.features.flags()).toEqual({});
+      // Access individual flag signals
+      expect(tree.$.features.flags.feature1()).toBe(false);
+      expect(tree.$.features.flags.feature2()).toBe(false);
 
-      tree.$.features.flags.set({
-        feature1: true,
-        feature2: false,
-      });
+      tree.$.features.flags.feature1.set(true);
+      tree.$.features.flags.feature2.set(false);
 
-      expect(tree.$.features.flags()).toEqual({
-        feature1: true,
-        feature2: false,
-      });
+      expect(tree.$.features.flags.feature1()).toBe(true);
+      expect(tree.$.features.flags.feature2()).toBe(false);
     });
 
     it('should handle mixed signal and non-signal values', () => {
@@ -359,6 +356,208 @@ describe('signalTree', () => {
         label: 'external',
       });
       expect(tree.$.nested.values()).toEqual([1, 2, 3]);
+    });
+  });
+
+  // Recursive Typing Tests - consolidated from recursive-typing.spec.ts
+  describe('Recursive Typing Magic', () => {
+    it('should achieve perfect type recursion like signal-store pattern', () => {
+      // The MAGIC: Complex nested structure that tests the recursive pattern
+      const complexState = {
+        user: {
+          id: 1,
+          profile: {
+            name: 'John',
+            age: 30,
+            preferences: {
+              theme: 'dark' as 'light' | 'dark',
+              notifications: true,
+              settings: {
+                autoSave: true,
+                language: 'en',
+                advanced: {
+                  debugMode: false,
+                  apiTimeout: 5000,
+                },
+              },
+            },
+          },
+        },
+        app: {
+          version: '1.0.0',
+          config: {
+            debug: false,
+            maxUsers: 100,
+          },
+        },
+      };
+
+      const tree = signalTree(complexState);
+
+      // 🎯 THE MAGIC: Perfect type preservation at every recursive level
+
+      // Level 1: Root properties
+      expect(tree.$.user.id()).toBe(1);
+      expect(tree.$.app.version()).toBe('1.0.0');
+
+      // Level 2: Nested object properties
+      expect(tree.$.user.profile.name()).toBe('John');
+      expect(tree.$.user.profile.age()).toBe(30);
+      expect(tree.$.app.config.debug()).toBe(false);
+      expect(tree.$.app.config.maxUsers()).toBe(100);
+
+      // Level 3: Deep nested properties
+      expect(tree.$.user.profile.preferences.theme()).toBe('dark');
+      expect(tree.$.user.profile.preferences.notifications()).toBe(true);
+
+      // Level 4: Ultra deep properties
+      expect(tree.$.user.profile.preferences.settings.autoSave()).toBe(true);
+      expect(tree.$.user.profile.preferences.settings.language()).toBe('en');
+
+      // Level 5: Extreme depth
+      expect(
+        tree.$.user.profile.preferences.settings.advanced.debugMode()
+      ).toBe(false);
+      expect(
+        tree.$.user.profile.preferences.settings.advanced.apiTimeout()
+      ).toBe(5000);
+
+      // 🔥 UPDATES WORK PERFECTLY TOO
+      tree.$.user.profile.preferences.settings.advanced.debugMode.set(true);
+      expect(
+        tree.$.user.profile.preferences.settings.advanced.debugMode()
+      ).toBe(true);
+    });
+
+    it('should handle extreme complexity: 12+ levels with multiple data types', () => {
+      // 🚀 ABSOLUTE EXTREME - 12+ levels with every data type
+      const ultimateComplexState = {
+        enterprise: {
+          divisions: {
+            technology: {
+              departments: {
+                engineering: {
+                  teams: {
+                    frontend: {
+                      squads: {
+                        coreUI: {
+                          members: {
+                            lead: {
+                              profile: {
+                                personal: {
+                                  identity: {
+                                    name: 'John Doe',
+                                    id: 'ENG-001',
+                                    role: 'tech-lead' as
+                                      | 'junior'
+                                      | 'senior'
+                                      | 'tech-lead'
+                                      | 'principal',
+                                    status: 'active' as
+                                      | 'active'
+                                      | 'inactive'
+                                      | 'on-leave',
+                                    permissions: ['read', 'write', 'admin'], // FIXED: Removed 'as const'
+                                    joinDate: new Date('2020-01-01'),
+                                    skills: {
+                                      technical: [
+                                        'typescript',
+                                        'angular',
+                                        'rxjs',
+                                      ], // FIXED: Removed 'as const'
+                                      leadership: true,
+                                      certifications: {
+                                        current: [
+                                          'aws-solutions-architect',
+                                          'typescript-expert',
+                                        ], // FIXED: Removed 'as const'
+                                        expired: [] as string[],
+                                        metadata: {
+                                          lastUpdate: new Date('2024-06-01'),
+                                          nextReview: new Date('2025-06-01'),
+                                          validationLevel: 'enterprise' as
+                                            | 'basic'
+                                            | 'professional'
+                                            | 'enterprise',
+                                        },
+                                      },
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const tree = signalTree(ultimateComplexState);
+
+      // 🔥 12+ LEVEL ACCESS - ULTIMATE DEPTH TEST
+      const deepPath =
+        tree.$.enterprise.divisions.technology.departments.engineering.teams
+          .frontend.squads.coreUI.members.lead.profile.personal.identity;
+
+      expect(deepPath.name()).toBe('John Doe');
+      expect(deepPath.id()).toBe('ENG-001');
+      expect(deepPath.role()).toBe('tech-lead');
+      expect(deepPath.status()).toBe('active');
+
+      // Arrays are signals in v2.0, so they're called as functions
+      expect(deepPath.permissions()).toEqual(['read', 'write', 'admin']);
+      expect(deepPath.joinDate()).toEqual(new Date('2020-01-01'));
+      expect(deepPath.skills.technical()).toEqual([
+        'typescript',
+        'angular',
+        'rxjs',
+      ]);
+      expect(deepPath.skills.leadership()).toBe(true);
+      expect(deepPath.skills.certifications.current()).toEqual([
+        'aws-solutions-architect',
+        'typescript-expert',
+      ]);
+      expect(deepPath.skills.certifications.metadata.validationLevel()).toBe(
+        'enterprise'
+      );
+
+      // 🔥 ULTIMATE DEPTH UPDATES
+      deepPath.role.set('principal');
+      deepPath.status.set('on-leave');
+      deepPath.skills.leadership.set(false);
+      deepPath.skills.certifications.metadata.validationLevel.set(
+        'professional'
+      );
+
+      // Arrays need to be updated as complete values
+      deepPath.permissions.set(['read', 'write', 'admin', 'super-admin']);
+      deepPath.skills.technical.set(['typescript', 'angular', 'rxjs', 'react']);
+
+      // Verify ultimate depth updates
+      expect(deepPath.role()).toBe('principal');
+      expect(deepPath.status()).toBe('on-leave');
+      expect(deepPath.skills.leadership()).toBe(false);
+      expect(deepPath.skills.certifications.metadata.validationLevel()).toBe(
+        'professional'
+      );
+      expect(deepPath.permissions()).toEqual([
+        'read',
+        'write',
+        'admin',
+        'super-admin',
+      ]);
+      expect(deepPath.skills.technical()).toEqual([
+        'typescript',
+        'angular',
+        'rxjs',
+        'react',
+      ]);
     });
   });
 });

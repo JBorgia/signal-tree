@@ -4,39 +4,51 @@
  * MIT License
  */
 
-import { signal, WritableSignal, isSignal } from '@angular/core';
+import { signal, isSignal } from '@angular/core';
 import type { SignalTree, DeepSignalify } from './types';
 
 /**
  * Creates a reactive signal tree with the simplified v2.0 architecture.
- *
- * @template T - The state object type
- * @param initialState - The initial state object
- * @returns A SignalTree with reactive state and enhancer composition
+ * NO CONSTRAINTS for maximum type inference and flexibility.
  */
-export function signalTree<T extends Record<string, unknown>>(
-  initialState: T
-): SignalTree<T> {
+export function signalTree<T>(initialState: T): SignalTree<T> {
   // Create the deep signal structure
   const signalState = createDeepSignals(initialState);
+
+  // Enhanced with function that supports proper overloads
+  function withEnhancers(): SignalTree<T>;
+  function withEnhancers<R1>(enhancer1: (tree: SignalTree<T>) => R1): R1;
+  function withEnhancers<R1, R2>(
+    enhancer1: (tree: SignalTree<T>) => R1,
+    enhancer2: (tree: R1) => R2
+  ): R2;
+  function withEnhancers<R1, R2, R3>(
+    enhancer1: (tree: SignalTree<T>) => R1,
+    enhancer2: (tree: R1) => R2,
+    enhancer3: (tree: R2) => R3
+  ): R3;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function withEnhancers(...enhancers: Array<(tree: any) => any>): any {
+    if (enhancers.length === 0) return tree;
+
+    return enhancers.reduce((currentTree, enhancer) => {
+      return enhancer(currentTree);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }, tree as any);
+  }
 
   // Create the core tree structure
   const tree: SignalTree<T> = {
     $: signalState,
-    state: signalState, // Alias for backward compatibility
-
-    with<R>(...enhancers: Array<(tree: SignalTree<T>) => R>): R {
-      return enhancers.reduce((currentTree, enhancer) => {
-        return enhancer(currentTree as SignalTree<T>);
-      }, tree as unknown) as R;
-    },
+    state: signalState,
+    with: withEnhancers,
   };
 
   return tree;
 }
 
 /**
- * Creates deep signal structure with proper typing and methods
+ * Creates deep signal structure using v1.1.5 clean patterns with no constraints
  */
 function createDeepSignals<T>(obj: T): DeepSignalify<T> {
   if (obj === null || obj === undefined || typeof obj !== 'object') {
@@ -47,40 +59,21 @@ function createDeepSignals<T>(obj: T): DeepSignalify<T> {
     return signal(obj) as DeepSignalify<T>;
   }
 
-  // Create signals for each property
+  // Create signals for each property with clean typing
   const result = {} as Record<string, unknown>;
 
   for (const [key, value] of Object.entries(obj)) {
-    if (
+    // Never double-wrap signals
+    if (isSignal(value)) {
+      result[key] = value;
+    } else if (
       typeof value === 'object' &&
       value !== null &&
       !Array.isArray(value) &&
       !isBuiltInObject(value)
     ) {
       // Nested object - create recursive structure
-      const nestedSignals = createDeepSignals(value);
-      result[key] = nestedSignals;
-
-      // Add set and update methods as non-enumerable properties
-      Object.defineProperty(result[key], 'set', {
-        enumerable: false,
-        configurable: true,
-        value: function (partial: Partial<typeof value>) {
-          applyPartialUpdate(this, partial);
-        },
-      });
-
-      Object.defineProperty(result[key], 'update', {
-        enumerable: false,
-        configurable: true,
-        value: function (
-          updater: (current: typeof value) => Partial<typeof value>
-        ) {
-          const current = unwrapBranch(this);
-          const update = updater(current);
-          applyPartialUpdate(this, update);
-        },
-      });
+      result[key] = createDeepSignals(value);
     } else {
       // Leaf node - just a signal
       result[key] = signal(value);
@@ -88,65 +81,6 @@ function createDeepSignals<T>(obj: T): DeepSignalify<T> {
   }
 
   return result as DeepSignalify<T>;
-}
-
-/**
- * Helper to apply partial updates to nested signal structures
- */
-function applyPartialUpdate<T>(
-  target: Record<string, unknown>,
-  update: Partial<T>
-): void {
-  for (const [key, value] of Object.entries(
-    update as Record<string, unknown>
-  )) {
-    const targetProp = target[key];
-
-    if (isSignal(targetProp)) {
-      // It's a signal - update it
-      (targetProp as WritableSignal<unknown>).set(value);
-    } else if (
-      targetProp &&
-      typeof targetProp === 'object' &&
-      typeof value === 'object' &&
-      value !== null &&
-      !Array.isArray(value) &&
-      !isBuiltInObject(value)
-    ) {
-      // Nested object with set method - recursively update
-      if ('set' in targetProp && typeof targetProp.set === 'function') {
-        targetProp.set(value);
-      } else {
-        applyPartialUpdate(targetProp as Record<string, unknown>, value);
-      }
-    }
-  }
-}
-
-/**
- * Helper to unwrap a branch node to plain object (for update method)
- */
-function unwrapBranch<T>(branch: Record<string, unknown>): T {
-  const result = {} as Record<string, unknown>;
-
-  for (const key in branch) {
-    // Skip methods
-    if (key === 'set' || key === 'update') continue;
-    if (!Object.prototype.hasOwnProperty.call(branch, key)) continue;
-
-    const value = branch[key];
-
-    if (isSignal(value)) {
-      result[key] = value();
-    } else if (value && typeof value === 'object') {
-      // Nested branch - recurse
-      result[key] = unwrapBranch(value as Record<string, unknown>);
-    } else {
-      result[key] = value;
-    }
-  }
-
-  return result as T;
 }
 
 /**

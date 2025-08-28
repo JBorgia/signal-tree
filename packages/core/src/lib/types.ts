@@ -45,25 +45,37 @@ export type BuiltInObject =
   | File;
 
 /**
- * DeepSignalify type - recursively converts objects to signals
- * Methods (set/update) are added at runtime as non-enumerable properties
+ * Enhanced DeepSignalify with perfect type inference from v1.1.5
+ * Never double-wraps signals and properly handles functions and built-in objects
  */
-export type DeepSignalify<T> = {
-  [K in keyof T]: T[K] extends (infer U)[]
-    ? WritableSignal<U[]>
-    : T[K] extends object
-    ? T[K] extends Signal<unknown>
-      ? T[K] // Don't double-wrap signals
-      : T[K] extends BuiltInObject
-      ? WritableSignal<T[K]>
-      : T[K] extends (...args: unknown[]) => unknown
-      ? WritableSignal<T[K]>
-      : DeepSignalify<T[K]> // No methods in type - added at runtime
-    : WritableSignal<T[K]>;
-};
+export type DeepSignalify<T> = T extends Signal<unknown>
+  ? T // Never double-wrap signals
+  : T extends Primitive
+  ? WritableSignal<T>
+  : T extends BuiltInObject
+  ? WritableSignal<T> // Treat built-in objects as primitive values
+  : T extends readonly (infer U)[]
+  ? WritableSignal<U[]> // Handle readonly arrays
+  : T extends (infer U)[]
+  ? WritableSignal<U[]> // Handle mutable arrays
+  : T extends object
+  ? T extends (...args: unknown[]) => unknown // Functions should be wrapped as signals
+    ? WritableSignal<T>
+    : {
+        [K in keyof T]: T[K] extends (infer U)[]
+          ? WritableSignal<U[]>
+          : T[K] extends BuiltInObject
+          ? WritableSignal<T[K]>
+          : T[K] extends object
+          ? T[K] extends Signal<infer TK>
+            ? WritableSignal<TK>
+            : DeepSignalify<T[K]> // Recursive call preserves original type structure
+          : WritableSignal<T[K]>;
+      }
+  : WritableSignal<T>;
 
 /**
- * Minimal SignalTree with composable enhancers
+ * SignalTree type - NO CONSTRAINTS for maximum flexibility and type inference
  */
 export type SignalTree<T> = {
   /**
@@ -77,10 +89,21 @@ export type SignalTree<T> = {
   state: DeepSignalify<T>;
 
   /**
-   * Compose enhancers to add functionality
+   * Compose enhancers to add functionality with proper type inference
    */
+  with(): SignalTree<T>;
+  with<R1>(enhancer1: (tree: SignalTree<T>) => R1): R1;
+  with<R1, R2>(
+    enhancer1: (tree: SignalTree<T>) => R1,
+    enhancer2: (tree: R1) => R2
+  ): R2;
+  with<R1, R2, R3>(
+    enhancer1: (tree: SignalTree<T>) => R1,
+    enhancer2: (tree: R1) => R2,
+    enhancer3: (tree: R2) => R3
+  ): R3;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  with<R>(...enhancers: Array<(tree: any) => any>): R;
+  with(...enhancers: Array<(tree: any) => any>): any;
 };
 
 // ============================================
