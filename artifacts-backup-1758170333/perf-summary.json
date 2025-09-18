@@ -431,9 +431,7 @@
   "constraints": {
     "overheadBudgetPct": 25,
     "enforceClaims": false,
-    "violations": [
-      "package size budget failed"
-    ],
+    "violations": ["package size budget failed"],
     "pass": false
   }
 }
