@@ -1,23 +1,11 @@
-# Aggregate benchmark report
-Generated: 2025-09-17T21:49:17.325Z
+# Aggregate Benchmark Report
 
-## Summary
-Libraries found: SignalTree
+## deep-nested
 
-## Per-scenario table
-### deep-nested
+- mode=full n=1900 p50=4.200 mean=3.246
+- mode=light n=1900 p50=4.100 mean=3.222
+- mode=off n=1900 p50=4.200 mean=3.299
 
-| Library | median (ms) | p95 (ms) | ops/s | samples | manyZeros | quantized | highVariance | Rank |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| SignalTree | 0.10000002384185791 | 0.20000004768371582 | 10000 | 100 | no | YES | no | 🏆 |
+**Compare light vs full:** n1=1900 n2=1900 p=5.525e-1 z=-0.594 delta=-0.011 magnitude=negligible
 
-**Flags**:
-- SignalTree: quantized low samples
 
-**Recommendation**: For scenarios flagged with many zeros / quantized: increase per-sample work, set the enhanced runner (longer minDuration), or rerun with aggregation mode to avoid timer quantization.
-
-### large-array
-
-| Library | median (ms) | p95 (ms) | ops/s | samples | manyZeros | quantized | highVariance | Rank |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| SignalTree | 1.4000000953674316 | 1.600000023841858 | 714 | 100 | no | no | no | 🏆 |
