@@ -32,7 +32,8 @@
       "@signaltree/serialization": ["packages/serialization/src/index.ts"],
       "@signaltree/shared": ["packages/shared/src/index.ts"],
       "@signaltree/shared/*": ["packages/shared/src/*"],
-      "@signaltree/time-travel": ["packages/time-travel/src/index.ts"]
+      "@signaltree/time-travel": ["packages/time-travel/src/index.ts"],
+      "@signaltree/core/enhancers/*": ["packages/core/enhancers/*/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

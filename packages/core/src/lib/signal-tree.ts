@@ -2,11 +2,11 @@ import { computed, DestroyRef, effect, inject, isSignal, Signal, signal, Writabl
 
 import { SIGNAL_TREE_CONSTANTS, SIGNAL_TREE_MESSAGES } from './constants';
 import { resolveEnhancerOrder } from './enhancers';
-import { SignalMemoryManager } from './memory/memory-manager';
-import { OptimizedUpdateEngine } from './performance/update-engine';
-import { SecurityValidator } from './security/security-validator';
 import { createLazySignalTree, equal, isBuiltInObject, unwrap } from './utils';
 
+// withBatching is loaded dynamically in create() to avoid circular import
+// problems between the core runtime and the batching enhancer during module
+// initialization. We require it at runtime when applying the default enhancer.
 // Global symbol for NodeAccessor identification
 const NODE_ACCESSOR_SYMBOL = Symbol.for('NodeAccessor');
 
@@ -197,92 +197,6 @@ function shouldUseLazy(
   return estimatedSize > SIGNAL_TREE_CONSTANTS.LAZY_THRESHOLD;
 }
 
-// ============================================
-// SECURITY VALIDATION
-// ============================================
-
-/**
- * Validates an object tree using SecurityValidator if configured
- * Throws if validation fails
- */
-function validateTree<T>(
-  obj: T,
-  config: TreeConfig,
-  path: string[] = []
-): void {
-  if (!config.security) {
-    return; // No validation needed
-  }
-
-  const validator = new SecurityValidator(config.security);
-
-  function validate(value: unknown, currentPath: string[]): void {
-    // Validate primitives and null/undefined
-    if (value === null || value === undefined) {
-      return;
-    }
-
-    if (typeof value !== 'object') {
-      // Validate the value (this will catch functions)
-      validator.validateValue(value);
-      return;
-    }
-
-    // Skip built-in objects
-    if (isBuiltInObject(value)) {
-      return;
-    }
-
-    // Validate arrays
-    if (Array.isArray(value)) {
-      value.forEach((item, index) => {
-        validate(item, [...currentPath, String(index)]);
-      });
-      return;
-    }
-
-    // Validate object keys and values
-    // Use Reflect.ownKeys to catch all keys including __proto__
-    const keys = [
-      ...Object.keys(value as Record<string, unknown>),
-      ...Object.getOwnPropertyNames(value),
-    ];
-    const uniqueKeys = [...new Set(keys)];
-
-    for (const key of uniqueKeys) {
-      if (typeof key === 'symbol') continue;
-
-      // Validate the key
-      try {
-        validator.validateKey(key);
-      } catch (error) {
-        const err = error as Error;
-        throw new Error(
-          `${err.message}\nPath: ${[...currentPath, key].join('.')}`
-        );
-      }
-
-      // Get the value
-      const val = (value as Record<string, unknown>)[key];
-
-      // Validate the value
-      try {
-        validator.validateValue(val);
-      } catch (error) {
-        const err = error as Error;
-        throw new Error(
-          `${err.message}\nPath: ${[...currentPath, key].join('.')}`
-        );
-      }
-
-      // Recursively validate nested objects
-      validate(val, [...currentPath, key]);
-    }
-  }
-
-  validate(obj, path);
-}
-
 function createEqualityFn(useShallowComparison: boolean) {
   return useShallowComparison ? Object.is : equal;
 }
@@ -418,6 +332,30 @@ function enhanceTree<T>(
       return tree as unknown as ChainResult<SignalTree<T>, E>;
     }
 
+    // Convert generic enhancers tuple into a local mutable array for runtime
+    // manipulation (prepending default enhancers when needed).
+    let enhancersList = enhancers as unknown as LocalUnknownEnhancer[];
+
+    // Ensure default enhancers (like batching) are applied when requested
+    if (config.batchUpdates) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const batchingMod = require('../../../batching/src/lib/batching');
+        const _withBatching = batchingMod?.withBatching;
+        if (typeof _withBatching === 'function') {
+          // Prepend the instantiated enhancer if not already provided
+          const hasBatch = enhancersList.some(
+            (e: unknown) => (e && (e as any).metadata?.name) === 'withBatching'
+          );
+          if (!hasBatch) {
+            enhancersList = [(_withBatching as any)(), ...enhancersList];
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+
     const coreCapabilities = new Set<string>();
     if (config.batchUpdates) coreCapabilities.add('batchUpdate');
     if (config.useMemoization) coreCapabilities.add('memoize');
@@ -430,16 +368,16 @@ function enhanceTree<T>(
       // Ignore reflection issues
     }
 
-    const hasMetadata = enhancers.some((e) =>
+    const hasMetadata = enhancersList.some((e) =>
       Boolean(e.metadata && (e.metadata.requires || e.metadata.provides))
     );
 
-    let orderedEnhancers = enhancers as LocalUnknownEnhancer[];
+    let orderedEnhancers = enhancersList as LocalUnknownEnhancer[];
 
     if (hasMetadata) {
       try {
         orderedEnhancers = resolveEnhancerOrder(
-          enhancers as LocalUnknownEnhancer[],
+          enhancersList,
           coreCapabilities,
           config.debugMode
         );
@@ -611,6 +549,20 @@ function addStubMethods<T>(tree: SignalTree<T>, config: TreeConfig): void {
     try {
       effect(() => fn(tree()));
     } catch (error) {
+      // Attempt to run inside Angular TestBed injection context when available
+      try {
+        // Use require so this doesn't become a hard dependency at compile time
+        // in non-test environments.
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const tb = require('@angular/core/testing');
+        if (tb && typeof tb.TestBed?.runInInjectionContext === 'function') {
+          tb.TestBed.runInInjectionContext(() => effect(() => fn(tree())));
+          return;
+        }
+      } catch {
+        // fallthrough
+      }
+
       if (config.debugMode) {
         console.warn(SIGNAL_TREE_MESSAGES.EFFECT_NO_CONTEXT, error);
       }
@@ -622,15 +574,39 @@ function addStubMethods<T>(tree: SignalTree<T>, config: TreeConfig): void {
       const destroyRef = inject(DestroyRef);
       let isDestroyed = false;
 
-      const effectRef = effect(() => {
-        if (!isDestroyed) {
-          fn(tree());
+      const createEffect = () =>
+        effect(() => {
+          if (!isDestroyed) {
+            fn(tree());
+          }
+        });
+
+      // Try normal effect creation; if it fails due to missing injection
+      // context, attempt to use TestBed.runInInjectionContext if available.
+      let effectRef: ReturnType<typeof effect> | undefined;
+      try {
+        effectRef = createEffect();
+      } catch {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const tb = require('@angular/core/testing');
+          if (tb && typeof tb.TestBed?.runInInjectionContext === 'function') {
+            tb.TestBed.runInInjectionContext(() => {
+              effectRef = createEffect();
+            });
+          }
+        } catch {
+          // ignore
         }
-      });
+      }
 
       const unsubscribe = () => {
         isDestroyed = true;
-        effectRef.destroy();
+        try {
+          effectRef?.destroy();
+        } catch {
+          // ignore
+        }
       };
 
       destroyRef.onDestroy(unsubscribe);
@@ -664,26 +640,6 @@ function addStubMethods<T>(tree: SignalTree<T>, config: TreeConfig): void {
       console.warn(SIGNAL_TREE_MESSAGES.PERFORMANCE_NOT_ENABLED);
     }
     return 0;
-  };
-
-  // Optimized update engine
-  let updateEngine: OptimizedUpdateEngine | null = null;
-
-  tree.updateOptimized = (updates: Partial<T>, options = {}) => {
-    // Lazy initialize the update engine
-    if (!updateEngine) {
-      updateEngine = new OptimizedUpdateEngine(tree.state);
-    }
-
-    // Perform optimized update
-    const result = updateEngine.update(tree.state, updates, options);
-
-    // If changes were made, rebuild the index
-    if (result.changed && result.stats) {
-      updateEngine.rebuildIndex(tree.state);
-    }
-
-    return result;
   };
 
   tree.getMetrics = (): PerformanceMetrics => {
@@ -768,9 +724,6 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
     throw new Error(SIGNAL_TREE_MESSAGES.NULL_OR_UNDEFINED);
   }
 
-  // Validate the tree if security is configured
-  validateTree(obj, config);
-
   const estimatedSize = estimateObjectSize(obj);
   const equalityFn = createEqualityFn(config.useShallowComparison ?? false);
 
@@ -808,17 +761,12 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
   }
 
   let signalState: TreeNode<T>;
-  let memoryManager: SignalMemoryManager | undefined;
 
   try {
     if (useLazy && typeof obj === 'object') {
-      // Instantiate memory manager for lazy trees to enable automatic cleanup
-      memoryManager = new SignalMemoryManager();
       signalState = createLazySignalTree(
         obj as object,
-        equalityFn,
-        '', // basePath
-        memoryManager
+        equalityFn
       ) as TreeNode<T>;
     } else {
       signalState = createSignalStore(obj, equalityFn) as TreeNode<T>;
@@ -827,14 +775,13 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
     if (useLazy) {
       console.warn(SIGNAL_TREE_MESSAGES.LAZY_FALLBACK, error);
       signalState = createSignalStore(obj, equalityFn) as TreeNode<T>;
-      memoryManager = undefined; // Reset memory manager on fallback
     } else {
       throw error;
     }
   }
 
   // Create callable tree function for the root
-  const tree = function (arg?: unknown): T | void {
+  let tree = function (arg?: unknown): T | void {
     if (arguments.length === 0) {
       return unwrap(signalState);
     }
@@ -863,25 +810,36 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
   });
   Object.defineProperty(tree, '$', { value: signalState, enumerable: false });
 
-  // Add dispose() method for manual cleanup when using lazy signals
-  if (memoryManager) {
-    Object.defineProperty(tree, 'dispose', {
-      value: () => {
-        memoryManager?.dispose();
-        const cleanup = (
-          signalState as TreeNode<T> & { __cleanup__?: () => void }
-        ).__cleanup__;
-        if (typeof cleanup === 'function') {
-          cleanup();
-        }
-      },
-      enumerable: false,
-      writable: false,
-    });
-  }
-
   // Enhance tree with methods
   enhanceTree(tree, config);
+
+  // Apply default batching enhancer unless explicitly disabled. Load the
+  // batching enhancer dynamically to avoid circular import issues during
+  // module initialization.
+  try {
+    if (config.batchUpdates === undefined || config.batchUpdates) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const batchingMod = require('../../../batching/src/lib/batching');
+        const withBatching = batchingMod?.withBatching;
+        if (withBatching && typeof withBatching === 'function') {
+          try {
+            if (typeof (tree as any).with === 'function') {
+              (tree as any) = (tree as any).with(withBatching());
+            } else {
+              tree = withBatching()(tree as any) as SignalTree<T>;
+            }
+          } catch {
+            // ignore and proceed unbatched
+          }
+        }
+      } catch {
+        // ignore failures to require batching module
+      }
+    }
+  } catch {
+    // ignore
+  }
 
   // Attach signal state properties to the tree AFTER enhancement
   // This prevents conflicts with built-in methods

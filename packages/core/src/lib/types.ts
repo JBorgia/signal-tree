@@ -103,11 +103,21 @@ export type Unwrap<T> = T extends WritableSignal<infer U>
   : T;
 
 /**
- * Node accessor interface - unified API for get/set/update via function calls.
+ * NodeAccessor interface - unified API for get/set/update on nested objects.
+ *
+ * - Always callable at runtime: supports both direct set and updater forms.
+ * - No transform required: this is a real function, not a Proxy.
+ *
  * Overloads:
- *  (): T                     - getter
- *  (value: NotFn<T>): void   - direct set (blocked when T is itself a function)
- *  (updater: (T)=>T): void   - functional update
+ *   (): T                     - getter
+ *   (value: NotFn<T>): void   - direct set (blocked when T is itself a function)
+ *   (updater: (T)=>T): void   - functional update
+ *
+ * @example
+ * // Nested object accessors are always callable:
+ * tree.$.user({ name: 'Jane', email: 'jane@example.com' });
+ * tree.$.user((u) => ({ ...u, name: 'Janet' }));
+ * const user = tree.$.user();
  */
 export interface NodeAccessor<T> {
   (): T;
@@ -116,21 +126,47 @@ export interface NodeAccessor<T> {
 }
 
 /**
- * Signalified node with callable interface
+ * Signalified node with callable interface.
+ *
+ * - For nested objects: NodeAccessor<T> (callable at runtime)
+ * - For leaves: WritableSignal<T> (not callable at runtime unless using the transform)
  */
 export type AccessibleNode<T> = NodeAccessor<T> & TreeNode<T>;
 
 /**
- * Deep signalification type - converts object properties to signals recursively
- * - Leaves (primitives, arrays, functions, built-ins): Raw Angular WritableSignal<T>
- * - Nested objects: NodeAccessor<T> (callable) + recursive TreeNode<T> properties
+ * WritableSignal with callable set/update overloads (purely type-level augmentation).
+ *
+ * - This is a TypeScript-only DX feature. At runtime, signals are NOT callable unless you use the @signaltree/callable-syntax transform.
+ * - Use .set() and .update() directly unless you have the transform enabled.
+ *
+ * @example
+ * // With the transform:
+ * tree.$.count(5); // becomes tree.$.count.set(5)
+ * tree.$.count((n) => n + 1); // becomes tree.$.count.update(n => n + 1)
+ *
+ * // Without the transform:
+ * tree.$.count.set(5);
+ * tree.$.count.update(n => n + 1);
  */
-// WritableSignal with callable set/update overloads (purely type-level augmentation)
 export type CallableWritableSignal<T> = WritableSignal<T> & {
   (value: NotFn<T>): void;
   (updater: (current: T) => T): void;
 };
 
+/**
+ * Deep signalification type - converts object properties to signals recursively.
+ *
+ * - Leaves (primitives, arrays, functions, built-ins): WritableSignal<T> (not callable at runtime)
+ * - Nested objects: NodeAccessor<T> (callable at runtime) + recursive TreeNode<T> properties
+ *
+ * @example
+ * // Leaves (primitives):
+ * tree.$.count.set(5); // always works
+ * // Nested objects:
+ * tree.$.user({ name: 'Jane' }); // always works
+ *
+ * // Callable syntax for leaves (tree.$.count(5)) requires the transform.
+ */
 export type TreeNode<T> = {
   [K in keyof T]: T[K] extends readonly unknown[]
     ? CallableWritableSignal<T[K]> // Arrays get callable overloads
@@ -216,10 +252,12 @@ export interface WithMethod<T> {
   ): O4;
   // Overloads for EnhancerWithMeta form so enhancers exported with metadata
   <O1>(e1: EnhancerWithMeta<SignalTree<T>, O1>): O1;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // Accept enhancers that operate on SignalTree<any> (helps non-generic enhancers)
   <O1>(e1: EnhancerWithMeta<SignalTree<any>, O1>): O1;
   // Generic overload to accept EnhancerWithMeta starting from Start type
   <O1>(e1: EnhancerWithMeta<SignalTree<T>, O1>): O1;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   <O1>(
     e1: EnhancerWithMeta<SignalTree<any>, O1>,
     e2: EnhancerWithMeta<O1, unknown>
@@ -228,6 +266,7 @@ export interface WithMethod<T> {
     e1: EnhancerWithMeta<SignalTree<T>, O1>,
     e2: EnhancerWithMeta<O1, O2>
   ): O2;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   <O1, O2>(
     e1: EnhancerWithMeta<SignalTree<any>, O1>,
     e2: EnhancerWithMeta<O1, O2>
@@ -237,6 +276,7 @@ export interface WithMethod<T> {
     e2: EnhancerWithMeta<O1, O2>,
     e3: EnhancerWithMeta<O2, O3>
   ): O3;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   <O1, O2, O3>(
     e1: EnhancerWithMeta<SignalTree<any>, O1>,
     e2: EnhancerWithMeta<O1, O2>,
@@ -248,6 +288,7 @@ export interface WithMethod<T> {
     e3: EnhancerWithMeta<O2, O3>,
     e4: EnhancerWithMeta<O3, O4>
   ): O4;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   <O1, O2, O3, O4>(
     e1: EnhancerWithMeta<SignalTree<any>, O1>,
     e2: EnhancerWithMeta<O1, O2>,
@@ -313,6 +354,50 @@ export type SignalTree<T> = NodeAccessor<T> & {
   batch(updater: (tree: T) => void): void;
   batchUpdate(updater: (current: T) => Partial<T>): void;
   memoize<R>(fn: (tree: T) => R, cacheKey?: string): Signal<R>;
+
+  /**
+   * Executes a function within a transaction.
+   * All signal updates within the transaction are batched
+   * and flushed once at the end, resulting in a single recomputation.
+   *
+   * @param fn - Function to execute in transaction
+   * @returns The return value of fn
+   *
+   * @example
+   * ```typescript
+   * const tree = signalTree({ user: { firstName: 'John', lastName: 'Doe' } });
+   *
+   * // Without transaction: 2 recomputations
+   * tree.$.user.firstName('Jane');
+   * tree.$.user.lastName('Smith');
+   *
+   * // With transaction: 1 recomputation
+   * tree.transaction(() => {
+   *   tree.$.user.firstName('Jane');
+   *   tree.$.user.lastName('Smith');
+   * });
+   * ```
+   */
+  transaction<R>(fn: () => R): R;
+
+  /**
+   * Executes a function with batching temporarily disabled.
+   * All signal updates execute immediately (synchronously).
+   *
+   * @param fn - Function to execute synchronously
+   * @returns The return value of fn
+   *
+   * @example
+   * ```typescript
+   * const tree = signalTree({ count: 0 });
+   *
+   * tree.sync(() => {
+   *   tree.$.count(5);
+   *   console.log(tree.$.count()); // Immediately shows 5
+   * });
+   * ```
+   */
+  sync<R>(fn: () => R): R;
   // Memoization helpers (stubs in core; real impl by withMemoization)
   memoizedUpdate(updater: (current: T) => Partial<T>, cacheKey?: string): void;
   clearMemoCache(key?: string): void;

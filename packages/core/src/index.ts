@@ -102,9 +102,7 @@ export {
   SignalMemoryManager,
   type MemoryStats,
   type MemoryManagerConfig,
-} from './lib/memory/memory-manager';
-
-// ============================================
+} from './lib/memory/memory-manager'; // ============================================
 // ENHANCER EXPORTS
 // ============================================
 

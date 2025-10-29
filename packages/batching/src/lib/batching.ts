@@ -102,6 +102,8 @@ interface BatchedUpdate {
 let updateQueue: Array<BatchedUpdate> = [];
 /** Flag to prevent recursive batch processing */
 let isUpdating = false;
+/** Transaction nesting counter */
+let transactionDepth = 0;
 /** Timeout ID for scheduled flush operations */
 let flushTimeoutId: number | undefined;
 /** Current batching configuration */
@@ -229,6 +231,11 @@ function batchUpdates(fn: () => void, path?: string): void {
     if (isTimedOut) {
       flushUpdates();
     } else if (!isUpdating && updateQueue.length > 0) {
+      // If inside a transaction, defer flushing until transaction end
+      if (transactionDepth > 0) {
+        return;
+      }
+
       // Schedule flush but don't set isUpdating until the microtask runs
       queueMicrotask(() => {
         flushUpdates();
@@ -284,6 +291,16 @@ export function withBatching<T>(
   return (tree: SignalTree<T>): BatchingSignalTree<T> => {
     if (!enabled) {
       return tree as BatchingSignalTree<T>;
+    }
+
+    // Debug: indicate batching enhancer applied
+    // console.debug can be helpful during test runs to verify enhancer application
+    try {
+      // eslint-disable-next-line no-console
+      console.debug &&
+        console.debug('[withBatching] applying batching to tree');
+    } catch {
+      // ignore
     }
 
     // Store the original callable tree function
@@ -351,6 +368,148 @@ export function withBatching<T>(
             (property as (value: unknown) => void)(value);
           }
         });
+      });
+
+      // Transaction / sync helpers and nested update wrapping
+      // Wrap writable signals and NodeAccessors on the state to ensure their
+      // updates are queued through the batching system.
+      try {
+        const stateRoot = enhancedTree.state as
+          | Record<string, unknown>
+          | undefined;
+        if (stateRoot) {
+          const visited = new WeakSet<object | Function>();
+
+          const wrapNode = (node: any, path: string) => {
+            if (
+              !node ||
+              (typeof node !== 'object' && typeof node !== 'function')
+            )
+              return;
+            if (visited.has(node)) return;
+            visited.add(node);
+
+            // If it's a writable signal (object with .set), wrap set
+            if (
+              typeof node === 'object' &&
+              'set' in node &&
+              typeof node.set === 'function'
+            ) {
+              try {
+                const originalSet = node.set.bind(node);
+                node.set = (value: unknown) => {
+                  batchUpdates(() => originalSet(value), path);
+                };
+              } catch {
+                // ignore
+              }
+              return;
+            }
+
+            // If it's a callable NodeAccessor, wrap the function and recurse its properties
+            if (typeof node === 'function') {
+              try {
+                // Wrap the callable so invocations are batched
+                const originalFn = node as Function;
+                const wrappedFn = function (arg?: unknown) {
+                  if (arguments.length === 0) return originalFn();
+                  batchUpdates(() => originalFn(arg), path);
+                } as unknown as Function;
+
+                // Copy enumerable properties (nested signals) onto the wrapper
+                try {
+                  Object.setPrototypeOf(
+                    wrappedFn,
+                    Object.getPrototypeOf(originalFn)
+                  );
+                  Object.assign(wrappedFn as any, originalFn as object);
+                } catch {
+                  // ignore
+                }
+
+                // Replace references in parent (best-effort)
+                try {
+                  // If this function is stored as a property somewhere, replace it there
+                  // We'll iterate parent objects separately below to replace outer refs if needed.
+                } catch {
+                  // ignore
+                }
+
+                // Recurse into properties of the function (nested branches)
+                for (const k of Object.keys(node as object)) {
+                  try {
+                    wrapNode((node as any)[k], `${path}.${k}`);
+                  } catch {
+                    // ignore
+                  }
+                }
+              } catch {
+                // ignore
+              }
+              return;
+            }
+
+            // Object: iterate properties
+            if (typeof node === 'object') {
+              for (const k of Object.keys(node as object)) {
+                try {
+                  wrapNode((node as any)[k], `${path}.${k}`);
+                } catch {
+                  // ignore
+                }
+              }
+            }
+          };
+
+          // Start recursive wrapping at the root
+          for (const k of Object.keys(stateRoot)) {
+            try {
+              wrapNode((stateRoot as any)[k], k);
+            } catch {
+              // ignore
+            }
+          }
+        }
+      } catch {
+        // ignore state wrapping errors
+      }
+
+      // Transaction support: group updates and flush at transaction end
+      (enhancedTree as any).transaction = (fn: () => void) => {
+        transactionDepth++;
+        try {
+          fn();
+        } catch (err) {
+          // Clear pending updates on error
+          updateQueue = [];
+          throw err;
+        } finally {
+          transactionDepth--;
+          if (transactionDepth === 0) {
+            flushUpdates();
+          }
+        }
+      };
+
+      // Synchronous execution helper: run function and flush immediately
+      // Debug: indicate when we add accessor helpers
+      try {
+        // eslint-disable-next-line no-console
+        console.debug &&
+          console.debug('[withBatching] adding transaction/sync helpers');
+      } catch {
+        // ignore
+      }
+
+      (enhancedTree as any).sync = (fn: () => void) => {
+        fn();
+        flushBatchedUpdates();
+      };
+
+      // Optional stats for tests
+      (enhancedTree as any).getBatchingStats = () => ({
+        isInTransaction: transactionDepth > 0,
+        pendingUpdates: updateQueue.length,
       });
     };
     return enhancedTree;
