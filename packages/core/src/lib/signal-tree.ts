@@ -1,14 +1,18 @@
 import { computed, DestroyRef, effect, inject, isSignal, Signal, signal, WritableSignal } from '@angular/core';
 
+import { BatchingEngine } from './batching/batching-engine';
 import { SIGNAL_TREE_CONSTANTS, SIGNAL_TREE_MESSAGES } from './constants';
 import { resolveEnhancerOrder } from './enhancers';
+import { ErrorType, MinimalErrorHandler } from './errors/minimal-error-handler';
 import { SignalMemoryManager } from './memory/memory-manager';
-import { OptimizedUpdateEngine } from './performance/update-engine';
 import { SecurityValidator } from './security/security-validator';
 import { createLazySignalTree, equal, isBuiltInObject, unwrap } from './utils';
 
 // Global symbol for NodeAccessor identification
 const NODE_ACCESSOR_SYMBOL = Symbol.for('NodeAccessor');
+
+// Global batching engine - disabled by default, enabled via config or transaction()
+const globalBatcher = new BatchingEngine();
 
 import type {
   SignalTree,
@@ -75,9 +79,9 @@ function makeRootNodeAccessor<T>(
 
     if (typeof arg === 'function') {
       const updater = arg as (current: T) => T;
-      writeSignal.set(updater(readSignal()));
+      globalBatcher.queueUpdate(writeSignal, updater(readSignal()));
     } else {
-      writeSignal.set(arg as T);
+      globalBatcher.queueUpdate(writeSignal, arg as T);
     }
   } as NodeAccessor<T>;
 
@@ -116,7 +120,11 @@ function recursiveUpdate(target: unknown, updates: unknown): void {
     if (isSignal(targetProp)) {
       // Leaf signal - check if it's writable
       if ('set' in targetProp && typeof targetProp.set === 'function') {
-        (targetProp as WritableSignal<unknown>).set(updateValue);
+        // Use batching engine to queue updates
+        globalBatcher.queueUpdate(
+          targetProp as WritableSignal<unknown>,
+          updateValue
+        );
       }
     } else if (isNodeAccessor(targetProp)) {
       // For nested objects, check if updateValue is an object for recursive update
@@ -214,6 +222,8 @@ function validateTree<T>(
     return; // No validation needed
   }
 
+  // Dynamic import for tree-shaking (only bundled if security config is used)
+  const { SecurityValidator } = require('./security/security-validator');
   const validator = new SecurityValidator(config.security);
 
   function validate(value: unknown, currentPath: string[]): void {
@@ -355,8 +365,19 @@ function createSignalStore<T>(
                   enumerable: true,
                   configurable: true,
                 });
-              } catch {
-                // Skip if property can't be defined
+              } catch (error) {
+                // Log and attempt recovery with direct assignment
+                MinimalErrorHandler.handle({
+                  type: ErrorType.PROPERTY_DEFINITION_FAILED,
+                  message: `Failed to define property "${String(branchKey)}"`,
+                  path: `${key}.${String(branchKey)}`,
+                  context: {
+                    target: callableBranch,
+                    key: branchKey,
+                    value: (branch as Record<string, unknown>)[branchKey],
+                    originalError: error,
+                  },
+                });
               }
             }
           }
@@ -554,6 +575,15 @@ function addStubMethods<T>(tree: SignalTree<T>, config: TreeConfig): void {
     return computed(() => fn(tree()));
   };
 
+  // Batching API - always available
+  tree.transaction = <R>(fn: () => R): R => {
+    return globalBatcher.transaction(fn);
+  };
+
+  tree.sync = <R>(fn: () => R): R => {
+    return globalBatcher.sync(fn);
+  };
+
   // Memoization helper stubs (overridden by withMemoization)
   (
     tree as unknown as {
@@ -664,26 +694,6 @@ function addStubMethods<T>(tree: SignalTree<T>, config: TreeConfig): void {
       console.warn(SIGNAL_TREE_MESSAGES.PERFORMANCE_NOT_ENABLED);
     }
     return 0;
-  };
-
-  // Optimized update engine
-  let updateEngine: OptimizedUpdateEngine | null = null;
-
-  tree.updateOptimized = (updates: Partial<T>, options = {}) => {
-    // Lazy initialize the update engine
-    if (!updateEngine) {
-      updateEngine = new OptimizedUpdateEngine(tree.state);
-    }
-
-    // Perform optimized update
-    const result = updateEngine.update(tree.state, updates, options);
-
-    // If changes were made, rebuild the index
-    if (result.changed && result.stats) {
-      updateEngine.rebuildIndex(tree.state);
-    }
-
-    return result;
   };
 
   tree.getMetrics = (): PerformanceMetrics => {
@@ -813,6 +823,8 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
   try {
     if (useLazy && typeof obj === 'object') {
       // Instantiate memory manager for lazy trees to enable automatic cleanup
+      // Dynamic import for tree-shaking (only bundled if lazy mode is used)
+      const { SignalMemoryManager } = require('./memory/memory-manager');
       memoryManager = new SignalMemoryManager();
       signalState = createLazySignalTree(
         obj as object,
@@ -883,6 +895,11 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
   // Enhance tree with methods
   enhanceTree(tree, config);
 
+  // Enable batching if configured
+  if (config.batchUpdates) {
+    globalBatcher.isBatchingEnabled = true;
+  }
+
   // Attach signal state properties to the tree AFTER enhancement
   // This prevents conflicts with built-in methods
   for (const key in signalState) {
@@ -895,8 +912,19 @@ function create<T>(obj: T, config: TreeConfig = {}): SignalTree<T> {
             enumerable: true,
             configurable: true,
           });
-        } catch {
-          // Skip if property can't be defined
+        } catch (error) {
+          // Log and attempt recovery with direct assignment
+          MinimalErrorHandler.handle({
+            type: ErrorType.PROPERTY_DEFINITION_FAILED,
+            message: `Failed to attach property "${key}" to tree`,
+            path: key,
+            context: {
+              target: tree,
+              key,
+              value: (signalState as Record<string, unknown>)[key],
+              originalError: error,
+            },
+          });
         }
       }
     }

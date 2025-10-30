@@ -1,8 +1,4 @@
-import {
-  SecurityValidator,
-  SecurityPresets,
-  type SecurityEvent,
-} from './security-validator';
+import { SecurityEvent, SecurityPresets, SecurityValidator, type } from './security-validator';
 
 describe('SecurityValidator', () => {
   describe('Prototype Pollution Prevention', () => {
