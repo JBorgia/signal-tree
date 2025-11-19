@@ -1,18 +1,24 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
+    "baseUrl": "../..",
+    "outDir": "../../dist/packages/enterprise/dist",
+    "declarationDir": "../../dist/packages/enterprise/dist",
     "declaration": true,
+    "declarationMap": true,
+    "inlineSources": false,
+    "module": "ESNext",
     "types": ["node"],
-    "typeRoots": [
-      "./src/types",
-      "../../node_modules/@types"
-    ],
     "paths": {
-      "@signaltree/core": ["../../packages/core/src/index.ts"],
-      "@signaltree/core/*": ["../../packages/core/src/*"]
+      "@signaltree/core": ["packages/core/src/index.ts"],
+      "@signaltree/core/*": ["packages/core/src/*"]
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
+  "references": [
+    {
+      "path": "../core/tsconfig.lib.json"
+    }
+  ]
 }
