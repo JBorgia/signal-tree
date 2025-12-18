@@ -471,6 +471,7 @@ export interface EntityConfig<E, K extends string | number = string> {
  * Runtime marker for entity collections
  */
 export interface EntityMapMarker<E, K extends string | number> {
+  readonly __isEntityMap: true;
   readonly __entityType?: E;
   readonly __keyType?: K;
 }
@@ -484,7 +485,7 @@ export function entityMap<
     ? I
     : string
 >(config?: EntityConfig<E, K>): EntityMapMarker<E, K> {
-  return { ...config } as EntityMapMarker<E, K>;
+  return { ...config, __isEntityMap: true as const } as EntityMapMarker<E, K>;
 }
 
 /**

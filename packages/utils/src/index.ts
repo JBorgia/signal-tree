@@ -70,6 +70,19 @@ export function isAnySignal(value: unknown): boolean {
 }
 
 /**
+ * Checks if a value is an EntityMapMarker
+ * EntityMapMarker objects should be preserved (not proxied) so withEntities() can materialize them
+ */
+function isEntityMapMarker(value: unknown): boolean {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    '__isEntityMap' in value &&
+    (value as { __isEntityMap?: unknown }).__isEntityMap === true
+  );
+}
+
+/**
  * Converts a NodeAccessor (SignalTree slice or whole tree) into a WritableSignal
  * compatible with Angular's Signal Forms connect() API and other APIs that expect WritableSignal.
  *
@@ -178,6 +191,20 @@ export function createLazySignalTree<T extends object>(
       const value = (target as Record<string, unknown>)[key];
 
       if (isSignal(value)) return value;
+
+      // Check if value is already an EntitySignal (materialized by withEntities())
+      // EntitySignal has addOne and all methods
+      if (
+        value &&
+        typeof value === 'object' &&
+        typeof (value as { addOne?: unknown }).addOne === 'function' &&
+        typeof (value as { all?: unknown }).all === 'function'
+      ) {
+        return value;
+      }
+
+      // Preserve EntityMapMarker objects - they need to be materialized by withEntities()
+      if (isEntityMapMarker(value)) return value;
 
       // Check memory manager cache first
       if (memoryManager) {
