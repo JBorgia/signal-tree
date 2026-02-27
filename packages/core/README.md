@@ -1715,10 +1715,13 @@ In Redux DevTools you will see a single instance named `"MyApp SignalTree"` with
 **Key behaviors:**
 
 - Trees sharing the same `aggregatedReduxInstance.id` are grouped together.
+- The Redux DevTools `instanceId` is based on `aggregatedReduxInstance.id` to avoid collisions.
 - Trees can be dynamically registered/unregistered as lazy-loaded modules come and go.
 - The shared connection is created on first registration and cleaned up when the last tree disconnects.
 - Trees that omit `aggregatedReduxInstance` work as standalone DevTools instances as before.
 - You can mix aggregated and standalone trees in the same application.
+
+**Logging:** DevTools internal logging is quiet by default. Set `enableLogging: true` on `devTools({ ... })` if you need console diagnostics.
 
 **Cleanup:** Call `tree.disconnectDevTools()` when destroying a tree (e.g. in `DestroyRef.onDestroy`) to unregister it from the group and clean up its state in DevTools.
 

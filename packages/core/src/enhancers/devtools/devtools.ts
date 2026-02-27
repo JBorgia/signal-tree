@@ -109,8 +109,9 @@ type DevToolsAction = {
 // Helpers
 // ============================================================================
 
-function createActivityTracker(): ModuleActivityTracker {
+function createActivityTracker(options?: { enableConsole?: boolean }): ModuleActivityTracker {
   const modules = new Map<string, ModuleMetadata>();
+  const enableConsole = options?.enableConsole === true;
 
   return {
     trackMethodCall: (module: string, method: string, duration: number) => {
@@ -140,10 +141,12 @@ function createActivityTracker(): ModuleActivityTracker {
       if (existing) {
         existing.errorCount++;
       }
-      console.error(
-        `❌ [${module}] Error${context ? ` in ${context}` : ''}:`,
-        error
-      );
+      if (enableConsole) {
+        console.error(
+          `❌ [${module}] Error${context ? ` in ${context}` : ''}:`,
+          error
+        );
+      }
     },
 
     getModuleActivity: (module: string) => modules.get(module),
@@ -152,13 +155,15 @@ function createActivityTracker(): ModuleActivityTracker {
   };
 }
 
-function createCompositionLogger(): CompositionLogger {
+function createCompositionLogger(options?: { enableConsole?: boolean }): CompositionLogger {
   const logs: Array<{
     timestamp: Date;
     module: string;
     type: 'composition' | 'method' | 'state' | 'performance';
     data: unknown;
   }> = [];
+
+  const enableConsole = options?.enableConsole === true;
 
   const addLog = (
     module: string,
@@ -174,7 +179,9 @@ function createCompositionLogger(): CompositionLogger {
   return {
     logComposition: (modules: string[], action: 'with' | 'enhance') => {
       addLog('core', 'composition', { modules, action });
-      console.log(`🔗 Composition ${action}:`, modules.join(' → '));
+      if (enableConsole) {
+        console.log(`🔗 Composition ${action}:`, modules.join(' → '));
+      }
     },
 
     logMethodExecution: (
@@ -184,7 +191,9 @@ function createCompositionLogger(): CompositionLogger {
       result: unknown
     ) => {
       addLog(module, 'method', { method, args, result });
-      console.debug(`🔧 [${module}] ${method}`, { args, result });
+      if (enableConsole) {
+        console.debug(`🔧 [${module}] ${method}`, { args, result });
+      }
     },
 
     logStateChange: (
@@ -194,10 +203,12 @@ function createCompositionLogger(): CompositionLogger {
       newValue: unknown
     ) => {
       addLog(module, 'state', { path, oldValue, newValue });
-      console.debug(`📝 [${module}] State change at ${path}:`, {
-        from: oldValue,
-        to: newValue,
-      });
+      if (enableConsole) {
+        console.debug(`📝 [${module}] State change at ${path}:`, {
+          from: oldValue,
+          to: newValue,
+        });
+      }
     },
 
     logPerformanceWarning: (
@@ -207,11 +218,13 @@ function createCompositionLogger(): CompositionLogger {
       threshold: number
     ) => {
       addLog(module, 'performance', { operation, duration, threshold });
-      console.warn(
-        `⚠️ [${module}] Slow ${operation}: ${duration.toFixed(
-          2
-        )}ms (threshold: ${threshold}ms)`
-      );
+      if (enableConsole) {
+        console.warn(
+          `⚠️ [${module}] Slow ${operation}: ${duration.toFixed(
+            2
+          )}ms (threshold: ${threshold}ms)`
+        );
+      }
     },
 
     exportLogs: () => [...logs],
@@ -488,6 +501,7 @@ interface DevToolsGroup {
       applyExternalState: (state: unknown) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
+      enableTimeTravel: boolean;
       maxDepth: number;
       maxArrayLength: number;
       maxStringLength: number;
@@ -551,6 +565,7 @@ function getOrCreateDevToolsGroup(
       applyExternalState: (state: unknown) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
+      enableTimeTravel: boolean;
       maxDepth: number;
       maxArrayLength: number;
       maxStringLength: number;
@@ -638,6 +653,7 @@ function getOrCreateDevToolsGroup(
     isApplyingExternalState = true;
     try {
       for (const [treeKey, tree] of trees) {
+        if (!tree.enableTimeTravel) continue;
         const treeState = state?.[treeKey];
         if (treeState !== undefined) {
           tree.applyExternalState(treeState);
@@ -654,21 +670,39 @@ function getOrCreateDevToolsGroup(
 
   const handleDevToolsMessage = (message: any) => {
     if (!message || typeof message !== 'object') return;
-    const msg = message;
+    const msg = message as {
+      type?: unknown;
+      payload?: { type?: unknown; nextLiftedState?: unknown };
+      state?: unknown;
+    };
+
+    const messageType = typeof msg.type === 'string' ? msg.type : undefined;
 
     // Redux DevTools sends { type: 'START' } when the panel is (re)opened.
     // Re-send current state so the instance becomes visible in the panel.
-    if (msg.type === 'START') {
+    if (messageType === 'START') {
       if (browserDevTools && trees.size > 0) {
+        const elapsed = Date.now() - lastSendAt;
+        if (elapsed < 500) return;
         const aggregated = buildAggregatedState();
         browserDevTools.send({ type: 'SignalTree/reconnect' }, aggregated);
+        lastSendAt = Date.now();
       }
       return;
     }
 
-    if (msg.type !== 'DISPATCH' || !msg.payload?.type) return;
+    const anyTimeTravelEnabled = Array.from(trees.values()).some(
+      (t) => t.enableTimeTravel
+    );
+    if (!anyTimeTravelEnabled) return;
 
-    const actionType = msg.payload.type;
+    if (messageType !== 'DISPATCH') return;
+
+    const actionType =
+      msg.payload && typeof msg.payload.type === 'string'
+        ? msg.payload.type
+        : undefined;
+    if (!actionType) return;
 
     if (actionType === 'JUMP_TO_STATE' || actionType === 'JUMP_TO_ACTION') {
       const nextState = parseDevToolsState(msg.state);
@@ -689,10 +723,16 @@ function getOrCreateDevToolsGroup(
     }
 
     if (actionType === 'IMPORT_STATE') {
-      const lifted = msg.payload.nextLiftedState;
-      const computedStates = lifted?.computedStates ?? [];
-      const index = lifted?.currentStateIndex ?? computedStates.length - 1;
-      const entry = computedStates[index];
+      const lifted = msg.payload?.nextLiftedState as any;
+      const computedStates = Array.isArray(lifted?.computedStates)
+        ? lifted.computedStates
+        : [];
+      const indexRaw =
+        typeof lifted?.currentStateIndex === 'number'
+          ? lifted.currentStateIndex
+          : computedStates.length - 1;
+      const index = Math.max(0, Math.min(indexRaw, computedStates.length - 1));
+      const entry = computedStates[index] as any;
       const nextState = parseDevToolsState(entry?.state);
       applyExternalState(nextState);
       sendInit();
@@ -725,7 +765,7 @@ function getOrCreateDevToolsGroup(
       devToolsExtension = devToolsExt;
       const connection = devToolsExt.connect({
         name: displayName,
-        instanceId: displayName,
+        instanceId: groupId,
         features: {
           dispatch: true,
           jump: true,
@@ -785,39 +825,26 @@ function getOrCreateDevToolsGroup(
     const allFormattedPaths: string[] = [];
 
     for (const [treeKey, tree] of trees) {
-      const previous = lastSnapshots.get(treeKey);
       const currentSnapshot = tree.readSnapshot();
       lastSnapshots.set(treeKey, currentSnapshot);
       const serialized = tree.buildSerializedState(currentSnapshot);
       lastSerialized.set(treeKey, serialized);
       aggregatedState[treeKey] = serialized;
 
-      const defaultPaths =
-        previous === undefined
-          ? []
-          : computeChangedPaths(
-            previous,
-            currentSnapshot,
-            tree.maxDepth,
-            tree.maxArrayLength
-          );
+      // Aggregated mode is driven by PathNotifier flushes (and explicit meta
+      // events like `tree.update`). Avoid deep diffing entire trees here.
       const pendingRaw = pendingPathsByTree.get(treeKey) ?? [];
-      const mergedRawPaths = Array.from(
-        new Set([
-          ...pendingRaw,
-          ...defaultPaths.filter((path) => path && tree.isPathAllowed(path)),
-        ])
-      );
-
-      if (mergedRawPaths.length > 0) {
-        const formatted = mergedRawPaths.map((path) =>
+      const allowedRaw = pendingRaw.filter((p) => p && tree.isPathAllowed(p));
+      if (allowedRaw.length > 0) {
+        const formatted = Array.from(new Set(allowedRaw)).map((path) =>
           tree.formatPathFn(`${treeKey}.${path}`)
         );
         allFormattedPaths.push(...formatted);
       }
     }
 
-    if (allFormattedPaths.length === 0 && !pendingExplicitAction) {
+    const hasMeta = pendingSource !== undefined || pendingDuration !== undefined;
+    if (allFormattedPaths.length === 0 && !pendingExplicitAction && !hasMeta) {
       pendingAction = null;
       pendingExplicitAction = false;
       pendingSource = undefined;
@@ -933,6 +960,7 @@ function getOrCreateDevToolsGroup(
       applyExternalState: (state: unknown) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
+      enableTimeTravel: boolean;
       maxDepth: number;
       maxArrayLength: number;
       maxStringLength: number;
@@ -963,7 +991,32 @@ function getOrCreateDevToolsGroup(
       updateRateLimit();
 
       if (trees.size === 0) {
+        // Last tree removed: reset DevTools instance and clean up globals.
         sendEmptyState();
+        try {
+          unsubscribeDevTools?.();
+        } catch {
+          // ignore
+        }
+        try {
+          browserDevToolsConnection?.unsubscribe?.();
+        } catch {
+          // ignore
+        }
+        try {
+          browserDevToolsConnection?.disconnect?.();
+        } catch {
+          // ignore
+        }
+
+        unsubscribeDevTools = null;
+        browserDevToolsConnection = null;
+        browserDevTools = null;
+        devToolsExtension = null;
+        isConnected = false;
+
+        devToolsConnections.delete(groupId);
+        devToolsGroups.delete(groupId);
         return;
       }
 
@@ -1018,7 +1071,7 @@ export function devTools(
     name,
     enableBrowserDevTools = true,
     enableTimeTravel = true,
-    enableLogging = true,
+    enableLogging = false,
     performanceThreshold = 16,
     includePaths,
     excludePaths,
@@ -1062,9 +1115,9 @@ export function devTools(
     // ========================================================================
     // Enabled path
     // ========================================================================
-    const activityTracker = createActivityTracker();
+    const activityTracker = createActivityTracker({ enableConsole: enableLogging });
     const logger = enableLogging
-      ? createCompositionLogger()
+      ? createCompositionLogger({ enableConsole: true })
       : createNoopLogger();
     const metrics = createModularMetrics();
 
@@ -1190,7 +1243,15 @@ export function devTools(
         lastSerializedJson === undefined ||
         currentSerializedJson !== lastSerializedJson;
 
-      if (!stateActuallyChanged && !pendingExplicitAction) {
+      const pendingAllowedPaths = pendingPaths.filter(
+        (path) => path && isPathAllowed(path)
+      );
+
+      if (
+        !stateActuallyChanged &&
+        !pendingExplicitAction &&
+        pendingAllowedPaths.length === 0
+      ) {
         pendingAction = null;
         pendingExplicitAction = false;
         pendingSource = undefined;
@@ -1201,25 +1262,21 @@ export function devTools(
         return;
       }
 
-      // Compute changed paths for action naming (best-effort)
-      const defaultPaths =
-        lastSnapshot === undefined
-          ? []
-          : computeChangedPaths(
-              lastSnapshot,
-              currentSnapshot,
-              maxDepth,
-              maxArrayLength
-            );
+      // Compute changed paths for action naming (best-effort).
+      // If PathNotifier already provided hints, avoid deep diffing the whole tree.
+      const rawPathsForNaming =
+        pendingAllowedPaths.length > 0
+          ? Array.from(new Set(pendingAllowedPaths))
+          : lastSnapshot === undefined
+            ? []
+            : computeChangedPaths(
+                lastSnapshot,
+                currentSnapshot,
+                maxDepth,
+                maxArrayLength
+              ).filter((path) => path && isPathAllowed(path));
 
-      // Merge pendingPaths (PathNotifier hints) with defaultPaths for action naming
-      const mergedPaths = Array.from(
-        new Set([
-          ...pendingPaths,
-          ...defaultPaths.filter((path) => path && isPathAllowed(path)),
-        ])
-      );
-      const formattedPaths = mergedPaths.map((path) => formatPathFn(path));
+      const formattedPaths = rawPathsForNaming.map((path) => formatPathFn(path));
 
       if (
         pathInclude.length > 0 &&
@@ -1364,14 +1421,16 @@ export function devTools(
       if (!message || typeof message !== 'object') return;
 
       const msg = message as {
-        type?: string;
-        payload?: { type?: string; nextLiftedState?: any };
+        type?: unknown;
+        payload?: { type?: unknown; nextLiftedState?: unknown };
         state?: unknown;
       };
 
+      const messageType = typeof msg.type === 'string' ? msg.type : undefined;
+
       // Redux DevTools sends { type: 'START' } when the panel is (re)opened.
       // Re-send current state so the instance becomes visible in the panel.
-      if (msg.type === 'START') {
+      if (messageType === 'START') {
         if (lastSnapshot === undefined) {
           // First time: send @@INIT to establish the instance
           sendInit();
@@ -1398,9 +1457,13 @@ export function devTools(
 
       if (!enableTimeTravel) return;
 
-      if (msg.type !== 'DISPATCH' || !msg.payload?.type) return;
+      if (messageType !== 'DISPATCH') return;
 
-      const actionType = msg.payload.type;
+      const actionType =
+        msg.payload && typeof msg.payload.type === 'string'
+          ? msg.payload.type
+          : undefined;
+      if (!actionType) return;
       if (actionType === 'JUMP_TO_STATE' || actionType === 'JUMP_TO_ACTION') {
         const nextState = parseDevToolsState(msg.state);
         applyExternalState(nextState);
@@ -1420,10 +1483,16 @@ export function devTools(
       }
 
       if (actionType === 'IMPORT_STATE') {
-        const lifted = msg.payload.nextLiftedState;
-        const computedStates = lifted?.computedStates ?? [];
-        const index = lifted?.currentStateIndex ?? computedStates.length - 1;
-        const entry = computedStates[index];
+        const lifted = msg.payload?.nextLiftedState as any;
+        const computedStates = Array.isArray(lifted?.computedStates)
+          ? lifted.computedStates
+          : [];
+        const indexRaw =
+          typeof lifted?.currentStateIndex === 'number'
+            ? lifted.currentStateIndex
+            : computedStates.length - 1;
+        const index = Math.max(0, Math.min(indexRaw, computedStates.length - 1));
+        const entry = computedStates[index] as any;
         const nextState = parseDevToolsState(entry?.state);
         applyExternalState(nextState);
         sendInit();
@@ -1446,6 +1515,7 @@ export function devTools(
             applyExternalState,
             formatPathFn,
             isPathAllowed,
+            enableTimeTravel,
             maxDepth,
             maxArrayLength,
             maxStringLength,
@@ -1488,7 +1558,7 @@ export function devTools(
         devToolsExtension = devToolsExt;
         const connection = devToolsExt.connect({
           name: displayName,
-          instanceId: displayName,
+          instanceId: groupId,
           features: { dispatch: true, jump: true, skip: true },
         });
         browserDevToolsConnection = connection;
@@ -1528,7 +1598,9 @@ export function devTools(
 
         sendInit();
         isConnected = true;
-        console.log(`🔗 Connected to Redux DevTools as "${displayName}"`);
+        if (enableLogging) {
+          console.log(`🔗 Connected to Redux DevTools as "${displayName}"`);
+        }
       } catch (e) {
         devToolsConnections.delete(groupId);
         console.warn('[SignalTree] Failed to connect to Redux DevTools:', e);
@@ -1682,22 +1754,36 @@ export function devTools(
       },
     };
 
-    // Build a set of top-level keys belonging to this tree so we can filter
-    // out PathNotifier events from other trees (PathNotifier is a global singleton).
+    // PathNotifier is a global singleton, so in aggregated mode we try to
+    // filter out events from other trees. In standalone mode we preserve the
+    // historical behavior: accept all paths (ownership is ambiguous).
+    const shouldFilterByOwnership = Boolean(aggregatedReduxInstance);
     const treeTopKeys = new Set<string>();
-    try {
-      if ('$' in tree) {
-        for (const key of Object.keys(tree.$ as Record<string, unknown>)) {
-          treeTopKeys.add(key);
+    const refreshTreeTopKeys = (): void => {
+      treeTopKeys.clear();
+      try {
+        if ('$' in tree) {
+          for (const key of Object.keys(tree.$ as Record<string, unknown>)) {
+            treeTopKeys.add(key);
+          }
         }
+      } catch {
+        // ignore
       }
-    } catch {
-      // fall back to accepting all paths
-    }
+    };
+
+    // Always populate keys so we can intercept leaf signals. Ownership
+    // filtering is only applied in aggregated mode.
+    refreshTreeTopKeys();
 
     const isPathOwnedByTree = (path: string): boolean => {
-      if (treeTopKeys.size === 0) return true; // no keys known, accept all
+      if (!shouldFilterByOwnership) return true;
+      if (treeTopKeys.size === 0) return true;
       const root = path.split('.')[0];
+      if (treeTopKeys.has(root)) return true;
+
+      // If new keys were added after initialization, refresh once.
+      refreshTreeTopKeys();
       return treeTopKeys.has(root);
     };
 
@@ -1705,6 +1791,7 @@ export function devTools(
     // notifications. Entity collections already notify via their own internals,
     // but plain Angular signals (counter, flags, etc.) do not.
     const notifier = getPathNotifier();
+    const restoreInterceptors: Array<() => void> = [];
     try {
       if ('$' in tree) {
         const treeNode = tree.$ as Record<string, unknown>;
@@ -1725,6 +1812,11 @@ export function devTools(
             const original = sig as any;
             const originalSet = original.set.bind(original);
             const originalUpdate = original.update.bind(original);
+
+            restoreInterceptors.push(() => {
+              original.set = originalSet;
+              original.update = originalUpdate;
+            });
 
             original.set = (value: unknown) => {
               const prev = original();
@@ -1769,25 +1861,6 @@ export function devTools(
       if (isApplyingExternalState) return;
       if (pendingPaths.length === 0) return;
 
-      // Verify this tree actually changed. snapshotState/unwrap always creates
-      // new object references, so we compare serialized JSON instead.
-      const currentSnapshot = readSnapshot() ?? {};
-      if (lastSerializedJson !== undefined) {
-        const currentSerialized = buildSerializedState(currentSnapshot);
-        let currentJson: string;
-        try {
-          currentJson = JSON.stringify(currentSerialized);
-        } catch {
-          currentJson = '';
-        }
-        if (currentJson === lastSerializedJson) {
-          pendingPaths = [];
-          return;
-        }
-      } else {
-        // lastSerializedJson undefined — first flush, skip comparison
-      }
-
       if (aggregatedReduxInstance) {
         const group = devToolsGroups.get(aggregatedReduxInstance.id);
         if (group) {
@@ -1821,6 +1894,7 @@ export function devTools(
 
     // Always return the enhanced tree with DevTools methods (only those required by DevToolsMethods)
     const result = Object.assign(enhancedTree, {
+      __devTools: devToolsInterface,
       connectDevTools: devToolsInterface.connectDevTools,
       exportDebugSession: devToolsInterface.exportDebugSession,
       disconnectDevTools: () => {
@@ -1832,6 +1906,15 @@ export function devTools(
         if (unsubscribePathFlush) {
           unsubscribePathFlush();
           unsubscribePathFlush = null;
+        }
+
+        // Restore any intercepted signal methods
+        for (const restore of restoreInterceptors) {
+          try {
+            restore();
+          } catch {
+            // ignore
+          }
         }
 
         if (aggregatedReduxInstance) {
