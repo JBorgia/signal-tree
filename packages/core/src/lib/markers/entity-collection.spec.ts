@@ -81,14 +81,17 @@ describe('entityCollection() marker', () => {
 });
 
 describe('entityCollection materialization', () => {
-  it('auto-loads on materialize (lazy: false) and exposes the entityMap surface', () => {
+  it('auto-loads on materialize (lazy: false) and exposes the entityMap surface', async () => {
     const tree = signalTree({
       plants: entityCollection<Plant>({
         load: () => of([P1, P2]),
         selectId,
       }),
     });
-    // Observable `of()` emits synchronously during materialize.
+    // Auto-load is deferred off the materialize/render pass (NG0600-safe), so
+    // the first synchronous read is empty; it populates on the next microtask.
+    expect(tree.$.plants.all()).toEqual([]);
+    await Promise.resolve();
     expect(tree.$.plants.all()).toEqual([P1, P2]);
     expect(tree.$.plants.count()).toBe(2);
     expect(tree.$.plants.loaded()).toBe(true);
@@ -290,10 +293,12 @@ describe('invalidate() (gap 4)', () => {
     expect(calls).toBe(0);
   });
 
-  it('swr:false → loaded flips false on invalidate; swr:true → stays true', () => {
+  it('swr:false → loaded flips false on invalidate; swr:true → stays true', async () => {
     const nonSwr = signalTree({
       plants: entityCollection<Plant>({ load: () => of([P1]), selectId }),
     });
+    nonSwr.$.plants.all(); // finalize + queue the deferred auto-load
+    await Promise.resolve();
     expect(nonSwr.$.plants.loaded()).toBe(true);
     nonSwr.$.plants.invalidate();
     expect(nonSwr.$.plants.loaded()).toBe(false);
@@ -305,6 +310,8 @@ describe('invalidate() (gap 4)', () => {
         swr: true,
       }),
     });
+    swr.$.plants.all();
+    await Promise.resolve();
     expect(swr.$.plants.loaded()).toBe(true);
     swr.$.plants.invalidate();
     expect(swr.$.plants.loaded()).toBe(true); // serve stale
@@ -335,7 +342,11 @@ describe('invalidateTag()', () => {
         tags: ['orders'],
       }),
     });
-    // First `.$` access finalizes the tree and triggers the (non-lazy) auto-load.
+    // First `.$` access finalizes the tree and queues the (non-lazy) auto-load,
+    // which runs on the next microtask (NG0600-safe deferral).
+    tree.$.plants.all();
+    tree.$.orders.all();
+    await Promise.resolve();
     expect(tree.$.plants.loaded()).toBe(true);
     expect(tree.$.orders.loaded()).toBe(true);
     expect(plantCalls).toBe(1);
@@ -393,27 +404,30 @@ describe('persist hydrate-then-revalidate (gap 5)', () => {
     };
   }
 
-  it('seeds rows from the snapshot instantly, then revalidates', async () => {
+  it('seeds rows from the snapshot, then revalidates', async () => {
     const adapter = memoryAdapter([P1, P2]); // persisted snapshot
     let calls = 0;
+    const d = deferred<Plant[]>();
     const tree = signalTree({
       plants: entityCollection<Plant>({
         load: () => {
           calls++;
-          return of([P3]); // server truth differs from cache
+          return d.promise; // async so the seed is observable before revalidation
         },
         selectId,
         persist: { adapter, key: 'plants', hydrateThenRevalidate: true },
       }),
     });
-    // Seeded synchronously from cache (getItem is sync here):
-    expect(tree.$.plants.all()).toEqual([P1, P2]);
-    // Seeded data is stale — not marked loaded yet.
+    // Seed + auto-load are deferred off the materialize pass (NG0600-safe).
+    expect(tree.$.plants.all()).toEqual([]);
+    await Promise.resolve(); // kickoff microtask: seed from cache + start load
+    expect(tree.$.plants.all()).toEqual([P1, P2]); // seeded (stale)
     expect(tree.$.plants.loaded()).toBe(false);
-
-    await Promise.resolve(); // let the background load() chain run
-    await Promise.resolve();
     expect(calls).toBe(1);
+
+    d.resolve([P3]); // server truth differs from cache
+    await d.promise;
+    await Promise.resolve();
     expect(tree.$.plants.all()).toEqual([P3]); // revalidated
     expect(tree.$.plants.loaded()).toBe(true);
   });
@@ -428,9 +442,10 @@ describe('persist hydrate-then-revalidate (gap 5)', () => {
         persist: { adapter, key: 'plants' },
       }),
     });
-    // First `.$` access finalizes the tree and triggers the auto-load.
-    expect(tree.$.plants.loaded()).toBe(true);
+    // First `.$` access finalizes the tree and queues the deferred auto-load.
+    tree.$.plants.all();
     await Promise.resolve();
+    expect(tree.$.plants.loaded()).toBe(true);
     expect(setSpy).toHaveBeenCalledWith('plants', JSON.stringify([P1]));
   });
 });

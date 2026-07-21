@@ -128,38 +128,40 @@ On first access the collection paints the persisted snapshot (marked stale, so `
 `false` until the network confirms), fires `load()`, and swaps in fresh rows on success — while
 `swr: true` keeps serving the old rows during the revalidation instead of blanking the view.
 
-## 6. Keyed collections (scope-parameterized)
+## 6. Scoped collections (parameterized by region, customer, tenant, …)
 
-Reach for the keyed form (v11.3+, [RFC 0003](../rfcs/0003-keyed-entity-collection.md)) when a
+Reach for the scoped form (v11.4+, [RFC 0003](../rfcs/0003-keyed-entity-collection.md)) when a
 collection is scoped to something that changes at runtime — a region, a customer, a tenant — and
 you'd otherwise hand-roll a "current scope" ref plus manual clear/refetch on change around a plain
-`entityMap`. Add a third type param `P` and a `key` function; everything else (`entityMap` surface,
-single-flight, `tags`, `persist`, `swr`) is unchanged.
+`entityMap`. Add a third type param `P` and give `load` a parameter; everything else (`entityMap`
+surface, single-flight, `tags`, `persist`, `swr`) is unchanged.
 
 ```typescript
 customers: entityCollection<Customer, string, { regionUrl: string }>({
   load: ({ regionUrl }) => api.getCustomers$(regionUrl),
-  key: ({ regionUrl }) => [regionUrl], // JSON-stable, order-sensitive — like a TanStack queryKey
   selectId: (c) => c.externalId,
   staleTime: '30m',
+  // freshness compared per scope with `equal` (default: structural value comparison)
 });
 ```
 
 ```typescript
 // In a component — pass the current scope on every call:
-tree.$.customers.load({ regionUrl }); // same key + fresh => no-op; key changed => refetch
-tree.$.customers.currentKey(); // Signal<string | null> — serialized key of the loaded scope
+tree.$.customers.load({ regionUrl }); // same scope + fresh => no-op; scope changed => refetch
+tree.$.customers.params(); // Signal<{ regionUrl: string } | undefined> — the loaded scope, typed
 ```
 
-`staleTime` freshness is now evaluated **per-key**: switching `regionUrl` marks the collection
-stale and refetches even though the previous region was still fresh. A `load()` for a different
-key while one is in flight supersedes it (last-request-wins) rather than racing. Keyed collections
-are implicitly lazy — there's no scope to auto-load on first `tree.$` access, so call
-`load(params)` explicitly (e.g. from the component that owns the scope selector).
+`staleTime` freshness is now evaluated **per-scope**, compared via `equal` (default: a structural
+value comparison, so `{ regionUrl }` object literals compare by value): switching `regionUrl` marks
+the collection stale and refetches even though the previous region was still fresh. Pass a custom
+`equal` when you need a cheaper or narrower comparison. A `load()` for a different scope while one
+is in flight supersedes it (last-request-wins) rather than racing. A collection whose loader
+declares a parameter is implicitly lazy — there's no scope to auto-load on first `tree.$` access,
+so call `load(params)` explicitly (e.g. from the component that owns the scope selector).
 
-This is a **single-scope cache**: only the most recently loaded key's rows are kept, so toggling
+This is a **single-scope cache**: only the most recently loaded scope's rows are kept, so toggling
 between two scopes refetches each time rather than serving a cached second scope instantly. A
-multi-key LRU (instant back-toggle between recently seen scopes) is explicitly deferred — see RFC
+multi-scope LRU (instant back-toggle between recently seen scopes) is explicitly deferred — see RFC
 0003 §5 — and layers on top of this without an API break if it ships later.
 
 ## Anti-patterns

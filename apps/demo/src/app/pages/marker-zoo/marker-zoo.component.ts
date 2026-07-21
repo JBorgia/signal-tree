@@ -171,6 +171,10 @@ store.$.organization.teams.catalog.plants.invalidate(); // mark stale`,
             selectId: (p) => p.id,
             staleTime: '30s',
             tags: ['plants'],
+            // Non-lazy: auto-loads on materialize. Safe during template-triggered
+            // materialization because the auto-load is deferred off the render
+            // pass (no signal writes mid-render). The "Load plants" button below
+            // acts as a manual refresh.
           }),
         },
       },

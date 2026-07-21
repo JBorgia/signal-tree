@@ -1,10 +1,36 @@
-# RFC 0003 — Keyed / parameterized `entityCollection`
+# RFC 0003 — Scoped / parameterized `entityCollection`
 
-**Status:** Accepted (2026-07-20)
+**Status:** Accepted (2026-07-20); **revised same-day** — see §0
 **Date:** 2026-07-20
 **Affects:** `@signaltree/core` (11.x line), docs/skills/recipes
 **Builds on:** [RFC 0002](0002-entity-collection.md) (the parameterless `entityCollection`)
-**Versions at writing:** core 11.2.0 (published); target 11.3.0 (this feature)
+**Versions at writing:** core 11.2.0 (published); target 11.4.0 (this feature — see §0)
+
+## 0. Revision note (11.3.0 → 11.4.0, same-day correction)
+
+This RFC originally shipped in 11.3.0 with a `key?: (params) => unknown[]`
+config function, a `currentKey: Signal<string | null>` accessor, and
+`clearOnKeyChange`. That shape is **superseded** by this revision, published
+as **11.4.0** the same day (there was no separate 11.3.0 release to preserve
+compatibility with). The design intent — scope-parameterized freshness on
+`entityCollection` — is unchanged; only the API surface is corrected:
+
+- **`key?: (params) => unknown[]`** → **`equal?: (a: P, b: P) => boolean`**.
+  Freshness now compares the raw scope params directly (default: a structural
+  value comparison, so `{ regionUrl }` object literals compare by value) instead
+  of routing through a caller-supplied queryKey-array function.
+- **`currentKey: Signal<string | null>`** → **`params: Signal<P | undefined>`**.
+  The signal now exposes the *typed* scope object it loaded, not a serialized
+  string — no `JSON.stringify` round-trip for callers who want to read it back.
+- **`clearOnKeyChange`** → **`clearOnParamsChange`** (same semantics, renamed
+  to track the option it now pairs with).
+
+Why: see §4 for the full rationale (matches `asyncQuery`/`asyncStream`'s
+`equal` comparator convention; avoids a second serialized-key source of truth;
+`key` collided with `persist.key` in the same config object, forcing readers to
+disambiguate two same-named-but-unrelated options at a glance). The rest of
+this document is written against the **corrected (`equal`/`params`)** shape;
+where it matters, the superseded 11.3.0 names are called out explicitly.
 
 ---
 
@@ -32,94 +58,150 @@ See the before/after in §7.
 
 ## 2. What ships
 
-Extend `entityCollection` with an optional **`key`** function and a scope-parameter type
-`P`. `staleTime` freshness is evaluated against the **current key**; a key change marks
-the collection stale and refetches. Everything else (normalized surface, single-flight,
-resolves-never-rejects `load()`, `tags`, error handling, `persist`, `swr`) is unchanged.
+Extend `entityCollection` with an optional **`equal`** comparator and a scope-parameter
+type `P`. A collection whose loader declares a parameter (`load: (params) => …`) is
+**scoped**; `staleTime` freshness is evaluated against the **current scope**, compared
+via `equal`, and a scope change marks the collection stale and refetches. Everything
+else (normalized surface, single-flight, resolves-never-rejects `load()`, `tags`, error
+handling, `persist`, `swr`) is unchanged.
 
 ```ts
 customers: entityCollection<Customer, string, { regionUrl: string }>({
   load: ({ regionUrl }) => api.getCustomers$(regionUrl),
-  key:  ({ regionUrl }) => [regionUrl],   // presence of `key` ⇒ keyed
   selectId: (c) => c.externalId,
   staleTime: '30m',
+  // freshness compared per scope with `equal` (structural by default)
 });
 // caller: tree.$.customers.load({ regionUrl });
-//   same key + fresh → no-op; key changed → refetch (supersedes any in-flight load)
+//   same scope + fresh → no-op; scope changed → refetch (supersedes any in-flight load)
 ```
 
 New/changed surface (`P` defaults to `void` — the existing parameterless form is
 byte-for-byte compatible):
 
-- Config: `load: (params: P) => …`, `key?: (params: P) => unknown[]`,
-  `clearOnKeyChange?: boolean`.
+- Config: `load: (params: P) => …` (a loader declaring a parameter makes the collection
+  *scoped*), `equal?: (a: P, b: P) => boolean` (default: structural value comparison),
+  `clearOnParamsChange?: boolean`.
 - Signal: `load(params: P)`, `refresh(params?: P)`, and a new
-  `currentKey: Signal<string | null>` (serialized key of the loaded scope; always `null`
-  for unkeyed collections).
+  `params: Signal<P | undefined>` (the typed scope of the currently-loaded data;
+  `undefined` for a global collection or before its first load).
 
 **Typing:** a single `load(params: P)` signature covers both forms — `void` params are
-omittable, so unkeyed `load()` type-checks while keyed `load(params)` requires the
-argument. No overloads; inference flows from `load`'s parameter or the explicit third
-type argument. (Enforced by `@ts-expect-error` type tests.)
+omittable, so a global collection's `load()` type-checks while a scoped `load(params)`
+requires the argument. No overloads; inference flows from `load`'s parameter or the
+explicit third type argument. (Enforced by `@ts-expect-error` type tests.) Whether a
+collection is scoped is derived from `load`'s declared arity (`load.length > 0`), not
+from a separate config flag — one loader-shape decision drives both typing and runtime
+behavior.
+
+**NG0600 safety.** Because SignalTree finalizes markers lazily on first `.$` access —
+frequently a template read *during* Angular's render — materializing `entityCollection`
+performs no synchronous signal writes: a global (non-lazy) collection's initial
+auto-load and offline-first seed are deferred to a microtask, landing after the current
+render pass. Reading a non-lazy collection first inside a template no longer throws
+`NG0600: Writing to signals is not allowed while Angular renders`. One observable
+consequence: auto-load is now asynchronous — data arrives on the next microtask, not
+synchronously during construction.
 
 ## 3. Semantics (precise)
 
-Let `k = stableStringify(key(params))` for keyed collections (`null` for unkeyed).
+Let `equalFn` be `equal ?? defaultEqual` (structural value comparison — `a === b ||
+stableStringify(a) === stableStringify(b)`) for scoped collections (irrelevant for
+global collections, which have no `P`).
 
-- **Freshness is per-current-key.** `load(params)` fetches when: never loaded, OR
-  `k !== currentKey`, OR `invalidate()`d, OR `Date.now() - lastLoadedAt >= staleMs`.
-  Otherwise it's a no-op (`Promise.resolve()`), exactly as RFC 0002.
-- **Single-flight** stays: a concurrent `load()` for the **same** key returns the
-  in-flight promise.
-- **Supersede on different key.** A `load()` for a **different** key while one is in
-  flight abandons the in-flight result (its rows never write — guarded by a run token;
-  the observable is unsubscribed) and starts the new-key load. The superseded promise is
-  resolved (never left hanging). This is last-request-wins, matching `asyncQuery`'s
-  `switchMap`.
-- **On success:** `setAll(rows)`, `lastLoadedAt = now`, `currentKey = k`, clear
-  `invalidated`, `loading = false`, persist write-through (per-scope key).
+- **Freshness is per-current-scope.** `load(params)` fetches when: never loaded, OR
+  `!equalFn(loadedParams, params)` (scope changed), OR `invalidate()`d, OR
+  `Date.now() - lastLoadedAt >= staleMs`. Otherwise it's a no-op (`Promise.resolve()`),
+  exactly as RFC 0002.
+- **Single-flight** stays: a concurrent `load()` for an **equal** scope (per `equalFn`)
+  returns the in-flight promise.
+- **Supersede on a different scope.** A `load()` for a scope that is **not equal** to
+  the in-flight one abandons the in-flight result (its rows never write — guarded by a
+  run token; the observable is unsubscribed) and starts the new-scope load. The
+  superseded promise is resolved (never left hanging). This is last-request-wins,
+  matching `asyncQuery`'s `switchMap`.
+- **On success:** `setAll(rows)`, `lastLoadedAt = now`, `params()` is set to the loaded
+  scope, clear `invalidated`, `loading = false`, persist write-through (per-scope
+  storage key).
 - **`load()` resolves, never rejects.** Errors route to `error()` (unchanged).
 - **`invalidate()`** marks the current scope stale; `invalidateTag(tree, tag)` marks
-  tagged collections stale regardless of key.
-- **Clear-on-key-change (config, default off).** Default is **keep-until-settled**: the
-  previous scope's rows stay visible (and `loaded` stays true) until the new load
-  settles — no flicker. `clearOnKeyChange: true` blanks the rows immediately and drops to
-  a not-loaded/loading state on a scope change (the "blank the list on scope switch" UX).
-- **Auto-load:** keyed collections **cannot** auto-load on first `tree.$` access (no
+  tagged collections stale regardless of scope.
+- **Clear-on-params-change (config, default off).** Default is **keep-until-settled**:
+  the previous scope's rows stay visible (and `loaded` stays true) until the new load
+  settles — no flicker. `clearOnParamsChange: true` blanks the rows immediately and drops
+  to a not-loaded/loading state on a scope change (the "blank the list on scope switch"
+  UX).
+- **Auto-load:** scoped collections **cannot** auto-load on first `tree.$` access (no
   params available), so they are **implicitly `lazy`** — call `load(params)`. Documented;
-  no error thrown (setting `lazy` is a no-op for keyed).
+  no error thrown (setting `lazy` is a no-op for a scoped collection). Global (unscoped)
+  collections auto-load as in RFC 0002, but the auto-load and any offline-first seed are
+  **deferred to a microtask** off the synchronous materialization pass — see the
+  NG0600-safety note in §2. This makes auto-load asynchronous: `loading()` reads `true`
+  starting the microtask after materialization, not synchronously during it.
 
 ## 4. Design decisions (with rationale)
 
 1. **Single-scope by default, not a multi-key cache.** Cache only the current scope's
-   data + key; a key change evicts and refetches. This matches how scoped UIs work (one
-   region at a time), keeps memory bounded, and is a strict, safe superset of the
-   hand-rolled guard. A future opt-in **multi-key LRU** (à la TanStack Query
+   data + params; a scope change evicts and refetches. This matches how scoped UIs work
+   (one region at a time), keeps memory bounded, and is a strict, safe superset of the
+   hand-rolled guard. A future opt-in **multi-scope LRU** (à la TanStack Query
    `queryKey` + `gcTime`) can layer on without an API break — the seam is the internal
-   `loadedKey`/`currentKey` bookkeeping, which would become a small keyed map. **Not
+   `loadedParams`/`params` bookkeeping, which would become a small keyed map. **Not
    built now.**
-2. **Key serialization.** `stableStringify` sorts object keys at every level, so
-   equal-by-value scopes serialize identically regardless of property order; **arrays
-   stay order-sensitive** (queryKey semantics). Contract: keys must be JSON-serializable.
-3. **Persistence.** `persist` write-through uses a **per-scope storage key**
-   (`${key}::${serializedKey}`), so scopes don't clobber each other. `hydrateThenRevalidate`
-   for a keyed collection seeds a scope on its **first `load(params)`** (sync adapters
-   seed before the fetch; async adapters seed when the read resolves), rather than at
-   materialize (no key is known there). Unkeyed hydration is unchanged (materialize-time).
-4. **No overloads for `load`.** A single `load(params: P)` with `P = void` gives both
+2. **Why `equal`, not a `key` queryKey function (the 11.3.0→11.4.0 correction).** The
+   original design borrowed TanStack Query's `queryKey` shape: a `key: (params) =>
+   unknown[]` function the caller writes, serialized internally to decide freshness.
+   Same-day review found three problems:
+   - **Inconsistent with the rest of core.** `asyncQuery` and `asyncStream` already
+     compare their input/scope via an `equal` comparator, not a caller-supplied key
+     function. A second, differently-shaped mechanism for the same concept ("has the
+     scope changed?") is one more thing an agent or human has to learn — and get wrong —
+     per marker. `equal` makes `entityCollection` consistent with markers it's meant to
+     compose alongside.
+   - **A redundant serialized-key source of truth.** `key` existed only to produce a
+     string to diff; `equal` diffs the params directly and skips the round-trip. The
+     default (`stableStringify` under the hood) gives the same "compare by value, order
+     matters in arrays" behavior for the common case, but callers never see or manage a
+     serialized form.
+   - **Naming collision with `persist.key`.** `EntityCollectionConfig` already has a
+     `persist.key` (the storage key). A sibling top-level `key` option meant "the scope
+     key function" and "the storage key" were both spelled `key` in the same config
+     object, one level apart — a real, observed point of confusion in review. `equal`
+     doesn't collide with anything.
+   - The **signal-level** rename (`currentKey: Signal<string | null>` →
+     `params: Signal<P | undefined>`) follows from the same shift: once freshness is
+     decided by comparing typed params instead of diffing serialized keys, exposing the
+     serialized key on the signal has no remaining purpose — callers who read it back
+     want the typed scope, not its string form.
+3. **Params serialization for persistence and the default comparator.**
+   `stableStringify` sorts object keys at every level, so equal-by-value scopes serialize
+   identically regardless of property order; **arrays stay order-sensitive**. This is
+   used both as the default `equal` implementation and for building the per-scope
+   storage key (below). Contract: params must be JSON-serializable to get persistence or
+   the default comparator; a custom `equal` lifts the JSON-serializability requirement
+   for freshness (but not for `persist`, which still serializes the scope into the
+   storage key).
+4. **Persistence.** `persist` write-through uses a **per-scope storage key**
+   (`${key}::${stableStringify(params)}`), so scopes don't clobber each other.
+   `hydrateThenRevalidate` for a scoped collection seeds a scope on its **first
+   `load(params)`** (sync adapters seed before the fetch; async adapters seed when the
+   read resolves), rather than at materialize (no scope is known there). Global-collection
+   hydration is unchanged (materialize-time, deferred to a microtask — see §2/§3).
+5. **No overloads for `load`.** A single `load(params: P)` with `P = void` gives both
    call shapes type-safely (void is omittable). Fewer signatures = less for an AI agent
    to disambiguate — consistent with RFC 0001's surface-minimization bias.
 
 ## 5. Explicitly deferred
 
-Multi-key LRU / `gcTime` (instant back-toggle); prefetch; infinite/paginated collections;
-per-key `staleTime`. All layer onto single-scope later without breaking the API.
+Multi-scope LRU / `gcTime` (instant back-toggle); prefetch; infinite/paginated collections;
+per-scope `staleTime`. All layer onto single-scope later without breaking the API.
 
 ## 6. Backward compatibility
 
 100%. `P` defaults to `void`; the parameterless `entityCollection<E,K>({ load: () => … })`
 form, its `load()`/`refresh()`/`invalidate()` calls, and all RFC 0002 tests are unchanged.
-Additive minor (11.3.0).
+Additive minor — published as **11.4.0** (see §0; there is no separately-published
+11.3.0 whose shape this needs to stay compatible with).
 
 ## 7. Motivating before/after
 
@@ -139,7 +221,7 @@ loadCustomers$(regionUrl: string, force = false): Observable<void> {
   );
 }
 // ...×6, plus a subtle bug: clearing the list unconditionally wipes it on a guard-skip;
-// it must only clear on a *real* key change.
+// it must only clear on a *real* scope change.
 ```
 
 collapses to a declaration — no `_key` fields, no guard, no set/setLoaded/setError
@@ -148,9 +230,9 @@ ceremony, and the clear-on-change decision moves into the (tested-once) primitiv
 ```ts
 customers: entityCollection<Customer, string, { regionUrl: string }>({
   load: ({ regionUrl }) => api.getCustomers$(regionUrl),
-  key: ({ regionUrl }) => [regionUrl],
   selectId: c => c.externalId,
   staleTime: '30m',
+  // freshness compared per scope with `equal` (structural by default)
 });
 // caller: tree.$.customers.load({ regionUrl });
 ```
@@ -162,6 +244,8 @@ all of them."
 
 Implemented in [`markers/entity-collection.ts`](../../packages/core/src/lib/markers/entity-collection.ts);
 tests in [`markers/entity-collection-keyed.spec.ts`](../../packages/core/src/lib/markers/entity-collection-keyed.spec.ts)
-(single-flight, supersede, per-key freshness, refresh, invalidate, error, swr,
-clearOnKeyChange, invalidateTag, per-scope persist, keyed hydrate, and `load()`-vs-`load(params)`
-type enforcement). Full core suite green; parameterless form unchanged.
+(single-flight, supersede, per-scope freshness, refresh, invalidate, error, swr,
+clearOnParamsChange, invalidateTag, per-scope persist, scoped hydrate, and
+`load()`-vs-`load(params)` type enforcement). Full core suite green; parameterless form
+unchanged. NG0600-safety (deferred auto-load/seed) covered by the corresponding
+`async-source.spec.ts` and `entity-collection.spec.ts` render-timing cases.

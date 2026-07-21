@@ -1298,23 +1298,25 @@ invalidateTag(tree, 'plants'); // marks every collection carrying the tag stale
 
 Auto-loads on first `tree.$` access unless `lazy: true`. Keep HTTP-level caching (ETag / conditional GET) in the browser + `HttpClient`; `entityCollection` owns application-level freshness, not the transport.
 
-#### Keyed / scoped collections (v11.3+)
+#### Scoped collections (v11.4+)
 
-Add a third type param `P` and a `key` function to parameterize the collection by scope (region, customer, tenant, …) — see [RFC 0003](../../docs/rfcs/0003-keyed-entity-collection.md):
+Add a third type param `P` and give `load` a parameter to parameterize the collection by scope (region, customer, tenant, …) — see [RFC 0003](../../docs/rfcs/0003-keyed-entity-collection.md):
 
 ```typescript
 customers: entityCollection<Customer, string, { regionUrl: string }>({
   load: ({ regionUrl }) => api.getCustomers$(regionUrl),
-  key: ({ regionUrl }) => [regionUrl], // JSON-stable, order-sensitive — like a TanStack queryKey
   selectId: (c) => c.externalId,
   staleTime: '30m',
+  // freshness compared per scope with `equal` (default: structural value comparison)
 });
 
-tree.$.customers.load({ regionUrl }); // same key+fresh => no-op; key changed => refetch + entities replaced
-tree.$.customers.currentKey(); // Signal<string | null> — serialized key of the loaded scope
+tree.$.customers.load({ regionUrl }); // same scope+fresh => no-op; scope changed => refetch + entities replaced
+tree.$.customers.params(); // Signal<{ regionUrl: string } | undefined> — the typed scope of the loaded data
 ```
 
-Freshness (`staleTime`) is evaluated per-key, not globally: switching `regionUrl` marks the collection stale and refetches even if the old scope was still fresh. `.refresh(params?)` forces a reload (omit `params` to redo the last scope); `clearOnKeyChange` (default `false`) controls whether old rows stay visible during the scope switch. This is a **single-scope cache** — only the most recent key's rows are retained; a multi-key LRU is deferred (RFC 0003 §5). The parameterless form above is unaffected — `P` defaults to `void`.
+Freshness (`staleTime`) is evaluated per-scope, not globally: switching `regionUrl` marks the collection stale and refetches even if the old scope was still fresh. `.refresh(params?)` forces a reload (omit `params` to redo the last scope); `clearOnParamsChange` (default `false`) controls whether old rows stay visible during the scope switch. This is a **single-scope cache** — only the most recent scope's rows are retained; a multi-scope LRU is deferred (RFC 0003 §5). The parameterless (global) form above is unaffected — `P` defaults to `void`.
+
+**NG0600 fix (v11.4):** a non-lazy `entityCollection`'s auto-load — and any offline-first `persist` seed — is deferred to a microtask off the synchronous materialization/render pass, so reading a non-lazy collection first inside a template no longer throws `NG0600: Writing to signals is not allowed while Angular renders`. Auto-load is now asynchronous (data arrives on the next microtask instead of during construction). The same fix applies to `asyncSource`.
 
 ### 10) `status()` - Manual Async State
 
