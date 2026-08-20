@@ -55,6 +55,18 @@ const PACKAGES = [
 const COPIES = [
   ['apps/demo/public/llms.txt', 'dist/packages/core/llms.txt'],
   ['apps/demo/public/llms-full.txt', 'dist/packages/core/llms-full.txt'],
+  // Apache-2.0 requires the license text to travel WITH the distribution, and
+  // NOTICE with it. Published 14.1.2 declared `"license": "Apache-2.0"` in
+  // package.json and shipped NEITHER file — the tarball root held only dist,
+  // src, skills, README, llms*.txt and package.json.
+  //
+  // `files` cannot reference a parent directory, so a root-level LICENSE can
+  // never reach a tarball on its own. It has to be copied in, exactly like
+  // llms.txt above, and for the same reason that copy is not conditional.
+  ...PACKAGES.flatMap((pkg) => [
+    ['LICENSE', `dist/packages/${pkg}/LICENSE`],
+    ['NOTICE', `dist/packages/${pkg}/NOTICE`],
+  ]),
 ];
 
 function run(label, argv) {
