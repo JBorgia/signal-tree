@@ -32,6 +32,42 @@ const WRONG_ENTITY_METHODS: Record<string, string> = {
 };
 
 /**
+ * Refuse a mutation whose `intercept()` handler returned a Promise.
+ *
+ * `InterceptHandlers` declares its hooks as `=> void | Promise<void>`, so the
+ * published type INVITES an async handler. Every call site below runs handlers
+ * in a plain synchronous loop, which means an async handler's `ctx.block()`
+ * arrives after the write has already committed: the guard FAILS OPEN and the
+ * mutation silently succeeds. That is the shape an async permission or
+ * uniqueness check naturally takes, and a guard that silently permits is worse
+ * than no guard, because it is relied upon.
+ *
+ * This refuses the mutation instead, in EVERY build. Not dev-only: a permissive
+ * production path is precisely the defect being fixed.
+ *
+ * The type is left as-is here rather than narrowed to `void`, which would be a
+ * source-breaking change for consumers who wrote the async form. They were
+ * already broken; this makes the breakage loud instead of silent.
+ */
+function refuseAsyncInterceptor(result: unknown, hook: string): void {
+  if (
+    result !== null &&
+    (typeof result === 'object' || typeof result === 'function') &&
+    typeof (result as { then?: unknown }).then === 'function'
+  ) {
+    throw new Error(
+      `SignalTree: an entityMap intercept() \`${hook}\` handler returned a ` +
+        `Promise. Async interceptors CANNOT block or transform — handlers run ` +
+        `synchronously, so the mutation would commit before the handler resumed ` +
+        `and \`ctx.block()\` would be ignored. The mutation has been REFUSED ` +
+        `rather than allowed through unchecked. Do the async work BEFORE calling ` +
+        `the mutation, then validate synchronously inside the handler. [ST2033]`
+    );
+  }
+}
+
+
+/**
  * EntitySignal Implementation (Composition Pattern)
  *
  * Map-based reactive entity collections with:
@@ -743,7 +779,7 @@ export function createEntitySignal<
           blocked: false,
           blockReason: undefined,
         };
-        handler.onAdd?.(entity, ctx);
+        refuseAsyncInterceptor(handler.onAdd?.(entity, ctx), 'onAdd');
       }
 
       // Store and update signals
@@ -885,7 +921,7 @@ export function createEntitySignal<
             blocked: false,
             blockReason: undefined,
           };
-          handler.onAdd?.(entity, ctx);
+          refuseAsyncInterceptor(handler.onAdd?.(entity, ctx), 'onAdd');
         }
 
         storage.set(id, transformedEntity);
@@ -940,7 +976,7 @@ export function createEntitySignal<
           blocked: false,
           blockReason: undefined,
         };
-        handler.onUpdate?.(id, changes, ctx);
+        refuseAsyncInterceptor(handler.onUpdate?.(id, changes, ctx), 'onUpdate');
       }
 
       const finalUpdated = { ...entity, ...transformedChanges };
@@ -991,7 +1027,7 @@ export function createEntitySignal<
           blocked: false,
           blockReason: undefined,
         };
-        handler.onUpdate?.(id, entity as Partial<E>, ctx);
+        refuseAsyncInterceptor(handler.onUpdate?.(id, entity as Partial<E>, ctx), 'onUpdate');
       }
 
       storage.set(id, next);
@@ -1037,7 +1073,7 @@ export function createEntitySignal<
             blocked: false,
             blockReason: undefined,
           };
-          handler.onUpdate?.(id, changes, ctx);
+          refuseAsyncInterceptor(handler.onUpdate?.(id, changes, ctx), 'onUpdate');
         }
 
         const finalUpdated = { ...entity, ...transformedChanges };
@@ -1103,7 +1139,7 @@ export function createEntitySignal<
           blocked: false,
           blockReason: undefined,
         };
-        handler.onRemove?.(id, entity, ctx);
+        refuseAsyncInterceptor(handler.onRemove?.(id, entity, ctx), 'onRemove');
       }
 
       // Delete and update signals
@@ -1146,7 +1182,7 @@ export function createEntitySignal<
             blocked: false,
             blockReason: undefined,
           };
-          handler.onRemove?.(id, entity, ctx);
+          refuseAsyncInterceptor(handler.onRemove?.(id, entity, ctx), 'onRemove');
         }
 
         entitiesToRemove.push({ id, entity });
@@ -1237,7 +1273,7 @@ export function createEntitySignal<
             blocked: false,
             blockReason: undefined,
           };
-          handler.onAdd?.(entity, ctx);
+          refuseAsyncInterceptor(handler.onAdd?.(entity, ctx), 'onAdd');
         }
         storage.set(id, transformedEntity);
         nodeCache.delete(id);
@@ -1268,7 +1304,7 @@ export function createEntitySignal<
             blocked: false,
             blockReason: undefined,
           };
-          handler.onUpdate?.(id, entity, ctx);
+          refuseAsyncInterceptor(handler.onUpdate?.(id, entity, ctx), 'onUpdate');
         }
         const finalUpdated = { ...prev, ...transformedChanges };
         storage.set(id, finalUpdated);
@@ -1343,7 +1379,7 @@ export function createEntitySignal<
             blocked: false,
             blockReason: undefined,
           };
-          handler.onAdd?.(entity, ctx);
+          refuseAsyncInterceptor(handler.onAdd?.(entity, ctx), 'onAdd');
         }
 
         storage.set(id, transformedEntity);
