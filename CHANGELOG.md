@@ -1,3 +1,58 @@
+## 14.1.3 (unreleased)
+
+### Fixed
+
+- **`entityMap` `intercept()` no longer fails open on an async handler.**
+  `InterceptHandlers` declares every hook as `=> void | Promise<void>`, so the
+  published type invites an async handler — but handlers run in a plain
+  synchronous loop, so an async handler's `ctx.block()` arrived *after* the write
+  had committed. The guard silently permitted the mutation and the rejection
+  landed nowhere. Measured on published 14.1.2: `addOne` returned without
+  throwing, the row was present, and it held the value the handler believed it
+  had blocked.
+
+  All ten intercept call sites now refuse the mutation and throw **ST2033** if a
+  handler returns a thenable — `addOne`, `addMany`, `updateOne`, `replaceOne`,
+  `updateMany`, `removeOne`, `removeMany`, both halves of `upsertMany`, and
+  `setAll`. The refusal is unconditional, not dev-only: a permissive production
+  path was the defect.
+
+  **This is breaking for code that used the async form.** That code was never
+  blocking anything — it only looked like it was. Do the async work before
+  calling the mutation, then validate synchronously inside the handler.
+
+  `tap()` is unaffected. It fires after the write and never promised to block, so
+  an async observer there remains legitimate.
+
+  The type is deliberately left as `void | Promise<void>` rather than narrowed to
+  `void`. Narrowing describes what the runtime supports but is source-breaking
+  for the same consumers, who are already broken; this makes the breakage loud
+  first. The type will be deprecated in a later 14.x.
+
+- **`LICENSE` and `NOTICE` now ship inside every package.** 14.1.2 declared
+  `"license": "Apache-2.0"` and shipped neither file — the tarball root held only
+  `dist`, `src`, `skills`, `README.md`, `llms*.txt` and `package.json`. `files`
+  cannot reference a parent directory, so a root-level `LICENSE` could never
+  reach a tarball on its own; it is now copied into each package during publish
+  staging, exactly like `llms.txt`, and declared in `files` so
+  `verify-publish-artifacts` enforces it. Core ships it in this release; the
+  other packages pick it up on their next.
+
+- **The repository is relicensed to Apache-2.0, matching what is published.** The
+  relicense was made on a development branch and never merged, so `main` said
+  BUSL-1.1 while every published 14.1.2 package said Apache-2.0 — the tree and
+  the registry granted different rights. `main` now matches the registry.
+
+> **14.1.2 (2026-08-17) — published, but not from a recorded state.** It carries
+> no git tag, its version bump was never committed on any branch, and
+> reconstructing the tarball places its source on an unmerged development branch
+> at a state several days older than that branch's tip: it contains
+> `markers/status.js`, contains the ST2031 diagnostic that branch removed on
+> 2026-08-13, and declares the Apache-2.0 relicense made on 2026-08-11. It was
+> the whole package family, not core alone. Content is 14.1.1 plus the relicense;
+> the exact commit is not identifiable, so no tag has been fabricated for it. See
+> `RELEASE-1.0.md` for the full provenance ledger and the process fixes.
+
 ## 14.1.1 (2026-08-11)
 
 > **14.1.0 was published and immediately superseded — do not install it.** It shipped
