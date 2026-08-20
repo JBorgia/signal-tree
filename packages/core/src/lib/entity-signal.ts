@@ -50,9 +50,15 @@ const WRONG_ENTITY_METHODS: Record<string, string> = {
  * already broken; this makes the breakage loud instead of silent.
  */
 function refuseAsyncInterceptor(result: unknown, hook: string): void {
+  // The Promises/A+ thenable test, and nothing more. An earlier revision also
+  // checked `typeof result === 'object' || typeof result === 'function'`, which
+  // tripped the walker-guard lint rule — correctly, since that IS the shape of a
+  // hand-rolled traversal guard. The right answer was not to reach for
+  // `isTraversableNode()` (this is not a tree walk) but to notice the check was
+  // redundant: reading `.then` off a number or string is safe once null and
+  // undefined are excluded, and a callable thenable is still caught.
   if (
-    result !== null &&
-    (typeof result === 'object' || typeof result === 'function') &&
+    result != null &&
     typeof (result as { then?: unknown }).then === 'function'
   ) {
     throw new Error(
