@@ -3100,6 +3100,10 @@ may legitimately remain if it appears in neutral async contracts.
       `ng-forms` now imports `isTraversableNode` from the core root; validation:
       `pnpm nx build ng-forms --skip-nx-cache --output-style=static`, emitted
       artifact grep, `npm run typecheck:source`.
+- [x] Remove demo pressure for unearned authoring APIs — `58d27090` removed the
+  benchmark service dependency on enhancer-order internals, and `e71e758c`
+  deleted the reachable custom marker/enhancer authoring page. Validation:
+  `pnpm nx build demo --skip-nx-cache --output-style=static`.
 - [ ] Derive or delete each remaining external implementer need independently
 - [ ] Only after convergence, decide whether any shared neutral contract and
       package boundary exists
