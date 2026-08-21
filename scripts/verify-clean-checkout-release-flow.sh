@@ -14,10 +14,13 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "📦 Exporting clean checkout for $REF"
-git -C "$ROOT" archive "$REF" | tar -x -C "$TMP_DIR"
+echo "📦 Cloning clean checkout for $REF"
+git clone --quiet --no-hardlinks "$ROOT" "$TMP_DIR/repo"
+cd "$TMP_DIR/repo"
+git checkout --quiet "$REF"
 
-cd "$TMP_DIR"
+echo "📦 Verifying clean git state"
+git status --short --untracked-files=no
 
 echo "📦 Installing from frozen lockfile"
 pnpm install --frozen-lockfile --ignore-scripts
