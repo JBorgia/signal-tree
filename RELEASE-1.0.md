@@ -2554,9 +2554,8 @@ been corrected to say so.
 | `events/angular`                    | `@angular/core`, `@angular/core/rxjs-interop`, `rxjs`, `rxjs/webSocket`, `tslib` |
 | `events/nestjs`                     | `@nestjs/common`, `bullmq`, `tslib`                                              |
 | `events/testing`                    | (none)                                                                           |
-| `ng-forms` `.`                      | `@angular/core`, `@angular/forms`, `@signaltree/core{,/authoring}`, `rxjs`       |
+| `ng-forms` `.`                      | `@angular/core`, `@angular/forms`, `@signaltree/core`, `rxjs`                    |
 | `ng-forms/audit`                    | `@signaltree/core` only — confirms it is a pure re-export                        |
-| `ng-forms/signals`                  | `@angular/core`, `@angular/forms/signals`, `@signaltree/core{,/authoring}`       |
 
 **This corrects an earlier claim of mine.** `schema` and `guardrails` are no
 longer package-topology inputs. Their existence was current-form evidence, not a
@@ -3097,6 +3096,10 @@ may legitimately remain if it appears in neutral async contracts.
       `nx lint core`, emitted declaration inspection.
 - [x] Move current-form package pressure out of the decision — `a4bc5493`,
       `a0cf4f34`, `7335ed88`
+- [x] Remove `ng-forms` dependency on `@signaltree/core/authoring` — `b6aac5a9`.
+      `ng-forms` now imports `isTraversableNode` from the core root; validation:
+      `pnpm nx build ng-forms --skip-nx-cache --output-style=static`, emitted
+      artifact grep, `npm run typecheck:source`.
 - [ ] Derive or delete each remaining external implementer need independently
 - [ ] Only after convergence, decide whether any shared neutral contract and
       package boundary exists
@@ -3194,7 +3197,14 @@ REMOVE — type machinery public only because inference needed it.
 content. **Core owns audit; remove the republication.** Also eliminate
 `ng-forms`' four `export *` barrels so its contract is explicit.
 
-**`realtime` — 13 symbols, the abstraction is real.**
+**Historical `realtime` note — superseded by `048c5132`.**
+
+The classification below is retained only as evidence for why `realtime` was
+examined. It is not an active package-topology recommendation: external
+synchronization did not earn package survival for 15.0, and `@signaltree/realtime`
+has been deleted.
+
+Earlier classification:
 
 | Class             |   n | Detail                                              |
 | ----------------- | --: | --------------------------------------------------- |
@@ -3202,10 +3212,8 @@ content. **Core owns audit; remove the republication.** Also eliminate
 | Supabase-specific |   4 | The whole `./supabase` subpath                      |
 | Angular-specific  |   0 | —                                                   |
 
-**KEEP the name.** A rename to `@signaltree/supabase` would destroy a working
-provider boundary. The defect is that Angular sits in the NEUTRAL half —
-`connection-state.ts` and `types.ts` import `@angular/core` — so the cleanup is
-2 files, not a repackaging.
+Earlier conclusion, now withdrawn: keeping the name was plausible only if the
+external synchronization package itself survived. It did not.
 
 Recommended topology, pending that decision:
 
@@ -3217,13 +3225,13 @@ Recommended topology, pending that decision:
    +----------+-------+--------+-----------+
    |          |                |           |
 ng-forms   schema?          realtime?   guardrails
-(Angular)  (neutral?)       (neutral?)  (already neutral)
+(Angular)  (deleted)        (deleted)   (deleted)
 
 events: root neutral, Angular peer scoped to ./angular, Nest to ./nestjs
 ```
 
-Two facts support this being achievable rather than aspirational: `guardrails`
-already imports zero Angular across 6 files, and `shared` zero across 12.
+This topology sketch is historical; current live packages after companion
+deletions are `core`, `events`, and `ng-forms`, plus private `shared`.
 
 ### RESOLVED at `56572c5d` — declaration closure, entity-map instance
 
@@ -5655,7 +5663,8 @@ in 21. Defensible, but it must be stated as policy.
 Angular 20                       OUT of the 15.0 product boundary
 Angular 21                       supported
 Angular 22                       supported, primary development target
-@signaltree/ng-forms/signals     Angular 22+ (stability policy)
+@signaltree/ng-forms/signals     UNRESOLVED after schema-route deletion; current
+                                 package manifest publishes no such subpath
 ```
 
 **Rationale is PRODUCT HORIZON, and note it is the compatibility-UNfriendly
