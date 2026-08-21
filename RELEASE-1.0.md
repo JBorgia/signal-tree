@@ -10897,8 +10897,8 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
       (66/66): `enhancer-cleanup`, `entity-predicate-churn`,
       `marker-snapshot-memo`, `stored-leak`, `memory-manager`, `memory-stress`.
       Smoke measurements: `node --expose-gc tools/bench-retention-arms.mjs
-  scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
-  100 5`, `node tools/bench-predicate-memo.mjs --n 100 --reads 20 --json`.
+scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
+100 5`, `node tools/bench-predicate-memo.mjs --n 100 --reads 20 --json`.
 - [x] error model audit — focused error tests passed (156/156),
       `node tools/check-error-codes.mjs`, `node tools/check-error-codes.mjs --self-test`,
       `node tools/check-devmode-foldable.mjs`,
@@ -10917,10 +10917,25 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
       Angular support claim. Validation: `node scripts/lint-readme-apis.mjs`,
       `node scripts/verify-version-claims.js`.
 - [x] docs/examples/demo — stale links to deleted AI artifacts and removed
-  source files were removed or rewritten as prose. Validation:
-  `node tools/check-doc-links.mjs`, `node scripts/lint-readme-apis.mjs`,
-  `node scripts/verify-version-claims.js`, `npm run smoke:routes`.
-- [ ] package metadata/license/security audit
+      source files were removed or rewritten as prose. Validation:
+      `node tools/check-doc-links.mjs`, `node scripts/lint-readme-apis.mjs`,
+      `node scripts/verify-version-claims.js`, `npm run smoke:routes`.
+- [x] package metadata/license/security audit — publishable package manifests
+  now include `LICENSE` and `NOTICE`, Rollup build assets copy them into
+  each dist package, and package hygiene enforces both files. Direct
+  production advisories were cleared by updating `echarts`/`lodash-es`,
+  moving type-only `@vercel/node` to devDependencies, and pinning its dev
+  `undici` tree to the latest 5.x patch. Validation:
+  `pnpm audit --prod`, `pnpm nx run-many -t build -p core,events,ng-forms
+  --skip-nx-cache --output-style=static`,
+  `node scripts/verify-package-hygiene.js`,
+  `node scripts/verify-package-hygiene.js --self-test`,
+  `node scripts/verify-exports.js`,
+  `node scripts/verify-publish-artifacts.mjs core events ng-forms`,
+  `node tools/verify-tarball-consumer.mjs`,
+  `node tools/verify-consumer-typecheck.mjs`,
+  `node tools/verify-angular-consumer.mjs`,
+  `node tools/check-bundle-budget.mjs`.
 
 Exit condition: `GATE D`
 

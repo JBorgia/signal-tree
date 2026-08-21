@@ -32,7 +32,9 @@
   "files": [
     "dist/**/*.js",
     "src/**/*.d.ts",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "repository": {
     "type": "git",

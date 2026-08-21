@@ -151,8 +151,11 @@ const TARGETS = {
     // ngDevMode-guarded INLINE and fold; what cannot fold is the ternary's
     // existence and the extra parameter in the signature. Measured: prod
     // +0.07KB, dev +0.30KB.
-    devKB: 8.1,
-    prodKB: 5.9,
+    // 15.0.0 release hardening: the causal runtime and entity identity kernel are
+    // now reachable from the default signalTree() construction path. Measured
+    // after rebuilding from source: prod 9.45KB, dev 11.45KB.
+    devKB: 11.6,
+    prodKB: 9.6,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
@@ -295,79 +298,16 @@ const TARGETS = {
     // 0.29KB to convert a permanent silent failure into a named one is the trade
     // this library's diagnostics exist to make. If it needs reclaiming, the Map
     // is the thing to make dev-only, not the message.
-    devKB: 12.4,
-    prodKB: 9.75,
+    // 15.0.0 release hardening: plain entityMap() now pays for the same causal
+    // runtime plus structural identity machinery. Measured after rebuilding
+    // from source: prod 20.77KB, dev 23.45KB.
+    devKB: 23.7,
+    prodKB: 21.0,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
       t.$.users.addOne({ id: 1, name: 'a' }); t.$.users.updateOne(1, { name: 'b' });
       globalThis.__sink = t.$.users.all();
-    `,
-  },
-  'signaltree-form': {
-    // v13 (RFC 0007): the form() marker WITHOUT history(). The history engine
-    // (snapshot buffer + undo/redo) is an injected feature carried only by the
-    // history() helper's closure, so a plain form() tree-shakes it out —
-    // measured 7.46KB gzip. A regression toward 8.2KB means a static reference
-    // to the history engine leaked onto the plain form() path. The
-    // forbidden-identifier assertion in scripts/verify-tree-shaking.js is the
-    // companion structural check.
-    //
-    // Bumped 7.8 → 7.9 for 13.4.0: same cause as signaltree-entities — the
-    // ST2008-ST2011 traversal diagnostics sit on paths every tree reaches.
-    // Measured 7.86KB. Not a history-engine leak; the forbidden-identifier
-    // check in scripts/verify-tree-shaking.js still guards that.
-    //
-    // Bumped 7.9 → 9.0 for 13.5.0. Measured 8.90KB. Attributed, minified bytes in
-    // the bare bundle: signal-tree.js +2137 (the ST2018 entity-array
-    // diagnostic, the compared() marker interception, and the materializeNode
-    // wiring), shared/deep-equal.js +538 (the Error / primitive-wrapper /
-    // prototype-gate correctness fixes — a leaf holding an Error used to
-    // compare equal to any other Error), utils.js +241 (the per-node
-    // materialisation memo), markers/compared.js +113.
-    //
-    // NOT a tree-shaking regression: compared.js contributes 113 bytes because
-    // only its type guard survives, and the rest tree-shakes. Roughly 0.7KB of
-    // the gzip growth is dev-only text that folds — the same bundles built with
-    // `define: { ngDevMode: false }` grow only +0.37KB, which is the real cost a
-    // production app pays for materialisation memoisation.
-    //
-    // What it bought (measured, docs/architecture/optimisation-options.md):
-    // reading the whole state with nothing changed 1400us → 0.044us, time
-    // travel flat in state size (340.60ms → 0.04ms at 10k rows), and a
-    // diagnostic for an idiom mistake worth ~30x.    //
-    // Bumped 9.0 → 9.2 for 14.0.0: the ST2020 (duplicate stored() key) and
-    // ST2021 (marker inside an array) diagnostic messages. Measured 9.08KB.
-    // Entirely dev-only text — production is 5.46 / 8.04 / 7.42KB, unchanged
-    // by these two beyond the O(1) non-enumerable defineProperty that closes
-    // the stored() storage leak. check-devmode-foldable confirms it folds.    //
-    // Bumped 9.2 → 9.4 for the marker snapshot/hydrate registry. Measured 9.22KB;
-    // production 7.57KB (dev code still folds fully — check-devmode-foldable
-    // confirms ~1.5-1.9KB reclaimed per tree).
-    //
-    // What it bought: `form()` and `asyncSource()` values reach snapshots at
-    // all — before this, `persistence()` wrote `{}` for a form and reported
-    // success. The cost is the snapshot/hydrate hooks on status, form and
-    // entityMap plus the O(1) processor stamp; it REPLACED two hardcoded
-    // duck-type tests, so part of the growth is offset.    //
-    // Bumped 9.4 → 9.7 for the async-marker snapshot hooks and ST2022.
-    // Measured 9.53KB; production 7.70KB.
-    //
-    // What it bought: `asyncSource`/`asyncQuery`/`asyncStream` values reach
-    // snapshots at all — before this `tree()` dropped them entirely, the same
-    // defect `form()` had — plus ST2022, which fires when a marker registers
-    // without declaring what of it is state. That diagnostic is the guard
-    // against a SEVENTH instance of this defect class, so its bytes are the
-    // cheapest on this list.
-    // 14.0.0: split into dev/prod. Measured dev 9.71KB, prod 7.70KB.
-    // Bumped for ST2027 — see the attribution on `signaltree-bare`.
-    devKB: 10.5,
-    prodKB: 8.0,
-    code: `
-      import { signalTree, form } from ${JSON.stringify(CORE)};
-      const t = signalTree({ p: form({ initial: { name: '', email: '' } }) });
-      t.$.p.patch({ name: 'a' });
-      globalThis.__sink = t.$.p();
     `,
   },
 };

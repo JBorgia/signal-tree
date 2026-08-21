@@ -16,7 +16,8 @@
  *      test configs, fixtures, `node_modules`. This is the accident this gate
  *      exists to catch (a mis-scoped `files` glob shipping the world).
  *   2. Required entries ARE present — `package.json`, the `main`/`module`
- *      entry, at least one `.d.ts`, and every `exports` subpath target.
+ *      entry, at least one `.d.ts`, the Apache license/notice texts, and every
+ *      `exports` subpath target.
  *
  * Run: node scripts/verify-package-hygiene.js
  *      node scripts/verify-package-hygiene.js --self-test
@@ -69,6 +70,8 @@ function checkPackage(files, distDir) {
 
   const has = (p) => files.includes(p);
   if (!has('package.json')) violations.push('missing package.json');
+  if (!has('LICENSE')) violations.push('missing LICENSE');
+  if (!has('NOTICE')) violations.push('missing NOTICE');
 
   const pkg = JSON.parse(
     fs.readFileSync(path.join(distDir, 'package.json'), 'utf8')
@@ -178,9 +181,17 @@ function selfTest() {
   expect('flags a source map', v.some((x) => x.includes('source map')));
   expect('flags raw .ts source', v.some((x) => x.includes('raw .ts')));
 
-  const clean = ['package.json', 'dist/index.js', 'dist/index.d.ts'];
+  const clean = [
+    'package.json',
+    'LICENSE',
+    'NOTICE',
+    'dist/index.js',
+    'dist/index.d.ts',
+  ];
   expect('passes a clean package', checkPackage(clean, tmp).length === 0);
   expect('keeps .d.ts (not flagged as raw .ts)', !checkPackage(clean, tmp).some((x) => x.includes('raw .ts')));
+  expect('requires LICENSE', checkPackage(clean.filter((f) => f !== 'LICENSE'), tmp).some((x) => x.includes('LICENSE')));
+  expect('requires NOTICE', checkPackage(clean.filter((f) => f !== 'NOTICE'), tmp).some((x) => x.includes('NOTICE')));
 
   fs.rmSync(tmp, { recursive: true, force: true });
   if (failed) {

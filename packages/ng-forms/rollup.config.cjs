@@ -20,6 +20,16 @@ const options = {
       output: '.',
     },
     {
+      input: '.',
+      glob: 'LICENSE',
+      output: '.',
+    },
+    {
+      input: '.',
+      glob: 'NOTICE',
+      output: '.',
+    },
+    {
       input: 'packages/ng-forms',
       glob: 'package.json',
       output: '.',

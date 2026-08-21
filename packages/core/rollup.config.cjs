@@ -19,6 +19,16 @@ const options = {
       output: '.',
     },
     {
+      input: '.',
+      glob: 'LICENSE',
+      output: '.',
+    },
+    {
+      input: '.',
+      glob: 'NOTICE',
+      output: '.',
+    },
+    {
       input: 'packages/core',
       glob: 'package.json',
       output: '.',
