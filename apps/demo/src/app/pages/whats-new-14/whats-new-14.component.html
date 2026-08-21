@@ -12,9 +12,8 @@
     <nav class="page-toc" aria-label="On this page">
       <a href="#collections">1. Collections</a>
       <a href="#history">2. Time travel</a>
-      <a href="#observe">3. Observation seams</a>
-      <a href="#st2026">4. ST2026, measured</a>
-      <a href="#fanout">5. Fan-out, measured</a>
+      <a href="#st2026">3. ST2026, measured</a>
+      <a href="#fanout">4. Fan-out, measured</a>
     </nav>
   </header>
 
@@ -99,35 +98,6 @@
       canUndo: <strong>{{ canUndo() }}</strong> · canRedo:
       <strong>{{ canRedo() }}</strong>
     </p>
-  </section>
-
-  <section id="observe" class="section">
-    <h2 class="section-title">Observation seams</h2>
-    <p class="section-intro">
-      <code>onTreeError</code> is one place to see every error the library
-      catches. <code>onHydrateDecision</code> reports when a marker declines a
-      rehydrate because its loader owns that data — deliberately
-      <strong>not</strong> a warning, because declining is correct and warning
-      on correct behaviour trains people to ignore the channel.
-    </p>
-    <div class="log-grid">
-      <div class="log">
-        <h3>onTreeError</h3>
-        @for (e of errors(); track e) {
-        <p class="log-line">{{ e }}</p>
-        } @empty {
-        <p class="log-empty">nothing caught yet</p>
-        }
-      </div>
-      <div class="log">
-        <h3>onHydrateDecision</h3>
-        @for (d of hydrateDecisions(); track d) {
-        <p class="log-line">{{ d }}</p>
-        } @empty {
-        <p class="log-empty">no hydrate decisions yet</p>
-        }
-      </div>
-    </div>
   </section>
 
   <section id="st2026" class="section section-alt">
