@@ -10893,7 +10893,12 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
   match surviving routes after package deletion, then validated the built
   demo. Validation: `pnpm nx build demo --configuration=production
   --skip-nx-cache --output-style=static`, `npm run smoke:routes` (21 passed).
-- [ ] lifecycle/memory/churn tests
+- [x] lifecycle/memory/churn tests — focused lifecycle/churn specs passed
+  (66/66): `enhancer-cleanup`, `entity-predicate-churn`,
+  `marker-snapshot-memo`, `stored-leak`, `memory-manager`, `memory-stress`.
+  Smoke measurements: `node --expose-gc tools/bench-retention-arms.mjs
+  scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
+  100 5`, `node tools/bench-predicate-memo.mjs --n 100 --reads 20 --json`.
 - [ ] error model audit
 - [ ] persistence contract audit/documentation
 - [ ] SSR/hydration decision and tests/docs
