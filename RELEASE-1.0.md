@@ -2594,10 +2594,10 @@ some belong elsewhere and having to redo `GATE B`. Four questions:
    publishes only `.`, with no `./audit` subpath. `ng-forms` now uses an
    explicit public barrel instead of `export *`, so core owns audit and forms
    owns only its Angular forms API.
-3. **Live packages that declare an `@angular/core` peer while their public types
-   do not require it** — `events` (0 of 116). `events` already splits
-   `./angular` and `./nestjs` subpaths, so its root could be framework-neutral
-   with Angular peer-scoped to the subpath.
+3. **`events` peer topology — CLOSED.** Root remains framework-neutral and emits
+  `zod` only. Framework-specific dependencies are package-scoped optional peers
+  because npm cannot scope peers per subpath; install only the peers for the
+  subpaths used.
 4. **`@signaltree/kernel`: private boundary or published package?** Recommend
    PRIVATE first. The extraction prerequisite is unchanged — the realization
    port still consumes the Angular-shaped `TreeScalarSlotRuntime` and must move

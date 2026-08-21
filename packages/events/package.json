@@ -57,13 +57,7 @@
     "@nestjs/common": {
       "optional": true
     },
-    "@nestjs/core": {
-      "optional": true
-    },
     "bullmq": {
-      "optional": true
-    },
-    "ioredis": {
       "optional": true
     },
     "@angular/core": {
@@ -76,9 +70,6 @@
       "optional": true
     },
     "@signaltree/core": {
-      "optional": true
-    },
-    "socket.io-client": {
       "optional": true
     }
   },
