@@ -60,12 +60,19 @@ for (const pkg of readdirSync(join(ROOT, 'packages'))) {
   }
 }
 
-const documented = new Set(
-  (readFileSync(join(ROOT, CATALOGUE), 'utf8').match(CODE) ?? []).map(String)
+const catalogueText = readFileSync(join(ROOT, CATALOGUE), 'utf8');
+const documented = new Set((catalogueText.match(CODE) ?? []).map(String));
+const retired = new Set(
+  catalogueText
+    .split('\n')
+    .filter((line) => /\b(Historical|retired|deleted|no longer emitted)\b/i.test(line))
+    .flatMap((line) => line.match(CODE) ?? [])
 );
 
 const undocumented = [...emitted].filter((c) => !documented.has(c)).sort();
-const phantom = [...documented].filter((c) => !emitted.has(c)).sort();
+const phantom = [...documented]
+  .filter((c) => !emitted.has(c) && !retired.has(c))
+  .sort();
 
 if (process.argv.includes('--self-test')) {
   // The check must fail when a code is emitted and undocumented. Simulate by

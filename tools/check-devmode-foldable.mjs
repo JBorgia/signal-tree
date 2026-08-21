@@ -56,7 +56,7 @@ const CORE = new URL('../dist/packages/core/dist/index.js', import.meta.url)
 const REPO_NODE_MODULES = new URL('../node_modules', import.meta.url).pathname;
 const EXTERNAL = ['@angular/*', 'rxjs', 'rxjs/*', 'tslib'];
 
-/** Same entry shapes as the budget gate — bare / entities / form. */
+/** Same entry shapes as the surviving budget gate targets — bare / entities. */
 const TARGETS = {
   'signaltree-bare': `
     import { signalTree } from ${JSON.stringify(CORE)};
@@ -69,12 +69,6 @@ const TARGETS = {
     const t = signalTree({ count: 0, users: entityMap() });
     t.$.users.addOne({ id: 1, name: 'a' });
     globalThis.__sink = t.$.users.all();
-  `,
-  'signaltree-form': `
-    import { signalTree, form } from ${JSON.stringify(CORE)};
-    const t = signalTree({ p: form({ initial: { name: '', email: '' } }) });
-    t.$.p.patch({ name: 'a' });
-    globalThis.__sink = t.$.p();
   `,
 };
 

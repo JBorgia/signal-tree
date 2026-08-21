@@ -10890,16 +10890,19 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
 ## Phase 4 — Release Quality
 
 - [x] compatibility/runtime/browser coverage — updated route-smoke coverage to
-  match surviving routes after package deletion, then validated the built
-  demo. Validation: `pnpm nx build demo --configuration=production
+      match surviving routes after package deletion, then validated the built
+      demo. Validation: `pnpm nx build demo --configuration=production
   --skip-nx-cache --output-style=static`, `npm run smoke:routes` (21 passed).
 - [x] lifecycle/memory/churn tests — focused lifecycle/churn specs passed
-  (66/66): `enhancer-cleanup`, `entity-predicate-churn`,
-  `marker-snapshot-memo`, `stored-leak`, `memory-manager`, `memory-stress`.
-  Smoke measurements: `node --expose-gc tools/bench-retention-arms.mjs
-  scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
-  100 5`, `node tools/bench-predicate-memo.mjs --n 100 --reads 20 --json`.
-- [ ] error model audit
+      (66/66): `enhancer-cleanup`, `entity-predicate-churn`,
+      `marker-snapshot-memo`, `stored-leak`, `memory-manager`, `memory-stress`.
+      Smoke measurements: `node --expose-gc tools/bench-retention-arms.mjs
+      scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
+      100 5`, `node tools/bench-predicate-memo.mjs --n 100 --reads 20 --json`.
+- [x] error model audit — focused error tests passed (156/156),
+      `node tools/check-error-codes.mjs`, `node tools/check-error-codes.mjs --self-test`,
+      `node tools/check-devmode-foldable.mjs`,
+      `node tools/check-devmode-foldable.mjs --self-test`
 - [ ] persistence contract audit/documentation
 - [ ] SSR/hydration decision and tests/docs
 - [ ] README upgrade
