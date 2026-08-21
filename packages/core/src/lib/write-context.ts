@@ -1,4 +1,4 @@
-import type { UpdateMetadata } from './types';
+import type { UpdateMetadata } from './mutation-types';
 
 /**
  * Ambient write-context channel for tagging tree writes with `UpdateMetadata`.

@@ -13,7 +13,7 @@ import { getActiveWriteContext } from './write-context';
 
 import { getCausalWriteMode } from './causal-write-mode';
 
-import type { MutationEnvelope, UpdateMetadata } from './types';
+import type { MutationEnvelope, UpdateMetadata } from './mutation-types';
 
 export type PathNotifierHandler = (
   value: unknown,
