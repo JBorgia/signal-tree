@@ -62,11 +62,12 @@ export default [
     // (different variables) also flags — zero in-tree instances today; if one
     // ever appears legitimately, eslint-disable-next-line it with a comment.
     files: ['packages/*/src/**/*.ts'],
-    // node-shape.ts DECLARES isTraversableNode, so it is the one place the
-    // hand-rolled shape actually belongs. utils.ts stays ignored because it
-    // re-exports it and still holds signal-shaped guards of its own.
+    // is-traversable-node.ts DECLARES isTraversableNode, so it is the one place
+    // the hand-rolled shape actually belongs. Core's historical node-shape.ts
+    // stays ignored while internal call sites are migrated.
     ignores: [
       '**/*.spec.ts',
+      'packages/shared/src/lib/is-traversable-node.ts',
       'packages/core/src/lib/utils.ts',
       'packages/core/src/lib/internals/node-shape.ts',
     ],
@@ -77,7 +78,7 @@ export default [
           selector:
             'LogicalExpression:has(BinaryExpression[operator=/^[!=]==?$/]:has(UnaryExpression[operator="typeof"]) > Literal[value="object"]):has(BinaryExpression[operator=/^[!=]==?$/]:has(UnaryExpression[operator="typeof"]) > Literal[value="function"]) BinaryExpression[operator=/^[!=]==?$/]:has(UnaryExpression[operator="typeof"]) > Literal[value="object"]',
           message:
-            "Hand-rolled 'object or function' walker guard — use isTraversableNode() from @signaltree/core (packages/core/src/lib/utils.ts) instead. See docs/rfcs/0004-v12-optimal-iteration.md §3 V-P1.",
+            "Hand-rolled 'object or function' walker guard — use isTraversableNode() from @signaltree/shared instead. See docs/rfcs/0004-v12-optimal-iteration.md §3 V-P1.",
         },
       ],
     },

@@ -1,6 +1,7 @@
 import { deepClone } from './deep-clone.js';
 import { deepEqual } from './deep-equal.js';
 import { isBuiltInObject } from './is-built-in-object.js';
+import { isTraversableNode } from './is-traversable-node.js';
 import { LRUCache } from './lru-cache.js';
 import {
   clearParsePathCache,
@@ -80,6 +81,22 @@ describe('Shared utilities', () => {
       expect(isBuiltInObject(Object.create(null))).toBe(false);
       expect(isBuiltInObject(123)).toBe(false);
       expect(isBuiltInObject('test')).toBe(false);
+    });
+  });
+
+  describe('isTraversableNode', () => {
+    it('accepts objects and functions', () => {
+      expect(isTraversableNode({})).toBe(true);
+      expect(isTraversableNode([])).toBe(true);
+      expect(isTraversableNode(() => undefined)).toBe(true);
+    });
+
+    it('rejects nullish and primitive values', () => {
+      expect(isTraversableNode(null)).toBe(false);
+      expect(isTraversableNode(undefined)).toBe(false);
+      expect(isTraversableNode('value')).toBe(false);
+      expect(isTraversableNode(1)).toBe(false);
+      expect(isTraversableNode(false)).toBe(false);
     });
   });
 

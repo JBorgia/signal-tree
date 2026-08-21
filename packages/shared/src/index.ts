@@ -3,6 +3,7 @@ export * from './lib/deep-clone';
 export * from './lib/deep-equal';
 export * from './lib/get-changes';
 export * from './lib/is-built-in-object';
+export * from './lib/is-traversable-node';
 export * from './lib/lru-cache';
 export * from './lib/match-path';
 export * from './lib/merge-deep';
