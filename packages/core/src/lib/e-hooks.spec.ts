@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
 import { entityMap } from './types';
+import { timeTravel } from '../enhancers/time-travel/time-travel';
 
 /**
  * DERIVATION E — the last two members: `tap` and `intercept`.
@@ -15,6 +16,28 @@ import { entityMap } from './types';
  */
 type Row = { id: string; n: number };
 const tick = () => new Promise<void>((r) => setTimeout(r, 0));
+
+type TimeTravelRows = {
+  $: {
+    rows: {
+      addOne(row: Row): void;
+      updateOne(id: string, changes: Partial<Row>): void;
+      ids(): string[];
+      byId(id: string): { n: () => number | undefined } | undefined;
+      intercept: ReturnType<
+        typeof signalTree<{ rows: ReturnType<typeof entityMap<Row, string>> }>
+      >['$']['rows']['intercept'];
+    };
+  };
+  canUndo(): boolean;
+  getHistory(): unknown[];
+};
+
+function createTimeTravelRows(): TimeTravelRows {
+  return signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) }).with(
+    timeTravel()
+  ) as unknown as TimeTravelRows;
+}
 
 // ============================================================================
 // E-TAP — is push observation a function, given a complete pull surface?
@@ -179,6 +202,46 @@ describe('E-INT — write-path authority', () => {
 
     expect(blockAttempted).toBe(true);
     expect(tree.$.rows.byId('a')?.n()).toBe(1);
+  });
+
+  it('DR-2 — blocked interceptor creates no history residue', async () => {
+    const tree = createTimeTravelRows();
+    const initialHistoryLength = tree.getHistory().length;
+    tree.$.rows.intercept({
+      onAdd: (_entity, ctx) => ctx.block('negative'),
+    });
+
+    expect(() => tree.$.rows.addOne({ id: 'bad', n: -1 })).toThrow(/negative/);
+
+    await tick();
+
+    expect(tree.$.rows.ids()).toEqual([]);
+    expect(tree.canUndo()).toBe(false);
+    expect(tree.getHistory()).toHaveLength(initialHistoryLength);
+  });
+
+  it('DR-2 — thenable interceptor failure creates no history residue', async () => {
+    const tree = createTimeTravelRows();
+    tree.$.rows.addOne({ id: 'a', n: 1 });
+    await tick();
+    const historyBeforeFailedUpdate = tree.getHistory().length;
+    let transformAttempted = false;
+    tree.$.rows.intercept({
+      onUpdate: (_id, _changes, ctx) => {
+        return Promise.resolve().then(() => {
+          transformAttempted = true;
+          ctx.transform({ n: 99 });
+        });
+      },
+    });
+
+    expect(() => tree.$.rows.updateOne('a', { n: 2 })).toThrow(/ST2033/);
+
+    await tick();
+
+    expect(transformAttempted).toBe(true);
+    expect(tree.$.rows.byId('a')?.n()).toBe(1);
+    expect(tree.getHistory()).toHaveLength(historyBeforeFailedUpdate);
   });
 
   it('DEFECT — ctx.blocked / ctx.blockReason are vestigial: block() throws instead of setting them', () => {
