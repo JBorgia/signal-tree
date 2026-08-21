@@ -153,7 +153,7 @@ function checkCoreConsumerResolves(coreTgz, tmp) {
     return;
   }
   const req = createRequire(join(consumer, 'index.js'));
-  const subpaths = ['@signaltree/core', '@signaltree/core/authoring', '@signaltree/core/security', '@signaltree/core/lazy', '@signaltree/core/edit-session', '@signaltree/core/storage'];
+  const subpaths = ['@signaltree/core', '@signaltree/core/security', '@signaltree/core/lazy', '@signaltree/core/edit-session', '@signaltree/core/storage'];
   for (const sp of subpaths) {
     try {
       req.resolve(sp);

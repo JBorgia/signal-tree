@@ -28,7 +28,7 @@ import {
     ValidationErrors,
     ValidatorFn as AngularValidatorFn,
 } from '@angular/forms';
-import { isTraversableNode, signalTree } from '@signaltree/core';
+import { signalTree } from '@signaltree/core';
 import {
   deepClone,
   isGlobKey,
@@ -204,6 +204,12 @@ export class FormValidationError extends Error {
  */
 function readOwn<T>(map: Record<string, T>, key: string): T | undefined {
   return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : undefined;
+}
+
+function isTraversableNode(value: unknown): value is object {
+  return (
+    value != null && (typeof value === 'object' || typeof value === 'function')
+  );
 }
 
 type SyncValidatorMap = Record<string, (value: unknown) => string | null>;
