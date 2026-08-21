@@ -3104,6 +3104,10 @@ may legitimately remain if it appears in neutral async contracts.
   benchmark service dependency on enhancer-order internals, and `e71e758c`
   deleted the reachable custom marker/enhancer authoring page. Validation:
   `pnpm nx build demo --skip-nx-cache --output-style=static`.
+- [x] Remove the final app-side `@signaltree/core/authoring` import — `151354dd`
+  deleted the What’s New observation-hook demo section. Validation:
+  `pnpm nx build demo --skip-nx-cache --output-style=static`; grep confirms
+  zero `apps/**` imports of the authoring subpath.
 - [ ] Derive or delete each remaining external implementer need independently
 - [ ] Only after convergence, decide whether any shared neutral contract and
       package boundary exists
