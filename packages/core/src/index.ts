@@ -127,9 +127,6 @@ export type {
   EntitySignalWithSlices,
   EntityMapMarkerWithSlices,
 } from './lib/markers/entity-map';
-// Tree guard narrows to the core tree contract, so it belongs on the core barrel.
-export { isSignalTree } from './lib/types';
-
 // Per-leaf equality (13.5.0)
 export { compared, byKeys } from './lib/markers/compared';
 export type { ComparedMarker } from './lib/markers/compared';
@@ -261,7 +258,6 @@ export {
   // `equal` (an alias of `deepEqual`) was removed in 14.1.1 — see deep-equal.ts.
   deepEqual,
   toWritableSignal,
-  isAnySignal,
   // isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath moved to
   // '@signaltree/core/authoring' in 14.0.0.
 } from './lib/utils';
