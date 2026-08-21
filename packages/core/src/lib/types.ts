@@ -1053,17 +1053,13 @@ export interface InterceptContext<T> {
  * Intercept handlers - block or transform mutations before they happen
  */
 export interface InterceptHandlers<E, K extends string | number> {
-  onAdd?: (entity: E, ctx: InterceptContext<E>) => void | Promise<void>;
+  onAdd?: (entity: E, ctx: InterceptContext<E>) => void;
   onUpdate?: (
     id: K,
     changes: Partial<E>,
     ctx: InterceptContext<Partial<E>>
-  ) => void | Promise<void>;
-  onRemove?: (
-    id: K,
-    entity: E,
-    ctx: InterceptContext<void>
-  ) => void | Promise<void>;
+  ) => void;
+  onRemove?: (id: K, entity: E, ctx: InterceptContext<void>) => void;
 }
 
 /**

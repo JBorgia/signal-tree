@@ -984,6 +984,39 @@ export function createEntitySignal<
     effect.afterSubject = afterSubject;
   }
 
+  function assertSynchronousInterceptorFunction(
+    handler: unknown,
+    hookName: string
+  ): void {
+    if (
+      typeof handler === 'function' &&
+      handler.constructor?.name === 'AsyncFunction'
+    ) {
+      throw new Error(
+        `SignalTree: ${hookName} interceptors must be synchronous. ` +
+          `Async interceptors cannot safely block a synchronous mutation path. [ST2033]`
+      );
+    }
+  }
+
+  function assertSynchronousInterceptorResult(
+    result: void | Promise<void> | undefined,
+    hookName: string
+  ): void {
+    if (result && typeof result.then === 'function') {
+      throw new Error(
+        `SignalTree: ${hookName} interceptors must be synchronous. ` +
+          `Async interceptors cannot safely block a synchronous mutation path. [ST2033]`
+      );
+    }
+  }
+
+  function assertSynchronousInterceptors(handlers: InterceptHandlers<E, K>): void {
+    assertSynchronousInterceptorFunction(handlers.onAdd, 'onAdd');
+    assertSynchronousInterceptorFunction(handlers.onUpdate, 'onUpdate');
+    assertSynchronousInterceptorFunction(handlers.onRemove, 'onRemove');
+  }
+
   function interceptAddedEntity(entity: E): E {
     let transformedEntity = entity;
     for (const handler of interceptHandlers) {
@@ -999,7 +1032,7 @@ export function createEntitySignal<
         blocked: false,
         blockReason: undefined,
       };
-      handler.onAdd?.(entity, ctx);
+      assertSynchronousInterceptorResult(handler.onAdd?.(entity, ctx), 'onAdd');
     }
 
     return transformedEntity;
@@ -1020,7 +1053,10 @@ export function createEntitySignal<
         blocked: false,
         blockReason: undefined,
       };
-      handler.onUpdate?.(id, changes, ctx);
+      assertSynchronousInterceptorResult(
+        handler.onUpdate?.(id, changes, ctx),
+        'onUpdate'
+      );
     }
 
     return transformedChanges;
@@ -1925,7 +1961,10 @@ export function createEntitySignal<
           blocked: false,
           blockReason: undefined,
         };
-        handler.onUpdate?.(id, changes, ctx);
+        assertSynchronousInterceptorResult(
+          handler.onUpdate?.(id, changes, ctx),
+          'onUpdate'
+        );
       }
 
       const finalUpdated = { ...entity, ...transformedChanges };
@@ -1992,7 +2031,10 @@ export function createEntitySignal<
           blocked: false,
           blockReason: undefined,
         };
-        handler.onUpdate?.(id, entity as Partial<E>, ctx);
+        assertSynchronousInterceptorResult(
+          handler.onUpdate?.(id, entity as Partial<E>, ctx),
+          'onUpdate'
+        );
       }
 
       const subjectId = structuralStore.subjectIdForKey(id);
@@ -2059,7 +2101,10 @@ export function createEntitySignal<
             blocked: false,
             blockReason: undefined,
           };
-          handler.onUpdate?.(id, changes, ctx);
+          assertSynchronousInterceptorResult(
+            handler.onUpdate?.(id, changes, ctx),
+            'onUpdate'
+          );
         }
 
         const finalUpdated = { ...entity, ...transformedChanges };
@@ -2160,7 +2205,10 @@ export function createEntitySignal<
           blocked: false,
           blockReason: undefined,
         };
-        handler.onRemove?.(id, entity, ctx);
+        assertSynchronousInterceptorResult(
+          handler.onRemove?.(id, entity, ctx),
+          'onRemove'
+        );
       }
 
       // Delete and update signals
@@ -2245,7 +2293,10 @@ export function createEntitySignal<
             blocked: false,
             blockReason: undefined,
           };
-          handler.onRemove?.(id, entity, ctx);
+          assertSynchronousInterceptorResult(
+            handler.onRemove?.(id, entity, ctx),
+            'onRemove'
+          );
         }
 
         preparedRemovals.push({
@@ -2530,7 +2581,10 @@ export function createEntitySignal<
                 blocked: false,
                 blockReason: undefined,
               };
-              handler.onUpdate?.(id, entity as Partial<E>, ctx);
+              assertSynchronousInterceptorResult(
+                handler.onUpdate?.(id, entity as Partial<E>, ctx),
+                'onUpdate'
+              );
             }
             return replacement;
           })()
@@ -2558,7 +2612,10 @@ export function createEntitySignal<
               blocked: false,
               blockReason: undefined,
             };
-            handler.onRemove?.(id, entity, ctx);
+            assertSynchronousInterceptorResult(
+              handler.onRemove?.(id, entity, ctx),
+              'onRemove'
+            );
           }
 
           const subjectId = resolveSubjectId(id);
@@ -2810,6 +2867,7 @@ export function createEntitySignal<
     },
 
     intercept(handlers: InterceptHandlers<E, K>): () => void {
+      assertSynchronousInterceptors(handlers);
       interceptHandlers.push(handlers);
       return () => {
         const idx = interceptHandlers.indexOf(handlers);
