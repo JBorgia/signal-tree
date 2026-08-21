@@ -50,18 +50,6 @@ const packages = [
     claimed: 2501,
   },
   {
-    name: 'guardrails',
-    path: 'dist/packages/guardrails/dist/lib/guardrails.js',
-    maxSize: 9000,
-    claimed: 7500,
-  },
-  {
-    name: 'guardrails/factories',
-    path: 'dist/packages/guardrails/dist/factories/index.js',
-    maxSize: 9000,
-    claimed: 7500,
-  },
-  {
     name: 'schema',
     path: 'dist/packages/schema/index.esm.js',
     maxSize: 6000,
@@ -110,7 +98,6 @@ const nxProjects = [
   'events',
   'realtime',
   'shared',
-  'guardrails',
   'ng-forms',
   'schema',
 ];

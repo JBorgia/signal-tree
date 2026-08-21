@@ -311,13 +311,6 @@ export const appRoutes: Route[] = [
   },
 
   {
-    path: 'guardrails',
-    loadComponent: () =>
-      import(
-        './pages/guardrails-monitoring/guardrails-monitoring.component'
-      ).then((c) => c.GuardrailsMonitoringComponent),
-  },
-  {
     path: 'ng-forms',
     loadComponent: () =>
       import('./pages/ng-forms-demo/ng-forms-demo.component').then(

@@ -23,7 +23,6 @@ const VALID_PACKAGES = new Set([
   '@signaltree/ng-forms',
   '@signaltree/realtime',
   '@signaltree/enterprise',
-  '@signaltree/guardrails',
   '@signaltree/shared',
   // Angular
   '@angular/core',

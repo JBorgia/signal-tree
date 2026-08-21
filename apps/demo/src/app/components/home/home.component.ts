@@ -172,13 +172,6 @@ export class HomeComponent {
       route: '/custom-extensions',
       cta: 'Explore custom extensions →',
     },
-    {
-      title: 'Guardrails & Undo/Redo',
-      description:
-        'Explore development guardrails, history workflows, and related advanced examples.',
-      route: '/guardrails',
-      cta: 'Explore guardrails →',
-    },
   ];
 
   readonly coreFeatures = [

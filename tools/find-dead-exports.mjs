@@ -304,7 +304,6 @@ if (process.argv.includes('--self-test')) {
     ['core', 'entityMap'],
     ['core', 'timeTravel'],
     ['core', 'serialization'],
-    ['guardrails', 'createTestTree'],   // reachable only via the ./factories entry point
   ];
   for (const [pkg, name] of MUST_BE_LIVE) {
     const isPublic = publicByPackage.get(pkg)?.has(name);

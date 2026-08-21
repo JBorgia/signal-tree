@@ -45,7 +45,6 @@ const DIST = join(ROOT, 'dist', 'packages');
 // not pass at HEAD no matter what the artifacts contained.
 const PACKAGES = [
   'core',
-  'guardrails',
   'ng-forms',
   'realtime',
   'events',

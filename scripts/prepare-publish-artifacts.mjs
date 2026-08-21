@@ -44,7 +44,6 @@ const VERIFY_ONLY = process.argv.includes('--verify-only');
 const PACKAGES = [
   'core',
   'events',
-  'guardrails',
   'ng-forms',
   'realtime',
   'shared',

@@ -49,7 +49,6 @@ const PROJECTS = [
   'packages/core',
   'packages/ng-forms',
   'packages/shared',
-  'packages/guardrails',
   'packages/schema',
   'packages/events',
   'packages/realtime',

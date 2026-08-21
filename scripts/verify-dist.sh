@@ -14,7 +14,6 @@ NC='\033[0m'
 NX_PACKAGES=(
     "core"
     "shared"
-    "guardrails"
     "events"
     "realtime"
     "ng-forms"
@@ -83,21 +82,6 @@ for package in "${NX_PACKAGES[@]}"; do
                     echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
                 fi
             done
-        elif [ "$package" = "guardrails" ]; then
-            GUARDRAILS_EXPECTED=(
-                "$JS_DIR/lib/guardrails.js"
-                "$JS_DIR/factories/index.js"
-                "$JS_DIR/noop.js"
-            )
-            for expected in "${GUARDRAILS_EXPECTED[@]}"; do
-                RELATIVE_PATH="${expected#$JS_DIR/}"
-                if [ ! -f "$expected" ]; then
-                    echo -e "${RED}❌ Missing guardrails artifact: $RELATIVE_PATH${NC}"
-                    ((ERRORS++))
-                else
-                    echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
-                fi
-            done
         else
             if [ ! -f "$JS_DIR/index.js" ]; then
                 echo -e "${RED}❌ Missing index.js in $JS_DIR${NC}"
@@ -153,30 +137,11 @@ for package in "${NX_PACKAGES[@]}"; do
                 echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
             fi
         done
-    elif [ "$package" = "guardrails" ]; then
-        # Guardrails has special entry points, skip generic index.d.ts check
-        :
     elif [ ! -f "$JS_DIR/index.d.ts" ]; then
         echo -e "${RED}❌ Missing index.d.ts in $JS_DIR${NC}"
         ((ERRORS++))
     else
         echo -e "${GREEN}✓ index.d.ts found${NC}"
-    fi
-
-    if [ "$package" = "guardrails" ]; then
-        EXTRA_DTS=(
-            "$JS_DIR/noop.d.ts"
-            "$JS_DIR/factories/index.d.ts"
-        )
-        for expected in "${EXTRA_DTS[@]}"; do
-            RELATIVE_PATH="${expected#$JS_DIR/}"
-            if [ ! -f "$expected" ]; then
-                echo -e "${RED}❌ Missing guardrails declaration: $RELATIVE_PATH${NC}"
-                ((ERRORS++))
-            else
-                echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
-            fi
-        done
     fi
 
     echo -e "${GREEN}✅ $package verified${NC}\n"

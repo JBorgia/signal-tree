@@ -158,9 +158,8 @@ The "any component can mutate" concern is overstated on both sides:
 - ⚠️ By default, any component with a tree reference can mutate any leaf.
 - ✅ Wrap the tree in an `@Injectable()` service and expose only `$` reads and `ops.domain.method()` writes — this is the documented production pattern.
 - ✅ Opt into `@signaltree/events` for typed unidirectional command flow (analogous to NgRx actions).
-- ✅ Opt into `@signaltree/guardrails` for runtime invariant checks on writes.
 
-**Bottom line:** if a developer writes a backdoor, either library leaks. The choice is "guardrails on by default with an unlock flag" (NgRx) vs. "speed on by default with composable opt-in" (SignalTree). Pick whichever defaults match your team's culture.
+**Bottom line:** if a developer writes a backdoor, either library leaks. The durable SignalTree answer is service-level encapsulation plus typed command flow where needed, not a runtime guardrails package.
 
 ### 6. Async and RxJS interop
 
@@ -225,11 +224,11 @@ For teams migrating NgRx `rxMethod` code: the SignalTree-native mapping is `asyn
 
 ### 9. Forms
 
-|                       | NgRx SignalStore                     | SignalTree                                                                             |
-| --------------------- | ------------------------------------ | -------------------------------------------------------------------------------------- |
-| **Forms integration** | Manual binding or community packages | `@signaltree/ng-forms` — Angular Forms bridge                                          |
-| **Schema validation** | Manual                               | Your own validator (Zod, Valibot, ArkType) over values read from the tree — SignalTree ships no validation API      |
-| **Form-state marker** | n/a                                  | `form<T>(config)` marker — validation, wizard, persistence at the form's data location |
+|                       | NgRx SignalStore                     | SignalTree                                                                                                     |
+| --------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| **Forms integration** | Manual binding or community packages | `@signaltree/ng-forms` — Angular Forms bridge                                                                  |
+| **Schema validation** | Manual                               | Your own validator (Zod, Valibot, ArkType) over values read from the tree — SignalTree ships no validation API |
+| **Form-state marker** | n/a                                  | `form<T>(config)` marker — validation, wizard, persistence at the form's data location                         |
 
 ### 10. Type safety and IDE performance
 
@@ -481,7 +480,7 @@ Neither is wrong. Pick what your team reads more naturally.
 - **Domain-shaped state.** Markers at any node mean your code shape matches your data shape.
 - **In-tree derived state.** `.derived($)` deep-merges into the source tree — no separate computed namespace to hop between.
 - **Zero-boilerplate reads/writes.** No `patchState`, no `withMethods` to wire up basic mutations.
-- **Cohesive feature family.** `forms`, `events`, `guardrails`, `schema`, `realtime`, `enterprise` all designed against the same tree model. Pull in only what you need.
+- **Cohesive feature family.** `forms`, `events`, `schema`, `realtime`, `enterprise` all designed against the same tree model. Pull in only what you need.
 - **Edit sessions.** Scoped undo/redo over a subtree — useful for wizards and editors.
 - **Build-time callable syntax.** `$.x.name('Bob')` syntax with zero runtime overhead, opt-in.
 

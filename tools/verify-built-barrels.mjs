@@ -30,7 +30,6 @@ const PKGS = [
   'ng-forms',
   'realtime',
   'schema',
-  'guardrails',
 ];
 const ROOT = new URL('..', import.meta.url).pathname;
 const NM = `${ROOT}node_modules`;

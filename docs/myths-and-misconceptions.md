@@ -264,7 +264,6 @@ For write encapsulation, the documented options are:
 
 - Wrap the tree in an `@Injectable()` service that exposes only `$` reads + `ops.domain.method()` writes.
 - Use `@signaltree/events` for typed unidirectional command flow.
-- Use `@signaltree/guardrails` for runtime invariant checks on writes.
 
 **Source:** [`packages/core/src/edit-session.ts`](../packages/core/src/edit-session.ts) — the actual API. [`docs/architecture/signaltree-architecture-guide.md`](architecture/signaltree-architecture-guide.md) — encapsulation patterns.
 
@@ -284,28 +283,14 @@ The honest comparison: NgRx defaults to read-only consumer exports; SignalTree d
 
 ---
 
-## Myth 13: "`@signaltree/guardrails` doesn't exist."
+## Myth 13: "`@signaltree/guardrails` exists in 15.0."
 
-**Where this comes from:** Observed in May 2026 - when Gemini was asked to
-self-audit its confidence, it over-corrected and disowned its memory of real
-packages, listing them as fabricated.
+**Where this comes from:** `@signaltree/guardrails` existed in 14.x, and older
+docs, examples, and model memories may still mention it.
 
-**The truth:** `@signaltree/guardrails`
-([packages/guardrails/package.json](../packages/guardrails/package.json)) is
-real - "Development guardrails for SignalTree reactive JSON. Performance
-monitoring and anti-pattern detection." The export is `guardrails(...)` (no
-`with` prefix), plus `rules`.
-
-This is the inverse of the more familiar hallucination problem: instead of
-inventing fake packages (Myths 4 & 5), models can also **disown real packages**
-when the names are rare in their training corpus and they are explicitly asked to
-be cautious.
-
-**Note for 15.0:** `@signaltree/schema` was also named in that self-audit, and it
-WAS real through 14.x. It is **deleted in 15.0** - SignalTree ships no validation
-API at all. Validate with the validator your application already uses, against
-values read from the tree. An agent asserting it does not exist is now correct
-for 15.0 and wrong for 14.x.
+**The truth:** `@signaltree/guardrails` is deleted in 15.0. Runtime guardrails did
+not survive as a package-level product concept. Use service-level encapsulation,
+typed command flow, TypeScript types, tests, and ordinary diagnostics instead.
 
 ---
 
@@ -328,28 +313,6 @@ If you want a non-reactive snapshot of the underlying values, call `tree()` to g
 **Source:** [`packages/core/src/lib/types.ts`](../packages/core/src/lib/types.ts) — `$` is the only node accessor; `state` was removed in v11.
 
 **Doc-side action:** Ensure no current docs reference `tree.state`.
-
----
-
-## Myth 16: "`guardrails(tree, config)` is called directly with the tree as first arg."
-
-**Where this comes from:** Inference from "monitoring" language — sounds like a function that takes the thing-to-monitor as its first parameter. Gemini made this exact substitution in May 2026 when corrected from earlier hallucinations.
-
-**The truth:** `guardrails(config)` returns an **enhancer**, applied via `.with()`. Same pattern as every other SignalTree enhancer (`batching()`, `devTools()`, `timeTravel()`, etc.).
-
-```typescript
-import { signalTree } from '@signaltree/core';
-import { guardrails } from '@signaltree/guardrails';
-
-const tree = signalTree({ count: 0 }).with(
-  guardrails({
-    budgets: { maxUpdateTime: 16 },
-    hotPaths: { threshold: 10 },
-  })
-);
-```
-
-**Source:** [`packages/guardrails/README.md`](../packages/guardrails/README.md) — Quick Start section.
 
 ---
 

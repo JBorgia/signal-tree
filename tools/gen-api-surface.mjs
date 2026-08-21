@@ -105,7 +105,6 @@ const subpaths = Object.keys(
  */
 const PURPOSE = {
   'ng-forms': 'Angular Reactive Forms integration',
-  guardrails: 'Development performance monitoring (dev-only)',
   events: 'Typed event/command bus over the tree',
   realtime: 'Keep entity maps in sync with WebSocket / SSE',
   schema: 'Standard Schema validation (Zod, Valibot, ArkType)',
