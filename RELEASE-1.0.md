@@ -10940,9 +10940,8 @@ scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
 Exit condition: `GATE D` — **SATISFIED**
 
 Gate D independent review at `1fea406c`: no blocker demonstrated. Residual
-Phase 5/RC risk carried forward: `node tools/check-numeric-claims.mjs` is red
-for missing generator annotations and should be fixed before publishing release
-candidate docs.
+Phase 5/RC risk carried forward: numeric-claim generator annotations needed
+repair before publishing release candidate docs; closed during Phase 5.
 
 ## Phase 5 — Automation
 
