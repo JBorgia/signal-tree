@@ -7,13 +7,10 @@ name: Publish to npm (CI)
 # the protected-check architecture: no human laptop state, no gate bypass.
 #
 # Owner setup (one-time):
-#   1. Create a GRANULAR npm automation token scoped to the @signaltree
-#      packages (npmjs.com → Access Tokens → Generate New Token → Granular,
-#      "Read and write" on the 3 publishable packages (core, events,
-#      ng-forms — `shared` is private), no 2FA prompt on automation).
-#   2. Add it as the `NPM_TOKEN` repository secret
-#      (GitHub → Settings → Secrets and variables → Actions).
-#   3. Protect tags: Settings → Rules → Rulesets → new tag ruleset matching
+#   1. Configure npm trusted publishing for each publishable package:
+#      owner/repo `JBorgia/signaltree`, workflow filename `publish.yml`, allowed
+#      action `npm publish`.
+#   2. Protect tags: Settings → Rules → Rulesets → new tag ruleset matching
 #      `v*` restricting who can create tags; and require the "Verify tagged
 #      commit (full gate set)" check on main via branch protection so no
 #      unverified commit can be tagged for release.
@@ -80,11 +77,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '22.14.0'
+          registry-url: 'https://registry.npmjs.org'
           cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Use npm CLI with trusted publishing support
+        run: npm install -g npm@^11.5.1 && npm --version
 
       - name: Verify tag matches package.json version
         run: |
@@ -160,5 +161,5 @@ jobs:
 
       - name: Publish to npm
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'
         run: bash scripts/ci-publish.sh

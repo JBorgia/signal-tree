@@ -10,11 +10,14 @@
 #
 # Requirements:
 #   - dist/packages/<pkg> already built (production configuration)
-#   - NPM_TOKEN env var set (granular automation token with publish rights
-#     for the @signaltree scope) — no interactive login fallback here.
+#   - npm trusted publishing configured for .github/workflows/publish.yml, or
+#     NPM_TOKEN set as an explicit fallback. No interactive login fallback here.
 #
 # Idempotent: "cannot publish over the previously published versions" is
 # treated as success so a re-run after a partial publish completes the rest.
+#
+# Dry run: pass `--dry-run` to exercise all pre-publish checks and npm pack
+# behavior without writing to the registry.
 
 set -euo pipefail
 
@@ -29,6 +32,11 @@ print_success() { echo -e "${GREEN}✅ $1${NC}"; }
 print_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 print_error() { echo -e "${RED}❌ $1${NC}"; }
 
+DRY_RUN=false
+if [[ " $* " == *" --dry-run "* ]]; then
+    DRY_RUN=true
+fi
+
 cd "$(dirname "$0")/.."
 
 if [ ! -f "package.json" ] || [ ! -d "packages" ]; then
@@ -36,9 +44,13 @@ if [ ! -f "package.json" ] || [ ! -d "packages" ]; then
     exit 1
 fi
 
-if [ -z "${NPM_TOKEN:-}" ]; then
-    print_error "NPM_TOKEN is not set. CI publish requires an automation token."
-    print_error "Add the NPM_TOKEN repository secret (see docs/guides/releasing.md)."
+if [ -n "${NPM_TOKEN:-}" ]; then
+    print_step "Using NPM_TOKEN fallback for npm authentication"
+elif [ -n "${GITHUB_ACTIONS:-}" ]; then
+    print_step "Using npm trusted publishing via GitHub Actions OIDC"
+else
+    print_error "No npm authentication available."
+    print_error "Configure npm trusted publishing for publish.yml, or set NPM_TOKEN for local fallback."
     exit 1
 fi
 
@@ -96,11 +108,20 @@ print_success "Workspace specs resolved in dist manifests"
 # ships a tarball missing an unmatched glob without a word.
 node scripts/verify-publish-artifacts.mjs "${PACKAGES[@]}" || exit 1
 
-# Auth: token-scoped userconfig so we never touch the runner's global .npmrc.
-NPMRC_TEMP="$(mktemp)"
-cleanup() { rm -f "$NPMRC_TEMP"; }
+# Auth: trusted publishing needs no long-lived token. If NPM_TOKEN is supplied
+# for a fallback run, scope it to a temp userconfig so we never touch global
+# npm configuration.
+NPMRC_TEMP=""
+cleanup() {
+    if [ -n "$NPMRC_TEMP" ]; then
+        rm -f "$NPMRC_TEMP"
+    fi
+}
 trap cleanup EXIT
-echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > "$NPMRC_TEMP"
+if [ -n "${NPM_TOKEN:-}" ]; then
+    NPMRC_TEMP="$(mktemp)"
+    echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > "$NPMRC_TEMP"
+fi
 
 
 # ---------------------------------------------------------------------------
@@ -127,6 +148,9 @@ case "$VERSION" in
 esac
 
 print_step "Publishing with dist-tag: $NPM_TAG (version $VERSION)"
+if [ "$DRY_RUN" = true ]; then
+    print_warning "Dry run enabled: npm publish will not write to the registry"
+fi
 
 PUBLISHED_PACKAGES=()
 FAILED_PACKAGES=()
@@ -135,7 +159,13 @@ for package in "${PACKAGES[@]}"; do
     DIST_PATH="./dist/packages/$package"
     print_step "Publishing @signaltree/$package@$VERSION..."
 
-    PUBLISH_CMD=(npm publish --access public --tag "$NPM_TAG" --userconfig "$NPMRC_TEMP")
+    PUBLISH_CMD=(npm publish --access public --tag "$NPM_TAG")
+    if [ -n "$NPMRC_TEMP" ]; then
+        PUBLISH_CMD+=(--userconfig "$NPMRC_TEMP")
+    fi
+    if [ "$DRY_RUN" = true ]; then
+        PUBLISH_CMD+=(--dry-run)
+    fi
     # Provenance is supported on trusted CI providers (GitHub Actions).
     if [ -n "${GITHUB_ACTIONS:-}" ] || [ "${NPM_CONFIG_PROVENANCE:-}" = "true" ]; then
         PUBLISH_CMD+=(--provenance)
@@ -172,7 +202,11 @@ if [ ${#FAILED_PACKAGES[@]} -gt 0 ]; then
     exit 1
 fi
 
-print_success "All ${#PUBLISHED_PACKAGES[@]} packages published at $VERSION"
+if [ "$DRY_RUN" = true ]; then
+    print_success "Dry run completed for all ${#PUBLISHED_PACKAGES[@]} packages at $VERSION"
+else
+    print_success "All ${#PUBLISHED_PACKAGES[@]} packages published at $VERSION"
+fi
 for package in "${PUBLISHED_PACKAGES[@]}"; do
     echo -e "${GREEN}📦 @signaltree/$package@$VERSION${NC}"
 done
