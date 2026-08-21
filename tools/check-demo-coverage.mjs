@@ -16,10 +16,10 @@
  * walking a tree. None of it is app code, and all of it was on the entry point
  * an app imports.
  *
- * So the failure was not "the demo is incomplete". It was that the root barrel
- * mixed the app API with authoring plumbing, and this check is what made that
- * visible. Those symbols moved to `@signaltree/core/authoring` in 14.0.0 — an
- * entry point that already existed for exactly this distinction.
+ * So the failure was not always "the demo is incomplete". It was that the root
+ * barrel mixed the app API with lower-level plumbing, and this check is what
+ * made that visible. In 15.0, the next step is no longer "move it to
+ * authoring" by default; derive a surviving public need or stop exporting it.
  *
  * ## What is NOT checked
  *
@@ -107,8 +107,8 @@ if (absent.length) {
   console.error(
     `\nOne of two things is true, and they need different fixes:\n` +
       `  1. It is app API and the demo is missing it — add a usage.\n` +
-      `  2. It is plumbing for enhancer/marker/tooling authors — move it to\n` +
-      `     '@signaltree/core/authoring', where the other 39 such symbols live.\n` +
+      `  2. It is lower-level plumbing — derive a surviving public need or\n` +
+      `     stop exporting it before the 15.0 API freeze.\n` +
       `Do not silence this by widening the match.`
   );
   process.exit(1);

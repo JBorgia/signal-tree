@@ -264,8 +264,7 @@ export {
   deepEqual,
   toWritableSignal,
   isAnySignal,
-  isTraversableNode,
-  // isNodeAccessor / isBuiltInObject / parsePath moved to
+  // isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath moved to
   // '@signaltree/core/authoring' in 14.0.0.
 } from './lib/utils';
 

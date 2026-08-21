@@ -83,9 +83,7 @@ const SAMPLE = `
 import {
   signalTree,
   entityMap,
-  status,
   stored,
-  form,
   loader,
   compared,
   byKeys,
@@ -94,10 +92,8 @@ import {
   batching,
 } from '@signaltree/core';
 import { createIndexedDBAdapter } from '@signaltree/core/storage';
-import { onHydrateDecision } from '@signaltree/core/authoring';
 
 type User = { id: number; name: string; version: number };
-type Profile = { name: string; email: string; [k: string]: unknown };
 
 const tree = signalTree({
   count: 0,
@@ -109,9 +105,7 @@ const tree = signalTree({
       persist: { adapter: createIndexedDBAdapter(), key: 'users' },
     }),
   }),
-  job: status<Error>(),
   theme: stored('theme', 'light' as 'light' | 'dark'),
-  profile: form<Profile>({ initial: { name: '', email: '' } }),
   cached: compared({ id: 1, name: 'x', version: 1 } as User, byKeys<User>('id', 'version')),
 })
   // .with() takes ONE enhancer and is CHAINED. Passing several at once is
@@ -125,9 +119,7 @@ const tree = signalTree({
 const n: number = tree.$.count();
 const whole: { count: number } = tree() as { count: number };
 const rows: User[] = tree.$.users.all();
-const isLoading: boolean = tree.$.job.loading();
 const themeValue: 'light' | 'dark' = tree.$.theme();
-const formValues: Profile = tree.$.profile();
 
 // Leaf writes — .set()/.update(), NOT leaf(value)
 tree.$.count.set(5);
@@ -140,8 +132,6 @@ tree({ count: 9 });
 // Marker APIs
 tree.$.users.addOne({ id: 1, name: 'a', version: 1 });
 tree.$.users.updateOne(1, { name: 'b' });
-tree.$.job.setLoaded();
-tree.$.profile.patch({ name: 'z' });
 
 // Enhancer methods
 tree.undo();
@@ -150,11 +140,7 @@ const json: string = tree.serialize();
 tree.deserialize(json);
 tree.batch(() => tree.$.count.set(0));
 
-// Authoring seam
-const off = onHydrateDecision((e: { reason: string }) => void e.reason);
-off();
-
-export const _used = [n, whole, rows, isLoading, themeValue, formValues];
+export const _used = [n, whole, rows, themeValue];
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
 

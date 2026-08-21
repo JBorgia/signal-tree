@@ -3096,18 +3096,19 @@ may legitimately remain if it appears in neutral async contracts.
       `nx lint core`, emitted declaration inspection.
 - [x] Move current-form package pressure out of the decision — `a4bc5493`,
       `a0cf4f34`, `7335ed88`
-- [x] Remove `ng-forms` dependency on `@signaltree/core/authoring` — `b6aac5a9`.
-      `ng-forms` now imports `isTraversableNode` from the core root; validation:
-      `pnpm nx build ng-forms --skip-nx-cache --output-style=static`, emitted
-      artifact grep, `npm run typecheck:source`.
+- [x] Remove `ng-forms` dependency on `@signaltree/core/authoring` — `b6aac5a9`,
+      corrected in the follow-up local-guard slice. `ng-forms` now owns its
+      tiny structural traversal predicate instead of promoting it to core root;
+      validation: `pnpm nx build ng-forms --skip-nx-cache --output-style=static`,
+      emitted artifact grep, `npm run typecheck:source`.
 - [x] Remove demo pressure for unearned authoring APIs — `58d27090` removed the
-  benchmark service dependency on enhancer-order internals, and `e71e758c`
-  deleted the reachable custom marker/enhancer authoring page. Validation:
-  `pnpm nx build demo --skip-nx-cache --output-style=static`.
+      benchmark service dependency on enhancer-order internals, and `e71e758c`
+      deleted the reachable custom marker/enhancer authoring page. Validation:
+      `pnpm nx build demo --skip-nx-cache --output-style=static`.
 - [x] Remove the final app-side `@signaltree/core/authoring` import — `151354dd`
-  deleted the What’s New observation-hook demo section. Validation:
-  `pnpm nx build demo --skip-nx-cache --output-style=static`; grep confirms
-  zero `apps/**` imports of the authoring subpath.
+      deleted the What’s New observation-hook demo section. Validation:
+      `pnpm nx build demo --skip-nx-cache --output-style=static`; grep confirms
+      zero `apps/**` imports of the authoring subpath.
 - [ ] Derive or delete each remaining external implementer need independently
 - [ ] Only after convergence, decide whether any shared neutral contract and
       package boundary exists
