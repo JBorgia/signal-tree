@@ -204,7 +204,6 @@ export {
 // Async-source marker (v9.5) - load-and-expose async primitive
 export {
   asyncSource,
-  createAsyncSourceSignal,
   type AsyncSourceMarker,
   type AsyncSourceSignal,
   type AsyncSourceConfig,
@@ -214,7 +213,6 @@ export {
 // Async-query marker (v9.5) - input-driven debounced query primitive
 export {
   asyncQuery,
-  createAsyncQuerySignal,
   type AsyncQueryMarker,
   type AsyncQuerySignal,
   type AsyncQueryConfig,
