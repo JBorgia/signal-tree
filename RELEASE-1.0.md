@@ -10889,7 +10889,10 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
 
 ## Phase 4 — Release Quality
 
-- [ ] compatibility/runtime/browser coverage
+- [x] compatibility/runtime/browser coverage — updated route-smoke coverage to
+  match surviving routes after package deletion, then validated the built
+  demo. Validation: `pnpm nx build demo --configuration=production
+  --skip-nx-cache --output-style=static`, `npm run smoke:routes` (21 passed).
 - [ ] lifecycle/memory/churn tests
 - [ ] error model audit
 - [ ] persistence contract audit/documentation
