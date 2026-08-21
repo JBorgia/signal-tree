@@ -127,12 +127,7 @@ export { compared, byKeys } from './lib/markers/compared';
 export type { ComparedMarker } from './lib/markers/compared';
 
 // Derived state types (v7)
-export type {
-  ProcessDerived,
-  DeepMergeTree,
-  DerivedFactory,
-  WithDerived,
-} from './lib/internals/derived-types';
+export type { WithDerived } from './lib/internals/derived-types';
 
 // Derived helper (v7.2) - for defining derived functions in separate files with proper typing
 export { derivedFrom } from './lib/internals/derived-types';
@@ -145,10 +140,7 @@ export { derivedFrom } from './lib/internals/derived-types';
 export { linked, type LinkedOptions } from './lib/linked';
 
 // Builder types (v7)
-export type {
-  SignalTreeBuilder,
-  SignalTreePlanBuilder,
-} from './lib/internals/builder-types';
+export type { SignalTreeBuilder } from './lib/internals/builder-types';
 
 // ============================================
 // MARKER EXPORTS
