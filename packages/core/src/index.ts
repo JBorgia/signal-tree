@@ -128,8 +128,8 @@ export type {
   EntitySignalWithSlices,
   EntityMapMarkerWithSlices,
 } from './lib/markers/entity-map';
-// isSignalTree lives on '@signaltree/core/authoring' with the rest of the guard
-// family.
+// Tree guard narrows to the core tree contract, so it belongs on the core barrel.
+export { isSignalTree } from './lib/types';
 
 // Per-leaf equality (13.5.0)
 export { compared, byKeys } from './lib/markers/compared';
