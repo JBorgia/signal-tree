@@ -2513,10 +2513,12 @@ the kernel before `GATE A`.
       `node tools/check-demo-coverage.mjs`, `node tools/verify-tarball-consumer.mjs`
 - [x] public TypeScript tests — `npm run typecheck:typing`,
       `node tools/verify-consumer-typecheck.mjs`
-- [ ] compatibility matrix
-- [ ] freeze public API
+- [x] compatibility matrix — `node tools/check-angular-compat.mjs`,
+      `node tools/verify-tarball-consumer.mjs`, `node tools/verify-consumer-typecheck.mjs`
+- [x] freeze public API — `GATE B` satisfied after `5f1c96e0`, `f4de79a9`,
+      `1ce22bd4`, `3065bc65`, `5f3dcd8a`
 
-Exit condition: `GATE B`
+Exit condition: `GATE B` — **SATISFIED**
 
 ### Historical measured public surface (`6e7bf16a`, checker-resolved, not regex)
 
