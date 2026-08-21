@@ -2505,8 +2505,8 @@ the kernel before `GATE A`.
 - [x] inventory public packages — `6e7bf16a`, baseline `tools/api-baseline.json`
 - [x] delete unearned companion packages — `a4bc5493` removed `guardrails`,
       `a0cf4f34` removed live `enterprise` / `callable-syntax` remnants, and
-  `7335ed88` removed nonexistent `schema` from package lists;
-  `048c5132` removed `realtime`
+      `7335ed88` removed nonexistent `schema` from package lists;
+      `048c5132` removed `realtime`
 - [ ] **PACKAGE TOPOLOGY DECISION** (below) — blocks the export freeze
 - [ ] freeze exports
 - [ ] public TypeScript tests
@@ -2595,9 +2595,9 @@ some belong elsewhere and having to redo `GATE B`. Four questions:
    all declared in `packages/core/src/lib/audit/audit.ts`. Two packages publish
    one API. Which owns it?
 3. **Live packages that declare an `@angular/core` peer while their public types
-  do not require it** — `events` (0 of 116). `events` already splits
-  `./angular` and `./nestjs` subpaths, so its root could be framework-neutral
-  with Angular peer-scoped to the subpath.
+   do not require it** — `events` (0 of 116). `events` already splits
+   `./angular` and `./nestjs` subpaths, so its root could be framework-neutral
+   with Angular peer-scoped to the subpath.
 4. **`@signaltree/kernel`: private boundary or published package?** Recommend
    PRIVATE first. The extraction prerequisite is unchanged — the realization
    port still consumes the Angular-shaped `TreeScalarSlotRuntime` and must move
@@ -3141,7 +3141,21 @@ The audience argument for the split still holds — 37 of 48 symbols have no
 ordinary-app use. The seam is real; it just cuts THROUGH the SDK today rather
 than around it, so splitting now would ship the wrong boundary permanently.
 
-### Keep / remove / move symbol map
+### Historical keep / remove / move symbol map — superseded as a plan
+
+**SUPERSEDED BY `a4bc5493`, `a0cf4f34`, `7335ed88`, `048c5132` and peer
+review.** The table below is retained only as evidence about how symbols were
+classified before the companion-package deletions. It is **not** a plan to
+create `@signaltree/authoring`, and it does not establish a generic enhancer,
+marker, declaration-lowering or SDK package concept.
+
+Use it only to ask narrower questions:
+
+```text
+Does this specific symbol serve a surviving external implementer need?
+If yes, what is the smallest neutral contract that need requires?
+If multiple independently surviving needs converge, then consider a shared form.
+```
 
 Governing rule, applied per symbol rather than per package history:
 
@@ -3152,18 +3166,20 @@ framework-specific integration needs it        -> adapter/integration package
 nobody outside SignalTree implementation needs it -> stop exporting it
 ```
 
-**`core/authoring` — 48 symbols. The seam is clean enough to justify a split.**
+**`core/authoring` — 48 symbols.** Earlier text said the seam was clean enough
+to justify a split. That conclusion is withdrawn: current-form grouping is not
+survival evidence, and package/form remains unproven.
 
 | Class                                                                                                                                         |   n | Disposition                                                                                                                                                  |
 | --------------------------------------------------------------------------------------------------------------------------------------------- | --: | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Extension SDK — marker processing, hydrate/error hooks, enhancer composition, write context, path notifier, 4 `create*Signal` factories       |  24 | MOVE to `@signaltree/authoring` if the split lands; otherwise keep, but relocate the 10 declared under `internals/`                                          |
-| Marker introspection — 8 `*_READERS`, 6 `is*Marker`, `*_MARKER` tokens                                                                        |  13 | MOVE with the SDK; coherent as a set                                                                                                                         |
+| Extension-looking surface — marker processing, hydrate/error hooks, enhancer composition, write context, path notifier, 4 `create*Signal` factories |  24 | EVIDENCE ONLY. Derive each external implementer need independently; no SDK/package entitlement                                                               |
+| Marker introspection — 8 `*_READERS`, 6 `is*Marker`, `*_MARKER` tokens                                                                        |  13 | EVIDENCE ONLY. Co-location does not establish a generic marker/declaration protocol                                                                           |
 | General utilities — `composeEnhancers`, `isAnySignal`, `isNodeAccessor`, `isTraversableNode`, `SIGNAL_TREE_CONSTANTS`, `SIGNAL_TREE_MESSAGES` |   7 | KEEP in core — ordinary-user API mis-filed under authoring                                                                                                   |
 | **Private-package leakage** — `isBuiltInObject`, `parsePath`                                                                                  |   2 | **REMOVE.** Declared in `@signaltree/shared`, which is `"private": true`. Publishing them makes a private package's internals part of core's public contract |
 
-37 of 48 are genuine extension-author surface with no ordinary-app use. That is
-an SDK, not a convenience subpath — `@signaltree/authoring` is justified on
-evidence, not merely plausible.
+37 of 48 looked like extension-author surface with no ordinary-app use. That is
+not enough. The corrected conclusion is: these symbols are a queue of possible
+external implementer needs, not evidence that an SDK package survives.
 
 **Root's 7 `internals/` exports.** Verify each against docs, examples and typing
 specs before cutting; expected dispositions: `derivedFrom` KEEP (user-facing);
