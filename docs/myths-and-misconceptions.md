@@ -235,7 +235,7 @@ store.$.users.refresh();
 store.$.search.input.set('alice');
 ```
 
-For **migrating from NgRx `rxMethod`**: map `rxMethod<void>(pipeline)` doing a load-and-expose → `asyncSource(config)`. Map `rxMethod<TInput>(pipeline)` doing a debounced input-driven query → `asyncQuery(config)`. Map complex multi-step orchestration that neither marker fits → plain Observable method in an `@Injectable()` Ops class with `tap()` writing to tree paths. See [`docs/skills/using-signaltree/reference/migration-from-ngrx-signals.md`](skills/using-signaltree/reference/migration-from-ngrx-signals.md) for the full mapping with examples.
+For **migrating from NgRx `rxMethod`**: map `rxMethod<void>(pipeline)` doing a load-and-expose → `asyncSource(config)`. Map `rxMethod<TInput>(pipeline)` doing a debounced input-driven query → `asyncQuery(config)`. Map complex multi-step orchestration that neither marker fits → plain Observable method in an `@Injectable()` Ops class with `tap()` writing to tree paths.
 
 **Historical note:** A `rxMethod` 1:1 alias briefly shipped in 9.5.0-9.5.2 at `@signaltree/core/rxjs-interop`. It was **removed in 9.6.0** because keeping it created two parallel async stories and an API surface that didn't fit SignalTree's design philosophy. Anyone who shipped against 9.5.x's `rxMethod` should migrate to `asyncSource` / `asyncQuery` (most cases) or a plain Observable method (orchestration cases) when upgrading to 9.6.0+.
 
@@ -320,7 +320,7 @@ If you want a non-reactive snapshot of the underlying values, call `tree()` to g
 
 **Where this comes from:** Reasonable-sounding package boundary inference — "forms package contains form marker."
 
-**The truth:** The `form()` marker ships in `@signaltree/core` ([`packages/core/src/lib/markers/form.ts`](../packages/core/src/lib/markers/form.ts)). `@signaltree/ng-forms` is a separate package that provides the Angular Forms bridge for Standard Schema validation — useful when you want to bind a tree node to an `Angular FormGroup`, but not where the `form()` marker itself lives.
+**The truth:** The `form()` marker was removed from SignalTree 15.0. `@signaltree/ng-forms` is the Angular `FormGroup` adapter package and now exposes `createFormTree()` for that use case.
 
 **Doc-side action:** Clarify in the root README's "Optional Packages" table that `@signaltree/ng-forms` is a _bridge_, not the source of the `form()` marker.
 
@@ -455,6 +455,6 @@ Every error catalogued above is one that **AI coding agents will continue to mak
 2. Retrieval-augmented agents (Cursor, Claude Code, Copilot, Gemini) pull from a thin docs surface and fabricate the rest.
 3. Each wrong recommendation propagates into more codebases, more StackOverflow answers, more docs, more training data.
 
-The countermeasure is to give retrieval _better signal_ than the noise. This page is part of that — together with [`llms.txt`](../apps/demo/public/llms.txt), [`llms-full.txt`](../apps/demo/public/llms-full.txt), [`docs/compare/ngrx-signalstore.md`](compare/ngrx-signalstore.md), and the [agent skill](skills/using-signaltree/SKILL.md).
+The countermeasure is to give retrieval _better signal_ than the noise. This page is part of that, together with [`docs/compare/ngrx-signalstore.md`](compare/ngrx-signalstore.md). The old `llms.txt`, `llms-full.txt`, and agent skill artifacts were removed because they taught APIs that no longer exist.
 
 If you spot a new variant of these myths in the wild (or a new myth not listed), open a PR or issue with the source.

@@ -26,7 +26,7 @@ Every consumer of `entityMap` that loads its data from a server re-implements th
 3. an `asyncSource`-style loader that calls the API and calls `setAll()`,
 4. a **load-guard** so the same collection isn't fetched five times by five subsystems.
 
-The v3 audit found exactly this: `loadActiveTicket$` triggered by five subsystems with no freshness check and no coalescing — redundant fetches every consumer had to remember to prevent. The pieces all exist in core today ([entity-map.ts](../../packages/core/src/lib/markers/entity-map.ts), [status.ts](../../packages/core/src/lib/markers/status.ts), [async-source.ts](../../packages/core/src/lib/markers/async-source.ts), [stored.ts](../../packages/core/src/lib/markers/stored.ts)); nothing composes them.
+The v3 audit found exactly this: `loadActiveTicket$` triggered by five subsystems with no freshness check and no coalescing — redundant fetches every consumer had to remember to prevent. At the time, the relevant pieces were `entityMap`, `status`, `asyncSource`, and `stored`; nothing composed them.
 
 **Should the composition be a new core marker, or a recipe?**
 

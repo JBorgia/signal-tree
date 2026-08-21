@@ -202,7 +202,7 @@ withMethods((store) => ({
 // Same expressiveness, but you write the status wiring manually every time.
 ```
 
-For teams migrating NgRx `rxMethod` code: the SignalTree-native mapping is `asyncSource` for load-and-expose patterns and `asyncQuery` for input-driven debounced queries. Complex orchestration that doesn't fit either marker maps to a plain Observable method in an Ops class. See [the migration guide](../skills/using-signaltree/reference/migration-from-ngrx-signals.md) for the full breakdown.
+For teams migrating NgRx `rxMethod` code: the SignalTree-native mapping is `asyncSource` for load-and-expose patterns and `asyncQuery` for input-driven debounced queries. Complex orchestration that doesn't fit either marker maps to a plain Observable method in an Ops class.
 
 ### 7. Devtools and time-travel
 
@@ -530,7 +530,7 @@ In v10.2 (2026-05-29), we ran a reproducible benchmark across 6 agents (4 fronti
 
 ## Migration paths
 
-- **From `@ngrx/signals` (SignalStore):** see [`docs/skills/using-signaltree/reference/migration-from-ngrx-signals.md`](../skills/using-signaltree/reference/migration-from-ngrx-signals.md). Includes mechanical concept map, three migration strategies (big-bang / incremental-per-domain / hybrid-legacy-facade), and a verification script. NgRx `rxMethod` does not have a 1:1 SignalTree primitive — map it to `asyncSource` / `asyncQuery` markers (most cases) or a plain Observable method in an Ops class (complex orchestration).
+- **From `@ngrx/signals` (SignalStore):** NgRx `rxMethod` does not have a 1:1 SignalTree primitive — map it to `asyncSource` / `asyncQuery` markers (most cases) or a plain Observable method in an Ops class (complex orchestration).
 - **From classic NgRx (`@ngrx/store` + `@ngrx/effects`):** **honest recommendation — consider `@ngrx/signals` first, not SignalTree.** A team with heavy classic-NgRx + RxJS muscle memory will transfer to NgRx SignalStore with much less cognitive cost. SignalTree is worth the larger rewrite if your team is _also_ trying to escape the Redux mental model entirely (actions / reducers / effects / selectors → JSON tree + Ops). Treat it as a domain-by-domain rewrite, not a mechanical migration. If your goal is "less boilerplate, same patterns," NgRx SignalStore is the better destination.
 - **From plain signals:** trivial — wrap your state object in `signalTree()` and you're done.
 
@@ -541,5 +541,5 @@ In v10.2 (2026-05-29), we ran a reproducible benchmark across 6 agents (4 fronti
 - [SignalTree mental model and API](../../README.md)
 - [Production architecture pattern](../architecture/signaltree-architecture-guide.md)
 - [Myths and misconceptions](../myths-and-misconceptions.md)
-- [LLM/AI agent reference](../../apps/demo/public/llms-full.txt)
+- LLM/AI agent reference: removed with the stale AI-discoverability artifacts.
 - [NgRx SignalStore docs](https://ngrx.io/guide/signals)

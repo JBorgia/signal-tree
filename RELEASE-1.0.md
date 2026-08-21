@@ -10916,7 +10916,10 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
       presets, `withTimeTravel`, `bindFormToTree`) and restored the canonical
       Angular support claim. Validation: `node scripts/lint-readme-apis.mjs`,
       `node scripts/verify-version-claims.js`.
-- [ ] docs/examples/demo
+- [x] docs/examples/demo — stale links to deleted AI artifacts and removed
+  source files were removed or rewritten as prose. Validation:
+  `node tools/check-doc-links.mjs`, `node scripts/lint-readme-apis.mjs`,
+  `node scripts/verify-version-claims.js`, `npm run smoke:routes`.
 - [ ] package metadata/license/security audit
 
 Exit condition: `GATE D`

@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-28
 **Outcome:** **Branch A — clean pass.** Angular Signal Forms shipped in `@angular/forms@22.0.0-rc.2`. The bridge is actionable.
-**Plan reference:** [docs/architecture/schema-enhancer-plan.md §9](../../../docs/architecture/schema-enhancer-plan.md)
+**Plan reference:** the deleted `docs/architecture/schema-enhancer-plan.md` spike notes.
 
 ## Spike question
 
@@ -46,7 +46,7 @@ applyEach<TValue>(
 // submit, provideSignalFormsConfig, metadata, …
 ```
 
-Angular's documentation confirms: **"`form` uses the given model as the source of truth and *does not* maintain its own copy of the data. This means that updating the value on a `FieldState` updates the originally passed in model as well."**
+Angular's documentation confirms: **"`form` uses the given model as the source of truth and _does not_ maintain its own copy of the data. This means that updating the value on a `FieldState` updates the originally passed in model as well."**
 
 ## Implications for SignalTree integration
 
@@ -57,9 +57,7 @@ import { toWritableSignal } from '@signaltree/core';
 import { schemas } from '@signaltree/schema';
 import { form, validateStandardSchema, applyEach } from '@angular/forms';
 
-const tree = signalTree({ user: { name: '', email: '' } }).with(
-  schemas({ schemas: { 'user.email': z.string().email() } }),
-);
+const tree = signalTree({ user: { name: '', email: '' } }).with(schemas({ schemas: { 'user.email': z.string().email() } }));
 
 // The bridge:
 const userForm = form(toWritableSignal(tree.$.user), (user) => {
@@ -70,6 +68,7 @@ const userForm = form(toWritableSignal(tree.$.user), (user) => {
 ```
 
 The bridge package (`@signaltree/ng-forms`) provides:
+
 - A `signalFormBridge(treePath)` helper that returns a `FieldTree` wired to the
   schemas registered on the tree at `treePath`.
 - An `applyEachFor(path)` adapter for wildcard schemas (`users.*.email`).
@@ -80,8 +79,8 @@ The bridge package (`@signaltree/ng-forms`) provides:
 Angular 22's `@angular/forms` exports its own `schema()` factory. We renamed our factory to `schemas()` (plural) to avoid the collision. Both packages can be imported alongside each other without aliases:
 
 ```ts
-import { schemas } from '@signaltree/schema';            // ✅ ours
-import { schema, form, validateStandardSchema } from '@angular/forms';  // ✅ Angular's
+import { schemas } from '@signaltree/schema'; // ✅ ours
+import { schema, form, validateStandardSchema } from '@angular/forms'; // ✅ Angular's
 ```
 
 ## Version compatibility

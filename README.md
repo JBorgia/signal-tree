@@ -431,7 +431,8 @@ SignalTree no longer ships `rxMethod` (removed in v9.6.0 — it was briefly avai
 - **`asyncQuery`** when the pipeline is doing input-driven debounced query
 - **plain Observable method in an Ops class** when the pipeline is doing complex multi-step orchestration that neither marker fits
 
-See [the migration guide](docs/skills/using-signaltree/reference/migration-from-ngrx-signals.md) for the full mapping with examples.
+The old AI migration guide was removed with the stale AI-discoverability
+artifacts; use the mapping above as the current guidance.
 
 ## Lifecycle
 
@@ -479,11 +480,8 @@ This is the most common migration path. We ship a complete, AI-agent-ready migra
 - A **`Phase 0` recipe** for landing the foundation in a single dependency-only PR before touching any consumer
 - The [`scripts/verify-signaltree-migration.sh`](scripts/verify-signaltree-migration.sh) script — drop-in, package-manager-agnostic, runs `build` + `test` + `lint` and asserts `@ngrx/signals` is gone from source and `package.json`
 
-→ [`docs/skills/using-signaltree/reference/migration-from-ngrx-signals.md`](docs/skills/using-signaltree/reference/migration-from-ngrx-signals.md)
-
-For migrations that exceed a single agent's context window (typically >5 consumer files), an orchestrator playbook coordinates multiple implementer subagents through phased work: → [`docs/skills/using-signaltree/reference/orchestrating-a-migration.md`](docs/skills/using-signaltree/reference/orchestrating-a-migration.md)
-
-The guide is written as an Agent Skill — point Cursor, Claude Code, or any `SKILL.md`-aware harness at `node_modules/@signaltree/core/skills/using-signaltree/` and your AI assistant will follow the same playbook end-to-end. See [Using SignalTree with AI Agents](#using-signaltree-with-ai-agents) below.
+The old AI migration skill was removed with the stale AI-discoverability
+artifacts. Do not copy older `using-signaltree` skill content into new projects.
 
 ## API Summary
 
@@ -570,29 +568,16 @@ collection entries, plain leaves) and skips in-flight state. Full reasoning in
 - [Marker zoo](https://signaltree.io/marker-zoo) — all 7 markers at 4 depths in one tree (v10)
 - [AI-codegen accuracy benchmark](scripts/ai-codegen-benchmark/) — reproducible scorecard scaffolding (v10)
 
-## Using SignalTree with AI Agents
+## AI Guidance
 
-SignalTree ships a vendor-neutral Agent Skill so AI coding assistants can help you consume `@signaltree/*` packages correctly **and migrate existing `@ngrx/signals` codebases**. The canonical skill lives at [`docs/skills/using-signaltree/`](docs/skills/using-signaltree/) and covers the mental model, quick-start, enhancer decision tree, the full `@ngrx/signals` migration playbook (see [Migrating from `@ngrx/signals`?](#migrating-from-ngrxsignals) above), and per-package sub-skills (one level deep for `ng-forms`, `events`, `realtime`).
+The old `using-signaltree` skill, `llms.txt`, and related AI-discoverability
+artifacts were removed because they taught APIs that no longer exist. Until a
+new guide is derived from the frozen public surface, use this README, the
+package READMEs, and the generated TypeScript declarations as the source of
+truth.
 
-**Cursor** — copy the folder into your project:
-
-```bash
-cp -r node_modules/@signaltree/core/skills/using-signaltree .cursor/skills/
-```
-
-(A pointer shim at [`.cursor/skills/using-signaltree/SKILL.md`](.cursor/skills/using-signaltree/SKILL.md) already exists in this repo for local development.)
-
-**Claude Code** — same pattern:
-
-```bash
-cp -r node_modules/@signaltree/core/skills/using-signaltree .claude/skills/
-```
-
-(`.claude/` is gitignored, so this repo ships no Claude-specific shim — the copy above is the whole setup. The canonical skill lives at [`docs/skills/using-signaltree/SKILL.md`](docs/skills/using-signaltree/SKILL.md).)
-
-**Generic harnesses** — any tool that can point at a directory of `SKILL.md` files can read `docs/skills/` directly (either from a git checkout or from the `skills/` folder shipped inside each published `@signaltree/*` tarball). No harness-specific phrasing lives inside the skill bodies.
-
-For contributor-oriented guidance (commands, bundle limits, validation pipeline, release flow), see [`AGENTS.md`](AGENTS.md).
+For contributor-oriented guidance (commands, bundle limits, validation pipeline,
+release flow), see [`AGENTS.md`](AGENTS.md).
 
 ## Contributing
 
