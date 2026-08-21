@@ -30,7 +30,7 @@ done
 # Check CHANGELOG for current version
 if [ -f "CHANGELOG.md" ]; then
     CURRENT_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "unknown")
-    
+
     if [ "$CURRENT_VERSION" != "unknown" ]; then
         if grep -q "$CURRENT_VERSION" CHANGELOG.md; then
             echo -e "${GREEN}✅ CHANGELOG.md includes version $CURRENT_VERSION${NC}"
@@ -42,7 +42,7 @@ if [ -f "CHANGELOG.md" ]; then
 fi
 
 # Check for package-specific READMEs
-PACKAGES=("core" "ng-forms" "guardrails" "schema")
+PACKAGES=("core" "ng-forms" "schema")
 
 for package in "${PACKAGES[@]}"; do
     README_PATH="./packages/$package/README.md"

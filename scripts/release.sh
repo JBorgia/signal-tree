@@ -45,7 +45,6 @@ PACKAGES=(
     "events"          # Event-driven architecture (BullMQ, NestJS, testing)
     "ng-forms"        # Angular forms integration
     "realtime"        # Real-time sync with Supabase/WebSocket
-    "guardrails"      # Dev-only performance guardrails (Rollup build)
     "schema"          # Schema-driven validation via StandardSchema (Zod, Valibot, …)
 )
 
@@ -94,7 +93,7 @@ if [[ ! "$RELEASE_TYPE" =~ ^(major|minor|patch)$ ]]; then
     echo "  skip-tests  Skips ONLY the slow steps (unit tests, coverage, benchmarks)."
     echo "              ALL correctness gates still run: builds, barrel + export"
     echo "              parity, tarball-consumer, taught-symbols, version-claims,"
-    echo "              guardrails-exports, size gates, changelog gate."
+    echo "              size gates, changelog gate."
     echo "              There is no flag that skips the correctness gates."
     exit 1
 fi
@@ -378,7 +377,7 @@ fi
 # skip-tests does NOT bypass validation (RFC 0004 §5). It sets FAST_VALIDATE=1,
 # which skips ONLY the slow steps (unit tests, coverage, benchmarks); every
 # correctness gate (builds, barrel + export parity, tarball-consumer,
-# taught-symbols, version-claims, guardrails-exports, size gates, release-state,
+# taught-symbols, version-claims, size gates, release-state,
 # skill code-block lint) still runs and still blocks the release.
 print_step "Running comprehensive pre-publish validation (post-bump, validates what ships)..."
 if [ "$SKIP_TESTS" != "skip-tests" ]; then

@@ -1,6 +1,6 @@
 /**
  * Post-build script to fix @signaltree/shared imports in .d.ts files
- * 
+ *
  * The @signaltree/shared package is bundled at build time, but TypeScript
  * generates .d.ts files that still reference it. This script inlines the
  * type declarations since they're simple utility types.
@@ -13,7 +13,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
 
 // Packages that import from @signaltree/shared
-const PACKAGES_TO_FIX = ['core', 'enterprise', 'ng-forms', 'guardrails'];
+const PACKAGES_TO_FIX = ['core', 'enterprise', 'ng-forms'];
 
 // Inline type declarations for shared utilities
 // These replace the imports from @signaltree/shared
@@ -59,7 +59,7 @@ async function findDtsFiles(dir, files = []) {
 
 async function fixDtsFile(filePath, packageRoot) {
   const content = await readFile(filePath, 'utf8');
-  
+
   // Check if file imports from @signaltree/shared
   if (!content.includes('@signaltree/shared')) {
     return false;
@@ -67,7 +67,7 @@ async function fixDtsFile(filePath, packageRoot) {
 
   let newContent = content;
   let needsInlineDeclarations = false;
-  
+
   // Remove import statements from @signaltree/shared
   // Pattern: import { X, Y } from '@signaltree/shared';
   const importRegex = /import\s*\{[^}]+\}\s*from\s*['"]@signaltree\/shared['"];?\n?/g;
@@ -75,7 +75,7 @@ async function fixDtsFile(filePath, packageRoot) {
     needsInlineDeclarations = true;
     return ''; // Remove the import
   });
-  
+
   // Replace export statements with local exports
   // Pattern: export { X, Y } from '@signaltree/shared';
   const exportRegex = /export\s*\{([^}]+)\}\s*from\s*['"]@signaltree\/shared['"];?\n?/g;
@@ -85,7 +85,7 @@ async function fixDtsFile(filePath, packageRoot) {
     const exportList = exports.split(',').map(e => e.trim()).join(', ');
     return `export { ${exportList} };\n`;
   });
-  
+
   // Add inline declarations at the top if needed
   if (needsInlineDeclarations) {
     // Find a good place to insert (after other imports)
@@ -104,35 +104,35 @@ async function fixDtsFile(filePath, packageRoot) {
     console.log(`  Fixed: ${relative(ROOT, filePath)}`);
     return true;
   }
-  
+
   return false;
 }
 
 async function main() {
   console.log('Fixing @signaltree/shared imports in .d.ts files...\n');
-  
+
   let totalFixed = 0;
-  
+
   for (const pkg of PACKAGES_TO_FIX) {
     const packageRoot = join(ROOT, 'dist/packages', pkg);
     const srcDir = join(packageRoot, 'src');
-    
+
     try {
       await stat(srcDir);
     } catch {
       console.log(`Skipping ${pkg}: no src directory found`);
       continue;
     }
-    
+
     console.log(`Processing ${pkg}...`);
     const dtsFiles = await findDtsFiles(srcDir);
-    
+
     for (const file of dtsFiles) {
       const fixed = await fixDtsFile(file, packageRoot);
       if (fixed) totalFixed++;
     }
   }
-  
+
   console.log(`\nDone! Fixed ${totalFixed} file(s).`);
 }
 

@@ -32,7 +32,6 @@ const PACKAGES = [
   'events',
   'ng-forms',
   'realtime',
-  'guardrails',
   'schema',
 ];
 

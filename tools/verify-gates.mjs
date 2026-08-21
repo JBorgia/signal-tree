@@ -90,7 +90,7 @@ const GATES = [
       // `nx test demo` by hand. It is also the app the demo-coverage gate holds
       // up as proof every export is demonstrated — so it breaking silently would
       // undermine that gate too.
-      '--projects=core,ng-forms,shared,guardrails,schema,events,realtime,demo',
+      '--projects=core,ng-forms,shared,schema,events,realtime,demo',
       '--skip-nx-cache',
     ],
     slow: true,
@@ -193,18 +193,6 @@ const GATES = [
       file: 'tools/check-devmode-foldable.mjs',
       find: "const WARN_ONLY_CODES = ['ST2001', 'ST2002', 'ST2003', 'ST2007'];",
       replace: 'const WARN_ONLY_CODES = [];',
-    },
-  },
-  {
-    name: 'guardrails-exports',
-    covers:
-      'guardrails resolves to the noop build under the production condition',
-    cmd: ['node', 'scripts/verify-guardrails-default-condition.mjs'],
-    needsBuild: true,
-    mutation: {
-      file: 'dist/packages/guardrails/package.json',
-      find: '"production": {\n        "import": "./dist/noop.js"',
-      replace: '"production": {\n        "import": "./dist/index.js"',
     },
   },
   {
@@ -669,10 +657,11 @@ const GATES = [
     // strip plugin in tools/build/create-rollup-config.mjs removes them from JS.
     //
     // `generate`, not find/replace: the harness replaces the FIRST match only,
-    // so blinding one `/**` of the 106 in this file left the package at 86%
-    // retained and the gate green. Emptying it drops guardrails to ~12%.
+    // so blinding one package's first `/**` can leave the package above the
+    // retention threshold. Emptying a documented declaration file proves the
+    // aggregate gate fails.
     mutation: {
-      file: 'dist/packages/guardrails/src/lib/types.d.ts',
+      file: 'dist/packages/core/src/lib/types.d.ts',
       generate: () => '',
     },
   },
@@ -858,7 +847,7 @@ const selected = GATES.filter(
  * half-written `dist/` produce noise, and "the build is broken" is the finding,
  * not a footnote to twenty-three other failures.
  */
-const BUILD_PROJECTS = 'core,shared,ng-forms,guardrails,events,realtime,schema';
+const BUILD_PROJECTS = 'core,shared,ng-forms,events,realtime,schema';
 
 function buildOnceIfNeeded() {
   if (!selected.some((g) => g.needsBuild)) return;

@@ -59,12 +59,6 @@ export class DocumentationComponent implements OnInit {
       description: 'Angular forms integration, validation, and persistence workflows',
       readmePath: 'assets/docs/ng-forms/README.md',
     },
-    {
-      id: 'guardrails',
-      name: '@signaltree/guardrails',
-      description: 'Development-time guardrails for safer state usage patterns',
-      readmePath: 'assets/docs/guardrails/README.md',
-    },
   ];
 
   readonly quickLinks: DocQuickLink[] = [

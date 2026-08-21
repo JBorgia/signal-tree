@@ -61,17 +61,17 @@ describe('DocumentationComponent', () => {
   });
 
   it('selectPackage() updates selectedPackage() and re-issues the README fetch for the new package', () => {
-    const guardrailsPkg = component.packages.find(
-      (p) => p.id === 'guardrails'
-    );
-    expect(guardrailsPkg).toBeDefined();
+    const eventsPkg = component.packages.find((p) => p.id === 'events');
+    if (!eventsPkg) {
+      throw new Error('Expected events package docs entry');
+    }
 
-    component.selectPackage(guardrailsPkg!);
+    component.selectPackage(eventsPkg);
 
-    expect(component.selectedPackage().id).toBe('guardrails');
+    expect(component.selectedPackage().id).toBe('events');
     // expectOne removes the request from the pending queue, so it must be
     // flushed here rather than left for the afterEach's blanket drain.
-    httpMock.expectOne(guardrailsPkg!.readmePath).flush('# Guardrails\n');
+    httpMock.expectOne(eventsPkg.readmePath).flush('# Events\n');
   });
 
   it('clicking a package button in the DOM drives the same selection', () => {

@@ -42,7 +42,6 @@ PACKAGES=(
     "core"
     "ng-forms"
     "enterprise"
-    "guardrails"
     "schema"
 )
 
@@ -66,15 +65,7 @@ for i in "${!PACKAGES[@]}"; do
 
     print_step "[$current/$TOTAL_PACKAGES] Testing package: $pkg"
 
-    if [ "$pkg" = "guardrails" ]; then
-        if pnpm nx test guardrails --coverage --silent; then
-            print_success "✓ $pkg - Tests passed"
-            ((SUCCESSFUL_TESTS++))
-        else
-            print_error "✗ $pkg - Tests failed"
-            ((FAILED_TESTS++))
-        fi
-    elif nx test "$pkg" --coverage --silent; then
+    if nx test "$pkg" --coverage --silent; then
         print_success "✓ $pkg - Tests passed"
         ((SUCCESSFUL_TESTS++))
     else

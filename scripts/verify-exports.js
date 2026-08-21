@@ -18,7 +18,6 @@ const PUBLISHED_PACKAGES = [
   'events',
   'ng-forms',
   'realtime',
-  'guardrails',
   'schema',
 ];
 

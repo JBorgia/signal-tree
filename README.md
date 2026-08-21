@@ -450,13 +450,12 @@ store.registerCleanup(() => ws.close());
 
 ## Optional Packages
 
-| Package                  | Purpose                                                                  |
-| ------------------------ | ------------------------------------------------------------------------ |
-| `@signaltree/ng-forms`   | Two-way binding between SignalTree nodes and Angular reactive forms      |
-| `@signaltree/enterprise` | **Deprecated (13.5.0)** — use `tree.updateAndReport()` in core           |
-| `@signaltree/events`     | Event-oriented helpers for reacting to state changes                     |
-| `@signaltree/realtime`   | Keep entity maps in sync with live data sources (WebSocket, SSE)         |
-| `@signaltree/guardrails` | Dev-only performance budgets, hot-path detection, and policy enforcement |
+| Package                  | Purpose                                                             |
+| ------------------------ | ------------------------------------------------------------------- |
+| `@signaltree/ng-forms`   | Two-way binding between SignalTree nodes and Angular reactive forms |
+| `@signaltree/enterprise` | **Deprecated (13.5.0)** — use `tree.updateAndReport()` in core      |
+| `@signaltree/events`     | Event-oriented helpers for reacting to state changes                |
+| `@signaltree/realtime`   | Keep entity maps in sync with live data sources (WebSocket, SSE)    |
 
 ## Real-World Migration (Case Study)
 
@@ -576,7 +575,7 @@ collection entries, plain leaves) and skips in-flight state. Full reasoning in
 
 ## Using SignalTree with AI Agents
 
-SignalTree ships a vendor-neutral Agent Skill so AI coding assistants can help you consume `@signaltree/*` packages correctly **and migrate existing `@ngrx/signals` codebases**. The canonical skill lives at [`docs/skills/using-signaltree/`](docs/skills/using-signaltree/) and covers the mental model, quick-start, enhancer decision tree, the full `@ngrx/signals` migration playbook (see [Migrating from `@ngrx/signals`?](#migrating-from-ngrxsignals) above), and per-package sub-skills (one level deep for `ng-forms`, `enterprise`, `guardrails`, `events`, `realtime`).
+SignalTree ships a vendor-neutral Agent Skill so AI coding assistants can help you consume `@signaltree/*` packages correctly **and migrate existing `@ngrx/signals` codebases**. The canonical skill lives at [`docs/skills/using-signaltree/`](docs/skills/using-signaltree/) and covers the mental model, quick-start, enhancer decision tree, the full `@ngrx/signals` migration playbook (see [Migrating from `@ngrx/signals`?](#migrating-from-ngrxsignals) above), and per-package sub-skills (one level deep for `ng-forms`, `enterprise`, `events`, `realtime`).
 
 **Cursor** — copy the folder into your project:
 

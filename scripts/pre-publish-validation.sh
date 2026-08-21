@@ -100,7 +100,7 @@ print_fast_banner() {
     echo "╠════════════════════════════════════════════════════════════════════╣"
     echo "║  ALL correctness gates STILL RUN: builds, barrel + export parity,   ║"
     echo "║  tarball-consumer, taught-symbols, version-claims, size claims,     ║"
-    echo "║  release-state, guardrails exports, bundle budget, sanity checks.   ║"
+    echo "║  release-state, bundle budget, sanity checks.                       ║"
     echo "║  CI must run the FULL suite before anything is published.           ║"
     echo "╚════════════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
@@ -144,7 +144,7 @@ release_provenance_ok() {
 # (its PACKAGES array). Deliberately excludes the private `packages/shared`
 # (bundled into core, never published) and any other package.json — the old
 # `packages/[^/]+/package.json` wildcard tolerated dirt in non-released manifests.
-RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(core|events|ng-forms|realtime|guardrails|schema)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
+RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(core|events|ng-forms|realtime|schema)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
 
 if [ -z "$(git status --porcelain)" ]; then
     print_success "Working directory is clean"
@@ -184,7 +184,7 @@ print_header "3. Type Checking"
 print_step "Running TypeScript compiler checks"
 # Type checking happens during build, so we'll verify TypeScript configs exist
 TYPECHECK_PASSED=true
-for package in core ng-forms guardrails schema; do
+for package in core ng-forms schema; do
     TSCONFIG="./packages/$package/tsconfig.json"
     if [ ! -f "$TSCONFIG" ]; then
         print_error "Missing tsconfig.json for $package"
@@ -266,7 +266,7 @@ else
     exit 1
 fi
 
-PUBLISHED_PACKAGES="shared,guardrails,events,realtime,ng-forms,schema"
+PUBLISHED_PACKAGES="shared,events,realtime,ng-forms,schema"
 if NX_DAEMON=false npx nx run-many -t build --projects=$PUBLISHED_PACKAGES --configuration=production 2>&1 | tee /tmp/build.log; then
     print_success "All published packages built successfully"
 else
@@ -367,19 +367,6 @@ else
     exit 1
 fi
 
-# 9d. Guardrails Conditional-Exports Gate (BLOCKING)
-# Asserts @signaltree/guardrails' exports map resolves the default condition
-# to the real build (not the no-op stub). Previously only ran in CI
-# (validate.yml); wired here 2026-07-24 so no publish path can dodge it.
-print_step "Verifying guardrails conditional exports (default → real build)"
-if node scripts/verify-guardrails-default-condition.mjs 2>&1 | tee /tmp/verify-guardrails-exports.log; then
-    print_success "Guardrails conditional exports verified"
-else
-    print_error "Guardrails conditional exports broken — default condition would resolve to the wrong build"
-    cat /tmp/verify-guardrails-exports.log
-    exit 1
-fi
-
 # 9e. Tarball-Consumer Gate (BLOCKING)
 # Packs every publishable package and asserts the SHIPPED tarball actually
 # contains every file its `exports` map references (the guardrails@10.6
@@ -451,7 +438,7 @@ fi
 # Thrown-error codes (ST1xxx, ST2004-ST2006) are intentionally exempt — see
 # docs/performance/dropping-dev-code.md. Needs the core build (step 7).
 print_header "10c. Dev-Code Foldability Gate"
-print_step "Verifying advisory guardrails fold when ngDevMode is defined false"
+print_step "Verifying advisory dev code folds when ngDevMode is defined false"
 if node tools/check-devmode-foldable.mjs 2>&1 | tee /tmp/devmode-foldable.log; then
     print_success "Dev-only code is foldable"
 else

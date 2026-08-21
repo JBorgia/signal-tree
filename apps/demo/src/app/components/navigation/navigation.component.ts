@@ -228,14 +228,6 @@ export class NavigationComponent {
       category: 'advanced',
     },
     {
-      id: 'guardrails',
-      title: 'Guardrails',
-      description: 'Development guardrails and monitoring surface',
-      route: '/guardrails',
-      category: 'advanced',
-    },
-
-    {
       id: 'extreme-depth',
       title: 'Extreme Depth',
       description: 'Test recursive typing at 15+ levels',
