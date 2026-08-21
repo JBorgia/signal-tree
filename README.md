@@ -123,14 +123,15 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
 - **Server-backed collections** — `entityMap({ load: loader(fn) })` gives you normalized O(1) CRUD
   plus caching, `staleTime` freshness, single-flight dedup, tag invalidation, and optional
   offline-first persistence from one config key.
-- **Forms** — the `form()` marker covers field/dirty/valid/touched/submit and wizards, and bridges
-  to Angular Signal Forms via `signalForm()`.
+- **Forms** — `@signaltree/ng-forms` provides `createFormTree()` for Angular
+  `FormGroup` interop backed by SignalTree state.
 - **Optimistic UI** — snapshot with `byId()`, write eagerly, restore on failure; `entityMap`'s
   batch ops keep a burst to one notification. `updateAndReport()` tells you which **paths** changed
   (for partial server-payload sync, audit trails, targeted persistence). See the
   [Ops recipe](docs/guides/composition-recipes.md#2-a-reusable-entity-crud-ops-base).
 - **Async data** — `asyncSource()` / `asyncQuery()` for load-and-expose and debounced
-  input-driven queries, with `status()` predicates for the lifecycle.
+  input-driven queries; keep local loading flags as ordinary state, or let
+  `entityMap({ load: loader(...) })` own collection loading.
 - **Undo/redo, persistence, DevTools** — `timeTravel()`, `stored()` with migrations, `history()` /
   `trackHistory()`, Redux DevTools integration. All included, none hand-wired.
 - **State that will grow.** Starting simple is fine — the shape _is_ the API, so adding a domain or
@@ -249,18 +250,17 @@ Pass `sortComparer` to keep `all()`/`ids()` sorted on every read (`@ngrx/entity`
 Markers declare special node behavior at tree creation time:
 
 ```typescript
-import { signalTree, entityMap, status, stored } from '@signaltree/core';
+import { signalTree, entityMap, stored } from '@signaltree/core';
 
 const store = signalTree({
   users: entityMap<User>(), // Normalized entity collection (see above)
-  loadingState: status(), // Loading / loaded / error / not-loaded state machine
+  loadingState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
   preference: stored('pref-key', 'light'), // Auto-persisted to localStorage (key, default)
 });
 
-store.$.loadingState.setLoading();
+store.$.loadingState.set('loading');
 store.$.users.setAll(data); // entities written directly — loadingState is a sibling
-store.$.loadingState.setLoaded();
-store.$.loadingState.loading(); // Signal<boolean> (the `is`-prefix aliases — .isLoading() etc. — were removed in v11.0.0)
+store.$.loadingState.set('loaded');
 ```
 
 Wrapping a load function with the `loader()` helper and passing it as `entityMap()`'s `load` (plus optional `staleTime`/`equal`/`swr`/`tags`/`persist` in `loader()`'s second argument) turns the collection into a cache-aware (single-scope), self-loading one — a loader, load status, a `staleTime` freshness guard, single-flight dedup, tag-based invalidation, and optional offline-first persistence, all on the same marker. `loader()` is what keeps this machinery tree-shakeable — a plain `entityMap()` doesn't pay for it. The collection retains only the current scope — switching scope A → B → A refetches A rather than serving from a multi-key cache. There is no separate `entityCollection` marker — the short-lived v11.2/11.3 marker of that name was folded into `entityMap` in v11.4.0. See [`docs/guides/entity-collection-cookbook.md`](docs/guides/entity-collection-cookbook.md) for the full walkthrough.
@@ -535,14 +535,13 @@ tree.registerCleanup(fn); // Register custom cleanup
 Devtools replay is **forensic**: the point is to see what the app was actually
 doing, spinners and errors included.
 
-|                             | undo/redo (`restore`)                                        | cross-process (`rehydrate`)                          |
-| --------------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
-| form values                 | restored                                                     | restored                                             |
-| form `touched`              | **restored** — you go back to where you were, errors and all | **dropped** — Angular's own `form.value` omits it    |
-| form `submitting`           | never                                                        | never — a submit in flight then is not in flight now |
-| collection entries          | restored                                                     | restored                                             |
-| `status()` `LOADING`        | **kept** — the fetch may still be running                    | **→ `NotLoaded`** — nothing survived the boundary    |
-| `status()` `LOADED`/`ERROR` | restored                                                     | restored                                             |
+|                     | undo/redo (`restore`)                                        | cross-process (`rehydrate`)                          |
+| ------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
+| form values         | restored                                                     | restored                                             |
+| form `touched`      | **restored** — you go back to where you were, errors and all | **dropped** — Angular's own `form.value` omits it    |
+| form `submitting`   | never                                                        | never — a submit in flight then is not in flight now |
+| collection entries  | restored                                                     | restored                                             |
+| local loading flags | restored                                                     | restored                                             |
 
 The rule: **`restore` is exact, `rehydrate` is opinionated.** A cleaned-up undo
 is a lie about what the user did; a cleaned-up rehydrate is good manners.

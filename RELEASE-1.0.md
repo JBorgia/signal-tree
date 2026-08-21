@@ -10897,8 +10897,8 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
       (66/66): `enhancer-cleanup`, `entity-predicate-churn`,
       `marker-snapshot-memo`, `stored-leak`, `memory-manager`, `memory-stress`.
       Smoke measurements: `node --expose-gc tools/bench-retention-arms.mjs
-    scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
-    100 5`, `node tools/bench-predicate-memo.mjs --n 100 --reads 20 --json`.
+  scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
+  100 5`, `node tools/bench-predicate-memo.mjs --n 100 --reads 20 --json`.
 - [x] error model audit — focused error tests passed (156/156),
       `node tools/check-error-codes.mjs`, `node tools/check-error-codes.mjs --self-test`,
       `node tools/check-devmode-foldable.mjs`,
@@ -10911,7 +10911,11 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
       (29/29): `ssr-transfer`, `rehydrate-ownership`, `hydrate-decisions`,
       `rehydration`, `marker-serialization`, `marker-roundtrip`; active guide
       reviewed: `docs/guides/ssr-and-hydration.md`
-- [ ] README upgrade
+- [x] README upgrade — removed active README/doc imports for deleted APIs
+      (`status`, `form`, `validators`, `formBridge`, `memoization`, `entities`,
+      presets, `withTimeTravel`, `bindFormToTree`) and restored the canonical
+      Angular support claim. Validation: `node scripts/lint-readme-apis.mjs`,
+      `node scripts/verify-version-claims.js`.
 - [ ] docs/examples/demo
 - [ ] package metadata/license/security audit
 
