@@ -25,6 +25,7 @@ type EntityHistoryStepStore = {
       setAll(rows: Row[]): void;
       updateOne(id: number, changes: Partial<Row>): void;
       removeOne(id: number): void;
+      changeId(from: number, to: number): void;
       ids(): number[];
       byId(id: number): { label: () => string | undefined } | undefined;
     };
@@ -225,5 +226,33 @@ describe('history step adapter seam', () => {
     expect(store.$.rows.byId(1)?.label()).toBe('keep');
     expect(store.$.rows.byId(2)?.label()).toBe('remove');
     expect(store.$.rows.byId(3)).toBeUndefined();
+  });
+
+  it('confirms entity rekey with scalar update as one user-recognizable undo step', async () => {
+    const store = createEntityStore();
+    store.$.rows.addOne({ id: 1, label: 'temp' });
+    await tick();
+    const initialHistoryLength = store.getHistory().length;
+
+    const step = store.transaction(() => {
+      store.$.rows.changeId(1, 42);
+      store.$.rows.updateOne(42, { label: 'server' });
+    });
+
+    expect(store.$.rows.ids()).toEqual([42]);
+    expect(store.$.rows.byId(1)).toBeUndefined();
+    expect(store.$.rows.byId(42)?.label()).toBe('server');
+
+    step.confirm();
+    await tick();
+
+    expect(store.getHistory()).toHaveLength(initialHistoryLength + 1);
+
+    store.undo();
+    await tick();
+
+    expect(store.$.rows.ids()).toEqual([1]);
+    expect(store.$.rows.byId(1)?.label()).toBe('temp');
+    expect(store.$.rows.byId(42)).toBeUndefined();
   });
 });
