@@ -10903,7 +10903,10 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
       `node tools/check-error-codes.mjs`, `node tools/check-error-codes.mjs --self-test`,
       `node tools/check-devmode-foldable.mjs`,
       `node tools/check-devmode-foldable.mjs --self-test`
-- [ ] persistence contract audit/documentation
+- [x] persistence contract audit/documentation — focused persistence,
+      stored, hydration and SSR specs passed (98/98); active persistence docs
+      reviewed: `docs/guides/persistence-guide.md`,
+      `docs/guides/persistence-and-security.md`
 - [ ] SSR/hydration decision and tests/docs
 - [ ] README upgrade
 - [ ] docs/examples/demo
