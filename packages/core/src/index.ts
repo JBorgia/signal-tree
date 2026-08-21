@@ -264,9 +264,9 @@ export {
   deepEqual,
   toWritableSignal,
   isAnySignal,
-  // isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath moved to
-  // '@signaltree/core/authoring' in 14.0.0 — you reach for a structural guard
-  // when you are walking a tree, which is authoring work.
+  isTraversableNode,
+  // isNodeAccessor / isBuiltInObject / parsePath moved to
+  // '@signaltree/core/authoring' in 14.0.0.
 } from './lib/utils';
 
 // `getPathNotifier` — removed from the root barrel in v12; import from
