@@ -371,4 +371,32 @@ describe('intercept hooks can transform and block', () => {
     expect(transformAttempted).toBe(true);
     expect(t.$.r.byId(1)?.().name).toBe('a');
   });
+
+  it('DR-2 — thenable update interceptor fails closed before mixed upsertMany lands', async () => {
+    const t = mk();
+    let transformAttempted = false;
+    t.$.r.intercept({
+      onUpdate: (_id, _changes, ctx) => {
+        return Promise.resolve().then(() => {
+          transformAttempted = true;
+          ctx.transform({ name: 'late' });
+        });
+      },
+    });
+
+    expect(() =>
+      t.$.r.upsertMany([
+        { id: 2, name: 'updated', done: true },
+        { id: 4, name: 'new', done: false },
+      ])
+    ).toThrow(/ST2033/);
+    expect(ids(t)).toBe('1,2,3');
+    expect(t.$.r.byId(2)?.().name).toBe('b');
+    expect(t.$.r.byId(4)).toBeUndefined();
+
+    await tick();
+
+    expect(transformAttempted).toBe(true);
+    expect(ids(t)).toBe('1,2,3');
+  });
 });
