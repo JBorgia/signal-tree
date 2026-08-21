@@ -2,6 +2,7 @@ import { computed } from '@angular/core';
 
 import { entityMap } from '../index';
 import { signalTree } from './signal-tree';
+import type { AcquiredSubjectHandle } from './physical/structural-store';
 
 /**
  * Guards for the per-entity signal layer (body-granular entityMap) and the
@@ -22,6 +23,21 @@ function makeRows() {
     removeOne: (id: number) => void;
     byId: (id: number) => { v: () => number | undefined } | undefined;
   };
+}
+
+type InternalHandleRows = ReturnType<typeof makeRows> & {
+  __acquireEntityHandleForTesting: (
+    id: number
+  ) => AcquiredSubjectHandle | undefined;
+  __resolveEntityHandleForTesting: (handle: AcquiredSubjectHandle) => unknown;
+};
+
+function acquireExistingHandle(rows: InternalHandleRows, id: number) {
+  const handle = rows.__acquireEntityHandleForTesting(id);
+  if (handle === undefined) {
+    throw new Error(`Expected active entity at ${id}`);
+  }
+  return handle;
 }
 
 describe('entityMap granular reactivity', () => {
@@ -166,5 +182,22 @@ describe('entityMap — tombstoned subjects stay distinct from later key reuse',
 
     expect(field()).toBeUndefined();
     expect(tree.$.rows.byId(1)?.v()).toBe('b');
+  });
+
+  it('resolves internal acquired handles by subject, not by reused key address', () => {
+    const rows = makeRows() as InternalHandleRows;
+    rows.addOne({ id: 1, v: 5 });
+    const handle = acquireExistingHandle(rows, 1);
+
+    rows.removeOne(1);
+    rows.addOne({ id: 1, v: 7 });
+
+    expect(rows.byId(1)?.v()).toBe(7);
+    expect(rows.__resolveEntityHandleForTesting(handle)).toEqual({
+      state: 'tombstoned',
+      subjectId: 1,
+      restoreAllowed: true,
+      revision: 1,
+    });
   });
 });

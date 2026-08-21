@@ -10,10 +10,12 @@ import {
   type PreparedSubjectTombstone,
   type PreparedValueReplacement,
 } from './physical/entity-mutation-frame';
+import { resolveEntityHandle } from './physical/entity-handle-resolution';
 import { EntityValueStore } from './physical/entity-value-store';
 import { MaterializedEntityProjection } from './physical/materialized-entity-projection';
 import {
   StructuralStore,
+  type AcquiredSubjectHandle,
   type SubjectLifetimeRecord,
 } from './physical/structural-store';
 import {
@@ -303,6 +305,16 @@ export function createEntitySignal<
 
   function snapshotStorageProjection(): ReadonlyMap<K, E> {
     return materializedProjection.snapshot();
+  }
+
+  function acquireEntityHandleForTesting(
+    id: K
+  ): AcquiredSubjectHandle | undefined {
+    return structuralStore.acquireSubjectHandleForKey(id);
+  }
+
+  function resolveEntityHandleForTesting(handle: AcquiredSubjectHandle) {
+    return resolveEntityHandle(structuralStore, valueStore, handle);
   }
 
   function rebuildActiveProjectionFromOwners(): ReadonlyMap<K, E> {
@@ -2878,6 +2890,16 @@ export function createEntitySignal<
   });
   Object.defineProperty(api, '__snapshotStorageProjectionForTesting', {
     value: snapshotStorageProjection,
+    enumerable: false,
+    configurable: true,
+  });
+  Object.defineProperty(api, '__acquireEntityHandleForTesting', {
+    value: acquireEntityHandleForTesting,
+    enumerable: false,
+    configurable: true,
+  });
+  Object.defineProperty(api, '__resolveEntityHandleForTesting', {
+    value: resolveEntityHandleForTesting,
     enumerable: false,
     configurable: true,
   });
