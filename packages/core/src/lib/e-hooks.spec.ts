@@ -113,6 +113,28 @@ describe('E-INT — write-path authority', () => {
     expect(tree.$.rows.byId('bad')?.n()).toBe(-1);
   });
 
+  it('DR-2 — thenable add interceptors fail closed before the add lands', async () => {
+    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    let transformAttempted = false;
+
+    tree.$.rows.intercept({
+      onAdd: (_entity, ctx) => {
+        return Promise.resolve().then(() => {
+          transformAttempted = true;
+          ctx.transform({ id: 'a', n: 99 });
+        });
+      },
+    });
+
+    expect(() => tree.$.rows.addOne({ id: 'a', n: 1 })).toThrow(/ST2033/);
+    expect(tree.$.rows.ids()).toEqual([]);
+
+    await tick();
+
+    expect(transformAttempted).toBe(true);
+    expect(tree.$.rows.ids()).toEqual([]);
+  });
+
   it('DR-2 — thenable update interceptors fail closed before the update lands', async () => {
     const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
     tree.$.rows.addOne({ id: 'a', n: 1 });
