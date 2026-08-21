@@ -112,6 +112,10 @@
         <h2>Time Travel Controls</h2>
         <p class="card-description">Navigate through state history</p>
 
+        @if (rollbackMessage(); as message) {
+        <p class="error-message">{{ message }}</p>
+        }
+
         <div class="tt-controls">
           <button
             (click)="undo()"
