@@ -23,9 +23,8 @@ export { signalTree } from './lib/signal-tree';
  * Wrap a tree factory in an injectable Angular service (the idiomatic Angular
  * DI pattern for a tree; comparable to NgRx SignalStore's `signalStore()`).
  * @see {@link defineStore}
- */
-export { defineStore, type DefineStoreConfig } from './lib/define-store';
-
+  // The per-marker reader-key allowlists are not root app API. They exist to
+  // TYPE `asReadonly`; an app calls `asReadonly(tree)` and never names them.
 /**
  * Type-only read-only narrowing of a tree — same runtime object, no write
  * path offered on the type. The primary readonly surface;
@@ -34,9 +33,8 @@ export { defineStore, type DefineStoreConfig } from './lib/define-store';
  */
 export {
   asReadonly,
-  // The per-marker reader-key allowlists moved to '@signaltree/core/authoring'
-  // in 14.0.0. They exist to TYPE `asReadonly`; an app calls `asReadonly(tree)`
-  // and never names them.
+  // The per-marker reader-key allowlists are not root app API. They exist to
+  // TYPE `asReadonly`; an app calls `asReadonly(tree)` and never names them.
   type ReadonlyStore,
   type ReadonlyView,
   type ReadonlyNodeAccessor,
@@ -78,8 +76,6 @@ export type {
   // Entity types
   EntitySignal,
   EntityMapMarker,
-  EntityConfig,
-  MutationOptions,
   AddOptions,
   AddManyOptions,
   TimeTravelEntry,
@@ -110,8 +106,7 @@ export type {
 export { SignalTreeRollbackError } from './lib/types';
 
 // Enhancer-author plumbing (EnhancerMeta, withWriteContext,
-// getActiveWriteContext, interceptLeafSignals) was removed from the root barrel
-// in v12 — import it from '@signaltree/core/authoring'.
+// getActiveWriteContext, interceptLeafSignals) is not root app API.
 
 // Entity helpers (runtime)
 export { entityMap } from './lib/types';
@@ -246,8 +241,7 @@ export type { LoadingEntityMapMarker, LoadingEntitySignal } from './lib/types';
 // docs/guides/streaming-accumulation.md. Git has the implementation if the
 // answer ever turns out to be "marker".
 
-// Marker processing (v7): `registerMarkerProcessor` was removed from the root
-// barrel in v12 — import it from '@signaltree/core/authoring'.
+// Marker processing (v7): `registerMarkerProcessor` is not root app API.
 
 // ============================================
 // UTILITY EXPORTS
@@ -258,13 +252,12 @@ export {
   // `equal` (an alias of `deepEqual`) was removed in 14.1.1 — see deep-equal.ts.
   deepEqual,
   toWritableSignal,
-  // isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath moved to
-  // '@signaltree/core/authoring' in 14.0.0.
+  // isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath are not
+  // root app API.
 } from './lib/utils';
 
-// `getPathNotifier` — removed from the root barrel in v12; import from
-// '@signaltree/core/authoring'. `composeEnhancers` left the root barrel in v12
-// too and was deleted outright in 15.0 — use `tree.with(a).with(b)`.
+// `getPathNotifier` is not root app API. `composeEnhancers` left the root barrel
+// in v12 too and was deleted outright in 15.0 — use `tree.with(a).with(b)`.
 
 // ============================================
 // EDIT SESSION (subpath: @signaltree/core/edit-session)
@@ -287,8 +280,7 @@ export {
 // ============================================
 
 // `createEnhancer`, `resolveEnhancerOrder`, `ENHANCER_META` — enhancer-author
-// plumbing removed from the root barrel in v12; import from
-// '@signaltree/core/authoring'.
+// plumbing, not root app API.
 
 // ============================================
 // INDIVIDUAL ENHANCER EXPORTS
@@ -355,11 +347,11 @@ export { devTools } from './enhancers/devtools/devtools';
  * @see {@link SIGNAL_TREE_CONSTANTS} for configuration values
  * @see {@link SIGNAL_TREE_MESSAGES} for error/warning messages
  */
-// SIGNAL_TREE_CONSTANTS / SIGNAL_TREE_MESSAGES moved to
-// '@signaltree/core/authoring' in 14.0.0. `isDev` was removed from the public
-// surface in 15.0: it had no consumer in this workspace or any first-party
-// package, and an app branching on dev mode uses its framework's own primitive
-// (Angular's isDevMode()). Core still determines dev-ness internally.
+// SIGNAL_TREE_CONSTANTS / SIGNAL_TREE_MESSAGES are not root app API. `isDev` was
+// removed from the public surface in 15.0: it had no consumer in this workspace
+// or any first-party package, and an app branching on dev mode uses its
+// framework's own primitive (Angular's isDevMode()). Core still determines
+// dev-ness internally.
 
 // ============================================
 // PUBLIC API SUMMARY

@@ -49,7 +49,7 @@ import { join } from 'node:path';
 async function emit(out, strip) {
   rmSync(out, { recursive: true, force: true });
   const b = await rollup({
-    input: ['packages/core/src/index.ts', 'packages/core/src/authoring.ts'],
+    input: ['packages/core/src/index.ts'],
     external: (id) => !id.startsWith('.') && !id.startsWith('/'),
     plugins: [
       typescript({

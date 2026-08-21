@@ -8,30 +8,8 @@ import type { UpdateMetadata } from './mutation-types';
  * widened to carry metadata. This module provides a synchronous ambient
  * channel that the leaf-interceptor captures at write time.
  *
- * ## Usage
- *
- * Tag a batch of writes with intent:
- *
- * ```ts
- * import { withWriteContext } from '@signaltree/core/authoring';
- *
- * withWriteContext({ intent: 'hydrate', source: 'serialization' }, () => {
- *   tree.$.user.set(serverPayload.user);
- *   tree.$.session.set(serverPayload.session);
- * });
- * ```
- *
- * Read the active context from inside an enhancer (e.g., a leaf interceptor
- * callback or guardrails-style payload handler):
- *
- * ```ts
- * import { getActiveWriteContext } from '@signaltree/core/authoring';
- *
- * const meta = getActiveWriteContext();
- * if (meta?.intent === 'hydrate') {
- *   // skip validation for hydration replays
- * }
- * ```
+ * Internal callers tag a batch of writes with intent, and internal observers
+ * can read that active context while processing leaf writes.
  *
  * ## Synchronous capture only
  *

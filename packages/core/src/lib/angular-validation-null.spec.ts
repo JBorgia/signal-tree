@@ -23,9 +23,9 @@ import { entityMap, signalTree } from '../index';
  *
  *     const result = computed(() => myValidator(tree.$.user()));
  *
- * NOTHING in this file may import from `@signaltree/core/authoring`, and
- * nothing may use `interceptLeafSignals`. If the null needs privileged access
- * it has failed, and that failure is the finding.
+ * NOTHING in this file may use internal authoring seams like
+ * `interceptLeafSignals`. If the null needs privileged access it has failed,
+ * and that failure is the finding.
  *
  * A section characterizing `interceptLeafSignals`' own misses (depth cap,
  * array-valued leaves) lived here while the deletion was being decided. It was
@@ -301,10 +301,9 @@ describe('ANG-V0-C — async validation owned entirely by the consumer', () => {
 // ============================================================================
 // ANG-V0-D — THE STRONGEST SURVIVING CANDIDATE.
 //
-// `@signaltree/schema` does not use `computed` over published truth. It
-// attaches `interceptLeafSignals` from `@signaltree/core/authoring` and
-// validates PUSH-side, on write events. That is a privileged mechanism the
-// null cannot use.
+// `@signaltree/schema` did not use `computed` over published truth. It attached
+// `interceptLeafSignals` and validated PUSH-side, on write events. That is a
+// privileged mechanism the null cannot use.
 //
 // So the question is not whether push works — it does. It is whether push is
 // REQUIRED: is there validation-relevant truth that changes WITHOUT notifying

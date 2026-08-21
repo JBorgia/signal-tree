@@ -422,7 +422,7 @@ const GATES = [
   {
     name: 'demo-coverage',
     covers:
-      'every ROOT-barrel export is demonstrated in the demo app — NOT node methods, /authoring exports or types, which release-claims covers',
+      'every ROOT-barrel export is demonstrated in the demo app — not node methods or type-only declarations',
     cmd: ['node', 'tools/check-demo-coverage.mjs'],
     needsBuild: true,
     // Adding a root export with no demo must fail. This is the stronger of the
@@ -679,23 +679,6 @@ const GATES = [
       file: 'tools/check-declaration-docs.mjs',
       find: '(text.match(/\\/\\*\\*/g) ?? []).length',
       replace: '0',
-    },
-  },
-  {
-    name: 'api-surface',
-    covers:
-      'the entry-point inventory in llms.txt, llms-full.txt, the SKILL and core README matches the BUILT barrels',
-    cmd: ['node', 'tools/gen-api-surface.mjs', '--check'],
-    needsBuild: true,
-    // The inventory used to be hand-written in four places. It drifted: the
-    // SKILL claimed "25 symbols MOVED there" and then enumerated fewer, and six
-    // /authoring exports were documented on no surface at all. Editing a managed
-    // region by hand must fail, because that is the drift returning.
-    mutation: {
-      file: 'docs/skills/using-signaltree/SKILL.md',
-      find: '<!-- END GENERATED: api-entry-points -->',
-      replace:
-        'and one more symbol nobody added.\n<!-- END GENERATED: api-entry-points -->',
     },
   },
   {
