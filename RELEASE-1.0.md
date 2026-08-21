@@ -3071,6 +3071,11 @@ may legitimately remain if it appears in neutral async contracts.
 - [x] `async-query` split — `3c5521fc` (lifecycle proven realization-side)
 - [x] Contract-neutrality gate — `tools/check-contract-neutrality.mjs`, 5/5 pass
 - [x] Closure proof run — 38/46 neutral; see the table above
+- [x] Readonly reader-key declaration hotspot split — `4f62d082`.
+  `authoring.d.ts` now exports `*_READERS` from `./lib/readonly-readers`,
+  whose emitted declaration has 0 `@angular/core` imports. Validation:
+  `readonly.spec.ts`, `typecheck:source`, `typecheck:typing`, `nx build core`,
+  `nx lint core`, emitted declaration inspection.
 - [ ] Move the 3 realizations + 4 ordinary-user utilities out of authoring
 - [ ] Resolve `interceptLeafSignals` (port, or accept as Angular-side)
 - [ ] Re-run the closure proof; require 0 retained Angular
