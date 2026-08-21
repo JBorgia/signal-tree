@@ -92,7 +92,9 @@
   "files": [
     "dist/**/*.js",
     "src/**/*.d.ts",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "keywords": [
     "signaltree",

@@ -20,6 +20,16 @@ const configValues = {
         output: '.',
       },
       {
+        input: '.',
+        glob: 'LICENSE',
+        output: '.',
+      },
+      {
+        input: '.',
+        glob: 'NOTICE',
+        output: '.',
+      },
+      {
         input: 'packages/events',
         glob: 'package.json',
         output: '.',
