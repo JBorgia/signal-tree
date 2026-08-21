@@ -7,6 +7,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import {
   entityMap,
+  SignalTreeRollbackError,
   signalTree,
   timeTravel,
 } from '@signaltree/core';
@@ -199,6 +200,7 @@ export class TimeTravelDemoComponent {
   currentIndex = signal(this.tree.getCurrentIndex());
   canUndo = signal(this.tree.canUndo());
   canRedo = signal(this.tree.canRedo());
+  rollbackMessage = signal<string | null>(null);
 
   // Helper to refresh time travel state
   private refreshTimeTravelState() {
@@ -306,17 +308,41 @@ export class TimeTravelDemoComponent {
 
   // Time travel actions
   undo() {
-    this.tree.undo();
-    this.refreshTimeTravelState();
+    try {
+      this.rollbackMessage.set(null);
+      this.tree.undo();
+      this.refreshTimeTravelState();
+    } catch (error) {
+      this.handleRollbackError(error);
+    }
   }
 
   redo() {
-    this.tree.redo();
-    this.refreshTimeTravelState();
+    try {
+      this.rollbackMessage.set(null);
+      this.tree.redo();
+      this.refreshTimeTravelState();
+    } catch (error) {
+      this.handleRollbackError(error);
+    }
   }
 
   goToState(index: number) {
-    this.tree.jumpTo(index);
+    try {
+      this.rollbackMessage.set(null);
+      this.tree.jumpTo(index);
+      this.refreshTimeTravelState();
+    } catch (error) {
+      this.handleRollbackError(error);
+    }
+  }
+
+  private handleRollbackError(error: unknown): void {
+    if (!(error instanceof SignalTreeRollbackError)) {
+      throw error;
+    }
+
+    this.rollbackMessage.set(error.message);
     this.refreshTimeTravelState();
   }
 
