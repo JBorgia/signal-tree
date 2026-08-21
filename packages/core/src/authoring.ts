@@ -95,7 +95,7 @@ export {
   STORED_READERS,
   ASYNC_SOURCE_READERS,
   ASYNC_QUERY_READERS,
-} from './lib/readonly';
+} from './lib/readonly-readers';
 
 // Marker brand symbols — for recognising a marker you did not create.
 export { ASYNC_SOURCE_MARKER } from './lib/markers/async-source.contract';

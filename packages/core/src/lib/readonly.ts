@@ -12,6 +12,13 @@ import type {
   NodeAccessor,
   TreeNode,
 } from './types';
+import {
+  ASYNC_QUERY_READERS,
+  ASYNC_SOURCE_READERS,
+  ENTITY_LOADER_READERS,
+  ENTITY_READERS,
+  STORED_READERS,
+} from './readonly-readers';
 
 /**
  * READ-ONLY VIEW TYPES (RFC 0004 §4 step 2 — "Readonly, truthful and minimal")
@@ -34,60 +41,6 @@ import type {
  * someone deliberately adds it to the reader list; a renamed/removed reader
  * key fails `tsc` loudly at the `Pick` site.
  */
-
-// =============================================================================
-// PER-MARKER READER ALLOWLISTS (const — importable by parity fixtures)
-// =============================================================================
-/**
- * Readers on {@link EntitySignal}. Mutators (`addOne`, `upsertOne`,
- * `removeWhere`, `setAll`, …) and the hook registrars (`tap`, `intercept` —
- * lifecycle capabilities, not state reads) are deliberately absent.
- * `byId`/`byIdOrFail` are not in this list because they are re-signed (their
- * `EntityNode` result is deep-writable) — see {@link ReadonlyEntitySignal}.
- */
-export const ENTITY_READERS = [
-  'all',
-  'count',
-  'ids',
-  'has',
-  'empty',
-  'asMap',
-  'where',
-  'find',
-] as const;
-
-/**
- * Readers on {@link EntityLoaderSurface}. `load`/`loadOrThrow`/`refresh`/
- * `invalidate` all mutate loader state (they fetch, or mark the scope stale)
- * and are deliberately absent — triggering a load is an Ops-service concern.
- */
-export const ENTITY_LOADER_READERS = [
-  'loading',
-  'loaded',
-  'error',
-  'lastLoadedAt',
-  'params',
-] as const;
-
-
-/** Readers on {@link StoredSignal}. The mutators — `set`/`update`/`clear`/`reload`/`flush` — are absent. */
-export const STORED_READERS = ['key', 'version'] as const;
-
-/** Readers on {@link AsyncSourceSignal}. `refresh`/`set`/`update`/`reset` are absent. */
-export const ASYNC_SOURCE_READERS = ['data', 'loading', 'error'] as const;
-
-/**
- * Readers on {@link AsyncQuerySignal}. `input` is a `WritableSignal` on the
- * full surface (writing it drives the query); the readonly view demotes it to
- * a plain `Signal`. `rerun`/`reset` are absent.
- */
-export const ASYNC_QUERY_READERS = [
-  'input',
-  'results',
-  'data',
-  'loading',
-  'error',
-] as const;
 
 // =============================================================================
 // HELPERS
