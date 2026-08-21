@@ -41,7 +41,6 @@ print_coverage() {
 PACKAGES=(
     "core"
     "ng-forms"
-    "enterprise"
     "schema"
 )
 

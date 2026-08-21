@@ -152,13 +152,6 @@ export const appRoutes: Route[] = [
 
   // Core SignalTree modules - now under examples/features
   {
-    path: 'callable-syntax',
-    loadComponent: () =>
-      import(
-        './examples/features/fundamentals/examples/enhancers/callable-syntax-demo/callable-syntax-demo.component'
-      ).then((c) => c.CallableSyntaxDemoComponent),
-  },
-  {
     path: 'batching',
     loadComponent: () =>
       import(

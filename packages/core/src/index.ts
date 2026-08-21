@@ -96,7 +96,6 @@ export type {
   // own return type (losing `.batch()`/`.undo()`/… for its callers). Found via a
   // real consumer doing exactly that — see docs/audits/2026-07/.
   DevToolsMethods,
-  OptimizedUpdateMethods,
 
   // Lifecycle
   EnhancerCleanup,

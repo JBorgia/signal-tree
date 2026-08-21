@@ -480,9 +480,8 @@ Neither is wrong. Pick what your team reads more naturally.
 - **Domain-shaped state.** Markers at any node mean your code shape matches your data shape.
 - **In-tree derived state.** `.derived($)` deep-merges into the source tree — no separate computed namespace to hop between.
 - **Zero-boilerplate reads/writes.** No `patchState`, no `withMethods` to wire up basic mutations.
-- **Cohesive feature family.** `forms`, `events`, `schema`, `realtime`, `enterprise` all designed against the same tree model. Pull in only what you need.
+- **Cohesive feature family.** Forms, events, schema, and realtime features are designed against the same tree model. Pull in only what you need.
 - **Edit sessions.** Scoped undo/redo over a subtree — useful for wizards and editors.
-- **Build-time callable syntax.** `$.x.name('Bob')` syntax with zero runtime overhead, opt-in.
 
 ---
 

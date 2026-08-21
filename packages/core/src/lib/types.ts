@@ -248,12 +248,10 @@ export interface ISignalTree<T> extends NodeAccessor<T> {
    *
    * @example
    * ```typescript
-   * const tree = signalTree<DashboardState>({...})
-   *   .with(enterprise())  // Returns tree with DashboardState + enterprise methods
-   *   .with(batching());   // Returns tree with DashboardState + enterprise + batching
+  * const tree = signalTree<DashboardState>({...})
+  *   .with(batching());   // Returns tree with batching methods
    *
    * tree.$.metrics  // ✅ DashboardState preserved
-   * tree.updateOptimized({...})  // ✅ Enterprise method available
    * tree.batch(() => {...})  // ✅ Batching method available
    * ```
    */
@@ -556,28 +554,6 @@ export interface DevToolsMethods {
 export interface EntitiesEnabled {
   /** @internal */
   readonly __entitiesEnabled?: true;
-}
-
-export interface OptimizedUpdateMethods<T> {
-  updateOptimized(
-    updates: Partial<T>,
-    options?: {
-      batch?: boolean;
-      batchSize?: number;
-      maxDepth?: number;
-      ignoreArrayOrder?: boolean;
-      equalityFn?: (a: unknown, b: unknown) => boolean;
-    }
-  ): {
-    changed: boolean;
-    duration: number;
-    changedPaths: string[];
-    stats?: {
-      totalPaths: number;
-      optimizedPaths: number;
-      batchedUpdates: number;
-    };
-  };
 }
 
 export interface TimeTravelEntry<T> {

@@ -118,13 +118,6 @@ export class NavigationComponent {
       category: 'packages',
     },
     {
-      id: 'callable-syntax',
-      title: 'Callable Syntax',
-      description: 'Branches merge on call; leaves take .set()/.update()',
-      route: '/callable-syntax',
-      category: 'learn',
-    },
-    {
       id: 'form-marker',
       title: 'Form Marker',
       description: 'Tree-integrated form state modeling',

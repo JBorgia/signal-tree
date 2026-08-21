@@ -4,7 +4,6 @@
 import type {
   BatchingMethods,
   DevToolsMethods,
-  OptimizedUpdateMethods,
   TimeTravelMethods,
   EntitiesEnabled,
 } from '../../lib/types';
@@ -52,19 +51,12 @@ type _triple_btd = Assert<
   >
 >;
 
-// Include optimized update methods and entities
-type EO = EntitiesEnabled & OptimizedUpdateMethods<Tree> & Base;
-type _pair_entities_opt = Assert<
-  Equals<EO, Base & EntitiesEnabled & OptimizedUpdateMethods<Tree>>
->;
-
 // Affirm composition assignability (structural)
 type Composite = Base &
   BatchingMethods &
   DevToolsMethods &
   TimeTravelMethods &
-  EntitiesEnabled &
-  OptimizedUpdateMethods<Tree>;
+  EntitiesEnabled;
 type _composite_ok = Assert<Equals<Composite, Composite>>;
 
 export {};

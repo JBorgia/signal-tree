@@ -1,8 +1,5 @@
 import { AsyncDemoComponent } from '../../features/fundamentals/examples/async/async-demo.component';
 import { BatchingDemoComponent } from '../../features/fundamentals/examples/enhancers/batching-demo/batching-demo.component';
-import {
-    CallableSyntaxDemoComponent,
-} from '../../features/fundamentals/examples/enhancers/callable-syntax-demo/callable-syntax-demo.component';
 import { DevtoolsDemoComponent } from '../../features/fundamentals/examples/enhancers/devtools-demo/devtools-demo.component';
 import {
     PersistenceDemoComponent,
@@ -126,24 +123,6 @@ export const batchingExampleMeta: ExampleMeta = {
   component: BatchingDemoComponent,
   difficulty: 'intermediate',
   tags: ['batching', 'performance', 'optimization', 'bulk-updates'],
-};
-
-/**
- * Callable Syntax Examples
- */
-export const callableSyntaxExampleMeta: ExampleMeta = {
-  id: 'callable-syntax',
-  title: 'Callable Syntax',
-  description:
-    'What is callable and what is not: branches and the root merge on call; a leaf is an Angular signal, so it takes .set()/.update().',
-  category: 'API',
-  focusAreas: ['api', 'syntax', 'usability'],
-  functionalUse: ['state-updates', 'api-usage'],
-  enhancers: [],
-  route: '/callable-syntax',
-  component: CallableSyntaxDemoComponent,
-  difficulty: 'beginner',
-  tags: ['callable-syntax', 'api', 'fluent-api', 'usability', 'core'],
 };
 
 /**
@@ -328,7 +307,6 @@ export const EXAMPLES_REGISTRY: ExampleMeta[] = [
   granularReactivityExampleMeta,
   linkedDerivedExampleMeta,
   batchingExampleMeta,
-  callableSyntaxExampleMeta,
   devtoolsExampleMeta,
   persistenceExampleMeta,
   serializationExampleMeta,
