@@ -6,7 +6,6 @@ import {
   signal,
 } from '@angular/core';
 import { entityMap, signalTree, timeTravel } from '@signaltree/core';
-import { onHydrateDecision, onTreeError } from '@signaltree/core/authoring';
 
 /**
  * 14.0.0, running.
@@ -77,30 +76,11 @@ export class WhatsNew14Component {
     })
   );
 
-  readonly errors = signal<string[]>([]);
-  readonly hydrateDecisions = signal<string[]>([]);
-
   constructor() {
     this.tree.$.rows.addMany([
       { id: nextId(), label: 'first', done: false },
       { id: nextId(), label: 'second', done: true },
     ]);
-
-    // One place to observe every error the library CATCHES. Markers still
-    // handle their own errors exactly as before — this is additive, and a
-    // listener that throws cannot damage the operation that reported to it.
-    onTreeError((e) =>
-      this.errors.update((l) => [...l, String(e.error)].slice(-5))
-    );
-
-    // Not a warning, deliberately: declining a rehydrate because a loader owns
-    // the source is CORRECT, and warning on correct behaviour trains people to
-    // ignore the channel.
-    onHydrateDecision((e) =>
-      this.hydrateDecisions.update((l) =>
-        [...l, `${e.marker}: ${e.decision} (${e.reason})`].slice(-5)
-      )
-    );
   }
 
   readonly rows = computed(() => this.tree.$.rows.all());
