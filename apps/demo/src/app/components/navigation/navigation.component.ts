@@ -198,14 +198,6 @@ export class NavigationComponent {
       category: 'examples',
     },
     {
-      id: 'custom-extensions',
-      title: 'Custom Markers & Enhancers',
-      description:
-        'Build your own markers and enhancers — registerMarkerProcessor() and .with() chains',
-      route: '/custom-extensions',
-      category: 'advanced',
-    },
-    {
       id: 'markers',
       title: 'Markers',
       description: 'Understand the marker model and built-in primitives',

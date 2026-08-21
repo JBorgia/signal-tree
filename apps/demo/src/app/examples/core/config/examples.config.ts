@@ -280,9 +280,6 @@ export const recommendedArchitectureExampleMeta: ExampleMeta = {
   ],
 };
 
-// Note: CustomExtensionsDemoComponent is NOT included in the registry
-// to allow it to be lazy-loaded separately via its own route
-
 /**
  * Central registry of all examples
  */

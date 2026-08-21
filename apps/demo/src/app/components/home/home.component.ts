@@ -157,13 +157,6 @@ export class HomeComponent {
       route: '/persistence',
       cta: 'Explore persistence →',
     },
-    {
-      title: 'Custom Markers & Enhancers',
-      description:
-        'Learn the extension story without leaving the path-first, data-first model. Build your own markers and enhancers via `registerMarkerProcessor()` and `.with()` chains.',
-      route: '/custom-extensions',
-      cta: 'Explore custom extensions →',
-    },
   ];
 
   readonly coreFeatures = [
