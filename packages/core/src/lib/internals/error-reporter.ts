@@ -48,12 +48,6 @@ const listeners = new Set<(event: TreeErrorEvent) => void>();
 /**
  * Observe every error the library catches. Returns an unsubscribe function.
  *
- * ```ts
- * import { onTreeError } from '@signaltree/core/authoring';
- *
- * onTreeError((e) => Sentry.captureException(e.error, { extra: e }));
- * ```
- *
  * Fires for errors that were ALREADY handled locally — the marker has set its
  * error state and the app may show it. This is for reporting, not recovery.
  */

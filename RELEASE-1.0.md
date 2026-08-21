@@ -3122,14 +3122,24 @@ may legitimately remain if it appears in neutral async contracts.
 - [x] Remove async realization factories from the root public barrel —
       `createAsyncSourceSignal` and `createAsyncQuerySignal` are materializers,
       not app-facing marker declarations. Validation: `pnpm nx build core
-  --skip-nx-cache --output-style=static`, `npm run typecheck:source`,
+--skip-nx-cache --output-style=static`, `npm run typecheck:source`,
       `node tools/check-demo-coverage.mjs` now reports two remaining root-export
       questions instead of four.
 - [x] Remove remaining undemonstrated structural guards from the root barrel —
-  `isAnySignal` and `isSignalTree` had no app/demo/package consumer need.
-  Validation: `pnpm nx build core --skip-nx-cache --output-style=static`,
-  `npm run typecheck:source`, `node tools/check-demo-coverage.mjs` is green
-  at 28/28.
+      `isAnySignal` and `isSignalTree` had no app/demo/package consumer need.
+      Validation: `pnpm nx build core --skip-nx-cache --output-style=static`,
+      `npm run typecheck:source`, `node tools/check-demo-coverage.mjs` is green
+      at 28/28.
+- [x] Remove `@signaltree/core/authoring` from the published package surface —
+  no live app/package/tool consumer remained after the previous slices.
+  Removed the export map entry, Rollup entrypoint, source entrypoint and the
+  obsolete generated API-surface gate that only targeted deleted managed
+  docs. Validation: `npm run build:all` command path via static Nx build,
+  `pnpm nx build core --skip-nx-cache --output-style=static`,
+  `node tools/verify-tarball-consumer.mjs`,
+  `node tools/verify-consumer-typecheck.mjs`,
+  `node tools/check-declaration-closure.mjs`, `npm run typecheck:source`,
+  no built authoring artifacts, root demo coverage green at 27/27.
 - [ ] Derive or delete each remaining external implementer need independently
 - [ ] Only after convergence, decide whether any shared neutral contract and
       package boundary exists

@@ -532,10 +532,10 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
 
 describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', () => {
   /**
-   * `withWriteContext` is exported from `@signaltree/core/authoring`, which
-   * `package.json#exports` publishes as a public subpath. So the question is
-   * not hypothetical: can arbitrary consumer code claim `realization` over an
-   * ordinary application mutation, and does the claim take effect?
+  * Before 15.0, `withWriteContext` was reachable through the public authoring
+  * subpath. The historical question was not hypothetical: could arbitrary
+  * consumer code claim `realization` over an ordinary application mutation,
+  * and did the claim take effect?
    */
   it('an ORDINARY application write, claimed as realization', async () => {
     const tree = signalTree({ balance: 0 }).with(timeTravel());

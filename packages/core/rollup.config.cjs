@@ -8,7 +8,6 @@ const options = {
     './src/lazy.ts',
     './src/edit-session.ts',
     './src/storage.ts',
-    './src/authoring.ts',
   ],
   tsConfig: './tsconfig.lib.prod.json',
   outputPath: '../../dist/packages/core',
