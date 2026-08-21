@@ -3,7 +3,7 @@ name: GitHub Release
 # A tag push no longer blindly creates a release (v12 audit intake,
 # 2026-07-24): the `verify` job checks out the EXACT tagged commit and reruns
 # the full gate set — lint, typecheck, tests, builds, built-barrel resolution,
-# taught-symbols, version-claims, the tarball-consumer gate, and the
+# README/API checks, version-claims, tarball-consumer checks, and the
 # CHANGELOG-entry gate for the tag's version. Release creation depends on all
 # of it passing.
 
@@ -58,35 +58,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Lint
-        run: pnpm run lint:all
-
-      - name: Typecheck
-        run: pnpm run typecheck
-
-      - name: Test
-        run: pnpm run test:all
-
-      - name: Build
+      - name: Build all packages
         run: pnpm run build:all
 
-      - name: Verify built barrels resolve (all 8 packages)
-        run: node tools/verify-built-barrels.mjs
+      - name: All gates (lint budget, typecheck, tests, barrels, exports, docs, budgets, harnesses)
+        run: pnpm run gates
 
-      - name: Verify guardrails conditional exports (default → real build)
-        run: node scripts/verify-guardrails-default-condition.mjs
-
-      - name: Bundle-budget gate (own-code gzip floor)
-        run: node tools/check-bundle-budget.mjs
-
-      - name: Dev-code foldability gate (ngDevMode advisory code must fold)
-        run: node tools/check-devmode-foldable.mjs
-
-      - name: Verify taught symbols
-        run: node scripts/verify-taught-symbols.js
+      - name: Prove every gate can still fail
+        run: pnpm run gates:self-test
 
       - name: Verify version claims
         run: node scripts/verify-version-claims.js
+
+      - name: Verify publish artifacts
+        run: node scripts/verify-publish-artifacts.mjs core events ng-forms
 
       - name: Tarball-consumer gate (self-test, then gate)
         run: |

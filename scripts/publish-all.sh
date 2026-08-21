@@ -79,13 +79,9 @@ case "$VERSION" in
         ;;
 esac
 
-# Tarball contents: AI skills + llms.txt, then VERIFY every declared `files`
-# entry resolves. One script, shared by all three publish paths.
-#
-# This replaces a conditional `cp` that each of these scripts carried its own
-# copy of. A missing source made all three skip it SILENTLY and publish core
-# without the llms.txt that primes retrieval-aware agents -- and npm never warns
-# when a `files` glob matches nothing, so the tarball just shipped light.
+# Prepare any generated publish artifacts, then VERIFY every declared `files`
+# entry resolves. The 15.0 release removed the stale AI-skill and llms artifacts;
+# this script remains the single shared preparation hook.
 node scripts/prepare-publish-artifacts.mjs || exit 1
 
 # Resolve pnpm `workspace:` / bare `*` specs before publishing. This path had

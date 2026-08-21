@@ -47,7 +47,8 @@ import { signalTree } from '@signaltree/core';
 import { batching } from '@signaltree/core/enhancers/batching';
 ```
 
-**Measured impact** (with modern bundlers):
+**Measured impact** (with modern bundlers). Reproduce current bundle ceilings with
+`node tools/check-bundle-budget.mjs`:
 
 - Core only: ~8.5 KB gzipped
 - Core + batching: ~9.3 KB gzipped (barrel vs subpath: identical)
@@ -966,10 +967,20 @@ tree.$.products.setMany([
   { id: 2, name: 'Chair', category: 'furniture', price: 199, inStock: false },
 ]);
 
-tree.$.products.all();              // Signal<Product[]> - all entities
-tree.$.products.byId(1);            // Signal<Product> | undefined
-tree.$.products.ids();              // Signal<number[]>
-tree.$.products.count();            // Signal<number>
+tree.$.products.all();              // Product[] - all entities
+tree.$.products.asMap();            // ReadonlyMap<number, Product>
+tree.$.products.byId(1);            // EntityNode<Product> | undefined
+tree.$.products.byIdOrFail(1);      // EntityNode<Product> or throws
+tree.$.products.ids();              // number[]
+tree.$.products.count();            // number
+tree.$.products.empty();            // boolean
+tree.$.products.has(1)();           // boolean signal
+tree.$.products.where((p) => p.inStock)(); // Product[] signal
+tree.$.products.find((p) => p.price > 500)(); // Product | undefined signal
+tree.$.products.setActiveId(1);
+tree.$.products.activeId();         // number | undefined
+tree.$.products.activeEntity();     // Product | undefined
+tree.$.products.clearActiveId();
 
 // Computed slices (reactive, type-safe)
 tree.$.products.electronics();      // Signal<Product[]> - auto-updates
@@ -977,8 +988,15 @@ tree.$.products.inStock();          // Signal<Product[]>
 tree.$.products.totalValue();       // Signal<number>
 
 // CRUD operations
+tree.$.products.addOne({ id: 3, name: 'Desk', category: 'furniture', price: 299, inStock: true });
+tree.$.products.addMany([...]);
+tree.$.products.prependOne({ id: 0, name: 'Featured', category: 'electronics', price: 499, inStock: true });
+tree.$.products.prependMany([...]);
+tree.$.products.updateOne(1, { price: 899 });
+tree.$.products.replaceOne(1, { id: 1, name: 'Laptop Pro', category: 'electronics', price: 1299, inStock: true });
 tree.$.products.upsertOne({ id: 1, name: 'Updated', category: 'electronics', price: 899, inStock: true });
 tree.$.products.upsertMany([...]);
+tree.$.products.changeId(3, 30);
 tree.$.products.removeOne(1);
 tree.$.products.removeMany([1, 2]);
 tree.$.products.clear();
@@ -1534,6 +1552,12 @@ tree.undo(); // Time travel
 tree.save(); // Persistence
 ```
 
+For optimistic workflows, `transactions()` adds an explicit tree-local
+transaction boundary. `transaction(fn)` groups synchronous writes into one
+pending turn; callers can `confirm()` it or `rollback()` it. A rollback that
+cannot be applied conservatively throws `SignalTreeRollbackError`, leaving the
+surviving authoritative state intact for reconciliation or refetch.
+
 ### Production-Ready Composition
 
 ```typescript
@@ -2042,14 +2066,20 @@ All enhancers are now consolidated in the core package. The following features a
 
 ### Performance & Optimization
 
+<!-- measured: historical enhancer delta table; remeasure with `node tools/measure-enhancer-deltas.mjs` before publishing updated figures. -->
+
 - **batching()** (+1.27KB gzipped) - Batch multiple updates for better performance
 
 ### Development Tools
+
+<!-- measured: historical enhancer delta table; remeasure with `node tools/measure-enhancer-deltas.mjs` before publishing updated figures. -->
 
 - **devTools()** (+2.49KB gzipped) - Development tools & Redux DevTools integration
 - **timeTravel()** (+1.75KB gzipped) - Undo/redo functionality & state history
 
 ### Integration & Convenience
+
+<!-- measured: historical enhancer delta table; remeasure with `node tools/measure-enhancer-deltas.mjs` before publishing updated figures. -->
 
 - **serialization()** (+0.84KB gzipped) - State persistence & SSR support
 

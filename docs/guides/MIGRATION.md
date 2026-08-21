@@ -240,6 +240,8 @@ echo "sed -i '' 's/@signaltree\\/batching/@signaltree\\/core/g' your-file.ts"
 
 ### 1. Smaller Bundle Size
 
+<!-- measured: historical v4 consolidation figures; remeasure with `node tools/size-report.mjs` before publishing updated migration numbers. -->
+
 **16.2% reduction** when using multiple enhancers:
 
 - **Before (v3.x)**: ~27.50KB (core + 3 enhancers)

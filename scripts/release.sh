@@ -90,7 +90,7 @@ if [[ ! "$RELEASE_TYPE" =~ ^(major|minor|patch)$ ]]; then
     echo ""
     echo "  skip-tests  Skips ONLY the slow steps (unit tests, coverage, benchmarks)."
     echo "              ALL correctness gates still run: builds, barrel + export"
-    echo "              parity, tarball-consumer, taught-symbols, version-claims,"
+    echo "              parity, tarball-consumer, README/API checks, version-claims,"
     echo "              size gates, changelog gate."
     echo "              There is no flag that skips the correctness gates."
     exit 1
@@ -375,8 +375,8 @@ fi
 # skip-tests does NOT bypass validation (RFC 0004 §5). It sets FAST_VALIDATE=1,
 # which skips ONLY the slow steps (unit tests, coverage, benchmarks); every
 # correctness gate (builds, barrel + export parity, tarball-consumer,
-# taught-symbols, version-claims, size gates, release-state,
-# skill code-block lint) still runs and still blocks the release.
+# README/API checks, version-claims, size gates, release-state,
+# package hygiene) still runs and still blocks the release.
 print_step "Running comprehensive pre-publish validation (post-bump, validates what ships)..."
 if [ "$SKIP_TESTS" != "skip-tests" ]; then
     if RELEASE_IN_PROGRESS=1 RELEASE_IN_PROGRESS_TOKEN="$RELEASE_IN_PROGRESS_TOKEN" bash scripts/pre-publish-validation.sh; then
@@ -429,18 +429,9 @@ fi
 
 print_success "Package builds completed"
 
-# Copy AI-discoverability priming surfaces into the core tarball so that
-# `node_modules/@signaltree/core/llms.txt` exists for retrieval-aware AI agents
-# without requiring a separate web/GitHub fetch. The +49pp lift we measure
-# only fires when llms.txt is in the agent's context — shipping it via npm
-# install reaches every user automatically.
-# Tarball contents: AI skills + llms.txt, then VERIFY every declared `files`
-# entry resolves. One script, shared by all three publish paths.
-#
-# This replaces a conditional `cp` that each of these scripts carried its own
-# copy of. A missing source made all three skip it SILENTLY and publish core
-# without the llms.txt that primes retrieval-aware agents -- and npm never warns
-# when a `files` glob matches nothing, so the tarball just shipped light.
+# Prepare any generated publish artifacts, then VERIFY every declared `files`
+# entry resolves. The 15.0 release removed the stale AI-skill and llms artifacts;
+# this script remains the single shared preparation hook.
 node scripts/prepare-publish-artifacts.mjs || exit 1
 
 # Preflight: ensure all publishable dist folders exist BEFORE publishing anything.
