@@ -17,7 +17,6 @@ const PUBLISHED_PACKAGES = [
   'core',
   'events',
   'ng-forms',
-  'realtime',
 ];
 
 const PACKAGES = PUBLISHED_PACKAGES;

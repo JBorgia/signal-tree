@@ -102,14 +102,6 @@ export class NavigationComponent {
       category: 'packages',
     },
     {
-      id: 'realtime',
-      title: 'Realtime',
-      description: 'Live synchronization patterns for entity maps',
-      route: '/docs',
-      queryParams: { package: 'realtime' },
-      category: 'packages',
-    },
-    {
       id: 'ng-forms',
       title: 'Angular Forms',
       description: 'Forms integration with validation and persistence',

@@ -57,13 +57,6 @@ export const appRoutes: Route[] = [
       ).then((c) => c.StoredVersioningDemoComponent),
   },
   {
-    path: 'realtime',
-    loadComponent: () =>
-      import('./pages/realtime-demo/realtime-demo.component').then(
-        (c) => c.RealtimeDemoComponent
-      ),
-  },
-  {
     path: 'events',
     loadComponent: () =>
       import('./pages/events-demo/events-demo.component').then(

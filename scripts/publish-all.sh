@@ -53,7 +53,6 @@ PACKAGES=(
     "core"
     "events"
     "ng-forms"
-    "realtime"
 )
 
 

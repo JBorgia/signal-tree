@@ -47,7 +47,6 @@ PACKAGES=(
     "core"
     "events"
     "ng-forms"
-    "realtime"
 )
 
 VERSION=$(node -p "require('./package.json').version")

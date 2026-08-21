@@ -90,7 +90,6 @@ const packages = [
 const nxProjects = [
   'core',
   'events',
-  'realtime',
   'shared',
   'ng-forms',
 ];

@@ -28,7 +28,6 @@ const PKGS = [
   'core',
   'events',
   'ng-forms',
-  'realtime',
 ];
 const ROOT = new URL('..', import.meta.url).pathname;
 const NM = `${ROOT}node_modules`;

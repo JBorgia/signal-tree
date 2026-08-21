@@ -15,7 +15,6 @@ NX_PACKAGES=(
     "core"
     "shared"
     "events"
-    "realtime"
     "ng-forms"
 )
 ERRORS=0
@@ -67,20 +66,6 @@ for package in "${NX_PACKAGES[@]}"; do
                     echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
                 fi
             done
-        elif [ "$package" = "realtime" ]; then
-            REALTIME_EXPECTED=(
-                "$JS_DIR/index.js"
-                "$JS_DIR/supabase/index.js"
-            )
-            for expected in "${REALTIME_EXPECTED[@]}"; do
-                RELATIVE_PATH="${expected#$JS_DIR/}"
-                if [ ! -f "$expected" ]; then
-                    echo -e "${RED}❌ Missing realtime artifact: $RELATIVE_PATH${NC}"
-                    ((ERRORS++))
-                else
-                    echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
-                fi
-            done
         else
             if [ ! -f "$JS_DIR/index.js" ]; then
                 echo -e "${RED}❌ Missing index.js in $JS_DIR${NC}"
@@ -103,20 +88,6 @@ for package in "${NX_PACKAGES[@]}"; do
             RELATIVE_PATH="${expected#$DIST_DIR/}"
             if [ ! -f "$expected" ]; then
                 echo -e "${RED}❌ Missing events declaration: $RELATIVE_PATH${NC}"
-                ((ERRORS++))
-            else
-                echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
-            fi
-        done
-    elif [ "$package" = "realtime" ]; then
-        REALTIME_DTS=(
-            "$DIST_DIR/src/index.d.ts"
-            "$DIST_DIR/src/supabase/index.d.ts"
-        )
-        for expected in "${REALTIME_DTS[@]}"; do
-            RELATIVE_PATH="${expected#$DIST_DIR/}"
-            if [ ! -f "$expected" ]; then
-                echo -e "${RED}❌ Missing realtime declaration: $RELATIVE_PATH${NC}"
                 ((ERRORS++))
             else
                 echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"

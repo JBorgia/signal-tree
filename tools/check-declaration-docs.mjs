@@ -34,7 +34,6 @@ const PACKAGES = [
   'shared',
   'ng-forms',
   'events',
-  'realtime',
 ];
 
 // Count JSDoc block openers. Line comments are deliberately not counted:

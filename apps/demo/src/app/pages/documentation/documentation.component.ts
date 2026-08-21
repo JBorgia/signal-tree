@@ -48,12 +48,6 @@ export class DocumentationComponent implements OnInit {
       readmePath: 'assets/docs/events/README.md',
     },
     {
-      id: 'realtime',
-      name: '@signaltree/realtime',
-      description: 'Realtime synchronization patterns for SignalTree entity maps',
-      readmePath: 'assets/docs/realtime/README.md',
-    },
-    {
       id: 'ng-forms',
       name: '@signaltree/ng-forms',
       description: 'Angular forms integration, validation, and persistence workflows',

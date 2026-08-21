@@ -31,8 +31,6 @@
       "@signaltree/ng-forms/signals": [
         "packages/ng-forms/src/signals/index.ts"
       ],
-      "@signaltree/realtime": ["packages/realtime/src/index.ts"],
-      "@signaltree/realtime/*": ["packages/realtime/src/*"],
       "@signaltree/shared": ["packages/shared/src/index.ts"],
       "@signaltree/shared/*": ["packages/shared/src/*"]
     },
