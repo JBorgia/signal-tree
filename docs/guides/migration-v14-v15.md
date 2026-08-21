@@ -13,11 +13,11 @@ publication. If one does not compile for you, that is a bug — please report it
 
 ## At a glance
 
-| Removed | Replacement |
-| --- | --- |
-| `SignalTreeBase<T>` | `SignalTree<T>` |
-| root state properties on the tree (`tree.count`) | `tree.$.count()` |
-| `composeEnhancers(a, b)` | `tree.with(a).with(b)` |
+| Removed                                          | Replacement            |
+| ------------------------------------------------ | ---------------------- |
+| `SignalTreeBase<T>`                              | `SignalTree<T>`        |
+| root state properties on the tree (`tree.count`) | `tree.$.count()`       |
+| `composeEnhancers(a, b)`                         | `tree.with(a).with(b)` |
 
 ---
 
@@ -52,7 +52,7 @@ the tree object itself. The runtime root has never carried them:
 const tree = signalTree({ count: 0, user: { name: 'Ada' } });
 
 Object.keys(tree); // []           <- no state keys, before or after 15.0
-tree.$.count();    // 0
+tree.$.count(); // 0
 ```
 
 So `tree.count` typechecked as a writable signal and was `undefined` at runtime.
@@ -70,7 +70,7 @@ tree.$.user.name();
 tree.$.user(); // read the whole branch
 ```
 
-If your code compiled *and* ran on v14, it already used `$` and needs no change.
+If your code compiled _and_ ran on v14, it already used `$` and needs no change.
 
 ### Why not add the root properties to the runtime instead?
 
@@ -79,8 +79,8 @@ That would give two ways to address one node — `tree.count()` beside
 the tree callable is for whole-tree reads and writes:
 
 ```ts
-tree();                                    // read the whole state
-tree({ count: 1 });                        // partial merge
+tree(); // read the whole state
+tree({ count: 1 }); // partial merge
 tree((current) => ({ ...current, count: 2 })); // functional update
 ```
 
@@ -117,7 +117,6 @@ fixed in 15.0.
 
 ```ts
 // before
-import { composeEnhancers } from '@signaltree/core/authoring';
 const tree = signalTree({ count: 0 }).with(composeEnhancers(a, b));
 
 // after
@@ -153,21 +152,16 @@ tree.beta(); // ✅ from the second
 ```
 
 `composeEnhancers` erased them. Its type used one `T` for both its parameter and
-its return, leaving nowhere to carry what an enhancer *adds*. With two enhancers
+its return, leaving nowhere to carry what an enhancer _adds_. With two enhancers
 the additions vanished silently; with a single enhancer the result could not be
 applied at all, because `T` inferred from the return and then demanded it as
 input.
 
-**It participates in enhancer metadata and validation.** Individually applied
-enhancers stay visible to SignalTree's construction plan, so they get duplicate
-detection, dependency validation and ordering. A composed fold hid its children
-from all of it — and the dependency check is fail-closed, so bypassing it meant
-an enhancer declaring an unmet requirement ran anyway instead of throwing.
-
-If you were relying on `composeEnhancers` to force raw source order past that
-check, there is no supported replacement: that was an undocumented bypass of a
-safety check, and removing it is deliberate. Declare the ordering you need with
-enhancer metadata instead.
+**It preserves the supported application path.** Individually applied enhancers
+stay visible to `.with()`, while `composeEnhancers` hid its children behind a
+plain left fold. In 15.0, the generic enhancer-author metadata helpers are not a
+public API. If you need a reusable app-local bundle, apply the enhancers in the
+order you mean inside a helper function.
 
 ### Composing your own helper
 
@@ -185,12 +179,11 @@ additions, and writing it out is how they get lost.
 
 ---
 
-## Not changed
+## Also removed from the public surface
 
-- `createEnhancer` — unchanged.
-- `resolveEnhancerOrder` — unchanged; it is the supported way to express
-  dependency-aware ordering.
-- `ENHANCER_META` — unchanged.
+- `createEnhancer`
+- `resolveEnhancerOrder`
+- `ENHANCER_META`
 - Variadic `.with(a, b)` — still does **not** exist. Chain the calls.
 
 ---

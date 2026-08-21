@@ -830,57 +830,14 @@ tree.update((state) => ({
 }));
 ```
 
-### 7) Extensibility: Custom Markers & Enhancers
+### 7) App-local Helpers
 
-SignalTree is designed for extensibility. Create your own **markers** (state placeholders that materialize into specialized signals) and **enhancers** (functions that augment trees with additional capabilities).
+SignalTree 15.0 no longer publishes a generic custom marker/enhancer authoring
+SDK. Use the built-in primitives from `@signaltree/core`, and keep app-specific
+behavior in ordinary Angular signals, services, or helper functions around the
+tree you own.
 
-#### Custom Marker Example
-
-```typescript
-import { signal, Signal } from '@angular/core';
-import { registerMarkerProcessor, signalTree } from '@signaltree/core';
-
-// 1. Define marker symbol and interface
-const VALIDATED_MARKER = Symbol('VALIDATED_MARKER');
-
-interface ValidatedMarker<T> {
-  [VALIDATED_MARKER]: true;
-  defaultValue: T;
-  validator: (value: T) => string | null;
-}
-
-// 2. Create marker factory
-function validated<T>(defaultValue: T, validator: (value: T) => string | null): ValidatedMarker<T> {
-  return { [VALIDATED_MARKER]: true, defaultValue, validator };
-}
-
-// 3. Type guard
-function isValidatedMarker(value: unknown): value is ValidatedMarker<unknown> {
-  return Boolean(value && typeof value === 'object' && (value as any)[VALIDATED_MARKER] === true);
-}
-
-// 4. Register materializer (call once at app startup)
-registerMarkerProcessor(isValidatedMarker, (marker) => {
-  const valueSignal = signal(marker.defaultValue);
-  const errorSignal = signal<string | null>(marker.validator(marker.defaultValue));
-  return {
-    get: () => valueSignal(),
-    set: (v: any) => {
-      valueSignal.set(v);
-      errorSignal.set(marker.validator(v));
-    },
-    error: errorSignal.asReadonly(),
-    isValid: () => errorSignal() === null,
-  };
-});
-
-// 5. Usage
-const tree = signalTree({
-  email: validated('', (v) => (v.includes('@') ? null : 'Invalid email')),
-});
-```
-
-#### Custom Enhancer Example
+#### Helper Example
 
 ```typescript
 import { signal, Signal } from '@angular/core';
@@ -906,10 +863,6 @@ function withLogger(config?: { maxHistory?: number }) {
 const tree = signalTree({ count: 0 }).with(withLogger());
 tree.log('Tree created');
 ```
-
-> 📖 **Full guide**: [Custom Markers & Enhancers](https://github.com/JBorgia/signaltree/blob/main/docs/custom-markers-enhancers.md)
->
-> 📱 **Interactive demo**: [Demo App](/custom-extensions)
 
 ### 8) Derived State Tiers
 
