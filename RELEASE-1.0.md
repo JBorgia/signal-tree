@@ -10880,7 +10880,12 @@ else.
 - [x] clean Angular consumer smoke project —
       `node tools/verify-angular-consumer.mjs`
 
-Exit condition: `GATE C`
+Exit condition: `GATE C` — **SATISFIED**
+
+Gate C independent review at `aa481df6`: no blocker demonstrated. Residual Gate
+D risks carried forward: fix `check-bundle-budget.mjs` after deleted `form`,
+re-baseline or reduce bundle budgets, ship LICENSE files in package tarballs,
+and clean stale `dist/packages/*` artifacts for deleted packages.
 
 ## Phase 4 — Release Quality
 
