@@ -6,10 +6,6 @@ import {
   signalTree,
   timeTravel,
 } from '@signaltree/core';
-import {
-  ENHANCER_META,
-  resolveEnhancerOrder,
-} from '@signaltree/core/authoring';
 
 /**
  * The zero-delay batching preset, local to this benchmark.
@@ -162,44 +158,19 @@ export class SignalTreeBenchmarkService {
       }
 
       if (enhancers.length > 0) {
-        // Use the resolver to ensure enhancers are applied in dependency order
         try {
-          const ordered = resolveEnhancerOrder(enhancers as any);
-          // record applied enhancer names for diagnostics and export
-          try {
-            (window as any).__SIGNALTREE_ACTIVE_ENHANCERS__ = ordered.map(
-              (en: any) =>
-                (en &&
-                  (en.metadata?.name || (en as any)[ENHANCER_META]?.name)) ||
-                'unknown'
-            );
-          } catch {
-            // ignore - diagnostic best-effort
-          }
-
-          let t = tree;
-          for (const e of ordered) {
-            t = t.with(e);
-          }
-          return t;
+          (window as any).__SIGNALTREE_ACTIVE_ENHANCERS__ = enhancers.map(
+            (enhancer: any) => enhancer?.metadata?.name || 'unknown'
+          );
         } catch {
-          // Fallback to original order on error
-          let t = tree;
-          for (const e of enhancers) {
-            t = t.with(e);
-          }
-          try {
-            (window as any).__SIGNALTREE_ACTIVE_ENHANCERS__ = enhancers.map(
-              (en: any) =>
-                (en &&
-                  (en.metadata?.name || (en as any)[ENHANCER_META]?.name)) ||
-                'unknown'
-            );
-          } catch {
-            // ignore - diagnostic best-effort
-          }
-          return t;
+          // ignore - diagnostic best-effort
         }
+
+        let t = tree;
+        for (const enhancer of enhancers) {
+          t = t.with(enhancer);
+        }
+        return t;
       }
 
       // No requested enhancers — apply scenario defaults if provided
