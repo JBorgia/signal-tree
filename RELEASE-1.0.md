@@ -2505,7 +2505,8 @@ the kernel before `GATE A`.
 - [x] inventory public packages — `6e7bf16a`, baseline `tools/api-baseline.json`
 - [x] delete unearned companion packages — `a4bc5493` removed `guardrails`,
       `a0cf4f34` removed live `enterprise` / `callable-syntax` remnants, and
-      `7335ed88` removed nonexistent `schema` from package lists
+  `7335ed88` removed nonexistent `schema` from package lists;
+  `048c5132` removed `realtime`
 - [ ] **PACKAGE TOPOLOGY DECISION** (below) — blocks the export freeze
 - [ ] freeze exports
 - [ ] public TypeScript tests
@@ -2521,11 +2522,11 @@ Exit condition: `GATE B`
 | `core`     |   209 |      84 |       125 |                      **3** |             169 |              **17** |
 | `events`   |   116 |      63 |        53 |                      **0** |              11 |                   0 |
 | `ng-forms` |    34 |      15 |        19 |                      **3** |              26 |                   0 |
-| `realtime` |    13 |       5 |         8 |                      **0** |               7 |                   0 |
 
-`guardrails`, `schema`, `enterprise`, and `callable-syntax` are deleted from the
-15.0 live release surface. The 6e7bf16a inventory remains historical evidence
-only where it explains why those packages did not earn survival.
+`guardrails`, `schema`, `enterprise`, `callable-syntax`, and `realtime` are
+deleted from the 15.0 live release surface. The 6e7bf16a inventory remains
+historical evidence only where it explains why those packages did not earn
+survival.
 
 `core` by entrypoint: `.` 142 (36 runtime) · `./authoring` 48 (39) · `./security` 7 ·
 `./edit-session` 6 · `./lazy` 3 · `./storage` 3.
@@ -2556,12 +2557,11 @@ been corrected to say so.
 | `ng-forms` `.`                      | `@angular/core`, `@angular/forms`, `@signaltree/core{,/authoring}`, `rxjs`       |
 | `ng-forms/audit`                    | `@signaltree/core` only — confirms it is a pure re-export                        |
 | `ng-forms/signals`                  | `@angular/core`, `@angular/forms/signals`, `@signaltree/core{,/authoring}`       |
-| **`realtime` `.` and `./supabase`** | **`@angular/core`**                                                              |
 
 **This corrects an earlier claim of mine.** `schema` and `guardrails` are no
 longer package-topology inputs. Their existence was current-form evidence, not a
-reason to preserve a package or SDK boundary. `realtime` remains a live package
-question because it still emits `@angular/core` at runtime.
+reason to preserve a package or SDK boundary. `realtime` joined them in
+`048c5132`: external synchronization did not earn package survival.
 
 `events` is the genuine success: its root emits only `zod`, with Angular
 confined to `./angular` and Nest/bullmq to `./nestjs`. That is the shape the
@@ -2595,10 +2595,9 @@ some belong elsewhere and having to redo `GATE B`. Four questions:
    all declared in `packages/core/src/lib/audit/audit.ts`. Two packages publish
    one API. Which owns it?
 3. **Live packages that declare an `@angular/core` peer while their public types
-   do not require it** — `events` (0 of 116) and `realtime` (0 of 13).
-   `events` already splits `./angular` and `./nestjs` subpaths, so its root
-   could be framework-neutral with Angular peer-scoped to the subpath. `realtime`
-   remains a live package-topology question.
+  do not require it** — `events` (0 of 116). `events` already splits
+  `./angular` and `./nestjs` subpaths, so its root could be framework-neutral
+  with Angular peer-scoped to the subpath.
 4. **`@signaltree/kernel`: private boundary or published package?** Recommend
    PRIVATE first. The extraction prerequisite is unchanged — the realization
    port still consumes the Angular-shaped `TreeScalarSlotRuntime` and must move
