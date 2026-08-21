@@ -2509,8 +2509,10 @@ the kernel before `GATE A`.
       `048c5132` removed `realtime`
 - [x] **PACKAGE TOPOLOGY DECISION** (below) — closed by `f4de79a9`, `3065bc65`,
       `5f3dcd8a`, and the private-kernel decision recorded here
-- [ ] freeze exports
-- [ ] public TypeScript tests
+- [x] freeze exports — `5f1c96e0`; `node tools/api-inventory.mjs --check`,
+      `node tools/check-demo-coverage.mjs`, `node tools/verify-tarball-consumer.mjs`
+- [x] public TypeScript tests — `npm run typecheck:typing`,
+      `node tools/verify-consumer-typecheck.mjs`
 - [ ] compatibility matrix
 - [ ] freeze public API
 
