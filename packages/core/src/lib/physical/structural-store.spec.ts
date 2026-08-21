@@ -10,6 +10,17 @@ const seedStore = () => {
   return store;
 };
 
+const acquireExistingHandle = (
+  store: StructuralStore<string>,
+  key: string
+) => {
+  const handle = store.acquireSubjectHandleForKey(key);
+  if (handle === undefined) {
+    throw new Error(`Expected active subject at ${key}`);
+  }
+  return handle;
+};
+
 describe('StructuralStore', () => {
   it('tracks canonical active order across create, remove, rekey, and append', () => {
     const store = seedStore();
@@ -47,6 +58,40 @@ describe('StructuralStore', () => {
     expect(store.neighborSubjectsForKey('X')).toEqual({
       beforeSubject: 1,
       afterSubject: 3,
+    });
+  });
+
+  it('keeps keyed lookup address-based while acquired handles remain subject-based', () => {
+    const store = seedStore();
+    const handle = acquireExistingHandle(store, 'B');
+
+    expect(handle).toEqual({ subjectId: 2, acquiredRevision: 0 });
+
+    store.tombstoneSubject(2, 'B', true);
+    store.createSubject(4, 'B');
+
+    expect(store.subjectIdForKey('B')).toBe(4);
+    expect(store.resolveSubjectHandle(handle)).toEqual({
+      state: 'tombstoned',
+      subjectId: 2,
+      restoreAllowed: true,
+      revision: 0,
+    });
+  });
+
+  it('resolves acquired handles through rekey without retargeting through the old key', () => {
+    const store = seedStore();
+    const handle = acquireExistingHandle(store, 'B');
+
+    store.transferSubject(2, 'B', 'X');
+
+    expect(store.subjectIdForKey('B')).toBeUndefined();
+    expect(store.subjectIdForKey('X')).toBe(2);
+    expect(store.resolveSubjectHandle(handle)).toEqual({
+      state: 'active',
+      subjectId: 2,
+      key: 'X',
+      revision: 0,
     });
   });
 
