@@ -97,6 +97,7 @@
     "validate:types": "bash scripts/verify-no-broken-dts.sh",
     "validate:budget": "node scripts/v9-budget-checks.js",
     "validate:tree-shaking": "node scripts/verify-tree-shaking.js",
+    "validate:clean-release": "bash scripts/verify-clean-checkout-release-flow.sh",
     "validate:all": "npm run validate",
     "// Performance & Analysis": "Performance testing and bundle analysis",
     "perf:test": "npm run test:performance",
