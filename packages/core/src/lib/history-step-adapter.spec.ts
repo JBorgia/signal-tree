@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { signalTree, timeTravel } from '../index';
+import { entityMap, signalTree, timeTravel } from '../index';
 
 const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
@@ -16,10 +16,33 @@ type HistoryStepStore = {
   getHistory(): unknown[];
 };
 
+type Row = { id: number; label: string };
+
+type EntityHistoryStepStore = {
+  $: {
+    rows: {
+      addOne(row: Row): void;
+      updateOne(id: number, changes: Partial<Row>): void;
+      removeOne(id: number): void;
+      ids(): number[];
+      byId(id: number): { label: () => string | undefined } | undefined;
+    };
+  };
+  transaction(fn: () => void): { confirm(): void; rollback(): void };
+  undo(): void;
+  getHistory(): unknown[];
+};
+
 function createStore(): HistoryStepStore {
   return signalTree({ left: 'L0', right: 'R0', later: 'Z0' }).with(
     timeTravel()
   ) as unknown as HistoryStepStore;
+}
+
+function createEntityStore(): EntityHistoryStepStore {
+  return signalTree({
+    rows: entityMap<Row, number>({ selectId: (row) => row.id }),
+  }).with(timeTravel()) as unknown as EntityHistoryStepStore;
 }
 
 describe('history step adapter seam', () => {
@@ -134,5 +157,37 @@ describe('history step adapter seam', () => {
         store.transaction(() => store.$.right.set('R1'));
       })
     ).toThrow(/nested transaction/i);
+  });
+
+  it('confirms structural entity mutations as one user-recognizable undo step', async () => {
+    const store = createEntityStore();
+    store.$.rows.addOne({ id: 1, label: 'keep' });
+    store.$.rows.addOne({ id: 2, label: 'remove' });
+    await tick();
+    const initialHistoryLength = store.getHistory().length;
+
+    const step = store.transaction(() => {
+      store.$.rows.addOne({ id: 3, label: 'add' });
+      store.$.rows.updateOne(1, { label: 'updated' });
+      store.$.rows.removeOne(2);
+    });
+
+    expect(store.$.rows.ids()).toEqual([1, 3]);
+    expect(store.$.rows.byId(1)?.label()).toBe('updated');
+    expect(store.$.rows.byId(2)).toBeUndefined();
+    expect(store.$.rows.byId(3)?.label()).toBe('add');
+
+    step.confirm();
+    await tick();
+
+    expect(store.getHistory()).toHaveLength(initialHistoryLength + 1);
+
+    store.undo();
+    await tick();
+
+    expect(store.$.rows.ids()).toEqual([1, 2]);
+    expect(store.$.rows.byId(1)?.label()).toBe('keep');
+    expect(store.$.rows.byId(2)?.label()).toBe('remove');
+    expect(store.$.rows.byId(3)).toBeUndefined();
   });
 });
