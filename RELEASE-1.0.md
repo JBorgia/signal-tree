@@ -284,31 +284,31 @@ boundary, and it is where the judgement per file lives.
 
 **The withdrawal is PER TEST CASE, not per file.** Most of these files carry
 `entityMap` cases beside their `status` case — `marker-roundtrip` has both
-*"entityMap: entities survive"* and *"status: Loaded survives"*; `ssr-transfer`
+_"entityMap: entities survive"_ and _"status: Loaded survives"_; `ssr-transfer`
 carries an entityMap collection; `hydrate-decisions` covers a loader-backed
 entityMap. Those cases are untouched. Only the status specimen withdraws.
 
-| Spec | Function actually under test | Function status | Evidence role | STATUS-DEL action |
-|---|---|---|---|---|
-| `rehydration` | generic marker reconstruction | **UNPROVEN** | regression | withdraw status cases; defer replacement |
-| `marker-roundtrip` | snapshot → reconstruction | **UNPROVEN** | regression | withdraw the `status:` case; entityMap case stands |
-| `marker-materialization` | registered marker realization | **UNPROVEN** | regression | withdraw status cases |
-| `hydrate-decisions` | hydrate decision reporting | **UNPROVEN** | regression | withdraw status cases; asyncSource cases go with ASYNC-DEL |
-| `marker-serialization` | marker external representation | **UNPROVEN** | regression | withdraw status cases |
-| `ssr-transfer` | transfer representation | **UNPROVEN** (RFC 0014 exists, not derived here) | regression | withdraw status case; entityMap case stands |
-| `lazy-markers` | lazy realization | **UNPROVEN** | regression | withdraw status case |
-| `traversal-diagnostics` | traversal over markers | **UNPROVEN** | regression | withdraw status case |
-| `rehydrate-ownership` | ownership across rehydrate | **UNPROVEN** | regression | withdraw status case |
-| `legacy-payload` | legacy payload handling | **UNPROVEN** | regression | withdraw status cases |
-| `intercept-leaf-signals` | owner paths for built-in markers | **UNPROVEN** | regression | withdraw status case |
-| `devtools` | marker mutator notification | **UNPROVEN** | regression | withdraw status case |
-| `transactions` | marker source-signal rollback via the generic causal path | kernel **FROZEN**; marker participation **UNPROVEN** | mixed | withdraw the marker case — frozen transaction coverage lives elsewhere |
-| `greenfield-transactions` | heterogeneous write capture through the frozen kernel | kernel **FROZEN**; marker as one write-kind **UNPROVEN** | mixed | withdraw the marker write-kind; keep the kernel assertions |
-| `undo-redo` | marker source-signal owned turns; restore-vs-rehydrate | **UNPROVEN** | regression | withdraw both status cases |
-| `persistence` | save/load of a tree | persistence **FROZEN** | regression | status is fixture furniture — use plain state or drop from the fixture |
-| `planned-signal-tree` | pre-exposure planning | function **SURVIVED**; public constructor **REJECTED** | mixed | keep only assertions belonging to the earned planning function |
-| `write-only-marker` | — | — | test infrastructure | remove the unused import |
-| `time-travel:3305` | status promise-vocabulary aliases | **REJECTED** | legacy contract | **DELETE with the feature** (Class 1) |
+| Spec                      | Function actually under test                              | Function status                                          | Evidence role       | STATUS-DEL action                                                      |
+| ------------------------- | --------------------------------------------------------- | -------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------- |
+| `rehydration`             | generic marker reconstruction                             | **UNPROVEN**                                             | regression          | withdraw status cases; defer replacement                               |
+| `marker-roundtrip`        | snapshot → reconstruction                                 | **UNPROVEN**                                             | regression          | withdraw the `status:` case; entityMap case stands                     |
+| `marker-materialization`  | registered marker realization                             | **UNPROVEN**                                             | regression          | withdraw status cases                                                  |
+| `hydrate-decisions`       | hydrate decision reporting                                | **UNPROVEN**                                             | regression          | withdraw status cases; asyncSource cases go with ASYNC-DEL             |
+| `marker-serialization`    | marker external representation                            | **UNPROVEN**                                             | regression          | withdraw status cases                                                  |
+| `ssr-transfer`            | transfer representation                                   | **UNPROVEN** (RFC 0014 exists, not derived here)         | regression          | withdraw status case; entityMap case stands                            |
+| `lazy-markers`            | lazy realization                                          | **UNPROVEN**                                             | regression          | withdraw status case                                                   |
+| `traversal-diagnostics`   | traversal over markers                                    | **UNPROVEN**                                             | regression          | withdraw status case                                                   |
+| `rehydrate-ownership`     | ownership across rehydrate                                | **UNPROVEN**                                             | regression          | withdraw status case                                                   |
+| `legacy-payload`          | legacy payload handling                                   | **UNPROVEN**                                             | regression          | withdraw status cases                                                  |
+| `intercept-leaf-signals`  | owner paths for built-in markers                          | **UNPROVEN**                                             | regression          | withdraw status case                                                   |
+| `devtools`                | marker mutator notification                               | **UNPROVEN**                                             | regression          | withdraw status case                                                   |
+| `transactions`            | marker source-signal rollback via the generic causal path | kernel **FROZEN**; marker participation **UNPROVEN**     | mixed               | withdraw the marker case — frozen transaction coverage lives elsewhere |
+| `greenfield-transactions` | heterogeneous write capture through the frozen kernel     | kernel **FROZEN**; marker as one write-kind **UNPROVEN** | mixed               | withdraw the marker write-kind; keep the kernel assertions             |
+| `undo-redo`               | marker source-signal owned turns; restore-vs-rehydrate    | **UNPROVEN**                                             | regression          | withdraw both status cases                                             |
+| `persistence`             | save/load of a tree                                       | persistence **FROZEN**                                   | regression          | status is fixture furniture — use plain state or drop from the fixture |
+| `planned-signal-tree`     | pre-exposure planning                                     | function **SURVIVED**; public constructor **REJECTED**   | mixed               | keep only assertions belonging to the earned planning function         |
+| `write-only-marker`       | —                                                         | —                                                        | test infrastructure | remove the unused import                                               |
+| `time-travel:3305`        | status promise-vocabulary aliases                         | **REJECTED**                                             | legacy contract     | **DELETE with the feature** (Class 1)                                  |
 
 **Every UNPROVEN row is regression coverage.** Not one of them is an
 architectural falsifier for a frozen claim, so by the premise above none has a
@@ -327,7 +327,7 @@ anything onto another marker.
 
 **`transactions.spec` — the frozen property is "rollback works without
 feature-specific logic".** The test immediately following the status one is
-*"rolls back pending stored writes and restores persisted state"* — the same
+_"rolls back pending stored writes and restores persisted state"_ — the same
 property, a different specimen, already present. Alongside it:
 
 ```text
@@ -374,7 +374,7 @@ production    UNCHANGED — no generic mechanism is deleted by withdrawing a tes
 
 ### THE CYCLE WAS FALSE — Rule 0l applies to TESTS
 
-I framed this as *"STATUS-DEL is blocked on the marker derivation."* **Wrong.**
+I framed this as _"STATUS-DEL is blocked on the marker derivation."_ **Wrong.**
 The status-dependent REGRESSION TESTS are blocked on it; STATUS-DEL is not.
 
 The missing premise:
@@ -501,8 +501,8 @@ settled anywhere in this RFC. Migrating thirteen-plus specs onto a hand-built
 test marker would quietly assert that it does.
 
 **Consequence:** the Class 3 survival table is not optional bookkeeping before
-the edits. It is the gate. Several rows may resolve to *"do not migrate; this
-coverage belongs to a derivation that has not run."*
+the edits. It is the gate. Several rows may resolve to _"do not migrate; this
+coverage belongs to a derivation that has not run."_
 
 ### FIXTURE RULE, STRENGTHENED — capability-minimal per falsifier
 
@@ -511,8 +511,8 @@ coverage belongs to a derivation that has not run."*
 
 "A marker with hydrate/snapshot hooks and nothing else" is still too broad. One
 shared test marker carrying marker + hydrate + snapshot + capabilities + lazy
-behaviour would replace *"status accidentally sponsors generic machinery"* with
-*"TestMarker accidentally asserts all generic machinery belongs together"* — the
+behaviour would replace _"status accidentally sponsors generic machinery"_ with
+_"TestMarker accidentally asserts all generic machinery belongs together"_ — the
 test equivalent of inventing an architecture envelope before the functions earn
 one.
 
@@ -552,8 +552,8 @@ Otherwise STATUS-DEL manufactures future evidence not through `stored()`, but by
 Where coverage must be kept while its architecture is still open, the fixture
 comment must say so in as many words:
 
-> *This fixture preserves current implementation coverage. It is not survival
-> evidence.*
+> _This fixture preserves current implementation coverage. It is not survival
+> evidence._
 
 ### TEST-EVIDENCE TAXONOMY — worth keeping beyond STATUS-DEL
 
@@ -595,8 +595,8 @@ COMMIT 2 — STATUS-DEL
   UNTOUCHED  generic marker production machinery
 ```
 
-This does not reintroduce the atomicity problem. The bad split would be *delete
-tests, then delete implementation*, leaving a live feature without its own
+This does not reintroduce the atomicity problem. The bad split would be _delete
+tests, then delete implementation_, leaving a live feature without its own
 contract coverage. Here the status-SPECIFIC coverage stays with the feature until
 Commit 2; Commit 1 removes only cases already classified as UNPROVEN-subject,
 rejected-fixture, regression-role.
@@ -814,7 +814,7 @@ package.json "license": "Apache-2.0"       -> AFTER e1617fb1 (2026-08-11 11:40)
 README says Apache-2.0                     -> same
 ```
 
-`e1617fb1` — *"license: relicense from BUSL-1.1 to Apache-2.0"* — exists **only on
+`e1617fb1` — _"license: relicense from BUSL-1.1 to Apache-2.0"_ — exists **only on
 `history/gate1-frontier-cutover`**. It is not on `main`.
 
 So **14.1.2 was published from the 15 development branch**, from a working-tree
@@ -897,14 +897,14 @@ PREMISE ATTACK on the interpretation
 architectural conclusion
 ```
 
-The audit stops being *"build a null and see whether it works"* and becomes
-*"first prove there is something legitimate for a null to falsify."* That is the
+The audit stops being _"build a null and see whether it works"_ and becomes
+_"first prove there is something legitimate for a null to falsify."_ That is the
 guard whose absence explains nearly every error below.
 
 ### Why this exists
 
 Every significant error in the frontier/collections derivations had one shape: the
-incumbent *mechanism* was removed while one of its semantic *assumptions* stayed
+incumbent _mechanism_ was removed while one of its semantic _assumptions_ stayed
 embedded in the null. The null came back green because it was built to answer a
 question whose answer it already partly encoded.
 
@@ -927,9 +927,9 @@ E2-S00      object-reference compare               -> identity reappeared INSIDE
 computed    framework realization                  -> leaked into kernel evidence
 ```
 
-Executable falsifiers reliably catch *"the implementation doesn't do what we
-thought."* They cannot catch *"we never established it should do what the test
-asserts."*
+Executable falsifiers reliably catch _"the implementation doesn't do what we
+thought."_ They cannot catch _"we never established it should do what the test
+asserts."_
 
 ## PRE-REGISTRATION — complete BEFORE any null is implemented
 
@@ -992,7 +992,7 @@ INTERPRETATIONS   may NOT commit until the premise attack closes
 VOCABULARY        measurement commits must use OBSERVATION-ONLY language
 ```
 
-Without the third clause, *"measurements commit freely"* recreates the exact
+Without the third clause, _"measurements commit freely"_ recreates the exact
 contamination channel that `wrong-row read` travelled through. A conclusion one
 level too strong survives long enough for the next derivation to inherit it, and
 the corrective commit arrives after the damage. The cost of a high commit rate is
@@ -1078,7 +1078,7 @@ A rung-3 verdict reached on sufficient premises is legitimate with rungs 1 and 2
 empty. What is illegitimate is **filling a premise gap with measurement.**
 
 Recorded because an interpretation reviewer once explained a row's undecidability as
-*"rung 3 entered with 1 and 2 empty — that is out of order"*, and the author adopted
+_"rung 3 entered with 1 and 2 empty — that is out of order"_, and the author adopted
 it and generalized it to four unopened rows. That framing implies measurement would
 have decided the row, which is the same "provisional against measurement" error
 already struck elsewhere, returning in ladder clothing. **The ladder describes what
@@ -1099,7 +1099,7 @@ not need.**
 5  A PARTICULAR CARRIER SURVIVES
 ```
 
-*"A held reference revives after undo"* earns **step 1**. Nothing more. The
+_"A held reference revives after undo"_ earns **step 1**. Nothing more. The
 one-step limit is stronger than "no finding skips more than one step", because a
 sufficiently seductive test will otherwise produce
 `measurement -> therefore the function survives -> therefore SubjectId` inside a
@@ -1122,15 +1122,14 @@ discipline: a reviewer who starts designing the mechanism has already granted it
 **Structural limit, recorded plainly.** One agent deriving the requirement,
 designing the null, implementing it, debugging it, interpreting it and writing the
 verdict is prone to confirmation bias whatever the discipline. Once the words
-*"wrong-row read"* are written, the classification precedes the contract. **A
+_"wrong-row read"_ are written, the classification precedes the contract. **A
 checklist cannot make an author independent of their own framing** — the controller
 can only make the omission visible. An empty OPPOSITE CONTRACT field is therefore
 a stop condition, not a note.
 
-
 ## DELEGATION POLICY — independence is the point, not headcount
 
-The old rule was *"only use subagents when explicitly requested."* Replaced:
+The old rule was _"only use subagents when explicitly requested."_ Replaced:
 
 > **Use subagents whenever epistemic independence materially improves the
 > decision. Keep writes and final architectural authority centralized.**
@@ -1140,8 +1139,8 @@ permission for each time.
 
 ### Differentiated packets — the load-bearing part
 
-Five agents that all see *"I think SubjectId is necessary because key reuse causes
-wrong-row aliasing"* are not five reviews. They are one frame, five times. What
+Five agents that all see _"I think SubjectId is necessary because key reuse causes
+wrong-row aliasing"_ are not five reviews. They are one frame, five times. What
 buys independence is giving them **deliberately different information and
 incentives**:
 
@@ -1279,7 +1278,7 @@ A closure may never be broader than its packet. Widening is a NEW row.
 
 Reviewer B's job is to exhibit a coherent world without the candidate. Nothing said
 what weight the components of that world carry. So `turn-coalesced notification`,
-invented because B needed *something* in that slot, was recorded as a "surviving
+invented because B needed _something_ in that slot, was recorded as a "surviving
 container obligation."
 
 ```text
@@ -1356,7 +1355,7 @@ CANDIDATE DECIDABLE.
 ```
 
 Observed once, on its second application: the reviewer correctly detected that the
-premises did not decide a candidate, and then wrote *"two obligations follow"* —
+premises did not decide a candidate, and then wrote _"two obligations follow"_ —
 including a cheap check to run and a question to settle. Both existed only to make
 the closed candidate decidable. That is the transition the underdetermined-is-
 terminal rule forbids, committed by the gate that enforces it.
@@ -1395,8 +1394,8 @@ A pre-registered OPPOSITE CONTRACT may not contain a clause that DECIDES a
 question the row might need to decide.
 ```
 
-Observed on U5b-A. The opposite contract was written as *"the grouping premise
-governs only confirmed reversal granularity"* — which handed the null the answer to
+Observed on U5b-A. The opposite contract was written as _"the grouping premise
+governs only confirmed reversal granularity"_ — which handed the null the answer to
 precisely the question a reviewer then identified as undecided by the premises. Any
 closure leaning on the null's wording was leaning on a stipulation, and the phrase
 had to be recorded as **the author's wording, not a finding.**
@@ -1449,7 +1448,7 @@ material. Gate 2 gates the SYNTHESIS, not the measurement.
 
 Handing over "the function statement and the proposed contract" already smuggles
 the first premise in. The packet carries frozen premises plus a clearly marked
-*candidate*:
+_candidate_:
 
 ```text
 ZERO STATE
@@ -1539,7 +1538,7 @@ OUT-OF-ROW     PARK
 
 ### Row wording must not arrive pre-shaped
 
-*"Does `structural` need more than canonical truth?"* is already
+_"Does `structural` need more than canonical truth?"_ is already
 representation-shaped — it names the incumbent's field. Start one level up:
 
 ```text
@@ -1547,9 +1546,9 @@ What independently surviving function, if any, requires information that cannot
 be reconstructed from canonical truth at confirmed-reversal time?
 ```
 
-Then let the reviewer attack whether even *that* function exists. Only after
-survival: *what information property is required?* Only then: *what representation
-carries it?* This keeps `structural`, `SubjectId`, effects, snapshots and
+Then let the reviewer attack whether even _that_ function exists. Only after
+survival: _what information property is required?_ Only then: _what representation
+carries it?_ This keeps `structural`, `SubjectId`, effects, snapshots and
 generation tokens out of the question until they are earned.
 
 ### Why the misses happened — recorded, because it is the finding
@@ -1844,8 +1843,8 @@ tree.with(formBridge()); tree.getAngularForm(...)
       An Angular object now presents that truth.               ENHANCER FAILS
 ```
 
-The second is `Enhancer` used as *"a convenient way to attach methods to the
-tree"* rather than *"a semantic extension of the tree"*. Rule 0g exists to
+The second is `Enhancer` used as _"a convenient way to attach methods to the
+tree"_ rather than _"a semantic extension of the tree"_. Rule 0g exists to
 eliminate exactly that.
 
 **Before the kernel, making everything an enhancer was defensible — the tree
@@ -1856,10 +1855,10 @@ SEMANTIC CATEGORIES WITH NARROW OWNERSHIP, not generic hooks.
 
 Migrating six built-ins to `Enhancer<Methods>` proved the PROTOCOL is neutral
 and coherent. Under Rule 0h that says nothing about whether each of those
-features should BE an enhancer. Do not conclude *"we built an excellent neutral
-enhancer model, therefore schema/realtime/ng-forms must fit it"*. Conclude
-*"we built an excellent neutral enhancer model — now determine which functions
-are actually enhancers"*.
+features should BE an enhancer. Do not conclude _"we built an excellent neutral
+enhancer model, therefore schema/realtime/ng-forms must fit it"_. Conclude
+_"we built an excellent neutral enhancer model — now determine which functions
+are actually enhancers"_.
 
 **PRELIMINARY CLASSIFICATION — every row needs its own 0g derivation; none is a
 disposition:**
@@ -2054,11 +2053,11 @@ enforcing the new architectural division
 
 Every finding gets exactly one of three dispositions:
 
-| disposition | meaning |
-| --- | --- |
-| **14.x DEFECT -> PATCH** | incorrect implementation or documentation under the EXISTING 14.x contract. Fix on the 14.x line, document, patch-release, and ensure 15.0 inherits the correction. |
-| **15.0 BREAKING CORRECTION** | 14.x publicly promised or permitted the wrong thing; correcting it necessarily changes consumer-visible semantics. Document the defect against 14.x; the contract change lands only in 15.0. |
-| **15.0 ARCHITECTURAL CUTOFF** | not necessarily a 14.x bug — a supported old design deliberately removed or reassigned in the major. |
+| disposition                   | meaning                                                                                                                                                                                      |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **14.x DEFECT -> PATCH**      | incorrect implementation or documentation under the EXISTING 14.x contract. Fix on the 14.x line, document, patch-release, and ensure 15.0 inherits the correction.                          |
+| **15.0 BREAKING CORRECTION**  | 14.x publicly promised or permitted the wrong thing; correcting it necessarily changes consumer-visible semantics. Document the defect against 14.x; the contract change lands only in 15.0. |
+| **15.0 ARCHITECTURAL CUTOFF** | not necessarily a 14.x bug — a supported old design deliberately removed or reassigned in the major.                                                                                         |
 
 Each 14.x defect needs a record carrying:
 
@@ -2504,6 +2503,9 @@ the kernel before `GATE A`.
 ## Phase 2 — Public Release Surface
 
 - [x] inventory public packages — `6e7bf16a`, baseline `tools/api-baseline.json`
+- [x] delete unearned companion packages — `a4bc5493` removed `guardrails`,
+      `a0cf4f34` removed live `enterprise` / `callable-syntax` remnants, and
+      `7335ed88` removed nonexistent `schema` from package lists
 - [ ] **PACKAGE TOPOLOGY DECISION** (below) — blocks the export freeze
 - [ ] freeze exports
 - [ ] public TypeScript tests
@@ -2514,14 +2516,16 @@ Exit condition: `GATE B`
 
 ### Measured public surface (`6e7bf16a`, checker-resolved, not regex)
 
-| Package      | Total | Runtime | Type-only | **Angular in public TYPE** | Angular in decl | Internal-decl leaks |
-| ------------ | ----: | ------: | --------: | -------------------------: | --------------: | ------------------: |
-| `core`       |   209 |      84 |       125 |                      **3** |             169 |              **17** |
-| `events`     |   116 |      63 |        53 |                      **0** |              11 |                   0 |
-| `ng-forms`   |    34 |      15 |        19 |                      **3** |              26 |                   0 |
-| `guardrails` |    33 |      11 |        22 |                      **0** |               2 |                   0 |
-| `realtime`   |    13 |       5 |         8 |                      **0** |               7 |                   0 |
-| `schema`     |     4 |       1 |         3 |                      **0** |               4 |                   0 |
+| Package    | Total | Runtime | Type-only | **Angular in public TYPE** | Angular in decl | Internal-decl leaks |
+| ---------- | ----: | ------: | --------: | -------------------------: | --------------: | ------------------: |
+| `core`     |   209 |      84 |       125 |                      **3** |             169 |              **17** |
+| `events`   |   116 |      63 |        53 |                      **0** |              11 |                   0 |
+| `ng-forms` |    34 |      15 |        19 |                      **3** |              26 |                   0 |
+| `realtime` |    13 |       5 |         8 |                      **0** |               7 |                   0 |
+
+`guardrails`, `schema`, `enterprise`, and `callable-syntax` are deleted from the
+15.0 live release surface. The 6e7bf16a inventory remains historical evidence
+only where it explains why those packages did not earn survival.
 
 `core` by entrypoint: `.` 142 (36 runtime) · `./authoring` 48 (39) · `./security` 7 ·
 `./edit-session` 6 · `./lazy` 3 · `./storage` 3.
@@ -2549,18 +2553,15 @@ been corrected to say so.
 | `events/angular`                    | `@angular/core`, `@angular/core/rxjs-interop`, `rxjs`, `rxjs/webSocket`, `tslib` |
 | `events/nestjs`                     | `@nestjs/common`, `bullmq`, `tslib`                                              |
 | `events/testing`                    | (none)                                                                           |
-| `guardrails` (all)                  | `@signaltree/core/authoring` only — **no Angular anywhere**                      |
 | `ng-forms` `.`                      | `@angular/core`, `@angular/forms`, `@signaltree/core{,/authoring}`, `rxjs`       |
 | `ng-forms/audit`                    | `@signaltree/core` only — confirms it is a pure re-export                        |
 | `ng-forms/signals`                  | `@angular/core`, `@angular/forms/signals`, `@signaltree/core{,/authoring}`       |
 | **`realtime` `.` and `./supabase`** | **`@angular/core`**                                                              |
-| **`schema` `.`**                    | **`@angular/core`, `@signaltree/core/authoring`**                                |
 
-**This corrects an earlier claim of mine.** I called `schema` "the strongest
-candidate for eliminating Angular" on the basis that 0 of its 4 public types
-mention Angular. Its emitted root imports `@angular/core` at runtime, so it is
-NOT neutral today. Making it neutral means removing the Angular usage, not
-merely narrowing the peer declaration. Same for `realtime`.
+**This corrects an earlier claim of mine.** `schema` and `guardrails` are no
+longer package-topology inputs. Their existence was current-form evidence, not a
+reason to preserve a package or SDK boundary. `realtime` remains a live package
+question because it still emits `@angular/core` at runtime.
 
 `events` is the genuine success: its root emits only `zod`, with Angular
 confined to `./angular` and Nest/bullmq to `./nestjs`. That is the shape the
@@ -2593,12 +2594,11 @@ some belong elsewhere and having to redo `GATE B`. Four questions:
    `createAuditCallback`, `AuditEntry`, `AuditMetadata`, `AuditTrackerConfig`,
    all declared in `packages/core/src/lib/audit/audit.ts`. Two packages publish
    one API. Which owns it?
-3. **Three packages declare an `@angular/core` peer that their public types do
-   not require** — `events` (0 of 116), `realtime` (0 of 13), `schema` (0 of 4).
+3. **Live packages that declare an `@angular/core` peer while their public types
+   do not require it** — `events` (0 of 116) and `realtime` (0 of 13).
    `events` already splits `./angular` and `./nestjs` subpaths, so its root
-   could be framework-neutral with Angular peer-scoped to the subpath. `schema`
-   is the strongest case: a Standard Schema bridge should not need Angular at
-   all. Narrow the peers, or keep them for safety?
+   could be framework-neutral with Angular peer-scoped to the subpath. `realtime`
+   remains a live package-topology question.
 4. **`@signaltree/kernel`: private boundary or published package?** Recommend
    PRIVATE first. The extraction prerequisite is unchanged — the realization
    port still consumes the Angular-shaped `TreeScalarSlotRuntime` and must move
@@ -2608,7 +2608,27 @@ some belong elsewhere and having to redo `GATE B`. Four questions:
    `EntityMutationFrame` into public view is exactly what a private boundary
    lets us find out without a compatibility promise.
 
-### `@signaltree/authoring` — IN PROGRESS. Resume here.
+### `@signaltree/authoring` — STOPPED. Package/form is UNPROVEN.
+
+**Corrected after peer review and package deletion commits.** The split below is
+retained as evidence about neutral declarations, not as an architectural
+conclusion. A set of framework-neutral contracts may be needed by independently
+surviving external implementers, but the package/form `@signaltree/authoring`
+does not inherit survival from current `core/authoring`, marker processors,
+enhancers, guardrails, or extraction convenience.
+
+Current rule:
+
+```text
+Specific external implementer need first.
+Shared neutral contract only after multiple surviving needs converge.
+Package name and public SDK form last.
+```
+
+So the next action is **not** "create `@signaltree/authoring`". The next action
+is to derive or delete each external implementer need independently.
+
+### Historical `@signaltree/authoring` split notes — evidence only
 
 **Decision reversed: the split happens in this major.** 15.0 is already the
 breaking release; keeping `@signaltree/core/authoring` now and moving it later
@@ -3072,15 +3092,17 @@ may legitimately remain if it appears in neutral async contracts.
 - [x] Contract-neutrality gate — `tools/check-contract-neutrality.mjs`, 5/5 pass
 - [x] Closure proof run — 38/46 neutral; see the table above
 - [x] Readonly reader-key declaration hotspot split — `4f62d082`.
-  `authoring.d.ts` now exports `*_READERS` from `./lib/readonly-readers`,
-  whose emitted declaration has 0 `@angular/core` imports. Validation:
-  `readonly.spec.ts`, `typecheck:source`, `typecheck:typing`, `nx build core`,
-  `nx lint core`, emitted declaration inspection.
-- [ ] Move the 3 realizations + 4 ordinary-user utilities out of authoring
-- [ ] Resolve `interceptLeafSignals` (port, or accept as Angular-side)
-- [ ] Re-run the closure proof; require 0 retained Angular
-- [ ] Create `@signaltree/authoring`, move the SDK, repoint `guardrails`
-- [ ] Remove `@signaltree/core/authoring` as a 15.0 breaking change
+      `authoring.d.ts` now exports `*_READERS` from `./lib/readonly-readers`,
+      whose emitted declaration has 0 `@angular/core` imports. Validation:
+      `readonly.spec.ts`, `typecheck:source`, `typecheck:typing`, `nx build core`,
+      `nx lint core`, emitted declaration inspection.
+- [x] Move current-form package pressure out of the decision — `a4bc5493`,
+      `a0cf4f34`, `7335ed88`
+- [ ] Derive or delete each remaining external implementer need independently
+- [ ] Only after convergence, decide whether any shared neutral contract and
+      package boundary exists
+- [ ] Remove `@signaltree/core/authoring` as a 15.0 breaking change if no
+      surviving public need remains
 - [ ] Regenerate the API baseline deliberately, then `GATE B`
 
 ### Historical — the dependency check that produced the sequence above
@@ -3558,11 +3580,11 @@ artifact exists, artifact has/lacks the property being tested.
 No single proxy can freeze the API. Each of these has now been observed passing
 while another failed:
 
-| dimension             | question                                  | failure it missed                                                                                                                    |
-| --------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Export inventory      | what names exist?                         | `TimeTravelMethods<T>` -> `TimeTravelMethods` (arity change, symbol set identical); `StateOf` (inventory clean, declaration invalid) |
+| dimension             | question                                  | failure it missed                                                                                                                                            |
+| --------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Export inventory      | what names exist?                         | `TimeTravelMethods<T>` -> `TimeTravelMethods` (arity change, symbol set identical); `StateOf` (inventory clean, declaration invalid)                         |
 | Public type contracts | what do those names mean to TypeScript?   | not yet systematic — targeted contract tests are sufficient for 1.0. `SignalTree<T>` is now covered by `signal-tree-type-matrix.typing.spec.ts` (`9f0d1464`) |
-| Declaration closure   | can the shipped types be consumed at all? | the entity-map blocker above                                                                                                         |
+| Declaration closure   | can the shipped types be consumed at all? | the entity-map blocker above                                                                                                                                 |
 
 `tools/api-inventory.mjs` compares symbol sets and metadata; it structurally
 cannot see a type-shape change to an existing symbol. Generic-arity plus
@@ -3628,7 +3650,7 @@ v14 has X -> X is public/tested/documented/used -> therefore some 15 equivalent
 must exist -> derive a smaller, better X
 ```
 
-and required a human to interrupt with *"we don't need to keep that."* That
+and required a human to interrupt with _"we don't need to keep that."_ That
 interruption should never be necessary. **The burden drifted** from
 
 ```text
@@ -3662,8 +3684,8 @@ derived->derived unnecessary  -> "so users cannot author it"
 status deleted                -> "so where does error-retention move?"
 ```
 
-All three are the deleted thing still steering. The answers may be *no boundary*,
-*users can*, and *nowhere*. **Never propose a replacement for a rejected
+All three are the deleted thing still steering. The answers may be _no boundary_,
+_users can_, and _nowhere_. **Never propose a replacement for a rejected
 mechanism in the same reasoning step that rejects it.**
 
 ```text
@@ -3726,16 +3748,16 @@ exist, if any).
 "migration"                "compatibility"
 ```
 
-Not always wrong — but each can hide *old thing existed -> new thing must fill an
-equivalent role*. The response is **"why must that role exist at all?"** before
+Not always wrong — but each can hide _old thing existed -> new thing must fill an
+equivalent role_. The response is **"why must that role exist at all?"** before
 any discussion of what fills it.
 
 ### Consequence for arbitration
 
-*"Should we preserve this because v14 had it?"* is **NOT a valid arbitration
+_"Should we preserve this because v14 had it?"_ is **NOT a valid arbitration
 question** and must never be escalated as one. It is answered mechanically by
-this rule. The only admissible restatement is *"does greenfield SignalTree need
-this function?"*
+this rule. The only admissible restatement is _"does greenfield SignalTree need
+this function?"_
 
 ## RULE 0n — MAJOR-VERSION CONTINUITY IS NON-SEMANTIC
 
@@ -3770,7 +3792,7 @@ exercised by the demo with two custom declaration kinds, and advertised as a
 product capability — and I inferred from that a "real open-set requirement" that
 made the null "much harder". **That was publicness acting as a survival bonus**,
 which is Rule 0l's failure mode wearing a new disguise. The same demo sentence
-advertises *"markers AND enhancers"*, and the enhancer half was already found to
+advertises _"markers AND enhancers"_, and the enhancer half was already found to
 have no surviving function.
 
 What the evidence actually establishes:
@@ -3835,7 +3857,7 @@ DX AS PRESSURE / FALSIFIER             required now
 derived->derived semantic topology is unnecessary — projectors are pure functions
 of store truth, so any finite acyclic composition collapses by substitution. That
 is a statement about the RUNTIME GRAPH. It was one inference step from becoming
-*"the author may not compose named projections"*, which the semantics do not
+_"the author may not compose named projections"_, which the semantics do not
 require: the dependency can expand transitively to canonical inputs during
 lowering, leaving the authoring capability intact.
 
@@ -3856,8 +3878,8 @@ Every closing matrix row now also answers:
 > **Did this conclusion accidentally remove a useful authoring capability that
 > the semantic result does not actually forbid?**
 
-Recorded as CAPABILITY, never as spelling. For `derived` that reads *"let authors
-compose named projections naturally"* — NOT `$.subtotal()`, `derived.subtotal`,
+Recorded as CAPABILITY, never as spelling. For `derived` that reads _"let authors
+compose named projections naturally"_ — NOT `$.subtotal()`, `derived.subtotal`,
 `derive(subtotal)`, or any other candidate syntax, none of which is frozen.
 
 **The final DX pass is explicitly deferred**, and its question is not "what API
@@ -3880,7 +3902,7 @@ The audit has crossed the point where `.with()`, `Enhancer`, `plannedSignalTree`
 architecture. They are now HISTORICAL EVIDENCE about functions the old system
 happened to provide.
 
-The question stops being *"how do we replace enhancers?"* and becomes:
+The question stops being _"how do we replace enhancers?"_ and becomes:
 
 > **What useful functions existed, which still matter, which are already
 > satisfied naturally by the derived architecture, and what is the optimal
@@ -4182,8 +4204,8 @@ behaviour in place.** Batching must intercept `tree(...)` to schedule its
 notification; time travel and devtools must intercept it to record. On an
 ALREADY-CONSTRUCTED tree that requires SOME new callable identity — the current
 copy-and-redefine is one realization of that constraint, and a Proxy would be
-another. **WORDING CORRECTED:** the surviving requirement is *change callable
-behaviour*, not *replace identity*; an earlier draft said "the only way", which
+another. **WORDING CORRECTED:** the surviving requirement is _change callable
+behaviour_, not _replace identity_; an earlier draft said "the only way", which
 overclaimed. The architectural conclusion is unchanged, because every mechanism
 that satisfies the constraint post-construction produces a new callable.
 
@@ -4194,8 +4216,8 @@ mechanism available for modifying a callable that already exists.
 
 `batching.ts:353` and `devtools-impl.ts:1736` carry the same comment:
 
-> *"Define new .with() method that passes enhancedTree (not the original tree) to
-> subsequent enhancers. This is critical for preserving the enhancer chain."*
+> _"Define new .with() method that passes enhancedTree (not the original tree) to
+> subsequent enhancers. This is critical for preserving the enhancer chain."_
 
 The replacement redefines `.with()` **in order to preserve the chain**, and the
 replacement itself exists only because the chain applies changes after
@@ -4233,8 +4255,8 @@ open.
 ### T1 CASE 0 — late attachment, measured before prototyping
 
 Searched every `.with()` call site outside core's own implementation and specs,
-separating *syntax split across statements during construction* from *a live,
-exposed tree extended later*.
+separating _syntax split across statements during construction_ from _a live,
+exposed tree extended later_.
 
 ```
 demo call sites                         all construction-time
@@ -4379,9 +4401,9 @@ time-travel    capabilities: ['causal-runtime', 'temporal-snapshots']
 enhancer to an ALREADY-CONSTRUCTED tree whose substrate is already fixed to the
 legacy plan; a capability that must exist at construction time — leaf
 specialization, the causal substrate, position topology — cannot be retrofitted
-onto it. The spec names say exactly this: *"installs causal capability before
-exposure so retained set refs stay correct"*, *"keeps status marker source leaves
-non-authoring without mutation-capture"*.
+onto it. The spec names say exactly this: _"installs causal capability before
+exposure so retained set refs stay correct"_, _"keeps status marker source leaves
+non-authoring without mutation-capture"_.
 
 So the NULL is answered: something real is lost. Deferred construction is not
 ordinary application composition here — it is the only point at which the
@@ -4541,7 +4563,6 @@ neither implies any replacement design:
   what to repair would let a stale artifact select the API being frozen. An
   existing export is not evidence of intended public API.
 
-
 1. ~~Delete `SignalTreeBase`.~~ **DONE** — characterized `9f0d1464`, deleted
    `6a515699`. See "Slice 1 — `SignalTreeBase`" below.
 2. ~~Delete `composeEnhancers`.~~ **DONE** — characterized `2f46115b`, deleted
@@ -4557,7 +4578,7 @@ neither implies any replacement design:
    identity-replacing enhancer case.
    **ITS RECORDED JUSTIFICATION NO LONGER HOLDS.** The overload's docblock said
    it exists because "core's built-ins are declared `<T>(tree: ISignalTree<T>)
-   => ISignalTree<T> & Methods`". After item #3 that is FALSE — all six are
+=> ISignalTree<T> & Methods`". After item #3 that is FALSE — all six are
    `Enhancer<Methods>`. Core no longer justifies it. That is NOT proof it is
    unused: `guardrails`, `realtime`, `schema` and `ng-forms` still declare
    enhancers against `ISignalTree`, and THAT is what must be measured before
@@ -4570,6 +4591,7 @@ neither implies any replacement design:
    are then dead machinery; `devTools`' is NOT — see the correction below —
    but under Rule 0e the canonical path should be the SOLE owner, not merely the
    winner. Do not keep them because the fix tolerates them.
+
 5. Realistic `SignalTree` vs `ISignalTree` matrix (state containing nested
    object + `entityMap` + marker + primitive leaf, with negative controls).
    **The annotation/constructor alignment half is DONE** (`243dd5fb`,
@@ -4654,11 +4676,11 @@ Review of `9f0d1464` caught the matrix doing three things a PERMANENT gate must
 not do. All three are fixed; the deletion at `6a515699` is unaffected and
 stands.
 
-| defect | why it was wrong |
-| --- | --- |
-| froze `SignalTree<T> === ISignalTree<T> & TreeNode<T>` | freezes a decomposition queue item 7 schedules for DELETION; the file would contradict the plan and have to be edited by the slice doing the work |
-| `declare const primitiveTree: SignalTree<number>` | measured that an ANNOTATION is expressible and called it a product contract. The constructor is `T extends object`. Rule 0 category error, and it committed the release to a capability nobody chose |
-| every row used `declare const … : SignalTree<T>` | proved only "given a value already typed `SignalTree<T>`, these semantics follow" — never that a consumer calling `signalTree()` gets them |
+| defect                                                 | why it was wrong                                                                                                                                                                                     |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| froze `SignalTree<T> === ISignalTree<T> & TreeNode<T>` | freezes a decomposition queue item 7 schedules for DELETION; the file would contradict the plan and have to be edited by the slice doing the work                                                    |
+| `declare const primitiveTree: SignalTree<number>`      | measured that an ANNOTATION is expressible and called it a product contract. The constructor is `T extends object`. Rule 0 category error, and it committed the release to a capability nobody chose |
+| every row used `declare const … : SignalTree<T>`       | proved only "given a value already typed `SignalTree<T>`, these semantics follow" — never that a consumer calling `signalTree()` gets them                                                           |
 
 The rule this establishes for every future contract matrix:
 
@@ -4678,10 +4700,10 @@ incompatibility" on the strength of one elaborated error — a proxy for a
 property it does not measure, since **TypeScript stops at the first decisive
 member incompatibility**. The one-variable experiment refuted it.
 
-| # | mismatch | which side is wrong |
-| --- | --- | --- |
-| 1 | builder `bind()` -> `(value?: S) => S \| void`; `ISignalTree.bind()` -> `NodeAccessor<S>` | the **declaration**. Runtime copies the base tree's `bind` verbatim (`signal-tree.ts:1802`) and it returns `NodeAccessor<T>` (`signal-tree.ts:1365`) |
-| 2 | `SignalTree<T>` = `ISignalTree<T> & TreeNode<T>` requires the STATE KEYS on the tree object; the builder does not declare them | the **annotation**. The runtime root has no state keys at all |
+| #   | mismatch                                                                                                                       | which side is wrong                                                                                                                                  |
+| --- | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | builder `bind()` -> `(value?: S) => S \| void`; `ISignalTree.bind()` -> `NodeAccessor<S>`                                      | the **declaration**. Runtime copies the base tree's `bind` verbatim (`signal-tree.ts:1802`) and it returns `NodeAccessor<T>` (`signal-tree.ts:1365`) |
+| 2   | `SignalTree<T>` = `ISignalTree<T> & TreeNode<T>` requires the STATE KEYS on the tree object; the builder does not declare them | the **annotation**. The runtime root has no state keys at all                                                                                        |
 
 Mismatch 2 is the serious one and it inverts the first diagnosis. Executed
 runtime probe on `signalTree({ count, tags, user })`:
@@ -4723,10 +4745,10 @@ assignability positively.**
 
 Landed as two commits, one variable each, in that order:
 
-| commit | one variable | proven result |
-| --- | --- | --- |
-| `243dd5fb` | `SignalTree<T>` -> `ISignalTree<T>` | assignment still RED; sole remaining blocker is now exactly `bind(...)(...)` returning `void \| RootState`, verified by reading the elaborated error |
-| `215568cb` | `SignalTreeBuilder.bind` -> `NodeAccessor<TSource>` | assignment GREEN, no `@ts-expect-error` |
+| commit     | one variable                                        | proven result                                                                                                                                        |
+| ---------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `243dd5fb` | `SignalTree<T>` -> `ISignalTree<T>`                 | assignment still RED; sole remaining blocker is now exactly `bind(...)(...)` returning `void \| RootState`, verified by reading the elaborated error |
+| `215568cb` | `SignalTreeBuilder.bind` -> `NodeAccessor<TSource>` | assignment GREEN, no `@ts-expect-error`                                                                                                              |
 
 Endpoint now asserted positively in matrix section C:
 
@@ -4894,12 +4916,12 @@ resolveEnhancerOrder   edge only when `a.provides.has(req)`   -> CAPABILITY
 so a requirement is satisfiable only when an enhancer is BOTH named `x` AND
 declares `provides: ['x']`. Measured across all four spellings:
 
-| `requires` | provider `name` | provider `provides` | result |
-| --- | --- | --- | --- |
-| `base` | `provider` | `['base']` | THROWS |
-| `provider` | `provider` | `['base']` | THROWS |
-| `provider` | `provider` | `['provider']` | OK, reordered |
-| `base` | `base` | `['base']` | OK, reordered |
+| `requires` | provider `name` | provider `provides` | result        |
+| ---------- | --------------- | ------------------- | ------------- |
+| `base`     | `provider`      | `['base']`          | THROWS        |
+| `provider` | `provider`      | `['base']`          | THROWS        |
+| `provider` | `provider`      | `['provider']`      | OK, reordered |
+| `base`     | `base`          | `['base']`          | OK, reordered |
 
 Both natural spellings fail. Characterized in
 `packages/core/src/lib/planned-enhancer-dependencies.spec.ts` as **CURRENT
@@ -4928,13 +4950,13 @@ the field names.
 
 #### The concepts, separated
 
-| field | type | consumed by | means |
-| --- | --- | --- | --- |
-| `name` | `string` | `.with()` duplicate detection, `.with()` dependency guard | identity |
-| `provides` | `string[]` | `resolveEnhancerOrder` edges | capability token |
-| `requires` | `string[]` | `resolveEnhancerOrder` (as CAPABILITY), `.with()` guard (as NAME) | **two authorities, disagreeing** |
-| `capabilities` | `TreeCapability[]` | `buildTreePlan` -> `collectRequestedTreeCapabilities` | tree SUBSTRATE capability — a separate, typed axis; not part of this question |
-| `description` | `string` | docs only | — |
+| field          | type               | consumed by                                                       | means                                                                         |
+| -------------- | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `name`         | `string`           | `.with()` duplicate detection, `.with()` dependency guard         | identity                                                                      |
+| `provides`     | `string[]`         | `resolveEnhancerOrder` edges                                      | capability token                                                              |
+| `requires`     | `string[]`         | `resolveEnhancerOrder` (as CAPABILITY), `.with()` guard (as NAME) | **two authorities, disagreeing**                                              |
+| `capabilities` | `TreeCapability[]` | `buildTreePlan` -> `collectRequestedTreeCapabilities`             | tree SUBSTRATE capability — a separate, typed axis; not part of this question |
+| `description`  | `string`           | docs only                                                         | —                                                                             |
 
 #### Evidence — every source says CAPABILITY except the guard
 
@@ -5039,21 +5061,21 @@ twice produced a wrong conclusion by characterizing HEAD and reasoning backward
 about an older release. Method: `git show v14.1.1:<path>` and compare the
 decisive lines.
 
-| Finding | Verified at `v14.1.1` | 14.x action | 15.0 disposition |
-| --- | --- | --- | --- |
-| `requires` resolved against NAMES while the sorter matches `provides` | guard `appliedEnhancers.has(dep)`; sorter `a.provides.has(req)` (`enhancers/index.ts:91`) — the disagreement is real at 14.1.1 | **PATCH CODE** | inherit (`681ffb8e`) |
-| enhancer marked applied BEFORE it succeeds | `appliedEnhancers.add(meta.name)` precedes `return enhancer(tree)` | **PATCH CODE** | inherit |
-| anonymous enhancer's `requires` silently ignored | whole block gated on `if (meta?.name)` | **PATCH CODE** | inherit |
-| `ENHANCERS.md` composition example cannot compile | imports `composeEnhancers` from `@signaltree/core`, where `index.ts:303` carries only a REMOVAL COMMENT ("removed from the root barrel in v12"); also passes enhancer FACTORIES | **PATCH DOCS** | corrected docs continue |
-| `withAudit` guide example cannot work | `{ name: 'withAudit', provides: ['audit'], requires: ['logger'] }` — `name !== provides`, unsatisfiable under the name-based guard | **PATCH DOCS** | ditto |
-| `createEnhancer` JSDoc example cannot work | `provides: ['feature1'], requires: ['feature2']` — same shape | **PATCH DOCS** | ditto |
-| builder `bind()` under-promise | `bind(thisArg?: unknown): (value?: TSource) => TSource \| void` (`builder-types.ts:70`) | **NEEDS CONSUMER PROOF** — see below | corrected (`215568cb`); SURVIVAL is a separate question, item 9 |
-| false `SignalTree<T>` root-state surface | `export type SignalTree<T> = ISignalTree<T> & TreeNode<T>` (`types.ts:1297`) | **PATCH DOCS / KNOWN ISSUE** — do not silently make a breaking type correction on 14.x | **BREAKING CORRECTION** (`243dd5fb`) |
-| `composeEnhancers` broken types + bypass semantics | implementation byte-identical (`utils.ts:377`) | **PATCH DOCS / DEPRECATION** — see the warning below | **ARCHITECTURAL CUTOFF** (`6c3d73a8`) |
-| `SignalTreeBase` | present (`types.ts:1298`); no defect | **NO ACTION** | **ARCHITECTURAL CUTOFF** (`6a515699`) |
-| **identity-replacing enhancers silently disable the enhancer protocol** | `Object.defineProperty(enhancedTree, 'with', …)` in `batching.ts`, `time-travel.ts`, `devtools-impl.ts` — independently present in all three at the tag; the replacement `with` only type-checks its argument and calls `enhancer(enhancedTree)` | **PATCH CODE** | **BLOCKS #3b** — see below |
-| stale generated API-surface docs | **NOT MEASURED at 14.1.1** — the staleness found was relative to HEAD source | **UNCLASSIFIED** | 15.0 cleanup (`7772effa`) |
-| `nx test core` unreliable + swallows the reporter; `api-inventory` member/shape blind spot | tooling, not a consumer contract | **NO ACTION** | **TOOLING DEBT** — Phase 5 |
+| Finding                                                                                    | Verified at `v14.1.1`                                                                                                                                                                                                                            | 14.x action                                                                            | 15.0 disposition                                                |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `requires` resolved against NAMES while the sorter matches `provides`                      | guard `appliedEnhancers.has(dep)`; sorter `a.provides.has(req)` (`enhancers/index.ts:91`) — the disagreement is real at 14.1.1                                                                                                                   | **PATCH CODE**                                                                         | inherit (`681ffb8e`)                                            |
+| enhancer marked applied BEFORE it succeeds                                                 | `appliedEnhancers.add(meta.name)` precedes `return enhancer(tree)`                                                                                                                                                                               | **PATCH CODE**                                                                         | inherit                                                         |
+| anonymous enhancer's `requires` silently ignored                                           | whole block gated on `if (meta?.name)`                                                                                                                                                                                                           | **PATCH CODE**                                                                         | inherit                                                         |
+| `ENHANCERS.md` composition example cannot compile                                          | imports `composeEnhancers` from `@signaltree/core`, where `index.ts:303` carries only a REMOVAL COMMENT ("removed from the root barrel in v12"); also passes enhancer FACTORIES                                                                  | **PATCH DOCS**                                                                         | corrected docs continue                                         |
+| `withAudit` guide example cannot work                                                      | `{ name: 'withAudit', provides: ['audit'], requires: ['logger'] }` — `name !== provides`, unsatisfiable under the name-based guard                                                                                                               | **PATCH DOCS**                                                                         | ditto                                                           |
+| `createEnhancer` JSDoc example cannot work                                                 | `provides: ['feature1'], requires: ['feature2']` — same shape                                                                                                                                                                                    | **PATCH DOCS**                                                                         | ditto                                                           |
+| builder `bind()` under-promise                                                             | `bind(thisArg?: unknown): (value?: TSource) => TSource \| void` (`builder-types.ts:70`)                                                                                                                                                          | **NEEDS CONSUMER PROOF** — see below                                                   | corrected (`215568cb`); SURVIVAL is a separate question, item 9 |
+| false `SignalTree<T>` root-state surface                                                   | `export type SignalTree<T> = ISignalTree<T> & TreeNode<T>` (`types.ts:1297`)                                                                                                                                                                     | **PATCH DOCS / KNOWN ISSUE** — do not silently make a breaking type correction on 14.x | **BREAKING CORRECTION** (`243dd5fb`)                            |
+| `composeEnhancers` broken types + bypass semantics                                         | implementation byte-identical (`utils.ts:377`)                                                                                                                                                                                                   | **PATCH DOCS / DEPRECATION** — see the warning below                                   | **ARCHITECTURAL CUTOFF** (`6c3d73a8`)                           |
+| `SignalTreeBase`                                                                           | present (`types.ts:1298`); no defect                                                                                                                                                                                                             | **NO ACTION**                                                                          | **ARCHITECTURAL CUTOFF** (`6a515699`)                           |
+| **identity-replacing enhancers silently disable the enhancer protocol**                    | `Object.defineProperty(enhancedTree, 'with', …)` in `batching.ts`, `time-travel.ts`, `devtools-impl.ts` — independently present in all three at the tag; the replacement `with` only type-checks its argument and calls `enhancer(enhancedTree)` | **PATCH CODE**                                                                         | **BLOCKS #3b** — see below                                      |
+| stale generated API-surface docs                                                           | **NOT MEASURED at 14.1.1** — the staleness found was relative to HEAD source                                                                                                                                                                     | **UNCLASSIFIED**                                                                       | 15.0 cleanup (`7772effa`)                                       |
+| `nx test core` unreliable + swallows the reporter; `api-inventory` member/shape blind spot | tooling, not a consumer contract                                                                                                                                                                                                                 | **NO ACTION**                                                                          | **TOOLING DEBT** — Phase 5                                      |
 
 ### BLOCKER for #3b — the enhancer protocol does not survive its own built-ins
 
@@ -5605,8 +5627,8 @@ value.
 
 **SECOND CORRECTION — "/signals has a hard Angular 22 requirement".** Signal
 Forms exist in Angular 21+; they became STABLE in 22. The repo's own comment
-says so precisely — *"`@angular/forms` ships **stable** Signal Forms via the
-`./signals` subpath starting in v22.0.0"*. So the boundary is **SignalTree
+says so precisely — _"`@angular/forms` ships **stable** Signal Forms via the
+`./signals` subpath starting in v22.0.0"_. So the boundary is **SignalTree
 PRODUCT POLICY** — do not build a stable integration contract on an Angular API
 that did not yet carry Angular's stability guarantee — not a technical absence
 in 21. Defensible, but it must be stated as policy.
@@ -5745,8 +5767,8 @@ no baseline requirement says those issues must retain SEMANTIC IDENTITY across
 ```
 
 That alone removes any need for `PositionId`, rekey-stable issue ownership, or
-tree-addressed results. A later requirement that *"a result stays attached to
-entity 42 across reorder/rekey"* would be a CONTINUOUSLY MAINTAINED PROJECTION
+tree-addressed results. A later requirement that _"a result stays attached to
+entity 42 across reorder/rekey"_ would be a CONTINUOUSLY MAINTAINED PROJECTION
 and must be derived independently.
 
 #### D — cross-format normalization — **FAILS, and it is the dangerous one**
@@ -5771,7 +5793,7 @@ SIGNALTREE MUST PROVIDE A VALIDATION FACILITY NO   (no counterexample found)
 The honest 15.0 shape becomes:
 
 ```ts
-const value  = tree.$.order();
+const value = tree.$.order();
 const result = await mySchema['~standard'].validate(value);
 ```
 
@@ -5889,7 +5911,7 @@ reads back in through the rule body:
 
 ```ts
 validate(order(), (value) => {
-  const customer = tree.$.customer();   // ambient SECOND read
+  const customer = tree.$.customer(); // ambient SECOND read
 });
 ```
 
@@ -5936,8 +5958,8 @@ job, not the evaluator's.
 
 #### R3 — ASYNC LIFECYCLE — **COLLAPSES**
 
-The stated responsibility was *"obsolete async runs must never overwrite newer
-results"*. Attack it directly:
+The stated responsibility was _"obsolete async runs must never overwrite newer
+results"_. Attack it directly:
 
 > **Overwrite WHAT?**
 
@@ -5972,6 +5994,7 @@ validate(value, rules) -> Result | Promise<Result>
 ASYNC LIFECYCLE OWNERSHIP    COLLAPSED — keep this result
 PUBLIC SYNC/ASYNC API SHAPE  UNPROVEN
 ```
+
 - no stored state, no registration, no installation, no tree coupling.
 
 #### REJECTED ALTERNATIVES, each with its falsifier
@@ -6069,8 +6092,8 @@ STANDARD SCHEMA        format/interoperability ADAPTER, not a second authority
 matters.** The argument ran: `await validate(tree.$.order(), orderRules)` is
 generally useful, THEREFORE SignalTree should provide `validate`. That does not
 follow. Once V1 erased SignalTree and derived `validate(value, rules)`, the
-function is no longer *validate SignalTree state* — it is *validate a JavaScript
-value*. **The value having come from SignalTree gives SignalTree no ownership
+function is no longer _validate SignalTree state_ — it is _validate a JavaScript
+value_. **The value having come from SignalTree gives SignalTree no ownership
 claim over the operation.**
 
 ```
@@ -6090,8 +6113,8 @@ REOPENED
 
 The original functional argument is preserved below for the record, but it
 proves only that the CAPABILITY is useful — never that SignalTree must PROVIDE
-it. Validation of SignalTree state is useful *without Angular Forms existing at
-all*:
+it. Validation of SignalTree state is useful _without Angular Forms existing at
+all_:
 
 ```ts
 const result = await validate(tree.$.order, orderRules);
@@ -6101,7 +6124,7 @@ if (!result.valid) { … }
 Nothing there is Angular-specific, form-specific or presentation-specific — it
 is useful in services, imports, workflows, pre-submit checks and background
 processing. Angular Forms being one major consumer does not make Angular the
-semantic owner of the operation. Putting validation *only* inside Angular Forms
+semantic owner of the operation. Putting validation _only_ inside Angular Forms
 would make a general state concern subordinate to a UI integration.
 
 **THE DISTINCTION THAT SPLITS THE PRODUCT:**
@@ -6112,8 +6135,8 @@ OBSERVING TRUTH SO VALIDATION STAYS     framework/runtime-specific    -> WE DO N
 CURRENT
 ```
 
-Providing only the first preserves *"SignalTree owns truth, Angular owns
-observation"* — and prevents validation from being used to smuggle a generic
+Providing only the first preserves _"SignalTree owns truth, Angular owns
+observation"_ — and prevents validation from being used to smuggle a generic
 mutation observer back into the kernel.
 
 **THE CONTRACT, negatively stated:**
@@ -6160,8 +6183,9 @@ Those remaining functions — `dirty`/`touched`, `submitting`, `wizard`,
 ```
 
 not `form()` owning validators + Angular Reactive Forms + Signal Forms + wizard
-+ touched + submitting. After the facility's API is frozen, `form()` can be
-audited with essentially ALL of its inherited justifications stripped.
+
+- touched + submitting. After the facility's API is frozen, `form()` can be
+  audited with essentially ALL of its inherited justifications stripped.
 
 #### Next — kernel-first derivation, everything hidden
 
@@ -6189,8 +6213,8 @@ Promoted ahead of realtime because RF-M1 produced evidence that 15.0 may carry
 schema, both Angular forms adapters and marker design simultaneously. Realtime is
 a self-contained product question; this is not.
 
-**RETRACTED NULL HYPOTHESIS.** This row opened with *"SignalTree has exactly ONE
-semantic validation authority unless falsified"*. That **already assumes
+**RETRACTED NULL HYPOTHESIS.** This row opened with _"SignalTree has exactly ONE
+semantic validation authority unless falsified"_. That **already assumes
 SignalTree should own validation semantics at all**, which has not been earned.
 Rule 0g requires deleting REQUIREMENTS too — and "we currently have two
 validation systems" is not evidence that we need one.
@@ -6313,16 +6337,16 @@ changing the semantic state engine, that is strong evidence against A.
 The null has real support: `NodeAccessor`s provide readable state, so no mutation
 interception, paths, marker ownership or causal records are automatically
 needed. An async evaluator can also own its own operational concerns —
-*read truth -> validate against input X -> newer input arrives -> old result is
-stale -> publish only the surviving result* — WITHOUT `pending` becoming
+_read truth -> validate against input X -> newer input arrives -> old result is
+stale -> publish only the surviving result_ — WITHOUT `pending` becoming
 SignalTree truth. **And solve staleness with an EVALUATOR-LOCAL GENERATION
 COUNTER, not physical revisions**, unless the required semantics demand kernel
-identity: *run 41 starts, run 42 starts, 41 resolves -> ignore, 42 resolves ->
-publish.*
+identity: _run 41 starts, run 42 starts, 41 resolves -> ignore, 42 resolves ->
+publish._
 
 **RETRACTED FROM MY OWN ARGUMENT — "publication machinery provides reactive
-realization".** That is ANGULAR-specific. The frozen invariant is *"Angular owns
-observation"*, so a FRAMEWORK-NEUTRAL validation package cannot casually lean on
+realization".** That is ANGULAR-specific. The frozen invariant is _"Angular owns
+observation"_, so a FRAMEWORK-NEUTRAL validation package cannot casually lean on
 Angular publication to solve automatic currency. Two questions must be split:
 
 ```
@@ -6451,8 +6475,8 @@ BASELINE   const result = await validate(node, rules);
 NOT        validation.isValid()  // a perpetual promise to track future truth
 ```
 
-Because *"evaluate current truth against rules"* is unquestionably validation,
-while *"remain continuously synchronized with future truth"* is a SECOND
+Because _"evaluate current truth against rules"_ is unquestionably validation,
+while _"remain continuously synchronized with future truth"_ is a SECOND
 function — observation/invalidation of changing dependencies. Those must not be
 silently bundled. Angular layers the second naturally, because Angular owns
 observation; a future non-Angular adapter supplies its own mechanism.
@@ -6497,7 +6521,7 @@ question — i.e. V0.6.
 
 #### `@signaltree/schema` — the audit question, sharpened
 
-Do NOT ask *"should `@signaltree/schema` become neutral?"* Ask:
+Do NOT ask _"should `@signaltree/schema` become neutral?"_ Ask:
 
 > Assuming 15.0 deliberately ships a general validation facility, ERASE
 > `@signaltree/schema`. What would the optimal evaluator + Standard Schema
@@ -6527,11 +6551,11 @@ The minimum sufficient information may be only:
 
 with NO before, no after, no path, no mutation kind, no event envelope, and no
 `PositionId` exposure. That preserves everything MUT-0 row 1 established, and it
-is a far better question than *"what replaces `interceptLeafSignals`?"*
+is a far better question than _"what replaces `interceptLeafSignals`?"_
 
 Only AFTER V0 does the one-authority falsifier run, and then in its corrected
-form: *can every SURVIVING validation function be satisfied by one
-non-overlapping semantic authority?*
+form: _can every SURVIVING validation function be satisfied by one
+non-overlapping semantic authority?_
 
 **A counterexample must identify TWO GENUINELY DIFFERENT FUNCTIONS.** These are
 representation and format differences until proven otherwise:
@@ -6603,14 +6627,14 @@ dot-path   MUTABLE ADDRESS structure
 PositionId semantic/topological identity   <- the kernel's actual model
 ```
 
-So the greenfield question is not *"field scope or path scope?"* but:
+So the greenfield question is not _"field scope or path scope?"_ but:
 
 > **What semantic THING is being validated, and what DEPENDENCIES may its rule
 > have?**
 
 **AND DO NOT PROMOTE `PositionId` INTO VALIDATION'S PUBLIC ONTOLOGY.** That
 would be another nearby-kernel-structure promotion. The kernel may internally
-compile a dependency such as *"`profile.name` depends on `profile.country`"*
+compile a dependency such as _"`profile.name` depends on `profile.country`"_
 into semantic identities while a rule author still writes something like
 `validate(tree.$.profile.name, …)` or a schema object over a subtree. The
 question is:
@@ -6622,13 +6646,13 @@ NOT: should validation's PUBLIC ontology expose PositionId?
 
 The answer may well be **internal YES / public NO.**
 
-e.g. *validate position P using truth at P, Q and R*, or *validate subtree S
-against current committed truth*. Both `keyof T` and dot-paths may vanish from
+e.g. _validate position P using truth at P, Q and R_, or _validate subtree S
+against current committed truth_. Both `keyof T` and dot-paths may vanish from
 the internal model entirely — which is precisely the kind of thing this audit
 exists to catch.
 
-**FALSIFIER:** *can every required validation workflow be expressed through ONE
-canonical authority without losing a genuinely distinct semantic capability?*
+**FALSIFIER:** _can every required validation workflow be expressed through ONE
+canonical authority without losing a genuinely distinct semantic capability?_
 If yes, two owners are wrong. If no, state precisely why both exist and give
 them NON-OVERLAPPING ownership.
 
@@ -6656,7 +6680,7 @@ reset / clear / patch operations
 ```
 
 Those may each have different owners. So the question after validation is
-resolved is NOT *"does the remaining form-session bundle justify `form()`?"* but:
+resolved is NOT _"does the remaining form-session bundle justify `form()`?"_ but:
 
 > **What INDEPENDENTLY REQUIRED functions remain inside the historical form
 > bundle?**
@@ -6686,7 +6710,7 @@ truth -> async validation process -> pending / result
 ```
 
 And there is a reason for active suspicion: undo/redo/rollback should almost
-certainly NOT treat *"a validator promise is currently unresolved"* as authored
+certainly NOT treat _"a validator promise is currently unresolved"_ as authored
 domain history. Keep all three questions separate:
 
 ```
@@ -6746,9 +6770,9 @@ owner.**
 It imports `inject`, `Injector`, `DestroyRef`, and its config carries escape
 hatches — with this comment:
 
-> *"Injector for reactive FormSignal -> FormGroup sync (auto-injected if in
+> _"Injector for reactive FormSignal -> FormGroup sync (auto-injected if in
 > injection context). **Without one, signal-side writes only reach the FormGroup
-> at creation time.**"*
+> at creation time.**"_
 
 A tree-mutating enhancer applied via `tree.with(...)` may run anywhere, so the
 integration **silently degrades to one-way** when the context is absent.
@@ -6843,7 +6867,7 @@ mergeMarkerValidators(formSignal, …)      VALIDATORS       -> the ONLY real de
 DECLARED VALIDATION RULES attached to the position.**
 
 So Reactive Forms interop does not depend on "form-ness" at all. It depends on
-*"where are this subtree's validation rules?"* — **a VALIDATION-OWNERSHIP
+_"where are this subtree's validation rules?"_ — **a VALIDATION-OWNERSHIP
 question, not a forms-interop one.** And validation already has a second owner in
 `@signaltree/schema`, so 15.0 currently has TWO validation systems and the forms
 adapter is coupled to one of them by accident of history.
@@ -6892,9 +6916,9 @@ signalForm()   Angular SIGNAL FORMS   requires @angular/forms/signals, Angular 2
 formBridge()   Angular REACTIVE FORMS interop (FormGroup), Angular 20/21
 ```
 
-The demo states it outright: *"Requires Angular 22+ (`@angular/forms/signals`).
+The demo states it outright: _"Requires Angular 22+ (`@angular/forms/signals`).
 The classic `formBridge()` (Reactive Forms) remains available for Angular 20/21
-apps."* And the peer range is `^20 || ^21 || ^22` on both `core` and `ng-forms`.
+apps."_ And the peer range is `^20 || ^21 || ^22` on both `core` and `ng-forms`.
 
 **These are two DIFFERENT Angular form systems, not old and new versions of one.**
 `formBridge` provides `getAngularForm(path)` and a `Map` of `AngularFormBridge`
@@ -7046,7 +7070,7 @@ and no leaf interception. Can A1 still be implemented?
 interface CausalTurn {
   readonly id: TurnId;
   readonly effects: readonly CausalEffect[];
-  readonly participants: readonly PositionId[];   // <- AFFECTED SEMANTIC POSITIONS
+  readonly participants: readonly PositionId[]; // <- AFFECTED SEMANTIC POSITIONS
   readonly state: TurnState;
 }
 ```
@@ -7229,8 +7253,8 @@ attribution owner                      UNPROVEN — do not assume the turn
 **"No event needs values" is NOT frozen.** It holds for capabilities deriving
 from CURRENT TRUTH. It would not hold for recording "A -> B happened", sending
 a delta to a replica, or an incremental transformation that cannot be
-reconstructed. Keep only the weaker rule: *current-truth consumers should not
-receive copied state unless proven necessary.*
+reconstructed. Keep only the weaker rule: _current-truth consumers should not
+receive copied state unless proven necessary._
 
 **COUNTEREXAMPLES THAT WOULD OVERTURN THIS:**
 
@@ -7273,8 +7297,8 @@ SCHEMA      what must validation ACCOMPLISH?
 
 #### X1 SPLIT INTO THREE CLAIMS OF INCREASING STRENGTH
 
-Binary X1 permits the bad inference *"realtime needs A->B, therefore SignalTree
-needs a public mutation observer"*. Split:
+Binary X1 permits the bad inference _"realtime needs A->B, therefore SignalTree
+needs a public mutation observer"_. Split:
 
 ```
 X1a  does ANY legitimate non-causal capability require historical TRANSITION
@@ -7331,8 +7355,8 @@ preserve.
 
 ### MUT-1 — PARTICIPATION MODEL — **DERIVED PROPOSAL, NOT FROZEN**
 
-Answers ONE question: *at which lifecycle phases may external authoring
-participants act, and what authority does each phase permit?* No event types, no
+Answers ONE question: _at which lifecycle phases may external authoring
+participants act, and what authority does each phase permit?_ No event types, no
 mapping of existing classes — those are MUT-2 and later.
 
 Every line below is labelled. Nothing here is ledger truth until reviewed.
@@ -7492,6 +7516,7 @@ each integrate with the authority that owns the information they need, with no
 shared observation contract at all.
 
 #### Challenge cases — "can this actor's legitimate responsibility be placed
+
 cleanly?", NOT "where does it run today"
 
 ```
@@ -7538,8 +7563,8 @@ MUT-4  CONSUMERS  map schema, causal history, transactions, time travel,
                   contracts — including which need NONE of them.
 ```
 
-Only AFTER those: *can `MutationEnvelope` + `PathNotifier` be refactored into
-this model?* Plausible outcome — envelope survives largely intact, the notifier
+Only AFTER those: _can `MutationEnvelope` + `PathNotifier` be refactored into
+this model?_ Plausible outcome — envelope survives largely intact, the notifier
 becomes a tree-scoped dispatcher, and the flattened callback, the global
 singleton, the post-hoc "interceptors" and `interceptLeafSignals` are all
 deleted. Or the derivation produces something else; that is why it comes first.
@@ -7995,7 +8020,7 @@ for realtime, not just for merge.
 **1 — the rule address silently picks the one identity kind that cannot cross.**
 
 ```ts
-rules: [{ at: tree.$.preferences, resolve: 'theirs' }]
+rules: [{ at: tree.$.preferences, resolve: 'theirs' }];
 ```
 
 `tree.$.preferences` is a live NodeAccessor from OUR tree — a REALIZATION HANDLE.
@@ -8038,10 +8063,9 @@ only when realtime product semantics establish that divergent histories exist.
 
 **The package is gone (SCHEMA-DEL EXECUTED). Nothing below is a release
 blocker.** It is kept because the investigation produced one finding that
-survives the deletion and belongs to MUT: *ordinary leaf writes do not enter a
-canonical semantic mutation pipeline.* Read the rest as evidence for that, not
+survives the deletion and belongs to MUT: _ordinary leaf writes do not enter a
+canonical semantic mutation pipeline._ Read the rest as evidence for that, not
 as work.
-
 
 ```
 FIRST BAD    d8824b91  feat(history): scaffold causal runtime kernel
@@ -8142,7 +8166,6 @@ API decision, not a repair detail.
 
 ## VALIDATION LADDER — workspace test rung (rung retained; its trigger is gone)
 
-
 **Building a package is not evidence that its runtime contract passes.** The
 ladder ran `nx run-many -t build --all` and tested CORE ONLY, so
 `@signaltree/schema` sat 25 tests red through ~150 commits while every gate
@@ -8172,7 +8195,6 @@ false readings for Jest projects — "no tests" for `ng-forms`, "27 failed" for
 `demo`. Both were artifacts.
 
 ## ~~BLOCKER #4a-2~~ — **VOID.** The 25 RED tests were deleted with the package
-
 
 Found while capturing the pre-migration runtime baseline for `schemas()`.
 
@@ -8326,8 +8348,8 @@ lint  (all projects, + scripts separately)             exit 0
 build core/ng-forms/guardrails/realtime/events/shared  exit 0, fresh artifacts
 ```
 
-`demo:test` was the recorded baseline's only test-rung red — *"4 failed / 177
-passed, all SchemaDemoComponent, same defect."* Those four died with the
+`demo:test` was the recorded baseline's only test-rung red — _"4 failed / 177
+passed, all SchemaDemoComponent, same defect."_ Those four died with the
 component. **The workspace test ladder is now green.**
 
 TWO PRE-EXISTING REDS, stated so they are not silently inherited:
@@ -8490,9 +8512,9 @@ the server sent late. Construction time is a CEILING here, not a capability.
 The marker's processor registration argues that `touched` must ride in the
 snapshot:
 
-> *"`touched` is restored for UNDO/REDO ... Undo must land the user exactly
+> _"`touched` is restored for UNDO/REDO ... Undo must land the user exactly
 > where they were, errors and all -- a cleaned-up undo is a lie about what they
-> did."*
+> did."_
 
 **THE ARCHITECTURAL ANSWER COMES FIRST, and it is independent of what the code
 does today** (Rule 0g -- a current failure may not answer a product question):
@@ -8646,8 +8668,8 @@ construction-time specialization does.
 **MEASURED — the flag does not mean what its name says.** Only
 `marker.submit()` sets it. An application that saves the very same values
 through its own service leaves `submitting()` `false` throughout. So it does not
-report *"a submission of this state is running"*; it reports *"one particular
-API on this marker was called"* -- a fact about an API call, not about truth.
+report _"a submission of this state is running"_; it reports _"one particular
+API on this marker was called"_ -- a fact about an API call, not about truth.
 
 **MEASURED — one boolean cannot describe N concurrent operations:**
 
@@ -8660,8 +8682,8 @@ await marker.submit(async () => 'fast')
 
 **CHARACTERIZATION, NOT JUSTIFICATION — `status()`.** Core's `status()`
 distinguishes NotLoaded / Loading / Loaded / Error and carries the error, where
-`submitting` is a boolean collapsing all four. That is *evidence that
-`submitting` duplicates an already-recognized operational-state category*. **It
+`submitting` is a boolean collapsing all four. That is _evidence that
+`submitting` duplicates an already-recognized operational-state category_. **It
 does not justify either abstraction.** `status()` is itself unaudited and does
 not get a vote on what should exist; ownership of `submitting` is decided
 independently, by who owns the external operation. The inference "legacy A
@@ -8670,8 +8692,8 @@ duplicates legacy B, therefore preserve B" is exactly what this audit rejects.
 **PERSISTENCE EXCLUSION, stated at its true width.** The marker excludes
 `submitting` from the snapshot, reasoning that restoring it would leave "a form
 permanently submitting with nothing running to finish it". An earlier draft
-generalized this to *"a field the marker will not persist because it does not
-describe the state is a field that does not belong to the state"* -- **too
+generalized this to _"a field the marker will not persist because it does not
+describe the state is a field that does not belong to the state"_ -- **too
 broad. Non-durability does not prove non-statehood**; plenty of legitimate
 runtime state should not survive persistence. The narrow claim: persistence
 exclusion is CONSISTENT with `submitting` being transient operational state
@@ -8904,8 +8926,8 @@ currentStep() === 0    canNext() === true     nothing completed, nothing valid
 goTo(2)                canNext() === false    isLastStep() === true
 ```
 
-`canNext` answers *"is there a later step"* -- step ARITHMETIC -- not *"may I go
-there"*. A template binding `[disabled]="!wizard.canNext()"` therefore enables a
+`canNext` answers _"is there a later step"_ -- step ARITHMETIC -- not _"may I go
+there"_. A template binding `[disabled]="!wizard.canNext()"` therefore enables a
 Next button that `next()` may refuse, which is the button-that-does-nothing
 defect. Naming aside, this confirms the split above: **ordering and permission
 are different concepts, and the current API conflates them.**
@@ -8916,10 +8938,10 @@ The entire surface is one integer plus `computed`s over a static list:
 
 ```ts
 const steps = ['one', 'two', 'three'] as const;
-const step  = signal(0);
+const step = signal(0);
 const stepName = computed(() => steps[step()]);
-const canPrev  = computed(() => step() > 0);
-const isLast   = computed(() => step() === steps.length - 1);
+const canPrev = computed(() => step() > 0);
+const isLast = computed(() => step() === steps.length - 1);
 const next = () => step.update((i) => Math.min(i + 1, steps.length - 1));
 ```
 
@@ -9004,8 +9026,8 @@ SIGNALTREE?    NO -- the write is already published; the baseline is not
 CONSTRUCTION?  NO.
 ```
 
-`reset` and `dirty` are the SAME QUESTION seen from two sides -- *"does this
-differ from the baseline"* and *"put the baseline back"* -- so `reset` inherits
+`reset` and `dirty` are the SAME QUESTION seen from two sides -- _"does this
+differ from the baseline"_ and _"put the baseline back"_ -- so `reset` inherits
 F1's OWNERSHIP problem exactly:
 
 > **SignalTree has no basis for deciding WHICH historical value is the baseline.**
@@ -9077,9 +9099,9 @@ Only the domain knows whether the empty rating is `0`, `null` or `undefined`.
 a checkbox the user ticked stays ticked through a "clear". Whatever rule
 produced `''` and `0` was not applied to `true`.
 
-This is precisely the antipattern the MERGE row already condemned -- *"SignalTree
+This is precisely the antipattern the MERGE row already condemned -- _"SignalTree
 must never infer policy from type; seeing two numbers and deciding numbers get
-summed is the domain owner's call"* -- shipped and running.
+summed is the domain owner's call"_ -- shipped and running.
 
 ```
 DISPOSITION    F6 clear -> DELETE. Type-inferred domain policy SignalTree has no
@@ -9199,7 +9221,7 @@ INTRODUCED BY   06785300  2026-08-11 22:29
 
 The form-marker + second-tree scenario may still be a distinct defect — it throws
 from a different path (:2175). But it is no longer evidence for
-*"the marker's write is what makes the difference"*, because the guard fires with
+_"the marker's write is what makes the difference"_, because the guard fires with
 no marker present. The cheaper explanation now available: both are the same
 incomplete cutover, and the form-marker experiment simply produced a non-scalar
 effect by another route.
@@ -9223,7 +9245,6 @@ CONTAMINATES  Derivation E's canonicality column. On this branch entityMap passe
 GATE     must be fixed, or consciously accepted with its blast radius recorded,
          before the M cut.
 ```
-
 
 ```
 14.x   DEFECT. `tree.undo()` throws on a tree whose own writes were valid,
@@ -9382,8 +9403,8 @@ Once a supposed abstraction decomposes into that many owners, asking whether its
 remaining helper aliases survive is backwards. **Nothing left could establish the
 only claim that would save the marker:**
 
-> *this position INTRINSICALLY IS A FORM and must therefore be COMPILED
-> differently.*
+> _this position INTRINSICALLY IS A FORM and must therefore be COMPILED
+> differently._
 
 The single construction-time coupling found anywhere in the audit (F8c) is a
 STORAGE KEY -- persistence's property, borrowed. It is not form-ness.
@@ -9408,8 +9429,8 @@ forms need integration". A genuine construction requirement. None was found.
 
 From here the old API gets **zero weight** -- names, grouping, methods, marker
 representation, lifecycle and implementation all count for nothing. It survives
-only as a capability-discovery list, answering one question: *did it contain a
-useful user capability we have not considered?*
+only as a capability-discovery list, answering one question: _did it contain a
+useful user capability we have not considered?_
 
 ```
 CAPABILITY                 STATUS
@@ -9478,10 +9499,10 @@ const other = signalTree({ q: { n: 1 } }).with(timeTravel());
 await tick();
 
 marked.$.p.patch({ name: 'Grace' });
-other.$.q({ n: 2 });          // an UNRELATED tree
+other.$.q({ n: 2 }); // an UNRELATED tree
 await tick();
 
-marked.undo();                // throws
+marked.undo(); // throws
 ```
 
 ```
@@ -9493,8 +9514,8 @@ CONTROLS (all clean): marker tree alone; second tree idle; two PLAIN trees
 unrunnable. That is NOT evidence the defect is fixed. MUT must determine why
 foreign-tree activity affected the first tree, and must look for a second
 trigger path that does not involve `form()`. If none is found, the finding is
-recorded as *closed by removal of the only known trigger* -- explicitly not as
-*resolved*.
+recorded as _closed by removal of the only known trigger_ -- explicitly not as
+_resolved_.
 
 ## RULE 0j — SUBTRACTION-ONLY, and PHYSICAL deletion follows ARCHITECTURAL deletion
 
@@ -9505,8 +9526,8 @@ recorded as *closed by removal of the only known trigger* -- explicitly not as
 > consideration where it looks genuinely useful. Architecture first;
 > convenience reconstruction later.**
 
-So the question is never *"what should replace `persistNow()`?"* It is *"does
-`persistNow()` belong on this abstraction as written?"* If no: DELETE, and the
+So the question is never _"what should replace `persistNow()`?"_ It is _"does
+`persistNow()` belong on this abstraction as written?"_ If no: DELETE, and the
 replacement is DEFERRED — possibly to nothing.
 
 **DEFERRED CAPABILITY CANDIDATES** — deliberately weak. Not "future SignalTree
@@ -9522,8 +9543,8 @@ imperative durability controls
 framework integration conveniences
 ```
 
-The list means only: *things users may find useful enough to reconsider after
-stabilization.* Default remains **DO NOT ADD A SIGNALTREE FEATURE.**
+The list means only: _things users may find useful enough to reconsider after
+stabilization._ Default remains **DO NOT ADD A SIGNALTREE FEATURE.**
 
 **AMENDED — CANDIDATE is not the only bucket.** The list above was too weak: it
 placed capabilities that ALREADY SURVIVED hostile audit next to ones that never
@@ -9563,7 +9584,6 @@ Signal Forms interoperability           SURVIVING PRODUCT FUNCTION, deferred
 No replacement design now -- but these are OBLIGATIONS on the later greenfield
 pass, not candidates that may quietly evaporate.
 
-
 ### 0j-2 — the corpse does not participate in the next experiment
 
 **ARCHITECTURAL deletion and PHYSICAL deletion are different events, and the gap
@@ -9600,7 +9620,6 @@ form() frozen DELETE
 MUT's evidence surface includes mutation machinery that form() participates in
 -> FORM-DEL MUST PRECEDE MUT
 ```
-
 
 **This is not cleanup. It is evidence hygiene**, and it directly improves the
 next two derivations:
@@ -9672,8 +9691,6 @@ STATUS       createFormTree deprecation AND survival -> UNPROVEN, its own audit
 A bare deprecation notice may stand temporarily. What cannot stand is guidance
 toward a deleted API.
 
-
-
 **CONSEQUENCE TO SURFACE, not to silently resolve:** `createFormTree()` is
 currently DEPRECATED IN FAVOUR OF the thing being deleted — its warning tells
 users to migrate to the marker plus `formBridge()`. Deleting `form()` therefore
@@ -9715,7 +9732,7 @@ its migration target was removed and no replacement has been chosen. Reactive
 Forms and Signal Forms interoperability stay DEFERRED OBLIGATIONS.
 
 **CORRECTED — "not forced to die" is not "survived".** The line above read
-*"Survivals were measured, not assumed"*, which is the SAME inference just
+_"Survivals were measured, not assumed"_, which is the SAME inference just
 removed for `@signaltree/ng-forms` one section earlier. Zero marker references
 establish INDEPENDENCE, not necessity:
 
@@ -9740,7 +9757,6 @@ distinction is exact: those FUNCTIONS survived prior architectural decisions, so
 they are DEFERRED OBLIGATIONS. **Their particular retained implementations do
 not inherit that status** — an obligation attaches to the function, never to the
 code that happened to provide it.
-
 
 ### COMMIT-BOUNDARY BLEMISH in `b57ba293` — recorded, NOT rewritten
 
@@ -9784,8 +9800,8 @@ OBLIGATION (deferred, cheap, not an architecture cycle)
 
 The demo build had been red all session on `TS4114` at `types.ts` —
 `SignalTreeRollbackError` redeclaring `cause`. Adding `override` fixed the demo
-and instantly broke core's rollup build with `TS4113`, *"not declared in the base
-class"*. **The two configs disagree about whether `Error.cause` exists at their
+and instantly broke core's rollup build with `TS4113`, _"not declared in the base
+class"_. **The two configs disagree about whether `Error.cause` exists at their
 lib targets.** Resolved by not declaring the field and assigning through a cast,
 which satisfies both; the disagreement is recorded in a comment at the site.
 
@@ -9880,8 +9896,8 @@ first.** With it, the doc surface genuinely waits for the shipping gate.
 
 ### FRAMING CORRECTION, before any experiment
 
-My opening question was *"what makes a write a semantic participant in exactly
-one tree/lineage?"* **That contains part of the answer.** "Exactly one
+My opening question was _"what makes a write a semantic participant in exactly
+one tree/lineage?"_ **That contains part of the answer.** "Exactly one
 tree/lineage" is a CANDIDATE INVARIANT, not part of the definition of
 participation — and collapsing `tree` with `lineage` behind a slash assumes they
 are the same scope before anything has established it.
@@ -10011,8 +10027,8 @@ status() transition    yes      +1          job.state
 
 #### R1 — a non-landed write produced no consequence ON THE MEASURED PATHS
 
-**CORRECTED — narrowed to the experiment.** The earlier wording, *"LANDED is the
-precondition for every other dimension"*, converted one negative control into
+**CORRECTED — narrowed to the experiment.** The earlier wording, _"LANDED is the
+precondition for every other dimension"_, converted one negative control into
 ontology. What was measured:
 
 > **For the HISTORY and PATHNOTIFIER paths, a non-landed deep-equal write
@@ -10040,7 +10056,7 @@ undo                              truth changes   notifier emits   history  0
 ```
 
 **Undo is indistinguishable from an authored write AT THE NOTIFIER.** Any
-consumer inferring *"the user changed this"* from a PathNotifier event is wrong,
+consumer inferring _"the user changed this"_ from a PathNotifier event is wrong,
 and the error is invisible.
 
 **CORRECTED — history is EVIDENCE of a category distinction, not the DEFINITION
@@ -10060,7 +10076,7 @@ actually owns that distinction.**
 **CORRECTED — PathNotifier is NOT "publication".** The earlier row read
 `PUBLICATION tracks LANDED exactly`, which quietly redefined a frozen term. What
 was measured is a CORE CALLBACK BUS firing at landed-leaf granularity. Under the
-frozen invariant *Angular owns observation*, that is not automatically the
+frozen invariant _Angular owns observation_, that is not automatically the
 Angular publication boundary:
 
 ```
@@ -10079,11 +10095,11 @@ So the claim travels as:
 
 Its justification reads:
 
-> *"SignalTree's recursive update pipeline writes to leaf signals directly
+> _"SignalTree's recursive update pipeline writes to leaf signals directly
 > without invoking PathNotifier ... a direct call like
 > `tree.$.user.profile.name.set(x)` never produces a PathNotifier event by
 > itself. Enhancers that need to observe every mutation must intercept those
-> leaf writes themselves."*
+> leaf writes themselves."_
 
 Tested on its own named example:
 
@@ -10103,9 +10119,9 @@ this row, must do that.
 
 #### Correction to the SCHEMA-era finding — stated without a mirror overclaim
 
-The schema investigation concluded *"ordinary leaf writes do not enter a
-canonical semantic mutation pipeline."* Replacing that with *"they DO enter a
-canonical semantic mutation pipeline"* would be the same overclaim inverted.
+The schema investigation concluded _"ordinary leaf writes do not enter a
+canonical semantic mutation pipeline."_ Replacing that with _"they DO enter a
+canonical semantic mutation pipeline"_ would be the same overclaim inverted.
 What is proved:
 
 > **Ordinary leaf writes DO enter PathNotifier. The earlier claim that they
@@ -10168,7 +10184,7 @@ interface MutationEnvelope { positionId; path; ownerPath?; before; after;
 
 #### MEASURED — the distinction DOES reach observers
 
-**This REFINES R3.** R3 said a consumer inferring *"the user changed this"* from
+**This REFINES R3.** R3 said a consumer inferring _"the user changed this"_ from
 a notification is wrong. That holds for the PATH, and only for the path. The
 notification's META does carry the distinction:
 
@@ -10259,15 +10275,13 @@ transport.
 
 #### CORRECTION 3 — the absence claim, now MEASURED rather than inferred
 
-MUT-2 asserted *"`'authoring'` is inferred from the realization mark's absence"*
-and *"a forgotten stamp is silently classified as authored"*. That needed a
+MUT-2 asserted _"`'authoring'` is inferred from the realization mark's absence"_
+and _"a forgotten stamp is silently classified as authored"_. That needed a
 defaulting rule to exist. **It does**, and the whole of it is four lines:
 
 ```ts
 // packages/core/src/lib/causal-write-mode.ts
-export const getCausalWriteMode = (
-  meta?: Pick<UpdateMetadata, 'causalMode'> | undefined
-): CausalWriteMode => meta?.causalMode ?? 'authoring';
+export const getCausalWriteMode = (meta?: Pick<UpdateMetadata, 'causalMode'> | undefined): CausalWriteMode => meta?.causalMode ?? 'authoring';
 ```
 
 #### THE FULL TRACE
@@ -10303,8 +10317,8 @@ IT MARKS EXCEPTIONS. Authorship is never written, only synthesized by `??`.
 
 And the falsifier resolves cleanly:
 
-> *"If I construct a landed change with no `causalMode`, what surviving semantic
-> consumer treats it differently from one explicitly marked `'authoring'`?"*
+> _"If I construct a landed change with no `causalMode`, what surviving semantic
+> consumer treats it differently from one explicitly marked `'authoring'`?"_
 
 ```
 NOTHING. Provably — they are collapsed by the single function every reader uses.
@@ -10324,7 +10338,7 @@ forgets its stamp produces **phantom undo entries**, a failure this repository
 has already paid for once (`history-scoped-capture.spec.ts`, "no PHANTOM undo
 steps").
 
-The candidate invariant is therefore not merely *"realization must be stamped"*:
+The candidate invariant is therefore not merely _"realization must be stamped"_:
 
 > **UNKNOWN != AUTHORING.** A landed change whose mode nobody established must
 > not silently acquire authorship. Absence is a THIRD state, and collapsing it
@@ -10353,7 +10367,7 @@ narrower result than the one they reached for.
 
 #### AMENDMENT 1 — `'authoring'` is IMPLICIT/DEFAULTED, not "aspirational"
 
-Calling it *"a union member no code writes and no reader names"* went too far.
+Calling it _"a union member no code writes and no reader names"_ went too far.
 No production site writes the STRING, true — but `getCausalWriteMode()` PRODUCES
 `'authoring'` as its normalized result, and that is production behaviour. Its
 callers branch against realization, so `'authoring'` is the complementary
@@ -10368,7 +10382,7 @@ The asymmetry criticism is untouched; only the word "aspirational" goes.
 
 #### AMENDMENT 2 — the capture claim was broader than the trace supports
 
-*"An unmarked write is CAPTURED as authored history"* generalized over readers
+_"An unmarked write is CAPTURED as authored history"_ generalized over readers
 that do different jobs. `PathNotifier` uses the mode for BATCH IDENTITY, not
 causal capture, and `mode != realization` does not by itself imply
 `will become history` — other predicates may apply. The trace supports only:
@@ -10475,8 +10489,8 @@ That does not imply an `'unknown'` enum member, and does not decide the boundary
 
 #### AMENDMENT 1 — "manufactures authorship" reclaims what we just took away
 
-The heading read *"OMITTING THE REALIZATION CLASSIFICATION MANUFACTURES
-AUTHORSHIP"*. Three rounds were spent preventing time-travel history from
+The heading read _"OMITTING THE REALIZATION CLASSIFICATION MANUFACTURES
+AUTHORSHIP"_. Three rounds were spent preventing time-travel history from
 becoming the DEFINITION of causal authorship, and that wording hands it back.
 What the experiment deterministically proves:
 
@@ -10500,7 +10514,7 @@ semantic owner is still UNPROVEN. Frozen as:
 
 #### AMENDMENT 3 — the control was MISLABELLED
 
-The row *"no write context at all"* was wrong: the helper always wrapped the
+The row _"no write context at all"_ was wrong: the helper always wrapped the
 write, so `run({})` was an EMPTY CONTEXT. Corrected with a true no-context arm
 and a four-rung ladder:
 
@@ -10565,8 +10579,8 @@ statement about ENFORCEMENT, not about ownership.
 
 #### STATED AT ITS TRUE WIDTH — this is NOT yet a security finding
 
-`/authoring` self-documents as *"Enhancer- and marker-author plumbing ...
-application code should not need any of it."* So this is a DOCUMENTED-INTERNAL
+`/authoring` self-documents as _"Enhancer- and marker-author plumbing ...
+application code should not need any of it."_ So this is a DOCUMENTED-INTERNAL
 surface, not an untrusted-input boundary, and no threat model has been
 established. The finding is architectural:
 
@@ -10587,7 +10601,7 @@ causal-kernel operation is exactly what MUT must now derive.
 
 `write-context.ts` documents its own storage:
 
-> *"`activeContext` is a module-level singleton."*
+> _"`activeContext` is a module-level singleton."_
 
 **Write-context STORAGE is MODULE-GLOBAL and not intrinsically keyed by tree.**
 
@@ -10643,8 +10657,8 @@ redundancy without ever proving the two things mean the same thing. That is the
 
 ### THE COUNTEREXAMPLE, and it was caught by review rather than by the audit
 
-I cited `derived()`'s removal in 6.3.1 as precedent — *"the project already
-applied this test once and deleted."* **It did not.** Measured:
+I cited `derived()`'s removal in 6.3.1 as precedent — _"the project already
+applied this test once and deleted."_ **It did not.** Measured:
 
 ```
 REMOVED     the standalone `derived()` FACTORY
@@ -10664,9 +10678,9 @@ Angular has computed()
 all SignalTree derived functionality is redundant
 ```
 
-The surviving function may be something like *"compile additional state whose
+The surviving function may be something like _"compile additional state whose
 identity and TYPE SURFACE derive from the tree and participate in the resulting
-facade"* — categorically different from *"give me a computed signal"*. And
+facade"_ — categorically different from _"give me a computed signal"_. And
 `linked()` may differ again: **Angular owns the reactive primitive while
 SignalTree may own how that primitive participates in a compiled tree surface.**
 
@@ -10741,8 +10755,8 @@ not become a universal blocker. Tier 2 does not need MUT to define its function.
 The substrate hypothesis — undo/redo/rollback/branch/merge as operations over one
 causal substrate — is recorded as FALSE AT HEAD. That is a **current
 implementation fact, not an architectural disposition.** Time travel and the
-causal runtime being separate today refutes *"already unified"*, not
-*"should unify."*
+causal runtime being separate today refutes _"already unified"_, not
+_"should unify."_
 
 ### AI DISCOVERABILITY — artifacts deleted, function retained
 
@@ -10772,9 +10786,9 @@ prose until audited, rather than the file being deleted.
 **Publish wiring must follow.** `prepare-publish-artifacts.mjs` hard-fails on a
 missing source ON PURPOSE:
 
-> *"NOT conditional. A missing source is the failure this script exists to
+> _"NOT conditional. A missing source is the failure this script exists to
 > surface ... Either produce the file or remove its entry from
-> @signaltree/core's `files` — do not restore the silent skip."*
+> @signaltree/core's `files` — do not restore the silent skip."_
 
 So the deletion must also remove the copy-list entries and the `files` entries,
 exactly as that error instructs. The guard itself stays intact for everything
@@ -10820,6 +10834,7 @@ Exit condition: `GATE D`
       included, so the flakiness above currently cannot be diagnosed through the
       documented command — see "Newly discovered" under slice 1. `npx vitest
       run` from `packages/core` reports normally.
+
 - [ ] CI release gate
 - [ ] trusted publishing/provenance
 - [ ] clean-checkout release flow
@@ -10949,6 +10964,7 @@ WHAT ACTUALLY REMAINS IN B1
    `isDev` emits as `export declare const isDev: boolean` — the primitive
    inlined its literal type exactly as the fixture predicted, so `bc50d960`'s
    fix holds at HEAD. The value-space route is CLOSED with no repairs owed.
+
 2. ~~Decide public intent for `isDev`, `HydrateMode`, and each scan hit.~~
    **BOTH DECIDED. The scan produced no hits.**
 
