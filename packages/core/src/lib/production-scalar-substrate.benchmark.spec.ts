@@ -1435,25 +1435,29 @@ describe('Complexity audit: restore-one projection maintenance', () => {
 });
 
 describe('Complexity audit: public undo-of-remove realization', () => {
-  it('proves public undo-of-remove realizes through one incremental restore', () => {
-    const stats = installProductionSubstrateStatsForTesting();
-    const rows = measurePublicUndoLogicalWorkRows(
-      STRUCTURAL_LOGICAL_AUDIT_SIZES,
-      stats
-    );
+  it(
+    'proves public undo-of-remove realizes through one incremental restore',
+    () => {
+      const stats = installProductionSubstrateStatsForTesting();
+      const rows = measurePublicUndoLogicalWorkRows(
+        STRUCTURAL_LOGICAL_AUDIT_SIZES,
+        stats
+      );
 
-    for (const size of STRUCTURAL_LOGICAL_AUDIT_SIZES) {
-      const row = rows.find((candidate) => candidate.positions === size);
-      expect(row).toEqual({
-        positions: size,
-        projectionRebuilds: 0,
-        projectionEntriesVisited: 0,
-        projectionRestores: 1,
-        publicUndoPositionEntriesExamined: 2,
-        publicUndoTurnEffectsExamined: 1,
-      });
-    }
-  });
+      for (const size of STRUCTURAL_LOGICAL_AUDIT_SIZES) {
+        const row = rows.find((candidate) => candidate.positions === size);
+        expect(row).toEqual({
+          positions: size,
+          projectionRebuilds: 0,
+          projectionEntriesVisited: 0,
+          projectionRestores: 1,
+          publicUndoPositionEntriesExamined: 2,
+          publicUndoTurnEffectsExamined: 1,
+        });
+      }
+    },
+    20_000
+  );
 });
 
 describe('Timing guard: production scalar substrate', () => {

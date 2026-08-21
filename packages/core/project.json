@@ -32,11 +32,11 @@
       }
     },
     "test": {
-      "executor": "@nx/vitest:test",
+      "executor": "nx:run-commands",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "vitestConfig": "packages/core/vitest.config.ts",
-        "passWithNoTests": true
+        "command": "node tools/run-core-vitest.mjs",
+        "forwardAllArgs": true
       }
     },
     "lint": {
