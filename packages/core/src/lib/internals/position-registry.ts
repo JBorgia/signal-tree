@@ -1,5 +1,5 @@
 import type { PositionId } from '../types';
-import { isTraversableNode } from '../utils';
+import { isTraversableNode } from './node-shape';
 
 const POSITION_REGISTRY_SYMBOL = Symbol.for('SignalTree:PositionRegistry');
 
