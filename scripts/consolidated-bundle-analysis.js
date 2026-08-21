@@ -373,7 +373,7 @@ class BundleAnalyzer {
     this.log('\n📊 Full Package Analysis (All Files)');
     console.log('==========================================\n');
 
-    const packageDirs = ['core', 'enterprise',  'shared'];
+    const packageDirs = ['core', 'shared'];
 
     const fullSizes = [];
 

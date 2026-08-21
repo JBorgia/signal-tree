@@ -25,11 +25,6 @@ const packages = [
     features: ['Recursive Typing', 'Signal Tree', 'Built-in Enhancers'],
   },
   {
-    name: 'enterprise',
-    path: 'packages/enterprise',
-    features: ['Diff Engine', 'Path Index', 'Bulk Updates'],
-  },
-  {
     name: 'ng-forms',
     path: 'packages/ng-forms',
     features: ['Signal Forms', 'Async Validators', 'Wizard API'],

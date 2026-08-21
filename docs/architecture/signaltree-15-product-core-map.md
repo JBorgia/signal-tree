@@ -365,7 +365,7 @@ document's provisional placement and carries no weight.
 | `PathNotifier`                                             | —        | publish              | LC    | **NOT the observation boundary** — ordinary leaf writes produce ZERO events                                                                                   |
 | `interceptLeafSignals`                                     | P-B      | frame commit         | LC    | does not wrap a leaf's `.set` at all                                                                                                                          |
 | error authority (`onTreeError`, `SignalTreeRollbackError`) | P-B      | frame commit         | KA    | **DR-2**: a promise that a refusal is encounterable AS a refusal needs a reportable refusal. FORM undisposed — branded factories were RFC 0004 plan-of-record |
-| `isDev` / dev-only gating                                  | —        | —                    | ⚠     | **blocking GATE B**; "guardrails dead in prod" NEEDS RECONCILIATION                                                                                           |
+| `isDev` / dev-only gating                                  | —        | —                    | ⚠     | guardrails package deleted; remaining dev-only core diagnostics still need foldability policy                                                                 |
 | `edit-session`                                             | P-B      | frame commit         | ⚠     | NULL NOT RUN                                                                                                                                                  |
 | `security` subpath                                         | —        | —                    | KA    | emits **no** external imports                                                                                                                                 |
 | `lazy` / incremental materialization                       | P-F      | static child table   | ⚠     | threshold-driven; unassigned to any layer                                                                                                                     |
@@ -384,7 +384,7 @@ document's provisional placement and carries no weight.
 | Package                  | Class | Ledger state                                                         |
 | ------------------------ | ----- | -------------------------------------------------------------------- |
 | `@signaltree/events`     | KA    | root emits `zod` only — the neutrality shape the others should reach |
-| `@signaltree/guardrails` | KA    | no Angular anywhere                                                  |
+| `@signaltree/guardrails` | —     | **DELETED in 15.0** — diagnostics did not earn package survival      |
 | `@signaltree/ng-forms`   | KA    | Angular adapter?; `/audit` is a pure re-export                       |
 | `@signaltree/realtime`   | ⚠     | reset to R0 OWNERSHIP; emits `@angular/core`                         |
 | `@signaltree/shared`     | ⚠     | version drift flagged; unpublished                                   |

@@ -39,7 +39,7 @@ const enhancers = [
     name: 'TimeTravel',
     importPath: '../../lib/types',
     typeName: 'TimeTravelMethods',
-    generic: true,
+    generic: false,
     methods: [
       'undo',
       'redo',
@@ -58,14 +58,6 @@ const enhancers = [
     typeName: 'DevToolsMethods',
     generic: false,
     methods: ['connectDevTools', 'disconnectDevTools'],
-  },
-  {
-    id: 'F',
-    name: 'OptimizedUpdate',
-    importPath: '../../lib/types',
-    typeName: 'OptimizedUpdateMethods',
-    generic: true,
-    methods: ['updateOptimized'],
   },
 ];
 

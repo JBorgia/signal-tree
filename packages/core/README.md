@@ -98,16 +98,15 @@ const name = tree.$.name(); // No transform needed
 
 **Key Points:**
 
-- **Zero runtime overhead**: No Proxy wrappers or runtime hooks
-- **Build-time only**: AST transform converts callable syntax to direct `.set/.update` calls
-- **Optional**: Use `@signaltree/callable-syntax` transform or stick with direct `.set/.update`
-- **Type-safe**: Full TypeScript support via module augmentation
+- **Branches are callable**: root and branch accessors merge partial values.
+- **Leaves are Angular signals**: write with `.set()` / `.update()`.
+- **No build transform required**: `@signaltree/callable-syntax` was deleted; leaf call syntax is not supported.
 
 **Function-valued leaves:**
 When a leaf stores a function as its value, use direct `.set(fn)` to assign. Callable `sig(fn)` is treated as an updater.
 
 **Setup:**
-Install `@signaltree/callable-syntax` and configure your build tool to apply the transform. Without the transform, use `.set/.update` directly.
+No setup is required. Use `.set()` / `.update()` for leaves.
 
 ### Measuring performance and size
 
@@ -671,8 +670,6 @@ All enhancers are exported directly from `@signaltree/core`:
 These are the **only** separate packages in the SignalTree ecosystem:
 
 - **`@signaltree/ng-forms`** - Angular Forms integration (separate package)
-- **`@signaltree/enterprise`** - Enterprise-scale optimizations for 500+ signals (separate package)
-- **`@signaltree/callable-syntax`** - Build-time transform for callable syntax (dev dependency, separate package)
 
 #### Composition Patterns
 
@@ -2083,9 +2080,7 @@ Consider enhancers when you need:
 
 Consider separate packages when you need:
 
-- 📝 Angular forms integration (@signaltree/ng-forms)
-- 🏢 Enterprise-scale optimizations (@signaltree/enterprise)
-- 🎯 Callable syntax transform (@signaltree/callable-syntax)
+- 📝 Angular forms integration (`@signaltree/ng-forms`)
 
 ## Migration from NgRx
 
@@ -2338,235 +2333,6 @@ class UserFormComponent {
 
 ---
 
-### 🏢 @signaltree/enterprise
-
-**Enterprise-scale optimizations for large applications**
-
-Advanced performance optimizations designed for applications with 500+ signals and complex state trees.
-
-```bash
-npm install @signaltree/enterprise
-```
-
-**Features:**
-
-- ⚡ PathIndex for O(k) lookup time regardless of tree size
-- 🗜️ Advanced memory optimization algorithms
-- 📊 Performance profiling and monitoring
-- 🔍 Efficient path-based signal resolution
-- 🎯 Optimized for large-scale applications
-
-**Quick Example:**
-
-```typescript
-import { signalTree } from '@signaltree/core';
-import { enterpriseOptimizations } from '@signaltree/enterprise';
-
-const tree = signalTree({
-  // Large application state with hundreds of signals
-  modules: {
-    auth: {
-      /* ... */
-    },
-    data: {
-      /* ... */
-    },
-    ui: {
-      /* ... */
-    },
-    // ... many more modules
-  },
-}).with(
-  enterpriseOptimizations({
-    enablePathIndex: true,
-    enableMemoryOptimizations: true,
-    enablePerformanceMonitoring: true,
-  })
-);
-```
-
-**Performance Benefits:**
-
-- **Constant-time lookups:** O(k) lookup where k is path depth, not total signal count
-- **Memory efficiency:** Up to 40% reduction in memory usage for large trees
-- **Faster updates:** Optimized update batching for high-frequency scenarios
-
-**When to use:**
-
-- Applications with 500+ signals
-- Complex nested state structures (10+ levels deep)
-- High-frequency state updates
-- Enterprise-scale applications with performance requirements
-- Need detailed performance profiling
-
-**Learn more:** [npm package](https://www.npmjs.com/package/@signaltree/enterprise)
-
----
-
-### 🛡️ @signaltree/guardrails
-
-**Development-only performance monitoring and debugging**
-
-Comprehensive development tools for detecting performance issues, memory leaks, and anti-patterns during development. **Zero production overhead** via conditional exports.
-
-```bash
-npm install --save-dev @signaltree/guardrails
-```
-
-**Features:**
-
-- 🔥 Hot-path detection - identifies frequently accessed signals
-- 💾 Memory leak detection - tracks signal cleanup issues
-- 📊 Performance budgets - enforces performance thresholds
-- ⚠️ Anti-pattern warnings - detects common mistakes
-- 📈 Real-time performance metrics
-- 🎯 Zero production overhead (no-op in production builds)
-
-**Quick Example:**
-
-```typescript
-import { signalTree } from '@signaltree/core';
-import { guardrails } from '@signaltree/guardrails';
-
-const tree = signalTree({
-  users: [] as User[],
-  posts: [] as Post[],
-}).with(
-  guardrails({
-    hotPathThreshold: 100, // Warn if signal accessed >100 times/sec
-    memoryLeakThreshold: 50, // Warn if >50 uncleaned signals
-    budgets: {
-      updateTime: 16, // Warn if updates take >16ms
-      signalCount: 1000, // Warn if >1000 signals created
-    },
-  })
-);
-
-// Development warnings will appear in console
-// Production builds get no-op functions (0 overhead)
-```
-
-**Development Features:**
-
-```typescript
-import { getPerformanceMetrics, getHotPaths, checkMemoryLeaks } from '@signaltree/guardrails';
-
-// Get detailed performance metrics
-const metrics = getPerformanceMetrics();
-console.log('Update time:', metrics.avgUpdateTime);
-console.log('Signal count:', metrics.totalSignals);
-
-// Identify hot paths
-const hotPaths = getHotPaths();
-console.log('Most accessed signals:', hotPaths);
-
-// Check for memory leaks
-const leaks = checkMemoryLeaks();
-if (leaks.length > 0) {
-  console.warn('Potential memory leaks:', leaks);
-}
-```
-
-**Conditional Exports (Zero Production Overhead):**
-
-```json
-{
-  "exports": {
-    ".": {
-      "development": "./dist/index.js",
-      "production": "./dist/noop.js"
-    }
-  }
-}
-```
-
-In production builds, all guardrails functions become no-ops with zero runtime cost.
-
-**When to use:**
-
-- During active development
-- Performance optimization phase
-- Debugging state management issues
-- Team onboarding and code reviews
-- CI/CD performance regression detection
-
-**Learn more:** [npm package](https://www.npmjs.com/package/@signaltree/guardrails)
-
----
-
-### 🎯 @signaltree/callable-syntax
-
-**Build-time transform for callable signal syntax**
-
-A TypeScript transformer that enables callable syntax sugar for setting signal values. This is **purely a developer experience enhancement** with zero runtime overhead.
-
-```bash
-npm install --save-dev @signaltree/callable-syntax
-```
-
-**Features:**
-
-- 🍬 Syntactic sugar for signal updates
-- ⚡ Zero runtime overhead (build-time transform)
-- ✅ Full TypeScript type safety
-- 🔧 Works with any build tool (Rollup, Webpack, esbuild, etc.)
-- 📝 Optional - use direct `.set/.update` if preferred
-
-**Syntax Transformation:**
-
-```typescript
-// With callable-syntax transform
-tree.$.name('Jane'); // Transformed to: tree.$.name.set('Jane')
-tree.$.count((n) => n + 1); // Transformed to: tree.$.count.update((n) => n + 1)
-
-// Reading always works directly (no transform needed)
-const name = tree.$.name(); // Direct Angular signal API
-```
-
-**Setup (tsconfig.json):**
-
-```json
-{
-  "compilerOptions": {
-    "plugins": [{ "transform": "@signaltree/callable-syntax" }]
-  }
-}
-```
-
-**Setup (Rollup):**
-
-```javascript
-import { callableSyntaxTransform } from '@signaltree/callable-syntax/rollup';
-
-export default {
-  plugins: [callableSyntaxTransform()],
-};
-```
-
-**Important Notes:**
-
-- **Optional:** You can always use direct `.set(value)` or `.update(fn)` syntax
-- **Build-time only:** No runtime code is added to your bundle
-- **Function-valued leaves:** When storing functions, use `.set(fn)` directly
-- **Type-safe:** Full TypeScript support via module augmentation
-
-**When to use:**
-
-- Prefer shorter, more concise syntax
-- Team convention favors callable style
-- Migrating from other signal libraries with similar syntax
-- Want familiar DX without runtime overhead
-
-**When to skip:**
-
-- Team prefers explicit `.set/.update` syntax
-- Build pipeline doesn't support transformers
-- Storing functions as signal values (use direct `.set`)
-
-**Learn more:** [npm package](https://www.npmjs.com/package/@signaltree/callable-syntax)
-
----
-
 ## Package Selection Guide
 
 **Start with just `@signaltree/core`** - it includes comprehensive enhancers for most applications:
@@ -2578,12 +2344,9 @@ export default {
 
 **Add companion packages when you need:**
 
-| Package                       | When to Add                        | Bundle Impact    |
-| ----------------------------- | ---------------------------------- | ---------------- |
-| `@signaltree/ng-forms`        | Angular Reactive Forms integration | ~10KB gzipped    |
-| `@signaltree/enterprise`      | 500+ signals, large-scale apps     | ~8KB gzipped     |
-| `@signaltree/guardrails`      | Development performance monitoring | 0KB (dev-only)   |
-| `@signaltree/callable-syntax` | Prefer callable syntax sugar       | 0KB (build-time) |
+| Package                | When to Add                        | Bundle Impact |
+| ---------------------- | ---------------------------------- | ------------- |
+| `@signaltree/ng-forms` | Angular Reactive Forms integration | ~10KB gzipped |
 
 **Typical Installation Patterns:**
 
@@ -2594,12 +2357,8 @@ npm install @signaltree/core
 # Application with forms
 npm install @signaltree/core @signaltree/ng-forms
 
-# Large enterprise application
-npm install @signaltree/core @signaltree/enterprise
-
-# Development with all tools
-npm install @signaltree/core @signaltree/enterprise @signaltree/ng-forms
-npm install --save-dev @signaltree/guardrails @signaltree/callable-syntax
+# Application with all current companion packages
+npm install @signaltree/core @signaltree/ng-forms
 ```
 
 ## Links

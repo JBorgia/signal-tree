@@ -38,7 +38,6 @@ dependency or runtime earns its own package; a within-tree mechanic lives in cor
 - **@signaltree/ng-forms**: Angular Forms integration — `createFormTree` (FormGroup) and `signalForm()` (Angular 22 Signal Forms bridge). Separate because it depends on `@angular/forms`
 - **@signaltree/events**: domain-event bus with an `entityMap` bridge and optimistic-update manager
 - **@signaltree/realtime**: SSE/SignalR wiring onto tag-based cache invalidation
-- **@signaltree/enterprise**: _deprecated in 13.5.0_ — superseded by `tree.updateAndReport()` in `@signaltree/core`, which is faster and needs no enhancer
 
 **All enhancers are exported from `@signaltree/core`** — no need for separate enhancer packages.
 

@@ -13,7 +13,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
 
 // Packages that import from @signaltree/shared
-const PACKAGES_TO_FIX = ['core', 'enterprise', 'ng-forms'];
+const PACKAGES_TO_FIX = ['core', 'ng-forms'];
 
 // Inline type declarations for shared utilities
 // These replace the imports from @signaltree/shared
