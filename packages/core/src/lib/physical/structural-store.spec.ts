@@ -65,7 +65,11 @@ describe('StructuralStore', () => {
     const store = seedStore();
     const handle = acquireExistingHandle(store, 'B');
 
-    expect(handle).toEqual({ subjectId: 2, acquiredRevision: 0 });
+    expect(handle).toEqual({
+      subjectId: 2,
+      acquiredRevision: 0,
+      collectionIncarnation: 0,
+    });
 
     store.tombstoneSubject(2, 'B', true);
     store.createSubject(4, 'B');
@@ -76,6 +80,21 @@ describe('StructuralStore', () => {
       subjectId: 2,
       restoreAllowed: true,
       revision: 0,
+    });
+  });
+
+  it('does not let a whole structural reset retarget an acquired handle through reused subject ids', () => {
+    const store = seedStore();
+    const handle = acquireExistingHandle(store, 'B');
+
+    store.clear();
+    store.createSubject(2, 'B');
+
+    expect(store.subjectIdForKey('B')).toBe(2);
+    expect(store.resolveSubjectHandle(handle)).toEqual({
+      state: 'missing',
+      subjectId: 2,
+      acquiredRevision: 0,
     });
   });
 
