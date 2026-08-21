@@ -6,9 +6,8 @@
  * ## Why this exists
  *
  * Every other gate in this repo is a NO-DANGLING-REFERENCE check. `readme-apis`
- * asserts that a symbol a README names exists; `lint-skills` does it for skill
- * code blocks; `taught-symbols` does it for `llms-full.txt`. They all run in one
- * direction: claim -> API.
+ * asserts that a symbol a README names exists. They all run in one direction:
+ * claim -> API.
  *
  * The opposite direction was unguarded, and it is not symmetric. **A "we don't
  * have X" is a claim about ABSENCE, and you cannot grep for a symbol that is not
@@ -19,7 +18,9 @@
  *   - `49dd9ffb` — "the AI-priming surfaces taught NONE of 14.0.0". `llms.txt`,
  *     `llms-full.txt`, the core README and the skill scored ZERO on prependOne,
  *     activeEntity, setActiveId, changeId, pauseRecording, shouldSkip,
- *     onTreeError, ST2025 and ST2026. Found by hand.
+ *     onTreeError, ST2025 and ST2026. Found by hand. The AI priming artifacts
+ *     were later removed in 15.0 after their API guidance went stale, so this
+ *     gate now tracks the surviving release claim surfaces.
  *   - `docs/compare/capability-matrix.md` still carried ❌ for FIVE capabilities
  *     the same release shipped, and was edited twice AFTER they landed. It was
  *     not in `49dd9ffb`'s hand-written surface list.
@@ -273,27 +274,6 @@ function codesAt(rev) {
  */
 const SURFACES = [
   {
-    name: 'llms.txt',
-    files: ['apps/demo/public/llms.txt'],
-    // The priming file an agent retrieves. It teaches the API you CALL, so a
-    // type alias is out of scope and a new callable is squarely in it.
-    applies: (r) =>
-      !r.isCode &&
-      (r.kind === 'value' || r.kind === 'member') &&
-      r.pkg === 'core',
-  },
-  {
-    name: 'llms-full.txt',
-    files: ['apps/demo/public/llms-full.txt'],
-    // The long form teaches diagnostics too — an agent that can name the code
-    // can explain the warning the user is staring at.
-    applies: (r) =>
-      (!r.isCode &&
-        (r.kind === 'value' || r.kind === 'member') &&
-        r.pkg === 'core') ||
-      r.isCode,
-  },
-  {
     name: 'core README',
     files: ['packages/core/README.md'],
     applies: (r) =>
@@ -325,14 +305,28 @@ const SURFACES = [
  */
 const EXEMPT = new Map(
   Object.entries({
+    causalMode:
+      'internal UpdateMetadata replay discriminator; documented by causal-runtime architecture docs, not app-facing README/changelog',
+    historyEffect:
+      'internal UpdateMetadata structural replay payload; documented by causal-runtime architecture docs, not app-facing README/changelog',
     HydrateMode: 'authoring-only type; the modes are documented in prose',
     HydrateReason:
       'authoring-only type; reasons documented with onHydrateDecision',
+    mutationIntent:
+      'internal UpdateMetadata rollback classifier; documented by causal-runtime architecture docs, not app-facing README/changelog',
+    positionIds:
+      'internal UpdateMetadata/MutationEnvelope ownership ids; not an application-facing option',
     SerializedState: 'return type of an already-documented method',
     SerializationMethods:
       'method bag type; the methods are documented individually',
     PersistenceMethods:
       'method bag type; the methods are documented individually',
+    subjectIds:
+      'internal UpdateMetadata/MutationEnvelope structural subject ids; not an application-facing option',
+    transactionId:
+      'internal UpdateMetadata transaction token used by transactions()',
+    transactionOwner:
+      'internal UpdateMetadata tree token used to isolate transactions()',
   })
 );
 

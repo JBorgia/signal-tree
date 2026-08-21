@@ -12,13 +12,13 @@
    otherwise.
 2. Create and push a **signed** tag for the exact commit: `git tag -s -m "Release vX.Y.Z" vX.Y.Z && git push origin vX.Y.Z`.
 3. The tag push runs `release.yml`, which first **verifies the tagged
-   commit** (frozen install, lint, typecheck, tests, builds, built-barrel
-   resolution, guardrails-exports, taught-symbols, version-claims,
-   tarball-consumer gate, changelog entry) and only then creates the GitHub
+   commit** (frozen install, lint budget, typecheck, tests, builds,
+   built-barrel resolution, README/API checks, version-claims,
+   tarball-consumer and publish-artifact gates, changelog entry) and only then creates the GitHub
    release.
 4. Actions → "Publish to npm (CI)" → Run workflow with the tag. This runs
    `publish.yml`, which **reruns the same full gate set against the tag**,
-   builds production, and publishes all **6** publishable packages with `NPM_TOKEN`
+   builds production, and publishes all **3** publishable packages with `NPM_TOKEN`
    (`scripts/ci-publish.sh`, provenance enabled). Re-runs are safe:
    already-published versions are skipped. (Note: releases created by
    `release.yml` do not auto-trigger `publish.yml` — `GITHUB_TOKEN` events
@@ -43,8 +43,8 @@ publish → push).
 
 - `skip-tests` **no longer bypasses validation**: it sets `FAST_VALIDATE=1`,
   which skips only unit tests, coverage, and benchmarks. All correctness
-  gates (builds, barrel + export parity, tarball-consumer, taught-symbols,
-  version-claims, guardrails-exports, size, release-state, skill lint)
+  gates (builds, barrel + export parity, tarball-consumer, README/API checks,
+  version-claims, size, release-state, package hygiene)
   still run and still block. There is no flag that skips them.
 - `npm run publish:all` now runs the full `npm run validate` suite first —
   no publish path dodges the gates.

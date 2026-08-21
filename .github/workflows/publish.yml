@@ -9,9 +9,8 @@ name: Publish to npm (CI)
 # Owner setup (one-time):
 #   1. Create a GRANULAR npm automation token scoped to the @signaltree
 #      packages (npmjs.com → Access Tokens → Generate New Token → Granular,
-#      "Read and write" on the 6 publishable packages (core, events,
-#      ng-forms, realtime, guardrails, schema — `shared` is private and has
-#      never been on the registry), no 2FA prompt on automation).
+#      "Read and write" on the 3 publishable packages (core, events,
+#      ng-forms — `shared` is private), no 2FA prompt on automation).
 #   2. Add it as the `NPM_TOKEN` repository secret
 #      (GitHub → Settings → Secrets and variables → Actions).
 #   3. Protect tags: Settings → Rules → Rulesets → new tag ruleset matching
@@ -156,7 +155,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Build all packages (production) + ship skills
+      - name: Build all packages (production)
         run: pnpm run build:production
 
       - name: Publish to npm

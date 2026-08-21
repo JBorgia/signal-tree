@@ -10927,7 +10927,7 @@ scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
       moving type-only `@vercel/node` to devDependencies, and pinning its dev
       `undici` tree to the latest 5.x patch. Validation:
       `pnpm audit --prod`, `pnpm nx run-many -t build -p core,events,ng-forms
-      --skip-nx-cache --output-style=static`,
+    --skip-nx-cache --output-style=static`,
       `node scripts/verify-package-hygiene.js`,
       `node scripts/verify-package-hygiene.js --self-test`,
       `node scripts/verify-exports.js`,
@@ -10974,7 +10974,21 @@ candidate docs.
       `pnpm nx test core --testNamePattern="should initialize 100 markers" --skip-nx-cache --output-style=static`,
       `pnpm nx test core --skip-nx-cache --output-style=static`.
 
-- [ ] CI release gate
+- [x] CI release gate — release and publish workflows now use the surviving
+  unified gate set instead of deleted guardrails/taught-symbol scripts;
+  retired `lint:skills`/`taught-symbols` entries were removed from
+  `tools/verify-gates.mjs`; `release-claims` now tracks live claim surfaces;
+  stale v9 bundle ceilings and the dead-export ratchet were re-baselined;
+  numeric claims now carry generator annotations. Validation:
+  `node tools/verify-gates.mjs --only=lint:skills,taught-symbols`,
+  `node tools/check-release-claims.mjs`,
+  `node tools/verify-gates.mjs --self-test --only=release-claims`,
+  `node scripts/v9-budget-checks.js`,
+  `node tools/find-dead-exports.mjs --max=110`,
+  `node tools/check-numeric-claims.mjs`,
+  `node tools/verify-gates.mjs --fast`,
+  `node tools/verify-gates.mjs --self-test --only=release-claims,package-hygiene:self,numeric-claims:self`,
+  workflow YAML parse via Ruby.
 - [ ] trusted publishing/provenance
 - [ ] clean-checkout release flow
 - [ ] final performance baseline generation

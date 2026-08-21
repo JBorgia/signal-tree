@@ -1,3 +1,15 @@
+**15.0.0 release-claim staging note.**
+
+These entries keep release-delta claim checks honest before the actual version
+bump inserts the final dated 15.0.0 heading.
+
+- **`transactions()`** adds explicit tree-local optimistic transaction grouping;
+  rollback failures surface as `SignalTreeRollbackError` so callers can reconcile
+  or refetch instead of silently corrupting state.
+- **[ST2033]** rejects async or thenable-returning `entityMap().intercept(...)`
+  handlers. Entity mutations are synchronous, so async validation belongs before
+  the mutation path.
+
 ## 14.1.1 (2026-08-11)
 
 > **14.1.0 was published and immediately superseded — do not install it.** It shipped
