@@ -2,7 +2,9 @@
 
 > Drop-in `.cursorrules` and `CLAUDE.md` content for projects that use SignalTree. Copy verbatim into your repo root. These templates teach AI assistants (Cursor, Claude Code, Copilot via custom instructions) the correct mental model and prevent the common hallucinations catalogued in [myths-and-misconceptions.md](../myths-and-misconceptions.md).
 
-There is also a vendor-neutral [Agent Skill](../skills/using-signaltree/SKILL.md) shipped inside every `@signaltree/*` tarball. The skill is more comprehensive than these templates — use the templates as a lightweight starting point and the skill for harnesses that support `SKILL.md`.
+The old vendor-neutral `using-signaltree` Agent Skill was removed with the stale
+AI-discoverability artifacts. Use these templates as a lightweight starting
+point until a replacement is derived from the frozen public API.
 
 ---
 
