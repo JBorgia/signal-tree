@@ -2600,8 +2600,8 @@ some belong elsewhere and having to redo `GATE B`. Four questions:
    because npm cannot scope peers per subpath; install only the peers for the
    subpaths used.
 4. **`@signaltree/kernel` package identity — CLOSED for 15.0.** No published
-  kernel package. Keep the kernel boundary private until the neutral port
-  prerequisites are complete; package identity is the last step, not the first.
+   kernel package. Keep the kernel boundary private until the neutral port
+   prerequisites are complete; package identity is the last step, not the first.
 
 ### `@signaltree/authoring` — STOPPED. Package/form is UNPROVEN.
 
@@ -3142,8 +3142,8 @@ may legitimately remain if it appears in neutral async contracts.
       package boundary exists
 - [x] Remove `@signaltree/core/authoring` as a 15.0 breaking change — `f4de79a9`
 - [x] Regenerate the API baseline deliberately — current measured surface:
-  `core 126`, `events 116`, `ng-forms 18`; validation:
-  `node tools/api-inventory.mjs && node tools/api-inventory.mjs --check`
+      `core 126`, `events 116`, `ng-forms 18`; validation:
+      `node tools/api-inventory.mjs && node tools/api-inventory.mjs --check`
 
 ### Historical — the dependency check that produced the sequence above
 
