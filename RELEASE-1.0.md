@@ -2590,10 +2590,10 @@ some belong elsewhere and having to redo `GATE B`. Four questions:
    a breaking change; keeping them means `internals/` is a misnomer for those
    files. The `./authoring` internal-leak class was closed by deleting the
    subpath in `f4de79a9`.
-2. **`ng-forms` re-exports core's audit API as its own** — `createAuditTracker`,
-   `createAuditCallback`, `AuditEntry`, `AuditMetadata`, `AuditTrackerConfig`,
-   all declared in `packages/core/src/lib/audit/audit.ts`. Two packages publish
-   one API. Which owns it?
+2. **`ng-forms` audit/export topology — CLOSED.** The current package manifest
+   publishes only `.`, with no `./audit` subpath. `ng-forms` now uses an
+   explicit public barrel instead of `export *`, so core owns audit and forms
+   owns only its Angular forms API.
 3. **Live packages that declare an `@angular/core` peer while their public types
    do not require it** — `events` (0 of 116). `events` already splits
    `./angular` and `./nestjs` subpaths, so its root could be framework-neutral
@@ -3230,12 +3230,12 @@ specs before cutting; expected dispositions: `derivedFrom` KEEP (user-facing);
 `SignalTreePlanBuilder` MOVE to authoring; `ProcessDerived`, `DeepMergeTree`
 REMOVE — type machinery public only because inference needed it.
 
-**`ng-forms` audit duplication.** `createAuditTracker`, `createAuditCallback`,
-`AuditEntry`, `AuditMetadata`, `AuditTrackerConfig` all declare in
-`packages/core/src/lib/audit/audit.ts`. `ng-forms/audit` emits only
-`@signaltree/core`, confirming it is a pure re-export with no forms-specific
-content. **Core owns audit; remove the republication.** Also eliminate
-`ng-forms`' four `export *` barrels so its contract is explicit.
+**`ng-forms` audit/export topology — CLOSED.** `ng-forms/audit` no longer exists
+in the current package manifest/source, and `ng-forms`' root barrel is explicit
+rather than `export *`-based. Core owns audit; `ng-forms` owns Angular forms.
+Validation: `pnpm nx build ng-forms --skip-nx-cache --output-style=static`,
+`npm run typecheck:source`, `TS_JEST_DISABLE_VER_CHECKER=true pnpm nx test
+ng-forms --output-style=static --silent`.
 
 **Historical `realtime` note — superseded by `048c5132`.**
 

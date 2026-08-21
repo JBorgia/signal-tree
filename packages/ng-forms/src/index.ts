@@ -1,9 +1,20 @@
-export * from './core/ng-forms';
-export * from './history';
-// `./wizard` was implemented, documented in the README as "retained for existing
-// createFormTree users", and exported from nowhere — so no consumer could reach
-// it. Same gap class as the entityMap builder types in core.
-export * from './wizard';
+export {
+  createFormTree,
+  createVirtualFormArray,
+  FormValidationError,
+  SignalValueDirective,
+  SIGNAL_FORM_DIRECTIVES,
+  type ConditionalField,
+  type EnhancedArraySignal,
+  type FieldConfig,
+  type FieldValidator,
+  type FormTree,
+  type FormTreeAsyncValidatorFn,
+  type FormTreeOptions,
+  type TypedFormGroup,
+} from './core/ng-forms';
+export { withFormHistory, type FormHistory } from './history';
+export { createWizardForm, type FormStep } from './wizard';
 
 import { debounce, unique } from './core/async-validators';
 import {
