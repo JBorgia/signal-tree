@@ -16,6 +16,7 @@ export type ResolvedSubjectRestorePlacement<K extends string | number> = {
 export type AcquiredSubjectHandle = {
   subjectId: number;
   acquiredRevision: number;
+  collectionIncarnation: number;
 };
 
 export type ResolvedSubjectHandle<K extends string | number> =
@@ -51,6 +52,7 @@ export class StructuralStore<K extends string | number> {
   private readonly activeNodesByKey = new Map<K, ActiveNode<K>>();
   private readonly activeNodesBySubject = new Map<number, ActiveNode<K>>();
   private nextSubjectId = 1;
+  private collectionIncarnation = 0;
   private activeHead: ActiveNode<K> | undefined;
   private activeTail: ActiveNode<K> | undefined;
   private activeCount = 0;
@@ -76,10 +78,19 @@ export class StructuralStore<K extends string | number> {
       : {
           subjectId,
           acquiredRevision: this.subjectRevision(subjectId),
+          collectionIncarnation: this.collectionIncarnation,
         };
   }
 
   resolveSubjectHandle(handle: AcquiredSubjectHandle): ResolvedSubjectHandle<K> {
+    if (handle.collectionIncarnation !== this.collectionIncarnation) {
+      return {
+        state: 'missing',
+        subjectId: handle.subjectId,
+        acquiredRevision: handle.acquiredRevision,
+      };
+    }
+
     const state = this.subjectStates.get(handle.subjectId);
 
     if (state === undefined) {
@@ -422,6 +433,7 @@ export class StructuralStore<K extends string | number> {
     this.activeTail = undefined;
     this.activeCount = 0;
     this.nextSubjectId = 1;
+    this.collectionIncarnation += 1;
   }
 
   __assertActiveOrderIntegrityForTesting(): void {
