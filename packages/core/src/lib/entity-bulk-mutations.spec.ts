@@ -20,6 +20,8 @@ import { signalTree } from './signal-tree';
  */
 type Row = { id: number; name: string; done: boolean };
 
+const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
 const rows = (): Row[] => [
   { id: 1, name: 'a', done: false },
   { id: 2, name: 'b', done: true },
@@ -277,5 +279,96 @@ describe('intercept hooks can transform and block', () => {
 
     expect(() => t.$.r.addOne({ id: 4, name: 'd', done: false })).not.toThrow();
     expect(t.$.r.count()).toBe(4);
+  });
+
+  it('DR-2 — thenable add interceptor fails closed for addMany', async () => {
+    const t = mk();
+    let transformAttempted = false;
+    t.$.r.intercept({
+      onAdd: (_entity, ctx) => {
+        return Promise.resolve().then(() => {
+          transformAttempted = true;
+          ctx.transform({ id: 4, name: 'late', done: false });
+        });
+      },
+    });
+
+    expect(() =>
+      t.$.r.addMany([{ id: 4, name: 'd', done: false }])
+    ).toThrow(/ST2033/);
+    expect(t.$.r.count()).toBe(3);
+
+    await tick();
+
+    expect(transformAttempted).toBe(true);
+    expect(t.$.r.count()).toBe(3);
+  });
+
+  it('DR-2 — thenable update interceptor fails closed for updateMany', async () => {
+    const t = mk();
+    let transformAttempted = false;
+    t.$.r.intercept({
+      onUpdate: (_id, _changes, ctx) => {
+        return Promise.resolve().then(() => {
+          transformAttempted = true;
+          ctx.transform({ name: 'late' });
+        });
+      },
+    });
+
+    expect(() => t.$.r.updateMany([1, 3], { name: 'updated' })).toThrow(/ST2033/);
+    expect(t.$.r.byId(1)?.().name).toBe('a');
+    expect(t.$.r.byId(3)?.().name).toBe('c');
+
+    await tick();
+
+    expect(transformAttempted).toBe(true);
+    expect(t.$.r.byId(1)?.().name).toBe('a');
+    expect(t.$.r.byId(3)?.().name).toBe('c');
+  });
+
+  it('DR-2 — thenable remove interceptor fails closed for removeMany', async () => {
+    const t = mk();
+    let blockAttempted = false;
+    t.$.r.intercept({
+      onRemove: (_id, _entity, ctx) => {
+        return Promise.resolve().then(() => {
+          blockAttempted = true;
+          ctx.block('too late');
+        });
+      },
+    });
+
+    expect(() => t.$.r.removeMany([1, 3])).toThrow(/ST2033/);
+    expect(ids(t)).toBe('1,2,3');
+
+    await tick();
+
+    expect(blockAttempted).toBe(true);
+    expect(ids(t)).toBe('1,2,3');
+  });
+
+  it('DR-2 — thenable replace interceptor fails closed for setAll', async () => {
+    const t = mk();
+    let transformAttempted = false;
+    t.$.r.intercept({
+      onUpdate: (_id, _changes, ctx) => {
+        return Promise.resolve().then(() => {
+          transformAttempted = true;
+          ctx.transform({ name: 'late' });
+        });
+      },
+    });
+
+    expect(() => t.$.r.setAll([{ id: 1, name: 'updated', done: true }])).toThrow(
+      /ST2033/
+    );
+    expect(ids(t)).toBe('1,2,3');
+    expect(t.$.r.byId(1)?.().name).toBe('a');
+
+    await tick();
+
+    expect(transformAttempted).toBe(true);
+    expect(t.$.r.byId(1)?.().name).toBe('a');
   });
 });
