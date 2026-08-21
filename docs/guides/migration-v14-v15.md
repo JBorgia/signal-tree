@@ -158,11 +158,11 @@ the additions vanished silently; with a single enhancer the result could not be
 applied at all, because `T` inferred from the return and then demanded it as
 input.
 
-**It participates in enhancer metadata and validation.** Under
-`plannedSignalTree()`, individually applied enhancers get duplicate detection,
-dependency validation and ordering. A composed fold hid its children from all of
-it — and the dependency check is fail-closed, so bypassing it meant an enhancer
-declaring an unmet requirement ran anyway instead of throwing.
+**It participates in enhancer metadata and validation.** Individually applied
+enhancers stay visible to SignalTree's construction plan, so they get duplicate
+detection, dependency validation and ordering. A composed fold hid its children
+from all of it — and the dependency check is fail-closed, so bypassing it meant
+an enhancer declaring an unmet requirement ran anyway instead of throwing.
 
 If you were relying on `composeEnhancers` to force raw source order past that
 check, there is no supported replacement: that was an undocumented bypass of a

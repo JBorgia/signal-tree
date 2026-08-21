@@ -3109,6 +3109,11 @@ may legitimately remain if it appears in neutral async contracts.
       deleted the What’s New observation-hook demo section. Validation:
       `pnpm nx build demo --skip-nx-cache --output-style=static`; grep confirms
       zero `apps/**` imports of the authoring subpath.
+- [x] Remove `plannedSignalTree` from the root public barrel — follow-up slice
+  after the product map already classified it as not frozen public API.
+  Validation: `pnpm nx build core --skip-nx-cache --output-style=static`,
+  `npm run typecheck:source`, `node tools/check-demo-coverage.mjs` now reports
+  five remaining root-export questions instead of six.
 - [ ] Derive or delete each remaining external implementer need independently
 - [ ] Only after convergence, decide whether any shared neutral contract and
       package boundary exists

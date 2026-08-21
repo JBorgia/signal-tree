@@ -17,7 +17,7 @@
  * Main factory function to create a SignalTree
  * @see {@link signalTree}
  */
-export { plannedSignalTree, signalTree } from './lib/signal-tree';
+export { signalTree } from './lib/signal-tree';
 
 /**
  * Wrap a tree factory in an injectable Angular service (the idiomatic Angular
