@@ -1,4 +1,4 @@
-import type { NodeAccessor } from '../types';
+import type { NodeAccessor } from '../node-accessor';
 
 /**
  * The structural predicate every tree walk starts from — framework-neutral by

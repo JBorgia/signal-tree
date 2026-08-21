@@ -54,8 +54,8 @@ export type {
 export { createEnhancer, resolveEnhancerOrder } from './enhancers/index';
 
 // Enhancer metadata symbol (third-party compatibility) + its shape.
-export { ENHANCER_META } from './lib/types';
-export type { EnhancerMeta } from './lib/types';
+export { ENHANCER_META } from './lib/enhancer-types';
+export type { EnhancerMeta } from './lib/enhancer-types';
 
 // Marker signal factories — the raw builders behind asyncSource()/asyncQuery()
 // markers, for authors building custom marker processors on top of the built-in
