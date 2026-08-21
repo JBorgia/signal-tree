@@ -33,7 +33,6 @@ const PACKAGES = [
   'core',
   'shared',
   'ng-forms',
-  'schema',
   'events',
   'realtime',
 ];

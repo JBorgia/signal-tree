@@ -45,7 +45,6 @@ PACKAGES=(
     "events"          # Event-driven architecture (BullMQ, NestJS, testing)
     "ng-forms"        # Angular forms integration
     "realtime"        # Real-time sync with Supabase/WebSocket
-    "schema"          # Schema-driven validation via StandardSchema (Zod, Valibot, …)
 )
 
 # Parse command line arguments

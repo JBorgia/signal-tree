@@ -144,7 +144,7 @@ release_provenance_ok() {
 # (its PACKAGES array). Deliberately excludes the private `packages/shared`
 # (bundled into core, never published) and any other package.json — the old
 # `packages/[^/]+/package.json` wildcard tolerated dirt in non-released manifests.
-RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(core|events|ng-forms|realtime|schema)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
+RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(core|events|ng-forms|realtime)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
 
 if [ -z "$(git status --porcelain)" ]; then
     print_success "Working directory is clean"
@@ -184,7 +184,7 @@ print_header "3. Type Checking"
 print_step "Running TypeScript compiler checks"
 # Type checking happens during build, so we'll verify TypeScript configs exist
 TYPECHECK_PASSED=true
-for package in core ng-forms schema; do
+for package in core ng-forms; do
     TSCONFIG="./packages/$package/tsconfig.json"
     if [ ! -f "$TSCONFIG" ]; then
         print_error "Missing tsconfig.json for $package"
@@ -266,7 +266,7 @@ else
     exit 1
 fi
 
-PUBLISHED_PACKAGES="shared,events,realtime,ng-forms,schema"
+PUBLISHED_PACKAGES="shared,events,realtime,ng-forms"
 if NX_DAEMON=false npx nx run-many -t build --projects=$PUBLISHED_PACKAGES --configuration=production 2>&1 | tee /tmp/build.log; then
     print_success "All published packages built successfully"
 else

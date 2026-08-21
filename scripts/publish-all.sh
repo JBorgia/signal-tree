@@ -54,7 +54,6 @@ PACKAGES=(
     "events"
     "ng-forms"
     "realtime"
-    "schema"
 )
 
 
