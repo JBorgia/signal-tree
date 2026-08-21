@@ -120,7 +120,6 @@ export { isAsyncQueryMarker } from './lib/markers/async-query.contract';
 // exactly when an accidental export should stop existing.
 export { isTraversableNode, isNodeAccessor } from './lib/internals/node-shape';
 export { isAnySignal } from './lib/utils';
-export { isSignalTree } from './lib/types';
 
 // Constants and diagnostic message text.
 export { SIGNAL_TREE_CONSTANTS, SIGNAL_TREE_MESSAGES } from './lib/constants';
