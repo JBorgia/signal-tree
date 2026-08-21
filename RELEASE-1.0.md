@@ -2507,7 +2507,8 @@ the kernel before `GATE A`.
       `a0cf4f34` removed live `enterprise` / `callable-syntax` remnants, and
       `7335ed88` removed nonexistent `schema` from package lists;
       `048c5132` removed `realtime`
-- [ ] **PACKAGE TOPOLOGY DECISION** (below) — blocks the export freeze
+- [x] **PACKAGE TOPOLOGY DECISION** (below) — closed by `f4de79a9`, `3065bc65`,
+      `5f3dcd8a`, and the private-kernel decision recorded here
 - [ ] freeze exports
 - [ ] public TypeScript tests
 - [ ] compatibility matrix
@@ -2596,14 +2597,9 @@ some belong elsewhere and having to redo `GATE B`. Four questions:
    `zod` only. Framework-specific dependencies are package-scoped optional peers
    because npm cannot scope peers per subpath; install only the peers for the
    subpaths used.
-4. **`@signaltree/kernel`: private boundary or published package?** Recommend
-   PRIVATE first. The extraction prerequisite is unchanged — the realization
-   port still consumes the Angular-shaped `TreeScalarSlotRuntime` and must move
-   to the neutral `SlotIndex` interface. Publishing also means committing to a
-   surface; whether that surface is small (`createTree`, `transactions`,
-   `history`, `persistence`) or forces `SlotIndex` / `StructuralStore` /
-   `EntityMutationFrame` into public view is exactly what a private boundary
-   lets us find out without a compatibility promise.
+4. **`@signaltree/kernel` package identity — CLOSED for 15.0.** No published
+  kernel package. Keep the kernel boundary private until the neutral port
+  prerequisites are complete; package identity is the last step, not the first.
 
 ### `@signaltree/authoring` — STOPPED. Package/form is UNPROVEN.
 
@@ -3143,7 +3139,9 @@ may legitimately remain if it appears in neutral async contracts.
 - [ ] Only after convergence, decide whether any shared neutral contract and
       package boundary exists
 - [x] Remove `@signaltree/core/authoring` as a 15.0 breaking change — `f4de79a9`
-- [ ] Regenerate the API baseline deliberately, then `GATE B`
+- [x] Regenerate the API baseline deliberately — current measured surface:
+  `core 126`, `events 116`, `ng-forms 18`; validation:
+  `node tools/api-inventory.mjs && node tools/api-inventory.mjs --check`
 
 ### Historical — the dependency check that produced the sequence above
 
