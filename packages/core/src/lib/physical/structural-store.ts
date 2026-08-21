@@ -13,6 +13,30 @@ export type ResolvedSubjectRestorePlacement<K extends string | number> = {
   afterKey?: K;
 };
 
+export type AcquiredSubjectHandle = {
+  subjectId: number;
+  acquiredRevision: number;
+};
+
+export type ResolvedSubjectHandle<K extends string | number> =
+  | {
+      state: 'active';
+      subjectId: number;
+      key: K;
+      revision: number;
+    }
+  | {
+      state: 'tombstoned';
+      subjectId: number;
+      restoreAllowed: boolean;
+      revision: number;
+    }
+  | {
+      state: 'missing';
+      subjectId: number;
+      acquiredRevision: number;
+    };
+
 type ActiveNode<K extends string | number> = {
   key: K;
   subjectId: number;
@@ -43,6 +67,50 @@ export class StructuralStore<K extends string | number> {
 
   subjectIdForKey(key: K): number | undefined {
     return this.subjectIds.get(key);
+  }
+
+  acquireSubjectHandleForKey(key: K): AcquiredSubjectHandle | undefined {
+    const subjectId = this.subjectIds.get(key);
+    return subjectId === undefined
+      ? undefined
+      : {
+          subjectId,
+          acquiredRevision: this.subjectRevision(subjectId),
+        };
+  }
+
+  resolveSubjectHandle(handle: AcquiredSubjectHandle): ResolvedSubjectHandle<K> {
+    const state = this.subjectStates.get(handle.subjectId);
+
+    if (state === undefined) {
+      return {
+        state: 'missing',
+        subjectId: handle.subjectId,
+        acquiredRevision: handle.acquiredRevision,
+      };
+    }
+
+    if (state.active) {
+      if (state.key === undefined) {
+        throw new Error(
+          `Active subject ${String(handle.subjectId)} is missing its active key.`
+        );
+      }
+
+      return {
+        state: 'active',
+        subjectId: handle.subjectId,
+        key: state.key,
+        revision: this.subjectRevision(handle.subjectId),
+      };
+    }
+
+    return {
+      state: 'tombstoned',
+      subjectId: handle.subjectId,
+      restoreAllowed: state.restoreAllowed,
+      revision: this.subjectRevision(handle.subjectId),
+    };
   }
 
   stateForSubject(subjectId: number): SubjectLifetimeRecord<K> | undefined {
