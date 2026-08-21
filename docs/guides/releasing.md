@@ -18,17 +18,18 @@
    release.
 4. Actions → "Publish to npm (CI)" → Run workflow with the tag. This runs
    `publish.yml`, which **reruns the same full gate set against the tag**,
-   builds production, and publishes all **3** publishable packages with `NPM_TOKEN`
-   (`scripts/ci-publish.sh`, provenance enabled). Re-runs are safe:
+   builds production, and publishes all **3** publishable packages through npm
+   trusted publishing (`scripts/ci-publish.sh`, provenance enabled). Re-runs are safe:
    already-published versions are skipped. (Note: releases created by
    `release.yml` do not auto-trigger `publish.yml` — `GITHUB_TOKEN` events
    never trigger other workflows — so the dispatch step is deliberate.)
 
 ## Owner setup (one-time)
 
-- **`NPM_TOKEN` secret** — create a _granular_ npm automation token with
-  read/write on the `@signaltree/*` packages; add it under GitHub →
-  Settings → Secrets and variables → Actions → `NPM_TOKEN`.
+- **npm trusted publishing** — for each publishable package, configure npm →
+  Package → Settings → Trusted publishing with GitHub Actions, repository
+  `JBorgia/signaltree`, workflow filename `publish.yml`, and allowed action
+  `npm publish`.
 - **Tag protection** — Settings → Rules → Rulesets: a tag ruleset for `v*`
   restricting creation to the owner.
 - **Required check** — branch protection on `main` requiring the
@@ -51,18 +52,17 @@ publish → push).
 
 ### What the emergency path costs you
 
-**Provenance.** `ci-publish.sh` passes `--provenance` only when
-`GITHUB_ACTIONS` is set, so a local publish produces no npm attestation and it
-cannot be added to that version afterwards. 14.0.0 shipped this way, from a
-laptop, because the dispatch in step 4 needs **admin** rights on the repository
-and a `repo`+`workflow` token gets `HTTP 403`. If provenance matters for a
-release, the dispatch has to be done by someone with admin.
+**Provenance.** `publish.yml` grants `id-token: write`, installs npm CLI
+11.5.1+, and `ci-publish.sh` publishes without `NPM_TOKEN` on GitHub Actions so
+npm can exchange the workflow OIDC identity for a short-lived trusted-publisher
+credential. A local emergency publish can still use `NPM_TOKEN`, but it produces
+no trusted-publishing attestation and that cannot be added to the version later.
 
-The rest of the safety did survive: `ci-publish.sh` is the same script CI runs,
-so it still refused to start without `NPM_TOKEN`, resolved the `workspace:*`
-specs npm will not rewrite, verified every declared `files` entry, checked
-tarball hygiene, and derived the dist-tag from the version string rather than
-letting `npm publish` default a prerelease onto `latest`.
+The rest of the safety still survives: `ci-publish.sh` is the same script CI
+runs, resolves the `workspace:*` specs npm will not rewrite, verifies every
+declared `files` entry, checks tarball hygiene, and derives the dist-tag from
+the version string rather than letting `npm publish` default a prerelease onto
+`latest`.
 
 ### Tags are required, not optional
 
