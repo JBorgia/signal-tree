@@ -1,4 +1,4 @@
-import type { UpdateMetadata } from '../types';
+import type { UpdateMetadata } from '../mutation-types';
 import { isTraversableNode } from './node-shape';
 import { getNodeProcessor, snapshotMarkerNode } from './materialize-markers';
 import {
