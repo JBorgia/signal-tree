@@ -3119,6 +3119,12 @@ may legitimately remain if it appears in neutral async contracts.
       `pnpm nx build demo --skip-nx-cache --output-style=static`,
       `npm run typecheck:source`, `node tools/check-demo-coverage.mjs` now reports
       four remaining root-export questions instead of five.
+- [x] Remove async realization factories from the root public barrel —
+  `createAsyncSourceSignal` and `createAsyncQuerySignal` are materializers,
+  not app-facing marker declarations. Validation: `pnpm nx build core
+  --skip-nx-cache --output-style=static`, `npm run typecheck:source`,
+  `node tools/check-demo-coverage.mjs` now reports two remaining root-export
+  questions instead of four.
 - [ ] Derive or delete each remaining external implementer need independently
 - [ ] Only after convergence, decide whether any shared neutral contract and
       package boundary exists
