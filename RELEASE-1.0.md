@@ -10946,7 +10946,7 @@ candidate docs.
 
 ## Phase 5 — Automation
 
-- [ ] **Fix two timing-sensitive specs that fail under parallel load.**
+- [x] **Fix two timing-sensitive specs that fail under parallel load.**
       `status.spec.ts` "should initialize 100 markers in under 50ms" and
       `production-scalar-substrate.benchmark.spec.ts` "public undo-of-remove
       realization" both failed transiently during Phase 1 runs and pass on a
@@ -10961,6 +10961,18 @@ candidate docs.
       included, so the flakiness above currently cannot be diagnosed through the
       documented command — see "Newly discovered" under slice 1. `npx vitest
       run` from `packages/core` reports normally.
+
+      Done at `1c67f91b`: the stored-marker wall-clock performance
+      suite is already gated behind `ST_PERF=1`; the public undo-of-remove
+      100k complexity audit now has the same explicit `20_000` timeout as the
+      neighboring large structural audits; and `nx test core` now routes through
+      `tools/run-core-vitest.mjs`, preserving the documented command while
+      streaming Vitest's own failure names and stacks. Validation:
+      `node --check tools/run-core-vitest.mjs`,
+      `pnpm nx test core --testFile=packages/core/src/lib/production-scalar-substrate.benchmark.spec.ts --skip-nx-cache --output-style=static`,
+      `pnpm nx test core --testFile packages/core/src/lib/production-scalar-substrate.benchmark.spec.ts --skip-nx-cache --output-style=static`,
+      `pnpm nx test core --testNamePattern="should initialize 100 markers" --skip-nx-cache --output-style=static`,
+      `pnpm nx test core --skip-nx-cache --output-style=static`.
 
 - [ ] CI release gate
 - [ ] trusted publishing/provenance
