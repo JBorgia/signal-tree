@@ -1307,9 +1307,8 @@ export function createEntitySignal<
     };
 
     const entitySig = () => {
-      getSubjectStateSignal(subjectId)();
-      const resolved = resolveEntityHandleForTesting(handle);
-      return resolved.state === 'active' ? resolved.value : undefined;
+      const key = currentKey();
+      return key === undefined ? undefined : getEntitySignal(key)();
     };
 
     const node = ((valueOrUpdater?: E | ((current: E) => E)): E | undefined => {
