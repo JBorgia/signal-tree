@@ -10861,16 +10861,24 @@ else.
 ## Phase 3 — Packaging Proof
 
 - [x] preflight: close Gate B reviewer lint finding — move `isTraversableNode`
-  helper to private `@signaltree/shared` and consume it from `ng-forms`;
-  validation: `pnpm nx lint ng-forms --output-style=static`,
-  `pnpm nx lint shared --output-style=static`, shared/ng-forms tests,
-  `pnpm nx build ng-forms --skip-nx-cache --output-style=static`,
-  `npm run typecheck:source`
-- [ ] audit built package output
-- [ ] `npm pack` every publishable package
-- [ ] verify tarball exports/types/layout
-- [ ] clean TypeScript consumer smoke project
-- [ ] clean Angular consumer smoke project
+      helper to private `@signaltree/shared` and consume it from `ng-forms`;
+      validation: `pnpm nx lint ng-forms --output-style=static`,
+      `pnpm nx lint shared --output-style=static`, shared/ng-forms tests,
+      `pnpm nx build ng-forms --skip-nx-cache --output-style=static`,
+      `npm run typecheck:source`
+- [x] audit built package output —
+  `nx run-many -t build --projects=core,ng-forms,shared,events --output-style=static`,
+  `node scripts/verify-package-hygiene.js`,
+  `node scripts/verify-publish-artifacts.mjs core events ng-forms`
+- [x] `npm pack` every publishable package — covered by
+  `node scripts/verify-package-hygiene.js` and
+  `node tools/verify-tarball-consumer.mjs`
+- [x] verify tarball exports/types/layout —
+  `node tools/verify-tarball-consumer.mjs`
+- [x] clean TypeScript consumer smoke project —
+  `node tools/verify-consumer-typecheck.mjs`
+- [x] clean Angular consumer smoke project —
+  `node tools/verify-angular-consumer.mjs`
 
 Exit condition: `GATE C`
 
