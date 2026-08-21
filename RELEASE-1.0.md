@@ -10907,7 +10907,10 @@ and clean stale `dist/packages/*` artifacts for deleted packages.
       stored, hydration and SSR specs passed (98/98); active persistence docs
       reviewed: `docs/guides/persistence-guide.md`,
       `docs/guides/persistence-and-security.md`
-- [ ] SSR/hydration decision and tests/docs
+- [x] SSR/hydration decision and tests/docs — focused SSR/hydration specs passed
+  (29/29): `ssr-transfer`, `rehydrate-ownership`, `hydrate-decisions`,
+  `rehydration`, `marker-serialization`, `marker-roundtrip`; active guide
+  reviewed: `docs/guides/ssr-and-hydration.md`
 - [ ] README upgrade
 - [ ] docs/examples/demo
 - [ ] package metadata/license/security audit
