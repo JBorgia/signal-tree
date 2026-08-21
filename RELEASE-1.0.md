@@ -10997,7 +10997,13 @@ candidate docs.
       `c2a93b5d`. Validation: npm trusted-publishing docs review,
       `bash -n scripts/ci-publish.sh`, workflow YAML parse via Ruby,
       `GITHUB_ACTIONS=true NPM_CONFIG_PROVENANCE=true bash scripts/ci-publish.sh --dry-run`.
-- [ ] clean-checkout release flow
+- [x] clean-checkout release flow — added
+  `scripts/verify-clean-checkout-release-flow.sh`, which clones committed
+  `HEAD` into a temporary directory, installs from the frozen lockfile,
+  builds publishable packages, runs `node tools/verify-gates.mjs --fast`,
+  and exercises `ci-publish.sh --dry-run` through the GitHub Actions OIDC
+  branch. Done at `88b82a8a`. Validation:
+  `bash scripts/verify-clean-checkout-release-flow.sh`.
 - [ ] final performance baseline generation
 
 Exit condition: `GATE E`
