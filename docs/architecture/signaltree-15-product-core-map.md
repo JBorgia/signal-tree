@@ -377,17 +377,17 @@ document's provisional placement and carries no weight.
 | `defineStore()`                              | P-F      | observer adapter | KA    | Angular DI integration; owner Angular (realization)                                                    |
 | enhancer protocol (`.with()`)                | —        | —                | ⚠     | `.with()` canonical and FROZEN as the only door; post-exposure composition DELETE. **blocking GATE B** |
 | marker processor protocol / `core/authoring` | —        | —                | LC    | M1/M2 CLOSED — third-party extension NOT EARNED; no entitlement                                        |
-| `@signaltree/authoring`                      | —        | —                | ⚠     | **DOES NOT EXIST.** Phase 2, in progress                                                               |
+| `@signaltree/authoring`                      | —        | —                | ⚠     | **DOES NOT EXIST.** Package/form STOPPED and UNPROVEN; derive external implementer needs first         |
 
 ### I — packages
 
-| Package                  | Class | Ledger state                                                         |
-| ------------------------ | ----- | -------------------------------------------------------------------- |
-| `@signaltree/events`     | KA    | root emits `zod` only — the neutrality shape the others should reach |
-| `@signaltree/guardrails` | —     | **DELETED in 15.0** — diagnostics did not earn package survival      |
-| `@signaltree/ng-forms`   | KA    | Angular adapter?; `/audit` is a pure re-export                       |
+| Package                  | Class | Ledger state                                                                 |
+| ------------------------ | ----- | ---------------------------------------------------------------------------- |
+| `@signaltree/events`     | KA    | root emits `zod` only — the neutrality shape the others should reach         |
+| `@signaltree/guardrails` | —     | **DELETED in 15.0** — diagnostics did not earn package survival              |
+| `@signaltree/ng-forms`   | KA    | Angular adapter?; `/audit` is a pure re-export                               |
 | `@signaltree/realtime`   | —     | **DELETED in 15.0** — external synchronization did not earn package survival |
-| `@signaltree/shared`     | ⚠     | version drift flagged; unpublished                                   |
+| `@signaltree/shared`     | ⚠     | version drift flagged; unpublished                                           |
 
 ---
 
