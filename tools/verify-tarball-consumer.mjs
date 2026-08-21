@@ -46,7 +46,6 @@ const DIST = join(ROOT, 'dist', 'packages');
 const PACKAGES = [
   'core',
   'ng-forms',
-  'realtime',
   'events',
   'shared',
 ];

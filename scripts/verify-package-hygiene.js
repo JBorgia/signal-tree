@@ -31,7 +31,6 @@ const PACKAGES = [
   'core',
   'events',
   'ng-forms',
-  'realtime',
 ];
 
 /** Files that must NEVER appear in a published tarball. */

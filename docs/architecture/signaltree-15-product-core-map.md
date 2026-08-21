@@ -386,7 +386,7 @@ document's provisional placement and carries no weight.
 | `@signaltree/events`     | KA    | root emits `zod` only — the neutrality shape the others should reach |
 | `@signaltree/guardrails` | —     | **DELETED in 15.0** — diagnostics did not earn package survival      |
 | `@signaltree/ng-forms`   | KA    | Angular adapter?; `/audit` is a pure re-export                       |
-| `@signaltree/realtime`   | ⚠     | reset to R0 OWNERSHIP; emits `@angular/core`                         |
+| `@signaltree/realtime`   | —     | **DELETED in 15.0** — external synchronization did not earn package survival |
 | `@signaltree/shared`     | ⚠     | version drift flagged; unpublished                                   |
 
 ---

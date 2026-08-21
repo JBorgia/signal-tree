@@ -50,7 +50,6 @@ const PROJECTS = [
   'packages/ng-forms',
   'packages/shared',
   'packages/events',
-  'packages/realtime',
   'apps/demo',
   // tools/ and scripts/ are NOT nx projects, so `nx run-many -t lint` never
   // reaches them and this list did not either — it was written from the nx

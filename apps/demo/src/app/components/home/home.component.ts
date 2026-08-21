@@ -70,7 +70,7 @@ export class HomeComponent {
     {
       title: 'Read package docs',
       description:
-        'Browse the core package first, then optional packages like realtime, events, and forms.',
+        'Browse the core package first, then optional packages like events and forms.',
       route: '/docs',
       cta: 'Browse documentation →',
     },
@@ -106,14 +106,6 @@ export class HomeComponent {
       route: '/docs',
       queryParams: { package: 'events' },
       cta: 'Read events docs →',
-    },
-    {
-      title: '@signaltree/realtime',
-      description:
-        'Keep entity maps in sync with live data sources while preserving SignalTree’s path-based ergonomics.',
-      route: '/docs',
-      queryParams: { package: 'realtime' },
-      cta: 'Read realtime docs →',
     },
     {
       title: '@signaltree/ng-forms',
@@ -237,7 +229,6 @@ npm install @signaltree/core
 
 # Optional packages
 npm install @signaltree/ng-forms
-npm install @signaltree/realtime
 npm install @signaltree/events`,
     },
     {

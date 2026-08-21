@@ -177,7 +177,7 @@ export class UserOps {
 ```
 
 For typed event-driven flows: import `@signaltree/events`.
-For WebSocket/SSE sync into entity maps: import `@signaltree/realtime`.
+For WebSocket/SSE sync into entity maps: wire your transport to ordinary entity-map operations in application code.
 
 ## Anti-patterns to avoid
 
@@ -294,7 +294,7 @@ Quick rules:
 - Markers (`entityMap`, `status`, `stored`, `form`) attach at any node in the initial-state literal, not at the root.
 - Derived state via `.derived($ => ({...}))` deep-merges into the tree. Use `derivedFrom<TTree>()(fn)` (curried) for derived in separate files.
 - Enhancers: `.with(batching())`, `.with(devTools())`, `.with(timeTravel({maxHistorySize}))`, `.with(persistence(config))`, `.with(serialization())`.
-- All exports live in `@signaltree/core` except: `@signaltree/ng-forms`, `@signaltree/events`, `@signaltree/realtime`. No `@signaltree/time-travel`, `@signaltree/storage`, `@signaltree/enterprise`, `@signaltree/callable-syntax`, or `@signaltree/guardrails` — those are hallucinations. `@signaltree/schema` was DELETED in 15.0 — SignalTree ships no validation API; validate with your own validator against values read from the tree.
+- All exports live in `@signaltree/core` except: `@signaltree/ng-forms`, `@signaltree/events`. No `@signaltree/time-travel`, `@signaltree/storage`, `@signaltree/realtime`, `@signaltree/enterprise`, `@signaltree/callable-syntax`, or `@signaltree/guardrails` — those are hallucinations. `@signaltree/schema` was DELETED in 15.0 — SignalTree ships no validation API; validate with your own validator against values read from the tree.
 - For production architecture, wrap the tree in @Injectable() with an `ops.domain.method()` namespace for mutations. See docs/architecture/signaltree-architecture-guide.md.
 
 Avoid: `.with(entities())` (removed), manual loading shapes (use `status()`), entity duplication (derive from selected ID), and any @signaltree/* package not listed above.

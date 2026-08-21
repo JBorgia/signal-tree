@@ -44,7 +44,6 @@ PACKAGES=(
     "core"            # Main package with all enhancers (batching, devtools, etc.)
     "events"          # Event-driven architecture (BullMQ, NestJS, testing)
     "ng-forms"        # Angular forms integration
-    "realtime"        # Real-time sync with Supabase/WebSocket
 )
 
 # Parse command line arguments

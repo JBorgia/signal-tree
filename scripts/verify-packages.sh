@@ -37,7 +37,6 @@ PACKAGES=(
     "core"
     "ng-forms"
     "events"
-    "realtime"
 )
 
 ISSUES_FOUND=0

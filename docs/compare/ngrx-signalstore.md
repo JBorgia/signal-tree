@@ -171,7 +171,7 @@ The "any component can mutate" concern is overstated on both sides:
 | **Input flexibility**              | Raw value, Signal, or Observable                                    | Signal-driven via `input` (asyncQuery) or explicit `refresh()` (asyncSource) |
 | **Auto-cleanup**                   | `DestroyRef`                                                        | `DestroyRef` (same)                                                          |
 | **Event-bus pattern**              | `@ngrx/store` (classic) or community packages                       | `@signaltree/events` provides typed events                                   |
-| **WebSocket/SSE sync**             | Manual wiring                                                       | `@signaltree/realtime`                                                       |
+| **WebSocket/SSE sync**             | Manual wiring                                                       | Manual wiring to entity-map operations                                       |
 
 **Honest take:** The async story is where SignalTree's marker philosophy shines compared to NgRx's `withMethods` composition. The marker pattern eliminates the entire `tap(() => setLoading())` / `setLoaded()` ceremony and co-locates the async behavior with the data:
 

@@ -90,7 +90,7 @@ const GATES = [
       // `nx test demo` by hand. It is also the app the demo-coverage gate holds
       // up as proof every export is demonstrated — so it breaking silently would
       // undermine that gate too.
-      '--projects=core,ng-forms,shared,events,realtime,demo',
+      '--projects=core,ng-forms,shared,events,demo',
       '--skip-nx-cache',
     ],
     slow: true,
@@ -847,7 +847,7 @@ const selected = GATES.filter(
  * half-written `dist/` produce noise, and "the build is broken" is the finding,
  * not a footnote to twenty-three other failures.
  */
-const BUILD_PROJECTS = 'core,shared,ng-forms,events,realtime';
+const BUILD_PROJECTS = 'core,shared,ng-forms,events';
 
 function buildOnceIfNeeded() {
   if (!selected.some((g) => g.needsBuild)) return;

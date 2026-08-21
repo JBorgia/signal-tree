@@ -454,7 +454,6 @@ store.registerCleanup(() => ws.close());
 | ---------------------- | ------------------------------------------------------------------- |
 | `@signaltree/ng-forms` | Two-way binding between SignalTree nodes and Angular reactive forms |
 | `@signaltree/events`   | Event-oriented helpers for reacting to state changes                |
-| `@signaltree/realtime` | Keep entity maps in sync with live data sources (WebSocket, SSE)    |
 
 ## Real-World Migration (Case Study)
 
