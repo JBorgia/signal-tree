@@ -113,6 +113,52 @@ describe('E-INT — write-path authority', () => {
     expect(tree.$.rows.byId('bad')?.n()).toBe(-1);
   });
 
+  it('DR-2 — thenable update interceptors fail closed before the update lands', async () => {
+    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    tree.$.rows.addOne({ id: 'a', n: 1 });
+    let transformAttempted = false;
+
+    tree.$.rows.intercept({
+      onUpdate: (_id, _changes, ctx) => {
+        return Promise.resolve().then(() => {
+          transformAttempted = true;
+          ctx.transform({ n: 99 });
+        });
+      },
+    });
+
+    expect(() => tree.$.rows.updateOne('a', { n: 2 })).toThrow(/ST2033/);
+    expect(tree.$.rows.byId('a')?.n()).toBe(1);
+
+    await tick();
+
+    expect(transformAttempted).toBe(true);
+    expect(tree.$.rows.byId('a')?.n()).toBe(1);
+  });
+
+  it('DR-2 — thenable remove interceptors fail closed before the removal lands', async () => {
+    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    tree.$.rows.addOne({ id: 'a', n: 1 });
+    let blockAttempted = false;
+
+    tree.$.rows.intercept({
+      onRemove: (_id, _entity, ctx) => {
+        return Promise.resolve().then(() => {
+          blockAttempted = true;
+          ctx.block('too late');
+        });
+      },
+    });
+
+    expect(() => tree.$.rows.removeOne('a')).toThrow(/ST2033/);
+    expect(tree.$.rows.byId('a')?.n()).toBe(1);
+
+    await tick();
+
+    expect(blockAttempted).toBe(true);
+    expect(tree.$.rows.byId('a')?.n()).toBe(1);
+  });
+
   it('DEFECT — ctx.blocked / ctx.blockReason are vestigial: block() throws instead of setting them', () => {
     const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
     let observedBlocked: boolean | undefined;
