@@ -83,39 +83,33 @@ describe('E-INT — write-path authority', () => {
     expect(tree.$.rows.ids()).toEqual(['ok']);
   });
 
-  it('DEFECT — an ASYNC interceptor does NOT block: the type says Promise, the call site never awaits', async () => {
+  it('DR-2 — async interceptors fail closed before any mutation can land', async () => {
     const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
 
-    // `InterceptHandlers.onAdd` is declared `=> void | Promise<void>`, so this
-    // is a form the PUBLIC TYPE invites. Every call site iterates handlers in a
-    // plain synchronous loop with no await.
+    // TypeScript allows an async function where a void-returning callback is
+    // expected, so runtime still has to fail closed before a synchronous write
+    // path can commit.
     let blockAttempted = false;
-    tree.$.rows.intercept({
-      onAdd: async (e, ctx) => {
-        await Promise.resolve();
-        if (e.n < 0) {
-          blockAttempted = true;
-          // The throw is caught HERE only so it does not surface as an
-          // unhandled rejection and fail the run. In production nothing catches
-          // it: the rejection is the entire trace the fail-open ever left,
-          // which is why the defect was invisible.
-          try {
+    expect(() =>
+      tree.$.rows.intercept({
+        onAdd: async (e, ctx) => {
+          await Promise.resolve();
+          if (e.n < 0) {
+            blockAttempted = true;
             ctx.block('negative');
-          } catch {
-            /* swallowed by the promise, exactly as in production */
           }
-        }
-      },
-    });
+        },
+      })
+    ).toThrow(/ST2033/);
 
-    // No throw — the write is already committed by the time the handler resumes.
     expect(() => tree.$.rows.addOne({ id: 'bad', n: -1 })).not.toThrow();
     expect(tree.$.rows.ids()).toEqual(['bad']);
 
     await tick();
 
-    // The handler DID try to block. Its rejection landed nowhere.
-    expect(blockAttempted).toBe(true);
+    // The async handler was never admitted, so no delayed block can leak in after
+    // the synchronous mutation path has already made a decision.
+    expect(blockAttempted).toBe(false);
     expect(tree.$.rows.byId('bad')?.n()).toBe(-1);
   });
 
