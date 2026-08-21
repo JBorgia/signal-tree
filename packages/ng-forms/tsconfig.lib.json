@@ -22,9 +22,6 @@
       ],
       "@signaltree/shared/*": [
         "../../packages/shared/src/*"
-      ],
-      "@signaltree/core/authoring": [
-        "packages/core/src/authoring.ts"
       ]
     }
   },
