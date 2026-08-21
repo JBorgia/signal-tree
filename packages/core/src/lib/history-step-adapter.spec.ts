@@ -22,6 +22,7 @@ type EntityHistoryStepStore = {
   $: {
     rows: {
       addOne(row: Row): void;
+      setAll(rows: Row[]): void;
       updateOne(id: number, changes: Partial<Row>): void;
       removeOne(id: number): void;
       ids(): number[];
@@ -170,6 +171,41 @@ describe('history step adapter seam', () => {
       store.$.rows.addOne({ id: 3, label: 'add' });
       store.$.rows.updateOne(1, { label: 'updated' });
       store.$.rows.removeOne(2);
+    });
+
+    expect(store.$.rows.ids()).toEqual([1, 3]);
+    expect(store.$.rows.byId(1)?.label()).toBe('updated');
+    expect(store.$.rows.byId(2)).toBeUndefined();
+    expect(store.$.rows.byId(3)?.label()).toBe('add');
+
+    step.confirm();
+    await tick();
+
+    expect(store.getHistory()).toHaveLength(initialHistoryLength + 1);
+
+    store.undo();
+    await tick();
+
+    expect(store.$.rows.ids()).toEqual([1, 2]);
+    expect(store.$.rows.byId(1)?.label()).toBe('keep');
+    expect(store.$.rows.byId(2)?.label()).toBe('remove');
+    expect(store.$.rows.byId(3)).toBeUndefined();
+  });
+
+  it('confirms wholesale entity replacement as one user-recognizable undo step', async () => {
+    const store = createEntityStore();
+    store.$.rows.setAll([
+      { id: 1, label: 'keep' },
+      { id: 2, label: 'remove' },
+    ]);
+    await tick();
+    const initialHistoryLength = store.getHistory().length;
+
+    const step = store.transaction(() => {
+      store.$.rows.setAll([
+        { id: 1, label: 'updated' },
+        { id: 3, label: 'add' },
+      ]);
     });
 
     expect(store.$.rows.ids()).toEqual([1, 3]);
