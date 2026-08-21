@@ -441,15 +441,18 @@ const isValid = registry.validate(event);
 ```json
 {
   "zod": "^3.0.0",
-  "@angular/core": "^18.0.0 || ^19.0.0 || ^20.0.0",
+  "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
   "rxjs": "^7.0.0",
   "@nestjs/common": "^10.0.0 || ^11.0.0",
   "bullmq": "^5.0.0",
+  "@signaltree/core": "workspace:*",
   "reflect-metadata": "^0.1.13 || ^0.2.0"
 }
 ```
 
-All peer dependencies except `zod` are optional - only install what you need for your framework.
+All peer dependencies except `zod` are optional. Install only the peers required
+by the subpaths you import: Angular/RxJS for `./angular`, NestJS/BullMQ for
+`./nestjs`, and `@signaltree/core` only for the Angular entityMap bridge types.
 
 ## License
 
