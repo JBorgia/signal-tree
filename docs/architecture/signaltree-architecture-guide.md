@@ -64,7 +64,7 @@ This yields the best DX: a single dot-notation state universe, one DevTools inst
 
 ```typescript
 // app-tree.ts
-import { signalTree, entityMap, status, stored } from '@signaltree/core';
+import { signalTree, entityMap, stored } from '@signaltree/core';
 
 export function createAppTree() {
   return signalTree({
@@ -72,8 +72,8 @@ export function createAppTree() {
     users: entityMap<User, string>(),
     posts: entityMap<Post, string>(),
 
-    // status() - auto loading state tracking
-    usersStatus: status(),
+    // Ordinary loading state
+    usersStatus: 'not-loaded' as 'not-loaded' | 'loading' | 'loaded' | 'error',
 
     // stored() - auto localStorage persistence
     ui: {
@@ -1132,44 +1132,31 @@ entityMap<Plant>();
 
 When using `entityMap` directly at the domain level, you have two options for loading state:
 
-#### Approach A: Using `status()` Marker (Recommended for v7+)
+#### Approach A: Explicit loading state
 
-The `status()` marker provides automatic loading state with derived convenience signals.
+Use ordinary state for local loading flags, and derive any convenience predicates with Angular `computed()`.
 
 ```typescript
-import { status } from '@signaltree/core';
+import { computed } from '@angular/core';
+import { entityMap } from '@signaltree/core';
 
-{
+const state = {
   plants: {
     entities: entityMap<Plant, number>(),
-    status: status<ApiError>()  // Auto-creates state, error + read predicates
+    loadStatus: 'not-loaded' as 'not-loaded' | 'loading' | 'loaded' | 'error',
+    error: null as ApiError | null,
   },
-}
+};
 
-// Access — bare-name predicates (the `is`-prefixed aliases were REMOVED in v11)
-tree.$.plants.status.state()       // LoadingState enum
-tree.$.plants.status.error()       // ApiError | null
-tree.$.plants.status.notLoaded()   // boolean — strictly state === NotLoaded
-tree.$.plants.status.loading()     // boolean
-tree.$.plants.status.loaded()      // boolean
-tree.$.plants.status.hasError()    // boolean (NOT `error()` — that's the value)
-tree.$.plants.status.idle()        // !loading() && !loaded() — covers NotLoaded AND Error
-tree.$.plants.status.settled()     // loaded() || hasError() — "stop the spinner"
-
-// In a guard/resolver use idle(), NOT notLoaded(): notLoaded() is false once a load
-// has errored, so a notLoaded()-gated fetch silently never retries.
+const isLoading = computed(() => tree.$.plants.loadStatus() === 'loading');
 
 // Mutations
-tree.$.plants.status.setLoading()
-tree.$.plants.status.setLoaded()
-tree.$.plants.status.setError(error)
-tree.$.plants.status.reset()
-
-// With custom error type:
-status: status<NotifyErrorModel>()  // error() returns NotifyErrorModel | null
+tree.$.plants.loadStatus.set('loading');
+tree.$.plants.loadStatus.set('loaded');
+tree.$.plants.error.set(error);
 ```
 
-**Pros:** Less boilerplate, auto-derived signals, type-safe error handling.
+**Pros:** Explicit shape, no extra marker semantics.
 
 #### Approach B: Manual Loading State (Legacy)
 
@@ -1200,26 +1187,25 @@ Loading state as sibling to entity collection.
 ```typescript
 {
   plants: entityMap<Plant, number>(),
-  plantsStatus: status(),  // or manual loading state
+  plantsStatus: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
 }
 
 // Access
-tree.$.plantsStatus.loading()
+tree.$.plantsStatus()
 ```
 
 **Pros:** Flatter structure, simpler when using `entityMap` directly.
 
 #### Which to Choose?
 
-| Scenario                                                  | Recommendation                |
-| --------------------------------------------------------- | ----------------------------- |
-| New v7+ projects                                          | Approach A (`status()`)       |
-| Domain has multiple pieces (entities, filters, selection) | Approach A                    |
-| Custom error types needed                                 | Approach A with `status<E>()` |
-| Domain is just an entity collection                       | Approach C                    |
-| Legacy code migration                                     | Approach B                    |
+| Scenario                                                  | Recommendation |
+| --------------------------------------------------------- | -------------- |
+| New projects                                              | Approach A     |
+| Domain has multiple pieces (entities, filters, selection) | Approach A     |
+| Domain is just an entity collection                       | Approach C     |
+| Legacy code migration                                     | Approach B     |
 
-**v7 Recommendation:** Use `status()` marker for new code. It reduces boilerplate and provides type-safe derived signals.
+**Recommendation:** keep loading state explicit unless `entityMap({ load: loader(...) })` owns the loading lifecycle.
 
 ---
 

@@ -12,6 +12,8 @@
 
 SignalTree treats application state as **reactive JSON** — a typed, dot-notation interface to plain JSON-like objects with fine-grained reactivity layered transparently on top.
 
+Supports Angular 20, 21, or 22.
+
 You don't model state as actions, reducers, selectors, or classes — you model it as **data**.
 
 ### Core Philosophy
@@ -53,12 +55,12 @@ import { batching } from '@signaltree/core/enhancers/batching';
 
 ### Marker Tree-Shaking (Self-Registering)
 
-Built-in markers (`entityMap()`, `status()`, `stored()`) are **self-registering** - they only add their processor code when you actually use them:
+Built-in markers (`entityMap()`, `stored()`, `asyncSource()`, `asyncQuery()`) are **self-registering** - they only add their processor code when you actually use them:
 
 ```ts
-// ✅ Only status() code is bundled (entityMap and stored tree-shaken out)
-import { signalTree, status } from '@signaltree/core';
-const tree = signalTree({ loadState: status() });
+// ✅ Only stored() code is bundled (entityMap and async markers tree-shaken out)
+import { signalTree, stored } from '@signaltree/core';
+const tree = signalTree({ theme: stored('theme', 'light') });
 
 // ✅ Minimal bundle - no marker code included
 import { signalTree } from '@signaltree/core';
@@ -67,7 +69,7 @@ const tree = signalTree({ count: 0 });
 
 **How it works:**
 
-- Each marker factory (`status()`, `stored()`, `entityMap()`) registers its processor on first call
+- Each marker factory (`stored()`, `entityMap()`, `asyncSource()`, `asyncQuery()`) registers its processor on first call
 - If you never call a marker factory, its code is completely eliminated
 - Zero import-time side effects - registration is lazy and automatic
 
@@ -201,11 +203,9 @@ tree.$.form.submitted.set(true);
 When tests need synchronous notification delivery, use `flushSync()`:
 
 ```typescript
-import { getPathNotifier } from '@signaltree/core';
-
 it('updates state', () => {
   tree.$.count.set(5);
-  getPathNotifier().flushSync();
+  await Promise.resolve();
   expect(subscriber).toHaveBeenCalledWith(5, 0);
 });
 ```
@@ -420,12 +420,13 @@ effect(() => {
 // 5. Use factory functions for parameterized computations
 ```
 
-### Performance optimization with memoization
+### Performance optimization with computed values
 
-Computed values become even more powerful with the built-in memoization enhancer:
+Computed values are Angular-native and memoized by default:
 
 ```typescript
-import { signalTree, memoization } from '@signaltree/core';
+import { computed } from '@angular/core';
+import { signalTree } from '@signaltree/core';
 
 const tree = signalTree({
   items: Array.from({ length: 10000 }, (_, i) => ({
@@ -433,9 +434,9 @@ const tree = signalTree({
     value: Math.random(),
     category: `cat-${i % 10}`,
   })),
-}).with(memoization());
+});
 
-// Expensive computation - automatically cached by memoization enhancer
+// Expensive computation - automatically cached by Angular computed()
 const expensiveComputation = computed(() => {
   return tree.$.items()
     .filter((item) => item.value > 0.5)
@@ -643,27 +644,16 @@ All enhancers are exported directly from `@signaltree/core`:
 **Performance Enhancers:**
 
 - `batching()` - Batch updates to reduce recomputation and rendering
-- `memoization()` - Intelligent caching for expensive computations
-- `highPerformanceBatching()` - Advanced batching for high-frequency updates
-- `withHighPerformanceMemoization()` - Optimized memoization for large state trees
 
 **Data Management:**
 
-- `entities()` - Advanced CRUD operations for collections
-- `createAsyncOperation()` - Async operation management with loading/error states
-- `trackAsync()` - Track async operations in your state
 - `serialization()` - State persistence and SSR support
 - `persistence()` - Auto-save to localStorage/IndexedDB
 
 **Development Tools:**
 
 - `devTools()` - Redux DevTools auto-connect, path actions, and time-travel dispatch
-- `withTimeTravel()` - Undo/redo functionality
-
-**Presets:**
-
-- `createDevTree()` - Pre-configured development setup
-- `TREE_PRESETS` - Common configuration patterns
+- `timeTravel()` - Undo/redo functionality
 
 #### Additional Packages
 
@@ -678,24 +668,21 @@ These are the **only** separate packages in the SignalTree ecosystem:
 ```typescript
 import { signalTree, batching, devTools } from '@signaltree/core';
 
-// Apply enhancers in order
-const tree = signalTree({ count: 0 }).with(
-  batching(), // Performance optimization
-  devTools() // Development tools
-);
+// Apply enhancers one at a time
+const tree = signalTree({ count: 0 })
+  .with(batching()) // Performance optimization
+  .with(devTools()); // Development tools
 ```
 
 **Performance-Focused Stack:**
 
 ```typescript
-import { signalTree, batching, memoization, entities } from '@signaltree/core';
+import { signalTree, batching, entityMap } from '@signaltree/core';
 
 const tree = signalTree({
   products: entityMap<Product>(),
   ui: { loading: false },
-})
-  .with(entities()) // Efficient CRUD operations (auto-detects entityMap)
-  .with(batching()); // Batch updates for optimal rendering
+}).with(batching()); // Batch updates for optimal rendering
 
 // Entity CRUD operations
 tree.$.products.addOne(newProduct);
@@ -708,19 +695,18 @@ const electronics = tree.$.products.all.filter((p) => p.category === 'electronic
 **Full-Stack Application:**
 
 ```typescript
-import { signalTree, serialization, withTimeTravel } from '@signaltree/core';
+import { signalTree, serialization, timeTravel, devTools } from '@signaltree/core';
 
 const tree = signalTree({
   user: null as User | null,
   preferences: { theme: 'light' },
 }).with(
-  // withAsync removed — API integration patterns are now covered by async helpers
   serialization({
     // Auto-save to localStorage
     autoSave: true,
     storage: 'localStorage',
   }),
-  withTimeTravel() // Undo/redo support
+  timeTravel() // Undo/redo support
 );
 
 // For async operations, use manual async or async helpers
@@ -743,54 +729,21 @@ tree.$.preferences.theme('dark'); // Auto-saved
 tree.undo(); // Revert changes
 ```
 
-#### Enhancer Metadata & Ordering
-
-Derived computed signals are preserved across `.with()` chaining, so enhancer composition does not recreate signal identities.
-
-Enhancers can declare metadata for automatic dependency resolution:
-
-```typescript
-// Enhancers are automatically ordered based on requirements
-const tree = signalTree(state).with(
-  devTools(), // Requires: core, provides: debugging
-  batching(), // Requires: core, provides: batching
-  memoization() // Requires: batching, provides: caching
-);
-// Automatically ordered: batching -> memoization -> devtools
-```
-
-#### Quick Start with Presets
-
-For common patterns, use presets that combine multiple enhancers:
-
-```typescript
-import { createDevTree, TREE_PRESETS } from '@signaltree/core';
-
-// Development preset includes: batching, memoization, devtools, time-travel
-const devTree = createDevTree({
-  products: [] as Product[],
-  cart: { items: [], total: 0 },
-});
-
-// Or use preset configurations
-const customTree = signalTree(state, TREE_PRESETS.DASHBOARD);
-```
-
 #### Core Stubs
 
 SignalTree Core includes all enhancer functionality built-in. No separate packages needed:
 
 ```typescript
-import { signalTree, entityMap, entities } from '@signaltree/core';
+import { signalTree, entityMap } from '@signaltree/core';
 
 // Without entityMap - use manual array updates
 const basic = signalTree({ users: [] as User[] });
 basic.$.users.update((users) => [...users, newUser]);
 
-// With entityMap + entities - use entity helpers
+// With entityMap - use entity helpers
 const enhanced = signalTree({
   users: entityMap<User>(),
-}).with(entities());
+});
 
 enhanced.$.users.addOne(newUser); // ✅ Advanced CRUD operations
 enhanced.$.users.byId(123)(); // ✅ O(1) lookups
@@ -1047,46 +1000,24 @@ const tree = signalTree({
 tree.$.users.upsertOne(user, { selectId: (u) => u.odataId });
 ```
 
-### 10) `status()` - Manual Async State
+### 10) Manual Async State
 
-Creates a status signal for manual async state management with type-safe error handling.
+Use ordinary state for local operation flags, or `entityMap({ load: loader(...) })` for cache-aware loading.
 
 ```typescript
-import { signalTree, status, LoadingState } from '@signaltree/core';
-
-interface ApiError {
-  code: number;
-  message: string;
-}
+import { signalTree } from '@signaltree/core';
 
 const tree = signalTree({
   users: {
     data: [] as User[],
-    loadStatus: status<ApiError>(), // Generic error type
+    loadStatus: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
   },
 });
 
-// Status API
-tree.$.users.loadStatus.state(); // Signal<LoadingState>
-tree.$.users.loadStatus.error(); // Signal<ApiError | null>
+tree.$.users.loadStatus.set('loading');
 
-// Convenience signals
-tree.$.users.loadStatus.isNotLoaded(); // Signal<boolean>
-tree.$.users.loadStatus.isLoading(); // Signal<boolean>
-tree.$.users.loadStatus.isLoaded(); // Signal<boolean>
-tree.$.users.loadStatus.isError(); // Signal<boolean>
-
-// Update methods
-tree.$.users.loadStatus.setLoading();
-tree.$.users.loadStatus.setLoaded();
-tree.$.users.loadStatus.setError({ code: 404, message: 'Not found' });
-tree.$.users.loadStatus.reset();
-
-// LoadingState enum
-LoadingState.NotLoaded; // 'not-loaded'
-LoadingState.Loading; // 'loading'
-LoadingState.Loaded; // 'loaded'
-LoadingState.Error; // 'error'
+tree.$.users.loadStatus(); // 'idle' | 'loading' | 'loaded' | 'error'
+tree.$.users.loadStatus.set('loaded');
 ```
 
 ### 11) `stored(key, default, options?)` - localStorage Persistence
@@ -1186,12 +1117,12 @@ stored('key', defaultValue, {
 });
 ```
 
-### 12) `form(config)` - Tree-Integrated Forms
+### 12) Angular Forms Integration
 
-Creates forms with validation, wizard navigation, and persistence that live inside SignalTree.
+Use `@signaltree/ng-forms` when you need Angular `FormGroup` interop backed by SignalTree state.
 
 ```typescript
-import { signalTree, form, validators } from '@signaltree/core';
+import { createFormTree, ngFormValidators } from '@signaltree/ng-forms';
 
 interface ContactForm {
   name: string;
@@ -1200,57 +1131,45 @@ interface ContactForm {
   message: string;
 }
 
-const tree = signalTree({
-  contact: form<ContactForm>({
-    initial: { name: '', email: '', phone: '', message: '' },
+const form = createFormTree<ContactForm>(
+  { name: '', email: '', phone: '', message: '' },
+  {
     validators: {
-      name: validators.required('Name is required'),
-      email: [validators.required('Email is required'), validators.email('Invalid email format')],
-      phone: validators.pattern(/^\+?[\d\s-]+$/, 'Invalid phone number'),
-      message: validators.minLength(10, 'Message must be at least 10 characters'),
+      name: ngFormValidators.required('Name is required'),
+      email: [ngFormValidators.required('Email is required'), ngFormValidators.email('Invalid email format')],
+      phone: ngFormValidators.pattern(/^\+?[\d\s-]+$/, 'Invalid phone number'),
+      message: ngFormValidators.minLength(10, 'Message must be at least 10 characters'),
     },
-  }),
-});
+  }
+);
+```
 
-// FormSignal API - Field access via $
-tree.$.contact.$.name(); // Get field value
-tree.$.contact.$.name.set('Jane'); // Set field value
-tree.$.contact.$.email();
+```typescript
+// FormTree API
+form.$.name(); // Get field value
+form.$.name.set('Jane'); // Set field value
+form.$.email();
 
 // Form-level operations
-tree.$.contact(); // Get all values: ContactForm
-tree.$.contact.set({ name: 'Jane', email: 'jane@example.com', phone: '', message: '' });
-tree.$.contact.patch({ name: 'Updated' }); // Partial update
-tree.$.contact.reset(); // Reset to initial values
-tree.$.contact.clear(); // Clear all values
-
-// Validation signals
-tree.$.contact.valid(); // Signal<boolean>
-tree.$.contact.dirty(); // Signal<boolean>
-tree.$.contact.submitting(); // Signal<boolean>
-tree.$.contact.touched(); // Signal<Record<keyof T, boolean>>
-tree.$.contact.errors(); // Signal<Partial<Record<keyof T, string>>>
-tree.$.contact.errorList(); // Signal<string[]>
-
-// Validation methods
-await tree.$.contact.validate(); // Validate all fields
-await tree.$.contact.validateField('email');
-tree.$.contact.touch('name'); // Mark field as touched
-tree.$.contact.touchAll(); // Mark all fields as touched
+form.unwrap();
+form.setValues({ name: 'Updated' });
+form.reset();
+await form.validate();
 ```
 
 #### Built-in Validators
 
 ```typescript
-import { validators } from '@signaltree/core';
+import { ngFormValidators } from '@signaltree/ng-forms';
 
-validators.required('Field is required')
-validators.minLength(5, 'Min 5 characters')
-validators.maxLength(100, 'Max 100 characters')
-validators.min(0, 'Must be positive')
-validators.max(100, 'Max 100')
-validators.email('Invalid email')
-validators.pattern(/regex/, 'Invalid format')
+ngFormValidators.required('Field is required')
+ngFormValidators.minLength(5, 'Min 5 characters')
+ngFormValidators.maxLength(100, 'Max 100 characters')
+ngFormValidators.min(0, 'Must be positive')
+ngFormValidators.max(100, 'Max 100')
+ngFormValidators.email('Invalid email')
+ngFormValidators.pattern(/regex/, 'Invalid format')
+});
 
 // Compose multiple validators
 validators: {
@@ -1498,22 +1417,19 @@ tree.effect(() => console.log('State changed'));
 ### Performance-Enhanced Composition
 
 ```typescript
-import { signalTree, batching, memoization } from '@signaltree/core';
+import { computed } from '@angular/core';
+import { signalTree, batching } from '@signaltree/core';
 
 // Add performance optimizations
 const tree = signalTree({
   products: [] as Product[],
   filters: { category: '', search: '' },
-}).with(
-  batching(), // Batch updates for optimal rendering
-  memoization() // Cache expensive computations
-);
+}).with(batching());
 
-// Now supports batched updates
-tree.batchUpdate((state) => ({
-  products: [...state.products, ...newProducts],
-  filters: { category: 'electronics', search: '' },
-}));
+tree.batch(() => {
+  tree.$.products.update((products) => [...products, ...newProducts]);
+  tree.$.filters.category.set('electronics');
+});
 
 // Expensive computations are automatically cached
 const filteredProducts = computed(() => {
@@ -1526,19 +1442,19 @@ const filteredProducts = computed(() => {
 ### Data Management Composition
 
 ```typescript
-import { signalTree, entityMap, entities } from '@signaltree/core';
+import { signalTree, entityMap } from '@signaltree/core';
 
 // Add data management capabilities (+2.77KB total)
 const tree = signalTree({
   users: entityMap<User>(),
   posts: entityMap<Post>(),
   ui: { loading: false, error: null as string | null },
-}).with(entities());
+});
 
 // Advanced entity operations via tree.$ accessor
 tree.$.users.addOne(newUser);
-tree.$.users.selectBy((u) => u.active);
-tree.$.users.updateMany([{ id: '1', changes: { status: 'active' } }]);
+tree.$.users.where((u) => u.active);
+tree.$.users.updateMany(['1'], { status: 'active' });
 
 // Entity helpers work with nested structures
 // Example: deeply nested entities in a domain-driven design pattern
@@ -1555,13 +1471,13 @@ const appTree = signalTree({
       reports: entityMap<Report>(),
     },
   },
-}).with(entities());
+});
 
 // Access nested entities using tree.$ accessor
-appTree.$.app.data.users.selectBy((u) => u.isAdmin); // Filtered signal
-appTree.$.app.data.products.selectTotal(); // Count signal
-appTree.$.admin.data.logs.all; // All items as array
-appTree.$.admin.data.reports.selectIds(); // ID array signal
+appTree.$.app.data.users.where((u) => u.isAdmin); // Filtered signal
+appTree.$.app.data.products.count(); // Count signal
+appTree.$.admin.data.logs.all(); // All items as array
+appTree.$.admin.data.reports.ids(); // ID array signal
 
 // For async operations, use manual async or async helpers
 async function fetchUsers() {
@@ -1580,7 +1496,7 @@ async function fetchUsers() {
 ### Full-Featured Development Composition
 
 ```typescript
-import { signalTree, batching, entities, serialization, withTimeTravel, devTools } from '@signaltree/core';
+import { signalTree, batching, serialization, timeTravel, devTools } from '@signaltree/core';
 
 // Full development stack (example)
 const tree = signalTree({
@@ -1591,14 +1507,12 @@ const tree = signalTree({
   },
 }).with(
   batching(), // Performance
-  entities(), // Data management
-  // withAsync removed — use async helpers for API integration
   serialization({
     // State persistence
     autoSave: true,
     storage: 'localStorage',
   }),
-  withTimeTravel({
+  timeTravel({
     // Undo/redo
     maxHistory: 50,
   }),
@@ -1623,13 +1537,11 @@ tree.save(); // Persistence
 ### Production-Ready Composition
 
 ```typescript
-import { signalTree, batching, entities, serialization } from '@signaltree/core';
+import { signalTree, batching, serialization } from '@signaltree/core';
 
 // Production build (no dev tools)
 const tree = signalTree(initialState).with(
   batching(), // Performance optimization
-  entities(), // Data management
-  // withAsync removed — use async helpers for API integration
   serialization({
     // User preferences
     autoSave: true,
@@ -1644,40 +1556,21 @@ const tree = signalTree(initialState).with(
 ### Conditional Enhancement
 
 ```typescript
-import { signalTree, batching, entities, devTools, withTimeTravel } from '@signaltree/core';
+import { signalTree, batching, devTools, timeTravel } from '@signaltree/core';
 
 const isDevelopment = process.env['NODE_ENV'] === 'development';
 
 // Conditional enhancement based on environment
 const tree = signalTree(state).with(
   batching(), // Always include performance
-  entities(), // Always include data management
   ...(isDevelopment
     ? [
         // Development-only features
         devTools(),
-        withTimeTravel(),
+        timeTravel(),
       ]
     : [])
 );
-```
-
-### Preset-Based Composition
-
-```typescript
-import { createDevTree, TREE_PRESETS } from '@signaltree/core';
-
-// Use presets for common patterns
-const devTree = createDevTree({
-  products: [],
-  cart: { items: [], total: 0 },
-  user: null,
-});
-// Includes: batching, memoization, devtools, time-travel
-
-// Or use preset configurations directly
-const customTree = signalTree(state, TREE_PRESETS.PERFORMANCE);
-// Includes: batching, memoization optimizations
 ```
 
 ### Measuring bundle size
@@ -1695,11 +1588,8 @@ const tree = signalTree(state);
 // Phase 2: Add performance when needed
 const tree2 = tree.with(batching());
 
-// Phase 3: Add data management for collections
-const tree3 = tree2.with(entities());
-
-// Phase 4: Add async for API integration
-// withAsync removed — no explicit async enhancer; use async helpers instead
+// Phase 3: Use entityMap for collections and loader() for cache-aware loading
+const tree3 = signalTree({ users: entityMap<User>() }).with(batching());
 
 // Each phase is fully functional and production-ready
 ```
@@ -1713,11 +1603,11 @@ if (isDevelopment) {
 }
 
 if (needsPerformance) {
-  tree = tree.with(batching(), memoization());
+  tree = tree.with(batching());
 }
 
 if (needsTimeTravel) {
-  tree = tree.with(withTimeTravel());
+  tree = tree.with(timeTravel());
 }
 ```
 
@@ -1996,10 +1886,9 @@ tree.destroy(); // Cleanup resources
 SignalTree Core includes all enhancers built-in:
 
 ```typescript
-import { signalTree, batching, memoization, withTimeTravel } from '@signaltree/core';
+import { signalTree, batching, timeTravel } from '@signaltree/core';
 
-// All enhancers available from @signaltree/core
-const tree = signalTree(initialState).with(batching(), memoization(), withTimeTravel());
+const tree = signalTree(initialState).with(batching()).with(timeTravel());
 ```
 
 ### Available enhancers
@@ -2007,13 +1896,9 @@ const tree = signalTree(initialState).with(batching(), memoization(), withTimeTr
 All enhancers are included in `@signaltree/core`:
 
 - **batching()** - Batch multiple updates for better performance
-- **memoization()** - Intelligent caching & performance optimization
-- **entities()** - Advanced entity management & CRUD operations
 - **devTools()** - Redux DevTools integration for debugging
-- **withTimeTravel()** - Undo/redo functionality & state history
+- **timeTravel()** - Undo/redo functionality & state history
 - **serialization()** - State persistence & SSR support
-- **createDevTree()** - Pre-configured development setup
-- **TREE_PRESETS** - Common configuration patterns (PERFORMANCE, DASHBOARD, etc.)
 
 ## When to use core only
 
@@ -2027,9 +1912,9 @@ Perfect for:
 
 Consider enhancers when you need:
 
-- ⚡ Performance optimization (batching, memoization)
-- 🐛 Advanced debugging (devTools, withTimeTravel)
-- 📦 Entity management (entities)
+- ⚡ Performance optimization (`batching()`)
+- 🐛 Advanced debugging (`devTools()`)
+- ↩️ Undo/redo (`timeTravel()`)
 
 Consider separate packages when you need:
 
@@ -2158,22 +2043,15 @@ All enhancers are now consolidated in the core package. The following features a
 ### Performance & Optimization
 
 - **batching()** (+1.27KB gzipped) - Batch multiple updates for better performance
-- **memoization()** (+2.33KB gzipped) - Intelligent caching & performance optimization
-
-### Advanced Features
-
-- **entities()** (+0.97KB gzipped) - Enhanced CRUD operations & entity management
 
 ### Development Tools
 
 - **devTools()** (+2.49KB gzipped) - Development tools & Redux DevTools integration
-- **withTimeTravel()** (+1.75KB gzipped) - Undo/redo functionality & state history
+- **timeTravel()** (+1.75KB gzipped) - Undo/redo functionality & state history
 
 ### Integration & Convenience
 
 - **serialization()** (+0.84KB gzipped) - State persistence & SSR support
-- **ecommercePreset()** - Pre-configured setups for e-commerce applications
-- **dashboardPreset()** - Pre-configured setups for dashboard applications
 
 ### Quick Start with Extensions
 
@@ -2183,17 +2061,17 @@ All enhancers are now available from the core package:
 # Install only the core package - all features included
 npm install @signaltree/core
 
-# Everything is available from @signaltree/core:
+# Common app APIs are available from @signaltree/core:
 import {
   signalTree,
   batching,
-  memoization,
-  entities,
   devTools,
-  withTimeTravel,
+  timeTravel,
   serialization,
-  ecommercePreset,
-  dashboardPreset
+  entityMap,
+  stored,
+  asyncSource,
+  asyncQuery,
 } from '@signaltree/core';
 ```
 
@@ -2245,12 +2123,9 @@ The `@signaltree/ng-forms` package supports Angular 17+ and will prefer `connect
 **Quick Example:**
 
 ```typescript
-import { signalTree } from '@signaltree/core';
-import { bindFormToTree } from '@signaltree/ng-forms';
+import { createFormTree, ngFormValidators } from '@signaltree/ng-forms';
 
-const tree = signalTree({
-  user: { name: '', email: '', age: 0 },
-});
+const formTree = createFormTree({ name: '', email: '', age: 0 }, { validators: { email: ngFormValidators.email() } });
 
 @Component({
   template: `
@@ -2262,16 +2137,7 @@ const tree = signalTree({
   `,
 })
 class UserFormComponent {
-  form = new FormGroup({
-    name: new FormControl(''),
-    email: new FormControl(''),
-    age: new FormControl(0),
-  });
-
-  constructor() {
-    // Automatically sync form with tree state
-    bindFormToTree(this.form, tree.$.user);
-  }
+  form = formTree.form;
 }
 ```
 

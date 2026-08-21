@@ -108,7 +108,7 @@ recipe is.
 ### State: one slice factory per domain
 
 ```typescript
-import { entityMap, loader, status } from '@signaltree/core';
+import { entityMap, loader } from '@signaltree/core';
 
 export function entityCrudState<T extends { id: string }>(api: ApiService, config: { name: string; endpoint: string; staleTime?: string }) {
   return {
@@ -120,6 +120,7 @@ export function entityCrudState<T extends { id: string }>(api: ApiService, confi
         lazy: true,
       }),
     }),
+    loadStatus: 'not-loaded' as 'not-loaded' | 'loading' | 'loaded' | 'error',
     save: status<AppError>(),
     selection: { selectedIds: [] as string[], isAdding: false },
   };

@@ -121,12 +121,13 @@ store.$.users.removeMany(ids);
 store.$.users.clear();
 ```
 
-### `status<ErrorType>()`
+### Loading state
 
-Creates async operation status tracking with derived convenience signals.
+Use ordinary state for local loading flags, or `entityMap({ load: loader(...) })`
+for cache-aware loading collections.
 
 ```typescript
-import { status, LoadingState } from '@signaltree/core';
+type LoadingState = 'not-loaded' | 'loading' | 'loaded' | 'error';
 
 interface ApiError {
   code: string;
@@ -136,30 +137,13 @@ interface ApiError {
 const store = signalTree({
   users: {
     entities: entityMap<User, number>(),
-    status: status<ApiError>(), // Custom error type
+    loadStatus: 'not-loaded' as LoadingState,
+    error: null as ApiError | null,
   },
 });
 
-// Status signals:
-store.$.users.status.state(); // Signal<LoadingState>
-store.$.users.status.error(); // Signal<ApiError | null>
-store.$.users.status.isLoading(); // Signal<boolean>
-store.$.users.status.isLoaded(); // Signal<boolean>
-store.$.users.status.isError(); // Signal<boolean>
-store.$.users.status.isNotLoaded(); // Signal<boolean>
-
-// Status mutations:
-store.$.users.status.setLoading();
-store.$.users.status.setLoaded();
-store.$.users.status.setError(error);
-store.$.users.status.setNotLoaded();
-store.$.users.status.reset();
-
-// LoadingState enum values:
-// LoadingState.NotLoaded = 'NOT_LOADED'
-// LoadingState.Loading = 'LOADING'
-// LoadingState.Loaded = 'LOADED'
-// LoadingState.Error = 'ERROR'
+store.$.users.loadStatus.set('loading');
+store.$.users.error.set(null);
 ```
 
 ### `stored(key, defaultValue, options?)`
@@ -672,25 +656,14 @@ const store = signalTree({
 }));
 ```
 
-### ❌ Don't create manual loading state when status() is available
+### ✅ Keep local loading state explicit
 
 ```typescript
-// ❌ Wrong - manual boilerplate
 const store = signalTree({
   users: {
     entities: entityMap<User, number>(),
-    loading: {
-      state: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
-      error: null as Error | null,
-    },
-  },
-});
-
-// ✅ Correct - use status() marker
-const store = signalTree({
-  users: {
-    entities: entityMap<User, number>(),
-    status: status(),
+    loadStatus: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
+    error: null as Error | null,
   },
 });
 ```
@@ -777,11 +750,9 @@ const store = signalTree({
 +});
 ```
 
-### Step 2: Replace manual loading state with `status()`
+### Step 2: Keep loading state explicit
 
 ```diff
-+ import { status } from '@signaltree/core';
-
 const store = signalTree({
   users: {
     entities: entityMap<User, number>(),
