@@ -399,4 +399,113 @@ describe('intercept hooks can transform and block', () => {
     expect(transformAttempted).toBe(true);
     expect(ids(t)).toBe('1,2,3');
   });
+
+  it('DR-2 — thenable replace interceptor fails closed for replaceOne', async () => {
+    const t = mk();
+    let transformAttempted = false;
+    t.$.r.intercept({
+      onUpdate: (_id, _changes, ctx) => {
+        return Promise.resolve().then(() => {
+          transformAttempted = true;
+          ctx.transform({ name: 'late' });
+        });
+      },
+    });
+
+    expect(() =>
+      t.$.r.replaceOne(1, { id: 1, name: 'replacement', done: true })
+    ).toThrow(/ST2033/);
+    expect(t.$.r.byId(1)?.().name).toBe('a');
+    expect(t.$.r.byId(1)?.().done).toBe(false);
+
+    await tick();
+
+    expect(transformAttempted).toBe(true);
+    expect(t.$.r.byId(1)?.().name).toBe('a');
+  });
+
+  it('DR-2 — thenable interceptors fail closed for upsertOne add and update arms', async () => {
+    const t = mk();
+    let addAttempted = false;
+    const offAdd = t.$.r.intercept({
+      onAdd: (_entity, ctx) => {
+        return Promise.resolve().then(() => {
+          addAttempted = true;
+          ctx.transform({ id: 4, name: 'late', done: false });
+        });
+      },
+    });
+
+    expect(() => t.$.r.upsertOne({ id: 4, name: 'new', done: false })).toThrow(
+      /ST2033/
+    );
+    expect(t.$.r.byId(4)).toBeUndefined();
+    offAdd();
+
+    let updateAttempted = false;
+    t.$.r.intercept({
+      onUpdate: (_id, _changes, ctx) => {
+        return Promise.resolve().then(() => {
+          updateAttempted = true;
+          ctx.transform({ name: 'late' });
+        });
+      },
+    });
+
+    expect(() => t.$.r.upsertOne({ id: 2, name: 'B', done: true })).toThrow(
+      /ST2033/
+    );
+    expect(t.$.r.byId(2)?.().name).toBe('b');
+
+    await tick();
+
+    expect(addAttempted).toBe(true);
+    expect(updateAttempted).toBe(true);
+    expect(ids(t)).toBe('1,2,3');
+  });
+
+  it('DR-2 — thenable update interceptor fails closed for updateWhere', async () => {
+    const t = mk();
+    let transformAttempted = false;
+    t.$.r.intercept({
+      onUpdate: (_id, _changes, ctx) => {
+        return Promise.resolve().then(() => {
+          transformAttempted = true;
+          ctx.transform({ name: 'late' });
+        });
+      },
+    });
+
+    expect(() => t.$.r.updateWhere((row) => !row.done, { name: 'updated' })).toThrow(
+      /ST2033/
+    );
+    expect(t.$.r.byId(1)?.().name).toBe('a');
+    expect(t.$.r.byId(3)?.().name).toBe('c');
+
+    await tick();
+
+    expect(transformAttempted).toBe(true);
+    expect(t.$.r.byId(1)?.().name).toBe('a');
+  });
+
+  it('DR-2 — thenable remove interceptor fails closed for removeWhere', async () => {
+    const t = mk();
+    let blockAttempted = false;
+    t.$.r.intercept({
+      onRemove: (_id, _entity, ctx) => {
+        return Promise.resolve().then(() => {
+          blockAttempted = true;
+          ctx.block('too late');
+        });
+      },
+    });
+
+    expect(() => t.$.r.removeWhere((row) => !row.done)).toThrow(/ST2033/);
+    expect(ids(t)).toBe('1,2,3');
+
+    await tick();
+
+    expect(blockAttempted).toBe(true);
+    expect(ids(t)).toBe('1,2,3');
+  });
 });
