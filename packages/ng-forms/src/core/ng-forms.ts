@@ -32,6 +32,7 @@ import { signalTree } from '@signaltree/core';
 import {
   deepClone,
   isGlobKey,
+  isTraversableNode,
   matchPath,
   mergeDeep,
   parsePath,
@@ -204,12 +205,6 @@ export class FormValidationError extends Error {
  */
 function readOwn<T>(map: Record<string, T>, key: string): T | undefined {
   return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : undefined;
-}
-
-function isTraversableNode(value: unknown): value is object {
-  return (
-    value != null && (typeof value === 'object' || typeof value === 'function')
-  );
 }
 
 type SyncValidatorMap = Record<string, (value: unknown) => string | null>;

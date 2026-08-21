@@ -8,7 +8,7 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 2 — Public Release Surface`
+Current phase: `Phase 3 — Packaging Proof`
 
 `GATE A` is **SATISFIED**. The kernel is FROZEN as of `4f7a2169`.
 
@@ -10860,6 +10860,12 @@ else.
 
 ## Phase 3 — Packaging Proof
 
+- [x] preflight: close Gate B reviewer lint finding — move `isTraversableNode`
+  helper to private `@signaltree/shared` and consume it from `ng-forms`;
+  validation: `pnpm nx lint ng-forms --output-style=static`,
+  `pnpm nx lint shared --output-style=static`, shared/ng-forms tests,
+  `pnpm nx build ng-forms --skip-nx-cache --output-style=static`,
+  `npm run typecheck:source`
 - [ ] audit built package output
 - [ ] `npm pack` every publishable package
 - [ ] verify tarball exports/types/layout
