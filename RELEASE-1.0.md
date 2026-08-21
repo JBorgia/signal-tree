@@ -10998,13 +10998,29 @@ candidate docs.
       `bash -n scripts/ci-publish.sh`, workflow YAML parse via Ruby,
       `GITHUB_ACTIONS=true NPM_CONFIG_PROVENANCE=true bash scripts/ci-publish.sh --dry-run`.
 - [x] clean-checkout release flow — added
-  `scripts/verify-clean-checkout-release-flow.sh`, which clones committed
-  `HEAD` into a temporary directory, installs from the frozen lockfile,
-  builds publishable packages, runs `node tools/verify-gates.mjs --fast`,
-  and exercises `ci-publish.sh --dry-run` through the GitHub Actions OIDC
-  branch. Done at `88b82a8a`. Validation:
-  `bash scripts/verify-clean-checkout-release-flow.sh`.
-- [ ] final performance baseline generation
+      `scripts/verify-clean-checkout-release-flow.sh`, which clones committed
+      `HEAD` into a temporary directory, installs from the frozen lockfile,
+      builds publishable packages, runs `node tools/verify-gates.mjs --fast`,
+      and exercises `ci-publish.sh --dry-run` through the GitHub Actions OIDC
+      branch. Done at `88b82a8a`. Validation:
+      `bash scripts/verify-clean-checkout-release-flow.sh`.
+- [x] final performance baseline generation — regenerated final measurement
+  outputs under ignored local scratch directory
+  `artifacts/final-baseline-2026-08-21/` from the authoritative generator
+  scripts. `tools/size-report.mjs` was updated to remove deleted
+  `status`/`form` scenarios, and `tools/bench-ssr-payload.mjs --json` now
+  suppresses dev warnings so JSON output stays machine-readable.
+  `tools/bench-history-ownership.mjs` now emits temporary shims for its
+  transpiled `path-notifier` dependency graph, restoring the release-only
+  harness gate. Validation: `node tools/size-report.mjs --json`,
+  `node --expose-gc tools/bench-compare.mjs --n 10000 --json`,
+  `NODE_OPTIONS=--max-old-space-size=8192 node tools/bench-vs-signalstore.mjs --json`,
+  `node tools/bench-depth-latency.mjs --json`,
+  `node tools/bench-leaf-equality.mjs --json`,
+  `node tools/bench-ssr-payload.mjs --json`,
+  `node --expose-gc tools/bench-history-ownership.mjs --json`,
+  parse every generated JSON file, and
+  `node tools/verify-gates.mjs --release --only=size-report,size-compare,bench-harness,history-ownership-bench,memory-harness,memory-compare,state-scale,raw-signals`.
 
 Exit condition: `GATE E`
 

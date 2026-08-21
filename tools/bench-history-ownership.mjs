@@ -212,8 +212,26 @@ function ensureCommitted3ArgPathNotifierModule() {
 
   mkdirSync(dirname(COMMITTED_3ARG_LIB), { recursive: true });
   writeFileSync(
+    join(dirname(COMMITTED_3ARG_LIB), 'write-context.mjs'),
+    `let activeContext;\n` +
+      `export function withWriteContext(meta, fn) {\n` +
+      `  const previous = activeContext;\n` +
+      `  activeContext = meta;\n` +
+      `  try { return fn(); } finally { activeContext = previous; }\n` +
+      `}\n` +
+      `export function getActiveWriteContext() { return activeContext; }\n`,
+    'utf8'
+  );
+  writeFileSync(
+    join(dirname(COMMITTED_3ARG_LIB), 'causal-write-mode.mjs'),
+    `export function getCausalWriteMode(meta) { return meta?.causalMode ?? 'authoring'; }\n`,
+    'utf8'
+  );
+  writeFileSync(
     COMMITTED_3ARG_LIB,
-    `// transpiled from HEAD:packages/core/src/lib/path-notifier.ts\n${compiled.outputText}`,
+    `// transpiled from HEAD:packages/core/src/lib/path-notifier.ts\n${compiled.outputText
+      .replace("'./write-context'", "'./write-context.mjs'")
+      .replace("'./causal-write-mode'", "'./causal-write-mode.mjs'")}`,
     'utf8'
   );
   return COMMITTED_3ARG_LIB;

@@ -59,16 +59,9 @@ const MARKERS = [
   ['entityMap + loader', 'entityMap, loader', `
     const t = signalTree({ rows: entityMap({ selectId: (r) => r.id, load: loader(async () => []) }) });
     t.$.rows.load(); globalThis.__sink = [t.$.rows.all(), t.$.rows.loading()];`],
-  ['status', 'status', `
-    const t = signalTree({ j: status() });
-    t.$.j.setLoaded(); t.$.j.setError(new Error('x'));
-    globalThis.__sink = [t.$.j.state(), t.$.j.loading(), t.$.j.settled()];`],
   ['stored', 'stored', `
     const t = signalTree({ k: stored('k', 'v') });
     t.$.k.set('w'); globalThis.__sink = [t.$.k()];`],
-  ['form', 'form', `
-    const t = signalTree({ f: form({ initial: { a: '' } }) });
-    t.$.f.patch({ a: 'x' }); globalThis.__sink = [t.$.f(), t.$.f.valid()];`],
   ['compared', 'compared, byKeys', `
     const t = signalTree({ u: compared({ id: 1, v: 1 }, byKeys('id', 'v')) });
     t.$.u.set({ id: 1, v: 2 }); globalThis.__sink = [t.$.u()];`],
@@ -134,23 +127,26 @@ for (const [label, code] of SUBPATHS) {
 
 // Realistic combinations — what an app actually ships.
 const COMBOS = [
-  ['typical app (entityMap + status + form)', `
-    import { signalTree, entityMap, status, form } from ${C};
+  ['typical app (entityMap + stored + asyncSource)', `
+    import { signalTree, entityMap, stored, asyncSource } from ${C};
     const t = signalTree({
-      rows: entityMap({ selectId: (r) => r.id }), j: status(), f: form({ initial: { a: '' } }) });
-    t.$.rows.addOne({ id: 1 }); t.$.j.setLoaded(); t.$.f.patch({ a: 'x' });
-    globalThis.__sink = [t.$.rows.all(), t.$.j.state(), t.$.f()];`],
+      rows: entityMap({ selectId: (r) => r.id }),
+      k: stored('k', 'v'),
+      s: asyncSource({ load: async () => 1 }),
+    });
+    t.$.rows.addOne({ id: 1 }); t.$.k.set('w');
+    globalThis.__sink = [t.$.rows.all(), t.$.k(), t.$.s()];`],
   ['everything', `
-    import { signalTree, entityMap, status, stored, form, compared, byKeys,
+    import { signalTree, entityMap, stored, compared, byKeys,
              asyncSource, asyncQuery, loader, batching, timeTravel, serialization } from ${C};
     const t = signalTree({
       rows: entityMap({ selectId: (r) => r.id, load: loader(async () => []) }),
-      j: status(), k: stored('k','v'), f: form({ initial: { a: '' } }),
+      k: stored('k','v'),
       u: compared({ id: 1 }, byKeys('id')),
       s: asyncSource({ load: async () => 1 }),
       q: asyncQuery({ initialResult: 0, query: async () => 1 }),
     }).with(batching()).with(timeTravel()).with(serialization());
-    t.$.rows.addOne({ id: 1 }); t.$.j.setLoaded(); t.$.f.patch({ a: 'x' });
+    t.$.rows.addOne({ id: 1 }); t.$.s.refresh(); t.$.q.input.set('x');
     t.batch(() => t.$.k.set('w')); t.undo();
     globalThis.__sink = [t.serialize()];`],
 ];
