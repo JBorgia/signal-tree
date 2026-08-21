@@ -2515,7 +2515,7 @@ the kernel before `GATE A`.
 
 Exit condition: `GATE B`
 
-### Measured public surface (`6e7bf16a`, checker-resolved, not regex)
+### Historical measured public surface (`6e7bf16a`, checker-resolved, not regex)
 
 | Package    | Total | Runtime | Type-only | **Angular in public TYPE** | Angular in decl | Internal-decl leaks |
 | ---------- | ----: | ------: | --------: | -------------------------: | --------------: | ------------------: |
@@ -2528,8 +2528,10 @@ deleted from the 15.0 live release surface. The 6e7bf16a inventory remains
 historical evidence only where it explains why those packages did not earn
 survival.
 
-`core` by entrypoint: `.` 142 (36 runtime) · `./authoring` 48 (39) · `./security` 7 ·
-`./edit-session` 6 · `./lazy` 3 · `./storage` 3.
+The table above is the Phase 2 starting point, not current HEAD. Since that
+inventory, `./authoring` has been removed from `@signaltree/core`, root demo
+coverage is green at 27/27, and the package currently publishes only `.`,
+`./security`, `./lazy`, `./edit-session`, and `./storage`.
 
 **The headline finding: core's CONTRACT is already framework-neutral.** Only 3 of
 209 symbols expose an Angular type publicly — `linked`, `trackHistory`,
@@ -2547,7 +2549,6 @@ been corrected to say so.
 | Entrypoint                          | Emitted external imports                                                         |
 | ----------------------------------- | -------------------------------------------------------------------------------- |
 | `core` `.`                          | `@angular/core`, `@angular/core/rxjs-interop`, `rxjs`, `rxjs/operators`, `tslib` |
-| `core/authoring`                    | `@angular/core`, `@angular/core/rxjs-interop`, `rxjs`, `rxjs/operators`          |
 | `core/lazy`, `core/edit-session`    | `@angular/core`                                                                  |
 | **`core/security`, `core/storage`** | **(none)**                                                                       |
 | **`events` `.`**                    | **`zod` only — no Angular, no Nest, no rxjs**                                    |
@@ -2581,14 +2582,14 @@ Two anomalies to verify at `GATE C`, not now:
 Freezing 209 core symbols before deciding the topology risks discovering that
 some belong elsewhere and having to redo `GATE B`. Four questions:
 
-1. **17 internal declarations are publicly exported.** 7 on root
+1. **Root internal declarations are publicly exported.** 7 on root
    (`ProcessDerived`, `DeepMergeTree`, `DerivedFactory`, `WithDerived`,
    `derivedFrom`, `SignalTreeBuilder`, `SignalTreePlanBuilder` from
-   `lib/internals/*-types.ts`) and 10 on `./authoring` (marker-processor,
-   hydrate-decision and error-reporter symbols). Are these intentional
-   extension points to be relocated out of `internals/`, or accidental leaks to
-   be removed? Removal is a breaking change; keeping them means `internals/` is
-   a misnomer for those files.
+   `lib/internals/*-types.ts`). Are these intentional extension points to be
+   relocated out of `internals/`, or accidental leaks to be removed? Removal is
+   a breaking change; keeping them means `internals/` is a misnomer for those
+   files. The `./authoring` internal-leak class was closed by deleting the
+   subpath in `f4de79a9`.
 2. **`ng-forms` re-exports core's audit API as its own** — `createAuditTracker`,
    `createAuditCallback`, `AuditEntry`, `AuditMetadata`, `AuditTrackerConfig`,
    all declared in `packages/core/src/lib/audit/audit.ts`. Two packages publish
