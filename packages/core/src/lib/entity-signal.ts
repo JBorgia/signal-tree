@@ -1257,14 +1257,23 @@ export function createEntitySignal<
     // removed subject becomes structurally unreachable by clearing its active
     // key binding, while the retained subject id, signal, and cached node can
     // survive until a separate restoration or reclamation decision.
+    const handle = acquireEntityHandleForTesting(initialKey);
+    if (handle === undefined || handle.subjectId !== subjectId) {
+      throw new Error(
+        `Entity with id ${String(initialKey)} has no acquired subject handle`
+      );
+    }
+
     const currentKey = (): K | undefined => {
       getSubjectStateSignal(subjectId)();
-      return findKeyBySubjectId(subjectId);
+      const resolved = structuralStore.resolveSubjectHandle(handle);
+      return resolved.state === 'active' ? resolved.key : undefined;
     };
 
     const entitySig = () => {
-      const key = currentKey();
-      return key === undefined ? undefined : getEntitySignal(key)();
+      getSubjectStateSignal(subjectId)();
+      const resolved = resolveEntityHandleForTesting(handle);
+      return resolved.state === 'active' ? resolved.value : undefined;
     };
 
     const node = ((valueOrUpdater?: E | ((current: E) => E)): E | undefined => {
