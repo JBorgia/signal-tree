@@ -200,4 +200,23 @@ describe('entityMap — tombstoned subjects stay distinct from later key reuse',
       revision: 1,
     });
   });
+
+  it('keeps acquired handles isolated when setAll reuses a tombstoned key', () => {
+    const rows = makeRows() as InternalHandleRows;
+    rows.setAll([{ id: 1, v: 5 }]);
+    const held = rows.byId(1);
+    const handle = acquireExistingHandle(rows, 1);
+
+    rows.removeOne(1);
+    rows.setAll([{ id: 1, v: 9 }]);
+
+    expect(rows.byId(1)?.v()).toBe(9);
+    expect(held?.()).toBeUndefined();
+    expect(rows.__resolveEntityHandleForTesting(handle)).toEqual({
+      state: 'tombstoned',
+      subjectId: 1,
+      restoreAllowed: true,
+      revision: 1,
+    });
+  });
 });
