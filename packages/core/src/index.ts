@@ -203,10 +203,9 @@ export {
 } from './lib/audit/audit';
 
 // Async-source marker (v9.5) - load-and-expose async primitive
-// createAsyncSourceSignal moved to '@signaltree/core/authoring' in 11.6.0
-// (authoring-only factory, zero application consumers).
 export {
   asyncSource,
+  createAsyncSourceSignal,
   type AsyncSourceMarker,
   type AsyncSourceSignal,
   type AsyncSourceConfig,
@@ -214,10 +213,9 @@ export {
 } from './lib/markers/async-source';
 
 // Async-query marker (v9.5) - input-driven debounced query primitive
-// createAsyncQuerySignal moved to '@signaltree/core/authoring' in 11.6.0
-// (authoring-only factory, zero application consumers).
 export {
   asyncQuery,
+  createAsyncQuerySignal,
   type AsyncQueryMarker,
   type AsyncQuerySignal,
   type AsyncQueryConfig,
@@ -266,9 +264,10 @@ export {
   // `equal` (an alias of `deepEqual`) was removed in 14.1.1 — see deep-equal.ts.
   deepEqual,
   toWritableSignal,
-  // isNodeAccessor / isAnySignal / isTraversableNode / isBuiltInObject /
-  // parsePath moved to '@signaltree/core/authoring' in 14.0.0 — you reach for a
-  // structural guard when you are walking a tree, which is authoring work.
+  isAnySignal,
+  // isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath moved to
+  // '@signaltree/core/authoring' in 14.0.0 — you reach for a structural guard
+  // when you are walking a tree, which is authoring work.
 } from './lib/utils';
 
 // `getPathNotifier` — removed from the root barrel in v12; import from

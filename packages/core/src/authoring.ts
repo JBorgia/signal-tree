@@ -57,12 +57,6 @@ export { createEnhancer, resolveEnhancerOrder } from './enhancers/index';
 export { ENHANCER_META } from './lib/enhancer-types';
 export type { EnhancerMeta } from './lib/enhancer-types';
 
-// Marker signal factories — the raw builders behind asyncSource()/asyncQuery()
-// markers, for authors building custom marker processors on top of the built-in
-// signal shapes.
-export { createAsyncSourceSignal } from './lib/markers/async-source';
-export { createAsyncQuerySignal } from './lib/markers/async-query';
-
 // Global error observation — every error the library CATCHES, in one place.
 // Not a handler: it cannot swallow, retry or transform, because making every
 // marker's error path depend on a listener is a far larger promise than "tell
@@ -119,7 +113,6 @@ export { isAsyncQueryMarker } from './lib/markers/async-query.contract';
 // core; only the public re-export is gone. No compatibility shim: a major is
 // exactly when an accidental export should stop existing.
 export { isTraversableNode, isNodeAccessor } from './lib/internals/node-shape';
-export { isAnySignal } from './lib/utils';
 
 // Constants and diagnostic message text.
 export { SIGNAL_TREE_CONSTANTS, SIGNAL_TREE_MESSAGES } from './lib/constants';
