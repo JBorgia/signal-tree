@@ -41,7 +41,6 @@ print_coverage() {
 PACKAGES=(
     "core"
     "ng-forms"
-    "schema"
 )
 
 print_step "Starting comprehensive test coverage analysis..."

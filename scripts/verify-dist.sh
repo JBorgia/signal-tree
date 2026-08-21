@@ -17,7 +17,6 @@ NX_PACKAGES=(
     "events"
     "realtime"
     "ng-forms"
-    "schema"
 )
 ERRORS=0
 

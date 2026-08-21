@@ -50,12 +50,6 @@ const packages = [
     claimed: 2501,
   },
   {
-    name: 'schema',
-    path: 'dist/packages/schema/index.esm.js',
-    maxSize: 6000,
-    claimed: 4400,
-  },
-  {
     name: 'core/enhancers/batching',
     path: 'dist/packages/core/dist/enhancers/batching/lib/batching.js',
     maxSize: 1400,
@@ -99,7 +93,6 @@ const nxProjects = [
   'realtime',
   'shared',
   'ng-forms',
-  'schema',
 ];
 
 class BundleAnalyzer {
