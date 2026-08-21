@@ -1,11 +1,15 @@
 import { SIGNAL_TREE_MESSAGES } from '../lib/constants';
-import { ENHANCER_META } from '../lib/types';
+import { ENHANCER_META } from '../lib/enhancer-types';
 
 /**
  * SignalTree Enhancer System
  * Handles enhancer composition and dependency resolution
  */
-import type { EnhancerMeta, EnhancerWithMeta, Enhancer } from '../lib/types';
+import type {
+  EnhancerMeta,
+  EnhancerWithMeta,
+  Enhancer,
+} from '../lib/enhancer-types';
 /**
  * Helper to create an enhancer with metadata attached
  *

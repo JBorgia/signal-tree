@@ -1,9 +1,20 @@
 import { Signal, WritableSignal } from '@angular/core';
 
+import type { Enhancer } from './enhancer-types';
+import type { NodeAccessor } from './node-accessor';
 import { AsyncQueryMarker, AsyncQuerySignal } from './markers/async-query';
 import { AsyncSourceMarker, AsyncSourceSignal } from './markers/async-source';
 import type { EntityLoaderSurface } from './markers/entity-loader';
 import { StoredMarker, StoredSignal } from './markers/stored';
+
+export { ENHANCER_META } from './enhancer-types';
+export type {
+  Enhancer,
+  EnhancerMeta,
+  EnhancerWithMeta,
+  TreeCapability,
+} from './enhancer-types';
+export type { NodeAccessor } from './node-accessor';
 
 /**
  * Metadata describing the intent and source of a tree update.
@@ -239,15 +250,6 @@ export type NotFn<T> = T extends (...args: unknown[]) => unknown ? never : T;
  * `typeof node === 'function'`, `node.set === undefined`,
  * `node.update === undefined`, while `leaf.set` / `leaf.update` are functions.
  */
-export interface NodeAccessor<T> {
-  /** Read: unwraps this node and everything under it. */
-  (): T;
-  /** Write: deep partial merge — keys not present are preserved. */
-  (value: Partial<T>): void;
-  /** Write: receives the current unwrapped value; the result is merged. */
-  (updater: (current: T) => T): void;
-}
-
 /**
  * The literal (declared) keys of `S`, discarding any `string`/`number` index
  * signature.
@@ -1426,81 +1428,6 @@ export interface CallableWritableSignal<T> extends WritableSignal<T> {
 export type AccessibleNode<T> = NodeAccessor<T> & TreeNode<T>;
 
 // Removed v5 legacy helper types to reduce public surface area in v6
-
-/** Symbol key for enhancer metadata (stable public export) */
-export const ENHANCER_META = Symbol('signaltree:enhancer:meta');
-
-// =============================================================================
-// ENHANCER SYSTEM (v6)
-// =============================================================================
-
-/**
- * The capabilities an enhancer body receives — the UNION of what the built-in
- * neutral enhancers actually use, measured rather than guessed.
- *
- * DELIBERATELY NOT EXPORTED. It is an authoring context, not a tree model, and
- * publishing it would invite `NeutralSignalTree`-shaped speculation. It appears
- * in the emitted `.d.ts` as a non-exported interface because `Enhancer` names
- * it; that is structural reachability, not public API.
- *
- * WHY A FIXED TYPE AND NOT `<TTree extends EnhancerHost>`. The generic-constraint
- * form was tried and failed twice, for two independent reasons:
- *
- *   1. VARIANCE. `NodeAccessor<T>` has input positions (`(value: Partial<T>)`),
- *      so it is contravariant in `T` and `ISignalTree<Model>` is NOT assignable
- *      to a host declaring `bind(): NodeAccessor<unknown>`. The constraint could
- *      not be satisfied by a real tree.
- *   2. INFERENCE. A return of `TTree & TAdded` asks TypeScript to split ONE
- *      intersection against TWO inference targets. It cannot, so `TAdded`
- *      collapsed to `unknown` and every added method vanished from `.with()`.
- *
- * A fixed host has neither problem, because NOTHING in a public signature ever
- * needs a concrete tree to be assignable to it — only `with()`'s implementation
- * does, and that is one library-owned, audited assertion.
- */
-interface EnhancerHost {
-  readonly $: unknown;
-  bind(thisArg?: unknown): NodeAccessor<unknown>;
-  destroy(): void;
-  registerCleanup(fn: EnhancerCleanup): void;
-}
-
-/**
- * Enhancer function that adds methods to a tree.
- * Generic parameter `TAdded` represents the methods being added.
- *
- * `TAdded` is the ONLY inference target here, which is why
- * `createEnhancer(meta, tree => Object.assign(tree, { foo() {} }))` infers with
- * no annotation, no explicit generic and no cast.
- *
- * The previous signature took `ISignalTree<unknown>`, documented as being
- * "to allow enhancers to be applied to trees that have already accumulated
- * methods from previous enhancers." That reason was wrong: `ISignalTree<unknown>`
- * contains no accumulated methods, and accumulation is produced entirely by
- * `with()` returning `this & TAdded`. The Angular coupling was historical
- * breadth, not semantics — no built-in enhancer body needed it.
- */
-export type Enhancer<TAdded> = (tree: EnhancerHost) => EnhancerHost & TAdded;
-
-/** Enhancer with optional metadata for ordering/debugging */
-export type EnhancerWithMeta<TAdded> = Enhancer<TAdded> & {
-  metadata?: EnhancerMeta;
-};
-
-export type TreeCapability =
-  | 'mutation-capture'
-  | 'position-topology'
-  | 'causal-runtime'
-  | 'temporal-snapshots';
-
-/** Metadata for enhancer ordering and debugging */
-export interface EnhancerMeta {
-  name?: string;
-  requires?: string[];
-  provides?: string[];
-  capabilities?: TreeCapability[];
-  description?: string;
-}
 
 /**
  * Canonical public tree contract — the ONE name a consumer should annotate
