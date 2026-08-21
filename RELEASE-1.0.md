@@ -10927,7 +10927,7 @@ scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
       moving type-only `@vercel/node` to devDependencies, and pinning its dev
       `undici` tree to the latest 5.x patch. Validation:
       `pnpm audit --prod`, `pnpm nx run-many -t build -p core,events,ng-forms
-    --skip-nx-cache --output-style=static`,
+--skip-nx-cache --output-style=static`,
       `node scripts/verify-package-hygiene.js`,
       `node scripts/verify-package-hygiene.js --self-test`,
       `node scripts/verify-exports.js`,
@@ -10975,21 +10975,28 @@ candidate docs.
       `pnpm nx test core --skip-nx-cache --output-style=static`.
 
 - [x] CI release gate — release and publish workflows now use the surviving
-  unified gate set instead of deleted guardrails/taught-symbol scripts;
-  retired `lint:skills`/`taught-symbols` entries were removed from
-  `tools/verify-gates.mjs`; `release-claims` now tracks live claim surfaces;
-  stale v9 bundle ceilings and the dead-export ratchet were re-baselined;
-  numeric claims now carry generator annotations. Validation:
-  `node tools/verify-gates.mjs --only=lint:skills,taught-symbols`,
-  `node tools/check-release-claims.mjs`,
-  `node tools/verify-gates.mjs --self-test --only=release-claims`,
-  `node scripts/v9-budget-checks.js`,
-  `node tools/find-dead-exports.mjs --max=110`,
-  `node tools/check-numeric-claims.mjs`,
-  `node tools/verify-gates.mjs --fast`,
-  `node tools/verify-gates.mjs --self-test --only=release-claims,package-hygiene:self,numeric-claims:self`,
-  workflow YAML parse via Ruby.
-- [ ] trusted publishing/provenance
+      unified gate set instead of deleted guardrails/taught-symbol scripts;
+      retired `lint:skills`/`taught-symbols` entries were removed from
+      `tools/verify-gates.mjs`; `release-claims` now tracks live claim surfaces;
+      stale v9 bundle ceilings and the dead-export ratchet were re-baselined;
+      numeric claims now carry generator annotations. Validation:
+      `node tools/verify-gates.mjs --only=lint:skills,taught-symbols`,
+      `node tools/check-release-claims.mjs`,
+      `node tools/verify-gates.mjs --self-test --only=release-claims`,
+      `node scripts/v9-budget-checks.js`,
+      `node tools/find-dead-exports.mjs --max=110`,
+      `node tools/check-numeric-claims.mjs`,
+      `node tools/verify-gates.mjs --fast`,
+      `node tools/verify-gates.mjs --self-test --only=release-claims,package-hygiene:self,numeric-claims:self`,
+      workflow YAML parse via Ruby.
+- [x] trusted publishing/provenance — CI publish now prefers npm trusted
+      publishing through GitHub Actions OIDC (`id-token: write`, npm CLI
+      11.5.1+, no `NPM_TOKEN` in the workflow) while retaining `NPM_TOKEN` as
+      an explicit fallback for emergency/local runs. `ci-publish.sh --dry-run`
+      exercises all pre-publish checks without writing to npm. Done at
+      `c2a93b5d`. Validation: npm trusted-publishing docs review,
+      `bash -n scripts/ci-publish.sh`, workflow YAML parse via Ruby,
+      `GITHUB_ACTIONS=true NPM_CONFIG_PROVENANCE=true bash scripts/ci-publish.sh --dry-run`.
 - [ ] clean-checkout release flow
 - [ ] final performance baseline generation
 
