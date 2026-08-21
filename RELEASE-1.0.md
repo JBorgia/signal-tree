@@ -8,7 +8,7 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 4 — Release Quality`
+Current phase: `Phase 5 — Automation`
 
 `GATE A` is **SATISFIED**. The kernel is FROZEN as of `4f7a2169`.
 
@@ -10921,23 +10921,28 @@ scalar 100 5`, `node --expose-gc tools/bench-retention-arms.mjs sameRow
       `node tools/check-doc-links.mjs`, `node scripts/lint-readme-apis.mjs`,
       `node scripts/verify-version-claims.js`, `npm run smoke:routes`.
 - [x] package metadata/license/security audit — publishable package manifests
-  now include `LICENSE` and `NOTICE`, Rollup build assets copy them into
-  each dist package, and package hygiene enforces both files. Direct
-  production advisories were cleared by updating `echarts`/`lodash-es`,
-  moving type-only `@vercel/node` to devDependencies, and pinning its dev
-  `undici` tree to the latest 5.x patch. Validation:
-  `pnpm audit --prod`, `pnpm nx run-many -t build -p core,events,ng-forms
-  --skip-nx-cache --output-style=static`,
-  `node scripts/verify-package-hygiene.js`,
-  `node scripts/verify-package-hygiene.js --self-test`,
-  `node scripts/verify-exports.js`,
-  `node scripts/verify-publish-artifacts.mjs core events ng-forms`,
-  `node tools/verify-tarball-consumer.mjs`,
-  `node tools/verify-consumer-typecheck.mjs`,
-  `node tools/verify-angular-consumer.mjs`,
-  `node tools/check-bundle-budget.mjs`.
+      now include `LICENSE` and `NOTICE`, Rollup build assets copy them into
+      each dist package, and package hygiene enforces both files. Direct
+      production advisories were cleared by updating `echarts`/`lodash-es`,
+      moving type-only `@vercel/node` to devDependencies, and pinning its dev
+      `undici` tree to the latest 5.x patch. Validation:
+      `pnpm audit --prod`, `pnpm nx run-many -t build -p core,events,ng-forms
+      --skip-nx-cache --output-style=static`,
+      `node scripts/verify-package-hygiene.js`,
+      `node scripts/verify-package-hygiene.js --self-test`,
+      `node scripts/verify-exports.js`,
+      `node scripts/verify-publish-artifacts.mjs core events ng-forms`,
+      `node tools/verify-tarball-consumer.mjs`,
+      `node tools/verify-consumer-typecheck.mjs`,
+      `node tools/verify-angular-consumer.mjs`,
+      `node tools/check-bundle-budget.mjs`.
 
-Exit condition: `GATE D`
+Exit condition: `GATE D` — **SATISFIED**
+
+Gate D independent review at `1fea406c`: no blocker demonstrated. Residual
+Phase 5/RC risk carried forward: `node tools/check-numeric-claims.mjs` is red
+for missing generator annotations and should be fixed before publishing release
+candidate docs.
 
 ## Phase 5 — Automation
 
