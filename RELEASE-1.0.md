@@ -2582,22 +2582,20 @@ Two anomalies to verify at `GATE C`, not now:
 Freezing 209 core symbols before deciding the topology risks discovering that
 some belong elsewhere and having to redo `GATE B`. Four questions:
 
-1. **Root internal declarations are publicly exported.** 7 on root
-   (`ProcessDerived`, `DeepMergeTree`, `DerivedFactory`, `WithDerived`,
-   `derivedFrom`, `SignalTreeBuilder`, `SignalTreePlanBuilder` from
-   `lib/internals/*-types.ts`). Are these intentional extension points to be
-   relocated out of `internals/`, or accidental leaks to be removed? Removal is
-   a breaking change; keeping them means `internals/` is a misnomer for those
-   files. The `./authoring` internal-leak class was closed by deleting the
-   subpath in `f4de79a9`.
+1. **Root internal declarations — CLOSED.** `ProcessDerived`, `DeepMergeTree`,
+   `DerivedFactory`, and `SignalTreePlanBuilder` were removed from the root
+   public barrel. `derivedFrom`, `WithDerived`, and `SignalTreeBuilder` remain
+   because they have current app/docs usage for external derived definitions and
+   store helpers. The `./authoring` internal-leak class was closed by deleting
+   the subpath in `f4de79a9`.
 2. **`ng-forms` audit/export topology — CLOSED.** The current package manifest
    publishes only `.`, with no `./audit` subpath. `ng-forms` now uses an
    explicit public barrel instead of `export *`, so core owns audit and forms
    owns only its Angular forms API.
 3. **`events` peer topology — CLOSED.** Root remains framework-neutral and emits
-  `zod` only. Framework-specific dependencies are package-scoped optional peers
-  because npm cannot scope peers per subpath; install only the peers for the
-  subpaths used.
+   `zod` only. Framework-specific dependencies are package-scoped optional peers
+   because npm cannot scope peers per subpath; install only the peers for the
+   subpaths used.
 4. **`@signaltree/kernel`: private boundary or published package?** Recommend
    PRIVATE first. The extraction prerequisite is unchanged — the realization
    port still consumes the Angular-shaped `TreeScalarSlotRuntime` and must move
