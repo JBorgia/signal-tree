@@ -18,6 +18,11 @@ import {
   serialization,
 } from '../dist/packages/core/dist/index.js';
 
+const JSON_ONLY = process.argv.includes('--json');
+if (JSON_ONLY) {
+  globalThis.ngDevMode = false;
+}
+
 const rows = (n) =>
   Array.from({ length: n }, (_, i) => ({
     id: i,
@@ -66,7 +71,7 @@ const asyncSourceResult = {
   underTransfer: accepted.$.feed() === undefined ? 'dropped' : 'delivered',
 };
 
-if (process.argv.includes('--json')) {
+if (JSON_ONLY) {
   console.log(
     JSON.stringify({ curve, asyncSource: asyncSourceResult }, null, 2)
   );
