@@ -8,7 +8,14 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 6 — Release Candidate`
+Current phase: `Phase 2 — Public Release Surface (REOPENED)`
+
+`GATE B` is **REOPENED** as of `7c182798` / `ca8f6006`. Deterministic
+tarball/API evidence showed symbols with settled negative or unresolved
+dispositions still present in the publishable public surface. Downstream Gates
+C–E remain mechanically validated, but the release is globally blocked until
+the public surface is reconciled and `node tools/check-rc-public-dispositions.mjs`
+passes.
 
 `GATE A` is **SATISFIED**. The kernel is FROZEN as of `4f7a2169`.
 
@@ -2518,7 +2525,13 @@ the kernel before `GATE A`.
 - [x] freeze public API — `GATE B` satisfied after `5f1c96e0`, `f4de79a9`,
       `1ce22bd4`, `3065bc65`, `5f3dcd8a`
 
-Exit condition: `GATE B` — **SATISFIED**
+Exit condition: `GATE B` — **REOPENED**
+
+Reopened by deterministic RC surface evidence at `7c182798` / `ca8f6006`:
+`@signaltree/core` still publicly exports symbols whose disposition is DELETE,
+NOT EARNED, LC/mechanically retained, or unresolved. This is a public-surface
+gate failure, not a new release-time product decision. Settled negatives default
+to absence. The executable gate is `node tools/check-rc-public-dispositions.mjs`.
 
 ### Historical measured public surface (`6e7bf16a`, checker-resolved, not regex)
 
@@ -11036,14 +11049,14 @@ first real publish remains the RC task.
 ## Phase 6 — Release Candidate
 
 - [ ] **Resolve RC public surface reconciliation before publishing.**
-  `docs/audits/2026-08/rc-public-surface-reconciliation.md` maps the
-  current tarball exports against the final disposition map. Blockers before
-  `1.0.0-rc.1`: `asyncSource`/`asyncQuery` are still public root exports
-  while the map says DELETE / decision required; several mechanically
-  retained helpers remain public without a survival decision; and the 10k
-  collection workload retains 66.12 MB without attribution. Do not publish
-  RC until each exported feature is either accepted, removed, or explicitly
-  carried into RC notes as unresolved.
+      `docs/audits/2026-08/rc-public-surface-reconciliation.md` maps the
+      current tarball exports against the final disposition map. Blockers before
+      `1.0.0-rc.1`: `asyncSource`/`asyncQuery` are still public root exports
+  while the map says DELETE; NOT EARNED and LC/mechanically retained symbols
+  remain public; unresolved symbols are shipping as if settled; and the 10k
+  collection workload retention is only partially attributed. Do not publish
+  RC until each exported feature has release authority and
+  `node tools/check-rc-public-dispositions.mjs` passes.
 - [ ] publish `1.0.0-rc.1`
 - [ ] install from npm in external projects
 - [ ] collect RC packaging/DX/docs failures

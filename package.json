@@ -92,6 +92,7 @@
     "validate:docs": "bash scripts/validate-docs.sh",
     "validate:version-claims": "node scripts/verify-version-claims.js",
     "validate:release-state": "node scripts/verify-release-state.js",
+    "validate:rc-surface": "node tools/check-rc-public-dispositions.mjs",
     "validate:tarball-consumer": "node tools/verify-tarball-consumer.mjs",
     "validate:changelog-entry": "bash scripts/verify-changelog-entry.sh",
     "validate:types": "bash scripts/verify-no-broken-dts.sh",
