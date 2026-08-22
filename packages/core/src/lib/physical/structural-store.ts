@@ -423,6 +423,34 @@ export class StructuralStore<K extends string | number> {
     });
   }
 
+  /**
+   * Drop a retired subject's lifetime ledger entirely — state AND revision.
+   *
+   * ⚠️ TRIAL. This is the null hypothesis for "is the ~117 B/retired lifetime
+   * record earned?" (docs/architecture/retired-subject-churn.md, open question
+   * 2). `retireSubject` above keeps a `{active:false, restoreAllowed:false}`
+   * record forever, which is what makes zero-owner churn linear in every subject
+   * that ever existed. This deletes it.
+   *
+   * SAFE ONLY FOR A TERMINAL, ZERO-OWNER RETIREMENT, and the reason is subject
+   * id allocation: `nextSubjectId` only ever increases, and `tombstoneSubject`
+   * has already removed the key -> subject mapping. A later add of the same
+   * business key therefore gets a FRESH subject id and cannot collide with the
+   * forgotten one. Deleting the record cannot resurrect or alias a subject.
+   *
+   * WHAT IT GIVES UP: `resolveSubjectHandle` reports `missing` rather than
+   * `tombstoned` for the forgotten subject, and `planRestore`'s
+   * "has retired backing and cannot be restored" guard loses its input. Both are
+   * acceptable only because a tree with no restoration authority has no path to
+   * a restore at all — the guard becomes unreachable rather than unenforced. If
+   * a restorer can exist, DO NOT call this.
+   */
+  forgetSubject(subjectId: number): void {
+    this.subjectStates.delete(subjectId);
+    this.subjectRevisions.delete(subjectId);
+    this.activeNodesBySubject.delete(subjectId);
+  }
+
   clear(): void {
     this.subjectIds.clear();
     this.subjectStates.clear();

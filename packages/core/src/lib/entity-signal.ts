@@ -75,6 +75,29 @@ export function setEntityPositionIdNotifyEnabledForTesting(
   entityPositionIdNotifyEnabled = enabled;
 }
 
+/**
+ * TRIAL FLAG — is the retired-subject lifetime ledger earned?
+ *
+ * Off by default, so the shipped behaviour is untouched. When on, a zero-owner
+ * retirement deletes the subject's lifetime record and revision along with its
+ * value backing, instead of leaving a permanent
+ * `{active:false, restoreAllowed:false}` entry.
+ *
+ * This exists to FALSIFY, not to configure. It is not a `TreeConfig` option and
+ * must not become one: the two arms are not both correct, and the trial ends
+ * with the flag deleted in whichever direction the gates decide. See
+ * docs/architecture/retired-subject-churn.md, open question 2, and
+ * `entity-lifetime-ledger-null.spec.ts`.
+ *
+ * @internal
+ */
+let forgetRetiredSubjectLifetime = false;
+
+/** @internal Trial-only. See `forgetRetiredSubjectLifetime`. */
+export function setForgetRetiredSubjectLifetimeForTrial(enabled = true): void {
+  forgetRetiredSubjectLifetime = enabled;
+}
+
 export type EntitySubjectPhysicalInventory<K extends string | number> = {
   subjectId: number;
   state: 'active' | 'tombstoned';
@@ -1520,6 +1543,7 @@ export function createEntitySignal<
       const retirement: PreparedRetainedValueRetirement = {
         kind: 'retire-retained-value',
         subjectId,
+        forgetLifetime: forgetRetiredSubjectLifetime,
       };
       frame.stageRetainedValueRetirement(retirement);
       entitySignals.delete(subjectId);
@@ -1531,6 +1555,16 @@ export function createEntitySignal<
     }
 
     const result = commitAndProjectEntityMutationFrame(frame);
+    if (forgetRetiredSubjectLifetime) {
+      // DO NOT PUBLISH a physical change for a subject whose ledger was just
+      // deleted. `publishSubjectPhysicalChange` -> `bumpSubjectRevision` writes
+      // `subjectRevisions.set(id, 1)`, which RESURRECTS the entry the forget
+      // just removed — the trial measured 79 B/retired instead of its real
+      // figure until this was found. There is nothing left to notify either:
+      // the entity signal was deleted in the loop above, and the activation
+      // token is interned lazily so a never-read subject has none.
+      return;
+    }
     for (const changedSubjectId of result.physicallyChangedSubjectIds) {
       publishSubjectPhysicalChange(changedSubjectId);
     }
@@ -3053,3 +3087,17 @@ Object.defineProperty(createEntitySignal, '__setPositionIdNotifyEnabledForTestin
   enumerable: false,
   configurable: true,
 });
+// Attached rather than only exported, for the same reason as the hook above:
+// a bare `export` with no reference in the source graph is tree-shaken out of
+// the build, so the bench arm that needs it would import `undefined` from the
+// built module. Non-enumerable, so it stays off snapshots and off the public
+// value-export budget.
+Object.defineProperty(
+  createEntitySignal,
+  '__setForgetRetiredSubjectLifetimeForTrial',
+  {
+    value: setForgetRetiredSubjectLifetimeForTrial,
+    enumerable: false,
+    configurable: true,
+  }
+);
