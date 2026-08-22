@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { EntityMutationFrame } from './entity-mutation-frame';
 import { resolveEntityHandle } from './entity-handle-resolution';
 import { EntityValueStore } from './entity-value-store';
-import { MaterializedEntityProjection } from './materialized-entity-projection';
 import { StructuralStore } from './structural-store';
 
 type Item = {
@@ -13,13 +12,11 @@ type Item = {
 
 function createHarness() {
   const valueStore = new EntityValueStore<Item>();
-  const projection = new MaterializedEntityProjection<number, Item>();
   const structuralStore = new StructuralStore<number>();
-  const frame = new EntityMutationFrame(valueStore, projection, structuralStore);
+  const frame = new EntityMutationFrame(valueStore, structuralStore);
 
   return {
     valueStore,
-    projection,
     structuralStore,
     frame,
   };

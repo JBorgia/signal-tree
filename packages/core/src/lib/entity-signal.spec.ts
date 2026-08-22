@@ -14,16 +14,10 @@ const pathNotifier = {
 type SubjectInventoryApi = {
   __listSubjectReclamationCandidates?: () => readonly number[];
   __inspectSubjectResources?: (subjectId: number) => unknown;
-  __snapshotStorageProjectionForTesting?: () => ReadonlyMap<
-    number,
-    { id: number; name: string; active: boolean }
-  >;
   __rebuildActiveProjectionFromOwnersForTesting?: () => ReadonlyMap<
     number,
     { id: number; name: string; active: boolean }
   >;
-  __clearStorageProjectionForTesting?: () => void;
-  __rebuildStorageProjectionForTesting?: () => void;
   __planSubjectReclamation?: (
     subjectId: number,
     options: { causallyEligible: boolean }
@@ -1001,28 +995,17 @@ describe('entity subject physical inventory', () => {
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
       )
     ).toEqual(expectedEntries);
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual(expectedEntries);
     expect(Array.from(api.asMap().entries())).toEqual(expectedEntries);
     expect(internal.__listSubjectReclamationCandidates?.()).toEqual([subjectOne]);
 
-    internal.__clearStorageProjectionForTesting?.();
 
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([]);
     expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
       )
     ).toEqual(expectedEntries);
 
-    internal.__rebuildStorageProjectionForTesting?.();
 
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual(expectedEntries);
     expect(Array.from(api.asMap().entries())).toEqual(expectedEntries);
   });
 
@@ -1053,30 +1036,19 @@ describe('entity subject physical inventory', () => {
       },
     });
     expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
+      Array.from(
+        internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
+      )
     ).toEqual([[1, { id: 1, name: 'Alice', active: true }]]);
+
+
     expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
       )
     ).toEqual([[1, { id: 1, name: 'Alice', active: true }]]);
 
-    internal.__clearStorageProjectionForTesting?.();
 
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([]);
-    expect(
-      Array.from(
-        internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
-      )
-    ).toEqual([[1, { id: 1, name: 'Alice', active: true }]]);
-
-    internal.__rebuildStorageProjectionForTesting?.();
-
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([[1, { id: 1, name: 'Alice', active: true }]]);
     expect(Array.from(api.asMap().entries())).toEqual([
       [1, { id: 1, name: 'Alice', active: true }],
     ]);
@@ -1469,30 +1441,19 @@ describe('entity subject physical inventory', () => {
     ] as const;
 
     expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
+      Array.from(
+        internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
+      )
     ).toEqual(expectedEntries);
+
+
     expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
       )
     ).toEqual(expectedEntries);
 
-    internal.__clearStorageProjectionForTesting?.();
 
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([]);
-    expect(
-      Array.from(
-        internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
-      )
-    ).toEqual(expectedEntries);
-
-    internal.__rebuildStorageProjectionForTesting?.();
-
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual(expectedEntries);
   });
 });
 
@@ -1514,7 +1475,6 @@ describe('addMany() mode option (F-011)', () => {
       'items'
     );
     const internal = api as typeof api & {
-      __snapshotStorageProjectionForTesting?: () => ReadonlyMap<number, Item>;
       __rebuildActiveProjectionFromOwnersForTesting?: () => ReadonlyMap<number, Item>;
     };
 
@@ -1529,9 +1489,6 @@ describe('addMany() mode option (F-011)', () => {
     expect(() => api.addOne({ id: 1, name: 'blocked' })).toThrow('blocked add');
     expect(api.count()).toBe(0);
     expect(api.byId(1)).toBeUndefined();
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([]);
     expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
@@ -1628,7 +1585,6 @@ describe('addMany() mode option (F-011)', () => {
   it('does not partially allocate or publish when a later addMany interceptor blocks', () => {
     const api = makeApi();
     const internal = api as typeof api & {
-      __snapshotStorageProjectionForTesting?: () => ReadonlyMap<number, Item>;
       __rebuildActiveProjectionFromOwnersForTesting?: () => ReadonlyMap<number, Item>;
     };
     api.intercept({
@@ -1650,9 +1606,6 @@ describe('addMany() mode option (F-011)', () => {
     expect(api.byId(1)).toBeUndefined();
     expect(api.byId(2)).toBeUndefined();
     expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([]);
-    expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
       )
@@ -1665,10 +1618,7 @@ describe('addMany() mode option (F-011)', () => {
   it('commits fresh addMany subjects in authored order and rebuilds projection from owners', () => {
     const api = makeApi();
     const internal = api as typeof api & {
-      __snapshotStorageProjectionForTesting?: () => ReadonlyMap<number, Item>;
       __rebuildActiveProjectionFromOwnersForTesting?: () => ReadonlyMap<number, Item>;
-      __clearStorageProjectionForTesting?: () => void;
-      __rebuildStorageProjectionForTesting?: () => void;
     };
 
     const ids = api.addMany([
@@ -1690,37 +1640,25 @@ describe('addMany() mode option (F-011)', () => {
     ] as const;
 
     expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
+      Array.from(
+        internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
+      )
     ).toEqual(expectedEntries);
+
+
     expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
       )
     ).toEqual(expectedEntries);
 
-    internal.__clearStorageProjectionForTesting?.();
 
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([]);
-    expect(
-      Array.from(
-        internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
-      )
-    ).toEqual(expectedEntries);
-
-    internal.__rebuildStorageProjectionForTesting?.();
-
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual(expectedEntries);
     expect(Array.from(api.asMap().entries())).toEqual(expectedEntries);
   });
 
   it('does not partially add when upsertMany later fails in the update phase', () => {
     const api = makeApi();
     const internal = api as typeof api & {
-      __snapshotStorageProjectionForTesting?: () => ReadonlyMap<number, Item>;
       __rebuildActiveProjectionFromOwnersForTesting?: () => ReadonlyMap<number, Item>;
     };
     api.addOne({ id: 1, name: 'original' });
@@ -1749,12 +1687,6 @@ describe('addMany() mode option (F-011)', () => {
     expect(api.byId(3)).toBeUndefined();
     expect(api.byId(4)).toBeUndefined();
     expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([
-      [1, { id: 1, name: 'original' }],
-      [2, { id: 2, name: 'second' }],
-    ]);
-    expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
       )
@@ -1770,10 +1702,7 @@ describe('addMany() mode option (F-011)', () => {
   it('upsertMany commits mixed existing and fresh subjects while preserving fresh allocation order', () => {
     const api = makeApi();
     const internal = api as typeof api & {
-      __snapshotStorageProjectionForTesting?: () => ReadonlyMap<number, Item>;
       __rebuildActiveProjectionFromOwnersForTesting?: () => ReadonlyMap<number, Item>;
-      __clearStorageProjectionForTesting?: () => void;
-      __rebuildStorageProjectionForTesting?: () => void;
     };
 
     api.addOne({ id: 1, name: 'A' });
@@ -1804,30 +1733,19 @@ describe('addMany() mode option (F-011)', () => {
     ] as const;
 
     expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
+      Array.from(
+        internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
+      )
     ).toEqual(expectedEntries);
+
+
     expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
       )
     ).toEqual(expectedEntries);
 
-    internal.__clearStorageProjectionForTesting?.();
 
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([]);
-    expect(
-      Array.from(
-        internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
-      )
-    ).toEqual(expectedEntries);
-
-    internal.__rebuildStorageProjectionForTesting?.();
-
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual(expectedEntries);
   });
 
   it('removeMany tombstones the whole prepared subject batch while retaining backing and held facades', () => {
@@ -1894,12 +1812,6 @@ describe('addMany() mode option (F-011)', () => {
       subjectTwo,
       subjectFour,
     ]);
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([
-      [1, { id: 1, name: 'Alice', active: true }],
-      [3, { id: 3, name: 'Cara', active: true }],
-    ]);
   });
 
   it('clear empties active projection without deleting retained subject lifetimes or values', () => {
@@ -1957,9 +1869,6 @@ describe('addMany() mode option (F-011)', () => {
       subjectIds as number[]
     );
     expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([]);
-    expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
       )
@@ -1974,7 +1883,6 @@ describe('addMany() mode option (F-011)', () => {
       'items'
     );
     const internal = api as typeof api & {
-      __snapshotStorageProjectionForTesting?: () => ReadonlyMap<number, Item>;
       __rebuildActiveProjectionFromOwnersForTesting?: () => ReadonlyMap<number, Item>;
     };
 
@@ -2006,12 +1914,6 @@ describe('addMany() mode option (F-011)', () => {
     expect(api.byIdOrFail(1).name.__subjectIds?.[0]).toBe(subjectOne);
     expect(api.byIdOrFail(2).name.__subjectIds?.[0]).toBe(subjectTwo);
     expect(api.byId(3)).toBeUndefined();
-    expect(
-      Array.from(internal.__snapshotStorageProjectionForTesting?.().entries() ?? [])
-    ).toEqual([
-      [1, { id: 1, name: 'Alice' }],
-      [2, { id: 2, name: 'Bob' }],
-    ]);
     expect(
       Array.from(
         internal.__rebuildActiveProjectionFromOwnersForTesting?.().entries() ?? []
