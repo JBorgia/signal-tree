@@ -11035,6 +11035,15 @@ first real publish remains the RC task.
 
 ## Phase 6 — Release Candidate
 
+- [ ] **Resolve RC public surface reconciliation before publishing.**
+  `docs/audits/2026-08/rc-public-surface-reconciliation.md` maps the
+  current tarball exports against the final disposition map. Blockers before
+  `1.0.0-rc.1`: `asyncSource`/`asyncQuery` are still public root exports
+  while the map says DELETE / decision required; several mechanically
+  retained helpers remain public without a survival decision; and the 10k
+  collection workload retains 66.12 MB without attribution. Do not publish
+  RC until each exported feature is either accepted, removed, or explicitly
+  carried into RC notes as unresolved.
 - [ ] publish `1.0.0-rc.1`
 - [ ] install from npm in external projects
 - [ ] collect RC packaging/DX/docs failures
