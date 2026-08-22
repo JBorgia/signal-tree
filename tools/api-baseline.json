@@ -180,6 +180,24 @@
         "internalDecl": false
       },
       {
+        "name": "defineStore",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/core/src/lib/define-store.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DefineStoreConfig",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/define-store.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "derivedFrom",
         "subpath": ".",
         "kind": "runtime",
@@ -337,24 +355,6 @@
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "linked",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/linked.ts",
-        "angularInDecl": true,
-        "angularInType": true,
-        "internalDecl": false
-      },
-      {
-        "name": "LinkedOptions",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/linked.ts",
         "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false
