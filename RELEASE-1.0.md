@@ -11072,11 +11072,16 @@ first real publish remains the RC task.
       public-disposition gate now passes. Independent review found four internal
       evidence specs still importing removed symbols through the public barrel;
       `08b8fae5` moved those specs to internal imports and `pnpm nx test core
-    --skip-nx-cache --output-style=static` passed on rerun. `b957f604` removed
+        --skip-nx-cache --output-style=static` passed on rerun. `b957f604` removed
       stale `compared()` advice from dev warnings after `compared` left the
-      public API. The 10k collection workload retention is now attributed at the
-      RC decision layer to active `entityMap` realization; deeper retainer splits
-      remain optimization work, not an unattributed RC blocker.
+      public API. `entityMap` live retention remains an explicit open
+      performance characterization: the large public-path heap signature is
+      measured, root snapshots/simple projections are apparently cleared as the
+      dominant cause, but the exact retained owner, kernel/semantic/Angular
+      observation split, and 18 MB transient-`byId` vs 60 MB baseline anomaly are
+      not yet established. This is not an automatic RC blocker unless the release
+      acceptance threshold requires architectural/performance attribution before
+      external publication.
 - [ ] publish `1.0.0-rc.1`
 - [ ] install from npm in external projects
 - [ ] collect RC packaging/DX/docs failures

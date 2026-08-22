@@ -11,6 +11,10 @@ Update: the public-surface contradiction is resolved as of `cf008545`.
 only the surviving core entry points (`.`, `./security`, `./storage`), and the
 reviewer-discovered internal spec imports were repaired in `08b8fae5`.
 
+Performance status is separate: the `entityMap` live-retention finding remains
+OPEN PERFORMANCE CHARACTERIZATION. It is not automatically an RC blocker, but it
+is not explained and must not be recorded as an accepted v15 kernel tradeoff.
+
 Release engineering is in good shape: gates pass, self-tests prove the gates can fail, tarballs are checked, clean-checkout flow works, and CI publishing is wired for trusted publishing. The public API reconciliation blockers recorded below are retained as the audit trail for why the removals happened.
 
 ## Blocking Findings
@@ -50,7 +54,7 @@ Resolved: public removals from `22792f97`, `c53aa416`, `52644fa3`, `b339b921`,
 root exports/subpaths. Only a later independent authority may grant one of those
 exact symbols again.
 
-### 3. Collection retention is measured and attributed at the RC decision layer
+### 3. Collection retention remains open performance characterization
 
 Final baseline measured the 10k collection workload as:
 
@@ -70,13 +74,29 @@ narrow the owner:
 - `entityMap` 10k plus held `byId()` for every row: `65.29 MB`, `6846 B/entity`
 - `entityMap` 10k plus transient, unheld `byId()` for every row: `18.03 MB`, `1890 B/entity`
 
-This rules out a held `tree()` snapshot and normal projection reads as the main owner. Held per-row facades add about `5.34 MB`, but the dominant `~60 MB` is already present in active `entityMap` storage/structural/value realization after `setAll`. Transient `byId()` materialization is collectable and substantially lower after a turn boundary, so the weak cache is not the 60 MB owner.
+Measured: current public `entityMap` construction / `setAll` is associated with
+a very large heap signature.
 
-RC-level attribution: the broad memory result belongs to active public `entityMap`
-realization, not kernel logical update cost, not held snapshots, and not projection
-reads. A deeper split between active value backing, structural store,
-subject/position metadata, entity signals, and Angular internals remains useful
-optimization work, but it is no longer an unattributed release blocker.
+Strongly suggested: root `tree()` snapshots and normal `all()` / `ids()` /
+`asMap()` projection reads are not the dominant cause. Held per-row facades add
+about `5.34 MB`, so they explain only a minority of the observed signature.
+
+Not yet established:
+
+- `59.95 MB` is the stable intrinsic live cost of the same active `entityMap`
+  under equivalent conditions.
+- The retained owner is specifically entity realization rather than measurement
+  setup or scenario shape.
+- The split between framework-neutral kernel truth, semantic/entity
+  realization, and Angular observation realization.
+- The `18.03 MB` transient unheld-`byId()` scenario is compatible with the
+  `~60 MB` baseline scenario.
+
+RC policy: this is not automatically an `rc.1` blocker if RC is defined as
+public API/disposition correctness plus functional correctness with known
+performance questions investigated during RC. It remains a blocker only under a
+stricter policy that requires v15's principal architectural/performance claims
+to be understood before external publication.
 
 ### 4. Collection throughput needs layer boundaries, not one headline number
 
@@ -90,8 +110,8 @@ Follow-up public API decomposition at 10k rows (`node --expose-gc tools/bench-pu
 | -------------------------------------------- | -----------: | -------------: | ----------------------------------------------------------------- |
 | plain array tree construction                |   `1.727 ms` |      `0.17 MB` | payload/control                                                   |
 | empty `entityMap` declaration                |   `0.596 ms` |      `0.12 MB` | construction is not the 122 ms owner                              |
-| `entityMap.setAll(10k)`                      | `116.180 ms` |     `71.33 MB` | initial population owns the broad workload time/heap              |
-| `entityMap.addMany(10k)`                     | `113.136 ms` |     `71.32 MB` | same as `setAll`: bulk realization/population                     |
+| `entityMap.setAll(10k)`                      | `116.180 ms` |     `71.33 MB` | public entry path that produces the broad workload time/heap      |
+| `entityMap.addMany(10k)`                     | `113.136 ms` |     `71.32 MB` | same as `setAll`: public bulk population path                     |
 | existing `updateOne`                         |   `0.290 ms` |     `-0.02 MB` | public steady-state update remains sub-ms                         |
 | existing `updateOne` + dependent `byId` read |   `0.453 ms` |     `-0.01 MB` | compatible with kernel O(1) direction                             |
 | structural `addOne`                          |   `0.364 ms` |     `-0.02 MB` | single public structural mutation is not the broad workload owner |
@@ -105,12 +125,14 @@ This reconciles the apparent contradiction with the kernel measurements:
 
 - the kernel `updateOne` / direct-frame logical-work results are about steady-state mutation after realization;
 - the broad 10k collection workload is dominated by initial population / realization;
-- the large retained heap appears when entering active `entityMap` realization, not when reading projections or updating an existing member.
+- the large retained heap is associated with entering through active public
+  `entityMap` bulk population, not with reading projections or updating an
+  existing member.
 
-What remains unresolved is the optimization-level retainer split inside initial
-`entityMap` realization: active value backing, structural store,
-subject/position metadata, entity signals, Angular runtime objects, and
-closure/map overhead.
+What remains unresolved is semantic ownership of the retained bytes: active
+value backing, structural store, subject/position metadata, entity signals,
+Angular runtime objects, closure/map overhead, and whether the compact
+framework-neutral kernel remains compact independently of Angular observation.
 
 ## Current Publishable Packages
 
@@ -125,25 +147,25 @@ Deleted package surfaces: `guardrails`, `realtime`, `schema`, `enterprise`, `cal
 
 ## Benchmarked Feature Surface
 
-| Feature measured by `tools/size-report.mjs` | Public in current RC candidate? | Disposition in map                                 | Reconciliation                                                                                   |
-| ------------------------------------------- | ------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `signalTree`                                | Yes                             | `KP` frozen                                        | Keep. Core construction boundary.                                                                |
-| `entityMap`                                 | Yes                             | Survives but challenged / unplaced                 | Keep for RC; retention attributed to active realization, deeper split remains optimization debt. |
-| `entityMap + loader`                        | No                              | `loader` app responsibility; tags unrun remainder  | Removed from RC public surface.                                                                  |
-| `stored`                                    | No                              | `AS`, not earned both halves                       | Removed from RC public surface.                                                                  |
-| `compared` / `byKeys`                       | No                              | unplaced; null not run                             | Removed from RC public surface.                                                                  |
-| `asyncSource`                               | No                              | DELETE                                             | Removed from RC public surface.                                                                  |
-| `asyncQuery`                                | No                              | DELETE                                             | Removed from RC public surface.                                                                  |
-| `batching`                                  | Yes                             | `KA`                                               | Keep. Notification batching over synchronous writes.                                             |
-| `timeTravel`                                | Yes                             | `KA` devtools/history instrument                   | Keep if framed as causal/debug/history adapter, not end-user undo by itself.                     |
-| `transactions`                              | Yes                             | `KA` for refusal/neutrality; speculative role open | Keep only if the exported API can promise only the earned semantics.                             |
-| `serialization`                             | No                              | not earned for core function / unplaced            | Removed from RC public surface.                                                                  |
-| `persistence`                               | Yes                             | `KA`; enhancer form undisposed                     | Keepable for tree-scoped durability, but form needs explicit acceptance.                         |
-| `devTools`                                  | Yes                             | `KA` diagnostic projection                         | Keep. Diagnostic adapter.                                                                        |
-| `security` subpath                          | Yes                             | `KA`, no external imports                          | Keep. Isolated construction-time validator.                                                      |
-| `lazy` subpath                              | No                              | unassigned threshold-driven                        | Removed from RC public surface.                                                                  |
-| `edit-session` subpath                      | No                              | null not run                                       | Removed from RC public surface.                                                                  |
-| `storage` subpath                           | Yes                             | `KA`                                               | Keep. Adapter-only, no Angular coupling.                                                         |
+| Feature measured by `tools/size-report.mjs` | Public in current RC candidate? | Disposition in map                                 | Reconciliation                                                                     |
+| ------------------------------------------- | ------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `signalTree`                                | Yes                             | `KP` frozen                                        | Keep. Core construction boundary.                                                  |
+| `entityMap`                                 | Yes                             | Survives but challenged / unplaced                 | Keep for RC; live-retention attribution remains open performance characterization. |
+| `entityMap + loader`                        | No                              | `loader` app responsibility; tags unrun remainder  | Removed from RC public surface.                                                    |
+| `stored`                                    | No                              | `AS`, not earned both halves                       | Removed from RC public surface.                                                    |
+| `compared` / `byKeys`                       | No                              | unplaced; null not run                             | Removed from RC public surface.                                                    |
+| `asyncSource`                               | No                              | DELETE                                             | Removed from RC public surface.                                                    |
+| `asyncQuery`                                | No                              | DELETE                                             | Removed from RC public surface.                                                    |
+| `batching`                                  | Yes                             | `KA`                                               | Keep. Notification batching over synchronous writes.                               |
+| `timeTravel`                                | Yes                             | `KA` devtools/history instrument                   | Keep if framed as causal/debug/history adapter, not end-user undo by itself.       |
+| `transactions`                              | Yes                             | `KA` for refusal/neutrality; speculative role open | Keep only if the exported API can promise only the earned semantics.               |
+| `serialization`                             | No                              | not earned for core function / unplaced            | Removed from RC public surface.                                                    |
+| `persistence`                               | Yes                             | `KA`; enhancer form undisposed                     | Keepable for tree-scoped durability, but form needs explicit acceptance.           |
+| `devTools`                                  | Yes                             | `KA` diagnostic projection                         | Keep. Diagnostic adapter.                                                          |
+| `security` subpath                          | Yes                             | `KA`, no external imports                          | Keep. Isolated construction-time validator.                                        |
+| `lazy` subpath                              | No                              | unassigned threshold-driven                        | Removed from RC public surface.                                                    |
+| `edit-session` subpath                      | No                              | null not run                                       | Removed from RC public surface.                                                    |
+| `storage` subpath                           | Yes                             | `KA`                                               | Keep. Adapter-only, no Angular coupling.                                           |
 
 ## Retained Functionality: How It Works and Why It Was Kept or Questioned
 
@@ -282,7 +304,13 @@ At 10k collection workload:
 - Elf: `1.50 ms`, `0.92 MB retained`
 - Raw signals: `4.87 ms`, `6.16 MB retained`
 
-Additional retained-heap ablation shows the dominant cost appears before projection reads and before held per-row facades. The remaining attribution target is active `entityMap` internals: retained value backing, structural store, subject/position metadata, entity signals, and Angular runtime objects.
+Additional retained-heap ablation shows the dominant cost appears before
+projection reads and before held per-row facades, but it does not yet establish
+the semantic owner. The remaining attribution target is active `entityMap`
+internals across framework-neutral kernel truth, semantic/entity realization,
+and Angular observation realization. The transient unheld-`byId()` result
+(`18.03 MB`) must be reconciled with the `~60 MB` baseline before architectural
+claims are made from these numbers.
 
 ### Granular workload vs SignalStore
 
@@ -309,6 +337,8 @@ symbols and unplaced subpaths are absent, tarball exports resolve, copyable docs
 do not import removed names, and full core tests pass after internal evidence
 specs moved off the public barrel.
 
-Before publishing `1.0.0-rc.1`, run the normal RC packaging/publish proof. The
-remaining `entityMap` memory work is now optimization-level attribution inside
-active realization, not an unattributed RC surface contradiction.
+Before publishing `1.0.0-rc.1`, run the normal RC packaging/publish proof and
+preserve the retention finding as an explicit RC investigation. The public API
+surface is clean enough to proceed, but the `entityMap` memory story is still
+open: the 60 MB signature is not an accepted tradeoff, not proven kernel cost,
+and not reconciled with the 18 MB transient-`byId()` scenario.
