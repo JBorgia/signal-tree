@@ -136,13 +136,6 @@ export {
   type DerivedType,
 } from './lib/markers/derived';
 
-
-// `trackHistory()` — signal-native undo/redo over ANY WritableSignal. Marker
-// free: it takes the model signal directly, so it survived FORM-DEL untouched.
-// Tree-shakeable — unused means the snapshot/undo engine is never bundled.
-export { trackHistory } from './lib/form-history/form-history';
-export type { FormHistoryOptions } from './lib/types';
-
 // Audit tracker — framework-agnostic tree change logging (moved from
 // @signaltree/ng-forms in v13, RFC 0006). Tree-shakeable: unused → not bundled.
 export {
