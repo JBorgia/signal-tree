@@ -40,8 +40,6 @@ export {
   type ReadonlyNodeAccessor,
   type ReadonlyEntityNode,
   type ReadonlyEntitySignal,
-  type ReadonlyEntityLoaderSurface,
-  type ReadonlyLoadingEntitySignal,
   type ReadonlyStoredSignal,
 } from './lib/readonly';
 
@@ -113,7 +111,6 @@ export { entityMap } from './lib/types';
 // serialization config types had.
 export type {
   EntityMapBuilder,
-  LoadingEntityMapBuilder,
   DefaultKey,
   ComputedSliceConfig,
   EntityMapComputedSlices,
@@ -182,24 +179,6 @@ export {
   type AuditMetadata,
   type AuditTrackerConfig,
 } from './lib/audit/audit';
-
-// Cache-aware (single-scope) loading for entityMap (RFC 0002/0003). `entityMap({ load, … })`
-// turns a plain collection into a self-loading, cache-aware one; `invalidateTag`
-// is the push-invalidation seam. `entityMap` is exported above (from ./lib/types).
-export {
-  invalidateTag,
-  type EntityLoader,
-  type EntityLoadOptions,
-  type EntityLoaderSurface,
-  type EntityPersist,
-  type EntityStorageAdapter,
-} from './lib/markers/entity-loader';
-// `loader()` — the tree-shakeable way to make an entityMap cache-aware (RFC 0005 §6).
-// Importing `entityMap` WITHOUT `loader` shakes the loader machinery out; the
-// branded `LoaderFeature` it returns is the only static reference to `attachLoader`.
-export { loader, type LoaderOptions } from './lib/markers/loader';
-export type { LoaderFeature } from './lib/types';
-export type { LoadingEntityMapMarker, LoadingEntitySignal } from './lib/types';
 
 // Async-stream marker — DELETED in 14.0.0, along with its implementation and
 // tests. It sat here unexported for several releases while the API question (a

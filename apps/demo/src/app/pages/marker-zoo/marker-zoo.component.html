@@ -32,25 +32,16 @@
     <article class="card">
       <h2>
         <span class="depth-badge">depth 4</span>
-        <code>entityMap&lt;E, K&gt;()</code> <span class="submeta">(cache-aware)</span>
+        <code>entityMap&lt;E, K&gt;()</code> <span class="submeta">(nested)</span>
       </h2>
       <p>
-        The same <code>entityMap</code> marker as depth 3, in its cache-aware,
-        self-loading form — nested inside <code>organization.teams.catalog</code>.
-        Auto-loads on materialize, then <code>load()</code> is a no-op while fresh.
+        The same <code>entityMap</code> marker as depth 3, nested inside
+        <code>organization.teams.catalog</code>. App services own loading and
+        freshness; the tree owns normalized membership and granular reads.
       </p>
       <div class="row">
-        <button (click)="loadPlants()" [disabled]="store.$.organization.teams.catalog.plants.loading()">
-          @if (store.$.organization.teams.catalog.plants.loading()) {
-            Loading…
-          } @else {
-            Load plants
-          }
-        </button>
+        <button (click)="loadPlants()">Load plants</button>
         <span class="count">{{ store.$.organization.teams.catalog.plants.count() }} plants</span>
-        @if (store.$.organization.teams.catalog.plants.loaded()) {
-          <span class="badge loaded">✅ fresh</span>
-        }
       </div>
       @if (store.$.organization.teams.catalog.plants.count() > 0) {
         <ul class="entity-list">

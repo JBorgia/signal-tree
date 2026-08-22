@@ -1020,7 +1020,9 @@ tree.$.users.upsertOne(user, { selectId: (u) => u.odataId });
 
 ### 10) Manual Async State
 
-Use ordinary state for local operation flags, or `entityMap({ load: loader(...) })` for cache-aware loading.
+Use ordinary state for local operation flags. The old cache-aware
+`entityMap({ load: loader(...) })` surface is not part of the current RC public
+API; keep loading/freshness orchestration in application services.
 
 ```typescript
 import { signalTree } from '@signaltree/core';
@@ -1612,7 +1614,7 @@ const tree = signalTree(state);
 // Phase 2: Add performance when needed
 const tree2 = tree.with(batching());
 
-// Phase 3: Use entityMap for collections and loader() for cache-aware loading
+// Phase 3: Use entityMap for normalized local collections
 const tree3 = signalTree({ users: entityMap<User>() }).with(batching());
 
 // Each phase is fully functional and production-ready

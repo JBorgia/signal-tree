@@ -4,11 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
   entityMap,
-  loader,
   signalTree,
   stored,
 } from '@signaltree/core';
-import { delay, of } from 'rxjs';
 
 import { CodeTabsComponent } from '../../examples/shared/components/example-shell';
 import type { CodeFile } from '../../examples/shared/components/example-shell';
@@ -61,8 +59,7 @@ const ALL_PLANTS: Plant[] = [
  * Depth map:
  *   depth 2: settings.theme (stored),
  *   depth 3: organization.teams.list (entityMap)
- *   depth 4: organization.teams.catalog.plants (entityMap in its cache-aware,
- *            self-loading form — not a separate marker)
+ *   depth 4: organization.teams.catalog.plants (plain nested entityMap)
  */
 @Component({
   selector: 'app-marker-zoo',
@@ -95,16 +92,10 @@ export class MarkerZooComponent {
       language: 'typescript',
       source: `plants: entityMap<Plant, string>({
   selectId: (p) => p.id,
-  load: loader(() => of(ALL_PLANTS).pipe(delay(400)), {
-    staleTime: '30s',  // load() is a no-op while fresh
-    tags: ['plants'],  // invalidateTag(tree, 'plants')
-  }),
 })
 
 store.$.organization.teams.catalog.plants.all();      // full entityMap surface
-store.$.organization.teams.catalog.plants.loading();   // Signal<boolean>
-store.$.organization.teams.catalog.plants.load();      // guarded — coalesces concurrent calls
-store.$.organization.teams.catalog.plants.invalidate(); // mark stale`,
+store.$.organization.teams.catalog.plants.setAll(rows); // app service owns loading`,
     },
   ];
 
@@ -115,16 +106,8 @@ store.$.organization.teams.catalog.plants.invalidate(); // mark stale`,
         list: entityMap<Team, number>({ selectId: (t) => t.id }),
 
         catalog: {
-          // depth 4 — entityMap in its cache-aware, self-loading form
+          // depth 4 — plain nested entityMap
           plants: entityMap<Plant, string>({
-            // Non-lazy: auto-loads on materialize. Safe during template-triggered
-            // materialization because the auto-load is deferred off the render
-            // pass (no signal writes mid-render). The "Load plants" button below
-            // acts as a manual refresh.
-            load: loader(() => of(ALL_PLANTS).pipe(delay(400)), {
-              staleTime: '30s',
-              tags: ['plants'],
-            }),
             selectId: (p) => p.id,
           }),
         },
@@ -143,7 +126,7 @@ store.$.organization.teams.catalog.plants.invalidate(); // mark stale`,
   }
 
   loadPlants(): void {
-    this.store.$.organization.teams.catalog.plants.load();
+    this.store.$.organization.teams.catalog.plants.setAll(ALL_PLANTS);
   }
 
   toggleTheme(): void {
@@ -157,6 +140,5 @@ store.$.organization.teams.catalog.plants.invalidate(); // mark stale`,
   resetAll(): void {
     this.store.$.organization.teams.list.clear();
     this.store.$.organization.teams.catalog.plants.clear();
-    this.store.$.organization.teams.catalog.plants.invalidate();
   }
 }

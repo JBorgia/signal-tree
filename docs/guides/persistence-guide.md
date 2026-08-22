@@ -138,70 +138,16 @@ import { createIndexedDBAdapter } from '@signaltree/core/storage';
 const tree = signalTree({ document: { blocks: [] as Block[] } }).with(persistence({ key: 'editor', storage: createIndexedDBAdapter() }));
 ```
 
-The same adapters plug into `entityMap`'s `loader({ persist })` option below.
-(`stored()` takes a DOM `Storage` backend instead — it is deliberately
-localStorage-shaped.)
+`stored()` takes a DOM `Storage` backend instead — it is deliberately
+localStorage-shaped.
 
-## 4. `entityMap({ load: loader(fn, { persist }) })` — per-collection offline-first
+## 4. Server-backed collection persistence
 
-For collections with a loader. On every successful `load()`, rows are written
-through to the adapter under `key` (scoped collections get one entry per
-params scope: `key::<params>`). With `hydrateThenRevalidate: true`, the cached
-rows are shown immediately, marked stale, and the loader refetches in the
-background — offline-first warm starts.
-
-```typescript
-import { signalTree, entityMap, loader } from '@signaltree/core';
-import { createIndexedDBAdapter } from '@signaltree/core/storage';
-
-const tree = signalTree({
-  plants: entityMap<Plant, string>({
-    selectId: (p) => p.id,
-    load: loader(() => api.getPlants(), {
-      staleTime: '30m',
-      persist: {
-        adapter: createIndexedDBAdapter(),
-        key: 'plants',
-        hydrateThenRevalidate: true, // cached rows now, fresh rows soon
-      },
-    }),
-  }),
-});
-
-// First paint: rows from IndexedDB (loaded() is false — they're stale).
-// Then the loader settles and loaded() flips true.
-```
-
-Persistence here is best-effort by design: a storage failure never breaks the
-load path.
-
-## Persisted-scope cleanup (high-cardinality scopes)
-
-A scoped `entityMap` with `loader({ persist })` writes one storage entry per
-scope (`key::<stableStringify(params)>`). Left alone, an app cycling through
-thousands of tenant/customer/search scopes accumulates entries forever. Set
-`persist.maxScopes` to cap them:
-
-```typescript
-load: loader(({ tenantId }) => api.customers(tenantId), {
-  persist: {
-    adapter: createIndexedDBAdapter(),
-    key: 'customers',
-    hydrateThenRevalidate: true,
-    maxScopes: 20, // keep the 20 most-recently written scopes
-  },
-}),
-```
-
-The loader maintains a touch-ordered index of persisted scope keys under
-`key::__scopes` (a JSON array, most-recent last). Every successful
-write-through moves the current scope to the tail; once the index exceeds
-`maxScopes`, the oldest scopes' storage entries are removed. Like write-through
-itself this is best-effort — an adapter failure never breaks (or delays) the
-load path — and it is **storage GC only**: a pruned scope simply misses
-hydration and loads fresh on its next visit. The in-memory cache is unaffected
-and still single-scope; a multi-scope in-memory LRU remains explicitly
-deferred (RFC 0003 §5).
+The old `entityMap({ load: loader(fn, { persist }) })` surface is not part of
+the current RC public API. For server-backed collections, keep HTTP caching,
+freshness, revalidation, and high-cardinality scope cleanup in application
+services or framework data primitives, then write resolved rows into plain
+`entityMap()` state.
 
 **When you need a custom policy** (time-based expiry, per-user quotas, keys
 shared across trees), leave `maxScopes` unset — the `key::__scopes` index is
