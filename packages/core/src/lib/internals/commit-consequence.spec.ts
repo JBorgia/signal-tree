@@ -88,7 +88,9 @@ describe('commit-consequence registry — explicit attribution', () => {
     // WRONG owner, right id — likewise.
     expect(deferCommitConsequence({}, 1, 'k', () => (ran = true))).toBe(false);
     // Exact match.
-    expect(deferCommitConsequence(owner, 1, 'k', () => (ran = true))).toBe(true);
+    expect(deferCommitConsequence(owner, 1, 'k', () => (ran = true))).toBe(
+      true
+    );
 
     expect(ran).toBe(false);
     settleCommitScope(owner, 1, 'commit');
@@ -219,12 +221,15 @@ describe('commit-consequence boundary — observed through stored()', () => {
     resetPathNotifier();
 
     const rec = recordingStorage({ 'cc-bare': 'light' });
-    const store = signalTree({
-      theme: stored('cc-bare', 'light', {
-        storage: rec.adapter,
-        debounceMs: 0,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        theme: stored('cc-bare', 'light', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { theme: { (): string; set(value: string): void } };
     };
 
@@ -243,10 +248,13 @@ describe('commit-consequence boundary — observed through stored()', () => {
     getPathNotifier().setBatchingEnabled(false);
 
     const rec = recordingStorage({ 'cc-a': 'a0', 'cc-b': 'b0' });
-    const store = signalTree({
-      a: stored('cc-a', 'a0', { storage: rec.adapter, debounceMs: 0 }),
-      b: stored('cc-b', 'b0', { storage: rec.adapter, debounceMs: 0 }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        a: stored('cc-a', 'a0', { storage: rec.adapter, debounceMs: 0 }),
+        b: stored('cc-b', 'b0', { storage: rec.adapter, debounceMs: 0 }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: {
         a: { (): string; set(value: string): void };
         b: { (): string; set(value: string): void };
@@ -283,9 +291,12 @@ describe('commit-consequence boundary — observed through stored()', () => {
     getPathNotifier().setBatchingEnabled(false);
 
     const rec = recordingStorage({ 'cc-throw': 'keep' });
-    const store = signalTree({
-      v: stored('cc-throw', 'keep', { storage: rec.adapter, debounceMs: 0 }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        v: stored('cc-throw', 'keep', { storage: rec.adapter, debounceMs: 0 }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { v: { (): string; set(value: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -315,9 +326,15 @@ describe('commit-consequence boundary — observed through stored()', () => {
     getPathNotifier().setBatchingEnabled(false);
 
     const rec = recordingStorage({ 'cc-rb': 'light' });
-    const store = signalTree({
-      theme: stored('cc-rb', 'light', { storage: rec.adapter, debounceMs: 0 }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        theme: stored('cc-rb', 'light', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { theme: { (): string; set(value: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -345,9 +362,12 @@ describe('commit-consequence boundary — observed through stored()', () => {
     const rec = recordingStorage({ 'cc-t1': 'x0', 'cc-t2': 'y0' });
 
     const makeTree = (key: string, seed: string) =>
-      signalTree({
-        v: stored(key, seed, { storage: rec.adapter, debounceMs: 0 }),
-      }).with(transactions()) as {
+      signalTree(
+        {
+          v: stored(key, seed, { storage: rec.adapter, debounceMs: 0 }),
+        },
+        { enhancers: [transactions()] }
+      ) as {
         $: { v: { (): string; set(value: string): void } };
         transaction: (fn: () => void) => { confirm(): void; rollback(): void };
       };
@@ -377,15 +397,20 @@ describe('commit-consequence boundary — observed through stored()', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const { timeTravel } = await import('../../enhancers/time-travel/time-travel');
+    const { timeTravel } = await import(
+      '../../enhancers/time-travel/time-travel'
+    );
 
     const rec = recordingStorage({ 'cc-undo': 'light' });
-    const store = signalTree({
-      theme: stored('cc-undo', 'light', {
-        storage: rec.adapter,
-        debounceMs: 0,
-      }),
-    }).with(timeTravel()) as unknown as {
+    const store = signalTree(
+      {
+        theme: stored('cc-undo', 'light', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as unknown as {
       $: { theme: { (): string; set(value: string): void } };
       undo(): void;
     };

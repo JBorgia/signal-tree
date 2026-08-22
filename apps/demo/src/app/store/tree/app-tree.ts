@@ -70,9 +70,9 @@ function createBaseState() {
  * ```
  */
 export function createAppTree() {
-  return signalTree(createBaseState())
-    .with(devTools({ name: STORE_NAME }))
-    .with(batching())
+  return signalTree(createBaseState(), {
+    enhancers: [devTools({ name: STORE_NAME }), batching()],
+  })
     .derived(tier1Derived)
     .derived(tier2Derived)
     .derived(tier3Derived);

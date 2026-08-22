@@ -20,8 +20,9 @@ describe('time travel records direct leaf writes', () => {
   const flush = () => new Promise((r) => setTimeout(r, 0));
 
   it('undo restores a direct leaf .set()', async () => {
-    const tree = signalTree({ user: { profile: { name: 'a' } } }).with(
-      timeTravel()
+    const tree = signalTree(
+      { user: { profile: { name: 'a' } } },
+      { enhancers: [timeTravel()] }
     );
 
     tree.$.user.profile.name.set('b');
@@ -35,7 +36,7 @@ describe('time travel records direct leaf writes', () => {
   });
 
   it('undo restores a direct leaf .update()', async () => {
-    const tree = signalTree({ count: 0 }).with(timeTravel());
+    const tree = signalTree({ count: 0 }, { enhancers: [timeTravel()] });
 
     tree.$.count.update((n) => n + 1);
     await flush();
@@ -48,7 +49,10 @@ describe('time travel records direct leaf writes', () => {
   });
 
   it('records leaf writes at depth', async () => {
-    const tree = signalTree({ a: { b: { c: { d: 1 } } } }).with(timeTravel());
+    const tree = signalTree(
+      { a: { b: { c: { d: 1 } } } },
+      { enhancers: [timeTravel()] }
+    );
 
     tree.$.a.b.c.d.set(2);
     await flush();
@@ -59,7 +63,7 @@ describe('time travel records direct leaf writes', () => {
   });
 
   it('redo replays a leaf write that undo rolled back', async () => {
-    const tree = signalTree({ n: 1 }).with(timeTravel());
+    const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
 
     tree.$.n.set(2);
     await flush();
@@ -71,7 +75,7 @@ describe('time travel records direct leaf writes', () => {
   });
 
   it('does not grow history while restoring', async () => {
-    const tree = signalTree({ n: 1 }).with(timeTravel());
+    const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
 
     tree.$.n.set(2);
     await flush();
@@ -86,11 +90,14 @@ describe('time travel records direct leaf writes', () => {
   });
 
   it('undo on a tree with entity collections keeps redo and records no phantom entry', async () => {
-    const tree = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    );
 
     tree.$.rows.addOne({ id: 1, name: 'a' });
     await flush();

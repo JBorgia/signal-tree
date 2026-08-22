@@ -89,16 +89,16 @@ import {
 
 type User = { id: number; name: string; version: number };
 
-const tree = signalTree({
-  count: 0,
-  user: { name: 'Ada', age: 36 },
-  users: entityMap<User, number>({ selectId: (u: User) => u.id }),
-})
-  // .with() takes ONE enhancer and is CHAINED. Passing several at once is
-  // TS2554 (Expected 1 arguments, but got 3) — worth having right in the
-  // sample, because it is the shape a newcomer reaches for first.
-  .with(timeTravel())
-  .with(batching());
+// Enhancers are DECLARED, all of them, in one array. There is no .with() to
+// chain and no order to get right -- the sample shows the only shape there is.
+const tree = signalTree(
+  {
+    count: 0,
+    user: { name: 'Ada', age: 36 },
+    users: entityMap<User, number>({ selectId: (u: User) => u.id }),
+  },
+  { enhancers: [timeTravel(), batching()] }
+);
 
 // Reads
 const n: number = tree.$.count();

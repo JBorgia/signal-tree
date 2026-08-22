@@ -28,7 +28,10 @@ const ENHANCERS: Array<[string, () => (t: never) => never]> = [
 
 describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => {
   it('updateAndReport writes AND reports', () => {
-    const tree = signalTree({ count: 0, other: 'x' }).with(make() as never);
+    const tree = signalTree(
+      { count: 0, other: 'x' },
+      { enhancers: [make() as never], capabilities: ['causal-runtime'] }
+    );
 
     const changed = (
       tree as unknown as { updateAndReport: (u: unknown) => string[] }
@@ -42,7 +45,10 @@ describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => 
   // the tree callable. The replacement is the callable itself, which the builder
   // already exposes, so this asserts the write path that survives.
   it('the tree callable writes through the builder (batchUpdate is gone)', () => {
-    const tree = signalTree({ count: 0 }).with(make() as never);
+    const tree = signalTree(
+      { count: 0 },
+      { enhancers: [make() as never], capabilities: ['causal-runtime'] }
+    );
 
     expect(
       (tree as unknown as { batchUpdate?: unknown }).batchUpdate
@@ -57,7 +63,10 @@ describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => 
     // the copy — and that is NOT harmless: with `destroy` missing the builder
     // falls to its else-branch and installs a NO-OP, so timeTravel history,
     // batching timers and persistence subscriptions all leak, silently.
-    const tree = signalTree({ count: 0 }).with(make() as never);
+    const tree = signalTree(
+      { count: 0 },
+      { enhancers: [make() as never], capabilities: ['causal-runtime'] }
+    );
     let ran = 0;
     (
       tree as unknown as { registerCleanup: (f: () => void) => void }
@@ -72,23 +81,45 @@ describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => 
   });
 
   it('keeps $ identity, so leaf refs held across the enhancer still work', () => {
-    const base = signalTree({ count: 0 });
-    const baseLeaf = base.$.count;
-    const tree = base.with(make() as never);
+    // v15 has no late enhancement, so there is no "tree before the enhancer"
+    // to hold a reference from. The guarantee is unchanged, though — an
+    // enhancer that returns a NEW tree object must not swap `$` — so the
+    // pre-enhancer reference is taken from inside the enhancer chain instead,
+    // by a probe declared ahead of the enhancer under test.
+    //
+    // This depends on independent enhancers applying in declaration order,
+    // which the test below this describe block pins directly; if that ever
+    // stops holding, this test goes vacuous rather than wrong, and that test
+    // fails first.
+    let seen$: unknown;
+    let seenLeaf: unknown;
+    const probe = (t: unknown) => {
+      seen$ = (t as { $: unknown }).$;
+      seenLeaf = (t as { $: { count: unknown } }).$.count;
+      return t;
+    };
 
-    expect((tree as unknown as { $: unknown }).$).toBe(base.$);
+    const tree = signalTree(
+      { count: 0 },
+      { enhancers: [probe as never, make() as never] }
+    );
+
+    expect((tree as unknown as { $: unknown }).$).toBe(seen$);
     expect((tree as unknown as { $: { count: unknown } }).$.count).toBe(
-      baseLeaf
+      seenLeaf
     );
 
     // A write through the PRE-enhancer leaf reference must be visible through
     // the enhanced tree.
-    (baseLeaf as unknown as { set: (v: number) => void }).set(42);
+    (seenLeaf as { set: (v: number) => void }).set(42);
     expect((tree as unknown as () => { count: number })().count).toBe(42);
   });
 
   it('bind() survives and still writes', () => {
-    const tree = signalTree({ count: 0 }).with(make() as never);
+    const tree = signalTree(
+      { count: 0 },
+      { enhancers: [make() as never], capabilities: ['causal-runtime'] }
+    );
     const bound = (
       tree as unknown as { bind: () => (v?: unknown) => unknown }
     ).bind();
@@ -99,17 +130,44 @@ describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => 
   });
 
   it('the call form still writes', () => {
-    const tree = signalTree({ count: 0 }).with(make() as never);
+    const tree = signalTree(
+      { count: 0 },
+      { enhancers: [make() as never], capabilities: ['causal-runtime'] }
+    );
     (tree as unknown as (u: unknown) => void)({ count: 8 });
     expect(tree.$.count()).toBe(8);
   });
 });
 
+describe('enhancer application order', () => {
+  it('applies independent enhancers in declaration order', () => {
+    // Nothing in the dependency graph relates these two, so the topological
+    // sort must leave them as declared. The `$`-identity tests above read a
+    // pre-enhancer reference by declaring a probe first, and rely on this.
+    const log: string[] = [];
+    const mark = (name: string) => (t: unknown) => {
+      log.push(name);
+      return t;
+    };
+
+    signalTree(
+      { count: 0 },
+      { enhancers: [mark('first') as never, mark('second') as never] }
+    );
+
+    expect(log).toEqual(['first', 'second']);
+  });
+});
+
 describe('stacked enhancers', () => {
   it('survive two layers', () => {
-    const tree = signalTree({ count: 0 })
-      .with(timeTravel() as never)
-      .with(batching() as never);
+    const tree = signalTree(
+      { count: 0 },
+      {
+        enhancers: [timeTravel() as never, batching() as never],
+        capabilities: ['causal-runtime'],
+      }
+    );
 
     const changed = (
       tree as unknown as { updateAndReport: (u: unknown) => string[] }
@@ -133,7 +191,10 @@ describe('a missing forward target is loud', () => {
         fresh['$'] = (t as Record<string, unknown>)['$'];
         return fresh;
       };
-      const tree = signalTree({ count: 0 }).with(broken as never);
+      const tree = signalTree(
+        { count: 0 },
+        { enhancers: [broken as never], capabilities: ['causal-runtime'] }
+      );
 
       const changed = (
         tree as unknown as { updateAndReport: (u: unknown) => string[] }

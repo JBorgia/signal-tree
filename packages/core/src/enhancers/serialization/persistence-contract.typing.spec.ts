@@ -23,6 +23,13 @@
  * `enhancer-metadata-authority.spec.ts`.
  *
  * `persistence` requires config (no default), unlike every enhancer before it.
+ *
+ * v15: enhancers are DECLARED, so the call site is
+ * `signalTree(state, { enhancers: [persistence()] })` and the added surface arrives
+ * through the return type. Note the state is a separate annotated `const`
+ * rather than `signalTree<AppState>(...)` — an explicit type argument would
+ * have to name the enhancer tuple parameter too, and naming it is exactly the
+ * ceremony this file exists to forbid.
  */
 import { signalTree } from '../../lib/signal-tree';
 import { persistence } from './serialization';
@@ -44,8 +51,9 @@ interface AppState {
   user: { name: string; age: number };
 }
 
-const tree = signalTree<AppState>({ count: 0, user: { name: 'Ada', age: 36 } });
-const persisted = tree.with(persistence({ key: 'app-state' }));
+const initial: AppState = { count: 0, user: { name: 'Ada', age: 36 } };
+const tree = signalTree(initial);
+const persisted = signalTree(initial, { enhancers: [persistence({ key: 'app-state' })] });
 
 // ============================================================================
 // 1 — the PersistenceMethods half
@@ -93,12 +101,8 @@ persisted({ count: 1 });
 // ============================================================================
 declare const labeller: Enhancer<{ label(): string }>;
 
-const persistedThenLabelled = tree
-  .with(persistence({ key: 'a' }))
-  .with(labeller);
-const labelledThenPersisted = tree
-  .with(labeller)
-  .with(persistence({ key: 'b' }));
+const persistedThenLabelled = signalTree(initial, { enhancers: [persistence({ key: 'a' }), labeller] });
+const labelledThenPersisted = signalTree(initial, { enhancers: [labeller, persistence({ key: 'b' })] });
 
 export const _e1: string = persistedThenLabelled.label();
 export const _e2: Promise<void> = persistedThenLabelled.save();
@@ -111,9 +115,9 @@ export const _e6: string = labelledThenPersisted.serialize();
 // 5 — config is REQUIRED here, unlike every other built-in
 // ============================================================================
 // @ts-expect-error `persistence()` requires a config with a `key`
-tree.with(persistence());
+signalTree(initial, { enhancers: [persistence()] });
 // @ts-expect-error config is checked, not `any`
-tree.with(persistence({ nope: true }));
+signalTree(initial, { enhancers: [persistence({ nope: true })] });
 
 // ============================================================================
 // 6 — negative controls

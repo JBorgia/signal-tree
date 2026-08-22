@@ -124,7 +124,7 @@ See [Frequency Weighting System Documentation](performance/frequency-weighting-s
 
 ### Enhancers and composition
 
-- Extensible via `tree.with(...)` enhancers
+- Extensible via declared enhancers: `signalTree(state, { enhancers: [...] })`
 - Metadata-driven ordering with `requires`/`provides`
 - Prefer mutation (augment in place) to preserve identity
 

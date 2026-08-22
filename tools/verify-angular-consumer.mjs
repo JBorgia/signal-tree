@@ -108,7 +108,7 @@ type UserUpdatedEvent = BaseEvent<'UserUpdated', User>;
 const tree = signalTree({
   count: 0,
   users: entityMap<User, number>({ selectId: (user) => user.id }),
-}).with(timeTravel()).with(batching());
+}, { enhancers: [timeTravel(), batching()] });
 
 tree.$.users.addOne({ id: 1, name: 'Ada' });
 tree.batch(() => tree.$.count.set(1));

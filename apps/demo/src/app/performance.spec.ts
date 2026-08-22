@@ -144,7 +144,7 @@ describe('SignalTree Performance Benchmarks', () => {
   it('should benchmark batching performance', () => {
     const state = generateNestedState(3, 4);
     const regularTree = signalTree(state);
-    const batchTree = signalTree(state).with(batching()) as any;
+    const batchTree = signalTree(state, { enhancers: [batching()] }) as any;
 
     const singleUpdateTime = measureTime(() => {
       regularTree((state: any) => ({ ...state, value: Math.random() }));
@@ -186,11 +186,17 @@ describe('SignalTree Performance Benchmarks', () => {
     });
 
     const lazyTime = measureTime(() => {
-      const tree = signalTree(largeState, { lazy: lazy(), useLazySignals: true });
+      const tree = signalTree(largeState, {
+        lazy: lazy(),
+        useLazySignals: true,
+      });
       tree();
     });
 
-    const lazyTree = signalTree(largeState, { lazy: lazy(), useLazySignals: true });
+    const lazyTree = signalTree(largeState, {
+      lazy: lazy(),
+      useLazySignals: true,
+    });
     const accessTime = measureTime(() => {
       // Access a deeply nested property to trigger signal creation
       const val = (lazyTree.$ as Record<string, any>)['level_5_item_0']?.[

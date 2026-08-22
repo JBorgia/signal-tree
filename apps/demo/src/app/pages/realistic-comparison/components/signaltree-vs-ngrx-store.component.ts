@@ -1,10 +1,12 @@
-
-import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { createSelector } from '@ngrx/store';
 import {
-  batching,
-  signalTree,
-} from '@signaltree/core';
+  Component,
+  computed,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import { createSelector } from '@ngrx/store';
+import { batching, signalTree } from '@signaltree/core';
 
 import { PerformanceGraphComponent } from '../../../shared/performance-graph/performance-graph.component';
 import { BenchmarkCalibrationService } from '../benchmark-calibration.service';
@@ -122,24 +124,26 @@ interface BenchmarkResult {
       </div>
       }
 
-      <div class="benchmark-disclosure" style="margin: 1rem 0; padding: 0.75rem 1rem; background: var(--surface-2, #f5f5f5); border-left: 3px solid var(--primary, #666); font-size: 0.875rem;">
+      <div
+        class="benchmark-disclosure"
+        style="margin: 1rem 0; padding: 0.75rem 1rem; background: var(--surface-2, #f5f5f5); border-left: 3px solid var(--primary, #666); font-size: 0.875rem;"
+      >
         <strong>Methodology note:</strong> SignalTree benchmarks run with
         <code>batching()</code> enabled — the recommended production
         configuration in v9+. Derived values use Angular's
         <code>computed()</code> directly; SignalTree no longer ships a
-        memoization enhancer because <code>computed()</code> provides
-        equivalent caching at zero extra cost. Both libraries run identical
+        memoization enhancer because <code>computed()</code> provides equivalent
+        caching at zero extra cost. Both libraries run identical
         <code>computed()</code> work per iteration so only library write-path
         overhead differs. The NgRx Store Deep Nested and Array Update scenarios
-        use Angular's <code>signal()</code> with immutable update patterns —
-        the same architectural paradigm NgRx Store uses, without
-        dispatch/reducer overhead. The Array Update scenario measures
-        immutable spread cost (NgRx paradigm) vs. in-place mutation
-        (SignalTree paradigm) — a deliberate paradigm comparison, not a
-        controlled equivalence test. The Selector scenario uses NgRx's
-        <code>createSelector</code> memoization directly. For full NgRx Store
-        runtime results including dispatch overhead, see the orchestrated
-        benchmark tab.
+        use Angular's <code>signal()</code> with immutable update patterns — the
+        same architectural paradigm NgRx Store uses, without dispatch/reducer
+        overhead. The Array Update scenario measures immutable spread cost (NgRx
+        paradigm) vs. in-place mutation (SignalTree paradigm) — a deliberate
+        paradigm comparison, not a controlled equivalence test. The Selector
+        scenario uses NgRx's <code>createSelector</code> memoization directly.
+        For full NgRx Store runtime results including dispatch overhead, see the
+        orchestrated benchmark tab.
       </div>
 
       <div class="architecture-explanation">
@@ -148,12 +152,23 @@ interface BenchmarkResult {
           <div class="arch-card">
             <h4>SignalTree — 3-Pillar Pattern</h4>
             <ul>
-              <li><strong>READ</strong> — all computed via <code>.derived()</code> on the tree</li>
-              <li><strong>WRITE</strong> — Ops services: mutations + async only</li>
-              <li><strong>REACT</strong> — native Angular <code>effect(() =&gt; tree.$.path())</code>: reads drive reactions</li>
+              <li>
+                <strong>READ</strong> — all computed via
+                <code>.derived()</code> on the tree
+              </li>
+              <li>
+                <strong>WRITE</strong> — Ops services: mutations + async only
+              </li>
+              <li>
+                <strong>REACT</strong> — native Angular
+                <code>effect(() =&gt; tree.$.path())</code>: reads drive
+                reactions
+              </li>
               <li>Granular reactivity per path</li>
               <li>Change detection batched via <code>batching()</code></li>
-              <li>Derived state via Angular <code>computed()</code> directly</li>
+              <li>
+                Derived state via Angular <code>computed()</code> directly
+              </li>
             </ul>
           </div>
           <div class="arch-card">
@@ -531,8 +546,7 @@ export class SignalTreeVsNgrxStoreComponent {
     for (let i = 0; i < iterations; i++) {
       const testData = this.createDeepNestedData();
       // Deep Nested scenario mapping: batching + shallow memoization
-      const store = signalTree(testData)
-        .with(batching());
+      const store = signalTree(testData, { enhancers: [batching()] });
 
       // Create computed values with MODERATE intensive work (reduced from extreme)
       const computed1 = computed(() => {
@@ -778,7 +792,9 @@ export class SignalTreeVsNgrxStoreComponent {
             : this.createLargeArray(this.arraySize),
       };
       // Array Updates scenario mapping: high-performance batching only
-      const store = signalTree(testData).with(batching({ enabled: true, notificationDelayMs: 0 }));
+      const store = signalTree(testData, {
+        enhancers: [batching({ enabled: true, notificationDelayMs: 0 })],
+      });
 
       // Create computeds with MODERATE work that depend on the array
       const totalComputed = computed(() => {
@@ -948,12 +964,11 @@ export class SignalTreeVsNgrxStoreComponent {
     // iterations param overrides default
     const seed = seedBase ?? 7777;
     const testData = { items: this.buildLargeArray(this.arraySize, seed) };
-    const store = signalTree(testData).with(batching());
+    const store = signalTree(testData, { enhancers: [batching()] });
 
     // Create derived computation
     const expensiveComputation = computed(() => {
-      return store.$
-        .items()
+      return store.$.items()
         .filter((item) => item.value > 500)
         .map((item) => ({ ...item, computed: item.value * 2 }))
         .sort((a, b) => b.value - a.value);

@@ -20,7 +20,10 @@ type InternalTimeTravelManager = {
   redoAt(positionId: number): boolean;
   canUndoAt(positionId: number): boolean;
   canRedoAt(positionId: number): boolean;
-  containsPosition(authorityPositionId: number, participantPositionId: number): boolean;
+  containsPosition(
+    authorityPositionId: number,
+    participantPositionId: number
+  ): boolean;
   getFrontier(positionId: number): number;
 };
 
@@ -52,9 +55,10 @@ describe('time-travel enhancer', () => {
 
   it('records a single history entry per PathNotifier flush when batching is enabled', async () => {
     // Create the enhanced store
-    const store = (await import('../../lib/signal-tree'))
-      .signalTree({ count: 0 })
-      .with(timeTravel());
+    const store = (await import('../../lib/signal-tree')).signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     // Ensure global notifier is in default state and enabled for batching
@@ -91,9 +95,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = (await import('../../lib/signal-tree'))
-      .signalTree({ count: 0 })
-      .with(timeTravel());
+    const store = (await import('../../lib/signal-tree')).signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     const initial = t.getHistory().length;
 
@@ -111,9 +116,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = (await import('../../lib/signal-tree'))
-      .signalTree({ user: { profile: { name: 'Ada' } } })
-      .with(timeTravel());
+    const store = (await import('../../lib/signal-tree')).signalTree(
+      { user: { profile: { name: 'Ada' } } },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     const initial = t.getHistory().length;
 
@@ -136,17 +142,20 @@ describe('time-travel enhancer', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     t.resetHistory();
     const baseline = t.getTurns().length;
@@ -205,10 +214,13 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      inside: '',
-      outside: '',
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        inside: '',
+        outside: '',
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     t.resetHistory();
     const baseline = t.getTurns().length;
@@ -234,10 +246,13 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      inside: '',
-      outside: '',
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        inside: '',
+        outside: '',
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     t.resetHistory();
     const baseline = t.getTurns().length;
@@ -279,7 +294,10 @@ describe('time-travel enhancer', () => {
   });
 
   it('rejects nested explicit transactions', () => {
-    const store = signalTree({ count: 0 }).with(timeTravel());
+    const store = signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     expect(() =>
       store.transaction(() => {
@@ -298,7 +316,10 @@ describe('time-travel enhancer', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const store = signalTree({ left: '', right: '' }).with(timeTravel());
+    const store = signalTree(
+      { left: '', right: '' },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     t.resetHistory();
     const baseline = t.getTurns().length;
@@ -327,7 +348,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ x: '', y: '' }).with(timeTravel());
+    const store = signalTree(
+      { x: '', y: '' },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     t.resetHistory();
 
@@ -342,7 +366,10 @@ describe('time-travel enhancer', () => {
     expect(store.canUndo()).toBe(true);
     const beforeConfirmTurns = t.getTurns();
     expect(beforeConfirmTurns.at(-2)?.state).toEqual({ x: 'pending', y: '' });
-    expect(beforeConfirmTurns.at(-1)?.state).toEqual({ x: 'pending', y: 'confirmed-later' });
+    expect(beforeConfirmTurns.at(-1)?.state).toEqual({
+      x: 'pending',
+      y: 'confirmed-later',
+    });
 
     pending.confirm();
 
@@ -357,10 +384,13 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      a: { x: 1 },
-      b: { y: 2 },
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        a: { x: 1 },
+        b: { y: 2 },
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const realizationPort = getTreeRealizationPort(store.$);
     if (!realizationPort) {
       throw new Error('Expected tree-owned realization port');
@@ -388,12 +418,15 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      profile: {
-        name: '',
-        email: 'old@example.com',
+    const store = signalTree(
+      {
+        profile: {
+          name: '',
+          email: 'old@example.com',
+        },
       },
-    }).with(timeTravel());
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const pending = store.transaction(() => {
       store.$.profile.name.set('Jon');
@@ -417,7 +450,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ x: 'A' }).with(timeTravel());
+    const store = signalTree(
+      { x: 'A' },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     const pending = store.transaction(() => {
@@ -441,7 +477,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ x: 10 }).with(timeTravel());
+    const store = signalTree(
+      { x: 10 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     const pending = store.transaction(() => {
@@ -465,7 +504,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ x: 10 }).with(timeTravel());
+    const store = signalTree(
+      { x: 10 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const pending = store.transaction(() => {
       store.$.x.set(20);
@@ -484,7 +526,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ x: 10 }).with(timeTravel());
+    const store = signalTree(
+      { x: 10 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const pending = store.transaction(() => {
       store.$.x.set(20);
@@ -504,7 +549,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ x: 10 }).with(timeTravel());
+    const store = signalTree(
+      { x: 10 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const pending = store.transaction(() => {
       store.$.x.set(20);
@@ -524,7 +572,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ x: 10 }).with(timeTravel());
+    const store = signalTree(
+      { x: 10 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const pending = store.transaction(() => {
       store.$.x.set(20);
@@ -544,7 +595,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ x: 10 }).with(timeTravel());
+    const store = signalTree(
+      { x: 10 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const pending = store.transaction(() => {
       store.$.x.set(20);
@@ -564,7 +618,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ x: 10 }).with(timeTravel());
+    const store = signalTree(
+      { x: 10 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const pending = store.transaction(() => {
       store.$.x.set(20);
@@ -587,8 +644,9 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ count: 10, title: 'Original' }).with(
-      timeTravel()
+    const store = signalTree(
+      { count: 10, title: 'Original' },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -611,11 +669,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 18, name: 'existing' });
@@ -641,11 +702,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const pending = store.transaction(() => {
       store.$.rows.addOne({ id: 17, name: 'pending' });
@@ -668,11 +732,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const pending = store.transaction(() => {
       store.$.rows.addOne({ id: 17, name: 'pending' });
@@ -695,11 +762,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 16, name: 'A' });
@@ -709,7 +779,8 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     t.resetHistory();
 
-    const originalSubject = (store.$.rows.byIdOrFail(17).name as any).__subjectIds?.[0] as number;
+    const originalSubject = (store.$.rows.byIdOrFail(17).name as any)
+      .__subjectIds?.[0] as number;
 
     const pending = store.transaction(() => {
       store.$.rows.removeOne(17);
@@ -733,11 +804,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 17, name: 'pending-remove' });
@@ -750,7 +824,9 @@ describe('time-travel enhancer', () => {
     });
 
     expect(store.$.rows.byId(17)).toBeUndefined();
-    expect(() => store.$.rows.byIdOrFail(17)).toThrow(/Entity with id 17 not found/);
+    expect(() => store.$.rows.byIdOrFail(17)).toThrow(
+      /Entity with id 17 not found/
+    );
 
     pending.rollback();
 
@@ -762,11 +838,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 17, name: 'original' });
@@ -794,11 +873,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'target' });
@@ -807,7 +889,8 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     t.resetHistory();
 
-    const originalSubject = (store.$.rows.byIdOrFail(7).name as any).__subjectIds?.[0] as number;
+    const originalSubject = (store.$.rows.byIdOrFail(7).name as any)
+      .__subjectIds?.[0] as number;
 
     const pending = store.transaction(() => {
       store.$.rows.changeId(7, 42);
@@ -831,13 +914,16 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      status: 'idle',
-      other: 'before',
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        status: 'idle',
+        other: 'before',
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     t.resetHistory();
     const baseline = t.getTurns().length;
@@ -866,11 +952,19 @@ describe('time-travel enhancer', () => {
     };
     const pendingTurn = turns.at(-2) as {
       __ownerPaths?: string[];
-      state: { status: string; other: string; rows: { all: Array<{ id: number; name: string }> } };
+      state: {
+        status: string;
+        other: string;
+        rows: { all: Array<{ id: number; name: string }> };
+      };
     };
     const afterTurn = turns.at(-1) as {
       __ownerPaths?: string[];
-      state: { status: string; other: string; rows: { all: Array<{ id: number; name: string }> } };
+      state: {
+        status: string;
+        other: string;
+        rows: { all: Array<{ id: number; name: string }> };
+      };
     };
 
     expect(beforeTurn.__ownerPaths).toEqual(['status']);
@@ -897,12 +991,15 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      a: 0,
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        a: 0,
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     t.resetHistory();
     const baseline = t.getTurns().length;
@@ -936,11 +1033,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'target' });
@@ -969,11 +1069,14 @@ describe('time-travel enhancer', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel()) as {
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    ) as {
       $: {
         rows: {
           addOne(row: { id: number; name: string }): void;
@@ -1000,10 +1103,12 @@ describe('time-travel enhancer', () => {
       store.$.rows.byIdOrFail(42).name.set('stable');
     });
 
-    expect(t.getTurns().at(-1)?.__effects?.map((effect) => effect.kind)).toEqual([
-      'rekey',
-      'set',
-    ]);
+    expect(
+      t
+        .getTurns()
+        .at(-1)
+        ?.__effects?.map((effect) => effect.kind)
+    ).toEqual(['rekey', 'set']);
   });
 
   it('keeps transaction authority singular for composed transactions() + timeTravel() rekey plus scalar writes', async () => {
@@ -1013,16 +1118,24 @@ describe('time-travel enhancer', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(transactions()).with(timeTravel()) as {
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      {
+        enhancers: [transactions(), timeTravel()],
+        capabilities: ['causal-runtime'],
+      }
+    ) as {
       $: {
         rows: {
           addOne(row: { id: number; name: string }): void;
           changeId(from: number, to: number): void;
-          byIdOrFail(id: number): { name: { (): string; set(value: string): void } };
+          byIdOrFail(id: number): {
+            name: { (): string; set(value: string): void };
+          };
           ids(): number[];
         };
       };
@@ -1049,7 +1162,8 @@ describe('time-travel enhancer', () => {
     const baselineTurns = t.getTurns().length;
     const baselineTransactionConfirmed =
       store.__transactions.getConfirmedTurnCount();
-    const baselineTransactionPending = store.__transactions.getPendingTurnCount();
+    const baselineTransactionPending =
+      store.__transactions.getPendingTurnCount();
 
     const pending = store.transaction(() => {
       store.$.rows.changeId(7, 42);
@@ -1060,17 +1174,16 @@ describe('time-travel enhancer', () => {
     expect([
       store.__transactions.getConfirmedTurnCount(),
       store.__transactions.getPendingTurnCount(),
-    ]).toEqual([
-      baselineTransactionConfirmed,
-      baselineTransactionPending,
-    ]);
+    ]).toEqual([baselineTransactionConfirmed, baselineTransactionPending]);
     expect(t.getHistory()).toHaveLength(baselineHistory);
     expect(t.getTurns()).toHaveLength(baselineTurns + 1);
     expect(t.getTurnStatus(t.getTurns().at(-1)?.id)).toBe('pending');
-    expect(t.getTurns().at(-1)?.__effects?.map((effect) => effect.kind)).toEqual([
-      'rekey',
-      'set',
-    ]);
+    expect(
+      t
+        .getTurns()
+        .at(-1)
+        ?.__effects?.map((effect) => effect.kind)
+    ).toEqual(['rekey', 'set']);
 
     pending.rollback();
 
@@ -1079,10 +1192,7 @@ describe('time-travel enhancer', () => {
     expect([
       store.__transactions.getConfirmedTurnCount(),
       store.__transactions.getPendingTurnCount(),
-    ]).toEqual([
-      baselineTransactionConfirmed,
-      baselineTransactionPending,
-    ]);
+    ]).toEqual([baselineTransactionConfirmed, baselineTransactionPending]);
     expect(t.getHistory()).toHaveLength(baselineHistory);
     expect(t.getTurns()).toHaveLength(baselineTurns);
   });
@@ -1091,11 +1201,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'target' });
@@ -1121,11 +1234,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'target' });
@@ -1154,11 +1270,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'target' });
@@ -1166,7 +1285,8 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     t.resetHistory();
 
-    const originalSubject = (store.$.rows.byIdOrFail(7).name as any).__subjectIds?.[0] as number;
+    const originalSubject = (store.$.rows.byIdOrFail(7).name as any)
+      .__subjectIds?.[0] as number;
 
     const pending = store.transaction(() => {
       store.$.rows.changeId(7, 42);
@@ -1192,11 +1312,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 16, name: 'A' });
@@ -1225,11 +1348,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 16, name: 'A' });
@@ -1258,11 +1384,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 16, name: 'A' });
@@ -1294,7 +1423,10 @@ describe('time-travel enhancer', () => {
   );
 
   it('makes confirm and rollback idempotent in their own terminal direction', () => {
-    const store = signalTree({ value: '' }).with(timeTravel());
+    const store = signalTree(
+      { value: '' },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const confirmed = store.transaction(() => {
       store.$.value.set('confirmed');
@@ -1312,7 +1444,10 @@ describe('time-travel enhancer', () => {
   });
 
   it('rejects mixed terminal transitions on a transaction handle', () => {
-    const store = signalTree({ value: '' }).with(timeTravel());
+    const store = signalTree(
+      { value: '' },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const confirmed = store.transaction(() => {
       store.$.value.set('confirmed');
@@ -1328,17 +1463,20 @@ describe('time-travel enhancer', () => {
   });
 
   it('records one canonical turn across multiple owner positions in one flush', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'assigned' });
@@ -1374,14 +1512,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('indexes one position across many turns without duplicating the canonical turn', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'assigned' });
@@ -1420,14 +1561,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('resolves the full canonical turn from any indexed position', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'assigned' });
@@ -1452,14 +1596,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('stores the history entry and canonical turn as the same object reference', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'assigned' });
@@ -1475,14 +1622,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('undoes the frontier closure needed to keep every position prefix-closed', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
@@ -1538,20 +1688,23 @@ describe('time-travel enhancer', () => {
   });
 
   it('undoes transitive dependents until the closure reaches a fixed point', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      depots: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        depots: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
@@ -1643,17 +1796,20 @@ describe('time-travel enhancer', () => {
   });
 
   it('preserves an unrelated later turn while selectively undoing a closure', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
@@ -1717,14 +1873,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('fails before mutating state or frontiers when a closure contains an unsupported effect', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
@@ -1785,17 +1944,20 @@ describe('time-travel enhancer', () => {
   });
 
   it('reapplies prerequisite closure oldest-to-newest when redoing from a dependent position', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
@@ -1858,23 +2020,26 @@ describe('time-travel enhancer', () => {
   });
 
   it('reapplies transitive prerequisites while preserving unrelated applied state', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      depots: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      yards: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        depots: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        yards: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
@@ -1916,8 +2081,10 @@ describe('time-travel enhancer', () => {
     };
     const depotPositionId = (thirdTurn.__positionIds ?? []).find(
       (positionId: number) =>
-        positionId !== ((secondTurn.__positionIds ?? []).find(
-          (candidate: number) => candidate !== (firstTurn.__positionIds?.[0] as number)
+        positionId !==
+        ((secondTurn.__positionIds ?? []).find(
+          (candidate: number) =>
+            candidate !== (firstTurn.__positionIds?.[0] as number)
         ) as number)
     ) as number;
 
@@ -1958,17 +2125,20 @@ describe('time-travel enhancer', () => {
   });
 
   it('canonically truncates abandoned future turns across every position index on a new write', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
@@ -2034,20 +2204,23 @@ describe('time-travel enhancer', () => {
   });
 
   it('truncates the global canonical future even when the new write is on an unrelated position', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      depots: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        depots: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
@@ -2120,11 +2293,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('keeps TurnId monotonic after truncation and a new write', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, status: 'one' });
@@ -2136,12 +2312,18 @@ describe('time-travel enhancer', () => {
     store.$.rows.byIdOrFail(7).status.set('two');
     await Promise.resolve();
     await Promise.resolve();
-    const firstTurn = t.getTurns().at(-1) as { id: number; __positionIds?: number[] };
+    const firstTurn = t.getTurns().at(-1) as {
+      id: number;
+      __positionIds?: number[];
+    };
 
     store.$.rows.byIdOrFail(7).status.set('three');
     await Promise.resolve();
     await Promise.resolve();
-    const secondTurn = t.getTurns().at(-1) as { id: number; __positionIds?: number[] };
+    const secondTurn = t.getTurns().at(-1) as {
+      id: number;
+      __positionIds?: number[];
+    };
 
     store.$.rows.byIdOrFail(7).status.set('four');
     await Promise.resolve();
@@ -2161,11 +2343,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('coalesces repeated writes to one scalar path into one canonical effect', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string; active: boolean }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string; active: boolean }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'one', active: false });
@@ -2203,11 +2388,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('suppresses a canonical turn when every scalar effect coalesces to net zero', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string; active: boolean }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string; active: boolean }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'one', active: false });
@@ -2228,11 +2416,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('retains only non-zero scalar effects in a mixed flush', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string; active: boolean }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string; active: boolean }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'one', active: false });
@@ -2267,11 +2458,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('keeps independent scalar effects separate while sharing owner and subject identity', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string; active: boolean }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string; active: boolean }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'one', active: false });
@@ -2307,11 +2501,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('undoes and redoes a single collection remove while preserving SubjectId and order', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addMany([
@@ -2360,14 +2557,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('undoes a collection remove closure while preserving an unrelated later scalar turn', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addMany([
@@ -2393,7 +2593,10 @@ describe('time-travel enhancer', () => {
     store.$.drivers.byIdOrFail(7).status.set('assigned');
     await Promise.resolve();
     await Promise.resolve();
-    const scalarTurn = t.getTurns().at(-1) as { id: number; __positionIds?: number[] };
+    const scalarTurn = t.getTurns().at(-1) as {
+      id: number;
+      __positionIds?: number[];
+    };
     const driverPositionId = scalarTurn.__positionIds?.[0] as number;
 
     expect(t.undoPosition(collectionPositionId)).toEqual([removeTurn.id]);
@@ -2405,17 +2608,20 @@ describe('time-travel enhancer', () => {
   });
 
   it('undos and redoes one mixed turn containing collection remove and scalar effects atomically', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; state: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; state: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addMany([
@@ -2471,11 +2677,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('undoes and redoes an added row while preserving SubjectId continuity', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     t.resetHistory();
@@ -2500,24 +2709,35 @@ describe('time-travel enhancer', () => {
     };
 
     expect(turn.__effects).toEqual([
-      expect.objectContaining({ kind: 'add', key: 7, subject: expect.any(Number) }),
+      expect.objectContaining({
+        kind: 'add',
+        key: 7,
+        subject: expect.any(Number),
+      }),
     ]);
-    expect(store.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(addEffect.subject);
+    expect(store.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(
+      addEffect.subject
+    );
 
     expect(t.undoPosition(positionId)).toEqual([turn.id]);
     expect(store.$.rows.ids()).toEqual([]);
 
     expect(t.redoPosition(positionId)).toEqual([turn.id]);
     expect(store.$.rows.ids()).toEqual([7]);
-    expect(store.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(addEffect.subject);
+    expect(store.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(
+      addEffect.subject
+    );
   });
 
   it('replays a prepended add at its anchored position', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 1, name: 'A' });
@@ -2547,25 +2767,32 @@ describe('time-travel enhancer', () => {
     };
 
     expect(store.$.rows.ids()).toEqual([2, 1, 3]);
-    expect(addEffect.afterSubject).toBe(store.$.rows.byIdOrFail(1).name.__subjectIds?.[0]);
+    expect(addEffect.afterSubject).toBe(
+      store.$.rows.byIdOrFail(1).name.__subjectIds?.[0]
+    );
 
     expect(t.undoPosition(positionId)).toEqual([turn.id]);
     expect(store.$.rows.ids()).toEqual([1, 3]);
 
     expect(t.redoPosition(positionId)).toEqual([turn.id]);
     expect(store.$.rows.ids()).toEqual([2, 1, 3]);
-    expect(store.$.rows.byIdOrFail(2).name.__subjectIds?.[0]).toBe(addEffect.subject);
+    expect(store.$.rows.byIdOrFail(2).name.__subjectIds?.[0]).toBe(
+      addEffect.subject
+    );
   });
 
   it('undos and redoes a mixed add turn atomically', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 1, name: 'A' });
@@ -2604,14 +2831,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('fails atomically when redoing a mixed add turn cannot restore the added subject', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 1, name: 'A' });
@@ -2652,8 +2882,12 @@ describe('time-travel enhancer', () => {
     );
     expect(store.$.rows.ids()).toEqual([1]);
     expect(store.$.drivers.byIdOrFail(7).status()).toBe('idle');
-    expect(t.getAppliedTurnIdsForPosition(collectionPositionId as number)).toEqual([]);
-    expect(t.getAppliedTurnIdsForPosition(driverPositionId as number)).toEqual([]);
+    expect(
+      t.getAppliedTurnIdsForPosition(collectionPositionId as number)
+    ).toEqual([]);
+    expect(t.getAppliedTurnIdsForPosition(driverPositionId as number)).toEqual(
+      []
+    );
     expect(t.getFrontier(collectionPositionId as number)).toBe(0);
     expect(t.getFrontier(driverPositionId as number)).toBe(0);
   });
@@ -2664,11 +2898,14 @@ describe('time-travel enhancer', () => {
     );
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     const initial = t.getHistory().length;
     const seenPaths: string[] = [];
@@ -2712,7 +2949,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }).with(timeTravel());
+    const store = signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.count.set(1);
@@ -2728,7 +2968,9 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const historyStates = t.getHistory().map((entry: { state: { count: number } }) => entry.state.count);
+    const historyStates = t
+      .getHistory()
+      .map((entry: { state: { count: number } }) => entry.state.count);
 
     expect(store().count).toBe(3);
     expect(historyStates).toEqual([0, 1, 3]);
@@ -2738,7 +2980,10 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }).with(timeTravel());
+    const store = signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.count.set(1);
@@ -2754,7 +2999,9 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const historyStates = t.getHistory().map((entry: { state: { count: number } }) => entry.state.count);
+    const historyStates = t
+      .getHistory()
+      .map((entry: { state: { count: number } }) => entry.state.count);
 
     expect(store().count).toBe(1);
     expect(historyStates).not.toContain(3);
@@ -2767,11 +3014,14 @@ describe('time-travel enhancer', () => {
     );
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const notifier = getPathNotifier();
     const t = (store as any).__timeTravel;
     const liveOwnerTokens: number[][] = [];
@@ -2809,27 +3059,32 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterFirstAdd = [
-      ...(((t.getHistory().at(-1) as { __positionIds?: number[] })?.__positionIds) ?? []),
+      ...((t.getHistory().at(-1) as { __positionIds?: number[] })
+        ?.__positionIds ?? []),
     ];
     const subjectAfterFirstAdd = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     store.$.rows.addOne({ id: 8, name: 'second' });
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterSecondAdd = [
-      ...(((t.getHistory().at(-1) as { __positionIds?: number[] })?.__positionIds) ?? []),
+      ...((t.getHistory().at(-1) as { __positionIds?: number[] })
+        ?.__positionIds ?? []),
     ];
     const subjectAfterSecondAdd = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     store.$.rows.changeId(7, 70);
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterRekey = [
-      ...(((t.getHistory().at(-1) as { __positionIds?: number[] })?.__positionIds) ?? []),
+      ...((t.getHistory().at(-1) as { __positionIds?: number[] })
+        ?.__positionIds ?? []),
     ];
 
     store.$.rows.removeOne(8);
@@ -2840,10 +3095,12 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterReuse = [
-      ...(((t.getHistory().at(-1) as { __positionIds?: number[] })?.__positionIds) ?? []),
+      ...((t.getHistory().at(-1) as { __positionIds?: number[] })
+        ?.__positionIds ?? []),
     ];
     const subjectAfterReuse = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     t.undo();
@@ -2873,11 +3130,14 @@ describe('time-travel enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'first' });
@@ -2899,7 +3159,9 @@ describe('time-travel enhancer', () => {
       __subjectIds?: number[];
     };
 
-    expect(boundaryEntry.__positionIds).toEqual(beforeBoundaryEntry.__positionIds);
+    expect(boundaryEntry.__positionIds).toEqual(
+      beforeBoundaryEntry.__positionIds
+    );
     expect(boundaryEntry.__subjectIds).toHaveLength(2);
     expect(boundaryEntry.__subjectIds?.[0]).toBe(
       beforeBoundaryEntry.__subjectIds?.[0]
@@ -2915,11 +3177,14 @@ describe('time-travel enhancer', () => {
     );
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const notifier = getPathNotifier();
     const t = (store as any).__timeTravel;
     const liveSubjectTokens: number[][] = [];
@@ -2953,28 +3218,32 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const addedToken = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     store.$.rows.changeId(-1, 42);
     await Promise.resolve();
     await Promise.resolve();
     const rekeyedToken = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     store.$.rows.byIdOrFail(42).name.set('server');
     await Promise.resolve();
     await Promise.resolve();
     const retainedToken = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     store.$.rows.addOne({ id: -1, name: 'replacement' });
     await Promise.resolve();
     await Promise.resolve();
     const reusedPathToken = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     t.undo();
@@ -3001,11 +3270,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('undoes and redoes a rekey while preserving SubjectId continuity', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'A' });
@@ -3014,7 +3286,8 @@ describe('time-travel enhancer', () => {
 
     t.resetHistory();
 
-    const beforeSubject = store.$.rows.byIdOrFail(7).name.__subjectIds?.[0] as number;
+    const beforeSubject = store.$.rows.byIdOrFail(7).name
+      .__subjectIds?.[0] as number;
 
     store.$.rows.changeId(7, 42);
     await Promise.resolve();
@@ -3045,26 +3318,35 @@ describe('time-travel enhancer', () => {
         afterKey: 42,
       }),
     ]);
-    expect(store.$.rows.byIdOrFail(42).name.__subjectIds?.[0]).toBe(beforeSubject);
+    expect(store.$.rows.byIdOrFail(42).name.__subjectIds?.[0]).toBe(
+      beforeSubject
+    );
 
     expect(t.undoPosition(positionId)).toEqual([turn.id]);
     expect(store.$.rows.ids()).toEqual([7]);
-    expect(store.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(beforeSubject);
+    expect(store.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(
+      beforeSubject
+    );
 
     expect(t.redoPosition(positionId)).toEqual([turn.id]);
     expect(store.$.rows.ids()).toEqual([42]);
-    expect(store.$.rows.byIdOrFail(42).name.__subjectIds?.[0]).toBe(rekeyEffect.subject);
+    expect(store.$.rows.byIdOrFail(42).name.__subjectIds?.[0]).toBe(
+      rekeyEffect.subject
+    );
   });
 
   it('fails atomically when undoing a mixed rekey turn would steal an occupied key', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'A' });
@@ -3112,14 +3394,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('fails atomically when redoing a mixed rekey turn would steal an occupied key', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'A' });
@@ -3160,8 +3445,12 @@ describe('time-travel enhancer', () => {
     );
     expect(store.$.rows.ids()).toEqual([7]);
     expect(store.$.drivers.byIdOrFail(1).status()).toBe('idle');
-    expect(t.getAppliedTurnIdsForPosition(rowsPositionId as number)).toEqual([]);
-    expect(t.getAppliedTurnIdsForPosition(driverPositionId as number)).toEqual([]);
+    expect(t.getAppliedTurnIdsForPosition(rowsPositionId as number)).toEqual(
+      []
+    );
+    expect(t.getAppliedTurnIdsForPosition(driverPositionId as number)).toEqual(
+      []
+    );
     expect(t.getFrontier(rowsPositionId as number)).toBe(0);
     expect(t.getFrontier(driverPositionId as number)).toBe(0);
   });
@@ -3172,11 +3461,14 @@ describe('time-travel enhancer', () => {
     );
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const notifier = getPathNotifier();
     const t = (store as any).__timeTravel;
     const liveSubjectTokens: number[][] = [];
@@ -3210,21 +3502,24 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const originalToken = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     store.$.rows.removeOne(7);
     await Promise.resolve();
     await Promise.resolve();
     const removedToken = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     store.$.rows.addOne({ id: 7, name: 'replacement' });
     await Promise.resolve();
     await Promise.resolve();
     const replacementToken = [
-      ...(((t.getHistory().at(-1) as { __subjectIds?: number[] })?.__subjectIds) ?? []),
+      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
+        ?.__subjectIds ?? []),
     ];
 
     t.undo();
@@ -3251,27 +3546,30 @@ describe('time-travel enhancer', () => {
   it('records history for stored clear() and reload()', async () => {
     const storage = new Map<string, string>();
     const key = 'time-travel-stored-clear-reload';
-    const store = signalTree({
-      theme: stored(key, 'light', {
-        storage: {
-          getItem: (key: string) => storage.get(key) ?? null,
-          setItem: (key: string, value: string) => {
-            storage.set(key, value);
+    const store = signalTree(
+      {
+        theme: stored(key, 'light', {
+          storage: {
+            getItem: (key: string) => storage.get(key) ?? null,
+            setItem: (key: string, value: string) => {
+              storage.set(key, value);
+            },
+            removeItem: (key: string) => {
+              storage.delete(key);
+            },
+            clear: () => {
+              storage.clear();
+            },
+            key: (index: number) => Array.from(storage.keys())[index] ?? null,
+            get length() {
+              return storage.size;
+            },
           },
-          removeItem: (key: string) => {
-            storage.delete(key);
-          },
-          clear: () => {
-            storage.clear();
-          },
-          key: (index: number) => Array.from(storage.keys())[index] ?? null,
-          get length() {
-            return storage.size;
-          },
-        },
-        debounceMs: 100,
-      }),
-    }).with(timeTravel());
+          debounceMs: 100,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     const initial = t.getHistory().length;
 
@@ -3307,7 +3605,10 @@ describe('time-travel enhancer', () => {
   // agents rather than a function.
 
   it('routes public undo through turn frontiers for a single scalar write', async () => {
-    const store = signalTree({ count: 0 }).with(timeTravel());
+    const store = signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.count.set(1);
@@ -3326,11 +3627,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('routes public undo through turn frontiers for a single entity-field write', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'A' });
@@ -3355,11 +3659,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('routes collection add, remove, and rekey turns through the realization port', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     const realizationPort = getTreeRealizationPort(store.$);
     if (!realizationPort) {
@@ -3413,7 +3720,10 @@ describe('time-travel enhancer', () => {
   });
 
   it('gives top-level scalar turns distinct participant positions under a shared root authority', async () => {
-    const store = signalTree({ count: 0, title: 'A' }).with(timeTravel());
+    const store = signalTree(
+      { count: 0, title: 'A' },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
     const rootPositionId = (store.$ as unknown as ScopedAuthorityNode)
       .__positionIds?.[0] as number;
@@ -3436,7 +3746,9 @@ describe('time-travel enhancer', () => {
     expect(t.containsPosition(rootPositionId, firstPositionId)).toBe(true);
     expect(t.containsPosition(rootPositionId, secondPositionId)).toBe(true);
     expect(t.getAppliedTurnIdsForPosition(rootPositionId)).toEqual([]);
-    expect(t.getAppliedTurnIdsForPosition(firstPositionId)).toEqual([firstTurn.id]);
+    expect(t.getAppliedTurnIdsForPosition(firstPositionId)).toEqual([
+      firstTurn.id,
+    ]);
     expect(t.getAppliedTurnIdsForPosition(secondPositionId)).toEqual([
       secondTurn.id,
     ]);
@@ -3459,20 +3771,25 @@ describe('time-travel enhancer', () => {
   });
 
   it('recomputes derived state without adding a second causal effect or frontier movement', async () => {
-    const store = signalTree({
-      profile: {
-        firstName: 'Jonathan',
-        lastName: 'Borgia',
-      },
-    })
-      .derived(($) => ({
+    const store = signalTree(
+      {
         profile: {
-          fullName: computed(
-            () => `${$.profile.firstName()} ${$.profile.lastName()}`
-          ),
+          firstName: 'Jonathan',
+          lastName: 'Borgia',
         },
-      }))
-      .with(timeTravel());
+      },
+      {
+        capabilities: ['causal-runtime'],
+        enhancers: [timeTravel()],
+        derived: ($) => ({
+          profile: {
+            fullName: computed(
+              () => `${$.profile.firstName()} ${$.profile.lastName()}`
+            ),
+          },
+        }),
+      }
+    );
     const t = (store as any).__timeTravel;
     const fullName = store.$.profile.fullName as {
       (): string;
@@ -3522,20 +3839,25 @@ describe('time-travel enhancer', () => {
   });
 
   it('undoes the source write while derived state recomputes without its own history entry', async () => {
-    const store = signalTree({
-      profile: {
-        firstName: 'Jonathan',
-        lastName: 'Borgia',
-      },
-    })
-      .derived(($) => ({
+    const store = signalTree(
+      {
         profile: {
-          fullName: computed(
-            () => `${$.profile.firstName()} ${$.profile.lastName()}`
-          ),
+          firstName: 'Jonathan',
+          lastName: 'Borgia',
         },
-      }))
-      .with(timeTravel());
+      },
+      {
+        capabilities: ['causal-runtime'],
+        enhancers: [timeTravel()],
+        derived: ($) => ({
+          profile: {
+            fullName: computed(
+              () => `${$.profile.firstName()} ${$.profile.lastName()}`
+            ),
+          },
+        }),
+      }
+    );
     const t = (store as any).__timeTravel;
 
     t.resetHistory();
@@ -3565,7 +3887,10 @@ describe('time-travel enhancer', () => {
   });
 
   it('indexes one root callable partial update under descendant owner positions and keeps undo/redo atomic', async () => {
-    const store = signalTree({ count: 1, title: 'A' }).with(timeTravel());
+    const store = signalTree(
+      { count: 1, title: 'A' },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     t.resetHistory();
@@ -3576,7 +3901,10 @@ describe('time-travel enhancer', () => {
 
     const indexedTurns = t
       .getTurns()
-      .filter((turn: { __positionIds?: number[] }) => (turn.__positionIds?.length ?? 0) > 0);
+      .filter(
+        (turn: { __positionIds?: number[] }) =>
+          (turn.__positionIds?.length ?? 0) > 0
+      );
     const turn = indexedTurns.at(-1) as {
       id: number;
       __positionIds?: number[];
@@ -3588,14 +3916,14 @@ describe('time-travel enhancer', () => {
         position: number;
       }>;
     };
-    const positions = [...new Set(turn.__effects?.map((effect) => effect.position) ?? [])].sort(
-      (left, right) => left - right
-    );
+    const positions = [
+      ...new Set(turn.__effects?.map((effect) => effect.position) ?? []),
+    ].sort((left, right) => left - right);
 
     expect(indexedTurns).toHaveLength(1);
-    expect(turn.__positionIds?.slice().sort((left, right) => left - right)).toEqual(
-      positions
-    );
+    expect(
+      turn.__positionIds?.slice().sort((left, right) => left - right)
+    ).toEqual(positions);
     expect(turn.__effects).toHaveLength(2);
     expect(turn.__effects?.map((effect) => effect.path).sort()).toEqual([
       'count',
@@ -3609,35 +3937,46 @@ describe('time-travel enhancer', () => {
         expect.objectContaining({ path: 'title', before: 'A', after: 'B' }),
       ])
     );
-    expect(positions.every((positionId) => t.getFrontier(positionId) === 1)).toBe(true);
+    expect(
+      positions.every((positionId) => t.getFrontier(positionId) === 1)
+    ).toBe(true);
 
     store.undo();
 
     expect(store.$.count()).toBe(1);
     expect(store.$.title()).toBe('A');
-    expect(positions.every((positionId) => t.getFrontier(positionId) === 0)).toBe(true);
+    expect(
+      positions.every((positionId) => t.getFrontier(positionId) === 0)
+    ).toBe(true);
 
     store.redo();
 
     expect(store.$.count()).toBe(2);
     expect(store.$.title()).toBe('B');
-    expect(positions.every((positionId) => t.getFrontier(positionId) === 1)).toBe(true);
+    expect(
+      positions.every((positionId) => t.getFrontier(positionId) === 1)
+    ).toBe(true);
   });
 
   it('refuses descendant authority for a multi-position turn and lets the containing branch undo atomically', async () => {
-    const store = signalTree({
-      profile: { firstName: 'John', lastName: 'Smith' },
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        profile: { firstName: 'John', lastName: 'Smith' },
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel as InternalTimeTravelManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
       firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
       lastName: ScopedAuthorityNode & { (): string; set(value: string): void };
     };
 
-    store.transaction(() => {
-      profile.firstName.set('Jane');
-      profile.lastName.set('Jones');
-    }).confirm();
+    store
+      .transaction(() => {
+        profile.firstName.set('Jane');
+        profile.lastName.set('Jones');
+      })
+      .confirm();
 
     const profilePositionId = profile.__positionIds?.[0] as number;
     const firstNamePositionId = profile.firstName.__positionIds?.[0] as number;
@@ -3668,9 +4007,12 @@ describe('time-travel enhancer', () => {
   });
 
   it('allows single-position turns to undo at leaf, branch, and root authority', async () => {
-    const store = signalTree({
-      profile: { firstName: 'John', lastName: 'Smith' },
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        profile: { firstName: 'John', lastName: 'Smith' },
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel as InternalTimeTravelManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
       firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
@@ -3700,10 +4042,13 @@ describe('time-travel enhancer', () => {
   });
 
   it('refuses cross-domain turns below the lowest common ancestor and leaves state neutral on refusal', async () => {
-    const store = signalTree({
-      profile: { firstName: 'John', lastName: 'Smith' },
-      settings: { theme: 'light' },
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        profile: { firstName: 'John', lastName: 'Smith' },
+        settings: { theme: 'light' },
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel as InternalTimeTravelManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
       firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
@@ -3712,18 +4057,24 @@ describe('time-travel enhancer', () => {
       theme: ScopedAuthorityNode & { (): string; set(value: string): void };
     };
 
-    store.transaction(() => {
-      profile.firstName.set('Jane');
-      settings.theme.set('dark');
-    }).confirm();
+    store
+      .transaction(() => {
+        profile.firstName.set('Jane');
+        settings.theme.set('dark');
+      })
+      .confirm();
 
     const profilePositionId = profile.__positionIds?.[0] as number;
     const settingsPositionId = settings.__positionIds?.[0] as number;
     const firstNamePositionId = profile.firstName.__positionIds?.[0] as number;
     const themePositionId = settings.theme.__positionIds?.[0] as number;
 
-    expect(t.containsPosition(firstNamePositionId, firstNamePositionId)).toBe(true);
-    expect(t.containsPosition(firstNamePositionId, themePositionId)).toBe(false);
+    expect(t.containsPosition(firstNamePositionId, firstNamePositionId)).toBe(
+      true
+    );
+    expect(t.containsPosition(firstNamePositionId, themePositionId)).toBe(
+      false
+    );
     expect(t.canUndoAt(profilePositionId)).toBe(false);
     expect(t.canUndoAt(settingsPositionId)).toBe(false);
 
@@ -3739,10 +4090,13 @@ describe('time-travel enhancer', () => {
   });
 
   it('refuses a contained historical turn when a later cross-boundary turn has advanced the frontier', async () => {
-    const store = signalTree({
-      profile: { firstName: 'John', lastName: 'Smith' },
-      settings: { theme: 'light' },
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        profile: { firstName: 'John', lastName: 'Smith' },
+        settings: { theme: 'light' },
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel as InternalTimeTravelManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
       firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
@@ -3752,15 +4106,19 @@ describe('time-travel enhancer', () => {
       theme: ScopedAuthorityNode & { (): string; set(value: string): void };
     };
 
-    store.transaction(() => {
-      profile.firstName.set('Ada');
-      profile.lastName.set('Lovelace');
-    }).confirm();
+    store
+      .transaction(() => {
+        profile.firstName.set('Ada');
+        profile.lastName.set('Lovelace');
+      })
+      .confirm();
 
-    store.transaction(() => {
-      profile.firstName.set('Grace');
-      settings.theme.set('dark');
-    }).confirm();
+    store
+      .transaction(() => {
+        profile.firstName.set('Grace');
+        settings.theme.set('dark');
+      })
+      .confirm();
 
     const profilePositionId = profile.__positionIds?.[0] as number;
     const firstNamePositionId = profile.firstName.__positionIds?.[0] as number;
@@ -3785,7 +4143,10 @@ describe('time-travel enhancer', () => {
   });
 
   it('routes public redo through turn frontiers for a single scalar write', async () => {
-    const store = signalTree({ count: 0 }).with(timeTravel());
+    const store = signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.count.set(1);
@@ -3805,11 +4166,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('routes public redo through turn frontiers for a single entity-field write', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'A' });
@@ -3835,60 +4199,79 @@ describe('time-travel enhancer', () => {
   });
 
   it('routes public redo through turn frontiers for collection add while preserving SubjectId', async () => {
-    const addStore = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const addStore = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const addTimeTravel = (addStore as any).__timeTravel;
 
     addStore.$.rows.addOne({ id: 7, name: 'A' });
     await Promise.resolve();
     await Promise.resolve();
 
-    const addedToken = addStore.$.rows.byIdOrFail(7).name.__subjectIds?.[0] as number;
-    const addTurn = addTimeTravel.getTurns().at(-1) as { __positionIds?: number[] };
+    const addedToken = addStore.$.rows.byIdOrFail(7).name
+      .__subjectIds?.[0] as number;
+    const addTurn = addTimeTravel.getTurns().at(-1) as {
+      __positionIds?: number[];
+    };
     const addPositionId = addTurn.__positionIds?.[0] as number;
     addStore.undo();
     addStore.redo();
     expect(addStore.$.rows.ids()).toEqual([7]);
-    expect(addStore.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(addedToken);
+    expect(addStore.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(
+      addedToken
+    );
     expect(addTimeTravel.getFrontier(addPositionId)).toBe(1);
   });
 
   it('routes public redo through turn frontiers for collection remove while preserving SubjectId on undo', async () => {
-    const removeStore = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const removeStore = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const removeTimeTravel = (removeStore as any).__timeTravel;
 
     removeStore.$.rows.addOne({ id: 7, name: 'A' });
     await Promise.resolve();
     await Promise.resolve();
-    const originalRemoveToken = removeStore.$.rows.byIdOrFail(7).name.__subjectIds?.[0] as number;
+    const originalRemoveToken = removeStore.$.rows.byIdOrFail(7).name
+      .__subjectIds?.[0] as number;
     removeTimeTravel.resetHistory();
 
     removeStore.$.rows.removeOne(7);
     await Promise.resolve();
     await Promise.resolve();
 
-    const removeTurn = removeTimeTravel.getTurns().at(-1) as { __positionIds?: number[] };
+    const removeTurn = removeTimeTravel.getTurns().at(-1) as {
+      __positionIds?: number[];
+    };
     const removePositionId = removeTurn.__positionIds?.[0] as number;
     removeStore.undo();
-    expect(removeStore.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(originalRemoveToken);
+    expect(removeStore.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(
+      originalRemoveToken
+    );
     removeStore.redo();
     expect(removeStore.$.rows.ids()).toEqual([]);
     expect(removeTimeTravel.getFrontier(removePositionId)).toBe(1);
   });
 
   it('routes public redo through turn frontiers for collection rekey while preserving SubjectId', async () => {
-    const rekeyStore = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const rekeyStore = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const rekeyTimeTravel = (rekeyStore as any).__timeTravel;
 
     rekeyStore.$.rows.addOne({ id: 7, name: 'A' });
@@ -3896,22 +4279,30 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     rekeyTimeTravel.resetHistory();
 
-    const beforeRekeyToken = rekeyStore.$.rows.byIdOrFail(7).name.__subjectIds?.[0] as number;
+    const beforeRekeyToken = rekeyStore.$.rows.byIdOrFail(7).name
+      .__subjectIds?.[0] as number;
     rekeyStore.$.rows.changeId(7, 42);
     await Promise.resolve();
     await Promise.resolve();
 
-    const rekeyTurn = rekeyTimeTravel.getTurns().at(-1) as { __positionIds?: number[] };
+    const rekeyTurn = rekeyTimeTravel.getTurns().at(-1) as {
+      __positionIds?: number[];
+    };
     const rekeyPositionId = rekeyTurn.__positionIds?.[0] as number;
     rekeyStore.undo();
     rekeyStore.redo();
     expect(rekeyStore.$.rows.ids()).toEqual([42]);
-    expect(rekeyStore.$.rows.byIdOrFail(42).name.__subjectIds?.[0]).toBe(beforeRekeyToken);
+    expect(rekeyStore.$.rows.byIdOrFail(42).name.__subjectIds?.[0]).toBe(
+      beforeRekeyToken
+    );
     expect(rekeyTimeTravel.getFrontier(rekeyPositionId)).toBe(1);
   });
 
   it('attaches one stable realization port per tree instance', () => {
-    const store = signalTree({ count: 0 }).with(timeTravel());
+    const store = signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const rootPort = getTreeRealizationPort(store as unknown as object);
     const statePort = getTreeRealizationPort(store.$);
@@ -3922,8 +4313,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('keeps realization ports independent across tree instances', () => {
-    const left = signalTree({ count: 0 }).with(timeTravel());
-    const right = signalTree({ count: 0 }).with(timeTravel());
+    const left = signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
+    const right = signalTree(
+      { count: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const leftPort = getTreeRealizationPort(left.$);
     const rightPort = getTreeRealizationPort(right.$);
@@ -3934,12 +4331,15 @@ describe('time-travel enhancer', () => {
   });
 
   it('realizes a supported scalar plus rekey turn entirely through the tree-owned port', async () => {
-    const store = signalTree({
-      count: 0,
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        count: 0,
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'A' });
@@ -3947,10 +4347,12 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     t.resetHistory();
 
-    store.transaction(() => {
-      store.$.count.set(1);
-      store.$.rows.changeId(7, 42);
-    }).confirm();
+    store
+      .transaction(() => {
+        store.$.count.set(1);
+        store.$.rows.changeId(7, 42);
+      })
+      .confirm();
 
     await Promise.resolve();
     await Promise.resolve();
@@ -3969,12 +4371,15 @@ describe('time-travel enhancer', () => {
   });
 
   it('realizes a mixed root scalar plus subject scalar turn entirely through the tree-owned port', async () => {
-    const store = signalTree({
-      count: 0,
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        count: 0,
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'A' });
@@ -3982,10 +4387,12 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     t.resetHistory();
 
-    store.transaction(() => {
-      store.$.count.set(1);
-      store.$.rows.byIdOrFail(7).name.set('B');
-    }).confirm();
+    store
+      .transaction(() => {
+        store.$.count.set(1);
+        store.$.rows.byIdOrFail(7).name.set('B');
+      })
+      .confirm();
 
     await Promise.resolve();
     await Promise.resolve();
@@ -4015,11 +4422,14 @@ describe('time-travel enhancer', () => {
     );
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     store.$.rows.addOne({ id: 7, name: 'Alice' });
     await Promise.resolve();
@@ -4065,11 +4475,14 @@ describe('time-travel enhancer', () => {
   });
 
   it('does not resolve a subject scalar descriptor onto a foreign subject that later reuses the key', async () => {
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     store.$.rows.addOne({ id: 7, name: 'Alice' });
     await Promise.resolve();
@@ -4095,7 +4508,8 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const foreignSubjectId = store.$.rows.byIdOrFail(7).name.__subjectIds?.[0] as number;
+    const foreignSubjectId = store.$.rows.byIdOrFail(7).name
+      .__subjectIds?.[0] as number;
     expect(foreignSubjectId).not.toBe(subjectId);
 
     const realizationPort = getTreeRealizationPort(store.$);
@@ -4119,12 +4533,15 @@ describe('time-travel enhancer', () => {
   });
 
   it('routes a mixed supported scalar plus remove turn entirely through the realization port', async () => {
-    const store = signalTree({
-      count: 0,
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        count: 0,
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'A' });
@@ -4132,10 +4549,12 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     t.resetHistory();
 
-    store.transaction(() => {
-      store.$.count.set(1);
-      store.$.rows.removeOne(7);
-    }).confirm();
+    store
+      .transaction(() => {
+        store.$.count.set(1);
+        store.$.rows.removeOne(7);
+      })
+      .confirm();
 
     await Promise.resolve();
     await Promise.resolve();
@@ -4165,7 +4584,9 @@ describe('time-travel enhancer', () => {
     };
     const turnEffects = turn.__effects;
     if (!turnEffects || turnEffects.length !== 2) {
-      throw new Error('Expected one scalar and one remove effect in the captured turn');
+      throw new Error(
+        'Expected one scalar and one remove effect in the captured turn'
+      );
     }
 
     const realizationPort = getTreeRealizationPort(store.$);
@@ -4173,11 +4594,15 @@ describe('time-travel enhancer', () => {
       throw new Error('Expected tree-owned realization port');
     }
     const setEffect = turnEffects.find(
-      (effect): effect is Extract<(typeof turnEffects)[number], { kind: 'set' }> =>
+      (
+        effect
+      ): effect is Extract<(typeof turnEffects)[number], { kind: 'set' }> =>
         effect.kind === 'set'
     );
     const removeEffect = turnEffects.find(
-      (effect): effect is Extract<(typeof turnEffects)[number], { kind: 'remove' }> =>
+      (
+        effect
+      ): effect is Extract<(typeof turnEffects)[number], { kind: 'remove' }> =>
         effect.kind === 'remove'
     );
     if (!setEffect || !removeEffect) {
@@ -4226,12 +4651,15 @@ describe('time-travel enhancer', () => {
   });
 
   it('does not fall back to legacy realization when a port-capable structural turn semantically refuses', async () => {
-    const store = signalTree({
-      count: 0,
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        count: 0,
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.rows.addOne({ id: 7, name: 'A' });
@@ -4239,10 +4667,12 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     t.resetHistory();
 
-    store.transaction(() => {
-      store.$.count.set(1);
-      store.$.rows.removeOne(7);
-    }).confirm();
+    store
+      .transaction(() => {
+        store.$.count.set(1);
+        store.$.rows.removeOne(7);
+      })
+      .confirm();
 
     await Promise.resolve();
     await Promise.resolve();
@@ -4257,7 +4687,9 @@ describe('time-travel enhancer', () => {
       .mockReturnValue({ kind: 'structural-drift' });
     const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
 
-    expect(() => store.undo()).toThrow('Unsupported scoped undo effect at structural-drift');
+    expect(() => store.undo()).toThrow(
+      'Unsupported scoped undo effect at structural-drift'
+    );
 
     expect(validateSpy).toHaveBeenCalledTimes(1);
     expect(applySpy).not.toHaveBeenCalled();
@@ -4267,17 +4699,20 @@ describe('time-travel enhancer', () => {
   });
 
   it('routes public redo sequentially through turn history using turn/frontier authority', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     const t = (store as any).__timeTravel;
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
@@ -4292,19 +4727,26 @@ describe('time-travel enhancer', () => {
     store.$.trucks.byIdOrFail(12).driverId.set(7);
     await Promise.resolve();
     await Promise.resolve();
-    const firstTurn = t.getTurns().at(-1) as { id: number; __positionIds?: number[] };
+    const firstTurn = t.getTurns().at(-1) as {
+      id: number;
+      __positionIds?: number[];
+    };
 
     store.$.drivers.byIdOrFail(7).status.set('loading');
     store.$.orders.byIdOrFail(99).status.set('queued');
     await Promise.resolve();
     await Promise.resolve();
-    const secondTurn = t.getTurns().at(-1) as { id: number; __positionIds?: number[] };
+    const secondTurn = t.getTurns().at(-1) as {
+      id: number;
+      __positionIds?: number[];
+    };
 
     store.undo();
     store.undo();
 
     const orderPositionId = (secondTurn.__positionIds ?? []).find(
-      (positionId: number) => positionId !== (firstTurn.__positionIds?.[0] as number)
+      (positionId: number) =>
+        positionId !== (firstTurn.__positionIds?.[0] as number)
     ) as number;
     expect(t.getFrontier(orderPositionId)).toBe(0);
 
@@ -4322,18 +4764,23 @@ describe('time-travel enhancer', () => {
     expect(store.$.orders.byIdOrFail(99).status()).toBe('queued');
     expect(t.getTurnStatus(firstTurn.id)).toBe('applied');
     expect(t.getTurnStatus(secondTurn.id)).toBe('applied');
-    expect(t.getAppliedTurnIdsForPosition(orderPositionId)).toEqual([secondTurn.id]);
+    expect(t.getAppliedTurnIdsForPosition(orderPositionId)).toEqual([
+      secondTurn.id,
+    ]);
   });
 
   it('allows public canUndo and canRedo to both be true when an earlier turn is unapplied and a later turn remains applied', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
     store.$.orders.addOne({ id: 99, status: 'new' });
@@ -4351,7 +4798,10 @@ describe('time-travel enhancer', () => {
     store.$.orders.byIdOrFail(99).status.set('queued');
     await Promise.resolve();
     await Promise.resolve();
-    const secondTurn = t.getTurns().at(-1) as { __positionIds?: number[]; id: number };
+    const secondTurn = t.getTurns().at(-1) as {
+      __positionIds?: number[];
+      id: number;
+    };
 
     const firstPositionId = firstTurn.__positionIds?.[0] as number;
 
@@ -4365,17 +4815,20 @@ describe('time-travel enhancer', () => {
   });
 
   it('keeps confirmed frontiers causal while jumpTo answers a temporal snapshot question', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      trucks: entityMap<{ id: number; driverId: number | null }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        trucks: entityMap<{ id: number; driverId: number | null }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
     store.$.trucks.addOne({ id: 12, driverId: null });
@@ -4429,14 +4882,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('preserves confirmed frontiers and turn status across repeated temporal jumpTo excursions', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
     store.$.orders.addOne({ id: 99, status: 'new' });
@@ -4517,14 +4973,17 @@ describe('time-travel enhancer', () => {
   });
 
   it('clears public redo availability when a new confirmed write truncates the abandoned future in a mixed frontier state', async () => {
-    const store = signalTree({
-      drivers: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      orders: entityMap<{ id: number; status: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const store = signalTree(
+      {
+        drivers: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        orders: entityMap<{ id: number; status: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     store.$.drivers.addOne({ id: 7, status: 'idle' });
     store.$.orders.addOne({ id: 99, status: 'new' });
@@ -4537,7 +4996,10 @@ describe('time-travel enhancer', () => {
     store.$.drivers.byIdOrFail(7).status.set('assigned');
     await Promise.resolve();
     await Promise.resolve();
-    const firstTurn = t.getTurns().at(-1) as { id: number; __positionIds?: number[] };
+    const firstTurn = t.getTurns().at(-1) as {
+      id: number;
+      __positionIds?: number[];
+    };
 
     store.$.orders.byIdOrFail(99).status.set('queued');
     await Promise.resolve();
@@ -4554,7 +5016,9 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const remainingTurnIds = t.getTurns().map((turn: { id: number }) => turn.id);
+    const remainingTurnIds = t
+      .getTurns()
+      .map((turn: { id: number }) => turn.id);
 
     expect(store.$.drivers.byIdOrFail(7).status()).toBe('loading');
     expect(store.$.orders.byIdOrFail(99).status()).toBe('queued');
@@ -4565,16 +5029,22 @@ describe('time-travel enhancer', () => {
   });
 
   it('does not record unrelated writes from another tree that shares top-level keys', async () => {
-    const first = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
-    const second = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(timeTravel());
+    const first = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
+    const second = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const firstBaseline = first.getHistory().length;
     const secondBaseline = second.getHistory().length;

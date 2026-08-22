@@ -84,6 +84,12 @@ export type {
   // own return type (losing `.batch()`/`.undo()`/… for its callers). Found via a
   // real consumer doing exactly that — see docs/audits/2026-07/.
   DevToolsMethods,
+  // `exportDebugSession()`'s return shape, for the same reason: a consumer that
+  // stores or forwards a session needs to be able to name its type.
+  DevToolsDebugSession,
+  DevToolsLogEntry,
+  DevToolsModuleMetadata,
+  DevToolsPerformanceMetrics,
 
   // Lifecycle
   EnhancerCleanup,

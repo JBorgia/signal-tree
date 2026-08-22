@@ -34,8 +34,9 @@ type TimeTravelRows = {
 };
 
 function createTimeTravelRows(): TimeTravelRows {
-  return signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) }).with(
-    timeTravel()
+  return signalTree(
+    { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
+    { enhancers: [timeTravel()] }
   ) as unknown as TimeTravelRows;
 }
 
@@ -44,11 +45,14 @@ function createTimeTravelRows(): TimeTravelRows {
 // ============================================================================
 describe('E-TAP — push observation', () => {
   it('MEASURE — tap reports WHICH member changed and how', () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     const seen: string[] = [];
     tree.$.rows.tap({
       onAdd: (e, id) => seen.push(`add:${id}:${e.n}`),
-      onUpdate: (id, changes) => seen.push(`upd:${id}:${JSON.stringify(changes)}`),
+      onUpdate: (id, changes) =>
+        seen.push(`upd:${id}:${JSON.stringify(changes)}`),
       onRemove: (id) => seen.push(`rem:${id}`),
     });
 
@@ -60,7 +64,9 @@ describe('E-TAP — push observation', () => {
   });
 
   it('NULL — the pull surface carries the same information, recovered by diff', () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
 
     // ANG-V0-D already established entityMap CRUD is fully visible through its
     // own read surface. The only thing push adds is CHANGE IDENTITY, which pull
@@ -92,7 +98,9 @@ describe('E-TAP — push observation', () => {
 // ============================================================================
 describe('E-INT — write-path authority', () => {
   it('MEASURE — a SYNCHRONOUS interceptor really does block the write', () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     tree.$.rows.intercept({
       onAdd: (e, ctx) => {
         if (e.n < 0) ctx.block('negative');
@@ -107,7 +115,9 @@ describe('E-INT — write-path authority', () => {
   });
 
   it('DR-2 — async interceptors fail closed before any mutation can land', async () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
 
     // TypeScript allows an async function where a void-returning callback is
     // expected, so runtime still has to fail closed before a synchronous write
@@ -137,7 +147,9 @@ describe('E-INT — write-path authority', () => {
   });
 
   it('DR-2 — thenable add interceptors fail closed before the add lands', async () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     let transformAttempted = false;
 
     tree.$.rows.intercept({
@@ -159,7 +171,9 @@ describe('E-INT — write-path authority', () => {
   });
 
   it('DR-2 — thenable update interceptors fail closed before the update lands', async () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     tree.$.rows.addOne({ id: 'a', n: 1 });
     let transformAttempted = false;
 
@@ -182,7 +196,9 @@ describe('E-INT — write-path authority', () => {
   });
 
   it('DR-2 — thenable remove interceptors fail closed before the removal lands', async () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     tree.$.rows.addOne({ id: 'a', n: 1 });
     let blockAttempted = false;
 
@@ -245,7 +261,9 @@ describe('E-INT — write-path authority', () => {
   });
 
   it('DEFECT — ctx.blocked / ctx.blockReason are vestigial: block() throws instead of setting them', () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     let observedBlocked: boolean | undefined;
 
     tree.$.rows.intercept({

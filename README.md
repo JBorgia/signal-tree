@@ -272,24 +272,37 @@ A SignalTree store is composed from four distinct, type-safe mechanisms — each
 | ----------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap` | `signalTree({ users: entityMap<User>() })`        |
 | **Derived state** | `.derived()` / `derivedFrom()` — computed signals deep-merged at any path                                  | `.derived($ => ({ activeCount: computed(...) }))` |
-| **Capabilities**  | `.with()` enhancers — opt-in, tree-shakeable, and reusable (author your own custom enhancers)              | `.with(batching()).with(devTools())`              |
+| **Capabilities**  | the `enhancers` config array — opt-in, tree-shakeable, and reusable (author your own custom enhancers)     | `signalTree(state, { enhancers: [batching(), devTools()] })` |
 | **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes  | `ops.users.select(id)`                            |
 
-This deliberately splits across four purpose-built tools what NgRx SignalStore unifies under one `with*` composition primitive (`withState` / `withComputed` / `withMethods` / `signalStoreFeature`). The closest analog to NgRx's reusable-feature primitive (`signalStoreFeature` / `withFeature`) is `.with()` enhancers; state, derived state, and actions live in the other three mechanisms. For an honest, axis-by-axis comparison — including where NgRx wins — see [docs/compare/ngrx-signalstore.md](docs/compare/ngrx-signalstore.md).
+This deliberately splits across four purpose-built tools what NgRx SignalStore unifies under one `with*` composition primitive (`withState` / `withComputed` / `withMethods` / `signalStoreFeature`). The closest analog to NgRx's reusable-feature primitive (`signalStoreFeature` / `withFeature`) is the `enhancers` array; state, derived state, and actions live in the other three mechanisms. For an honest, axis-by-axis comparison — including where NgRx wins — see [docs/compare/ngrx-signalstore.md](docs/compare/ngrx-signalstore.md).
 
 The sections below detail each mechanism.
 
 ## Enhancers
 
-Enhancers add capabilities via `.with()`. Each is opt-in and tree-shakeable (modern bundlers — Vite, esbuild, Rollup, webpack 5+). Applying the same enhancer twice throws a clear error — fail-fast, no silent fallback.
+Enhancers add capabilities. Declare the whole set in `signalTree`'s config —
+there is no `.with()` and no late enhancement, because the tree's build plan is
+derived from the enhancer set and cannot be truthful until that set is known.
+Each enhancer is opt-in and tree-shakeable (modern bundlers — Vite, esbuild,
+Rollup, webpack 5+). Declaration order does not matter: requirements resolve
+against everything in the array and the planner runs providers first. Listing
+the same enhancer twice throws a clear error before anything is built —
+fail-fast, no silent fallback.
 
 ```typescript
 import { signalTree, batching, devTools, timeTravel } from '@signaltree/core';
 
-const store = signalTree({ count: 0, items: [] })
-  .with(batching()) // Batch change notifications
-  .with(timeTravel({ maxHistory: 50 })) // Undo/redo with 50-step history
-  .with(devTools()); // Redux DevTools integration
+const store = signalTree(
+  { count: 0, items: [] },
+  {
+    enhancers: [
+      batching(), // Batch change notifications
+      timeTravel({ maxHistory: 50 }), // Undo/redo with 50-step history
+      devTools(), // Redux DevTools integration
+    ],
+  }
+);
 ```
 
 | Enhancer          | Purpose                                                                                        |
@@ -400,7 +413,7 @@ artifacts; use the mapping above as the current guidance.
 Every tree has deterministic cleanup. `destroy()` runs every registered cleanup hook (in registration order), tearing down signals, enhancer timers, caches, and DevTools connections. Built-in enhancers register their own cleanup; custom enhancers must call `tree.registerCleanup(fn)` to participate:
 
 ```typescript
-const store = signalTree({ data: null }).with(batching()).with(devTools());
+const store = signalTree({ data: null }, { enhancers: [batching(), devTools()] });
 store.destroyed(); // Signal<boolean> — false
 
 store.destroy();
@@ -465,9 +478,9 @@ tree.$.users.addOne(entity);
 tree.$.users.byId(id);
 tree.$.users.all();
 
-// Enhance & derive
-tree.with(enhancer()); // Add capabilities (chainable)
-tree.derived(derivedFn); // Attach derived state
+// Enhance & derive — enhancers are DECLARED, not attached later
+signalTree(state, { enhancers: [enhancer()], derived: derivedFn });
+tree.derived(derivedFn); // Derived state can also be added after construction
 
 // Async — markers attach at any tree path (rxMethod was removed in v9.6.0)
 const tree = signalTree({
@@ -511,7 +524,7 @@ collection entries, plain leaves) and skips in-flight state. Full reasoning in
 
 ## Debugging — `devTools()` enhancer
 
-`.with(devTools())` wires SignalTree into the standard Redux DevTools browser extension. Every state change appears in the timeline with a **path-based action name** (e.g., `[users.profile.name]/set`) so you can scrub backward and forward through state history and see _which path_ caused each render — not just _that something changed_. `devTools()` alone delivers the in-browser time-travel scrubber (controlled by its own `enableTimeTravel` config flag, default `true`); the separate `timeTravel()` enhancer is an independent API-level surface for programmatic undo/redo/jumpTo from code, useful when you want history control without depending on the browser extension. See [Architecture Guide](docs/architecture/signaltree-architecture-guide.md#devtools-integration) for screenshots and the full action-naming scheme.
+Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser extension. Every state change appears in the timeline with a **path-based action name** (e.g., `[users.profile.name]/set`) so you can scrub backward and forward through state history and see _which path_ caused each render — not just _that something changed_. `devTools()` alone delivers the in-browser time-travel scrubber (controlled by its own `enableTimeTravel` config flag, default `true`); the separate `timeTravel()` enhancer is an independent API-level surface for programmatic undo/redo/jumpTo from code, useful when you want history control without depending on the browser extension. See [Architecture Guide](docs/architecture/signaltree-architecture-guide.md#devtools-integration) for screenshots and the full action-naming scheme.
 
 ## Documentation
 

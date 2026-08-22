@@ -7,20 +7,7 @@ import {
   ExampleComponent,
 } from '../../../../../shared/components/example-shell';
 
-import type { DevToolsMethods, ISignalTree } from '@signaltree/core';
-
-// devTools() attaches exportDebugSession() at runtime (see
-// devtools-impl.ts), but the public DevToolsMethods type only declares
-// connectDevTools/disconnectDevTools. Extend it locally so the store keeps
-// its real accessor typing instead of reaching in with a Record cast.
-interface DevToolsDemoMethods extends DevToolsMethods {
-  exportDebugSession(): {
-    metrics: unknown;
-    modules: unknown[];
-    logs: unknown[];
-    compositionHistory: Array<{ timestamp: Date; chain: string[] }>;
-  };
-}
+import type { DevToolsDebugSession } from '@signaltree/core';
 
 interface DevtoolsState {
   counter: number;
@@ -49,20 +36,25 @@ interface ActionRecord {
 // Source shown in the st-example code panel (mirrors the store setup below).
 const STORE_SOURCE = `import { devTools, signalTree } from '@signaltree/core';
 
-const store = signalTree<DevtoolsState>({
-  counter: 0,
-  user: {
-    name: 'John Doe',
-    email: 'john@example.com',
-    preferences: { notifications: true },
-  },
-  todos: [],
-}).with(
-  devTools({
-    name: 'DevTools Demo',
-    enableLogging: true,
-    enableBrowserDevTools: true,
-  })
+const store = signalTree(
+  {
+    counter: 0,
+    user: {
+      name: 'John Doe',
+      email: 'john@example.com',
+      preferences: { notifications: true },
+    },
+    todos: [],
+  } as DevtoolsState,
+  {
+    enhancers: [
+      devTools({
+        name: 'DevTools Demo',
+        enableLogging: true,
+        enableBrowserDevTools: true,
+      }),
+    ],
+  }
 );
 
 // Path-based updates surface automatically in Redux DevTools.
@@ -87,23 +79,31 @@ export class DevtoolsDemoComponent {
   actionHistory: ActionRecord[] = [];
   replaying = false;
 
-  public store = signalTree<DevtoolsState>({
-    counter: 0,
-    user: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      preferences: {
-        notifications: true,
+  // The `as unknown as ISignalTree<…> & DevToolsDemoMethods` cast that used to
+  // sit here is gone: declaring the enhancer puts its surface in the return
+  // type, which is the whole point of the v15 construction API.
+  public store = signalTree(
+    {
+      counter: 0,
+      user: {
+        name: 'John Doe',
+        email: 'john@example.com',
+        preferences: {
+          notifications: true,
+        },
       },
-    },
-    todos: [],
-  }).with(
-    devTools({
-      name: 'DevTools Demo',
-      enableLogging: true,
-      enableBrowserDevTools: true,
-    })
-  ) as unknown as ISignalTree<DevtoolsState> & DevToolsDemoMethods;
+      todos: [],
+    } as DevtoolsState,
+    {
+      enhancers: [
+        devTools({
+          name: 'DevTools Demo',
+          enableLogging: true,
+          enableBrowserDevTools: true,
+        }),
+      ],
+    }
+  );
 
   // Computed properties
   counter = this.store.$.counter;
@@ -224,8 +224,11 @@ export class DevtoolsDemoComponent {
   }
 
   triggerSnapshot() {
-    // Export current debug session as a snapshot
-    this.store.exportDebugSession();
+    // Export current debug session as a snapshot. Annotated so the demo names
+    // the public return type rather than relying on inference — the type is
+    // part of the API surface `devTools()` promises.
+    const session: DevToolsDebugSession = this.store.exportDebugSession();
+    void session;
     this.lastAction = 'Take state snapshot';
   }
 

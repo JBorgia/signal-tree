@@ -30,11 +30,16 @@ import { signalTree } from './signal-tree';
  * had to change.
  */
 const mkTree = () =>
-  signalTree({
-    count: 0,
-    user: { name: 'initial' },
-    rows: entityMap<{ id: number; n: string }, number>({ selectId: (e) => e.id }),
-  }).with(serialization());
+  signalTree(
+    {
+      count: 0,
+      user: { name: 'initial' },
+      rows: entityMap<{ id: number; n: string }, number>({
+        selectId: (e) => e.id,
+      }),
+    },
+    { enhancers: [serialization()] }
+  );
 
 /** What 13.x actually left in storage, after a JSON round trip. */
 const LEGACY_PAYLOAD = JSON.stringify({

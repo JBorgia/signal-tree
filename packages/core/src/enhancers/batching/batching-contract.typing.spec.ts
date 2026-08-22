@@ -15,8 +15,15 @@
  * does assert that shape and is expected to need a deliberate update.)
  *
  * The load-bearing property is NO CASTS AND NO EXPLICIT GENERICS at the call
- * site. If a consumer has to write `.with<BatchingMethods>(...)` or cast the
+ * site. If a consumer has to annotate the enhancer's added type or cast the
  * result, the migration has failed even when every type below still resolves.
+ *
+ * v15: enhancers are DECLARED, so the call site is
+ * `signalTree(state, { enhancers: [batching()] })` and the added surface
+ * arrives through the return type. Note the state is a separate annotated
+ * `const` rather than `signalTree<AppState>(...)` — an explicit type argument
+ * would have to name the enhancer tuple parameter too, and naming it is exactly
+ * the ceremony this file exists to forbid.
  */
 import { signalTree } from '../../lib/signal-tree';
 import { batching } from './batching';
@@ -38,8 +45,9 @@ interface AppState {
 }
 
 // The call site under test. No generics, no casts, no annotation.
-const tree = signalTree<AppState>({ count: 0, user: { name: 'Ada', age: 36 } });
-const batched = tree.with(batching());
+const initial: AppState = { count: 0, user: { name: 'Ada', age: 36 } };
+const tree = signalTree(initial);
+const batched = signalTree(initial, { enhancers: [batching()] });
 
 // ============================================================================
 // 1 — the four methods are inferred, with exact signatures
@@ -82,8 +90,12 @@ batched((current) => ({ ...current, count: current.count + 1 }));
 // ============================================================================
 declare const labeller: Enhancer<{ label(): string }>;
 
-const batchedThenLabelled = tree.with(batching()).with(labeller);
-const labelledThenBatched = tree.with(labeller).with(batching());
+const batchedThenLabelled = signalTree(initial, {
+  enhancers: [batching(), labeller],
+});
+const labelledThenBatched = signalTree(initial, {
+  enhancers: [labeller, batching()],
+});
 
 export const _a1: void = batchedThenLabelled.batch(() => undefined);
 export const _a2: string = batchedThenLabelled.label();
@@ -96,12 +108,14 @@ export const _a6: string = labelledThenBatched.$.user.name();
 // ============================================================================
 // 4 — config is optional and does not change the added surface
 // ============================================================================
-const configured = tree.with(batching({ enabled: false, notificationDelayMs: 5 }));
+const configured = signalTree(initial, {
+  enhancers: [batching({ enabled: false, notificationDelayMs: 5 })],
+});
 export type _ConfigDoesNotChangeSurface = Expect<
   Equal<(typeof configured)['batch'], (typeof batched)['batch']>
 >;
 // @ts-expect-error config is checked, not `any`
-tree.with(batching({ nope: true }));
+signalTree(initial, { enhancers: [batching({ nope: true })] });
 
 // ============================================================================
 // 5 — negative controls

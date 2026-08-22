@@ -16,7 +16,10 @@ import {
 
 describe('tree scalar slot runtime', () => {
   it('keeps the same PositionId bound to the same SlotIndex across scalar writes', () => {
-    const tree = signalTree({ profile: { name: 'Alice', enabled: true } }) as ISignalTree<{
+    const tree = signalTree(
+      { profile: { name: 'Alice', enabled: true } },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       profile: {
         name: { (): string; set(value: string): void };
         enabled: { (): boolean; set(value: boolean): void };
@@ -43,7 +46,10 @@ describe('tree scalar slot runtime', () => {
   });
 
   it('binds different PositionIds to different live scalar slots', () => {
-    const tree = signalTree({ profile: { name: 'Alice' }, settings: { enabled: true } }) as ISignalTree<{
+    const tree = signalTree(
+      { profile: { name: 'Alice' }, settings: { enabled: true } },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       profile: {
         name: { (): string; set(value: string): void };
       };
@@ -69,7 +75,10 @@ describe('tree scalar slot runtime', () => {
   });
 
   it('preserves semantic PositionId and SlotIndex across parent rewrites of the same scalar path', () => {
-    const tree = signalTree({ profile: { name: 'Alice', enabled: true } }) as ISignalTree<{
+    const tree = signalTree(
+      { profile: { name: 'Alice', enabled: true } },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       profile: {
         (): { name: string; enabled: boolean };
         name: { (): string; set(value: string): void };
@@ -91,9 +100,10 @@ describe('tree scalar slot runtime', () => {
     tree.$.profile({ name: 'Alicia', enabled: false });
 
     const afterPositionId = getOwnedPositionIds(tree.$.profile.name)?.[0];
-    const afterSlot = afterPositionId === undefined
-      ? undefined
-      : runtime.resolveScalarSlot(afterPositionId);
+    const afterSlot =
+      afterPositionId === undefined
+        ? undefined
+        : runtime.resolveScalarSlot(afterPositionId);
 
     expect(afterPositionId).toBe(beforePositionId);
     expect(afterSlot).toBe(beforeSlot);
@@ -139,10 +149,12 @@ describe('tree scalar slot runtime', () => {
     const runtime = createTreeScalarSlotKernel();
     const stableSlot = runtime.createSlot('A', Object.is);
 
-    expect(runtime.commitSlot(stableSlot, 'A')).toEqual<SingleSlotCommitResult>({
-      revision: 0,
-      changed: false,
-    });
+    expect(runtime.commitSlot(stableSlot, 'A')).toEqual<SingleSlotCommitResult>(
+      {
+        revision: 0,
+        changed: false,
+      }
+    );
     expect(runtime.readSlot<string>(stableSlot)).toBe('A');
     expect(runtime.revision()).toBe(0);
   });

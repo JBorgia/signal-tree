@@ -59,7 +59,7 @@ const addBaz = createEnhancer(metaBaz, (tree) =>
 // 2. ACCUMULATION. Every link survives to the end of the chain, and the LITERAL
 //    types survive with them — `string` here would mean TAdded had widened.
 // ─────────────────────────────────────────────────────────────────────────────
-const chained = signalTree({ n: 0 }).with(addFoo).with(addBar).with(addBaz);
+const chained = signalTree({ n: 0 }, { enhancers: [addFoo, addBar, addBaz] });
 
 export const _foo: 'foo' = chained.foo();
 export const _bar: 'bar' = chained.bar();
@@ -69,7 +69,7 @@ export const _baz: 'baz' = chained.baz();
 export const _n: number = chained.$.n();
 
 // 4. Order independence — accumulation must not depend on position.
-const reordered = signalTree({ n: 0 }).with(addBaz).with(addFoo).with(addBar);
+const reordered = signalTree({ n: 0 }, { enhancers: [addBaz, addFoo, addBar] });
 export const _r1: 'baz' = reordered.baz();
 export const _r2: 'foo' = reordered.foo();
 export const _r3: 'bar' = reordered.bar();

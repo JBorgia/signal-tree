@@ -19,11 +19,14 @@ type Row = { id: number; name: string };
 const KEY = makeStateKey<string>('signaltree');
 
 const makeTree = () =>
-  signalTree({
-    user: { name: '', role: '' },
-    rows: entityMap<Row, number>({ selectId: (r) => r.id }),
-    counter: 0,
-  }).with(serialization());
+  signalTree(
+    {
+      user: { name: '', role: '' },
+      rows: entityMap<Row, number>({ selectId: (r) => r.id }),
+      counter: 0,
+    },
+    { enhancers: [serialization()] }
+  );
 
 describe('C3 — server → TransferState → client', () => {
   it('THE RECIPE: round-trips plain state across two tree instances', () => {
@@ -90,7 +93,7 @@ describe('C3 gap — asyncSource ships its payload and then drops it', () => {
   });
 
   it('the server value IS serialised into the payload', () => {
-    const server = signalTree(make()).with(serialization());
+    const server = signalTree(make(), { enhancers: [serialization()] });
     (server.$.feed as unknown as { set(v: unknown): void }).set(['SERVER']);
     expect(server.serialize()).toContain('SERVER');
   });
@@ -101,12 +104,12 @@ describe('C3 gap — asyncSource ships its payload and then drops it', () => {
     // captured nothing while the warning was plainly on stdout, because the
     // report routes through a listener. Asserting on the observable outcome is
     // both stronger and not hostage to how the report is delivered.
-    const server = signalTree(make()).with(serialization());
+    const server = signalTree(make(), { enhancers: [serialization()] });
     (server.$.feed as unknown as { set(v: unknown): void }).set(['SERVER']);
     const payload = server.serialize();
     expect(payload).toContain('SERVER'); // the bytes were shipped
 
-    const client = signalTree(make()).with(serialization());
+    const client = signalTree(make(), { enhancers: [serialization()] });
     client.deserialize(payload);
 
     // ...and dropped on arrival.
@@ -117,10 +120,10 @@ describe('C3 gap — asyncSource ships its payload and then drops it', () => {
     const mk = () => ({
       rows: entityMap<Row, number>({ selectId: (r) => r.id }),
     });
-    const server = signalTree(mk()).with(serialization());
+    const server = signalTree(mk(), { enhancers: [serialization()] });
     server.$.rows.setAll([{ id: 1, name: 'a' }]);
 
-    const client = signalTree(mk()).with(serialization());
+    const client = signalTree(mk(), { enhancers: [serialization()] });
     client.deserialize(server.serialize());
 
     expect(client.$.rows.all()).toHaveLength(1);
@@ -140,15 +143,15 @@ describe('RFC 0014 — deserialize({ transfer: true })', () => {
   });
 
   it('DELIVERS the server payload that rehydrate drops', () => {
-    const server = signalTree(make()).with(serialization());
+    const server = signalTree(make(), { enhancers: [serialization()] });
     (server.$.feed as unknown as { set(v: unknown): void }).set(['SERVER']);
     const payload = server.serialize();
 
-    const dropped = signalTree(make()).with(serialization());
+    const dropped = signalTree(make(), { enhancers: [serialization()] });
     dropped.deserialize(payload);
     expect((dropped.$.feed as unknown as () => unknown)()).toBeUndefined();
 
-    const delivered = signalTree(make()).with(serialization());
+    const delivered = signalTree(make(), { enhancers: [serialization()] });
     delivered.deserialize(payload, { transfer: true });
     expect((delivered.$.feed as unknown as () => unknown)()).toEqual([
       'SERVER',
@@ -158,11 +161,11 @@ describe('RFC 0014 — deserialize({ transfer: true })', () => {
   // WITHDRAWN WITH STATUS-DEL — same subject, freshness variant.
 
   it('leaves the storage path alone — no flag, no change in behaviour', () => {
-    const server = signalTree(make()).with(serialization());
+    const server = signalTree(make(), { enhancers: [serialization()] });
     (server.$.feed as unknown as { set(v: unknown): void }).set(['STALE']);
     const payload = server.serialize();
 
-    const client = signalTree(make()).with(serialization());
+    const client = signalTree(make(), { enhancers: [serialization()] });
     client.deserialize(payload, { transfer: false });
     expect((client.$.feed as unknown as () => unknown)()).toBeUndefined();
   });
@@ -170,15 +173,15 @@ describe('RFC 0014 — deserialize({ transfer: true })', () => {
   it('the mode does not leak into a later deserialize', () => {
     // `hydrateMode` is closure state restored in a `finally`; this is the test
     // that keeps that honest.
-    const server = signalTree(make()).with(serialization());
+    const server = signalTree(make(), { enhancers: [serialization()] });
     (server.$.feed as unknown as { set(v: unknown): void }).set(['X']);
     const payload = server.serialize();
 
-    const client = signalTree(make()).with(serialization());
+    const client = signalTree(make(), { enhancers: [serialization()] });
     client.deserialize(payload, { transfer: true });
     expect((client.$.feed as unknown as () => unknown)()).toEqual(['X']);
 
-    const after = signalTree(make()).with(serialization());
+    const after = signalTree(make(), { enhancers: [serialization()] });
     after.deserialize(payload); // default: rehydrate
     expect((after.$.feed as unknown as () => unknown)()).toBeUndefined();
   });

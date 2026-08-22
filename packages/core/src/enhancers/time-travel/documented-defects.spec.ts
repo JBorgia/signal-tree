@@ -83,7 +83,7 @@ describe('6c — undo() after deserialize() reverts the restore', () => {
   //   TODO.md 6c
   it('the first undo discards the restored state, and redo brings it back', async () => {
     const make = () =>
-      signalTree({ n: 0 }).with(serialization()).with(timeTravel({}));
+      signalTree({ n: 0 }, { enhancers: [serialization(), timeTravel({})] });
 
     const source = make();
     source.$.n.set(7);
@@ -110,8 +110,13 @@ describe('6c — undo() after deserialize() reverts the restore', () => {
 describe('6d — maxHistorySize validation (FIXED in 14.1.1)', () => {
   // Ordinary regression tests: this defect IS fixed.
   const usableSteps = async (cfg?: number) => {
-    const tree = signalTree({ n: 0 }).with(
-      timeTravel(cfg === undefined ? {} : { maxHistorySize: cfg })
+    const tree = signalTree(
+      { n: 0 },
+      {
+        enhancers: [
+          timeTravel(cfg === undefined ? {} : { maxHistorySize: cfg }),
+        ],
+      }
     );
     await flush();
     for (let i = 1; i <= 10; i++) {

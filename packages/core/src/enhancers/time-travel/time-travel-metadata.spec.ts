@@ -15,7 +15,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
   it('writes performed during undo() carry source=time-travel meta', async () => {
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }).with(timeTravel());
+    const store = signalTree({ count: 0 }, { enhancers: [timeTravel()] });
 
     // Drive the tree forward so we have history to undo into.
     (store as any).$.count.set(1);
@@ -26,7 +26,16 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     const captured: Array<{ path: string; meta?: UpdateMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       'count',
-      (_next, _prev, path, _ownerPath, source, _subjectIds, _positionIds, meta) => {
+      (
+        _next,
+        _prev,
+        path,
+        _ownerPath,
+        source,
+        _subjectIds,
+        _positionIds,
+        meta
+      ) => {
         if (source !== 'time-travel') {
           return;
         }
@@ -57,7 +66,10 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
   it('writes performed during jumpTo() carry source=time-travel meta', async () => {
     resetPathNotifier();
 
-    const store = signalTree({ count: 0, label: 'a' }).with(timeTravel());
+    const store = signalTree(
+      { count: 0, label: 'a' },
+      { enhancers: [timeTravel()] }
+    );
 
     (store as any).$.count.set(1);
     await Promise.resolve();
@@ -69,7 +81,16 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     const captured: Array<{ path: string; meta?: UpdateMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       '**',
-      (_next, _prev, path, _ownerPath, source, _subjectIds, _positionIds, meta) => {
+      (
+        _next,
+        _prev,
+        path,
+        _ownerPath,
+        source,
+        _subjectIds,
+        _positionIds,
+        meta
+      ) => {
         if (source !== 'time-travel') {
           return;
         }
@@ -93,12 +114,21 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
   it('regular user writes carry canonical mutation metadata without a time-travel source', async () => {
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }).with(timeTravel());
+    const store = signalTree({ count: 0 }, { enhancers: [timeTravel()] });
 
     const captured: Array<{ path: string; meta?: UpdateMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       'count',
-      (_next, _prev, path, _ownerPath, source, _subjectIds, _positionIds, meta) => {
+      (
+        _next,
+        _prev,
+        path,
+        _ownerPath,
+        source,
+        _subjectIds,
+        _positionIds,
+        meta
+      ) => {
         captured.push({ path, meta: source === undefined ? meta : undefined });
       }
     );

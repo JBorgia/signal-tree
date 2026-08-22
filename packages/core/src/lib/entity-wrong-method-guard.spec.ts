@@ -48,7 +48,9 @@ describe('entityMap wrong-method guard (dev mode)', () => {
     void r.upsert;
     void r.upsert;
     void r.upsert;
-    expect(warn.mock.calls.filter((c) => String(c[0]).includes('upsert')).length).toBe(1);
+    expect(
+      warn.mock.calls.filter((c) => String(c[0]).includes('upsert')).length
+    ).toBe(1);
   });
 
   it('does NOT warn for real methods', () => {
@@ -65,7 +67,7 @@ describe('entityMap wrong-method guard (dev mode)', () => {
   // while wrapping setters. On an entityMap proxy that bare read used to fire a
   // spurious [ST2002] hint even though the user never called `.update()`.
   it('does NOT warn when batching enhancer wraps a tree containing an entityMap', () => {
-    signalTree({ rows: entityMap<Row, number>() }).with(batching());
+    signalTree({ rows: entityMap<Row, number>() }, { enhancers: [batching()] });
     expect(hintFor('update')).toBeFalsy();
     expect(warn.mock.calls.length).toBe(0);
   });

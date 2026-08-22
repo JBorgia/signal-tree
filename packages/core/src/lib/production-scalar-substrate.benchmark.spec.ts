@@ -188,7 +188,11 @@ function median(values: number[]): number {
     : (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
-function benchmark(fn: () => void, warmup = WARMUP_RUNS, runs = MEASURE_RUNS): number {
+function benchmark(
+  fn: () => void,
+  warmup = WARMUP_RUNS,
+  runs = MEASURE_RUNS
+): number {
   for (let index = 0; index < warmup; index++) {
     fn();
   }
@@ -239,16 +243,24 @@ function buildFlatState(size: number): Record<string, number> {
 }
 
 function createScalarHarness(size: number): ScalarHarness {
-  const tree = signalTree(buildFlatState(size)) as ISignalTree<Record<string, ScalarLeaf>>;
+  const tree = signalTree(buildFlatState(size), {
+    capabilities: ['causal-runtime'],
+  }) as ISignalTree<Record<string, ScalarLeaf>>;
   const runtime = getTreeScalarSlotRuntime(tree.$);
   if (!runtime) {
-    throw new Error('Expected scalar slot runtime on production signalTree path.');
+    throw new Error(
+      'Expected scalar slot runtime on production signalTree path.'
+    );
   }
 
   const targetKey = `leaf_${Math.floor(size / 2)}` as keyof typeof tree.$;
   const targetLeaf = tree.$[targetKey] as ScalarLeaf;
   const targetSlot = resolveLeafSlot(runtime, targetLeaf);
-  const frameSlots = collectFrameSlots(tree, runtime, Math.min(size, MAX_FRAME_WIDTH));
+  const frameSlots = collectFrameSlots(
+    tree,
+    runtime,
+    Math.min(size, MAX_FRAME_WIDTH)
+  );
 
   return {
     runtime,
@@ -269,7 +281,12 @@ function createScalarHarness(size: number): ScalarHarness {
 }
 
 function createEntityHarness(size: number): EntityHarness {
-  const tree = signalTree({ rows: entityMap<EntityRow, number>() }) as ISignalTree<{
+  const tree = signalTree(
+    {
+      rows: entityMap<EntityRow, number>(),
+    },
+    { capabilities: ['causal-runtime'] }
+  ) as ISignalTree<{
     rows: EntityCollection;
   }>;
   const rows = tree.$.rows;
@@ -307,8 +324,9 @@ function createEntityHarness(size: number): EntityHarness {
 }
 
 function createUndoEntityHarness(size: number): UndoEntityHarness {
-  const tree = signalTree({ rows: entityMap<EntityRow, number>() }).with(
-    timeTravel({ maxHistorySize: size + 10 })
+  const tree = signalTree(
+    { rows: entityMap<EntityRow, number>() },
+    { enhancers: [timeTravel({ maxHistorySize: size + 10 })] }
   ) as ISignalTree<{
     rows: EntityCollection;
   }> & {
@@ -355,7 +373,9 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
   const freshSubjectId = size + 1;
 
   if (stableSubjectId === undefined || removableSubjectId === undefined) {
-    throw new Error('Expected seeded structural subjects for projection frame harness.');
+    throw new Error(
+      'Expected seeded structural subjects for projection frame harness.'
+    );
   }
 
   return {
@@ -568,7 +588,9 @@ function createRestoreAuditHarness(size: number): { restoreOne(): void } {
   };
 }
 
-function createProjectionRestoreHarness(size: number): ProjectionRestoreHarness {
+function createProjectionRestoreHarness(
+  size: number
+): ProjectionRestoreHarness {
   const valueStore = new EntityValueStore<EntityRow>();
   const structuralStore = new StructuralStore<number>();
   const restoreKey = Math.floor(size / 2);
@@ -651,7 +673,9 @@ function scaleRatio<T extends { positions: number; perOperationUs: number }>(
   positions: readonly number[]
 ): number {
   const smallest = rows.find((row) => row.positions === positions[0]);
-  const largest = rows.find((row) => row.positions === positions[positions.length - 1]);
+  const largest = rows.find(
+    (row) => row.positions === positions[positions.length - 1]
+  );
   if (!smallest || !largest) {
     throw new Error('Missing benchmark rows for scaling ratio.');
   }
@@ -659,9 +683,7 @@ function scaleRatio<T extends { positions: number; perOperationUs: number }>(
   return largest.perOperationUs / Math.max(smallest.perOperationUs, 0.0001);
 }
 
-function measureScalarTimingRows(
-  sizes: readonly number[]
-): ScalarTimingRow[] {
+function measureScalarTimingRows(sizes: readonly number[]): ScalarTimingRow[] {
   const rows: ScalarTimingRow[] = [];
 
   for (const size of sizes) {
@@ -675,7 +697,11 @@ function measureScalarTimingRows(
         positions: size,
         perOperationUs: perOperationUs(
           benchmark(() => {
-            for (let iteration = 0; iteration < TIMING_READ_ITERATIONS; iteration++) {
+            for (
+              let iteration = 0;
+              iteration < TIMING_READ_ITERATIONS;
+              iteration++
+            ) {
               harness.readTarget();
             }
           }),
@@ -689,7 +715,11 @@ function measureScalarTimingRows(
         positions: size,
         perOperationUs: perOperationUs(
           benchmark(() => {
-            for (let iteration = 0; iteration < TIMING_WRITE_ITERATIONS; iteration++) {
+            for (
+              let iteration = 0;
+              iteration < TIMING_WRITE_ITERATIONS;
+              iteration++
+            ) {
               writeSeed += 1;
               harness.setTarget(writeSeed);
             }
@@ -709,7 +739,11 @@ function measureScalarTimingRows(
           positions: size,
           perOperationUs: perOperationUs(
             benchmark(() => {
-              for (let iteration = 0; iteration < TIMING_FRAME_ITERATIONS; iteration++) {
+              for (
+                let iteration = 0;
+                iteration < TIMING_FRAME_ITERATIONS;
+                iteration++
+              ) {
                 frameSeed += width;
                 harness.commitFrame(width, frameSeed);
               }
@@ -726,9 +760,7 @@ function measureScalarTimingRows(
   return rows;
 }
 
-function measureEntityTimingRows(
-  sizes: readonly number[]
-): EntityTimingRow[] {
+function measureEntityTimingRows(sizes: readonly number[]): EntityTimingRow[] {
   const rows: EntityTimingRow[] = [];
 
   for (const size of sizes) {
@@ -742,7 +774,11 @@ function measureEntityTimingRows(
         positions: size,
         perOperationUs: perOperationUs(
           measureOnceMs(() => {
-            for (let iteration = 0; iteration < ENTITY_UPDATE_ITERATIONS; iteration++) {
+            for (
+              let iteration = 0;
+              iteration < ENTITY_UPDATE_ITERATIONS;
+              iteration++
+            ) {
               updateSeed += 1;
               updateHarness.updateOne(updateSeed);
             }
@@ -761,7 +797,11 @@ function measureEntityTimingRows(
         positions: size,
         perOperationUs: perOperationUs(
           measureOnceMs(() => {
-            for (let iteration = 0; iteration < ENTITY_STRUCTURAL_ITERATIONS; iteration++) {
+            for (
+              let iteration = 0;
+              iteration < ENTITY_STRUCTURAL_ITERATIONS;
+              iteration++
+            ) {
               addHarness.addOne();
             }
           }),
@@ -779,7 +819,11 @@ function measureEntityTimingRows(
         positions: size,
         perOperationUs: perOperationUs(
           measureOnceMs(() => {
-            for (let iteration = 0; iteration < structuralIterations; iteration++) {
+            for (
+              let iteration = 0;
+              iteration < structuralIterations;
+              iteration++
+            ) {
               removeHarness.removeOne();
             }
           }),
@@ -797,7 +841,11 @@ function measureEntityTimingRows(
         positions: size,
         perOperationUs: perOperationUs(
           measureOnceMs(() => {
-            for (let iteration = 0; iteration < ENTITY_STRUCTURAL_ITERATIONS; iteration++) {
+            for (
+              let iteration = 0;
+              iteration < ENTITY_STRUCTURAL_ITERATIONS;
+              iteration++
+            ) {
               changeIdHarness.changeId();
             }
           }),
@@ -805,24 +853,23 @@ function measureEntityTimingRows(
         ),
       });
 
-        const undoHarness = createUndoEntityHarness(size);
-        try {
-          rows.push({
-            operation: 'entity-undoRemove',
-            positions: size,
-            perOperationUs: measurePreparedOperationUs(
-              structuralIterations,
-              () => undoHarness.prepareUndo(),
-              () => undoHarness.undoRemove()
-            ),
-          });
-        } finally {
-          undoHarness.destroy();
-        }
+      const undoHarness = createUndoEntityHarness(size);
+      try {
+        rows.push({
+          operation: 'entity-undoRemove',
+          positions: size,
+          perOperationUs: measurePreparedOperationUs(
+            structuralIterations,
+            () => undoHarness.prepareUndo(),
+            () => undoHarness.undoRemove()
+          ),
+        });
+      } finally {
+        undoHarness.destroy();
+      }
     } finally {
       changeIdHarness.destroy();
     }
-
   }
 
   return rows;
@@ -841,7 +888,11 @@ function measureEntityFrameTimingRows(
       positions: size,
       perOperationUs: perOperationUs(
         measureOnceMs(() => {
-          for (let iteration = 0; iteration < ENTITY_STRUCTURAL_ITERATIONS; iteration++) {
+          for (
+            let iteration = 0;
+            iteration < ENTITY_STRUCTURAL_ITERATIONS;
+            iteration++
+          ) {
             frameHarness.addOne();
           }
         }),
@@ -923,7 +974,8 @@ function measureEntityFrameLogicalWorkRows(
       operation,
       positions,
       structuralActiveKeyLookups: stats.structuralActiveKeyLookups,
-      structuralActiveKeyEntriesVisited: stats.structuralActiveKeyEntriesVisited,
+      structuralActiveKeyEntriesVisited:
+        stats.structuralActiveKeyEntriesVisited,
       structuralSubjectsCreated: stats.structuralSubjectsCreated,
       structuralSubjectTransfers: stats.structuralSubjectTransfers,
       structuralSubjectTombstones: stats.structuralSubjectTombstones,
@@ -964,7 +1016,8 @@ function measureRestoreLogicalWorkRows(
     rows.push({
       positions: size,
       structuralActiveKeyLookups: stats.structuralActiveKeyLookups,
-      structuralActiveKeyEntriesVisited: stats.structuralActiveKeyEntriesVisited,
+      structuralActiveKeyEntriesVisited:
+        stats.structuralActiveKeyEntriesVisited,
     });
   }
 
@@ -1143,9 +1196,7 @@ describe('Complexity guard: production scalar substrate', () => {
 });
 
 describe('Complexity audit: entity structural projection maintenance', () => {
-  it(
-    'proves value-only writes stay O(1) while structural projection work stays local',
-    () => {
+  it('proves value-only writes stay O(1) while structural projection work stays local', () => {
     const stats = installProductionSubstrateStatsForTesting();
     const rows = measureEntityLogicalWorkRows(LOGICAL_AUDIT_SIZES, stats);
 
@@ -1202,9 +1253,7 @@ describe('Complexity audit: entity structural projection maintenance', () => {
         publicAddExistingKeysCopied: 0,
       });
     }
-    },
-    20_000
-  );
+  }, 20_000);
 });
 
 describe('Complexity audit: public fresh-add bookkeeping', () => {
@@ -1229,9 +1278,7 @@ describe('Complexity audit: public fresh-add bookkeeping', () => {
 });
 
 describe('Complexity audit: structural store order bookkeeping', () => {
-  it(
-    'proves direct-frame structural mutations avoid inspecting unrelated active keys',
-    () => {
+  it('proves direct-frame structural mutations avoid inspecting unrelated active keys', () => {
     const stats = installProductionSubstrateStatsForTesting();
     const rows = measureEntityFrameLogicalWorkRows(
       STRUCTURAL_LOGICAL_AUDIT_SIZES,
@@ -1240,7 +1287,8 @@ describe('Complexity audit: structural store order bookkeeping', () => {
 
     for (const size of STRUCTURAL_LOGICAL_AUDIT_SIZES) {
       const addRow = rows.find(
-        (row) => row.operation === 'entity-frame-addOne' && row.positions === size
+        (row) =>
+          row.operation === 'entity-frame-addOne' && row.positions === size
       );
       expect(addRow).toEqual({
         operation: 'entity-frame-addOne',
@@ -1254,7 +1302,8 @@ describe('Complexity audit: structural store order bookkeeping', () => {
       });
 
       const removeRow = rows.find(
-        (row) => row.operation === 'entity-frame-removeOne' && row.positions === size
+        (row) =>
+          row.operation === 'entity-frame-removeOne' && row.positions === size
       );
       expect(removeRow).toEqual({
         operation: 'entity-frame-removeOne',
@@ -1268,7 +1317,8 @@ describe('Complexity audit: structural store order bookkeeping', () => {
       });
 
       const changeIdRow = rows.find(
-        (row) => row.operation === 'entity-frame-changeId' && row.positions === size
+        (row) =>
+          row.operation === 'entity-frame-changeId' && row.positions === size
       );
       expect(changeIdRow).toEqual({
         operation: 'entity-frame-changeId',
@@ -1281,9 +1331,7 @@ describe('Complexity audit: structural store order bookkeeping', () => {
         valueStoreWrites: 0,
       });
     }
-    },
-    20_000
-  );
+  }, 20_000);
 });
 
 describe('Complexity audit: restore-one projection maintenance', () => {
@@ -1306,26 +1354,22 @@ describe('Complexity audit: restore-one projection maintenance', () => {
 });
 
 describe('Complexity audit: public undo-of-remove realization', () => {
-  it(
-    'proves public undo-of-remove realizes through one incremental restore',
-    () => {
-      const stats = installProductionSubstrateStatsForTesting();
-      const rows = measurePublicUndoLogicalWorkRows(
-        STRUCTURAL_LOGICAL_AUDIT_SIZES,
-        stats
-      );
+  it('proves public undo-of-remove realizes through one incremental restore', () => {
+    const stats = installProductionSubstrateStatsForTesting();
+    const rows = measurePublicUndoLogicalWorkRows(
+      STRUCTURAL_LOGICAL_AUDIT_SIZES,
+      stats
+    );
 
-      for (const size of STRUCTURAL_LOGICAL_AUDIT_SIZES) {
-        const row = rows.find((candidate) => candidate.positions === size);
-        expect(row).toEqual({
-          positions: size,
-          publicUndoPositionEntriesExamined: 2,
-          publicUndoTurnEffectsExamined: 1,
-        });
-      }
-    },
-    20_000
-  );
+    for (const size of STRUCTURAL_LOGICAL_AUDIT_SIZES) {
+      const row = rows.find((candidate) => candidate.positions === size);
+      expect(row).toEqual({
+        positions: size,
+        publicUndoPositionEntriesExamined: 2,
+        publicUndoTurnEffectsExamined: 1,
+      });
+    }
+  }, 20_000);
 });
 
 describe('Timing guard: production scalar substrate', () => {
@@ -1334,7 +1378,9 @@ describe('Timing guard: production scalar substrate', () => {
 
     for (const operation of ['compiled-read', 'compiled-write'] as const) {
       const operationRows = rows.filter((row) => row.operation === operation);
-      expect(scaleRatio(operationRows, COMPLEXITY_SIZES)).toBeLessThan(TIMING_RATIO_LIMIT);
+      expect(scaleRatio(operationRows, COMPLEXITY_SIZES)).toBeLessThan(
+        TIMING_RATIO_LIMIT
+      );
     }
 
     for (const width of FRAME_WIDTHS) {
@@ -1342,7 +1388,9 @@ describe('Timing guard: production scalar substrate', () => {
       const operationRows = rows.filter(
         (row) => row.operation === (`frame-${width}` as ScalarTimingOperation)
       );
-      expect(scaleRatio(operationRows, supportedSizes)).toBeLessThan(TIMING_RATIO_LIMIT);
+      expect(scaleRatio(operationRows, supportedSizes)).toBeLessThan(
+        TIMING_RATIO_LIMIT
+      );
     }
   });
 });
@@ -1353,7 +1401,10 @@ timingDescribe('Performance report: production substrate', () => {
     const entityRows = measureEntityTimingRows(COMPLEXITY_SIZES);
     const entityFrameRows = measureEntityFrameTimingRows(COMPLEXITY_SIZES);
     const stats = installProductionSubstrateStatsForTesting();
-    const entityLogicalRows = measureEntityLogicalWorkRows(LOGICAL_AUDIT_SIZES, stats);
+    const entityLogicalRows = measureEntityLogicalWorkRows(
+      LOGICAL_AUDIT_SIZES,
+      stats
+    );
     const entityFrameLogicalRows = measureEntityFrameLogicalWorkRows(
       STRUCTURAL_LOGICAL_AUDIT_SIZES,
       stats

@@ -90,19 +90,25 @@ class BatchProcessor {
   styleUrl: './batching-demo.component.scss',
 })
 export class BatchingDemoComponent {
-  private store = signalTree<BatchingState>({
-    users: generateUsers(5),
-    posts: generatePosts(10, 5),
-    batchQueue: [],
-    processing: false,
-    completedOperations: [],
-    batchResults: [],
-  }).with(
-    batching({
-      enabled: true,
-      // v6.1.0: Signal writes are synchronous, only CD notifications are batched
-      notificationDelayMs: 0, // 0 = microtask (default)
-    })
+  private store = signalTree(
+    {
+      users: generateUsers(5),
+      posts: generatePosts(10, 5),
+      batchQueue: [],
+      processing: false,
+      completedOperations: [],
+      batchResults: [],
+    } as BatchingState,
+    {
+      enhancers: [
+        batching({
+          enabled: true,
+          // v6.1.0: Signal writes are synchronous, only CD notifications are
+          // batched
+          notificationDelayMs: 0, // 0 = microtask (default)
+        }),
+      ],
+    }
   );
 
   private batchProcessor = new BatchProcessor();

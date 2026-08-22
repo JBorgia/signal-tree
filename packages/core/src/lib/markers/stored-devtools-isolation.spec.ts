@@ -37,7 +37,7 @@ const fakeStorage = () => {
 const persisted = (map: Map<string, string>, key: string) =>
   JSON.parse(map.get(key) as string).data;
 
-const versioned = <T,>(value: T) => JSON.stringify({ __v: 1, data: value });
+const versioned = <T>(value: T) => JSON.stringify({ __v: 1, data: value });
 
 describe('stored() and replay side effects', () => {
   it('set() emits one canonical mutation and persists once with attribution', async () => {
@@ -59,7 +59,16 @@ describe('stored() and replay side effects', () => {
     }> = [];
     const unsubscribe = notifier.subscribe(
       'k',
-      (_value, _prev, path, ownerPath, _source, _subjectIds, _positionIds, meta) => {
+      (
+        _value,
+        _prev,
+        path,
+        ownerPath,
+        _source,
+        _subjectIds,
+        _positionIds,
+        meta
+      ) => {
         seen.push({
           path,
           ownerPath,
@@ -68,9 +77,15 @@ describe('stored() and replay side effects', () => {
       }
     );
     const owner = {};
-    const tree = signalTree({
-      k: stored('sdi-set', 'light', { storage: trackedAdapter, debounceMs: 0 }),
-    });
+    const tree = signalTree(
+      {
+        k: stored('sdi-set', 'light', {
+          storage: trackedAdapter,
+          debounceMs: 0,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     withWriteContext(
       {
@@ -119,9 +134,12 @@ describe('stored() and replay side effects', () => {
     const unsubscribe = notifier.subscribe('k', () => {
       seen.push('k');
     });
-    const tree = signalTree({
-      k: stored('sdi-update', 1, { storage: trackedAdapter, debounceMs: 0 }),
-    });
+    const tree = signalTree(
+      {
+        k: stored('sdi-update', 1, { storage: trackedAdapter, debounceMs: 0 }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     tree.$.k.update((value) => value + 1);
     await Promise.resolve();
@@ -137,9 +155,15 @@ describe('stored() and replay side effects', () => {
     resetPathNotifier();
     const { map, adapter } = fakeStorage();
     const notifier = getPathNotifier();
-    const tree = signalTree({
-      k: stored('sdi-unobserved', 'light', { storage: adapter, debounceMs: 0 }),
-    });
+    const tree = signalTree(
+      {
+        k: stored('sdi-unobserved', 'light', {
+          storage: adapter,
+          debounceMs: 0,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     tree.$.k.set('dark');
 
@@ -149,9 +173,12 @@ describe('stored() and replay side effects', () => {
 
   it('an UNDO writes through — the user is undoing the persisted change', () => {
     const { map, adapter } = fakeStorage();
-    const tree = signalTree({
-      k: stored('sdi-undo', 'light', { storage: adapter, debounceMs: 0 }),
-    });
+    const tree = signalTree(
+      {
+        k: stored('sdi-undo', 'light', { storage: adapter, debounceMs: 0 }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     tree.$.k.set('dark');
     tree.$.k.flush?.();
@@ -167,9 +194,12 @@ describe('stored() and replay side effects', () => {
 
   it('a DEVTOOLS scrub leaves storage alone', () => {
     const { map, adapter } = fakeStorage();
-    const tree = signalTree({
-      k: stored('sdi-scrub', 'light', { storage: adapter, debounceMs: 0 }),
-    });
+    const tree = signalTree(
+      {
+        k: stored('sdi-scrub', 'light', { storage: adapter, debounceMs: 0 }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     tree.$.k.set('dark');
     tree.$.k.flush?.();
@@ -188,9 +218,12 @@ describe('stored() and replay side effects', () => {
 
   it('an ordinary write persists as usual', () => {
     const { map, adapter } = fakeStorage();
-    const tree = signalTree({
-      k: stored('sdi-plain', 'light', { storage: adapter, debounceMs: 0 }),
-    });
+    const tree = signalTree(
+      {
+        k: stored('sdi-plain', 'light', { storage: adapter, debounceMs: 0 }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     tree.$.k.set('dark');
     tree.$.k.flush?.();
@@ -202,9 +235,12 @@ describe('stored() and replay side effects', () => {
     resetPathNotifier();
     const { map, adapter } = fakeStorage();
     map.set('sdi-init', versioned('dark'));
-    const tree = signalTree({
-      k: stored('sdi-init', 'light', { storage: adapter, debounceMs: 0 }),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        k: stored('sdi-init', 'light', { storage: adapter, debounceMs: 0 }),
+      },
+      { enhancers: [timeTravel()] }
+    );
     const t = (tree as any).__timeTravel;
 
     await Promise.resolve();
@@ -212,7 +248,10 @@ describe('stored() and replay side effects', () => {
 
     const indexedTurns = t
       .getTurns()
-      .filter((turn: { __positionIds?: number[] }) => (turn.__positionIds?.length ?? 0) > 0);
+      .filter(
+        (turn: { __positionIds?: number[] }) =>
+          (turn.__positionIds?.length ?? 0) > 0
+      );
 
     expect(tree.$.k()).toBe('dark');
     expect(indexedTurns).toHaveLength(0);
@@ -221,9 +260,15 @@ describe('stored() and replay side effects', () => {
   it('public undo writes through to storage without creating an extra turn', async () => {
     resetPathNotifier();
     const { map, adapter } = fakeStorage();
-    const tree = signalTree({
-      k: stored('sdi-public-undo', 'light', { storage: adapter, debounceMs: 0 }),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        k: stored('sdi-public-undo', 'light', {
+          storage: adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    );
     const t = (tree as any).__timeTravel;
 
     tree.$.k.set('dark');

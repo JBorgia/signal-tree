@@ -76,13 +76,16 @@ export class TimeTravelDemoComponent {
   // (EntitySignal, StatusSignal, FormSignal). Only the timeTravel methods need
   // a cast, and casting the WHOLE tree — as the plain-leaf section above does —
   // would erase exactly the marker types this section exists to exercise.
-  private markerTree = signalTree({
-    people: entityMap<Person, number>({ selectId: (p) => p.id }),
-    // STATUS-DEL: was `status<Error>()`. The demo only needs a changing named
-    // value to show undo/redo, so ordinary store state is the minimum fixture.
-    job: 'NOT_LOADED' as 'NOT_LOADED' | 'LOADED' | 'ERROR',
-    profile: { name: '', email: '' } as ProfileModel,
-  }).with(timeTravel({ maxHistorySize: 50 }));
+  private markerTree = signalTree(
+    {
+      people: entityMap<Person, number>({ selectId: (p) => p.id }),
+      // STATUS-DEL: was `status<Error>()`. The demo only needs a changing named
+      // value to show undo/redo, so ordinary store state is the minimum fixture.
+      job: 'NOT_LOADED' as 'NOT_LOADED' | 'LOADED' | 'ERROR',
+      profile: { name: '', email: '' } as ProfileModel,
+    },
+    { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+  );
 
   private get markerTT(): TimeTravelMethods {
     return this.markerTree as unknown as TimeTravelMethods;
@@ -173,17 +176,20 @@ export class TimeTravelDemoComponent {
     this.refreshMarkerState();
   }
 
-  private tree = signalTree<AppState>({
-    counter: 0,
-    message: 'Hello SignalTree!',
-    todos: [
-      { id: 1, title: 'Learn SignalTree', completed: true },
-      { id: 2, title: 'Try Time Travel', completed: false },
-      { id: 3, title: 'Build Something Amazing', completed: false },
-    ],
-  }).with(
-    timeTravel({ maxHistorySize: 50 })
-  ) as unknown as ISignalTree<AppState> & TimeTravelMethods;
+  // No cast: `timeTravel()`'s surface arrives through the return type now that
+  // the enhancer is declared rather than chained on afterwards.
+  private tree = signalTree(
+    {
+      counter: 0,
+      message: 'Hello SignalTree!',
+      todos: [
+        { id: 1, title: 'Learn SignalTree', completed: true },
+        { id: 2, title: 'Try Time Travel', completed: false },
+        { id: 3, title: 'Build Something Amazing', completed: false },
+      ],
+    } as AppState,
+    { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+  );
 
   // Type-safe tree updater
   private updateTree = (updater: (state: AppState) => AppState) => {

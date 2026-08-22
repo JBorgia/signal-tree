@@ -35,9 +35,12 @@ interface FooMethods {
 }
 
 /** Adds `foo()` by mutation — the ordinary enhancer shape. */
-const addsFoo = createEnhancer({ name: 'addsFoo', provides: ['foo'] }, <T>(
-  tree: ISignalTree<T>
-) => Object.assign(tree, { foo: () => 'foo-result' }) as ISignalTree<T> & FooMethods);
+const addsFoo = createEnhancer(
+  { name: 'addsFoo', provides: ['foo'] },
+  <T>(tree: ISignalTree<T>) =>
+    Object.assign(tree, { foo: () => 'foo-result' }) as ISignalTree<T> &
+      FooMethods
+);
 
 const REPLACERS: Array<[string, () => unknown]> = [
   ['batching', () => batching()],
@@ -48,9 +51,10 @@ const REPLACERS: Array<[string, () => unknown]> = [
 describe('accumulated capability survives identity replacement', () => {
   for (const [name, make] of REPLACERS) {
     it(`${name}: a property added BEFORE it still works after`, () => {
-      const tree = signalTree({ count: 0 })
-        .with(addsFoo as never)
-        .with(make() as never) as unknown as FooMethods & {
+      const tree = signalTree(
+        { count: 0 },
+        { enhancers: [addsFoo as never, make() as never] }
+      ) as unknown as FooMethods & {
         $: { count: () => number };
       };
 
@@ -61,9 +65,10 @@ describe('accumulated capability survives identity replacement', () => {
     });
 
     it(`${name}: control — a property added AFTER it works too`, () => {
-      const tree = signalTree({ count: 0 })
-        .with(make() as never)
-        .with(addsFoo as never) as unknown as FooMethods & {
+      const tree = signalTree(
+        { count: 0 },
+        { enhancers: [make() as never, addsFoo as never] }
+      ) as unknown as FooMethods & {
         $: { count: () => number };
       };
 
@@ -73,10 +78,10 @@ describe('accumulated capability survives identity replacement', () => {
   }
 
   it('survives TWO stacked replacements', () => {
-    const tree = signalTree({ count: 0 })
-      .with(addsFoo as never)
-      .with(batching())
-      .with(timeTravel() as never) as unknown as FooMethods & {
+    const tree = signalTree(
+      { count: 0 },
+      { enhancers: [addsFoo as never, batching(), timeTravel() as never] }
+    ) as unknown as FooMethods & {
       $: { count: () => number };
       batch(fn: () => void): void;
     };

@@ -7,7 +7,9 @@ import { signalTree } from './signal-tree';
 
 describe('defineStore()', () => {
   it('injects the real tree — callable, with $ and full API', () => {
-    const CounterStore = defineStore(() => signalTree({ count: 0, user: { name: 'a' } }));
+    const CounterStore = defineStore(() =>
+      signalTree({ count: 0, user: { name: 'a' } })
+    );
 
     TestBed.configureTestingModule({ providers: [CounterStore] });
     const store = TestBed.inject(CounterStore);
@@ -66,7 +68,9 @@ describe('defineStore()', () => {
     const tagged = <T extends object>(tree: T): T & { tag(): string } =>
       Object.assign(tree, { tag: () => 'tagged' });
 
-    const TaggedStore = defineStore(() => signalTree({ x: 1 }).with(tagged));
+    const TaggedStore = defineStore(() =>
+      signalTree({ x: 1 }, { enhancers: [tagged] })
+    );
 
     TestBed.configureTestingModule({ providers: [TaggedStore] });
     const store = TestBed.inject(TaggedStore);

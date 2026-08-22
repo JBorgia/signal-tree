@@ -50,11 +50,14 @@ describe('entityMap() marker', () => {
 
   describe('integration with signalTree', () => {
     it('should materialize computed slices in tree', () => {
-      const tree = signalTree({
-        users: entityMap<User, number>()
-          .computed('admins', (all) => all.filter((u) => u.role === 'admin'))
-          .computed('activeUsers', (all) => all.filter((u) => u.active)),
-      });
+      const tree = signalTree(
+        {
+          users: entityMap<User, number>()
+            .computed('admins', (all) => all.filter((u) => u.role === 'admin'))
+            .computed('activeUsers', (all) => all.filter((u) => u.active)),
+        },
+        { capabilities: ['causal-runtime'] }
+      );
 
       // Add some users
       tree.$.users.addMany([
@@ -77,11 +80,14 @@ describe('entityMap() marker', () => {
     });
 
     it('should update computed slices when entities change', () => {
-      const tree = signalTree({
-        users: entityMap<User, number>().computed('active', (all) =>
-          all.filter((u) => u.active)
-        ),
-      });
+      const tree = signalTree(
+        {
+          users: entityMap<User, number>().computed('active', (all) =>
+            all.filter((u) => u.active)
+          ),
+        },
+        { capabilities: ['causal-runtime'] }
+      );
 
       tree.$.users.addMany([
         { id: 1, name: 'Alice', role: 'user', active: true, score: 100 },
@@ -97,13 +103,16 @@ describe('entityMap() marker', () => {
     });
 
     it('should work with complex filter functions', () => {
-      const tree = signalTree({
-        users: entityMap<User, number>().computed('topActiveAdmins', (all) =>
-          all
-            .filter((u) => u.role === 'admin' && u.active && u.score > 100)
-            .sort((a, b) => b.score - a.score)
-        ),
-      });
+      const tree = signalTree(
+        {
+          users: entityMap<User, number>().computed('topActiveAdmins', (all) =>
+            all
+              .filter((u) => u.role === 'admin' && u.active && u.score > 100)
+              .sort((a, b) => b.score - a.score)
+          ),
+        },
+        { capabilities: ['causal-runtime'] }
+      );
 
       tree.$.users.addMany([
         { id: 1, name: 'Alice', role: 'admin', active: true, score: 150 },
@@ -120,13 +129,16 @@ describe('entityMap() marker', () => {
     });
 
     it('should allow returning transformed data', () => {
-      const tree = signalTree({
-        users: entityMap<User, number>()
-          .computed('userNames', (all) => all.map((u) => u.name))
-          .computed('totalScore', (all) =>
-            all.reduce((sum, u) => sum + u.score, 0)
-          ),
-      });
+      const tree = signalTree(
+        {
+          users: entityMap<User, number>()
+            .computed('userNames', (all) => all.map((u) => u.name))
+            .computed('totalScore', (all) =>
+              all.reduce((sum, u) => sum + u.score, 0)
+            ),
+        },
+        { capabilities: ['causal-runtime'] }
+      );
 
       tree.$.users.addMany([
         { id: 1, name: 'Alice', role: 'user', active: true, score: 100 },
@@ -141,11 +153,14 @@ describe('entityMap() marker', () => {
     });
 
     it('should preserve existing entityMap methods', () => {
-      const tree = signalTree({
-        users: entityMap<User, number>().computed('active', (all) =>
-          all.filter((u) => u.active)
-        ),
-      });
+      const tree = signalTree(
+        {
+          users: entityMap<User, number>().computed('active', (all) =>
+            all.filter((u) => u.active)
+          ),
+        },
+        { capabilities: ['causal-runtime'] }
+      );
 
       // All standard methods should still work
       tree.$.users.addOne({
@@ -167,19 +182,30 @@ describe('entityMap() marker', () => {
     });
 
     it('allocates owner PositionIds per tree domain, not globally', () => {
-      const firstTree = signalTree({
-        users: entityMap<User, number>(),
-        orders: entityMap<{ id: number; total: number }, number>(),
-      });
-      const secondTree = signalTree({
-        users: entityMap<User, number>(),
-      });
+      const firstTree = signalTree(
+        {
+          users: entityMap<User, number>(),
+          orders: entityMap<{ id: number; total: number }, number>(),
+        },
+        { capabilities: ['causal-runtime'] }
+      );
+      const secondTree = signalTree(
+        {
+          users: entityMap<User, number>(),
+        },
+        { capabilities: ['causal-runtime'] }
+      );
 
-      const firstRootPositionIds = (firstTree.$ as any).__positionIds as number[];
-      const firstUsersPositionIds = (firstTree.$.users as any).__positionIds as number[];
-      const firstOrdersPositionIds = (firstTree.$.orders as any).__positionIds as number[];
-      const secondRootPositionIds = (secondTree.$ as any).__positionIds as number[];
-      const secondUsersPositionIds = (secondTree.$.users as any).__positionIds as number[];
+      const firstRootPositionIds = (firstTree.$ as any)
+        .__positionIds as number[];
+      const firstUsersPositionIds = (firstTree.$.users as any)
+        .__positionIds as number[];
+      const firstOrdersPositionIds = (firstTree.$.orders as any)
+        .__positionIds as number[];
+      const secondRootPositionIds = (secondTree.$ as any)
+        .__positionIds as number[];
+      const secondUsersPositionIds = (secondTree.$.users as any)
+        .__positionIds as number[];
 
       expect(firstRootPositionIds).toEqual([1]);
       expect(secondRootPositionIds).toEqual([1]);

@@ -24,13 +24,16 @@ import { serialization } from './serialization';
  */
 describe('serialization round-trips every marker', () => {
   const roundTrip = <T extends object>(build: () => T) => {
-    const a = signalTree(build()).with(serialization());
-    return { a, restore: () => {
-      const json = a.serialize();
-      const b = signalTree(build()).with(serialization());
-      b.deserialize(json);
-      return b;
-    } };
+    const a = signalTree(build(), { enhancers: [serialization()] });
+    return {
+      a,
+      restore: () => {
+        const json = a.serialize();
+        const b = signalTree(build(), { enhancers: [serialization()] });
+        b.deserialize(json);
+        return b;
+      },
+    };
   };
 
   // WITHDRAWN WITH STATUS-DEL — the status() serialization cases. Their subject
@@ -48,7 +51,6 @@ describe('serialization round-trips every marker', () => {
     expect(b.$.r.count()).toBe(2);
     expect(b.$.r.byId(2)?.()).toEqual({ id: 2, v: 'b' });
   });
-
 });
 
 describe('special types still survive — one materialiser, same result', () => {
@@ -66,8 +68,8 @@ describe('special types still survive — one materialiser, same result', () => 
       nested: { d2: new Date(0) },
     });
 
-    const a = signalTree(shape()).with(serialization());
-    const b = signalTree(shape()).with(serialization());
+    const a = signalTree(shape(), { enhancers: [serialization()] });
+    const b = signalTree(shape(), { enhancers: [serialization()] });
     b.deserialize(a.serialize());
 
     expect(b.$.d().toISOString()).toBe('2020-01-02T03:04:05.000Z');

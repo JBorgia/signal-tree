@@ -249,10 +249,7 @@ const appTree = signalTree({
   cart: {
     items: [] as Array<{ id: string; quantity: number }>
   }
-})
-  .with(batching())
-  .with(devTools({ name: 'App State' }))
-  .with(timeTravel());
+}, { enhancers: [batching(), devTools({ name: 'App State' }), timeTravel()] });
 
 // Read nested values directly
 console.log(appTree.$.user.profile.name());

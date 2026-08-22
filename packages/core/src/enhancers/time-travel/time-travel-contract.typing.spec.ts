@@ -30,6 +30,13 @@
  * SCOPE: this slice asks whether the EXISTING capability can be expressed
  * through `Enhancer<TimeTravelMethods>`. It does not reopen time-travel's public
  * contract — nothing here asserts a change to `TimeTravelMethods`' shape.
+ *
+ * v15: enhancers are DECLARED, so the call site is
+ * `signalTree(state, { enhancers: [timeTravel()] })` and the added surface arrives
+ * through the return type. Note the state is a separate annotated `const`
+ * rather than `signalTree<AppState>(...)` — an explicit type argument would
+ * have to name the enhancer tuple parameter too, and naming it is exactly the
+ * ceremony this file exists to forbid.
  */
 import { signalTree } from '../../lib/signal-tree';
 import { timeTravel } from './time-travel';
@@ -56,8 +63,9 @@ interface AppState {
 }
 
 // The call site under test. No generics, no casts, no annotation.
-const tree = signalTree<AppState>({ count: 0, user: { name: 'Ada', age: 36 } });
-const travelled = tree.with(timeTravel());
+const initial: AppState = { count: 0, user: { name: 'Ada', age: 36 } };
+const tree = signalTree(initial);
+const travelled = signalTree(initial, { enhancers: [timeTravel()] });
 
 // ============================================================================
 // 1 — THE LOAD-BEARING ROW: history keeps the CONCRETE state type
@@ -128,8 +136,8 @@ travelled({ count: 1 });
 // ============================================================================
 declare const labeller: Enhancer<{ label(): string }>;
 
-const travelledThenLabelled = tree.with(timeTravel()).with(labeller);
-const labelledThenTravelled = tree.with(labeller).with(timeTravel());
+const travelledThenLabelled = signalTree(initial, { enhancers: [timeTravel(), labeller] });
+const labelledThenTravelled = signalTree(initial, { enhancers: [labeller, timeTravel()] });
 
 export const _b1: string = travelledThenLabelled.label();
 export const _b2: boolean = travelledThenLabelled.canUndo();
@@ -150,7 +158,7 @@ export type _HistoryStateSurvivesChaining = [
 // ============================================================================
 // 6 — config is optional and does not change the added surface
 // ============================================================================
-const disabled = tree.with(timeTravel({ enabled: false }));
+const disabled = signalTree(initial, { enhancers: [timeTravel({ enabled: false })] });
 export type _ConfigDoesNotChangeSurface = [
   Expect<Equal<(typeof disabled)['undo'], (typeof travelled)['undo']>>,
   Expect<
@@ -158,7 +166,7 @@ export type _ConfigDoesNotChangeSurface = [
   >
 ];
 // @ts-expect-error config is checked, not `any`
-tree.with(timeTravel({ nope: true }));
+signalTree(initial, { enhancers: [timeTravel({ nope: true })] });
 
 // ============================================================================
 // 7 — negative controls

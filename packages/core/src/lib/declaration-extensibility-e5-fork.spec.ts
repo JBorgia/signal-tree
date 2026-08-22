@@ -1,4 +1,9 @@
-import { computed, signal, type Signal, type WritableSignal } from '@angular/core';
+import {
+  computed,
+  signal,
+  type Signal,
+  type WritableSignal,
+} from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
@@ -52,8 +57,9 @@ const flush = async () => {
 
 describe('E5 fork — canonical participation of the two candidate paths', () => {
   it('PATH A: a preserved Angular signal is NOT captured by undo', async () => {
-    const tree = signalTree({ counter: makeCounterSignal(10) }).with(
-      timeTravel()
+    const tree = signalTree(
+      { counter: makeCounterSignal(10) },
+      { enhancers: [timeTravel()] }
     );
     (tree.$.counter as CounterA).increment();
     await flush();
@@ -68,7 +74,7 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
   });
 
   it('PATH B: ordinary canonical state IS captured by undo', async () => {
-    const tree = signalTree({ counter: 10 }).with(timeTravel());
+    const tree = signalTree({ counter: 10 }, { enhancers: [timeTravel()] });
     const api = makeCounterApi(tree.$.counter);
 
     api.increment();
@@ -90,7 +96,7 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
   });
 
   it('PATH B: writes roll back through the generic transaction kernel', () => {
-    const tree = signalTree({ counter: 10 }).with(transactions());
+    const tree = signalTree({ counter: 10 }, { enhancers: [transactions()] });
     const api = makeCounterApi(tree.$.counter);
 
     const pending = tree.transaction(() => {

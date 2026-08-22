@@ -43,7 +43,13 @@ describe('restore takes the diff fast path when the shape is unchanged', () => {
 
     hydrateMarkerNode(
       tree.$.rows,
-      { all: [{ id: 1, v: 1 }, { id: 2, v: 99 }, { id: 3, v: 3 }] },
+      {
+        all: [
+          { id: 1, v: 1 },
+          { id: 2, v: 99 },
+          { id: 3, v: 3 },
+        ],
+      },
       'restore'
     );
 
@@ -76,7 +82,13 @@ describe('the fallback — every shape the fast path must NOT handle', () => {
 
     hydrateMarkerNode(
       tree.$.rows,
-      { all: [{ id: 1, v: 1 }, { id: 2, v: 2 }, { id: 3, v: 3 }] },
+      {
+        all: [
+          { id: 1, v: 1 },
+          { id: 2, v: 2 },
+          { id: 3, v: 3 },
+        ],
+      },
       'restore'
     );
 
@@ -91,7 +103,16 @@ describe('the fallback — every shape the fast path must NOT handle', () => {
       { id: 3, v: 3 },
     ]);
 
-    hydrateMarkerNode(tree.$.rows, { all: [{ id: 1, v: 1 }, { id: 3, v: 3 }] }, 'restore');
+    hydrateMarkerNode(
+      tree.$.rows,
+      {
+        all: [
+          { id: 1, v: 1 },
+          { id: 3, v: 3 },
+        ],
+      },
+      'restore'
+    );
 
     expect(tree.$.rows.count()).toBe(2);
     expect(tree.$.rows.byId(2)).toBeUndefined();
@@ -107,7 +128,13 @@ describe('the fallback — every shape the fast path must NOT handle', () => {
 
     hydrateMarkerNode(
       tree.$.rows,
-      { all: [{ id: 3, v: 3 }, { id: 1, v: 1 }, { id: 2, v: 2 }] },
+      {
+        all: [
+          { id: 3, v: 3 },
+          { id: 1, v: 1 },
+          { id: 2, v: 2 },
+        ],
+      },
       'restore'
     );
 
@@ -127,7 +154,12 @@ describe('the fallback — every shape the fast path must NOT handle', () => {
 
     hydrateMarkerNode(
       tree.$.rows,
-      { all: [{ id: 7, v: 7 }, { id: 8, v: 8 }] },
+      {
+        all: [
+          { id: 7, v: 7 },
+          { id: 8, v: 8 },
+        ],
+      },
       'restore'
     );
 
@@ -158,9 +190,12 @@ describe('undo/redo end to end still reverts a large collection', () => {
     const rows: Row[] = [];
     for (let i = 0; i < N; i++) rows.push({ id: i, v: i });
     const { timeTravel } = await import('../enhancers/time-travel/time-travel');
-    const tree = signalTree({
-      rows: entityMap<Row, number>({ selectId: (r) => r.id }),
-    }).with(timeTravel({ maxHistorySize: 100 }));
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, number>({ selectId: (r) => r.id }),
+      },
+      { enhancers: [timeTravel({ maxHistorySize: 100 })] }
+    );
     tree.$.rows.setAll(rows);
     await flush();
 

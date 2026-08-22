@@ -77,7 +77,7 @@ const SCENARIOS = [
     capability: 'Entity collection + undo/redo history',
     signaltree: `
       import { signalTree, entityMap, timeTravel } from ${JSON.stringify(CORE)};
-      const t = signalTree({ users: entityMap() }).with(timeTravel({ maxHistorySize: 50 }));
+      const t = signalTree({ users: entityMap() }, { enhancers: [timeTravel({ maxHistorySize: 50 })] });
       t.$.users.addOne({ id: 1, name: 'a' });
       t.undo(); t.redo();
       globalThis.__sink = [t.$.users.all(), t.canUndo(), t.canRedo()];

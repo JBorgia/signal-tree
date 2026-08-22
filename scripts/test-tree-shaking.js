@@ -34,7 +34,7 @@ const SELF_TEST_CASE = {
   name: 'SELF-TEST — deliberately imports what it forbids',
   code: `
       import { signalTree, devTools } from '@signaltree/core';
-      const tree = signalTree({ count: 0 }).with(devTools());
+      const tree = signalTree({ count: 0 }, { enhancers: [devTools()] });
     `,
   expectedFiles: ['signal-tree.js'],
   // devtools IS imported above, so a working checker must report this case as
@@ -58,7 +58,7 @@ const testCases = [
     name: 'Core + one enhancer (batching)',
     code: `
       import { signalTree, batching } from '@signaltree/core';
-      const tree = signalTree({ count: 0 }).with(batching());
+      const tree = signalTree({ count: 0 }, { enhancers: [batching()] });
     `,
     expectedFiles: ['signal-tree.js', 'batching.js'],
     shouldNotInclude: ['devtools', 'serialization'],
@@ -68,7 +68,7 @@ const testCases = [
     code: `
       import { signalTree } from '@signaltree/core';
       import { batching } from '@signaltree/core/enhancers/batching';
-      const tree = signalTree({ count: 0 }).with(batching());
+      const tree = signalTree({ count: 0 }, { enhancers: [batching()] });
     `,
     expectedFiles: ['signal-tree.js', 'batching.js'],
     shouldNotInclude: ['devtools', 'serialization'],

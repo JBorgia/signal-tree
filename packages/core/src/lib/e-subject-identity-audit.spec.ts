@@ -37,7 +37,9 @@ describe('SUBJ-AUDIT — the hazards the docblocks imply', () => {
   // If reuse aliased the OLD subject, a held reference would silently start
   // reporting an unrelated member's data — a wrong-row read, not a stale one.
   it('KEY REUSE — a freed key adopted by a new member does NOT alias the old subject', () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     tree.$.rows.addOne({ id: 'tmp-1', n: 5 });
     const held = tree.$.rows.byId('tmp-1');
 
@@ -51,8 +53,13 @@ describe('SUBJ-AUDIT — the hazards the docblocks imply', () => {
   });
 
   it('COLLISION — rekeying onto an OCCUPIED key throws and changes NOTHING', () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
-    tree.$.rows.addMany([{ id: 'a', n: 1 }, { id: 'b', n: 2 }]);
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
+    tree.$.rows.addMany([
+      { id: 'a', n: 1 },
+      { id: 'b', n: 2 },
+    ]);
     const heldB = tree.$.rows.byId('b');
 
     expect(() => tree.$.rows.changeId('a', 'b')).toThrow(
@@ -61,12 +68,17 @@ describe('SUBJ-AUDIT — the hazards the docblocks imply', () => {
 
     // No member destroyed, no member merged, no held reference disturbed.
     expect(tree.$.rows.ids()).toEqual(['a', 'b']);
-    expect(tree.$.rows.all()).toEqual([{ id: 'a', n: 1 }, { id: 'b', n: 2 }]);
+    expect(tree.$.rows.all()).toEqual([
+      { id: 'a', n: 1 },
+      { id: 'b', n: 2 },
+    ]);
     expect(heldB?.n()).toBe(2);
   });
 
   it('SELF — rekeying a key to itself is a no-op, not a throw and not a churn', () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     tree.$.rows.addOne({ id: 'a', n: 1 });
     const held = tree.$.rows.byId('a');
 
@@ -77,7 +89,9 @@ describe('SUBJ-AUDIT — the hazards the docblocks imply', () => {
   });
 
   it('MISSING — rekeying an absent key throws and changes NOTHING', () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     tree.$.rows.addOne({ id: 'a', n: 1 });
 
     expect(() => tree.$.rows.changeId('zzz', 'q')).toThrow(
@@ -88,7 +102,9 @@ describe('SUBJ-AUDIT — the hazards the docblocks imply', () => {
   });
 
   it('ROUND TRIP — rekey and rekey back: does entity.id ever reconcile?', () => {
-    const tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+    const tree = signalTree({
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    });
     tree.$.rows.addOne({ id: 'a', n: 1 });
 
     tree.$.rows.changeId('a', 'b');
@@ -103,10 +119,13 @@ describe('SUBJ-AUDIT — the hazards the docblocks imply', () => {
   });
 
   it('UNDO — a snapshot taken across the split identity restores the KEY, not the stale field', async () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-      draft: '',
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+        draft: '',
+      },
+      { enhancers: [timeTravel()] }
+    );
     tree.$.rows.addOne({ id: 'tmp-1', n: 5 });
     await tick();
 

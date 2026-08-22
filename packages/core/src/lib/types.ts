@@ -1,6 +1,5 @@
 import { Signal, WritableSignal } from '@angular/core';
 
-import type { Enhancer } from './enhancer-types';
 import type { UpdateMetadata } from './mutation-types';
 import type { NodeAccessor } from './node-accessor';
 import { AsyncQueryMarker, AsyncQuerySignal } from './markers/async-query';
@@ -8,8 +7,11 @@ import { AsyncSourceMarker, AsyncSourceSignal } from './markers/async-source';
 import type { EntityLoaderSurface } from './markers/entity-loader';
 import { StoredMarker, StoredSignal } from './markers/stored';
 
+import type { EnhancerWithMeta, TreeCapability } from './enhancer-types';
+
 export { ENHANCER_META } from './enhancer-types';
 export type {
+  AccumulatedEnhancerAdditions,
   Enhancer,
   EnhancerMeta,
   EnhancerWithMeta,
@@ -214,8 +216,8 @@ export type TreeNode<T> = {
     : T[K] extends
         | Date
         | RegExp
-      | Map<unknown, unknown>
-      | Set<unknown>
+        | Map<unknown, unknown>
+        | Set<unknown>
         | Error
         | ((...args: unknown[]) => unknown)
     ? CallableWritableSignal<T[K]> // Built-in objects → treat as atomic values
@@ -239,63 +241,23 @@ export interface ISignalTree<T> extends NodeAccessor<T> {
   /** Reactive tree-node accessor — the canonical entry point. */
   readonly $: TreeNode<T>;
   /**
-   * Apply an enhancer to the tree.
-   * Preserves the caller's tree type (`this`) and intersects with added features.
+   * `with()` IS GONE, ON PURPOSE — this note is the tombstone.
    *
-   * @typeParam TAdded - The additional methods/properties added by the enhancer
-   * @param enhancer - Function that receives the tree and returns it with additions
-   * @returns The tree with both its original type and the added features
+   * Enhancers are declared in `signalTree`'s config and applied once, during
+   * construction. Late enhancement is not deprecated-with-a-shim; it is
+   * removed, because it was what made the build plan unknowable: `.with()` had
+   * to materialize before applying each enhancer, so the plan was fixed before
+   * the first enhancer was ever seen and every tree got the maximal plan.
    *
-   * @example
-   * ```typescript
-  * const tree = signalTree<DashboardState>({...})
-  *   .with(batching());   // Returns tree with batching methods
+   * The accumulated enhancer surface still reaches the caller — through the
+   * return type of `signalTree`, via `AccumulatedEnhancerAdditions`.
    *
-   * tree.$.metrics  // ✅ DashboardState preserved
-   * tree.batch(() => {...})  // ✅ Batching method available
-   * ```
+   * Do NOT re-add a `with()` here "for compatibility". It would be a second
+   * construction engine with its own copy of duplicate detection and
+   * requirement checking, able to disagree with
+   * `assertEnhancerConfigurationValid` about the same configuration — which is
+   * exactly the state 15.0 removed.
    */
-  /**
-   * Takes `Enhancer<TAdded>` so `TAdded` is read straight off the enhancer's own
-   * type. The previous signature inlined its own lambda shape, which made
-   * `with()` RE-DERIVE `TAdded` by matching the enhancer's return against
-   * `ISignalTree<T> & TAdded` — so a neutrally-typed enhancer had its host
-   * absorbed into the inference result (`ISignalTree<T> & EnhancerHost & {...}`).
-   * Two separate types were solving the same problem and disagreeing about it.
-   *
-   * `this & TAdded` is unchanged, and it is what actually preserves both the
-   * concrete state type and every previously accumulated enhancer method.
-   */
-  with<TAdded>(enhancer: Enhancer<TAdded>): this & TAdded;
-  /**
-   * Realization-facing overload, for enhancers written against a CONCRETE tree.
-   *
-   * STALE PREMISE, CORRECTED. This overload was justified by "core's built-ins
-   * are declared `<T>(tree: ISignalTree<T>) => ISignalTree<T> & Methods` and
-   * legitimately read the realized surface". As of the 15.0 built-in migration
-   * that is FALSE — all six (`batching`, `timeTravel`, `devTools`,
-   * `serialization`, `persistence`, `transactions`) are declared
-   * `Enhancer<Methods>`, each with one boundary cast at its own return.
-   *
-   * So core no longer justifies this overload. Whether anything still does is
-   * release queue item #4's question: `guardrails`, `realtime`, `schema` and
-   * `ng-forms` declare enhancers against `ISignalTree`, and that is what must
-   * be measured before deleting it. Do NOT read this note as "the overload is
-   * unused" — read it as "its recorded reason no longer applies".
-   *
-   * The variance fact below is unchanged and is why a single signature cannot
-   * accept both: `Enhancer` is a function-type alias and therefore has a
-   * CONTRAVARIANT parameter under `strictFunctionTypes` — accepting a concrete
-   * enhancer through it would require `EnhancerHost` to be assignable to
-   * `ISignalTree<unknown>`, i.e. the neutral host to be a SUBTYPE of the tree,
-   * which is the exact inversion of what neutrality means.
-   *
-   * Ordering matters: the neutral overload is first so a `createEnhancer` result
-   * resolves against it and keeps `TAdded` exact.
-   */
-  with<TAdded>(
-    enhancer: (tree: ISignalTree<T>) => ISignalTree<T> & TAdded
-  ): this & TAdded;
   bind(thisArg?: unknown): NodeAccessor<T>;
   destroy(): void;
   /** Whether this tree has been destroyed. */
@@ -542,9 +504,58 @@ export interface PendingTransaction {
   rollback(): void;
 }
 
+/** One module's activity record, as reported by {@link DevToolsMethods.exportDebugSession}. */
+export interface DevToolsModuleMetadata {
+  name: string;
+  methods: string[];
+  addedAt: Date;
+  lastActivity: Date;
+  operationCount: number;
+  averageExecutionTime: number;
+  errorCount: number;
+}
+
+/** Aggregate counters, as reported by {@link DevToolsMethods.exportDebugSession}. */
+export interface DevToolsPerformanceMetrics {
+  totalUpdates: number;
+  moduleUpdates: Record<string, number>;
+  modulePerformance: Record<string, number>;
+  signalGrowth: Record<string, number>;
+  memoryDelta: Record<string, number>;
+  moduleCacheStats: Record<string, { hits: number; misses: number }>;
+}
+
+/** One logged event, as reported by {@link DevToolsMethods.exportDebugSession}. */
+export interface DevToolsLogEntry {
+  timestamp: Date;
+  module: string;
+  type: 'composition' | 'method' | 'state' | 'performance';
+  data: unknown;
+}
+
+/** What {@link DevToolsMethods.exportDebugSession} returns. */
+export interface DevToolsDebugSession {
+  metrics: DevToolsPerformanceMetrics;
+  modules: DevToolsModuleMetadata[];
+  logs: DevToolsLogEntry[];
+}
+
 export interface DevToolsMethods {
   connectDevTools(name?: string): void;
   disconnectDevTools(): void;
+  /**
+   * Snapshot the current debug session — metrics, per-module activity, logs.
+   *
+   * DECLARED IN 15.0, PRESENT SINCE LONG BEFORE. `devTools()` has always
+   * attached this at runtime and `devtools.spec.ts` has always asserted it, but
+   * it was missing from this interface, so reaching it required a cast — and the
+   * demo carried exactly that cast, with a hand-written `compositionHistory`
+   * field the runtime does not return. Same runtime-present / type-missing drift
+   * already recorded for `destroyed`, `registerCleanup` and `updateAndReport`.
+   *
+   * It surfaced because removing `.with()` removed the cast that was hiding it.
+   */
+  exportDebugSession(): DevToolsDebugSession;
 }
 
 /**
@@ -592,6 +603,50 @@ export interface TreeConfig {
   enableDevTools?: boolean;
   debugMode?: boolean;
   useStructuralSharing?: boolean;
+
+  /**
+   * Enhancers to apply, declared up front.
+   *
+   * The whole set has to be known before the tree is built, because the build
+   * plan is derived from it: which capabilities to resolve, whether to install
+   * mutation metadata, whether a physical commit clock is needed. A chained
+   * `.with()` could not supply that -- it had to materialize before applying
+   * each enhancer, so the plan was always fixed before the first enhancer was
+   * seen.
+   *
+   * Declaration order does not matter. Requirements are validated against the
+   * union of everything configured, then the set is topologically ordered so
+   * providers run before consumers.
+   */
+  enhancers?: readonly EnhancerWithMeta<unknown>[];
+
+  /**
+   * Capabilities to install regardless of which enhancers are configured.
+   *
+   * Enhancers normally declare what they need, and that is the ordinary path.
+   * This exists for the case with no enhancer to speak for the requirement:
+   * driving the causal runtime directly, or a consumer that wants position
+   * topology without adopting a feature that happens to imply it. Dependencies
+   * resolve the same way -- requesting `causal-runtime` also installs
+   * `mutation-capture` and `position-topology`.
+   */
+  capabilities?: readonly TreeCapability[];
+
+  /**
+   * Derived state, declared with the enhancers rather than chained after them.
+   *
+   * Runs against the tree's `$` and returns a partial shape of `computed()`
+   * signals, which are merged in at the same point a chained `.derived()` call
+   * would have applied them: lazily, on first `$` access, after every enhancer
+   * has been applied.
+   *
+   * The parameter is typed `never` here on purpose. `TreeConfig` has no `T` to
+   * name, so the honest declaration is the bottom type — every concrete factory
+   * `($: TreeNode<T>) => TDerived` is assignable to it. The real typing, and the
+   * `ProcessDerived<TDerived>` in the result, come from the `signalTree`
+   * overload that recognises this field.
+   */
+  derived?: ($: never) => object;
 
   /**
    * Construction-time security validation, built with the `security()` helper
@@ -734,7 +789,6 @@ export interface FormHistoryApi<_T> {
   /** @internal Binds form undo/redo selection to shared scoped history. */
   __bindSharedAuthority?(authority: FormHistorySharedAuthority): void;
 }
-
 
 // ============================================
 // FEATURE TYPES

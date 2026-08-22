@@ -14,7 +14,7 @@ tree.$.age.set(30);
 // → 3 notifications
 
 // With batching: notifications are coalesced
-const tree = signalTree(state).with(batching());
+const tree = signalTree(state, { enhancers: [batching()] });
 tree.$.firstName.set('Alice');
 tree.$.lastName.set('Smith');
 tree.$.age.set(30);

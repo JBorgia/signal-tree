@@ -365,7 +365,7 @@ export class BenchmarkService {
 
     // Batch updates
     try {
-      const batchTree = signalTree(state).with(batching());
+      const batchTree = signalTree(state, { enhancers: [batching()] });
 
       results.batch10 = BenchmarkService.measureTime(() => {
         // `batch(() => tree(partial))` — explicit, and NOT `batchUpdate`, which was

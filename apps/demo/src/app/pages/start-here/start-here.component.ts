@@ -1,4 +1,3 @@
-
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
@@ -76,8 +75,7 @@ export const appTree = signalTree({
   user: { name: '', email: '' },
   ui: { theme: 'light', sidebarOpen: false },
   cart: { items: [] as CartItem[], total: 0 },
-})
-  .with(devTools())      // Redux DevTools at the root
+}, { enhancers: [devTools()] })      // Redux DevTools at the root
   .with(timeTravel())    // Undo/redo at the root
   .with(persistence({ key: 'app-tree' }));  // Auto-save at the root
 

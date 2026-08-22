@@ -45,20 +45,32 @@ export class BatchingComparisonComponent {
    * underlying signal. The wrap is applied BEFORE any enhancer, so a batched
    * tree's coalesced writes are counted after deduplication.
    */
-  private createCountingTree() {
-    const tree = signalTree({ counter: 0 });
+  /**
+   * A probe enhancer that counts RAW writes to `counter`.
+   *
+   * It has to wrap the setter before `batching` wraps it, or it counts the
+   * coalesced write instead of the real one — and the whole comparison is that
+   * difference. v15 builds a tree and its enhancers in one call, so "before the
+   * enhancer" means "earlier in the declared array".
+   */
+  private makeWriteCounter() {
     let applied = 0;
-    const counter = tree.$.counter as unknown as { set(v: number): void };
-    const rawSet = counter.set.bind(counter);
-    counter.set = (v: number) => {
-      applied++;
-      rawSet(v);
+    const probe = <T>(t: T): T => {
+      const counter = (t as unknown as { $: { counter: unknown } }).$
+        .counter as unknown as { set(v: number): void };
+      const rawSet = counter.set.bind(counter);
+      counter.set = (v: number) => {
+        applied++;
+        rawSet(v);
+      };
+      return t;
     };
-    return { tree, appliedWrites: () => applied };
+    return { probe, appliedWrites: () => applied };
   }
 
   private async runUnbatched(): Promise<void> {
-    const { tree, appliedWrites } = this.createCountingTree();
+    const { probe, appliedWrites } = this.makeWriteCounter();
+    const tree = signalTree({ counter: 0 }, { enhancers: [probe] });
 
     let renders = 0;
     const ref = effect(
@@ -85,12 +97,18 @@ export class BatchingComparisonComponent {
   }
 
   private async runBatched(): Promise<void> {
-    const { tree: base, appliedWrites } = this.createCountingTree();
-    const tree = base.with(
-      batching({
-        enabled: true,
-        notificationDelayMs: this.batchNotificationDelayMs(),
-      })
+    const { probe, appliedWrites } = this.makeWriteCounter();
+    const tree = signalTree(
+      { counter: 0 },
+      {
+        enhancers: [
+          probe,
+          batching({
+            enabled: true,
+            notificationDelayMs: this.batchNotificationDelayMs(),
+          }),
+        ],
+      }
     );
 
     let renders = 0;

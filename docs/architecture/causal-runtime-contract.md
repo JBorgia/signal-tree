@@ -57,7 +57,7 @@ This means internal lifecycle may become fully construction-first:
 
 After tree exposure, structural capabilities are treated as frozen. Users care
 that the exposed tree still feels like a reactive JSON object; they do not care
-whether setup came from `signalTree(...).with(...)`, `createTree({...})`, a
+whether setup came from `signalTree(..., { enhancers: [...] })`, `createTree({...})`, a
 builder, or another internal construction ritual.
 
 ---

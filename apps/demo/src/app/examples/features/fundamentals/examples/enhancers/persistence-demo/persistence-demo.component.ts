@@ -1,4 +1,9 @@
-import { Component, OnDestroy, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { persistence, signalTree } from '@signaltree/core';
 
@@ -41,32 +46,37 @@ export class PersistenceDemoComponent implements OnDestroy {
   newNoteContent = '';
 
   // Create store with persistence enhancer
-  store = signalTree({
-    user: {
-      name: '',
-      email: '',
-      theme: 'system' as Themes,
+  store = signalTree(
+    {
+      user: {
+        name: '',
+        email: '',
+        theme: 'system' as Themes,
+      },
+      preferences: {
+        notifications: true,
+        autoSave: true,
+        language: 'en',
+      },
+      notes: [] as Array<{
+        id: number;
+        title: string;
+        content: string;
+        createdAt: string;
+      }>,
+      lastSaved: null as string | null,
     },
-    preferences: {
-      notifications: true,
-      autoSave: true,
-      language: 'en',
-    },
-    notes: [] as Array<{
-      id: number;
-      title: string;
-      content: string;
-      createdAt: string;
-    }>,
-    lastSaved: null as string | null,
-  }).with(
-    persistence({
-      key: this.STORAGE_KEY,
-      autoSave: true, // Auto-save on every state change
-      autoLoad: true, // Auto-load on creation
-      debounceMs: 500, // Debounce saves by 500ms
-      includeMetadata: true, // Include save timestamp
-    })
+    {
+      enhancers: [
+        persistence({
+          key: this.STORAGE_KEY,
+          autoSave: true, // Auto-save on every state change
+          autoLoad: true, // Auto-load on creation
+          debounceMs: 500, // Debounce saves by 500ms
+          includeMetadata: true, // Include save timestamp
+        }),
+      ],
+    }
   );
 
   // Expose state for template

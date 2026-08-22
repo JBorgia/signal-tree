@@ -22,6 +22,13 @@
  * `TransactionMethods` is also INHERITED by `TimeTravelMethods`, so this
  * contract is reachable two ways. The rows here cover the direct application;
  * `time-travel-contract.typing.spec.ts` covers the inherited path.
+ *
+ * v15: enhancers are DECLARED, so the call site is
+ * `signalTree(state, { enhancers: [transactions()] })` and the added surface arrives
+ * through the return type. Note the state is a separate annotated `const`
+ * rather than `signalTree<AppState>(...)` — an explicit type argument would
+ * have to name the enhancer tuple parameter too, and naming it is exactly the
+ * ceremony this file exists to forbid.
  */
 import { signalTree } from '../../lib/signal-tree';
 import { transactions } from './transactions';
@@ -46,8 +53,9 @@ interface AppState {
   user: { name: string; age: number };
 }
 
-const tree = signalTree<AppState>({ count: 0, user: { name: 'Ada', age: 36 } });
-const txn = tree.with(transactions());
+const initial: AppState = { count: 0, user: { name: 'Ada', age: 36 } };
+const tree = signalTree(initial);
+const txn = signalTree(initial, { enhancers: [transactions()] });
 
 // ============================================================================
 // 1 — the method is inferred, with its exact signature
@@ -75,8 +83,8 @@ txn({ count: 1 });
 // ============================================================================
 declare const labeller: Enhancer<{ label(): string }>;
 
-const txnThenLabelled = tree.with(transactions()).with(labeller);
-const labelledThenTxn = tree.with(labeller).with(transactions());
+const txnThenLabelled = signalTree(initial, { enhancers: [transactions(), labeller] });
+const labelledThenTxn = signalTree(initial, { enhancers: [labeller, transactions()] });
 
 export const _f1: string = txnThenLabelled.label();
 export const _f2: PendingTransaction = txnThenLabelled.transaction(() => undefined);
@@ -88,7 +96,7 @@ export const _f5: number = txnThenLabelled.$.count();
 // 4 — takes no config
 // ============================================================================
 // @ts-expect-error `transactions()` takes no arguments
-tree.with(transactions({ nope: true }));
+signalTree(initial, { enhancers: [transactions({ nope: true })] });
 
 // ============================================================================
 // 5 — negative controls

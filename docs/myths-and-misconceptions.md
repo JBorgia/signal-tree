@@ -105,13 +105,13 @@ Each marker materializes at its declared path. There is no root-level constraint
 
 ## Myth 4: "Time-travel is in a separate package, `@signaltree/time-travel`."
 
-**Where this comes from:** Plausible package-naming convention. LLMs see ".with(timeTravel())" and assume a package boundary.
+**Where this comes from:** Plausible package-naming convention. LLMs see `timeTravel()` named as an enhancer and assume a package boundary.
 
 **The truth:** No such package exists. `timeTravel` is exported from `@signaltree/core`.
 
 ```typescript
 import { signalTree, timeTravel } from '@signaltree/core'; // ← correct
-const store = signalTree({ ... }).with(timeTravel({ maxHistorySize: 50 }));
+const store = signalTree({ ... }, { enhancers: [timeTravel({ maxHistorySize: 50 })] });
 ```
 
 **Source:** [`packages/core/src/index.ts:237`](../packages/core/src/index.ts) — `export { timeTravel } from './enhancers/time-travel/time-travel';`.
@@ -156,7 +156,7 @@ store.$.y.set(2);
 store.$.z.set(3);
 // → Three synchronous writes, ONE microtask notification to subscribers.
 
-// With .with(batching()):
+// With batching() declared:
 store.batch(() => {
   store.$.x.set(1);
   store.$.y.set(2);

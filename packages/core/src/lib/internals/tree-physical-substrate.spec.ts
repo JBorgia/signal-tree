@@ -10,7 +10,10 @@ import { getTreeScalarSlotRuntime } from './tree-scalar-slot-angular-runtime';
 
 describe('tree physical substrate', () => {
   it('uses the slot-backed scalar substrate on the public signalTree path by default', () => {
-    const tree = signalTree({ profile: { name: 'Alice' }, enabled: true }) as ISignalTree<{
+    const tree = signalTree(
+      { profile: { name: 'Alice' }, enabled: true },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       profile: {
         name: { (): string; set(value: string): void };
       };
@@ -22,25 +25,34 @@ describe('tree physical substrate', () => {
 
   it('publishes reactive consequences only after a coherent slot-frame commit', () => {
     TestBed.runInInjectionContext(() => {
-      const tree = signalTree({ a: 'A', b: 'B' }) as ISignalTree<{
+      const tree = signalTree(
+        { a: 'A', b: 'B' },
+        { capabilities: ['causal-runtime'] }
+      ) as ISignalTree<{
         a: { (): string; set(value: string): void };
         b: { (): string; set(value: string): void };
       }>;
       const runtime = getTreeScalarSlotRuntime(tree.$);
       if (!runtime) {
-        throw new Error('Expected scalar slot runtime on public signalTree path');
+        throw new Error(
+          'Expected scalar slot runtime on public signalTree path'
+        );
       }
 
       const aPositionId = getOwnedPositionIds(tree.$.a)?.[0];
       const bPositionId = getOwnedPositionIds(tree.$.b)?.[0];
       if (aPositionId === undefined || bPositionId === undefined) {
-        throw new Error('Expected owned positions for scalar frame publication test');
+        throw new Error(
+          'Expected owned positions for scalar frame publication test'
+        );
       }
 
       const aSlot = runtime.resolveScalarSlot(aPositionId);
       const bSlot = runtime.resolveScalarSlot(bPositionId);
       if (aSlot === undefined || bSlot === undefined) {
-        throw new Error('Expected slot bindings for scalar frame publication test');
+        throw new Error(
+          'Expected slot bindings for scalar frame publication test'
+        );
       }
 
       const seen: string[] = [];
@@ -71,12 +83,17 @@ describe('tree physical substrate', () => {
 
   it('does not publish unchanged direct scalar writes and publishes exactly one changed slot write', () => {
     TestBed.runInInjectionContext(() => {
-      const tree = signalTree({ a: 'A' }) as ISignalTree<{
+      const tree = signalTree(
+        { a: 'A' },
+        { capabilities: ['causal-runtime'] }
+      ) as ISignalTree<{
         a: { (): string; set(value: string): void };
       }>;
       const runtime = getTreeScalarSlotRuntime(tree.$);
       if (!runtime) {
-        throw new Error('Expected scalar slot runtime on public signalTree path');
+        throw new Error(
+          'Expected scalar slot runtime on public signalTree path'
+        );
       }
 
       const seen: string[] = [];

@@ -86,13 +86,17 @@ For derived definitions in a SEPARATE file, use `derivedFrom<TTree>()(fn)` (curr
 This is a typed-identity helper for file organization only — zero runtime cost.
 It is NOT a read-only projection or write-encapsulation utility.
 
-## Enhancers chain via `.with()`
+## Enhancers are DECLARED in the config
 
-- `.with(batching())` — adds `.batch(fn)` / `.coalesce(fn)` (automatic microtask batching is ALREADY ON by default)
-- `.with(devTools())` — Redux DevTools integration
-- `.with(timeTravel({ maxHistorySize: 50 }))` — adds `.undo()` / `.redo()`
-- `.with(persistence(config))` — tree-wide storage adapter
-- `.with(serialization())` — JSON serialize/deserialize
+`signalTree(state, { enhancers: [a, b] })`. There is no `.with()` — enhancers
+cannot be attached after construction, because the tree's build plan is derived
+from the set. Declaration order does not matter.
+
+- `batching()` — adds `.batch(fn)` / `.coalesce(fn)` (automatic microtask batching is ALREADY ON by default)
+- `devTools()` — Redux DevTools integration
+- `timeTravel({ maxHistorySize: 50 })` — adds `.undo()` / `.redo()`
+- `persistence(config)` — tree-wide storage adapter
+- `serialization()` — JSON serialize/deserialize
 
 Import all from `@signaltree/core`. There is NO `@signaltree/time-travel` or `@signaltree/storage` package.
 
@@ -118,7 +122,7 @@ Folder layout:
 store/
   app-store.ts                # facade
   tree/
-    app-tree.ts               # signalTree({...}).derived(...).with(...)
+    app-tree.ts               # signalTree({...}, { enhancers: [...], derived: ... })
     state/                    # per-domain initial state functions
     derived/                  # tier-N.derived.ts files using derivedFrom<>()
   ops/                        # async + mutation logic per domain
@@ -160,7 +164,7 @@ For WebSocket/SSE sync into entity maps: wire your transport to ordinary entity-
 
 ## Anti-patterns to avoid
 
-- DO NOT use `.with(entities())` — removed in v7, `entityMap()` is auto-processed.
+- DO NOT use the `entities()` enhancer — removed in v7, `entityMap()` is auto-processed.
 - DO NOT duplicate entity data — store IDs, derive entities via `.derived()` + `byId()`.
 - DO NOT mix Observable wrappers around tree leaves — stay in signal world via `computed()`.
 - DO NOT generate manual `loading: { state, error }` shapes — use the `status()` marker.
@@ -214,7 +218,7 @@ This project uses **SignalTree** (`@signaltree/core`) for Angular state manageme
 
 **Derived state via `.derived($ => ({...}))`:** definitions deep-merge into the existing tree alongside source properties. Use `derivedFrom<TTree>()(fn)` for derived definitions in separate files — it is a typed-identity helper, not a projection utility, signature is curried.
 
-**Enhancers via `.with(...)`:** `batching()`, `devTools()`, `timeTravel({maxHistorySize})`, `persistence(config)`, `serialization()`. Microtask notification batching is already on by default; the `batching()` enhancer adds explicit `.batch(fn)`.
+**Enhancers via `{ enhancers: [...] }`:** `batching()`, `devTools()`, `timeTravel({maxHistorySize})`, `persistence(config)`, `serialization()`. Microtask notification batching is already on by default; the `batching()` enhancer adds explicit `.batch(fn)`.
 
 **Callable syntax:** branches and the root are callable natively (`$.user({...})`, `$.user(fn)`, `store({...})`); LEAVES ARE NOT — use `.set()`/`.update()`. `@signaltree/callable-syntax` promised the leaf form via a build transform and was deleted in 14.0.0: it could never run inside an Angular app, so the call type-checked and silently did nothing.
 
@@ -241,7 +245,7 @@ Async pattern (canonical): `asyncSource` / `asyncQuery` markers at the tree path
 
 ## Anti-patterns to refuse
 
-- `.with(entities())` — removed in v7. Use the `entityMap()` marker directly; it auto-processes.
+- the `entities()` enhancer — removed in v7. Use the `entityMap()` marker directly; it auto-processes.
 - Manual `loading: { state, error }` shapes — use the `status()` marker instead.
 - Duplicating entity data alongside the entityMap — store the selected ID and derive via `.derived()` + `byId()`.
 - Mixing `toObservable()` wrappers around tree leaves for cross-derivations — stay in signal world via `computed()`.
@@ -272,11 +276,11 @@ Quick rules:
 - Reads: `store.$.path.to.leaf()`. Writes: `.set(v)` / `.update(fn)` — never `leaf(v)`.
 - Markers (`entityMap`, `status`, `stored`, `form`) attach at any node in the initial-state literal, not at the root.
 - Derived state via `.derived($ => ({...}))` deep-merges into the tree. Use `derivedFrom<TTree>()(fn)` (curried) for derived in separate files.
-- Enhancers: `.with(batching())`, `.with(devTools())`, `.with(timeTravel({maxHistorySize}))`, `.with(persistence(config))`, `.with(serialization())`.
+- Enhancers, all declared in one array: `signalTree(state, { enhancers: [batching(), devTools(), timeTravel({maxHistorySize}), persistence(config), serialization()] })`.
 - All exports live in `@signaltree/core` except: `@signaltree/ng-forms`, `@signaltree/events`. No `@signaltree/time-travel`, `@signaltree/storage`, `@signaltree/realtime`, `@signaltree/enterprise`, `@signaltree/callable-syntax`, or `@signaltree/guardrails` — those are hallucinations. `@signaltree/schema` was DELETED in 15.0 — SignalTree ships no validation API; validate with your own validator against values read from the tree.
 - For production architecture, wrap the tree in @Injectable() with an `ops.domain.method()` namespace for mutations. See docs/architecture/signaltree-architecture-guide.md.
 
-Avoid: `.with(entities())` (removed), manual loading shapes (use `status()`), entity duplication (derive from selected ID), and any @signaltree/* package not listed above.
+Avoid: the `entities()` enhancer (removed), `.with()` of any kind (removed in 15.0), manual loading shapes (use `status()`), entity duplication (derive from selected ID), and any @signaltree/* package not listed above.
 
 For full reference: https://signaltree.io/llms-full.txt
 ````

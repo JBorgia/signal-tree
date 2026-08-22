@@ -21,6 +21,13 @@
  * NOTE, not a change: `snapshot()` returns `SerializedState<unknown>`, so the
  * state type is already erased in the 14.x contract. This migration neither
  * improves nor worsens that; reopening it would be a different decision.
+ *
+ * v15: enhancers are DECLARED, so the call site is
+ * `signalTree(state, { enhancers: [serialization()] })` and the added surface arrives
+ * through the return type. Note the state is a separate annotated `const`
+ * rather than `signalTree<AppState>(...)` — an explicit type argument would
+ * have to name the enhancer tuple parameter too, and naming it is exactly the
+ * ceremony this file exists to forbid.
  */
 import { signalTree } from '../../lib/signal-tree';
 import { serialization } from './serialization';
@@ -43,8 +50,9 @@ interface AppState {
 }
 
 // The call site under test. No generics, no casts, no annotation.
-const tree = signalTree<AppState>({ count: 0, user: { name: 'Ada', age: 36 } });
-const serial = tree.with(serialization());
+const initial: AppState = { count: 0, user: { name: 'Ada', age: 36 } };
+const tree = signalTree(initial);
+const serial = signalTree(initial, { enhancers: [serialization()] });
 
 // ============================================================================
 // 1 — the six methods are inferred, with exact signatures
@@ -84,8 +92,8 @@ serial({ count: 1 });
 // ============================================================================
 declare const labeller: Enhancer<{ label(): string }>;
 
-const serialThenLabelled = tree.with(serialization()).with(labeller);
-const labelledThenSerial = tree.with(labeller).with(serialization());
+const serialThenLabelled = signalTree(initial, { enhancers: [serialization(), labeller] });
+const labelledThenSerial = signalTree(initial, { enhancers: [labeller, serialization()] });
 
 export const _d1: string = serialThenLabelled.label();
 export const _d2: string = serialThenLabelled.serialize();
@@ -96,14 +104,12 @@ export const _d5: number = serialThenLabelled.$.count();
 // ============================================================================
 // 4 — config is optional and does not change the added surface
 // ============================================================================
-const configured = tree.with(
-  serialization({ includeMetadata: false, maxDepth: 10 })
-);
+const configured = signalTree(initial, { enhancers: [serialization({ includeMetadata: false, maxDepth: 10 })] });
 export type _ConfigDoesNotChangeSurface = Expect<
   Equal<(typeof configured)['serialize'], (typeof serial)['serialize']>
 >;
 // @ts-expect-error config is checked, not `any`
-tree.with(serialization({ nope: true }));
+signalTree(initial, { enhancers: [serialization({ nope: true })] });
 
 // ============================================================================
 // 5 — negative controls

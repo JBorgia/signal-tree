@@ -21,10 +21,10 @@ import { serialization } from '../enhancers/serialization/serialization';
 import { signalTree } from './signal-tree';
 import { timeTravel } from '../enhancers/time-travel/time-travel';
 
-const chained = signalTree({ n: 0 })
-  .with(timeTravel())
-  .with(serialization())
-  .with(batching());
+const chained = signalTree(
+  { n: 0 },
+  { enhancers: [timeTravel(), serialization(), batching()] }
+);
 
 // FIRST link survives to the end of the chain.
 export const _canUndo: boolean = chained.canUndo();
@@ -35,15 +35,15 @@ export const _serialize: string = chained.serialize();
 export const _batch: void = chained.batch(() => undefined);
 
 // Order must not matter.
-const reordered = signalTree({ n: 0 })
-  .with(batching())
-  .with(timeTravel())
-  .with(serialization());
+const reordered = signalTree(
+  { n: 0 },
+  { enhancers: [batching(), timeTravel(), serialization()] }
+);
 export const _r1: void = reordered.batch(() => undefined);
 export const _r2: boolean = reordered.canUndo();
 export const _r3: string = reordered.serialize();
 
 // A single enhancer still works, and the base surface is intact.
-const single = signalTree({ n: 0 }).with(batching());
+const single = signalTree({ n: 0 }, { enhancers: [batching()] });
 export const _s1: void = single.batch(() => undefined);
 export const _s2: number = single.$.n();

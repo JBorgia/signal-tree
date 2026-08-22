@@ -74,7 +74,9 @@ function stableRatio(
     ratios.push(cand / base);
   }
   const ratio = Math.min(...ratios);
-  console.log(`${label}: ratio=${ratio.toFixed(2)}x (min of ${repeats} paired)`);
+  console.log(
+    `${label}: ratio=${ratio.toFixed(2)}x (min of ${repeats} paired)`
+  );
   return ratio;
 }
 
@@ -90,7 +92,8 @@ function bestOf(
   repeats = 5
 ): number {
   let best = Infinity;
-  for (let r = 0; r < repeats; r++) best = Math.min(best, benchmark(fn, warmup, runs));
+  for (let r = 0; r < repeats; r++)
+    best = Math.min(best, benchmark(fn, warmup, runs));
   return best;
 }
 
@@ -112,7 +115,7 @@ timingDescribe('Benchmark: signalTree vs raw signal()', () => {
           for (let j = 0; j < 20; j++) {
             state[`key_${j}`] = j;
           }
-          const tree = signalTree(state);
+          const tree = signalTree(state, { capabilities: ['causal-runtime'] });
           tree.destroy();
         }
       }
@@ -133,7 +136,7 @@ timingDescribe('Benchmark: signalTree vs raw signal()', () => {
     for (let i = 0; i < 20; i++) {
       signals[`key_${i}`] = signal(i);
     }
-    const tree = signalTree(state);
+    const tree = signalTree(state, { capabilities: ['causal-runtime'] });
 
     const ratio = stableRatio(
       'Read',
@@ -156,7 +159,7 @@ timingDescribe('Benchmark: signalTree vs raw signal()', () => {
 
   it('write overhead is bounded (< 7x per set)', () => {
     const rawSig = signal(0);
-    const tree = signalTree({ value: 0 });
+    const tree = signalTree({ value: 0 }, { capabilities: ['causal-runtime'] });
 
     const ratio = stableRatio(
       'Write',
@@ -180,8 +183,14 @@ timingDescribe('Benchmark: signalTree vs raw signal()', () => {
 
 timingDescribe('Benchmark: enhancer overhead', () => {
   it('batching overhead is bounded (< 2x per write)', () => {
-    const plain = signalTree({ count: 0 });
-    const batched = signalTree({ count: 0 }).with(batching());
+    const plain = signalTree(
+      { count: 0 },
+      { capabilities: ['causal-runtime'] }
+    );
+    const batched = signalTree(
+      { count: 0 },
+      { enhancers: [batching()], capabilities: ['causal-runtime'] }
+    );
 
     const ratio = stableRatio(
       'Batching',
@@ -209,8 +218,17 @@ timingDescribe('Benchmark: enhancer overhead', () => {
   });
 
   it('devTools (disabled) overhead is near-zero (< 1.5x)', () => {
-    const plain = signalTree({ count: 0 });
-    const withDt = signalTree({ count: 0 }).with(devTools({ enabled: false }));
+    const plain = signalTree(
+      { count: 0 },
+      { capabilities: ['causal-runtime'] }
+    );
+    const withDt = signalTree(
+      { count: 0 },
+      {
+        enhancers: [devTools({ enabled: false })],
+        capabilities: ['causal-runtime'],
+      }
+    );
 
     const ratio = stableRatio(
       'DevTools(disabled)',
@@ -238,12 +256,18 @@ timingDescribe('Benchmark: enhancer overhead', () => {
 timingDescribe('Benchmark: mutation substrate overhead', () => {
   it('multi-leaf callable subtree updates stay within 6x of two direct leaf sets', () => {
     const callableIterations = 2_500;
-    const baselineTree = signalTree({
-      profile: { firstName: '', lastName: '', email: '' },
-    });
-    const callableTree = signalTree({
-      profile: { firstName: '', lastName: '', email: '' },
-    });
+    const baselineTree = signalTree(
+      {
+        profile: { firstName: '', lastName: '', email: '' },
+      },
+      { capabilities: ['causal-runtime'] }
+    );
+    const callableTree = signalTree(
+      {
+        profile: { firstName: '', lastName: '', email: '' },
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     const ratio = stableRatio(
       'Callable subtree update',
@@ -272,8 +296,14 @@ timingDescribe('Benchmark: mutation substrate overhead', () => {
   }, 15_000);
 
   it('history-enabled leaf writes stay within 10x of plain leaf writes', () => {
-    const plain = signalTree({ value: 0 });
-    const history = signalTree({ value: 0 }).with(timeTravel());
+    const plain = signalTree(
+      { value: 0 },
+      { capabilities: ['causal-runtime'] }
+    );
+    const history = signalTree(
+      { value: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
 
     const ratio = stableRatio(
       'History-enabled write',
@@ -303,11 +333,12 @@ describe('Topology characterisation', () => {
       state[`leaf_${i}`] = i;
     }
 
-    const tree = signalTree(state);
+    const tree = signalTree(state, { capabilities: ['causal-runtime'] });
     const positionIds = new Set<number>();
 
     visitTree(tree.$, (node) => {
-      const positionId = (node as { __positionIds?: number[] }).__positionIds?.[0];
+      const positionId = (node as { __positionIds?: number[] })
+        .__positionIds?.[0];
       if (typeof positionId === 'number') {
         positionIds.add(positionId);
       }
@@ -333,7 +364,9 @@ timingDescribe('Benchmark: cold-start construction', () => {
 
     const time = bestOf(
       () => {
-        const t = signalTree(buildState());
+        const t = signalTree(buildState(), {
+          capabilities: ['causal-runtime'],
+        });
         t.destroy();
       },
       5,
@@ -371,10 +404,16 @@ timingDescribe('Benchmark: cold-start construction', () => {
 
 timingDescribe('Benchmark: per-mutation throughput at depth', () => {
   it('writes at depth-5 path are within 2.5x of writes at depth-1', () => {
-    const shallow = signalTree({ value: 0 });
-    const deep = signalTree({
-      a: { b: { c: { d: { e: { value: 0 } } } } },
-    });
+    const shallow = signalTree(
+      { value: 0 },
+      { capabilities: ['causal-runtime'] }
+    );
+    const deep = signalTree(
+      {
+        a: { b: { c: { d: { e: { value: 0 } } } } },
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     const ratio = stableRatio(
       'Mutation depth',
@@ -392,10 +431,16 @@ timingDescribe('Benchmark: per-mutation throughput at depth', () => {
   });
 
   it('reads at depth-5 are within 2.5x of reads at depth-1', () => {
-    const shallow = signalTree({ value: 42 });
-    const deep = signalTree({
-      a: { b: { c: { d: { e: { value: 42 } } } } },
-    });
+    const shallow = signalTree(
+      { value: 42 },
+      { capabilities: ['causal-runtime'] }
+    );
+    const deep = signalTree(
+      {
+        a: { b: { c: { d: { e: { value: 42 } } } } },
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     const ratio = stableRatio(
       'Read depth',
@@ -420,7 +465,10 @@ timingDescribe('Benchmark: per-mutation throughput at depth', () => {
 describe('Memoization correctness', () => {
   it('Angular computed skips recompute when unrelated tree leaves change', async () => {
     const { computed } = await import('@angular/core');
-    const tree = signalTree({ a: 1, b: 2, unrelated: 0 });
+    const tree = signalTree(
+      { a: 1, b: 2, unrelated: 0 },
+      { capabilities: ['causal-runtime'] }
+    );
     let computeCount = 0;
     const sumSig = computed(() => {
       computeCount += 1;
@@ -445,7 +493,7 @@ describe('Memoization correctness', () => {
 
   it('computed treats same-value writes as no-op (Object.is equality)', async () => {
     const { computed } = await import('@angular/core');
-    const tree = signalTree({ x: 5 });
+    const tree = signalTree({ x: 5 }, { capabilities: ['causal-runtime'] });
     let computeCount = 0;
     const doubled = computed(() => {
       computeCount += 1;

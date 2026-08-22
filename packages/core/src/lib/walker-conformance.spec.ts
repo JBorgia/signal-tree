@@ -20,11 +20,7 @@ import { describe, expect, it } from 'vitest';
 
 import { of } from 'rxjs';
 
-import {
-  batching,
-  entityMap,
-  signalTree,
-} from '../index';
+import { batching, entityMap, signalTree } from '../index';
 import { serialization } from '../enhancers/serialization/serialization';
 import { invalidateTag } from './markers/entity-loader';
 import { getPathNotifier, resetPathNotifier } from './path-notifier';
@@ -54,40 +50,60 @@ const makeDeepState = () => ({
 
 describe('walker conformance — core subsystems on a deep callable-branch tree', () => {
   it('marker materialization reaches markers nested under deep branches', () => {
-    const tree = signalTree({
-      org: {
-        teams: {
-          alpha: {
-            members: entityMap<Member, number>(),
+    const tree = signalTree(
+      {
+        org: {
+          teams: {
+            alpha: {
+              members: entityMap<Member, number>(),
+            },
           },
         },
       },
-    });
+      { capabilities: ['causal-runtime'] }
+    );
 
     tree.$.org.teams.alpha.members.addOne({ id: 1, name: 'Ada' });
     expect(tree.$.org.teams.alpha.members.all()).toEqual([
       { id: 1, name: 'Ada' },
     ]);
-
   });
 
   it('batching setter interception wraps leaves five branches deep', () => {
-    const base = signalTree(makeDeepState());
-
     // Count RAW writes by wrapping the setter BEFORE the enhancer; if the
     // enhancer's walker skips callable branches, coalesce() applies every
-    // write instead of one and this counter exposes it.
+    // write instead of one and this counter exposes it. The wrapper is
+    // installed by a probe enhancer declared ahead of `batching`, which is the
+    // only "before the enhancer" that exists now that construction and
+    // enhancement are one call.
     let applied = 0;
-    const leaf = base.$.org.teams.alpha.lead.profile.score as unknown as {
-      set(v: number): void;
-    };
-    const rawSet = leaf.set.bind(leaf);
-    leaf.set = (v: number) => {
-      applied++;
-      rawSet(v);
+    const countRawWrites = <TTree>(t: TTree): TTree => {
+      const leaf = (
+        t as unknown as {
+          $: {
+            org: {
+              teams: { alpha: { lead: { profile: { score: unknown } } } };
+            };
+          };
+        }
+      ).$.org.teams.alpha.lead.profile.score as unknown as {
+        set(v: number): void;
+      };
+      const rawSet = leaf.set.bind(leaf);
+      leaf.set = (v: number) => {
+        applied++;
+        rawSet(v);
+      };
+      return t;
     };
 
-    const tree = base.with(batching({ enabled: true, notificationDelayMs: 0 }));
+    const tree = signalTree(makeDeepState(), {
+      capabilities: ['causal-runtime'],
+      enhancers: [
+        countRawWrites,
+        batching({ enabled: true, notificationDelayMs: 0 }),
+      ],
+    });
     tree.coalesce(() => {
       tree.$.org.teams.alpha.lead.profile.score.set(10);
       tree.$.org.teams.alpha.lead.profile.score.set(20);
@@ -100,7 +116,7 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
 
   it('serialization round-trips deep leaves and a Date sitting mid-path', () => {
     const initial = makeDeepState();
-    const tree = signalTree(initial).with(serialization());
+    const tree = signalTree(initial, { enhancers: [serialization()] });
 
     const json = tree.serialize();
 
@@ -122,11 +138,16 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
 
   it('PathNotifier observes a write five branches deep', async () => {
     resetPathNotifier();
-    const tree = signalTree(makeDeepState());
-    const paths: string[] = [];
-    const unsubscribe = getPathNotifier().subscribe('**', (_next, _prev, path) => {
-      paths.push(path);
+    const tree = signalTree(makeDeepState(), {
+      capabilities: ['causal-runtime'],
     });
+    const paths: string[] = [];
+    const unsubscribe = getPathNotifier().subscribe(
+      '**',
+      (_next, _prev, path) => {
+        paths.push(path);
+      }
+    );
 
     tree.$.org.teams.alpha.lead.profile.score.set(42);
     await Promise.resolve();
@@ -137,19 +158,25 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
 
   it('invalidateTag finds a tagged collection nested past a built-in leaf sibling', async () => {
     let calls = 0;
-    const tree = signalTree({
-      catalog: {
-        stamp: new Date('2021-01-01T00:00:00Z'), // sibling the walk must step over, not choke on
-        nursery: {
-          plants: entityMap<Member, number>({
-            load: loader(() => {
-              calls++;
-              return of([{ id: 1, name: 'Fern' }]);
-            }, { staleTime: '1h', tags: ['plants'] }),
-          }),
+    const tree = signalTree(
+      {
+        catalog: {
+          stamp: new Date('2021-01-01T00:00:00Z'), // sibling the walk must step over, not choke on
+          nursery: {
+            plants: entityMap<Member, number>({
+              load: loader(
+                () => {
+                  calls++;
+                  return of([{ id: 1, name: 'Fern' }]);
+                },
+                { staleTime: '1h', tags: ['plants'] }
+              ),
+            }),
+          },
         },
       },
-    });
+      { capabilities: ['causal-runtime'] }
+    );
 
     tree.$.catalog.nursery.plants.all();
     await Promise.resolve(); // deferred auto-load settles

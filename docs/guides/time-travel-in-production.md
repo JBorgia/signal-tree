@@ -89,7 +89,9 @@ anything; `node tools/size-report.mjs` prints the current delta.
 
 ```ts
 // BROKEN — the static import defeats tree-shaking, so timeTravel is in the bundle
-const tree = isProduction ? base : base.with(timeTravel());
+const tree = signalTree(state, {
+  enhancers: isProduction ? [] : [timeTravel()],
+});
 ```
 
 Put the import behind the build so the bundler can drop it — see
@@ -101,7 +103,7 @@ production, this cost is simply the price of the feature, and it is small.
 ### 1. Bound the history — `maxHistorySize`
 
 ```ts
-signalTree(state).with(timeTravel({ maxHistorySize: 50 }));
+signalTree(state, { enhancers: [timeTravel({ maxHistorySize: 50 })] });
 ```
 
 Verified: 20 writes against `maxHistorySize: 5` leaves 5 reversible turns and 5
@@ -119,7 +121,7 @@ signalTree({
   rows: entityMap({ selectId: (r) => r.id, recordHistory: false }),
   // the small editable state the user actually undoes
   draft: { title: '', tags: [] as string[] },
-}).with(timeTravel({ maxHistorySize: 50 }));
+}, { enhancers: [timeTravel({ maxHistorySize: 50 })] });
 ```
 
 Verified: with `recordHistory: false`, two undos reverted the scalar state to its
@@ -161,7 +163,7 @@ part of the app-wide history stream:
 signalTree({
   rows: entityMap({ selectId: (r) => r.id, recordHistory: false }), // server-owned
   profile: form({ initial: { name: '' }, history: history() }), // undoable, scoped
-}).with(timeTravel({ maxHistorySize: 50 })); // covers plain branches only
+}, { enhancers: [timeTravel({ maxHistorySize: 50 })] }); // covers plain branches only
 
 tree.$.profile.history?.undo(); // reverts the field — this is the working path
 ```
@@ -249,12 +251,10 @@ export const appTree = signalTree({
   rows: entityMap({ selectId: (r: Row) => r.id, recordHistory: false }),
   draft: { title: '', body: '' },
   ui: { cursor: 0, hovered: null as string | null },
-}).with(
-  timeTravel({
+}, { enhancers: [timeTravel({
     maxHistorySize: 50,
     shouldSkip: (prev, next) => (prev as State).draft === (next as State).draft,
-  })
-);
+  })] });
 ```
 
 Fifty steps over a small draft, a large collection deliberately outside the undo

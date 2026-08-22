@@ -105,18 +105,31 @@ describe('batching behavior', () => {
     // used to skip non-objects entirely — so no leaf setter was ever wrapped
     // and coalesce() never deduped. Count actual writes by wrapping the raw
     // setter BEFORE the enhancer, then assert coalesce applies only the last.
+    //
+    // "Before the enhancer" is a probe enhancer declared ahead of `batching`,
+    // since v15 builds the tree and its enhancers in one call — there is no
+    // moment between them for the test to reach in.
     it('coalesce() dedupes same-path writes down to one applied write', () => {
-      const base = signalTree({ counter: 0 });
       let applied = 0;
-      const counter = base.$.counter as unknown as { set(v: number): void };
-      const rawSet = counter.set.bind(counter);
-      counter.set = (v: number) => {
-        applied++;
-        rawSet(v);
+      const countRawWrites = <TTree>(t: TTree): TTree => {
+        const counter = (t as unknown as { $: { counter: unknown } }).$
+          .counter as unknown as { set(v: number): void };
+        const rawSet = counter.set.bind(counter);
+        counter.set = (v: number) => {
+          applied++;
+          rawSet(v);
+        };
+        return t;
       };
 
-      const tree = base.with(
-        batching({ enabled: true, notificationDelayMs: 0 })
+      const tree = signalTree(
+        { counter: 0 },
+        {
+          enhancers: [
+            countRawWrites,
+            batching({ enabled: true, notificationDelayMs: 0 }),
+          ],
+        }
       );
       tree.coalesce(() => {
         for (let i = 0; i < 100; i++) tree.$.counter.set(i + 1);
@@ -127,17 +140,27 @@ describe('batching behavior', () => {
     });
 
     it('wraps nested leaf setters too', () => {
-      const base = signalTree({ a: { b: { value: 0 } } });
       let applied = 0;
-      const leaf = base.$.a.b.value as unknown as { set(v: number): void };
-      const rawSet = leaf.set.bind(leaf);
-      leaf.set = (v: number) => {
-        applied++;
-        rawSet(v);
+      const countRawWrites = <TTree>(t: TTree): TTree => {
+        const leaf = (t as unknown as { $: { a: { b: { value: unknown } } } })
+          .$.a.b
+          .value as unknown as { set(v: number): void };
+        const rawSet = leaf.set.bind(leaf);
+        leaf.set = (v: number) => {
+          applied++;
+          rawSet(v);
+        };
+        return t;
       };
 
-      const tree = base.with(
-        batching({ enabled: true, notificationDelayMs: 0 })
+      const tree = signalTree(
+        { a: { b: { value: 0 } } },
+        {
+          enhancers: [
+            countRawWrites,
+            batching({ enabled: true, notificationDelayMs: 0 }),
+          ],
+        }
       );
       tree.coalesce(() => {
         tree.$.a.b.value.set(1);

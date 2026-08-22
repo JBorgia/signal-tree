@@ -107,10 +107,12 @@ if (armFlag !== -1) {
   }
   const { signalTree, entityMap, timeTravel } = await import(CORE);
 
-  const base = signalTree({ rows: entityMap({ selectId: (r) => r.id }) });
-  const tree = a.history
-    ? base.with(timeTravel({ maxHistorySize: 10_000 }))
-    : base;
+  // v15: declared, so the no-history arm no longer carries the causal-runtime
+  // plan that late `.with()` forced on every tree.
+  const tree = signalTree(
+    { rows: entityMap({ selectId: (r) => r.id }) },
+    { enhancers: a.history ? [timeTravel({ maxHistorySize: 10_000 })] : [] }
+  );
   const generation = (g) => {
     const d = [];
     for (let i = 0; i < WIDTH; i++)

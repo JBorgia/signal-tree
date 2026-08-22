@@ -34,7 +34,7 @@ type BatchWrappedNode = Record<string, unknown> & {
  *
  * @example
  * ```typescript
- * const tree = signalTree({ count: 0 }).with(batching());
+ * const tree = signalTree({ count: 0 }, { enhancers: [batching()] });
  *
  * tree.$.count.set(5);
  * console.log(tree.$.count()); // 5 - immediate!
@@ -46,7 +46,9 @@ type BatchWrappedNode = Record<string, unknown> & {
  * });
  * ```
  */
-export function batching(config: BatchingConfig = {}): Enhancer<BatchingMethods> {
+export function batching(
+  config: BatchingConfig = {}
+): Enhancer<BatchingMethods> {
   const enabled = config.enabled ?? true;
   const notificationDelayMs = config.notificationDelayMs ?? 0;
 

@@ -208,13 +208,18 @@ describe('devTools enhancer (v6 API)', () => {
     };
 
     try {
-      const tree = signalTree({
-        user: {
-          profile: {
-            name: 'Ada',
+      const tree = signalTree(
+        {
+          user: {
+            profile: {
+              name: 'Ada',
+            },
           },
         },
-      }).with(devTools({ enabled: true, enableBrowserDevTools: true }));
+        {
+          enhancers: [devTools({ enabled: true, enableBrowserDevTools: true })],
+        }
+      );
 
       send.mockClear();
 

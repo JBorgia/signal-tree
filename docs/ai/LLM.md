@@ -55,7 +55,7 @@ store.$.settings.theme.set('dark');
 
 ## v7 Breaking Changes
 
-### ❌ REMOVED: `.with(entities())` (v7 - remove calls)
+### ❌ REMOVED: the `entities()` enhancer (v7 — remove the call)
 
 **v6 (old):**
 
@@ -64,7 +64,7 @@ import { signalTree, entityMap } from '@signaltree/core';
 
 const store = signalTree({
   users: entityMap<User, number>(),
-}).with(entities()); // ❌ No longer needed
+}, { enhancers: [entities()] }); // ❌ No longer needed
 ```
 
 **v7 (new):**
@@ -191,7 +191,7 @@ store.$.hasSelection(); // boolean
 3. **Multiple tiers allowed** - Chain `.derived()` for complex dependencies
 4. **Avoid side effects** - Derived state should be pure computations
 
-**Composition note:** You can interleave `.derived(...)` and `.with(...)` in a chain. Enhancer chaining preserves derived computed identity; derived factories should run once and remain stable across `.with()` calls.
+**Composition note:** Enhancers are declared in `signalTree`'s config, not chained on afterwards; derived state can be declared there too (`derived: ($) => ({...})`) or added with `.derived(...)` after construction. Either way the derived factory runs once, after every enhancer, and its computed identity is stable.
 
 ### Derived Tier Rules
 
@@ -251,10 +251,16 @@ import {
   timeTravel
 } from '@signaltree/core';
 
-const store = signalTree({ ... })
-  .with(devTools({ name: 'AppStore' }))  // Redux DevTools integration
-  .with(batching())                           // Batch multiple updates
-  .with(timeTravel({ maxHistorySize: 50 })); // Undo/redo support
+const store = signalTree(
+  { ... },
+  {
+    enhancers: [
+      devTools({ name: 'AppStore' }),   // Redux DevTools integration
+      batching(),                        // Batch multiple updates
+      timeTravel({ maxHistorySize: 50 }) // Undo/redo support
+    ]
+  }
+);
 ```
 
 > **9.0.1:** The `memoization()` enhancer was removed. Use Angular's built-in `computed()` for memoized derivations.
@@ -590,13 +596,13 @@ export class UsersResource {
 
 ## Anti-Patterns to Avoid
 
-### ❌ Don't use `.with(entities())` in v7+
+### ❌ Don't use the `entities()` enhancer in v7+
 
 ```typescript
 // ❌ Wrong - entities() is deprecated
 const store = signalTree({
   users: entityMap<User, number>(),
-}).with(entities());
+}, { enhancers: [entities()] });
 
 // ✅ Correct - entityMap auto-processed
 const store = signalTree({
@@ -707,7 +713,7 @@ describe('UsersComponent', () => {
 
 ## Migration from v6
 
-### Step 1: Remove `.with(entities())`
+### Step 1: Remove the `entities()` enhancer
 
 ```diff
 - import { signalTree, entityMap } from '@signaltree/core';
@@ -715,7 +721,7 @@ describe('UsersComponent', () => {
 
 const store = signalTree({
   users: entityMap<User, number>()
--}).with(entities());
+-}, { enhancers: [entities()] });
 +});
 ```
 

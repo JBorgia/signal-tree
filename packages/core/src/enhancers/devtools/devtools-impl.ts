@@ -16,7 +16,10 @@ import type {
   Enhancer,
   ISignalTree,
   DevToolsConfig,
+  DevToolsLogEntry,
   DevToolsMethods,
+  DevToolsModuleMetadata,
+  DevToolsPerformanceMetrics,
   EnhancerMeta,
   TreeNode,
 } from '../../lib/types';
@@ -30,24 +33,14 @@ import { ENHANCER_META } from '../../lib/types';
 // Types
 // ============================================================================
 
-interface ModuleMetadata {
-  name: string;
-  methods: string[];
-  addedAt: Date;
-  lastActivity: Date;
-  operationCount: number;
-  averageExecutionTime: number;
-  errorCount: number;
-}
+// `ModuleMetadata`, `ModularPerformanceMetrics` and the log-entry shape are
+// PUBLIC now — `DevToolsMethods.exportDebugSession()` returns them, so
+// `lib/types.ts` owns the declarations and these are aliases onto it. Keeping
+// private copies here is what let the public interface drift out of step with
+// what the enhancer actually returns.
+type ModuleMetadata = DevToolsModuleMetadata;
 
-interface ModularPerformanceMetrics {
-  totalUpdates: number;
-  moduleUpdates: Record<string, number>;
-  modulePerformance: Record<string, number>;
-  signalGrowth: Record<string, number>;
-  memoryDelta: Record<string, number>;
-  moduleCacheStats: Record<string, { hits: number; misses: number }>;
-}
+type ModularPerformanceMetrics = DevToolsPerformanceMetrics;
 
 interface ModuleActivityTracker {
   trackMethodCall: (module: string, method: string, duration: number) => void;
@@ -75,12 +68,7 @@ interface CompositionLogger {
     duration: number,
     threshold: number
   ) => void;
-  exportLogs: () => Array<{
-    timestamp: Date;
-    module: string;
-    type: 'composition' | 'method' | 'state' | 'performance';
-    data: unknown;
-  }>;
+  exportLogs: () => DevToolsLogEntry[];
 }
 
 interface ModularDevToolsInterface {
@@ -1142,6 +1130,24 @@ export function createDevToolsEnhancer(
         },
         disconnectDevTools(): void {
           /* disabled */
+        },
+        // An EMPTY session, not a missing method. The disabled path used to
+        // omit `exportDebugSession` entirely, so `devTools({ enabled: false })`
+        // produced a tree where calling it threw — invisible while the method
+        // was undeclared, because reaching it already required a cast.
+        exportDebugSession() {
+          return {
+            metrics: {
+              totalUpdates: 0,
+              moduleUpdates: {},
+              modulePerformance: {},
+              signalGrowth: {},
+              memoryDelta: {},
+              moduleCacheStats: {},
+            },
+            modules: [],
+            logs: [],
+          };
         },
       };
       return Object.assign(tree, noopMethods) as unknown as ISignalTree<T> &

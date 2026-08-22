@@ -34,7 +34,10 @@ describe('time travel snapshot sharing', () => {
   });
 
   it('history entries share the untouched parts of state', async () => {
-    const tree = signalTree({ a: { x: 1 }, b: { y: 2 } }).with(timeTravel());
+    const tree = signalTree(
+      { a: { x: 1 }, b: { y: 2 } },
+      { enhancers: [timeTravel()] }
+    );
 
     tree.$.a.x.set(10);
     await flush();
@@ -50,7 +53,7 @@ describe('time travel snapshot sharing', () => {
   });
 
   it('does not record a write that changed nothing', async () => {
-    const tree = signalTree({ n: 1 }).with(timeTravel());
+    const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
     tree.$.n.set(2);
     await flush();
     const before = tree.getHistory().length;
@@ -62,7 +65,10 @@ describe('time travel snapshot sharing', () => {
   });
 
   it('undo still restores correctly with shared references', async () => {
-    const tree = signalTree({ a: { x: 1 }, b: { y: 2 } }).with(timeTravel());
+    const tree = signalTree(
+      { a: { x: 1 }, b: { y: 2 } },
+      { enhancers: [timeTravel()] }
+    );
 
     tree.$.a.x.set(10);
     await flush();
@@ -80,7 +86,7 @@ describe('time travel snapshot sharing', () => {
     // Without a clone, this is the property that matters: the recorded snapshot
     // must stay put. It does because a write builds NEW objects along the
     // changed path rather than mutating the old ones.
-    const tree = signalTree({ n: 1 }).with(timeTravel());
+    const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
     tree.$.n.set(2);
     await flush();
 
@@ -97,7 +103,7 @@ describe('time travel snapshot sharing', () => {
     // a wall-clock budget — the property is "flat in N", which is inherently a
     // comparison, and an absolute threshold would be flaky under CI load.
     const run = (rows: number) => {
-      const tree = signalTree(withRows(rows)).with(timeTravel());
+      const tree = signalTree(withRows(rows), { enhancers: [timeTravel()] });
       tree();
       const t0 = performance.now();
       for (let i = 0; i < 50; i++) tree({ counter: i } as never);

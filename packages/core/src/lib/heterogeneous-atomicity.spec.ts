@@ -65,11 +65,14 @@ function harness(key: string): Harness {
     (k) => void map.delete(k)
   );
 
-  const tree = signalTree({
-    count: 0,
-    theme: stored(key, 'light', { storage: adapter, debounceMs: 0 }),
-    rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-  }).with(transactions()) as unknown as Harness['tree'];
+  const tree = signalTree(
+    {
+      count: 0,
+      theme: stored(key, 'light', { storage: adapter, debounceMs: 0 }),
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+    },
+    { enhancers: [transactions()] }
+  ) as unknown as Harness['tree'];
 
   return {
     tree,
