@@ -518,6 +518,49 @@ const GATES = [
     },
   },
   {
+    name: 'signal-identity-durability',
+    covers:
+      'a live consumer keeps receiving updates across garbage collection — the property the test suite structurally cannot check',
+    // The suite has no forced GC, so it cannot observe this. That is not
+    // theoretical: holding entitySignals weakly (the policy nodeCache already
+    // uses) passed all 1,791 core tests, cut post-read residue from 1,054 to
+    // 498 B/entity and cut churn from 798 to 249 B/retired -- while silently
+    // leaving live consumers serving stale values. A computed re-fetches its
+    // signal per read rather than holding it, so its dependency edge does not
+    // reliably keep the signal reachable; the write then finds a cleared
+    // WeakRef and skips.
+    //
+    // This gate is the acceptance criterion for any change to signal retention.
+    // Note the mutation below (never intern) is ALSO caught by the suite -- it
+    // proves the gate can fail, not that the gate is uniquely necessary. The
+    // failure it uniquely caught, weak interning, is a multi-line change and
+    // cannot be expressed as a one-line mutation here.
+    cmd: ['node', '--expose-gc', 'tools/check-signal-identity-durability.mjs'],
+    slow: true,
+    needsBuild: true,
+    provenBy: 'signal-identity-durability:self',
+  },
+  {
+    name: 'signal-identity-durability:self',
+    covers:
+      'the durability checker detects a non-durable identity map and accepts a durable one',
+    cmd: [
+      'node',
+      '--expose-gc',
+      'tools/check-signal-identity-durability.mjs',
+      '--self-test',
+    ],
+    // Break the DURABLE side of the fixture so the checker can no longer tell
+    // durable from non-durable and its own assertions stop holding. Forcing
+    // `detectsLeak = true` instead left the self-test still passing, which is
+    // how this mutation was first registered BLIND.
+    mutation: {
+      file: 'tools/check-signal-identity-durability.mjs',
+      find: 'if (m === durable) m.set(k, s);',
+      replace: 'void m;',
+    },
+  },
+  {
     name: 'memory-consistency',
     covers:
       'the retained-heap table is internally possible — no scenario measures less than a scenario it strictly contains',
