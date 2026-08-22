@@ -9,10 +9,6 @@
  * @packageDocumentation
  */
 
-// ============================================
-// CORE EXPORTS
-// ============================================
-
 /**
  * Main factory function to create a SignalTree
  * @see {@link signalTree}
@@ -23,8 +19,9 @@ export { signalTree } from './lib/signal-tree';
  * Wrap a tree factory in an injectable Angular service (the idiomatic Angular
  * DI pattern for a tree; comparable to NgRx SignalStore's `signalStore()`).
  * @see {@link defineStore}
-  // The per-marker reader-key allowlists are not root app API. They exist to
-  // TYPE `asReadonly`; an app calls `asReadonly(tree)` and never names them.
+ */
+export { defineStore, type DefineStoreConfig } from './lib/define-store';
+
 /**
  * Type-only read-only narrowing of a tree — same runtime object, no write
  * path offered on the type. The primary readonly surface;
@@ -125,13 +122,6 @@ export type { WithDerived } from './lib/internals/derived-types';
 
 // Derived helper (v7.2) - for defining derived functions in separate files with proper typing
 export { derivedFrom } from './lib/internals/derived-types';
-
-/**
- * Derived-but-writable signal, comparable to NgRx SignalStore's `withLinkedState`.
- * Use inside `.derived($ => ({ ... }))`; wraps Angular's native `linkedSignal`.
- * @see {@link linked}
- */
-export { linked, type LinkedOptions } from './lib/linked';
 
 // Builder types (v7)
 export type { SignalTreeBuilder } from './lib/internals/builder-types';
