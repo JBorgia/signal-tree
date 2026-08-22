@@ -5,8 +5,6 @@ const options = {
   main: './src/index.ts',
   additionalEntryPoints: [
     './src/security.ts',
-    './src/lazy.ts',
-    './src/edit-session.ts',
     './src/storage.ts',
   ],
   tsConfig: './tsconfig.lib.prod.json',
