@@ -224,11 +224,11 @@ describe('restoration authority is fixed at construction', () => {
     tree.$.rows.removeOne('A');
     await tick();
 
-    const after = inspect(tree.$.rows, subjectA);
-    expect(after?.state).toBe('tombstoned');
-    // The bytes are released at the moment of retirement, not on a later sweep:
-    // with no restorer there is no turn that could be holding them.
-    expect(after?.retainedValueBacking).toBeUndefined();
+    // Nothing is left to inspect. The retirement boundary releases the value
+    // backing, the entity signal, the lifetime record and the revision — all of
+    // it, at the moment of retirement rather than on a later sweep, because with
+    // no restorer there is no turn that could be holding any of it.
+    expect(inspect(tree.$.rows, subjectA)).toBeUndefined();
     // The surviving subject is untouched.
     expect(tree.$.rows.byId('B')?.().name).toBe('Beta');
   });

@@ -518,6 +518,38 @@ const GATES = [
     },
   },
   {
+    name: 'retired-subject-slope',
+    covers:
+      'retention does not grow with the number of subjects that have retired — the asymptotic claim a byte budget cannot express',
+    // 117 B/retired passes any budget stable enough to keep, and 117 B/retired
+    // is unbounded growth. So this measures the same workload at 50 and 150
+    // rounds and fails if the total scales with the retirements rather than
+    // sitting flat. It regressed once already, when a step inside the retirement
+    // re-interned the forgotten subject by id and turned 6 B into 79 B.
+    cmd: ['node', '--expose-gc', 'tools/check-retired-subject-slope.mjs'],
+    slow: true,
+    needsBuild: true,
+    provenBy: 'retired-subject-slope:self',
+  },
+  {
+    name: 'retired-subject-slope:self',
+    covers:
+      'the slope checker rejects the pre-fix linear table and accepts the measured flat one',
+    cmd: ['node', 'tools/check-retired-subject-slope.mjs', '--self-test'],
+    // Blind the VERDICT, not one input to it.
+    //
+    // Registered blind on the first attempt by widening MAX_BYTES_PER_RETIRED
+    // alone: the ratio condition still caught the linear fixture, so the
+    // self-test kept passing while its target was broken. Two conditions means a
+    // single-input mutation proves nothing — same trap recorded on
+    // `signal-identity-durability:self` above.
+    mutation: {
+      file: 'tools/check-retired-subject-slope.mjs',
+      find: '  return problems;',
+      replace: '  return [];',
+    },
+  },
+  {
     name: 'signal-identity-durability',
     covers:
       'a live consumer keeps receiving updates across garbage collection — the property the test suite structurally cannot check',
@@ -723,11 +755,17 @@ const GATES = [
     // so nothing typechecked it; esbuild strips types without checking. Both
     // arms of the test built an identical default tree and its equality
     // assertion passed vacuously. Mutating the option name back reproduces it.
+    //
+    // ⚠️ ANCHOR MOVED ONCE. The 15.0 declarative-construction codemod
+    // reformatted this call site, splitting the entityMap config across lines,
+    // and the old single-line anchor stopped matching — the self-test reported
+    // ERROR rather than silently passing, which is the behaviour to preserve if
+    // it happens again. Re-anchored on the multi-line form.
     mutation: {
       file: 'packages/core/src/lib/history-scoped-capture.spec.ts',
-      find: 'selectId: (r) => r.id, recordHistory }',
+      find: '            recordHistory,\n          }),',
       replace:
-        'selectId: (r) => r.id, recordHistory: recordHistory as never, bogusOption: 1 }',
+        '            recordHistory: recordHistory as never,\n            bogusOption: 1,\n          }),',
     },
   },
   {

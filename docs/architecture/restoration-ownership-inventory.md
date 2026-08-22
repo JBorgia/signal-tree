@@ -326,3 +326,34 @@ the right one, and whether the residual 117 B/retired is earned, are untouched.
 The zero-owner path does not route through `runPhysicalMaintenance` and is not a
 bypass of it: with no owner there are no turns for it to assess, so its causal
 question has no subject. The owned case is still entirely its problem.
+
+
+## SECOND AMENDMENT — open question 2 is answered: the residue was not earned
+
+Open question 2 above asks whether the residual per-retired cost is earned. It
+is not, and the answer came from falsifying it rather than reasoning about it.
+
+Zero-owner retirement now forgets the subject entirely — value backing, entity
+signal, lifetime record and revision. Retention went 249 B -> 117 B -> **6 B per
+retired subject**, and at 150 rounds it measures -6 B, which is the quiescence
+noise floor. Growth is no longer linear in retired subjects at all.
+
+The stale-handle semantic the residue was believed to buy is untouched. All four
+GC-dependent properties in `check-signal-identity-durability.mjs` pass, because
+isolation is anchored in SUBJECT identity, not key identity: `nextSubjectId` only
+increases and `tombstoneSubject` already removes the key -> subject mapping, so a
+re-add of the same business key is a different subject by construction. A held
+reference keeps reading `undefined` because the consumer holds the orphaned
+signal and, with the map entry gone, nothing can write to it again.
+
+The general statement, which is the useful part:
+
+> Subject identity needs to be durable only for as long as something can still
+> observe that subject.
+
+Neither a permanent tombstone ledger nor weak-reference machinery is required.
+The second was the designed fallback if the hard delete had failed; it did not.
+
+**Open question 3 is unchanged**, and open question 1 (whether the coordinator's
+`TurnStore` model is the right one) with it. The owned case still retains
+1,310 B/retired and still needs history-aware eligibility.

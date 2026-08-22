@@ -116,26 +116,6 @@ if (!existsSync(CORE)) {
 }
 const { signalTree, entityMap, timeTravel } = await import(CORE);
 const { computed } = await import('@angular/core');
-
-// TRIAL MODE — `--forget-lifetime` runs every property below against the
-// zero-owner lifetime-ledger null (see entity-lifetime-ledger-null.spec.ts).
-// These four properties are the ones vitest structurally cannot check, because
-// they are only observable across a real collection, so the null is not
-// decidable without running them here too.
-if (process.argv.includes('--forget-lifetime')) {
-  const { createEntitySignal } = await import(
-    join(process.cwd(), 'dist/packages/core/dist/lib/entity-signal.js')
-  );
-  const setTrial = createEntitySignal?.__setForgetRetiredSubjectLifetimeForTrial;
-  if (typeof setTrial !== 'function') {
-    console.error(
-      '❌ --forget-lifetime requested but the trial hook is gone from the build'
-    );
-    process.exit(1);
-  }
-  setTrial(true);
-  console.log('  (trial: zero-owner retirements forget the lifetime ledger)\n');
-}
 const cfg = { selectId: (r) => r.id };
 
 // 1 — the decisive one
