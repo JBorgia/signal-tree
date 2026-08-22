@@ -75,28 +75,6 @@ export function setEntityPositionIdNotifyEnabledForTesting(
   entityPositionIdNotifyEnabled = enabled;
 }
 
-/**
- * TRIAL FLAG — is the retired-subject lifetime ledger earned?
- *
- * Off by default, so the shipped behaviour is untouched. When on, a zero-owner
- * retirement deletes the subject's lifetime record and revision along with its
- * value backing, instead of leaving a permanent
- * `{active:false, restoreAllowed:false}` entry.
- *
- * This exists to FALSIFY, not to configure. It is not a `TreeConfig` option and
- * must not become one: the two arms are not both correct, and the trial ends
- * with the flag deleted in whichever direction the gates decide. See
- * docs/architecture/retired-subject-churn.md, open question 2, and
- * `entity-lifetime-ledger-null.spec.ts`.
- *
- * @internal
- */
-let forgetRetiredSubjectLifetime = false;
-
-/** @internal Trial-only. See `forgetRetiredSubjectLifetime`. */
-export function setForgetRetiredSubjectLifetimeForTrial(enabled = true): void {
-  forgetRetiredSubjectLifetime = enabled;
-}
 
 export type EntitySubjectPhysicalInventory<K extends string | number> = {
   subjectId: number;
@@ -1504,19 +1482,35 @@ export function createEntitySignal<
    * immediately, and reclaiming there stays the coordinator's problem — it needs
    * history-aware eligibility, which is a separate piece of work.
    *
-   * ## What it does NOT reclaim
+   * ## What it reclaims: EVERYTHING physical, the lifetime ledger included
    *
-   * Only `retained-value-backing`. The subject lifetime record, the revision
-   * entry and the Map slots survive, because stale-handle isolation depends on
-   * them: `check-signal-identity-durability.mjs` asserts a held reference to a
-   * removed subject does not start tracking a fresh occupant of the reused key.
-   * Measured, that residue is ~119 B/retired against ~249 B before this ran.
-   * Whether the residue is earned is its own trial.
+   * The value backing, the entity signal, the subject lifetime record and the
+   * revision entry. Retention is 6 B per retired subject, down from 249 B before
+   * any reclamation and 117 B when the ledger was kept — and it no longer grows
+   * with the number of retirements at all.
    *
-   * Deleting the entity signal is safe for the same reason the backing is: with
-   * no restorer, a held reference must read `undefined` forever, which is what
-   * `tombstoneSubjectSignal` already set it to. A later `byId()` on a REUSED key
-   * is a different subject and correctly gets a different signal.
+   * Keeping the ledger was believed to be what stale-handle isolation rested on.
+   * It is not, and that was FALSIFIED rather than assumed: every semantic gate,
+   * including the four GC-dependent properties in
+   * `check-signal-identity-durability.mjs`, passes with it deleted.
+   *
+   * Isolation is anchored in SUBJECT identity, not key identity. `nextSubjectId`
+   * only increases and `tombstoneSubject` already removed the key -> subject
+   * mapping, so a re-add of the same business key is a different subject by
+   * construction. A held reference keeps reading `undefined` because the
+   * CONSUMER holds the orphaned signal and, with the map entry gone, nothing can
+   * ever write to it again.
+   *
+   * The price, both on internal surfaces: `resolveSubjectHandle` reports
+   * `missing` rather than `tombstoned` for a forgotten subject, and the subject
+   * leaves `__listSubjectReclamationCandidates` — correct, since it has nothing
+   * left to reclaim. `entity-lifetime-ledger-null.spec.ts` pins both.
+   *
+   * ⚠️ `planRestore`'s "has retired backing and cannot be restored" guard loses
+   * its input for a forgotten subject. Acceptable ONLY because a tree with no
+   * restoration authority has no reachable restore at all, so the guard becomes
+   * unreachable rather than unenforced. If a restorer can exist, none of this
+   * runs.
    *
    * See docs/architecture/retired-subject-churn.md and
    * docs/architecture/restoration-ownership-inventory.md.
@@ -1543,7 +1537,7 @@ export function createEntitySignal<
       const retirement: PreparedRetainedValueRetirement = {
         kind: 'retire-retained-value',
         subjectId,
-        forgetLifetime: forgetRetiredSubjectLifetime,
+        forgetLifetime: true,
       };
       frame.stageRetainedValueRetirement(retirement);
       entitySignals.delete(subjectId);
@@ -1554,20 +1548,18 @@ export function createEntitySignal<
       return;
     }
 
-    const result = commitAndProjectEntityMutationFrame(frame);
-    if (forgetRetiredSubjectLifetime) {
-      // DO NOT PUBLISH a physical change for a subject whose ledger was just
-      // deleted. `publishSubjectPhysicalChange` -> `bumpSubjectRevision` writes
-      // `subjectRevisions.set(id, 1)`, which RESURRECTS the entry the forget
-      // just removed — the trial measured 79 B/retired instead of its real
-      // figure until this was found. There is nothing left to notify either:
-      // the entity signal was deleted in the loop above, and the activation
-      // token is interned lazily so a never-read subject has none.
-      return;
-    }
-    for (const changedSubjectId of result.physicallyChangedSubjectIds) {
-      publishSubjectPhysicalChange(changedSubjectId);
-    }
+    commitAndProjectEntityMutationFrame(frame);
+
+    // DELIBERATELY NO PUBLISH, and this is load-bearing rather than an omission.
+    // `publishSubjectPhysicalChange` -> `bumpSubjectRevision` writes
+    // `subjectRevisions.set(id, 1)`, which RESURRECTS the entry the forget just
+    // deleted — measured at 79 B/retired instead of 6 B until it was found.
+    // Deleting from a Map does not stay deleted if a later step in the same
+    // operation interns by the same key.
+    //
+    // There is also nothing left to notify: the entity signal was deleted in the
+    // loop above, and the activation token is interned lazily, so a subject
+    // nobody read has none.
   }
 
   function retireSubjectRetainedValueBackingForTesting(subjectId: number): void {
@@ -3087,17 +3079,3 @@ Object.defineProperty(createEntitySignal, '__setPositionIdNotifyEnabledForTestin
   enumerable: false,
   configurable: true,
 });
-// Attached rather than only exported, for the same reason as the hook above:
-// a bare `export` with no reference in the source graph is tree-shaken out of
-// the build, so the bench arm that needs it would import `undefined` from the
-// built module. Non-enumerable, so it stays off snapshots and off the public
-// value-export budget.
-Object.defineProperty(
-  createEntitySignal,
-  '__setForgetRetiredSubjectLifetimeForTrial',
-  {
-    value: setForgetRetiredSubjectLifetimeForTrial,
-    enumerable: false,
-    configurable: true,
-  }
-);

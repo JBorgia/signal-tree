@@ -222,9 +222,11 @@ L5/L5m comparison was attributing partly to metadata. Re-measured on 15.0 with
 | ---------------------- | ----------: | --------: |
 | L5-nodes-held          |     5,562 B |   3,859 B |
 | L5m-nodes-held-nometa  |     3,980 B |   3,853 B |
-| **difference**         | **1,710 B** |   **6 B** |
+| **difference**         | **1,710 B** | **6-7 B** |
 
-Six bytes per entity — 0.06 MB across 10,000 held entities. The accessors are
+Six or seven bytes per entity, run to run — 0.06 MB across 10,000 held entities.
+Re-measured again after zero-owner lifetime forgetting landed, unchanged: that
+change touches retirements, and these arms hold live entities. The accessors are
 not a memory opportunity, and **§5 must not be quoted as one**. Almost all of the
 held-node cost is jointly the Angular field computeds and the node/facade
 objects; no arm in that harness separates those two, so neither is charged alone.

@@ -67,8 +67,8 @@ one process per arm.
 | `L5-nodes-held`              | 36.80 MB |    3,859 B | every row node/fields held            |
 | `L5m-nodes-held-nometa`      | 36.75 MB |    3,853 B | control for L5                        |
 
-L5 minus L5m is **6 B/entity**. The metadata accessors are not a memory
-opportunity; see the AMENDMENT in
+L5 minus L5m is **6-7 B/entity** across runs. The metadata accessors are not a
+memory opportunity; see the AMENDMENT in
 [capability-authority-audit.md](./capability-authority-audit.md), which
 supersedes an earlier ~1,710 B/entity figure.
 
@@ -76,15 +76,26 @@ supersedes an earlier ~1,710 B/entity figure.
 
 1,000 live rows held constant, 50 full key generations.
 
-| arm                 | per retired | note                          |
-| ------------------- | ----------: | ----------------------------- |
-| `no-history`        |       117 B | zero-owner reclamation active |
-| `no-history-reads`  |       117 B | observation now costs nothing |
-| `time-travel`       |     1,310 B | a restorer exists             |
-| `time-travel-reads` |     1,859 B | restorer plus observation     |
+| arm                 | per retired | note                                |
+| ------------------- | ----------: | ----------------------------------- |
+| `no-history`        |         6 B | zero-owner retirement forgets it all |
+| `no-history-reads`  |         6 B | observation costs nothing once retired |
+| `time-travel`       |     1,310 B | a restorer exists                   |
+| `time-travel-reads` |     1,859 B | restorer plus observation           |
 
-Still linear in retired subjects — the pre-registered criterion in
-[entity-churn-retention.md](./entity-churn-retention.md) is recorded as FAILED.
+At 150 rounds the two `no-history` arms read **-6 B/retired** — the quiescence
+noise floor, not memory being created. Tripling the retirements does not scale
+the total, so retention is no longer linear in retired subjects and the
+pre-registered criterion in
+[entity-churn-retention.md](./entity-churn-retention.md) is MET.
+
+**Do not treat 6 B as the budget.** The claim is the asymptote, and
+`tools/check-retired-subject-slope.mjs` gates it by measuring at two subject
+counts — 117 B/retired would pass any byte budget stable enough to keep, and
+117 B/retired is unbounded growth.
+
+The owned arms are untouched and still grow: 1,310 B/retired at 50 rounds,
+1,407 B at 150. History-aware eligibility is a separate problem.
 
 ## Workload classes — `tools/bench-workload-classes.mjs`
 

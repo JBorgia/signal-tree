@@ -312,10 +312,48 @@ is acceptable ONLY because a tree with no restoration authority has no path to a
 restore: the guard becomes unreachable rather than unenforced. If a restorer can
 exist, `forgetSubject` must not be called — and it is not.
 
-### Not concluded
+### PROMOTED — the null is now the implementation
 
-That the default should flip. The evidence supports it and no gate refutes it,
-but collapsing `tombstoned` into `missing` is a semantic call about the physical
-inspection surface, not something the measurement settles. The owned case
-(1,310 B/retired with `timeTravel`) is untouched and still needs history-aware
-eligibility.
+The flag is deleted; forgetting is unconditional for a zero-owner retirement.
+Measured on the shipped path:
+
+| rounds |               arm |   growth | per retired |
+| -----: | ----------------- | -------: | ----------: |
+|     50 | `no-history`      |  0.30 MB |         6 B |
+|     50 | `no-history-reads`|  0.30 MB |         6 B |
+|    150 | `no-history`      | -0.83 MB |        -6 B |
+|    150 | `no-history-reads`| -0.86 MB |        -6 B |
+
+`tools/check-retired-subject-slope.mjs` is the regression gate, and it pins the
+ASYMPTOTIC claim rather than a byte budget — 117 B/retired passes any budget
+stable enough to keep, and 117 B/retired is unbounded growth. It runs the same
+workload at 50 and 150 rounds and fails if the total scales with the
+retirements. Its self-test rejects the pre-fix table.
+
+Two regression rows guard the way this quietly undoes itself
+(`entity-lifetime-ledger-null.spec.ts`): a forgotten subject must still be
+forgotten at the END of the whole retirement operation, and after further
+unrelated churn. That is the 79 B bug — anything appended to the retirement path
+that touches the subject by id resurrects it.
+
+`planRestore`'s unreachability is encoded too, in both halves: the guard no
+longer fires for a forgotten subject, AND no public path reaches it. If a bare
+tree ever grows `undo`/`redo`/`transaction`, that row fails and forgetting must
+stop.
+
+### The architectural statement
+
+> Subject identity needs to be durable only for as long as something can still
+> observe that subject.
+
+Once ownership and external reachability are both gone, permanent historical
+identity bookkeeping buys no observable semantic correctness. That is why
+neither a permanent tombstone ledger nor weak-reference machinery is needed here
+— the second was the fallback if the hard delete had failed, and it did not.
+
+### Still open
+
+The OWNED case. A tree with `timeTravel` still retains 1,310 B/retired (1,407 B
+at 150 rounds), and eviction from a bounded history still goes unnoticed. That
+needs history-aware eligibility and remains `runPhysicalMaintenance`'s problem;
+nothing here routes through it.

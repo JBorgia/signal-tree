@@ -193,21 +193,20 @@ describe('entityMap — tombstoned subjects stay distinct from later key reuse',
     rows.addOne({ id: 1, v: 7 });
 
     expect(rows.byId(1)?.v()).toBe(7);
-    // `restoreAllowed: false, revision: 2` is ZERO-OWNER RECLAMATION, not drift.
-    // `makeRows()` builds a bare tree — no enhancers, so no restoration
-    // authority — and the retirement boundary therefore releases the retired
-    // subject's value backing immediately. Restore is genuinely no longer
-    // possible, and the revision bump is the reclaiming commit.
+    // `state: 'missing'` is ZERO-OWNER RETIREMENT, not drift. `makeRows()` builds
+    // a bare tree — no enhancers, so no restoration authority — and the
+    // retirement boundary therefore forgets the subject entirely: value backing,
+    // entity signal, lifetime record and revision. There is no tombstone left to
+    // report, so resolution reports the handle as unrecognised.
     //
-    // The CLAIM of this row is untouched: the handle still resolves to subject
-    // 1 in the tombstoned state rather than following the reused key to the
-    // fresh subject. That is what the assertion is for; the other two fields
-    // record the physical consequence.
+    // The CLAIM of this row is untouched, and is the whole point: the handle
+    // still resolves to SUBJECT 1 rather than following the reused key to the
+    // fresh subject. Isolation never depended on the tombstone — see
+    // `entity-lifetime-ledger-null.spec.ts`.
     expect(rows.__resolveEntityHandleForTesting(handle)).toEqual({
-      state: 'tombstoned',
+      state: 'missing',
       subjectId: 1,
-      restoreAllowed: false,
-      revision: 2,
+      acquiredRevision: 0,
     });
   });
 
@@ -222,12 +221,11 @@ describe('entityMap — tombstoned subjects stay distinct from later key reuse',
 
     expect(rows.byId(1)?.v()).toBe(9);
     expect(held?.()).toBeUndefined();
-    // Same reclamation as the row above — see the note there.
+    // Same zero-owner retirement as the row above — see the note there.
     expect(rows.__resolveEntityHandleForTesting(handle)).toEqual({
-      state: 'tombstoned',
+      state: 'missing',
       subjectId: 1,
-      restoreAllowed: false,
-      revision: 2,
+      acquiredRevision: 0,
     });
   });
 });
