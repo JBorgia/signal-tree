@@ -11050,13 +11050,17 @@ first real publish remains the RC task.
 
 - [ ] **Resolve RC public surface reconciliation before publishing.**
       `docs/audits/2026-08/rc-public-surface-reconciliation.md` maps the
-      current tarball exports against the final disposition map. Blockers before
-      `1.0.0-rc.1`: `asyncSource`/`asyncQuery` are still public root exports
-      while the map says DELETE; NOT EARNED and LC/mechanically retained symbols
-      remain public; unresolved symbols are shipping as if settled; and the 10k
-      collection workload retention is only partially attributed. Do not publish
-      RC until each exported feature has release authority and
-      `node tools/check-rc-public-dispositions.mjs` passes.
+  current tarball exports against the final disposition map. Progress:
+  `165e71f9` removed `asyncSource`/`asyncQuery` from the public RC surface;
+  `22792f97` removed `loader`/`invalidateTag` helpers and their public type
+  companions; `c53aa416` removed `stored`, storage-key helpers, and global
+  stored flush from the public RC surface. Remaining blockers before
+  `1.0.0-rc.1`: `linked`, `trackHistory`, `serialization`, `compared`, the
+  `lazy` subpath, and the `edit-session` subpath still need removal or a
+  later independent authority that explicitly grants the symbol. The 10k
+  collection workload retention is also only partially attributed. Do not
+  publish RC until each exported feature has release authority and
+  `node tools/check-rc-public-dispositions.mjs` passes.
 - [ ] publish `1.0.0-rc.1`
 - [ ] install from npm in external projects
 - [ ] collect RC packaging/DX/docs failures
