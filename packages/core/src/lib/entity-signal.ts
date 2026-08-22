@@ -240,6 +240,18 @@ export function createEntitySignal<
     ownerMetadataEnabled?: boolean;
     subjectMetadataEnabled?: boolean;
     positionMetadataEnabled?: boolean;
+    /**
+     * Whether anything in this tree could restore a subject after it retires.
+     *
+     * Comes from the finalized build plan (`RuntimeTreePlan`) and cannot change
+     * for the life of the tree. `false` is what licenses zero-owner reclamation
+     * at the retirement boundary below.
+     *
+     * DEFAULTS TO TRUE — retain. A collection created outside `signalTree`'s
+     * construction path has no plan to consult, and reclaiming a subject some
+     * unseen owner could restore is unrecoverable.
+     */
+    hasRestorationAuthority?: boolean;
   }
 ): EntitySignal<E, K> {
   // ==================
@@ -371,6 +383,7 @@ export function createEntitySignal<
   const subjectMetadataEnabled =
     options?.subjectMetadataEnabled ?? ownerMetadataEnabled;
   const positionMetadataEnabled = options?.positionMetadataEnabled ?? true;
+  const hasRestorationAuthority = options?.hasRestorationAuthority ?? true;
   const physicalCommitClock = options?.physicalCommitClock;
   const positionId = (
     options?.positionIdAllocator ??
@@ -1446,6 +1459,83 @@ export function createEntitySignal<
     }
   }
 
+  /**
+   * ZERO-OWNER RECLAMATION — the only reclamation that runs automatically.
+   *
+   * When the tree has no restoration authority, a tombstoned subject's retained
+   * value backing is unreachable: nothing can undo, roll back, or re-project it,
+   * so the bytes are held against a restore that cannot be requested. This
+   * releases them at the moment of retirement.
+   *
+   * ## Why this needs no causal assessment
+   *
+   * `runPhysicalMaintenance` exists for the hard case and asks a real question —
+   * is any turn, pending turn, applied-history entry or redo entry still
+   * referencing this subject? Answering it requires a `TurnStore` and an
+   * `AppliedHistory`, which a tree without `causal-runtime` does not have. That
+   * absence is not a gap to work around; it IS the answer. With no owner there
+   * are no turns, so there is nothing a turn could be holding.
+   *
+   * This is therefore NOT a bypass of the coordinator, and must not grow into
+   * one. The moment a tree has restoration authority this function returns
+   * immediately, and reclaiming there stays the coordinator's problem — it needs
+   * history-aware eligibility, which is a separate piece of work.
+   *
+   * ## What it does NOT reclaim
+   *
+   * Only `retained-value-backing`. The subject lifetime record, the revision
+   * entry and the Map slots survive, because stale-handle isolation depends on
+   * them: `check-signal-identity-durability.mjs` asserts a held reference to a
+   * removed subject does not start tracking a fresh occupant of the reused key.
+   * Measured, that residue is ~119 B/retired against ~249 B before this ran.
+   * Whether the residue is earned is its own trial.
+   *
+   * Deleting the entity signal is safe for the same reason the backing is: with
+   * no restorer, a held reference must read `undefined` forever, which is what
+   * `tombstoneSubjectSignal` already set it to. A later `byId()` on a REUSED key
+   * is a different subject and correctly gets a different signal.
+   *
+   * See docs/architecture/retired-subject-churn.md and
+   * docs/architecture/restoration-ownership-inventory.md.
+   */
+  function reclaimRetiredSubjectsWithoutOwner(
+    subjectIds: readonly number[]
+  ): void {
+    if (hasRestorationAuthority || subjectIds.length === 0) {
+      return;
+    }
+
+    const frame = createEntityMutationFrame();
+    let staged = 0;
+    for (const subjectId of subjectIds) {
+      const state = resolveSubjectState(subjectId);
+      // Still active means this was not a retirement after all. A missing state
+      // means the subject is already gone. Neither is reclaimable.
+      if (!state || state.active) {
+        continue;
+      }
+      if (!valueStore.hasRetainedValueBacking(subjectId)) {
+        continue;
+      }
+      const retirement: PreparedRetainedValueRetirement = {
+        kind: 'retire-retained-value',
+        subjectId,
+      };
+      frame.stageRetainedValueRetirement(retirement);
+      entitySignals.delete(subjectId);
+      staged += 1;
+    }
+
+    if (staged === 0) {
+      return;
+    }
+
+    const result = commitAndProjectEntityMutationFrame(frame);
+    for (const changedSubjectId of result.physicallyChangedSubjectIds) {
+      publishSubjectPhysicalChange(changedSubjectId);
+    }
+  }
+
   function retireSubjectRetainedValueBackingForTesting(subjectId: number): void {
     const subjectState = resolveSubjectState(subjectId);
     if (!subjectState || subjectState.active) {
@@ -2159,6 +2249,7 @@ export function createEntitySignal<
         publishSubjectPhysicalChange(changedSubjectId);
       }
       tombstoneSubjectSignal(subjectIdsForWrite[0]);
+      reclaimRetiredSubjectsWithoutOwner([subjectIdsForWrite[0]]);
       updateSignals();
 
       // Notify PathNotifier
@@ -2252,6 +2343,9 @@ export function createEntitySignal<
       for (const { subjectId } of preparedRemovals) {
         tombstoneSubjectSignal(subjectId);
       }
+      reclaimRetiredSubjectsWithoutOwner(
+        preparedRemovals.map(({ subjectId }) => subjectId)
+      );
 
       // Single signal update after all entities are removed
       updateSignals();
@@ -2465,6 +2559,9 @@ export function createEntitySignal<
         );
         publishSubjectPhysicalChange(subjectId);
       }
+      reclaimRetiredSubjectsWithoutOwner(
+        activeSubjects.map(({ subjectId }) => subjectId)
+      );
       activeIdSignal.set(undefined);
       lastSubjectIds = activeSubjects.map(({ subjectId }) => subjectId);
       resetEntitySignals();
@@ -2636,6 +2733,9 @@ export function createEntitySignal<
         );
         publishSubjectPhysicalChange(subjectId);
       }
+      reclaimRetiredSubjectsWithoutOwner(
+        stagedRemovals.map(({ subjectId }) => subjectId)
+      );
 
       for (const { subjectId, entity } of stagedUpdates) {
         valueStore.retainSubjectValue(subjectId, entity);

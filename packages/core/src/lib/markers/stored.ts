@@ -10,6 +10,7 @@ import {
 
 import { getActiveWriteContext } from '../write-context';
 import { scheduleDurableConsequence } from '../internals/commit-consequence';
+import type { TreeCapability } from '../enhancer-types';
 
 declare const ngDevMode: boolean | undefined;
 
@@ -528,7 +529,7 @@ export function createStoredSignal<T>(
   path?: string,
   context?: {
     positionTopologyEnabled?: boolean;
-    hasCapability?: (capability: 'mutation-capture' | 'position-topology') => boolean;
+    hasCapability?: (capability: TreeCapability) => boolean;
     allocatePositionId: (parentPositionId?: number) => number;
     /**
      * Per-tree identity. Kept `unknown` because this marker only ever compares

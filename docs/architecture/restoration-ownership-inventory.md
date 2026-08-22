@@ -283,3 +283,46 @@ The rule the assertions pin moved with it: `entity-restoration-authority.spec.ts
 asserted a PROSPECTIVE rule evaluated over time and now asserts a STATIC one —
 that a tree built without a restoration owner has no path to acquiring one. Read
 that file's header before building on either statement.
+
+## RESOLVED — consequence 1 and open question 1, 15.0
+
+Written after zero-owner reclamation shipped. The AMENDMENT above said
+consequence 1 stood ("the capability query still has no source of truth") and
+open question 1 got easier but was not answered. Both moved.
+
+**Consequence 1 is closed for this question.**
+`internals/runtime-tree-plan.ts` supplies the query, built once from the
+finalized `TreeBuildPlan` and frozen:
+
+```ts
+interface RuntimeTreePlan {
+  hasCapability(capability: TreeCapability): boolean;
+  readonly hasRestorationAuthority: boolean;
+}
+```
+
+It is a VALUE, not the mutable registry the v14 design called for. The registry
+was correct for v14 — `.with()` could change the answer between two writes — and
+is now a mutable container for an immutable fact. It reaches the retirement
+boundary through `MaterializationContext`, whose `hasCapability` is widened from
+`'mutation-capture' | 'position-topology'` to the full `TreeCapability` union so
+it can answer for `causal-runtime` at all.
+
+`hasRestorationAuthority` is `causal-runtime || temporal-snapshots`, which is
+deliberately broader than "an enhancer named timeTravel is attached": requesting
+the causal runtime through `capabilities` installs the machinery to drive
+restoration with no enhancer present, and this decision must be wrong in the
+safe direction. The default when no plan exists — a test, a direct
+materialization — is `true`, i.e. RETAIN.
+
+**Open question 1 is answered: yes, for the zero-owner case only.** Absence of a
+restorer is sufficient, because it is now a static property of the tree rather
+than a race against a future attachment. Measured result and the control that
+makes it a result are in
+[retired-subject-churn.md](./retired-subject-churn.md), "RESOLUTION".
+
+**Open questions 2 and 3 stand.** Whether the coordinator's `TurnStore` model is
+the right one, and whether the residual 117 B/retired is earned, are untouched.
+The zero-owner path does not route through `runPhysicalMaintenance` and is not a
+bypass of it: with no owner there are no turns for it to assess, so its causal
+question has no subject. The owned case is still entirely its problem.

@@ -656,6 +656,24 @@ All enhancers are exported directly from `@signaltree/core`:
 - `devTools()` - Redux DevTools auto-connect, path actions, and time-travel dispatch
 - `timeTravel()` - Undo/redo functionality
 
+`devTools()` also adds `tree.exportDebugSession()`, which returns a
+`DevToolsDebugSession` snapshot — aggregate metrics, per-module activity, and the
+log buffer — for saving or attaching to a bug report:
+
+```typescript
+import { signalTree, devTools } from '@signaltree/core';
+import type { DevToolsDebugSession } from '@signaltree/core';
+
+const tree = signalTree(state, { enhancers: [devTools({ name: 'MyApp' })] });
+
+const session: DevToolsDebugSession = tree.exportDebugSession();
+// session.metrics · session.modules · session.logs
+```
+
+It has always been attached at runtime; 15.0 is where it was finally declared on
+`DevToolsMethods`, so reaching it no longer needs a cast. `devTools({ enabled:
+false })` returns an empty session rather than throwing.
+
 #### Additional Packages
 
 These are the **only** separate packages in the SignalTree ecosystem:

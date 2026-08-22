@@ -9,6 +9,12 @@ bump inserts the final dated 15.0.0 heading.
 - **[ST2033]** rejects async or thenable-returning `entityMap().intercept(...)`
   handlers. Entity mutations are synchronous, so async validation belongs before
   the mutation path.
+- **`exportDebugSession()`** is now declared on `DevToolsMethods`, with
+  `DevToolsDebugSession` and its member types exported from the barrel. The
+  method has shipped and been spec-asserted for a long time but was never on the
+  interface, so consumers had to cast to reach it — and the `enabled: false`
+  path did not implement it at all, so calling it there threw. Both fixed. Found
+  because deleting `.with()` removed the cast that was hiding it.
 
 ## 14.1.1 (2026-08-11)
 

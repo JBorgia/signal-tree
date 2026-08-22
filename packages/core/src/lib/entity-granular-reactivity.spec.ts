@@ -193,11 +193,21 @@ describe('entityMap — tombstoned subjects stay distinct from later key reuse',
     rows.addOne({ id: 1, v: 7 });
 
     expect(rows.byId(1)?.v()).toBe(7);
+    // `restoreAllowed: false, revision: 2` is ZERO-OWNER RECLAMATION, not drift.
+    // `makeRows()` builds a bare tree — no enhancers, so no restoration
+    // authority — and the retirement boundary therefore releases the retired
+    // subject's value backing immediately. Restore is genuinely no longer
+    // possible, and the revision bump is the reclaiming commit.
+    //
+    // The CLAIM of this row is untouched: the handle still resolves to subject
+    // 1 in the tombstoned state rather than following the reused key to the
+    // fresh subject. That is what the assertion is for; the other two fields
+    // record the physical consequence.
     expect(rows.__resolveEntityHandleForTesting(handle)).toEqual({
       state: 'tombstoned',
       subjectId: 1,
-      restoreAllowed: true,
-      revision: 1,
+      restoreAllowed: false,
+      revision: 2,
     });
   });
 
@@ -212,11 +222,12 @@ describe('entityMap — tombstoned subjects stay distinct from later key reuse',
 
     expect(rows.byId(1)?.v()).toBe(9);
     expect(held?.()).toBeUndefined();
+    // Same reclamation as the row above — see the note there.
     expect(rows.__resolveEntityHandleForTesting(handle)).toEqual({
       state: 'tombstoned',
       subjectId: 1,
-      restoreAllowed: true,
-      revision: 1,
+      restoreAllowed: false,
+      revision: 2,
     });
   });
 });
