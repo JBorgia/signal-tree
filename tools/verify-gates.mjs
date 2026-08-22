@@ -399,6 +399,24 @@ const GATES = [
     },
   },
   {
+    name: 'rc-public-dispositions',
+    covers:
+      'every RC public symbol has release authority; settled negative dispositions are absent from tarballs',
+    cmd: ['node', 'tools/check-rc-public-dispositions.mjs'],
+    provenBy: 'rc-public-dispositions:self',
+  },
+  {
+    name: 'rc-public-dispositions:self',
+    covers:
+      'the RC public-disposition checker catches blocked symbols and permits allowed symbols',
+    cmd: ['node', 'tools/check-rc-public-dispositions.mjs', '--self-test'],
+    mutation: {
+      file: 'tools/check-rc-public-dispositions.mjs',
+      find: "symbol: 'asyncSource',",
+      replace: "symbol: '__gateMissedAsyncSource',",
+    },
+  },
+  {
     name: 'demo-coverage',
     covers:
       'every ROOT-barrel export is demonstrated in the demo app — not node methods or type-only declarations',

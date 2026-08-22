@@ -6,13 +6,14 @@ HEAD reviewed: `3670e73b`
 
 ## Verdict
 
-Do not publish `1.0.0-rc.1` yet if the RC is expected to represent an analytically reconciled public surface.
+Do not publish `1.0.0-rc.1`. The RC public surface contradicts settled
+dispositions, so the public-surface gate is reopened.
 
 Release engineering is in good shape: gates pass, self-tests prove the gates can fail, tarballs are checked, clean-checkout flow works, and CI publishing is wired for trusted publishing. The remaining blockers are product/API reconciliation, not release plumbing.
 
 ## Blocking Findings
 
-### 1. Async markers are still public while the disposition map says delete / decision required
+### 1. Async markers are still public while the disposition map says delete
 
 Current `@signaltree/core` root exports include:
 
@@ -29,15 +30,21 @@ Current `@signaltree/core` root exports include:
 - `ReadonlyAsyncSourceSignal`
 - `ReadonlyAsyncQuerySignal`
 
-The product-core map states `asyncSource()` / `asyncQuery()` are `DELETE — frozen, still physically present` and that DR-4 requires a decision on promise-carrier scope. That is a release-surface contradiction, not a performance issue.
+The product-core map states `asyncSource()` / `asyncQuery()` are `DELETE — frozen, still physically present`. DR-4 may still require a future async-helper derivation, but that broader question does not revive these named carriers.
 
-Required before RC: decide whether these are intentionally public in the RC. If yes, update the disposition map and release ledger with the survival argument. If no, remove them from root public exports and published declarations.
+Required before RC: remove these names and their companion public types from the
+publishable root surface. If a SignalTree-owned async helper later survives, it
+must be derived from zero rather than inherited from these spellings.
 
 ### 2. Several public root exports are mechanically retained or not earned
 
-The current root barrel still exports capabilities classified as `LC`, `AS`, or unplaced in the map. That can be acceptable for an RC only if each is explicitly labeled as transitional or accepted as a survivor.
+The current root barrel still exports capabilities classified as `LC`, `AS`, not
+earned, or unplaced in the map. Settled negative states are not fresh release
+decisions.
 
-Required before RC: for each item below, either keep with an updated disposition or remove/defer it.
+Required before RC: remove settled negatives by default. Only keep an item if a
+later independent authority explicitly grants that exact public symbol. Open or
+unplaced items may not accidentally ship as settled v15 API.
 
 ### 3. Collection retention is measured and only partially attributed
 
@@ -63,36 +70,36 @@ Required before RC or explicitly carried into RC notes: classify this as a parti
 
 ## Current Publishable Packages
 
-| Package | Public entry points | Status |
-| --- | --- | --- |
-| `@signaltree/core` | `.`, `./security`, `./lazy`, `./edit-session`, `./storage` | Survives; root surface needs reconciliation |
-| `@signaltree/events` | `.`, `./nestjs`, `./angular`, `./testing` | Survives as standalone event bus / adapter package |
-| `@signaltree/ng-forms` | `.` | Survives as Angular FormGroup adapter, but individual helpers remain mechanically retained unless dispositioned |
-| `@signaltree/shared` | private | Internal only |
+| Package                | Public entry points                                        | Status                                                                                                          |
+| ---------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `@signaltree/core`     | `.`, `./security`, `./lazy`, `./edit-session`, `./storage` | Survives; root surface needs reconciliation                                                                     |
+| `@signaltree/events`   | `.`, `./nestjs`, `./angular`, `./testing`                  | Survives as standalone event bus / adapter package                                                              |
+| `@signaltree/ng-forms` | `.`                                                        | Survives as Angular FormGroup adapter, but individual helpers remain mechanically retained unless dispositioned |
+| `@signaltree/shared`   | private                                                    | Internal only                                                                                                   |
 
 Deleted package surfaces: `guardrails`, `realtime`, `schema`, `enterprise`, `callable-syntax`, and `core/authoring`.
 
 ## Benchmarked Feature Surface
 
-| Feature measured by `tools/size-report.mjs` | Public in current RC candidate? | Disposition in map | Reconciliation |
-| --- | --- | --- | --- |
-| `signalTree` | Yes | `KP` frozen | Keep. Core construction boundary. |
-| `entityMap` | Yes | Survives but challenged / unplaced | Keep only with explicit unresolved-retention note or run attribution first. |
-| `entityMap + loader` | Yes: `loader`, `invalidateTag`, loader types | `loader` app responsibility; tags unrun remainder | Needs decision: public cache-policy helpers are still shipping. |
-| `stored` | Yes | `AS`, not earned both halves | Needs keep/delete decision. Consequence ordering fixed; independent survival not proven. |
-| `compared` / `byKeys` | Yes | unplaced; null not run | Needs keep/delete decision. |
-| `asyncSource` | Yes | DELETE / decision required | Blocker unless disposition changes. |
-| `asyncQuery` | Yes | DELETE / decision required | Blocker unless disposition changes. |
-| `batching` | Yes | `KA` | Keep. Notification batching over synchronous writes. |
-| `timeTravel` | Yes | `KA` devtools/history instrument | Keep if framed as causal/debug/history adapter, not end-user undo by itself. |
-| `transactions` | Yes | `KA` for refusal/neutrality; speculative role open | Keep only with narrow scope documented. |
-| `serialization` | Yes | not earned for core function / unplaced | Needs keep/delete decision or scoped survival. |
-| `persistence` | Yes | `KA`; enhancer form undisposed | Keepable for tree-scoped durability, but form needs explicit acceptance. |
-| `devTools` | Yes | `KA` diagnostic projection | Keep. Diagnostic adapter. |
-| `security` subpath | Yes | `KA`, no external imports | Keep. Isolated construction-time validator. |
-| `lazy` subpath | Yes | unassigned threshold-driven | Needs explicit keep/delete decision. |
-| `edit-session` subpath | Yes | null not run | Needs explicit keep/delete decision. |
-| `storage` subpath | Yes | `KA` | Keep. Adapter-only, no Angular coupling. |
+| Feature measured by `tools/size-report.mjs` | Public in current RC candidate?              | Disposition in map                                 | Reconciliation                                                                           |
+| ------------------------------------------- | -------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `signalTree`                                | Yes                                          | `KP` frozen                                        | Keep. Core construction boundary.                                                        |
+| `entityMap`                                 | Yes                                          | Survives but challenged / unplaced                 | Public survival not reopened by this audit, but retention remains unresolved.            |
+| `entityMap + loader`                        | Yes: `loader`, `invalidateTag`, loader types | `loader` app responsibility; tags unrun remainder  | Needs decision: public cache-policy helpers are still shipping.                          |
+| `stored`                                    | Yes                                          | `AS`, not earned both halves                       | Default remove unless a later authority explicitly grants this symbol.                   |
+| `compared` / `byKeys`                       | Yes                                          | unplaced; null not run                             | Omit or finish the equality ownership derivation.                                        |
+| `asyncSource`                               | Yes                                          | DELETE                                             | Remove from RC public surface.                                                           |
+| `asyncQuery`                                | Yes                                          | DELETE                                             | Remove from RC public surface.                                                           |
+| `batching`                                  | Yes                                          | `KA`                                               | Keep. Notification batching over synchronous writes.                                     |
+| `timeTravel`                                | Yes                                          | `KA` devtools/history instrument                   | Keep if framed as causal/debug/history adapter, not end-user undo by itself.             |
+| `transactions`                              | Yes                                          | `KA` for refusal/neutrality; speculative role open | Keep only if the exported API can promise only the earned semantics.                     |
+| `serialization`                             | Yes                                          | not earned for core function / unplaced            | Default remove unless a later authority explicitly grants this symbol.                   |
+| `persistence`                               | Yes                                          | `KA`; enhancer form undisposed                     | Keepable for tree-scoped durability, but form needs explicit acceptance.                 |
+| `devTools`                                  | Yes                                          | `KA` diagnostic projection                         | Keep. Diagnostic adapter.                                                                |
+| `security` subpath                          | Yes                                          | `KA`, no external imports                          | Keep. Isolated construction-time validator.                                              |
+| `lazy` subpath                              | Yes                                          | unassigned threshold-driven                        | Omit or finish the independent derivation.                                               |
+| `edit-session` subpath                      | Yes                                          | null not run                                       | Omit or finish the independent derivation.                                               |
+| `storage` subpath                           | Yes                                          | `KA`                                               | Keep. Adapter-only, no Angular coupling.                                                 |
 
 ## Retained Functionality: How It Works and Why It Was Kept or Questioned
 
@@ -118,7 +125,7 @@ How it works: `.derived()` attaches computed tiers to the tree; `derivedFrom<T>(
 
 Optimization/adaptation: `derivedFrom` is a TypeScript ergonomics fix, not runtime machinery. `linked()` delegates to Angular.
 
-Justification: mixed. `derivedFrom` is justified by module-boundary typing. `.derived()` chain remains legacy-compatible. `linked()` is not uniquely SignalTree-owned and needs a keep/delete decision.
+Justification: mixed. `derivedFrom` is justified by module-boundary typing. `.derived()` chain remains legacy-compatible. `linked()` is not uniquely SignalTree-owned and defaults to removal unless a later authority grants it.
 
 ### Entity collections: `entityMap` and entity members
 
@@ -126,7 +133,7 @@ How it works: normalized collection state with entity signals, structural store,
 
 Optimization/adaptation: heavily adapted. v15 added subject/position separation, address-vs-reference semantics, staged entity mutation frames, structural rekey/remove handling, and causal-history integration. Bulk operations stage before commit to avoid partial publication.
 
-Justification: partial. Dynamic membership itself has real SignalTree function. The five minimum members are closest to justified. Bulk/convenience members, `changeId`, active-entity selection, `tap`, and `intercept` remain mixed or negative in the disposition map. Memory retention at 10k is unattributed and must not be normalized as accepted architectural cost.
+Justification: partial. Dynamic membership itself has real SignalTree function. The five minimum members are closest to justified. Bulk/convenience members, `changeId`, active-entity selection, `tap`, and `intercept` remain mixed or negative in the disposition map. Memory retention at 10k is only partially attributed and must not be normalized as accepted architectural cost.
 
 ### Entity loader helpers: `loader`, `invalidateTag`, loader types
 
@@ -134,7 +141,7 @@ How it works: `loader()` brands load/cache policy for `entityMap({ load })`; `in
 
 Optimization/adaptation: tree-shakeable helper path. Plain `entityMap()` does not statically import loader machinery.
 
-Justification: unresolved. The map classifies cache/freshness/tags as application cache policy, with `invalidateTag` still an un-run remainder. Public survival needs an explicit decision.
+Justification: unresolved. The map classifies cache/freshness/tags as application cache policy, with `invalidateTag` still an un-run remainder. Public survival requires independent authority; release pressure grants none.
 
 ### Durability: `stored`, `persistence`, `serialization`, storage subpath
 
@@ -142,7 +149,7 @@ How it works: `stored()` persists individual leaves/markers; `persistence()` per
 
 Optimization/adaptation: consequence ordering was repaired so durable writes run only after the tree commit scope settles. `persistence()` is tree-scoped. Storage adapters are isolated in a subpath.
 
-Justification: mixed. The post-commit consequence authority is frozen. `persistence()` and storage adapters are plausibly justified. `stored()` had correctness fixes but remains not independently earned in the map. `serialization()` is validated but still not earned as a core function in the disposition map.
+Justification: mixed. The post-commit consequence authority is frozen. `persistence()` and storage adapters are plausibly justified. `stored()` had correctness fixes but remains not independently earned in the map. `serialization()` is validated but still not earned as a core function in the disposition map. Settled negatives default to absence.
 
 ### Async markers: `asyncSource`, `asyncQuery`
 
@@ -158,7 +165,7 @@ How it works: wraps a leaf with custom equality so writes that are semantically 
 
 Optimization/adaptation: small tree-shakeable marker/helper; benchmarked as `+0.07 KB` over bare.
 
-Justification: unresolved. Useful, but the map says its null has not run: what does SignalTree need to know about equality? Needs keep/delete decision.
+Justification: unresolved. Useful, but the map says its null has not run: what does SignalTree need to know about equality? Omit or finish that derivation before RC.
 
 ### History and transactions: `timeTravel`, `transactions`, `SignalTreeRollbackError`, `trackHistory`
 
@@ -166,7 +173,7 @@ How it works: `timeTravel()` records causal turns and realizes undo/redo through
 
 Optimization/adaptation: substantially redone. History now composes causal turn storage, applied-history assessment, structural dependency checks, and physical realization instead of plain whole-state snapshots. `transactions()` delegates to pending confirmation/rollback rather than opening a second mutation path.
 
-Justification: mixed. Causal turn atomicity, rollback refusal semantics, and user-recognizable history steps are justified. `transactions()` is justified for refusal/neutrality, but speculative role remains open. `trackHistory()` is mechanically retained after form deletion and needs its own decision.
+Justification: mixed. Causal turn atomicity, rollback refusal semantics, and user-recognizable history steps are justified. `transactions()` is justified for refusal/neutrality only if the public API can be narrowed to that earned promise; documentation cannot rescue an over-broad carrier. `trackHistory()` is mechanically retained after form deletion and defaults to removal.
 
 ### Batching
 
@@ -182,7 +189,7 @@ How it works: `devTools()` projects tree changes into Redux DevTools; audit trac
 
 Optimization/adaptation: most are tree-shakeable and/or subpath-isolated. `security` and `storage` avoid main-bundle external coupling. `lazy` isolates memory-manager/proxy machinery in a subpath.
 
-Justification: mixed. `devTools`, audit, security, and storage are reasonably scoped adapters. `lazy` and `edit-session` are still unplaced/null-not-run in the map and need explicit keep/delete decisions.
+Justification: mixed. `devTools`, audit, security, and storage are reasonably scoped adapters. `lazy` and `edit-session` are still unplaced/null-not-run in the map and should be omitted unless their independent derivations are completed.
 
 ### `@signaltree/events`
 
@@ -198,7 +205,7 @@ How it works: `createFormTree()` builds a SignalTree-backed Angular `FormGroup`;
 
 Optimization/adaptation: removed dependency on `core/authoring`; explicit root barrel; no marker bridge/signals subpaths in the published manifest.
 
-Justification: unresolved at function level. The package may survive as Angular adapter, but `createFormTree`, wizard, and history are recorded as mechanically retained / unproven. Needs explicit acceptance or narrowing before RC.
+Justification: unresolved at function level. The package may survive as Angular adapter, but `createFormTree`, wizard, and history are recorded as mechanically retained / unproven. They default to absence unless a later authority grants them.
 
 ## Performance Baseline Summary
 
