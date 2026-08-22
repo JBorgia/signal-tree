@@ -120,18 +120,17 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
 - **Structured or nested state** — settings, user profiles, workspaces, dashboards, multi-step
   wizards, anything with domains inside domains. `tree.$.workspace.editor.draft.dirty()` reads and
   writes at any depth, with full recursive typing.
-- **Server-backed collections** — `entityMap({ load: loader(fn) })` gives you normalized O(1) CRUD
-  plus caching, `staleTime` freshness, single-flight dedup, tag invalidation, and optional
-  offline-first persistence from one config key.
+- **Collections** — `entityMap()` gives you normalized membership and O(1)
+  keyed reads. Keep server loading, freshness, and invalidation in application
+  services until a v15 async/cache helper is derived.
 - **Forms** — `@signaltree/ng-forms` provides `createFormTree()` for Angular
   `FormGroup` interop backed by SignalTree state.
 - **Optimistic UI** — snapshot with `byId()`, write eagerly, restore on failure; `entityMap`'s
   batch ops keep a burst to one notification. `updateAndReport()` tells you which **paths** changed
   (for partial server-payload sync, audit trails, targeted persistence). See the
   [Ops recipe](docs/guides/composition-recipes.md#2-a-reusable-entity-crud-ops-base).
-- **Async data** — `asyncSource()` / `asyncQuery()` for load-and-expose and debounced
-  input-driven queries; keep local loading flags as ordinary state, or let
-  `entityMap({ load: loader(...) })` own collection loading.
+- **Async data** — keep local loading flags as ordinary state and put
+  orchestration in application services or framework primitives.
 - **Undo/redo, persistence, DevTools** — `timeTravel()`, `stored()` with migrations, `history()` /
   `trackHistory()`, Redux DevTools integration. All included, none hand-wired.
 - **State that will grow.** Starting simple is fine — the shape _is_ the API, so adding a domain or
@@ -263,18 +262,20 @@ store.$.users.setAll(data); // entities written directly — loadingState is a s
 store.$.loadingState.set('loaded');
 ```
 
-Wrapping a load function with the `loader()` helper and passing it as `entityMap()`'s `load` (plus optional `staleTime`/`equal`/`swr`/`tags`/`persist` in `loader()`'s second argument) turns the collection into a cache-aware (single-scope), self-loading one — a loader, load status, a `staleTime` freshness guard, single-flight dedup, tag-based invalidation, and optional offline-first persistence, all on the same marker. `loader()` is what keeps this machinery tree-shakeable — a plain `entityMap()` doesn't pay for it. The collection retains only the current scope — switching scope A → B → A refetches A rather than serving from a multi-key cache. There is no separate `entityCollection` marker — the short-lived v11.2/11.3 marker of that name was folded into `entityMap` in v11.4.0. See [`docs/guides/entity-collection-cookbook.md`](docs/guides/entity-collection-cookbook.md) for the full walkthrough.
+The old cache-aware `entityMap({ load: loader(...) })` surface is not part of
+the current RC public API. Use plain `entityMap()` for normalized local
+membership and write resolved rows from app-owned services.
 
 ## Composition model
 
 A SignalTree store is composed from four distinct, type-safe mechanisms — each handles one concern, rather than funneling everything through a single primitive:
 
-| Concern           | Mechanism                                                                                                        | Example                                           |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| **State shape**   | the constructor object — state _is_ the JSON, including markers (`entityMap`, `status`, `stored`, `asyncSource`) | `signalTree({ users: entityMap<User>() })`        |
-| **Derived state** | `.derived()` / `derivedFrom()` — computed signals deep-merged at any path                                        | `.derived($ => ({ activeCount: computed(...) }))` |
-| **Capabilities**  | `.with()` enhancers — opt-in, tree-shakeable, and reusable (author your own custom enhancers)                    | `.with(batching()).with(devTools())`              |
-| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes        | `ops.users.select(id)`                            |
+| Concern           | Mechanism                                                                                                  | Example                                           |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap` | `signalTree({ users: entityMap<User>() })`        |
+| **Derived state** | `.derived()` / `derivedFrom()` — computed signals deep-merged at any path                                  | `.derived($ => ({ activeCount: computed(...) }))` |
+| **Capabilities**  | `.with()` enhancers — opt-in, tree-shakeable, and reusable (author your own custom enhancers)              | `.with(batching()).with(devTools())`              |
+| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes  | `ops.users.select(id)`                            |
 
 This deliberately splits across four purpose-built tools what NgRx SignalStore unifies under one `with*` composition primitive (`withState` / `withComputed` / `withMethods` / `signalStoreFeature`). The closest analog to NgRx's reusable-feature primitive (`signalStoreFeature` / `withFeature`) is `.with()` enhancers; state, derived state, and actions live in the other three mechanisms. For an honest, axis-by-axis comparison — including where NgRx wins — see [docs/compare/ngrx-signalstore.md](docs/compare/ngrx-signalstore.md).
 

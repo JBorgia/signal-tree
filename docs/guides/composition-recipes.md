@@ -93,13 +93,13 @@ REST endpoint, with optimistic writes and rollback.
 
 Most of this already ships. Before writing any of it, note what you get for free:
 
-| Concern                                             | Already provided by                                      |
-| --------------------------------------------------- | -------------------------------------------------------- |
-| Normalized collection, O(1) `byId`                  | `entityMap()`                                            |
-| Fetch + caching + `staleTime` + single-flight + SWR | `entityMap({ load: loader(fn) })`                        |
-| Load status                                         | the loader surface: `loading()` / `loaded()` / `error()` |
-| Save/submit lifecycle                               | `status<Err>()` + its predicates                         |
-| Batch writes in one notification                    | `upsertMany` / `updateMany` / `removeMany`               |
+| Concern                            | Already provided by                          |
+| ---------------------------------- | -------------------------------------------- |
+| Normalized collection, O(1) `byId` | `entityMap()`                                |
+| Fetch + caching + freshness        | app-owned service / framework data primitive |
+| Load status                        | ordinary state in the slice                  |
+| Save/submit lifecycle              | `status<Err>()` + its predicates             |
+| Batch writes in one notification   | `upsertMany` / `updateMany` / `removeMany`   |
 
 What is **not** provided is the opinionated glue: your REST verb/URL conventions,
 your error model, and the optimistic-rollback policy. That glue is what the
@@ -108,17 +108,12 @@ recipe is.
 ### State: one slice factory per domain
 
 ```typescript
-import { entityMap, loader } from '@signaltree/core';
+import { entityMap } from '@signaltree/core';
 
 export function entityCrudState<T extends { id: string }>(api: ApiService, config: { name: string; endpoint: string; staleTime?: string }) {
   return {
     entities: entityMap<T, string>({
       selectId: (e) => e.id,
-      load: loader(() => api.get$<T[]>(config.endpoint), {
-        staleTime: config.staleTime ?? '5m',
-        swr: true, // serve cached rows while revalidating
-        lazy: true,
-      }),
     }),
     loadStatus: 'not-loaded' as 'not-loaded' | 'loading' | 'loaded' | 'error',
     save: status<AppError>(),
@@ -127,9 +122,8 @@ export function entityCrudState<T extends { id: string }>(api: ApiService, confi
 }
 ```
 
-Note `load:` takes `loader(fn)`, not a raw function — a raw function is rejected
-with `[ST2004]`. That branded-helper rule is what keeps the loader machinery
-tree-shakeable for collections that don't load.
+The old `loader()` helper is not part of the current RC public API. Keep request
+coalescing, freshness, and retry policy in the Ops/service layer.
 
 ### Ops: an abstract base over a tree slice
 

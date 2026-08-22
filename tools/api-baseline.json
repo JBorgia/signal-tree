@@ -279,33 +279,6 @@
         "internalDecl": false
       },
       {
-        "name": "EntityLoader",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/entity-loader.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EntityLoaderSurface",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/entity-loader.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EntityLoadOptions",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/entity-loader.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "entityMap",
         "subpath": ".",
         "kind": "runtime",
@@ -351,15 +324,6 @@
         "internalDecl": false
       },
       {
-        "name": "EntityPersist",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/entity-loader.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "EntitySignal",
         "subpath": ".",
         "kind": "type-only",
@@ -378,15 +342,6 @@
         "internalDecl": false
       },
       {
-        "name": "EntityStorageAdapter",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/entity-loader.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "flushAllStoredSignals",
         "subpath": ".",
         "kind": "runtime",
@@ -400,15 +355,6 @@
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "invalidateTag",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/entity-loader.ts",
         "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false
@@ -436,60 +382,6 @@
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/linked.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "loader",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/loader.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "LoaderFeature",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "LoaderOptions",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/loader.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "LoadingEntityMapBuilder",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/entity-map.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "LoadingEntityMapMarker",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "LoadingEntitySignal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/types.ts",
         "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false
@@ -567,15 +459,6 @@
         "internalDecl": false
       },
       {
-        "name": "ReadonlyEntityLoaderSurface",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/readonly.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "ReadonlyEntityNode",
         "subpath": ".",
         "kind": "type-only",
@@ -586,15 +469,6 @@
       },
       {
         "name": "ReadonlyEntitySignal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/readonly.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ReadonlyLoadingEntitySignal",
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/readonly.ts",
