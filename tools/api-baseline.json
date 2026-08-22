@@ -3,8 +3,6 @@
     "entrypoints": [
       ".",
       "./security",
-      "./lazy",
-      "./edit-session",
       "./storage"
     ],
     "symbols": [
@@ -556,87 +554,6 @@
         "angularInDecl": true,
         "angularInType": false,
         "internalDecl": true
-      },
-      {
-        "name": "createEditSession",
-        "subpath": "./edit-session",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/edit-session.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createTreeEditSession",
-        "subpath": "./edit-session",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/edit-session.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EditSession",
-        "subpath": "./edit-session",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/edit-session.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "TreeEditSession",
-        "subpath": "./edit-session",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/edit-session.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "TreeEditSource",
-        "subpath": "./edit-session",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/edit-session.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "UndoRedoHistory",
-        "subpath": "./edit-session",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/edit-session.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "lazy",
-        "subpath": "./lazy",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lazy.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "LazyFeature",
-        "subpath": "./lazy",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SignalMemoryManager",
-        "subpath": "./lazy",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/memory/memory-manager.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
       },
       {
         "name": "security",
