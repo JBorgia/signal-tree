@@ -93,7 +93,7 @@ for (const [label, imports, body] of MARKERS) {
 for (const [label, imports, apply, use] of ENHANCERS) {
   const code = `
     import { signalTree, ${imports} } from ${C};
-    const t = signalTree({ count: 0 }).with(${apply});
+    const t = signalTree({ count: 0 }, { enhancers: [${apply}] });
     t.$.count.set(1); ${use}
     globalThis.__sink = [t.$.count()];`;
   const k = await kb(code, 'enh_' + label);
@@ -116,7 +116,7 @@ const COMBOS = [
     const t = signalTree({
       rows: entityMap({ selectId: (r) => r.id }),
       count: 0,
-    }).with(batching());
+    }, { enhancers: [batching()] });
     t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.count.set(1); });
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
   ['current public surface mix', `
@@ -125,7 +125,7 @@ const COMBOS = [
     const t = signalTree({
       rows: entityMap({ selectId: (r) => r.id }),
       count: 0,
-    }).with(batching()).with(timeTravel());
+    }, { enhancers: [batching(), timeTravel()] });
     t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.count.set(1); }); t.undo();
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
 ];
@@ -180,12 +180,23 @@ if (process.argv.includes('--json')) {
     out.enhancers
       .filter((r) => ['batching', 'timeTravel', 'serialization'].includes(r.feature))
       .reduce((a, r) => a + r.deltaKB, 0);
-  const everything = out.combos.find((c) => c.feature === 'everything');
-  console.log(
-    `\n  If every feature's cost were additive, "everything" would be ` +
-      `+${additive.toFixed(2)} KB.\n  Measured: +${everything.deltaKB.toFixed(2)} KB — about ` +
-      `${(additive - everything.deltaKB).toFixed(2)} KB of shared machinery.\n` +
-      `  A combo much LARGER than additive would mean something is NOT being shared.`
+  // PRE-EXISTING: this looked up a combo named 'everything' that COMBOS has not
+  // contained for some time, so the reporter crashed on its own last line with
+  // `Cannot read properties of undefined`. Found while re-running the
+  // benchmarks for the 15.0 declarative-construction migration; unrelated to it.
+  // Compare against the widest combo that actually exists rather than inventing
+  // one, and say which combo the sharing figure is about.
+  const widest = out.combos.reduce(
+    (a, c) => (a && a.deltaKB >= c.deltaKB ? a : c),
+    undefined
   );
+  if (widest) {
+    console.log(
+      `\n  If every feature's cost were additive, "${widest.feature}" would be ` +
+        `+${additive.toFixed(2)} KB.\n  Measured: +${widest.deltaKB.toFixed(2)} KB — about ` +
+        `${(additive - widest.deltaKB).toFixed(2)} KB of shared machinery.\n` +
+        `  A combo much LARGER than additive would mean something is NOT being shared.`
+    );
+  }
   console.log('\n  Analysis: docs/architecture/size-structure-review.md');
 }

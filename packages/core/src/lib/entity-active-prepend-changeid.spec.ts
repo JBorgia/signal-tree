@@ -20,8 +20,17 @@ import { signalTree } from './signal-tree';
  */
 type Row = { id: number; v: number };
 
-const mk = (rows: Row[] = [{ id: 1, v: 1 }, { id: 2, v: 2 }, { id: 3, v: 3 }]) => {
-  const tree = signalTree({ r: entityMap<Row, number>({ selectId: (x) => x.id }) });
+const mk = (
+  rows: Row[] = [
+    { id: 1, v: 1 },
+    { id: 2, v: 2 },
+    { id: 3, v: 3 },
+  ]
+) => {
+  const tree = signalTree(
+    { r: entityMap<Row, number>({ selectId: (x) => x.id }) },
+    { capabilities: ['causal-runtime'] }
+  );
   tree.$.r.setAll(rows);
   return tree;
 };
@@ -36,7 +45,10 @@ describe('prepend', () => {
 
   it('prependMany keeps the order it was given', () => {
     const t = mk();
-    t.$.r.prependMany([{ id: -1, v: -1 }, { id: 0, v: 0 }]);
+    t.$.r.prependMany([
+      { id: -1, v: -1 },
+      { id: 0, v: 0 },
+    ]);
     expect(ids(t)).toBe('-1,0,1,2,3');
   });
 
@@ -253,7 +265,9 @@ describe('changeId', () => {
       t.$.r.changeId(tempId, 42);
       t.$.r.addOne({ id: tempId, v: 555 });
 
-      const key = Number(naivePositionId.slice(naivePositionId.indexOf('.') + 1));
+      const key = Number(
+        naivePositionId.slice(naivePositionId.indexOf('.') + 1)
+      );
 
       // The string still names a CURRENT row, just not the ORIGINAL row.
       expect(t.$.r.byId(key)?.().v).toBe(555);

@@ -96,30 +96,33 @@ describe('interceptLeafSignals — UpdateMetadata passthrough (PR1)', () => {
 
   it('reports owner paths for built-in markers at their owning positions', () => {
     const storage = new Map<string, string>();
-    const tree = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-      theme: stored('intercept-owner-theme', 'light', {
-        storage: {
-          getItem: (key: string) => storage.get(key) ?? null,
-          setItem: (key: string, value: string) => {
-            storage.set(key, value);
+    const tree = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+        theme: stored('intercept-owner-theme', 'light', {
+          storage: {
+            getItem: (key: string) => storage.get(key) ?? null,
+            setItem: (key: string, value: string) => {
+              storage.set(key, value);
+            },
+            removeItem: (key: string) => {
+              storage.delete(key);
+            },
+            clear: () => {
+              storage.clear();
+            },
+            key: (index: number) => Array.from(storage.keys())[index] ?? null,
+            get length() {
+              return storage.size;
+            },
           },
-          removeItem: (key: string) => {
-            storage.delete(key);
-          },
-          clear: () => {
-            storage.clear();
-          },
-          key: (index: number) => Array.from(storage.keys())[index] ?? null,
-          get length() {
-            return storage.size;
-          },
-        },
-        debounceMs: 0,
-      }),
-    });
+          debounceMs: 0,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
     const { list, onWrite } = captureWrites();
     const restore = interceptLeafSignals(tree.$, onWrite);
 

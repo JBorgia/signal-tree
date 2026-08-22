@@ -1,7 +1,7 @@
 import { signalTree } from '../../lib/signal-tree';
 import { transactions } from './transactions';
 
-const transactional = signalTree({ n: 0 }).with(transactions());
+const transactional = signalTree({ n: 0 }, { enhancers: [transactions()] });
 
 export const _pending = transactional.transaction(() => {
   transactional.$.n.set(1);

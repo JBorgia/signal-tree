@@ -54,17 +54,21 @@ function recordingStorage(): Recorder {
 const settleTimers = () => new Promise((r) => setTimeout(r, 260));
 
 function makeTree(recorder: Recorder, key: string) {
-  return signalTree({ a: 'a0', b: 'b0' })
-    .with(transactions())
-    .with(
-      persistence({
-        key,
-        storage: recorder.adapter,
-        autoSave: true,
-        autoLoad: false,
-        debounceMs: 10,
-      })
-    ) as unknown as {
+  return signalTree(
+    { a: 'a0', b: 'b0' },
+    {
+      enhancers: [
+        transactions(),
+        persistence({
+          key,
+          storage: recorder.adapter,
+          autoSave: true,
+          autoLoad: false,
+          debounceMs: 10,
+        }),
+      ],
+    }
+  ) as unknown as {
     $: {
       a: { (): string; set(v: string): void };
       b: { (): string; set(v: string): void };
@@ -252,22 +256,26 @@ describe('persistence() autoSave survives a REFUSED ROLLBACK PLAN', () => {
     resetPathNotifier();
 
     const rec = recordingStorage();
-    const tree = signalTree({
-      note: 'n0',
-      rows: entityMap<{ id: string; name: string }, string>({
-        selectId: (r) => r.id,
-      }),
-    })
-      .with(transactions())
-      .with(
-        persistence({
-          key: 'pco-conflict',
-          storage: rec.adapter,
-          autoSave: true,
-          autoLoad: false,
-          debounceMs: 10,
-        })
-      ) as unknown as {
+    const tree = signalTree(
+      {
+        note: 'n0',
+        rows: entityMap<{ id: string; name: string }, string>({
+          selectId: (r) => r.id,
+        }),
+      },
+      {
+        enhancers: [
+          transactions(),
+          persistence({
+            key: 'pco-conflict',
+            storage: rec.adapter,
+            autoSave: true,
+            autoLoad: false,
+            debounceMs: 10,
+          }),
+        ],
+      }
+    ) as unknown as {
       $: {
         note: { (): string; set(v: string): void };
         rows: {
@@ -345,9 +353,12 @@ describe('a REFUSED compensation flushes surviving truth', () => {
     };
     map.set('pcr-refuse', JSON.stringify({ __v: 1, data: 'v0' }));
 
-    const tree = signalTree({
-      v: stored('pcr-refuse', 'v0', { storage: adapter, debounceMs: 0 }),
-    }).with(transactions()) as {
+    const tree = signalTree(
+      {
+        v: stored('pcr-refuse', 'v0', { storage: adapter, debounceMs: 0 }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { v: { (): string; set(x: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -381,9 +392,8 @@ describe('a REFUSED compensation flushes surviving truth', () => {
     // honour a reversal that did not happen.
     // Compare the PARSED payload, never a substring of the JSON: `toContain('a')`
     // matches the 'a' inside `"data"` and asserts nothing.
-    const durable = JSON.parse(
-      adapter.getItem('pcr-refuse') as string
-    ).data as string;
+    const durable = JSON.parse(adapter.getItem('pcr-refuse') as string)
+      .data as string;
     expect(durable).toBe('a');
   });
 });

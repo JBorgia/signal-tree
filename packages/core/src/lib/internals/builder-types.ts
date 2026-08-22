@@ -6,7 +6,7 @@
 import type { Signal } from '@angular/core';
 
 import type { ProcessDerived } from './derived-types';
-import type { Enhancer, ISignalTree, NodeAccessor, TreeNode } from '../types';
+import type { NodeAccessor, TreeNode } from '../types';
 
 // =============================================================================
 // SIGNAL TREE BUILDER
@@ -43,30 +43,11 @@ export interface SignalTreeBuilder<TSource, TAccum = TreeNode<TSource>> {
   readonly $: TAccum;
   readonly state: TAccum;
 
-  /**
-   * Enhancer chaining. Returns `this & TAdded` so each enhancer's surface
-   * ACCUMULATES across the chain.
-   *
-   * This used to return `SignalTreeBuilder<TSource, TAccum> & TAdded`, which
-   * discarded everything added before it — so
-   *
-   *     signalTree({}).with(timeTravel()).with(serialization()).with(batching())
-   *
-   * typed as `SignalTreeBuilder<…> & BatchingMethods` and lost `canUndo` and
-   * `serialize` entirely. Every method existed at RUNTIME; only the type forgot
-   * them, so the workaround was a cast, and the demo's time-travel page carries
-   * exactly that cast.
-   *
-   * `batching.types.ts` has asserted "`.with()` preserves accumulated types via
-   * the `this & TAdded` pattern" the whole time. The comment described the
-   * intent; the signature did not implement it. Fixed in 14.0.0 — polymorphic
-   * `this` is what makes the intersection survive the next link.
-   */
-  with<TAdded>(enhancer: Enhancer<TAdded>): this & TAdded;
-  /** Realization-facing overload — see ISignalTree.with. */
-  with<TAdded>(
-    enhancer: (tree: ISignalTree<TSource>) => ISignalTree<TSource> & TAdded
-  ): this & TAdded;
+  // `with()` is GONE in v15. Enhancers are declared in `signalTree`'s config
+  // and the accumulated surface arrives through the return type instead — see
+  // `AccumulatedEnhancerAdditions`. It is not deprecated-but-present: late
+  // enhancement was what made the build plan unknowable, so there is no runtime
+  // method to describe here.
 
   // From ISignalTree
   /**
@@ -130,19 +111,4 @@ export interface SignalTreeBuilder<TSource, TAccum = TreeNode<TSource>> {
   derived<TDerived extends object>(
     factory: ($: TAccum) => TDerived
   ): SignalTreeBuilder<TSource, TAccum & ProcessDerived<TDerived>>;
-}
-
-export interface SignalTreePlanBuilder<
-  TSource extends object,
-  TAdded extends object = object,
-> {
-  with<TNextAdded>(
-    enhancer: Enhancer<TNextAdded>
-  ): SignalTreePlanBuilder<TSource, TAdded & TNextAdded>;
-  /** Realization-facing overload — see ISignalTree.with. */
-  with<TNextAdded>(
-    enhancer: (tree: ISignalTree<TSource>) => ISignalTree<TSource> & TNextAdded
-  ): SignalTreePlanBuilder<TSource, TAdded & TNextAdded>;
-
-  build(): ISignalTree<TSource> & TAdded;
 }

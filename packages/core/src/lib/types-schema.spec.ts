@@ -62,7 +62,9 @@ describe('Schema-level type tests', () => {
     expectTypeOf<Tree>().toHaveProperty('destroy');
     expectTypeOf<Tree>().toHaveProperty('destroyed');
     expectTypeOf<Tree>().toHaveProperty('registerCleanup');
-    expectTypeOf<Tree>().toHaveProperty('with');
+    // `with` was here until 15.0. Enhancers are declared in signalTree()'s
+    // config now, so a tree has no method that applies one — see the tombstone
+    // on `ISignalTree` in types.ts.
     expectTypeOf<Tree>().toHaveProperty('subscribe');
   });
 

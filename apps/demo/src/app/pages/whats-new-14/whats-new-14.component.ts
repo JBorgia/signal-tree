@@ -54,26 +54,31 @@ const nextId = () => `r${++seq}`;
 })
 export class WhatsNew14Component {
   // ── Collections: prepend, active entity, id migration ────────────────────
-  readonly tree = signalTree({
-    rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-    note: 'edit me',
-    // Sealing counter. A collection mutation does NOT create a history entry —
-    // only a tree/branch write does — so a bulk import needs a root write after
-    // it to record one entry holding the finished result.
-    imports: 0,
-  }).with(
-    timeTravel({
-      maxHistorySize: 50,
-      // A cursor move is not an undo step. The comparator runs on EVERY
-      // recorded write, so it compares the one field it means — walking the
-      // whole state here would reintroduce the O(state) cost per write that
-      // reference-dedup exists to remove.
-      shouldSkip: (prev, next) =>
-        (prev as { note?: string })?.note ===
-          (next as { note?: string })?.note &&
-        (prev as { rows?: { all?: unknown[] } })?.rows?.all?.length ===
-          (next as { rows?: { all?: unknown[] } })?.rows?.all?.length,
-    })
+  readonly tree = signalTree(
+    {
+      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+      note: 'edit me',
+      // Sealing counter. A collection mutation does NOT create a history entry —
+      // only a tree/branch write does — so a bulk import needs a root write after
+      // it to record one entry holding the finished result.
+      imports: 0,
+    },
+    {
+      enhancers: [
+        timeTravel({
+          maxHistorySize: 50,
+          // A cursor move is not an undo step. The comparator runs on EVERY
+          // recorded write, so it compares the one field it means — walking the
+          // whole state here would reintroduce the O(state) cost per write that
+          // reference-dedup exists to remove.
+          shouldSkip: (prev, next) =>
+            (prev as { note?: string })?.note ===
+              (next as { note?: string })?.note &&
+            (prev as { rows?: { all?: unknown[] } })?.rows?.all?.length ===
+              (next as { rows?: { all?: unknown[] } })?.rows?.all?.length,
+        }),
+      ],
+    }
   );
 
   constructor() {

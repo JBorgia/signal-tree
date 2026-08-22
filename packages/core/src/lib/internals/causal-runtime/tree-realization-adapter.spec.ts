@@ -10,7 +10,11 @@ import { signalTree } from '../../signal-tree';
 import type { ISignalTree, UpdateMetadata } from '../../types';
 import { timeTravel } from '../../../enhancers/time-travel/time-travel';
 import { transactions } from '../../../enhancers/transactions/transactions';
-import { getOwnedPositionIds, getOwnedSubjectIds, getOwnedOwnerPath } from '../owned-mutation';
+import {
+  getOwnedPositionIds,
+  getOwnedSubjectIds,
+  getOwnedOwnerPath,
+} from '../owned-mutation';
 import {
   clearProductionSubstrateStatsForTesting,
   installProductionSubstrateStatsForTesting,
@@ -81,7 +85,10 @@ describe('tree realization adapter', () => {
   });
 
   it('applies scalar leaf effects without transaction recapture', () => {
-    const tree = signalTree({ profile: { name: 'Alice' } }) as ISignalTree<{
+    const tree = signalTree(
+      { profile: { name: 'Alice' } },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       profile: {
         name: {
           (): string;
@@ -108,9 +115,7 @@ describe('tree realization adapter', () => {
     const captureSpy = createCaptureSpy();
 
     expect(
-      adapter.validateEffects([
-        { owner, before: 'Alice', after: 'Alicia' },
-      ])
+      adapter.validateEffects([{ owner, before: 'Alice', after: 'Alicia' }])
     ).toBeUndefined();
 
     adapter.applyAtomically([{ owner, before: 'Alice', after: 'Alicia' }]);
@@ -124,12 +129,15 @@ describe('tree realization adapter', () => {
 
   it('applies stored effects, persists restored state, and avoids transaction recapture', async () => {
     const storage = createMockStorage();
-    const tree = signalTree({
-      preference: stored('realization-preference', 'compact', {
-        storage,
-        debounceMs: 0,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        preference: stored('realization-preference', 'compact', {
+          storage,
+          debounceMs: 0,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       preference: {
         (): string;
         set(value: string): void;
@@ -158,7 +166,9 @@ describe('tree realization adapter', () => {
     await new Promise((resolve) => queueMicrotask(resolve));
 
     expect(tree.$.preference()).toBe('spacious');
-    expect(JSON.parse(storage.getItem('realization-preference') ?? 'null')).toEqual({
+    expect(
+      JSON.parse(storage.getItem('realization-preference') ?? 'null')
+    ).toEqual({
       __v: 1,
       data: 'spacious',
     });
@@ -168,11 +178,17 @@ describe('tree realization adapter', () => {
   });
 
   it('preserves subject identity and owned positions across structural rekey', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string; enabled: boolean }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<
+          { id: string; name: string; enabled: boolean },
+          string
+        >({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string; enabled: boolean }): void;
         changeId(from: string, to: string): void;
@@ -190,7 +206,11 @@ describe('tree realization adapter', () => {
     const beforeNameLeaf = tree.$.users.byIdOrFail('u2').name;
     const beforeSubjectId = beforeNameLeaf.__subjectIds?.[0];
     const beforePositions = getOwnedPositionIds(beforeNameLeaf);
-    if (owner === undefined || beforeSubjectId === undefined || !beforePositions) {
+    if (
+      owner === undefined ||
+      beforeSubjectId === undefined ||
+      !beforePositions
+    ) {
       throw new Error('Expected entity ownership metadata');
     }
 
@@ -237,11 +257,17 @@ describe('tree realization adapter', () => {
   });
 
   it('characterizes entity field PositionIds as shared collection coverage, not exact field identity', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string; enabled: boolean }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<
+          { id: string; name: string; enabled: boolean },
+          string
+        >({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string; enabled: boolean }): void;
         byIdOrFail(id: string): {
@@ -270,11 +296,14 @@ describe('tree realization adapter', () => {
 
   it('validates a subject descriptor added after adapter creation with zero tree visits', () => {
     const stats = installProductionSubstrateStatsForTesting();
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         byIdOrFail(id: string): {
@@ -322,11 +351,14 @@ describe('tree realization adapter', () => {
 
   it('resolves the same semantic subject target after a rekey performed after adapter creation with zero tree visits', () => {
     const stats = installProductionSubstrateStatsForTesting();
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         changeId(from: string, to: string): void;
@@ -378,11 +410,14 @@ describe('tree realization adapter', () => {
 
   it('resolves a restored semantic subject target after adapter creation with zero tree visits', () => {
     const stats = installProductionSubstrateStatsForTesting();
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
@@ -480,11 +515,14 @@ describe('tree realization adapter', () => {
   });
 
   it('refuses same-key structural work when that key is now occupied by a different subject', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
@@ -534,11 +572,14 @@ describe('tree realization adapter', () => {
   });
 
   it('resolves scalar realization by stable PositionId after a physical rekey', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         changeId(from: string, to: string): void;
@@ -554,7 +595,9 @@ describe('tree realization adapter', () => {
     tree.$.users.addOne({ id: 'u1', name: 'Alice' });
     getPathNotifier().flushSync();
 
-    const nameOwner = getOwnedPositionIds(tree.$.users.byIdOrFail('u1').name)?.[0];
+    const nameOwner = getOwnedPositionIds(
+      tree.$.users.byIdOrFail('u1').name
+    )?.[0];
     const subjectId = tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0];
     if (nameOwner === undefined || subjectId === undefined) {
       throw new Error('Expected stable leaf owner');
@@ -598,11 +641,14 @@ describe('tree realization adapter', () => {
 
     try {
       TestBed.runInInjectionContext(() => {
-        const tree = signalTree({
-          users: entityMap<{ id: string; name: string }, string>({
-            selectId: (user) => user.id,
-          }),
-        }) as ISignalTree<{
+        const tree = signalTree(
+          {
+            users: entityMap<{ id: string; name: string }, string>({
+              selectId: (user) => user.id,
+            }),
+          },
+          { capabilities: ['causal-runtime'] }
+        ) as ISignalTree<{
           users: {
             addOne(user: { id: string; name: string }): void;
             changeId(from: string, to: string): void;
@@ -683,11 +729,17 @@ describe('tree realization adapter', () => {
   });
 
   it('realizes structural remove and add from owner-level producer metadata', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string; enabled: boolean }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<
+          { id: string; name: string; enabled: boolean },
+          string
+        >({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string; enabled: boolean }): void;
         byIdOrFail(id: string): {
@@ -705,7 +757,11 @@ describe('tree realization adapter', () => {
     const beforeNameLeaf = tree.$.users.byIdOrFail('u1').name;
     const beforeSubjectId = beforeNameLeaf.__subjectIds?.[0];
     const beforePositions = getOwnedPositionIds(beforeNameLeaf);
-    if (owner === undefined || beforeSubjectId === undefined || !beforePositions) {
+    if (
+      owner === undefined ||
+      beforeSubjectId === undefined ||
+      !beforePositions
+    ) {
       throw new Error('Expected structural ownership metadata');
     }
 
@@ -775,11 +831,14 @@ describe('tree realization adapter', () => {
   });
 
   it('prepares and realizes a retained-subject structural restore from removal metadata alone', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
@@ -845,7 +904,9 @@ describe('tree realization adapter', () => {
 
     expect(tree.$.users.ids()).toEqual(['u1']);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Ada');
-    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(subjectId);
+    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
+      subjectId
+    );
   });
 
   it('realizes a same-turn restore plus separate subject scalar under one shared physical revision', () => {
@@ -855,18 +916,23 @@ describe('tree realization adapter', () => {
 
     try {
       TestBed.runInInjectionContext(() => {
-        const tree = signalTree({
-          users: entityMap<{ id: string; name: string }, string>({
-            selectId: (user) => user.id,
-          }),
-        }).with(timeTravel()) as ISignalTree<{
+        const tree = signalTree(
+          {
+            users: entityMap<{ id: string; name: string }, string>({
+              selectId: (user) => user.id,
+            }),
+          },
+          { enhancers: [timeTravel()] }
+        ) as ISignalTree<{
           users: {
             addOne(user: { id: string; name: string }): void;
             removeOne(id: string): void;
             ids(): string[];
-            byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-              name: ((() => string | undefined) & { __subjectIds?: number[] });
-            });
+            byIdOrFail(id: string): (() =>
+              | { id: string; name: string }
+              | undefined) & {
+              name: (() => string | undefined) & { __subjectIds?: number[] };
+            };
           };
         }>;
 
@@ -885,7 +951,9 @@ describe('tree realization adapter', () => {
           nameOwner === undefined ||
           subjectId === undefined
         ) {
-          throw new Error('Expected retained subject structural + scalar metadata');
+          throw new Error(
+            'Expected retained subject structural + scalar metadata'
+          );
         }
 
         const descriptors = new Map<number, TreeRealizationDescriptor>();
@@ -941,11 +1009,15 @@ describe('tree realization adapter', () => {
           subjectId,
         };
 
-        expect(adapter.validateEffects([addEffect, scalarEffect])).toBeUndefined();
+        expect(
+          adapter.validateEffects([addEffect, scalarEffect])
+        ).toBeUndefined();
 
         const seen: string[] = [];
         effect(() => {
-          seen.push(`${tree.$.users.ids()[0] ?? '<none>'}|${heldName() ?? '<none>'}`);
+          seen.push(
+            `${tree.$.users.ids()[0] ?? '<none>'}|${heldName() ?? '<none>'}`
+          );
         });
         TestBed.flushEffects();
 
@@ -968,18 +1040,23 @@ describe('tree realization adapter', () => {
   });
 
   it('keeps restore planning side-effect free when later scalar frame preparation fails', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -1036,9 +1113,12 @@ describe('tree realization adapter', () => {
       getPhysicalCommitClock(tree) ?? getPhysicalCommitClock(tree.$);
     const beforeRevision = physicalCommitClock?.revision();
     const notifications: string[] = [];
-    const unsubscribe = getPathNotifier().subscribe('**', (_value, _prev, path) => {
-      notifications.push(path);
-    });
+    const unsubscribe = getPathNotifier().subscribe(
+      '**',
+      (_value, _prev, path) => {
+        notifications.push(path);
+      }
+    );
 
     const addEffect = {
       owner: structuralOwner,
@@ -1069,10 +1149,13 @@ describe('tree realization adapter', () => {
       };
     };
     if (!collectionInternal.__planRestore) {
-      throw new Error('Expected deferred restore planner for restore planning test');
+      throw new Error(
+        'Expected deferred restore planner for restore planning test'
+      );
     }
 
-    const originalPlanRestore = collectionInternal.__planRestore.bind(collectionInternal);
+    const originalPlanRestore =
+      collectionInternal.__planRestore.bind(collectionInternal);
     const planRestoreSpy = vi
       .spyOn(collectionInternal, '__planRestore')
       .mockImplementation(() => {
@@ -1105,18 +1188,23 @@ describe('tree realization adapter', () => {
   });
 
   it('realizes same-turn restore then rekey against prepared subject state', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -1196,7 +1284,9 @@ describe('tree realization adapter', () => {
       ownerPath: 'users.u1',
     };
 
-    expect(adapter.validateEffects([restoreEffect, rekeyEffect])).toBeUndefined();
+    expect(
+      adapter.validateEffects([restoreEffect, rekeyEffect])
+    ).toBeUndefined();
     expect(
       adapter.validateEffects([restoreEffect, rekeyEffect, scalarEffect])
     ).toBeUndefined();
@@ -1215,18 +1305,23 @@ describe('tree realization adapter', () => {
   });
 
   it('keeps restore-rekey planning side-effect free when a later stale subject scalar fails', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -1283,9 +1378,12 @@ describe('tree realization adapter', () => {
       getPhysicalCommitClock(tree) ?? getPhysicalCommitClock(tree.$);
     const beforeRevision = physicalCommitClock?.revision();
     const notifications: string[] = [];
-    const unsubscribe = getPathNotifier().subscribe('**', (_value, _prev, path) => {
-      notifications.push(path);
-    });
+    const unsubscribe = getPathNotifier().subscribe(
+      '**',
+      (_value, _prev, path) => {
+        notifications.push(path);
+      }
+    );
 
     const restoreEffect = {
       owner: structuralOwner,
@@ -1310,7 +1408,9 @@ describe('tree realization adapter', () => {
       ownerPath: 'users.u1',
     };
 
-    expect(adapter.validateEffects([restoreEffect, rekeyEffect])).toBeUndefined();
+    expect(
+      adapter.validateEffects([restoreEffect, rekeyEffect])
+    ).toBeUndefined();
     expect(
       adapter.validateEffects([restoreEffect, rekeyEffect, invalidScalarEffect])
     ).toEqual({ kind: 'structural-drift' });
@@ -1327,18 +1427,23 @@ describe('tree realization adapter', () => {
   });
 
   it('refuses prepared restore-rekey when the destination key remains occupied', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -1407,18 +1512,23 @@ describe('tree realization adapter', () => {
   });
 
   it('realizes remove-restore-rekey when prepared vacancy overrides live occupancy', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -1503,7 +1613,9 @@ describe('tree realization adapter', () => {
     expect(adapter.validateEffects([restore42, rekey42ToB])).toEqual({
       kind: 'structural-drift',
     });
-    expect(adapter.validateEffects([remove99, restore42, rekey42ToB])).toBeUndefined();
+    expect(
+      adapter.validateEffects([remove99, restore42, rekey42ToB])
+    ).toBeUndefined();
 
     adapter.applyAtomically([remove99, restore42, rekey42ToB]);
 
@@ -1522,18 +1634,23 @@ describe('tree realization adapter', () => {
   });
 
   it('keeps prepared vacancy side-effect free when a later scalar effect refuses', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -1599,9 +1716,12 @@ describe('tree realization adapter', () => {
       getPhysicalCommitClock(tree) ?? getPhysicalCommitClock(tree.$);
     const beforeRevision = physicalCommitClock?.revision();
     const notifications: string[] = [];
-    const unsubscribe = getPathNotifier().subscribe('**', (_value, _prev, path) => {
-      notifications.push(path);
-    });
+    const unsubscribe = getPathNotifier().subscribe(
+      '**',
+      (_value, _prev, path) => {
+        notifications.push(path);
+      }
+    );
 
     const remove99 = {
       owner: structuralOwner,
@@ -1634,7 +1754,12 @@ describe('tree realization adapter', () => {
     };
 
     expect(
-      adapter.validateEffects([remove99, restore42, rekey42ToB, invalidScalarEffect])
+      adapter.validateEffects([
+        remove99,
+        restore42,
+        rekey42ToB,
+        invalidScalarEffect,
+      ])
     ).toEqual({ kind: 'structural-drift' });
 
     getPathNotifier().flushSync();
@@ -1651,18 +1776,23 @@ describe('tree realization adapter', () => {
   });
 
   it('keeps competing prepared restores side-effect free when earlier prepared occupancy blocks a later rekey', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -1740,9 +1870,12 @@ describe('tree realization adapter', () => {
       getPhysicalCommitClock(tree) ?? getPhysicalCommitClock(tree.$);
     const beforeRevision = physicalCommitClock?.revision();
     const notifications: string[] = [];
-    const unsubscribe = getPathNotifier().subscribe('**', (_value, _prev, path) => {
-      notifications.push(path);
-    });
+    const unsubscribe = getPathNotifier().subscribe(
+      '**',
+      (_value, _prev, path) => {
+        notifications.push(path);
+      }
+    );
 
     const restore99AtB = {
       owner: structuralOwner,
@@ -1767,7 +1900,9 @@ describe('tree realization adapter', () => {
     };
 
     expect(adapter.validateEffects([restore42AtA, rekey42ToB])).toBeUndefined();
-    expect(adapter.validateEffects([restore99AtB, restore42AtA])).toBeUndefined();
+    expect(
+      adapter.validateEffects([restore99AtB, restore42AtA])
+    ).toBeUndefined();
     expect(
       adapter.validateEffects([restore99AtB, restore42AtA, rekey42ToB])
     ).toEqual({ kind: 'structural-drift' });
@@ -1786,18 +1921,23 @@ describe('tree realization adapter', () => {
   });
 
   it('realizes remove-restore-rekey-scalar as one coherent prepared topology turn', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -1913,18 +2053,23 @@ describe('tree realization adapter', () => {
   });
 
   it('refuses rekey when a later prepared restore re-occupies the vacated destination', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -2027,9 +2172,12 @@ describe('tree realization adapter', () => {
       getPhysicalCommitClock(tree) ?? getPhysicalCommitClock(tree.$);
     const beforeRevision = physicalCommitClock?.revision();
     const notifications: string[] = [];
-    const unsubscribe = getPathNotifier().subscribe('**', (_value, _prev, path) => {
-      notifications.push(path);
-    });
+    const unsubscribe = getPathNotifier().subscribe(
+      '**',
+      (_value, _prev, path) => {
+        notifications.push(path);
+      }
+    );
 
     const remove99 = {
       owner: structuralOwner,
@@ -2080,18 +2228,23 @@ describe('tree realization adapter', () => {
   });
 
   it('realizes same-subject remove then restore at a new key', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -2170,16 +2323,21 @@ describe('tree realization adapter', () => {
   });
 
   it('realizes fresh add plus later scalar without physically creating the subject during preparation', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -2222,14 +2380,21 @@ describe('tree realization adapter', () => {
       getPhysicalCommitClock(tree) ?? getPhysicalCommitClock(tree.$);
     const beforeRevision = physicalCommitClock?.revision();
     const collectionInternal = tree.$.users as typeof tree.$.users & {
-      __inspectSubjectResources?: (subjectId: number) => {
-        state: 'active' | 'tombstoned';
-        activeKey: string | undefined;
-      } | undefined;
+      __inspectSubjectResources?: (subjectId: number) =>
+        | {
+            state: 'active' | 'tombstoned';
+            activeKey: string | undefined;
+          }
+        | undefined;
       __findKeyBySubjectId?: (subjectId: number) => string | number | undefined;
     };
-    if (!collectionInternal.__inspectSubjectResources || !collectionInternal.__findKeyBySubjectId) {
-      throw new Error('Expected subject inventory hooks for fresh add characterization');
+    if (
+      !collectionInternal.__inspectSubjectResources ||
+      !collectionInternal.__findKeyBySubjectId
+    ) {
+      throw new Error(
+        'Expected subject inventory hooks for fresh add characterization'
+      );
     }
 
     const freshAdd = {
@@ -2254,10 +2419,16 @@ describe('tree realization adapter', () => {
       ownerPath: 'users.u1',
     };
 
-    expect(collectionInternal.__inspectSubjectResources(freshSubjectId)).toBeUndefined();
+    expect(
+      collectionInternal.__inspectSubjectResources(freshSubjectId)
+    ).toBeUndefined();
     expect(adapter.validateEffects([freshAdd, renameFresh])).toBeUndefined();
-    expect(collectionInternal.__inspectSubjectResources(freshSubjectId)).toBeUndefined();
-    expect(collectionInternal.__findKeyBySubjectId(freshSubjectId)).toBeUndefined();
+    expect(
+      collectionInternal.__inspectSubjectResources(freshSubjectId)
+    ).toBeUndefined();
+    expect(
+      collectionInternal.__findKeyBySubjectId(freshSubjectId)
+    ).toBeUndefined();
     expect(physicalCommitClock?.revision()).toBe(beforeRevision);
 
     adapter.applyAtomically([freshAdd, renameFresh]);
@@ -2265,9 +2436,13 @@ describe('tree realization adapter', () => {
 
     expect(tree.$.users.ids()).toEqual(['u1']);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alicia');
-    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(freshSubjectId);
+    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
+      freshSubjectId
+    );
     expect(collectionInternal.__findKeyBySubjectId(freshSubjectId)).toBe('u1');
-    expect(collectionInternal.__inspectSubjectResources(freshSubjectId)).toMatchObject({
+    expect(
+      collectionInternal.__inspectSubjectResources(freshSubjectId)
+    ).toMatchObject({
       state: 'active',
       activeKey: 'u1',
     });
@@ -2277,17 +2452,22 @@ describe('tree realization adapter', () => {
   });
 
   it('does not consume a planned fresh subject id when later realization validation refuses', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -2327,13 +2507,17 @@ describe('tree realization adapter', () => {
       descriptors,
     });
     const collectionInternal = tree.$.users as typeof tree.$.users & {
-      __inspectSubjectResources?: (subjectId: number) => {
-        state: 'active' | 'tombstoned';
-        activeKey: string | undefined;
-      } | undefined;
+      __inspectSubjectResources?: (subjectId: number) =>
+        | {
+            state: 'active' | 'tombstoned';
+            activeKey: string | undefined;
+          }
+        | undefined;
     };
     if (!collectionInternal.__inspectSubjectResources) {
-      throw new Error('Expected subject inventory hooks for failed fresh add characterization');
+      throw new Error(
+        'Expected subject inventory hooks for failed fresh add characterization'
+      );
     }
 
     const freshAdd = {
@@ -2358,33 +2542,44 @@ describe('tree realization adapter', () => {
       ownerPath: 'users.u1',
     };
 
+    expect(adapter.validateEffects([freshAdd, invalidScalarEffect])).toEqual({
+      kind: 'structural-drift',
+    });
     expect(
-      adapter.validateEffects([freshAdd, invalidScalarEffect])
-    ).toEqual({ kind: 'structural-drift' });
-    expect(collectionInternal.__inspectSubjectResources(freshSubjectId)).toBeUndefined();
+      collectionInternal.__inspectSubjectResources(freshSubjectId)
+    ).toBeUndefined();
 
     tree.$.users.addOne({ id: 'live', name: 'Live' });
     getPathNotifier().flushSync();
 
-    expect(tree.$.users.byIdOrFail('live').name.__subjectIds?.[0]).toBe(freshSubjectId);
-    expect(collectionInternal.__inspectSubjectResources(freshSubjectId)).toMatchObject({
+    expect(tree.$.users.byIdOrFail('live').name.__subjectIds?.[0]).toBe(
+      freshSubjectId
+    );
+    expect(
+      collectionInternal.__inspectSubjectResources(freshSubjectId)
+    ).toMatchObject({
       state: 'active',
       activeKey: 'live',
     });
   });
 
   it('consumes a committed fresh subject id exactly once and advances the next ordinary allocation', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -2454,22 +2649,29 @@ describe('tree realization adapter', () => {
     tree.$.users.addOne({ id: 'u2', name: 'Bea' });
     getPathNotifier().flushSync();
 
-    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(freshSubjectId);
+    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
+      freshSubjectId
+    );
     expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(2);
   });
   it('treats fresh add at a historical key as a new subject lifetime', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -2518,14 +2720,21 @@ describe('tree realization adapter', () => {
       descriptors,
     });
     const collectionInternal = tree.$.users as typeof tree.$.users & {
-      __inspectSubjectResources?: (subjectId: number) => {
-        state: 'active' | 'tombstoned';
-        activeKey: string | undefined;
-      } | undefined;
+      __inspectSubjectResources?: (subjectId: number) =>
+        | {
+            state: 'active' | 'tombstoned';
+            activeKey: string | undefined;
+          }
+        | undefined;
       __findKeyBySubjectId?: (subjectId: number) => string | number | undefined;
     };
-    if (!collectionInternal.__inspectSubjectResources || !collectionInternal.__findKeyBySubjectId) {
-      throw new Error('Expected subject inventory hooks for historical key characterization');
+    if (
+      !collectionInternal.__inspectSubjectResources ||
+      !collectionInternal.__findKeyBySubjectId
+    ) {
+      throw new Error(
+        'Expected subject inventory hooks for historical key characterization'
+      );
     }
 
     const freshAdd = {
@@ -2551,36 +2760,49 @@ describe('tree realization adapter', () => {
     };
 
     expect(adapter.validateEffects([freshAdd, renameFresh])).toBeUndefined();
-    expect(collectionInternal.__inspectSubjectResources(freshSubjectId)).toBeUndefined();
+    expect(
+      collectionInternal.__inspectSubjectResources(freshSubjectId)
+    ).toBeUndefined();
 
     adapter.applyAtomically([freshAdd, renameFresh]);
     getPathNotifier().flushSync();
 
     expect(tree.$.users.ids()).toEqual(['u1']);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alicia');
-    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(freshSubjectId);
+    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
+      freshSubjectId
+    );
     expect(collectionInternal.__findKeyBySubjectId(freshSubjectId)).toBe('u1');
-    expect(collectionInternal.__inspectSubjectResources(freshSubjectId)).toMatchObject({
+    expect(
+      collectionInternal.__inspectSubjectResources(freshSubjectId)
+    ).toMatchObject({
       state: 'active',
       activeKey: 'u1',
     });
-    expect(collectionInternal.__inspectSubjectResources(oldSubjectId)).toMatchObject({
+    expect(
+      collectionInternal.__inspectSubjectResources(oldSubjectId)
+    ).toMatchObject({
       state: 'tombstoned',
       activeKey: undefined,
     });
   });
 
   it('realizes fresh add followed by rekey and scalar against prepared future topology', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -2623,7 +2845,9 @@ describe('tree realization adapter', () => {
       __findKeyBySubjectId?: (subjectId: number) => string | number | undefined;
     };
     if (!collectionInternal.__findKeyBySubjectId) {
-      throw new Error('Expected subject lookup hook for fresh rekey characterization');
+      throw new Error(
+        'Expected subject lookup hook for fresh rekey characterization'
+      );
     }
 
     const freshAdd = {
@@ -2655,29 +2879,38 @@ describe('tree realization adapter', () => {
       ownerPath: 'users.u1',
     };
 
-    expect(adapter.validateEffects([freshAdd, rekeyFresh, renameFresh])).toBeUndefined();
+    expect(
+      adapter.validateEffects([freshAdd, rekeyFresh, renameFresh])
+    ).toBeUndefined();
 
     adapter.applyAtomically([freshAdd, rekeyFresh, renameFresh]);
     getPathNotifier().flushSync();
 
     expect(tree.$.users.ids()).toEqual(['u2']);
     expect(tree.$.users.byIdOrFail('u2').name()).toBe('Alicia');
-    expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(freshSubjectId);
+    expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(
+      freshSubjectId
+    );
     expect(collectionInternal.__findKeyBySubjectId(freshSubjectId)).toBe('u2');
   });
 
   it('realizes same-key replacement as remove old subject then fresh add new subject', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -2725,14 +2958,21 @@ describe('tree realization adapter', () => {
       descriptors,
     });
     const collectionInternal = tree.$.users as typeof tree.$.users & {
-      __inspectSubjectResources?: (subjectId: number) => {
-        state: 'active' | 'tombstoned';
-        activeKey: string | undefined;
-      } | undefined;
+      __inspectSubjectResources?: (subjectId: number) =>
+        | {
+            state: 'active' | 'tombstoned';
+            activeKey: string | undefined;
+          }
+        | undefined;
       __findKeyBySubjectId?: (subjectId: number) => string | number | undefined;
     };
-    if (!collectionInternal.__inspectSubjectResources || !collectionInternal.__findKeyBySubjectId) {
-      throw new Error('Expected subject inventory hooks for same-key replacement characterization');
+    if (
+      !collectionInternal.__inspectSubjectResources ||
+      !collectionInternal.__findKeyBySubjectId
+    ) {
+      throw new Error(
+        'Expected subject inventory hooks for same-key replacement characterization'
+      );
     }
 
     const removeOld = {
@@ -2764,7 +3004,9 @@ describe('tree realization adapter', () => {
       ownerPath: 'users.u1',
     };
 
-    expect(adapter.validateEffects([removeOld, freshAdd, renameFresh])).toBeUndefined();
+    expect(
+      adapter.validateEffects([removeOld, freshAdd, renameFresh])
+    ).toBeUndefined();
 
     adapter.applyAtomically([removeOld, freshAdd, renameFresh]);
     getPathNotifier().flushSync();
@@ -2775,31 +3017,44 @@ describe('tree realization adapter', () => {
     expect(heldOldName()).toBeUndefined();
     expect(heldOldName.__subjectIds?.[0]).toBe(oldSubjectId);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alicia');
-    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(freshSubjectId);
-    expect(collectionInternal.__findKeyBySubjectId(oldSubjectId)).toBeUndefined();
-    expect(collectionInternal.__inspectSubjectResources(oldSubjectId)).toMatchObject({
+    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
+      freshSubjectId
+    );
+    expect(
+      collectionInternal.__findKeyBySubjectId(oldSubjectId)
+    ).toBeUndefined();
+    expect(
+      collectionInternal.__inspectSubjectResources(oldSubjectId)
+    ).toMatchObject({
       state: 'tombstoned',
       activeKey: undefined,
     });
     expect(collectionInternal.__findKeyBySubjectId(freshSubjectId)).toBe('u1');
-    expect(collectionInternal.__inspectSubjectResources(freshSubjectId)).toMatchObject({
+    expect(
+      collectionInternal.__inspectSubjectResources(freshSubjectId)
+    ).toMatchObject({
       state: 'active',
       activeKey: 'u1',
     });
   });
 
   it('retains held subject facades across same-key fresh replacement until the old subject is restored elsewhere', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         ids(): string[];
-        byIdOrFail(id: string): ((() => { id: string; name: string } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
     }>;
 
@@ -2874,14 +3129,21 @@ describe('tree realization adapter', () => {
       descriptors,
     });
     const collectionInternal = tree.$.users as typeof tree.$.users & {
-      __inspectSubjectResources?: (subjectId: number) => {
-        state: 'active' | 'tombstoned';
-        activeKey: string | undefined;
-      } | undefined;
+      __inspectSubjectResources?: (subjectId: number) =>
+        | {
+            state: 'active' | 'tombstoned';
+            activeKey: string | undefined;
+          }
+        | undefined;
       __findKeyBySubjectId?: (subjectId: number) => string | number | undefined;
     };
-    if (!collectionInternal.__inspectSubjectResources || !collectionInternal.__findKeyBySubjectId) {
-      throw new Error('Expected subject inventory hooks for held-facade characterization');
+    if (
+      !collectionInternal.__inspectSubjectResources ||
+      !collectionInternal.__findKeyBySubjectId
+    ) {
+      throw new Error(
+        'Expected subject inventory hooks for held-facade characterization'
+      );
     }
 
     const removeOld = {
@@ -2921,7 +3183,12 @@ describe('tree realization adapter', () => {
     };
 
     expect(
-      adapter.validateEffects([removeOld, freshAdd, renameFresh, restoreOldAtU2])
+      adapter.validateEffects([
+        removeOld,
+        freshAdd,
+        renameFresh,
+        restoreOldAtU2,
+      ])
     ).toBeUndefined();
 
     adapter.applyAtomically([removeOld, freshAdd, renameFresh]);
@@ -2929,12 +3196,18 @@ describe('tree realization adapter', () => {
 
     expect(tree.$.users.ids()).toEqual(['u1']);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alicia');
-    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(freshSubjectId);
-    expect(collectionInternal.__inspectSubjectResources(oldSubjectId)).toMatchObject({
+    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
+      freshSubjectId
+    );
+    expect(
+      collectionInternal.__inspectSubjectResources(oldSubjectId)
+    ).toMatchObject({
       state: 'tombstoned',
       activeKey: undefined,
     });
-    expect(collectionInternal.__inspectSubjectResources(freshSubjectId)).toMatchObject({
+    expect(
+      collectionInternal.__inspectSubjectResources(freshSubjectId)
+    ).toMatchObject({
       state: 'active',
       activeKey: 'u1',
     });
@@ -2950,10 +3223,16 @@ describe('tree realization adapter', () => {
 
     expect(tree.$.users.ids()).toEqual(['u1', 'u2']);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alicia');
-    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(freshSubjectId);
+    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
+      freshSubjectId
+    );
     expect(tree.$.users.byIdOrFail('u2').name()).toBe('Legacy');
-    expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(oldSubjectId);
-    expect(collectionInternal.__inspectSubjectResources(oldSubjectId)).toMatchObject({
+    expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(
+      oldSubjectId
+    );
+    expect(
+      collectionInternal.__inspectSubjectResources(oldSubjectId)
+    ).toMatchObject({
       state: 'active',
       activeKey: 'u2',
     });
@@ -2974,10 +3253,17 @@ describe('tree realization adapter', () => {
         state[`leaf_${index}`] = index;
       }
 
-      const tree = signalTree(state) as ISignalTree<Record<string, {
-        (): number;
-        set(value: number): void;
-      }>>;
+      const tree = signalTree(state, {
+        capabilities: ['causal-runtime'],
+      }) as ISignalTree<
+        Record<
+          string,
+          {
+            (): number;
+            set(value: number): void;
+          }
+        >
+      >;
       try {
         const effectCount = Math.min(50, size);
         const step = Math.max(1, Math.floor(size / effectCount));
@@ -3016,7 +3302,12 @@ describe('tree realization adapter', () => {
   }, 120_000);
 
   it('refuses unknown positions without a traversal fallback', () => {
-    const tree = signalTree({ profile: { name: 'Alice' } }) as ISignalTree<object>;
+    const tree = signalTree(
+      {
+        profile: { name: 'Alice' },
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<object>;
     const stats = installProductionSubstrateStatsForTesting();
     const adapter = createTreeRealizationAdapter({
       tree,
@@ -3037,11 +3328,14 @@ describe('tree realization adapter', () => {
   });
 
   it('restores each removed subject from its own structural payload on one collection owner', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         byIdOrFail(id: string): {
@@ -3058,7 +3352,11 @@ describe('tree realization adapter', () => {
     const owner = getOwnedPositionIds(tree.$.users)?.[0];
     const subjectOne = tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0];
     const subjectTwo = tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0];
-    if (owner === undefined || subjectOne === undefined || subjectTwo === undefined) {
+    if (
+      owner === undefined ||
+      subjectOne === undefined ||
+      subjectTwo === undefined
+    ) {
       throw new Error('Expected multi-subject structural metadata');
     }
 
@@ -3157,24 +3455,35 @@ describe('tree realization adapter', () => {
     expect(tree.$.users.ids()).toEqual(['u1', 'u2']);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alice');
     expect(tree.$.users.byIdOrFail('u2').name()).toBe('Bob');
-    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(subjectOne);
-    expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(subjectTwo);
+    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
+      subjectOne
+    );
+    expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(
+      subjectTwo
+    );
   });
 
-
   it('reactivates the exact held row and field when restoring the same tombstoned subject', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string; enabled: boolean }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<
+          { id: string; name: string; enabled: boolean },
+          string
+        >({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string; enabled: boolean }): void;
         removeOne(id: string): void;
-        byIdOrFail(id: string): ((() => { id: string; name: string; enabled: boolean } | undefined) & {
-          name: ((() => string | undefined) & { __subjectIds?: number[] });
-          enabled: (() => boolean | undefined);
-        });
+        byIdOrFail(id: string): (() =>
+          | { id: string; name: string; enabled: boolean }
+          | undefined) & {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+          enabled: () => boolean | undefined;
+        };
         ids(): string[];
       };
     }>;
@@ -3190,7 +3499,11 @@ describe('tree realization adapter', () => {
     const subjectId = getOwnedSubjectIds(heldName)?.[0];
     const positionId = getOwnedPositionIds(heldName)?.[0];
     const ownerPath = getOwnedOwnerPath(heldName);
-    if (owner === undefined || subjectId === undefined || positionId === undefined) {
+    if (
+      owner === undefined ||
+      subjectId === undefined ||
+      positionId === undefined
+    ) {
       throw new Error('Expected subject and position metadata');
     }
 
@@ -3290,7 +3603,10 @@ describe('tree realization adapter', () => {
   });
 
   it('still emits canonical notifier traffic during realization, proving non-authoring is a broader seam than the adapter', () => {
-    const tree = signalTree({ profile: { name: 'Alice' } }) as ISignalTree<{
+    const tree = signalTree(
+      { profile: { name: 'Alice' } },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       profile: {
         name: {
           (): string;
@@ -3316,7 +3632,16 @@ describe('tree realization adapter', () => {
     const notifications: Array<{ path: string; meta?: UpdateMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       '**',
-      (_next, _prev, path, _ownerPath, _source, _subjectIds, _positionIds, meta) => {
+      (
+        _next,
+        _prev,
+        path,
+        _ownerPath,
+        _source,
+        _subjectIds,
+        _positionIds,
+        meta
+      ) => {
         notifications.push({ path, meta });
       }
     );
@@ -3329,8 +3654,9 @@ describe('tree realization adapter', () => {
   });
 
   it('keeps scalar realization causally silent between authored writes', async () => {
-    const tree = signalTree({ left: '', middle: '', right: '' }).with(
-      timeTravel()
+    const tree = signalTree(
+      { left: '', middle: '', right: '' },
+      { enhancers: [timeTravel()] }
     ) as ISignalTree<{
       left: { (): string; set(value: string): void };
       middle: { (): string; set(value: string): void };
@@ -3378,12 +3704,15 @@ describe('tree realization adapter', () => {
 
   it('keeps stored realization causally silent while preserving persistence consequences', async () => {
     const storage = createMockStorage();
-    const tree = signalTree({
-      preference: stored('realization-non-authoring-preference', 'compact', {
-        storage,
-        debounceMs: 0,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        preference: stored('realization-non-authoring-preference', 'compact', {
+          storage,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       preference: { (): string; set(value: string): void };
     }> & {
       getHistory(): unknown[];
@@ -3410,7 +3739,11 @@ describe('tree realization adapter', () => {
     await new Promise((resolve) => queueMicrotask(resolve));
 
     expect(tree.$.preference()).toBe('spacious');
-    expect(JSON.parse(storage.getItem('realization-non-authoring-preference') ?? 'null')).toEqual({
+    expect(
+      JSON.parse(
+        storage.getItem('realization-non-authoring-preference') ?? 'null'
+      )
+    ).toEqual({
       __v: 1,
       data: 'spacious',
     });
@@ -3418,11 +3751,14 @@ describe('tree realization adapter', () => {
   });
 
   it('keeps structural realization causally silent while preserving subject identity', async () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         changeId(from: string, to: string): void;
@@ -3443,7 +3779,11 @@ describe('tree realization adapter', () => {
     const beforeNameLeaf = tree.$.users.byIdOrFail('u2').name;
     const beforeSubjectId = beforeNameLeaf.__subjectIds?.[0];
     const beforePositions = getOwnedPositionIds(beforeNameLeaf);
-    if (owner === undefined || beforeSubjectId === undefined || !beforePositions) {
+    if (
+      owner === undefined ||
+      beforeSubjectId === undefined ||
+      !beforePositions
+    ) {
       throw new Error('Expected entity ownership metadata');
     }
 
@@ -3480,13 +3820,16 @@ describe('tree realization adapter', () => {
   });
 
   it('restores authored capture after a realization write throws', async () => {
-    const tree = signalTree({
-      before: '',
-      after: '',
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        before: '',
+        after: '',
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       before: { (): string; set(value: string): void };
       after: { (): string; set(value: string): void };
       users: {
@@ -3501,14 +3844,18 @@ describe('tree realization adapter', () => {
     await Promise.resolve();
     const baselineHistory = tree.getHistory().length;
 
-    const owner = getOwnedPositionIds((tree.$ as Record<string, unknown>).users)?.[0];
+    const owner = getOwnedPositionIds(
+      (tree.$ as Record<string, unknown>).users
+    )?.[0];
     if (owner === undefined) {
       throw new Error('Expected structural owner');
     }
 
     const adapter = createTreeRealizationAdapter({
       tree: tree as ISignalTree<object>,
-      descriptors: new Map([[owner, { path: 'users', ownerPath: 'users', collectionPath: 'users' }]]),
+      descriptors: new Map([
+        [owner, { path: 'users', ownerPath: 'users', collectionPath: 'users' }],
+      ]),
     });
 
     expect(() =>
@@ -3533,8 +3880,9 @@ describe('tree realization adapter', () => {
   });
 
   it('keeps outer transaction authorship active across an inner realization write', () => {
-    const tree = signalTree({ left: '', middle: '', right: '' }).with(
-      transactions()
+    const tree = signalTree(
+      { left: '', middle: '', right: '' },
+      { enhancers: [transactions()] }
     ) as ISignalTree<{
       left: { (): string; set(value: string): void };
       middle: { (): string; set(value: string): void };
@@ -3583,95 +3931,106 @@ describe('tree realization adapter', () => {
   });
 
   it('atomicity spike: pre-commit scalar staging failure leaves state and notifications unchanged', () => {
-      const tree = signalTree({ a: 'A', b: 'B' }).with(timeTravel()) as ISignalTree<{
-        a: { (): string; set(value: string): void };
-        b: { (): string; set(value: string): void };
-      }> & {
-        getHistory(): unknown[];
-      };
+    const tree = signalTree(
+      { a: 'A', b: 'B' },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
+      a: { (): string; set(value: string): void };
+      b: { (): string; set(value: string): void };
+    }> & {
+      getHistory(): unknown[];
+    };
 
-      const aOwner = getOwnedPositionIds(tree.$.a)?.[0];
-      const bOwner = getOwnedPositionIds(tree.$.b)?.[0];
-      if (aOwner === undefined || bOwner === undefined) {
-        throw new Error('Expected owned positions for scalar atomicity test');
-      }
+    const aOwner = getOwnedPositionIds(tree.$.a)?.[0];
+    const bOwner = getOwnedPositionIds(tree.$.b)?.[0];
+    if (aOwner === undefined || bOwner === undefined) {
+      throw new Error('Expected owned positions for scalar atomicity test');
+    }
 
-      const descriptors = new Map<number, TreeRealizationDescriptor>();
-      rememberTreeRealizationDescriptor({
-        descriptors,
-        path: 'a',
-        positionIds: [aOwner],
-      });
-      rememberTreeRealizationDescriptor({
-        descriptors,
-        path: 'b',
-        positionIds: [bOwner],
-      });
+    const descriptors = new Map<number, TreeRealizationDescriptor>();
+    rememberTreeRealizationDescriptor({
+      descriptors,
+      path: 'a',
+      positionIds: [aOwner],
+    });
+    rememberTreeRealizationDescriptor({
+      descriptors,
+      path: 'b',
+      positionIds: [bOwner],
+    });
 
-      const adapter = createTreeRealizationAdapter({
-        tree: tree as ISignalTree<object>,
-        descriptors,
-      });
-      const scalarSlotRuntime =
-        getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
-      if (!scalarSlotRuntime) {
-        throw new Error('Expected scalar slot runtime for atomicity test');
-      }
-      const observedNotifications: Array<{ path: string; value: unknown; prev: unknown }> = [];
-      const unsubscribe = getPathNotifier().subscribe(
-        '**',
-        (value, prev, path) => {
-          if (path === 'a' || path === 'b') {
-            observedNotifications.push({ path, value, prev });
-          }
+    const adapter = createTreeRealizationAdapter({
+      tree: tree as ISignalTree<object>,
+      descriptors,
+    });
+    const scalarSlotRuntime =
+      getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+    if (!scalarSlotRuntime) {
+      throw new Error('Expected scalar slot runtime for atomicity test');
+    }
+    const observedNotifications: Array<{
+      path: string;
+      value: unknown;
+      prev: unknown;
+    }> = [];
+    const unsubscribe = getPathNotifier().subscribe(
+      '**',
+      (value, prev, path) => {
+        if (path === 'a' || path === 'b') {
+          observedNotifications.push({ path, value, prev });
         }
-      );
+      }
+    );
 
-      const baselineHistory = tree.getHistory().length;
-      const injectedFailure = new Error('Injected scalar staging failure');
-      const originalResolve = scalarSlotRuntime.resolveScalarSlot.bind(scalarSlotRuntime);
-      const resolveSpy = vi
-        .spyOn(scalarSlotRuntime, 'resolveScalarSlot')
-        .mockImplementation((positionId) => {
-          if (positionId === bOwner) {
-            throw injectedFailure;
-          }
+    const baselineHistory = tree.getHistory().length;
+    const injectedFailure = new Error('Injected scalar staging failure');
+    const originalResolve =
+      scalarSlotRuntime.resolveScalarSlot.bind(scalarSlotRuntime);
+    const resolveSpy = vi
+      .spyOn(scalarSlotRuntime, 'resolveScalarSlot')
+      .mockImplementation((positionId) => {
+        if (positionId === bOwner) {
+          throw injectedFailure;
+        }
 
-          return originalResolve(positionId);
-        });
+        return originalResolve(positionId);
+      });
 
-      expect(
-        adapter.validateEffects([
-          { owner: aOwner, before: 'A', after: 'A2' },
-          { owner: bOwner, before: 'B', after: 'B2' },
-        ])
-      ).toBeUndefined();
+    expect(
+      adapter.validateEffects([
+        { owner: aOwner, before: 'A', after: 'A2' },
+        { owner: bOwner, before: 'B', after: 'B2' },
+      ])
+    ).toBeUndefined();
 
-      expect(() =>
-        adapter.applyAtomically([
-          { owner: aOwner, before: 'A', after: 'A2' },
-          { owner: bOwner, before: 'B', after: 'B2' },
-        ])
-      ).toThrow(injectedFailure);
+    expect(() =>
+      adapter.applyAtomically([
+        { owner: aOwner, before: 'A', after: 'A2' },
+        { owner: bOwner, before: 'B', after: 'B2' },
+      ])
+    ).toThrow(injectedFailure);
 
-      getPathNotifier().flushSync();
+    getPathNotifier().flushSync();
 
-      expect(tree.$.a()).toBe('A');
-      expect(tree.$.b()).toBe('B');
-      expect(tree.getHistory().length).toBe(baselineHistory);
-      expect(observedNotifications).toEqual([]);
+    expect(tree.$.a()).toBe('A');
+    expect(tree.$.b()).toBe('B');
+    expect(tree.getHistory().length).toBe(baselineHistory);
+    expect(observedNotifications).toEqual([]);
 
-      unsubscribe();
-        resolveSpy.mockRestore();
+    unsubscribe();
+    resolveSpy.mockRestore();
   });
 
   it('stales an open scalar frame after a structural rekey before commit', () => {
-    const tree = signalTree({
-      status: 'pending',
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        status: 'pending',
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       status: {
         (): string;
         set(value: string): void;
@@ -3717,13 +4076,16 @@ describe('tree realization adapter', () => {
   });
 
   it('refuses a stale heterogeneous realization before any prepared structural mutation applies', () => {
-    const tree = signalTree({
-      other: 'unchanged',
-      status: 'pending',
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }).with(timeTravel()) as ISignalTree<{
+    const tree = signalTree(
+      {
+        other: 'unchanged',
+        status: 'pending',
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    ) as ISignalTree<{
       other: { (): string; set(value: string): void };
       status: { (): string; set(value: string): void };
       users: {
@@ -3762,7 +4124,9 @@ describe('tree realization adapter', () => {
       subjectId === undefined ||
       !tree.$.users.__planRekey
     ) {
-      throw new Error('Expected structural and scalar metadata for mixed stale test');
+      throw new Error(
+        'Expected structural and scalar metadata for mixed stale test'
+      );
     }
 
     const descriptors = new Map<number, TreeRealizationDescriptor>();
@@ -3784,12 +4148,19 @@ describe('tree realization adapter', () => {
       descriptors,
     });
 
-    const observedNotifications: Array<{ path: string; value: unknown; prev: unknown }> = [];
-    const unsubscribe = getPathNotifier().subscribe('**', (value, prev, path) => {
-      if (path === 'status' || path === 'users') {
-        observedNotifications.push({ path, value, prev });
+    const observedNotifications: Array<{
+      path: string;
+      value: unknown;
+      prev: unknown;
+    }> = [];
+    const unsubscribe = getPathNotifier().subscribe(
+      '**',
+      (value, prev, path) => {
+        if (path === 'status' || path === 'users') {
+          observedNotifications.push({ path, value, prev });
+        }
       }
-    });
+    );
 
     const baselineHistory = tree.getHistory().length;
     const scalarSlotRuntime =
@@ -3798,7 +4169,8 @@ describe('tree realization adapter', () => {
       throw new Error('Expected scalar slot runtime for mixed stale test');
     }
 
-    const originalBeginFrame = scalarSlotRuntime.beginFrame.bind(scalarSlotRuntime);
+    const originalBeginFrame =
+      scalarSlotRuntime.beginFrame.bind(scalarSlotRuntime);
     const beginFrameSpy = vi
       .spyOn(scalarSlotRuntime, 'beginFrame')
       .mockImplementation(() => {
@@ -3860,12 +4232,15 @@ describe('tree realization adapter', () => {
 
     try {
       TestBed.runInInjectionContext(() => {
-        const tree = signalTree({
-          status: 'pending',
-          users: entityMap<{ id: string; name: string }, string>({
-            selectId: (user) => user.id,
-          }),
-        }) as ISignalTree<{
+        const tree = signalTree(
+          {
+            status: 'pending',
+            users: entityMap<{ id: string; name: string }, string>({
+              selectId: (user) => user.id,
+            }),
+          },
+          { capabilities: ['causal-runtime'] }
+        ) as ISignalTree<{
           status: {
             (): string;
             set(value: string): void;
@@ -3948,12 +4323,15 @@ describe('tree realization adapter', () => {
   });
 
   it('validates the full effect set before any mutation and refuses structural drift without partial application', () => {
-    const tree = signalTree({
-      profile: { name: 'Alice' },
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        profile: { name: 'Alice' },
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       profile: {
         name: {
           (): string;

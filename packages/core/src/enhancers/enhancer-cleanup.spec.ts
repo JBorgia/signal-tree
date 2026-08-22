@@ -29,21 +29,38 @@ function createMockTree() {
 
   tree.state = {
     count: {
-      set: (v: number) => { state.count = v; },
-      update: (fn: (v: number) => number) => { state.count = fn(state.count); },
+      set: (v: number) => {
+        state.count = v;
+      },
+      update: (fn: (v: number) => number) => {
+        state.count = fn(state.count);
+      },
     },
     name: {
-      set: (v: string) => { state.name = v; },
-      update: (fn: (v: string) => string) => { state.name = fn(state.name); },
+      set: (v: string) => {
+        state.name = v;
+      },
+      update: (fn: (v: string) => string) => {
+        state.name = fn(state.name);
+      },
     },
   };
   tree.$ = tree.state;
-  tree.bind = (_: unknown) => (...a: unknown[]) => tree(...(a as any));
-  tree.registerCleanup = (fn: () => void) => { cleanupFns.push(fn); };
+  tree.bind =
+    (_: unknown) =>
+    (...a: unknown[]) =>
+      tree(...(a as any));
+  tree.registerCleanup = (fn: () => void) => {
+    cleanupFns.push(fn);
+  };
   tree.destroyed = () => false;
   tree.destroy = () => {
     for (const fn of cleanupFns) {
-      try { fn(); } catch { /* ignore */ }
+      try {
+        fn();
+      } catch {
+        /* ignore */
+      }
     }
     cleanupFns.length = 0;
   };
@@ -65,7 +82,10 @@ describe('enhancer cleanup registration', () => {
   });
 
   it('timeTravel registers cleanup', async () => {
-    const tree = signalTree({ count: 0, name: '' }).with(timeTravel());
+    const tree = signalTree(
+      { count: 0, name: '' },
+      { enhancers: [timeTravel()] }
+    );
 
     tree.$.count.set(1);
     await flush();
@@ -107,8 +127,9 @@ describe('destroy() clears enhancer resources', () => {
   });
 
   it('timeTravel: clears history on destroy', () => {
-    const enhanced = signalTree({ count: 0, name: '' }).with(
-      timeTravel({ maxHistorySize: 50 })
+    const enhanced = signalTree(
+      { count: 0, name: '' },
+      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
     );
 
     // Make some changes

@@ -62,9 +62,12 @@ function collectionOver(leaf: {
 // ============================================================================
 describe('E2-S1 — membership reversal', () => {
   it('the REAL system undoes and redoes an add', async () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+      },
+      { enhancers: [timeTravel()] }
+    );
     tree.$.rows.addMany([
       { id: 'a', n: 1 },
       { id: 'b', n: 2 },
@@ -85,9 +88,12 @@ describe('E2-S1 — membership reversal', () => {
   });
 
   it('UNDO of a remove REVIVES the original subject; an ordinary RE-ADD does not', async () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+      },
+      { enhancers: [timeTravel()] }
+    );
     tree.$.rows.addMany([{ id: 'a', n: 1 }]);
     await tick();
 
@@ -136,9 +142,12 @@ describe('E2-S1 — membership reversal', () => {
 // ============================================================================
 describe('E2-S2 — key reuse across undo', () => {
   it('THE REAL SYSTEM does not alias: the new subject stays dead after undo', async () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+      },
+      { enhancers: [timeTravel()] }
+    );
     tree.$.rows.addOne({ id: 'k', n: 111 });
     await tick();
 

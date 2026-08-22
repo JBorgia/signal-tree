@@ -27,7 +27,7 @@ const heap = () => process.memoryUsage().heapUsed / 1024 / 1024;
 const tree = signalTree({
   rows: entityMap({ selectId: (r) => r.id, ...(recordHistory ? {} : { recordHistory: false }) }),
   n: 0,
-}).with(timeTravel({ maxHistorySize: 10000 }));
+}, { enhancers: [timeTravel({ maxHistorySize: 10000 })] });
 tree.$.rows.addMany(Array.from({ length: width }, (_, i) => ({ id: String(i), v: i })));
 await tick();
 await settle();

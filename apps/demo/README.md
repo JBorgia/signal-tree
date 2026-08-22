@@ -165,13 +165,11 @@ const performance = enterpriseTree.$.company.divisions.technology.departments.en
 const persistentDemo = signalTree({
   userPreferences: { theme: 'light' },
   appData: { lastSaved: new Date() },
-}).with(
-  persistence({
+}, { enhancers: [persistence({
     key: 'demo-state',
     autoSave: true,
     notificationDelayMs: 500, // v6.1.0: debounce CD notifications
-  })
-);
+  })] });
 
 // Automatic persistence with visual feedback
 // Changes are automatically saved and restored across sessions

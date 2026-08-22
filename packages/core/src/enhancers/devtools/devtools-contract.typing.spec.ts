@@ -21,6 +21,13 @@
  * in production — a migration that moved the choice into a function body would
  * silently defeat that, which is a bundling property no type row can see.
  * Recorded here so the next reader does not "simplify" it.
+ *
+ * v15: enhancers are DECLARED, so the call site is
+ * `signalTree(state, { enhancers: [devTools()] })` and the added surface arrives
+ * through the return type. Note the state is a separate annotated `const`
+ * rather than `signalTree<AppState>(...)` — an explicit type argument would
+ * have to name the enhancer tuple parameter too, and naming it is exactly the
+ * ceremony this file exists to forbid.
  */
 import { signalTree } from '../../lib/signal-tree';
 import { devTools } from './devtools';
@@ -42,8 +49,9 @@ interface AppState {
 }
 
 // The call site under test. No generics, no casts, no annotation.
-const tree = signalTree<AppState>({ count: 0, user: { name: 'Ada', age: 36 } });
-const devved = tree.with(devTools());
+const initial: AppState = { count: 0, user: { name: 'Ada', age: 36 } };
+const tree = signalTree(initial);
+const devved = signalTree(initial, { enhancers: [devTools()] });
 
 // ============================================================================
 // 1 — the two methods are inferred, with exact signatures
@@ -76,8 +84,8 @@ devved({ count: 1 });
 // ============================================================================
 declare const labeller: Enhancer<{ label(): string }>;
 
-const devvedThenLabelled = tree.with(devTools()).with(labeller);
-const labelledThenDevved = tree.with(labeller).with(devTools());
+const devvedThenLabelled = signalTree(initial, { enhancers: [devTools(), labeller] });
+const labelledThenDevved = signalTree(initial, { enhancers: [labeller, devTools()] });
 
 export const _c1: string = devvedThenLabelled.label();
 devvedThenLabelled.connectDevTools();
@@ -88,14 +96,12 @@ export const _c3: number = devvedThenLabelled.$.count();
 // ============================================================================
 // 4 — config is optional and does not change the added surface
 // ============================================================================
-const configured = tree.with(
-  devTools({ name: 'X', enableLogging: false, performanceThreshold: 10 })
-);
+const configured = signalTree(initial, { enhancers: [devTools({ name: 'X', enableLogging: false, performanceThreshold: 10 })] });
 export type _ConfigDoesNotChangeSurface = Expect<
   Equal<(typeof configured)['connectDevTools'], (typeof devved)['connectDevTools']>
 >;
 // @ts-expect-error config is checked, not `any`
-tree.with(devTools({ nope: true }));
+signalTree(initial, { enhancers: [devTools({ nope: true })] });
 
 // ============================================================================
 // 5 — negative controls

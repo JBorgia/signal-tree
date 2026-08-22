@@ -127,7 +127,7 @@ Follow these principles for idiomatic SignalTree code:
 ### 1. Expose signals directly (no computed wrappers)
 
 ```typescript
-const tree = signalTree(initialState); // No .with(entities()) needed in v7+ (deprecated in v6, removed in v7)
+const tree = signalTree(initialState); // No entities() enhancer needed in v7+ (deprecated in v6, removed in v7)
 const $ = tree.$; // Shorthand for state access
 
 // ✅ SignalTree-first: Direct signal exposure
@@ -669,10 +669,16 @@ These are the **only** separate packages in the SignalTree ecosystem:
 ```typescript
 import { signalTree, batching, devTools } from '@signaltree/core';
 
-// Apply enhancers one at a time
-const tree = signalTree({ count: 0 })
-  .with(batching()) // Performance optimization
-  .with(devTools()); // Development tools
+// Declare the whole set — there is no late enhancement
+const tree = signalTree(
+  { count: 0 },
+  {
+    enhancers: [
+      batching(), // Performance optimization
+      devTools(), // Development tools
+    ],
+  }
+);
 ```
 
 **Performance-Focused Stack:**
@@ -683,7 +689,7 @@ import { signalTree, batching, entityMap } from '@signaltree/core';
 const tree = signalTree({
   products: entityMap<Product>(),
   ui: { loading: false },
-}).with(batching()); // Batch updates for optimal rendering
+}, { enhancers: [batching()] }); // Batch updates for optimal rendering
 
 // Entity CRUD operations
 tree.$.products.addOne(newProduct);
@@ -701,9 +707,7 @@ import { signalTree, persistence, timeTravel } from '@signaltree/core';
 const tree = signalTree({
   user: null as User | null,
   preferences: { theme: 'light' },
-})
-  .with(persistence({ key: 'app-state' }))
-  .with(timeTravel()); // Undo/redo support
+}, { enhancers: [persistence({ key: 'app-state' }), timeTravel()] }); // Undo/redo support
 
 // For async operations, use manual async or async helpers
 async function fetchUser(id: string) {
@@ -809,7 +813,7 @@ function withLogger(config?: { maxHistory?: number }) {
 }
 
 // Usage
-const tree = signalTree({ count: 0 }).with(withLogger());
+const tree = signalTree({ count: 0 }, { enhancers: [withLogger()] });
 tree.log('Tree created');
 ```
 
@@ -1349,7 +1353,7 @@ import { signalTree, batching } from '@signaltree/core';
 const tree = signalTree({
   products: [] as Product[],
   filters: { category: '', search: '' },
-}).with(batching());
+}, { enhancers: [batching()] });
 
 tree.batch(() => {
   tree.$.products.update((products) => [...products, ...newProducts]);
@@ -1430,24 +1434,23 @@ const tree = signalTree({
     preferences: { theme: 'light' },
     data: { users: [], posts: [] },
   },
-})
-  .with(batching()) // Performance
-  .with(persistence({ key: 'my-app-state' }))
-  .with(
+}, {
+  enhancers: [
+    batching(), // Performance
+    persistence({ key: 'my-app-state' }),
     timeTravel({
       // Undo/redo
       maxHistory: 50,
-    })
-  )
-  .with(
+    }),
     devTools({
       // Debug tools (dev only)
       name: 'MyApp',
       enableTimeTravel: true,
       includePaths: ['app.*', 'ui.*'],
       formatPath: (path) => path.replace(/\.(\d+)/g, '[$1]'),
-    })
-  );
+    }),
+  ],
+});
 
 // Rich feature set available
 async function fetchUser(id: string) {
@@ -1470,9 +1473,12 @@ surviving authoritative state intact for reconciliation or refetch.
 import { signalTree, batching, persistence } from '@signaltree/core';
 
 // Production build (no dev tools)
-const tree = signalTree(initialState)
-  .with(batching()) // Performance optimization
-  .with(persistence({ key: 'app-v1.2.3' }));
+const tree = signalTree(initialState, {
+  enhancers: [
+    batching(), // Performance optimization
+    persistence({ key: 'app-v1.2.3' }),
+  ],
+});
 
 // Clean, efficient, production-ready
 ```
@@ -1485,16 +1491,14 @@ import { signalTree, batching, devTools, timeTravel } from '@signaltree/core';
 const isDevelopment = process.env['NODE_ENV'] === 'development';
 
 // Conditional enhancement based on environment
-const tree = signalTree(state).with(
-  batching(), // Always include performance
+const tree = signalTree(state, { enhancers: [batching(), // Always include performance
   ...(isDevelopment
     ? [
         // Development-only features
         devTools(),
         timeTravel(),
       ]
-    : [])
-);
+    : [])] });
 ```
 
 ### Measuring bundle size
@@ -1509,31 +1513,33 @@ Start with core and grow incrementally:
 // Phase 1: Start with core
 const tree = signalTree(state);
 
-// Phase 2: Add performance when needed
-const tree2 = tree.with(batching());
+// Phase 2: Add performance when needed — as a NEW tree, not by enhancing this
+// one. A tree's capabilities are fixed at construction.
+const tree2 = signalTree(state, { enhancers: [batching()] });
 
 // Phase 3: Use entityMap for normalized local collections
-const tree3 = signalTree({ users: entityMap<User>() }).with(batching());
+const tree3 = signalTree({ users: entityMap<User>() }, { enhancers: [batching()] });
 
 // Each phase is fully functional and production-ready
 ```
 
+Conditional features are a conditional ARRAY, decided before the tree exists:
+
 ```typescript
-// Start minimal, add features as needed
-let tree = signalTree(initialState);
+const enhancers = [
+  ...(isDevelopment ? [devTools()] : []),
+  ...(needsPerformance ? [batching()] : []),
+  ...(needsTimeTravel ? [timeTravel()] : []),
+];
 
-if (isDevelopment) {
-  tree = tree.with(devTools());
-}
-
-if (needsPerformance) {
-  tree = tree.with(batching());
-}
-
-if (needsTimeTravel) {
-  tree = tree.with(timeTravel());
-}
+const tree = signalTree(initialState, { enhancers });
 ```
+
+This is what replaced reassigning `tree = tree.with(...)` in a chain of `if`s,
+and it is better than a rewrite of the same thing: on the old path the tree was
+already built before the first `if` ran, so it carried the full build plan
+whichever branch was taken. Here a build with no `timeTravel()` does not install
+the machinery `timeTravel()` needs.
 
 ### Service-based pattern
 
@@ -1812,7 +1818,7 @@ SignalTree Core includes all enhancers built-in:
 ```typescript
 import { signalTree, batching, timeTravel } from '@signaltree/core';
 
-const tree = signalTree(initialState).with(batching()).with(timeTravel());
+const tree = signalTree(initialState, { enhancers: [batching(), timeTravel()] });
 ```
 
 ### Available enhancers
@@ -1860,7 +1866,7 @@ users = this.tree.$.users;
 // Step 3: Replace effects with manual async operations
 // Before (NgRx)
 loadUsers$ = createEffect(() =>
-  this.actions$.with(
+  this.actions$.pipe(
     ofType(loadUsers),
     switchMap(() => this.api.getUsers())
   )

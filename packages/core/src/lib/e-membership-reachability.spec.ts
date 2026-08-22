@@ -63,11 +63,14 @@ describe('E — is the conjunction delivered over canonical truth?', () => {
     const { entityMap } = await import('./types');
     const { timeTravel } = await import('../enhancers/time-travel/time-travel');
 
-    const tree = signalTree({
-      rows: entityMap<{ id: string; n: number }, string>({
-        selectId: (r) => r.id,
-      }),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<{ id: string; n: number }, string>({
+          selectId: (r) => r.id,
+        }),
+      },
+      { enhancers: [timeTravel()] }
+    );
 
     tree.$.rows.addOne({ id: 'a', n: 1 });
     await Promise.resolve();

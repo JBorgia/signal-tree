@@ -80,7 +80,7 @@ export function createAppTree() {
       sidebarOpen: true as boolean,
     },
   });
-  // Note: v7+ auto-processes markers; `.with(entities())` was deprecated in v6 and removed in v7 (do not call it)
+  // Note: v7+ auto-processes markers; the `entities()` enhancer was deprecated in v6 and removed in v7 (do not call it)
 }
 
 // Type inference - single source of truth
@@ -206,7 +206,7 @@ Stable:
 Negotiable:
 
 - `signalTree(...)` call shape
-- `.with(...)` chaining
+- declared enhancers (`{ enhancers: [...] }`)
 - builder lifecycle
 - capability declaration syntax
 - enhancer installation timing
@@ -225,15 +225,14 @@ Every SignalTree application follows one rule. Once you know it, every structura
 | --------- | ---------------------------------- | --------------------------------------------------------------------------------- |
 | **READ**  | `.derived()` on the tree           | All computed/derived state lives on `$` — never inside Ops services or components |
 | **WRITE** | Ops `@Injectable` services         | Mutations + async only. Zero `computed()` properties.                             |
-| **REACT** | `.with(effects()) → tree.effect()` | State changes are the events — no actions, no dispatch                            |
+| **REACT** | `effects()` in `enhancers` → `tree.effect()` | State changes are the events — no actions, no dispatch                 |
 
 ```typescript
 import { signalTree, entityMap } from '@signaltree/core';
 
 // READ — all computed on the tree
-// REACT — .with(effects()) adds tree.effect() and tree.subscribe()
-const tree = signalTree({ tickets: entityMap<Ticket>(), filter: '' })
-  .with(effects())
+// REACT — declaring effects() adds tree.effect() and tree.subscribe()
+const tree = signalTree({ tickets: entityMap<Ticket>(), filter: '' }, { enhancers: [effects()] })
   .derived(($) => ({
     tickets: {
       visible: computed(() => $.tickets.all().filter((t) => t.title.includes($.filter()))),
@@ -250,14 +249,14 @@ export class TicketOps {
   }
 }
 
-// REACT — state changes drive side effects (requires .with(effects()) above)
+// REACT — state changes drive side effects (requires effects() declared above)
 tree.effect((state) => {
   const filter = state.tickets.filter;
   untracked(() => ticketOps.load(filter));
 });
 ```
 
-**The corollary:** If you find a `readonly x = computed(...)` inside an `@Injectable` service, move it to `.derived()`. If you find async logic inside `.derived()`, move it to Ops. If you find action dispatch, replace it with a state write + `tree.effect()` (after `.with(effects())`).
+**The corollary:** If you find a `readonly x = computed(...)` inside an `@Injectable` service, move it to `.derived()`. If you find async logic inside `.derived()`, move it to Ops. If you find action dispatch, replace it with a state write + `tree.effect()` (with `effects()` declared).
 
 ---
 
@@ -586,26 +585,22 @@ const DEVTOOLS_GROUP_ID = 'my-app';
 const DEVTOOLS_GROUP_NAME = 'MyApp SignalTree';
 
 // orders-tree.ts
-const ordersTree = signalTree({ orders: entityMap<Order>() })
-  .with(batching())
-  .with(devTools({
+const ordersTree = signalTree({ orders: entityMap<Order>() }, { enhancers: [batching(), devTools({
     name: 'orders-store',
     aggregatedReduxInstance: {
       id: DEVTOOLS_GROUP_ID,
       name: DEVTOOLS_GROUP_NAME,
     },
-  }));
+  })] });
 
 // products-tree.ts
-const productsTree = signalTree({ products: entityMap<Product>() })
-  .with(batching())
-  .with(devTools({
+const productsTree = signalTree({ products: entityMap<Product>() }, { enhancers: [batching(), devTools({
     name: 'products-store',
     aggregatedReduxInstance: {
       id: DEVTOOLS_GROUP_ID,
       name: DEVTOOLS_GROUP_NAME,
     },
-  }));
+  })] });
 ````
 
 All trees sharing the same `aggregatedReduxInstance.id` will appear under a **single Redux DevTools instance** (named by `aggregatedReduxInstance.name`), with each tree's state nested under its `name` key. Trees can be dynamically registered/unregistered as lazy-loaded modules come and go — the shared DevTools instance is created on first registration and cleaned up when the last tree disconnects.
@@ -2422,8 +2417,10 @@ export class PlantSelectionService {
 **Using the Time Travel Enhancer:**
 
 ```typescript
-const tree = signalTree<AppState>({...})
-  .with(timeTravel({ maxHistory: 50 }));
+const tree = signalTree(
+  {...} as AppState,
+  { enhancers: [timeTravel({ maxHistory: 50 })] }
+);
 
 @Injectable({ providedIn: 'root' })
 export class UndoService {
@@ -2652,12 +2649,13 @@ async updatePlant(id: string, changes: Partial<Plant>) {
 
 ```typescript
 // "Using multiple enhancers is over-engineering"
-const tree = signalTree<AppState>({
-  ...,
-  plants: entityMap<Plant>(),
-})
-  .with(batching())
-  .with(devTools()); // ❌ "Too many enhancers!"
+const tree = signalTree(
+  {
+    ...,
+    plants: entityMap<Plant>(),
+  } as AppState,
+  { enhancers: [batching(), devTools()] } // ❌ "Too many enhancers!"
+);
 // Note: v7+ auto-processes markers (entityMap, status, stored), no explicit enhancer needed
 ```
 
@@ -3632,11 +3630,7 @@ Start
 
 ```typescript
 // ❌ Don't add every enhancer "just in case"
-const tree = signalTree(state)
-  .with(batching())
-  .with(timeTravel())
-  .with(devTools())
-  .with(persistence({ key: 'all' }));
+const tree = signalTree(state, { enhancers: [batching(), timeTravel(), devTools(), persistence({ key: 'all' })] });
 
 // ✅ Start with none, add what you actually need
 const tree = signalTree(state);

@@ -130,7 +130,7 @@ const userTree = signalTree({
   users: [] as User[],
   loading: false,
   error: null
-  }).with(batching() /*, entities() */);
+  }, { enhancers: [batching() /*, entities() */] });
 
 // Usage: userTree.async.loadUsers(() => api.getUsers())`,
       },
@@ -182,7 +182,7 @@ import { withForms } from '@signaltree/ng-forms';
 
 const formTree = signalTree({
   user: { name: '', email: '' }
-}).with(withForms());
+}, { enhancers: [withForms()] });
 
 // Auto-generates FormGroup, validation, dirty tracking`,
         complexity: 2,

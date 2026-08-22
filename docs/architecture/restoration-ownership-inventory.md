@@ -253,3 +253,33 @@ warranted, or that `timeTravel` should adopt `TurnStore`. The inventory says
 what exists; which seam carries the eligibility decision is a derivation, and
 "two owners sharing one adapter" is a materially smaller problem than the
 five-owner version would have been.
+
+## AMENDMENT — declarative construction changes consequence 2
+
+Added after the 15.0 declarative-construction migration. Consequence 2 above
+says a construction-time snapshot is the wrong shape, because "markers
+materialize during `signalTree(...)` while enhancers attach afterwards via
+`.with()`". **That premise is now false.** `.with()` is deleted; the enhancer set
+is declared in `signalTree`'s config and applied during construction, and there
+is no operation that adds one to a live tree.
+
+What follows, and what does not:
+
+- **Consequence 2 inverts.** A construction-time answer is now the only
+  well-defined one. "Does this tree have a restoration owner?" is decided before
+  the first write and cannot change, so a value captured at materialization
+  cannot go stale the way the old note describes.
+- **Consequence 1 stands unchanged.** The capability query still has no source
+  of truth at retirement time. Knowing the answer is fixed does not supply it;
+  wiring `hasCapability` remains a prerequisite for zero-owner reclamation.
+- **Open question 1 gets easier but is not answered.** Absence of a restorer is
+  now a static property of the tree rather than a race against a future
+  `.with()`, which removes the strongest objection to treating it as sufficient.
+  It does not settle whether an explicit authority should still answer.
+- **Nothing here licenses turning reclamation on.** No production path calls
+  `runPhysicalMaintenance`, and that is unchanged.
+
+The rule the assertions pin moved with it: `entity-restoration-authority.spec.ts`
+asserted a PROSPECTIVE rule evaluated over time and now asserts a STATIC one —
+that a tree built without a restoration owner has no path to acquiring one. Read
+that file's header before building on either statement.

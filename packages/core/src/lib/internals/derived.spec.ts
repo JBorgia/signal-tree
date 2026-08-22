@@ -245,13 +245,23 @@ describe('derived() marker pattern', () => {
       expect(tree.$.name()).toBe('test');
     });
 
-    it('should preserve with() enhancer chaining', () => {
-      const tree = signalTree({ count: 0 }).derived(($) => ({
-        doubled: computed(() => $.count() * 2),
-      }));
+    it('composes with configured enhancers', () => {
+      // Was 'should preserve with() enhancer chaining'. There is no chaining to
+      // preserve in v15 — enhancers are declared with the tree — so the claim
+      // is the one that survived it: declaring derived state does not cost you
+      // enhancers, and declaring enhancers does not cost you derived state.
+      const tree = signalTree(
+        { count: 0 },
+        {
+          enhancers: [batching()],
+          derived: ($) => ({ doubled: computed(() => $.count() * 2) }),
+        }
+      );
 
-      // with() should still be available
-      expect(typeof tree.with).toBe('function');
+      expect(tree.$.doubled()).toBe(0);
+      expect(typeof (tree as unknown as { coalesce?: unknown }).coalesce).toBe(
+        'function'
+      );
     });
   });
 
@@ -795,20 +805,42 @@ describe('derived() marker pattern', () => {
     });
   });
 
-  it('should preserve derived signal identity across .with() chaining', () => {
+  it('merges derived signals once, into the $ the enhancers saw', () => {
+    // Was 'should preserve derived signal identity across .with() chaining'.
+    // The failure it guards against is unchanged: derived factories running
+    // more than once, or running against a `$` that an enhancer later replaced,
+    // which produces a second `doubled` over the same source and the
+    // 'overwrites source signal' warning. Without a chain to compare across,
+    // the observable form is that the finished tree's `$` IS the object each
+    // enhancer was handed, and `doubled` lands on it exactly once.
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {
       // silence warnings; we assert below that overwrite warnings do not happen
     });
 
-    const base = signalTree({ count: 1 }).derived(($) => ({
-      doubled: computed(() => $.count() * 2),
-    }));
+    const seen: unknown[] = [];
+    const probe = (t: unknown) => {
+      seen.push((t as { $: unknown }).$);
+      return t;
+    };
 
-    const w1 = base.with(batching());
-    const w2 = w1.with(devTools({ enabled: false }));
+    const tree = signalTree(
+      { count: 1 },
+      {
+        enhancers: [
+          probe as never,
+          batching() as never,
+          probe as never,
+          devTools({ enabled: false }) as never,
+          probe as never,
+        ],
+        derived: ($) => ({ doubled: computed(() => $.count() * 2) }),
+      }
+    );
 
-    expect(base.$.doubled).toBe(w1.$.doubled);
-    expect(w1.$.doubled).toBe(w2.$.doubled);
+    expect(seen).toHaveLength(3);
+    for (const seen$ of seen) expect(tree.$).toBe(seen$);
+    expect(tree.$.doubled).toBe(tree.$.doubled);
+    expect(tree.$.doubled()).toBe(2);
 
     const warnedAboutOverwrite = warnSpy.mock.calls.some((call) =>
       String(call[0] ?? '').includes('overwrites source signal')

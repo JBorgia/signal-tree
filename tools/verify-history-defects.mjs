@@ -50,9 +50,7 @@ const check = (name, reproduced, detail) => {
 // fixed — form field writes announce on the form path, so global time-travel
 // records and reverts them. These checks pin the FIXED behaviour by outcome.
 {
-  const t = signalTree({ profile: form({ initial: { name: '' } }) }).with(
-    timeTravel({})
-  );
+  const t = signalTree({ profile: form({ initial: { name: '' } }) }, { enhancers: [timeTravel({})] });
   const baseline = t.getHistory().length;
   for (const v of ['a', 'ab', 'abc']) {
     t.$.profile.$.name.set(v);
@@ -74,7 +72,7 @@ const check = (name, reproduced, detail) => {
   const t = signalTree({
     profile: form({ initial: { name: '' } }),
     plain: '',
-  }).with(timeTravel({}));
+  }, { enhancers: [timeTravel({})] });
   t.$.plain.set('p1');
   await flush();
   t.$.profile.$.name.set('ada');
@@ -177,9 +175,7 @@ const check = (name, reproduced, detail) => {
     origError(...args);
   };
   for (const cap of [undefined, 0, 1, 2, 5]) {
-    const t = signalTree({ n: 0 }).with(
-      timeTravel(cap === undefined ? {} : { maxHistorySize: cap })
-    );
+    const t = signalTree({ n: 0 }, { enhancers: [timeTravel(cap === undefined ? {} : { maxHistorySize: cap })] });
     for (let i = 1; i <= 10; i++) {
       t.$.n.set(i);
       await flush();

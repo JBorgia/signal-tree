@@ -139,9 +139,7 @@ const cfg = { selectId: (r) => r.id };
 }
 // 2 — same-subject restore
 {
-  const t = signalTree({ rows: entityMap(cfg) }).with(
-    timeTravel({ maxHistorySize: 20 })
-  );
+  const t = signalTree({ rows: entityMap(cfg) }, { enhancers: [timeTravel({ maxHistorySize: 20 })] });
   t.$.rows.setAll([
     { id: 1, name: 'Alice' },
     { id: 2, name: 'Bob' },

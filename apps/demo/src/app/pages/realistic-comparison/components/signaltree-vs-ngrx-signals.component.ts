@@ -529,7 +529,7 @@ export class SignalTreeVsNgrxSignalsComponent {
   ): Promise<BenchmarkResult> {
     const initialState = this.createInitialState();
     // Deep Nested scenario mapping: batching + shallow memoization
-    const tree = signalTree(initialState).with(batching());
+    const tree = signalTree(initialState, { enhancers: [batching()] });
 
     const samples: number[] = [];
     let computedRecomputes = 0;
@@ -744,9 +744,9 @@ export class SignalTreeVsNgrxSignalsComponent {
   ): Promise<BenchmarkResult> {
     const initialState = this.createInitialState();
     // Array Updates scenario mapping: high-performance batching only
-    const tree = signalTree(initialState).with(
-      batching({ enabled: true, notificationDelayMs: 0 })
-    );
+    const tree = signalTree(initialState, {
+      enhancers: [batching({ enabled: true, notificationDelayMs: 0 })],
+    });
 
     const samples: number[] = [];
     let computedRecomputes = 0;
@@ -994,7 +994,7 @@ export class SignalTreeVsNgrxSignalsComponent {
     onSample?: (ms: number) => void
   ): Promise<BenchmarkResult> {
     const initialState = this.createInitialState();
-    const tree = signalTree(initialState).with(batching());
+    const tree = signalTree(initialState, { enhancers: [batching()] });
 
     const samples: number[] = [];
     let computedRecomputes = 0;

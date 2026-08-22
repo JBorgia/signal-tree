@@ -154,7 +154,10 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
   });
 
   it('CANONICALITY — BLOCKED by a 15-branch UNDO REGRESSION, not by array leaves', async () => {
-    const tree = signalTree({ rows: [] as Row[], draft: '' }).with(timeTravel());
+    const tree = signalTree(
+      { rows: [] as Row[], draft: '' },
+      { enhancers: [timeTravel()] }
+    );
     const rows = collectionOver(tree.$.rows);
 
     rows.addOne({ id: 'a', n: 1 });

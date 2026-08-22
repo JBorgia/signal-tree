@@ -3,7 +3,11 @@ import { computed } from '@angular/core';
 import { entityMap, signalTree, timeTravel } from '../index';
 import { getCausalWriteMode } from './causal-write-mode';
 import { withWriteContext } from './write-context';
-import { getPathNotifier, PathNotifier, resetPathNotifier } from './path-notifier';
+import {
+  getPathNotifier,
+  PathNotifier,
+  resetPathNotifier,
+} from './path-notifier';
 
 /**
  * MUT-1 — EVIDENCE. What distinguishes a physical change that merely REALIZES
@@ -64,18 +68,27 @@ async function probe(
 
 describe('MUT-1 — landed vs semantic vs causally authored', () => {
   const plain = () => {
-    const tree = signalTree({ a: { n: 1 }, rows: entityMap<{ id: string; v: number }>() }).with(
-      timeTravel()
+    const tree = signalTree(
+      { a: { n: 1 }, rows: entityMap<{ id: string; v: number }>() },
+      { enhancers: [timeTravel()] }
     );
     return { tree, read: () => tree.$.a() };
   };
 
   it('ORDINARY LEAF WRITE — the reference case', async () => {
     const r = await probe(plain, (t) => {
-      (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(2);
+      (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(
+        2
+      );
     });
-    expect({ landed: r.landed, history: r.history, notified: r.notified }).toEqual({
-      landed: true, history: 1, notified: ['a.n'],
+    expect({
+      landed: r.landed,
+      history: r.history,
+      notified: r.notified,
+    }).toEqual({
+      landed: true,
+      history: 1,
+      notified: ['a.n'],
     });
   });
 
@@ -83,8 +96,14 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
     const r = await probe(plain, (t) => {
       (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 });
     });
-    expect({ landed: r.landed, history: r.history, notified: r.notified }).toEqual({
-      landed: true, history: 1, notified: ['a.n'],
+    expect({
+      landed: r.landed,
+      history: r.history,
+      notified: r.notified,
+    }).toEqual({
+      landed: true,
+      history: 1,
+      notified: ['a.n'],
     });
   });
 
@@ -94,21 +113,29 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
     });
     // LANDED is the precondition: nothing downstream observes a write that
     // did not land.
-    expect({ landed: r.landed, history: r.history, notified: r.notified }).toEqual({
-      landed: false, history: 0, notified: [],
+    expect({
+      landed: r.landed,
+      history: r.history,
+      notified: r.notified,
+    }).toEqual({
+      landed: false,
+      history: 0,
+      notified: [],
     });
   });
 
   it('UNDO — truth changes, but is it AUTHORED?', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }).with(timeTravel());
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
     await tick();
     tree.$.a({ n: 2 });
     await tick();
 
     const beforeHistory = tree.getHistory().length;
     const notified: string[] = [];
-    const off = getPathNotifier().subscribe('**', (_n, _p, path) => notified.push(String(path)));
+    const off = getPathNotifier().subscribe('**', (_n, _p, path) =>
+      notified.push(String(path))
+    );
 
     tree.undo();
     await tick();
@@ -124,16 +151,22 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
   it('ENTITY CRUD', async () => {
     const r = await probe(
       () => {
-        const tree = signalTree({ rows: entityMap<{ id: string; v: number }>() }).with(timeTravel());
+        const tree = signalTree(
+          { rows: entityMap<{ id: string; v: number }>() },
+          { enhancers: [timeTravel()] }
+        );
         return { tree, read: () => tree.$.rows.all() };
       },
       (t) => {
-        (t as unknown as { $: { rows: { addMany(x: unknown[]): void } } }).$.rows.addMany([
-          { id: 'a', v: 1 },
-        ]);
+        (
+          t as unknown as { $: { rows: { addMany(x: unknown[]): void } } }
+        ).$.rows.addMany([{ id: 'a', v: 1 }]);
       }
     );
-    expect({ landed: r.landed, history: r.history }).toEqual({ landed: true, history: 1 });
+    expect({ landed: r.landed, history: r.history }).toEqual({
+      landed: true,
+      history: 1,
+    });
     expect(r.notified).toContain('rows.a');
   });
 
@@ -142,7 +175,10 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
   // specimen; the ordinary-leaf, branch-call-form and deep-equal rows remain.
 
   it('PUBLICATION is independent — every landed change is pull-visible', async () => {
-    const tree = signalTree({ a: { n: 1 } });
+    const tree = signalTree(
+      { a: { n: 1 } },
+      { capabilities: ['causal-runtime'] }
+    );
     const seen = computed(() => tree.$.a.n());
     expect(seen()).toBe(1);
     tree.$.a.n.set(9);
@@ -153,7 +189,10 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
 describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENHANCER?', () => {
   it('a leaf write on a BARE tree (no enhancer)', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } });
+    const tree = signalTree(
+      { a: { n: 1 } },
+      { capabilities: ['causal-runtime'] }
+    );
     const notified: string[] = [];
     const off = getPathNotifier().subscribe('**', (_n, _p, path) =>
       notified.push(String(path))
@@ -170,7 +209,7 @@ describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENH
 
   it('the same write WITH timeTravel', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }).with(timeTravel());
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
     await tick();
     const notified: string[] = [];
     const off = getPathNotifier().subscribe('**', (_n, _p, path) =>
@@ -186,7 +225,10 @@ describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENH
 
   it('entityMap CRUD on a BARE tree', async () => {
     resetPathNotifier();
-    const tree = signalTree({ rows: entityMap<{ id: string; v: number }>() });
+    const tree = signalTree(
+      { rows: entityMap<{ id: string; v: number }>() },
+      { capabilities: ['causal-runtime'] }
+    );
     const notified: string[] = [];
     const off = getPathNotifier().subscribe('**', (_n, _p, path) =>
       notified.push(String(path))
@@ -203,7 +245,10 @@ describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENH
 describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
   const capture = async (op: (t: ReturnType<typeof signalTree>) => void) => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1, s: 'x' }, top: 0 });
+    const tree = signalTree(
+      { a: { n: 1, s: 'x' }, top: 0 },
+      { capabilities: ['causal-runtime'] }
+    );
     const notified: string[] = [];
     const off = getPathNotifier().subscribe('**', (_n, _p, path) =>
       notified.push(String(path))
@@ -216,7 +261,9 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
 
   it('DIRECT leaf .set()', async () => {
     const r = await capture((t) => {
-      (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(2);
+      (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(
+        2
+      );
     });
     expect(r.notified).toEqual(['a.n']);
   });
@@ -256,7 +303,10 @@ describe('MUT-1 — the interceptLeafSignals docblock, tested verbatim', () => {
    */
   it('the exact shape the docblock names', async () => {
     resetPathNotifier();
-    const tree = signalTree({ user: { profile: { name: 'a', age: 1 } } });
+    const tree = signalTree(
+      { user: { profile: { name: 'a', age: 1 } } },
+      { capabilities: ['causal-runtime'] }
+    );
     const notified: string[] = [];
     const off = getPathNotifier().subscribe('**', (_n, _p, path) =>
       notified.push(String(path))
@@ -306,7 +356,7 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
 
   it('AUTHORED write — what meta reaches the observer?', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }).with(timeTravel());
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
     await tick();
     const { seen, off } = capture();
 
@@ -322,7 +372,7 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
 
   it('UNDO realization — what meta reaches the observer?', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }).with(timeTravel());
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
     await tick();
     tree.$.a.n.set(2);
     await tick();
@@ -364,7 +414,11 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
         meta?: unknown
       ) => {
         const m = (meta ?? {}) as Record<string, unknown>;
-        seen.push({ path, source: source ?? null, causalMode: m['causalMode'] ?? null });
+        seen.push({
+          path,
+          source: source ?? null,
+          causalMode: m['causalMode'] ?? null,
+        });
       }
     );
     return { seen, off };
@@ -372,7 +426,7 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
 
   it('REDO is also marked realization', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }).with(timeTravel());
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
     await tick();
     tree.$.a.n.set(2);
     await tick();
@@ -391,7 +445,7 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
 
   it('THE ASYMMETRY: authorship is signalled by ABSENCE, not by a positive mark', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }).with(timeTravel());
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
     await tick();
 
     const { seen, off } = capture();
@@ -424,7 +478,9 @@ describe('MUT-2A — what does ABSENCE of causalMode mean?', () => {
     expect(getCausalWriteMode(undefined)).toBe('authoring');
     expect(getCausalWriteMode({})).toBe('authoring');
     expect(getCausalWriteMode({ causalMode: 'authoring' })).toBe('authoring');
-    expect(getCausalWriteMode({ causalMode: 'realization' })).toBe('realization');
+    expect(getCausalWriteMode({ causalMode: 'realization' })).toBe(
+      'realization'
+    );
   });
 
   it('COLLAPSE: unmarked and explicitly-authoring are INDISTINGUISHABLE', () => {
@@ -461,7 +517,7 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
    * the requirement stops being a plausibility argument.
    */
   const run = async (meta: Record<string, unknown>) => {
-    const tree = signalTree({ a: { n: 0 } }).with(timeTravel());
+    const tree = signalTree({ a: { n: 0 } }, { enhancers: [timeTravel()] });
     await tick();
     const before = tree.getHistory().length;
 
@@ -479,7 +535,11 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
   });
 
   it('A — explicitly classified realization', async () => {
-    const r = await run({ causalMode: 'realization', source: 'system', intent: 'system' });
+    const r = await run({
+      causalMode: 'realization',
+      source: 'system',
+      intent: 'system',
+    });
     // Classified realization: NOT captured.
     expect(r).toEqual({ delta: 0, value: 1 });
   });
@@ -500,7 +560,7 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
    * no-context arm and a four-rung ladder.
    */
   const withCtx = async (meta: Record<string, unknown> | null) => {
-    const tree = signalTree({ a: { n: 0 } }).with(timeTravel());
+    const tree = signalTree({ a: { n: 0 } }, { enhancers: [timeTravel()] });
     await tick();
     const before = tree.getHistory().length;
     if (meta === null) {
@@ -532,13 +592,13 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
 
 describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', () => {
   /**
-  * Before 15.0, `withWriteContext` was reachable through the public authoring
-  * subpath. The historical question was not hypothetical: could arbitrary
-  * consumer code claim `realization` over an ordinary application mutation,
-  * and did the claim take effect?
+   * Before 15.0, `withWriteContext` was reachable through the public authoring
+   * subpath. The historical question was not hypothetical: could arbitrary
+   * consumer code claim `realization` over an ordinary application mutation,
+   * and did the claim take effect?
    */
   it('an ORDINARY application write, claimed as realization', async () => {
-    const tree = signalTree({ balance: 0 }).with(timeTravel());
+    const tree = signalTree({ balance: 0 }, { enhancers: [timeTravel()] });
     await tick();
     const before = tree.getHistory().length;
 
@@ -555,7 +615,7 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
   });
 
   it('the same write WITHOUT the claim — the control', async () => {
-    const tree = signalTree({ balance: 0 }).with(timeTravel());
+    const tree = signalTree({ balance: 0 }, { enhancers: [timeTravel()] });
     await tick();
     const before = tree.getHistory().length;
 

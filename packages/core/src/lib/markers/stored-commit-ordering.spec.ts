@@ -80,12 +80,15 @@ describe('stored() consequence ordering', () => {
 
     const rec = recordingStorage({ 'sco-pending': 'light' });
 
-    const store = signalTree({
-      theme: stored('sco-pending', 'light', {
-        storage: rec.adapter,
-        debounceMs: 0,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        theme: stored('sco-pending', 'light', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { theme: { (): string; set(value: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -97,7 +100,12 @@ describe('stored() consequence ordering', () => {
     // Live tree advanced; durable state has not.
     expect(store.$.theme()).toBe('dark');
     expect(rec.log).toEqual([]);
-    expect(dataIn({ 'sco-pending': rec.adapter.getItem('sco-pending') as string }, 'sco-pending')).toBe('light');
+    expect(
+      dataIn(
+        { 'sco-pending': rec.adapter.getItem('sco-pending') as string },
+        'sco-pending'
+      )
+    ).toBe('light');
 
     pending.confirm();
 
@@ -114,12 +122,15 @@ describe('stored() consequence ordering', () => {
 
     const rec = recordingStorage({ 'sco-throw': 'keep' });
 
-    const store = signalTree({
-      v: stored('sco-throw', 'keep', {
-        storage: rec.adapter,
-        debounceMs: 0,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        v: stored('sco-throw', 'keep', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { v: { (): string; set(value: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -151,12 +162,15 @@ describe('stored() consequence ordering', () => {
 
     const rec = recordingStorage({ 'sco-collapse': 'v0' });
 
-    const store = signalTree({
-      v: stored('sco-collapse', 'v0', {
-        storage: rec.adapter,
-        debounceMs: 0,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        v: stored('sco-collapse', 'v0', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { v: { (): string; set(value: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -183,10 +197,13 @@ describe('stored() consequence ordering', () => {
 
     const rec = recordingStorage({ 'sco-a': 'a0', 'sco-b': 'b0' });
 
-    const store = signalTree({
-      a: stored('sco-a', 'a0', { storage: rec.adapter, debounceMs: 0 }),
-      b: stored('sco-b', 'b0', { storage: rec.adapter, debounceMs: 0 }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        a: stored('sco-a', 'a0', { storage: rec.adapter, debounceMs: 0 }),
+        b: stored('sco-b', 'b0', { storage: rec.adapter, debounceMs: 0 }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: {
         a: { (): string; set(value: string): void };
         b: { (): string; set(value: string): void };
@@ -234,12 +251,15 @@ describe('stored() post-commit boundary — audit blockers', () => {
 
     const rec = recordingStorage({ 'sco-clear': 'light' });
 
-    const store = signalTree({
-      theme: stored('sco-clear', 'light', {
-        storage: rec.adapter,
-        debounceMs: 0,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        theme: stored('sco-clear', 'light', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { theme: { (): string; set(v: string): void; clear(): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -268,12 +288,15 @@ describe('stored() post-commit boundary — audit blockers', () => {
 
     const rec = recordingStorage({ 'sco-overlap': 'v0' });
 
-    const store = signalTree({
-      v: stored('sco-overlap', 'v0', {
-        storage: rec.adapter,
-        debounceMs: 0,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        v: stored('sco-overlap', 'v0', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { v: { (): string; set(value: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -314,7 +337,7 @@ describe('stored() post-commit boundary — audit blockers', () => {
       $: { theme: { (): string; set(v: string): void } };
     };
 
-    const treeB = signalTree({ n: 0 }).with(transactions()) as {
+    const treeB = signalTree({ n: 0 }, { enhancers: [transactions()] }) as {
       $: { n: { (): number; set(v: number): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -354,9 +377,12 @@ describe('stored() deferred consequences resolve at settle time', () => {
 
     const rec = recordingStorage({ 'sco-stale': 'v0' });
 
-    const store = signalTree({
-      v: stored('sco-stale', 'v0', { storage: rec.adapter, debounceMs: 0 }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        v: stored('sco-stale', 'v0', { storage: rec.adapter, debounceMs: 0 }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { v: { (): string; set(value: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -390,12 +416,15 @@ describe('stored() deferred consequences resolve at settle time', () => {
 
     const rec = recordingStorage({ 'sco-stale-clear': 'v0' });
 
-    const store = signalTree({
-      v: stored('sco-stale-clear', 'v0', {
-        storage: rec.adapter,
-        debounceMs: 0,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        v: stored('sco-stale-clear', 'v0', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { v: { (): string; set(value: string): void; clear(): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -441,9 +470,12 @@ describe('stored() commit attribution — RECORDED DEFECT', () => {
 
     const rec = recordingStorage({ 'sco-attr': 'v0' });
 
-    const store = signalTree({
-      v: stored('sco-attr', 'v0', { storage: rec.adapter, debounceMs: 0 }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        v: stored('sco-attr', 'v0', { storage: rec.adapter, debounceMs: 0 }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { v: { (): string; set(value: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };
@@ -484,10 +516,16 @@ describe('stored() commit attribution — RECORDED DEFECT', () => {
 
     const rec = recordingStorage({ 'sco-bare-hold': 'v0' });
 
-    const store = signalTree({
-      v: stored('sco-bare-hold', 'v0', { storage: rec.adapter, debounceMs: 0 }),
-      n: 0,
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        v: stored('sco-bare-hold', 'v0', {
+          storage: rec.adapter,
+          debounceMs: 0,
+        }),
+        n: 0,
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: {
         v: { (): string; set(value: string): void };
         n: { (): number; set(value: number): void };
@@ -524,7 +562,7 @@ describe('stored() commit attribution — RECORDED DEFECT', () => {
       }),
     }) as unknown as { $: { v: { (): string; set(value: string): void } } };
 
-    const treeB = signalTree({ n: 0 }).with(transactions()) as {
+    const treeB = signalTree({ n: 0 }, { enhancers: [transactions()] }) as {
       $: { n: { (): number; set(value: number): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
     };

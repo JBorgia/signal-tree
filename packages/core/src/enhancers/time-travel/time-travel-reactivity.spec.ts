@@ -27,7 +27,10 @@ const flush = () => new Promise((r) => setTimeout(r, 0));
 
 describe('canUndo tracks the history position', () => {
   it('flips false → true when the first entry is recorded', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 10 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    );
     const canUndo = computed(() => tree.canUndo());
     expect(canUndo()).toBe(false);
 
@@ -38,7 +41,10 @@ describe('canUndo tracks the history position', () => {
   });
 
   it('flips back to false when undone to the start', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 10 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    );
     const canUndo = computed(() => tree.canUndo());
     tree.$.n.set(1);
     await flush();
@@ -50,7 +56,10 @@ describe('canUndo tracks the history position', () => {
   });
 
   it('actually RE-EVALUATES — the assertion the value alone cannot make', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 10 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    );
     let evaluations = 0;
     const canUndo = computed(() => {
       evaluations++;
@@ -69,7 +78,10 @@ describe('canUndo tracks the history position', () => {
 
 describe('canRedo tracks BOTH the position and the history length', () => {
   it('is false at the end of history and true after an undo', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 10 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    );
     const canRedo = computed(() => tree.canRedo());
     tree.$.n.set(1);
     await flush();
@@ -82,7 +94,10 @@ describe('canRedo tracks BOTH the position and the history length', () => {
   });
 
   it('goes back to false once redone to the end', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 10 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    );
     const canRedo = computed(() => tree.canRedo());
     tree.$.n.set(1);
     await flush();
@@ -98,7 +113,10 @@ describe('canRedo tracks BOTH the position and the history length', () => {
   it('a NEW write after an undo discards the redo branch', async () => {
     // The index does not move here — a new entry replaces the future — so this
     // is the case that needs the history-length dependency, not the index one.
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 10 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    );
     const canRedo = computed(() => tree.canRedo());
     tree.$.n.set(1);
     await flush();
@@ -115,7 +133,10 @@ describe('canRedo tracks BOTH the position and the history length', () => {
 
 describe('getHistory is reactive', () => {
   it('a computed over its length sees entries appear', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 10 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    );
     const length = computed(() => tree.getHistory().length);
     const before = length();
 
@@ -126,7 +147,10 @@ describe('getHistory is reactive', () => {
   });
 
   it('resetHistory is observed', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 10 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    );
     const length = computed(() => tree.getHistory().length);
     tree.$.n.set(1);
     await flush();
@@ -143,7 +167,10 @@ describe('getHistory is reactive', () => {
 
 describe('the imperative API is unchanged', () => {
   it('direct calls still return the same answers', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 10 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    );
     expect(tree.canUndo()).toBe(false);
 
     tree.$.n.set(1);
@@ -158,7 +185,10 @@ describe('the imperative API is unchanged', () => {
   });
 
   it('maxHistorySize still evicts, and the position follows', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel({ maxHistorySize: 3 }));
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel({ maxHistorySize: 3 })] }
+    );
     for (let i = 1; i <= 6; i++) {
       tree.$.n.set(i);
       await flush();

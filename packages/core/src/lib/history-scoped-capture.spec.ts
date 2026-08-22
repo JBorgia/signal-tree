@@ -34,13 +34,16 @@ const flush = () => new Promise<void>((r) => setTimeout(r, 0));
 
 describe('recordHistory: false — excluded from time travel', () => {
   it('keeps the collection out of recorded history entries', async () => {
-    const tree = signalTree({
-      rows: entityMap<Row, number>({
-        selectId: (r) => r.id,
-        recordHistory: false,
-      }),
-      n: 0,
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, number>({
+          selectId: (r) => r.id,
+          recordHistory: false,
+        }),
+        n: 0,
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     tree.$.rows.setAll(rows(5));
     await flush();
 
@@ -63,10 +66,13 @@ describe('recordHistory: false — excluded from time travel', () => {
   });
 
   it('an INCLUDED collection is still captured — the flag is opt-in', async () => {
-    const tree = signalTree({
-      rows: entityMap<Row, number>({ selectId: (r) => r.id }),
-      n: 0,
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, number>({ selectId: (r) => r.id }),
+        n: 0,
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     tree.$.rows.setAll(rows(5));
     await flush();
 
@@ -89,12 +95,15 @@ describe('recordHistory: false — excluded from time travel', () => {
 
 describe('recordHistory: false — present everywhere ELSE', () => {
   it('still appears in tree()', () => {
-    const tree = signalTree({
-      rows: entityMap<Row, number>({
-        selectId: (r) => r.id,
-        recordHistory: false,
-      }),
-    });
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, number>({
+          selectId: (r) => r.id,
+          recordHistory: false,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
     tree.$.rows.setAll(rows(3));
 
     const snap = tree() as { rows: { all: Row[] } };
@@ -110,9 +119,15 @@ describe('recordHistory: false — present everywhere ELSE', () => {
     // shorthand variable, so a future rename breaks the build instead of
     // quietly emptying the test.
     const mk = (recordHistory: boolean) => {
-      const t = signalTree({
-        rows: entityMap<Row, number>({ selectId: (r) => r.id, recordHistory }),
-      }).with(serialization());
+      const t = signalTree(
+        {
+          rows: entityMap<Row, number>({
+            selectId: (r) => r.id,
+            recordHistory,
+          }),
+        },
+        { enhancers: [serialization()], capabilities: ['causal-runtime'] }
+      );
       t.$.rows.setAll(rows(10));
       return t;
     };
@@ -135,13 +150,16 @@ describe('recordHistory: false — present everywhere ELSE', () => {
 
 describe('recordHistory: false — undo is PARTIAL, by design', () => {
   it('keeps the excluded collection out of confirmed turn participation', async () => {
-    const tree = signalTree({
-      rows: entityMap<Row, number>({
-        selectId: (r) => r.id,
-        recordHistory: false,
-      }),
-      n: 0,
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, number>({
+          selectId: (r) => r.id,
+          recordHistory: false,
+        }),
+        n: 0,
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     tree.$.rows.setAll(rows(3));
     await flush();
 
@@ -151,32 +169,38 @@ describe('recordHistory: false — undo is PARTIAL, by design', () => {
     (tree as unknown as (v: object) => void)({ n: 2 });
     await flush();
 
-    const manager = (tree as unknown as {
-      __timeTravel: {
-        getTurns(): Array<{
-          id: number;
-          __positionIds?: number[];
-          __effects?: Array<{ ownerPath?: string; path?: string }>;
-        }>;
-        getFrontier(positionId: number): number;
-        getAppliedTurnIdsForPosition(positionId: number): number[];
-      };
-    }).__timeTravel;
-    const rowsPositionId = (tree.$.rows as { __positionIds?: number[] }).__positionIds?.[0];
-    const countPositionId = (tree.$.n as { __positionIds?: number[] }).__positionIds?.[0];
+    const manager = (
+      tree as unknown as {
+        __timeTravel: {
+          getTurns(): Array<{
+            id: number;
+            __positionIds?: number[];
+            __effects?: Array<{ ownerPath?: string; path?: string }>;
+          }>;
+          getFrontier(positionId: number): number;
+          getAppliedTurnIdsForPosition(positionId: number): number[];
+        };
+      }
+    ).__timeTravel;
+    const rowsPositionId = (tree.$.rows as { __positionIds?: number[] })
+      .__positionIds?.[0];
+    const countPositionId = (tree.$.n as { __positionIds?: number[] })
+      .__positionIds?.[0];
     const latestTurn = manager.getTurns().at(-1);
 
     expect(rowsPositionId).toBeTypeOf('number');
     expect(countPositionId).toBeTypeOf('number');
     expect(latestTurn?.__positionIds).not.toContain(rowsPositionId);
     expect(latestTurn?.__positionIds).toContain(countPositionId);
-    expect(latestTurn?.__effects?.some((effect) => effect.ownerPath === 'rows')).toBe(
-      false
-    );
-    expect(latestTurn?.__effects?.some((effect) => effect.path?.startsWith('rows'))).toBe(
-      false
-    );
-    expect(manager.getAppliedTurnIdsForPosition(rowsPositionId as number)).toEqual([]);
+    expect(
+      latestTurn?.__effects?.some((effect) => effect.ownerPath === 'rows')
+    ).toBe(false);
+    expect(
+      latestTurn?.__effects?.some((effect) => effect.path?.startsWith('rows'))
+    ).toBe(false);
+    expect(
+      manager.getAppliedTurnIdsForPosition(rowsPositionId as number)
+    ).toEqual([]);
     expect(manager.getFrontier(rowsPositionId as number)).toBe(0);
   });
 
@@ -185,13 +209,16 @@ describe('recordHistory: false — undo is PARTIAL, by design', () => {
     // regression: "a partial restore is worse than a failed one" is a lesson
     // this codebase already paid for, so the partiality must be deliberate,
     // opt-in, and tested.
-    const tree = signalTree({
-      rows: entityMap<Row, number>({
-        selectId: (r) => r.id,
-        recordHistory: false,
-      }),
-      n: 0,
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, number>({
+          selectId: (r) => r.id,
+          recordHistory: false,
+        }),
+        n: 0,
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     tree.$.rows.setAll(rows(3));
     await flush();
 
@@ -237,10 +264,13 @@ describe('ST2029 — history retention', () => {
     width: number,
     writes: number
   ) {
-    const tree = signalTree({
-      rows: entityMap<Row, number>(config),
-      n: 0,
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, number>(config),
+        n: 0,
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     warn.mockClear();
 
     tree.$.rows.setAll(rows(width));
@@ -293,10 +323,13 @@ describe('entityMap({ recordHistory: false }) — no PHANTOM undo steps (14.1.1)
   // only inside excluded state came back structurally identical but
   // referentially distinct. `last.state === entry.state` missed them.
   it('excluded-only writes create NO entries', async () => {
-    const tree = signalTree({
-      rows: entityMap<{ id: string; n: number }>({ recordHistory: false }),
-      draft: '',
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<{ id: string; n: number }>({ recordHistory: false }),
+        draft: '',
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     tree.$.rows.addMany([{ id: 'a', n: 0 }]);
     await tick();
 
@@ -311,10 +344,13 @@ describe('entityMap({ recordHistory: false }) — no PHANTOM undo steps (14.1.1)
   });
 
   it('an excluded write does not shift where undo lands', async () => {
-    const tree = signalTree({
-      rows: entityMap<{ id: string; n: number }>({ recordHistory: false }),
-      draft: '',
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<{ id: string; n: number }>({ recordHistory: false }),
+        draft: '',
+      },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     tree.$.rows.addMany([{ id: 'a', n: 0 }]);
     await tick();
 
@@ -335,12 +371,15 @@ describe('entityMap({ recordHistory: false }) — no PHANTOM undo steps (14.1.1)
   // intermediate `box` node too, so the root's `box` reference differs even
   // though nothing observable changed.
   it('works when the excluded collection is NESTED', async () => {
-    const tree = signalTree({
-      box: {
-        rows: entityMap<{ id: string; n: number }>({ recordHistory: false }),
-        label: 'x',
+    const tree = signalTree(
+      {
+        box: {
+          rows: entityMap<{ id: string; n: number }>({ recordHistory: false }),
+          label: 'x',
+        },
       },
-    }).with(timeTravel());
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     tree.$.box.rows.addMany([{ id: 'a', n: 0 }]);
     await tick();
 
@@ -358,7 +397,10 @@ describe('entityMap({ recordHistory: false }) — no PHANTOM undo steps (14.1.1)
   });
 
   it('does not suppress ordinary writes when nothing is excluded', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel());
+    const tree = signalTree(
+      { n: 0 },
+      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+    );
     await tick();
     const base = tree.getHistory().length;
     tree.$.n.set(1);

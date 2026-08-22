@@ -3,7 +3,11 @@ import { AppliedHistory } from './applied-history';
 import { rollbackPendingTurnAt } from './pending-rollback';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
-import type { ISignalTree, StructuralHistoryEffect, UpdateMetadata } from '../../types';
+import type {
+  ISignalTree,
+  StructuralHistoryEffect,
+  UpdateMetadata,
+} from '../../types';
 import { withWriteContext } from '../../write-context';
 import { entityMap } from '../../markers/entity-map';
 import { stored } from '../../markers/stored';
@@ -12,7 +16,10 @@ import { createPositionRegistry } from '../position-registry';
 import { getPositionRegistry } from '../position-registry';
 import { createRealizationContextSource } from './realization-context';
 import { createGreenfieldTransactionDraft } from './greenfield-transactions';
-import { createTransactionCaptureBridge, toExplicitTransactionEffect } from './transaction-capture-bridge';
+import {
+  createTransactionCaptureBridge,
+  toExplicitTransactionEffect,
+} from './transaction-capture-bridge';
 import {
   createTreeRealizationAdapter,
   rememberTreeRealizationDescriptor,
@@ -96,7 +103,16 @@ const createLiveDraftHarness = (
         });
       }
 
-      bridge(next, prev, path, ownerPath, source, subjectIds, positionIds, meta);
+      bridge(
+        next,
+        prev,
+        path,
+        ownerPath,
+        source,
+        subjectIds,
+        positionIds,
+        meta
+      );
     }
   );
 
@@ -158,11 +174,14 @@ const createActualTreeAbort = (options: {
 
 const createLiveUsersAbortHarness = () => {
   resetPathNotifier();
-  const tree = signalTree({
-    users: entityMap<{ id: string; name: string }, string>({
-      selectId: (user) => user.id,
-    }),
-  }) as ISignalTree<{
+  const tree = signalTree(
+    {
+      users: entityMap<{ id: string; name: string }, string>({
+        selectId: (user) => user.id,
+      }),
+    },
+    { capabilities: ['causal-runtime'] }
+  ) as ISignalTree<{
     users: {
       addOne(user: { id: string; name: string }): void;
       removeOne(id: string): void;
@@ -284,7 +303,7 @@ describe('greenfield transactions', () => {
     expect(store.getTurns()).toEqual([]);
 
     expect(draft.confirm()).toEqual({ ok: true, turnId: 1 });
-  expect(draft.getLifecycle()).toBe('confirmed');
+    expect(draft.getLifecycle()).toBe('confirmed');
     expect(physicalWrites).toBe(1);
     expect(values.get(P_THEME)).toBe('dark');
     expect(store.getPendingTurnIds()).toEqual([]);
@@ -393,9 +412,17 @@ describe('greenfield transactions', () => {
       appliedHistory,
     });
     const values = new Map<PositionId, unknown>([[P_THEME, 'B']]);
-    const appliedEffects: Array<ReadonlyArray<{ owner: PositionId; before: unknown; after: unknown }>> = [];
+    const appliedEffects: Array<
+      ReadonlyArray<{ owner: PositionId; before: unknown; after: unknown }>
+    > = [];
     const port = {
-      applyAtomically(effects: readonly { owner: PositionId; before: unknown; after: unknown }[]) {
+      applyAtomically(
+        effects: readonly {
+          owner: PositionId;
+          before: unknown;
+          after: unknown;
+        }[]
+      ) {
         const staged = new Map(values);
 
         for (const effect of effects) {
@@ -430,7 +457,9 @@ describe('greenfield transactions', () => {
 
     expect(draft.abort()).toEqual({ ok: true, turnId: 1 });
     expect(draft.getLifecycle()).toBe('aborted');
-    expect(appliedEffects).toEqual([[{ owner: P_THEME, before: 'B', after: 'A' }]]);
+    expect(appliedEffects).toEqual([
+      [{ owner: P_THEME, before: 'B', after: 'A' }],
+    ]);
     expect(values.get(P_THEME)).toBe('A');
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
@@ -455,9 +484,17 @@ describe('greenfield transactions', () => {
       appliedHistory,
     });
     const values = new Map<PositionId, unknown>([[P_THEME, 'C']]);
-    const appliedEffects: Array<ReadonlyArray<{ owner: PositionId; before: unknown; after: unknown }>> = [];
+    const appliedEffects: Array<
+      ReadonlyArray<{ owner: PositionId; before: unknown; after: unknown }>
+    > = [];
     const port = {
-      applyAtomically(effects: readonly { owner: PositionId; before: unknown; after: unknown }[]) {
+      applyAtomically(
+        effects: readonly {
+          owner: PositionId;
+          before: unknown;
+          after: unknown;
+        }[]
+      ) {
         const staged = new Map(values);
 
         for (const effect of effects) {
@@ -513,7 +550,9 @@ describe('greenfield transactions', () => {
         realizationContext,
       })
     ).toEqual({ ok: true, turnId: 2 });
-    expect(appliedEffects[1]).toEqual([{ owner: P_THEME, before: 'C', after: 'A' }]);
+    expect(appliedEffects[1]).toEqual([
+      { owner: P_THEME, before: 'C', after: 'A' },
+    ]);
     expect(values.get(P_THEME)).toBe('A');
   });
 
@@ -524,13 +563,19 @@ describe('greenfield transactions', () => {
       turnId: 1,
       store,
       appliedHistory,
-      abortPendingTurn: () => ({ ok: false, refusal: { kind: 'dependency-conflict' } }),
+      abortPendingTurn: () => ({
+        ok: false,
+        refusal: { kind: 'dependency-conflict' },
+      }),
     });
 
     draft.capture({ owner: P_THEME, before: 'A', after: 'B' });
     draft.seal();
 
-    expect(draft.abort()).toEqual({ ok: false, refusal: { kind: 'dependency-conflict' } });
+    expect(draft.abort()).toEqual({
+      ok: false,
+      refusal: { kind: 'dependency-conflict' },
+    });
     expect(draft.getLifecycle()).toBe('sealed');
     expect(store.getPendingTurnIds()).toEqual([1]);
   });
@@ -601,7 +646,10 @@ describe('greenfield transactions', () => {
       turnId: 1,
       store,
       appliedHistory,
-      abortPendingTurn: () => ({ ok: false, refusal: { kind: 'history-evicted' } }),
+      abortPendingTurn: () => ({
+        ok: false,
+        refusal: { kind: 'history-evicted' },
+      }),
     });
 
     draft.capture({ owner: P_THEME, before: 'A', after: 'B' });
@@ -644,7 +692,15 @@ describe('greenfield transactions', () => {
       [P_DRIVER_KEY, 'B'],
       [P_DRIVER_NAME, 'Alicia'],
     ]);
-    const appliedEffects: Array<ReadonlyArray<{ owner: PositionId; before: unknown; after: unknown; subjectId?: unknown; structural?: 'add' | 'remove' | 'rekey' }>> = [];
+    const appliedEffects: Array<
+      ReadonlyArray<{
+        owner: PositionId;
+        before: unknown;
+        after: unknown;
+        subjectId?: unknown;
+        structural?: 'add' | 'remove' | 'rekey';
+      }>
+    > = [];
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
@@ -770,7 +826,15 @@ describe('greenfield transactions', () => {
       [P_DRIVER_NAME, 'Alice'],
       [P_DRIVER_ENABLED, true],
     ]);
-    const appliedEffects: Array<ReadonlyArray<{ owner: PositionId; before: unknown; after: unknown; subjectId?: unknown; structural?: 'add' | 'remove' | 'rekey' }>> = [];
+    const appliedEffects: Array<
+      ReadonlyArray<{
+        owner: PositionId;
+        before: unknown;
+        after: unknown;
+        subjectId?: unknown;
+        structural?: 'add' | 'remove' | 'rekey';
+      }>
+    > = [];
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
@@ -973,7 +1037,10 @@ describe('greenfield transactions', () => {
 
   it('captures a real SignalTree leaf write into an open draft, seals it as pending, then confirms without extra writes', () => {
     resetPathNotifier();
-    const tree = signalTree({ theme: 'light' }) as ISignalTree<{ theme: string }>;
+    const tree = signalTree(
+      { theme: 'light' },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{ theme: string }>;
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
     const draft = createGreenfieldTransactionDraft({
@@ -985,7 +1052,16 @@ describe('greenfield transactions', () => {
     const notifications: Array<{ path: string; meta?: UpdateMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       '**',
-      (_next, _prev, path, _ownerPath, _source, _subjectIds, _positionIds, meta) => {
+      (
+        _next,
+        _prev,
+        path,
+        _ownerPath,
+        _source,
+        _subjectIds,
+        _positionIds,
+        meta
+      ) => {
         notifications.push({ path, meta });
       }
     );
@@ -1033,7 +1109,10 @@ describe('greenfield transactions', () => {
 
   it('nets repeated real scalar writes inside one draft from the first before value to the final after value', () => {
     resetPathNotifier();
-    const tree = signalTree({ theme: 'A' }) as ISignalTree<{ theme: string }>;
+    const tree = signalTree(
+      { theme: 'A' },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{ theme: string }>;
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
     const draft = createGreenfieldTransactionDraft({
@@ -1062,7 +1141,10 @@ describe('greenfield transactions', () => {
 
   it('keeps explicit attribution local when two real drafts interleave writes', () => {
     resetPathNotifier();
-    const tree = signalTree({ a: 'A', b: 'B', c: 'C' }) as ISignalTree<{
+    const tree = signalTree(
+      { a: 'A', b: 'B', c: 'C' },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       a: string;
       b: string;
       c: string;
@@ -1134,16 +1216,19 @@ describe('greenfield transactions', () => {
     // state, entityMap structural, and the `stored` marker — so the frozen
     // heterogeneous-write falsifier still has specimens. Marker participation as
     // a write-kind is UNPROVEN and was withdrawn rather than migrated.
-    const tree = signalTree({
-      profile: { firstName: 'John' },
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-      preference: stored('greenfield-live-preference', 'compact', {
-        storage,
-        debounceMs: 0,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        profile: { firstName: 'John' },
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+        preference: stored('greenfield-live-preference', 'compact', {
+          storage,
+          debounceMs: 0,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       profile: { firstName: string };
       users: {
         addOne(user: { id: string; name: string }): void;
@@ -1189,7 +1274,8 @@ describe('greenfield transactions', () => {
     const liveHarness = createLiveDraftHarness(liveDraft, 1);
     liveHarnessRef.current = liveHarness;
 
-    const originalSubject = tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0];
+    const originalSubject =
+      tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0];
 
     liveHarness.write(() => {
       tree.$.profile.firstName.set('Jane');
@@ -1206,9 +1292,13 @@ describe('greenfield transactions', () => {
     ).toBe('spacious');
     expect(store.getPendingTurnIds()).toEqual([]);
 
-    const profileOwner = getOwnedPositionIds(tree.$.profile.firstName)?.[0] as PositionId;
+    const profileOwner = getOwnedPositionIds(
+      tree.$.profile.firstName
+    )?.[0] as PositionId;
     const usersOwner = getOwnedPositionIds(tree.$.users)?.[0] as PositionId;
-    const preferenceOwner = getOwnedPositionIds(tree.$.preference)?.[0] as PositionId;
+    const preferenceOwner = getOwnedPositionIds(
+      tree.$.preference
+    )?.[0] as PositionId;
 
     expect(liveDraft.seal()).toEqual({
       id: 1,
@@ -1250,11 +1340,14 @@ describe('greenfield transactions', () => {
 
   it('captures a real entity add transaction with canonical structural coverage already authored', () => {
     resetPathNotifier();
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         byIdOrFail(id: string): { name: () => string | undefined };
@@ -1262,7 +1355,11 @@ describe('greenfield transactions', () => {
     }>;
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
-    const draft = createGreenfieldTransactionDraft({ turnId: 1, store, appliedHistory });
+    const draft = createGreenfieldTransactionDraft({
+      turnId: 1,
+      store,
+      appliedHistory,
+    });
     const harness = createLiveDraftHarness(draft, 1);
 
     harness.write(() => {
@@ -1298,11 +1395,14 @@ describe('greenfield transactions', () => {
 
   it('captures a real entity remove transaction with canonical structural coverage already authored', () => {
     resetPathNotifier();
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
@@ -1313,7 +1413,11 @@ describe('greenfield transactions', () => {
 
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
-    const draft = createGreenfieldTransactionDraft({ turnId: 1, store, appliedHistory });
+    const draft = createGreenfieldTransactionDraft({
+      turnId: 1,
+      store,
+      appliedHistory,
+    });
     const harness = createLiveDraftHarness(draft, 1);
 
     harness.write(() => {
@@ -1350,11 +1454,17 @@ describe('greenfield transactions', () => {
 
   it('proves collection-owner remove coverage is sufficient for real multi-field abort restoration', () => {
     resetPathNotifier();
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string; enabled: boolean }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<
+          { id: string; name: string; enabled: boolean },
+          string
+        >({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string; enabled: boolean }): void;
         removeOne(id: string): void;
@@ -1397,8 +1507,10 @@ describe('greenfield transactions', () => {
     liveHarnessRef.current = liveHarness;
 
     const usersOwner = getOwnedPositionIds(tree.$.users)?.[0] as PositionId;
-    const nameOwner = tree.$.users.byIdOrFail('u1').name.__positionIds?.[0] as PositionId;
-    const enabledOwner = tree.$.users.byIdOrFail('u1').enabled.__positionIds?.[0] as PositionId;
+    const nameOwner = tree.$.users.byIdOrFail('u1').name
+      .__positionIds?.[0] as PositionId;
+    const enabledOwner = tree.$.users.byIdOrFail('u1').enabled
+      .__positionIds?.[0] as PositionId;
 
     liveHarness.write(() => {
       tree.$.users.removeOne('u1');
@@ -1434,8 +1546,12 @@ describe('greenfield transactions', () => {
     expect(tree.$.users.ids()).toEqual(['u1']);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alice');
     expect(tree.$.users.byIdOrFail('u1').enabled()).toBe(true);
-    expect(tree.$.users.byIdOrFail('u1').name.__positionIds?.[0]).toBe(nameOwner);
-    expect(tree.$.users.byIdOrFail('u1').enabled.__positionIds?.[0]).toBe(enabledOwner);
+    expect(tree.$.users.byIdOrFail('u1').name.__positionIds?.[0]).toBe(
+      nameOwner
+    );
+    expect(tree.$.users.byIdOrFail('u1').enabled.__positionIds?.[0]).toBe(
+      enabledOwner
+    );
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
     expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
@@ -1445,12 +1561,15 @@ describe('greenfield transactions', () => {
 
   it('aborts a mixed live structural draft through the realization adapter by contextualizing the fresh subject removal', () => {
     resetPathNotifier();
-    const tree = signalTree({
-      count: 0,
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        count: 0,
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       count: { set(value: number): void; (): number };
       users: {
         addOne(user: { id: string; name: string }): void;
@@ -1466,9 +1585,8 @@ describe('greenfield transactions', () => {
     tree.$.users.addOne({ id: 'u1', name: 'Alice' });
     getPathNotifier().flushSync();
 
-    const originalSubject = tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0] as
-      | number
-      | undefined;
+    const originalSubject = tree.$.users.byIdOrFail('u1').name
+      .__subjectIds?.[0] as number | undefined;
 
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
@@ -1515,9 +1633,15 @@ describe('greenfield transactions', () => {
     expect(pendingTurn.effects).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ before: 0, after: 1, subjectId: undefined }),
-        expect.objectContaining({ structural: 'remove', subjectId: originalSubject }),
+        expect.objectContaining({
+          structural: 'remove',
+          subjectId: originalSubject,
+        }),
         expect.objectContaining({ structural: 'add', subjectId: freshSubject }),
-        expect.objectContaining({ structural: 'rekey', subjectId: freshSubject }),
+        expect.objectContaining({
+          structural: 'rekey',
+          subjectId: freshSubject,
+        }),
         expect.objectContaining({
           before: { id: 'u2', name: 'Bran' },
           after: { id: 'u2', name: 'Cora' },
@@ -1539,9 +1663,9 @@ describe('greenfield transactions', () => {
 
     tree.$.users.addOne({ id: 'u9', name: 'Zed' });
     getPathNotifier().flushSync();
-    expect(tree.$.users.byIdOrFail('u9').name.__subjectIds?.[0]).toBeGreaterThan(
-      freshSubject as number
-    );
+    expect(
+      tree.$.users.byIdOrFail('u9').name.__subjectIds?.[0]
+    ).toBeGreaterThan(freshSubject as number);
 
     liveHarness.dispose();
   });
@@ -1574,9 +1698,8 @@ describe('greenfield transactions', () => {
 
     tree.$.users.addOne({ id: 'u9', name: 'Zed' });
     getPathNotifier().flushSync();
-    const nextFreshSubject = tree.$.users.byIdOrFail('u9').name.__subjectIds?.[0] as
-      | number
-      | undefined;
+    const nextFreshSubject = tree.$.users.byIdOrFail('u9').name
+      .__subjectIds?.[0] as number | undefined;
     expect(nextFreshSubject).toBeGreaterThan(freshSubject as number);
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
@@ -1621,9 +1744,8 @@ describe('greenfield transactions', () => {
 
     tree.$.users.addOne({ id: 'u9', name: 'Zed' });
     getPathNotifier().flushSync();
-    const nextFreshSubject = tree.$.users.byIdOrFail('u9').name.__subjectIds?.[0] as
-      | number
-      | undefined;
+    const nextFreshSubject = tree.$.users.byIdOrFail('u9').name
+      .__subjectIds?.[0] as number | undefined;
     expect(nextFreshSubject).toBeGreaterThan(freshSubject as number);
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
@@ -1633,8 +1755,14 @@ describe('greenfield transactions', () => {
   });
 
   it('constructs fresh add plus rekey rollback as a stale pre-rekey remove and refuses it as structural drift', () => {
-    const { tree, store, appliedHistory, liveDraft, liveHarness, abortWithPort } =
-      createLiveUsersAbortHarness();
+    const {
+      tree,
+      store,
+      appliedHistory,
+      liveDraft,
+      liveHarness,
+      abortWithPort,
+    } = createLiveUsersAbortHarness();
 
     let freshSubject: number | undefined;
     liveHarness.write(() => {
@@ -1674,7 +1802,10 @@ describe('greenfield transactions', () => {
       },
     });
 
-    expect(result).toEqual({ ok: false, refusal: { kind: 'structural-drift' } });
+    expect(result).toEqual({
+      ok: false,
+      refusal: { kind: 'structural-drift' },
+    });
     expect(capturedEffects).toEqual([
       expect.objectContaining({
         before: 'u2',
@@ -1696,8 +1827,14 @@ describe('greenfield transactions', () => {
   });
 
   it('proves the adapter can remove the fresh subject once the stale rollback remove is contextualized to the current key', () => {
-    const { tree, store, appliedHistory, liveDraft, liveHarness, abortWithPort } =
-      createLiveUsersAbortHarness();
+    const {
+      tree,
+      store,
+      appliedHistory,
+      liveDraft,
+      liveHarness,
+      abortWithPort,
+    } = createLiveUsersAbortHarness();
 
     const collectionInternal = tree.$.users as typeof tree.$.users & {
       __findKeyBySubjectId?: (subjectId: number) => string | number | undefined;
@@ -1706,7 +1843,9 @@ describe('greenfield transactions', () => {
       ) => { state: 'active' | 'tombstoned' } | undefined;
     };
     if (!collectionInternal.__findKeyBySubjectId) {
-      throw new Error('Expected subject lookup hook for rollback contextualization probe');
+      throw new Error(
+        'Expected subject lookup hook for rollback contextualization probe'
+      );
     }
 
     let freshSubject: number | undefined;
@@ -1753,29 +1892,39 @@ describe('greenfield transactions', () => {
       before: 'u3',
     };
 
-    expect(adapter.validateEffects([contextualizedRollbackEffect])).toBeUndefined();
+    expect(
+      adapter.validateEffects([contextualizedRollbackEffect])
+    ).toBeUndefined();
     adapter.applyAtomically([contextualizedRollbackEffect]);
     getPathNotifier().flushSync();
 
     expect(tree.$.users.ids()).toEqual([]);
-    expect(collectionInternal.__findKeyBySubjectId(freshSubject as number)).toBeUndefined();
-    expect(collectionInternal.__inspectSubjectResources?.(freshSubject as number)).toEqual(
-      expect.objectContaining({ state: 'tombstoned' })
-    );
+    expect(
+      collectionInternal.__findKeyBySubjectId(freshSubject as number)
+    ).toBeUndefined();
+    expect(
+      collectionInternal.__inspectSubjectResources?.(freshSubject as number)
+    ).toEqual(expect.objectContaining({ state: 'tombstoned' }));
 
     tree.$.users.addOne({ id: 'u9', name: 'Zed' });
     getPathNotifier().flushSync();
     expect(tree.$.users.ids()).toEqual(['u9']);
-    expect(tree.$.users.byIdOrFail('u9').name.__subjectIds?.[0]).toBeGreaterThan(
-      freshSubject as number
-    );
+    expect(
+      tree.$.users.byIdOrFail('u9').name.__subjectIds?.[0]
+    ).toBeGreaterThan(freshSubject as number);
 
     liveHarness.dispose();
   });
 
   it('constructs fresh add plus rekey plus scalar rollback as the same stale pre-rekey remove frontier', () => {
-    const { tree, store, appliedHistory, liveDraft, liveHarness, abortWithPort } =
-      createLiveUsersAbortHarness();
+    const {
+      tree,
+      store,
+      appliedHistory,
+      liveDraft,
+      liveHarness,
+      abortWithPort,
+    } = createLiveUsersAbortHarness();
 
     let freshSubject: number | undefined;
     liveHarness.write(() => {
@@ -1824,7 +1973,10 @@ describe('greenfield transactions', () => {
       },
     });
 
-    expect(result).toEqual({ ok: false, refusal: { kind: 'structural-drift' } });
+    expect(result).toEqual({
+      ok: false,
+      refusal: { kind: 'structural-drift' },
+    });
     expect(capturedEffects).toEqual([
       expect.objectContaining({
         before: 'u2',
@@ -1847,11 +1999,14 @@ describe('greenfield transactions', () => {
 
   it('restores multiple removed subjects in one live transaction abort even when they share one collection owner', () => {
     resetPathNotifier();
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
@@ -1909,19 +2064,29 @@ describe('greenfield transactions', () => {
     expect(tree.$.users.ids()).toEqual(['u1', 'u2']);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alice');
     expect(tree.$.users.byIdOrFail('u2').name()).toBe('Bob');
-    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(subjectOne);
-    expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(subjectTwo);
+    expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
+      subjectOne
+    );
+    expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(
+      subjectTwo
+    );
 
     liveHarness.dispose();
   });
 
   it('undoes a confirmed structural remove after the live transaction harness is disposed', () => {
     resetPathNotifier();
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string; enabled: boolean }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<
+          { id: string; name: string; enabled: boolean },
+          string
+        >({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string; enabled: boolean }): void;
         removeOne(id: string): void;
@@ -1938,7 +2103,11 @@ describe('greenfield transactions', () => {
 
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
-    const draft = createGreenfieldTransactionDraft({ turnId: 1, store, appliedHistory });
+    const draft = createGreenfieldTransactionDraft({
+      turnId: 1,
+      store,
+      appliedHistory,
+    });
     const liveHarness = createLiveDraftHarness(draft, 1);
 
     liveHarness.write(() => {
@@ -2006,11 +2175,14 @@ describe('greenfield transactions', () => {
 
   it('authors setAll as one canonical remove-set-add turn and replays the same fresh subject on redo', () => {
     resetPathNotifier();
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<{ id: string; name: string }, string>({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: { id: string; name: string }): void;
         removeOne(id: string): void;
@@ -2030,7 +2202,9 @@ describe('greenfield transactions', () => {
     const historicalCName = historicalCNode.name;
     const historicalCSubject = historicalCName.__subjectIds?.[0];
     if (historicalCSubject === undefined) {
-      throw new Error('Expected historical subject metadata for key reuse proof');
+      throw new Error(
+        'Expected historical subject metadata for key reuse proof'
+      );
     }
 
     tree.$.users.removeOne('c');
@@ -2047,7 +2221,11 @@ describe('greenfield transactions', () => {
 
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
-    const draft = createGreenfieldTransactionDraft({ turnId: 1, store, appliedHistory });
+    const draft = createGreenfieldTransactionDraft({
+      turnId: 1,
+      store,
+      appliedHistory,
+    });
     const harness = createLiveDraftHarness(draft, 1);
 
     harness.write(() => {
@@ -2186,15 +2364,21 @@ describe('greenfield transactions', () => {
       name: 'Alice',
       settings: { enabled: true },
     };
-    const tree = signalTree({
-      users: entityMap<{
-        id: string;
-        name: string;
-        settings: { enabled: boolean };
-      }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
+    const tree = signalTree(
+      {
+        users: entityMap<
+          {
+            id: string;
+            name: string;
+            settings: { enabled: boolean };
+          },
+          string
+        >({
+          selectId: (user) => user.id,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    ) as ISignalTree<{
       users: {
         addOne(user: {
           id: string;
@@ -2216,7 +2400,11 @@ describe('greenfield transactions', () => {
 
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
-    const draft = createGreenfieldTransactionDraft({ turnId: 1, store, appliedHistory });
+    const draft = createGreenfieldTransactionDraft({
+      turnId: 1,
+      store,
+      appliedHistory,
+    });
     const liveHarness = createLiveDraftHarness(draft, 1);
 
     liveHarness.write(() => {

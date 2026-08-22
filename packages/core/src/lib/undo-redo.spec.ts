@@ -33,10 +33,13 @@ const flush = () => new Promise((r) => setTimeout(r, 0));
 
 describe('undo/redo restores what the user edited', () => {
   it('undoes a collection edit, not just the scalars beside it', async () => {
-    const tree = signalTree({
-      n: 0,
-      rows: entityMap<{ id: number }, number>(),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        n: 0,
+        rows: entityMap<{ id: number }, number>(),
+      },
+      { enhancers: [timeTravel()] }
+    );
 
     for (let i = 1; i <= 3; i++) {
       tree.$.n.set(i);
@@ -55,9 +58,12 @@ describe('undo/redo restores what the user edited', () => {
   });
 
   it('undoing a removed entity restores it at its original position', async () => {
-    const tree = signalTree({
-      rows: entityMap<{ id: string }, string>(),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        rows: entityMap<{ id: string }, string>(),
+      },
+      { enhancers: [timeTravel()] }
+    );
 
     tree.$.rows.setAll([{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
     await flush();
@@ -73,8 +79,9 @@ describe('undo/redo restores what the user edited', () => {
   });
 
   it('redoes what it undid', async () => {
-    const tree = signalTree({ rows: entityMap<{ id: number }, number>() }).with(
-      timeTravel()
+    const tree = signalTree(
+      { rows: entityMap<{ id: number }, number>() },
+      { enhancers: [timeTravel()] }
     );
     tree.$.rows.setAll([{ id: 1 }]);
     await flush();

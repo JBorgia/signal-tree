@@ -46,7 +46,10 @@ type Nested = {
 // ============================================================================
 describe('E2-C1 — real P3', () => {
   it('a PENDING write is visible in canonical truth but adds NO history entry', async () => {
-    const tree = signalTree({ x: 'A' }).with(timeTravel()) as unknown as TT<Scalar>;
+    const tree = signalTree(
+      { x: 'A' },
+      { enhancers: [timeTravel()] }
+    ) as unknown as TT<Scalar>;
     const base = tree.getHistory().length;
 
     tree.transaction(() => tree.$.x.set('B'));
@@ -57,7 +60,10 @@ describe('E2-C1 — real P3', () => {
   });
 
   it('CONFIRMATION historicises; ROLLBACK of a superseded pending turn changes neither truth nor history', async () => {
-    const tree = signalTree({ x: 'A' }).with(timeTravel()) as unknown as TT<Scalar>;
+    const tree = signalTree(
+      { x: 'A' },
+      { enhancers: [timeTravel()] }
+    ) as unknown as TT<Scalar>;
 
     const t1 = tree.transaction(() => tree.$.x.set('B')); // pending
     await tick();
@@ -79,7 +85,10 @@ describe('E2-C1 — real P3', () => {
   });
 
   it('RECORDED: confirmed undo lands on B, not A — and redo returns to C', async () => {
-    const tree = signalTree({ x: 'A' }).with(timeTravel()) as unknown as TT<Scalar>;
+    const tree = signalTree(
+      { x: 'A' },
+      { enhancers: [timeTravel()] }
+    ) as unknown as TT<Scalar>;
 
     const t1 = tree.transaction(() => tree.$.x.set('B'));
     await tick();
@@ -120,9 +129,12 @@ describe('E2-C1 — real P3', () => {
 // ============================================================================
 describe('E2-C2 — nested path', () => {
   it('undo preserves the untouched sibling', async () => {
-    const tree = signalTree({
-      profile: { name: 'A', age: 30 },
-    }).with(timeTravel()) as unknown as TT<Nested>;
+    const tree = signalTree(
+      {
+        profile: { name: 'A', age: 30 },
+      },
+      { enhancers: [timeTravel()] }
+    ) as unknown as TT<Nested>;
 
     const t1 = tree.transaction(() => tree.$.profile.name.set('B'));
     await tick();
@@ -149,7 +161,10 @@ describe('E2-C2 — nested path', () => {
 // ============================================================================
 describe('E2-C3 — real ABA authorship', () => {
   it('RECORDED: the real kernel does NOT distinguish authorship of an identical value', async () => {
-    const tree = signalTree({ x: 'A' }).with(timeTravel()) as unknown as TT<Scalar>;
+    const tree = signalTree(
+      { x: 'A' },
+      { enhancers: [timeTravel()] }
+    ) as unknown as TT<Scalar>;
 
     const t1 = tree.transaction(() => tree.$.x.set('B'));
     t1.confirm(); // CONFIRMED — this is the entry undo targets

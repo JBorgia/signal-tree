@@ -91,7 +91,7 @@ const rows = [];
 for (const e of ENHANCERS) {
   const code = `
     import { signalTree, ${e.imports} } from ${JSON.stringify(CORE)};
-    const t = signalTree({ count: 0, user: { name: 'a' } }).with(${e.apply});
+    const t = signalTree({ count: 0, user: { name: 'a' } }, { enhancers: [${e.apply}] });
     t.$.count.set(1);
     ${e.use}
     globalThis.__sink = [t.$.count()];

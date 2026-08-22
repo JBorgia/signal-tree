@@ -21,11 +21,9 @@ installMaterializationRealization({
 import { SIGNAL_TREE_CONSTANTS, SIGNAL_TREE_MESSAGES } from './constants';
 import { resolveEnhancerOrder } from '../enhancers';
 import { batchScope } from './internals/batch-scope';
-import {
-  SignalTreeBuilder,
-  SignalTreePlanBuilder,
-} from './internals/builder-types';
+import { SignalTreeBuilder } from './internals/builder-types';
 import { ProcessDerived } from './internals/derived-types';
+import { assertEnhancerConfigurationValid } from './internals/enhancer-requirements';
 import {
   createMaterializationContext,
   _recordTreeConstruction,
@@ -72,6 +70,7 @@ import {
 } from './utils';
 
 import type {
+  AccumulatedEnhancerAdditions,
   TreeNode,
   TreeConfig,
   NodeAccessor,
@@ -113,7 +112,6 @@ const ENTITY_ARRAY_WARN_CAP = 256;
  * snapshot.
  */
 const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
-const PLANNED_TREE_BUILD_SYMBOL = Symbol.for('SignalTree:PlannedBuild');
 // =============================================================================
 
 type TreeBuildPlan = {
@@ -137,11 +135,6 @@ function createTreeBuildPlan(
     leafMetadataStorage,
   };
 }
-
-const LEGACY_TREE_BUILD_PLAN = createTreeBuildPlan(
-  ['causal-runtime', 'temporal-snapshots'],
-  'property'
-);
 
 // Public signalTree() now has one default scalar substrate: tree-owned slots
 // with Angular tokens as the reactive adapter. Optional capabilities layer
@@ -171,9 +164,7 @@ function finalizeLeafSignal<TValue>(
   }
 }
 
-function getEnhancerMeta(
-  enhancer: unknown
-): EnhancerMeta | undefined {
+function getEnhancerMeta(enhancer: unknown): EnhancerMeta | undefined {
   return (
     (enhancer as Record<symbol, EnhancerMeta | undefined>)[ENHANCER_META] ??
     (enhancer as { metadata?: EnhancerMeta }).metadata
@@ -181,12 +172,20 @@ function getEnhancerMeta(
 }
 
 function buildTreePlan(
-  enhancers: EnhancerWithMeta<unknown>[]
+  enhancers: EnhancerWithMeta<unknown>[],
+  explicitCapabilities: readonly TreeCapability[] = []
 ): TreeBuildPlan {
-  const requestedCapabilities = collectRequestedTreeCapabilities(
-    enhancers.map((enhancer) => getEnhancerMeta(enhancer))
-  );
-  return createTreeBuildPlan(requestedCapabilities, 'sidecar');
+  const requestedCapabilities = collectRequestedTreeCapabilities([
+    ...enhancers.map((enhancer) => getEnhancerMeta(enhancer)),
+    // An explicit request is treated as one more declaration, so it goes
+    // through the same dependency resolution rather than bypassing it.
+    { capabilities: [...explicitCapabilities] },
+  ]);
+  // LAYOUT: 'property' is retained deliberately for now. The planned path used
+  // 'sidecar', and switching both construction AND physical metadata layout in
+  // one change would confound them -- a failure could be either. The layout A/B
+  // is its own trial; see docs/architecture/phase-model-blast-radius.md.
+  return createTreeBuildPlan(requestedCapabilities, 'property');
 }
 
 function materializeTreeMarkers<T extends object>(
@@ -878,7 +877,7 @@ function leafEqual(
           `the new value is a different object but deep-equals the current ` +
           `one, so the whole structure was compared and the write discarded. ` +
           `A re-fetched payload does this. Skip the write when the data is ` +
-            `unchanged, or write the smaller changed leaf. [ST2027]`
+          `unchanged, or write the smaller changed leaf. [ST2027]`
       );
     }
     return eq;
@@ -1137,7 +1136,7 @@ function create<T extends object>(
   initialState: T,
   config: TreeConfig,
   materializationContext: MaterializationContext,
-  buildPlan: TreeBuildPlan = LEGACY_TREE_BUILD_PLAN,
+  buildPlan: TreeBuildPlan,
   captureRuntime: MutationCaptureRuntime = createMutationCaptureRuntime()
 ): ISignalTree<T> {
   if (initialState === null || initialState === undefined) {
@@ -1274,22 +1273,6 @@ function create<T extends object>(
   // Lifecycle: cleanup registry and destroyed flag
   const cleanupFns: Array<() => void> = [];
   const destroyedSig = signal(false);
-  /**
-   * Enhancer protocol bookkeeping — TWO namespaces, deliberately separate.
-   *
-   * `name` is IDENTITY (duplicate detection, diagnostics). `provides` are
-   * CAPABILITY TOKENS, and `requires` names capability tokens — never an
-   * enhancer name. Collapsing them is what made a requirement satisfiable only
-   * when the provider was BOTH named `x` AND declared `provides: ['x']`, a
-   * contract with no coherent owner that silently broke every documented
-   * authoring example where `name !== provides`.
-   *
-   * Do NOT reintroduce a name fallback (`provided.has(req) || applied.has(req)`)
-   * — that restores the ambiguity rather than resolving it, and
-   * `enhancer-metadata-authority.spec.ts` fails if you do.
-   */
-  const appliedEnhancerNames = new Set<string>();
-  const providedEnhancerCapabilities = new Set<string>();
 
   // Add core properties
   Object.defineProperty(tree, '$', {
@@ -1337,121 +1320,6 @@ function create<T extends object>(
    * @returns The enhanced tree with additional methods or capabilities.
    * @see BatchingConfig, TimeTravelConfig, DevToolsConfig, SerializationConfig
    */
-  /**
-   * The tree an enhancer must be applied TO. Not `tree` — an identity-replacing
-   * enhancer returns a NEW callable, and everything after it must see that one.
-   *
-   * MEASURED, both directions, because the two failure modes are complementary
-   * and no existing pattern avoided both:
-   *
-   *   copy `with`'s descriptor onto the replacement  bookkeeping SURVIVES,
-   *   (a hand-written replacer)                      receiver is the ORIGINAL
-   *
-   *   redefine `with` on the replacement             receiver is CURRENT,
-   *   (batching / timeTravel / devTools)             bookkeeping is LOST
-   *
-   * The first is wrong because `with` closed over `tree`; the second is wrong
-   * because the replacement's own `with` reaches none of the state below. One
-   * mutable reference plus re-installing THIS function on each replacement gives
-   * both: validation keeps using one tree's bookkeeping, invocation always uses
-   * the latest realization.
-   */
-  let currentRealization: unknown = tree;
-
-  const canonicalWith = function <R>(enhancer: (tree: ISignalTree<T>) => R): R {
-    {
-      if (typeof enhancer !== 'function') {
-        throw new Error('Enhancer must be a function');
-      }
-
-      // Duplicate detection via enhancer metadata
-      const meta =
-        (enhancer as unknown as Record<symbol, EnhancerMeta>)[ENHANCER_META] ??
-        (enhancer as unknown as { metadata?: EnhancerMeta }).metadata;
-
-      // IDENTITY — duplicate detection keys on `name` and nothing else.
-      if (meta?.name && appliedEnhancerNames.has(meta.name)) {
-        throw new Error(
-          `Enhancer "${meta.name}" has already been applied to this tree. ` +
-            `Each enhancer can only be applied once.`
-        );
-      }
-
-      // CAPABILITY — requirements resolve against what applied enhancers have
-      // PROVIDED. Never against their names: an enhancer's identity is not a
-      // capability, and `provides` is the only thing that grants one.
-      //
-      // Validated independently of `name`, so an anonymous enhancer that
-      // declares `requires` is still checked. Previously the whole block was
-      // gated on `meta.name`, so an unnamed enhancer's requirements were
-      // silently ignored.
-      if (meta?.requires) {
-        for (const dep of meta.requires) {
-          if (!providedEnhancerCapabilities.has(dep)) {
-            const who = meta.name ? `Enhancer "${meta.name}"` : 'This enhancer';
-            throw new Error(
-              `${who} requires capability "${dep}", which no applied enhancer ` +
-                `provides. Declare "${dep}" in another enhancer's \`provides\` ` +
-                `and apply it first.`
-            );
-          }
-        }
-      }
-
-      // Apply BEFORE publishing. A throwing enhancer must not leave its name
-      // marked applied or its capabilities marked satisfied — otherwise a
-      // failed application would let a dependent enhancer run against a
-      // prerequisite that never took effect, and would make a retry look like a
-      // duplicate. Dependency state obeys the same fail-closed principle as the
-      // validation above.
-      const result = enhancer(currentRealization as ISignalTree<T>) as R;
-
-      if (meta?.name) {
-        appliedEnhancerNames.add(meta.name);
-      }
-      for (const capability of meta?.provides ?? []) {
-        providedEnhancerCapabilities.add(capability);
-      }
-
-      // ADOPT a replacement. An identity-replacing enhancer hands back a new
-      // callable; from here on it IS the tree, so the next enhancer must be
-      // applied to it and must still reach this guard. Re-installing this exact
-      // function is what keeps the chain inside the protocol.
-      //
-      // HISTORICAL. `batching`, `timeTravel` and `devTools` each used to define
-      // their own guard-less `with` on the replacement, which this adoption
-      // overwrote — that was the bypass. All three are DELETED as of the item
-      // #4 ownership cleanup, so this now re-installs onto replacements that
-      // carry no competing implementation. `7a6bd4c9` claimed those overrides
-      // "only forwarded"; that was true for two of three, and `devTools`' also
-      // reported a composition chain, a diagnostic since deleted for want of
-      // any consumer.
-      if (result !== currentRealization && isTraversableNode(result)) {
-        currentRealization = result;
-        try {
-          Object.defineProperty(result, 'with', {
-            value: canonicalWith,
-            enumerable: false,
-            writable: false,
-            configurable: true,
-          });
-        } catch {
-          // Non-configurable `with` on a replacement: the tree keeps working,
-          // but the chain past it is outside the protocol. Never seen in-repo;
-          // swallowing beats throwing from a successful application.
-        }
-      }
-
-      return result;
-    }
-  };
-
-  Object.defineProperty(tree, 'with', {
-    value: canonicalWith,
-    enumerable: false,
-    writable: false,
-    configurable: true,
-  });
 
   // bind()
   Object.defineProperty(tree, 'bind', {
@@ -1584,6 +1452,45 @@ function create<T extends object>(
 // =============================================================================
 
 /**
+ * Apply the resolved enhancer list, adopting identity replacements.
+ *
+ * THE ONLY PLACE AN ENHANCER IS EVER INVOKED. There used to be two: this loop
+ * and `tree.with()`, which carried its own copy of duplicate detection and
+ * requirement checking. Two engines meant two answers — `.with()` validated
+ * against enhancers applied SO FAR, `signalTree` validates the declared SET —
+ * and the pair could disagree on the same configuration. `with` is gone from
+ * the tree and from `ISignalTree`; `assertEnhancerConfigurationValid` above is
+ * the single authority, and it runs before this function is reached.
+ *
+ * What survives from `with` is the part that was never about validation:
+ * ADOPTING A REPLACEMENT. `batching`, `timeTravel` and `devTools` each return a
+ * NEW callable rather than mutating the tree they were given, and everything
+ * after must see that one — hence the reassignment rather than a fixed
+ * receiver. `enhancer-protocol-continuity.spec.ts` row F is the falsifier.
+ *
+ * A throwing enhancer propagates. Construction fails as a whole, so there is no
+ * partially enhanced tree to reason about and nothing to unwind.
+ */
+function applyEnhancers<T extends object>(
+  tree: ISignalTree<T>,
+  ordered: readonly EnhancerWithMeta<unknown>[]
+): ISignalTree<T> {
+  let current = tree;
+  for (const enhancer of ordered) {
+    if (typeof enhancer !== 'function') {
+      throw new Error('Enhancer must be a function');
+    }
+    const result = (enhancer as Enhancer<unknown>)(
+      current as never
+    ) as unknown as ISignalTree<T>;
+    if (result !== (current as unknown) && isTraversableNode(result)) {
+      current = result;
+    }
+  }
+  return current;
+}
+
+/**
  * Create a minimal SignalTree.
  *
  * Returns ISignalTree<T> with only core functionality.
@@ -1623,6 +1530,52 @@ export function signalTree<T extends object, TDerived extends object>(
   derivedFactory: ($: TreeNode<T>) => TDerived
 ): SignalTreeBuilder<T, TreeNode<T> & ProcessDerived<TDerived>>;
 
+/**
+ * THE RETURN TYPE IS WHERE `.with()` WENT.
+ *
+ * A chain accumulated enhancer surfaces one link at a time (`this & TAdded`).
+ * A declared array has to recover the same information from a tuple, which is
+ * what `AccumulatedEnhancerAdditions` does — and it only works if the tuple
+ * survives inference, which is what `const E` is for. Without `const`, the
+ * argument widens to `Enhancer<unknown>[]` and every added method is lost,
+ * silently, exactly the failure `enhancer-chain.typing.spec.ts` was written
+ * against.
+ *
+ * The four overloads are the cross-product of the two optional fields that
+ * change the result type, most specific first.
+ */
+
+// Overload: enhancers AND a derived factory
+export function signalTree<
+  T extends object,
+  const E extends readonly Enhancer<unknown>[],
+  TDerived extends object
+>(
+  initialState: T,
+  config: Omit<TreeConfig, 'enhancers' | 'derived'> & {
+    enhancers: E;
+    derived: ($: TreeNode<T>) => TDerived;
+  }
+): SignalTreeBuilder<T, TreeNode<T> & ProcessDerived<TDerived>> &
+  AccumulatedEnhancerAdditions<E>;
+
+// Overload: enhancers
+export function signalTree<
+  T extends object,
+  const E extends readonly Enhancer<unknown>[]
+>(
+  initialState: T,
+  config: Omit<TreeConfig, 'enhancers'> & { enhancers: E }
+): SignalTreeBuilder<T, TreeNode<T>> & AccumulatedEnhancerAdditions<E>;
+
+// Overload: config object carrying a derived factory
+export function signalTree<T extends object, TDerived extends object>(
+  initialState: T,
+  config: Omit<TreeConfig, 'derived'> & {
+    derived: ($: TreeNode<T>) => TDerived;
+  }
+): SignalTreeBuilder<T, TreeNode<T> & ProcessDerived<TDerived>>;
+
 // Overload: with config object
 export function signalTree<T extends object>(
   initialState: T,
@@ -1634,132 +1587,86 @@ export function signalTree<T extends object, TDerived extends object>(
   initialState: T,
   configOrDerived?: TreeConfig | (($: TreeNode<T>) => TDerived)
 ): SignalTreeBuilder<T, TreeNode<T>> {
-  // Determine if second arg is a derived factory or config
   const isFactory = typeof configOrDerived === 'function';
   const config: TreeConfig = isFactory ? {} : configOrDerived ?? {};
 
-  const physicalCommitClock = createPhysicalCommitClock();
+  // CONFIGURE -> FINALIZE. The whole enhancer set is known here, so the plan
+  // can be truthful. The chained builder could not do this: `.with()` had to
+  // materialize before applying each enhancer, so the plan was fixed before the
+  // first enhancer was seen and every tree got LEGACY_TREE_BUILD_PLAN -- which
+  // declares causal-runtime and therefore resolves to every capability, on
+  // every tree, whether or not anything consumed it.
+  const declared = (config.enhancers ?? []) as EnhancerWithMeta<unknown>[];
+
+  // Validate the CONFIGURATION as a set, before anything is built. Declaration
+  // order is not information: a requirement is satisfied if anything in the
+  // array provides it, and the ordering pass below reorders accordingly.
+  assertEnhancerConfigurationValid(declared.map((e) => getEnhancerMeta(e)));
+
+  const ordered = resolveEnhancerOrder(
+    [...declared],
+    new Set<string>(),
+    Boolean(config.debugMode)
+  );
+  const buildPlan = buildTreePlan(ordered, config.capabilities);
+
+  const physicalCommitClock = buildPlan.has('causal-runtime')
+    ? createPhysicalCommitClock()
+    : undefined;
   const materializationContext = createMaterializationContext(
-    true,
-    (capability) => LEGACY_TREE_BUILD_PLAN.has(capability),
+    buildPlan.has('position-topology'),
+    (capability) => buildPlan.has(capability),
     physicalCommitClock
   );
   const captureRuntime = createMutationCaptureRuntime();
-  const baseTree = create(
+
+  let tree: ISignalTree<T> = create(
     initialState,
     config,
     materializationContext,
-    LEGACY_TREE_BUILD_PLAN,
+    buildPlan,
     captureRuntime
   );
+
+  // Markers must exist before enhancers run -- entityMap(), form() and friends
+  // are what enhancers attach to. `.with()` used to do this per call, which is
+  // precisely why the plan could never see an enhancer. Doing it once, here, is
+  // what makes the plan knowable.
+  //
+  // Only when there is something to attach, though. With no enhancers there is
+  // nothing that needs markers up front, and materializing anyway would make
+  // construction eager for every tree and destroy incremental materialization
+  // -- markers are supposed to realize on the access path that first needs
+  // them. The builder still materializes lazily in that case.
+  const hasEnhancers = ordered.length > 0;
+  if (hasEnhancers) {
+    materializeTreeMarkers(tree, materializationContext);
+    tree = applyEnhancers(tree, ordered);
+  }
+
   const builder = createBuilder<T, TreeNode<T>>(
-    baseTree,
-    materializationContext
+    tree as ISignalTree<T>,
+    materializationContext,
+    hasEnhancers
   );
 
-  // If derived factory provided, apply it immediately
-  if (isFactory) {
+  // A derived factory may arrive either as the whole second argument (the v7
+  // shorthand) or as `config.derived`. Both queue on the builder, so both apply
+  // at the same point a chained `.derived()` would have: lazily, on first `$`
+  // access, after every enhancer.
+  const derivedFactory = isFactory
+    ? (configOrDerived as ($: TreeNode<T>) => TDerived)
+    : (config.derived as unknown as
+        | (($: TreeNode<T>) => TDerived)
+        | undefined);
+
+  if (derivedFactory) {
     return builder.derived(
-      configOrDerived as ($: TreeNode<T>) => TDerived
+      derivedFactory
     ) as unknown as SignalTreeBuilder<T, TreeNode<T>>;
   }
 
   return builder;
-}
-
-export function plannedSignalTree<T extends object>(
-  initialState: T,
-  config: TreeConfig = {}
-): SignalTreePlanBuilder<T> {
-  return createPlannedBuilder(initialState, config);
-}
-
-function createPlannedBuilder<TSource extends object, TAdded extends object = object>(
-  initialState: TSource,
-  config: TreeConfig,
-  enhancers: EnhancerWithMeta<unknown>[] = []
-): SignalTreePlanBuilder<TSource, TAdded> {
-  let builtTree: (ISignalTree<TSource> & TAdded) | undefined;
-
-  const planner: SignalTreePlanBuilder<TSource, TAdded> = {
-    with<TNextAdded>(
-      // Implementation signature: must satisfy BOTH declared overloads
-      // (neutral and realization-facing), so it accepts either shape.
-      enhancer:
-        | Enhancer<TNextAdded>
-        | ((tree: ISignalTree<TSource>) => ISignalTree<TSource> & TNextAdded)
-    ): SignalTreePlanBuilder<TSource, TAdded & TNextAdded> {
-      if (builtTree) {
-        throw new Error(
-          'SignalTree: plannedSignalTree() cannot add capabilities after build().'
-        );
-      }
-
-      return createPlannedBuilder<TSource, TAdded & TNextAdded>(
-        initialState,
-        config,
-        [...enhancers, enhancer as EnhancerWithMeta<unknown>]
-      );
-    },
-
-    build(): ISignalTree<TSource> & TAdded {
-      if (builtTree) {
-        return builtTree;
-      }
-
-      const orderedEnhancers = resolveEnhancerOrder(
-        [...enhancers],
-        new Set<string>(),
-        Boolean(config.debugMode)
-      );
-      const buildPlan = buildTreePlan(orderedEnhancers);
-      const physicalCommitClock = buildPlan.has('causal-runtime')
-        ? createPhysicalCommitClock()
-        : undefined;
-      const materializationContext = createMaterializationContext(
-        buildPlan.has('position-topology'),
-        (capability) => buildPlan.has(capability),
-        physicalCommitClock
-      );
-      const captureRuntime = createMutationCaptureRuntime();
-
-      let tree = create(
-        initialState,
-        config,
-        materializationContext,
-        buildPlan,
-        captureRuntime
-      ) as ISignalTree<TSource>;
-
-      materializeTreeMarkers(tree, materializationContext);
-
-      for (const enhancer of orderedEnhancers) {
-        tree = tree.with(enhancer as Enhancer<unknown>);
-      }
-
-      Object.defineProperty(tree, 'with', {
-        value: () => {
-          throw new Error(
-            'SignalTree: Capabilities are fixed at build() time for plannedSignalTree().'
-          );
-        },
-        enumerable: false,
-        writable: false,
-        configurable: true,
-      });
-
-      Object.defineProperty(tree, PLANNED_TREE_BUILD_SYMBOL, {
-        value: buildPlan,
-        enumerable: false,
-        configurable: true,
-      });
-
-      builtTree = tree as ISignalTree<TSource> & TAdded;
-      return builtTree;
-    },
-  };
-
-  return planner;
 }
 
 // =============================================================================
@@ -1773,12 +1680,18 @@ function createPlannedBuilder<TSource extends object, TAdded extends object = ob
  */
 function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
   baseTree: ISignalTree<TSource>,
-  materializationContext: MaterializationContext
+  materializationContext: MaterializationContext,
+  /**
+   * signalTree() materializes before applying enhancers, because enhancers
+   * attach to markers. Telling the builder so keeps `materializeOnly()`
+   * idempotent instead of walking an already-materialized tree again.
+   */
+  alreadyMaterialized = false
 ): SignalTreeBuilder<TSource, TAccum> {
   const derivedQueue: Array<($: unknown) => object> = [];
   let isFinalized = false;
 
-  let markersMaterialized = false;
+  let markersMaterialized = alreadyMaterialized;
 
   /**
    * Materialize markers only — idempotent, and deliberately does NOT latch
@@ -1838,57 +1751,6 @@ function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
   });
 
   // Override 'with' method to maintain builder chain
-  Object.defineProperty(builder, 'with', {
-    value: function <TAdded>(
-      enhancer: Enhancer<TAdded>
-    ): SignalTreeBuilder<TSource, TAccum> & TAdded {
-      // Finalize markers BEFORE passing to enhancer so form(), entityMap(), etc. are materialized
-      finalize();
-      // Apply enhancer to base tree
-      const enhanced = baseTree.with(enhancer);
-      // Create a new builder wrapping the enhanced tree
-      const newBuilder = createBuilder<TSource, TAccum>(
-        enhanced as unknown as ISignalTree<TSource>,
-        materializationContext
-      );
-      // Copy any additional properties from the enhancer result
-      for (const key of Object.keys(enhanced)) {
-        if (
-          key !== '$' &&
-          key !== 'state' &&
-          key !== 'with' &&
-          key !== 'bind' &&
-          key !== 'destroy' &&
-          key !== 'destroyed' &&
-          key !== 'registerCleanup' &&
-          key !== 'derived'
-        ) {
-          try {
-            (newBuilder as unknown as Record<string, unknown>)[key] = (
-              enhanced as unknown as Record<string, unknown>
-            )[key];
-          } catch {
-            /* ignore read-only */
-          }
-        }
-      }
-      for (const symbolKey of Object.getOwnPropertySymbols(enhanced)) {
-        const descriptor = Object.getOwnPropertyDescriptor(enhanced, symbolKey);
-        if (!descriptor) {
-          continue;
-        }
-        try {
-          Object.defineProperty(newBuilder, symbolKey, descriptor);
-        } catch {
-          /* ignore non-configurable symbols */
-        }
-      }
-      return newBuilder as SignalTreeBuilder<TSource, TAccum> & TAdded;
-    },
-    enumerable: false,
-    writable: false,
-    configurable: true,
-  });
 
   // Copy 'bind' method from baseTree (if it exists)
   if (typeof baseTree.bind === 'function') {
@@ -1997,5 +1859,42 @@ function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
     configurable: true,
   });
 
+  // Forward everything the enhancers added.
+  //
+  // signalTree() now applies enhancers to the base tree BEFORE wrapping it, so
+  // by the time the builder is created the tree already carries undo(),
+  // getHistory(), transaction() and whatever else was configured. The chained
+  // `.with()` used to copy these across one enhancer at a time; the copy has to
+  // happen here instead, or the methods exist on the tree and are invisible on
+  // the object the caller holds.
+  const RESERVED = new Set([
+    '$',
+    'state',
+    'with',
+    'bind',
+    'destroy',
+    'destroyed',
+    'registerCleanup',
+    'derived',
+  ]);
+  for (const key of Object.keys(baseTree)) {
+    if (RESERVED.has(key)) continue;
+    const descriptor = Object.getOwnPropertyDescriptor(baseTree, key);
+    if (!descriptor) continue;
+    try {
+      Object.defineProperty(builder, key, descriptor);
+    } catch {
+      /* non-configurable on the source: nothing useful to do */
+    }
+  }
+  for (const symbolKey of Object.getOwnPropertySymbols(baseTree)) {
+    const descriptor = Object.getOwnPropertyDescriptor(baseTree, symbolKey);
+    if (!descriptor) continue;
+    try {
+      Object.defineProperty(builder, symbolKey, descriptor);
+    } catch {
+      /* ignore */
+    }
+  }
   return builder;
 }

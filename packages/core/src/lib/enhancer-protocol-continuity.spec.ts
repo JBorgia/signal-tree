@@ -85,60 +85,88 @@ const consumer = (cap: string, log: string[] = []) =>
 describe('enhancer protocol continuity across identity replacement', () => {
   it('A — a capability provided BEFORE a replacement survives it', () => {
     expect(() =>
-      signalTree({ n: 0 })
-        .with(provider('cap') as never)
-        .with(REPLACE as never)
-        .with(consumer('cap') as never)
+      signalTree(
+        { n: 0 },
+        {
+          enhancers: [
+            provider('cap') as never,
+            REPLACE as never,
+            consumer('cap') as never,
+          ],
+        }
+      )
     ).not.toThrow();
   });
 
   it('B — a capability provided AFTER a replacement is honoured', () => {
     expect(() =>
-      signalTree({ n: 0 })
-        .with(REPLACE as never)
-        .with(provider('cap') as never)
-        .with(consumer('cap') as never)
+      signalTree(
+        { n: 0 },
+        {
+          enhancers: [
+            REPLACE as never,
+            provider('cap') as never,
+            consumer('cap') as never,
+          ],
+        }
+      )
     ).not.toThrow();
   });
 
   it('C — an unmet requirement after a replacement still fails CLOSED', () => {
     const log: string[] = [];
     expect(() =>
-      signalTree({ n: 0 })
-        .with(REPLACE as never)
-        .with(consumer('missing', log) as never)
+      signalTree(
+        { n: 0 },
+        { enhancers: [REPLACE as never, consumer('missing', log) as never] }
+      )
     ).toThrow(/requires capability "missing"/);
     expect(log).toEqual([]);
   });
 
-  it('D — duplicate detection survives a replacement', () => {
+  it('D — duplicate detection is unreachable by a replacement', () => {
+    // Under the chained builder this row was at genuine risk: the built-ins
+    // redefined `with` on their replacement, and the redefined version had no
+    // duplicate bookkeeping, so a name applied twice across a replacement went
+    // through. v15 validates the DECLARED set before anything is constructed,
+    // which puts the check out of reach of anything an enhancer body does. The
+    // row is kept — with REPLACE still in the configuration — because that is
+    // the claim, not because the old mechanism still needs guarding.
     const dup = createEnhancer({ name: 'dup', provides: ['d'] }, (t) => t);
-    const tree = signalTree({ n: 0 })
-      .with(REPLACE as never)
-      .with(dup as never);
     expect(() =>
-      (tree as unknown as { with(e: unknown): unknown }).with(dup as never)
-    ).toThrow(/has already been applied/);
+      signalTree(
+        { n: 0 },
+        { enhancers: [REPLACE as never, dup as never, dup as never] }
+      )
+    ).toThrow(/"dup" is configured 2 times/);
   });
 
   it('E — a THROWING enhancer after a replacement contributes nothing', () => {
+    // "Contributes nothing" is now total rather than incremental: a throwing
+    // enhancer aborts construction, so there is no tree to have been partially
+    // enhanced and no capability to have been half-published. The consumer of
+    // the capability `boom` claims to provide is declared alongside it, and
+    // must not run.
+    const log: string[] = [];
     const boom = createEnhancer(
       { name: 'boom', provides: ['bcap'] },
       (): never => {
         throw new Error('boom');
       }
     );
-    const tree = signalTree({ n: 0 }).with(REPLACE as never);
-    expect(() =>
-      (tree as unknown as { with(e: unknown): unknown }).with(boom as never)
-    ).toThrow('boom');
 
-    const log: string[] = [];
     expect(() =>
-      (tree as unknown as { with(e: unknown): unknown }).with(
-        consumer('bcap', log) as never
+      signalTree(
+        { n: 0 },
+        {
+          enhancers: [
+            REPLACE as never,
+            boom as never,
+            consumer('bcap', log) as never,
+          ],
+        }
       )
-    ).toThrow(/requires capability "bcap"/);
+    ).toThrow('boom');
     expect(log).toEqual([]);
   });
 
@@ -146,22 +174,34 @@ describe('enhancer protocol continuity across identity replacement', () => {
     // Property 2, independent of every row above. Before the fix this saw the
     // ORIGINAL tree while bookkeeping still worked.
     let seen: unknown = 'never-ran';
-    signalTree({ n: 0 })
-      .with(REPLACE as never)
-      .with(((t: never) => {
-        seen = (t as unknown as Record<symbol, unknown>)[MARK] ?? false;
-        return t;
-      }) as never);
+    signalTree(
+      { n: 0 },
+      {
+        enhancers: [
+          REPLACE as never,
+          ((t: never) => {
+            seen = (t as unknown as Record<symbol, unknown>)[MARK] ?? false;
+            return t;
+          }) as never,
+        ],
+      }
+    );
     expect(seen).toBe(true);
   });
 
   it('G — survives TWO real built-in replacements (batching + timeTravel)', () => {
     expect(() =>
-      signalTree({ n: 0 })
-        .with(provider('gcap') as never)
-        .with(batching())
-        .with(timeTravel() as never)
-        .with(consumer('gcap') as never)
+      signalTree(
+        { n: 0 },
+        {
+          enhancers: [
+            provider('gcap') as never,
+            batching(),
+            timeTravel() as never,
+            consumer('gcap') as never,
+          ],
+        }
+      )
     ).not.toThrow();
   });
 
@@ -170,10 +210,16 @@ describe('enhancer protocol continuity across identity replacement', () => {
     // G alone passes in both worlds.
     const log: string[] = [];
     expect(() =>
-      signalTree({ n: 0 })
-        .with(batching())
-        .with(timeTravel() as never)
-        .with(consumer('never-provided', log) as never)
+      signalTree(
+        { n: 0 },
+        {
+          enhancers: [
+            batching(),
+            timeTravel() as never,
+            consumer('never-provided', log) as never,
+          ],
+        }
+      )
     ).toThrow(/requires capability "never-provided"/);
     expect(log).toEqual([]);
   });

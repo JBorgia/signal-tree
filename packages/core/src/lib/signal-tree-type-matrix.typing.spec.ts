@@ -256,12 +256,14 @@ export const _noAccessorAssign: SignalTree<RootState> = accessor;
 // The repo annotates nothing with `SignalTree<T>` — every call site infers —
 // so this is the path that is really in use.
 
-const built = signalTree({
+const builtState = {
   count: 0,
   name: 'John',
   tags: ['a'] as string[],
   user: { name: 'John', age: 30, address: { city: 'Boise' } },
-});
+};
+
+const built = signalTree(builtState);
 
 // B1 — root call forms and `$`, on the constructed value.
 export const _builtRead: {
@@ -329,17 +331,22 @@ export type _BuiltEntities = [
 ];
 
 // B5 — enhancer accumulation on the constructed value.
-// `.with()` returns `this & TAdded`, so the state type AND every previously
-// accumulated method survive the next link.
+// The declared enhancer tuple is collapsed to an intersection and added to the
+// result, so the state type AND every enhancer's surface survive together. The
+// `.with()` chain this replaced made the same claim link by link; the failure it
+// guards against is the same one — an enhancer array widening to
+// `Enhancer<unknown>[]` and taking every added method with it.
 declare const counter: Enhancer<CounterMethods>;
 declare const labeller: Enhancer<{ label(): string }>;
 
-const enhancedOnce = built.with(counter);
-const enhancedTwice = built.with(counter).with(labeller);
+const enhancedOnce = signalTree(builtState, { enhancers: [counter] });
+const enhancedTwice = signalTree(builtState, {
+  enhancers: [counter, labeller],
+});
 
 export type _EnhancerAccumulation = [
   Expect<Equal<typeof enhancedOnce, typeof built & CounterMethods>>,
-  // FIRST link survives to the end of the chain, alongside the last.
+  // The FIRST enhancer survives alongside the last.
   Expect<
     Equal<typeof enhancedTwice, typeof built & CounterMethods & { label(): string }>
   >

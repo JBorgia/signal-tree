@@ -25,10 +25,10 @@ describe('transactions enhancer', () => {
   };
 
   it('adds transaction semantics without exposing temporal history methods', () => {
-    const store = signalTree({ count: 0 }).with(transactions()) as Record<
-      string,
-      unknown
-    >;
+    const store = signalTree(
+      { count: 0 },
+      { enhancers: [transactions()] }
+    ) as Record<string, unknown>;
 
     expect(typeof store.transaction).toBe('function');
     expect(store.undo).toBeUndefined();
@@ -45,7 +45,7 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }).with(transactions()) as {
+    const store = signalTree({ count: 0 }, { enhancers: [transactions()] }) as {
       (): { count: number };
       $: { count: () => number };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
@@ -73,7 +73,10 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ inside: '', outside: '' }).with(transactions());
+    const store = signalTree(
+      { inside: '', outside: '' },
+      { enhancers: [transactions()] }
+    );
 
     const pending = store.transaction(() => {
       store.$.inside.set('grouped');
@@ -119,9 +122,15 @@ describe('transactions enhancer', () => {
     };
     map.set('tx-stored', JSON.stringify({ __v: 1, data: 'light' }));
 
-    const store = signalTree({
-      theme: stored('tx-stored', 'light', { storage: adapter, debounceMs: 0 }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        theme: stored('tx-stored', 'light', {
+          storage: adapter,
+          debounceMs: 0,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: { theme: { (): string; set(value: string): void } };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {
@@ -157,8 +166,9 @@ describe('transactions enhancer', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const store = signalTree({ left: '', right: '', outside: 'stable' }).with(
-      transactions()
+    const store = signalTree(
+      { left: '', right: '', outside: 'stable' },
+      { enhancers: [transactions()] }
     );
     expect(getOwnedPositionIds(store.$)?.length).toBeGreaterThan(0);
     expect(getTreeRealizationPort(store.$)?.validateEffects).toBeTypeOf(
@@ -184,12 +194,15 @@ describe('transactions enhancer', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const store = signalTree({
-      count: 0,
-      rows: entityMap<{ id: string; name: string }, string>({
-        selectId: (row) => row.id,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        count: 0,
+        rows: entityMap<{ id: string; name: string }, string>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       (): { count: number; rows: { all: Array<{ id: string; name: string }> } };
       $: {
         count: () => number;
@@ -217,9 +230,8 @@ describe('transactions enhancer', () => {
     const baselineConfirmed = store.__transactions.getConfirmedTurnCount();
     const baselinePending = store.__transactions.getPendingTurnCount();
 
-    const originalSubject = store.$.rows.byIdOrFail('b').name.__subjectIds?.[0] as
-      | number
-      | undefined;
+    const originalSubject = store.$.rows.byIdOrFail('b').name
+      .__subjectIds?.[0] as number | undefined;
     let abortedFreshSubject: number | undefined;
 
     expect(() =>
@@ -227,7 +239,8 @@ describe('transactions enhancer', () => {
         store.$.count.set(1);
         store.$.rows.removeOne('b');
         store.$.rows.addOne({ id: 'a', name: 'Alpha' });
-        abortedFreshSubject = store.$.rows.byIdOrFail('a').name.__subjectIds?.[0];
+        abortedFreshSubject =
+          store.$.rows.byIdOrFail('a').name.__subjectIds?.[0];
         store.$.rows.changeId('a', 'c');
         store.$.rows.byIdOrFail('c').name.set('Charlie');
         throw new Error('boom');
@@ -245,7 +258,9 @@ describe('transactions enhancer', () => {
     expect(store.$.rows.byIdOrFail('b').name.__subjectIds?.[0]).toBe(
       originalSubject
     );
-    expect(store.__transactions.getConfirmedTurnCount()).toBe(baselineConfirmed);
+    expect(store.__transactions.getConfirmedTurnCount()).toBe(
+      baselineConfirmed
+    );
     expect(store.__transactions.getPendingTurnCount()).toBe(baselinePending);
 
     store.$.rows.addOne({ id: 'z', name: 'Zed' });
@@ -262,12 +277,15 @@ describe('transactions enhancer', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const store = signalTree({
-      count: 0,
-      rows: entityMap<{ id: string; name: string }, string>({
-        selectId: (row) => row.id,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        count: 0,
+        rows: entityMap<{ id: string; name: string }, string>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       $: {
         count: () => number;
         rows: {
@@ -340,12 +358,15 @@ describe('transactions enhancer', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const store = signalTree({
-      count: 0,
-      rows: entityMap<{ id: string; name: string }, string>({
-        selectId: (row) => row.id,
-      }),
-    }).with(transactions()) as {
+    const store = signalTree(
+      {
+        count: 0,
+        rows: entityMap<{ id: string; name: string }, string>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [transactions()] }
+    ) as {
       (): { count: number; rows: { all: Array<{ id: string; name: string }> } };
       $: {
         count: () => number;
@@ -372,9 +393,8 @@ describe('transactions enhancer', () => {
 
     const baselineConfirmed = store.__transactions.getConfirmedTurnCount();
     const baselinePending = store.__transactions.getPendingTurnCount();
-    const originalSubject = store.$.rows.byIdOrFail('b').name.__subjectIds?.[0] as
-      | number
-      | undefined;
+    const originalSubject = store.$.rows.byIdOrFail('b').name
+      .__subjectIds?.[0] as number | undefined;
 
     const pending = store.transaction(() => {
       store.$.count.set(1);
@@ -384,14 +404,19 @@ describe('transactions enhancer', () => {
       store.$.rows.byIdOrFail('c').name.set('Charlie');
     });
 
-    const pendingFreshSubject = store.$.rows.byIdOrFail('c').name.__subjectIds?.[0];
+    const pendingFreshSubject =
+      store.$.rows.byIdOrFail('c').name.__subjectIds?.[0];
 
     expect(originalSubject).toBe(1);
     expect(pendingFreshSubject).toBe(2);
     expect(store.$.count()).toBe(1);
     expect(store.$.rows.ids()).toEqual(['c']);
-    expect(store.__transactions.getConfirmedTurnCount()).toBe(baselineConfirmed);
-    expect(store.__transactions.getPendingTurnCount()).toBe(baselinePending + 1);
+    expect(store.__transactions.getConfirmedTurnCount()).toBe(
+      baselineConfirmed
+    );
+    expect(store.__transactions.getPendingTurnCount()).toBe(
+      baselinePending + 1
+    );
 
     pending.rollback();
 
@@ -404,11 +429,15 @@ describe('transactions enhancer', () => {
     expect(store.$.rows.byIdOrFail('b').name.__subjectIds?.[0]).toBe(
       originalSubject
     );
-    expect(store.__transactions.getConfirmedTurnCount()).toBe(baselineConfirmed);
+    expect(store.__transactions.getConfirmedTurnCount()).toBe(
+      baselineConfirmed
+    );
     expect(store.__transactions.getPendingTurnCount()).toBe(baselinePending);
 
     expect(() => pending.rollback()).not.toThrow();
-    expect(() => pending.confirm()).toThrow('Cannot confirm a rolled back transaction');
+    expect(() => pending.confirm()).toThrow(
+      'Cannot confirm a rolled back transaction'
+    );
 
     store.$.rows.addOne({ id: 'z', name: 'Zed' });
     await Promise.resolve();
@@ -421,9 +450,9 @@ describe('transactions enhancer', () => {
     const { getPathNotifier, resetPathNotifier } = await import(
       '../../lib/path-notifier'
     );
-    const {
-      MUTATION_CAPTURE_RUNTIME,
-    } = await import('../../lib/internals/mutation-capture-runtime');
+    const { MUTATION_CAPTURE_RUNTIME } = await import(
+      '../../lib/internals/mutation-capture-runtime'
+    );
     const { getOrCreateInternalTransactionRuntime } = await import(
       './transactions'
     );
@@ -432,7 +461,9 @@ describe('transactions enhancer', () => {
 
     const store = signalTree({ left: '', outside: 'stable' });
     const cleanupFailure = new Error('cleanup failed');
-    const report = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const report = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
     (store as unknown as Record<symbol, unknown>)[MUTATION_CAPTURE_RUNTIME] = {
       isCaptureActive: () => false,
       activateCapture: () => () => {
@@ -459,9 +490,9 @@ describe('transactions enhancer', () => {
 
   it('surfaces capture release cleanup failure when the transaction body succeeds', async () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
-    const {
-      MUTATION_CAPTURE_RUNTIME,
-    } = await import('../../lib/internals/mutation-capture-runtime');
+    const { MUTATION_CAPTURE_RUNTIME } = await import(
+      '../../lib/internals/mutation-capture-runtime'
+    );
     const { getOrCreateInternalTransactionRuntime } = await import(
       './transactions'
     );
@@ -489,11 +520,14 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(transactions());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [transactions()] }
+    );
 
     store.$.rows.addOne({ id: 7, name: 'target' });
     await Promise.resolve();
@@ -517,11 +551,14 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(transactions());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [transactions()] }
+    );
 
     const pending = store.transaction(() => {
       store.$.rows.addOne({ id: 17, name: 'pending' });
@@ -544,13 +581,16 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      order: { status: 'open' as 'open' | 'assigned' },
-      driver: { orderId: null as number | null },
-      telemetry: entityMap<{ id: number; lat: number }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(transactions());
+    const store = signalTree(
+      {
+        order: { status: 'open' as 'open' | 'assigned' },
+        driver: { orderId: null as number | null },
+        telemetry: entityMap<{ id: number; lat: number }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [transactions()] }
+    );
 
     const pending = store.transaction(() => {
       store.$.order.status.set('assigned');
@@ -574,11 +614,14 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({
-      rows: entityMap<{ id: number; name: string }, number>({
-        selectId: (row) => row.id,
-      }),
-    }).with(transactions());
+    const store = signalTree(
+      {
+        rows: entityMap<{ id: number; name: string }, number>({
+          selectId: (row) => row.id,
+        }),
+      },
+      { enhancers: [transactions()] }
+    );
 
     const pending = store.transaction(() => {
       store.$.rows.addOne({ id: 17, name: 'optimistic' });

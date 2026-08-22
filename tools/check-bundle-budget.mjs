@@ -154,8 +154,35 @@ const TARGETS = {
     // 15.0.0 release hardening: the causal runtime and entity identity kernel are
     // now reachable from the default signalTree() construction path. Measured
     // after rebuilding from source: prod 9.45KB, dev 11.45KB.
-    devKB: 11.6,
-    prodKB: 9.6,
+    //
+    // ⚠️ 15.0.0 DECLARATIVE CONSTRUCTION — +0.47KB prod, +0.49KB dev, and this
+    // one is a DESIGN COST, not a diagnostic. Read it before bumping again.
+    //
+    // Enhancers used to arrive through `.with()`, so a tree that never called it
+    // never linked the enhancer machinery and esbuild dropped the whole resolver.
+    // They arrive in `signalTree`'s config now, which puts two modules on the
+    // MANDATORY construction path of every tree, including one with no
+    // enhancers at all. Measured attribution, minified prod bytes:
+    //
+    //     enhancers/index.js                    +851  (resolveEnhancerOrder)
+    //     lib/internals/enhancer-requirements.js +817  (config validation)
+    //     lib/internals/tree-capabilities.js     +99   (the plan sees enhancers)
+    //     lib/signal-tree.js                     -432  (canonicalWith deleted)
+    //     ─────────────────────────────────────────────
+    //     net                                   +1335  ≈ +0.47KB gzip
+    //
+    // A runtime `if (enhancers.length === 0)` short-circuit does NOT recover it:
+    // tree-shaking is static, and the call site keeps both modules alive however
+    // the guard resolves. The only real reductions are a leaner resolver (Kahn's
+    // algorithm with adjacency maps and cycle detection, for a set already
+    // validated by the pass beside it) or folding validation INTO ordering so the
+    // provided-capability set is computed once. Both are their own change; do not
+    // attempt either as a side effect of a budget bump.
+    //
+    // Measured after the migration: prod 9.91KB, dev 11.94KB. Budgets set just
+    // above, so the next byte still has to justify itself.
+    devKB: 12.1,
+    prodKB: 10.0,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });

@@ -403,7 +403,7 @@ describe('coalesce() + update() — no wall-clock data loss (14.1.1)', () => {
   // one was silently dropped. Three `+1`s gave n = 1 when fast and n = 3 when
   // spaced 2ms apart — same code, answer decided by machine speed.
   it('three +1 updaters in one coalesce apply all three', () => {
-    const tree = signalTree({ n: 0 }).with(batching());
+    const tree = signalTree({ n: 0 }, { enhancers: [batching()] });
     tree.coalesce(() => {
       tree.$.n.update((v) => v + 1);
       tree.$.n.update((v) => v + 1);
@@ -419,7 +419,7 @@ describe('coalesce() + update() — no wall-clock data loss (14.1.1)', () => {
         /* busy */
       }
     };
-    const tree = signalTree({ n: 0 }).with(batching());
+    const tree = signalTree({ n: 0 }, { enhancers: [batching()] });
     tree.coalesce(() => {
       tree.$.n.update((v) => v + 1);
       spin(2);
@@ -430,7 +430,7 @@ describe('coalesce() + update() — no wall-clock data loss (14.1.1)', () => {
 
   // `set` IS coalescable — last value wins, and none of them read the previous.
   it('set still coalesces to the final value', () => {
-    const tree = signalTree({ q: '' }).with(batching());
+    const tree = signalTree({ q: '' }, { enhancers: [batching()] });
     tree.coalesce(() => {
       tree.$.q.set('h');
       tree.$.q.set('he');
@@ -442,7 +442,7 @@ describe('coalesce() + update() — no wall-clock data loss (14.1.1)', () => {
   // An updater must see a pending coalesced `set` on its own path, not a stale
   // value — otherwise mixing the two silently discards the set.
   it('an updater observes a pending coalesced set on the same path', () => {
-    const tree = signalTree({ n: 0 }).with(batching());
+    const tree = signalTree({ n: 0 }, { enhancers: [batching()] });
     tree.coalesce(() => {
       tree.$.n.set(10);
       tree.$.n.update((v) => v + 1);

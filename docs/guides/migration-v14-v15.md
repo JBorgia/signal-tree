@@ -13,11 +13,13 @@ publication. If one does not compile for you, that is a bug — please report it
 
 ## At a glance
 
-| Removed                                          | Replacement            |
-| ------------------------------------------------ | ---------------------- |
-| `SignalTreeBase<T>`                              | `SignalTree<T>`        |
-| root state properties on the tree (`tree.count`) | `tree.$.count()`       |
-| `composeEnhancers(a, b)`                         | `tree.with(a).with(b)` |
+| Removed                                          | Replacement                                     |
+| ------------------------------------------------ | ----------------------------------------------- |
+| `SignalTreeBase<T>`                              | `SignalTree<T>`                                 |
+| root state properties on the tree (`tree.count`) | `tree.$.count()`                                |
+| `tree.with(a)` / `.with(a).with(b)`              | `signalTree(state, { enhancers: [a, b] })`      |
+| `composeEnhancers(a, b)`                         | `signalTree(state, { enhancers: [a, b] })`      |
+| `tree.derived(fn)` after construction            | `signalTree(state, { derived: fn })` (both work) |
 
 ---
 
@@ -113,69 +115,129 @@ fixed in 15.0.
 
 ---
 
-## 3. `composeEnhancers` removed
+## 3. `.with()` removed — enhancers are declared
+
+**This is the largest change in 15.0.** There is no method that applies an
+enhancer to a tree. The whole enhancer set is passed to `signalTree`:
 
 ```ts
 // before
-const tree = signalTree({ count: 0 }).with(composeEnhancers(a, b));
+const tree = signalTree({ count: 0 }).with(timeTravel()).with(batching());
 
 // after
-const tree = signalTree({ count: 0 }).with(a).with(b);
+const tree = signalTree(
+  { count: 0 },
+  { enhancers: [timeTravel(), batching()] }
+);
 ```
 
-Note that built-in enhancers are **factories** — call them:
+`composeEnhancers(a, b)` is removed in the same change, and has the same
+replacement — put `a` and `b` in the array.
+
+Built-in enhancers are **factories**; call them:
 
 ```ts
 import { signalTree, batching, devTools } from '@signaltree/core';
 
-const tree = signalTree({ count: 0 }).with(batching()).with(devTools());
+const tree = signalTree({ count: 0 }, { enhancers: [batching(), devTools()] });
 
 tree.batch(() => {
   /* ... */
 });
 ```
 
-### Chained `.with()` is not merely equivalent syntax
+### Why the chain had to go
 
-It is the canonical application path, and it does things `composeEnhancers` could
-not. `composeEnhancers` was a plain left fold that called its children directly,
-so those children never passed through `.with()` — and `.with()` is where the
-enhancer protocol lives.
+Not style. `.with()` had to materialize the tree's markers before applying each
+enhancer, so the tree was already built by the time the first enhancer was seen.
+Its BUILD PLAN — which capabilities to install, whether to allocate mutation
+metadata, whether a physical commit clock is needed — was therefore fixed before
+anything was known about what would be attached, so every tree got the maximal
+plan and paid for machinery it would never use. Knowing the enhancer set up
+front is what makes the plan truthful, and you cannot know a set that is still
+being typed.
 
-**It preserves your types.** `.with()` returns `this & TAdded`, so every
-enhancer's additions accumulate and stay statically available:
+### What you get back
 
-```ts
-const tree = signalTree({ count: 0 }).with(a).with(b);
-tree.alpha(); // ✅ from the first enhancer
-tree.beta(); // ✅ from the second
-```
-
-`composeEnhancers` erased them. Its type used one `T` for both its parameter and
-its return, leaving nowhere to carry what an enhancer _adds_. With two enhancers
-the additions vanished silently; with a single enhancer the result could not be
-applied at all, because `T` inferred from the return and then demanded it as
-input.
-
-**It preserves the supported application path.** Individually applied enhancers
-stay visible to `.with()`, while `composeEnhancers` hid its children behind a
-plain left fold. In 15.0, the generic enhancer-author metadata helpers are not a
-public API. If you need a reusable app-local bundle, apply the enhancers in the
-order you mean inside a helper function.
-
-### Composing your own helper
-
-If you had a reusable enhancer bundle, make it a function that applies them in
-order and let the return type infer:
+**Declaration order no longer matters.** `.with()` validated each call against
+the enhancers applied so far, so listing a consumer before its provider was an
+error even when the configuration was satisfiable. The whole set is known now:
+requirements resolve against the union of everything declared, and the planner
+runs providers first.
 
 ```ts
-function withStandardEnhancers<T extends object>(tree: SignalTree<T>) {
-  return tree.with(batching()).with(devTools());
-}
+// legal in 15.0 — the planner orders these correctly
+signalTree(state, { enhancers: [needsStorage(), providesStorage()] });
 ```
 
-Do not annotate the return type by hand — inference carries the accumulated
-additions, and writing it out is how they get lost.
+**Every configuration problem is reported at once**, before anything is built:
+
+```text
+SignalTree could not finalize the enhancer configuration:
+  - "consumer" requires capability "storage", but no configured enhancer provides it.
+  - enhancer "batching" is configured 2 times; each enhancer may appear once.
+```
+
+**Your types still accumulate.** The declared array is a tuple, and every
+enhancer's additions are intersected into the result — the same guarantee
+`.with()`'s `this & TAdded` gave, without the chain:
+
+```ts
+const tree = signalTree({ count: 0 }, { enhancers: [timeTravel(), batching()] });
+tree.canUndo(); // ✅ from the first
+tree.batch(() => {}); // ✅ from the second
+```
+
+### Conditional enhancers
+
+Build the array, not the tree:
+
+```ts
+// before
+const tree = isProd ? base : base.with(timeTravel());
+
+// after
+const tree = signalTree(state, {
+  enhancers: isProd ? [] : [timeTravel()],
+});
+```
+
+Note this is a real behaviour improvement, not just a rewrite: on v14 the
+production tree still carried the maximal build plan, because `.with()` fixed
+the plan before it knew nothing would be attached. In 15.0 it does not.
+
+### Reusable bundles
+
+If you had a shared enhancer bundle, return the ARRAY and spread it:
+
+```ts
+const standardEnhancers = () => [batching(), devTools()];
+
+const tree = signalTree(state, {
+  enhancers: [...standardEnhancers(), timeTravel()],
+});
+```
+
+Do not annotate the array's type by hand — inference carries the tuple, and
+widening it to `Enhancer<unknown>[]` is how the accumulated additions get lost.
+
+### Derived state
+
+`.derived()` still works after construction. It can also be declared alongside
+the enhancers, which is the shape to prefer when you are already passing config:
+
+```ts
+const tree = signalTree(
+  { first: 'Ada', last: 'Lovelace' },
+  {
+    enhancers: [timeTravel()],
+    derived: ($) => ({ full: computed(() => `${$.first()} ${$.last()}`) }),
+  }
+);
+```
+
+Both forms apply the factory at the same point — lazily, on first `$` access,
+after every enhancer.
 
 ---
 
@@ -184,7 +246,10 @@ additions, and writing it out is how they get lost.
 - `createEnhancer`
 - `resolveEnhancerOrder`
 - `ENHANCER_META`
-- Variadic `.with(a, b)` — still does **not** exist. Chain the calls.
+- `ISignalTree.with()` and `SignalTreeBuilder.with()` — see section 3
+- `plannedSignalTree()` / `.build()` — the planned-construction prototype. Its
+  behaviour is what `signalTree(state, { enhancers })` now does, so there is no
+  second construction path to choose between.
 
 ---
 
@@ -193,7 +258,9 @@ additions, and writing it out is how they get lost.
 ```text
 [ ] replace SignalTreeBase<T> with SignalTree<T>
 [ ] route any tree.<key> state access through tree.$.<key>
-[ ] replace composeEnhancers(a, b) with .with(a).with(b)
-[ ] make sure built-in enhancers are CALLED: .with(batching()), not .with(batching)
+[ ] replace tree.with(a).with(b) with signalTree(state, { enhancers: [a, b] })
+[ ] replace composeEnhancers(a, b) the same way
+[ ] rewrite conditional enhancement as a conditional ARRAY, not a conditional tree
+[ ] make sure built-in enhancers are CALLED: [batching()], not [batching]
 [ ] typecheck — every change above is compile-time visible
 ```

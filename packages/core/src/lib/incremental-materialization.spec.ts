@@ -34,12 +34,15 @@ describe('incremental materialisation', () => {
   };
 
   it('returns the identical object when nothing changed', () => {
-    const tree = signalTree({ a: { x: 1 }, b: { y: 2 } });
+    const tree = signalTree(
+      { a: { x: 1 }, b: { y: 2 } },
+      { capabilities: ['causal-runtime'] }
+    );
     expect(tree()).toBe(tree());
   });
 
   it('shares untouched subtrees and replaces touched ones', () => {
-    const tree = signalTree(grid(3, 3));
+    const tree = signalTree(grid(3, 3), { capabilities: ['causal-runtime'] });
     const before = tree();
     tree.$.r1.c1.set(42);
     const after = tree();
@@ -51,7 +54,7 @@ describe('incremental materialisation', () => {
   });
 
   it('still observes every write', () => {
-    const tree = signalTree(grid(3, 3));
+    const tree = signalTree(grid(3, 3), { capabilities: ['causal-runtime'] });
     tree();
     tree.$.r1.c1.set(42);
     expect(tree().r1.c1).toBe(42);
@@ -61,14 +64,20 @@ describe('incremental materialisation', () => {
   });
 
   it('does not rebuild when a write is a no-op', () => {
-    const tree = signalTree({ a: { x: 1 } });
+    const tree = signalTree(
+      { a: { x: 1 } },
+      { capabilities: ['causal-runtime'] }
+    );
     const before = tree();
     tree.$.a.x.set(1); // same value — equality short-circuits
     expect(tree()).toBe(before);
   });
 
   it('keeps an old snapshot isolated from later writes', () => {
-    const tree = signalTree({ cfg: { list: [1, 2, 3] } });
+    const tree = signalTree(
+      { cfg: { list: [1, 2, 3] } },
+      { capabilities: ['causal-runtime'] }
+    );
     const snapshot = tree();
     tree.$.cfg.list.set([9]);
 
@@ -80,14 +89,20 @@ describe('incremental materialisation', () => {
     // The defensive copy in unwrap's isSignal branch is load-bearing: without
     // it a snapshot would hand out a reference to live state.
     const value = { nested: { n: 1 } };
-    const tree = signalTree({ obj: { held: value } });
+    const tree = signalTree(
+      { obj: { held: value } },
+      { capabilities: ['causal-runtime'] }
+    );
     const snapshot = tree() as { obj: { held: typeof value } };
     expect(snapshot.obj.held).not.toBe(value);
     expect(snapshot.obj.held).toEqual(value);
   });
 
   it('propagates through deep nesting', () => {
-    const tree = signalTree({ a: { b: { c: { d: { e: 1 } } } } });
+    const tree = signalTree(
+      { a: { b: { c: { d: { e: 1 } } } } },
+      { capabilities: ['causal-runtime'] }
+    );
     const before = tree();
     tree.$.a.b.c.d.e.set(2);
     const after = tree();
@@ -98,7 +113,10 @@ describe('incremental materialisation', () => {
   });
 
   it('stays reactive when read inside a computed', () => {
-    const tree = signalTree({ a: { x: 1 }, b: { y: 10 } });
+    const tree = signalTree(
+      { a: { x: 1 }, b: { y: 10 } },
+      { capabilities: ['causal-runtime'] }
+    );
     let runs = 0;
     const total = computed(() => {
       runs++;
@@ -115,7 +133,10 @@ describe('incremental materialisation', () => {
   });
 
   it('freezes snapshots in dev so mutation cannot corrupt the cache', () => {
-    const tree = signalTree({ a: { x: 1 } });
+    const tree = signalTree(
+      { a: { x: 1 } },
+      { capabilities: ['causal-runtime'] }
+    );
     const snapshot = tree();
     expect(Object.isFrozen(snapshot)).toBe(true);
     expect(Object.isFrozen(snapshot.a)).toBe(true);
@@ -131,7 +152,7 @@ describe('incremental materialisation', () => {
     // a wall-clock budget. An absolute threshold here made the suite flaky:
     // it passed alone and failed when all 11 projects ran in parallel, which
     // is a property of the CI box rather than of the code.
-    const tree = signalTree(grid(60, 60));
+    const tree = signalTree(grid(60, 60), { capabilities: ['causal-runtime'] });
     tree();
 
     const dirtyAll = () => {
@@ -168,7 +189,7 @@ describe('incremental materialisation', () => {
   });
 
   it('rebuilds only the touched row of a wide grid', () => {
-    const tree = signalTree(grid(50, 50));
+    const tree = signalTree(grid(50, 50), { capabilities: ['causal-runtime'] });
     const before = tree();
     tree.$.r25.c25.set(999);
     const after = tree();
@@ -183,23 +204,27 @@ describe('incremental materialisation', () => {
   });
 
   it('preserves descendant PositionIds across branch replacement and callable subtree writes', () => {
-    const tree = signalTree({
-      profile: { firstName: 'John', lastName: 'Smith' },
-      settings: { theme: 'light' },
-    });
+    const tree = signalTree(
+      {
+        profile: { firstName: 'John', lastName: 'Smith' },
+        settings: { theme: 'light' },
+      },
+      { capabilities: ['causal-runtime'] }
+    );
 
     const collect = () => ({
-      profile: (tree.$.profile as unknown as { __positionIds?: number[] }).__positionIds?.[0],
+      profile: (tree.$.profile as unknown as { __positionIds?: number[] })
+        .__positionIds?.[0],
       firstName: (
         tree.$.profile.firstName as unknown as { __positionIds?: number[] }
       ).__positionIds?.[0],
       lastName: (
         tree.$.profile.lastName as unknown as { __positionIds?: number[] }
       ).__positionIds?.[0],
-      settings: (tree.$.settings as unknown as { __positionIds?: number[] }).__positionIds?.[0],
-      theme: (
-        tree.$.settings.theme as unknown as { __positionIds?: number[] }
-      ).__positionIds?.[0],
+      settings: (tree.$.settings as unknown as { __positionIds?: number[] })
+        .__positionIds?.[0],
+      theme: (tree.$.settings.theme as unknown as { __positionIds?: number[] })
+        .__positionIds?.[0],
     });
 
     const before = collect();
@@ -215,17 +240,19 @@ describe('incremental materialisation', () => {
   });
 
   it('records structural parentage in the tree-owned PositionRegistry', () => {
-    const tree = signalTree({
-      profile: { firstName: 'John', lastName: 'Smith' },
-      settings: { theme: 'light' },
-    });
+    const tree = signalTree(
+      {
+        profile: { firstName: 'John', lastName: 'Smith' },
+        settings: { theme: 'light' },
+      },
+      { capabilities: ['causal-runtime'] }
+    );
     const registry = getPositionRegistry(tree.$);
 
     expect(registry).toBeDefined();
 
-    const rootPositionId = (
-      tree.$ as unknown as { __positionIds?: number[] }
-    ).__positionIds?.[0] as number;
+    const rootPositionId = (tree.$ as unknown as { __positionIds?: number[] })
+      .__positionIds?.[0] as number;
     const profilePositionId = (
       tree.$.profile as unknown as { __positionIds?: number[] }
     ).__positionIds?.[0] as number;
@@ -238,19 +265,25 @@ describe('incremental materialisation', () => {
 
     expect(registry?.parentOf(profilePositionId)).toBe(rootPositionId);
     expect(registry?.parentOf(firstNamePositionId)).toBe(profilePositionId);
-    expect(registry?.contains(profilePositionId, firstNamePositionId)).toBe(true);
+    expect(registry?.contains(profilePositionId, firstNamePositionId)).toBe(
+      true
+    );
     expect(registry?.contains(profilePositionId, themePositionId)).toBe(false);
   });
 
   it('stamps one PositionId per materialized descendant', () => {
-    const tree = signalTree({
-      profile: { firstName: 'John', lastName: 'Smith' },
-      settings: { theme: 'light' },
-    });
+    const tree = signalTree(
+      {
+        profile: { firstName: 'John', lastName: 'Smith' },
+        settings: { theme: 'light' },
+      },
+      { capabilities: ['causal-runtime'] }
+    );
     const positionIds = new Set<number>();
 
     visitTree(tree.$, (node) => {
-      const positionId = (node as { __positionIds?: number[] }).__positionIds?.[0];
+      const positionId = (node as { __positionIds?: number[] })
+        .__positionIds?.[0];
       if (typeof positionId === 'number') {
         positionIds.add(positionId);
       }

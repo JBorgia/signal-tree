@@ -36,9 +36,12 @@ const payload = (data: unknown) =>
 
 describe('M4 — is the decline a uniform rule?', () => {
   it('THE PROPERTY DECIDES, NOT THE KIND — a loaderless collection ACCEPTS rehydrate', () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-    }).with(serialization());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, string>({ selectId: (r) => r.id }),
+      },
+      { enhancers: [serialization()] }
+    );
     tree.$.rows.addOne({ id: 'live', n: 1 });
 
     // Same declaration kind, same mode, no live source -> the payload applies.
@@ -48,12 +51,15 @@ describe('M4 — is the decline a uniform rule?', () => {
   });
 
   it('THE SAME KIND DECLINES once it owns a live source', () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({
-        selectId: (r) => r.id,
-        load: loader(() => of([{ id: 'fromLoader', n: 9 }]), { lazy: true }),
-      }),
-    }).with(serialization());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, string>({
+          selectId: (r) => r.id,
+          load: loader(() => of([{ id: 'fromLoader', n: 9 }]), { lazy: true }),
+        }),
+      },
+      { enhancers: [serialization()] }
+    );
     tree.$.rows.addOne({ id: 'live', n: 1 });
 
     tree.deserialize(payload({ rows: { all: [{ id: 'stored', n: 2 }] } }));
@@ -63,12 +69,15 @@ describe('M4 — is the decline a uniform rule?', () => {
   });
 
   it('MODE, NOT PAYLOAD — the identical payload APPLIES under transfer', () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({
-        selectId: (r) => r.id,
-        load: loader(() => of([{ id: 'fromLoader', n: 9 }]), { lazy: true }),
-      }),
-    }).with(serialization());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, string>({
+          selectId: (r) => r.id,
+          load: loader(() => of([{ id: 'fromLoader', n: 9 }]), { lazy: true }),
+        }),
+      },
+      { enhancers: [serialization()] }
+    );
     tree.$.rows.addOne({ id: 'live', n: 1 });
 
     // Same position, same live source, same bytes — opposite answer, decided
@@ -82,19 +91,29 @@ describe('M4 — is the decline a uniform rule?', () => {
   });
 
   it('THE RULE READS NOTHING FROM THE PAYLOAD', () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({
-        selectId: (r) => r.id,
-        load: loader(() => of([{ id: 'fromLoader', n: 9 }]), { lazy: true }),
-      }),
-    }).with(serialization());
+    const tree = signalTree(
+      {
+        rows: entityMap<Row, string>({
+          selectId: (r) => r.id,
+          load: loader(() => of([{ id: 'fromLoader', n: 9 }]), { lazy: true }),
+        }),
+      },
+      { enhancers: [serialization()] }
+    );
     tree.$.rows.addOne({ id: 'live', n: 1 });
 
     // An empty collection, a full one, a malformed one — all declined
     // identically, because the predicate never inspects `value`.
     for (const body of [
       { rows: { all: [] } },
-      { rows: { all: [{ id: 'a', n: 1 }, { id: 'b', n: 2 }] } },
+      {
+        rows: {
+          all: [
+            { id: 'a', n: 1 },
+            { id: 'b', n: 2 },
+          ],
+        },
+      },
       { rows: {} },
     ]) {
       tree.deserialize(payload(body));

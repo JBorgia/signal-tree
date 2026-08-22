@@ -7,7 +7,10 @@ const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 describe('time-travel behavior', () => {
   it('records history and supports undo/redo', async () => {
-    const enhanced = signalTree({ count: 0, text: '' }).with(timeTravel());
+    const enhanced = signalTree(
+      { count: 0, text: '' },
+      { enhancers: [timeTravel()] }
+    );
 
     enhanced.$.count.set(1);
     await flush();

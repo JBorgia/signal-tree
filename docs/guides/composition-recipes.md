@@ -22,11 +22,13 @@ half-right for your app, and you can read the whole thing.
 **The need:** every app re-decides which enhancers to apply and whether to gate
 `timeTravel()` out of production. Two apps in one repo will drift.
 
-**The recipe** — one function in your shared lib:
+**The recipe** — one function in your shared lib. It returns the enhancer
+ARRAY, not an enhanced tree: 15.0 has no `.with()`, and a helper that took a
+tree could not add anything to it.
 
 ```typescript
 import { batching, devTools } from '@signaltree/core';
-import type { Enhancer, SignalTreeBuilder, TreeNode } from '@signaltree/core';
+import type { Enhancer } from '@signaltree/core';
 
 export interface StandardEnhancerOptions {
   name: string;
@@ -34,10 +36,17 @@ export interface StandardEnhancerOptions {
   extra?: Array<Enhancer<unknown>>;
 }
 
-export function withStandardEnhancers<T extends object>(tree: SignalTreeBuilder<T, TreeNode<T>>, { name, extra = [] }: StandardEnhancerOptions) {
-  const base = tree.with(batching()).with(devTools({ name }));
-  return extra.reduce((acc, enhancer) => acc.with(enhancer), base);
+export function standardEnhancers({ name, extra = [] }: StandardEnhancerOptions) {
+  return [batching(), devTools({ name }), ...extra];
 }
+```
+
+Used at the construction site, which is the only place enhancers can be applied:
+
+```typescript
+const tree = signalTree(state, {
+  enhancers: standardEnhancers({ name: 'MyApp' }),
+});
 ```
 
 ### The tree-shaking trap — read this before writing your own
@@ -47,7 +56,7 @@ inside:
 
 ```typescript
 // ✗ DON'T — timeTravel ships in every production bundle
-return isProduction ? enhanced : enhanced.with(timeTravel());
+return isProduction ? base : [...base, timeTravel()];
 ```
 
 That is a **static import behind a runtime check**, so the bundler cannot drop
@@ -62,27 +71,32 @@ is wanted, so a production entry point never references it:
 
 ```typescript
 // dev entry point
-withStandardEnhancers(signalTree(state), {
-  name: 'MyApp Dev',
-  extra: [timeTravel()], // import lives in the dev-only file
+signalTree(state, {
+  enhancers: standardEnhancers({
+    name: 'MyApp Dev',
+    extra: [timeTravel()], // import lives in the dev-only file
+  }),
 });
 
 // production entry point — no timeTravel import anywhere in this graph
-withStandardEnhancers(signalTree(state), { name: 'MyApp' });
+signalTree(state, { enhancers: standardEnhancers({ name: 'MyApp' }) });
 ```
 
 With Angular, `fileReplacements` in `angular.json` is the natural seam.
 
 ### Typing note
 
-`.with()` returns `this & TAdded`. If your helper lives in a **library** and you
-let TypeScript infer the return type, the emitted `.d.ts` will reference the
-enhancer method interfaces — `BatchingMethods`, `DevToolsMethods`,
-`TimeTravelMethods`, `OptimizedUpdateMethods`, `EffectsMethods`. All five are
-exported from `@signaltree/core`, so this works; if you are on **< 13.2.0**,
-`DevToolsMethods` and `OptimizedUpdateMethods` were missing from the barrel and
-you would have had to annotate a narrower return type (losing `.batch()`/`.undo()`
-for your callers). Upgrade rather than erase the type.
+The declared enhancer array is a tuple, and `signalTree` intersects every
+enhancer's additions into its result. That only survives if the tuple survives:
+annotating the helper's return as `Enhancer<unknown>[]` widens it and every added
+method disappears — `.batch()`, `.undo()`, `.serialize()` — while the runtime
+keeps working, which is the worst version of the failure. Let the return type
+infer, or write the array inline at the construction site.
+
+If your helper lives in a **library** and you let TypeScript infer, the emitted
+`.d.ts` will reference the enhancer method interfaces — `BatchingMethods`,
+`DevToolsMethods`, `TimeTravelMethods`, `OptimizedUpdateMethods`,
+`EffectsMethods`. All five are exported from `@signaltree/core`, so this works.
 
 ---
 

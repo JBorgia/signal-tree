@@ -46,8 +46,10 @@ describe('Memory stress tests', () => {
 
   it('should create and destroy 100 trees with enhancers without error', () => {
     for (let i = 0; i < 100; i++) {
-      const tree = signalTree({ count: i, name: `tree_${i}` })
-        .with(batching());
+      const tree = signalTree(
+        { count: i, name: `tree_${i}` },
+        { enhancers: [batching()] }
+      );
 
       // Use it
       tree.$.count.set(i + 1);

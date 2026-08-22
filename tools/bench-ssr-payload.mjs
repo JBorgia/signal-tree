@@ -37,7 +37,7 @@ const kb = (s) => s.length / 1024;
 const curve = [100, 1000, 10000].map((n) => {
   const t = signalTree({
     rows: entityMap({ selectId: (r) => r.id }),
-  }).with(serialization());
+  }, { enhancers: [serialization()] });
   t.$.rows.setAll(rows(n));
   return { rows: n, kb: kb(t.serialize()) };
 });
@@ -49,15 +49,15 @@ const curve = [100, 1000, 10000].map((n) => {
 const N = 500;
 const mk = () => ({ feed: asyncSource(() => Promise.resolve([])), n: 0 });
 
-const server = signalTree(mk()).with(serialization());
+const server = signalTree(mk(), { enhancers: [serialization()] });
 server.$.feed.set(rows(N));
 const withData = server.serialize();
-const emptyPayload = signalTree(mk()).with(serialization()).serialize();
+const emptyPayload = signalTree(mk(), { enhancers: [serialization()] }).serialize();
 
-const declined = signalTree(mk()).with(serialization());
+const declined = signalTree(mk(), { enhancers: [serialization()] });
 declined.deserialize(withData);
 
-const accepted = signalTree(mk()).with(serialization());
+const accepted = signalTree(mk(), { enhancers: [serialization()] });
 accepted.deserialize(withData, { transfer: true });
 
 const shipped = kb(withData) - kb(emptyPayload);

@@ -95,10 +95,14 @@ const seed = (n) => {
 const IMPLS = {
   signaltree: async (withHistory) => {
     const { signalTree, entityMap, timeTravel } = await import(CORE);
-    const base = signalTree({ rows: entityMap({ selectId: (r) => r.id }) });
-    const tree = withHistory
-      ? base.with(timeTravel({ maxHistorySize: 200 }))
-      : base;
+    // v15: the enhancer is DECLARED, so the two arms differ in their build
+    // plan as well as their history. That is the real shape now — a tree with
+    // no timeTravel no longer pays for the causal runtime — and it is exactly
+    // what the comparison should measure.
+    const tree = signalTree(
+      { rows: entityMap({ selectId: (r) => r.id }) },
+      { enhancers: withHistory ? [timeTravel({ maxHistorySize: 200 })] : [] }
+    );
     return {
       store: tree,
       setAll: (d) => tree.$.rows.setAll(d),

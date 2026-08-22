@@ -25,13 +25,20 @@ const MAX_EXPORTS = 60;
  *
  * 15.0.0 release hardening re-baseline: measured by this script after rebuilding
  * from source. Minimal tree: 9659B; tree + stored(): 11404B.
+ *
+ * 15.0.0 declarative construction: minimal tree 9659B -> 10134B. Not a
+ * diagnostic — declaring enhancers in `signalTree`'s config puts the enhancer
+ * resolver and the configuration validator on the mandatory construction path
+ * of every tree, including one with no enhancers. Full attribution, and why a
+ * runtime short-circuit cannot recover it, is on `signaltree-bare` in
+ * tools/check-bundle-budget.mjs.
  */
 const CONSUMER_SCENARIOS = [
   {
     name: 'minimal tree (no markers)',
     imports: 'signalTree',
     code: "const t = signalTree({ user: { name: 'a' }, count: 0 }); t.$.count.set(5); globalThis.o = t();",
-    budget: 9800,
+    budget: 10300,
   },
   {
     name: 'tree + stored()',

@@ -36,15 +36,19 @@ type EntityHistoryStepStore = {
 };
 
 function createStore(): HistoryStepStore {
-  return signalTree({ left: 'L0', right: 'R0', later: 'Z0' }).with(
-    timeTravel()
+  return signalTree(
+    { left: 'L0', right: 'R0', later: 'Z0' },
+    { enhancers: [timeTravel()] }
   ) as unknown as HistoryStepStore;
 }
 
 function createEntityStore(): EntityHistoryStepStore {
-  return signalTree({
-    rows: entityMap<Row, number>({ selectId: (row) => row.id }),
-  }).with(timeTravel()) as unknown as EntityHistoryStepStore;
+  return signalTree(
+    {
+      rows: entityMap<Row, number>({ selectId: (row) => row.id }),
+    },
+    { enhancers: [timeTravel()] }
+  ) as unknown as EntityHistoryStepStore;
 }
 
 describe('history step adapter seam', () => {

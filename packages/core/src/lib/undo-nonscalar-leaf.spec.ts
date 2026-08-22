@@ -32,7 +32,7 @@ const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 
 describe('undo — scalar leaves work', () => {
   it('CONTROL — a number leaf undoes correctly', async () => {
-    const tree = signalTree({ n: 0 }).with(timeTravel());
+    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
     tree.$.n.set(1);
     await tick();
     tree.$.n.set(2);
@@ -43,7 +43,7 @@ describe('undo — scalar leaves work', () => {
   });
 
   it('CONTROL — a string leaf undoes correctly', async () => {
-    const tree = signalTree({ s: '' }).with(timeTravel());
+    const tree = signalTree({ s: '' }, { enhancers: [timeTravel()] });
     tree.$.s.set('a');
     await tick();
     tree.$.s.set('b');
@@ -56,7 +56,10 @@ describe('undo — scalar leaves work', () => {
 
 describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
   it('ARRAY leaf', async () => {
-    const tree = signalTree({ rows: [] as number[] }).with(timeTravel());
+    const tree = signalTree(
+      { rows: [] as number[] },
+      { enhancers: [timeTravel()] }
+    );
     tree.$.rows.set([1]);
     await tick();
     tree.$.rows.set([1, 2]);
@@ -65,9 +68,12 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
   });
 
   it('DATE leaf', async () => {
-    const tree = signalTree({
-      when: new Date('2020-01-01T00:00:00.000Z'),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        when: new Date('2020-01-01T00:00:00.000Z'),
+      },
+      { enhancers: [timeTravel()] }
+    );
     tree.$.when.set(new Date('2021-01-01T00:00:00.000Z'));
     await tick();
     tree.$.when.set(new Date('2022-01-01T00:00:00.000Z'));
@@ -76,9 +82,12 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
   });
 
   it('MAP leaf', async () => {
-    const tree = signalTree({
-      lookup: new Map<string, number>(),
-    }).with(timeTravel());
+    const tree = signalTree(
+      {
+        lookup: new Map<string, number>(),
+      },
+      { enhancers: [timeTravel()] }
+    );
     tree.$.lookup.set(new Map([['a', 1]]));
     await tick();
     tree.$.lookup.set(new Map([['a', 2]]));
@@ -89,7 +98,10 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
   });
 
   it('SET leaf', async () => {
-    const tree = signalTree({ seen: new Set<string>() }).with(timeTravel());
+    const tree = signalTree(
+      { seen: new Set<string>() },
+      { enhancers: [timeTravel()] }
+    );
     tree.$.seen.set(new Set(['a']));
     await tick();
     tree.$.seen.set(new Set(['a', 'b']));
@@ -101,7 +113,10 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
     // The throw is not scoped to the offending position. `applyTurnEffects`
     // validates the WHOLE effect list before applying any of it, so one
     // non-scalar leaf in a turn takes the scalar writes down with it.
-    const tree = signalTree({ n: 0, rows: [] as number[] }).with(timeTravel());
+    const tree = signalTree(
+      { n: 0, rows: [] as number[] },
+      { enhancers: [timeTravel()] }
+    );
     tree.$.n.set(1);
     await tick();
     tree.$.n.set(2);

@@ -375,7 +375,7 @@ document's provisional placement and carries no weight.
 | Feature                                      | Property | Kernel concepts  | Class | Ledger state                                                                                           |
 | -------------------------------------------- | -------- | ---------------- | ----- | ------------------------------------------------------------------------------------------------------ |
 | `defineStore()`                              | P-F      | observer adapter | KA    | Angular DI integration; owner Angular (realization)                                                    |
-| enhancer protocol (`.with()`)                | —        | —                | ⚠     | `.with()` canonical and FROZEN as the only door; post-exposure composition DELETE. **blocking GATE B** |
+| enhancer protocol (declared `enhancers`)     | —        | —                | ⚠     | RESOLVED DIFFERENTLY: `.with()` is DELETED, not frozen. The single door is `signalTree(state, { enhancers })`, validated as a set before construction; post-exposure composition is unreachable rather than forbidden. **blocking GATE B** |
 | marker processor protocol / `core/authoring` | —        | —                | LC    | M1/M2 CLOSED — third-party extension NOT EARNED; no entitlement                                        |
 | `@signaltree/authoring`                      | —        | —                | ⚠     | **DOES NOT EXIST.** Package/form STOPPED and UNPROVEN; derive external implementer needs first         |
 

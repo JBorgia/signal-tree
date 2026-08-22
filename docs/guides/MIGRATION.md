@@ -81,7 +81,7 @@ import { serialization } from '@signaltree/serialization';
 // ✅ New way - single package import
 import { signalTree, batching, memoization, withDevtools, withTimeTravel, serialization, ecommercePreset, dashboardPreset } from '@signaltree/core';
 
-// Note: `.with(entities())` was deprecated in v6 and removed in v7 — remove any calls in your code.
+// Note: the `entities()` enhancer was deprecated in v6 and removed in v7 — remove any calls in your code.
 // Note: devTools auto-connects to Redux DevTools and supports time-travel dispatch.
 ```
 
@@ -91,7 +91,7 @@ The **API remains 100% compatible** - only import statements change. Your existi
 
 ```typescript
 // Your existing code works exactly the same
-const tree = signalTree(state).with(batching(), memoization(), withDevtools());
+const tree = signalTree(state, { enhancers: [batching(), memoization(), withDevtools()] });
 ```
 
 ---
@@ -108,7 +108,7 @@ import { signalTree } from '@signaltree/core';
 import { batching } from '@signaltree/batching';
 import { memoization } from '@signaltree/memoization';
 
-const tree = signalTree(state).with(batching(), memoization());
+const tree = signalTree(state, { enhancers: [batching(), memoization()] });
 ```
 
 **After:**
@@ -117,7 +117,7 @@ const tree = signalTree(state).with(batching(), memoization());
 // ✅ v4.0.0+
 import { signalTree, batching, memoization } from '@signaltree/core';
 
-const tree = signalTree(state).with(batching(), memoization());
+const tree = signalTree(state, { enhancers: [batching(), memoization()] });
 ```
 
 ### Example 2: Full Stack with DevTools
@@ -133,7 +133,7 @@ import { withDevtools } from '@signaltree/devtools';
 import { withTimeTravel } from '@signaltree/time-travel';
 import { entities } from '@signaltree/entities';
 
-const tree = signalTree(state).with(batching(), memoization(), entities(), withTimeTravel(), withDevtools());
+const tree = signalTree(state, { enhancers: [batching(), memoization(), entities(), withTimeTravel(), withDevtools()] });
 ```
 
 **After:**
@@ -142,7 +142,7 @@ const tree = signalTree(state).with(batching(), memoization(), entities(), withT
 // ✅ v4.0.0+
 import { signalTree, batching, memoization, withDevtools, withTimeTravel, entities } from '@signaltree/core';
 
-const tree = signalTree(state).with(batching(), memoization(), entities(), withTimeTravel(), withDevtools());
+const tree = signalTree(state, { enhancers: [batching(), memoization(), entities(), withTimeTravel(), withDevtools()] });
 ```
 
 ### Example 3: E-commerce Preset
@@ -154,7 +154,7 @@ const tree = signalTree(state).with(batching(), memoization(), entities(), withT
 import { signalTree } from '@signaltree/core';
 import { ecommercePreset } from '@signaltree/presets';
 
-const tree = signalTree(state).with(ecommercePreset());
+const tree = signalTree(state, { enhancers: [ecommercePreset()] });
 ```
 
 **After:**
@@ -163,7 +163,7 @@ const tree = signalTree(state).with(ecommercePreset());
 // ✅ v4.0.0+
 import { signalTree, ecommercePreset } from '@signaltree/core';
 
-const tree = signalTree(state).with(ecommercePreset());
+const tree = signalTree(state, { enhancers: [ecommercePreset()] });
 ```
 
 ### Example 4: Serialization
@@ -175,12 +175,10 @@ const tree = signalTree(state).with(ecommercePreset());
 import { signalTree } from '@signaltree/core';
 import { serialization } from '@signaltree/serialization';
 
-const tree = signalTree(state).with(
-  serialization({
+const tree = signalTree(state, { enhancers: [serialization({
     autoSave: true,
     key: 'app-state',
-  })
-);
+  })] });
 ```
 
 **After:**
@@ -189,12 +187,10 @@ const tree = signalTree(state).with(
 // ✅ v4.0.0+
 import { signalTree, serialization } from '@signaltree/core';
 
-const tree = signalTree(state).with(
-  serialization({
+const tree = signalTree(state, { enhancers: [serialization({
     autoSave: true,
     key: 'app-state',
-  })
-);
+  })] });
 ```
 
 ---
