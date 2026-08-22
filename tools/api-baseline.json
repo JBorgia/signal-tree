@@ -99,38 +99,11 @@
         "internalDecl": false
       },
       {
-        "name": "byKeys",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/compared.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "CallableWritableSignal",
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/types.ts",
         "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "compared",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/compared.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ComparedMarker",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/compared.ts",
-        "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
       },

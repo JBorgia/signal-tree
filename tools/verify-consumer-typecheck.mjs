@@ -83,8 +83,6 @@ const SAMPLE = `
 import {
   signalTree,
   entityMap,
-  compared,
-  byKeys,
   timeTravel,
   batching,
 } from '@signaltree/core';
@@ -95,7 +93,6 @@ const tree = signalTree({
   count: 0,
   user: { name: 'Ada', age: 36 },
   users: entityMap<User, number>({ selectId: (u: User) => u.id }),
-  cached: compared({ id: 1, name: 'x', version: 1 } as User, byKeys<User>('id', 'version')),
 })
   // .with() takes ONE enhancer and is CHAINED. Passing several at once is
   // TS2554 (Expected 1 arguments, but got 3) — worth having right in the

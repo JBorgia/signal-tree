@@ -56,9 +56,6 @@ const MARKERS = [
     const t = signalTree({ rows: entityMap({ selectId: (r) => r.id }) });
     t.$.rows.addOne({ id: 1 }); t.$.rows.updateOne(1, {});
     globalThis.__sink = [t.$.rows.all(), t.$.rows.count()];`],
-  ['compared', 'compared, byKeys', `
-    const t = signalTree({ u: compared({ id: 1, v: 1 }, byKeys('id', 'v')) });
-    t.$.u.set({ id: 1, v: 2 }); globalThis.__sink = [t.$.u()];`],
 ];
 
 const ENHANCERS = [
@@ -123,14 +120,14 @@ const COMBOS = [
     t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.count.set(1); });
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
   ['current public surface mix', `
-    import { signalTree, entityMap, compared, byKeys,
+    import { signalTree, entityMap,
              batching, timeTravel } from ${C};
     const t = signalTree({
       rows: entityMap({ selectId: (r) => r.id }),
-      u: compared({ id: 1 }, byKeys('id')),
+      count: 0,
     }).with(batching()).with(timeTravel());
-    t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.u.set({ id: 1 }); }); t.undo();
-    globalThis.__sink = [t.$.rows.all(), t.$.u()];`],
+    t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.count.set(1); }); t.undo();
+    globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
 ];
 out.combos = [];
 for (const [label, code] of COMBOS) {
