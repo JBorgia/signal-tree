@@ -47,10 +47,37 @@ let sink = 0;
  * the arms alternated. The doc's own §13 preamble already warns about an
  * in-process race producing "a 7.5x phantom" — same family of mistake.
  */
-function duel(label, armA, armB, opsPerRound) {
+/**
+ * ⚠️ A TURN BOUNDARY PER ROUND, or this file does not run at all.
+ *
+ * Without it the whole benchmark is one synchronous job, and SignalTree's
+ * turn-dependent cleanup — the microtask-deferred notifier, the WeakRef node
+ * cache, the FinalizationRegistry — cannot reclaim anything, however much
+ * garbage accumulates. At HEAD that was fatal: 22 fresh 50,000-row collections
+ * in task 2, on top of `scaling()`, exhausted a 4 GB heap and the process died
+ * with "Ineffective mark-compacts near heap limit" before printing a single
+ * row. Each task passes in isolation; `scaling` + `t1` + `t2` together do not.
+ *
+ * One `setTimeout(0)` per round turns the OOM into a clean run. It sits OUTSIDE
+ * every timed region — each arm takes its own `hrtime` inside itself — so it
+ * costs the measurement nothing and both arms get it equally.
+ *
+ * This is not SignalTree leaking: sequentially built and dropped collections do
+ * not accumulate when a turn is available (measured flat at ~11.4 MB across
+ * both 8 and 16 dropped 10k trees). What it clears is a LEAK diagnosis, and
+ * nothing more. An application can absolutely run a long synchronous job, and
+ * inside one SignalTree can build hundreds of MB of state that is conceptually
+ * dead but not yet reclaimable. That is real transient high-water pressure and
+ * it is worth knowing about — it is tracked as turn-bound deferred retention,
+ * not dismissed. The harness yields because its rounds are independent
+ * samples, which is a statement about the harness, not about whether the
+ * pressure matters.
+ */
+async function duel(label, armA, armB, opsPerRound) {
   const a = [],
     b = [];
   for (let r = 0; r < WARMUP + ROUNDS; r++) {
+    await new Promise((resolve) => setTimeout(resolve, 0));
     if (r % 2 === 0) {
       a.push(armA());
       b.push(armB());
@@ -205,9 +232,12 @@ const t4store = () => {
  * `updateEntity` rebuilds the entity map — `{ ...map, [id]: next }` — which is
  * O(keys). SignalTree holds a signal per entity, so the write touches one.
  */
-function scaling() {
+async function scaling() {
   const out = [];
   for (const n of [1_000, 10_000, 50_000]) {
+    // Same reason as `duel`: a 50,000-row arm built with no turn available
+    // cannot release the previous one. See the note above `duel`.
+    await new Promise((resolve) => setTimeout(resolve, 0));
     const A = [],
       B = [];
     for (let r = 0; r < 5; r++) {
@@ -230,13 +260,13 @@ function scaling() {
   return out;
 }
 
-const scale = scaling();
+const scale = await scaling();
 
 const results = [
-  duel('write one field 10 levels deep', t1tree, t1store, N1),
-  duel('update 1 row of 50k + dependent read', t2tree, t2store, N2),
-  duel('write, then read whole state 10x', t3tree, t3store, N3),
-  duel('50 writes with undo history', t4tree, t4store, N4),
+  await duel('write one field 10 levels deep', t1tree, t1store, N1),
+  await duel('update 1 row of 50k + dependent read', t2tree, t2store, N2),
+  await duel('write, then read whole state 10x', t3tree, t3store, N3),
+  await duel('50 writes with undo history', t4tree, t4store, N4),
 ];
 
 if (process.argv.includes('--json')) {

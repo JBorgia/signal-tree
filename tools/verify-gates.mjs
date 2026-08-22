@@ -518,6 +518,84 @@ const GATES = [
     },
   },
   {
+    name: 'memory-consistency',
+    covers:
+      'the retained-heap table is internally possible — no scenario measures less than a scenario it strictly contains',
+    // The defect this replaces was not a wrong number, it was an IMPOSSIBLE
+    // pair: `entityMap 10k` published 59.95 MB while the same collection plus a
+    // materialised node for all 10,000 rows published 18.03 MB. That is an
+    // ablation in which doing strictly more work retains 42 MB less, and it was
+    // read as evidence for weeks. Its cause was a `yieldBeforeMeasure` flag set
+    // on one scenario, so two arms were read at different points on the
+    // reclamation curve.
+    //
+    // `memory-harness` above already ran this exact report and passed the
+    // whole time the impossible pair was in it. It proves the tool REFUSES to
+    // run without --expose-gc; it never reads what the tool printed. That is
+    // the gap — a harness gate that checks the harness starts, not that its
+    // output could be true.
+    //
+    // Deliberately an ORDERING check and not a budget: pinning the absolute MB
+    // would fail on every legitimate improvement, and would not have caught
+    // this — both numbers were individually plausible. It is also deliberately
+    // blind to a protocol that is uniformly wrong, because a uniform protocol
+    // still produces a self-consistent table; what it catches is asymmetry
+    // between arms, which is the defect class that shipped.
+    cmd: ['node', '--expose-gc', 'tools/check-memory-harness.mjs'],
+    slow: true,
+    releaseOnly: true,
+    needsBuild: true,
+    provenBy: 'memory-consistency:self',
+  },
+  {
+    name: 'memory-consistency:self',
+    covers:
+      'the containment checker rejects the exact 59.95/18.03 table that shipped, and accepts a consistent one',
+    cmd: [
+      'node',
+      '--expose-gc',
+      'tools/check-memory-harness.mjs',
+      '--self-test',
+    ],
+    // Emptying CONTAINMENTS is the honest mutation: a checker with no pairs
+    // passes everything, which is precisely the state the repo was in before
+    // this gate existed — the lesson was written in memory-report.mjs's header
+    // ("strictly more data cannot retain less") and enforced by nothing.
+    mutation: {
+      file: 'tools/check-memory-harness.mjs',
+      find: 'const CONTAINMENTS = [',
+      replace: 'const CONTAINMENTS = []; const __unusedContainments = [',
+    },
+  },
+  {
+    name: 'historical-ab-isolation:self',
+    covers:
+      'the historical-A/B isolation checker rejects a comparison whose two arms are the same build (NOT full proof of a historical comparison — see the file header)',
+    // There is no unconditional live form of this gate: it needs a historical
+    // build to exist, which only happens during an A/B. What it protects is
+    // real and already bit once — NX_WORKSPACE_ROOT_PATH is set in this
+    // environment, so `nx build` from a worktree (or from a detached
+    // `git archive` extract with its own node_modules) silently compiles the
+    // MAIN tree's source into the MAIN tree's dist. The "historical" arm is then
+    // HEAD, the ratio is fiction, and the main dist has been overwritten
+    // underneath whatever else is measuring against it.
+    //
+    // That happened twice while attributing the setAll regression and was
+    // caught only because the two captured artifacts were byte-identical.
+    // Run the live form during any historical comparison:
+    //   node tools/check-historical-ab-isolation.mjs --old <barrel> --new <barrel> \
+    //     --marker lib/internals/production-substrate-stats.js --expect-marker new
+    cmd: ['node', 'tools/check-historical-ab-isolation.mjs', '--self-test'],
+    // Make the identical-build detection unreachable: the checker then passes
+    // an A/B comparing a build with itself, which is precisely the state it
+    // exists to refuse.
+    mutation: {
+      file: 'tools/check-historical-ab-isolation.mjs',
+      find: '  if (a.digest === b.digest) {',
+      replace: '  if (false && a.digest === b.digest) {',
+    },
+  },
+  {
     name: 'state-scale',
     releaseOnly: true,
     covers:

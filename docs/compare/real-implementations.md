@@ -1,7 +1,20 @@
 # Cross-library, real implementations
 
-**Status:** measurement, 14.0.0. Reproduce with
+**Status:** re-measured 2026-08-21 on a repaired harness. Reproduce with
 `node --expose-gc tools/bench-compare.mjs`.
+
+> ⚠️ **The 14.0.0 revision of this page published an invalid comparison and both
+> of its tables have been replaced.** Two independent defects: the memory column
+> took its baseline after five timing iterations in the same process, and the
+> settling rule was not neutral across arms — adding a turn boundary moves
+> SignalTree by tens of MB and the other three by 0.00 MB, because SignalTree is
+> the only arm here with a microtask-deferred notifier, weak caches and a
+> `FinalizationRegistry`. Timing and retention now run in separate processes and
+> every arm settles through `tools/lib/heap-quiescence.mjs`.
+>
+> **Re-measuring also exposed a throughput regression that is not a measurement
+> artefact** — see "Open: the collection regression" below. It is unresolved,
+> and the collection table should not be quoted as a current claim until it is.
 
 Every arm implements the **same capability** using that library's own entity
 API, not a simplified stand-in:
@@ -23,22 +36,48 @@ each workload isolates one thing.
 
 Reproduce with `node --expose-gc tools/bench-compare.mjs --n 10000`.
 
-| arm            | median      | retained |
-| -------------- | ----------- | -------- |
-| elf            | **1.43 ms** | 0.92 MB  |
-| **signaltree** | 3.24 ms     | 1.29 MB  |
-| raw-signals    | 4.60 ms     | 6.16 MB  |
-| ngrx-signals   | 10.98 ms    | 0.93 MB  |
+| arm            | median        | retained | 14.0.0 published   |
+| -------------- | ------------- | -------- | ------------------ |
+| elf            | **1.43 ms**   | 1.05 MB  | 1.43 ms / 0.92 MB  |
+| raw-signals    | 5.05 ms       | 6.28 MB  | 4.60 ms / 6.16 MB  |
+| ngrx-signals   | 10.22 ms      | 1.07 MB  | 10.98 ms / 0.93 MB |
+| **signaltree** | **107.04 ms** | 11.44 MB | 3.24 ms / 1.29 MB  |
 
-**SignalTree is second of four on raw collection throughput.** It beats
-`@ngrx/signals` by 3.4× and a hand-rolled map of signals by 1.4×, and loses to
-elf by 2.3×.
+`retained` is the COLLECTION's cost. Each arm's library module graph is loaded
+before the measured window, because it is not equal across arms and it is not
+what this column is asking about: `@signaltree/core` (which pulls Angular)
+retains 6.67 MB of modules, `@ngrx/signals` 5.88 MB, `@ngneat/elf` 2.18 MB.
+Charging each arm its own import padded every number and compressed the gap
+between them by ~4x. This figure agrees with the isolated layer probe in
+[memory-profile.md](../architecture/memory-profile.md) to 0.03 MB.
 
-This moved: it was 5.97 ms and third, behind the hand-rolled arm. Two fixes
-account for it — the `byId()` node cache became weak (so the read path stopped
-allocating permanently) and a marker's snapshot wrapper became memoised (so an
-unrelated write stopped re-allocating it). Neither was aimed at this benchmark;
-both were correctness or memory fixes that happened to be on the hot path.
+**SignalTree is fourth of four, and this is a regression, not a re-measurement.**
+The three other arms reproduce their 14.0.0 timings within noise on the
+byte-identical harness. Only SignalTree moved, and it moved 36×.
+
+The memory column moved for the harness reasons in the banner above. The TIMING
+column did not: timing was never affected by the settling defect, the workload
+is unchanged, and `tools/bench-compare.mjs` is byte-identical to the commit that
+produced the published table.
+
+### Open: the collection regression
+
+`git diff 888336d1..HEAD -- tools/bench-compare.mjs` is empty, so the harness and
+workload that measured 3.24 ms are the ones now measuring 115.32 ms. elf,
+`@ngrx/signals` and raw-signals all land within ~5% of their published figures
+across the same interval, which rules out the machine and the harness.
+
+Decomposition (`node --expose-gc tools/bench-public-collection-layers.mjs --n
+10000`) puts essentially all of it in initial population: `setAll(10k)` at
+~116 ms, while steady-state `updateOne` stays at ~0.29 ms and the structural
+mutations at ~0.4 ms. So the O(1)-write thesis is unaffected; what regressed is
+bulk realization.
+
+**Unattributed.** 681 commits separate the two measurements and no bisect has
+been run — one was attempted in a git worktree and abandoned because `nx`
+resolved the workspace root through the symlinked `node_modules` and wrote its
+build into the main tree, which would have measured the wrong commit. Attributing
+it needs a worktree with its own install.
 
 ---
 
@@ -51,21 +90,18 @@ Reproduce with `node --expose-gc tools/bench-compare.mjs --n 10000`.
 > all — see "The retraction" below. These numbers are the corrected ones, and
 > they are verified by postconditions every arm must satisfy.
 
-| arm          | median      | retained | history                      |
-| ------------ | ----------- | -------- | ---------------------------- |
-| **elf**      | **1.24 ms** | 4.77 MB  | built-in `elf-state-history` |
-| signaltree   | **3.67 ms** | 5.25 MB  | built-in `timeTravel()`      |
-| ngrx-signals | 179.84 ms   | 0.94 MB  | hand-rolled                  |
-| raw-signals  | 278.44 ms   | 6.16 MB  | hand-rolled                  |
+| arm          | median       | retained | history                      | 14.0.0 published |
+| ------------ | ------------ | -------- | ---------------------------- | ---------------- |
+| **elf**      | **1.09 ms**  | 4.88 MB  | built-in `elf-state-history` | 1.24 ms          |
+| signaltree   | **29.45 ms** | 29.70 MB | built-in `timeTravel()`      | 3.67 ms          |
+| ngrx-signals | 177.21 ms    | 1.08 MB  | hand-rolled                  | 179.84 ms        |
+| raw-signals  | 273.85 ms    | 6.31 MB  | hand-rolled                  | 278.44 ms        |
 
-Re-measured on a later run: elf 1.29 / signaltree 3.58 / ngrx-signals 176.97 /
-raw-signals 260.04 ms — every arm within noise of the table above, which is the
-first time these figures have been checkable at all.
-
-**SignalTree is ~3× behind elf and ~49× ahead of a hand-rolled history.** That
-is after fixing a real defect the retraction exposed — see "What the correction
-found" below. The first honest measurement had SignalTree at 190 ms, level with
-hand-rolled; it is now 4.13 ms.
+**SignalTree is ~27× behind elf and ~6× ahead of a hand-rolled history.** The
+same regression pattern as the collection workload and almost certainly the same
+cause: elf, `@ngrx/signals` and raw-signals reproduce their published timings,
+SignalTree went from 3.67 ms to 29.45 ms. The published "~49× ahead of
+hand-rolled" no longer holds; ~6× does.
 
 elf remains ahead for a structural reason worth naming: it is an immutable
 store, so an undo swaps ONE state reference — 3 µs, independent of collection
@@ -306,17 +342,28 @@ same framework, same signals-first premise, same problem.
 
 Against that one comparison, measured here:
 
-|                                                         | SignalTree  | `@ngrx/signals` |           |
-| ------------------------------------------------------- | ----------- | --------------- | --------- |
-| consumers invalidated by a 1-entity change (1,000 rows) | **1**       | 1,000           | **1000×** |
-| collection: build 10k + 200 updates + read all          | **2.94 ms** | 9.48 ms         | **3.2×**  |
-| undo/redo: 50 writes + 50 undos over 10k                | **3.67 ms** | 179.84 ms       | **49×**   |
-| retained per entity (marginal)                          | 136 B       | 91 B            | 0.67×     |
-| history primitive                                       | built in    | hand-rolled     |           |
+|                                                         | SignalTree   | `@ngrx/signals` |           |
+| ------------------------------------------------------- | ------------ | --------------- | --------- |
+| consumers invalidated by a 1-entity change (1,000 rows) | **1**        | 1,000           | **1000×** |
+| collection: build 10k + 200 updates + read all          | 107.04 ms    | **10.22 ms**    | 0.10×     |
+| undo/redo: 50 writes + 50 undos over 10k                | **29.45 ms** | 177.21 ms       | **6.0×**  |
+| collection retained (10k, module graph excluded)        | 11.44 MB     | **1.07 MB**     | 0.09×     |
+| retained per entity (marginal)                          | 1,176 B      | **89 B**        | 0.08×     |
+| history primitive                                       | built in     | hand-rolled     |           |
 
-Three wins of 3.2× to 1000×, one loss of 1.5× on per-entity memory, and the loss
-is the price of the biggest win: the id index and per-entity storage are what
-make `byId()` O(1) and per-entity writes not touch the array.
+**This is materially worse than the 14.0.0 version of this table claimed**, which
+read 3.2× / 49× / 0.67×. One win survives intact and is still the one that
+matters most (granularity, and it is not a benchmark result — see below); undo/
+redo remains a win at 6.1× rather than 49×; collection throughput and per-entity
+memory are now losses of 10× and 13× rather than a win and a 1.5× loss.
+
+The memory line moved for harness reasons — `@ngrx/signals` reads 89 B/entity
+either way, SignalTree's 136 B was measured before the heap settled. The
+collection line moved for a real and unattributed regression. Neither is
+explained by "the price of the biggest win", and that framing has been removed
+rather than restated at a worse ratio: 13× the per-entity memory of the
+alternative is a cost that has to be argued for on its own, and 1,172 B/entity
+against a 120 B payload is not obviously the price of an id index.
 
 **The granularity row is the one that matters and it is not a benchmark result.**
 Reading `entityMap()` in `@ngrx/signals` takes a dependency on the whole
@@ -344,14 +391,23 @@ look.
 - ✅ **Against `@ngrx/signals`: granular by default, 1 invalidation vs 1,000.**
   The clearest and most defensible claim in this document, and the comparison
   most readers are actually making.
-- ⚖️ **Undo/redo: ~50× faster than hand-rolled, ~2.5× behind elf.** Defensible
+- ⚖️ **Undo/redo: ~6× faster than hand-rolled, ~23× behind elf.** (Was ~50× and
+  ~2.5×; the same unattributed regression moved this too.) Defensible
   against "you would have to write this yourself", not against elf. The original
   "20× faster than elf" was an artefact of measuring an idle arm; the corrected
   measurement then exposed a real O(collection) defect in restore, now fixed.
 - ✅ **Snapshots are nearly free.** A held `tree()` of 10k entities costs 0.01 MB
-  ([memory-profile.md](../architecture/memory-profile.md)).
-- ⚖️ **Collection throughput: second of four.** Ahead of `@ngrx/signals` by 3.4×
-  and of hand-rolled signals, behind elf by 2.3×.
-- ❌ **Not per-entity memory.** Highest of four
-  ([memory-profile.md](../architecture/memory-profile.md)).
+  ([memory-profile.md](../architecture/memory-profile.md)) — one of the few
+  claims here that survived re-measurement unchanged, and now on equal footing
+  with its baseline rather than compared across settling points.
+- ⛔ **Collection throughput: DO NOT CLAIM.** Fourth of four and 36× slower than
+  the same harness measured at 14.0.0, unattributed. See "Open: the collection
+  regression".
+- ❌ **Not per-entity memory, and by more than previously stated.** Highest of
+  four at 1,176 B/entity marginal against 89 B for `@ngrx/signals`
+  ([memory-profile.md](../architecture/memory-profile.md)). The previously
+  published 136 B was measured before the heap had settled.
+- ⛔ **Do not claim anything about churned collections.** Retention grows without
+  bound as keys turn over
+  ([entity-churn-retention.md](../architecture/entity-churn-retention.md)).
 - ❌ **Not bundle size.** Recorded elsewhere and unchanged.

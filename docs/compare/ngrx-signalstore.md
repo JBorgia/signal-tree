@@ -262,12 +262,29 @@ library uses its own best idiom for the same user-facing outcome, `@ngrx/signals
 
 Reproduce with `node tools/bench-vs-signalstore.mjs`.
 
-| Task                                 | SignalTree | SignalStore |                                    |
-| ------------------------------------ | ---------- | ----------- | ---------------------------------- |
-| Write one field 10 levels deep       | 0.011 µs   | 1.219 µs    | ~100x faster                       |
-| Update 1 row of 50k + dependent read | 0.51 µs    | 743 µs      | a SHAPE, not a ratio — see below   |
-| Write, then read whole state 10x     | 0.73 µs    | 2.60 µs     | **NOISE — spread exceeds the gap** |
-| 50 writes with undo history          | 0.34 µs    | 295 µs      | no history primitive exists        |
+> ⚠️ **Re-measured 2026-08-21, and every SignalTree figure moved the wrong way.** > `bench-vs-signalstore.mjs` could not run at all at HEAD — it exhausted a 4 GB
+> heap and died before printing a row (fixed: it now yields a turn per round,
+> see the note in the file). On the repaired harness every SignalStore figure
+> reproduces within ~10% and every SignalTree figure is 2–8× slower than the
+> table below used to state.
+>
+> Competitors reproducing while SignalTree does not establishes that
+> **SignalTree changed**. It does not establish that one change caused all of
+> it, and these figures span different paths — bulk population, deep scalar
+> write, point entity update. The `setAll` regression is now attributed
+> ([setall-regression.md](../architecture/setall-regression.md)); whether it
+> also explains the ~8× deep-write move is **correlated but unproven**, and is
+> not assumed here.
+
+| Task                                 | SignalTree | SignalStore | previously stated |                                    |
+| ------------------------------------ | ---------- | ----------- | ----------------- | ---------------------------------- |
+| Write one field 10 levels deep       | 0.093 µs   | 1.066 µs    | 0.011 / 1.219     | 11.5x faster (was stated ~100x)    |
+| Update 1 row of 50k + dependent read | 1.355 µs   | 974 µs      | 0.51 / 743        | a SHAPE, not a ratio — see below   |
+| Write, then read whole state 10x     | 1.341 µs   | 2.540 µs    | 0.73 / 2.60       | **NOISE — spread exceeds the gap** |
+| 50 writes with undo history          | 1.400 µs   | 307 µs      | 0.34 / 295        | no history primitive exists        |
+
+**The `~100x faster` deep-write claim is withdrawn.** It is 11.5× on the same
+harness today. The direction survives; the magnitude does not.
 
 The shape of this is the architecture, not tuning. SignalTree writes one leaf and
 rebuilds nothing above it; SignalStore rebuilds the object graph along the path to
@@ -277,15 +294,36 @@ the change and hands you a whole new state value.
 
 Reproduce with `node tools/bench-vs-signalstore.mjs`.
 
-| collection | SignalStore `updateEntity` | SignalTree `updateOne` |
-| ---------- | -------------------------- | ---------------------- |
-| 1,000      | 8.6 µs                     | 0.44 µs                |
-| 10,000     | 75.2 µs                    | 0.30 µs                |
-| 50,000     | 908 µs                     | 0.35 µs                |
+| collection | SignalStore `updateEntity` | SignalTree `updateOne` | previously stated |
+| ---------- | -------------------------- | ---------------------- | ----------------- |
+| 1,000      | 6.26 µs                    | 1.275 µs               | 8.6 / 0.44        |
+| 10,000     | 71.02 µs                   | 0.907 µs               | 75.2 / 0.30       |
+| 50,000     | 925.28 µs                  | 0.741 µs               | 908 / 0.35        |
+
+**The shape claim survives the re-measurement intact, and it is the claim.**
+SignalTree is still flat as the collection grows by 50× — 1.275 → 0.741 µs — and
+SignalStore is still linear. The constant factor regressed ~2–3×; the complexity
+class did not change, which is what this row is for.
 
 SignalStore is **linear** — `updateEntity` rebuilds the entity map, which is
 O(keys), and this uses `@ngrx/signals/entities`, its own best idiom, not a naive
 `.map()`. SignalTree is **flat**: one signal per entity, so a write touches one.
+
+**The fairness of the SignalStore arm was audited directly, because a ratio this
+large deserves it.** Three questions, all answerable by measurement rather than
+argument:
+
+- _Is `signalState` the wrong container?_ No. The idiomatic entity container is
+  `signalStore(withEntities())`, and it measures the same: 7.31 vs 7.35 µs at
+  1k, 51.9 vs 48.7 at 10k, 740.7 vs 761.6 at 50k. Within noise at every size.
+- _Is the dependent read a hidden collection scan?_ No. The SignalStore arm
+  reads `st.ids().length`, which is O(1), against SignalTree's `count()`, also
+  O(1). Neither arm scans, so the gap is not a read-shape artefact.
+- _Is it the deep-signal machinery?_ Only the constant. A hand-rolled shallow
+  `{...map}` control is ~19× cheaper than either NgRx container at 50k (40 µs
+  vs ~740) — but still linear. The O(n) belongs to rebuilding the entity map,
+  which is inherent to the immutable-collection representation, not to the
+  container choice.
 
 Quote that. A multiplier here is a statement about the fixture — it runs from
 ~15x at 1,000 rows to ~1,900x at 50,000 — and picking one is the mistake ST2018
