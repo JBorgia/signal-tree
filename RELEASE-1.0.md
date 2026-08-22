@@ -8,7 +8,7 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 5 — Automation`
+Current phase: `Phase 6 — Release Candidate`
 
 `GATE A` is **SATISFIED**. The kernel is FROZEN as of `4f7a2169`.
 
@@ -11026,7 +11026,12 @@ repair before publishing release candidate docs; closed during Phase 5.
       parse every generated JSON file, and
       `node tools/verify-gates.mjs --release --only=size-report,size-compare,bench-harness,history-ownership-bench,memory-harness,memory-compare,state-scale,raw-signals`.
 
-Exit condition: `GATE E`
+Exit condition: `GATE E` — **SATISFIED**
+
+Gate E independent review at `f0dadad4`: no blocker demonstrated after the
+`gates:self-test` blocker was fixed. Residual Phase 6 risk: the trusted
+publishing workflow has not fired against npm yet because no `1.0.0` tag exists;
+first real publish remains the RC task.
 
 ## Phase 6 — Release Candidate
 
