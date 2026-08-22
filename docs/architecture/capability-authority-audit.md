@@ -203,3 +203,44 @@ Whether `mutation-capture` should become a query, whether the two enhancers
 should declare it or whether the gate belongs somewhere else entirely, and
 whether the metadata accessors are earned at all once the answer is truthful.
 The last one is its own trial, with the ~1,710 B/entity as its prize.
+
+---
+
+## AMENDMENT — the "unaudited prize" of §5 is SUPERSEDED
+
+Added after the 15.0 declarative-construction and zero-owner-reclamation work.
+Section 5 above claims metadata accessors are **~1,710 B/entity** (L5 5,562 vs
+L5m 3,980) and calls that the prize for making `mutation-capture` truthful.
+
+**That number no longer exists.** It was measured before the
+materialized-projection deletion and the activation-token and
+subject-position-transport cleanups, all of which removed held-node cost that the
+L5/L5m comparison was attributing partly to metadata. Re-measured on 15.0 with
+`node --expose-gc tools/bench-entity-layers.mjs`:
+
+| arm                    | before (§5) | now       |
+| ---------------------- | ----------: | --------: |
+| L5-nodes-held          |     5,562 B |   3,859 B |
+| L5m-nodes-held-nometa  |     3,980 B |   3,853 B |
+| **difference**         | **1,710 B** |   **6 B** |
+
+Six bytes per entity — 0.06 MB across 10,000 held entities. The accessors are
+not a memory opportunity, and **§5 must not be quoted as one**. Almost all of the
+held-node cost is jointly the Angular field computeds and the node/facade
+objects; no arm in that harness separates those two, so neither is charged alone.
+
+What survives from §5: making `mutation-capture` truthful is still a
+**correctness** improvement — the flag was intended to be conditional and
+answering `true` for everyone is wrong regardless of what it costs. Do the work
+for that reason or not at all.
+
+### Also resolved: items 2 and 3
+
+The wiring §5 was gated on exists now. `signalTree` builds the plan from the
+declared enhancer set and passes `(capability) => buildPlan.has(capability)` into
+`createMaterializationContext`, so `hasCapability` has a real source of truth,
+and `internals/runtime-tree-plan.ts` carries the finalized answer to runtime
+consumers. The acceptance criteria above are still worth running, but their
+`.with()` rows no longer apply: there is no attachment to be "before", which is
+the point — see the AMENDMENT in
+[restoration-ownership-inventory.md](./restoration-ownership-inventory.md).
