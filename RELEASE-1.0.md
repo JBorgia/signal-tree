@@ -8,14 +8,14 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 2 — Public Release Surface (REOPENED)`
+Current phase: `Phase 2 — Public Release Surface (REOPENED — SATISFIED)`
 
-`GATE B` is **REOPENED** as of `7c182798` / `ca8f6006`. Deterministic
-tarball/API evidence showed symbols with settled negative or unresolved
-dispositions still present in the publishable public surface. Downstream Gates
-C–E remain mechanically validated, but the release is globally blocked until
-the public surface is reconciled and `node tools/check-rc-public-dispositions.mjs`
-passes.
+`GATE B` is **SATISFIED AGAIN** as of `cf008545` / `b957f604`. Deterministic
+tarball/API evidence at `7c182798` / `ca8f6006` reopened the gate because
+symbols with settled negative or unresolved dispositions were still present in
+the publishable public surface. The blocked root symbols and unplaced subpaths
+were removed, reviewer-found internal spec imports were repaired, and
+`node tools/check-rc-public-dispositions.mjs` now passes.
 
 `GATE A` is **SATISFIED**. The kernel is FROZEN as of `4f7a2169`.
 
@@ -2525,13 +2525,22 @@ the kernel before `GATE A`.
 - [x] freeze public API — `GATE B` satisfied after `5f1c96e0`, `f4de79a9`,
       `1ce22bd4`, `3065bc65`, `5f3dcd8a`
 
-Exit condition: `GATE B` — **REOPENED**
+Exit condition: `GATE B` — **SATISFIED AGAIN** (`cf008545` / `b957f604`)
 
 Reopened by deterministic RC surface evidence at `7c182798` / `ca8f6006`:
 `@signaltree/core` still publicly exports symbols whose disposition is DELETE,
 NOT EARNED, LC/mechanically retained, or unresolved. This is a public-surface
 gate failure, not a new release-time product decision. Settled negatives default
 to absence. The executable gate is `node tools/check-rc-public-dispositions.mjs`.
+
+Reclosed after public-surface removals through `18fe5781`, reviewer blocker fix
+`08b8fae5`, and stale warning cleanup `b957f604`. Validation: `node
+tools/check-rc-public-dispositions.mjs`, `node scripts/lint-readme-apis.mjs`,
+`node tools/check-doc-links.mjs`, `node tools/verify-tarball-consumer.mjs`,
+`npm run typecheck:source`, `npm run typecheck:typing`, `pnpm nx test core
+--skip-nx-cache --output-style=static`, `pnpm nx build demo
+--configuration=production --skip-nx-cache --output-style=static`, `node
+tools/verify-consumer-typecheck.mjs`, and `node tools/verify-angular-consumer.mjs`.
 
 ### Historical measured public surface (`6e7bf16a`, checker-resolved, not regex)
 
@@ -11048,7 +11057,7 @@ first real publish remains the RC task.
 
 ## Phase 6 — Release Candidate
 
-- [ ] **Resolve RC public surface reconciliation before publishing.**
+- [x] **Resolve RC public surface reconciliation before publishing.**
       `docs/audits/2026-08/rc-public-surface-reconciliation.md` maps the
       current tarball exports against the final disposition map. Progress:
       `165e71f9` removed `asyncSource`/`asyncQuery` from the public RC surface;
@@ -11063,10 +11072,11 @@ first real publish remains the RC task.
       public-disposition gate now passes. Independent review found four internal
       evidence specs still importing removed symbols through the public barrel;
       `08b8fae5` moved those specs to internal imports and `pnpm nx test core
-      --skip-nx-cache --output-style=static` passed on rerun. The 10k collection
-      workload retention is still only partially attributed, so do not publish
-      RC until that remaining performance-shape question is closed or explicitly
-      deferred.
+    --skip-nx-cache --output-style=static` passed on rerun. `b957f604` removed
+      stale `compared()` advice from dev warnings after `compared` left the
+      public API. The 10k collection workload retention is now attributed at the
+      RC decision layer to active `entityMap` realization; deeper retainer splits
+      remain optimization work, not an unattributed RC blocker.
 - [ ] publish `1.0.0-rc.1`
 - [ ] install from npm in external projects
 - [ ] collect RC packaging/DX/docs failures
