@@ -68,6 +68,37 @@ This rules out a held `tree()` snapshot and normal projection reads as the main 
 
 Required before RC or explicitly carried into RC notes: classify this as a partially-attributed performance finding and avoid claiming it is an accepted tradeoff of the v15 architecture until the active `entityMap` internals are decomposed further.
 
+### 4. Collection throughput needs layer boundaries, not one headline number
+
+The broad `bench-compare` collection workload reports SignalTree at `122.72 ms`
+for 10k rows. That number is not comparable to the production-kernel
+`updateOne` measurements until the workload is split by operation type.
+
+Follow-up public API decomposition at 10k rows (`tools/bench-public-collection-layers.mjs`, 5 samples) measured:
+
+| Layer                                        |       Median | Retained delta | Interpretation                                                    |
+| -------------------------------------------- | -----------: | -------------: | ----------------------------------------------------------------- |
+| plain array tree construction                |   `1.582 ms` |      `0.17 MB` | payload/control                                                   |
+| empty `entityMap` declaration                |   `0.570 ms` |      `0.12 MB` | construction is not the 122 ms owner                              |
+| `entityMap.setAll(10k)`                      | `120.212 ms` |     `71.33 MB` | initial population owns the broad workload time/heap              |
+| `entityMap.addMany(10k)`                     | `119.349 ms` |     `71.32 MB` | same as `setAll`: bulk realization/population                     |
+| existing `updateOne`                         |   `0.296 ms` |     `-0.03 MB` | public steady-state update remains sub-ms                         |
+| existing `updateOne` + dependent `byId` read |   `0.436 ms` |     `-0.02 MB` | compatible with kernel O(1) direction                             |
+| structural `addOne`                          |   `0.330 ms` |     `-0.02 MB` | single public structural mutation is not the broad workload owner |
+| structural `removeOne`                       |   `0.440 ms` |     `-0.02 MB` | same                                                              |
+| structural `changeId`                        |   `0.378 ms` |      `0.05 MB` | same                                                              |
+| projection `all()`                           |   `1.978 ms` |      `0.15 MB` | projection read cost exists but is not 122 ms                     |
+| projection `ids()`                           |   `0.545 ms` |      `0.15 MB` | same                                                              |
+| projection `asMap()`                         |   `2.361 ms` |      `0.51 MB` | same                                                              |
+
+This reconciles the apparent contradiction with the kernel measurements:
+
+- the kernel `updateOne` / direct-frame logical-work results are about steady-state mutation after realization;
+- the broad 10k collection workload is dominated by initial population / realization;
+- the large retained heap appears when entering active `entityMap` realization, not when reading projections or updating an existing member.
+
+What remains unresolved is the retainer split inside initial `entityMap` realization: active value backing, structural store, subject/position metadata, entity signals, Angular runtime objects, and closure/map overhead.
+
 ## Current Publishable Packages
 
 | Package                | Public entry points                                        | Status                                                                                                          |
@@ -81,25 +112,25 @@ Deleted package surfaces: `guardrails`, `realtime`, `schema`, `enterprise`, `cal
 
 ## Benchmarked Feature Surface
 
-| Feature measured by `tools/size-report.mjs` | Public in current RC candidate?              | Disposition in map                                 | Reconciliation                                                                           |
-| ------------------------------------------- | -------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `signalTree`                                | Yes                                          | `KP` frozen                                        | Keep. Core construction boundary.                                                        |
-| `entityMap`                                 | Yes                                          | Survives but challenged / unplaced                 | Public survival not reopened by this audit, but retention remains unresolved.            |
-| `entityMap + loader`                        | Yes: `loader`, `invalidateTag`, loader types | `loader` app responsibility; tags unrun remainder  | Needs decision: public cache-policy helpers are still shipping.                          |
-| `stored`                                    | Yes                                          | `AS`, not earned both halves                       | Default remove unless a later authority explicitly grants this symbol.                   |
-| `compared` / `byKeys`                       | Yes                                          | unplaced; null not run                             | Omit or finish the equality ownership derivation.                                        |
-| `asyncSource`                               | Yes                                          | DELETE                                             | Remove from RC public surface.                                                           |
-| `asyncQuery`                                | Yes                                          | DELETE                                             | Remove from RC public surface.                                                           |
-| `batching`                                  | Yes                                          | `KA`                                               | Keep. Notification batching over synchronous writes.                                     |
-| `timeTravel`                                | Yes                                          | `KA` devtools/history instrument                   | Keep if framed as causal/debug/history adapter, not end-user undo by itself.             |
-| `transactions`                              | Yes                                          | `KA` for refusal/neutrality; speculative role open | Keep only if the exported API can promise only the earned semantics.                     |
-| `serialization`                             | Yes                                          | not earned for core function / unplaced            | Default remove unless a later authority explicitly grants this symbol.                   |
-| `persistence`                               | Yes                                          | `KA`; enhancer form undisposed                     | Keepable for tree-scoped durability, but form needs explicit acceptance.                 |
-| `devTools`                                  | Yes                                          | `KA` diagnostic projection                         | Keep. Diagnostic adapter.                                                                |
-| `security` subpath                          | Yes                                          | `KA`, no external imports                          | Keep. Isolated construction-time validator.                                              |
-| `lazy` subpath                              | Yes                                          | unassigned threshold-driven                        | Omit or finish the independent derivation.                                               |
-| `edit-session` subpath                      | Yes                                          | null not run                                       | Omit or finish the independent derivation.                                               |
-| `storage` subpath                           | Yes                                          | `KA`                                               | Keep. Adapter-only, no Angular coupling.                                                 |
+| Feature measured by `tools/size-report.mjs` | Public in current RC candidate?              | Disposition in map                                 | Reconciliation                                                                |
+| ------------------------------------------- | -------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `signalTree`                                | Yes                                          | `KP` frozen                                        | Keep. Core construction boundary.                                             |
+| `entityMap`                                 | Yes                                          | Survives but challenged / unplaced                 | Public survival not reopened by this audit, but retention remains unresolved. |
+| `entityMap + loader`                        | Yes: `loader`, `invalidateTag`, loader types | `loader` app responsibility; tags unrun remainder  | Default remove unless later authority explicitly grants these symbols.        |
+| `stored`                                    | Yes                                          | `AS`, not earned both halves                       | Default remove unless a later authority explicitly grants this symbol.        |
+| `compared` / `byKeys`                       | Yes                                          | unplaced; null not run                             | Omit or finish the equality ownership derivation.                             |
+| `asyncSource`                               | Yes                                          | DELETE                                             | Remove from RC public surface.                                                |
+| `asyncQuery`                                | Yes                                          | DELETE                                             | Remove from RC public surface.                                                |
+| `batching`                                  | Yes                                          | `KA`                                               | Keep. Notification batching over synchronous writes.                          |
+| `timeTravel`                                | Yes                                          | `KA` devtools/history instrument                   | Keep if framed as causal/debug/history adapter, not end-user undo by itself.  |
+| `transactions`                              | Yes                                          | `KA` for refusal/neutrality; speculative role open | Keep only if the exported API can promise only the earned semantics.          |
+| `serialization`                             | Yes                                          | not earned for core function / unplaced            | Default remove unless a later authority explicitly grants this symbol.        |
+| `persistence`                               | Yes                                          | `KA`; enhancer form undisposed                     | Keepable for tree-scoped durability, but form needs explicit acceptance.      |
+| `devTools`                                  | Yes                                          | `KA` diagnostic projection                         | Keep. Diagnostic adapter.                                                     |
+| `security` subpath                          | Yes                                          | `KA`, no external imports                          | Keep. Isolated construction-time validator.                                   |
+| `lazy` subpath                              | Yes                                          | unassigned threshold-driven                        | Omit or finish the independent derivation.                                    |
+| `edit-session` subpath                      | Yes                                          | null not run                                       | Omit or finish the independent derivation.                                    |
+| `storage` subpath                           | Yes                                          | `KA`                                               | Keep. Adapter-only, no Angular coupling.                                      |
 
 ## Retained Functionality: How It Works and Why It Was Kept or Questioned
 
@@ -141,7 +172,7 @@ How it works: `loader()` brands load/cache policy for `entityMap({ load })`; `in
 
 Optimization/adaptation: tree-shakeable helper path. Plain `entityMap()` does not statically import loader machinery.
 
-Justification: unresolved. The map classifies cache/freshness/tags as application cache policy, with `invalidateTag` still an un-run remainder. Public survival requires independent authority; release pressure grants none.
+Justification: unresolved. The map classifies cache/freshness/tags as application cache policy, with `invalidateTag` still an un-run remainder. Public survival requires independent authority; release pressure grants none. These helpers now participate in the RC disposition gate.
 
 ### Durability: `stored`, `persistence`, `serialization`, storage subpath
 

@@ -46,6 +46,21 @@ const BLOCKED = [
   { symbol: 'ReadonlyAsyncSourceSignal', disposition: 'readonly type companion of deleted asyncSource' },
   { symbol: 'ReadonlyAsyncQuerySignal', disposition: 'readonly type companion of deleted asyncQuery' },
 
+  { symbol: 'loader', disposition: 'UNRESOLVED cache-policy carrier; survival requires independent authority' },
+  { symbol: 'invalidateTag', disposition: 'UNRESOLVED tag invalidation carrier; A3 tree-scoped policy-holder question not run' },
+  { symbol: 'LoaderOptions', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'LoaderFeature', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'EntityLoader', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'EntityLoadOptions', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'EntityLoaderSurface', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'EntityPersist', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'EntityStorageAdapter', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'LoadingEntityMapBuilder', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'LoadingEntityMapMarker', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'LoadingEntitySignal', disposition: 'type companion of unresolved loader helper' },
+  { symbol: 'ReadonlyEntityLoaderSurface', disposition: 'readonly type companion of unresolved loader helper' },
+  { symbol: 'ReadonlyLoadingEntitySignal', disposition: 'readonly type companion of unresolved loader helper' },
+
   { symbol: 'stored', disposition: 'NOT EARNED as RC public API; consequence ordering fix is not survival proof' },
   { symbol: 'StoredMarker', disposition: 'type companion of unearned stored marker' },
   { symbol: 'StoredSignal', disposition: 'type companion of unearned stored marker' },
@@ -112,10 +127,11 @@ if (process.argv.includes('--self-test')) {
 const auditPath = 'docs/audits/2026-08/rc-public-surface-reconciliation.md';
 const audit = readFileSync(auditPath, 'utf8');
 const requiredPhrases = [
-  'DELETE / decision required',
+  'Remove from RC public surface',
   'not earned',
   'mechanically retained',
   '66.12 MB retained',
+  'Collection throughput needs layer boundaries',
 ];
 const missingAuditEvidence = requiredPhrases.filter((phrase) => !audit.includes(phrase));
 
