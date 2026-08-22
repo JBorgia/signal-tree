@@ -113,10 +113,6 @@ export type {
   EntitySignalWithSlices,
   EntityMapMarkerWithSlices,
 } from './lib/markers/entity-map';
-// Per-leaf equality (13.5.0)
-export { compared, byKeys } from './lib/markers/compared';
-export type { ComparedMarker } from './lib/markers/compared';
-
 // Derived state types (v7)
 export type { WithDerived } from './lib/internals/derived-types';
 
