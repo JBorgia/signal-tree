@@ -43,8 +43,6 @@ export {
   type ReadonlyEntityLoaderSurface,
   type ReadonlyLoadingEntitySignal,
   type ReadonlyStoredSignal,
-  type ReadonlyAsyncSourceSignal,
-  type ReadonlyAsyncQuerySignal,
 } from './lib/readonly';
 
 // ============================================
@@ -184,24 +182,6 @@ export {
   type AuditMetadata,
   type AuditTrackerConfig,
 } from './lib/audit/audit';
-
-// Async-source marker (v9.5) - load-and-expose async primitive
-export {
-  asyncSource,
-  type AsyncSourceMarker,
-  type AsyncSourceSignal,
-  type AsyncSourceConfig,
-  type AsyncSourceLoader,
-} from './lib/markers/async-source';
-
-// Async-query marker (v9.5) - input-driven debounced query primitive
-export {
-  asyncQuery,
-  type AsyncQueryMarker,
-  type AsyncQuerySignal,
-  type AsyncQueryConfig,
-  type AsyncQueryFn,
-} from './lib/markers/async-query';
 
 // Cache-aware (single-scope) loading for entityMap (RFC 0002/0003). `entityMap({ load, … })`
 // turns a plain collection into a self-loading, cache-aware one; `invalidateTag`

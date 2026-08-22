@@ -2100,8 +2100,6 @@ import {
   serialization,
   entityMap,
   stored,
-  asyncSource,
-  asyncQuery,
 } from '@signaltree/core';
 ```
 

@@ -3,8 +3,6 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
-  asyncQuery,
-  asyncSource,
   entityMap,
   loader,
   signalTree,
@@ -54,15 +52,15 @@ const ALL_PLANTS: Plant[] = [
 /**
  * MARKER ZOO
  *
- * Showcases ALL 6 markers in ONE tree at four different depths simultaneously.
+ * Showcases surviving marker-style APIs in ONE tree at different depths.
  * This is intentionally non-trivial — the point is to demonstrate that
  * SignalTree's marker family composes at arbitrary tree positions, which
  * is impossible (or requires significant ceremony) in libraries that
  * compose features at the store root.
  *
  * Depth map:
- *   depth 2: directory.users (asyncSource), settings.theme (stored),
- *   depth 3: organization.teams.list (entityMap), organization.teams.search (asyncQuery)
+ *   depth 2: settings.theme (stored),
+ *   depth 3: organization.teams.list (entityMap)
  *   depth 4: organization.teams.catalog.plants (entityMap in its cache-aware,
  *            self-loading form — not a separate marker)
  */
@@ -111,32 +109,10 @@ store.$.organization.teams.catalog.plants.invalidate(); // mark stale`,
   ];
 
   readonly store = signalTree({
-    // depth 2 — asyncSource for an org-wide user directory
-    directory: {
-      users: asyncSource<User[]>({
-        initial: [],
-        load: () => of(ALL_USERS).pipe(delay(600)),
-        lazy: true,
-      }),
-    },
-
     organization: {
       teams: {
         // depth 3 — entityMap of teams (nested inside organization)
         list: entityMap<Team, number>({ selectId: (t) => t.id }),
-
-        // depth 3 — asyncQuery for team-name search
-        search: asyncQuery<string, Team[]>({
-          initialResult: [],
-          debounce: 250,
-          filter: (q) => q.length > 0,
-          query: (q) =>
-            of(
-              ALL_TEAMS.filter((t) =>
-                t.name.toLowerCase().includes(q.toLowerCase())
-              )
-            ).pipe(delay(180)),
-        }),
 
         catalog: {
           // depth 4 — entityMap in its cache-aware, self-loading form
@@ -162,11 +138,6 @@ store.$.organization.teams.catalog.plants.invalidate(); // mark stale`,
 
   });
 
-  loadDirectory(): void {
-    this.store.$.directory.users.refresh();
-    // compose: each does one thing, you wire them together explicitly.
-  }
-
   loadTeams(): void {
     this.store.$.organization.teams.list.setAll(ALL_TEAMS);
   }
@@ -184,9 +155,7 @@ store.$.organization.teams.catalog.plants.invalidate(); // mark stale`,
 
 
   resetAll(): void {
-    this.store.$.directory.users.reset();
     this.store.$.organization.teams.list.clear();
-    this.store.$.organization.teams.search.reset();
     this.store.$.organization.teams.catalog.plants.clear();
     this.store.$.organization.teams.catalog.plants.invalidate();
   }
