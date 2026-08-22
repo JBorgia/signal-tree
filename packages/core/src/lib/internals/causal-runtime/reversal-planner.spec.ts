@@ -220,7 +220,6 @@ describe('planConfirmedReversal', () => {
           after: undefined,
           subjectId: SUBJECT_PROFILE,
           structural: 'remove',
-          subjectPositions: [positions.key, positions.name, positions.enabled],
         },
       ],
     });
@@ -237,11 +236,6 @@ describe('planConfirmedReversal', () => {
             after: 'A',
             subjectId: SUBJECT_PROFILE,
             structural: 'add',
-            subjectPositions: [positions.key, positions.name, positions.enabled],
-            subjectState: {
-              [positions.name]: 'Alice',
-              [positions.enabled]: true,
-            },
           },
         ],
       },
@@ -277,7 +271,6 @@ describe('planConfirmedReversal', () => {
           after: undefined,
           subjectId: SUBJECT_PROFILE,
           structural: 'remove',
-          subjectPositions: [positions.key, positions.name, positions.enabled],
         },
       ],
     });
@@ -294,11 +287,6 @@ describe('planConfirmedReversal', () => {
             after: 'A',
             subjectId: SUBJECT_PROFILE,
             structural: 'add',
-            subjectPositions: [positions.key, positions.name, positions.enabled],
-            subjectState: {
-              [positions.name]: 'Alicia',
-              [positions.enabled]: true,
-            },
           },
           {
             owner: positions.name,
@@ -353,7 +341,6 @@ describe('planConfirmedReversal', () => {
           after: undefined,
           subjectId: SUBJECT_PROFILE,
           structural: 'remove',
-          subjectPositions: [positions.key, positions.name, positions.enabled],
         },
       ],
     });
@@ -370,11 +357,6 @@ describe('planConfirmedReversal', () => {
             after: 'A',
             subjectId: SUBJECT_PROFILE,
             structural: 'add',
-            subjectPositions: [positions.key, positions.name, positions.enabled],
-            subjectState: {
-              [positions.name]: 'Alicia',
-              [positions.enabled]: true,
-            },
           },
           {
             owner: positions.name,

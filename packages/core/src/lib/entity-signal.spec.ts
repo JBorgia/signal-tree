@@ -2313,7 +2313,6 @@ describe('structural history effect delivery', () => {
         kind: 'add',
         key: 17,
         subject: seenA[0]?.subjectIds?.[0],
-        subjectPositions: seenA[0]?.positionIds,
       },
       positionIds: seenB[0]?.positionIds,
     });
@@ -2338,7 +2337,6 @@ describe('structural history effect delivery', () => {
         kind: 'remove',
         key: 17,
         subject: seenA[0]?.subjectIds?.[0],
-        subjectPositions: seenA[0]?.positionIds,
       },
       positionIds: seenB[0]?.positionIds,
     });
@@ -2362,7 +2360,6 @@ describe('structural history effect delivery', () => {
         beforeKey: 17,
         afterKey: 27,
         subject: seenA[0]?.subjectIds?.[0],
-        subjectPositions: seenA[0]?.positionIds,
       },
       positionIds: seenB[0]?.positionIds,
     });
@@ -2382,7 +2379,6 @@ describe('structural history effect delivery', () => {
     expect(seenA).toHaveLength(3);
     for (const event of seenA) {
       expect(event.historyEffect).toMatchObject({
-        subjectPositions: event.positionIds,
       });
     }
   });
@@ -2414,7 +2410,6 @@ describe('structural history effect delivery', () => {
         kind: 'remove',
         key: 4,
         subject: removeEvent?.subjectIds?.[0],
-        subjectPositions: removeEvent?.positionIds,
       },
     });
     expect(survivorEvent?.historyEffect).toBeUndefined();
@@ -2423,7 +2418,6 @@ describe('structural history effect delivery', () => {
         kind: 'add',
         key: 1,
         subject: reusedKeyEvent?.subjectIds?.[0],
-        subjectPositions: reusedKeyEvent?.positionIds,
       },
     });
     expect(freshArrivalEvent).toMatchObject({
@@ -2431,7 +2425,6 @@ describe('structural history effect delivery', () => {
         kind: 'add',
         key: 3,
         subject: freshArrivalEvent?.subjectIds?.[0],
-        subjectPositions: freshArrivalEvent?.positionIds,
       },
     });
 

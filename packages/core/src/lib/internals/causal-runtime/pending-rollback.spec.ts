@@ -152,7 +152,6 @@ describe('rollbackPendingTurnAt', () => {
           after: undefined,
           subjectId: SUBJECT_DRIVER,
           structural: 'remove' as const,
-          subjectPositions: [P_DRIVER_KEY],
         },
       ],
       participants: [P_DRIVER_KEY],
@@ -329,7 +328,6 @@ describe('rollbackPendingTurnAt', () => {
           after: undefined,
           subjectId: SUBJECT_DRIVER,
           structural: 'remove' as const,
-          subjectPositions: [P_DRIVER_KEY],
         },
       ],
       participants: [P_DRIVER_KEY],
@@ -500,7 +498,6 @@ describe('rollbackPendingTurnAt', () => {
                 subjectId,
                 structural: undefined,
                 structuralContext: undefined,
-                subjectState: undefined,
               },
             ]);
           }),
@@ -795,7 +792,6 @@ describe('rollbackPendingTurnAt', () => {
           after: undefined,
           subjectId: SUBJECT_DRIVER,
           structural: 'remove',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME],
         },
         {
           owner: P_DRIVER_KEY,
@@ -803,7 +799,6 @@ describe('rollbackPendingTurnAt', () => {
           after: undefined,
           subjectId: SUBJECT_DRIVER_TWO,
           structural: 'remove',
-          subjectPositions: [P_DRIVER_KEY],
         },
       ],
     });
@@ -816,9 +811,6 @@ describe('rollbackPendingTurnAt', () => {
           after: 'driver-1',
           subjectId: SUBJECT_DRIVER,
           structural: 'add',
-          subjectState: {
-            [P_DRIVER_NAME]: 'Alice',
-          },
         },
         {
           owner: P_DRIVER_KEY,
@@ -826,7 +818,6 @@ describe('rollbackPendingTurnAt', () => {
           after: 'driver-2',
           subjectId: SUBJECT_DRIVER_TWO,
           structural: 'add',
-          subjectState: undefined,
         },
       ]);
     });

@@ -25,7 +25,7 @@ import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 import { PathNotifier } from '../lib/path-notifier';
 import { getActiveWriteContext } from '../lib/write-context';
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
-import { HISTORY_EXCLUDED, isTraversableNode } from './utils';
+import { HISTORY_EXCLUDED } from './utils';
 
 // Angular's global dev-mode flag (defined by the Angular CLI; undefined in
 // plain test/node contexts, treated as dev there).
@@ -424,47 +424,6 @@ export function createEntitySignal<
     };
   }
 
-  function collectOwnedPositions(
-    node: unknown,
-    positions: Set<PositionId>,
-    seen = new WeakSet<object>()
-  ): void {
-    if (!isTraversableNode(node)) {
-      return;
-    }
-
-    const direct = (node as { __positionIds?: readonly number[] }).__positionIds;
-    for (const positionId of direct ?? []) {
-      positions.add(positionId as PositionId);
-    }
-
-    const ref = node as object;
-    if (seen.has(ref)) {
-      return;
-    }
-
-    seen.add(ref);
-
-    for (const key of Object.keys(node as Record<string, unknown>)) {
-      collectOwnedPositions(
-        (node as Record<string, unknown>)[key],
-        positions,
-        seen
-      );
-    }
-  }
-
-  function deriveSubjectPositions(id: K, entity: E): readonly PositionId[] | undefined {
-    const positions = new Set<PositionId>();
-    collectOwnedPositions(api, positions);
-    collectOwnedPositions(getOrCreateNode(id, entity), positions);
-    if (positions.size === 0) {
-      return undefined;
-    }
-
-    return [...positions].sort((left, right) => left - right);
-  }
-
   /**
    * ST2026 — the inline-predicate trap, caught in dev.
    *
@@ -572,7 +531,6 @@ export function createEntitySignal<
       subject: subjectId,
       beforeKey: from,
       afterKey: to,
-      subjectPositions: deriveSubjectPositions(from, entity),
     };
 
     return {
@@ -620,8 +578,7 @@ export function createEntitySignal<
     from: K,
     to: K,
     subjectId: number,
-    entity: E,
-    subjectPositions?: readonly PositionId[]
+    entity: E
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
     publish(metaOverride?: UpdateMetadata): void;
@@ -642,7 +599,6 @@ export function createEntitySignal<
       subject: subjectId,
       beforeKey: from,
       afterKey: to,
-      subjectPositions,
     };
 
     return {
@@ -932,7 +888,6 @@ export function createEntitySignal<
       value: deepClone(entity),
       beforeSubject,
       afterSubject,
-      subjectPositions: deriveSubjectPositions(key, entity),
     };
     const currentState = resolveSubjectState(subjectId);
     const tombstone: PreparedSubjectTombstone<K> = {
@@ -1097,7 +1052,6 @@ export function createEntitySignal<
       value: deepClone(transformedEntity),
       beforeSubject:
         previousLastKey === undefined ? undefined : allocateSubjectId(previousLastKey),
-      subjectPositions: deriveSubjectPositions(id, transformedEntity),
     };
     lastSubjectIds = [subjectId];
     invalidateNodeCache(id);
@@ -1918,7 +1872,6 @@ export function createEntitySignal<
             value: deepClone(entity),
             beforeSubject:
               beforeKey === undefined ? undefined : allocateSubjectId(beforeKey),
-            subjectPositions: deriveSubjectPositions(id, entity),
           })
         );
       }
@@ -2219,7 +2172,6 @@ export function createEntitySignal<
         value: deepClone(entity),
         beforeSubject,
         afterSubject,
-        subjectPositions: deriveSubjectPositions(id, entity),
       };
       const currentState = resolveSubjectState(subjectIdsForWrite[0]);
       const tombstone: PreparedSubjectTombstone<K> = {
@@ -2264,7 +2216,6 @@ export function createEntitySignal<
         subjectId: number;
         beforeSubject?: number;
         afterSubject?: number;
-        subjectPositions?: readonly PositionId[];
       }> = [];
       for (const id of ids) {
         const entity = getProjectedEntity(id);
@@ -2276,7 +2227,6 @@ export function createEntitySignal<
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
         const { beforeSubject, afterSubject } = getNeighborSubjects(id);
-        const subjectPositions = deriveSubjectPositions(id, entity);
 
         // Run interceptors
         for (const handler of interceptHandlers) {
@@ -2304,7 +2254,6 @@ export function createEntitySignal<
           subjectId,
           beforeSubject,
           afterSubject,
-          subjectPositions,
         });
       }
 
@@ -2342,7 +2291,6 @@ export function createEntitySignal<
           entity,
           beforeSubject,
           afterSubject,
-          subjectPositions,
         } = preparedRemovals[i];
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
@@ -2358,7 +2306,6 @@ export function createEntitySignal<
             value: deepClone(entity),
             beforeSubject,
             afterSubject,
-            subjectPositions,
           })
         );
       }
@@ -2707,7 +2654,6 @@ export function createEntitySignal<
             value: deepClone(entity),
             beforeSubject,
             afterSubject,
-            subjectPositions: deriveSubjectPositions(id, entity),
           };
         }
       );
@@ -2789,7 +2735,6 @@ export function createEntitySignal<
           value: deepClone(entity),
           beforeSubject,
           afterSubject,
-          subjectPositions: deriveSubjectPositions(id, entity),
         };
       });
 

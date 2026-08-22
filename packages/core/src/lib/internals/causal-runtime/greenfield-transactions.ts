@@ -13,7 +13,6 @@ export interface ExplicitTransactionEffect {
   readonly subjectId?: unknown;
   readonly structural?: 'add' | 'remove' | 'rekey';
   readonly structuralContext?: StructuralHistoryEffect;
-  readonly subjectPositions?: readonly PositionId[];
 }
 
 export type GreenfieldTransactionLifecycle =
@@ -61,7 +60,6 @@ class DefaultGreenfieldTransactionDraft implements GreenfieldTransactionDraft {
       subjectId: effect.subjectId,
       structural: effect.structural,
       structuralContext: effect.structuralContext,
-      subjectPositions: effect.subjectPositions ? [...effect.subjectPositions] : undefined,
     });
   }
 
@@ -163,8 +161,7 @@ function shouldPreserveAuthoredEffect(effect: ExplicitTransactionEffect): boolea
   return (
     effect.subjectId !== undefined ||
     effect.structural !== undefined ||
-    effect.structuralContext !== undefined ||
-    effect.subjectPositions !== undefined
+    effect.structuralContext !== undefined
   );
 }
 
@@ -178,6 +175,5 @@ function copyEffect(
     subjectId: effect.subjectId,
     structural: effect.structural,
     structuralContext: effect.structuralContext,
-    subjectPositions: effect.subjectPositions ? [...effect.subjectPositions] : undefined,
   };
 }

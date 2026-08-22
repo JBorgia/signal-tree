@@ -19,7 +19,6 @@ describe('transaction capture bridge', () => {
           value: { id: 'u1', name: 'Alice', enabled: true },
           beforeSubject: 16,
           afterSubject: 18,
-          subjectPositions: [3, 4, 5],
         },
       },
     });
@@ -37,9 +36,7 @@ describe('transaction capture bridge', () => {
         value: { id: 'u1', name: 'Alice', enabled: true },
         beforeSubject: 16,
         afterSubject: 18,
-        subjectPositions: [3, 4, 5],
       },
-      subjectPositions: [3, 4, 5],
     });
   });
 
@@ -65,7 +62,6 @@ describe('transaction capture bridge', () => {
         subject: 17,
         beforeKey: 'u1',
         afterKey: 'u2',
-        subjectPositions: [3, 4, 5],
       },
     };
 
@@ -105,9 +101,7 @@ describe('transaction capture bridge', () => {
         subject: 17,
         beforeKey: 'u1',
         afterKey: 'u2',
-        subjectPositions: [3, 4, 5],
       },
-      subjectPositions: [3, 4, 5],
     });
   });
 

@@ -51,7 +51,6 @@ function createReapplyEffects(
       ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
       structural: effect.structural,
       structuralContext: effect.structuralContext,
-      subjectPositions: effect.subjectPositions ? [...effect.subjectPositions] : undefined,
     }));
   }
 
@@ -66,7 +65,6 @@ function createReapplyEffects(
         subjectId: effect.subjectId,
         structural: effect.structural,
         structuralContext: effect.structuralContext,
-        subjectPositions: effect.subjectPositions ? [...effect.subjectPositions] : undefined,
       };
     }
 
@@ -85,7 +83,6 @@ function createReapplyEffects(
       ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
       structural: undefined,
       structuralContext: effect.structuralContext,
-      subjectPositions: effect.subjectPositions ? [...effect.subjectPositions] : undefined,
     };
   });
 }
