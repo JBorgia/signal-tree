@@ -11060,9 +11060,13 @@ first real publish remains the RC task.
       type companions; `76ab032c` removed `compared`/`byKeys` and their public
       type companion; `18fe5781` removed the unplaced `lazy` and `edit-session`
       subpaths from the package exports and build entry points. The executable
-      public-disposition gate now passes. The 10k collection workload retention
-      is still only partially attributed, so do not publish RC until that
-      remaining performance-shape question is closed or explicitly deferred.
+      public-disposition gate now passes. Independent review found four internal
+      evidence specs still importing removed symbols through the public barrel;
+      `08b8fae5` moved those specs to internal imports and `pnpm nx test core
+      --skip-nx-cache --output-style=static` passed on rerun. The 10k collection
+      workload retention is still only partially attributed, so do not publish
+      RC until that remaining performance-shape question is closed or explicitly
+      deferred.
 - [ ] publish `1.0.0-rc.1`
 - [ ] install from npm in external projects
 - [ ] collect RC packaging/DX/docs failures
