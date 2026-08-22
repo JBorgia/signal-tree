@@ -703,7 +703,10 @@ export function createEntitySignal<
   }
 
   function bumpSubjectStateSignal(subjectId: number): void {
-    getSubjectStateSignal(subjectId).update((value) => value + 1);
+    // Publish only to an activation token that already exists. Interning here
+    // would recreate eager realization through the write path: any subject that
+    // is ever mutated would acquire a token whether or not anything observes it.
+    subjectStateSignals.get(subjectId)?.update((value) => value + 1);
   }
 
   function publishSubjectPhysicalChange(subjectId: number): void {
@@ -723,7 +726,6 @@ export function createEntitySignal<
   function commitFreshSubject(id: K): number {
     const subjectId = structuralStore.allocateFreshSubjectId();
     structuralStore.createSubject(subjectId, id);
-    getSubjectStateSignal(subjectId);
     return subjectId;
   }
 
@@ -848,7 +850,6 @@ export function createEntitySignal<
           nextValue: entity,
         });
         commitAndProjectEntityMutationFrame(frame, options);
-        getSubjectStateSignal(subjectId);
         lastSubjectIds = [subjectId];
         invalidateNodeCache(key);
         syncEntitySignal(key);
@@ -1044,7 +1045,6 @@ export function createEntitySignal<
     };
     frame.stageFreshSubject(freshSubject);
     commitAndProjectEntityMutationFrame(frame);
-    getSubjectStateSignal(subjectId);
     const historyEffect: PendingAddHistoryEffect = {
       kind: 'add',
       subject: subjectId,
@@ -1827,14 +1827,10 @@ export function createEntitySignal<
       for (const {
         entity: transformedEntity,
         id,
-        existingSubjectId,
       } of preparedAdds) {
         const subjectId = subjectIdsByKey.get(id);
         if (subjectId === undefined) {
           throw new Error(`Entity with id ${String(id)} has no subject id`);
-        }
-        if (existingSubjectId === undefined) {
-          getSubjectStateSignal(subjectId);
         }
         invalidateNodeCache(id);
         syncEntitySignal(id);

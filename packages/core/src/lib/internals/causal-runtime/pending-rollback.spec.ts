@@ -618,7 +618,7 @@ describe('rollbackPendingTurnAt', () => {
       activeKey: undefined,
       retainedSubjectState: true,
       entitySignal: true,
-      activationToken: true,
+      activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
       positionIds: heldName.__positionIds,
