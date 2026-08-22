@@ -10978,10 +10978,15 @@ repair before publishing release candidate docs; closed during Phase 5.
       retired `lint:skills`/`taught-symbols` entries were removed from
       `tools/verify-gates.mjs`; `release-claims` now tracks live claim surfaces;
       stale v9 bundle ceilings and the dead-export ratchet were re-baselined;
-      numeric claims now carry generator annotations. Validation:
+      numeric claims now carry generator annotations. Gate E review found
+      `gates:self-test` still blocked release/publish workflows; fixed at
+      `22ff88ac` by retargeting the blind `dead-exports:self` and
+      `declaration-docs` mutations. Validation:
       `node tools/verify-gates.mjs --only=lint:skills,taught-symbols`,
       `node tools/check-release-claims.mjs`,
       `node tools/verify-gates.mjs --self-test --only=release-claims`,
+      `node tools/verify-gates.mjs --self-test --only=dead-exports:self,declaration-docs`,
+      `node tools/verify-gates.mjs --self-test`,
       `node scripts/v9-budget-checks.js`,
       `node tools/find-dead-exports.mjs --max=110`,
       `node tools/check-numeric-claims.mjs`,
@@ -11004,22 +11009,22 @@ repair before publishing release candidate docs; closed during Phase 5.
       branch. Done at `88b82a8a`. Validation:
       `bash scripts/verify-clean-checkout-release-flow.sh`.
 - [x] final performance baseline generation — regenerated final measurement
-  outputs under ignored local scratch directory
-  `artifacts/final-baseline-2026-08-21/` from the authoritative generator
-  scripts. `tools/size-report.mjs` was updated to remove deleted
-  `status`/`form` scenarios, and `tools/bench-ssr-payload.mjs --json` now
-  suppresses dev warnings so JSON output stays machine-readable.
-  `tools/bench-history-ownership.mjs` now emits temporary shims for its
-  transpiled `path-notifier` dependency graph, restoring the release-only
-  harness gate. Validation: `node tools/size-report.mjs --json`,
-  `node --expose-gc tools/bench-compare.mjs --n 10000 --json`,
-  `NODE_OPTIONS=--max-old-space-size=8192 node tools/bench-vs-signalstore.mjs --json`,
-  `node tools/bench-depth-latency.mjs --json`,
-  `node tools/bench-leaf-equality.mjs --json`,
-  `node tools/bench-ssr-payload.mjs --json`,
-  `node --expose-gc tools/bench-history-ownership.mjs --json`,
-  parse every generated JSON file, and
-  `node tools/verify-gates.mjs --release --only=size-report,size-compare,bench-harness,history-ownership-bench,memory-harness,memory-compare,state-scale,raw-signals`.
+      outputs under ignored local scratch directory
+      `artifacts/final-baseline-2026-08-21/` from the authoritative generator
+      scripts. `tools/size-report.mjs` was updated to remove deleted
+      `status`/`form` scenarios, and `tools/bench-ssr-payload.mjs --json` now
+      suppresses dev warnings so JSON output stays machine-readable.
+      `tools/bench-history-ownership.mjs` now emits temporary shims for its
+      transpiled `path-notifier` dependency graph, restoring the release-only
+      harness gate. Validation: `node tools/size-report.mjs --json`,
+      `node --expose-gc tools/bench-compare.mjs --n 10000 --json`,
+      `NODE_OPTIONS=--max-old-space-size=8192 node tools/bench-vs-signalstore.mjs --json`,
+      `node tools/bench-depth-latency.mjs --json`,
+      `node tools/bench-leaf-equality.mjs --json`,
+      `node tools/bench-ssr-payload.mjs --json`,
+      `node --expose-gc tools/bench-history-ownership.mjs --json`,
+      parse every generated JSON file, and
+      `node tools/verify-gates.mjs --release --only=size-report,size-compare,bench-harness,history-ownership-bench,memory-harness,memory-compare,state-scale,raw-signals`.
 
 Exit condition: `GATE E`
 
