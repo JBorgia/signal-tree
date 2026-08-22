@@ -2,7 +2,8 @@ import { effect } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { signalTree, stored } from '../index';
+import { signalTree } from '../index';
+import { stored } from './markers/stored';
 
 /**
  * DERIVATION — `stored`, SPLIT INBOUND / OUTBOUND.

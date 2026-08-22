@@ -89,7 +89,6 @@ import {
   batching,
   entityMap,
   signalTree,
-  stored,
   timeTravel,
 } from '@signaltree/core';
 import {
@@ -107,12 +106,12 @@ type User = { id: number; name: string };
 type UserUpdatedEvent = BaseEvent<'UserUpdated', User>;
 
 const tree = signalTree({
+  count: 0,
   users: entityMap<User, number>({ selectId: (user) => user.id }),
-  theme: stored('theme', 'light' as 'light' | 'dark'),
 }).with(timeTravel()).with(batching());
 
 tree.$.users.addOne({ id: 1, name: 'Ada' });
-tree.batch(() => tree.$.theme.set('dark'));
+tree.batch(() => tree.$.count.set(1));
 
 const form = createFormTree(
   { email: '' },

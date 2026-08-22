@@ -55,7 +55,7 @@ Every `with*` feature composes against the entire store. There is no syntactic w
 ### SignalTree — features attach at any node, at any depth
 
 ```typescript
-import { signalTree, entityMap, stored } from '@signaltree/core';
+import { signalTree, entityMap } from '@signaltree/core';
 import { computed } from '@angular/core';
 
 const store = signalTree({
@@ -76,9 +76,7 @@ const store = signalTree({
       },
     },
   },
-  settings: {
-    theme: stored('app-theme', 'light'), // ← marker at depth 2
-  },
+  settings: { theme: 'light' as 'light' | 'dark' },
 }).derived(($) => ({
   tickets: {
     active: computed(() => {
@@ -398,12 +396,12 @@ export const UserStore = signalStore(
 
 ```typescript
 // tree/state/users.state.ts
-import { entityMap, stored } from '@signaltree/core';
+import { entityMap } from '@signaltree/core';
 export function usersState() {
   return {
     entities: entityMap<User, number>(),
     selectedId: null as number | null,
-    lastSearchFilter: stored('users-last-filter', ''),
+    lastSearchFilter: '',
     loadStatus: 'not-loaded' as 'not-loaded' | 'loading' | 'loaded' | 'error',
     loading: status<ApiError>(),
   };

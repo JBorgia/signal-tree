@@ -19,20 +19,14 @@
 import type { Signal } from '@angular/core';
 
 import type {
-  AsyncQuerySignal,
-  AsyncSourceSignal,
   CallableWritableSignal,
   EntitySignal,
-  StoredSignal,
 } from '../../index';
-import {
-  asyncQuery,
-  asyncSource,
-  entityMap,
-  loader,
-  signalTree,
-  stored,
-} from '../../index';
+import { entityMap, signalTree } from '../../index';
+import { asyncQuery, type AsyncQuerySignal } from './async-query';
+import { asyncSource, type AsyncSourceSignal } from './async-source';
+import { loader } from './loader';
+import { stored, type StoredSignal } from './stored';
 // Internal (not barrel-exported) tree-node variants — imported relatively so the
 // harness can gate their marker resolution too.
 import type {

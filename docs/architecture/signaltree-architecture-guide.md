@@ -64,7 +64,7 @@ This yields the best DX: a single dot-notation state universe, one DevTools inst
 
 ```typescript
 // app-tree.ts
-import { signalTree, entityMap, stored } from '@signaltree/core';
+import { signalTree, entityMap } from '@signaltree/core';
 
 export function createAppTree() {
   return signalTree({
@@ -75,9 +75,8 @@ export function createAppTree() {
     // Ordinary loading state
     usersStatus: 'not-loaded' as 'not-loaded' | 'loading' | 'loaded' | 'error',
 
-    // stored() - auto localStorage persistence
     ui: {
-      theme: stored('app-theme', 'light' as 'light' | 'dark'),
+      theme: 'light' as 'light' | 'dark',
       sidebarOpen: true as boolean,
     },
   });

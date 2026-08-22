@@ -117,15 +117,6 @@
         "internalDecl": false
       },
       {
-        "name": "clearStoragePrefix",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/stored.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "compared",
         "subpath": ".",
         "kind": "runtime",
@@ -167,15 +158,6 @@
         "kind": "runtime",
         "declFile": "packages/core/src/lib/audit/audit.ts",
         "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createStorageKeys",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/stored.ts",
-        "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false
       },
@@ -342,15 +324,6 @@
         "internalDecl": false
       },
       {
-        "name": "flushAllStoredSignals",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/stored.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "FormHistoryOptions",
         "subpath": ".",
         "kind": "type-only",
@@ -383,15 +356,6 @@
         "kind": "type-only",
         "declFile": "packages/core/src/lib/linked.ts",
         "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "MigrationFn",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/stored.contract.ts",
-        "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
       },
@@ -495,15 +459,6 @@
         "internalDecl": false
       },
       {
-        "name": "ReadonlyStoredSignal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/readonly.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "ReadonlyView",
         "subpath": ".",
         "kind": "type-only",
@@ -580,60 +535,6 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "stored",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/stored.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "StoredErrorContext",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/stored.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "StoredMarker",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/stored.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "StoredOptions",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/stored.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "StoredReloadResult",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/stored.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "StoredSignal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/stored.ts",
         "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false

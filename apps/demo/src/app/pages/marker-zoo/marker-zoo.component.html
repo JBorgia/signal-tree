@@ -1,4 +1,4 @@
-<div class="page" [class.dark]="store.$.settings.theme() === 'dark'">
+<div class="page">
   <header class="hero">
     <h1>Marker Zoo</h1>
     <p class="lead">
@@ -51,20 +51,6 @@
         </ul>
       }
       <st-code-tabs [files]="plantsCode" />
-    </article>
-
-    <article class="card">
-      <h2>
-        <span class="depth-badge">depth 2</span>
-        <code>stored(key, default)</code>
-      </h2>
-      <p>Auto-synced localStorage. Refresh the page — your selection persists.</p>
-      <div class="row">
-        <button (click)="toggleTheme()">
-          Theme: <strong>{{ store.$.settings.theme() }}</strong> (click to toggle)
-        </button>
-      </div>
-      <st-code-tabs [files]="storedCode" />
     </article>
 
   </section>

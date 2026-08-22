@@ -124,18 +124,17 @@ const store = signalTree({ ... }).with(timeTravel({ maxHistorySize: 50 }));
 
 **Where this comes from:** Same package-naming hallucination as Myth 4.
 
-**The truth:** No `@signaltree/storage` package exists. Persistence is available two ways, both from `@signaltree/core`:
-
-1. **Per-leaf marker** `stored(key, default, options?)` — auto-syncs a single leaf to localStorage.
-2. **Tree-wide enhancer** `.with(persistence(config))` — uses storage adapters from `@signaltree/core/storage` subpath import.
+**The truth:** No `@signaltree/storage` package exists. The old per-leaf
+storage marker is not part of the current RC public API. Keep persistence in an
+application service, or use a release-authorized core persistence enhancer when
+one is present.
 
 ```typescript
-import { signalTree, stored, persistence } from '@signaltree/core';
-import { createIndexedDBAdapter } from '@signaltree/core/storage';
+import { signalTree } from '@signaltree/core';
 
 const store = signalTree({
-  settings: { theme: stored('app-theme', 'light') }, // per-leaf
-}).with(persistence({ adapter: createIndexedDBAdapter('app-state') })); // tree-wide
+  settings: { theme: 'light' as 'light' | 'dark' },
+});
 ```
 
 **Source:** [`packages/core/src/lib/markers/stored.ts`](../packages/core/src/lib/markers/stored.ts), [`packages/core/src/enhancers/serialization/`](../packages/core/src/enhancers/serialization/).

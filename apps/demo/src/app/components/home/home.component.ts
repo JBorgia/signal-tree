@@ -144,11 +144,11 @@ export class HomeComponent {
 
   readonly advancedRoutes: HomeLinkCard[] = [
     {
-      title: 'SignalTree-native async markers',
+      title: 'Removed async marker archive',
       description:
-        '`asyncSource` and `asyncQuery` — SignalTree-native async primitives that compose with `entityMap` (including its cache-aware loading form), `status`, `stored`, and `form`. Path-attached, auto-cleanup, no boilerplate.',
+        'The old async marker page is retained as an RC tombstone so the demo does not advertise removed public APIs.',
       route: '/async',
-      cta: 'Try async markers →',
+      cta: 'View archive →',
     },
     {
       title: 'Persistence & Serialization',

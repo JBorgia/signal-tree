@@ -82,9 +82,9 @@ export const appRoutes: Route[] = [
         (c) => c.MarkerZooComponent
       ),
     data: {
-      title: 'Marker zoo — all 6 markers at 4 different depths',
+      title: 'Marker zoo — surviving markers at nested depths',
       description:
-        'All SignalTree markers in one tree at depths 1-4 simultaneously: entityMap, status, stored, form, asyncSource, asyncQuery. Demonstrates path-attached composition.',
+        'Surviving SignalTree markers in one tree at nested paths. Demonstrates path-attached composition without root-level feature assembly.',
     },
   },
   {
@@ -94,9 +94,9 @@ export const appRoutes: Route[] = [
         (c) => c.EntityCollectionShowcaseComponent
       ),
     data: {
-      title: 'entityMap — cache-aware loading, visualized',
+      title: 'entityMap — normalized collections, visualized',
       description:
-        'Interactive showcase of entityMap cache-aware loading (v11.2): single-flight load coalescing, staleTime freshness, invalidateTag push-invalidation, stale-while-revalidate, and offline-first hydrate-then-revalidate.',
+        'Interactive showcase of the surviving entityMap surface: normalized membership, keyed reads, and app-owned loading/freshness.',
     },
   },
   {
