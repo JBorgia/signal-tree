@@ -11055,8 +11055,9 @@ first real publish remains the RC task.
       `22792f97` removed `loader`/`invalidateTag` helpers and their public type
       companions; `c53aa416` removed `stored`, storage-key helpers, and global
       stored flush from the public RC surface; `52644fa3` removed `linked` and
-      its public type companion. Remaining blockers before `1.0.0-rc.1`:
-      `trackHistory`, `serialization`, `compared`, the `lazy` subpath, and the
+      its public type companion; `b339b921` removed `trackHistory` and its
+      public type companion. Remaining blockers before `1.0.0-rc.1`:
+      `serialization`, `compared`, the `lazy` subpath, and the
       `edit-session` subpath still need removal or a later independent
       authority that explicitly grants the symbol. The 10k collection workload
       retention is also only partially attributed. Do not publish RC until each
