@@ -11058,12 +11058,11 @@ first real publish remains the RC task.
       its public type companion; `b339b921` removed `trackHistory` and its
       public type companion; `2029db99` removed `serialization` and its public
       type companions; `76ab032c` removed `compared`/`byKeys` and their public
-      type companion. Remaining blockers before `1.0.0-rc.1`: the `lazy`
-      subpath and the `edit-session` subpath still need removal or a
-      later independent authority that explicitly grants the symbol. The 10k
-      collection workload retention is also only partially attributed. Do not
-      publish RC until each exported feature has release authority and
-      `node tools/check-rc-public-dispositions.mjs` passes.
+      type companion; `18fe5781` removed the unplaced `lazy` and `edit-session`
+      subpaths from the package exports and build entry points. The executable
+      public-disposition gate now passes. The 10k collection workload retention
+      is still only partially attributed, so do not publish RC until that
+      remaining performance-shape question is closed or explicitly deferred.
 - [ ] publish `1.0.0-rc.1`
 - [ ] install from npm in external projects
 - [ ] collect RC packaging/DX/docs failures
