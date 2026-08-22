@@ -23,10 +23,10 @@ import { of } from 'rxjs';
 import {
   batching,
   entityMap,
-  invalidateTag,
-  serialization,
   signalTree,
 } from '../index';
+import { serialization } from '../enhancers/serialization/serialization';
+import { invalidateTag } from './markers/entity-loader';
 import { getPathNotifier, resetPathNotifier } from './path-notifier';
 import { loader } from './markers/loader';
 

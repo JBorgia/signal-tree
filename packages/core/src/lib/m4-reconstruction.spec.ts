@@ -2,7 +2,8 @@ import { isSignal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 import { of } from 'rxjs';
 
-import { asyncSource, entityMap, signalTree } from '../index';
+import { entityMap, signalTree } from '../index';
+import { asyncSource } from './markers/async-source';
 
 /**
  * M4 — IS A REALIZED VALUE RECONSTRUCTIBLE BY A UNIFORM RULE?

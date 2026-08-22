@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { of } from 'rxjs';
 
 import { serialization } from '../enhancers/serialization/serialization';
-import { entityMap, loader, signalTree } from '../index';
+import { entityMap, signalTree } from '../index';
+import { loader } from './markers/loader';
 
 /**
  * M4 — CLOSING THE OWNERSHIP HALF.
