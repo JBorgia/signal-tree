@@ -342,15 +342,6 @@
         "internalDecl": false
       },
       {
-        "name": "FormHistoryOptions",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "ISignalTree",
         "subpath": ".",
         "kind": "type-only",
@@ -571,15 +562,6 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/core/src/lib/utils.ts",
-        "angularInDecl": true,
-        "angularInType": true,
-        "internalDecl": false
-      },
-      {
-        "name": "trackHistory",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/form-history/form-history.ts",
         "angularInDecl": true,
         "angularInType": true,
         "internalDecl": false

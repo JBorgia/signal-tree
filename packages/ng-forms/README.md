@@ -81,22 +81,11 @@ await login.validate();
 **Use when**: Need Angular `[formGroup]` directives, Angular validators,
 conditional field disabling, and bidirectional form/state sync.
 
-### `trackHistory()` — undo/redo for a signal model
+### Undo / redo
 
-```typescript
-import { signal, WritableSignal } from '@angular/core';
-import { trackHistory } from '@signaltree/core';
-
-const model: WritableSignal<{ content: string }> = signal({ content: '' });
-const editor = trackHistory(model, { capacity: 50 });
-
-editor.undo();
-editor.redo();
-editor.canUndo();
-```
-
-**Use when**: Complex editors or custom Angular forms where the model is already
-a writable signal.
+Signal-level `trackHistory()` is not part of the current release-candidate
+public API. Use the release-authorized core tree history surface for undo/redo
+workflows.
 
 ## Installation
 
