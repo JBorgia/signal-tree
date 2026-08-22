@@ -299,12 +299,6 @@ describe('assessConfirmedUndo', () => {
           after: undefined,
           subjectId: 'profile-1',
           structural: 'remove',
-          subjectPositions: [
-            positions.firstName,
-            positions.lastName,
-            positions.enabled,
-            positions.local,
-          ],
         },
       ],
     });

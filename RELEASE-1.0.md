@@ -11104,7 +11104,35 @@ first real publish remains the RC task.
       restorer attached), split into earned and orphan portions in
       `docs/architecture/entity-churn-retention.md`. Neither the regression nor
       the churn finding is automatically an rc.1 blocker under a
-      public-API/functional-correctness definition of RC.
+      public-API/functional-correctness definition of RC. The `setAll` regression is now
+      ATTRIBUTED and its primary mechanism DELETED
+      (`docs/architecture/setall-regression.md`). Against an isolated 14.0.0
+      build both curves are linear, so it was a ~41x constant-factor increase in
+      per-member work, not an algorithmic change. `setAll` called
+      `deriveSubjectPositions` per entity, which materialized the full per-row
+      node facade, recursively walked it, also walked the whole collection
+      `api`, and then discarded the node — work that bought no retained state
+      and violated the `member exists != node exists` boundary at
+      bulk-population time. Stubbing it left 1,794 core tests passing and failed
+      11, all representation assertions in causal specs; a behavioural probe
+      with no envelope assertions found every observable public `timeTravel()`
+      undo behaviour intact, and the real transaction suite passed 29/29 with
+      position information removed from EVERY entry point including the
+      hand-authored `draft.capture` inputs. REMOVE, ADD and REKEY were each
+      covered independently. The whole transport was then deleted with it — the
+      field, the `subjectState` it fed, `deriveSubjectState`,
+      `deriveUndoSubjectState`, three apply loops, `applySubjectState`, the
+      adapter plumbing, forwarding across six modules, and seven synthetic
+      tests that were its only exercise (all hand-construct `CausalTurn`
+      effects; none reachable from a public API). `git grep subjectPositions
+      packages/core/src` now returns nothing. No replacement was introduced.
+      Result: `setAll(10k)` 90.4 -> ~18-19 ms, `setAll(50k)` 528 -> ~89 ms,
+      same-turn high-water heap 59.9 -> 15.3 MB, settled retention unchanged at
+      ~11.3 MB (confirming those nodes were always transient). Remaining: ~8x
+      the 14.0.0 control, now measurable on a clean build, with
+      BASE-SUBJECT-STATE-SIGNAL next (an Angular `WritableSignal` per unobserved
+      subject is an ownership question) ahead of BASE-STRUCTURED-CLONE (likely
+      only a representation choice).
 - [ ] publish `1.0.0-rc.1`
 - [ ] install from npm in external projects
 - [ ] collect RC packaging/DX/docs failures

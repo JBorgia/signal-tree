@@ -422,7 +422,6 @@ describe('tree realization adapter', () => {
             subject: subjectId,
             key: 'u1',
             value: { id: 'u1', name: 'Alicia' },
-            subjectPositions: [collectionOwner, positionId],
           },
         },
       });
@@ -722,7 +721,6 @@ describe('tree realization adapter', () => {
           subject: beforeSubjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Alice', enabled: true },
-          subjectPositions: [owner],
         },
       },
     });
@@ -820,7 +818,6 @@ describe('tree realization adapter', () => {
           subject: subjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner],
         },
       },
     });
@@ -904,7 +901,6 @@ describe('tree realization adapter', () => {
               subject: subjectId,
               key: 'u1',
               value: { id: 'u1', name: 'Ada' },
-              subjectPositions: [structuralOwner, nameOwner],
             },
           },
         });
@@ -1018,7 +1014,6 @@ describe('tree realization adapter', () => {
           subject: subjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner],
         },
       },
     });
@@ -1156,7 +1151,6 @@ describe('tree realization adapter', () => {
           subject: subjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner],
         },
       },
     });
@@ -1267,7 +1261,6 @@ describe('tree realization adapter', () => {
           subject: subjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner],
         },
       },
     });
@@ -1381,7 +1374,6 @@ describe('tree realization adapter', () => {
           subject: subjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner],
         },
       },
     });
@@ -1470,7 +1462,6 @@ describe('tree realization adapter', () => {
           subject: subject42,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner42],
         },
       },
     });
@@ -1586,7 +1577,6 @@ describe('tree realization adapter', () => {
           subject: subject42,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner42],
         },
       },
     });
@@ -1719,7 +1709,6 @@ describe('tree realization adapter', () => {
           subject: subject42,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner42],
         },
       },
     });
@@ -1735,7 +1724,6 @@ describe('tree realization adapter', () => {
           subject: subject99,
           key: 'u2',
           value: { id: 'u2', name: 'Bea' },
-          subjectPositions: [structuralOwner, nameOwner99],
         },
       },
     });
@@ -1853,7 +1841,6 @@ describe('tree realization adapter', () => {
           subject: subject42,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner42],
         },
       },
     });
@@ -1994,7 +1981,6 @@ describe('tree realization adapter', () => {
           subject: subject42,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner42],
         },
       },
     });
@@ -2010,7 +1996,6 @@ describe('tree realization adapter', () => {
           subject: subject99,
           key: 'u2',
           value: { id: 'u2', name: 'Bea' },
-          subjectPositions: [structuralOwner, nameOwner99],
         },
       },
     });
@@ -2026,7 +2011,6 @@ describe('tree realization adapter', () => {
           subject: subject77,
           key: 'u3',
           value: { id: 'u3', name: 'Cy' },
-          subjectPositions: [structuralOwner, nameOwner77],
         },
       },
     });
@@ -2143,7 +2127,6 @@ describe('tree realization adapter', () => {
           subject: subject42,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, nameOwner42],
         },
       },
     });
@@ -2220,7 +2203,6 @@ describe('tree realization adapter', () => {
           subject: freshSubjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, freshNameOwner],
         },
       },
     });
@@ -2261,9 +2243,7 @@ describe('tree realization adapter', () => {
         subject: freshSubjectId,
         key: 'u1',
         value: { id: 'u1', name: 'Ada' },
-        subjectPositions: [structuralOwner, freshNameOwner],
       },
-      subjectPositions: [structuralOwner, freshNameOwner],
     };
     const renameFresh = {
       owner: freshNameOwner,
@@ -2331,7 +2311,6 @@ describe('tree realization adapter', () => {
           subject: freshSubjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, freshNameOwner],
         },
       },
     });
@@ -2368,9 +2347,7 @@ describe('tree realization adapter', () => {
         subject: freshSubjectId,
         key: 'u1',
         value: { id: 'u1', name: 'Ada' },
-        subjectPositions: [structuralOwner, freshNameOwner],
       },
-      subjectPositions: [structuralOwner, freshNameOwner],
     };
     const invalidScalarEffect = {
       owner: freshNameOwner,
@@ -2431,7 +2408,6 @@ describe('tree realization adapter', () => {
           subject: freshSubjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, freshNameOwner],
         },
       },
     });
@@ -2459,9 +2435,7 @@ describe('tree realization adapter', () => {
         subject: freshSubjectId,
         key: 'u1',
         value: { id: 'u1', name: 'Ada' },
-        subjectPositions: [structuralOwner, freshNameOwner],
       },
-      subjectPositions: [structuralOwner, freshNameOwner],
     };
     const renameFresh = {
       owner: freshNameOwner,
@@ -2528,7 +2502,6 @@ describe('tree realization adapter', () => {
           subject: freshSubjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, freshNameOwner],
         },
       },
     });
@@ -2566,9 +2539,7 @@ describe('tree realization adapter', () => {
         subject: freshSubjectId,
         key: 'u1',
         value: { id: 'u1', name: 'Ada' },
-        subjectPositions: [structuralOwner, freshNameOwner],
       },
-      subjectPositions: [structuralOwner, freshNameOwner],
     };
     const renameFresh = {
       owner: freshNameOwner,
@@ -2633,7 +2604,6 @@ describe('tree realization adapter', () => {
           subject: freshSubjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, freshNameOwner],
         },
       },
     });
@@ -2667,9 +2637,7 @@ describe('tree realization adapter', () => {
         subject: freshSubjectId,
         key: 'u1',
         value: { id: 'u1', name: 'Ada' },
-        subjectPositions: [structuralOwner, freshNameOwner],
       },
-      subjectPositions: [structuralOwner, freshNameOwner],
     };
     const rekeyFresh = {
       owner: structuralOwner,
@@ -2741,7 +2709,6 @@ describe('tree realization adapter', () => {
           subject: freshSubjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, freshNameOwner],
         },
       },
     });
@@ -2786,9 +2753,7 @@ describe('tree realization adapter', () => {
         subject: freshSubjectId,
         key: 'u1',
         value: { id: 'u1', name: 'Ada' },
-        subjectPositions: [structuralOwner, freshNameOwner],
       },
-      subjectPositions: [structuralOwner, freshNameOwner],
     };
     const renameFresh = {
       owner: freshNameOwner,
@@ -2871,7 +2836,6 @@ describe('tree realization adapter', () => {
           subject: oldSubjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Legacy' },
-          subjectPositions: [structuralOwner, oldNameOwner],
         },
       },
     });
@@ -2894,7 +2858,6 @@ describe('tree realization adapter', () => {
           subject: freshSubjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Ada' },
-          subjectPositions: [structuralOwner, freshNameOwner],
         },
       },
     });
@@ -2939,9 +2902,7 @@ describe('tree realization adapter', () => {
         subject: freshSubjectId,
         key: 'u1',
         value: { id: 'u1', name: 'Ada' },
-        subjectPositions: [structuralOwner, freshNameOwner],
       },
-      subjectPositions: [structuralOwner, freshNameOwner],
     };
     const renameFresh = {
       owner: freshNameOwner,
@@ -3113,7 +3074,6 @@ describe('tree realization adapter', () => {
           subject: subjectOne,
           key: 'u1',
           value: { id: 'u1', name: 'Alice' },
-          subjectPositions: [owner],
         },
       },
     });
@@ -3128,7 +3088,6 @@ describe('tree realization adapter', () => {
           subject: subjectTwo,
           key: 'u2',
           value: { id: 'u2', name: 'Bob' },
-          subjectPositions: [owner],
         },
       },
     });
@@ -3202,98 +3161,6 @@ describe('tree realization adapter', () => {
     expect(tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0]).toBe(subjectTwo);
   });
 
-  it('overlays restored structural payload with contextual subjectState', () => {
-    const tree = signalTree({
-      users: entityMap<{ id: string; name: string; enabled: boolean }, string>({
-        selectId: (user) => user.id,
-      }),
-    }) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string; enabled: boolean }): void;
-        removeOne(id: string): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
-          enabled(): boolean;
-        };
-        ids(): string[];
-      };
-    }>;
-
-    tree.$.users.addOne({ id: 'u1', name: 'Alicia', enabled: true });
-    getPathNotifier().flushSync();
-
-    const owner = getOwnedPositionIds(tree.$.users)?.[0];
-    const beforeName = tree.$.users.byIdOrFail('u1').name;
-    const subjectId = beforeName.__subjectIds?.[0];
-    const enabledOwner = getOwnedPositionIds(tree.$.users.byIdOrFail('u1').enabled)?.[0];
-    if (owner === undefined || subjectId === undefined || enabledOwner === undefined) {
-      throw new Error('Expected structural ownership metadata');
-    }
-
-    const descriptors = new Map<number, TreeRealizationDescriptor>();
-    rememberTreeRealizationDescriptor({
-      descriptors,
-      path: 'users.u1.enabled',
-      ownerPath: 'users.u1',
-      positionIds: [enabledOwner],
-      subjectIds: [subjectId],
-    });
-
-    tree.$.users.removeOne('u1');
-    getPathNotifier().flushSync();
-
-    const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
-      descriptors,
-    });
-
-    expect(
-      adapter.validateEffects([
-        {
-          owner,
-          before: undefined,
-          after: 'u1',
-          subjectId,
-          structural: 'add',
-          structuralContext: {
-            kind: 'remove',
-            subject: subjectId,
-            key: 'u1',
-            value: { id: 'u1', name: 'Alicia', enabled: true },
-            subjectPositions: [owner, enabledOwner],
-          },
-          subjectState: {
-            [enabledOwner]: false,
-          },
-        },
-      ])
-    ).toBeUndefined();
-
-    adapter.applyAtomically([
-      {
-        owner,
-        before: undefined,
-        after: 'u1',
-        subjectId,
-        structural: 'add',
-        structuralContext: {
-          kind: 'remove',
-          subject: subjectId,
-          key: 'u1',
-          value: { id: 'u1', name: 'Alicia', enabled: true },
-          subjectPositions: [owner, enabledOwner],
-        },
-        subjectState: {
-          [enabledOwner]: false,
-        },
-      },
-    ]);
-    getPathNotifier().flushSync();
-
-    expect(tree.$.users.ids()).toEqual(['u1']);
-    expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alicia');
-    expect(tree.$.users.byIdOrFail('u1').enabled()).toBe(false);
-  });
 
   it('reactivates the exact held row and field when restoring the same tombstoned subject', () => {
     const tree = signalTree({
@@ -3356,7 +3223,6 @@ describe('tree realization adapter', () => {
           subject: subjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Alicia', enabled: true },
-          subjectPositions: [owner, positionId],
         },
       },
     });
@@ -3386,7 +3252,6 @@ describe('tree realization adapter', () => {
             subject: subjectId,
             key: 'u1',
             value: { id: 'u1', name: 'Alicia', enabled: true },
-            subjectPositions: [owner, positionId],
           },
         },
       ])
@@ -3404,7 +3269,6 @@ describe('tree realization adapter', () => {
           subject: subjectId,
           key: 'u1',
           value: { id: 'u1', name: 'Alicia', enabled: true },
-          subjectPositions: [owner, positionId],
         },
       },
     ]);
@@ -4127,7 +3991,6 @@ describe('tree realization adapter', () => {
           subject: 1,
           key: 'u1',
           value: { id: 'u1', name: 'Alice' },
-          subjectPositions: [structuralOwner],
         },
       } satisfies UpdateMetadata,
     });

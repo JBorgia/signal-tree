@@ -515,7 +515,6 @@ describe('confirmed structural undo/redo composition', () => {
           after: 'A',
           subjectId: SUBJECT_DRIVER,
           structural: 'add',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME],
         },
         {
           owner: P_DRIVER_NAME,
@@ -559,7 +558,6 @@ describe('confirmed structural undo/redo composition', () => {
         after: undefined,
         subjectId: SUBJECT_DRIVER,
         structural: 'remove',
-        subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME],
       },
     ]);
     expect(values.get(P_DRIVER_KEY)).toBeUndefined();
@@ -583,7 +581,6 @@ describe('confirmed structural undo/redo composition', () => {
         after: 'A',
         subjectId: SUBJECT_DRIVER,
         structural: 'add',
-        subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME],
       },
       {
         owner: P_DRIVER_NAME,
@@ -631,7 +628,6 @@ describe('confirmed structural undo/redo composition', () => {
           after: 'A',
           subjectId: SUBJECT_DRIVER,
           structural: 'add',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED],
         },
         {
           owner: P_DRIVER_NAME,
@@ -689,7 +685,6 @@ describe('confirmed structural undo/redo composition', () => {
         after: undefined,
         subjectId: SUBJECT_DRIVER,
         structural: 'remove',
-        subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED],
       },
     ]);
     expect(values.get(P_DRIVER_KEY)).toBeUndefined();
@@ -714,7 +709,6 @@ describe('confirmed structural undo/redo composition', () => {
         after: 'A',
         subjectId: SUBJECT_DRIVER,
         structural: 'add',
-        subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED],
       },
       {
         owner: P_DRIVER_NAME,
@@ -736,334 +730,8 @@ describe('confirmed structural undo/redo composition', () => {
     expect(values.get(P_DRIVER_ENABLED)).toBe(true);
   });
 
-  it('undoes and redoes a confirmed scalar plus remove turn using complete remove-boundary state overlaid with same-turn prefix values', () => {
-    const topology = createPositionRegistry();
-    const root = topology.allocate();
-    const profile = topology.allocate(root);
-    const driverKey = topology.allocate(profile);
-    const driverName = topology.allocate(profile);
-    const driverEnabled = topology.allocate(profile);
-    const driverLocal = topology.allocate(profile);
 
-    expect(root).toBe(P_ROOT);
-    expect(profile).toBe(P_PROFILE);
-    expect(driverKey).toBe(P_DRIVER_KEY);
-    expect(driverName).toBe(P_DRIVER_NAME);
-    expect(driverEnabled).toBe(P_DRIVER_ENABLED);
-    expect(driverLocal).toBe(P_DRIVER_LOCAL);
 
-    const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
-    const realizationContext = createRealizationContextSource({
-      baselineValues: new Map([
-        [P_DRIVER_KEY, 'A'],
-        [P_DRIVER_NAME, 'Alice'],
-        [P_DRIVER_ENABLED, true],
-        [P_DRIVER_LOCAL, 'TX'],
-      ]),
-      store,
-      appliedHistory,
-    });
-    const confirmed = store.admitConfirmed({
-      id: 1,
-      effects: [
-        {
-          owner: P_DRIVER_NAME,
-          before: 'Alice',
-          after: 'Alicia',
-          subjectId: SUBJECT_DRIVER,
-        },
-        {
-          owner: P_DRIVER_KEY,
-          before: 'A',
-          after: undefined,
-          subjectId: SUBJECT_DRIVER,
-          structural: 'remove',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED, P_DRIVER_LOCAL],
-        },
-      ],
-    });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
-
-    const values = new Map<PositionId, unknown>([
-      [P_DRIVER_KEY, undefined],
-      [P_DRIVER_NAME, undefined],
-      [P_DRIVER_ENABLED, undefined],
-      [P_DRIVER_LOCAL, undefined],
-    ]);
-    const appliedEffects: ReversalEffect[][] = [];
-    const port = createStructuralPort(values, appliedEffects);
-
-    expect(
-      undoConfirmedAt({
-        authority: P_PROFILE,
-        store,
-        appliedHistory,
-        topology,
-        port,
-        realizationContext,
-      })
-    ).toEqual({ ok: true, turnId: confirmed.id });
-
-    expect(appliedEffects[0]).toEqual([
-      {
-        owner: P_DRIVER_KEY,
-        before: undefined,
-        after: 'A',
-        subjectId: SUBJECT_DRIVER,
-        structural: 'add',
-        subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED, P_DRIVER_LOCAL],
-        subjectState: {
-          [P_DRIVER_NAME]: 'Alicia',
-          [P_DRIVER_ENABLED]: true,
-          [P_DRIVER_LOCAL]: 'TX',
-        },
-      },
-      {
-        owner: P_DRIVER_NAME,
-        before: 'Alicia',
-        after: 'Alice',
-        subjectId: SUBJECT_DRIVER,
-        structural: undefined,
-      },
-    ]);
-    expect(values.get(P_DRIVER_KEY)).toBe('A');
-    expect(values.get(P_DRIVER_NAME)).toBe('Alice');
-    expect(values.get(P_DRIVER_ENABLED)).toBe(true);
-    expect(values.get(P_DRIVER_LOCAL)).toBe('TX');
-
-    expect(
-      redoConfirmedAt({
-        authority: P_PROFILE,
-        store,
-        appliedHistory,
-        topology,
-        port,
-        realizationContext,
-      })
-    ).toEqual({ ok: true, turnId: confirmed.id });
-
-    expect(appliedEffects[1]).toEqual([
-      {
-        owner: P_DRIVER_NAME,
-        before: 'Alice',
-        after: 'Alicia',
-        subjectId: SUBJECT_DRIVER,
-        structural: undefined,
-      },
-      {
-        owner: P_DRIVER_KEY,
-        before: 'A',
-        after: undefined,
-        subjectId: SUBJECT_DRIVER,
-        structural: 'remove',
-        subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED, P_DRIVER_LOCAL],
-      },
-    ]);
-    expect(values.get(P_DRIVER_KEY)).toBeUndefined();
-    expect(values.get(P_DRIVER_NAME)).toBeUndefined();
-    expect(values.get(P_DRIVER_ENABLED)).toBeUndefined();
-    expect(values.get(P_DRIVER_LOCAL)).toBeUndefined();
-  });
-
-  it('undoes a confirmed remove using surviving realized subject state after an earlier pending contribution is rolled back', () => {
-    const topology = createPositionRegistry();
-    const root = topology.allocate();
-    const profile = topology.allocate(root);
-    const driverKey = topology.allocate(profile);
-    const driverName = topology.allocate(profile);
-
-    expect(root).toBe(P_ROOT);
-    expect(profile).toBe(P_PROFILE);
-    expect(driverKey).toBe(P_DRIVER_KEY);
-    expect(driverName).toBe(P_DRIVER_NAME);
-
-    const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
-    const realizationContext = createRealizationContextSource({
-      baselineValues: new Map([
-        [P_DRIVER_KEY, 'A'],
-        [P_DRIVER_NAME, 'Alice'],
-      ]),
-      store,
-      appliedHistory,
-    });
-    const pending = store.admitPending({
-      id: 1,
-      effects: [
-        {
-          owner: P_DRIVER_NAME,
-          before: 'Alice',
-          after: 'Alicia',
-          subjectId: SUBJECT_DRIVER,
-        },
-      ],
-    });
-    const confirmed = store.admitConfirmed({
-      id: 2,
-      effects: [
-        {
-          owner: P_DRIVER_KEY,
-          before: 'A',
-          after: undefined,
-          subjectId: SUBJECT_DRIVER,
-          structural: 'remove',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME],
-        },
-      ],
-    });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
-
-    const discard = store.prepareDiscardPendingTurn(pending.id);
-    expect(discard).toEqual({ ok: true, transition: discard.ok ? discard.transition : undefined });
-    if (discard.ok) {
-      store.commitPreparedDiscardPending(discard.transition);
-    }
-
-    const values = new Map<PositionId, unknown>([
-      [P_DRIVER_KEY, undefined],
-      [P_DRIVER_NAME, undefined],
-    ]);
-    const appliedEffects: ReversalEffect[][] = [];
-    const port = createStructuralPort(values, appliedEffects);
-
-    expect(
-      undoConfirmedAt({
-        authority: P_PROFILE,
-        store,
-        appliedHistory,
-        topology,
-        port,
-        realizationContext,
-      })
-    ).toEqual({ ok: true, turnId: confirmed.id });
-
-    expect(appliedEffects).toEqual([
-      [
-        {
-          owner: P_DRIVER_KEY,
-          before: undefined,
-          after: 'A',
-          subjectId: SUBJECT_DRIVER,
-          structural: 'add',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME],
-          subjectState: {
-            [P_DRIVER_NAME]: 'Alice',
-          },
-        },
-      ],
-    ]);
-    expect(values.get(P_DRIVER_KEY)).toBe('A');
-    expect(values.get(P_DRIVER_NAME)).toBe('Alice');
-  });
-
-  it('undoes a confirmed remove with mixed internal and contextual boundary values after a pending untouched-field change is rolled back', () => {
-    const topology = createPositionRegistry();
-    const root = topology.allocate();
-    const profile = topology.allocate(root);
-    const driverKey = topology.allocate(profile);
-    const driverName = topology.allocate(profile);
-    const driverEnabled = topology.allocate(profile);
-
-    expect(root).toBe(P_ROOT);
-    expect(profile).toBe(P_PROFILE);
-    expect(driverKey).toBe(P_DRIVER_KEY);
-    expect(driverName).toBe(P_DRIVER_NAME);
-    expect(driverEnabled).toBe(P_DRIVER_ENABLED);
-
-    const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
-    const realizationContext = createRealizationContextSource({
-      baselineValues: new Map([
-        [P_DRIVER_KEY, 'A'],
-        [P_DRIVER_NAME, 'Alice'],
-        [P_DRIVER_ENABLED, true],
-      ]),
-      store,
-      appliedHistory,
-    });
-    const pending = store.admitPending({
-      id: 1,
-      effects: [
-        {
-          owner: P_DRIVER_ENABLED,
-          before: true,
-          after: false,
-          subjectId: SUBJECT_DRIVER,
-        },
-      ],
-    });
-    const confirmed = store.admitConfirmed({
-      id: 2,
-      effects: [
-        {
-          owner: P_DRIVER_NAME,
-          before: 'Alice',
-          after: 'Alicia',
-          subjectId: SUBJECT_DRIVER,
-        },
-        {
-          owner: P_DRIVER_KEY,
-          before: 'A',
-          after: undefined,
-          subjectId: SUBJECT_DRIVER,
-          structural: 'remove',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED],
-        },
-      ],
-    });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
-
-    const discard = store.prepareDiscardPendingTurn(pending.id);
-    expect(discard.ok).toBe(true);
-    if (discard.ok) {
-      store.commitPreparedDiscardPending(discard.transition);
-    }
-
-    const values = new Map<PositionId, unknown>([
-      [P_DRIVER_KEY, undefined],
-      [P_DRIVER_NAME, undefined],
-      [P_DRIVER_ENABLED, undefined],
-    ]);
-    const appliedEffects: ReversalEffect[][] = [];
-    const port = createStructuralPort(values, appliedEffects);
-
-    expect(
-      undoConfirmedAt({
-        authority: P_PROFILE,
-        store,
-        appliedHistory,
-        topology,
-        port,
-        realizationContext,
-      })
-    ).toEqual({ ok: true, turnId: confirmed.id });
-
-    expect(appliedEffects[0]).toEqual([
-      {
-        owner: P_DRIVER_KEY,
-        before: undefined,
-        after: 'A',
-        subjectId: SUBJECT_DRIVER,
-        structural: 'add',
-        subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED],
-        subjectState: {
-          [P_DRIVER_NAME]: 'Alicia',
-          [P_DRIVER_ENABLED]: true,
-        },
-      },
-      {
-        owner: P_DRIVER_NAME,
-        before: 'Alicia',
-        after: 'Alice',
-        subjectId: SUBJECT_DRIVER,
-        structural: undefined,
-      },
-    ]);
-    expect(values.get(P_DRIVER_KEY)).toBe('A');
-    expect(values.get(P_DRIVER_NAME)).toBe('Alice');
-    expect(values.get(P_DRIVER_ENABLED)).toBe(true);
-  });
 
   it('keeps a confirmed add redoable when redo validation refuses with structural-drift', () => {
     const topology = createPositionRegistry();
@@ -1096,7 +764,6 @@ describe('confirmed structural undo/redo composition', () => {
           after: 'A',
           subjectId: SUBJECT_DRIVER,
           structural: 'add',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME],
         },
         {
           owner: P_DRIVER_NAME,
@@ -1149,7 +816,6 @@ describe('confirmed structural undo/redo composition', () => {
         after: 'A',
         subjectId: SUBJECT_DRIVER,
         structural: 'add',
-        subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME],
       },
       {
         owner: P_DRIVER_NAME,
@@ -1164,116 +830,6 @@ describe('confirmed structural undo/redo composition', () => {
     expect(appliedHistory.inspect()).toEqual(appliedBefore);
   });
 
-  it('keeps a confirmed remove redoable when redo validation detects a different subject at the same structural key', () => {
-    const topology = createPositionRegistry();
-    const root = topology.allocate();
-    const profile = topology.allocate(root);
-    const driverKey = topology.allocate(profile);
-    const driverName = topology.allocate(profile);
-    const driverEnabled = topology.allocate(profile);
-
-    expect(root).toBe(P_ROOT);
-    expect(profile).toBe(P_PROFILE);
-    expect(driverKey).toBe(P_DRIVER_KEY);
-    expect(driverName).toBe(P_DRIVER_NAME);
-    expect(driverEnabled).toBe(P_DRIVER_ENABLED);
-
-    const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
-    const realizationContext = createRealizationContextSource({
-      baselineValues: new Map([
-        [P_DRIVER_KEY, 'A'],
-        [P_DRIVER_NAME, 'Alice'],
-        [P_DRIVER_ENABLED, true],
-      ]),
-      store,
-      appliedHistory,
-    });
-    const confirmed = store.admitConfirmed({
-      id: 1,
-      effects: [
-        {
-          owner: P_DRIVER_NAME,
-          before: 'Alice',
-          after: 'Alicia',
-          subjectId: SUBJECT_DRIVER,
-        },
-        {
-          owner: P_DRIVER_KEY,
-          before: 'A',
-          after: undefined,
-          subjectId: SUBJECT_DRIVER,
-          structural: 'remove',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED],
-        },
-      ],
-    });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
-
-    const values = new Map<PositionId, unknown>([
-      [P_DRIVER_KEY, undefined],
-      [P_DRIVER_NAME, undefined],
-      [P_DRIVER_ENABLED, undefined],
-    ]);
-    const port = createStructuralPort(values, []);
-
-    expect(
-      undoConfirmedAt({
-        authority: P_PROFILE,
-        store,
-        appliedHistory,
-        topology,
-        port,
-        realizationContext,
-      })
-    ).toEqual({ ok: true, turnId: confirmed.id });
-
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
-    const validateEffects = vi.fn((effects: readonly ReversalEffect[]) => {
-      expect(effects).toEqual([
-        {
-          owner: P_DRIVER_NAME,
-          before: 'Alice',
-          after: 'Alicia',
-          subjectId: SUBJECT_DRIVER,
-          structural: undefined,
-        },
-        {
-          owner: P_DRIVER_KEY,
-          before: 'A',
-          after: undefined,
-          subjectId: SUBJECT_DRIVER,
-          structural: 'remove',
-          subjectPositions: [P_DRIVER_KEY, P_DRIVER_NAME, P_DRIVER_ENABLED],
-        },
-      ]);
-
-      // External uncaptured drift: the key/path still points at A, but it now
-      // identifies a different semantic subject than the authored remove expects.
-      const actualSubjectAtKey = SUBJECT_OTHER_DRIVER;
-      expect(actualSubjectAtKey).not.toBe(SUBJECT_DRIVER);
-
-      return { kind: 'structural-drift' as const };
-    });
-    const appliedBefore = appliedHistory.inspect();
-    const storeBefore = store.inspect();
-
-    expect(
-      redoConfirmedAt({
-        authority: P_PROFILE,
-        store,
-        appliedHistory,
-        topology,
-        port: { applyAtomically, validateEffects },
-        realizationContext,
-      })
-    ).toEqual({ ok: false, refusal: { kind: 'structural-drift' } });
-
-    expect(validateEffects).toHaveBeenCalledTimes(1);
-    expect(applyAtomically).not.toHaveBeenCalled();
-    expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
-  });
 });
 
 function createStructuralPort(
@@ -1288,19 +844,6 @@ function createStructuralPort(
         expect(staged.get(effect.owner)).toEqual(effect.before);
         staged.set(effect.owner, effect.after);
 
-        if (effect.structural === 'remove') {
-          for (const positionId of effect.subjectPositions ?? []) {
-            if (positionId === effect.owner) {
-              continue;
-            }
-
-            staged.set(positionId, undefined);
-          }
-        }
-
-        for (const [positionId, value] of Object.entries(effect.subjectState ?? {})) {
-          staged.set(Number(positionId) as PositionId, value);
-        }
       }
 
       appliedEffects.push(effects.map((effect) => ({ ...effect })));

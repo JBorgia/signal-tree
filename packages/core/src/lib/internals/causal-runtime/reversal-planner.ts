@@ -49,8 +49,6 @@ function createReversalEffects(
         ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
         structural: deriveUndoStructural(effect.structural),
         structuralContext: effect.structuralContext,
-        subjectPositions: effect.subjectPositions ? [...effect.subjectPositions] : undefined,
-        subjectState: undefined,
       }));
   }
 
@@ -85,13 +83,6 @@ function createReversalEffects(
       ownerPath: (effect as CausalEffect & { ownerPath?: string }).ownerPath,
       structural,
       structuralContext: effect.structuralContext,
-      subjectPositions: effect.subjectPositions ? [...effect.subjectPositions] : undefined,
-      subjectState: deriveUndoSubjectState({
-        turn,
-        effect,
-        originalIndex,
-        realizationContext,
-      }),
     };
 
     seedCurrentBoundary(currentByOwner, reversedEffect);
@@ -113,53 +104,6 @@ function deriveUndoStructural(
     default:
       return undefined;
   }
-}
-
-function deriveUndoSubjectState(options: {
-  turn: NonNullable<ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>>;
-  effect: NonNullable<ReturnType<Pick<TurnStore, 'getTurn'>['getTurn']>>['effects'][number];
-  originalIndex: number;
-  realizationContext: RealizationContext;
-}): Readonly<Record<string, unknown>> | undefined {
-  const { effect, originalIndex, realizationContext, turn } = options;
-  if (effect.structural !== 'remove' || effect.subjectId === undefined || !effect.subjectPositions) {
-    return undefined;
-  }
-
-  const priorSameSubjectEffects = turn.effects.filter(
-    (candidateEffect, index) =>
-      index < originalIndex && candidateEffect.subjectId === effect.subjectId
-  );
-  const relevantPositions = effect.subjectPositions.filter(
-    (positionId) => positionId !== effect.owner
-  );
-  if (relevantPositions.length === 0) {
-    return undefined;
-  }
-
-  const values = new Map<number, unknown>();
-  for (const positionId of relevantPositions) {
-    values.set(
-      positionId,
-      realizationContext.getValueWithoutConfirmedTurn(turn.id, positionId)
-    );
-  }
-
-  for (const priorEffect of priorSameSubjectEffects) {
-    if (
-      priorEffect.subjectId === effect.subjectId &&
-      values.has(priorEffect.owner)
-    ) {
-      values.set(priorEffect.owner, priorEffect.after);
-    }
-  }
-
-  const entries = [...values.entries()].filter(([, value]) => value !== undefined);
-  if (entries.length === 0) {
-    return undefined;
-  }
-
-  return Object.fromEntries(entries.map(([positionId, value]) => [String(positionId), value]));
 }
 
 function deriveStructuralUndoBefore(
@@ -196,7 +140,4 @@ function seedCurrentBoundary(
 ): void {
   currentByOwner.set(effect.owner, effect.after);
 
-  for (const [positionId, value] of Object.entries(effect.subjectState ?? {})) {
-    currentByOwner.set(Number(positionId), value);
-  }
 }

@@ -142,7 +142,7 @@ function createPendingRollbackEffects(
       }
     )
     .map((effect) =>
-      createPendingRollbackEffect(effect, turn.id, realizationContext, turn)
+      createPendingRollbackEffect(effect, turn.id, realizationContext)
     )
     .filter((effect) => effect.before !== effect.after);
 }
@@ -150,8 +150,7 @@ function createPendingRollbackEffects(
 function createPendingRollbackEffect(
   effect: CausalTurn['effects'][number],
   turnId: TurnId,
-  realizationContext: RealizationContext,
-  turn: CausalTurn
+  realizationContext: RealizationContext
 ): ReversalEffect {
   const structural = deriveCompensationStructuralEffect(effect.structural);
 
@@ -163,7 +162,6 @@ function createPendingRollbackEffect(
       subjectId: effect.subjectId,
       structural,
       structuralContext: effect.structuralContext,
-      subjectState: deriveSubjectState(turn, effect, turnId, realizationContext),
     };
   }
 
@@ -177,7 +175,6 @@ function createPendingRollbackEffect(
       ownerPath: effect.ownerPath,
       structural,
       structuralContext: effect.structuralContext,
-      subjectState: deriveSubjectState(turn, effect, turnId, realizationContext),
     };
   }
 
@@ -188,7 +185,6 @@ function createPendingRollbackEffect(
     subjectId: effect.subjectId,
     structural,
     structuralContext: effect.structuralContext,
-    subjectState: deriveSubjectState(turn, effect, turnId, realizationContext),
   };
 }
 
@@ -233,31 +229,6 @@ function deriveStructuralRollbackAfter(
     default:
       return effect.after;
   }
-}
-
-function deriveSubjectState(
-  turn: CausalTurn,
-  effect: CausalTurn['effects'][number],
-  turnId: TurnId,
-  realizationContext: RealizationContext
-): Readonly<Record<string, unknown>> | undefined {
-  if (effect.structural !== 'remove' || !effect.subjectPositions) {
-    return undefined;
-  }
-
-  const entries = effect.subjectPositions
-    .filter((positionId) => positionId !== effect.owner)
-    .map((positionId) => [
-      String(positionId),
-      realizationContext.getValueWithoutPendingTurn(turnId, positionId),
-    ] as const)
-    .filter((entry) => entry[1] !== undefined);
-
-  if (entries.length === 0) {
-    return undefined;
-  }
-
-  return Object.fromEntries(entries);
 }
 
 function hasLaterStructuralDependency(

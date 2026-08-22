@@ -61,8 +61,7 @@ type CollectionNode = {
     from: string | number,
     to: string | number,
     subjectId: number,
-    entity: unknown,
-    subjectPositions?: readonly PositionId[]
+    entity: unknown
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
     publish(metaOverride?: UpdateMetadata): void;
@@ -92,7 +91,6 @@ type PreparedSubjectRealization = {
   reachable: boolean;
   currentKey: string | number | undefined;
   value: unknown;
-  subjectPositions?: readonly PositionId[];
 };
 
 type PreparedOccupancyState = number | 'vacant';
@@ -130,7 +128,6 @@ class PreparedRealizationContext {
     collectionPath: string,
     key: string | number,
     value: unknown,
-    subjectPositions?: readonly PositionId[]
   ): void {
     this.subjects.set(subjectId, {
       collectionPath,
@@ -138,7 +135,6 @@ class PreparedRealizationContext {
       reachable: true,
       currentKey: key,
       value,
-      subjectPositions,
     });
     this.setOccupancy(collectionPath, key, subjectId);
   }
@@ -168,11 +164,9 @@ class PreparedRealizationContext {
     collectionPath: string,
     key: string | number,
     value: unknown,
-    subjectPositions?: readonly PositionId[]
   ): void {
     const existing = this.subjects.get(subjectId);
     const currentValue = existing?.value ?? value;
-    const currentPositions = existing?.subjectPositions ?? subjectPositions;
 
     if (existing?.currentKey !== undefined) {
       this.setOccupancy(existing.collectionPath, existing.currentKey, 'vacant');
@@ -186,7 +180,6 @@ class PreparedRealizationContext {
       reachable: false,
       currentKey: undefined,
       value: currentValue,
-      subjectPositions: currentPositions,
     });
   }
 
@@ -706,8 +699,7 @@ function planHeterogeneousFrame(
             effect.before as string | number,
             effect.after as string | number,
             effect.subjectId as number,
-            preparedSubject.value,
-            preparedSubject.subjectPositions
+            preparedSubject.value
           )
         : typeof collectionNode.__planRekey === 'function'
           ? collectionNode.__planRekey(
@@ -1152,37 +1144,11 @@ function applyEffect(
             historyEffect.beforeSubject,
             historyEffect.afterSubject
           );
-          applySubjectState(tree, descriptors, scalarSlotRuntime, ownerNode, effect);
           return;
         }
       }
     }
   );
-}
-
-function applySubjectState(
-  tree: ISignalTree<object>,
-  descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
-  scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
-  ownerNode: CollectionNode,
-  effect: ReversalEffect
-): void {
-  const rowNode = ownerNode.byIdOrFail(effect.after as string | number);
-
-  for (const [positionId, value] of Object.entries(effect.subjectState ?? {})) {
-    const numericPositionId = Number(positionId) as PositionId;
-    const liveNode =
-      scalarSlotRuntime?.resolveScalarLeaf(numericPositionId) ??
-      resolveSubjectTargetFromDescriptor(
-        rowNode,
-        descriptors.get(numericPositionId)
-      );
-    if (!isWritableLeaf(liveNode)) {
-      throw new Error(`Missing live subject leaf for owner ${positionId}`);
-    }
-
-    liveNode.set(value);
-  }
 }
 
 function resolveLiveScalarNode(
@@ -1364,18 +1330,9 @@ function updatePreparedRealizationContext(
         effect.subjectId,
         collectionPath,
         effect.after as string | number,
-        preparedValue,
-        historyEffect.subjectPositions
+        preparedValue
       );
 
-      for (const [positionId, value] of Object.entries(effect.subjectState ?? {})) {
-        const positionDescriptor = descriptors.get(Number(positionId) as PositionId);
-        const fieldPathFromRow = positionDescriptor?.fieldPathFromRow;
-        if (!fieldPathFromRow) {
-          continue;
-        }
-        assignPreparedSubjectValue(preparedValue, fieldPathFromRow, value);
-      }
       return;
     }
     case 'rekey':
@@ -1755,27 +1712,6 @@ function resolveCurrentScopedTarget(
   );
 }
 
-function resolveSubjectTargetFromDescriptor(
-  rowNode: unknown,
-  descriptor: TreeRealizationDescriptor | undefined
-): unknown {
-  if (!descriptor) {
-    return undefined;
-  }
-
-  if (descriptor.fieldPathFromRow === '') {
-    return rowNode;
-  }
-
-  if (!descriptor.fieldPathFromRow) {
-    return undefined;
-  }
-
-  return resolveNodeAtPath(
-    rowNode as Record<string, unknown>,
-    descriptor.fieldPathFromRow
-  );
-}
 
 function resolveNodeAtPath(
   root: Record<string, unknown>,

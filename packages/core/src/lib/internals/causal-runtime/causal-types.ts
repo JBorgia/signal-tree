@@ -16,15 +16,9 @@ export interface CausalEffect {
    * Producer-authored structural information required to realize this
    * existence transition after the original mutation context is gone.
    *
-   * This is durable canonical history. It is an authored structural snapshot,
-   * not the current contextual subject state; planners derive that separately
-   * as `subjectState` when realizing undo/redo.
+   * This is durable canonical history: an authored structural snapshot.
    */
   readonly structuralContext?: StructuralHistoryEffect;
-  // Structural coverage for an authored existence transition. These positions may
-  // supply payload needed to physically realize add/remove without becoming
-  // independent value participants in the turn.
-  readonly subjectPositions?: readonly PositionId[];
 }
 
 export interface CausalTurn {
@@ -51,10 +45,6 @@ export interface ReversalEffect {
   readonly structural?: StructuralEffect;
   /** Durable structural recipe carried from canonical history into realization. */
   readonly structuralContext?: StructuralHistoryEffect;
-  // Structural coverage carried forward so reversal can reconstruct the physical
-  // subject boundary at the structural effect boundary.
-  readonly subjectPositions?: readonly PositionId[];
-  readonly subjectState?: Readonly<Record<string, unknown>>;
 }
 
 export interface ConfirmedReversalPlan {

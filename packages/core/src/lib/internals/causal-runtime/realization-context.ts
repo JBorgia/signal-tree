@@ -108,7 +108,6 @@ function copyTurn(turn: CausalTurn): CausalTurn {
     ...turn,
     effects: turn.effects.map((effect) => ({
       ...effect,
-      subjectPositions: effect.subjectPositions ? [...effect.subjectPositions] : undefined,
     })),
     participants: [...turn.participants],
   };

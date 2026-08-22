@@ -84,7 +84,6 @@ function mapStructuralEffect(
         subjectId,
         structural: 'add',
         structuralContext: historyEffect,
-        subjectPositions: historyEffect.subjectPositions,
       };
     case 'remove':
       return {
@@ -94,7 +93,6 @@ function mapStructuralEffect(
         subjectId,
         structural: 'remove',
         structuralContext: historyEffect,
-        subjectPositions: historyEffect.subjectPositions,
       };
     case 'rekey':
       return {
@@ -104,7 +102,6 @@ function mapStructuralEffect(
         subjectId,
         structural: 'rekey',
         structuralContext: historyEffect,
-        subjectPositions: historyEffect.subjectPositions,
       };
   }
 }

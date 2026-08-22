@@ -61,7 +61,6 @@ export type CollectionAddEffect = TurnEffectBase & {
   value: unknown;
   beforeSubject?: number;
   afterSubject?: number;
-  subjectPositions?: readonly number[];
 };
 
 export type CollectionRemoveEffect = TurnEffectBase & {
@@ -71,7 +70,6 @@ export type CollectionRemoveEffect = TurnEffectBase & {
   value: unknown;
   beforeSubject?: number;
   afterSubject?: number;
-  subjectPositions?: readonly number[];
 };
 
 export type CollectionRekeyEffect = TurnEffectBase & {
@@ -79,7 +77,6 @@ export type CollectionRekeyEffect = TurnEffectBase & {
   subject: number;
   beforeKey: string | number;
   afterKey: string | number;
-  subjectPositions?: readonly number[];
 };
 
 export type TurnEffect =
@@ -854,9 +851,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             value: effect.value,
             beforeSubject: effect.beforeSubject,
             afterSubject: effect.afterSubject,
-            subjectPositions: effect.subjectPositions,
           },
-          subjectPositions: effect.subjectPositions,
         } as CausalEffect;
       case 'remove':
         return {
@@ -874,9 +869,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             value: effect.value,
             beforeSubject: effect.beforeSubject,
             afterSubject: effect.afterSubject,
-            subjectPositions: effect.subjectPositions,
           },
-          subjectPositions: effect.subjectPositions,
         } as CausalEffect;
       case 'rekey':
         return {
@@ -892,9 +885,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             subject: effect.subject,
             beforeKey: effect.beforeKey,
             afterKey: effect.afterKey,
-            subjectPositions: effect.subjectPositions,
           },
-          subjectPositions: effect.subjectPositions,
         } as CausalEffect;
     }
   };

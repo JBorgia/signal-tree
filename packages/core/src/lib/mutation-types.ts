@@ -7,7 +7,6 @@ export type StructuralHistoryEffect =
       beforeSubject?: number;
       afterSubject?: number;
       /** Structural ownership positions encompassed by this existence transition. */
-      subjectPositions?: readonly PositionId[];
     }
   | {
       kind: 'remove';
@@ -17,7 +16,6 @@ export type StructuralHistoryEffect =
       beforeSubject?: number;
       afterSubject?: number;
       /** Structural ownership positions encompassed by this existence transition. */
-      subjectPositions?: readonly PositionId[];
     }
   | {
       kind: 'rekey';
@@ -25,7 +23,6 @@ export type StructuralHistoryEffect =
       beforeKey: string | number;
       afterKey: string | number;
       /** Structural ownership positions encompassed by this existence transition. */
-      subjectPositions?: readonly PositionId[];
     };
 
 export type PositionId = number;

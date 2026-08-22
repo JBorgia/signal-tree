@@ -401,7 +401,6 @@ describe('TurnStore', () => {
           after: undefined,
           subjectId: 'profile-1',
           structural: 'remove',
-          subjectPositions: [P_FIRST_NAME, P_LAST_NAME, P_ENABLED, P_LOCAL],
         },
       ],
     });
