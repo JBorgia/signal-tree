@@ -90,7 +90,7 @@ describe('ST2018 — entity array stored as a plain leaf', () => {
     expect(fired()).toBe(false);
   });
 
-  it('can be silenced by taking explicit control with compared()', () => {
+  it('stays quiet for legacy compared markers', () => {
     signalTree({
       rows: compared(entities(500), (a, b) => a.length === b.length),
     });

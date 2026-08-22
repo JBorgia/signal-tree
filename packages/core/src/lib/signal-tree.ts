@@ -547,7 +547,7 @@ function warnEntityArrayLeaf(key: string, value: readonly unknown[]): void {
       `"${idKey}" — use entityMap({ selectId: (e) => e.${idKey} }). An array ` +
       `leaf rebuilds and re-compares the whole array on every update — two ` +
       `orders of magnitude at 50k. Read-only or replaced wholesale? ` +
-      `compared() silences this. [ST2018]`
+      `Leave it plain; otherwise model it as an entityMap. [ST2018]`
   );
 }
 
@@ -878,7 +878,7 @@ function leafEqual(
           `the new value is a different object but deep-equals the current ` +
           `one, so the whole structure was compared and the write discarded. ` +
           `A re-fetched payload does this. Skip the write when the data is ` +
-          `unchanged, or use compared() to pick a cheaper equality. [ST2027]`
+            `unchanged, or write the smaller changed leaf. [ST2027]`
       );
     }
     return eq;
