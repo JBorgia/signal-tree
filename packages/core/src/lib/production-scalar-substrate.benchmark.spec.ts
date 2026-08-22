@@ -7,7 +7,6 @@ import { timeTravel } from '../enhancers/time-travel/time-travel';
 import { entityMap } from './markers/entity-map';
 import { EntityMutationFrame } from './physical/entity-mutation-frame';
 import { EntityValueStore } from './physical/entity-value-store';
-import { MaterializedEntityProjection } from './physical/materialized-entity-projection';
 import { StructuralStore } from './physical/structural-store';
 import {
   clearProductionSubstrateStatsForTesting,
@@ -87,9 +86,6 @@ type EntityFrameTimingRow = {
 
 type PublicUndoLogicalWorkRow = {
   positions: number;
-  projectionRebuilds: number;
-  projectionEntriesVisited: number;
-  projectionRestores: number;
   publicUndoPositionEntriesExamined: number;
   publicUndoTurnEffectsExamined: number;
 };
@@ -114,17 +110,11 @@ type EntityFrameLogicalWorkRow = {
   structuralSubjectTransfers: number;
   structuralSubjectTombstones: number;
   valueStoreWrites: number;
-  projectionAppends: number;
-  projectionRemovals: number;
-  projectionRekeys: number;
 };
 
 type EntityLogicalWorkRow = {
   operation: EntityLogicalWorkOperation;
   positions: number;
-  projectionRebuilds: number;
-  projectionEntriesVisited: number;
-  projectionReplacements: number;
   publicAddPreviousTailReads: number;
   publicAddExistingKeysCopied: number;
 };
@@ -135,7 +125,6 @@ type PublicAddLogicalWorkRow = {
   publicAddExistingKeysCopied: number;
   structuralSubjectsCreated: number;
   valueStoreWrites: number;
-  projectionAppends: number;
 };
 
 type ScalarHarness = {
@@ -187,9 +176,6 @@ type StructuralAuditHarness = {
 
 type RestoreLogicalWorkRow = {
   positions: number;
-  projectionRebuilds: number;
-  projectionEntriesVisited: number;
-  projectionRestores: number;
   structuralActiveKeyLookups: number;
   structuralActiveKeyEntriesVisited: number;
 };
@@ -351,7 +337,6 @@ function createUndoEntityHarness(size: number): UndoEntityHarness {
 
 function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
   const valueStore = new EntityValueStore<EntityRow>();
-  const projection = new MaterializedEntityProjection<number, EntityRow>();
   const structuralStore = new StructuralStore<number>();
 
   for (let index = 0; index < size; index++) {
@@ -359,7 +344,6 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
     const entity = { id: index, value: index };
     structuralStore.createSubject(subjectId, index);
     valueStore.retainSubjectValue(subjectId, entity);
-    projection.replaceEntry(index, entity);
   }
 
   const stableKey = Math.floor(size / 2);
@@ -376,11 +360,7 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
 
   return {
     updateOne(value: number): void {
-      const frame = new EntityMutationFrame(
-        valueStore,
-        projection,
-        structuralStore
-      );
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageValueReplacement({
         kind: 'replace-value',
         key: stableKey,
@@ -388,14 +368,9 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
         nextValue: { id: stableKey, value },
       });
       const result = frame.commit();
-      frame.project(result);
     },
     addOne(): void {
-      const frame = new EntityMutationFrame(
-        valueStore,
-        projection,
-        structuralStore
-      );
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageFreshSubject({
         kind: 'create-fresh-subject',
         key: freshKey,
@@ -403,14 +378,9 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
         nextValue: { id: freshKey, value: freshKey },
       });
       const result = frame.commit();
-      frame.project(result);
     },
     removeOne(): void {
-      const frame = new EntityMutationFrame(
-        valueStore,
-        projection,
-        structuralStore
-      );
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageSubjectTombstone({
         kind: 'tombstone-subject',
         key: removableKey,
@@ -418,14 +388,9 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
         restoreAllowed: true,
       });
       const result = frame.commit();
-      frame.project(result);
     },
     changeId(): void {
-      const frame = new EntityMutationFrame(
-        valueStore,
-        projection,
-        structuralStore
-      );
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageKeyTransfer({
         kind: 'transfer-key',
         fromKey: stableKey,
@@ -433,14 +398,9 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
         subjectId: stableSubjectId,
       });
       const result = frame.commit();
-      frame.project(result);
     },
     runMixedFrame(): void {
-      const frame = new EntityMutationFrame(
-        valueStore,
-        projection,
-        structuralStore
-      );
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageKeyTransfer({
         kind: 'transfer-key',
         fromKey: stableKey,
@@ -466,7 +426,6 @@ function createProjectionFrameHarness(size: number): ProjectionFrameHarness {
         nextValue: { id: freshKey, value: freshKey },
       });
       const result = frame.commit();
-      frame.project(result);
     },
   };
 }
@@ -538,9 +497,8 @@ function createStructuralAuditHarness(size: number): StructuralAuditHarness {
   return {
     addOne(): void {
       const valueStore = new EntityValueStore<EntityRow>();
-      const projection = new MaterializedEntityProjection<number, EntityRow>();
       const structuralStore = seedAddStore();
-      const frame = new EntityMutationFrame(valueStore, projection, structuralStore);
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageFreshSubject({
         kind: 'create-fresh-subject',
         key: freshKey,
@@ -548,13 +506,11 @@ function createStructuralAuditHarness(size: number): StructuralAuditHarness {
         nextValue: { id: freshKey, value: freshKey },
       });
       const result = frame.commit();
-      frame.project(result);
     },
     removeOne(): void {
       const valueStore = new EntityValueStore<EntityRow>();
-      const projection = new MaterializedEntityProjection<number, EntityRow>();
       const structuralStore = seedRemoveStore();
-      const frame = new EntityMutationFrame(valueStore, projection, structuralStore);
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageSubjectTombstone({
         kind: 'tombstone-subject',
         key: removableKey,
@@ -562,13 +518,11 @@ function createStructuralAuditHarness(size: number): StructuralAuditHarness {
         restoreAllowed: true,
       });
       const result = frame.commit();
-      frame.project(result);
     },
     changeId(): void {
       const valueStore = new EntityValueStore<EntityRow>();
-      const projection = new MaterializedEntityProjection<number, EntityRow>();
       const structuralStore = seedChangeIdStore();
-      const frame = new EntityMutationFrame(valueStore, projection, structuralStore);
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageKeyTransfer({
         kind: 'transfer-key',
         fromKey: stableKey,
@@ -576,14 +530,12 @@ function createStructuralAuditHarness(size: number): StructuralAuditHarness {
         subjectId: stableSubjectId,
       });
       const result = frame.commit();
-      frame.project(result);
     },
   };
 }
 
 function createRestoreAuditHarness(size: number): { restoreOne(): void } {
   const valueStore = new EntityValueStore<EntityRow>();
-  const projection = new MaterializedEntityProjection<number, EntityRow>();
   const structuralStore = new StructuralStore<number>();
   const restoreKey = Math.floor(size / 2);
   const restoreSubjectId = restoreKey + 1;
@@ -595,19 +547,13 @@ function createRestoreAuditHarness(size: number): { restoreOne(): void } {
     const entity = { id: index, value: index };
     structuralStore.createSubject(subjectId, index);
     valueStore.retainSubjectValue(subjectId, entity);
-    projection.replaceEntry(index, entity);
   }
 
   structuralStore.tombstoneSubject(restoreSubjectId, restoreKey, true);
-  projection.removeEntry(restoreKey);
 
   return {
     restoreOne(): void {
-      const frame = new EntityMutationFrame(
-        valueStore,
-        projection,
-        structuralStore
-      );
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageSubjectRestore({
         kind: 'restore-subject',
         key: restoreKey,
@@ -618,14 +564,12 @@ function createRestoreAuditHarness(size: number): { restoreOne(): void } {
         realizedValue: { id: restoreKey, value: restoreKey },
       });
       const result = frame.commit();
-      frame.project(result);
     },
   };
 }
 
 function createProjectionRestoreHarness(size: number): ProjectionRestoreHarness {
   const valueStore = new EntityValueStore<EntityRow>();
-  const projection = new MaterializedEntityProjection<number, EntityRow>();
   const structuralStore = new StructuralStore<number>();
   const restoreKey = Math.floor(size / 2);
   const restoreSubjectId = restoreKey + 1;
@@ -637,16 +581,11 @@ function createProjectionRestoreHarness(size: number): ProjectionRestoreHarness 
     const entity = { id: index, value: index };
     structuralStore.createSubject(subjectId, index);
     valueStore.retainSubjectValue(subjectId, entity);
-    projection.replaceEntry(index, entity);
   }
 
   return {
     prepareRestore(): void {
-      const frame = new EntityMutationFrame(
-        valueStore,
-        projection,
-        structuralStore
-      );
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageSubjectTombstone({
         kind: 'tombstone-subject',
         key: restoreKey,
@@ -654,14 +593,9 @@ function createProjectionRestoreHarness(size: number): ProjectionRestoreHarness 
         restoreAllowed: true,
       });
       const result = frame.commit();
-      frame.project(result);
     },
     restoreOne(): void {
-      const frame = new EntityMutationFrame(
-        valueStore,
-        projection,
-        structuralStore
-      );
+      const frame = new EntityMutationFrame(valueStore, structuralStore);
       frame.stageSubjectRestore({
         kind: 'restore-subject',
         key: restoreKey,
@@ -672,7 +606,6 @@ function createProjectionRestoreHarness(size: number): ProjectionRestoreHarness 
         realizedValue: { id: restoreKey, value: restoreKey },
       });
       const result = frame.commit();
-      frame.project(result);
     },
   };
 }
@@ -944,9 +877,6 @@ function measureEntityLogicalWorkRows(
     rows.push({
       operation,
       positions,
-      projectionRebuilds: stats.projectionRebuilds,
-      projectionEntriesVisited: stats.projectionEntriesVisited,
-      projectionReplacements: stats.projectionReplacements,
       publicAddPreviousTailReads: stats.publicAddPreviousTailReads,
       publicAddExistingKeysCopied: stats.publicAddExistingKeysCopied,
     });
@@ -998,9 +928,6 @@ function measureEntityFrameLogicalWorkRows(
       structuralSubjectTransfers: stats.structuralSubjectTransfers,
       structuralSubjectTombstones: stats.structuralSubjectTombstones,
       valueStoreWrites: stats.valueStoreWrites,
-      projectionAppends: stats.projectionAppends,
-      projectionRemovals: stats.projectionRemovals,
-      projectionRekeys: stats.projectionRekeys,
     });
   };
 
@@ -1036,9 +963,6 @@ function measureRestoreLogicalWorkRows(
     harness.restoreOne();
     rows.push({
       positions: size,
-      projectionRebuilds: stats.projectionRebuilds,
-      projectionEntriesVisited: stats.projectionEntriesVisited,
-      projectionRestores: stats.projectionRestores,
       structuralActiveKeyLookups: stats.structuralActiveKeyLookups,
       structuralActiveKeyEntriesVisited: stats.structuralActiveKeyEntriesVisited,
     });
@@ -1065,7 +989,6 @@ function measurePublicAddLogicalWorkRows(
         publicAddExistingKeysCopied: stats.publicAddExistingKeysCopied,
         structuralSubjectsCreated: stats.structuralSubjectsCreated,
         valueStoreWrites: stats.valueStoreWrites,
-        projectionAppends: stats.projectionAppends,
       });
     } finally {
       harness.destroy();
@@ -1090,9 +1013,6 @@ function measurePublicUndoLogicalWorkRows(
       harness.undoRemove();
       rows.push({
         positions: size,
-        projectionRebuilds: stats.projectionRebuilds,
-        projectionEntriesVisited: stats.projectionEntriesVisited,
-        projectionRestores: stats.projectionRestores,
         publicUndoPositionEntriesExamined:
           stats.publicUndoPositionEntriesExamined,
         publicUndoTurnEffectsExamined: stats.publicUndoTurnEffectsExamined,
@@ -1147,13 +1067,6 @@ describe('Complexity guard: production scalar substrate', () => {
           publicationDependencyReads: 1,
           publications: 0,
           treeVisits: 0,
-          projectionRebuilds: 0,
-          projectionEntriesVisited: 0,
-          projectionReplacements: 0,
-          projectionAppends: 0,
-          projectionRemovals: 0,
-          projectionRekeys: 0,
-          projectionRestores: 0,
           structuralActiveKeyLookups: 0,
           structuralActiveKeyEntriesVisited: 0,
           structuralSubjectsCreated: 0,
@@ -1177,13 +1090,6 @@ describe('Complexity guard: production scalar substrate', () => {
           publicationDependencyReads: 1,
           publications: 1,
           treeVisits: 0,
-          projectionRebuilds: 0,
-          projectionEntriesVisited: 0,
-          projectionReplacements: 0,
-          projectionAppends: 0,
-          projectionRemovals: 0,
-          projectionRekeys: 0,
-          projectionRestores: 0,
           structuralActiveKeyLookups: 0,
           structuralActiveKeyEntriesVisited: 0,
           structuralSubjectsCreated: 0,
@@ -1217,13 +1123,6 @@ describe('Complexity guard: production scalar substrate', () => {
             publicationDependencyReads: 0,
             publications: width,
             treeVisits: 0,
-            projectionRebuilds: 0,
-            projectionEntriesVisited: 0,
-            projectionReplacements: 0,
-            projectionAppends: 0,
-            projectionRemovals: 0,
-            projectionRekeys: 0,
-            projectionRestores: 0,
             structuralActiveKeyLookups: 0,
             structuralActiveKeyEntriesVisited: 0,
             structuralSubjectsCreated: 0,
@@ -1257,9 +1156,6 @@ describe('Complexity audit: entity structural projection maintenance', () => {
       expect(updateRow).toEqual({
         operation: 'entity-updateOne',
         positions: size,
-        projectionRebuilds: 0,
-        projectionEntriesVisited: 0,
-        projectionReplacements: 1,
         publicAddPreviousTailReads: 0,
         publicAddExistingKeysCopied: 0,
       });
@@ -1270,9 +1166,6 @@ describe('Complexity audit: entity structural projection maintenance', () => {
       expect(addRow).toEqual({
         operation: 'entity-addOne',
         positions: size,
-        projectionRebuilds: 0,
-        projectionEntriesVisited: 0,
-        projectionReplacements: 0,
         publicAddPreviousTailReads: 0,
         publicAddExistingKeysCopied: 0,
       });
@@ -1283,9 +1176,6 @@ describe('Complexity audit: entity structural projection maintenance', () => {
       expect(removeRow).toEqual({
         operation: 'entity-removeOne',
         positions: size,
-        projectionRebuilds: 0,
-        projectionEntriesVisited: 0,
-        projectionReplacements: 0,
         publicAddPreviousTailReads: 0,
         publicAddExistingKeysCopied: 0,
       });
@@ -1296,9 +1186,6 @@ describe('Complexity audit: entity structural projection maintenance', () => {
       expect(changeIdRow).toEqual({
         operation: 'entity-changeId',
         positions: size,
-        projectionRebuilds: 0,
-        projectionEntriesVisited: 0,
-        projectionReplacements: 0,
         publicAddPreviousTailReads: 0,
         publicAddExistingKeysCopied: 0,
       });
@@ -1311,9 +1198,6 @@ describe('Complexity audit: entity structural projection maintenance', () => {
       expect(mixedRow).toEqual({
         operation: 'entity-mixed-structural-frame',
         positions: size,
-        projectionRebuilds: 0,
-        projectionEntriesVisited: 0,
-        projectionReplacements: 1,
         publicAddPreviousTailReads: 0,
         publicAddExistingKeysCopied: 0,
       });
@@ -1339,7 +1223,6 @@ describe('Complexity audit: public fresh-add bookkeeping', () => {
         publicAddExistingKeysCopied: 0,
         structuralSubjectsCreated: 1,
         valueStoreWrites: 1,
-        projectionAppends: 1,
       });
     }
   });
@@ -1368,9 +1251,6 @@ describe('Complexity audit: structural store order bookkeeping', () => {
         structuralSubjectTransfers: 0,
         structuralSubjectTombstones: 0,
         valueStoreWrites: 1,
-        projectionAppends: 1,
-        projectionRemovals: 0,
-        projectionRekeys: 0,
       });
 
       const removeRow = rows.find(
@@ -1385,9 +1265,6 @@ describe('Complexity audit: structural store order bookkeeping', () => {
         structuralSubjectTransfers: 0,
         structuralSubjectTombstones: 1,
         valueStoreWrites: 0,
-        projectionAppends: 0,
-        projectionRemovals: 1,
-        projectionRekeys: 0,
       });
 
       const changeIdRow = rows.find(
@@ -1402,9 +1279,6 @@ describe('Complexity audit: structural store order bookkeeping', () => {
         structuralSubjectTransfers: 1,
         structuralSubjectTombstones: 0,
         valueStoreWrites: 0,
-        projectionAppends: 0,
-        projectionRemovals: 0,
-        projectionRekeys: 1,
       });
     }
     },
@@ -1424,9 +1298,6 @@ describe('Complexity audit: restore-one projection maintenance', () => {
       const row = rows.find((candidate) => candidate.positions === size);
       expect(row).toEqual({
         positions: size,
-        projectionRebuilds: 0,
-        projectionEntriesVisited: 0,
-        projectionRestores: 1,
         structuralActiveKeyLookups: 0,
         structuralActiveKeyEntriesVisited: 0,
       });
@@ -1448,9 +1319,6 @@ describe('Complexity audit: public undo-of-remove realization', () => {
         const row = rows.find((candidate) => candidate.positions === size);
         expect(row).toEqual({
           positions: size,
-          projectionRebuilds: 0,
-          projectionEntriesVisited: 0,
-          projectionRestores: 1,
           publicUndoPositionEntriesExamined: 2,
           publicUndoTurnEffectsExamined: 1,
         });

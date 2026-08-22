@@ -12,7 +12,6 @@ import {
 } from './physical/entity-mutation-frame';
 import { resolveEntityHandle } from './physical/entity-handle-resolution';
 import { EntityValueStore } from './physical/entity-value-store';
-import { MaterializedEntityProjection } from './physical/materialized-entity-projection';
 import {
   StructuralStore,
   type AcquiredSubjectHandle,
@@ -250,7 +249,6 @@ export function createEntitySignal<
   // Derived materialized projection only.
   // Authoritative structural state lives in structuralStore.
   // Authoritative subject values live in valueStore.
-  const materializedProjection = new MaterializedEntityProjection<K, E>();
 
   /**
    * Collection version. Bumped once per mutation; every collection query below
@@ -295,18 +293,6 @@ export function createEntitySignal<
     return getProjectedEntries().map(([, entity]) => entity);
   }
 
-  function rebuildStorageProjection(): void {
-    materializedProjection.rebuild(structuralStore, valueStore);
-  }
-
-  function writeStorageProjectionEntry(id: K, entity: E): void {
-    materializedProjection.replaceEntry(id, entity);
-  }
-
-  function snapshotStorageProjection(): ReadonlyMap<K, E> {
-    return materializedProjection.snapshot();
-  }
-
   function acquireEntityHandleForTesting(
     id: K
   ): AcquiredSubjectHandle | undefined {
@@ -321,16 +307,8 @@ export function createEntitySignal<
     return new Map(getProjectedEntries());
   }
 
-  function clearStorageProjectionForTesting(): void {
-    materializedProjection.clearForTesting();
-  }
-
   function createEntityMutationFrame(): EntityMutationFrame<K, E> {
-    return new EntityMutationFrame(
-      valueStore,
-      materializedProjection,
-      structuralStore
-    );
+    return new EntityMutationFrame(valueStore, structuralStore);
   }
 
   function commitAndProjectEntityMutationFrame(
@@ -338,7 +316,6 @@ export function createEntitySignal<
     options?: { advancePhysicalRevision?: boolean }
   ) {
     const result = frame.commit();
-    frame.project(result);
     if (options?.advancePhysicalRevision !== false) {
       physicalCommitClock?.advance();
     }
@@ -655,7 +632,6 @@ export function createEntitySignal<
    */
   function moveToFront(ids: K[]): void {
     structuralStore.moveKeysToFront(ids);
-    rebuildStorageProjection();
     physicalCommitClock?.advance();
     updateSignals();
   }
@@ -2392,7 +2368,6 @@ export function createEntitySignal<
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
         valueStore.retainSubjectValue(subjectId, transformedEntity);
-        writeStorageProjectionEntry(id, transformedEntity);
         invalidateNodeCache(id);
         syncEntitySignal(id);
         addedEntities.push({ id, entity: transformedEntity, subjectId });
@@ -2413,7 +2388,6 @@ export function createEntitySignal<
         transformedChanges,
       } of stagedUpdates) {
         valueStore.retainSubjectValue(subjectId, finalUpdated);
-        writeStorageProjectionEntry(id, finalUpdated);
         syncEntitySignal(id);
         updatedEntities.push({ id, subjectId, prev, finalUpdated, transformedChanges });
       }
@@ -2491,8 +2465,6 @@ export function createEntitySignal<
         );
         publishSubjectPhysicalChange(subjectId);
       }
-
-      rebuildStorageProjection();
       activeIdSignal.set(undefined);
       lastSubjectIds = activeSubjects.map(({ subjectId }) => subjectId);
       resetEntitySignals();
@@ -2684,7 +2656,6 @@ export function createEntitySignal<
       }
 
       structuralStore.reorderActiveKeys(stagedIncomingIds);
-      rebuildStorageProjection();
 
       lastSubjectIds = [
         ...stagedRemovals.map(({ subjectId }) => subjectId),
@@ -2895,11 +2866,6 @@ export function createEntitySignal<
     enumerable: false,
     configurable: true,
   });
-  Object.defineProperty(api, '__snapshotStorageProjectionForTesting', {
-    value: snapshotStorageProjection,
-    enumerable: false,
-    configurable: true,
-  });
   Object.defineProperty(api, '__acquireEntityHandleForTesting', {
     value: acquireEntityHandleForTesting,
     enumerable: false,
@@ -2912,16 +2878,6 @@ export function createEntitySignal<
   });
   Object.defineProperty(api, '__rebuildActiveProjectionFromOwnersForTesting', {
     value: rebuildActiveProjectionFromOwners,
-    enumerable: false,
-    configurable: true,
-  });
-  Object.defineProperty(api, '__clearStorageProjectionForTesting', {
-    value: clearStorageProjectionForTesting,
-    enumerable: false,
-    configurable: true,
-  });
-  Object.defineProperty(api, '__rebuildStorageProjectionForTesting', {
-    value: rebuildStorageProjection,
     enumerable: false,
     configurable: true,
   });

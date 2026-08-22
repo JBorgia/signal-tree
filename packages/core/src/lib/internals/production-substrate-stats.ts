@@ -7,13 +7,6 @@ export interface ProductionSubstrateStats {
   publicationDependencyReads: number;
   publications: number;
   treeVisits: number;
-  projectionRebuilds: number;
-  projectionEntriesVisited: number;
-  projectionReplacements: number;
-  projectionAppends: number;
-  projectionRemovals: number;
-  projectionRekeys: number;
-  projectionRestores: number;
   structuralActiveKeyLookups: number;
   structuralActiveKeyEntriesVisited: number;
   structuralSubjectsCreated: number;
@@ -53,13 +46,6 @@ export function resetProductionSubstrateStatsForTesting(
   stats.publicationDependencyReads = 0;
   stats.publications = 0;
   stats.treeVisits = 0;
-  stats.projectionRebuilds = 0;
-  stats.projectionEntriesVisited = 0;
-  stats.projectionReplacements = 0;
-  stats.projectionAppends = 0;
-  stats.projectionRemovals = 0;
-  stats.projectionRekeys = 0;
-  stats.projectionRestores = 0;
   stats.structuralActiveKeyLookups = 0;
   stats.structuralActiveKeyEntriesVisited = 0;
   stats.structuralSubjectsCreated = 0;
@@ -94,13 +80,6 @@ function createProductionSubstrateStats(): ProductionSubstrateStats {
     publicationDependencyReads: 0,
     publications: 0,
     treeVisits: 0,
-    projectionRebuilds: 0,
-    projectionEntriesVisited: 0,
-    projectionReplacements: 0,
-    projectionAppends: 0,
-    projectionRemovals: 0,
-    projectionRekeys: 0,
-    projectionRestores: 0,
     structuralActiveKeyLookups: 0,
     structuralActiveKeyEntriesVisited: 0,
     structuralSubjectsCreated: 0,
