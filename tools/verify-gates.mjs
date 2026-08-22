@@ -518,6 +518,36 @@ const GATES = [
     },
   },
   {
+    name: 'update-matrix',
+    covers:
+      'every arm of the cross-library update matrix constructs, runs and satisfies its postconditions',
+    // NOT a performance budget and must not become one — timings move with
+    // machine load far more than with code. What this proves is that all four
+    // arms still BUILD and that every operation's postcondition fires, so a
+    // silently dropped write cannot be reported as the fastest arm in the
+    // table. The numbers are read by a human from
+    // docs/architecture/v15-update-matrix-baseline.md.
+    cmd: [
+      'node',
+      '--expose-gc',
+      'tools/bench-update-matrix.mjs',
+      '--axis',
+      'consumers',
+      '--samples',
+      '1',
+    ],
+    slow: true,
+    needsBuild: true,
+    mutation: {
+      // Break the write so it lands nowhere. Every arm's postcondition reads
+      // back what it wrote, so this must fail; a harness that timed a no-op
+      // would report the broken arm as the fastest one here.
+      file: 'tools/bench-update-matrix.mjs',
+      find: '      updateOne: (id, changes) => tree.$.rows.updateOne(id, changes),',
+      replace: '      updateOne: () => undefined,',
+    },
+  },
+  {
     name: 'retired-subject-slope',
     covers:
       'retention does not grow with the number of subjects that have retired — the asymptotic claim a byte budget cannot express',
