@@ -184,16 +184,84 @@ describe('restoration authority is fixed at construction', () => {
   });
 
   /**
-   * NOT YET ASSERTABLE. The eligibility rule above is what makes reclaiming a
-   * zero-owner retirement safe, but no production path calls
-   * `runPhysicalMaintenance`, so there is nothing to observe yet. When that
-   * lands, this becomes: retire with no owner attached -> maintenance reclaims
-   * the backing -> attaching an owner afterwards still cannot restore it.
+   * ZERO-OWNER RECLAMATION. Was an `it.todo` while nothing drove reclamation;
+   * the retirement boundary drives it now, for this case only.
    *
-   * Deliberately a `todo` rather than a skipped assertion: a skipped test that
-   * looks like coverage is worse than an explicit gap.
+   * The two rows are a matched pair and neither means anything alone. The
+   * positive row alone would pass against an implementation that reclaimed
+   * unconditionally — which would be a data-loss bug, not a fix — so the
+   * negative control is what makes it a result.
    */
-  it.todo(
-    'reclaims backing for a subject retired with no restoration owner attached'
-  );
+  const inspect = (rows: unknown, subjectId: number) =>
+    (
+      rows as {
+        __inspectSubjectResources: (id: number) =>
+          | { retainedValueBacking: unknown; state: string }
+          | undefined;
+      }
+    ).__inspectSubjectResources(subjectId);
+
+  const subjectIdOf = (rows: unknown, key: string) =>
+    (
+      rows as { __acquireEntityHandleForTesting: (k: string) => { subjectId: number } }
+    ).__acquireEntityHandleForTesting(key).subjectId;
+
+  it('reclaims backing for a subject retired with no restoration owner', async () => {
+    const tree = signalTree({
+      rows: entityMap<{ id: string; name: string }, string>({
+        selectId: (r) => r.id,
+      }),
+    });
+    tree.$.rows.setAll([
+      { id: 'A', name: 'Alpha' },
+      { id: 'B', name: 'Beta' },
+    ]);
+    await tick();
+
+    const subjectA = subjectIdOf(tree.$.rows, 'A');
+    expect(inspect(tree.$.rows, subjectA)?.retainedValueBacking).toBeDefined();
+
+    tree.$.rows.removeOne('A');
+    await tick();
+
+    const after = inspect(tree.$.rows, subjectA);
+    expect(after?.state).toBe('tombstoned');
+    // The bytes are released at the moment of retirement, not on a later sweep:
+    // with no restorer there is no turn that could be holding them.
+    expect(after?.retainedValueBacking).toBeUndefined();
+    // The surviving subject is untouched.
+    expect(tree.$.rows.byId('B')?.().name).toBe('Beta');
+  });
+
+  it('does NOT reclaim when a restoration owner is configured', async () => {
+    // The control. Reclaiming here would delete the value `undo()` restores.
+    const tree = signalTree(
+      {
+        rows: entityMap<{ id: string; name: string }, string>({
+          selectId: (r) => r.id,
+        }),
+      },
+      {
+        enhancers: [timeTravel({ maxHistorySize: 20 })],
+        capabilities: ['causal-runtime'],
+      }
+    );
+    tree.$.rows.setAll([
+      { id: 'A', name: 'Alpha' },
+      { id: 'B', name: 'Beta' },
+    ]);
+    await tick();
+
+    const subjectA = subjectIdOf(tree.$.rows, 'A');
+    tree.$.rows.removeOne('A');
+    await tick();
+
+    expect(inspect(tree.$.rows, subjectA)?.state).toBe('tombstoned');
+    expect(inspect(tree.$.rows, subjectA)?.retainedValueBacking).toBeDefined();
+
+    // And the backing is not merely present — it is the thing undo needs.
+    tree.undo();
+    await tick();
+    expect(tree.$.rows.byId('A')?.().name).toBe('Alpha');
+  });
 });

@@ -1,6 +1,8 @@
 # Entity churn retention — pre-registered interpretation
 
-**Status:** OPEN. Measured, attributed, not fixed.
+**Status:** OPEN. Partially addressed in 15.0 and the criteria below were
+CHECKED against it: criterion 1 FAILED, criteria 2-4 met. Do not read the
+15.0 reclamation as resolving this document.
 Reproduce with `node --expose-gc tools/bench-entity-churn-retention.mjs`.
 
 This document is written **before** any fix, and says in advance what would
@@ -101,3 +103,46 @@ A fix resolves this if and only if, with `--width 1000 --rounds 150`:
 - Not a fix direction. `retireSubject` already exists and already fails to
   delete; whether the answer is deletion, a weak lifetime map, or a reclamation
   pass on tombstone is a design question this document does not prejudge.
+
+
+---
+
+## Criteria checked against 15.0 zero-owner reclamation
+
+`node --expose-gc tools/bench-entity-churn-retention.mjs --width 1000
+--rounds {50,150}`, against the retirement-boundary reclamation described in
+[retired-subject-churn.md](./retired-subject-churn.md), "RESOLUTION".
+
+| # | criterion                                              | verdict  | evidence                                                              |
+| - | ------------------------------------------------------ | -------- | --------------------------------------------------------------------- |
+| 1 | no-history arm stops growing per retired subject        | **FAIL** | `no-history` 117 B at 50 rounds, 140 B at 150 — not falling            |
+| 2 | `timeTravel()` still restores a removed row after churn | pass     | both time-travel arms byte-identical; restore specs unchanged and green |
+| 3 | live-collection retention does not regress              | pass     | `bench-entity-layers.mjs` L4 487 B/entity, unmoved                     |
+| 4 | reclamation is not opt-in                               | pass     | runs at the retirement boundary; no public `compact()`                 |
+
+Criterion 1 is the one that matters and it failed. The reduction is real and
+large — at 50 rounds, `no-history` 249 B → 117 B and `no-history-reads`
+797 B → 117 B — but the shape did not change. Tripling the rounds does not push
+the per-subject cost toward zero; it rises slightly as the fixed component
+amortizes the other way:
+
+```text
+                     50 rounds   150 rounds
+  no-history            117 B       140 B
+  no-history-reads      117 B       131 B
+```
+
+Growth is still linear in retired subjects with no plateau. The reclaimed half
+was the entity value; the surviving half is the per-subject lifetime record, and
+nothing about reclaiming values makes that bounded.
+
+(The 150-round BEFORE column is not measured here. The 50-round pair is the
+controlled comparison; the 150-round run exists to test the shape, not the
+delta.)
+
+Criterion 3's threshold in the list above (~1,181 B/entity) is stale — it
+predates the materialized-projection deletion, and L4 has since moved to
+~487 B/entity. The criterion is "does not regress", and it did not.
+
+This document stays open. Closing it requires the residual to become bounded,
+which is a different piece of work from the one measured here.

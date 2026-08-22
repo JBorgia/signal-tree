@@ -17,6 +17,9 @@ import {
   type PositionRegistry,
 } from './position-registry';
 import type { PhysicalCommitClock } from './physical-commit-clock';
+import { createRuntimeTreePlan } from './runtime-tree-plan';
+import type { RuntimeTreePlan } from './runtime-tree-plan';
+import type { TreeCapability } from '../types';
 import { getPathNotifier, PathNotifier } from '../path-notifier';
 import { isNodeAccessor, isTraversableNode } from './node-shape';
 
@@ -72,15 +75,31 @@ export interface MaterializationContext {
   positionRegistry: PositionRegistry;
   positionTopologyEnabled: boolean;
   physicalCommitClock?: PhysicalCommitClock;
-  hasCapability: (capability: 'mutation-capture' | 'position-topology') => boolean;
+  hasCapability: (capability: TreeCapability) => boolean;
+  /**
+   * The finalized build plan, as the runtime queries a materialized node makes
+   * of it. Carried here because markers materialize during construction and the
+   * subsystems they create — `entityMap`'s retirement boundary above all — need
+   * the answer long afterwards.
+   */
+  runtimeTreePlan: RuntimeTreePlan;
   allocatePositionId: (parentPositionId?: number) => number;
 }
 
 export function createMaterializationContext(
   positionTopologyEnabled = true,
-  hasCapability: (capability: 'mutation-capture' | 'position-topology') => boolean =
-    (capability) =>
-      capability === 'position-topology' ? positionTopologyEnabled : true,
+  /**
+   * The default is PERMISSIVE, and that is the fail-safe direction here.
+   *
+   * A context built without a plan — a test, or a direct materialization —
+   * answers `true` for everything except position topology, so
+   * `hasRestorationAuthority` is `true` and the retirement boundary RETAINS.
+   * Reclaiming a subject some unseen owner could still restore is
+   * unrecoverable; retaining one nothing will restore costs bytes. Never invert
+   * this default to make a test reclaim; pass a real predicate instead.
+   */
+  hasCapability: (capability: TreeCapability) => boolean = (capability) =>
+    capability === 'position-topology' ? positionTopologyEnabled : true,
   physicalCommitClock?: PhysicalCommitClock
 ): MaterializationContext {
   const positionRegistry = createPositionRegistry();
@@ -89,6 +108,7 @@ export function createMaterializationContext(
     positionTopologyEnabled,
     physicalCommitClock,
     hasCapability,
+    runtimeTreePlan: createRuntimeTreePlan(hasCapability),
     allocatePositionId: (parentPositionId?: number) =>
       positionRegistry.allocate(parentPositionId),
   };
