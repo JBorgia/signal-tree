@@ -56,21 +56,9 @@ const MARKERS = [
     const t = signalTree({ rows: entityMap({ selectId: (r) => r.id }) });
     t.$.rows.addOne({ id: 1 }); t.$.rows.updateOne(1, {});
     globalThis.__sink = [t.$.rows.all(), t.$.rows.count()];`],
-  ['entityMap + loader', 'entityMap, loader', `
-    const t = signalTree({ rows: entityMap({ selectId: (r) => r.id, load: loader(async () => []) }) });
-    t.$.rows.load(); globalThis.__sink = [t.$.rows.all(), t.$.rows.loading()];`],
-  ['stored', 'stored', `
-    const t = signalTree({ k: stored('k', 'v') });
-    t.$.k.set('w'); globalThis.__sink = [t.$.k()];`],
   ['compared', 'compared, byKeys', `
     const t = signalTree({ u: compared({ id: 1, v: 1 }, byKeys('id', 'v')) });
     t.$.u.set({ id: 1, v: 2 }); globalThis.__sink = [t.$.u()];`],
-  ['asyncSource', 'asyncSource', `
-    const t = signalTree({ s: asyncSource({ load: async () => 1 }) });
-    globalThis.__sink = [t.$.s(), t.$.s.loading()];`],
-  ['asyncQuery', 'asyncQuery', `
-    const t = signalTree({ q: asyncQuery({ initialResult: 0, query: async () => 1 }) });
-    globalThis.__sink = [t.$.q(), t.$.q.loading()];`],
 ];
 
 const ENHANCERS = [
@@ -127,27 +115,22 @@ for (const [label, code] of SUBPATHS) {
 
 // Realistic combinations — what an app actually ships.
 const COMBOS = [
-  ['typical app (entityMap + stored + asyncSource)', `
-    import { signalTree, entityMap, stored, asyncSource } from ${C};
+  ['typical app (entityMap + batching)', `
+    import { signalTree, entityMap, batching } from ${C};
     const t = signalTree({
       rows: entityMap({ selectId: (r) => r.id }),
-      k: stored('k', 'v'),
-      s: asyncSource({ load: async () => 1 }),
-    });
-    t.$.rows.addOne({ id: 1 }); t.$.k.set('w');
-    globalThis.__sink = [t.$.rows.all(), t.$.k(), t.$.s()];`],
-  ['everything', `
-    import { signalTree, entityMap, stored, compared, byKeys,
-             asyncSource, asyncQuery, loader, batching, timeTravel, serialization } from ${C};
+      count: 0,
+    }).with(batching());
+    t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.count.set(1); });
+    globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
+  ['current public surface mix', `
+    import { signalTree, entityMap, compared, byKeys,
+             batching, timeTravel, serialization } from ${C};
     const t = signalTree({
-      rows: entityMap({ selectId: (r) => r.id, load: loader(async () => []) }),
-      k: stored('k','v'),
+      rows: entityMap({ selectId: (r) => r.id }),
       u: compared({ id: 1 }, byKeys('id')),
-      s: asyncSource({ load: async () => 1 }),
-      q: asyncQuery({ initialResult: 0, query: async () => 1 }),
     }).with(batching()).with(timeTravel()).with(serialization());
-    t.$.rows.addOne({ id: 1 }); t.$.s.refresh(); t.$.q.input.set('x');
-    t.batch(() => t.$.k.set('w')); t.undo();
+    t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.u.set({ id: 1 }); }); t.undo();
     globalThis.__sink = [t.serialize()];`],
 ];
 out.combos = [];

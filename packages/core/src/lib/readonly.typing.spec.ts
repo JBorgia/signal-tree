@@ -27,14 +27,14 @@
 import { computed, type Signal } from '@angular/core';
 
 import {
-  asyncQuery,
-  asyncSource,
   entityMap,
   linked,
   signalTree,
-  stored,
 } from '../index';
+import { asyncQuery } from './markers/async-query';
+import { asyncSource } from './markers/async-source';
 import { loader } from './markers/loader';
+import { stored } from './markers/stored';
 import type {
   ReadonlyEntityNode,
   ReadonlyEntitySignal,

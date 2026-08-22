@@ -1,7 +1,8 @@
 import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
-import { entityMap, signalTree, stored } from '../index';
+import { entityMap, signalTree } from '../index';
+import { stored } from './markers/stored';
 
 /**
  * DERIVATION — SERIALIZATION, FROM ZERO.

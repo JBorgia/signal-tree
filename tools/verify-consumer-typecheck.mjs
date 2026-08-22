@@ -83,15 +83,12 @@ const SAMPLE = `
 import {
   signalTree,
   entityMap,
-  stored,
-  loader,
   compared,
   byKeys,
   timeTravel,
   serialization,
   batching,
 } from '@signaltree/core';
-import { createIndexedDBAdapter } from '@signaltree/core/storage';
 
 type User = { id: number; name: string; version: number };
 
@@ -99,13 +96,6 @@ const tree = signalTree({
   count: 0,
   user: { name: 'Ada', age: 36 },
   users: entityMap<User, number>({ selectId: (u: User) => u.id }),
-  remote: entityMap<User, number>({
-    selectId: (u: User) => u.id,
-    load: loader(async () => [] as User[], {
-      persist: { adapter: createIndexedDBAdapter(), key: 'users' },
-    }),
-  }),
-  theme: stored('theme', 'light' as 'light' | 'dark'),
   cached: compared({ id: 1, name: 'x', version: 1 } as User, byKeys<User>('id', 'version')),
 })
   // .with() takes ONE enhancer and is CHAINED. Passing several at once is
@@ -119,7 +109,6 @@ const tree = signalTree({
 const n: number = tree.$.count();
 const whole: { count: number } = tree() as { count: number };
 const rows: User[] = tree.$.users.all();
-const themeValue: 'light' | 'dark' = tree.$.theme();
 
 // Leaf writes — .set()/.update(), NOT leaf(value)
 tree.$.count.set(5);
@@ -140,7 +129,7 @@ const json: string = tree.serialize();
 tree.deserialize(json);
 tree.batch(() => tree.$.count.set(0));
 
-export const _used = [n, whole, rows, themeValue];
+export const _used = [n, whole, rows];
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
 

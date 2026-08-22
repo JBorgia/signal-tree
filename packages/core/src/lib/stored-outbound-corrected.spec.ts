@@ -1,6 +1,7 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 
-import { signalTree, stored } from '../index';
+import { signalTree } from '../index';
+import { stored } from './markers/stored';
 
 /**
  * CORRECTED — `stored` OUTBOUND. The previous null was INVALID.

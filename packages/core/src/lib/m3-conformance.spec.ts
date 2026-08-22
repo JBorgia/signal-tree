@@ -1,7 +1,8 @@
 import { isSignal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
-import { entityMap, signalTree, stored } from '../index';
+import { entityMap, signalTree } from '../index';
+import { stored } from './markers/stored';
 
 /**
  * M3 — IS A REALIZED VALUE'S STATE IDENTIFIABLE BY A UNIFORM RULE?

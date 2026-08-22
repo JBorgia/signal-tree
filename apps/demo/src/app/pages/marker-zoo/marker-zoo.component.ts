@@ -2,11 +2,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import {
-  entityMap,
-  signalTree,
-  stored,
-} from '@signaltree/core';
+import { entityMap, signalTree } from '@signaltree/core';
 
 import { CodeTabsComponent } from '../../examples/shared/components/example-shell';
 import type { CodeFile } from '../../examples/shared/components/example-shell';
@@ -57,7 +53,6 @@ const ALL_PLANTS: Plant[] = [
  * compose features at the store root.
  *
  * Depth map:
- *   depth 2: settings.theme (stored),
  *   depth 3: organization.teams.list (entityMap)
  *   depth 4: organization.teams.catalog.plants (plain nested entityMap)
  */
@@ -75,14 +70,6 @@ export class MarkerZooComponent {
       label: 'entityMap.ts',
       language: 'typescript',
       source: `store.$.organization.teams.list.all()`,
-    },
-  ];
-
-  readonly storedCode: CodeFile[] = [
-    {
-      label: 'stored.ts',
-      language: 'typescript',
-      source: `theme: stored('marker-zoo-theme', 'light')`,
     },
   ];
 
@@ -113,12 +100,6 @@ store.$.organization.teams.catalog.plants.setAll(rows); // app service owns load
         },
       },
     },
-
-    // depth 2 — stored marker for auto-synced localStorage preference
-    settings: {
-      theme: stored('marker-zoo-theme', 'light' as 'light' | 'dark'),
-    },
-
   });
 
   loadTeams(): void {
@@ -128,14 +109,6 @@ store.$.organization.teams.catalog.plants.setAll(rows); // app service owns load
   loadPlants(): void {
     this.store.$.organization.teams.catalog.plants.setAll(ALL_PLANTS);
   }
-
-  toggleTheme(): void {
-    this.store.$.settings.theme.update((t) => (t === 'light' ? 'dark' : 'light'));
-  }
-
-
-
-
 
   resetAll(): void {
     this.store.$.organization.teams.list.clear();

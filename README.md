@@ -28,7 +28,6 @@ State is modeled as the shape of your data, and the capabilities you'd otherwise
 - **`form()`** (`@signaltree/ng-forms`) → tree-integrated reactive forms with validation and wizards
 - **`.derived()`** → computed state deep-merged at any path
 - **`timeTravel()`** → undo/redo with configurable history depth
-- **`stored()`** → localStorage autosave with migrations and durable writes (auto-drained on background/unload)
 
 ### Use SignalTree if you need
 
@@ -36,7 +35,6 @@ State is modeled as the shape of your data, and the capabilities you'd otherwise
 - Undo / redo (`timeTravel` enhancer)
 - Typed normalized collections with O(1) lookups (`entityMap`)
 - Reactive forms with validation, wizards, and persistence (`form()` marker)
-- localStorage autosave with migrations and background/kill-safe writes (`stored()` marker)
 - State that mirrors your data shape, not Redux ceremony
 
 ### Production architecture
@@ -102,8 +100,8 @@ from a domain to a workload is judgment, so validate it against your own app.
 | Workload                                          | Typical domains                                                                                     | What the measurements say                                                                     | What teams usually pick              |
 | ------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------ |
 | Streaming telemetry into many per-entity bindings | Fleet & logistics, grid/SCADA, telecom NOC, manufacturing MES, airline & rail ops, trading blotters | **SignalTree, decisively** — 448× at 1,000 consumers                                          | SignalTree                           |
-| Offline-first with server-owned collections       | Field service, mobile ops                                                                           | **SignalTree** — `loader` + `hydrateThenRevalidate`                                           | SignalTree                           |
-| Deep nested forms with audit and persistence      | Healthcare, claims, regulated workflows                                                             | **SignalTree** — `form()`, `history()`, `stored()` are primitives here and assembly elsewhere | Toss-up; governance decides          |
+| Offline-first with server-owned collections       | Field service, mobile ops                                                                           | **Application-owned loading + `entityMap`** until a cache helper earns RC authority           | SignalTree                           |
+| Deep nested forms with audit and persistence      | Healthcare, claims, regulated workflows                                                             | **SignalTree** — `form()` and history are primitives here; persistence stays app-owned for RC | Toss-up; governance decides          |
 | CRUD over moderate lists, server round-trips      | CRM, ERP, admin consoles, insurance                                                                 | **SignalTree leans** — ~3× on the collection task, tens of × on undo                          | `@ngrx/signals`, on gravity          |
 | Drag-driven boards and schedules                  | Dispatch, Gantt, planning                                                                           | **SignalTree leans** — high write frequency, per-item bindings, moderate collections          | Toss-up                              |
 | Undo/redo over moderate state                     | Editors-in-a-panel, wizards, bulk edit                                                              | **SignalTree** — `@ngrx/signals` has no undo primitive at all                                 | Hand-rolled history (the 262 ms arm) |
@@ -131,8 +129,8 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
   [Ops recipe](docs/guides/composition-recipes.md#2-a-reusable-entity-crud-ops-base).
 - **Async data** — keep local loading flags as ordinary state and put
   orchestration in application services or framework primitives.
-- **Undo/redo, persistence, DevTools** — `timeTravel()`, `stored()` with migrations, `history()` /
-  `trackHistory()`, Redux DevTools integration. All included, none hand-wired.
+- **Undo/redo and DevTools** — `timeTravel()` and Redux DevTools integration. Persistence stays in
+  application services until a new public contract earns the release surface.
 - **State that will grow.** Starting simple is fine — the shape _is_ the API, so adding a domain or
   attaching a marker at a new node doesn't restructure anything you already wrote. You don't need to
   predict your final shape to start.
@@ -249,12 +247,12 @@ Pass `sortComparer` to keep `all()`/`ids()` sorted on every read (`@ngrx/entity`
 Markers declare special node behavior at tree creation time:
 
 ```typescript
-import { signalTree, entityMap, stored } from '@signaltree/core';
+import { signalTree, entityMap } from '@signaltree/core';
 
 const store = signalTree({
   users: entityMap<User>(), // Normalized entity collection (see above)
   loadingState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
-  preference: stored('pref-key', 'light'), // Auto-persisted to localStorage (key, default)
+  preference: 'light' as 'light' | 'dark',
 });
 
 store.$.loadingState.set('loading');

@@ -146,42 +146,11 @@ store.$.users.loadStatus.set('loading');
 store.$.users.error.set(null);
 ```
 
-### `stored(key, defaultValue, options?)`
+### Persistence
 
-Auto-persists signal value to localStorage.
-
-```typescript
-import { stored } from '@signaltree/core';
-
-const store = signalTree({
-  settings: {
-    theme: stored('app-theme', 'light'),
-    language: stored('app-lang', 'en'),
-    notifications: stored('app-notifications', true),
-  },
-});
-
-// Read (auto-loads from localStorage)
-store.$.settings.theme(); // 'light' or value from localStorage
-
-// Write (auto-saves to localStorage)
-store.$.settings.theme.set('dark');
-
-// Additional methods:
-store.$.settings.theme.clear(); // Remove from localStorage, reset to default (cancels pending write)
-store.$.settings.theme.reload(); // Re-read from localStorage, runs migrations (cancels pending write)
-store.$.settings.theme.flush(); // Commit a pending debounced write synchronously
-```
-
-Writes are debounced (default 100 ms) and drained automatically on
-`visibilitychange` → hidden / `pagehide`, so a value set just before the app is
-backgrounded or the tab closes is not lost. (A hard kill with no preceding
-lifecycle event can still drop it — use `debounceMs: 0` for keys that must
-never sit in a debounce window.) Options: `debounceMs` (0 = synchronous write),
-`maxWaitMs` (caps write delay under continuous updates), `onError(error, { key, operation })`
-(storage failure hook). `flushAllStoredSignals()` (exported from
-`@signaltree/core`) drains every stored signal — call it from native lifecycle
-hooks like Capacitor's `App` `'pause'` event.
+The old `stored(key, defaultValue, options?)` marker is not part of the current
+release-candidate public API. Keep browser persistence in an application-owned
+service and write resolved values into ordinary SignalTree state.
 
 ---
 
@@ -775,19 +744,16 @@ const store = signalTree({
 + tree.$.users.status.setError(error);
 ```
 
-### Step 3: Add `stored()` for persisted settings
+### Step 3: Keep persisted settings in an app service
 
 ```diff
-+ import { stored } from '@signaltree/core';
-
 const store = signalTree({
   settings: {
--   theme: 'light' as 'light' | 'dark',
-+   theme: stored('app-theme', 'light' as 'light' | 'dark'),
+    theme: 'light' as 'light' | 'dark',
   }
 });
 
-// Remove manual localStorage code
+// Load/save settings in an application service, then write the resolved value.
 - localStorage.setItem('app-theme', theme);
 - const savedTheme = localStorage.getItem('app-theme');
 ```

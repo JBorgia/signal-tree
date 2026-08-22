@@ -2,106 +2,37 @@
   <div class="demo-header">
     <h1>Markers Demo</h1>
     <p class="subtitle">
-      <code>stored()</code> markers provide localStorage persistence.
+      The RC public marker surface is intentionally narrow. <code>entityMap()</code>
+      remains public; removed persistence markers are no longer shown as live APIs.
     </p>
   </div>
 
-  <!-- Stored Marker Section -->
   <st-example
-    heading="stored() Marker — localStorage Persistence"
-    intro="Auto-sync signals to localStorage with debounced writes. Changes persist across page reloads."
-    [state]="storageSnapshot()"
-    stateLabel="localStorage Values"
-    [code]="storedCodeFiles"
+    heading="entityMap() Marker"
+    intro="Normalized collection state with granular reads and mutations."
+    [state]="{ count: store.$.users.entities.count(), users: store.$.users.entities.all() }"
+    stateLabel="Collection State"
+    [code]="entityMapCodeFiles"
   >
-    <div class="demo-card" [ngStyle]="store.$.themeStyles()">
+    <div class="demo-card">
       <div class="card-header">
-        <h3>Preferences Demo</h3>
-        <span class="persistence-badge"> 📦 Persisted to localStorage </span>
+        <h3>Users</h3>
       </div>
 
       <div class="card-content">
-        <div class="preference-controls">
-          <div class="control-group">
-            <span class="control-label">Theme</span>
-            <div class="button-group">
-              <button
-                class="btn"
-                [class.active]="store.$.theme() === 'light'"
-                (click)="store.$.theme.set('light')"
-              >
-                ☀️ Light
-              </button>
-              <button
-                class="btn"
-                [class.active]="store.$.theme() === 'dark'"
-                (click)="store.$.theme.set('dark')"
-              >
-                🌙 Dark
-              </button>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <span class="control-label"
-              >Font Size: {{ store.$.fontSize() }}px</span
-            >
-            <div class="button-group">
-              <button class="btn" (click)="decreaseFontSize()">A-</button>
-              <button class="btn" (click)="increaseFontSize()">A+</button>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <span class="control-label">Last Viewed User</span>
-            <span class="value">
-              @if (store.$.selectedUser(); as user) {
-              {{ user.name }}
-              } @else { None selected }
-            </span>
-          </div>
-        </div>
-
         <div class="button-group">
-          <button class="btn danger" (click)="clearPreferences()">
-            Clear All Preferences
-          </button>
+          <button class="btn" (click)="loadUsers()">Load Users</button>
+          <button class="btn danger" (click)="resetUsers()">Reset</button>
         </div>
+
+        @if (store.$.users.entities.count() > 0) {
+          <ul>
+            @for (user of store.$.users.entities.all(); track user.id) {
+              <li>{{ user.name }} - {{ user.email }}</li>
+            }
+          </ul>
+        }
       </div>
     </div>
   </st-example>
-
-  <!-- Combined Usage Section -->
-  <st-example
-    heading="Combining Markers with Derived State"
-    [code]="combinedCodeFiles"
-  >
-    <p intro>
-      Use markers together with <code>.derived()</code> for powerful patterns.
-    </p>
-  </st-example>
-
-  <!-- Performance Notes -->
-  <section class="demo-section">
-    <h2>Performance Optimizations</h2>
-    <div class="performance-grid">
-      <div class="perf-card">
-        <h3>stored()</h3>
-        <ul>
-          <li>
-            <strong>Debounced Writes:</strong> Default 100ms debounce prevents
-            localStorage hammering
-          </li>
-          <li>
-            <strong>Non-blocking:</strong> Writes use queueMicrotask() for
-            responsive UI
-          </li>
-          <li>
-            <strong>Coalesced Updates:</strong> Rapid updates result in single
-            storage write
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
 </div>

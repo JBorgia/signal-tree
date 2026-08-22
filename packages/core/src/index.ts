@@ -40,7 +40,6 @@ export {
   type ReadonlyNodeAccessor,
   type ReadonlyEntityNode,
   type ReadonlyEntitySignal,
-  type ReadonlyStoredSignal,
 } from './lib/readonly';
 
 // ============================================
@@ -147,22 +146,6 @@ export {
   type DerivedType,
 } from './lib/markers/derived';
 
-
-// Stored marker (v7) - localStorage persistence
-export {
-  stored,
-  createStorageKeys,
-  clearStoragePrefix,
-  flushAllStoredSignals,
-  type StoredMarker,
-  type StoredSignal,
-  type StoredOptions,
-  // The type of StoredOptions.migrate — a consumer declaring a migration
-  // function could not name it.
-  type MigrationFn,
-  type StoredErrorContext,
-  type StoredReloadResult,
-} from './lib/markers/stored';
 
 // `trackHistory()` — signal-native undo/redo over ANY WritableSignal. Marker
 // free: it takes the model signal directly, so it survived FORM-DEL untouched.

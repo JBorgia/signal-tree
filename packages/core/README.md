@@ -56,12 +56,12 @@ import { batching } from '@signaltree/core/enhancers/batching';
 
 ### Marker Tree-Shaking (Self-Registering)
 
-Built-in markers (`entityMap()`, `stored()`, `asyncSource()`, `asyncQuery()`) are **self-registering** - they only add their processor code when you actually use them:
+Built-in public markers such as `entityMap()` are **self-registering** - they only add their processor code when you actually use them:
 
 ```ts
-// ✅ Only stored() code is bundled (entityMap and async markers tree-shaken out)
-import { signalTree, stored } from '@signaltree/core';
-const tree = signalTree({ theme: stored('theme', 'light') });
+// ✅ Only entityMap() code is bundled
+import { signalTree, entityMap } from '@signaltree/core';
+const tree = signalTree({ users: entityMap<User, number>({ selectId: (user) => user.id }) });
 
 // ✅ Minimal bundle - no marker code included
 import { signalTree } from '@signaltree/core';
@@ -70,7 +70,7 @@ const tree = signalTree({ count: 0 });
 
 **How it works:**
 
-- Each marker factory (`stored()`, `entityMap()`, `asyncSource()`, `asyncQuery()`) registers its processor on first call
+- Each public marker factory registers its processor on first call
 - If you never call a marker factory, its code is completely eliminated
 - Zero import-time side effects - registration is lazy and automatic
 
@@ -1040,102 +1040,12 @@ tree.$.users.loadStatus(); // 'idle' | 'loading' | 'loaded' | 'error'
 tree.$.users.loadStatus.set('loaded');
 ```
 
-### 11) `stored(key, default, options?)` - localStorage Persistence
+### 11) Persistence
 
-Auto-syncs state to localStorage with versioning and migration support.
-
-```typescript
-import { signalTree, stored, createStorageKeys, clearStoragePrefix } from '@signaltree/core';
-
-// Basic usage
-const tree = signalTree({
-  theme: stored('app-theme', 'light' as 'light' | 'dark'),
-  lastViewedId: stored('last-viewed', null as number | null),
-});
-
-// Auto-loads from localStorage on init
-// Auto-saves on every .set() or .update()
-tree.$.theme.set('dark'); // Saved to localStorage immediately
-
-// StoredSignal API
-tree.$.theme(); // Get current value
-tree.$.theme.set('light'); // Set and persist
-tree.$.theme.clear(); // Remove from storage, reset to default
-tree.$.theme.reload(); // Force reload from storage
-```
-
-#### Versioning and Migrations
-
-```typescript
-interface SettingsV1 {
-  darkMode: boolean;
-}
-
-interface SettingsV2 {
-  theme: 'light' | 'dark' | 'system';
-  fontSize: number;
-}
-
-const tree = signalTree({
-  settings: stored<SettingsV2>(
-    'user-settings',
-    { theme: 'light', fontSize: 14 },
-    {
-      version: 2,
-      migrate: (oldData, oldVersion) => {
-        if (oldVersion === 1) {
-          // Migrate from V1 to V2
-          const v1 = oldData as SettingsV1;
-          return {
-            theme: v1.darkMode ? 'dark' : 'light',
-            fontSize: 14, // New field with default
-          };
-        }
-        return oldData as SettingsV2;
-      },
-      clearOnMigrationFailure: true, // Clear storage if migration fails
-    }
-  ),
-});
-```
-
-#### Type-Safe Storage Keys
-
-```typescript
-// Create namespaced storage keys
-const STORAGE = createStorageKeys('myApp', {
-  theme: 'theme',
-  user: {
-    settings: 'settings',
-    preferences: 'prefs',
-  },
-} as const);
-
-// STORAGE.theme = "myApp:theme"
-// STORAGE.user.settings = "myApp:user:settings"
-
-const tree = signalTree({
-  theme: stored(STORAGE.theme, 'light'),
-  settings: stored(STORAGE.user.settings, {}),
-});
-
-// Clear all app storage (e.g., on logout)
-clearStoragePrefix('myApp');
-```
-
-#### Advanced Options
-
-```typescript
-stored('key', defaultValue, {
-  version: 1, // Schema version
-  migrate: (old, ver) => migrated, // Migration function
-  debounceMs: 100, // Write debounce (default: 100)
-  storage: sessionStorage, // Custom storage backend
-  serialize: (v) => JSON.stringify(v), // Custom serializer
-  deserialize: (s) => JSON.parse(s), // Custom deserializer
-  clearOnMigrationFailure: false, // Clear on failed migration
-});
-```
+The old `stored(key, default, options?)` marker and storage-key helpers are not
+part of the current release-candidate public surface. Keep persistence in an
+application service for now, then write the resulting values into SignalTree
+through ordinary state or `entityMap()` APIs.
 
 ### 12) Angular Forms Integration
 
@@ -2101,7 +2011,6 @@ import {
   timeTravel,
   serialization,
   entityMap,
-  stored,
 } from '@signaltree/core';
 ```
 

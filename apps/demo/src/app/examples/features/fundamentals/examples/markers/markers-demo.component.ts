@@ -1,11 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import {
-  entityMap,
-  signalTree,
-  stored,
-} from '@signaltree/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { entityMap, signalTree } from '@signaltree/core';
 
 import {
   type CodeFile,
@@ -18,168 +13,46 @@ interface User {
   email: string;
 }
 
-interface MarkersState {
-  // Status marker for async operations
-  users: {
-    entities: ReturnType<typeof entityMap<User, number>>;
-  };
-
-  // Stored markers for persistence
-  theme: ReturnType<typeof stored<'light' | 'dark'>>;
-  fontSize: ReturnType<typeof stored<number>>;
-  lastViewedUserId: ReturnType<typeof stored<number | null>>;
-}
-
 @Component({
   selector: 'app-markers-demo',
   standalone: true,
-  imports: [CommonModule, FormsModule, ExampleComponent],
+  imports: [CommonModule, ExampleComponent],
   templateUrl: './markers-demo.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './markers-demo.component.scss',
 })
 export class MarkersDemoComponent {
-  store = signalTree<MarkersState>({
+  readonly store = signalTree({
     users: {
-      entities: entityMap<User, number>({ selectId: (u) => u.id }),
+      entities: entityMap<User, number>({ selectId: (user) => user.id }),
     },
-    theme: stored<'light' | 'dark'>('demo-theme', 'light'),
-    fontSize: stored('demo-fontSize', 14),
-    lastViewedUserId: stored<number | null>('demo-lastViewedUserId', null),
-  }).derived(($) => ({
-    // STATUS-DEL: was `$.users.status.loaded() && …`. Readiness now derives from
-    // the entity collection alone.
-    isReady: computed(() => $.users.entities.all().length > 0),
-    selectedUser: computed(() => {
-      const id = $.lastViewedUserId();
-      return id != null ? $.users.entities.byId(id)?.() ?? null : null;
-    }),
-    // Theme-based styles
-    themeStyles: computed(() => ({
-      background: $.theme() === 'dark' ? '#1e1e1e' : '#ffffff',
-      color: $.theme() === 'dark' ? '#ffffff' : '#1e1e1e',
-      fontSize: `${$.fontSize()}px`,
-    })),
-  }));
+  });
 
-  // Simulate async loading
-  async loadUsers() {
+  readonly entityMapCodeFiles: CodeFile[] = [
+    {
+      label: 'entity-map.ts',
+      language: 'typescript',
+      source: `const tree = signalTree({
+  users: {
+    entities: entityMap<User, number>({ selectId: (user) => user.id }),
+  },
+});
 
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+tree.$.users.entities.setAll(users);
+tree.$.users.entities.byId(1)?.();`,
+    },
+  ];
 
-    // Simulate success or failure
-    const shouldFail = Math.random() < 0.2; // 20% chance of failure
-
-    if (shouldFail) {
-      return;
-    }
-
-    // Add mock users
-    const mockUsers: User[] = [
+  loadUsers(): void {
+    this.store.$.users.entities.setAll([
       { id: 1, name: 'Alice Johnson', email: 'alice@example.com' },
       { id: 2, name: 'Bob Smith', email: 'bob@example.com' },
       { id: 3, name: 'Carol Davis', email: 'carol@example.com' },
       { id: 4, name: 'David Wilson', email: 'david@example.com' },
-    ];
-
-    this.store.$.users.entities.setAll(mockUsers);
+    ]);
   }
 
-  resetUsers() {
+  resetUsers(): void {
     this.store.$.users.entities.clear();
   }
-
-  selectUser(userId: number) {
-    this.store.$.lastViewedUserId.set(userId);
-  }
-
-  toggleTheme() {
-    const current = this.store.$.theme();
-    this.store.$.theme.set(current === 'light' ? 'dark' : 'light');
-  }
-
-  increaseFontSize() {
-    this.store.$.fontSize.update((size) => Math.min(size + 2, 24));
-  }
-
-  decreaseFontSize() {
-    this.store.$.fontSize.update((size) => Math.max(size - 2, 10));
-  }
-
-  clearPreferences() {
-    this.store.$.theme.clear();
-    this.store.$.fontSize.clear();
-    this.store.$.lastViewedUserId.clear();
-  }
-
-  // ── st-example: live-state snapshots ───────────────────────────────────────
-
-  readonly storageSnapshot = computed(() => ({
-    'demo-theme': this.store.$.theme(),
-    'demo-fontSize': this.store.$.fontSize(),
-    'demo-lastViewedUserId': this.store.$.lastViewedUserId(),
-  }));
-
-  // Code examples for display
-
-  storedExample = `// stored() marker - localStorage persistence
-const tree = signalTree({
-  theme: stored('app-theme', 'light'),
-  fontSize: stored('app-fontSize', 14),
-  lastViewed: stored('last-viewed', null),
-});
-
-// Auto-loads from localStorage on init
-tree.$.theme();  // 'light' or restored value
-
-// Auto-saves on change (debounced 100ms default). Pending writes are
-// drained automatically when the page is hidden/unloaded, so a value set
-// right before the app is backgrounded is not lost (v13.3).
-tree.$.theme.set('dark');  // Immediate signal update
-
-// Methods
-tree.$.theme.clear();   // Reset to default (cancels pending write)
-tree.$.theme.reload();  // Reload from storage, runs migrations (cancels pending write)
-tree.$.theme.flush();   // Commit a pending debounced write right now (v13.3)
-
-// Durability options (v13.3)
-stored('key', value, { debounceMs: 0 });   // Synchronous write in set()'s stack
-stored('key', value, { maxWaitMs: 1000 }); // Cap write delay under rapid updates
-stored('key', value, { onError: (e, ctx) => report(e, ctx) }); // Quota/serialize failures
-
-// Drain every stored signal (e.g. Capacitor App 'pause' hook)
-flushAllStoredSignals();`;
-
-  combinedExample = `// Combining markers with derived state
-const tree = signalTree({
-  users: {
-    entities: entityMap<User>(),
-  },
-  lastViewedUserId: stored('lastViewed', null),
-})
-// No .with(entities()) needed in v7+ (deprecated in v6, removed in v7)
-.derived(($) => ({
-  isReady: computed(() =>
-    $.users.entities.all().length > 0
-  ),
-  selectedUser: computed(() => {
-    const id = $.lastViewedUserId();
-    return id != null
-      ? $.users.entities.byId(id)?.()
-      : null;
-  }),
-}));`;
-
-  // ── st-example: source tabs (wrap the example strings above) ────────────────
-  readonly storedCodeFiles: CodeFile[] = [
-    { label: 'stored()', language: 'typescript', source: this.storedExample },
-  ];
-  readonly combinedCodeFiles: CodeFile[] = [
-    {
-      label: 'markers + derived',
-      language: 'typescript',
-      source: this.combinedExample,
-    },
-  ];
 }

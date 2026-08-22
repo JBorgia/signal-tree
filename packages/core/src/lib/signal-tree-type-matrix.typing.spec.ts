@@ -67,18 +67,20 @@
  */
 import type { Signal } from '@angular/core';
 
-import { asyncQuery, entityMap, signalTree, stored } from '../index';
+import { entityMap, signalTree } from '../index';
+import { asyncQuery } from './markers/async-query';
+import { stored } from './markers/stored';
 import type {
   AccessibleNode,
-  AsyncQuerySignal,
   CallableWritableSignal,
   EntitySignal,
   Enhancer,
   NodeAccessor,
   SignalTree,
-  StoredSignal,
   TreeNode,
 } from '../index';
+import type { AsyncQuerySignal } from './markers/async-query';
+import type { StoredSignal } from './markers/stored';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
