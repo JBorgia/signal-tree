@@ -11072,16 +11072,39 @@ first real publish remains the RC task.
       public-disposition gate now passes. Independent review found four internal
       evidence specs still importing removed symbols through the public barrel;
       `08b8fae5` moved those specs to internal imports and `pnpm nx test core
-        --skip-nx-cache --output-style=static` passed on rerun. `b957f604` removed
+--skip-nx-cache --output-style=static` passed on rerun. `b957f604` removed
       stale `compared()` advice from dev warnings after `compared` left the
-      public API. `entityMap` live retention remains an explicit open
-      performance characterization: the large public-path heap signature is
-      measured, root snapshots/simple projections are apparently cleared as the
-      dominant cause, but the exact retained owner, kernel/semantic/Angular
-      observation split, and 18 MB transient-`byId` vs 60 MB baseline anomaly are
-      not yet established. This is not an automatic RC blocker unless the release
-      acceptance threshold requires architectural/performance attribution before
-      external publication.
+      public API. The `entityMap` retention figures previously recorded here
+      were produced by a defective harness and are withdrawn. The 18 MB / 60 MB
+      anomaly was a measurement artifact, not a property of the code:
+      `memory-report.mjs` applied a turn boundary to one scenario and no other.
+      Repaired (`tools/lib/heap-quiescence.mjs`, one settling protocol for every
+      arm; timing and retention split into separate processes in
+      `bench-compare.mjs`, which also loads each library's module graph outside
+      the measured window; new `memory-consistency` gate rejecting any table
+      where a scenario measures less than one it strictly contains; new
+      `historical-ab-isolation` gate after `NX_WORKSPACE_ROOT_PATH` was found to
+      silently defeat worktree isolation). Quiescent baseline is ~11.3 MB per 10k
+      3-field entities; ~81% of the all-held configuration is held per-row
+      node/field realization; the physical stores are compact at ~455 B/entity.
+      Cross-library retention, module graphs excluded: SignalTree 11.44 MB vs
+      NgRx 1.07 MB, elf 1.05 MB, raw signals 6.28 MB — ~10.7x, not the ~2.6x an
+      earlier repaired-but-unhoisted run suggested, and nothing like the
+      published 66/0.93. `bench-vs-signalstore.mjs` could not run at HEAD at all
+      (OOM; the whole file was one synchronous job with no turn available for
+      deferred cleanup) and is fixed; its NgRx arm was audited for fairness and
+      is sound — idiomatic `signalStore(withEntities())` measures the same at
+      1k/10k/50k, the dependent read is O(1) on both sides, and NgRx's O(n) is
+      inherent to rebuilding the entity map. The flat-vs-linear shape claim
+      survives; the deep-write `~100x` claim does not (11.5x today) and is
+      withdrawn, as is the published collection-throughput claim: `setAll` has
+      regressed against 14.0.0 on a byte-identical harness while all three
+      competitor arms reproduce. Key churn also retains without bound
+      (~119.7 MB across 150 generations at constant 1k live membership with no
+      restorer attached), split into earned and orphan portions in
+      `docs/architecture/entity-churn-retention.md`. Neither the regression nor
+      the churn finding is automatically an rc.1 blocker under a
+      public-API/functional-correctness definition of RC.
 - [ ] publish `1.0.0-rc.1`
 - [ ] install from npm in external projects
 - [ ] collect RC packaging/DX/docs failures

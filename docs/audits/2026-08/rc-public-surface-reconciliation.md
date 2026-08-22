@@ -11,9 +11,11 @@ Update: the public-surface contradiction is resolved as of `cf008545`.
 only the surviving core entry points (`.`, `./security`, `./storage`), and the
 reviewer-discovered internal spec imports were repaired in `08b8fae5`.
 
-Performance status is separate: the `entityMap` live-retention finding remains
-OPEN PERFORMANCE CHARACTERIZATION. It is not automatically an RC blocker, but it
-is not explained and must not be recorded as an accepted v15 kernel tradeoff.
+Performance status is separate, and it has changed materially since this
+document was first written. The `entityMap` retention figures it recorded were
+produced by a defective harness; re-measurement resolved the anomaly, inverted
+one conclusion, and surfaced two findings that were not visible before. See
+"Collection retention — superseded" below.
 
 Release engineering is in good shape: gates pass, self-tests prove the gates can fail, tarballs are checked, clean-checkout flow works, and CI publishing is wired for trusted publishing. The public API reconciliation blockers recorded below are retained as the audit trail for why the removals happened.
 
@@ -54,49 +56,105 @@ Resolved: public removals from `22792f97`, `c53aa416`, `52644fa3`, `b339b921`,
 root exports/subpaths. Only a later independent authority may grant one of those
 exact symbols again.
 
-### 3. Collection retention remains open performance characterization
+### 3. Collection retention — superseded by a harness repair
 
-Final baseline measured the 10k collection workload as:
+Everything this section originally recorded was measured before the heap had
+settled. `tools/memory-report.mjs` applied a turn boundary to one scenario via a
+`yieldBeforeMeasure` flag and to no other, so the arms it compared sat at
+different points on the reclamation curve. The figures below are kept as the
+audit trail; none of them should be quoted.
 
-- SignalTree: `122.72 ms`, `66.12 MB retained`
-- NgRx signals: `10.41 ms`, `0.93 MB retained`
-- Elf: `1.50 ms`, `0.92 MB retained`
-- Raw signals: `4.87 ms`, `6.16 MB retained`
+| scenario                      | recorded here | repaired harness |
+| ----------------------------- | ------------- | ---------------- |
+| `entityMap` 1k                | `6.11 MB`     | `1.34 MB`        |
+| `entityMap` 10k               | `59.95 MB`    | `11.35 MB`       |
+| 10k + held `tree()` snapshot  | `59.96 MB`    | `11.36 MB`       |
+| 10k + held `byId()` every row | `65.29 MB`    | `59.61 MB`       |
+| 10k + transient `byId()`      | `18.03 MB`    | `16.62 MB`       |
 
-Follow-up retained-heap probes from `node --expose-gc tools/memory-report.mjs --json`
-narrow the owner:
+The corrected checkpoint:
 
-- plain object, 20k keys: `1.21 MB`, `64 B/key`
-- raw Angular signals, 20k: `11.00 MB`, `577 B/signal`
-- `entityMap` 1k after `setAll`: `6.11 MB`, `6410 B/entity`
-- `entityMap` 10k after `setAll`: `59.95 MB`, `6286 B/entity`
-- `entityMap` 10k plus held `tree()` snapshot: `59.96 MB`, `6287 B/entity`
-- `entityMap` 10k plus held `byId()` for every row: `65.29 MB`, `6846 B/entity`
-- `entityMap` 10k plus transient, unheld `byId()` for every row: `18.03 MB`, `1890 B/entity`
+```text
+ENTITYMAP MEMORY CHARACTERIZATION
 
-Measured: current public `entityMap` construction / `setAll` is associated with
-a very large heap signature.
+OLD 66 MB / ~1 MB COMPETITIVE TABLE
+  INVALID
+  unequal quiescence + timing/memory process contamination
 
-Strongly suggested: root `tree()` snapshots and normal `all()` / `ids()` /
-`asMap()` projection reads are not the dominant cause. Held per-row facades add
-about `5.34 MB`, so they explain only a minority of the observed signature.
+18 MB vs 60 MB ANOMALY
+  EXPLAINED
+  unequal measurement discipline, not a property of the code
 
-Not yet established:
+QUIESCENT PUBLIC BASELINE
+  ~11.35 MB / 10k 3-field entities, ~1190 B/entity
+  workload-specific, NOT "intrinsic cost"
 
-- `59.95 MB` is the stable intrinsic live cost of the same active `entityMap`
-  under equivalent conditions.
-- The retained owner is specifically entity realization rather than measurement
-  setup or scenario shape.
-- The split between framework-neutral kernel truth, semantic/entity
-  realization, and Angular observation realization.
-- The `18.03 MB` transient unheld-`byId()` scenario is compatible with the
-  `~60 MB` baseline scenario.
+PHYSICAL STRUCTURAL + VALUE STORES
+  ~4.34 MB, ~455 B/entity
+  compact in this probe
+  NOT YET equivalent to "complete framework-neutral kernel"
 
-RC policy: this is not automatically an `rc.1` blocker if RC is defined as
-public API/disposition correctness plus functional correctness with known
-performance questions investigated during RC. It remains a blocker only under a
-stricter policy that requires v15's principal architectural/performance claims
-to be understood before external publication.
+ALL 10K byId NODES HELD
+  ~59.6 MB
+
+INCREMENTAL HELD NODE/FIELD REALIZATION
+  ~48.4 MB, ~81% of that measured all-held configuration
+
+METADATA-ENABLED PORTION OF HELD-NODE COST
+  ~16.3 MB, substantial
+
+ARCHITECTURAL OWNER
+  do NOT collapse the whole 81% to "Angular"
+  node/facade + Angular field computeds + closures + metadata
+
+COMPETITIVE RETENTION, REPAIRED HARNESS
+  10k collection only, each library's module graph excluded
+  SignalTree  ~11.44 MB     marginal 1176 B/entity
+  raw signals  ~6.28 MB     marginal   87 B/entity
+  NgRx         ~1.07 MB     marginal   89 B/entity
+  Elf          ~1.05 MB     marginal   96 B/entity
+  NOTE the earlier repaired-but-unhoisted run read 18.1/12.0/6.9/3.4 MB and
+  put SignalTree at ~2.6x NgRx. That gap was compressed by charging every arm
+  its own import cost (core+Angular 6.67 MB, ngrx 5.88, elf 2.18). Excluded,
+  it is ~10.7x, and the independent marginal slope agrees at ~13x.
+
+CHURN
+  constant 1k live membership produces linear retained growth,
+  ~119.7 MB at 150 key generations with NO restorer attached
+  DEFECT CANDIDATE, attribution below
+```
+
+Three specific corrections to what this document previously asserted:
+
+1. **"Held per-row facades add about 5.34 MB, a minority" was inverted.** That
+   delta was two equally-inflated readings cancelling. Under one protocol the
+   base collection is 11.26 MB and the all-held configuration is 59.62 MB: held
+   facades are ~81% of it, not a minority.
+2. **"59.95 MB is the entityMap signature" is withdrawn.** The quiescent
+   baseline is ~11.35 MB. It is a workload-specific figure for 10k 3-field
+   entities under this protocol, not an intrinsic cost — it varies with field
+   count, value shapes, runtime and observation state.
+3. **The layer labels are narrower than first written.** `StructuralStore` +
+   `EntityValueStore` measure the physical entity stores, not "the
+   framework-neutral kernel" — that arm bypasses mutation framing and commit
+   machinery. And `createEntitySignal` imports `signal`/`computed` from
+   `@angular/core`, so no arm here isolates entity semantics without Angular.
+
+Churn attribution, pre-registered in
+`docs/architecture/entity-churn-retention.md`: restoration is reachable only via
+`__restoreOne` / `__planRestore`, consumed solely by the causal-runtime adapter
+behind `timeTravel()`. A tree with no history enhancer therefore has no contract
+entitled to a retired subject's state — and still retains 798 B/subject, plus
+548 B/subject more if the row was ever read through `byId()`. Attaching
+`timeTravel()` adds a further 1,205 B/subject, which is earned by an explicit
+opt-in. The orphan portion is the defect candidate.
+
+Harness repairs: `tools/lib/heap-quiescence.mjs` (one protocol, no per-scenario
+knobs), timing and retention split into separate processes in
+`tools/bench-compare.mjs`, and `tools/check-memory-harness.mjs` — registered as
+the `memory-consistency` gate — which rejects any table where a scenario
+measures less than a scenario it strictly contains. Its self-test rejects the
+exact `59.95 / 18.03` table that shipped.
 
 ### 4. Collection throughput needs layer boundaries, not one headline number
 

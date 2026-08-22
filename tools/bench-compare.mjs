@@ -33,19 +33,36 @@
  * strawman either — it is what the absence of a primitive forces on a user.
  *
  * ONE PROCESS PER ARM (timing and heap both contaminate across arms in-process —
- * design-thesis §3). Timing is the median of 5 runs; memory uses forced GC.
+ * design-thesis §3).
+ *
+ * ONE PROCESS PER *PHASE*, TOO, which is the harder-won half. This file used to
+ * run five timing iterations and then take the memory baseline in the same
+ * process, separated only by four synchronous `gc()` calls. Those calls do not
+ * reclaim what a turn boundary reclaims, so the baseline was read on top of the
+ * timing phase's garbage. The proof is unambiguous: add a turn boundary to that
+ * flow and the signaltree arm reports MINUS 294 MB retained. A negative
+ * retention is not a small error, it is a demonstration that both endpoints
+ * were noise — and 66.12 MB came out of the same subtraction. The memory phase
+ * now gets a virgin process that builds one store, runs the workload once, and
+ * measures. It never sees a timing iteration.
+ *
+ * AND ONE SETTLING RULE FOR ALL ARMS. Retention is read through
+ * `tools/lib/heap-quiescence.mjs`, which drains turn boundaries until the heap
+ * stops moving. This matters more than it sounds: adding that boundary moves
+ * signaltree by ~54 MB and moves elf, ngrx-signals and raw-signals by 0.00 MB
+ * each, because signaltree is the only arm here with a microtask-deferred
+ * notifier, weak caches and a FinalizationRegistry. A protocol that only one
+ * arm is sensitive to is not a comparison, and the old table was one.
  *
  * Usage: node --expose-gc tools/bench-compare.mjs [--n 10000] [--json]
- *        node --expose-gc tools/bench-compare.mjs --arm <a> --workload <w> --n <n>
+ *        node --expose-gc tools/bench-compare.mjs --arm <a> --workload <w> --phase <p> --n <n>
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { measureRetained, requireExposeGc } from './lib/heap-quiescence.mjs';
 
-if (typeof globalThis.gc !== 'function') {
-  console.error('❌ Run with --expose-gc.');
-  process.exit(1);
-}
+requireExposeGc('tools/bench-compare.mjs');
 const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
 if (!existsSync(CORE)) {
   console.error('❌ build first: nx run-many -t build --all');
@@ -59,15 +76,11 @@ const arg = (name, dflt) => {
 const N = Number(arg('--n', 10_000));
 const UPDATES = 200;
 const HISTORY_WRITES = 50;
-const MB = 1024 * 1024;
 // A MICROTASK, not a timer. The notifier flushes via queueMicrotask, so this
 // is enough to make history record — and 100 setTimeout(0) calls add ~100ms of
 // pure timer granularity to EVERY arm, which swamped the differences being
 // measured. Verified below that history still reaches 52 entries.
 const tick = () => Promise.resolve();
-const settle = () => {
-  for (let i = 0; i < 4; i++) globalThis.gc();
-};
 const seed = (n) => {
   const out = [];
   for (let i = 0; i < n; i++)
@@ -83,7 +96,9 @@ const IMPLS = {
   signaltree: async (withHistory) => {
     const { signalTree, entityMap, timeTravel } = await import(CORE);
     const base = signalTree({ rows: entityMap({ selectId: (r) => r.id }) });
-    const tree = withHistory ? base.with(timeTravel({ maxHistorySize: 200 })) : base;
+    const tree = withHistory
+      ? base.with(timeTravel({ maxHistorySize: 200 }))
+      : base;
     return {
       store: tree,
       setAll: (d) => tree.$.rows.setAll(d),
@@ -99,13 +114,16 @@ const IMPLS = {
 
   'ngrx-signals': async () => {
     const { signalState, patchState, getState } = await import('@ngrx/signals');
-    const { setAllEntities, updateEntity } = await import('@ngrx/signals/entities');
+    const { setAllEntities, updateEntity } = await import(
+      '@ngrx/signals/entities'
+    );
     const store = signalState({ entityMap: {}, ids: [] });
     const history = [];
     return {
       store,
       setAll: (d) => patchState(store, setAllEntities(d)),
-      updateOne: (id, changes) => patchState(store, updateEntity({ id, changes })),
+      updateOne: (id, changes) =>
+        patchState(store, updateEntity({ id, changes })),
       readAll: () => store.ids().map((i) => store.entityMap()[i]),
       readOne: (id) => store.entityMap()[id],
       historyLength: () => history.length + 1,
@@ -123,8 +141,13 @@ const IMPLS = {
 
   elf: async (withHistory) => {
     const { createStore, withProps } = await import('@ngneat/elf');
-    const { withEntities, setEntities, updateEntities, getAllEntities, getEntity } =
-      await import('@ngneat/elf-entities');
+    const {
+      withEntities,
+      setEntities,
+      updateEntities,
+      getAllEntities,
+      getEntity,
+    } = await import('@ngneat/elf-entities');
     // elf's OWN history primitive — the fair comparison for this library.
     const { stateHistory } = await import('@ngneat/elf-state-history');
     const store = createStore(
@@ -195,7 +218,8 @@ const WORKLOADS = {
     }
     const all = impl.readAll();
     const t1 = performance.now();
-    if (all.length !== n) throw new Error(`readAll returned ${all.length}, expected ${n}`);
+    if (all.length !== n)
+      throw new Error(`readAll returned ${all.length}, expected ${n}`);
     return t1 - t0;
   },
 
@@ -233,7 +257,9 @@ const WORKLOADS = {
     const afterUndos = impl.readOne(probeId);
     if (afterWrites?.value !== 900_000 + HISTORY_WRITES - 1) {
       throw new Error(
-        `writes did not land: expected ${900_000 + HISTORY_WRITES - 1}, got ${afterWrites?.value}`
+        `writes did not land: expected ${900_000 + HISTORY_WRITES - 1}, got ${
+          afterWrites?.value
+        }`
       );
     }
     if (afterUndos?.value === afterWrites?.value) {
@@ -266,36 +292,77 @@ if (armName) {
   // primitive to enable. Each workload now isolates one thing.
   const withHistory = workload === 'undo-redo';
 
-  // Timing: median of 5, each on a fresh store.
-  const times = [];
-  for (let i = 0; i < 5; i++) {
-    const impl = await make(withHistory);
-    times.push(await run(impl, N));
+  // ONE PHASE PER PROCESS. `--phase timing` never reads the heap and
+  // `--phase memory` never runs a timing iteration, so neither can contaminate
+  // the other's endpoints. Splitting these was not a tidiness change: sharing
+  // the process is what produced the 66.12 MB this file used to publish.
+  const phase = arg('--phase', 'timing');
+
+  if (phase === 'timing') {
+    const times = [];
+    for (let i = 0; i < 5; i++) {
+      const impl = await make(withHistory);
+      times.push(await run(impl, N));
+    }
+    times.sort((a, b) => a - b);
+    console.log(
+      JSON.stringify({
+        arm: armName,
+        workload,
+        phase,
+        medianMs: +times[2].toFixed(2),
+        builtInHistory: (await make(withHistory)).hasBuiltInHistory,
+      })
+    );
+    process.exit(0);
   }
-  times.sort((a, b) => a - b);
-  const medianMs = times[2];
 
-  // Memory: retained after the workload, forced GC.
-  settle();
-  const before = process.memoryUsage().heapUsed;
-  let impl = await make(withHistory);
-  await run(impl, N);
-  settle();
-  const retainedMB = (process.memoryUsage().heapUsed - before) / MB;
-  const historyLen = impl.history ? impl.history.length : null;
-  impl = null;
+  if (phase === 'memory') {
+    // One setup, one workload, one measurement — and `historyLen` is captured
+    // inside the closure so holding `impl` for later inspection cannot keep the
+    // arm alive past the measurement.
+    // WARM THE MODULE GRAPH FIRST, outside the measured window.
+    //
+    // `make()` does `await import(...)` for its library, and ESM caches
+    // modules — so without this the FIRST arm construction charges the whole
+    // library's module graph to the collection. That is not a rounding error
+    // and it is not equal across arms: @signaltree/core (which pulls Angular)
+    // retains 6.67 MB of module graph, @ngrx/signals 5.88 MB, @angular/core
+    // alone 5.75 MB, @ngneat/elf 2.18 MB. Charging each arm its own library's
+    // load made SignalTree read 18.12 MB against an isolated-probe 11.41 MB for
+    // the identical collection, and made the cross-arm gap look 4x smaller than
+    // it is by padding every competitor with its own import cost.
+    //
+    // The warm-up result is garbage by the time the baseline is taken —
+    // measureRetained quiesces before it reads `before`.
+    await make(withHistory);
 
-  console.log(
-    JSON.stringify({
-      arm: armName,
-      workload,
-      medianMs: +medianMs.toFixed(2),
-      retainedMB: +retainedMB.toFixed(2),
-      builtInHistory: (await make(withHistory)).hasBuiltInHistory,
-      historyLen,
-    })
-  );
-  process.exit(0);
+    let historyLen = null;
+    const measured = await measureRetained(
+      async () => {
+        const impl = await make(withHistory);
+        await run(impl, N);
+        historyLen = impl.history ? impl.history.length : null;
+        return impl;
+      },
+      { label: `${armName}/${workload}` }
+    );
+    console.log(
+      JSON.stringify({
+        arm: armName,
+        workload,
+        phase,
+        retainedMB: +measured.retainedMB.toFixed(2),
+        quiesceRounds: measured.quiesceRounds,
+        collectable: measured.collectable,
+        historyLen,
+      })
+    );
+    process.exit(0);
+  }
+
+  console.error(`unknown phase: ${phase}`);
+  process.exit(1);
 }
 
 // --- driver -----------------------------------------------------------------
@@ -303,23 +370,47 @@ const out = { n: N, workloads: {} };
 for (const workload of Object.keys(WORKLOADS)) {
   out.workloads[workload] = [];
   for (const arm of Object.keys(IMPLS)) {
-    try {
+    // Two children per arm: timing and retention never share a process. See the
+    // header — sharing one is what produced the number this file used to print.
+    const runPhase = (phase) => {
       const res = execFileSync(
         process.execPath,
         [
           '--expose-gc',
           new URL(import.meta.url).pathname,
-          '--arm', arm,
-          '--workload', workload,
-          '--n', String(N),
+          '--arm',
+          arm,
+          '--workload',
+          workload,
+          '--phase',
+          phase,
+          '--n',
+          String(N),
         ],
-        { encoding: 'utf8', cwd: process.cwd(), stdio: ['ignore', 'pipe', 'pipe'] }
+        {
+          encoding: 'utf8',
+          cwd: process.cwd(),
+          stdio: ['ignore', 'pipe', 'pipe'],
+        }
       );
-      out.workloads[workload].push(JSON.parse(res.trim().split('\n').pop()));
+      return JSON.parse(res.trim().split('\n').pop());
+    };
+    try {
+      const timing = runPhase('timing');
+      const memory = runPhase('memory');
+      out.workloads[workload].push({
+        ...timing,
+        ...memory,
+        phase: 'timing+memory',
+      });
     } catch (err) {
       out.workloads[workload].push({
         arm,
-        error: String(err.stderr || err.message).split('\n').filter(Boolean).pop()?.slice(0, 90),
+        error: String(err.stderr || err.message)
+          .split('\n')
+          .filter(Boolean)
+          .pop()
+          ?.slice(0, 90),
       });
     }
   }
@@ -335,11 +426,20 @@ if (process.argv.includes('--json')) {
   for (const [workload, rows] of Object.entries(out.workloads)) {
     console.log(`\n${title[workload]}`);
     console.log('  ' + '─'.repeat(66));
-    console.log('  ' + 'arm'.padEnd(18) + 'median'.padStart(11) + 'retained'.padStart(12) + '   history');
-    const ok = rows.filter((r) => !r.error).sort((a, b) => a.medianMs - b.medianMs);
+    console.log(
+      '  ' +
+        'arm'.padEnd(18) +
+        'median'.padStart(11) +
+        'retained'.padStart(12) +
+        '   history'
+    );
+    const ok = rows
+      .filter((r) => !r.error)
+      .sort((a, b) => a.medianMs - b.medianMs);
     for (const r of ok) {
       console.log(
-        '  ' + r.arm.padEnd(18) +
+        '  ' +
+          r.arm.padEnd(18) +
           `${r.medianMs.toFixed(2)} ms`.padStart(11) +
           `${r.retainedMB.toFixed(2)} MB`.padStart(12) +
           `   ${r.builtInHistory ? 'BUILT-IN' : 'hand-rolled'}`
@@ -354,12 +454,14 @@ if (process.argv.includes('--json')) {
     console.log(
       `  ${ok.length}/${rows.length} arms completed` +
         (ok.length < rows.length
-          ? ` — ${rows.length - ok.length} FAILED and are absent from the ranking above`
+          ? ` — ${
+              rows.length - ok.length
+            } FAILED and are absent from the ranking above`
           : '')
     );
   }
   console.log(
-    '\n  Every arm implements the same capability using that library\'s own entity\n' +
+    "\n  Every arm implements the same capability using that library's own entity\n" +
       '  API. Undo/redo has no primitive outside SignalTree for this store shape,\n' +
       '  so those arms snapshot state per change — which is what its absence forces.'
   );

@@ -1,7 +1,18 @@
 # Retained heap — the axis that actually constrains a low-end device
 
-**Status:** measurement, 14.0.0. Reproduce with
-`node --expose-gc tools/memory-report.mjs`.
+**Status:** measurement, re-measured 2026-08-21 on a repaired harness.
+Reproduce with `node --expose-gc tools/memory-report.mjs`, decomposed with
+`node --expose-gc tools/bench-entity-layers.mjs`.
+
+> **Every number in the 14.0.0 revision of this document was measured before the
+> heap had settled and has been replaced.** The harness applied a turn boundary
+> to one scenario and not the others, so rows that were meant to be compared sat
+> at different points on the reclamation curve. The settling rule now lives in
+> `tools/lib/heap-quiescence.mjs`, every scenario gets the same one, and
+> `tools/check-memory-harness.mjs` fails the build if a scenario ever measures
+> less than a scenario it strictly contains. The superseded figures are kept in
+> "What the old numbers were" below rather than deleted, because two claims in
+> this repo were argued from them.
 
 Bundle size and retained heap are different constraints, and conflating them
 leads to optimising the wrong one. **Bytes over the wire decide load time;
@@ -18,16 +29,48 @@ Node 24.3 / V8 13.6, forced GC, one process per scenario.
 
 | scenario                                          | retained | per unit           | collectable after release |
 | ------------------------------------------------- | -------- | ------------------ | ------------------------- |
-| `signalTree`, 20k scalar leaves                   | 11.81 MB | **619 B/leaf**     | ✅                        |
-| plain object of 20k RAW Angular signals           | 11.00 MB | **577 B/signal**   | ✅                        |
-| plain object, 20k keys (floor)                    | 1.21 MB  | 63 B/key           | ✅                        |
-| `entityMap`, 1k entities                          | 0.31 MB  | 330 B/entity       | ✅                        |
-| `entityMap`, 10k entities                         | 2.85 MB  | 299 B/entity       | ✅                        |
-| `entityMap` 10k **+ a held `tree()` snapshot**    | 2.86 MB  | 300 B/entity       | ✅                        |
-| `entityMap` 10k **+ `byId()` on every row, HELD** | 34.08 MB | **3,573 B/entity** | ✅                        |
-| `entityMap` 10k + `byId()` on every row, not held | 8.05 MB  | **844 B/entity**   | ✅                        |
+| `signalTree`, 20k scalar leaves                   | 37.29 MB | **1,955 B/leaf**   | ✅                        |
+| plain object of 20k RAW Angular signals           | 11.01 MB | **577 B/signal**   | ✅                        |
+| plain object, 20k keys (floor)                    | 1.22 MB  | 64 B/key           | ✅                        |
+| `entityMap`, 1k entities                          | 1.34 MB  | 1,407 B/entity     | ✅                        |
+| `entityMap`, 10k entities                         | 11.35 MB | **1,190 B/entity** | ✅                        |
+| `entityMap` 10k **+ a held `tree()` snapshot**    | 11.36 MB | 1,191 B/entity     | ✅                        |
+| `entityMap` 10k **+ `byId()` on every row, HELD** | 59.61 MB | **6,251 B/entity** | ✅                        |
+| `entityMap` 10k + `byId()` on every row, not held | 16.62 MB | **1,743 B/entity** | ✅                        |
 
-2,000 repeated `tree()` reads grew the heap by **0.039 MB**.
+2,000 repeated `tree()` reads grew the heap by **0.044 MB**.
+
+### Where the 10k collection's bytes are
+
+`node --expose-gc tools/bench-entity-layers.mjs`, same protocol, one process per
+arm, 3-field entities:
+
+| layer                                               | retained | per entity |
+| --------------------------------------------------- | -------- | ---------- |
+| plain `Map` of the same entities (payload floor)    | 1.14 MB  | 120 B      |
+| `StructuralStore` + `EntityValueStore`, direct      | 4.34 MB  | 455 B      |
+| `createEntitySignal` + `setAll`, metadata off       | 11.20 MB | 1,175 B    |
+| `createEntitySignal` + `setAll`, metadata on        | 11.21 MB | 1,176 B    |
+| **public `entityMap` + `setAll`**                   | 11.26 MB | 1,181 B    |
+| + `byId()` on every row, nodes dropped              | 16.62 MB | 1,742 B    |
+| + `byId()` on every row, **all nodes held**         | 59.62 MB | 6,252 B    |
+| all nodes held, owner/subject/position metadata off | 43.31 MB | 4,541 B    |
+
+Read carefully, because the obvious reading of this table is wrong in two ways.
+
+**The layer names are narrow on purpose.** The physical-stores row is a floor
+for those two classes, **not** a measurement of "the framework-neutral kernel" —
+it constructs them directly and so skips mutation framing, commit machinery and
+identity plumbing that a real neutral path pays for. And `createEntitySignal`
+imports `signal`/`computed` from `@angular/core` at its top, so Angular is
+already present from that row down; there is no "entity semantics without
+Angular" arm here and there cannot be one without a different build.
+
+**The held-node delta is not "Angular".** +48.36 MB is 81% of the all-held
+configuration, and 16.31 MB of it is the owner/subject/position metadata
+accessors. The remainder is jointly the Angular field `computed()`s **and** the
+callable node object, its `set`/`update`/`asReadonly` closures and its property
+descriptors. No arm separates those, so neither is charged alone.
 
 ---
 
@@ -53,7 +96,7 @@ property [`snapshot-aliasing.spec.ts`](../../packages/core/src/lib/snapshot-alia
 documents from the correctness side. Read whole state as often as you like; it
 is not a memory event.
 
-**3. Reading does not grow the heap.** 2,000 full `tree()` reads added 0.039 MB
+**3. Reading does not grow the heap.** 2,000 full `tree()` reads added 0.044 MB
 — noise. The memo is keyed per node and invalidated by writes, so it grows with
 the SHAPE of the tree, not with how often it is read. A memo that grew per read
 would be a leak in any app that renders in a loop.
@@ -71,6 +114,16 @@ Recorded because both are silent and both invent a problem that does not exist.
 record at 8× (25.71 MB vs 3.32 MB) in
 [materialisation-prior-art §3.2](./materialisation-prior-art.md). The tool now
 refuses to run without `--expose-gc`.
+
+**Forced GC is still not settled, and an unequal settling rule is worse than a
+wrong one.** This file's 14.0.0 numbers were all read after four synchronous
+`gc()` calls with no turn boundary — except one scenario, which had a
+`yieldBeforeMeasure` flag. That produced a published ablation in which
+materialising a node for all 10,000 rows retained 42 MB LESS than not doing it.
+Both numbers were individually plausible, which is why review did not catch it.
+`tools/lib/heap-quiescence.mjs` now drains turn boundaries until the heap stops
+moving, identically for every arm, and `tools/check-memory-harness.mjs` rejects
+any table where a scenario measures less than one it strictly contains.
 
 **Scenarios sharing one process contaminate each other.** The first draft ran
 them all in one and reported `entityMap 10k + a held snapshot` retaining LESS
@@ -94,12 +147,22 @@ is how that bug announced itself.
 `node --expose-gc tools/memory-compare.mjs`. Same 10,000 entity objects in each
 library's idiomatic collection, one process per arm.
 
-| arm                        | @10k    | **marginal**     | fixed   |
-| -------------------------- | ------- | ---------------- | ------- |
-| elf                        | 3.15 MB | **96 B/entity**  | 2.23 MB |
-| raw Angular signals        | 6.59 MB | **89 B/entity**  | 5.74 MB |
-| `@ngrx/signals`            | 6.68 MB | **91 B/entity**  | 5.81 MB |
-| **SignalTree `entityMap`** | 7.89 MB | **134 B/entity** | 6.61 MB |
+| arm                        | @10k     | **marginal**       | fixed   |
+| -------------------------- | -------- | ------------------ | ------- |
+| elf                        | 3.13 MB  | **94 B/entity**    | 2.23 MB |
+| raw Angular signals        | 6.57 MB  | **89 B/entity**    | 5.72 MB |
+| `@ngrx/signals`            | 6.66 MB  | **89 B/entity**    | 5.81 MB |
+| **SignalTree `entityMap`** | 18.03 MB | **1,172 B/entity** | 6.84 MB |
+
+The `fixed` column is essentially each library's module graph, measured
+independently at 6.67 / 5.75 / 5.88 / 2.18 MB — which is why the marginal slope,
+not the `@10k` absolute, is the comparable number. The three competitor arms
+moved by ~2 B/entity when the harness was repaired. SignalTree's marginal went
+from a published **134 B/entity to 1,172** — because
+the boundary the old protocol omitted is worth ~54 MB to this arm and 0.00 MB to
+the other three. A protocol only one arm is sensitive to is not a comparison.
+The corrected figure agrees with `memory-report.mjs` independently: 1,172 B
+marginal against 1,190 B per entity at 10k, from a different tool.
 
 **MARGINAL is the slope between 1k and 10k**, so every fixed cost — module load,
 Angular init, the harness — cancels. It is the only column that answers "what
@@ -161,3 +224,85 @@ comes close to it.
 - **No browser numbers.** Node/V8 only. A phone's constraint is the same shape
   but the absolute figures will differ.
 - **No DOM.** This measures the store, not the rendering that consumes it.
+
+---
+
+## What the old numbers were
+
+Kept because two claims in this repo were argued from them, and a reader who
+remembers them deserves to see what changed rather than a quietly different
+table.
+
+| scenario                                 | 14.0.0 (unsettled) | repaired       |
+| ---------------------------------------- | ------------------ | -------------- |
+| `entityMap`, 10k entities                | 2.85 MB            | 11.35 MB       |
+| `entityMap` 10k + `byId()` all, HELD     | 34.08 MB           | 59.61 MB       |
+| `entityMap` 10k + `byId()` all, not held | 8.05 MB            | 16.62 MB       |
+| cross-library marginal                   | 134 B/entity       | 1,172 B/entity |
+
+A separate audit run of the same unsettled harness reported `entityMap` 10k at
+**59.95 MB** and 1k at **6.11 MB**. Three mutually inconsistent generations of
+this table were in circulation — 2.85, 59.95 and 11.35 MB for the same shape —
+which is itself the argument for the consistency gate rather than for more
+careful re-measurement.
+
+**The guidance did not change direction.** Holding a node per row was the
+dominant cost before and is the dominant cost now; it is larger than the old
+table said (59.61 MB, not 34.08 MB), and the base collection is larger too
+(11.35 MB, not 2.85 MB). What changed is that the numbers are now reproducible
+to 0.01 MB across runs and agree across two independent tools.
+
+## Churn is a separate, open finding
+
+Everything above measures a collection built once and held. A collection whose
+KEYS churn — a filter changing, a page turning, a poll replacing rows — grows
+without bound even with constant live membership: 1,000 live rows across 150
+key generations retain 119.72 MB in a tree with no history enhancer attached and
+no way to restore any of the retired subjects. Measured, attributed and
+pre-registered in [entity-churn-retention.md](./entity-churn-retention.md);
+reproduce with `node --expose-gc tools/bench-entity-churn-retention.mjs`.
+
+## The collection cost, with module load excluded
+
+`bench-compare.mjs` loads each arm's library before the measured window, so its
+`retained` column is the collection alone:
+
+| arm          | 10k collection retained |
+| ------------ | ----------------------- |
+| elf          | 1.05 MB                 |
+| ngrx-signals | 1.07 MB                 |
+| raw signals  | 6.28 MB                 |
+| SignalTree   | 11.44 MB                |
+
+### Two separate memory problems, not one
+
+The held-node cost does not explain the base cost, and conflating them hides the
+harder question:
+
+```text
+A. UNOBSERVED COLLECTION BASE
+   SignalTree ~1,176 B/member marginal   vs   @ngrx/signals ~89 B
+   ~13x, before a single byId() node exists.
+   Why does merely EXISTING in an entityMap cost this much?
+
+B. MATERIALIZED OBSERVATION
+   base ~11.4 MB  ->  all nodes held ~59.6 MB
+   ~48 MB incremental, largely understood: per-field computeds,
+   closures, property descriptors, metadata accessors.
+```
+
+B is increasingly explained. **A is not**, and it is the one that contradicts
+the intended separation — an untouched member should be paying for its canonical
+value, its membership/indexing, and whatever lifetime facts are independently
+earned, not for observation machinery it has never been observed through. 13×
+does not have to become 89 B/member — SignalTree owns more semantics than
+`@ngrx/signals` does — but at that ratio every major component has to justify
+itself individually.
+
+**This is the honest cross-library retention comparison and it is harsher than
+the absolutes suggested.** An earlier repaired-but-unhoisted run read 18.12 /
+6.92 / 11.99 / 3.36 MB, which put SignalTree at ~2.6x `@ngrx/signals`; that gap
+was compressed by charging every arm its own import cost. Excluding it,
+SignalTree is ~10.7x, and the independent marginal slope agrees at ~13x
+(1,176 B/entity against 89 B). The 11.44 MB figure also agrees with the isolated
+layer probe's 11.41 MB to 0.03 MB, from a different tool.

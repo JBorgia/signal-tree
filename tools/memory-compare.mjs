@@ -18,8 +18,19 @@
  * a much worse problem than an unclear metric.)
  *
  * This measures what a phone actually runs out of: bytes still held after the
- * collection is built. Forced GC, ONE PROCESS PER ARM, `WeakRef` for
- * collectability.
+ * collection is built. ONE PROCESS PER ARM, `WeakRef` for collectability, and
+ * the settling protocol in `tools/lib/heap-quiescence.mjs`.
+ *
+ * ⚠️ FORCED GC IS NOT SETTLED. This file used to read `withHeld` after four
+ * synchronous `gc()` calls and no turn boundary — the same defect that made
+ * `memory-report.mjs` publish an ablation with a negative cost, and that made
+ * `bench-compare.mjs` publish a difference of two contaminated readings. It
+ * matters most HERE, in the one file whose entire purpose is cross-library
+ * comparison: the boundary is worth ~54 MB to the SignalTree arm and 0.00 MB to
+ * elf, ngrx-signals and raw-signals, so measuring without it does not make
+ * every arm equally wrong, it makes exactly one arm wrong. Slope-of-two-sizes
+ * does not rescue it either, because the un-reclaimed garbage scales with N and
+ * so lands in the slope rather than cancelling out of it.
  *
  * Arms are limited to what runs without an Angular JIT bootstrap — @ngrx/store,
  * @ngxs/store and akita need one, and standing up a full Angular environment per
@@ -39,11 +50,10 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { measureRetained, requireExposeGc } from './lib/heap-quiescence.mjs';
 
-if (typeof globalThis.gc !== 'function') {
-  console.error('❌ Run with --expose-gc — without it this measures allocation, not retention.');
-  process.exit(1);
-}
+requireExposeGc('tools/memory-compare.mjs');
+
 const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
 if (!existsSync(CORE)) {
   console.error('❌ build first: nx run-many -t build --all');
@@ -56,7 +66,8 @@ const MB = 1024 * 1024;
 
 const rows = (n) => {
   const out = [];
-  for (let i = 0; i < n; i++) out.push({ id: i, name: 'name' + i, value: i, active: i % 2 === 0 });
+  for (let i = 0; i < n; i++)
+    out.push({ id: i, name: 'name' + i, value: i, active: i % 2 === 0 });
   return out;
 };
 
@@ -107,26 +118,19 @@ if (armFlag !== -1) {
     console.error(`unknown arm: ${name}`);
     process.exit(1);
   }
-  const settle = () => {
-    for (let i = 0; i < 4; i++) globalThis.gc();
-  };
-  settle();
-  const before = process.memoryUsage().heapUsed;
-  let held = await build(N);
-  settle();
-  const withHeld = process.memoryUsage().heapUsed;
-  const ref = new WeakRef(typeof held === 'object' ? held : { held });
-  held = null;
-  settle();
-  // A WeakRef is not cleared in the same synchronous turn, however many gc()s.
-  await new Promise((r) => setTimeout(r, 50));
-  settle();
+  // The arm's `await import(...)` happens inside the measured region on
+  // purpose — that fixed module-load cost is what the two-size slope below
+  // cancels. See the MARGINAL note in the header.
+  const measured = await measureRetained(() => build(N), {
+    label: `${name}@${N}`,
+  });
   console.log(
     JSON.stringify({
       arm: name,
-      retainedMB: +((withHeld - before) / MB).toFixed(2),
-      bytesPerEntity: Math.round((withHeld - before) / N),
-      collectable: ref.deref() === undefined,
+      retainedMB: +measured.retainedMB.toFixed(2),
+      bytesPerEntity: Math.round(measured.retainedBytes / N),
+      quiesceRounds: measured.quiesceRounds,
+      collectable: measured.collectable,
     })
   );
   process.exit(0);
@@ -138,8 +142,19 @@ const run = (arm, n) =>
   JSON.parse(
     execFileSync(
       process.execPath,
-      ['--expose-gc', new URL(import.meta.url).pathname, '--arm', arm, '--n', String(n)],
-      { encoding: 'utf8', cwd: process.cwd(), stdio: ['ignore', 'pipe', 'pipe'] }
+      [
+        '--expose-gc',
+        new URL(import.meta.url).pathname,
+        '--arm',
+        arm,
+        '--n',
+        String(n),
+      ],
+      {
+        encoding: 'utf8',
+        cwd: process.cwd(),
+        stdio: ['ignore', 'pipe', 'pipe'],
+      }
     )
       .trim()
       .split('\n')
@@ -162,7 +177,10 @@ for (const arm of Object.keys(ARMS)) {
       collectable: big.collectable && small.collectable,
     });
   } catch (err) {
-    results.push({ arm, error: String(err.message).split('\n')[0].slice(0, 80) });
+    results.push({
+      arm,
+      error: String(err.message).split('\n')[0].slice(0, 80),
+    });
   }
 }
 
@@ -172,17 +190,23 @@ if (process.argv.includes('--json')) {
   console.log(`RETAINED HEAP holding ${N.toLocaleString()} entities`);
   console.log('forced GC, one process per arm, WeakRef collectability\n');
   console.log(
-    '  arm'.padEnd(26) + `@${N / 1000}k`.padStart(11) + 'MARGINAL'.padStart(14) +
-      'fixed'.padStart(10) + '  ok'
+    '  arm'.padEnd(26) +
+      `@${N / 1000}k`.padStart(11) +
+      'MARGINAL'.padStart(14) +
+      'fixed'.padStart(10) +
+      '  ok'
   );
   console.log('  ' + '─'.repeat(68));
-  for (const r of results.sort((a, b) => (a.retainedMB ?? 1e9) - (b.retainedMB ?? 1e9))) {
+  for (const r of results.sort(
+    (a, b) => (a.retainedMB ?? 1e9) - (b.retainedMB ?? 1e9)
+  )) {
     if (r.error) {
       console.log('  ' + r.arm.padEnd(24) + '  — ' + r.error);
       continue;
     }
     console.log(
-      '  ' + r.arm.padEnd(24) +
+      '  ' +
+        r.arm.padEnd(24) +
         `${r.retainedMB.toFixed(2)} MB`.padStart(11) +
         `${r.bytesPerEntity} B/ent`.padStart(14) +
         `${r.fixedMB.toFixed(2)} MB`.padStart(10) +
@@ -193,12 +217,17 @@ if (process.argv.includes('--json')) {
   console.log(
     `\n  ${done}/${results.length} arms completed` +
       (done < results.length
-        ? ` — ${results.length - done} FAILED and are absent from the ranking above`
+        ? ` — ${
+            results.length - done
+          } FAILED and are absent from the ranking above`
         : '')
   );
   console.log(
-    '\n  MARGINAL is the slope between ' + SMALL.toLocaleString() + ' and ' +
-      N.toLocaleString() + ' entities, so every FIXED cost\n' +
+    '\n  MARGINAL is the slope between ' +
+      SMALL.toLocaleString() +
+      ' and ' +
+      N.toLocaleString() +
+      ' entities, so every FIXED cost\n' +
       '  (module load, Angular init, the harness) cancels. It is the only column\n' +
       '  that answers "what does one more row cost". The entity objects\n' +
       '  themselves are ~89 B of it, and no library controls that part.'
@@ -221,7 +250,9 @@ if (crashed.length) {
   if (process.argv.includes('--allow-missing')) {
     console.error('  (--allow-missing: continuing anyway)');
   } else {
-    console.error('\nExiting non-zero. Pass --allow-missing if a library is genuinely absent.');
+    console.error(
+      '\nExiting non-zero. Pass --allow-missing if a library is genuinely absent.'
+    );
     process.exit(1);
   }
 }
