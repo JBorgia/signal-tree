@@ -1433,17 +1433,21 @@ const tree = signalTree({
 })
   .with(batching()) // Performance
   .with(persistence({ key: 'my-app-state' }))
-  .with(timeTravel({
-    // Undo/redo
-    maxHistory: 50,
-  }))
-  .with(devTools({
-    // Debug tools (dev only)
-    name: 'MyApp',
-    enableTimeTravel: true,
-    includePaths: ['app.*', 'ui.*'],
-    formatPath: (path) => path.replace(/\.(\d+)/g, '[$1]'),
-  }));
+  .with(
+    timeTravel({
+      // Undo/redo
+      maxHistory: 50,
+    })
+  )
+  .with(
+    devTools({
+      // Debug tools (dev only)
+      name: 'MyApp',
+      enableTimeTravel: true,
+      includePaths: ['app.*', 'ui.*'],
+      formatPath: (path) => path.replace(/\.(\d+)/g, '[$1]'),
+    })
+  );
 
 // Rich feature set available
 async function fetchUser(id: string) {
