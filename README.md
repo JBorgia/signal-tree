@@ -382,54 +382,16 @@ The value-level `createEditSession(initial)` primitive (single-arg, no tree bind
 
 > **When to reach for what:** use `createTreeEditSession` when you need an uncommitted draft you can `commit()` or `cancel()` against a specific subtree — distinct from `timeTravel()`, which records the whole tree's history and lets you step backward globally rather than holding a separate draft.
 
-## Async (`asyncSource` / `asyncQuery` markers)
+## Async Orchestration
 
-Async state usually belongs **at the tree path it describes** — use `asyncSource` for load-and-expose and `asyncQuery` for input-driven debounced queries. Reach for a plain Observable method on an Ops class only when the orchestration spans multiple paths or stages that no single marker can express (see the migration section). Two markers cover the two main async patterns and compose with the rest of the marker family (`entityMap`, `status`, `stored`, `form`):
-
-```typescript
-import { signalTree, asyncSource, asyncQuery } from '@signaltree/core';
-
-const store = signalTree({
-  // Load-and-expose: auto-loads, exposes data/loading/error/refresh
-  users: asyncSource<User[]>({
-    initial: [],
-    load: () => this.api.list$(),  // Observable<T> or Promise<T>
-  }),
-
-  // Input-driven debounced query
-  search: asyncQuery<string, User[]>({
-    initialResult: [],
-    debounce: 300,
-    filter: (q) => q.length > 0,
-    query: (q) => this.api.search$(q),
-  }),
-});
-
-// Read — uniform with every other marker:
-store.$.users();           // User[] | undefined (current value)
-store.$.users.loading();   // boolean
-store.$.users.error();     // unknown | null
-
-store.$.search();          // User[] | undefined (results)
-store.$.search.loading();
-store.$.search.input.set('alice');  // drives debounced pipeline
-
-// Drive lifecycle:
-store.$.users.refresh();   // reload (cancels in-flight)
-store.$.users.set([...]);  // manual override
-store.$.users.reset();     // back to initial state
-store.$.search.rerun();    // rerun with current input (skip dedup)
-```
-
-Both markers attach at **any tree depth** and accept **Observables or Promises**. When the tree is constructed inside an Angular injection context, both markers auto-clean their in-flight subscriptions on the surrounding `DestroyRef`. Outside an injection context (e.g., trees built in plain functions or tests), call `store.destroy()` for cleanup. No manual `tap()` / `setLoading()` / `setLoaded()` wiring either way.
+The old `asyncSource` and `asyncQuery` markers are not part of the SignalTree 15
+public surface. Keep async orchestration in application services or framework
+primitives, then write resolved values into plain tree state or an independently
+justified collection surface.
 
 ### Migration from `@ngrx/signals` `rxMethod`
 
-SignalTree no longer ships `rxMethod` (removed in v9.6.0 — it was briefly available as a migration alias in v9.5.x). Its callable-factory-inside-`withMethods` shape was NgRx-flavored and didn't fit SignalTree's path-attached marker philosophy. Map NgRx `rxMethod` to:
-
-- **`asyncSource`** when the pipeline is doing load-and-expose
-- **`asyncQuery`** when the pipeline is doing input-driven debounced query
-- **plain Observable method in an Ops class** when the pipeline is doing complex multi-step orchestration that neither marker fits
+SignalTree no longer ships `rxMethod` (removed in v9.6.0 — it was briefly available as a migration alias in v9.5.x). Its callable-factory-inside-`withMethods` shape was NgRx-flavored and didn't fit SignalTree's tree-as-state model. Move complex orchestration to a plain Observable method in an Ops class, then write the resulting state explicitly.
 
 The old AI migration guide was removed with the stale AI-discoverability
 artifacts; use the mapping above as the current guidance.

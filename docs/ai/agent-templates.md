@@ -124,34 +124,11 @@ store/
   ops/                        # async + mutation logic per domain
 ```
 
-## Async pattern (canonical) — `asyncSource` / `asyncQuery` markers
+## Async pattern
 
-The SignalTree-native answer for async state is a **marker at the tree path the data lives at**. The materializer auto-derives `data` / `loading` / `error` signals — no manual status wiring.
-
-```typescript
-import { signalTree, asyncSource, asyncQuery } from '@signaltree/core';
-
-const store = signalTree({
-  // Load-and-expose: auto-loads on materialization
-  users: asyncSource<User[]>({
-    initial: [],
-    load: () => this.api.list$(),
-  }),
-  // Input-driven debounced query
-  search: asyncQuery<string, User[]>({
-    initialResult: [],
-    debounce: 300,
-    query: (q) => this.api.search$(q),
-  }),
-});
-
-// Read:
-store.$.users(); // current value
-store.$.users.loading(); // boolean (auto)
-store.$.users.error(); // unknown | null (auto)
-store.$.users.refresh();
-store.$.search.input.set('alice');
-```
+SignalTree 15 does not publish the old `asyncSource` / `asyncQuery` markers.
+Keep async orchestration in application services or framework primitives, then
+write resolved values into ordinary tree state.
 
 ## Async pattern (alternative) — plain Observable in Ops class
 

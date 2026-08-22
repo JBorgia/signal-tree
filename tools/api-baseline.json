@@ -45,96 +45,6 @@
         "internalDecl": false
       },
       {
-        "name": "asyncQuery",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/async-query.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "AsyncQueryConfig",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/async-query.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "AsyncQueryFn",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/async-query.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "AsyncQueryMarker",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/async-query.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "AsyncQuerySignal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/async-query.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "asyncSource",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/markers/async-source.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "AsyncSourceConfig",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/async-source.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "AsyncSourceLoader",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/async-source.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "AsyncSourceMarker",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/async-source.contract.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "AsyncSourceSignal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/async-source.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "AuditEntry",
         "subpath": ".",
         "kind": "type-only",
@@ -652,24 +562,6 @@
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ReadonlyAsyncQuerySignal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/readonly.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ReadonlyAsyncSourceSignal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/readonly.ts",
         "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false
