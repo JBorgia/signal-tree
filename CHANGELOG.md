@@ -3,6 +3,20 @@
 These entries keep release-delta claim checks honest before the actual version
 bump inserts the final dated 15.0.0 heading.
 
+- **Entity field rollback no longer corrupts the row.**
+  `transaction(() => rows.updateOne(id, patch)).rollback()` restored structural
+  membership correctly and then wrote the FIELD's previous value into the ENTITY
+  slot, so the row became a bare value instead of an object. `ids()` stayed right
+  and `all()` kept the right length, so lists rendered the correct number of
+  items and only a consumer reading a field saw `undefined` — silent data
+  corruption on a supported public path. Cause: `hasInlineScopedLeafAddress`
+  required `subjectId === undefined`, rejecting entity field effects that
+  legitimately carry both a subject id and a scoped leaf address, which dropped
+  the field path before the applier saw it. `undo()` was never affected because
+  the undo planner always carried both. The same condition also collapsed the
+  rollback dedupe key, so only the FIRST field written to a row was restored.
+  Predates 15.0.
+
 - **`transactions()`** adds explicit tree-local optimistic transaction grouping;
   rollback failures surface as `SignalTreeRollbackError` so callers can reconcile
   or refetch instead of silently corrupting state.

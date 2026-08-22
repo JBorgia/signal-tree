@@ -187,16 +187,11 @@ describe('a tree WITH a restorer keeps everything', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    // ⚠️ ASSERTS A DEFECT, DELIBERATELY. Rolling back an entity field update
-    // writes the FIELD's previous value into the ENTITY slot, so the row becomes
-    // the bare string 'Alpha' instead of { id: 'A', name: 'Alpha' }. It predates
-    // this branch entirely (reproduced at 0a23a551) and is pinned with controls
-    // in `transactions-documented-defects.spec.ts`.
-    //
-    // Asserted as-is because this row's job is "retirement did not disturb
-    // transactions". Asserting the CORRECT value would make it fail for an
-    // unrelated reason and stop it detecting what it is here to detect.
-    expect(tree.$.rows.byId('A')?.() as unknown).toBe('Alpha');
+    // This row asserted the broken value until the entity field rollback defect
+    // was fixed — see `transactions-entity-field-rollback.spec.ts`, which owns
+    // that behaviour. Here it is only a control: retirement must not disturb
+    // transactions.
+    expect(tree.$.rows.byId('A')?.()).toEqual({ id: 'A', name: 'Alpha' });
     // Membership is restored, and B is not resurrected by the rollback.
     expect(tree.$.rows.ids()).toEqual(['A']);
   });
