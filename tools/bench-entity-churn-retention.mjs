@@ -94,6 +94,26 @@ const ARMS = {
     history: true,
     readNodes: true,
   },
+  // TRIAL ARMS — the null hypothesis for the ~117 B/retired residue. They flip
+  // an internal flag that also deletes the subject's lifetime record and
+  // revision at a zero-owner retirement, not just its value backing. Off by
+  // default everywhere else; see `entity-lifetime-ledger-null.spec.ts` for the
+  // semantic gates the null has to survive, and open question 2 in
+  // docs/architecture/retired-subject-churn.md.
+  'no-history-forget': {
+    label: 'plain tree, lifetime ledger FORGOTTEN, no node reads',
+    detail: 'TRIAL: is the lifetime record earned?',
+    history: false,
+    readNodes: false,
+    forgetLifetime: true,
+  },
+  'no-history-reads-forget': {
+    label: 'plain tree, lifetime ledger FORGOTTEN, byId() every row',
+    detail: 'TRIAL: same, with every row observed',
+    history: false,
+    readNodes: true,
+    forgetLifetime: true,
+  },
 };
 
 // --- child ------------------------------------------------------------------
@@ -106,6 +126,27 @@ if (armFlag !== -1) {
     process.exit(1);
   }
   const { signalTree, entityMap, timeTravel } = await import(CORE);
+
+  if (a.forgetLifetime) {
+    // Deep import: the trial setter is `@internal` and deliberately not on the
+    // barrel. If the trial ends by deleting the flag, this arm fails loudly
+    // rather than silently measuring the shipped path and reporting it as the
+    // null.
+    const entitySignalModule = join(
+      process.cwd(),
+      'dist/packages/core/dist/lib/entity-signal.js'
+    );
+    const { createEntitySignal } = await import(entitySignalModule);
+    const setForgetRetiredSubjectLifetimeForTrial =
+      createEntitySignal?.__setForgetRetiredSubjectLifetimeForTrial;
+    if (typeof setForgetRetiredSubjectLifetimeForTrial !== 'function') {
+      console.error(
+        '❌ trial arm requested but setForgetRetiredSubjectLifetimeForTrial is gone'
+      );
+      process.exit(1);
+    }
+    setForgetRetiredSubjectLifetimeForTrial(true);
+  }
 
   // v15: declared, so the no-history arm no longer carries the causal-runtime
   // plan that late `.with()` forced on every tree.

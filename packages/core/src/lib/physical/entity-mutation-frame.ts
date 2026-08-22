@@ -17,6 +17,15 @@ export type PreparedValueReplacement<
 export type PreparedRetainedValueRetirement = {
   kind: 'retire-retained-value';
   subjectId: number;
+  /**
+   * Also delete the subject's lifetime record and revision, not just its value.
+   *
+   * ⚠️ TRIAL — see `StructuralStore.forgetSubject`. Only legal for a terminal
+   * retirement on a tree with no restoration authority. Absent/false keeps the
+   * shipped behaviour: retire the value, keep a permanent
+   * `{active:false, restoreAllowed:false}` record.
+   */
+  forgetLifetime?: boolean;
 };
 
 export type PreparedKeyTransfer<K extends string | number> = {
@@ -203,7 +212,11 @@ export class EntityMutationFrame<
         const hadBacking = this.valueStore.retireSubjectValue(
           mutation.subjectId
         );
-        this.structuralStore.retireSubject(mutation.subjectId);
+        if (mutation.forgetLifetime) {
+          this.structuralStore.forgetSubject(mutation.subjectId);
+        } else {
+          this.structuralStore.retireSubject(mutation.subjectId);
+        }
         if (hadBacking) {
           physicallyChangedSubjectIds.add(mutation.subjectId);
         }

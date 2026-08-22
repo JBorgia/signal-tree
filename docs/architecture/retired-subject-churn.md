@@ -214,3 +214,108 @@ live entities, and this touches only retirements.
   is decidable statically. Do not generalise the mechanism to the owned case by
   loosening the guard.
 
+
+
+---
+
+## TRIAL — is the 117 B lifetime ledger earned? NOT REFUTED
+
+Open question 2, run as a null hypothesis rather than as a fix. Reproduce with
+`node --expose-gc tools/bench-entity-churn-retention.mjs` (arms
+`no-history-forget`, `no-history-reads-forget`),
+`packages/core/src/lib/entity-lifetime-ledger-null.spec.ts`, and
+`node --expose-gc tools/check-signal-identity-durability.mjs --forget-lifetime`.
+
+**The trial is OFF by default. Nothing shipped changed.** The flag exists to
+falsify, not to configure, and the trial ends by deleting it in whichever
+direction the evidence points.
+
+### The null
+
+The semantic the residue is believed to buy is NOT on trial and is
+non-negotiable:
+
+```text
+held handle -> removed subject -> undefined, forever
+fresh entity reuses the same business key -> the held handle must NOT follow it
+```
+
+On trial is only the claim that preserving it REQUIRES a permanent
+`{active:false, restoreAllowed:false}` record plus a revision entry per subject
+that ever existed. The null deletes both at a zero-owner retirement
+(`StructuralStore.forgetSubject`).
+
+Why it might hold: isolation is anchored in SUBJECT identity, not key identity.
+`nextSubjectId` only increases, `tombstoneSubject` already deletes the
+key -> subject mapping, so a re-add of the same key is a different subject by
+construction. The held signal survives because the CONSUMER holds it, and once
+the map entry is gone nothing can write to it.
+
+### Result: every gate passes in both arms
+
+| gate                                                     | ledger kept | forgotten |
+| -------------------------------------------------------- | ----------- | --------- |
+| stale handle undefined after remove                       | pass        | pass      |
+| fresh entity on the reused key is not followed            | pass        | pass      |
+| held FIELD reference behaves the same                     | pass        | pass      |
+| independent stale handles stay isolated                   | pass        | pass      |
+| subject ids are never recycled                            | pass        | pass      |
+| timeTravel undo unaffected                                | pass        | pass      |
+| transactions rollback unaffected                          | pass        | pass      |
+| **GC: live consumer invalidates after collection**        | pass        | pass      |
+| **GC: held ref survives remove -> undo (same subject)**   | pass        | pass      |
+| **GC: held ref does not follow a reused key**             | pass        | pass      |
+| **GC: independent consumers all invalidate**              | pass        | pass      |
+
+The four GC rows are the decisive ones and vitest cannot run them; they come
+from `check-signal-identity-durability.mjs --forget-lifetime`.
+
+### Measured
+
+| rounds | arm                       | growth   | per retired |
+| -----: | ------------------------- | -------: | ----------: |
+|     50 | `no-history`              |  5.60 MB |       117 B |
+|     50 | `no-history-forget`       |  0.30 MB |       **6 B** |
+|    150 | `no-history`              | 18.79 MB |       131 B |
+|    150 | `no-history-forget`       | -0.83 MB |      **-6 B** |
+
+Negative at 150 rounds. That is the quiescence protocol's noise floor, not
+memory being created — and it is the point: growth is no longer measurable, so
+it is no longer linear in retired subjects. **The pre-registered criterion 1 in
+[entity-churn-retention.md](./entity-churn-retention.md), which zero-owner
+reclamation FAILED, passes under the null.**
+
+### One found bug, inside the trial
+
+The first trial measurement read 79 B/retired, not 6 B. Cause:
+`publishSubjectPhysicalChange` -> `bumpSubjectRevision` runs after the commit and
+writes `subjectRevisions.set(id, 1)`, **resurrecting the entry the forget had
+just deleted**. The null was silently only two-thirds implemented. Recorded
+because the failure mode generalises: deleting from a Map does not stay deleted
+if a later step in the same operation interns by the same key.
+
+### What the null gives up
+
+Exactly two things, both on internal surfaces:
+
+1. `resolveSubjectHandle` reports `missing` rather than `tombstoned` for a
+   forgotten subject, collapsing it with "handle from a previous collection
+   incarnation". Reachable only through `__resolveEntityHandleForTesting`;
+   `entity-handle-resolution.ts` has exactly one call site and it is that hook.
+2. The subject stops appearing in `__listSubjectReclamationCandidates`. Correct
+   — it has nothing left to reclaim — but it can no longer be used to enumerate
+   retirement history. Nothing in production enumerates it.
+
+Neither is a production observable. `planRestore`'s
+"has retired backing and cannot be restored" guard also loses its input, which
+is acceptable ONLY because a tree with no restoration authority has no path to a
+restore: the guard becomes unreachable rather than unenforced. If a restorer can
+exist, `forgetSubject` must not be called — and it is not.
+
+### Not concluded
+
+That the default should flip. The evidence supports it and no gate refutes it,
+but collapsing `tombstoned` into `missing` is a semantic call about the physical
+inspection surface, not something the measurement settles. The owned case
+(1,310 B/retired with `timeTravel`) is untouched and still needs history-aware
+eligibility.
