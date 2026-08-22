@@ -2,7 +2,6 @@ import { computed, Injectable } from '@angular/core';
 import {
   batching,
   entityMap,
-  serialization,
   signalTree,
   timeTravel,
 } from '@signaltree/core';
@@ -143,9 +142,6 @@ export class SignalTreeBenchmarkService {
               break;
             case 'highPerformanceBatching':
               enhancers.push(highPerformanceBatching());
-              break;
-            case 'serialization':
-              enhancers.push(serialization());
               break;
             case 'timeTravel':
               enhancers.push(timeTravel());
@@ -498,72 +494,12 @@ export class SignalTreeBenchmarkService {
   async runSerializationBenchmark(
     dataSize: number
   ): Promise<number | BenchmarkResult> {
-    // ARCHITECTURAL TRADE-OFF: SignalTree's signal unwrapping creates serialization overhead
-    // This is the cost of fine-grained reactivity vs immutable snapshots
-    // Consider: How often does your app serialize state vs perform updates?
-    const base = signalTree({
-      users: Array.from(
-        {
-          length: Math.max(
-            BENCHMARK_CONSTANTS.DATA_SIZE_LIMITS.USER_SIMULATION.MIN,
-            Math.min(
-              BENCHMARK_CONSTANTS.DATA_SIZE_LIMITS.USER_SIMULATION.MAX,
-              dataSize
-            )
-          ),
-        },
-        (_, i) => ({
-          id: i,
-          name: `User ${i}`,
-          roles: i % 5 === 0 ? ['admin', 'user'] : ['user'],
-          active: i % 3 === 0,
-          meta: { createdAt: new Date(2020, 0, 1 + (i % 28)) },
-        })
-      ),
-      settings: {
-        theme: 'dark',
-        flags: {
-          a: true,
-          b: false,
-          c: iota(8).reduce(
-            (o, j) => ({ ...o, [j]: j % 2 === 0 }),
-            {} as Record<number, boolean>
-          ),
-        },
-      },
-    });
-    const tree = this.applyConfiguredEnhancers(base, [
-      highPerformanceBatching(),
-      serialization({ preserveTypes: false, includeMetadata: false }),
-    ]);
-
-    // Helper to avoid ts errors
-    function iota(n: number) {
-      return Array.from({ length: n }, (_, i) => i);
-    }
-
-    // Mutate a little so shape stabilizes
-    for (let i = 0; i < 10; i++) {
-      // Immutable rebuild, matching what the NgRx SignalStore arm does for the
-      // same scenario. (The in-place version did stabilize shape — core's
-      // ref-equality check suppresses notification, not the mutation, and this
-      // benchmark measures snapshot + stringify, which never consults
-      // notification. The rewrite is for parity between the arms, not
-      // correctness.)
-      (tree.$ as any)['users'].update((arr: any[]) => {
-        const idx = i % arr.length;
-        return arr.map((item: any, j: number) =>
-          j === idx ? { ...item, active: !item.active } : item
-        );
-      });
-    }
-
-    // Measure snapshot (unwrap) + stringify separately for fairness
-    const t0 = performance.now();
-    const snapshot = tree.snapshot();
-    JSON.stringify({ data: snapshot.data });
-    const duration = performance.now() - t0;
-    return this.toResult(duration, undefined, 'SignalTree serialization');
+    void dataSize;
+    return this.toResult(
+      -1,
+      undefined,
+      'SignalTree serialization is not in the current RC public surface'
+    );
   }
 
   /**
@@ -1338,10 +1274,7 @@ export class SignalTreeBenchmarkService {
       history: [] as Array<{ action: string; id: number }>,
       middlewareLog: [] as string[],
     });
-    const tree = this.applyConfiguredEnhancers(base, [
-      batching(),
-      serialization(),
-    ]);
+    const tree = this.applyConfiguredEnhancers(base, [batching()]);
 
     const start = performance.now();
 

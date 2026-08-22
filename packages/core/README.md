@@ -696,19 +696,14 @@ const electronics = tree.$.products.all.filter((p) => p.category === 'electronic
 **Full-Stack Application:**
 
 ```typescript
-import { signalTree, serialization, timeTravel, devTools } from '@signaltree/core';
+import { signalTree, persistence, timeTravel } from '@signaltree/core';
 
 const tree = signalTree({
   user: null as User | null,
   preferences: { theme: 'light' },
-}).with(
-  serialization({
-    // Auto-save to localStorage
-    autoSave: true,
-    storage: 'localStorage',
-  }),
-  timeTravel() // Undo/redo support
-);
+})
+  .with(persistence({ key: 'app-state' }))
+  .with(timeTravel()); // Undo/redo support
 
 // For async operations, use manual async or async helpers
 async function fetchUser(id: string) {
@@ -1426,7 +1421,7 @@ async function fetchUsers() {
 ### Full-Featured Development Composition
 
 ```typescript
-import { signalTree, batching, serialization, timeTravel, devTools } from '@signaltree/core';
+import { signalTree, batching, persistence, timeTravel, devTools } from '@signaltree/core';
 
 // Full development stack (example)
 const tree = signalTree({
@@ -1435,25 +1430,20 @@ const tree = signalTree({
     preferences: { theme: 'light' },
     data: { users: [], posts: [] },
   },
-}).with(
-  batching(), // Performance
-  serialization({
-    // State persistence
-    autoSave: true,
-    storage: 'localStorage',
-  }),
-  timeTravel({
+})
+  .with(batching()) // Performance
+  .with(persistence({ key: 'my-app-state' }))
+  .with(timeTravel({
     // Undo/redo
     maxHistory: 50,
-  }),
-  devTools({
+  }))
+  .with(devTools({
     // Debug tools (dev only)
     name: 'MyApp',
     enableTimeTravel: true,
     includePaths: ['app.*', 'ui.*'],
     formatPath: (path) => path.replace(/\.(\d+)/g, '[$1]'),
-  })
-);
+  }));
 
 // Rich feature set available
 async function fetchUser(id: string) {
@@ -1473,18 +1463,12 @@ surviving authoritative state intact for reconciliation or refetch.
 ### Production-Ready Composition
 
 ```typescript
-import { signalTree, batching, serialization } from '@signaltree/core';
+import { signalTree, batching, persistence } from '@signaltree/core';
 
 // Production build (no dev tools)
-const tree = signalTree(initialState).with(
-  batching(), // Performance optimization
-  serialization({
-    // User preferences
-    autoSave: true,
-    storage: 'localStorage',
-    key: 'app-v1.2.3',
-  })
-);
+const tree = signalTree(initialState)
+  .with(batching()) // Performance optimization
+  .with(persistence({ key: 'app-v1.2.3' }));
 
 // Clean, efficient, production-ready
 ```
@@ -2009,7 +1993,7 @@ import {
   batching,
   devTools,
   timeTravel,
-  serialization,
+  persistence,
   entityMap,
 } from '@signaltree/core';
 ```

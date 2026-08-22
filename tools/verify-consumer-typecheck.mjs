@@ -86,7 +86,6 @@ import {
   compared,
   byKeys,
   timeTravel,
-  serialization,
   batching,
 } from '@signaltree/core';
 
@@ -102,7 +101,6 @@ const tree = signalTree({
   // TS2554 (Expected 1 arguments, but got 3) — worth having right in the
   // sample, because it is the shape a newcomer reaches for first.
   .with(timeTravel())
-  .with(serialization())
   .with(batching());
 
 // Reads
@@ -125,8 +123,6 @@ tree.$.users.updateOne(1, { name: 'b' });
 // Enhancer methods
 tree.undo();
 tree.redo();
-const json: string = tree.serialize();
-tree.deserialize(json);
 tree.batch(() => tree.$.count.set(0));
 
 export const _used = [n, whole, rows];
