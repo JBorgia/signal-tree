@@ -5,7 +5,8 @@ import { onHydrateDecision } from './internals/materialize-markers';
 import type { HydrateDecisionEvent } from './internals/materialize-markers';
 import { serialization } from '../enhancers/serialization/serialization';
 import { timeTravel } from '../enhancers/time-travel/time-travel';
-import { entityMap, loader, signalTree } from '../index';
+import { entityMap, signalTree } from '../index';
+import { loader } from './markers/loader';
 
 /**
  * M5 — DECISION OBSERVABILITY.
