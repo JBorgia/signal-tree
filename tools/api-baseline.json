@@ -459,42 +459,6 @@
         "internalDecl": false
       },
       {
-        "name": "serialization",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/enhancers/serialization/serialization.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SerializationConfig",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/enhancers/serialization/serialization.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SerializationMethods",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/enhancers/serialization/serialization.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SerializedState",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/enhancers/serialization/serialization.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "signalTree",
         "subpath": ".",
         "kind": "runtime",

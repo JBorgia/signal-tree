@@ -64,7 +64,6 @@ const MARKERS = [
 const ENHANCERS = [
   ['batching', 'batching', 'batching()', 't.batch(() => t.$.count.set(2));'],
   ['timeTravel', 'timeTravel', 'timeTravel()', 't.undo(); t.redo();'],
-  ['serialization', 'serialization', 'serialization()', 'globalThis.__s = t.serialize();'],
   ['devTools', 'devTools', 'devTools()', 't.connectDevTools();'],
   ['persistence', 'persistence', "persistence({ key: 'k' })", 't.save();'],
 
@@ -125,13 +124,13 @@ const COMBOS = [
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
   ['current public surface mix', `
     import { signalTree, entityMap, compared, byKeys,
-             batching, timeTravel, serialization } from ${C};
+             batching, timeTravel } from ${C};
     const t = signalTree({
       rows: entityMap({ selectId: (r) => r.id }),
       u: compared({ id: 1 }, byKeys('id')),
-    }).with(batching()).with(timeTravel()).with(serialization());
+    }).with(batching()).with(timeTravel());
     t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.u.set({ id: 1 }); }); t.undo();
-    globalThis.__sink = [t.serialize()];`],
+    globalThis.__sink = [t.$.rows.all(), t.$.u()];`],
 ];
 out.combos = [];
 for (const [label, code] of COMBOS) {
