@@ -194,9 +194,29 @@ function hasInlineScopedLeafAddress(
   const inlinePath = (effect as unknown as { path?: unknown }).path;
   const inlineOwnerPath = (effect as unknown as { ownerPath?: unknown }).ownerPath;
 
+  // ⚠️ DO NOT RE-ADD `effect.subjectId === undefined` HERE.
+  //
+  // It was here, and it silently corrupted every entity FIELD rollback. An
+  // entity field write legitimately carries BOTH a subject id and a scoped leaf
+  // address — the capture records exactly this:
+  //
+  //     { owner: 2, before: 'Alpha', after: 'Changed',
+  //       subjectId: 1, path: 'rows.A.name', ownerPath: 'rows' }
+  //
+  // Excluding subject-addressed effects sent it to the address-less branch
+  // below, which drops `path`/`ownerPath`. The applier then had only a subject
+  // id, resolved the target as the ROW, and wrote the FIELD's previous value
+  // into it — the row became the bare string 'Alpha' instead of
+  // `{ id: 'A', name: 'Alpha' }`.
+  //
+  // The two are not alternatives: `hasInlineSubjectAddress` on the applier side
+  // REQUIRES both together, and `reversal-planner.ts` (the undo path) has always
+  // carried both unconditionally. That is why `undo()` was correct and
+  // `rollback()` was not, and the difference was this one condition.
+  //
+  // See transactions-documented-defects.spec.ts.
   return (
     effect.structural === undefined &&
-    effect.subjectId === undefined &&
     typeof inlinePath === 'string' &&
     typeof inlineOwnerPath === 'string' &&
     inlinePath !== inlineOwnerPath
