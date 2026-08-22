@@ -39,7 +39,7 @@ The current root barrel still exports capabilities classified as `LC`, `AS`, or 
 
 Required before RC: for each item below, either keep with an updated disposition or remove/defer it.
 
-### 3. Collection retention is measured but unattributed
+### 3. Collection retention is measured and only partially attributed
 
 Final baseline measured the 10k collection workload as:
 
@@ -48,9 +48,18 @@ Final baseline measured the 10k collection workload as:
 - Elf: `1.50 ms`, `0.92 MB retained`
 - Raw signals: `4.87 ms`, `6.16 MB retained`
 
-This is not yet evidence that `entityMap` must be memory-heavy. It only proves the benchmark workload retained substantially more memory. Attribution is not measured.
+Follow-up retained-heap probes narrow the owner:
 
-Required before RC or explicitly carried into RC notes: classify this as an unattributed performance finding and avoid claiming it is an accepted tradeoff of the v15 architecture.
+- plain `signalTree({ rows: Row[] })`, 10k rows: about `0.8–1.0 MB`
+- `entityMap` 10k after `setAll`, without `all()`: about `59.8 MB`
+- `entityMap` 10k plus `all()`: about `59.7 MB`
+- `entityMap` 10k plus `ids()` / `count()` / `asMap()`: about `60.2 MB`
+- `entityMap` 10k plus held `byId()` for every row: about `65.3 MB`
+- `entityMap` 10k plus transient, unheld `byId()` for every row: about `18.0 MB`
+
+This rules out a held `tree()` snapshot and normal projection reads as the main owner. Held per-row facades add about `5 MB`, but the dominant `~60 MB` is already present in active `entityMap` storage/structural/value realization after `setAll`. The exact split between active value backing, structural store, subject/position metadata, entity signals, and Angular internals is still not measured.
+
+Required before RC or explicitly carried into RC notes: classify this as a partially-attributed performance finding and avoid claiming it is an accepted tradeoff of the v15 architecture until the active `entityMap` internals are decomposed further.
 
 ## Current Publishable Packages
 
@@ -222,7 +231,7 @@ At 10k collection workload:
 - Elf: `1.50 ms`, `0.92 MB retained`
 - Raw signals: `4.87 ms`, `6.16 MB retained`
 
-This is the major unexplained finding. Treat it as unattributed until an ablation identifies the owner.
+Additional retained-heap ablation shows the dominant cost appears before projection reads and before held per-row facades. The remaining attribution target is active `entityMap` internals: retained value backing, structural store, subject/position metadata, entity signals, and Angular runtime objects.
 
 ### Granular workload vs SignalStore
 
