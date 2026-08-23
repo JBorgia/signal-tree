@@ -34,9 +34,12 @@ add-ons. Package boundaries follow the rule in
 [RFC 0007](rfcs/0007-packaging-principle-and-ng-forms-reslice.md): an independent
 dependency or runtime earns its own package; a within-tree mechanic lives in core.
 
-- **@signaltree/core**: the whole state layer — enhancers (batching, devtools, time-travel, serialization), markers (`entityMap`, `status`, `stored`, `form`, `asyncSource`, `asyncQuery`), plus `loader()`, `history()`, `trackHistory()`, `linked()`, `derivedFrom()`, `defineStore()`, `asReadonly()`
-- **@signaltree/ng-forms**: Angular Forms integration — `createFormTree` (FormGroup) and `signalForm()` (Angular 22 Signal Forms bridge). Separate because it depends on `@angular/forms`
-- **@signaltree/events**: domain-event bus with an `entityMap` bridge and optimistic-update manager
+- **@signaltree/core**: the whole state layer — `signalTree()`, the `entityMap`
+  marker, `derivedFrom()`, `defineStore()`, `asReadonly()`, and the enhancers
+  (`batching`, `devTools`, `timeTravel`, `transactions`, `persistence`,
+  `serialization`), plus the `./security` and `./storage` subpaths
+- **@signaltree/events**: domain-event bus with an `entityMap` bridge and
+  optimistic-update manager
 
 **All enhancers are exported from `@signaltree/core`** — no need for separate enhancer packages.
 

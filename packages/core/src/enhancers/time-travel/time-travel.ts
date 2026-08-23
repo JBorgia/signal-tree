@@ -17,7 +17,6 @@ import { copyTreeProperties } from '../utils/copy-tree-properties';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-runtime';
 import {
-  createPositionRegistry,
   getPositionRegistry,
   type PositionRegistry,
 } from '../../lib/internals/position-registry';
@@ -2006,109 +2005,16 @@ class TimeTravelManager<T> {
   }
 }
 
-export interface ScopedHistoryAuthority<T> {
-  record(next: T): void;
-  reset(next: T): void;
-  undo(): boolean;
-  redo(): boolean;
-  canUndo(): boolean;
-  canRedo(): boolean;
-}
-
-export function createScopedHistoryAuthority<
-  T extends Record<string, unknown>
->(options: {
-  read: () => T;
-  write: (next: Partial<T>) => void;
-  maxHistoryEntries?: number;
-  ownerPath?: string;
-  positionId?: number;
-}): ScopedHistoryAuthority<T> {
-  const ownerPath = options.ownerPath ?? '__history';
-  const positionId = options.positionId ?? 1;
-  const snapshot = signal(options.read());
-  const historyTree = { $: snapshot.asReadonly() } as unknown as ISignalTree<T>;
-  const positionRegistry = createPositionRegistry();
-  positionRegistry.allocate();
-  const manager = new TimeTravelManager(
-    historyTree,
-    positionRegistry,
-    {
-      maxHistorySize: Math.max(2, options.maxHistoryEntries ?? 2),
-      includePayload: false,
-    },
-    undefined,
-    (effects, direction) => {
-      for (const effect of effects) {
-        if (effect.kind !== 'set') {
-          throw new Error(`Unsupported scoped form effect at ${effect.path}`);
-        }
-        const nextValue = direction === 'undo' ? effect.before : effect.after;
-        options.write(nextValue as Partial<T>);
-      }
-      snapshot.set(options.read());
-    }
-  );
-
-  let lastRecorded = options.read();
-
-  return {
-    record(next: T): void {
-      if (deepEqual(lastRecorded, next)) {
-        snapshot.set(next);
-        return;
-      }
-
-      manager.addEntry(
-        'SET',
-        undefined,
-        [ownerPath],
-        undefined,
-        [positionId],
-        [
-          {
-            kind: 'set',
-            path: `${ownerPath}.values`,
-            ownerPath,
-            position: positionId,
-            before: lastRecorded,
-            after: next,
-          },
-        ]
-      );
-      lastRecorded = next;
-      snapshot.set(next);
-    },
-    reset(next: T): void {
-      manager.resetHistory();
-      snapshot.set(next);
-      lastRecorded = next;
-      manager.addEntry('INIT');
-    },
-    undo(): boolean {
-      const changed = manager.undoAt(positionId);
-      if (changed) {
-        lastRecorded = options.read();
-        snapshot.set(lastRecorded);
-      }
-      return changed;
-    },
-    redo(): boolean {
-      const changed = manager.redoAt(positionId);
-      if (changed) {
-        lastRecorded = options.read();
-        snapshot.set(lastRecorded);
-      }
-      return changed;
-    },
-    canUndo(): boolean {
-      return manager.canUndoAt(positionId);
-    },
-    canRedo(): boolean {
-      return manager.canRedoAt(positionId);
-    },
-  };
-}
+// TOMBSTONE: `ScopedHistoryAuthority` / `createScopedHistoryAuthority`.
+//
+// A private `TimeTravelManager` over a standalone snapshot signal, built by
+// `ed09e864` so form history could share the causal engine. Its only consumer
+// was `trackHistory()`, and TH-DEL took that; `dead-exports` found it the same
+// hour, unreachable from every entry point and every import.
+//
+// Not preserved "in case": a second history engine over a synthetic one-node
+// tree is exactly the shape TH-0 measured as harmful — a restoration system
+// whose writes another restoration system reads as new authored mutations.
 
 /**
  * Enhances a SignalTree with comprehensive time travel capabilities.

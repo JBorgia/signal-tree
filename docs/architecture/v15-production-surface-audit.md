@@ -15,6 +15,17 @@ exports to get TruckTrax compiling are specifically forbidden — they would
 contaminate the experiment by making the old shape the answer before the
 question is asked.
 
+## A design rule TH-0 produced
+
+> **Two APIs that can independently restore the same state are not
+> automatically composable. If one system interprets the other's restoration as
+> a new authored mutation, exposing both creates competing histories rather than
+> additional capability.**
+
+This is why `trackHistory` was deleted, and it is a much stronger reason than
+"nobody used it". Test it by making the two systems coexist and asking what the
+second one records when the first one undoes.
+
 ## A release rule NGF-DEL produced
 
 > **A gate may not survive merely because its invariant remains philosophically
@@ -157,7 +168,7 @@ is a new question, and a new question does not outrank an unfinished one.
 ```text
 NGF-0   does @signaltree/ng-forms exist at all?          DONE — deleted
    ↓
-TH-0    generic WritableSignal history                   DONE — recommend delete
+TH-0    generic WritableSignal history                   DONE — deleted
    ↓
 A3      status vs transactions
    ↓
@@ -182,7 +193,7 @@ freeze the Candidate B surface
 | id | capability | v13 spelling | status |
 | --- | --- | --- | --- |
 | **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **DELETED — NGF-DEL executed** |
-| **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **evidence gathered — recommend DELETE** |
+| **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
 | A1 | remote acquisition / loading | `loader` | evidence gathered, undecided |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | evidence gathered, undecided |
 | A3 | async / status representation | `status` | evidence gathered, undecided |
@@ -465,16 +476,32 @@ warning that this is not a plain function.
 the justified capability is `timeTravel()`, and this conflicts with it. 3 is
 possible in principle but has no destination and no consumer asking for one.
 
-**Recommended disposition: DELETE (1).** The old negative — "LC / mechanically
-retained" — was wrong about the *reason*, and correcting the reason does not
-produce a positive. `trackHistory` survived FORM-DEL because it was already
-compositional, which made it a coherent primitive; the audit asked whether that
-makes it SignalTree's to publish, and the answer is no on both branches of the
-fork.
+**Disposition: DELETED.** Executed as TH-DEL. The old negative — "LC /
+mechanically retained" — was wrong about the *reason*, and correcting a reason
+does not produce a positive. `trackHistory` survived FORM-DEL because it was
+already compositional, which made it a coherent primitive; the audit asked
+whether that makes it SignalTree's to publish, and the answer is no on both
+branches of the fork.
 
-**This is a recommendation, not an action.** It is not in Candidate A's public
-surface, so deleting the implementation is a source change rather than a surface
-change — but it is still a deletion, and it belongs to you.
+The decisive evidence is the semantic conflict, not the absence of users. Zero
+usage would have been a weak argument — plenty of good APIs start unused. Two
+restoration systems that make each other's interpretation of "undo" wrong is a
+structural argument, and it would hold even with a thousand consumers.
+
+### What TH-DEL removed, and one cascade
+
+`form-history.ts` and its two specs, including the TH-0 experiment itself: a
+spec cannot outlive its subject, and the measurement it produced is recorded
+above. `FormHistoryOptions`, `FormHistoryApi` and `FormHistorySharedAuthority`
+went with it, orphaned. Both disposition rows are retired — a deleted symbol has
+nothing left to withhold.
+
+Then `dead-exports` found a cascade the same run:
+`createScopedHistoryAuthority` in `time-travel.ts`, a private
+`TimeTravelManager` over a standalone snapshot signal built by `ed09e864` so
+form history could share the causal engine. `trackHistory` was its only
+consumer. Deleted rather than kept "in case" — a second history engine over a
+synthetic one-node tree is precisely the shape TH-0 measured as harmful.
 
 **Consequence for the forms migration.** Undo/redo over a composed form model
 would then have no SignalTree answer, which is honest: for a form over a tree
@@ -489,7 +516,20 @@ way.
 `trackHistory()` and `linked()`. Seven of those nine are deleted or withheld.
 `readme-apis` did not catch it because the line is prose, not an import — the
 same blind spot that let the fictional `withForms()` survive in a template
-literal. Logged for MATRIX-CLOSE.
+literal.
+
+**Corrected now**, because it described the shipped product incorrectly. The
+general blind spot goes to MATRIX-CLOSE, and it should NOT become an
+understand-all-prose gate. The falsifiable shape is narrower:
+
+> take the deleted/withheld names from the disposition ledger, scan live
+> shipping docs for them, and allowlist historical and migration contexts
+> explicitly.
+
+That is mechanically testable and would have caught this line. The division of
+labour is then: `readme-apis` proves syntactically recognisable API references
+resolve; the ledger scan proves the docs do not claim deleted or withheld
+capabilities exist.
 
 ---
 
