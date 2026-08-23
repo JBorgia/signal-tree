@@ -8,7 +8,7 @@
  * Angular consumer. Runtime/browser execution belongs to Gate D.
  *
  * Usage: node tools/verify-angular-consumer.mjs
- *        (requires dist/packages/core, ng-forms and events — run the build first)
+ *        (requires dist/packages/core and events — run the build first)
  */
 import { execFileSync } from 'node:child_process';
 import {
@@ -24,7 +24,7 @@ import { join } from 'node:path';
 
 const ROOT = process.cwd();
 const DIST = join(ROOT, 'dist/packages');
-const PACKAGES = ['core', 'ng-forms', 'events'];
+const PACKAGES = ['core', 'events'];
 const ANGULAR_VERSION = process.env['NG_VERSION'] || '^22.0.0';
 const VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version;
 
@@ -90,12 +90,8 @@ import {
   entityMap,
   signalTree,
   timeTravel,
+  toWritableSignal,
 } from '@signaltree/core';
-import {
-  createFormTree,
-  FormValidationError,
-  ngFormValidators,
-} from '@signaltree/ng-forms';
 import { createEventSchema, type BaseEvent } from '@signaltree/events';
 import {
   createOptimisticUpdateManager,
@@ -113,12 +109,13 @@ const tree = signalTree({
 tree.$.users.addOne({ id: 1, name: 'Ada' });
 tree.batch(() => tree.$.count.set(1));
 
-const form = createFormTree(
-  { email: '' },
-  { validators: { email: ngFormValidators.email() } }
-);
-const control = new FormControl(form.$.email());
-const validationError = new FormValidationError({}, {});
+// Forms are COMPOSED, not provided. The ng-forms package is deleted, so this
+// fixture exercises the seam the project actually ships: an ordinary branch
+// handed to Angular as a writable signal.
+// (No backticks in this comment on purpose — it lives inside a template
+// literal, and a backtick here silently ends the fixture source.)
+const profile = signalTree({ email: '' });
+const control = new FormControl(toWritableSignal(profile.$)().email);
 
 const UserUpdated = createEventSchema('UserUpdated', {
   id: z.number(),
@@ -143,7 +140,7 @@ class SmokeComponent {
 export const used = [
   UserUpdated,
   SmokeComponent,
-  validationError,
+  profile,
   manager,
   handler,
 ];

@@ -171,56 +171,18 @@ const userTree = signalTree({
     });
   });
 
-  it('should measure form integration boilerplate', () => {
-    const formExamples = [
-      {
-        framework: 'SignalTree + ng-forms',
-        linesOfCode: 8,
-        setup: `
-import { signalTree } from '@signaltree/core';
-import { withForms } from '@signaltree/ng-forms';
-
-const formTree = signalTree({
-  user: { name: '', email: '' }
-}, { enhancers: [withForms()] });
-
-// Auto-generates FormGroup, validation, dirty tracking`,
-        complexity: 2,
-        maintainability: 9,
-      },
-      {
-        framework: 'Reactive Forms',
-        linesOfCode: 25,
-        setup: `
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
-export class UserFormComponent {
-  userForm: FormGroup;
-
-  constructor(private fb: FormBuilder) {
-    this.userForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]]
-    });
-  }
-
-  onSubmit() {
-    if (this.userForm.valid) {
-      const user = this.userForm.value;
-      // Handle submission
-    }
-  }
-}`,
-        complexity: 6,
-        maintainability: 6,
-      },
-    ];
-
-    formExamples.forEach((example) => {
-      expect(example.framework).toBeDefined();
-      expect(example.linesOfCode).toBeGreaterThan(0);
-    });
-  });
+  // REMOVED: 'should measure form integration boilerplate'.
+  //
+  // It compared "SignalTree + ng-forms — 8 lines, complexity 2, maintainability
+  // 9" against Reactive Forms, and the SignalTree side imported `withForms()`,
+  // which has never existed in any shipped version. The snippet lived in a
+  // template literal, so nothing compiled it and no gate read it: a metric
+  // arguing for a package, computed against an API the package did not have.
+  //
+  // Found by NGF-0 (docs/architecture/v15-production-surface-audit.md) and
+  // deleted rather than corrected, because `@signaltree/ng-forms` is deleted
+  // and because the assertions were `toBeDefined()` — the test could not have
+  // failed on a wrong number either way.
 
   it('should measure type safety and inference', () => {
     // Test TypeScript inference quality

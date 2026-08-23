@@ -4,7 +4,6 @@
  * Verify Package Exports
  * Ensures all package exports are valid and can be imported
  *
- * Note: ng-forms is built during release (after core is published)
  * so they may not be present during pre-publish validation. Use --all to check all packages.
  */
 
@@ -16,7 +15,6 @@ const path = require('path');
 const PUBLISHED_PACKAGES = [
   'core',
   'events',
-  'ng-forms',
 ];
 
 const PACKAGES = PUBLISHED_PACKAGES;

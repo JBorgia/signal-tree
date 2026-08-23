@@ -8,13 +8,19 @@
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": ["{options.outputPath}"],
-      "dependsOn": ["generate-versions"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "dependsOn": [
+        "generate-versions"
+      ],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/demo",
         "browser": "apps/demo/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js"
+        ],
         "tsConfig": "apps/demo/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -39,16 +45,13 @@
           },
           {
             "glob": "README.md",
-            "input": "packages/ng-forms",
-            "output": "assets/docs/ng-forms"
-          },
-          {
-            "glob": "README.md",
             "input": "packages/guardrails",
             "output": "assets/docs/guardrails"
           }
         ],
-        "styles": ["apps/demo/src/styles.scss"]
+        "styles": [
+          "apps/demo/src/styles.scss"
+        ]
       },
       "configurations": {
         "production": {
@@ -104,7 +107,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
         "jestConfig": "apps/demo/jest.config.ts",
         "passWithNoTests": true,

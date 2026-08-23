@@ -44,7 +44,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 /** The fixed release group — the projects `build:all` produces and we publish. */
-const PUBLISHABLE = ['core', 'events', 'ng-forms'];
+const PUBLISHABLE = ['core', 'events'];
 
 const BAD_PROTOCOLS = ['workspace:', 'file:', 'link:', 'portal:'];
 const DEP_BLOCKS = [
@@ -212,18 +212,18 @@ function inspectManifest(json, path, versionByName) {
  */
 function selfTest() {
   const clean = {
-    name: '@signaltree/ng-forms',
+    name: '@signaltree/events',
     version: '15.0.0-rc.1',
     peerDependencies: { '@signaltree/core': '^15.0.0-rc.1' },
   };
   const withProtocol = {
-    name: '@signaltree/ng-forms',
+    name: '@signaltree/events',
     version: '15.0.0-rc.1',
     // The exact string the 15.0 rehearsal found in dist/.
     peerDependencies: { '@signaltree/core': 'workspace:*' },
   };
   const withDeadRange = {
-    name: '@signaltree/ng-forms',
+    name: '@signaltree/events',
     version: '15.0.0-rc.1',
     // Valid semver, admits nothing being shipped — a caret on a stable version
     // does NOT admit a prerelease of the same version.

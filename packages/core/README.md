@@ -2089,79 +2089,6 @@ import {
 
 While `@signaltree/core` includes comprehensive built-in enhancers for most use cases, the SignalTree ecosystem also provides specialized companion packages for specific needs:
 
-### 📝 @signaltree/ng-forms
-
-**Angular Forms integration for SignalTree (Angular 17+)**
-
-Seamlessly connect Angular Forms with your SignalTree state for two-way data binding, validation, and form control.
-
-```bash
-npm install @signaltree/ng-forms
-```
-
-**Features:**
-
-- 🔗 Two-way binding between forms and SignalTree state
-- ✅ Built-in validation integration
-- 🎯 Type-safe form controls
-- 🔄 Automatic sync between form state and tree state
-- 📊 Form status tracking (valid, pristine, touched, etc.)
-- ⚡ Native Signal Forms support (Angular 20.3+)
-- 🔧 Legacy bridge for Angular 17-19 (deprecated, will be removed with Angular 21)
-
-**Signal Forms (Angular 20.3+ recommended)**
-
-Use Angular's Signal Forms `connect()` API directly with SignalTree:
-
-```ts
-import { toWritableSignal } from '@signaltree/core';
-
-const tree = signalTree({
-  user: { name: '', email: '' },
-});
-
-// Leaves are WritableSignal<T>
-nameControl.connect(tree.$.user.name);
-
-// Convert a slice to a WritableSignal<T>
-const userSignal = toWritableSignal(tree.$.user);
-userGroupControl.connect(userSignal);
-```
-
-The `@signaltree/ng-forms` package supports Angular 17+ and will prefer `connect()` when available (Angular 20.3+). Angular 17-19 uses a legacy bridge that will be deprecated when Angular 21 is released.
-
-**Quick Example:**
-
-```typescript
-import { createFormTree, ngFormValidators } from '@signaltree/ng-forms';
-
-const formTree = createFormTree({ name: '', email: '', age: 0 }, { validators: { email: ngFormValidators.email() } });
-
-@Component({
-  template: `
-    <form [formGroup]="form">
-      <input formControlName="name" />
-      <input formControlName="email" type="email" />
-      <input formControlName="age" type="number" />
-    </form>
-  `,
-})
-class UserFormComponent {
-  form = formTree.form;
-}
-```
-
-**When to use:**
-
-- Building forms with Angular Reactive Forms
-- Need validation integration
-- Two-way data binding between forms and state
-- Complex form scenarios with nested form groups
-
-**Learn more:** [npm package](https://www.npmjs.com/package/@signaltree/ng-forms)
-
----
-
 ## Package Selection Guide
 
 **Start with just `@signaltree/core`** - it includes comprehensive enhancers for most applications:
@@ -2183,11 +2110,8 @@ class UserFormComponent {
 # Basic application
 npm install @signaltree/core
 
-# Application with forms
-npm install @signaltree/core @signaltree/ng-forms
-
-# Application with all current companion packages
-npm install @signaltree/core @signaltree/ng-forms
+# Application with the events companion package
+npm install @signaltree/core @signaltree/events
 ```
 
 ## Links

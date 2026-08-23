@@ -107,17 +107,9 @@ export class CartView {
       audience: 'I want the full reference',
       title: 'Browse package docs',
       description:
-        'Core API surface, plus optional packages: ng-forms, realtime, events. Every type, every signature.',
+        'Core API surface, plus the optional events package. Every type, every signature.',
       route: '/docs',
       cta: 'Open docs →',
-    },
-    {
-      audience: 'I need form / data validation',
-      title: 'See the Angular forms bridge',
-      description:
-        'SignalTree ships no validation API and no form marker. It publishes the model; Angular observes it; your own Zod / Valibot / ArkType schemas do the judging.',
-      route: '/ng-forms',
-      cta: 'Open the forms demo →',
     },
     {
       audience: 'I want proof, not promises',

@@ -116,7 +116,7 @@ const GATES = [
       // `nx test demo` by hand. It is also the app the demo-coverage gate holds
       // up as proof every export is demonstrated — so it breaking silently would
       // undermine that gate too.
-      '--projects=core,ng-forms,shared,events,demo',
+      '--projects=core,shared,events,demo',
       '--skip-nx-cache',
     ],
     slow: true,
@@ -221,23 +221,19 @@ const GATES = [
       replace: 'const WARN_ONLY_CODES = [];',
     },
   },
-  {
-    name: 'angular-compat',
-    covers: 'no Angular API newer than the ^20 floor is imported as a VALUE',
-    cmd: ['node', 'tools/check-angular-compat.mjs'],
-    needsBuild: true,
-    // The repo's own Angular is 22, so an accidental value-import of Signal
-    // Forms would build, test and publish green while breaking every Angular 20
-    // consumer at import time.
-    // Mutating the /signals entry proves nothing — it is ALLOWED to use Signal
-    // Forms. The regression that matters is the MAIN entry reaching it, which
-    // is what breaks an Angular 20 consumer who never touched /signals.
-    mutation: {
-      file: 'dist/packages/ng-forms/dist/core/ng-forms.js',
-      append:
-        "\nexport { form as __gateLeak } from '@angular/forms/signals';\n",
-    },
-  },
+  // REMOVED WITH THE PACKAGE: 'angular-compat'.
+  //
+  // Its whole subject was `@signaltree/ng-forms/signals`, which required
+  // Angular 22 while the main ng-forms entry had to stay importable on Angular
+  // 20 — the gate checked that the main entry could not transitively reach
+  // Signal Forms. NGF-DEL deleted both entries, so `ENTRY_FLOORS` is empty and
+  // its mutation target no longer exists: the gate could no longer fail, which
+  // is the blind condition this suite rejects.
+  //
+  // The INVARIANT is still real and still general — an entry point must not
+  // reach an API above its own Angular floor. It has no subject today because
+  // no shipped entry declares a floor above its package's peer range. Re-add
+  // it, with the same transitive-reachability check, the moment one does.
   {
     name: 'version-claims',
     covers: 'every documented Angular-version claim matches peerDependencies',
@@ -1129,7 +1125,7 @@ const selected = GATES.filter(
  * half-written `dist/` produce noise, and "the build is broken" is the finding,
  * not a footnote to twenty-three other failures.
  */
-const BUILD_PROJECTS = 'core,shared,ng-forms,events';
+const BUILD_PROJECTS = 'core,shared,events';
 
 function buildOnceIfNeeded() {
   if (!selected.some((g) => g.needsBuild)) return;

@@ -31,7 +31,6 @@ const path = require('node:path');
 const PACKAGES = [
   'core',
   'events',
-  'ng-forms',
 ];
 
 /** Files that must NEVER appear in a published tarball. */
