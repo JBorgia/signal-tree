@@ -157,9 +157,31 @@ function barrelsFor(pkgDir) {
  * those are NOT followed — the same rule `api-surface.mjs` learned after
  * counting our internals against competitors' public APIs.
  */
-function symbolsAt(rev, relPath, seen = new Set(), out = new Map(), depth = 0) {
-  if (depth > 6 || seen.has(relPath)) return out;
-  seen.add(relPath);
+/**
+ * `typesOnly` harvests a module's exported TYPE names without its values.
+ *
+ * Needed because a NAMED re-export — `export { timeTravel } from './…'` — used
+ * to note the value and stop. The module's config interface never entered the
+ * public name set, so none of its members were ever diffed, even though every
+ * option a user can pass to `timeTravel()` is public API by way of that
+ * signature. Proven blind: a brand-new `TimeTravelConfig` member was invisible
+ * and the gate still reported "0 uncovered".
+ *
+ * Harvested as kind `'type'`, which the coverage rules ignore, so this widens
+ * MEMBER checking without demanding that type names themselves be documented.
+ * It over-includes types a module exports but no signature uses — the safe
+ * direction for a gate whose failure mode is a silent green.
+ */
+function symbolsAt(
+  rev,
+  relPath,
+  seen = new Set(),
+  out = new Map(),
+  depth = 0,
+  typesOnly = false
+) {
+  if (depth > 6 || seen.has(`${typesOnly ? 'T' : 'V'}${relPath}`)) return out;
+  seen.add(`${typesOnly ? 'T' : 'V'}${relPath}`);
   const text = showAt(rev, relPath);
   if (text == null) return out;
 
@@ -176,6 +198,7 @@ function symbolsAt(rev, relPath, seen = new Set(), out = new Map(), depth = 0) {
 
   const pkg = relPath.split('/')[1] ?? 'unknown';
   const note = (name, kind) => {
+    if (typesOnly && kind !== 'type') return;
     // A name re-exported as a value anywhere wins: `export type { X }` in one
     // barrel and `export function X` in another must not downgrade to a type.
     if (kind === 'value' || !out.has(name)) out.set(name, { kind, pkg });
@@ -187,9 +210,18 @@ function symbolsAt(rev, relPath, seen = new Set(), out = new Map(), depth = 0) {
         for (const el of st.exportClause.elements) {
           note(el.name.text, st.isTypeOnly || el.isTypeOnly ? 'type' : 'value');
         }
+        // A named re-export publishes only those names — but a re-exported
+        // FUNCTION drags its parameter and return types into the public surface
+        // with it. Harvest the source module's types so their members are
+        // diffed. Values are deliberately not harvested: they are genuinely
+        // not exported by this barrel.
+        if (st.moduleSpecifier) {
+          const next = resolveSpecifier(st.moduleSpecifier.text);
+          if (next) symbolsAt(rev, next, seen, out, depth + 1, true);
+        }
       } else if (!st.exportClause && st.moduleSpecifier) {
         const next = resolveSpecifier(st.moduleSpecifier.text);
-        if (next) symbolsAt(rev, next, seen, out, depth + 1);
+        if (next) symbolsAt(rev, next, seen, out, depth + 1, typesOnly);
       }
       continue;
     }
@@ -327,6 +359,24 @@ const EXEMPT = new Map(
       'internal UpdateMetadata transaction token used by transactions()',
     transactionOwner:
       'internal UpdateMetadata tree token used to isolate transactions()',
+    // ── under active disposition in HIST-C2 step 7 ──────────────────────
+    // These are declines WITH a stated deadline, not silent gaps. Each is a
+    // real public config member today; each is slated to be deleted or
+    // reconciled before 15.0 ships. If any of them survives to release, the
+    // exemption is wrong and it must be documented instead.
+    recordHistory:
+      'entityMap({ recordHistory: false }) — a location-scoped history filter ' +
+      '(RFC 0012). HIST-0 case 4 and a measured mixed-turn case show it ' +
+      'partially reverses an atomically authored operation. Opt-in eligibility ' +
+      'leaves it no semantic role; slated for deletion, not documentation',
+    shouldSkip:
+      'TimeTravelConfig.shouldSkip — a read-time transition filter that still ' +
+      'pays full recording cost. Overlaps what turn eligibility now expresses; ' +
+      'disposition (subsume or delete) is HIST-C2 step 7',
+    restorationEligibility:
+      'HIST-C2 prototype switch. Exists only so the existing suites can run ' +
+      'under the old default while the door is characterised, and is deleted ' +
+      'when the default flips. Implementation vocabulary; never a shipped option',
     restorationDesignated:
       'HIST-C2 prototype plumbing: stamped on UpdateMetadata at notify() time ' +
       'because capture is deferred to the flush microtask. Applications never ' +

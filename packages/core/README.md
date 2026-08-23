@@ -1907,6 +1907,30 @@ All enhancers are included in `@signaltree/core`:
 - **timeTravel()** - Undo/redo functionality & state history
 - **serialization()** - State persistence & SSR support
 
+### SSR transfer vs storage restore
+
+`deserialize()` accepts `{ transfer: true }` to mark a payload as an **SSR
+transfer** rather than a storage restore. Both cross a process boundary, and
+they want opposite answers from any marker that owns a live source:
+
+```ts
+// client bootstrap
+const ts = inject(TransferState);
+if (ts.hasKey(KEY)) tree.deserialize(ts.get(KEY, '{}'), { transfer: true });
+```
+
+A `localStorage` payload may be days old, so a loader-backed marker is right to
+decline it and fetch something better. A server payload was fetched milliseconds
+ago and the local loader has not run, so declining it ships the bytes into the
+page and then refetches, wasting the transfer entirely. RFC 0014 records the
+measurement behind that.
+
+With `transfer: true`, `asyncSource` and loader-backed `entityMap` accept the
+payload. It deliberately does not change two things: an in-flight `LOADING`
+status is still normalised (a request in flight on the server is not in flight
+here), and a form's `touched` is still not restored. Defaults to `false`. RFC
+0014.
+
 ## When to use core only
 
 Perfect for:
