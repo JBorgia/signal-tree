@@ -26,7 +26,6 @@ import { build } from 'esbuild';
 
 const PKGS = [
   'core',
-  'events',
 ];
 const ROOT = new URL('..', import.meta.url).pathname;
 const NM = `${ROOT}node_modules`;

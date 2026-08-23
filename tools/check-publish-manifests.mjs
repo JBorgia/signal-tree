@@ -44,7 +44,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 /** The fixed release group — the projects `build:all` produces and we publish. */
-const PUBLISHABLE = ['core', 'events'];
+const PUBLISHABLE = ['core'];
 
 const BAD_PROTOCOLS = ['workspace:', 'file:', 'link:', 'portal:'];
 const DEP_BLOCKS = [

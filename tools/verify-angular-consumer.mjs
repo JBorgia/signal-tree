@@ -8,7 +8,7 @@
  * Angular consumer. Runtime/browser execution belongs to Gate D.
  *
  * Usage: node tools/verify-angular-consumer.mjs
- *        (requires dist/packages/core and events — run the build first)
+ *        (requires dist/packages/core — run the build first)
  */
 import { execFileSync } from 'node:child_process';
 import {
@@ -24,7 +24,7 @@ import { join } from 'node:path';
 
 const ROOT = process.cwd();
 const DIST = join(ROOT, 'dist/packages');
-const PACKAGES = ['core', 'events'];
+const PACKAGES = ['core'];
 const ANGULAR_VERSION = process.env['NG_VERSION'] || '^22.0.0';
 const VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version;
 
@@ -84,7 +84,6 @@ writeFileSync(
   `
 import { Component, signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { z } from 'zod';
 import {
   batching,
   entityMap,
@@ -92,14 +91,8 @@ import {
   timeTravel,
   toWritableSignal,
 } from '@signaltree/core';
-import { createEventSchema, type BaseEvent } from '@signaltree/events';
-import {
-  createOptimisticUpdateManager,
-  entityEventHandler,
-} from '@signaltree/events/angular';
 
 type User = { id: number; name: string };
-type UserUpdatedEvent = BaseEvent<'UserUpdated', User>;
 
 const tree = signalTree({
   count: 0,
@@ -117,15 +110,6 @@ tree.batch(() => tree.$.count.set(1));
 const profile = signalTree({ email: '' });
 const control = new FormControl(toWritableSignal(profile.$)().email);
 
-const UserUpdated = createEventSchema('UserUpdated', {
-  id: z.number(),
-  name: z.string(),
-});
-
-const manager = createOptimisticUpdateManager();
-const handler = entityEventHandler<User, number, UserUpdatedEvent>(tree.$.users, {
-  upsert: (event) => event.data,
-});
 
 @Component({
   standalone: true,
@@ -137,13 +121,7 @@ class SmokeComponent {
   readonly tree = tree;
 }
 
-export const used = [
-  UserUpdated,
-  SmokeComponent,
-  profile,
-  manager,
-  handler,
-];
+export const used = [SmokeComponent, profile, tree];
 `
 );
 

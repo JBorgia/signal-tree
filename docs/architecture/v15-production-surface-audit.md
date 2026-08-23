@@ -333,7 +333,7 @@ freeze the Candidate B surface
 | **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **DELETED — NGF-DEL executed** |
 | **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
 | **PER-0** | **does `persistence()` deserve to ship, and in this form?** | `persistence`, `StorageAdapter`, `./storage` | **REDESIGN — function survives, form does not** |
-| **EVT-0** | **does `@signaltree/events` exist at all?** | the package and its four entry points | **evidence gathered — recommend DELETE** |
+| **EVT-0** | **does `@signaltree/events` exist at all?** | the package and its four entry points | **DELETED — EVT-DEL executed** |
 | A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
@@ -1103,13 +1103,20 @@ The event-bus toolkit may be genuinely good. That is not the question NGF-0
 settled — **useful is not owned**, and a package with zero imports of the
 library it is named after has no ownership claim to make.
 
-**Recommendation, not action.** It is published, so removal is a public-surface
-decision. If it is kept instead, the minimum is: drop the unused peer
-dependency, and reconcile `OptimisticUpdateManager` with `transactions()` rather
-than shipping two rollback authorities.
+**Disposition: DELETED.** Executed as EVT-DEL. Nothing was re-homed, for the
+same reason nothing was re-homed from ng-forms.
 
-If it is deleted, the shipped topology becomes **`@signaltree/core` alone** —
-which would make the "one package, one tree" story literal.
+The shipped topology is now **`@signaltree/core` alone**, which makes the
+"one package, one tree" story literal. Its remaining subpaths — `./security`
+and `./storage` — are the entire companion surface, and both are under audit
+(SEC-0, and PER-0 which put `./storage` on death row unless independently
+earned).
+
+Two demo specs were made package-agnostic on the way out. One named `events`;
+an earlier version of the same test named `ng-forms` and broke when THAT was
+deleted. A test about selection-to-fetch wiring should not be a hostage of the
+package list — and with a single package left, `expectOne` also had to become
+`match`, because the constructor already fetched the only README there is.
 
 ---
 

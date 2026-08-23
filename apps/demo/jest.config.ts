@@ -13,11 +13,6 @@ module.exports = {
     '^@signaltree/core/(authoring|security|lazy|edit-session|storage)$':
       '<rootDir>/../../packages/core/src/$1.ts',
     '^@signaltree/core/(.*)$': '<rootDir>/../../packages/core/src/$1/index.ts',
-    // Package subpaths that are DIRECTORIES under src/ (e.g. events/angular).
-    // Without this the generic rule below captures `$1 = "events/angular"` and
-    // resolves to packages/events/angular/src/index.ts, which does not exist.
-    '^@signaltree/events/(.*)$':
-      '<rootDir>/../../packages/events/src/$1/index.ts',
     '^@signaltree/(.*)$': '<rootDir>/../../packages/$1/src/index.ts',
     '^@app/(.*)$': '<rootDir>/src/app/$1',
     '^@benchmark/(.*)$': '<rootDir>/src/app/services/benchmark/$1',

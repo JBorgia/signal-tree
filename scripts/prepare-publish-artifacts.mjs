@@ -43,7 +43,6 @@ const VERIFY_ONLY = process.argv.includes('--verify-only');
 
 const PACKAGES = [
   'core',
-  'events',
   'shared',
 ];
 

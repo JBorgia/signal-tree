@@ -89,7 +89,6 @@ const packages = [
 // meant a green release run had verified neither of them.
 const nxProjects = [
   'core',
-  'events',
   'shared',
   'ng-forms',
 ];

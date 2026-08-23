@@ -14,7 +14,6 @@ const path = require('path');
 // (Pre-publish validation now builds all of these.)
 const PUBLISHED_PACKAGES = [
   'core',
-  'events',
 ];
 
 const PACKAGES = PUBLISHED_PACKAGES;

@@ -35,11 +35,6 @@
           },
           {
             "glob": "README.md",
-            "input": "packages/events",
-            "output": "assets/docs/events"
-          },
-          {
-            "glob": "README.md",
             "input": "packages/realtime",
             "output": "assets/docs/realtime"
           },
