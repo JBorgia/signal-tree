@@ -1553,6 +1553,33 @@ export function signalTree<T extends object, TDerived extends object>(
   const hasEnhancers = ordered.length > 0;
   if (hasEnhancers) {
     materializeTreeMarkers(tree, materializationContext);
+
+    // Hand the entity collections to the tree so the reclamation sink can
+    // broadcast to them. The ARRAY REFERENCE is attached, not a copy of its
+    // contents: markers materialize lazily when nothing forces them, so a
+    // collection can register after this line and must still be visible.
+    //
+    // Placed here rather than in `create()` for two reasons. Markers have not
+    // materialized yet at that point, so the list is always empty there — the
+    // first version of this attached an empty array and the sink silently
+    // reclaimed nothing. And `hasEnhancers` gates it, so a bare tree pays
+    // nothing.
+    //
+    // A bare `Symbol.for` rather than an import from the sink module,
+    // deliberately: `signal-tree.ts` is the bare bundle's entry point and that
+    // edge would ship the sink to trees that can never restore, which is the
+    // defect `bundle-budget` caught when the claim registry was constructed
+    // here. The sink resolves the same global symbol.
+    Object.defineProperty(
+      tree.$ as object,
+      Symbol.for('SignalTree:SubjectPhysicalOwners'),
+      {
+        value: materializationContext.physicalOwners,
+        enumerable: false,
+        configurable: true,
+      }
+    );
+
     tree = applyEnhancers(tree, ordered);
   }
 

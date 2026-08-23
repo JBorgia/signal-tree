@@ -741,3 +741,105 @@ Defaults that follow: history off unless requested, transactions off unless
 requested, reclamation automatic, and no reclamation-policy knob. `timeTravel()`
 is bounded by default; the specific depth is configuration and has not been
 established empirically.
+
+
+---
+
+## STEP 8 PHASE 6D — the sink lands, and the Phase 1 attribution is FALSIFIED
+
+Reproduce with `node --expose-gc tools/probe-staged-retention.mjs`,
+`tools/probe-history-subject-ownership.mjs` and
+`tools/probe-heap-object-census.mjs`.
+
+### What the sink achieved
+
+Released claims now reach the physical layer. It BROADCASTS, because Phase 6A
+established that a subject id cannot route to a collection. It re-checks the
+registry per subject, so the last-owner rule is enforced in one place rather
+than at every call site. `transactions()` retains for the pending interval so a
+rollback cannot lose its subject.
+
+The entity-side result is exactly the intended shape:
+
+```text
+rounds   retired   physical   claimed   owned   ORPHANS
+    20     4,000      4,000     4,200   4,000         0
+   320    64,000      4,000     4,200   4,000         0
+```
+
+Physical retention plateaus at one window; orphans are zero at every point.
+
+### The Phase 1 attribution was wrong, and this is how it was found
+
+Phase 1 reported that orphaned retired subjects accounted for **90% of the heap
+slope at 945 B each**. Eliminating 100% of the orphans removed roughly **9%** of
+it: 61.3 MB -> 54.1 MB at 320 rounds.
+
+The statistic was a correlation dressed as an attribution. `marginalBytesPerOrphan
+= Δheap / Δorphans` divides one quantity that grows with the round count by
+another that also grows with the round count; any per-round term would have
+produced a plausible per-orphan figure. The probe never removed the orphans and
+re-measured, which is the only thing that could have told the two apart.
+
+This is the second time a divide-by-a-covariate produced a confident wrong
+answer in this file — see the `Infinity` note in Phase 1. The lesson is the
+same and it is now recorded twice: an attribution needs an intervention.
+
+### Two real defects found and fixed on the way
+
+**The publish re-interned the forget.** `applyPreparedSubjectReclamation`
+published `physicallyChangedSubjectIds` after the frame, and
+`publishSubjectPhysicalChange` -> `bumpSubjectRevision` does
+`subjectRevisions.set(id, ...)`, recreating the entry `forgetSubject` had just
+deleted. `subjectRevisions` grew to one entry per subject ever created — 64,200
+at 320 rounds while every other structural map sat at 4,200. Identical in
+mechanism to the 79 B/6 B bug already documented on the zero-owner path, and
+reintroduced at the new call site.
+
+**The inventory that declared success could not see the leak.**
+`__listSubjectReclamationCandidates` filters on `hasRetainedValueBacking`, so a
+subject whose bytes were reclaimed drops out of it even though its lifetime
+record survives. The first sink retired only the value; the inventory read
+"bounded" and the ledger kept growing. The planner now retires
+`subject-lifetime-record` too, gated on the claim check.
+
+### What is still unbounded, and it is not the entity layer
+
+A no-history tree is flat (-0.80 MB at 64,000 retirements). A tree with
+`maxHistorySize: 2` — which legitimately retains ~400 subjects — grows 4.1 MB ->
+47.4 MB over the same churn. So this is history-runtime retention, not
+allocation noise, and it is not bounded by `maxHistorySize`.
+
+A V8 heap-object census named the owner. Per retired subject, the
+tree-realization descriptors keep four entries that nothing prunes:
+
+```text
+                                64,000 retirements
+structuralHistoryEffects               128,200   (add + remove per subject)
+structuralHistoryBySubject              64,200
+subjectDescriptors                      64,200
+                                       -------
+                                       256,600 entries
+```
+
+They live in the `SignalTree:TreeRealizationDescriptors` map, keyed by owner
+position, and no eviction, reclamation or claim release touches them.
+
+### The remaining work, stated as the same ownership rule
+
+For each entry in those three maps: what legal future operation still requires
+it? Needed by a live subject, by a retained history entry, or by a pending
+transaction — retain for exactly that long. None of the above — delete. That is
+the rule already frozen above; these structures simply were never connected to
+it.
+
+Not "delete all descriptor data when a claim reaches zero" until the read sites
+are pinned: the three maps have different purposes and different readers.
+
+### The gate threshold was too weak, and briefly reported a false green
+
+`boundedIsFlat` was `ratio < roundRatio / 2`, which at 16x the rounds passes
+anything under 8x. The bounded arm measured 8.1x and the gate flipped to
+BOUNDED over a run that grew 6.8 MB -> 54 MB. It now requires `< 2`: bounded
+means the retained set is the window, so total retention is close at 20 rounds
+and at 320. The gate is red again, for the right reason.

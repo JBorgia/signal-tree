@@ -1,3 +1,4 @@
+import { getOrCreateSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import type {
   Enhancer,
   EnhancerMeta,
@@ -345,6 +346,24 @@ class TransactionAuthority {
   private pendingTurns = new Map<number, TransactionTurnRecord>();
   private nextTurnId = 1;
 
+  /**
+   * Restoration-claim hooks, injected because the authority has no tree.
+   *
+   * An UNSETTLED turn owns the subjects it retired: Phase 6B measured that
+   * reclaiming one makes `rollback()` throw and loses the row permanently. The
+   * claim exists for exactly that interval — optimistic mutation to settlement,
+   * confirm or reject alike — so the bound is how many operations are
+   * outstanding right now, never a configured depth.
+   */
+  constructor(
+    private readonly retainPendingClaims: (
+      turnId: number,
+      subjectIds: readonly number[]
+    ) => void = () => undefined,
+    private readonly releasePendingClaims: (turnId: number) => void = () =>
+      undefined
+  ) {}
+
   private buildTurn(
     ownerPaths?: string[],
     subjectIds?: number[],
@@ -403,6 +422,7 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.set(turn.id, turn);
+    this.retainPendingClaims(turn.id, turn.restorationSubjectIds ?? []);
     return cloneTurnRecord(turn);
   }
 
@@ -412,6 +432,12 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.delete(turnId);
+    // SETTLED. Confirmation discards rollback state rather than becoming
+    // permanent history — those are different product concepts. A tree that
+    // also has `timeTravel()` has already claimed these subjects through its
+    // own capture of the same writes, so the subject is not left unowned by
+    // the handoff.
+    this.releasePendingClaims(turnId);
     this.insertConfirmed(turn);
     return cloneTurnRecord(turn);
   }
@@ -422,6 +448,7 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.delete(turnId);
+    this.releasePendingClaims(turnId);
     return cloneTurnRecord(turn);
   }
 
@@ -499,7 +526,28 @@ export function getOrCreateInternalTransactionRuntime<T>(
     return existing;
   }
 
-  const authority = new TransactionAuthority();
+  const authority = new TransactionAuthority(
+    (turnId, subjectIds) => {
+      if (subjectIds.length === 0) {
+        return;
+      }
+      getOrCreateSubjectRestorationClaims(tree)?.retain(
+        `transaction:${turnId}`,
+        subjectIds
+      );
+    },
+    (turnId) => {
+      // Releases the claim; deliberately does NOT drive the reclamation sink.
+      // Settlement can land before the notifier flush that lets `timeTravel()`
+      // claim the same subjects, and reclaiming in that gap is the
+      // premature-reclamation hazard `never-claimed-retirement.spec.ts` pins.
+      // Reclamation happens at the history eviction boundary, which is late
+      // enough that every capture has run.
+      getOrCreateSubjectRestorationClaims(tree)?.release(
+        `transaction:${turnId}`
+      );
+    }
+  );
   const transactionOwnerToken = {};
   let nextTransactionId = 1;
   const isRestoring = false;

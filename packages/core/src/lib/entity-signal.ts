@@ -125,6 +125,24 @@ export type PreparedEntitySubjectReclamation = {
 
 export type EntitySubjectReclamationPlanningOptions = {
   causallyEligible: boolean;
+  /**
+   * Also drop the subject's LIFETIME RECORD, not just its value bytes.
+   *
+   * Off by default because the two have different safety arguments. Retiring
+   * the value is invisible: nothing reads `backingForSubject` on a tombstoned
+   * subject, and every restorer holds its own copy. Forgetting the lifetime is
+   * what makes the subject unrestorable, so it needs a caller that has
+   * established nothing can still restore it.
+   *
+   * It is also the only half that BOUNDS retention. The value is ~132 B of the
+   * measured 249 B/retired and the lifetime record is the other ~111 B, and the
+   * ledger is what grows with every subject the collection has ever retired.
+   * A sink that retires only the value leaves a slope — measured, after the
+   * first version of this did exactly that and the inventory looked bounded
+   * because `__listSubjectReclamationCandidates` only counts value-backed
+   * subjects.
+   */
+  reclaimLifetimeRecord?: boolean;
 };
 
 export function planEntitySubjectReclamation<K extends string | number>(
@@ -174,13 +192,19 @@ export function planEntitySubjectReclamation<K extends string | number>(
 
   const retire: EntitySubjectReclamationResource[] = [];
   const remaining = [...retain];
+  const promote = (resource: EntitySubjectReclamationResource) => {
+    retire.push(resource);
+    const index = remaining.indexOf(resource);
+    if (index !== -1) {
+      remaining.splice(index, 1);
+    }
+  };
 
   if (inventory.retainedValueBacking) {
-    retire.push('retained-value-backing');
-    const backingIndex = remaining.indexOf('retained-value-backing');
-    if (backingIndex !== -1) {
-      remaining.splice(backingIndex, 1);
-    }
+    promote('retained-value-backing');
+  }
+  if (options.reclaimLifetimeRecord && inventory.retainedSubjectState) {
+    promote('subject-lifetime-record');
   }
 
   return {
@@ -1442,19 +1466,44 @@ export function createEntitySignal<
     }
 
     const frame = createEntityMutationFrame();
-    for (const resource of prepared.retire) {
-      if (resource === 'retained-value-backing') {
-        const retirement: PreparedRetainedValueRetirement = {
-          kind: 'retire-retained-value',
-          subjectId: prepared.subjectId,
-        };
-        frame.stageRetainedValueRetirement(retirement);
-        entitySignals.delete(prepared.subjectId);
-      }
+    const forgetLifetime = prepared.retire.includes('subject-lifetime-record');
+    const retiresValue = prepared.retire.includes('retained-value-backing');
+    if (forgetLifetime || retiresValue) {
+      // ONE mutation covers both: `retire-retained-value` deletes the value and
+      // then either `retireSubject` (keep a `{active:false,
+      // restoreAllowed:false}` record) or `forgetSubject` (drop it entirely).
+      // Staging it even when there is no value left is what lets a subject
+      // whose bytes went earlier still lose its ledger entry.
+      const retirement: PreparedRetainedValueRetirement = {
+        kind: 'retire-retained-value',
+        subjectId: prepared.subjectId,
+        forgetLifetime,
+      };
+      frame.stageRetainedValueRetirement(retirement);
+      entitySignals.delete(prepared.subjectId);
     }
 
     const result = commitAndProjectEntityMutationFrame(frame);
     for (const changedSubjectId of result.physicallyChangedSubjectIds) {
+      if (forgetLifetime && changedSubjectId === prepared.subjectId) {
+        // NO PUBLISH for a forgotten subject, and this is load-bearing rather
+        // than an optimization. `publishSubjectPhysicalChange` ->
+        // `bumpSubjectRevision` does `subjectRevisions.set(id, ...)`, which
+        // RE-INTERNS the entry `forgetSubject` just deleted. Deleting from a
+        // Map does not stay deleted if a later step in the same operation
+        // interns by the same key.
+        //
+        // `reclaimRetiredSubjectsWithoutOwner` documents this as the 79 B
+        // versus 6 B measurement, and the sink reintroduced it here: with the
+        // publish in place `subjectRevisions` grew to one entry per subject
+        // ever created — 64,200 at 320 rounds while every other structure sat
+        // at 4,200 — and it was the whole remaining retention slope.
+        //
+        // Nothing is left to notify either: the entity signal was deleted
+        // above, and the activation channel is interned lazily, so a subject
+        // nobody read has none.
+        continue;
+      }
       publishSubjectPhysicalChange(changedSubjectId);
     }
   }

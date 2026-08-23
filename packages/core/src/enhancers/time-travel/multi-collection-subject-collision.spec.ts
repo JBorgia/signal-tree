@@ -163,8 +163,12 @@ describe('multi-collection subject id collision', () => {
     }
   });
 
-  it('when the number finally goes unowned, BOTH collections still hold their own retired subject', async () => {
-    // This is the fact that forces a broadcast sink rather than a routed one.
+  it('when the number goes unowned the BROADCAST reclaims it in BOTH collections', async () => {
+    // The property that proves the sink broadcasts rather than routes. One
+    // number, two physical owners: a `Map<subjectId, PhysicalOwner>` would pick
+    // one and leave the other retained forever. Before the sink existed this
+    // test asserted the opposite — that both were still held — which was the
+    // measurement that established the requirement.
     const WINDOW = 3;
     const tree = makeTree(WINDOW);
     tree.$.users.setAll([{ id: 'u1', name: 'a' }]);
@@ -187,18 +191,20 @@ describe('multi-collection subject id collision', () => {
 
     expect(claims?.isClaimed(shared)).toBe(false);
 
-    // One number, two physical owners, no way to route. A sink holding
-    // `Map<number, PhysicalOwner>` would pick one and leak the other.
-    expect(retiredIn(tree.$.users)).toContain(shared);
-    expect(retiredIn(tree.$.orders)).toContain(shared);
+    // Both, not one.
+    expect(retiredIn(tree.$.users)).not.toContain(shared);
+    expect(retiredIn(tree.$.orders)).not.toContain(shared);
   });
 
-  it('a quiet collection is over-retained but stays BOUNDED under a churning neighbour', async () => {
+  it('a quiet collection is drained once its own claims expire', async () => {
     // The cost of numeric collapsing, measured rather than argued. `orders`
     // retires a handful of subjects and then goes silent; `users` churns
-    // forever and keeps re-claiming the same low numbers. If collapsing made
-    // retention unbounded, the quiet collection's retired set would grow with
-    // the neighbour's churn.
+    // forever and keeps re-claiming the same low numbers.
+    //
+    // Before the sink this asserted that the quiet collection's inventory was
+    // over-retained but did not GROW with the neighbour's churn. With the sink
+    // the stronger property holds: the neighbour's churn is what evicts the
+    // quiet collection's claims, so its inventory drains to nothing.
     const tree = makeTree(6);
     tree.$.orders.setAll([
       { id: 'o1', total: 1 },
@@ -223,10 +229,10 @@ describe('multi-collection subject id collision', () => {
       await tick();
     }
 
-    // 400 user subjects retired. The quiet collection's inventory must not have
-    // moved: over-retention from collapsing is bounded by what that collection
-    // itself retired, never by the neighbour's churn.
-    expect(retiredIn(tree.$.orders).length).toBe(quietAfterRetirement);
+    // 400 user subjects retired, and the quiet collection is empty. What must
+    // never happen is the reverse — reclaiming while still claimed — which the
+    // eviction-ordering test above pins.
+    expect(retiredIn(tree.$.orders).length).toBe(0);
 
     const claims = getSubjectRestorationClaims(tree);
     // And the tree-wide claim inventory still tracks the window, not the churn.

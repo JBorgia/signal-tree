@@ -84,6 +84,24 @@ export interface MaterializationContext {
    */
   runtimeTreePlan: RuntimeTreePlan;
   allocatePositionId: (parentPositionId?: number) => number;
+  /**
+   * Entity collections that can be asked to reclaim a retired subject.
+   *
+   * Collected here because a marker materialises with no reference to the root
+   * — the context is the only thing it and `signalTree` both see. `signalTree`
+   * hands the list to the tree; the reclamation sink broadcasts to it.
+   *
+   * Structurally typed rather than importing `SubjectPhysicalOwner`, so the
+   * bare bundle does not gain an edge to the sink module for a field it never
+   * populates. A tree with no restoration authority leaves this empty.
+   */
+  physicalOwners: Array<{
+    __prepareSubjectReclamation(
+      subjectId: number,
+      options: { causallyEligible: boolean; reclaimLifetimeRecord?: boolean }
+    ): unknown;
+    __applyPreparedSubjectReclamation(prepared: unknown): void;
+  }>;
 }
 
 export function createMaterializationContext(
@@ -111,6 +129,7 @@ export function createMaterializationContext(
     runtimeTreePlan: createRuntimeTreePlan(hasCapability),
     allocatePositionId: (parentPositionId?: number) =>
       positionRegistry.allocate(parentPositionId),
+    physicalOwners: [],
   };
 }
 
