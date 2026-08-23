@@ -185,12 +185,13 @@ A3-0    status vs transactions/operation lifecycle      DONE — stays deleted
    ↓
 A1-0    remote acquisition / resource composition       DONE — one seam owed
    ↓
-A2      persistence + does core/storage exist at all?    ← one question, not two
+A2-0    persistence + core/storage                       DONE — A2-B
    ↓
 A6      EntitySignal.map
    ↓
 MATRIX-CLOSE
         EVT-0 @signaltree/events, and each of its subpaths
+        PER-0 persistence() itself — never audited; ./storage inherits it
         core/security
         core/storage (resolved by A2)
         every surviving root capability
@@ -206,7 +207,7 @@ freeze the Candidate B surface
 | **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **DELETED — NGF-DEL executed** |
 | **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
 | A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
-| A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | evidence gathered, undecided |
+| A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
 | A4+A5 | form integration and its history | `form`, `FormSignal`, `history`, `@signaltree/ng-forms/signals` | **resolved — one consumer, proven path, one gap** |
 | A6 | collection projections | `EntitySignal.map` | not started |
@@ -942,6 +943,108 @@ A2-C  persistence genuinely requires SignalTree-owned coordination across
 
 B is the recurring pattern from forms, TH-0, A3 and A1. That is a reason to test
 it hard, not a reason to expect it.
+
+---
+
+# A2-0 — RESULT
+
+The subject turned out not to be `stored()`. **`stored` is withheld;
+`persistence()` is what actually ships**, so the audit characterised that.
+Pinned in `a2-persistence-discriminators.spec.ts`.
+
+## The four jobs are all covered — for whole-tree persistence
+
+| job | shipped `persistence()` |
+| --- | --- |
+| RESTORE | `autoLoad` on construction, `load()` |
+| PUBLISH | debounced autoSave |
+| DRAIN | **public `save()`** — plus `__flushAutoSave` |
+| MECHANISM | `StorageAdapter`, defaulting to `window.localStorage` |
+
+**Case 5 — the drain works, and needs no global function.** With
+`debounceMs: 5000` a write persists nothing; `await tree.save()` writes
+immediately. That is exactly what the Capacitor background handler needs, and
+it is a method on the thing that owns the behaviour rather than a
+`flushAllStoredSignals()` reaching across the whole library.
+
+## Case 3 — the predicted seam is ALREADY CLOSED, and that is the interesting part
+
+Persistence should be a consequence of committed truth. Measured: an optimistic
+transaction value is **never written**. Zero writes contain it; one write
+happens, after settlement, with the rolled-back value.
+
+The implementation says why, and names the same defect this audit was chasing:
+
+> autoSave serializes the WHOLE tree, so a snapshot taken while an explicit
+> transaction is open would persist speculative state — *the same defect
+> `stored()` had, reached through a different API*.
+
+It defers by asking whether the tree has an unsettled scope, and re-arms on
+settlement, via `scheduleDurableConsequence`.
+
+## But that coordinator is INTERNAL — and that is the A2-B seam
+
+`scheduleDurableConsequence` and `cancelDurableConsequence` are not in the
+shipped barrel. Neither is `getActiveWriteContext`.
+
+So a **composed** persistence — ordinary state plus an adapter, which is what
+scoped persistence would be — cannot reproduce case 3's correctness. A naive
+`effect(() => write(tree.$.prefs()))` persists speculative transaction values,
+because there is no public way to ask "is this committed truth yet?".
+
+**This is the same shape as A1's finding, and they may be one seam.** A1 needs
+*classify this incoming write as realization rather than authored action*; A2
+needs *run this outgoing side effect only on committed truth*. Both are about
+the causal status of a write crossing the boundary to an external system, and
+both already exist internally.
+
+## Case 9 — the real gap against production is SCOPING
+
+`persistence()` writes the whole tree: the payload provably contains transient
+state that must not be durable. TruckTrax needs three scoped leaves out of a
+tree that also holds entity collections and scratch state.
+
+Scoping itself is not a SignalTree semantic — reading `tree.$.prefs()` and
+writing it is ordinary composition. What composition cannot currently do is the
+commit-settlement part above.
+
+## Case 8 — persistence does not degrade
+
+With no `window`, `persistence()` **throws at construction**. A tree carrying it
+cannot be built on a platform without storage. Recorded as a characteristic, not
+judged here.
+
+## `./storage`
+
+108 lines, **zero imports**, pure generic key/value plumbing: `StorageAdapter`,
+`createStorageAdapter`, `createIndexedDBAdapter`. Nothing about it needs
+SignalTree state, causal semantics, identity or lifecycle.
+
+By NGF-0's rule that would be enough to delete it — except that it is the
+**adapter door for the public `persistence()` enhancer**, whose config takes a
+`StorageAdapter` that the main barrel does not export. So `./storage` is not
+free-floating utility code; it is the only way to configure a shipped
+capability.
+
+**Its survival is therefore entailed by `persistence()`'s, and `persistence()`
+has never been audited.** That is a new MATRIX-CLOSE row, and it is the same
+hole NGF-0 found: a shipped artifact whose existence nobody proved.
+
+## Disposition
+
+**A2-B.** `stored` and `flushAllStoredSignals` stay deleted — the shipped
+enhancer already does RESTORE, PUBLISH, DRAIN and MECHANISM, and does the
+transaction case *better* than `stored()` did. The earned seam is:
+
+> a public way to run a durable consequence only on committed truth
+
+which is very likely the same primitive A1 needs, seen from the other side.
+
+Deferred to MATRIX-CLOSE: **PER-0 — does `persistence()` itself deserve to
+ship?**, with `./storage` inheriting the answer. Scoped persistence, which is
+what production actually needs, is composition over ordinary state plus that
+seam — but whether the whole-tree enhancer earns its place is a separate
+question this audit did not ask.
 
 ---
 
