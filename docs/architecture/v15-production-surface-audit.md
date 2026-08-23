@@ -40,6 +40,10 @@ materially different architectures, and the choice follows **who owns the
 behaviour and its lifetime** — not how v13 happened to spell it.
 
 ```text
+COMPOSITION            form(toWritableSignal(tree.$.profile), schema)
+                       — the branch stays ordinary state; another system
+                         composes the capability over it. See the forms
+                         case study below. Consider this FIRST.
 plain helper            helper(tree.$.users)
 tree/subtree enhancer   enhance(tree.$.users, ...)
 declaration marker      entityMap({ load: ... })
@@ -50,6 +54,76 @@ derived capability      tree.$.users.derived(...)
 external adapter        createSomething(tree, api)
 tree-level enhancer     signalTree(state, { enhancers: [...] })
 ```
+
+## The canonical case study: forms
+
+We have already run this exact audit once, on forms, and the result is the
+precedent that should shape every dossier below.
+
+The question was never "should SignalTree own forms". It was "what part of
+forms is SignalTree's". The answer:
+
+```text
+SignalTree branch                     ordinary state, nothing special
+      │  toWritableSignal(...)        ← THE SEAM, and the whole contribution
+      ▼
+Angular WritableSignal<Model>
+      ▼
+Angular Signal Forms                  validation, touched, dirty, disabled,
+                                      hidden — Angular owns all of it
+field writes
+      ▼
+SignalTree canonical mutations        transactions, rollback, undo/redo,
+                                      causal identity
+```
+
+`FORM-DEL` (`b57ba293`) then deleted `form()`, `FormSignal`, the marker
+machinery, `history()`, and the entire `@signaltree/ng-forms/signals` bridge.
+The demos converted `profile: form(...)` to `profile: { name: '', email: '' }`
+and **nothing was lost** — `patch({...})` is just the branch call form.
+
+Three things about that outcome matter here.
+
+**`history()` died with the marker because it had exactly one consumer** —
+`form({ history })`. A capability whose only caller is another capability is not
+a capability.
+
+**`trackHistory()` survived, and the reason is the whole lesson.** It takes a
+plain `WritableSignal` and never referenced the marker, so it needed no
+rescuing. The compositional thing was already portable; the coupled thing was
+not.
+
+**The real fix landed in core, not in the integration.** When the branch adapter
+collapsed multiple field writes under the branch's `PositionId`, that was fixed
+in subtree-write semantics so descendants keep their own causal positions — which
+then paid off for DevTools, adapters, subtree assignment, serialization restore
+and bulk patches. The forms work's most valuable output was a core primitive,
+not a forms feature.
+
+> **The hypothesis this establishes, and which every dossier must test:
+> SignalTree needs to provide a correct seam and correct causal semantics. It
+> does not need to own the domain abstraction.**
+
+Note what this does NOT license. It is not "delete everything and tell people to
+compose". Signal Forms exists and is good; there was something real to compose
+with. Where no such external system exists, composition is not automatically
+available and the capability may genuinely belong here.
+
+## Two questions every dossier must answer
+
+Added because of the forms result, and placed before the API-shape question
+because they can make it moot:
+
+> **C1. Can this be expressed by composition over an ordinary SignalTree branch,
+> the way Angular Signal Forms composes over `toWritableSignal()`?**
+>
+> **C2. What minimal primitive, if any, is missing from core to make that
+> composition CORRECT?**
+
+C2 is the one that pays. With forms the answer was not "write more forms code",
+it was "fix subtree ownership semantics". A dossier that answers C1 "yes" and C2
+"nothing" is describing a capability that should not be in the public surface at
+all.
 
 ## Dossier template
 
@@ -70,8 +144,7 @@ disposition.
 | A1 | remote acquisition / loading | `loader` | evidence gathered, undecided |
 | A2 | persistence / stored state | `stored`, `flushAllStoredSignals` | evidence gathered, undecided |
 | A3 | async / status representation | `status` | evidence gathered, undecided |
-| A4 | form integration | `form`, `FormSignal`, `@signaltree/ng-forms/signals` | not started |
-| A5 | history migration | `history` | not started |
+| A4+A5 | form integration and its history | `form`, `FormSignal`, `history`, `@signaltree/ng-forms/signals` | **resolved — one consumer, proven path, one gap** |
 | A6 | collection projections | `EntitySignal.map` | not started |
 | A7 | tree composition | `.with()` | decided in 15.0 — declarative construction |
 
@@ -158,8 +231,35 @@ rollback, persistent storage.
 - Cancellation and retry appear nowhere in the evidence. Neither is currently
   demonstrated; do not design for them from imagination.
 
-**Disposition: NOT TAKEN.** Needs non-TruckTrax evidence — at minimum a
-paginated list, a stale-while-refresh dashboard, and a route-scoped store.
+## C1 / C2
+
+**C1 — can this compose over an ordinary branch?** Plausibly, and this is the
+hypothesis to attack first. Angular now ships `resource()`, which is a real
+external system to compose with in the way Signal Forms was. A shape like
+
+```ts
+const users = connectResource(tree.$.users, resource({ … }));
+```
+
+would leave `entityMap` as ordinary keyed state and put acquisition beside the
+tree rather than inside its ontology. If that works, `loader` disappears from
+the surface entirely and `staleTime`/`swr`/`lazy`/`tags` become someone else's
+vocabulary.
+
+**C2 — what would core have to provide?** The seam. For forms it was
+`toWritableSignal`; here it is whatever lets an external acquirer replace a
+collection's contents *as one causal event* — preserving subject identity for
+rows that survive the refresh, so held references, transactions and undo behave.
+That is the `setAll`-with-identity question, and it is exactly the kind of core
+primitive the forms work produced. **If the answer to C2 is a small identity
+contract rather than a loader, that is the better outcome.**
+
+The counter-argument to record: `resource()` is per-value, and these are keyed
+collections with parameters. Composition may need more seam than forms did.
+
+**Disposition: NOT TAKEN.** Needs the `connectResource` spike answering C2, plus
+non-TruckTrax evidence — at minimum a paginated list, a stale-while-refresh
+dashboard, and a route-scoped store.
 
 ---
 
@@ -227,8 +327,20 @@ capability-scoped, because the host calls it once for everything.
   nested markers leak raw markers into `tree()`) — a re-exported `stored` must
   not re-expose that.
 
-**Disposition: NOT TAKEN.** Needs the offline/local-preferences scenario and a
-decision on whether persistence is a leaf marker or a tree capability.
+## C1 / C2
+
+**C1** — persistence over three scalar leaves is close to trivially
+compositional: read once at construction, subscribe, write debounced. The
+awkward part is not the storing, it is the DRAIN, which is inherently a
+lifecycle concern the branch cannot own.
+
+**C2** — a way for a host to say "everything is about to stop", reaching every
+persisted leaf. That is a tree-level or capability-level lifecycle hook, not a
+marker feature. Note the forms lesson applies literally here: `stored()` changes
+what a branch *is*, where an attached behaviour would leave it ordinary state.
+
+**Disposition: NOT TAKEN.** Needs the offline/local-preferences scenario and an
+answer to C2 that works on a platform where `pagehide` never fires.
 
 ---
 
@@ -290,15 +402,106 @@ per-request.
   optimistic mutation. This is the one place where a v15 capability might
   legitimately absorb a v13 marker.
 
-**Disposition: NOT TAKEN.** The transactions overlap must be tested first.
+## C1 / C2
+
+**C1** — this is the capability where composition is LEAST available, and that
+is itself the argument for it. There is no external system that owns "the state
+of an operation I performed myself". Angular's `resource()` covers loads it
+performs; it does not cover `POST /ticket`. So unlike forms, there is nothing to
+compose with.
+
+**C2** — not applicable if C1 is no.
+
+But the forms precedent still bites in a different direction: `history()` died
+because its only consumer was another capability. `status` must be checked
+against the same test — if v15's `transactions()` can express a ticket save,
+then `status` is a view over transaction state rather than a marker, and the
+answer is a derived projection, not a public primitive.
+
+**Disposition: NOT TAKEN.** The transactions overlap must be tested first, and
+it is the single highest-value experiment in this audit: it is the one case
+where a v15 capability may absorb a v13 marker outright.
 
 ---
 
-# A4–A6 — not started
+# A4 + A5 — form integration and its history
 
-`form` / `FormSignal` / the `@signaltree/ng-forms/signals` subpath, `history`,
-and `EntitySignal.map`. Evidence gathering has not run. `A7` (`.with()`) is
-already decided — declarative construction, 15.0.
+These were listed separately and are one thing. **28 of the 212 TruckTrax errors
+— `form` (14), `history` (7), the `@signaltree/ng-forms/signals` subpath (7) —
+come from a single consumer**: TruckTrax's own `packages/signal-forms` wrapper,
+in two files.
+
+## The call site, and why it is the case study in miniature
+
+```ts
+// packages/signal-forms/src/lib/entity/build-entity-form.ts
+const tree = signalTree({
+  editForm: stForm<EntityModel<TModel>>({
+    initial: createEntityModel(config.metadata, config.defaultValues),
+    history: history({ capacity: 50 }),
+  }),
+});
+const fields = signalForm(tree.$.editForm, { schema, injector, name });
+```
+
+A throwaway one-node tree, created solely to host a form marker with history,
+bridged into Angular Signal Forms. That is precisely the arrangement FORM-DEL
+replaced, and TruckTrax's own comment describes the coupling as the feature:
+"the FieldTree's model IS the marker's values signal … one engine, no separate
+model signal, no sync loop".
+
+The compositional model gives the same property without the marker, because
+`toWritableSignal` is the shared model:
+
+```ts
+const tree = signalTree({ editForm: createEntityModel(metadata, defaults) });
+const model = toWritableSignal(tree.$.editForm);
+const fields = form(model, schema);        // Angular Signal Forms
+const undo = trackHistory(model, { capacity: 50 });
+```
+
+**C1 — can this compose?** Yes. Demonstrated by the greenfield spike, and the
+demos already converted.
+
+**C2 — what is missing from core to make it correct?** Exactly one thing, and it
+is not new code.
+
+## The one gap
+
+| piece | shipped in `15.0.0-rc.1`? |
+| --- | --- |
+| `toWritableSignal` — the seam | **yes** |
+| Angular Signal Forms — validation, touched, dirty | external, fine |
+| `trackHistory` — undo/redo over a plain signal | **implemented, WITHHELD** |
+
+`trackHistory` lives at `core/src/lib/form-history/form-history.ts:206`, appears
+zero times in the core barrel and zero times in the shipped `.d.ts`, and its
+disposition reads "LC / mechanically retained after form deletion".
+
+That disposition is now falsified by evidence. `trackHistory` was not
+mechanically retained — it survived FORM-DEL **because it was already the
+compositional shape**, taking a plain `WritableSignal` and never touching the
+marker. It is the undo/redo half of the arrangement the project chose, and
+withholding it ships two-thirds of a story.
+
+## Disposition
+
+**A4/A5 need no new SignalTree capability.** The migration is TruckTrax's, the
+path is proven, and the only SignalTree action is to re-examine one
+disposition — `trackHistory` — against the fact that the compositional forms
+model depends on it.
+
+`form`, `FormSignal`, `history` and the `signals` subpath stay deleted. Note
+that `@signaltree/ng-forms` surviving at all is recorded as UNPROVEN in
+`b57ba293`, pending its own audit; nothing here changes that.
+
+---
+
+# A6 — collection projections (`EntitySignal.map`)
+
+Not started. 8 errors.
+
+`A7` (`.with()`) is already decided — declarative construction, 15.0.
 
 ---
 
