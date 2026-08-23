@@ -16,93 +16,16 @@ export interface StorageAdapter {
 /**
  * Create a custom storage adapter
  */
-export function createStorageAdapter(
-  getItem: (key: string) => string | null | Promise<string | null>,
-  setItem: (key: string, value: string) => void | Promise<void>,
-  removeItem: (key: string) => void | Promise<void>
-): StorageAdapter {
-  return { getItem, setItem, removeItem };
-}
 
-/**
- * IndexedDB storage adapter for large state trees
- */
-export function createIndexedDBAdapter(
-  dbName = 'SignalTreeDB',
-  storeName = 'states'
-): StorageAdapter {
-  // Cache the PROMISE, not the resolved connection.
-  //
-  // Caching the resolved `db` left a window: `openDB` is async, so two calls
-  // arriving before the first `onsuccess` both saw `db === null` and both
-  // called `indexedDB.open()`. Every concurrent caller opened its own
-  // connection, and the last one to resolve won the cache slot while the others
-  // leaked. That is the ordinary case, not an edge case — `persist` fires
-  // `getItem` for several collections during the same hydration tick.
-  //
-  // Caching the in-flight promise makes concurrent callers await the SAME open.
-  // On failure the slot is cleared so a later call can retry rather than
-  // re-await a permanently rejected promise.
-  let dbPromise: Promise<IDBDatabase> | null = null;
-
-  const openDB = (): Promise<IDBDatabase> => {
-    if (dbPromise) return dbPromise;
-
-    dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open(dbName, 1);
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve(request.result);
-
-      request.onupgradeneeded = (event) => {
-        const database = (event.target as IDBOpenDBRequest).result;
-        if (!database.objectStoreNames.contains(storeName)) {
-          database.createObjectStore(storeName);
-        }
-      };
-    }).catch((err) => {
-      dbPromise = null;
-      throw err;
-    });
-
-    return dbPromise;
-  };
-
-  return {
-    async getItem(key: string): Promise<string | null> {
-      const database = await openDB();
-      return new Promise((resolve, reject) => {
-        const transaction = database.transaction([storeName], 'readonly');
-        const store = transaction.objectStore(storeName);
-        const request = store.get(key);
-
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result || null);
-      });
-    },
-
-    async setItem(key: string, value: string): Promise<void> {
-      const database = await openDB();
-      return new Promise((resolve, reject) => {
-        const transaction = database.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
-        const request = store.put(value, key);
-
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve();
-      });
-    },
-
-    async removeItem(key: string): Promise<void> {
-      const database = await openDB();
-      return new Promise((resolve, reject) => {
-        const transaction = database.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
-        const request = store.delete(key);
-
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve();
-      });
-    },
-  };
-}
+// TOMBSTONE: `createStorageAdapter()` and `createIndexedDBAdapter()`.
+//
+// PER-0: their only consumers were this package's own specs — no application,
+// no demo, no package. Generic key/value plumbing with no SignalTree semantics
+// of any kind, and `localStorage` already satisfies `StorageAdapter` without a
+// factory. An IndexedDB adapter is a thing an application writes once against a
+// three-method interface.
+//
+// The CONTRACT survives because a durability capability needs a storage
+// abstraction. The implementations did not, and NGF-0's rule applies: useful
+// code with no demonstrated consumer and no ownership claim is deleted, not
+// re-homed.

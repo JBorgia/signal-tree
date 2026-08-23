@@ -1,5 +1,5 @@
 {
-  "total": 350,
+  "total": 348,
   "files": {
     "packages/core/src/enhancers/batching/batching.spec.ts": 4,
     "packages/core/src/enhancers/devtools/devtools.spec.ts": 4,
@@ -56,8 +56,6 @@
     "packages/core/src/lib/noop-write-warning.spec.ts": 3,
     "packages/core/src/lib/physical/entity-mutation-frame.spec.ts": 2,
     "packages/core/src/lib/production-scalar-substrate.benchmark.spec.ts": 6,
-    "packages/core/src/lib/security/integration.spec.ts": 1,
-    "packages/core/src/lib/security/security-validator.spec.ts": 1,
     "packages/core/src/lib/snapshot-builder.spec.ts": 3,
     "packages/core/src/lib/ssr-transfer.spec.ts": 2,
     "packages/core/src/lib/traversal-diagnostics.spec.ts": 4,

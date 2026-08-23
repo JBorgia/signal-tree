@@ -334,7 +334,7 @@ freeze the Candidate B surface
 | **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
 | **PER-0** | **does `persistence()` deserve to ship, and in this form?** | `persistence`, `StorageAdapter`, `./storage` | **REDESIGN — function survives, form does not** |
 | **EVT-0** | **does `@signaltree/events` exist at all?** | the package and its four entry points | **DELETED — EVT-DEL executed** |
-| **SEC-0** | **does `@signaltree/core/security` exist at all?** | the subpath and `security()` | **evidence gathered — recommend DELETE, and one live defect** |
+| **SEC-0** | **does `@signaltree/core/security` exist at all?** | the subpath and `security()` | **DELETED — SEC-DEL executed** |
 | A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
@@ -1082,8 +1082,7 @@ adding nothing, the other claims a protection it does not deliver.
 
 ## Recommended disposition
 
-**DELETE `./security`, `security()`, `SecurityValidator` and `SecurityPresets`,
-with more urgency than the other deletions** — not because the code is unused,
+**DELETED.** Executed as SEC-DEL, with more urgency than the other deletions — not because the code is unused,
 but because the inert `preventXSS` is a false assurance that ships today.
 
 Keep core's own prototype-pollution handling, which is where the real defence

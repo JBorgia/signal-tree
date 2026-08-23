@@ -1,11 +1,24 @@
 import { describe, expect, it } from 'vitest';
+import type { StorageAdapter } from '../enhancers/serialization/storage-adapters';
 
 import { entityMap } from './markers/entity-map';
 import { getPhysicalCommitClock } from './internals/physical-commit-clock';
 import { signalTree } from './signal-tree';
 import { stored } from './markers/stored';
 import { transactions } from '../enhancers/transactions/transactions';
-import { createStorageAdapter } from '../enhancers/serialization/storage-adapters';
+
+/**
+ * Local stand-in for the deleted `createStorageAdapter()` factory, which was
+ * `(getItem, setItem, removeItem) => ({ getItem, setItem, removeItem })` and
+ * nothing more. STORAGE-DEL removed it from the public surface (PER-0: no
+ * consumer outside these specs, no SignalTree semantics); the three-line
+ * convenience lives here now, where it is used.
+ */
+const createStorageAdapter = (
+  getItem: StorageAdapter['getItem'],
+  setItem: StorageAdapter['setItem'],
+  removeItem: StorageAdapter['removeItem']
+): StorageAdapter => ({ getItem, setItem, removeItem });
 
 /**
  * Heterogeneous atomicity — RELEASE-1.0.md Phase 1.

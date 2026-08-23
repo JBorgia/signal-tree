@@ -14,16 +14,6 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./security": {
-      "types": "./src/security.d.ts",
-      "import": "./dist/security.js",
-      "default": "./dist/security.js"
-    },
-    "./storage": {
-      "types": "./src/storage.d.ts",
-      "import": "./dist/storage.js",
-      "default": "./dist/storage.js"
-    },
     "./package.json": "./package.json"
   },
   "peerDependencies": {

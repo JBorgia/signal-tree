@@ -4,8 +4,6 @@ const { withNx } = require('@nx/rollup/with-nx');
 const options = {
   main: './src/index.ts',
   additionalEntryPoints: [
-    './src/security.ts',
-    './src/storage.ts',
   ],
   tsConfig: './tsconfig.lib.prod.json',
   outputPath: '../../dist/packages/core',

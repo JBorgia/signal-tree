@@ -227,33 +227,35 @@ function createEqualityFn(useShallowComparison: boolean) {
 // object was.
 
 // =============================================================================
-// SECURITY VALIDATION
+// SECURITY VALIDATION — REMOVED IN 15.0 (SEC-DEL)
 // =============================================================================
+//
+// TOMBSTONE: `validateTree()`, `config.security`, `SecurityFeature`, the
+// `security()` helper, `SecurityValidator`, `SecurityPresets` and the
+// `@signaltree/core/security` subpath.
+//
+// SEC-0 measured all three protections it offered:
+//
+//   PROTOTYPE POLLUTION  core already drops a JSON-parsed `__proto__` and does
+//                        not pollute Object.prototype, with no opt-in. What the
+//                        feature added was rejecting `constructor` and
+//                        `prototype` as LITERAL DATA KEYS — harmless
+//                        own-properties that real data contains. Strictly worse
+//                        than core alone.
+//
+//   preventXSS           INERT. `validateValue()` RETURNS a sanitised string
+//                        and the walk discarded the return, and only ran at
+//                        construction. An advertised control that did nothing
+//                        on the path users invoke.
+//
+//   preventFunctions     serializability hygiene, not a security boundary.
+//
+// Core's own prototype-pollution handling stays — that is where the real
+// defence lives, covered by `apply-state-pollution.spec.ts`. Do not reintroduce
+// a construction-time sanitiser: sanitising on the way INTO state corrupts data
+// and does not protect the rendering sink, which is where XSS is decided and
+// which Angular already escapes.
 
-function validateTree<T>(obj: T, config: TreeConfig): void {
-  // Security is injected (v11+): the validator + its recursive walk live in
-  // `@signaltree/core/security` and are carried on `config.security` by the
-  // `security()` helper. Core no longer statically imports SecurityValidator,
-  // so it tree-shakes out of every bundle that doesn't opt in. Validation still
-  // runs synchronously here during construction.
-  const security = config.security;
-  if (!security) return;
-
-  // Fail-closed: a present-but-malformed `security` (e.g. a pre-v11 raw config
-  // object passed by an untyped/JS consumer who didn't migrate to `security()`)
-  // must NOT silently skip validation — that is fail-open for a security
-  // control. TS consumers get a compile error from the `SecurityFeature` type;
-  // this guard catches the JS/`any`/dynamic case and fails loudly instead.
-  const sec = security as {
-    __signalTreeSecurity?: unknown;
-    validate?: unknown;
-  };
-  if (sec.__signalTreeSecurity !== true || typeof sec.validate !== 'function') {
-    throw new Error(SIGNAL_TREE_MESSAGES.SECURITY_INVALID);
-  }
-
-  security.validate(obj);
-}
 
 // =============================================================================
 // NODE ACCESSOR CREATION
@@ -1096,9 +1098,6 @@ function create<T extends object>(
   if (initialState === null || initialState === undefined) {
     throw new Error(SIGNAL_TREE_MESSAGES.NULL_OR_UNDEFINED);
   }
-
-  // Security validation
-  validateTree(initialState, config);
 
   const equalityFn = createEqualityFn(config.useShallowComparison ?? false);
 
