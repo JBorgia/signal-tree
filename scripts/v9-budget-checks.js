@@ -39,6 +39,7 @@ const CONSUMER_SCENARIOS = [
     name: 'minimal tree (no markers)',
     imports: 'signalTree',
     code: "const t = signalTree({ user: { name: 'a' }, count: 0 }); t.$.count.set(5); globalThis.o = t();",
+    // 9721B after lazy removal (was 10191B). ~6% headroom.
     budget: 10300,
   },
   {
@@ -58,11 +59,11 @@ const CONSUMER_SCENARIOS = [
     name: 'tree + entityMap()',
     imports: 'signalTree, entityMap',
     code: "const t = signalTree({ rows: entityMap({ selectId: (r) => r.id }), count: 0 }); t.$.rows.addOne({ id: 1 }); t.$.count.set(5); globalThis.o = t();",
-    // Measured 20992B. 21400 is ~2% headroom, matching the minimal-tree
-    // scenario above rather than the ~15% the header describes: on a 21KB
-    // budget 15% would let a 3KB regression through unnoticed, which is most of
-    // an enhancer.
-    budget: 21400,
+    // 20506B after lazy removal (was 20992B). 21000 is ~2% headroom, matching
+    // the minimal-tree scenario rather than the ~15% the header describes: on a
+    // 21KB budget 15% would let a 3KB regression through unnoticed, which is
+    // most of an enhancer.
+    budget: 21000,
   },
 ];
 

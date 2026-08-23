@@ -796,11 +796,12 @@ invalidateTag(tree, 'plants'); // marks every 'plants'-tagged collection stale</
         reference, now retired.
       </li>
       <li>
-        <strong><code>security</code> and lazy signals are opt-in.</strong> Wrap security
-        config with <code>security()</code> from <code>&#64;signaltree/core/security</code>,
-        and inject <code>lazy: lazy()</code> from <code>&#64;signaltree/core/lazy</code> to
-        restore auto-lazy behavior. Both were statically reachable before and shipped in every
-        bundle; they now tree-shake out when unused. Reads/writes are functionally identical.
+        <strong><code>security</code> is opt-in.</strong> Wrap security config with
+        <code>security()</code> from <code>&#64;signaltree/core/security</code>. It was
+        statically reachable before and shipped in every bundle; it now tree-shakes out
+        when unused. Reads/writes are functionally identical. (Lazy signal creation was
+        opt-in alongside it and is removed in 15.0 — incremental materialization on the
+        default path is what makes large trees cheap to read.)
       </li>
     </ul>
     <h4>✨ New</h4>

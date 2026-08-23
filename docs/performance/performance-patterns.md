@@ -75,16 +75,25 @@ Angular's microtask-based change detection already batches many updates in real 
 
 Split hot state into separate nodes. Use shared selectors instead of per-component inline computed expressions. Virtualize large lists.
 
-## Lazy Trees
+## Incremental materialization (there are no lazy trees)
 
-SignalTree automatically uses lazy proxy-based signal creation for state shapes with more than 50 estimated nodes. This means signals are created on-demand when accessed, not upfront.
+Lazy proxy-based signal CREATION — `useLazySignals`, `TreeConfig.lazy` and the
+`@signaltree/core/lazy` subpath — was removed in 15.0. It had been unreachable
+since the subpath was withdrawn from the published surface, and its benefit was
+never measured.
 
-You can override this:
+What does the work is incremental materialization, on the default path and with
+numbers behind it. Every node memoises its materialization, so a read rebuilds
+only the subtrees a write actually touched and clean ones come back by
+reference:
 
-```typescript
-signalTree(largeState, { useLazySignals: true }); // Force lazy
-signalTree(smallState, { useLazySignals: false }); // Force eager
+```text
+grid 100x100 (10k leaves)   all 1807.8us | 1 leaf 149.2us | none 0.044us
+grid 20x1000 (20k leaves)   all 5066.4us | 1 leaf 311.6us | none 0.045us
 ```
+
+That is lazy READING, and it needs no configuration. Source:
+`packages/core/src/lib/incremental-materialization.spec.ts`.
 
 ## Diagnostics
 

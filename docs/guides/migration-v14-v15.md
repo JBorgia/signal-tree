@@ -246,6 +246,11 @@ after every enhancer.
 - `createEnhancer`
 - `resolveEnhancerOrder`
 - `ENHANCER_META`
+- `TreeConfig.lazy`, `TreeConfig.useLazySignals`, `LazyFeature` and the
+  `@signaltree/core/lazy` subpath — with diagnostics ST1032 and ST1004. Nothing
+  to migrate: the subpath had already been withdrawn from the published surface,
+  so neither option could be satisfied and `useLazySignals: true` was a no-op.
+  Incremental materialization gives large trees cheap reads on the default path.
 - `ISignalTree.with()` and `SignalTreeBuilder.with()` — see section 3
 - `plannedSignalTree()` / `.build()` — the planned-construction prototype. Its
   behaviour is what `signalTree(state, { enhancers })` now does, so there is no
