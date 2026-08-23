@@ -50,7 +50,12 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { quiesce, requireExposeGc, MB } from './lib/heap-quiescence.mjs';
 
-requireExposeGc('tools/probe-bounded-history-retention.mjs');
+// The self-test only exercises the pure verdict against recorded tables, so it
+// needs no GC control — and requiring it would make the cheap check as awkward
+// to run as the ten-minute one.
+if (!process.argv.includes('--self-test')) {
+  requireExposeGc('tools/probe-bounded-history-retention.mjs');
+}
 
 const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
 if (!existsSync(CORE)) {
@@ -175,6 +180,76 @@ const runPoint = (arm, rounds) => {
   return JSON.parse(out.trim().split('\n').at(-1));
 };
 
+/**
+ * Pure verdict, so the self-test can exercise it without a 10-minute run.
+ *
+ * `< 2` and not `< roundRatio / 2`. The original threshold passed anything
+ * growing slower than half the churn, which at 16x the rounds blessed 8x — and
+ * a real run measuring 8.1x briefly reported BOUNDED over 6.8 MB -> 54 MB.
+ * "Grows more slowly than the churn" is satisfied by any O(n) term with a small
+ * constant; "bounded" means the retained set is the window, so the total is
+ * close at the smallest and largest round counts.
+ */
+export function isBounded(points) {
+  const first = points[0];
+  const last = points.at(-1);
+  const ratio = first.growthMB > 0.1 ? last.growthMB / first.growthMB : Infinity;
+  return ratio < 2;
+}
+
+if (process.argv.includes('--self-test')) {
+  // The real pre-fix table, and the real post-fix one. Both measured, both in
+  // docs/architecture/retired-subject-churn.md.
+  const UNBOUNDED = [
+    { rounds: 20, growthMB: 6.66 },
+    { rounds: 40, growthMB: 10.78 },
+    { rounds: 80, growthMB: 16.96 },
+    { rounds: 160, growthMB: 31.79 },
+    { rounds: 320, growthMB: 61.29 },
+  ];
+  const FLAT = [
+    { rounds: 20, growthMB: 6.66 },
+    { rounds: 40, growthMB: 7.99 },
+    { rounds: 80, growthMB: 8.45 },
+    { rounds: 160, growthMB: 8.7 },
+    { rounds: 320, growthMB: 8.63 },
+  ];
+  // The one that mattered: the table the OLD threshold accepted. 54/6.66 = 8.1x,
+  // under `roundRatio / 2` = 8, so it passed. It must not now.
+  const FALSE_GREEN = [
+    { rounds: 20, growthMB: 6.66 },
+    { rounds: 40, growthMB: 10.59 },
+    { rounds: 80, growthMB: 16.22 },
+    { rounds: 160, growthMB: 29.54 },
+    { rounds: 320, growthMB: 54.05 },
+  ];
+
+  const problems = [];
+  if (isBounded(UNBOUNDED)) {
+    problems.push('accepted the pre-fix unbounded table (6.66 -> 61.29 MB)');
+  }
+  if (isBounded(FALSE_GREEN)) {
+    problems.push(
+      'accepted the 8.1x table the old `< roundRatio / 2` threshold blessed ' +
+        '(6.66 -> 54.05 MB)'
+    );
+  }
+  if (!isBounded(FLAT)) {
+    problems.push('rejected the measured flat table (6.66 -> 8.63 MB)');
+  }
+
+  if (problems.length > 0) {
+    console.error('❌ bounded-history verdict self-test FAILED');
+    for (const problem of problems) console.error(`   - ${problem}`);
+    process.exit(1);
+  }
+  console.log(
+    '✅ the bounded-history verdict rejects both the pre-fix table and the 8.1x\n' +
+      '   table its first threshold accepted, and accepts the measured flat one'
+  );
+  process.exit(0);
+}
+
 console.log(
   `BOUNDED-HISTORY RETENTION — ${WIDTH} live rows held constant, keys churned\n` +
     `  bounded arm: maxHistorySize ${BOUNDED_HISTORY}   ` +
@@ -237,18 +312,7 @@ if (anyUndoDead) {
   process.exit(1);
 }
 
-// ⚠️ THIS THRESHOLD WAS TOO WEAK AND BRIEFLY REPORTED A FALSE GREEN.
-//
-// It was `b.ratio < b.roundRatio / 2`. With 16x the rounds that passes anything
-// under 8x — and the bounded arm measured 8.1x, so a run that grew 6.8 MB ->
-// 54 MB flipped to "BOUNDED" on noise. Growing eight-fold is not a plateau by
-// any reading; the criterion was measuring "grows more slowly than the churn",
-// which an O(n) term with a small constant also satisfies.
-//
-// What BOUNDED means here is that the retained set is the window, so total
-// retention is the same at 20 rounds and at 320. `< 2` allows for the window
-// filling and for allocator noise; it does not allow for a per-retirement term.
-const boundedIsFlat = b.ratio < 2;
+const boundedIsFlat = isBounded(bounded);
 
 if (boundedIsFlat) {
   console.log(

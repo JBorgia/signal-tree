@@ -577,6 +577,26 @@ const GATES = [
     ],
     slow: true,
     needsBuild: true,
+    provenBy: 'bounded-history-retention:self',
+  },
+  {
+    name: 'bounded-history-retention:self',
+    covers:
+      'the retention verdict rejects the pre-fix table AND the 8.1x table its first threshold accepted',
+    // This row exists because the gate above was briefly WRONG rather than
+    // merely absent. Its threshold was `ratio < roundRatio / 2`, which at 16x
+    // the rounds accepts anything under 8x; a run growing 6.8 -> 54 MB measured
+    // 8.1x and reported BOUNDED. A gate that can bless an eight-fold increase
+    // is not a weaker gate, it is a false witness, and the only durable defence
+    // is a fixture of the exact table it accepted.
+    cmd: ['node', 'tools/probe-bounded-history-retention.mjs', '--self-test'],
+    // Blind the VERDICT rather than one fixture — same reason recorded on
+    // `retired-subject-slope:self`.
+    mutation: {
+      file: 'tools/probe-bounded-history-retention.mjs',
+      find: '  return ratio < 2;',
+      replace: '  return ratio < 999;',
+    },
   },
   {
     name: 'retired-subject-slope',
