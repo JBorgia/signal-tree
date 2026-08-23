@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { getTreeRealizationPort } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import { entityMap } from '../../lib/markers/entity-map';
-import { form } from '../../lib/markers/form';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import { stored } from '../../lib/markers/stored';
 import { signalTree } from '../../lib/signal-tree';

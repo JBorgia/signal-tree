@@ -3,7 +3,6 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { entityMap } from '../../markers/entity-map';
-import { form } from '../../markers/form';
 import { stored } from '../../markers/stored';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
@@ -88,14 +87,17 @@ describe('tree realization adapter', () => {
     const tree = signalTree(
       { profile: { name: 'Alice' } },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      profile: {
-        name: {
-          (): string;
-          set(value: string): void;
+    ) as unknown as {
+      $: {
+        profile: {
+          name: {
+            (): string;
+            set(value: string): void;
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
     const owner = getOwnedPositionIds(tree.$.profile.name)?.[0];
     if (owner === undefined) {
       throw new Error('Expected owned position for profile.name');
@@ -109,7 +111,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const captureSpy = createCaptureSpy();
@@ -137,12 +139,15 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      preference: {
-        (): string;
-        set(value: string): void;
-      };
-    }>;
+    ) as unknown as {
+      $: {
+        preference: {
+          (): string;
+          set(value: string): void;
+        };
+    };
+      destroy(): void;
+    };
     const owner = getOwnedPositionIds(tree.$.preference)?.[0];
     if (owner === undefined) {
       throw new Error('Expected owned position for preference');
@@ -156,7 +161,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const captureSpy = createCaptureSpy();
@@ -188,16 +193,19 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string; enabled: boolean }): void;
-        changeId(from: string, to: string): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string; enabled: boolean }): void;
+          changeId(from: string, to: string): void;
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+          };
+          ids(): string[];
         };
-        ids(): string[];
       };
-    }>;
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u2', name: 'Alice', enabled: true });
     getPathNotifier().flushSync();
@@ -223,7 +231,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -267,15 +275,18 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string; enabled: boolean }): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
-          enabled: (() => boolean) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string; enabled: boolean }): void;
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+            enabled: (() => boolean) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true });
     getPathNotifier().flushSync();
@@ -303,19 +314,22 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     try {
       const descriptors = new Map<number, TreeRealizationDescriptor>();
       const adapter = createTreeRealizationAdapter({
-        tree: tree as ISignalTree<object>,
+        tree: tree as unknown as ISignalTree<object>,
         descriptors,
       });
 
@@ -358,15 +372,18 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        changeId(from: string, to: string): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          changeId(from: string, to: string): void;
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     try {
       tree.$.users.addOne({ id: 'u1', name: 'Alice' });
@@ -389,7 +406,7 @@ describe('tree realization adapter', () => {
       });
 
       const adapter = createTreeRealizationAdapter({
-        tree: tree as ISignalTree<object>,
+        tree: tree as unknown as ISignalTree<object>,
         descriptors,
       });
 
@@ -417,16 +434,19 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+          };
+          ids(): string[];
         };
-        ids(): string[];
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     try {
       tree.$.users.addOne({ id: 'u1', name: 'Alice' });
@@ -469,7 +489,7 @@ describe('tree realization adapter', () => {
       });
 
       const adapter = createTreeRealizationAdapter({
-        tree: tree as ISignalTree<object>,
+        tree: tree as unknown as ISignalTree<object>,
         descriptors,
       });
 
@@ -522,15 +542,18 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice' });
     getPathNotifier().flushSync();
@@ -554,7 +577,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -579,18 +602,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        changeId(from: string, to: string): void;
-        byIdOrFail(id: string): {
-          name: {
-            (): string;
-            set(value: string): void;
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          changeId(from: string, to: string): void;
+          byIdOrFail(id: string): {
+            name: {
+              (): string;
+              set(value: string): void;
+            };
           };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice' });
     getPathNotifier().flushSync();
@@ -616,7 +642,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -648,20 +674,23 @@ describe('tree realization adapter', () => {
             }),
           },
           { capabilities: ['causal-runtime'] }
-        ) as ISignalTree<{
-          users: {
-            addOne(user: { id: string; name: string }): void;
-            changeId(from: string, to: string): void;
-            ids(): string[];
-            byIdOrFail(id: string): {
-              name: {
-                (): string;
-                set(value: string): void;
-                __subjectIds?: number[];
+        ) as unknown as {
+      $: {
+            users: {
+              addOne(user: { id: string; name: string }): void;
+              changeId(from: string, to: string): void;
+              ids(): string[];
+              byIdOrFail(id: string): {
+                name: {
+                  (): string;
+                  set(value: string): void;
+                  __subjectIds?: number[];
+                };
               };
             };
-          };
-        }>;
+        };
+      destroy(): void;
+    };
 
         tree.$.users.addOne({ id: 'u1', name: 'Alice' });
 
@@ -694,7 +723,7 @@ describe('tree realization adapter', () => {
         });
 
         const adapter = createTreeRealizationAdapter({
-          tree: tree as ISignalTree<object>,
+          tree: tree as unknown as ISignalTree<object>,
           descriptors,
         });
         const seen: string[] = [];
@@ -739,16 +768,19 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string; enabled: boolean }): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
-          enabled(): boolean;
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string; enabled: boolean }): void;
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+            enabled(): boolean;
+          };
+          ids(): string[];
         };
-        ids(): string[];
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true });
     getPathNotifier().flushSync();
@@ -782,7 +814,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -838,16 +870,19 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     getPathNotifier().flushSync();
@@ -885,7 +920,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -923,18 +958,21 @@ describe('tree realization adapter', () => {
             }),
           },
           { enhancers: [timeTravel()] }
-        ) as ISignalTree<{
-          users: {
-            addOne(user: { id: string; name: string }): void;
-            removeOne(id: string): void;
-            ids(): string[];
-            byIdOrFail(id: string): (() =>
-              | { id: string; name: string }
-              | undefined) & {
-              name: (() => string | undefined) & { __subjectIds?: number[] };
+        ) as unknown as {
+      $: {
+            users: {
+              addOne(user: { id: string; name: string }): void;
+              removeOne(id: string): void;
+              ids(): string[];
+              byIdOrFail(id: string): (() =>
+                | { id: string; name: string }
+                | undefined) & {
+                name: (() => string | undefined) & { __subjectIds?: number[] };
+              };
             };
-          };
-        }>;
+        };
+      destroy(): void;
+    };
 
         tree.$.users.addOne({ id: 'u1', name: 'Ada' });
         getPathNotifier().flushSync();
@@ -988,7 +1026,7 @@ describe('tree realization adapter', () => {
         expect(heldName()).toBeUndefined();
 
         const adapter = createTreeRealizationAdapter({
-          tree: tree as ISignalTree<object>,
+          tree: tree as unknown as ISignalTree<object>,
           descriptors,
         });
         const physicalCommitClock =
@@ -1047,18 +1085,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     getPathNotifier().flushSync();
@@ -1106,7 +1147,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -1195,18 +1236,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     getPathNotifier().flushSync();
@@ -1254,7 +1298,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -1312,18 +1356,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     getPathNotifier().flushSync();
@@ -1371,7 +1418,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -1434,18 +1481,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     tree.$.users.addOne({ id: 'u2', name: 'Bea' });
@@ -1487,7 +1537,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -1519,18 +1569,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     tree.$.users.addOne({ id: 'u2', name: 'Bea' });
@@ -1580,7 +1633,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -1641,18 +1694,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     tree.$.users.addOne({ id: 'u2', name: 'Bea' });
@@ -1709,7 +1765,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -1783,18 +1839,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     tree.$.users.addOne({ id: 'u2', name: 'Bea' });
@@ -1863,7 +1922,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -1928,18 +1987,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     tree.$.users.addOne({ id: 'u2', name: 'Bea' });
@@ -1996,7 +2058,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -2060,18 +2122,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     tree.$.users.addOne({ id: 'u2', name: 'Bea' });
@@ -2165,7 +2230,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -2235,18 +2300,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Ada' });
     getPathNotifier().flushSync();
@@ -2285,7 +2353,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -2330,16 +2398,19 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
     if (structuralOwner === undefined) {
@@ -2373,7 +2444,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const physicalCommitClock =
@@ -2459,17 +2530,20 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
     if (structuralOwner === undefined) {
@@ -2503,7 +2577,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const collectionInternal = tree.$.users as typeof tree.$.users & {
@@ -2571,17 +2645,20 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
     if (structuralOwner === undefined) {
@@ -2615,7 +2692,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -2662,18 +2739,21 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Legacy' });
     getPathNotifier().flushSync();
@@ -2716,7 +2796,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const collectionInternal = tree.$.users as typeof tree.$.users & {
@@ -2795,16 +2875,19 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
     if (structuralOwner === undefined) {
@@ -2838,7 +2921,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const collectionInternal = tree.$.users as typeof tree.$.users & {
@@ -2902,17 +2985,20 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Legacy' });
     getPathNotifier().flushSync();
@@ -2954,7 +3040,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const collectionInternal = tree.$.users as typeof tree.$.users & {
@@ -3046,17 +3132,20 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        ids(): string[];
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          ids(): string[];
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Legacy' });
     getPathNotifier().flushSync();
@@ -3125,7 +3214,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const collectionInternal = tree.$.users as typeof tree.$.users & {
@@ -3287,7 +3376,7 @@ describe('tree realization adapter', () => {
         }
 
         const adapter = createTreeRealizationAdapter({
-          tree: tree as ISignalTree<object>,
+          tree: tree as unknown as ISignalTree<object>,
           descriptors,
         });
 
@@ -3335,15 +3424,18 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+          };
+          ids(): string[];
         };
-        ids(): string[];
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice' });
     tree.$.users.addOne({ id: 'u2', name: 'Bob' });
@@ -3391,7 +3483,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -3474,19 +3566,22 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string; enabled: boolean }): void;
-        removeOne(id: string): void;
-        byIdOrFail(id: string): (() =>
-          | { id: string; name: string; enabled: boolean }
-          | undefined) & {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
-          enabled: () => boolean | undefined;
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string; enabled: boolean }): void;
+          removeOne(id: string): void;
+          byIdOrFail(id: string): (() =>
+            | { id: string; name: string; enabled: boolean }
+            | undefined) & {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+            enabled: () => boolean | undefined;
+          };
+          ids(): string[];
         };
-        ids(): string[];
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true });
     getPathNotifier().flushSync();
@@ -3548,7 +3643,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -3606,14 +3701,17 @@ describe('tree realization adapter', () => {
     const tree = signalTree(
       { profile: { name: 'Alice' } },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      profile: {
-        name: {
-          (): string;
-          set(value: string): void;
+    ) as unknown as {
+      $: {
+        profile: {
+          name: {
+            (): string;
+            set(value: string): void;
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
     const owner = getOwnedPositionIds(tree.$.profile.name)?.[0];
     if (owner === undefined) {
       throw new Error('Expected owned position for profile.name');
@@ -3626,7 +3724,7 @@ describe('tree realization adapter', () => {
       positionIds: [owner],
     });
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const notifications: Array<{ path: string; meta?: UpdateMetadata }> = [];
@@ -3657,11 +3755,14 @@ describe('tree realization adapter', () => {
     const tree = signalTree(
       { left: '', middle: '', right: '' },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      left: { (): string; set(value: string): void };
-      middle: { (): string; set(value: string): void };
-      right: { (): string; set(value: string): void };
-    }> & {
+    ) as unknown as {
+      $: {
+        left: { (): string; set(value: string): void };
+        middle: { (): string; set(value: string): void };
+        right: { (): string; set(value: string): void };
+    };
+      destroy(): void;
+    } & {
       getHistory(): unknown[];
     };
     const owner = getOwnedPositionIds(tree.$.middle)?.[0];
@@ -3676,7 +3777,7 @@ describe('tree realization adapter', () => {
       positionIds: [owner],
     });
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -3712,9 +3813,12 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      preference: { (): string; set(value: string): void };
-    }> & {
+    ) as unknown as {
+      $: {
+        preference: { (): string; set(value: string): void };
+    };
+      destroy(): void;
+    } & {
       getHistory(): unknown[];
     };
     const owner = getOwnedPositionIds(tree.$.preference)?.[0];
@@ -3729,7 +3833,7 @@ describe('tree realization adapter', () => {
       positionIds: [owner],
     });
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -3758,16 +3862,19 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        changeId(from: string, to: string): void;
-        byIdOrFail(id: string): {
-          name: (() => string) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          changeId(from: string, to: string): void;
+          byIdOrFail(id: string): {
+            name: (() => string) & { __subjectIds?: number[] };
+          };
+          ids(): string[];
         };
-        ids(): string[];
-      };
-    }> & {
+    };
+      destroy(): void;
+    } & {
       getHistory(): unknown[];
     };
 
@@ -3795,7 +3902,7 @@ describe('tree realization adapter', () => {
       positionIds: [owner],
     });
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -3829,13 +3936,16 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      before: { (): string; set(value: string): void };
-      after: { (): string; set(value: string): void };
-      users: {
-        ids(): string[];
-      };
-    }> & {
+    ) as unknown as {
+      $: {
+        before: { (): string; set(value: string): void };
+        after: { (): string; set(value: string): void };
+        users: {
+          ids(): string[];
+        };
+    };
+      destroy(): void;
+    } & {
       getHistory(): unknown[];
     };
 
@@ -3852,7 +3962,7 @@ describe('tree realization adapter', () => {
     }
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors: new Map([
         [owner, { path: 'users', ownerPath: 'users', collectionPath: 'users' }],
       ]),
@@ -3883,11 +3993,14 @@ describe('tree realization adapter', () => {
     const tree = signalTree(
       { left: '', middle: '', right: '' },
       { enhancers: [transactions()] }
-    ) as ISignalTree<{
-      left: { (): string; set(value: string): void };
-      middle: { (): string; set(value: string): void };
-      right: { (): string; set(value: string): void };
-    }> & {
+    ) as unknown as {
+      $: {
+        left: { (): string; set(value: string): void };
+        middle: { (): string; set(value: string): void };
+        right: { (): string; set(value: string): void };
+    };
+      destroy(): void;
+    } & {
       transaction(fn: () => void): { confirm(): void; rollback(): void };
       __transactions: {
         getPendingTurnCount(): number;
@@ -3906,7 +4019,7 @@ describe('tree realization adapter', () => {
       positionIds: [owner],
     });
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -3934,10 +4047,13 @@ describe('tree realization adapter', () => {
     const tree = signalTree(
       { a: 'A', b: 'B' },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      a: { (): string; set(value: string): void };
-      b: { (): string; set(value: string): void };
-    }> & {
+    ) as unknown as {
+      $: {
+        a: { (): string; set(value: string): void };
+        b: { (): string; set(value: string): void };
+    };
+      destroy(): void;
+    } & {
       getHistory(): unknown[];
     };
 
@@ -3960,7 +4076,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
     const scalarSlotRuntime =
@@ -4030,22 +4146,25 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      status: {
-        (): string;
-        set(value: string): void;
-      };
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        changeId(from: string, to: string): void;
-        byIdOrFail(id: string): {
-          name: {
-            (): string;
-            set(value: string): void;
+    ) as unknown as {
+      $: {
+        status: {
+          (): string;
+          set(value: string): void;
+        };
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          changeId(from: string, to: string): void;
+          byIdOrFail(id: string): {
+            name: {
+              (): string;
+              set(value: string): void;
+            };
           };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice' });
     getPathNotifier().flushSync();
@@ -4085,29 +4204,32 @@ describe('tree realization adapter', () => {
         }),
       },
       { enhancers: [timeTravel()] }
-    ) as ISignalTree<{
-      other: { (): string; set(value: string): void };
-      status: { (): string; set(value: string): void };
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        changeId(from: string, to: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): {
-          name: {
-            (): string;
-            set(value: string): void;
-            __subjectIds?: number[];
+    ) as unknown as {
+      $: {
+        other: { (): string; set(value: string): void };
+        status: { (): string; set(value: string): void };
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          changeId(from: string, to: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): {
+            name: {
+              (): string;
+              set(value: string): void;
+              __subjectIds?: number[];
+            };
+          };
+          __planRekey?: (
+            from: string,
+            to: string
+          ) => {
+            commit(): void;
+            publish(metaOverride?: UpdateMetadata): void;
           };
         };
-        __planRekey?: (
-          from: string,
-          to: string
-        ) => {
-          commit(): void;
-          publish(metaOverride?: UpdateMetadata): void;
-        };
-      };
-    }> & {
+    };
+      destroy(): void;
+    } & {
       getHistory(): unknown[];
     };
 
@@ -4144,7 +4266,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
@@ -4240,22 +4362,25 @@ describe('tree realization adapter', () => {
             }),
           },
           { capabilities: ['causal-runtime'] }
-        ) as ISignalTree<{
-          status: {
-            (): string;
-            set(value: string): void;
-          };
-          users: {
-            addOne(user: { id: string; name: string }): void;
-            ids(): string[];
-            byIdOrFail(id: string): {
-              name: {
-                (): string;
-                __subjectIds?: number[];
+        ) as unknown as {
+      $: {
+            status: {
+              (): string;
+              set(value: string): void;
+            };
+            users: {
+              addOne(user: { id: string; name: string }): void;
+              ids(): string[];
+              byIdOrFail(id: string): {
+                name: {
+                  (): string;
+                  __subjectIds?: number[];
+                };
               };
             };
-          };
-        }>;
+        };
+      destroy(): void;
+    };
 
         tree.$.users.addOne({ id: 'u1', name: 'Alice' });
 
@@ -4285,7 +4410,7 @@ describe('tree realization adapter', () => {
         });
 
         const adapter = createTreeRealizationAdapter({
-          tree: tree as ISignalTree<object>,
+          tree: tree as unknown as ISignalTree<object>,
           descriptors,
         });
         const physicalCommitClock =
@@ -4331,17 +4456,20 @@ describe('tree realization adapter', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      profile: {
-        name: {
-          (): string;
-          set(value: string): void;
+    ) as unknown as {
+      $: {
+        profile: {
+          name: {
+            (): string;
+            set(value: string): void;
+          };
         };
-      };
-      users: {
-        addOne(user: { id: string; name: string }): void;
-      };
-    }>;
+        users: {
+          addOne(user: { id: string; name: string }): void;
+        };
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice' });
     getPathNotifier().flushSync();
@@ -4374,7 +4502,7 @@ describe('tree realization adapter', () => {
     });
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
 
