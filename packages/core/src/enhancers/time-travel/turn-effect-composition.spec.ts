@@ -160,31 +160,30 @@ describe('RESTORE-P0 composition: the rows deliberately NOT composed', () => {
   });
 
   /**
-   * ⚠️ PINS A DEFECT — P0-D, found by this suite and NOT repaired.
+   * ✅ REPAIRED — P0-D. Found by this suite, and NOT a composition problem.
    *
-   * `remove('a')` then `addOne('a')` in one turn, then undo, THROWS:
+   * `remove('a')` then `addOne('a')` in one turn, then undo, used to THROW
+   * `Entity with id a already exists` — an undo that crashes rather than one
+   * that produces the wrong state.
    *
-   *     Error: Entity with id a already exists
+   * Composition cannot reach it: a removed key is tombstoned and re-adding it
+   * mints a NEW subject, so the two effects belong to different subjects and
+   * never share a slot. They are correctly two effects.
    *
-   * An undo that crashes, not one that produces the wrong state.
+   * The bug was a question asked at the wrong time. `planRestore` checked "is
+   * this key free?" against pre-frame state, when the honest question is "will
+   * this key be free when I commit?" — and the frame's own removals commit
+   * before its restores. The planner already knew every key it was about to
+   * vacate; it just never told the collection.
    *
-   * Why composition does not reach it: a removed key is tombstoned and
-   * re-adding it mints a NEW subject, so the two effects belong to different
-   * subjects and never share a slot. The reversal therefore re-adds the
-   * original subject under 'a' while the replacement subject still holds that
-   * key.
+   * A wrong fix was tried first: ordering the reversal so structural removes
+   * precede adds. It changed nothing, because `applyAtomically` delegates to
+   * `planHeterogeneousFrame`, which plans its own order — and the COMMIT order
+   * was already correct. It was reverted rather than left in.
    *
-   * Why the obvious fix does not work: ordering the reversal so structural
-   * removes precede adds changes nothing, because `applyAtomically` hands the
-   * effects to `planHeterogeneousFrame`, which plans its own order. That
-   * attempt was written, measured to fix nothing, and reverted rather than left
-   * in as unexplained complexity. The repair belongs in the frame planner.
-   *
-   * PROVENANCE: pre-existing. Reproduces identically at `065e521d`, before the
-   * P0-A/B composition work — verified by checking out that revision, not
-   * assumed.
+   * PROVENANCE: pre-existing. Reproduced at `065e521d`, before the P0-A/B work.
    */
-  it('DEFECT (P0-D): remove then re-add of the same key THROWS on undo', async () => {
+  it('REPAIRED (P0-D): remove then re-add of the same key reverses cleanly', async () => {
     const tree = makeTree();
     tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]);
     await flush();
@@ -194,6 +193,12 @@ describe('RESTORE-P0 composition: the rows deliberately NOT composed', () => {
     await flush();
     expect(tree.$.rows.byId('a')?.()?.name).toBe('Reborn');
 
-    expect(() => tree.undo()).toThrow(/already exists/);
+    tree.undo();
+    await flush();
+
+    // The pre-turn state exactly: the ORIGINAL subject, under its original key,
+    // with its original value — not the replacement that the turn introduced.
+    expect(tree.$.rows.ids()).toEqual(['a']);
+    expect(tree.$.rows.byId('a')?.()?.name).toBe('Alpha');
   });
 });

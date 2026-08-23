@@ -787,12 +787,25 @@ export function createEntitySignal<
     entity: E,
     subjectId: number,
     beforeSubject?: number,
-    afterSubject?: number
+    afterSubject?: number,
+    /**
+     * Keys the caller's frame will vacate before this restore commits.
+     * RESTORE-P0 P0-D: the frame's own removals commit BEFORE its restores, so
+     * a key listed here is free by the time this plan runs even though it is
+     * occupied right now.
+     */
+    vacatingKeys?: ReadonlySet<string | number>
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
     publish(metaOverride?: UpdateMetadata): void;
   } {
-    if (structuralStore.hasActiveKey(key)) {
+    // The occupancy check answers "is this key free?" — but the honest question
+    // is "will this key be free when I commit?". Undoing a turn that removed
+    // 'a' and re-added 'a' produces two effects on two DIFFERENT subjects (a
+    // removed key is tombstoned, so re-adding mints a new subject). Reversing
+    // them frees 'a' and reclaims it in one frame, and asking the pre-frame
+    // question turned a correct undo into a crash.
+    if (structuralStore.hasActiveKey(key) && !vacatingKeys?.has(key)) {
       throw new Error(`Entity with id ${String(key)} already exists`);
     }
 
