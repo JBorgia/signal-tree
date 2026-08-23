@@ -367,7 +367,6 @@ export abstract class WebSocketService implements OnDestroy {
    * Called when an event is received
    * Override in subclass to dispatch to store
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected onEventReceived(_event: BaseEvent): void {
     // Override in subclass
   }

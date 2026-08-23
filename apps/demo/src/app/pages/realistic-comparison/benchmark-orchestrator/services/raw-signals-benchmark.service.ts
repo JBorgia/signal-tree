@@ -3,8 +3,6 @@ import { computed, Injectable, signal } from '@angular/core';
 import { BENCHMARK_CONSTANTS } from '../shared/benchmark-constants';
 import { BenchmarkResult } from './_types';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 /**
  * Raw Angular Signals baseline.
  *

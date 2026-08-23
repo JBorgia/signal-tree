@@ -333,7 +333,6 @@ export class InMemoryIdempotencyStore implements IdempotencyStore {
     }
 
     // Return without internal expiresAt field
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { expiresAt: _, ...publicRecord } = record;
     return publicRecord;
   }

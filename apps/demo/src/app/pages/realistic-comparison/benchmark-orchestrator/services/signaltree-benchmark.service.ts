@@ -91,7 +91,6 @@ export class SignalTreeBenchmarkService {
     dataSize: number;
     initial: Record<string, number>;
     payload: Record<string, number>; // 10% mutated from initial
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     tree: any;
     toggle: boolean;
   };

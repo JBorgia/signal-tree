@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const { unique } = require('./async-validators');
 const {
   createFormTree,
