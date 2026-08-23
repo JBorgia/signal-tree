@@ -41,12 +41,6 @@ export class DocumentationComponent implements OnInit {
       description: 'Core tree, entities, enhancers, DevTools, and persistence primitives',
       readmePath: 'assets/docs/core/README.md',
     },
-    {
-      id: 'events',
-      name: '@signaltree/events',
-      description: 'Event helpers for reacting to state changes in a data-first way',
-      readmePath: 'assets/docs/events/README.md',
-    },
   ];
 
   readonly quickLinks: DocQuickLink[] = [

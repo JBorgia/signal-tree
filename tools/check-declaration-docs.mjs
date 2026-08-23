@@ -32,7 +32,6 @@ const SELF_TEST = process.argv.includes('--self-test');
 const PACKAGES = [
   'core',
   'shared',
-  'events',
 ];
 
 // Count JSDoc block openers. Line comments are deliberately not counted:

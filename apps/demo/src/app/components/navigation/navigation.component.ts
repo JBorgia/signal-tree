@@ -94,14 +94,6 @@ export class NavigationComponent {
       category: 'packages',
     },
     {
-      id: 'events',
-      title: 'Events',
-      description: 'Event helpers and related docs/demo entry points',
-      route: '/docs',
-      queryParams: { package: 'events' },
-      category: 'packages',
-    },
-    {
       id: 'form-marker',
       title: 'Form Marker',
       description: 'Tree-integrated form state modeling',

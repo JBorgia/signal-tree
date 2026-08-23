@@ -2102,16 +2102,11 @@ While `@signaltree/core` includes comprehensive built-in enhancers for most use 
 
 | Package                | When to Add                        | Bundle Impact |
 | ---------------------- | ---------------------------------- | ------------- |
-| `@signaltree/ng-forms` | Angular Reactive Forms integration | ~10KB gzipped |
 
-**Typical Installation Patterns:**
+**Installation:**
 
 ```bash
-# Basic application
 npm install @signaltree/core
-
-# Application with the events companion package
-npm install @signaltree/core @signaltree/events
 ```
 
 ## Links

@@ -30,7 +30,6 @@ const path = require('node:path');
 // Keep aligned with scripts/release.sh / ci-publish.sh PACKAGES.
 const PACKAGES = [
   'core',
-  'events',
 ];
 
 /** Files that must NEVER appear in a published tarball. */

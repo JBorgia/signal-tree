@@ -99,14 +99,6 @@ export class HomeComponent {
       cta: 'Read core docs →',
       queryParams: { package: 'core' },
     },
-    {
-      title: '@signaltree/events',
-      description:
-        'Event-oriented helpers for reacting to state changes without abandoning the data-first tree model.',
-      route: '/docs',
-      queryParams: { package: 'events' },
-      cta: 'Read events docs →',
-    },
   ];
 
   readonly proofCards: HomeLinkCard[] = [
@@ -211,9 +203,7 @@ export class HomeComponent {
       language: 'bash',
       source: `# Install the core package
 npm install @signaltree/core
-
-# Optional packages
-npm install @signaltree/events`,
+`,
     },
     {
       label: 'quick-start.ts',

@@ -57,13 +57,6 @@ export const appRoutes: Route[] = [
       ).then((c) => c.StoredVersioningDemoComponent),
   },
   {
-    path: 'events',
-    loadComponent: () =>
-      import('./pages/events-demo/events-demo.component').then(
-        (c) => c.EventsDemoComponent
-      ),
-  },
-  {
     path: 'async',
     loadComponent: () =>
       import('./pages/async-demo/async-demo.component').then(
