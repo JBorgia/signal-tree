@@ -357,3 +357,73 @@ The OWNED case. A tree with `timeTravel` still retains 1,310 B/retired (1,407 B
 at 150 rounds), and eviction from a bounded history still goes unnoticed. That
 needs history-aware eligibility and remains `runPhysicalMaintenance`'s problem;
 nothing here routes through it.
+
+
+---
+
+## BOUNDED HISTORY DOES NOT BOUND RETENTION — the RC discriminator
+
+Run before implementing Step 8, to classify it: is history-owned retention an
+OPTIMIZATION (bounded, just larger than necessary) or a CORRECTNESS defect
+(unbounded)? The answer decides whether Step 8 blocks `15.0.0-rc.1`.
+
+Reproduce with `node --expose-gc tools/probe-bounded-history-retention.mjs`.
+Registered as a KNOWN-RED gate: without it a full run reads 40/40 and says
+nothing about the one case that blocks the RC.
+
+### Method
+
+200 live rows held constant, keys fully churned each round, so every round
+retires exactly 200 subjects. `maxHistorySize: 20`, and the rounds run far past
+it so eviction happens on every round after the twentieth. A control arm sets
+the bound to 100,000 so it never evicts.
+
+Two postconditions per point, because **a plateau produced by breakage looks
+identical to a plateau produced by reclamation**: live membership must be
+exactly 200, and `undo()` must still move the collection back a generation.
+
+### Result: UNBOUNDED
+
+```text
+BOUNDED — maxHistorySize 20
+  rounds   retired    growth    B/retired   history   undo
+      20      4000      5.67 MB      1486        20   ok
+      40      8000      9.55 MB      1252        20   ok
+      80     16000     15.73 MB      1031        20   ok
+     160     32000     30.48 MB       999        20   ok
+     240     48000     48.39 MB      1057        20   ok
+     320     64000     60.02 MB       983        20   ok
+
+CONTROL — maxHistorySize 100,000 (never evicts)
+      20      4000      5.69 MB      1493        22   ok
+      40      8000     10.71 MB      1404        42   ok
+      80     16000     19.19 MB      1258        82   ok
+     160     32000     38.53 MB      1263       162   ok
+```
+
+`historyLength` is pinned at 20 throughout and `undo()` works at every point, so
+the semantic bound is enforced and history is alive. Retention still grows with
+total churn: 16x the rounds gives 10.6x the heap, and B/retired settles at ~1000
+instead of falling toward zero.
+
+**The semantic history bound is not a physical retention bound.** Evicting an
+entry releases its snapshot — the bounded arm ends at 60 MB where the control
+would be near 77 — but not the entity-side backing of the subjects that entry
+referenced. Nothing tells the entity layer that the last history reference to a
+subject has gone, and zero-owner reclamation deliberately does not run when a
+restorer exists.
+
+### Consequence
+
+A long-running application with `timeTravel()` attached grows with every
+subject it has ever retired, no matter how small `maxHistorySize` is. That is a
+correctness defect, not an optimization, and **Step 8 blocks the RC**.
+
+It also sharpens Step 8 from "history uses too much memory" to one question:
+
+> which structure still makes a retired subject reachable after the history
+> entry that justified that reachability has been evicted?
+
+The zero-owner answer — a static ownership fact decided at construction — does
+not transfer. This one is dynamic: ownership ends when the last retained history
+reference to the subject does, and nothing currently observes that moment.

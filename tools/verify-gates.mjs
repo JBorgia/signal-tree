@@ -558,6 +558,27 @@ const GATES = [
     },
   },
   {
+    name: 'bounded-history-retention',
+    covers:
+      'a tree with a BOUNDED timeTravel() does not retain retired subjects without bound',
+    knownFailing:
+      'RC BLOCKER, reproduced: bounded history does not bound physical retention. ' +
+      'See docs/architecture/retired-subject-churn.md, "BOUNDED HISTORY DOES NOT BOUND ' +
+      'RETENTION". Closes with Step 8; until then this gate is expected red and must ' +
+      'not be silenced.',
+    // Registered RED on purpose. The zero-owner case is closed and flat, so
+    // without this row a full gate run reads 40/40 and says nothing about the
+    // case that actually blocks the RC. A blocker that is known and invisible is
+    // the same as one that is unknown.
+    cmd: [
+      'node',
+      '--expose-gc',
+      'tools/probe-bounded-history-retention.mjs',
+    ],
+    slow: true,
+    needsBuild: true,
+  },
+  {
     name: 'retired-subject-slope',
     covers:
       'retention does not grow with the number of subjects that have retired — the asymptotic claim a byte budget cannot express',
