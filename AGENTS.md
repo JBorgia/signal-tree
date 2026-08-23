@@ -245,6 +245,45 @@ Writing a replacement is a deferred obligation owed after the API freeze — see
 deleted path; two have already been committed pointing at targets that did not
 exist.
 
+## Tree lifetime — `destroy()` is a contract, not a suggestion
+
+A `SignalTree` owns runtime resources for the lifetime of the tree. Dropping the
+last reference is **not** sufficient for prompt reclamation.
+
+```text
+LONG-LIVED APPLICATION STORE   created once, lives with the app
+                               destroy() at teardown, if at all
+
+BOUNDED-LIFETIME STORE         a test, an SSR request, a route- or
+                               component-owned store, a temporary workflow
+                               destroy() REQUIRED at the ownership boundary
+```
+
+Any harness that builds trees in a loop is in the second category. Measured, six
+identical 10k-row stores in one process
+(`tools/probe-history-sample-isolation.mjs`):
+
+```text
+build            1        2        3        4        5        6
+abandoned    89.65   174.08   263.14   355.81   452.13      OOM
+destroyed     7.08     7.21     7.28     7.28     7.37     7.38
+isolated     89.65    89.66    89.63    89.62    89.65    89.65
+```
+
+`isolated` is one store per process — a single tree costs the same every time,
+so nothing grows unboundedly inside a tree. `abandoned` is those six builds
+without `destroy()`.
+
+**Phrase it as ownership, never as a leak.** "SignalTree leaks unless destroyed"
+is disproved by the `destroyed` row; what is true is that resources are owned
+until released, and the cost of ignoring that scales with how many trees you
+create rather than how long one lives.
+
+This bit a benchmark before it bit a user: `tools/bench-update-matrix.mjs`
+abandoned its stores between samples, OOM'd on the largest cells, and the failure
+was written up as if the library's history representation were at fault. See the
+CORRECTION in `docs/architecture/v15-update-matrix-baseline.md`.
+
 ## Type-checking gates
 
 `npm run typecheck` runs two passes, and the split is deliberate:
