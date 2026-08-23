@@ -544,6 +544,114 @@ capabilities exist.
 
 ---
 
+# A1-0 — PRE-REGISTERED before the experiment ran
+
+> **Can Angular resource ownership plus an ordinary `entityMap` reproduce a real
+> TruckTrax loader site without losing request correctness, entity lifetime
+> identity, or SignalTree causal semantics?**
+
+`connectResource()` is NOT being implemented as a candidate API. It is an
+experiment-local adapter whose job is to expose what core is missing. The forms
+precedent says the valuable result may be the primitive the spike forces us to
+discover, not the adapter.
+
+## C2 has three parts, not one
+
+The earlier note guessed "preserve entity identity during replacement". That may
+be necessary and is probably not sufficient. Remote acquisition raises three
+separable questions:
+
+```text
+1. STRUCTURAL IDENTITY
+   surviving key   -> same SubjectId / same lifetime
+   removed key     -> correctly retired
+   reused key later-> a NEW lifetime, never a resurrection
+
+2. SEMANTIC CLASSIFICATION
+   a server refresh is ... an authored mutation? a system realization?
+   an undoable turn? a transaction participant?
+
+3. REQUEST OWNERSHIP
+   params, cancellation, supersession, stale responses — these belong to the
+   resource/controller unless evidence says otherwise
+```
+
+**Part 2 is the one to attack.** Identity can be perfect while the causal
+classification is wrong. If `setAll()` puts a background refresh into
+`timeTravel()` as something the user can undo, the missing primitive is not
+"loader" — it is closer to *apply externally acquired collection truth, with
+entity lifetime preserved and the correct causal classification*. That is a far
+more general seam than a loader, and it is the shape the forms work produced.
+
+If current public collection replacement already gets all three right, C2
+answers **nothing**, and the whole of `loader` can disappear into composition.
+
+## Cache policy is OUT of the first proof
+
+The 19 production configurations are uniform — `staleTime: '30m'`, `swr`,
+`lazy`, `tags` — but carrying that whole vocabulary into the spike would risk
+concluding that "composition needs lots of machinery" when the machinery was
+imported from the historical API. `tags` in particular has **zero** exercised
+invalidation in production.
+
+First question: can remote keyed acquisition compose with an ordinary
+`entityMap` at all? Only then, which cache conveniences are genuinely missing.
+
+## What A3-0 already removed from A1's job
+
+Acquisition status does not need designing here. A3-0 established that
+operation-lifecycle state is not SignalTree's to own, and that production
+already treats collection acquisition and operation lifecycle as separate
+concepts. So the boundary under test is:
+
+```text
+Angular resource / controller     loading, error, refreshing, request identity
+SignalTree entityMap              committed collection truth, subject identity,
+                                  structural and causal semantics
+```
+
+A3's deletion creates no hole for `loader` to fill.
+
+## The cases
+
+| # | case | tests |
+| --- | --- | --- |
+| 1 | initial load `[A,B]` | basic external acquisition |
+| 2 | refresh `[A',B']`, same keys | surviving subject identity |
+| 3 | refresh `[B,C]` | B survives, A retires, C is new |
+| 4 | A returns later | key reuse must NOT resurrect A's old subject |
+| 5 | params P1 → P2 | who owns clearing and supersession |
+| 6 | P1 slow, P2 fast | a stale response must not overwrite a newer scope |
+| 7 | refresh with identical values | no false semantic work |
+| 8 | `timeTravel()` enabled | does acquisition pollute user history? |
+| 9 | pending transaction on a refreshed row | whose truth wins |
+| 10 | destroy a route-scoped tree | controller lifecycle terminates |
+
+Case 9 is the one that could force a statement we have been getting for free:
+when server truth arrives for a row an unresolved optimistic transaction is
+holding, someone must decide. That decision should not be an accident of
+`loader`'s implementation.
+
+## Outcomes, pre-registered
+
+```text
+C1 yes / C2 nothing
+    -> DELETE the loader implementation; document external composition
+
+C1 yes / C2 a small generic collection-truth seam
+    -> EXPOSE only that earned primitive; DELETE loader
+
+C1 mostly yes, but keyed remote coordination has coherent reusable
+functionality nothing external supplies
+    -> consider a first-party controller/helper; still no marker by default
+
+C1 fails: remote acquisition genuinely requires SignalTree-owned semantics
+throughout its lifetime
+    -> REDESIGN the capability; only then reconsider first-class ownership
+```
+
+---
+
 # A1 — remote acquisition / loading
 
 ## Business jobs
