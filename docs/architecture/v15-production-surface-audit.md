@@ -335,6 +335,7 @@ freeze the Candidate B surface
 | **PER-0** | **does `persistence()` deserve to ship, and in this form?** | `persistence`, `StorageAdapter`, `./storage` | **REDESIGN — function survives, form does not** |
 | **EVT-0** | **does `@signaltree/events` exist at all?** | the package and its four entry points | **DELETED — EVT-DEL executed** |
 | **SEC-0** | **does `@signaltree/core/security` exist at all?** | the subpath and `security()` | **DELETED — SEC-DEL executed** |
+| **HIST-0** | **is history participation whole-tree, or selective?** | `timeTravel()` scope | **PRE-REGISTERED — evidence not yet gathered** |
 | A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
@@ -997,6 +998,113 @@ collections with parameters. Composition may need more seam than forms did.
 **Disposition: NOT TAKEN.** Needs the `connectResource` spike answering C2, plus
 non-TruckTrax evidence — at minimum a paginated list, a stale-while-refresh
 dashboard, and a route-scoped store.
+
+---
+
+# HIST-0 (HIST-SCOPE) — PRE-REGISTERED before any evidence
+
+Moved AHEAD of PER-B deliberately. A1 and PER-0 put the causal model at the
+centre of Candidate B — restore must classify an async incoming write, egress
+needs settlement authority, acquisition needs realization classification. All of
+that is the same machinery HIST-SCOPE can change. Designing PER-B first would
+risk designing it against a causal model this audit then replaces.
+
+> **Null: does one restoration authority require whole-tree participation, or
+> can history participation be selective without breaking causal atomicity,
+> identity, or restoration semantics?**
+
+Written before looking at production evidence, because PER-0's outcomes were
+written after and that was the weakest thing about it.
+
+## Candidate models — all four kept alive
+
+```text
+HIST-A  WHOLE TREE        timeTravel owns every authored write; current
+                          semantics survive
+HIST-B  LOCATION SCOPED   specific branches/collections participate; one
+                          authority, selective membership
+HIST-C  OPERATION SCOPED  eligibility belongs to the authored operation/turn;
+                          an operation is reversible or not, regardless of
+                          which branches it touches
+HIST-D  BOTH              location sets eligibility/default, operation resolves
+                          participation — acceptable ONLY if B and C are each
+                          falsified alone
+```
+
+`timeTravel({ include: [...] })` and an operation flag are **possible forms, not
+findings**. Neither is assumed.
+
+## Constraints this audit may NOT reopen
+
+Both are already evidence-backed:
+
+> **TH-0** — selective history must be selection INSIDE one restoration
+> authority, never multiple independent history engines attached to pieces of
+> the tree.
+>
+> **A1** — realization is non-historical regardless of whether its target
+> location normally participates in history.
+
+## Cases
+
+| # | case | tests |
+| --- | --- | --- |
+| 1 | authored write to historical state | history grows; undo restores |
+| 2 | authored write to non-historical state | history does not grow |
+| 3 | realization into historical state | still does not grow |
+| 4 | historical + non-historical in one TURN | what does one undo mean |
+| 5 | historical + non-historical in one TRANSACTION | **the model discriminator** |
+| 6 | same location: authored edit, then server realization | authored reversible, realization not |
+| 7 | entity remove/rekey in a historical collection | SubjectId and restoration guarantees unchanged |
+| 8 | undo after unrelated UI mutations | the product edit reverses without rewinding unrelated state |
+| 9 | retention | non-participating state must not acquire restoration lifetime merely because `timeTravel()` exists |
+
+**Case 5 is expected to decide location versus operation.** A transaction that
+atomically changes `document.content` (historical) and `ui.selectedTab`
+(non-historical) forces a choice:
+
+```text
+undo reverses only document.content   -> an atomic authored operation is later
+                                         PARTIALLY reversed
+undo reverses both                    -> ui.selectedTab was historical after
+                                         all, despite being declared otherwise
+mixed transactions forbidden          -> a significant programming constraint
+```
+
+Operation-scoped eligibility may dissolve that, but the experiment has to show
+it rather than the design assuming it.
+
+**Case 9 connects to the lifetime work.** If only part of a tree participates,
+history must not acquire restoration claims over the rest: no legal restoration
+right means no history-owned retention right.
+
+## Deliberately out of scope unless evidence demands it
+
+Two independent undo domains — "undo in editor A" meaning A's last operation
+rather than the global last one. That is a history-channels concept, and it
+enters only if TruckTrax or another real consumer demonstrates the need.
+
+## Revised execution order
+
+```text
+SEC-DEL + STORAGE-DEL          done — one package, one entry point
+   ↓
+HIST-0                         settle history participation semantics
+   ↓
+HIST implementation
+   ↓
+the coalesced-turn P0          fixed ONCE, against the chosen model
+   ↓
+PER-B                          scoped persistence, settled egress,
+                               causally-correct async restore
+   ↓
+A1 public ingress door
+   ↓
+pristine rehearsal -> MATRIX-CLOSE -> Candidate B -> TruckTrax 2/3
+```
+
+The P0 moves up. It lives in the same restoration machinery, so fixing it before
+HIST-0 settles would risk a HIST implementation invalidating part of the repair.
 
 ---
 
