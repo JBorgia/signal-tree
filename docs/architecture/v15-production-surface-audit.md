@@ -1663,6 +1663,93 @@ cheap to reason about: `isTurnEligible()` is one function, consulted by the
 flush path, the root path and the transaction path, and nothing else decides
 admission.
 
+## Step 6 — Signal Forms integration: **FORM-C2-B**
+
+Run against the real `@angular/forms/signals` API on Angular 22.0.7, over an
+ordinary branch through `toWritableSignal()`.
+
+### The programmatic path composes (but decides nothing)
+
+`histc2-signal-forms.spec.ts`, 6 cases: a `f.name().value.set(...)` inside the
+generic scope produces exactly one reversible turn; undo restores the tree AND
+the form; an undesignated write to the same model records nothing; a mixed turn
+promotes wholly; an ordinary tree-handle write to the form branch stays
+non-reversible.
+
+That proves the door composes with Signal Forms. It proves nothing about
+production, because the APPLICATION makes that call — of course a scope can wrap
+it.
+
+### The DOM path decides it
+
+`histc2-form-dom.spec.ts`. In production the user types into
+`<input [formField]="f.name">` and Angular's `FormField` directive writes the
+model from inside its own DOM listener.
+
+```text
+CONTROL   a DOM edit reaches the tree            'grace'  ✓
+FINDING   the same edit produces NO turn         no application callback exists
+```
+
+There is nowhere to put `reversible(() => …)`. **FORM-C2-B**: the smallest
+mutation-ingress adapter is earned.
+
+One measurement shapes the adapter: wrapping the *dispatch* does designate the
+turn (measured: 1). No real application can exploit that — the browser
+dispatches — but it proves the directive's write is **synchronous** inside the
+event, so there is no scheduling gap for a designation to fall into. An adapter
+that designates inside its own `set()` is therefore sound.
+
+### The adapter, and the control that keeps it honest
+
+`toWritableSignal(node, injector, { designatesRestoration: true })` wraps the
+write-back in the designation. `histc2-form-ingress.spec.ts`:
+
+| | result |
+| --- | --- |
+| real DOM edit through the adapter | **one reversible turn**; undo restores tree and form |
+| same branch, ordinary tree handle | **non-reversible** — the HIST-B control |
+| adapter WITHOUT the option | non-reversible — the option does the work, not the form |
+
+```text
+NOT THIS       all writes to branch X are historical          (HIST-B)
+THIS           a write ENTERING through this adapter marks
+               its causal operation reversible                 (ingress)
+```
+
+### The mixed-turn worry does not arise on the DOM path
+
+Pre-registered as a consequence to expose rather than hide. Measured, it does
+not occur:
+
+```text
+typeInto(...)                 -> turn ALREADY recorded here, synchronously
+tree.$.ui.panel.set(...)      -> adds nothing (undesignated, and a later turn)
+undo                          -> form edit reverses, screen state does not
+```
+
+zone.js flushes at the DOM event boundary, so a template-driven edit closes its
+own causal turn before any later application write can join it. The mixed-turn
+consequence is real — it is proved programmatically — but for template-driven
+editing each edit is naturally its own operation. **The ergonomics worry behind
+the step-6 requirement is answered: nothing was special-cased, and the situation
+does not arise.**
+
+### Two method corrections from this step
+
+Both are the same failure this audit keeps catching, and both were caught by a
+control rather than by reasoning.
+
+**`toWritableSignal` without an injection context is SILENTLY one-way.** Its
+`effect()` throws, the catch swallows it behind a `console.warn`, and the
+returned signal looks identical. I read the resulting stale model as
+"Signal Forms does not observe restoration" — a false defect report about the
+seam the whole forms strategy rests on. Passing the injector makes it two-way in
+both directions, verified in isolation before continuing.
+
+**`Field` is a TYPE alias, not the directive.** Importing it into `imports: []`
+yields NG0919. The directive is `FormField`, selector `[formField]`.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
