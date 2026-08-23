@@ -606,3 +606,60 @@ reversal planner reverses N ordinary removals and nothing in time-travel needed
 to know a clear had happened. `clear-undoable.spec.ts` replaces the old pin, and
 `clear()` is back in the oracle script — which is where the 0/56 above comes
 from.
+
+
+---
+
+## STEP 8 PHASE 6A — subject ids are COLLECTION-scoped, and collapsing them is safe
+
+Run before the reclamation sink is allowed to delete anything. Reproduce with
+`nx test core` — `multi-collection-subject-collision.spec.ts`.
+
+`SubjectRestorationClaims` is TREE-scoped and indexes by `number`.
+`StructuralStore` is constructed once per `entityMap` and starts
+`nextSubjectId` at 1. So a tree with two collections contains two different
+subjects both called 1, and the Phase 2 oracle — one collection — could not see
+it. The proposition the sink is about to rely on,
+
+> last claim released ⇒ nothing in this tree can legally require this backing
+
+is under numeric collapsing either conservative or wrong, and which one decides
+the sink's shape.
+
+**The collision is real, not hypothetical.** `users#u1` and `orders#o1` allocate
+the same number, asserted directly so nothing below can pass vacuously.
+
+**Collapsing is SAFE, and structurally rather than incidentally.** Merging two
+subjects under one number can only ever ADD owners to that number, never remove
+one. Sufficiency — the half of the frozen contract that is required — is
+therefore preserved by construction; it is minimality, the half that is not
+required, that degrades. The tests corroborate the construction at the points
+where an ordering could bite: a claim from either collection keeps the number
+claimed, no eviction reports it unowned while any owner remains, and when it
+finally does go unowned BOTH collections still hold their own retired subject of
+that number.
+
+**That last fact is what forces the sink's shape.** A number cannot route to a
+collection, so `Map<subjectId, PhysicalOwner>` would pick one owner and leak the
+other. The sink must BROADCAST an unowned number to every registered physical
+owner and let each answer for itself — do I hold this subject, is it retired,
+does it still have backing.
+
+**The over-retention is bounded by the collection, not by its neighbour.** A
+collection that retires three subjects and goes silent still holds exactly three
+after a neighbour churns 400 through the same window. Collapsing costs
+`O(collections x window)`, which is bounded, and does not reintroduce growth
+with total churn.
+
+**Restoration semantics are unaffected, checked separately.**
+`restoreState(state, restorationSubjectIds, positionIds)` puts the numeric set
+into the write context, so a restore driven by subject number could in principle
+act on the wrong collection's subject of that number. A four-step undo and redo
+across two collections with colliding ids moves exactly one collection per step.
+This had to be established before the sink regardless of the claim question: a
+reclamation built on a restore that already confuses collections would be
+reasoning about the wrong thing.
+
+**Conclusion: do not widen the RC scope.** A composite
+`{ collection, subjectId }` reference would buy exactness the contract does not
+require, and the falsifier gives no reason to pay for it.

@@ -1,5 +1,5 @@
 {
-  "total": 383,
+  "total": 382,
   "files": {
     "packages/core/src/enhancers/batching/batching.spec.ts": 4,
     "packages/core/src/enhancers/devtools/devtools.spec.ts": 4,
@@ -51,7 +51,6 @@
     "packages/core/src/lib/markers/stored-leak.spec.ts": 4,
     "packages/core/src/lib/markers/stored-traversal.spec.ts": 2,
     "packages/core/src/lib/markers/stored.spec.ts": 19,
-    "packages/core/src/lib/memory/memory-manager.spec.ts": 1,
     "packages/core/src/lib/mut-participation.spec.ts": 10,
     "packages/core/src/lib/noop-copy-write.spec.ts": 2,
     "packages/core/src/lib/noop-write-warning.spec.ts": 3,
