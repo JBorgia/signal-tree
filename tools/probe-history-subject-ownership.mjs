@@ -25,12 +25,12 @@
  * entity layer's own answer: tombstoned subjects that still hold value backing.
  * Not a heap estimate, an inventory.
  *
- * SEMANTICALLY OWNED — the union of `__subjectIds` across every RETAINED
+ * SEMANTICALLY OWNED — the union of `restorationSubjectIds` across every RETAINED
  * history entry, undo side and redo side alike, intersected with the retired
  * set. Live subjects appear in that union too and are not retired, so they must
  * be excluded or the orphan count is understated.
  *
- * ⚠️ `__subjectIds` is the set of subjects a write TOUCHED, which is a claim
+ * ⚠️ `restorationSubjectIds` is the set of subjects a write TOUCHED, which is a claim
  * that a restore of that entry needs them. It is not the same as "every subject
  * mentioned in `entry.state`", and it must not be replaced by a snapshot walk:
  * a snapshot names the whole collection, so counting it would make every
@@ -99,7 +99,7 @@ if (pointFlag !== -1) {
   const history = tree.getHistory();
   const claimedByHistory = new Set();
   for (const entry of history) {
-    for (const subjectId of entry.__subjectIds ?? []) {
+    for (const subjectId of entry.restorationSubjectIds ?? []) {
       claimedByHistory.add(subjectId);
     }
   }

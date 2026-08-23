@@ -63,7 +63,25 @@ type CanonicalTurn<T> = TimeTravelEntry<T> & {
   historyIndex: number;
   __turnId: number;
   __ownerPaths?: string[];
-  __subjectIds?: number[];
+  /**
+   * RESTORATION CLAIM SET — the subjects whose backing must conservatively
+   * remain available while this record is retained.
+   *
+   * SUFFICIENCY, NOT MINIMALITY. It is required to contain every retired
+   * subject a legal traversal of this record could make live again; it is
+   * permitted to name more. `probe-restoration-required-set.mjs` measures both
+   * halves against an observational oracle that traverses undo to the oldest
+   * retained entry and redo back to the newest: 0 required-but-unnamed at every
+   * history size, and as of the `clear()` repair 0 named-but-never-live either.
+   *
+   * Not a debugging annotation. `restoreState()` CONSUMES it, and Step 8 makes
+   * it the retention authority — the last record naming a subject is what keeps
+   * that subject's backing alive. Do not widen it to "every subject mentioned
+   * in `state`": a snapshot names the whole collection, so that would make
+   * every retained record claim everything and reproduce today's unbounded
+   * retention inside a tidier data structure.
+   */
+  restorationSubjectIds?: number[];
   __positionIds?: number[];
   __effects?: TurnEffect[];
 };
@@ -621,7 +639,7 @@ class TimeTravelManager<T> {
     return {
       ...entry,
       __ownerPaths: entry.__ownerPaths ? [...entry.__ownerPaths] : undefined,
-      __subjectIds: entry.__subjectIds ? [...entry.__subjectIds] : undefined,
+      restorationSubjectIds: entry.restorationSubjectIds ? [...entry.restorationSubjectIds] : undefined,
       __positionIds: entry.__positionIds ? [...entry.__positionIds] : undefined,
       __effects: entry.__effects
         ? entry.__effects.map(cloneTurnEffect)
@@ -784,7 +802,7 @@ class TimeTravelManager<T> {
     const resolvedSubjectIds =
       subjectIds && subjectIds.length > 0 ? subjectIds : effectSubjectIds;
     if (resolvedSubjectIds.length > 0) {
-      entry.__subjectIds = [...resolvedSubjectIds];
+      entry.restorationSubjectIds = [...resolvedSubjectIds];
     }
     const resolvedPositionIds =
       positionIds && positionIds.length > 0 ? positionIds : effectPositionIds;
@@ -889,7 +907,7 @@ class TimeTravelManager<T> {
       .map((turn) => ({
         ...turn,
         __ownerPaths: turn.__ownerPaths ? [...turn.__ownerPaths] : undefined,
-        __subjectIds: turn.__subjectIds ? [...turn.__subjectIds] : undefined,
+        restorationSubjectIds: turn.restorationSubjectIds ? [...turn.restorationSubjectIds] : undefined,
         __positionIds: turn.__positionIds ? [...turn.__positionIds] : undefined,
         __effects: turn.__effects
           ? turn.__effects.map(cloneTurnEffect)
@@ -906,7 +924,7 @@ class TimeTravelManager<T> {
     return {
       ...turn,
       __ownerPaths: turn.__ownerPaths ? [...turn.__ownerPaths] : undefined,
-      __subjectIds: turn.__subjectIds ? [...turn.__subjectIds] : undefined,
+      restorationSubjectIds: turn.restorationSubjectIds ? [...turn.restorationSubjectIds] : undefined,
       __positionIds: turn.__positionIds ? [...turn.__positionIds] : undefined,
       __effects: turn.__effects
         ? turn.__effects.map(cloneTurnEffect)
@@ -1439,7 +1457,7 @@ class TimeTravelManager<T> {
     const undoneEntry = this.history[
       this.currentIndex
     ] as TimeTravelEntry<T> & {
-      __subjectIds?: number[];
+      restorationSubjectIds?: number[];
       __positionIds?: number[];
     };
     this.currentIndex = this.skipsBackward(this.currentIndex);
@@ -1447,7 +1465,7 @@ class TimeTravelManager<T> {
     const entry = this.history[this.currentIndex];
     this.restoreState(
       entry.state,
-      undoneEntry.__subjectIds,
+      undoneEntry.restorationSubjectIds,
       undoneEntry.__positionIds
     );
     return true;
@@ -1546,10 +1564,10 @@ class TimeTravelManager<T> {
     this.currentIndex = this.skipsForward(this.currentIndex);
     this.isTemporalViewActive = true;
     const entry = this.history[this.currentIndex] as TimeTravelEntry<T> & {
-      __subjectIds?: number[];
+      restorationSubjectIds?: number[];
       __positionIds?: number[];
     };
-    this.restoreState(entry.state, entry.__subjectIds, entry.__positionIds);
+    this.restoreState(entry.state, entry.restorationSubjectIds, entry.__positionIds);
     return true;
   }
 
@@ -1609,10 +1627,10 @@ class TimeTravelManager<T> {
     this.currentIndex = index;
     this.isTemporalViewActive = true;
     const entry = this.history[index] as TimeTravelEntry<T> & {
-      __subjectIds?: number[];
+      restorationSubjectIds?: number[];
       __positionIds?: number[];
     };
-    this.restoreState(entry.state, entry.__subjectIds, entry.__positionIds);
+    this.restoreState(entry.state, entry.restorationSubjectIds, entry.__positionIds);
     return true;
   }
 

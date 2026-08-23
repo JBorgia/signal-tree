@@ -126,7 +126,25 @@ type CaptureBucket = {
 export type TransactionTurnRecord = {
   id: number;
   __ownerPaths?: string[];
-  __subjectIds?: number[];
+  /**
+   * RESTORATION CLAIM SET — the subjects whose backing must conservatively
+   * remain available while this record is retained.
+   *
+   * SUFFICIENCY, NOT MINIMALITY. It is required to contain every retired
+   * subject a legal traversal of this record could make live again; it is
+   * permitted to name more. `probe-restoration-required-set.mjs` measures both
+   * halves against an observational oracle that traverses undo to the oldest
+   * retained entry and redo back to the newest: 0 required-but-unnamed at every
+   * history size, and as of the `clear()` repair 0 named-but-never-live either.
+   *
+   * Not a debugging annotation. `restoreState()` CONSUMES it, and Step 8 makes
+   * it the retention authority — the last record naming a subject is what keeps
+   * that subject's backing alive. Do not widen it to "every subject mentioned
+   * in `state`": a snapshot names the whole collection, so that would make
+   * every retained record claim everything and reproduce today's unbounded
+   * retention inside a tidier data structure.
+   */
+  restorationSubjectIds?: number[];
   __positionIds?: number[];
   __effects?: TurnEffect[];
   __baselineValues?: Map<number, unknown>;
@@ -346,7 +364,7 @@ class TransactionAuthority {
     return {
       id: this.nextTurnId++,
       __ownerPaths: ownerPaths ? [...ownerPaths] : undefined,
-      __subjectIds: subjectIds ? [...subjectIds] : undefined,
+      restorationSubjectIds: subjectIds ? [...subjectIds] : undefined,
       __positionIds: positionIds ? [...positionIds] : undefined,
       __effects: effects ? effects.map(cloneTurnEffect) : undefined,
       __baselineValues: baselineValues ? new Map(baselineValues) : undefined,
@@ -452,7 +470,7 @@ function cloneTurnRecord(turn: TransactionTurnRecord): TransactionTurnRecord {
   return {
     ...turn,
     __ownerPaths: turn.__ownerPaths ? [...turn.__ownerPaths] : undefined,
-    __subjectIds: turn.__subjectIds ? [...turn.__subjectIds] : undefined,
+    restorationSubjectIds: turn.restorationSubjectIds ? [...turn.restorationSubjectIds] : undefined,
     __positionIds: turn.__positionIds ? [...turn.__positionIds] : undefined,
     __effects: turn.__effects ? turn.__effects.map(cloneTurnEffect) : undefined,
     __baselineValues: turn.__baselineValues

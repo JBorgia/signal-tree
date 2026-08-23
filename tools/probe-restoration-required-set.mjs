@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 /**
  * STEP 8 PHASE 2 — the ORACLE. What does a retained history record actually
- * require, and how does that compare to what `__subjectIds` names?
+ * require, and how does that compare to what `restorationSubjectIds` names?
  *
  * Phase 1 proved the leak is orphaned retired subjects and that the fix belongs
  * at the eviction boundary. It did NOT establish what a restoration claim
- * should CONTAIN. Before `__subjectIds` becomes the retention authority, three
+ * should CONTAIN. Before `restorationSubjectIds` becomes the retention authority, three
  * outcomes have to be told apart:
  *
- *   A. EXACT         __subjectIds == the required set. The structure Step 8
+ *   A. EXACT         restorationSubjectIds == the required set. The structure Step 8
  *                    needs already exists; name it for what it is.
- *   B. CONSERVATIVE  __subjectIds is a safe SUPERSET. Bounded, therefore
+ *   B. CONSERVATIVE  restorationSubjectIds is a safe SUPERSET. Bounded, therefore
  *                    RC-sufficient; narrowing it is a later optimization.
- *   C. UNSAFE        something required is NOT named. `__subjectIds` cannot be
+ *   C. UNSAFE        something required is NOT named. `restorationSubjectIds` cannot be
  *                    the authority and capture must be fixed first. STOP.
  *
  * ## The definition being measured
@@ -30,16 +30,16 @@
  * Observationally. The probe performs every legal traversal — undo to the
  * oldest retained entry, then redo forward to the newest — and records which
  * subject ids are LIVE at each step. A retired subject observed live at any
- * point was required by some legal traversal. That never reads `__subjectIds`.
+ * point was required by some legal traversal. That never reads `restorationSubjectIds`.
  *
  * ⚠️ BUT IT IS NOT FULLY INDEPENDENT, and pretending otherwise would be the
  * whole point missed. `time-travel.ts` calls
- * `restoreState(entry.state, entry.__subjectIds, entry.__positionIds)` — the
+ * `restoreState(entry.state, entry.restorationSubjectIds, entry.__positionIds)` — the
  * restore path CONSUMES the metadata. So what this observes is "what restoration
  * resurrects given the metadata it has", not "what restoration would need in
  * principle".
  *
- * That limit is itself a finding: `__subjectIds` is not debugging metadata, it
+ * That limit is itself a finding: `restorationSubjectIds` is not debugging metadata, it
  * PARTICIPATES in restoration semantics. It also bounds what this probe can
  * decide. It can measure EXCESS — of the subjects a claim would name, how many
  * ever come back — which separates A from B. It cannot by itself refute C,
@@ -126,7 +126,7 @@ async function measure(historySize) {
   const history = tree.getHistory();
   const physicallyRetained = new Set(rows.__listSubjectReclamationCandidates());
   const namedUnion = new Set(
-    history.flatMap((entry) => entry.__subjectIds ?? [])
+    history.flatMap((entry) => entry.restorationSubjectIds ?? [])
   );
 
   // The oracle: traverse every legal position and watch what becomes live.
@@ -216,7 +216,7 @@ if (anyIncorrect) {
 } else if (anyUnnamed) {
   console.log(
     '  C — UNSAFE. A retired subject became live during a legal traversal that\n' +
-      '  `__subjectIds` never names. It cannot be the retention authority;\n' +
+      '  `restorationSubjectIds` never names. It cannot be the retention authority;\n' +
       '  capture metadata is incomplete and must be corrected first. STOP.'
   );
   process.exit(1);
@@ -233,7 +233,7 @@ if (anyIncorrect) {
       `  The property Step 8 needs: the named set scales with the WINDOW, not\n` +
       `  with total churn — ${results.map((r) => `${r.historySize}->${r.named}`).join(', ')} against ` +
       `${results[0].physicallyRetained} ever retired.\n` +
-      `  ${scalesWithWindow ? 'Confirmed' : 'NOT confirmed'}. Claims keyed on \`__subjectIds\` therefore bound\n` +
+      `  ${scalesWithWindow ? 'Confirmed' : 'NOT confirmed'}. Claims keyed on \`restorationSubjectIds\` therefore bound\n` +
       '  retention at O(live + window), which is the RC requirement. Narrowing\n' +
       '  the residual excess is a later optimization, not a blocker.'
   );
