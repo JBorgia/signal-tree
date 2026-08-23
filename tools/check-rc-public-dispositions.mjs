@@ -76,8 +76,6 @@ const BLOCKED = [
   { symbol: 'linked', disposition: 'NOT EARNED; Angular owns linkedSignal primitive' },
   { symbol: 'LinkedOptions', disposition: 'type companion of unearned linked helper' },
 
-  { symbol: 'trackHistory', disposition: 'LC / mechanically retained after form deletion' },
-  { symbol: 'FormHistoryOptions', disposition: 'type companion of mechanically retained trackHistory' },
 
   { symbol: 'serialization', disposition: 'NOT EARNED / unplaced as RC public API' },
   { symbol: 'SerializationConfig', disposition: 'type companion of unearned serialization enhancer' },

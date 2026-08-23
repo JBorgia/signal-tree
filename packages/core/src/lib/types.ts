@@ -731,45 +731,21 @@ export interface LoaderFeature<E, P = void> {
   readonly __params?: P;
 }
 
-/** Options for `trackHistory()`. */
-export interface FormHistoryOptions<T> {
-  /** Maximum number of past entries retained (default: 10). */
-  capacity?: number;
-  /**
-   * Fields that are NEVER written to the history buffer (e.g. `password`,
-   * `ssn`). Excluded fields keep their live value across undo/redo — they are
-   * never cloned into the snapshot stack, so secrets do not linger in memory
-   * or leak through devtools/serialization. This is the security escape hatch
-   * that the legacy `withFormHistory` lacked.
-   */
-  exclude?: (keyof T)[];
-}
-
-/** Immutable undo/redo state exposed by {@link FormHistoryApi.history}. */
-/** @internal Shared scoped-history authority bound by `timeTravel()` during Gate 2 migration. */
-export interface FormHistorySharedAuthority {
-  undo(): boolean;
-  redo(): boolean;
-  canUndo(): boolean;
-  canRedo(): boolean;
-}
-
-/**
- * Undo/redo surface attached to a `form()` marker when `history()` is
- * configured. Because history rides on the marker's values signal — the same
- * signal `signalForm()` uses as its `FieldTree` model — undo/redo drive BOTH
- * the marker API and any bound Angular Signal Forms field from one engine.
- */
-export interface FormHistoryApi<_T> {
-  /** Revert to the previous recorded state (no-op if none). */
-  undo(): void;
-  /** Re-apply the next state after an undo (no-op if none). */
-  redo(): void;
-  canUndo: Signal<boolean>;
-  canRedo: Signal<boolean>;
-  /** @internal Binds form undo/redo selection to shared scoped history. */
-  __bindSharedAuthority?(authority: FormHistorySharedAuthority): void;
-}
+// TOMBSTONE: `FormHistoryOptions`, `FormHistoryApi` and
+// `FormHistorySharedAuthority` went with `trackHistory()` in TH-DEL.
+//
+// TH-0 measured the reason and it is not disuse. `trackHistory` undid by
+// WRITING BACK — `model.update(m => ({...m, ...next}))` — so over a SignalTree
+// branch its undo was a new authored mutation, which `timeTravel()` then
+// recorded as forward motion. The two systems did not merely overlap: a
+// `tree.undo()` after a `hist.undo()` REDID the edit. Over a plain Angular
+// signal it was correct, but that is the case with no SignalTree involvement,
+// so there was no ownership claim on either branch.
+//
+// Do not reintroduce a generic writable-signal history here. For state in a
+// tree, `timeTravel()` is the restoration authority; for a signal outside one,
+// this library is not in the picture. See
+// docs/architecture/v15-production-surface-audit.md, TH-0.
 
 // ============================================
 // FEATURE TYPES
