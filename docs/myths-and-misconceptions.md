@@ -239,14 +239,14 @@ For **migrating from NgRx `rxMethod`**: move complex orchestration to a plain Ob
 
 **Where this comes from:** Misreading docs that previously described `createEditSession(tree, '$.path')` — a path-bound overload that **does not exist** in the current shipped API.
 
-**The truth:** SignalTree does **not** ship an explicit "subpath isolation" API. The shipped `createEditSession(initial: T)` is a **value-level** undo/redo wrapper — it takes any initial value and exposes `applyChanges`/`undo`/`redo`/`reset`/`setOriginal`/`isDirty`. Useful for form-wizard draft-and-cancel flows; **independent of the tree** (bridge via an effect if you want changes to flow back to a tree leaf). A path-bound overload is planned for v10.1.
+**The truth:** SignalTree does **not** ship an explicit "subpath isolation" API — and as of 15.0 it does not ship `createEditSession` either. It lives in the source as a **value-level** undo/redo wrapper (`applyChanges`/`undo`/`redo`/`reset`/`setOriginal`/`isDirty`, independent of the tree), but `18fe5781` withdrew the `@signaltree/core/edit-session` subpath from the published surface and `check-rc-public-dispositions.mjs` records it as "UNPLACED edit-session subpath; null not run". There is no import path for it. Treat the paragraph below as the answer.
 
 For write encapsulation, the documented options are:
 
 - Wrap the tree in an `@Injectable()` service that exposes only `$` reads + `ops.domain.method()` writes.
 - Use `@signaltree/events` for typed unidirectional command flow.
 
-**Source:** [`packages/core/src/edit-session.ts`](../packages/core/src/edit-session.ts) — the actual API. [`docs/architecture/signaltree-architecture-guide.md`](architecture/signaltree-architecture-guide.md) — encapsulation patterns.
+**Source:** [`packages/core/src/lib/edit-session.ts`](../packages/core/src/lib/edit-session.ts) — the implementation, unpublished. [`docs/architecture/signaltree-architecture-guide.md`](architecture/signaltree-architecture-guide.md) — encapsulation patterns.
 
 **Doc-side action:** Replaces the previously-overstated "subpath isolation" framing in marketing copy. (Future README review pass.)
 
