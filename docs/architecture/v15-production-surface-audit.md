@@ -312,7 +312,7 @@ PER-0   persistence(): function vs form                  DONE — REDESIGN
    ↓
 EVT-0   @signaltree/events                               DONE — recommend DELETE
    ↓
-SEC-0   @signaltree/core/security
+SEC-0   @signaltree/core/security                        DONE — recommend DELETE
    ↓
 MATRIX-CLOSE   ← NO ARCHITECTURE. Mechanical reconciliation only.
         every shipped package    -> terminal disposition
@@ -334,6 +334,7 @@ freeze the Candidate B surface
 | **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
 | **PER-0** | **does `persistence()` deserve to ship, and in this form?** | `persistence`, `StorageAdapter`, `./storage` | **REDESIGN — function survives, form does not** |
 | **EVT-0** | **does `@signaltree/events` exist at all?** | the package and its four entry points | **DELETED — EVT-DEL executed** |
+| **SEC-0** | **does `@signaltree/core/security` exist at all?** | the subpath and `security()` | **evidence gathered — recommend DELETE, and one live defect** |
 | A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
@@ -996,6 +997,102 @@ collections with parameters. Composition may need more seam than forms did.
 **Disposition: NOT TAKEN.** Needs the `connectResource` spike answering C2, plus
 non-TruckTrax evidence — at minimum a paginated list, a stale-while-refresh
 dashboard, and a route-scoped store.
+
+---
+
+# SEC-0 — `@signaltree/core/security`
+
+> **Null: if `./security` did not exist, what SignalTree correctness property
+> would become impossible for an application to implement through ordinary
+> composition?**
+
+335 lines, **zero imports of anything SignalTree**. It offers three protections
+through a construction-time `security()` feature. Each was measured; pinned in
+`sec0-is-it-redundant.spec.ts`.
+
+## 1. Prototype pollution — core already stops the real attack, unaided
+
+```text
+signalTree(JSON.parse('{"a":1,"__proto__":{"polluted":true}}'))   // NO security()
+  -> snapshot keys ["a"],  Object.prototype NOT polluted
+```
+
+The actual vector is handled unconditionally by core. What `security()` adds is
+blocking `constructor` and `prototype` as *literal data keys* — which are
+harmless own-properties on a plain object, and which real data contains:
+
+```text
+signalTree({ constructor: 'Acme Constructor Co' }, { security: security(...) })
+  -> THROWS: Dangerous key "constructor" is not allowed
+```
+
+So on this protection the feature is **strictly worse than core alone**: it adds
+no defence against the real attack and rejects legitimate data.
+
+## 2. ⚠️ preventXSS is INERT — a live defect
+
+```text
+SecurityValidator.validateValue('<script>alert(1)</script>hi')  -> "hi"        ✓
+via security() at construction                                  -> unchanged   ✗
+via security() on a later write                                 -> unchanged   ✗
+```
+
+`validateValue()` RETURNS the sanitised string. The `security()` walk calls it
+for its throw behaviour and **discards the return value**. The walk also runs
+only at construction, so writes after that are never examined at all.
+
+This is worse than a no-op. A consumer who enables `preventXSS: true` may
+reasonably believe stored values are sanitised, and nothing tells them
+otherwise. It is the security-theater failure mode: an API implying a boundary
+it does not enforce.
+
+**And fixing the bug would not make it right.** Sanitising on the way INTO state
+is the wrong boundary — it corrupts data (a bio that legitimately discusses the
+`<script>` tag) while failing to protect the rendering sink, which is where XSS
+is actually decided and which Angular already escapes by default.
+
+## 3. preventFunctions — serializability, not security
+
+Blocking function values keeps state serialisable. That is a real concern and it
+is hygiene, not a security boundary. Core accepts functions today without it.
+
+## Ownership, consumers, form
+
+**SignalTree semantics: none.** No dependence on identity, causal writes,
+transactions, restoration, subject lifetime or tree lifecycle. It is a recursive
+object walk with a regex.
+
+**Consumers: its own specs.** Nothing in packages, apps or tools. TruckTrax's
+`core/security/` hits are its own unrelated folder.
+
+**Form: a public subpath** for a feature nobody imports.
+
+## Outcomes, pre-registered
+
+```text
+SEC-A  no SignalTree-owned function            -> DELETE ./security
+SEC-B  useful but generic/application-owned    -> DELETE from SignalTree
+SEC-C  a narrow semantic primitive survives    -> move to root, delete subpath
+SEC-D  substantial owned capability + isolation justified -> KEEP
+```
+
+**Result: SEC-A.** There is no function here that composition cannot do, and two
+of the three protections are actively wrong — one rejects legitimate data while
+adding nothing, the other claims a protection it does not deliver.
+
+## Recommended disposition
+
+**DELETE `./security`, `security()`, `SecurityValidator` and `SecurityPresets`,
+with more urgency than the other deletions** — not because the code is unused,
+but because the inert `preventXSS` is a false assurance that ships today.
+
+Keep core's own prototype-pollution handling, which is where the real defence
+already lives and which is independently covered by
+`apply-state-pollution.spec.ts`.
+
+If any of it is kept instead, the `preventXSS` defect must be fixed or the
+option removed in the same change. Shipping an advertised protection that does
+nothing is the one outcome that is worse than either.
 
 ---
 
