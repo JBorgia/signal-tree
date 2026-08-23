@@ -247,11 +247,9 @@ export function isLoaderFeature(
 /**
  * Generic memory manager interface for lazy signal trees
  */
-export interface MemoryManager {
-  getSignal(path: string): WritableSignal<unknown> | undefined;
-  cacheSignal(path: string, signal: WritableSignal<unknown>): void;
-  dispose(): void;
-}
+// `MemoryManager` lived here and is DELETED in 15.0. It described the shape of
+// `SignalMemoryManager`, the cache behind the lazy proxy, and nothing else ever
+// implemented or consumed it.
 
 // NodeAccessor and TreeNode are defined in ./types.ts (canonical location)
 import type { NodeAccessor, TreeNode } from './types';

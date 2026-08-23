@@ -249,12 +249,13 @@ export { devTools } from './enhancers/devtools/devtools';
 // ============================================
 
 /**
- * Configuration constants and error messages
- * Exposed for library extensions and debugging
- * @see {@link SIGNAL_TREE_CONSTANTS} for configuration values
+ * Error messages
  * @see {@link SIGNAL_TREE_MESSAGES} for error/warning messages
+ *
+ * `SIGNAL_TREE_CONSTANTS` was deleted in 15.0 — every member lost its last
+ * consumer with lazy signal creation. See the tombstone in lib/constants.ts.
  */
-// SIGNAL_TREE_CONSTANTS / SIGNAL_TREE_MESSAGES are not root app API. `isDev` was
+// SIGNAL_TREE_MESSAGES is not root app API. `isDev` was
 // removed from the public surface in 15.0: it had no consumer in this workspace
 // or any first-party package, and an app branching on dev mode uses its
 // framework's own primitive (Angular's isDevMode()). Core still determines

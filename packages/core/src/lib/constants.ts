@@ -1,23 +1,18 @@
-import { DEFAULT_PATH_CACHE_SIZE } from '@signaltree/shared';
-
 /**
  * SignalTree Constants
- * Centralized configuration values and messages
+ *
+ * `SIGNAL_TREE_CONSTANTS` lived here and is DELETED in 15.0. Every member had
+ * zero consumers once lazy signal creation went: the three `ESTIMATE_*` values
+ * tuned `estimateObjectSize`, which existed only to decide lazy-vs-eager, and
+ * `LAZY_THRESHOLD` went with it. `MAX_PATH_CACHE_SIZE`, `DEFAULT_CACHE_SIZE`
+ * and `DEFAULT_BATCH_SIZE` were already unreferenced and had been carried along
+ * inside the same object, which is how a dead constant hides — nothing flags an
+ * unused MEMBER of a used object, and the object stopped being used only when
+ * its last member did.
+ *
+ * The `dead-exports` gate caught this within one commit of being ratcheted to
+ * zero. That is the ratchet earning itself.
  */
-
-export const SIGNAL_TREE_CONSTANTS = {
-  /** Cache configuration */
-  MAX_PATH_CACHE_SIZE: DEFAULT_PATH_CACHE_SIZE,
-
-  /** Performance thresholds */
-  ESTIMATE_MAX_DEPTH: 3,
-  ESTIMATE_SAMPLE_SIZE_ARRAY: 3,
-  ESTIMATE_SAMPLE_SIZE_OBJECT: 5,
-
-  /** Default values */
-  DEFAULT_CACHE_SIZE: 100,
-  DEFAULT_BATCH_SIZE: 10,
-} as const;
 
 // Full developer-facing messages.
 //
