@@ -181,7 +181,7 @@ NGF-0   does @signaltree/ng-forms exist at all?          DONE — deleted
    ↓
 TH-0    generic WritableSignal history                   DONE — deleted
    ↓
-A3      status vs transactions
+A3-0    status vs transactions/operation lifecycle      DONE — stays deleted
    ↓
 A1      remote acquisition / resource composition
    ↓
@@ -207,7 +207,7 @@ freeze the Candidate B surface
 | **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
 | A1 | remote acquisition / loading | `loader` | evidence gathered, undecided |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | evidence gathered, undecided |
-| A3 | async / status representation | `status` | evidence gathered, undecided |
+| A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
 | A4+A5 | form integration and its history | `form`, `FormSignal`, `history`, `@signaltree/ng-forms/signals` | **resolved — one consumer, proven path, one gap** |
 | A6 | collection projections | `EntitySignal.map` | not started |
 | A7 | tree composition | `.with()` | decided in 15.0 — declarative construction |
@@ -779,6 +779,150 @@ earn it independently.
 starts for the same logical operation while A is in flight: does B supersede A,
 coexist with it, cancel it, or leave A able to overwrite B's status? If the
 answer is application policy, a generic `status()` leaf is under-specified.
+
+---
+
+# A3-0 — RESULT
+
+Eight `status()` declarations across five files, every one read. The
+pre-registered matrix is above; this is what the cases returned.
+
+## The site classification
+
+| site | job | case |
+| --- | --- | --- |
+| `ticket.save` | POST create ticket | non-optimistic mutation |
+| `ticket.useLast` | recall-most-recent request | non-optimistic mutation |
+| `v3edge.capture` | scale capture request | non-optimistic mutation |
+| `v3edge.netWeight` | ask backend to compute net weight | external async op |
+| `work/messages.loading` | message POST failure state | non-optimistic mutation |
+| `work/tickets.loading` | imperative load of a loader-less `entityMap` | external async op |
+| `device.loading` | request lifecycle beside a loader-backed collection | external async op |
+| `feature-flag.load` | fetch flags, land them on a separate leaf | external async op |
+
+## Finding 1 — NOT ONE SITE IS AN OPTIMISTIC MUTATION
+
+This is the headline, and it settles the question the audit was opened to ask.
+`transactions()` owns optimistic local mutation with rollback. **Zero of the
+eight sites mutate local state before the server answers.** `netWeight` and
+`feature-flag` are explicit about it — the result lands on a *separate* leaf
+(`netWeightResult`, `flags`) that is written only on success.
+
+So the "transactions subsumes status" hypothesis is refuted by absence, not by
+argument. Case 1 of the matrix has no production instances at all; every site is
+case 2 or case 3. Renaming `status()` to `transactionStatus()` would have
+overfitted a use case that does not occur here.
+
+## Finding 2 — `loader` and `status` coexist WITHOUT overlapping
+
+`messagesState()` declares both: a `loader()` on the `threads` collection, and a
+`status()` named `loading` whose doc comment says it is send-failure state for
+message *posts*. Different operations on the same slice. `work/tickets` is the
+mirror image — an `entityMap` with **no** loader, populated imperatively, with
+`status` tracking that acquisition.
+
+The A1/A3 boundary is therefore real and clean: `loader` owns the status of
+collections the tree acquires; `status` covers operations it does not perform.
+Neither subsumes the other, and the production code already treats them that
+way.
+
+## Finding 3 — the concurrency case falsifies the ABSTRACTION, not just the API
+
+No call site has any concurrency guard:
+
+```ts
+capture$(dto) {
+  this._$.capture.setLoading();
+  return this._v3EdgeService.capture$(dto).pipe(
+    tap(() => this._$.capture.setLoaded()),
+    catchError(error => { this._$.capture.setError(…); return of(null); }),
+  );
+}
+```
+
+Two overlapping captures produce:
+
+```text
+A setLoading · B setLoading · A fails · B succeeds   ->  slot reads "loaded",
+                                                          A's failure is lost
+A setLoading · B setLoading · B succeeds · A fails   ->  slot reads "error",
+                                                          B's success is lost
+```
+
+The slot has no operation identity, so it describes whichever write landed last.
+On supersession the answer is "none of the above": B does not supersede, cancel
+or coexist with A — it simply overwrites, and A can overwrite back.
+
+This corroborates derivation S1, which deleted the marker after measuring that
+**every setter was an unguarded assignment and nothing in core ever drove status
+from an execution** — neither transition governance nor lifecycle observation
+was present. A3-0 adds the production half: applications did need this state,
+and the abstraction they were given could not say which operation it was about.
+
+**So the correct reading of the 36 compiler errors is: applications need
+operation-lifecycle state. It is NOT: `status()` was an adequate abstraction for
+it.** Both halves have to be recorded, because the first alone would have
+argued for restoring it.
+
+## Finding 4 — typed errors are app-shaped, not tree-shaped
+
+Seven sites use `NotifyErrorModel`, one uses `string`. Every value arrives via
+`captureError(error, 'V3EdgeOps')` — an application helper — and is read by the
+UI for retry affordances. Nothing restores it, no transaction consults it, no
+causal operation depends on it. It is request-layer state that the app keeps
+where its other state lives.
+
+## The two verdicts
+
+```text
+FUNCTION    do applications need async-operation lifecycle represented?
+            YES. Eight sites, consistent shape, real UI needs, and no
+            alternative in the library today.
+
+OWNERSHIP   does SignalTree need to own a public primitive for it?
+            NO. Not one site requires SignalTree's semantic responsibilities —
+            state truth, causal operations, transactions, restoration,
+            identity. The state is in the tree because that is where the
+            application keeps state and because several components read it.
+```
+
+"Several components read it" is a shared-state argument, and shared state is
+already served — by an ordinary branch. `{ pending: false, error: null }` with
+derived predicates expresses all eight sites, which is precisely what S1
+concluded: *workflow state is ordinary store truth; its predicates are ordinary
+derived projections.*
+
+**Disposition: `status` stays deleted. No replacement primitive.** The outcome
+is the second row of the pre-registered outcome space — transaction lifecycle
+for optimistic work, ordinary state plus composition for everything else — and
+the migration needs to document two patterns rather than one substitution.
+
+## What TruckTrax has to write instead
+
+```ts
+// ordinary branch — no marker
+save: { pending: false, error: null as NotifyErrorModel | null },
+
+// ops
+this._$.save.pending.set(true);
+…
+this._$.save.pending.set(false);
+this._$.save.error.set(captureError(e, 'TicketOps'));
+```
+
+Predicates become `computed`/`derivedFrom`. If an application wants operation
+identity — which the concurrency finding says these sites arguably should have —
+that is an application concern with an application answer, and it is one v15
+does not prevent.
+
+## What A3-0 does NOT establish
+
+That a well-specified operation-lifecycle primitive *with* operation identity
+would be wrong for SignalTree. It establishes that the deleted one was
+under-specified and that nothing in the production evidence requires SignalTree
+to own the concept. If a future case shows lifecycle state that must line up
+with transaction ownership or survive restoration, that is a new derivation, not
+a resurrection.
 
 ---
 
