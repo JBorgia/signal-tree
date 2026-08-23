@@ -272,8 +272,7 @@ A2-0    persistence + core/storage                       DONE — A2-B
    ↓
 A6      EntitySignal.map                                 DONE — no gap, rename
    ↓
-PER-0   persistence(): function vs current form; scoped persistence;
-        the StorageAdapter contract vs the ./storage package boundary
+PER-0   persistence(): function vs form                  DONE — REDESIGN
    ↓
 EVT-0   @signaltree/events — root, /angular, /nestjs, /testing, each
    ↓
@@ -297,6 +296,7 @@ freeze the Candidate B surface
 | --- | --- | --- | --- |
 | **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **DELETED — NGF-DEL executed** |
 | **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
+| **PER-0** | **does `persistence()` deserve to ship, and in this form?** | `persistence`, `StorageAdapter`, `./storage` | **REDESIGN — function survives, form does not** |
 | A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
@@ -959,6 +959,196 @@ collections with parameters. Composition may need more seam than forms did.
 **Disposition: NOT TAKEN.** Needs the `connectResource` spike answering C2, plus
 non-TruckTrax evidence — at minimum a paginated list, a stale-while-refresh
 dashboard, and a route-scoped store.
+
+---
+
+# PER-0 — `persistence()`, the `StorageAdapter` contract, and the `./storage` subpath
+
+Opened by A2, which found that `./storage` exists to serve `persistence()` and
+that `persistence()` had never been audited. Three artifacts, three separate
+questions, deliberately not answered together.
+
+## `persistence()` — the function survives; the form does not
+
+**FUNCTION: needed.** TruckTrax persists three scalar leaves. That demand is
+real and predates this API.
+
+**SIGNALTREE-SPECIFIC: yes, and this is what separates it from `ng-forms`.**
+A2 measured it: `persistence()` withholds speculative transaction state and
+re-arms on settlement, via `scheduleDurableConsequence`. A generic storage
+effect cannot know *"this value exists physically but is not yet eligible to
+escape as a durable consequence"* — SignalTree can. That is a genuine ownership
+claim, not merely working code.
+
+**CURRENT FORM: cannot express the one production need we have evidence for.**
+Measured, not inferred:
+
+```text
+scoping      persists the WHOLE tree — the payload provably contains a leaf
+             explicitly marked do-not-persist
+instances    a second persistence() is REFUSED at construction:
+             "enhancer 'persistence' is configured 2 times; each enhancer may
+              appear once"
+selection    no `select`, `include`, `exclude` or path option exists
+```
+
+So there is no way — not by configuration, not by using two instances — to say
+"persist these three leaves and nothing else". TruckTrax's tree holds entity
+collections and scratch state that must not become durable.
+
+**CONSUMERS: zero.** Not used by TruckTrax, not used by any package. The demo
+has a persistence page, and that is `demo-coverage` doing what it is told —
+circular by NGF-0's reasoning, exactly as it was for `ng-forms`.
+
+**Disposition: REDESIGN.** Not KEEP: the shipped form cannot serve the only
+demonstrated need. Not DELETE: the settlement semantics are a real
+SignalTree-owned capability that no composition can currently reproduce.
+
+The open design question is the one A2 named, and PER-0 does not settle it:
+
+```text
+Option A   expose a public settlement seam; persistence composes outside
+Option B   first-party persistence keeps the internal authority and gains
+           scoped selection; no public egress door
+Option C   something smaller, not yet derived
+```
+
+Option B is the one this evidence makes cheapest — the capability already
+exists and only lacks selection — but "cheapest" is not "earned", and A and C
+have not been attempted.
+
+## `StorageAdapter` — the contract survives whatever persistence becomes
+
+Any durability capability needs a storage abstraction, and this one is three
+methods. It is a type: zero runtime cost, and it can live in the main barrel.
+Note that today it does NOT — `PersistenceConfig.storage?: StorageAdapter` is
+part of a public enhancer's contract while the type is reachable only from a
+subpath.
+
+## `createStorageAdapter` / `createIndexedDBAdapter` — unproven
+
+**Consumers: the enhancer's own specs, and nothing else.** No application, no
+demo, no package. 108 lines of generic key/value plumbing with zero imports and
+no SignalTree semantics of any kind.
+
+By NGF-0's rule that is a deletion by default: useful-looking code with no
+demonstrated consumer and no ownership claim. `localStorage` already satisfies
+the contract without a factory, and an IndexedDB adapter is a thing an
+application writes once against a three-method interface.
+
+## `./storage` — the subpath is unproven independently of all of the above
+
+The correction A2 needed: the CONTRACT being entailed does not entail the
+PACKAGE. If the implementations go and only the type survives, the type belongs
+in the main barrel and the subpath has nothing left to ship.
+
+```text
+persistence redesigned · contract in main barrel · impls deleted
+    -> DELETE ./storage
+
+impls independently earn themselves (no current evidence)
+    -> ./storage survives
+```
+
+## Restore is the OTHER direction, and it is NOT handled
+
+A2 measured egress and found it correct. PER-0 measured ingress and found it is
+not. Pinned in `per0-restore-semantics.spec.ts`.
+
+**Hydrating persisted truth creates an undoable user turn.**
+
+```text
+autoLoad restores 'PERSISTED'   history 1 -> 2,  canUndo() true
+tree.undo()                     -> 'default'
+```
+
+The first undo a user presses throws away their saved settings and reverts to
+the code default. This is A1's ingress problem again, and arguably worse,
+because it happens at startup on every session rather than on a background
+poll.
+
+**An explicit `load()` mid-transaction silently redefines rollback.**
+
+```text
+transaction sets 'OPTIMISTIC'
+load()            -> 'PERSISTED'
+rollback()        -> succeeds, and lands on 'PERSISTED'
+```
+
+Rollback should restore the pre-transaction baseline, which was `'default'`.
+The load moved the baseline. No error, no refusal — the transaction's meaning
+changed underneath it.
+
+## And the ingress seam as it exists CANNOT fix this
+
+The obvious move is A1's wrapper. It does not work:
+
+```ts
+await withWriteContext({ intent: 'system', causalMode: 'realization' },
+  () => tree.load());
+// history STILL grows 1 -> 2, canUndo() still true
+```
+
+`withWriteContext` is **synchronously scoped**. `load()` is async: the context
+is established and torn down before the storage read resolves, so the writes
+land outside it. A1's case worked only because `setAll()` was synchronous
+inside the wrapper.
+
+**So the classification must wrap the WRITE, not the OPERATION** — and for an
+API that owns its own write, only the callee can do that. No caller-side
+wrapper can classify `persistence().load()`.
+
+That is a genuine constraint on the shape of the eventual ingress door, and it
+was invisible from A1 alone, where the application happened to own the write.
+
+## Persistence uses BOTH directions — and implements one
+
+```text
+storage -> tree    incoming durable truth       NOT classified  ✗
+tree -> storage    outgoing durable consequence settled-only    ✓
+```
+
+That makes `persistence()` half a reference implementation of the causal
+boundary. The half it gets right, it gets right in a way no composition can
+currently reproduce; the half it gets wrong, it gets wrong in a way no caller
+can currently correct.
+
+## Outcome space
+
+Recorded here for completeness, and with a methodological admission: **unlike
+A1, A2 and A3, PER-0's outcomes were written down AFTER its evidence.** The
+conclusion is not weakened by that — it is falsification-shaped and the
+measurements are pinned — but the ordering was worse, and the discipline exists
+because post-hoc outcome spaces tend to fit the result.
+
+```text
+PER-A  the current whole-tree enhancer is already the minimum correct form
+PER-B  the function survives, the form does not -> redesign with scoped
+       selection; keep only the required contract; likely delete ./storage
+PER-C  the same correctness composes externally through one smaller seam
+       -> delete persistence(), expose only that seam
+PER-D  responsibilities survive separately -> split
+```
+
+**Result: PER-B**, and the restore finding hardens it. PER-A is refuted twice
+over — the form cannot scope, and it mishandles ingress. PER-C is refuted by the
+synchronous-scope constraint: an external composition cannot classify an async
+restore it does not own, so deleting `persistence()` and exposing a seam would
+leave restore incorrect in every composition.
+
+## What PER-0 hands to Candidate B
+
+**`persistence()` cannot ship in its current form.** It cannot scope, and it
+creates an undoable turn out of the user's own saved settings.
+
+Either it is redesigned before the RC, or 15.0 ships without a first-party
+durability capability — and applications cannot correctly compose one, because
+the egress seam is internal AND the ingress classification is impossible from
+outside for an async restore.
+
+Those are linked, and together they are the sharpest constraint the audit has
+produced. Shipping neither would leave durability strictly worse than v13, where
+`stored()` at least existed and at least worked.
 
 ---
 
