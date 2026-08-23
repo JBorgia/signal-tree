@@ -183,7 +183,7 @@ TH-0    generic WritableSignal history                   DONE — deleted
    ↓
 A3-0    status vs transactions/operation lifecycle      DONE — stays deleted
    ↓
-A1      remote acquisition / resource composition
+A1-0    remote acquisition / resource composition       DONE — one seam owed
    ↓
 A2      persistence + does core/storage exist at all?    ← one question, not two
    ↓
@@ -205,7 +205,7 @@ freeze the Candidate B surface
 | --- | --- | --- | --- |
 | **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **DELETED — NGF-DEL executed** |
 | **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
-| A1 | remote acquisition / loading | `loader` | evidence gathered, undecided |
+| A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | evidence gathered, undecided |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
 | A4+A5 | form integration and its history | `form`, `FormSignal`, `history`, `@signaltree/ng-forms/signals` | **resolved — one consumer, proven path, one gap** |
@@ -649,6 +649,111 @@ C1 fails: remote acquisition genuinely requires SignalTree-owned semantics
 throughout its lifetime
     -> REDESIGN the capability; only then reconsider first-class ownership
 ```
+
+---
+
+# A1-0 — RESULT
+
+Run with an ordinary `entityMap` and acquisition composed beside it. No
+`loader()`, no cache vocabulary. Pinned in `composed-acquisition.spec.ts`.
+
+## C1 — structural identity composes PERFECTLY, with nothing added
+
+| case | result |
+| --- | --- |
+| 1-2 initial load, then refresh with the same keys | surviving key keeps its `SubjectId`; a reference held across the refresh reads the new value |
+| 3 refresh drops A, keeps B, adds C | B's lifetime survives, A retires, C is new |
+| 4 A returns later | new lifetime; the reference held before the gap stays `undefined` — no resurrection |
+| 7 refresh with identical values | no identity churn |
+| 10 destroy, then a late response | does not throw into the acquirer |
+
+Part 1 of C2 — the thing the earlier note guessed was the missing seam — is
+**already correct**. `setAll` over an ordinary `entityMap` is a
+lifetime-preserving reconciliation, which is exactly what a remote refresh
+needs. Nothing has to be added for it.
+
+## C2 — the real gap is SEMANTIC CLASSIFICATION, and the seam already exists
+
+**Case 8.** An untagged refresh is indistinguishable from an authored mutation:
+time-travel's history GROWS, and the user's undo reverts *the server's truth* to
+a stale client value.
+
+```text
+setAll(server rows)   ->  history 2 -> 3,  canUndo() true
+tree.undo()           ->  'Ada'  (the pre-refresh client value)
+```
+
+**Case 9 is worse, and it is the one that forces a statement.** A refresh
+arriving while an optimistic transaction holds the row makes that transaction
+**unresolvable**:
+
+```text
+untagged:   rollback() THROWS "could not rollback the pending transaction"
+            final value = Server, transaction stuck
+```
+
+**Case 8b / 9b — both are fixed by classification, and core already has it.**
+Time-travel checks `getCausalWriteMode(activeMeta) === 'realization'` and
+declines to record. Wrapping the same write:
+
+```ts
+withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+  rows.setAll(serverRows);
+});
+```
+
+```text
+case 8b:  history 2 -> 2,  value applied,  no phantom undo step
+case 9b:  rollback() SUCCEEDS, restoring the pre-transaction baseline
+```
+
+**`withWriteContext` is not in the shipped barrel.** Nor is `causalMode`. Core
+knows how to classify this write; applications have no way to say it. That is
+the entire C2 answer, and it is the forms result again: the valuable output of
+the spike is a primitive that already exists internally and is unreachable.
+
+Note what 9b's policy actually is — rollback restores the pre-transaction
+baseline, so the concurrent server value is discarded. That is arguable. The
+point is that it is now a *statable consequence of classification* rather than
+an accident: untagged, the same sequence cannot be resolved at all.
+
+## Part 3 — request ownership is correctly external
+
+Cases 5-6. Core has no scope concept: a slow P1 response landing after a P2
+scope simply replaces it, because `setAll` applies whatever it is given.
+
+That is right, not a defect. Params, cancellation, supersession and staleness
+belong to the resource/controller — which is what Angular's `resource()` already
+owns. Composition therefore *requires* a controller; it does not require
+SignalTree to grow one.
+
+## Outcome
+
+The pre-registered second row:
+
+```text
+C1 yes / C2 a small generic collection-truth seam
+    -> EXPOSE only that earned primitive; DELETE loader
+```
+
+**`loader` is not needed for correctness.** Everything it provides beyond cache
+policy — keyed acquisition into a collection with preserved lifetimes — an
+ordinary `entityMap` already does. What is missing is one narrow door.
+
+**What that door should NOT be: `withWriteContext` as-is.** It is
+enhancer-author plumbing carrying `intent`, `source`, `causalMode`, `subjectIds`
+and `positionIds`; exposing it wholesale would ship a large surface to buy one
+sentence. The earned primitive is the sentence: *apply this write as externally
+acquired truth rather than as something the user did.* Naming and shape are open
+— that is a design step, not a finding.
+
+## What A1-0 does NOT settle
+
+The cache conveniences, deliberately excluded from this spike. 19 production
+sites configure `staleTime: '30m'`, `swr`, `lazy` identically, which looks far
+more like a default than a feature; `tags` has zero exercised invalidation. Ask
+that question *after* the seam exists, and ask it as "which of these is missing
+from composition", not "how do we keep loader".
 
 ---
 
