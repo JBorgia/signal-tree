@@ -1797,6 +1797,68 @@ const unsubscribe = tree.subscribe((state) => {
 });
 ```
 
+## Tree lifetime and `destroy()`
+
+A `SignalTree` owns runtime resources for the lifetime of the tree — per-leaf
+signals, the entity stores behind `entityMap()`, notifier subscriptions, and
+whatever the enhancers you declared installed. **When a tree is created with a
+bounded lifetime, call `destroy()` when that lifetime ends.**
+
+Two categories, and only the second needs anything from you:
+
+```text
+LONG-LIVED APPLICATION STORE
+  created once, lives as long as the application
+  destroy() at application or root-service teardown, if at all
+
+BOUNDED-LIFETIME STORE
+  a test
+  an SSR request
+  a route- or component-owned feature store
+  a temporary workflow, a store recreated on navigation
+  → destroy() at the ownership boundary
+```
+
+Angular makes the bounded case easy: create the tree in a service provided at
+the component or route level and call `destroy()` from `ngOnDestroy`, or hand it
+to `DestroyRef`.
+
+```typescript
+@Injectable() // provided by the component/route, not in root
+export class FeatureStore implements OnDestroy {
+  private tree = signalTree({ rows: entityMap<Row, string>({ selectId: (r) => r.id }) });
+  readonly rows = this.tree.$.rows.all;
+
+  ngOnDestroy() {
+    this.tree.destroy();
+  }
+}
+```
+
+### Why this is a requirement and not a warning about leaks
+
+Dropping the last reference to a tree that has taken writes is **not** sufficient
+for prompt reclamation. Measured — six identical stores built in one process,
+10,000 rows each, `tools/probe-history-sample-isolation.mjs`:
+
+```text
+build            1        2        3        4        5        6
+abandoned    89.65   174.08   263.14   355.81   452.13      OOM
+destroyed     7.08     7.21     7.28     7.28     7.37     7.38
+isolated     89.65    89.66    89.63    89.62    89.65    89.65
+```
+
+The `isolated` row is one store per process: a single tree costs the same every
+time, so there is no unbounded growth inside a tree. The `abandoned` row is the
+same six builds in one process without `destroy()` — nothing is released. The
+`destroyed` row is those six builds calling it.
+
+So the accurate statement is **"a tree owns resources until you destroy it"**,
+not "SignalTree leaks unless destroyed". The experiment disproves the second: the
+resources are owned, reclaimable on request, and bounded per tree. What it
+establishes is an ownership contract, and the cost of ignoring it scales with how
+many trees you create rather than how long one lives.
+
 ## Core API reference
 
 ### signalTree()

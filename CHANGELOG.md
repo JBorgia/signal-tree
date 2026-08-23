@@ -3,6 +3,14 @@
 These entries keep release-delta claim checks honest before the actual version
 bump inserts the final dated 15.0.0 heading.
 
+- **Tree lifetime is now documented as a contract.** A `SignalTree` owns runtime
+  resources until `destroy()` is called; dropping the last reference is not
+  sufficient for prompt reclamation. Nothing changed in the runtime — this is
+  a measured fact that was never written down. Trees with bounded lifetimes
+  (tests, SSR requests, route- or component-owned stores) must be destroyed at
+  their ownership boundary. See "Tree lifetime and `destroy()`" in the core
+  README for the measurement and the Angular pattern.
+
 - **BREAKING: lazy signal creation removed.** `TreeConfig.lazy`,
   `TreeConfig.useLazySignals`, the `LazyFeature` type, the
   `@signaltree/core/lazy` subpath, the lazy proxy and `SignalMemoryManager` are
