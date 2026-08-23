@@ -427,3 +427,69 @@ It also sharpens Step 8 from "history uses too much memory" to one question:
 The zero-owner answer — a static ownership fact decided at construction — does
 not transfer. This one is dynamic: ownership ends when the last retained history
 reference to the subject does, and nothing currently observes that moment.
+
+
+---
+
+## STEP 8, NULL FIRST — orphaned retired subjects account for the slope
+
+Run before designing any mechanism, to test the explanation rather than assume
+it. Reproduce with `node --expose-gc tools/probe-history-subject-ownership.mjs`.
+
+Two inventories, both counted rather than estimated. PHYSICALLY RETAINED is
+`__listSubjectReclamationCandidates()` — the entity layer's own list of
+tombstoned subjects still holding value backing. SEMANTICALLY OWNED is the union
+of `__subjectIds` across every retained history entry, intersected with the
+retired set.
+
+```text
+  rounds   retired   physical   claimed   owned   ORPHANS   growth
+      20      4000      4000      4200    4000         0     5.67 MB
+      40      8000      8000      4200    4000      4000     9.55 MB
+      80     16000     16000      4200    4000     12000    15.73 MB
+     160     32000     32000      4200    4000     28000     30.5 MB
+     320     64000     64000      4200    4000     60000    60.01 MB
+```
+
+Three facts, and the third is the finding:
+
+1. **`physical` equals `retired` exactly, at every point.** Not "most", not
+   "asymptotically" — every subject the tree has ever retired is still holding
+   its backing. Nothing is ever released.
+2. **`owned` is pinned at 4000 and `claimed` at 4200.** The semantic window is
+   bounded exactly as designed: 20 entries x 200 rows, plus the 200 live. The
+   history layer is doing its job.
+3. **Orphans — retired, physically retained, claimed by no retained entry —
+   grow linearly and cost 945 B each, which is 90% of all heap growth.**
+
+So the two layers disagree about what is alive, and the disagreement is the
+leak. Eviction ends a restoration claim and nothing releases the backing that
+claim was justifying.
+
+### What this rules in, and what it rules out
+
+RULED IN: the fix belongs at the eviction boundary. The information needed is
+already on the entry — `__subjectIds` is recorded at capture time and is the set
+a restore of that entry would need.
+
+RULED OUT: a reachability sweep as the production mechanism. It would discard
+information the system already has and pay `retired x retained-history` to
+rediscover it. A sweep is still worth building as a TEST-ONLY oracle, because
+claim bookkeeping is easy to get subtly wrong and an independent recomputation
+is the only cheap way to falsify it.
+
+⚠️ ALSO RULED OUT: claiming every subject named in `entry.state`. A snapshot
+names the whole collection, so counting it would make every retained entry claim
+every subject and reproduce today's over-retention inside a tidier structure.
+The claim set is restoration NECESSITY, not serialization reachability — which
+is what `__subjectIds` already records.
+
+### A note on the statistic, not the data
+
+The first version of this probe divided `last.orphans / first.orphans`. The
+first point has ZERO orphans by construction — at 20 rounds a 20-entry history
+still covers every round, so nothing has been evicted — and the division printed
+NOT CONFIRMED over data that confirms the hypothesis cleanly. A wrong statistic
+on a right experiment reads exactly like a result. The verdict now tests three
+things instead: the owned set is bounded, orphans grow from the first point that
+HAS them, and the marginal heap per marginal orphan is stable and positive.
