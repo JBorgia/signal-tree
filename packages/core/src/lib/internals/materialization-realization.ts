@@ -76,6 +76,4 @@ export function getMaterializationRealization():
 }
 
 /** Test seam. Never called by production code. */
-export function resetMaterializationRealizationForTest(): void {
-  installed = undefined;
-}
+

@@ -1378,16 +1378,17 @@ export type SignalTree<T> = ISignalTree<T>;
 // TYPE GUARDS
 // ============================================
 
-/**
- * Type guard to check if a value is a SignalTree
- */
-export function isSignalTree<T>(value: unknown): value is ISignalTree<T> {
-  return (
-    value !== null &&
-    typeof value === 'function' && // It's a callable function
-    'state' in value &&
-    '$' in value &&
-    'with' in value &&
-    'destroy' in value
-  );
-}
+// `isSignalTree()` lived here and is DELETED in 15.0. It tested
+// `'with' in value`, so after `.with()` was removed in 223b355a it returned
+// FALSE for every SignalTree that exists. Nothing broke, because nothing
+// imported it.
+//
+// Read how it got there, because the shape repeats. It was on the public barrel
+// with the note "narrows to the core tree contract, so it belongs on the core
+// barrel", and 1e5c1167 removed it from the barrel to satisfy `demo-coverage`
+// (every root export must be demonstrated in the demo app) rather than because
+// anyone judged it unearned. Un-exported to make a gate green, then unreachable,
+// then silently wrong.
+//
+// If a tree guard is wanted, write it against the v15 shape — `$`, `state`,
+// `destroy`, callable — and demonstrate it, like every other barrel export.
