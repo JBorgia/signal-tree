@@ -77,7 +77,7 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
    * but not in WHETHER its recorded before-value is still authoritative.
    * Fix it once against the chosen HIST model, not before.
    */
-  it('DEFECT: undo lets stale client history overwrite later external truth', async () => {
+  it('REPAIRED (P0-C): undo is refused rather than discarding server truth', async () => {
     const tree = signalTree(
       { document: { title: 'v1' } },
       { enhancers: [timeTravel({ maxHistorySize: 50 })] }
@@ -90,10 +90,10 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     realization(() => tree.$.document.title.set('SERVER'));
     await flush();
 
-    tree.undo();
+    expect(() => tree.undo()).toThrow(/ST1034/);
     await flush();
 
-    expect(tree.$.document.title()).toBe('v1'); // ← the defect, pinned
+    expect(tree.$.document.title()).toBe('SERVER');
   });
 
   it('control: a realization to a DIFFERENT leaf DOES survive (10b holds)', async () => {
@@ -149,18 +149,14 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     realization(() => tree.$.document.title.set('SERVER'));
     await flush();
 
-    tree.undo();
+    // The undo is refused, so there is nothing to redo — which resolves the
+    // symmetry worry rather than answering it. "Undo respects later truth but
+    // redo does not" cannot arise, because the state machine never advanced.
+    expect(() => tree.undo()).toThrow(/ST1034/);
     await flush();
-    expect(tree.$.document.title()).toBe('v1');
 
-    // Redo remains available and replays the authored write. Consistent with
-    // undo — the realization is simply absent from the redo model too. Whatever
-    // HIST decides for the undo direction has to decide this direction as well;
-    // "undo respects later truth but redo does not" would be incoherent.
-    expect(tree.canRedo()).toBe(true);
-    tree.redo();
-    await flush();
-    expect(tree.$.document.title()).toBe('A');
+    expect(tree.$.document.title()).toBe('SERVER');
+    expect(tree.canRedo()).toBe(false);
   });
 });
 
