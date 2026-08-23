@@ -1907,6 +1907,62 @@ All enhancers are included in `@signaltree/core`:
 - **timeTravel()** - Undo/redo functionality & state history
 - **serialization()** - State persistence & SSR support
 
+### Marking an operation undoable
+
+`undoable()` designates the authored causal turn containing its writes as
+eligible for undo. It does **not** create a causal-turn boundary.
+
+```ts
+import { signalTree, timeTravel, undoable } from '@signaltree/core';
+
+const tree = signalTree({ doc: { title: '' }, ui: { panel: 'none' } }, {
+  enhancers: [timeTravel({ maxHistorySize: 50 })],
+});
+
+function rename(title: string) {
+  undoable(() => tree.$.doc.title.set(title));
+}
+```
+
+Two consequences follow from "the turn, not the write", and both are worth
+knowing before you meet them:
+
+```ts
+// One designated write promotes the WHOLE turn. These reverse together,
+// because writes in the same tick are one causal turn.
+undoable(() => tree.$.doc.title.set('edited'));
+tree.$.ui.panel.set('inspector');
+
+// Two scopes in one tick are ONE undo step, for the same reason.
+undoable(() => tree.$.a.set(1));
+undoable(() => tree.$.b.set(2));
+```
+
+If you need separate undo steps, separate the turns — an ordinary event boundary
+already does that, which is why there is no boundary API.
+
+The scope is synchronous. An async callback is refused with `ST1033` rather than
+silently designating nothing:
+
+```ts
+const data = await load();
+undoable(() => tree.$.x.set(data));   // ✅ designate the synchronous write
+```
+
+When a framework owns the write and there is no callback to wrap — Angular
+Signal Forms writes its model from inside its own DOM listener — designate at
+the mutation door instead:
+
+```ts
+const model = toWritableSignal(tree.$.editForm, injector, { undoable: true });
+```
+
+That is ingress designation, not "this branch is historical": a write to the same
+branch through an ordinary tree handle stays non-undoable.
+
+An `undo()` that cannot be applied is refused rather than partially applied —
+see `ST1034` in [docs/errors](../../docs/errors/README.md).
+
 ### SSR transfer vs storage restore
 
 `deserialize()` accepts `{ transfer: true }` to mark a payload as an **SSR
