@@ -335,7 +335,7 @@ freeze the Candidate B surface
 | **PER-0** | **does `persistence()` deserve to ship, and in this form?** | `persistence`, `StorageAdapter`, `./storage` | **REDESIGN — function survives, form does not** |
 | **EVT-0** | **does `@signaltree/events` exist at all?** | the package and its four entry points | **DELETED — EVT-DEL executed** |
 | **SEC-0** | **does `@signaltree/core/security` exist at all?** | the subpath and `security()` | **DELETED — SEC-DEL executed** |
-| **HIST-0** | **is history participation whole-tree, or selective?** | `timeTravel()` scope | **PRE-REGISTERED — evidence not yet gathered** |
+| **HIST-0** | **is history participation whole-tree, or selective?** | `timeTravel()` scope | **BASELINE MEASURED — mechanics already operation-scoped** |
 | A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
@@ -1105,6 +1105,95 @@ pristine rehearsal -> MATRIX-CLOSE -> Candidate B -> TruckTrax 2/3
 
 The P0 moves up. It lives in the same restoration machinery, so fixing it before
 HIST-0 settles would risk a HIST implementation invalidating part of the repair.
+
+---
+
+# HIST-0 — BASELINE (descriptive, no implementation changed)
+
+Pinned in `hist0-baseline.spec.ts`. What the existing whole-tree authority does
+when selective-history requirements are put to it.
+
+## The headline: the mechanics are ALREADY operation-scoped
+
+The hardest semantic target named for this audit — *reverse an operation's own
+effects against intervening non-restorable truth, rather than rewinding a
+whole-tree snapshot* — **is already met**.
+
+```text
+edit title -> 'A'
+realization sets body -> 'server-body'     (AFTER the edit)
+undo
+
+  snapshot rewind    would give  title 'v1', body 'b1'      server value LOST
+  per-turn reversal  gives       title 'v1', body 'server-body'
+                                                    ^ measured
+```
+
+Restoration reverses the turn's own effects and leaves later non-restorable
+truth standing.
+
+**⚠️ My first formulation of this case did not discriminate**, and I nearly
+recorded the weaker result as the finding. Placing the intervening writes
+*before* the undone operation gives the same answer under both models, because
+they are already inside the prior snapshot. Only truth arriving *after*
+separates them. Same "control first" lesson as the four earlier false signals,
+in a new costume: a case that passes is not automatically a case that tested
+anything.
+
+## The nine cases
+
+| # | measured today |
+| --- | --- |
+| 1-2 | **no notion of a non-historical branch** — a `ui.scrollTop` write and a document edit are indistinguishable; both create turns |
+| 3 | a realization into a historical branch does NOT enter history ✓ |
+| 5 | a transaction spanning both branches reverses **both**, atomically |
+| 7 | entity subject lifetime survives undo — a held reference re-publishes ✓ |
+| 9 | UI churn creates history entries; subject claims tracked separately |
+| 10a | intervening truth *before* the undone operation survives (does not discriminate) |
+| 10b | intervening truth *after* survives — **per-turn reversal confirmed** |
+
+## What this does to the model space
+
+The question is now much narrower than "whole-tree versus selective", because
+the restoration MECHANISM is not the whole-tree part. What is whole-tree is
+**eligibility**: every authored write becomes a turn, regardless of location.
+
+```text
+ELIGIBILITY      whole-tree today          <- the only thing HIST-SCOPE changes
+MECHANICS        per-turn effect reversal  <- already operation-scoped
+```
+
+So:
+
+**HIST-B (location-scoped)** is a filter on eligibility. Case 5 prices it
+exactly: a transaction touching `document.title` and `ui.selectedPanel` today
+reverses both. Filtering by location would partially reverse an atomically
+authored operation — the first of the three coherent outcomes, and the one that
+breaks atomicity during restoration.
+
+**HIST-C (operation-scoped)** fits the mechanics that already exist. If
+eligibility belongs to the turn rather than the branch, case 5 has no
+contradiction: the operation is reversible or it is not, and all its writes move
+together.
+
+**HIST-A** remains the status quo and is not refuted by anything here — it is
+merely expensive in eligibility terms, which case 9 is about rather than
+correctness.
+
+**HIST-D** still needs B or C to fail alone before it is admissible.
+
+## Not yet measured
+
+Case 4 (a single un-transacted turn spanning both branches) and case 6 (authored
+edit then realization at the same location) are covered indirectly by 5 and 3
+but deserve their own rows before a disposition. Case 8 is subsumed by 10b.
+
+Case 9 needs the retention half done properly: whether excluded state acquires
+restoration claims, measured the way the churn probes measure it, not asserted
+from a snapshot count.
+
+**No disposition yet.** The baseline narrows the question; it does not answer
+it.
 
 ---
 
