@@ -34,6 +34,12 @@ the RC's public surface.
 The RC ships **34 public names total** — 26 from `.`, 6 from `./security`, 2
 from `./storage`. `check-rc-public-dispositions.mjs` withholds **57 symbols**.
 
+> **CORRECTION.** The "import sites" column counts import statements, not call
+> sites. `loader` has **19** call sites, not 6. The per-capability numbers in
+> [`v15-production-surface-audit.md`](v15-production-surface-audit.md) are the
+> ones to use; these undercount every capability that is configured more than
+> once per file.
+
 ## The distinction that matters: deleted vs withheld
 
 Four of the seven — `loader`, `stored`, `flushAllStoredSignals`, `asyncSource`
@@ -119,3 +125,13 @@ git worktree add -b wip/signaltree-15-rc1-eval <path> # in the consumer repo
 pnpm install --no-frozen-lockfile
 npm run typecheck
 ```
+
+## Superseded by the capability audit
+
+This page stays as the pass-1 record. The decision work moved to
+[`v15-production-surface-audit.md`](v15-production-surface-audit.md), because
+the symbol-level framing here — "restore the export or delete the
+implementation" — is the wrong unit. Six `loader` imports are evidence about
+remote acquisition; they are not a vote to re-export `loader()`. The audit
+starts from the business job and evaluates every API placement, with the
+historical spelling ranked as the weakest evidence available.
