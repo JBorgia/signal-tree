@@ -139,8 +139,6 @@
   },
   "packages": [
     "core",
-    "ng-forms",
-    
     "enterprise",
     "guardrails"
   ],
@@ -156,10 +154,6 @@
         "maxSize": "15KB",
         "maxGzip": "5KB"
       },
-      "ng-forms": {
-        "maxSize": "10KB",
-        "maxGzip": "4KB"
-      },
       "enterprise": {
         "maxSize": "8KB",
         "maxGzip": "3KB"
@@ -171,4 +165,3 @@
     }
   }
 }
-

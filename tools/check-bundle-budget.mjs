@@ -60,7 +60,7 @@ const REPO_NODE_MODULES = new URL('../node_modules', import.meta.url).pathname;
  * build that is not stale. A check with false alarms gets disabled, which
  * leaves you back here.
  */
-const BUILD_PROJECTS = 'core,shared,ng-forms,events';
+const BUILD_PROJECTS = 'core,shared,events';
 
 function ensureBuilt() {
   try {

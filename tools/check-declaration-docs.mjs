@@ -32,7 +32,6 @@ const SELF_TEST = process.argv.includes('--self-test');
 const PACKAGES = [
   'core',
   'shared',
-  'ng-forms',
   'events',
 ];
 

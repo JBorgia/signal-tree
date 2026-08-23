@@ -78,13 +78,15 @@ describe('DocumentationComponent', () => {
     const buttons: HTMLButtonElement[] = Array.from(
       fixture.nativeElement.querySelectorAll('.package-button')
     );
-    const ngFormsIndex = component.packages.findIndex(
-      (p) => p.id === 'ng-forms'
-    );
-    buttons[ngFormsIndex].click();
+    // Drive the LAST package rather than a named one: this test is about the
+    // button-to-selection wiring, and hard-coding a package id made it a
+    // hostage of the package list (it broke when ng-forms was deleted).
+    const index = component.packages.length - 1;
+    const target = component.packages[index];
+    buttons[index].click();
     fixture.detectChanges();
 
-    expect(component.selectedPackage().id).toBe('ng-forms');
-    expect(buttons[ngFormsIndex].classList.contains('active')).toBe(true);
+    expect(component.selectedPackage().id).toBe(target.id);
+    expect(buttons[index].classList.contains('active')).toBe(true);
   });
 });

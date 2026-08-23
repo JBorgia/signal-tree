@@ -47,12 +47,6 @@ export class DocumentationComponent implements OnInit {
       description: 'Event helpers for reacting to state changes in a data-first way',
       readmePath: 'assets/docs/events/README.md',
     },
-    {
-      id: 'ng-forms',
-      name: '@signaltree/ng-forms',
-      description: 'Angular forms integration, validation, and persistence workflows',
-      readmePath: 'assets/docs/ng-forms/README.md',
-    },
   ];
 
   readonly quickLinks: DocQuickLink[] = [

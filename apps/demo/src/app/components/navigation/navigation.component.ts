@@ -102,14 +102,6 @@ export class NavigationComponent {
       category: 'packages',
     },
     {
-      id: 'ng-forms',
-      title: 'Angular Forms',
-      description: 'Forms integration with validation and persistence',
-      route: '/docs',
-      queryParams: { package: 'ng-forms' },
-      category: 'packages',
-    },
-    {
       id: 'form-marker',
       title: 'Form Marker',
       description: 'Tree-integrated form state modeling',

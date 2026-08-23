@@ -107,14 +107,6 @@ export class HomeComponent {
       queryParams: { package: 'events' },
       cta: 'Read events docs →',
     },
-    {
-      title: '@signaltree/ng-forms',
-      description:
-        'Angular forms integration for reactive form state, validation, and persistence patterns.',
-      route: '/docs',
-      queryParams: { package: 'ng-forms' },
-      cta: 'Read forms docs →',
-    },
   ];
 
   readonly proofCards: HomeLinkCard[] = [
@@ -221,7 +213,6 @@ export class HomeComponent {
 npm install @signaltree/core
 
 # Optional packages
-npm install @signaltree/ng-forms
 npm install @signaltree/events`,
     },
     {

@@ -163,7 +163,7 @@ freeze the Candidate B surface
 
 | id | capability | v13 spelling | status |
 | --- | --- | --- | --- |
-| **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **evidence gathered — hypothesis survived falsification** |
+| **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **DELETED — NGF-DEL executed** |
 | A1 | remote acquisition / loading | `loader` | evidence gathered, undecided |
 | A2 | persistence / stored state | `stored`, `flushAllStoredSignals` | evidence gathered, undecided |
 | A3 | async / status representation | `status` | evidence gathered, undecided |
@@ -294,19 +294,69 @@ the package:
 | Is there production demand? | none; the one consumer is gate-mandated |
 | Does the SignalTree-coupled entry point have a future? | it is deprecated with no chosen replacement |
 
-**Recommended disposition: DELETE `@signaltree/ng-forms` before 15.0.** Not
-tidy it — remove it. `createWizardForm` and `withFormHistory` lose their subject
-when `createFormTree` goes; the validators and the directive are Angular
-utilities that do not need a SignalTree package, and can be re-homed or dropped
-on their own merits.
+**Disposition: DELETED.** Executed as NGF-DEL. Not tidied — removed.
+`createWizardForm` and `withFormHistory` lost their subject with
+`createFormTree`; the validators and the directive were Angular utilities that
+did not need a SignalTree package.
 
-This is a recommendation, not an action. The package is published today and
-deleting it is a public-surface decision. What the audit establishes is that the
-burden of proof was on the package and it has not been met.
+They were **not re-homed**. Moving them somewhere else because they look useful
+would repeat the same mistake one level down: no demonstrated consumer and no
+SignalTree ownership means deletion is the default, and git holds them if a
+later product need establishes an owner.
 
-**If it is kept**, the minimum is: un-deprecate `createFormTree` with a stated
-architecture, delete the fictional `withForms` metric, and record why two-model
-synchronization is right here when it was wrong for Signal Forms.
+### What NGF-DEL removed
+
+The package; its build, publish and release wiring; the demo page, route, nav
+entry, home card and documentation entry that existed only to satisfy
+`demo-coverage`; the `/signals` jest mapping; the core README's install
+instructions and feature section; the `docs/README` row.
+
+Two things went with it that are worth naming.
+
+**The fictional metric is deleted, not annotated.** The
+`should measure form integration boilerplate` test scored "SignalTree +
+ng-forms - 8 lines, complexity 2, maintainability 9" against Reactive Forms
+using a `withForms()` helper that never existed. Its assertions were
+`toBeDefined()`, so it could not have failed on a wrong number either way. A
+test whose fixture describes a fictional product is not evidence, and correcting
+the number would have implied the comparison was otherwise sound.
+
+**The `angular-compat` gate went too, and that needs recording.** Its entire
+subject was the `/signals` entry requiring Angular 22 while the main entry had
+to stay importable on Angular 20; it checked that the main entry could not
+transitively reach Signal Forms. With both entries gone its floors map is empty
+and its mutation target does not exist - it could no longer fail, which is the
+blind condition this suite rejects. **The invariant is still real and still
+general**: an entry point must not reach an API above its own Angular floor. It
+has no subject today because no shipped entry declares a floor above its
+package's peer range. Re-add it the moment one does.
+
+### Migration
+
+`createFormTree` -> compose. The seam is the shipped part:
+
+```ts
+const model = toWritableSignal(tree.$.editForm);
+const fields = form(model, schema);   // Angular Signal Forms
+```
+
+Undo/redo over that model is **deliberately not documented yet** - that is the
+`trackHistory` question, and naming a replacement now would prejudge it. Same
+reason `createFormTree`'s deprecation was left de-pointed rather than re-pointed
+in `b57ba293`.
+
+`ngFormValidators`, `SignalValueDirective`, `createVirtualFormArray`,
+`createWizardForm`, `withFormHistory` -> no replacement. Angular owns
+validation; the rest were conveniences with no demonstrated consumer.
+
+### One thing NGF-DEL leaves open
+
+The demo's start-here page had an "I need form / data validation" card pointing
+at the deleted route. The card is removed, so the demo now answers that question
+nowhere - even though its old copy was already the right answer ("SignalTree
+ships no validation API and no form marker. It publishes the model; Angular
+observes it"). A compositional forms example is a demo gap, recorded here rather
+than invented during a deletion.
 
 ---
 

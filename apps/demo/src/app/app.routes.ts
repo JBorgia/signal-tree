@@ -289,14 +289,6 @@ export const appRoutes: Route[] = [
       ).then((c) => c.RealisticBenchmarkHistoryComponent),
   },
 
-  {
-    path: 'ng-forms',
-    loadComponent: () =>
-      import('./pages/ng-forms-demo/ng-forms-demo.component').then(
-        (c) => c.NgFormsDemoComponent
-      ),
-  },
-
   // Architecture overview (renamed from /architecture for clarity vs. /examples/.../recommended-architecture)
   {
     path: 'architecture-overview',
@@ -329,7 +321,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Documentation',
       description:
-        'SignalTree package documentation: core API surface plus optional ng-forms, realtime, and events packages.',
+        'SignalTree package documentation: core API surface plus the optional events package.',
     },
   },
 
