@@ -310,7 +310,7 @@ A6      EntitySignal.map                                 DONE — no gap, rename
    ↓
 PER-0   persistence(): function vs form                  DONE — REDESIGN
    ↓
-EVT-0   @signaltree/events — root, /angular, /nestjs, /testing, each
+EVT-0   @signaltree/events                               DONE — recommend DELETE
    ↓
 SEC-0   @signaltree/core/security
    ↓
@@ -333,6 +333,7 @@ freeze the Candidate B surface
 | **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **DELETED — NGF-DEL executed** |
 | **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
 | **PER-0** | **does `persistence()` deserve to ship, and in this form?** | `persistence`, `StorageAdapter`, `./storage` | **REDESIGN — function survives, form does not** |
+| **EVT-0** | **does `@signaltree/events` exist at all?** | the package and its four entry points | **evidence gathered — recommend DELETE** |
 | A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
@@ -995,6 +996,120 @@ collections with parameters. Composition may need more seam than forms did.
 **Disposition: NOT TAKEN.** Needs the `connectResource` spike answering C2, plus
 non-TruckTrax evidence — at minimum a paginated list, a stale-while-refresh
 dashboard, and a route-scoped store.
+
+---
+
+# EVT-0 — `@signaltree/events` and its four entry points
+
+> **Null: if `@signaltree/events` did not exist, would v15 create this package
+> and each of its four entry points today?**
+
+Four surfaces audited separately, so that one valid adapter cannot entail the
+package or its siblings.
+
+## The structural finding, and it is stronger than NGF-0's
+
+**6,381 lines. Zero imports of `@signaltree/core`. Anywhere.**
+
+```text
+core     1,836 lines    0 imports
+angular  1,432 lines    0 imports
+nestjs   1,756 lines    0 imports
+testing  1,357 lines    0 imports
+```
+
+Every apparent match is a docstring. `ng-forms` at least had one file that
+imported core; this package has none.
+
+The single surface that touches entity state does so **deliberately without the
+import**:
+
+```ts
+/**
+ * The minimal read/write surface `applyOptimisticEntityChange` needs from an
+ * entityMap collection. A real `@signaltree/core` `EntitySignal<E, K>`
+ * satisfies this structurally — no import from `@signaltree/core` required.
+ */
+export interface EntitySnapshotAccessor<E, K> {
+  readonly asMap: Signal<ReadonlyMap<K, E>>;
+  upsertOne(entity: E): K;
+  removeOne(id: K): void;
+}
+```
+
+That is a well-written duck type. It is also an admission: the coupling is a
+shape, not a dependency, and any object with three methods satisfies it.
+
+## It declares a required peer it never uses
+
+```json
+"peerDependencies": { "@signaltree/core": "^15.0.0-rc.1", … }
+```
+
+Installing `@signaltree/events` obliges a consumer to install
+`@signaltree/core`, for a package that imports nothing from it. That is a defect
+independent of the survival question, and it is the kind of thing only a
+package-level audit finds.
+
+## Production evidence: zero
+
+TruckTrax uses **none** of it — not the root, not any subpath. The demo has an
+events page and two cards, which is `demo-coverage` doing what it is told. Same
+circular evidence as `ng-forms`.
+
+## Per surface
+
+**`core` (1,836 lines)** — a typed event toolkit: factory, zod schemas,
+registry, validation, idempotency, error classification. Requires no SignalTree
+semantics. Composable from ordinary code plus zod. Useful; not owned.
+
+**`/angular` (1,432 lines)** — and this one is worse than merely unowned.
+`OptimisticUpdateManager` has **zero references to transactions**, and its
+rollback is a caller-supplied closure:
+
+```ts
+rollback: () => store.$.trade.status.set('pending'),
+```
+
+That is a WRITE, not a reversal — so under `timeTravel()` it becomes a new
+authored turn, and under `transactions()` it is a second, competing
+optimistic-mutation authority. TH-0's rule applies directly:
+
+> Two APIs that can independently restore the same state are not automatically
+> composable.
+
+A3 already established that `transactions()` is SignalTree's optimistic-mutation
+authority. Shipping a second one, in a sibling package, that does not know the
+first exists, is the `trackHistory` situation again — discovered before release
+rather than after.
+
+**`/nestjs` (1,756 lines)** — bullmq, dead-letter queues, decorators, a Nest
+module and service. **Server-side Node code in a client-side signal state
+library.** There is no SignalTree question here to answer; the surface has no
+relationship to the product at all.
+
+**`/testing` (1,357 lines)** — assertions, factories and helpers for the events
+package. Its survival is entirely downstream of the package's.
+
+## Recommended disposition
+
+**DELETE `@signaltree/events`.** It fails the NGF-0 test more decisively than
+`ng-forms` did: no code coupling at all, no production consumer, a peer
+dependency it does not use, a backend subpath unrelated to the product, and an
+Angular subpath that duplicates an authority core already owns and would
+actively fight.
+
+The event-bus toolkit may be genuinely good. That is not the question NGF-0
+settled — **useful is not owned**, and a package with zero imports of the
+library it is named after has no ownership claim to make.
+
+**Recommendation, not action.** It is published, so removal is a public-surface
+decision. If it is kept instead, the minimum is: drop the unused peer
+dependency, and reconcile `OptimisticUpdateManager` with `transactions()` rather
+than shipping two rollback authorities.
+
+If it is deleted, the shipped topology becomes **`@signaltree/core` alone** —
+which would make the "one package, one tree" story literal.
 
 ---
 
