@@ -59,6 +59,24 @@ export interface TimeTravelConfig {
   shouldSkip?: (previous: unknown, next: unknown) => boolean;
 
   /**
+   * HIST-C2 PROTOTYPE — which authored turns are restoration-eligible.
+   *
+   * - `'all'` (default): today's semantics. Every authored turn is recorded.
+   * - `'designated'`: only turns containing an explicitly designated write are
+   *   recorded, and a non-eligible turn acquires neither a history entry nor
+   *   restoration claims.
+   *
+   * The default is deliberately NOT flipped yet. HIST-C2 selected opt-in as the
+   * product semantic, but flipping it before the door is characterised would
+   * change behaviour under every existing suite at once. The flip is a separate,
+   * deliberate change.
+   *
+   * @internal Prototype surface for the HIST-C2 derivation.
+   * @default 'all'
+   */
+  restorationEligibility?: 'all' | 'designated';
+
+  /**
    * Custom action names for different operations
    */
   actionNames?: {

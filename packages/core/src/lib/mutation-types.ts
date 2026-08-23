@@ -47,6 +47,23 @@ export type CausalWriteMode = 'authoring' | 'realization';
 export interface UpdateMetadata {
   /** Intent of the update (closed union — adding new intents is a core change). */
   intent?: 'hydrate' | 'reset' | 'bulk' | 'migration' | 'user' | 'system';
+
+  /**
+   * HIST-C2 PROTOTYPE — whether the write was performed inside a restoration
+   * designation scope, captured at `notify()` time.
+   *
+   * Stamped where the write is OBSERVED rather than read where it is recorded,
+   * because capture is deferred to the flush microtask and any synchronous
+   * ambient flag is already restored by then. This follows the existing
+   * precedent for `source` in `path-notifier.ts`, whose comment documents the
+   * same trap.
+   *
+   * @internal Not application API. Applications express "this is an undoable
+   *   user operation"; they must never set this field. The public spelling is
+   *   chosen separately, and moving this off the public `UpdateMetadata` type is
+   *   part of that step.
+   */
+  restorationDesignated?: boolean;
   /** Source of the update (closed union). */
   source?: 'serialization' | 'time-travel' | 'devtools' | 'user' | 'system';
   /** Suppress guardrails for this update. */

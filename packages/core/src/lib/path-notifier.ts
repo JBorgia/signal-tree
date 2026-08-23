@@ -10,6 +10,7 @@
  */
 
 import { getActiveWriteContext } from './write-context';
+import { isRestorationDesignated } from './internals/restoration-eligibility';
 
 import { getCausalWriteMode } from './causal-write-mode';
 
@@ -203,7 +204,16 @@ export class PathNotifier {
     positionIds?: number[],
     metaOverride?: UpdateMetadata
   ): { blocked: boolean; value: unknown } {
-    const meta = metaOverride ?? getActiveWriteContext();
+    const ambientMeta = metaOverride ?? getActiveWriteContext();
+    // HIST-C2. Captured HERE, at the synchronous observation of the write, for
+    // exactly the reason the `source` comment below gives: the flush that
+    // delivers this entry is deferred to a microtask, so a designation scope
+    // that has already returned is invisible to the recorder. Measured — all
+    // three `captureIntoBucket` calls for one designated tick ran after the
+    // scope had exited.
+    const meta: UpdateMetadata | undefined = isRestorationDesignated()
+      ? { ...ambientMeta, restorationDesignated: true }
+      : ambientMeta;
     // Tag the batch with the ambient write source (e.g. `time-travel` during a
     // history restore). The flush that delivers this entry is DEFERRED to a
     // microtask, so consumers must be able to tell "this write came from a

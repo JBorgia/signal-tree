@@ -1370,11 +1370,14 @@ not a product feature**. No shipped code calls `tree.undo()`.
 The only user-facing undo in the consumer is
 `packages/signal-forms/src/lib/entity/build-entity-form.ts`:
 
-```ts
-import { form as stForm, history, signalTree } from '@signaltree/core';
-// ...
-history({ capacity: 50 })
-```
+it imports `form` (aliased `stForm`), `history` and `signalTree` from the core
+barrel and builds the model with `history({ capacity: 50 })`.
+
+> Written out in prose rather than quoted as code on purpose. `form` and
+> `history` are deleted at HEAD, and `readme-apis` reads an import line in any
+> fence as a claim about the current barrel — it rejected the literal quotation,
+> correctly. The consumer's line is real; it is just written against an older
+> core.
 
 wired to `canUndo` / `canRedo` / `undo()` / `redo()` in
 `entity-store-signal-form-base.ts` and `entity-form.component.ts`.
@@ -1532,6 +1535,133 @@ NOT per leaf write        eligibility would be write-scoped while the engine's
 ```
 
 Which leaves designation of the operation itself.
+
+## Finding 2 — designation must be captured at WRITE time, not at record time
+
+The first prototype read the ambient designation inside `captureIntoBucket()`
+and recorded nothing at all. Probed rather than reasoned about, for one
+designated tick containing a leaf write and a collection write:
+
+```text
+inside-scope                true
+after-set-still-inside      true
+outside-scope               false
+captureIntoBucket           false     <- x3, ALL of them
+after-flush                 false
+```
+
+Capture is uniformly deferred to the flush microtask, so by the time the
+recorder runs the designation scope has already returned. Any synchronous
+ambient flag is invisible there.
+
+**`path-notifier.ts` had already solved this once.** Its `source` field is
+captured at `notify()` time with a comment naming the identical trap —
+*"the flush that delivers this entry is DEFERRED to a microtask … `isRestoring`-
+style flags that reset synchronously are already false by then."* The fix
+follows that precedent exactly: stamp the designation onto the write's metadata
+at `notify()`, the one synchronous choke point every write passes through, and
+read it off the delivered meta at record time.
+
+Three places needed it, and the reason each is separate is itself the finding:
+
+```text
+notify()                the general choke point
+leaf interceptor        computes its own meta and passes it to notify() as a
+                        metaOverride, which BYPASSES notify's stamping
+plain-leaf capture      does not go through captureIntoBucket() at all; it
+                        calls captureEffects() directly
+```
+
+The last two are pre-existing asymmetries in the capture path. They are worth
+recording because any future work that assumes "all writes funnel through
+`captureIntoBucket`" is wrong.
+
+## The ten cases — results
+
+Prototype: internal `withRestorationDesignation()`, `restorationEligibility:
+'designated'`. All 13 assertions in `histc2-door.spec.ts` pass; core stays at
+1771 passing and 35/35 fast gates.
+
+| # | case | result |
+| --- | --- | --- |
+| 1 | ordinary unmarked write | no entry, no undo — **and the write still lands** |
+| 2 | one marked write | exactly one turn; undo restores |
+| 3 | several marked writes, one turn | ONE atomic entry |
+| 4 | **marked + unmarked, one turn** | **the WHOLE turn reverses** |
+| 5 | two marked scopes, one tick | **one** turn — see below |
+| 6 | transaction inside a marked scope | one reversible transaction |
+| 7 | unmarked transaction | no entry; **the transaction still commits** |
+| 8 | realization inside a marked scope | stays non-historical — rule 4 holds |
+| 9 | restoration inside a marked scope | no new history — rule 5 holds |
+| 10 | nested marked scopes | idempotent, one turn |
+| — | non-eligible entity churn | **zero claims, zero claimed subjects** |
+| — | designated turn (control) | claims acquired — the zero above means something |
+| — | async designation scope | **throws ST1033**, never silently ignored |
+
+**Case 4 is the one that had to hold** and does: one designated write promotes
+the whole turn, so the door cannot reintroduce partial reversal by another
+route. Case 7 confirms the separation the contract needs — eligibility governs
+restoration, never whether a write lands.
+
+### Case 5 — the scope is an ELIGIBILITY scope, not an operation boundary
+
+```ts
+reversible(() => tree.$.a.set(10));
+reversible(() => tree.$.b.set(20));   // same tick
+```
+
+collapses to **one** undo step. That is the honest measurement, and it is
+consistent with everything else: the turn is the tick, and the scope designates
+the turn it is in rather than creating one.
+
+Whether applications need those separate is **not yet established**, and no
+machinery is being built for it. Ordinary UI events supply a tick boundary on
+their own. If evidence later shows an explicit reversible operation must also
+establish a causal-turn boundary, that is a second requirement to derive then.
+
+### The async contract is enforced, not documented
+
+`withRestorationDesignation` throws **ST1033** on a thenable return. PER-0 and
+three earlier false signals in this audit were all the same shape — a
+synchronous ambient designation that looks like it spans an `await` and does
+not. Rather than write that trap down, the door refuses it.
+
+## What remains open in HIST-C2
+
+```text
+DONE   1 turn-level eligibility bit is sufficient
+DONE   2 same-turn marked/unmarked atomicity
+DONE   3 transaction composition (both directions, plus the unmarked case)
+DONE   4 scope boundaries / two scopes in one tick
+DONE   5 synchronous/async behaviour pinned
+OPEN   6 the Signal Forms integration case
+OPEN   7 the public spelling
+```
+
+Step 6 is the one that could still change the design: TruckTrax's requirement is
+that writes entering through an editable form model are reversible, and with
+Angular Signal Forms those writes may not have a convenient callback around
+them. If the framework lets the event be wrapped, no extra API is earned. If it
+does not, the candidate is a designating mutation adapter —
+*an authored write entering through THIS adapter marks its causal operation
+reversible* — which is **not** location-scoped history, because writes to the
+same branch from another source stay ordinary. It gets added only if the real
+migration needs it.
+
+### Surface debt to settle at step 7
+
+The prototype stamps `restorationDesignated` on `UpdateMetadata`, which is a
+**public type export**. That is acceptable for characterisation and wrong to
+ship: applications must express "this is an undoable user operation", not set a
+causal-engine field. Moving it off the public type is part of choosing the
+spelling.
+
+### Also settled by the prototype, and worth stating
+
+The default is still `'all'`. Flipping it is a separate change, and it is now
+cheap to reason about: `isTurnEligible()` is one function, consulted by the
+flush path, the root path and the transaction path, and nothing else decides
+admission.
 
 # RESTORE-P0 — the reversal-validity cluster
 

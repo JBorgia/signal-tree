@@ -29,6 +29,7 @@ import {
   getTreeRealizationPort,
   rememberTreeRealizationDescriptor,
 } from '../../lib/internals/causal-runtime/tree-realization-adapter';
+import { isRestorationDesignated } from '../../lib/internals/restoration-eligibility';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { recordProductionSubstrateStat } from '../../lib/internals/production-substrate-stats';
 import { getCausalWriteMode } from '../../lib/causal-write-mode';
@@ -425,6 +426,13 @@ type CaptureBucket = {
   subjectIds: Set<number>;
   positionIds: Set<number>;
   effects: PendingEffectMap;
+  /**
+   * HIST-C2: whether any write accumulated into this turn was designated
+   * restoration-eligible. Turn-WIDE by construction — one designated write
+   * promotes the whole turn, because the turn is the atomic unit (HIST-0 case
+   * 4). It is a boolean rather than a count so nesting is idempotent.
+   */
+  designated: boolean;
 };
 
 function cloneTurnEffect(effect: TurnEffect): TurnEffect {
@@ -2347,6 +2355,7 @@ export function timeTravel(
       subjectIds: new Set<number>(),
       positionIds: new Set<number>(),
       effects: new Map(),
+      designated: false,
     });
     const pendingCapture = createCaptureBucket();
     const pendingTransactions = new Map<number, CaptureBucket>();
@@ -2366,6 +2375,7 @@ export function timeTravel(
       subjectIds: number[];
       positionIds: number[];
       effects: TurnEffect[];
+      designated: boolean;
     } => {
       const ownerPaths = Array.from(bucket.ownerPaths).sort();
       bucket.ownerPaths.clear();
@@ -2379,8 +2389,23 @@ export function timeTravel(
       bucket.positionIds.clear();
       const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
       bucket.effects.clear();
-      return { ownerPaths, subjectIds, positionIds, effects };
+      const designated = bucket.designated;
+      bucket.designated = false;
+      return { ownerPaths, subjectIds, positionIds, effects, designated };
     };
+
+    /**
+     * HIST-C2 — THE admission predicate. Every record site consults this one
+     * function, so eligibility cannot drift between the flush path, the root
+     * path and the transaction path.
+     *
+     * Gated BEFORE `buildTurn()` on purpose. `buildTurn` snapshots state, and
+     * the whole point of HIST-C2 is that a non-reversible operation acquires no
+     * restoration cost — gating at `insertConfirmedTurn()` would be the single
+     * cleanest site semantically but would still pay for the snapshot.
+     */
+    const isTurnEligible = (designated: boolean): boolean =>
+      config.restorationEligibility !== 'designated' || designated;
     const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
       if (!ownerPath) {
         return undefined;
@@ -2614,6 +2639,17 @@ export function timeTravel(
         return;
       }
 
+      // HIST-C2. OR, never assign: the turn is eligible if ANY of its writes
+      // was designated. Assigning would let a later undesignated write in the
+      // same turn demote it, which would partially reverse an atomic operation
+      // — the exact HIST-B failure.
+      //
+      // Read off the DELIVERED meta, not the ambient flag: this runs at flush
+      // time, after the designation scope has returned.
+      if (meta?.restorationDesignated === true) {
+        bucket.designated = true;
+      }
+
       const resolvedPositionIds =
         positionIds && positionIds.length > 0
           ? positionIds
@@ -2653,13 +2689,14 @@ export function timeTravel(
       bucket: CaptureBucket,
       action: string
     ): boolean => {
-      const { ownerPaths, subjectIds, positionIds, effects } =
+      const { ownerPaths, subjectIds, positionIds, effects, designated } =
         drainCaptureBucket(bucket);
       if (
-        ownerPaths.length === 0 &&
-        subjectIds.length === 0 &&
-        positionIds.length === 0 &&
-        effects.length === 0
+        !isTurnEligible(designated) ||
+        (ownerPaths.length === 0 &&
+          subjectIds.length === 0 &&
+          positionIds.length === 0 &&
+          effects.length === 0)
       ) {
         return false;
       }
@@ -2698,8 +2735,11 @@ export function timeTravel(
       if (!bucket) {
         return undefined;
       }
-      const { ownerPaths, subjectIds, positionIds, effects } =
+      const { ownerPaths, subjectIds, positionIds, effects, designated } =
         drainCaptureBucket(bucket);
+      if (!isTurnEligible(designated)) {
+        return undefined;
+      }
       return timeTravelManager.createPendingEntry(
         'transaction',
         undefined,
@@ -2790,7 +2830,14 @@ export function timeTravel(
           restoreLeafInterceptors = interceptLeafSignals(
             (tree as ISignalTree<T>).$ as Record<string, unknown>,
             (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
-              const effectiveMeta = meta ?? getActiveWriteContext();
+              const ambient = meta ?? getActiveWriteContext();
+              // Stamped here because this callback is synchronous with the
+              // `.set()`, and because handing `effectiveMeta` to `notify()` as a
+              // metaOverride would otherwise bypass notify's own stamping.
+              const effectiveMeta: UpdateMetadata | undefined =
+                isRestorationDesignated()
+                  ? { ...ambient, restorationDesignated: true }
+                  : ambient;
               if (isRestoring) return;
               if (getCausalWriteMode(effectiveMeta) === 'realization') {
                 notifier.notify(
@@ -2817,6 +2864,12 @@ export function timeTravel(
                   positionIds
                 );
               } else {
+                // The plain-leaf path does not go through `captureIntoBucket`,
+                // so the designation has to be OR-ed in here too. Same rule:
+                // one designated write promotes the whole turn.
+                if (effectiveMeta?.restorationDesignated === true) {
+                  pendingCapture.designated = true;
+                }
                 captureEffects(
                   pendingCapture.effects,
                   path,
@@ -2859,13 +2912,14 @@ export function timeTravel(
             // people's trees is the worst kind.
             if (!selfDirty) return;
             selfDirty = false;
-            const { ownerPaths, subjectIds, positionIds, effects } =
+            const { ownerPaths, subjectIds, positionIds, effects, designated } =
               drainCaptureBucket(pendingCapture);
             const recorded =
-              ownerPaths.length === 0 &&
-              subjectIds.length === 0 &&
-              positionIds.length === 0 &&
-              effects.length === 0
+              !isTurnEligible(designated) ||
+              (ownerPaths.length === 0 &&
+                subjectIds.length === 0 &&
+                positionIds.length === 0 &&
+                effects.length === 0)
                 ? false
                 : timeTravelManager.addEntry(
                     'batch',
