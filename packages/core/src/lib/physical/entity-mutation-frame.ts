@@ -52,40 +52,12 @@ export type PreparedFreshSubject<
   nextValue: E;
 };
 
-export type ProjectionReplacement<
-  K extends string | number,
-  E extends Record<string, unknown>,
-> = {
-  key: K;
-  nextValue: E;
-};
-
-export type ProjectionRemoval<K extends string | number> = {
-  key: K;
-};
-
-export type ProjectionAppend<
-  K extends string | number,
-  E extends Record<string, unknown>,
-> = {
-  key: K;
-  nextValue: E;
-};
-
-export type ProjectionRekey<K extends string | number> = {
-  fromKey: K;
-  toKey: K;
-};
-
-export type ProjectionRestore<
-  K extends string | number,
-  E extends Record<string, unknown>,
-> = {
-  key: K;
-  nextValue: E;
-  beforeKey?: K;
-  afterKey?: K;
-};
+// ProjectionReplacement / ProjectionRemoval / ProjectionAppend / ProjectionRekey
+// / ProjectionRestore lived here and were DELETED in 15.0. They described the
+// mutation vocabulary of the materialized entity projection, which 7896addf
+// removed; the types outlived it by a release because nothing imports them by
+// name and no check asked. Do not reintroduce them to describe the incremental
+// path — that path speaks in PreparedSubject* terms, which are below.
 
 export type PreparedSubjectRestore<
   K extends string | number,

@@ -333,12 +333,22 @@ const GATES = [
     name: 'dead-exports',
     covers:
       'no NEW export is unreachable from every entry point and every import',
-    // Ratcheted to ZERO: the 42 leads were triaged to nothing, so any new
-    // unreachable export is a regression rather than one more on a pile.
-    // 15.0.0 release hardening ratchet: 110 leads remain after the package
-    // deletion and causal-kernel work. They are not verdicts; this locks the
-    // current count so new unreachable exports still fail CI.
-    cmd: ['node', 'tools/find-dead-exports.mjs', '--max=110'],
+    // BACK TO ZERO, and the 110 is gone rather than lowered.
+    //
+    // That budget was parked under noise. The scanner asked "is this reachable
+    // from the public barrel?" of `internals/` modules, which are by design not
+    // public, so 126 of its 134 leads were the declared option/result types of
+    // functions the module itself uses — false positives a number cannot fix.
+    // Rule 4 (referenced elsewhere in its own file) removed them, leaving 8 real
+    // orphans, and all 8 were deleted: five from the materialized-projection
+    // removal, an uncalled test hook, an unused alias, and `isSignalTree`, which
+    // tested `'with' in value` and had therefore returned false for every tree
+    // since 223b355a.
+    //
+    // Zero is the honest number now. A new unreachable export is a regression,
+    // not one more on a pile — which is what the ratchet said before the pile
+    // grew back.
+    cmd: ['node', 'tools/find-dead-exports.mjs', '--max=0'],
     mutation: {
       file: 'packages/core/src/lib/utils.ts',
       append: '\nexport const __gateUnreachableExport = 1;\n',

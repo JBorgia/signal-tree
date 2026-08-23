@@ -6,7 +6,6 @@ import { Signal, WritableSignal } from '@angular/core';
  * Type definitions for the derived state system in SignalTree v7.
  */
 import type { DerivedMarker } from '../markers/derived';
-import type { TreeNode } from '../types';
 
 // =============================================================================
 // DERIVED STATE TYPES
@@ -61,14 +60,6 @@ export type DeepMergeTree<TSource, TDerived> = {
     ? ProcessDerived<TDerived[K]>
     : never;
 };
-
-/**
- * Factory function type for derived state.
- * Receives the processed source state (TreeNode) and returns derived definitions.
- */
-export type DerivedFactory<TSource, TDerived> = (
-  $: TreeNode<TSource>
-) => TDerived;
 
 // =============================================================================
 // EXTERNAL DERIVED UTILITIES

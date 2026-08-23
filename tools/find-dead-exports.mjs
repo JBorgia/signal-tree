@@ -10,13 +10,38 @@
  * source, all in the demo app — which says nothing at all about whether the
  * rewrite left orphaned exports behind, because that is not a question it asks.
  *
- * A symbol is DEAD here when all three hold:
+ * A symbol is DEAD here when all four hold:
  *   1. it is exported from a file inside a package's `src/`;
  *   2. it is not reachable from that package's public barrel (`src/index.ts`),
  *      directly or through a chain of re-exports — the public API is *supposed*
  *      to look unused from inside;
  *   3. no other file in the repo imports it — packages, apps, tools and scripts
- *      all count, so a symbol used only by the demo or by a build script is live.
+ *      all count, so a symbol used only by the demo or by a build script is live;
+ *   4. it is not referenced anywhere else in its OWN file.
+ *
+ * ## Rule 4, added in 15.0, and why it is a fix rather than a loosening
+ *
+ * Rules 1-3 ask "is this reachable from the public barrel?" of every symbol in
+ * the repo — including modules under `internals/`, which are BY DESIGN not
+ * public and are not supposed to be barrel-reachable. Measured on 15.0, that
+ * produced 134 leads of which 126 were the declared option/result/port types of
+ * functions the module itself uses:
+ *
+ *     export interface RollbackPendingTurnAtOptions { ... }
+ *     export function rollbackPendingTurnAt(options: RollbackPendingTurnAtOptions)
+ *
+ * Nothing imports `RollbackPendingTurnAtOptions` by name, and nothing should
+ * have to: TypeScript requires it to be exported for the function's declaration
+ * to be nameable. Calling it dead is a false positive, and 126 false positives
+ * is not a lead list — it is noise with a budget parked underneath it, which is
+ * exactly what the `--max=110` was.
+ *
+ * The rule is deliberately narrow: referenced ELSEWHERE IN ITS OWN FILE, not
+ * "looks structural". A symbol that appears once, in its own declaration, is
+ * still reported. After rule 4 the true count was 8, and all 8 were real —
+ * five orphans of the materialized-projection deletion (7896addf), a test hook
+ * nobody calls, an unused factory alias, and `isSignalTree`, which still tested
+ * `'with' in value` and therefore returned false for every tree in 15.0.
  *
  * ## What it deliberately does not flag
  *
@@ -266,6 +291,29 @@ for (const p of PACKAGES) {
   publicByPackage.set(p, all);
 }
 
+
+/**
+ * Rule 4 — is the symbol used anywhere in its own file beyond the line that
+ * declares it?
+ *
+ * Deliberately textual rather than a type-checker query. The question is
+ * "does this module use the name it exports", and a whole-program type walk to
+ * answer it would make a scan of every package cost more than the gate is
+ * worth. The failure mode of being textual is over-forgiveness — a name that
+ * appears only inside a comment counts as used — and that is the safe direction
+ * for a tool whose own header says to read its output as a lead, not a verdict.
+ */
+function referencedElsewhereInOwnFile(source, name) {
+  const declaration = new RegExp(
+    `export\\s+(?:declare\\s+)?(?:abstract\\s+)?(?:interface|type|class|function|const|let|var|enum)\\s+${name}\\b`
+  );
+  const body = source
+    .split('\n')
+    .filter((line) => !declaration.test(line))
+    .join('\n');
+  return new RegExp(`\\b${name}\\b`).test(body);
+}
+
 const dead = [];
 for (const [file, exported] of exportsByFile) {
   const rel = relative(ROOT, file);
@@ -275,9 +323,11 @@ for (const [file, exported] of exportsByFile) {
   const pkg = rel.split('/')[1];
   const api = publicByPackage.get(pkg);
   if (!api) continue;
+  const source = readFileSync(file, 'utf8');
   for (const name of exported) {
     if (api.has(name)) continue;
     if (importedNames.has(name)) continue;
+    if (referencedElsewhereInOwnFile(source, name)) continue;
     dead.push({ file: rel, name });
   }
 }
@@ -299,11 +349,17 @@ if (process.argv.includes('--self-test')) {
   const flagged = new Set(dead.map((d) => d.name));
 
   // 1. Nothing on the public API may be flagged.
+  // Every name here must ACTUALLY be on the barrel. `serialization` was in this
+  // list and is not public — its disposition in
+  // tools/check-rc-public-dispositions.mjs reads "NOT EARNED / unplaced as RC
+  // public API" — so the fixture asserted the opposite of a recorded decision
+  // and this self-test had been failing on it. `persistence` is the enhancer
+  // that IS exported from that module, and it replaces it.
   const MUST_BE_LIVE = [
     ['core', 'signalTree'],
     ['core', 'entityMap'],
     ['core', 'timeTravel'],
-    ['core', 'serialization'],
+    ['core', 'persistence'],
   ];
   for (const [pkg, name] of MUST_BE_LIVE) {
     const isPublic = publicByPackage.get(pkg)?.has(name);
