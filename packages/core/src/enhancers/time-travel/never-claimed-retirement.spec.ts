@@ -201,9 +201,10 @@ describe('never-claimed retirements', () => {
     expect(tree.$.rows.ids().sort()).toEqual(['a', 'b']);
   });
 
-  it('CATEGORY A confirmed: eviction leaves a retired subject unclaimed and retained', async () => {
-    // The state the release-driven sink exists to clean up, pinned so the sink
-    // has something to be measured against.
+  it('CATEGORY A: eviction releases the last claim and the sink reclaims', async () => {
+    // The whole point, end to end. Before the sink was wired this asserted the
+    // opposite — unclaimed AND still holding backing — which is what the
+    // 945 B/orphan slope was made of.
     const WINDOW = 3;
     const tree = makeTree(WINDOW);
     tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
@@ -224,9 +225,8 @@ describe('never-claimed retirements', () => {
       await tick();
     }
 
-    // Unclaimed — no legal traversal can bring it back — and still holding
-    // physical backing. 945 B of it, at the measured rate.
+    // Unclaimed — no legal traversal can bring it back — and now released.
     expect(claims?.isClaimed(subject)).toBe(false);
-    expect(retired(tree.$.rows)).toContain(subject);
+    expect(retired(tree.$.rows)).not.toContain(subject);
   });
 });

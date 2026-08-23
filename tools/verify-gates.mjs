@@ -563,9 +563,13 @@ const GATES = [
       'a tree with a BOUNDED timeTravel() does not retain retired subjects without bound',
     knownFailing:
       'RC BLOCKER, reproduced: bounded history does not bound physical retention. ' +
-      'See docs/architecture/retired-subject-churn.md, "BOUNDED HISTORY DOES NOT BOUND ' +
-      'RETENTION". Closes with Step 8; until then this gate is expected red and must ' +
-      'not be silenced.',
+      'The ENTITY-side half is closed — retired subjects are reclaimed at the ' +
+      'eviction boundary and the inventory is flat at one window. What remains is ' +
+      'the tree-realization descriptors: `structuralHistoryEffects`, ' +
+      '`structuralHistoryBySubject` and `subjectDescriptors` accumulate 4 entries ' +
+      'per retired subject (128,200 + 64,200 + 64,200 at 64k retirements) and ' +
+      'nothing prunes them. See docs/architecture/retired-subject-churn.md, ' +
+      '"STEP 8 PHASE 6D". Expected red; must not be silenced.',
     // Registered RED on purpose. The zero-owner case is closed and flat, so
     // without this row a full gate run reads 40/40 and says nothing about the
     // case that actually blocks the RC. A blocker that is known and invisible is

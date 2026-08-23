@@ -1,3 +1,4 @@
+import { getOrCreateSubjectReclamationSink } from '../../lib/internals/subject-reclamation-sink';
 import {
   getOrCreateSubjectRestorationClaims,
   type RestorationClaimOwner,
@@ -1843,14 +1844,13 @@ class TimeTravelManager<T> {
   }
 
   /**
-   * THE boundary. Returns the subjects whose last claim this released — the
-   * set that becomes reclaimable.
+   * THE boundary. Releases these entries' claims and offers whatever that left
+   * unowned to the physical layer.
    *
-   * Nothing consumes the return value yet; offering it to the physical layer
-   * needs a tree-scoped reclamation sink the entity collections register with,
-   * and that is the next commit. Until then this bounds the CLAIM INVENTORY
-   * and not the heap, which is exactly what `bounded-history-retention`
-   * continues to report red.
+   * The offer is where retention actually ends. The sink re-checks the registry
+   * per subject, so a subject another owner still holds — a second entry, a
+   * pending transaction — is skipped rather than freed; that check lives there
+   * rather than here because a caller that had to remember it would forget.
    */
   private releaseRetainedHistoryEntries(
     entries: readonly CanonicalTurn<T>[]
@@ -1862,6 +1862,11 @@ class TimeTravelManager<T> {
     const newlyUnowned: number[] = [];
     for (const entry of entries) {
       newlyUnowned.push(...claims.release(this.restorationClaimOwner(entry.id)));
+    }
+    if (newlyUnowned.length > 0) {
+      getOrCreateSubjectReclamationSink(this.tree)?.offerUnclaimed(
+        newlyUnowned
+      );
     }
     return newlyUnowned;
   }

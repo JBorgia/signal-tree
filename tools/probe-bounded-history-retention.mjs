@@ -237,9 +237,18 @@ if (anyUndoDead) {
   process.exit(1);
 }
 
-// A bounded arm should grow far less than the round count; an unbounded one
-// grows roughly with it.
-const boundedIsFlat = b.ratio < b.roundRatio / 2;
+// ⚠️ THIS THRESHOLD WAS TOO WEAK AND BRIEFLY REPORTED A FALSE GREEN.
+//
+// It was `b.ratio < b.roundRatio / 2`. With 16x the rounds that passes anything
+// under 8x — and the bounded arm measured 8.1x, so a run that grew 6.8 MB ->
+// 54 MB flipped to "BOUNDED" on noise. Growing eight-fold is not a plateau by
+// any reading; the criterion was measuring "grows more slowly than the churn",
+// which an O(n) term with a small constant also satisfies.
+//
+// What BOUNDED means here is that the retained set is the window, so total
+// retention is the same at 20 rounds and at 320. `< 2` allows for the window
+// filling and for allocator noise; it does not allow for a per-retirement term.
+const boundedIsFlat = b.ratio < 2;
 
 if (boundedIsFlat) {
   console.log(

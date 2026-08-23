@@ -282,6 +282,17 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
           }
         );
 
+        // Register as a reclamation target, but ONLY when something in this
+        // tree can restore. Without restoration authority the retirement
+        // boundary already releases everything at the moment of retirement, so
+        // a sink would have nothing to offer and the list would just pin the
+        // collection.
+        if (context.runtimeTreePlan.hasRestorationAuthority) {
+          context.physicalOwners.push(
+            entitySignal as unknown as (typeof context.physicalOwners)[number]
+          );
+        }
+
         // Computed slices
         const slices = marker.__computedSlices;
         if (slices) {
