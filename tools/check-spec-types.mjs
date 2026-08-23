@@ -46,6 +46,38 @@
  *
  * Fix errors, then `node tools/check-spec-types.mjs --update` to ratchet down.
  * The count may only ever decrease.
+ *
+ * ## 15.0 re-baseline: 166 -> 383, and why that is a tightening
+ *
+ * The recorded baseline said 166 across 43 files while the real count was 723
+ * across 70. It predated the causal-runtime kernel and the declarative
+ * construction change, so the gate could not go green no matter what was fixed —
+ * and a ratchet that can only be red detects nothing new, which is the same
+ * place as switched off.
+ *
+ * 723 -> 383 came from three systematic fixes, all of them stale artifacts of
+ * decisions already taken, none of them a loosening:
+ *
+ *   -  5  dead `import { form }` lines. FORM-DEL (b57ba293) deleted the module;
+ *         esbuild drops unused imports, so the specs kept running and only tsc
+ *         could see it.
+ *   - 55  `) as ISignalTree<{ realized shape }>` casts. `ISignalTree<T>` puts T
+ *         through `TreeNode<T>` for `$`, so feeding it an ALREADY-realized shape
+ *         re-wrapped it and typed `byIdOrFail(...)` as `void`. One file carried
+ *         185 errors from this alone. Now `as unknown as { $: {...} }`.
+ *   - 102  direct `.__subjectIds` / `.__positionIds` reads, rerouted through
+ *         `getOwnedSubjectIds()` / `getOwnedPositionIds()`. This one is also a
+ *         CORRECTNESS fix: the direct property is only populated under the
+ *         'property' metadata layout, so those assertions would silently read
+ *         `undefined` under 'sidecar' — the layout the deferred A/B intends to
+ *         test.
+ *
+ * The remaining 383 is debt, recorded as such. The top entries are
+ * causal-runtime.contract (27), events/mock-event-bus (26), entity-signal (22),
+ * time-travel (21) and subject-reclamation-coordinator (20); the rest is a long
+ * tail of implicit-any callback params and deliberately loose casts. Nothing in
+ * it is known to be a vacuous test, but nothing in it has been checked either —
+ * that is what the number means.
  */
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';

@@ -181,17 +181,20 @@ const createLiveUsersAbortHarness = () => {
       }),
     },
     { capabilities: ['causal-runtime'] }
-  ) as ISignalTree<{
-    users: {
-      addOne(user: { id: string; name: string }): void;
-      removeOne(id: string): void;
-      changeId(from: string, to: string): void;
-      ids(): string[];
-      byIdOrFail(id: string): {
-        name: (() => string | undefined) & { __subjectIds?: number[] };
+  ) as unknown as {
+      $: {
+      users: {
+        addOne(user: { id: string; name: string }): void;
+        removeOne(id: string): void;
+        changeId(from: string, to: string): void;
+        ids(): string[];
+        byIdOrFail(id: string): {
+          name: (() => string | undefined) & { __subjectIds?: number[] };
+        };
       };
+  };
+      destroy(): void;
     };
-  }>;
 
   const store = new TurnStore();
   const appliedHistory = new AppliedHistory(store);
@@ -238,7 +241,7 @@ const createLiveUsersAbortHarness = () => {
       }
 
       return createActualTreeAbort({
-        tree: tree as ISignalTree<object>,
+        tree: tree as unknown as ISignalTree<object>,
         authority: getOwnedPositionIds(tree)?.[0] as PositionId,
         store,
         appliedHistory,
@@ -1040,7 +1043,10 @@ describe('greenfield transactions', () => {
     const tree = signalTree(
       { theme: 'light' },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{ theme: string }>;
+    ) as unknown as {
+      $: {   theme: string };
+      destroy(): void;
+    };
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
     const draft = createGreenfieldTransactionDraft({
@@ -1112,7 +1118,10 @@ describe('greenfield transactions', () => {
     const tree = signalTree(
       { theme: 'A' },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{ theme: string }>;
+    ) as unknown as {
+      $: {   theme: string };
+      destroy(): void;
+    };
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
     const draft = createGreenfieldTransactionDraft({
@@ -1144,11 +1153,14 @@ describe('greenfield transactions', () => {
     const tree = signalTree(
       { a: 'A', b: 'B', c: 'C' },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      a: string;
-      b: string;
-      c: string;
-    }>;
+    ) as unknown as {
+      $: {
+        a: string;
+        b: string;
+        c: string;
+    };
+      destroy(): void;
+    };
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
     const firstDraft = createGreenfieldTransactionDraft({
@@ -1228,21 +1240,24 @@ describe('greenfield transactions', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      profile: { firstName: string };
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        changeId(from: string, to: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        profile: { firstName: string };
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          changeId(from: string, to: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-      preference: {
-        (): string;
-        set(value: string): void;
-      };
-    }>;
+        preference: {
+          (): string;
+          set(value: string): void;
+        };
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Jonathan' });
     getPathNotifier().flushSync();
@@ -1262,7 +1277,7 @@ describe('greenfield transactions', () => {
         }
 
         return createActualTreeAbort({
-          tree: tree as ISignalTree<object>,
+          tree: tree as unknown as ISignalTree<object>,
           authority: getOwnedPositionIds(tree)?.[0] as PositionId,
           store,
           appliedHistory,
@@ -1347,12 +1362,15 @@ describe('greenfield transactions', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        byIdOrFail(id: string): { name: () => string | undefined };
-      };
-    }>;
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          byIdOrFail(id: string): { name: () => string | undefined };
+        };
+    };
+      destroy(): void;
+    };
     const store = new TurnStore();
     const appliedHistory = new AppliedHistory(store);
     const draft = createGreenfieldTransactionDraft({
@@ -1402,12 +1420,15 @@ describe('greenfield transactions', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-      };
-    }>;
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+        };
+    };
+      destroy(): void;
+    };
     tree.$.users.addOne({ id: 'u1', name: 'Jonathan' });
     getPathNotifier().flushSync();
 
@@ -1464,17 +1485,20 @@ describe('greenfield transactions', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string; enabled: boolean }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): {
-          name: (() => string | undefined) & { __positionIds?: number[] };
-          enabled: (() => boolean | undefined) & { __positionIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string; enabled: boolean }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): {
+            name: (() => string | undefined) & { __positionIds?: number[] };
+            enabled: (() => boolean | undefined) & { __positionIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true });
     getPathNotifier().flushSync();
@@ -1494,7 +1518,7 @@ describe('greenfield transactions', () => {
         }
 
         return createActualTreeAbort({
-          tree: tree as ISignalTree<object>,
+          tree: tree as unknown as ISignalTree<object>,
           authority: getOwnedPositionIds(tree)?.[0] as PositionId,
           store,
           appliedHistory,
@@ -1569,18 +1593,21 @@ describe('greenfield transactions', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      count: { set(value: number): void; (): number };
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        changeId(from: string, to: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        count: { set(value: number): void; (): number };
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          changeId(from: string, to: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice' });
     getPathNotifier().flushSync();
@@ -1603,7 +1630,7 @@ describe('greenfield transactions', () => {
         }
 
         return createActualTreeAbort({
-          tree: tree as ISignalTree<object>,
+          tree: tree as unknown as ISignalTree<object>,
           authority: getOwnedPositionIds(tree)?.[0] as PositionId,
           store,
           appliedHistory,
@@ -1884,7 +1911,7 @@ describe('greenfield transactions', () => {
     );
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors: liveHarness.descriptors,
     });
     const contextualizedRollbackEffect = {
@@ -2006,16 +2033,19 @@ describe('greenfield transactions', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice' });
     tree.$.users.addOne({ id: 'u2', name: 'Bob' });
@@ -2036,7 +2066,7 @@ describe('greenfield transactions', () => {
         }
 
         return createActualTreeAbort({
-          tree: tree as ISignalTree<object>,
+          tree: tree as unknown as ISignalTree<object>,
           authority: getOwnedPositionIds(tree)?.[0] as PositionId,
           store,
           appliedHistory,
@@ -2086,17 +2116,20 @@ describe('greenfield transactions', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string; enabled: boolean }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        byIdOrFail(id: string): {
-          name: (() => string | undefined) & { __subjectIds?: number[] };
-          enabled(): boolean | undefined;
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string; enabled: boolean }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          byIdOrFail(id: string): {
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+            enabled(): boolean | undefined;
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true });
     getPathNotifier().flushSync();
@@ -2148,7 +2181,7 @@ describe('greenfield transactions', () => {
     }
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors: new Map(),
     });
     const realizationContext = createRealizationContextSource({
@@ -2182,18 +2215,21 @@ describe('greenfield transactions', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: { id: string; name: string }): void;
-        removeOne(id: string): void;
-        setAll(users: Array<{ id: string; name: string }>): void;
-        ids(): string[];
-        byIdOrFail(id: string): {
-          (): { id: string; name: string } | undefined;
-          name: (() => string | undefined) & { __subjectIds?: number[] };
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: { id: string; name: string }): void;
+          removeOne(id: string): void;
+          setAll(users: Array<{ id: string; name: string }>): void;
+          ids(): string[];
+          byIdOrFail(id: string): {
+            (): { id: string; name: string } | undefined;
+            name: (() => string | undefined) & { __subjectIds?: number[] };
+          };
         };
-      };
-    }>;
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne({ id: 'c', name: 'Stale Carol' });
     getPathNotifier().flushSync();
@@ -2304,7 +2340,7 @@ describe('greenfield transactions', () => {
     }
 
     const adapter = createTreeRealizationAdapter({
-      tree: tree as ISignalTree<object>,
+      tree: tree as unknown as ISignalTree<object>,
       descriptors: harness.descriptors,
     });
     const realizationContext = createRealizationContextSource({
@@ -2378,22 +2414,25 @@ describe('greenfield transactions', () => {
         }),
       },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      users: {
-        addOne(user: {
-          id: string;
-          name: string;
-          settings: { enabled: boolean };
-        }): void;
-        removeOne(id: string): void;
-        ids(): string[];
-        all(): Array<{
-          id: string;
-          name: string;
-          settings: { enabled: boolean };
-        }>;
-      };
-    }>;
+    ) as unknown as {
+      $: {
+        users: {
+          addOne(user: {
+            id: string;
+            name: string;
+            settings: { enabled: boolean };
+          }): void;
+          removeOne(id: string): void;
+          ids(): string[];
+          all(): Array<{
+            id: string;
+            name: string;
+            settings: { enabled: boolean };
+          }>;
+        };
+    };
+      destroy(): void;
+    };
 
     tree.$.users.addOne(original);
     getPathNotifier().flushSync();
@@ -2434,7 +2473,7 @@ describe('greenfield transactions', () => {
         appliedHistory,
         topology,
         port: createTreeRealizationAdapter({
-          tree: tree as ISignalTree<object>,
+          tree: tree as unknown as ISignalTree<object>,
           descriptors: new Map(),
         }),
         realizationContext: createRealizationContextSource({

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import { entityMap } from '../../lib/types';
-import { form } from '../../lib/markers/form';
 import { signalTree } from '../../lib/signal-tree';
 import { serialization } from './serialization';
 

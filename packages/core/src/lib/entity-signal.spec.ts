@@ -3,6 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createEntitySignal, planEntitySubjectReclamation } from './entity-signal';
 import { PathNotifier } from './path-notifier';
+import {
+  getOwnedPositionIds,
+  getOwnedSubjectIds,
+} from './internals/owned-metadata';
 
 // Minimal PathNotifier stub
 const pathNotifier = {
@@ -162,8 +166,8 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldRow = api.byIdOrFail(1);
     const heldField = heldRow.name;
-    const subjectId = heldField.__subjectIds?.[0];
-    const positionIds = heldField.__positionIds;
+    const subjectId = getOwnedSubjectIds(heldField)?.[0];
+    const positionIds = getOwnedPositionIds(heldField);
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -205,7 +209,7 @@ describe('entity subject physical inventory', () => {
     expect(internal.__listSubjectReclamationCandidates?.()).toEqual([subjectId]);
 
     api.addOne({ id: 1, name: 'Bob', active: false });
-    const foreignSubjectId = api.byIdOrFail(1).name.__subjectIds?.[0];
+    const foreignSubjectId = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
     expect(foreignSubjectId).not.toBe(subjectId);
 
     expect(internal.__inspectSubjectResources?.(subjectId)).toEqual({
@@ -247,7 +251,7 @@ describe('entity subject physical inventory', () => {
     const restored = api.byIdOrFail(1);
     expect(restored).toBe(heldRow);
     expect(restored.name).toBe(heldField);
-    expect(restored.name.__subjectIds?.[0]).toBe(subjectId);
+    expect(getOwnedSubjectIds(restored.name)?.[0]).toBe(subjectId);
     expect(internal.__inspectSubjectResources?.(subjectId)).toEqual({
       subjectId,
       state: 'active',
@@ -275,8 +279,8 @@ describe('entity subject physical inventory', () => {
 
     const heldOne = api.byIdOrFail(1).name;
     const heldTwo = api.byIdOrFail(2).name;
-    const subjectOne = heldOne.__subjectIds?.[0];
-    const subjectTwo = heldTwo.__subjectIds?.[0];
+    const subjectOne = getOwnedSubjectIds(heldOne)?.[0];
+    const subjectTwo = getOwnedSubjectIds(heldTwo)?.[0];
     if (subjectOne === undefined || subjectTwo === undefined) {
       throw new Error('Expected subject metadata for held fields');
     }
@@ -300,7 +304,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldOne.__positionIds,
+      positionIds: getOwnedPositionIds(heldOne),
       retainedValueBacking: undefined,
     });
     expect(internal.__listSubjectReclamationCandidates?.()).toEqual([subjectTwo]);
@@ -314,7 +318,7 @@ describe('entity subject physical inventory', () => {
     const internal = api as typeof api & SubjectInventoryApi;
 
     api.addOne({ id: 1, name: 'Alice', active: true });
-    const subjectId = api.byIdOrFail(1).name.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -385,7 +389,7 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldRow = api.byIdOrFail(1);
     const heldName = heldRow.name;
-    const subjectId = heldName.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(heldName)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -432,7 +436,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldName.__positionIds,
+      positionIds: getOwnedPositionIds(heldName),
       retainedValueBacking: undefined,
     });
     expect(observedRow()).toBe('absent');
@@ -456,7 +460,7 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldRow = api.byIdOrFail(1);
     const heldName = heldRow.name;
-    const subjectId = heldName.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(heldName)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -500,7 +504,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldName.__positionIds,
+      positionIds: getOwnedPositionIds(heldName),
       retainedValueBacking: undefined,
     });
     expect(observedName()).toBe('absent');
@@ -520,7 +524,7 @@ describe('entity subject physical inventory', () => {
     const internal = api as typeof api & SubjectInventoryApi;
 
     api.addOne({ id: 1, name: 'Alice', active: true });
-    const subjectId = api.byIdOrFail(1).name.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -545,7 +549,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: api.byIdOrFail(1).name.__positionIds,
+      positionIds: getOwnedPositionIds(api.byIdOrFail(1).name),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -560,7 +564,7 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 1, name: 'Alice', active: true });
     const originalRow = api.byIdOrFail(1);
     const originalField = originalRow.name;
-    const originalSubjectId = originalField.__subjectIds?.[0];
+    const originalSubjectId = getOwnedSubjectIds(originalField)?.[0];
     if (originalSubjectId === undefined) {
       throw new Error('Expected subject metadata for original field');
     }
@@ -575,7 +579,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -595,7 +599,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -613,7 +617,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -631,7 +635,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -641,7 +645,7 @@ describe('entity subject physical inventory', () => {
     ]);
 
     api.addOne({ id: 2, name: 'Bob', active: true });
-    const foreignSubjectId = api.byIdOrFail(2).name.__subjectIds?.[0];
+    const foreignSubjectId = getOwnedSubjectIds(api.byIdOrFail(2).name)?.[0];
     if (foreignSubjectId === undefined) {
       throw new Error('Expected subject metadata for foreign field');
     }
@@ -657,7 +661,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -675,7 +679,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -696,7 +700,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -714,7 +718,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -735,7 +739,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: undefined,
     });
   });
@@ -747,7 +751,7 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldRow = api.byIdOrFail(1);
     const heldField = heldRow.name;
-    const subjectId = heldField.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(heldField)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -762,7 +766,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldField.__positionIds,
+      positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -774,7 +778,7 @@ describe('entity subject physical inventory', () => {
     const rekeyedRow = api.byIdOrFail(2);
     expect(rekeyedRow).toBe(heldRow);
     expect(rekeyedRow.name).toBe(heldField);
-    expect(rekeyedRow.name.__subjectIds?.[0]).toBe(subjectId);
+    expect(getOwnedSubjectIds(rekeyedRow.name)?.[0]).toBe(subjectId);
     expect(rekeyedRow.name()).toBe('Alice');
     expect(internal.__inspectSubjectResources?.(subjectId)).toEqual({
       subjectId,
@@ -786,7 +790,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldField.__positionIds,
+      positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -800,7 +804,7 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldRow = api.byIdOrFail(1);
     const heldField = heldRow.name;
-    const subjectId = heldField.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(heldField)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -820,7 +824,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldField.__positionIds,
+      positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -835,7 +839,7 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 1, name: 'Alice', active: true });
     const originalRow = api.byIdOrFail(1);
     const originalField = originalRow.name;
-    const originalSubjectId = originalField.__subjectIds?.[0];
+    const originalSubjectId = getOwnedSubjectIds(originalField)?.[0];
     if (originalSubjectId === undefined) {
       throw new Error('Expected subject metadata for original field');
     }
@@ -843,7 +847,7 @@ describe('entity subject physical inventory', () => {
     api.removeOne(1);
 
     api.addOne({ id: 1, name: 'Bob', active: false });
-    const foreignSubjectId = api.byIdOrFail(1).name.__subjectIds?.[0];
+    const foreignSubjectId = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
     if (foreignSubjectId === undefined) {
       throw new Error('Expected subject metadata for foreign field');
     }
@@ -869,7 +873,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -884,7 +888,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -892,7 +896,7 @@ describe('entity subject physical inventory', () => {
     expect(internal.__listSubjectReclamationCandidates?.()).toEqual([foreignSubjectId]);
 
     api.addOne({ id: 2, name: 'Cara', active: true });
-    expect(api.byIdOrFail(2).name.__subjectIds?.[0]).toBe(foreignSubjectId + 1);
+    expect(getOwnedSubjectIds(api.byIdOrFail(2).name)?.[0]).toBe(foreignSubjectId + 1);
   });
 
   it('replaces subject-owned value without changing structural identity or facades', () => {
@@ -907,7 +911,7 @@ describe('entity subject physical inventory', () => {
 
     const heldRow = api.byIdOrFail(2);
     const heldField = heldRow.name;
-    const subjectId = heldField.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(heldField)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -923,7 +927,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldField.__positionIds,
+      positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -937,7 +941,7 @@ describe('entity subject physical inventory', () => {
     expect(replacedRow.name).toBe(heldField);
     expect(replacedRow.name()).toBe('Jonathan');
     expect(replacedRow.active()).toBe(true);
-    expect(replacedRow.name.__subjectIds?.[0]).toBe(subjectId);
+    expect(getOwnedSubjectIds(replacedRow.name)?.[0]).toBe(subjectId);
     expect(internal.__inspectSubjectResources?.(subjectId)).toEqual({
       subjectId,
       state: 'active',
@@ -948,7 +952,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldField.__positionIds,
+      positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -964,8 +968,8 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 2, name: 'Bob', active: false });
     api.addOne({ id: 3, name: 'Cara', active: true });
 
-    const subjectOne = api.byIdOrFail(1).name.__subjectIds?.[0];
-    const subjectThree = api.byIdOrFail(3).name.__subjectIds?.[0];
+    const subjectOne = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
+    const subjectThree = getOwnedSubjectIds(api.byIdOrFail(3).name)?.[0];
     if (subjectOne === undefined || subjectThree === undefined) {
       throw new Error('Expected subject metadata for held fields');
     }
@@ -977,7 +981,7 @@ describe('entity subject physical inventory', () => {
     api.removeOne(1);
     api.addOne({ id: 1, name: 'Delta', active: false });
 
-    const replacementSubject = api.byIdOrFail(1).name.__subjectIds?.[0];
+    const replacementSubject = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
     if (replacementSubject === undefined) {
       throw new Error('Expected subject metadata for replacement field');
     }
@@ -1015,7 +1019,7 @@ describe('entity subject physical inventory', () => {
 
     api.addOne({ id: 1, name: 'Alice', active: true });
 
-    const subjectId = api.byIdOrFail(1).name.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for added field');
     }
@@ -1030,7 +1034,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: api.byIdOrFail(1).name.__positionIds,
+      positionIds: getOwnedPositionIds(api.byIdOrFail(1).name),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1061,7 +1065,7 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 1, name: 'Alice', active: true });
     const originalRow = api.byIdOrFail(1);
     const originalField = originalRow.name;
-    const originalSubjectId = originalField.__subjectIds?.[0];
+    const originalSubjectId = getOwnedSubjectIds(originalField)?.[0];
     if (originalSubjectId === undefined) {
       throw new Error('Expected subject metadata for original field');
     }
@@ -1078,7 +1082,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1086,7 +1090,7 @@ describe('entity subject physical inventory', () => {
 
     api.addOne({ id: 1, name: 'Bob', active: false });
     const foreignRow = api.byIdOrFail(1);
-    const foreignSubjectId = foreignRow.name.__subjectIds?.[0];
+    const foreignSubjectId = getOwnedSubjectIds(foreignRow.name)?.[0];
     if (foreignSubjectId === undefined) {
       throw new Error('Expected subject metadata for foreign field');
     }
@@ -1103,7 +1107,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1118,7 +1122,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1141,7 +1145,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1163,7 +1167,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: originalField.__positionIds,
+      positionIds: getOwnedPositionIds(originalField),
       retainedValueBacking: undefined,
     });
     expect(() =>
@@ -1178,7 +1182,7 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldRow = api.byIdOrFail(1);
     const heldField = heldRow.name;
-    const retiredSubjectId = heldField.__subjectIds?.[0];
+    const retiredSubjectId = getOwnedSubjectIds(heldField)?.[0];
     if (retiredSubjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -1187,7 +1191,7 @@ describe('entity subject physical inventory', () => {
     internal.__retireSubjectRetainedValueBackingForTesting?.(retiredSubjectId);
 
     api.addOne({ id: 1, name: 'Bob', active: false });
-    const freshSubjectId = api.byIdOrFail(1).name.__subjectIds?.[0];
+    const freshSubjectId = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
 
     expect(freshSubjectId).not.toBe(retiredSubjectId);
     expect(heldRow()).toBeUndefined();
@@ -1202,7 +1206,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldField.__positionIds,
+      positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: undefined,
     });
     expect(internal.__inspectSubjectResources?.(freshSubjectId as number)).toEqual({
@@ -1215,7 +1219,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldField.__positionIds,
+      positionIds: getOwnedPositionIds(heldField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1227,7 +1231,7 @@ describe('entity subject physical inventory', () => {
     const internal = api as typeof api & SubjectInventoryApi;
 
     api.addOne({ id: 1, name: 'Alice', active: true });
-    const subjectId = api.byIdOrFail(1).name.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -1258,7 +1262,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: api.byIdOrFail(1).name.__positionIds,
+      positionIds: getOwnedPositionIds(api.byIdOrFail(1).name),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1276,8 +1280,8 @@ describe('entity subject physical inventory', () => {
     const heldRowB = api.byIdOrFail(2);
     const heldFieldA = heldRowA.name;
     const heldFieldB = heldRowB.name;
-    const subjectA = heldFieldA.__subjectIds?.[0];
-    const subjectB = heldFieldB.__subjectIds?.[0];
+    const subjectA = getOwnedSubjectIds(heldFieldA)?.[0];
+    const subjectB = getOwnedSubjectIds(heldFieldB)?.[0];
     if (subjectA === undefined || subjectB === undefined) {
       throw new Error('Expected subject metadata for held fields');
     }
@@ -1293,9 +1297,9 @@ describe('entity subject physical inventory', () => {
     const activeTwo = api.byIdOrFail(2);
     const activeOne = api.byIdOrFail(1);
     const activeThree = api.byIdOrFail(3);
-    const subjectOneAfter = activeOne.name.__subjectIds?.[0];
-    const subjectTwoAfter = activeTwo.name.__subjectIds?.[0];
-    const subjectThreeAfter = activeThree.name.__subjectIds?.[0];
+    const subjectOneAfter = getOwnedSubjectIds(activeOne.name)?.[0];
+    const subjectTwoAfter = getOwnedSubjectIds(activeTwo.name)?.[0];
+    const subjectThreeAfter = getOwnedSubjectIds(activeThree.name)?.[0];
 
     expect(activeTwo).toBe(heldRowB);
     expect(activeTwo.name).toBe(heldFieldB);
@@ -1321,7 +1325,7 @@ describe('entity subject physical inventory', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldFieldA.__positionIds,
+      positionIds: getOwnedPositionIds(heldFieldA),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1339,7 +1343,7 @@ describe('entity subject physical inventory', () => {
     api.addOne({ id: 4, name: 'D-old', active: true });
     const historicalDRow = api.byIdOrFail(4);
     const historicalDField = historicalDRow.name;
-    const historicalDSubject = historicalDField.__subjectIds?.[0];
+    const historicalDSubject = getOwnedSubjectIds(historicalDField)?.[0];
     if (historicalDSubject === undefined) {
       throw new Error('Expected subject metadata for historical D');
     }
@@ -1349,10 +1353,10 @@ describe('entity subject physical inventory', () => {
     const heldFieldB = api.byIdOrFail(2).name;
     const heldFieldC = api.byIdOrFail(3).name;
     const heldFieldE = api.byIdOrFail(5).name;
-    const subjectA = heldFieldA.__subjectIds?.[0];
-    const subjectB = heldFieldB.__subjectIds?.[0];
-    const subjectC = heldFieldC.__subjectIds?.[0];
-    const subjectE = heldFieldE.__subjectIds?.[0];
+    const subjectA = getOwnedSubjectIds(heldFieldA)?.[0];
+    const subjectB = getOwnedSubjectIds(heldFieldB)?.[0];
+    const subjectC = getOwnedSubjectIds(heldFieldC)?.[0];
+    const subjectE = getOwnedSubjectIds(heldFieldE)?.[0];
     if (
       subjectA === undefined ||
       subjectB === undefined ||
@@ -1369,15 +1373,15 @@ describe('entity subject physical inventory', () => {
       { id: 6, name: 'F1', active: true },
     ]);
 
-    const subjectDAfter = api.byIdOrFail(4).name.__subjectIds?.[0];
-    const subjectFAfter = api.byIdOrFail(6).name.__subjectIds?.[0];
+    const subjectDAfter = getOwnedSubjectIds(api.byIdOrFail(4).name)?.[0];
+    const subjectFAfter = getOwnedSubjectIds(api.byIdOrFail(6).name)?.[0];
     if (subjectDAfter === undefined || subjectFAfter === undefined) {
       throw new Error('Expected subject metadata for fresh setAll arrivals');
     }
 
     expect(api.ids()).toEqual([3, 4, 1, 6]);
-    expect(api.byIdOrFail(3).name.__subjectIds?.[0]).toBe(subjectC);
-    expect(api.byIdOrFail(1).name.__subjectIds?.[0]).toBe(subjectA);
+    expect(getOwnedSubjectIds(api.byIdOrFail(3).name)?.[0]).toBe(subjectC);
+    expect(getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0]).toBe(subjectA);
     expect(subjectDAfter).not.toBe(historicalDSubject);
     expect(subjectFAfter).toBe(subjectDAfter + 1);
     expect(api.byIdOrFail(3).name()).toBe('C2');
@@ -1397,7 +1401,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldFieldB.__positionIds,
+      positionIds: getOwnedPositionIds(heldFieldB),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1412,7 +1416,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldFieldE.__positionIds,
+      positionIds: getOwnedPositionIds(heldFieldE),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1427,7 +1431,7 @@ describe('entity subject physical inventory', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: historicalDField.__positionIds,
+      positionIds: getOwnedPositionIds(historicalDField),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1496,7 +1500,7 @@ describe('addMany() mode option (F-011)', () => {
     ).toEqual([]);
 
     api.addOne({ id: 2, name: 'after block' });
-    expect(api.byIdOrFail(2).name.__subjectIds?.[0]).toBe(1);
+    expect(getOwnedSubjectIds(api.byIdOrFail(2).name)?.[0]).toBe(1);
   });
 
   it('occupied addOne refusal leaves the subject namespace unchanged', () => {
@@ -1517,7 +1521,7 @@ describe('addMany() mode option (F-011)', () => {
     expect(notify.mock.calls).toHaveLength(notifyCountBefore);
 
     api.addOne({ id: 2, name: 'B' });
-    expect(api.byIdOrFail(2).name.__subjectIds?.[0]).toBe(2);
+    expect(getOwnedSubjectIds(api.byIdOrFail(2).name)?.[0]).toBe(2);
   });
 
   it('strict (default) throws on duplicate', () => {
@@ -1552,7 +1556,7 @@ describe('addMany() mode option (F-011)', () => {
     expect(notify.mock.calls).toHaveLength(notifyCountBefore);
 
     api.addOne({ id: 4, name: 'after refusal' });
-    expect(api.byIdOrFail(4).name.__subjectIds?.[0]).toBe(2);
+    expect(getOwnedSubjectIds(api.byIdOrFail(4).name)?.[0]).toBe(2);
   });
 
   it('skip silently omits duplicates and returns only newly added ids', () => {
@@ -1612,7 +1616,7 @@ describe('addMany() mode option (F-011)', () => {
     ).toEqual([]);
 
     api.addOne({ id: 3, name: 'after failure' });
-    expect(api.byIdOrFail(3).name.__subjectIds?.[0]).toBe(1);
+    expect(getOwnedSubjectIds(api.byIdOrFail(3).name)?.[0]).toBe(1);
   });
 
   it('commits fresh addMany subjects in authored order and rebuilds projection from owners', () => {
@@ -1629,9 +1633,9 @@ describe('addMany() mode option (F-011)', () => {
 
     expect(ids).toEqual([3, 1, 2]);
     expect(api.ids()).toEqual([3, 1, 2]);
-    expect(api.byIdOrFail(3).name.__subjectIds?.[0]).toBe(1);
-    expect(api.byIdOrFail(1).name.__subjectIds?.[0]).toBe(2);
-    expect(api.byIdOrFail(2).name.__subjectIds?.[0]).toBe(3);
+    expect(getOwnedSubjectIds(api.byIdOrFail(3).name)?.[0]).toBe(1);
+    expect(getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0]).toBe(2);
+    expect(getOwnedSubjectIds(api.byIdOrFail(2).name)?.[0]).toBe(3);
 
     const expectedEntries = [
       [3, { id: 3, name: 'C' }],
@@ -1696,7 +1700,7 @@ describe('addMany() mode option (F-011)', () => {
     ]);
 
     api.addOne({ id: 5, name: 'after failure' });
-    expect(api.byIdOrFail(5).name.__subjectIds?.[0]).toBe(3);
+    expect(getOwnedSubjectIds(api.byIdOrFail(5).name)?.[0]).toBe(3);
   });
 
   it('upsertMany commits mixed existing and fresh subjects while preserving fresh allocation order', () => {
@@ -1720,10 +1724,10 @@ describe('addMany() mode option (F-011)', () => {
     expect(api.byIdOrFail(2).name()).toBe('B updated');
     expect(api.byIdOrFail(3).name()).toBe('C');
     expect(api.byIdOrFail(4).name()).toBe('D');
-    expect(api.byIdOrFail(1).name.__subjectIds?.[0]).toBe(1);
-    expect(api.byIdOrFail(2).name.__subjectIds?.[0]).toBe(2);
-    expect(api.byIdOrFail(3).name.__subjectIds?.[0]).toBe(3);
-    expect(api.byIdOrFail(4).name.__subjectIds?.[0]).toBe(4);
+    expect(getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0]).toBe(1);
+    expect(getOwnedSubjectIds(api.byIdOrFail(2).name)?.[0]).toBe(2);
+    expect(getOwnedSubjectIds(api.byIdOrFail(3).name)?.[0]).toBe(3);
+    expect(getOwnedSubjectIds(api.byIdOrFail(4).name)?.[0]).toBe(4);
 
     const expectedEntries = [
       [1, { id: 1, name: 'A updated' }],
@@ -1763,8 +1767,8 @@ describe('addMany() mode option (F-011)', () => {
     const heldFieldTwo = heldRowTwo.name;
     const heldRowFour = api.byIdOrFail(4);
     const heldFieldFour = heldRowFour.name;
-    const subjectTwo = heldFieldTwo.__subjectIds?.[0];
-    const subjectFour = heldFieldFour.__subjectIds?.[0];
+    const subjectTwo = getOwnedSubjectIds(heldFieldTwo)?.[0];
+    const subjectFour = getOwnedSubjectIds(heldFieldFour)?.[0];
     if (subjectTwo === undefined || subjectFour === undefined) {
       throw new Error('Expected subject metadata for held fields');
     }
@@ -1788,7 +1792,7 @@ describe('addMany() mode option (F-011)', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldFieldTwo.__positionIds,
+      positionIds: getOwnedPositionIds(heldFieldTwo),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1803,7 +1807,7 @@ describe('addMany() mode option (F-011)', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldFieldFour.__positionIds,
+      positionIds: getOwnedPositionIds(heldFieldFour),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
@@ -1826,7 +1830,7 @@ describe('addMany() mode option (F-011)', () => {
 
     const heldRows = [api.byIdOrFail(1), api.byIdOrFail(2), api.byIdOrFail(3)];
     const heldFields = heldRows.map((row) => row.name);
-    const subjectIds = heldFields.map((field) => field.__subjectIds?.[0]);
+    const subjectIds = heldFields.map((field) => getOwnedSubjectIds(field)?.[0]);
     if (subjectIds.some((subjectId) => subjectId === undefined)) {
       throw new Error('Expected subject metadata for held fields');
     }
@@ -1858,7 +1862,7 @@ describe('addMany() mode option (F-011)', () => {
         activationToken: true,
         nodeFacadeMaterialized: true,
         fieldFacadesMaterialized: ['active', 'id', 'name'],
-        positionIds: heldFields[i].__positionIds,
+        positionIds: getOwnedPositionIds(heldFields[i]),
         retainedValueBacking: {
           kind: 'retained-entity-signal',
         },
@@ -1888,8 +1892,8 @@ describe('addMany() mode option (F-011)', () => {
 
     api.addOne({ id: 1, name: 'Alice' });
     api.addOne({ id: 2, name: 'Bob' });
-    const subjectOne = api.byIdOrFail(1).name.__subjectIds?.[0];
-    const subjectTwo = api.byIdOrFail(2).name.__subjectIds?.[0];
+    const subjectOne = getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0];
+    const subjectTwo = getOwnedSubjectIds(api.byIdOrFail(2).name)?.[0];
     const notifyCountBefore = notify.mock.calls.length;
 
     api.intercept({
@@ -1911,8 +1915,8 @@ describe('addMany() mode option (F-011)', () => {
     expect(api.ids()).toEqual([1, 2]);
     expect(api.byIdOrFail(1).name()).toBe('Alice');
     expect(api.byIdOrFail(2).name()).toBe('Bob');
-    expect(api.byIdOrFail(1).name.__subjectIds?.[0]).toBe(subjectOne);
-    expect(api.byIdOrFail(2).name.__subjectIds?.[0]).toBe(subjectTwo);
+    expect(getOwnedSubjectIds(api.byIdOrFail(1).name)?.[0]).toBe(subjectOne);
+    expect(getOwnedSubjectIds(api.byIdOrFail(2).name)?.[0]).toBe(subjectTwo);
     expect(api.byId(3)).toBeUndefined();
     expect(
       Array.from(
@@ -1925,7 +1929,7 @@ describe('addMany() mode option (F-011)', () => {
     expect(notify.mock.calls).toHaveLength(notifyCountBefore);
 
     api.addOne({ id: 4, name: 'after failure' });
-    expect(api.byIdOrFail(4).name.__subjectIds?.[0]).toBe(3);
+    expect(getOwnedSubjectIds(api.byIdOrFail(4).name)?.[0]).toBe(3);
   });
 });
 
@@ -2015,7 +2019,7 @@ describe('owner PositionId allocation', () => {
       'rows'
     );
     first.addOne({ id: 1, name: 'first' });
-    const firstPositionIds = (first as any).__positionIds as number[];
+    const firstPositionIds = getOwnedPositionIds((first as any)) as number[];
 
     const second = createEntitySignal<Row, number>(
       { selectId: (row) => row.id },
@@ -2023,7 +2027,7 @@ describe('owner PositionId allocation', () => {
       'rows'
     );
     second.addOne({ id: 2, name: 'second' });
-    const secondPositionIds = (second as any).__positionIds as number[];
+    const secondPositionIds = getOwnedPositionIds((second as any)) as number[];
 
     expect(firstPositionIds).toHaveLength(1);
     expect(secondPositionIds).toHaveLength(1);
@@ -2071,7 +2075,7 @@ describe('owner PositionId allocation', () => {
       notifier,
       'rows'
     );
-    const ownerPositionIds = (api as any).__positionIds as number[];
+    const ownerPositionIds = getOwnedPositionIds((api as any)) as number[];
 
     api.addMany([
       { id: 1, name: 'first' },
