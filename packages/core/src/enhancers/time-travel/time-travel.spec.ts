@@ -3062,8 +3062,8 @@ describe('time-travel enhancer', () => {
         ?.__positionIds ?? []),
     ];
     const subjectAfterFirstAdd = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     store.$.rows.addOne({ id: 8, name: 'second' });
@@ -3074,8 +3074,8 @@ describe('time-travel enhancer', () => {
         ?.__positionIds ?? []),
     ];
     const subjectAfterSecondAdd = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     store.$.rows.changeId(7, 70);
@@ -3098,8 +3098,8 @@ describe('time-travel enhancer', () => {
         ?.__positionIds ?? []),
     ];
     const subjectAfterReuse = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     t.undo();
@@ -3145,7 +3145,7 @@ describe('time-travel enhancer', () => {
 
     const beforeBoundaryEntry = t.getHistory().at(-1) as {
       __positionIds?: number[];
-      __subjectIds?: number[];
+      restorationSubjectIds?: number[];
     };
 
     store.$.rows.removeOne(7);
@@ -3155,18 +3155,18 @@ describe('time-travel enhancer', () => {
 
     const boundaryEntry = t.getHistory().at(-1) as {
       __positionIds?: number[];
-      __subjectIds?: number[];
+      restorationSubjectIds?: number[];
     };
 
     expect(boundaryEntry.__positionIds).toEqual(
       beforeBoundaryEntry.__positionIds
     );
-    expect(boundaryEntry.__subjectIds).toHaveLength(2);
-    expect(boundaryEntry.__subjectIds?.[0]).toBe(
-      beforeBoundaryEntry.__subjectIds?.[0]
+    expect(boundaryEntry.restorationSubjectIds).toHaveLength(2);
+    expect(boundaryEntry.restorationSubjectIds?.[0]).toBe(
+      beforeBoundaryEntry.restorationSubjectIds?.[0]
     );
-    expect(boundaryEntry.__subjectIds?.[1]).not.toBe(
-      beforeBoundaryEntry.__subjectIds?.[0]
+    expect(boundaryEntry.restorationSubjectIds?.[1]).not.toBe(
+      beforeBoundaryEntry.restorationSubjectIds?.[0]
     );
   });
 
@@ -3217,32 +3217,32 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const addedToken = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     store.$.rows.changeId(-1, 42);
     await Promise.resolve();
     await Promise.resolve();
     const rekeyedToken = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     store.$.rows.byIdOrFail(42).name.set('server');
     await Promise.resolve();
     await Promise.resolve();
     const retainedToken = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     store.$.rows.addOne({ id: -1, name: 'replacement' });
     await Promise.resolve();
     await Promise.resolve();
     const reusedPathToken = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     t.undo();
@@ -3501,24 +3501,24 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const originalToken = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     store.$.rows.removeOne(7);
     await Promise.resolve();
     await Promise.resolve();
     const removedToken = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     store.$.rows.addOne({ id: 7, name: 'replacement' });
     await Promise.resolve();
     await Promise.resolve();
     const replacementToken = [
-      ...((t.getHistory().at(-1) as { __subjectIds?: number[] })
-        ?.__subjectIds ?? []),
+      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+        ?.restorationSubjectIds ?? []),
     ];
 
     t.undo();

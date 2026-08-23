@@ -439,7 +439,7 @@ it. Reproduce with `node --expose-gc tools/probe-history-subject-ownership.mjs`.
 Two inventories, both counted rather than estimated. PHYSICALLY RETAINED is
 `__listSubjectReclamationCandidates()` — the entity layer's own list of
 tombstoned subjects still holding value backing. SEMANTICALLY OWNED is the union
-of `__subjectIds` across every retained history entry, intersected with the
+of `restorationSubjectIds` across every retained history entry, intersected with the
 retired set.
 
 ```text
@@ -469,7 +469,7 @@ claim was justifying.
 ### What this rules in, and what it rules out
 
 RULED IN: the fix belongs at the eviction boundary. The information needed is
-already on the entry — `__subjectIds` is recorded at capture time and is the set
+already on the entry — `restorationSubjectIds` is recorded at capture time and is the set
 a restore of that entry would need.
 
 RULED OUT: a reachability sweep as the production mechanism. It would discard
@@ -482,7 +482,7 @@ is the only cheap way to falsify it.
 names the whole collection, so counting it would make every retained entry claim
 every subject and reproduce today's over-retention inside a tidier structure.
 The claim set is restoration NECESSITY, not serialization reachability — which
-is what `__subjectIds` already records.
+is what `restorationSubjectIds` already records.
 
 ### A note on the statistic, not the data
 
@@ -497,7 +497,7 @@ HAS them, and the marginal heap per marginal orphan is stable and positive.
 
 ---
 
-## STEP 8 PHASE 2 — the oracle: `__subjectIds` is a SAFE AUTHORITY
+## STEP 8 PHASE 2 — the oracle: `restorationSubjectIds` is a SAFE AUTHORITY
 
 Run before the claim registry, to decide what a claim should CONTAIN. Reproduce
 with `node tools/probe-restoration-required-set.mjs`.
@@ -513,7 +513,7 @@ operation created are themselves retired and redo has to resurrect them.
 
 Measured observationally — traverse every legal position (undo to the oldest
 retained entry, redo forward to the newest) and record which subject ids are LIVE
-at each step. That never reads `__subjectIds`.
+at each step. That never reads `restorationSubjectIds`.
 
 ```text
   maxHistory   entries   physical   named   required   excess   unnamed   ok
@@ -524,23 +524,23 @@ at each step. That never reads `__subjectIds`.
 ```
 
 **Outcome C is refuted at every size: `unnamed` is 0.** Nothing a legal traversal
-required was missing from `__subjectIds`. Excess is 1 subject in 57 (2%) —
+required was missing from `restorationSubjectIds`. Excess is 1 subject in 57 (2%) —
 mostly EXACT, conservative by one at H=6.
 
 **And the property Step 8 actually needs holds: the named set scales with the
 WINDOW, not with total churn** — 4→10, 6→15, 10→16, 24→16 against 16 ever
-retired. Claims keyed on `__subjectIds` therefore bound retention at
+retired. Claims keyed on `restorationSubjectIds` therefore bound retention at
 `O(live + window)`, which is the RC requirement. Narrowing the residual 2% is a
 later optimization.
 
 ### The honest limit on the oracle's independence
 
-`time-travel.ts` calls `restoreState(entry.state, entry.__subjectIds,
+`time-travel.ts` calls `restoreState(entry.state, entry.restorationSubjectIds,
 entry.__positionIds)` — **the restore path CONSUMES the metadata**. So the
 traversal observes what restoration resurrects GIVEN that metadata, not what it
 would need in principle, and the probe cannot refute C by observation alone.
 
-That limit is itself a finding: `__subjectIds` is not debugging metadata, it
+That limit is itself a finding: `restorationSubjectIds` is not debugging metadata, it
 participates in restoration semantics. C is refuted instead by CORRECTNESS — the
 traversal's end state is compared against an independent replay of the same
 script, at every history size, and matches. A required-but-unnamed subject would
