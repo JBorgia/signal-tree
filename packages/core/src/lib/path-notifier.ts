@@ -509,9 +509,30 @@ export class PathNotifier {
   }
 
   private crossesStructuralBoundary(left: PendingEntry, right: PendingEntry): boolean {
-    const leftStructural = left.meta?.historyEffect !== undefined;
-    const rightStructural = right.meta?.historyEffect !== undefined;
-    return leftStructural !== rightStructural;
+    const leftEffect = left.meta?.historyEffect;
+    const rightEffect = right.meta?.historyEffect;
+    const leftStructural = leftEffect !== undefined;
+    const rightStructural = rightEffect !== undefined;
+    if (leftStructural !== rightStructural) {
+      return true;
+    }
+
+    // RESTORE-P0. Two structural effects of DIFFERENT kinds on the same subject
+    // are not the same event, and coalescing them silently discarded the first.
+    //
+    //   setAll([a,b]) then removeOne('a')   in one tick
+    //     -> add(subject 1) coalesced INTO remove(subject 1)
+    //     -> time-travel only ever saw the remove, so undo re-added a row the
+    //        turn had created, and the collection could not return to empty
+    //
+    // Keeping both entries is the notifier's whole job here: it must not lose
+    // information. Deciding what the pair NETS to is a history concern and
+    // belongs to the turn recorder, which composes them per subject.
+    if (leftStructural && rightStructural && leftEffect.kind !== rightEffect.kind) {
+      return true;
+    }
+
+    return false;
   }
 
   private crossesScalarIntentBoundary(left: PendingEntry, right: PendingEntry): boolean {
