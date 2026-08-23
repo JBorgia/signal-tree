@@ -63,6 +63,21 @@ export type ReversalRefusal =
   | { readonly kind: 'history-evicted' }
   | { readonly kind: 'dependency-conflict' }
   | { readonly kind: 'structural-drift' }
+  /**
+   * RESTORE-P0 P0-C — world-relative divergence.
+   *
+   * The turn's recorded inverse is only valid while the location still holds
+   * what the turn left there. Once a realization (or any later write) has
+   * superseded it, replaying the inverse would destroy truth the history system
+   * does not own. Carries the detail because a refusal the caller cannot
+   * inspect is barely better than a silent one.
+   */
+  | {
+      readonly kind: 'value-drift';
+      readonly path: string;
+      readonly current: unknown;
+      readonly expected: unknown;
+    }
   | { readonly kind: 'not-found' };
 
 export type ReversalResult<

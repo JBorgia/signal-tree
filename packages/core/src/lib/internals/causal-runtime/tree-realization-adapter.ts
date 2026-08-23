@@ -372,6 +372,19 @@ export function createTreeRealizationAdapter(
         return { kind: 'structural-drift' };
       }
 
+      // RESTORE-P0 P0-C is deliberately NOT decided here.
+      //
+      // The first attempt compared each scalar location against the value the
+      // turn left there and refused on any difference. It broke seven existing
+      // selective-undo tests, because a closure undo legitimately reverses a
+      // dependent turn first — so while reversing turn N the location still
+      // holds turn N+1's value, and "current != recorded" is the NORMAL case,
+      // not a conflict.
+      //
+      // The real predicate is provenance, not value: refuse when the current
+      // value is EXTERNAL truth, allow when it came from an authored turn the
+      // restoration is itself reversing. Only the history authority knows which
+      // writes were realizations, so the check lives there.
       return undefined;
     },
     applyAtomically(effects) {

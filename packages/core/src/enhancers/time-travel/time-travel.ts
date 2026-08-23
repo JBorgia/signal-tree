@@ -53,7 +53,10 @@ import type {
 } from '../../lib/types';
 
 import { ENHANCER_META, SignalTreeRollbackError } from '../../lib/types';
-import type { ReversalEffect } from '../../lib/internals/causal-runtime/causal-types';
+import type {
+  ReversalEffect,
+  ReversalRefusal,
+} from '../../lib/internals/causal-runtime/causal-types';
 
 // Re-export for convenience (do not redefine locally)
 export type { TimeTravelConfig, TimeTravelEntry };
@@ -2303,8 +2306,64 @@ export function timeTravel(
       const reversalEffects = effects.map((effect) =>
         toReversalEffect(effect, direction)
       );
-      const refusal = realizationPort.validateEffects(reversalEffects);
+      // RESTORE-P0 P0-C — world-relative validity, checked BEFORE any mutation
+      // and before the cursor moves, so a refused restoration leaves the state
+      // and the history position exactly as they were.
+      //
+      // The rule is provenance-based, not value-based: refuse only when the
+      // location currently holds EXTERNAL truth that this restoration is not
+      // reversing. A location holding a later AUTHORED value is fine — that is
+      // what a closure undo looks like mid-flight.
+      const externalConflict = ((): ReversalRefusal | undefined => {
+        if (externalTruthByPath.size === 0) return undefined;
+        for (const effect of reversalEffects) {
+          if (effect.structural !== undefined) continue;
+          const path = effect.path;
+          if (typeof path !== 'string') continue;
+          if (!externalTruthByPath.has(path)) continue;
+
+          const live = resolveLiveNodeAtPath(path);
+          if (typeof live !== 'function') continue;
+          const current = (live as () => unknown)();
+
+          // Only a conflict if the location still holds the external value AND
+          // the inverse would overwrite it with something else.
+          if (
+            Object.is(current, externalTruthByPath.get(path)) &&
+            !Object.is(current, effect.after)
+          ) {
+            return {
+              kind: 'value-drift',
+              path,
+              current,
+              expected: effect.after,
+            };
+          }
+        }
+        return undefined;
+      })();
+
+      const refusal =
+        externalConflict ?? realizationPort.validateEffects(reversalEffects);
       if (refusal) {
+        if (refusal.kind === 'value-drift') {
+          // RESTORE-P0 P0-C. An undo either reverses the authored operation or
+          // it does not happen. The two rejected alternatives:
+          //
+          //   skip the conflicting effect -> an atomically authored turn is
+          //     partially reversed, which is the HIST-B failure through a
+          //     different door
+          //   let the inverse win -> history overwrites external truth it does
+          //     not own, which is the case-6 defect
+          throw new Error(
+            `ST1034: restoration refused — '${refusal.path}' changed after the ` +
+              `operation being reversed. Expected ${JSON.stringify(
+                refusal.expected
+              )} but found ${JSON.stringify(
+                refusal.current
+              )}. Nothing was changed; the history position is unmoved.`
+          );
+        }
         throw new Error(`Unsupported scoped undo effect at ${refusal.kind}`);
       }
 
@@ -2313,6 +2372,27 @@ export function timeTravel(
         realizationPort.applyAtomically(reversalEffects);
       } finally {
         isRestoring = false;
+      }
+
+      // RESTORE-P0 P0-C. A restoration's OWN writes are published with
+      // `causalMode: 'realization'` — measured via MUT-2, which records that
+      // redo is marked realization too — and they carry `source: 'system'`
+      // rather than `'time-travel'`, so the notifier subscription cannot tell
+      // them from server truth. Banking them would make the next undo refuse
+      // against the previous undo's output.
+      //
+      // Cleared here rather than filtered at the subscription because this is
+      // the only place that knows these particular writes came from
+      // restoration.
+      for (const effect of reversalEffects) {
+        if (effect.structural === undefined && typeof effect.path === 'string') {
+          externalTruthByPath.delete(effect.path);
+          // Deleting is not enough on its own: the notifier delivers at FLUSH,
+          // after this returns, so the subscription would bank the restoration's
+          // own write as external truth a moment later. Mark the path so the
+          // next delivery for it is skipped once.
+          restorationWrittenPaths.add(effect.path);
+        }
       }
     };
 
@@ -2358,6 +2438,32 @@ export function timeTravel(
       designated: false,
     });
     const pendingCapture = createCaptureBucket();
+
+    /**
+     * RESTORE-P0 P0-C — the last value a REALIZATION wrote at a scalar path,
+     * cleared as soon as an authored write lands there.
+     *
+     * This is the provenance signal that separates the two kinds of divergence:
+     *
+     *   authored divergence  a closure undo reverses a dependent turn first, so
+     *                        the location holds a LATER AUTHORED value. Normal;
+     *                        the restoration is reversing that turn too.
+     *   external divergence  a realization superseded the location. Replaying
+     *                        the inverse would destroy truth history does not
+     *                        own.
+     *
+     * Only the second is a conflict. Keyed by path and holding the VALUE rather
+     * than a timestamp, so an authored write that happens to restore the same
+     * value does not leave a stale conflict behind.
+     */
+    const externalTruthByPath = new Map<string, unknown>();
+
+    /**
+     * Paths written by the restoration itself, consumed once on delivery.
+     * Restoration writes are published as realizations with `source: 'system'`,
+     * so the notifier cannot distinguish them from server truth.
+     */
+    const restorationWrittenPaths = new Set<string>();
     const pendingTransactions = new Map<number, CaptureBucket>();
     const transactionOwnerToken = {};
     let nextTransactionId = 1;
@@ -2850,8 +2956,18 @@ export function timeTravel(
                 return;
               }
               if (getCausalWriteMode(meta) === 'realization') {
+                // RESTORE-P0 P0-C. Recorded HERE rather than only in the leaf
+                // interceptor: measured, that interceptor is not installed for
+                // every tree shape, and for a plain nested branch it never runs
+                // at all — the notifier subscription is the observation point
+                // every write reaches.
+                if (!restorationWrittenPaths.delete(path)) {
+                  externalTruthByPath.set(path, next);
+                }
                 return;
               }
+              // An authored write returns this location to history's control.
+              externalTruthByPath.delete(path);
               const transactionId = resolveTransactionId(meta);
               if (transactionId !== undefined) {
                 captureIntoBucket(
@@ -2900,6 +3016,8 @@ export function timeTravel(
                   : ambient;
               if (isRestoring) return;
               if (getCausalWriteMode(effectiveMeta) === 'realization') {
+                // P0-C: remember that this location now holds external truth.
+                externalTruthByPath.set(path, next);
                 notifier.notify(
                   path,
                   next,
@@ -2911,6 +3029,9 @@ export function timeTravel(
                 );
                 return;
               }
+              // An authored write supersedes the realization at this location,
+              // so the location is back under history's control.
+              externalTruthByPath.delete(path);
               const transactionId = resolveTransactionId(effectiveMeta);
               if (transactionId !== undefined) {
                 captureIntoBucket(
