@@ -162,24 +162,70 @@ history dominates, and both keep 200 entries. @ngrx/signals stays at 10 MB
 because it has no history primitive to configure — that row is not a win, it is
 a missing feature.
 
-## A finding this run surfaced, for Step 8
+## CORRECTION — the OOM footnote, and what it actually is
 
-`signaltree / update-100-fields @ 10k / featured` needed its sample count
-reduced from 5 to 3 (`†`). It OOMs at 8 GB otherwise, and the shape of the
-failure is the point:
+This section originally read: *"the history-recording update loop accumulates,
+a previous sample's store is still reachable when the next is built, this is the
+same residue Step 8 exists to attack."* **Two of those three claims were wrong**,
+and `tools/probe-history-sample-isolation.mjs` is what refuted them. The
+correction is kept in place rather than edited away, because the reasoning that
+produced the wrong attribution is the part worth not repeating.
+
+### What IS true — and it is a real finding
+
+**An abandoned SignalTree that has taken writes is fully retained until
+`destroy()` is called.** Six builds of the same fixture, one process:
 
 ```text
-5 setup-only builds, same fixture       277 MB   fine
-6 builds WITH the update loop           > 8 GB   OOM
+                        build 1   build 2   build 3   build 4   build 5   build 6
+  tree abandoned         89.65    174.08    263.14    355.81    452.13       OOM
+  tree destroyed          7.08      7.21      7.28      7.28      7.37      7.38
 ```
 
-Construction is not what accumulates — the history-recording update loop is, and
-a previous sample's store is still reachable when the next is built. The harness
-retries with fewer samples and MARKS the cell rather than lowering the default
-for everyone, because the reduction is the finding.
+Nothing is released without `destroy()`; everything is released with it. Six
+isolated processes each report **89.65 MB**, identical to two decimals, so a
+single store's cost is flat and the in-process curve is pure accumulation.
 
-This is the same residue Step 8 exists to attack, seen from the timing side:
-1,310 B per retired subject with a restorer attached, against 6 B without one.
+That is a **lifecycle contract, not a leak** — and it is the answer to the
+discriminator that mattered: it is not the harness holding completed samples
+(`oneBuild` returns nothing), and it is not unbounded per-store growth.
+
+### What was WRONG
+
+**History is not what fills the heap.** One build costs 84.3 MB at ZERO updates
+and 94.99 MB at 400 — so history is ~27 KB per wide update, and the 89 MB is the
+seeded store. Attributing the OOM to "the history-recording update loop" was
+reading a plausible cause into a measurement that did not distinguish it.
+
+The claim reached the doc because the earlier evidence for it — "five setup-only
+builds settle at ~277 MB" — came from an ad-hoc script using `heapUsed` after a
+single `gc()`, not the quiescence protocol. It under-measured, showed sublinear
+growth, and made construction look innocent. **The protocol difference produced
+the wrong conclusion, in a repo that already has a documented rule about
+exactly this.**
+
+### OPEN ITEM — one cell, unlocalized, do not quote it
+
+`signaltree / featured / update-100-fields @ 10k` still OOMs at 5 samples
+**after** `destroy()` was added to the harness teardown. Seeding it costs
+~142 KB/row inside the harness:
+
+```text
+  n=1000    151.8 MB      n=5000     714.8 MB
+  n=2000    292.2 MB      n=10000   1418.1 MB
+```
+
+against ~8 KB/row in every standalone reproduction — including one that runs the
+harness's own `IMPLS.signaltree` code inside the harness's own process and
+settles at 82 MB. Linear in n, reproducible, and I could not localize it.
+
+Three hypotheses were tested and refuted: cross-tree history contamination
+through the global `PathNotifier` (a second tree's history stays at 1 entry),
+the seed array being retained (kept in scope deliberately: no effect), and a
+superlinear cost from constructing a third featured tree (81.9 MB standalone).
+
+**Until this is closed, the featured wide-field row is not evidence of anything
+about the library.** Every other cell reproduces standalone.
 
 ## What this baseline is for
 

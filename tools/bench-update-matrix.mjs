@@ -132,6 +132,11 @@ const IMPLS = {
         const node = tree.$.rows.byId(id);
         return computed(() => node?.()?.value);
       },
+      // A tree that has taken writes is retained until destroyed — measured, not
+      // assumed: six abandoned builds accumulate 452 MB and then OOM, while six
+      // destroyed builds settle at 7.4 MB.
+      // See tools/probe-history-sample-isolation.mjs.
+      teardown: () => tree.destroy(),
       batch: featured ? (fn) => tree.batch(fn) : null,
       rollback: featured
         ? (fn) => {
@@ -220,6 +225,7 @@ const IMPLS = {
       },
       teardown: () => {
         for (const sub of subscriptions) sub.unsubscribe();
+        store.destroy();
       },
       // elf has no batching primitive that coalesces N separate `update` calls;
       // its unit of atomicity is the single `update`.
@@ -324,8 +330,10 @@ const OPS = {
   'update-100-fields': {
     detail: 'a hundred fields at once — the same axis, 10x out',
     sizes: [1_000, 10_000],
-    setup: (impl, n) =>
-      impl.setAll(seed(n).map((r) => ({ ...r, ...widePatch(100, 'init') }))),
+    setup: (impl, n) => {
+      const data = seed(n).map((r) => ({ ...r, ...widePatch(100, 'init') }));
+      impl.setAll(data);
+    },
     run: (impl, n, i) => impl.updateOne(i % n, widePatch(100, 'w' + i)),
     check: (impl, n, iterations) =>
       impl.readOne((iterations - 1) % n)?.f99 === `w${iterations - 1}-99`,
@@ -457,6 +465,8 @@ if (cellFlag !== -1) {
   if (process.argv.includes('--memory')) {
     // Retention AFTER the workload, quiesced. Speed that hides retention is the
     // thing this column exists to expose.
+    // NOTE: deliberately no teardown here. This arm measures what a LIVE store
+    // retains; destroying it would measure the empty case.
     const measured = await measureRetained(
       async () => {
         const { impl, held } = await build();
@@ -481,11 +491,16 @@ if (cellFlag !== -1) {
   for (let s = 0; s < SAMPLES + WARMUP; s++) {
     // RELEASE THE PREVIOUS SAMPLE'S STORE BEFORE BUILDING THE NEXT.
     //
-    // Without this the run OOMs on the largest featured cells: a 100k-row store
-    // with a 200-entry history retains ~190 MB, and seven of them is 1.3 GB.
-    // The first version of this harness died there and reported the crash as if
-    // the LIBRARY had failed, which is the worst way for a benchmark to be
-    // wrong — it looks like a result.
+    // Dropping the reference is NOT enough, and getting this wrong produced a
+    // wrong finding before it produced a crash. An abandoned SignalTree that has
+    // taken writes stays fully reachable: six builds accumulate 452 MB and OOM,
+    // while six builds that call `destroy()` settle at 7.4 MB. The harness was
+    // abandoning them, so the largest featured cells died and the failure was
+    // written up as if the library's history representation were at fault.
+    //
+    // It is a LIFECYCLE CONTRACT, not a leak — `destroy()` releases it — and the
+    // teardown below is the harness honouring that contract.
+    // Discriminated in tools/probe-history-sample-isolation.mjs.
     globalThis.gc?.();
     let sample = await build();
     const { impl, held } = sample;
@@ -508,6 +523,7 @@ if (cellFlag !== -1) {
     if (s >= WARMUP) samples.push(elapsed / op.iterations);
     sample = undefined;
   }
+
 
   samples.sort((a, b) => a - b);
   emit({
@@ -563,11 +579,23 @@ function runCell(lib, config, op, n, consumers, memory = false, samples = SAMPLE
       // the sample count for everyone to make one cell fit — the reduction IS a
       // finding, and hiding it inside a default would erase it.
       //
-      // What it means: the store from a previous sample is still reachable when
-      // the next is built. Six builds of the featured 10k x 100-field arm
-      // exceed 8 GB, while five setup-only builds of the same shape settle at
-      // ~277 MB — so it is the history-recording UPDATE LOOP that accumulates,
-      // not construction. Step 8 material, not a harness defect to tune away.
+      // ⚠️ THE FIRST EXPLANATION WRITTEN HERE WAS WRONG. It said the
+      // history-recording update loop accumulates across samples. Two things
+      // refuted it (tools/probe-history-sample-isolation.mjs):
+      //
+      //   - a single build costs 84.3 MB at ZERO updates and 94.99 MB at 400,
+      //     so history is ~27 KB/update and is not what fills the heap
+      //   - adding `destroy()` to this teardown — which does release an
+      //     abandoned store, 452 MB -> 7.4 MB over six builds — did NOT clear
+      //     this cell
+      //
+      // What is actually happening in this ONE cell is not yet localized:
+      // seeding it costs ~142 KB/row inside this harness against ~8 KB/row in
+      // every standalone reproduction, including one running the harness's own
+      // impl code inside the harness's own process. Linear in n, reproducible,
+      // unexplained. See the OPEN ITEM in
+      // docs/architecture/v15-update-matrix-baseline.md — and do not quote the
+      // featured wide-field row until it is closed.
       if (samples > REDUCED_SAMPLES) {
         const retried = runCell(
           lib,
@@ -637,10 +665,10 @@ function collectSkips(rows) {
     if (row.reducedSamples) {
       notes.add(
         `${row.lib} / ${row.op} @ n=${row.n}: reduced to ${row.reducedSamples} ` +
-          `samples (\u2020) — it OOMs at ${SAMPLES}. The previous sample's store ` +
-          `is still reachable when the next is built, and the accumulation comes ` +
-          `from the history-recording update loop rather than construction. ` +
-          `A finding for Step 8, not a harness setting to tune.`
+          `samples (\u2020) — it OOMs at ${SAMPLES}, and the cause is NOT yet ` +
+          `localized. Not history (27 KB/update measured) and not the abandoned ` +
+          `store (destroy() is called and does release it). Do not quote this ` +
+          `row; see the OPEN ITEM in v15-update-matrix-baseline.md.`
       );
     }
     if (row.handRolled) {
