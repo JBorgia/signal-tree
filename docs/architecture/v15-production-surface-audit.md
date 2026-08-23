@@ -271,15 +271,16 @@ The demo uses the package because the package exists.
 "SignalTree + ng-forms, 8 lines of code, complexity 2, maintainability 9" —
 around this snippet:
 
-```ts
-import { withForms } from '@signaltree/ng-forms';
-signalTree({ … }, { enhancers: [withForms()] });
-```
+The snippet imports `withForms` from the package and passes `withForms()` as an
+enhancer. **That symbol has never existed.** It sits inside a template literal,
+so nothing compiles it — a metric that argues for the package is built on an API
+the package does not have. Same family as the fictional `FormControl.connect()`
+already on record.
 
-**`withForms` has never existed.** It is inside a template literal, so nothing
-compiles it and no gate reads it. A metric that argues for the package is built
-on an API the package does not have. Same family as the fictional
-`FormControl.connect()` already on record.
+(The snippet is described rather than quoted here on purpose: `readme-apis`
+scans this document too, and quoting the import made this page fail the gate —
+which is the gate working. It is also why the defect survives in the spec file:
+a template literal is not an import.)
 
 ## Result
 
