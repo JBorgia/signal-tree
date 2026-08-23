@@ -327,6 +327,13 @@ const EXEMPT = new Map(
       'internal UpdateMetadata transaction token used by transactions()',
     transactionOwner:
       'internal UpdateMetadata tree token used to isolate transactions()',
+    restorationDesignated:
+      'HIST-C2 prototype plumbing: stamped on UpdateMetadata at notify() time ' +
+      'because capture is deferred to the flush microtask. Applications never ' +
+      'set it — they express "this is an undoable user operation" through the ' +
+      'designation scope. Sitting on a public type is known surface debt to be ' +
+      'resolved when the public spelling is chosen (HIST-C2 step 7); if it ' +
+      'ships on UpdateMetadata, this exemption is wrong and it needs documenting',
   })
 );
 

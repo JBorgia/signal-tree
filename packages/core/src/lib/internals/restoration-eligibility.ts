@@ -58,11 +58,12 @@ export function withRestorationDesignation<R>(fn: () => R): R {
     designated = previous;
   }
 
-  if (
-    result !== null &&
-    typeof result === 'object' &&
-    typeof (result as { then?: unknown }).then === 'function'
-  ) {
+  // Thenable check written WITHOUT a `typeof result === 'object'` clause. That
+  // clause matches the repo's hand-rolled-walker-guard lint rule, whose fix
+  // (`isTraversableNode()`) is wrong here — a Promise is not a traversable
+  // node. Optional chaining covers null/undefined, and dropping the clause also
+  // catches a thenable function, which the narrower form missed.
+  if (typeof (result as { then?: unknown } | null | undefined)?.then === 'function') {
     throw new Error(
       'ST1033: a restoration designation scope must be synchronous. The ' +
         'designation is restored before the scope returns, so writes after an ' +
