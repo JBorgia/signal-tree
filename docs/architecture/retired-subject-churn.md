@@ -843,3 +843,37 @@ anything under 8x. The bounded arm measured 8.1x and the gate flipped to
 BOUNDED over a run that grew 6.8 MB -> 54 MB. It now requires `< 2`: bounded
 means the retained set is the window, so total retention is close at 20 rounds
 and at 320. The gate is red again, for the right reason.
+
+### CLOSED — the descriptors were subject-lifetime state all along
+
+Every read of the three maps is on the reversal-planning path and keyed by
+subject id: `structuralHistoryEffects` by `${kind}:${subject}:${key}`,
+`structuralHistoryBySubject` and `subjectDescriptors` by `String(subject)`. So
+an entry is needed for exactly as long as its subject is restorable, which is
+exactly as long as something claims it — the rule already frozen above. They
+were simply never connected to it.
+
+`forgetSubjectsInTreeRealizationDescriptors` runs at the same boundary, over the
+subjects the sink reports released. A scan rather than a `subject -> keys`
+index: the index would be a second structure that can drift, and pruning keeps
+the map small enough that the scan is the cheaper thing to be sure about.
+
+Measured, one process, 200 live rows, 64,000 retirements:
+
+```text
+                 20 rounds    320 rounds     retained
+history 2          1.33 MB       0.40 MB          400
+history 20         6.81 MB       9.08 MB        4,000
+history 100        6.84 MB      37.29 MB       20,000
+```
+
+Depth-dependent, not runtime-dependent — each window reaches its own plateau and
+stays there. `history 100` is still filling its window at the last point, which
+is why it is the only column still climbing.
+
+The gate: bounded arm 1.3x against 16x the rounds, control arm 13.6x.
+**41/41, no known-red.**
+
+`probe-history-subject-ownership.mjs` was rewritten rather than deleted. It once
+asserted that orphans EXPLAINED the slope; it now asserts that orphans are zero,
+which is the end state that work produced and a property worth keeping.

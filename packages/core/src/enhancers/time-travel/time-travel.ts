@@ -25,6 +25,7 @@ import {
   createTreeRealizationAdapter,
   defineTreeRealizationDescriptors,
   defineTreeRealizationPort,
+  forgetSubjectsInTreeRealizationDescriptors,
   getTreeRealizationDescriptors,
   getTreeRealizationPort,
   rememberTreeRealizationDescriptor,
@@ -1864,9 +1865,25 @@ class TimeTravelManager<T> {
       newlyUnowned.push(...claims.release(this.restorationClaimOwner(entry.id)));
     }
     if (newlyUnowned.length > 0) {
-      getOrCreateSubjectReclamationSink(this.tree)?.offerUnclaimed(
-        newlyUnowned
-      );
+      const released =
+        getOrCreateSubjectReclamationSink(this.tree)?.offerUnclaimed(
+          newlyUnowned
+        ) ?? [];
+      if (released.length > 0) {
+        // The realization descriptors are per-SUBJECT restoration state, read
+        // only by reversal planning and keyed only by subject id, and nothing
+        // pruned them: they grew four entries per retired subject and were the
+        // whole remaining retention slope once the entity layer plateaued.
+        // Their lifetime is the subject's claim, so they end here with it.
+        const descriptors =
+          getTreeRealizationDescriptors(this.tree) ??
+          getTreeRealizationDescriptors(
+            (this.tree as unknown as { $?: unknown }).$
+          );
+        if (descriptors) {
+          forgetSubjectsInTreeRealizationDescriptors(descriptors, released);
+        }
+      }
     }
     return newlyUnowned;
   }

@@ -229,30 +229,43 @@ console.log(
 );
 
 console.log('\nVERDICT');
-const confirmed =
-  ownedBounded && orphansGrow && marginalBytesPerOrphan > 0 && orphanShareOfHeap > 0.7;
 
-if (confirmed) {
+// ⚠️ THIS PROBE ONCE ASSERTED THE OPPOSITE, and the reversal is the point.
+//
+// It was built to test "orphaned retired subjects explain the heap slope" and
+// reported CONFIRMED at 945 B/orphan and 90% of the growth. Step 8 then removed
+// 100% of the orphans and the slope fell by about 9%. The statistic was
+// `Δheap / Δorphans` — one quantity that grows with the round count over
+// another that grows with the round count — so any per-round term would have
+// produced a plausible per-orphan cost. See "STEP 8 PHASE 6D" in
+// docs/architecture/retired-subject-churn.md.
+//
+// What it checks NOW is the end state that work produced, which is a property
+// worth keeping: the set a retained window can restore is bounded, and NOTHING
+// is retained beyond it. Orphans must be zero, not merely explanatory.
+const maxOrphans = Math.max(...points.map((p) => p.orphans));
+const achieved = ownedBounded && maxOrphans === 0;
+
+if (achieved) {
   console.log(
-    '  CONFIRMED. The set a retained history window can restore is BOUNDED, and\n' +
-      '  everything beyond it is retained anyway — orphans grow with total churn\n' +
-      '  and account for essentially all of the heap slope.\n\n' +
-      '  Eviction ends the restoration claim without releasing the backing. The\n' +
-      '  fix belongs at the eviction boundary: release the evicted entry\'s\n' +
-      '  claims, and reclaim a subject when its LAST claim goes.'
+    '  BOUNDED AND FULLY OWNED. The owned set tracks the history window, and\n' +
+      '  every retired subject beyond it has been reclaimed — orphans are zero at\n' +
+      '  every point. Eviction releases the claim and the sink frees the backing.'
   );
 } else {
   console.log(
-    '  NOT CONFIRMED — orphaned retired subjects do not account for the slope on\n' +
-      '  their own. STOP: find the remaining term before designing a claim\n' +
-      '  registry against a hypothesis that has not survived.\n' +
-      `  (owned bounded: ${ownedBounded}, orphans grow: ${orphansGrow}, ` +
-      `share: ${(orphanShareOfHeap * 100).toFixed(0)}%)`
+    `  ORPHANS PRESENT (max ${maxOrphans}). A retired subject is retained that no\n` +
+      '  retained history entry can restore, so the eviction boundary is not\n' +
+      '  releasing, the sink is not reclaiming, or a claim is outliving its entry.\n' +
+      `  (owned bounded: ${ownedBounded})`
   );
 }
+void orphansGrow;
+void marginalBytesPerOrphan;
+void orphanShareOfHeap;
 
 if (process.argv.includes('--json')) {
   console.log(JSON.stringify(points, null, 2));
 }
 
-process.exit(confirmed ? 0 : 1);
+process.exit(achieved ? 0 : 1);
