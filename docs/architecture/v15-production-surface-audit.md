@@ -15,6 +15,17 @@ exports to get TruckTrax compiling are specifically forbidden — they would
 contaminate the experiment by making the old shape the answer before the
 question is asked.
 
+## A release rule NGF-DEL produced
+
+> **A gate may not survive merely because its invariant remains philosophically
+> true. It must have a live shipped subject and a falsifiable mutation target.**
+
+`angular-compat` was removed under this rule when its last subject was deleted,
+with its resurrection condition recorded: reinstate a compatibility-floor gate
+whenever a shipped entry point requires an Angular API above the minimum
+admitted by its package peer range. A gate that cannot fail is not protection,
+it is a false claim of protection.
+
 ## Evidence hierarchy
 
 Used to weigh every claim in every dossier below. Higher beats lower.
@@ -144,17 +155,24 @@ otherwise ship unjustified. The A3 transactions experiment is high value but it
 is a new question, and a new question does not outrank an unfinished one.
 
 ```text
-NGF-0   does @signaltree/ng-forms exist at all?          ← evidence gathered
+NGF-0   does @signaltree/ng-forms exist at all?          DONE — deleted
    ↓
-trackHistory as a generic compositional primitive        ← its old negative is
-   ↓                                                       invalid; needs a positive
+TH-0    generic WritableSignal history                   DONE — recommend delete
+   ↓
 A3      status vs transactions
    ↓
 A1      remote acquisition / resource composition
    ↓
-A2      persistence / lifecycle composition
+A2      persistence + does core/storage exist at all?    ← one question, not two
    ↓
 A6      EntitySignal.map
+   ↓
+MATRIX-CLOSE
+        EVT-0 @signaltree/events, and each of its subpaths
+        core/security
+        core/storage (resolved by A2)
+        every surviving root capability
+        every shipped artifact -> terminal disposition
    ↓
 freeze the Candidate B surface
 ```
@@ -164,8 +182,9 @@ freeze the Candidate B surface
 | id | capability | v13 spelling | status |
 | --- | --- | --- | --- |
 | **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **DELETED — NGF-DEL executed** |
+| **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **evidence gathered — recommend DELETE** |
 | A1 | remote acquisition / loading | `loader` | evidence gathered, undecided |
-| A2 | persistence / stored state | `stored`, `flushAllStoredSignals` | evidence gathered, undecided |
+| A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | evidence gathered, undecided |
 | A3 | async / status representation | `status` | evidence gathered, undecided |
 | A4+A5 | form integration and its history | `form`, `FormSignal`, `history`, `@signaltree/ng-forms/signals` | **resolved — one consumer, proven path, one gap** |
 | A6 | collection projections | `EntitySignal.map` | not started |
@@ -357,6 +376,120 @@ nowhere - even though its old copy was already the right answer ("SignalTree
 ships no validation API and no form marker. It publishes the model; Angular
 observes it"). A compositional forms example is a demo gap, recorded here rather
 than invented during a deletion.
+
+---
+
+# TH-0 — should SignalTree publicly own generic `WritableSignal` history?
+
+> **Null: if v15 had never contained form history, would we create a public
+> generic `WritableSignal` history utility today?**
+
+Two propositions are kept strictly apart throughout. "This function is useful"
+is not "SignalTree should own it" — that conflation is what put `createFormTree`
+in a shipped package for years.
+
+## What it is
+
+`trackHistory(model: WritableSignal<T>, options)`, 230 lines, at
+`core/src/lib/form-history/form-history.ts:206`. It attaches an Angular `effect`
+that records the model's value on every change, and undoes by writing back:
+
+```ts
+read:  () => model(),
+write: (next) => model.update((m) => ({ ...m, ...next })),
+```
+
+A stack of value snapshots and a shallow merge. No causal identity, no subject
+lifetimes, no transaction awareness.
+
+## The decisive experiment
+
+Pinned in `track-history-vs-timetravel.spec.ts`. The compositional forms story
+wants `trackHistory(toWritableSignal(tree.$.branch))`, so the question is
+whether its undo routes back through the canonical mutation path — the way
+`timeTravel()` does — or maintains an independent history around the signal.
+
+**It is independent, and the two systems fight.** Over a tree that also has
+`timeTravel()`:
+
+| step | result |
+| --- | --- |
+| `hist.undo()` | value reverts, **and time-travel's history GROWS** |
+| `tree.undo()` afterwards | **REDOES the edit** — the model moves forward |
+| both after two edits | `hist.canUndo()` and `tree.canUndo()` are both true |
+
+Because the undo is a `model.update(...)`, it is a *new write*. Time-travel
+records it as forward motion. An application wiring a single undo button to
+either system gets a stack the other one is actively corrupting.
+
+That is exactly the predicted outcome: **two restoration systems representing
+the same user operation at different layers.** It is an argument against
+publishing both, and it says nothing about the quality of either.
+
+## The fork, and why neither branch lands on "public SignalTree capability"
+
+**Over SignalTree state** — `timeTravel()` already covers it, with canonical
+semantics `trackHistory` does not have: subject identity, transaction
+interaction, causal position. And as measured, adding `trackHistory` on top
+makes undo incorrect rather than richer.
+
+**Over an arbitrary Angular `WritableSignal`** — it works correctly. But that is
+precisely the case with no SignalTree involvement at all. As you put it: a
+useful generic Angular primitive is not a SignalTree public capability. If
+anything, this branch *weakens* the ownership case, because the thing it does
+well is the thing that has nothing to do with this library.
+
+## The other questions
+
+**Does anything consume it?** No. Zero call sites in packages, apps, tools or
+TruckTrax. Its only appearances are documentation and its own disposition entry.
+TruckTrax's forms wrapper used the deleted `history()` marker, never this.
+
+**Is it needed internally?** No. Nothing in core calls it.
+
+**Does it cost anything to use?** It requires an Angular injection context and
+the framework scheduler. The first version of the experiment above used
+microtasks and saw every undo as a no-op — a defect in the test, but a fair
+warning that this is not a plain function.
+
+## Four possibilities
+
+```text
+1. DELETE       generic WritableSignal history is not SignalTree's job
+2. INTERNALIZE  core needs it, applications do not
+3. MOVE/COMPOSE useful, but belongs beside Angular signals
+4. KEEP/REDESIGN an independently justified SignalTree capability
+```
+
+2 is refuted — nothing internal uses it. 4 is refuted — over SignalTree state
+the justified capability is `timeTravel()`, and this conflicts with it. 3 is
+possible in principle but has no destination and no consumer asking for one.
+
+**Recommended disposition: DELETE (1).** The old negative — "LC / mechanically
+retained" — was wrong about the *reason*, and correcting the reason does not
+produce a positive. `trackHistory` survived FORM-DEL because it was already
+compositional, which made it a coherent primitive; the audit asked whether that
+makes it SignalTree's to publish, and the answer is no on both branches of the
+fork.
+
+**This is a recommendation, not an action.** It is not in Candidate A's public
+surface, so deleting the implementation is a source change rather than a surface
+change — but it is still a deletion, and it belongs to you.
+
+**Consequence for the forms migration.** Undo/redo over a composed form model
+would then have no SignalTree answer, which is honest: for a form over a tree
+branch, `timeTravel()` is the answer; for a form over a plain Angular signal,
+SignalTree is not in the picture. The migration note stays de-pointed either
+way.
+
+## A documentation defect found on the way
+
+`docs/overview.md:37` still advertises core's surface as including `status`,
+`stored`, `form`, `asyncSource`, `asyncQuery`, `loader()`, `history()`,
+`trackHistory()` and `linked()`. Seven of those nine are deleted or withheld.
+`readme-apis` did not catch it because the line is prose, not an import — the
+same blind spot that let the fictional `withForms()` survive in a template
+literal. Logged for MATRIX-CLOSE.
 
 ---
 
