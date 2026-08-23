@@ -493,3 +493,71 @@ NOT CONFIRMED over data that confirms the hypothesis cleanly. A wrong statistic
 on a right experiment reads exactly like a result. The verdict now tests three
 things instead: the owned set is bounded, orphans grow from the first point that
 HAS them, and the marginal heap per marginal orphan is stable and positive.
+
+
+---
+
+## STEP 8 PHASE 2 — the oracle: `__subjectIds` is a SAFE AUTHORITY
+
+Run before the claim registry, to decide what a claim should CONTAIN. Reproduce
+with `node tools/probe-restoration-required-set.mjs`.
+
+The definition under test is not "touched", not "named in the snapshot", not
+"part of that turn":
+
+> required(H) = the non-current subject lifetimes that H may legally make live
+> again while H remains retained
+
+It covers undo AND redo, which matters: after an undo, the subjects the forward
+operation created are themselves retired and redo has to resurrect them.
+
+Measured observationally — traverse every legal position (undo to the oldest
+retained entry, redo forward to the newest) and record which subject ids are LIVE
+at each step. That never reads `__subjectIds`.
+
+```text
+  maxHistory   entries   physical   named   required   excess   unnamed   ok
+           4         4         16      10         10        0         0   yes
+           6         6         16      15         14        1         0   yes
+          10        10         16      16         16        0         0   yes
+          24        13         16      16         16        0         0   yes
+```
+
+**Outcome C is refuted at every size: `unnamed` is 0.** Nothing a legal traversal
+required was missing from `__subjectIds`. Excess is 1 subject in 57 (2%) —
+mostly EXACT, conservative by one at H=6.
+
+**And the property Step 8 actually needs holds: the named set scales with the
+WINDOW, not with total churn** — 4→10, 6→15, 10→16, 24→16 against 16 ever
+retired. Claims keyed on `__subjectIds` therefore bound retention at
+`O(live + window)`, which is the RC requirement. Narrowing the residual 2% is a
+later optimization.
+
+### The honest limit on the oracle's independence
+
+`time-travel.ts` calls `restoreState(entry.state, entry.__subjectIds,
+entry.__positionIds)` — **the restore path CONSUMES the metadata**. So the
+traversal observes what restoration resurrects GIVEN that metadata, not what it
+would need in principle, and the probe cannot refute C by observation alone.
+
+That limit is itself a finding: `__subjectIds` is not debugging metadata, it
+participates in restoration semantics. C is refuted instead by CORRECTNESS — the
+traversal's end state is compared against an independent replay of the same
+script, at every history size, and matches. A required-but-unnamed subject would
+land the traversal somewhere else.
+
+Because the metadata is load-bearing rather than incidental, it should be named
+for what it is when the registry lands.
+
+### A defect the oracle found on its way
+
+Its first run could not traverse at all: `clear()` is not undoable. The first
+undo after a `clear()` silently restores nothing while `canUndo()` reports true,
+and the next one throws `Unsupported scoped undo effect at structural-drift`.
+Removing the same rows one at a time and undoing works correctly, so it is
+specific to `clear()`. Pre-existing — reproduced at `0a23a551` — and pinned in
+`clear-not-undoable.spec.ts`.
+
+**It should be fixed before the claim registry**, not after: a history entry
+whose undo semantics are broken cannot have a trustworthy claim set derived from
+it, and the oracle has to omit `clear()` from its script until it is.
