@@ -1750,6 +1750,138 @@ both directions, verified in isolation before continuing.
 **`Field` is a TYPE alias, not the directive.** Importing it into `imports: []`
 yields NG0919. The directive is `FormField`, selector `[formField]`.
 
+# HIST-C2 step 7 — surface minimisation (prepared, name not yet chosen)
+
+## The current public value surface — 15 names
+
+```text
+signalTree  defineStore  asReadonly  SignalTreeRollbackError  entityMap
+derivedFrom  createAuditTracker  createAuditCallback  deepEqual
+toWritableSignal  batching  timeTravel  transactions  persistence  devTools
+```
+
+Plus 51 exported types. Step 7 does not add a package; at most it adds one door
+and removes three leaks.
+
+## The leak inventory
+
+```text
+LEAK   restorationDesignated      on the PUBLIC UpdateMetadata type
+LEAK   restorationEligibility     on TimeTravelConfig — implementation
+                                  vocabulary as configuration
+LEAK   designatesRestoration      toWritableSignal's option, earned by
+                                  FORM-C2-B but not yet named
+GONE   recordHistory              EntityConfig — refuted, see dividend below
+GONE   shouldSkip                 TimeTravelConfig — subsumed, see below
+DOOR   withRestorationDesignation internal today; needs one public spelling
+```
+
+## `shouldSkip` — subsumed, and its own rationale says why
+
+Read before proposing removal, because the design is deliberate and good. The
+comparator was deliberately MOVED from record time to read time, for five stated
+reasons, the first being that a potentially O(state) predicate ran per write to
+avoid something that costs almost nothing, and the second that a skipped entry
+never existed so a wrong predicate lost history permanently.
+
+That reasoning is sound and it is exactly what opt-in eligibility supersedes. Its
+stated purpose is:
+
+> a comparator lets the app decide a change is uninteresting — a cursor position,
+> a hover flag, a field the user is still typing into — so undo lands on
+> something a person recognises as a step
+
+Under HIST-C2 a cursor position is simply **never designated**. The filter's job
+is done upstream, for free, and without a per-transition predicate. The read-time
+design existed to avoid losing data by filtering a complete record; opt-in means
+the record already contains only the user's operations.
+
+Corroborating: **zero consumers**. Not in this repository outside its own
+implementation, and not in TruckTrax.
+
+## Deleting `recordHistory` pays a real dividend
+
+Not just "one fewer option". The exclusion feature is load-bearing for a chain of
+machinery that exists only to service it:
+
+```text
+pruneHistoryExcluded()      a walk producing a pruned snapshot
+didPrune                    `plain !== rawSnapshot`, described in-source as
+                            "an exact O(1) test for does this tree use
+                            recordHistory: false at all"
+prunedEqual()               a structural-equality walk, run only when pruning
+                            happened
+PHANTOM ENTRIES             the bug that walk guards: a write to an excluded
+                            collection still makes a new root, so two snapshots
+                            differing only inside excluded state are
+                            structurally identical and referentially distinct —
+                            `canUndo()` true, undo changes nothing visible, and
+                            the user spends a step they never had
+isHistoryExcludedCapture()  the capture-path check
+HISTORY_EXCLUDED            the symbol, and its stamping in entity-signal
+```
+
+All of it goes with the option. A whole class of phantom-entry bug disappears
+rather than being fixed.
+
+## Naming — analysis, with one candidate ruled out on evidence
+
+The public API should carry **one bit**: *this write belongs to the user's
+reversible action model.* Everything else (`intent`, `source`, `causalMode`,
+`subjectIds`, `positionIds`, `restorationEligibility`) is the engine's reasoning
+and stays internal.
+
+Two of the three candidate directions have concrete problems, and one of them is
+a measurement rather than a preference:
+
+```text
+markRestorationBoundary   REFUTED BY CASE 5. Two designation scopes in one tick
+                          collapse into ONE turn — the scope is an eligibility
+                          scope, NOT an operation boundary. This name would ship
+                          a promise the engine does not keep, and would be the
+                          first thing a user tests.
+
+withRestorableWrite       MIS-NAMES THE UNIT. Case 4: one designated write
+                          promotes an UNDESIGNATED sibling write in the same
+                          turn. A reader of "restorable write" expects only that
+                          write to revert. The unit is the turn.
+
+withCausalIntent          Leaks engine vocabulary into application code, and
+                          "intent" already means something else internally (the
+                          UpdateMetadata field).
+```
+
+**Recommendation: `undoable()`.** It is the user's word for the capability, it
+names the operation rather than the write, it claims no boundary, it pairs with
+the `undo()` it feeds, and it carries no engine vocabulary. The adapter option
+reads `{ undoable: true }`, which says the right thing at the call site:
+
+```text
+undoable(() => { ... })                          the generic door
+toWritableSignal(node, injector, { undoable: true })   the framework bridge
+```
+
+**Not chosen here.** The name is a product decision; this section records the
+analysis and the one candidate that evidence eliminates.
+
+## Sequence once the name is fixed
+
+```text
+1  add the public door under the chosen name; keep the internal function as its
+   implementation
+2  move restorationDesignated off the public UpdateMetadata type
+3  rename the adapter option to match the door
+4  flip the default; delete restorationEligibility
+5  delete recordHistory and the prune/phantom machinery it carries
+6  delete shouldSkip
+7  full gates + the release-claims exemptions for recordHistory / shouldSkip /
+   restorationEligibility must now FAIL if any survived — they are written to
+```
+
+Step 7 gate note: the release-claims repair means steps 5, 6 and 4 cannot be
+quietly skipped. Each of those three members has an exemption whose stated reason
+is that surviving to release makes the exemption wrong.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
