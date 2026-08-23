@@ -1182,17 +1182,100 @@ correctness.
 
 **HIST-D** still needs B or C to fail alone before it is admissible.
 
-## Not yet measured
+## Cases 4, 6 and 9 — the three the baseline left open
 
-Case 4 (a single un-transacted turn spanning both branches) and case 6 (authored
-edit then realization at the same location) are covered indirectly by 5 and 3
-but deserve their own rows before a disposition. Case 8 is subsumed by 10b.
+Pinned in `hist0-remaining.spec.ts` (8 tests).
 
-Case 9 needs the retention half done properly: whether excluded state acquires
-restoration claims, measured the way the churn probes measure it, not asserted
-from a snapshot count.
+### Case 4 — atomicity is a property of the TURN, not of `transactions()`
 
-**No disposition yet.** The baseline narrows the question; it does not answer
+```text
+tree.$.document.title.set('edited')     same tick, no transaction
+tree.$.ui.panel.set('inspector')
+-> 1 history entry, and ONE undo reverses BOTH
+```
+
+This is the most consequential of the three. Case 5 priced HIST-B using a
+`transactions()` boundary, which could be dismissed as an exotic path. It is not
+exotic: two ordinary `.set()` calls in the same tick coalesce into one turn.
+Location-scoped eligibility would partially reverse atomically authored turns in
+**ordinary application code that never opens a transaction** — an event handler
+that updates a document field and a UI field is the normal shape of Angular code,
+not a corner case.
+
+**HIST-B is now refuted, not merely expensive.**
+
+### Case 6 — ⚠️ A NEW DEFECT, and not a B-versus-C question
+
+```text
+title := 'A'          authored
+title := 'SERVER'     realization, LATER
+undo               -> 'v1'      MEASURED
+                   -> 'SERVER'  what correctness requires
+```
+
+Control (case 10b's shape): a realization to a *different* leaf **does** survive.
+So this is a location-collision defect, not a general failure to respect
+realizations. Reproduced identically through the structural path
+(`updateOne` on an entity row → reverts to `orig`, discarding `SERVER`).
+
+Per-turn reversal restores the turn's recorded before-value **unconditionally**.
+It reverses the right *locations* but never asks whether its recorded
+before-value is still authoritative at those locations. The consequence:
+
+> an undo silently discards server state whenever the user's last edit and a
+> later server response touched the same location
+
+That is the ordinary optimistic-update collision, not an edge case. It joins the
+two pinned P0s as the same class of bug — reversal is per-turn in *what* it
+touches but not in *whether* what it recorded still holds.
+
+Redo is consistent with undo: `canRedo()` is true and redo replays `'A'`, not
+`'SERVER'`. The realization is absent from both directions. Whatever HIST decides
+about later truth has to decide it for redo too — "undo respects later truth but
+redo does not" is incoherent.
+
+**This does not discriminate between the models.** It is a defect in the shared
+mechanics that HIST-SCOPE merely made visible, and it must be fixed against the
+chosen model alongside the coalesced-turn P0.
+
+### Case 9 — the two consequences separate cleanly
+
+Measured on the causal inventories directly, not from a heap probe:
+
+| | authored churn (40 rounds, window 5) | realization churn (40 rounds) |
+| --- | --- | --- |
+| history entries | bounded by the window | **0** |
+| claim owners | ≤ 5 | **0** |
+| claimed subjects | tracked | **0** |
+| collection correct | yes | yes (control: `ids() === ['g39']`) |
+
+```text
+RESTORATION consequence   SATISFIED      no claim, no SubjectId retained for undo
+DIAGNOSTIC  consequence   NOT SATISFIED  the write is ABSENT from history, not
+                                         "recorded but non-restorable"
+```
+
+The restoration half needs **no new machinery** — a non-restorable write already
+acquires no restoration ownership. That is the strongest argument for HIST-C:
+the property a selective model needs is already achievable through
+classification.
+
+The diagnostic half is a different axis. There is exactly one inventory today and
+exclusion means erasure. Promising devtools visibility for excluded operations
+requires a *second* inventory — new machinery, and exactly the scope HIST-0
+should not smuggle in.
+
+## Where the model space stands
+
+```text
+HIST-A  status quo        not refuted; expensive in eligibility only
+HIST-B  location scoped   REFUTED by case 4 — partial reversal of atomically
+                          authored turns in ordinary code
+HIST-C  operation scoped  fits the existing mechanics; case 9 shows the
+                          retention property already holds
+HIST-D  both              inadmissible — requires B to fail ALONE, and B failed
+```
+
 it.
 
 ---
