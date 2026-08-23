@@ -33,12 +33,12 @@ describe('subject restoration claims', () => {
     claims.retain('time-travel:1', [1, 2]);
     claims.retain('transaction:1', [2, 3]);
 
-    expect(claims.ownersOf(2).sort()).toEqual(['time-travel:1', 'transaction:1']);
+    expect([...claims.ownersOf(2)].sort()).toEqual(['time-travel:1', 'transaction:1']);
     // Evicting the whole time-travel window must not free a subject a pending
     // transaction still needs to roll back to.
     expect(claims.release('time-travel:1')).toEqual([1]);
     expect(claims.isClaimed(2)).toBe(true);
-    expect(claims.release('transaction:1').sort()).toEqual([2, 3]);
+    expect([...claims.release('transaction:1')].sort()).toEqual([2, 3]);
   });
 
   it('is idempotent per owner — re-retaining does not pin a subject forever', () => {
@@ -59,7 +59,7 @@ describe('subject restoration claims', () => {
     claims.retain('time-travel:1', [4, 4, 4, 9]);
 
     expect(claims.ownersOf(4)).toEqual(['time-travel:1']);
-    expect(claims.release('time-travel:1').sort()).toEqual([4, 9]);
+    expect([...claims.release('time-travel:1')].sort()).toEqual([4, 9]);
   });
 
   it('retain replaces an owner atomically and reports what that dropped', () => {
@@ -70,7 +70,7 @@ describe('subject restoration claims', () => {
     // nothing else holds 1, so this call is where 1 becomes reclaimable — a
     // caller that only listens to `release` would leak it.
     expect(claims.retain('time-travel:1', [2, 3, 4])).toEqual([1]);
-    expect(claims.claimedSubjects().sort()).toEqual([2, 3, 4]);
+    expect([...claims.claimedSubjects()].sort()).toEqual([2, 3, 4]);
   });
 
   it('does not report a dropped subject that another owner still holds', () => {
@@ -111,7 +111,7 @@ describe('subject restoration claims', () => {
     claims.retain('time-travel:1', [1, 2]);
     claims.retain('transaction:1', [2, 3]);
 
-    expect(claims.releaseAll().sort()).toEqual([1, 2, 3]);
+    expect([...claims.releaseAll()].sort()).toEqual([1, 2, 3]);
     expect(claims.snapshot()).toEqual({ owners: 0, claimedSubjects: 0 });
     expect(claims.isClaimed(2)).toBe(false);
     // And it must stay empty rather than resurrect on the next read.

@@ -190,3 +190,87 @@ export function createSubjectRestorationClaims(): SubjectRestorationClaims {
     },
   };
 }
+
+/**
+ * `SignalTree:` prefix REQUIRED, not cosmetic. `unwrap()` walks
+ * `Object.getOwnPropertySymbols` — which returns non-enumerable symbols too, so
+ * `enumerable: false` buys nothing — and skips brands by that description
+ * prefix. A symbol named anything else lands in every snapshot the tree
+ * produces; measured as 67 failing specs before it was renamed.
+ */
+const SUBJECT_RESTORATION_CLAIMS_SYMBOL = Symbol.for(
+  'SignalTree:SubjectRestorationClaims'
+);
+
+/**
+ * Attach the registry to a tree, following the same convention as
+ * `definePositionRegistry`. TREE-SCOPED ON PURPOSE: claims have to aggregate
+ * across SYSTEMS, not merely across the entries of one of them. A tree with
+ * both `timeTravel()` and `transactions()` has two independent reasons to keep
+ * a subject alive, and a per-enhancer registry would let either one free
+ * backing the other still needs.
+ */
+/**
+ * Get the tree's registry, creating and installing it on first use.
+ *
+ * LAZY ON PURPOSE. Constructing it in `signalTree()` put it on the
+ * statically-reachable path of the bare bundle and cost 0.11 KB prod that a
+ * tree with no restoration authority never uses — `bundle-budget` caught it.
+ * Only an enhancer that can restore has a reason to claim anything, so the
+ * enhancer pays for it.
+ *
+ * Installed on `$` when there is one, which is where it has to live: enhancers
+ * hand back a wrapper around the tree, so a symbol on the outer object is not
+ * the same object the next enhancer sees, and two enhancers would each create
+ * their own registry and stop composing.
+ */
+export function getOrCreateSubjectRestorationClaims(
+  node: unknown
+): SubjectRestorationClaims | undefined {
+  const existing = getSubjectRestorationClaims(node);
+  if (existing) {
+    return existing;
+  }
+  const host = ((node as { $?: unknown } | null)?.$ ?? node) as object | null;
+  if (host === null || typeof host !== 'object') {
+    return undefined;
+  }
+  const claims = createSubjectRestorationClaims();
+  defineSubjectRestorationClaims(host, claims);
+  return claims;
+}
+
+export function defineSubjectRestorationClaims(
+  node: object,
+  claims: SubjectRestorationClaims
+): void {
+  Object.defineProperty(node, SUBJECT_RESTORATION_CLAIMS_SYMBOL, {
+    value: claims,
+    enumerable: false,
+    configurable: true,
+  });
+}
+
+/**
+ * Resolve the registry from a tree, its `$`, or any node carrying it.
+ *
+ * `$` is checked because that is where it reliably lands: enhancers hand back a
+ * wrapper around the tree, and a symbol defined on the object `signalTree`
+ * built does not survive that, while `signalState` is passed through by
+ * reference. Same resolution order `commit-consequence` uses for the position
+ * registry, and for the same reason.
+ */
+export function getSubjectRestorationClaims(
+  node: unknown
+): SubjectRestorationClaims | undefined {
+  return read(node) ?? read((node as { $?: unknown } | null)?.$);
+}
+
+function read(node: unknown): SubjectRestorationClaims | undefined {
+  if (node === null || typeof node !== 'object') {
+    return undefined;
+  }
+  return (
+    node as Record<symbol, SubjectRestorationClaims | undefined>
+  )[SUBJECT_RESTORATION_CLAIMS_SYMBOL];
+}
