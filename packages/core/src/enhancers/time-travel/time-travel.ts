@@ -1,3 +1,7 @@
+import {
+  getOrCreateSubjectRestorationClaims,
+  type RestorationClaimOwner,
+} from '../../lib/internals/subject-restoration-claims';
 import { signal } from '@angular/core';
 
 import {
@@ -701,7 +705,16 @@ class TimeTravelManager<T> {
       this.isTemporalViewActive &&
       this.currentIndex < this.history.length - 1
     ) {
+      // DEFENSIVE, and honestly so: a probe that threw here on any discarded
+      // entry carrying `restorationSubjectIds` fired ZERO times across the
+      // whole suite, and mutating this call away fails nothing. Only
+      // position-indexed entries name subjects, and `truncateScopedRedoFuture`
+      // above has already removed those. The call stays because the coupling
+      // that makes it redundant is not a property either function states, and
+      // it costs one no-op release. Do not cite it as covered.
+      const discarded = this.history.slice(this.currentIndex + 1);
       this.history = this.history.slice(0, this.currentIndex + 1);
+      this.releaseRetainedHistoryEntries(discarded);
       this.bumpHistory();
     }
 
@@ -868,9 +881,14 @@ class TimeTravelManager<T> {
     this.currentIndex = this.history.length - 1;
     this.isTemporalViewActive = false;
 
+    this.retainRestorationClaims(entry);
+
     // Enforce max history size
     if (this.history.length > this.maxHistorySize) {
-      this.history.shift();
+      const evicted = this.history.shift();
+      if (evicted) {
+        this.releaseRetainedHistoryEntries([evicted]);
+      }
       this.bumpHistory();
       this.currentIndex--;
     }
@@ -1606,6 +1624,10 @@ class TimeTravelManager<T> {
   }
 
   resetHistory(): void {
+    // Before `nextTurnId` goes back to 1. Owner strings are derived from turn
+    // ids, so releasing after the counter reset would leave the old claims
+    // attached to owners the next entries are about to mint.
+    this.releaseAllOwnedRestorationClaims();
     this.history = [];
     this.turns.clear();
     this.pendingTurns.clear();
@@ -1782,6 +1804,98 @@ class TimeTravelManager<T> {
     );
   }
 
+  // ==========================================================================
+  // RESTORATION CLAIMS — the single boundary
+  // ==========================================================================
+  //
+  // A retained history entry is a REASON to keep retired subjects alive. It
+  // stops being one at exactly five moments, and before this there was no code
+  // at any of them: max-size eviction, redo truncation on a new write after an
+  // undo, scoped redo truncation, `resetHistory()`, and destroy (which routes
+  // through `resetHistory()`). Every one of them dropped the entry and left the
+  // subjects it named pinned forever — 945 B each, 90% of the measured slope.
+  //
+  // Every removal path calls `releaseRetainedHistoryEntries`. Nothing else may
+  // remove an entry from `this.history`.
+
+  private restorationClaimOwner(turnId: number): RestorationClaimOwner {
+    // `<system>:<id>` so time-travel and transactions cannot collide in the
+    // shared registry. NOT a history index — indices shift when the window
+    // slides, and a shifted index re-points a live claim at another record.
+    //
+    // Turn ids restart at 1 after `resetHistory()`, so an owner string CAN be
+    // reused across a reset. That is safe only because the reset releases every
+    // owner before the counter goes back; if that order ever inverts, a new
+    // entry inherits a dead entry's claims.
+    return `time-travel:${turnId}`;
+  }
+
+  /** Claim the subjects an entry needs kept alive. Idempotent per entry. */
+  private retainRestorationClaims(entry: CanonicalTurn<T>): void {
+    const claims = getOrCreateSubjectRestorationClaims(this.tree);
+    if (!claims) {
+      return;
+    }
+    claims.retain(
+      this.restorationClaimOwner(entry.id),
+      entry.restorationSubjectIds ?? []
+    );
+  }
+
+  /**
+   * THE boundary. Returns the subjects whose last claim this released — the
+   * set that becomes reclaimable.
+   *
+   * Nothing consumes the return value yet; offering it to the physical layer
+   * needs a tree-scoped reclamation sink the entity collections register with,
+   * and that is the next commit. Until then this bounds the CLAIM INVENTORY
+   * and not the heap, which is exactly what `bounded-history-retention`
+   * continues to report red.
+   */
+  private releaseRetainedHistoryEntries(
+    entries: readonly CanonicalTurn<T>[]
+  ): readonly number[] {
+    const claims = getOrCreateSubjectRestorationClaims(this.tree);
+    if (!claims || entries.length === 0) {
+      return [];
+    }
+    const newlyUnowned: number[] = [];
+    for (const entry of entries) {
+      newlyUnowned.push(...claims.release(this.restorationClaimOwner(entry.id)));
+    }
+    return newlyUnowned;
+  }
+
+  /**
+   * Release every claim THIS manager holds — destroy, and the reset path.
+   *
+   * Derived from `this.history` rather than from a second ledger: the owners a
+   * manager holds are exactly the entries it retains, so there is no bookkeeping
+   * that can drift out of step with the array. Never `releaseAll()`, which
+   * would also free claims a `transactions()` enhancer on the same tree holds.
+   */
+  private releaseAllOwnedRestorationClaims(): readonly number[] {
+    return this.releaseRetainedHistoryEntries([...this.history]);
+  }
+
+  /** Test-only inventory: what this tree currently pins, and for whom. */
+  __restorationClaimInventoryForTesting(): {
+    owners: number;
+    claimedSubjects: number;
+    subjects: number[];
+  } {
+    const claims = getOrCreateSubjectRestorationClaims(this.tree);
+    if (!claims) {
+      return { owners: 0, claimedSubjects: 0, subjects: [] };
+    }
+    const snapshot = claims.snapshot();
+    return {
+      owners: snapshot.owners,
+      claimedSubjects: snapshot.claimedSubjects,
+      subjects: [...claims.claimedSubjects()].sort((a, b) => a - b),
+    };
+  }
+
   private rebuildTurnIndexes(): void {
     const appliedTurnIds = new Set<number>();
     for (const [positionId, turnIds] of this.positionTurnIds.entries()) {
@@ -1854,10 +1968,16 @@ class TimeTravelManager<T> {
       }
     }
 
-    this.history = this.history.filter((entry) => {
+    const surviving: CanonicalTurn<T>[] = [];
+    const discarded: CanonicalTurn<T>[] = [];
+    for (const entry of this.history) {
       const indexed = (entry.__positionIds?.length ?? 0) > 0;
-      return !indexed || survivingIds.has(entry.id);
-    });
+      (!indexed || survivingIds.has(entry.id) ? surviving : discarded).push(
+        entry
+      );
+    }
+    this.history = surviving;
+    this.releaseRetainedHistoryEntries(discarded);
     this.currentIndex = this.history.length - 1;
     this.bumpHistory();
     this.rebuildTurnIndexes();
