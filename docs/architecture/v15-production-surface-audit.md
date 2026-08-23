@@ -137,16 +137,175 @@ possible API shapes · smallest sufficient public surface · rejected
 alternatives · v13 migration · tests needed · bundle and capability cost ·
 disposition.
 
+## Queue
+
+NGF-0 goes first: it is bounded, already known to be open, and the package would
+otherwise ship unjustified. The A3 transactions experiment is high value but it
+is a new question, and a new question does not outrank an unfinished one.
+
+```text
+NGF-0   does @signaltree/ng-forms exist at all?          ← evidence gathered
+   ↓
+trackHistory as a generic compositional primitive        ← its old negative is
+   ↓                                                       invalid; needs a positive
+A3      status vs transactions
+   ↓
+A1      remote acquisition / resource composition
+   ↓
+A2      persistence / lifecycle composition
+   ↓
+A6      EntitySignal.map
+   ↓
+freeze the Candidate B surface
+```
+
 ## Register
 
 | id | capability | v13 spelling | status |
 | --- | --- | --- | --- |
+| **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **evidence gathered — hypothesis survived falsification** |
 | A1 | remote acquisition / loading | `loader` | evidence gathered, undecided |
 | A2 | persistence / stored state | `stored`, `flushAllStoredSignals` | evidence gathered, undecided |
 | A3 | async / status representation | `status` | evidence gathered, undecided |
 | A4+A5 | form integration and its history | `form`, `FormSignal`, `history`, `@signaltree/ng-forms/signals` | **resolved — one consumer, proven path, one gap** |
 | A6 | collection projections | `EntitySignal.map` | not started |
 | A7 | tree composition | `.with()` | decided in 15.0 — declarative construction |
+
+---
+
+# NGF-0 — does `@signaltree/ng-forms` deserve to exist?
+
+Run first, ahead of A1–A3, because it is a bounded question the project already
+knows it left open. `FORM-DEL` (`b57ba293`) states it plainly: the marker-free
+remainder survived the deletion mechanically, and **"this does NOT establish
+that `@signaltree/ng-forms` survives architecturally; that remains UNPROVEN
+pending its own audit."** v15 currently intends to publish a package whose
+existence has never been justified.
+
+> **Hypothesis: if SignalTree were designed today, with Angular Signal Forms
+> available and branch composition proven, we would not create
+> `@signaltree/ng-forms`.**
+
+The burden of proof is on the package. What follows is an attempt to falsify the
+hypothesis, not to confirm it.
+
+## What is actually in there
+
+2,715 lines. Eight runtime exports and about thirteen types.
+
+**Only ONE file imports `@signaltree/core`** — `src/core/ng-forms.ts`, for
+`signalTree` plus three types. Everything else is Angular:
+
+```text
+createFormTree            ← the ONLY SignalTree-coupled entry point
+   ├── createWizardForm       imports createFormTree from '..'
+   └── withFormHistory        takes FormTree<T>; reads formTree.form.getRawValue()
+                              — undo/redo over an Angular FormGroup.
+                              Imports @angular/core and @signaltree/shared only.
+
+ngFormValidators (296 lines)   pure Angular. No SignalTree reference.
+SignalValueDirective            takes a plain WritableSignal<unknown>. A
+                                ControlValueAccessor. No SignalTree reference.
+createVirtualFormArray          form-array convenience.
+```
+
+So the package is one SignalTree-coupled function, two helpers that depend on
+it, and ~600 lines of Angular utilities that are in a SignalTree package for no
+structural reason.
+
+## Falsification attempt 1 — does `createFormTree` need SignalTree?
+
+This is the strongest case available, so it gets the most weight.
+
+`FormTree<T>` genuinely exposes SignalTree to the user:
+
+```ts
+export type FormTree<T> = {
+  state: TreeNode<T>;
+  $: TreeNode<T>;              // a real SignalTree node
+  form: TypedFormGroup<T>;     // and a real Angular FormGroup
+  …
+};
+```
+
+Two models over one logical form, kept in step by hand-rolled synchronization.
+`FormTreeOptions extends TreeConfig`, so it also accepts a full tree config.
+
+**This does not falsify the hypothesis — it is the clearest instance of the
+architecture the project already rejected.** The Signal Forms result was
+celebrated for "one shared model, no synchronization copy, no sync loop".
+`createFormTree` is the sync loop. Internally it does not even compose over the
+caller's tree: it calls `signalTree(hydratedInitialValues, treeConfig)` and
+manufactures its *own*, so the application's state is not involved at all.
+
+It also carries `persistKey`, `storage`, `persistDebounceMs` — a second
+implementation of A2's persistence capability, inside a forms package.
+
+And it is already **deprecated at runtime**, warning that "its previous
+migration target was removed in 15.0; a replacement has not been chosen yet."
+
+## Falsification attempt 2 — is there a missing template seam?
+
+`SignalValueDirective` is the candidate: a `ControlValueAccessor` binding a
+signal to an element. Its input type is `WritableSignal<unknown>` — **a plain
+Angular signal**. It never touches a tree. It is a generic Angular directive
+whose only connection to this project is its `signalTree`-prefixed selector.
+
+No seam is missing. If it is useful, it is useful to Angular users generally.
+
+## Falsification attempt 3 — is there production demand?
+
+**TruckTrax uses none of the surviving surface.** Its single
+`@signaltree/ng-forms` import is `signalForm` from the `/signals` subpath, which
+FORM-DEL deleted. Zero uses of `createFormTree`, `withFormHistory`,
+`createWizardForm`, `ngFormValidators`, `createVirtualFormArray` or the
+directives.
+
+The only consumer is this repo's own demo — and that is **circular**, because
+`demo-coverage` is a gate requiring every root-barrel export to be demonstrated.
+The demo uses the package because the package exists.
+
+## An unrelated defect found while looking
+
+`apps/demo/src/app/boilerplate-metrics.spec.ts` markets a framework comparison —
+"SignalTree + ng-forms, 8 lines of code, complexity 2, maintainability 9" —
+around this snippet:
+
+```ts
+import { withForms } from '@signaltree/ng-forms';
+signalTree({ … }, { enhancers: [withForms()] });
+```
+
+**`withForms` has never existed.** It is inside a template literal, so nothing
+compiles it and no gate reads it. A metric that argues for the package is built
+on an API the package does not have. Same family as the fictional
+`FormControl.connect()` already on record.
+
+## Result
+
+Every falsification attempt failed, and two of them produced evidence *against*
+the package:
+
+| test | outcome |
+| --- | --- |
+| Does anything need SignalTree semantics? | only `createFormTree`, and it is the rejected two-model sync |
+| Is a template seam missing? | no — the directive takes a plain signal |
+| Is there production demand? | none; the one consumer is gate-mandated |
+| Does the SignalTree-coupled entry point have a future? | it is deprecated with no chosen replacement |
+
+**Recommended disposition: DELETE `@signaltree/ng-forms` before 15.0.** Not
+tidy it — remove it. `createWizardForm` and `withFormHistory` lose their subject
+when `createFormTree` goes; the validators and the directive are Angular
+utilities that do not need a SignalTree package, and can be re-homed or dropped
+on their own merits.
+
+This is a recommendation, not an action. The package is published today and
+deleting it is a public-surface decision. What the audit establishes is that the
+burden of proof was on the package and it has not been met.
+
+**If it is kept**, the minimum is: un-deprecate `createFormTree` with a stated
+architecture, delete the fictional `withForms` metric, and record why two-model
+synchronization is right here when it was wrong for Signal Forms.
 
 ---
 
@@ -478,11 +637,19 @@ is not new code.
 zero times in the core barrel and zero times in the shipped `.d.ts`, and its
 disposition reads "LC / mechanically retained after form deletion".
 
-That disposition is now falsified by evidence. `trackHistory` was not
+The *wording* of that disposition is falsified. `trackHistory` was not
 mechanically retained — it survived FORM-DEL **because it was already the
 compositional shape**, taking a plain `WritableSignal` and never touching the
-marker. It is the undo/redo half of the arrangement the project chose, and
-withholding it ships two-thirds of a story.
+marker.
+
+**But that invalidates the old negative; it does not establish a new positive.**
+It proves `trackHistory` is a coherent generic primitive. It does not prove
+SignalTree should publicly own generic `WritableSignal` history. That needs its
+own small audit: does `timeTravel()` already cover it? Is signal-history
+generally useful standalone? Does Angular Signal Forms actually need SignalTree
+to supply it? Is its contract consistent with v15 history semantics?
+
+The action is **re-audit, not re-export**.
 
 ## Disposition
 
