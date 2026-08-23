@@ -949,6 +949,41 @@ const GATES = [
     },
   },
   {
+    name: 'publish-manifests',
+    covers:
+      'the BUILT manifests are installable off this machine — no workspace/file/link protocols, internal ranges admit the versions shipping beside them',
+    // Found by the 15.0 release rehearsal, not by any existing check. Every
+    // internal dependency was `"@signaltree/core": "workspace:*"`, and whether
+    // that reached the registry depended on which command was run:
+    // `npm pack` from dist ships it SILENTLY, `pnpm pack` from dist refuses,
+    // and `nx release version` rewrites only `version`. A manifest defect fails
+    // no build, no test and no import in this repository — it fails once, for
+    // every consumer, after publish.
+    cmd: ['node', 'tools/check-publish-manifests.mjs'],
+    needsBuild: true,
+    provenBy: 'publish-manifests:self',
+  },
+  {
+    name: 'publish-manifests:self',
+    covers:
+      'the manifest checker rejects `workspace:*` and a range that admits nothing, and its comparator handles prereleases',
+    // Registered BLIND on the first attempt, by blinding BAD_PROTOCOLS while
+    // the repository was already clean: with nothing left to catch, the
+    // mutation passed. A checker on a clean tree can only prove itself against
+    // FIXTURES of the defects it exists to stop.
+    cmd: ['node', 'tools/check-publish-manifests.mjs', '--self-test'],
+    // Blind the SHARED inspection, which is the code the real run and the
+    // fixtures both execute. Two earlier attempts registered blind: blinding
+    // `failures.length > 0` changed nothing on a clean tree, and blinding
+    // `BAD_PROTOCOLS` alone was still caught by the unparsable-range path — the
+    // checker was not actually blind, so the self-test was right to pass.
+    mutation: {
+      file: 'tools/check-publish-manifests.mjs',
+      find: '  return found;\n}',
+      replace: '  return [];\n}',
+    },
+  },
+  {
     name: 'publish-artifacts',
     covers: 'every declared `files` entry of every package resolves in dist',
     cmd: ['node', 'scripts/prepare-publish-artifacts.mjs'],

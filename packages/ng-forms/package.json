@@ -1,6 +1,6 @@
 {
   "name": "@signaltree/ng-forms",
-  "version": "14.1.1",
+  "version": "15.0.0-rc.1",
   "description": "Angular forms as reactive JSON. Seamless SignalTree integration with FormTree creation, validators, and form state tracking.",
   "license": "Apache-2.0",
   "type": "module",
@@ -18,7 +18,7 @@
   "peerDependencies": {
     "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
     "@angular/forms": "^20.0.0 || ^21.0.0 || ^22.0.0",
-    "@signaltree/core": "workspace:*",
+    "@signaltree/core": "^15.0.0-rc.1",
     "rxjs": "^7.0.0"
   },
   "devDependencies": {
