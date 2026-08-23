@@ -2470,14 +2470,40 @@ export function timeTravel(
           return `${effect.kind}\u0000${effect.path}\u0000${
             effect.position
           }\u0000${effect.subject ?? ''}`;
+        // RESTORE-P0: structural effects key by SUBJECT, deliberately WITHOUT
+        // `kind`. Including the kind gave `add(a)` and `remove(a)` different
+        // slots, so one turn kept two contradictory inverses. Keying by subject
+        // makes them collide so `enqueueEffect` can compose the turn's NET
+        // effect — and makes that an O(1) map hit rather than a scan.
         case 'remove':
-          return `${effect.kind}\u0000${effect.ownerPath}\u0000${effect.position}\u0000${effect.subject}`;
         case 'add':
-          return `${effect.kind}\u0000${effect.ownerPath}\u0000${effect.position}\u0000${effect.subject}`;
         case 'rekey':
-          return `${effect.kind}\u0000${effect.ownerPath}\u0000${effect.position}\u0000${effect.subject}`;
+          return `structural\u0000${effect.ownerPath}\u0000${effect.position}\u0000${effect.subject}`;
       }
     };
+    /**
+     * RESTORE-P0 A/B — compose STRUCTURAL effects on the same subject.
+     *
+     * `effectKey` includes `kind`, so `add(a)` and `remove(a)` in one turn used
+     * to land under different keys and both survived into the turn. Reversal is
+     * per-effect (`toReversalEffect`), so the turn then carried two
+     * contradictory inverses — re-add and re-remove — and applying both left the
+     * collection in a state that was never the pre-turn state.
+     *
+     * Both pinned defects are this one bug:
+     *
+     *   setAll([a,b]) + removeOne('a')      undo -> ['a']   should be []
+     *   changeId('a','a2') + removeOne('a2') rollback -> ['a2']  should be ['a']
+     *
+     * The fix is to record the turn's NET effect per subject, because that is
+     * what a turn means: reversal restores the state before the whole turn, not
+     * before each write inside it.
+     *
+     * Deliberately NOT composed: `remove` then `add` of the same subject. Its
+     * net is a key/value change for a subject that existed before and after,
+     * which no single effect kind expresses, and there is no evidence it is
+     * broken today. It keeps its existing two-entry behaviour.
+     */
     const enqueueEffect = (
       effectMap: PendingEffectMap,
       effect: TurnEffect
@@ -2495,6 +2521,40 @@ export function timeTravel(
             effectMap.delete(key);
           }
           return;
+        }
+
+        if (existing.kind !== 'set' && effect.kind !== 'set') {
+          // Created and destroyed inside one turn: the subject did not exist
+          // before the turn and does not exist after it, so the turn has NO
+          // structural effect on it. P0-A.
+          if (existing.kind === 'add' && effect.kind === 'remove') {
+            effectMap.delete(key);
+            return;
+          }
+
+          // Renamed then removed: the pre-turn state had the row under its
+          // ORIGINAL key, so that is the key reversal must restore. P0-B.
+          if (existing.kind === 'rekey' && effect.kind === 'remove') {
+            effectMap.set(key, { ...effect, key: existing.beforeKey });
+            return;
+          }
+
+          // Created then renamed: one creation, under the final key.
+          if (existing.kind === 'add' && effect.kind === 'rekey') {
+            existing.key = effect.afterKey;
+            return;
+          }
+
+          // Renamed twice: one rename, original to final. A round trip is no
+          // rename at all.
+          if (existing.kind === 'rekey' && effect.kind === 'rekey') {
+            if (existing.beforeKey === effect.afterKey) {
+              effectMap.delete(key);
+              return;
+            }
+            existing.afterKey = effect.afterKey;
+            return;
+          }
         }
         return;
       }

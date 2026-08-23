@@ -5,12 +5,16 @@ import { signalTree } from '../../lib/signal-tree';
 import { transactions } from './transactions';
 
 /**
- * ⚠️ PINS A DEFECT. Everything asserted below is WRONG BEHAVIOUR, recorded so
- * it is visible and so fixing it is a deliberate change to this file rather
- * than a surprise. Same treatment `clear-not-undoable.spec.ts` had until the
- * repair landed.
+ * ✅ REPAIRED by RESTORE-P0 (P0-B). This file pinned a defect; it now guards the
+ * fix.
  *
- * ## The defect
+ * Root cause shared with P0-A: `effectKey` included `kind`, so a `rekey` and a
+ * `remove` of the SAME subject in one turn occupied different slots and both
+ * inverses were applied. Structural effects are now keyed by SUBJECT and the
+ * turn records their NET effect — for rekey-then-remove, a remove carrying the
+ * ORIGINAL key.
+ *
+ * ## The defect, as it was
  *
  * Rolling back a pending transaction correctly reverses a `changeId` on its
  * own, a `removeOne` on its own, and a `changeId` followed by an `updateOne`.
@@ -118,7 +122,7 @@ describe('transaction rollback after a rekey', () => {
     expect(store.$.rows.byId('a')?.()?.name).toBe('Alpha');
   });
 
-  it('DEFECT: rekey then remove leaves the row under the NEW key', async () => {
+  it('REPAIRED (P0-B): rekey then remove rolls back to the ORIGINAL key', async () => {
     const store = makeStore();
     store.$.rows.addOne({ id: 'a', name: 'Alpha' });
     await tick();
@@ -132,9 +136,10 @@ describe('transaction rollback after a rekey', () => {
 
     pending.rollback();
 
-    // CORRECT WOULD BE `['a']`. The removal is reversed; the rekey is not.
-    expect(store.$.rows.ids()).toEqual(['a2']);
-    expect(store.$.rows.byId('a')).toBeUndefined();
+    // Previously `['a2']` — the removal was reversed and the rekey was not, so
+    // the row came back under the name it had been renamed TO.
+    expect(store.$.rows.ids()).toEqual(['a']);
+    expect(store.$.rows.byId('a')?.()?.name).toBe('Alpha');
   });
 
   it('CONTROL: rekey then update rolls back — fixed by d487a4ae', async () => {

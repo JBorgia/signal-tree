@@ -5,12 +5,20 @@ import { signalTree } from '../../lib/signal-tree';
 import { timeTravel } from './time-travel';
 
 /**
- * ⚠️ PINS A DEFECT. The `DEFECT:` case below asserts WRONG BEHAVIOUR, recorded
- * so it is visible and so fixing it is a deliberate change to this file. Same
- * treatment as `rekeyed-rollback-defect.spec.ts`, which is the same family:
- * structural effects composed inside ONE turn are only partially reversed.
+ * ✅ REPAIRED by RESTORE-P0. This file pinned a defect; it now guards the fix.
  *
- * ## The defect
+ * The family was: structural effects composed inside ONE turn were only
+ * partially reversed. Two causes, one layer apart:
+ *
+ *   1. `PathNotifier` coalesced `add(subject)` INTO `remove(subject)` as though
+ *      they were the same event, so the creation never reached the recorder.
+ *   2. `effectKey` included `kind`, so when both DID arrive they occupied
+ *      different slots and the turn carried two contradictory inverses.
+ *
+ * The repair keeps the notifier from discarding either event, keys structural
+ * effects by SUBJECT, and composes the turn's NET effect there.
+ *
+ * ## The defect, as it was
  *
  * When a single un-flushed turn both CREATES rows and REMOVES one of them,
  * undoing that turn restores the removed row instead of reversing the creation.
@@ -105,7 +113,7 @@ describe('reversal of a coalesced turn', () => {
     expect(tree.$.rows.ids()).toEqual(['a', 'b']);
   });
 
-  it('DEFECT: a turn that creates then removes restores the removed row', async () => {
+  it('REPAIRED (P0-A): a turn that creates then removes reverses to empty', async () => {
     const tree = makeTree();
 
     // ONE turn, from an empty collection: it creates a and b, then removes a.
@@ -119,9 +127,10 @@ describe('reversal of a coalesced turn', () => {
     await tick();
     await tick();
 
-    // CORRECT WOULD BE `[]` — the turn created everything here, so reversing it
-    // empties the collection. Instead the removal is reversed and the creation
-    // is not, leaving the row the turn itself introduced.
-    expect(tree.$.rows.ids()).toEqual(['a']);
+    // The turn created everything here, so reversing it empties the
+    // collection. Previously this returned `['a']` — the removal was reversed
+    // and the creation was not, leaving behind the very row the turn
+    // introduced.
+    expect(tree.$.rows.ids()).toEqual([]);
   });
 });

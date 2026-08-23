@@ -637,10 +637,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
     switch (effect.kind) {
       case 'set':
         return `${effect.kind}\u0000${effect.path}\u0000${effect.position}\u0000${effect.subject ?? ''}`;
+      // RESTORE-P0 P0-B: keyed by SUBJECT, deliberately without `kind`, so the
+      // transaction's effects on one subject collide and can be composed into
+      // the NET effect. With `kind` in the key, `rekey('a','a2')` and
+      // `removeOne('a2')` occupied separate slots and rollback applied both
+      // inverses, returning the row under the name it had been renamed TO.
+      // Mirrors the same repair in time-travel.ts.
       case 'remove':
       case 'add':
       case 'rekey':
-        return `${effect.kind}\u0000${effect.ownerPath}\u0000${effect.position}\u0000${effect.subject}`;
+        return `structural\u0000${effect.ownerPath}\u0000${effect.position}\u0000${effect.subject}`;
     }
   };
 
@@ -660,6 +666,40 @@ export function getOrCreateInternalTransactionRuntime<T>(
         );
         if (existing.before === existing.after) {
           effectMap.delete(key);
+        }
+        return;
+      }
+
+      if (existing.kind !== 'set' && effect.kind !== 'set') {
+        // Created and destroyed inside one transaction: no net structural
+        // effect, so rollback must do nothing for this subject.
+        if (existing.kind === 'add' && effect.kind === 'remove') {
+          effectMap.delete(key);
+          return;
+        }
+
+        // Renamed then removed: rollback has to restore the ORIGINAL key. P0-B.
+        if (existing.kind === 'rekey' && effect.kind === 'remove') {
+          const composed = { ...effect, key: existing.beforeKey };
+          rememberBaselineValue(bucket, composed);
+          effectMap.set(key, composed);
+          return;
+        }
+
+        // Created then renamed: one creation, under the final key.
+        if (existing.kind === 'add' && effect.kind === 'rekey') {
+          existing.key = effect.afterKey;
+          return;
+        }
+
+        // Renamed twice: original to final; a round trip is no rename.
+        if (existing.kind === 'rekey' && effect.kind === 'rekey') {
+          if (existing.beforeKey === effect.afterKey) {
+            effectMap.delete(key);
+            return;
+          }
+          existing.afterKey = effect.afterKey;
+          return;
         }
       }
       return;
