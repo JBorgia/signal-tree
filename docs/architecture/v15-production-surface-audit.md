@@ -870,6 +870,81 @@ dashboard, and a route-scoped store.
 
 ---
 
+# A2-0 — PRE-REGISTERED before the experiment ran
+
+The existing words are refused. Not "how should `stored()` and `./storage`
+cooperate" — that question smuggles in the answer. Derive the function first.
+
+> **Null: does SignalTree need to own persistence, or does it only need enough
+> committed-state and lifecycle semantics for a persistence system to compose
+> correctly?**
+
+## Four jobs, each with its own owner question
+
+```text
+1. RESTORE    obtain the persisted value when state is established
+2. PUBLISH    committed application truth becomes durable
+3. DRAIN      the host says "you may stop now; finish outstanding work"
+4. MECHANISM  localStorage / IndexedDB / custom adapter / platform storage
+```
+
+The drain is the falsifier that prevents the glib answer
+`effect(() => localStorage.setItem(...))`. TruckTrax already proved a
+browser-only design is wrong: the Capacitor host knows the app is backgrounding,
+and `pagehide` never fires. Composition must stay **host-drainable**.
+
+## Discriminators
+
+| # | case | question |
+| --- | --- | --- |
+| 1 | hydrate a scalar | can external storage establish initial truth without creating bogus authored history? |
+| 2 | normal write | does persistence observe the settled value, or intermediate physical writes? |
+| 3 | transaction rollback | is the rolled-back intermediate value ever persisted? |
+| 4 | time-travel undo | is restored state meant to become durable, and when? |
+| 5 | debounce + immediate background | can the host force the latest value durable when lifecycle hooks never fire? |
+| 6 | storage write failure | who owns the error; does state stay authoritative? |
+| 7 | destroy with a pending write | drain, cancel, or an explicit host decision? |
+| 8 | SSR / no storage platform | can the tree exist without a storage implementation? |
+| 9 | multiple persisted leaves | does one drain require a tree-wide registry? |
+| 10 | custom adapter | does `./storage` provide anything SignalTree-specific beyond a key/value adapter? |
+
+**Case 3 may be A2's version of A1's discovery.** Persistence should be a
+consequence of *committed* truth. If the mechanism sees private intermediate
+transaction writes, that is a missing semantic seam of the same family as
+causal classification. If it already observes only settled truth, that is
+evidence against needing a marker at all.
+
+**Case 5 may expose a different seam** — host lifecycle reaching a persistence
+coordinator's `flush()`. That does not imply a global
+`flushAllStoredSignals()`; it may only mean the composition object owes its host
+a drain operation.
+
+## `./storage` is audited independently, inside this one
+
+For every export — `createStorageAdapter`, `createIndexedDBAdapter` — ask
+whether it requires SignalTree state semantics, causal semantics, identity or
+lifecycle, or whether it is generic storage plumbing. **Usefulness does not save
+a subpath.** NGF-0 settled that.
+
+## Outcomes, pre-registered
+
+```text
+A2-A  ordinary state + external persistence works, no missing seam
+      -> stored dies, flushAllStoredSignals dies, ./storage likely dies
+
+A2-B  composition works but needs one narrow post-commit / lifecycle seam
+      -> expose only that earned primitive; the old ontology still dies
+
+A2-C  persistence genuinely requires SignalTree-owned coordination across
+      committed truth and lifecycle
+      -> redesign a first-party capability, then decide where ./storage belongs
+```
+
+B is the recurring pattern from forms, TH-0, A3 and A1. That is a reason to test
+it hard, not a reason to expect it.
+
+---
+
 # A2 — persistence / stored state
 
 ## Business jobs
