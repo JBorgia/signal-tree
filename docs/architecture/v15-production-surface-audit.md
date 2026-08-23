@@ -1441,6 +1441,98 @@ scoped, capacity-bounded, UI-wired undo is a semantics choice, not a cost
 workaround. Even a free whole-tree history would not make it correct for the
 undo button to revert a map pan.
 
+# HIST-C2 — deriving the door
+
+Accepted going in, from the disposition: eligibility attaches to the **causal
+turn**; a scope or call site is only how the application designates that turn.
+The door must generalise the existing admission predicate, not add a second
+mechanism.
+
+## Finding 1 — HIST-B is not merely refuted, it is SHIPPED
+
+Found while reading the capture path for the prototype:
+`captureIntoBucket()` opens with `isHistoryExcludedCapture(ownerPath, path)`,
+which reads a `HISTORY_EXCLUDED` symbol stamped on collection nodes by
+**`entityMap({ recordHistory: false })`** (RFC 0012). That is a public,
+location-scoped history exclusion in the product today — HIST-B in miniature.
+
+Case 4 predicts what location scoping does to an atomic causal turn. Measured, in
+`histc2-record-history-collision.spec.ts`, with both controls green so the
+mechanism is provably exercised:
+
+```text
+control  excluded collection alone      -> no history entry        (works)
+control  ordinary leaf alone            -> one history entry       (works)
+
+THE COLLISION — one tick, therefore ONE causal turn:
+    document.title.set('edited')
+    cache.updateOne('a', { name: 'changed' })
+  -> ONE history entry
+  undo
+  -> document.title  'v1'        reversed
+  -> cache.a.name    'changed'   NOT reversed
+```
+
+**An atomically authored operation is partially reversed.** Exactly the failure
+case 4 predicted for HIST-B, present in shipped API rather than in a hypothetical
+design. And the mixed shape is the ordinary one in application code — write a
+document field and refresh a cache in the same handler.
+
+### This is an argument FOR C2, not a new defect to guard
+
+Under an opt-in default nothing is recorded unless an operation is designated, so
+`recordHistory: false` has nothing left to subtract from: the option **dissolves**
+rather than needing a compatibility guard. The flip removes a shipped defect
+instead of adding machinery to contain it.
+
+```text
+RECONCILIATION      recordHistory:false is subsumed by opt-in eligibility and
+                    should be deleted with the flip, not carried forward
+```
+
+That also sharpens the requirement on the prototype: the eligibility bit must not
+merely be *sufficient* to express designation — it must be sufficient to
+**subsume** the one location-scoped exclusion already in the product.
+
+## The contract being tested
+
+```text
+RESTORATION ELIGIBILITY
+
+1. Default authored turns are non-reversible.
+2. An explicit reversible designation promotes the authored causal turn to
+   restoration-eligible.
+3. Eligibility is turn-wide and therefore atomic.
+4. Realization can never be promoted into restoration history.
+5. Restoration can never become new restoration history.
+6. An eligible confirmed turn enters the one existing history inventory and
+   acquires restoration claims.
+7. A non-eligible turn acquires neither.
+8. Eligibility does not imply diagnostic visibility; DIAG-JOURNAL owns that.
+```
+
+## Prototype constraint: the default is NOT flipped yet
+
+The flip is a behaviour change under 1754 existing tests that all assume
+default-on, so flipping it first would destroy the ability to characterise
+anything. The prototype therefore carries an explicit mode —
+`all` (today's semantics) versus `designated` (HIST-C2) — existing suites run
+unchanged in `all`, and the new cases run in `designated`. **The default flip is
+a separate, deliberate change made after the door semantics are proven**, not a
+side effect of this derivation.
+
+## Where the designation may NOT live
+
+```text
+NOT on state location     HIST-B; case 4 refuted it and Finding 1 shows the
+                          shipped instance producing partial reversal
+NOT per leaf write        eligibility would be write-scoped while the engine's
+                          atomic unit is the turn, so two writes in one turn
+                          could disagree about their shared operation
+```
+
+Which leaves designation of the operation itself.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
