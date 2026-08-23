@@ -1090,15 +1090,14 @@ export function createEntitySignal<
     entitySignals.get(subjectId)?.set(undefined);
   }
 
-  /**
-   * Full reset (clear/setAll): notify all current observers their entity is
-   * gone, then drop every materialized signal so memory returns to baseline.
-   * setAll re-materializes lazily on the next byId() of each surviving entity.
-   */
-  function resetEntitySignals(): void {
-    entitySignals.forEach((s) => s.set(undefined));
-    entitySignals.clear();
-  }
+  // TOMBSTONE: `resetEntitySignals()` — a bulk `forEach(set(undefined))` +
+  // `clear()` of the signal map, once called by `clear()`. It is gone because
+  // dropping the MAP ENTRY is what made `clear()` un-undoable: a held reference
+  // reads through the signal it was given, and a restore into a fresh signal is
+  // a different subject wearing the same key. `clear()` now tombstones
+  // per-subject exactly as `removeOne` does. Do not reintroduce a bulk reset as
+  // a memory optimization — reclamation at the retirement boundary already
+  // sheds zero-owner entries, and it sheds only the ones nothing can restore.
 
   /**
    * Cache for entity nodes (deep access proxies), held WEAKLY.
@@ -2567,13 +2566,27 @@ export function createEntitySignal<
     // ==================
 
     clear(): void {
+      // AUTHORS THE SAME STRUCTURAL REMOVALS `removeMany` DOES, and that is the
+      // whole fix. Until 15.0 this tombstoned subjects and told the notifier
+      // nothing, so the turn timeTravel recorded carried no structural effect:
+      // `canUndo()` reported true, the first undo silently restored nothing, and
+      // the next threw "Unsupported scoped undo effect at structural-drift".
+      // Removing the same rows one at a time and undoing worked correctly, which
+      // is what made it a defect rather than a limitation — see
+      // `clear-not-undoable.spec.ts`.
+      //
+      // The entity VALUES and the neighbour subjects have to be captured BEFORE
+      // anything is tombstoned: a `remove` effect carries the value it removed
+      // and where it sat, and after the tombstone neither is reachable.
       const activeIds = structuralStore.activeKeysSnapshot();
       const activeSubjects = activeIds.map((id) => {
         const subjectId = resolveSubjectId(id);
         if (subjectId === undefined) {
           throw new Error(`Entity with id ${String(id)} has no subject id`);
         }
-        return { id, subjectId };
+        const entity = getProjectedEntity(id);
+        const { beforeSubject, afterSubject } = getNeighborSubjects(id);
+        return { id, subjectId, entity, beforeSubject, afterSubject };
       });
 
       for (const { id, subjectId } of activeSubjects) {
@@ -2585,13 +2598,54 @@ export function createEntitySignal<
         );
         publishSubjectPhysicalChange(subjectId);
       }
+
+      // Per-subject, exactly as `removeOne` does — never a bulk reset (see the
+      // tombstone above). A held reference has to keep reading through the SAME
+      // signal so an undo re-publishes into it, which is the property
+      // `check-signal-identity-durability.mjs` pins for `removeOne`. Zero-owner
+      // trees still shed the entries, one line below.
+      for (const { subjectId } of activeSubjects) {
+        tombstoneSubjectSignal(subjectId);
+      }
       reclaimRetiredSubjectsWithoutOwner(
         activeSubjects.map(({ subjectId }) => subjectId)
       );
       activeIdSignal.set(undefined);
       lastSubjectIds = activeSubjects.map(({ subjectId }) => subjectId);
-      resetEntitySignals();
       updateSignals();
+
+      for (const {
+        id,
+        subjectId,
+        entity,
+        beforeSubject,
+        afterSubject,
+      } of activeSubjects) {
+        if (!entity) continue;
+        pathNotifier.notify(
+          `${basePath}.${String(id)}`,
+          undefined,
+          entity,
+          basePath,
+          [subjectId],
+          getPositionIdsForNotify(),
+          createStructuralHistoryMeta({
+            kind: 'remove',
+            subject: subjectId,
+            key: id,
+            value: deepClone(entity),
+            beforeSubject,
+            afterSubject,
+          })
+        );
+      }
+
+      for (const { id, entity } of activeSubjects) {
+        if (!entity) continue;
+        for (const handler of tapHandlers) {
+          handler.onRemove?.(id, entity);
+        }
+      }
     },
 
     setAll(entities: E[], opts?: AddOptions<E, K>): void {
