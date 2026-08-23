@@ -52,15 +52,23 @@ const subjectOf = (rows: unknown, id: string): number | undefined =>
     }
   ).__acquireEntityHandleForTesting?.(id)?.subjectId;
 
-const makeTree = (enhancers: unknown[] = []) =>
-  signalTree(
-    { users: entityMap<User, string>({ selectId: (u) => u.id }) },
-    { enhancers: enhancers as never }
-  );
+const usersState = () => ({
+  users: entityMap<User, string>({ selectId: (u) => u.id }),
+});
+
+// Three concrete builders rather than one `enhancers: unknown[]` helper. The
+// generic version needed `as never`, which erased the enhancers' type additions
+// and cost `getHistory()` and `transaction()` — `spec-types` caught it. A cast
+// that hides the very API under test makes the assertions vacuous.
+const makePlainTree = () => signalTree(usersState());
+const makeTimeTravelTree = () =>
+  signalTree(usersState(), { enhancers: [timeTravel({ maxHistorySize: 20 })] });
+const makeTransactionTree = () =>
+  signalTree(usersState(), { enhancers: [transactions()] });
 
 describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   it('cases 1-2: initial load, then refresh with the same keys preserves subject identity', async () => {
-    const tree = makeTree();
+    const tree = makePlainTree();
     applyServerTruth(tree.$.users, [
       { id: 'a', name: 'Ada', v: 1 },
       { id: 'b', name: 'Boo', v: 1 },
@@ -85,7 +93,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('case 3: a refresh that drops and adds retires one and starts another', async () => {
-    const tree = makeTree();
+    const tree = makePlainTree();
     applyServerTruth(tree.$.users, [
       { id: 'a', name: 'Ada', v: 1 },
       { id: 'b', name: 'Boo', v: 1 },
@@ -106,7 +114,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('case 4: a key that comes back gets a NEW lifetime, never a resurrection', async () => {
-    const tree = makeTree();
+    const tree = makePlainTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
     const original = subjectOf(tree.$.users, 'a');
@@ -125,7 +133,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('case 7: a refresh with identical values does not churn identity', async () => {
-    const tree = makeTree();
+    const tree = makePlainTree();
     const rows = [
       { id: 'a', name: 'Ada', v: 1 },
       { id: 'b', name: 'Boo', v: 1 },
@@ -143,7 +151,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('CASE 8 — an untagged refresh BECOMES an undoable user turn', async () => {
-    const tree = makeTree([timeTravel({ maxHistorySize: 20 })]);
+    const tree = makeTimeTravelTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
     const before = tree.getHistory().length;
@@ -162,7 +170,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('CASE 8b — classifying it as a realization fixes that, and the seam already exists', async () => {
-    const tree = makeTree([timeTravel({ maxHistorySize: 20 })]);
+    const tree = makeTimeTravelTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
     const before = tree.getHistory().length;
@@ -180,7 +188,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('CASE 9 — an untagged refresh mid-transaction makes rollback IMPOSSIBLE', async () => {
-    const tree = makeTree([transactions()]);
+    const tree = makeTransactionTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
 
@@ -200,7 +208,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('CASE 9b — classified as a realization, rollback completes to the baseline', async () => {
-    const tree = makeTree([transactions()]);
+    const tree = makeTransactionTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
 
@@ -224,7 +232,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('case 10: destroying the tree does not require the acquirer to know', async () => {
-    const tree = makeTree([timeTravel({ maxHistorySize: 5 })]);
+    const tree = makeTimeTravelTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
 
