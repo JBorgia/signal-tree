@@ -662,7 +662,6 @@ export interface TreeConfig {
    * const strict = signalTree(state, { security: security(SecurityPresets.strict().getConfig()) });
    * ```
    */
-  security?: SecurityFeature;
 
 }
 
@@ -696,16 +695,6 @@ export interface TreeConfig {
  * that it used to be here.
  */
 
-/**
- * Construction-time security feature carried on {@link TreeConfig.security}.
- * Built by `security()` from `@signaltree/core/security`. Defined here (not in
- * the security subpath) so core can type the config without importing the
- * validator, keeping it tree-shakeable.
- */
-export interface SecurityFeature {
-  readonly __signalTreeSecurity: true;
-  validate(state: unknown): void;
-}
 
 /**
  * Branded loading feature produced by the `loader()` helper and passed as the

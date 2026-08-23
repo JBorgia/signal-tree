@@ -53,8 +53,6 @@ const DEV_MESSAGES = {
   ENHANCER_NOT_FUNCTION: 'enhancer not function [ST1028]',
   EFFECT_NO_CONTEXT: 'no angular context [ST1029]',
   SUBSCRIBE_NO_CONTEXT: 'no angular context [ST1030]',
-  SECURITY_INVALID:
-    'invalid security config — pass security(config) from @signaltree/core/security, not a raw config object [ST1031]',
   // ST1032 (LAZY_NOT_INJECTED) and ST1004 (LAZY_FALLBACK) were removed in 15.0
   // with the lazy feature. ST1032 in particular told users to import from
   // `@signaltree/core/lazy`, a subpath withdrawn from the published surface —

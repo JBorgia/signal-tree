@@ -977,14 +977,11 @@ export function serialization(
 
 // v12: removed the deprecated `withSerialization` alias — use `serialization()`.
 
-// Storage adapters live in ./storage-adapters (so '@signaltree/core/storage'
-// doesn't enter through this enhancer module); re-exported here to keep this
-// module's public surface unchanged.
-export {
-  createStorageAdapter,
-  createIndexedDBAdapter,
-  type StorageAdapter,
-} from './storage-adapters';
+// The StorageAdapter CONTRACT is re-exported; the generic factories went with
+// STORAGE-DEL and the './storage' subpath (PER-0). `PersistenceConfig.storage`
+// references this type, so it must be reachable from the root barrel — which is
+// where it now lives, rather than behind a subpath.
+export { type StorageAdapter } from './storage-adapters';
 
 /**
  * Persistence configuration

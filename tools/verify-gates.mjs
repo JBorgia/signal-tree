@@ -266,12 +266,29 @@ const GATES = [
     covers: 'raw bundle-size ceiling and the public value-export count budget',
     cmd: ['node', 'scripts/v9-budget-checks.js'],
     needsBuild: true,
+    // INCOMPRESSIBLE padding, and that is the whole point.
+    //
+    // This appended 40,000 'x' and said "raw bytes, not gzip — this budget
+    // measures unminified size". The budget is GZIP of an esbuild bundle of
+    // this file, and a run of one repeated character gzips to about fifty
+    // bytes — so the mutation moved the measured number by nothing and the gate
+    // registered BLIND.
+    //
+    // The padding below is a deterministic xorshift expansion over a printable
+    // alphabet, which does not compress. Mutating the SOURCE instead does not
+    // work either: `needsBuild` gates build BEFORE the mutation is applied, so
+    // a source edit never reaches dist.
     mutation: {
       file: 'dist/packages/core/dist/index.js',
       generate: (original) => {
-        // Raw bytes, not gzip — this budget measures unminified size, so the
-        // padding does not need to be incompressible.
-        const pad = 'x'.repeat(40_000);
+        let seed = 0x2545f491;
+        let pad = '';
+        for (let i = 0; i < 60_000; i++) {
+          seed ^= seed << 13;
+          seed ^= seed >>> 17;
+          seed ^= seed << 5;
+          pad += String.fromCharCode(33 + (Math.abs(seed) % 90));
+        }
         return `${original}\nglobalThis.__gateSizePad = ${JSON.stringify(
           pad
         )};\n`;
@@ -879,9 +896,14 @@ const GATES = [
     // Was short by two when written: ST1031 and ST1032 were emittable and
     // documented nowhere. The earlier sweep missed them because it compared
     // COUNTS on the ST2xxx series (27 vs 27) instead of comparing the sets.
+    // Mutate a LIVE code, not a retired one. This pointed at ST1031, which
+    // SEC-DEL then marked "Retired in 15.0" — and the checker exempts retired
+    // rows, so renaming one exempt row to another exempt row changed nothing
+    // and the gate registered BLIND. A mutation is only a proof while its
+    // target is still something the checker can object to.
     mutation: {
       file: 'docs/errors/README.md',
-      find: '| ST1031 |',
+      find: '| ST1001 |',
       replace: '| ST9999 |',
     },
   },

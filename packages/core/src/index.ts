@@ -186,13 +186,6 @@ export {
 // Import from there to reduce main bundle size.
 
 // ============================================
-// SECURITY (subpath: @signaltree/core/security)
-// ============================================
-
-// Moved to '@signaltree/core/security' in v9.
-// Import from there to reduce main bundle size.
-
-// ============================================
 // MEMORY MANAGEMENT EXPORTS
 // ============================================
 // ENHANCER EXPORTS
@@ -233,6 +226,7 @@ export { timeTravel } from './enhancers/time-travel/time-travel';
 export { transactions } from './enhancers/transactions/transactions';
 
 export { persistence } from './enhancers/serialization/serialization';
+export type { StorageAdapter } from './enhancers/serialization/storage-adapters';
 export type {
   PersistenceConfig,
   PersistenceMethods,

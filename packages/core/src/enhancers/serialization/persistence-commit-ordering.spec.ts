@@ -1,9 +1,22 @@
 import { describe, expect, it } from 'vitest';
+import type { StorageAdapter } from './storage-adapters';
 
 import { persistence } from './serialization';
 import { signalTree } from '../../lib/signal-tree';
 import { transactions } from '../transactions/transactions';
-import { createStorageAdapter } from './storage-adapters';
+
+/**
+ * Local stand-in for the deleted `createStorageAdapter()` factory, which was
+ * `(getItem, setItem, removeItem) => ({ getItem, setItem, removeItem })` and
+ * nothing more. STORAGE-DEL removed it from the public surface (PER-0: no
+ * consumer outside these specs, no SignalTree semantics); the three-line
+ * convenience lives here now, where it is used.
+ */
+const createStorageAdapter = (
+  getItem: StorageAdapter['getItem'],
+  setItem: StorageAdapter['setItem'],
+  removeItem: StorageAdapter['removeItem']
+): StorageAdapter => ({ getItem, setItem, removeItem });
 
 /**
  * `persistence()` autoSave vs. the commit boundary.
