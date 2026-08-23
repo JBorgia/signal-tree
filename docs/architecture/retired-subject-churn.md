@@ -515,23 +515,30 @@ Measured observationally — traverse every legal position (undo to the oldest
 retained entry, redo forward to the newest) and record which subject ids are LIVE
 at each step. That never reads `restorationSubjectIds`.
 
+The first run had to omit `clear()`, because `clear()` was not undoable and the
+traversal could not get past one — see "A defect the oracle found on its way"
+below. It reported excess 1/57 (2%) over a 12-operation script. The table here is
+the re-run after `d9451b42` repaired `clear()`, on the full 13-operation script:
+
 ```text
   maxHistory   entries   physical   named   required   excess   unnamed   ok
            4         4         16      10         10        0         0   yes
-           6         6         16      15         14        1         0   yes
+           6         6         16      14         14        0         0   yes
           10        10         16      16         16        0         0   yes
-          24        13         16      16         16        0         0   yes
+          24        14         16      16         16        0         0   yes
 ```
 
 **Outcome C is refuted at every size: `unnamed` is 0.** Nothing a legal traversal
-required was missing from `restorationSubjectIds`. Excess is 1 subject in 57 (2%) —
-mostly EXACT, conservative by one at H=6.
+required was missing from `restorationSubjectIds`. And with `clear()`
+participating the excess is **0/56 — EXACT at every history size**, outcome A
+rather than B. Adding an operation improved the figure rather than degrading it,
+which is what makes the earlier 2% readable as an artifact of the broken entry
+rather than as headroom the mechanism needs.
 
-**And the property Step 8 actually needs holds: the named set scales with the
-WINDOW, not with total churn** — 4→10, 6→15, 10→16, 24→16 against 16 ever
+**The property Step 8 actually needs holds: the named set scales with the
+WINDOW, not with total churn** — 4→10, 6→14, 10→16, 24→16 against 16 ever
 retired. Claims keyed on `restorationSubjectIds` therefore bound retention at
-`O(live + window)`, which is the RC requirement. Narrowing the residual 2% is a
-later optimization.
+`O(live + window)`, which is the RC requirement.
 
 ### The honest limit on the oracle's independence
 
@@ -546,8 +553,40 @@ traversal's end state is compared against an independent replay of the same
 script, at every history size, and matches. A required-but-unnamed subject would
 land the traversal somewhere else.
 
-Because the metadata is load-bearing rather than incidental, it should be named
-for what it is when the registry lands.
+Because the metadata is load-bearing rather than incidental, it was named for
+what it is before the registry landed: `__subjectIds` → `restorationSubjectIds`
+in `384ebedf`, entry-level only. The node-level property of the same old name —
+"the subjects that own this value" — is a different concept and keeps its name.
+
+### FROZEN — the claim contract
+
+Settled by the table above; the registry is built against this and not against
+whatever the current capture happens to emit.
+
+> **A restoration claim names the subjects whose backing must conservatively
+> remain available while the record holding it is retained.**
+
+- **Sufficiency is required.** Every retired subject some legal traversal of the
+  record could make live again must be named. A false negative frees backing a
+  later undo or redo needs, and that is a correctness defect, not a performance
+  one.
+- **Minimality is not required.** Naming more than necessary is permitted. It
+  costs retention, bounded by the window, and can be narrowed later without
+  changing anything that depends on the contract.
+- **The bound is what the contract buys**, and it comes from the window rather
+  than from exactness: total claimed ⊆ `O(live + window)` regardless of how much
+  has ever been retired.
+- **Measured EXACT today, specified as a superset.** Anything built on
+  "`restorationSubjectIds` is precisely the required set" would be relying on a
+  measurement rather than on the contract, and would break the first time
+  capture legitimately over-names.
+- **Derivation is not the contract.** "Touched by this write", "named in the
+  snapshot" and "part of that turn" are candidate derivations. The snapshot walk
+  is specifically excluded: it names the whole collection, so every retained
+  record would claim everything and reproduce today's unbounded retention inside
+  a tidier data structure.
+- **Not asserted for positions.** The oracle measured subject claims only.
+  `__positionIds` may well satisfy the same contract; no evidence here says so.
 
 ### A defect the oracle found on its way
 
@@ -555,9 +594,15 @@ Its first run could not traverse at all: `clear()` is not undoable. The first
 undo after a `clear()` silently restores nothing while `canUndo()` reports true,
 and the next one throws `Unsupported scoped undo effect at structural-drift`.
 Removing the same rows one at a time and undoing works correctly, so it is
-specific to `clear()`. Pre-existing — reproduced at `0a23a551` — and pinned in
-`clear-not-undoable.spec.ts`.
+specific to `clear()`. Pre-existing — reproduced at `0a23a551` — and pinned at
+the time in `clear-not-undoable.spec.ts`.
 
-**It should be fixed before the claim registry**, not after: a history entry
-whose undo semantics are broken cannot have a trustworthy claim set derived from
-it, and the oracle has to omit `clear()` from its script until it is.
+**RESOLVED in `d9451b42`, before the claim registry** rather than after: a
+history entry whose undo semantics are broken cannot have a trustworthy claim set
+derived from it. The cause was that `clear()` authored a whole-collection value
+change and emptied the entity-signal map, where `removeOne` authors a structural
+`remove` per subject. It now authors the same per-subject removals, so the
+reversal planner reverses N ordinary removals and nothing in time-travel needed
+to know a clear had happened. `clear-undoable.spec.ts` replaces the old pin, and
+`clear()` is back in the oracle script — which is where the 0/56 above comes
+from.
