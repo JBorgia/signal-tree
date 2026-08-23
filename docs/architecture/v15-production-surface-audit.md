@@ -26,6 +26,65 @@ This is why `trackHistory` was deleted, and it is a much stronger reason than
 "nobody used it". Test it by making the two systems coexist and asking what the
 second one records when the first one undoes.
 
+## THE CONVERGENCE — one causal boundary, two directions
+
+A1 and A2 found the same thing from opposite sides. Recorded here because it is
+the strongest structural result of the audit so far.
+
+```text
+                     EXTERNAL SYSTEMS
+              HTTP · resource · storage · adapters
+                       │              ▲
+              incoming truth     outgoing effect
+                       ▼              │
+            ┌──────────────────────────────┐
+            │   SIGNALTREE CAUSAL SEAM     │
+            │  ingress: classify as        │
+            │          realization         │
+            │  egress:  act only on        │
+            │          settled truth       │
+            └──────────────┬───────────────┘
+                           ▼
+                canonical SignalTree state
+              identity · transactions · history
+```
+
+**A1 / ingress** — "this incoming value is externally acquired truth, not an
+authored user action." Without it, a background refresh becomes an undoable turn
+and can make a pending transaction unresolvable.
+
+**A2 / egress** — "run this external consequence only once the state is settled
+committed truth." Without it, a composed persistence writes speculative
+transaction values.
+
+Both already exist internally. Neither is reachable. That is more fundamental
+than `loader()` or `stored()` ever were.
+
+### ⚠️ One authority does NOT mean one public API
+
+The temptation is `withCausalContext({...})` because both are implemented with
+causal metadata. That exposes mechanism, and it is the same mistake as exposing
+`withWriteContext` wholesale. The public doors should encode the narrow intents
+that earned access — *apply external truth*, *act after committed truth* —
+possibly as two APIs over one constrained protocol.
+
+**One causal boundary, possibly multiple intention-specific doors.** Not "one
+public primitive" — that is a design step nobody has earned yet.
+
+### And A2 supplies a counterexample to an older MUT result
+
+Earlier MUT work could not prove SignalTree needed a public committed-observation
+facility, and that was right at the time. A2 is the first production-backed
+counterexample: a composed persistence must act on settled truth and cannot
+determine that boundary through the public API.
+
+That does NOT revive `PathNotifier`, `interceptLeafSignals`, or a general
+`observeCommittedWrites()`. Handing outsiders a mutation stream is a much larger
+claim than *schedule this consequence when the relevant truth is settled* — and
+PER-0 must keep alive the possibility that `persistence()` owns the integration
+internally and gains scoped selection, in which case **no public egress door is
+needed at all**.
+
 ## A deletion rule the TH-DEL cascade produced
 
 > **When a rejected public abstraction has private infrastructure whose only
@@ -36,6 +95,19 @@ second one records when the first one undoes.
 so `trackHistory` could share the causal machinery, with no other consumer. Kept
 "in case", it would have been dead architecture below the waterline — the part
 no public-surface audit looks at.
+
+## An experiment-methodology rule, after three false signals
+
+> **An async probe must wait on the scheduler the mechanism under test actually
+> uses. "Microtasks drained" is not evidence of framework, effect or timer
+> quiescence.**
+
+It has now independently produced three false defect signals: TH-0's undo looked
+like a no-op because `trackHistory` records through an Angular `effect`, and
+A2's persistence looked dead twice because autoSave debounces through
+`setTimeout` and falls back to a 100ms poll outside an injection context. Each
+initially read as a product defect. No gate for this — it belongs in how
+experiments are run.
 
 ## A release rule NGF-DEL produced
 
@@ -170,6 +242,17 @@ possible API shapes · smallest sufficient public surface · rejected
 alternatives · v13 migration · tests needed · bundle and capability cost ·
 disposition.
 
+## What makes Candidate B different from Candidate A
+
+Not "everything we happened to decide is clean". The bar is:
+
+> **There is no shipped artifact whose existence lacks a completed derivation.**
+
+The existential audits (PER-0, EVT-0, SEC-0) run BEFORE the closure gate, not
+inside it. MATRIX-CLOSE deriving whether a package deserves to exist would be
+doing architecture during a closure gate — which is how `ng-forms` reached a
+tarball in the first place.
+
 ## Queue
 
 NGF-0 goes first: it is bounded, already known to be open, and the package would
@@ -189,13 +272,21 @@ A2-0    persistence + core/storage                       DONE — A2-B
    ↓
 A6      EntitySignal.map
    ↓
-MATRIX-CLOSE
-        EVT-0 @signaltree/events, and each of its subpaths
-        PER-0 persistence() itself — never audited; ./storage inherits it
-        core/security
-        core/storage (resolved by A2)
-        every surviving root capability
-        every shipped artifact -> terminal disposition
+PER-0   persistence(): function vs current form; scoped persistence;
+        the StorageAdapter contract vs the ./storage package boundary
+   ↓
+EVT-0   @signaltree/events — root, /angular, /nestjs, /testing, each
+   ↓
+SEC-0   @signaltree/core/security
+   ↓
+MATRIX-CLOSE   ← NO ARCHITECTURE. Mechanical reconciliation only.
+        every shipped package    -> terminal disposition
+        every shipped subpath    -> terminal disposition
+        every public capability  -> terminal disposition
+        every shipping doc       -> agrees with the ledger
+        no deleted/withheld corpse reachable or advertised
+
+        On encountering an UNPROVEN it FAILS. It does not answer it.
    ↓
 freeze the Candidate B surface
 ```
@@ -1026,9 +1117,24 @@ By NGF-0's rule that would be enough to delete it — except that it is the
 free-floating utility code; it is the only way to configure a shipped
 capability.
 
-**Its survival is therefore entailed by `persistence()`'s, and `persistence()`
-has never been audited.** That is a new MATRIX-CLOSE row, and it is the same
-hole NGF-0 found: a shipped artifact whose existence nobody proved.
+**CORRECTION — the CONTRACT may be entailed; the SUBPATH is not.** Saying
+"`./storage` survives if `persistence()` survives" repeats NGF-0's error one
+level up, at packaging instead of function. If `persistence()` survives, what is
+entailed is the `StorageAdapter` *contract*; the generic implementations and the
+subpath that ships them are independently unproven. Both of these remain open:
+
+```text
+persistence() survives · StorageAdapter survives · generic impls do NOT
+    -> export the tiny contract from core, DELETE ./storage
+
+persistence() survives · SignalTree-specific storage impls earn themselves
+    -> ./storage survives
+```
+
+So: **`./storage`'s current reason for existence depends on `persistence()`, but
+its packaging and its generic implementations remain independently unproven.**
+`persistence()` has never been audited either — a new row, and the same hole
+NGF-0 found: a shipped artifact whose existence nobody proved.
 
 ## Disposition
 
