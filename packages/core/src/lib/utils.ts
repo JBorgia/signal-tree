@@ -332,22 +332,28 @@ export function toWritableSignal<T>(
   injector?: unknown,
   options?: {
     /**
-     * HIST-C2 PROTOTYPE — mark writes ENTERING through this adapter as
-     * designating their causal turn restoration-eligible.
+     * Mark writes ENTERING through this adapter as designating their authored
+     * causal turn undoable — the same designation {@link undoable} applies, for
+     * the case where there is no callback to wrap.
      *
-     * Earned by FORM-C2-B: Angular Signal Forms' `FormField` directive performs
-     * the model write from inside its own DOM listener, so an application has
-     * no callback to wrap with a designation scope. The adapter is the only
-     * place the application still controls.
+     * Earned by evidence: Angular Signal Forms' `FormField` directive performs
+     * the model write from inside its own DOM listener, so an application never
+     * gets a callback around a user's edit. The adapter is the only place it
+     * still controls.
      *
-     * This is INGRESS designation, not location scoping. Eligibility follows
-     * the mutation entrance: a write to the same branch through an ordinary
-     * tree handle stays non-reversible. That is the distinction from HIST-B,
-     * and it is pinned by a control test.
+     * This is INGRESS designation, not location scoping. Eligibility follows the
+     * mutation entrance, so a write to the SAME branch through an ordinary tree
+     * handle stays non-undoable — the property that distinguishes this from
+     * marking a branch "historical", and it has its own control test.
      *
-     * @internal Prototype surface; the public spelling is HIST-C2 step 7.
+     * ```ts
+     * const model = toWritableSignal(tree.$.editForm, injector, {
+     *   undoable: true,
+     * });
+     * const f = form(model);   // user edits are now undoable operations
+     * ```
      */
-    designatesRestoration?: boolean;
+    undoable?: boolean;
   }
 ): WritableSignal<T> {
   // Create a signal initialized with the current node value
@@ -377,7 +383,7 @@ export function toWritableSignal<T>(
 
   // Override set to write back to the NodeAccessor, then update local signal
   sig.set = (value: T) => {
-    if (options?.designatesRestoration) {
+    if (options?.undoable) {
       // Synchronous by construction with the write itself, which is what the
       // designation contract requires. Measured: the directive's write happens
       // inside the DOM dispatch, so there is no scheduling gap to lose it in.

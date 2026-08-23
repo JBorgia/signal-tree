@@ -54,7 +54,7 @@ class HostComponent {
   private readonly injector = inject(Injector);
   readonly tree = makeTree();
   readonly model = toWritableSignal(this.tree.$.editForm, this.injector, {
-    designatesRestoration: true,
+    undoable: true,
   });
   readonly f = form(this.model);
 }

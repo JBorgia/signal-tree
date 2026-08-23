@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
 import { toWritableSignal } from '../../lib/utils';
-import { withRestorationDesignation } from '../../lib/internals/restoration-eligibility';
+import { undoable } from '../../lib/undoable';
 import { timeTravel } from './time-travel';
 
 /**
@@ -38,8 +38,6 @@ const flush = async () => {
   await Promise.resolve();
   await Promise.resolve();
 };
-
-const reversible = withRestorationDesignation;
 
 const designatedTree = () =>
   signalTree(
@@ -95,7 +93,7 @@ describe('HIST-C2 step 6: Angular Signal Forms over an ordinary branch', () => {
     const f = runInInjectionContext(injector, () => form(model));
     await flush();
 
-    reversible(() => {
+    undoable(() => {
       f.name().value.set('grace');
     });
     await flush();
@@ -140,7 +138,7 @@ describe('HIST-C2 step 6: Angular Signal Forms over an ordinary branch', () => {
     await flush();
 
     // Same tick: a form edit and an ordinary screen-state mutation.
-    reversible(() => {
+    undoable(() => {
       f.name().value.set('grace');
     });
     tree.$.ui.panel.set('inspector');

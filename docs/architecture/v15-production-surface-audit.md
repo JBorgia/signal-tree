@@ -1882,6 +1882,102 @@ Step 7 gate note: the release-claims repair means steps 5, 6 and 4 cannot be
 quietly skipped. Each of those three members has an exemption whose stated reason
 is that surviving to release makes the exemption wrong.
 
+# HIST-C2 step 7 — `undoable()` FROZEN, and the flip rule pre-registered
+
+## The name
+
+```ts
+undoable(() => {
+  // the authored operation
+});
+
+toWritableSignal(node, injector, { undoable: true });
+```
+
+> **`undoable()` designates the authored causal turn containing its writes as
+> eligible for undo. It does not create a causal-turn boundary.**
+
+That second sentence is the one the evidence forced. Case 5 measured two
+designation scopes in a single tick collapsing into ONE turn, so a name implying
+a boundary (`markRestorationBoundary`) would have shipped a promise the engine
+does not keep. Case 4 measured one designated write promoting an *undesignated*
+sibling in the same turn, so a name implying per-write scope
+(`withRestorableWrite`) would have mis-stated the unit.
+
+Not public, and deliberately: `restorationEligible`, `restorationDesignated`,
+`causalMode`, `intent`, `source`, `restorationEligibility`. Those are the
+engine's reasoning. The public surface carries one bit — *this is an undoable
+user operation.*
+
+## PRE-REGISTERED before the default flip
+
+Recorded now, while nothing is failing, because the flip is the step where
+migration-by-habit is cheapest and most damaging:
+
+> **No test receives `undoable()` merely because it used to create history.
+> Designation requires an independently stated restoration requirement.**
+
+Every post-flip failure gets classified, and only the first class earns
+designation:
+
+```text
+TEST ASSUMES OLD PRODUCT SEMANTICS
+    -> migrate the test; the operation was never a product undo
+
+OPERATION GENUINELY REQUIRES RESTORATION
+    -> designate it, and say WHY in the test
+
+ENGINE USED HISTORY AS AN ACCIDENTAL INTERNAL TRANSPORT
+    -> architectural defect. Do NOT paper over it with undoable().
+```
+
+The third class is the one to watch. A test failing after the flip does not earn
+a wrapper; the question is whether a *product user* should be able to undo that
+operation.
+
+Pre-registered answers, so they are not decided under pressure:
+
+```text
+explicit user edit                        yes
+form DOM mutation through the adapter     yes
+server realization                        never
+persistence restore                       never
+setup fixture mutation                    no — establish the baseline differently
+test helper that later calls undo         only if the test really exercises an
+                                          undoable product operation
+```
+
+## ST1034 stays a thrown error
+
+`undo(): void` already has a clean contract:
+
+```text
+success   the entire operation was reversed
+failure   throws ST1034; nothing changed, cursor unmoved, redo unchanged
+```
+
+Widening it to `undo(): UndoResult` because structured conflicts would be
+tidier is exactly the speculative-API move this audit has rejected everywhere
+else. If DevTools or a real consumer later needs machine-readable refusal
+detail, a typed error is the narrower evolution.
+
+## Execution order
+
+```text
+1  freeze undoable() / { undoable: true }        <- this commit
+2  name-dependent surface work
+3  delete recordHistory + its pruning machinery
+4  delete or subsume shouldSkip
+5  internalize the prototype metadata
+6  FLIP TO OPT-IN — classify every failure against the rule above
+7  remove the prototype compatibility switch
+8  full gates + release-claims + build + TruckTrax surface check
+```
+
+Steps 3-5 remove machinery already proved unnecessary. **Step 6 is the only one
+expected to be surprising**, because it inverts the semantics under a large
+existing corpus rather than deleting something dead.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded

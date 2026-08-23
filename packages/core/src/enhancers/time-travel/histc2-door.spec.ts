@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
-import { withRestorationDesignation } from '../../lib/internals/restoration-eligibility';
+import { undoable } from '../../lib/undoable';
 import { withWriteContext } from '../../lib/write-context';
 import { timeTravel } from './time-travel';
 import { transactions } from '../transactions/transactions';
@@ -13,7 +13,7 @@ import { transactions } from '../transactions/transactions';
  * `restorationEligibility: 'designated'` mode.
  *
  * `withRestorationDesignation` stands in for whatever the public spelling turns
- * out to be (`reversible(...)`, `tree.reversible(...)`, …). The name is NOT the
+ * out to be (`undoable(...)`, `tree.undoable(...)`, …). The name is NOT the
  * experiment; whether synchronous designation correctly reaches the confirmed
  * causal turn is.
  */
@@ -24,8 +24,6 @@ const flush = async () => {
   await Promise.resolve();
   await Promise.resolve();
 };
-
-const reversible = withRestorationDesignation;
 
 /**
  * Typed builders rather than one generic helper with `as never`. An earlier
@@ -73,7 +71,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = makeTree();
     await flush();
 
-    reversible(() => tree.$.document.title.set('edited'));
+    undoable(() => tree.$.document.title.set('edited'));
     await flush();
 
     expect(turns(tree)).toBe(1);
@@ -88,7 +86,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = makeTree();
     await flush();
 
-    reversible(() => {
+    undoable(() => {
       tree.$.document.title.set('t');
       tree.$.document.body.set('b');
       tree.$.ui.panel.set('inspector');
@@ -110,7 +108,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
 
     // One tick, therefore one causal turn. The designation is inside; the
     // second write is outside it but inside the same turn.
-    reversible(() => tree.$.document.title.set('edited'));
+    undoable(() => tree.$.document.title.set('edited'));
     tree.$.ui.panel.set('inspector');
     await flush();
 
@@ -131,8 +129,8 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = signalTree({ a: 1, b: 2 }, { enhancers: [ttDesignated()] });
     await flush();
 
-    reversible(() => tree.$.a.set(10));
-    reversible(() => tree.$.b.set(20));
+    undoable(() => tree.$.a.set(10));
+    undoable(() => tree.$.b.set(20));
     await flush();
 
     // THE FINDING, recorded rather than preferred: the scope is an ELIGIBILITY
@@ -155,7 +153,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     );
     await flush();
 
-    reversible(() => {
+    undoable(() => {
       tree
         .transaction(() => {
           tree.$.document.title.set('edited');
@@ -196,7 +194,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = makeTree();
     await flush();
 
-    reversible(() => {
+    undoable(() => {
       withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
         tree.$.document.title.set('from-server');
       });
@@ -213,11 +211,11 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = makeTree();
     await flush();
 
-    reversible(() => tree.$.document.title.set('edited'));
+    undoable(() => tree.$.document.title.set('edited'));
     await flush();
     expect(turns(tree)).toBe(1);
 
-    reversible(() => tree.undo());
+    undoable(() => tree.undo());
     await flush();
 
     // Rule 5. An undo performed inside a designation scope must not record a
@@ -230,8 +228,8 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     const tree = makeTree();
     await flush();
 
-    reversible(() => {
-      reversible(() => {
+    undoable(() => {
+      undoable(() => {
         tree.$.document.title.set('inner');
       });
       tree.$.document.body.set('outer');
@@ -269,7 +267,7 @@ describe('HIST-C2 door: the cost claim and the async contract', () => {
     const tree = makeRowsTree();
     const claims = getSubjectRestorationClaims(tree);
 
-    reversible(() => tree.$.rows.setAll([{ id: 'a', name: 'n' }]));
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'n' }]));
     await flush();
 
     // Control. Without this the zero above would prove nothing.
@@ -284,7 +282,7 @@ describe('HIST-C2 door: the cost claim and the async contract', () => {
     // so an async callback would designate nothing at all — the failure mode
     // that produced four false signals earlier in this audit.
     expect(() =>
-      reversible(async () => {
+      undoable(async () => {
         await Promise.resolve();
         tree.$.document.title.set('never-designated');
       })

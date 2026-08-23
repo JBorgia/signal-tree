@@ -29,7 +29,11 @@ import {
   getTreeRealizationPort,
   rememberTreeRealizationDescriptor,
 } from '../../lib/internals/causal-runtime/tree-realization-adapter';
-import { isRestorationDesignated } from '../../lib/internals/restoration-eligibility';
+import {
+  isMetaDesignated,
+  isRestorationDesignated,
+  markMetaDesignated,
+} from '../../lib/internals/restoration-eligibility';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { recordProductionSubstrateStat } from '../../lib/internals/production-substrate-stats';
 import { getCausalWriteMode } from '../../lib/causal-write-mode';
@@ -2898,7 +2902,7 @@ export function timeTravel(
       //
       // Read off the DELIVERED meta, not the ambient flag: this runs at flush
       // time, after the designation scope has returned.
-      if (meta?.restorationDesignated === true) {
+      if (isMetaDesignated(meta)) {
         bucket.designated = true;
       }
 
@@ -3125,9 +3129,7 @@ export function timeTravel(
               // `.set()`, and because handing `effectiveMeta` to `notify()` as a
               // metaOverride would otherwise bypass notify's own stamping.
               const effectiveMeta: UpdateMetadata | undefined =
-                isRestorationDesignated()
-                  ? { ...ambient, restorationDesignated: true }
-                  : ambient;
+                isRestorationDesignated() ? markMetaDesignated(ambient) : ambient;
               if (isRestoring) return;
               if (getCausalWriteMode(effectiveMeta) === 'realization') {
                 // P0-C: remember that this location now holds external truth.
@@ -3162,7 +3164,7 @@ export function timeTravel(
                 // The plain-leaf path does not go through `captureIntoBucket`,
                 // so the designation has to be OR-ed in here too. Same rule:
                 // one designated write promotes the whole turn.
-                if (effectiveMeta?.restorationDesignated === true) {
+                if (isMetaDesignated(effectiveMeta)) {
                   pendingCapture.designated = true;
                 }
                 captureEffects(
