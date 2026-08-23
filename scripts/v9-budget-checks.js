@@ -24,7 +24,8 @@ const MAX_EXPORTS = 60;
  * regression does. Update deliberately, with the measurement in the commit.
  *
  * 15.0.0 release hardening re-baseline: measured by this script after rebuilding
- * from source. Minimal tree: 9659B; tree + stored(): 11404B.
+ * from source. Minimal tree: 9659B; tree + stored(): 11404B. The second
+ * scenario is now `tree + entityMap()` — see the note on it.
  *
  * 15.0.0 declarative construction: minimal tree 9659B -> 10134B. Not a
  * diagnostic — declaring enhancers in `signalTree`'s config puts the enhancer
@@ -41,10 +42,27 @@ const CONSUMER_SCENARIOS = [
     budget: 10300,
   },
   {
-    name: 'tree + stored()',
-    imports: 'signalTree, stored',
-    code: "const t = signalTree({ th: stored('t', 'light'), count: 0 }); t.$.count.set(5); globalThis.o = t();",
-    budget: 11600,
+    // WAS `tree + stored()`, and that is why the budget moved.
+    //
+    // `stored` is NOT public. It was removed from the RC surface in c53aa416
+    // with the disposition "NOT EARNED as RC public API", and
+    // tools/check-rc-public-dispositions.mjs actively enforces its ABSENCE from
+    // every tarball. This scenario kept importing it anyway, so the bundle step
+    // failed with "No matching export ... for import stored" and the whole
+    // check exited 1 — a red gate reporting a stale scenario, not a defect.
+    //
+    // `entityMap` is the only marker on the public surface, so it is the only
+    // thing this scenario can be. Do not "restore" `stored` here or on the
+    // barrel to make an old number reachable again; the RC gate would then fail
+    // instead, and it is the one recording an actual decision.
+    name: 'tree + entityMap()',
+    imports: 'signalTree, entityMap',
+    code: "const t = signalTree({ rows: entityMap({ selectId: (r) => r.id }), count: 0 }); t.$.rows.addOne({ id: 1 }); t.$.count.set(5); globalThis.o = t();",
+    // Measured 20992B. 21400 is ~2% headroom, matching the minimal-tree
+    // scenario above rather than the ~15% the header describes: on a 21KB
+    // budget 15% would let a 3KB regression through unnoticed, which is most of
+    // an enhancer.
+    budget: 21400,
   },
 ];
 

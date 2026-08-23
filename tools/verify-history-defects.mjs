@@ -9,8 +9,9 @@
  * without a following undo() is NOT evidence — that is how the original
  * time-travel audit mis-scored itself (see docs/audits/2026-08/).
  *
- * 6a is FIXED (2026-08-11) and its checks now pin the corrected behaviour;
- * 6b and 6d still reproduce as documented.
+ * 6a is GONE — `form()` and `history()` were deleted in b57ba293 (FORM-DEL),
+ * so its subject no longer exists; see the tombstone below. 6b and 6d still
+ * reproduce as documented.
  *
  * Exits 0 when the documented behaviours reproduce (6b/6d) and the fixed
  * behaviour holds (6a), 1 when a documented defect no longer reproduces —
@@ -31,7 +32,7 @@ if (!existsSync(DIST)) {
   process.exit(1);
 }
 const core = await import(pathToFileURL(DIST).href);
-const { signalTree, timeTravel, form, history, createAuditTracker } = core;
+const { signalTree, timeTravel, createAuditTracker } = core;
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -44,72 +45,21 @@ const check = (name, reproduced, detail) => {
   console.log(`    ${detail}`);
 };
 
-// -- 6a: timeTravel() covers form() state (fixed 2026-08-11) ----------------
-// 6a was the data-losing shape: form writes produced no entries, and undoing a
-// neighbouring plain-leaf write rewound the form to a stale snapshot. That is
-// fixed — form field writes announce on the form path, so global time-travel
-// records and reverts them. These checks pin the FIXED behaviour by outcome.
-{
-  const t = signalTree({ profile: form({ initial: { name: '' } }) }, { enhancers: [timeTravel({})] });
-  const baseline = t.getHistory().length;
-  for (const v of ['a', 'ab', 'abc']) {
-    t.$.profile.$.name.set(v);
-    await flush();
-  }
-  const before = t.$.profile.$.name();
-  t.undo();
-  const after = t.$.profile.$.name();
-  check(
-    '6a form-only tree: timeTravel records form writes and reverts them',
-    t.getHistory().length > baseline && after === 'ab',
-    `3 form writes -> getHistory() ${JSON.stringify(
-      t.getHistory().map((e) => e.action)
-    )}, ` + `undo() left name ${JSON.stringify(after)} (expected "ab")`
-  );
-}
-{
-  // the mixed tree: undo aimed at the plain field must NOT rewind the form
-  const t = signalTree({
-    profile: form({ initial: { name: '' } }),
-    plain: '',
-  }, { enhancers: [timeTravel({})] });
-  t.$.plain.set('p1');
-  await flush();
-  t.$.profile.$.name.set('ada');
-  await flush();
-  t.$.plain.set('p2');
-  await flush();
-  t.undo();
-  const afterUndo = t.$.plain();
-  const formAfterUndo = t.$.profile.$.name();
-  check(
-    '6a mixed tree: undoing a neighbouring plain-leaf write keeps form content',
-    afterUndo === 'p1' && formAfterUndo === 'ada',
-    `undo() of the PLAIN field left plain=${JSON.stringify(
-      afterUndo
-    )} and form name ${JSON.stringify(formAfterUndo)} (both expected to hold)`
-  );
-}
-{
-  // and the mechanism that does work, so the guide's recommendation is verified too
-  const t = signalTree({
-    profile: form({ initial: { name: '' }, history: history() }),
-  });
-  for (const v of ['a', 'ab', 'abc']) {
-    t.$.profile.$.name.set(v);
-    await flush();
-  }
-  t.$.profile.history?.undo();
-  await flush();
-  const after = t.$.profile.$.name();
-  check(
-    '6a recommended path: form({ history: history() }) undo WORKS',
-    after === 'ab',
-    `3 writes then form.history.undo() -> ${JSON.stringify(
-      after
-    )} (expected "ab")`
-  );
-}
+// -- 6a: DELETED WITH ITS SUBJECT ------------------------------------------
+//
+// 6a asked whether `timeTravel()` covers `form()` state, and whether
+// `form({ history: history() })` is the recommended path. Both `form()` and
+// `history()` were deleted from @signaltree/core in b57ba293 (FORM-DEL), so the
+// question no longer has a subject and the checks cannot be rewritten to ask it
+// of anything else.
+//
+// This is a tombstone, not a gap: the block imported `form` and `history` from
+// the built barrel, so the tool crashed on load from FORM-DEL onward and
+// neither 6b nor 6d has run since. Removing it is what makes the surviving
+// checks reachable again.
+//
+// docs/guides/time-travel-in-production.md cites this tool for its figures.
+// Anything it says about form() is describing a removed API.
 
 // -- 6b: createAuditTracker samples, so it drops changes -------------------
 // NB: the 100 ms interval is NOT measured here. It is a source constant —
