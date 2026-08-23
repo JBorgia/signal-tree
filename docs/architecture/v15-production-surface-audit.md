@@ -335,7 +335,7 @@ freeze the Candidate B surface
 | **PER-0** | **does `persistence()` deserve to ship, and in this form?** | `persistence`, `StorageAdapter`, `./storage` | **REDESIGN — function survives, form does not** |
 | **EVT-0** | **does `@signaltree/events` exist at all?** | the package and its four entry points | **DELETED — EVT-DEL executed** |
 | **SEC-0** | **does `@signaltree/core/security` exist at all?** | the subpath and `security()` | **DELETED — SEC-DEL executed** |
-| **HIST-0** | **is history participation whole-tree, or selective?** | `timeTravel()` scope | **BASELINE MEASURED — mechanics already operation-scoped** |
+| **HIST-0** | **is history participation whole-tree, or selective?** | `timeTravel()` scope | **CLOSED — HIST-C, operation/turn-scoped eligibility** |
 | A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
@@ -1265,20 +1265,185 @@ exclusion means erasure. Promising devtools visibility for excluded operations
 requires a *second* inventory — new machinery, and exactly the scope HIST-0
 should not smuggle in.
 
-## Where the model space stands
+## HIST-0 DISPOSITION — **HIST-C, operation/turn-scoped eligibility**
 
 ```text
-HIST-A  status quo        not refuted; expensive in eligibility only
-HIST-B  location scoped   REFUTED by case 4 — partial reversal of atomically
-                          authored turns in ordinary code
-HIST-C  operation scoped  fits the existing mechanics; case 9 shows the
-                          retention property already holds
-HIST-D  both              inadmissible — requires B to fail ALONE, and B failed
+HIST-A  whole-tree authored history      coherent, NOT SELECTED
+HIST-B  location-scoped history          REFUTED — breaks causal-turn atomicity
+                                         in ordinary same-tick writes (case 4)
+HIST-C  operation/turn-scoped            SELECTED
+HIST-D  location + operation             NOT ADMITTED — its prerequisite was B or
+                                         C failing alone, and B failed
 ```
 
-it.
+The selected model:
 
----
+```text
+CAUSAL TURN
+    |
+    +- reversible
+    |    -> enters restoration history
+    |    -> acquires restoration claims
+    |    -> existing per-turn reversal machinery
+    |
+    +- non-reversible
+         -> no restoration entry
+         -> no restoration claims
+         -> ordinary reclamation
+```
+
+The expensive half already behaves correctly (case 9). Selective history needs
+**no new reclamation mechanism** — it needs an eligibility decision at the
+causal-turn boundary.
+
+### What prices the implementation
+
+Verified against HEAD rather than estimated:
+
+```text
+history.push(entry)              ONE site, in insertConfirmedTurn()
+retainRestorationClaims(entry)   ONE site, in insertConfirmedTurn()
+                                 ^ the SAME method, adjacent lines
+insertConfirmedTurn callers      2
+```
+
+Both consequences of eligibility already flow through a single gate, and the
+three existing short-circuits are the identical predicate
+(`getCausalWriteMode(meta) === 'realization'`) at the collection notifier, the
+leaf interceptor and the root-write path. HIST-C generalises one predicate; it
+does not add a mechanism.
+
+### The open half: eligibility is settled, the DOOR is not
+
+HIST-C says where the semantic authority lives. It does not say what the public
+API is. The load-bearing fact:
+
+> `withWriteContext` and `getActiveWriteContext` are **not root-exported**.
+> `UpdateMetadata` is a type-only export. There is today **no public way for an
+> application to classify a write.**
+
+So realization is an internal classification, and HIST-C requires opening a door
+that does not currently exist. Candidates, pre-registered before evidence:
+
+```text
+HIST-C1  OPT-OUT    authored operations reversible by default; a way to mark an
+                    operation non-reversible
+HIST-C2  OPT-IN     only designated operations reversible
+HIST-C3  DERIVED    eligibility falls out of the existing intent/causal
+                    classification; the "new API" is only a public, ergonomic
+                    door onto machinery that already exists
+```
+
+**A1 convergence to test, not assume.** A1 concluded core needs a narrow
+"apply external truth" ingress door. External truth is exactly the
+non-reversible class. If those are the same door, C3 is nearly free and the two
+audits converge on one public surface. What that would still leave uncovered is
+the *authored but non-reversible* case — a UI change the user genuinely caused
+but should not be able to undo — which no existing classification expresses.
+Whether that case is real is a question for evidence, not for the design.
+
+# RESTORE-P0 — the reversal-validity cluster
+
+Grouped because they are one defect family, not three bugs: **the recorded
+inverse is valid at capture time, but unconditional replay later can violate
+intervening state.** The engine knows *what effect belonged to the authored
+operation*; what it does not ask is *is this authored effect still causally
+applicable to the current truth?*
+
+```text
+P0-A  same-turn setAll/remove structural reversal
+P0-B  same-family structural rekey/remove reversal
+P0-C  a later realization to the same location is overwritten by undo
+        scalar reproduction        pinned
+        structural/entity repro    pinned
+```
+
+Fixed **once, after HIST-C's eligibility model is installed**, so the repair is
+made against the final causal model rather than one HIST then replaces.
+
+Constraints the fix must satisfy:
+
+```text
+PRESERVE 10b   a later realization to an UNRELATED location still survives undo
+PIN REDO       redo semantics after supersession decided explicitly, not left to
+               fall out — "undo respects later truth but redo does not" is
+               incoherent, and today both ignore it symmetrically
+```
+
+# DIAG-JOURNAL — pre-registered before evidence
+
+HIST-C makes a non-reversible authored operation correctly absent from
+restoration history — and therefore, today, absent from diagnostics too, because
+there is exactly one inventory. That violates the observability/restoration
+distinction this audit established, so it is a v15 item rather than a deferral.
+
+> **Null: can DevTools observe every causal turn without that observation
+> becoming another restoration authority or retention owner?**
+
+The failure mode to be hostile to is a re-run of TH-0 one layer down:
+
+```text
+NOT THIS:   restoration history #1
+            diagnostic history #2 WITH REPLAY      <- a second undo authority
+```
+
+The diagnostic side must be **observational**. The classes it should surface:
+
+```text
+authored reversible
+authored non-reversible
+realization
+transaction begin / confirm / reject
+restoration
+```
+
+All visible; only the first necessarily owns restoration lifetime. Whether the
+form is a bounded causal journal, an event feed, a serialized projection, or
+something smaller is a separate derivation — and the smallest thing that
+satisfies the null wins.
+
+## Revised execution order
+
+```text
+HIST-0                  CLOSED — HIST-C
+   |
+HIST-C implementation   operation/turn restoration eligibility; one restoration
+                        authority; no location-scoped partial reversal; excluded
+                        operations acquire no restoration claims
+   |
+RESTORE-P0              P0-A, P0-B, P0-C fixed once against the final model;
+                        preserve 10b; pin redo
+   |
+DIAG-JOURNAL            whole-tree developer observability, no restoration
+                        ownership, no accidental second undo authority
+   |
+PER-B                   scoped persistence, causally-correct async restore,
+                        settled-only egress
+   |
+A1 public ingress seam  narrow external-truth write intent
+   |
+pristine rehearsal -> MATRIX-CLOSE -> Candidate B -> TruckTrax 2/3
+```
+
+DIAG-JOURNAL sits before PER-B because it is still part of settling the causal
+architecture. Persistence and acquisition should plug into a causal model whose
+restoration *and* diagnostic projections are both known.
+
+## What HIST-C actually buys
+
+Not "historical operations are dramatically faster." The real claim:
+
+> **operations that are not reversible stop acquiring restoration cost at all**
+
+Case 9 shows the engine already knows how to do this. The remaining work is
+making the distinction available to ordinary authored operations rather than only
+to internal causal classes like realization.
+
+The level shift is smaller internally than feared and larger architecturally:
+**one causal stream, operation-scoped restoration eligibility, one restoration
+authority, and a separate whole-tree diagnostic projection that carries
+observation without restoration ownership.**
+
 
 # SEC-0 — `@signaltree/core/security`
 
