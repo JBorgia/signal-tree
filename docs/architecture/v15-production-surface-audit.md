@@ -26,6 +26,17 @@ This is why `trackHistory` was deleted, and it is a much stronger reason than
 "nobody used it". Test it by making the two systems coexist and asking what the
 second one records when the first one undoes.
 
+## A deletion rule the TH-DEL cascade produced
+
+> **When a rejected public abstraction has private infrastructure whose only
+> purpose is to realize that abstraction, the infrastructure inherits the
+> deletion unless it independently passes a survival test.**
+
+`createScopedHistoryAuthority` was exactly that: a private history engine built
+so `trackHistory` could share the causal machinery, with no other consumer. Kept
+"in case", it would have been dead architecture below the waterline — the part
+no public-surface audit looks at.
+
 ## A release rule NGF-DEL produced
 
 > **A gate may not survive merely because its invariant remains philosophically
@@ -724,6 +735,50 @@ what a branch *is*, where an attached behaviour would leave it ordinary state.
 
 **Disposition: NOT TAKEN.** Needs the offline/local-preferences scenario and an
 answer to C2 that works on a platform where `pagehide` never fires.
+
+---
+
+# A3-0 — PRE-REGISTERED before the experiment ran
+
+> **Null: does SignalTree need an independently mutable operation-lifecycle
+> state primitive, once transaction-owned lifecycle and ordinary application
+> state are available?**
+
+Written down before any case was run, so the experiment cannot drift toward
+rescuing `status()`. `transactions()` is a CONTROL here and is not modified
+during the characterization pass — changing it to absorb status would
+manufacture the answer.
+
+| case | supports a SignalTree primitive | argues against one |
+| --- | --- | --- |
+| optimistic mutation | lifecycle unrepresentable by `transactions()` without losing semantics | the transaction already owns pending/confirm/reject |
+| non-optimistic save | the lifecycle must participate in SignalTree semantics *before* state changes | ordinary async/controller state handles it |
+| external async op | some SignalTree-owned state or causal property is required despite no tree mutation | the lifecycle lives entirely outside SignalTree |
+| concurrent operations | SignalTree has a coherent identity/concurrency model the app needs | the single `status` slot collapses distinct operations |
+| typed errors | errors need durable or tree-owned semantics | errors belong to the request/controller/UI layer |
+
+Two verdicts are required, and they are independent:
+
+```text
+FUNCTION     do applications need async-operation lifecycle represented?
+OWNERSHIP    does SignalTree need to own a public primitive for it?
+```
+
+"State worth displaying" is not an ownership argument. A UI needs `saving`,
+`failed`, `last error`, `refreshing`; the question is whether those values
+participate in SignalTree's actual responsibilities — state truth, causal
+operations, transactions, restoration, identity — or are transient controller
+state stored in the tree because the tree is convenient.
+
+Equally, ephemeral does not imply "not SignalTree". If multiple components react
+to it, a route transition depends on it, or its identity must line up with
+transaction ownership, that could be a legitimate state function. It just has to
+earn it independently.
+
+**Extra discriminator inside the concurrency case — supersession.** When B
+starts for the same logical operation while A is in flight: does B supersede A,
+coexist with it, cancel it, or leave A able to overwrite B's status? If the
+answer is application policy, a generic `status()` leaf is under-specified.
 
 ---
 
