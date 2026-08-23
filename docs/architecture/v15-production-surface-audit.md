@@ -1342,6 +1342,105 @@ the *authored but non-reversible* case — a UI change the user genuinely caused
 but should not be able to undo — which no existing classification expresses.
 Whether that case is real is a question for evidence, not for the design.
 
+## HIST-C-DOOR — production evidence, and it is hostile to the obvious design
+
+Top of the evidence hierarchy: what the real consumer actually ships. Two
+independent facts from TruckTrax v3, and neither one is what the API design
+would have assumed.
+
+### Fact 1 — `timeTravel()` is compiled OUT of production, in all three apps
+
+`apps/{geotrax,scaletrax,trucktrax-geo}` each carry a `debug-enhancers.ts` /
+`debug-enhancers.prod.ts` pair swapped by `fileReplacements`, and the prod
+variant is deliberately free of any value import from `@signaltree/core` so the
+bundler can drop the enhancer. The in-repo comment is explicit about why:
+
+> the whole-tree-clone-per-write enhancer
+
+`packages/store/src/lib/tree-enhancers.ts` goes further and removes the methods
+from the static type on purpose:
+
+> Time-travel is driven from the Redux DevTools panel, not from `tree.undo()`.
+
+So in real production usage, whole-tree history is **a development diagnostic,
+not a product feature**. No shipped code calls `tree.undo()`.
+
+### Fact 2 — the real product undo was `history()`, scoped to a form model
+
+The only user-facing undo in the consumer is
+`packages/signal-forms/src/lib/entity/build-entity-form.ts`:
+
+```ts
+import { form as stForm, history, signalTree } from '@signaltree/core';
+// ...
+history({ capacity: 50 })
+```
+
+wired to `canUndo` / `canRedo` / `undo()` / `redo()` in
+`entity-store-signal-form-base.ts` and `entity-form.component.ts`.
+
+**Correction to how this was filed.** `trucktrax-rc1-findings.md` lists
+`history` absent with 7 call sites under "migration", and FORM-DEL (`b57ba293`)
+justified removing it with *"history() had exactly one consumer,
+form({ history }), and dies with it."* That was true of the repository and false
+of the product: `form({ history })` is precisely the pattern production shipped,
+and it was the **only restoration authority that survived to a production
+build**. Deleting it was still correct under TH-0 — it was a second independent
+history engine attached to a piece of the tree, which is exactly what TH-0
+forbids — but it left the real use case with no replacement, and the ledger
+recorded it as a migration cost rather than as the loss of the shipped authority.
+
+### What this does to C1 / C2 / C3
+
+```text
+HIST-C1  OPT-OUT   REFUTED as the default. It presumes a default-reversible
+                   world, and nobody runs one — production ships history
+                   nowhere. An opt-out door would be a way to subtract from a
+                   default that the only real consumer has already subtracted
+                   entirely.
+
+HIST-C2  OPT-IN    SUPPORTED. Both facts point the same way: restoration is
+                   wanted for a BOUNDED set of operations (one form model,
+                   capacity 50, explicit UI affordance), not for the tree.
+
+HIST-C3  DERIVED   INSUFFICIENT ALONE. A1's ingress door classifies EXTERNAL
+                   truth, and that is a genuine convergence worth keeping — but
+                   it cannot express "this authored edit is reversible and that
+                   authored map-pan is not." The distinction production needs is
+                   between two AUTHORED operations, which no existing causal
+                   class separates.
+```
+
+The earlier open question — *is "authored but non-reversible" real?* — is
+answered, but inverted. It is not that a few authored operations need excluding;
+it is that **almost all of them are already excluded in practice**, and the
+reversible ones are the small, deliberately designated set.
+
+### The demand, stated as production states it
+
+```text
+bounded product undo      scoped to what the user is editing, shipped
+cheap whole-tree observability   dev-time, currently paid for with a
+                                 clone-per-write enhancer that gets compiled out
+```
+
+That is HIST-C2 plus DIAG-JOURNAL, and it is worth noting that these two items
+are the ones with real demand behind them. HIST-C's value is not "selective
+history is faster"; it is that **opt-in eligibility restores the deleted
+`history()` use case inside the single authority TH-0 requires**, instead of as a
+second engine bolted to a subtree.
+
+### One honest limit on this evidence
+
+The stated reason for compiling `timeTravel()` out is *cost*, not semantics — and
+a note records that the runtime gate never actually fired (DEV-2367), so
+production builds were running the enhancer for some time without functional
+complaint. So Fact 1 is strong evidence about cost and only suggestive about
+eligibility preference. **Fact 2 is the load-bearing one**: a deliberately
+scoped, capacity-bounded, UI-wired undo is a semantics choice, not a cost
+workaround. Even a free whole-tree history would not make it correct for the
+undo button to revert a map pan.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
