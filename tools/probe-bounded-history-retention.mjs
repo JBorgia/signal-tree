@@ -50,15 +50,22 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { quiesce, requireExposeGc, MB } from './lib/heap-quiescence.mjs';
 
+const SELF_TEST = process.argv.includes('--self-test');
+
 // The self-test only exercises the pure verdict against recorded tables, so it
 // needs no GC control — and requiring it would make the cheap check as awkward
 // to run as the ten-minute one.
-if (!process.argv.includes('--self-test')) {
+if (!SELF_TEST) {
   requireExposeGc('tools/probe-bounded-history-retention.mjs');
 }
 
+// The build check has to come AFTER the self-test branch below, not here.
+// It used to sit at the top, so `--self-test` — which touches no build output
+// at all, only recorded tables — printed "build first" and exited on any
+// unbuilt checkout. Invisible in a warm tree; the 15.0 pristine-checkout
+// rehearsal is what surfaced it.
 const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
-if (!existsSync(CORE)) {
+if (!SELF_TEST && !existsSync(CORE)) {
   console.error('❌ build first: npx nx build core');
   process.exit(1);
 }
@@ -197,7 +204,7 @@ export function isBounded(points) {
   return ratio < 2;
 }
 
-if (process.argv.includes('--self-test')) {
+if (SELF_TEST) {
   // The real pre-fix table, and the real post-fix one. Both measured, both in
   // docs/architecture/retired-subject-churn.md.
   const UNBOUNDED = [

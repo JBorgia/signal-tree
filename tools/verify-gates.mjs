@@ -54,6 +54,32 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
+// A stray `NX_WORKSPACE_ROOT_PATH` silently redirects EVERY nx command to
+// another checkout, and nothing warns.
+//
+// Found during the 15.0 pristine rehearsal. A fresh worktree reported a build
+// cache hit it could not possibly have, `nx build` printed "created
+// ../../dist/packages/core" while that directory did not exist, the build wrote
+// into a different clone entirely, and 19 gates failed for reasons that looked
+// like a broken repository. The variable was set in the operator's shell.
+//
+// Refusing to run beats producing a release from the wrong tree.
+if (process.env['NX_WORKSPACE_ROOT_PATH']) {
+  const declared = resolve(process.env['NX_WORKSPACE_ROOT_PATH']);
+  if (declared !== ROOT) {
+    console.error(
+      `❌ NX_WORKSPACE_ROOT_PATH points somewhere else.\n\n` +
+        `   this checkout : ${ROOT}\n` +
+        `   the variable  : ${declared}\n\n` +
+        `   Every nx command would operate on that other tree: builds land there,\n` +
+        `   its cache answers for this one, and the gates below would report on a\n` +
+        `   repository you are not testing. Unset it:\n\n` +
+        `     env -u NX_WORKSPACE_ROOT_PATH npm run gates\n`
+    );
+    process.exit(1);
+  }
+}
+
 /**
  * `needsBuild` marks a gate that reads `dist/`. Its mutation therefore targets a
  * BUILT file, not a source file — mutating the source would leave the gate
