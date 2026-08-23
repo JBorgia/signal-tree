@@ -117,7 +117,7 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     expect(tree.$.document.body()).toBe('SERVER');
   });
 
-  it('DEFECT: the same collision inside an entity row', async () => {
+  it('REPAIRED (P0-C-ROW): the same collision inside an entity row', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       { enhancers: [timeTravel({ maxHistorySize: 50 })] }
@@ -130,11 +130,13 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     realization(() => tree.$.rows.updateOne('a', { name: 'SERVER' }));
     await flush();
 
-    tree.undo();
+    expect(() => tree.undo()).toThrow(/ST1034/);
     await flush();
 
-    // Same discard, through the structural path. Not scalar-leaf-specific.
-    expect(tree.$.rows.byId('a')?.()?.name).toBe('orig');
+    // Row fields were the last place this defect survived. The provenance index
+    // is keyed by position+subject there, because the realization is delivered
+    // at the ROW while the reversal effect names the FIELD.
+    expect(tree.$.rows.byId('a')?.()?.name).toBe('SERVER');
   });
 
   it('REDO after supersession restores the authored value, not the server value', async () => {

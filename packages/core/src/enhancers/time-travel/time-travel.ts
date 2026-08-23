@@ -2314,24 +2314,58 @@ export function timeTravel(
       // location currently holds EXTERNAL truth that this restoration is not
       // reversing. A location holding a later AUTHORED value is fine — that is
       // what a closure undo looks like mid-flight.
+      const readNested = (source: unknown, segments: string[]): unknown => {
+        let cursor = source;
+        for (const segment of segments) {
+          if (cursor === null || typeof cursor !== 'object') return undefined;
+          cursor = (cursor as Record<string, unknown>)[segment];
+        }
+        return cursor;
+      };
+
       const externalConflict = ((): ReversalRefusal | undefined => {
-        if (externalTruthByPath.size === 0) return undefined;
+        if (externalTruthByPath.size === 0 && externalTruthBySubject.size === 0) {
+          return undefined;
+        }
         for (const effect of reversalEffects) {
           if (effect.structural !== undefined) continue;
           const path = effect.path;
           if (typeof path !== 'string') continue;
-          if (!externalTruthByPath.has(path)) continue;
 
-          const live = resolveLiveNodeAtPath(path);
-          if (typeof live !== 'function') continue;
-          const current = (live as () => unknown)();
+          // Tree-level scalar: the path-keyed index resolves directly.
+          if (externalTruthByPath.has(path)) {
+            const live = resolveLiveNodeAtPath(path);
+            if (typeof live === 'function') {
+              const current = (live as () => unknown)();
+              if (
+                Object.is(current, externalTruthByPath.get(path)) &&
+                !Object.is(current, effect.after)
+              ) {
+                return {
+                  kind: 'value-drift',
+                  path,
+                  current,
+                  expected: effect.after,
+                };
+              }
+              continue;
+            }
+          }
 
-          // Only a conflict if the location still holds the external value AND
-          // the inverse would overwrite it with something else.
-          if (
-            Object.is(current, externalTruthByPath.get(path)) &&
-            !Object.is(current, effect.after)
-          ) {
+          // P0-C-ROW. Entity row field: compare the specific field out of the
+          // row the realization delivered, which is why the row VALUE is stored
+          // rather than a flag.
+          const subjectKey = subjectTruthKey(effect.owner, effect.subjectId);
+          if (subjectKey === undefined) continue;
+          const rowTruth = externalTruthBySubject.get(subjectKey);
+          if (!rowTruth) continue;
+          if (!path.startsWith(`${rowTruth.rowPath}.`)) continue;
+
+          const fieldSegments = path
+            .slice(rowTruth.rowPath.length + 1)
+            .split('.');
+          const current = readNested(rowTruth.value, fieldSegments);
+          if (!Object.is(current, effect.after)) {
             return {
               kind: 'value-drift',
               path,
@@ -2392,6 +2426,17 @@ export function timeTravel(
           // own write as external truth a moment later. Mark the path so the
           // next delivery for it is skipped once.
           restorationWrittenPaths.add(effect.path);
+        }
+        const restoredSubjectKey = subjectTruthKey(
+          effect.owner,
+          effect.subjectId
+        );
+        if (restoredSubjectKey !== undefined) {
+          externalTruthBySubject.delete(restoredSubjectKey);
+          // Marked unconditionally, not only when an entry existed: the
+          // restoration's own row write must never be banked, whether or not
+          // external truth was present beforehand.
+          restorationWrittenSubjects.add(restoredSubjectKey);
         }
       }
     };
@@ -2459,11 +2504,52 @@ export function timeTravel(
     const externalTruthByPath = new Map<string, unknown>();
 
     /**
+     * P0-C-ROW — external truth for an ENTITY ROW, keyed by position+subject.
+     *
+     * The path-keyed index above cannot see row fields, because the two sides
+     * disagree about granularity. Measured:
+     *
+     *   recorded at   `rows.a`        the whole row object, subj=1, pos=2
+     *   checked at    `rows.a.name`   the field,            subj=1, owner=2
+     *
+     * Position and subject are the identity both sides carry, so the row value
+     * is stored under those and the individual field is compared out of it.
+     * Without this, an authored row edit superseded by a server refresh was
+     * silently reverted — the original P0-C defect, alive for the single most
+     * common `entityMap` mutation shape.
+     */
+    const externalTruthBySubject = new Map<
+      string,
+      { readonly rowPath: string; readonly value: unknown }
+    >();
+    // Accepts `unknown` because `PositionId` is a branded type on the reversal
+    // side and a plain number on the notification side; the key only needs the
+    // two to stringify identically.
+    const subjectTruthKey = (
+      position: unknown,
+      subject: unknown
+    ): string | undefined =>
+      position === undefined || subject === undefined
+        ? undefined
+        : `${String(position)}\u0000${String(subject)}`;
+
+    /**
      * Paths written by the restoration itself, consumed once on delivery.
      * Restoration writes are published as realizations with `source: 'system'`,
      * so the notifier cannot distinguish them from server truth.
      */
     const restorationWrittenPaths = new Set<string>();
+
+    /**
+     * Subjects written by the restoration itself, consumed once on delivery.
+     *
+     * Path-based suppression cannot cover a row: the restoration writes a FIELD
+     * (`rows.0.v`) but the notification arrives at the ROW (`rows.0`), and the
+     * field-to-row split is not derivable from the path. Measured as false
+     * refusals — each undo banked its own output as external truth and the next
+     * undo refused against it.
+     */
+    const restorationWrittenSubjects = new Set<string>();
     const pendingTransactions = new Map<number, CaptureBucket>();
     const transactionOwnerToken = {};
     let nextTransactionId = 1;
@@ -2961,13 +3047,41 @@ export function timeTravel(
                 // every tree shape, and for a plain nested branch it never runs
                 // at all — the notifier subscription is the observation point
                 // every write reaches.
-                if (!restorationWrittenPaths.delete(path)) {
-                  externalTruthByPath.set(path, next);
+                const subjectKey = subjectTruthKey(
+                  positionIds?.[0],
+                  subjectIds?.[0]
+                );
+                if (
+                  restorationWrittenPaths.delete(path) ||
+                  (subjectKey !== undefined &&
+                    restorationWrittenSubjects.delete(subjectKey))
+                ) {
+                  return;
+                }
+                externalTruthByPath.set(path, next);
+                // Only a row-shaped payload is useful here; the collection also
+                // notifies at its own path with an undefined value.
+                if (
+                  subjectKey !== undefined &&
+                  next !== null &&
+                  typeof next === 'object'
+                ) {
+                  externalTruthBySubject.set(subjectKey, {
+                    rowPath: path,
+                    value: next,
+                  });
                 }
                 return;
               }
               // An authored write returns this location to history's control.
               externalTruthByPath.delete(path);
+              const authoredSubjectKey = subjectTruthKey(
+                positionIds?.[0],
+                subjectIds?.[0]
+              );
+              if (authoredSubjectKey !== undefined) {
+                externalTruthBySubject.delete(authoredSubjectKey);
+              }
               const transactionId = resolveTransactionId(meta);
               if (transactionId !== undefined) {
                 captureIntoBucket(
