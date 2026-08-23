@@ -10,7 +10,6 @@ export const SIGNAL_TREE_CONSTANTS = {
   MAX_PATH_CACHE_SIZE: DEFAULT_PATH_CACHE_SIZE,
 
   /** Performance thresholds */
-  LAZY_THRESHOLD: 50,
   ESTIMATE_MAX_DEPTH: 3,
   ESTIMATE_SAMPLE_SIZE_ARRAY: 3,
   ESTIMATE_SAMPLE_SIZE_OBJECT: 5,
@@ -33,7 +32,6 @@ const DEV_MESSAGES = {
   NULL_OR_UNDEFINED: 'null/undefined [ST1001]',
   CIRCULAR_REF: 'circular ref [ST1002]',
   UPDATER_INVALID: 'updater invalid [ST1003]',
-  LAZY_FALLBACK: 'lazy fallback [ST1004]',
   SIGNAL_CREATION_FAILED: 'signal creation failed [ST1005]',
   UPDATE_PATH_NOT_FOUND: 'update path not found [ST1006]',
   UPDATE_FAILED: 'update failed [ST1007]',
@@ -62,8 +60,10 @@ const DEV_MESSAGES = {
   SUBSCRIBE_NO_CONTEXT: 'no angular context [ST1030]',
   SECURITY_INVALID:
     'invalid security config — pass security(config) from @signaltree/core/security, not a raw config object [ST1031]',
-  LAZY_NOT_INJECTED:
-    'useLazySignals:true has no effect without the lazy feature — pass lazy: lazy() from @signaltree/core/lazy [ST1032]',
+  // ST1032 (LAZY_NOT_INJECTED) and ST1004 (LAZY_FALLBACK) were removed in 15.0
+  // with the lazy feature. ST1032 in particular told users to import from
+  // `@signaltree/core/lazy`, a subpath withdrawn from the published surface —
+  // a runtime diagnostic giving advice that could not be followed.
 } as const;
 
 // Production messages use the same short readable strings as dev.

@@ -1,6 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { batching, signalTree } from '@signaltree/core';
-import { lazy } from '@signaltree/core/lazy';
 
 /**
  * @fileoverview Comprehensive benchmarking suite for SignalTree Demo
@@ -477,112 +476,10 @@ export class BenchmarkService {
     return results;
   }
 
-  /**
-   * Benchmark memory efficiency with lazy loading.
-   *
-   * The lazy branch MUST pass `lazy: lazy()`. Since v11 lazy signal creation is an
-   * injected feature, so `useLazySignals: true` alone is a silent no-op (core warns
-   * LAZY_NOT_INJECTED) — without the feature both branches build eager trees and this
-   * benchmark compares two identical configurations while reporting a lazy/eager
-   * delta.
-   */
-  benchmarkLazyLoading() {
-    try {
-      const largeState = BenchmarkService.generateNestedState(7, 5);
-
-      const results = {
-        eager: { memory: 0, accessTime: 0 },
-        lazy: { memory: 0, accessTime: 0, secondAccess: 0 },
-      };
-
-      // Eager loading
-      const eagerMemory = BenchmarkService.profileMemory(() => {
-        const tree = signalTree(largeState, { useLazySignals: false });
-        tree();
-      });
-      results.eager.memory = eagerMemory?.delta || 0;
-
-      const eagerTree = signalTree(largeState, { useLazySignals: false });
-      results.eager.accessTime = BenchmarkService.measureTime(() => {
-        try {
-          // Safely access nested properties
-          const level5 = (eagerTree.$ as Record<string, unknown>)[
-            'level_5_item_0'
-          ];
-          const level4 = (level5 as Record<string, unknown>)?.[
-            'level_4_item_0'
-          ];
-          const level3 = (level4 as Record<string, unknown>)?.[
-            'level_3_item_0'
-          ];
-          if (level3 && typeof level3 === 'function') level3();
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (_e) {
-          // Ignore property access errors in benchmark
-        }
-      });
-
-      // Lazy loading
-      const lazyMemory = BenchmarkService.profileMemory(() => {
-        const tree = signalTree(largeState, {
-          lazy: lazy(),
-          useLazySignals: true,
-        });
-        tree();
-      });
-      results.lazy.memory = lazyMemory?.delta || 0;
-
-      const lazyTree = signalTree(largeState, {
-        lazy: lazy(),
-        useLazySignals: true,
-      });
-      results.lazy.accessTime = BenchmarkService.measureTime(() => {
-        try {
-          // Safely access nested properties
-          const level5 = (lazyTree.$ as Record<string, unknown>)[
-            'level_5_item_0'
-          ];
-          const level4 = (level5 as Record<string, unknown>)?.[
-            'level_4_item_0'
-          ];
-          const level3 = (level4 as Record<string, unknown>)?.[
-            'level_3_item_0'
-          ];
-          if (level3 && typeof level3 === 'function') level3();
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (_e) {
-          // Ignore property access errors in benchmark
-        }
-      }, 100);
-
-      results.lazy.secondAccess = BenchmarkService.measureTime(() => {
-        try {
-          // Safely access nested properties
-          const level5 = (lazyTree.$ as Record<string, unknown>)[
-            'level_5_item_0'
-          ];
-          const level4 = (level5 as Record<string, unknown>)?.[
-            'level_4_item_0'
-          ];
-          const level3 = (level4 as Record<string, unknown>)?.[
-            'level_3_item_0'
-          ];
-          if (level3 && typeof level3 === 'function') level3();
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch (_e) {
-          // Ignore property access errors in benchmark
-        }
-      });
-
-      return results;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_e) {
-      return {
-        eager: { memory: 0, accessTime: 0 },
-        lazy: { memory: 0, accessTime: 0, secondAccess: 0 },
-      };
-    }
-  }
+  // `benchmarkLazyLoading()` lived here and is deleted with the lazy feature
+  // in 15.0. It had no caller, and its lazy branch imported
+  // `@signaltree/core/lazy` — a subpath withdrawn from the published surface,
+  // so the benchmark could not have run against a published build anyway.
 
   /**
    * Compare with native Angular signals
@@ -660,7 +557,6 @@ export class BenchmarkService {
       initialization: this.benchmarkInitialization(),
       updates: this.benchmarkUpdates(),
       computations: this.benchmarkComputations(),
-      lazyLoading: this.benchmarkLazyLoading(),
       comparison: this.compareWithNativeSignals(),
     };
 
@@ -724,36 +620,15 @@ export class BenchmarkService {
       analysis.performance.grade = 'B';
       analysis.performance.insights.push('Initialization could be optimized');
       analysis.recommendations.push(
-        'Consider lazy loading for large state trees'
+        'Split large state across trees, or model collections with entityMap()'
       );
     }
 
-    // Memory analysis
-    const lazyLoading = results['lazyLoading'] as Record<
-      string,
-      Record<string, number>
-    >;
-    const eager = lazyLoading['eager'];
-    if (eager['memory'] > 0) {
-      const lazy = lazyLoading['lazy'];
-      const memorySavings =
-        (eager['memory'] - lazy['memory']) / eager['memory'];
-
-      if (memorySavings > 0.3) {
-        analysis.memory.grade = 'A+';
-        analysis.memory.insights.push(
-          `Lazy loading saves ${(memorySavings * 100).toFixed(1)}% memory`
-        );
-      } else if (memorySavings > 0.1) {
-        analysis.memory.grade = 'A';
-        analysis.memory.insights.push(
-          `Lazy loading saves ${(memorySavings * 100).toFixed(1)}% memory`
-        );
-      } else {
-        analysis.memory.grade = 'B';
-        analysis.memory.insights.push('Memory usage could be optimized');
-      }
-    }
+    // Memory analysis was a lazy-vs-eager comparison and went with the lazy
+    // feature in 15.0. It graded A+/A/B on a "memory savings" ratio between two
+    // trees — and since v11 both branches built the SAME eager tree unless the
+    // (unpublished) lazy feature was injected, so the grade was computed from a
+    // difference that was structurally zero.
 
     // Memoization effectiveness
     const computations = results['computations'] as Record<

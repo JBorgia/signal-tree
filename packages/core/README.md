@@ -779,9 +779,6 @@ const tree = signalTree(
       level1: { level2: { level3: { data: 'value' } } },
     },
   },
-  {
-    useLazySignals: true, // Default: true
-  }
 );
 
 // Custom equality function

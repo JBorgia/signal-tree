@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { batching, signalTree } from '@signaltree/core';
-import { lazy } from '@signaltree/core/lazy';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
@@ -177,72 +176,10 @@ describe('SignalTree Performance Benchmarks', () => {
     expect(true).toBe(true);
   });
 
-  it('should benchmark lazy loading vs eager loading', () => {
-    const largeState = generateNestedState(5, 3); // ~364 nodes
-
-    const eagerTime = measureTime(() => {
-      const tree = signalTree(largeState, { useLazySignals: false });
-      tree();
-    });
-
-    const lazyTime = measureTime(() => {
-      const tree = signalTree(largeState, {
-        lazy: lazy(),
-        useLazySignals: true,
-      });
-      tree();
-    });
-
-    const lazyTree = signalTree(largeState, {
-      lazy: lazy(),
-      useLazySignals: true,
-    });
-    const accessTime = measureTime(() => {
-      // Access a deeply nested property to trigger signal creation
-      const val = (lazyTree.$ as Record<string, any>)['level_5_item_0']?.[
-        'level_4_item_0'
-      ]?.['level_3_item_0']?.['level_2_item_0']?.['level_1_item_0']?.[
-        'value'
-      ]?.();
-      void val; // Use the value to ensure it's accessed
-    }, 100);
-
-    const savings = ((eagerTime - lazyTime) / eagerTime) * 100;
-
-    performanceResults.lazyLoading = {
-      eager: eagerTime,
-      lazy: lazyTime,
-      access: accessTime,
-      savings,
-    };
-
-    // ASSERT CORRECTNESS, REPORT TIMING.
-    //
-    // This was `expect(lazyTime).toBeLessThan(eagerTime * 2)`, and it failed on
-    // 7.64ms against a 7.20ms threshold — a wall-clock RATIO between two
-    // operations that are genuinely close in cost, measured in single-digit
-    // milliseconds. The harness above is already careful (50 warm-up rounds,
-    // 1,000 iterations, a 10-90% trimmed median); the flake is not sloppy
-    // measurement, it is that no amount of care makes a 2x ratio between
-    // comparable operations stable on a shared machine.
-    //
-    // HANDOFF already records two other timing assertions removed for the same
-    // reason. A test that fails on machine load teaches people to re-run CI
-    // until it passes, which is worse than no test.
-    //
-    // So: the numbers are still measured and still reported (they feed
-    // performanceResults, which the suite prints), and what is ASSERTED is the
-    // property that actually has to hold — lazy and eager must agree.
-    const eagerRead = signalTree(largeState)();
-    const lazyRead = signalTree(largeState, {
-      lazy: lazy(),
-      useLazySignals: true,
-    })();
-    expect(lazyRead).toEqual(eagerRead);
-
-    // A deliberately loose sanity bound: 10x is not a performance claim, it is
-    // "lazy has not become catastrophically broken". Anything tighter is the
-    // flake above.
-    expect(lazyTime).toBeLessThan(eagerTime * 10);
-  });
+  // 'lazy loading vs eager loading' lived here and is deleted with the lazy
+  // feature in 15.0. It compared two trees built with `lazy: lazy()` against
+  // one built eagerly — and since v11 the lazy branch only differed if the
+  // feature was injected from `@signaltree/core/lazy`, a subpath withdrawn
+  // from the published surface. There is one construction path now, so there
+  // is nothing left to compare.
 });

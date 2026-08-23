@@ -18,7 +18,7 @@ installMaterializationRealization({
   memoizeSnapshot: (_node, compute) => computed(compute),
 });
 
-import { SIGNAL_TREE_CONSTANTS, SIGNAL_TREE_MESSAGES } from './constants';
+import { SIGNAL_TREE_MESSAGES } from './constants';
 import { resolveEnhancerOrder } from '../enhancers';
 import { batchScope } from './internals/batch-scope';
 import { SignalTreeBuilder } from './internals/builder-types';
@@ -221,56 +221,10 @@ function createEqualityFn(useShallowComparison: boolean) {
   return useShallowComparison ? Object.is : deepEqual;
 }
 
-function estimateObjectSize(
-  obj: unknown,
-  maxDepth = SIGNAL_TREE_CONSTANTS.ESTIMATE_MAX_DEPTH,
-  currentDepth = 0
-): number {
-  if (currentDepth >= maxDepth) return 1;
-  if (obj === null || obj === undefined) return 0;
-  if (typeof obj !== 'object') return 1;
-
-  let size = 0;
-
-  try {
-    if (Array.isArray(obj)) {
-      size = obj.length;
-      const sampleSize = Math.min(
-        SIGNAL_TREE_CONSTANTS.ESTIMATE_SAMPLE_SIZE_ARRAY,
-        obj.length
-      );
-      for (let i = 0; i < sampleSize; i++) {
-        size += estimateObjectSize(obj[i], maxDepth, currentDepth + 1) * 0.1;
-      }
-    } else {
-      const keys = Object.keys(obj);
-      size = keys.length;
-      const sampleSize = Math.min(
-        SIGNAL_TREE_CONSTANTS.ESTIMATE_SAMPLE_SIZE_OBJECT,
-        keys.length
-      );
-      for (let i = 0; i < sampleSize; i++) {
-        const value = (obj as Record<string, unknown>)[keys[i]];
-        size += estimateObjectSize(value, maxDepth, currentDepth + 1) * 0.5;
-      }
-    }
-  } catch {
-    return 1;
-  }
-
-  return Math.floor(size);
-}
-
-function shouldUseLazy(
-  obj: unknown,
-  config: TreeConfig,
-  precomputedSize?: number
-): boolean {
-  if (config.useLazySignals !== undefined) return config.useLazySignals;
-  if (config.debugMode || config.enableDevTools) return false;
-  const estimatedSize = precomputedSize ?? estimateObjectSize(obj);
-  return estimatedSize > SIGNAL_TREE_CONSTANTS.LAZY_THRESHOLD;
-}
+// `estimateObjectSize` and `shouldUseLazy` lived here and are DELETED in 15.0
+// with the lazy feature. They existed only to decide whether to hand
+// construction to the lazy proxy; nothing else ever asked how big a state
+// object was.
 
 // =============================================================================
 // SECURITY VALIDATION
@@ -1147,27 +1101,8 @@ function create<T extends object>(
   validateTree(initialState, config);
 
   const equalityFn = createEqualityFn(config.useShallowComparison ?? false);
-  // Lazy mode is opt-in (v11): it only runs when the `lazy` feature is injected
-  // via `@signaltree/core/lazy`. Without it the size estimate is skipped and the
-  // tree is always eager, so the lazy proxy + memory manager tree-shake out.
-  const lazyFeature = config.lazy;
-  const useLazy = lazyFeature
-    ? shouldUseLazy(initialState, config, estimateObjectSize(initialState))
-    : false;
-
-  // Dev-mode: `useLazySignals: true` is a silent no-op without the lazy feature.
-  // Warn rather than let a perf-sensitive opt-in vanish unnoticed on upgrade.
-  if (
-    (typeof ngDevMode === 'undefined' || ngDevMode) &&
-    config.useLazySignals === true &&
-    !lazyFeature
-  ) {
-    console.warn(SIGNAL_TREE_MESSAGES.LAZY_NOT_INJECTED);
-  }
 
   // Create signal store
-  let signalState: TreeNode<T>;
-  let disposeLazy: (() => void) | undefined;
   const scalarSlotRuntime = buildPlan.has('causal-runtime')
     ? createTreeScalarSlotRuntime(materializationContext.physicalCommitClock)
     : undefined;
@@ -1185,37 +1120,17 @@ function create<T extends object>(
     // ignore failures (shouldn't happen)
   }
 
-  if (lazyFeature && useLazy && typeof initialState === 'object') {
-    try {
-      const built = lazyFeature.build(initialState, equalityFn);
-      signalState = built.tree as TreeNode<T>;
-      disposeLazy = built.dispose;
-    } catch (error) {
-      if (typeof ngDevMode === 'undefined' || ngDevMode) {
-        console.warn(SIGNAL_TREE_MESSAGES.LAZY_FALLBACK, error);
-      }
-      signalState = createSignalStore(
-        initialState,
-        equalityFn,
-        materializationContext,
-        buildPlan,
-        captureRuntime,
-        scalarSlotRuntime,
-        rootPositionIds
-      );
-      disposeLazy = undefined;
-    }
-  } else {
-    signalState = createSignalStore(
-      initialState,
-      equalityFn,
-      materializationContext,
-      buildPlan,
-      captureRuntime,
-      scalarSlotRuntime,
-      rootPositionIds
-    );
-  }
+  // ONE construction path. The lazy proxy was the other one, and it is gone —
+  // see the tombstone on `TreeConfig` in types.ts.
+  const signalState: TreeNode<T> = createSignalStore(
+    initialState,
+    equalityFn,
+    materializationContext,
+    buildPlan,
+    captureRuntime,
+    scalarSlotRuntime,
+    rootPositionIds
+  );
 
   // Create root callable function
   const tree = function (arg?: unknown): T | void {
@@ -1351,9 +1266,6 @@ function create<T extends object>(
         }
       }
       cleanupFns.length = 0;
-      if (disposeLazy) {
-        disposeLazy();
-      }
       if (config.debugMode) {
         console.log(SIGNAL_TREE_MESSAGES.TREE_DESTROYED);
       }

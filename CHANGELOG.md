@@ -3,6 +3,18 @@
 These entries keep release-delta claim checks honest before the actual version
 bump inserts the final dated 15.0.0 heading.
 
+- **BREAKING: lazy signal creation removed.** `TreeConfig.lazy`,
+  `TreeConfig.useLazySignals`, the `LazyFeature` type, the
+  `@signaltree/core/lazy` subpath, the lazy proxy and `SignalMemoryManager` are
+  all gone, along with diagnostics ST1032 (lazy not injected) and ST1004 (lazy
+  fallback). Nothing needs migrating: the subpath was withdrawn from the
+  published surface in 18fe5781, so `lazy()` could not be imported and both
+  options were already inert — `useLazySignals: true` did nothing and ST1032
+  told users to import from a path that does not ship. Large trees are cheap to
+  read because of incremental materialization on the default path, which is
+  measured (10k leaves, one changed: 149µs against 1808µs for a full rebuild)
+  and needs no configuration.
+
 - **Entity field rollback no longer corrupts the row.**
   `transaction(() => rows.updateOne(id, patch)).rollback()` restored structural
   membership correctly and then wrote the FIELD's previous value into the ENTITY

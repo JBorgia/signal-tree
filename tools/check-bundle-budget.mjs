@@ -179,10 +179,19 @@ const TARGETS = {
     // provided-capability set is computed once. Both are their own change; do not
     // attempt either as a side effect of a budget bump.
     //
-    // Measured after the migration: prod 9.91KB, dev 11.94KB. Budgets set just
-    // above, so the next byte still has to justify itself.
-    devKB: 12.1,
-    prodKB: 10.0,
+    // Measured after the migration: prod 9.91KB, dev 11.94KB.
+    //
+    // Then 15.0 REMOVED lazy signal creation, and the bare bundle came back
+    // down to prod 9.51KB / dev 11.50KB — 0.41KB, which is most of the 0.47KB
+    // declarative construction cost above. Not a coincidence worth reading into:
+    // one is the enhancer resolver arriving, the other is a proxy and a memory
+    // manager leaving. They are unrelated and happen to be similar in size.
+    //
+    // Re-tightened rather than left at 10.0: a budget kept loose after a shrink
+    // stops measuring, which is the defect just fixed in dead-exports and the
+    // lint ledger.
+    devKB: 11.7,
+    prodKB: 9.7,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
