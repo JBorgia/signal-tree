@@ -561,19 +561,15 @@ const GATES = [
     name: 'bounded-history-retention',
     covers:
       'a tree with a BOUNDED timeTravel() does not retain retired subjects without bound',
-    knownFailing:
-      'RC BLOCKER, reproduced: bounded history does not bound physical retention. ' +
-      'The ENTITY-side half is closed — retired subjects are reclaimed at the ' +
-      'eviction boundary and the inventory is flat at one window. What remains is ' +
-      'the tree-realization descriptors: `structuralHistoryEffects`, ' +
-      '`structuralHistoryBySubject` and `subjectDescriptors` accumulate 4 entries ' +
-      'per retired subject (128,200 + 64,200 + 64,200 at 64k retirements) and ' +
-      'nothing prunes them. See docs/architecture/retired-subject-churn.md, ' +
-      '"STEP 8 PHASE 6D". Expected red; must not be silenced.',
-    // Registered RED on purpose. The zero-owner case is closed and flat, so
-    // without this row a full gate run reads 40/40 and says nothing about the
-    // case that actually blocks the RC. A blocker that is known and invisible is
-    // the same as one that is unknown.
+    // WAS REGISTERED RED, and closed by Step 8. Kept as a live gate rather than
+    // deleted: it is the only check that a bounded `timeTravel()` tree has
+    // bounded retained memory, which is a property two separate mechanisms have
+    // to keep working — claim release at the eviction boundary, and the
+    // per-subject prune of the realization descriptors. Either one silently
+    // regressing puts the slope straight back.
+    //
+    // Its threshold was also too weak once and briefly reported a false green
+    // over a run that grew 6.8 -> 54 MB; see the note in the probe.
     cmd: [
       'node',
       '--expose-gc',

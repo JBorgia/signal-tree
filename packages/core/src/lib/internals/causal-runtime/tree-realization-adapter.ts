@@ -1828,6 +1828,86 @@ function parentPath(path: string): string {
   return lastDot === -1 ? '' : path.slice(0, lastDot);
 }
 
+/**
+ * Drop every realization record belonging to subjects that can no longer be
+ * restored.
+ *
+ * ## Why these are subject-lifetime state, not history state
+ *
+ * `structuralHistoryEffects`, `structuralHistoryBySubject` and
+ * `subjectDescriptors` are read on exactly one path — reversal planning — and
+ * every read is keyed by subject id:
+ *
+ *   structuralHistoryEffects     `${kind}:${subject}:${key}`, read by
+ *                                `resolveStructuralHistoryEffect`
+ *   structuralHistoryBySubject   `String(subject)`, same reader
+ *   subjectDescriptors           `String(subject)`, read for `collectionPath`
+ *                                and `fieldPathFromRow`
+ *
+ * So an entry is needed for exactly as long as its subject is restorable, which
+ * is exactly as long as something claims it. Nothing pruned them: they were
+ * bounded by neither `maxHistorySize` nor reclamation, and grew four entries per
+ * retired subject — 256,600 at 64,000 retirements — which was the whole
+ * remaining slope after the entity layer plateaued. See
+ * docs/architecture/retired-subject-churn.md, "STEP 8 PHASE 6D".
+ *
+ * ## Why a scan rather than a subject index
+ *
+ * The effect keys are prefixed by subject, so a `subject -> keys` index would
+ * make this O(1) per subject. It would also be a second structure that can
+ * drift out of step with the first, for a pass over a map that pruning itself
+ * keeps bounded at a few entries per live row plus one window. The scan is the
+ * cheaper thing to be sure about.
+ *
+ * The CALLER must have established that these subjects are unclaimed. This
+ * function does not re-check — it is the destructive half of a decision made
+ * against the claim registry.
+ */
+export function forgetSubjectsInTreeRealizationDescriptors(
+  descriptors: Map<PositionId, TreeRealizationDescriptor>,
+  subjectIds: readonly number[]
+): void {
+  if (subjectIds.length === 0 || descriptors.size === 0) {
+    return;
+  }
+  const forgotten = new Set(subjectIds.map((id) => String(id)));
+
+  for (const descriptor of descriptors.values()) {
+    const bySubject = descriptor.structuralHistoryBySubject;
+    if (bySubject instanceof Map) {
+      for (const key of forgotten) {
+        bySubject.delete(key);
+      }
+    }
+
+    const subjectDescriptors = descriptor.subjectDescriptors;
+    if (subjectDescriptors instanceof Map) {
+      for (const key of forgotten) {
+        subjectDescriptors.delete(key);
+      }
+    }
+
+    const effects = descriptor.structuralHistoryEffects;
+    if (effects instanceof Map) {
+      for (const key of [...effects.keys()]) {
+        // `${kind}:${subject}:...` — the subject is always the second segment.
+        const firstColon = key.indexOf(':');
+        if (firstColon === -1) {
+          continue;
+        }
+        const secondColon = key.indexOf(':', firstColon + 1);
+        const subject = key.slice(
+          firstColon + 1,
+          secondColon === -1 ? undefined : secondColon
+        );
+        if (forgotten.has(subject)) {
+          effects.delete(key);
+        }
+      }
+    }
+  }
+}
+
 function toStructuralHistoryEffectKey(effect: StructuralHistoryEffect): string {
   switch (effect.kind) {
     case 'add':

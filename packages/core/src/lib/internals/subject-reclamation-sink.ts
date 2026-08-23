@@ -45,11 +45,12 @@ export interface SubjectReclamationSink {
   /**
    * Offer subjects whose last restoration claim has been released.
    *
-   * Returns how many were actually reclaimed, which is what the retention
-   * gates assert on — a sink that silently reclaims nothing looks exactly like
-   * a sink that is not wired.
+   * Returns the subjects it RELEASED — those that passed the last-owner check —
+   * whether or not a physical owner had anything left to free. Callers use it to
+   * clean up their own per-subject state, and a sink that silently releases
+   * nothing looks exactly like a sink that is not wired.
    */
-  offerUnclaimed(subjectIds: readonly number[]): number;
+  offerUnclaimed(subjectIds: readonly number[]): readonly number[];
   /** Registered owner count, for diagnostics and for the boundary tests. */
   ownerCount(): number;
 }
@@ -60,10 +61,10 @@ export function createSubjectReclamationSink(
 ): SubjectReclamationSink {
   return {
     offerUnclaimed(subjectIds) {
-      if (subjectIds.length === 0 || owners.length === 0) {
-        return 0;
+      if (subjectIds.length === 0) {
+        return [];
       }
-      let reclaimed = 0;
+      const released: number[] = [];
       for (const subjectId of subjectIds) {
         // THE LAST-OWNER RULE. The caller released ITS claim; someone else may
         // still hold one, and freeing here would be the data loss Phase 6B
@@ -71,6 +72,10 @@ export function createSubjectReclamationSink(
         if (claims.isClaimed(subjectId)) {
           continue;
         }
+        // Released regardless of whether an owner had a plan: a subject whose
+        // bytes went earlier still has per-subject state elsewhere that the
+        // caller has to drop.
+        released.push(subjectId);
         for (const owner of owners) {
           const prepared = owner.__prepareSubjectReclamation(subjectId, {
             // Sound because the registry IS the causal authority for this
@@ -93,10 +98,9 @@ export function createSubjectReclamationSink(
             continue;
           }
           owner.__applyPreparedSubjectReclamation(prepared);
-          reclaimed += 1;
         }
       }
-      return reclaimed;
+      return released;
     },
 
     ownerCount() {
