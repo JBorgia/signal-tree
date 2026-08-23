@@ -45,7 +45,13 @@ type CollectionNode = {
     entity: unknown,
     subjectId: number,
     beforeSubject?: number,
-    afterSubject?: number
+    afterSubject?: number,
+    /**
+     * Keys this same frame will vacate before the restore commits. Without it
+     * the occupancy check is evaluated against pre-frame state and rejects a
+     * key the frame itself is about to free. See RESTORE-P0 P0-D.
+     */
+    vacatingKeys?: ReadonlySet<string | number>
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
     publish(metaOverride?: UpdateMetadata): void;
@@ -536,6 +542,26 @@ function planHeterogeneousFrame(
     );
   }
 
+  // RESTORE-P0 P0-D — what this frame is about to free, per collection.
+  //
+  // `removeKeysByEffect` is fully resolved above, BEFORE any restore is
+  // planned, so the planner already knows every key its own frame will vacate.
+  // It just never told the collection, and `planRestore` therefore validated
+  // occupancy against pre-frame state.
+  //
+  // Scoped by owner (position id) rather than global: two collections may
+  // legitimately hold the same key, and freeing 'a' in one must not license
+  // overwriting 'a' in another.
+  const vacatingKeysByOwner = new Map<number, Set<string | number>>();
+  for (const [removeEffect, removedKey] of removeKeysByEffect) {
+    let keys = vacatingKeysByOwner.get(removeEffect.owner);
+    if (!keys) {
+      keys = new Set<string | number>();
+      vacatingKeysByOwner.set(removeEffect.owner, keys);
+    }
+    keys.add(removedKey);
+  }
+
   const preparedSubjectScalarEffects = scalarEffects.filter((effect) =>
     isPreparedSubjectScalarEffect(effect, preparedContext)
   );
@@ -653,7 +679,8 @@ function planHeterogeneousFrame(
         preparedSubject.value,
         effect.subjectId,
         historyEffect.beforeSubject,
-        historyEffect.afterSubject
+        historyEffect.afterSubject,
+        vacatingKeysByOwner.get(effect.owner)
       ),
     });
   }
