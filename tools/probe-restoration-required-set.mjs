@@ -83,11 +83,12 @@ const SCRIPT = [
   { label: 'updateOne', apply: (r) => r.updateOne('b-0', { v: 200 }) },
   { label: 'setAll (replace all)', apply: (r) => r.setAll(seed('c')) },
   { label: 'removeOne', apply: (r) => r.removeOne('c-1') },
-  // `clear()` is DELIBERATELY ABSENT. Undoing it restores nothing and the undo
-  // after that throws "Unsupported scoped undo effect at structural-drift" — a
-  // pre-existing defect pinned in `clear-not-undoable.spec.ts`, found by this
-  // probe when its traversal could not get past it. Including it here would make
-  // the oracle measure a broken entry's claims.
+  // `clear()` was absent from this script until 15.0, because undoing it
+  // restored nothing and the undo after that threw. This probe is what found
+  // that — its traversal could not get past a clear — and the claim-set
+  // conclusion below is only frozen with `clear()` participating correctly.
+  // See `clear-undoable.spec.ts`.
+  { label: 'clear', apply: (r) => r.clear() },
   { label: 'setAll (reseed)', apply: (r) => r.setAll(seed('d')) },
 ];
 
@@ -223,8 +224,12 @@ if (anyIncorrect) {
   const excessPct = ((totalExcess / Math.max(1, totalNamed)) * 100).toFixed(0);
   console.log(
     `  SAFE AUTHORITY. Across every history size, nothing required is unnamed —\n` +
-      `  outcome C is refuted. Excess is ${totalExcess}/${totalNamed} (${excessPct}%): mostly EXACT,\n` +
-      `  conservative by a subject or two at some sizes.\n\n` +
+      `  outcome C is refuted. Excess is ${totalExcess}/${totalNamed} (${excessPct}%)` +
+      `${
+        totalExcess === 0
+          ? ': EXACT at every size.'
+          : ': a safe superset, conservative by a subject or two.'
+      }\n\n` +
       `  The property Step 8 needs: the named set scales with the WINDOW, not\n` +
       `  with total churn — ${results.map((r) => `${r.historySize}->${r.named}`).join(', ')} against ` +
       `${results[0].physicallyRetained} ever retired.\n` +

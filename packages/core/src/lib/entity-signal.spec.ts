@@ -1858,7 +1858,15 @@ describe('addMany() mode option (F-011)', () => {
         subjectRevision: 1,
         activeKey: undefined,
         retainedSubjectState: true,
-        entitySignal: false,
+        // `true` since 15.0. `clear()` used to call `resetEntitySignals()`,
+        // dropping every entity signal, and that is what made it impossible to
+        // undo: a held reference had no signal left to be re-published into, so
+        // restoration could only have manufactured a NEW subject at the same
+        // key. It now tombstones each signal the way `removeOne` does and keeps
+        // the entry. Zero-owner trees still shed it, through reclamation at the
+        // retirement boundary rather than through a blanket reset.
+        // See `clear-undoable.spec.ts`.
+        entitySignal: true,
         activationToken: true,
         nodeFacadeMaterialized: true,
         fieldFacadesMaterialized: ['active', 'id', 'name'],
