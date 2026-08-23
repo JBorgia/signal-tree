@@ -29,6 +29,33 @@
  *   undoable user operation"), never manipulate the causal engine directly.
  */
 
+import type { UpdateMetadata } from '../mutation-types';
+
+/**
+ * The runtime metadata a designated write carries.
+ *
+ * Deliberately NOT a field on the public `UpdateMetadata`: applications express
+ * "this is an undoable user operation" through {@link undoable}, and must never
+ * set an engine field. The property exists on the object at runtime; only this
+ * internal view declares it.
+ */
+export type DesignatedWriteMeta = UpdateMetadata & {
+  restorationDesignated?: boolean;
+};
+
+/** @internal Read the designation off a delivered metadata object. */
+export function isMetaDesignated(meta: UpdateMetadata | undefined): boolean {
+  return (meta as DesignatedWriteMeta | undefined)?.restorationDesignated === true;
+}
+
+/** @internal Stamp the ambient designation onto a metadata object. */
+export function markMetaDesignated(
+  meta: UpdateMetadata | undefined
+): UpdateMetadata {
+  const stamped: DesignatedWriteMeta = { ...meta, restorationDesignated: true };
+  return stamped;
+}
+
 let designated = false;
 
 /** @internal */

@@ -175,6 +175,14 @@ export {
   // root app API.
 } from './lib/utils';
 
+/**
+ * @see {@link undoable} — designates an authored causal turn as eligible for
+ *   undo. The one public door onto restoration eligibility; the engine's own
+ *   vocabulary (`causalMode`, `intent`, `source`, restoration designation
+ *   metadata) stays internal.
+ */
+export { undoable } from './lib/undoable';
+
 // `getPathNotifier` is not root app API. `composeEnhancers` left the root barrel
 // in v12 too and was deleted outright in 15.0 — use `tree.with(a).with(b)`.
 

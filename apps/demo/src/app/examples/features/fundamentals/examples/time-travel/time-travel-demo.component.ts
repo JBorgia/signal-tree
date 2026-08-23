@@ -10,6 +10,7 @@ import {
   SignalTreeRollbackError,
   signalTree,
   timeTravel,
+  undoable,
 } from '@signaltree/core';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
@@ -286,10 +287,18 @@ export class TimeTravelDemoComponent {
       completed: false,
     };
 
-    this.updateTree((state: AppState) => ({
-      ...state,
-      todos: [...state.todos, newTodo],
-    }));
+    // `undoable()` marks the authored causal turn containing these writes as
+    // eligible for undo. Adding a todo is a real user operation, which is the
+    // bar for designation — not "it happens to change state".
+    //
+    // It does NOT create a turn boundary: anything else written in this same
+    // tick belongs to the same operation and reverses with it.
+    undoable(() => {
+      this.updateTree((state: AppState) => ({
+        ...state,
+        todos: [...state.todos, newTodo],
+      }));
+    });
     this.newTodoText = '';
     this.refreshTimeTravelState();
   }

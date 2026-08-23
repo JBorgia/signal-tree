@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
 import { toWritableSignal } from '../../lib/utils';
-import { withRestorationDesignation } from '../../lib/internals/restoration-eligibility';
+import { undoable } from '../../lib/undoable';
 import { timeTravel } from './time-travel';
 
 /**
@@ -92,7 +92,7 @@ describe('HIST-C2 step 6: the DOM-driven write', () => {
 
     // THE FINDING. The write lands, and it is not designated, because the
     // application never gets a callback around the directive's listener. There
-    // is no place to put `reversible(() => …)`.
+    // is no place to put `undoable(() => …)`.
     expect(tree.$.editForm.name()).toBe('grace');
     expect(turns(tree)).toBe(before);
   });
@@ -112,7 +112,7 @@ describe('HIST-C2 step 6: the DOM-driven write', () => {
     // event dispatch itself. Even this is not available in a real app — the
     // browser dispatches, not the app — so it is an upper bound, not a
     // workaround.
-    withRestorationDesignation(() => {
+    undoable(() => {
       input.dispatchEvent(new Event('input'));
     });
     fixture.detectChanges();

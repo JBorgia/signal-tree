@@ -377,13 +377,6 @@ const EXEMPT = new Map(
       'HIST-C2 prototype switch. Exists only so the existing suites can run ' +
       'under the old default while the door is characterised, and is deleted ' +
       'when the default flips. Implementation vocabulary; never a shipped option',
-    restorationDesignated:
-      'HIST-C2 prototype plumbing: stamped on UpdateMetadata at notify() time ' +
-      'because capture is deferred to the flush microtask. Applications never ' +
-      'set it — they express "this is an undoable user operation" through the ' +
-      'designation scope. Sitting on a public type is known surface debt to be ' +
-      'resolved when the public spelling is chosen (HIST-C2 step 7); if it ' +
-      'ships on UpdateMetadata, this exemption is wrong and it needs documenting',
   })
 );
 

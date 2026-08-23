@@ -10,7 +10,10 @@
  */
 
 import { getActiveWriteContext } from './write-context';
-import { isRestorationDesignated } from './internals/restoration-eligibility';
+import {
+  isRestorationDesignated,
+  markMetaDesignated,
+} from './internals/restoration-eligibility';
 
 import { getCausalWriteMode } from './causal-write-mode';
 
@@ -212,7 +215,7 @@ export class PathNotifier {
     // three `captureIntoBucket` calls for one designated tick ran after the
     // scope had exited.
     const meta: UpdateMetadata | undefined = isRestorationDesignated()
-      ? { ...ambientMeta, restorationDesignated: true }
+      ? markMetaDesignated(ambientMeta)
       : ambientMeta;
     // Tag the batch with the ambient write source (e.g. `time-travel` during a
     // history restore). The flush that delivers this entry is DEFERRED to a
