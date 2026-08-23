@@ -1,16 +1,13 @@
 {
   "counts": {
-    "packages/core": 539,
-    "packages/ng-forms": 32,
+    "packages/core": 0,
+    "packages/ng-forms": 28,
     "packages/shared": 0,
-    "packages/guardrails": 27,
-    "packages/schema": 56,
-    "packages/events": 6,
-    "packages/realtime": 6,
-    "apps/demo": 15,
-    "tools": 5,
-    "scripts": 58
+    "packages/events": 1,
+    "apps/demo": 10,
+    "tools": 4,
+    "scripts": 54
   },
-  "total": 744,
-  "filesLinted": 580
+  "total": 97,
+  "filesLinted": 664
 }

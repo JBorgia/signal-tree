@@ -158,7 +158,6 @@ export abstract class BaseSubscriber<TEvent extends BaseEvent = BaseEvent>
    * Called before processing starts (for setup/validation)
    */
   protected async beforeProcess(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _event: TEvent
   ): Promise<void> {
     // Override in subclass if needed
@@ -168,9 +167,7 @@ export abstract class BaseSubscriber<TEvent extends BaseEvent = BaseEvent>
    * Called after processing completes (for cleanup)
    */
   protected async afterProcess(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _event: TEvent,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _result: ProcessingResult
   ): Promise<void> {
     // Override in subclass if needed
