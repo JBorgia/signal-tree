@@ -3,6 +3,27 @@
 These entries keep release-delta claim checks honest before the actual version
 bump inserts the final dated 15.0.0 heading.
 
+- **`undoable()` — designate an operation as undoable.** Restoration eligibility
+  now has one public door. `undoable(fn)` marks the authored causal turn
+  containing its writes as eligible for undo; it does not create a turn
+  boundary, so one designated write promotes the whole turn and two scopes in
+  the same tick are one undo step. The scope is synchronous and refuses an async
+  callback with ST1033. For writes a framework owns —
+  Angular Signal Forms writes its model from inside its own DOM listener —
+  `toWritableSignal(node, injector, { undoable: true })` designates at the
+  mutation door, which follows the mutation entrance rather than the branch: the
+  same branch written through an ordinary tree handle stays non-undoable. The
+  engine's own vocabulary (`causalMode`, restoration designation metadata) stays
+  internal.
+
+- **Restoration refuses rather than destroying later truth (ST1034).** An
+  `undo()`/`redo()` either reverses the authored operation atomically or does not
+  happen. If a location the operation touched has since been changed by external
+  truth, the restoration is refused before anything mutates: nothing changes, the
+  history position does not move, and redo state is unchanged. Applying it
+  partially would break the operation's atomicity; applying it fully would
+  discard truth the history system does not own.
+
 - **Tree lifetime is now documented as a contract.** A `SignalTree` owns runtime
   resources until `destroy()` is called; dropping the last reference is not
   sufficient for prompt reclamation. Nothing changed in the runtime — this is
