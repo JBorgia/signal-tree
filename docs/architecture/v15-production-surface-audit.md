@@ -60,6 +60,35 @@ transaction values.
 Both already exist internally. Neither is reachable. That is more fundamental
 than `loader()` or `stored()` ever were.
 
+### PUBLIC INTENT vs INTERNAL AUTHORITY
+
+PER-0 sharpened this into a two-tier requirement, because the two cases differ
+in **who owns the write**:
+
+```text
+A1     the CALLER owns the write
+       -> a narrow public door is sufficient:
+          "apply externally realized truth"
+
+PER-0  the CALLEE owns an ASYNC write
+       -> no caller-side wrapper can reach it; the capability must hold the
+          classification authority INTERNALLY
+```
+
+So Candidate B needs both, and must not solve them with one exposure:
+
+```text
+PUBLIC     a small operation expressing one intent
+INTERNAL   the write context — causalMode, subject/position metadata,
+           transaction interaction, restoration machinery
+```
+
+A redesigned `persistence()` uses the internal authority because it owns its
+eventual write. An application-driven resource integration uses the constrained
+public door because the application owns that write. Exposing the internal
+mechanism to serve the first case would hand every consumer authority only the
+second case needs.
+
 ### ⚠️ One authority does NOT mean one public API
 
 The temptation is `withCausalContext({...})` because both are implemented with
@@ -98,16 +127,23 @@ no public-surface audit looks at.
 
 ## An experiment-methodology rule, after three false signals
 
-> **An async probe must wait on the scheduler the mechanism under test actually
-> uses. "Microtasks drained" is not evidence of framework, effect or timer
-> quiescence.**
+> **A negative probe is valid only after a control proves the mechanism was
+> actually exercised.** "Nothing happened" has meant "the harness never reached
+> the behaviour" four times in this audit, and never once meant "the product
+> lacks the behaviour".
+>
+> The scheduler case is one instance: **an async probe must wait on the
+> scheduler the mechanism under test actually uses.** "Microtasks drained" is
+> not evidence of framework, effect or timer quiescence.
 
-It has now independently produced three false defect signals: TH-0's undo looked
-like a no-op because `trackHistory` records through an Angular `effect`, and
-A2's persistence looked dead twice because autoSave debounces through
-`setTimeout` and falls back to a 100ms poll outside an injection context. Each
-initially read as a product defect. No gate for this — it belongs in how
-experiments are run.
+Four false defect signals so far. TH-0's undo looked like a no-op because
+`trackHistory` records through an Angular `effect`. A2's persistence looked dead
+twice because autoSave debounces through `setTimeout` and falls back to a 100ms
+poll outside an injection context. And PER-0's restore looked broken because the
+fixture hand-wrote a payload shape that `load()` silently ignored — fixed by
+seeding from a real `save()` round-trip, which is the control that should have
+come first. Each initially read as a product defect. No gate for this; it
+belongs in how experiments are run.
 
 ## A release rule NGF-DEL produced
 
@@ -1135,6 +1171,29 @@ over — the form cannot scope, and it mishandles ingress. PER-C is refuted by t
 synchronous-scope constraint: an external composition cannot classify an async
 restore it does not own, so deleting `persistence()` and exposing a seam would
 leave restore incorrect in every composition.
+
+## A semantic decision Candidate B must make explicitly
+
+There are now two external-truth/transaction interactions, and they differ:
+
+```text
+A1 realization arrives mid-transaction
+   rollback -> pre-transaction baseline; the realization is discarded
+
+PER-0 load() arrives mid-transaction
+   rollback -> the LOADED value; the baseline moved silently
+```
+
+The second is unacceptable because it arises from an unclassified mutation, not
+from a decision. But fixing the classification does not by itself choose the
+policy. Candidate B must state which:
+
+```text
+reject or defer a load while a transaction is unsettled
+apply it as a realization with A1's defined semantics
+```
+
+PER-0 proves only that today's silent baseline mutation cannot remain.
 
 ## What PER-0 hands to Candidate B
 
