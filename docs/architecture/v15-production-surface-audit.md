@@ -270,7 +270,7 @@ A1-0    remote acquisition / resource composition       DONE — one seam owed
    ↓
 A2-0    persistence + core/storage                       DONE — A2-B
    ↓
-A6      EntitySignal.map
+A6      EntitySignal.map                                 DONE — no gap, rename
    ↓
 PER-0   persistence(): function vs current form; scoped persistence;
         the StorageAdapter contract vs the ./storage package boundary
@@ -301,7 +301,7 @@ freeze the Candidate B surface
 | A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
 | A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
 | A4+A5 | form integration and its history | `form`, `FormSignal`, `history`, `@signaltree/ng-forms/signals` | **resolved — one consumer, proven path, one gap** |
-| A6 | collection projections | `EntitySignal.map` | not started |
+| A6 | collection projections | `EntitySignal.map` | **RESOLVED — no gap; `asMap` already ships** |
 | A7 | tree composition | `.with()` | decided in 15.0 — declarative construction |
 
 ---
@@ -1581,6 +1581,59 @@ model depends on it.
 `form`, `FormSignal`, `history` and the `signals` subpath stay deleted. Note
 that `@signaltree/ng-forms` surviving at all is recorded as UNPROVEN in
 `b57ba293`, pending its own audit; nothing here changes that.
+
+---
+
+# A6 — collection projections (`EntitySignal.map`)
+
+The shortest dossier in the audit, and worth recording precisely because the
+error count made it look bigger than it is.
+
+## The blast radius is TWO LINES, not eight errors
+
+All eight reduce to two locations in one TruckTrax file, multiplied across the
+typecheck projects that include it:
+
+```text
+service-crud-ops.ts:134    Object.fromEntries(this.slice.entities.map())
+service-crud-state.ts:124  Pick<EntitySignal<T, EntityId>, 'all' | 'byId' | 'map'>
+```
+
+The second is a type alias — `ServiceCrudEntityReads` — whose **only reference
+in the entire monorepo is its own declaration**. Dead code.
+
+So there is exactly ONE real call: building a `Record<EntityId, TEntity>`
+lookup from the collection.
+
+## There is no capability gap — the replacement already ships and is better
+
+`EntitySignal` exposes:
+
+```ts
+readonly asMap: Signal<ReadonlyMap<K, E>>;
+```
+
+Keyed by the collection's own `selectId`, reactive, and covered by eight
+assertions across three core specs. The migration is a rename:
+
+```ts
+Object.fromEntries(this.slice.entities.map())     // v13
+Object.fromEntries(this.slice.entities.asMap())   // v15
+```
+
+and the better form drops `fromEntries` entirely, since a `ReadonlyMap` is what
+the consumer wanted in the first place.
+
+## Disposition
+
+**No SignalTree action. Migration only, and it is a rename plus a dead-type
+deletion.** `map` does not come back; `asMap` is the same projection with a
+better type and a reactive wrapper.
+
+Recorded because the pass-1 ledger listed this at 8 errors alongside genuine
+capability gaps, which overstated it. Error counts measure compiler
+consequences, not distinct findings — the same correction the implicit-any
+cascade needed.
 
 ---
 
