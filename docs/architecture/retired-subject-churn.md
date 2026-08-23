@@ -663,3 +663,81 @@ reasoning about the wrong thing.
 **Conclusion: do not widen the RC scope.** A composite
 `{ collection, subjectId }` reference would buy exactness the contract does not
 require, and the falsifier gives no reason to pay for it.
+
+
+---
+
+## STEP 8 PHASE 6B — what each restoration system actually owns
+
+Reproduce with `nx test core` —
+`enhancers/transactions/retired-backing-ownership-null.spec.ts`.
+
+Phase 5 wired `timeTravel()` into the claim registry and nothing wired
+`transactions()`, so `claims.release(...) -> N` meant "N has no TIME-TRAVEL
+owner". The causal coordinator is not quietly covering the gap: `reclaimSubject`
+and `assessReclamationEligibility` have NO production caller, and
+`TurnStore`/`AppliedHistory` are constructed in exactly one place — inside
+`transactions()`.
+
+The question was answered directly rather than by wiring: get into a state,
+retire a subject, delete its backing, and see whether every legal operation
+still completes.
+
+### The two halves are not the same thing
+
+| what is deleted | who needs it |
+| --- | --- |
+| the VALUE bytes (`EntityValueStore`) | **nobody, once tombstoned** |
+| the LIFETIME record (`restoreAllowed`, subject state) | a pending transaction; a retained history entry |
+
+**Value bytes have no reader on the tombstoned path.** Every
+`backingForSubject` caller is active-path: `getProjectedEntity` resolves through
+a key mapping the tombstone deleted, `getEntitySignal` materialises for a live
+id, `resolveEntityHandle` returns before the read unless the subject is active.
+The one apparent exception — `mutation.realizedValue ?? backingForSubject(...)`
+in `prepareCommitInstructions` — is dead: the only construction site is
+`planRestore(key, entity, ...)`, whose `entity` is required. Every restorer
+already holds its own copy: a time-travel entry has the snapshot, a transaction
+turn has `__baselineValues`, a structural `remove` effect has
+`deepClone(entity)`. The entity layer's retained value is a THIRD copy.
+
+Measured: deleting the value bytes leaves pending rollback, confirm, abort,
+time-travel undo, and both-enhancer trees correct — including the HELD
+REFERENCE, which is the discriminating case a fresh read would have passed
+vacuously.
+
+**The lifetime record is owned, and only while the turn is unsettled.** Full
+production reclamation of a subject retired inside a pending turn makes
+`rollback()` throw `could not rollback the pending transaction` and loses the
+row permanently. That is data loss, not a degraded restore.
+`assessReclamationEligibility` already returns a `pending-reference` blocker for
+exactly this case; it has no caller, which is why the hazard is reachable.
+
+Historical byte split: 249 B/retired with nothing reclaimed, 117 B with the
+ledger kept, 6 B with it forgotten. The value is roughly half and needs no
+claim; the ledger is the other half and needs one.
+
+### Ownership lifetimes — FROZEN
+
+| owner | retains from | releases at | bound |
+| --- | --- | --- | --- |
+| optimistic operation | the optimistic mutation | settlement — confirm OR reject | unresolved operations right now |
+| time travel | capture | the entry leaves the retained window | the configured window |
+| ordinary mutation | — | — | nothing retained |
+
+> **Retain state for as long as the application still has a legal operation
+> that can require it, and reclaim it automatically at the earliest point after
+> that right disappears.**
+
+The transaction bound is NOT a configured depth. An application that has made
+two million optimistic updates over a week, with four requests currently
+outstanding, should retain rollback data for four. Confirmation DISCARDS
+rollback state; it does not silently become permanent history. An application
+that wants a confirmed optimistic edit to remain undoable composes the two
+owners, and the subject is never unowned during the handoff — which is what the
+aggregate registry is for.
+
+Defaults that follow: history off unless requested, transactions off unless
+requested, reclamation automatic, and no reclamation-policy knob. `timeTravel()`
+is bounded by default; the specific depth is configuration and has not been
+established empirically.
