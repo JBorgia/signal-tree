@@ -107,6 +107,24 @@ const TRANSACTION_LIFECYCLE = Symbol.for(
   'SignalTree:TransactionLifecycleChannel'
 );
 
+/**
+ * Records that SOME transaction owner set this tree up.
+ *
+ * Separate from the channel itself, and that separation is the whole point: it
+ * is what lets an observer tell a missing channel apart from a tree that never
+ * had one. Established by `installTransactionLifecycleChannel`, an operation
+ * only an owner performs — so the authority fact comes from the act of
+ * ownership rather than from recognising a particular owner.
+ *
+ * It deliberately does NOT record WHICH owner, or how many. Both `transactions()`
+ * and `restoration()` install, and nothing needs to distinguish them; if owner
+ * identity is ever needed this becomes a registry, but widening it before there
+ * is a consumer would be inventing the requirement.
+ */
+const TRANSACTION_LIFECYCLE_OWNER = Symbol.for(
+  'SignalTree:TransactionLifecycleOwnerPresent'
+);
+
 function createChannel(): TransactionLifecycleChannel {
   const listeners = new Set<TransactionLifecycleListener>();
   return {
@@ -162,6 +180,19 @@ export function installTransactionLifecycleChannel(
   tree: object
 ): TransactionLifecycleChannel {
   const host = canonicalHost(tree);
+
+  // Marked BEFORE the early return, so a second owner installing onto an
+  // existing channel still asserts the fact, and so the marker survives a
+  // channel that is later lost.
+  if (!(host as Record<symbol, unknown>)[TRANSACTION_LIFECYCLE_OWNER]) {
+    Object.defineProperty(host, TRANSACTION_LIFECYCLE_OWNER, {
+      value: true,
+      enumerable: false,
+      writable: false,
+      configurable: true,
+    });
+  }
+
   const existing = (host as Record<symbol, unknown>)[TRANSACTION_LIFECYCLE];
   if (existing) {
     return existing as TransactionLifecycleChannel;
@@ -179,14 +210,23 @@ export function installTransactionLifecycleChannel(
 }
 
 /**
- * Does this tree have a transaction authority at all?
+ * Did a transaction OWNER set this tree up?
  *
- * Keyed on `__transactions`, the handle the transactions enhancer PUBLISHES for
- * exactly this purpose — not on a heuristic like "does it have a `transaction`
- * method", which any object could satisfy.
+ * TURN-FEED-0.2.1. This used to read `__transactions`, the handle the
+ * transactions enhancer publishes — which narrowed a general ownership concept
+ * to one concrete producer. `restoration()` is also a transaction owner and
+ * publishes no such handle, so a restoration-only tree whose channel had been
+ * lost reported "no transaction capability" instead of corruption: the loud
+ * failure was loud for one enhancer and silent for the other.
+ *
+ * The fact now comes from the act of ownership itself — the marker is written by
+ * `installTransactionLifecycleChannel`, which only an owner calls. Replacing one
+ * owner-specific check with two (`__transactions || __restoration`) would have
+ * kept the same defect and merely enumerated more of it.
  */
-function hasTransactionAuthority(tree: object): boolean {
-  return !!(tree as Record<string, unknown>)['__transactions'];
+function hasTransactionOwner(tree: object): boolean {
+  const host = canonicalHost(tree);
+  return !!(host as Record<symbol, unknown>)[TRANSACTION_LIFECYCLE_OWNER];
 }
 
 /**
@@ -232,10 +272,10 @@ export function getTransactionLifecycleChannel(
   if (channel) {
     return channel;
   }
-  if (hasTransactionAuthority(tree)) {
+  if (hasTransactionOwner(tree)) {
     throw new Error(
       'ST1036: this tree has a transaction authority but no lifecycle channel ' +
-        'could be resolved. The channel is installed by the authority on the ' +
+        'could be resolved. The channel is installed by that owner on the ' +
         "tree's canonical host; failing to find one here means the install and " +
         'the lookup disagree about that host, which would silently deliver no ' +
         'lifecycle events at all.'

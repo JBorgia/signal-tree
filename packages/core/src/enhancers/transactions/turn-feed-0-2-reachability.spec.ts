@@ -205,6 +205,33 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     );
   });
 
+  it('case 8b — SELF-TEST: the OTHER owner, restoration(), is equally loud', async () => {
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
+    await flush();
+
+    const host = (tree as unknown as { $: object }).$;
+    expect(Object.prototype.hasOwnProperty.call(host, LIFECYCLE)).toBe(true);
+    delete (host as Record<symbol, unknown>)[LIFECYCLE];
+
+    // Case 8 proved fail-loud for ONE owner implementation. The invariant is
+    // about a transaction OWNER, and restoration is one — so the same corruption
+    // must produce the same corruption message here.
+    expect(tryGetTransactionLifecycleChannel(tree)).toBeUndefined();
+    expect(() => getTransactionLifecycleChannel(tree)).toThrowError(
+      /transaction authority but no lifecycle channel/
+    );
+  });
+
+  it('case 8c — no owner and no channel is legitimate absence, not corruption', async () => {
+    const tree = signalTree({ n: 0 }, { enhancers: [batching()] });
+    await flush();
+
+    expect(tryGetTransactionLifecycleChannel(tree)).toBeUndefined();
+    expect(() => getTransactionLifecycleChannel(tree)).toThrowError(
+      /no transaction capability/
+    );
+  });
+
   it('case 9 — repeated lookups return the SAME channel identity', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [transactions()] });
     await flush();
