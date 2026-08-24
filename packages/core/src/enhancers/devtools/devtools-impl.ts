@@ -519,7 +519,7 @@ interface DevToolsGroup {
     tree: {
       readSnapshot: () => unknown;
       buildSerializedState: (state: unknown) => unknown;
-      applyExternalState: (state: unknown) => void;
+      applyInspectionState: (state: unknown) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
       enableTimeTravel: boolean;
@@ -584,7 +584,7 @@ function getOrCreateDevToolsGroup(
     {
       readSnapshot: () => unknown;
       buildSerializedState: (state: unknown) => unknown;
-      applyExternalState: (state: unknown) => void;
+      applyInspectionState: (state: unknown) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
       enableTimeTravel: boolean;
@@ -602,7 +602,7 @@ function getOrCreateDevToolsGroup(
   let browserDevTools: Pick<ReduxDevToolsConnection, 'send' | 'subscribe'> | null = null;
   let unsubscribeDevTools: (() => void) | null = null;
   let isConnected = false;
-  let isApplyingExternalState = false;
+  let isApplyingInspectionState = false;
 
   let sendScheduled = false;
   let sendTimer: ReturnType<typeof setTimeout> | null = null;
@@ -668,20 +668,20 @@ function getOrCreateDevToolsGroup(
     browserDevTools.send('@@INIT', aggregated);
   };
 
-  const applyExternalState = (state: unknown) => {
+  const applyInspectionState = (state: unknown) => {
     if (state === undefined || state === null) return;
-    isApplyingExternalState = true;
+    isApplyingInspectionState = true;
     try {
       const stateByTree = state as Record<string, unknown>;
       for (const [treeKey, tree] of trees) {
         if (!tree.enableTimeTravel) continue;
         const treeState = stateByTree[treeKey];
         if (treeState !== undefined) {
-          tree.applyExternalState(treeState);
+          tree.applyInspectionState(treeState);
         }
       }
     } finally {
-      isApplyingExternalState = false;
+      isApplyingInspectionState = false;
       for (const treeKey of trees.keys()) {
         lastSnapshots.delete(treeKey);
         pendingPathsByTree.delete(treeKey);
@@ -727,13 +727,13 @@ function getOrCreateDevToolsGroup(
 
     if (actionType === 'JUMP_TO_STATE' || actionType === 'JUMP_TO_ACTION') {
       const nextState = parseDevToolsState(msg.state);
-      applyExternalState(nextState);
+      applyInspectionState(nextState);
       return;
     }
 
     if (actionType === 'ROLLBACK') {
       const nextState = parseDevToolsState(msg.state);
-      applyExternalState(nextState);
+      applyInspectionState(nextState);
       sendInit();
       return;
     }
@@ -755,7 +755,7 @@ function getOrCreateDevToolsGroup(
       const index = Math.max(0, Math.min(indexRaw, computedStates.length - 1));
       const entry = computedStates[index];
       const nextState = parseDevToolsState(entry?.state);
-      applyExternalState(nextState);
+      applyInspectionState(nextState);
       sendInit();
     }
   };
@@ -842,7 +842,7 @@ function getOrCreateDevToolsGroup(
 
   const flushSend = () => {
     sendScheduled = false;
-    if (!browserDevTools || isApplyingExternalState) return;
+    if (!browserDevTools || isApplyingInspectionState) return;
 
     const aggregatedState: Record<string, unknown> = {};
     const allFormattedPaths: string[] = [];
@@ -921,7 +921,7 @@ function getOrCreateDevToolsGroup(
   };
 
   const scheduleSend = (action?: DevToolsAction, meta?: DevToolsActionMeta) => {
-    if (isApplyingExternalState) return;
+    if (isApplyingInspectionState) return;
 
     if (action !== undefined) {
       if (!pendingExplicitAction && pendingAction == null) {
@@ -981,7 +981,7 @@ function getOrCreateDevToolsGroup(
     tree: {
       readSnapshot: () => unknown;
       buildSerializedState: (state: unknown) => unknown;
-      applyExternalState: (state: unknown) => void;
+      applyInspectionState: (state: unknown) => void;
       formatPathFn: (path: string) => string;
       isPathAllowed: (path: string) => boolean;
       enableTimeTravel: boolean;
@@ -1174,7 +1174,7 @@ export function createDevToolsEnhancer(
     let browserDevToolsConnection: ReduxDevToolsConnection | null = null;
     let browserDevTools: Pick<ReduxDevToolsConnection, 'send' | 'subscribe'> | null = null;
     let isConnected = false;
-    let isApplyingExternalState = false;
+    let isApplyingInspectionState = false;
     let unsubscribeDevTools: (() => void) | null = null;
 
     // PathNotifier subscriptions (batched mutation streaming)
@@ -1246,7 +1246,7 @@ export function createDevToolsEnhancer(
 
     const flushSend = (): void => {
       sendScheduled = false;
-      if (!browserDevTools || isApplyingExternalState) return;
+      if (!browserDevTools || isApplyingInspectionState) return;
 
       const rawSnapshot = readSnapshot();
       const currentSnapshot = rawSnapshot ?? {};
@@ -1362,7 +1362,7 @@ export function createDevToolsEnhancer(
       action?: DevToolsAction,
       meta?: Partial<DevToolsActionMeta>
     ): void => {
-      if (isApplyingExternalState) return;
+      if (isApplyingInspectionState) return;
       if (action !== undefined) {
         pendingAction = action;
         pendingExplicitAction = true;
@@ -1427,9 +1427,9 @@ export function createDevToolsEnhancer(
       pendingDuration = undefined;
     };
 
-    const applyExternalState = (state: unknown): void => {
+    const applyInspectionState = (state: unknown): void => {
       if (state === undefined || state === null) return;
-      isApplyingExternalState = true;
+      isApplyingInspectionState = true;
       try {
         // Tag every leaf write performed during this replay with
         // `origin: 'devtools'` — NOT `'restoration'`, which is what this used
@@ -1461,7 +1461,7 @@ export function createDevToolsEnhancer(
           }
         );
       } finally {
-        isApplyingExternalState = false;
+        isApplyingInspectionState = false;
         lastSnapshot = readSnapshot();
         pendingPaths = [];
       }
@@ -1516,13 +1516,13 @@ export function createDevToolsEnhancer(
       if (!actionType) return;
       if (actionType === 'JUMP_TO_STATE' || actionType === 'JUMP_TO_ACTION') {
         const nextState = parseDevToolsState(msg.state);
-        applyExternalState(nextState);
+        applyInspectionState(nextState);
         return;
       }
 
       if (actionType === 'ROLLBACK') {
         const nextState = parseDevToolsState(msg.state);
-        applyExternalState(nextState);
+        applyInspectionState(nextState);
         sendInit();
         return;
       }
@@ -1547,7 +1547,7 @@ export function createDevToolsEnhancer(
         );
         const entry = computedStates[index];
         const nextState = parseDevToolsState(entry?.state);
-        applyExternalState(nextState);
+        applyInspectionState(nextState);
         sendInit();
       }
     };
@@ -1565,7 +1565,7 @@ export function createDevToolsEnhancer(
           groupUnregister = group.registerTree(displayName, {
             readSnapshot,
             buildSerializedState,
-            applyExternalState,
+            applyInspectionState,
             formatPathFn,
             isPathAllowed,
             enableTimeTravel,
@@ -1830,7 +1830,7 @@ export function createDevToolsEnhancer(
     unsubscribePathNotifier = notifier.subscribe(
       '**',
       (_value, _prev, path) => {
-        if (isApplyingExternalState) return;
+        if (isApplyingInspectionState) return;
         if (!isPathOwnedByTree(path)) return;
         if (!isPathAllowed(path)) return;
         pendingPaths.push(path);
@@ -1842,7 +1842,7 @@ export function createDevToolsEnhancer(
     // (e.g. tree created outside injection context). When effect() IS available,
     // flushSend's no-change guard prevents duplicate sends.
     unsubscribePathFlush = notifier.onFlush(() => {
-      if (isApplyingExternalState) return;
+      if (isApplyingInspectionState) return;
       if (pendingPaths.length === 0) return;
 
       if (aggregatedReduxInstance) {

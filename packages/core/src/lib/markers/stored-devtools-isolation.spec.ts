@@ -205,9 +205,14 @@ describe('stored() and replay side effects', () => {
     undoable(() => tree.$.k.set('dark'));
     tree.$.k.flush?.();
 
-    withWriteContext({ intent: 'system', origin: 'devtools' }, () => {
-      undoable(() => tree.$.k.set('light'));
-    });
+    // The context `devTools()` actually establishes — both axes, because the
+    // policy below is keyed on the PARTICIPATION, not on who is performing it.
+    withWriteContext(
+      { intent: 'system', origin: 'devtools', participation: 'inspection' },
+      () => {
+        undoable(() => tree.$.k.set('light'));
+      }
+    );
     tree.$.k.flush?.();
 
     // Storage untouched...
@@ -282,5 +287,60 @@ describe('stored() and replay side effects', () => {
     expect(tree.$.k()).toBe('light');
     expect(persisted(map, 'sdi-public-undo')).toBe('light');
     expect(t.getTurns()).toHaveLength(turnCountBeforeUndo);
+  });
+});
+
+describe('stored() declines INSPECTION, not devtools', () => {
+  it('an inspection write from any origin leaves storage alone', () => {
+    const { map, adapter } = fakeStorage();
+    const tree = signalTree(
+      {
+        k: stored('sdi-participation', 'light', {
+          storage: adapter,
+          debounceMs: 0,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
+
+    undoable(() => tree.$.k.set('dark'));
+    tree.$.k.flush?.();
+
+    // No devtools origin at all — only the participation. What makes a write
+    // un-persistable is that it is a diagnostic application of state nobody
+    // committed, not that DevTools happened to perform it.
+    withWriteContext({ intent: 'system', participation: 'inspection' }, () => {
+      tree.$.k.set('light');
+    });
+    tree.$.k.flush?.();
+
+    expect(persisted(map, 'sdi-participation')).toBe('dark');
+    expect(tree.$.k()).toBe('light');
+  });
+
+  it('CONTROL — a devtools ORIGIN alone does persist', () => {
+    const { map, adapter } = fakeStorage();
+    const tree = signalTree(
+      {
+        k: stored('sdi-origin-only', 'light', {
+          storage: adapter,
+          debounceMs: 0,
+        }),
+      },
+      { capabilities: ['causal-runtime'] }
+    );
+
+    undoable(() => tree.$.k.set('dark'));
+    tree.$.k.flush?.();
+
+    // Provenance without a participation declaration is an ordinary authored
+    // write, and it persists. That is the two-axis rule holding in the awkward
+    // direction: the policy may not be inferred from who wrote it.
+    withWriteContext({ intent: 'system', origin: 'devtools' }, () => {
+      tree.$.k.set('light');
+    });
+    tree.$.k.flush?.();
+
+    expect(persisted(map, 'sdi-origin-only')).toBe('light');
   });
 });
