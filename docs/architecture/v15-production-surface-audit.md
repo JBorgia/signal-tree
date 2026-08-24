@@ -9404,6 +9404,123 @@ link(x, endpoint)           location  <-> external state
 `afterCommit` does not, and now that is measured rather than assumed in either
 direction.
 
+# DEMARCATION-0 — the NULL survives. The public surface is `link()` alone
+
+`packages/core/src/lib/demarcation-0.spec.ts`, 16/16.
+
+```text
+NULL       a correct public `link(x, endpoint)` can be implemented on INTERNAL
+           settlement-aware observation; no public `onCommitted()` or
+           `afterCommit()` is required
+RESULT     SURVIVES
+```
+
+## ⚠️ A drift, corrected
+
+AFTER-COMMIT-1 proved `afterCommit(effect)` has a coherent contract, and I
+treated coherence as a warrant for publishing it. The standing rule — only a
+DEMONSTRATED THIRD-PARTY AUTHORING NEED justifies a public primitive — was
+applied rigorously to `stored`, `persistence` and `loader`, and not to the
+primitives I had just discovered.
+
+```text
+commit consequence            EARNED INTERNAL CAPABILITY
+`afterCommit(effect)`         PUBLIC SURVIVAL UNPROVEN
+committed-state observation   EARNED INTERNAL CAPABILITY
+`onCommitted(x, cb)`          PUBLIC SURVIVAL UNPROVEN
+```
+
+The AFTER-COMMIT-0/1 tests stay — they prove the internal model a link is built
+out of. And EGRESS-0's result changes STATUS rather than vanishing: it showed a
+user-land link is implementable GIVEN A PUBLIC gate, so with the gate private
+that inverts into the reason `link()` must be core.
+
+## Q1 — public link on private machinery: YES
+
+The composed candidate is the whole surface — `retrieve()`, `settled()`,
+`dispose()`. No `.subscribe()`, no `.then()`, no `afterGet`/`afterSet`, no
+lifecycle callbacks. It carries all ten preserved semantics and passes leaf
+acquire/echo/send, settlement safety, collection turns, disposal and the empty
+endpoint refusal.
+
+## Q2 — the exact private capability required
+
+```text
+1  getPositionRegistry(x)          owner identity, and the acceptance predicate
+2  getPathNotifier().subscribe     the trigger stream
+3  notifier.onFlush                THE TURN BOUNDARY — see below
+4  scheduleDurableConsequence      settlement-deferred egress with late read
+5  external()                      PUBLIC already; the inbound half needs
+                                   nothing private
+```
+
+⚠️ **The turn boundary was a real discovery, not an optimisation.** Scheduling
+per delivered event gave ONE observation for three writes to the same leaf — but
+that is the NOTIFIER coalescing same-path entries, not turn coalescing. Measured:
+`addMany` of three rows produced THREE observations of the same final
+collection, because three distinct child paths deliver three events. For a link
+that is three identical outbound writes — three serialised round-trips for one
+logical change. `onFlush` fires once per flush, the same boundary the diagnostic
+journal uses.
+
+## Q3 — the owner-only collection ping IS harmless for link
+
+Every mutator was inventoried:
+
+```text
+addOne addMany updateOne upsertOne removeOne setAll clear
+  -> each emits >= 1 QUALIFIED, VALUE-CARRYING `data.rows.<id>` event
+  -> the unqualified `{ path: 'data.rows' }` ping accompanies every one and is
+     NEVER the only event
+```
+
+So a link that filters on the namespace and late-reads sees every transition.
+Mutation refines this further: treating the ping AS a trigger breaks nothing,
+because it always arrives in the same flush as its valued siblings. The filter
+is DEFENSIVE, not load-bearing — stated rather than overclaimed.
+
+## Q4 — one behaviour that forces nothing, and one surface limitation
+
+```text
+AN ANGULAR EFFECT SEES SPECULATIVE STATE — measured and pinned. Ordinary
+reactivity cannot distinguish settled from speculative, and it observes
+'speculative' mid-transaction. It is TRANSIENTLY wrong, not permanently: the
+reversal is observed too.
+
+That does NOT earn a public observer. The remedy for an irreversible action is
+that it belongs to whoever owns transaction confirmation — the same code holding
+the pending handle. For `afterCommit` to earn public surface, the falsifier
+would have to be code that does NOT own settlement, demonstrably needing to
+register an irreversible consequence with the current operation and unable to
+express it by composition. No such case is on record.
+```
+
+⚠️ **An entityMap NODE is not a linkable location.** It resolves no registry —
+leaves and branch accessors got one in OWNER-REPLAY-2, a marker-materialised
+collection node is neither. So `link(tree.$.data.rows, endpoint)` is refused.
+The PARENT BRANCH covers it, whose late read includes the collection's settled
+contents, so this costs a spelling rather than a capability. Whether a collection
+node SHOULD be directly linkable is an ownership-metadata question, recorded and
+not answered here.
+
+## Q5 — evidence
+
+```text
+drop owner isolation            1 of 16 fails
+drop the reconciliation loop    1 of 16 fails
+drop the flush turn boundary    1 of 16 fails
+drop the loop equality guard    HANGS — the loop's only termination condition
+```
+
+Two guarantees were asserted without being tested in the first draft — owner
+isolation and reconciliation — and mutation caught it; both now have cases.
+
+⚠️ And the composition got SMALLER because of it: a separate echo-suppression
+check turned out to be redundant. The reconciliation loop's first iteration
+already compares current X against `knownY` and returns without sending, so
+echo suppression and the convergence test are the same question asked at
+different moments. One equality check, not two.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
