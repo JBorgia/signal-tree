@@ -2518,6 +2518,86 @@ collision — while the later-installed enhancer was silently overwriting the
 earlier method, and both were correct under the old default so the outputs could
 not disagree.
 
+# THE SECOND FLIP — C = 0
+
+Flip-only again: one line, `git diff --stat` showing `1 insertion(+), 1
+deletion(-)`.
+
+```text
+initial failures   194 across 39 files      (first flip: 211 across 37)
+
+A = 194
+B = 0
+C = 0      <- the result the first flip could not support
+U = 0
+```
+
+## The first flip's category C is gone, not compensated for
+
+The seven `rejects rollback …` tests that stopped throwing under flip 1 were the
+whole category C. Five such tests exist now, after the TX-SURFACE-0 migration,
+and **all five pass under the flip**. Nothing was added to make them pass; the
+mechanism that made them fail was deleted:
+
+```text
+timeTravel().transaction()          DELETED — it read this.history as its
+                                    dependency ledger
+getPendingRollbackPlan()            DELETED with it
+transactions() admission            now by causal EFFECT, not authorship (C3)
+```
+
+## Why C = 0 is asserted from the whole set, not a sample
+
+Flip 1's A count was sampled and I said so. This one is classified by cause
+shape across all 194, with the one risky shape enumerated exhaustively.
+
+The distribution is uniform: `canUndo` false, counts short, `[]` where a
+restored value was expected. Every shape reduces to *the operation was not
+designated, so no turn exists*.
+
+The shape that could hide a C is **"expected [Function] to throw an error"** — a
+refusal that stopped firing, which is exactly how flip 1's C presented. All 15
+were read individually:
+
+```text
+P0-C / P0-C-ROW refusals          undo vs later external truth
+non-scalar-leaf undo refusals     ARRAY / DATE / MAP / SET leaves
+port + closure refusals           unsupported effect in a closure
+```
+
+Every one needs an **admitted turn to refuse**. The refusal machinery is intact;
+it has nothing to refuse because the operation was never admitted. None protects
+anything other than restoration, which is what separates them from flip 1's
+rollback cluster.
+
+## Two things that resolved themselves
+
+**`tree-realization-adapter.spec.ts`.** Flip 1 recorded it as failing 3× in the
+full run and passing alone, suspected test-order coupling, explicitly left
+unexplained. It is the same designated-mode count difference as everything else —
+plain A. The suspicion was wrong and the honest record of it was worth keeping.
+
+**My own protocol specs.** `turn-feed-0` (2) and `turn-feed-0-1-identity` (1) fail
+because they assert history counts without requesting designated mode. The cases
+that DO request it — case 2's separation control, case 3's designated turn — pass.
+So the lifecycle protocol is orthogonal to admission, which is the property it
+was built to have.
+
+## What C = 0 actually establishes
+
+Not "the default changed". This:
+
+> **Nothing inside SignalTree requires an arbitrary authored operation to be
+> retained as user-restoration history.**
+
+Three concepts that shared storage and mechanisms are now separate:
+
+```text
+causal occurrence          every write, observed where it is needed
+transaction dependency     bounded, pending-scoped, origin-independent (C3)
+restoration eligibility    designated operations only (undoable)
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
