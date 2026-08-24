@@ -2598,6 +2598,118 @@ transaction dependency     bounded, pending-scoped, origin-independent (C3)
 restoration eligibility    designated operations only (undoable)
 ```
 
+# HIST-C2 — CLOSED
+
+## The evidentiary chain
+
+```text
+first flip            exposed a category C
+TX-SURFACE-0          deleted the duplicate transaction authority
+TURN-FEED-0           supplied the missing lifecycle protocol
+TX-LEDGER C3          separated dependency from authorship
+second flip           A=194  B=0  C=0  U=0
+A migration           194 -> 0, six green batches
+permanent flip        green
+restorationEligibility deleted   green again
+```
+
+Final state verified by EXIT CODE, not by reading output: tests 0 (1811 passed),
+lint 0, build 0, spec-types 0, fast gates 0 (35/35).
+
+## The claim, now earned rather than intended
+
+> **Arbitrary authored writes are causal state changes, not restoration history.
+> Restoration exists only where the application designates an operation as
+> undoable. No SignalTree subsystem depends on the old default-all restoration
+> inventory.**
+
+Three concepts that previously shared storage and mechanisms are separate:
+
+```text
+causal occurrence          observed where it is needed
+transaction dependency     bounded, pending-scoped, origin-independent
+restoration eligibility    designated operations only
+```
+
+## What the migration itself proved
+
+**19 false designations were reverted.** Wrapping compiled and passed in every
+one of them, and meant nothing, because the receiver was a `Map`, a physical
+scalar frame, a cache, a storage adapter, or a benchmark harness driving
+`EntityValueStore`/`StructuralStore` with no tree at all. Mechanical wrapping is
+fine for volume; only reading what it wrapped shows whether a designation says
+anything. The audit caught these twice, at different scales.
+
+**A runtime fix, not test cleanup.** `markMetaDesignated`'s spread was
+materialising absent metadata keys as explicit `undefined` in every delivered
+write. MUT-2 caught it because it asserts that shape exactly. Recorded here
+because the closing summary would otherwise read as "tests only", and it was not.
+
+**MUT-2 was nearly destroyed by the migration.** Its finding is that authorship
+is NOT positively marked; designating its write added a positive marker and
+erased that. Reverted, with the designated case added as a separate test, which
+left the result sharper: authorship remains unmarked, designation is marked, and
+they are different properties.
+
+**Two documented defects are repaired by the flip rather than by a fix.**
+
+```text
+6c       deserialize() no longer becomes an undo step, so no first undo can
+         discard a restore
+CASE 8   an untagged background refresh no longer enters the undo stack
+```
+
+Both had to land WITH the flip: designating those operations to green them early
+would have reintroduced the defects.
+
+## ⚠️ What the flip did NOT settle — A1 stays on the board
+
+CASE 8's repair is narrower than it looks, and the spec says so in place:
+
+> acquisition is still INDISTINGUISHABLE from an authored write. It just no
+> longer MATTERS **for restoration admission**, because neither is admitted
+> without designation.
+
+Another subsystem already needs that distinction: TX-LEDGER C3 treats a
+classified realization as external truth when deciding whether a rollback is
+safe. So the narrow public realization-ingress door A1 identified is **not**
+disposed of by HIST-C2, and TruckTrax's loader/acquisition path may still need
+it. A1 remains open with its own terminal disposition.
+
+## Remaining sequence
+
+```text
+1  DIAG-JOURNAL
+2  PER-B                       (owns the stored().reload() question below)
+3  A1 realization ingress — terminal disposition
+4  MATRIX-CLOSE
+5  Candidate B, only if materially different
+6  TruckTrax pass 2
+7  TruckTrax pass 3
+8  final perf / retention measurements
+9  FULL release gate suite — `--fast` closes a workstream, not a release
+10 RC / final closure
+```
+
+## Carried, not dropped
+
+```text
+stored().reload()   currently designatable, but it re-reads DURABLE truth, which
+                    makes it closer to a restore than an authored operation — and
+                    6c establishes that a restore must not become an undo step.
+                    PER-B decides; flagged in place in the spec.
+raw-NUL harness     a cheap syntactic gate rejecting raw NUL and unexpected C0
+                    controls in tracked sources. Earned by a real incident: an
+                    invisible NUL byte reached committed source, propagated into
+                    the script written to fix it, and was found only because
+                    Python refused to parse it. No correctness gate can see it.
+rollback message    transactions()' compensation path surfaces the wrapped
+                    error's message rather than the underlying refusal kind, so
+                    a refusal reason is less legible than before TX-SURFACE-0.
+```
+
+**Not to be reopened absent new falsifying production evidence.**
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
