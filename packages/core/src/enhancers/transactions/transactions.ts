@@ -8,7 +8,7 @@ import type {
   UpdateMetadata,
 } from '../../lib/types';
 
-import { getCausalWriteMode } from '../../lib/causal-write-mode';
+import { getCausalWriteMode, isInspectionWrite } from '../../lib/causal-write-mode';
 import {
   ENHANCER_META,
   SignalTreeRollbackError,
@@ -1139,6 +1139,15 @@ export function getOrCreateInternalTransactionRuntime<T>(
             if (source === 'time-travel') {
               return;
             }
+            // DEVTOOLS-JUMP-0.1. Inspection contributes NOTHING here: no
+            // bucket, no confirmed effect, and above all no dependency
+            // evidence. Placed ahead of the realization branch because the C3
+            // probe below deliberately admits later effects regardless of
+            // origin, which is right for external truth and wrong for a
+            // diagnostic snapshot.
+            if (isInspectionWrite(meta)) {
+              return;
+            }
             if (getCausalWriteMode(meta) === 'realization') {
               // TX-LEDGER C3. A realization is NOT an authored turn and must
               // never become one — but it can still make a pending rollback
@@ -1214,7 +1223,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
           if (effectiveMeta?.source === 'time-travel') {
             return;
           }
-          if (getCausalWriteMode(effectiveMeta) === 'realization') {
+          // DEVTOOLS-JUMP-0.1. Notified so the write still reaches observers
+          // and the tree updates, but captured nowhere.
+          if (
+            isInspectionWrite(effectiveMeta) ||
+            getCausalWriteMode(effectiveMeta) === 'realization'
+          ) {
             notifier.notify(
               path,
               next,

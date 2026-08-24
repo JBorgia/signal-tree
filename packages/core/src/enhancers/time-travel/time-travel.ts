@@ -37,7 +37,7 @@ import {
 } from '../../lib/internals/restoration-eligibility';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { recordProductionSubstrateStat } from '../../lib/internals/production-substrate-stats';
-import { getCausalWriteMode } from '../../lib/causal-write-mode';
+import { getCausalWriteMode, isInspectionWrite } from '../../lib/causal-write-mode';
 import { getPathNotifier } from '../../lib/path-notifier';
 import {
   getActiveWriteContext,
@@ -2888,6 +2888,13 @@ export function timeTravel(
               if (source === 'time-travel') {
                 return;
               }
+              // DEVTOOLS-JUMP-0.1. Inspection records NO external truth. It is
+              // not truth anyone committed, so it earns no protection from
+              // P0-C — a diagnostic snapshot must never be able to refuse a
+              // legitimate undo. Measured: the undo overwrites the scrub.
+              if (isInspectionWrite(meta)) {
+                return;
+              }
               if (getCausalWriteMode(meta) === 'realization') {
                 // RESTORE-P0 P0-C. Recorded HERE rather than only in the leaf
                 // interceptor: measured, that interceptor is not installed for
@@ -2967,6 +2974,22 @@ export function timeTravel(
               const effectiveMeta: UpdateMetadata | undefined =
                 isRestorationDesignated() ? markMetaDesignated(ambient) : ambient;
               if (isRestoring) return;
+              // DEVTOOLS-JUMP-0.1. Notified but recorded nowhere, and
+              // deliberately NOT deleting the external-truth marker below:
+              // inspection is inert with respect to provenance, so looking at a
+              // location cannot release it from another authority's protection.
+              if (isInspectionWrite(effectiveMeta)) {
+                notifier.notify(
+                  path,
+                  next,
+                  prev,
+                  ownerPath,
+                  subjectIds,
+                  positionIds,
+                  effectiveMeta
+                );
+                return;
+              }
               if (getCausalWriteMode(effectiveMeta) === 'realization') {
                 // P0-C: remember that this location now holds external truth.
                 externalTruthByPath.set(path, next);
@@ -3109,7 +3132,10 @@ export function timeTravel(
         // 0.44ms without.
         if (beforeState !== afterState) {
           const activeMeta = getActiveWriteContext();
-          if (getCausalWriteMode(activeMeta) === 'realization') {
+          if (
+            isInspectionWrite(activeMeta) ||
+            getCausalWriteMode(activeMeta) === 'realization'
+          ) {
             return result;
           }
           const transactionId = resolveTransactionId(activeMeta);

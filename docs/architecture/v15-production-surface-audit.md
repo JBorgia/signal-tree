@@ -2894,10 +2894,30 @@ time-travel    realization      restoration
 devtools       realization      devtools
 ```
 
-and participation becomes derivable: *authored iff origin is absent*. One axis.
+### ⚠️ CORRECTION — that collapse does not follow, and I claimed it did
 
-> **So the consolidation cannot be decided before DEVTOOLS-JUMP-0. The dependency
-> runs the opposite way from the proposed order.**
+I wrote that flipping the devtools row makes participation derivable —
+*authored iff origin is absent*. **That is wrong**, and the table I had just
+recorded refutes it:
+
+```text
+null           null             authored
+null           realization      external truth      <-- SAME origin,
+                                                        DIFFERENT participation
+```
+
+External truth has no positive origin either. So even with devtools flipped, one
+absent origin maps to two participations and the model stays two-axis. DevTools
+was never the only thing preventing a one-axis model.
+
+The real blocker is that `origin` is **incomplete**: there is no positive value
+for external truth. Which is suspiciously close to the unresolved A1
+realization-ingress problem — an external write has no public door that could
+stamp its origin in the first place.
+
+> **So DEVTOOLS-JUMP-0 must NOT be asked to answer the one-axis question. It
+> answers only what a DevTools jump IS. The axis question needs `origin` to be
+> complete, and completing it may require A1.**
 
 Doing SEMANTICS-NAMES first would mean either freezing a two-axis ontology on the
 strength of a behaviour nobody has ratified, or collapsing to one axis by
@@ -2915,12 +2935,17 @@ contribution.
 Not measured as a live defect here, and not fixed here. Recorded because
 DEVTOOLS-JUMP-0 should decide it deliberately rather than inherit it.
 
+> **MEASURED SINCE, in DEVTOOLS-JUMP-0.** Contribution capture does not in fact
+> occur for a scrub landing after the callback returns — but the DEPENDENCY
+> LEDGER does admit it, and a devtools scrub therefore REFUSES a rollback. The
+> suspicion above was right in kind and wrong in mechanism.
+
 ## Recommended vocabulary — pending that decision
 
 The renames the audit supports on evidence:
 
 ```text
-causalMode  ->  participationMode   (or applicationMode)
+causalMode  ->  participation   [SUPERSEDED: was participationMode]
                 the field decides PARTICIPATION in authored causal semantics;
                 `causalMode` names no dimension at all
 
@@ -2967,10 +2992,278 @@ recorded as recommended with its evidence.
 ## Revised order
 
 ```text
-1  DEVTOOLS-JUMP-0     restoration vs inspection-state application; decides
-                       whether participation is derivable from origin
+1  DEVTOOLS-JUMP-0     restoration vs inspection-state application. NOT the
+                       one-axis question — see the correction above
 2  SEMANTICS-NAMES-1   execute the ontology on a settled space
 3  DIAG-JOURNAL-1      read-only bounded projection + reclamation falsifiers
+```
+
+> **SUPERSEDED by DEVTOOLS-JUMP-0's terminal disposition.** The names are now
+> settled (`participation` / `origin` / `restoration()`), the ontology is settled
+> as two-dimensional, and the only remaining blocker on EXECUTING the rename is
+> A1's positive external origin. See "SEMANTICS-NAMES — the terminal names".
+
+# DEVTOOLS-JUMP-0 — the evidence points at **D**
+
+> **What kind of state application is a DevTools jump, and what invariants apply?**
+
+```text
+A  authored participation — current semantics intentional
+B  realization participation
+C  it is RESTORATION and must route through the restoration authority
+D  a distinct INSPECTION application, needing its own participation semantic
+U  evidence does not discriminate
+```
+
+Measured in `devtools-jump-0.spec.ts`. The discriminating evidence is the
+transaction interaction, not the philosophy.
+
+## The finding
+
+```text
+pending transaction adds row 'a'
+devtools scrub updates that row
+rollback                          ->  REFUSED, later-confirmed-dependency
+                                      the speculative row survives
+```
+
+**A diagnostic inspection blocks a business rollback.** A developer moving a
+DevTools slider has changed what the application is permitted to do. That is a
+wrong ownership relationship whatever the participation is called.
+
+## Why this rules out B as well as A
+
+Flipping devtools to realization participation does **not** fix it. TX-LEDGER C3
+deliberately admits later effects by causal EFFECT regardless of origin — that
+was the whole point of C3, and it is right for server truth. A devtools scrub
+would therefore still create dependency evidence and still block the rollback.
+
+Only a participation EXCLUDED from dependency admission fixes it. That is D.
+
+And B has a second cost, in the other direction. P0-C protects later external
+truth from being discarded by an undo, and it protects it by recording
+realization-participating writes. Today a devtools write is authored-participating
+and therefore unprotected — measured: an undo overwrites a scrub, which is correct
+for inspection. Reclassify it as realization and it becomes protected, meaning
+**an inspection action could refuse a legitimate undo.** B trades one wrong
+ownership relationship for another.
+
+## What C would cost, and why it is not indicated
+
+Routing a jump through the restoration authority would require it to satisfy
+designation, validity, refusal and claim semantics. But a scrub is not asking
+*reverse one previously designated operation legally*; it is asking *show the tree
+as this snapshot*. Most jump targets were never designated at all, so the
+authority would have to refuse nearly every one — which is not a DevTools feature,
+it is its removal.
+
+So the "single restoration authority" rule is **not violated** by DevTools having
+its own application path. It would be violated only if DevTools claimed to be
+performing restoration. It does not; it never did.
+
+## Proposed invariants for D — inspection-state application
+
+```text
+origin           devtools
+participation    inspection  (a third value, not authored and not realization)
+                 -> excluded from restoration admission
+                 -> excluded from transaction dependency admission
+                 -> excluded from transaction contribution capture
+                 -> not protected from being overwritten by restoration
+                 -> does not persist  (already true: stored() declines it)
+                 -> never claims to be undo/redo
+```
+
+Every line except `participation` is either already true or already measured, so D
+is mostly a matter of NAMING what is happening and closing the one hole.
+
+## One thing this audit did NOT reach
+
+The scrub in the transaction case lands AFTER the transaction callback returns, so
+it is not captured into the contribution — and the reason is incidental rather
+than designed: `withWriteContext` REPLACES the ambient context, so no
+`transactionId` is in scope. A scrub landing DURING a transaction callback is a
+different question, and this file does not answer it. Recorded rather than
+assumed.
+
+## Disposition — TERMINAL
+
+> **DevTools state application is INSPECTION: not authorship, not realization,
+> and not restoration.**
+
+Confirmed by the owner. The decisive argument is not that a jump is
+"non-authored" — it is that BOTH existing participations grant it authority it
+should not have. Authored lets a scrub create transaction dependency evidence and
+veto a rollback; realization would additionally make P0-C protect the scrub
+against a legitimate restoration.
+
+The conservative-refusal counter-argument is rejected on a stated principle:
+
+> C3's conservative refusal is correct for **truth or causal consequences that
+> another authority has a right to preserve.** A diagnostic snapshot has no such
+> right. The fact that the developer looked at state B cannot itself make
+> application rollback from C to A illegal.
+
+# The ontology is TWO-DIMENSIONAL — settled
+
+Not "two axes until one can be derived from the other". Two axes, permanently,
+because they answer different questions:
+
+```text
+origin          Where did this application come from?
+participation   How may this application participate in SignalTree's causal
+                mechanisms?
+```
+
+DEVTOOLS-JUMP makes the second unmistakably a POLICY dimension:
+
+```text
+participation: authored     participates as application-authored work
+
+participation: realized     established truth / consequence, not newly
+                            authored; eligible for external-truth dependency
+                            and provenance treatment
+
+participation: inspection   diagnostic state application; not application work,
+                            not authoritative external truth, not restoration;
+                            excluded from business dependency and capture
+```
+
+**Even if a function could someday compute participation from origin, the
+concepts do not merge.** That would recouple provenance to policy — the exact
+compression this audit has repeatedly had to undo. The one-axis question is
+therefore not deferred; it is closed as the wrong question.
+
+The earlier correction stands and is now doubly grounded: external realization
+still has no positive origin, so the one-axis claim was premature on the facts as
+well as wrong in principle.
+
+# SEMANTICS-NAMES — the terminal names
+
+Settled by the owner. Field and value names, not `participationMode`:
+
+```ts
+type Participation = 'authored' | 'realized' | 'inspection';
+```
+
+```text
+causalMode   ->  participation
+source       ->  origin
+timeTravel() ->  restoration()
+```
+
+```ts
+{ origin: 'restoration', participation: 'realized'   }
+{ origin: 'external',    participation: 'realized'   }
+{ origin: 'devtools',    participation: 'inspection' }
+```
+
+The field and value now read as an answer to a specific question, which
+`causalMode: 'realization'` never did.
+
+`timeTravel()` -> `restoration()` is settled and STRENGTHENED by this
+disposition: there are two distinct capabilities, and the one that does the
+arbitrary jumping is the one NOT called "time travel". A1 concerns external
+origin, not restoration ownership, so it is very unlikely to contradict this.
+
+**Blocked on A1 for one thing only:** the exact `origin` VALUE SET — what
+ordinary application origin is called, and how external truth comes to carry
+`origin: 'external'` when it has no public door to declare itself through. The
+rename executes after A1 settles that, and not as another audit.
+
+# DEVTOOLS-JUMP-0.1 — implemented, and the acceptance the owner asked for
+
+Two holes remained after the disposition. Both are now closed and pinned in
+`devtools-jump-0-1.spec.ts`.
+
+## Hole 1 — the exclusion from contribution was incidental
+
+DEVTOOLS-JUMP-0 only measured a scrub landing AFTER the callback returned, where
+exclusion holds because `withWriteContext` replaces the ambient context and drops
+the `transactionId`. The synchronous-in-callback case was never measured.
+
+```text
+transaction callback begins
+  authored speculative write        addOne('a')
+  DevTools inspection DURING it     asDevtools(() => n.set(42))
+callback completes
+rollback
+```
+
+```text
+MEASURED   rollback succeeds; row 'a' gone; n stays 42
+```
+
+Excluded, now for a declared reason: both capture sites return before any bucket
+is touched, whether or not a `transactionId` is in scope. The in-callback scrub of
+the SPECULATIVE row also no longer refuses.
+
+## Hole 2 — dependency admission
+
+```text
+BEFORE   pending addOne('a'); devtools scrub of 'a'; rollback
+         -> REFUSED later-confirmed-dependency, row survives
+
+AFTER    -> rollback succeeds, row gone
+```
+
+With a control in the same file: **the identical write in realization
+participation still refuses.** Same write, same timing, different participation —
+so the exclusion is the participation doing the work, not the timing, and C3
+remains intact for the case it was built for.
+
+## The pin the owner asked for — inspection is not a causal eraser
+
+> An inspection write itself cannot create business dependency evidence. A later
+> independently authored or realized consequence of that inspection is classified
+> on its own terms and may create dependency evidence.
+
+```text
+pending addOne('a')
+devtools scrub of 'a'            contributes nothing
+authored updateOne('a')          classified on its own terms
+rollback  ->  REFUSED, correctly
+```
+
+Without this, `inspection` would be a laundering channel: touch a speculative row
+through the devtools door, then author freely against it and claim the rollback is
+unblocked. Inspection excuses the inspection and nothing downstream of it.
+
+## How it is implemented
+
+`'inspection'` is a third `CausalWriteMode` value, DECLARED by `devTools()` in the
+write context it establishes — deliberately not inferred from `source ===
+'devtools'`, since inferring policy from provenance is the coupling the two-axis
+decision rejects. A named `isInspectionWrite()` predicate makes the exclusion read
+identically at every site:
+
+```text
+transactions      both capture sites return before bucket capture AND before
+                  the C3 probe; the leaf site still notifies
+capture bridge    excluded from a transaction draft's contribution
+time-travel       records no external truth, enters no history, and does NOT
+                  delete an existing external-truth marker — inspection is inert
+                  with respect to provenance, so looking at a location cannot
+                  release it from another authority's protection
+```
+
+Verified by exit code: `nx test core` (1836 passed / 202 files), `nx lint core`,
+`npm run typecheck`, `nx build core`, `check-spec-types`, `check-release-claims`,
+`lint-readme-apis`, `verify-gates --fast` 35/35 — all 0.
+
+`devtools-jump-0.spec.ts` keeps its ORIGINAL context helper, renamed
+`asAuthoredDevtools`, because those findings are the behaviour of that context and
+are what closed the disposition. `devtools-jump-0-1.spec.ts` is the acceptance
+file for the contract.
+
+# Queue after DEVTOOLS-JUMP-0.1
+
+```text
+1  A1 terminal ingress    settle the POSITIVE external origin and the public way
+                          external truth declares itself   <-- next
+2  SEMANTICS-NAMES-1      EXECUTE the renames; not another audit
+3  full verification      the standard set, including build / spec-types / gates
+4  DIAG-JOURNAL-1         read-only bounded projection + reclamation falsifiers
 ```
 
 # RESTORE-P0 — the reversal-validity cluster

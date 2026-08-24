@@ -36,7 +36,29 @@ export type MutationKind =
   | 'rekey'
   | 'replace';
 
-export type CausalWriteMode = 'authoring' | 'realization';
+/**
+ * How a write participates in SignalTree's causal mechanisms.
+ *
+ * This is a POLICY dimension and is deliberately independent of `source`, which
+ * answers a different question (where the write came from). Two writes with the
+ * same origin can participate differently, and two writes with different origins
+ * can share a participation — `restoration` and external truth both realize.
+ *
+ * - `authoring`    application-authored work. Eligible for restoration
+ *                  designation, contributes to a transaction, creates dependency
+ *                  evidence.
+ * - `realization`  established truth or consequence, not newly authored. Never
+ *                  becomes an authored turn, but may still create dependency
+ *                  evidence (TX-LEDGER C3) and is protected from being
+ *                  discarded by a restoration (RESTORE-P0 P0-C).
+ * - `inspection`   diagnostic state application — a DevTools jump. Not
+ *                  application work and not authoritative truth, so it is
+ *                  excluded from restoration admission, transaction
+ *                  contribution and dependency admission, and it is not
+ *                  protected against being overwritten by a restoration.
+ *                  DEVTOOLS-JUMP-0 / 0.1.
+ */
+export type CausalWriteMode = 'authoring' | 'realization' | 'inspection';
 
 /**
  * Metadata describing the intent and source of a tree update.
