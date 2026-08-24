@@ -2,7 +2,7 @@ import type { PathNotifierHandler } from '../../path-notifier';
 
 import { getWriteParticipation, isInspectionWrite } from '../../write-participation';
 
-import type { PositionId, StructuralHistoryEffect, WriteMetadata } from '../../types';
+import type { PositionId, StructuralEffect, WriteMetadata } from '../../types';
 
 import type { ExplicitTransactionEffect, GreenfieldTransactionDraft } from './greenfield-transactions';
 
@@ -19,8 +19,8 @@ export function toExplicitTransactionEffect(options: {
   }
 
   const subjectId = options.subjectIds?.[0];
-  const historyEffect = options.meta?.historyEffect;
-  if (!historyEffect) {
+  const structuralEffect = options.meta?.structuralEffect;
+  if (!structuralEffect) {
     return {
       owner,
       before: options.prev,
@@ -29,7 +29,7 @@ export function toExplicitTransactionEffect(options: {
     };
   }
 
-  return mapStructuralEffect(owner, subjectId, historyEffect);
+  return mapStructuralEffect(owner, subjectId, structuralEffect);
 }
 
 export function createTransactionCaptureBridge(options: {
@@ -76,35 +76,35 @@ export function createTransactionCaptureBridge(options: {
 function mapStructuralEffect(
   owner: PositionId,
   subjectId: number | undefined,
-  historyEffect: StructuralHistoryEffect
+  structuralEffect: StructuralEffect
 ): ExplicitTransactionEffect {
-  switch (historyEffect.kind) {
+  switch (structuralEffect.kind) {
     case 'add':
       return {
         owner,
         before: undefined,
-        after: historyEffect.key,
+        after: structuralEffect.key,
         subjectId,
         structural: 'add',
-        structuralContext: historyEffect,
+        structuralContext: structuralEffect,
       };
     case 'remove':
       return {
         owner,
-        before: historyEffect.key,
+        before: structuralEffect.key,
         after: undefined,
         subjectId,
         structural: 'remove',
-        structuralContext: historyEffect,
+        structuralContext: structuralEffect,
       };
     case 'rekey':
       return {
         owner,
-        before: historyEffect.beforeKey,
-        after: historyEffect.afterKey,
+        before: structuralEffect.beforeKey,
+        after: structuralEffect.afterKey,
         subjectId,
         structural: 'rekey',
-        structuralContext: historyEffect,
+        structuralContext: structuralEffect,
       };
   }
 }

@@ -1,4 +1,4 @@
-import type { ISignalTree, PositionId, StructuralHistoryEffect, WriteMetadata } from '../../types';
+import type { ISignalTree, PositionId, StructuralEffect, WriteMetadata } from '../../types';
 import { getPathNotifier } from '../../path-notifier';
 import { getActiveWriteContext, withWriteContext } from '../../write-context';
 import { deepClone } from '@signaltree/shared';
@@ -219,8 +219,8 @@ export interface TreeRealizationDescriptor {
   readonly ownerPath?: string;
   readonly collectionPath?: string;
   readonly fieldPathFromRow?: string;
-  readonly structuralHistoryEffects?: ReadonlyMap<string, StructuralHistoryEffect>;
-  readonly structuralHistoryBySubject?: ReadonlyMap<string, StructuralHistoryEffect>;
+  readonly structuralEffects?: ReadonlyMap<string, StructuralEffect>;
+  readonly structuralEffectBySubject?: ReadonlyMap<string, StructuralEffect>;
   readonly subjectDescriptors?: ReadonlyMap<string, SubjectRealizationDescriptor>;
 }
 
@@ -260,30 +260,30 @@ export function rememberTreeRealizationDescriptor(
   }
 
   const existing = options.descriptors.get(owner);
-  const structuralHistoryEffects =
-    existing?.structuralHistoryEffects instanceof Map
-      ? (existing.structuralHistoryEffects as Map<string, StructuralHistoryEffect>)
-      : new Map(existing?.structuralHistoryEffects ?? []);
-  const structuralHistoryBySubject =
-    existing?.structuralHistoryBySubject instanceof Map
-      ? (existing.structuralHistoryBySubject as Map<string, StructuralHistoryEffect>)
-      : new Map(existing?.structuralHistoryBySubject ?? []);
+  const structuralEffects =
+    existing?.structuralEffects instanceof Map
+      ? (existing.structuralEffects as Map<string, StructuralEffect>)
+      : new Map(existing?.structuralEffects ?? []);
+  const structuralEffectBySubject =
+    existing?.structuralEffectBySubject instanceof Map
+      ? (existing.structuralEffectBySubject as Map<string, StructuralEffect>)
+      : new Map(existing?.structuralEffectBySubject ?? []);
   const subjectDescriptors =
     existing?.subjectDescriptors instanceof Map
       ? (existing.subjectDescriptors as Map<string, SubjectRealizationDescriptor>)
       : new Map(existing?.subjectDescriptors ?? []);
-  if (options.meta?.historyEffect) {
-    structuralHistoryEffects.set(
-      toStructuralHistoryEffectKey(options.meta.historyEffect),
-      options.meta.historyEffect
+  if (options.meta?.structuralEffect) {
+    structuralEffects.set(
+      toStructuralEffectKey(options.meta.structuralEffect),
+      options.meta.structuralEffect
     );
     if (
-      options.meta.historyEffect.kind === 'add' ||
-      options.meta.historyEffect.kind === 'remove'
+      options.meta.structuralEffect.kind === 'add' ||
+      options.meta.structuralEffect.kind === 'remove'
     ) {
-      structuralHistoryBySubject.set(
-        String(options.meta.historyEffect.subject),
-        options.meta.historyEffect
+      structuralEffectBySubject.set(
+        String(options.meta.structuralEffect.subject),
+        options.meta.structuralEffect
       );
     }
   }
@@ -294,13 +294,13 @@ export function rememberTreeRealizationDescriptor(
     options.path,
     ownerPath,
     subjectId,
-    options.meta?.historyEffect
+    options.meta?.structuralEffect
   );
   const fieldPathFromRow = deriveFieldPathFromRow(
     options.path,
     ownerPath,
     subjectId,
-    options.meta?.historyEffect
+    options.meta?.structuralEffect
   );
   if (typeof subjectId === 'number') {
     const subjectKey = String(subjectId);
@@ -332,8 +332,8 @@ export function rememberTreeRealizationDescriptor(
     existing?.ownerPath === nextOwnerPath &&
     existing?.collectionPath === nextCollectionPath &&
     existing?.fieldPathFromRow === nextFieldPathFromRow &&
-    existing?.structuralHistoryEffects === structuralHistoryEffects &&
-    existing?.structuralHistoryBySubject === structuralHistoryBySubject &&
+    existing?.structuralEffects === structuralEffects &&
+    existing?.structuralEffectBySubject === structuralEffectBySubject &&
     existing?.subjectDescriptors === subjectDescriptors
   ) {
     return;
@@ -344,8 +344,8 @@ export function rememberTreeRealizationDescriptor(
     ownerPath: nextOwnerPath,
     collectionPath: nextCollectionPath,
     fieldPathFromRow: nextFieldPathFromRow,
-    structuralHistoryEffects,
-    structuralHistoryBySubject,
+    structuralEffects,
+    structuralEffectBySubject,
     subjectDescriptors,
   });
 }
@@ -647,7 +647,7 @@ function planHeterogeneousFrame(
       structuralOwnerPaths,
       effect
     );
-    const historyEffect = getStructuralAddEffect(descriptor, effect);
+    const structuralEffect = getStructuralAddEffect(descriptor, effect);
     const collectionPath = resolveCollectionPath(
       descriptor,
       structuralOwnerPaths,
@@ -657,7 +657,7 @@ function planHeterogeneousFrame(
     const isFreshSubject = subjectInventory === undefined;
     if (
       !collectionNode ||
-      !historyEffect ||
+      !structuralEffect ||
       !collectionPath ||
       (isFreshSubject
         ? typeof collectionNode.__planFreshAdd !== 'function'
@@ -703,8 +703,8 @@ function planHeterogeneousFrame(
         effect.after as string | number,
         preparedSubject.value,
         effect.subjectId,
-        historyEffect.beforeSubject,
-        historyEffect.afterSubject,
+        structuralEffect.beforeSubject,
+        structuralEffect.afterSubject,
         vacatingKeysByOwner.get(effect.owner)
       ),
     });
@@ -1175,8 +1175,8 @@ function applyEffect(
           return;
         }
         case 'add': {
-          const historyEffect = getStructuralAddEffect(descriptor, effect);
-          if (!historyEffect) {
+          const structuralEffect = getStructuralAddEffect(descriptor, effect);
+          if (!structuralEffect) {
             throw new Error(
               `Missing structural restore metadata for owner ${String(effect.owner)}`
             );
@@ -1184,10 +1184,10 @@ function applyEffect(
 
           ownerNode.__restoreOne?.(
             effect.after as string | number,
-            historyEffect.value,
+            structuralEffect.value,
             effect.subjectId as number,
-            historyEffect.beforeSubject,
-            historyEffect.afterSubject
+            structuralEffect.beforeSubject,
+            structuralEffect.afterSubject
           );
           return;
         }
@@ -1366,11 +1366,11 @@ function updatePreparedRealizationContext(
       if (!collectionPath) {
         return;
       }
-      const historyEffect = getStructuralAddEffect(descriptor, effect);
-      if (!historyEffect) {
+      const structuralEffect = getStructuralAddEffect(descriptor, effect);
+      if (!structuralEffect) {
         return;
       }
-      const preparedValue = deepClone(historyEffect.value);
+      const preparedValue = deepClone(structuralEffect.value);
       preparedContext.rememberRestoredSubject(
         effect.subjectId,
         collectionPath,
@@ -1780,33 +1780,33 @@ function resolveNodeAtPath(
 function getStructuralAddEffect(
   descriptor: TreeRealizationDescriptor | undefined,
   effect: ReversalEffect
-): Extract<StructuralHistoryEffect, { kind: 'add' | 'remove' }> | undefined {
+): Extract<StructuralEffect, { kind: 'add' | 'remove' }> | undefined {
   if (effect.structural !== 'add' || typeof effect.subjectId !== 'number') {
     return undefined;
   }
 
-  if (isStructuralHistoryEffect(effect.structuralContext)) {
+  if (isStructuralEffect(effect.structuralContext)) {
     return effect.structuralContext.kind === 'remove' ||
       effect.structuralContext.kind === 'add'
       ? effect.structuralContext
       : undefined;
   }
 
-  const removeEffect = descriptor?.structuralHistoryEffects?.get(
+  const removeEffect = descriptor?.structuralEffects?.get(
     `remove:${String(effect.subjectId)}:${String(effect.after)}`
   );
   if (removeEffect?.kind === 'remove') {
     return removeEffect;
   }
 
-  const subjectEffect = descriptor?.structuralHistoryBySubject?.get(
+  const subjectEffect = descriptor?.structuralEffectBySubject?.get(
     String(effect.subjectId)
   );
   if (subjectEffect?.kind === 'remove' || subjectEffect?.kind === 'add') {
     return subjectEffect;
   }
 
-  const addEffect = descriptor?.structuralHistoryEffects?.get(
+  const addEffect = descriptor?.structuralEffects?.get(
     `add:${String(effect.subjectId)}:${String(effect.after)}`
   );
   return addEffect?.kind === 'add' ? addEffect : undefined;
@@ -1816,9 +1816,9 @@ function deriveCollectionPath(
   path: string,
   ownerPath: string,
   subjectId: number | undefined,
-  historyEffect: StructuralHistoryEffect | undefined
+  structuralEffect: StructuralEffect | undefined
 ): string | undefined {
-  if (historyEffect) {
+  if (structuralEffect) {
     return ownerPath;
   }
 
@@ -1845,9 +1845,9 @@ function deriveFieldPathFromRow(
   path: string,
   ownerPath: string,
   subjectId: number | undefined,
-  historyEffect: StructuralHistoryEffect | undefined
+  structuralEffect: StructuralEffect | undefined
 ): string | undefined {
-  if (historyEffect) {
+  if (structuralEffect) {
     return undefined;
   }
 
@@ -1879,13 +1879,13 @@ function parentPath(path: string): string {
  *
  * ## Why these are subject-lifetime state, not history state
  *
- * `structuralHistoryEffects`, `structuralHistoryBySubject` and
+ * `structuralEffects`, `structuralEffectBySubject` and
  * `subjectDescriptors` are read on exactly one path — reversal planning — and
  * every read is keyed by subject id:
  *
- *   structuralHistoryEffects     `${kind}:${subject}:${key}`, read by
- *                                `resolveStructuralHistoryEffect`
- *   structuralHistoryBySubject   `String(subject)`, same reader
+ *   structuralEffects     `${kind}:${subject}:${key}`, read by
+ *                                `resolveStructuralEffect`
+ *   structuralEffectBySubject   `String(subject)`, same reader
  *   subjectDescriptors           `String(subject)`, read for `collectionPath`
  *                                and `fieldPathFromRow`
  *
@@ -1918,7 +1918,7 @@ export function forgetSubjectsInTreeRealizationDescriptors(
   const forgotten = new Set(subjectIds.map((id) => String(id)));
 
   for (const descriptor of descriptors.values()) {
-    const bySubject = descriptor.structuralHistoryBySubject;
+    const bySubject = descriptor.structuralEffectBySubject;
     if (bySubject instanceof Map) {
       for (const key of forgotten) {
         bySubject.delete(key);
@@ -1932,7 +1932,7 @@ export function forgetSubjectsInTreeRealizationDescriptors(
       }
     }
 
-    const effects = descriptor.structuralHistoryEffects;
+    const effects = descriptor.structuralEffects;
     if (effects instanceof Map) {
       for (const key of [...effects.keys()]) {
         // `${kind}:${subject}:...` — the subject is always the second segment.
@@ -1953,7 +1953,7 @@ export function forgetSubjectsInTreeRealizationDescriptors(
   }
 }
 
-function toStructuralHistoryEffectKey(effect: StructuralHistoryEffect): string {
+function toStructuralEffectKey(effect: StructuralEffect): string {
   switch (effect.kind) {
     case 'add':
     case 'remove':
@@ -1980,14 +1980,14 @@ function isWritableEntityNode(value: unknown): value is WritableEntityNode {
   );
 }
 
-function isStructuralHistoryEffect(value: unknown): value is StructuralHistoryEffect {
+function isStructuralEffect(value: unknown): value is StructuralEffect {
   return Boolean(
     value &&
       typeof value === 'object' &&
       'kind' in (value as object) &&
-      ((value as StructuralHistoryEffect).kind === 'add' ||
-        (value as StructuralHistoryEffect).kind === 'remove' ||
-        (value as StructuralHistoryEffect).kind === 'rekey')
+      ((value as StructuralEffect).kind === 'add' ||
+        (value as StructuralEffect).kind === 'remove' ||
+        (value as StructuralEffect).kind === 'rekey')
   );
 }
 

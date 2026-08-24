@@ -2049,7 +2049,7 @@ describe('owner PositionId allocation', () => {
       [1],
       firstPositionIds,
       expect.objectContaining({
-        historyEffect: expect.objectContaining({
+        structuralEffect: expect.objectContaining({
           kind: 'add',
           key: 1,
           subject: 1,
@@ -2065,7 +2065,7 @@ describe('owner PositionId allocation', () => {
       [1],
       secondPositionIds,
       expect.objectContaining({
-        historyEffect: expect.objectContaining({
+        structuralEffect: expect.objectContaining({
           kind: 'add',
           key: 2,
           subject: 1,
@@ -2153,14 +2153,14 @@ describe('owner PositionId allocation', () => {
   });
 });
 
-describe('structural history effect delivery', () => {
+describe('structural structural effect delivery', () => {
   type Row = { id: number; name: string };
   type StructuralEvent = {
     path: string;
     ownerPath?: string;
     subjectIds?: number[];
     positionIds?: number[];
-    historyEffect?: unknown;
+    structuralEffect?: unknown;
   };
 
   const observeStructuralMutation = (
@@ -2182,15 +2182,15 @@ describe('structural history effect delivery', () => {
       notifier.subscribe(
         'rows.*',
         (_next, _prev, path, ownerPath, _origin, subjectIds, positionIds, meta) => {
-          if (meta?.historyEffect) {
-            expect(Object.isFrozen(meta.historyEffect)).toBe(true);
+          if (meta?.structuralEffect) {
+            expect(Object.isFrozen(meta.structuralEffect)).toBe(true);
           }
           bucket.push({
             path,
             ownerPath,
             subjectIds,
             positionIds,
-            historyEffect: meta?.historyEffect,
+            structuralEffect: meta?.structuralEffect,
           });
         }
       );
@@ -2216,11 +2216,11 @@ describe('structural history effect delivery', () => {
 
     expect(seenA).toHaveLength(1);
     expect(seenB).toHaveLength(1);
-    expect(seenA[0]?.historyEffect).toBe(seenB[0]?.historyEffect);
+    expect(seenA[0]?.structuralEffect).toBe(seenB[0]?.structuralEffect);
     expect(seenA[0]).toMatchObject({
       path: 'rows.17',
       ownerPath: 'rows',
-      historyEffect: {
+      structuralEffect: {
         kind: 'add',
         key: 17,
         subject: seenA[0]?.subjectIds?.[0],
@@ -2240,11 +2240,11 @@ describe('structural history effect delivery', () => {
 
     expect(seenA).toHaveLength(1);
     expect(seenB).toHaveLength(1);
-    expect(seenA[0]?.historyEffect).toBe(seenB[0]?.historyEffect);
+    expect(seenA[0]?.structuralEffect).toBe(seenB[0]?.structuralEffect);
     expect(seenA[0]).toMatchObject({
       path: 'rows.17',
       ownerPath: 'rows',
-      historyEffect: {
+      structuralEffect: {
         kind: 'remove',
         key: 17,
         subject: seenA[0]?.subjectIds?.[0],
@@ -2262,11 +2262,11 @@ describe('structural history effect delivery', () => {
 
     expect(seenA).toHaveLength(1);
     expect(seenB).toHaveLength(1);
-    expect(seenA[0]?.historyEffect).toBe(seenB[0]?.historyEffect);
+    expect(seenA[0]?.structuralEffect).toBe(seenB[0]?.structuralEffect);
     expect(seenA[0]).toMatchObject({
       path: 'rows.27',
       ownerPath: 'rows',
-      historyEffect: {
+      structuralEffect: {
         kind: 'rekey',
         beforeKey: 17,
         afterKey: 27,
@@ -2289,7 +2289,7 @@ describe('structural history effect delivery', () => {
 
     expect(seenA).toHaveLength(3);
     for (const event of seenA) {
-      expect(event.historyEffect).toMatchObject({
+      expect(event.structuralEffect).toMatchObject({
       });
     }
   });
@@ -2317,36 +2317,36 @@ describe('structural history effect delivery', () => {
     const freshArrivalEvent = seenA.find((event) => event.path === 'rows.3');
 
     expect(removeEvent).toMatchObject({
-      historyEffect: {
+      structuralEffect: {
         kind: 'remove',
         key: 4,
         subject: removeEvent?.subjectIds?.[0],
       },
     });
-    expect(survivorEvent?.historyEffect).toBeUndefined();
+    expect(survivorEvent?.structuralEffect).toBeUndefined();
     expect(reusedKeyEvent).toMatchObject({
-      historyEffect: {
+      structuralEffect: {
         kind: 'add',
         key: 1,
         subject: reusedKeyEvent?.subjectIds?.[0],
       },
     });
     expect(freshArrivalEvent).toMatchObject({
-      historyEffect: {
+      structuralEffect: {
         kind: 'add',
         key: 3,
         subject: freshArrivalEvent?.subjectIds?.[0],
       },
     });
 
-    expect(removeEvent?.historyEffect).toBe(
-      seenB.find((event) => event.path === 'rows.4')?.historyEffect
+    expect(removeEvent?.structuralEffect).toBe(
+      seenB.find((event) => event.path === 'rows.4')?.structuralEffect
     );
-    expect(reusedKeyEvent?.historyEffect).toBe(
-      seenB.find((event) => event.path === 'rows.1')?.historyEffect
+    expect(reusedKeyEvent?.structuralEffect).toBe(
+      seenB.find((event) => event.path === 'rows.1')?.structuralEffect
     );
-    expect(freshArrivalEvent?.historyEffect).toBe(
-      seenB.find((event) => event.path === 'rows.3')?.historyEffect
+    expect(freshArrivalEvent?.structuralEffect).toBe(
+      seenB.find((event) => event.path === 'rows.3')?.structuralEffect
     );
   });
 });

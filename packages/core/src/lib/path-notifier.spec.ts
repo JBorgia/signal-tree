@@ -311,7 +311,7 @@ describe('PathNotifier (batching)', () => {
         [17],
         [3],
         {
-          historyEffect: {
+          structuralEffect: {
             kind: 'rekey',
             subject: 17,
             beforeKey: 7,
@@ -339,7 +339,7 @@ describe('PathNotifier (batching)', () => {
       subjectIds: [17],
       positionIds: [3],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'rekey',
           subject: 17,
           beforeKey: 7,
@@ -356,7 +356,7 @@ describe('PathNotifier (batching)', () => {
         mutationIntent: 'replace',
       },
     });
-    expect(seen[1]?.meta?.historyEffect).toBeUndefined();
+    expect(seen[1]?.meta?.structuralEffect).toBeUndefined();
   });
 
   it('preserves rekey metadata on the structural notification only when a later same-subject update happens in the same flush', async () => {
@@ -370,7 +370,7 @@ describe('PathNotifier (batching)', () => {
         [17],
         [3],
         {
-          historyEffect: {
+          structuralEffect: {
             kind: 'rekey',
             subject: 17,
             beforeKey: 7,
@@ -392,7 +392,7 @@ describe('PathNotifier (batching)', () => {
     });
 
     expect(seen).toHaveLength(2);
-    expect(seen[0]?.meta?.historyEffect).toMatchObject({
+    expect(seen[0]?.meta?.structuralEffect).toMatchObject({
       kind: 'rekey',
       subject: 17,
       beforeKey: 7,
@@ -407,10 +407,10 @@ describe('PathNotifier (batching)', () => {
         mutationIntent: 'derive',
       },
     });
-    expect(seen[1]?.meta?.historyEffect).toBeUndefined();
+    expect(seen[1]?.meta?.structuralEffect).toBeUndefined();
   });
 
-  it('does not drop a same-reference structural notification when historyEffect is present', async () => {
+  it('does not drop a same-reference structural notification when structuralEffect is present', async () => {
     const rekeyedEntity = { id: 42, name: 'pending' };
     const seen = await captureNotifications((notifier) => {
       notifier.notify(
@@ -421,7 +421,7 @@ describe('PathNotifier (batching)', () => {
         [17],
         [3],
         {
-          historyEffect: {
+          structuralEffect: {
             kind: 'rekey',
             subject: 17,
             beforeKey: 7,
@@ -438,7 +438,7 @@ describe('PathNotifier (batching)', () => {
       subjectIds: [17],
       positionIds: [3],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'rekey',
           subject: 17,
           beforeKey: 7,
@@ -461,7 +461,7 @@ describe('PathNotifier (batching)', () => {
         {
           transactionId: 1,
           transactionOwner,
-          historyEffect: {
+          structuralEffect: {
             kind: 'rekey',
             subject: 17,
             beforeKey: 7,
@@ -491,7 +491,7 @@ describe('PathNotifier (batching)', () => {
       positionIds: [3],
       meta: {
         transactionId: 1,
-        historyEffect: {
+        structuralEffect: {
           kind: 'rekey',
           subject: 17,
           beforeKey: 7,
@@ -508,7 +508,7 @@ describe('PathNotifier (batching)', () => {
         transactionId: 1,
       },
     });
-    expect(seen[1]?.meta?.historyEffect).toBeUndefined();
+    expect(seen[1]?.meta?.structuralEffect).toBeUndefined();
   });
 
   it('keeps same-path structural and later entity updates separate within one flush', async () => {
@@ -524,7 +524,7 @@ describe('PathNotifier (batching)', () => {
         {
           transactionId: 1,
           transactionOwner,
-          historyEffect: {
+          structuralEffect: {
             kind: 'rekey',
             subject: 17,
             beforeKey: 7,
@@ -547,7 +547,7 @@ describe('PathNotifier (batching)', () => {
     });
 
     expect(seen).toHaveLength(2);
-    expect(seen[0]?.meta?.historyEffect).toMatchObject({
+    expect(seen[0]?.meta?.structuralEffect).toMatchObject({
       kind: 'rekey',
       subject: 17,
       beforeKey: 7,
@@ -559,7 +559,7 @@ describe('PathNotifier (batching)', () => {
       subjectIds: [17],
       positionIds: [3],
     });
-    expect(seen[1]?.meta?.historyEffect).toBeUndefined();
+    expect(seen[1]?.meta?.structuralEffect).toBeUndefined();
   });
 
   it('preserves add metadata on the structural notification only when a later same-subject set happens in the same flush', async () => {
@@ -572,7 +572,7 @@ describe('PathNotifier (batching)', () => {
         [17],
         [3],
         {
-          historyEffect: {
+          structuralEffect: {
             kind: 'add',
             subject: 17,
             key: 17,
@@ -600,7 +600,7 @@ describe('PathNotifier (batching)', () => {
       subjectIds: [17],
       positionIds: [3],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'add',
           subject: 17,
           key: 17,
@@ -616,7 +616,7 @@ describe('PathNotifier (batching)', () => {
         mutationIntent: 'replace',
       },
     });
-    expect(seen[1]?.meta?.historyEffect).toBeUndefined();
+    expect(seen[1]?.meta?.structuralEffect).toBeUndefined();
   });
 
   it('preserves add metadata on the structural notification only when a later same-subject update happens in the same flush', async () => {
@@ -629,7 +629,7 @@ describe('PathNotifier (batching)', () => {
         [17],
         [3],
         {
-          historyEffect: {
+          structuralEffect: {
             kind: 'add',
             subject: 17,
             key: 17,
@@ -651,7 +651,7 @@ describe('PathNotifier (batching)', () => {
     });
 
     expect(seen).toHaveLength(2);
-    expect(seen[0]?.meta?.historyEffect).toMatchObject({
+    expect(seen[0]?.meta?.structuralEffect).toMatchObject({
       kind: 'add',
       subject: 17,
       key: 17,
@@ -665,7 +665,7 @@ describe('PathNotifier (batching)', () => {
         mutationIntent: 'derive',
       },
     });
-    expect(seen[1]?.meta?.historyEffect).toBeUndefined();
+    expect(seen[1]?.meta?.structuralEffect).toBeUndefined();
   });
 
   it('does not drop owner-only marker notifications during batching', async () => {

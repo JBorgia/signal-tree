@@ -473,7 +473,7 @@ describe('tree realization adapter', () => {
         positionIds: [collectionOwner],
         subjectIds: [subjectId],
         meta: {
-          historyEffect: {
+          structuralEffect: {
             kind: 'remove',
             subject: subjectId,
             key: 'u1',
@@ -805,7 +805,7 @@ describe('tree realization adapter', () => {
       ownerPath: 'users',
       positionIds: [owner],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: beforeSubjectId,
           key: 'u1',
@@ -908,7 +908,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subjectId,
           key: 'u1',
@@ -1003,7 +1003,7 @@ describe('tree realization adapter', () => {
           positionIds: [structuralOwner],
           subjectIds: [subjectId],
           meta: {
-            historyEffect: {
+            structuralEffect: {
               kind: 'remove',
               subject: subjectId,
               key: 'u1',
@@ -1128,7 +1128,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subjectId,
           key: 'u1',
@@ -1279,7 +1279,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subjectId,
           key: 'u1',
@@ -1399,7 +1399,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subjectId,
           key: 'u1',
@@ -1525,7 +1525,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subjectId,
           key: 'u1',
@@ -1621,7 +1621,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subject42],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subject42,
           key: 'u1',
@@ -1746,7 +1746,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subject42],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subject42,
           key: 'u1',
@@ -1894,7 +1894,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subject42],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subject42,
           key: 'u1',
@@ -1909,7 +1909,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subject99],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subject99,
           key: 'u2',
@@ -2039,7 +2039,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subject42],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subject42,
           key: 'u1',
@@ -2187,7 +2187,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subject42],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subject42,
           key: 'u1',
@@ -2202,7 +2202,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subject99],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subject99,
           key: 'u2',
@@ -2217,7 +2217,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subject77],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subject77,
           key: 'u3',
@@ -2344,7 +2344,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [subject42],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subject42,
           key: 'u1',
@@ -2428,7 +2428,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [freshSubjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'add',
           subject: freshSubjectId,
           key: 'u1',
@@ -2561,7 +2561,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [freshSubjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'add',
           subject: freshSubjectId,
           key: 'u1',
@@ -2676,7 +2676,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [freshSubjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'add',
           subject: freshSubjectId,
           key: 'u1',
@@ -2780,7 +2780,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [freshSubjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'add',
           subject: freshSubjectId,
           key: 'u1',
@@ -2905,7 +2905,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [freshSubjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'add',
           subject: freshSubjectId,
           key: 'u1',
@@ -3024,7 +3024,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [freshSubjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'add',
           subject: freshSubjectId,
           key: 'u1',
@@ -3176,7 +3176,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [oldSubjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: oldSubjectId,
           key: 'u1',
@@ -3198,7 +3198,7 @@ describe('tree realization adapter', () => {
       positionIds: [structuralOwner],
       subjectIds: [freshSubjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'add',
           subject: freshSubjectId,
           key: 'u1',
@@ -3460,7 +3460,7 @@ describe('tree realization adapter', () => {
       ownerPath: 'users',
       positionIds: [owner],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subjectOne,
           key: 'u1',
@@ -3474,7 +3474,7 @@ describe('tree realization adapter', () => {
       ownerPath: 'users',
       positionIds: [owner],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subjectTwo,
           key: 'u2',
@@ -3627,7 +3627,7 @@ describe('tree realization adapter', () => {
       positionIds: [owner],
       subjectIds: [subjectId],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: subjectId,
           key: 'u1',
@@ -4493,7 +4493,7 @@ describe('tree realization adapter', () => {
       ownerPath: 'users',
       positionIds: [structuralOwner],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: 1,
           key: 'u1',
