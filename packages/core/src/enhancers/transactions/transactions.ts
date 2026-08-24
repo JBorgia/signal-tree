@@ -23,6 +23,7 @@ import type {
   PositionId as CausalPositionId,
 } from '../../lib/internals/causal-runtime/causal-types';
 import { rollbackPendingTurnAt } from '../../lib/internals/causal-runtime/pending-rollback';
+import { getTransactionLifecycleChannel } from '../../lib/internals/causal-runtime/transaction-lifecycle';
 import { createRealizationContextSource } from '../../lib/internals/causal-runtime/realization-context';
 import {
   createTreeRealizationAdapter,
@@ -1197,6 +1198,16 @@ export function getOrCreateInternalTransactionRuntime<T>(
       const transactionId = nextTransactionId++;
       pendingTransactions.set(transactionId, createCaptureBucket());
 
+      // TURN-FEED-0. Announced BEFORE the callback runs, because an observer has
+      // to know the transaction is open in order to treat the writes inside it
+      // as speculative. Announcing after would be announcing too late.
+      const lifecycleChannel = getTransactionLifecycleChannel(tree as object);
+      lifecycleChannel.announce({
+        kind: 'opened',
+        owner: transactionOwnerToken,
+        id: transactionId,
+      });
+
       // Persistence is post-commit: open the deferral scope BEFORE the callback
       // runs, so speculative writes inside it queue instead of reaching storage.
       openCommitScope(transactionOwnerToken, transactionId, tree as object);
@@ -1279,6 +1290,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
         throw cleanupError;
       }
 
+      // TURN-FEED-0 'staged': the callback has returned, so this transaction's
+      // contribution is complete and awaits a decision.
+      lifecycleChannel.announce({
+        kind: 'staged',
+        owner: transactionOwnerToken,
+        id: transactionId,
+      });
+
       notifier?.flushSync();
       const pendingTurn = materializePendingTransaction(transactionId);
       const pendingTurnId = pendingTurn?.id;
@@ -1296,6 +1315,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
             throw new Error('Cannot confirm a rolled back transaction');
           }
           lifecycle = 'confirmed';
+          lifecycleChannel.announce({
+            kind: 'confirmed',
+            owner: transactionOwnerToken,
+            id: transactionId,
+          });
           try {
             if (pendingTurnId !== undefined) {
               const confirmedTurn = authority.confirmPending(pendingTurnId);
@@ -1350,6 +1374,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
 
           lifecycle = 'rejected';
+          lifecycleChannel.announce({
+            kind: 'rolled-back',
+            owner: transactionOwnerToken,
+            id: transactionId,
+          });
           let discardedTurn: TransactionTurnRecord | undefined;
           if (pendingTurnId !== undefined) {
             discardedTurn = authority.discardPending(pendingTurnId);

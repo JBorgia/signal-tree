@@ -2437,6 +2437,87 @@ deleting; my probe was simply blind to it. The test at
 transactions() + timeTravel()"* — was, all along, exercising time-travel's
 implementation rather than the composition it names.
 
+# TURN-FEED-0 — pre-registered, and deliberately narrower than its name
+
+The TX-SURFACE-0 deletion earned exactly one thing: a way for a transaction
+owner to announce a lifecycle, so another authority can observe it without
+sharing the owner's private token.
+
+## SCOPE CONSTRAINT, pre-registered
+
+> **TURN-FEED-0 carries transaction LIFECYCLE, not a general stream of mutation
+> effects. C3 may widen it only if `transactions()`' existing effect capture
+> proves insufficient.**
+
+Recorded because the temptation is obvious and wrong: DIAG-JOURNAL will
+eventually want every causal effect, so it is tempting to build that stream now.
+That would jump from a three-event protocol that has been falsified into an
+architecture that has not.
+
+```text
+TURN-FEED-0             transaction lifecycle only          <- earned
+TX dependency ledger    effect observation for rollback     <- C3, maybe
+                                                               inside transactions()
+DIAG-JOURNAL            whole causal observation            <- not yet earned
+```
+
+## The protocol
+
+Internal. The identity is the PAIR, which is what preserves the reason
+`transactionOwnerToken` existed without making every consumer share it:
+
+```text
+(owner, transactionId)
+
+  opened       a transaction is accepting writes
+  confirmed    its writes become part of the causal record
+  rolled-back  its writes never happened
+```
+
+`timeTravel()` stops asking *"is this MY transaction?"* and starts asking *"does
+this write carry a recognised ACTIVE transaction identity?"*.
+
+**The lifecycle signal does not grant restoration rights.** That separation is
+the whole point, and it gets its own control:
+
+```text
+transaction(...).confirm()                designated mode -> NO restoration entry
+undoable(() => transaction(...).confirm())               -> exactly ONE turn
+```
+
+If a confirmed transaction becomes restoration history on its own, the protocol
+has recreated the conflation the flip exposed.
+
+## Six cases
+
+```text
+1  PENDING ISOLATION     writes while pending never appear in confirmed
+                         restoration history
+2  CONFIRMATION          observed exactly once, no duplicate turn, and admission
+                         still decided by undoable()
+3  ROLLBACK              the observer's bucket disappears; zero restoration
+                         entries, zero restoration claims
+4  SURROUNDING WRITES    write A / transaction / write B stay distinct causal
+                         turns, no cross-bucket contamination
+5  ENHANCER ORDERING     both orders behave identically once the duplicate
+                         transaction() is gone
+6  OWNERSHIP             transactions() alone unchanged; timeTravel() alone has
+                         NO transaction() API
+```
+
+Case 6 is the one that proves the deletion rather than merely making the composed
+path green.
+
+## A reusable audit rule from the correction
+
+> **When two enhancers expose the same public method, equal output does not prove
+> composition. Prove which implementation owns the call.**
+
+My order probe compared answers, got agreement, and concluded there was no
+collision — while the later-installed enhancer was silently overwriting the
+earlier method, and both were correct under the old default so the outputs could
+not disagree.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded

@@ -27,6 +27,10 @@ import {
   rememberTreeRealizationDescriptor,
 } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import {
+  getTransactionLifecycleChannel,
+  transactionIdentityKey,
+} from '../../lib/internals/causal-runtime/transaction-lifecycle';
+import {
   isMetaDesignated,
   isRestorationDesignated,
   markMetaDesignated,
@@ -2893,13 +2897,49 @@ export function timeTravel(
       }
       return bucket;
     };
+    /**
+     * TURN-FEED-0 — active foreign transactions, keyed by `(owner, id)`.
+     *
+     * This used to compare `meta.transactionOwner` against `transactionOwnerToken`,
+     * time-travel's own private token. That was correct only while time-travel
+     * shipped its own `transaction()`; a transaction opened by `transactions()`
+     * was invisible, and its speculative writes landed in CONFIRMED restoration
+     * history before `confirm()`.
+     *
+     * Recognition alone is not enough — measured. Without a lifecycle signal the
+     * pending bucket never drains. Hence the subscription below.
+     */
+    const activeForeignTransactions = new Map<string, number>();
+
+    /**
+     * Turns built at 'staged' and awaiting a decision, keyed by `(owner, id)`.
+     * Held here rather than rebuilt at 'confirmed' so the turn's snapshot is
+     * taken while it is still the newest thing that happened.
+     */
+    const stagedForeignTurns = new Map<string, number>();
+
     const resolveTransactionId = (meta?: {
       transactionId?: unknown;
       transactionOwner?: unknown;
     }): number | undefined => {
-      return typeof meta?.transactionId === 'number' &&
-        meta.transactionOwner === transactionOwnerToken
-        ? meta.transactionId
+      if (typeof meta?.transactionId !== 'number') {
+        return undefined;
+      }
+      if (meta.transactionOwner === transactionOwnerToken) {
+        return meta.transactionId;
+      }
+      if (typeof meta.transactionOwner !== 'object' || meta.transactionOwner === null) {
+        return undefined;
+      }
+      // Only while the announcing owner says it is OPEN. A stale id from a
+      // settled transaction must not divert writes into a bucket nothing will
+      // drain.
+      const key = transactionIdentityKey(
+        meta.transactionOwner as object,
+        meta.transactionId
+      );
+      return activeForeignTransactions.has(key)
+        ? activeForeignTransactions.get(key)
         : undefined;
     };
     const materializePendingTransaction = (
@@ -2924,6 +2964,69 @@ export function timeTravel(
         effects.length > 0 ? effects : undefined
       );
     };
+    /**
+     * TURN-FEED-0 — observe a FOREIGN transaction's lifecycle.
+     *
+     * Time-travel is a pure observer here. It learns that a transaction opened,
+     * confirmed or rolled back; it does not decide any of those, and learning
+     * that one confirmed grants no restoration rights — `materializePendingTransaction`
+     * still runs `isTurnEligible`, so admission stays with `undoable()`.
+     *
+     * Its own transactions are NOT routed through this. They already hold
+     * `transactionOwnerToken` and drive the manager directly.
+     */
+    const unsubscribeTransactionLifecycle = getTransactionLifecycleChannel(
+      tree as object
+    ).subscribe((event) => {
+      if (event.owner === transactionOwnerToken) {
+        return;
+      }
+      const key = transactionIdentityKey(event.owner, event.id);
+
+      if (event.kind === 'opened') {
+        // Registered BEFORE the transaction's writes arrive, which is why the
+        // announcement has to precede the callback.
+        activeForeignTransactions.set(key, event.id);
+        return;
+      }
+
+      if (event.kind === 'staged') {
+        // The contribution is complete but undecided, so the turn is BUILT now
+        // and held pending. Building it at 'confirmed' instead was measured
+        // wrong: surrounding writes flush in between and record a snapshot that
+        // already contains the speculative state, so the transaction's own turn
+        // is reference-identical to it and dedupes away to nothing.
+        if (!activeForeignTransactions.has(key)) {
+          return;
+        }
+        getPathNotifier()?.flushSync();
+        const staged = materializePendingTransaction(event.id);
+        if (staged) {
+          stagedForeignTurns.set(key, staged.id);
+        }
+        return;
+      }
+
+      activeForeignTransactions.delete(key);
+      const stagedTurnId = stagedForeignTurns.get(key);
+      stagedForeignTurns.delete(key);
+      if (stagedTurnId === undefined) {
+        // Nothing was staged — either never opened here, or it produced no
+        // eligible turn. Either way there is nothing to decide.
+        return;
+      }
+
+      if (event.kind === 'confirmed') {
+        timeTravelManager.confirmPendingTurn(stagedTurnId);
+        return;
+      }
+
+      // 'rolled-back'. The writes never happened, so the staged turn is thrown
+      // away rather than admitted. Compensation is the owner's job — time-travel
+      // neither applies nor validates it.
+      timeTravelManager.discardPendingTurn(stagedTurnId);
+    });
+
     const drainTransactionEffects = (transactionId: number): TurnEffect[] => {
       const bucket = pendingTransactions.get(transactionId);
       pendingTransactions.delete(transactionId);
@@ -3405,6 +3508,11 @@ export function timeTravel(
         }
         try {
           unsubscribeNotifications?.();
+        } catch {
+          /* ignore */
+        }
+        try {
+          unsubscribeTransactionLifecycle?.();
         } catch {
           /* ignore */
         }
