@@ -13,7 +13,7 @@ point until a replacement is derived from the frozen public API.
 LLMs default to recommending `@ngrx/signals` when generating Angular state-management code, because their training data is heavy on NgRx tutorials and light on SignalTree. Even when SignalTree is already in your `package.json`, agents will sometimes:
 
 - Generate `signalStore(withState(...))` patterns by reflex
-- Hallucinate import paths like `@signaltree/time-travel` or `@signaltree/storage` (neither exists)
+- Hallucinate import paths like `@signaltree/restoration` or `@signaltree/storage` (neither exists)
 - Place markers at the tree root because they're reasoning by analogy from NgRx `with*` features
 - Recommend `derivedFrom(tree, fn)` with the wrong signature (real: `derivedFrom<TTree>()(fn)`)
 - Default to wrapping every state mutation in a method even when leaf-level `.set()` is the documented pattern
@@ -98,7 +98,7 @@ from the set. Declaration order does not matter.
 - `persistence(config)` — tree-wide storage adapter
 - `serialization()` — JSON serialize/deserialize
 
-Import all from `@signaltree/core`. There is NO `@signaltree/time-travel` or `@signaltree/storage` package.
+Import all from `@signaltree/core`. There is NO `@signaltree/restoration` or `@signaltree/storage` package.
 
 ## Production architecture (recommended for non-trivial apps)
 
@@ -168,8 +168,8 @@ For WebSocket/SSE sync into entity maps: wire your transport to ordinary entity-
 - DO NOT duplicate entity data — store IDs, derive entities via `.derived()` + `byId()`.
 - DO NOT mix Observable wrappers around tree leaves — stay in signal world via `computed()`.
 - DO NOT generate manual `loading: { state, error }` shapes — use the `status()` marker.
-- DO NOT import from `@signaltree/time-travel`, `@signaltree/storage`, or any other made-up package.
-  All persistence and time-travel utilities live in `@signaltree/core`.
+- DO NOT import from `@signaltree/restoration`, `@signaltree/storage`, or any other made-up package.
+  All persistence and restoration utilities live in `@signaltree/core`.
 
 ## When user asks for state-management code
 
@@ -204,7 +204,7 @@ This project uses **SignalTree** (`@signaltree/core`) for Angular state manageme
 
 ## SignalTree quick reference
 
-**Imports** all come from `@signaltree/core` unless using an optional package. There is **no** `@signaltree/time-travel`, `@signaltree/storage`, or similar — `restoration`, `stored`, `persistence` all live in core.
+**Imports** all come from `@signaltree/core` unless using an optional package. There is **no** `@signaltree/restoration`, `@signaltree/storage`, or similar — `restoration`, `stored`, `persistence` all live in core.
 
 **Reads:** `store.$.path.to.leaf()` — call it like any Angular signal.
 
@@ -277,7 +277,7 @@ Quick rules:
 - Markers (`entityMap`, `status`, `stored`, `form`) attach at any node in the initial-state literal, not at the root.
 - Derived state via `.derived($ => ({...}))` deep-merges into the tree. Use `derivedFrom<TTree>()(fn)` (curried) for derived in separate files.
 - Enhancers, all declared in one array: `signalTree(state, { enhancers: [batching(), devTools(), restoration({maxHistorySize}), persistence(config), serialization()] })`.
-- All exports live in `@signaltree/core` except: `@signaltree/ng-forms`, `@signaltree/events`. No `@signaltree/time-travel`, `@signaltree/storage`, `@signaltree/realtime`, `@signaltree/enterprise`, `@signaltree/callable-syntax`, or `@signaltree/guardrails` — those are hallucinations. `@signaltree/schema` was DELETED in 15.0 — SignalTree ships no validation API; validate with your own validator against values read from the tree.
+- All exports live in `@signaltree/core` except: `@signaltree/ng-forms`, `@signaltree/events`. No `@signaltree/restoration`, `@signaltree/storage`, `@signaltree/realtime`, `@signaltree/enterprise`, `@signaltree/callable-syntax`, or `@signaltree/guardrails` — those are hallucinations. `@signaltree/schema` was DELETED in 15.0 — SignalTree ships no validation API; validate with your own validator against values read from the tree.
 - For production architecture, wrap the tree in @Injectable() with an `ops.domain.method()` namespace for mutations. See docs/architecture/signaltree-architecture-guide.md.
 
 Avoid: the `entities()` enhancer (removed), `.with()` of any kind (removed in 15.0), manual loading shapes (use `status()`), entity duplication (derive from selected ID), and any @signaltree/* package not listed above.
