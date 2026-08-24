@@ -437,7 +437,29 @@ export interface TransactionMethods {
  * State inference is UNCHANGED for consumers: `getHistory()[0].state` is the
  * exact concrete state, through arbitrarily long `.with()` chains.
  */
-export interface TimeTravelMethods extends TransactionMethods {
+/**
+ * `TimeTravelMethods` deliberately does NOT extend `TransactionMethods` (15.0,
+ * TX-SURFACE-0).
+ *
+ * `timeTravel()` used to ship its own `transaction()` — a second implementation
+ * of a concept `transactions()` already owns and the README already documented
+ * as belonging there, reaching the public surface silently through an interface
+ * extension. It was also the incorrect one: its rollback dependency check read
+ * the restoration history rather than its own captured effects, so under opt-in
+ * eligibility it stopped refusing unsafe rollbacks. It looked correct only
+ * because the old default admitted every authored write to that history.
+ *
+ * The capabilities compose, which is why deletion was cheaper than repair:
+ *
+ *   transactions()  groups authored work, owns rollback, announces lifecycle
+ *   undoable()      admits the resulting causal turn
+ *   timeTravel()    observes that lifecycle and restores admitted turns
+ *
+ * Install `transactions()` for a transaction boundary. There is no shim, and
+ * re-adding one via another interface extension would recreate the duplication —
+ * see the negative typing test in `tx-ownership.typing.spec.ts`.
+ */
+export interface TimeTravelMethods {
   undo(): void;
   redo(): void;
   canUndo(): boolean;

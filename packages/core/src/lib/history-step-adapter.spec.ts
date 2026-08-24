@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { transactions } from '../enhancers/transactions/transactions';
 
 import { entityMap, signalTree, timeTravel } from '../index';
 
@@ -38,7 +39,7 @@ type EntityHistoryStepStore = {
 function createStore(): HistoryStepStore {
   return signalTree(
     { left: 'L0', right: 'R0', later: 'Z0' },
-    { enhancers: [timeTravel()] }
+    { enhancers: [timeTravel(), transactions()] }
   ) as unknown as HistoryStepStore;
 }
 
@@ -47,7 +48,7 @@ function createEntityStore(): EntityHistoryStepStore {
     {
       rows: entityMap<Row, number>({ selectId: (row) => row.id }),
     },
-    { enhancers: [timeTravel()] }
+    { enhancers: [timeTravel(), transactions()] }
   ) as unknown as EntityHistoryStepStore;
 }
 

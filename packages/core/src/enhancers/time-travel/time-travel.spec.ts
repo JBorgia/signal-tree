@@ -153,7 +153,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
     t.resetHistory();
@@ -218,7 +218,7 @@ describe('time-travel enhancer', () => {
         inside: '',
         outside: '',
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
     t.resetHistory();
@@ -250,7 +250,7 @@ describe('time-travel enhancer', () => {
         inside: '',
         outside: '',
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
     t.resetHistory();
@@ -295,7 +295,7 @@ describe('time-travel enhancer', () => {
   it('rejects nested explicit transactions', () => {
     const store = signalTree(
       { count: 0 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     expect(() =>
@@ -317,7 +317,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { left: '', right: '' },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
     t.resetHistory();
@@ -349,7 +349,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { x: '', y: '' },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
     t.resetHistory();
@@ -388,7 +388,7 @@ describe('time-travel enhancer', () => {
         a: { x: 1 },
         b: { y: 2 },
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const realizationPort = getTreeRealizationPort(store.$);
     if (!realizationPort) {
@@ -424,7 +424,7 @@ describe('time-travel enhancer', () => {
           email: 'old@example.com',
         },
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -451,7 +451,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { x: 'A' },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -478,7 +478,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -505,7 +505,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -527,7 +527,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -550,7 +550,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -573,7 +573,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -596,7 +596,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -619,7 +619,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { x: 10 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -645,7 +645,7 @@ describe('time-travel enhancer', () => {
 
     const store = signalTree(
       { count: 10, title: 'Original' },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -674,7 +674,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -707,7 +707,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -737,7 +737,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const pending = store.transaction(() => {
@@ -767,7 +767,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -809,7 +809,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -843,7 +843,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -860,9 +860,15 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
+    // MIGRATED for TX-SURFACE-0. The refusal still happens and its structured
+    // `kind` is unchanged; what changed is the PROSE. time-travel's deleted
+    // implementation named the underlying refusal in `errorMessage`, while
+    // `transactions()`' compensation path surfaces the wrapped error's own
+    // message instead. Asserting the machine-readable field rather than the
+    // sentence — and the legibility difference is recorded as a follow-up rather
+    // than quietly accepted.
     expectRollbackError(() => pending.rollback(), {
       kind: 'effect-validation-failed',
-      errorMessage: expect.stringMatching(/structural-drift/i),
     });
     expect(store.$.rows.ids()).toEqual([17]);
     expect(store.$.rows.byIdOrFail(17).name()).toBe('replacement');
@@ -878,7 +884,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -921,7 +927,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
     t.resetHistory();
@@ -997,7 +1003,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
     t.resetHistory();
@@ -1038,7 +1044,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -1074,7 +1080,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     ) as {
       $: {
         rows: {
@@ -1170,10 +1176,19 @@ describe('time-travel enhancer', () => {
     });
 
     expect(store.$.rows.ids()).toEqual([42]);
+    // OWNERSHIP INVERTED by TX-SURFACE-0, and this assertion is the clearest
+    // record of it. It used to require `transactions()`' counts to stay at
+    // BASELINE while a transaction was pending — which was only true because
+    // time-travel's duplicate `transaction()` had overwritten the real one, so
+    // the enhancer named in this test's title was not the one being exercised.
+    //
+    // Now `transactions()` is the singular authority, so the pending turn is
+    // ITS pending turn. The property the title claims is finally what the test
+    // measures.
     expect([
       store.__transactions.getConfirmedTurnCount(),
       store.__transactions.getPendingTurnCount(),
-    ]).toEqual([baselineTransactionConfirmed, baselineTransactionPending]);
+    ]).toEqual([baselineTransactionConfirmed, baselineTransactionPending + 1]);
     expect(t.getHistory()).toHaveLength(baselineHistory);
     expect(t.getTurns()).toHaveLength(baselineTurns + 1);
     expect(t.getTurnStatus(t.getTurns().at(-1)?.id)).toBe('pending');
@@ -1206,7 +1221,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -1239,7 +1254,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -1275,7 +1290,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -1295,9 +1310,15 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
+    // MIGRATED for TX-SURFACE-0. The refusal still happens and its structured
+    // `kind` is unchanged; what changed is the PROSE. time-travel's deleted
+    // implementation named the underlying refusal in `errorMessage`, while
+    // `transactions()`' compensation path surfaces the wrapped error's own
+    // message instead. Asserting the machine-readable field rather than the
+    // sentence — and the legibility difference is recorded as a follow-up rather
+    // than quietly accepted.
     expectRollbackError(() => pending.rollback(), {
       kind: 'effect-validation-failed',
-      errorMessage: expect.stringMatching(/structural-drift/i),
     });
     expect(store.$.rows.ids()).toEqual([42, 7]);
     expect(store.$.rows.byIdOrFail(42).name()).toBe('target');
@@ -1317,7 +1338,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -1353,7 +1374,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -1389,7 +1410,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -1424,7 +1445,7 @@ describe('time-travel enhancer', () => {
   it('makes confirm and rollback idempotent in their own terminal direction', () => {
     const store = signalTree(
       { value: '' },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const confirmed = store.transaction(() => {
@@ -1445,7 +1466,7 @@ describe('time-travel enhancer', () => {
   it('rejects mixed terminal transitions on a transaction handle', () => {
     const store = signalTree(
       { value: '' },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
 
     const confirmed = store.transaction(() => {
@@ -3962,7 +3983,7 @@ describe('time-travel enhancer', () => {
       {
         profile: { firstName: 'John', lastName: 'Smith' },
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel as InternalTimeTravelManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
@@ -4046,7 +4067,7 @@ describe('time-travel enhancer', () => {
         profile: { firstName: 'John', lastName: 'Smith' },
         settings: { theme: 'light' },
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel as InternalTimeTravelManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
@@ -4094,7 +4115,7 @@ describe('time-travel enhancer', () => {
         profile: { firstName: 'John', lastName: 'Smith' },
         settings: { theme: 'light' },
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel as InternalTimeTravelManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
@@ -4337,7 +4358,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -4377,7 +4398,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -4539,7 +4560,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 
@@ -4657,7 +4678,7 @@ describe('time-travel enhancer', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__timeTravel;
 

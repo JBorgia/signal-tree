@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { transactions } from '../enhancers/transactions/transactions';
 
 import { timeTravel } from '../enhancers/time-travel/time-travel';
 import { signalTree } from '../index';
@@ -48,7 +49,7 @@ describe('E2-C1 — real P3', () => {
   it('a PENDING write is visible in canonical truth but adds NO history entry', async () => {
     const tree = signalTree(
       { x: 'A' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Scalar>;
     const base = tree.getHistory().length;
 
@@ -62,7 +63,7 @@ describe('E2-C1 — real P3', () => {
   it('CONFIRMATION historicises; ROLLBACK of a superseded pending turn changes neither truth nor history', async () => {
     const tree = signalTree(
       { x: 'A' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Scalar>;
 
     const t1 = tree.transaction(() => tree.$.x.set('B')); // pending
@@ -87,7 +88,7 @@ describe('E2-C1 — real P3', () => {
   it('RECORDED: confirmed undo lands on B, not A — and redo returns to C', async () => {
     const tree = signalTree(
       { x: 'A' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Scalar>;
 
     const t1 = tree.transaction(() => tree.$.x.set('B'));
@@ -133,7 +134,7 @@ describe('E2-C2 — nested path', () => {
       {
         profile: { name: 'A', age: 30 },
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Nested>;
 
     const t1 = tree.transaction(() => tree.$.profile.name.set('B'));
@@ -163,7 +164,7 @@ describe('E2-C3 — real ABA authorship', () => {
   it('RECORDED: the real kernel does NOT distinguish authorship of an identical value', async () => {
     const tree = signalTree(
       { x: 'A' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Scalar>;
 
     const t1 = tree.transaction(() => tree.$.x.set('B'));

@@ -32,13 +32,14 @@
  * contract — nothing here asserts a change to `TimeTravelMethods`' shape.
  *
  * v15: enhancers are DECLARED, so the call site is
- * `signalTree(state, { enhancers: [timeTravel()] })` and the added surface arrives
+ * `signalTree(state, { enhancers: [timeTravel(), transactions()] })` and the added surface arrives
  * through the return type. Note the state is a separate annotated `const`
  * rather than `signalTree<AppState>(...)` — an explicit type argument would
  * have to name the enhancer tuple parameter too, and naming it is exactly the
  * ceremony this file exists to forbid.
  */
 import { signalTree } from '../../lib/signal-tree';
+import { transactions } from '../transactions/transactions';
 import { timeTravel } from './time-travel';
 
 import type {
@@ -65,7 +66,7 @@ interface AppState {
 // The call site under test. No generics, no casts, no annotation.
 const initial: AppState = { count: 0, user: { name: 'Ada', age: 36 } };
 const tree = signalTree(initial);
-const travelled = signalTree(initial, { enhancers: [timeTravel()] });
+const travelled = signalTree(initial, { enhancers: [timeTravel(), transactions()] });
 
 // ============================================================================
 // 1 — THE LOAD-BEARING ROW: history keeps the CONCRETE state type
@@ -158,7 +159,7 @@ export type _HistoryStateSurvivesChaining = [
 // ============================================================================
 // 6 — config is optional and does not change the added surface
 // ============================================================================
-const disabled = signalTree(initial, { enhancers: [timeTravel({ enabled: false })] });
+const disabled = signalTree(initial, { enhancers: [timeTravel({ enabled: false }), transactions()] });
 export type _ConfigDoesNotChangeSurface = [
   Expect<Equal<(typeof disabled)['undo'], (typeof travelled)['undo']>>,
   Expect<
@@ -166,7 +167,7 @@ export type _ConfigDoesNotChangeSurface = [
   >
 ];
 // @ts-expect-error config is checked, not `any`
-signalTree(initial, { enhancers: [timeTravel({ nope: true })] });
+signalTree(initial, { enhancers: [timeTravel({ nope: true }), transactions()] });
 
 // ============================================================================
 // 7 — negative controls
