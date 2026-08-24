@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { undoable } from '../../lib/undoable';
 
-import { timeTravel } from '../../enhancers/restoration/restoration';
+import { restoration } from '../../enhancers/restoration/restoration';
 import { getPathNotifier, resetPathNotifier } from '../path-notifier';
 import { signalTree } from '../signal-tree';
 import { stored } from './stored';
@@ -240,7 +240,7 @@ describe('stored() and replay side effects', () => {
       {
         k: stored('sdi-init', 'light', { storage: adapter, debounceMs: 0 }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     const t = (tree as any).__restoration;
 
@@ -268,7 +268,7 @@ describe('stored() and replay side effects', () => {
           debounceMs: 0,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     const t = (tree as any).__restoration;
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { undoable } from '../lib/undoable';
 import { transactions } from '../enhancers/transactions/transactions';
 
-import { entityMap, signalTree, timeTravel } from '../index';
+import { entityMap, signalTree, restoration } from '../index';
 
 const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
@@ -40,7 +40,7 @@ type EntityHistoryStepStore = {
 function createStore(): HistoryStepStore {
   return signalTree(
     { left: 'L0', right: 'R0', later: 'Z0' },
-    { enhancers: [timeTravel(), transactions()] }
+    { enhancers: [restoration(), transactions()] }
   ) as unknown as HistoryStepStore;
 }
 
@@ -49,11 +49,11 @@ function createEntityStore(): EntityHistoryStepStore {
     {
       rows: entityMap<Row, number>({ selectId: (row) => row.id }),
     },
-    { enhancers: [timeTravel(), transactions()] }
+    { enhancers: [restoration(), transactions()] }
   ) as unknown as EntityHistoryStepStore;
 }
 
-describe('history step adapter seam', () => {
+describe('restoration turn adapter seam', () => {
   it('confirms several writes as one user-recognizable undo step', async () => {
     const store = createStore();
     const initialHistoryLength = store.getRestorationHistory().length;
@@ -110,7 +110,7 @@ describe('history step adapter seam', () => {
     expect(store.$.right()).toBe('R0');
   });
 
-  it('does not create a history step when the demarcated callback throws', async () => {
+  it('does not create a restoration turn when the demarcated callback throws', async () => {
     const store = createStore();
     const initialHistoryLength = store.getRestorationHistory().length;
 

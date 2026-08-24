@@ -543,10 +543,10 @@ function warnMissingForward(method: string): void {
 /**
  * @internal Which hydrate mode a write through `recursiveUpdate` represents.
  *
- * `recursiveUpdate` serves BOTH `tree(partial)` and `timeTravel` undo/redo —
+ * `recursiveUpdate` serves BOTH `tree(partial)` and `restoration` undo/redo —
  * `restoreState` falls through to `this.tree(state)` — so the two cannot be
  * told apart by call shape. They are told apart by the write context that
- * time travel already tags every replay with (`origin: 'restoration'`), which
+ * restoration already tags every replay with (`origin: 'restoration'`), which
  * exists for exactly this kind of question and needed no new plumbing.
  *
  * The distinction is not cosmetic. An UNDO must land the user in the state they
@@ -619,7 +619,7 @@ function recursiveUpdate(
     // is an unbranded callable (`form`) or a plain object with its own API
     // (`entityMap`, `status`) falls through to the branch/leaf logic below,
     // which has no idea how to write it — so `tree(partial)` silently no-ops,
-    // and `timeTravel` undo silently leaves the marker at its post-change
+    // and `restoration` undo silently leaves the marker at its post-change
     // value, landing the user in a state that never existed and reporting
     // success. Measured before this: `n=3 rows=3` → undo → `n=2 rows=3`.
     if (hydrateMarkerNode(prop, value, currentHydrateMode())) {
@@ -942,7 +942,7 @@ function createSignalStore<T>(
     // prototype became an attacker-controlled node. `tree.$.isAdmin` then read
     // back a live signal holding `true` while `tree()` reported only the
     // legitimate keys — invisible to snapshots, serialization, persistence,
-    // devtools and time-travel — and a later `tree({ isAdmin: … })` wrote
+    // devtools and restoration — and a later `tree({ isAdmin: … })` wrote
     // THROUGH to it, bypassing the ST2010 not-in-initial-shape discard.
     // Nested branches were safe (each accessor gets a fresh Function.prototype);
     // the root is the only victim, which is exactly why it was easy to miss.
@@ -1198,7 +1198,7 @@ function create<T extends object>(
   /**
    * Apply a single enhancer to this SignalTree instance and return the enhanced tree.
    *
-   * Enhancers extend the tree with additional capabilities (batching, time travel, dev tools, entities, serialization, etc).
+   * Enhancers extend the tree with additional capabilities (batching, restoration, dev tools, entities, serialization, etc).
    *
    * Usage:
    * ```ts
@@ -1206,7 +1206,7 @@ function create<T extends object>(
    * // Chain multiple enhancers:
    * const fullyEnhanced = tree
    *   .with(batching())
-   *   .with(timeTravel({ maxHistorySize: 100 }))
+   *   .with(restoration({ maxHistorySize: 100 }))
    *   .with(devTools({ name: 'MyTree' }));
    * ```
    *
@@ -1217,7 +1217,7 @@ function create<T extends object>(
    *   - Signal writes are always synchronous.
    *   - Options: `enabled`, `notificationDelayMs`.
    *
-   * - `timeTravel(config?: RestorationConfig)`
+   * - `restoration(config?: RestorationConfig)`
    *   - Enables undo/redo and state history.
    *   - Options: `maxHistorySize`, `includePayload`, `actionNames`, `enabled`.
    *
@@ -1374,7 +1374,7 @@ function create<T extends object>(
  * the single authority, and it runs before this function is reached.
  *
  * What survives from `with` is the part that was never about validation:
- * ADOPTING A REPLACEMENT. `batching`, `timeTravel` and `devTools` each return a
+ * ADOPTING A REPLACEMENT. `batching`, `restoration` and `devTools` each return a
  * NEW callable rather than mutating the tree they were given, and everything
  * after must see that one — hence the reassignment rather than a fixed
  * receiver. `enhancer-protocol-continuity.spec.ts` row F is the falsifier.
@@ -1417,7 +1417,7 @@ function applyEnhancers<T extends object>(
  *
  * // With multiple enhancers
  * const tree = signalTree({ count: 0 })
- *   .with(timeTravel())
+ *   .with(restoration())
  *   .with(batching());
  *
  * // With derived state (v7) - chained syntax

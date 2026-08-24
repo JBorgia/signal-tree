@@ -398,7 +398,7 @@ describe('commit-consequence boundary — observed through stored()', () => {
     resetPathNotifier();
     getPathNotifier().setBatchingEnabled(false);
 
-    const { timeTravel } = await import(
+    const { restoration } = await import(
       '../../enhancers/restoration/restoration'
     );
 
@@ -410,7 +410,7 @@ describe('commit-consequence boundary — observed through stored()', () => {
           debounceMs: 0,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: { theme: { (): string; set(value: string): void } };
       undo(): void;

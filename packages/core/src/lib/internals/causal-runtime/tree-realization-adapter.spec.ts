@@ -8,7 +8,7 @@ import { stored } from '../../markers/stored';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
 import type { ISignalTree, WriteMetadata } from '../../types';
-import { timeTravel } from '../../../enhancers/restoration/restoration';
+import { restoration } from '../../../enhancers/restoration/restoration';
 import { transactions } from '../../../enhancers/transactions/transactions';
 import {
   getOwnedPositionIds,
@@ -958,7 +958,7 @@ describe('tree realization adapter', () => {
               selectId: (user) => user.id,
             }),
           },
-          { enhancers: [timeTravel()] }
+          { enhancers: [restoration()] }
         ) as unknown as {
       $: {
             users: {
@@ -1085,7 +1085,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -1236,7 +1236,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -1356,7 +1356,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -1481,7 +1481,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -1569,7 +1569,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -1694,7 +1694,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -1839,7 +1839,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -1987,7 +1987,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -2122,7 +2122,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -2300,7 +2300,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -2398,7 +2398,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -2530,7 +2530,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -2645,7 +2645,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -2739,7 +2739,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -2875,7 +2875,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -2985,7 +2985,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -3132,7 +3132,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -3755,7 +3755,7 @@ describe('tree realization adapter', () => {
   it('keeps scalar realization causally silent between authored writes', async () => {
     const tree = signalTree(
       { left: '', middle: '', right: '' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         left: { (): string; set(value: string): void };
@@ -3813,7 +3813,7 @@ describe('tree realization adapter', () => {
           debounceMs: 0,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         preference: { (): string; set(value: string): void };
@@ -3862,7 +3862,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         users: {
@@ -3936,7 +3936,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         before: { (): string; set(value: string): void };
@@ -4047,7 +4047,7 @@ describe('tree realization adapter', () => {
   it('atomicity spike: pre-commit scalar staging failure leaves state and notifications unchanged', () => {
     const tree = signalTree(
       { a: 'A', b: 'B' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         a: { (): string; set(value: string): void };
@@ -4146,7 +4146,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         status: {
@@ -4204,7 +4204,7 @@ describe('tree realization adapter', () => {
           selectId: (user) => user.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     ) as unknown as {
       $: {
         other: { (): string; set(value: string): void };

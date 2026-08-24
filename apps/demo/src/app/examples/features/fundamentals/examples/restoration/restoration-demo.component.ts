@@ -10,7 +10,7 @@ import {
   realize,
   SignalTreeRollbackError,
   signalTree,
-  timeTravel,
+  restoration,
   undoable,
 } from '@signaltree/core';
 
@@ -63,7 +63,7 @@ export class RestorationDemoComponent {
   // MARKERS + UNDO — the 14.0.0 fix, demonstrated
   // ===========================================================================
   //
-  // Before 14.0.0 this section could not exist. `timeTravel()` captured a
+  // Before 14.0.0 this section could not exist. `restoration()` captured a
   // snapshot by walking the tree, and a marker emitted its API surface rather
   // than its state — so an undo left the marker at its POST-change value and
   // reported success, landing the user in a state that never existed.
@@ -75,7 +75,7 @@ export class RestorationDemoComponent {
   // is here: a demo that only exercises the passing path is how the defect
   // survived four releases.
   // Inference does the work here: `$` keeps its full marker types
-  // (EntitySignal, StatusSignal, FormSignal). Only the timeTravel methods need
+  // (EntitySignal, StatusSignal, FormSignal). Only the restoration methods need
   // a cast, and casting the WHOLE tree — as the plain-leaf section above does —
   // would erase exactly the marker types this section exists to exercise.
   private markerTree = signalTree(
@@ -86,7 +86,7 @@ export class RestorationDemoComponent {
       job: 'NOT_LOADED' as 'NOT_LOADED' | 'LOADED' | 'ERROR',
       profile: { name: '', email: '' } as ProfileModel,
     },
-    { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+    { enhancers: [restoration({ maxHistorySize: 50 })] }
   );
 
   private get markerTT(): RestorationMethods {
@@ -178,7 +178,7 @@ export class RestorationDemoComponent {
     this.refreshMarkerState();
   }
 
-  // No cast: `timeTravel()`'s surface arrives through the return type now that
+  // No cast: `restoration()`'s surface arrives through the return type now that
   // the enhancer is declared rather than chained on afterwards.
   private tree = signalTree(
     {
@@ -190,7 +190,7 @@ export class RestorationDemoComponent {
         { id: 3, title: 'Build Something Amazing', completed: false },
       ],
     } as AppState,
-    { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+    { enhancers: [restoration({ maxHistorySize: 50 })] }
   );
 
   // Type-safe tree updater

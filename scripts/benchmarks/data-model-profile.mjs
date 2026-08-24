@@ -25,7 +25,7 @@ import { computed, signal } from '@angular/core';
 import {
   entityMap,
   signalTree,
-  timeTravel,
+  restoration,
 } from '../../dist/packages/core/dist/index.js';
 import { deepEqual } from '../../dist/packages/shared/dist/index.js';
 
@@ -693,14 +693,14 @@ if (want('timetravel')) {
 
   // How many history entries does a synchronous burst of leaf writes produce?
   {
-    const t = signalTree(wide(1000)).with(timeTravel({ maxHistorySize: 10000 }));
+    const t = signalTree(wide(1000)).with(restoration({ maxHistorySize: 10000 }));
     for (let i = 0; i < 100; i++) t.$.g0.f0.set(i);
     await new Promise((r) => setTimeout(r, 5));
     console.log(
       `  100 SYNCHRONOUS leaf writes → ${t.getRestorationHistory().length} history entries ` +
         `(INIT + flush-coalesced). Batching is per-microtask, not per-write.`
     );
-    const t2 = signalTree(wide(1000)).with(timeTravel({ maxHistorySize: 10000 }));
+    const t2 = signalTree(wide(1000)).with(restoration({ maxHistorySize: 10000 }));
     for (let i = 0; i < 100; i++) {
       t2.$.g0.f0.set(i);
       await Promise.resolve();
@@ -717,10 +717,10 @@ if (want('timetravel')) {
     const rows = await (async () => {
       const arms = [
         [
-          'with timeTravel()',
+          'with restoration()',
           () => {
             const t = signalTree(structuredClone(shape)).with(
-              timeTravel({ maxHistorySize: 100000 })
+              restoration({ maxHistorySize: 100000 })
             );
             return async () => {
               for (let i = 0; i < ENTRIES; i++) {
@@ -796,7 +796,7 @@ if (want('timetravel')) {
       );
 
     // undo() cost
-    const t = signalTree(structuredClone(shape)).with(timeTravel({ maxHistorySize: 100000 }));
+    const t = signalTree(structuredClone(shape)).with(restoration({ maxHistorySize: 100000 }));
     for (let i = 0; i < 60; i++) {
       t.$.g0.f0.set(i);
       await Promise.resolve();
@@ -821,7 +821,7 @@ if (want('timetravel')) {
       gc(); gc(); gc();
       const before = process.memoryUsage().heapUsed;
       const tt = signalTree(structuredClone(shape)).with(
-        timeTravel({ maxHistorySize: 100000 })
+        restoration({ maxHistorySize: 100000 })
       );
       for (let i = 0; i < k; i++) {
         tt.$.g0.f0.set(-(i + 1));
@@ -850,15 +850,15 @@ if (want('timetravel')) {
 
 }
 
-// timeTravel installs a GLOBAL PathNotifier onFlush listener per enhanced tree,
+// restoration installs a GLOBAL PathNotifier onFlush listener per enhanced tree,
 // and every listener runs a full snapshot+clone+deepEqual on EVERY flush in the
 // process — including flushes caused by an unrelated tree. So this must run in
 // its own process or the numbers are contaminated by trees created above.
 if (want('ttentity')) {
-  console.log('\n=== 1d-bis. entityMap under timeTravel (run in a CLEAN process) ===');
+  console.log('\n=== 1d-bis. entityMap under restoration (run in a CLEAN process) ===');
   const N = 5000;
   // Order matters: the no-enhancer baseline must be taken BEFORE any
-  // timeTravel tree exists in the process (see ttleak below).
+  // restoration tree exists in the process (see ttleak below).
   const measure = async (t, label) => {
     const xs = [];
     for (let i = 0; i < 20; i++) {
@@ -876,15 +876,15 @@ if (want('ttentity')) {
   await new Promise((r) => setTimeout(r, 10));
   await measure(tNo, `entityMap(${N}) updateOne + flush, NO enhancer:  `);
 
-  const t = signalTree({ items: entityMap() }).with(timeTravel({ maxHistorySize: 1000 }));
+  const t = signalTree({ items: entityMap() }).with(restoration({ maxHistorySize: 1000 }));
   t.$.items.setAll(mkItems(N));
   await new Promise((r) => setTimeout(r, 10));
-  await measure(t, `entityMap(${N}) updateOne + flush, timeTravel(): `);
+  await measure(t, `entityMap(${N}) updateOne + flush, restoration(): `);
   console.log(`  history after 20 distinct updates: ${t.getRestorationHistory().length} entries`);
 }
 
-// timeTravel() subscribes to the GLOBAL PathNotifier flush event, so every live
-// timeTravel tree runs a full snapshotState + structuredClone + deepEqual on
+// restoration() subscribes to the GLOBAL PathNotifier flush event, so every live
+// restoration tree runs a full snapshotState + structuredClone + deepEqual on
 // EVERY flush in the process — including flushes caused by a completely
 // unrelated tree. The result is then discarded (addEntry dedupes an unchanged
 // state), so it is pure waste. MUST run in its own process.
@@ -893,7 +893,7 @@ if (want('ttentity')) {
 // an unenhanced tree never calls the notifier, so it never reveals this. An
 // entityMap mutation does.
 if (want('ttleak')) {
-  console.log('\n=== 1d-ter. cross-tree cost of a live timeTravel() tree (CLEAN process) ===');
+  console.log('\n=== 1d-ter. cross-tree cost of a live restoration() tree (CLEAN process) ===');
   const A = signalTree({ items: entityMap() });
   A.$.items.setAll(mkItems(2000));
   await new Promise((r) => setTimeout(r, 10));
@@ -908,12 +908,12 @@ if (want('ttleak')) {
     }
     console.log(`  ${label} ${stats(xs).med.toFixed(3)}ms`);
   };
-  await probe('entityMap(2000).updateOne + flush, no timeTravel tree alive:      '.padEnd(70));
+  await probe('entityMap(2000).updateOne + flush, no restoration tree alive:      '.padEnd(70));
   const others = [];
   for (let k = 1; k <= 3; k++) {
-    others.push(signalTree(wide(10000)).with(timeTravel({ maxHistorySize: 5 })));
+    others.push(signalTree(wide(10000)).with(restoration({ maxHistorySize: 5 })));
     await new Promise((r) => setTimeout(r, 10));
-    await probe(`same write, with ${k} unrelated 10000-leaf timeTravel tree(s) alive:`.padEnd(70));
+    await probe(`same write, with ${k} unrelated 10000-leaf restoration tree(s) alive:`.padEnd(70));
   }
   console.log(
     `  their histories are still ${others.map((t) => t.getRestorationHistory().length).join('/')} — ` +

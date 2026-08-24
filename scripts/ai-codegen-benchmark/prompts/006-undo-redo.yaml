@@ -22,7 +22,7 @@ prompt: |
 expected_patterns:
   signaltree:
     must_include: ['signalTree(']
-    should_include_one_of: ['createEditSession', 'createTreeEditSession', 'timeTravel']
+    should_include_one_of: ['createEditSession', 'createTreeEditSession', 'restoration']
     must_not_include: ['signalStore(', 'createStore', 'BehaviorSubject']
   ngrx-signals:
     must_include: ['signalStore(']

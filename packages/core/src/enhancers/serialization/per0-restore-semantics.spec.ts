@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../restoration/restoration';
+import { restoration } from '../restoration/restoration';
 import { transactions } from '../transactions/transactions';
 import { persistence } from './serialization';
 import type { StorageAdapter } from './storage-adapters';
@@ -50,7 +50,7 @@ describe('PER-0: what IS a restore, causally?', () => {
     const { adapter } = seeded('r1', JSON.parse(raw));
     const tree = signalTree(
       { prefs: { theme: 'default' } },
-      { enhancers: [timeTravel({ maxHistorySize: 20 }), persistence({ key: 'r1', storage: adapter, debounceMs: 0 })] }
+      { enhancers: [restoration({ maxHistorySize: 20 }), persistence({ key: 'r1', storage: adapter, debounceMs: 0 })] }
     ) as any;
     await settle();
 
@@ -97,7 +97,7 @@ describe('PER-0: is restore fixed by A1 ingress classification?', () => {
 
     const tree = signalTree(
       { prefs: { theme: 'default' } },
-      { enhancers: [timeTravel({ maxHistorySize: 20 }), persistence({ key: 'r3', storage: adapter, autoLoad: false, debounceMs: 0 })] }
+      { enhancers: [restoration({ maxHistorySize: 20 }), persistence({ key: 'r3', storage: adapter, autoLoad: false, debounceMs: 0 })] }
     ) as any;
     await settle();
     const before = tree.getRestorationHistory().length;

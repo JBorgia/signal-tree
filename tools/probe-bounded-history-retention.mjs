@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * THE RC QUESTION: can a BOUNDED `timeTravel()` tree retain retired subjects
+ * THE RC QUESTION: can a BOUNDED `restoration()` tree retain retired subjects
  * without bound?
  *
  * This decides whether Step 8 (history-owned reclamation) blocks
@@ -15,7 +15,7 @@
  *   RETAINS WITHOUT BOUND
  *       subjects stay after the history entry that justified them was evicted,
  *       so retention grows with every retirement the tree has ever seen and a
- *       long-running app with `timeTravel()` grows forever.
+ *       long-running app with `restoration()` grows forever.
  *       -> CORRECTNESS. Step 8 blocks the RC.
  *
  * `maxHistorySize` is enforced — `time-travel.ts` shifts the oldest entry off
@@ -91,10 +91,10 @@ if (pointFlag !== -1) {
   const maxHistorySize =
     armName === 'bounded' ? BOUNDED_HISTORY : UNBOUNDED_HISTORY;
 
-  const { signalTree, entityMap, timeTravel } = await import(CORE);
+  const { signalTree, entityMap, restoration } = await import(CORE);
   const tree = signalTree(
     { rows: entityMap({ selectId: (r) => r.id }) },
-    { enhancers: [timeTravel({ maxHistorySize })] }
+    { enhancers: [restoration({ maxHistorySize })] }
   );
 
   const generation = (g) => {
@@ -324,7 +324,7 @@ const boundedIsFlat = isBounded(bounded);
 if (boundedIsFlat) {
   console.log(
     '  BOUNDED. Retention plateaus once the history window saturates, so a\n' +
-      '  tree with a bounded `timeTravel()` does NOT grow with the number of\n' +
+      '  tree with a bounded `restoration()` does NOT grow with the number of\n' +
       '  subjects it has ever retired. Step 8 is an OPTIMIZATION — it removes\n' +
       '  retention that is real but bounded — and does not block the RC.'
   );
@@ -332,7 +332,7 @@ if (boundedIsFlat) {
   console.log(
     '  UNBOUNDED. The bounded arm grows with the round count, so evicting a\n' +
       '  history entry does not release the entity-side backing of the subjects\n' +
-      '  it referenced. A long-running tree with `timeTravel()` grows forever,\n' +
+      '  it referenced. A long-running tree with `restoration()` grows forever,\n' +
       '  which is a CORRECTNESS defect and blocks the RC. Step 8 first.'
   );
 }

@@ -143,10 +143,10 @@ Three specific corrections to what this document previously asserted:
 Churn attribution, pre-registered in
 `docs/architecture/entity-churn-retention.md`: restoration is reachable only via
 `__restoreOne` / `__planRestore`, consumed solely by the causal-runtime adapter
-behind `timeTravel()`. A tree with no history enhancer therefore has no contract
+behind `restoration()`. A tree with no history enhancer therefore has no contract
 entitled to a retired subject's state — and still retains 798 B/subject, plus
 548 B/subject more if the row was ever read through `byId()`. Attaching
-`timeTravel()` adds a further 1,205 B/subject, which is earned by an explicit
+`restoration()` adds a further 1,205 B/subject, which is earned by an explicit
 opt-in. The orphan portion is the defect candidate.
 
 Harness repairs: `tools/lib/heap-quiescence.mjs` (one protocol, no per-scenario
@@ -215,7 +215,7 @@ Deleted package surfaces: `guardrails`, `realtime`, `schema`, `enterprise`, `cal
 | `asyncSource`                               | No                              | DELETE                                             | Removed from RC public surface.                                                    |
 | `asyncQuery`                                | No                              | DELETE                                             | Removed from RC public surface.                                                    |
 | `batching`                                  | Yes                             | `KA`                                               | Keep. Notification batching over synchronous writes.                               |
-| `timeTravel`                                | Yes                             | `KA` devtools/history instrument                   | Keep if framed as causal/debug/history adapter, not end-user undo by itself.       |
+| `restoration`                                | Yes                             | `KA` devtools/history instrument                   | Keep if framed as causal/debug/history adapter, not end-user undo by itself.       |
 | `transactions`                              | Yes                             | `KA` for refusal/neutrality; speculative role open | Keep only if the exported API can promise only the earned semantics.               |
 | `serialization`                             | No                              | not earned for core function / unplaced            | Removed from RC public surface.                                                    |
 | `persistence`                               | Yes                             | `KA`; enhancer form undisposed                     | Keepable for tree-scoped durability, but form needs explicit acceptance.           |
@@ -291,9 +291,9 @@ Optimization/adaptation: small tree-shakeable marker/helper; benchmarked as `+0.
 
 Justification: unresolved. Useful, but the map says its null has not run: what does SignalTree need to know about equality? Omit or finish that derivation before RC.
 
-### History and transactions: `timeTravel`, `transactions`, `SignalTreeRollbackError`, `trackHistory`
+### History and transactions: `restoration`, `transactions`, `SignalTreeRollbackError`, `trackHistory`
 
-How it works: `timeTravel()` records causal turns and realizes undo/redo through the tree realization adapter; `transactions()` groups synchronous writes into pending turns with `confirm()` / `rollback()`; rollback can throw `SignalTreeRollbackError`; `trackHistory()` is signal-level history over a writable signal.
+How it works: `restoration()` records causal turns and realizes undo/redo through the tree realization adapter; `transactions()` groups synchronous writes into pending turns with `confirm()` / `rollback()`; rollback can throw `SignalTreeRollbackError`; `trackHistory()` is signal-level history over a writable signal.
 
 Optimization/adaptation: substantially redone. History now composes causal turn storage, applied-history assessment, structural dependency checks, and physical realization instead of plain whole-state snapshots. `transactions()` delegates to pending confirmation/rollback rather than opening a second mutation path.
 
@@ -345,7 +345,7 @@ Generated under ignored local scratch directory `artifacts/final-baseline-2026-0
 - `asyncSource`: `10.26 KB` total, `+0.81 KB`
 - `asyncQuery`: `10.34 KB` total, `+0.89 KB`
 - `batching`: `+0.79 KB`
-- `timeTravel`: `+11.73 KB`
+- `restoration`: `+11.73 KB`
 - `serialization`: `+1.82 KB`
 - `persistence`: `+2.61 KB`
 - typical app (`entityMap + stored + asyncSource`): `22.9 KB`

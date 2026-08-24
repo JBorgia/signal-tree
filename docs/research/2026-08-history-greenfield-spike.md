@@ -3,7 +3,7 @@
 **Status:** research, 2026-08-10. Target release for whatever is chosen: 14.1.1.
 
 This designs history/undo/time-travel **from scratch**. The existing
-`timeTravel()` is treated as prior art, not as a starting point, and no option
+`restoration()` is treated as prior art, not as a starting point, and no option
 below is justified by what another library ships. Where a competitor is mentioned
 it is to explain why an idea we might copy does not apply to us.
 
@@ -46,7 +46,7 @@ microtask queue was allowed to drain:
 | synchronously after the calls | 1              | `false`     |
 | after `await` (one tick)      | 2              | **`true`**  |
 
-The `PathNotifier` batches through `queueMicrotask`, and `timeTravel()` records
+The `PathNotifier` batches through `queueMicrotask`, and `restoration()` records
 on `onFlush`. Nothing is recorded synchronously for a marker write, so a
 synchronous assertion sees an empty history **by construction, for any marker
 write, forever**. The reported numbers reproduce exactly — 1 and `false` — which
@@ -64,7 +64,7 @@ counter-bump workaround and no root write:
 
 The mechanism is `interceptLeafSignals`, which wraps marker mutators
 (`intercept-leaf-signals.ts`, the marker branch) as well as plain signals, so an
-`addOne` sets `timeTravel`'s `selfDirty` flag and the flush hook records.
+`addOne` sets `restoration`'s `selfDirty` flag and the flush hook records.
 
 **Consequence for this spike:** the demand side is not "collections cannot be
 undone". It is "collections can be undone, and the step boundaries, the scope and
@@ -91,7 +91,7 @@ With `interceptLeafSignals` installed, all four plain-write forms are covered
 (`tree(partial)`, `updateAndReport`, `tree(updater)`, `batchUpdate` — MEASURED,
 all produce a path). So the substrate is real but it is **two mechanisms, not
 one**: markers self-notify; everything else needs an interceptor that
-`timeTravel()` and devtools each install independently.
+`restoration()` and devtools each install independently.
 
 Two narrower facts matter for the options below:
 
@@ -779,7 +779,7 @@ reachable G1 failures and the phantom-step defect; and no consumer's
 in a library whose entire thesis is that no code path may do O(state) work when
 one leaf changed — §4 of
 [the design thesis](../architecture/design-thesis-and-benchmarking-rules.md)
-names `timeTravel()` as the worst violation of exactly that rule, and this option
+names `restoration()` as the worst violation of exactly that rule, and this option
 leaves the violation in place. It also leaves G4 unachievable, which means G1 is
 forever a matter of the consumer remembering something.
 
@@ -1042,7 +1042,7 @@ each of those has a measured failure behind it rather than a preference:
   finding that should decide this, and it was assumed the other way in every
   document written before this one.
 
-`timeTravel()` becomes Option E: keyframes, `jumpTo`, unbounded history, full
+`restoration()` becomes Option E: keyframes, `jumpTo`, unbounded history, full
 forensic fidelity including `status()`, off in production. Undo becomes something
 else entirely, which is what
 [undo-redo-vs-devtools.md](../architecture/undo-redo-vs-devtools.md) already

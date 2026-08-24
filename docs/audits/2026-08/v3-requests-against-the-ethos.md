@@ -97,10 +97,10 @@ exactly those grounds. It has to be one marker with a richer `load`, not
 
 ---
 
-## #4 `devOnly(timeTravel())` — FAILS the ethos screen
+## #4 `devOnly(restoration())` — FAILS the ethos screen
 
 Confirmed factually: `pauseRecording`/`resumeRecording` exist (`types.ts:421-423`,
-attached at `time-travel.ts:744-746`), `timeTravel()` ships as a full runtime
+attached at `time-travel.ts:744-746`), `restoration()` ships as a full runtime
 enhancer with one `ngDevMode` check at `:187`, and there is no `devOnly()` anywhere.
 
 **But the request should be declined as framed**, and this is the interesting one.
@@ -121,7 +121,7 @@ this session.
 wrapper that makes a dev tool look shippable. Answering #4 as asked would ship a
 foot-gun with a type signature that endorses it.
 
-## #5 `timeTravel({ mode: 'inspect' })` — FAILS as framed, real gap underneath
+## #5 `restoration({ mode: 'inspect' })` — FAILS as framed, real gap underneath
 
 The v3 write-up is right that RFC 0012 §4 Option A already rejected per-marker-type
 exclusion, and right not to re-propose it. But two corrections:
@@ -172,7 +172,7 @@ collapses; that is the input to the decision, not a request of core.
 | **#2 multi-selection**         | Take, on the invariant | Volume win, but drop the convenience argument                                                         |
 | **#3 paged loader**            | Take, carefully        | Volume win; must be a richer `load`, not a second marker                                              |
 | **#5 inspector path**          | Reframe                | Not "purpose on the enhancer" — "no inspector without the undo engine"                                |
-| **#4 `devOnly(timeTravel())`** | **Decline as framed**  | Makes a whole-tree dev instrument look production-ready, for a use case whose rationale does not work |
+| **#4 `devOnly(restoration())`** | **Decline as framed**  | Makes a whole-tree dev instrument look production-ready, for a use case whose rationale does not work |
 
 **#1 and #6 are shippable now** and neither needs a design decision. #2 and #3 are
 the volume wins and both want the collection-recording work (TODO item 2) settled

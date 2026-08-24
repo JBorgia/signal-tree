@@ -4,7 +4,7 @@ import { undoable } from '../../lib/undoable';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * STEP 8 PHASE 6C — is a release-only sink COMPLETE?
@@ -19,7 +19,7 @@ import { timeTravel } from './restoration';
  *                       release-driven sink leaves it retained forever.
  *
  * The old zero-owner path cannot cover B either: it returns immediately whenever
- * the tree has ANY restoration authority, which a `timeTravel()` tree always
+ * the tree has ANY restoration authority, which a `restoration()` tree always
  * has.
  *
  * So the question is whether B exists in practice, and these tests answer it by
@@ -66,7 +66,7 @@ const makeTree = (maxHistorySize: number) =>
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
       other: entityMap<Row, string>({ selectId: (r) => r.id }),
     },
-    { enhancers: [timeTravel({ maxHistorySize })] }
+    { enhancers: [restoration({ maxHistorySize })] }
   ) as unknown as Store;
 
 const retired = (rows: Rows): readonly number[] =>

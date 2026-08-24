@@ -122,12 +122,12 @@ enhancer to a tree. The whole enhancer set is passed to `signalTree`:
 
 ```ts
 // before
-const tree = signalTree({ count: 0 }).with(timeTravel()).with(batching());
+const tree = signalTree({ count: 0 }).with(restoration()).with(batching());
 
 // after
 const tree = signalTree(
   { count: 0 },
-  { enhancers: [timeTravel(), batching()] }
+  { enhancers: [restoration(), batching()] }
 );
 ```
 
@@ -183,7 +183,7 @@ enhancer's additions are intersected into the result — the same guarantee
 `.with()`'s `this & TAdded` gave, without the chain:
 
 ```ts
-const tree = signalTree({ count: 0 }, { enhancers: [timeTravel(), batching()] });
+const tree = signalTree({ count: 0 }, { enhancers: [restoration(), batching()] });
 tree.canUndo(); // ✅ from the first
 tree.batch(() => {}); // ✅ from the second
 ```
@@ -194,11 +194,11 @@ Build the array, not the tree:
 
 ```ts
 // before
-const tree = isProd ? base : base.with(timeTravel());
+const tree = isProd ? base : base.with(restoration());
 
 // after
 const tree = signalTree(state, {
-  enhancers: isProd ? [] : [timeTravel()],
+  enhancers: isProd ? [] : [restoration()],
 });
 ```
 
@@ -214,7 +214,7 @@ If you had a shared enhancer bundle, return the ARRAY and spread it:
 const standardEnhancers = () => [batching(), devTools()];
 
 const tree = signalTree(state, {
-  enhancers: [...standardEnhancers(), timeTravel()],
+  enhancers: [...standardEnhancers(), restoration()],
 });
 ```
 
@@ -230,7 +230,7 @@ the enhancers, which is the shape to prefer when you are already passing config:
 const tree = signalTree(
   { first: 'Ada', last: 'Lovelace' },
   {
-    enhancers: [timeTravel()],
+    enhancers: [restoration()],
     derived: ($) => ({ full: computed(() => `${$.first()} ${$.last()}`) }),
   }
 );

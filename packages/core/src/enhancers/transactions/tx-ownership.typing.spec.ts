@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../restoration/restoration';
+import { restoration } from '../restoration/restoration';
 import { transactions } from './transactions';
 
 /**
@@ -18,18 +18,18 @@ import { transactions } from './transactions';
  */
 
 describe('TX-SURFACE-0 typing: transaction() belongs to transactions()', () => {
-  it('timeTravel() alone does NOT type a transaction() method', () => {
+  it('restoration() alone does NOT type a transaction() method', () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
 
-    // @ts-expect-error transaction() belongs to transactions(), not timeTravel()
+    // @ts-expect-error transaction() belongs to transactions(), not restoration()
     tree.transaction(() => {
       tree.$.n.set(1);
     });
 
-    // Restoration is still timeTravel's, and still typed.
+    // Restoration is still restoration's, and still typed.
     expect(typeof tree.undo).toBe('function');
     expect(typeof tree.canUndo).toBe('function');
   });
@@ -37,7 +37,7 @@ describe('TX-SURFACE-0 typing: transaction() belongs to transactions()', () => {
   it('the composition types BOTH capabilities', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [transactions(), timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [transactions(), restoration({ maxHistorySize: 10 })] }
     );
 
     // Both present, from their own owners, with no cast.

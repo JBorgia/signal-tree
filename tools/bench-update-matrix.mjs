@@ -108,11 +108,11 @@ const widePatch = (count, salt) => {
 // ---------------------------------------------------------------------------
 const IMPLS = {
   signaltree: async (featured) => {
-    const { signalTree, entityMap, timeTravel, batching, transactions } =
+    const { signalTree, entityMap, restoration, batching, transactions } =
       await import(CORE);
     const { computed } = await import('@angular/core');
     const enhancers = featured
-      ? [timeTravel({ maxHistorySize: 200 }), batching(), transactions()]
+      ? [restoration({ maxHistorySize: 200 }), batching(), transactions()]
       : [];
     const tree = signalTree(
       { rows: entityMap({ selectId: (r) => r.id }) },

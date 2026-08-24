@@ -1,7 +1,7 @@
 /**
  * TYPE-TEST — compile-time only (`*typing*.spec.ts` is excluded from vitest).
  *
- * THE CONSUMER CONTRACT for `timeTravel()`, pinned so the
+ * THE CONSUMER CONTRACT for `restoration()`, pinned so the
  * `Enhancer<RestorationMethods>` migration can be proven not to change it.
  * Written and proven GREEN BEFORE the signature change, re-run unchanged after.
  *
@@ -28,11 +28,11 @@
  * what that change was for. These rows are the check that it delivered.
  *
  * SCOPE: this slice asks whether the EXISTING capability can be expressed
- * through `Enhancer<RestorationMethods>`. It does not reopen time-travel's public
+ * through `Enhancer<RestorationMethods>`. It does not reopen restoration's public
  * contract — nothing here asserts a change to `RestorationMethods`' shape.
  *
  * v15: enhancers are DECLARED, so the call site is
- * `signalTree(state, { enhancers: [timeTravel(), transactions()] })` and the added surface arrives
+ * `signalTree(state, { enhancers: [restoration(), transactions()] })` and the added surface arrives
  * through the return type. Note the state is a separate annotated `const`
  * rather than `signalTree<AppState>(...)` — an explicit type argument would
  * have to name the enhancer tuple parameter too, and naming it is exactly the
@@ -40,7 +40,7 @@
  */
 import { signalTree } from '../../lib/signal-tree';
 import { transactions } from '../transactions/transactions';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 import type {
   CallableWritableSignal,
@@ -66,7 +66,7 @@ interface AppState {
 // The call site under test. No generics, no casts, no annotation.
 const initial: AppState = { count: 0, user: { name: 'Ada', age: 36 } };
 const tree = signalTree(initial);
-const travelled = signalTree(initial, { enhancers: [timeTravel(), transactions()] });
+const travelled = signalTree(initial, { enhancers: [restoration(), transactions()] });
 
 // ============================================================================
 // 1 — THE LOAD-BEARING ROW: history keeps the CONCRETE state type
@@ -88,7 +88,7 @@ export type _HistoryIsNotNever = ExpectFalse<
 >;
 
 // ============================================================================
-// 2 — the time-travel surface, exact signatures
+// 2 — the restoration surface, exact signatures
 // ============================================================================
 export type _MethodTypes = [
   Expect<Equal<(typeof travelled)['undo'], () => void>>,
@@ -111,7 +111,7 @@ travelled.resetRestorationHistory();
 // 3 — the INHERITED transaction surface survives too
 // ============================================================================
 // `RestorationMethods extends TransactionMethods`, so this enhancer adds two
-// surfaces. A migration that kept only the time-travel half would pass §2.
+// surfaces. A migration that kept only the restoration half would pass §2.
 export type _TransactionSurvives = Expect<
   Equal<(typeof travelled)['transaction'], (fn: () => void) => PendingTransaction>
 >;
@@ -137,8 +137,8 @@ travelled({ count: 1 });
 // ============================================================================
 declare const labeller: Enhancer<{ label(): string }>;
 
-const travelledThenLabelled = signalTree(initial, { enhancers: [timeTravel(), labeller] });
-const labelledThenTravelled = signalTree(initial, { enhancers: [labeller, timeTravel()] });
+const travelledThenLabelled = signalTree(initial, { enhancers: [restoration(), labeller] });
+const labelledThenTravelled = signalTree(initial, { enhancers: [labeller, restoration()] });
 
 export const _b1: string = travelledThenLabelled.label();
 export const _b2: boolean = travelledThenLabelled.canUndo();
@@ -159,7 +159,7 @@ export type _HistoryStateSurvivesChaining = [
 // ============================================================================
 // 6 — config is optional and does not change the added surface
 // ============================================================================
-const disabled = signalTree(initial, { enhancers: [timeTravel({ enabled: false }), transactions()] });
+const disabled = signalTree(initial, { enhancers: [restoration({ enabled: false }), transactions()] });
 export type _ConfigDoesNotChangeSurface = [
   Expect<Equal<(typeof disabled)['undo'], (typeof travelled)['undo']>>,
   Expect<
@@ -167,13 +167,13 @@ export type _ConfigDoesNotChangeSurface = [
   >
 ];
 // @ts-expect-error config is checked, not `any`
-signalTree(initial, { enhancers: [timeTravel({ nope: true }), transactions()] });
+signalTree(initial, { enhancers: [restoration({ nope: true }), transactions()] });
 
 // ============================================================================
 // 7 — negative controls
 // ============================================================================
-// @ts-expect-error `undo` requires timeTravel()
+// @ts-expect-error `undo` requires restoration()
 export type _NoUndoBefore = (typeof tree)['undo'];
-// @ts-expect-error `getRestorationHistory` requires timeTravel()
+// @ts-expect-error `getRestorationHistory` requires restoration()
 export type _NoHistoryBefore = (typeof tree)['getRestorationHistory'];
 export type _EnhancedDiffers = ExpectFalse<Equal<typeof travelled, typeof tree>>;

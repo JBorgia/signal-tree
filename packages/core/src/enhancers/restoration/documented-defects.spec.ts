@@ -5,7 +5,7 @@ import { createAuditTracker } from '../../lib/audit/audit';
 import { history } from '../../lib/form-history/form-history';
 import { signalTree } from '../../lib/signal-tree';
 import { serialization } from '../serialization/serialization';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * Characterization tests for the history defects documented as TODO 6a-6d.
@@ -16,7 +16,7 @@ import { timeTravel } from './restoration';
  * code fix is gated on the representation decision. Without tests, nothing catches a
  * silent change in behaviour, and the documentation quietly stops being true. That is
  * exactly how a defect report survived on four surfaces while being false: the claim
- * "collection mutations create no history entry" came from asserting a counter in the
+ * "collection mutations create no restoration history entry" came from asserting a counter in the
  * same tick as a `queueMicrotask` flush, and `undo()` was never called once.
  *
  * ## How to read a failure
@@ -41,7 +41,7 @@ describe('6b — createAuditTracker samples on a timer', () => {
   // The interval is the literal constant at lib/audit/audit.ts:156
   // (`setInterval(handleChange, 100)`) — cited rather than measured here.
   // If this fails, the tracker may have become event-driven. Update:
-  //   docs/guides/time-travel-in-production.md (the composition table row)
+  //   docs/guides/restoration-in-production.md (the composition table row)
   //   TODO.md 6b
   it('two writes inside one sampling window collapse to one entry', async () => {
     const tree = signalTree({ n: 0 });
@@ -87,11 +87,11 @@ describe('6c — undo() after deserialize() (REPAIRED by opt-in eligibility)', (
   // being migrated with the earlier batches.
   //
   // Docs updated with this change:
-  //   docs/guides/time-travel-in-production.md
+  //   docs/guides/restoration-in-production.md
   //   TODO.md 6c
   it('a restored payload is NOT an undo step, so undo cannot discard it', async () => {
     const make = () =>
-      signalTree({ n: 0 }, { enhancers: [serialization(), timeTravel({})] });
+      signalTree({ n: 0 }, { enhancers: [serialization(), restoration({})] });
 
     const source = make();
     undoable(() => source.$.n.set(7));
@@ -121,7 +121,7 @@ describe('6d — maxHistorySize validation (FIXED in 14.1.1)', () => {
       { n: 0 },
       {
         enhancers: [
-          timeTravel(cfg === undefined ? {} : { maxHistorySize: cfg }),
+          restoration(cfg === undefined ? {} : { maxHistorySize: cfg }),
         ],
       }
     );

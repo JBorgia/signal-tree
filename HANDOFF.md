@@ -223,7 +223,7 @@ Reason: the API reduction queue still changes public surface and types.
 | Declaration closure | GREEN. Reopen only on a **packed-consumer counterexample**. |
 | `stripInternal` model | Cause established; two source presentations; no third mechanism. |
 | `Enhancer<TAdded>` neutral contract | FROZEN (`8e294c4c`). |
-| `TimeTravelMethods` receiver-derived state | FROZEN (`b266457d`). |
+| `RestorationMethods` receiver-derived state | FROZEN (`b266457d`). |
 | `SignalTreeBase` | **DELETED (`6a515699`).** Settled. |
 | `SignalTree<T>` | **KEEP — the sole canonical consumer type.** Deleting it was considered and rejected: local code infers, but a library needs a nameable type for `function inspect(tree: SignalTree<AppState>)`. |
 | `SignalTree<T>` root grammar | **FROZEN (`243dd5fb`).** State through `$` only. Root property copying REJECTED — it would create `tree.count()` beside `tree.$.count()`. |

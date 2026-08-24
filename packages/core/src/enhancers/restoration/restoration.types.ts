@@ -1,10 +1,10 @@
 import { Assert, Equals } from '../test-helpers/types-equals';
-import { timeTravel, RestorationConfig } from './restoration';
+import { restoration, RestorationConfig } from './restoration';
 
 import type { Enhancer, RestorationMethods } from '../../lib/types';
 
 /**
- * `timeTravel()` returns the NEUTRAL enhancer contract.
+ * `restoration()` returns the NEUTRAL enhancer contract.
  *
  * This asserted the realization-facing shape,
  * `(config?) => <T>(tree: ISignalTree<T>) => ISignalTree<T> & RestorationMethods`.
@@ -13,16 +13,16 @@ import type { Enhancer, RestorationMethods } from '../../lib/types';
  * deliberately, not worked around.
  *
  * This file does NOT stand in for the consumer contract. Asserting
- * `timeTravel`'s own declared shape says nothing about whether a call site
+ * `restoration`'s own declared shape says nothing about whether a call site
  * still gets `RestorationHistoryEntry<AppState>[]` out of `getRestorationHistory()` — which is the
  * one property this migration could plausibly have broken, since the state is
  * recovered from polymorphic `this` and `EnhancerHost` is not a `NodeAccessor`.
- * That is `time-travel-contract.typing.spec.ts`, proven green BEFORE this
+ * That is `restoration-contract.typing.spec.ts`, proven green BEFORE this
  * signature changed and re-run unchanged afterwards.
  */
 type ExpectedSignature = (config?: RestorationConfig) => Enhancer<RestorationMethods>;
 
-type ActualSignature = typeof timeTravel;
+type ActualSignature = typeof restoration;
 
 type _ContractCheck = Assert<Equals<ActualSignature, ExpectedSignature>>;
 

@@ -3,7 +3,7 @@ import { undoable } from '../../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * `canUndo()`, `canRedo()` and `getRestorationHistory()` are REACTIVE.
@@ -30,7 +30,7 @@ describe('canUndo tracks the history position', () => {
   it('flips false → true when the first entry is recorded', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
     const canUndo = computed(() => tree.canUndo());
     expect(canUndo()).toBe(false);
@@ -44,7 +44,7 @@ describe('canUndo tracks the history position', () => {
   it('flips back to false when undone to the start', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
     const canUndo = computed(() => tree.canUndo());
     undoable(() => tree.$.n.set(1));
@@ -59,7 +59,7 @@ describe('canUndo tracks the history position', () => {
   it('actually RE-EVALUATES — the assertion the value alone cannot make', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
     let evaluations = 0;
     const canUndo = computed(() => {
@@ -81,7 +81,7 @@ describe('canRedo tracks BOTH the position and the history length', () => {
   it('is false at the end of history and true after an undo', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
     const canRedo = computed(() => tree.canRedo());
     undoable(() => tree.$.n.set(1));
@@ -97,7 +97,7 @@ describe('canRedo tracks BOTH the position and the history length', () => {
   it('goes back to false once redone to the end', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
     const canRedo = computed(() => tree.canRedo());
     undoable(() => tree.$.n.set(1));
@@ -116,7 +116,7 @@ describe('canRedo tracks BOTH the position and the history length', () => {
     // is the case that needs the history-length dependency, not the index one.
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
     const canRedo = computed(() => tree.canRedo());
     undoable(() => tree.$.n.set(1));
@@ -136,7 +136,7 @@ describe('getRestorationHistory is reactive', () => {
   it('a computed over its length sees entries appear', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
     const length = computed(() => tree.getRestorationHistory().length);
     const before = length();
@@ -150,7 +150,7 @@ describe('getRestorationHistory is reactive', () => {
   it('resetRestorationHistory is observed', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
     const length = computed(() => tree.getRestorationHistory().length);
     undoable(() => tree.$.n.set(1));
@@ -170,7 +170,7 @@ describe('the imperative API is unchanged', () => {
   it('direct calls still return the same answers', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
     expect(tree.canUndo()).toBe(false);
 
@@ -188,7 +188,7 @@ describe('the imperative API is unchanged', () => {
   it('maxHistorySize still evicts, and the position follows', async () => {
     const tree = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 3 })] }
+      { enhancers: [restoration({ maxHistorySize: 3 })] }
     );
     for (let i = 1; i <= 6; i++) {
       undoable(() => tree.$.n.set(i));

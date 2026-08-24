@@ -2,7 +2,7 @@
  * TURN-FEED-0 — the transaction lifecycle channel.
  *
  * One authority owns transactions; another may need to observe them. Before
- * this existed, `timeTravel()` recognised a pending transaction only by
+ * this existed, `restoration()` recognised a pending transaction only by
  * comparing `meta.transactionOwner` against its OWN private token, so a
  * transaction opened by the `transactions()` enhancer was invisible to it and
  * its speculative writes landed in confirmed restoration history.

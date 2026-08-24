@@ -1,7 +1,7 @@
 /**
  * ACCUMULATED CAPABILITY SURVIVES IDENTITY REPLACEMENT — runtime.
  *
- * Closes the identity-replacing enhancer class (`batching`, `timeTravel`,
+ * Closes the identity-replacing enhancer class (`batching`, `restoration`,
  * `devTools`) with the property their type contracts CANNOT prove.
  *
  * `.with()` returns `this & TAdded`, so at the type level an earlier enhancer's
@@ -25,7 +25,7 @@ import { describe, expect, it } from 'vitest';
 import { batching } from '../enhancers/batching/batching';
 import { devTools } from '../enhancers/devtools/devtools';
 import { createEnhancer } from '../enhancers/index';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
 
 import type { ISignalTree } from '../index';
@@ -44,7 +44,7 @@ const addsFoo = createEnhancer(
 
 const REPLACERS: Array<[string, () => unknown]> = [
   ['batching', () => batching()],
-  ['timeTravel', () => timeTravel()],
+  ['restoration', () => restoration()],
   ['devTools', () => devTools()],
 ];
 
@@ -80,7 +80,7 @@ describe('accumulated capability survives identity replacement', () => {
   it('survives TWO stacked replacements', () => {
     const tree = signalTree(
       { count: 0 },
-      { enhancers: [addsFoo as never, batching(), timeTravel() as never] }
+      { enhancers: [addsFoo as never, batching(), restoration() as never] }
     ) as unknown as FooMethods & {
       $: { count: () => number };
       batch(fn: () => void): void;

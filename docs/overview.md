@@ -36,7 +36,7 @@ dependency or runtime earns its own package; a within-tree mechanic lives in cor
 
 - **@signaltree/core**: the whole state layer — `signalTree()`, the `entityMap`
   marker, `derivedFrom()`, `defineStore()`, `asReadonly()`, and the enhancers
-  (`batching`, `devTools`, `timeTravel`, `transactions`, `persistence`,
+  (`batching`, `devTools`, `restoration`, `transactions`, `persistence`,
   `serialization`), plus the `./security` and `./storage` subpaths
 - **@signaltree/events**: domain-event bus with an `entityMap` bridge and
   optimistic-update manager

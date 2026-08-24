@@ -5,7 +5,7 @@ import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { withWriteContext } from '../../lib/write-context';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 import { transactions } from './../transactions/transactions';
 
 /**
@@ -42,7 +42,7 @@ const makeTree = () =>
       ui: { selectedPanel: 'none', scrollTop: 0 },
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
     },
-    { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+    { enhancers: [restoration({ maxHistorySize: 50 })] }
   );
 
 const claims = (tree: unknown) =>
@@ -92,7 +92,7 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
         document: { title: 'v1', body: 'b1' } as Doc,
         ui: { selectedPanel: 'none', scrollTop: 0 },
       },
-      { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
+      { enhancers: [restoration({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
 

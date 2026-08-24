@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { entityMap } from './markers/entity-map';
 import { getPathNotifier } from './path-notifier';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 import { undoable } from './undoable';
 import { withWriteContext } from './write-context';
@@ -63,7 +63,7 @@ const observe = () => {
 
 describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
   it('CASE 1+2 — authored writes are observable, and DESIGNATION is an attribute', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     const { seen, off } = observe();
 
@@ -83,7 +83,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
   });
 
   it('CASE 3 — a realization is distinguishable from authored work', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     const { seen, off } = observe();
 
@@ -99,7 +99,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
   });
 
   it('CASE 7 — REPAIRED: a restoration carries its own origin', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
@@ -125,7 +125,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
   it('CASE 4+5 — transaction identity is on the fact; lifecycle is separate', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel(), transactions()] }
+      { enhancers: [restoration(), transactions()] }
     );
     await flush();
     const { seen, off } = observe();
@@ -148,7 +148,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
   });
 
   it('CASE 8 — the turn boundary is the FLUSH, and it is observable', async () => {
-    const tree = signalTree({ a: 0, b: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: 0, b: 0 }, { enhancers: [restoration()] });
     await flush();
 
     let flushes = 0;
@@ -175,7 +175,7 @@ describe('DIAG-JOURNAL-0 inventory: what a projection would RETAIN', () => {
   it('the notifier hands over VALUES, not live tree nodes', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     await flush();
 
@@ -198,7 +198,7 @@ describe('DIAG-JOURNAL-0 inventory: what a projection would RETAIN', () => {
   it('and SUBSCRIBING creates no restoration or transaction ownership', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel(), transactions()] }
+      { enhancers: [restoration(), transactions()] }
     );
     await flush();
 

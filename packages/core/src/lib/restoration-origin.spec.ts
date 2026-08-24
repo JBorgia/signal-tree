@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getPathNotifier } from './path-notifier';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { undoable } from './undoable';
 import { withWriteContext } from './write-context';
 
@@ -52,8 +52,8 @@ const observe = () => {
 };
 
 describe('restoration origin: the five falsifiers', () => {
-  it('1 — undo() publishes facts with source "time-travel"', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+  it('1 — undo() publishes facts with source "restoration"', async () => {
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
@@ -71,7 +71,7 @@ describe('restoration origin: the five falsifiers', () => {
   });
 
   it('2 — redo() does the same', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
@@ -87,8 +87,8 @@ describe('restoration origin: the five falsifiers', () => {
     expect(seen.every((f) => f.source === 'restoration')).toBe(true);
   });
 
-  it('3 — an external realization never acquires source "time-travel"', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+  it('3 — an external realization never acquires source "restoration"', async () => {
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
 
     const { seen, off } = observe();
@@ -105,7 +105,7 @@ describe('restoration origin: the five falsifiers', () => {
   });
 
   it('4 — restoration creates no new history and does not admit itself', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
@@ -119,7 +119,7 @@ describe('restoration origin: the five falsifiers', () => {
   });
 
   it('5 — P0-C is unchanged: later external truth still blocks the undo', async () => {
-    const tree = signalTree({ doc: { title: 'v1' } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ doc: { title: 'v1' } }, { enhancers: [restoration()] });
     await flush();
     undoable(() => tree.$.doc.title.set('A'));
     await flush();
@@ -135,7 +135,7 @@ describe('restoration origin: the five falsifiers', () => {
   });
 
   it('and the authored cases carry NO origin at all', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
 
     const { seen, off } = observe();

@@ -52,7 +52,7 @@ async function ask(prompt: string) {
 
 That is the whole thing. `chat.$.reply` is a signal, so templates track it,
 `computed()` derives from it, and — because it is an ordinary leaf — it is
-captured by `timeTravel()`, included in `tree()`, and persisted by
+captured by `restoration()`, included in `tree()`, and persisted by
 `persistence()` with no marker contract to satisfy.
 
 ### Cancellation
@@ -147,7 +147,7 @@ array leaf rebuilds and re-compares on every write.
 
 ## Why composition rather than a marker
 
-**It participates in everything for free.** A leaf is captured by `timeTravel()`,
+**It participates in everything for free.** A leaf is captured by `restoration()`,
 appears in `tree()`, persists, and needs no `snapshot`/`hydrate` declaration.
 Every marker has to earn those individually — and the four bugs behind
 [ST2022](../errors/README.md) were markers that never did.

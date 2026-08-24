@@ -4,10 +4,10 @@ import { undoable } from '../lib/undoable';
 import { entityMap } from './types';
 import { form } from './markers/form';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 
 /**
- * Undo/redo — the production half of time travel.
+ * Undo/redo — the production half of restoration.
  *
  * This is deliberately separate from devtools forensic replay. Undo/redo needs
  * the state a USER edited: form values, collection entries, plain leaves. It
@@ -39,7 +39,7 @@ describe('undo/redo restores what the user edited', () => {
         n: 0,
         rows: entityMap<{ id: number }, number>(),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
 
     for (let i = 1; i <= 3; i++) {
@@ -63,7 +63,7 @@ describe('undo/redo restores what the user edited', () => {
       {
         rows: entityMap<{ id: string }, string>(),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
 
     undoable(() => tree.$.rows.setAll([{ id: 'a' }, { id: 'b' }, { id: 'c' }]));
@@ -82,7 +82,7 @@ describe('undo/redo restores what the user edited', () => {
   it('redoes what it undid', async () => {
     const tree = signalTree(
       { rows: entityMap<{ id: number }, number>() },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     undoable(() => tree.$.rows.setAll([{ id: 1 }]));
     await flush();

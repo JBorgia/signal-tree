@@ -3,13 +3,13 @@ import { undoable } from '../../lib/undoable';
 
 import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * Direct leaf writes must land in history.
  *
  * `tree.$.a.b.set(x)` goes straight to a leaf signal — it does not pass through
- * the root callable that timeTravel wraps. If history does not see it, undo
+ * the root callable that restoration wraps. If history does not see it, undo
  * silently cannot restore it, which is the worst kind of failure for an undo
  * feature: it appears to work and quietly loses writes.
  *
@@ -17,13 +17,13 @@ import { timeTravel } from './restoration';
  * flush hook records them. These tests pin that, because it is invisible from
  * the outside until it breaks.
  */
-describe('time travel records direct leaf writes', () => {
+describe('restoration records direct leaf writes', () => {
   const flush = () => new Promise((r) => setTimeout(r, 0));
 
   it('undo restores a direct leaf .set()', async () => {
     const tree = signalTree(
       { user: { profile: { name: 'a' } } },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
 
     undoable(() => tree.$.user.profile.name.set('b'));
@@ -37,7 +37,7 @@ describe('time travel records direct leaf writes', () => {
   });
 
   it('undo restores a direct leaf .update()', async () => {
-    const tree = signalTree({ count: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ count: 0 }, { enhancers: [restoration()] });
 
     undoable(() => tree.$.count.update((n) => n + 1));
     await flush();
@@ -52,7 +52,7 @@ describe('time travel records direct leaf writes', () => {
   it('records leaf writes at depth', async () => {
     const tree = signalTree(
       { a: { b: { c: { d: 1 } } } },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
 
     undoable(() => tree.$.a.b.c.d.set(2));
@@ -64,7 +64,7 @@ describe('time travel records direct leaf writes', () => {
   });
 
   it('redo replays a leaf write that undo rolled back', async () => {
-    const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 1 }, { enhancers: [restoration()] });
 
     undoable(() => tree.$.n.set(2));
     await flush();
@@ -76,7 +76,7 @@ describe('time travel records direct leaf writes', () => {
   });
 
   it('does not grow history while restoring', async () => {
-    const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 1 }, { enhancers: [restoration()] });
 
     undoable(() => tree.$.n.set(2));
     await flush();
@@ -97,7 +97,7 @@ describe('time travel records direct leaf writes', () => {
           selectId: (row) => row.id,
         }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
 
     undoable(() => tree.$.rows.addOne({ id: 1, name: 'a' }));

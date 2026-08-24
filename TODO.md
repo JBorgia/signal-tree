@@ -62,7 +62,7 @@ Everything already committed, plus:
   before it. Removing it early strands adopters twice.
 - **6a's code fix.** It is gated on the representation decision; the doc fix has shipped.
   > **Boundary crossed (2026-08-11, audit note):** the working tree later landed the
-  > form-notifier fix that makes global `timeTravel()` record direct `form()` writes,
+  > form-notifier fix that makes global `restoration()` record direct `form()` writes,
   > and `docs/guides/time-travel-in-production.md` §2b, `packages/core/README.md` and
   > the 2026-08 audits were rewritten to say 6a is fixed. This contradicts the
   > "OUT of 14.1.1 — do not let these leak in" decision above. Noted here because the
@@ -1048,7 +1048,7 @@ before touching 2a-2c or 3.** Six candidate architectures with pros and cons; th
 choice is not made yet, and this item is the decision, not an implementation.
 
 **The adopter check has been run and it narrowed the field.** v3 ships 50-step undo to
-production end users at the form layer and deliberately type-erases `timeTravel`, so the
+production end users at the form layer and deliberately type-erases `restoration`, so the
 target's architecture is already their shipped architecture. Two results that change
 this item:
 
@@ -1102,12 +1102,12 @@ captured 3 entity paths and **0 of 4** scalar writes — but it ran against a ba
 
 ```
 bare tree         captured: ["entities.e1"]                                        0/3 leaves
-with timeTravel() captured: ["entities.e1","selectedIds","saveState","bulkCompleted"] 3/3 leaves
+with restoration() captured: ["entities.e1","selectedIds","saveState","bulkCompleted"] 3/3 leaves
 ```
 
 `time-travel.ts:638` installs `interceptLeafSignals` and calls `notifier.notify()`
 itself at `:646`, so plain-leaf writes reach `PathNotifier` **only because
-`timeTravel()` injects them**. Consequence: an action built as a standalone notifier
+`restoration()` injects them**. Consequence: an action built as a standalone notifier
 subscriber inherits the blind spot; one built **inside the time-travel enhancer gets
 leaves for free**. That is an independent confirmation of the target doc's §4.5 siting,
 arrived at from the opposite direction.
@@ -1339,7 +1339,7 @@ footgun**, so a deprecation window is a window in which more call sites acquire 
 Delete the three methods, the `pausedSignal`, the early return at `time-travel.ts:128`,
 and lever 3 of `docs/guides/time-travel-in-production.md` (the pause + sealing-write
 recipe). Nothing in `packages/*` or the demo depends on them, and v3 — the only known
-adopter — deliberately type-erases `timeTravel` and does not use them.
+adopter — deliberately type-erases `restoration` and does not use them.
 
 **This can ship before the transaction exists.** Its absence is strictly safer than its
 presence, so it is not gated on the replacement.
@@ -1385,7 +1385,7 @@ Two things the spike established that any option must reckon with:
 `notify(path, value, prev)` already exists at every write site
 (`path-notifier.ts:113`, called from entity-signal, form, devtools), and
 `updateAndReport()` already returns changed paths. So the library already produces
-`{ path, before, after }` per write and `timeTravel()` throws it away to snapshot
+`{ path, before, after }` per write and `restoration()` throws it away to snapshot
 the root instead — which is the only thing an immutable-root store CAN capture, and
 we are not one.
 
@@ -1420,7 +1420,7 @@ The `history` option name carries **two opposite meanings** today:
 | Marker        | `history` today      | Means                                          |
 | ------------- | -------------------- | ---------------------------------------------- |
 | `form()`      | `history: history()` | **Opt IN** to this form's own undo stack       |
-| `entityMap()` | `history?: boolean`  | **Opt OUT** of the global `timeTravel()` stack |
+| `entityMap()` | `history?: boolean`  | **Opt OUT** of the global `restoration()` stack |
 
 One name, opt-in at one position and opt-out at another. Patching the phantom entry
 leaves that collision in place, and the collision is the reason the phantom exists:
@@ -1517,11 +1517,11 @@ Still to do, in order:
    inside `coalesce` sees the OLD value because `coalesce` defers the WRITE, while
    `batch` defers only notification. Neither docstring says so, and both currently imply
    the same end state reached two ways.
-3. **`getHistory()` / `getCurrentIndex()`** — the only `get`-prefixed accessors in a
+3. **`getRestorationHistory()` / `getCurrentIndex()`** — the only `get`-prefixed accessors in a
    library of bare nouns (`all()`, `count()`, `canUndo()`). Both move to the devtools
    surface anyway; rename once, there.
-4. ~~**`resetHistory()` vs `clear()`**~~ — ANSWERED, no rename. MEASURED: after 3
-   writes, `resetHistory()` left `n === 3`, `canUndo() === false`, and a following
+4. ~~**`resetRestorationHistory()` vs `clear()`**~~ — ANSWERED, no rename. MEASURED: after 3
+   writes, `resetRestorationHistory()` left `n === 3`, `canUndo() === false`, and a following
    `undo()` left `n === 3`. It empties the stack and leaves state alone. The name is
    accurate; `clear()` would be ambiguous between the two operations.
 5. **`byIdOrFail()`** — an `OrFail` suffix unique in the API, for a "strict variant"
@@ -1597,12 +1597,12 @@ Confirmed along the way, independently: collection mutations record, `undo()`
 restores deletes, field edits and **order**, and 20 `updateOne` in one microtask is
 one entry reverted by one undo. The retraction holds.
 
-### 6a. NEW DEFECT — `timeTravel()` does not cover `form()` state
+### 6a. NEW DEFECT — `restoration()` does not cover `form()` state
 
 **The largest finding of the re-score, and it loses user data.** Form writes never
 notify the history recorder.
 
-- Form-only tree, 3 form writes: `getHistory()` is `["INIT"]`, `canUndo() === false`,
+- Form-only tree, 3 form writes: `getRestorationHistory()` is `["INIT"]`, `canUndo() === false`,
   `undo()` is a no-op. Identical writes to a plain leaf on the same-shaped tree give
   4 entries and a working undo.
 - Mixed tree: a _later_ plain-leaf write snapshots the form's then-current values
@@ -1612,7 +1612,7 @@ notify the history recorder.
   the form.
 
 `form({ history: history() })` — the form's own scoped stack — works correctly.
-This is why v3 does undo at the form layer and type-erases `timeTravel`: their
+This is why v3 does undo at the form layer and type-erases `restoration`: their
 architecture was forced, not chosen.
 
 Do not fix by making the snapshot walker descend into form markers — that
@@ -1634,7 +1634,7 @@ write followed by a revert to the original value logs **0** entries at 0 ms and
 That is acceptable for an undo stack and wrong for an audit trail, which is the
 thing it is named for and recommended for in the regulated/healthcare workload.
 Either drive it from `PathNotifier` (the notification already fires at every write
-site) or delete it and document `createAuditCallback` / `getHistory()`, which are
+site) or delete it and document `createAuditCallback` / `getRestorationHistory()`, which are
 exact. It also leaks its interval unless the returned stop function is wired to a
 `DestroyRef`.
 
@@ -1659,7 +1659,7 @@ Where it lands varies; that it discards the restore does not.
 whose first press does something the user cannot want, not data loss. Rank it below
 6a and 6b accordingly.
 
-Mitigation that works today: `deserialize()` **before** `.with(timeTravel({}))` →
+Mitigation that works today: `deserialize()` **before** `.with(restoration({}))` →
 `canUndo() === false` and `undo()` is a no-op, because the restored state becomes
 `INIT`'s baseline and undo has no way past it.
 
@@ -1828,7 +1828,7 @@ Nothing in our docs should reason from what elf or Akita do. Their constraint wa
 snapshot cost per write, which 13.5.0 removed. That framing is how `pauseRecording`
 arrived with a rationale that does not work.
 
-`docs/guides/time-travel-in-production.md` also argues you can run `timeTravel()`
+`docs/guides/time-travel-in-production.md` also argues you can run `restoration()`
 in production because recording is cheap. True and beside the point — whole-tree
 undo reverts things the user never did. Rewrite around scoped, marker-declared
 undo.
@@ -1985,7 +1985,7 @@ Consumers/projections after the kernel:
 
 - `transactions()` — speculative lifecycle projection
 - scoped undo/redo — confirmed-turn reversal projection
-- `timeTravel()` — causal projection plus separate temporal snapshot
+- `restoration()` — causal projection plus separate temporal snapshot
   projection
 - DevTools — inspection projection
 - provenance — inspection/query projection

@@ -4,19 +4,19 @@ import { undoable } from '../../lib/undoable';
 import { signalTree } from '../../lib/signal-tree';
 import { getPathNotifier, resetPathNotifier } from '../../lib/path-notifier';
 import type { WriteMetadata } from '../../lib/types';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
- * PR1: time-travel replay writes are tagged with the ambient write-context
+ * PR1: restoration replay writes are tagged with the ambient write-context
  * `{ intent: 'system', origin: 'restoration' }`. Enhancers (validation,
  * guardrails) consume this via `getActiveWriteContext()` to suppress side
  * effects for replays.
  */
-describe('time-travel — replay writes carry source: time-travel (PR1)', () => {
-  it('writes performed during undo() carry source=time-travel meta', async () => {
+describe('restoration — replay writes carry source: restoration (PR1)', () => {
+  it('writes performed during undo() carry source=restoration meta', async () => {
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }, { enhancers: [timeTravel()] });
+    const store = signalTree({ count: 0 }, { enhancers: [restoration()] });
 
     // Drive the tree forward so we have history to undo into.
     undoable(() => (store as any).$.count.set(1));
@@ -54,7 +54,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     unsubscribe();
 
     // At least one leaf write must have fired during undo. Every replay
-    // write carries the time-travel context (no plain user writes happen
+    // write carries the restoration context (no plain user writes happen
     // inside undo()).
     expect(captured.length).toBeGreaterThanOrEqual(1);
     for (const c of captured) {
@@ -64,12 +64,12 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     }
   });
 
-  it('writes performed during jumpTo() carry source=time-travel meta', async () => {
+  it('writes performed during jumpTo() carry source=restoration meta', async () => {
     resetPathNotifier();
 
     const store = signalTree(
       { count: 0, label: 'a' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
 
     undoable(() => (store as any).$.count.set(1));
@@ -112,10 +112,10 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     }
   });
 
-  it('regular user writes carry canonical mutation metadata without a time-travel source', async () => {
+  it('regular user writes carry canonical mutation metadata without a restoration source', async () => {
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }, { enhancers: [timeTravel()] });
+    const store = signalTree({ count: 0 }, { enhancers: [restoration()] });
 
     const captured: Array<{ path: string; meta?: WriteMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(

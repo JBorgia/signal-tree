@@ -213,7 +213,7 @@ import {
   signalTree,
   batching,
   devTools,
-  timeTravel
+  restoration
 } from '@signaltree/core';
 
 const appTree = signalTree({
@@ -230,7 +230,7 @@ const appTree = signalTree({
   cart: {
     items: [] as Array<{ id: string; quantity: number }>
   }
-}, { enhancers: [batching(), devTools({ name: 'App State' }), timeTravel()] });
+}, { enhancers: [batching(), devTools({ name: 'App State' }), restoration()] });
 
 // Read nested values directly
 console.log(appTree.$.user.profile.name());

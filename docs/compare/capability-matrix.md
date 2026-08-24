@@ -319,7 +319,7 @@ an O(state) walk per write — exactly the cost the reference-dedup was introduc
 to remove. It should be opt-in and documented as such.
 
 **Verdict: SHIPPED in 14.0.0-rc.1** (`4e6b3ba0`) as `pauseRecording()` /
-`resumeRecording()` / `isRecordingPaused()`, plus `timeTravel({ shouldSkip })`.
+`resumeRecording()` / `isRecordingPaused()`, plus `restoration({ shouldSkip })`.
 The cost IS stated, in the config's own doc comment. `isRecordingPaused` is
 reactive — the `canUndo` lesson applied before shipping rather than after.
 `pauseRecording` is checked before any snapshot work, so pausing costs nothing.

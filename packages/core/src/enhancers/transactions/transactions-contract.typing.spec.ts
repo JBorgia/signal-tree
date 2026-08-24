@@ -14,14 +14,14 @@
  *     which is the reason a generic `tree + additions` combiner cannot express
  *     this enhancer, and is untouched by a signature change;
  *   - its metadata declares `capabilities: ['causal-runtime']`, so like
- *     `timeTravel` it participates in `buildTreePlan` substrate provisioning;
+ *     `restoration` it participates in `buildTreePlan` substrate provisioning;
  *   - `TransactionMethods` is a single method with no `this`, no conditional
  *     types and no state generic, so there is no receiver-derived precision at
  *     risk.
  *
  * `TransactionMethods` is also INHERITED by `RestorationMethods`, so this
  * contract is reachable two ways. The rows here cover the direct application;
- * `time-travel-contract.typing.spec.ts` covers the inherited path.
+ * `restoration-contract.typing.spec.ts` covers the inherited path.
  *
  * v15: enhancers are DECLARED, so the call site is
  * `signalTree(state, { enhancers: [transactions()] })` and the added surface arrives

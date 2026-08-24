@@ -144,7 +144,7 @@ What to do instead:
 
 - **A bulk import is already one entry** when its writes share a microtask. Try it
   before reaching for anything else.
-- **To drop uninteresting transitions**, use `timeTravel({ shouldSkip })`. It runs on
+- **To drop uninteresting transitions**, use `restoration({ shouldSkip })`. It runs on
   every recorded write, so compare only the fields you mean.
 - **For genuine intent-scoped grouping** — "these five writes are one user action,
   across several parts of the tree" — that is a transaction handle, and it is the

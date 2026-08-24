@@ -4,7 +4,7 @@ import { undoable } from '../../lib/undoable';
 import { entityMap } from '../../lib/markers/entity-map';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * THE INVARIANT, and the reason it is written as an invariant rather than as a
@@ -32,7 +32,7 @@ const seed = (prefix: string, width = 4): Row[] =>
 const makeTree = (maxHistorySize: number) =>
   signalTree(
     { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-    { enhancers: [timeTravel({ maxHistorySize })] }
+    { enhancers: [restoration({ maxHistorySize })] }
   );
 
 const tick = () => Promise.resolve();
@@ -146,7 +146,7 @@ describe('restoration claim boundary', () => {
     // version of this suite left that call site unmutated and green.
     const tree = signalTree(
       { count: 0, label: 'a' },
-      { enhancers: [timeTravel({ maxHistorySize: 20 })] }
+      { enhancers: [restoration({ maxHistorySize: 20 })] }
     );
 
     for (let i = 1; i <= 6; i++) {
@@ -193,7 +193,7 @@ describe('restoration claim boundary', () => {
     // The invariant alone would be satisfied by a stale claim set that happens
     // to match a stale history, so this asserts the absolute state: turn ids
     // restart at 1 after a reset, and a claim surviving under the old
-    // `time-travel:1` would be inherited by the next entry to mint that name.
+    // `restoration:1` would be inherited by the next entry to mint that name.
     expectInvariant(tree);
     const claims = getSubjectRestorationClaims(tree);
     expect(claims?.snapshot().owners).toBeLessThanOrEqual(1);

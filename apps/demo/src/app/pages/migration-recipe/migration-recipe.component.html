@@ -16,7 +16,7 @@
     <strong>What we don't claim:</strong> that the libraries' internals are
     equivalent. SignalTree's <code>status()</code>, <code>entityMap()</code>,
     <code>stored()</code>, <code>batching()</code>, <code>devTools()</code>, and
-    <code>timeTravel()</code> primitives encapsulate behavior that other
+    <code>restoration()</code> primitives encapsulate behavior that other
     libraries reconstruct from primitives in app code. That's the point of the
     comparison &mdash; not "look how much shorter SignalTree is" but "look at
     what each library asks <em>your</em> code to express."
@@ -1515,7 +1515,7 @@ export function settingsState() &#123;
 
 // tree/app-tree.ts
 import &#123; InjectionToken, Provider, computed &#125; from '&#64;angular/core';
-import &#123; signalTree, batching, devTools, timeTravel &#125; from '&#64;signaltree/core';
+import &#123; signalTree, batching, devTools, restoration &#125; from '&#64;signaltree/core';
 import &#123; identityState &#125; from '../identity/identity.state';
 import &#123; ticketsState &#125; from '../tickets/tickets.state';
 import &#123; settingsState &#125; from '../settings/settings.state';
@@ -1532,7 +1532,7 @@ export function createAppTree() &#123;
   return signalTree(createBaseState())
     .with(devTools(&#123; name: 'AppTree' &#125;))
     .with(batching())
-    .with(timeTravel())
+    .with(restoration())
     // Tier 1: entity resolution
     .derived(($) =&gt; (&#123;
       tickets: &#123;

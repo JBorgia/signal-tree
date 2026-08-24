@@ -76,7 +76,7 @@ export const appTree = signalTree({
   ui: { theme: 'light', sidebarOpen: false },
   cart: { items: [] as CartItem[], total: 0 },
 }, { enhancers: [devTools()] })      // Redux DevTools at the root
-  .with(timeTravel())    // Undo/redo at the root
+  .with(restoration())    // Undo/redo at the root
   .with(persistence({ key: 'app-tree' }));  // Auto-save at the root
 
 // Use it anywhere — features get typed slices

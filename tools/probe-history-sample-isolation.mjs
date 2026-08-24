@@ -87,13 +87,13 @@ const widePatch = (count, salt) => {
  * thing under investigation.
  */
 async function oneBuild(rows, fields, updates, { destroy = false } = {}) {
-  const { signalTree, entityMap, timeTravel, batching, transactions } =
+  const { signalTree, entityMap, restoration, batching, transactions } =
     await import(CORE);
   const tree = signalTree(
     { rows: entityMap({ selectId: (r) => r.id }) },
     {
       enhancers: [
-        timeTravel({ maxHistorySize: 200 }),
+        restoration({ maxHistorySize: 200 }),
         batching(),
         transactions(),
       ],

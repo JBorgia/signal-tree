@@ -292,7 +292,7 @@ describe('devTools enhancer (v6 API)', () => {
     }
   });
 
-  it('applies DevTools time-travel dispatches', async () => {
+  it('applies DevTools restoration dispatches', async () => {
     resetPathNotifier();
 
     const originalWindow = (globalThis as any).window;
@@ -361,7 +361,7 @@ describe('devTools enhancer (v6 API)', () => {
     }
   });
 
-  it('time-travel restores EntitySignal-like nodes via setAll(all)', () => {
+  it('restoration restores EntitySignal-like nodes via setAll(all)', () => {
     resetPathNotifier();
 
     const originalWindow = (globalThis as any).window;
@@ -371,7 +371,7 @@ describe('devTools enhancer (v6 API)', () => {
     const setAll = vi.fn();
     const users = {
       setAll,
-      // method placeholders that must NOT be overwritten by time travel
+      // method placeholders that must NOT be overwritten by restoration
       addOne: vi.fn(),
       byId: vi.fn(),
     };
@@ -465,7 +465,7 @@ describe('devTools enhancer (v6 API)', () => {
     }
   });
 
-  it('aggregatedReduxInstance applies time-travel dispatches to all trees', async () => {
+  it('aggregatedReduxInstance applies restoration dispatches to all trees', async () => {
     resetPathNotifier();
 
     const originalWindow = (globalThis as any).window;

@@ -83,18 +83,18 @@
       "surface": "packages/core/README.md",
       "question": "broken-claims",
       "severity": "P1",
-      "title": "`withTimeTravel` referenced throughout README but only `timeTravel` is exported; config key `maxHistory` is wrong (should be `maxHistorySize`)",
+      "title": "`withTimeTravel` referenced throughout README but only `restoration` is exported; config key `maxHistory` is wrong (should be `maxHistorySize`)",
       "steel_man": "`withTimeTravel` may have been the v5/v6 name and the README was partially updated. The intent is correct — there IS a time-travel enhancer.",
       "evidence_refs": [
         "packages/core/README.md:1629 — withTimeTravel({ // Undo/redo maxHistory: 50 })",
         "packages/core/README.md:1730 — withTimeTravel()",
         "packages/core/README.md:1747 — devTools(), withTimeTravel()",
         "packages/core/README.md:2119 — withTimeTravel() - Undo/redo functionality",
-        "packages/core/README.md:2115 — import { signalTree, batching, timeTravel } from '@signaltree/core'",
-        "packages/core/src/index.ts:209 — export { timeTravel } from './enhancers/restoration/restoration'",
+        "packages/core/README.md:2115 — import { signalTree, batching, restoration } from '@signaltree/core'",
+        "packages/core/src/index.ts:209 — export { restoration } from './enhancers/restoration/restoration'",
         "packages/core/src/lib/types.ts:9-33 — RestorationConfig.maxHistorySize (not maxHistory)"
       ],
-      "proposed_action": "Global search-replace all `withTimeTravel` → `timeTravel` in the README. Fix `maxHistory: 50` → `maxHistorySize: 50` in the withTimeTravel config example. Verify all import lines include `timeTravel` not `withTimeTravel`.",
+      "proposed_action": "Global search-replace all `withTimeTravel` → `restoration` in the README. Fix `maxHistory: 50` → `maxHistorySize: 50` in the withTimeTravel config example. Verify all import lines include `restoration` not `withTimeTravel`.",
       "status": "resolved",
       "resolved_in": "v2 cycle — RFC-1 README overhaul (2026-04-29)"
     },

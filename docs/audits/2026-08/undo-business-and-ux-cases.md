@@ -13,7 +13,7 @@
 > changes riding inside the next recorded snapshot, so that "undoing an unrelated
 > edit silently reverts them — data loss with a confident UI." That mechanism is
 > real and it was **measured** — but it applies to **`form()` state**, not to
-> collections. §3b's clean three-way split is therefore too generous: `timeTravel()`
+> collections. §3b's clean three-way split is therefore too generous: `restoration()`
 > does not merely leave form fields alone, it captures them incidentally and
 > rewinds them. See case 20 of the sibling audit and TODO 6a.
 
@@ -113,10 +113,10 @@ indication. That is data loss with a confident UI.
 ## 3b. CORRECTION — there are two undo systems, and I audited one
 
 Everything above, and the scoring that follows, was written as though
-`timeTravel()` were the only undo mechanism. It is not, and missing this made the
+`restoration()` were the only undo mechanism. It is not, and missing this made the
 verdict far more pessimistic than the truth.
 
-**`form()` has its own history, independent of `timeTravel()`:**
+**`form()` has its own history, independent of `restoration()`:**
 
 ```ts
 signalTree({ f: form({ initial: { name: '', email: '' }, history: history() }) });
@@ -136,14 +136,14 @@ statement:
 | Mechanism           | Scope               | Good for                                        |
 | ------------------- | ------------------- | ----------------------------------------------- |
 | `form(history())`   | One form's fields   | Field-level undo while editing a record         |
-| `timeTravel()`      | The whole tree      | Structural undo — add/remove/reorder, bulk work |
+| `restoration()`      | The whole tree      | Structural undo — add/remove/reorder, bulk work |
 | `createEditSession` | One editing session | Commit-or-discard, nothing enters history       |
 
 Which matters because **the dominant LOB editing pattern is form-shaped**: click a
 row, a drawer or dialog opens, edit fields, save or cancel. In that pattern the
 undo the user wants is field-level, inside the form — and it already works.
 
-`timeTravel()` is left holding the cases the form cannot see: rows added, rows
+`restoration()` is left holding the cases the form cannot see: rows added, rows
 deleted, rows reordered, and bulk actions. Those are exactly the ones that do not
 record.
 
@@ -155,7 +155,7 @@ Verified by execution against the built package.
 | --- | ---- | ------ | --- |
 
 These scores are REVISED against §3b. The first version of this table scored
-every case against `timeTravel()` alone and read "two of nine work", which was
+every case against `restoration()` alone and read "two of nine work", which was
 wrong — it audited one of two mechanisms.
 
 | 1 | Undo a row edit **in a form** | ✅ | `form(history())` — the dominant LOB pattern |
@@ -175,7 +175,7 @@ a form works today and covers the dominant editing pattern. What does not work i
 not record.
 
 My previous statement here was "two of nine work", which was wrong for the reason
-worth remembering: I audited `timeTravel()` and treated it as the whole subject,
+worth remembering: I audited `restoration()` and treated it as the whole subject,
 so a working mechanism sitting one marker away scored as a gap. Asking "how much
 of this is forms rather than time travel" found it in one question.
 
@@ -188,7 +188,7 @@ there is measured evidence rather than taste behind it.
 rides inside the next recorded snapshot, a server push that arrives between two
 user edits is inside the snapshot the second edit records — so the user's Ctrl+Z
 reverts the server's change too, silently. That is not a bug to be fixed in
-`timeTravel()`; it is inherent to whole-tree snapshot undo. Any tree-wide undo has
+`restoration()`; it is inherent to whole-tree snapshot undo. Any tree-wide undo has
 it. The only real defence is **scope**.
 
 ### The ethos already answers this
@@ -219,7 +219,7 @@ it is already the established pattern.
 | Marker        | `history` option today | Meaning                                        |
 | ------------- | ---------------------- | ---------------------------------------------- |
 | `form()`      | `history: history()`   | **Opt IN** to this form's own undo stack       |
-| `entityMap()` | `history?: boolean`    | **Opt OUT** of the global `timeTravel()` stack |
+| `entityMap()` | `history?: boolean`    | **Opt OUT** of the global `restoration()` stack |
 
 Same name, opposite polarity, different subject. A reader who learns one learns
 the wrong thing about the other.
@@ -270,7 +270,7 @@ records collection mutations into a scoped stack _without_ forking the shared
 snapshot path. That is the real content of §5 item 1 in this document, and it is
 why it is RFC material rather than a patch.
 
-### What that leaves `timeTravel()` for
+### What that leaves `restoration()` for
 
 Devtools. Whole-tree rewind and fast-forward, unbounded history, full fidelity —
 genuinely useful, and genuinely a development concern. Keeping it dev-only is not a
@@ -279,9 +279,9 @@ scope for a whole-tree tool, arrived at from the opposite direction.
 
 Which reverses the recommendation in
 [time-travel-in-production.md](../../guides/time-travel-in-production.md). That
-guide argues you CAN run `timeTravel()` in production because recording is now
+guide argues you CAN run `restoration()` in production because recording is now
 cheap. True, and beside the point: cost was never the only reason not to. The
-guide needs rewriting around scoped, marker-declared undo, with `timeTravel()`
+guide needs rewriting around scoped, marker-declared undo, with `restoration()`
 positioned as the devtools instrument.
 
 ## 5. What the research says to build
@@ -354,7 +354,7 @@ the `undo()` it called and the state afterwards.
    `history: history()`. Code samples below use the current spelling.
 
 `form(history())` = scoped field undo, works (verified). The older warning that the
-**global** `timeTravel()` could not see `form()` state is now stale: direct form
+**global** `restoration()` could not see `form()` state is now stale: direct form
 writes record into global history again. Scoped form history remains the tidier choice
 when undo should belong to the form instead of the whole app.
 
@@ -498,7 +498,7 @@ writes.** The old verdict was right to flag form UX risk, but the raw claim that
 global history could not see form writes is now outdated.
 
 - Collection structure **does** record — the ❌ came from the retracted premise.
-- Direct `form()` state now **does** participate in `timeTravel()` again for ordinary
+- Direct `form()` state now **does** participate in `restoration()` again for ordinary
   field writes, and undoing a neighbouring plain-leaf write no longer rewinds the
   form. The remaining product question is scope: whether a form should share the
   app-wide undo stream or keep a local `form(history())` stack.

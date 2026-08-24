@@ -9,7 +9,7 @@
  *     enhancer         claimed    measured (prod main bundle)
  *     batching         +1.27 KB   +0.98 KB
  *     devTools         +2.49 KB   +0.10 KB  (impl is LAZY — 8.25 KB chunk)
- *     timeTravel       +1.75 KB   +1.68 KB  ✓
+ *     restoration       +1.75 KB   +1.68 KB  ✓
  *     serialization    +0.84 KB   +1.85 KB  ← understated by 2.2x
  *
  * `serialization` is the one that matters: understating a cost is the direction
@@ -80,7 +80,7 @@ const BASE = `
  */
 const ENHANCERS = [
   { name: 'batching', imports: 'batching', apply: 'batching()', use: 't.batch(() => t.$.count.set(2));' },
-  { name: 'timeTravel', imports: 'timeTravel', apply: 'timeTravel()', use: 't.undo(); t.redo();' },
+  { name: 'restoration', imports: 'restoration', apply: 'restoration()', use: 't.undo(); t.redo();' },
   { name: 'serialization', imports: 'serialization', apply: 'serialization()', use: 'globalThis.__s = t.serialize();' },
   { name: 'devTools', imports: 'devTools', apply: 'devTools()', use: 't.connectDevTools();' },
 ];

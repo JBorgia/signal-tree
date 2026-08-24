@@ -248,7 +248,7 @@ import {
   signalTree,
   devTools,
   batching,
-  timeTravel
+  restoration
 } from '@signaltree/core';
 
 const store = signalTree(
@@ -257,7 +257,7 @@ const store = signalTree(
     enhancers: [
       devTools({ name: 'AppStore' }),   // Redux DevTools integration
       batching(),                        // Batch multiple updates
-      timeTravel({ maxHistorySize: 50 }) // Undo/redo support
+      restoration({ maxHistorySize: 50 }) // Undo/redo support
     ]
   }
 );
@@ -271,7 +271,7 @@ const store = signalTree(
 | ----------------- | ----------------------------- | ------------------------- |
 | `devTools()`      | Redux DevTools integration    | Development/debugging     |
 | `batching()`      | Batch multiple signal updates | Performance optimization  |
-| `timeTravel()`    | Undo/redo functionality       | Form editing, canvas apps |
+| `restoration()`    | Undo/redo functionality       | Form editing, canvas apps |
 | `serialization()` | State persistence             | App reload persistence    |
 
 ---

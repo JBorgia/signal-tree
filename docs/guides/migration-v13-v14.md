@@ -168,7 +168,7 @@ tree.$.rows.setActiveId(id); // master/detail without hand-rolling it
 tree.$.rows.activeEntity(); // granular: only THAT row invalidates it
 tree.$.rows.changeId(tempId, 42); // adopt the id the server assigned
 
-timeTravel({ shouldSkip: (a, b) => a.cursor !== b.cursor });
+restoration({ shouldSkip: (a, b) => a.cursor !== b.cursor });
 
 import { onTreeError } from '@signaltree/core/authoring';
 onTreeError((e) => Sentry.captureException(e.error, { extra: e }));

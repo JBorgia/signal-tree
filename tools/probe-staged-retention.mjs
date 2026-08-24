@@ -42,11 +42,11 @@ const WIDTH = Number(arg('--width', 200));
 const HISTORY = Number(arg('--history', 20));
 const POINTS = [20, 40, 80, 160, 320];
 
-const { signalTree, entityMap, timeTravel } = await import(CORE);
+const { signalTree, entityMap, restoration } = await import(CORE);
 
 const tree = signalTree(
   { rows: entityMap({ selectId: (r) => r.id }) },
-  { enhancers: [timeTravel({ maxHistorySize: HISTORY })] }
+  { enhancers: [restoration({ maxHistorySize: HISTORY })] }
 );
 const rows = tree.$.rows;
 

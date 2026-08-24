@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { undoable } from '../../lib/undoable';
 
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 import { signalTree } from '../../lib/signal-tree';
 
 const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
-describe('time-travel behavior', () => {
+describe('restoration behavior', () => {
   it('records history and supports undo/redo', async () => {
     const enhanced = signalTree(
       { count: 0, text: '' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
 
     undoable(() => enhanced.$.count.set(1));

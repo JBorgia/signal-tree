@@ -1325,7 +1325,7 @@ newValue`; I found no way to recover the previous value from the node. Capturing
 - **RxDB cross-tab (BroadcastChannel) delivery semantics** — only the
   single-instance synchronous `$emit()` path was traced.
 - **Whether an M0+M5 design actually works for this repo's consumers**
-  (`persistence`, `timeTravel`, `devTools`, `guardrails`). That is a synthesis
+  (`persistence`, `restoration`, `devTools`, `guardrails`). That is a synthesis
   question and depends on Findings C.
 
 ## Findings C — internal ground truth
@@ -1543,7 +1543,7 @@ check at all. That is a different, larger, and cheaper 13 than the chokepoint's
 Tree: `signalTree({ a: 1, nested: { b: 2 } })`, one enhancer at a time.
 `—` = not observed. All values measured, not inferred.
 
-| Write path                                | `onPathChange` | `updateAndReport` return | `PathNotifier` (bare) | `PathNotifier` (+devTools _or_ timeTravel) | timeTravel history                                 | devTools | persistence    | guardrails                                                                                  |
+| Write path                                | `onPathChange` | `updateAndReport` return | `PathNotifier` (bare) | `PathNotifier` (+devTools _or_ restoration) | restoration history                                 | devTools | persistence    | guardrails                                                                                  |
 | ----------------------------------------- | -------------- | ------------------------ | --------------------- | ------------------------------------------ | -------------------------------------------------- | -------- | -------------- | ------------------------------------------------------------------------------------------- |
 | `tree({a:10})` root call                  | ✅ `[a]`       | n/a                      | —                     | ✅ `a`                                     | ✅ +1                                              | ✅       | ✅ (poll)      | ❌                                                                                          |
 | `tree(fn)` root updater                   | ✅ `[a]`       | n/a                      | —                     | ✅                                         | ✅                                                 | ✅       | ✅ (poll)      | ❌                                                                                          |
@@ -1565,7 +1565,7 @@ Notes on the measurements:
 - **`PathNotifier` fires for exactly two things in a bare tree**: `entityMap`
   mutations (the eight `pathNotifier.notify(...)` calls in
   `core/src/lib/entity-signal.ts`) and nothing else. O8 confirmed.
-- **Leaf writes only reach `PathNotifier` if devTools or timeTravel is
+- **Leaf writes only reach `PathNotifier` if devTools or restoration is
   attached**, because those two are the only things that call
   `interceptLeafSignals`. `@signaltree/schema` calls it too but routes the
   callback to its own dispatcher, never to the notifier. So "does a leaf write
@@ -1628,7 +1628,7 @@ Additionally, four independent mechanisms currently monkey-patch leaf
 `interceptLeafSignals` (devtools), `interceptLeafSignals` (time-travel),
 `interceptLeafSignals` (schema), and `batching`'s `wrapSignalSetters`. Only
 `batching` has an idempotence flag (`__batchingWrapped`). **Measured: with
-`.with(devTools()).with(timeTravel())`, one `tree.$.a.set(5)` emits `PathNotifier`
+`.with(devTools()).with(restoration())`, one `tree.$.a.set(5)` emits `PathNotifier`
 events `[a, a]` — count 2.** Every `'**'` subscriber (including guardrails'
 `updateCount`) double-counts.
 
@@ -1678,7 +1678,7 @@ notifier, but only devtools filters by tree ownership**
   paths** — precisely because it ignores every notification mechanism and
   brute-forces `JSON.stringify(tree())`. It is also the only one that observes
   the raw-property-assignment bypass (§C6 route 3).
-- **timeTravel double-records.** It records once from its wrapped callable
+- **restoration double-records.** It records once from its wrapped callable
   (`deepEqual` compare) _and_ once from `PathNotifier.onFlush`. For a root call
   both fire; the `onFlush` entry is labelled `'batch'`, the other `'update'`.
 
@@ -1686,8 +1686,8 @@ notifier, but only devtools filters by tree ownership**
 
 Each of these was checked by running the code.
 
-1. **`.with(timeTravel())` silently breaks `batchUpdate`, `updateAndReport`
-   and `onPathChange`.** Measured: on `signalTree({a:1}).with(timeTravel())`,
+1. **`.with(restoration())` silently breaks `batchUpdate`, `updateAndReport`
+   and `onPathChange`.** Measured: on `signalTree({a:1}).with(restoration())`,
    `t.batchUpdate({a:10})` leaves `a === 1`; `t.updateAndReport({a:20})` leaves
    `a === 1` and returns `[]`; `t.onPathChange(fn)` returns a function but the
    listener never fires even for a root call that does change `a`. Cause:
@@ -1818,12 +1818,12 @@ code, but for a reason the RFC's argument does not address either way.**
 ### Verified personally (not relayed from an agent)
 
 ```
-timeTravel: report=[] value=0 listeners=[] subErr=none
+restoration: report=[] value=0 listeners=[] subErr=none
 directAssign: raw:12345 snapshot={"a":12345}
 subscribe typeof=undefined
 ```
 
-1. **`.with(timeTravel())` silently swallows the write.**
+1. **`.with(restoration())` silently swallows the write.**
    `updateAndReport({count:1})` returns `[]`, `count` stays `0`, listeners never
    fire, nothing throws. That is DATA LOSS in a documented enhancer combination,
    and it means the API shipped this session is broken under a common enhancer.
@@ -1878,7 +1878,7 @@ real own `__proto__`; `get-changes.ts`; `mergeDeep` (live path:
 **Cut it.** Not because it is unused — because it is _broken_, and because the
 problem is not a missing mechanism.
 
-- It silently does nothing under `timeTravel()` (verified above).
+- It silently does nothing under `restoration()` (verified above).
 - `.with(enterprise())` reverts it to enterprise semantics, contradicting core's
   own JSDoc.
 - Core already has **nine** change-detection mechanisms, two of which poll at
@@ -1979,7 +1979,7 @@ single global slot, and depending on it is an avoidable bet. Owning the leaf at
 creation gives the same coverage with no external dependency, **and it is
 idempotent by construction** — which fixes the defect Track C found where four
 separate mechanisms monkey-patch `.set` after the fact and
-`.with(devTools()).with(timeTravel())` therefore emits every event twice.
+`.with(devTools()).with(restoration())` therefore emits every event twice.
 
 Nine mechanisms collapse into one primitive plus consumers:
 `updateAndReport` becomes a pull at the call site; `onPathChange` becomes

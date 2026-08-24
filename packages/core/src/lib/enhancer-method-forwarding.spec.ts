@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 
 import { batching } from '../enhancers/batching/batching';
 import { devTools } from '../enhancers/devtools/devtools';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from '../index';
 
 /**
@@ -13,7 +13,7 @@ import { signalTree } from '../index';
  * — `updateAndReport`, `onPathChange`, `registerCleanup` — is
  * defined `enumerable: false`. They were silently dropped, so the builder
  * wrapping the enhanced tree found nothing to forward to and returned an empty
- * result. `updateAndReport({count:1})` on a `.with(timeTravel())` tree returned
+ * result. `updateAndReport({count:1})` on a `.with(restoration())` tree returned
  * `[]` and never wrote — a dropped write that looked exactly like "nothing
  * changed".
  *
@@ -21,7 +21,7 @@ import { signalTree } from '../index';
  * fail against every version before the fix.
  */
 const ENHANCERS: Array<[string, () => (t: never) => never]> = [
-  ['timeTravel', () => timeTravel() as never],
+  ['restoration', () => restoration() as never],
   ['batching', () => batching() as never],
   ['devTools', () => devTools({ name: 'x' }) as never],
 ];
@@ -61,7 +61,7 @@ describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => 
   it('destroy() still runs registered cleanups and flips destroyed()', () => {
     // The suite passed with `destroy`/`registerCleanup`/`destroyed` dropped from
     // the copy — and that is NOT harmless: with `destroy` missing the builder
-    // falls to its else-branch and installs a NO-OP, so timeTravel history,
+    // falls to its else-branch and installs a NO-OP, so restoration history,
     // batching timers and persistence subscriptions all leak, silently.
     const tree = signalTree(
       { count: 0 },
@@ -164,7 +164,7 @@ describe('stacked enhancers', () => {
     const tree = signalTree(
       { count: 0 },
       {
-        enhancers: [timeTravel() as never, batching() as never],
+        enhancers: [restoration() as never, batching() as never],
         capabilities: ['causal-runtime'],
       }
     );

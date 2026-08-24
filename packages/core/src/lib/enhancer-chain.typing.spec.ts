@@ -8,7 +8,7 @@
  * everything added before it — so a three-enhancer chain typed as
  * `SignalTreeBuilder<…> & BatchingMethods` and lost `canUndo` and `serialize`.
  * Runtime was always fine; only the type forgot, so the workaround was a cast,
- * and the demo's time-travel page carried exactly that cast for exactly this
+ * and the demo's restoration page carried exactly that cast for exactly this
  * reason.
  *
  * `all-chains.spec.ts` did not catch it because it asserts on hand-written type
@@ -19,11 +19,11 @@
 import { batching } from '../enhancers/batching/batching';
 import { serialization } from '../enhancers/serialization/serialization';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 
 const chained = signalTree(
   { n: 0 },
-  { enhancers: [timeTravel(), serialization(), batching()] }
+  { enhancers: [restoration(), serialization(), batching()] }
 );
 
 // FIRST link survives to the end of the chain.
@@ -37,7 +37,7 @@ export const _batch: void = chained.batch(() => undefined);
 // Order must not matter.
 const reordered = signalTree(
   { n: 0 },
-  { enhancers: [batching(), timeTravel(), serialization()] }
+  { enhancers: [batching(), restoration(), serialization()] }
 );
 export const _r1: void = reordered.batch(() => undefined);
 export const _r2: boolean = reordered.canUndo();

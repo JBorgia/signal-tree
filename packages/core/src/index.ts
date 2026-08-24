@@ -155,7 +155,7 @@ export {
 // decision toward itself without anyone choosing.
 //
 // Accumulation is three lines of composition over a plain leaf — and a leaf is
-// captured by timeTravel(), appears in tree(), and persists with no marker
+// captured by restoration(), appears in tree(), and persists with no marker
 // contract to satisfy, which a marker has to earn individually. See
 // docs/guides/streaming-accumulation.md. Git has the implementation if the
 // answer ever turns out to be "marker".
@@ -233,10 +233,10 @@ export type { BatchingConfig, BatchingMethods } from './lib/types';
 // (proper injection-context handling; no NG0203 footgun).
 
 /**
- * Time travel enhancer for debugging and undo/redo functionality
- * @see {@link timeTravel} for time travel capabilities
+ * Restoration enhancer for debugging and undo/redo functionality
+ * @see {@link restoration} for restoration capabilities
  */
-export { timeTravel } from './enhancers/restoration/restoration';
+export { restoration } from './enhancers/restoration/restoration';
 
 /**
  * Transaction enhancer for optimistic updates without temporal history APIs.
@@ -289,7 +289,7 @@ export { devTools } from './enhancers/devtools/devtools';
  *
  * **Enhancers (one function each):**
  * - `batching(config?)` - Batch CD notifications
- * - `timeTravel(config?)` - Undo/redo
+ * - `restoration(config?)` - Undo/redo
  * - `transactions()` - Optimistic transaction rollback without undo/redo history
  * - `devTools(config?)` - Redux DevTools integration
  * - `serialization(config?)` - State serialization

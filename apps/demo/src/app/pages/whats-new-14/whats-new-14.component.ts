@@ -5,7 +5,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { entityMap, signalTree, timeTravel, undoable } from '@signaltree/core';
+import { entityMap, signalTree, restoration, undoable } from '@signaltree/core';
 
 /**
  * 14.0.0, running.
@@ -71,7 +71,7 @@ export class WhatsNew14Component {
         // should perceive it, which is the decision `undoable()` makes BEFORE a
         // turn exists. The row operations below are designated; `select()` and
         // `clearSelection()` are not, which is the whole filter.
-        timeTravel({ maxHistorySize: 50 }),
+        restoration({ maxHistorySize: 50 }),
       ],
     }
   );

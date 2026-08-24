@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
 import { entityMap } from './types';
 
@@ -124,7 +124,7 @@ describe('SUBJ-AUDIT — the hazards the docblocks imply', () => {
         rows: entityMap<Row, string>({ selectId: (r) => r.id }),
         draft: '',
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     tree.$.rows.addOne({ id: 'tmp-1', n: 5 });
     await tick();

@@ -4,7 +4,7 @@ import { undoable } from '../../lib/undoable';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * STEP 8 PHASE 6A — the multi-collection falsifier, run BEFORE the sink is
@@ -50,7 +50,7 @@ const makeTree = (maxHistorySize = 4) =>
       users: entityMap<User, string>({ selectId: (u) => u.id }),
       orders: entityMap<Order, string>({ selectId: (o) => o.id }),
     },
-    { enhancers: [timeTravel({ maxHistorySize })] }
+    { enhancers: [restoration({ maxHistorySize })] }
   );
 
 type Collection = {
@@ -124,7 +124,7 @@ describe('multi-collection subject id collision', () => {
     expect(claims?.ownersOf(shared).length).toBeGreaterThanOrEqual(2);
   });
 
-  it('evicting one collection history entry does NOT free a number the other still claims', async () => {
+  it('evicting one collection restoration history entry does NOT free a number the other still claims', async () => {
     // The ordering the sink would get wrong. `users` churns until its removal
     // entry is evicted; `orders` sits still holding its own claim on the same
     // number.

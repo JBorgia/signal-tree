@@ -21,7 +21,7 @@ API, not a simplified stand-in:
 
 | arm            | implementation                                                                                        |
 | -------------- | ----------------------------------------------------------------------------------------------------- |
-| `signaltree`   | `entityMap({ selectId })`, `timeTravel()`                                                             |
+| `signaltree`   | `entityMap({ selectId })`, `restoration()`                                                             |
 | `ngrx-signals` | `signalState` + `@ngrx/signals/entities` (`setAllEntities`, `updateEntity`) — the official entity API |
 | `elf`          | `createStore` + `withEntities`, and **`@ngneat/elf-state-history`** for undo                          |
 | `raw-signals`  | a hand-rolled `Map` of per-entity signals + an id list — what you write with no library               |
@@ -93,7 +93,7 @@ Reproduce with `node --expose-gc tools/bench-compare.mjs --n 10000`.
 | arm          | median       | retained | history                      | 14.0.0 published |
 | ------------ | ------------ | -------- | ---------------------------- | ---------------- |
 | **elf**      | **1.09 ms**  | 4.88 MB  | built-in `elf-state-history` | 1.24 ms          |
-| signaltree   | **29.45 ms** | 29.70 MB | built-in `timeTravel()`      | 3.67 ms          |
+| signaltree   | **29.45 ms** | 29.70 MB | built-in `restoration()`      | 3.67 ms          |
 | ngrx-signals | 177.21 ms    | 1.08 MB  | hand-rolled                  | 179.84 ms        |
 | raw-signals  | 273.85 ms    | 6.31 MB  | hand-rolled                  | 278.44 ms        |
 
@@ -197,7 +197,7 @@ SYNC (as the harness was written)   history=1    reverted=false     0.51 ms
 AWAITED                             history=52   reverted=TRUE    215.12 ms
 ```
 
-`timeTravel()` records on a notifier FLUSH, which is scheduled with
+`restoration()` records on a notifier FLUSH, which is scheduled with
 `queueMicrotask`. The workload was `async` but had no `await` between the writes
 and the undos, so the flush never ran: SignalTree recorded **one** entry, called
 `undo()` fifty times with nothing to undo, and restored nothing — while every

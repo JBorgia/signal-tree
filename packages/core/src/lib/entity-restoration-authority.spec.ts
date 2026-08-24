@@ -1,7 +1,7 @@
 import { signalTree } from './signal-tree';
 import { undoable } from '../lib/undoable';
 import { entityMap } from './markers/entity-map';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 
 /**
@@ -72,11 +72,11 @@ describe('restoration authority is fixed at construction', () => {
     ).toBeUndefined();
   });
 
-  it('gives timeTravel no rights over subjects retired before its history begins', async () => {
+  it('gives restoration no rights over subjects retired before its history begins', async () => {
     // The prospective half of the rule survives inside a single tree's
-    // lifetime: timeTravel snapshots from the point it starts recording, so a
+    // lifetime: restoration snapshots from the point it starts recording, so a
     // retirement it never saw is not undoable. Here the retirement happens
-    // before any history entry exists to undo back past.
+    // before any restoration history entry exists to undo back past.
     const tree = signalTree(
       {
         rows: entityMap<{ id: string; name: string }, string>({
@@ -84,7 +84,7 @@ describe('restoration authority is fixed at construction', () => {
         }),
       },
       {
-        enhancers: [timeTravel({ maxHistorySize: 20 })],
+        enhancers: [restoration({ maxHistorySize: 20 })],
         capabilities: ['causal-runtime'],
       }
     );
@@ -110,7 +110,7 @@ describe('restoration authority is fixed at construction', () => {
         }),
       },
       {
-        enhancers: [timeTravel({ maxHistorySize: 20 })],
+        enhancers: [restoration({ maxHistorySize: 20 })],
         capabilities: ['causal-runtime'],
       }
     );
@@ -137,7 +137,7 @@ describe('restoration authority is fixed at construction', () => {
         }),
       },
       {
-        enhancers: [timeTravel({ maxHistorySize: 20 })],
+        enhancers: [restoration({ maxHistorySize: 20 })],
         capabilities: ['causal-runtime'],
       }
     );
@@ -243,7 +243,7 @@ describe('restoration authority is fixed at construction', () => {
         }),
       },
       {
-        enhancers: [timeTravel({ maxHistorySize: 20 })],
+        enhancers: [restoration({ maxHistorySize: 20 })],
         capabilities: ['causal-runtime'],
       }
     );

@@ -45,7 +45,7 @@ in §4.
 | New         | `compared()` / `byKeys()` — opt-in per-leaf equality                                                         |
 | New         | **ST2018** — warns when a collection is modelled as a plain array leaf                                       |
 | Fixed       | A held `byId()` reference died permanently across remove → re-add                                            |
-| Fixed       | `timeTravel()` deep-cloned itself whenever _any_ tree in the process flushed                                 |
+| Fixed       | `restoration()` deep-cloned itself whenever _any_ tree in the process flushed                                 |
 | ⚠️ Breaking | `tree()` returns a memoised, dev-frozen object. Mutating a snapshot throws in dev                            |
 
 Release notes for the GitHub release page are written and staged at
@@ -111,7 +111,7 @@ working tree):
 | `snapshotState()`          | ❌ 8 keys     | ✅ 2         |
 | `JSON.stringify(tree())`   | ❌ `"map":{}` | ✅           |
 | **`serialization()`**      | ❌ THROWS     | ❌ THROWS    |
-| **`timeTravel` undo**      | ❌ silent     | ❌ silent    |
+| **`restoration` undo**      | ❌ silent     | ❌ silent    |
 | **`tree(partial)`**        | ❌ silent     | ❌ silent    |
 | **`tree()` — `form()`**    | ❌ absent     | ❌ absent    |
 | `applyState()` (devtools)  | ✅            | ✅           |
@@ -153,7 +153,7 @@ true blocks a "don't fetch while loading" guard, `idle()` false blocks an
 idle-gated fetch, `settled()` false blocks anything awaiting settlement — and
 nothing is in flight to change any of them.
 
-**5.3 `timeTravel` undo silently does not restore marker state.** MEASURED,
+**5.3 `restoration` undo silently does not restore marker state.** MEASURED,
 pre-existing. Undo appears to succeed and leaves `status()`/`entityMap` at their
 post-change values. Arguably ranks with 5.1. **Not an independent defect** —
 `restoreState` falls through to `this.tree(state)` (`time-travel.ts:218`), so

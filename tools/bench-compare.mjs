@@ -24,7 +24,7 @@
  *   undo-redo   50 writes recorded to history, then 50 undos
  *
  * Undo/redo is where the libraries genuinely differ. SignalTree ships
- * `timeTravel()`; elf ships `@ngneat/elf-state-history`, which is installed here
+ * `restoration()`; elf ships `@ngneat/elf-state-history`, which is installed here
  * and used — testing elf WITHOUT its own history primitive would have been a
  * strawman, and the first run of this file did exactly that.
  *
@@ -94,14 +94,14 @@ const seed = (n) => {
 // ---------------------------------------------------------------------------
 const IMPLS = {
   signaltree: async (withHistory) => {
-    const { signalTree, entityMap, timeTravel } = await import(CORE);
+    const { signalTree, entityMap, restoration } = await import(CORE);
     // v15: the enhancer is DECLARED, so the two arms differ in their build
     // plan as well as their history. That is the real shape now — a tree with
-    // no timeTravel no longer pays for the causal runtime — and it is exactly
+    // no restoration no longer pays for the causal runtime — and it is exactly
     // what the comparison should measure.
     const tree = signalTree(
       { rows: entityMap({ selectId: (r) => r.id }) },
-      { enhancers: withHistory ? [timeTravel({ maxHistorySize: 200 })] : [] }
+      { enhancers: withHistory ? [restoration({ maxHistorySize: 200 })] : [] }
     );
     return {
       store: tree,

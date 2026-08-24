@@ -88,7 +88,7 @@ import {
   batching,
   entityMap,
   signalTree,
-  timeTravel,
+  restoration,
   toWritableSignal,
 } from '@signaltree/core';
 
@@ -97,7 +97,7 @@ type User = { id: number; name: string };
 const tree = signalTree({
   count: 0,
   users: entityMap<User, number>({ selectId: (user) => user.id }),
-}, { enhancers: [timeTravel(), batching()] });
+}, { enhancers: [restoration(), batching()] });
 
 tree.$.users.addOne({ id: 1, name: 'Ada' });
 tree.batch(() => tree.$.count.set(1));

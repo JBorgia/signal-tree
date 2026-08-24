@@ -67,7 +67,7 @@
       <li>
         The unexported <code>asyncStream</code> marker is removed. Accumulation
         is three lines of composition over a plain leaf, and a leaf is captured
-        by <code>timeTravel()</code>, appears in <code>tree()</code> and persists
+        by <code>restoration()</code>, appears in <code>tree()</code> and persists
         with no marker contract to satisfy.
       </li>
     </ul>
@@ -191,7 +191,7 @@
         <strong>costs writes nothing</strong>.
       </li>
       <li>
-        <strong><code>timeTravel()</code> no longer scales with state
+        <strong><code>restoration()</code> no longer scales with state
         size.</strong> A history entry is now the snapshot reference rather than
         a <code>structuredClone</code>, and every comparison collapses to
         <code>===</code>. 50 writes each changing ONE number, at 10,000 rows:
@@ -256,7 +256,7 @@
         churning underneath it.
       </li>
       <li>
-        <strong><code>timeTravel()</code> charged you for other people's
+        <strong><code>restoration()</code> charged you for other people's
         trees.</strong> It subscribes to the global flush, so every time-travelled
         tree materialised and deep-cloned <em>itself</em> whenever
         <em>any</em> tree in the process flushed: 0.008ms → 9.7ms as three

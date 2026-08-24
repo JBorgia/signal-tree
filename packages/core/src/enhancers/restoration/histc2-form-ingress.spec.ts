@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
 import { toWritableSignal } from '../../lib/utils';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * HIST-C2 STEP 6, outcome FORM-C2-B — the earned mutation-ingress adapter.
@@ -36,7 +36,7 @@ const makeTree = () =>
     { editForm: { name: 'ada' } as Model, ui: { panel: 'none' } },
     {
       enhancers: [
-        timeTravel({
+        restoration({
           maxHistorySize: 50,
         }),
       ],

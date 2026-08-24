@@ -12,7 +12,7 @@ import type { TreeCapability } from '../types';
  * ## Why this is a VALUE and not a registry
  *
  * The v14 design for this was a mutable `Set` maintained at runtime, and it was
- * the right design for v14: `.with()` could attach `timeTravel` at any moment,
+ * the right design for v14: `.with()` could attach `restoration` at any moment,
  * so "does this tree have a restoration owner?" was a question whose answer
  * could change between two writes. Every consumer therefore had to re-ask it,
  * and something had to keep it current.
@@ -32,8 +32,8 @@ export interface RuntimeTreePlan {
    * Can ANYTHING in this tree restore a subject after it retires?
    *
    * True when the tree carries `causal-runtime` (what `transactions` requests,
-   * and what `timeTravel` requests transitively) or `temporal-snapshots`. It is
-   * deliberately broader than "an enhancer named timeTravel is attached":
+   * and what `restoration` requests transitively) or `temporal-snapshots`. It is
+   * deliberately broader than "an enhancer named restoration is attached":
    * requesting the causal runtime directly through `capabilities` installs the
    * machinery to drive restoration without an enhancer, and a reclamation
    * decision must be wrong in the safe direction.

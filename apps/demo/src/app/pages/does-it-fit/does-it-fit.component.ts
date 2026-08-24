@@ -522,7 +522,7 @@ export class DoesItFitComponent {
       workload: 'Undo/redo as a shipped feature over moderate state',
       domains: 'Editors-in-a-panel, wizards, bulk edit',
       fit: 'signaltree',
-      best: 'SignalTree — timeTravel() exists; @ngrx/signals has no undo primitive',
+      best: 'SignalTree — restoration() exists; @ngrx/signals has no undo primitive',
       usual: 'Hand-rolled snapshot history, which is the 216.96 ms arm',
     },
     {

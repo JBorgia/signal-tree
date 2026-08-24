@@ -2,17 +2,17 @@ import { describe, expect, it } from 'vitest';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../restoration/restoration';
+import { restoration } from '../restoration/restoration';
 import { transactions } from './transactions';
 import { undoable } from '../../lib/undoable';
 
 /**
- * TX-SURFACE-0 — does `timeTravel().transaction()` deserve to exist?
+ * TX-SURFACE-0 — does `restoration().transaction()` deserve to exist?
  *
- * > NULL: `timeTravel()`'s `transaction()` has no independently owned public
+ * > NULL: `restoration()`'s `transaction()` has no independently owned public
  * > role and should be deleted in favour of `transactions()`.
  *
- * Context: `RestorationMethods extends TransactionMethods`, so `timeTravel()`
+ * Context: `RestorationMethods extends TransactionMethods`, so `restoration()`
  * ships a SECOND `transaction()` implementation — and TX-LEDGER-0 measured that
  * one to be the less correct of the two, because its rollback dependency check
  * reads the restoration history rather than its own captured effects.
@@ -54,19 +54,19 @@ const probeRollbackOwner = async (
 };
 
 describe('TX-SURFACE-0: the duplicate transaction() surface', () => {
-  it('ENHANCER ORDER — transactions() then timeTravel()', async () => {
+  it('ENHANCER ORDER — transactions() then restoration()', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [transactions(), timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [transactions(), restoration({ maxHistorySize: 50 })] }
     );
     await flush();
     expect(await probeRollbackOwner(tree)).toBe('later-confirmed-dependency');
   });
 
-  it('ENHANCER ORDER — timeTravel() then transactions()', async () => {
+  it('ENHANCER ORDER — restoration() then transactions()', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
+      { enhancers: [restoration({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
     // ⚠️ NOTE ON WHAT THIS DOES AND DOES NOT PROVE. Both orders return the same
@@ -78,10 +78,10 @@ describe('TX-SURFACE-0: the duplicate transaction() surface', () => {
     expect(await probeRollbackOwner(tree)).toBe('later-confirmed-dependency');
   });
 
-  it('CASE 6 — timeTravel() alone no longer answers transaction() at all', async () => {
+  it('CASE 6 — restoration() alone no longer answers transaction() at all', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [restoration({ maxHistorySize: 50 })] }
     );
     await flush();
 
@@ -100,7 +100,7 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       {
         enhancers: [
-          timeTravel({
+          restoration({
             maxHistorySize: 50,
           }),
           transactions(),
@@ -128,7 +128,7 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       {
         enhancers: [
-          timeTravel({
+          restoration({
             maxHistorySize: 50,
           }),
           transactions(),
@@ -157,7 +157,7 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
     // THE OWNERSHIP STORY, end to end:
     //   transactions() groups the authored work
     //   undoable()     admits the resulting causal turn
-    //   timeTravel()   restores admitted turns
+    //   restoration()   restores admitted turns
     // No subsystem impersonating another.
     expect(tree.$.rows.ids()).toEqual([]);
   });

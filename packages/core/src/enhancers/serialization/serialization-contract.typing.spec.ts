@@ -11,7 +11,7 @@
  *     replace tree identity, unlike the three enhancers migrated before it.
  *   - `SerializationMethods` has no `this`, no conditional types and no state
  *     generic — every payload is `SerializedState<unknown>`. So there is no
- *     receiver-derived precision to lose here, which is what made `timeTravel`
+ *     receiver-derived precision to lose here, which is what made `restoration`
  *     risky. Recorded as a MEASURED fact, not an assumption carried over.
  *   - It is CONSUMED INTERNALLY by `persistence()`, which applies
  *     `serialization(config)(tree)` inside its own body. That coupling is why

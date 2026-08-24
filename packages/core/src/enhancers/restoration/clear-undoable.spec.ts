@@ -2,7 +2,7 @@
  * `clear()` IS UNDOABLE — fixed in 15.0, pinned so it cannot silently regress.
  *
  * It was not. `clear()` tombstoned every subject and told the notifier nothing,
- * so the turn timeTravel recorded carried no structural effect:
+ * so the turn restoration recorded carried no structural effect:
  *
  *     rows.setAll([a, b]);  rows.clear();
  *     tree.canUndo()  ->  true
@@ -37,7 +37,7 @@
 import { entityMap } from '../../lib/markers/entity-map';
 import { undoable } from '../../lib/undoable';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 type Row = { id: string; v: number };
 
@@ -46,7 +46,7 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 const makeTree = () =>
   signalTree(
     { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-    { enhancers: [timeTravel({ maxHistorySize: 24 })] }
+    { enhancers: [restoration({ maxHistorySize: 24 })] }
   );
 
 const seeded = async () => {
@@ -63,7 +63,7 @@ const seeded = async () => {
   return tree;
 };
 
-describe('time-travel — clear() is undoable', () => {
+describe('restoration — clear() is undoable', () => {
   it('CONTROL: undoing individual removals restores the rows', async () => {
     const tree = await seeded();
 

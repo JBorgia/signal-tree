@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../restoration/restoration';
+import { restoration } from '../restoration/restoration';
 import { transactions } from './transactions';
 
 /**
@@ -12,19 +12,19 @@ import { transactions } from './transactions';
  * later dependent write was no longer admitted to history. Before designing any
  * ledger, one question decides how large the problem is:
  *
- * > does rollback dependency safety work when `timeTravel()` is NOT installed?
+ * > does rollback dependency safety work when `restoration()` is NOT installed?
  *
  * Required relationship:
  *
  *   transactions()  requires causal-runtime facts
- *   timeTravel()    requires causal-runtime facts
- *   transactions()  does NOT require timeTravel()
+ *   restoration()    requires causal-runtime facts
+ *   transactions()  does NOT require restoration()
  *
  * MEASURED: it holds. `transactions()` refuses identically with and without
- * `timeTravel()`, and with the same refusal KIND, because it builds its
+ * `restoration()`, and with the same refusal KIND, because it builds its
  * dependency store from ITS OWN captured effects rather than from the history.
  *
- * That scopes the category-C defect to one path — `timeTravel()`'s own
+ * That scopes the category-C defect to one path — `restoration()`'s own
  * `transaction()`, whose `getPendingRollbackPlan` reads `this.history` — and
  * means a correct reference implementation already exists in this repository.
  */
@@ -40,11 +40,11 @@ const flush = async () => {
 const refusalKind = (error: unknown): unknown =>
   (error as { cause?: { kind?: unknown } })?.cause?.kind;
 
-describe('TX-LEDGER-0 case 6: rollback safety without timeTravel()', () => {
-  it('refuses a dependent rollback with timeTravel() installed', async () => {
+describe('TX-LEDGER-0 case 6: rollback safety without restoration()', () => {
+  it('refuses a dependent rollback with restoration() installed', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
+      { enhancers: [restoration({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
 

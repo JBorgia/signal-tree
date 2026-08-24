@@ -53,7 +53,7 @@ const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
  * was crossed.
  *
  * - `merge`     — `tree(partial)`. A partial write from application code.
- * - `restore`   — `timeTravel` undo/redo/jumpTo. Same process; an in-flight
+ * - `restore`   — `restoration` undo/redo/jumpTo. Same process; an in-flight
  *                 request may genuinely still be running, so transient state is
  *                 restored VERBATIM.
  * - `rehydrate` — `deserialize` from storage. A process boundary was crossed and

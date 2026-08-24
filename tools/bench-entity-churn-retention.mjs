@@ -34,7 +34,7 @@
  * itself as EARNED — the subject can be restored. The arms below test whether
  * anything is in a position to do that: restoration is reachable only through
  * `__restoreOne` / `__planRestore`, which are non-enumerable and consumed only
- * by the causal-runtime adapter behind `timeTravel()`. If a tree with no
+ * by the causal-runtime adapter behind `restoration()`. If a tree with no
  * history enhancer retains exactly as much as one with it, the retention is not
  * conditioned on a restorer existing, and "earned by the restore contract" is
  * not available as an explanation for that part.
@@ -83,13 +83,13 @@ const ARMS = {
     readNodes: true,
   },
   'time-travel': {
-    label: 'timeTravel() attached, no node reads',
+    label: 'restoration() attached, no node reads',
     detail: 'a restorer EXISTS — does retention differ?',
     history: true,
     readNodes: false,
   },
   'time-travel-reads': {
-    label: 'timeTravel() attached, byId() every row every round',
+    label: 'restoration() attached, byId() every row every round',
     detail: 'restorer plus observation',
     history: true,
     readNodes: true,
@@ -105,13 +105,13 @@ if (armFlag !== -1) {
     console.error(`unknown arm: ${name}`);
     process.exit(1);
   }
-  const { signalTree, entityMap, timeTravel } = await import(CORE);
+  const { signalTree, entityMap, restoration } = await import(CORE);
 
   // v15: declared, so the no-history arm no longer carries the causal-runtime
   // plan that late `.with()` forced on every tree.
   const tree = signalTree(
     { rows: entityMap({ selectId: (r) => r.id }) },
-    { enhancers: a.history ? [timeTravel({ maxHistorySize: 10_000 })] : [] }
+    { enhancers: a.history ? [restoration({ maxHistorySize: 10_000 })] : [] }
   );
   const generation = (g) => {
     const d = [];

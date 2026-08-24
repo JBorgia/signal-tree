@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { undoable } from './undoable';
 
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 
 /**
@@ -60,7 +60,7 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
   it('PATH A: a preserved Angular signal is NOT captured by undo', async () => {
     const tree = signalTree(
       { counter: makeCounterSignal(10) },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     undoable(() => (tree.$.counter as CounterA).increment());
     await flush();
@@ -75,7 +75,7 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
   });
 
   it('PATH B: ordinary canonical state IS captured by undo', async () => {
-    const tree = signalTree({ counter: 10 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ counter: 10 }, { enhancers: [restoration()] });
     const api = makeCounterApi(tree.$.counter);
 
     // Designated: the question this test asks is whether ordinary canonical

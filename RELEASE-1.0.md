@@ -1657,7 +1657,7 @@ from the 15.0 work, and they look nothing alike until you line them up:
 | ------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- |
 | Is the SDK neutral?                         | module-graph traversal                                 | retained runtime / declaration closure      |
 | Does variadic `.with()` work?               | neutral tuple, realization enhancer chained separately | a realization enhancer INSIDE the tuple     |
-| Does `T` flow through `timeTravel`?         | annotated call sites                                   | unannotated inferred consumer type          |
+| Does `T` flow through `restoration`?         | annotated call sites                                   | unannotated inferred consumer type          |
 | Is the declaration valid?                   | source typecheck                                       | packed `.d.ts`, consumer compile            |
 | Did the build succeed?                      | absence of `error TS`                                  | exit 0 AND artifact exists                  |
 | Is the API unchanged?                       | exported symbol names                                  | public type contract                        |
@@ -1668,7 +1668,7 @@ Corollary, and it is not a consolation prize: **optimize for cheaper, earlier,
 more decisive failures — not for fewer failed experiments.** Every falsifier
 that fired in this work improved the architecture rather than merely blocking
 a change. The heterogeneous `.with()` failure exposed the neutral/realization
-distinction; the `TimeTravelMethods<T>` falsifier produced the polymorphic
+distinction; the `RestorationMethods<T>` falsifier produced the polymorphic
 `this` design; the emitted-declaration failure exposed a shipped-package
 defect that predated the work entirely; the failed barrel probe eliminated a
 whole class of API "fixes" that would have widened the public surface to
@@ -1872,7 +1872,7 @@ disposition:**
 
 ```
 transactions   tree acquires transaction semantics        ENHANCER plausible
-timeTravel     temporal/causal capability                 installation form UNPROVEN;
+restoration     temporal/causal capability                 installation form UNPROVEN;
                                                           causal owner already matters
 batching       notification timing of realization         UNPROVEN — may be
                                                           publication-side
@@ -3582,7 +3582,7 @@ controls that pass only if the shipped types are precise:
 | `HydrateMode`      | all four members accepted; `'nope'` rejected                                                                                     |
 | `createFormSignal` | callable at its emitted signature (the value re-export the differential cannot see)                                              |
 | `entityMap`        | `DefaultKey` / computed-slice declarations resolve                                                                               |
-| `timeTravel`       | `entry.state.count: number`, `.profile.name: string`, rejects `string` — receiver-derived inference surviving the packed `.d.ts` |
+| `restoration`       | `entry.state.count: number`, `.profile.name: string`, rejects `string` — receiver-derived inference surviving the packed `.d.ts` |
 
 One failure during construction was correctly classified as a FIXTURE defect, not a
 package defect: the fixture invented an `initial` member on `EntityConfig`. No
@@ -3667,7 +3667,7 @@ while another failed:
 
 | dimension             | question                                  | failure it missed                                                                                                                                            |
 | --------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Export inventory      | what names exist?                         | `TimeTravelMethods<T>` -> `TimeTravelMethods` (arity change, symbol set identical); `StateOf` (inventory clean, declaration invalid)                         |
+| Export inventory      | what names exist?                         | `RestorationMethods<T>` -> `RestorationMethods` (arity change, symbol set identical); `StateOf` (inventory clean, declaration invalid)                         |
 | Public type contracts | what do those names mean to TypeScript?   | not yet systematic — targeted contract tests are sufficient for 1.0. `SignalTree<T>` is now covered by `signal-tree-type-matrix.typing.spec.ts` (`9f0d1464`) |
 | Declaration closure   | can the shipped types be consumed at all? | the entity-map blocker above                                                                                                                                 |
 
@@ -4566,7 +4566,7 @@ requires:  non-empty declarations in production      ZERO
 provides:  six declarations, and FIVE RESTATE `name`
            batching     -> ['batching']
            devTools     -> ['devTools']
-           timeTravel   -> ['timeTravel']
+           restoration   -> ['restoration']
            transactions -> ['transactions']
            serialization-> ['serialization']
            persistence  -> ['persistence','serialization']   <- the only one that
@@ -4653,7 +4653,7 @@ neither implies any replacement design:
 2. ~~Delete `composeEnhancers`.~~ **DONE** — characterized `2f46115b`, deleted
    `6c3d73a8`, equivalence claim refuted and corrected `d09525d6`, migration
    `2ae531c1`. See "Slice 2" below.
-3. ~~Migrate remaining built-ins to `Enhancer<Methods>`, one at a time.~~ **DONE** — all six migrated, one per commit: `batching` `cc7ad43f`, `timeTravel` `cfbd4985`, `devTools` `a0ebaf3f`, `serialization` `7850acf8`, `persistence` `37e59e1c`, `transactions` `5fa0053e`. Protocol prerequisites first: capability authority `681ffb8e`, continuity across identity replacement `7a6bd4c9`. <- item #4 is NEXT
+3. ~~Migrate remaining built-ins to `Enhancer<Methods>`, one at a time.~~ **DONE** — all six migrated, one per commit: `batching` `cc7ad43f`, `restoration` `cfbd4985`, `devTools` `a0ebaf3f`, `serialization` `7850acf8`, `persistence` `37e59e1c`, `transactions` `5fa0053e`. Protocol prerequisites first: capability authority `681ffb8e`, continuity across identity replacement `7a6bd4c9`. <- item #4 is NEXT
    **Also owns the `requires` namespace defect** found in slice 2 (below), and
    the transitional tests in `planned-enhancer-dependencies.spec.ts` that record
    it. Those tests are NOT a compatibility contract — changing the behaviour
@@ -4672,7 +4672,7 @@ neither implies any replacement design:
 
    **Also delete the three built-in `.with()` overrides** (`batching.ts:355`,
    `time-travel.ts:2820`, `devtools-impl.ts:1733`). `7a6bd4c9` made the
-   canonical `with` overwrite them on adoption. `batching`'s and `timeTravel`'s
+   canonical `with` overwrite them on adoption. `batching`'s and `restoration`'s
    are then dead machinery; `devTools`' is NOT — see the correction below —
    but under Rule 0e the canonical path should be the SOLE owner, not merely the
    winner. Do not keep them because the fix tolerates them.
@@ -5081,7 +5081,7 @@ consulted for ORDERING and ignored for VALIDATION.
 **Why every built-in hides the defect:** all of them declare `name ===
 provides[0]` (`batching`/`['batching']`, `devTools`/`['devTools']`,
 `transactions`/`['transactions']`, `serialization`/`['serialization']`,
-`timeTravel`/`['timeTravel']`). The accidental intersection is satisfied, so
+`restoration`/`['restoration']`). The accidental intersection is satisfied, so
 nothing in-repo fails. `persistence` is the one built-in that declares a second
 capability, and that second capability is exactly what does not work.
 
@@ -5182,7 +5182,7 @@ validation, no capability publication.
 This is the SAME defect class as `composeEnhancers` — a fail-closed check
 bypassed by an alternate application path — and it **defeats the `681ffb8e`
 repair in exactly the configurations most real apps use**, since batching,
-devTools and timeTravel are the common enhancers. The protocol is disabled for
+devTools and restoration are the common enhancers. The protocol is disabled for
 the remainder of the chain from the moment any of them is applied.
 
 **Why this is not a #3b sub-task.** MEASURED: the bookkeeping
@@ -5215,7 +5215,7 @@ C  REPLACE -> requires[missing]                       must FAIL before it runs
 D  REPLACE -> A -> A                                  duplicate must FAIL
 E  REPLACE -> throwing provides[cap] -> requires[cap] contributes NEITHER
 F  REPLACE -> B                                       B receives CURRENT tree
-G  provider -> batching -> timeTravel -> requires[provider cap]
+G  provider -> batching -> restoration -> requires[provider cap]
                                                       survives MULTIPLE handoffs
 ```
 
@@ -5331,7 +5331,7 @@ direct measure; the text search was a proxy.
 
 ```
 batching    pure forwarder                      -> vestigial, safe to delete
-timeTravel  pure forwarder                      -> vestigial, safe to delete
+restoration  pure forwarder                      -> vestigial, safe to delete
 devTools    forwarder + composition reporting   -> NOT vestigial
 ```
 
@@ -5418,7 +5418,7 @@ CANDIDATE SUBSTRATE. It has attractive ingredients — `MutationEnvelope` carrie
 semantic identity, the class imports zero Angular, and `emitOwnedMutation`
 already forwards envelopes into it — but the join test is decisive against
 promoting it: **ordinary leaf writes produce ZERO events through it**, with or
-without `timeTravel()`. Calling it "already exists" would repeat the exact error
+without `restoration()`. Calling it "already exists" would repeat the exact error
 this queue keeps making: promoting a discovered implementation into the
 architecture before its semantics are shown to match the endpoint.
 
@@ -7400,9 +7400,9 @@ A capability needing transitions can still land as
 observer API**, preserving the null design at the SDK level. Only X1c reaching
 "yes" creates public surface.
 
-**AND NOT WITH `timeTravel`.**
+**AND NOT WITH `restoration`.**
 
-`timeTravel` is a CONTAMINATED candidate: it IS the authority that owns causal
+`restoration` is a CONTAMINATED candidate: it IS the authority that owns causal
 history, so of course undo needs before/after. That proves only "causal history
 needs transition information", which is already frozen — and using it would
 falsely resurrect `MutationEnvelope` as a public concept because the causal
@@ -7612,7 +7612,7 @@ schema           tier 2. Observe-only by design, needs attribution for
 guardrails       tier 2. Authoring-time diagnostics, reports.        CLEAN
 devTools         tier 2 for state; publication timing is Angular's.  CLEAN
 persistence      CONSEQUENCE, already governed.                      CLEAN
-timeTravel       tier 2 + causal axis. OPEN: does recording need more
+restoration       tier 2 + causal axis. OPEN: does recording need more
                  than an observer can see? MUT-2.              NEEDS MUT-2
 transactions     NOT an extension of this model — it DEFINES the semantic
                  unit that tier 2 observes.                          CLEAN
@@ -8204,7 +8204,7 @@ it is corrected here rather than left standing.
 Two further measurements, both negative, that narrow the search:
 
 - `getPathNotifier().subscribe('**', …)` receives NOTHING for plain leaf writes,
-  with or without `timeTravel()` applied. So the new capture path is not
+  with or without `restoration()` applied. So the new capture path is not
   silently taking over delivery either — nobody observes those writes.
 - `emitOwnedMutation` early-returns when `positionIds?.[0]` is `undefined`, and
   plain leaves have no positionIds. That is consistent with the silence but does
@@ -8638,7 +8638,7 @@ form({ history: history() }).undo()
         values   'Ada'                        CORRECT
         touched  { name: true, age: true }    NOT restored
 
-.with(timeTravel()) -> tree.undo()
+.with(restoration()) -> tree.undo()
         values   { name: 'Ada', age: 0 }      CORRECT
         touched  { name: true, age: true }    NOT restored
 ```
@@ -8647,7 +8647,7 @@ Descriptively, why: `history()` records `project(ctx.read())` -- values only --
 so the snapshot/hydrate pair that carries `touched` is not the path
 `form({ history })` undo uses; it keeps its own buffer. And `touch()` /
 `touchAll()` do not `announce`, `recordHistory` or `schedulePersist`, measured
-directly: a `touch()` plus a `touchAll()` leave `tree.getHistory().length`
+directly: a `touch()` plus a `touchAll()` leave `tree.getRestorationHistory().length`
 unchanged, so no entry ever exists at a distinct touched state. (Free
 consequence nobody has claimed: a touch alone therefore never persists either.)
 
@@ -8805,8 +8805,8 @@ Six candidates, none granted in advance.
 wrapper:**
 
 ```
-CAUSAL ATTRIBUTION   a submit records nothing; getHistory() unchanged under
-                     timeTravel
+CAUSAL ATTRIBUTION   a submit records nothing; getRestorationHistory() unchanged under
+                     restoration
 WRITE GATING         the tree stays writable mid-submit; patch() lands
 ERROR OWNERSHIP      a throwing handler propagates exactly as the null does, and
                      no error is retained (`submitError`, `lastError`: undefined)
@@ -8970,8 +8970,8 @@ that happens to be reachable through a marker. Two more measurements confirm it
 is not tree state in any operational sense:
 
 ```
-timeTravel undo    values rewind 'Grace' -> 'Ada'; currentStep STAYS 1
-two next() calls   tree.getHistory().length UNCHANGED
+restoration undo    values rewind 'Grace' -> 'Ada'; currentStep STAYS 1
+two next() calls   tree.getRestorationHistory().length UNCHANGED
 ```
 
 So navigation is not persisted, not undone, not serialized, and not recorded.
@@ -9079,7 +9079,7 @@ CONSTRUCTION?  NO.
 ```
 marked.$.p.patch({ name: 'Grace' })    -> { name: 'Grace', age: 36 }
 plain.$.p({ name: 'Grace' })           -> { name: 'Grace', age: 36 }
-both record history under timeTravel
+both record history under restoration
 ```
 
 **And the plain branch write is MORE capable: it merges at EVERY DEPTH.**
@@ -9200,17 +9200,17 @@ Not a `form()` question, and it outlives every deletion above. Narrowed by
 one-variable experiment:
 
 ```
-form-marker patch + a second WRITTEN timeTravel tree   THROWS
+form-marker patch + a second WRITTEN restoration tree   THROWS
     Error: Unsupported scoped undo effect at structural-drift
     time-travel.ts:2175 -> applyTurnEffectsThroughRealizationPort
 
-form-marker patch + a second IDLE timeTravel tree      CLEAN
+form-marker patch + a second IDLE restoration tree      CLEAN
 form-marker patch, its tree ALONE                      CLEAN
-two PLAIN timeTravel trees, both written               CLEAN
+two PLAIN restoration trees, both written               CLEAN
 ```
 
 **Both conditions are required**: a `form()` marker write AND a concurrent write
-to an unrelated `timeTravel()` tree. Two plain trees do not contaminate each
+to an unrelated `restoration()` tree. Two plain trees do not contaminate each
 other, so this is not generic time-travel scoping -- the marker's write is what
 makes the difference.
 
@@ -9228,7 +9228,7 @@ requires a form-marker write, so all of these remain live:
 
 ```
 form emits incorrectly scoped effects
-timeTravel stores global / shared state
+restoration stores global / shared state
 the realization port mixes identities
 marker hydration uses process-global metadata
 an interaction of two otherwise-correct mechanisms
@@ -9242,7 +9242,7 @@ inverted expectations on `main`.
 The record above concludes:
 
 > **Both conditions are required**: a `form()` marker write AND a concurrent
-> write to an unrelated `timeTravel()` tree. Two plain trees do not contaminate
+> write to an unrelated `restoration()` tree. Two plain trees do not contaminate
 > each other, so this is not generic time-travel scoping.
 
 **Neither condition is required.** The same guard refuses undo with **one tree,
@@ -9250,7 +9250,7 @@ no marker, and no second tree at all**. The only requirement is that a leaf's
 value is not scalar:
 
 ```text
-ONE plain tree, no marker, .with(timeTravel())
+ONE plain tree, no marker, .with(restoration())
 
   n: 0            number   undo OK
   s: ''           string   undo OK
@@ -9580,8 +9580,8 @@ Resolved by recording it here verbatim, as evidence rather than as a live test:
 // THROWS: Unsupported scoped undo effect at structural-drift
 const marked = signalTree({
   p: form<Profile>({ initial: { name: 'Ada', age: 36 } }),
-}).with(timeTravel());
-const other = signalTree({ q: { n: 1 } }).with(timeTravel());
+}).with(restoration());
+const other = signalTree({ q: { n: 1 } }).with(restoration());
 await tick();
 
 marked.$.p.patch({ name: 'Grace' });
@@ -10260,7 +10260,7 @@ Started from the corrected question rather than an inventory:
 
 ```ts
 type CausalWriteMode = 'authoring' | 'realization';   // types.ts
-interface WriteAttribution { causalMode?: ...; source?: ...; intent?: ... }
+interface WriteAttribution { participation?: ...; source?: ...; intent?: ... }
 interface MutationEnvelope { positionId; path; ownerPath?; before; after;
                              kind; subjectId?; structural?; attribution?; }
 ```
@@ -10278,24 +10278,24 @@ notification's META does carry the distinction:
 AUTHORED write   path a.n   source null       meta { mutationIntent: 'replace' }
 UNDO             path a.n   source 'system'   meta { intent: 'system',
                                                      source: 'system',
-                                                     causalMode: 'realization',
+                                                     participation: 'realization',
                                                      positionIds: [3] }
-REDO             path a.n   source 'system'   causalMode 'realization'
+REDO             path a.n   source 'system'   participation 'realization'
 ```
 
 So the corrected R3 is (further qualified by MUT-2A):
 
 > **The notification PATH cannot separate authored from realized. The
 > notification META can, on two independent channels (`source === 'system'` and
-> `causalMode === 'realization'`).**
+> `participation === 'realization'`).**
 
 A consumer using path alone is wrong; a consumer reading meta is not.
 
 #### THE ARCHITECTURAL FINDING — the marking is ASYMMETRIC
 
 ```
-REALIZATION   POSITIVELY MARKED     causalMode: 'realization', source: 'system'
-AUTHORING     NOT MARKED AT ALL     no causalMode; only mutationIntent
+REALIZATION   POSITIVELY MARKED     participation: 'realization', source: 'system'
+AUTHORING     NOT MARKED AT ALL     no participation; only mutationIntent
 ```
 
 **Authorship is signalled by ABSENCE.** `CausalWriteMode` names two modes, but
@@ -10305,7 +10305,7 @@ being there.
 That is fragile in a specific, nameable way:
 
 ```
-any write path that FORGETS to stamp causalMode is SILENTLY CLASSIFIED AS
+any write path that FORGETS to stamp participation is SILENTLY CLASSIFIED AS
 AUTHORED — the default is the semantically stronger claim.
 ```
 
@@ -10352,7 +10352,7 @@ relies on it for correctness, and what happens when nobody establishes it.
 
 #### CORRECTION 2 — "two independent channels" -> two CORRELATED indicators
 
-`source === 'system'` and `causalMode === 'realization'` were observed together
+`source === 'system'` and `participation === 'realization'` were observed together
 on undo and redo. They may be two fields stamped from ONE ambient context.
 Independence needs a divergence test — can either occur without the other? —
 which was not run. Recorded as **two correlated indicators**, so we do not
@@ -10367,7 +10367,7 @@ defaulting rule to exist. **It does**, and the whole of it is four lines:
 
 ```ts
 // packages/core/src/lib/causal-write-mode.ts
-export const getCausalWriteMode = (meta?: Pick<UpdateMetadata, 'causalMode'> | undefined): CausalWriteMode => meta?.causalMode ?? 'authoring';
+export const getCausalWriteMode = (meta?: Pick<WriteMetadata, 'participation'> | undefined): CausalWriteMode => meta?.participation ?? 'authoring';
 ```
 
 #### THE FULL TRACE
@@ -10403,7 +10403,7 @@ IT MARKS EXCEPTIONS. Authorship is never written, only synthesized by `??`.
 
 And the falsifier resolves cleanly:
 
-> _"If I construct a landed change with no `causalMode`, what surviving semantic
+> _"If I construct a landed change with no `participation`, what surviving semantic
 > consumer treats it differently from one explicitly marked `'authoring'`?"_
 
 ```
@@ -10503,16 +10503,16 @@ Physically identical write, otherwise eligible for capture, differing in
 transport path is identical.
 
 ```
-                                   causalMode      HISTORY d   value
+                                   participation      HISTORY d   value
 no write context at all            (absent)        +1          1
-A  { causalMode: 'realization',
+A  { participation: 'realization',
      source: 'system',
      intent: 'system' }            realization      0          1
 B  { source: 'system',
      intent: 'system' }            (absent)        +1          1
 ```
 
-**A and B differ only in `causalMode`. B produced a history entry that A did
+**A and B differ only in `participation`. B produced a history entry that A did
 not.**
 
 ```
@@ -10533,23 +10533,23 @@ than argued. It says nothing yet about how many semantic states exist.
 #### A DIVERGENCE RESULT, obtained for free
 
 Amendment 2 of MUT-2A recorded `source === 'system'` and
-`causalMode === 'realization'` as CORRELATED INDICATORS pending a divergence
+`participation === 'realization'` as CORRELATED INDICATORS pending a divergence
 test. **Arm B is that test.** It carries `source: 'system'` and `intent:
-'system'` WITHOUT `causalMode`, and it was captured anyway.
+'system'` WITHOUT `participation`, and it was captured anyway.
 
 ```
 source: 'system' occurred WITHOUT the exclusion behaviour
--> for the capture gate, `causalMode` is LOAD-BEARING and `source` is NOT
+-> for the capture gate, `participation` is LOAD-BEARING and `source` is NOT
 ```
 
 They are correlated in EMISSION but not equivalent in EFFECT. The reverse
-direction — `causalMode: 'realization'` without `source: 'system'` — is still
+direction — `participation: 'realization'` without `source: 'system'` — is still
 unmeasured.
 
 #### THE STRUCTURAL FINDING — normalization happens at READ TIME
 
 ```
-transport   causalMode?: CausalWriteMode        OPTIONAL
+transport   participation?: CausalWriteMode        OPTIONAL
 consumer    getCausalWriteMode(meta)            SUPPLIES THE SEMANTIC DEFAULT
 ```
 
@@ -10608,7 +10608,7 @@ and a four-rung ladder:
 no ambient context                                        d +1
 empty ambient context {}                                  d +1
 { source:'system', intent:'system' }                      d +1
-{ source:'system', intent:'system', causalMode:'realization' }   d  0
+{ source:'system', intent:'system', participation:'realization' }   d  0
 ```
 
 **The MODE FIELD is decisive, not the presence of a context.** The first three
@@ -10618,7 +10618,7 @@ gate.
 
 ### MUT-2C — OWNERSHIP AND FORGEABILITY
 
-> **Is `causalMode` merely transport for a fact owned by the causal kernel, or
+> **Is `participation` merely transport for a fact owned by the causal kernel, or
 > can ordinary authoring code MANUFACTURE that fact?**
 
 `withWriteContext` is exported from `@signaltree/core/authoring`, which
@@ -10626,7 +10626,7 @@ gate.
 hypothetical.
 
 ```ts
-withWriteContext({ causalMode: 'realization' }, () => {
+withWriteContext({ participation: 'realization' }, () => {
   tree.$.balance.set(1_000_000);
 });
 ```
@@ -10641,8 +10641,8 @@ HONEST CONTROL      1 000 000      +1        true
 claiming realization, lands in full and is suppressed from the MEASURED
 TIME-TRAVEL capture and undo surface.**
 
-**CORRECTED — the measured owner is `timeTravel()`, not "causal history".** The
-experiment used `.with(timeTravel())`, `tree.getHistory()` and `tree.canUndo()`.
+**CORRECTED — the measured owner is `restoration()`, not "causal history".** The
+experiment used `.with(restoration())`, `tree.getRestorationHistory()` and `tree.canUndo()`.
 Promoting that to canonical causal history would annex an authority MUT has not
 established, and the unified-substrate hypothesis is explicitly unproven.
 
@@ -10706,7 +10706,7 @@ Recorded, NOT yet run: MUT-3 derives the scope contract first.
 
 ```
 PROVED
-  causalMode changes the measured time-travel capture behaviour
+  participation changes the measured time-travel capture behaviour
   explicitly-realized       -> history d 0
   otherwise-identical unmarked -> history d +1
   the mode FIELD is decisive, not context presence
@@ -10803,7 +10803,7 @@ compared      what does SIGNALTREE ITSELF need to know about equality?
 
 ```
 1  FINISH MUT FIRST — their semantics depend on the contract
-     timeTravel · transactions · PathNotifier · interceptLeafSignals
+     restoration · transactions · PathNotifier · interceptLeafSignals
      devtools causal behaviour · batching (if mutation/publication affects it)
      the cross-tree undo defect
 
@@ -11115,7 +11115,7 @@ first real publish remains the RC task.
       and violated the `member exists != node exists` boundary at
       bulk-population time. Stubbing it left 1,794 core tests passing and failed
       11, all representation assertions in causal specs; a behavioural probe
-      with no envelope assertions found every observable public `timeTravel()`
+      with no envelope assertions found every observable public `restoration()`
       undo behaviour intact, and the real transaction suite passed 29/29 with
       position information removed from EVERY entry point including the
       hand-authored `draft.capture` inputs. REMOVE, ADD and REKEY were each

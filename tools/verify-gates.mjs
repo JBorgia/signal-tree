@@ -599,9 +599,9 @@ const GATES = [
   {
     name: 'bounded-history-retention',
     covers:
-      'a tree with a BOUNDED timeTravel() does not retain retired subjects without bound',
+      'a tree with a BOUNDED restoration() does not retain retired subjects without bound',
     // WAS REGISTERED RED, and closed by Step 8. Kept as a live gate rather than
-    // deleted: it is the only check that a bounded `timeTravel()` tree has
+    // deleted: it is the only check that a bounded `restoration()` tree has
     // bounded retained memory, which is a property two separate mechanisms have
     // to keep working — claim release at the eviction boundary, and the
     // per-subject prune of the realization descriptors. Either one silently

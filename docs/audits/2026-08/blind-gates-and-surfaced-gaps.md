@@ -1364,7 +1364,7 @@ The verdict lines in the tool flip with the data from a stated 50ns threshold.
   one component" row is marked `n/a` — it can now be filled with a
   measurement: raw signals are complete for that shape, and the number says
   so. **The answer to "why not raw signals" is not granularity — it is
-  capability**: `entityMap` semantics, markers, `timeTravel`, serialization.
+  capability**: `entityMap` semantics, markers, `restoration`, serialization.
   The container is a wash at small scale; the dependency's value begins where
   the 50-line hand-roll stops being 50 lines.
 - **The first draft of THIS tool shipped the error this repo keeps catching.**
@@ -1435,7 +1435,7 @@ tree, …` a dozen times — and report the **within-arm spread** beside the
 > **What I think the honest C5 answer is, for you to confirm or refute:** on a
 > small store the two are **within noise of each other**, the bare write tax is
 > real but ~5ns, and the case for the dependency is capabilities — `entityMap`,
-> markers, `timeTravel`, serialization — exactly as the hypothesis in C5 said,
+> markers, `restoration`, serialization — exactly as the hypothesis in C5 said,
 > but for a better reason than "raw wins": raw does not win. It ties. A tie is a
 > stronger argument for the container than a loss, and publishing a loss you
 > cannot reproduce would be the same defect this audit has been chasing for

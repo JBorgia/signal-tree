@@ -5,7 +5,7 @@ import { signalTree } from '../../lib/signal-tree';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { undoable } from '../../lib/undoable';
 import { withWriteContext } from '../../lib/write-context';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 import { transactions } from '../transactions/transactions';
 
 /**
@@ -36,7 +36,7 @@ const flush = async () => {
  * the enhancer methods on the inferred type.
  */
 const ttDesignated = () =>
-  timeTravel({ maxHistorySize: 50 });
+  restoration({ maxHistorySize: 50 });
 
 const makeTree = () =>
   signalTree(
