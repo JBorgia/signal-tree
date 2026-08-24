@@ -1,4 +1,5 @@
 import { computed } from '@angular/core';
+import { undoable } from '../../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
@@ -34,7 +35,7 @@ describe('canUndo tracks the history position', () => {
     const canUndo = computed(() => tree.canUndo());
     expect(canUndo()).toBe(false);
 
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     await flush();
 
     expect(canUndo()).toBe(true);
@@ -46,7 +47,7 @@ describe('canUndo tracks the history position', () => {
       { enhancers: [timeTravel({ maxHistorySize: 10 })] }
     );
     const canUndo = computed(() => tree.canUndo());
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     await flush();
 
     tree.undo();
@@ -68,7 +69,7 @@ describe('canUndo tracks the history position', () => {
     canUndo();
     const initial = evaluations;
 
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     await flush();
     canUndo();
 
@@ -83,7 +84,7 @@ describe('canRedo tracks BOTH the position and the history length', () => {
       { enhancers: [timeTravel({ maxHistorySize: 10 })] }
     );
     const canRedo = computed(() => tree.canRedo());
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     await flush();
     expect(canRedo()).toBe(false);
 
@@ -99,7 +100,7 @@ describe('canRedo tracks BOTH the position and the history length', () => {
       { enhancers: [timeTravel({ maxHistorySize: 10 })] }
     );
     const canRedo = computed(() => tree.canRedo());
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     await flush();
     tree.undo();
     await flush();
@@ -118,13 +119,13 @@ describe('canRedo tracks BOTH the position and the history length', () => {
       { enhancers: [timeTravel({ maxHistorySize: 10 })] }
     );
     const canRedo = computed(() => tree.canRedo());
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     await flush();
     tree.undo();
     await flush();
     expect(canRedo()).toBe(true);
 
-    tree.$.n.set(99);
+    undoable(() => tree.$.n.set(99));
     await flush();
 
     expect(canRedo()).toBe(false);
@@ -140,7 +141,7 @@ describe('getHistory is reactive', () => {
     const length = computed(() => tree.getHistory().length);
     const before = length();
 
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     await flush();
 
     expect(length()).toBe(before + 1);
@@ -152,9 +153,9 @@ describe('getHistory is reactive', () => {
       { enhancers: [timeTravel({ maxHistorySize: 10 })] }
     );
     const length = computed(() => tree.getHistory().length);
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     await flush();
-    tree.$.n.set(2);
+    undoable(() => tree.$.n.set(2));
     await flush();
     expect(length()).toBeGreaterThan(1);
 
@@ -173,7 +174,7 @@ describe('the imperative API is unchanged', () => {
     );
     expect(tree.canUndo()).toBe(false);
 
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     await flush();
     expect(tree.canUndo()).toBe(true);
     expect(tree.canRedo()).toBe(false);
@@ -190,7 +191,7 @@ describe('the imperative API is unchanged', () => {
       { enhancers: [timeTravel({ maxHistorySize: 3 })] }
     );
     for (let i = 1; i <= 6; i++) {
-      tree.$.n.set(i);
+      undoable(() => tree.$.n.set(i));
       await flush();
     }
     expect(tree.getHistory().length).toBeLessThanOrEqual(3);

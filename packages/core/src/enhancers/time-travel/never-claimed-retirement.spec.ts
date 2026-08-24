@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { entityMap } from '../../lib/markers/entity-map';
@@ -83,7 +84,7 @@ describe('never-claimed retirements', () => {
     // nothing claims it at the moment it retires.
     const WINDOW = 3;
     const tree = makeTree(WINDOW);
-    tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
     const subject = tree.$.rows.__acquireEntityHandleForTesting?.('a')
@@ -92,13 +93,13 @@ describe('never-claimed retirements', () => {
 
     // Churn other rows until `a`'s add entry falls out of the window.
     for (let i = 0; i < WINDOW * 3; i++) {
-      tree.$.rows.addOne({ id: `filler-${i}`, name: 'f' });
+      undoable(() => tree.$.rows.addOne({ id: `filler-${i}`, name: 'f' }));
       await tick();
       await tick();
     }
     expect(claims?.isClaimed(subject)).toBe(false);
 
-    tree.$.rows.removeOne('a');
+    undoable(() => tree.$.rows.removeOne('a'));
     // Synchronously after the mutation and before the flush: still unclaimed,
     // and now RETIRED. A sink that reclaimed here would destroy the backing the
     // entry about to be captured is going to claim.
@@ -129,10 +130,15 @@ describe('never-claimed retirements', () => {
     };
 
     for (let g = 0; g < 30; g++) {
-      tree.$.rows.setAll([
-        { id: `g${g}-a`, name: 'a' },
-        { id: `g${g}-b`, name: 'b' },
-      ]);
+      // Designated: this suite MEASURES restoration claims across authored
+      // churn. An undesignated write acquires no claims at all, so the
+      // measurement would be vacuously empty rather than informative.
+      undoable(() =>
+        tree.$.rows.setAll([
+          { id: `g${g}-a`, name: 'a' },
+          { id: `g${g}-b`, name: 'b' },
+        ])
+      );
       await tick();
       await tick();
       observe();
@@ -155,13 +161,13 @@ describe('never-claimed retirements', () => {
     const tree = makeTree(WINDOW);
     const claims = getSubjectRestorationClaims(tree);
 
-    tree.$.other.setAll([{ id: 'o1', name: 'x' }]);
+    undoable(() => tree.$.other.setAll([{ id: 'o1', name: 'x' }]));
     await tick();
     await tick();
     const otherSubject = tree.$.other.__acquireEntityHandleForTesting?.('o1')
       ?.subjectId as number;
 
-    tree.$.other.removeOne('o1');
+    undoable(() => tree.$.other.removeOne('o1'));
     await tick();
     await tick();
 
@@ -174,10 +180,10 @@ describe('never-claimed retirements', () => {
     // forward operation created, and an undo records no new entry — so if
     // anything were going to be retired without a claim, it would be these.
     const tree = makeTree(20);
-    tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
-    tree.$.rows.addOne({ id: 'b', name: 'Beta' });
+    undoable(() => tree.$.rows.addOne({ id: 'b', name: 'Beta' }));
     await tick();
     await tick();
 
@@ -207,20 +213,20 @@ describe('never-claimed retirements', () => {
     // 945 B/orphan slope was made of.
     const WINDOW = 3;
     const tree = makeTree(WINDOW);
-    tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
     const subject = tree.$.rows.__acquireEntityHandleForTesting?.('a')
       ?.subjectId as number;
 
-    tree.$.rows.removeOne('a');
+    undoable(() => tree.$.rows.removeOne('a'));
     await tick();
     await tick();
     const claims = getSubjectRestorationClaims(tree);
     expect(claims?.isClaimed(subject)).toBe(true);
 
     for (let i = 0; i < WINDOW * 3; i++) {
-      tree.$.rows.addOne({ id: `filler-${i}`, name: 'f' });
+      undoable(() => tree.$.rows.addOne({ id: `filler-${i}`, name: 'f' }));
       await tick();
       await tick();
     }

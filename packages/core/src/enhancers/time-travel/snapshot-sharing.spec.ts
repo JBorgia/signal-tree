@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { signalTree } from '../../lib/signal-tree';
 import { timeTravel } from './time-travel';
@@ -39,9 +40,9 @@ describe('time travel snapshot sharing', () => {
       { enhancers: [timeTravel()] }
     );
 
-    tree.$.a.x.set(10);
+    undoable(() => tree.$.a.x.set(10));
     await flush();
-    tree.$.a.x.set(20);
+    undoable(() => tree.$.a.x.set(20));
     await flush();
 
     const history = tree.getHistory();
@@ -54,7 +55,7 @@ describe('time travel snapshot sharing', () => {
 
   it('does not record a write that changed nothing', async () => {
     const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
-    tree.$.n.set(2);
+    undoable(() => tree.$.n.set(2));
     await flush();
     const before = tree.getHistory().length;
 
@@ -70,9 +71,9 @@ describe('time travel snapshot sharing', () => {
       { enhancers: [timeTravel()] }
     );
 
-    tree.$.a.x.set(10);
+    undoable(() => tree.$.a.x.set(10));
     await flush();
-    tree.$.b.y.set(20);
+    undoable(() => tree.$.b.y.set(20));
     await flush();
     expect(tree()).toMatchObject({ a: { x: 10 }, b: { y: 20 } });
 
@@ -87,13 +88,13 @@ describe('time travel snapshot sharing', () => {
     // must stay put. It does because a write builds NEW objects along the
     // changed path rather than mutating the old ones.
     const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
-    tree.$.n.set(2);
+    undoable(() => tree.$.n.set(2));
     await flush();
 
     const recorded = tree.getHistory().at(-1)?.state as { n: number };
     expect(recorded.n).toBe(2);
 
-    tree.$.n.set(3);
+    undoable(() => tree.$.n.set(3));
     await flush();
     expect(recorded.n).toBe(2);
   });

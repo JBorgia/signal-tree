@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
@@ -48,7 +49,7 @@ describe('P0-C C1 — scalar collision', () => {
     const tree = makeDoc();
     await flush();
 
-    tree.$.doc.title.set('A');
+    undoable(() => tree.$.doc.title.set('A'));
     await flush();
 
     realization(() => tree.$.doc.title.set('SERVER'));
@@ -69,10 +70,10 @@ describe('P0-C C2 — structural collision', () => {
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       { enhancers: [timeTravel({ maxHistorySize: 50 })] }
     );
-    tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]));
     await flush();
 
-    tree.$.rows.changeId('a', 'b');
+    undoable(() => tree.$.rows.changeId('a', 'b'));
     await flush();
 
     realization(() => tree.$.rows.changeId('b', 'c'));
@@ -97,8 +98,8 @@ describe('P0-C C3 — THE ATOMICITY CASE: mixed safe and unsafe in one turn', ()
     await flush();
 
     // ONE turn touching two locations.
-    tree.$.doc.title.set('A');
-    tree.$.doc.description.set('B');
+    undoable(() => tree.$.doc.title.set('A'));
+    undoable(() => tree.$.doc.description.set('B'));
     await flush();
 
     // Only ONE of them is superseded.
@@ -123,7 +124,7 @@ describe('P0-C C4 — the state machine after a refusal', () => {
     const tree = makeDoc();
     await flush();
 
-    tree.$.doc.title.set('A');
+    undoable(() => tree.$.doc.title.set('A'));
     await flush();
     const indexBefore = tree.getCurrentIndex();
 

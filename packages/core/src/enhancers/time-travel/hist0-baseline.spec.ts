@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
@@ -56,11 +57,11 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     await flush();
     const start = tree.getHistory().length;
 
-    tree.$.document.title.set('v2');
+    undoable(() => tree.$.document.title.set('v2'));
     await flush();
     const afterHistorical = tree.getHistory().length;
 
-    tree.$.ui.selectedPanel.set('inspector');
+    undoable(() => tree.$.ui.selectedPanel.set('inspector'));
     await flush();
     const afterUi = tree.getHistory().length;
 
@@ -72,12 +73,12 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
 
   it('case 3: a realization into a historical branch does NOT enter history', async () => {
     const tree = makeTree();
-    tree.$.document.title.set('v2');
+    undoable(() => tree.$.document.title.set('v2'));
     await flush();
     const before = tree.getHistory().length;
 
     withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
-      tree.$.document.title.set('from-server');
+      undoable(() => tree.$.document.title.set('from-server'));
     });
     await flush();
 
@@ -97,8 +98,8 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
 
     tree
       .transaction(() => {
-        tree.$.document.title.set('edited');
-        tree.$.ui.selectedPanel.set('inspector');
+        undoable(() => tree.$.document.title.set('edited'));
+        undoable(() => tree.$.ui.selectedPanel.set('inspector'));
       })
       .confirm();
     await flush();
@@ -121,15 +122,15 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     const tree = makeTree();
     await flush();
 
-    tree.$.document.title.set('A');
+    undoable(() => tree.$.document.title.set('A'));
     await flush();
-    tree.$.ui.selectedPanel.set('inspector');
+    undoable(() => tree.$.ui.selectedPanel.set('inspector'));
     await flush();
     withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
-      tree.$.document.body.set('server-body');
+      undoable(() => tree.$.document.body.set('server-body'));
     });
     await flush();
-    tree.$.document.title.set('D');
+    undoable(() => tree.$.document.title.set('D'));
     await flush();
 
     tree.undo();
@@ -152,11 +153,11 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     const tree = makeTree();
     await flush();
 
-    tree.$.document.title.set('A');
+    undoable(() => tree.$.document.title.set('A'));
     await flush();
 
     withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
-      tree.$.document.body.set('server-body');
+      undoable(() => tree.$.document.body.set('server-body'));
     });
     await flush();
 
@@ -179,7 +180,7 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     await flush();
     const held = tree.$.rows.byIdOrFail('a');
 
-    tree.$.rows.removeOne('a');
+    undoable(() => tree.$.rows.removeOne('a'));
     await flush();
     expect(held()).toBeUndefined();
 
@@ -192,7 +193,7 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
 
   it('case 9: what holds restoration claims when only part of the tree is "historical"', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'a', name: 'Ada' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'Ada' }]));
     await flush();
 
     const withRows = claims(tree);
@@ -200,7 +201,7 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     // A burst of pure-UI churn. Under a selective model none of this is
     // restorable, so none of it should acquire restoration rights.
     for (let i = 0; i < 20; i++) {
-      tree.$.ui.scrollTop.set(i);
+      undoable(() => tree.$.ui.scrollTop.set(i));
       await flush();
     }
 

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { createAuditTracker } from '../../lib/audit/audit';
 import { history } from '../../lib/form-history/form-history';
@@ -49,7 +50,7 @@ describe('6b — createAuditTracker samples on a timer', () => {
     await new Promise((r) => setTimeout(r, 120));
     const base = log.length;
 
-    tree.$.n.set(1);
+    undoable(() => tree.$.n.set(1));
     tree.$.n.set(2); // same window
     await new Promise((r) => setTimeout(r, 250));
     stop();
@@ -66,7 +67,7 @@ describe('6b — createAuditTracker samples on a timer', () => {
     await new Promise((r) => setTimeout(r, 120));
     const base = log.length;
 
-    tree.$.name.set('TEMP');
+    undoable(() => tree.$.name.set('TEMP'));
     tree.$.name.set('a'); // reverted in the same window
     await new Promise((r) => setTimeout(r, 250));
     stop();
@@ -77,7 +78,16 @@ describe('6b — createAuditTracker samples on a timer', () => {
 });
 
 describe('6c — undo() after deserialize() reverts the restore', () => {
-  // Recoverable via redo(), which is why this ranks below 6a. If it changes, update:
+  // ⏳ REPAIRED BY THE OPT-IN FLIP, and migrated with it rather than here.
+  //
+  // `deserialize()` is not an operation a user authored, so under opt-in
+  // eligibility it is never designated and never becomes an undo step. Measured:
+  // with the flip applied, `canUndo()` is false here and the first undo cannot
+  // discard the restore.
+  //
+  // This assertion still describes the CURRENT default, so it stays until the
+  // flip lands. Designating the restore to make the new assertion pass early
+  // would have reintroduced the defect. Docs to update at that point:
   //   docs/guides/time-travel-in-production.md
   //   TODO.md 6c
   it('the first undo discards the restored state, and redo brings it back', async () => {
@@ -85,7 +95,7 @@ describe('6c — undo() after deserialize() reverts the restore', () => {
       signalTree({ n: 0 }, { enhancers: [serialization(), timeTravel({})] });
 
     const source = make();
-    source.$.n.set(7);
+    undoable(() => source.$.n.set(7));
     await flush();
     const payload = source.serialize();
 
@@ -119,7 +129,7 @@ describe('6d — maxHistorySize validation (FIXED in 14.1.1)', () => {
     );
     await flush();
     for (let i = 1; i <= 10; i++) {
-      tree.$.n.set(i);
+      undoable(() => tree.$.n.set(i));
       await flush();
     }
     let spent = 0;

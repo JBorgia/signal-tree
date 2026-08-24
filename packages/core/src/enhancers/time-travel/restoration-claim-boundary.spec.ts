@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
@@ -71,7 +72,7 @@ describe('restoration claim boundary', () => {
   it('holds the invariant through max-size eviction', async () => {
     const tree = makeTree(5);
     for (let g = 0; g < 40; g++) {
-      tree.$.rows.setAll(seed(`g${g}`));
+      undoable(() => tree.$.rows.setAll(seed(`g${g}`)));
       await tick();
       await tick();
       expectInvariant(tree);
@@ -87,11 +88,11 @@ describe('restoration claim boundary', () => {
 
   it('holds the invariant through redo truncation after an undo', async () => {
     const tree = makeTree(20);
-    tree.$.rows.setAll(seed('a'));
+    undoable(() => tree.$.rows.setAll(seed('a')));
     await tick();
     await tick();
     for (let i = 0; i < 6; i++) {
-      tree.$.rows.addOne({ id: `x-${i}`, name: 'x', v: i });
+      undoable(() => tree.$.rows.addOne({ id: `x-${i}`, name: 'x', v: i }));
       await tick();
       await tick();
     }
@@ -105,7 +106,7 @@ describe('restoration claim boundary', () => {
 
     // A write here discards the redo branch; those entries' claims must go
     // with it.
-    tree.$.rows.addOne({ id: 'branch', name: 'b', v: 99 });
+    undoable(() => tree.$.rows.addOne({ id: 'branch', name: 'b', v: 99 }));
     await tick();
     await tick();
     expectInvariant(tree);
@@ -113,26 +114,26 @@ describe('restoration claim boundary', () => {
 
   it('holds the invariant through removals, changeId and clear', async () => {
     const tree = makeTree(8);
-    tree.$.rows.setAll(seed('a'));
+    undoable(() => tree.$.rows.setAll(seed('a')));
     await tick();
     await tick();
 
-    tree.$.rows.removeOne('a-1');
+    undoable(() => tree.$.rows.removeOne('a-1'));
     await tick();
     await tick();
     expectInvariant(tree);
 
-    tree.$.rows.changeId('a-2', 'a-2-renamed');
+    undoable(() => tree.$.rows.changeId('a-2', 'a-2-renamed'));
     await tick();
     await tick();
     expectInvariant(tree);
 
-    tree.$.rows.clear();
+    undoable(() => tree.$.rows.clear());
     await tick();
     await tick();
     expectInvariant(tree);
 
-    tree.$.rows.setAll(seed('b'));
+    undoable(() => tree.$.rows.setAll(seed('b')));
     await tick();
     await tick();
     expectInvariant(tree);
@@ -149,7 +150,7 @@ describe('restoration claim boundary', () => {
     );
 
     for (let i = 1; i <= 6; i++) {
-      tree.$.count.set(i);
+      undoable(() => tree.$.count.set(i));
       await tick();
       await tick();
     }
@@ -158,7 +159,7 @@ describe('restoration claim boundary', () => {
     tree.undo();
     await tick();
 
-    tree.$.label.set('branched');
+    undoable(() => tree.$.label.set('branched'));
     await tick();
     await tick();
 
@@ -179,7 +180,7 @@ describe('restoration claim boundary', () => {
   it('releases every owned claim on resetHistory, before turn ids restart', async () => {
     const tree = makeTree(20);
     for (let g = 0; g < 5; g++) {
-      tree.$.rows.setAll(seed(`g${g}`));
+      undoable(() => tree.$.rows.setAll(seed(`g${g}`)));
       await tick();
       await tick();
     }
@@ -201,7 +202,7 @@ describe('restoration claim boundary', () => {
   it('releases every owned claim on destroy', async () => {
     const tree = makeTree(20);
     for (let g = 0; g < 5; g++) {
-      tree.$.rows.setAll(seed(`g${g}`));
+      undoable(() => tree.$.rows.setAll(seed(`g${g}`)));
       await tick();
       await tick();
     }
@@ -222,7 +223,7 @@ describe('restoration claim boundary', () => {
     const churn = async (window: number, rounds: number) => {
       const tree = makeTree(window);
       for (let g = 0; g < rounds; g++) {
-        tree.$.rows.setAll(seed(`g${g}`, 3));
+        undoable(() => tree.$.rows.setAll(seed(`g${g}`, 3)));
         await tick();
         await tick();
       }

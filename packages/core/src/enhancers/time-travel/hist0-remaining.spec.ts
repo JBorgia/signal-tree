@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
@@ -31,8 +32,8 @@ describe('HIST-0 case 4: mixed writes in ONE untransacted turn', () => {
     const before = tree.getHistory().length;
 
     // No flush between them — one tick, therefore one turn.
-    tree.$.document.title.set('edited');
-    tree.$.ui.panel.set('inspector');
+    undoable(() => tree.$.document.title.set('edited'));
+    undoable(() => tree.$.ui.panel.set('inspector'));
     await flush();
 
     const turnsAdded = tree.getHistory().length - before;
@@ -84,7 +85,7 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     );
     await flush();
 
-    tree.$.document.title.set('A');
+    undoable(() => tree.$.document.title.set('A'));
     await flush();
 
     realization(() => tree.$.document.title.set('SERVER'));
@@ -103,7 +104,7 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     );
     await flush();
 
-    tree.$.document.title.set('A');
+    undoable(() => tree.$.document.title.set('A'));
     await flush();
     realization(() => tree.$.document.body.set('SERVER'));
     await flush();
@@ -122,10 +123,10 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       { enhancers: [timeTravel({ maxHistorySize: 50 })] }
     );
-    tree.$.rows.setAll([{ id: 'a', name: 'orig' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'orig' }]));
     await flush();
 
-    tree.$.rows.updateOne('a', { name: 'AUTHORED' });
+    undoable(() => tree.$.rows.updateOne('a', { name: 'AUTHORED' }));
     await flush();
     realization(() => tree.$.rows.updateOne('a', { name: 'SERVER' }));
     await flush();
@@ -146,7 +147,7 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     );
     await flush();
 
-    tree.$.document.title.set('A');
+    undoable(() => tree.$.document.title.set('A'));
     await flush();
     realization(() => tree.$.document.title.set('SERVER'));
     await flush();
@@ -171,7 +172,7 @@ describe('HIST-0 case 9: does observability create restoration ownership?', () =
     const claims = getSubjectRestorationClaims(tree);
 
     for (let g = 0; g < 40; g++) {
-      tree.$.rows.setAll([{ id: `g${g}`, name: 'n' }]);
+      undoable(() => tree.$.rows.setAll([{ id: `g${g}`, name: 'n' }]));
       await flush();
     }
 
