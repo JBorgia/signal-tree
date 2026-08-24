@@ -102,7 +102,6 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
         enhancers: [
           timeTravel({
             maxHistorySize: 50,
-            restorationEligibility: 'designated' as const,
           }),
           transactions(),
         ],
@@ -131,7 +130,6 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
         enhancers: [
           timeTravel({
             maxHistorySize: 50,
-            restorationEligibility: 'designated' as const,
           }),
           transactions(),
         ],

@@ -2367,17 +2367,21 @@ export function timeTravel(
     };
 
     /**
-     * HIST-C2 — THE admission predicate. Every record site consults this one
-     * function, so eligibility cannot drift between the flush path, the root
-     * path and the transaction path.
+     * THE admission predicate. Every record site consults this one function,
+     * so eligibility cannot drift between the flush path, the root path and the
+     * transaction path.
+     *
+     * It is now the identity of `designated`, because the `restorationEligibility`
+     * instrument that made it a choice was deleted once opt-in became the only
+     * semantic. The function stays rather than being inlined: it is the single
+     * place admission is decided, and that is worth a name.
      *
      * Gated BEFORE `buildTurn()` on purpose. `buildTurn` snapshots state, and
      * the whole point of HIST-C2 is that a non-reversible operation acquires no
      * restoration cost — gating at `insertConfirmedTurn()` would be the single
      * cleanest site semantically but would still pay for the snapshot.
      */
-    const isTurnEligible = (designated: boolean): boolean =>
-      config.restorationEligibility === 'all' || designated;
+    const isTurnEligible = (designated: boolean): boolean => designated;
     const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
       if (!ownerPath) {
         return undefined;

@@ -49,7 +49,6 @@ const designatedTree = () =>
       enhancers: [
         timeTravel({
           maxHistorySize: 50,
-          restorationEligibility: 'designated' as const,
         }),
       ],
     }
