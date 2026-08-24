@@ -4407,13 +4407,24 @@ external truth — a failure the type system cannot see.
 A candidate is rejected outright if:
 
 ```text
-T1  a cold reader cannot infer when to use it
+T1  SITUATIONAL AFFORDANCE — after the primitive has been taught ONCE, the
+    situation does not cue a developer to reach for this API
 T2  it attracts a major negative case (C8-C12)
 T3  it encourages wrapping authored consequences
 T4  its meaning depends on TRANSPORT rather than causal ownership
-T5  it looks ornamental next to a plain `.set()`
+T5  the name does not make the special door feel WARRANTED here — it reads as
+    ceremony rather than as a decision worth stating
 T6  it only works for HTTP / network acquisition
 ```
+
+> **⚠️ T1 and T5 WERE REPLACED IN PLACE, and the rejections below were re-derived
+> under the replacements.** Step 2 originally ran a cold-reader criterion ("an
+> unfamiliar developer cannot define it") and an ornamentation criterion, both of
+> which the revised north star rejects: SignalTree does not need names that
+> explain its causal model to someone who has never seen it, it needs names that
+> become obvious at the moment of use to someone who has. Every verdict that
+> depended on the old T1 or T5 is restated with its corrected reason rather than
+> left standing on a criterion no longer in force.
 
 Only survivors get compared. A table reading `realize 71 / incoming 83 /
 applyExternal 85` would let a disqualifying flaw be outscored by fluency.
@@ -4515,13 +4526,19 @@ naturally ends at the acquired write. **T3 fires for the event/source family.**
 ## The rejection ledger
 
 ```text
-realize()                  REJECT  T1
-  The incumbent. Requires SignalTree-specific vocabulary before the call site
-  means anything: a cold reader cannot infer WHEN to use it. Swift's guideline —
-  clarity at the point of use outranks brevity — is decisive against it.
+realize()                  REJECT  T1 (situational retrieval)
+  The incumbent, and it still loses under the corrected criterion — for a better
+  reason. Teach it once ("`realize()` applies externally acquired state"), then a
+  week later the developer is writing
+  `api.getTickets().subscribe(tickets => …)`. The situation does not cue the word
+  "realize"; nothing about a subscribe callback retrieves it. Compare the same
+  sentence taught for `applyExternal()`, where the situation and the word share
+  vocabulary.
+  The old reason — "a stranger cannot define it" — is withdrawn. The correct one
+  is POOR SITUATIONAL RETRIEVAL AFTER LEARNING.
   NOTE: `realized` survives as the participation VALUE. Values are READ in
-  metadata by people already holding the ontology; doors are TYPED by developers
-  who are not.
+  metadata by people already holding the ontology; doors are TYPED at the moment
+  a situation occurs. The asymmetry is the point.
 
 incoming()                 REJECT  T3, T4
   Best five-second read in the study, and it fails on the two heavyweights it
@@ -4535,13 +4552,21 @@ received()                 REJECT  T3, T4
   Everything above, worse: past-tense event description pulls even harder toward
   callback-wide wrapping.
 
-external()                 REJECT  T1, T3
-  No action at all — `external(() => …)` does not say what happens. Adjectival
-  names characterise the surrounding thing, which is the T3 failure again.
+external()                 RUNNER-UP  (was REJECT on the withdrawn T1)
+  The old rejection leaned on "no action at all — it does not say what happens",
+  which is a cold-reader complaint and no longer disqualifying. Under the
+  corrected criteria it survives: the situation cues it, it repels the worker
+  price (a value the app asked its own worker for is not external), and it is
+  adjective-shaped like `undoable`. Its remaining defect is T3 — as an adjective
+  it characterises the surrounding context, so R22's mixed callback still invites
+  a callback-wide wrap. Narrower than `incoming()`'s defect, and real.
 
-fromExternal()             REJECT  T1, T5
-  A prepositional fragment reads as an argument, not an operation. Next to a
-  plain `.set()` it looks like decoration.
+fromExternal()             REJECT  T5 (unwarranted-feeling)
+  A prepositional fragment reads as an argument rather than something being done,
+  so at the call site it feels like an annotation someone added rather than a
+  decision worth stating. Re-derived under the corrected T5; the old
+  "reads as decoration next to `.set()`" phrasing was the same observation made
+  against the wrong standard.
 
 applyIncoming()            REJECT  T4
   `apply` repairs the scope-boundary problem; `incoming` keeps the transport
@@ -4573,9 +4598,10 @@ writeAsExternal()          SURVIVE (weak)
   vocabulary applications use (they `set`, `update`, `addOne`), and at 15
   characters it is the longest survivor. Kept for comparison, not favoured.
 
-ingest()                   REJECT  T1
-  ETL / pipeline jargon. Outside data-engineering it does not read as a state
-  operation, and it carries a whiff of transformation the door does not perform.
+ingest()                   REJECT  T1 (situational retrieval), false affordance
+  ETL / pipeline vocabulary. A developer writing an Angular subscribe callback
+  does not retrieve "ingest", and the word additionally suggests a transformation
+  step the door does not perform.
 
 hydrate()                  REJECT  T2, prior art
   Established narrower meaning: TanStack `hydrate()` restores a previously
@@ -4615,11 +4641,16 @@ applyExternal()      survives all six thresholds
 writeAsExternal()    survives, weaker on family coherence and length
 ```
 
-Two survivors, both from the ACTION+SOURCE family, and the split between the two
-families is the study's actual finding:
+Two survivors, both from the ACTION+SOURCE family. The finding is stated
+NARROWLY, because the broad version turns English grammar into architecture:
 
-> **Event words classify the arrival. Action words classify the write. SignalTree
-> needs the write classified, so the family is decided before the word is.**
+> **The arrival-oriented names TESTED HERE — `incoming`, `received`, and the bare
+> source adjectives — tended to cue the surrounding acquisition EVENT, while
+> `applyExternal()` cued the state-classification OPERATION.**
+
+That keeps the evidence attached to the candidates that produced it. A general
+law ("event words classify arrival, action words classify writes") is a useful
+heuristic for generating candidates and is NOT claimed as proved.
 
 ## What Step 2 did NOT settle
 
@@ -4686,10 +4717,21 @@ Wrapping this callback in `incoming()` produces three separate defects at once:
    undo
 ```
 
-`applyExternal()` does not invite the wrap, because there is no externally
-acquired write in that statement to apply — the acquired data is the ticket, and
-the authored act is making it active. The correct rendering separates them, and
-the name is what makes the separation obvious:
+`applyExternal()` **does not invite** that wrap — and the earlier claim that it
+"refuses the mis-wrap by construction" is WITHDRAWN as an overclaim. Nothing
+stops a developer writing:
+
+```ts
+applyExternal(() => {
+  ops.tickets.setActiveTicket(ticket);
+  ops.tickets.loadTertiaryData$(ticket.id).subscribe();
+});
+```
+
+There is no runtime or type barrier. What the name does is ask the reader to
+identify WHICH write is external rather than to classify the whole arrival event,
+and that is a DX advantage — evidence of discouragement, not a guarantee. The
+correct rendering separates them:
 
 ```ts
 applyExternal(() => ops.tickets.applyTicketData(ticket));
@@ -4719,8 +4761,8 @@ Fluent for both finalists and for the control. One family, already scored.
 ## Holdout result
 
 ```text
-applyExternal()    survives; instructs rather than narrates on R19; refuses the
-                   R22 mis-wrap by construction
+applyExternal()    survives; instructs rather than narrates on R19; DISCOURAGES
+                   the R22 mis-wrap (no barrier — see the withdrawal above)
 writeAsExternal()  survives; identical semantics, consistently clumsier at every
                    real site
 incoming()          ELIMINATION CONFIRMED on real code — R22 reproduced the
@@ -4957,6 +4999,108 @@ rejected                incoming() — best signpost in the study, and it points
 The rename stays unexecuted, which is now doing useful work rather than being
 mere caution: `realize()` ships today and is rejected under both the old standard
 and the new one, so the door's name is the open question and the shape is not.
+
+# DX-NAMES-1.1 — the criterion corrected, the winner unchanged, the doubt recorded
+
+Four corrections applied IN PLACE rather than appended, so no verdict is left
+standing on a criterion no longer in force:
+
+```text
+1  T1 cold-reader explanation  ->  situational affordance / retrieval after
+                                   the primitive has been taught once
+2  T5 "looks ornamental"       ->  does the name make the door feel WARRANTED
+3  R22 "refuses by construction"  WITHDRAWN — it discourages; there is no barrier
+4  the event/action "law"         NARROWED to the candidates actually tested
+```
+
+Re-derived verdicts:
+
+```text
+realize()      REJECT — poor situational retrieval after learning. The word is
+                        not cued by a subscribe callback. (Old reason, "a
+                        stranger cannot define it", withdrawn.)
+external()     RUNNER-UP — its rejection depended on the withdrawn T1. Under the
+                        corrected criteria it survives, with T3 as its remaining
+                        defect.
+incoming()     REJECT — unchanged, and for the criteria the new standard KEEPS.
+fromExternal() REJECT — T5 as corrected.
+ingest()       REJECT — situational retrieval.
+```
+
+## Why the winner did not move
+
+The worker pair is the load-bearing evidence and it is untouched by the criterion
+change, because it was never a comprehension result:
+
+```ts
+const price   = await pricingWorker.calculate(localInputs);  // app-owned
+const reading = await sensorWorker.read();                   // acquired
+```
+
+```text
+incoming()        cues "something arrived"                  — true of BOTH
+applyExternal()   cues "applying something whose authority
+                  is external"                              — true of ONE
+```
+
+That is the distinction SignalTree needs a developer to make, and it is the
+distinction the name has to carry.
+
+## ⚠️ THE DOUBT, RECORDED — and it is well founded
+
+The owner is not certain about `applyExternal()`, and the study agrees with the
+doubt rather than arguing with it:
+
+```text
+misuse attraction   STRONG evidence   C5a and R22 are concrete and reproducible
+scope guidance      STRONG evidence   R22 is real code with real consequences
+situational
+  affordance        WEAK evidence     introspection about what a developer would
+retrievability      WEAK evidence     reach for. One reader is not a sample.
+```
+
+**The revised north star makes heaviest exactly the two dimensions this study
+measures worst.** More analysis from the same reader cannot fix that — it would
+only produce more confident prose on the same evidence. Two honest ways forward,
+and they are cheap:
+
+```text
+A  ASK A FEW ANGULAR DEVELOPERS, two questions, ten minutes:
+     1  given this subscribe callback and one sentence of teaching, which name do
+        you reach for?
+     2  here is `const price = await pricingWorker.calculate(inputs)` — does the
+        door belong around `tree.$.quote.total.set(price)`?
+   Q1 is the affordance evidence this study lacks. Q2 is the falsifier. A name
+   that wins Q1 and fails Q2 is the trap; a name that wins both should overturn
+   this recommendation.
+
+B  DEFER. `realize()` is still what ships, the rename is unexecuted, and nothing
+   downstream depends on the choice. PER-B and MATRIX-CLOSE can proceed and the
+   door can be named at the surface-change point with better evidence.
+```
+
+Neither costs anything, and B costs nothing at all. What should NOT happen is
+freezing the name on the strength of the dimensions this study happens to be good
+at, when the owner's own criteria say the other two matter more.
+
+## Disposition
+
+```text
+applyExternal()   LEADING, on misuse resistance and scope discipline
+external()        RUNNER-UP
+incoming()        REJECTED on the criteria the revised standard retains
+realize()         REJECTED under both standards, for different reasons
+DX-NAMES-1        NOT TERMINAL — affordance evidence outstanding
+```
+
+The vocabulary it would produce, three recognisable doors rather than three
+explanations:
+
+```ts
+undoable(() => { … });         // authored, and I want it undoable
+applyExternal(() => { … });    // applying state under external authority
+tree.transaction(() => { … }); // authored speculatively
+```
 
 # RESTORE-P0 — the reversal-validity cluster
 
