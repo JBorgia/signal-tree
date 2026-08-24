@@ -56,7 +56,10 @@ describe('ST2029 — history retention', () => {
     undoable(() => tree.$.rows.setAll(rows(width)));
     await flush();
     for (let i = 1; i <= writes; i++) {
-      (tree as unknown as (v: object) => void)({ n: i });
+      // Designated: ST2029 warns on RETAINED history entries, so the churn it
+      // measures has to be retained. Undesignated writes retain nothing and the
+      // warning could never fire.
+      undoable(() => (tree as unknown as (v: object) => void)({ n: i }));
       await flush();
     }
     return tree;
