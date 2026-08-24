@@ -893,9 +893,9 @@ const GATES = [
     },
   },
   {
-    name: 'journal-retention',
+    name: 'retention-gc',
     covers:
-      "a diagnostic journal releases the values it described once its bounded record is evicted (three arms: no journal -> dies, retained -> lives, evicted -> dies)",
+      "the GC-requiring retention proofs: a diagnostic journal releases the values it described once its bounded record is evicted, and a persistence() tree is released by destroy() (both three-armed: control dies -> held lives -> released dies)",
     // Runs outside `nx test core` because it needs --expose-gc, and it FAILS
     // rather than skips without it: a WeakRef that is merely eligible for
     // collection proves nothing, and a skipped retention test reads as evidence.
@@ -1216,7 +1216,7 @@ function run(gate) {
     execFileSync(gate.cmd[0], gate.cmd.slice(1), {
       cwd: ROOT,
       stdio: 'pipe',
-      // A gate may need its own environment — `journal-retention` needs
+      // A gate may need its own environment — `retention-gc` needs
       // --expose-gc to reach vitest's forked workers, which a `node --expose-gc`
       // command line would NOT do.
       env: gate.env ? { ...process.env, ...gate.env } : process.env,

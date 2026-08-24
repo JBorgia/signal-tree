@@ -30,10 +30,15 @@ export default defineConfig({
       // workers that flag via `poolOptions.forks.execArgv` was tried first and
       // silently did nothing on vitest 4 — a config knob that quietly fails is
       // the exact shape of defect this release keeps finding, so it is not
-      // used. The file runs as its own gate instead (`journal-retention` in
-      // tools/verify-gates.mjs) and FAILS rather than skipping without the
+      // used. These files run as their own gate instead (`retention-gc` in
+      // tools/verify-gates.mjs) and FAIL rather than skipping without the
       // flag: a skipped retention test reads as evidence in a green run.
+      //
+      // ⚠️ Adding a GC-requiring spec means editing THREE places — this
+      // exclude, `vitest.retention.config.ts`'s include, and the gate. Missing
+      // this one showed up immediately as two failures in `nx test core`.
       '**/diag-journal-1-eviction.spec.ts',
+      '**/a2-5-lifetime.spec.ts',
     ],
     coverage: {
       provider: 'v8',
