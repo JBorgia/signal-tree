@@ -1,4 +1,5 @@
 import { computed, type Signal } from '@angular/core';
+import { undoable } from '../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
 import { timeTravel } from '../enhancers/time-travel/time-travel';
@@ -61,15 +62,15 @@ function collectionOver(leaf: {
       let s = byIdCache.get(id);
       if (!s) {
         s = computed(() => leaf().find((r) => r.id === id));
-        byIdCache.set(id, s);
+        undoable(() => byIdCache.set(id, s));
       }
       return s;
     },
     addOne(row: Row): void {
-      leaf.update((c) => [...c, row]);
+      undoable(() => leaf.update((c) => [...c, row]));
     },
     removeOne(id: string): void {
-      leaf.update((c) => c.filter((r) => r.id !== id));
+      undoable(() => leaf.update((c) => c.filter((r) => r.id !== id)));
     },
     updateOne(id: string, changes: Partial<Row>): void {
       // Replaces ONLY the target member's object; every other reference is
@@ -86,8 +87,8 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     const tree = signalTree({ rows: [] as Row[] });
     const rows = collectionOver(tree.$.rows);
 
-    rows.addOne({ id: 'a', n: 1 });
-    rows.addOne({ id: 'b', n: 2 });
+    undoable(() => rows.addOne({ id: 'a', n: 1 }));
+    undoable(() => rows.addOne({ id: 'b', n: 2 }));
     expect(rows.all()).toEqual([
       { id: 'a', n: 1 },
       { id: 'b', n: 2 },
@@ -95,9 +96,9 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     expect(rows.ids()).toEqual(['a', 'b']);
 
     // Dynamic post-construction, which is the axis an ordinary RECORD fails.
-    rows.addOne({ id: 'c', n: 3 });
+    undoable(() => rows.addOne({ id: 'c', n: 3 }));
     expect(rows.ids()).toEqual(['a', 'b', 'c']);
-    rows.removeOne('a');
+    undoable(() => rows.removeOne('a'));
     expect(rows.ids()).toEqual(['b', 'c']);
     expect(rows.byId('a')()).toBeUndefined();
     expect(rows.byId('c')()?.n).toBe(3);
@@ -106,8 +107,8 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
   it('GRANULARITY — a watcher on byId(a) does NOT recompute when b changes', () => {
     const tree = signalTree({ rows: [] as Row[] });
     const rows = collectionOver(tree.$.rows);
-    rows.addOne({ id: 'a', n: 1 });
-    rows.addOne({ id: 'b', n: 2 });
+    undoable(() => rows.addOne({ id: 'a', n: 1 }));
+    undoable(() => rows.addOne({ id: 'b', n: 2 }));
 
     let runs = 0;
     const watchA = computed(() => {
@@ -117,7 +118,7 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     expect(watchA()).toBe(1);
     const base = runs;
 
-    rows.updateOne('b', { n: 99 });
+    undoable(() => rows.updateOne('b', { n: 99 }));
     watchA();
 
     // THE AXIS AN ORDINARY ARRAY WAS SAID TO FAIL.
@@ -125,7 +126,7 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     expect(rows.byId('b')()?.n).toBe(99);
 
     // And it still reacts to its OWN member.
-    rows.updateOne('a', { n: 7 });
+    undoable(() => rows.updateOne('a', { n: 7 }));
     expect(watchA()).toBe(7);
     expect(runs).toBe(base + 1);
   });
@@ -133,8 +134,8 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
   it('GRANULARITY holds across add and remove of OTHER members', () => {
     const tree = signalTree({ rows: [] as Row[] });
     const rows = collectionOver(tree.$.rows);
-    rows.addOne({ id: 'a', n: 1 });
-    rows.addOne({ id: 'b', n: 2 });
+    undoable(() => rows.addOne({ id: 'a', n: 1 }));
+    undoable(() => rows.addOne({ id: 'b', n: 2 }));
 
     let runs = 0;
     const watchA = computed(() => {
@@ -144,9 +145,9 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     watchA();
     const base = runs;
 
-    rows.addOne({ id: 'c', n: 3 });
+    undoable(() => rows.addOne({ id: 'c', n: 3 }));
     watchA();
-    rows.removeOne('b');
+    undoable(() => rows.removeOne('b'));
     watchA();
 
     expect(runs).toBe(base);
@@ -160,9 +161,9 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     );
     const rows = collectionOver(tree.$.rows);
 
-    rows.addOne({ id: 'a', n: 1 });
+    undoable(() => rows.addOne({ id: 'a', n: 1 }));
     await tick();
-    rows.addOne({ id: 'b', n: 2 });
+    undoable(() => rows.addOne({ id: 'b', n: 2 }));
     await tick();
     expect(rows.ids()).toEqual(['a', 'b']);
 
@@ -198,8 +199,8 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
   it('REPRESENTATION — tree() obtains it by the SAME generic rule as ordinary state', () => {
     const tree = signalTree({ rows: [] as Row[], n: 1, user: { name: 'Ada' } });
     const rows = collectionOver(tree.$.rows);
-    rows.addOne({ id: 'a', n: 1 });
-    rows.addOne({ id: 'b', n: 2 });
+    undoable(() => rows.addOne({ id: 'a', n: 1 }));
+    undoable(() => rows.addOne({ id: 'b', n: 2 }));
 
     // NO ENVELOPE. The collection appears as its bare value, exactly like the
     // sibling leaf and the sibling branch, because the walk sees an ordinary
@@ -236,8 +237,8 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
   it('FULL ROUND TRIP across a JSON boundary, with no marker anywhere', () => {
     const source = signalTree({ rows: [] as Row[], n: 3 });
     const srcRows = collectionOver(source.$.rows);
-    srcRows.addOne({ id: 'a', n: 1 });
-    srcRows.addOne({ id: 'b', n: 2 });
+    undoable(() => srcRows.addOne({ id: 'a', n: 1 }));
+    undoable(() => srcRows.addOne({ id: 'b', n: 2 }));
 
     const wire = JSON.parse(JSON.stringify(source())) as unknown;
 
@@ -259,7 +260,7 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     });
     watchA();
     const base = runs;
-    tgtRows.updateOne('b', { n: 99 });
+    undoable(() => tgtRows.updateOne('b', { n: 99 }));
     watchA();
     expect(runs).toBe(base);
   });

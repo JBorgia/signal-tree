@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { transactions } from '../../enhancers/transactions/transactions';
 import { stored } from '../markers/stored';
@@ -35,7 +36,7 @@ function recordingStorage(seed: Record<string, unknown> = {}): Recorder {
   const snapshots: Recorder['snapshots'] = [];
 
   for (const [key, value] of Object.entries(seed)) {
-    map.set(key, JSON.stringify({ __v: 1, data: value }));
+    undoable(() => map.set(key, JSON.stringify({ __v: 1, data: value })));
   }
 
   const snapshot = (): void => {
@@ -45,7 +46,7 @@ function recordingStorage(seed: Record<string, unknown> = {}): Recorder {
   const adapter: Storage = {
     getItem: (key) => map.get(key) ?? null,
     setItem: (key, value) => {
-      map.set(key, value);
+      undoable(() => map.set(key, value));
       log.push({ op: 'set', key });
       snapshot();
     },
@@ -233,7 +234,7 @@ describe('commit-consequence boundary — observed through stored()', () => {
       $: { theme: { (): string; set(value: string): void } };
     };
 
-    store.$.theme.set('dark');
+    undoable(() => store.$.theme.set('dark'));
 
     // No transaction, nothing to wait for: durable the moment set() returns.
     expect(rec.log).toEqual([{ op: 'set', key: 'cc-bare' }]);
@@ -263,9 +264,9 @@ describe('commit-consequence boundary — observed through stored()', () => {
     };
 
     const pending = store.transaction(() => {
-      store.$.a.set('a1');
+      undoable(() => store.$.a.set('a1'));
       store.$.a.set('a2'); // superseded — must never be durable
-      store.$.b.set('b1');
+      undoable(() => store.$.b.set('b1'));
     });
 
     // Zero durable writes while the transaction is unconfirmed.
@@ -303,7 +304,7 @@ describe('commit-consequence boundary — observed through stored()', () => {
 
     expect(() =>
       store.transaction(() => {
-        store.$.v.set('doomed');
+        undoable(() => store.$.v.set('doomed'));
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -340,7 +341,7 @@ describe('commit-consequence boundary — observed through stored()', () => {
     };
 
     const pending = store.transaction(() => {
-      store.$.theme.set('dark');
+      undoable(() => store.$.theme.set('dark'));
     });
     expect(rec.log).toEqual([]);
 
@@ -415,7 +416,7 @@ describe('commit-consequence boundary — observed through stored()', () => {
       undo(): void;
     };
 
-    store.$.theme.set('dark');
+    undoable(() => store.$.theme.set('dark'));
     expect(rec.adapter.getItem('cc-undo')).toContain('dark');
 
     // The turn has to be recorded before it can be undone.

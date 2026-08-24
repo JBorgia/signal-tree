@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../lib/undoable';
 
 import { entityMap } from './types';
 import { hydrateMarkerNode } from './internals/materialize-markers';
@@ -28,7 +29,7 @@ const mk = (rows: Row[]) => {
   const tree = signalTree({
     rows: entityMap<Row, number>({ selectId: (r) => r.id }),
   });
-  tree.$.rows.setAll(rows);
+  undoable(() => tree.$.rows.setAll(rows));
   return tree;
 };
 
@@ -196,11 +197,11 @@ describe('undo/redo end to end still reverts a large collection', () => {
       },
       { enhancers: [timeTravel({ maxHistorySize: 100 })] }
     );
-    tree.$.rows.setAll(rows);
+    undoable(() => tree.$.rows.setAll(rows));
     await flush();
 
     for (let i = 0; i < 50; i++) {
-      tree.$.rows.updateOne(0, { v: 900_000 + i });
+      undoable(() => tree.$.rows.updateOne(0, { v: 900_000 + i }));
       await flush();
     }
     expect(tree.$.rows.byId(0)?.().v).toBe(900_049);

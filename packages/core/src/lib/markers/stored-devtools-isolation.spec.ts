@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { timeTravel } from '../../enhancers/time-travel/time-travel';
 import { getPathNotifier, resetPathNotifier } from '../path-notifier';
@@ -95,7 +96,7 @@ describe('stored() and replay side effects', () => {
         transactionOwner: owner,
       },
       () => {
-        tree.$.k.set('dark');
+        undoable(() => tree.$.k.set('dark'));
       }
     );
     await Promise.resolve();
@@ -141,7 +142,7 @@ describe('stored() and replay side effects', () => {
       { capabilities: ['causal-runtime'] }
     );
 
-    tree.$.k.update((value) => value + 1);
+    undoable(() => tree.$.k.update((value) => value + 1));
     await Promise.resolve();
     unsubscribe();
 
@@ -165,7 +166,7 @@ describe('stored() and replay side effects', () => {
       { capabilities: ['causal-runtime'] }
     );
 
-    tree.$.k.set('dark');
+    undoable(() => tree.$.k.set('dark'));
 
     expect(notifier.hasPending()).toBe(false);
     expect(persisted(map, 'sdi-unobserved')).toBe('dark');
@@ -180,12 +181,12 @@ describe('stored() and replay side effects', () => {
       { capabilities: ['causal-runtime'] }
     );
 
-    tree.$.k.set('dark');
+    undoable(() => tree.$.k.set('dark'));
     tree.$.k.flush?.();
     expect(persisted(map, 'sdi-undo')).toBe('dark');
 
     withWriteContext({ intent: 'system', source: 'time-travel' }, () => {
-      tree.$.k.set('light');
+      undoable(() => tree.$.k.set('light'));
     });
     tree.$.k.flush?.();
 
@@ -201,11 +202,11 @@ describe('stored() and replay side effects', () => {
       { capabilities: ['causal-runtime'] }
     );
 
-    tree.$.k.set('dark');
+    undoable(() => tree.$.k.set('dark'));
     tree.$.k.flush?.();
 
     withWriteContext({ intent: 'system', source: 'devtools' }, () => {
-      tree.$.k.set('light');
+      undoable(() => tree.$.k.set('light'));
     });
     tree.$.k.flush?.();
 
@@ -225,7 +226,7 @@ describe('stored() and replay side effects', () => {
       { capabilities: ['causal-runtime'] }
     );
 
-    tree.$.k.set('dark');
+    undoable(() => tree.$.k.set('dark'));
     tree.$.k.flush?.();
 
     expect(persisted(map, 'sdi-plain')).toBe('dark');
@@ -234,7 +235,7 @@ describe('stored() and replay side effects', () => {
   it('initial storage load does not create an owned history turn', async () => {
     resetPathNotifier();
     const { map, adapter } = fakeStorage();
-    map.set('sdi-init', versioned('dark'));
+    undoable(() => map.set('sdi-init', versioned('dark')));
     const tree = signalTree(
       {
         k: stored('sdi-init', 'light', { storage: adapter, debounceMs: 0 }),
@@ -271,7 +272,7 @@ describe('stored() and replay side effects', () => {
     );
     const t = (tree as any).__timeTravel;
 
-    tree.$.k.set('dark');
+    undoable(() => tree.$.k.set('dark'));
     await Promise.resolve();
     await Promise.resolve();
     const turnCountBeforeUndo = t.getTurns().length;

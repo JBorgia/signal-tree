@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
@@ -145,14 +146,14 @@ describe('ownership of retired value backing', () => {
     // Production reclamation also drops the lifetime record, and `planRestore`
     // throws on `!restoreAllowed` — so this is where ownership actually lives.
     const store = makeStore([transactions()]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
     const subject = subjectOf(store.$.rows, 'a');
     const held = store.$.rows.byIdOrFail('a');
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne('a');
+      undoable(() => store.$.rows.removeOne('a'));
     });
     await tick();
 
@@ -168,13 +169,13 @@ describe('ownership of retired value backing', () => {
 
   it('CONTROL: the same turn rolls back when nothing is reclaimed', async () => {
     const store = makeStore([transactions()]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
     const held = store.$.rows.byIdOrFail('a');
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne('a');
+      undoable(() => store.$.rows.removeOne('a'));
     });
     await tick();
     pending.rollback();
@@ -188,11 +189,11 @@ describe('ownership of retired value backing', () => {
     // The state everyone assumes owns them. It does not: rollback restores
     // from the turn's own `__baselineValues`.
     const store = makeStore([transactions()]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     const subject = subjectOf(store.$.rows, 'a');
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne('a');
+      undoable(() => store.$.rows.removeOne('a'));
     });
     expect(store.$.rows.ids()).toEqual([]);
 
@@ -209,13 +210,13 @@ describe('ownership of retired value backing', () => {
     // probe only read a fresh handle — which would have passed even if the
     // held reference had been orphaned.
     const store = makeStore([transactions()]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     const subject = subjectOf(store.$.rows, 'a');
     const held = store.$.rows.byIdOrFail('a');
     const heldName = held.name;
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne('a');
+      undoable(() => store.$.rows.removeOne('a'));
     });
     deleteValueBacking(store.$.rows, subject);
     pending.rollback();
@@ -226,14 +227,14 @@ describe('ownership of retired value backing', () => {
 
   it('a HELD REFERENCE still re-publishes on time-travel undo with the bytes deleted', async () => {
     const store = makeStore([timeTravel({ maxHistorySize: 20 })]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
     const subject = subjectOf(store.$.rows, 'a');
     const held = store.$.rows.byIdOrFail('a');
     const heldName = held.name;
 
-    store.$.rows.removeOne('a');
+    undoable(() => store.$.rows.removeOne('a'));
     await tick();
     await tick();
     expect(held()).toBeUndefined();
@@ -248,15 +249,15 @@ describe('ownership of retired value backing', () => {
 
   it('CONFIRMED: a settled removal is unreachable, so nothing can want the bytes', async () => {
     const store = makeStore([transactions()]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
-    store.$.rows.addOne({ id: 'b', name: 'Beta' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
+    undoable(() => store.$.rows.addOne({ id: 'b', name: 'Beta' }));
     await tick();
     await tick();
     const subject = subjectOf(store.$.rows, 'a');
 
     store
       .transaction(() => {
-        store.$.rows.removeOne('a');
+        undoable(() => store.$.rows.removeOne('a'));
       })
       .confirm();
     await tick();
@@ -264,9 +265,9 @@ describe('ownership of retired value backing', () => {
     deleteValueBacking(store.$.rows, subject);
 
     expect(store.$.rows.ids()).toEqual(['b']);
-    store.$.rows.addOne({ id: 'c', name: 'Gamma' });
+    undoable(() => store.$.rows.addOne({ id: 'c', name: 'Gamma' }));
     const later = store.transaction(() => {
-      store.$.rows.updateOne('b', { name: 'Beta2' });
+      undoable(() => store.$.rows.updateOne('b', { name: 'Beta2' }));
     });
     later.rollback();
     expect(store.$.rows.byId('b')?.()?.name).toBe('Beta');
@@ -275,14 +276,14 @@ describe('ownership of retired value backing', () => {
 
   it('ABORTED: a subject created and discarded by a throwing transaction', async () => {
     const store = makeStore([transactions()]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
 
     let freshSubject: number | undefined;
     expect(() =>
       store.transaction(() => {
-        store.$.rows.addOne({ id: 'temp', name: 'Temp' });
+        undoable(() => store.$.rows.addOne({ id: 'temp', name: 'Temp' }));
         freshSubject = subjectOf(store.$.rows, 'temp');
         throw new Error('boom');
       })
@@ -291,7 +292,7 @@ describe('ownership of retired value backing', () => {
     expect(store.$.rows.ids()).toEqual(['a']);
     deleteValueBacking(store.$.rows, freshSubject as number);
 
-    store.$.rows.addOne({ id: 'next', name: 'Next' });
+    undoable(() => store.$.rows.addOne({ id: 'next', name: 'Next' }));
     // Identity must still be allocated forward — a discarded subject's number
     // is never handed out again.
     expect(subjectOf(store.$.rows, 'next')).toBeGreaterThan(
@@ -302,20 +303,20 @@ describe('ownership of retired value backing', () => {
 
   it('NO TURN IN FLIGHT: a plain retirement, then a full transaction', async () => {
     const store = makeStore([transactions()]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
-    store.$.rows.addOne({ id: 'b', name: 'Beta' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
+    undoable(() => store.$.rows.addOne({ id: 'b', name: 'Beta' }));
     await tick();
     await tick();
     const subject = subjectOf(store.$.rows, 'a');
 
-    store.$.rows.removeOne('a');
+    undoable(() => store.$.rows.removeOne('a'));
     await tick();
     await tick();
     deleteValueBacking(store.$.rows, subject);
 
     const pending = store.transaction(() => {
-      store.$.rows.updateOne('b', { name: 'Beta2' });
-      store.$.rows.addOne({ id: 'c', name: 'Gamma' });
+      undoable(() => store.$.rows.updateOne('b', { name: 'Beta2' }));
+      undoable(() => store.$.rows.addOne({ id: 'c', name: 'Gamma' }));
     });
     expect(store.$.rows.ids().sort()).toEqual(['b', 'c']);
     pending.rollback();
@@ -325,13 +326,13 @@ describe('ownership of retired value backing', () => {
 
   it('BOTH ENHANCERS: neither system needs the bytes when the other is present', async () => {
     const store = makeStore([timeTravel({ maxHistorySize: 20 }), transactions()]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
     const subject = subjectOf(store.$.rows, 'a');
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne('a');
+      undoable(() => store.$.rows.removeOne('a'));
     });
     deleteValueBacking(store.$.rows, subject);
     pending.rollback();
@@ -342,11 +343,11 @@ describe('ownership of retired value backing', () => {
 
   it('DESTROYED: deleting backing after teardown does not throw', async () => {
     const store = makeStore([transactions()]);
-    store.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
     const subject = subjectOf(store.$.rows, 'a');
-    store.$.rows.removeOne('a');
+    undoable(() => store.$.rows.removeOne('a'));
     await tick();
     await tick();
 

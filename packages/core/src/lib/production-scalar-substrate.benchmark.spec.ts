@@ -1,4 +1,5 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { undoable } from '../lib/undoable';
 
 import type { WritableSignal } from '@angular/core';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -272,7 +273,7 @@ function createScalarHarness(size: number): ScalarHarness {
     commitFrame: (width, seed) => {
       const frame = runtime.beginFrame();
       for (let index = 0; index < width; index++) {
-        frame.set(frameSlots[index], seed + index);
+        undoable(() => frame.set(frameSlots[index], seed + index));
       }
       frame.commit();
     },
@@ -290,7 +291,7 @@ function createEntityHarness(size: number): EntityHarness {
     rows: EntityCollection;
   }>;
   const rows = tree.$.rows;
-  rows.addMany(buildEntityRows(size));
+  undoable(() => rows.addMany(buildEntityRows(size)));
 
   const stableId = Math.floor(size / 2);
   let nextId = size;
@@ -301,18 +302,18 @@ function createEntityHarness(size: number): EntityHarness {
   return {
     rows,
     updateOne(value: number): void {
-      rows.updateOne(stableId, { value });
+      undoable(() => rows.updateOne(stableId, { value }));
     },
     addOne(): void {
-      rows.addOne({ id: nextId, value: nextId });
+      undoable(() => rows.addOne({ id: nextId, value: nextId }));
       nextId += 1;
     },
     removeOne(): void {
-      rows.removeOne(removableId);
+      undoable(() => rows.removeOne(removableId));
       removableId -= 1;
     },
     changeId(): void {
-      rows.changeId(currentChangeId, nextChangeId);
+      undoable(() => rows.changeId(currentChangeId, nextChangeId));
       const previousId = currentChangeId;
       currentChangeId = nextChangeId;
       nextChangeId = previousId;
@@ -336,12 +337,12 @@ function createUndoEntityHarness(size: number): UndoEntityHarness {
   const notifier = getPathNotifier();
   const removableId = size - 1;
 
-  rows.addMany(buildEntityRows(size));
+  undoable(() => rows.addMany(buildEntityRows(size)));
   notifier?.flushSync();
 
   return {
     prepareUndo(): void {
-      rows.removeOne(removableId);
+      undoable(() => rows.removeOne(removableId));
       notifier?.flushSync();
     },
     undoRemove(): void {
@@ -780,7 +781,7 @@ function measureEntityTimingRows(sizes: readonly number[]): EntityTimingRow[] {
               iteration++
             ) {
               updateSeed += 1;
-              updateHarness.updateOne(updateSeed);
+              undoable(() => updateHarness.updateOne(updateSeed));
             }
           }),
           ENTITY_UPDATE_ITERATIONS
@@ -802,7 +803,7 @@ function measureEntityTimingRows(sizes: readonly number[]): EntityTimingRow[] {
               iteration < ENTITY_STRUCTURAL_ITERATIONS;
               iteration++
             ) {
-              addHarness.addOne();
+              undoable(() => addHarness.addOne());
             }
           }),
           ENTITY_STRUCTURAL_ITERATIONS
@@ -824,7 +825,7 @@ function measureEntityTimingRows(sizes: readonly number[]): EntityTimingRow[] {
               iteration < structuralIterations;
               iteration++
             ) {
-              removeHarness.removeOne();
+              undoable(() => removeHarness.removeOne());
             }
           }),
           structuralIterations
@@ -846,7 +847,7 @@ function measureEntityTimingRows(sizes: readonly number[]): EntityTimingRow[] {
               iteration < ENTITY_STRUCTURAL_ITERATIONS;
               iteration++
             ) {
-              changeIdHarness.changeId();
+              undoable(() => changeIdHarness.changeId());
             }
           }),
           ENTITY_STRUCTURAL_ITERATIONS
@@ -893,7 +894,7 @@ function measureEntityFrameTimingRows(
             iteration < ENTITY_STRUCTURAL_ITERATIONS;
             iteration++
           ) {
-            frameHarness.addOne();
+            undoable(() => frameHarness.addOne());
           }
         }),
         ENTITY_STRUCTURAL_ITERATIONS
@@ -937,19 +938,19 @@ function measureEntityLogicalWorkRows(
     const harness = createProjectionFrameHarness(size);
 
     resetProductionSubstrateStatsForTesting(stats);
-    harness.updateOne(size + 1);
+    undoable(() => harness.updateOne(size + 1));
     captureRow('entity-updateOne', size);
 
     resetProductionSubstrateStatsForTesting(stats);
-    harness.addOne();
+    undoable(() => harness.addOne());
     captureRow('entity-addOne', size);
 
     resetProductionSubstrateStatsForTesting(stats);
-    harness.removeOne();
+    undoable(() => harness.removeOne());
     captureRow('entity-removeOne', size);
 
     resetProductionSubstrateStatsForTesting(stats);
-    harness.changeId();
+    undoable(() => harness.changeId());
     captureRow('entity-changeId', size);
 
     resetProductionSubstrateStatsForTesting(stats);
@@ -986,17 +987,17 @@ function measureEntityFrameLogicalWorkRows(
   for (const size of sizes) {
     const addHarness = createStructuralAuditHarness(size);
     resetProductionSubstrateStatsForTesting(stats);
-    addHarness.addOne();
+    undoable(() => addHarness.addOne());
     captureRow('entity-frame-addOne', size);
 
     const removeHarness = createStructuralAuditHarness(size);
     resetProductionSubstrateStatsForTesting(stats);
-    removeHarness.removeOne();
+    undoable(() => removeHarness.removeOne());
     captureRow('entity-frame-removeOne', size);
 
     const changeIdHarness = createStructuralAuditHarness(size);
     resetProductionSubstrateStatsForTesting(stats);
-    changeIdHarness.changeId();
+    undoable(() => changeIdHarness.changeId());
     captureRow('entity-frame-changeId', size);
   }
 
@@ -1035,7 +1036,7 @@ function measurePublicAddLogicalWorkRows(
 
     try {
       resetProductionSubstrateStatsForTesting(stats);
-      harness.addOne();
+      undoable(() => harness.addOne());
       rows.push({
         positions: size,
         publicAddPreviousTailReads: stats.publicAddPreviousTailReads,
