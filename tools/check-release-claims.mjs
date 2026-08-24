@@ -364,10 +364,6 @@ const EXEMPT = new Map(
     // real public config member today; each is slated to be deleted or
     // reconciled before 15.0 ships. If any of them survives to release, the
     // exemption is wrong and it must be documented instead.
-    shouldSkip:
-      'TimeTravelConfig.shouldSkip — a read-time transition filter that still ' +
-      'pays full recording cost. Overlaps what turn eligibility now expresses; ' +
-      'disposition (subsume or delete) is HIST-C2 step 7',
     restorationEligibility:
       'HIST-C2 prototype switch. Exists only so the existing suites can run ' +
       'under the old default while the door is characterised, and is deleted ' +

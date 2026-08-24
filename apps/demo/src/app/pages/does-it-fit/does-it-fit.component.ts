@@ -459,7 +459,8 @@ export class DoesItFitComponent {
         'primitive and the hand-rolled arm measures 216.96 ms against our 4.32 ms.',
       instead:
         'If the undo stack IS the product, use an immutable root. If you just need undo over a ' +
-        'big grid, entityMap({ recordHistory: false }) and timeTravel({ shouldSkip }) are the levers.',
+        'big grid, undoable() is the lever: designate the few operations a user should be able ' +
+        'to reverse, and the rest of the grid churn costs no restoration at all.',
     },
     {
       title: 'Concurrent editing of one document',
