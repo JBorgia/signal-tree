@@ -145,6 +145,36 @@ export function deferCommitConsequence(
 }
 
 /**
+ * Queue `fn` in a specific transaction's scope on the caller's EXPLICIT say-so,
+ * WITHOUT requiring a tree claimant.
+ *
+ * AFTER-COMMIT-1. {@link deferCommitConsequence} refuses an absent claimant,
+ * and correctly: it serves MUTATION ATTRIBUTION, where ambient context is not
+ * evidence — code inside a transaction callback sees that transaction's owner
+ * and id even while writing to a completely different tree, so a write must
+ * positively establish ownership before becoming speculative under it.
+ *
+ * An explicit consequence registration is a different act. Nothing is inferred
+ * from a mutation: the caller named THIS operation by running inside it and
+ * saying so. Applying the attribution guard here would force a public API to
+ * take a tree argument in order to satisfy a rule about writes.
+ *
+ * Deliberately narrow — it can only reach an ALREADY OPEN scope identified by
+ * the exact `(owner, transactionId)` pair, and it never runs anything itself.
+ */
+export function deferOperationConsequence(
+  owner: object,
+  transactionId: number,
+  key: unknown,
+  fn: CommitConsequence
+): boolean {
+  const scope = scopesByOwner.get(owner)?.get(transactionId);
+  if (!scope) return false;
+  scope.consequences.set(key, fn);
+  return true;
+}
+
+/**
  * THE primitive. Describe a durable consequence; the authority decides when it
  * runs. No caller determines commit-ness for itself.
  *

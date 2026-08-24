@@ -9219,7 +9219,13 @@ and inherits the namespace from `emitOwnedMutation`.
 > its owning tree — authored, external, restoration, rollback, DevTools
 > inspection and structural collection writes alike.
 
-# AFTER-COMMIT-0 — the NULL is falsified. `X` IS EARNED
+# AFTER-COMMIT-0 — ⚠️ ITS HEADLINE IS WITHDRAWN BY AFTER-COMMIT-1
+
+*(Everything below about the CONTRACT stands. The conclusion that `X` is earned
+does not — see AFTER-COMMIT-1. What this file actually falsified is that
+`transactionOwner` is a valid TREE CLAIMANT, which was already known.)*
+
+# AFTER-COMMIT-0 — the claimant form is falsified
 
 `packages/core/src/lib/after-commit-0.spec.ts`, 10/10.
 
@@ -9314,6 +9320,89 @@ afterCommit(anchor, effect)
 
 `afterCommit.settled()` would be a category error: a link owns an outbound
 queue, a one-shot consequence does not.
+
+# AFTER-COMMIT-1 — the NULL SURVIVES. `afterCommit(effect)` needs no anchor
+
+`packages/core/src/lib/after-commit-1.spec.ts`, 10/10.
+
+## ⚠️ Withdrawing "X IS EARNED"
+
+AFTER-COMMIT-0 concluded the anchor was earned. It was one step too far. What it
+falsified was
+
+```text
+scheduleDurableConsequence({ claimant: transactionOwner, ... })
+```
+
+— that `transactionOwner` is not a valid TREE CLAIMANT, which was already known.
+It never tested whether AMBIENT OPERATION IDENTITY is sufficient.
+
+I leaned on `scopeOwns` to justify the anchor, and misapplied it. Its rule —
+*"presence of a transaction is not evidence that THE WRITE is speculative under
+it"* — governs MUTATION ATTRIBUTION: a write to tree B inside a transaction on
+tree A must not become speculative under A. An explicit consequence registration
+is a different act. Nothing is inferred from a mutation; the application named
+the operation by running inside it and saying so.
+
+## What the operation-keyed form measures
+
+`deferOperationConsequence(owner, transactionId, key, fn)` looks the scope up by
+that exact pair and skips the attribution guard — deliberately narrow: it reaches
+only an ALREADY OPEN scope and never runs anything itself.
+
+```text
+⚠️ a transaction with NO WRITES AT ALL still holds it       confirm -> 1
+                                                            rollback -> 0
+with a write, confirm holds then releases exactly once       ✓
+with a write, rollback discards                              ✓
+⚠️ a transaction on A that WRITES TREE B: the effect is A's  ✓
+two interleaved transactions resolve independently           ✓
+same callback registered twice runs twice                    ✓
+effects start in registration order                          ✓
+⚠️ outside a transaction it DEFERS, not re-entrant           ✓
+CONTROL: the claimant route still runs during the callback   ✓
+```
+
+The first case is decisive: **no mutation to attribute and no location to anchor
+to — only an operation** — and the consequence still tracks confirm/rollback. So
+the scope is per-operation, independent of any write, and ambient
+`(owner, transactionId)` identifies it.
+
+The third is the direct counterexample to my misapplication: the effect follows
+the operation it was REGISTERED IN, while B's write is correctly not speculative
+under A and survives A's rollback.
+
+Mutation-checked: routing the candidate through the claimant form fails 6 of 10;
+keying on callback identity fails 1; dropping the microtask fails 1.
+
+## The two open contract questions, now decided
+
+```text
+OUTSIDE A TRANSACTION   DEFER. An API named `afterCommit` must not sometimes
+                        mean "before this function returns". Uniform
+                        non-reentrancy beats saving one microtask, and the
+                        candidate implements it.
+
+A THROWING CONSEQUENCE  still escapes `confirm()`. Sibling isolation holds, so
+                        the property that matters is intact — but a caller who
+                        registered nothing can be thrown at by someone else's
+                        consequence, and `pending.confirm()` throwing makes a
+                        COMMITTED transaction look failed. That is a settlement
+                        boundary decision, not `afterCommit`'s, and still not a
+                        reason to invent a public error channel.
+```
+
+## The resulting pair
+
+```text
+afterCommit(effect)         operation -> one consequence
+onCommitted(x, observer)    location  -> standing observation
+link(x, endpoint)           location  <-> external state
+```
+
+`onCommitted` genuinely needs `x` because the relationship IS to a location.
+`afterCommit` does not, and now that is measured rather than assumed in either
+direction.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
