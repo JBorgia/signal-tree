@@ -2108,6 +2108,123 @@ invariant holds.
 run alone. Possible test-order coupling; recorded rather than diagnosed, since it
 may simply disappear once the C is resolved.
 
+# TX-LEDGER-0 — case 6 first, and it narrows the category C sharply
+
+Case 6 was the architectural control, so it ran before any design work. It
+**passes**, and passing changes what the defect is.
+
+## The correction to my own report
+
+I described the category C as "transaction rollback uses the history log as its
+dependency ledger". That was too broad. Measured:
+
+```text
+transactions() + timeTravel()   rollback refuses  kind 'later-confirmed-dependency'
+transactions() ALONE            rollback refuses  kind 'later-confirmed-dependency'
+                                                  ^ IDENTICAL
+```
+
+`transactions()` is **not affected**. It admits its pending turn into a LOCAL
+`TurnStore` built from its own captured effects (`transactions.ts` ~1023), so its
+dependency question never consults the restoration history. The required
+ownership property holds:
+
+```text
+transactions()  does NOT require timeTravel()
+```
+
+## What the defect actually is
+
+`timeTravel()` ships its own `transaction()` — `TimeTravelMethods extends
+TransactionMethods` — and it is a **different implementation** from the
+`transactions()` enhancer. Its rollback plan comes from
+`getPendingRollbackPlan()`, whose first line is:
+
+```ts
+const laterEffects = this.history
+```
+
+That is the restoration history. Under opt-in, ordinary authored writes are not
+admitted to it, so `laterEffects` is empty, the dependency is invisible, and the
+rollback proceeds. All 7 refusal tests that stopped throwing install
+**`timeTravel()` only** and call `store.transaction(...)`.
+
+So the conflation is real, and narrower and more tractable than first reported:
+
+```text
+NOT      "transactions use history as their ledger"
+BUT      "timeTravel's own transaction API uses history as its ledger, while the
+          transactions() enhancer already does it correctly"
+```
+
+## Which means the reference implementation already exists
+
+The split does not need inventing. `transactions()` demonstrates it:
+
+```text
+pending turn + its own captured effects  ->  local TurnStore  ->  dependency answer
+                                             never the history
+```
+
+The repair is to stop the `timeTravel()` path substituting the admitted history
+for a causal record it should keep itself. What it still needs, and does not have
+under opt-in, is the LATER effects — those turns are no longer retained anywhere
+once they stop being admitted. That is where the bounded ledger comes in, with
+the lifetime already proposed:
+
+```text
+no pending transaction              retention = zero
+one or more pending transactions    retain causal facts back to the oldest
+                                    transaction that could still legally roll back
+transaction settles                 release what no live transaction can ask about
+```
+
+Payload is identity and effect facts — sequence, origin, affected
+positions/subjects/locations, structural dependency facts. Not snapshots, not
+inverses, not claims, not a cursor, not a user-facing entry. A correctness
+projection, not a second history.
+
+## Still to derive before implementing
+
+Cases 1, 2 and 5 are now partly answered by the case-6 evidence (1 and 2 are
+pinned in `tx-ledger-0.spec.ts` against `transactions()`, including the control
+that an UNRELATED later write leaves rollback legal — so the ledger is not merely
+"something happened"). Two remain open and both decide ledger admission:
+
+```text
+3  pending transaction -> later REALIZATION depending on speculative state
+   Does rollback have to refuse? Decides whether admission is by authorship or
+   by causal effect regardless of origin. A server refresh landing mid-optimistic
+   -transaction is the real-world shape.
+
+4  pending transaction -> dependency created -> that dependency then REVERSED
+   Does rollback become legal again? Decides whether the projection may be
+   monotonic or must reason about current state.
+```
+
+Neither is assumed. In particular "all authored turns" is NOT pre-registered as
+the admission rule — the question is *which causal origins can create or remove a
+rollback dependency*, and authored/realization/restoration get falsified
+separately.
+
+## Relationship to DIAG-JOURNAL, kept explicit
+
+One event source, three projections, different owners and different retention:
+
+```text
+CAUSAL TURN FEED
+   |
+   +- transaction dependency projection   correctness, shortest legal retention
+   +- restoration projection              designated turns only; claims,
+   |                                      inverses, cursor
+   +- diagnostic projection               later; bounded observation, no
+                                          restoration rights
+```
+
+The transaction ledger must not become the DevTools journal, and DIAG-JOURNAL
+must not become a second restoration authority. The feed is what both were
+missing; it is not itself an inventory.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
