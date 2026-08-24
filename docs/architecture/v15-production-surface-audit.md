@@ -7628,6 +7628,61 @@ new evidence**. A3-TX did not overturn S1 — `status()` had already been measur
 ordinary state with unguarded setters, and the replacement was demonstrated
 directly. PER-B is that new evidence for persistence; nothing else here qualifies.
 
+# A2-1 — CONSTRUCTION MATERIALISATION. The marker does not own it
+
+Four arms, same durable value, same assertions —
+`a2-1-construction-materialisation.spec.ts`.
+
+```text
+arm A  marker: stored('key','default')          first value durable, ZERO causal
+                                                writes, no restoration entry
+arm B  compose AFTER construction               ⚠️ transient default publicly
+                                                observable, AND the catch-up
+                                                write is causal ('theme' emitted)
+arm C  application reads BEFORE construction    first value durable, ZERO causal
+                                                writes — IDENTICAL to arm A
+```
+
+## The finding
+
+**Arm C reaches the marker's result with no new API at all.**
+
+```ts
+const raw = storage.getItem('theme');
+const tree = signalTree({ theme: raw ? JSON.parse(raw).data : 'light' });
+```
+
+Reading durable storage is SYNCHRONOUS on every platform in this footprint —
+`localStorage` and Capacitor Preferences both expose a sync read — so the durable
+value can simply BE the initial value. No transient, no causal write, no
+restoration entry, and it degrades correctly when storage is empty.
+
+So the answer to A2-1's question is **no**: the marker does not own construction
+materialisation. What it provides over arm C is the read boilerplate, once per
+persisted leaf — **a DX difference, not a capability difference.** A2's
+pre-registration says only a capability difference earns declaration-time
+placement.
+
+Arm B is the one that fails, and it matters because it is the naive shape a
+`persist(node, { key })` adapter falls into: hydrating after construction makes
+the transient observable AND emits a causal write. Any compositional design must
+therefore push the read to the application, not perform it itself.
+
+## What A2-1 does and does not settle
+
+```text
+REMOVED   the strongest argument for arm A. `stored()`'s declaration-time
+          placement is no longer justified by materialisation.
+NOT SETTLED  arm C is only an INITIALISATION technique, not a persistence
+          capability. It says nothing about write-through, settlement ordering,
+          host drain or lifetime — which is exactly what A2-2..A2-5 measure, and
+          where a real API still has to exist.
+```
+
+The live question is now narrower and better posed: **given that initialisation
+needs no API, what is the smallest surface for the WRITE side — write-through,
+settlement deference, host drain, and teardown?**
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
