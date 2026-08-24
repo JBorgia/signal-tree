@@ -7265,19 +7265,34 @@ artifact is the ledger, not a working consumer.
 
 ## Consumed surface — 10 symbols, 32 import sites, all from `@signaltree/core`
 
+### ⚠️ AMENDED — the first numbers were LEXICAL OCCURRENCES, not call sites
+
+The original table reported `stored 61 / loader 50 / asyncSource 17 / status 54`
+from `grep -rhoE "\b$s\b" | wc -l`, which counts comments, type references and
+repeated mentions. **This is the same counting error the audit corrected once
+before** — A1 had to restate `loader` from six IMPORT sites to nineteen CALL
+sites. Counting a proxy instead of the thing is the recurring shape of every
+defect in this repo's history, and it recurred here.
+
+Re-measured as declarations:
+
 ```text
-symbol                  prod uses   in Candidate B's ONLY entry point?
-signalTree                  11      EXPORTED
-entityMap                   75      EXPORTED
-derivedFrom                 10      EXPORTED
-WithDerived                  5      EXPORTED
-timeTravel                  17      renamed -> restoration()
-stored                      61      *** NOT EXPORTED ***
-status                    (54 marker-shaped)  *** NOT EXPORTED ***
-loader                      50      *** NOT EXPORTED ***
-asyncSource                 17      *** NOT EXPORTED ***
-flushAllStoredSignals        6      *** NOT EXPORTED ***
+symbol                  DECLARATIONS  files   in Candidate B's ONLY entry point?
+signalTree                       11      -    EXPORTED
+entityMap / derivedFrom
+  / WithDerived                   -      -    EXPORTED
+timeTravel                        -      -    renamed -> restoration()
+loader                           19      6    *** NOT EXPORTED ***
+stored                    7 leaves       10    *** NOT EXPORTED ***
+status<E>                         9     25    *** NOT EXPORTED ***
+asyncSource                       1      2    *** NOT EXPORTED ***
+flushAllStoredSignals             1      1    *** NOT EXPORTED ***
 ```
+
+**"100+ production sites" is WITHDRAWN.** The real footprint is 19 loader
+configurations, 7 persisted leaves, 9 status markers, ONE asyncSource declaration
+and ONE host drain. A materially different argument, and it must not be allowed to
+become a false one later.
 
 Parsed from the BUILT declaration's export statements, not from a name grep: 68
 named exports, and six of TruckTrax's ten are absent.
@@ -7328,16 +7343,31 @@ TT2-2  automatic history -> undoable() opt-in
                         user-reversible
        class            BREAKING-BY-DESIGN + DOC/DX-GAP
 
-TT2-3  stored()               61 sites   NOT EXPORTED, no replacement
-TT2-4  loader()               50 sites   NOT EXPORTED, no replacement
-TT2-5  status<T>()             5 files    NOT EXPORTED, no replacement
-TT2-6  asyncSource()          17 sites   NOT EXPORTED, no replacement
-TT2-7  flushAllStoredSignals   6 sites    NOT EXPORTED, no replacement
-       docs sufficient? NO — the core README documents `stored()` extensively
-                        while `stored` is not exported
-       shape            UNKNOWN — there is no migration to measure
-       class            DOC/DX-GAP, and arguably SIGNALTREE-DEFECT: a withdrawal
-                        with no replacement path is not a migration
+TT2-3  stored()                 7 persisted leaves, 10 files
+       class            DOC/DX-GAP -> A2-REOPEN. PER-B supplied evidence that did
+                        not exist when "NOT EARNED as RC public API" was written.
+
+TT2-4  loader()                19 configurations, 6 files
+       class            DOC/DX-GAP — NOT a defect. A1 examined these exact 19
+                        sites and resolved "C1 yes, C2 is one narrow seam", which
+                        became `external()`. TT2 produces no new evidence against
+                        A1; it exposes a MISSING MIGRATION RECIPE.
+
+TT2-5  status<E>()              9 markers, 25 files
+       class            ⚠️ UNRESOLVED, not decided. A3-TX settles it.
+
+TT2-6  asyncSource()            1 declaration, 2 files
+       class            DOC/DX-GAP. Deletion STANDS — M9 measured positively that
+                        its load produces ZERO causal events, so it is outside the
+                        causal substrate and reinstating it as a core primitive
+                        would go backwards. Migration is ordinary Angular/RxJS
+                        ownership, NOT `external()` around a non-event.
+
+TT2-7  flushAllStoredSignals    1 call, 1 file
+       class            DOC/DX-GAP -> A2-REOPEN as the host-drain half. The
+                        BEHAVIOUR earned itself — Capacitor backgrounding is the
+                        host lifecycle the web platform cannot infer, which A2
+                        already established. The SPELLING is a smaller question.
 
 TT2-8  @signaltree/ng-forms in the workspace catalog
        failure          package deleted (41373050)
@@ -7384,23 +7414,115 @@ failure ledger is complete for the symbol surface; RUNTIME behavioural differenc
 (TT2-2 and TT2-9 in particular, which compile cleanly and change meaning) are
 identified but unmeasured, and pass 3 is where they get measured.
 
-## Blocking question for pass 3
+## The A/B fork is REJECTED as too coarse
 
-**Pass 3 cannot start on TT2-3 through TT2-7.** There is nothing to migrate to.
-The prior decision required is the owner's:
+The five symbols do not share an architectural status, and one decision covering
+all of them would restore things TT2 gives no grounds to restore.
 
 ```text
-A  the five markers were withdrawn correctly    -> then v15 owes a documented
-                                                   replacement for each, and
-                                                   pass 3 measures THAT migration
-B  the withdrawal was wrong for stored/status   -> then Candidate B moves and
-   /loader, which have 100+ production sites       they are restored with the
-                                                   authority the disposition
-                                                   demanded
+loader()                withdrawal STANDS — A1 settled it on these exact sites
+asyncSource()           deletion STANDS — M9 measured it outside the substrate
+stored()                A2 REOPENS — PER-B is new evidence
+flushAllStoredSignals() reopens WITH A2, as the host-drain half
+status<E>()             ⚠️ never resolved. A3-TX settles it now.
 ```
 
-Per the standing rule — *if pass 3 uncovers a Candidate B defect, fix SignalTree,
-not TruckTrax around it* — this is exactly that shape, found one pass early.
+**What TT2 actually exposed, precisely:**
+
+```text
+A1  was SETTLED, and its migration story was never written
+A2  was once UNRESOLVED, and PER-B has since supplied major new evidence
+A3  was explicitly left UNRESOLVED and then disappeared behind a blocked-symbol
+    list, which read as a decision it never was
+```
+
+Call-site counts are not votes for old spellings — A1 said so first, and the
+corrected numbers above are exactly why that rule matters.
+
+# A3-TX — the owed falsifier, run. And a CORRECTION to the premise
+
+## The falsifier's answer: `transactions()` CANNOT absorb `status<E>()`
+
+Measured in `a3-tx-status-falsifier.spec.ts` against the real production shapes.
+
+```text
+case 1  POST /ticket, no speculative state
+        -> to open a transaction at all we had to WRITE A SENTINEL
+           (`ticket.id.set('__inflight__')`) — inventing a speculative business
+           write purely to obtain operation status
+        -> "a pending transaction exists" is TREE-scoped, not per-operation
+        -> a rollback reverses writes and retains NO typed error payload
+
+case 2  imperative feature-flag load
+        -> a transaction opens and confirms with ZERO writes. It does not refuse
+           — which is worse for the absorption argument, not better: an empty
+           ceremony carrying no loading state and no typed error. Nothing to wrap,
+           and wrapping nothing yields nothing.
+```
+
+## ⚠️ BUT THE PREMISE WAS WRONG, and it changes the outcome
+
+The brief said A3 *"was explicitly left unresolved and then disappeared behind a
+blocked-symbol list"*. **It was resolved, by measurement.** `4decd287` deleted the
+marker with a rationale from derivation S1:
+
+> the two capabilities the API implied — **transition governance** and **lifecycle
+> observation** — were both absent: every setter was an unguarded assignment, and
+> nothing in core ever drove status from an execution
+
+Verified against the pre-deletion source: the setters were bare pairs of
+`stateSignal.set(...)` / `errorSignal.set(...)` with no guard, four of them, plus
+promise-style aliases. `status()` was **two signals and four unguarded setters** —
+ordinary store truth wearing a primitive's clothes.
+
+So the alternative was never `transactions()`. **My falsifier answers a question
+that was not the one deciding the case** — correctly, and it resurrects nothing.
+
+```text
+WITHDRAWN   "A3 was never resolved"
+STANDS      A3 was resolved by S1 on measurement. `status` does NOT come back.
+USEFUL      A3-TX's negative result is still worth keeping: it says do not migrate
+            status to transactions either. That was a live temptation.
+```
+
+## The replacement, demonstrated rather than asserted
+
+Because declining to restore something nine production sites use requires showing
+the migration exists:
+
+```ts
+save: { state: 'idle' | 'loading' | 'loaded' | 'error', error: NotifyError | null }
+
+const setLoading = () => { state.set('loading'); error.set(null); };
+const setError = (e) => { state.set('error');   error.set(e); };
+const isLoading = () => state() === 'loading';
+```
+
+Identical behaviour to the deleted marker, typed error preserved, no primitive
+required — because the marker was never doing more than this. **What v15 owes is
+the RECIPE, not the API.**
+
+## TT2-5 reclassified
+
+```text
+WAS   ⚠️ UNRESOLVED — A3-TX settles it
+NOW   DOC/DX-GAP. Deletion stands on S1's measurement; migration is ordinary
+      state + derived predicates, mechanical across all 9 markers.
+```
+
+## Where this leaves the five withdrawn symbols
+
+```text
+loader()                withdrawal STANDS   A1, on these exact 19 sites
+asyncSource()           deletion STANDS     M9, measured outside the substrate
+status<E>()             deletion STANDS     S1, measured — corrected above
+stored()                A2 REOPENS          PER-B is genuinely new evidence
+flushAllStoredSignals() reopens WITH A2     the host-drain half
+```
+
+Four of five stand. **Only persistence has new evidence** — and it is the one the
+brief was right to single out, because PER-B did not exist when
+*"NOT EARNED as RC public API"* was written.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
