@@ -32,6 +32,7 @@
  * See docs/architecture/retired-subject-churn.md, "TRIAL".
  */
 import { entityMap } from './markers/entity-map';
+import { undoable } from '../lib/undoable';
 import { signalTree } from './signal-tree';
 import { timeTravel } from '../enhancers/time-travel/time-travel';
 import { transactions } from '../enhancers/transactions/transactions';
@@ -48,15 +49,15 @@ const makeRows = () => {
 describe('zero-owner retirement — isolation without a lifetime ledger', () => {
   it('a fresh entity reusing the key is not followed by a stale handle', () => {
     const rows = makeRows();
-    rows.setAll([{ id: 'A', name: 'Alpha' }]);
+    undoable(() => rows.setAll([{ id: 'A', name: 'Alpha' }]));
 
     const held = rows.byId('A');
     expect(held?.()?.name).toBe('Alpha');
 
-    rows.removeOne('A');
+    undoable(() => rows.removeOne('A'));
     expect(held?.()).toBeUndefined();
 
-    rows.addOne({ id: 'A', name: 'Second' });
+    undoable(() => rows.addOne({ id: 'A', name: 'Second' }));
 
     // The live lookup sees the new subject...
     expect(rows.byId('A')?.().name).toBe('Second');
@@ -66,13 +67,13 @@ describe('zero-owner retirement — isolation without a lifetime ledger', () => 
 
   it('a held FIELD reference behaves the same', () => {
     const rows = makeRows();
-    rows.setAll([{ id: 'A', name: 'Alpha' }]);
+    undoable(() => rows.setAll([{ id: 'A', name: 'Alpha' }]));
 
     const field = (rows.byId('A') as unknown as { name: () => string }).name;
     expect(field()).toBe('Alpha');
 
-    rows.removeOne('A');
-    rows.addOne({ id: 'A', name: 'Second' });
+    undoable(() => rows.removeOne('A'));
+    undoable(() => rows.addOne({ id: 'A', name: 'Second' }));
 
     expect(field()).toBeUndefined();
     expect(rows.byId('A')?.name()).toBe('Second');
@@ -88,16 +89,16 @@ describe('zero-owner retirement — isolation without a lifetime ledger', () => 
     const heldA = rows.byId('A');
     const heldB = rows.byId('B');
 
-    rows.removeOne('A');
+    undoable(() => rows.removeOne('A'));
     expect(heldA?.()).toBeUndefined();
     // Retiring A must not disturb B.
     expect(heldB?.()?.name).toBe('B1');
 
-    rows.removeOne('B');
+    undoable(() => rows.removeOne('B'));
     expect(heldB?.()).toBeUndefined();
 
-    rows.addOne({ id: 'A', name: 'A2' });
-    rows.addOne({ id: 'B', name: 'B2' });
+    undoable(() => rows.addOne({ id: 'A', name: 'A2' }));
+    undoable(() => rows.addOne({ id: 'B', name: 'B2' }));
     const heldA2 = rows.byId('A');
 
     expect(heldA?.()).toBeUndefined();
@@ -116,11 +117,11 @@ describe('zero-owner retirement — isolation without a lifetime ledger', () => 
       removeOne(id: string): void;
       __acquireEntityHandleForTesting(id: string): { subjectId: number };
     };
-    rows.setAll([{ id: 'A', name: 'Alpha' }]);
+    undoable(() => rows.setAll([{ id: 'A', name: 'Alpha' }]));
     const first = rows.__acquireEntityHandleForTesting('A').subjectId;
 
-    rows.removeOne('A');
-    rows.addOne({ id: 'A', name: 'Second' });
+    undoable(() => rows.removeOne('A'));
+    undoable(() => rows.addOne({ id: 'A', name: 'Second' }));
     const second = rows.__acquireEntityHandleForTesting('A').subjectId;
 
     expect(second).not.toBe(first);
@@ -146,7 +147,7 @@ describe('a tree WITH a restorer keeps everything', () => {
     await tick();
 
     const held = tree.$.rows.byId('A');
-    tree.$.rows.removeOne('A');
+    undoable(() => tree.$.rows.removeOne('A'));
     await tick();
     expect(held?.()).toBeUndefined();
 
@@ -163,14 +164,14 @@ describe('a tree WITH a restorer keeps everything', () => {
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       { enhancers: [transactions()], capabilities: ['causal-runtime'] }
     );
-    tree.$.rows.addOne({ id: 'A', name: 'Alpha' });
-    tree.$.rows.addOne({ id: 'B', name: 'Beta' });
+    undoable(() => tree.$.rows.addOne({ id: 'A', name: 'Alpha' }));
+    undoable(() => tree.$.rows.addOne({ id: 'B', name: 'Beta' }));
     await Promise.resolve();
     await Promise.resolve();
 
     // A retirement OUTSIDE the transaction, on a tree that HAS a restorer — so
     // the forget path must stay switched off for it.
-    tree.$.rows.removeOne('B');
+    undoable(() => tree.$.rows.removeOne('B'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -179,7 +180,7 @@ describe('a tree WITH a restorer keeps everything', () => {
         transaction: (f: () => void) => { rollback(): void };
       }
     ).transaction(() => {
-      tree.$.rows.updateOne('A', { name: 'Changed' });
+      undoable(() => tree.$.rows.updateOne('A', { name: 'Changed' }));
     });
     expect(tree.$.rows.byId('A')?.().name).toBe('Changed');
 
@@ -218,9 +219,9 @@ describe('what forgetting the ledger gives up', () => {
       __acquireEntityHandleForTesting(k: string): unknown;
       __resolveEntityHandleForTesting(h: unknown): { state: string };
     };
-    rows.setAll([{ id: 'A', name: 'Alpha' }]);
+    undoable(() => rows.setAll([{ id: 'A', name: 'Alpha' }]));
     const handle = rows.__acquireEntityHandleForTesting('A');
-    rows.removeOne('A');
+    undoable(() => rows.removeOne('A'));
 
     expect(rows.__resolveEntityHandleForTesting(handle).state).toBe('missing');
   });
@@ -234,8 +235,8 @@ describe('what forgetting the ledger gives up', () => {
       removeOne(id: string): void;
       __listSubjectReclamationCandidates(): readonly number[];
     };
-    rows.setAll([{ id: 'A', name: 'Alpha' }]);
-    rows.removeOne('A');
+    undoable(() => rows.setAll([{ id: 'A', name: 'Alpha' }]));
+    undoable(() => rows.removeOne('A'));
 
     expect(rows.__listSubjectReclamationCandidates()).toEqual([]);
   });
@@ -274,10 +275,10 @@ describe('a forgotten lifetime stays forgotten', () => {
     // that is where the resurrection happened. Any future step appended to the
     // retirement path that touches the subject by id fails here.
     const rows = internals(makeRows());
-    rows.setAll([{ id: 'A', name: 'Alpha' }]);
+    undoable(() => rows.setAll([{ id: 'A', name: 'Alpha' }]));
     const handle = rows.__acquireEntityHandleForTesting('A');
 
-    rows.removeOne('A');
+    undoable(() => rows.removeOne('A'));
 
     // No lifetime record, and no revision entry regrown behind it: a revision
     // that had been re-interned would resolve the handle with a `revision`
@@ -295,15 +296,15 @@ describe('a forgotten lifetime stays forgotten', () => {
     // A later mutation must not resurrect an earlier retirement by touching
     // shared bookkeeping — the same failure mode, one operation removed.
     const rows = internals(makeRows());
-    rows.setAll([{ id: 'A', name: 'Alpha' }]);
+    undoable(() => rows.setAll([{ id: 'A', name: 'Alpha' }]));
     const handle = rows.__acquireEntityHandleForTesting('A');
-    rows.removeOne('A');
+    undoable(() => rows.removeOne('A'));
 
-    rows.addOne({ id: 'B', name: 'Beta' });
-    rows.updateOne('B', { name: 'Beta2' });
-    rows.addOne({ id: 'A', name: 'Second' });
-    rows.removeOne('B');
-    rows.setAll([{ id: 'C', name: 'Gamma' }]);
+    undoable(() => rows.addOne({ id: 'B', name: 'Beta' }));
+    undoable(() => rows.updateOne('B', { name: 'Beta2' }));
+    undoable(() => rows.addOne({ id: 'A', name: 'Second' }));
+    undoable(() => rows.removeOne('B'));
+    undoable(() => rows.setAll([{ id: 'C', name: 'Gamma' }]));
 
     expect(rows.__inspectSubjectResources(handle.subjectId)).toBeUndefined();
     expect(rows.__listSubjectReclamationCandidates()).toEqual([]);
@@ -332,9 +333,9 @@ describe('a forgotten lifetime stays forgotten', () => {
         subjectId: number
       ): { commit(): void; publish(): void };
     };
-    rows.setAll([{ id: 'A', name: 'Alpha' }]);
+    undoable(() => rows.setAll([{ id: 'A', name: 'Alpha' }]));
     const subjectId = rows.__acquireEntityHandleForTesting('A').subjectId;
-    rows.removeOne('A');
+    undoable(() => rows.removeOne('A'));
 
     // HALF ONE: the guard no longer fires. Reached only by calling the
     // non-enumerable internal directly, which is what makes this a statement

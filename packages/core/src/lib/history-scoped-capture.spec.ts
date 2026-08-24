@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { undoable } from '../lib/undoable';
 
 import { entityMap } from './types';
 import { signalTree } from './signal-tree';
@@ -52,7 +53,7 @@ describe('ST2029 — history retention', () => {
     );
     warn.mockClear();
 
-    tree.$.rows.setAll(rows(width));
+    undoable(() => tree.$.rows.setAll(rows(width)));
     await flush();
     for (let i = 1; i <= writes; i++) {
       (tree as unknown as (v: object) => void)({ n: i });

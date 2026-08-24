@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { undoable } from '../lib/undoable';
 import { batching } from './batching/batching';
 import { timeTravel } from './time-travel/time-travel';
 import { devTools } from './devtools/devtools';
@@ -87,7 +88,7 @@ describe('enhancer cleanup registration', () => {
       { enhancers: [timeTravel()] }
     );
 
-    tree.$.count.set(1);
+    undoable(() => tree.$.count.set(1));
     await flush();
     expect(tree.getHistory().length).toBeGreaterThan(1);
 
@@ -111,7 +112,7 @@ describe('destroy() clears enhancer resources', () => {
     const enhanced = batching({ notificationDelayMs: 100 })(tree);
 
     // Trigger a batched notification
-    enhanced.$.count.set(42);
+    undoable(() => enhanced.$.count.set(42));
 
     // Destroy should clear the timer
     tree.destroy();
@@ -133,8 +134,8 @@ describe('destroy() clears enhancer resources', () => {
     );
 
     // Make some changes
-    enhanced.$.count.set(1);
-    enhanced.$.count.set(2);
+    undoable(() => enhanced.$.count.set(1));
+    undoable(() => enhanced.$.count.set(2));
 
     enhanced.destroy();
 

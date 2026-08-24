@@ -1,4 +1,5 @@
 import { effect } from '@angular/core';
+import { undoable } from '../../../lib/undoable';
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -34,13 +35,13 @@ function createMockStorage(): Storage {
   return {
     getItem: (key: string) => store.get(key) ?? null,
     setItem: (key: string, value: string) => {
-      store.set(key, value);
+      undoable(() => store.set(key, value));
     },
     removeItem: (key: string) => {
       store.delete(key);
     },
     clear: () => {
-      store.clear();
+      undoable(() => store.clear());
     },
     key: (index: number) => Array.from(store.keys())[index] ?? null,
     get length() {
@@ -207,7 +208,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u2', name: 'Alice', enabled: true });
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Alice', enabled: true }));
     getPathNotifier().flushSync();
 
     const owner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -288,7 +289,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true }));
     getPathNotifier().flushSync();
 
     const collectionOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -333,7 +334,7 @@ describe('tree realization adapter', () => {
         descriptors,
       });
 
-      tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+      undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
       getPathNotifier().flushSync();
 
       const nameLeaf = tree.$.users.byIdOrFail('u1').name;
@@ -386,7 +387,7 @@ describe('tree realization adapter', () => {
     };
 
     try {
-      tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+      undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
       getPathNotifier().flushSync();
 
       const nameLeaf = tree.$.users.byIdOrFail('u1').name;
@@ -410,7 +411,7 @@ describe('tree realization adapter', () => {
         descriptors,
       });
 
-      tree.$.users.changeId('u1', 'u2');
+      undoable(() => tree.$.users.changeId('u1', 'u2'));
       getPathNotifier().flushSync();
 
       resetProductionSubstrateStatsForTesting(stats);
@@ -449,7 +450,7 @@ describe('tree realization adapter', () => {
     };
 
     try {
-      tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+      undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
       getPathNotifier().flushSync();
 
       const collectionOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -493,7 +494,7 @@ describe('tree realization adapter', () => {
         descriptors,
       });
 
-      tree.$.users.removeOne('u1');
+      undoable(() => tree.$.users.removeOne('u1'));
       getPathNotifier().flushSync();
 
       resetProductionSubstrateStatsForTesting(stats);
@@ -555,7 +556,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
     getPathNotifier().flushSync();
 
     const owner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -564,8 +565,8 @@ describe('tree realization adapter', () => {
       throw new Error('Expected entity structural metadata');
     }
 
-    tree.$.users.removeOne('u1');
-    tree.$.users.addOne({ id: 'u1', name: 'Bob' });
+    undoable(() => tree.$.users.removeOne('u1'));
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Bob' }));
     getPathNotifier().flushSync();
 
     const descriptors = new Map<number, TreeRealizationDescriptor>();
@@ -618,7 +619,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
     getPathNotifier().flushSync();
 
     const nameOwner = getOwnedPositionIds(
@@ -638,7 +639,7 @@ describe('tree realization adapter', () => {
       subjectIds: [subjectId],
     });
 
-    tree.$.users.changeId('u1', 'u2');
+    undoable(() => tree.$.users.changeId('u1', 'u2'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -692,7 +693,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-        tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+        undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
 
         const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
         const nameLeaf = tree.$.users.byIdOrFail('u1').name;
@@ -782,7 +783,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true }));
     getPathNotifier().flushSync();
 
     const owner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -884,7 +885,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -916,7 +917,7 @@ describe('tree realization adapter', () => {
       },
     });
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -974,7 +975,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-        tree.$.users.addOne({ id: 'u1', name: 'Ada' });
+        undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
         getPathNotifier().flushSync();
 
         const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -1018,7 +1019,7 @@ describe('tree realization adapter', () => {
           subjectIds: [subjectId],
         });
 
-        tree.$.users.removeOne('u1');
+        undoable(() => tree.$.users.removeOne('u1'));
         getPathNotifier().flushSync();
 
         expect(tree.$.users.ids()).toEqual([]);
@@ -1101,7 +1102,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -1143,7 +1144,7 @@ describe('tree realization adapter', () => {
       subjectIds: [subjectId],
     });
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -1252,7 +1253,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -1294,7 +1295,7 @@ describe('tree realization adapter', () => {
       subjectIds: [subjectId],
     });
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -1372,7 +1373,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -1414,7 +1415,7 @@ describe('tree realization adapter', () => {
       subjectIds: [subjectId],
     });
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -1497,8 +1498,8 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
-    tree.$.users.addOne({ id: 'u2', name: 'Bea' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Bea' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -1533,7 +1534,7 @@ describe('tree realization adapter', () => {
       },
     });
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -1585,8 +1586,8 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
-    tree.$.users.addOne({ id: 'u2', name: 'Bea' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Bea' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -1629,7 +1630,7 @@ describe('tree realization adapter', () => {
       },
     });
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -1710,8 +1711,8 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
-    tree.$.users.addOne({ id: 'u2', name: 'Bea' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Bea' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -1761,7 +1762,7 @@ describe('tree realization adapter', () => {
       subjectIds: [subject42],
     });
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -1855,8 +1856,8 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
-    tree.$.users.addOne({ id: 'u2', name: 'Bea' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Bea' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -1917,8 +1918,8 @@ describe('tree realization adapter', () => {
       },
     });
 
-    tree.$.users.removeOne('u1');
-    tree.$.users.removeOne('u2');
+    undoable(() => tree.$.users.removeOne('u1'));
+    undoable(() => tree.$.users.removeOne('u2'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -2003,8 +2004,8 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
-    tree.$.users.addOne({ id: 'u2', name: 'Bea' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Bea' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -2054,7 +2055,7 @@ describe('tree realization adapter', () => {
       subjectIds: [subject42],
     });
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -2138,9 +2139,9 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
-    tree.$.users.addOne({ id: 'u2', name: 'Bea' });
-    tree.$.users.addOne({ id: 'u3', name: 'Cy' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Bea' }));
+    undoable(() => tree.$.users.addOne({ id: 'u3', name: 'Cy' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -2225,8 +2226,8 @@ describe('tree realization adapter', () => {
       },
     });
 
-    tree.$.users.removeOne('u1');
-    tree.$.users.removeOne('u3');
+    undoable(() => tree.$.users.removeOne('u1'));
+    undoable(() => tree.$.users.removeOne('u3'));
     getPathNotifier().flushSync();
 
     const adapter = createTreeRealizationAdapter({
@@ -2316,7 +2317,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Ada' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Ada' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -2623,7 +2624,7 @@ describe('tree realization adapter', () => {
       collectionInternal.__inspectSubjectResources(freshSubjectId)
     ).toBeUndefined();
 
-    tree.$.users.addOne({ id: 'live', name: 'Live' });
+    undoable(() => tree.$.users.addOne({ id: 'live', name: 'Live' }));
     getPathNotifier().flushSync();
 
     expect(tree.$.users.byIdOrFail('live').name.__subjectIds?.[0]).toBe(
@@ -2723,7 +2724,7 @@ describe('tree realization adapter', () => {
     adapter.applyAtomically([freshAdd, renameFresh]);
     getPathNotifier().flushSync();
 
-    tree.$.users.addOne({ id: 'u2', name: 'Bea' });
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Bea' }));
     getPathNotifier().flushSync();
 
     expect(tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0]).toBe(
@@ -2755,7 +2756,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Legacy' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Legacy' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -2766,7 +2767,7 @@ describe('tree realization adapter', () => {
       throw new Error('Expected existing subject metadata');
     }
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     const freshSubjectId = oldSubjectId + 10_000;
@@ -3000,7 +3001,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Legacy' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Legacy' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -3147,7 +3148,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Legacy' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Legacy' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -3371,7 +3372,7 @@ describe('tree realization adapter', () => {
             throw new Error(`Expected owned position for ${String(key)}`);
           }
 
-          descriptors.set(owner, { path: String(key), ownerPath: String(key) });
+          undoable(() => descriptors.set(owner, { path: String(key), ownerPath: String(key) }));
           effects.push({ owner, before: leafIndex, after: leafIndex + 1 });
         }
 
@@ -3437,8 +3438,8 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Alice' });
-    tree.$.users.addOne({ id: 'u2', name: 'Bob' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Bob' }));
     getPathNotifier().flushSync();
 
     const owner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -3583,7 +3584,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice', enabled: true }));
     getPathNotifier().flushSync();
 
     const owner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -3602,14 +3603,14 @@ describe('tree realization adapter', () => {
       throw new Error('Expected subject and position metadata');
     }
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     getPathNotifier().flushSync();
 
     expect(heldRow()).toBeUndefined();
     expect(heldName()).toBeUndefined();
     expect(tree.$.users.ids()).toEqual([]);
 
-    tree.$.users.addOne({ id: 'u1', name: 'Bob', enabled: false });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Bob', enabled: false }));
     getPathNotifier().flushSync();
 
     expect(heldRow()).toBeUndefined();
@@ -3783,7 +3784,7 @@ describe('tree realization adapter', () => {
 
     const baselineHistory = tree.getHistory().length;
 
-    tree.$.left.set('A');
+    undoable(() => tree.$.left.set('A'));
     getPathNotifier().flushSync();
     await Promise.resolve();
     const afterAuthoredLeft = tree.getHistory().length;
@@ -3792,7 +3793,7 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
     await Promise.resolve();
 
-    tree.$.right.set('C');
+    undoable(() => tree.$.right.set('C'));
     getPathNotifier().flushSync();
     await Promise.resolve();
 
@@ -3878,7 +3879,7 @@ describe('tree realization adapter', () => {
       getHistory(): unknown[];
     };
 
-    tree.$.users.addOne({ id: 'u2', name: 'Alice' });
+    undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Alice' }));
     getPathNotifier().flushSync();
     await Promise.resolve();
 
@@ -3949,7 +3950,7 @@ describe('tree realization adapter', () => {
       getHistory(): unknown[];
     };
 
-    tree.$.before.set('A');
+    undoable(() => tree.$.before.set('A'));
     getPathNotifier().flushSync();
     await Promise.resolve();
     const baselineHistory = tree.getHistory().length;
@@ -3980,7 +3981,7 @@ describe('tree realization adapter', () => {
       ])
     ).toThrow('Missing structural restore metadata');
 
-    tree.$.after.set('B');
+    undoable(() => tree.$.after.set('B'));
     getPathNotifier().flushSync();
     await Promise.resolve();
 
@@ -4024,9 +4025,9 @@ describe('tree realization adapter', () => {
     });
 
     const pending = tree.transaction(() => {
-      tree.$.left.set('A');
+      undoable(() => tree.$.left.set('A'));
       adapter.applyAtomically([{ owner, before: '', after: 'B' }]);
-      tree.$.right.set('C');
+      undoable(() => tree.$.right.set('C'));
     });
 
     expect(tree.$.left()).toBe('A');
@@ -4166,7 +4167,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
     getPathNotifier().flushSync();
 
     const owner = getOwnedPositionIds(tree.$.status)?.[0];
@@ -4182,9 +4183,9 @@ describe('tree realization adapter', () => {
     }
 
     const frame = scalarSlotRuntime.beginFrame();
-    frame.set(slotIndex, 'Alicia');
+    undoable(() => frame.set(slotIndex, 'Alicia'));
 
-    tree.$.users.changeId('u1', 'u2');
+    undoable(() => tree.$.users.changeId('u1', 'u2'));
     getPathNotifier().flushSync();
 
     expect(() => frame.commit()).toThrow(
@@ -4233,7 +4234,7 @@ describe('tree realization adapter', () => {
       getHistory(): unknown[];
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
     getPathNotifier().flushSync();
 
     const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
@@ -4302,7 +4303,7 @@ describe('tree realization adapter', () => {
           update: frame.update.bind(frame),
           discard: frame.discard.bind(frame),
           commit: (options) => {
-            tree.$.other.set('updated elsewhere');
+            undoable(() => tree.$.other.set('updated elsewhere'));
             return frame.commit(options);
           },
         };
@@ -4382,7 +4383,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-        tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+        undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
 
         const structuralOwner = getOwnedPositionIds(tree.$.users)?.[0];
         const statusOwner = getOwnedPositionIds(tree.$.status)?.[0];
@@ -4471,7 +4472,7 @@ describe('tree realization adapter', () => {
       destroy(): void;
     };
 
-    tree.$.users.addOne({ id: 'u1', name: 'Alice' });
+    undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
     getPathNotifier().flushSync();
 
     const scalarOwner = getOwnedPositionIds(tree.$.profile.name)?.[0];
