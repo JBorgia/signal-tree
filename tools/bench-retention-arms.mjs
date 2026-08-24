@@ -13,19 +13,23 @@
 // collection into the number (7.62 MB for the scalar arm) -- that difference is
 // why the spike's 0.896 MB never reproduced.
 //
-// argv: <shape> <width> <steps> [norec]
+// argv: <shape> <width> <steps>
 //   shape: scalar | sameRow | diffRows | allRows | n<K>   (n400 = 400 rows per write)
-//   norec: pass literally to set `entityMap({ recordHistory: false })`
+//
+// The `norec` arm was REMOVED in 15.0 with `entityMap({ recordHistory: false })`.
+// It measured retention with the collection excluded from history by location,
+// which is the model HIST-0 case 4 refuted. The equivalent question under opt-in
+// eligibility is "how much does an UNDOABLE operation retain", which is measured
+// by designating fewer operations rather than by excluding a location.
 import { signalTree, entityMap, timeTravel } from '/Users/jonathanborgia/code/signaltree/dist/packages/core/dist/index.js';
-const [shape, wArg, sArg, recArg] = process.argv.slice(2);
+const [shape, wArg, sArg] = process.argv.slice(2);
 const width = Number(wArg), steps = Number(sArg);
-const recordHistory = recArg !== 'norec';
 const tick = () => new Promise((r) => setTimeout(r, 0));
 const settle = async () => { for (let i = 0; i < 3; i++) { global.gc(); await tick(); } };
 const heap = () => process.memoryUsage().heapUsed / 1024 / 1024;
 
 const tree = signalTree({
-  rows: entityMap({ selectId: (r) => r.id, ...(recordHistory ? {} : { recordHistory: false }) }),
+  rows: entityMap({ selectId: (r) => r.id }),
   n: 0,
 }, { enhancers: [timeTravel({ maxHistorySize: 10000 })] });
 tree.$.rows.addMany(Array.from({ length: width }, (_, i) => ({ id: String(i), v: i })));
@@ -58,7 +62,7 @@ if (tree.$.rows.count() !== width) throw new Error('collection changed size');
 void tree.$.rows.all()[1].v;  // read back
 const entries = tree.getHistory().length;
 console.log(JSON.stringify({
-  shape, width, steps, recordHistory,
+  shape, width, steps,
   retainedMB: +retained.toFixed(3),
   entries,
   bytesPerPointer: shape === 'scalar' ? null : +(retained * 1048576 / (steps * width)).toFixed(2),

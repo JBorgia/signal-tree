@@ -92,7 +92,9 @@ question — _own a scoped undo stack_ versus _be recorded into someone else's_.
 spelling could not mean both.
 
 > **This one is worth a second look even if you never used it.** With
-> `recordHistory: false`, retention becomes **independent of collection width** —
+> `recordHistory: false` was REMOVED in 15.0 — see the 15.0 notes. It
+> excluded a collection from history by LOCATION, which partially reversed
+> any turn that touched both it and ordinary state.
 > measured flat at ~0.15 MB across 1k, 10k and 50k rows, against 19.38 MB for an
 > included 50k collection over 50 entries. It removes the `entries × width` term
 > rather than shrinking it. Previously published figures for this flag

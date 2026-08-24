@@ -364,11 +364,6 @@ const EXEMPT = new Map(
     // real public config member today; each is slated to be deleted or
     // reconciled before 15.0 ships. If any of them survives to release, the
     // exemption is wrong and it must be documented instead.
-    recordHistory:
-      'entityMap({ recordHistory: false }) — a location-scoped history filter ' +
-      '(RFC 0012). HIST-0 case 4 and a measured mixed-turn case show it ' +
-      'partially reverses an atomically authored operation. Opt-in eligibility ' +
-      'leaves it no semantic role; slated for deletion, not documentation',
     shouldSkip:
       'TimeTravelConfig.shouldSkip — a read-time transition filter that still ' +
       'pays full recording cost. Overlaps what turn eligibility now expresses; ' +

@@ -783,42 +783,6 @@ export interface EntityConfig<E, K extends string | number = string> {
    */
   sortComparer?: (a: E, b: E) => number;
 
-  /**
-   * Exclude this collection from `timeTravel()` history while keeping it in
-   * every OTHER snapshot — `serialization()`, `persistence()`, devtools, audit.
-   *
-   * **Named `recordHistory`, not `history`, since 14.1.1.** The old name collided
-   * with `form({ history: history() })` — and the two are DIFFERENT questions, so
-   * unifying them (the first plan) would have been wrong:
-   *
-   * - `form({ history: history() })` — this form OWNS a scoped undo stack. Opt IN
-   *   to a new, independent history that cannot see the rest of the tree.
-   * - `entityMap({ recordHistory: false })` — participation in the AMBIENT
-   *   `timeTravel()` stack. Opt OUT of a history someone else owns.
-   *
-   * One word for "own a history" and "be recorded into a history" is the collision.
-   * Two concepts, two names.
-   *
-   * Why the two need separating: `entityMap`'s snapshot is `{ all: node.all() }`,
-   * an N-pointer array rebuilt whenever the collection changes. Time travel
-   * records on every self-dirty flush, so attaching `timeTravel()` to a tree
-   * containing a large collection makes every collection-mutating write
-   * O(collection width), permanently. A 10,000-row streaming grid wants to
-   * survive reload and does NOT want to be in the undo stack.
-   *
-   * Before this flag, `transient: true` was the only opt-out and it opted out of
-   * BOTH — the grid either paid O(N) per write or did not persist at all.
-   *
-   * ⚠️ **Undo becomes partial for this collection, by design.** Undoing past a
-   * write to it will not revert it. That is the point, and it is the reason this
-   * is opt-in: "a partial restore is worse than a failed one" is a lesson this
-   * codebase has already paid for.
-   *
-   * @default true
-   * @example
-   * entityMap<Row, number>({ selectId: (r) => r.id, recordHistory: false })
-   */
-  recordHistory?: boolean;
 
   /**
    * Entity-level hooks (run before collection hooks)

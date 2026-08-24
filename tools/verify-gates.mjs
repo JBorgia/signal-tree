@@ -874,18 +874,22 @@ const GATES = [
     // `**/*.spec.ts` and core's typecheck config covers only *.typing.spec.ts,
     // so nothing typechecked it; esbuild strips types without checking. Both
     // arms of the test built an identical default tree and its equality
-    // assertion passed vacuously. Mutating the option name back reproduces it.
+    // assertion passed vacuously.
     //
-    // ⚠️ ANCHOR MOVED ONCE. The 15.0 declarative-construction codemod
-    // reformatted this call site, splitting the entityMap config across lines,
-    // and the old single-line anchor stopped matching — the self-test reported
-    // ERROR rather than silently passing, which is the behaviour to preserve if
-    // it happens again. Re-anchored on the multi-line form.
+    // ⚠️ ANCHOR MOVED TWICE, and both moves are worth knowing.
+    //   1. The 15.0 declarative-construction codemod reformatted the original
+    //      call site across lines and the single-line anchor stopped matching.
+    //      The self-test reported ERROR rather than silently passing, which is
+    //      the behaviour to preserve if it happens again.
+    //   2. 15.0 then DELETED `recordHistory` itself, taking the anchored call
+    //      site with it. Re-anchored on a surviving `entityMap` config literal —
+    //      the mechanism under test is "an unknown option in a spec's entityMap
+    //      config is a type error", which never depended on that option existing.
     mutation: {
-      file: 'packages/core/src/lib/history-scoped-capture.spec.ts',
-      find: '            recordHistory,\n          }),',
+      file: 'packages/core/src/enhancers/time-travel/turn-effect-composition.spec.ts',
+      find: '    { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },',
       replace:
-        '            recordHistory: recordHistory as never,\n            bogusOption: 1,\n          }),',
+        '    { rows: entityMap<Row, string>({ selectId: (r) => r.id, bogusOption: 1 }) },',
     },
   },
   {
