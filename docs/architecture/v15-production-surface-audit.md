@@ -2225,6 +2225,126 @@ The transaction ledger must not become the DevTools journal, and DIAG-JOURNAL
 must not become a second restoration authority. The feed is what both were
 missing; it is not itself an inventory.
 
+# TX-SURFACE-0 — does `timeTravel().transaction()` deserve to exist?
+
+> **Null: it has no independently owned public role and should be deleted in
+> favour of `transactions()`.**
+
+Audited rather than repaired, on the evidence that it is the less correct of two
+implementations of one public concept.
+
+## The evidence for deletion
+
+**The documented owner is already `transactions()`.** The core README says so:
+
+> For optimistic workflows, `transactions()` adds an explicit tree-local
+> transaction boundary.
+
+`timeTravel()`'s copy is undocumented duplication that arrives via
+`TimeTravelMethods extends TransactionMethods`.
+
+**No production consumer.** TruckTrax has no SignalTree `.transaction()` call at
+all — every hit is bundled IndexedDB/localForage code.
+
+**It is the incorrect one.** TX-LEDGER-0: its `getPendingRollbackPlan()` reads
+the restoration history as its dependency source, so under opt-in it stops
+refusing unsafe rollbacks. `transactions()` reads its own captured effects and is
+unaffected.
+
+**The target ownership story already composes, TODAY, under `'designated'`:**
+
+```text
+ordinary transaction                    commits, NOT undoable
+undoable(() => transaction(...))        commits as ONE undoable turn; undo reverses it
+```
+
+Both pinned in `tx-surface-0.spec.ts`. That is the whole model working with no new
+machinery:
+
+```text
+transactions()  groups authored work
+undoable()      admits the resulting causal turn
+timeTravel()    restores admitted turns
+```
+
+## Two things that did NOT turn out to be problems
+
+**Enhancer order does not change the answer.** `[transactions(), timeTravel()]`
+and `[timeTravel(), transactions()]` both refuse with
+`later-confirmed-dependency`. I expected a possible order-dependent
+overwrite — "whichever enhancer was listed last wins" would have been
+release-blocking on its own. It is not happening.
+
+**`timeTravel()` alone is correct today.** Under the current `'all'` default its
+history contains the later writes, so its dependency check works. The defect is
+latent and only surfaces under opt-in, which is why the flip found it and nothing
+before it did.
+
+## Migration cost, counted
+
+```text
+time-travel.spec.ts               ~46 transaction() calls, timeTravel only
+history-step-adapter.spec.ts        9 calls, timeTravel only
+time-travel-contract.typing.spec.ts 1 call
+```
+
+All migratable by adding `transactions()` to the enhancer list. No product code
+changes.
+
+**Disposition: DELETE, pending confirmation.** `TimeTravelMethods` stops
+extending `TransactionMethods`.
+
+---
+
+# TX-LEDGER-0 cases 3 and 4 — asked of the owner
+
+Run against `transactions()`, since that is where rollback lives. Pinned in
+`tx-ledger-0-cases34.spec.ts`.
+
+## Case 4 — the projection is MONOTONIC, and that is fine
+
+```text
+pending add 'a'
+authored update a.name = 'Edited'      dependency created
+authored update a.name = 'Alpha'       the effect is reversed by hand
+rollback                            -> still REFUSES
+```
+
+Once a dependency exists it stands. This is the conservative direction: it can
+refuse a rollback that would in fact have been safe, but never permits one that
+is not. **Recorded as the decision**, so a future ledger does not need to reason
+about current state in order to be correct.
+
+## Case 3 — ⚠️ a FINDING: admission is by AUTHORSHIP, and a realization is discarded
+
+```text
+pending add 'a'                             speculative row
+realization update a.name = 'FromServer'    a server refresh lands mid-transaction
+rollback                                 -> PROCEEDS, and removes the row
+```
+
+A realization creates no rollback dependency, so the rollback deletes a row the
+server had just written to.
+
+**This is RESTORE-P0 P0-C one layer up.** There, undo overwrote a realization;
+here, rollback deletes a row a server refresh had confirmed. Same shape: a
+reversal discarding truth the reversing authority does not own.
+
+Not repaired here, deliberately — it *is* the ledger-admission question. Deciding
+it decides the rule:
+
+```text
+admission by AUTHORSHIP        today's behaviour; a mid-transaction server
+                               refresh cannot protect speculative state
+admission by CAUSAL EFFECT     a realization touching speculative state makes
+                               rollback unsafe, matching how P0-C resolved
+                               the same conflict for undo
+```
+
+The P0-C precedent argues for the second, and for the same remedy — refuse rather
+than destroy. But it is a semantic decision with a cost (more refused rollbacks),
+so it is recorded as open rather than assumed.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
