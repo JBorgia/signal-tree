@@ -6747,6 +6747,157 @@ capture the failure MESSAGE  not just the exit code — the message is what prov
 green before and after       the restore is verified, not assumed
 ```
 
+# MATRIX-CLOSE · M6 — eight mechanism-removal probes. SIX PROVEN, TWO NOT
+
+One mechanism at a time, restored before the next, tree verified clean and green
+after all eight (1885 passed).
+
+```text
+S1  restoration designation   PROVEN
+S2  participation             PROVEN
+S3  origin                    ⚠️ NOT PROVEN
+S4  transaction correlation   PROVEN
+S5  lifecycle identity        ⚠️ NOT PROVEN
+S6  commit-consequence        PROVEN — table's named spec was WRONG
+S7  structural effect         PROVEN, overwhelmingly
+S8  diagnostic journal        PROVEN — and exactly as its criterion predicted
+```
+
+## The six proven
+
+```text
+S1  markMetaDesignated stops stamping
+    -> histc2-door.spec.ts, 8 failures, "expected +0 to be 1" — nothing is
+       admitted. The predicted semantic reason.
+
+S2  getWriteParticipation always returns 'authored'
+    -> a1-ingress.spec.ts, "expected 'no-refusal' to be 'ST1034'" — P0-C stops
+       protecting external truth, which is precisely the behaviour claimed.
+
+S4  transactionId omitted from the transaction's context
+    -> diag-journal-1-1-correlation.spec.ts, "txIds [undefined]" and one turn
+       where two were expected. Correlation is the behaviour, and it is gone.
+
+S6  the settlement boundary disabled
+    -> ⚠️ the table named per-b-classification P5, and P5 STAYED GREEN. The real
+       proofs are persistence-commit-ordering.spec.ts, stored-commit-ordering.spec.ts
+       and a2-persistence-discriminators.spec.ts — 8 failures.
+       WHY P5 did not fail, which is the useful part: P5's write happens INSIDE a
+       transaction callback, so it takes commit-consequence's FIRST branch
+       (`deferCommitConsequence(owner, transactionId, …)`), and the probe disabled
+       the SECOND (the open-scope-key path). Two routes into one boundary, and the
+       table named a spec that exercises the other one.
+
+S7  structuralEffect dropped from delivered metadata
+    -> 107 failures across restoration, transactions, entity lifetime and
+       a1-ingress. The most load-bearing mechanism in the set.
+
+S8  the journal's turn recording disabled
+    -> EXACTLY the pre-registered criterion, which is why the amendment was worth
+       making:
+           journal specs        RED (6: correlation, F3, F4, F4b, F5, retention)
+           everything else      GREEN (1879 passed)
+       An observer with real behaviour and no authority. Note that F3/F4/F5 fail
+       through their POSITIVE CONTROLS — the assertions that the journal actually
+       observed something — which is those controls doing the job they were added
+       for.
+```
+
+## ⚠️ S3 — NOT PROVEN. `origin` has no proven POLICY consumer
+
+```text
+probe      currentHydrateMode() forced to 'merge'
+target     hydrate-decisions.spec.ts:110 "a RESTORE is not a decline"  -> GREEN
+full suite 1885 passed, 20 skipped                                     -> GREEN
+```
+
+**Forcing the mode breaks nothing in the entire suite.** So the row's claimed
+behaviour — *a restoration replay is applied exactly; a rehydrate normalises* —
+has no proof.
+
+This retracts a claim MATRIX-CLOSE pass 1 made:
+
+```text
+PASS 1 SAID   "`currentHydrateMode` is the strongest evidence in the repo that
+              `origin` earns its axis" — a policy consumer participation cannot
+              serve
+M6 SAYS       that consumer is UNOBSERVED. The reasoning may still be correct;
+              the EVIDENCE does not exist.
+```
+
+Two possible resolutions, and M6 does not choose between them:
+
+```text
+A  the behaviour is real and untested   -> it is owed a test. The in-source
+                                           rationale describes a measured defect
+                                           ("n=3 rows=3 -> undo -> n=2 rows=3"),
+                                           so a spec should be recoverable from it.
+B  the mechanism is dead                -> the marker-hydrate path no longer
+                                           depends on the distinction, and the
+                                           branch should go.
+```
+
+Either way, `origin` remains justified as a PROVENANCE axis — DX-NAMES-1.3's
+Fact 1 and 2 stand on the enum's structure and on consumer visibility, not on
+this. What is withdrawn is the claim that it has a proven policy consumer.
+
+## ⚠️ S5 — NOT PROVEN. The `owner` half of lifecycle identity is unobserved
+
+```text
+probe      transactionIdentityKey returns String(id), dropping the owner ordinal
+target     turn-feed-0-1-identity.spec.ts  -> GREEN (2/2)
+full suite                                  -> GREEN (1885 passed)
+```
+
+The identity spec was written specifically as this falsifier, and it does not
+falsify. A distinction the probe surfaced:
+
+```text
+the KEY's owner component      unproven — nothing observes a collision
+restoration's owner FILTER     different mechanism (`event.owner ===
+                               transactionOwnerToken`), compared directly, not
+                               through the key
+```
+
+And DIAG-JOURNAL-1.1 already measured that **one tree announces under exactly one
+owner**, with channels held per-tree host — so within the only scope that ever
+reads the key, `id` alone may genuinely suffice. That points at resolution B, but
+it is not proven either.
+
+```text
+A  a second announcing owner is possible and untested -> owed a test
+B  it is impossible by construction                   -> the owner component is
+                                                         redundant and should go,
+                                                         with the per-tree
+                                                         invariant asserted instead
+```
+
+## The two probes that needed rescuing, recorded
+
+```text
+S7 first run   ANCHOR-MISS — my patch string did not exist. Caught by the
+               anchor-count assertion rather than by a green run.
+S8 target run  HARNESS INVALID — I pointed at
+               `src/lib/internals/diagnostics/diag-journal-1-grouping.spec.ts`
+               and the file is at `src/lib/internals/diag-journal-1-grouping.spec.ts`.
+               Vitest found no tests and exited 1, which the target arm reported
+               as "before=1" rather than as a pass. The FULL-SUITE arm is what
+               produced S8's result.
+```
+
+Both are why the method requires a green-before arm and a full-suite arm rather
+than trusting one named spec.
+
+## Status
+
+```text
+M1-M5, M7-M11   swept
+M6              8 probes run; 6 proven, 2 NOT proven
+OPEN            S3 and S5 — each needs a test written or a mechanism deleted.
+                That is a decision, not a sweep, so MATRIX-CLOSE does not make it
+                unilaterally.
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
