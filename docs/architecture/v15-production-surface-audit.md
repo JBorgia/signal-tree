@@ -3907,6 +3907,94 @@ repaired    ownership, identity, reachability, failure behaviour
 
 Recorded as a correctness repair to the frozen seam, not a new disposition.
 
+# TURN-FEED-0.2.1 — the repair was still deriving ownership from one producer
+
+The 0.2 resolver asked `!!tree['__transactions']` to decide whether a tree HAS a
+transaction authority. Its own acceptance matrix contained the contradiction:
+case 7b records that `restoration()` alone owns transactions and installs a
+channel, while `restoration()` publishes no `__transactions` handle.
+
+Predicted, then measured before fixing:
+
+```text
+restoration() alone, channel deleted from the canonical host
+  expected  "transaction authority but no lifecycle channel"   (corruption)
+  ACTUAL    "this tree has no transaction capability"          (absence)
+```
+
+**The loud failure was loud for one enhancer and silent for the other.** Case 8
+had proved fail-loud for one owner IMPLEMENTATION, not for the ownership
+INVARIANT.
+
+## The fix comes out of the owner/observer split itself
+
+`installTransactionLifecycleChannel()` is an operation only an owner performs, so
+the act of installing IS the authority fact:
+
+```text
+canonical host
+  TransactionLifecycleOwnerPresent = true     written by install
+  TransactionLifecycleChannel      = channel
+```
+
+```text
+channel present                    -> return it
+channel absent + owner marker      -> ST1036 CORRUPTION
+channel absent + no owner marker   -> legitimate absence
+```
+
+The marker is written BEFORE install's early return, so a second owner joining an
+existing channel still asserts it, and it survives a channel that is later lost —
+which is exactly the corrupted state the resolver has to recognise.
+
+**Not** `__transactions || __restoration`. That replaces one owner-specific
+heuristic with two and keeps the defect, merely enumerating more of it. Nothing
+records WHICH owner or how many; if owner identity is ever needed the marker
+becomes a registry, but widening it before a consumer exists would be inventing
+the requirement.
+
+## Triangulated, not exemplified
+
+```text
+8a  transactions() owner  + deleted channel   -> corruption
+8b  restoration() owner   + deleted channel   -> corruption
+8c  no owner, no channel                      -> legitimate absence
+```
+
+13 cases green. This is the third finding in this seam produced by asking *why*
+a green test is green rather than *whether* it is green.
+
+# F1 REPRESENTATION — TERMINAL
+
+```text
+journal unit           = the causal turn (flush-bounded)
+transaction lifecycle  = correlated protocol facts
+```
+
+A confirmed transaction happens to align with one causal turn; a rollback proves
+transaction identity cannot define the unit — one transaction, two causal turns,
+one lifecycle ending `rolled-back`.
+
+```ts
+DiagnosticTurn {
+  sequence: number;
+  effects: readonly DiagnosticEffect[];
+  transactionId?: number;   // CORRELATION, not the boundary
+}
+```
+
+The concrete type name and field set stay open — F3-F7 must be allowed to delete
+fields that are not necessary and expose fields that are — but the semantic unit
+is settled.
+
+## ⚠️ A constraint that falls out of F1 and must not be lost
+
+**Lifecycle state may not be stored inside a turn as though it were turn state.**
+A transaction can be `opened`/`staged` when its speculative causal turn is
+recorded and become `rolled-back` later, after a DIFFERENT causal turn exists.
+Retroactively editing the first turn would rewrite what that turn WAS. Lifecycle
+facts need correlated event representation, not mutation of a recorded turn.
+
 # DIAG-JOURNAL-1 · F1 + F2 — measured after the repair, probe unchanged
 
 ```text
