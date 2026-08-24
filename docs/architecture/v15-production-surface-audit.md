@@ -8610,11 +8610,13 @@ first two and silently desynchronises Y2 from truth Y1 supplied. Only a
 link-local correlation gets all three right.
 
 The mechanism already exists: `WriteMetadata.correlationId` survives to the
-subscriber alongside `origin`, `participation` and `ownerId` (measured). But
-`external()`, the public ingress door, does not accept one — so
-`withWriteContext` is required, which means **a correct two-way link must be
-core, not user-land.** That is an argument for `link()` existing, produced by
-measurement rather than by preference.
+subscriber alongside `origin`, `participation` and `ownerId` (measured).
+
+⚠️ **AND I DREW THE WRONG CONCLUSION FROM IT.** I wrote that because
+`external()` cannot stamp a correlation, "a correct two-way link must be core."
+LINK-ECHO-1 falsifies that: correlation is SUFFICIENT, not necessary. See
+LINK-ECHO-1 below — the core-necessity argument survives, but it rests on the
+EGRESS authority, not the ingress classification.
 
 ## Case 5 — order, not a clock
 
@@ -8674,6 +8676,140 @@ and a promise chain. Every one of those was earned separately for another reason
 
 `retrieve()` stays EXPLICIT. Nothing in the lineage has earned automatic initial
 retrieval as fundamental behaviour.
+
+# LINK-ECHO-1 — my core-necessity argument was wrong. The corrected one is better
+
+`packages/core/src/lib/link-echo-1-suppression.spec.ts`, 24/24 across three arms
+plus two public-only arms.
+
+LINK-1 proved correlation WORKS. I claimed it proved correlation is NECESSARY,
+and those are different claims. One shared battery — leaf self-echo, authored
+control, cross-link, authored-change-after-acquisition, rapid A-then-B inbound,
+branch full-shape, branch structurally-equal-different-reference, and X returning
+to an earlier value — run against three suppression rules:
+
+```text
+correlation      8/8   stamp linkId inbound; outbound skips its own
+equality-said    7/8   ELIMINATED
+equality-held    8/8   equivalent to correlation, and stamps NOTHING
+```
+
+## What eliminated `equality-said`
+
+The rule exactly as first proposed — "remember what Y said" — fails one case, and
+it is not a hypothetical:
+
+```text
+1  Y supplies 'light'          nothing goes out              ✓
+2  app authors 'dark'          'dark' goes out; Y holds it   ✓
+3  app authors 'light' again   'light' === what Y SAID in 1  -> SUPPRESSED  ✗
+```
+
+Y is stranded at `'dark'` while X is `'light'`, permanently, because the mismatch
+is invisible to the rule. One word fixes it: remember what Y is known to **HOLD**,
+which means an outbound send updates the remembered value too. That is the only
+difference between the two equality arms, and it is worth stating explicitly in
+whatever ships.
+
+## `equality-held` is the better rule, not merely an equal one
+
+```text
+Y already told us X = A. Don't immediately tell Y that X = A.
+If X becomes B, tell Y B.
+```
+
+It describes the RELATIONSHIP; correlation describes the implementation. It needs
+no privileged ingress. And it draws a boundary worth having: `link()` is STATE
+SYNCHRONISATION, so difference is meaningful — an event emission
+(`sendOrder(order)`) has no "only if different" and belongs to the
+committed-consequence side instead.
+
+`deepEqual` is the comparison, which is why the different-reference case matters:
+a transport that deserializes JSON hands back equal contents with new identity
+every time, and reference equality would echo forever.
+
+## What survives of the core-necessity argument, and it is simpler
+
+```text
+INBOUND    reachable from public `external()` alone — measured
+OUTBOUND   NOT reachable. `scheduleDurableConsequence` is not exported and
+           `getPathNotifier` is explicitly "not root app API", so application
+           code has no way to defer a write until the tree settles.
+```
+
+Measured: the only thing user-land can do is write through at authoring time.
+Inside a transaction that leaves Y holding the rolled-back value with nothing
+coming to correct it — LINK-1's PUSH-OUT requirement, "only settled state
+escapes", unreachable from outside core.
+
+> **`link()` is core because of the EGRESS AUTHORITY, not the ingress
+> classification.**
+
+That is a better argument than the one it replaces: it does not depend on which
+suppression rule wins, and it is the same authority `stored()` and
+`persistence()` were already using privately.
+
+# LINK-2 — the public contract. 12/12
+
+`packages/core/src/lib/link-2-public-contract.spec.ts`. Deliberately smaller than
+LINK-1; it retests no causality and answers only the unearned API questions.
+
+## The endpoint contract
+
+```text
+Endpoint<T>   get? / set? / subscribe?, all optional, AT LEAST ONE required
+              empty is REFUSED, not silently inert — every member being optional
+              means `{}` type-checks, and a link that looks installed and does
+              nothing forever is the worst available outcome
+              get-only / set-only / subscribe-only all valid
+              retrieve() on a set-only endpoint fails loudly
+```
+
+**`get + subscribe` is meaningful** — snapshot then live — and must not be
+forbidden. It also has a hazard that is the exact mirror of case 5's outbound
+rule:
+
+```text
+OUTBOUND  an older set() may not finish after a newer one   -> serialize
+INBOUND   an older acquisition may not overwrite a newer one -> sequence guard
+```
+
+Measured: a slow `get()` started first and resolving last overwrites a newer
+pushed value without the guard. Neither rule involves a clock.
+
+## The returned surface
+
+```text
+retrieve()   EARNED, and stays EXPLICIT — nothing in the lineage has earned
+             automatic startup hydration
+dispose()    EARNED (LINK-1 case 2)
+settled()    CONDITIONALLY EARNED, and the condition is the ENDPOINT'S, not the
+             link's: a SYNCHRONOUS endpoint has no in-flight window at all
+             (measured — the value is durable with no await), while an async one
+             does and nothing else public can observe it. TruckTrax's seven
+             leaves are synchronous, so its historical drain need disappears
+             once the debounce does.
+clear()      NOT EARNED — an endpoint operation
+save()       NOT EARNED — outbound is automatic
+flush()      NOT EARNED — there is no debounce to flush
+errors       NO Link surface at all
+```
+
+## Rejection visibility needs no new surface
+
+A rejected `set()` routes to `reportTreeError`, which `onTreeError` already
+observes — the mechanism built to answer NGXS's `NgxsUnhandledErrorHandler`
+because per-marker `onError` meant wiring Sentry at every call site forever. The
+harness's LINK-1 `failures` array is deleted. Also verified: a listener that
+throws does not damage the link, so adding error reporting cannot become a source
+of errors.
+
+```text
+⚠️ FINDING — `onTreeError` is NOT exported from the barrel.
+   It lives in `internals/` and no application can reach it, so every marker
+   that reports through it is invisible today, not just a link. Pinned by an
+   assertion that exporting it must flip.
+```
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
