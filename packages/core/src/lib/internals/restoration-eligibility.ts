@@ -1,5 +1,5 @@
 /**
- * HIST-C2 — restoration eligibility designation.
+ * Restoration eligibility designation — the mechanism behind `undoable()`.
  *
  * The semantic rule this implements:
  *
@@ -24,9 +24,9 @@
  * If evidence later proves an authored operation must span awaits, that earns an
  * explicit operation handle. It is not this.
  *
- * @internal Not public API. The public spelling is chosen after the door
- *   semantics are characterised; applications must express intent ("this is an
- *   undoable user operation"), never manipulate the causal engine directly.
+ * @internal Not public API — `undoable()` is. Applications express intent
+ *   ("this is an undoable user operation") and never manipulate the causal
+ *   engine directly. This module is the one place that ambient bit lives.
  */
 
 import type { UpdateMetadata } from '../mutation-types';

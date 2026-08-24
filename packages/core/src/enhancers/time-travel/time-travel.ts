@@ -2152,9 +2152,9 @@ function checkHistoryRetention(root: unknown, entries: number): void {
     )}k entity pointers — ${entries} history entries, each holding a fresh ` +
       `array for every collection it captures (widest: "${widestPath}" at ` +
       `${widest}). Every write to those collections is O(collection), and the ` +
-      `history only grows. If a collection should not be captured at all, use ` +
-      `transient: true; otherwise reduce maxHistorySize, or reduce how many ` +
-      `operations are undoable. [ST2029]`
+      `history only grows. Reduce maxHistorySize, or reduce how many ` +
+      `operations are undoable() — an operation that is not undoable retains ` +
+      `nothing, whatever it touches. [ST2029]`
   );
 }
 
