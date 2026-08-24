@@ -1,4 +1,5 @@
 declare const ngDevMode: boolean | undefined;
+import { getActiveWriteContext, withWriteContext } from '../../lib/write-context';
 import type { HydrateMode } from '../../lib/internals/materialize-markers';
 import { isSignal, Signal, WritableSignal } from '@angular/core';
 
@@ -1118,7 +1119,27 @@ export function persistence(
       try {
         const data = await Promise.resolve(storageAdapter.getItem(key));
         if (data) {
-          enhanced.deserialize(data, serializationConfig);
+          // A2-2. Rehydrating durable truth into a LIVE tree is a realization
+          // of external truth, not authored work — the same rule PER-B P2 fixed
+          // one level down for `stored().reload()`, which measured
+          // `{ origin: null, participation: null }` before its fix and let an
+          // enclosing transaction roll a durable read back (PER-B P4).
+          //
+          // Measured here before this fix: `load()` emitted exactly one write,
+          // classified AUTHORED. The tree-scoped surface had the marker's old
+          // defect, unfixed.
+          //
+          // Only the SYNCHRONOUS application is wrapped. The `await` above is
+          // the storage READ; the write itself happens inside the context, so
+          // this is not the async application ST1035 refuses.
+          withWriteContext(
+            {
+              ...(getActiveWriteContext() ?? {}),
+              origin: 'external',
+              participation: 'realized',
+            },
+            () => enhanced.deserialize(data, serializationConfig)
+          );
           // Reset cache after loading new data using a metadata-free key
           lastCacheKey = enhanced.serialize({
             ...serializationConfig,
