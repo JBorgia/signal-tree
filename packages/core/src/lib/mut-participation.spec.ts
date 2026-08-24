@@ -131,7 +131,8 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
     resetPathNotifier();
     const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
     await tick();
-    tree.$.a({ n: 2 });
+    // Designated: this test UNDOES this write, so it has to be an admitted turn.
+    undoable(() => tree.$.a({ n: 2 }));
     await tick();
 
     const beforeHistory = tree.getHistory().length;
@@ -161,9 +162,12 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
         return { tree, read: () => tree.$.rows.all() };
       },
       (t) => {
-        (
-          t as unknown as { $: { rows: { addMany(x: unknown[]): void } } }
-        ).$.rows.addMany([{ id: 'a', v: 1 }]);
+        // Designated: the probe asserts a history count for this operation.
+        undoable(() =>
+          (
+            t as unknown as { $: { rows: { addMany(x: unknown[]): void } } }
+          ).$.rows.addMany([{ id: 'a', v: 1 }])
+        );
       }
     );
     expect({ landed: r.landed, history: r.history }).toEqual({

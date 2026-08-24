@@ -78,7 +78,9 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
     const tree = signalTree({ counter: 10 }, { enhancers: [timeTravel()] });
     const api = makeCounterApi(tree.$.counter);
 
-    api.increment();
+    // Designated: the question this test asks is whether ordinary canonical
+    // state can PARTICIPATE in restoration, which requires an admitted turn.
+    undoable(() => api.increment());
     await flush();
     expect(api.read()).toBe(11);
 

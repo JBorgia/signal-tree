@@ -227,10 +227,15 @@ describe('multi-collection subject id collision', () => {
     expect(quietAfterRetirement).toBeGreaterThan(0);
 
     for (let i = 0; i < 200; i++) {
-      tree.$.users.setAll([
-        { id: `g${i}-a`, name: 'a' },
-        { id: `g${i}-b`, name: 'b' },
-      ]);
+      // Designated: the neighbour's churn is what EVICTS the quiet collection's
+      // claims, which is the mechanism under test. Undesignated churn takes no
+      // claims and evicts nothing.
+      undoable(() =>
+        tree.$.users.setAll([
+          { id: `g${i}-a`, name: 'a' },
+          { id: `g${i}-b`, name: 'b' },
+        ])
+      );
       await tick();
       await tick();
     }

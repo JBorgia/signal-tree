@@ -3613,7 +3613,15 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    store.$.theme.reload();
+    // Designated because this test's stated subject is that `reload()` RECORDS.
+    //
+    // ⚠️ OPEN QUESTION for PER-B, recorded rather than settled here: `reload()`
+    // re-reads durable state, which makes it closer to a restore than to an
+    // authored operation — and defect 6c establishes that a restore should not
+    // become an undo step. If reload is reclassified as a realization, this
+    // designation goes and the assertion inverts. Designating it now says only
+    // "a caller CAN make reload undoable", which is true of any operation.
+    undoable(() => store.$.theme.reload());
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3918,7 +3926,9 @@ describe('time-travel enhancer', () => {
 
     t.resetHistory();
 
-    store({ count: 2, title: 'B' });
+    // Designated: this test undoes and redoes the root-callable update, so it
+    // has to be an admitted turn.
+    undoable(() => store({ count: 2, title: 'B' }));
     await Promise.resolve();
     await Promise.resolve();
 
