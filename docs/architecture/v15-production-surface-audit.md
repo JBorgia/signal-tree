@@ -8742,12 +8742,12 @@ Inside a transaction that leaves Y holding the rolled-back value with nothing
 coming to correct it — LINK-1's PUSH-OUT requirement, "only settled state
 escapes", unreachable from outside core.
 
-> **`link()` is core because of the EGRESS AUTHORITY, not the ingress
-> classification.**
+> **A settlement-safe public EGRESS capability is required.**
 
-That is a better argument than the one it replaces: it does not depend on which
-suppression rule wins, and it is the same authority `stored()` and
-`persistence()` were already using privately.
+⚠️ I first wrote that as "`link()` is core because of the egress authority",
+which is a second overclaim of the same shape: it proves an egress GATE must be
+core, not that `link()` must BE that gate. EGRESS-0 separates them, and NULL
+survives — see below.
 
 # LINK-2 — the public contract. 12/12
 
@@ -8783,12 +8783,15 @@ pushed value without the guard. Neither rule involves a clock.
 retrieve()   EARNED, and stays EXPLICIT — nothing in the lineage has earned
              automatic startup hydration
 dispose()    EARNED (LINK-1 case 2)
-settled()    CONDITIONALLY EARNED, and the condition is the ENDPOINT'S, not the
-             link's: a SYNCHRONOUS endpoint has no in-flight window at all
-             (measured — the value is durable with no await), while an async one
-             does and nothing else public can observe it. TruckTrax's seven
-             leaves are synchronous, so its historical drain need disappears
-             once the debounce does.
+settled()    EARNED. ⚠️ Corrected from "conditionally earned": the NEED is
+             conditional on whether `set()` is async, but `Endpoint<T>` allows
+             `void | Promise<void>`, so the generic link supports async egress
+             and `settled()` is the only way to observe the outbound queue the
+             link itself owns. For a synchronous endpoint it resolves
+             immediately and is rarely useful — measured — which is a fact about
+             that endpoint, not a reason for conditional typing. Making it exist
+             conditionally via overloads would add complexity for nearly no
+             value.
 clear()      NOT EARNED — an endpoint operation
 save()       NOT EARNED — outbound is automatic
 flush()      NOT EARNED — there is no debounce to flush
@@ -8805,11 +8808,154 @@ throws does not damage the link, so adding error reporting cannot become a sourc
 of errors.
 
 ```text
-⚠️ FINDING — `onTreeError` is NOT exported from the barrel.
-   It lives in `internals/` and no application can reach it, so every marker
-   that reports through it is invisible today, not just a link. Pinned by an
-   assertion that exporting it must flip.
+⚠️ FINDING, AND IT IS NOT A LINK FEATURE — `onTreeError` is NOT exported from
+   the barrel. It lives in `internals/`, so no application can reach it and
+   every marker reporting through it is invisible today. Pinned by an assertion
+   that exporting it must flip.
+
+   Carried as its OWN disposition, ERROR-SURFACE-0, so `link()` cannot smuggle
+   the decision in:
+     was `onTreeError` intended to be public?
+     does any application requirement need to observe caught core errors?
+   Very likely yes to both — but it is decided on its own evidence.
 ```
+
+# EGRESS-0 — NULL SURVIVES. `link()` is a composition, not the primitive
+
+`packages/core/src/lib/egress-0-userland-link.spec.ts`, 12/12.
+
+```text
+NULL       one minimal PUBLIC settlement-aware egress primitive, plus existing
+           public `external()`, is sufficient to implement link() OUTSIDE core
+FALSIFIER  a correct link still needs private machinery even with that gate
+```
+
+The candidate gate is transport-neutral and knows nothing about state:
+
+```text
+onCommitted(x, cb)   observe X, defer to settlement, read X LATE, call cb
+```
+
+Everything private lives in it — ownership resolution, the observation seam, the
+commit-consequence authority. The user-land link above the fold imports only
+`external()`, `deepEqual()`, `onCommitted()` and ordinary JavaScript.
+
+## The whole battery, re-run against the user-land implementation
+
+```text
+self-echo (equality-held)                        ✓
+CONTROL: authored change goes out                ✓
+cross-link Y1 -> X -> Y2                         ✓
+X returns to an earlier value after Y moved on   ✓
+branch structural-equality, new reference        ✓
+PUSH-OUT: only settled state escapes             ✓  <- the one it could not
+                                                       meet before the gate
+outbound ordering (50ms A vs 5ms B)              ✓
+disposal: a held consequence does not escape     ✓
+the gate refuses an unowned X                    ✓
+```
+
+Mutation-checked: removing settlement deferral from the gate fails 2, removing
+equality suppression fails 4, removing serialization fails 1.
+
+> **So `link()` is NOT the causal primitive.** The stack is:
+>
+> ```text
+> CORE CAUSAL GATES     external()      Y -> X
+>                       onCommitted()   X -> outside world
+> COMPOSITION           link()          state sync using both
+> ```
+
+That also unblocks something `link()` alone would have left unreachable. Storage
+SET, HTTP PUT, socket send, POST and telemetry share the same outbound
+settlement boundary, and only some are state synchronisation:
+
+```text
+link          "is Y already at this state?"    equality is meaningful
+event effect  "perform this thing"             equality is meaningless
+```
+
+`chargeCard(order)` has no "only if different". If `link()` were the only public
+egress, the whole MATRIX commit-consequence dimension would stay private.
+
+`link()` may still ship — as an excellent ergonomic composition that must earn
+itself as CONVENIENCE, not as a causal primitive.
+
+## ⚠️ What the battery could NOT show, found by mutation
+
+The refinement "advance `knownY` only once `set()` succeeds" is a correctness
+argument, and I wrote a test claiming to measure it. Mutating the harness to
+advance at SCHEDULE time left all 12 green — so the test was passing for the
+wrong reason and has been rewritten to assert only what it observes.
+
+The reason is structural: a rejected write leaves X at the failed value and Y
+stale, nothing re-evaluates X because X has not changed, and the next write
+differs from the failed value so BOTH rules dispatch and resynchronise. A
+divergence needs the link to consult `knownY` for a value never successfully
+sent with no intervening send — which requires RETRY, deliberately out of scope.
+
+Keep the on-success rule, because a variable named "what Y is known to hold" must
+not record a value Y never received. But it is UNEARNED BY MEASUREMENT, and if
+retry is ever added it becomes measurable and must be tested then.
+
+# LINK-RACE-0 — cross-direction concurrency is a real defect
+
+Neither LINK-1 nor LINK-2 hit it: each proved its own direction ordered
+correctly, and the failure appears only when they CROSS.
+
+```text
+X authors B    -> set(B) begins, slow
+Y pushes C     -> X becomes C
+set(B) completes
+
+X = C, Y = B — with both direction rules individually obeyed
+```
+
+Measured, and nothing corrects it: the consequence for C already ran and was
+suppressed, because at that moment `knownY` still said C.
+
+```text
+WITHOUT post-success recheck   X='C', Y='B'   permanent divergence
+WITH post-success recheck      X='C', Y='C'   converges, sends ['B','C']
+```
+
+The fix is small and local — on a successful write, compare X as it is NOW
+against what Y now holds and dispatch again if they differ. It invents no
+conflict resolution and no versioning; it only re-asserts X, the side the link
+already treats as authoritative.
+
+But it only works if resolution MEANS something, which is a contract on Y:
+
+```text
+`set(v)` resolving successfully = the endpoint acknowledges v as its state
+```
+
+An endpoint that cannot promise that is not a bidirectional STATE endpoint
+without supplying version/conflict semantics of its own. That is a healthy
+boundary, and it is a requirement on the endpoint rather than machinery in the
+link.
+
+# LINK-2 case 4 — the type CANNOT enforce the X constraint
+
+`packages/core/src/lib/link-2-x-constraint.typing.spec.ts`. ⚠️ LINK-2's header
+referenced this file before it existed — an accuracy defect, now fixed. Writing
+it also overturned what I expected it to say.
+
+```text
+tree.$                REJECTED by the type    ✓
+computed              ACCEPTED by the type    ✗ measured
+bare WritableSignal   ACCEPTED by the type    ✗ measured
+```
+
+`NodeAccessor<T>` declares `(): T`, and every `Signal<T>` is a zero-argument
+function returning `T`, so a `computed` satisfies it. A bare `WritableSignal` is
+structurally identical to an owned leaf. Ownership is a RUNTIME fact on a
+non-enumerable property and TypeScript cannot see it.
+
+So the X constraint is a RUNTIME constraint. Making it compile-time needs a
+BRANDED location type threaded through every public return type in the library —
+a real option, a far larger decision than LINK, recorded and not taken. The
+consequence: `link()`'s X parameter cannot be trusted to reject at compile time.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
