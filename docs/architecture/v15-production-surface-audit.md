@@ -2710,6 +2710,122 @@ rollback message    transactions()' compensation path surfaces the wrapped
 
 **Not to be reopened absent new falsifying production evidence.**
 
+# DIAG-JOURNAL-0 — inventory first. Disposition: **B**
+
+> **NULL: can DevTools observe every causal turn without that observation
+> becoming another restoration authority or retention owner?**
+
+Audit, not implementation. No journal object and no new seam were added; this
+measured what the EXISTING seams expose at the point a turn is complete.
+Pinned in `diag-journal-0-inventory.spec.ts` (7 cases).
+
+## SCOPE CONSTRAINT, carried forward from TURN-FEED-0
+
+> **TURN-FEED remains transaction-lifecycle-only. DIAG-JOURNAL may CONSUME it
+> and may not WIDEN it. If causal effects cannot be observed elsewhere, that is
+> evidence for a separate narrow observation seam — not permission to smuggle an
+> effect bus into transaction lifecycle.**
+
+Also pre-registered: interactive time travel is OUT of scope here. Prove
+read-only observability first. The journal must never acquire `restore()`,
+`apply()`, `undo()` or equivalent; a later "jump to this point" routes through the
+single restoration authority or is refused where no legal restoration exists.
+
+## What already works — six of eight cases need nothing
+
+```text
+1  ordinary authored write      observable, and creates ZERO restoration history
+2  designated write             same KIND of occurrence; eligibility is an
+                                ATTRIBUTE (`restorationDesignated`) rather than a
+                                separate diagnostic mechanism
+3  realization                  distinguishable via `causalMode`, and acquires no
+                                restoration right by being seen
+4  transaction identity         `transactionId` rides on the write, so a
+   + 5 grouping                 projection groups without inventing a boundary.
+                                The four PHASES are not on the write — they are on
+                                the TURN-FEED channel, which is exactly why a
+                                journal must consume that channel rather than
+                                infer phases from effects
+8  turn boundary                the FLUSH is observable via `onFlush`, so a
+                                projection takes its boundary from the engine
+                                instead of guessing a finer one
+```
+
+## ⚠️ CASE 7 — the one missing fact
+
+A restoration is **indistinguishable from external truth** at the observation
+seam. Measured:
+
+```text
+tree.undo()  ->  every delivered write carries causalMode 'realization'
+                 and NONE carries source 'time-travel'
+```
+
+So a diagnostic projection can see that something happened and can see it was
+non-authored, but cannot say *this was a restoration* rather than *this was a
+server refresh*.
+
+Not a new discovery so much as a third sighting of the same gap:
+
+```text
+MUT-2      recorded the symptom — "REDO is also marked realization"
+P0-C       had to work around it with an explicit suppression set, because a
+           restoration's own writes were being banked as external truth
+DIAG-J-0   needs it as a POSITIVE fact, not a workaround
+```
+
+That is the whole of the B: one fact, restoration ORIGIN, at a seam that already
+carries origin for everything else.
+
+## Ownership falsifiers — the half measurable without a journal
+
+```text
+notifier payloads are VALUES, not live nodes    nothing delivered is callable, so
+                                                retaining it cannot pin a subject
+                                                graph
+subscribing changes no restoration state        history length and canUndo
+                                                unchanged; an undesignated write
+                                                stays unadmitted while watched
+```
+
+The other half — a removed entity whose only remaining reason to exist is the
+journal — needs a journal to measure and belongs to DIAG-JOURNAL-1, with the
+representation rule as its design constraint: retain DESCRIPTIONS of causal facts
+(sequence, origin, phase, paths, position and subject identifiers as values,
+effect summaries, transaction identity, designation flag, outcome), never live
+signals, tree nodes, capture buckets, turn stores, snapshots, claim handles, or
+closures capable of reversal.
+
+## ⚠️ A pre-existing finding, out of scope but not to be lost
+
+`devTools()` already implements `JUMP_TO_STATE` / `JUMP_TO_ACTION`, and applies
+whole-tree state directly through `applyState()` under
+`withWriteContext({ intent: 'system', source: 'devtools' })`. It does not route
+through `timeTravel()`.
+
+So a second state-application path already exists, and under opt-in eligibility
+it applies snapshots that were never designated — bypassing admission entirely.
+Its in-source rationale is deliberate and worth reading (scrubbing a timeline is
+INSPECTION, so `source: 'devtools'` keeps `stored()` from rewriting localStorage),
+so this is not an accident. But it is exactly the shape the DIAG-JOURNAL
+pre-registration forbids for the journal, and the rule cannot be "the journal may
+not, while the neighbouring enhancer already does" without that being a stated
+decision.
+
+Recorded as its own question rather than folded into this one. It does NOT make
+DIAG-JOURNAL-0 a category C: nothing about OBSERVATION requires it.
+
+## Disposition
+
+```text
+B — existing facts are sufficient except for restoration origin.
+    Add the narrowest internal observation seam that supplies it, then build the
+    read-only projection on top of seams that already exist.
+```
+
+Nothing here justifies a second inventory, a second reversal authority, or
+widening TURN-FEED.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
