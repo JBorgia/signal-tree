@@ -58,7 +58,6 @@ import type { MaterializationContext } from './internals/materialize-markers';
 import { applyDerivedFactories } from './internals/merge-derived';
 import { isComparedMarker } from './markers/compared';
 import { hydrateMarkerNode } from './internals/materialize-markers';
-import { getActiveWriteContext } from './write-context';
 import { getPathNotifier } from './path-notifier';
 import {
   deepEqual,
@@ -541,24 +540,36 @@ function warnMissingForward(method: string): void {
 }
 
 /**
- * @internal Which hydrate mode a write through `recursiveUpdate` represents.
+ * MATRIX-CLOSE S3 — `currentHydrateMode()` IS DELETED.
  *
- * `recursiveUpdate` serves BOTH `tree(partial)` and `restoration` undo/redo —
- * `restoreState` falls through to `this.tree(state)` — so the two cannot be
- * told apart by call shape. They are told apart by the write context that
- * restoration already tags every replay with (`origin: 'restoration'`), which
- * exists for exactly this kind of question and needed no new plumbing.
+ * It computed `'merge' | 'restore'` from `origin === 'restoration'` and passed
+ * the result to `hydrateMarkerNode`. Its comment claimed a measured corruption
+ * it existed to prevent:
  *
- * The distinction is not cosmetic. An UNDO must land the user in the state they
- * were in, exactly; a REHYDRATE crosses a process boundary where nothing is in
- * flight and some state must be normalised rather than believed. See
- * docs/architecture/undo-redo-vs-devtools.md.
+ *     n=3 rows=3  ->  undo  ->  n=2 rows=3
+ *
+ * M6 forced it permanently to `'merge'` and the whole 1885-test suite stayed
+ * green. S3-RECOVER then found something stronger than "that defect is gone":
+ *
+ * ```text
+ * currentHydrateMode() produced   'merge' | 'restore'
+ * markers branch only on          'rehydrate'
+ * ```
+ *
+ * `entity-map.ts` and `async-source.ts` each decline exactly one mode —
+ * `mode === 'rehydrate'` — which this function never produced. Both of its return
+ * values therefore fell through the same path in every marker processor. **The
+ * distinction was computed and no consumer could act on it.**
+ *
+ * `s3-hydrate-mode-recovery.spec.ts` holds both halves permanently: the
+ * historical n/rows case does not reproduce, and `'merge'` and `'restore'` are
+ * indistinguishable to a loader-backed marker while `'rehydrate'` is not.
+ *
+ * This deletes a POLICY BRANCH, not the `origin` axis. `origin` remains
+ * provenance with diagnostic consumers (DevTools action metadata, the diagnostic
+ * journal) and one structural justification (DX-NAMES-1.3 Fact 1). What is gone
+ * is the claim that it had a policy consumer.
  */
-function currentHydrateMode(): 'merge' | 'restore' {
-  return getActiveWriteContext()?.origin === 'restoration'
-    ? 'restore'
-    : 'merge';
-}
 
 /** Dev-mode: paths already warned about for ref-identical no-op writes. */
 const warnedNoopPaths = new Set<string>();
@@ -622,7 +633,7 @@ function recursiveUpdate(
     // and `restoration` undo silently leaves the marker at its post-change
     // value, landing the user in a state that never existed and reporting
     // success. Measured before this: `n=3 rows=3` → undo → `n=2 rows=3`.
-    if (hydrateMarkerNode(prop, value, currentHydrateMode())) {
+    if (hydrateMarkerNode(prop, value, 'restore')) {
       if (out) out.push(childPath);
       continue;
     }

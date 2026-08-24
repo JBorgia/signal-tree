@@ -80,27 +80,44 @@ export interface TransactionLifecycleChannel {
 }
 
 /**
- * A stable key for an `(owner, id)` pair.
+ * A stable key for one transaction WITHIN one tree's lifecycle channel.
  *
- * Owners are opaque tokens, so they cannot be part of a string key directly —
- * they get an interned ordinal instead, held weakly so a discarded owner does
- * not pin its entry.
+ * ## MATRIX-CLOSE S5 — the owner component is GONE, and why that is safe
  *
- * `\u0000` separated, matching `effectKey` in the enhancers. A space would also
- * be injective here (both halves are numbers), but NUL is the convention in this
- * codebase for composite keys and the convention is worth more than the byte.
+ * This used to intern each `owner` object to an ordinal and return
+ * `` `${ordinal}\u0000${id}` ``. M6 replaced the whole body with `String(id)`
+ * and the entire 1885-test suite stayed green — including
+ * `turn-feed-0-1-identity.spec.ts`, which was written specifically as this
+ * falsifier and did not falsify.
+ *
+ * The invariant that makes a bare id sufficient was already measured by
+ * DIAG-JOURNAL-1.1:
+ *
+ * > **A channel is installed on one tree's canonical host, and exactly ONE owner
+ * > announces on it.** `restoration()` holds a `transactionOwnerToken` of its own
+ * > but only LISTENS; the single per-tree transaction runtime is the only
+ * > announcer, and its counter is the only source of ids.
+ *
+ * Two trees both mint id 1 — and never share a channel, so no observer can see
+ * both. The owner ordinal was disambiguating a collision that cannot occur in
+ * the only scope that reads this key.
+ *
+ * ## What was KEPT, deliberately
+ *
+ * `TransactionLifecycleEvent.owner` stays. It does a DIFFERENT job that is
+ * independently earned: restoration compares it directly
+ * (`event.owner === transactionOwnerToken`) to ignore its own announcements and
+ * act only on foreign ones. That filter is not this key.
+ *
+ * ```text
+ * owner on the EVENT    earned — the foreign/own filter
+ * owner inside the KEY  unproven, and now removed
+ * ```
+ *
+ * @internal
  */
-const OWNER_ORDINALS = new WeakMap<object, number>();
-let nextOwnerOrdinal = 1;
-
-/** @internal */
-export function transactionIdentityKey(owner: object, id: number): string {
-  let ordinal = OWNER_ORDINALS.get(owner);
-  if (ordinal === undefined) {
-    ordinal = nextOwnerOrdinal++;
-    OWNER_ORDINALS.set(owner, ordinal);
-  }
-  return `${ordinal}\u0000${id}`;
+export function transactionIdentityKey(id: number): string {
+  return String(id);
 }
 
 const TRANSACTION_LIFECYCLE = Symbol.for(
