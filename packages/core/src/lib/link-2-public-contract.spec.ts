@@ -26,7 +26,9 @@ import { withWriteContext } from './write-context';
  * 1  the exact Endpoint<T> structural contract, and what an EMPTY one does
  * 2  which methods on the returned Link are EARNED, and which are convenience
  * 3  where a rejected outbound set() is OBSERVABLE, with no status/retry/backoff
- * 4  the X constraint — the type-level half lives in the companion typing spec
+ * 4  the X constraint — see `link-2-x-constraint.typing.spec.ts`, which
+ *    measures that the type rejects only `tree.$`; a computed and a bare
+ *    WritableSignal both COMPILE and are refused at runtime instead
  * 5  endpoint COMBINATIONS, including whether get + subscribe is meaningful
  * ```
  *
