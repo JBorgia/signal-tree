@@ -3561,6 +3561,169 @@ HistoryEntry ->           RestorationTurn if the unit really is turn-scoped;
 3  DIAG-JOURNAL-1
 ```
 
+# SEMANTICS-NAMES-1 — EXECUTED. The repository speaks the ontology
+
+Seven batches, seven commits, each verified by exit code before the next began.
+
+```text
+e4ad19f9  batch 1   metadata ontology
+2df46f2e  batch 2   structural-effect split
+7c6d629c  —         origin-union disposition (three orphans withdrawn)
+8e1e2f37  batch 3.1 restoration identity
+4c6ed5eb  batch 3.2 restoration history vocabulary
+62475b8b  batch 3.3 + 4   prose, and timeTravel() -> restoration()
+2efe1f71  batch 5   inspection vocabulary + the derivation fix
+c52b0932  batch 6+7 finish and grep
+```
+
+## The two axes, as shipped
+
+```ts
+type WriteParticipation = 'authored' | 'realized' | 'inspection';
+type WriteOrigin        = 'restoration' | 'devtools' | 'external';
+```
+
+```ts
+{                          participation: 'authored'   }  // absent origin
+{ origin: 'external',      participation: 'realized'   }
+{ origin: 'restoration',   participation: 'realized'   }
+{ origin: 'devtools',      participation: 'inspection' }
+```
+
+## Three findings the sweep produced that a rename was not supposed to produce
+
+### 1. `StructuralEffect` was already taken — by a different concept
+
+Renaming `StructuralHistoryEffect` -> `StructuralEffect` collided with
+`causal-types.ts`'s `StructuralEffect = 'add' | 'remove' | 'rekey'`, silently
+shadowing it so `structuralContext?: StructuralEffect` began resolving to a
+string. The record and the KIND had been one identifier apart since the
+causal-runtime kernel was scaffolded. Split:
+
+```text
+StructuralEffectKind  'add' | 'remove' | 'rekey'
+StructuralEffect      the subject/key/value structural fact
+```
+
+### 2. `enableTimeTravel` was TWO different things
+
+A `DevToolsConfig` option governing the Redux DevTools timeline scrubber, and a
+module-local restoration convenience function. The sweep renamed both, which
+would have retired a name the grid deliberately keeps AND made the survivor
+collide in meaning with `restoration()`. Reverted on the DevTools side;
+`anyTimeTravelEnabled` -> `anyDevtoolsTimelineEnabled` so the two can no longer
+be confused by eye.
+
+**Both collisions are the same shape as the `historyEffect` correction: a name
+that reads as one concept is load-bearing for two.** Worth noting that the
+mechanical sweep is what surfaced them — they were invisible while both concepts
+had comfortable, different-looking names.
+
+### 3. `stored()` was deriving policy from provenance
+
+The batch-5 derivation check found `stored()` declining to persist a write whose
+ORIGIN was devtools. The property that makes a scrub un-persistable is that it is
+INSPECTION — a diagnostic application of state nobody committed — not that
+DevTools performed it. Now keyed on `isInspectionWrite()`, with both directions
+pinned: an inspection from any origin declines, and a devtools origin ALONE
+persists.
+
+## `AppliedHistory` — the inspection the owner ordered, and it straddled
+
+Instantiated by `transactions.ts` as well as restoration, and consumed by
+reclamation, redo/authority assessment, realization-context,
+greenfield-transactions and entity-signal. Its own spec already had the word: it
+is "the confirmed applied PROJECTION" over the TurnStore.
+
+```text
+AppliedHistory -> AppliedTurnProjection      (no authority named)
+'history-evicted' -> 'turn-evicted'
+```
+
+`AppliedRestorationHistory` would have been the `historyEffect` mistake again.
+
+## What was DELIBERATELY not renamed
+
+```text
+DevToolsConfig.enableTimeTravel   the timeline scrubber really does travel
+devTools() JSDoc, README lines    same
+maxHistorySize                    unambiguous inside RestorationConfig
+local spec variables              beforeHistory / baselineHistory are
+                                  getRestorationHistory().length readings
+docs/architecture, rfcs, archive, records of what existed when written;
+audits, CHANGELOG, RELEASE-NOTES  rewriting them would falsify the trail
+```
+
+`TimeTravelEntry` became `RestorationHistoryEntry`, NOT `RestorationTurn`: it is
+`{ action, timestamp, state, payload }` — a snapshot with a label. Calling it a
+turn would assert the causal-turn structure HIST-C established in a type that
+does not have it.
+
+## Ghost names found by grep that no gate can see
+
+```text
+ST1033's runtime message      told users to call `reversible(...)`, a candidate
+                              name that never shipped
+the root barrel's comment     recommended `tree.with(a).with(b)`, deleted in 15.0
+packages/core/ENHANCERS.md    documented `tree.with(...)` as THE way to compose,
+                              and it ships inside the tarball
+README                        `timeTravel({ maxHistory: 50 })` — an option that
+                              has never existed under any name
+```
+
+Four in one workstream. Prose is not type-checked, and this is the failure mode
+this audit keeps re-finding.
+
+## ⚠️ Open, flagged not fixed
+
+`enhancer-safety.spec.ts` exercises `tree.with(...)` against a hand-built MOCK
+tree that defines its own `.with()`. It passes while testing a method the real
+tree has not had since 15.0. A test-validity question, not a vocabulary one.
+
+## Final grep — every survivor classified
+
+```text
+timeTravel / causalMode / CausalWriteMode / 'authoring' / 'realization' /
+historyEffect / StructuralHistoryEffect / isApplyingExternalState /
+UpdateMetadata / getHistory( / resetHistory( / AppliedHistory / 'history step' /
+reversible(                                        ZERO on every shipped surface
+
+TimeTravel        DevToolsConfig.enableTimeTravel and its docs (kept), plus
+                  migration guides recording the old name (historical)
+time-travel       devTools() prose (kept), migration guides, benchmark scenario
+                  labels comparing against other libraries' features
+tree.with(        the ISignalTree tombstone explaining its removal, migration
+                  guides, and the mock-tree spec flagged above
+```
+
+> **A methodology note.** The first run of this grep reported ZERO everywhere,
+> including for names that demonstrably existed. `for t in …; do grep … $SCOPE`
+> in zsh does not word-split `$SCOPE`, so every search ran against one
+> nonexistent path and stderr was suppressed. Caught by adding a sanity line that
+> asserted a KNOWN-PRESENT name returns a non-zero count. A clean grep is only
+> evidence if something proves the grep can fail.
+
+## SEMANTICS-NAMES-1 CLOSED
+
+No SEMANTICS-NAMES-2. The open naming items belong to other workstreams:
+`intent` (needs its own overlap audit), the `transaction-rollback` origin (needs
+its consumer audit), `stored().reload()` (PER-B), and the diagnostic-journal
+types (JOURNAL-1 must earn the representation first).
+
+Closure set, all exit 0: `nx test core` (1847 passed / 203 files),
+`nx lint core`, `npm run typecheck`, `nx build core`, `nx build demo`,
+`check-spec-types`, `check-error-codes`, `check-demo-coverage`,
+`check-release-claims`, `lint-readme-apis`, `check-doc-links`,
+`verify-gates --fast` 35/35.
+
+## Queue
+
+```text
+1  DIAG-JOURNAL-1   read-only bounded projection + reclamation falsifiers  <-- next
+2  MATRIX-CLOSE, Candidate B, TruckTrax passes, final perf/retention
+3  FULL release gate suite (not --fast), RC closure
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded

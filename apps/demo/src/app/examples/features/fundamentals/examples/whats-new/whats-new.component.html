@@ -103,7 +103,7 @@
         <strong>Scrubbing a devtools timeline no longer rewrites your
         localStorage.</strong>
         Undo and devtools replay were indistinguishable because both tagged
-        writes <code>'time-travel'</code>. Undoing
+        writes <code>'restoration'</code>. Undoing
         <em>should</em>
         write through to storage; dragging a devtools slider should not.
       </li>
@@ -257,7 +257,7 @@
       </li>
       <li>
         <strong><code>restoration()</code> charged you for other people's
-        trees.</strong> It subscribes to the global flush, so every time-travelled
+        trees.</strong> It subscribes to the global flush, so every restored
         tree materialised and deep-cloned <em>itself</em> whenever
         <em>any</em> tree in the process flushed: 0.008ms → 9.7ms as three
         unrelated 10,000-leaf trees were kept alive.
@@ -369,7 +369,7 @@
         output, and a merge write through a parent reaches them — so it also
         writes to storage. A merge <strong>replaces</strong> an object-valued
         stored leaf rather than merging into it, where a plain nested namespace
-        would deep-merge. Persisted values now also flow into time-travel and
+        would deep-merge. Persisted values now also flow into restoration and
         devtools payloads.
       </li>
     </ul>

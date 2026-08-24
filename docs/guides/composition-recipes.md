@@ -142,7 +142,7 @@ coalescing, freshness, and retry policy in the Ops/service layer.
 ### Ops: an abstract base over a tree slice
 
 The base operates on a **slice of your existing tree**, not its own store, so all
-domains share one DevTools timeline and one time-travel buffer.
+domains share one DevTools timeline and one restoration history.
 
 ```typescript
 export abstract class EntityCrudOps<T extends { id: string }> {
