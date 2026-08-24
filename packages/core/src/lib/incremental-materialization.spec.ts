@@ -159,18 +159,31 @@ describe('incremental materialisation', () => {
       for (let r = 0; r < 60; r++) tree.$['r' + r]['c0'].set(Math.random());
     };
 
-    dirtyAll();
-    const r0 = performance.now();
-    tree();
-    const oneRebuild = performance.now() - r0;
+    // BEST OF THREE, not one sample. This assertion FLAKED under load (11.67ms
+    // against a 7.73ms threshold) while claiming "four orders of magnitude of
+    // headroom" — and the claim was wrong about its own mechanism: it compared
+    // 2,000 memoised reads against 5x a SINGLE rebuild timing, and one
+    // `performance.now()` sample of one rebuild carries JIT warm-up and GC noise
+    // that no headroom in the memoised side can absorb. The headroom was
+    // whatever that one sample happened to be.
+    //
+    // Taking the fastest of three makes the baseline an estimate of how fast a
+    // rebuild CAN go, which is what the comparison actually means, and restores
+    // the headroom the comment claims.
+    let oneRebuild = Infinity;
+    for (let sample = 0; sample < 3; sample++) {
+      dirtyAll();
+      const r0 = performance.now();
+      tree();
+      oneRebuild = Math.min(oneRebuild, performance.now() - r0);
+    }
 
     const c0 = performance.now();
     for (let i = 0; i < 2000; i++) tree();
     const memoised = performance.now() - c0;
 
-    // 2,000 memoised reads must cost less than 5 full rebuilds. Measured ratio
-    // is ~0.04us vs ~1,800us, so this has four orders of magnitude of headroom
-    // and only fails if memoisation stops working entirely.
+    // 2,000 memoised reads must cost less than 5 full rebuilds. It fails only if
+    // memoisation stops working.
     expect(memoised).toBeLessThan(oneRebuild * 5);
   });
 

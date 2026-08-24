@@ -6322,6 +6322,121 @@ as owed rather than quietly skipped.
 Verified by exit code: nx test core (1883 passed / 209 files — seven mock-only
 tests deleted), nx lint core, npm run typecheck, verify-gates --fast 36/36.
 
+# MATRIX-CLOSE · pass 2A — M3, M8, M7
+
+## M3 — two findings, and I caused one of them
+
+### ⚠️ An edit session had been given the restoration authority's name
+
+`EditSession` is a public subpath (`@signaltree/core/edit-session`) with its own
+`undo()`, `redo()`, `canUndo()`, `canRedo()` over local past/present/future
+stacks. It never touches the causal runtime, restoration claims, causal turns or
+designation — a draft over two plain signals.
+
+```text
+git log -S   4c6ed5eb  SEMANTICS-NAMES-1 batch 3 pass 2
+before       getHistory(): UndoRedoHistory<T>
+after        getRestorationHistory(): UndoRedoHistory<T>
+```
+
+**My own sweep did this.** Batch 3 renamed `getHistory` repo-wide and handed a
+scratchpad the authority's vocabulary — precisely the "name implies an ownership
+the code does not have" error that batch corrected everywhere else. Fixed:
+
+```text
+EditSession.getRestorationHistory()  ->  getEditHistory()
+```
+
+`UndoRedoHistory<T>` is KEPT: it names a session's own undo/redo stacks
+accurately and claims no authority. The rationale is recorded at the declaration
+so the next repo-wide sweep does not redo it.
+
+### Batch-2 rename survivors in `entity-signal.ts`
+
+```text
+addOneWithHistoryEffect       -> addOneWithStructuralEffect
+stagedAddHistoryEffects       -> stagedAddStructuralEffects
+stagedRemovalHistoryEffects   -> stagedRemovalStructuralEffects
+```
+
+One site already read `createStructuralEffectMeta(stagedAddHistoryEffects[i])` —
+the type had been renamed and the variable holding it had not.
+
+### Correctly untouched
+
+`ScopedHistoryAuthority`, `pruneHistoryExcluded`, `recordHistory`,
+`compositionHistory`, `FormHistory*` are all TOMBSTONES. A tombstone must name
+the thing it buries.
+
+## M8 — clean
+
+Every production `*Source*` identifier is `asyncSource` (a marker named for what
+it is), a generic `TSource`, or `RealizationContextSource` (a supplier). No
+residue of the retired `source` metadata field. `System` has exactly one
+identifier.
+
+## M7 — the escape hatch was ACTIVELY HARMFUL, and it is deleted
+
+`WriteMetadata` carried the only permissive signature in the metadata types:
+
+```ts
+/** Open extension for guardrails' historical custom-key shape. */
+[key: string]: unknown;
+```
+
+Three facts, in order of weight:
+
+```text
+1  HARMFUL   this is the mechanism that let batch 1's stale `meta.source` reads
+             keep compiling after the rename — all 24 of them typechecked as
+             `unknown`. Withdrawing it is what forced the compiler to enumerate
+             them. Leaving it means the next rename hides the same way.
+2  UNUSED    compiler-verified, not grepped: with the signature withdrawn,
+             `npm run typecheck` passes across `packages/*/src/**` AND
+             `apps/demo/src/**`.
+3  ORPHANED  its justification names guardrails, a package removed in a4bc5493.
+             The hatch outlived its only stated consumer.
+```
+
+### ⚠️ And its ONLY consumer was a test asserting it exists
+
+`write-context.spec.ts` carried `customKey: 'value'` and asserted the open
+extension round-tripped. That was the sole thing in the repo exercising it.
+
+> **A test whose subject is its own fixture cannot fail for a product reason.**
+
+Identical circularity to pass 1's mock `.with()` suites. The declared-field
+pass-through assertion is kept; the custom-key half went with the hatch.
+
+## An incidental find: a perf assertion whose stated basis was wrong
+
+Not from any falsifier class — it flaked during pass-2A verification.
+
+```text
+FAILED   memoised 11.67ms  vs  threshold 7.73ms
+CLAIMED  "four orders of magnitude of headroom … only fails if memoisation stops
+          working entirely"
+```
+
+The claim was wrong about its own mechanism: it compared 2,000 memoised reads
+against 5x a **single** rebuild timing, and one `performance.now()` sample of one
+rebuild carries JIT warm-up and GC noise that no headroom on the memoised side
+can absorb. The real headroom was whatever that one sample happened to be.
+
+Fixed by taking the FASTEST of three rebuilds — an estimate of how fast a rebuild
+CAN go, which is what the comparison means. Four consecutive green runs after,
+three before the fix confirmed the flake rather than a regression.
+
+## Pass 2A verification
+
+nx test core (1883 passed / 209 files), nx lint core, npm run typecheck,
+nx build core, check-spec-types, verify-gates --fast 36/36 — all exit 0.
+
+```text
+SWEPT      M1, M2, M3, M4, M7, M8, M10, M11
+NOT YET    M5, M9 (pass 2B), M6 (pass 3, on the reduced survivor set)
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded

@@ -1044,7 +1044,7 @@ export function createEntitySignal<
     return transformedChanges;
   }
 
-  function addOneWithHistoryEffect(
+  function addOneWithStructuralEffect(
     entity: E,
     opts?: AddOptions<E, K>
   ): { id: K; structuralEffect: PendingAddStructuralEffect } {
@@ -1839,7 +1839,7 @@ export function createEntitySignal<
     // ==================
 
     addOne(entity: E, opts?: AddOptions<E, K>): K {
-      return addOneWithHistoryEffect(entity, opts).id;
+      return addOneWithStructuralEffect(entity, opts).id;
     },
 
     /**
@@ -1857,7 +1857,7 @@ export function createEntitySignal<
      */
     prependOne(entity: E, opts?: AddOptions<E, K>): K {
       const previousFirstKey = structuralStore.firstActiveKey();
-      const { id, structuralEffect } = addOneWithHistoryEffect(entity, opts);
+      const { id, structuralEffect } = addOneWithStructuralEffect(entity, opts);
       moveToFront([id]);
       rewritePendingAddEffect(
         structuralEffect,
@@ -2825,7 +2825,7 @@ export function createEntitySignal<
         freshSubjectIdsByKey.set(stagedAdds[index].id, freshSubjectIds[index]);
       }
 
-      const stagedRemovalHistoryEffects = stagedRemovals.map(
+      const stagedRemovalStructuralEffects = stagedRemovals.map(
         ({ id, entity, subjectId }) => {
           const currentIndex = currentEntries.findIndex(
             ([entryId]) => entryId === id
@@ -2904,7 +2904,7 @@ export function createEntitySignal<
         ...addedSubjectIds,
       ];
 
-      const stagedAddHistoryEffects = stagedAdds.map(({ id, entity }, index) => {
+      const stagedAddStructuralEffects = stagedAdds.map(({ id, entity }, index) => {
         const subjectId = addedSubjectIds[index];
         const finalIndex = finalIndexById.get(id) ?? -1;
         let beforeSubject: number | undefined;
@@ -2950,7 +2950,7 @@ export function createEntitySignal<
 
       for (let index = 0; index < stagedRemovals.length; index += 1) {
         const { id, entity, subjectId } = stagedRemovals[index];
-        const structuralEffect = stagedRemovalHistoryEffects[index];
+        const structuralEffect = stagedRemovalStructuralEffects[index];
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           undefined,
@@ -2983,7 +2983,7 @@ export function createEntitySignal<
           basePath,
           [addedSubjectIds[i]],
           getPositionIdsForNotify(),
-          createStructuralEffectMeta(stagedAddHistoryEffects[i])
+          createStructuralEffectMeta(stagedAddStructuralEffects[i])
         );
       }
 

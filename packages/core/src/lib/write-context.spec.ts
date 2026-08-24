@@ -94,20 +94,30 @@ describe('withWriteContext / getActiveWriteContext', () => {
     expect(getActiveWriteContext()).toBeUndefined();
   });
 
-  it('passes through optional fields (correlationId, source, custom keys)', () => {
+  it('passes through the declared optional fields', () => {
     const meta: WriteMetadata = {
       intent: 'migration',
       origin: 'devtools',
       correlationId: 'abc-123',
       timestamp: 1700000000,
-      // Open extension — should round-trip.
-      customKey: 'value',
     };
 
     withWriteContext(meta, () => {
-      const active = getActiveWriteContext();
-      expect(active).toEqual(meta);
-      expect(active?.['customKey']).toBe('value');
+      expect(getActiveWriteContext()).toEqual(meta);
     });
   });
+
+  // MATRIX-CLOSE M7. This test used to carry a `customKey: 'value'` field and
+  // assert that the open extension round-tripped. `WriteMetadata`'s
+  // `[key: string]: unknown` signature is deleted, and the assertion went with
+  // it — but the reason it is recorded here rather than just removed is that
+  // THIS TEST WAS THE HATCH'S ONLY CONSUMER IN THE REPO. The sole thing
+  // exercising the open extension was a test asserting the open extension
+  // exists.
+  //
+  // That is the same circularity as the mock `.with()` suites deleted in pass 1:
+  // a test whose subject is its own fixture cannot fail for a product reason. A
+  // third-party enhancer that genuinely needs custom keys earns a declared field
+  // by producing a consumer, which is how `'transaction-rollback'` earned its
+  // origin value.
 });
