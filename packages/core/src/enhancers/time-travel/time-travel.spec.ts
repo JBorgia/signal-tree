@@ -1,4 +1,5 @@
 import { computed } from '@angular/core';
+import { undoable } from '../../lib/undoable';
 import { describe, expect, it, vi } from 'vitest';
 
 import { getTreeRealizationPort } from '../../lib/internals/causal-runtime/tree-realization-adapter';
@@ -73,7 +74,9 @@ describe('time-travel enhancer', () => {
     // PathNotifier events). This ensures timeTravel snapshots a changed
     // state rather than deduping an identical snapshot.
     notifier.subscribe('count', (v) => {
-      store({ count: v as number });
+      // Designated: this test asserts that a batched flush RECORDS a history
+      // entry, so the write it records has to be an undoable operation.
+      undoable(() => store({ count: v as number }));
     });
 
     notifier.notify('count', 1, 0);
@@ -101,7 +104,7 @@ describe('time-travel enhancer', () => {
     const t = (store as any).__timeTravel;
     const initial = t.getHistory().length;
 
-    (store as any).$.count.set(5);
+    undoable(() => (store as any).$.count.set(5));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -122,7 +125,7 @@ describe('time-travel enhancer', () => {
     const t = (store as any).__timeTravel;
     const initial = t.getHistory().length;
 
-    (store as any).$.user.profile.name.set('Grace');
+    undoable(() => (store as any).$.user.profile.name.set('Grace'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -161,9 +164,9 @@ describe('time-travel enhancer', () => {
     const baselineHistory = t.getHistory().length;
 
     const pending = store.transaction(() => {
-      store.$.drivers.addOne({ id: 7, status: 'assigned' });
-      store.$.trucks.addOne({ id: 12, driverId: 7 });
-      store.$.orders.addOne({ id: 99, status: 'dispatched' });
+      undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
+      undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
+      undoable(() => store.$.orders.addOne({ id: 99, status: 'dispatched' }));
     });
 
     expect(store.$.drivers.all()).toEqual([{ id: 7, status: 'assigned' }]);
@@ -226,7 +229,7 @@ describe('time-travel enhancer', () => {
     const baselineHistory = t.getHistory().length;
 
     const pending = store.transaction(() => {
-      store.$.inside.set('grouped');
+      undoable(() => store.$.inside.set('grouped'));
     });
 
     expect(store().inside).toBe('grouped');
@@ -258,10 +261,10 @@ describe('time-travel enhancer', () => {
     const baselineHistory = t.getHistory().length;
 
     const pending = store.transaction(() => {
-      store.$.inside.set('grouped');
+      undoable(() => store.$.inside.set('grouped'));
     });
 
-    store.$.outside.set('later');
+    undoable(() => store.$.outside.set('later'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -300,9 +303,9 @@ describe('time-travel enhancer', () => {
 
     expect(() =>
       store.transaction(() => {
-        store.$.count.set(1);
+        undoable(() => store.$.count.set(1));
         store.transaction(() => {
-          store.$.count.set(2);
+          undoable(() => store.$.count.set(2));
         });
       })
     ).toThrow(/nested transaction/i);
@@ -330,8 +333,8 @@ describe('time-travel enhancer', () => {
 
     expect(() =>
       store.transaction(() => {
-        store.$.left.set('L');
-        store.$.right.set('R');
+        undoable(() => store.$.left.set('L'));
+        undoable(() => store.$.right.set('R'));
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -355,10 +358,10 @@ describe('time-travel enhancer', () => {
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.x.set('pending');
+      undoable(() => store.$.x.set('pending'));
     });
 
-    store.$.y.set('confirmed-later');
+    undoable(() => store.$.y.set('confirmed-later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -397,10 +400,10 @@ describe('time-travel enhancer', () => {
     const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
 
     const pending = store.transaction(() => {
-      store.$.a.x.set(10);
+      undoable(() => store.$.a.x.set(10));
     });
 
-    store.$.b.y.set(20);
+    undoable(() => store.$.b.y.set(20));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -428,10 +431,10 @@ describe('time-travel enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.profile.name.set('Jon');
+      undoable(() => store.$.profile.name.set('Jon'));
     });
 
-    store.$.profile.email.set('new@example.com');
+    undoable(() => store.$.profile.email.set('new@example.com'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -456,10 +459,10 @@ describe('time-travel enhancer', () => {
     const t = (store as any).__timeTravel;
 
     const pending = store.transaction(() => {
-      store.$.x.set('B');
+      undoable(() => store.$.x.set('B'));
     });
 
-    store.$.x.set('C');
+    undoable(() => store.$.x.set('C'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -483,10 +486,10 @@ describe('time-travel enhancer', () => {
     const t = (store as any).__timeTravel;
 
     const pending = store.transaction(() => {
-      store.$.x.set(20);
+      undoable(() => store.$.x.set(20));
     });
 
-    store.$.x.update((value) => (value as number) + 5);
+    undoable(() => store.$.x.update((value) => (value as number) + 5));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -509,10 +512,10 @@ describe('time-travel enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.x.set(20);
+      undoable(() => store.$.x.set(20));
     });
 
-    store.$.x.set(25);
+    undoable(() => store.$.x.set(25));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -531,10 +534,10 @@ describe('time-travel enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.x.set(20);
+      undoable(() => store.$.x.set(20));
     });
 
-    store.$.x.update((value) => (value as number) + 5);
+    undoable(() => store.$.x.update((value) => (value as number) + 5));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -554,11 +557,11 @@ describe('time-travel enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.x.set(20);
+      undoable(() => store.$.x.set(20));
     });
 
-    store.$.x.set(100);
-    store.$.x.update((value) => (value as number) + 5);
+    undoable(() => store.$.x.set(100));
+    undoable(() => store.$.x.update((value) => (value as number) + 5));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -577,11 +580,11 @@ describe('time-travel enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.x.set(20);
+      undoable(() => store.$.x.set(20));
     });
 
-    store.$.x.update((value) => (value as number) + 5);
-    store.$.x.set(100);
+    undoable(() => store.$.x.update((value) => (value as number) + 5));
+    undoable(() => store.$.x.set(100));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -600,11 +603,11 @@ describe('time-travel enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.x.set(20);
+      undoable(() => store.$.x.set(20));
     });
 
-    store.$.x.set(100);
-    store.$.x.set(105);
+    undoable(() => store.$.x.set(100));
+    undoable(() => store.$.x.set(105));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -623,11 +626,11 @@ describe('time-travel enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.x.set(20);
+      undoable(() => store.$.x.set(20));
     });
 
-    store.$.x.update((value) => (value as number) + 5);
-    store.$.x.update((value) => (value as number) + 7);
+    undoable(() => store.$.x.update((value) => (value as number) + 5));
+    undoable(() => store.$.x.update((value) => (value as number) + 7));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -655,7 +658,7 @@ describe('time-travel enhancer', () => {
       });
     });
 
-    store.$.count.set(30);
+    undoable(() => store.$.count.set(30));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -678,16 +681,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 18, name: 'existing' });
+    undoable(() => store.$.rows.addOne({ id: 18, name: 'existing' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.rows.addOne({ id: 17, name: 'pending' });
+      undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
-    store.$.rows.byIdOrFail(18).name.set('later');
+    undoable(() => store.$.rows.byIdOrFail(18).name.set('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -711,10 +714,10 @@ describe('time-travel enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.rows.addOne({ id: 17, name: 'pending' });
+      undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
-    store.$.rows.byIdOrFail(17).name.set('later');
+    undoable(() => store.$.rows.byIdOrFail(17).name.set('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -741,10 +744,10 @@ describe('time-travel enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.rows.addOne({ id: 17, name: 'pending' });
+      undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
-    store.$.rows.byIdOrFail(17).name.update((value) => `${value}-updated`);
+    undoable(() => store.$.rows.byIdOrFail(17).name.update((value) => `${value}-updated`));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -771,9 +774,9 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 16, name: 'A' });
-    store.$.rows.addOne({ id: 17, name: 'B' });
-    store.$.rows.addOne({ id: 18, name: 'C' });
+    undoable(() => store.$.rows.addOne({ id: 16, name: 'A' }));
+    undoable(() => store.$.rows.addOne({ id: 17, name: 'B' }));
+    undoable(() => store.$.rows.addOne({ id: 18, name: 'C' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
@@ -782,10 +785,10 @@ describe('time-travel enhancer', () => {
       .__subjectIds?.[0] as number;
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne(17);
+      undoable(() => store.$.rows.removeOne(17));
     });
 
-    store.$.rows.byIdOrFail(18).name.set('later');
+    undoable(() => store.$.rows.byIdOrFail(18).name.set('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -813,13 +816,13 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 17, name: 'pending-remove' });
+    undoable(() => store.$.rows.addOne({ id: 17, name: 'pending-remove' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne(17);
+      undoable(() => store.$.rows.removeOne(17));
     });
 
     expect(store.$.rows.byId(17)).toBeUndefined();
@@ -847,16 +850,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 17, name: 'original' });
+    undoable(() => store.$.rows.addOne({ id: 17, name: 'original' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne(17);
+      undoable(() => store.$.rows.removeOne(17));
     });
 
-    store.$.rows.addOne({ id: 17, name: 'replacement' });
+    undoable(() => store.$.rows.addOne({ id: 17, name: 'replacement' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -888,8 +891,8 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'target' });
-    store.$.rows.addOne({ id: 18, name: 'other' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
+    undoable(() => store.$.rows.addOne({ id: 18, name: 'other' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
@@ -898,10 +901,10 @@ describe('time-travel enhancer', () => {
       .__subjectIds?.[0] as number;
 
     const pending = store.transaction(() => {
-      store.$.rows.changeId(7, 42);
+      undoable(() => store.$.rows.changeId(7, 42));
     });
 
-    store.$.rows.byIdOrFail(18).name.set('later');
+    undoable(() => store.$.rows.byIdOrFail(18).name.set('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -934,13 +937,13 @@ describe('time-travel enhancer', () => {
     const baseline = t.getTurns().length;
     const baselineHistory = t.getHistory().length;
 
-    store.$.status.set('queued-before');
+    undoable(() => store.$.status.set('queued-before'));
 
     const pending = store.transaction(() => {
-      store.$.rows.addOne({ id: 17, name: 'pending' });
+      undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
     });
 
-    store.$.other.set('queued-after');
+    undoable(() => store.$.other.set('queued-after'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1010,11 +1013,11 @@ describe('time-travel enhancer', () => {
     const baseline = t.getTurns().length;
     const baselineHistory = t.getHistory().length;
 
-    store.$.a.set(1);
+    undoable(() => store.$.a.set(1));
 
     expect(() =>
       store.transaction(() => {
-        store.$.rows.addOne({ id: 17, name: 'pending' });
+        undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -1048,16 +1051,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'target' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.rows.changeId(7, 42);
+      undoable(() => store.$.rows.changeId(7, 42));
     });
 
-    store.$.rows.byIdOrFail(42).name.set('later');
+    undoable(() => store.$.rows.byIdOrFail(42).name.set('later'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1096,7 +1099,7 @@ describe('time-travel enhancer', () => {
       };
     };
 
-    store.$.rows.addOne({ id: 7, name: 'temp' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'temp' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1104,8 +1107,8 @@ describe('time-travel enhancer', () => {
     t.resetHistory();
 
     store.transaction(() => {
-      store.$.rows.changeId(7, 42);
-      store.$.rows.byIdOrFail(42).name.set('stable');
+      undoable(() => store.$.rows.changeId(7, 42));
+      undoable(() => store.$.rows.byIdOrFail(42).name.set('stable'));
     });
 
     expect(
@@ -1157,7 +1160,7 @@ describe('time-travel enhancer', () => {
       };
     };
 
-    store.$.rows.addOne({ id: 7, name: 'temp' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'temp' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1171,8 +1174,8 @@ describe('time-travel enhancer', () => {
       store.__transactions.getPendingTurnCount();
 
     const pending = store.transaction(() => {
-      store.$.rows.changeId(7, 42);
-      store.$.rows.byIdOrFail(42).name.set('stable');
+      undoable(() => store.$.rows.changeId(7, 42));
+      undoable(() => store.$.rows.byIdOrFail(42).name.set('stable'));
     });
 
     expect(store.$.rows.ids()).toEqual([42]);
@@ -1225,16 +1228,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'target' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.rows.changeId(7, 42);
+      undoable(() => store.$.rows.changeId(7, 42));
     });
 
-    store.$.rows.byIdOrFail(42).name.update((value) => `${value}-updated`);
+    undoable(() => store.$.rows.byIdOrFail(42).name.update((value) => `${value}-updated`));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1258,16 +1261,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'target' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.rows.changeId(7, 42);
+      undoable(() => store.$.rows.changeId(7, 42));
     });
 
-    store.$.rows.changeId(42, 99);
+    undoable(() => store.$.rows.changeId(42, 99));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1294,7 +1297,7 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'target' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
@@ -1303,10 +1306,10 @@ describe('time-travel enhancer', () => {
       .__subjectIds?.[0] as number;
 
     const pending = store.transaction(() => {
-      store.$.rows.changeId(7, 42);
+      undoable(() => store.$.rows.changeId(7, 42));
     });
 
-    store.$.rows.addOne({ id: 7, name: 'occupier' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'occupier' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1342,18 +1345,18 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 16, name: 'A' });
-    store.$.rows.addOne({ id: 17, name: 'B' });
-    store.$.rows.addOne({ id: 18, name: 'C' });
+    undoable(() => store.$.rows.addOne({ id: 16, name: 'A' }));
+    undoable(() => store.$.rows.addOne({ id: 17, name: 'B' }));
+    undoable(() => store.$.rows.addOne({ id: 18, name: 'C' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne(17);
+      undoable(() => store.$.rows.removeOne(17));
     });
 
-    store.$.rows.removeOne(16);
+    undoable(() => store.$.rows.removeOne(16));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1378,18 +1381,18 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 16, name: 'A' });
-    store.$.rows.addOne({ id: 17, name: 'B' });
-    store.$.rows.addOne({ id: 18, name: 'C' });
+    undoable(() => store.$.rows.addOne({ id: 16, name: 'A' }));
+    undoable(() => store.$.rows.addOne({ id: 17, name: 'B' }));
+    undoable(() => store.$.rows.addOne({ id: 18, name: 'C' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne(17);
+      undoable(() => store.$.rows.removeOne(17));
     });
 
-    store.$.rows.removeOne(18);
+    undoable(() => store.$.rows.removeOne(18));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1414,19 +1417,19 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 16, name: 'A' });
-    store.$.rows.addOne({ id: 17, name: 'B' });
-    store.$.rows.addOne({ id: 18, name: 'C' });
+    undoable(() => store.$.rows.addOne({ id: 16, name: 'A' }));
+    undoable(() => store.$.rows.addOne({ id: 17, name: 'B' }));
+    undoable(() => store.$.rows.addOne({ id: 18, name: 'C' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     const pending = store.transaction(() => {
-      store.$.rows.removeOne(17);
+      undoable(() => store.$.rows.removeOne(17));
     });
 
-    store.$.rows.removeOne(16);
-    store.$.rows.addOne({ id: 16, name: 'replacement-anchor' });
+    undoable(() => store.$.rows.removeOne(16));
+    undoable(() => store.$.rows.addOne({ id: 16, name: 'replacement-anchor' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1449,14 +1452,14 @@ describe('time-travel enhancer', () => {
     );
 
     const confirmed = store.transaction(() => {
-      store.$.value.set('confirmed');
+      undoable(() => store.$.value.set('confirmed'));
     });
     confirmed.confirm();
     confirmed.confirm();
     expect(store()).toEqual({ value: 'confirmed' });
 
     const rolledBack = store.transaction(() => {
-      store.$.value.set('rolled-back');
+      undoable(() => store.$.value.set('rolled-back'));
     });
     rolledBack.rollback();
     rolledBack.rollback();
@@ -1470,13 +1473,13 @@ describe('time-travel enhancer', () => {
     );
 
     const confirmed = store.transaction(() => {
-      store.$.value.set('confirmed');
+      undoable(() => store.$.value.set('confirmed'));
     });
     confirmed.confirm();
     expect(() => confirmed.rollback()).toThrow(/confirmed transaction/i);
 
     const rolledBack = store.transaction(() => {
-      store.$.value.set('rolled-back');
+      undoable(() => store.$.value.set('rolled-back'));
     });
     rolledBack.rollback();
     expect(() => rolledBack.confirm()).toThrow(/rolled back transaction/i);
@@ -1499,9 +1502,9 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'assigned' });
-    store.$.trucks.addOne({ id: 12, driverId: 7 });
-    store.$.orders.addOne({ id: 99, status: 'dispatched' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'dispatched' }));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1545,8 +1548,8 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'assigned' });
-    store.$.trucks.addOne({ id: 12, driverId: 7 });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1555,7 +1558,7 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.drivers.updateOne(7, { status: 'released' });
+    undoable(() => store.$.drivers.updateOne(7, { status: 'released' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1594,8 +1597,8 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'assigned' });
-    store.$.trucks.addOne({ id: 12, driverId: 7 });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1629,8 +1632,8 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'assigned' });
-    store.$.trucks.addOne({ id: 12, driverId: 7 });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1655,16 +1658,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
 
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1674,7 +1677,7 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.drivers.byIdOrFail(7).status.set('released');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('released'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1727,18 +1730,18 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
-    store.$.orders.addOne({ id: 99, status: 'new' });
-    store.$.depots.addOne({ id: 5, status: 'ready' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
+    undoable(() => store.$.depots.addOne({ id: 5, status: 'ready' }));
 
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1750,8 +1753,8 @@ describe('time-travel enhancer', () => {
     const driverPositionId = firstTurn.__positionIds?.[0] as number;
     const truckPositionId = firstTurn.__positionIds?.[1] as number;
 
-    store.$.drivers.byIdOrFail(7).status.set('loading');
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1764,7 +1767,7 @@ describe('time-travel enhancer', () => {
       (positionId: number) => positionId !== driverPositionId
     ) as number;
 
-    store.$.orders.byIdOrFail(99).status.set('dispatched');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1773,7 +1776,7 @@ describe('time-travel enhancer', () => {
       id: number;
     };
 
-    store.$.depots.byIdOrFail(5).status.set('busy');
+    undoable(() => store.$.depots.byIdOrFail(5).status.set('busy'));
 
     await Promise.resolve();
     await Promise.resolve();
@@ -1832,17 +1835,17 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
-    store.$.orders.addOne({ id: 99, status: 'new' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
 
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1853,13 +1856,13 @@ describe('time-travel enhancer', () => {
     const driverPositionId = firstTurn.__positionIds?.[0] as number;
     const truckPositionId = firstTurn.__positionIds?.[1] as number;
 
-    store.$.drivers.byIdOrFail(7).status.set('released');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('released'));
     await Promise.resolve();
     await Promise.resolve();
 
     const secondTurn = t.getTurns().at(-1) as { id: number };
 
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1906,15 +1909,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1923,7 +1926,7 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.drivers.byIdOrFail(7).status.set('released');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('released'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -1980,16 +1983,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
-    store.$.orders.addOne({ id: 99, status: 'new' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -1997,8 +2000,8 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.drivers.byIdOrFail(7).status.set('loading');
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2010,7 +2013,7 @@ describe('time-travel enhancer', () => {
         positionId !== (firstTurn.__positionIds?.[0] as number)
     ) as number;
 
-    store.$.orders.byIdOrFail(99).status.set('dispatched');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as { id: number };
@@ -2062,18 +2065,18 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
-    store.$.orders.addOne({ id: 99, status: 'new' });
-    store.$.depots.addOne({ id: 5, status: 'ready' });
-    store.$.yards.addOne({ id: 2, status: 'clear' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
+    undoable(() => store.$.depots.addOne({ id: 5, status: 'ready' }));
+    undoable(() => store.$.yards.addOne({ id: 2, status: 'clear' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -2082,8 +2085,8 @@ describe('time-travel enhancer', () => {
     };
     const truckPositionId = firstTurn.__positionIds?.[1] as number;
 
-    store.$.drivers.byIdOrFail(7).status.set('loading');
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2091,8 +2094,8 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.orders.byIdOrFail(99).status.set('dispatched');
-    store.$.depots.byIdOrFail(5).status.set('busy');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
+    undoable(() => store.$.depots.byIdOrFail(5).status.set('busy'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as {
@@ -2108,7 +2111,7 @@ describe('time-travel enhancer', () => {
         ) as number)
     ) as number;
 
-    store.$.yards.byIdOrFail(2).status.set('occupied');
+    undoable(() => store.$.yards.byIdOrFail(2).status.set('occupied'));
     await Promise.resolve();
     await Promise.resolve();
     const fourthTurn = t.getTurns().at(-1) as {
@@ -2161,16 +2164,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
-    store.$.orders.addOne({ id: 99, status: 'new' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -2179,8 +2182,8 @@ describe('time-travel enhancer', () => {
     };
     const firstPositionIds = firstTurn.__positionIds ?? [];
 
-    store.$.drivers.byIdOrFail(7).status.set('loading');
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2195,7 +2198,7 @@ describe('time-travel enhancer', () => {
       (positionId: number) => !firstPositionIds.includes(positionId)
     ) as number;
 
-    store.$.orders.byIdOrFail(99).status.set('dispatched');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as { id: number };
@@ -2205,7 +2208,7 @@ describe('time-travel enhancer', () => {
       secondTurn.id,
     ]);
 
-    store.$.drivers.byIdOrFail(7).status.set('staged');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('staged'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2243,17 +2246,17 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
-    store.$.orders.addOne({ id: 99, status: 'new' });
-    store.$.depots.addOne({ id: 5, status: 'ready' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
+    undoable(() => store.$.depots.addOne({ id: 5, status: 'ready' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -2262,8 +2265,8 @@ describe('time-travel enhancer', () => {
     };
     const driverPositionId = firstTurn.__positionIds?.[0] as number;
 
-    store.$.drivers.byIdOrFail(7).status.set('loading');
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2274,7 +2277,7 @@ describe('time-travel enhancer', () => {
       (positionId: number) => positionId !== driverPositionId
     ) as number;
 
-    store.$.orders.byIdOrFail(99).status.set('dispatched');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('dispatched'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as { id: number };
@@ -2284,7 +2287,7 @@ describe('time-travel enhancer', () => {
       secondTurn.id,
     ]);
 
-    store.$.depots.byIdOrFail(5).status.set('busy');
+    undoable(() => store.$.depots.byIdOrFail(5).status.set('busy'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2323,13 +2326,13 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, status: 'one' });
+    undoable(() => store.$.rows.addOne({ id: 7, status: 'one' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.byIdOrFail(7).status.set('two');
+    undoable(() => store.$.rows.byIdOrFail(7).status.set('two'));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -2337,7 +2340,7 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.rows.byIdOrFail(7).status.set('three');
+    undoable(() => store.$.rows.byIdOrFail(7).status.set('three'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -2345,7 +2348,7 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.rows.byIdOrFail(7).status.set('four');
+    undoable(() => store.$.rows.byIdOrFail(7).status.set('four'));
     await Promise.resolve();
     await Promise.resolve();
     const thirdTurn = t.getTurns().at(-1) as { id: number };
@@ -2354,7 +2357,7 @@ describe('time-travel enhancer', () => {
       thirdTurn.id,
     ]);
 
-    store.$.rows.byIdOrFail(7).status.set('five');
+    undoable(() => store.$.rows.byIdOrFail(7).status.set('five'));
     await Promise.resolve();
     await Promise.resolve();
     const fourthTurn = t.getTurns().at(-1) as { id: number };
@@ -2373,15 +2376,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'one', active: false });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'one', active: false }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.byIdOrFail(7).name.set('two');
-    store.$.rows.byIdOrFail(7).name.set('three');
-    store.$.rows.byIdOrFail(7).name.set('four');
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('three'));
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('four'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2418,7 +2421,7 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'one', active: false });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'one', active: false }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2426,8 +2429,8 @@ describe('time-travel enhancer', () => {
     const baselineTurnCount = t.getTurns().length;
     const baselineHistoryCount = t.getHistory().length;
 
-    store.$.rows.byIdOrFail(7).name.set('two');
-    store.$.rows.byIdOrFail(7).name.set('one');
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('one'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2446,15 +2449,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'one', active: false });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'one', active: false }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.byIdOrFail(7).name.set('two');
-    store.$.rows.byIdOrFail(7).name.set('one');
-    store.$.rows.byIdOrFail(7).active.set(true);
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('one'));
+    undoable(() => store.$.rows.byIdOrFail(7).active.set(true));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2488,14 +2491,14 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'one', active: false });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'one', active: false }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.byIdOrFail(7).name.set('two');
-    store.$.rows.byIdOrFail(7).active.set(true);
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
+    undoable(() => store.$.rows.byIdOrFail(7).active.set(true));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2541,7 +2544,7 @@ describe('time-travel enhancer', () => {
 
     t.resetHistory();
 
-    store.$.rows.removeOne(2);
+    undoable(() => store.$.rows.removeOne(2));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2595,13 +2598,13 @@ describe('time-travel enhancer', () => {
       { id: 2, name: 'B' },
       { id: 3, name: 'C' },
     ]);
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.removeOne(2);
+    undoable(() => store.$.rows.removeOne(2));
     await Promise.resolve();
     await Promise.resolve();
     const removeTurn = t.getTurns().at(-1) as {
@@ -2610,7 +2613,7 @@ describe('time-travel enhancer', () => {
     };
     const collectionPositionId = removeTurn.__positionIds?.[0] as number;
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     await Promise.resolve();
     await Promise.resolve();
     const scalarTurn = t.getTurns().at(-1) as {
@@ -2649,16 +2652,16 @@ describe('time-travel enhancer', () => {
       { id: 2, name: 'B' },
       { id: 3, name: 'C' },
     ]);
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.orders.addOne({ id: 31, state: 'open' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.orders.addOne({ id: 31, state: 'open' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.removeOne(2);
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.orders.byIdOrFail(31).state.set('dispatched');
+    undoable(() => store.$.rows.removeOne(2));
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.orders.byIdOrFail(31).state.set('dispatched'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2709,7 +2712,7 @@ describe('time-travel enhancer', () => {
 
     t.resetHistory();
 
-    store.$.rows.addOne({ id: 7, name: 'B' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'B' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2760,14 +2763,14 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 1, name: 'A' });
-    store.$.rows.addOne({ id: 3, name: 'C' });
+    undoable(() => store.$.rows.addOne({ id: 1, name: 'A' }));
+    undoable(() => store.$.rows.addOne({ id: 3, name: 'C' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.prependOne({ id: 2, name: 'B' });
+    undoable(() => store.$.rows.prependOne({ id: 2, name: 'B' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2815,15 +2818,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 1, name: 'A' });
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
+    undoable(() => store.$.rows.addOne({ id: 1, name: 'A' }));
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.addOne({ id: 2, name: 'B' });
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
+    undoable(() => store.$.rows.addOne({ id: 2, name: 'B' }));
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2864,15 +2867,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 1, name: 'A' });
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
+    undoable(() => store.$.rows.addOne({ id: 1, name: 'A' }));
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.addOne({ id: 2, name: 'B' });
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
+    undoable(() => store.$.rows.addOne({ id: 2, name: 'B' }));
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -2934,13 +2937,13 @@ describe('time-travel enhancer', () => {
       seenPaths.push(path);
     });
 
-    store.$.rows.addOne({ id: -1, name: 'temp' });
+    undoable(() => store.$.rows.addOne({ id: -1, name: 'temp' }));
     await Promise.resolve();
     await Promise.resolve();
     const addEntry = t.getHistory().at(-1);
     expect(t.getHistory().length).toBeGreaterThan(initial);
 
-    store.$.rows.changeId(-1, 42);
+    undoable(() => store.$.rows.changeId(-1, 42));
     await Promise.resolve();
     await Promise.resolve();
     const changeIdEntry = t.getHistory().at(-1);
@@ -2975,16 +2978,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.count.set(1);
+    undoable(() => store.$.count.set(1));
     await Promise.resolve();
     await Promise.resolve();
 
-    store.$.count.set(2);
+    undoable(() => store.$.count.set(2));
     await Promise.resolve();
     await Promise.resolve();
 
     t.undo();
-    store.$.count.set(3);
+    undoable(() => store.$.count.set(3));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3006,15 +3009,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.count.set(1);
+    undoable(() => store.$.count.set(1));
     await Promise.resolve();
     await Promise.resolve();
 
-    store.$.count.set(2);
+    undoable(() => store.$.count.set(2));
     await Promise.resolve();
     await Promise.resolve();
 
-    store.$.count.set(3);
+    undoable(() => store.$.count.set(3));
     t.undo();
     await Promise.resolve();
     await Promise.resolve();
@@ -3075,7 +3078,7 @@ describe('time-travel enhancer', () => {
       }
     );
 
-    store.$.rows.addOne({ id: 7, name: 'original' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'original' }));
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterFirstAdd = [
@@ -3087,7 +3090,7 @@ describe('time-travel enhancer', () => {
         ?.restorationSubjectIds ?? []),
     ];
 
-    store.$.rows.addOne({ id: 8, name: 'second' });
+    undoable(() => store.$.rows.addOne({ id: 8, name: 'second' }));
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterSecondAdd = [
@@ -3099,7 +3102,7 @@ describe('time-travel enhancer', () => {
         ?.restorationSubjectIds ?? []),
     ];
 
-    store.$.rows.changeId(7, 70);
+    undoable(() => store.$.rows.changeId(7, 70));
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterRekey = [
@@ -3107,11 +3110,11 @@ describe('time-travel enhancer', () => {
         ?.__positionIds ?? []),
     ];
 
-    store.$.rows.removeOne(8);
+    undoable(() => store.$.rows.removeOne(8));
     await Promise.resolve();
     await Promise.resolve();
 
-    store.$.rows.addOne({ id: 8, name: 'replacement' });
+    undoable(() => store.$.rows.addOne({ id: 8, name: 'replacement' }));
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterReuse = [
@@ -3160,7 +3163,7 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'first' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'first' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3169,8 +3172,8 @@ describe('time-travel enhancer', () => {
       restorationSubjectIds?: number[];
     };
 
-    store.$.rows.removeOne(7);
-    store.$.rows.addOne({ id: 7, name: 'replacement' });
+    undoable(() => store.$.rows.removeOne(7));
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'replacement' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3234,7 +3237,7 @@ describe('time-travel enhancer', () => {
       }
     );
 
-    store.$.rows.addOne({ id: -1, name: 'temp' });
+    undoable(() => store.$.rows.addOne({ id: -1, name: 'temp' }));
     await Promise.resolve();
     await Promise.resolve();
     const addedToken = [
@@ -3242,7 +3245,7 @@ describe('time-travel enhancer', () => {
         ?.restorationSubjectIds ?? []),
     ];
 
-    store.$.rows.changeId(-1, 42);
+    undoable(() => store.$.rows.changeId(-1, 42));
     await Promise.resolve();
     await Promise.resolve();
     const rekeyedToken = [
@@ -3250,7 +3253,7 @@ describe('time-travel enhancer', () => {
         ?.restorationSubjectIds ?? []),
     ];
 
-    store.$.rows.byIdOrFail(42).name.set('server');
+    undoable(() => store.$.rows.byIdOrFail(42).name.set('server'));
     await Promise.resolve();
     await Promise.resolve();
     const retainedToken = [
@@ -3258,7 +3261,7 @@ describe('time-travel enhancer', () => {
         ?.restorationSubjectIds ?? []),
     ];
 
-    store.$.rows.addOne({ id: -1, name: 'replacement' });
+    undoable(() => store.$.rows.addOne({ id: -1, name: 'replacement' }));
     await Promise.resolve();
     await Promise.resolve();
     const reusedPathToken = [
@@ -3300,7 +3303,7 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3309,7 +3312,7 @@ describe('time-travel enhancer', () => {
     const beforeSubject = store.$.rows.byIdOrFail(7).name
       .__subjectIds?.[0] as number;
 
-    store.$.rows.changeId(7, 42);
+    undoable(() => store.$.rows.changeId(7, 42));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3369,15 +3372,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
-    store.$.drivers.addOne({ id: 1, status: 'idle' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
+    undoable(() => store.$.drivers.addOne({ id: 1, status: 'idle' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.changeId(7, 42);
-    store.$.drivers.byIdOrFail(1).status.set('assigned');
+    undoable(() => store.$.rows.changeId(7, 42));
+    undoable(() => store.$.drivers.byIdOrFail(1).status.set('assigned'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3427,15 +3430,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
-    store.$.drivers.addOne({ id: 1, status: 'idle' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
+    undoable(() => store.$.drivers.addOne({ id: 1, status: 'idle' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.changeId(7, 42);
-    store.$.drivers.byIdOrFail(1).status.set('assigned');
+    undoable(() => store.$.rows.changeId(7, 42));
+    undoable(() => store.$.drivers.byIdOrFail(1).status.set('assigned'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3518,7 +3521,7 @@ describe('time-travel enhancer', () => {
       }
     );
 
-    store.$.rows.addOne({ id: 7, name: 'original' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'original' }));
     await Promise.resolve();
     await Promise.resolve();
     const originalToken = [
@@ -3526,7 +3529,7 @@ describe('time-travel enhancer', () => {
         ?.restorationSubjectIds ?? []),
     ];
 
-    store.$.rows.removeOne(7);
+    undoable(() => store.$.rows.removeOne(7));
     await Promise.resolve();
     await Promise.resolve();
     const removedToken = [
@@ -3534,7 +3537,7 @@ describe('time-travel enhancer', () => {
         ?.restorationSubjectIds ?? []),
     ];
 
-    store.$.rows.addOne({ id: 7, name: 'replacement' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'replacement' }));
     await Promise.resolve();
     await Promise.resolve();
     const replacementToken = [
@@ -3593,11 +3596,11 @@ describe('time-travel enhancer', () => {
     const t = (store as any).__timeTravel;
     const initial = t.getHistory().length;
 
-    store.$.theme.set('dark');
+    undoable(() => store.$.theme.set('dark'));
     await Promise.resolve();
     await Promise.resolve();
 
-    store.$.theme.clear();
+    undoable(() => store.$.theme.clear());
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3606,7 +3609,7 @@ describe('time-travel enhancer', () => {
     expect(t.getHistory().at(-1)?.__ownerPaths).toEqual(['theme']);
 
     storage.set(key, JSON.stringify('navy'));
-    store.$.theme.set('pink');
+    undoable(() => store.$.theme.set('pink'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3631,7 +3634,7 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.count.set(1);
+    undoable(() => store.$.count.set(1));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3657,13 +3660,13 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.byIdOrFail(7).name.set('B');
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('B'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3694,7 +3697,7 @@ describe('time-travel enhancer', () => {
     }
     const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3706,12 +3709,12 @@ describe('time-travel enhancer', () => {
     expect(store.$.rows.ids()).toEqual([]);
     expect(t.getFrontier(addPositionId)).toBe(0);
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
-    store.$.rows.removeOne(7);
+    undoable(() => store.$.rows.removeOne(7));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3726,7 +3729,7 @@ describe('time-travel enhancer', () => {
 
     t.resetHistory();
 
-    store.$.rows.changeId(7, 42);
+    undoable(() => store.$.rows.changeId(7, 42));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3748,13 +3751,13 @@ describe('time-travel enhancer', () => {
     const rootPositionId = (store.$ as unknown as ScopedAuthorityNode)
       .__positionIds?.[0] as number;
 
-    store.$.count.set(1);
+    undoable(() => store.$.count.set(1));
     await Promise.resolve();
     await Promise.resolve();
 
     const firstTurn = t.getTurns().at(-1) as { __positionIds?: number[] };
 
-    store.$.title.set('B');
+    undoable(() => store.$.title.set('B'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3825,7 +3828,7 @@ describe('time-travel enhancer', () => {
     const baselineHistoryCount = t.getHistory().length;
     const baselineTurnCount = t.getTurns().length;
 
-    store.$.profile.firstName.set('Jon');
+    undoable(() => store.$.profile.firstName.set('Jon'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3884,7 +3887,7 @@ describe('time-travel enhancer', () => {
     const baselineHistoryCount = t.getHistory().length;
     const baselineTurnCount = t.getTurns().length;
 
-    store.$.profile.firstName.set('Jon');
+    undoable(() => store.$.profile.firstName.set('Jon'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -3993,8 +3996,8 @@ describe('time-travel enhancer', () => {
 
     store
       .transaction(() => {
-        profile.firstName.set('Jane');
-        profile.lastName.set('Jones');
+        undoable(() => profile.firstName.set('Jane'));
+        undoable(() => profile.lastName.set('Jones'));
       })
       .confirm();
 
@@ -4040,7 +4043,7 @@ describe('time-travel enhancer', () => {
     const profilePositionId = profile.__positionIds?.[0] as number;
     const firstNamePositionId = profile.firstName.__positionIds?.[0] as number;
 
-    profile.firstName.set('Jane');
+    undoable(() => profile.firstName.set('Jane'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4079,8 +4082,8 @@ describe('time-travel enhancer', () => {
 
     store
       .transaction(() => {
-        profile.firstName.set('Jane');
-        settings.theme.set('dark');
+        undoable(() => profile.firstName.set('Jane'));
+        undoable(() => settings.theme.set('dark'));
       })
       .confirm();
 
@@ -4128,15 +4131,15 @@ describe('time-travel enhancer', () => {
 
     store
       .transaction(() => {
-        profile.firstName.set('Ada');
-        profile.lastName.set('Lovelace');
+        undoable(() => profile.firstName.set('Ada'));
+        undoable(() => profile.lastName.set('Lovelace'));
       })
       .confirm();
 
     store
       .transaction(() => {
-        profile.firstName.set('Grace');
-        settings.theme.set('dark');
+        undoable(() => profile.firstName.set('Grace'));
+        undoable(() => settings.theme.set('dark'));
       })
       .confirm();
 
@@ -4169,7 +4172,7 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.count.set(1);
+    undoable(() => store.$.count.set(1));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4196,13 +4199,13 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.rows.byIdOrFail(7).name.set('B');
+    undoable(() => store.$.rows.byIdOrFail(7).name.set('B'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4229,7 +4232,7 @@ describe('time-travel enhancer', () => {
     );
     const addTimeTravel = (addStore as any).__timeTravel;
 
-    addStore.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => addStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4259,14 +4262,14 @@ describe('time-travel enhancer', () => {
     );
     const removeTimeTravel = (removeStore as any).__timeTravel;
 
-    removeStore.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => removeStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
     const originalRemoveToken = removeStore.$.rows.byIdOrFail(7).name
       .__subjectIds?.[0] as number;
     removeTimeTravel.resetHistory();
 
-    removeStore.$.rows.removeOne(7);
+    undoable(() => removeStore.$.rows.removeOne(7));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4294,14 +4297,14 @@ describe('time-travel enhancer', () => {
     );
     const rekeyTimeTravel = (rekeyStore as any).__timeTravel;
 
-    rekeyStore.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => rekeyStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
     rekeyTimeTravel.resetHistory();
 
     const beforeRekeyToken = rekeyStore.$.rows.byIdOrFail(7).name
       .__subjectIds?.[0] as number;
-    rekeyStore.$.rows.changeId(7, 42);
+    undoable(() => rekeyStore.$.rows.changeId(7, 42));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4362,15 +4365,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     store
       .transaction(() => {
-        store.$.count.set(1);
-        store.$.rows.changeId(7, 42);
+        undoable(() => store.$.count.set(1));
+        undoable(() => store.$.rows.changeId(7, 42));
       })
       .confirm();
 
@@ -4402,15 +4405,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     store
       .transaction(() => {
-        store.$.count.set(1);
-        store.$.rows.byIdOrFail(7).name.set('B');
+        undoable(() => store.$.count.set(1));
+        undoable(() => store.$.rows.byIdOrFail(7).name.set('B'));
       })
       .confirm();
 
@@ -4451,7 +4454,7 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
 
-    store.$.rows.addOne({ id: 7, name: 'Alice' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'Alice' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4466,11 +4469,11 @@ describe('time-travel enhancer', () => {
       throw new Error('Expected subject-owned leaf metadata');
     }
 
-    heldName.set('Alicia');
+    undoable(() => heldName.set('Alicia'));
     await Promise.resolve();
     await Promise.resolve();
 
-    store.$.rows.changeId(7, 42);
+    undoable(() => store.$.rows.changeId(7, 42));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4504,7 +4507,7 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
 
-    store.$.rows.addOne({ id: 7, name: 'Alice' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'Alice' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4519,12 +4522,12 @@ describe('time-travel enhancer', () => {
       throw new Error('Expected subject-owned leaf metadata');
     }
 
-    heldName.set('Alicia');
+    undoable(() => heldName.set('Alicia'));
     await Promise.resolve();
     await Promise.resolve();
 
-    store.$.rows.removeOne(7);
-    store.$.rows.addOne({ id: 7, name: 'Bob' });
+    undoable(() => store.$.rows.removeOne(7));
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'Bob' }));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -4564,15 +4567,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     store
       .transaction(() => {
-        store.$.count.set(1);
-        store.$.rows.removeOne(7);
+        undoable(() => store.$.count.set(1));
+        undoable(() => store.$.rows.removeOne(7));
       })
       .confirm();
 
@@ -4682,15 +4685,15 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.rows.addOne({ id: 7, name: 'A' });
+    undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
     t.resetHistory();
 
     store
       .transaction(() => {
-        store.$.count.set(1);
-        store.$.rows.removeOne(7);
+        undoable(() => store.$.count.set(1));
+        undoable(() => store.$.rows.removeOne(7));
       })
       .confirm();
 
@@ -4735,16 +4738,16 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__timeTravel;
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
-    store.$.orders.addOne({ id: 99, status: 'new' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
     await Promise.resolve();
     await Promise.resolve();
 
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -4752,8 +4755,8 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.drivers.byIdOrFail(7).status.set('loading');
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -4802,20 +4805,20 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.orders.addOne({ id: 99, status: 'new' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
     await Promise.resolve();
     await Promise.resolve();
 
     const t = (store as any).__timeTravel;
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as { __positionIds?: number[] };
 
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -4850,17 +4853,17 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.trucks.addOne({ id: 12, driverId: null });
-    store.$.orders.addOne({ id: 99, status: 'new' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
     await Promise.resolve();
     await Promise.resolve();
 
     const t = (store as any).__timeTravel;
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
-    store.$.trucks.byIdOrFail(12).driverId.set(7);
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
+    undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -4869,7 +4872,7 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as { id: number };
@@ -4914,15 +4917,15 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.orders.addOne({ id: 99, status: 'new' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
     await Promise.resolve();
     await Promise.resolve();
 
     const t = (store as any).__timeTravel;
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -4931,7 +4934,7 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as {
@@ -5005,15 +5008,15 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
 
-    store.$.drivers.addOne({ id: 7, status: 'idle' });
-    store.$.orders.addOne({ id: 99, status: 'new' });
+    undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
+    undoable(() => store.$.orders.addOne({ id: 99, status: 'new' }));
     await Promise.resolve();
     await Promise.resolve();
 
     const t = (store as any).__timeTravel;
     t.resetHistory();
 
-    store.$.drivers.byIdOrFail(7).status.set('assigned');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     await Promise.resolve();
     await Promise.resolve();
     const firstTurn = t.getTurns().at(-1) as {
@@ -5021,7 +5024,7 @@ describe('time-travel enhancer', () => {
       __positionIds?: number[];
     };
 
-    store.$.orders.byIdOrFail(99).status.set('queued');
+    undoable(() => store.$.orders.byIdOrFail(99).status.set('queued'));
     await Promise.resolve();
     await Promise.resolve();
     const secondTurn = t.getTurns().at(-1) as { id: number };
@@ -5032,7 +5035,7 @@ describe('time-travel enhancer', () => {
     expect(store.canUndo()).toBe(true);
     expect(store.canRedo()).toBe(true);
 
-    store.$.drivers.byIdOrFail(7).status.set('loading');
+    undoable(() => store.$.drivers.byIdOrFail(7).status.set('loading'));
     await Promise.resolve();
     await Promise.resolve();
 
@@ -5069,7 +5072,7 @@ describe('time-travel enhancer', () => {
     const firstBaseline = first.getHistory().length;
     const secondBaseline = second.getHistory().length;
 
-    first.$.rows.addOne({ id: 1, name: 'A' });
+    undoable(() => first.$.rows.addOne({ id: 1, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
 
