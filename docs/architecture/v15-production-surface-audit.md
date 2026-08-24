@@ -6554,6 +6554,138 @@ SWEPT      M1 M2 M3 M4 M5 M7 M8 M9 M10 M11
 REMAINING  M6 only — mechanism-removal proofs against the frozen survivor set
 ```
 
+# MATRIX-CLOSE — THE FROZEN SURVIVOR SET (pre-registration for M6)
+
+Frozen BEFORE any mechanism is removed. M6 may **falsify** this table; it may not
+silently rewrite it. If a probe shows two rows are the same mechanism, that is an
+M6 finding and one row is deleted explicitly.
+
+**Seven mechanism rows, not eleven.** Three concepts from the conceptual list
+collapse, and one owns no behaviour at all — recorded below rather than kept for
+symmetry.
+
+## The seven
+
+```text
+S1  RESTORATION DESIGNATION
+    owner        restoration / restoration-eligibility.ts
+    dimension    restoration eligibility
+    consumer     `isTurnEligible(designated)` in restoration.ts
+    behaviour    only explicitly designated authored work may enter restoration
+                 history
+    public door  undoable()
+    probe        make `markMetaDesignated` return its input unchanged
+    expected     histc2-door.spec.ts — an `undoable()` write is NOT admitted, so
+                 the admission assertion fails
+
+S2  PARTICIPATION
+    owner        causal runtime / write-participation.ts
+    dimension    authored vs realized vs inspection causal POLICY
+    consumer     restoration admission, transaction capture, P0-C, stored()
+    behaviour    a realized write gains no authored rights and makes no
+                 transaction contribution
+    public door  external()
+    probe        make `getWriteParticipation` always return 'authored'
+    expected     a1-ingress.spec.ts case 2 — `historyGrew` stops being 0
+
+S3  ORIGIN
+    owner        causal attribution / mutation-types.ts
+    dimension    PROVENANCE
+    consumer     `currentHydrateMode()` — the one policy consumer participation
+                 CANNOT serve, since restoration and external truth are both
+                 'realized' while restore-vs-merge depends on WHICH authority
+                 replayed the write. Plus diagnostics.
+    behaviour    a restoration replay is applied exactly; a rehydrate normalises
+    probe        make `currentHydrateMode()` always return 'merge'
+    expected     hydrate-decisions.spec.ts:110 "a RESTORE is not a decline" — the
+                 marker treats the undo as a competing rehydrate and declines it
+
+S4  TRANSACTION CORRELATION (transactionId)
+    owner        transactions
+    dimension    write-to-transaction correlation
+    consumer     capture buckets, the rollback dependency ledger, the diagnostic
+                 journal
+    behaviour    effects correlate with the transaction that produced them
+    public door  transaction()
+    probe        omit `transactionId` from the context `transaction()` establishes
+    expected     tx-ledger / rollback specs — speculative writes are no longer
+                 captured into the transaction, so rollback compensates nothing
+
+S5  LIFECYCLE IDENTITY (owner, id)
+    owner        transaction-lifecycle.ts
+    dimension    protocol identity ACROSS owners
+    consumer     restoration's foreign-transaction filter
+                 (`event.owner === transactionOwnerToken`), the journal
+    behaviour    the same numeric id on two trees is not conflated
+    probe        make `transactionIdentityKey` key on `id` alone
+    expected     turn-feed-0-1-identity.spec.ts fails
+
+S6  COMMIT-CONSEQUENCE BOUNDARY
+    owner        commit-consequence.ts
+    dimension    MAY this durable consequence run now? (distinct from
+                 transactions' WHEN does settlement occur?)
+    consumer     stored()
+    behaviour    durable storage never gets ahead of settled commit state
+    probe        make `scheduleDurableConsequence` run its consequence immediately
+    expected     per-b-classification.spec.ts P5 — speculative state reaches
+                 storage during a pending transaction
+
+S7  STRUCTURAL EFFECT
+    owner        mutation substrate (entity-signal, path-notifier)
+    dimension    structural mutation description
+    consumer     restoration reversal AND transaction rollback composition
+    behaviour    add/remove/rekey carry enough information to be reversed safely
+    probe        omit `structuralEffect` from delivered metadata
+    expected     turn-effect-composition.spec.ts — subject-keyed composition
+                 cannot annihilate add+remove
+```
+
+## Collapsed, and why — no row for these
+
+```text
+external()      NOT a mechanism. It is the public DOOR onto S2 + S3, and its
+                removal probe IS S2's. Named as the door on those rows.
+undoable()      the public door onto S1, same reasoning.
+transaction()   the public door onto S4/S5/S6; the mechanisms are the three rows.
+
+DIAGNOSTIC      ⚠️ OWNS NO BEHAVIOUR, so it cannot be an M6 row. F3-F7 proved
+JOURNAL         positively that it grants no restoration rights, acquires no
+                ownership, changes no reclamation and holds no live handles —
+                i.e. removing it must break NOTHING except its own specs. It is a
+                CONSUMER of S3/S4/S5, not a survivor with a behaviour to prove.
+                Recorded rather than given a row for balance.
+
+asyncSource     NOT an ingress mechanism. Pass 2B established POSITIVELY that its
+                load runs and produces zero causal events, so there is no causal
+                behaviour to prove.
+```
+
+## Pre-registered outcomes per probe
+
+```text
+PROVEN                 the intended assertion fails for the predicted SEMANTIC
+                       reason
+NOT PROVEN — COMPILE   removal only causes type or import fallout
+NOT PROVEN — CRASH     execution never reaches the behaviour under test
+NOT PROVEN — INCIDENTAL some other behaviour fails while the claimed invariant
+                       still passes
+HARNESS INVALID        the positive arm never exercised the mechanism at all
+```
+
+The fifth category is earned rather than theoretical: pass 2B's `asyncSource`
+probe produced the CORRECT zero twice from a harness that never ran the load.
+**Every probe below therefore states its positive control** — the thing that must
+be observably true before the removal result means anything.
+
+## Method
+
+```text
+one mechanism at a time      restore before the next
+capture the failure MESSAGE  not just the exit code — the message is what proves
+                             the reason
+green before and after       the restore is verified, not assumed
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
