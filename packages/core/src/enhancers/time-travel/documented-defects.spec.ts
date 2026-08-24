@@ -77,20 +77,19 @@ describe('6b — createAuditTracker samples on a timer', () => {
   });
 });
 
-describe('6c — undo() after deserialize() reverts the restore', () => {
-  // ⏳ REPAIRED BY THE OPT-IN FLIP, and migrated with it rather than here.
+describe('6c — undo() after deserialize() (REPAIRED by opt-in eligibility)', () => {
+  // ✅ FIXED, and not by fixing it. `deserialize()` is not an operation a user
+  // authored, so it is never designated and never becomes an undo step — there
+  // is nothing for a first undo to discard.
   //
-  // `deserialize()` is not an operation a user authored, so under opt-in
-  // eligibility it is never designated and never becomes an undo step. Measured:
-  // with the flip applied, `canUndo()` is false here and the first undo cannot
-  // discard the restore.
+  // Designating the restore to keep the old assertion passing would have
+  // REINTRODUCED the defect, which is why this waited for the flip instead of
+  // being migrated with the earlier batches.
   //
-  // This assertion still describes the CURRENT default, so it stays until the
-  // flip lands. Designating the restore to make the new assertion pass early
-  // would have reintroduced the defect. Docs to update at that point:
+  // Docs updated with this change:
   //   docs/guides/time-travel-in-production.md
   //   TODO.md 6c
-  it('the first undo discards the restored state, and redo brings it back', async () => {
+  it('a restored payload is NOT an undo step, so undo cannot discard it', async () => {
     const make = () =>
       signalTree({ n: 0 }, { enhancers: [serialization(), timeTravel({})] });
 
@@ -105,14 +104,13 @@ describe('6c — undo() after deserialize() reverts the restore', () => {
     await flush();
 
     expect(target.$.n()).toBe(7);
-    expect(target.canUndo()).toBe(true);
+
+    // The defect was `canUndo()` being true here, with the first undo throwing
+    // the restore away.
+    expect(target.canUndo()).toBe(false);
 
     target.undo();
-    expect(target.$.n()).not.toBe(7); // the restore was discarded
-
-    expect(target.canRedo()).toBe(true);
-    target.redo();
-    expect(target.$.n()).toBe(7); // ...but it is recoverable
+    expect(target.$.n()).toBe(7);
   });
 });
 

@@ -150,7 +150,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     );
   });
 
-  it('CASE 8 — an untagged refresh BECOMES an undoable user turn', async () => {
+  it('CASE 8 — REPAIRED: an untagged refresh does NOT become an undoable turn', async () => {
     const tree = makeTimeTravelTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
@@ -160,13 +160,22 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada-from-server', v: 2 }]);
     await flush();
 
-    // THE FINDING. Acquisition is indistinguishable from an authored mutation.
-    expect(tree.getHistory().length).toBeGreaterThan(before);
+    // ✅ REPAIRED by opt-in eligibility. A1-0's finding was that acquisition is
+    // INDISTINGUISHABLE from an authored mutation, so an untagged background
+    // refresh entered the undo stack and a user's undo reverted the server's
+    // truth to a stale client value.
+    //
+    // Under opt-in the refresh is simply not designated, so it never becomes a
+    // turn — and the undo cannot reach it. Note what did NOT change: acquisition
+    // is still indistinguishable from an authored write. It just no longer
+    // MATTERS, because neither one is admitted without designation. CASE 8b's
+    // realization seam remains the right tool for telling them apart when
+    // something else needs to.
+    expect(tree.getHistory().length).toBe(before);
 
-    // So the user's undo reverts the SERVER's truth to a stale client value.
     tree.undo();
     await flush();
-    expect(tree.$.users.byId('a')?.()?.name).toBe('Ada');
+    expect(tree.$.users.byId('a')?.()?.name).toBe('Ada-from-server');
   });
 
   it('CASE 8b — classifying it as a realization fixes that, and the seam already exists', async () => {

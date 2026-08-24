@@ -3372,7 +3372,7 @@ describe('tree realization adapter', () => {
             throw new Error(`Expected owned position for ${String(key)}`);
           }
 
-          undoable(() => descriptors.set(owner, { path: String(key), ownerPath: String(key) }));
+          descriptors.set(owner, { path: String(key), ownerPath: String(key) });
           effects.push({ owner, before: leafIndex, after: leafIndex + 1 });
         }
 
@@ -4183,7 +4183,7 @@ describe('tree realization adapter', () => {
     }
 
     const frame = scalarSlotRuntime.beginFrame();
-    undoable(() => frame.set(slotIndex, 'Alicia'));
+    frame.set(slotIndex, 'Alicia');
 
     undoable(() => tree.$.users.changeId('u1', 'u2'));
     getPathNotifier().flushSync();

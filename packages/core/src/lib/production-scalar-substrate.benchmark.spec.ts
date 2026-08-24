@@ -273,7 +273,7 @@ function createScalarHarness(size: number): ScalarHarness {
     commitFrame: (width, seed) => {
       const frame = runtime.beginFrame();
       for (let index = 0; index < width; index++) {
-        undoable(() => frame.set(frameSlots[index], seed + index));
+        frame.set(frameSlots[index], seed + index);
       }
       frame.commit();
     },
@@ -781,7 +781,7 @@ function measureEntityTimingRows(sizes: readonly number[]): EntityTimingRow[] {
               iteration++
             ) {
               updateSeed += 1;
-              undoable(() => updateHarness.updateOne(updateSeed));
+              updateHarness.updateOne(updateSeed);
             }
           }),
           ENTITY_UPDATE_ITERATIONS
@@ -803,7 +803,7 @@ function measureEntityTimingRows(sizes: readonly number[]): EntityTimingRow[] {
               iteration < ENTITY_STRUCTURAL_ITERATIONS;
               iteration++
             ) {
-              undoable(() => addHarness.addOne());
+              addHarness.addOne();
             }
           }),
           ENTITY_STRUCTURAL_ITERATIONS
@@ -825,7 +825,7 @@ function measureEntityTimingRows(sizes: readonly number[]): EntityTimingRow[] {
               iteration < structuralIterations;
               iteration++
             ) {
-              undoable(() => removeHarness.removeOne());
+              removeHarness.removeOne();
             }
           }),
           structuralIterations
@@ -847,7 +847,7 @@ function measureEntityTimingRows(sizes: readonly number[]): EntityTimingRow[] {
               iteration < ENTITY_STRUCTURAL_ITERATIONS;
               iteration++
             ) {
-              undoable(() => changeIdHarness.changeId());
+              changeIdHarness.changeId();
             }
           }),
           ENTITY_STRUCTURAL_ITERATIONS
@@ -894,7 +894,7 @@ function measureEntityFrameTimingRows(
             iteration < ENTITY_STRUCTURAL_ITERATIONS;
             iteration++
           ) {
-            undoable(() => frameHarness.addOne());
+            frameHarness.addOne();
           }
         }),
         ENTITY_STRUCTURAL_ITERATIONS
@@ -938,19 +938,19 @@ function measureEntityLogicalWorkRows(
     const harness = createProjectionFrameHarness(size);
 
     resetProductionSubstrateStatsForTesting(stats);
-    undoable(() => harness.updateOne(size + 1));
+    harness.updateOne(size + 1);
     captureRow('entity-updateOne', size);
 
     resetProductionSubstrateStatsForTesting(stats);
-    undoable(() => harness.addOne());
+    harness.addOne();
     captureRow('entity-addOne', size);
 
     resetProductionSubstrateStatsForTesting(stats);
-    undoable(() => harness.removeOne());
+    harness.removeOne();
     captureRow('entity-removeOne', size);
 
     resetProductionSubstrateStatsForTesting(stats);
-    undoable(() => harness.changeId());
+    harness.changeId();
     captureRow('entity-changeId', size);
 
     resetProductionSubstrateStatsForTesting(stats);
@@ -987,17 +987,17 @@ function measureEntityFrameLogicalWorkRows(
   for (const size of sizes) {
     const addHarness = createStructuralAuditHarness(size);
     resetProductionSubstrateStatsForTesting(stats);
-    undoable(() => addHarness.addOne());
+    addHarness.addOne();
     captureRow('entity-frame-addOne', size);
 
     const removeHarness = createStructuralAuditHarness(size);
     resetProductionSubstrateStatsForTesting(stats);
-    undoable(() => removeHarness.removeOne());
+    removeHarness.removeOne();
     captureRow('entity-frame-removeOne', size);
 
     const changeIdHarness = createStructuralAuditHarness(size);
     resetProductionSubstrateStatsForTesting(stats);
-    undoable(() => changeIdHarness.changeId());
+    changeIdHarness.changeId();
     captureRow('entity-frame-changeId', size);
   }
 
@@ -1036,7 +1036,7 @@ function measurePublicAddLogicalWorkRows(
 
     try {
       resetProductionSubstrateStatsForTesting(stats);
-      undoable(() => harness.addOne());
+      harness.addOne();
       rows.push({
         positions: size,
         publicAddPreviousTailReads: stats.publicAddPreviousTailReads,

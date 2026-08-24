@@ -235,7 +235,7 @@ describe('stored() and replay side effects', () => {
   it('initial storage load does not create an owned history turn', async () => {
     resetPathNotifier();
     const { map, adapter } = fakeStorage();
-    undoable(() => map.set('sdi-init', versioned('dark')));
+    map.set('sdi-init', versioned('dark'));
     const tree = signalTree(
       {
         k: stored('sdi-init', 'light', { storage: adapter, debounceMs: 0 }),
