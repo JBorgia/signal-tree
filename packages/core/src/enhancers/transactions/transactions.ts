@@ -348,6 +348,35 @@ class TransactionAuthority {
   private nextTurnId = 1;
 
   /**
+   * TX-LEDGER C3 — later effects that are NOT authored turns.
+   *
+   * Rollback safety asks "has anything since relied on the structure I am about
+   * to invalidate?". That question is about causal DEPENDENCE, not authorship,
+   * and the old answer came only from `confirmedTurns` — which excludes
+   * realizations by construction. So a server refresh landing on a speculative
+   * row created no dependency and the rollback deleted the row the server had
+   * just written to: RESTORE-P0 P0-C one layer up.
+   *
+   * Deliberately NOT a causal history:
+   *
+   *   recorded ONLY while a pending turn exists   nothing outstanding, nothing
+   *                                               retained
+   *   dropped when the last pending turn settles  no accumulation
+   *   monotonic                                   a dependency latches; the
+   *                                               later write being reversed by
+   *                                               hand does not un-depend it
+   *                                               (measured, case 4)
+   *   sequence-scoped                             a turn only sees effects that
+   *                                               landed after IT opened
+   *
+   * The sequence matters with two open transactions: an effect recorded before
+   * the second opened is not "later" for the second, only for the first.
+   */
+  private dependencyLedger: Array<{ seq: number; effect: TurnEffect }> = [];
+  private ledgerSeq = 0;
+  private readonly pendingOpenedAtSeq = new Map<number, number>();
+
+  /**
    * Restoration-claim hooks, injected because the authority has no tree.
    *
    * An UNSETTLED turn owns the subjects it retired: Phase 6B measured that
@@ -423,8 +452,37 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.set(turn.id, turn);
+    this.pendingOpenedAtSeq.set(turn.id, this.ledgerSeq);
     this.retainPendingClaims(turn.id, turn.restorationSubjectIds ?? []);
     return cloneTurnRecord(turn);
+  }
+
+  /**
+   * Record a later effect for dependency purposes, whatever authored it.
+   *
+   * Returns immediately when nothing is pending, which is what keeps this a
+   * projection rather than an inventory: with no outstanding rollback right
+   * there is no question to answer and nothing is kept.
+   *
+   * @internal
+   */
+  observeLaterEffects(effects: readonly TurnEffect[]): void {
+    if (this.pendingTurns.size === 0 || effects.length === 0) {
+      return;
+    }
+    this.ledgerSeq += 1;
+    for (const effect of effects) {
+      this.dependencyLedger.push({ seq: this.ledgerSeq, effect });
+    }
+  }
+
+  /** Drop the ledger once no pending turn can ask about it. */
+  private releaseLedgerIfQuiet(): void {
+    if (this.pendingTurns.size === 0) {
+      this.dependencyLedger = [];
+      this.ledgerSeq = 0;
+      this.pendingOpenedAtSeq.clear();
+    }
   }
 
   confirmPending(turnId: number): TransactionTurnRecord | undefined {
@@ -433,6 +491,7 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.delete(turnId);
+    this.pendingOpenedAtSeq.delete(turnId);
     // SETTLED. Confirmation discards rollback state rather than becoming
     // permanent history — those are different product concepts. A tree that
     // also has `timeTravel()` has already claimed these subjects through its
@@ -440,6 +499,7 @@ class TransactionAuthority {
     // the handoff.
     this.releasePendingClaims(turnId);
     this.insertConfirmed(turn);
+    this.releaseLedgerIfQuiet();
     return cloneTurnRecord(turn);
   }
 
@@ -449,7 +509,9 @@ class TransactionAuthority {
       return undefined;
     }
     this.pendingTurns.delete(turnId);
+    this.pendingOpenedAtSeq.delete(turnId);
     this.releasePendingClaims(turnId);
+    this.releaseLedgerIfQuiet();
     return cloneTurnRecord(turn);
   }
 
@@ -458,12 +520,26 @@ class TransactionAuthority {
   }
 
   getPendingRollbackPlan(turnId: number): PendingRollbackPlan {
-    const laterEffects = this.confirmedTurns
+    const authoredLater = this.confirmedTurns
       .filter((turn) => turn.id > turnId)
       .flatMap((turn) =>
         (turn.__effects ?? []).map((effect) => ({ turnId: turn.id, effect }))
       );
-    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), laterEffects);
+
+    // TX-LEDGER C3. Effects with no authored turn of their own — a realization,
+    // typically — count when they landed after THIS turn opened. Admission is by
+    // dependence: `buildPendingRollbackPlan` decides relevance by position and
+    // subject overlap, so an unrelated realization is ignored exactly as an
+    // unrelated authored write is.
+    const openedAt = this.pendingOpenedAtSeq.get(turnId) ?? 0;
+    const observedLater = this.dependencyLedger
+      .filter((entry) => entry.seq > openedAt)
+      .map((entry) => ({ turnId, effect: entry.effect }));
+
+    return buildPendingRollbackPlan(this.pendingTurns.get(turnId), [
+      ...authoredLater,
+      ...observedLater,
+    ]);
   }
 
   getConfirmedTurnCount(): number {
@@ -1064,6 +1140,28 @@ export function getOrCreateInternalTransactionRuntime<T>(
               return;
             }
             if (getCausalWriteMode(meta) === 'realization') {
+              // TX-LEDGER C3. A realization is NOT an authored turn and must
+              // never become one — but it can still make a pending rollback
+              // unsafe by depending on speculative structure. Build its effects
+              // into a throwaway bucket and hand them to the dependency ledger
+              // only; nothing here reaches confirmedTurns.
+              //
+              // Skipped entirely when nothing is pending, so a tree with no open
+              // transaction pays nothing for this.
+              if (authority.getPendingTurnCount() > 0) {
+                const probe = createCaptureBucket();
+                captureIntoBucket(
+                  probe,
+                  path,
+                  next,
+                  prev,
+                  meta,
+                  ownerPath,
+                  subjectIds,
+                  positionIds
+                );
+                authority.observeLaterEffects(drainCaptureBucket(probe).effects);
+              }
               return;
             }
             if (
