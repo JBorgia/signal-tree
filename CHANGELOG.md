@@ -3,6 +3,18 @@
 These entries keep release-delta claim checks honest before the actual version
 bump inserts the final dated 15.0.0 heading.
 
+- **BREAKING: `timeTravel({ shouldSkip })` removed.** The comparator and the
+  `skipsBackward()`/`skipsForward()` traversal it drove are gone; `undo()` and
+  `redo()` move one turn. It looked like navigation and was not — the predicate
+  asked whether a recorded transition was one the user would recognise as a step,
+  which is an ADMISSION question asked late, and with the predicate removed the
+  traversal reduces to plus/minus one. Moving it to read time in 14.1.1 was a
+  real improvement over discarding entries on the hot path, but it treated
+  deciding LATE as the problem when the problem was recording the transition at
+  all. `undoable()` asks the same question before a turn exists: a cursor move is
+  not designated, so there is nothing to skip past and no per-transition
+  predicate running on every recorded write.
+
 - **BREAKING: `entityMap({ recordHistory: false })` removed.** The option, the
   `HISTORY_EXCLUDED` mark, `pruneHistoryExcluded()`, `prunedEqual()` and the
   snapshot-pruning path are all gone. It excluded a collection from history by

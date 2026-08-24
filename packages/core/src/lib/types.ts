@@ -45,20 +45,6 @@ export interface TimeTravelConfig {
   includePayload?: boolean;
 
   /**
-   * Return `true` to SKIP recording a transition.
-   *
-   * Reference-dedup already collapses snapshots that are identical, which is
-   * narrower than this: a comparator lets the app decide a change is
-   * uninteresting — a cursor position, a hover flag, a field the user is still
-   * typing into — so undo lands on something a person recognises as a step.
-   *
-   * ⚠️ It runs on EVERY recorded write. A comparator that walks the whole state
-   * reintroduces the O(state) cost per write that reference-dedup was
-   * introduced to remove. Compare the few fields you mean.
-   */
-  shouldSkip?: (previous: unknown, next: unknown) => boolean;
-
-  /**
    * HIST-C2 PROTOTYPE — which authored turns are restoration-eligible.
    *
    * - `'all'` (default): today's semantics. Every authored turn is recorded.

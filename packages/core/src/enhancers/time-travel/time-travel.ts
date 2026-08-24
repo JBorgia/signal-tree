@@ -855,8 +855,9 @@ class TimeTravelManager<T> {
       return undefined;
     }
 
-    // `shouldSkip` is NOT consulted here. It used to be, and the entry was
-    // discarded — see `skipsBackward()` for why that moved to read time.
+    // No admission predicate here, and none at read time either — see the
+    // tombstone above `redo()`. Admission is decided by `undoable()`, before a
+    // turn exists.
     //
     // The reference-dedup above stays: it is O(1), structural rather than
     // semantic, and collapsing an identical snapshot loses nothing.
@@ -1474,7 +1475,7 @@ class TimeTravelManager<T> {
       restorationSubjectIds?: number[];
       __positionIds?: number[];
     };
-    this.currentIndex = this.skipsBackward(this.currentIndex);
+    this.currentIndex = this.currentIndex - 1;
     this.isTemporalViewActive = true;
     const entry = this.history[this.currentIndex];
     this.restoreState(
@@ -1511,71 +1512,35 @@ class TimeTravelManager<T> {
     return this.undoBySnapshot();
   }
 
-  /**
-   * Where `undo()` should land, given `shouldSkip`.
-   *
-   * ## Why the comparator runs HERE and not at record time
-   *
-   * It used to run in `addEntry` and `return` early, so the entry was never
-   * pushed. Five problems, one cause — the cost and the decision were on the
-   * wrong operation:
-   *
-   * 1. **The cost was on the hot path.** A write happens per keystroke and per
-   *    telemetry frame; `undo()` is a human gesture. Recording an entry is
-   *    O(depth) and nearly free since structural sharing landed (50 writes over
-   *    10,000 rows: 0.04 ms). The comparator is the expensive part, so a
-   *    potentially O(state) predicate ran per write to avoid something that
-   *    costs almost nothing.
-   * 2. **It was irreversible.** A skipped entry never existed. A wrong predicate
-   *    lost history permanently. Filtering at read time is a view over complete
-   *    data — change the predicate, get different navigation, lose nothing.
-   * 3. **One policy for every consumer.** An undo button, a devtools panel and an
-   *    audit view had to share a single filter fixed at record time.
-   * 4. **It was a documented foot-gun.** "A careless comparator is an O(state)
-   *    walk per write" is no longer expressible: a careless predicate now costs
-   *    one slow `undo()`, not a slow app.
-   * 5. **Coalescing was impossible.** Merging keystrokes into one word needs a RUN
-   *    of entries, and at write N you cannot know N+1 is coming. Discarding at
-   *    write time forecloses it by construction.
-   *
-   * ## The rule
-   *
-   * Walk back while the transition INTO the state being left is uninteresting.
-   * If `E2 -> E3` is skippable then E2 and E3 are the same state to the user, so
-   * undoing from E3 must not land on E2 — it lands on the first state the user
-   * would recognise as different.
-   *
-   * Index 0 is never skipped past: the initial state is always a valid
-   * destination, or undo could refuse to move at all.
-   */
-  private skipsBackward(from: number): number {
-    const skip = this.config.shouldSkip;
-    let j = from - 1;
-    if (!skip) return j;
-    while (j > 0 && skip(this.history[j].state, this.history[j + 1].state)) {
-      j--;
-    }
-    return j;
-  }
-
-  /** Mirror of `skipsBackward` for `redo()`. */
-  private skipsForward(from: number): number {
-    const skip = this.config.shouldSkip;
-    const last = this.history.length - 1;
-    let j = from + 1;
-    if (!skip) return j;
-    while (j < last && skip(this.history[j - 1].state, this.history[j].state)) {
-      j++;
-    }
-    return j;
-  }
+  // `skipsBackward()` / `skipsForward()` and `shouldSkip` were DELETED in 15.0.
+  //
+  // TOMBSTONE, because the deletion looked like navigation and was not. The
+  // predicate asked "is the transition between these two states one the user
+  // would recognise as a step?" — an ADMISSION question, asked late. The
+  // navigation functions had no policy of their own: strip the predicate and
+  // they reduce to `from - 1` and `from + 1`, which is what they are now.
+  //
+  // Moving the comparator from record time to read time (14.1.1) was a real
+  // improvement over discarding entries on the hot path — it stopped an
+  // O(state) predicate running per write, and stopped a wrong predicate losing
+  // history irreversibly. But it treated deciding LATE as the problem, when the
+  // problem was deciding at all: history should not have been recording the
+  // transition in the first place.
+  //
+  // `undoable()` asks the same question on the correct side of the boundary. A
+  // cursor move is not designated, so it never becomes a turn, so there is
+  // nothing to skip past and no per-transition predicate to run.
+  //
+  // Do not reintroduce a read-time admission filter. If a future requirement
+  // needs navigation among ALREADY-ADMITTED turns — "jump to the last turn that
+  // touched X" — that is a different primitive and needs its own derivation.
 
   redo(): boolean {
     if (!this.canRedo()) {
       return false;
     }
 
-    this.currentIndex = this.skipsForward(this.currentIndex);
+    this.currentIndex = this.currentIndex + 1;
     this.isTemporalViewActive = true;
     const entry = this.history[this.currentIndex] as TimeTravelEntry<T> & {
       restorationSubjectIds?: number[];

@@ -5,7 +5,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { entityMap, signalTree, timeTravel } from '@signaltree/core';
+import { entityMap, signalTree, timeTravel, undoable } from '@signaltree/core';
 
 /**
  * 14.0.0, running.
@@ -65,18 +65,13 @@ export class WhatsNew14Component {
     },
     {
       enhancers: [
-        timeTravel({
-          maxHistorySize: 50,
-          // A cursor move is not an undo step. The comparator runs on EVERY
-          // recorded write, so it compares the one field it means — walking the
-          // whole state here would reintroduce the O(state) cost per write that
-          // reference-dedup exists to remove.
-          shouldSkip: (prev, next) =>
-            (prev as { note?: string })?.note ===
-              (next as { note?: string })?.note &&
-            (prev as { rows?: { all?: unknown[] } })?.rows?.all?.length ===
-              (next as { rows?: { all?: unknown[] } })?.rows?.all?.length,
-        }),
+        // A cursor move is not an undo step — but that is no longer a
+        // comparator over recorded transitions. `shouldSkip` was deleted in
+        // 15.0: it recorded the transition and then asked whether the user
+        // should perceive it, which is the decision `undoable()` makes BEFORE a
+        // turn exists. The row operations below are designated; `select()` and
+        // `clearSelection()` are not, which is the whole filter.
+        timeTravel({ maxHistorySize: 50 }),
       ],
     }
   );
@@ -94,23 +89,29 @@ export class WhatsNew14Component {
   readonly canRedo = computed(() => this.tree.canRedo());
 
   prepend(): void {
-    this.tree.$.rows.prependOne({
-      id: nextId(),
-      label: 'prepended',
-      done: false,
+    undoable(() => {
+      this.tree.$.rows.prependOne({
+        id: nextId(),
+        label: 'prepended',
+        done: false,
+      });
     });
   }
 
   /** Front, in the order given — `prependMany([a, b])` reads back as `a, b`. */
   prependBatch(): void {
-    this.tree.$.rows.prependMany([
-      { id: nextId(), label: 'batch A', done: false },
-      { id: nextId(), label: 'batch B', done: false },
-    ]);
+    undoable(() => {
+      this.tree.$.rows.prependMany([
+        { id: nextId(), label: 'batch A', done: false },
+        { id: nextId(), label: 'batch B', done: false },
+      ]);
+    });
   }
 
   append(): void {
-    this.tree.$.rows.addOne({ id: nextId(), label: 'appended', done: false });
+    undoable(() => {
+      this.tree.$.rows.addOne({ id: nextId(), label: 'appended', done: false });
+    });
   }
 
   select(id: string): void {
