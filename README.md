@@ -150,7 +150,8 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
 - **Deep undo over large collections.** Restoring writes values back into per-entity signals rather
   than swapping a reference — ~2.5× behind elf at 10,000 rows. If the undo stack _is_ the product
   (design tools, timeline editors), that ratio is the wrong way round for you. If you just need undo
-  over a big grid, `pauseRecording()` and `restoration({ shouldSkip })` are the levers.
+  over a big grid, `undoable()` is the lever: designate only the operations that should be
+  reversible, and the rest of the grid's churn never enters the undo stack at all.
 - **Collaborative document editing.** Merge semantics belong in a CRDT (Yjs, Automerge) underneath
   whatever store you pick; no state library is the right layer for that.
 - **A couple of values in one component.** Raw Angular signals (`signal` / `computed` /
@@ -370,13 +371,15 @@ store.$.count.update((n) => n + 1); // transform
 
 ## Subpath Imports
 
-Specialized APIs live in subpath imports to keep the main barrel small:
+Everything ships from the single `@signaltree/core` entry point.
 
-```typescript
-import { SecurityValidator, SecurityPresets } from '@signaltree/core/security';
-import { createEditSession, createTreeEditSession } from '@signaltree/core/edit-session';
-import { createStorageAdapter, createIndexedDBAdapter } from '@signaltree/core/storage';
-```
+> ⚠️ **This section used to list three subpath imports** —
+> `@signaltree/core/security`, `@signaltree/core/edit-session` and
+> `@signaltree/core/storage`. **None of them resolve.** `package.json` exports
+> only `.`, the `security` and `storage` subpaths were deleted in 15.0, and
+> `edit-session` was never added to the export map. RELEASE-RESIDUE-0 found this;
+> whether edit-session should be published or deleted is an open surface decision,
+> tracked in the audit rather than answered here.
 
 **Tree edit sessions** (`createTreeEditSession`, v10.1+) provide scoped undo/redo bound to a writable tree path — useful for form wizards and multi-step workflows. The session holds a draft separate from the source; `commit()` writes back, `cancel()` discards.
 
