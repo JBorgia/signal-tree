@@ -23,7 +23,10 @@ import type {
   PositionId as CausalPositionId,
 } from '../../lib/internals/causal-runtime/causal-types';
 import { rollbackPendingTurnAt } from '../../lib/internals/causal-runtime/pending-rollback';
-import { getTransactionLifecycleChannel } from '../../lib/internals/causal-runtime/transaction-lifecycle';
+import {
+  getTransactionLifecycleChannel,
+  installTransactionLifecycleChannel,
+} from '../../lib/internals/causal-runtime/transaction-lifecycle';
 import { createRealizationContextSource } from '../../lib/internals/causal-runtime/realization-context';
 import {
   createTreeRealizationAdapter,
@@ -1602,6 +1605,12 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
   (tree as unknown as Record<PropertyKey, unknown>)[INTERNAL_TRANSACTION_RUNTIME] =
     runtime;
+
+  // TURN-FEED-0.2. The runtime OWNS the lifecycle channel, so it installs one on
+  // the tree's canonical host here rather than letting the first `announce()`
+  // conjure it wherever that call happens to be standing.
+  installTransactionLifecycleChannel(tree as object);
+
   return runtime;
 }
 

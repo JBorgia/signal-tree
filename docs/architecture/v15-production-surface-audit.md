@@ -3716,13 +3716,242 @@ Closure set, all exit 0: `nx test core` (1847 passed / 203 files),
 `check-release-claims`, `lint-readme-apis`, `check-doc-links`,
 `verify-gates --fast` 35/35.
 
-## Queue
+## Queue — CORRECTED
+
+The first draft of this list dropped PER-B, which had not gone anywhere: the same
+paragraph above says `stored().reload()` is PER-B's to classify. Only A1 leaves
+the queue, because A1 is terminally closed.
 
 ```text
-1  DIAG-JOURNAL-1   read-only bounded projection + reclamation falsifiers  <-- next
-2  MATRIX-CLOSE, Candidate B, TruckTrax passes, final perf/retention
-3  FULL release gate suite (not --fast), RC closure
+1  DIAG-JOURNAL-1     read-only bounded projection + reclamation falsifiers  <-- next
+2  PER-B              stored() semantics, including reload()'s classification
+3  MATRIX-CLOSE
+4  Candidate B        only if materially different
+5  TruckTrax pass 2
+6  TruckTrax pass 3
+7  final perf / retention
+8  FULL historical release gate suite (not --fast)
+9  RC / final closure
 ```
+
+### Carried: harness-validity cleanup
+
+`enhancer-safety.spec.ts` builds a MOCK tree with its own `.with()` and exercises
+it. It passes while testing a method the real tree has not had since 15.0, which
+is false confidence about a surface that no longer exists. Not a naming task and
+not a JOURNAL task — carried as its own item.
+
+# DIAG-JOURNAL-1 — PRE-REGISTERED before any implementation
+
+> **CONTRACT UNDER TEST: can SignalTree retain a bounded, read-only description
+> of causal turns sufficient for diagnostics WITHOUT acquiring restoration
+> rights, transaction ownership, subject ownership, or reclamation authority?**
+
+DIAG-JOURNAL-0 closed as B: existing facts sufficed except restoration origin.
+That gap is now filled — the restoration-origin B shipped, and A1 case 6 measures
+`origin: 'restoration'` on an undo's writes. So JOURNAL-1 CONSUMES a complete
+vocabulary and invents none:
+
+```text
+causal runtime / notifier   effect, path, subject, position, origin,
+                            participation, transaction identity
+TURN-FEED                   opened, staged, confirmed, rolled-back
+onFlush                     the actual causal-turn boundary (DIAG-J-0 case 8)
+```
+
+TURN-FEED stays transaction-lifecycle-only. Consuming it is allowed; widening it
+is not.
+
+## The representation is NOT pre-named
+
+`DiagnosticTurn` vs `DiagnosticRecord` stays open until the grouping probe says
+whether one retained object corresponds 1:1 to a causal turn. Naming it first
+would be asserting the answer.
+
+## Falsifiers
+
+```text
+F1  GROUPING          does a flush-bounded entry correspond 1:1 to a causal turn?
+                      two writes in one tick; a transaction; a rollback
+F2  ONTOLOGY          a devtools inspection is journalled as
+                      origin devtools + participation inspection, and NOT
+                      reinterpreted as authored / realized / restoration.
+                      A restoration stays TWO facts: origin restoration +
+                      participation realized. The journal may not recompress the
+                      axes this release just separated.
+F3  NO RESTORATION    with the journal ON: history length, canUndo, canRedo and
+    RIGHTS            the admitted set are identical to journal OFF
+F4  NO OWNERSHIP      restoration claim inventory unchanged; transaction
+                      dependency/claim ownership unchanged
+F5  RECLAMATION       create -> remove -> restoration right gone -> reclaimed,
+                      and the disposition is IDENTICAL with the journal ON.
+                      A subject whose only remaining reason to exist is the
+                      journal must still be reclaimed.
+F6  EVICTION          a bounded journal releases its own ordinary payload
+                      references when an entry falls out of the window
+F7  NO LIVE HANDLES   nothing retained is callable, a signal, a node, a claim
+                      handle, a capture bucket, a turn store, or a closure
+                      capable of reversal
+```
+
+## Pre-registered outcomes
+
+```text
+A  the contract holds as stated                     -> build it, propose surface
+B  holds only with a narrower retention rule        -> record the rule, then build
+C  observation cannot be separated from ownership   -> STOP. A journal that
+                                                       pins subjects is a second
+                                                       retention authority and
+                                                       does not ship
+D  1:1 turn correspondence fails                    -> the unit is not a turn;
+                                                       name it for what it is
+U  evidence does not discriminate
+```
+
+A category C halts JOURNAL-1 the way it halted HIST-C2.
+
+## Out of scope, restated
+
+Interactive time travel. The journal never acquires `restore()`, `apply()`,
+`undo()` or an equivalent. A later "jump to this point" routes through the single
+restoration authority or is refused where no legal restoration exists.
+
+# TURN-FEED-0.2 — a correctness repair to the frozen seam
+
+Found while probing DIAG-JOURNAL-1's grouping, and it blocked JOURNAL-1 because
+the journal must CONSUME this channel.
+
+```text
+enhancers: [transactions()]                 subscriber received NOTHING
+enhancers: [restoration(), transactions()]  subscriber received all four events
+```
+
+**TURN-FEED's observable lifecycle depended on enhancer composition**, which
+contradicts the ownership independence TURN-FEED itself claims.
+
+## Mechanism
+
+```text
+enhancer input === enhancer output        transactions() mutates in place
+enhancer host  !== the public tree        applyEnhancers runs, THEN createBuilder
+                                          produces what signalTree() returns
+```
+
+The channel was a symbol on whatever object was asked, and
+`getTransactionLifecycleChannel()` did two jobs at once — *create if missing* for
+the owner, *find* for an observer. So an observer asking the public tree did not
+fail: it silently got a brand-new channel that could never fire. **Fail-open by
+construction.**
+
+## The repair
+
+```text
+installTransactionLifecycleChannel(tree)     OWNER side. Idempotent.
+tryGetTransactionLifecycleChannel(tree)      observer. undefined = absence.
+getTransactionLifecycleChannel(tree)         observer. ST1036 = corruption.
+```
+
+> If a tree has a transaction authority, failure to resolve its lifecycle channel
+> is CORRUPTION, not absence.
+
+Absence stays legitimate — a diagnostic observer must work on a tree with no
+transaction capability — and is keyed on `__transactions`, the handle the
+enhancer publishes, rather than on a heuristic like "has a `transaction` method".
+
+**Canonical host derived, not assumed.** Measured across the enhancer input, the
+`applyEnhancers` output and the public tree: `tree.$` is the one object identical
+at all three points. `hostIsPublic` was false in BOTH compositions, so the tree
+object itself could never have worked.
+
+**Both authorities install.** `restoration()` owns transactions of its own
+(`transactionOwnerToken`), so it is an owner-side installer rather than an
+observer — which is what makes case 4 (enhancer order) pass without an observer
+ever creating a channel.
+
+## Acceptance — 11 cases in `turn-feed-0-2-reachability.spec.ts`
+
+Cases 1-6 and 9-10 are reachability, order-independence, tree isolation, channel
+identity and unsubscribe. Two are worth calling out:
+
+**Case 8 is the self-test.** It deletes the installed channel from the canonical
+host while leaving the authority in place — reproducing exactly the state the old
+code produced silently on every single-enhancer tree — and proves the lookup
+throws `ST1036` rather than minting an inert channel.
+
+**Case 7b was a wrong expectation, corrected by measurement.** `restoration()`
+alone DOES expose a channel, because restoration is a transaction owner. Absence
+is keyed on having no OWNER, not on the `transactions()` enhancer specifically.
+
+## Why TURN-FEED-0 missed it
+
+Every case that SUBSCRIBES composes `restoration() + transactions()`. The one
+single-enhancer case asserts only that behaviour is unchanged and never
+subscribes — its comment, *"announcing to nobody is not an error"*, was true of
+what it tested and quietly normalised the missing condition.
+
+```text
+what it proved     installing the protocol does not disturb transactions()
+what we read       transactions() exposes the protocol
+```
+
+Green for a reason other than the intended one, exactly the class now being
+hunted.
+
+## This does NOT reopen TURN-FEED
+
+```text
+unchanged   event vocabulary (opened / staged / confirmed / rolled-back),
+            lifecycle-only scope, transaction semantics, restoration admission
+repaired    ownership, identity, reachability, failure behaviour
+```
+
+Recorded as a correctness repair to the frozen seam, not a new disposition.
+
+# DIAG-JOURNAL-1 · F1 + F2 — measured after the repair, probe unchanged
+
+```text
+two writes, one tick        1 group, paths [a, b]      turn boundary agrees
+two writes, separate ticks  2 groups
+confirmed transaction       1 group + opened/staged/confirmed, tx id 1
+rolled-back transaction     2 GROUPS + opened/staged/rolled-back
+```
+
+## The rollback result shapes the representation
+
+A rollback is **two causal turns** — the speculative writes, then the
+compensation — against **one** transaction lifecycle ending `rolled-back`.
+
+So "one retained object = one transaction" is already false. But outcome D is
+NOT in play: the flush-bounded unit is a causal turn in every case measured. What
+the journal needs is **causal turns with transaction correlation**:
+
+```text
+causal turn #41   speculative effects        tx 7
+transaction 7     rolled-back
+causal turn #42   compensation effects
+```
+
+## F2 — the ontology survives observation
+
+```text
+{ origin: 'devtools',    participation: 'inspection' }
+{ origin: 'restoration', participation: 'realized'   }
+{ origin: 'external',    participation: 'realized'   }
+```
+
+Three occurrences, three distinct pairs, none collapsed. Inspection is not
+reinterpreted as authored or realized, and a restoration stays TWO facts rather
+than being flattened into "realized". The journal consumes the ontology; it does
+not recompress it.
+
+One ordering note recorded rather than worked around: the probe undoes BEFORE the
+external ingress, because A1 case 6 already establishes that external truth at
+that location refuses the undo (ST1034). This case is about observation, not a
+re-measurement of P0-C.
+
+Still owed by JOURNAL-1: F3-F7 (no restoration rights, no ownership, the
+reclamation comparison, eviction, no live handles) — which need an actual bounded
+journal to measure.
 
 # RESTORE-P0 — the reversal-validity cluster
 
