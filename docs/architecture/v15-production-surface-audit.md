@@ -8957,6 +8957,153 @@ BRANDED location type threaded through every public return type in the library �
 a real option, a far larger decision than LINK, recorded and not taken. The
 consequence: `link()`'s X parameter cannot be trusted to reject at compile time.
 
+# LINK-RACE-1 — the fix is a RECONCILIATION LOOP, not a recheck
+
+`egress-0-userland-link.spec.ts`, 16/16 with three reconciliation modes.
+
+```text
+ONE crossing,   no reconciliation   X='C' Y='B'   permanent divergence
+ONE crossing,   single recheck      X='C' Y='C'   converges
+TWO crossings,  single recheck      X='D' Y='C'   ⚠️ DIVERGES AGAIN
+TWO crossings,  reconciliation loop X='D' Y='D'   converges
+THREE crossings, loop               X='E' Y='E'   still converges
+CONTROL: no crossing, loop          sends exactly once
+```
+
+The corrective write is itself an outbound write, so it can be crossed too. A
+post-success recheck that runs ONCE stops exactly one step short, every time.
+
+```text
+after every acknowledged outbound write, keep reconciling until current X
+equals the endpoint's acknowledged state
+```
+
+No debounce, no retry, no conflict resolver. The loop terminates on EQUALITY
+rather than a counter, which is why depth is not a parameter — and the control
+arm rules out a loop that simply sends until it happens to match.
+
+The acknowledgement contract this rests on, stated precisely:
+
+> after `set(v)` resolves successfully, the link may treat `v` as Y's
+> acknowledged state UNTIL A LATER INBOUND VALUE SUPERSEDES IT
+
+For a `set + subscribe` endpoint that makes ordering between acknowledgement and
+subscription delivery part of Y's contract. An endpoint that cannot provide a
+coherent ordering between its two channels is not a generic bidirectional STATE
+endpoint without its own version/conflict protocol — which is not SignalTree's
+problem to solve.
+
+# EGRESS-1 — the NULL is FALSIFIED. There are THREE gates, not two
+
+`packages/core/src/lib/egress-1-observation-vs-consequence.spec.ts`, 8/8.
+
+EGRESS-0 showed `link()` is a composition over `external()` and a
+settlement-aware gate, then inferred that gate is THE egress primitive for
+everything crossing the boundary. That inference does not survive.
+
+```text
+                       state OBSERVER      one-shot CONSEQUENCE
+authored write         fires   ✓ wanted    runs    ✓ wanted
+external acquisition   fires   ✗ fatal     silent  ✓
+rollback compensation  fires   ✗ fatal     silent  ✓
+A -> B -> A -> B       4 fires ✗ fatal     1 run   ✓
+undo                   SILENT  ✗ DEFECT    silent  ✓   (OWNER-REPLAY-0)
+```
+
+The difference is not a filter that could be added to the observer. It is WHO
+ASKS:
+
+```text
+OBSERVER     a standing subscription — "tell me whenever X settles".
+             Cause-blind by construction, which is exactly right for state.
+CONSEQUENCE  scheduled BY an operation, in that operation's own stack —
+             "if MY authored work survives, do this once".
+```
+
+A cause filter would not close it: the rollback compensation and the undo are
+both genuinely settled writes, and a standing subscription cannot know that a
+charge belonged to one particular earlier operation rather than to the location.
+
+```text
+external(...)      inbound authority                Y -> X
+afterCommit(...)   one-shot consequence authority   an operation -> out
+onCommitted(...)   committed-state observation      X -> out, standing
+link(...)          state synchronisation — composition over external +
+                   onCommitted, and NOT over afterCommit
+```
+
+`afterCommit` is the shape `stored()` and `persistence()` already use privately.
+The OBSERVER is the newer idea, and it is the one `link()` needs.
+
+## ⚠️ OWNER-REPLAY-0 — a gap in the ownership correction, found here
+
+I expected the undo to fire the observer twice and measured ONCE. The observer
+saw the authored value and never saw the reversal, while the tree really did
+return.
+
+```text
+the undo DOES reach the notifier   origin=restoration
+                                   ownerId=UNDEFINED
+```
+
+The ownership correction taught `emitOwnedMutation` to carry the namespace, but
+the enhancers replay through `notifier.notify(...)` positionally, and those call
+sites were never taught it. **24 sites** across restoration, transactions,
+devtools and entity-signal.
+
+Consequences:
+
+```text
+isolation      UNAFFECTED — the guards accept an absent namespace by design
+observers      BLIND to restoration, and to every other replayed write
+link()         would leave Y holding the pre-undo value forever
+```
+
+That is a harder failure than the double-charge EGRESS-1 was written to expose,
+and it must be fixed before an observer can be trusted for state sync. Fixing it
+moves the `undo` row to `fires ✗ fatal`, STRENGTHENING the falsification.
+
+# ERROR-SURFACE-0 — the reporter is not central, and its vocabulary is dead
+
+`packages/core/src/lib/error-surface-0-disposition.spec.ts`, 4/4.
+
+The finding is NOT "it isn't exported".
+
+```text
+reportTreeError call sites in the WHOLE library:  2
+                                   async-source.ts, stored.ts
+                                   — BOTH APIs this audit is retiring
+
+TreeErrorSource members with a reporter:    stored, async-source
+TreeErrorSource members with NONE:          async-query, entity-loader,
+                                            persistence, effect
+```
+
+A capability built to be "one place to observe every error the library catches"
+was wired to two markers and then left in `internals/`. Its listener contract is
+sound — additive, and a throwing listener does not damage the reporting
+operation — so this is under-wiring, not a broken mechanism.
+
+```text
+INTENDED PUBLIC?   its rationale only makes sense if yes — a Sentry integration
+                   is an application concern
+DEMANDED?          not yet. Under the standing rule, "might be useful" is
+                   UNPROVEN, not PUBLIC
+TAXONOMY RIGHT?    NO. Four members name nothing; two name retiring APIs
+```
+
+⚠️ **ORDER MATTERS.** Export first and clean later, and the retired vocabulary
+becomes a compatibility obligation. The taxonomy is disposed BEFORE the function
+is exported, or neither happens.
+
+## Process note
+
+The scan needed two corrections before it was trustworthy: `import.meta.url`
+arrives vite-prefixed (`/@fs/...`) and `cwd()` is the workspace root, not
+vitest's `--root`. Either mistake would have scanned nothing and "confirmed" the
+finding for entirely the wrong reason, so the file now asserts it can see
+`signal-tree.ts` before counting anything.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus

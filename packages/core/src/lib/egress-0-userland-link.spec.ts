@@ -129,7 +129,7 @@ interface Endpoint<T> {
 const userlandLink = <T>(
   x: unknown,
   endpoint: Endpoint<T>,
-  opts: { recheckOnSuccess?: boolean } = {}
+  opts: { reconcile?: 'none' | 'recheck' | 'loop' } = {}
 ) => {
   if (!endpoint.get && !endpoint.set && !endpoint.subscribe) {
     throw new Error('link: endpoint must supply at least one of get/set/subscribe.');
@@ -162,13 +162,30 @@ const userlandLink = <T>(
         if (knownY !== undefined && deepEqual(current, knownY.value)) return;
         chain = chain
           .then(async () => {
-            await endpoint.set?.(current);
+            const mode = opts.reconcile ?? 'none';
             // ⚠️ ON SUCCESS ONLY. Advancing `knownY` at schedule time would
             // claim Y holds a value a rejected write never established.
+            await endpoint.set?.(current);
             knownY = { value: current };
-            if (opts.recheckOnSuccess) {
+
+            if (mode === 'recheck') {
+              // ONE corrective pass — LINK-RACE-0's fix.
               const now = (x as () => unknown)() as T;
-              if (!deepEqual(now, current)) {
+              if (!deepEqual(now, knownY.value)) {
+                await endpoint.set?.(now);
+                knownY = { value: now };
+              }
+              return;
+            }
+
+            if (mode === 'loop') {
+              // RECONCILIATION: keep going while the two known states differ.
+              // No debounce, no retry, no conflict resolver — just do not stop
+              // while X and Y's acknowledged state disagree.
+              for (;;) {
+                if (disposed) return;
+                const now = (x as () => unknown)() as T;
+                if (deepEqual(now, knownY?.value)) return;
                 await endpoint.set?.(now);
                 knownY = { value: now };
               }
@@ -446,72 +463,122 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
  * X = C, Y = B, and both direction rules were individually obeyed.
  * ```
  */
-describe('LINK-RACE-0: outbound B crossing a newer inbound C', () => {
-  const race = async (recheckOnSuccess: boolean) => {
+describe('LINK-RACE-0/1: cross-direction concurrency', () => {
+  /**
+   * A harness that can block an arbitrary number of outbound writes in turn, so
+   * the directions can be made to cross REPEATEDLY rather than once.
+   */
+  const crossing = async (
+    reconcile: 'none' | 'recheck' | 'loop',
+    inbound: string[]
+  ) => {
     const tree = leafTree();
     await flush();
     const yState: string[] = [];
+    const gates = new Map<string, () => void>();
     let emit: ((v: string) => void) | undefined;
-    let releaseB: (() => void) | undefined;
 
     const l = userlandLink<string>(
       tree.$.theme,
       {
-        set: (v) => {
-          if (v === 'B') {
-            return new Promise<void>((resolve) => {
-              releaseB = () => {
-                yState.push('B');
-                resolve();
-              };
+        set: (v) =>
+          new Promise<void>((resolve) => {
+            // ONE-SHOT. The drain below opens every outstanding gate several
+            // times, and a re-openable gate would push `v` once per call —
+            // which is exactly how the control first failed, reporting six
+            // sends where the link made one.
+            let fired = false;
+            gates.set(v, () => {
+              if (fired) return;
+              fired = true;
+              gates.delete(v);
+              yState.push(v);
+              resolve();
             });
-          }
-          yState.push(v);
-          return Promise.resolve();
-        },
+          }),
         subscribe: (next) => {
           emit = next;
           return () => void (emit = undefined);
         },
       },
-      { recheckOnSuccess }
+      { reconcile }
     );
 
-    tree.$.theme.set('B'); // authored
-    await flush(); // set(B) begins and blocks
-    emit?.('C'); // Y pushes newer truth
+    // The authored write that starts the chain.
+    tree.$.theme.set('B');
     await flush();
-    expect(tree.$.theme()).toBe('C');
 
-    releaseB?.(); // the older write finally lands at Y
-    await l.settled();
-    await flush();
+    // Each inbound value arrives while the PREVIOUS outbound write is still in
+    // flight, then that write is released.
+    const pendingOrder = ['B', ...inbound.slice(0, -1)];
+    for (let i = 0; i < inbound.length; i++) {
+      emit?.(inbound[i]);
+      await flush();
+      gates.get(pendingOrder[i])?.();
+      await flush();
+      await flush();
+    }
+    // Drain anything the reconciler dispatched afterwards.
+    for (let i = 0; i < 6; i++) {
+      for (const open of [...gates.values()]) open();
+      await flush();
+    }
     await l.settled();
     l.dispose();
 
     return { x: tree.$.theme(), y: yState[yState.length - 1], yState };
   };
 
-  it('⚠️ WITHOUT a post-success recheck, X and Y diverge permanently', async () => {
-    const r = await race(false);
+  it('⚠️ LINK-RACE-0 — ONE crossing, NO reconciliation: permanent divergence', async () => {
+    const r = await crossing('none', ['C']);
 
-    // Both direction rules were obeyed and the result is still wrong. Nothing
-    // is coming to correct it: the consequence for C already ran and was
+    // Both direction rules were individually obeyed and the result is still
+    // wrong. Nothing corrects it: the consequence for C already ran and was
     // suppressed, because at that moment `knownY` still said C.
     expect(r.x).toBe('C');
     expect(r.y).toBe('B');
   });
 
-  it('WITH a post-success recheck, the link converges', async () => {
-    const r = await race(true);
+  it('ONE crossing, single recheck: converges', async () => {
+    const r = await crossing('recheck', ['C']);
 
-    // The rule is small and local: when a write succeeds, compare X as it is
-    // NOW against what Y now holds, and dispatch again if they differ. No
-    // conflict resolution, no versioning — it only re-asserts X, which is the
-    // side the link already treats as authoritative.
     expect(r.x).toBe('C');
     expect(r.y).toBe('C');
-    expect(r.yState).toEqual(['B', 'C']);
+  });
+
+  it('⚠️ LINK-RACE-1 — TWO crossings, single recheck: DIVERGES AGAIN', async () => {
+    const r = await crossing('recheck', ['C', 'D']);
+
+    // The corrective write is itself an outbound write, so it can be crossed
+    // too. A post-success recheck that runs ONCE stops exactly one step short,
+    // every time. This is why the fix is not "recheck" but "reconcile".
+    expect(r.x).toBe('D');
+    expect(r.y).toBe('C');
+  });
+
+  it('TWO crossings, reconciliation loop: converges', async () => {
+    const r = await crossing('loop', ['C', 'D']);
+
+    expect(r.x).toBe('D');
+    expect(r.y).toBe('D');
+  });
+
+  it('THREE crossings, reconciliation loop: still converges', async () => {
+    const r = await crossing('loop', ['C', 'D', 'E']);
+
+    // The loop terminates on EQUALITY, not on a counter, so depth is not a
+    // parameter. Without a terminating condition this would spin forever;
+    // `deepEqual(now, knownY)` is what stops it.
+    expect(r.x).toBe('E');
+    expect(r.y).toBe('E');
+  });
+
+  it('CONTROL — with no crossing at all the loop sends exactly once', async () => {
+    const r = await crossing('loop', []);
+
+    // Without this arm, "the loop converges" is satisfied by a loop that sends
+    // repeatedly until it happens to match.
+    expect(r.yState).toEqual(['B']);
   });
 });
 
