@@ -3,12 +3,12 @@ import { undoable } from '../../lib/undoable';
 
 import { signalTree } from '../../lib/signal-tree';
 import { getPathNotifier, resetPathNotifier } from '../../lib/path-notifier';
-import type { UpdateMetadata } from '../../lib/types';
+import type { WriteMetadata } from '../../lib/types';
 import { timeTravel } from './time-travel';
 
 /**
  * PR1: time-travel replay writes are tagged with the ambient write-context
- * `{ intent: 'system', source: 'time-travel' }`. Enhancers (validation,
+ * `{ intent: 'system', origin: 'restoration' }`. Enhancers (validation,
  * guardrails) consume this via `getActiveWriteContext()` to suppress side
  * effects for replays.
  */
@@ -24,7 +24,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     undoable(() => (store as any).$.count.set(2));
     await Promise.resolve();
 
-    const captured: Array<{ path: string; meta?: UpdateMetadata }> = [];
+    const captured: Array<{ path: string; meta?: WriteMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       'count',
       (
@@ -37,7 +37,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
         _positionIds,
         meta
       ) => {
-        if (source !== 'time-travel') {
+        if (source !== 'restoration') {
           return;
         }
         captured.push({ path, meta });
@@ -45,7 +45,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     );
 
     // Undo: synchronously triggers restoreState, which wraps writes in
-    // withWriteContext({ intent: 'system', source: 'time-travel' }).
+    // withWriteContext({ intent: 'system', origin: 'restoration' }).
     const t = (store as any).__timeTravel;
     expect(t.canUndo()).toBe(true);
     t.undo();
@@ -59,7 +59,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     expect(captured.length).toBeGreaterThanOrEqual(1);
     for (const c of captured) {
       expect(c.meta).toBeDefined();
-      expect(c.meta?.source).toBe('time-travel');
+      expect(c.meta?.origin).toBe('restoration');
       expect(c.meta?.intent).toBe('system');
     }
   });
@@ -79,7 +79,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     undoable(() => (store as any).$.count.set(2));
     await Promise.resolve();
 
-    const captured: Array<{ path: string; meta?: UpdateMetadata }> = [];
+    const captured: Array<{ path: string; meta?: WriteMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       '**',
       (
@@ -92,7 +92,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
         _positionIds,
         meta
       ) => {
-        if (source !== 'time-travel') {
+        if (source !== 'restoration') {
           return;
         }
         captured.push({ path, meta });
@@ -107,7 +107,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
 
     expect(captured.length).toBeGreaterThanOrEqual(1);
     for (const c of captured) {
-      expect(c.meta?.source).toBe('time-travel');
+      expect(c.meta?.origin).toBe('restoration');
       expect(c.meta?.intent).toBe('system');
     }
   });
@@ -117,7 +117,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
 
     const store = signalTree({ count: 0 }, { enhancers: [timeTravel()] });
 
-    const captured: Array<{ path: string; meta?: UpdateMetadata }> = [];
+    const captured: Array<{ path: string; meta?: WriteMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       'count',
       (
@@ -141,7 +141,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
 
     expect(captured.length).toBeGreaterThanOrEqual(1);
     expect(captured[0].path).toBe('count');
-    expect(captured[0].meta?.source).toBeUndefined();
+    expect(captured[0].meta?.origin).toBeUndefined();
     expect(captured[0].meta?.intent).toBeUndefined();
     expect(captured[0].meta?.mutationIntent).toBe('replace');
   });

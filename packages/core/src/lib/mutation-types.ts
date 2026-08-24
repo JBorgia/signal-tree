@@ -58,7 +58,7 @@ export type MutationKind =
  *                  protected against being overwritten by a restoration.
  *                  DEVTOOLS-JUMP-0 / 0.1.
  */
-export type CausalWriteMode = 'authoring' | 'realization' | 'inspection';
+export type WriteParticipation = 'authored' | 'realized' | 'inspection';
 
 /**
  * Metadata describing the intent and source of a tree update.
@@ -66,14 +66,14 @@ export type CausalWriteMode = 'authoring' | 'realization' | 'inspection';
  * Set ambient context for enhancers using `withWriteContext({...}, () => tree.$.x.set(y))`
  * from `@signaltree/core`. Enhancers read the active context via `getActiveWriteContext()`.
  */
-export interface UpdateMetadata {
+export interface WriteMetadata {
   /** Intent of the update (closed union — adding new intents is a core change). */
   intent?: 'hydrate' | 'reset' | 'bulk' | 'migration' | 'user' | 'system';
   /**
    * Origin of the update — where this application came from (closed union).
    *
    * PROVENANCE only. How a write may participate in causal mechanisms is the
-   * separate `causalMode` axis; the two are deliberately independent, so never
+   * separate `participation` axis; the two are deliberately independent, so never
    * infer one from the other.
    *
    * An ABSENT origin means ordinary application work. There is no positive
@@ -81,13 +81,20 @@ export interface UpdateMetadata {
    * from "authored by the application", and stamping every write to say so
    * would cost the common path for no consumer's benefit.
    */
-  source?:
-    | 'serialization'
-    | 'time-travel'
+  origin?:
+    | 'restoration'
     | 'devtools'
+    | 'external'
+    // ⚠️ THREE ORPHANS. After A1 and the batch-1 sweep, no production caller
+    // assigns these and no consumer reads them: `'system'` was only ever the
+    // realization adapter's fabricated fallback (seven sites, now deleted),
+    // `'user'` is redundant with absence, and nothing tags a deserialize.
+    // Retained here for one release rather than deleted inside a rename batch —
+    // withdrawing a public union member is a surface disposition and belongs to
+    // the RC public-disposition process, not to a vocabulary sweep.
+    | 'serialization'
     | 'user'
-    | 'system'
-    | 'external';
+    | 'system';
   /** Suppress guardrails for this update. */
   suppressGuardrails?: boolean;
   /** Optional correlation ID for related updates. */
@@ -105,7 +112,7 @@ export interface UpdateMetadata {
   /** @internal Declared leaf-write semantics for scalar rollback classification. */
   mutationIntent?: 'replace' | 'derive';
   /** @internal Explicitly distinguishes causal authorship from causal realization. */
-  causalMode?: CausalWriteMode;
+  participation?: WriteParticipation;
   /** @internal Canonical structural collection effect produced at mutation time. */
   historyEffect?: StructuralHistoryEffect;
   /** Open extension for guardrails' historical custom-key shape. */
@@ -113,12 +120,12 @@ export interface UpdateMetadata {
 }
 
 export interface WriteAttribution {
-  intent?: UpdateMetadata['intent'];
-  source?: UpdateMetadata['source'];
+  intent?: WriteMetadata['intent'];
+  origin?: WriteMetadata['origin'];
   transactionId?: number;
   transactionOwner?: object;
-  mutationIntent?: UpdateMetadata['mutationIntent'];
-  causalMode?: UpdateMetadata['causalMode'];
+  mutationIntent?: WriteMetadata['mutationIntent'];
+  participation?: WriteMetadata['participation'];
 }
 
 export interface MutationEnvelope<T = unknown> {

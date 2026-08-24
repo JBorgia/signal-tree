@@ -240,7 +240,7 @@ import type {
   EntityNode,
   AddOptions,
   AddManyOptions,
-  UpdateMetadata,
+  WriteMetadata,
   PositionId,
   StructuralHistoryEffect,
 } from '../lib/types';
@@ -430,7 +430,7 @@ export function createEntitySignal<
 
   function createStructuralHistoryMeta(
     effect: PendingHistoryEffect
-  ): UpdateMetadata {
+  ): WriteMetadata {
     const meta = getActiveWriteContext();
     return {
       ...(meta ?? {}),
@@ -519,7 +519,7 @@ export function createEntitySignal<
 
   function planRekey(from: K, to: K): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   } {
     const entity = getProjectedEntity(from);
     if (!entity) {
@@ -570,7 +570,7 @@ export function createEntitySignal<
         syncEntitySignal(to);
         updateSignals();
       },
-      publish(metaOverride?: UpdateMetadata): void {
+      publish(metaOverride?: WriteMetadata): void {
         const meta = metaOverride ?? getActiveWriteContext();
         pathNotifier.notify(
           `${basePath}.${String(to)}`,
@@ -595,7 +595,7 @@ export function createEntitySignal<
     entity: E
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   } {
     if (from === to) {
       return {
@@ -638,7 +638,7 @@ export function createEntitySignal<
         syncEntitySignal(to);
         updateSignals();
       },
-      publish(metaOverride?: UpdateMetadata): void {
+      publish(metaOverride?: WriteMetadata): void {
         const meta = metaOverride ?? getActiveWriteContext();
         pathNotifier.notify(
           `${basePath}.${String(to)}`,
@@ -796,7 +796,7 @@ export function createEntitySignal<
     vacatingKeys?: ReadonlySet<string | number>
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   } {
     // The occupancy check answers "is this key free?" — but the honest question
     // is "will this key be free when I commit?". Undoing a turn that removed
@@ -837,7 +837,7 @@ export function createEntitySignal<
         syncEntitySignal(key);
         updateSignals();
       },
-      publish(metaOverride?: UpdateMetadata): void {
+      publish(metaOverride?: WriteMetadata): void {
         pathNotifier.notify(
           `${basePath}.${String(key)}`,
           entity,
@@ -857,7 +857,7 @@ export function createEntitySignal<
     subjectId: number
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   } {
     const existingState = resolveSubjectState(subjectId);
     if (existingState) {
@@ -881,7 +881,7 @@ export function createEntitySignal<
         syncEntitySignal(key);
         updateSignals();
       },
-      publish(metaOverride?: UpdateMetadata): void {
+      publish(metaOverride?: WriteMetadata): void {
         pathNotifier.notify(
           `${basePath}.${String(key)}`,
           entity,
@@ -900,7 +900,7 @@ export function createEntitySignal<
     subjectId: number
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   } {
     const entity = getProjectedEntity(key);
     if (!entity) {
@@ -936,7 +936,7 @@ export function createEntitySignal<
         tombstoneSubjectSignal(subjectId);
         updateSignals();
       },
-      publish(metaOverride?: UpdateMetadata): void {
+      publish(metaOverride?: WriteMetadata): void {
         pathNotifier.notify(
           `${basePath}.${String(key)}`,
           undefined,

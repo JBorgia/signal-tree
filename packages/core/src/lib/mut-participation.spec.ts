@@ -2,7 +2,7 @@ import { computed } from '@angular/core';
 import { undoable } from '../lib/undoable';
 
 import { entityMap, signalTree, timeTravel } from '../index';
-import { getCausalWriteMode } from './causal-write-mode';
+import { getWriteParticipation } from './write-participation';
 import { withWriteContext } from './write-context';
 import {
   getPathNotifier,
@@ -334,8 +334,9 @@ describe('MUT-1 — the interceptLeafSignals docblock, tested verbatim', () => {
 
 describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED distinction?', () => {
   /**
-   * `CausalWriteMode = 'authoring' | 'realization'` exists, and
-   * `WriteAttribution.causalMode` carries it. R3 showed the notifier's PATH
+   * `WriteParticipation` (then two values, `'inspection'` added later by
+   * DEVTOOLS-JUMP-0) exists, and
+   * `WriteAttribution.participation` carries it. R3 showed the notifier's PATH
    * cannot separate an authored write from an undo. The sharper question is
    * whether the notification's META does.
    */
@@ -348,14 +349,14 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
         _prev: unknown,
         path: string,
         _ownerPath?: string,
-        source?: unknown,
+        origin?: unknown,
         _subjectIds?: unknown,
         _positionIds?: unknown,
         meta?: unknown
       ) => {
         seen.push({
           path,
-          source: source ?? null,
+          origin: origin ?? null,
           meta: (meta as Record<string, unknown>) ?? null,
         });
       }
@@ -376,9 +377,9 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
     await tick();
     off();
 
-    // NO causalMode. Authorship is not positively marked.
+    // NO participation. Authorship is not positively marked.
     expect(seen).toEqual([
-      { path: 'a.n', source: null, meta: { mutationIntent: 'replace' } },
+      { path: 'a.n', origin: null, meta: { mutationIntent: 'replace' } },
     ]);
   });
 
@@ -398,7 +399,7 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
     expect(seen).toEqual([
       {
         path: 'a.n',
-        source: null,
+        origin: null,
         meta: { mutationIntent: 'replace', restorationDesignated: true },
       },
     ]);
@@ -421,11 +422,11 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
     expect(seen).toEqual([
       {
         path: 'a.n',
-        source: 'time-travel',
+        origin: 'restoration',
         meta: {
           intent: 'system',
-          source: 'time-travel',
-          causalMode: 'realization',
+          origin: 'restoration',
+          participation: 'realized',
           positionIds: [3],
         },
       },
@@ -443,7 +444,7 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
         _p: unknown,
         path: string,
         _op?: string,
-        source?: unknown,
+        origin?: unknown,
         _s?: unknown,
         _pi?: unknown,
         meta?: unknown
@@ -451,8 +452,8 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
         const m = (meta ?? {}) as Record<string, unknown>;
         seen.push({
           path,
-          source: source ?? null,
-          causalMode: m['causalMode'] ?? null,
+          origin: origin ?? null,
+          participation: m['participation'] ?? null,
         });
       }
     );
@@ -475,11 +476,11 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
 
     // MUT-2's finding SURVIVES: a redo is still marked realization, because from
     // the perspective of authorship and history admission it is realization-like.
-    // What is new is the more specific provenance — `source: 'time-travel'` —
+    // What is new is the more specific provenance — `origin: 'restoration'` —
     // added so a diagnostic observer can distinguish a restoration from a server
     // refresh. The classification did not change; the origin was added.
     expect(seen).toEqual([
-      { path: 'a.n', source: 'time-travel', causalMode: 'realization' },
+      { path: 'a.n', origin: 'restoration', participation: 'realized' },
     ]);
   });
 
@@ -493,15 +494,15 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
     await tick();
     off();
 
-    // An ordinary authored write carries NO causalMode at all. A consumer can
+    // An ordinary authored write carries NO participation at all. A consumer can
     // only conclude "authored" from the ABSENCE of the realization mark.
     expect(seen).toHaveLength(1);
-    expect(seen[0]['causalMode']).toBeNull();
-    expect(seen[0]['source']).toBeNull();
+    expect(seen[0]['participation']).toBeNull();
+    expect(seen[0]['origin']).toBeNull();
   });
 });
 
-describe('MUT-2A — what does ABSENCE of causalMode mean?', () => {
+describe('MUT-2A — what does ABSENCE of participation mean?', () => {
   /**
    * Before expanding the matrix to rollback/hydrate/transactions, establish
    * what an unmarked write MEANS. Otherwise an `undefined` result from hydrate
@@ -513,33 +514,33 @@ describe('MUT-2A — what does ABSENCE of causalMode mean?', () => {
    *   undefined = irrelevant unless explicitly realization
    */
   it('THE DEFAULTING RULE: absence is actively converted to authoring', () => {
-    // causal-write-mode.ts is four lines long:
-    //   (meta) => meta?.causalMode ?? 'authoring'
-    expect(getCausalWriteMode(undefined)).toBe('authoring');
-    expect(getCausalWriteMode({})).toBe('authoring');
-    expect(getCausalWriteMode({ causalMode: 'authoring' })).toBe('authoring');
-    expect(getCausalWriteMode({ causalMode: 'realization' })).toBe(
-      'realization'
+    // write-participation.ts is four lines long:
+    //   (meta) => meta?.participation ?? 'authored'
+    expect(getWriteParticipation(undefined)).toBe('authored');
+    expect(getWriteParticipation({})).toBe('authored');
+    expect(getWriteParticipation({ participation: 'authored' })).toBe('authored');
+    expect(getWriteParticipation({ participation: 'realized' })).toBe(
+      'realized'
     );
   });
 
   it('COLLAPSE: unmarked and explicitly-authoring are INDISTINGUISHABLE', () => {
-    // Every surviving reader goes through getCausalWriteMode, so no consumer
+    // Every surviving reader goes through getWriteParticipation, so no consumer
     // can tell "nobody established a mode" from "someone established authoring".
-    expect(getCausalWriteMode(undefined)).toBe(
-      getCausalWriteMode({ causalMode: 'authoring' })
+    expect(getWriteParticipation(undefined)).toBe(
+      getWriteParticipation({ participation: 'authored' })
     );
   });
 
   it('the notifier batch-identity key inherits the collapse', () => {
     const notifier = new PathNotifier({ batching: false });
-    // Identity is derived from getCausalWriteMode, so an unmarked entry and an
+    // Identity is derived from getWriteParticipation, so an unmarked entry and an
     // explicitly-authoring entry produce the same discriminator.
     expect(
       (notifier as unknown as { constructor: unknown }).constructor
     ).toBeDefined();
-    expect(getCausalWriteMode({ causalMode: 'authoring' })).toBe(
-      getCausalWriteMode(undefined)
+    expect(getWriteParticipation({ participation: 'authored' })).toBe(
+      getWriteParticipation(undefined)
     );
   });
 });
@@ -548,10 +549,10 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
   /**
    * The one-variable falsifier. Take a physically identical write, otherwise
    * eligible for capture, and change ONLY whether it carries
-   * `causalMode: 'realization'`.
+   * `participation: 'realized'`.
    *
-   *   A   causalMode: 'realization'   -> expected: not captured
-   *   B   causalMode absent           -> ?
+   *   A   participation: 'realized'   -> expected: not captured
+   *   B   participation absent           -> ?
    *
    * If B is captured, omission manufactures authorship deterministically, and
    * the requirement stops being a plausibility argument.
@@ -576,8 +577,8 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
 
   it('A — explicitly classified realization', async () => {
     const r = await run({
-      causalMode: 'realization',
-      source: 'system',
+      participation: 'realized',
+      origin: 'system',
       intent: 'system',
     });
     // Classified realization: NOT captured.
@@ -585,7 +586,7 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
   });
 
   it('B — SAME meta, realization classification OMITTED', async () => {
-    const r = await run({ source: 'system', intent: 'system' });
+    const r = await run({ origin: 'system', intent: 'system' });
     // Identical to A except for the one field. CAPTURED — a history entry that
     // A did not produce. Omission manufactured authorship.
     expect(r).toEqual({ delta: 1, value: 1 });
@@ -617,11 +618,11 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
   it('the mode FIELD is decisive, not the presence of a context', async () => {
     const noContext = await withCtx(null);
     const emptyContext = await withCtx({});
-    const systemNoMode = await withCtx({ source: 'system', intent: 'system' });
+    const systemNoMode = await withCtx({ origin: 'system', intent: 'system' });
     const realization = await withCtx({
-      source: 'system',
+      origin: 'system',
       intent: 'system',
-      causalMode: 'realization',
+      participation: 'realized',
     });
 
     // The first three are indistinguishable at this gate; only the mode moves it.
@@ -642,7 +643,7 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
     await tick();
     const before = tree.getHistory().length;
 
-    withWriteContext({ causalMode: 'realization' } as never, () => {
+    withWriteContext({ participation: 'realized' } as never, () => {
       undoable(() => tree.$.balance.set(1_000_000));
     });
     await tick();

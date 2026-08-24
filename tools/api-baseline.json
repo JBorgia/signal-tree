@@ -538,7 +538,7 @@
         "internalDecl": false
       },
       {
-        "name": "UpdateMetadata",
+        "name": "WriteMetadata",
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/mutation-types.ts",

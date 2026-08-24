@@ -337,28 +337,28 @@ const SURFACES = [
  */
 const EXEMPT = new Map(
   Object.entries({
-    causalMode:
-      'internal UpdateMetadata replay discriminator; documented by causal-runtime architecture docs, not app-facing README/changelog',
+    participation:
+      'internal WriteMetadata replay discriminator; documented by causal-runtime architecture docs, not app-facing README/changelog',
     historyEffect:
-      'internal UpdateMetadata structural replay payload; documented by causal-runtime architecture docs, not app-facing README/changelog',
+      'internal WriteMetadata structural replay payload; documented by causal-runtime architecture docs, not app-facing README/changelog',
     HydrateMode: 'authoring-only type; the modes are documented in prose',
     HydrateReason:
       'authoring-only type; reasons documented with onHydrateDecision',
     mutationIntent:
-      'internal UpdateMetadata rollback classifier; documented by causal-runtime architecture docs, not app-facing README/changelog',
+      'internal WriteMetadata rollback classifier; documented by causal-runtime architecture docs, not app-facing README/changelog',
     positionIds:
-      'internal UpdateMetadata/MutationEnvelope ownership ids; not an application-facing option',
+      'internal WriteMetadata/MutationEnvelope ownership ids; not an application-facing option',
     SerializedState: 'return type of an already-documented method',
     SerializationMethods:
       'method bag type; the methods are documented individually',
     PersistenceMethods:
       'method bag type; the methods are documented individually',
     subjectIds:
-      'internal UpdateMetadata/MutationEnvelope structural subject ids; not an application-facing option',
+      'internal WriteMetadata/MutationEnvelope structural subject ids; not an application-facing option',
     transactionId:
-      'internal UpdateMetadata transaction token used by transactions()',
+      'internal WriteMetadata transaction token used by transactions()',
     transactionOwner:
-      'internal UpdateMetadata tree token used to isolate transactions()',
+      'internal WriteMetadata tree token used to isolate transactions()',
     // ── under active disposition in HIST-C2 step 7 ──────────────────────
     // These are declines WITH a stated deadline, not silent gaps. Each is a
     // real public config member today; each is slated to be deleted or

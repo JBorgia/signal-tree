@@ -15,19 +15,19 @@ import {
   markMetaDesignated,
 } from './internals/restoration-eligibility';
 
-import { getCausalWriteMode } from './causal-write-mode';
+import { getWriteParticipation } from './write-participation';
 
-import type { MutationEnvelope, UpdateMetadata } from './mutation-types';
+import type { MutationEnvelope, WriteMetadata } from './mutation-types';
 
 export type PathNotifierHandler = (
   value: unknown,
   prev: unknown,
   path: string,
   ownerPath?: string,
-  source?: string,
+  origin?: string,
   subjectIds?: number[],
   positionIds?: number[],
-  meta?: UpdateMetadata
+  meta?: WriteMetadata
 ) => void | Promise<void>;
 
 export type PathNotifierInterceptor = (
@@ -48,8 +48,8 @@ type PendingEntry = {
   newValue: unknown;
   oldValue: unknown;
   ownerPath?: string;
-  source?: string;
-  meta?: UpdateMetadata;
+  origin?: string;
+  meta?: WriteMetadata;
   subjectId?: number;
   positionId?: number;
   subjectIds?: number[];
@@ -62,8 +62,8 @@ const joinPathSegments = (path: readonly PropertyKey[]): string =>
   path.map((segment) => String(segment)).join('.');
 
 const materializeDeliveryMeta = (
-  meta?: UpdateMetadata
-): UpdateMetadata | undefined => {
+  meta?: WriteMetadata
+): WriteMetadata | undefined => {
   if (!meta?.historyEffect) {
     return meta;
   }
@@ -205,24 +205,24 @@ export class PathNotifier {
     ownerPath?: string,
     subjectIds?: number[],
     positionIds?: number[],
-    metaOverride?: UpdateMetadata
+    metaOverride?: WriteMetadata
   ): { blocked: boolean; value: unknown } {
     const ambientMeta = metaOverride ?? getActiveWriteContext();
     // HIST-C2. Captured HERE, at the synchronous observation of the write, for
-    // exactly the reason the `source` comment below gives: the flush that
+    // exactly the reason the `origin` comment below gives: the flush that
     // delivers this entry is deferred to a microtask, so a designation scope
     // that has already returned is invisible to the recorder. Measured — all
     // three `captureIntoBucket` calls for one designated tick ran after the
     // scope had exited.
-    const meta: UpdateMetadata | undefined = isRestorationDesignated()
+    const meta: WriteMetadata | undefined = isRestorationDesignated()
       ? markMetaDesignated(ambientMeta)
       : ambientMeta;
-    // Tag the batch with the ambient write source (e.g. `time-travel` during a
+    // Tag the batch with the ambient write origin (e.g. `time-travel` during a
     // history restore). The flush that delivers this entry is DEFERRED to a
     // microtask, so consumers must be able to tell "this write came from a
     // restore" apart from a user change at flush time — `isRestoring`-style
     // flags that reset synchronously are already false by then.
-    const source = meta?.source;
+    const origin = meta?.origin;
     if (!this.batchingEnabled) {
       // Synchronous path: run interceptors and subscribers immediately
       const deliveryMeta = materializeDeliveryMeta(meta);
@@ -231,7 +231,7 @@ export class PathNotifier {
         value,
         prev,
         ownerPath,
-        source,
+        origin,
         subjectIds,
         positionIds,
         deliveryMeta
@@ -243,7 +243,7 @@ export class PathNotifier {
       newValue: value,
       oldValue: prev,
       ownerPath,
-      source,
+      origin,
       meta,
       subjectId: subjectIds?.[0],
       positionId: positionIds?.[0],
@@ -270,10 +270,10 @@ export class PathNotifier {
     value: unknown,
     prev: unknown,
     ownerPath?: string,
-    source?: string,
+    origin?: string,
     subjectIds?: number[],
     positionIds?: number[],
-    meta?: UpdateMetadata
+    meta?: WriteMetadata
   ): { blocked: boolean; value: unknown } {
     let blocked = false;
     let transformed = value;
@@ -307,7 +307,7 @@ export class PathNotifier {
             prev,
             path,
             ownerPath,
-            source,
+            origin,
             subjectIds,
             positionIds,
             meta
@@ -354,7 +354,7 @@ export class PathNotifier {
           entry.newValue,
           entry.oldValue,
           entry.ownerPath,
-          entry.source,
+          entry.origin,
           entry.subjectIds,
           entry.positionIds,
           materializeDeliveryMeta(entry.meta)
@@ -549,13 +549,13 @@ export class PathNotifier {
   }
 
   private crossesCausalModeBoundary(left: PendingEntry, right: PendingEntry): boolean {
-    return getCausalWriteMode(left.meta) !== getCausalWriteMode(right.meta);
+    return getWriteParticipation(left.meta) !== getWriteParticipation(right.meta);
   }
 
   private coalesceEntry(target: PendingEntry, next: PendingEntry): void {
     target.newValue = next.newValue;
     target.ownerPath = next.ownerPath;
-    target.source = this.mergeSource(target.source, next.source);
+    target.origin = this.mergeOrigin(target.origin, next.origin);
     target.meta = this.mergeMeta(target.meta, next.meta);
     target.subjectId = next.subjectId;
     target.positionId = next.positionId;
@@ -563,30 +563,30 @@ export class PathNotifier {
     target.positionIds = next.positionIds;
   }
 
-  private mergeSource(left?: string, right?: string): string | undefined {
+  private mergeOrigin(left?: string, right?: string): string | undefined {
     if (!left && !right) return undefined;
     if (left === right) return left;
     return 'mixed';
   }
 
   private mergeMeta(
-    left?: UpdateMetadata,
-    right?: UpdateMetadata
-  ): UpdateMetadata | undefined {
+    left?: WriteMetadata,
+    right?: WriteMetadata
+  ): WriteMetadata | undefined {
     if (!left && !right) {
       return undefined;
     }
     if (!left || !right) {
       return undefined;
     }
-    if (left.source !== right.source) {
+    if (left.origin !== right.origin) {
       return undefined;
     }
     if (
       left.transactionId !== right.transactionId ||
       left.transactionOwner !== right.transactionOwner ||
       left.mutationIntent !== right.mutationIntent ||
-      getCausalWriteMode(left) !== getCausalWriteMode(right)
+      getWriteParticipation(left) !== getWriteParticipation(right)
     ) {
       return undefined;
     }
@@ -602,8 +602,8 @@ export class PathNotifier {
   private getCompositeBatchKey(entry: PendingEntry): string {
     const positionKey = entry.positionIds?.join(',') ?? '';
     const subjectKey = entry.subjectIds?.join(',') ?? '';
-    const causalMode = getCausalWriteMode(entry.meta);
-    return `${entry.path}${PathNotifier.ownerBoundarySeparator}${positionKey}${PathNotifier.ownerBoundarySeparator}${subjectKey}${PathNotifier.ownerBoundarySeparator}${causalMode}`;
+    const participation = getWriteParticipation(entry.meta);
+    return `${entry.path}${PathNotifier.ownerBoundarySeparator}${positionKey}${PathNotifier.ownerBoundarySeparator}${subjectKey}${PathNotifier.ownerBoundarySeparator}${participation}`;
   }
 
   /**

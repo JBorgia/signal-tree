@@ -4,7 +4,7 @@ import {
   withWriteContext,
   getActiveWriteContext,
 } from './write-context';
-import type { UpdateMetadata } from './types';
+import type { WriteMetadata } from './types';
 
 describe('withWriteContext / getActiveWriteContext', () => {
   it('returns undefined when no context is active', () => {
@@ -14,7 +14,7 @@ describe('withWriteContext / getActiveWriteContext', () => {
   it('exposes the context inside fn() and restores it afterward', () => {
     expect(getActiveWriteContext()).toBeUndefined();
 
-    let captured: UpdateMetadata | undefined;
+    let captured: WriteMetadata | undefined;
     withWriteContext({ intent: 'hydrate' }, () => {
       captured = getActiveWriteContext();
     });
@@ -29,10 +29,10 @@ describe('withWriteContext / getActiveWriteContext', () => {
   });
 
   it('restores the previous context after a nested call', () => {
-    withWriteContext({ intent: 'hydrate', source: 'serialization' }, () => {
+    withWriteContext({ intent: 'hydrate', origin: 'serialization' }, () => {
       expect(getActiveWriteContext()).toEqual({
         intent: 'hydrate',
-        source: 'serialization',
+        origin: 'serialization',
       });
 
       withWriteContext({ intent: 'user' }, () => {
@@ -42,7 +42,7 @@ describe('withWriteContext / getActiveWriteContext', () => {
       // Outer context restored after inner returns.
       expect(getActiveWriteContext()).toEqual({
         intent: 'hydrate',
-        source: 'serialization',
+        origin: 'serialization',
       });
     });
 
@@ -77,8 +77,8 @@ describe('withWriteContext / getActiveWriteContext', () => {
   it('does NOT survive `await` boundaries (documented limitation)', async () => {
     // Inside the synchronous portion of fn(), context is active.
     // After `await`, the synchronous frame has returned and context is restored.
-    let beforeAwait: UpdateMetadata | undefined;
-    let afterAwait: UpdateMetadata | undefined;
+    let beforeAwait: WriteMetadata | undefined;
+    let afterAwait: WriteMetadata | undefined;
 
     const yieldOnce = (): Promise<void> => Promise.resolve();
 
@@ -95,9 +95,9 @@ describe('withWriteContext / getActiveWriteContext', () => {
   });
 
   it('passes through optional fields (correlationId, source, custom keys)', () => {
-    const meta: UpdateMetadata = {
+    const meta: WriteMetadata = {
       intent: 'migration',
-      source: 'devtools',
+      origin: 'devtools',
       correlationId: 'abc-123',
       timestamp: 1700000000,
       // Open extension — should round-trip.

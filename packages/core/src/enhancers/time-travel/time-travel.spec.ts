@@ -3054,7 +3054,7 @@ describe('time-travel enhancer', () => {
     const unsubscribe = notifier.subscribe(
       'rows',
       (_next, _prev, _path, _ownerPath, source, subjectIds, positionIds) => {
-        if (source === 'time-travel') {
+        if (source === 'restoration') {
           return;
         }
         if (subjectIds && subjectIds.length > 0) {
@@ -3068,7 +3068,7 @@ describe('time-travel enhancer', () => {
     const restoreReplayObserver = interceptLeafSignals(
       (store as any).$,
       (_path, _next, _prev, meta) => {
-        if (meta?.source !== 'time-travel') {
+        if (meta?.origin !== 'restoration') {
           return;
         }
         const positionIds = meta.positionIds;
@@ -3216,7 +3216,7 @@ describe('time-travel enhancer', () => {
     const unsubscribe = notifier.subscribe(
       'rows',
       (_next, _prev, _path, _ownerPath, source, subjectIds) => {
-        if (source === 'time-travel') {
+        if (source === 'restoration') {
           return;
         }
         if (subjectIds && subjectIds.length > 0) {
@@ -3227,7 +3227,7 @@ describe('time-travel enhancer', () => {
     const restoreReplayObserver = interceptLeafSignals(
       (store as any).$,
       (_path, _next, _prev, meta) => {
-        if (meta?.source !== 'time-travel') {
+        if (meta?.origin !== 'restoration') {
           return;
         }
         const subjectIds = meta.subjectIds;
@@ -3500,7 +3500,7 @@ describe('time-travel enhancer', () => {
     const unsubscribe = notifier.subscribe(
       'rows',
       (_next, _prev, _path, _ownerPath, source, subjectIds) => {
-        if (source === 'time-travel') {
+        if (source === 'restoration') {
           return;
         }
         if (subjectIds && subjectIds.length > 0) {
@@ -3511,7 +3511,7 @@ describe('time-travel enhancer', () => {
     const restoreReplayObserver = interceptLeafSignals(
       (store as any).$,
       (_path, _next, _prev, meta) => {
-        if (meta?.source !== 'time-travel') {
+        if (meta?.origin !== 'restoration') {
           return;
         }
         const subjectIds = meta.subjectIds;

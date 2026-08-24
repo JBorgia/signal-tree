@@ -14,7 +14,7 @@ import { transactions } from './transactions';
  *
  * Measured cause: `getPendingRollbackPlan()` draws its later effects from
  * `confirmedTurns`, and the capture path returns early on
- * `getCausalWriteMode(meta) === 'realization'` — so a server refresh is never a
+ * `getWriteParticipation(meta) === 'realized'` — so a server refresh is never a
  * later effect at all, and a rollback deletes the row it wrote to.
  *
  * The criterion being implemented is deliberately stronger than "include
@@ -35,7 +35,7 @@ const flush = async () => {
 };
 
 const realization = (fn: () => void) =>
-  withWriteContext({ intent: 'system', causalMode: 'realization' }, fn);
+  withWriteContext({ intent: 'system', participation: 'realized' }, fn);
 
 const refusalKind = (error: unknown): unknown =>
   (error as { cause?: { kind?: unknown } })?.cause?.kind;

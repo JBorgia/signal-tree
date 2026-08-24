@@ -6,7 +6,7 @@ import type {
   MutationEnvelope,
   MutationKind,
   PositionId,
-  UpdateMetadata,
+  WriteMetadata,
 } from '../types';
 import {
   OWNED_NODE_METADATA,
@@ -24,7 +24,7 @@ export {
 } from './owned-metadata';
 import { getActiveWriteContext } from '../write-context';
 
-type OwnedMutationIntent = NonNullable<UpdateMetadata['mutationIntent']>;
+type OwnedMutationIntent = NonNullable<WriteMetadata['mutationIntent']>;
 
 type OwnedMetadataStorage = 'property' | 'sidecar';
 

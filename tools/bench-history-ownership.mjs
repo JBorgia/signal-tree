@@ -223,15 +223,15 @@ function ensureCommitted3ArgPathNotifierModule() {
     'utf8'
   );
   writeFileSync(
-    join(dirname(COMMITTED_3ARG_LIB), 'causal-write-mode.mjs'),
-    `export function getCausalWriteMode(meta) { return meta?.causalMode ?? 'authoring'; }\n`,
+    join(dirname(COMMITTED_3ARG_LIB), 'write-participation.mjs'),
+    `export function getWriteParticipation(meta) { return meta?.participation ?? 'authored'; }\n`,
     'utf8'
   );
   writeFileSync(
     COMMITTED_3ARG_LIB,
     `// transpiled from HEAD:packages/core/src/lib/path-notifier.ts\n${compiled.outputText
       .replace("'./write-context'", "'./write-context.mjs'")
-      .replace("'./causal-write-mode'", "'./causal-write-mode.mjs'")}`,
+      .replace("'./write-participation'", "'./write-participation.mjs'")}`,
     'utf8'
   );
   return COMMITTED_3ARG_LIB;

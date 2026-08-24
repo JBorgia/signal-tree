@@ -546,7 +546,7 @@ function warnMissingForward(method: string): void {
  * `recursiveUpdate` serves BOTH `tree(partial)` and `timeTravel` undo/redo —
  * `restoreState` falls through to `this.tree(state)` — so the two cannot be
  * told apart by call shape. They are told apart by the write context that
- * time travel already tags every replay with (`source: 'time-travel'`), which
+ * time travel already tags every replay with (`origin: 'restoration'`), which
  * exists for exactly this kind of question and needed no new plumbing.
  *
  * The distinction is not cosmetic. An UNDO must land the user in the state they
@@ -555,7 +555,7 @@ function warnMissingForward(method: string): void {
  * docs/architecture/undo-redo-vs-devtools.md.
  */
 function currentHydrateMode(): 'merge' | 'restore' {
-  return getActiveWriteContext()?.source === 'time-travel'
+  return getActiveWriteContext()?.origin === 'restoration'
     ? 'restore'
     : 'merge';
 }

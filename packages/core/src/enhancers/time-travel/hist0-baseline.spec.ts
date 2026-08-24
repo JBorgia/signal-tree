@@ -77,7 +77,7 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     await flush();
     const before = tree.getHistory().length;
 
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       undoable(() => tree.$.document.title.set('from-server'));
     });
     await flush();
@@ -126,7 +126,7 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     await flush();
     undoable(() => tree.$.ui.selectedPanel.set('inspector'));
     await flush();
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       undoable(() => tree.$.document.body.set('server-body'));
     });
     await flush();
@@ -156,7 +156,7 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     undoable(() => tree.$.document.title.set('A'));
     await flush();
 
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       undoable(() => tree.$.document.body.set('server-body'));
     });
     await flush();

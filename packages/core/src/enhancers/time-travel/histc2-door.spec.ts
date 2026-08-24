@@ -198,7 +198,7 @@ describe('HIST-C2 door: turn-level eligibility', () => {
     await flush();
 
     undoable(() => {
-      withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+      withWriteContext({ intent: 'system', participation: 'realized' }, () => {
         tree.$.document.title.set('from-server');
       });
     });

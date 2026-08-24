@@ -2181,7 +2181,7 @@ describe('structural history effect delivery', () => {
     const subscribe = (bucket: StructuralEvent[]): (() => void) =>
       notifier.subscribe(
         'rows.*',
-        (_next, _prev, path, ownerPath, _source, subjectIds, positionIds, meta) => {
+        (_next, _prev, path, ownerPath, _origin, subjectIds, positionIds, meta) => {
           if (meta?.historyEffect) {
             expect(Object.isFrozen(meta.historyEffect)).toBe(true);
           }

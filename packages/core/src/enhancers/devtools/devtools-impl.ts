@@ -87,7 +87,7 @@ interface ModularDevToolsInterface {
 
 type DevToolsActionMeta = {
   timestamp: number;
-  source?: string;
+  origin?: string;
   duration?: number;
   slow?: boolean;
   paths?: string[];
@@ -611,7 +611,7 @@ function getOrCreateDevToolsGroup(
 
   let pendingAction: DevToolsAction | null = null;
   let pendingExplicitAction = false;
-  let pendingSource: string | undefined;
+  let pendingOrigin: string | undefined;
   let pendingDuration: number | undefined;
 
   const sendAggregated = (actionType: string, payload: unknown) => {
@@ -867,11 +867,11 @@ function getOrCreateDevToolsGroup(
     }
 
     const hasMeta =
-      pendingSource !== undefined || pendingDuration !== undefined;
+      pendingOrigin !== undefined || pendingDuration !== undefined;
     if (allFormattedPaths.length === 0 && !pendingExplicitAction && !hasMeta) {
       pendingAction = null;
       pendingExplicitAction = false;
-      pendingSource = undefined;
+      pendingOrigin = undefined;
       pendingDuration = undefined;
       pendingPathsByTree.clear();
       lastSendAt = Date.now();
@@ -892,7 +892,7 @@ function getOrCreateDevToolsGroup(
 
     const actionMeta: DevToolsActionMeta = {
       timestamp: Date.now(),
-      ...(pendingSource && { source: pendingSource }),
+      ...(pendingOrigin && { origin: pendingOrigin }),
       ...(pendingDuration !== undefined && {
         duration: pendingDuration,
         slow: pendingDuration > 16,
@@ -913,7 +913,7 @@ function getOrCreateDevToolsGroup(
     } finally {
       pendingAction = null;
       pendingExplicitAction = false;
-      pendingSource = undefined;
+      pendingOrigin = undefined;
       pendingDuration = undefined;
       pendingPathsByTree.clear();
       lastSendAt = Date.now();
@@ -935,11 +935,11 @@ function getOrCreateDevToolsGroup(
       }
     }
 
-    if (meta?.source) {
-      if (!pendingSource) {
-        pendingSource = meta.source;
-      } else if (pendingSource !== meta.source) {
-        pendingSource = 'mixed';
+    if (meta?.origin) {
+      if (!pendingOrigin) {
+        pendingOrigin = meta.origin;
+      } else if (pendingOrigin !== meta.origin) {
+        pendingOrigin = 'mixed';
       }
     }
 
@@ -1184,7 +1184,7 @@ export function createDevToolsEnhancer(
     let sendScheduled = false;
     let pendingAction: DevToolsAction | null = null;
     let pendingExplicitAction = false;
-    let pendingSource: string | undefined;
+    let pendingOrigin: string | undefined;
     let pendingDuration: number | undefined;
     let lastSnapshot: unknown = undefined;
     let lastSendAt = 0;
@@ -1278,7 +1278,7 @@ export function createDevToolsEnhancer(
       if (!stateActuallyChanged && !pendingExplicitAction) {
         pendingAction = null;
         pendingExplicitAction = false;
-        pendingSource = undefined;
+        pendingOrigin = undefined;
         pendingDuration = undefined;
         pendingPaths = [];
         lastSnapshot = currentSnapshot;
@@ -1311,7 +1311,7 @@ export function createDevToolsEnhancer(
       ) {
         pendingAction = null;
         pendingExplicitAction = false;
-        pendingSource = undefined;
+        pendingOrigin = undefined;
         pendingDuration = undefined;
         pendingPaths = [];
         lastSnapshot = currentSnapshot;
@@ -1328,7 +1328,7 @@ export function createDevToolsEnhancer(
 
       const actionMeta: DevToolsActionMeta = {
         timestamp: Date.now(),
-        ...(pendingSource && { source: pendingSource }),
+        ...(pendingOrigin && { origin: pendingOrigin }),
         ...(pendingDuration !== undefined && {
           duration: pendingDuration,
           slow: pendingDuration > performanceThreshold,
@@ -1349,7 +1349,7 @@ export function createDevToolsEnhancer(
       } finally {
         pendingAction = null;
         pendingExplicitAction = false;
-        pendingSource = undefined;
+        pendingOrigin = undefined;
         pendingDuration = undefined;
         pendingPaths = [];
         lastSnapshot = currentSnapshot;
@@ -1367,11 +1367,11 @@ export function createDevToolsEnhancer(
         pendingAction = action;
         pendingExplicitAction = true;
       }
-      if (meta?.source) {
-        if (!pendingSource) {
-          pendingSource = meta.source;
-        } else if (pendingSource !== meta.source) {
-          pendingSource = 'mixed';
+      if (meta?.origin) {
+        if (!pendingOrigin) {
+          pendingOrigin = meta.origin;
+        } else if (pendingOrigin !== meta.origin) {
+          pendingOrigin = 'mixed';
         }
       }
       if (meta?.duration !== undefined) {
@@ -1423,7 +1423,7 @@ export function createDevToolsEnhancer(
       pendingPaths = [];
       pendingAction = null;
       pendingExplicitAction = false;
-      pendingSource = undefined;
+      pendingOrigin = undefined;
       pendingDuration = undefined;
     };
 
@@ -1432,7 +1432,7 @@ export function createDevToolsEnhancer(
       isApplyingExternalState = true;
       try {
         // Tag every leaf write performed during this replay with
-        // `source: 'devtools'` — NOT `'time-travel'`, which is what this used
+        // `origin: 'devtools'` — NOT `'restoration'`, which is what this used
         // to send and is what made devtools scrubbing indistinguishable from a
         // user pressing Ctrl+Z.
         //
@@ -1442,16 +1442,16 @@ export function createDevToolsEnhancer(
         // change too. Scrubbing a devtools timeline is INSPECTION — nobody
         // expects dragging a slider to rewrite their localStorage.
         //
-        // `'devtools'` was already in the `UpdateMetadata['source']` union and
+        // `'devtools'` was already in the `WriteMetadata['origin']` union and
         // simply unused. Enhancers read this via `getActiveWriteContext()`; the
         // context is synchronous, so applyState's recursive calls inherit it.
         // DEVTOOLS-JUMP-0 closed as D: this is INSPECTION participation, and it
-        // is declared rather than inferred from `source`. Provenance answers
+        // is declared rather than inferred from `origin`. Provenance answers
         // "where did this come from"; participation answers "how may this take
         // part in causal mechanisms". Deriving the second from the first would
         // recouple two axes this audit separated on evidence.
         withWriteContext(
-          { intent: 'system', source: 'devtools', causalMode: 'inspection' },
+          { intent: 'system', origin: 'devtools', participation: 'inspection' },
           () => {
             if ('$' in tree) {
               applyState((tree as ISignalTree<T>).$ as TreeNode<T>, state as T);
@@ -1704,13 +1704,13 @@ export function createDevToolsEnhancer(
         if (group) {
           group.enqueue(displayName, [], undefined, {
             timestamp: Date.now(),
-            source: 'tree.update',
+            origin: 'tree.update',
             duration,
           });
         }
       } else if (browserDevTools) {
         scheduleSend(undefined, {
-          source: 'tree.update',
+          origin: 'tree.update',
           duration,
         });
       }
@@ -1850,7 +1850,7 @@ export function createDevToolsEnhancer(
         if (group) {
           group.enqueue(displayName, pendingPaths, undefined, {
             timestamp: Date.now(),
-            source: 'path-notifier',
+            origin: 'path-notifier',
           });
           pendingPaths = [];
         }
@@ -1859,7 +1859,7 @@ export function createDevToolsEnhancer(
           pendingPaths = [];
           return;
         }
-        scheduleSend(undefined, { source: 'path-notifier' });
+        scheduleSend(undefined, { origin: 'path-notifier' });
       }
     });
 
@@ -1949,7 +1949,7 @@ export function createDevToolsEnhancer(
         sendScheduled = false;
         pendingAction = null;
         pendingExplicitAction = false;
-        pendingSource = undefined;
+        pendingOrigin = undefined;
         pendingDuration = undefined;
         lastSnapshot = undefined;
         lastSerializedJson = undefined;

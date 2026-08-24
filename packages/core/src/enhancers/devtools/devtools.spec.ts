@@ -183,7 +183,7 @@ describe('devTools enhancer (v6 API)', () => {
         type: 'SignalTree/products[1]',
         payload: 'products[1]',
         meta: {
-          source: 'path-notifier',
+          origin: 'path-notifier',
           paths: ['products[1]'],
           timestamp: expect.any(Number),
         },
@@ -233,7 +233,7 @@ describe('devTools enhancer (v6 API)', () => {
         type: 'SignalTree/user.profile.name',
         payload: 'user.profile.name',
         meta: {
-          source: 'path-notifier',
+          origin: 'path-notifier',
           paths: ['user.profile.name'],
           timestamp: expect.any(Number),
         },
@@ -566,7 +566,7 @@ describe('devTools enhancer (v6 API)', () => {
         type: 'SignalTree/A.a',
         payload: 'A.a',
         meta: {
-          source: 'path-notifier',
+          origin: 'path-notifier',
           paths: ['A.a'],
           timestamp: expect.any(Number),
         },

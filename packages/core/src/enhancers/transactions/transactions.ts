@@ -5,10 +5,10 @@ import type {
   ISignalTree,
   PendingTransaction,
   TransactionMethods,
-  UpdateMetadata,
+  WriteMetadata,
 } from '../../lib/types';
 
-import { getCausalWriteMode, isInspectionWrite } from '../../lib/causal-write-mode';
+import { getWriteParticipation, isInspectionWrite } from '../../lib/write-participation';
 import {
   ENHANCER_META,
   SignalTreeRollbackError,
@@ -786,7 +786,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   };
 
   const buildTurnEffectFromHistory = (
-    meta: UpdateMetadata | undefined,
+    meta: WriteMetadata | undefined,
     ownerPath: string,
     path: string,
     positionIds?: number[],
@@ -825,7 +825,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     path: string,
     next: unknown,
     prev: unknown,
-    meta?: UpdateMetadata,
+    meta?: WriteMetadata,
     ownerPath?: string,
     subjectIds?: number[],
     positionIds?: number[]
@@ -908,7 +908,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     path: string,
     next: unknown,
     prev: unknown,
-    meta?: UpdateMetadata,
+    meta?: WriteMetadata,
     ownerPath?: string,
     subjectIds?: number[],
     positionIds?: number[]
@@ -1135,8 +1135,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
         unsubscribeNotifications?.();
         unsubscribeNotifications = notifier.subscribe(
           '**',
-          (next, prev, path, ownerPath, source, subjectIds, positionIds, meta) => {
-            if (source === 'time-travel') {
+          (next, prev, path, ownerPath, origin, subjectIds, positionIds, meta) => {
+            if (origin === 'restoration') {
               return;
             }
             // DEVTOOLS-JUMP-0.1. Inspection contributes NOTHING here: no
@@ -1148,7 +1148,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
             if (isInspectionWrite(meta)) {
               return;
             }
-            if (getCausalWriteMode(meta) === 'realization') {
+            if (getWriteParticipation(meta) === 'realized') {
               // TX-LEDGER C3. A realization is NOT an authored turn and must
               // never become one — but it can still make a pending rollback
               // unsafe by depending on speculative structure. Build its effects
@@ -1220,14 +1220,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
         (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
           const effectiveMeta = meta ?? getActiveWriteContext();
           if (isRestoring) return;
-          if (effectiveMeta?.source === 'time-travel') {
+          if (effectiveMeta?.origin === 'restoration') {
             return;
           }
           // DEVTOOLS-JUMP-0.1. Notified so the write still reaches observers
           // and the tree updates, but captured nowhere.
           if (
             isInspectionWrite(effectiveMeta) ||
-            getCausalWriteMode(effectiveMeta) === 'realization'
+            getWriteParticipation(effectiveMeta) === 'realized'
           ) {
             notifier.notify(
               path,

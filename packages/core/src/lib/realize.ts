@@ -1,4 +1,4 @@
-import type { UpdateMetadata } from './mutation-types';
+import type { WriteMetadata } from './mutation-types';
 import { getActiveWriteContext, withWriteContext } from './write-context';
 
 /**
@@ -103,7 +103,7 @@ export function realize<R>(operation: () => R): R {
   // Defined keys only: `{ ...meta }` on a partially-filled metadata object
   // materialises absent keys as explicit `undefined`, which then shows up in
   // anything inspecting the delivered meta.
-  const meta: UpdateMetadata = { intent: 'system' };
+  const meta: WriteMetadata = { intent: 'system' };
   if (ambient) {
     for (const [key, value] of Object.entries(ambient)) {
       if (value !== undefined) {
@@ -111,8 +111,8 @@ export function realize<R>(operation: () => R): R {
       }
     }
   }
-  meta.source = 'external';
-  meta.causalMode = 'realization';
+  meta.origin = 'external';
+  meta.participation = 'realized';
 
   const result = withWriteContext(meta, operation);
 

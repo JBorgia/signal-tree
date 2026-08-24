@@ -37,7 +37,7 @@ import {
 } from '../../lib/internals/restoration-eligibility';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { recordProductionSubstrateStat } from '../../lib/internals/production-substrate-stats';
-import { getCausalWriteMode, isInspectionWrite } from '../../lib/causal-write-mode';
+import { getWriteParticipation, isInspectionWrite } from '../../lib/write-participation';
 import { getPathNotifier } from '../../lib/path-notifier';
 import {
   getActiveWriteContext,
@@ -54,7 +54,7 @@ import type {
   TimeTravelEntry,
   TreeNode,
   EnhancerMeta,
-  UpdateMetadata,
+  WriteMetadata,
 } from '../../lib/types';
 
 // `SignalTreeRollbackError` is no longer imported here: rollback errors are
@@ -1514,14 +1514,14 @@ class TimeTravelManager<T> {
     positionIds?: number[]
   ): void {
     // Tag every leaf write performed during this undo/redo/jump with
-    // `source: 'time-travel'`. Enhancers (validation, guardrails) read this
+    // `origin: 'restoration'`. Enhancers (validation, guardrails) read this
     // via `getActiveWriteContext()` and can suppress side effects for replays.
     withWriteContext(
       {
         ...(getActiveWriteContext() ?? {}),
         intent: 'system',
-        source: 'time-travel',
-        causalMode: 'realization',
+        origin: 'restoration',
+        participation: 'realized',
         subjectIds,
         positionIds,
       },
@@ -2188,7 +2188,7 @@ export function timeTravel(
         // synchronous flag and is already false by the time the notifier
         // delivers — which is the whole reason provenance has to travel WITH the
         // write rather than be inferred at delivery.
-        withWriteContext({ source: 'time-travel' }, () => {
+        withWriteContext({ origin: 'restoration' }, () => {
           realizationPort.applyAtomically(reversalEffects);
         });
       } finally {
@@ -2196,13 +2196,13 @@ export function timeTravel(
       }
 
       // RESTORE-P0 P0-C. A restoration's OWN writes are published with
-      // `causalMode: 'realization'` — measured via MUT-2, which records that
-      // redo is marked realization too — and they carry `source: 'system'`
-      // rather than `'time-travel'`, so the notifier subscription cannot tell
+      // `participation: 'realized'` — measured via MUT-2, which records that
+      // redo is marked realization too — and they carried `origin: 'system'`
+      // rather than `'restoration'`, so the notifier subscription cannot tell
       // them from server truth. Banking them would make the next undo refuse
       // against the previous undo's output.
       //
-      // The restoration's own writes now carry `source: 'time-travel'`, so the
+      // The restoration's own writes now carry `origin: 'restoration'`, so the
       // notifier subscription filters them before the external-truth branch is
       // reached. The consume-once marking that used to be needed here is gone —
       // see the tombstone at `externalTruthByPath`.
@@ -2316,12 +2316,12 @@ export function timeTravel(
     // restoration carried its own origin.
     //
     // TOMBSTONE, because the deletion is the point. P0-C needed them because a
-    // restoration published its writes as realizations with `source: 'system'`,
+    // restoration published its writes as realizations with a fabricated origin,
     // indistinguishable from server truth at the notifier — so each undo banked
     // its own output as external truth and the NEXT undo refused against it.
     // They were a consume-once workaround for a missing fact.
     //
-    // With `source: 'time-travel'` propagated through the write path, the
+    // With `origin: 'restoration'` propagated through the write path, the
     // subscription filters restoration writes before the external-truth branch
     // is reached, and there is nothing to suppress. Verified by neutering the
     // mechanism first and confirming the suite stayed correct, then deleting it —
@@ -2517,7 +2517,7 @@ export function timeTravel(
     const buildTurnEffectFromHistory = (
       ownerPath: string,
       path: string,
-      meta?: UpdateMetadata,
+      meta?: WriteMetadata,
       positionIds?: number[],
       subjectIds?: number[]
     ): TurnEffect | undefined => {
@@ -2561,7 +2561,7 @@ export function timeTravel(
       path: string,
       next: unknown,
       prev: unknown,
-      meta?: UpdateMetadata,
+      meta?: WriteMetadata,
       ownerPath?: string,
       subjectIds?: number[],
       positionIds?: number[]
@@ -2644,7 +2644,7 @@ export function timeTravel(
       path: string,
       next: unknown,
       prev: unknown,
-      meta?: UpdateMetadata,
+      meta?: WriteMetadata,
       ownerPath?: string,
       subjectIds?: number[],
       positionIds?: number[]
@@ -2880,12 +2880,12 @@ export function timeTravel(
               prev,
               path,
               ownerPath,
-              source,
+              origin,
               subjectIds,
               positionIds,
               meta
             ) => {
-              if (source === 'time-travel') {
+              if (origin === 'restoration') {
                 return;
               }
               // DEVTOOLS-JUMP-0.1. Inspection records NO external truth. It is
@@ -2895,7 +2895,7 @@ export function timeTravel(
               if (isInspectionWrite(meta)) {
                 return;
               }
-              if (getCausalWriteMode(meta) === 'realization') {
+              if (getWriteParticipation(meta) === 'realized') {
                 // RESTORE-P0 P0-C. Recorded HERE rather than only in the leaf
                 // interceptor: measured, that interceptor is not installed for
                 // every tree shape, and for a plain nested branch it never runs
@@ -2971,7 +2971,7 @@ export function timeTravel(
               // Stamped here because this callback is synchronous with the
               // `.set()`, and because handing `effectiveMeta` to `notify()` as a
               // metaOverride would otherwise bypass notify's own stamping.
-              const effectiveMeta: UpdateMetadata | undefined =
+              const effectiveMeta: WriteMetadata | undefined =
                 isRestorationDesignated() ? markMetaDesignated(ambient) : ambient;
               if (isRestoring) return;
               // DEVTOOLS-JUMP-0.1. Notified but recorded nowhere, and
@@ -2990,7 +2990,7 @@ export function timeTravel(
                 );
                 return;
               }
-              if (getCausalWriteMode(effectiveMeta) === 'realization') {
+              if (getWriteParticipation(effectiveMeta) === 'realized') {
                 // P0-C: remember that this location now holds external truth.
                 externalTruthByPath.set(path, next);
                 notifier.notify(
@@ -3134,7 +3134,7 @@ export function timeTravel(
           const activeMeta = getActiveWriteContext();
           if (
             isInspectionWrite(activeMeta) ||
-            getCausalWriteMode(activeMeta) === 'realization'
+            getWriteParticipation(activeMeta) === 'realized'
           ) {
             return result;
           }

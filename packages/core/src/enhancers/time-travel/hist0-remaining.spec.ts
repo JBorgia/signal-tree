@@ -20,7 +20,7 @@ const flush = async () => {
 };
 
 const realization = (fn: () => void) =>
-  withWriteContext({ intent: 'system', causalMode: 'realization' }, fn);
+  withWriteContext({ intent: 'system', participation: 'realized' }, fn);
 
 describe('HIST-0 case 4: mixed writes in ONE untransacted turn', () => {
   it('a document write and a UI write in one tick coalesce into ONE turn', async () => {

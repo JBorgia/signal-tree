@@ -121,9 +121,9 @@ Packaging principle + ng-forms re-slice, `history()`, events↔entityMap bridge,
 
 ### Public API additions (enhancer infrastructure)
 
-- **`UpdateMetadata`** lifted from `@signaltree/guardrails` to `@signaltree/core`. Cross-cutting metadata is core-level concern. Guardrails keeps a deprecated re-export for one minor release.
-- **`withWriteContext(meta, fn)` / `getActiveWriteContext()`** (`./lib/write-context.ts`) — synchronous ambient channel for tagging writes with `UpdateMetadata`. Enhancer-author API: capture metadata at write time without changing Angular's `WritableSignal.set(value)` signature.
-- **`interceptLeafSignals` callback widened** with optional 4th argument `meta?: UpdateMetadata`. Existing 3-arg callbacks continue to work. Captures the active write context synchronously immediately before invoking `onWrite`.
+- **`WriteMetadata`** lifted from `@signaltree/guardrails` to `@signaltree/core`. Cross-cutting metadata is core-level concern. Guardrails keeps a deprecated re-export for one minor release.
+- **`withWriteContext(meta, fn)` / `getActiveWriteContext()`** (`./lib/write-context.ts`) — synchronous ambient channel for tagging writes with `WriteMetadata`. Enhancer-author API: capture metadata at write time without changing Angular's `WritableSignal.set(value)` signature.
+- **`interceptLeafSignals` callback widened** with optional 4th argument `meta?: WriteMetadata`. Existing 3-arg callbacks continue to work. Captures the active write context synchronously immediately before invoking `onWrite`.
 - **`interceptLeafSignals` promoted to public API** for external enhancer authors (was internal-by-convention; used by core's devtools + time-travel; now consumable by `@signaltree/schema` and downstream packages). Removed `@internal` JSDoc tag so the d.ts emit includes the full signature under `stripInternal: true`.
 
 ### Internal: replay sites tagged with metadata
@@ -139,7 +139,7 @@ External enhancers that need to react to writes (validation, audit logging, tele
 
 - 100% backwards compatible for application code.
 - Backwards compatible for existing enhancers: the new 4th callback argument is optional.
-- `@signaltree/guardrails` continues to work via `@deprecated` re-export of `UpdateMetadata`; `extractMetadata` now reads `getActiveWriteContext()` first and falls back to the legacy payload-shape sniff.
+- `@signaltree/guardrails` continues to work via `@deprecated` re-export of `WriteMetadata`; `extractMetadata` now reads `getActiveWriteContext()` first and falls back to the legacy payload-shape sniff.
 
 ### Tests
 

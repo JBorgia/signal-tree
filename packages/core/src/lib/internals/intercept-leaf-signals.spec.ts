@@ -6,13 +6,13 @@ import { stored } from '../markers/stored';
 import { signalTree } from '../signal-tree';
 import { interceptLeafSignals } from './intercept-leaf-signals';
 import { withWriteContext } from '../write-context';
-import type { UpdateMetadata } from '../types';
+import type { WriteMetadata } from '../types';
 
 interface Captured {
   path: string;
   next: unknown;
   prev: unknown;
-  meta?: UpdateMetadata;
+  meta?: WriteMetadata;
   ownerPath?: string;
 }
 
@@ -22,7 +22,7 @@ function captureWrites(): {
     path: string,
     next: unknown,
     prev: unknown,
-    meta?: UpdateMetadata,
+    meta?: WriteMetadata,
     ownerPath?: string
   ) => void;
 } {
@@ -35,13 +35,13 @@ function captureWrites(): {
   };
 }
 
-describe('interceptLeafSignals — UpdateMetadata passthrough (PR1)', () => {
+describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
   it('passes `meta` from withWriteContext to onWrite on .set()', () => {
     const tree = { count: signal(0) };
     const { list, onWrite } = captureWrites();
     const restore = interceptLeafSignals(tree, onWrite);
 
-    withWriteContext({ intent: 'hydrate', source: 'serialization' }, () => {
+    withWriteContext({ intent: 'hydrate', origin: 'serialization' }, () => {
       tree.count.set(1);
     });
 
@@ -52,7 +52,7 @@ describe('interceptLeafSignals — UpdateMetadata passthrough (PR1)', () => {
     expect(list[0].prev).toBe(0);
     expect(list[0].meta).toEqual({
       intent: 'hydrate',
-      source: 'serialization',
+      origin: 'serialization',
       mutationIntent: 'replace',
     });
 

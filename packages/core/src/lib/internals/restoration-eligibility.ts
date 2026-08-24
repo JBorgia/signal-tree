@@ -29,29 +29,29 @@
  *   engine directly. This module is the one place that ambient bit lives.
  */
 
-import type { UpdateMetadata } from '../mutation-types';
+import type { WriteMetadata } from '../mutation-types';
 
 /**
  * The runtime metadata a designated write carries.
  *
- * Deliberately NOT a field on the public `UpdateMetadata`: applications express
+ * Deliberately NOT a field on the public `WriteMetadata`: applications express
  * "this is an undoable user operation" through {@link undoable}, and must never
  * set an engine field. The property exists on the object at runtime; only this
  * internal view declares it.
  */
-export type DesignatedWriteMeta = UpdateMetadata & {
+export type DesignatedWriteMeta = WriteMetadata & {
   restorationDesignated?: boolean;
 };
 
 /** @internal Read the designation off a delivered metadata object. */
-export function isMetaDesignated(meta: UpdateMetadata | undefined): boolean {
+export function isMetaDesignated(meta: WriteMetadata | undefined): boolean {
   return (meta as DesignatedWriteMeta | undefined)?.restorationDesignated === true;
 }
 
 /** @internal Stamp the ambient designation onto a metadata object. */
 export function markMetaDesignated(
-  meta: UpdateMetadata | undefined
-): UpdateMetadata {
+  meta: WriteMetadata | undefined
+): WriteMetadata {
   // Spread only what is actually present. `{ ...meta }` on a partially-filled
   // metadata object materialises its absent keys as explicit `undefined`, which
   // then shows up in anything that inspects the delivered meta — caught by

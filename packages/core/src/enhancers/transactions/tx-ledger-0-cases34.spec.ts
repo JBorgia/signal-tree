@@ -33,7 +33,7 @@ const flush = async () => {
 };
 
 const realization = (fn: () => void) =>
-  withWriteContext({ intent: 'system', causalMode: 'realization' }, fn);
+  withWriteContext({ intent: 'system', participation: 'realized' }, fn);
 
 const refusalKind = (error: unknown): unknown =>
   (error as { cause?: { kind?: unknown } })?.cause?.kind;
