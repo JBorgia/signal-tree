@@ -1111,14 +1111,29 @@ export function getOrCreateInternalTransactionRuntime<T>(
       store,
       appliedTurns,
     });
-    const result = rollbackPendingTurnAt({
-      authority: authorityPosition,
-      turnId: transactionId,
-      store,
-      topology: positionRegistry,
-      port: realizationPort,
-      realizationContext,
-    });
+    // DIAG-JOURNAL-1.1. Two facts, stated rather than inferred:
+    //
+    //   origin: 'transaction-rollback'   WHY this realized write exists
+    //   transactionId                    WHICH transaction it compensates
+    //
+    // Without them a compensation turn was indistinguishable from external
+    // truth, and the only way to correlate it with its transaction was "it came
+    // after the rolled-back event" — temporal adjacency, not correlation. The
+    // id is safe as a bare number here because a tree announces under exactly
+    // one owner (measured in diag-journal-1-1-correlation.spec.ts) and a journal
+    // observes one tree.
+    const result = withWriteContext(
+      { origin: 'transaction-rollback', transactionId },
+      () =>
+        rollbackPendingTurnAt({
+          authority: authorityPosition,
+          turnId: transactionId,
+          store,
+          topology: positionRegistry,
+          port: realizationPort,
+          realizationContext,
+        })
+    );
     if (!result.ok) {
       throw createRollbackError({
         kind: 'effect-validation-failed',

@@ -87,8 +87,18 @@ export interface WriteMetadata {
    * meaningful absence above; `'serialization'` claimed a provenance nothing
    * ever stamped. A positive origin exists when provenance carries semantic
    * information — not because the union previously admitted the spelling.
+   *
+   * `'transaction-rollback'` was added by DIAG-JOURNAL-1.1 under that same rule:
+   * a compensation write is a realization whose reason to exist is a withdrawn
+   * transaction, and a diagnostic reader could not tell it from external truth.
+   * It answers only WHY the write exists; WHICH transaction it compensates is
+   * `transactionId`, deliberately a separate fact.
    */
-  origin?: 'restoration' | 'devtools' | 'external';
+  origin?:
+    | 'restoration'
+    | 'devtools'
+    | 'external'
+    | 'transaction-rollback';
   /** Suppress guardrails for this update. */
   suppressGuardrails?: boolean;
   /** Optional correlation ID for related updates. */
