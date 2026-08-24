@@ -1,4 +1,5 @@
 import { signalTree } from './signal-tree';
+import { undoable } from '../lib/undoable';
 import { entityMap } from './markers/entity-map';
 import { timeTravel } from '../enhancers/time-travel/time-travel';
 import { transactions } from '../enhancers/transactions/transactions';
@@ -87,7 +88,7 @@ describe('restoration authority is fixed at construction', () => {
         capabilities: ['causal-runtime'],
       }
     );
-    tree.$.rows.setAll([{ id: 'B', name: 'Beta' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'B', name: 'Beta' }]));
     await tick();
 
     const beforeUndo = tree.$.rows.ids().slice().sort();
@@ -119,7 +120,7 @@ describe('restoration authority is fixed at construction', () => {
     ]);
     await tick();
 
-    tree.$.rows.removeOne('B');
+    undoable(() => tree.$.rows.removeOne('B'));
     await tick();
     expect(tree.$.rows.ids().slice().sort()).toEqual(['A']);
 
@@ -140,10 +141,10 @@ describe('restoration authority is fixed at construction', () => {
         capabilities: ['causal-runtime'],
       }
     );
-    tree.$.rows.setAll([{ id: 'A', name: 'Alpha' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'A', name: 'Alpha' }]));
     await tick();
 
-    tree.$.rows.removeOne('A');
+    undoable(() => tree.$.rows.removeOne('A'));
     await tick();
     tree.undo();
     await tick();
@@ -174,7 +175,7 @@ describe('restoration authority is fixed at construction', () => {
     const pending = (
       tree as unknown as { transaction: (f: () => void) => { rollback(): void } }
     ).transaction(() => {
-      tree.$.rows.updateOne('B', { name: 'Beta2' });
+      undoable(() => tree.$.rows.updateOne('B', { name: 'Beta2' }));
     });
     pending.rollback();
     await tick();
@@ -221,7 +222,7 @@ describe('restoration authority is fixed at construction', () => {
     const subjectA = subjectIdOf(tree.$.rows, 'A');
     expect(inspect(tree.$.rows, subjectA)?.retainedValueBacking).toBeDefined();
 
-    tree.$.rows.removeOne('A');
+    undoable(() => tree.$.rows.removeOne('A'));
     await tick();
 
     // Nothing is left to inspect. The retirement boundary releases the value
@@ -253,7 +254,7 @@ describe('restoration authority is fixed at construction', () => {
     await tick();
 
     const subjectA = subjectIdOf(tree.$.rows, 'A');
-    tree.$.rows.removeOne('A');
+    undoable(() => tree.$.rows.removeOne('A'));
     await tick();
 
     expect(inspect(tree.$.rows, subjectA)?.state).toBe('tombstoned');

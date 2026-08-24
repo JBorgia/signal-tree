@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../lib/undoable';
 
 import { signalTree } from './signal-tree';
 
@@ -46,7 +47,7 @@ describe('E — can any tree API add a record key after construction?', () => {
 
   it('the granular positions that DO exist keep working', () => {
     const tree = seed();
-    tree.$.rows.a.n.set(9);
+    undoable(() => tree.$.rows.a.n.set(9));
     expect(tree.$.rows.a.n()).toBe(9);
     expect(tree()).toEqual({ rows: { a: { n: 9 } }, other: 0 });
   });
@@ -72,9 +73,9 @@ describe('E — is the conjunction delivered over canonical truth?', () => {
       { enhancers: [timeTravel()] }
     );
 
-    tree.$.rows.addOne({ id: 'a', n: 1 });
+    undoable(() => tree.$.rows.addOne({ id: 'a', n: 1 }));
     await Promise.resolve();
-    tree.$.rows.updateOne('a', { n: 2 });
+    undoable(() => tree.$.rows.updateOne('a', { n: 2 }));
     await Promise.resolve();
     await Promise.resolve();
     expect(tree.$.rows.byIdOrFail('a').n()).toBe(2);

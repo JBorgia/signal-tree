@@ -1,4 +1,5 @@
 import { computed } from '@angular/core';
+import { undoable } from '../lib/undoable';
 
 import { entityMap, signalTree, timeTravel } from '../index';
 import { getCausalWriteMode } from './causal-write-mode';
@@ -77,8 +78,10 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
 
   it('ORDINARY LEAF WRITE — the reference case', async () => {
     const r = await probe(plain, (t) => {
-      (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(
-        2
+      undoable(() =>
+        (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(
+          2
+        )
       );
     });
     expect({
@@ -181,7 +184,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
     );
     const seen = computed(() => tree.$.a.n());
     expect(seen()).toBe(1);
-    tree.$.a.n.set(9);
+    undoable(() => tree.$.a.n.set(9));
     expect(seen()).toBe(9);
   });
 });
@@ -198,7 +201,7 @@ describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENH
       notified.push(String(path))
     );
 
-    tree.$.a.n.set(2);
+    undoable(() => tree.$.a.n.set(2));
     await tick();
     off();
 
@@ -216,7 +219,7 @@ describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENH
       notified.push(String(path))
     );
 
-    tree.$.a.n.set(2);
+    undoable(() => tree.$.a.n.set(2));
     await tick();
     off();
 
@@ -234,7 +237,7 @@ describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENH
       notified.push(String(path))
     );
 
-    tree.$.rows.addMany([{ id: 'a', v: 1 }]);
+    undoable(() => tree.$.rows.addMany([{ id: 'a', v: 1 }]));
     await tick();
     off();
 
@@ -261,8 +264,10 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
 
   it('DIRECT leaf .set()', async () => {
     const r = await capture((t) => {
-      (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(
-        2
+      undoable(() =>
+        (t as unknown as { $: { a: { n: { set(v: number): void } } } }).$.a.n.set(
+          2
+        )
       );
     });
     expect(r.notified).toEqual(['a.n']);
@@ -312,7 +317,7 @@ describe('MUT-1 — the interceptLeafSignals docblock, tested verbatim', () => {
       notified.push(String(path))
     );
 
-    tree.$.user.profile.name.set('b');
+    undoable(() => tree.$.user.profile.name.set('b'));
     await tick();
     off();
 
@@ -360,6 +365,9 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
     await tick();
     const { seen, off } = capture();
 
+    // Deliberately NOT designated. This test's subject is the METADATA an
+    // observer receives, not restoration, so it needs no undoable() — and
+    // leaving it undesignated is what preserves the original finding below.
     tree.$.a.n.set(2);
     await tick();
     off();
@@ -370,11 +378,33 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
     ]);
   });
 
+  it('and DESIGNATING it is what adds a positive marker', async () => {
+    resetPathNotifier();
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
+    await tick();
+    const { seen, off } = capture();
+
+    undoable(() => tree.$.a.n.set(2));
+    await tick();
+    off();
+
+    // The distinction MUT-2 found still holds, and is now sharper: authorship
+    // remains unmarked, while DESIGNATION is marked. They are different
+    // properties, and only the second is positively carried.
+    expect(seen).toEqual([
+      {
+        path: 'a.n',
+        source: null,
+        meta: { mutationIntent: 'replace', restorationDesignated: true },
+      },
+    ]);
+  });
+
   it('UNDO realization — what meta reaches the observer?', async () => {
     resetPathNotifier();
     const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
     await tick();
-    tree.$.a.n.set(2);
+    undoable(() => tree.$.a.n.set(2));
     await tick();
 
     const { seen, off } = capture();
@@ -428,7 +458,7 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
     resetPathNotifier();
     const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
     await tick();
-    tree.$.a.n.set(2);
+    undoable(() => tree.$.a.n.set(2));
     await tick();
     tree.undo();
     await tick();
@@ -449,7 +479,7 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
     await tick();
 
     const { seen, off } = capture();
-    tree.$.a.n.set(2);
+    undoable(() => tree.$.a.n.set(2));
     await tick();
     off();
 
@@ -522,7 +552,7 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
     const before = tree.getHistory().length;
 
     withWriteContext(meta as never, () => {
-      tree.$.a.n.set(1);
+      undoable(() => tree.$.a.n.set(1));
     });
     await tick();
 
@@ -564,10 +594,10 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
     await tick();
     const before = tree.getHistory().length;
     if (meta === null) {
-      tree.$.a.n.set(1);
+      undoable(() => tree.$.a.n.set(1));
     } else {
       withWriteContext(meta as never, () => {
-        tree.$.a.n.set(1);
+        undoable(() => tree.$.a.n.set(1));
       });
     }
     await tick();
@@ -603,7 +633,7 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
     const before = tree.getHistory().length;
 
     withWriteContext({ causalMode: 'realization' } as never, () => {
-      tree.$.balance.set(1_000_000);
+      undoable(() => tree.$.balance.set(1_000_000));
     });
     await tick();
 
@@ -619,7 +649,7 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
     await tick();
     const before = tree.getHistory().length;
 
-    tree.$.balance.set(1_000_000);
+    undoable(() => tree.$.balance.set(1_000_000));
     await tick();
 
     expect(tree.$.balance()).toBe(1_000_000);

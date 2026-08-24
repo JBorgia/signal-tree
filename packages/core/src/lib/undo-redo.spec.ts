@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../lib/undoable';
 
 import { entityMap } from './types';
 import { form } from './markers/form';
@@ -42,8 +43,8 @@ describe('undo/redo restores what the user edited', () => {
     );
 
     for (let i = 1; i <= 3; i++) {
-      tree.$.n.set(i);
-      tree.$.rows.addOne({ id: i });
+      undoable(() => tree.$.n.set(i));
+      undoable(() => tree.$.rows.addOne({ id: i }));
       await flush();
     }
     expect(tree.$.n()).toBe(3);
@@ -65,10 +66,10 @@ describe('undo/redo restores what the user edited', () => {
       { enhancers: [timeTravel()] }
     );
 
-    tree.$.rows.setAll([{ id: 'a' }, { id: 'b' }, { id: 'c' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a' }, { id: 'b' }, { id: 'c' }]));
     await flush();
 
-    tree.$.rows.removeOne('b');
+    undoable(() => tree.$.rows.removeOne('b'));
     await flush();
 
     expect(tree.$.rows.all().map((row) => row.id)).toEqual(['a', 'c']);
@@ -83,9 +84,9 @@ describe('undo/redo restores what the user edited', () => {
       { rows: entityMap<{ id: number }, number>() },
       { enhancers: [timeTravel()] }
     );
-    tree.$.rows.setAll([{ id: 1 }]);
+    undoable(() => tree.$.rows.setAll([{ id: 1 }]));
     await flush();
-    tree.$.rows.addOne({ id: 2 });
+    undoable(() => tree.$.rows.addOne({ id: 2 }));
     await flush();
     expect(tree.$.rows.count()).toBe(2);
 
@@ -99,7 +100,7 @@ describe('undo/redo restores what the user edited', () => {
 describe('tree(partial) writes markers — the same path undo uses', () => {
   it('restores a collection', () => {
     const src = signalTree({ rows: entityMap<{ id: number }, number>() });
-    src.$.rows.setAll([{ id: 1 }, { id: 2 }]);
+    undoable(() => src.$.rows.setAll([{ id: 1 }, { id: 2 }]));
 
     const fresh = signalTree({ rows: entityMap<{ id: number }, number>() });
     fresh(src());

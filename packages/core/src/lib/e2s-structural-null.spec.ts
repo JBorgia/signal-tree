@@ -1,4 +1,5 @@
 import { computed, type Signal } from '@angular/core';
+import { undoable } from '../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
 import { timeTravel } from '../enhancers/time-travel/time-travel';
@@ -50,7 +51,7 @@ function collectionOver(leaf: {
       let s = cache.get(id);
       if (!s) {
         s = computed(() => leaf().find((r) => r.id === id));
-        cache.set(id, s);
+        undoable(() => cache.set(id, s));
       }
       return s;
     },
@@ -74,7 +75,7 @@ describe('E2-S1 — membership reversal', () => {
     ]);
     await tick();
 
-    tree.$.rows.addOne({ id: 'c', n: 3 });
+    undoable(() => tree.$.rows.addOne({ id: 'c', n: 3 }));
     await tick();
     expect(tree.$.rows.ids()).toEqual(['a', 'b', 'c']);
 
@@ -94,13 +95,13 @@ describe('E2-S1 — membership reversal', () => {
       },
       { enhancers: [timeTravel()] }
     );
-    tree.$.rows.addMany([{ id: 'a', n: 1 }]);
+    undoable(() => tree.$.rows.addMany([{ id: 'a', n: 1 }]));
     await tick();
 
     const held = tree.$.rows.byId('a');
     expect(held?.n()).toBe(1);
 
-    tree.$.rows.removeOne('a');
+    undoable(() => tree.$.rows.removeOne('a'));
     await tick();
     expect(held?.n()).toBeUndefined();
 
@@ -113,11 +114,11 @@ describe('E2-S1 — membership reversal', () => {
     const plain = signalTree({
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
     });
-    plain.$.rows.addOne({ id: 'a', n: 1 });
+    undoable(() => plain.$.rows.addOne({ id: 'a', n: 1 }));
     const held = plain.$.rows.byId('a');
     expect(held?.n()).toBe(1);
 
-    plain.$.rows.removeOne('a');
+    undoable(() => plain.$.rows.removeOne('a'));
     expect(held?.n()).toBeUndefined();
 
     plain.$.rows.addOne({ id: 'a', n: 1 }); // SAME key, SAME value, NEW subject
@@ -148,10 +149,10 @@ describe('E2-S2 — key reuse across undo', () => {
       },
       { enhancers: [timeTravel()] }
     );
-    tree.$.rows.addOne({ id: 'k', n: 111 });
+    undoable(() => tree.$.rows.addOne({ id: 'k', n: 111 }));
     await tick();
 
-    tree.$.rows.removeOne('k');
+    undoable(() => tree.$.rows.removeOne('k'));
     await tick();
     tree.$.rows.addOne({ id: 'k', n: 999 }); // a DIFFERENT subject, same key
     await tick();
@@ -176,7 +177,7 @@ describe('E2-S2 — key reuse across undo', () => {
     const tree = signalTree({ rows: [] as Row[] });
     const rows = collectionOver(tree.$.rows);
 
-    tree.$.rows.set([{ id: 'k', n: 111 }]);
+    undoable(() => tree.$.rows.set([{ id: 'k', n: 111 }]));
     tree.$.rows.set([]); // remove
     tree.$.rows.set([{ id: 'k', n: 999 }]); // a different subject reuses the key
 
@@ -184,7 +185,7 @@ describe('E2-S2 — key reuse across undo', () => {
     expect(heldNew()?.n).toBe(999);
 
     // Restore the ORIGINAL value — the best a value-only representation can do.
-    tree.$.rows.set([{ id: 'k', n: 111 }]);
+    undoable(() => tree.$.rows.set([{ id: 'k', n: 111 }]));
 
     // ALIASED. The reference held to the second subject now reports the FIRST
     // subject's data, because a value-keyed lookup cannot tell them apart.

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../lib/undoable';
 import { transactions } from '../enhancers/transactions/transactions';
 
 import { entityMap, signalTree, timeTravel } from '../index';
@@ -58,8 +59,8 @@ describe('history step adapter seam', () => {
     const initialHistoryLength = store.getHistory().length;
 
     const step = store.transaction(() => {
-      store.$.left.set('L1');
-      store.$.right.set('R1');
+      undoable(() => store.$.left.set('L1'));
+      undoable(() => store.$.right.set('R1'));
     });
 
     expect(store.$.left()).toBe('L1');
@@ -83,14 +84,14 @@ describe('history step adapter seam', () => {
   it('keeps ordinary writes outside the demarcated step as separate undo steps', async () => {
     const store = createStore();
     const step = store.transaction(() => {
-      store.$.left.set('L1');
-      store.$.right.set('R1');
+      undoable(() => store.$.left.set('L1'));
+      undoable(() => store.$.right.set('R1'));
     });
     step.confirm();
     await tick();
     const afterConfirmedStep = store.getHistory().length;
 
-    store.$.later.set('Z1');
+    undoable(() => store.$.later.set('Z1'));
     await tick();
 
     expect(store.getHistory()).toHaveLength(afterConfirmedStep + 1);
@@ -115,8 +116,8 @@ describe('history step adapter seam', () => {
 
     expect(() =>
       store.transaction(() => {
-        store.$.left.set('L1');
-        store.$.right.set('R1');
+        undoable(() => store.$.left.set('L1'));
+        undoable(() => store.$.right.set('R1'));
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -133,7 +134,7 @@ describe('history step adapter seam', () => {
     const store = createStore();
     const initialHistoryLength = store.getHistory().length;
     const step = store.transaction(() => {
-      store.$.left.set('L1');
+      undoable(() => store.$.left.set('L1'));
       void Promise.resolve().then(() => store.$.right.set('R1'));
     });
 
@@ -160,7 +161,7 @@ describe('history step adapter seam', () => {
 
     expect(() =>
       store.transaction(() => {
-        store.$.left.set('L1');
+        undoable(() => store.$.left.set('L1'));
         store.transaction(() => store.$.right.set('R1'));
       })
     ).toThrow(/nested transaction/i);
@@ -168,15 +169,15 @@ describe('history step adapter seam', () => {
 
   it('confirms structural entity mutations as one user-recognizable undo step', async () => {
     const store = createEntityStore();
-    store.$.rows.addOne({ id: 1, label: 'keep' });
-    store.$.rows.addOne({ id: 2, label: 'remove' });
+    undoable(() => store.$.rows.addOne({ id: 1, label: 'keep' }));
+    undoable(() => store.$.rows.addOne({ id: 2, label: 'remove' }));
     await tick();
     const initialHistoryLength = store.getHistory().length;
 
     const step = store.transaction(() => {
-      store.$.rows.addOne({ id: 3, label: 'add' });
-      store.$.rows.updateOne(1, { label: 'updated' });
-      store.$.rows.removeOne(2);
+      undoable(() => store.$.rows.addOne({ id: 3, label: 'add' }));
+      undoable(() => store.$.rows.updateOne(1, { label: 'updated' }));
+      undoable(() => store.$.rows.removeOne(2));
     });
 
     expect(store.$.rows.ids()).toEqual([1, 3]);
@@ -235,13 +236,13 @@ describe('history step adapter seam', () => {
 
   it('confirms entity rekey with scalar update as one user-recognizable undo step', async () => {
     const store = createEntityStore();
-    store.$.rows.addOne({ id: 1, label: 'temp' });
+    undoable(() => store.$.rows.addOne({ id: 1, label: 'temp' }));
     await tick();
     const initialHistoryLength = store.getHistory().length;
 
     const step = store.transaction(() => {
-      store.$.rows.changeId(1, 42);
-      store.$.rows.updateOne(42, { label: 'server' });
+      undoable(() => store.$.rows.changeId(1, 42));
+      undoable(() => store.$.rows.updateOne(42, { label: 'server' }));
     });
 
     expect(store.$.rows.ids()).toEqual([42]);
