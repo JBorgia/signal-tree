@@ -5947,6 +5947,129 @@ P11  destroy while a load or save is pending
 P12  repeated reload of the same durable value
 ```
 
+# PER-B · P8-P12 — the boundaries hold, and one finding is NOT ours
+
+No new defects. Two results needed a control to classify correctly, and one of
+them belongs to somebody else.
+
+```text
+P8   async adapter restore     HOLDS. Classification lands on the SYNCHRONOUS
+                               write, and `external(async () => …)` throws
+                               ST1035 rather than silently classifying nothing.
+P9   mixed scope               HOLDS. A reload and an authored write in the SAME
+                               TICK keep their own classifications: theme
+                               external/realized, label authored.
+P10  structural data           HOLDS for classification. See the control below.
+P11  destroy while pending     HOLDS, by design. See below.
+P12  repeated reload           HOLDS. Three reloads of the same durable value:
+                               restoration history unchanged, canUndo unchanged,
+                               no drift. Persistence ran and manufactured nothing.
+```
+
+## ⚠️ P10 — a finding that is NOT a PER-B defect, proved by control
+
+An undo over a whole-array `stored<Row[]>` leaf fails with:
+
+```text
+"Unsupported scoped undo effect at rows"
+```
+
+not with ST1034. The tempting read is that persistence broke restoration. **The
+control refutes it:** a PLAIN array leaf, no `stored()` anywhere, fails with the
+identical message.
+
+```text
+stored<Row[]>  ->  "Unsupported scoped undo effect at rows"
+plain Row[]    ->  "Unsupported scoped undo effect at rows"
+```
+
+So this is a pre-existing scoped-undo limitation for whole-array writes, and PER-B
+walked into it rather than causing it. The OUTCOME is safe — durable truth
+survives — and what is wrong is the DIAGNOSIS a developer receives: a generic
+"unsupported" where the classified refusal would have explained the situation.
+
+**Carried as its own item.** Fixing it means teaching scoped undo about array
+leaves, which is not persistence's job, and the control ships in the spec so the
+distinction cannot be re-blurred later.
+
+## P11 — the late durable write is the STATED design
+
+`writesAfterDestroy: 1`. A debounced save committed after the tree was destroyed,
+and `stored.ts`'s own contract says why:
+
+> Weakness must not be able to outrace durability.
+
+Membership of the pending set tracks PENDING-NESS, not signal lifetime, so an
+armed write commits even if its tree is gone. Losing a user's last setting because
+a per-route tree was torn down is the worse behaviour, and a mobile WebView kill is
+the common case rather than a corner one.
+
+The pre-registered question was *"no late write into dead ownership"*, and the
+refined probe answers the direction that actually matters:
+
+```text
+durable write after destroy   1   intended — the value must not be lost
+TREE write after destroy      0   nothing resurrected state into dead ownership
+```
+
+Those are different questions, and only the second would have been a defect.
+
+## PER-B — DISPOSITION
+
+```text
+null       CAN stored() load and reload durable state while preserving the
+           authored/external distinction, transaction safety and the single
+           restoration authority WITHOUT persistence inventing its own causal
+           semantics?
+answer     YES, once reload() is classified. One misclassification produced two
+           defects; nothing else in persistence claimed causal authority it did
+           not have.
+```
+
+Against the acceptance bar — *persistence may observe and reproduce state, and
+must never manufacture authorship, restoration rights, transaction settlement or
+causal authority merely because data crossed durable storage*:
+
+```text
+authorship              no — reload is realized, autoload is not a causal event
+restoration rights      no — P12 proves repetition manufactures nothing, and
+                        `undoable()` cannot promote a reload
+transaction settlement  no — P5/P7, the commit-scope authority already held
+causal authority        no — no `origin: 'storage'`, no branch on the adapter
+```
+
+And against the falsifier — *if the same authoritative value gets different
+restoration/transaction semantics because the adapter changed, PER-B fails*:
+
+```text
+BEFORE   HTTP via external()  protected by P0-C, excluded from contribution
+         localStorage reload  destroyed by undo, captured into contribution
+AFTER    identical
+```
+
+The remaining difference between a fetch and a disk read is now zero at the causal
+layer, which is what the reference frame demanded: **a durable boundary is not a
+causal-authority boundary.**
+
+## Carried out of PER-B
+
+```text
+whole-array scoped undo   "Unsupported scoped undo effect" where ST1034 belongs.
+                          Pre-existing, control-proved, not persistence's job.
+enhancer-safety.spec.ts   the mock-`.with()` harness-validity item
+```
+
+## Queue
+
+```text
+1  MATRIX-CLOSE                                                      <-- next
+2  Candidate B      only if materially different
+3  TruckTrax passes 2-3
+4  final perf / retention
+5  FULL historical release gate suite (not --fast)
+6  RC / final closure
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
