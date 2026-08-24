@@ -7809,108 +7809,158 @@ overwritten by the compensation. Final state is right, but **storage transiently
 held rolled-back data**, and a crash in that window leaves durable truth holding
 speculative state.
 
-`stored()` does not have this hazard: it CANCELS pending writes on the discard
-outcome (`cancelPending`) rather than merely re-ordering them. So:
+⚠️ **CORRECTED BY A2-3.1.** I recorded this as "deferral alone is insufficient —
+a persister needs the settlement OUTCOME, so it must CANCEL like `stored()`".
+Both halves of that are wrong. See A2-3.1 below: the residue is caused by WHEN
+the persisted value is read, and the shipping surface fixes it without
+cancelling anything. A2-3's arm-B/arm-C result — a LEAF claimant resolves no
+scope and defers nothing — stands unchanged.
 
-> A persister needs the settlement **OUTCOME** — confirmed vs discarded — not just
-> permission to run. Any A2 surface that only asks "may I run now?" reproduces
-> this hazard.
+# A2-3.1 — the throughout-proof, and three findings that reshape A2
 
-That is a genuine constraint discovered by measurement, and it raises the bar for
-the write side: the capability must observe settlement resolution, which is
-another reason the owner is tree-scoped.
+`packages/core/src/lib/a2-3-1-rollback-cancellation.spec.ts`, 4/4 passing. The
+assertion is over EVERY payload that ever reached storage, not the final one — a
+final-state test accepts `light -> dark -> light`, which is the crash window.
 
-## Standing after A2-1, A2-1B, A2-3
+## FINDING 1 — the invariant is value-capture timing, NOT cancellation
 
-```text
-A2-A  marker        weakened. Owns no construction capability for sync sources
-                    (A2-1), cannot accept async sources at all (A2-1B).
-A2-B  per-node      ELIMINATED. Cannot obey settlement from a leaf.
-A2-C  tree-scoped   the only placement that satisfies settlement, and the only
-                    one positioned to observe the discard outcome.
-```
-
-A2-4 now asks whether that same tree scope is also the right owner for the host
-drain across MULTIPLE persisted leaves — or whether production needs something
-wider.
-
-# A2-4 — DRAIN OWNERSHIP: tree-scoped works, and the drain is not an override
-
-`a2-4-drain-ownership.spec.ts`, two persisted leaves, because one cannot
-discriminate the three ownership candidates.
+A2-3 diagnosed its arm-C residue as "deferral alone is insufficient; the persister
+needs the settlement OUTCOME, so it must cancel like `stored()`". Measurement says
+otherwise. Both arms below use the same tree, the same single consequence
+authority and the same `heldByKey` bucket; the only difference is when the value
+is read:
 
 ```text
-one host invocation, two armed writes    both drained          ✓
-host backgrounds MID-TRANSACTION         nothing durable       ✓
-two independent trees                    each drains its own   (see below)
+ARM-TIME capture   closes over the value at write time.   durable = ['dark']  ✗
+RUN-TIME capture   reads the tree inside run().           durable = ['light'] ✓
 ```
 
-## The drain must route through the SAME authority
-
-The second case is the one worth keeping. A host backgrounding mid-transaction is
-the worst possible moment for a naive drain: the app is about to stop, so a
-speculative value written durably may never be corrected — there may be no
-rollback at all.
-
-Routing the drain through `scheduleDurableConsequence` rather than writing
-directly means **the host cannot override settlement.** Nothing became durable,
-and the rollback then discarded the value as normal.
-
-## Cross-tree drain: left OPEN, deliberately
-
-A tree-scoped drain reaches one tree. Whether that is a defect depends on whether
-production needs ONE host event to drain MULTIPLE trees, and **TruckTrax does not
-demonstrate it** — its single drain call site backgrounds one app tree. So a
-process-global drain remains unjustified on the evidence, exactly as the
-pre-registration required.
-
-# ⚠️ NOTIFIER-SCOPE-0 — a defect A2-4 walked into, and it is NOT persistence's
-
-A2-4's control originally used the path `theme` in BOTH trees, and failed:
-`storeA` received tree B's value. Reduced:
+Both deferred correctly while the transaction was open. The arm-time one still
+persisted the discarded value, because a DEBOUNCED persister necessarily lands in
+`heldByKey` — a timer fires after the transaction callback returned, so there is
+no ambient context to file against, and outcome-cancellation is simply not
+available to that shape. A2-3's prescription was unavailable to the very shape
+that needed it.
 
 ```text
-same path, SAME tick, two trees    ONE event delivered — 'theme=B1'.
-                                   Tree A's write NEVER reached the stream.
-same path, SEPARATE ticks          both delivered
-DIFFERENT paths, same tick         both delivered
+INVARIANT      no durable payload may EVER contain a discarded value
+stored()       captures in the mutation's own stack  -> MUST cancel
+persistence()  reads the tree inside run()           -> nothing to cancel
 ```
 
-**The path notifier coalesces by PATH STRING within a flush, with no tree
-qualification.** Two independent trees writing the same path in one tick produce
-one notification, and the earlier write is invisible to every `**` observer.
+Two sufficient strategies. A durability capability must pick one **explicitly**;
+routing through the consequence authority does not confer safety by itself.
 
-Who is exposed: anything observing the global stream rather than its own tree's
-interceptors — the **diagnostic journal** (which would record one effect and
-attribute the wrong tree's value), **devTools**, and any future capability built
-on `subscribe('**')`. Restoration and transactions are largely insulated because
-they capture through per-tree leaf interceptors.
+## FINDING 2 — a post-construction capability has NO observation seam, by contract
+
+Building the persister on `interceptLeafSignals` (the per-tree seam, synchronous
+with the write) measured:
 
 ```text
-CARRIED, not fixed here. This is a shared-observation-seam defect that A2 merely
-walked into — the same shape as the whole-array scoped undo that MATRIX-CLOSE
-carried to RESTORE-P1. Fixing it means tree-qualifying notifier identity, which is
-not persistence's job and must not expand A2 into a notifier redesign.
+bare tree                interceptor fires        ✓
+tree with restoration()  fires ZERO times         ✗
 ```
 
-Its severity depends on how common multi-tree apps with colliding paths are —
-plausible for per-route trees, all of which might have a `loading` or `theme`
-leaf. That assessment is owed before RC.
+Not stacking displacement — an explicit refusal. Enhanced leaves carry
+`__emitsMutations`, and `interceptLeafSignals` returns early on
+`hasIntrinsicMutationEmitter(node)`: the node emits its own mutations, so wrapping
+it would double-count. Its own JSDoc already says "queued for hostile audit under
+MUT; do not build new consumers on it."
 
-# A2 — standing after 1, 1B, 3, 4
+That leaves an outside observer nothing synchronous:
 
 ```text
-A2-A  marker        owns no construction capability for sync sources; cannot
-                    accept async sources at all
-A2-B  per-node      ELIMINATED — cannot obey settlement from a leaf
-A2-C  tree-scoped   satisfies settlement, drains multiple leaves from one call,
-                    and keeps the host from overriding settlement
+interceptLeafSignals        refused on any enhanced tree — i.e. always
+pathNotifier.subscribe      fires at FLUSH, after the ambient context is gone
+pathNotifier.intercept      also inside _runNotify, so also at flush
 ```
 
-Owed before A2 closes: **A2-2** (live reload reaches external/realized through
-the proposed surface) and **A2-5** (teardown matches PER-B P11), plus the
-constraint A2-3 discovered — the capability must observe the settlement OUTCOME
-and cancel discarded writes, not merely defer them.
+> **A2-C is an ENHANCER, not a post-construction function.** `persistence(tree)`
+> called after construction cannot work. The `const durability = persist(tree)`
+> shape the design discussion was converging on is ruled out by measurement.
+
+## FINDING 3 — the tree-scoped persistence ENHANCER already ships
+
+```text
+persistence(config)   EXPORTED from the root barrel
+                      Enhancer<SerializationMethods & PersistenceMethods>
+                      { save(), load(), clear(), __flushAutoSave? }
+                      StorageAdapter is async-tolerant (T | Promise<T>)
+```
+
+It is already settlement-correct and already run-time-capture: autoSave debounces,
+then routes through `scheduleDurableConsequence({claimant: tree, key: autoSaveKey})`
+with one collapsing token per enhancer instance, serialises inside `run`, and
+`cancelDurableConsequence`s on `destroy()`. `persistence-commit-ordering.spec.ts`
+already carries a throughout-assertion for rollback, and M6's S6 probe proved that
+deference fails closed when the boundary is disabled.
+
+**So A2's placement question is answered by something that already exists.**
+
+```text
+A2-A  declaration marker          falsified (A2-1, A2-1B)
+A2-B  per-node composition        falsified (A2-3 arm B)
+A2-C  post-construction function  falsified (A2-3.1 Finding 2)
+A2-C' TREE-SCOPED ENHANCER        survives — and already ships
+```
+
+## What is actually left of A2
+
+```text
+1  PER-LEAF SELECTION AND KEYING
+   persistence() persists the WHOLE TREE under ONE key. TruckTrax has SEVEN
+   individually-keyed leaves that are a subset of the tree. Whole-tree would
+   persist transient UI state nobody wants durable, and would migrate a shipped
+   app from seven storage keys to one.
+
+2  THE DRAIN (A2-4)
+   `__flushAutoSave` is underscore-prefixed, optional, and documented "for
+   testing" — and it calls `enhanced.save()` DIRECTLY, bypassing
+   `scheduleDurableConsequence`. So the only existing drain is both non-public
+   and settlement-unsafe: invoked mid-transaction it writes speculative state,
+   at exactly the moment (app backgrounding) when no rollback may ever arrive.
+   That is a real gap, not a spelling question.
+```
+
+A2-2 and A2-5 now run against the shipping `persistence()` enhancer rather than a
+hypothetical surface.
+
+# A2-2 — the tree-scoped surface had the marker's old defect. Found and fixed
+
+`packages/core/src/lib/a2-2-tree-scoped-rehydration.spec.ts`, 3/3.
+
+PER-B P2 settled that a durable re-read is a REALIZATION of external truth, and
+P4 showed the cost of getting it wrong: an authored reload contributes to an
+enclosing transaction and is rolled back with it. A2-3.1 established that the
+surviving placement is the tree-scoped enhancer — so A2-2 asked the same question
+one level up, with PER-B's observer verbatim so the results are comparable.
+
+```text
+persistence().load()   { origin: null, participation: null }   AUTHORED   ✗
+ordinary write         { origin: null, participation: null }   AUTHORED   ✓ control
+stored().reload()      { origin: 'external', participation: 'realized' }  ✓ known-positive
+```
+
+One emitted write, classified authored. The control and the known-positive both
+pass in the same file, so the observer discriminates and the zero is not an
+artifact — the payload was also round-tripped through the enhancer's own
+`save()` rather than a hand-written envelope, after a guessed shape made `load()`
+a silent no-op on the first attempt.
+
+**Fixed** in `serialization.ts`: `load()` now applies the deserialization inside
+`withWriteContext({ ...ambient, origin: 'external', participation: 'realized' })`,
+the same spelling `stored().reload()` uses. Only the SYNCHRONOUS application is
+wrapped — the `await` is the storage READ, so this is not the async application
+ST1035 refuses. Full core suite green afterwards (1895 passed).
+
+```text
+A2 has now found TWO defects in persistence()'s neighbourhood:
+  A2-3.1   the only drain (`__flushAutoSave`) is non-public AND bypasses
+           settlement
+  A2-2     tree-scoped rehydration was classified as authored work
+Both were invisible while A2 argued about placement instead of measuring the
+surface that already ships.
+```
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
