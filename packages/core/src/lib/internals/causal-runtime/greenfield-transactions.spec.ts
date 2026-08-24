@@ -123,7 +123,6 @@ const createLiveDraftHarness = (
       return withWriteContext(
         {
           intent: 'user',
-          origin: 'user',
           transactionId: turnId,
           transactionOwner,
         },

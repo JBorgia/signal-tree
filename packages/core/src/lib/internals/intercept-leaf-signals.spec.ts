@@ -41,7 +41,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     const { list, onWrite } = captureWrites();
     const restore = interceptLeafSignals(tree, onWrite);
 
-    withWriteContext({ intent: 'hydrate', origin: 'serialization' }, () => {
+    withWriteContext({ intent: 'hydrate', origin: 'external' }, () => {
       tree.count.set(1);
     });
 
@@ -52,7 +52,7 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
     expect(list[0].prev).toBe(0);
     expect(list[0].meta).toEqual({
       intent: 'hydrate',
-      origin: 'serialization',
+      origin: 'external',
       mutationIntent: 'replace',
     });
 

@@ -91,7 +91,7 @@ describe('stored() and replay side effects', () => {
     withWriteContext(
       {
         intent: 'system',
-        origin: 'serialization',
+        origin: 'external',
         transactionId: 7,
         transactionOwner: owner,
       },
@@ -111,7 +111,7 @@ describe('stored() and replay side effects', () => {
       ownerPath: 'k',
       meta: {
         intent: 'system',
-        origin: 'serialization',
+        origin: 'external',
         transactionId: 7,
         transactionOwner: owner,
         mutationIntent: 'replace',

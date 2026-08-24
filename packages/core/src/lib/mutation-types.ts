@@ -80,21 +80,15 @@ export interface WriteMetadata {
    * `'application'` value: nothing needs to distinguish "no origin recorded"
    * from "authored by the application", and stamping every write to say so
    * would cost the common path for no consumer's benefit.
+   *
+   * Three spellings were withdrawn in 15.0 because they named no owner:
+   * `'system'` was fabricated provenance (the realization adapter's
+   * `?? 'system'` fallback, seven sites, deleted); `'user'` duplicated the
+   * meaningful absence above; `'serialization'` claimed a provenance nothing
+   * ever stamped. A positive origin exists when provenance carries semantic
+   * information — not because the union previously admitted the spelling.
    */
-  origin?:
-    | 'restoration'
-    | 'devtools'
-    | 'external'
-    // ⚠️ THREE ORPHANS. After A1 and the batch-1 sweep, no production caller
-    // assigns these and no consumer reads them: `'system'` was only ever the
-    // realization adapter's fabricated fallback (seven sites, now deleted),
-    // `'user'` is redundant with absence, and nothing tags a deserialize.
-    // Retained here for one release rather than deleted inside a rename batch —
-    // withdrawing a public union member is a surface disposition and belongs to
-    // the RC public-disposition process, not to a vocabulary sweep.
-    | 'serialization'
-    | 'user'
-    | 'system';
+  origin?: 'restoration' | 'devtools' | 'external';
   /** Suppress guardrails for this update. */
   suppressGuardrails?: boolean;
   /** Optional correlation ID for related updates. */
