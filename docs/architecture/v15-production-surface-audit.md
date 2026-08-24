@@ -9059,9 +9059,8 @@ observers      BLIND to restoration, and to every other replayed write
 link()         would leave Y holding the pre-undo value forever
 ```
 
-That is a harder failure than the double-charge EGRESS-1 was written to expose,
-and it must be fixed before an observer can be trusted for state sync. Fixing it
-moves the `undo` row to `fires ✗ fatal`, STRENGTHENING the falsification.
+⚠️ **FIXED — see OWNER-REPLAY-1 below.** The `undo` row moved from `SILENT` to
+`2 fires ✗ fatal`, which strengthened the falsification exactly as predicted.
 
 # ERROR-SURFACE-0 — the reporter is not central, and its vocabulary is dead
 
@@ -9103,6 +9102,65 @@ arrives vite-prefixed (`/@fs/...`) and `cwd()` is the workspace root, not
 vitest's `--root`. Either mistake would have scanned nothing and "confirmed" the
 finding for entirely the wrong reason, so the file now asserts it can see
 `signal-tree.ts` before counting anything.
+
+# OWNER-REPLAY-1 — the ownership invariant, completed
+
+`packages/core/src/lib/owner-replay-1.spec.ts`, 3/3. The invariant is promoted:
+
+```text
+WAS  ordinary mutations name their owning tree
+IS   EVERY SignalTree-owned mutation delivered through the notifier names its
+     owning tree — authored, external, restoration, rollback, DevTools or
+     structural replay alike
+```
+
+## ⚠️ It was TWO edits, not twenty-four
+
+The 24 `notifier.notify(...)` sites were a red herring, and the inventory said so
+before anything was changed. Measured meta shapes:
+
+```text
+authored   { mutationIntent, ownerId }                    via emitOwnedMutation ✓
+replay     { intent: 'system', participation, positionIds }                     ✗
+```
+
+Replay metas are built by spreading `getActiveWriteContext()`, and each replay
+already runs inside ONE `withWriteContext` wrap. Stamping the namespace there
+reaches every downstream site — including the realization adapter's SEVEN
+`intent: 'system'` builders — and a new replay site inherits it without anyone
+remembering to. That is what "structurally unavoidable" buys over an enumeration.
+
+```text
+restoration.ts   the wrap around `realizationPort.applyAtomically(...)`
+transactions.ts  the wrap around the compensation
+```
+
+⚠️ The first attempt stamped the WRONG wrap — `restoreState`'s, which is not the
+path `undo()` takes. The measurement said so immediately (the event still
+arrived with no namespace), and the ST1034 stack from an earlier probe was what
+pointed at `applyTurnEffectsThroughRealizationPort` instead.
+
+## Verified
+
+```text
+authored / external / restoration / rollback   ALL carry the namespace
+two trees, same path, same local positionId    never borrow each other's
+an owner-filtered observer now SEES a restoration:  [2, 1], was [2]
+```
+
+Mutation-checked: dropping restoration's `ownerId` fails 3 of 3; dropping
+rollback's fails 1 of 3.
+
+NOTIFIER-SCOPE-0's authority tests re-run green, so completing the invariant did
+not weaken tree isolation — the guards accept an absent namespace by design, and
+there are now fewer writes that have one.
+
+## Test-design note
+
+The first version of the preregistration put an `external()` acquisition BETWEEN
+the authored turn and the undo, and the undo refused with ST1034 — P0-C
+protecting acquired truth, exactly as LINK-0 measured. Sequencing the
+acquisition after the undo keeps the test on its own question.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
