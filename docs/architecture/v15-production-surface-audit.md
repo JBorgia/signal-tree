@@ -6186,6 +6186,142 @@ CARRIED NON-MATRIX       [item] — real, but architecturally orthogonal
 > dimension and a falsifiable proof — and every unexplained residue is either
 > DELETED or explicitly CARRIED outside the matrix.**
 
+# MATRIX-CLOSE · pass 1 — the carried residue, and the M1/M10/M11 sweeps
+
+## ITEM 1 — the mock `.with()` was worse than stale vocabulary. DELETED
+
+`enhancer-safety.spec.ts` contained seven tests over a hand-built
+`createMockTree()` whose `.with()`, duplicate check AND dependency check were all
+implemented **in the test file**. It threw
+
+```text
+"Enhancer X has already been applied to this tree"
+```
+
+a string that does not exist anywhere in the product. The file called
+`signalTree()` **zero** times.
+
+```text
+what it looked like   coverage of enhancer duplicate/dependency safety
+what it was           the test asserting that the TEST's reimplementation worked
+                      — unable to fail for a product reason, over a method 15.0
+                      deleted
+```
+
+The real behaviour is covered against real trees in
+`lib/enhancer-metadata-authority.spec.ts` — duplicate detection by name,
+requirement satisfaction by capability, fail-closed before any enhancer runs,
+declaration-order independence, a throwing enhancer aborting construction — with
+the messages the library actually emits (`"dup" is configured 2 times`).
+
+Deleted, with the metadata block that DID touch real code kept, and the
+deletion's reasoning recorded in the file so it cannot be reintroduced as
+"missing coverage".
+
+## ITEM 2 — CLASSIFIED, and it splits in a way that stops a sweep
+
+The whole-array undo diagnosis (`"Unsupported scoped undo effect at rows"`):
+
+```text
+CAPABILITY LIMITATION   `isSupportedEffect` accepts a 'set' only when before and
+                        after are scalar, or when the write is not at its owner
+                        path. A root-level non-scalar leaf satisfies neither, so
+                        a whole-array replacement cannot be reversed by scoped
+                        undo at all. That is RESTORE-P1 design work, NOT residue.
+                        -> CARRIED OUT of the matrix, as pre-registered.
+
+DIAGNOSTIC RESIDUE      the throw carries no ST code, so `check-error-codes`
+                        cannot see it and a user has nowhere to land.
+```
+
+⚠️ **And the diagnostic half turned out to be a CLASS, not an instance.** There
+are **149** uncoded `throw new Error(...)` sites in core outside specs. Giving
+this one a code would be arbitrary — fixing one of 149 is worse than fixing none,
+because it implies the other 148 were considered.
+
+```text
+NEW CARRIED ITEM   uncoded user-facing throws (149 sites). Needs triage —
+                   most are probably internal invariant violations no user can
+                   reach, and the gate only polices ST-prefixed codes, so the
+                   distinction has never been drawn. That is its own workstream.
+```
+
+This is the pre-registration working: MATRIX-CLOSE was told to classify before
+fixing, and classifying is what revealed that the tempting fix was one arbitrary
+edit inside an unexamined class.
+
+## M1 — policy derived from origin: ONE branch, and it is CORRECT
+
+Five live `origin ===` branches. Four are self- or foreign-filtering (*don't
+observe my own output*, *another authority's replay is not my business*) plus one
+coalescing-identity check, none of which derives policy from provenance.
+
+The fifth is real policy — and it is the strongest evidence in the repo that
+`origin` earns its axis:
+
+```ts
+// signal-tree.ts
+function currentHydrateMode(): 'merge' | 'restore' {
+  return getActiveWriteContext()?.origin === 'restoration' ? 'restore' : 'merge';
+}
+```
+
+An UNDO must land the user exactly where they were; a REHYDRATE crosses a process
+boundary and must normalise. **Participation cannot make that distinction** —
+restoration and external truth are both `'realized'`, and a server refresh must
+merge while an undo must restore. Only origin separates them.
+
+> So `origin` is a DIAGNOSTIC axis with exactly one policy consumer, by design.
+> That is not M1; it is the two-axis result being load-bearing. And it sharpens
+> the prohibition rather than weakening it: policy keys on PARTICIPATION unless
+> the question is literally *which authority replayed this*.
+
+## M2 — the origin values, each with a named consumer
+
+```text
+'restoration'           4 code consumers (restoration self-filter, transactions
+                        x2, currentHydrateMode)
+'devtools'              diagnostic display — the Redux action metadata a human
+                        reads in the panel
+'external'              diagnostic display, same
+'transaction-rollback'  DIAG-JOURNAL-1.1's correlation consumer
+```
+
+Three of four have only DISPLAY consumers, and that is correct rather than
+suspicious: provenance exists to be read by a person debugging. M2 targets
+metadata with NO consumer, which none of these are. Note also that `stored()` and
+`write-participation.ts` both carry comments stating they deliberately do NOT key
+on origin — the prohibition is documented at the sites most likely to break it.
+
+## M10 — no hidden second authority
+
+```text
+restoration admission   `isTurnEligible` appears ONLY in restoration.ts, and
+                        `restorationDesignated` only in restoration-eligibility.ts
+settlement              `openCommitScope`/`settleCommitScope` in transactions.ts
+                        and commit-consequence.ts — the latter being the single
+                        commit-scope authority by design, not a second one
+```
+
+## M11 — no transport-specific causal policy
+
+Zero hits for adapter/storage/http/socket/worker branches affecting causal
+semantics. PER-B removed the only one that existed.
+
+## ⚠️ Sweep status, stated rather than implied
+
+```text
+SWEPT      M1, M2, M4 (item 1), M10, M11
+NOT YET    M3, M5, M6, M7, M8, M9
+```
+
+M6 (green-for-the-wrong-reason) is the expensive one and the most valuable; it
+cannot be done by grep and needs mechanism-removal probes per primitive. Recorded
+as owed rather than quietly skipped.
+
+Verified by exit code: nx test core (1883 passed / 209 files — seven mock-only
+tests deleted), nx lint core, npm run typecheck, verify-gates --fast 36/36.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
