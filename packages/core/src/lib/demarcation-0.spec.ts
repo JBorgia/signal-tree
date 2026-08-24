@@ -374,18 +374,19 @@ describe('DEMARCATION-0: what an ordinary Angular effect sees', () => {
 // A surface limitation found while measuring
 // ───────────────────────────────────────────────────────────────────────────
 
-describe('DEMARCATION-0: an entityMap NODE is not a linkable location', () => {
-  it('⚠️ it resolves no registry, so a link on it is refused', async () => {
+describe('DEMARCATION-0: the entityMap ownership gap this file found', () => {
+  it('⚠️ FIXED by OWNER-LOCATION-0 — it now names its owning tree', async () => {
     const tree = collectionTree();
     await flush();
 
-    // Leaves and branch accessors both name their owning tree (OWNER-REPLAY-2),
-    // but a marker-materialised collection node is neither and was never given
-    // one. So `link(tree.$.data.rows, endpoint)` cannot be written.
-    expect(getPositionRegistry(tree.$.data.rows)).toBeUndefined();
-    expect(() => observeCommitted(tree.$.data.rows, () => void 0)).toThrow(
-      /owned SignalTree location/
+    // Measured when this file was written: `undefined`, and the observer
+    // refused. OWNER-LOCATION-0 then found the same gap in `stored()` and fixed
+    // BOTH at the marker construction boundary — not for link's benefit, but
+    // because an addressable position must name its owner.
+    expect(getPositionRegistry(tree.$.data.rows)).toBe(
+      getPositionRegistry(tree.$)
     );
+    expect(() => observeCommitted(tree.$.data.rows, () => void 0)).not.toThrow();
   });
 
   it('...and the PARENT BRANCH covers it, so link is not blocked', async () => {

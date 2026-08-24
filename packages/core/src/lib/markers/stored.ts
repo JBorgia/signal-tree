@@ -8,6 +8,10 @@ import {
   wrapOwnedWritableSignal,
 } from '../internals/owned-mutation';
 
+import {
+  definePositionRegistry,
+  type PositionRegistry,
+} from '../internals/position-registry';
 import { getActiveWriteContext, withWriteContext } from '../write-context';
 import { isInspectionWrite } from '../write-participation';
 import { scheduleDurableConsequence } from '../internals/commit-consequence';
@@ -533,11 +537,16 @@ export function createStoredSignal<T>(
     hasCapability?: (capability: TreeCapability) => boolean;
     allocatePositionId: (parentPositionId?: number) => number;
     /**
-     * Per-tree identity. Kept `unknown` because this marker only ever compares
-     * it by reference — it proves which tree a write belongs to, and must not
-     * grow a dependency on the registry's shape.
+     * Per-tree identity.
+     *
+     * This was kept `unknown` on the grounds that the marker only ever compared
+     * it by reference. OWNER-LOCATION-0 changed that: a `stored()` node is an
+     * ADDRESSABLE POSITION and must be able to NAME its owning tree, which needs
+     * both the registry object (for `getPositionRegistry`) and its `id` (for the
+     * namespace on emitted mutations). The dependency is on two stable members,
+     * not on the registry's internals.
      */
-    positionRegistry?: unknown;
+    positionRegistry?: PositionRegistry;
   },
   parentPositionId?: number
 ): StoredSignal<T> {
@@ -880,10 +889,19 @@ export function createStoredSignal<T>(
   const rawSet = sig.set.bind(sig);
 
   if (ownerPath && hasMutationCapture) {
+    // OWNER-LOCATION-0. The registry is attached at the leaf/branch
+    // construction sites in `signal-tree.ts`; a MARKER builds its own node, so
+    // it must name its owner itself. Without this a `stored()` node carries a
+    // positionId and an ownerPath — it is an addressable position — while being
+    // unable to say which tree it belongs to.
+    if (ownerRegistry) {
+      definePositionRegistry(sig as object, ownerRegistry);
+    }
     wrapOwnedWritableSignal(sig, {
       path: ownerPath,
       ownerPath,
       positionIds,
+      ownerId: ownerRegistry?.id,
     }, {
       afterSet: (value) => {
         saveToStorage(value);

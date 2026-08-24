@@ -9562,7 +9562,12 @@ Both SYNCHRONISATION SCOPE and VALUE SHAPE change.
 reasoning this audit refuses. The question is whether every addressable position
 should name its owner. Recorded for that decision, not taken here.
 
-# LINK-HANDLE-0 — `settled()` frozen, and the candidate shrank twice
+# LINK-HANDLE-0 — strong OUTBOUND settlement earned; whole-Link settlement still open
+
+⚠️ An earlier draft of this heading said `settled()` was FROZEN. It is not: this
+file's own record says whether an in-flight `retrieve()` participates is an open
+contract question, so the honest claim is "strong outbound settlement earned,
+one discriminator remaining" — see LINK-HANDLE-1.
 
 `packages/core/src/lib/link-handle-0.spec.ts`, 10/10.
 
@@ -9640,6 +9645,125 @@ endpoint let a send complete inside the microtask `await settled()` already
 yields; a microtask-fast `confirm()` never exercised the held-observation wait;
 and disposing while a send was in flight exited through the wrong branch. Each
 is noted at the arm it affected.
+
+# OWNER-LOCATION-0 — the NULL is falsified. entityMap was NOT exceptional
+
+`packages/core/src/lib/owner-location-0.spec.ts`, 3/3.
+
+An inventory BEFORE any invariant, because the tempting move — hand collections a
+registry so `link()` accepts them — would choose the fix by what one API wants.
+
+```text
+                     positionId  ownerPath  registry
+tree (root)              n          n          Y
+tree.$ (namespace)       Y          Y          Y
+branch accessor          Y          Y          Y
+leaf / nested leaf       Y          Y          Y
+compared node            Y          Y          Y
+entityMap node           Y          Y          n   <- addressable, unowned
+stored node              Y          Y          n   <- addressable, unowned
+asyncSource node         n          n          n   <- not addressable at all
+```
+
+**Two positions, not one.** The pattern is mechanical rather than semantic: the
+registry is attached at the leaf/branch construction sites in `signal-tree.ts`,
+and a MARKER builds its own node, so both marker-constructed positions missed it.
+`compared` has it only because it routes through `wrapLeafSignal`.
+
+So the invariant the inventory supports — distinct from OWNER-REPLAY-2's, which
+is about MUTATIONS:
+
+> **Every independently addressable SignalTree state position names its owning
+> PositionRegistry.**
+
+Fixed at the two MARKER CONSTRUCTION BOUNDARIES, `stored.ts` and
+`entity-map.ts` — not at `link()`, and not by special-casing collections.
+Mutation-checked: dropping either fails 2 of 3. Verified across trees — two
+collections at the same path resolve different registries, each the one its own
+tree resolves, while the local position numbers still collide (the namespace is
+named, not eliminated).
+
+`stored.ts` had typed its context registry as opaque `unknown` "because this
+marker only ever compares it by reference". That is no longer true and the
+comment now says why.
+
+Two earlier pins flipped as a result: DEMARCATION-0's "an entityMap node is not a
+linkable location" and ENTITY-LINK-0's "only the registry is missing".
+
+# LINK-COLLECTION-0 — the NULL survives. `Row[]` is the collection's value
+
+`packages/core/src/lib/link-collection-0.spec.ts`, 9 pass + 1 KNOWN RED.
+
+Ownership does not settle the VALUE contract: a collection is still not an
+ordinary callable writable location. The candidate resolves the shape FROM THE
+NODE rather than from configuration —
+
+```text
+read     rows.all()
+acquire  external(() => rows.setAll(value))
+value    Row[]
+```
+
+— and nothing marker-specific reaches the public surface.
+
+```text
+acquisition applies through setAll, no echo back to Y        ✓
+acquisition is EXTERNAL — zero restoration history           ✓
+addMany is ONE outbound snapshot, not N                      ✓
+rollback never leaks a speculative collection                ✓
+restoration reconciles to the FINAL restored collection      ✓
+a pushed whole snapshot REPLACES rather than merges          ✓
+two trees at the same collection path stay isolated          ✓
+dispose stops the relationship                               ✓
+```
+
+## ⚠️ NESTED-COLLECTION-ROLLBACK-0 — a defect found here, and it is not link's
+
+```text
+{ rows: entityMap }            transaction rollback of addOne   WORKS
+{ data: { rows: entityMap } }  the SAME rollback                REFUSES,
+                               and the speculative row SURVIVES
+```
+
+`SignalTreeRollbackError` is thrown and the tree is left holding state a
+transaction explicitly withdrew. **Verified pre-existing** — identical result
+with the OWNER-LOCATION-0 change stashed. Same severity class as
+NOTIFIER-SCOPE-0, carried as its own item and pinned `it.fails`; the link arm
+uses a top-level collection so link's question stays link's question.
+
+# LINK-HANDLE-1 — an in-flight `retrieve()` DOES participate in `settled()`
+
+`packages/core/src/lib/link-handle-1.spec.ts`, 5/5.
+
+```text
+EXCLUDED   settled() resolves BEFORE the acquisition lands, and the link then
+           mutates X after the caller was told the relationship was settled —
+           the same misleading shape as the WEAK outbound reading
+INCLUDED   waits for the retrieval, its acquisition, AND outbound work the
+           acquisition causes
+```
+
+`retrieve()` having its own promise is not sufficient to exclude it:
+per-operation promises and whole-object idle promises routinely coexist, and
+`retrieve()` is a method ON THE HANDLE that can mutate X. Disposal releases a
+`settled()` waiting on a retrieval, and the late value is still not applied.
+
+Mutation-checked: removing retrieval participation fails 1 of 5; leaving
+retrieval waiters unreleased on dispose fails 1 of 5.
+
+## The multi-failure contract
+
+```text
+set(A) rejects, set(B) rejects, then settled()
+  -> BOTH failures happen; ONE is reported (the latest)
+```
+
+Chosen as the minimum that makes no false claim: `settled()`'s contract is *this
+relationship is caught up*, and a rejection communicates *it is not*. WHICH
+failure is reported is not part of that claim, and the latest describes the most
+recent attempt. **No AggregateError is invented** — no case has been shown where
+a caller acts differently on two failures than on one, and inventing a richer
+error shape is the same move as inventing retry or status.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 

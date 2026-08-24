@@ -66,14 +66,16 @@ describe('ENTITY-LINK-0: what identity does a collection already carry?', () => 
     expect(getOwnedOwnerPath(page)).toBe('data.page');
     expect(getPositionRegistry(page)).toBe(registry);
 
-    // The collection carries the SAME two facts — a position id allocated from
-    // this tree's registry, and its own owner path. It is a position in the
-    // topology by every measure except the one link needs.
+    // The collection carries the SAME facts as the leaf beside it — a position
+    // id allocated from this tree's registry, and its own owner path.
     expect(getOwnedPositionIds(rows)).toBeDefined();
     expect(getOwnedOwnerPath(rows)).toBe('data.rows');
 
-    // ⚠️ AND ONLY THIS IS ABSENT.
-    expect(getPositionRegistry(rows)).toBeUndefined();
+    // ⚠️ THIS WAS ABSENT, AND IS THE FINDING THIS FILE EXISTS FOR. Measured
+    // when written: `undefined`. OWNER-LOCATION-0 then showed `stored()` had
+    // the identical shape — so the gap was never entityMap-specific — and fixed
+    // both at the marker construction boundary.
+    expect(getPositionRegistry(rows)).toBe(registry);
   });
 
   it('and the topology treats it as its own position — restoration reverses it alone', async () => {
@@ -169,7 +171,7 @@ describe('ENTITY-LINK-0: is parent-branch linking the SAME thing?', () => {
  * collection carries a positionId from the tree's registry   ✓
  * collection carries its own ownerPath                       ✓
  * restoration reverses it as its own position                ✓
- * collection carries the REGISTRY back-reference             ✗
+ * collection carries the REGISTRY back-reference             ✗ -> FIXED
  * ```
  *
  * So `entityMap` is ALREADY an independently addressable SignalTree position —
