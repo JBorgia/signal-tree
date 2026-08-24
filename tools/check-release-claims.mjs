@@ -363,11 +363,7 @@ const EXEMPT = new Map(
     // These are declines WITH a stated deadline, not silent gaps. Each is a
     // real public config member today; each is slated to be deleted or
     // reconciled before 15.0 ships. If any of them survives to release, the
-    // exemption is wrong and it must be documented instead.
-    restorationEligibility:
-      'HIST-C2 prototype switch. Exists only so the existing suites can run ' +
-      'under the old default while the door is characterised, and is deleted ' +
-      'when the default flips. Implementation vocabulary; never a shipped option',
+    // exemption is wrong and it must be documented instead.      'when the default flips. Implementation vocabulary; never a shipped option',
   })
 );
 

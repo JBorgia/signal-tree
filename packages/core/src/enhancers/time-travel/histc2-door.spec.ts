@@ -9,8 +9,11 @@ import { timeTravel } from './time-travel';
 import { transactions } from '../transactions/transactions';
 
 /**
- * HIST-C2 — the ten pre-registered door cases, run against the prototype in
- * `restorationEligibility: 'designated'` mode.
+ * HIST-C2 — the ten pre-registered door cases.
+ *
+ * Written against the temporary `restorationEligibility: 'designated'` switch;
+ * that switch is gone and opt-in is simply the default, so the cases now run
+ * against the shipped semantics unchanged.
  *
  * `withRestorationDesignation` stands in for whatever the public spelling turns
  * out to be (`undoable(...)`, `tree.undoable(...)`, …). The name is NOT the
@@ -33,7 +36,7 @@ const flush = async () => {
  * the enhancer methods on the inferred type.
  */
 const ttDesignated = () =>
-  timeTravel({ maxHistorySize: 50, restorationEligibility: 'designated' as const });
+  timeTravel({ maxHistorySize: 50 });
 
 const makeTree = () =>
   signalTree(

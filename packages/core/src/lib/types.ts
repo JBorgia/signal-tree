@@ -44,27 +44,16 @@ export interface TimeTravelConfig {
    */
   includePayload?: boolean;
 
-  /**
-   * ⚠️ TEMPORARY — the instrument for the opt-in default flip, and nothing else.
-   *
-   * - `'all'`: every authored turn is recorded (the pre-15.0 semantic).
-   * - `'designated'`: only turns containing an `undoable()` write are recorded,
-   *   and a non-eligible turn acquires neither a history entry nor restoration
-   *   claims.
-   *
-   * This exists ONLY so the existing suites can keep running under the old
-   * semantic while the flip is executed and its failures classified. It is
-   * implementation vocabulary, not a product option: an application should say
-   * `undoable(...)`, never configure an eligibility MODE.
-   *
-   * **Deleted once `'designated'` is the default and survives.** If you are
-   * reading this in a released version, that deletion was missed and this option
-   * is a bug.
-   *
-   * @internal
-   * @default 'all'
-   */
-  restorationEligibility?: 'all' | 'designated';
+  // `restorationEligibility` was DELETED in 15.0, having done its only job.
+  //
+  // It existed to execute the opt-in default flip: 'all' kept the pre-15.0
+  // semantic while the suite migrated, 'designated' was the target. Once
+  // 'designated' was the default and 1811 tests passed under it, a public
+  // eligibility MODE would have been a second restoration-admission door
+  // competing with `undoable()` — which is the duplication this release spent
+  // its time deleting elsewhere.
+  //
+  // Restoration admission has exactly one public door: `undoable()`.
 
   /**
    * Custom action names for different operations
