@@ -74,9 +74,13 @@ describe('TURN-FEED-0 case 2: confirmation', () => {
     await flush();
     const before = tree.getHistory().length;
 
-    const pending = tree.transaction(() => {
-      tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
-    });
+    // Designated: this case asserts the confirmed transaction becomes exactly
+    // ONE admitted turn, which requires it to be admitted at all.
+    const pending = undoable(() =>
+      tree.transaction(() => {
+        tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
+      })
+    );
     await flush();
     pending.confirm();
     await flush();
@@ -165,11 +169,15 @@ describe('TURN-FEED-0 case 4: surrounding writes', () => {
     await flush();
     const before = tree.getHistory().length;
 
-    tree.$.status.set('queued-before');
-    const pending = tree.transaction(() => {
-      tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
-    });
-    tree.$.other.set('queued-after');
+    // All three designated: the case is about three DISTINCT admitted turns and
+    // the absence of cross-bucket contamination between them.
+    undoable(() => tree.$.status.set('queued-before'));
+    const pending = undoable(() =>
+      tree.transaction(() => {
+        tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
+      })
+    );
+    undoable(() => tree.$.other.set('queued-after'));
     await flush();
 
     // TWO entries while pending — the before-write and the after-write. The

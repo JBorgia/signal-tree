@@ -121,7 +121,7 @@ describe('E2-S1 — membership reversal', () => {
     undoable(() => plain.$.rows.removeOne('a'));
     expect(held?.n()).toBeUndefined();
 
-    plain.$.rows.addOne({ id: 'a', n: 1 }); // SAME key, SAME value, NEW subject
+    undoable(() => plain.$.rows.addOne({ id: 'a', n: 1 })); // SAME key, SAME value, NEW subject
     expect(held?.n()).toBeUndefined(); // still dead — correctly
 
     // A fresh lookup finds the new member.
@@ -154,7 +154,7 @@ describe('E2-S2 — key reuse across undo', () => {
 
     undoable(() => tree.$.rows.removeOne('k'));
     await tick();
-    tree.$.rows.addOne({ id: 'k', n: 999 }); // a DIFFERENT subject, same key
+    undoable(() => tree.$.rows.addOne({ id: 'k', n: 999 })); // a DIFFERENT subject, same key
     await tick();
 
     const heldNew = tree.$.rows.byId('k');

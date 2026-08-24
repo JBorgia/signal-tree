@@ -54,7 +54,7 @@ describe('E2-C1 — real P3', () => {
     ) as unknown as TT<Scalar>;
     const base = tree.getHistory().length;
 
-    tree.transaction(() => tree.$.x.set('B'));
+    undoable(() => tree.transaction(() => tree.$.x.set('B')));
     await tick();
 
     expect(tree.$.x()).toBe('B'); // optimistic: visible immediately
@@ -67,11 +67,11 @@ describe('E2-C1 — real P3', () => {
       { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Scalar>;
 
-    const t1 = tree.transaction(() => tree.$.x.set('B')); // pending
+    const t1 = undoable(() => tree.transaction(() => tree.$.x.set('B'))); // pending
     await tick();
     const histAfterT1 = tree.getHistory().length;
 
-    const t2 = tree.transaction(() => tree.$.x.set('C'));
+    const t2 = undoable(() => tree.transaction(() => tree.$.x.set('C')));
     await tick();
     expect(tree.getHistory().length).toBe(histAfterT1); // still not historied
     t2.confirm();
@@ -92,9 +92,9 @@ describe('E2-C1 — real P3', () => {
       { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Scalar>;
 
-    const t1 = tree.transaction(() => tree.$.x.set('B'));
+    const t1 = undoable(() => tree.transaction(() => tree.$.x.set('B')));
     await tick();
-    const t2 = tree.transaction(() => tree.$.x.set('C'));
+    const t2 = undoable(() => tree.transaction(() => tree.$.x.set('C')));
     await tick();
     t2.confirm();
     await tick();
@@ -138,9 +138,9 @@ describe('E2-C2 — nested path', () => {
       { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Nested>;
 
-    const t1 = tree.transaction(() => tree.$.profile.name.set('B'));
+    const t1 = undoable(() => tree.transaction(() => tree.$.profile.name.set('B')));
     await tick();
-    const t2 = tree.transaction(() => tree.$.profile.name.set('C'));
+    const t2 = undoable(() => tree.transaction(() => tree.$.profile.name.set('C')));
     await tick();
     t2.confirm();
     await tick();
@@ -168,7 +168,7 @@ describe('E2-C3 — real ABA authorship', () => {
       { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Scalar>;
 
-    const t1 = tree.transaction(() => tree.$.x.set('B'));
+    const t1 = undoable(() => tree.transaction(() => tree.$.x.set('B')));
     t1.confirm(); // CONFIRMED — this is the entry undo targets
     await tick();
     const hist = tree.getHistory().length;

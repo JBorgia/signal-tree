@@ -5,6 +5,7 @@ import {
   type WritableSignal,
 } from '@angular/core';
 import { describe, expect, it } from 'vitest';
+import { undoable } from './undoable';
 
 import { signalTree } from './signal-tree';
 import { timeTravel } from '../enhancers/time-travel/time-travel';
@@ -61,7 +62,7 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
       { counter: makeCounterSignal(10) },
       { enhancers: [timeTravel()] }
     );
-    (tree.$.counter as CounterA).increment();
+    undoable(() => (tree.$.counter as CounterA).increment());
     await flush();
     expect(tree.$.counter()).toBe(11);
 
