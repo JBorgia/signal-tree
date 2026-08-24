@@ -1,6 +1,6 @@
 import type { PathNotifierHandler } from '../../path-notifier';
 
-import { getCausalWriteMode } from '../../causal-write-mode';
+import { getCausalWriteMode, isInspectionWrite } from '../../causal-write-mode';
 
 import type { PositionId, StructuralHistoryEffect, UpdateMetadata } from '../../types';
 
@@ -48,6 +48,9 @@ export function createTransactionCaptureBridge(options: {
     meta
   ) => {
     if (
+      // DEVTOOLS-JUMP-0.1: an inspection application is not part of any
+      // transaction's contribution.
+      isInspectionWrite(meta) ||
       getCausalWriteMode(meta) === 'realization' ||
       meta?.transactionId !== options.turnId ||
       meta.transactionOwner !== options.transactionOwner

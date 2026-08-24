@@ -1445,13 +1445,21 @@ export function createDevToolsEnhancer(
         // `'devtools'` was already in the `UpdateMetadata['source']` union and
         // simply unused. Enhancers read this via `getActiveWriteContext()`; the
         // context is synchronous, so applyState's recursive calls inherit it.
-        withWriteContext({ intent: 'system', source: 'devtools' }, () => {
-          if ('$' in tree) {
-            applyState((tree as ISignalTree<T>).$ as TreeNode<T>, state as T);
-          } else {
-            originalTreeCall(state as T);
+        // DEVTOOLS-JUMP-0 closed as D: this is INSPECTION participation, and it
+        // is declared rather than inferred from `source`. Provenance answers
+        // "where did this come from"; participation answers "how may this take
+        // part in causal mechanisms". Deriving the second from the first would
+        // recouple two axes this audit separated on evidence.
+        withWriteContext(
+          { intent: 'system', source: 'devtools', causalMode: 'inspection' },
+          () => {
+            if ('$' in tree) {
+              applyState((tree as ISignalTree<T>).$ as TreeNode<T>, state as T);
+            } else {
+              originalTreeCall(state as T);
+            }
           }
-        });
+        );
       } finally {
         isApplyingExternalState = false;
         lastSnapshot = readSnapshot();
