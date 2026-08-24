@@ -2826,6 +2826,153 @@ B — existing facts are sufficient except for restoration origin.
 Nothing here justifies a second inventory, a second reversal authority, or
 widening TURN-FEED.
 
+# SEMANTICS-NAMES-0 — the falsifier fires, and it reorders the queue
+
+> **FALSIFIER: if a single `origin` axis cannot represent the measured
+> distinctions without losing a genuinely independent dimension currently carried
+> by `source` or `causalMode`, the consolidation is wrong.**
+
+## What each field actually DECIDES
+
+Read from consumers, not from names.
+
+```text
+causalMode      ADMISSION   does this enter restoration history, or a
+   ('authoring'             transaction's confirmed effects?
+    'realization')
+                COALESCING  may this batch with a neighbouring write?
+                            (path-notifier's semantic-identity check)
+
+                -> "how does this participate in authored causal semantics?"
+
+source          FILTERING       skip my own output (time-travel and
+   ('time-travel'               transactions both early-return on
+    'devtools'                  source === 'time-travel')
+    'system' …)  SIDE EFFECTS   `stored()` declines to persist a write whose
+                                source is 'devtools' — scrubbing a timeline is
+                                inspection, not a storage edit
+                LABELLING       the devtools timeline names the action
+
+                -> "what originated this application?"
+```
+
+Two different questions. `causalMode` is a poor name for the first — it says
+nothing about which dimension it represents — and `source` is a reasonable name
+for the second.
+
+## The measured combination space
+
+Pinned in `semantics-names-0.spec.ts`:
+
+```text
+origin         participation    what it is
+-------------  --------------   ---------------------------------------
+null           null             ordinary authored write
+null           realization      external truth (server, storage)
+time-travel    realization      restoration (undo / redo)
+devtools       null             a devtools state application  <-- !!
+```
+
+**The falsifier FIRES.** `devtools` carries a non-default origin with DEFAULT
+participation, so the two fields vary independently today and a single `origin`
+axis cannot carry the space.
+
+## But the independence is contingent, not structural
+
+That fourth row exists because `devTools()` applies `JUMP_TO_STATE` /
+`ROLLBACK` / `IMPORT_STATE` in AUTHORING participation — it sets
+`{ intent: 'system', source: 'devtools' }` with no `causalMode` at all.
+
+Whether that is right is **exactly DEVTOOLS-JUMP-0's question.** If a devtools
+application is decided to be realization-participating — which it arguably is,
+since nobody authored it — the space collapses:
+
+```text
+null           null             authored
+null           realization      external
+time-travel    realization      restoration
+devtools       realization      devtools
+```
+
+and participation becomes derivable: *authored iff origin is absent*. One axis.
+
+> **So the consolidation cannot be decided before DEVTOOLS-JUMP-0. The dependency
+> runs the opposite way from the proposed order.**
+
+Doing SEMANTICS-NAMES first would mean either freezing a two-axis ontology on the
+strength of a behaviour nobody has ratified, or collapsing to one axis by
+silently deciding DEVTOOLS-JUMP in passing. Neither is a naming decision.
+
+## ⚠️ A latent consequence of that fourth row, worth its own look
+
+A devtools state application is currently treated as AUTHORED for admission and
+coalescing. Under opt-in that is harmless for restoration — it is not designated,
+so it cannot enter restoration history. But `transactions()` admits authored
+writes into a transaction's captured effects, so a devtools scrub performed while
+a transaction is pending would be captured as part of that transaction's
+contribution.
+
+Not measured as a live defect here, and not fixed here. Recorded because
+DEVTOOLS-JUMP-0 should decide it deliberately rather than inherit it.
+
+## Recommended vocabulary — pending that decision
+
+The renames the audit supports on evidence:
+
+```text
+causalMode  ->  participationMode   (or applicationMode)
+                the field decides PARTICIPATION in authored causal semantics;
+                `causalMode` names no dimension at all
+
+source      ->  origin
+                already the right question; `origin` says so, and `cause` /
+                `causation` must stay reserved for the dependency relation
+                TX-LEDGER owns
+```
+
+`realization` survives as a VALUE. The audit supports the reading that the
+mistake was the field name rather than the word: *apply this as established truth
+rather than as newly authored work* is a coherent participation mode that
+restoration and external truth can legitimately share, precisely because origin
+now distinguishes them.
+
+```text
+{ origin: 'restoration', participationMode: 'realization' }
+{ origin: 'external',    participationMode: 'realization' }
+```
+
+Those are no longer contradictory. They say: different origins, deliberately
+shared application semantics.
+
+## `timeTravel()` -> `restoration()`
+
+Supported, and the strongest argument is the inversion this audit surfaced:
+
+```text
+timeTravel()   a constrained restoration authority — designated turns only,
+               bounded retention, refusal on divergence, no arbitrary jumping
+devTools()     contains the actual arbitrary snapshot jumping
+```
+
+The subsystem named "time travel" is the one that cannot travel to arbitrary
+points, and the one that can is called something else. `restoration()` also makes
+the surrounding vocabulary cohere with terms already shipped —
+`undoable()`, restoration history, restoration claims, restoration origin — and
+avoids `history`, which this audit has already proved dangerously overloaded
+(restoration history, diagnostic history, causal history, dependency evidence).
+
+**Not executed here.** It is a public rename and a terminal naming disposition;
+recorded as recommended with its evidence.
+
+## Revised order
+
+```text
+1  DEVTOOLS-JUMP-0     restoration vs inspection-state application; decides
+                       whether participation is derivable from origin
+2  SEMANTICS-NAMES-1   execute the ontology on a settled space
+3  DIAG-JOURNAL-1      read-only bounded projection + reclamation falsifiers
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
