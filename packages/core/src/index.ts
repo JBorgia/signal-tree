@@ -200,11 +200,28 @@ export { external } from './lib/external';
 // well; this comment recommended it for one release after it stopped existing.)
 
 // ============================================
-// EDIT SESSION (subpath: @signaltree/core/edit-session)
+// EDIT SESSION — DELETED IN 15.0
 // ============================================
-
-// Moved to '@signaltree/core/edit-session' in v9.
-// Import from there to reduce main bundle size.
+//
+// `createEditSession` / `createTreeEditSession` / `EditSession` are gone, and the
+// reason is that RELEASE-RESIDUE-0 found they were never reachable.
+//
+//   this comment used to say   "Moved to '@signaltree/core/edit-session' in v9.
+//                               Import from there to reduce main bundle size."
+//   package.json exports       { ".", "./package.json" }
+//
+// That subpath never existed in the export map. The capability was implemented,
+// tested and documented — and unreachable by any consumer for six major versions.
+// Its only importers were its own specs.
+//
+// "Implemented and tested" is not evidence that something should ship, and
+// publishing it now would turn an archaeological accident into a permanent v15
+// commitment. Candidate A converged on one package with one "." entry point; the
+// MATRIX-CLOSE rule is that only DEMONSTRATED third-party authoring need earns
+// public surface, and no consumer has ever demonstrated this one.
+//
+// If the capability later earns a consumer it comes back deliberately, through
+// the established public topology — not by resurrecting the subpath.
 
 // ============================================
 // MEMORY MANAGEMENT EXPORTS

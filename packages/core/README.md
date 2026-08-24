@@ -42,9 +42,10 @@ Modern bundlers (webpack 5+, esbuild, Rollup, Vite) **automatically tree-shake b
 // ✅ Recommended: Simple and clean
 import { signalTree, batching } from '@signaltree/core';
 
-// ✅ Also fine: Explicit subpath (same bundle size)
-import { signalTree } from '@signaltree/core';
-import { batching } from '@signaltree/core/enhancers/batching';
+// ⚠️ There is NO subpath form. `@signaltree/core/enhancers/batching` was taught
+// here and does not resolve — package.json exports only ".". Everything comes
+// from the one entry point.
+import { signalTree, batching } from '@signaltree/core';
 ```
 
 **Measured impact** (with modern bundlers). Reproduce current bundle ceilings with
@@ -1061,182 +1062,18 @@ part of the current release-candidate public surface. Keep persistence in an
 application service for now, then write the resulting values into SignalTree
 through ordinary state or `entityMap()` APIs.
 
-### 12) Angular Forms Integration
+### 12) ~~Angular Forms Integration~~ — `@signaltree/ng-forms` was DELETED
 
-Use `@signaltree/ng-forms` when you need Angular `FormGroup` interop backed by SignalTree state.
+**This section taught `import { createFormTree, ngFormValidators } from
+'@signaltree/ng-forms'`, and that package no longer exists** — deleted in
+`41373050` (NGF-DEL), after NGF-0 found it did not earn its place. The README kept
+teaching it because `lint-readme-apis` validates SYMBOLS against built entry
+points and a specifier for a package that is not built is checked against
+nothing. `check-documented-imports.mjs` exists because of this.
 
-```typescript
-import { createFormTree, ngFormValidators } from '@signaltree/ng-forms';
-
-interface ContactForm {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-}
-
-const form = createFormTree<ContactForm>(
-  { name: '', email: '', phone: '', message: '' },
-  {
-    validators: {
-      name: ngFormValidators.required('Name is required'),
-      email: [ngFormValidators.required('Email is required'), ngFormValidators.email('Invalid email format')],
-      phone: ngFormValidators.pattern(/^\+?[\d\s-]+$/, 'Invalid phone number'),
-      message: ngFormValidators.minLength(10, 'Message must be at least 10 characters'),
-    },
-  }
-);
-```
-
-```typescript
-// FormTree API
-form.$.name(); // Get field value
-form.$.name.set('Jane'); // Set field value
-form.$.email();
-
-// Form-level operations
-form.unwrap();
-form.setValues({ name: 'Updated' });
-form.reset();
-await form.validate();
-```
-
-#### Built-in Validators
-
-```typescript
-import { ngFormValidators } from '@signaltree/ng-forms';
-
-ngFormValidators.required('Field is required')
-ngFormValidators.minLength(5, 'Min 5 characters')
-ngFormValidators.maxLength(100, 'Max 100 characters')
-ngFormValidators.min(0, 'Must be positive')
-ngFormValidators.max(100, 'Max 100')
-ngFormValidators.email('Invalid email')
-ngFormValidators.pattern(/regex/, 'Invalid format')
-});
-
-// Compose multiple validators
-validators: {
-  password: [
-    validators.required('Password is required'),
-    validators.minLength(8, 'Min 8 characters'),
-    validators.pattern(/[A-Z]/, 'Must contain uppercase'),
-    validators.pattern(/[0-9]/, 'Must contain number'),
-  ],
-}
-```
-
-#### Wizard Navigation
-
-```typescript
-const tree = signalTree({
-  listing: form<ListingDraft>({
-    initial: { title: '', description: '', photos: [], price: null, location: '' },
-    validators: {
-      title: validators.required('Title is required'),
-      price: [validators.required('Price required'), validators.min(0, 'Must be positive')],
-      location: validators.required('Location required'),
-    },
-    wizard: {
-      steps: ['details', 'media', 'pricing', 'review'],
-      stepFields: {
-        details: ['title', 'description'],
-        media: ['photos'],
-        pricing: ['price'],
-        review: ['location'],
-      },
-    },
-  }),
-});
-
-// Wizard API
-const wizard = tree.$.listing.wizard!;
-
-wizard.currentStep(); // Signal<number> - 0-based index
-wizard.stepName(); // Signal<string> - current step name
-wizard.steps(); // Signal<string[]> - all step names
-wizard.canNext(); // Signal<boolean>
-wizard.canPrev(); // Signal<boolean>
-wizard.isFirstStep(); // Signal<boolean>
-wizard.isLastStep(); // Signal<boolean>
-
-// Navigation (validates current step before proceeding)
-await wizard.next(); // Returns false if validation fails
-wizard.prev();
-await wizard.goTo(2); // Jump to step by index
-await wizard.goTo('pricing'); // Jump to step by name
-wizard.reset(); // Go back to first step
-```
-
-#### Form Persistence
-
-```typescript
-const tree = signalTree({
-  draft: form<EmailDraft>({
-    initial: { subject: '', body: '', to: '' },
-    persist: 'email-draft', // localStorage key
-    persistDebounceMs: 500, // Debounce writes (default: 500ms)
-    validators: {
-      subject: validators.required('Subject required'),
-      to: validators.email('Invalid email'),
-    },
-  }),
-});
-
-// Form auto-saves to localStorage
-// On page reload, draft is restored automatically
-```
-
-#### Async Validators
-
-```typescript
-const tree = signalTree({
-  registration: form<RegistrationForm>({
-    initial: { username: '', email: '' },
-    validators: {
-      username: validators.minLength(3, 'Min 3 characters'),
-    },
-    asyncValidators: {
-      username: async (value) => {
-        const taken = await api.checkUsername(value);
-        return taken ? 'Username already taken' : null;
-      },
-      email: async (value) => {
-        const exists = await api.checkEmail(value);
-        return exists ? 'Email already registered' : null;
-      },
-    },
-  }),
-});
-```
-
-#### Form Submission
-
-```typescript
-async function handleSubmit() {
-  const contactForm = tree.$.contact;
-
-  // Validate all fields first
-  contactForm.touchAll();
-  const isValid = await contactForm.validate();
-
-  if (!isValid) return;
-
-  // Set submitting state
-  contactForm.setSubmitting(true);
-
-  try {
-    await api.submit(contactForm());
-    contactForm.reset();
-  } catch (error) {
-    // Handle error
-  } finally {
-    contactForm.setSubmitting(false);
-  }
-}
-```
-
-## Error handling examples
+For Angular `FormGroup` interop, use `toWritableSignal()` to bridge a tree node
+into a form control, or hold form state as ordinary tree state and write it back
+through `undoable()` when the edit should be reversible.
 
 ### Manual async error handling
 

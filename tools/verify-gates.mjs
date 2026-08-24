@@ -911,6 +911,24 @@ const GATES = [
     env: { NODE_OPTIONS: '--expose-gc' },
   },
   {
+    name: 'documented-imports',
+    covers:
+      "every import specifier a LIVE document teaches resolves against the published export map — the documented -> publishable edge no other gate checks",
+    cmd: ['node', 'tools/check-documented-imports.mjs'],
+    // Earned by RELEASE-RESIDUE-0: the shipped core README taught
+    // `@signaltree/ng-forms` (deleted in 41373050) and
+    // `@signaltree/core/enhancers/batching` (never an export), while the root
+    // README taught three subpaths that resolve to nothing. lint-readme-apis
+    // could not see any of it — a specifier for a path that is not an entry
+    // point is checked against nothing.
+  },
+  {
+    name: 'documented-imports:self',
+    covers:
+      'the documented-import checker accepts a real entry point and rejects both a bogus subpath and a bogus package',
+    cmd: ['node', 'tools/check-documented-imports.mjs', '--self-test'],
+  },
+  {
     name: 'error-codes',
     covers:
       'every diagnostic code the packages can emit is in docs/errors/README.md, and the catalogue invents none',

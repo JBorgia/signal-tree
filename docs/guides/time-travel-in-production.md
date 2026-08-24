@@ -250,7 +250,7 @@ record-then-filter step.
 | What you are building                                 | Pattern                                                                              | Supported                                                                                                                           |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
 | Editor undo over a small document                     | `maxHistorySize`; designate document edits with `undoable()` and leave caret/selection undesignated | Yes                                                                                              |
-| Bulk-edit grid with cancel                            | `createTreeEditSession` (`@signaltree/core/edit-session`) — `commit()` or `cancel()` | Yes, and independent of `restoration`                                                                                                |
+| Bulk-edit grid with cancel                            | `transaction()` — `confirm()` or `rollback()`                                        | Yes, and independent of `restoration`                                                                                                |
 | Undo one panel, not the whole app                     | designate only the panel's operations with `undoable()`                              | Yes                                                                                                                                 |
 | Large server collection + small editable **branch**   | apply the collection with `external()`; designate the branch's edits with `undoable()` | Yes — the headline pattern                                                                                                        |
 | Large server collection + small editable **`form()`** | `external()` for the collection beside `form({ history: history() })`                | Yes. Prefer scoped form history when the form should undo independently; global `restoration()` also records direct form writes now. |
@@ -296,6 +296,6 @@ branch: kilobytes, not megabytes.
 - [entity-collection-cookbook.md](./entity-collection-cookbook.md) — collection
   modelling, including why an array leaf is the expensive mistake
 - [errors/README.md](../errors/README.md) — ST2029 (retention) and ST2028
-  (edit-session cloning)
+  (structural cloning)
 - [RFC 0012](../rfcs/0012-history-scoped-marker-capture.md) — scoping history for
   arbitrary branches, not just markers
