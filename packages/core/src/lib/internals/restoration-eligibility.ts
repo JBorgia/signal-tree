@@ -52,7 +52,18 @@ export function isMetaDesignated(meta: UpdateMetadata | undefined): boolean {
 export function markMetaDesignated(
   meta: UpdateMetadata | undefined
 ): UpdateMetadata {
-  const stamped: DesignatedWriteMeta = { ...meta, restorationDesignated: true };
+  // Spread only what is actually present. `{ ...meta }` on a partially-filled
+  // metadata object materialises its absent keys as explicit `undefined`, which
+  // then shows up in anything that inspects the delivered meta — caught by
+  // MUT-2, which asserts that shape exactly.
+  const stamped: DesignatedWriteMeta = { restorationDesignated: true };
+  if (meta) {
+    for (const [key, value] of Object.entries(meta)) {
+      if (value !== undefined) {
+        (stamped as Record<string, unknown>)[key] = value;
+      }
+    }
+  }
   return stamped;
 }
 

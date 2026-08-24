@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../lib/undoable';
 import { transactions } from '../enhancers/transactions/transactions';
 
 import { timeTravel } from '../enhancers/time-travel/time-travel';
@@ -175,7 +176,7 @@ describe('E2-C3 — real ABA authorship', () => {
     // Later work outside confirmed history, produced by the real mechanism: a
     // PENDING turn is visible in truth and adds no history entry (E2-C1 row 1).
     const later = tree.transaction(() => {
-      tree.$.x.set('C');
+      undoable(() => tree.$.x.set('C'));
       tree.$.x.set('B'); // value returns to T1's, authored by THIS turn
     });
     await tick();
