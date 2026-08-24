@@ -7,7 +7,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import {
   entityMap,
-  realize,
+  external,
   SignalTreeRollbackError,
   signalTree,
   restoration,
@@ -307,7 +307,7 @@ export class RestorationDemoComponent {
   /**
    * A server refresh — the mirror of `addTodo()`.
    *
-   * `realize()` says the contained writes are externally acquired truth rather
+   * `external()` says the contained writes are externally acquired truth rather
    * than work the user authored. Watch the history counter: it does NOT grow,
    * and the Undo button still points at your last real operation.
    *
@@ -316,7 +316,7 @@ export class RestorationDemoComponent {
    *
    * Note the shape: acquisition is asynchronous and belongs to whatever fetches
    * (a `resource()`, an RxJS pipeline, a fetch). Only APPLYING the result is a
-   * SignalTree event, and that part is synchronous — `realize(async () => …)`
+   * SignalTree event, and that part is synchronous — `external(async () => …)`
    * is refused with ST1035 rather than silently classifying nothing.
    */
   refreshFromServer() {
@@ -326,7 +326,7 @@ export class RestorationDemoComponent {
       { id: 9001, title: 'Review the server refresh', completed: false },
     ];
 
-    realize(() => {
+    external(() => {
       this.updateTree((state: AppState) => ({ ...state, todos: serverTodos }));
     });
     this.refreshTimeTravelState();
