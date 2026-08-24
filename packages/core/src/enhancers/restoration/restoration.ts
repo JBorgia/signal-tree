@@ -2183,14 +2183,30 @@ export function restoration(
       }
 
       isRestoring = true;
+      const replayOwnerId = getPositionRegistry(
+        (tree as { $?: object }).$ ?? tree
+      )?.id;
       try {
         // State the origin so the port propagates it. `isRestoring` is a
         // synchronous flag and is already false by the time the notifier
         // delivers — which is the whole reason provenance has to travel WITH the
         // write rather than be inferred at delivery.
-        withWriteContext({ origin: 'restoration' }, () => {
-          realizationPort.applyAtomically(reversalEffects);
-        });
+        // OWNER-REPLAY-1. `ownerId` is stamped ONCE, on the wrap that already
+        // surrounds the whole replay, rather than at each
+        // `notifier.notify(...)` site. Every downstream meta spreads
+        // `getActiveWriteContext()`, so the namespace reaches all of them —
+        // including the realization adapter's seven `intent: 'system'` sites —
+        // and a NEW replay site inherits it without anyone remembering to.
+        //
+        // Without this a replayed write reaches the notifier with
+        // `ownerId: undefined`, and an owner-filtered observer is blind to every
+        // undo: measured as OWNER-REPLAY-0 in EGRESS-1.
+        withWriteContext(
+          { origin: 'restoration', ownerId: replayOwnerId },
+          () => {
+            realizationPort.applyAtomically(reversalEffects);
+          }
+        );
       } finally {
         isRestoring = false;
       }

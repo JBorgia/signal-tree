@@ -151,31 +151,24 @@ describe('EGRESS-1: what causes make a state OBSERVER fire?', () => {
     expect(r.fired).toHaveLength(1);
   });
 
-  it('⚠️ an UNDO does NOT fire it — and that is a DEFECT, not a design', async () => {
+  it('⚠️ an UNDO fires it — twice', async () => {
     const r = await observe(async (t) => {
       undoable(() => t.$.order({ total: 200 }));
       await flush();
       t.undo();
     });
 
-    // ⚠️ I expected two firings and measured one. The observer saw the authored
-    // `200` and never saw the reversal, while the tree really did return to
-    // `100`. So an owner-filtered observer is BLIND to restoration.
+    // ⚠️ FLIPPED BY OWNER-REPLAY-1, and the flip STRENGTHENS the falsification.
+    // Measured before it: ONE firing. The observer saw the authored `200` and
+    // was blind to the reversal, because the undo reached the notifier with
+    // `ownerId: undefined` and the owner filter dropped it.
     //
-    // Root cause, measured separately (OWNER-REPLAY-0): the undo DOES reach the
-    // notifier — `origin=restoration` — but with `ownerId: undefined`, because
-    // restoration replays through `notifier.notify(...)` positionally and those
-    // call sites were never taught the namespace the ownership correction
-    // added. There are 24 such sites across restoration, transactions,
-    // devtools and entity-signal.
-    //
-    // For a CONSEQUENCE this accidentally looks right. For STATE SYNC it is a
-    // real defect: `link()` built on this observer would leave Y holding the
-    // pre-undo value forever. That is a harder failure than the double-charge
-    // this case was written to expose.
-    expect(r.fired).toHaveLength(1);
+    // Now both are visible. A storage observer wants exactly that. `chargeCard`
+    // would charge twice — the second time for a total the user just undid.
+    expect(r.fired).toHaveLength(2);
     expect(r.fired[0]).toMatchObject({ total: 200 });
-    expect(r.tree.$.order()).toMatchObject({ total: 100 }); // X moved; Y would not
+    expect(r.fired[1]).toMatchObject({ total: 100 });
+    expect(r.tree.$.order()).toMatchObject({ total: 100 });
   });
 
   it('⚠️ a ROLLBACK COMPENSATION fires it', async () => {
@@ -287,14 +280,13 @@ describe('EGRESS-1: what does a ONE-SHOT consequence do for the same causes?', (
  * external acquisition   fires   ✗ fatal     silent  ✓
  * rollback compensation  fires   ✗ fatal     silent  ✓
  * A -> B -> A -> B       4 fires ✗ fatal     1 run   ✓
- * undo                   SILENT  ✗ DEFECT    silent  ✓
+ * undo                   2 fires ✗ fatal     silent  ✓
  * ```
  *
- * The last row favours neither column — it is OWNER-REPLAY-0, an
- * incompleteness in the ownership correction that makes the observer blind to
- * restoration. It must be fixed before the observer can be trusted for state
- * sync, and fixing it moves that row to `fires ✗ fatal`, STRENGTHENING the
- * falsification rather than weakening it.
+ * The `undo` row began as a DEFECT — the observer was silent, because replayed
+ * writes reached the notifier with no namespace and the owner filter dropped
+ * them. OWNER-REPLAY-1 fixed that, and the row moved from "silent" to "fires",
+ * which STRENGTHENED this falsification rather than threatening it.
  *
  * One shape cannot serve both, and the difference is not a filter that could be
  * added to the observer. It is WHO ASKS:

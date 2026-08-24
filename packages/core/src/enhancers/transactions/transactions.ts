@@ -1123,7 +1123,14 @@ export function getOrCreateInternalTransactionRuntime<T>(
     // one owner (measured in diag-journal-1-1-correlation.spec.ts) and a journal
     // observes one tree.
     const result = withWriteContext(
-      { origin: 'transaction-rollback', transactionId },
+      {
+        origin: 'transaction-rollback',
+        transactionId,
+        // OWNER-REPLAY-1, same shape as restoration's: stamped once on the wrap
+        // that already surrounds the compensation, so every downstream meta
+        // that spreads `getActiveWriteContext()` carries the namespace.
+        ownerId: positionRegistry?.id,
+      },
       () =>
         rollbackPendingTurnAt({
           authority: authorityPosition,
