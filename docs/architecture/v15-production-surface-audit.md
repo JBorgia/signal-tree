@@ -4111,7 +4111,8 @@ journal releasing something.
 `poolOptions.forks.execArgv` was tried first for the `--expose-gc` flag and
 **silently did nothing on vitest 4**, which is the same shape as everything else
 this release has been finding, so it is not used. F6 runs as its own gate
-(`journal-retention`, 36/36) with the flag via `NODE_OPTIONS`, and FAILS rather
+(`retention-gc` — renamed from `journal-retention` when A2-5 joined it, 36/36)
+with the flag via `NODE_OPTIONS`, and FAILS rather
 than skipping without it — self-tested by running the gate bare. A skipped
 retention test reads as evidence in a green run.
 
@@ -7955,12 +7956,55 @@ ST1035 refuses. Full core suite green afterwards (1895 passed).
 
 ```text
 A2 has now found TWO defects in persistence()'s neighbourhood:
-  A2-3.1   the only drain (`__flushAutoSave`) is non-public AND bypasses
-           settlement
+  A2-4.1   the only drain (`__flushAutoSave`) is non-public AND bypasses
+           settlement — MEASURED, not read: it writes `{a: 'doomed'}` while a
+           transaction is open, and storage stays inconsistent after the
+           rollback because the drain also tore down autoSave. Positive control
+           in the same file (it does persist an ordinary armed write) rules out
+           a drain that simply writes nothing. Carried as a TRIPWIRE spec:
+           fixing the drain must break it. Deferred to the surface freeze
+           because routing through the consequence authority also changes what
+           the drain returns and what a host may await.
   A2-2     tree-scoped rehydration was classified as authored work
 Both were invisible while A2 argued about placement instead of measuring the
 surface that already ships.
 ```
+
+# A2-5 — lifetime. Non-regression, plus one correction to the measurement itself
+
+`packages/core/src/enhancers/serialization/a2-5-lifetime.spec.ts`, 5/5, under the
+`retention-gc` gate (renamed from `journal-retention`; it now carries both
+GC-requiring proofs and runs with `--expose-gc` via `NODE_OPTIONS`).
+
+```text
+BEHAVIOUR
+  armed write, tree lives        persisted            ✓ positive control
+  armed write, destroy() first   never reaches storage ✓
+
+RETENTION (three arms, the DIAG-JOURNAL-1 F6 shape)
+  A  no persistence enhancer     payload DIES    -> the harness can collect
+  B  persistence(), not destroyed payload LIVES  -> the capability really holds
+                                                    application values
+  C  persistence(), destroyed     payload DIES   -> destroy() releases them
+```
+
+Arm B's retention is not incidental: autoSave keeps `previousState = tree()`, a
+full materialised snapshot, for reference-identity change detection. So a
+persisted tree holds a second copy of its own state for the life of the
+capability. That is a deliberate trade — it replaced polling
+`JSON.stringify(tree())` every 100ms — and `destroy()` releases it, but it is a
+fact the surface freeze should state rather than leave to be discovered.
+
+## ⚠️ Correction to the measurement
+
+Arm B first held a `WeakRef(tree)` and measured COLLECTED, which would have made
+arm C vacuous. That was not evidence of no retention: `signalTree()` returns a
+wrapper and the enhancer's closures capture the object it was handed, so the
+outer reference can die while everything the capability holds lives on. The same
+zero-for-the-wrong-reason trap as the asyncSource probe and the A2-4 control,
+in retention form. Retention is measured on a payload object written into the
+state instead — the technique F6 already uses, which also makes the two results
+directly comparable.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
