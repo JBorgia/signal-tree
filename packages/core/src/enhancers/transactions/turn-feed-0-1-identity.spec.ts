@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
@@ -75,13 +76,16 @@ describe('TURN-FEED-0.1: two transaction owners on one tree', () => {
     // buckets live per-tree in per-enhancer closures, so this is the case that
     // would break a truly global numeric key — and it does not, because nothing
     // is global.
-    const a = treeA.transaction(() => treeA.$.n.set(1));
-    const b = treeB.transaction(() => treeB.$.n.set(2));
+    const a = undoable(() => treeA.transaction(() => treeA.$.n.set(1)));
+    const b = undoable(() => treeB.transaction(() => treeB.$.n.set(2)));
     await flush();
     a.confirm();
     b.confirm();
     await flush();
 
+    // Both trees committed their own id-1 transaction independently, and each
+    // admitted its own turn. Designated because the point is that the two
+    // buckets do not collide — which is only observable if both are recorded.
     expect(treeA.$.n()).toBe(1);
     expect(treeB.$.n()).toBe(2);
     expect(treeA.getHistory().length).toBeGreaterThan(1);

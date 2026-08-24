@@ -2377,7 +2377,7 @@ export function timeTravel(
      * cleanest site semantically but would still pay for the snapshot.
      */
     const isTurnEligible = (designated: boolean): boolean =>
-      config.restorationEligibility !== 'designated' || designated;
+      config.restorationEligibility === 'all' || designated;
     const resolveOwnerPositionId = (ownerPath?: string): number | undefined => {
       if (!ownerPath) {
         return undefined;

@@ -36,7 +36,7 @@ function recordingStorage(seed: Record<string, unknown> = {}): Recorder {
   const snapshots: Recorder['snapshots'] = [];
 
   for (const [key, value] of Object.entries(seed)) {
-    undoable(() => map.set(key, JSON.stringify({ __v: 1, data: value })));
+    map.set(key, JSON.stringify({ __v: 1, data: value }));
   }
 
   const snapshot = (): void => {
@@ -46,7 +46,7 @@ function recordingStorage(seed: Record<string, unknown> = {}): Recorder {
   const adapter: Storage = {
     getItem: (key) => map.get(key) ?? null,
     setItem: (key, value) => {
-      undoable(() => map.set(key, value));
+      map.set(key, value);
       log.push({ op: 'set', key });
       snapshot();
     },

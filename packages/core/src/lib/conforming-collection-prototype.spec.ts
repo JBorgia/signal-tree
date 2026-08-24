@@ -62,7 +62,7 @@ function collectionOver(leaf: {
       let s = byIdCache.get(id);
       if (!s) {
         s = computed(() => leaf().find((r) => r.id === id));
-        undoable(() => byIdCache.set(id, s));
+        byIdCache.set(id, s);
       }
       return s;
     },
