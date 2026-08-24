@@ -5389,6 +5389,164 @@ NOT REOPENING           the origin enum, the participation enum, `incoming()`,
                         `realize()`
 ```
 
+# DX-NAMES-1.4 — the reference frame, and an explicit reversal
+
+Recorded as a REOPENING of `external()` vs `acquired()` on new grounds, not as a
+refinement. What follows changes an argument this study already used to close the
+question.
+
+## ⚠️ REVERSAL LEDGER — DX-NAMES-1.3's accuracy leg is WITHDRAWN
+
+```text
+1.3 claimed   the worker trap discriminates `external` from `acquired`:
+              "did I acquire this price?" affirms the wrong answer, while
+              "is this external?" invites the right question.
+
+withdrawn     because under the reference frame below, the pricing-worker write
+              needs NO DOOR AT ALL. It is authored. `tree.$.price.set(price)`.
+              So C5a was never a test of WHICH WORD — it is a test of WHETHER
+              THE DOOR BELONGS, which is a different question.
+```
+
+This is the **second** walk-back of the same leg, by a different mechanism:
+
+```text
+Q1b (1.2)   over-credited: a pricing worker is off-thread and in another module,
+            so a developer may reasonably read it as external. The trap
+            discriminates ARRIVAL words from AUTHORITY words and does not
+            discriminate WITHIN the authority family.
+1.3         re-credited it as an accuracy discriminator anyway.
+1.4 (here)  withdrawn again, and Q1b's original finding stands. It was closer to
+            correct than the round that reversed it.
+```
+
+Recorded plainly because a leg that has now failed twice should not be available
+for a third citation. **C5a's standing finding: crossing a transport or execution
+boundary does not itself cross a causal-authority boundary.** That is what it
+proves, and it is enough.
+
+DX-NAMES-1.3 therefore stands on TWO independent arguments, not three: the
+structural-complement reading of the enum (Fact 1) and consumer visibility
+(Fact 2).
+
+## THE REFERENCE FRAME — chosen, not discovered
+
+> **SignalTree speaks from the store's causal perspective: a write is AUTHORED
+> when the current operation owns the decision, and EXTERNAL when its authority
+> comes from outside that operation.**
+
+The bank analogy earns its place here: the same money is legitimately described
+differently by the customer and by the bank, and a teller writing in the bank's
+ledger uses the bank's accounting perspective. A developer writing SignalTree
+state uses SignalTree's.
+
+`external` is therefore a TERM OF ART with a coordinate system, not a source
+adjective:
+
+```text
+external means   outside the authority of the current authored operation
+it does NOT mean another thread, module, worker, tab, process, server or machine
+```
+
+```ts
+const price = await pricingWorker.calculate(inputs);
+tree.$.price.set(price);              // authored. The app delegated COMPUTATION;
+                                      // authority never left.
+
+const reading = await sensorWorker.readSensor();
+external(() => tree.$.temperature.set(reading));   // another authority observed it
+```
+
+**The frame requires no implementation change**, which is the strongest evidence
+it was already the model's real rule rather than a new invention: absence of
+origin already means authored application work (A1-N), and
+`getWriteParticipation` already defaults to `'authored'`. The frame NAMES what
+ships.
+
+## `acquired()` — rejected on the frame, not on novelty
+
+The earlier reason is withdrawn as backwards:
+
+```text
+WITHDRAWN   "acquired() loses because the word isn't already in the ontology"
+STANDS      external() wins because SignalTree's causal perspective is chosen as
+            the single reference frame for BOTH api and diagnostics, and
+            `external` is the term that perspective uses.
+```
+
+`acquired` is application-perspective language — *I acquired this value*.
+`external` is store-perspective language — *this write's authority is outside
+this operation*. Had the application's perspective been chosen as canonical,
+`acquired()` could have won **and the metadata should have moved with it**. What
+is not available is mixing them.
+
+## Fact 2 survives, and the earlier version of it was circular
+
+The critique was right that "it matches the enum" was coherence with what
+shipped. Under a CHOSEN frame it stops being circular:
+
+```text
+circular version   external() is right because the enum says 'external'
+frame version      one perspective is canonical for both surfaces, so the door,
+                   the metadata, the diagnostics and the docs must all speak it —
+                   and a developer verifies that continuity in DevTools, where
+                   `origin: "external"` is visible beside the `external()` they
+                   typed
+```
+
+With `acquired()` the developer would translate between two perspectives every
+time they crossed from authoring to debugging. That cost buys nothing once the
+frame is chosen. **The two-perspective proposal is rejected as a conscious trade,
+not waved through as free.**
+
+## ⚠️ THE RESIDUAL RISK, and it is the real one
+
+Choosing the causal definition means `external` now has a **counter-intuitive
+reading available**. Its everyday meaning IS topological, so a developer who
+never reads the definition will reason:
+
+```ts
+// the worker is a different thread, therefore external
+external(() => tree.$.price.set(price));   // ⚠️ WRONG, and it reads fine
+```
+
+**The frame does not remove the C5a trap. It relocates it from the choice of word
+into the definition of the word.** That is a genuine cost of committing to a term
+of art, and it belongs in the record rather than in a footnote.
+
+Against it, the teaching argument holds: one invariant beats a list of
+exceptions.
+
+```text
+without the frame   worker sometimes counts; POST responses are special;
+                    WebSocket is special unless…; external doesn't mean external
+with the frame      ask who owned the DECISION, from the current operation's
+                    point of view. Everything derives.
+```
+
+Net assessment: a simplification, with the residual risk being that the word's
+plain meaning competes with its defined meaning. That risk is measurable, and it
+is precisely question 2 of the outside check already on the board — *given
+`const price = await pricingWorker.calculate(inputs)`, does the door belong?* A
+developer pool that answers "yes" is measuring the topological misreading, and
+that would be real evidence against `external()` rather than against the frame.
+
+## Status
+
+```text
+SEMANTIC QUESTION   CLOSED. The frame is chosen; `external` is the term that
+                    frame uses; `acquired` is rejected for mixing perspectives.
+DX QUESTION         OPEN, unchanged: external() vs applyExternal(), and now also
+                    the topological-misreading rate for `external`. Both are
+                    outside-developer questions.
+NOT REOPENING       C5a as a word discriminator (failed twice), either enum,
+                    incoming(), realize()
+```
+
+The definition must ship WITH the door — the JSDoc's first line has to be *outside
+the authority of the current authored operation, not outside your process* —
+because that sentence is now load-bearing rather than explanatory.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
