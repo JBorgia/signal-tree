@@ -578,7 +578,7 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
   it('A — explicitly classified realization', async () => {
     const r = await run({
       participation: 'realized',
-      origin: 'system',
+      origin: 'external',
       intent: 'system',
     });
     // Classified realization: NOT captured.
@@ -586,7 +586,7 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
   });
 
   it('B — SAME meta, realization classification OMITTED', async () => {
-    const r = await run({ origin: 'system', intent: 'system' });
+    const r = await run({ origin: 'external', intent: 'system' });
     // Identical to A except for the one field. CAPTURED — a history entry that
     // A did not produce. Omission manufactured authorship.
     expect(r).toEqual({ delta: 1, value: 1 });
@@ -618,9 +618,9 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
   it('the mode FIELD is decisive, not the presence of a context', async () => {
     const noContext = await withCtx(null);
     const emptyContext = await withCtx({});
-    const systemNoMode = await withCtx({ origin: 'system', intent: 'system' });
+    const systemNoMode = await withCtx({ origin: 'external', intent: 'system' });
     const realization = await withCtx({
-      origin: 'system',
+      origin: 'external',
       intent: 'system',
       participation: 'realized',
     });

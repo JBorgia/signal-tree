@@ -29,10 +29,10 @@ describe('withWriteContext / getActiveWriteContext', () => {
   });
 
   it('restores the previous context after a nested call', () => {
-    withWriteContext({ intent: 'hydrate', origin: 'serialization' }, () => {
+    withWriteContext({ intent: 'hydrate', origin: 'external' }, () => {
       expect(getActiveWriteContext()).toEqual({
         intent: 'hydrate',
-        origin: 'serialization',
+        origin: 'external',
       });
 
       withWriteContext({ intent: 'user' }, () => {
@@ -42,7 +42,7 @@ describe('withWriteContext / getActiveWriteContext', () => {
       // Outer context restored after inner returns.
       expect(getActiveWriteContext()).toEqual({
         intent: 'hydrate',
-        origin: 'serialization',
+        origin: 'external',
       });
     });
 
