@@ -9219,6 +9219,102 @@ and inherits the namespace from `emitOwnedMutation`.
 > its owning tree — authored, external, restoration, rollback, DevTools
 > inspection and structural collection writes alike.
 
+# AFTER-COMMIT-0 — the NULL is falsified. `X` IS EARNED
+
+`packages/core/src/lib/after-commit-0.spec.ts`, 10/10.
+
+```text
+NULL      a one-shot consequence needs NO location argument; one registration
+          binds to the AMBIENT authored operation
+RESULT    ⚠️ FALSIFIED, by a rule this codebase already states and enforces
+```
+
+## Why the no-argument form loses
+
+Measured first, before writing the harness:
+
+```text
+outside a transaction        getActiveWriteContext() === null
+inside one, before a write   { transactionId, transactionOwner }
+nested transactions          REFUSED — "Nested transaction is not supported"
+```
+
+The second line looked like enough. It is not:
+`openCommitScope(transactionOwnerToken, transactionId, tree)` keys the scope on
+`resolveScopeKey(TREE)`. The ambient `transactionOwner` is only the token
+identifying the operation, and it resolves to ITSELF — so a consequence claiming
+it finds no open scope and runs immediately. Measured: the confirmed and
+rolled-back cases both ran during the callback.
+
+That is deliberate. `scopeOwns` says so:
+
+> "The write context is ambient: any code running inside a transaction callback
+> sees that transaction's owner and id, INCLUDING A WRITE TO A COMPLETELY
+> DIFFERENT TREE. Presence of a transaction is not evidence that the write is
+> speculative under it, so ownership must be POSITIVELY ESTABLISHED."
+
+A no-argument `afterCommit()` can only infer, and inference is what that rule
+refuses. **The anchor is not a leaked claimant — it is the caller positively
+establishing whose settlement gates the effect.** Nesting being refused retires
+the nested-ownership case as unreachable rather than unproven.
+
+## What survives
+
+```text
+confirmed transaction    held while pending, then exactly once      ✓
+rolled back              discarded, never run-and-compensated       ✓
+same fn registered 2x    runs TWICE                                 ✓
+registration order       effects START in order A, B, C             ✓
+two trees interleaved    B rolled back, A confirmed -> only A runs  ✓
+async return             a never-resolving effect does not block
+                         the next one from starting                 ✓
+```
+
+The two-tree case is the signature discriminator: if ambient attribution were
+sufficient, either both would escape or neither would.
+
+⚠️ `key` is a FRESH TOKEN per call, and that single line is the whole
+event-vs-state distinction. `scheduleDurableConsequence` coalesces by key —
+right for a state observation, semantic corruption for an authored event.
+Mutation-checked: keying on callback identity fails exactly the
+duplicate-registration case, silently collapsing a double charge into one.
+
+## Two measured results that are CONTRACT QUESTIONS, not defects to fix here
+
+```text
+1  OUTSIDE A TRANSACTION IT RUNS SYNCHRONOUSLY
+   With no open scope there is nothing to defer to, so the effect runs before
+   `afterCommit` returns — re-entrant inside the caller's own operation.
+   `afterCommit(tree, chargeCard)` outside a transaction charges DURING the
+   function that asked for it. One `queueMicrotask` at the no-scope branch
+   would make timing uniform with the transactional path; the uniform-timing
+   argument looks stronger than the zero-latency one. Recorded, not chosen.
+
+2  A SYNCHRONOUS THROW ESCAPES `confirm()`
+   Sibling isolation HOLDS — the second consequence still starts, which is the
+   property that matters and which I had assumed was broken. But the throw
+   propagates out of the transaction API that released it, so a caller who
+   registered nothing can be thrown at by someone else's consequence.
+   Surfacing loudly is defensible and so is isolating; inventing a public error
+   channel is not (ERROR-SURFACE-0). Pinned so a change is deliberate.
+```
+
+## The resulting shape
+
+```text
+afterCommit(anchor, effect)
+  registration identity   per CALL
+  settlement authority    SignalTree
+  start ordering          SignalTree
+  remote completion       caller
+  retry                   caller
+  dedupe                  none
+  equality                meaningless
+```
+
+`afterCommit.settled()` would be a category error: a link owns an outbound
+queue, a one-shot consequence does not.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
