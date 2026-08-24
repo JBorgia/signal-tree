@@ -210,8 +210,22 @@ describe('NESTED-STRUCTURAL-ROLLBACK-1: isolation', () => {
    * ```
    *
    * So the operation matrix above is the ONE-TREE picture. With a second
-   * same-shaped tree present, even the "safe" nested operations fail, and the
-   * failure is silent data loss rather than a refusal that leaves state intact.
+   * same-shaped tree present, even the "safe" nested operations fail.
+   *
+   * ⚠️ CORRECTION TO AN EARLIER CHARACTERISATION. I called this "silent data
+   * loss". It is not silent — `rollback()` THROWS `SignalTreeRollbackError`.
+   * And it is the SAME failure class as the one-tree cases, not a new one:
+   *
+   * ```text
+   * rollback requested -> rollback REFUSED -> the transaction's speculative
+   * state remains materialised
+   *
+   *   addOne     the speculative ADDITION remains
+   *   removeOne  the speculative DELETION remains
+   * ```
+   *
+   * The second tree widens the defect's REACH — it makes an operation that
+   * succeeds with one tree fail with two — not its severity class.
    *
    * Cross-tree and top-level are unaffected, which points at the same
    * truncated-path boundary rather than a second unrelated cause — but that is

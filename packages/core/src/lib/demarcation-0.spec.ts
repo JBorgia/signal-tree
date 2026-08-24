@@ -104,13 +104,15 @@ function observeCommitted<T>(x: unknown, cb: (current: T) => void): () => void {
       ) {
         return;
       }
-      // ⚠️ DEFENSIVE, NOT LOAD-BEARING, and mutation says so: removing this
-      // line breaks nothing. The unqualified collection ping always arrives in
-      // the SAME FLUSH as its valued siblings, so `dirty` is already set and
-      // one observation happens either way. It is kept because "a value-less
-      // event is not a state transition" is true independently of whether some
-      // other event happens to accompany it — but it is not what makes Q3's
-      // answer correct.
+      // ⚠️ DEFENSIVE FOR LINK, AND NOT HARMLESS IN GENERAL. Mutation shows
+      // removing this line breaks no link test, because the unqualified
+      // collection ping arrives in the same flush as its valued siblings.
+      //
+      // But REALIZATION-NAMESPACE-0 later found that same ping CORRUPTING
+      // realization state: it carries no `structuralEffect`, so
+      // `deriveCollectionPath` takes its non-structural branch and rewrites a
+      // nested collection's descriptor path to the PARENT branch. "Harmless to
+      // the consumer I was looking at" was not "harmless".
       if (v === undefined && prev === undefined) return;
       dirty = true;
     }

@@ -9481,7 +9481,13 @@ addOne addMany updateOne upsertOne removeOne setAll clear
 So a link that filters on the namespace and late-reads sees every transition.
 Mutation refines this further: treating the ping AS a trigger breaks nothing,
 because it always arrives in the same flush as its valued siblings. The filter
-is DEFENSIVE, not load-bearing — stated rather than overclaimed.
+is DEFENSIVE for link, not load-bearing.
+
+⚠️ **AND "HARMLESS" WAS WRONG IN GENERAL.** REALIZATION-NAMESPACE-0 later found
+this same ping CORRUPTING realization state — it carries no `structuralEffect`,
+so `deriveCollectionPath` takes its non-structural branch and rewrites a nested
+collection's descriptor path to the parent branch. "Harmless to the consumer I
+was looking at" is not "harmless".
 
 ## Q4 — one behaviour that forces nothing, and one surface limitation
 
@@ -9795,9 +9801,20 @@ TOP,    one tree               threw=false  restored ✓
 TOP,    two trees              threw=false  restored ✓
 ```
 
-With a second same-shaped tree present, a nested rollback fails AND the row is
-gone — silent data loss rather than a refusal that leaves state intact. That is
-worse than the original finding in both reach and consequence.
+⚠️ **CORRECTION.** I first called this "silent data loss". It is not silent —
+`rollback()` throws `SignalTreeRollbackError` — and it is the SAME failure class
+as the one-tree cases:
+
+```text
+rollback requested -> rollback REFUSED -> the transaction's speculative state
+remains materialised
+
+  addOne     the speculative ADDITION remains
+  removeOne  the speculative DELETION remains
+```
+
+The second tree widens the defect's REACH — an operation that succeeds with one
+tree fails with two — not its severity class.
 
 ## The boundary, traced rather than guessed
 
@@ -9857,6 +9874,85 @@ MUST NOT weaken refusal to let the rollback continue
 Core is **2092 passing with 6 expected failures**, and five of those are this
 defect. That is NOT release-green: an expected failure standing in for a
 correctness defect is a deferred bug, not a passing suite.
+
+# REALIZATION-NAMESPACE-0 — the NULL survives. The two axes are ONE defect
+
+`packages/core/src/lib/realization-namespace-0.spec.ts`, 9/9 (4 pinning current
+broken behaviour).
+
+```text
+NULL       realization descriptor/capture state is fully owner-isolated
+RESULT     SURVIVES — B never writes A's descriptor
+```
+
+## The discriminator matrix
+
+```text
+A  A only                              ok
+B  A + B created, B never mutated      ok      existence alone is fine
+C  A + B, B SCALAR mutation only       ok      any B notification is fine
+D  A + B, B COLLECTION mutation        FAILS   the reproducer
+E  same path, DIFFERENT local posIds   ok      padding A fixes it
+F  DIFFERENT path, same local posIds   FAILS   path is irrelevant
+G  B created FIRST                     FAILS   ordering is irrelevant
+```
+
+The trigger is a **local position-id collision plus a collection mutation in the
+other tree** — not co-existence, not path, not order.
+
+## The descriptor snapshot — it diverges AT THE SEED
+
+```text
+ONE tree   afterSeed  collectionPath = "data.rows"   ✓
+TWO trees  afterSeed  collectionPath = "data"        ✗
+```
+
+Both runs have a private map (size 1), a correct `ownerPath`, and the same
+position. Only the DERIVED `collectionPath` differs, and it is already wrong
+before any transaction exists. Maps and registries are distinct objects.
+
+## So it is ONE defect, and here is the mechanism
+
+`deriveCollectionPath` returns `ownerPath` (correct) only when the notification
+carries a `structuralEffect`. The unqualified OWNER-ONLY COLLECTION PING —
+`{ path: 'data.rows' }`, both values undefined, no structural effect, no
+`ownerId` — takes the non-structural branch:
+
+```text
+if (path === ownerPath) {
+  return ownerPath.includes('.') ? parentPath(ownerPath) : undefined;
+}
+```
+
+`"data.rows"` -> `parentPath` -> `"data"`. At top level `"rows"` has no dot and
+returns `undefined`, leaving the good value alone — **the entire reason
+top-level survives.**
+
+With one tree the ping coalesces away in the same flush as the structural event.
+With a second tree mutating a collection at the SAME LOCAL POSITION ID, flush
+composition changes, the ping survives separately, and it lands LAST.
+
+```text
+ROOT CAUSE   deriveCollectionPath is string-shaped and ambiguous
+AXIS 1       nested subject-creating ops fail deterministically
+AXIS 2       a second same-position tree makes even nested removeOne fail, by
+             changing which of A's OWN notifications writes last
+```
+
+⚠️ `path === ownerPath` cannot mean "a row inside a collection" — if a
+notification's path IS its owner path, it is ABOUT the owner. `parentPath` is
+wrong there for any nested owner and only accidentally harmless at the root.
+
+## ⚠️ This corrects DEMARCATION-0 and OWNER-REPLAY-2
+
+I recorded the owner-only ping as "harmless residue" and "defensive, not
+load-bearing". That was true FOR LINK — a link filters it out, and every
+transition also emits a qualified event — and **false in general**. The ping is
+the vehicle that corrupts realization state here.
+
+> "Harmless to the consumer I was looking at" is not "harmless".
+
+Both records are corrected in place.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
