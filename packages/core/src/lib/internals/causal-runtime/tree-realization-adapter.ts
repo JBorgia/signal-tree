@@ -350,6 +350,18 @@ export function rememberTreeRealizationDescriptor(
   });
 }
 
+/**
+ * The port applies effects on behalf of two different callers — `timeTravel()`
+ * restoring, and `transactions()` compensating a rollback — so it no longer
+ * asserts an origin of its own. Each site takes `source` from the ambient write
+ * context and falls back to `'system'`.
+ *
+ * This is what makes a restoration distinguishable from external truth at the
+ * observation seam without changing its CLASSIFICATION: it stays
+ * `causalMode: 'realization'`, because from the perspective of authorship and
+ * history admission it is realization-like, and that is what stops an undo
+ * recursively admitting itself.
+ */
 export function createTreeRealizationAdapter(
   options: CreateTreeRealizationAdapterOptions
 ): TreeRealizationPort {
@@ -835,7 +847,7 @@ function planHeterogeneousFrame(
         plan.publish({
           ...(getActiveWriteContext() ?? {}),
           intent: 'system',
-          source: 'system',
+          source: getActiveWriteContext()?.source ?? 'system',
           causalMode: 'realization',
           positionIds: [effect.owner],
           subjectIds: [effect.subjectId],
@@ -846,7 +858,7 @@ function planHeterogeneousFrame(
         plan.publish({
           ...(getActiveWriteContext() ?? {}),
           intent: 'system',
-          source: 'system',
+          source: getActiveWriteContext()?.source ?? 'system',
           causalMode: 'realization',
           positionIds: [effect.owner],
           subjectIds: [effect.subjectId],
@@ -857,7 +869,7 @@ function planHeterogeneousFrame(
         plan.publish({
           ...(getActiveWriteContext() ?? {}),
           intent: 'system',
-          source: 'system',
+          source: getActiveWriteContext()?.source ?? 'system',
           causalMode: 'realization',
           positionIds: [effect.owner],
           subjectIds: [effect.subjectId],
@@ -868,7 +880,7 @@ function planHeterogeneousFrame(
         plan.publish({
           ...(getActiveWriteContext() ?? {}),
           intent: 'system',
-          source: 'system',
+          source: getActiveWriteContext()?.source ?? 'system',
           causalMode: 'realization',
           positionIds: [effect.owner],
           subjectIds:
@@ -898,7 +910,7 @@ function planHeterogeneousFrame(
           {
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
-            source: 'system',
+            source: getActiveWriteContext()?.source ?? 'system',
             causalMode: 'realization',
             positionIds: [effect.owner],
             subjectIds:
@@ -972,7 +984,7 @@ function planScalarFrame(
           {
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
-            source: 'system',
+            source: getActiveWriteContext()?.source ?? 'system',
             causalMode: 'realization',
             positionIds: [effect.owner],
             subjectIds:
@@ -1104,7 +1116,7 @@ function applyEffect(
     {
       ...(getActiveWriteContext() ?? {}),
       intent: 'system',
-      source: 'system',
+      source: getActiveWriteContext()?.source ?? 'system',
       causalMode: 'realization',
       positionIds: [effect.owner],
       subjectIds:
