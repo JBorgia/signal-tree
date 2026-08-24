@@ -97,7 +97,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
 
   it('BRANCH CALL-FORM WRITE', async () => {
     const r = await probe(plain, (t) => {
-      (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 });
+      undoable(() => (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 }));
     });
     expect({
       landed: r.landed,
@@ -112,7 +112,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
 
   it('DEEP-EQUAL WRITE — a write that does NOT land', async () => {
     const r = await probe(plain, (t) => {
-      (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 1 });
+      undoable(() => (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 1 }));
     });
     // LANDED is the precondition: nothing downstream observes a write that
     // did not land.
@@ -275,14 +275,14 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
 
   it('BRANCH call form', async () => {
     const r = await capture((t) => {
-      (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 });
+      undoable(() => (t as unknown as { $: { a: (v: object) => void } }).$.a({ n: 3 }));
     });
     expect(r.notified).toEqual(['a.n']);
   });
 
   it('ROOT call form — the recursive update pipeline', async () => {
     const r = await capture((t) => {
-      (t as unknown as (v: object) => void)({ a: { n: 4 }, top: 7 });
+      undoable(() => (t as unknown as (v: object) => void)({ a: { n: 4 }, top: 7 }));
     });
     // Only the LANDED leaves: `a.s` was rewritten with its own value and is
     // absent.

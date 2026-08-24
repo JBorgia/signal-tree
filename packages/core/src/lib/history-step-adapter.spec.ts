@@ -135,7 +135,9 @@ describe('history step adapter seam', () => {
     const initialHistoryLength = store.getHistory().length;
     const step = store.transaction(() => {
       undoable(() => store.$.left.set('L1'));
-      void Promise.resolve().then(() => store.$.right.set('R1'));
+      void Promise.resolve().then(() =>
+        undoable(() => store.$.right.set('R1'))
+      );
     });
 
     await tick();
@@ -209,10 +211,12 @@ describe('history step adapter seam', () => {
     const initialHistoryLength = store.getHistory().length;
 
     const step = store.transaction(() => {
-      store.$.rows.setAll([
-        { id: 1, label: 'updated' },
-        { id: 3, label: 'add' },
-      ]);
+      undoable(() =>
+        store.$.rows.setAll([
+          { id: 1, label: 'updated' },
+          { id: 3, label: 'add' },
+        ])
+      );
     });
 
     expect(store.$.rows.ids()).toEqual([1, 3]);
