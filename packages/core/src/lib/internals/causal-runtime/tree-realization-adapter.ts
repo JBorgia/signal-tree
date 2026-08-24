@@ -1,4 +1,4 @@
-import type { ISignalTree, PositionId, StructuralHistoryEffect, UpdateMetadata } from '../../types';
+import type { ISignalTree, PositionId, StructuralHistoryEffect, WriteMetadata } from '../../types';
 import { getPathNotifier } from '../../path-notifier';
 import { getActiveWriteContext, withWriteContext } from '../../write-context';
 import { deepClone } from '@signaltree/shared';
@@ -31,14 +31,14 @@ type CollectionNode = {
     subjectId: number
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   };
   __planRemove?(
     key: string | number,
     subjectId: number
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   };
   __planRestore?(
     key: string | number,
@@ -54,14 +54,14 @@ type CollectionNode = {
     vacatingKeys?: ReadonlySet<string | number>
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   };
   __planRekey?(
     from: string | number,
     to: string | number
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   };
   __planPreparedRekey?(
     from: string | number,
@@ -70,7 +70,7 @@ type CollectionNode = {
     entity: unknown
   ): {
     commit(options?: { advancePhysicalRevision?: boolean }): void;
-    publish(metaOverride?: UpdateMetadata): void;
+    publish(metaOverride?: WriteMetadata): void;
   };
   __findKeyBySubjectId?(subjectId: number): string | number | undefined;
   __inspectSubjectResources?(subjectId: number): { state: 'active' | 'tombstoned' } | undefined;
@@ -230,7 +230,7 @@ export interface RememberTreeRealizationDescriptorOptions {
   readonly ownerPath?: string;
   readonly positionIds?: readonly number[];
   readonly subjectIds?: readonly number[];
-  readonly meta?: UpdateMetadata;
+  readonly meta?: WriteMetadata;
 }
 
 export interface CreateTreeRealizationAdapterOptions {
@@ -358,7 +358,7 @@ export function rememberTreeRealizationDescriptor(
  *
  * This is what makes a restoration distinguishable from external truth at the
  * observation seam without changing its CLASSIFICATION: it stays
- * `causalMode: 'realization'`, because from the perspective of authorship and
+ * `participation: 'realized'`, because from the perspective of authorship and
  * history admission it is realization-like, and that is what stops an undo
  * recursively admitting itself.
  */
@@ -614,28 +614,28 @@ function planHeterogeneousFrame(
     effect: ReversalEffect & { structural: 'add'; subjectId: number };
     plan: {
       commit(options?: { advancePhysicalRevision?: boolean }): void;
-      publish(metaOverride?: UpdateMetadata): void;
+      publish(metaOverride?: WriteMetadata): void;
     };
   }> = [];
   const plannedFreshAdds: Array<{
     effect: ReversalEffect & { structural: 'add'; subjectId: number };
     plan: {
       commit(options?: { advancePhysicalRevision?: boolean }): void;
-      publish(metaOverride?: UpdateMetadata): void;
+      publish(metaOverride?: WriteMetadata): void;
     };
   }> = [];
   const plannedRekeys: Array<{
     effect: ReversalEffect & { structural: 'rekey' };
     plan: {
       commit(options?: { advancePhysicalRevision?: boolean }): void;
-      publish(metaOverride?: UpdateMetadata): void;
+      publish(metaOverride?: WriteMetadata): void;
     };
   }> = [];
   const plannedRemoves: Array<{
     effect: ReversalEffect & { structural: 'remove'; subjectId: number };
     plan: {
       commit(options?: { advancePhysicalRevision?: boolean }): void;
-      publish(metaOverride?: UpdateMetadata): void;
+      publish(metaOverride?: WriteMetadata): void;
     };
   }> = [];
 
@@ -847,8 +847,7 @@ function planHeterogeneousFrame(
         plan.publish({
           ...(getActiveWriteContext() ?? {}),
           intent: 'system',
-          source: getActiveWriteContext()?.source ?? 'system',
-          causalMode: 'realization',
+          participation: 'realized',
           positionIds: [effect.owner],
           subjectIds: [effect.subjectId],
         });
@@ -858,8 +857,7 @@ function planHeterogeneousFrame(
         plan.publish({
           ...(getActiveWriteContext() ?? {}),
           intent: 'system',
-          source: getActiveWriteContext()?.source ?? 'system',
-          causalMode: 'realization',
+          participation: 'realized',
           positionIds: [effect.owner],
           subjectIds: [effect.subjectId],
         });
@@ -869,8 +867,7 @@ function planHeterogeneousFrame(
         plan.publish({
           ...(getActiveWriteContext() ?? {}),
           intent: 'system',
-          source: getActiveWriteContext()?.source ?? 'system',
-          causalMode: 'realization',
+          participation: 'realized',
           positionIds: [effect.owner],
           subjectIds: [effect.subjectId],
         });
@@ -880,8 +877,7 @@ function planHeterogeneousFrame(
         plan.publish({
           ...(getActiveWriteContext() ?? {}),
           intent: 'system',
-          source: getActiveWriteContext()?.source ?? 'system',
-          causalMode: 'realization',
+          participation: 'realized',
           positionIds: [effect.owner],
           subjectIds:
             typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
@@ -910,8 +906,7 @@ function planHeterogeneousFrame(
           {
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
-            source: getActiveWriteContext()?.source ?? 'system',
-            causalMode: 'realization',
+            participation: 'realized',
             positionIds: [effect.owner],
             subjectIds:
               typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
@@ -984,8 +979,7 @@ function planScalarFrame(
           {
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
-            source: getActiveWriteContext()?.source ?? 'system',
-            causalMode: 'realization',
+            participation: 'realized',
             positionIds: [effect.owner],
             subjectIds:
               typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
@@ -1116,8 +1110,7 @@ function applyEffect(
     {
       ...(getActiveWriteContext() ?? {}),
       intent: 'system',
-      source: getActiveWriteContext()?.source ?? 'system',
-      causalMode: 'realization',
+      participation: 'realized',
       positionIds: [effect.owner],
       subjectIds:
         typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,

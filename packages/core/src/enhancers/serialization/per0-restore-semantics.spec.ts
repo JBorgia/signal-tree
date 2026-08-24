@@ -102,7 +102,7 @@ describe('PER-0: is restore fixed by A1 ingress classification?', () => {
     await settle();
     const before = tree.getHistory().length;
 
-    await withWriteContext({ intent: 'system', causalMode: 'realization' }, () => tree.load());
+    await withWriteContext({ intent: 'system', participation: 'realized' }, () => tree.load());
     await settle();
 
     console.log(`RESTORE-AS-REALIZATION value=${tree.$.prefs.theme()} historyBefore=${before} after=${tree.getHistory().length} canUndo=${tree.canUndo()}`);

@@ -37,7 +37,7 @@ const flush = async () => {
 type Observed = {
   path: string;
   source: unknown;
-  causalMode: unknown;
+  participation: unknown;
   designated: unknown;
   transactionId: unknown;
 };
@@ -51,8 +51,8 @@ const observe = () => {
       const m = (meta ?? {}) as Record<string, unknown>;
       seen.push({
         path: String(path),
-        source: source ?? m['source'] ?? null,
-        causalMode: m['causalMode'] ?? null,
+        source: source ?? m['origin'] ?? null,
+        participation: m['participation'] ?? null,
         designated: m['restorationDesignated'] ?? null,
         transactionId: m['transactionId'] ?? null,
       });
@@ -87,13 +87,13 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
     await flush();
     const { seen, off } = observe();
 
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       tree.$.n.set(9);
     });
     await flush();
     off();
 
-    expect(seen.map((s) => s.causalMode)).toEqual(['realization']);
+    expect(seen.map((s) => s.participation)).toEqual(['realized']);
     // ...and it acquired no restoration right by being seen.
     expect(tree.getHistory().length - 1).toBe(0);
   });
@@ -118,8 +118,8 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
     // classification is unchanged (still a realization, which is what stops an
     // undo recursively admitting itself) and the provenance is now present.
     expect(seen.length).toBeGreaterThan(0);
-    expect(seen.every((s) => s.causalMode === 'realization')).toBe(true);
-    expect(seen.every((s) => s.source === 'time-travel')).toBe(true);
+    expect(seen.every((s) => s.participation === 'realized')).toBe(true);
+    expect(seen.every((s) => s.source === 'restoration')).toBe(true);
   });
 
   it('CASE 4+5 — transaction identity is on the fact; lifecycle is separate', async () => {

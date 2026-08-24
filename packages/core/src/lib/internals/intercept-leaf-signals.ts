@@ -1,4 +1,4 @@
-import type { UpdateMetadata } from '../mutation-types';
+import type { WriteMetadata } from '../mutation-types';
 import { isTraversableNode } from './node-shape';
 import { getNodeProcessor, snapshotMarkerNode } from './materialize-markers';
 import {
@@ -22,7 +22,7 @@ import { visitTree } from './visit-tree';
  * observe every mutation (DevTools, time-travel, etc.) must intercept those
  * leaf writes themselves — this helper centralizes that traversal.
  *
- * The `onWrite` callback receives an optional `meta: UpdateMetadata` captured
+ * The `onWrite` callback receives an optional `meta: WriteMetadata` captured
  * synchronously from the active `withWriteContext` frame (if any). Existing
  * 3-arg callbacks `(path, next, prev) => void` continue to work since the
  * trailing `meta` and `ownerPath` parameters are optional.
@@ -49,7 +49,7 @@ export function interceptLeafSignals(
     path: string,
     next: unknown,
     prev: unknown,
-    meta?: UpdateMetadata,
+    meta?: WriteMetadata,
     ownerPath?: string,
     subjectIds?: number[],
     positionIds?: number[]
@@ -60,9 +60,9 @@ export function interceptLeafSignals(
   const maxDepth = options.maxDepth ?? 32;
 
   const withMutationIntent = (
-    meta: UpdateMetadata | undefined,
+    meta: WriteMetadata | undefined,
     mutationIntent: 'replace' | 'derive'
-  ): UpdateMetadata => ({
+  ): WriteMetadata => ({
     ...(meta ?? {}),
     mutationIntent,
   });

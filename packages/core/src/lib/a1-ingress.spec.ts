@@ -38,8 +38,8 @@ const observe = () => {
     (_n, _p, _path, _owner, source, _s, _pos, meta) => {
       const m = (meta ?? {}) as Record<string, unknown>;
       seen.push({
-        origin: source ?? m['source'] ?? null,
-        participation: m['causalMode'] ?? null,
+        origin: source ?? m['origin'] ?? null,
+        participation: m['participation'] ?? null,
       });
     }
   );
@@ -79,7 +79,7 @@ describe('A1 case 1-2: classification', () => {
     // participation, and ZERO restoration admission — the ingress is not an
     // undo step, which is case 8 of A1-0 (`documented-defects` 6c's sibling)
     // fixed at the door instead of by classification the app cannot express.
-    expect(seen).toEqual([{ origin: 'external', participation: 'realization' }]);
+    expect(seen).toEqual([{ origin: 'external', participation: 'realized' }]);
     expect(tree.getHistory().length - historyBefore).toBe(0);
   });
 });
@@ -217,7 +217,7 @@ describe('A1 case 7-9: boundary', () => {
     await flush();
     off();
     // Idempotent: an inner scope declares the same two facts as the outer one.
-    expect(seen).toEqual([{ origin: 'external', participation: 'realization' }]);
+    expect(seen).toEqual([{ origin: 'external', participation: 'realized' }]);
   });
 
   it('case 8 — classification does not leak past the callback', async () => {

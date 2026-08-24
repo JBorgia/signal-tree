@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { UpdateMetadata } from '../../types';
+import type { WriteMetadata } from '../../types';
 
 import { createTransactionCaptureBridge, toExplicitTransactionEffect } from './transaction-capture-bridge';
 
@@ -54,7 +54,7 @@ describe('transaction capture bridge', () => {
       turnId: 7,
       transactionOwner: owner,
     });
-    const meta: UpdateMetadata = {
+    const meta: WriteMetadata = {
       transactionId: 7,
       transactionOwner: owner,
       historyEffect: {
@@ -131,7 +131,7 @@ describe('transaction capture bridge', () => {
       {
         transactionId: 7,
         transactionOwner: owner,
-        causalMode: 'realization',
+        participation: 'realized',
       }
     );
 

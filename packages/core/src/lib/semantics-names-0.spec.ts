@@ -8,15 +8,15 @@ import { undoable } from './undoable';
 import { withWriteContext } from './write-context';
 
 /**
- * SEMANTICS-NAMES-0 — is `source` / `causalMode` one dimension or two?
+ * SEMANTICS-NAMES-0 — is `source` / `participation` one dimension or two?
  *
  * > FALSIFIER: if a single `origin` axis cannot represent the measured
  * > distinctions without losing a genuinely independent dimension currently
- * > carried by `source` or `causalMode`, the consolidation is wrong.
+ * > carried by `source` or `participation`, the consolidation is wrong.
  *
  * What each field DECIDES today, from its consumers rather than its name:
  *
- *   causalMode   admission (does this enter restoration history / a
+ *   participation   admission (does this enter restoration history / a
  *                transaction's confirmed effects?) and COALESCING (may this
  *                batch with a neighbouring write?)
  *                -> "how does this participate in authored causal semantics?"
@@ -44,8 +44,8 @@ const observe = () => {
     (_n, _p, _path, _owner, source, _s, _pos, meta) => {
       const m = (meta ?? {}) as Record<string, unknown>;
       seen.push({
-        origin: source ?? m['source'] ?? null,
-        participation: m['causalMode'] ?? null,
+        origin: source ?? m['origin'] ?? null,
+        participation: m['participation'] ?? null,
       });
     }
   );
@@ -68,13 +68,13 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
     const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
     await flush();
     const { seen, off } = observe();
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       tree.$.n.set(9);
     });
     await flush();
     off();
 
-    expect(seen).toEqual([{ origin: null, participation: 'realization' }]);
+    expect(seen).toEqual([{ origin: null, participation: 'realized' }]);
   });
 
   it('restoration — time-travel origin, realization participation', async () => {
@@ -91,7 +91,7 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
     expect(seen.length).toBeGreaterThan(0);
     expect(
       seen.every(
-        (f) => f.origin === 'time-travel' && f.participation === 'realization'
+        (f) => f.origin === 'restoration' && f.participation === 'realized'
       )
     ).toBe(true);
   });
@@ -105,7 +105,7 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
     // ROLLBACK / IMPORT_STATE before calling applyState(). Reproduced here
     // rather than driven through the Redux bridge, so the combination is
     // measured without a browser extension.
-    withWriteContext({ intent: 'system', source: 'devtools' }, () => {
+    withWriteContext({ intent: 'system', origin: 'devtools' }, () => {
       tree.$.n.set(42);
     });
     await flush();

@@ -98,7 +98,7 @@ export type {
   EffectsMethods,
 
   // Update metadata (lifted from guardrails in v9.3 for cross-enhancer use)
-  UpdateMetadata,
+  WriteMetadata,
 } from './lib/types';
 
 export { SignalTreeRollbackError } from './lib/types';
@@ -178,7 +178,7 @@ export {
 /**
  * @see {@link undoable} — designates an authored causal turn as eligible for
  *   undo. The one public door onto restoration eligibility; the engine's own
- *   vocabulary (`causalMode`, `intent`, `source`, restoration designation
+ *   vocabulary (`participation`, `intent`, `origin`, restoration designation
  *   metadata) stays internal.
  */
 export { undoable } from './lib/undoable';

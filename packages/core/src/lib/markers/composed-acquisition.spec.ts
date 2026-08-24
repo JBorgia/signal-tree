@@ -187,7 +187,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     // The candidate C2 seam. `withWriteContext` is enhancer-author plumbing and
     // is NOT in the shipped barrel — that is the whole finding. Core already
     // knows how to classify this write; applications cannot say it.
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       applyServerTruth(tree.$.users, [{ id: 'a', name: 'Server', v: 2 }]);
     });
     await flush();
@@ -225,7 +225,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
       tree.$.users.updateOne('a', { name: 'Optimistic' });
     });
 
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       applyServerTruth(tree.$.users, [{ id: 'a', name: 'Server', v: 5 }]);
     });
     await flush();

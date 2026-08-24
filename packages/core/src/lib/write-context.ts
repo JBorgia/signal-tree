@@ -1,7 +1,7 @@
-import type { UpdateMetadata } from './mutation-types';
+import type { WriteMetadata } from './mutation-types';
 
 /**
- * Ambient write-context channel for tagging tree writes with `UpdateMetadata`.
+ * Ambient write-context channel for tagging tree writes with `WriteMetadata`.
  *
  * Enhancers (guardrails, validation, devtools) observe writes via leaf
  * interceptors but Angular's `WritableSignal.set(value)` signature cannot be
@@ -45,7 +45,7 @@ import type { UpdateMetadata } from './mutation-types';
  * is an antipattern; use per-request trees.
  */
 
-let activeContext: UpdateMetadata | undefined;
+let activeContext: WriteMetadata | undefined;
 
 /**
  * Run `fn` with `meta` set as the active write context. The previous context
@@ -56,7 +56,7 @@ let activeContext: UpdateMetadata | undefined;
  * @returns The value returned by `fn`.
  */
 export function withWriteContext<R>(
-  meta: UpdateMetadata,
+  meta: WriteMetadata,
   fn: () => R
 ): R {
   const previous = activeContext;
@@ -75,9 +75,9 @@ export function withWriteContext<R>(
  *
  * @public — Enhancer-author API. Read inside an `onWrite` callback from
  *   `interceptLeafSignals` (or anywhere the enhancer observes writes) to
- *   capture the ambient `UpdateMetadata`. Application code should not use
+ *   capture the ambient `WriteMetadata`. Application code should not use
  *   this directly.
  */
-export function getActiveWriteContext(): UpdateMetadata | undefined {
+export function getActiveWriteContext(): WriteMetadata | undefined {
   return activeContext;
 }

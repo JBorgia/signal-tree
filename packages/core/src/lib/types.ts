@@ -1,6 +1,6 @@
 import { Signal, WritableSignal } from '@angular/core';
 
-import type { UpdateMetadata } from './mutation-types';
+import type { WriteMetadata } from './mutation-types';
 import type { NodeAccessor } from './node-accessor';
 import { AsyncQueryMarker, AsyncQuerySignal } from './markers/async-query';
 import { AsyncSourceMarker, AsyncSourceSignal } from './markers/async-source';
@@ -18,12 +18,12 @@ export type {
   TreeCapability,
 } from './enhancer-types';
 export type {
-  CausalWriteMode,
+  WriteParticipation,
   MutationEnvelope,
   MutationKind,
   PositionId,
   StructuralHistoryEffect,
-  UpdateMetadata,
+  WriteMetadata,
   WriteAttribution,
 } from './mutation-types';
 export type { NodeAccessor } from './node-accessor';
@@ -1195,7 +1195,7 @@ export interface PathNotifier {
     ownerPath?: string,
     subjectIds?: number[],
     positionIds?: number[],
-    meta?: UpdateMetadata
+    meta?: WriteMetadata
   ): void;
 }
 
@@ -1207,7 +1207,7 @@ type PathHandler = (
   source?: string,
   subjectIds?: number[],
   positionIds?: number[],
-  meta?: UpdateMetadata
+  meta?: WriteMetadata
 ) => void;
 
 type PathInterceptor = (

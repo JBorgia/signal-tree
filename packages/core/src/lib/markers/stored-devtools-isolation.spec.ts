@@ -17,8 +17,8 @@ import { withWriteContext } from '../write-context';
  * a slider.
  *
  * The two were indistinguishable because devtools tagged its replays
- * `source: 'time-travel'`, exactly as undo does. It now sends `'devtools'` — a
- * value that was already in the `UpdateMetadata['source']` union and simply
+ * `origin: 'restoration'`, exactly as undo does. It now sends `'devtools'` — a
+ * value that was already in the `WriteMetadata['origin']` union and simply
  * unused — so this needed no new mode, no new option, and no new vocabulary.
  */
 const fakeStorage = () => {
@@ -65,7 +65,7 @@ describe('stored() and replay side effects', () => {
         _prev,
         path,
         ownerPath,
-        _source,
+        _origin,
         _subjectIds,
         _positionIds,
         meta
@@ -91,7 +91,7 @@ describe('stored() and replay side effects', () => {
     withWriteContext(
       {
         intent: 'system',
-        source: 'serialization',
+        origin: 'serialization',
         transactionId: 7,
         transactionOwner: owner,
       },
@@ -111,7 +111,7 @@ describe('stored() and replay side effects', () => {
       ownerPath: 'k',
       meta: {
         intent: 'system',
-        source: 'serialization',
+        origin: 'serialization',
         transactionId: 7,
         transactionOwner: owner,
         mutationIntent: 'replace',
@@ -185,7 +185,7 @@ describe('stored() and replay side effects', () => {
     tree.$.k.flush?.();
     expect(persisted(map, 'sdi-undo')).toBe('dark');
 
-    withWriteContext({ intent: 'system', source: 'time-travel' }, () => {
+    withWriteContext({ intent: 'system', origin: 'restoration' }, () => {
       undoable(() => tree.$.k.set('light'));
     });
     tree.$.k.flush?.();
@@ -205,7 +205,7 @@ describe('stored() and replay side effects', () => {
     undoable(() => tree.$.k.set('dark'));
     tree.$.k.flush?.();
 
-    withWriteContext({ intent: 'system', source: 'devtools' }, () => {
+    withWriteContext({ intent: 'system', origin: 'devtools' }, () => {
       undoable(() => tree.$.k.set('light'));
     });
     tree.$.k.flush?.();

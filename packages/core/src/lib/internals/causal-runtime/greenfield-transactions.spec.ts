@@ -6,7 +6,7 @@ import { signalTree } from '../../signal-tree';
 import type {
   ISignalTree,
   StructuralHistoryEffect,
-  UpdateMetadata,
+  WriteMetadata,
 } from '../../types';
 import { withWriteContext } from '../../write-context';
 import { entityMap } from '../../markers/entity-map';
@@ -123,7 +123,7 @@ const createLiveDraftHarness = (
       return withWriteContext(
         {
           intent: 'user',
-          source: 'user',
+          origin: 'user',
           transactionId: turnId,
           transactionOwner,
         },
@@ -1055,7 +1055,7 @@ describe('greenfield transactions', () => {
       appliedHistory,
     });
     const harness = createLiveDraftHarness(draft, 1);
-    const notifications: Array<{ path: string; meta?: UpdateMetadata }> = [];
+    const notifications: Array<{ path: string; meta?: WriteMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       '**',
       (
@@ -1063,7 +1063,7 @@ describe('greenfield transactions', () => {
         _prev,
         path,
         _ownerPath,
-        _source,
+        _origin,
         _subjectIds,
         _positionIds,
         meta

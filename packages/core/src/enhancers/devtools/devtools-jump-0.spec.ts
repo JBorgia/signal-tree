@@ -12,8 +12,8 @@ import { withWriteContext } from '../../lib/write-context';
  *
  * `devTools()` handles JUMP_TO_STATE / JUMP_TO_ACTION / ROLLBACK / COMMIT /
  * IMPORT_STATE by calling `applyState()` directly under
- * `withWriteContext({ intent: 'system', source: 'devtools' })` — no
- * `causalMode`, and no routing through the restoration authority.
+ * `withWriteContext({ intent: 'system', origin: 'devtools' })` — no
+ * `participation`, and no routing through the restoration authority.
  *
  * Pre-registered possibilities:
  *
@@ -50,11 +50,11 @@ const flush = async () => {
  *
  * Kept verbatim rather than updated, because the findings below ARE the
  * behaviour of that context and are what closed the disposition as D. The
- * post-fix contract — `causalMode: 'inspection'` — is measured in
+ * post-fix contract — `participation: 'inspection'` — is measured in
  * `devtools-jump-0-1.spec.ts`, which is the acceptance file.
  */
 const asAuthoredDevtools = (fn: () => void) =>
-  withWriteContext({ intent: 'system', source: 'devtools' }, fn);
+  withWriteContext({ intent: 'system', origin: 'devtools' }, fn);
 
 describe('DEVTOOLS-JUMP-0: interaction with a PENDING transaction', () => {
   it('is a devtools application captured into the transaction contribution?', async () => {

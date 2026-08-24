@@ -37,7 +37,7 @@ const flush = async () => {
  */
 const asDevtools = (fn: () => void) =>
   withWriteContext(
-    { intent: 'system', source: 'devtools', causalMode: 'inspection' },
+    { intent: 'system', origin: 'devtools', participation: 'inspection' },
     fn
   );
 
@@ -187,7 +187,7 @@ describe('DEVTOOLS-JUMP-0.1: the ledger hole', () => {
     // exclusion above is the participation doing the work and not the timing —
     // and that C3 is intact for the case it was built for: truth another
     // authority has a right to preserve.
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       tree.$.rows.updateOne('a', { name: 'Server' });
     });
     await flush();

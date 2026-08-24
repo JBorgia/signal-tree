@@ -21,11 +21,11 @@ import { withWriteContext } from './write-context';
  *
  * Target matrix:
  *
- *   ordinary authored      causalMode absent,      source absent
- *   designated authored    causalMode absent,      source absent,
+ *   ordinary authored      participation absent,      source absent
+ *   designated authored    participation absent,      source absent,
  *                          restorationDesignated true
- *   external realization   causalMode realization, source != 'time-travel'
- *   undo / redo            causalMode realization, source == 'time-travel'
+ *   external realization   participation realization, source != 'restoration'
+ *   undo / redo            participation realization, source == 'restoration'
  */
 
 const flush = async () => {
@@ -33,7 +33,7 @@ const flush = async () => {
   await Promise.resolve();
 };
 
-type Fact = { source: unknown; causalMode: unknown; designated: unknown };
+type Fact = { source: unknown; participation: unknown; designated: unknown };
 
 const observe = () => {
   const seen: Fact[] = [];
@@ -42,8 +42,8 @@ const observe = () => {
     (_n, _p, _path, _owner, source, _s, _pos, meta) => {
       const m = (meta ?? {}) as Record<string, unknown>;
       seen.push({
-        source: source ?? m['source'] ?? null,
-        causalMode: m['causalMode'] ?? null,
+        source: source ?? m['origin'] ?? null,
+        participation: m['participation'] ?? null,
         designated: m['restorationDesignated'] ?? null,
       });
     }
@@ -64,10 +64,10 @@ describe('restoration origin: the five falsifiers', () => {
     off();
 
     expect(seen.length).toBeGreaterThan(0);
-    expect(seen.every((f) => f.source === 'time-travel')).toBe(true);
+    expect(seen.every((f) => f.source === 'restoration')).toBe(true);
     // Still a realization: that classification is what stops an undo from
     // recursively admitting itself.
-    expect(seen.every((f) => f.causalMode === 'realization')).toBe(true);
+    expect(seen.every((f) => f.participation === 'realized')).toBe(true);
   });
 
   it('2 — redo() does the same', async () => {
@@ -84,7 +84,7 @@ describe('restoration origin: the five falsifiers', () => {
     off();
 
     expect(seen.length).toBeGreaterThan(0);
-    expect(seen.every((f) => f.source === 'time-travel')).toBe(true);
+    expect(seen.every((f) => f.source === 'restoration')).toBe(true);
   });
 
   it('3 — an external realization never acquires source "time-travel"', async () => {
@@ -92,7 +92,7 @@ describe('restoration origin: the five falsifiers', () => {
     await flush();
 
     const { seen, off } = observe();
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       tree.$.n.set(9);
     });
     await flush();
@@ -100,8 +100,8 @@ describe('restoration origin: the five falsifiers', () => {
 
     // The distinction has to cut both ways, or it is not a distinction.
     expect(seen.length).toBeGreaterThan(0);
-    expect(seen.some((f) => f.source === 'time-travel')).toBe(false);
-    expect(seen.every((f) => f.causalMode === 'realization')).toBe(true);
+    expect(seen.some((f) => f.source === 'restoration')).toBe(false);
+    expect(seen.every((f) => f.participation === 'realized')).toBe(true);
   });
 
   it('4 — restoration creates no new history and does not admit itself', async () => {
@@ -124,7 +124,7 @@ describe('restoration origin: the five falsifiers', () => {
     undoable(() => tree.$.doc.title.set('A'));
     await flush();
 
-    withWriteContext({ intent: 'system', causalMode: 'realization' }, () => {
+    withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       tree.$.doc.title.set('SERVER');
     });
     await flush();
@@ -145,7 +145,7 @@ describe('restoration origin: the five falsifiers', () => {
     await flush();
     off();
 
-    expect(seen.map((f) => f.causalMode)).toEqual([null, null]);
+    expect(seen.map((f) => f.participation)).toEqual([null, null]);
     expect(seen.map((f) => f.source)).toEqual([null, null]);
     expect(seen.map((f) => f.designated)).toEqual([null, true]);
   });

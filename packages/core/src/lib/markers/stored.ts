@@ -643,10 +643,10 @@ export function createStoredSignal<T>(
     // their settings rewritten by dragging a slider.
     //
     // The two were indistinguishable because devtools tagged its replays
-    // `source: 'time-travel'`, the same as undo. It now sends `'devtools'` —
+    // `origin: 'restoration'`, the same as undo. It now sends `'devtools'` —
     // a value that was already in the union and simply unused — so this needs
     // no new mode and no new option.
-    if (getActiveWriteContext()?.source === 'devtools') return;
+    if (getActiveWriteContext()?.origin === 'devtools') return;
     writeGeneration++;
     try {
       const versionedData: VersionedStorageData<T> = {

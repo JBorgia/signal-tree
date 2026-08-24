@@ -7,7 +7,7 @@ import { entityMap } from '../../markers/entity-map';
 import { stored } from '../../markers/stored';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
-import type { ISignalTree, UpdateMetadata } from '../../types';
+import type { ISignalTree, WriteMetadata } from '../../types';
 import { timeTravel } from '../../../enhancers/time-travel/time-travel';
 import { transactions } from '../../../enhancers/transactions/transactions';
 import {
@@ -1187,7 +1187,7 @@ describe('tree realization adapter', () => {
         afterSubject?: number
       ) => {
         commit(options?: { advancePhysicalRevision?: boolean }): void;
-        publish(metaOverride?: UpdateMetadata): void;
+        publish(metaOverride?: WriteMetadata): void;
       };
     };
     if (!collectionInternal.__planRestore) {
@@ -3728,7 +3728,7 @@ describe('tree realization adapter', () => {
       tree: tree as unknown as ISignalTree<object>,
       descriptors,
     });
-    const notifications: Array<{ path: string; meta?: UpdateMetadata }> = [];
+    const notifications: Array<{ path: string; meta?: WriteMetadata }> = [];
     const unsubscribe = getPathNotifier().subscribe(
       '**',
       (
@@ -3736,7 +3736,7 @@ describe('tree realization adapter', () => {
         _prev,
         path,
         _ownerPath,
-        _source,
+        _origin,
         _subjectIds,
         _positionIds,
         meta
@@ -4225,7 +4225,7 @@ describe('tree realization adapter', () => {
             to: string
           ) => {
             commit(): void;
-            publish(metaOverride?: UpdateMetadata): void;
+            publish(metaOverride?: WriteMetadata): void;
           };
         };
     };
@@ -4499,7 +4499,7 @@ describe('tree realization adapter', () => {
           key: 'u1',
           value: { id: 'u1', name: 'Alice' },
         },
-      } satisfies UpdateMetadata,
+      } satisfies WriteMetadata,
     });
 
     const adapter = createTreeRealizationAdapter({

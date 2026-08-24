@@ -1,8 +1,8 @@
 import type { PathNotifierHandler } from '../../path-notifier';
 
-import { getCausalWriteMode, isInspectionWrite } from '../../causal-write-mode';
+import { getWriteParticipation, isInspectionWrite } from '../../write-participation';
 
-import type { PositionId, StructuralHistoryEffect, UpdateMetadata } from '../../types';
+import type { PositionId, StructuralHistoryEffect, WriteMetadata } from '../../types';
 
 import type { ExplicitTransactionEffect, GreenfieldTransactionDraft } from './greenfield-transactions';
 
@@ -11,7 +11,7 @@ export function toExplicitTransactionEffect(options: {
   prev: unknown;
   subjectIds?: number[];
   positionIds?: number[];
-  meta?: UpdateMetadata;
+  meta?: WriteMetadata;
 }): ExplicitTransactionEffect | undefined {
   const owner = options.positionIds?.[0] as PositionId | undefined;
   if (owner === undefined) {
@@ -51,7 +51,7 @@ export function createTransactionCaptureBridge(options: {
       // DEVTOOLS-JUMP-0.1: an inspection application is not part of any
       // transaction's contribution.
       isInspectionWrite(meta) ||
-      getCausalWriteMode(meta) === 'realization' ||
+      getWriteParticipation(meta) === 'realized' ||
       meta?.transactionId !== options.turnId ||
       meta.transactionOwner !== options.transactionOwner
     ) {
