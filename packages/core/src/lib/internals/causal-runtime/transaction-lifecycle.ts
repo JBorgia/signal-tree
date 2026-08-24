@@ -133,21 +133,42 @@ function createChannel(): TransactionLifecycleChannel {
 }
 
 /**
- * The channel for a tree, created on first use.
+ * The CANONICAL host for a tree's lifecycle channel.
  *
- * Attached under a `SignalTree:`-prefixed symbol so `unwrap`'s symbol walk skips
- * it and it can never reach a serialized payload.
+ * TURN-FEED-0.2. The object an enhancer is handed is NOT the object
+ * `signalTree()` returns — `applyEnhancers` runs first and `createBuilder`
+ * produces the public tree afterwards — so a channel attached to the enhancer's
+ * argument is unreachable from the tree an application holds. Measured across
+ * both the enhancer input, the `applyEnhancers` output and the public tree,
+ * `tree.$` is the one object identical at all three points, so it is the host.
+ *
+ * The fallback exists for the internal callers that pass a node directly.
+ */
+function canonicalHost(tree: object): object {
+  const dollar = (tree as { $?: unknown }).$;
+  return dollar && typeof dollar === 'object' ? (dollar as object) : tree;
+}
+
+/**
+ * Install the channel. **Owner side only.**
+ *
+ * Idempotent: the second authority to set up on a tree gets the first one's
+ * channel. Both `transactions()` and `restoration()` own transactions, so both
+ * install, and neither depends on enhancer order to be heard.
  *
  * @internal
  */
-export function getTransactionLifecycleChannel(
-  host: object
+export function installTransactionLifecycleChannel(
+  tree: object
 ): TransactionLifecycleChannel {
+  const host = canonicalHost(tree);
   const existing = (host as Record<symbol, unknown>)[TRANSACTION_LIFECYCLE];
   if (existing) {
     return existing as TransactionLifecycleChannel;
   }
   const channel = createChannel();
+  // Attached under a `SignalTree:`-prefixed symbol so `unwrap`'s symbol walk
+  // skips it and it can never reach a serialized payload.
   Object.defineProperty(host, TRANSACTION_LIFECYCLE, {
     value: channel,
     enumerable: false,
@@ -155,4 +176,74 @@ export function getTransactionLifecycleChannel(
     configurable: true,
   });
   return channel;
+}
+
+/**
+ * Does this tree have a transaction authority at all?
+ *
+ * Keyed on `__transactions`, the handle the transactions enhancer PUBLISHES for
+ * exactly this purpose — not on a heuristic like "does it have a `transaction`
+ * method", which any object could satisfy.
+ */
+function hasTransactionAuthority(tree: object): boolean {
+  return !!(tree as Record<string, unknown>)['__transactions'];
+}
+
+/**
+ * Resolve a tree's lifecycle channel, or `undefined` when the tree simply has
+ * no transaction capability. **Observer side. Never creates one.**
+ *
+ * @internal
+ */
+export function tryGetTransactionLifecycleChannel(
+  tree: object
+): TransactionLifecycleChannel | undefined {
+  const host = canonicalHost(tree);
+  return (host as Record<symbol, unknown>)[TRANSACTION_LIFECYCLE] as
+    | TransactionLifecycleChannel
+    | undefined;
+}
+
+/**
+ * Resolve a tree's lifecycle channel. **Observer side. Never creates one.**
+ *
+ * TURN-FEED-0.2, and the reason this function no longer creates: it used to do
+ * two jobs — "create if missing" for the owner and "find" for an observer — so
+ * an observer that asked the WRONG object silently got a brand-new channel that
+ * could never fire. Reachability then depended on which other enhancers were
+ * installed, which is precisely the ownership independence TURN-FEED claims.
+ *
+ * The distinction this preserves:
+ *
+ * ```text
+ * no transaction authority        absence      -> tryGet() returns undefined
+ * authority present, no channel   CORRUPTION   -> ST1036, loudly
+ * ```
+ *
+ * @throws `ST1036` if the tree has a transaction authority whose channel cannot
+ *   be resolved, or if it has no transaction capability at all. Use
+ *   {@link tryGetTransactionLifecycleChannel} where absence is legitimate.
+ * @internal
+ */
+export function getTransactionLifecycleChannel(
+  tree: object
+): TransactionLifecycleChannel {
+  const channel = tryGetTransactionLifecycleChannel(tree);
+  if (channel) {
+    return channel;
+  }
+  if (hasTransactionAuthority(tree)) {
+    throw new Error(
+      'ST1036: this tree has a transaction authority but no lifecycle channel ' +
+        'could be resolved. The channel is installed by the authority on the ' +
+        "tree's canonical host; failing to find one here means the install and " +
+        'the lookup disagree about that host, which would silently deliver no ' +
+        'lifecycle events at all.'
+    );
+  }
+  throw new Error(
+    'ST1036: this tree has no transaction capability, so it has no lifecycle ' +
+      'channel. Add `transactions()` to the enhancers, or use ' +
+      '`tryGetTransactionLifecycleChannel()` where absence is legitimate.'
+  );
 }

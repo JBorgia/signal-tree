@@ -27,7 +27,7 @@ import {
   rememberTreeRealizationDescriptor,
 } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import {
-  getTransactionLifecycleChannel,
+  installTransactionLifecycleChannel,
   transactionIdentityKey,
 } from '../../lib/internals/causal-runtime/transaction-lifecycle';
 import {
@@ -2806,7 +2806,12 @@ export function restoration(
      * Its own transactions are NOT routed through this. They already hold
      * `transactionOwnerToken` and drive the manager directly.
      */
-    const unsubscribeTransactionLifecycle = getTransactionLifecycleChannel(
+    // TURN-FEED-0.2. Restoration owns transactions of its own
+    // (`transactionOwnerToken`), so it is an owner-side installer, not merely an
+    // observer. Installing here rather than resolving is what makes the
+    // subscription independent of enhancer order: whichever authority sets up
+    // first creates the one channel, and the other joins it.
+    const unsubscribeTransactionLifecycle = installTransactionLifecycleChannel(
       tree as object
     ).subscribe((event) => {
       if (event.owner === transactionOwnerToken) {
