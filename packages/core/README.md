@@ -1963,6 +1963,54 @@ branch through an ordinary tree handle stays non-undoable.
 An `undo()` that cannot be applied is refused rather than partially applied —
 see `ST1034` in [docs/errors](../../docs/errors/README.md).
 
+### Applying externally acquired truth
+
+`realize()` is the mirror of `undoable()`. It declares that the contained writes
+are truth acquired from outside the authored operation, rather than work the user
+did:
+
+```ts
+import { realize, signalTree, timeTravel } from '@signaltree/core';
+
+const rows = await api.getRows();
+realize(() => tree.$.rows.setAll(rows));
+```
+
+Without it, a refresh is indistinguishable from a user edit — it becomes an undo
+step, and the next `undo()` reverts **the server's value** to a stale client one.
+
+What it declares, on the two axes SignalTree keeps separate:
+
+```text
+origin         external    where the value came from
+participation  realized    how it may take part in causal mechanisms
+```
+
+It classifies provenance; it does not buy exemption from consequences. External
+truth still participates: it can make a pending transaction rollback unsafe (the
+rollback is refused rather than discarding truth the transaction does not own),
+and it is protected from being discarded by an `undo()` (`ST1034`). What it never
+does is become an authored turn — no undo step, and no transaction contribution.
+
+The scope is synchronous, and an async callback is refused with `ST1035` rather
+than silently applying the server's value as authored work:
+
+```ts
+// ❌ throws ST1035 — the write lands after the classification is restored
+realize(async () => {
+  const rows = await api.getRows();
+  tree.$.rows.setAll(rows);
+});
+
+// ✅ acquire first, then classify the synchronous write
+const rows = await api.getRows();
+realize(() => tree.$.rows.setAll(rows));
+```
+
+That is the shape acquisition actually has: fetching is asynchronous and belongs
+to whatever owns the request — Angular's `resource()`, an RxJS pipeline, a plain
+`fetch` — while applying the result is a single synchronous SignalTree event.
+
 ### SSR transfer vs storage restore
 
 `deserialize()` accepts `{ transfer: true }` to mark a payload as an **SSR
