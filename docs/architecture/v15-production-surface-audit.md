@@ -4223,6 +4223,154 @@ DevTools is the likely second consumer. Until then `DiagnosticJournal`,
 `DiagnosticTurn`, the field set and the lifecycle representation are internal
 working vocabulary.
 
+# DX-NAMES-1 · STEP 1 — the corpus, classified BEFORE any candidate name
+
+> **PRE-REGISTRATION. Candidate generation may look at the calibration corpus.
+> The semantic classification of a scenario may NOT change in response to how a
+> candidate performs on it.** If a name reads badly on disk-loaded state, we do
+> not get to reclassify disk-loaded state as "not external" to save the name.
+
+TruckTrax is used READ-ONLY. Candidate renderings are written beside the original
+code in this document; no production file is modified by this study. Migration is
+a later decision.
+
+## The real corpus (TruckTrax, read-only)
+
+Situation written in ordinary language first, classification second. No candidate
+name has been applied at the time of writing.
+
+```text
+id   site                                     situation                          class
+R1   clearview.state customers                HTTP GET -> keyed collection       acquired
+R2   clearview.state projects                 HTTP GET (parameterized)           acquired
+R3   clearview.state products                 HTTP GET (parameterized)           acquired
+R4   clearview.state plants                   HTTP GET                           acquired
+R5   clearview.state (plant-scoped)           HTTP GET                           acquired
+R6   clearview.state cities                   HTTP GET                           acquired
+R7   dispatch.state haulers                   HTTP GET                           acquired
+R8   dispatch.state trucks                    HTTP GET + client filter           acquired
+R9   dispatch.state drivers                   HTTP GET + client filter           acquired
+R10  dispatch.state (region-scoped)           HTTP GET                           acquired
+R11  v3edge.state (1)                         HTTP GET                           acquired
+R12  v3edge.state (2)                         HTTP GET                           acquired
+R13  catalog.state haulers                    HTTP GET                           acquired
+R14  catalog.state trucks                     HTTP GET + page.items              acquired
+R15  catalog.state plants                     HTTP GET (filtered)                acquired
+R16  device.state glinxDevices                HTTP GET + key requirement         acquired
+R17  work.state messages                      HTTP GET (party-scoped)            acquired
+
+R18  ticket.ops loadTickets$                  HTTP GET -> setAll, no loader      acquired
+R19  device.ops addGlinxDevice$               POST response -> upsertMany        ⚠ AMBIGUOUS
+R20  device.ops getGLinxDeviceByExternalId$   GET -> upsertMany                  acquired
+R21  device.ops setGlinxDeviceEntity          Bluetooth bridge -> upsertMany     acquired
+R22  ticket.ops setActiveTicket (socket path) SignalR ticket -> active selection ⚠ AMBIGUOUS
+R23  dev-flags.service                        localStorage -> signal             PER-B
+R24  device-token-manager                     Capacitor Preferences.get          PER-B
+```
+
+### ⚠️ FINDING BEFORE THE STUDY EVEN STARTS: the real corpus is a monoculture
+
+R1-R18 and R20 are **the same scenario seventeen times**: an HTTP GET result
+applied to a keyed collection. The `loader()` uniformity the A1 audit noted is
+not just uniform CONFIGURATION, it is uniform SITUATION.
+
+Consequences the study must respect:
+
+```text
+the corpus proves    the name works for server fetch
+it cannot prove      breadth — disk, cache, worker, socket, sensor, peer
+```
+
+So `incoming()`'s open question — does it teach "arriving now over a channel"
+rather than "acquired rather than authored"? — **cannot be answered by TruckTrax
+alone**. The constructed controls carry that weight, and saying so now prevents a
+monoculture result from being read as breadth evidence later.
+
+(The earlier audit prose said 19 `loader()` sites; the count is 17. Its own table
+totalled 17 too. Corrected here.)
+
+### The two genuinely hard cases, classified before names
+
+**R19 — the POST response.** The app authored a device creation; the server
+returned the canonical record, which is then upserted. The REQUEST is authored;
+the applied VALUE is acquired. Classified **acquired**, because what reaches the
+tree is the server's record and not the client's input — but recorded as
+ambiguous, since a developer could reasonably read the whole operation as
+authored work. Any candidate that makes this site read naturally as "authored" is
+teaching the wrong thing at exactly the point where the distinction bites.
+
+**R22 — the socket-driven active-ticket selection.** A SignalR ticket arrives and
+the app sets it as the ACTIVE ticket. Two facts are entangled: the ticket data is
+acquired, and the selection of which ticket is active is a UI/business decision.
+Classified **ambiguous**, and it is the best available test of whether a
+candidate name tempts a developer to wrap a scope that contains authored work.
+
+**R23/R24 — durable storage.** Classified **PER-B-owned** and excluded from
+scoring. Whether reading back durable state is realized participation is PER-B's
+call, and letting a naming study decide it by implication is exactly the
+compression this release keeps undoing.
+
+## Constructed coverage controls
+
+The corpus cannot exercise these; they are stated now, before candidates:
+
+```text
+C1   REST GET result                       acquired
+C2   WebSocket / SSE push                  acquired
+C3   IndexedDB read-back                   PER-B-adjacent (scored, flagged)
+C4   localStorage read-back                PER-B-adjacent (scored, flagged)
+C5   Web Worker computation result         ⚠ acquired? computed elsewhere, not fetched
+C6   native / sensor bridge reading        acquired
+C7   collaborative peer edit               acquired
+C8   user form input                       AUTHORED (negative)
+C9   local business-rule mutation          AUTHORED (negative)
+C10  optimistic write inside a transaction AUTHORED (negative)
+C11  DevTools jump                         INSPECTION (negative)
+C12  undo / redo                           RESTORATION (negative)
+C13  server response to a user's POST      ⚠ ambiguous (mirrors R19)
+```
+
+C5 is deliberately included: a worker result is neither authored by the
+application nor fetched from a remote — it is the case most likely to split
+candidates that mean "arrived over a channel" from candidates that mean "not
+authored here".
+
+## Split, fixed now
+
+```text
+CALIBRATION   R1-R14  +  C1-C13        candidates may be refined against these
+HOLDOUT       R15-R22                  finalists only, untouched until then
+EXCLUDED      R23, R24                 PER-B owns the classification
+```
+
+The holdout deliberately carries both ambiguous cases (R19, R22) and the only
+non-HTTP real site (R21, Bluetooth). Calibration is therefore a monoculture plus
+constructed breadth, which is stated rather than hidden: a shortlist that scores
+well on calibration has NOT yet been tested against real ambiguity.
+
+## Scoring dimensions, weighted before results
+
+```text
+HEAVY   decision inference   would a competent TS developer know the wrapper
+                             belongs here, reading the site cold?
+HEAVY   misuse resistance    where does the name TEMPT a wrap that does not
+                             belong? (C8-C12 are the trap set)
+HEAVY   wrong-omission       against doing nothing special (`tree.$.x.set(v)`),
+                             does the name explain why the scope exists? An
+                             ornamental-looking candidate FAILS even if its
+                             English is accurate.
+medium  breadth              does one name cover fetch, disk, worker, sensor,
+                             peer without teaching a narrower story?
+medium  family coherence     beside `undoable()`, `transaction()`, `restoration()`
+light   discoverability      IDE completion, grep, docs search
+light   prior art collision  established framework meanings
+```
+
+## Deliverable
+
+Not a ranking — a **rejection ledger** with an earned reason per candidate, the
+way `origin`, `participation` and `restoration()` were earned.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
