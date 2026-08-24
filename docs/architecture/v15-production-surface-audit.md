@@ -9109,10 +9109,14 @@ finding for entirely the wrong reason, so the file now asserts it can see
 
 ```text
 WAS  ordinary mutations name their owning tree
-IS   EVERY SignalTree-owned mutation delivered through the notifier names its
-     owning tree — authored, external, restoration, rollback, DevTools or
-     structural replay alike
+IS   every SignalTree-owned mutation delivered through the notifier names its
+     owning tree
 ```
+
+⚠️ **THE FIRST WORDING OUTRAN THE EVIDENCE.** I wrote "authored, external,
+restoration, rollback, DevTools or structural replay alike" while the permanent
+test exercised only the first four. OWNER-REPLAY-2 measured the other two, found
+a real defect in one of them, and narrowed the claim to what is shown.
 
 ## ⚠️ It was TWO edits, not twenty-four
 
@@ -9161,6 +9165,59 @@ The first version of the preregistration put an `external()` acquisition BETWEEN
 the authored turn and the undo, and the undo refused with ST1034 — P0-C
 protecting acquired truth, exactly as LINK-0 measured. Sequencing the
 acquisition after the undo keeps the test on its own question.
+
+# OWNER-REPLAY-2 — closing the gap between the invariant written and verified
+
+`packages/core/src/lib/owner-replay-2.spec.ts`, 4/4.
+
+```text
+structural AUTHORED (addOne/removeOne)   ownerId: undefined   ✗ DEFECT, FIXED
+structural REPLAY (restore/rollback)     ownerId: present     ✓ (REPLAY-1)
+devtools inspection via write context    ownerId: present     ✓
+owner-only marker ping                   ownerId: undefined   ⚠️ RESIDUE
+devtools-impl.ts:1817 direct notify      UNVERIFIED
+```
+
+## The defect it found
+
+Collections notify the path notifier DIRECTLY rather than through the owned-write
+wrapper, so an authored `addOne` arrived unqualified while the restoration and
+rollback replays OF THE SAME OPERATION carried the namespace. An owner-filtered
+observer was blind to every authored collection change — the same shape as
+OWNER-REPLAY-0 and wider in reach.
+
+Fixed the same structural way: one `ambientMeta()` helper inside
+`entity-signal.ts` that all NINE `getActiveWriteContext()` sites route through,
+so a new notification site cannot silently omit the namespace. Mutation-checked —
+removing the namespace from that helper fails 3 of 4.
+
+DevTools needed no change: an inspection travels the ORDINARY owned write path
+and inherits the namespace from `emitOwnedMutation`.
+
+## What remains unverified, stated rather than assumed away
+
+```text
+1  THE OWNER-ONLY MARKER PING
+   A bare `{ path: 'rows' }` accompanies each collection mutation with BOTH
+   values undefined (`isOwnerOnlyMarkerSignal`). It reaches delivery with no
+   metaOverride at all, so it carries no namespace — and no VALUE either, so an
+   observer learns nothing from it the valued `rows.<id>` event does not already
+   say. The tests assert over value-carrying events specifically rather than
+   pretending the ping is covered.
+
+2  `devtools-impl.ts:1817`
+   `notifier.notify(path, next, prev, ownerPath)` — four arguments, NO meta, so
+   it structurally cannot carry a namespace. It sits inside
+   `interceptLeafSignals`, which A2-3.1 measured as REFUSED on any enhanced tree,
+   so it is LIKELY unreachable for the trees this matters for. "Likely" is not
+   "measured".
+```
+
+## The invariant, narrowed to what is shown
+
+> Every VALUE-CARRYING SignalTree mutation delivered through the notifier names
+> its owning tree — authored, external, restoration, rollback, DevTools
+> inspection and structural collection writes alike.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 

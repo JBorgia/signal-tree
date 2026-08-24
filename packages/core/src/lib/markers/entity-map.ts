@@ -274,6 +274,7 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
             ownerMetadataEnabled: hasMutationCapture,
             subjectMetadataEnabled: hasMutationCapture,
             positionMetadataEnabled: hasPositionTopology,
+            ownerId: context.positionRegistry.id,
             // Immutable for the life of the tree — see RuntimeTreePlan. False
             // is what lets the retirement boundary release a retired subject's
             // value backing immediately.

@@ -265,6 +265,16 @@ export function createEntitySignal<
     subjectMetadataEnabled?: boolean;
     positionMetadataEnabled?: boolean;
     /**
+     * Registry namespace of the tree this collection belongs to.
+     *
+     * OWNER-REPLAY-2. Collections notify the path notifier DIRECTLY rather than
+     * through the owned-write wrapper, so an authored `addOne`/`removeOne`
+     * reached subscribers with `ownerId: undefined` while the restoration and
+     * rollback replays of the SAME operation carried it. An owner-filtered
+     * observer was therefore blind to every authored collection change.
+     */
+    ownerId?: number;
+    /**
      * Whether anything in this tree could restore a subject after it retires.
      *
      * Comes from the finalized build plan (`RuntimeTreePlan`) and cannot change
@@ -408,6 +418,7 @@ export function createEntitySignal<
     options?.subjectMetadataEnabled ?? ownerMetadataEnabled;
   const positionMetadataEnabled = options?.positionMetadataEnabled ?? true;
   const hasRestorationAuthority = options?.hasRestorationAuthority ?? true;
+  const ownerId = options?.ownerId;
   const physicalCommitClock = options?.physicalCommitClock;
   const positionId = (
     options?.positionIdAllocator ??
@@ -420,6 +431,20 @@ export function createEntitySignal<
   type PendingStructuralEffect = StructuralEffect;
   type PendingAddStructuralEffect = Extract<PendingStructuralEffect, { kind: 'add' }>;
 
+  /**
+   * The ambient write context, ALWAYS carrying this collection's owning tree.
+   *
+   * Every meta this file builds goes through here rather than calling
+   * `ambientMeta()` directly, so a new notification site cannot
+   * silently omit the namespace — which is how OWNER-REPLAY-2's defect existed
+   * across eighteen sites at once.
+   */
+  function ambientMeta(): WriteMetadata | undefined {
+    const active = getActiveWriteContext();
+    if (ownerId === undefined) return active;
+    return { ...(active ?? {}), ownerId };
+  }
+
   function getPositionIds(): number[] | undefined {
     return positionId === undefined ? undefined : [positionId];
   }
@@ -431,7 +456,7 @@ export function createEntitySignal<
   function createStructuralEffectMeta(
     effect: PendingStructuralEffect
   ): WriteMetadata {
-    const meta = getActiveWriteContext();
+    const meta = ambientMeta();
     return {
       ...(meta ?? {}),
       structuralEffect: effect,
@@ -571,7 +596,7 @@ export function createEntitySignal<
         updateSignals();
       },
       publish(metaOverride?: WriteMetadata): void {
-        const meta = metaOverride ?? getActiveWriteContext();
+        const meta = metaOverride ?? ambientMeta();
         pathNotifier.notify(
           `${basePath}.${String(to)}`,
           entity,
@@ -639,7 +664,7 @@ export function createEntitySignal<
         updateSignals();
       },
       publish(metaOverride?: WriteMetadata): void {
-        const meta = metaOverride ?? getActiveWriteContext();
+        const meta = metaOverride ?? ambientMeta();
         pathNotifier.notify(
           `${basePath}.${String(to)}`,
           entity,
@@ -945,7 +970,7 @@ export function createEntitySignal<
           [subjectId],
           getPositionIdsForNotify(),
           {
-            ...(metaOverride ?? getActiveWriteContext() ?? {}),
+            ...(metaOverride ?? ambientMeta() ?? {}),
             structuralEffect,
           }
         );
@@ -2089,7 +2114,7 @@ export function createEntitySignal<
         basePath,
         subjectIdsForWrite,
         getPositionIdsForNotify(),
-        getActiveWriteContext()
+        ambientMeta()
       );
 
       // Run tap handlers
@@ -2160,7 +2185,7 @@ export function createEntitySignal<
         basePath,
         undefined,
         getPositionIdsForNotify(),
-        getActiveWriteContext()
+        ambientMeta()
       );
       for (const handler of tapHandlers) {
         handler.onUpdate?.(id, next as Partial<E>, next);
@@ -2252,7 +2277,7 @@ export function createEntitySignal<
           basePath,
           [subjectIdsForWrite[i]],
           getPositionIdsForNotify(),
-          getActiveWriteContext()
+          ambientMeta()
         );
       }
 
@@ -2970,7 +2995,7 @@ export function createEntitySignal<
           basePath,
           subjectId === undefined ? undefined : [subjectId],
           getPositionIdsForNotify(),
-          getActiveWriteContext()
+          ambientMeta()
         );
       }
 
