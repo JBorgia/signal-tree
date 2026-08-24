@@ -4,7 +4,7 @@ import { undoable } from '../../lib/undoable';
 import { signalTree } from '../../lib/signal-tree';
 import { getPathNotifier, resetPathNotifier } from '../../lib/path-notifier';
 import type { WriteMetadata } from '../../lib/types';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 /**
  * PR1: time-travel replay writes are tagged with the ambient write-context
@@ -46,7 +46,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
 
     // Undo: synchronously triggers restoreState, which wraps writes in
     // withWriteContext({ intent: 'system', origin: 'restoration' }).
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     expect(t.canUndo()).toBe(true);
     t.undo();
     await Promise.resolve();
@@ -99,7 +99,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
       }
     );
 
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.jumpTo(0); // jump to initial state
     await Promise.resolve();
 

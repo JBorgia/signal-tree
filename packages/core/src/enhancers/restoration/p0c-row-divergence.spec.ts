@@ -4,7 +4,7 @@ import { undoable } from '../../lib/undoable';
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
 import { withWriteContext } from '../../lib/write-context';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 /**
  * P0-C-ROW — does the provenance guard reach an ENTITY ROW FIELD?

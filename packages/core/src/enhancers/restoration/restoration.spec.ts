@@ -9,13 +9,13 @@ import { stored } from '../../lib/markers/stored';
 import { signalTree } from '../../lib/signal-tree';
 import { SignalTreeRollbackError } from '../../lib/types';
 import { transactions } from '../transactions/transactions';
-import { enableTimeTravel, timeTravel, withTimeTravel } from './time-travel';
+import { enableTimeTravel, timeTravel, withTimeTravel } from './restoration';
 
 type ScopedAuthorityNode = {
   __positionIds?: number[];
 };
 
-type InternalTimeTravelManager = {
+type InternalRestorationManager = {
   undoAt(positionId: number): boolean;
   redoAt(positionId: number): boolean;
   canUndoAt(positionId: number): boolean;
@@ -59,7 +59,7 @@ describe('time-travel enhancer', () => {
       { count: 0 },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     // Ensure global notifier is in default state and enabled for batching
     const { resetPathNotifier, getPathNotifier } = await import(
@@ -101,7 +101,7 @@ describe('time-travel enhancer', () => {
       { count: 0 },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const initial = t.getHistory().length;
 
     undoable(() => (store as any).$.count.set(5));
@@ -122,7 +122,7 @@ describe('time-travel enhancer', () => {
       { user: { profile: { name: 'Ada' } } },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const initial = t.getHistory().length;
 
     undoable(() => (store as any).$.user.profile.name.set('Grace'));
@@ -158,7 +158,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
     const baseline = t.getTurns().length;
     const baselineHistory = t.getHistory().length;
@@ -223,7 +223,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
     const baseline = t.getTurns().length;
     const baselineHistory = t.getHistory().length;
@@ -255,7 +255,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
     const baseline = t.getTurns().length;
     const baselineHistory = t.getHistory().length;
@@ -322,7 +322,7 @@ describe('time-travel enhancer', () => {
       { left: '', right: '' },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
     const baseline = t.getTurns().length;
     const realizationPort = getTreeRealizationPort(store.$);
@@ -354,7 +354,7 @@ describe('time-travel enhancer', () => {
       { x: '', y: '' },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
 
     const pending = store.transaction(() => {
@@ -456,7 +456,7 @@ describe('time-travel enhancer', () => {
       { x: 'A' },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     const pending = store.transaction(() => {
       undoable(() => store.$.x.set('B'));
@@ -483,7 +483,7 @@ describe('time-travel enhancer', () => {
       { x: 10 },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     const pending = store.transaction(() => {
       undoable(() => store.$.x.set(20));
@@ -679,7 +679,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 18, name: 'existing' }));
     await Promise.resolve();
@@ -772,7 +772,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 16, name: 'A' }));
     undoable(() => store.$.rows.addOne({ id: 17, name: 'B' }));
@@ -814,7 +814,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 17, name: 'pending-remove' }));
     await Promise.resolve();
@@ -848,7 +848,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 17, name: 'original' }));
     await Promise.resolve();
@@ -889,7 +889,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     undoable(() => store.$.rows.addOne({ id: 18, name: 'other' }));
@@ -932,7 +932,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
     const baseline = t.getTurns().length;
     const baselineHistory = t.getHistory().length;
@@ -1008,7 +1008,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
     const baseline = t.getTurns().length;
     const baselineHistory = t.getHistory().length;
@@ -1049,7 +1049,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
@@ -1093,7 +1093,7 @@ describe('time-travel enhancer', () => {
         };
       };
       transaction(fn: () => void): { confirm(): void; rollback(): void };
-      __timeTravel: {
+      __restoration: {
         resetHistory(): void;
         getTurns(): Array<{ id: number; __effects?: Array<{ kind: string }> }>;
       };
@@ -1103,7 +1103,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const t = store.__timeTravel;
+    const t = store.__restoration;
     t.resetHistory();
 
     store.transaction(() => {
@@ -1152,7 +1152,7 @@ describe('time-travel enhancer', () => {
         getConfirmedTurnCount(): number;
         getPendingTurnCount(): number;
       };
-      __timeTravel: {
+      __restoration: {
         resetHistory(): void;
         getHistory(): unknown[];
         getTurns(): Array<{ id: number; __effects?: Array<{ kind: string }> }>;
@@ -1164,7 +1164,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const t = store.__timeTravel;
+    const t = store.__restoration;
     t.resetHistory();
     const baselineHistory = t.getHistory().length;
     const baselineTurns = t.getTurns().length;
@@ -1226,7 +1226,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
@@ -1259,7 +1259,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
@@ -1295,7 +1295,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
@@ -1343,7 +1343,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 16, name: 'A' }));
     undoable(() => store.$.rows.addOne({ id: 17, name: 'B' }));
@@ -1379,7 +1379,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 16, name: 'A' }));
     undoable(() => store.$.rows.addOne({ id: 17, name: 'B' }));
@@ -1415,7 +1415,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 16, name: 'A' }));
     undoable(() => store.$.rows.addOne({ id: 17, name: 'B' }));
@@ -1500,7 +1500,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
@@ -1546,7 +1546,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
@@ -1595,7 +1595,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
@@ -1630,7 +1630,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: 7 }));
@@ -1656,7 +1656,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
@@ -1728,7 +1728,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
@@ -1833,7 +1833,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
@@ -1907,7 +1907,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
@@ -1981,7 +1981,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
@@ -2063,7 +2063,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
@@ -2162,7 +2162,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
@@ -2244,7 +2244,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
@@ -2324,7 +2324,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, status: 'one' }));
     await Promise.resolve();
@@ -2374,7 +2374,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'one', active: false }));
     await Promise.resolve();
@@ -2419,7 +2419,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'one', active: false }));
     await Promise.resolve();
@@ -2447,7 +2447,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'one', active: false }));
     await Promise.resolve();
@@ -2489,7 +2489,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'one', active: false }));
     await Promise.resolve();
@@ -2532,7 +2532,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     store.$.rows.addMany([
       { id: 1, name: 'A' },
@@ -2591,7 +2591,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     store.$.rows.addMany([
       { id: 1, name: 'A' },
@@ -2645,7 +2645,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     store.$.rows.addMany([
       { id: 1, name: 'A' },
@@ -2708,7 +2708,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     t.resetHistory();
 
@@ -2761,7 +2761,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 1, name: 'A' }));
     undoable(() => store.$.rows.addOne({ id: 3, name: 'C' }));
@@ -2816,7 +2816,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 1, name: 'A' }));
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
@@ -2865,7 +2865,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 1, name: 'A' }));
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
@@ -2929,7 +2929,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const initial = t.getHistory().length;
     const seenPaths: string[] = [];
     const notifier = getPathNotifier();
@@ -2976,7 +2976,7 @@ describe('time-travel enhancer', () => {
       { count: 0 },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.count.set(1));
     await Promise.resolve();
@@ -3007,7 +3007,7 @@ describe('time-travel enhancer', () => {
       { count: 0 },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.count.set(1));
     await Promise.resolve();
@@ -3046,7 +3046,7 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
     const notifier = getPathNotifier();
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const liveOwnerTokens: number[][] = [];
     const liveSubjectTokens: number[][] = [];
     const replayOwnerTokens: number[][] = [];
@@ -3161,7 +3161,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'first' }));
     await Promise.resolve();
@@ -3209,7 +3209,7 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
     const notifier = getPathNotifier();
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const liveSubjectTokens: number[][] = [];
     const replaySubjectTokens: number[][] = [];
 
@@ -3301,7 +3301,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -3370,7 +3370,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     undoable(() => store.$.drivers.addOne({ id: 1, status: 'idle' }));
@@ -3428,7 +3428,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     undoable(() => store.$.drivers.addOne({ id: 1, status: 'idle' }));
@@ -3493,7 +3493,7 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
     const notifier = getPathNotifier();
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const liveSubjectTokens: number[][] = [];
     const replaySubjectTokens: number[][] = [];
 
@@ -3593,7 +3593,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const initial = t.getHistory().length;
 
     undoable(() => store.$.theme.set('dark'));
@@ -3640,7 +3640,7 @@ describe('time-travel enhancer', () => {
       { count: 0 },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.count.set(1));
     await Promise.resolve();
@@ -3666,7 +3666,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -3698,7 +3698,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const realizationPort = getTreeRealizationPort(store.$);
     if (!realizationPort) {
       throw new Error('Expected tree-owned realization port');
@@ -3755,7 +3755,7 @@ describe('time-travel enhancer', () => {
       { count: 0, title: 'A' },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const rootPositionId = (store.$ as unknown as ScopedAuthorityNode)
       .__positionIds?.[0] as number;
 
@@ -3821,7 +3821,7 @@ describe('time-travel enhancer', () => {
         }),
       }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     const fullName = store.$.profile.fullName as {
       (): string;
       __positionIds?: number[];
@@ -3889,7 +3889,7 @@ describe('time-travel enhancer', () => {
         }),
       }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     t.resetHistory();
     const baselineHistoryCount = t.getHistory().length;
@@ -3922,7 +3922,7 @@ describe('time-travel enhancer', () => {
       { count: 1, title: 'A' },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     t.resetHistory();
 
@@ -3998,7 +3998,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel as InternalTimeTravelManager;
+    const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
       firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
       lastName: ScopedAuthorityNode & { (): string; set(value: string): void };
@@ -4046,7 +4046,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel as InternalTimeTravelManager;
+    const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
       firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
     };
@@ -4082,7 +4082,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel as InternalTimeTravelManager;
+    const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
       firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
     };
@@ -4130,7 +4130,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel as InternalTimeTravelManager;
+    const t = (store as any).__restoration as InternalRestorationManager;
     const profile = store.$.profile as unknown as ScopedAuthorityNode & {
       firstName: ScopedAuthorityNode & { (): string; set(value: string): void };
       lastName: ScopedAuthorityNode & { (): string; set(value: string): void };
@@ -4180,7 +4180,7 @@ describe('time-travel enhancer', () => {
       { count: 0 },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.count.set(1));
     await Promise.resolve();
@@ -4207,7 +4207,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -4240,7 +4240,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const addTimeTravel = (addStore as any).__timeTravel;
+    const addTimeTravel = (addStore as any).__restoration;
 
     undoable(() => addStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -4270,7 +4270,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const removeTimeTravel = (removeStore as any).__timeTravel;
+    const removeTimeTravel = (removeStore as any).__restoration;
 
     undoable(() => removeStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -4305,7 +4305,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const rekeyTimeTravel = (rekeyStore as any).__timeTravel;
+    const rekeyTimeTravel = (rekeyStore as any).__restoration;
 
     undoable(() => rekeyStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -4373,7 +4373,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -4413,7 +4413,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -4575,7 +4575,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -4693,7 +4693,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -4746,7 +4746,7 @@ describe('time-travel enhancer', () => {
       },
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
 
     undoable(() => store.$.drivers.addOne({ id: 7, status: 'idle' }));
     undoable(() => store.$.trucks.addOne({ id: 12, driverId: null }));
@@ -4820,7 +4820,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
@@ -4869,7 +4869,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
@@ -4932,7 +4932,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
@@ -5023,7 +5023,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const t = (store as any).__timeTravel;
+    const t = (store as any).__restoration;
     t.resetHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));

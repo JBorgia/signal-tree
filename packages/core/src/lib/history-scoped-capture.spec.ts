@@ -3,7 +3,7 @@ import { undoable } from '../lib/undoable';
 
 import { entityMap } from './types';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 
 /**
  * ST2029 — time travel retention warning.

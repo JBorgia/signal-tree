@@ -62,7 +62,7 @@ describe('E — can any tree API add a record key after construction?', () => {
 describe('E — is the conjunction delivered over canonical truth?', () => {
   it('an entity write is captured by undo', async () => {
     const { entityMap } = await import('./types');
-    const { timeTravel } = await import('../enhancers/time-travel/time-travel');
+    const { timeTravel } = await import('../enhancers/restoration/restoration');
 
     const tree = signalTree(
       {

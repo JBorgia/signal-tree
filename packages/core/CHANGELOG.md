@@ -143,4 +143,4 @@ External enhancers that need to react to writes (validation, audit logging, tele
 
 ### Tests
 
-19 new tests across `write-context.spec.ts`, `internals/intercept-leaf-signals.spec.ts`, and `enhancers/time-travel/time-travel-metadata.spec.ts`. All existing core / guardrails / devtools / time-travel / ng-forms tests pass unchanged.
+19 new tests across `write-context.spec.ts`, `internals/intercept-leaf-signals.spec.ts`, and `enhancers/restoration/restoration-metadata.spec.ts`. All existing core / guardrails / devtools / time-travel / ng-forms tests pass unchanged.

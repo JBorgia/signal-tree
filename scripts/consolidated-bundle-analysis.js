@@ -56,8 +56,8 @@ const packages = [
     claimed: 1280,
   },
   {
-    name: 'core/enhancers/time-travel',
-    path: 'dist/packages/core/dist/enhancers/time-travel/lib/time-travel.js',
+    name: 'core/enhancers/restoration',
+    path: 'dist/packages/core/dist/enhancers/restoration/lib/time-travel.js',
     maxSize: 1950,
     claimed: 1350,
   },

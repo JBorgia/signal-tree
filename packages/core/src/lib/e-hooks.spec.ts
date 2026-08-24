@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
 import { entityMap } from './types';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 
 /**
  * DERIVATION E — the last two members: `tap` and `intercept`.

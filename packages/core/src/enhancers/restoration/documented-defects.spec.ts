@@ -5,7 +5,7 @@ import { createAuditTracker } from '../../lib/audit/audit';
 import { history } from '../../lib/form-history/form-history';
 import { signalTree } from '../../lib/signal-tree';
 import { serialization } from '../serialization/serialization';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 /**
  * Characterization tests for the history defects documented as TODO 6a-6d.

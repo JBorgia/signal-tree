@@ -1217,7 +1217,7 @@ function create<T extends object>(
    *   - Signal writes are always synchronous.
    *   - Options: `enabled`, `notificationDelayMs`.
    *
-   * - `timeTravel(config?: TimeTravelConfig)`
+   * - `timeTravel(config?: RestorationConfig)`
    *   - Enables undo/redo and state history.
    *   - Options: `maxHistorySize`, `includePayload`, `actionNames`, `enabled`.
    *
@@ -1232,7 +1232,7 @@ function create<T extends object>(
    * @template R The return type of the enhancer (usually the enhanced tree).
    * @param enhancer A function that takes the current tree and returns an enhanced tree.
    * @returns The enhanced tree with additional methods or capabilities.
-   * @see BatchingConfig, TimeTravelConfig, DevToolsConfig, SerializationConfig
+   * @see BatchingConfig, RestorationConfig, DevToolsConfig, SerializationConfig
    */
 
   // bind()

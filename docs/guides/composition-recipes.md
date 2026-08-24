@@ -95,7 +95,7 @@ infer, or write the array inline at the construction site.
 
 If your helper lives in a **library** and you let TypeScript infer, the emitted
 `.d.ts` will reference the enhancer method interfaces — `BatchingMethods`,
-`DevToolsMethods`, `TimeTravelMethods`, `OptimizedUpdateMethods`,
+`DevToolsMethods`, `RestorationMethods`, `OptimizedUpdateMethods`,
 `EffectsMethods`. All five are exported from `@signaltree/core`, so this works.
 
 ---

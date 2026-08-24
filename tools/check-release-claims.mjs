@@ -164,7 +164,7 @@ function barrelsFor(pkgDir) {
  * to note the value and stop. The module's config interface never entered the
  * public name set, so none of its members were ever diffed, even though every
  * option a user can pass to `timeTravel()` is public API by way of that
- * signature. Proven blind: a brand-new `TimeTravelConfig` member was invisible
+ * signature. Proven blind: a brand-new `RestorationConfig` member was invisible
  * and the gate still reported "0 uncovered".
  *
  * Harvested as kind `'type'`, which the coverage rules ignore, so this widens
@@ -247,7 +247,7 @@ function symbolsAt(
  * made the first version of this gate BLIND to the exact failure it was written
  * for: `prependOne`, `activeEntity`, `setActiveId`, `changeId`,
  * `pauseRecording` and `shouldSkip` are all METHODS on `EntitySignal` /
- * `TimeTravelMethods` / `TimeTravelConfig`. Not one is an exported symbol, so
+ * `RestorationMethods` / `RestorationConfig`. Not one is an exported symbol, so
  * not one appeared in the diff — the gate passed while its own target was
  * broken, and `--self-test` said so.
  *

@@ -118,7 +118,7 @@ enhanced.undo(); // TypeScript: ✅ | Runtime: ✅
 | Component          | Purpose                                            |
 | ------------------ | -------------------------------------------------- |
 | `SignalTree<T>`    | Minimal core interface (state, $, with, destroy)   |
-| Method Interfaces  | `TimeTravelMethods<T>`, `BatchingMethods<T>`, etc. |
+| Method Interfaces  | `RestorationMethods<T>`, `BatchingMethods<T>`, etc. |
 | `Enhancer<TAdded>` | Type that transforms tree and adds methods         |
 | `WithMethod<T>`    | Properly typed `.with()` overloads                 |
 | Preset Factories   | `createDevTree()`, `createProdTree()`, etc.        |
@@ -150,7 +150,7 @@ SignalTree<T>                    # Core: state, $, with(), destroy()
     │
     ├── & MemoizationMethods<T>      # memoize(), clearMemoCache(), getCacheStats()
     │
-    ├── & TimeTravelMethods<T>       # undo(), redo(), canUndo(), canRedo(), etc.
+    ├── & RestorationMethods<T>       # undo(), redo(), canUndo(), canRedo(), etc.
     │
     ├── & DevToolsMethods            # connectDevTools(), disconnectDevTools()
     │
@@ -172,7 +172,7 @@ SignalTree<T>  ──► .with(effects())
     │               .with(withTimeTravel())
     │                        │
     │                        ▼
-    │               ISignalTree<T> & EffectsMethods<T> & TimeTravelMethods<T>
+    │               ISignalTree<T> & EffectsMethods<T> & RestorationMethods<T>
     │
     ▼
 createDevTree(state)  ──► ISignalTree<T> & ALL_METHODS
@@ -232,7 +232,7 @@ packages/core/src/
 
 | Task                     | Files                                       | Est. Time |
 | ------------------------ | ------------------------------------------- | --------- |
-| Implement withTimeTravel | `enhancers/time-travel.ts`                  | 2 hours   |
+| Implement withTimeTravel | `enhancers/restoration.ts`                  | 2 hours   |
 | Implement devTools       | `enhancers/devtools.ts`                     | 1.5 hours |
 | Implement entities       | `enhancers/entities.ts`, `entity-signal.ts` | 3 hours   |
 | Write integration tests  | `integration.spec.ts`                       | 1.5 hours |
@@ -589,7 +589,7 @@ export interface CacheStats {
  * NOTE: Use for USER undo/redo (Ctrl+Z), NOT for API rollback.
  * For optimistic update rollback, use snapshot patterns.
  */
-export interface TimeTravelMethods<T> {
+export interface RestorationMethods<T> {
   /** Undo the last change */
   undo(): void;
 
@@ -603,7 +603,7 @@ export interface TimeTravelMethods<T> {
   canRedo(): boolean;
 
   /** Get all history entries */
-  getHistory(): TimeTravelEntry<T>[];
+  getHistory(): RestorationHistoryEntry<T>[];
 
   /** Clear all history */
   resetHistory(): void;
@@ -616,7 +616,7 @@ export interface TimeTravelMethods<T> {
 }
 
 /** A single entry in the time travel history */
-export interface TimeTravelEntry<T> {
+export interface RestorationHistoryEntry<T> {
   /** Action name/type */
   action: string;
   /** Unix timestamp */
@@ -946,7 +946,7 @@ export interface TreeConfig {
  * Full-featured SignalTree with all standard enhancers.
  * Equivalent to createDevTree() return type.
  */
-export type FullSignalTree<T> = ISignalTree<T> & EffectsMethods<T> & BatchingMethods<T> & MemoizationMethods<T> & TimeTravelMethods<T> & DevToolsMethods & EntitiesMethods<T>;
+export type FullSignalTree<T> = ISignalTree<T> & EffectsMethods<T> & BatchingMethods<T> & MemoizationMethods<T> & RestorationMethods<T> & DevToolsMethods & EntitiesMethods<T>;
 
 /**
  * Production SignalTree without debug features.
@@ -974,7 +974,7 @@ export function isSignalTree<T>(value: unknown): value is ISignalTree<T> {
 /**
  * Check if a tree has time travel methods.
  */
-export function hasTimeTravel<T>(tree: ISignalTree<T>): tree is ISignalTree<T> & TimeTravelMethods<T> {
+export function hasTimeTravel<T>(tree: ISignalTree<T>): tree is ISignalTree<T> & RestorationMethods<T> {
   return typeof (tree as any).undo === 'function' && typeof (tree as any).canUndo === 'function';
 }
 
@@ -2328,16 +2328,16 @@ function applyPartialState<T>(treeNode: any, updates: Partial<T>): void {
 
 ### 4.9 Enhancer: Time Travel
 
-**File: `packages/core/src/lib/enhancers/time-travel.ts`**
+**File: `packages/core/src/lib/enhancers/restoration.ts`**
 
 ````typescript
-import { SignalTree, TimeTravelMethods, TimeTravelEntry, Enhancer } from '../types';
+import { SignalTree, RestorationMethods, RestorationHistoryEntry, Enhancer } from '../types';
 import { snapshotState, applyState, deepCloneJSON } from '../utils';
 
 /**
  * Configuration for withTimeTravel enhancer.
  */
-export interface TimeTravelConfig {
+export interface RestorationConfig {
   /**
    * Maximum number of history entries.
    * @default 50
@@ -2392,12 +2392,12 @@ export interface TimeTravelConfig {
  * tree.jumpTo(0); // text = '' (back to initial)
  * ```
  */
-export function withTimeTravel<T>(config: TimeTravelConfig = {}): Enhancer<TimeTravelMethods<T>> {
+export function withTimeTravel<T>(config: RestorationConfig = {}): Enhancer<RestorationMethods<T>> {
   const { maxHistory = 50, debounceMs = 0 } = config;
 
-  const enhancerFn = <S>(tree: ISignalTree<S>): ISignalTree<S> & TimeTravelMethods<S> => {
+  const enhancerFn = <S>(tree: ISignalTree<S>): ISignalTree<S> & RestorationMethods<S> => {
     // History storage
-    const history: TimeTravelEntry<S>[] = [];
+    const history: RestorationHistoryEntry<S>[] = [];
     let currentIndex = -1;
 
     // Flag to prevent recording while time traveling
@@ -2476,7 +2476,7 @@ export function withTimeTravel<T>(config: TimeTravelConfig = {}): Enhancer<TimeT
     // TODO: Hook into PathNotifier to auto-record changes
     // For now, changes must be manually recorded or we track on undo/redo
 
-    const methods: TimeTravelMethods<S> = {
+    const methods: RestorationMethods<S> = {
       undo() {
         if (currentIndex <= 0) return;
 
@@ -3403,11 +3403,11 @@ export class EntitySignalImpl<E, K extends string | number = string> implements 
 
 ````typescript
 import { signalTree } from './signal-tree';
-import { SignalTree, TreeConfig, EffectsMethods, BatchingMethods, MemoizationMethods, TimeTravelMethods, DevToolsMethods, EntitiesMethods, FullSignalTree, ProdSignalTree, MinimalSignalTree } from './types';
+import { SignalTree, TreeConfig, EffectsMethods, BatchingMethods, MemoizationMethods, RestorationMethods, DevToolsMethods, EntitiesMethods, FullSignalTree, ProdSignalTree, MinimalSignalTree } from './types';
 import { effects, EffectsConfig } from './enhancers/effects';
 import { batching, BatchingConfig } from './enhancers/batching';
 import { memoization, MemoizationConfig } from './enhancers/memoization';
-import { withTimeTravel, TimeTravelConfig } from './enhancers/time-travel';
+import { withTimeTravel, RestorationConfig } from './enhancers/restoration';
 import { devTools, DevToolsConfig } from './enhancers/devtools';
 import { entities, EntitiesConfig } from './enhancers/entities';
 
@@ -3422,7 +3422,7 @@ export interface DevTreeConfig extends TreeConfig {
   effects?: EffectsConfig;
   batching?: BatchingConfig;
   memoization?: MemoizationConfig;
-  timeTravel?: TimeTravelConfig;
+  timeTravel?: RestorationConfig;
   devTools?: DevToolsConfig;
   entities?: EntitiesConfig;
 }
@@ -3575,7 +3575,7 @@ export function createTree<T extends object>(initialState: T, config: DevTreeCon
  * tree.memoize();            // ❌ Not included
  * ```
  */
-export function createCustomTree<T extends object>(initialState: T, features: Array<'effects' | 'batching' | 'memoization' | 'timeTravel' | 'devTools' | 'entities'>, config: DevTreeConfig = {}): ISignalTree<T> & Partial<EffectsMethods<T> & BatchingMethods<T> & MemoizationMethods<T> & TimeTravelMethods<T> & DevToolsMethods & EntitiesMethods<T>> {
+export function createCustomTree<T extends object>(initialState: T, features: Array<'effects' | 'batching' | 'memoization' | 'timeTravel' | 'devTools' | 'entities'>, config: DevTreeConfig = {}): ISignalTree<T> & Partial<EffectsMethods<T> & BatchingMethods<T> & MemoizationMethods<T> & RestorationMethods<T> & DevToolsMethods & EntitiesMethods<T>> {
   let tree: any = signalTree(initialState, config);
 
   if (features.includes('effects')) {
@@ -3649,10 +3649,10 @@ export type { SignalTree, TreeNode, TreeConfig, NodeAccessor, AccessibleNode, Ca
 export type { Enhancer, EnhancerMeta, EnhancerAdds, WithMethod } from './lib/types';
 
 // Method interfaces (for custom typing)
-export type { EffectsMethods, BatchingMethods, MemoizationMethods, TimeTravelMethods, DevToolsMethods, EntitiesMethods, SerializationMethods, OptimizedUpdateMethods } from './lib/types';
+export type { EffectsMethods, BatchingMethods, MemoizationMethods, RestorationMethods, DevToolsMethods, EntitiesMethods, SerializationMethods, OptimizedUpdateMethods } from './lib/types';
 
 // Supporting types
-export type { CacheStats, TimeTravelEntry, OptimizedUpdateOptions, OptimizedUpdateResult } from './lib/types';
+export type { CacheStats, RestorationHistoryEntry, OptimizedUpdateOptions, OptimizedUpdateResult } from './lib/types';
 
 // Entity types
 export type { EntitySignal, EntityMapMarker, EntityConfig, EntityNode, EntityHelpers, TapHandlers, InterceptHandlers, InterceptContext, MutationOptions, AddOptions, AddManyOptions } from './lib/types';
@@ -3679,8 +3679,8 @@ export type { BatchingConfig } from './lib/enhancers/batching';
 export { memoization } from './lib/enhancers/memoization';
 export type { MemoizationConfig } from './lib/enhancers/memoization';
 
-export { withTimeTravel } from './lib/enhancers/time-travel';
-export type { TimeTravelConfig } from './lib/enhancers/time-travel';
+export { withTimeTravel } from './lib/enhancers/restoration';
+export type { RestorationConfig } from './lib/enhancers/restoration';
 
 export { devTools } from './lib/enhancers/devtools';
 export type { DevToolsConfig } from './lib/enhancers/devtools';
@@ -3846,8 +3846,8 @@ All other methods (undo, batch, memoize, entities, devtools, etc.) are added by 
 Each enhancer is typed to add its methods via an intersection. For example:
 
 ```ts
-type WithTimeTravel = Enhancer<TimeTravelMethods<T>>;
-// Applying it transforms the runtime type to: ISignalTree<T> & TimeTravelMethods<T>
+type WithTimeTravel = Enhancer<RestorationMethods<T>>;
+// Applying it transforms the runtime type to: ISignalTree<T> & RestorationMethods<T>
 ```
 
 This approach preserves IDE IntelliSense — when you apply `withTimeTravel()` the editor will immediately show `undo()`, `redo()`, and related helpers.

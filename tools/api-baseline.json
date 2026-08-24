@@ -469,13 +469,13 @@
         "name": "timeTravel",
         "subpath": ".",
         "kind": "runtime",
-        "declFile": "packages/core/src/enhancers/time-travel/time-travel.ts",
+        "declFile": "packages/core/src/enhancers/restoration/restoration.ts",
         "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false
       },
       {
-        "name": "TimeTravelEntry",
+        "name": "RestorationHistoryEntry",
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/types.ts",
@@ -484,7 +484,7 @@
         "internalDecl": false
       },
       {
-        "name": "TimeTravelMethods",
+        "name": "RestorationMethods",
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/types.ts",

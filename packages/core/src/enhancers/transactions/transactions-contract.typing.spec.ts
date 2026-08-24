@@ -19,7 +19,7 @@
  *     types and no state generic, so there is no receiver-derived precision at
  *     risk.
  *
- * `TransactionMethods` is also INHERITED by `TimeTravelMethods`, so this
+ * `TransactionMethods` is also INHERITED by `RestorationMethods`, so this
  * contract is reachable two ways. The rows here cover the direct application;
  * `time-travel-contract.typing.spec.ts` covers the inherited path.
  *

@@ -4,7 +4,7 @@ import { entityMap } from './markers/entity-map';
 import { getPathNotifier } from './path-notifier';
 import { realize } from './realize';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 import { undoable } from './undoable';
 

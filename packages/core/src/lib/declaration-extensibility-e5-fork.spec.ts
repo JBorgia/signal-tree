@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { undoable } from './undoable';
 
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 
 /**

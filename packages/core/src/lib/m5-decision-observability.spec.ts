@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { onHydrateDecision } from './internals/materialize-markers';
 import type { HydrateDecisionEvent } from './internals/materialize-markers';
 import { serialization } from '../enhancers/serialization/serialization';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { entityMap, signalTree } from '../index';
 import { loader } from './markers/loader';
 

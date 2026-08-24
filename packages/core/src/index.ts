@@ -70,9 +70,9 @@ export type {
   EntityMapMarker,
   AddOptions,
   AddManyOptions,
-  TimeTravelEntry,
+  RestorationHistoryEntry,
   TransactionMethods,
-  TimeTravelMethods,
+  RestorationMethods,
   PendingTransaction,
 
   // Enhancer-added method types. Exported so a DOWNSTREAM LIBRARY can name the
@@ -236,7 +236,7 @@ export type { BatchingConfig, BatchingMethods } from './lib/types';
  * Time travel enhancer for debugging and undo/redo functionality
  * @see {@link timeTravel} for time travel capabilities
  */
-export { timeTravel } from './enhancers/time-travel/time-travel';
+export { timeTravel } from './enhancers/restoration/restoration';
 
 /**
  * Transaction enhancer for optimistic updates without temporal history APIs.

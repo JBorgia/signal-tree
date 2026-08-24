@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../time-travel/time-travel';
+import { timeTravel } from '../restoration/restoration';
 import { transactions } from '../transactions/transactions';
 import { persistence } from './serialization';
 import type { StorageAdapter } from './storage-adapters';

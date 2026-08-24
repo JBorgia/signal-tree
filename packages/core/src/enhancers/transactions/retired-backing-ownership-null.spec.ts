@@ -3,7 +3,7 @@ import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../time-travel/time-travel';
+import { timeTravel } from '../restoration/restoration';
 import { transactions } from './transactions';
 
 /**

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getPathNotifier } from './path-notifier';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { undoable } from './undoable';
 import { withWriteContext } from './write-context';
 

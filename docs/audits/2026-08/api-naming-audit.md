@@ -140,7 +140,7 @@ would say what it is. (An AI agent reaching for `.map(fn)` is the concrete failu
 the codebase already maintains a `WRONG_ENTITY_METHODS` table for exactly this class of
 mistake.)
 
-### 5. `__timeTravel` on the public tree object
+### 5. `__restoration` on the public tree object
 
 Appears in `Object.keys(tree)`. A double-underscore convention communicates "internal"
 to a human reader and nothing to an enumerator — serialisation, devtools inspection and

@@ -25,7 +25,7 @@ import { describe, expect, it } from 'vitest';
 import { batching } from '../enhancers/batching/batching';
 import { devTools } from '../enhancers/devtools/devtools';
 import { createEnhancer } from '../enhancers/index';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
 
 import type { ISignalTree } from '../index';

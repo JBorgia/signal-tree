@@ -16,7 +16,7 @@ import {
     RecommendedArchitectureComponent,
 } from '../../features/fundamentals/examples/recommended-architecture/recommended-architecture.component';
 import { SignalsExamplesComponent } from '../../features/fundamentals/examples/signals/signals-examples.component';
-import { TimeTravelDemoComponent } from '../../features/fundamentals/examples/time-travel/time-travel-demo.component';
+import { RestorationDemoComponent } from '../../features/fundamentals/examples/restoration/restoration-demo.component';
 import { WhatsNewComponent } from '../../features/fundamentals/examples/whats-new/whats-new.component';
 
 import type { ExampleMeta } from '../models';
@@ -206,7 +206,7 @@ export const timeTravelExampleMeta: ExampleMeta = {
   functionalUse: ['undo-redo', 'debugging', 'state-history'],
   enhancers: ['time-travel'],
   route: '/time-travel',
-  component: TimeTravelDemoComponent,
+  component: RestorationDemoComponent,
   difficulty: 'advanced',
   tags: [
     'time-travel',

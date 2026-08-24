@@ -38,7 +38,7 @@ describe('transactions enhancer', () => {
     expect(store.getHistory).toBeUndefined();
     expect(store.jumpTo).toBeUndefined();
     expect(store.getCurrentIndex).toBeUndefined();
-    expect(store.__timeTravel).toBeUndefined();
+    expect(store.__restoration).toBeUndefined();
   });
 
   it('keeps pending transactions out of confirmed causal turns until confirm', async () => {

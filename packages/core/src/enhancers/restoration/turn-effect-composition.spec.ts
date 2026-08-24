@@ -3,7 +3,7 @@ import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 /**
  * RESTORE-P0 — the full composition table, one case per row.

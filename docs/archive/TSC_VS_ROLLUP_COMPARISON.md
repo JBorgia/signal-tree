@@ -44,7 +44,7 @@ API Extractor / copy-declarations → rolls type definitions
 | **@signaltree/guardrails/factories** | 0.85 KB      | Validation          | Factory helpers        |
 | **core/enhancers/batching**          | 1.19 KB      | Single enhancer     | Scheduling / batching  |
 | **core/enhancers/memoization**       | 2.46 KB      | Single enhancer     | Cache management       |
-| **core/enhancers/time-travel**       | 1.29 KB      | Single enhancer     | History buffer         |
+| **core/enhancers/restoration**       | 1.29 KB      | Single enhancer     | History buffer         |
 | **core/enhancers/entities**          | 0.90 KB      | Single enhancer     | Normalization layer    |
 | **core/enhancers/middleware**        | 1.03 KB      | Single enhancer     | Action middleware      |
 | **core/enhancers/devtools**          | 2.38 KB      | Single enhancer     | Debug utilities        |

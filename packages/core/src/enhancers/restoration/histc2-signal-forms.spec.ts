@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { signalTree } from '../../lib/signal-tree';
 import { toWritableSignal } from '../../lib/utils';
 import { undoable } from '../../lib/undoable';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 /**
  * HIST-C2 STEP 6 — the production ergonomics falsifier.

@@ -112,7 +112,7 @@ declare function declareTree<
 declare function transactionsDecl(): ExtensionDeclaration<{
   transaction(fn: () => void): void;
 }>;
-declare function timeTravelDecl(): ExtensionDeclaration<{
+declare function restorationDecl(): ExtensionDeclaration<{
   undo(): void;
   redo(): void;
   canUndo(): boolean;
@@ -139,7 +139,7 @@ const tree = declareTree({
       return dollarIsNotAny;
     },
   },
-  extensions: [transactionsDecl(), timeTravelDecl()],
+  extensions: [transactionsDecl(), restorationDecl()],
 });
 
 // 1. store leaf types remain precise
@@ -208,17 +208,17 @@ type _c8_is_node_accessor = Expect<
 
 const orderAB = declareTree({
   store: { count: 0 },
-  extensions: [transactionsDecl(), timeTravelDecl()],
+  extensions: [transactionsDecl(), restorationDecl()],
 });
 const orderBA = declareTree({
   store: { count: 0 },
-  extensions: [timeTravelDecl(), transactionsDecl()],
+  extensions: [restorationDecl(), transactionsDecl()],
 });
 
 type _e_order_irrelevant = Expect<
   Equal<
-    AccumulatedAdditions<[ReturnType<typeof transactionsDecl>, ReturnType<typeof timeTravelDecl>]>,
-    AccumulatedAdditions<[ReturnType<typeof timeTravelDecl>, ReturnType<typeof transactionsDecl>]>
+    AccumulatedAdditions<[ReturnType<typeof transactionsDecl>, ReturnType<typeof restorationDecl>]>,
+    AccumulatedAdditions<[ReturnType<typeof restorationDecl>, ReturnType<typeof transactionsDecl>]>
   >
 >;
 type _e_both_orders_have_both = Expect<
@@ -367,7 +367,7 @@ declare function guardedTree<
 const guardedOk = guardedTree({
   store: { count: 0, label: 'a' },
   derived: { doubled: ($) => $.count() * 2 },
-  extensions: [transactionsDecl(), timeTravelDecl()],
+  extensions: [transactionsDecl(), restorationDecl()],
 });
 type _g1_accumulates = Expect<
   Equal<typeof guardedOk.transaction, (fn: () => void) => void>
@@ -395,7 +395,7 @@ type _g3_not_any = Expect<Equal<typeof guardedDetect.derived.detect, false>>;
 const guardedSum = guardedTree({
   store: { count: 0 },
   derived: { sum: ($) => $.count() + $.count() },
-  extensions: [timeTravelDecl()],
+  extensions: [restorationDecl()],
 });
 type _g4_sum = Expect<Equal<typeof guardedSum.derived.sum, number>>;
 
@@ -419,11 +419,11 @@ guardedTree({
 // g7 — order reversal does not change the valid resulting type
 const guardedAB = guardedTree({
   store: { count: 0 },
-  extensions: [transactionsDecl(), timeTravelDecl()],
+  extensions: [transactionsDecl(), restorationDecl()],
 });
 const guardedBA = guardedTree({
   store: { count: 0 },
-  extensions: [timeTravelDecl(), transactionsDecl()],
+  extensions: [restorationDecl(), transactionsDecl()],
 });
 type _g7_order_irrelevant = Expect<
   Equal<

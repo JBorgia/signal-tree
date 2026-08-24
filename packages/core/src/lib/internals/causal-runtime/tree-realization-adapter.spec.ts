@@ -8,7 +8,7 @@ import { stored } from '../../markers/stored';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
 import type { ISignalTree, WriteMetadata } from '../../types';
-import { timeTravel } from '../../../enhancers/time-travel/time-travel';
+import { timeTravel } from '../../../enhancers/restoration/restoration';
 import { transactions } from '../../../enhancers/transactions/transactions';
 import {
   getOwnedPositionIds,

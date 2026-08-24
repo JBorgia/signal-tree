@@ -29,7 +29,7 @@ export type {
 export type { NodeAccessor } from './node-accessor';
 
 // Time travel enhancer configuration (canonical)
-export interface TimeTravelConfig {
+export interface RestorationConfig {
   /** Enable/disable time travel (default: true) */
   enabled?: boolean;
   /**
@@ -411,7 +411,7 @@ export interface TransactionMethods {
  * NOT generic in the state, and that is the point. `getHistory()` returns the
  * history of the tree the methods are attached to, so the state is recovered
  * from polymorphic `this` — which is what the semantics always were. The
- * previous `TimeTravelMethods<T>` carried a second copy of the state type
+ * previous `RestorationMethods<T>` carried a second copy of the state type
  * purely so the enhancer could transport it, and that generic is what forced
  * enhancer signatures to name `ISignalTree<T>`.
  *
@@ -427,7 +427,7 @@ export interface TransactionMethods {
  * exact concrete state, through arbitrarily long `.with()` chains.
  */
 /**
- * `TimeTravelMethods` deliberately does NOT extend `TransactionMethods` (15.0,
+ * `RestorationMethods` deliberately does NOT extend `TransactionMethods` (15.0,
  * TX-SURFACE-0).
  *
  * `timeTravel()` used to ship its own `transaction()` — a second implementation
@@ -448,12 +448,12 @@ export interface TransactionMethods {
  * re-adding one via another interface extension would recreate the duplication —
  * see the negative typing test in `tx-ownership.typing.spec.ts`.
  */
-export interface TimeTravelMethods {
+export interface RestorationMethods {
   undo(): void;
   redo(): void;
   canUndo(): boolean;
   canRedo(): boolean;
-  getHistory(): TimeTravelEntry<
+  getHistory(): RestorationHistoryEntry<
     this extends NodeAccessor<infer S> ? S : never
   >[];
   resetHistory(): void;
@@ -471,7 +471,7 @@ export interface TimeTravelMethods {
   // The replacement is a transaction handle — see
   // docs/architecture/history-the-greenfield-target.md.
   /** Internal time-travel manager exposed for advanced tooling/debugging */
-  readonly __timeTravel?: {
+  readonly __restoration?: {
     undo(): void;
     redo(): void;
     canUndo(): boolean;
@@ -479,7 +479,7 @@ export interface TimeTravelMethods {
     // `unknown`: this is an inline property type, so `this` is the enclosing
     // interface rather than the tree. Internal tooling surface — state
     // precision belongs on the public getHistory().
-    getHistory(): TimeTravelEntry<unknown>[];
+    getHistory(): RestorationHistoryEntry<unknown>[];
     resetHistory(): void;
     jumpTo(index: number): void;
     getCurrentIndex(): number;
@@ -586,7 +586,7 @@ export interface EntitiesEnabled {
   readonly __entitiesEnabled?: true;
 }
 
-export interface TimeTravelEntry<T> {
+export interface RestorationHistoryEntry<T> {
   action: string;
   timestamp: number;
   state: T;
