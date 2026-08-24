@@ -470,7 +470,7 @@ export interface RestorationMethods {
   //
   // The replacement is a transaction handle — see
   // docs/architecture/history-the-greenfield-target.md.
-  /** Internal time-travel manager exposed for advanced tooling/debugging */
+  /** Internal restoration manager exposed for advanced tooling/debugging */
   readonly __restoration?: {
     undo(): void;
     redo(): void;

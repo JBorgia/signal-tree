@@ -1,8 +1,15 @@
 # Enhancer System — Overview
 
 This document describes the enhancer system in `@signaltree/core`.
-Enhancers are built-in, tree-shakable extensions that augment a `SignalTree` at runtime
-via `tree.with(...)`.
+Enhancers are built-in, tree-shakable extensions that augment a `SignalTree`.
+They are declared when the tree is constructed:
+
+```ts
+const tree = signalTree(state, { enhancers: [batching(), restoration()] });
+```
+
+`tree.with(...)` was removed in 15.0 — see the tombstone on `ISignalTree` in
+`lib/types.ts` for why a chain made the build plan unknowable.
 
 All enhancers are exported from `@signaltree/core` — no separate packages needed.
 
@@ -10,8 +17,8 @@ Key pieces
 
 - `createEnhancer(meta, fn)` — helper that attaches metadata to an enhancer function.
 - `ENHANCER_META` — symbol under which metadata is also attached for 3rd-party compatibility.
-- `tree.with(...enhancers)` — apply 1..N enhancers to a tree; supports optional metadata-based
-  re-ordering via `requires`/`provides`.
+- `signalTree(state, { enhancers: [...] })` — apply 1..N enhancers to a tree;
+  supports optional metadata-based re-ordering via `requires`/`provides`.
 
 Metadata schema
 

@@ -251,12 +251,12 @@ const _d_wrong_derived: string = tree.derived.doubled;
 tree.transaction(42);
 
 // a capability from an extension NOT present in this declaration must not exist
-const withoutTimeTravel = declareTree({
+const withoutRestoration = declareTree({
   store: { count: 0 },
   extensions: [transactionsDecl()],
 });
 // @ts-expect-error restoration was not declared here
-withoutTimeTravel.undo();
+withoutRestoration.undo();
 
 // the projector parameter is typed, so a bogus member is rejected
 declareTree({

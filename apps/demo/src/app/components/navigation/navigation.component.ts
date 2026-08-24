@@ -136,10 +136,10 @@ export class NavigationComponent {
       category: 'examples',
     },
     {
-      id: 'time-travel',
+      id: 'restoration',
       title: 'Time Travel',
       description: 'Undo/redo and state history',
-      route: '/time-travel',
+      route: '/restoration',
       category: 'examples',
     },
     {
