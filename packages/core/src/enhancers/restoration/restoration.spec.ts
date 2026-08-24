@@ -3566,7 +3566,7 @@ describe('restoration enhancer', () => {
     expect(replaySubjectTokens).toContainEqual(removedToken);
   });
 
-  it('records history for stored clear() and reload()', async () => {
+  it('records history for stored clear(), and NOT for reload()', async () => {
     const storage = new Map<string, string>();
     const key = 'restoration-stored-clear-reload';
     const store = signalTree(
@@ -3612,22 +3612,25 @@ describe('restoration enhancer', () => {
     undoable(() => store.$.theme.set('pink'));
     await Promise.resolve();
     await Promise.resolve();
+    const beforeReload = t.getRestorationHistory().length;
 
-    // Designated because this test's stated subject is that `reload()` RECORDS.
+    // ⚠️ THE OPEN QUESTION THIS TEST RECORDED IS NOW ANSWERED, and the assertion
+    // inverted as predicted. The old note said: "if reload is reclassified as a
+    // realization, this designation goes and the assertion inverts."
     //
-    // ⚠️ OPEN QUESTION for PER-B, recorded rather than settled here: `reload()`
-    // re-reads durable state, which makes it closer to a restore than to an
-    // authored operation — and defect 6c establishes that a restore should not
-    // become an undo step. If reload is reclassified as a realization, this
-    // designation goes and the assertion inverts. Designating it now says only
-    // "a caller CAN make reload undoable", which is true of any operation.
+    // PER-B P2 reclassified it. `reload()` is the operation LEARNING what the
+    // durable authority now says, so it applies as external truth — and an
+    // `undoable()` scope CANNOT promote it, because designation only ever
+    // promotes AUTHORED work. That is the same rule that stops `undoable()`
+    // making a server refresh undoable.
     undoable(() => store.$.theme.reload());
     await Promise.resolve();
     await Promise.resolve();
 
     expect(store.$.theme()).toBe('navy');
-    expect(t.getRestorationHistory().at(-1)?.state).toEqual({ theme: 'navy' });
-    expect(t.getRestorationHistory().at(-1)?.__ownerPaths).toEqual(['theme']);
+    expect(t.getRestorationHistory().length).toBe(beforeReload);
+    // The last entry is still the authored 'pink' write, not the reload.
+    expect(t.getRestorationHistory().at(-1)?.state).toEqual({ theme: 'pink' });
   });
 
   // DELETED WITH STATUS-DEL — "records history for status promise-vocabulary

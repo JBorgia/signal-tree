@@ -5851,6 +5851,102 @@ Initial load, explicit reload, speculative save, reload during a pending
 transaction. Those four decide whether `stored()` already has a coherent model or
 whether this is Candidate B territory.
 
+# PER-B · P1 / P2 / P3 / P4 / P5 / P7 — one root cause, two defects
+
+## ⚠️ THE FOUNDATIONAL DISTINCTION
+
+> **Autoload is not a realization — it is not a causal write at all.
+> `reload()` IS a realization, because a live tree learns an authoritative value
+> it did not choose.**
+
+That is the answer to the counterexample the pre-registration called hardest, and
+it is not a compromise between the two candidate readings. It is a third one.
+
+```text
+P1  autoload      writesObserved 0, restoration history at baseline, canUndo
+                  false. The durable value IS the tree's initial value, arriving
+                  on the materialisation path. Nothing to classify, nothing to
+                  protect, nothing to admit.
+P2  reload()      the operation ASKED; it did not choose the value.
+```
+
+Keeping the three loads separate was what made this visible. Collapsing them into
+"load" would have forced a classification onto a case that has no causal event to
+classify.
+
+## The root cause
+
+```text
+BEFORE   reload()'s tree write carried { origin: null, participation: null }
+         — AUTHORED. The current operation claimed to own a decision that
+         durable storage had made.
+AFTER    { origin: 'external', participation: 'realized' }
+```
+
+No `origin: 'storage'`, and no branch anywhere on the fact that the bytes came
+off disk. The prohibition holds: persistence earns no provenance value of its own
+until a consumer needs one.
+
+## Two defects, both downstream of that one misclassification
+
+```text
+P3   BEFORE  an undo of OLDER local work SUCCEEDED and reverted the location,
+             silently discarding the durable value the reload had just read —
+             P0-C only protects realizations.
+     AFTER   ST1034. Refused whole, durable value intact, cursor unmoved.
+
+P4   BEFORE  a reload inside a pending transaction was captured into that
+             transaction's CONTRIBUTION, so the rollback reverted it and left the
+             tree holding a value durable storage no longer had. The tree
+             silently disagreed with storage.
+     AFTER   contributes nothing; the rollback reverses only the authored write;
+             tree and storage agree. NOT refused either, because the ingress
+             touched nothing speculative — C3's bounded admission, behaving as A1
+             case 5 measured for HTTP.
+```
+
+Both are the falsifier's own prediction coming true in reverse: the same
+authoritative value was getting different restoration and transaction semantics
+because it arrived through storage rather than through HTTP. It now gets the same
+semantics, and the difference that remains is earned by authority rather than by
+transport.
+
+## Not defects — the settlement boundary already holds
+
+```text
+P5   speculative state never reached storage; after rollback live and durable
+     agree
+P7   persistence observes a confirmed transaction only AFTER settlement
+```
+
+`internals/commit-consequence.ts`'s rule — *durable storage never gets ahead of
+the tree's settled commit state* — is doing real work rather than asserting
+itself. Tested rather than trusted, as pre-registered.
+
+## A falsifier left in place by an earlier session, and it tripped
+
+`restoration.spec.ts` carried a test titled *"records history for stored clear()
+and reload()"* whose comment pre-registered this exact outcome:
+
+> ⚠️ OPEN QUESTION for PER-B … If reload is reclassified as a realization, this
+> designation goes and the assertion inverts.
+
+It inverted. `undoable(() => theme.reload())` now records NOTHING, because
+designation only ever promotes AUTHORED work — the same rule that stops
+`undoable()` making a server refresh undoable. The test is retitled and its
+assertion inverted rather than deleted.
+
+## Still owed
+
+```text
+P8   async adapter restore — classification at the SYNCHRONOUS write, not around
+     the await
+P9   reload mixed with authored writes in one scope
+P10  restore + structural / entity data
+P11  destroy while a load or save is pending
+P12  repeated reload of the same durable value
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded

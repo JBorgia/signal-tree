@@ -8,7 +8,7 @@ import {
   wrapOwnedWritableSignal,
 } from '../internals/owned-mutation';
 
-import { getActiveWriteContext } from '../write-context';
+import { getActiveWriteContext, withWriteContext } from '../write-context';
 import { isInspectionWrite } from '../write-participation';
 import { scheduleDurableConsequence } from '../internals/commit-consequence';
 import type { TreeCapability } from '../enhancer-types';
@@ -971,21 +971,55 @@ export function createStoredSignal<T>(
     cancelPending();
     writeGeneration++;
     const nextValue = loadFromStorage();
-    if (ownerPath && hasMutationCapture) {
-      runOwnedMutation(
-        sig,
-        () => rawSet(nextValue),
-        {
-          path: ownerPath,
-          ownerPath,
-          positionIds,
-        },
-        'set',
-        'replace'
-      );
-    } else {
-      rawSet(nextValue);
-    }
+
+    // PER-B P2. A reload is the operation LEARNING what the durable authority
+    // now says — the caller chose to ask, and did not choose the value. So the
+    // write is classified exactly as any other externally authoritative
+    // application, using the values that already exist rather than a
+    // storage-specific origin:
+    //
+    //   origin: 'external'          the decision was made outside this operation
+    //   participation: 'realized'   apply as established truth, not authored work
+    //
+    // Measured before this existed (per-b-classification.spec.ts): the write was
+    // AUTHORED, and two defects followed from that single misclassification.
+    // An undo of OLDER local work discarded the freshly reloaded durable value,
+    // because P0-C only protects realizations. And a reload inside a pending
+    // transaction was captured as part of that transaction's contribution, so
+    // rolling back REVERTED the reload and left the tree holding a value durable
+    // storage no longer had.
+    //
+    // Note what is NOT here: no `origin: 'storage'`. Persistence earns no
+    // provenance value of its own until a consumer needs one, and nothing here
+    // derives policy from the fact that the bytes came off disk — a durable
+    // boundary is not a causal-authority boundary.
+    const applyFromDurableAuthority = () => {
+      if (ownerPath && hasMutationCapture) {
+        runOwnedMutation(
+          sig,
+          () => rawSet(nextValue),
+          {
+            path: ownerPath,
+            ownerPath,
+            positionIds,
+          },
+          'set',
+          'replace'
+        );
+      } else {
+        rawSet(nextValue);
+      }
+    };
+
+    withWriteContext(
+      {
+        ...(getActiveWriteContext() ?? {}),
+        origin: 'external',
+        participation: 'realized',
+      },
+      applyFromDurableAuthority
+    );
+
     return lastLoadResult;
   };
 
