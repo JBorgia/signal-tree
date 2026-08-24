@@ -5547,6 +5547,93 @@ The definition must ship WITH the door — the JSDoc's first line has to be *out
 the authority of the current authored operation, not outside your process* —
 because that sentence is now load-bearing rather than explanatory.
 
+# DX-NAMES-1 · STEP 5 — the outside check, pre-registered and BLOCKED on people
+
+The instrument is written and the decision rule is fixed before any data exists:
+[`docs/audits/2026-08/dx-names-1-outside-check.md`](../audits/2026-08/dx-names-1-outside-check.md).
+
+**I cannot execute this step.** It needs developers, and no amount of further
+analysis substitutes — that is the whole reason it exists. What is deliverable
+without them is the instrument, built so the answer BINDS instead of being
+interpreted afterwards.
+
+## Scope, narrowed as instructed
+
+```text
+TESTED       external()  vs  applyExternal()
+NOT TESTED   incoming, acquired, realize, received, setExternal, and the rest —
+             closed for this round
+```
+
+Two questions, both of which internal analysis has now failed to settle twice:
+
+```text
+A  situational retrieval   which name does the situation CUE, after the invariant
+                           is taught once?
+B  the topological trap     given the invariant and NO worker explanation, does a
+                           developer correctly refuse the door for an app-owned
+                           worker computation and accept it for a relayed sensor
+                           reading?
+```
+
+## Design guards, and three that are mine rather than the brief's
+
+```text
+from the brief   only two names; invariant given verbatim once; no worker
+                 explanation before Test B; presentation order counterbalanced;
+                 directional signal, no significance claimed
+added here       Test B runs AFTER Test A, because the trap would otherwise teach
+                 retrieval
+added here       an UNPROMPTED question ("what word came to mind before you saw
+                 the options?"), recorded verbatim even when it names a rejected
+                 candidate — that is still evidence about what the situation cues
+added here       B3: "in your own words, what does 'external' mean here?", coded
+                 causal vs topological. This is the direct measure of the
+                 residual risk DX-NAMES-1.4 recorded, and the most informative
+                 single item in the instrument
+```
+
+## Pre-registered decision rule
+
+```text
+1  retrieval comparable, trap mostly passed   -> external()
+2  applyExternal materially better            -> applyExternal(), `apply` earns
+                                                 its word on evidence at last
+3  BOTH names fail the trap                   -> the FRAME survives, the public
+                                                 WORD does not. `origin:
+                                                 'external'` stays internal; the
+                                                 door name reopens with a
+                                                 measured reason
+4  B1/B2 right but B3 reasoning topological   -> warning, not verdict. The word
+                                                 works by luck on two cases;
+                                                 ship the definition in the
+                                                 JSDoc's FIRST line
+```
+
+Outcome 3 is the one worth noticing: **the reference frame can survive even if the
+best public word for teaching it changes.** Keeping those separable is what stops
+a bad measurement from taking the principle down with it.
+
+## Queue
+
+```text
+1  OUTSIDE CHECK      blocked on participants — 5-8 Angular developers who have
+                      never used SignalTree; TruckTrax colleagues are the natural
+                      pool                                              <-- HERE
+2  close DX-NAMES-1   the rule above decides it; no further analysis
+3  PER-B              stored() semantics, including reload()'s classification
+4  MATRIX-CLOSE
+5  Candidate B, TruckTrax passes 2-3, final perf/retention
+6  FULL historical release gate suite (not --fast)
+7  RC / final closure
+```
+
+PER-B does not depend on the answer, so it can proceed in parallel if the check
+takes time to run. What should NOT happen is the name being frozen by default
+because the check was inconvenient to run — the door still ships as `realize()`,
+which is rejected under every standard this study has used, so the rename is
+owed either way.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
