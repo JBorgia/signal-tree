@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
@@ -45,10 +46,10 @@ const makeTree = () =>
 describe('P0-C-ROW: entity row field divergence', () => {
   it('an authored row edit superseded by a realization must not be discarded', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'a', name: 'orig' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'orig' }]));
     await flush();
 
-    tree.$.rows.updateOne('a', { name: 'USER' });
+    undoable(() => tree.$.rows.updateOne('a', { name: 'USER' }));
     await flush();
     const indexBefore = tree.getCurrentIndex();
 
@@ -79,10 +80,10 @@ describe('P0-C-ROW: entity row field divergence', () => {
 
   it('CONTROL — the same row edit with NO realization still undoes', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'a', name: 'orig' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'orig' }]));
     await flush();
 
-    tree.$.rows.updateOne('a', { name: 'USER' });
+    undoable(() => tree.$.rows.updateOne('a', { name: 'USER' }));
     await flush();
 
     tree.undo();

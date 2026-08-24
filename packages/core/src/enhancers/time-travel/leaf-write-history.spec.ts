@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
@@ -25,9 +26,9 @@ describe('time travel records direct leaf writes', () => {
       { enhancers: [timeTravel()] }
     );
 
-    tree.$.user.profile.name.set('b');
+    undoable(() => tree.$.user.profile.name.set('b'));
     await flush();
-    tree.$.user.profile.name.set('c');
+    undoable(() => tree.$.user.profile.name.set('c'));
     await flush();
     expect(tree().user.profile.name).toBe('c');
 
@@ -38,9 +39,9 @@ describe('time travel records direct leaf writes', () => {
   it('undo restores a direct leaf .update()', async () => {
     const tree = signalTree({ count: 0 }, { enhancers: [timeTravel()] });
 
-    tree.$.count.update((n) => n + 1);
+    undoable(() => tree.$.count.update((n) => n + 1));
     await flush();
-    tree.$.count.update((n) => n + 1);
+    undoable(() => tree.$.count.update((n) => n + 1));
     await flush();
     expect(tree().count).toBe(2);
 
@@ -54,7 +55,7 @@ describe('time travel records direct leaf writes', () => {
       { enhancers: [timeTravel()] }
     );
 
-    tree.$.a.b.c.d.set(2);
+    undoable(() => tree.$.a.b.c.d.set(2));
     await flush();
     expect(tree().a.b.c.d).toBe(2);
 
@@ -65,7 +66,7 @@ describe('time travel records direct leaf writes', () => {
   it('redo replays a leaf write that undo rolled back', async () => {
     const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
 
-    tree.$.n.set(2);
+    undoable(() => tree.$.n.set(2));
     await flush();
     tree.undo();
     expect(tree().n).toBe(1);
@@ -77,9 +78,9 @@ describe('time travel records direct leaf writes', () => {
   it('does not grow history while restoring', async () => {
     const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
 
-    tree.$.n.set(2);
+    undoable(() => tree.$.n.set(2));
     await flush();
-    tree.$.n.set(3);
+    undoable(() => tree.$.n.set(3));
     await flush();
     const before = tree.getHistory().length;
 
@@ -99,11 +100,11 @@ describe('time travel records direct leaf writes', () => {
       { enhancers: [timeTravel()] }
     );
 
-    tree.$.rows.addOne({ id: 1, name: 'a' });
+    undoable(() => tree.$.rows.addOne({ id: 1, name: 'a' }));
     await flush();
-    tree.$.rows.addOne({ id: 2, name: 'b' });
+    undoable(() => tree.$.rows.addOne({ id: 2, name: 'b' }));
     await flush();
-    tree.$.rows.addOne({ id: 3, name: 'c' });
+    undoable(() => tree.$.rows.addOne({ id: 3, name: 'c' }));
     await flush();
 
     const before = tree.getHistory().length;

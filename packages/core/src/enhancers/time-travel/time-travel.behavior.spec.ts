@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { timeTravel } from './time-travel';
 import { signalTree } from '../../lib/signal-tree';
@@ -12,9 +13,9 @@ describe('time-travel behavior', () => {
       { enhancers: [timeTravel()] }
     );
 
-    enhanced.$.count.set(1);
+    undoable(() => enhanced.$.count.set(1));
     await flush();
-    enhanced.$.text.set('hello');
+    undoable(() => enhanced.$.text.set('hello'));
     await flush();
 
     expect(enhanced.canUndo()).toBe(true);

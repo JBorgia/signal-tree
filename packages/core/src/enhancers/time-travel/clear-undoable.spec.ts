@@ -35,6 +35,7 @@
  * `clear()`. Pre-existing: reproduced at `0a23a551`, the 15.0 branch point.
  */
 import { entityMap } from '../../lib/markers/entity-map';
+import { undoable } from '../../lib/undoable';
 import { signalTree } from '../../lib/signal-tree';
 import { timeTravel } from './time-travel';
 
@@ -50,10 +51,14 @@ const makeTree = () =>
 
 const seeded = async () => {
   const tree = makeTree();
-  tree.$.rows.setAll([
-    { id: 'a', v: 1 },
-    { id: 'b', v: 2 },
-  ]);
+  // Designated because a test below undoes PAST this seeding — it is an
+  // operation whose reversal is under test, not incidental setup.
+  undoable(() =>
+    tree.$.rows.setAll([
+      { id: 'a', v: 1 },
+      { id: 'b', v: 2 },
+    ])
+  );
   await tick();
   return tree;
 };
@@ -62,8 +67,8 @@ describe('time-travel — clear() is undoable', () => {
   it('CONTROL: undoing individual removals restores the rows', async () => {
     const tree = await seeded();
 
-    tree.$.rows.removeOne('a');
-    tree.$.rows.removeOne('b');
+    undoable(() => tree.$.rows.removeOne('a'));
+    undoable(() => tree.$.rows.removeOne('b'));
     await tick();
     expect(tree.$.rows.ids()).toEqual([]);
 
@@ -75,7 +80,7 @@ describe('time-travel — clear() is undoable', () => {
   it('restores every row the clear removed', async () => {
     const tree = await seeded();
 
-    tree.$.rows.clear();
+    undoable(() => tree.$.rows.clear());
     await tick();
     expect(tree.$.rows.ids()).toEqual([]);
     expect(tree.canUndo()).toBe(true);
@@ -97,7 +102,7 @@ describe('time-travel — clear() is undoable', () => {
     const held = tree.$.rows.byId('a');
     expect(held?.()).toEqual({ id: 'a', v: 1 });
 
-    tree.$.rows.clear();
+    undoable(() => tree.$.rows.clear());
     await tick();
     expect(held?.()).toBeUndefined();
 
@@ -110,7 +115,7 @@ describe('time-travel — clear() is undoable', () => {
     // The second undo used to throw "Unsupported scoped undo effect at
     // structural-drift". It now walks back past the seeding setAll.
     const tree = await seeded();
-    tree.$.rows.clear();
+    undoable(() => tree.$.rows.clear());
     await tick();
 
     tree.undo();
@@ -124,7 +129,7 @@ describe('time-travel — clear() is undoable', () => {
 
   it('redoes the clear', async () => {
     const tree = await seeded();
-    tree.$.rows.clear();
+    undoable(() => tree.$.rows.clear());
     await tick();
     tree.undo();
     await tick();
@@ -138,11 +143,11 @@ describe('time-travel — clear() is undoable', () => {
   it('survives clear -> undo -> re-clear', async () => {
     const tree = await seeded();
 
-    tree.$.rows.clear();
+    undoable(() => tree.$.rows.clear());
     await tick();
     tree.undo();
     await tick();
-    tree.$.rows.clear();
+    undoable(() => tree.$.rows.clear());
     await tick();
     expect(tree.$.rows.ids()).toEqual([]);
 
@@ -157,9 +162,9 @@ describe('time-travel — clear() is undoable', () => {
     const tree = await seeded();
     const held = tree.$.rows.byId('a');
 
-    tree.$.rows.clear();
+    undoable(() => tree.$.rows.clear());
     await tick();
-    tree.$.rows.addOne({ id: 'a', v: 99 });
+    undoable(() => tree.$.rows.addOne({ id: 'a', v: 99 }));
     await tick();
 
     expect(tree.$.rows.byId('a')?.()).toEqual({ id: 'a', v: 99 });

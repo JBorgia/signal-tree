@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { signalTree } from '../../lib/signal-tree';
 import { getPathNotifier, resetPathNotifier } from '../../lib/path-notifier';
@@ -18,9 +19,9 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
     const store = signalTree({ count: 0 }, { enhancers: [timeTravel()] });
 
     // Drive the tree forward so we have history to undo into.
-    (store as any).$.count.set(1);
+    undoable(() => (store as any).$.count.set(1));
     await Promise.resolve();
-    (store as any).$.count.set(2);
+    undoable(() => (store as any).$.count.set(2));
     await Promise.resolve();
 
     const captured: Array<{ path: string; meta?: UpdateMetadata }> = [];
@@ -71,11 +72,11 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
       { enhancers: [timeTravel()] }
     );
 
-    (store as any).$.count.set(1);
+    undoable(() => (store as any).$.count.set(1));
     await Promise.resolve();
-    (store as any).$.label.set('b');
+    undoable(() => (store as any).$.label.set('b'));
     await Promise.resolve();
-    (store as any).$.count.set(2);
+    undoable(() => (store as any).$.count.set(2));
     await Promise.resolve();
 
     const captured: Array<{ path: string; meta?: UpdateMetadata }> = [];
@@ -133,7 +134,7 @@ describe('time-travel — replay writes carry source: time-travel (PR1)', () => 
       }
     );
 
-    (store as any).$.count.set(5);
+    undoable(() => (store as any).$.count.set(5));
     await Promise.resolve();
 
     unsubscribe();

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
@@ -80,10 +81,10 @@ const B = { id: 'b', name: 'Beta', v: 2 };
 describe('reversal of a coalesced turn', () => {
   it('CONTROL: a flush between the operations reverses correctly', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([A, B]);
+    undoable(() => tree.$.rows.setAll([A, B]));
     await tick();
     await tick();
-    tree.$.rows.removeOne('a');
+    undoable(() => tree.$.rows.removeOne('a'));
     await tick();
     await tick();
     expect(tree.$.rows.ids()).toEqual(['b']);
@@ -96,13 +97,13 @@ describe('reversal of a coalesced turn', () => {
 
   it('CONTROL: a coalesced turn touching PRE-EXISTING rows reverses correctly', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([A, B]);
+    undoable(() => tree.$.rows.setAll([A, B]));
     await tick();
     await tick();
 
     // One turn, two structural effects, neither on a subject this turn created.
-    tree.$.rows.removeOne('a');
-    tree.$.rows.addOne({ id: 'c', name: 'Gamma', v: 3 });
+    undoable(() => tree.$.rows.removeOne('a'));
+    undoable(() => tree.$.rows.addOne({ id: 'c', name: 'Gamma', v: 3 }));
     await tick();
     await tick();
     expect(tree.$.rows.ids()).toEqual(['b', 'c']);
@@ -117,8 +118,8 @@ describe('reversal of a coalesced turn', () => {
     const tree = makeTree();
 
     // ONE turn, from an empty collection: it creates a and b, then removes a.
-    tree.$.rows.setAll([A, B]);
-    tree.$.rows.removeOne('a');
+    undoable(() => tree.$.rows.setAll([A, B]));
+    undoable(() => tree.$.rows.removeOne('a'));
     await tick();
     await tick();
     expect(tree.$.rows.ids()).toEqual(['b']);

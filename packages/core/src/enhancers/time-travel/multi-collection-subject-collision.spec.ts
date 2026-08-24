@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { entityMap } from '../../lib/markers/entity-map';
@@ -81,8 +82,8 @@ const retiredIn = (collection: unknown): readonly number[] =>
 describe('multi-collection subject id collision', () => {
   it('THE PREMISE: two collections in one tree allocate the same numbers', async () => {
     const tree = makeTree();
-    tree.$.users.setAll([{ id: 'u1', name: 'a' }]);
-    tree.$.orders.setAll([{ id: 'o1', total: 1 }]);
+    undoable(() => tree.$.users.setAll([{ id: 'u1', name: 'a' }]));
+    undoable(() => tree.$.orders.setAll([{ id: 'o1', total: 1 }]));
     await tick();
     await tick();
 
@@ -97,8 +98,8 @@ describe('multi-collection subject id collision', () => {
 
   it('a claim from EITHER collection keeps the shared number claimed', async () => {
     const tree = makeTree(20);
-    tree.$.users.setAll([{ id: 'u1', name: 'a' }]);
-    tree.$.orders.setAll([{ id: 'o1', total: 1 }]);
+    undoable(() => tree.$.users.setAll([{ id: 'u1', name: 'a' }]));
+    undoable(() => tree.$.orders.setAll([{ id: 'o1', total: 1 }]));
     await tick();
     await tick();
 
@@ -106,10 +107,10 @@ describe('multi-collection subject id collision', () => {
     expect(shared).toBe(subjectOf(tree.$.orders, 'o1'));
 
     // Retire both. Each collection now holds its own retired subject `shared`.
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     await tick();
     await tick();
-    tree.$.orders.removeOne('o1');
+    undoable(() => tree.$.orders.removeOne('o1'));
     await tick();
     await tick();
 
@@ -129,22 +130,22 @@ describe('multi-collection subject id collision', () => {
     // number.
     const WINDOW = 4;
     const tree = makeTree(WINDOW);
-    tree.$.users.setAll([{ id: 'u1', name: 'a' }]);
-    tree.$.orders.setAll([{ id: 'o1', total: 1 }]);
+    undoable(() => tree.$.users.setAll([{ id: 'u1', name: 'a' }]));
+    undoable(() => tree.$.orders.setAll([{ id: 'o1', total: 1 }]));
     await tick();
     await tick();
 
     const shared = subjectOf(tree.$.users, 'u1');
     expect(shared).toBe(subjectOf(tree.$.orders, 'o1'));
 
-    tree.$.orders.removeOne('o1');
+    undoable(() => tree.$.orders.removeOne('o1'));
     await tick();
     await tick();
     const claims = getSubjectRestorationClaims(tree);
     const ordersOwners = new Set(claims?.ownersOf(shared) ?? []);
     expect(ordersOwners.size).toBeGreaterThan(0);
 
-    tree.$.users.removeOne('u1');
+    undoable(() => tree.$.users.removeOne('u1'));
     await tick();
     await tick();
 
@@ -154,7 +155,7 @@ describe('multi-collection subject id collision', () => {
     // thing that matters: the number is not reported unowned while ANY owner
     // remains.
     for (let i = 0; i < WINDOW * 3; i++) {
-      tree.$.users.addOne({ id: `filler-${i}`, name: 'f' });
+      undoable(() => tree.$.users.addOne({ id: `filler-${i}`, name: 'f' }));
       await tick();
       await tick();
 
@@ -171,20 +172,20 @@ describe('multi-collection subject id collision', () => {
     // measurement that established the requirement.
     const WINDOW = 3;
     const tree = makeTree(WINDOW);
-    tree.$.users.setAll([{ id: 'u1', name: 'a' }]);
-    tree.$.orders.setAll([{ id: 'o1', total: 1 }]);
+    undoable(() => tree.$.users.setAll([{ id: 'u1', name: 'a' }]));
+    undoable(() => tree.$.orders.setAll([{ id: 'o1', total: 1 }]));
     await tick();
     await tick();
 
     const shared = subjectOf(tree.$.users, 'u1');
-    tree.$.users.removeOne('u1');
-    tree.$.orders.removeOne('o1');
+    undoable(() => tree.$.users.removeOne('u1'));
+    undoable(() => tree.$.orders.removeOne('o1'));
     await tick();
     await tick();
 
     const claims = getSubjectRestorationClaims(tree);
     for (let i = 0; i < WINDOW * 6 && claims?.isClaimed(shared); i++) {
-      tree.$.users.addOne({ id: `filler-${i}`, name: 'f' });
+      undoable(() => tree.$.users.addOne({ id: `filler-${i}`, name: 'f' }));
       await tick();
       await tick();
     }
@@ -206,14 +207,19 @@ describe('multi-collection subject id collision', () => {
     // the stronger property holds: the neighbour's churn is what evicts the
     // quiet collection's claims, so its inventory drains to nothing.
     const tree = makeTree(6);
-    tree.$.orders.setAll([
-      { id: 'o1', total: 1 },
-      { id: 'o2', total: 2 },
-      { id: 'o3', total: 3 },
-    ]);
+    // Designated: the measurement is which restoration CLAIMS this collection
+    // holds and when they drain. Undesignated writes hold none, so the claim
+    // count would start at zero and the test would prove nothing.
+    undoable(() =>
+      tree.$.orders.setAll([
+        { id: 'o1', total: 1 },
+        { id: 'o2', total: 2 },
+        { id: 'o3', total: 3 },
+      ])
+    );
     await tick();
     await tick();
-    tree.$.orders.clear();
+    undoable(() => tree.$.orders.clear());
     await tick();
     await tick();
 
@@ -261,16 +267,16 @@ describe('multi-collection subject id collision', () => {
 
     expect(subjectOf(tree.$.users, 'u1')).toBe(subjectOf(tree.$.orders, 'o1'));
 
-    tree.$.users.updateOne('u1', { name: 'ALICE' });
+    undoable(() => tree.$.users.updateOne('u1', { name: 'ALICE' }));
     await tick();
     await tick();
-    tree.$.orders.updateOne('o1', { total: 999 });
+    undoable(() => tree.$.orders.updateOne('o1', { total: 999 }));
     await tick();
     await tick();
-    tree.$.users.removeOne('u2');
+    undoable(() => tree.$.users.removeOne('u2'));
     await tick();
     await tick();
-    tree.$.orders.removeOne('o2');
+    undoable(() => tree.$.orders.removeOne('o2'));
     await tick();
     await tick();
 
@@ -339,10 +345,10 @@ describe('multi-collection subject id collision', () => {
   it('holds the Phase 5 invariant with two collections in the same window', async () => {
     const tree = makeTree(5);
     for (let g = 0; g < 30; g++) {
-      tree.$.users.setAll([{ id: `u${g}`, name: 'a' }]);
+      undoable(() => tree.$.users.setAll([{ id: `u${g}`, name: 'a' }]));
       await tick();
       await tick();
-      tree.$.orders.setAll([{ id: `o${g}`, total: g }]);
+      undoable(() => tree.$.orders.setAll([{ id: `o${g}`, total: g }]));
       await tick();
       await tick();
 

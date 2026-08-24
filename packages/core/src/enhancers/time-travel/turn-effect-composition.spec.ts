@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
@@ -35,12 +36,12 @@ const makeTree = () =>
 describe('RESTORE-P0 composition: add + X in one turn', () => {
   it('add + remove annihilates — and records NO TURN at all', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'seed', name: 'Seed' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'seed', name: 'Seed' }]));
     await flush();
     const before = tree.getHistory().length;
 
-    tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
-    tree.$.rows.removeOne('a');
+    undoable(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' }));
+    undoable(() => tree.$.rows.removeOne('a'));
     await flush();
     expect(tree.$.rows.ids()).toEqual(['seed']);
 
@@ -60,11 +61,11 @@ describe('RESTORE-P0 composition: add + X in one turn', () => {
 
   it('add + rekey is ONE creation under the final key', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'seed', name: 'Seed' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'seed', name: 'Seed' }]));
     await flush();
 
-    tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
-    tree.$.rows.changeId('a', 'a2');
+    undoable(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' }));
+    undoable(() => tree.$.rows.changeId('a', 'a2'));
     await flush();
     expect(tree.$.rows.ids()).toEqual(['seed', 'a2']);
 
@@ -80,11 +81,11 @@ describe('RESTORE-P0 composition: add + X in one turn', () => {
 describe('RESTORE-P0 composition: rekey + X in one turn', () => {
   it('rekey + rekey is ONE rename, original to final', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]));
     await flush();
 
-    tree.$.rows.changeId('a', 'a2');
-    tree.$.rows.changeId('a2', 'a3');
+    undoable(() => tree.$.rows.changeId('a', 'a2'));
+    undoable(() => tree.$.rows.changeId('a2', 'a3'));
     await flush();
     expect(tree.$.rows.ids()).toEqual(['a3']);
 
@@ -98,13 +99,13 @@ describe('RESTORE-P0 composition: rekey + X in one turn', () => {
 
   it('a rekey ROUND TRIP in one turn is no rename at all', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]));
     await flush();
 
     const before = tree.getHistory().length;
 
-    tree.$.rows.changeId('a', 'a2');
-    tree.$.rows.changeId('a2', 'a');
+    undoable(() => tree.$.rows.changeId('a', 'a2'));
+    undoable(() => tree.$.rows.changeId('a2', 'a'));
     await flush();
     expect(tree.$.rows.ids()).toEqual(['a']);
 
@@ -118,11 +119,11 @@ describe('RESTORE-P0 composition: rekey + X in one turn', () => {
 
   it('rekey + remove reverses to the ORIGINAL key', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]));
     await flush();
 
-    tree.$.rows.changeId('a', 'a2');
-    tree.$.rows.removeOne('a2');
+    undoable(() => tree.$.rows.changeId('a', 'a2'));
+    undoable(() => tree.$.rows.removeOne('a2'));
     await flush();
     expect(tree.$.rows.ids()).toEqual([]);
 
@@ -137,12 +138,12 @@ describe('RESTORE-P0 composition: rekey + X in one turn', () => {
 describe('RESTORE-P0 composition: the rows deliberately NOT composed', () => {
   it('separate TURNS still compose nothing — each reverses on its own', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'seed', name: 'Seed' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'seed', name: 'Seed' }]));
     await flush();
 
-    tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
+    undoable(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await flush(); // <- turn boundary
-    tree.$.rows.removeOne('a');
+    undoable(() => tree.$.rows.removeOne('a'));
     await flush();
 
     expect(tree.$.rows.ids()).toEqual(['seed']);
@@ -185,11 +186,11 @@ describe('RESTORE-P0 composition: the rows deliberately NOT composed', () => {
    */
   it('REPAIRED (P0-D): remove then re-add of the same key reverses cleanly', async () => {
     const tree = makeTree();
-    tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]);
+    undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]));
     await flush();
 
-    tree.$.rows.removeOne('a');
-    tree.$.rows.addOne({ id: 'a', name: 'Reborn' });
+    undoable(() => tree.$.rows.removeOne('a'));
+    undoable(() => tree.$.rows.addOne({ id: 'a', name: 'Reborn' }));
     await flush();
     expect(tree.$.rows.byId('a')?.()?.name).toBe('Reborn');
 
