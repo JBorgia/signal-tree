@@ -6437,6 +6437,123 @@ SWEPT      M1, M2, M3, M4, M7, M8, M10, M11
 NOT YET    M5, M9 (pass 2B), M6 (pass 3, on the reduced survivor set)
 ```
 
+# MATRIX-CLOSE · pass 2B — M5 and M9
+
+## M5 — clean in BOTH directions
+
+Answered by the self-tested gates rather than by my own greps, which is the
+stronger form:
+
+```text
+FORWARD   readme-apis        every @signaltree symbol named in a README exists
+          error-codes        every emitted code documented, none invented
+          doc-links, declaration-docs
+REVERSE   dead-exports       no exported symbol unreachable from the barrels and
+                             every import (1902 files, 865 imported names)
+          demo-coverage      every root-barrel export demonstrated (17/17)
+```
+
+### The gap the gates cannot see, swept separately
+
+`lint-readme-apis` checks imported SYMBOLS, not MEMBERS — which is exactly how
+`tree.with(...)` survived in ENHANCERS.md until batch 7 grepped for it. So every
+member name taught in CURRENT docs was extracted and checked against the built
+declarations: 43 distinct names across 28 docs, 13 not found, **all 13
+classified as false positives or correct history**:
+
+```text
+9   user-state property names from the examples' own state (todos, isAdmin,
+    activeUser, retryCount, firmware, items, selectedUser, hasSelection,
+    activeUserCount)
+2   my regex's `$` alternative matching RxJS/NgRx rather than a tree —
+    `users$.pipe(...)` and `this.store.select(...)`, the latter inside a block
+    labelled "Before (NgRx)"
+2   correctly historical — `## 6. batchUpdate() removed` and
+    `updateOptimized()` "Deprecated in 13.5.0 and removed here"
+```
+
+Known-positive control, per the standing rule: the checker finds `undoable`,
+`external` and `reload` in the declarations and does not find
+`definitelyNotAMethod`. A zero result from it is therefore evidence.
+
+## M9 — no duplicated ownership on any axis
+
+```text
+restoration eligibility   isTurnEligible only in restoration.ts;
+                          restorationDesignated only in restoration-eligibility.ts
+settlement                transactions.ts decides WHEN a transaction settles;
+                          commit-consequence.ts decides WHETHER a durable
+                          consequence may run. Different decisions, different
+                          axes — and PER-B's P5/P7 proved persistence has no
+                          "confirmed enough to save" rule of its own.
+authored vs realized      one field, one reader (`getWriteParticipation`)
+origin                    one field
+transaction correlation   `transactionId` routes writes; `(owner, id)` identifies
+                          lifecycle events. NOT duplication — `owner` is what
+                          lets restoration filter its OWN transactions from
+                          foreign ones (`event.owner === transactionOwnerToken`),
+                          and DIAG-JOURNAL-1.1 measured that a bare id suffices
+                          only WITHIN one tree.
+diagnostic record         the journal OBSERVES; restoration history OWNS
+                          reversal. F3-F7 proved the journal decides nothing.
+structuralEffect          pass 2A removed the last three `*HistoryEffect*`
+                          survivors; zero remain.
+```
+
+**Acceptance rule held:** two mechanisms may observe the same event, but only one
+owns the decision on a given axis.
+
+## ⚠️ M9's real work: is `asyncSource` a second, unclassified ingress?
+
+The suspicion was strong and specific. `asyncSource` is exported from the root
+barrel, its entire job is acquiring external data, and it contains no
+`withWriteContext` at all — the loaded value lands via a bare
+`dataSignal.set(value)`. That is the exact shape PER-B just fixed in
+`stored().reload()`, where it cost two defects.
+
+**Measured, and the suspicion is REFUTED:**
+
+```text
+load ran            0 -> 7
+causal events       0
+restoration steps   1 (baseline)
+canUndo             false
+undo of authored    succeeds; the loaded value is untouched
+work
+```
+
+`asyncSource`'s value lives OUTSIDE the causal substrate — the same category as
+PER-B's P1 autoload, not the same category as `reload()`. There is no turn to
+admit, no location for P0-C to protect, no contribution for a transaction to
+capture. **A bare `set` with no write context is CORRECT here, and wrapping it in
+`external()` would be classifying a non-event.**
+
+### ⚠️ And it took THREE harness attempts, which is the finding worth keeping
+
+```text
+attempt 1   causalEvents: 0   — because the load NEVER RAN (no injection context)
+attempt 2   causalEvents: 0   — because the load never ran (wrong marker shape:
+                                asyncSource takes { initial, load }, and its
+                                accessor IS the value, not `.data()`)
+attempt 3   causalEvents: 0   — because there is genuinely no causal event
+```
+
+The first two reported the RIGHT NUMBER for the WRONG REASON. Recording either
+would have logged a correct conclusion on broken evidence — precisely the failure
+mode this audit keeps finding in other people's tests, committed by the audit
+itself. The spec now asserts the load explicitly (`before` 0, `after` 7) so a
+future harness break surfaces as a failure rather than a silent zero.
+
+## Pass 2B verification
+
+nx test core (1885 passed / 210 files), nx lint core, check-spec-types,
+verify-gates --fast 36/36 — all exit 0.
+
+```text
+SWEPT      M1 M2 M3 M4 M5 M7 M8 M9 M10 M11
+REMAINING  M6 only — mechanism-removal proofs against the frozen survivor set
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
