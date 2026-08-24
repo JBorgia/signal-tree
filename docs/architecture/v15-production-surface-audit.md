@@ -5739,6 +5739,118 @@ check-error-codes, check-demo-coverage 17/17.
 
 Carried: `enhancer-safety.spec.ts`'s mock-`.with()` harness-validity item.
 
+# PER-B — PRE-REGISTERED before touching implementation
+
+> **NULL: can `stored()` load and reload durable state while preserving the
+> authored/external distinction, transaction safety and the single restoration
+> authority — WITHOUT persistence inventing its own causal semantics?**
+
+DX-NAMES deliberately deferred the two real persistence sites (localStorage,
+Capacitor Preferences) rather than deciding them by implication. PER-B has to
+settle them directly, and it may not answer by analogy either.
+
+## Acceptance bar
+
+> Persistence may OBSERVE and REPRODUCE state. It must never manufacture
+> authorship, restoration rights, transaction settlement, or causal authority
+> merely because data crossed durable storage.
+
+## The falsifier, tied to the reference frame rather than to a source table
+
+> **If moving the same authoritative value between HTTP, localStorage,
+> IndexedDB, Capacitor Preferences or an in-memory adapter changes
+> restoration/transaction semantics SOLELY because the adapter changed, PER-B
+> fails — unless the difference is earned by authority semantics rather than by
+> transport.**
+
+That is DX-NAMES-1.4's frame applied to storage: a durable boundary is not a
+causal-authority boundary any more than a worker boundary is.
+
+## Prohibition
+
+> **Persistence may not derive causal policy from storage origin.** No
+> `origin === 'storage'` branch, and no new `origin: 'storage'` value unless a
+> consumer independently earns that provenance fact. `external` and
+> `participation: 'realized'` already exist; PER-B adds metadata only if
+> persistence demonstrates a diagnostic question those cannot answer.
+
+The precedent is exact: DIAG-JOURNAL-1.1 earned `'transaction-rollback'` by
+producing a consumer that could not otherwise correlate. Absent that, absence.
+
+## Three loads, deliberately NOT collapsed
+
+The hardest counterexample is initial hydration: if persistence is reconstructing
+**this same application's previously authored state**, calling it external may be
+misleading even though the bytes came from disk.
+
+```text
+autoload during construction     is this even a causal event, or is it the
+                                 tree's initial value arriving late?
+explicit reload after live       the operation is LEARNING what the durable
+                                 authority now says -> external, probably
+cross-context storage update     another tab/process wrote it -> external,
+                                 clearly
+```
+
+## Cases, locked
+
+```text
+P1   autoload before any user work         external / authored / outside history?
+P2   explicit stored().reload()            does rereading classify as external?
+P3   reload after an undoable local edit   does durable truth protect itself from
+                                           an undo of older local work?
+P4   reload inside a pending transaction   contribution, dependency evidence, or
+                                           refused?
+P5   save during a pending transaction     can speculative state reach storage
+                                           before settlement?
+P6   rollback after a speculative save     is storage guaranteed free of
+                                           withdrawn work?
+P7   confirmed transaction                 when may persistence observe it?
+P8   async adapter restore                 is classification applied at the
+                                           SYNCHRONOUS tree write, not around the
+                                           await?
+P9   reload mixed with authored writes     can a reload scope classify a
+                                           neighbouring authored write?
+P10  restore + structural/entity data      same semantics as scalars, including
+                                           identity and provenance protection
+P11  destroy while load/save pending       no late write into dead ownership
+P12  repeated reload of the same value     no fake authored turns or restoration
+                                           rights merely because persistence ran
+```
+
+## First hypothesis to attack
+
+```ts
+const saved = await adapter.load();
+external(() => tree.$.settings.set(saved));   // synchronous application
+```
+
+Stronger now that `external()` has a coordinate system — *did the current
+authored operation own the state decision?* For an explicit reload the answer is
+usually no. **But PER-B must PROVE that rather than assume "storage = external".**
+
+## Transaction expectation, stated before measuring
+
+Speculative authored state must not become durable truth before confirmation. If
+`stored()` autosaves staged values, that is the major PER-B defect: persistence
+would turn rollback-able work into an external observation of its own speculation.
+
+Prior art already in the tree, to be tested rather than trusted:
+`internals/commit-consequence.ts` claims a single commit-scope authority with the
+rule *durable storage never gets ahead of the tree's settled commit state*, and
+`transactions()` opens that scope before the callback runs. Whether it holds for
+`reload()` as well as for saves is P4's question.
+
+## Order
+
+```text
+P1 -> P2 -> P5 -> P4
+```
+
+Initial load, explicit reload, speculative save, reload during a pending
+transaction. Those four decide whether `stored()` already has a coherent model or
+whether this is Candidate B territory.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
