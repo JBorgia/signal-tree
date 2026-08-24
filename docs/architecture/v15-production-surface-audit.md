@@ -6648,16 +6648,77 @@ external()      NOT a mechanism. It is the public DOOR onto S2 + S3, and its
 undoable()      the public door onto S1, same reasoning.
 transaction()   the public door onto S4/S5/S6; the mechanisms are the three rows.
 
-DIAGNOSTIC      ⚠️ OWNS NO BEHAVIOUR, so it cannot be an M6 row. F3-F7 proved
-JOURNAL         positively that it grants no restoration rights, acquires no
-                ownership, changes no reclamation and holds no live handles —
-                i.e. removing it must break NOTHING except its own specs. It is a
-                CONSUMER of S3/S4/S5, not a survivor with a behaviour to prove.
-                Recorded rather than given a row for balance.
+DIAGNOSTIC      ⚠️ WITHDRAWN — see the amendment below. This entry claimed the
+JOURNAL         journal "owns no behaviour", which was a CATEGORY ERROR.
 
 asyncSource     NOT an ingress mechanism. Pass 2B established POSITIVELY that its
                 load runs and produces zero causal events, so there is no causal
                 behaviour to prove.
+```
+
+## ⚠️ AMENDMENT — the table's first falsification, before any probe ran
+
+The frozen table excluded the diagnostic journal on the grounds that it "owns no
+behaviour". **That conflated two different claims.**
+
+```text
+F3-F7 PROVED      the journal owns no CAUSAL AUTHORITY
+F3-F7 DID NOT     prove it owns no BEHAVIOUR
+PROVE
+```
+
+The journal owns real behaviour — it observes causal turns, retains them
+boundedly, observes lifecycle facts, preserves a monotonic sequence for
+correlation, exposes `turns()` / `transactionEvents()`, and disposes cleanly.
+That behaviour is READ-ONLY, which is a different thing from absent.
+
+And MATRIX-CLOSE's null explicitly covers *diagnostic* concepts, so excluding the
+journal would have defined **every observation-only mechanism out of M6** — a
+rule that would have exempted exactly the kind of mechanism most likely to be
+silently inert. TURN-FEED-0.2 is the standing proof that an observer can be
+broken and look fine.
+
+```text
+S8  DIAGNOSTIC JOURNAL
+    owner        diagnostic observation
+    dimension    bounded read-only causal chronology
+    consumer     DevTools / diagnostic readers
+    behaviour    authored / realized / inspection turns and lifecycle facts can be
+                 observed and CORRELATED without granting restoration,
+                 settlement or ownership
+    probe        disable the journal's turn recording while leaving the notifier
+                 and lifecycle production intact
+    control      prove the causal write and the transaction actually occurred
+    expected     the journal's grouping/correlation assertions lose their turns
+                 while the tree's own behaviour stays correct
+```
+
+Its success criterion is unusually clean, and it is the whole point of the row:
+
+```text
+journal proof        RED
+causal behaviour     GREEN
+restoration rights   unchanged
+transaction result   unchanged
+```
+
+The original entry's own words — *"removing it must break nothing except its own
+specs"* — were already almost the right expectation. Its specs ARE the proof of
+the behaviour it owns; "nothing else breaks" is the non-interference half.
+
+### And this repairs S3 rather than weakening it
+
+Forcing `currentHydrateMode()` to `'merge'` proves that **`origin: 'restoration'`
+has an independent policy consumer participation cannot replace**. It does not
+prove the whole provenance axis: `'external'`, `'devtools'` and
+`'transaction-rollback'` are diagnostic provenance, and S8 is where they earn
+their existence through observable behaviour instead of leaning on S3's single
+policy consumer.
+
+```text
+S3   provenance mechanism — ONE authority-specific policy consumer
+     (restoration -> exact restore rather than merge), plus diagnostic consumers
+S8   observes provenance, owns diagnostic chronology, owns NO causal policy
 ```
 
 ## Pre-registered outcomes per probe
