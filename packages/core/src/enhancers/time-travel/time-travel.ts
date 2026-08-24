@@ -57,7 +57,9 @@ import type {
   UpdateMetadata,
 } from '../../lib/types';
 
-import { ENHANCER_META, SignalTreeRollbackError } from '../../lib/types';
+// `SignalTreeRollbackError` is no longer imported here: rollback errors are
+// raised by `transactions()`, which owns rollback (TX-SURFACE-0).
+import { ENHANCER_META } from '../../lib/types';
 import type {
   ReversalEffect,
   ReversalRefusal,
@@ -166,45 +168,14 @@ type TreeRealizationDescriptorStore = Map<
   }
 >;
 
-type LaterAppliedEffect = {
-  turnId: number;
-  effect: TurnEffect;
-};
+// The rollback TYPE cluster — LaterAppliedEffect,
+// PendingRollbackDependencyConflict, PendingRollbackPlan, RollbackTurnLike,
+// RollbackFailureCause, ROLLBACK_ERROR_MESSAGE — was DELETED in 15.0 with
+// timeTravel()'s duplicate transaction() (TX-SURFACE-0).
+//
+// Rollback is `transactions()`' concern and it declares its own equivalents,
+// built from its own captured effects rather than from restoration history.
 
-type PendingRollbackDependencyConflict = {
-  kind: 'later-confirmed-dependency';
-  pendingTurnId: number;
-  pendingEffect: TurnEffect;
-  conflictingTurnId?: number;
-  conflictingEffect?: TurnEffect;
-};
-
-type PendingRollbackPlan =
-  | { compensation: TurnEffect[] }
-  | { conflict: PendingRollbackDependencyConflict };
-
-type RollbackTurnLike = {
-  id: number;
-  __effects?: TurnEffect[];
-};
-
-type RollbackFailureCause =
-  | PendingRollbackDependencyConflict
-  | {
-      kind: 'effect-validation-failed';
-      pendingTurnId: number;
-      compensation: TurnEffect[];
-      errorMessage: string;
-      cause?: unknown;
-    };
-
-const ROLLBACK_ERROR_MESSAGE =
-  'SignalTree could not rollback the pending transaction';
-
-const createRollbackError = (
-  cause: RollbackFailureCause
-): SignalTreeRollbackError =>
-  new SignalTreeRollbackError(ROLLBACK_ERROR_MESSAGE, { cause });
 
 function toReversalEffect(
   effect: TurnEffect,
@@ -281,151 +252,11 @@ function toReversalEffect(
   }
 }
 
-function buildPendingRollbackPlan(
-  pendingTurn: RollbackTurnLike | undefined,
-  laterEffects: LaterAppliedEffect[]
-): PendingRollbackPlan {
-  if (!pendingTurn) {
-    return { compensation: [] };
-  }
-
-  const pendingEffects = pendingTurn.__effects ?? [];
-  const makeScalarKey = (effect: ScalarSetEffect): string =>
-    `${effect.position}\u0000${effect.path}\u0000${effect.subject ?? ''}`;
-  const supersededScalarKeys = new Set(
-    laterEffects
-      .map(({ effect }) => effect)
-      .filter((effect): effect is ScalarSetEffect => effect.kind === 'set')
-      .map(makeScalarKey)
-  );
-  const classifyLaterOverlap = (
-    effect: ScalarSetEffect
-  ):
-    | { kind: 'none' }
-    | { kind: 'superseded' }
-    | {
-        kind: 'conflict';
-        conflictingTurnId?: number;
-        conflictingEffect?: TurnEffect;
-      } => {
-    let superseded = false;
-    for (const laterEntry of laterEffects) {
-      const laterEffect = laterEntry.effect;
-      if (laterEffect.position !== effect.position) {
-        continue;
-      }
-      if (
-        laterEffect.subject !== undefined &&
-        effect.subject !== undefined &&
-        laterEffect.subject !== effect.subject
-      ) {
-        continue;
-      }
-      if (laterEffect.path === effect.path) {
-        if (laterEffect.kind !== 'set') {
-          return {
-            kind: 'conflict',
-            conflictingTurnId: laterEntry.turnId,
-            conflictingEffect: laterEffect,
-          };
-        }
-        if (laterEffect.mutationIntent === 'replace') {
-          if (supersededScalarKeys.has(makeScalarKey(effect))) {
-            superseded = true;
-            continue;
-          }
-        }
-        return {
-          kind: 'conflict',
-          conflictingTurnId: laterEntry.turnId,
-          conflictingEffect: laterEffect,
-        };
-      }
-      if (
-        laterEffect.path.startsWith(`${effect.path}.`) ||
-        effect.path.startsWith(`${laterEffect.path}.`)
-      ) {
-        return {
-          kind: 'conflict',
-          conflictingTurnId: laterEntry.turnId,
-          conflictingEffect: laterEffect,
-        };
-      }
-    }
-    return superseded ? { kind: 'superseded' } : { kind: 'none' };
-  };
-  const hasSameSubjectDependency = (
-    effect: CollectionAddEffect | CollectionRemoveEffect | CollectionRekeyEffect
-  ):
-    | { conflictingTurnId?: number; conflictingEffect?: TurnEffect }
-    | undefined => {
-    for (const laterEntry of laterEffects) {
-      const laterEffect = laterEntry.effect;
-      if (laterEffect.kind === 'set') {
-        if (laterEffect.subject === effect.subject && effect.kind !== 'rekey') {
-          return {
-            conflictingTurnId: laterEntry.turnId,
-            conflictingEffect: laterEffect,
-          };
-        }
-        continue;
-      }
-      if (laterEffect.subject === effect.subject) {
-        return {
-          conflictingTurnId: laterEntry.turnId,
-          conflictingEffect: laterEffect,
-        };
-      }
-    }
-    return undefined;
-  };
-
-  const compensation: TurnEffect[] = [];
-  for (let i = pendingEffects.length - 1; i >= 0; i--) {
-    const effect = pendingEffects[i];
-    switch (effect.kind) {
-      case 'set': {
-        const overlap = classifyLaterOverlap(effect);
-        if (overlap.kind === 'conflict') {
-          return {
-            conflict: {
-              kind: 'later-confirmed-dependency',
-              pendingTurnId: pendingTurn.id,
-              pendingEffect: effect,
-              conflictingTurnId: overlap.conflictingTurnId,
-              conflictingEffect: overlap.conflictingEffect,
-            },
-          };
-        }
-        if (overlap.kind === 'superseded') {
-          continue;
-        }
-        compensation.push(effect);
-        break;
-      }
-      case 'add':
-      case 'remove':
-      case 'rekey': {
-        const dependency = hasSameSubjectDependency(effect);
-        if (dependency) {
-          return {
-            conflict: {
-              kind: 'later-confirmed-dependency',
-              pendingTurnId: pendingTurn.id,
-              pendingEffect: effect,
-              conflictingTurnId: dependency.conflictingTurnId,
-              conflictingEffect: dependency.conflictingEffect,
-            },
-          };
-        }
-        compensation.push(effect);
-        break;
-      }
-    }
-  }
-
-  return { compensation };
-}
+// `buildPendingRollbackPlan()` and its `RollbackFailureCause` /
+// `ROLLBACK_ERROR_MESSAGE` helpers were DELETED in 15.0 with timeTravel()'s
+// duplicate `transaction()` (TX-SURFACE-0). Rollback planning belongs to
+// `transactions()`, which has its own equivalent built from its own captured
+// effects rather than from restoration history.
 
 type PendingEffectMap = Map<string, TurnEffect>;
 
@@ -690,20 +521,21 @@ class TimeTravelManager<T> {
     return this.history.some((turn) => turn.id > turnId);
   }
 
-  getPendingRollbackPlan(turnId: number): PendingRollbackPlan {
-    const pendingTurn = this.pendingTurns.get(turnId);
-    const laterEffects = this.history
-      .filter(
-        (turn) => turn.id > turnId && this.getTurnStatus(turn.id) === 'applied'
-      )
-      .flatMap((turn) =>
-        (turn.__effects ?? []).map((effect) => ({
-          turnId: turn.id,
-          effect,
-        }))
-      ) as LaterAppliedEffect[];
-    return buildPendingRollbackPlan(pendingTurn, laterEffects);
-  }
+  // `getPendingRollbackPlan()` was DELETED in 15.0 with timeTravel()'s duplicate
+  // `transaction()` (TX-SURFACE-0).
+  //
+  // TOMBSTONE, because this method IS the category-C defect the opt-in flip
+  // found. Its first line was `const laterEffects = this.history` — it answered
+  // "is rolling back this pending turn safe?" by reading the RESTORATION
+  // HISTORY. That conflated two different questions: which operations a user may
+  // reverse, and what has happened since a speculative turn. Under opt-in an
+  // ordinary later write is not admitted to that history, so a dependent
+  // rollback silently stopped being refused.
+  //
+  // `transactions()` answers the same question from its own captured effects and
+  // never needed the history, which is why the repair was deletion rather than a
+  // fix. Do not reintroduce a rollback-safety check that reads restoration
+  // history: the dependency ledger and the undo stack are not the same thing.
 
   private buildTurn(
     action: string,
@@ -2501,7 +2333,6 @@ export function timeTravel(
     const restorationWrittenSubjects = new Set<string>();
     const pendingTransactions = new Map<number, CaptureBucket>();
     const transactionOwnerToken = {};
-    let nextTransactionId = 1;
     const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
       value !== null &&
       typeof value === 'object' &&
@@ -3027,16 +2858,6 @@ export function timeTravel(
       timeTravelManager.discardPendingTurn(stagedTurnId);
     });
 
-    const drainTransactionEffects = (transactionId: number): TurnEffect[] => {
-      const bucket = pendingTransactions.get(transactionId);
-      pendingTransactions.delete(transactionId);
-      if (!bucket) {
-        return [];
-      }
-
-      const { effects } = drainCaptureBucket(bucket);
-      return effects.reverse();
-    };
 
     /** Set by this tree's own leaf interceptors; read by the global flush hook. */
     let restoreLeafInterceptors: (() => void) | null = null;

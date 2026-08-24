@@ -45,7 +45,7 @@ const makeTree = () =>
   );
 
 @Component({
-  selector: 'st-ingress-host',
+  selector: 'lib-st-ingress-host',
   standalone: true,
   imports: [FormField],
   template: `<input [formField]="f.name" />`,
@@ -148,7 +148,7 @@ describe('HIST-C2 step 6: the earned mutation-ingress adapter', () => {
 
   it('and an adapter WITHOUT the option leaves the same edit non-reversible', async () => {
     @Component({
-      selector: 'st-plain-host',
+      selector: 'lib-st-plain-host',
       standalone: true,
       imports: [FormField],
       template: `<input [formField]="f.name" />`,

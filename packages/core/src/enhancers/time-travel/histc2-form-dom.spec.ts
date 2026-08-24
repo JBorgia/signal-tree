@@ -32,7 +32,7 @@ const flush = async () => {
 };
 
 @Component({
-  selector: 'st-host',
+  selector: 'lib-st-host',
   standalone: true,
   imports: [FormField],
   template: `<input [formField]="f.name" />`,
