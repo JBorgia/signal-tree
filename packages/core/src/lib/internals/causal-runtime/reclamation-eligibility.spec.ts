@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { PositionId } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import {
   assessReclamationEligibility,
   type ReclamationEligibility,
@@ -38,7 +38,7 @@ function expectEligibility(
 describe('reclamation eligibility', () => {
   it('blocks reclamation while retained confirmed history can still restore a tombstoned subject', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const turn = store.admitConfirmed({
       id: 1,
@@ -52,13 +52,13 @@ describe('reclamation eligibility', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(turn.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(turn.id)).toEqual({ ok: true });
 
     expectEligibility(
       assessReclamationEligibility({
         subjectId: SUBJECT_DRIVER,
         store,
-        appliedHistory,
+        appliedTurns,
       }),
       {
       eligible: false,
@@ -76,7 +76,7 @@ describe('reclamation eligibility', () => {
 
   it('blocks reclamation while redoable confirmed history can still re-add a tombstoned subject', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const turn = store.admitConfirmed({
       id: 1,
@@ -90,14 +90,14 @@ describe('reclamation eligibility', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(turn.id)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(turn.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(turn.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(turn.id)).toEqual({ ok: true });
 
     expectEligibility(
       assessReclamationEligibility({
         subjectId: SUBJECT_DRIVER,
         store,
-        appliedHistory,
+        appliedTurns,
       }),
       {
       eligible: false,
@@ -115,7 +115,7 @@ describe('reclamation eligibility', () => {
 
   it('does not let confirmed rekey history alone block reclamation', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const turn = store.admitConfirmed({
       id: 1,
@@ -129,13 +129,13 @@ describe('reclamation eligibility', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(turn.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(turn.id)).toEqual({ ok: true });
 
     expectEligibility(
       assessReclamationEligibility({
         subjectId: SUBJECT_DRIVER,
         store,
-        appliedHistory,
+        appliedTurns,
       }),
       {
       eligible: true,
@@ -146,7 +146,7 @@ describe('reclamation eligibility', () => {
 
   it('does not let confirmed scalar history alone block reclamation', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const turn = store.admitConfirmed({
       id: 1,
@@ -159,13 +159,13 @@ describe('reclamation eligibility', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(turn.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(turn.id)).toEqual({ ok: true });
 
     expectEligibility(
       assessReclamationEligibility({
         subjectId: SUBJECT_DRIVER,
         store,
-        appliedHistory,
+        appliedTurns,
       }),
       {
       eligible: true,
@@ -176,7 +176,7 @@ describe('reclamation eligibility', () => {
 
   it('blocks reclamation while pending speculative state still references the subject', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     store.admitPending({
       id: 2,
@@ -194,7 +194,7 @@ describe('reclamation eligibility', () => {
       assessReclamationEligibility({
         subjectId: SUBJECT_DRIVER,
         store,
-        appliedHistory,
+        appliedTurns,
       }),
       {
       eligible: false,
@@ -212,7 +212,7 @@ describe('reclamation eligibility', () => {
 
   it('blocks reclamation while pending rekey still references the subject', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     store.admitPending({
       id: 2,
@@ -231,7 +231,7 @@ describe('reclamation eligibility', () => {
       assessReclamationEligibility({
         subjectId: SUBJECT_DRIVER,
         store,
-        appliedHistory,
+        appliedTurns,
       }),
       {
       eligible: false,
@@ -249,7 +249,7 @@ describe('reclamation eligibility', () => {
 
   it('reports both confirmed restore and pending settlement blockers when both are present', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const removeTurn = store.admitConfirmed({
       id: 1,
@@ -263,7 +263,7 @@ describe('reclamation eligibility', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(removeTurn.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(removeTurn.id)).toEqual({ ok: true });
 
     store.admitPending({
       id: 2,
@@ -281,7 +281,7 @@ describe('reclamation eligibility', () => {
       assessReclamationEligibility({
         subjectId: SUBJECT_DRIVER,
         store,
-        appliedHistory,
+        appliedTurns,
       }),
       {
       eligible: false,
@@ -304,15 +304,15 @@ describe('reclamation eligibility', () => {
   });
 
   it('marks a tombstoned subject eligible once retained restore paths and pending references are gone', () => {
-    const appliedHistoryRef: { current?: AppliedHistory } = {};
+    const appliedTurnsRef: { current?: AppliedTurnProjection } = {};
     const store = new TurnStore({
       capacity: 1,
       retainEvictedConfirmedTurn: (turn) => {
-        appliedHistoryRef.current?.forgetRetainedTurn(turn.id);
+        appliedTurnsRef.current?.forgetRetainedTurn(turn.id);
       },
     });
-    const appliedHistory = new AppliedHistory(store);
-    appliedHistoryRef.current = appliedHistory;
+    const appliedTurns = new AppliedTurnProjection(store);
+    appliedTurnsRef.current = appliedTurns;
 
     const removed = store.admitConfirmed({
       id: 1,
@@ -326,19 +326,19 @@ describe('reclamation eligibility', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(removed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(removed.id)).toEqual({ ok: true });
 
     const unrelated = store.admitConfirmed({
       id: 2,
       effects: [{ owner: P_DRIVER_NAME, before: 'A', after: 'B' }],
     });
-    expect(appliedHistory.admitConfirmed(unrelated.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(unrelated.id)).toEqual({ ok: true });
 
     expectEligibility(
       assessReclamationEligibility({
         subjectId: SUBJECT_DRIVER,
         store,
-        appliedHistory,
+        appliedTurns,
       }),
       {
       eligible: true,

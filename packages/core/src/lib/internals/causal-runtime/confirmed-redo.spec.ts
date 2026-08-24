@@ -1,5 +1,5 @@
 import type { PositionId, ReversalEffect } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { redoConfirmedAt } from './confirmed-redo';
 import { createPositionRegistry, type PositionRegistry } from '../position-registry';
 import { createRealizationContextSource } from './realization-context';
@@ -14,7 +14,7 @@ const P_THEME = 6 as PositionId;
 
 describe('redoConfirmedAt', () => {
   it('leaves all state untouched when redo assessment refuses', () => {
-    const { store, appliedHistory, topology } = createConfirmedRedoContext();
+    const { store, appliedTurns, topology } = createConfirmedRedoContext();
 
     store.admitConfirmed({
       id: 1,
@@ -23,11 +23,11 @@ describe('redoConfirmedAt', () => {
         { owner: P_THEME, before: 'light', after: 'dark' },
       ],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(1)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
@@ -35,14 +35,14 @@ describe('redoConfirmedAt', () => {
         [P_THEME, 'light'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(
       redoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: { applyAtomically },
         realizationContext,
@@ -51,26 +51,26 @@ describe('redoConfirmedAt', () => {
 
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('leaves all state untouched when applied-history reapply preparation refuses after assessment and planning', () => {
-    const { store, appliedHistory, topology } = createConfirmedRedoContext();
+    const { store, appliedTurns, topology } = createConfirmedRedoContext();
 
     store.admitConfirmed({
       id: 1,
       effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
     });
     const storeBefore = store.inspect();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
-    const refusingAppliedHistory = {
-      getAppliedTurnIds: () => appliedHistory.getAppliedTurnIds(),
+    const refusingAppliedTurns = {
+      getAppliedTurnIds: () => appliedTurns.getAppliedTurnIds(),
       getRedoTurnIds: () => [1],
       prepareReapplyConfirmedTurn: () => ({
         ok: false as const,
@@ -84,7 +84,7 @@ describe('redoConfirmedAt', () => {
         {
           authority: P_ROOT,
           store,
-          appliedHistory: refusingAppliedHistory,
+          appliedTurns: refusingAppliedTurns,
           topology,
           port: { applyAtomically },
           realizationContext,
@@ -105,33 +105,33 @@ describe('redoConfirmedAt', () => {
 
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('propagates physical application failure without changing canonical or applied state', () => {
-    const { store, appliedHistory, topology } = createConfirmedRedoContext();
+    const { store, appliedTurns, topology } = createConfirmedRedoContext();
 
     store.admitConfirmed({
       id: 1,
       effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(1)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const failure = new Error('atomic silent application failed');
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(() =>
       redoConfirmedAt({
         authority: P_ROOT,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         realizationContext,
         port: {
@@ -143,11 +143,11 @@ describe('redoConfirmedAt', () => {
     ).toThrow(failure);
 
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('moves a whole confirmed turn from redoable back to applied after successful atomic reapplication, without changing canonical history', () => {
-    const { store, appliedHistory, topology } = createConfirmedRedoContext();
+    const { store, appliedTurns, topology } = createConfirmedRedoContext();
 
     store.admitConfirmed({
       id: 1,
@@ -157,9 +157,9 @@ describe('redoConfirmedAt', () => {
       id: 2,
       effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
-    expect(appliedHistory.admitConfirmed(2)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(1)).toEqual({ ok: true });
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const realizationContext = createRealizationContextSource({
@@ -168,14 +168,14 @@ describe('redoConfirmedAt', () => {
         [P_THEME, 'light'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(
       redoConfirmedAt({
         authority: P_ROOT,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: { applyAtomically },
         realizationContext,
@@ -193,7 +193,7 @@ describe('redoConfirmedAt', () => {
         [P_THEME]: 2,
       },
     });
-    expect(appliedHistory.inspect()).toEqual({
+    expect(appliedTurns.inspect()).toEqual({
       appliedTurnIds: [1, 2],
       redoTurnIds: [],
       frontiers: {
@@ -210,7 +210,7 @@ describe('redoConfirmedAt', () => {
 
 function createConfirmedRedoContext(): {
   store: TurnStore;
-  appliedHistory: AppliedHistory;
+  appliedTurns: AppliedTurnProjection;
   topology: PositionRegistry;
 } {
   const topology = createPositionRegistry();
@@ -232,7 +232,7 @@ function createConfirmedRedoContext(): {
   expect(theme).toBe(P_THEME);
 
   const store = new TurnStore();
-  const appliedHistory = new AppliedHistory(store);
+  const appliedTurns = new AppliedTurnProjection(store);
 
-  return { store, appliedHistory, topology };
+  return { store, appliedTurns, topology };
 }

@@ -104,7 +104,7 @@ describe('planConfirmedReapply', () => {
 
     expect(planConfirmedReapply({ turnId: 1, store })).toEqual({
       ok: false,
-      refusal: { kind: 'history-evicted' },
+      refusal: { kind: 'turn-evicted' },
     });
     expect(store.inspect()).toEqual(before);
   });
@@ -139,7 +139,7 @@ describe('planConfirmedReapply', () => {
     const assessment = assessConfirmedRedo({
       authority: positions.root,
       store,
-      appliedHistory: {
+      appliedTurns: {
         getAppliedTurnIds: () => [],
         getRedoTurnIds: () => [2],
       },

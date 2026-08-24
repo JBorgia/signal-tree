@@ -109,7 +109,7 @@ const IMPLS = {
       updateOne: (id, changes) => tree.$.rows.updateOne(id, changes),
       readAll: () => tree.$.rows.all(),
       readOne: (id) => tree.$.rows.byId(id)?.(),
-      historyLength: () => tree.getHistory().length,
+      historyLength: () => tree.getRestorationHistory().length,
       // Built-in. History entries are snapshot REFERENCES, not clones.
       hasBuiltInHistory: true,
       undo: () => tree.undo(),

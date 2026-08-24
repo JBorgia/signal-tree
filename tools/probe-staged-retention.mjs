@@ -80,7 +80,7 @@ for (const rounds of POINTS) {
       `${String(+((heap - baseline) / MB).toFixed(2)).padStart(18)} MB  ` +
       `${String(Math.round((heap - baseline) / retiredSubjects)).padStart(9)}   ` +
       `${String(rows.__listSubjectReclamationCandidates().length).padStart(8)}   ` +
-      `${String(tree.getHistory().length).padStart(7)}`
+      `${String(tree.getRestorationHistory().length).padStart(7)}`
   );
 }
 

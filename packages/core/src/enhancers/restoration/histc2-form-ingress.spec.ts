@@ -58,8 +58,8 @@ class HostComponent {
   readonly f = form(this.model);
 }
 
-const turns = (tree: { getHistory(): readonly unknown[] }) =>
-  tree.getHistory().length - 1;
+const turns = (tree: { getRestorationHistory(): readonly unknown[] }) =>
+  tree.getRestorationHistory().length - 1;
 
 const typeInto = (fixture: { nativeElement: HTMLElement }, value: string) => {
   const input = fixture.nativeElement.querySelector(

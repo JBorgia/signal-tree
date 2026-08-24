@@ -1,7 +1,7 @@
 import { createPositionRegistry } from '../position-registry';
 
 import type { PositionId } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { assessConfirmedRedo } from './redo-assessment';
 import { TurnStore } from './turn-store';
 
@@ -35,7 +35,7 @@ describe('assessConfirmedRedo', () => {
   it('allows disjoint redo even while unrelated later confirmed work remains applied', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const t1 = store.admitConfirmed({
       id: 1,
@@ -57,15 +57,15 @@ describe('assessConfirmedRedo', () => {
         },
       ],
     });
-    appliedHistory.admitConfirmed(t1.id);
-    appliedHistory.admitConfirmed(t2.id);
-    appliedHistory.moveConfirmedTurnToRedo(t1.id);
+    appliedTurns.admitConfirmed(t1.id);
+    appliedTurns.admitConfirmed(t2.id);
+    appliedTurns.moveConfirmedTurnToRedo(t1.id);
 
     expect(
       assessConfirmedRedo({
         authority: positions.firstName,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -101,7 +101,7 @@ describe('assessConfirmedRedo', () => {
 
     const redoTurnIds = [2] as const;
     const appliedTurnIds: readonly number[] = [];
-    const appliedHistory = {
+    const appliedTurns = {
       getAppliedTurnIds: () => appliedTurnIds,
       getRedoTurnIds: () => redoTurnIds,
     };
@@ -111,7 +111,7 @@ describe('assessConfirmedRedo', () => {
       assessConfirmedRedo({
         authority: positions.root,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -120,8 +120,8 @@ describe('assessConfirmedRedo', () => {
     });
 
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
-    expect(appliedHistory.getRedoTurnIds()).toEqual([2]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getRedoTurnIds()).toEqual([2]);
   });
 
   it('refuses a cross-position redo atomically when any participant is not ready for that confirmed prefix', () => {
@@ -156,7 +156,7 @@ describe('assessConfirmedRedo', () => {
 
     const redoTurnIds = [2] as const;
     const appliedTurnIds: readonly number[] = [];
-    const appliedHistory = {
+    const appliedTurns = {
       getAppliedTurnIds: () => appliedTurnIds,
       getRedoTurnIds: () => redoTurnIds,
     };
@@ -166,7 +166,7 @@ describe('assessConfirmedRedo', () => {
       assessConfirmedRedo({
         authority: positions.root,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -175,14 +175,14 @@ describe('assessConfirmedRedo', () => {
     });
 
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
-    expect(appliedHistory.getRedoTurnIds()).toEqual([2]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getRedoTurnIds()).toEqual([2]);
   });
 
   it('refuses a redoable cross-boundary turn for a narrower authority', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const t1 = store.admitConfirmed({
       id: 1,
@@ -199,17 +199,17 @@ describe('assessConfirmedRedo', () => {
         },
       ],
     });
-    appliedHistory.admitConfirmed(t1.id);
-    appliedHistory.moveConfirmedTurnToRedo(t1.id);
+    appliedTurns.admitConfirmed(t1.id);
+    appliedTurns.moveConfirmedTurnToRedo(t1.id);
 
     const storeBefore = store.inspect();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
 
     expect(
       assessConfirmedRedo({
         authority: positions.profile,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -218,13 +218,13 @@ describe('assessConfirmedRedo', () => {
     });
 
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('skips an earlier cross-boundary redoable turn and selects a later contained independent turn', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const t1 = store.admitConfirmed({
       id: 1,
@@ -252,19 +252,19 @@ describe('assessConfirmedRedo', () => {
       ],
     });
 
-    expect(appliedHistory.admitConfirmed(t1.id)).toEqual({ ok: true });
-    expect(appliedHistory.admitConfirmed(t2.id)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(t2.id)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(t1.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(t1.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(t2.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(t2.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(t1.id)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
 
     expect(
       assessConfirmedRedo({
         authority: positions.profile,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -273,6 +273,6 @@ describe('assessConfirmedRedo', () => {
     });
 
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 });

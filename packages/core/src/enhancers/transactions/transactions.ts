@@ -17,7 +17,7 @@ import {
   openCommitScope,
   settleCommitScope,
 } from '../../lib/internals/commit-consequence';
-import { AppliedHistory } from '../../lib/internals/causal-runtime/applied-history';
+import { AppliedTurnProjection } from '../../lib/internals/causal-runtime/applied-turn-projection';
 import type {
   CausalEffect,
   PositionId as CausalPositionId,
@@ -1102,11 +1102,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
       id: transactionId,
       effects: effects.map(toCausalEffect),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const result = rollbackPendingTurnAt({
       authority: authorityPosition,

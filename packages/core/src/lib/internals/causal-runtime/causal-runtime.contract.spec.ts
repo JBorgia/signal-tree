@@ -17,33 +17,33 @@ type UndoAssessment =
   | 'eligible'
   | 'outside-boundary'
   | 'frontier-blocked'
-  | 'history-evicted';
+  | 'turn-evicted';
 
 type RedoAssessment =
   | 'eligible'
   | 'outside-boundary'
   | 'prefix-blocked'
-  | 'history-evicted';
+  | 'turn-evicted';
 
 type UndoResult = ReversalResult<
   | { readonly kind: 'outside-boundary' }
   | { readonly kind: 'frontier-blocked' }
-  | { readonly kind: 'history-evicted' }
+  | { readonly kind: 'turn-evicted' }
 >;
 
 type RedoResult = ReversalResult<
   | { readonly kind: 'outside-boundary' }
   | { readonly kind: 'prefix-blocked' }
-  | { readonly kind: 'history-evicted' }
+  | { readonly kind: 'turn-evicted' }
 >;
 
 type RollbackResult = ReversalResult<
   | { readonly kind: 'dependency-conflict' }
-  | { readonly kind: 'history-evicted' }
+  | { readonly kind: 'turn-evicted' }
 >;
 
 type PendingLifecycleResult = ReversalResult<
-  | { readonly kind: 'history-evicted' }
+  | { readonly kind: 'turn-evicted' }
 >;
 
 interface RuntimeSnapshot {
@@ -130,7 +130,7 @@ class ContractRuntime {
   confirmPendingTurn(turnId: number): PendingLifecycleResult {
     const turn = this.pendingTurns.find(({ id }) => id === turnId);
     if (!turn) {
-      return { ok: false, refusal: { kind: 'history-evicted' } };
+      return { ok: false, refusal: { kind: 'turn-evicted' } };
     }
 
     this.pendingTurns = this.pendingTurns.filter(({ id }) => id !== turnId);
@@ -151,7 +151,7 @@ class ContractRuntime {
   discardPending(turnId: number): PendingLifecycleResult {
     const turn = this.pendingTurns.find(({ id }) => id === turnId);
     if (!turn) {
-      return { ok: false, refusal: { kind: 'history-evicted' } };
+      return { ok: false, refusal: { kind: 'turn-evicted' } };
     }
 
     this.pendingTurns = this.pendingTurns.filter(({ id }) => id !== turnId);
@@ -166,7 +166,7 @@ class ContractRuntime {
   assessUndo(authority: PositionId, turnId: number): UndoAssessment {
     const turn = this.confirmedTurns.find(({ id }) => id === turnId);
     if (!turn) {
-      return 'history-evicted';
+      return 'turn-evicted';
     }
 
     const intersectsAuthority = turn.participants.some((participant) =>
@@ -222,12 +222,12 @@ class ContractRuntime {
   assessRedo(authority: PositionId, turnId: number): RedoAssessment {
     const turn = this.confirmedTurns.find(({ id }) => id === turnId);
     if (!turn) {
-      return 'history-evicted';
+      return 'turn-evicted';
     }
 
     const isRedoable = this.redoTurns.some(({ id }) => id === turnId);
     if (!isRedoable) {
-      return 'history-evicted';
+      return 'turn-evicted';
     }
 
     const intersectsAuthority = turn.participants.some((participant) =>
@@ -266,7 +266,7 @@ class ContractRuntime {
 
     const turn = this.confirmedTurns.find(({ id }) => id === turnId);
     if (!turn) {
-      return { ok: false, refusal: { kind: 'history-evicted' } };
+      return { ok: false, refusal: { kind: 'turn-evicted' } };
     }
 
     const reapplyEffects = this.createConfirmedReapplyEffects(turn);
@@ -332,7 +332,7 @@ class ContractRuntime {
   rollback(turnId: number): RollbackResult {
     const turn = this.pendingTurns.find(({ id }) => id === turnId);
     if (!turn) {
-      return { ok: false, refusal: { kind: 'history-evicted' } };
+      return { ok: false, refusal: { kind: 'turn-evicted' } };
     }
 
     if (this.hasLaterStructuralDependency(turn)) {

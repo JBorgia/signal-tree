@@ -773,7 +773,7 @@ reload at a sane size.
 **Pros:** by far the least work; lands on a representation with 1,087 passing core
 tests behind it; keeps `jumpTo` and devtools working unchanged; fixes the two
 reachable G1 failures and the phantom-step defect; and no consumer's
-`getHistory()` breaks. It could ship in a minor.
+`getRestorationHistory()` breaks. It could ship in a minor.
 
 **Cons:** it accepts O(width) undo and `entries × width` retention permanently,
 in a library whose entire thesis is that no code path may do O(state) work when
@@ -1004,7 +1004,7 @@ which needs a per-turn "incomplete" verdict to be honest about.
 | `maxHistorySize` (count of entries)             | **must change meaning** — entries are O(state) (§1.7) | change to turns   | per position                     | **turns** — the unit a developer means | keyframe count             | keep, keeps meaning `entries × width` |
 | `jumpTo(index)`                                 | O(span); dev-only                                     | O(span); dev-only | not expressible                  | O(span) via the spine                  | **its home**               | keep                                  |
 | `includePayload`, `actionNames`                 | replaced by a per-entry/turn `label`                  | replaced          | replaced                         | replaced                               | replaced                   | replaced by `transaction()`           |
-| `getHistory(): {state,timestamp,action}[]`      | **breaks** — the major                                | breaks            | breaks                           | breaks                                 | survives                   | survives                              |
+| `getRestorationHistory(): {state,timestamp,action}[]`      | **breaks** — the major                                | breaks            | breaks                           | breaks                                 | survives                   | survives                              |
 | `entityMap({ history: false })`                 | keep (opt-out still needed)                           | keep              | **delete** — opt-in replaces it  | **delete**                             | keep (dev)                 | keep, and fix §1.9                    |
 | `finalizeProvisional` / `__provisional` (§1.13) | **delete — dead today**                               | delete            | delete                           | delete                                 | delete                     | **delete**                            |
 | `HISTORY_EXCLUDED` / `pruneHistoryExcluded`     | keep                                                  | keep              | delete with `history: false`     | delete                                 | keep                       | keep                                  |
@@ -1058,7 +1058,7 @@ revert, MEASURED, with no workaround. What is actually broken is three narrow
 things: turn attribution (§1.4, §1.8), phantom entries under `history: false`
 (§1.9), and the absence of labels and `transaction()`. All three are fixable on
 the shipped representation, behind 1,087 passing tests, without breaking a single
-consumer's `getHistory()`, and probably in a minor rather than a major.
+consumer's `getRestorationHistory()`, and probably in a minor rather than a major.
 
 Against that, D is the **largest** new public surface of any option: a turn
 journal, a per-position history contract, a `history()` value accepted by several

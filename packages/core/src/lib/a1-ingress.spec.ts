@@ -68,7 +68,7 @@ describe('A1 case 1-2: classification', () => {
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
-    const historyBefore = tree.getHistory().length;
+    const historyBefore = tree.getRestorationHistory().length;
 
     const { seen, off } = observe();
     realize(() => tree.$.n.set(9));
@@ -80,7 +80,7 @@ describe('A1 case 1-2: classification', () => {
     // undo step, which is case 8 of A1-0 (`documented-defects` 6c's sibling)
     // fixed at the door instead of by classification the app cannot express.
     expect(seen).toEqual([{ origin: 'external', participation: 'realized' }]);
-    expect(tree.getHistory().length - historyBefore).toBe(0);
+    expect(tree.getRestorationHistory().length - historyBefore).toBe(0);
   });
 });
 
@@ -234,7 +234,7 @@ describe('A1 case 7-9: boundary', () => {
     // No leak. The write after the scope is authored again, and it is the only
     // restoration step — the ingress before it never became one.
     expect(seen).toEqual([{ origin: null, participation: null }]);
-    expect(tree.getHistory().length).toBe(2);
+    expect(tree.getRestorationHistory().length).toBe(2);
   });
 
   it('case 9 — an async callback is REFUSED rather than silently unclassified', async () => {

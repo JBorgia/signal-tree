@@ -55,7 +55,7 @@ describe('PER-0: what IS a restore, causally?', () => {
     await settle();
 
     const restored = tree.$.prefs.theme();
-    const len = tree.getHistory().length;
+    const len = tree.getRestorationHistory().length;
     const canUndo = tree.canUndo();
     let afterUndo = '(not attempted)';
     if (canUndo) { tree.undo(); await settle(); afterUndo = tree.$.prefs.theme(); }
@@ -100,12 +100,12 @@ describe('PER-0: is restore fixed by A1 ingress classification?', () => {
       { enhancers: [timeTravel({ maxHistorySize: 20 }), persistence({ key: 'r3', storage: adapter, autoLoad: false, debounceMs: 0 })] }
     ) as any;
     await settle();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     await withWriteContext({ intent: 'system', participation: 'realized' }, () => tree.load());
     await settle();
 
-    console.log(`RESTORE-AS-REALIZATION value=${tree.$.prefs.theme()} historyBefore=${before} after=${tree.getHistory().length} canUndo=${tree.canUndo()}`);
+    console.log(`RESTORE-AS-REALIZATION value=${tree.$.prefs.theme()} historyBefore=${before} after=${tree.getRestorationHistory().length} canUndo=${tree.canUndo()}`);
     expect(true).toBe(true);
   });
 });

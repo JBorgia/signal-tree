@@ -3764,7 +3764,7 @@ describe('tree realization adapter', () => {
     };
       destroy(): void;
     } & {
-      getHistory(): unknown[];
+      getRestorationHistory(): unknown[];
     };
     const owner = getOwnedPositionIds(tree.$.middle)?.[0];
     if (owner === undefined) {
@@ -3782,12 +3782,12 @@ describe('tree realization adapter', () => {
       descriptors,
     });
 
-    const baselineHistory = tree.getHistory().length;
+    const baselineHistory = tree.getRestorationHistory().length;
 
     undoable(() => tree.$.left.set('A'));
     getPathNotifier().flushSync();
     await Promise.resolve();
-    const afterAuthoredLeft = tree.getHistory().length;
+    const afterAuthoredLeft = tree.getRestorationHistory().length;
 
     adapter.applyAtomically([{ owner, before: '', after: 'B' }]);
     getPathNotifier().flushSync();
@@ -3801,7 +3801,7 @@ describe('tree realization adapter', () => {
     expect(tree.$.middle()).toBe('B');
     expect(tree.$.right()).toBe('C');
     expect(afterAuthoredLeft).toBe(baselineHistory + 1);
-    expect(tree.getHistory().length).toBe(baselineHistory + 2);
+    expect(tree.getRestorationHistory().length).toBe(baselineHistory + 2);
   });
 
   it('keeps stored realization causally silent while preserving persistence consequences', async () => {
@@ -3820,7 +3820,7 @@ describe('tree realization adapter', () => {
     };
       destroy(): void;
     } & {
-      getHistory(): unknown[];
+      getRestorationHistory(): unknown[];
     };
     const owner = getOwnedPositionIds(tree.$.preference)?.[0];
     if (owner === undefined) {
@@ -3838,7 +3838,7 @@ describe('tree realization adapter', () => {
       descriptors,
     });
 
-    const baselineHistory = tree.getHistory().length;
+    const baselineHistory = tree.getRestorationHistory().length;
     adapter.applyAtomically([{ owner, before: 'compact', after: 'spacious' }]);
     getPathNotifier().flushSync();
     await new Promise((resolve) => queueMicrotask(resolve));
@@ -3852,7 +3852,7 @@ describe('tree realization adapter', () => {
       __v: 1,
       data: 'spacious',
     });
-    expect(tree.getHistory().length).toBe(baselineHistory);
+    expect(tree.getRestorationHistory().length).toBe(baselineHistory);
   });
 
   it('keeps structural realization causally silent while preserving subject identity', async () => {
@@ -3876,7 +3876,7 @@ describe('tree realization adapter', () => {
     };
       destroy(): void;
     } & {
-      getHistory(): unknown[];
+      getRestorationHistory(): unknown[];
     };
 
     undoable(() => tree.$.users.addOne({ id: 'u2', name: 'Alice' }));
@@ -3907,7 +3907,7 @@ describe('tree realization adapter', () => {
       descriptors,
     });
 
-    const baselineHistory = tree.getHistory().length;
+    const baselineHistory = tree.getRestorationHistory().length;
     adapter.applyAtomically([
       {
         owner,
@@ -3924,7 +3924,7 @@ describe('tree realization adapter', () => {
     expect(tree.$.users.ids()).toEqual(['u1']);
     expect(afterNameLeaf.__subjectIds?.[0]).toBe(beforeSubjectId);
     expect(getOwnedPositionIds(afterNameLeaf)).toEqual(beforePositions);
-    expect(tree.getHistory().length).toBe(baselineHistory);
+    expect(tree.getRestorationHistory().length).toBe(baselineHistory);
   });
 
   it('restores authored capture after a realization write throws', async () => {
@@ -3947,13 +3947,13 @@ describe('tree realization adapter', () => {
     };
       destroy(): void;
     } & {
-      getHistory(): unknown[];
+      getRestorationHistory(): unknown[];
     };
 
     undoable(() => tree.$.before.set('A'));
     getPathNotifier().flushSync();
     await Promise.resolve();
-    const baselineHistory = tree.getHistory().length;
+    const baselineHistory = tree.getRestorationHistory().length;
 
     const owner = getOwnedPositionIds(
       (tree.$ as Record<string, unknown>).users
@@ -3987,7 +3987,7 @@ describe('tree realization adapter', () => {
 
     expect(tree.$.before()).toBe('A');
     expect(tree.$.after()).toBe('B');
-    expect(tree.getHistory().length).toBe(baselineHistory + 1);
+    expect(tree.getRestorationHistory().length).toBe(baselineHistory + 1);
   });
 
   it('keeps outer transaction authorship active across an inner realization write', () => {
@@ -4055,7 +4055,7 @@ describe('tree realization adapter', () => {
     };
       destroy(): void;
     } & {
-      getHistory(): unknown[];
+      getRestorationHistory(): unknown[];
     };
 
     const aOwner = getOwnedPositionIds(tree.$.a)?.[0];
@@ -4099,7 +4099,7 @@ describe('tree realization adapter', () => {
       }
     );
 
-    const baselineHistory = tree.getHistory().length;
+    const baselineHistory = tree.getRestorationHistory().length;
     const injectedFailure = new Error('Injected scalar staging failure');
     const originalResolve =
       scalarSlotRuntime.resolveScalarSlot.bind(scalarSlotRuntime);
@@ -4131,7 +4131,7 @@ describe('tree realization adapter', () => {
 
     expect(tree.$.a()).toBe('A');
     expect(tree.$.b()).toBe('B');
-    expect(tree.getHistory().length).toBe(baselineHistory);
+    expect(tree.getRestorationHistory().length).toBe(baselineHistory);
     expect(observedNotifications).toEqual([]);
 
     unsubscribe();
@@ -4231,7 +4231,7 @@ describe('tree realization adapter', () => {
     };
       destroy(): void;
     } & {
-      getHistory(): unknown[];
+      getRestorationHistory(): unknown[];
     };
 
     undoable(() => tree.$.users.addOne({ id: 'u1', name: 'Alice' }));
@@ -4285,7 +4285,7 @@ describe('tree realization adapter', () => {
       }
     );
 
-    const baselineHistory = tree.getHistory().length;
+    const baselineHistory = tree.getRestorationHistory().length;
     const scalarSlotRuntime =
       getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
     if (!scalarSlotRuntime) {
@@ -4341,7 +4341,7 @@ describe('tree realization adapter', () => {
     expect(tree.$.status()).toBe('pending');
     expect(tree.$.users.ids()).toEqual(['u1']);
     expect(tree.$.users.byIdOrFail('u1').name()).toBe('Alice');
-    expect(tree.getHistory().length).toBe(baselineHistory + 1);
+    expect(tree.getRestorationHistory().length).toBe(baselineHistory + 1);
     expect(observedNotifications).toEqual([]);
 
     unsubscribe();

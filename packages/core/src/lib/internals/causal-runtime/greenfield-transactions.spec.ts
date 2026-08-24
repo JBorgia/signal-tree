@@ -1,5 +1,5 @@
 import type { PositionId } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { rollbackPendingTurnAt } from './pending-rollback';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
@@ -142,7 +142,7 @@ const createActualTreeAbort = (options: {
   tree: ISignalTree<object>;
   authority: PositionId;
   store: TurnStore;
-  appliedHistory: AppliedHistory;
+  appliedTurns: AppliedTurnProjection;
   baselineValues: ReadonlyMap<PositionId, unknown>;
   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>;
 }) => {
@@ -154,7 +154,7 @@ const createActualTreeAbort = (options: {
   const realizationContext = createRealizationContextSource({
     baselineValues: new Map(options.baselineValues),
     store: options.store,
-    appliedHistory: options.appliedHistory,
+    appliedTurns: options.appliedTurns,
   });
 
   return (turnId: number) =>
@@ -196,7 +196,7 @@ const createLiveUsersAbortHarness = () => {
     };
 
   const store = new TurnStore();
-  const appliedHistory = new AppliedHistory(store);
+  const appliedTurns = new AppliedTurnProjection(store);
   const liveHarnessRef: {
     current?: ReturnType<typeof createLiveDraftHarness>;
   } = {};
@@ -217,7 +217,7 @@ const createLiveUsersAbortHarness = () => {
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map(liveHarnessRef.current.baselineValues),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     return rollbackPendingTurnAt({
@@ -233,7 +233,7 @@ const createLiveUsersAbortHarness = () => {
   const liveDraft = createGreenfieldTransactionDraft({
     turnId: 1,
     store,
-    appliedHistory,
+    appliedTurns,
     abortPendingTurn: (turnId) => {
       if (!liveHarnessRef.current) {
         throw new Error('Live draft harness was not initialized');
@@ -243,7 +243,7 @@ const createLiveUsersAbortHarness = () => {
         tree: tree as unknown as ISignalTree<object>,
         authority: getOwnedPositionIds(tree)?.[0] as PositionId,
         store,
-        appliedHistory,
+        appliedTurns,
         baselineValues: liveHarnessRef.current.baselineValues,
         descriptors: liveHarnessRef.current.descriptors,
       })(turnId);
@@ -255,7 +255,7 @@ const createLiveUsersAbortHarness = () => {
   return {
     tree,
     store,
-    appliedHistory,
+    appliedTurns,
     liveDraft,
     liveHarness,
     abortWithPort,
@@ -265,14 +265,14 @@ const createLiveUsersAbortHarness = () => {
 describe('greenfield transactions', () => {
   it('seals explicitly captured live effects into one pending turn, then confirms without additional physical writes', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const values = new Map<PositionId, unknown>([[P_THEME, 'light']]);
     let physicalWrites = 0;
 
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(draft.getLifecycle()).toBe('open');
@@ -289,7 +289,7 @@ describe('greenfield transactions', () => {
     expect(values.get(P_THEME)).toBe('dark');
     expect(physicalWrites).toBe(1);
     expect(store.getPendingTurnIds()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
 
     const pendingTurn = draft.seal();
 
@@ -317,12 +317,12 @@ describe('greenfield transactions', () => {
         state: 'confirmed',
       },
     ]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([1]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([1]);
   });
 
   it('keeps explicit attribution local when two drafts interleave writes', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const values = new Map<PositionId, unknown>([
       [P_FIRST_NAME, 'Ada'],
       [P_LAST_NAME, 'Lovelace'],
@@ -331,12 +331,12 @@ describe('greenfield transactions', () => {
     const firstDraft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const secondDraft = createGreenfieldTransactionDraft({
       turnId: 2,
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     values.set(P_FIRST_NAME, 'Grace');
@@ -366,13 +366,13 @@ describe('greenfield transactions', () => {
 
   it('nets repeated scalar writes within one draft from the first before value to the final after value', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const values = new Map<PositionId, unknown>([[P_THEME, 'A']]);
 
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     values.set(P_THEME, 'B');
@@ -407,11 +407,11 @@ describe('greenfield transactions', () => {
     expect(theme).toBe(P_THEME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const values = new Map<PositionId, unknown>([[P_THEME, 'B']]);
     const appliedEffects: Array<
@@ -442,7 +442,7 @@ describe('greenfield transactions', () => {
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: (turnId) =>
         rollbackPendingTurnAt({
           authority: P_PROFILE,
@@ -465,7 +465,7 @@ describe('greenfield transactions', () => {
     expect(values.get(P_THEME)).toBe('A');
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
   });
 
   it('preserves later confirmed work when aborting a sealed transaction, then later undo uses the surviving context', () => {
@@ -479,11 +479,11 @@ describe('greenfield transactions', () => {
     expect(theme).toBe(P_THEME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const values = new Map<PositionId, unknown>([[P_THEME, 'C']]);
     const appliedEffects: Array<
@@ -514,7 +514,7 @@ describe('greenfield transactions', () => {
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: (turnId) =>
         rollbackPendingTurnAt({
           authority: P_PROFILE,
@@ -532,7 +532,7 @@ describe('greenfield transactions', () => {
       id: 2,
       effects: [{ owner: P_THEME, before: 'B', after: 'C' }],
     });
-    expect(appliedHistory.admitConfirmed(2)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
 
     expect(draft.abort()).toEqual({ ok: true, turnId: 1 });
     expect(draft.getLifecycle()).toBe('aborted');
@@ -540,13 +540,13 @@ describe('greenfield transactions', () => {
     expect(values.get(P_THEME)).toBe('C');
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns().map(({ id }) => id)).toEqual([2]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([2]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([2]);
 
     expect(
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -560,11 +560,11 @@ describe('greenfield transactions', () => {
 
   it('keeps a sealed transaction sealed when abort delegation refuses', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: () => ({
         ok: false,
         refusal: { kind: 'dependency-conflict' },
@@ -593,16 +593,16 @@ describe('greenfield transactions', () => {
     expect(theme).toBe(P_THEME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: (turnId) =>
         rollbackPendingTurnAt({
           authority: P_PROFILE,
@@ -625,7 +625,7 @@ describe('greenfield transactions', () => {
     expect(draft.getLifecycle()).toBe('sealed');
     expect(store.getPendingTurnIds()).toEqual([1]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
   });
 
   it('keeps transaction lifecycle confirmed after capacity-zero confirmation, and abort cannot reinterpret eviction as speculation', () => {
@@ -637,20 +637,20 @@ describe('greenfield transactions', () => {
       retainEvictedConfirmedTurn: (turn) =>
         realizationContextRef.current?.retainEvictedConfirmedTurn(turn),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     realizationContextRef.current = realizationContext;
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: () => ({
         ok: false,
-        refusal: { kind: 'history-evicted' },
+        refusal: { kind: 'turn-evicted' },
       }),
     });
 
@@ -681,14 +681,14 @@ describe('greenfield transactions', () => {
     expect(driverName).toBe(P_DRIVER_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, 'A'],
         [P_DRIVER_NAME, 'Alice'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'B'],
@@ -706,7 +706,7 @@ describe('greenfield transactions', () => {
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: (turnId) =>
         rollbackPendingTurnAt({
           authority: P_PROFILE,
@@ -817,11 +817,11 @@ describe('greenfield transactions', () => {
     expect(driverEnabled).toBe(P_DRIVER_ENABLED);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map(),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'A'],
@@ -840,7 +840,7 @@ describe('greenfield transactions', () => {
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: (turnId) =>
         rollbackPendingTurnAt({
           authority: P_PROFILE,
@@ -917,12 +917,12 @@ describe('greenfield transactions', () => {
 
   it('confirms a structural transaction with zero physical writes and preserves canonical metadata exactly', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     let physicalWrites = 0;
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     physicalWrites += 2;
@@ -987,16 +987,16 @@ describe('greenfield transactions', () => {
         state: 'confirmed',
       },
     ]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([1]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([1]);
   });
 
   it('preserves authored structural ordering instead of collapsing repeated rekeys', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     draft.capture({
@@ -1047,11 +1047,11 @@ describe('greenfield transactions', () => {
       destroy(): void;
     };
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const harness = createLiveDraftHarness(draft, 1);
     const notifications: Array<{ path: string; meta?: WriteMetadata }> = [];
@@ -1081,7 +1081,7 @@ describe('greenfield transactions', () => {
 
     expect(tree.$.theme()).toBe('dark');
     expect(store.getPendingTurnIds()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
     expect(notifications).toHaveLength(1);
 
     const owner = getOwnedPositionIds(tree.$.theme)?.[0] as PositionId;
@@ -1106,7 +1106,7 @@ describe('greenfield transactions', () => {
         state: 'confirmed',
       },
     ]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([1]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([1]);
 
     unsubscribe();
     harness.dispose();
@@ -1122,11 +1122,11 @@ describe('greenfield transactions', () => {
       destroy(): void;
     };
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const harness = createLiveDraftHarness(draft, 1);
 
@@ -1161,16 +1161,16 @@ describe('greenfield transactions', () => {
       destroy(): void;
     };
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const firstDraft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const secondDraft = createGreenfieldTransactionDraft({
       turnId: 2,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const firstHarness = createLiveDraftHarness(firstDraft, 1);
     const secondHarness = createLiveDraftHarness(secondDraft, 2);
@@ -1262,14 +1262,14 @@ describe('greenfield transactions', () => {
     getPathNotifier().flushSync();
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const liveHarnessRef: {
       current?: ReturnType<typeof createLiveDraftHarness>;
     } = {};
     const liveDraft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: (turnId) => {
         if (!liveHarnessRef.current) {
           throw new Error('Live draft harness was not initialized');
@@ -1279,7 +1279,7 @@ describe('greenfield transactions', () => {
           tree: tree as unknown as ISignalTree<object>,
           authority: getOwnedPositionIds(tree)?.[0] as PositionId,
           store,
-          appliedHistory,
+          appliedTurns,
           baselineValues: liveHarnessRef.current.baselineValues,
           descriptors: liveHarnessRef.current.descriptors,
         })(turnId);
@@ -1347,7 +1347,7 @@ describe('greenfield transactions', () => {
     ).toBe('compact');
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
 
     liveHarness.dispose();
   });
@@ -1371,11 +1371,11 @@ describe('greenfield transactions', () => {
       destroy(): void;
     };
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const harness = createLiveDraftHarness(draft, 1);
 
@@ -1432,11 +1432,11 @@ describe('greenfield transactions', () => {
     getPathNotifier().flushSync();
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const harness = createLiveDraftHarness(draft, 1);
 
@@ -1503,14 +1503,14 @@ describe('greenfield transactions', () => {
     getPathNotifier().flushSync();
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const liveHarnessRef: {
       current?: ReturnType<typeof createLiveDraftHarness>;
     } = {};
     const liveDraft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: (turnId) => {
         if (!liveHarnessRef.current) {
           throw new Error('Live draft harness was not initialized');
@@ -1520,7 +1520,7 @@ describe('greenfield transactions', () => {
           tree: tree as unknown as ISignalTree<object>,
           authority: getOwnedPositionIds(tree)?.[0] as PositionId,
           store,
-          appliedHistory,
+          appliedTurns,
           baselineValues: liveHarnessRef.current.baselineValues,
           descriptors: liveHarnessRef.current.descriptors,
         })(turnId);
@@ -1577,7 +1577,7 @@ describe('greenfield transactions', () => {
     );
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
 
     liveHarness.dispose();
   });
@@ -1615,14 +1615,14 @@ describe('greenfield transactions', () => {
       .__subjectIds?.[0] as number | undefined;
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const liveHarnessRef: {
       current?: ReturnType<typeof createLiveDraftHarness>;
     } = {};
     const liveDraft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: (turnId) => {
         if (!liveHarnessRef.current) {
           throw new Error('Live draft harness was not initialized');
@@ -1632,7 +1632,7 @@ describe('greenfield transactions', () => {
           tree: tree as unknown as ISignalTree<object>,
           authority: getOwnedPositionIds(tree)?.[0] as PositionId,
           store,
-          appliedHistory,
+          appliedTurns,
           baselineValues: liveHarnessRef.current.baselineValues,
           descriptors: liveHarnessRef.current.descriptors,
         })(turnId);
@@ -1685,7 +1685,7 @@ describe('greenfield transactions', () => {
     );
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
 
     tree.$.users.addOne({ id: 'u9', name: 'Zed' });
     getPathNotifier().flushSync();
@@ -1697,7 +1697,7 @@ describe('greenfield transactions', () => {
   });
 
   it('aborts a live fresh add by realizing a structural remove without reusing the fresh subject lifetime', () => {
-    const { tree, store, appliedHistory, liveDraft, liveHarness } =
+    const { tree, store, appliedTurns, liveDraft, liveHarness } =
       createLiveUsersAbortHarness();
 
     let freshSubject: number | undefined;
@@ -1729,13 +1729,13 @@ describe('greenfield transactions', () => {
     expect(nextFreshSubject).toBeGreaterThan(freshSubject as number);
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
 
     liveHarness.dispose();
   });
 
   it('aborts a live fresh add plus same-subject scalar through the same structural remove frontier', () => {
-    const { tree, store, appliedHistory, liveDraft, liveHarness } =
+    const { tree, store, appliedTurns, liveDraft, liveHarness } =
       createLiveUsersAbortHarness();
 
     let freshSubject: number | undefined;
@@ -1775,7 +1775,7 @@ describe('greenfield transactions', () => {
     expect(nextFreshSubject).toBeGreaterThan(freshSubject as number);
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
 
     liveHarness.dispose();
   });
@@ -1784,7 +1784,7 @@ describe('greenfield transactions', () => {
     const {
       tree,
       store,
-      appliedHistory,
+      appliedTurns,
       liveDraft,
       liveHarness,
       abortWithPort,
@@ -1847,7 +1847,7 @@ describe('greenfield transactions', () => {
     );
     expect(store.getPendingTurnIds()).toEqual([1]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
 
     liveHarness.dispose();
   });
@@ -1856,7 +1856,7 @@ describe('greenfield transactions', () => {
     const {
       tree,
       store,
-      appliedHistory,
+      appliedTurns,
       liveDraft,
       liveHarness,
       abortWithPort,
@@ -1946,7 +1946,7 @@ describe('greenfield transactions', () => {
     const {
       tree,
       store,
-      appliedHistory,
+      appliedTurns,
       liveDraft,
       liveHarness,
       abortWithPort,
@@ -2018,7 +2018,7 @@ describe('greenfield transactions', () => {
     );
     expect(store.getPendingTurnIds()).toEqual([1]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
 
     liveHarness.dispose();
   });
@@ -2051,14 +2051,14 @@ describe('greenfield transactions', () => {
     getPathNotifier().flushSync();
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const liveHarnessRef: {
       current?: ReturnType<typeof createLiveDraftHarness>;
     } = {};
     const liveDraft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
       abortPendingTurn: (turnId) => {
         if (!liveHarnessRef.current) {
           throw new Error('Live draft harness was not initialized');
@@ -2068,7 +2068,7 @@ describe('greenfield transactions', () => {
           tree: tree as unknown as ISignalTree<object>,
           authority: getOwnedPositionIds(tree)?.[0] as PositionId,
           store,
-          appliedHistory,
+          appliedTurns,
           baselineValues: liveHarnessRef.current.baselineValues,
           descriptors: liveHarnessRef.current.descriptors,
         })(turnId);
@@ -2134,11 +2134,11 @@ describe('greenfield transactions', () => {
     getPathNotifier().flushSync();
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const liveHarness = createLiveDraftHarness(draft, 1);
 
@@ -2186,14 +2186,14 @@ describe('greenfield transactions', () => {
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map(),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(
       undoConfirmedAt({
         authority: getOwnedPositionIds(tree)?.[0] as PositionId,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: adapter,
         realizationContext,
@@ -2255,11 +2255,11 @@ describe('greenfield transactions', () => {
     }
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const harness = createLiveDraftHarness(draft, 1);
 
@@ -2329,7 +2329,7 @@ describe('greenfield transactions', () => {
 
     expect(draft.confirm()).toEqual({ ok: true, turnId: 1 });
     expect(store.getTurns().map(({ id }) => id)).toEqual([1]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([1]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([1]);
 
     harness.dispose();
 
@@ -2345,14 +2345,14 @@ describe('greenfield transactions', () => {
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map(),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(
       undoConfirmedAt({
         authority: getOwnedPositionIds(tree)?.[0] as PositionId,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: adapter,
         realizationContext,
@@ -2371,7 +2371,7 @@ describe('greenfield transactions', () => {
       redoConfirmedAt({
         authority: getOwnedPositionIds(tree)?.[0] as PositionId,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: adapter,
         realizationContext,
@@ -2437,11 +2437,11 @@ describe('greenfield transactions', () => {
     getPathNotifier().flushSync();
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const draft = createGreenfieldTransactionDraft({
       turnId: 1,
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const liveHarness = createLiveDraftHarness(draft, 1);
 
@@ -2469,7 +2469,7 @@ describe('greenfield transactions', () => {
       undoConfirmedAt({
         authority: getOwnedPositionIds(tree)?.[0] as PositionId,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: createTreeRealizationAdapter({
           tree: tree as unknown as ISignalTree<object>,
@@ -2478,7 +2478,7 @@ describe('greenfield transactions', () => {
         realizationContext: createRealizationContextSource({
           baselineValues: new Map(),
           store,
-          appliedHistory,
+          appliedTurns,
         }),
       })
     ).toEqual({ ok: true, turnId: 1 });

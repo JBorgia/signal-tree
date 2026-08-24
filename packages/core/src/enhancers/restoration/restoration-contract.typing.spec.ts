@@ -8,9 +8,9 @@
  * WHY THIS ONE IS NOT BATCHING-SHAPED. Two properties make a superficially
  * green conversion dangerous here, and both get their own rows:
  *
- *   1. `getHistory()` is RECEIVER-DERIVED:
+ *   1. `getRestorationHistory()` is RECEIVER-DERIVED:
  *
- *        getHistory(): RestorationHistoryEntry<
+ *        getRestorationHistory(): RestorationHistoryEntry<
  *          this extends NodeAccessor<infer S> ? S : never
  *        >[]
  *
@@ -18,7 +18,7 @@
  *      the enhancer. `EnhancerHost` is NOT a `NodeAccessor`, so if `TAdded` ever
  *      resolved against the host rather than the caller's tree, `S` would
  *      silently collapse to `never` — method present, state gone. A row
- *      asserting only that `getHistory` EXISTS would not notice.
+ *      asserting only that `getRestorationHistory` EXISTS would not notice.
  *
  *   2. `RestorationMethods extends TransactionMethods`, so this enhancer adds a
  *      SECOND surface. Both must survive.
@@ -73,7 +73,7 @@ const travelled = signalTree(initial, { enhancers: [timeTravel(), transactions()
 // ============================================================================
 // If the receiver stops being seen as a `NodeAccessor<AppState>`, `S` becomes
 // `never` and this row fails. That is the whole risk of this migration.
-const entries = travelled.getHistory();
+const entries = travelled.getRestorationHistory();
 export type _HistoryStateIsConcrete = [
   Expect<Equal<typeof entries, RestorationHistoryEntry<AppState>[]>>,
   Expect<Equal<(typeof entries)[number]['state'], AppState>>
@@ -95,7 +95,7 @@ export type _MethodTypes = [
   Expect<Equal<(typeof travelled)['redo'], () => void>>,
   Expect<Equal<(typeof travelled)['canUndo'], () => boolean>>,
   Expect<Equal<(typeof travelled)['canRedo'], () => boolean>>,
-  Expect<Equal<(typeof travelled)['resetHistory'], () => void>>,
+  Expect<Equal<(typeof travelled)['resetRestorationHistory'], () => void>>,
   Expect<Equal<(typeof travelled)['jumpTo'], (index: number) => void>>,
   Expect<Equal<(typeof travelled)['getCurrentIndex'], () => number>>
 ];
@@ -105,7 +105,7 @@ export const _canUndo: boolean = travelled.canUndo();
 export const _canRedo: boolean = travelled.canRedo();
 export const _idx: number = travelled.getCurrentIndex();
 travelled.jumpTo(0);
-travelled.resetHistory();
+travelled.resetRestorationHistory();
 
 // ============================================================================
 // 3 — the INHERITED transaction surface survives too
@@ -149,10 +149,10 @@ export const _b4: boolean = labelledThenTravelled.canUndo();
 // row that would catch `S` collapsing only once another enhancer is chained.
 export type _HistoryStateSurvivesChaining = [
   Expect<
-    Equal<ReturnType<(typeof travelledThenLabelled)['getHistory']>, RestorationHistoryEntry<AppState>[]>
+    Equal<ReturnType<(typeof travelledThenLabelled)['getRestorationHistory']>, RestorationHistoryEntry<AppState>[]>
   >,
   Expect<
-    Equal<ReturnType<(typeof labelledThenTravelled)['getHistory']>, RestorationHistoryEntry<AppState>[]>
+    Equal<ReturnType<(typeof labelledThenTravelled)['getRestorationHistory']>, RestorationHistoryEntry<AppState>[]>
   >
 ];
 
@@ -163,7 +163,7 @@ const disabled = signalTree(initial, { enhancers: [timeTravel({ enabled: false }
 export type _ConfigDoesNotChangeSurface = [
   Expect<Equal<(typeof disabled)['undo'], (typeof travelled)['undo']>>,
   Expect<
-    Equal<ReturnType<(typeof disabled)['getHistory']>, RestorationHistoryEntry<AppState>[]>
+    Equal<ReturnType<(typeof disabled)['getRestorationHistory']>, RestorationHistoryEntry<AppState>[]>
   >
 ];
 // @ts-expect-error config is checked, not `any`
@@ -174,6 +174,6 @@ signalTree(initial, { enhancers: [timeTravel({ nope: true }), transactions()] })
 // ============================================================================
 // @ts-expect-error `undo` requires timeTravel()
 export type _NoUndoBefore = (typeof tree)['undo'];
-// @ts-expect-error `getHistory` requires timeTravel()
-export type _NoHistoryBefore = (typeof tree)['getHistory'];
+// @ts-expect-error `getRestorationHistory` requires timeTravel()
+export type _NoHistoryBefore = (typeof tree)['getRestorationHistory'];
 export type _EnhancedDiffers = ExpectFalse<Equal<typeof travelled, typeof tree>>;

@@ -71,7 +71,7 @@ describe('ST2028 — the edit-session clone fallback is LOSSLESS', () => {
     s.applyChanges({ when: new Date(1), onSave: () => 2 });
     s.undo();
     s.redo();
-    s.getHistory();
+    s.getRestorationHistory();
 
     const hits = warn.mock.calls.filter((c) =>
       String(c[0]).includes('ST2028')

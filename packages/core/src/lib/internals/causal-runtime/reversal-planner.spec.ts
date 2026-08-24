@@ -1,7 +1,7 @@
 import { createPositionRegistry } from '../position-registry';
 
 import type { PositionId } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { createRealizationContextSource } from './realization-context';
 import { assessConfirmedUndo } from './authority-assessment';
 import { planConfirmedReversal } from './reversal-planner';
@@ -132,7 +132,7 @@ describe('planConfirmedReversal', () => {
 
     expect(planConfirmedReversal({ turnId: 1, store })).toEqual({
       ok: false,
-      refusal: { kind: 'history-evicted' },
+      refusal: { kind: 'turn-evicted' },
     });
     expect(store.inspect()).toEqual(before);
   });
@@ -140,7 +140,7 @@ describe('planConfirmedReversal', () => {
   it('is not invoked when authority assessment already refuses', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -157,7 +157,7 @@ describe('planConfirmedReversal', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
     store.admitConfirmed({
       id: 2,
       effects: [
@@ -173,14 +173,14 @@ describe('planConfirmedReversal', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(2)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
 
     const planner = vi.fn(planConfirmedReversal);
     const before = store.inspect();
     const assessment = assessConfirmedUndo({
       authority: positions.profile,
       store,
-      appliedHistory,
+      appliedTurns,
       topology,
     });
 
@@ -200,7 +200,7 @@ describe('planConfirmedReversal', () => {
   it('plans confirmed remove undo from the surviving external boundary across structural coverage', () => {
     const { positions } = buildStructuralTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [positions.key, 'A'],
@@ -208,7 +208,7 @@ describe('planConfirmedReversal', () => {
         [positions.enabled, true],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     store.admitConfirmed({
@@ -223,7 +223,7 @@ describe('planConfirmedReversal', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
 
     expect(planConfirmedReversal({ turnId: 1, store, realizationContext })).toEqual({
       ok: true,
@@ -245,7 +245,7 @@ describe('planConfirmedReversal', () => {
   it('overlays same-turn prefix values onto the surviving external remove boundary', () => {
     const { positions } = buildStructuralTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [positions.key, 'A'],
@@ -253,7 +253,7 @@ describe('planConfirmedReversal', () => {
         [positions.enabled, true],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     store.admitConfirmed({
@@ -274,7 +274,7 @@ describe('planConfirmedReversal', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
 
     expect(planConfirmedReversal({ turnId: 1, store, realizationContext })).toEqual({
       ok: true,
@@ -303,7 +303,7 @@ describe('planConfirmedReversal', () => {
   it('uses the current surviving external boundary rather than stale canonical predecessor values', () => {
     const { positions } = buildStructuralTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [positions.key, 'A'],
@@ -311,7 +311,7 @@ describe('planConfirmedReversal', () => {
         [positions.enabled, false],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     store.admitConfirmed({
@@ -325,7 +325,7 @@ describe('planConfirmedReversal', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
     store.admitConfirmed({
       id: 2,
       effects: [
@@ -344,7 +344,7 @@ describe('planConfirmedReversal', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(2)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
 
     expect(planConfirmedReversal({ turnId: 2, store, realizationContext })).toEqual({
       ok: true,

@@ -79,7 +79,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
     expect(seen.map((s) => s.designated)).toEqual([null, true]);
 
     // And only the designated one became restoration history.
-    expect(tree.getHistory().length - 1).toBe(1);
+    expect(tree.getRestorationHistory().length - 1).toBe(1);
   });
 
   it('CASE 3 — a realization is distinguishable from authored work', async () => {
@@ -95,7 +95,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
 
     expect(seen.map((s) => s.participation)).toEqual(['realized']);
     // ...and it acquired no restoration right by being seen.
-    expect(tree.getHistory().length - 1).toBe(0);
+    expect(tree.getRestorationHistory().length - 1).toBe(0);
   });
 
   it('CASE 7 — REPAIRED: a restoration carries its own origin', async () => {
@@ -167,7 +167,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
     // A projection can take its boundary from the engine instead of guessing a
     // finer one, which is what case 8 requires.
     expect(flushes).toBe(1);
-    expect(tree.getHistory().length - 1).toBe(1);
+    expect(tree.getRestorationHistory().length - 1).toBe(1);
   });
 });
 
@@ -202,7 +202,7 @@ describe('DIAG-JOURNAL-0 inventory: what a projection would RETAIN', () => {
     );
     await flush();
 
-    const beforeHistory = tree.getHistory().length;
+    const beforeHistory = tree.getRestorationHistory().length;
     const beforeCanUndo = tree.canUndo();
 
     const off = getPathNotifier().subscribe('**', () => {
@@ -215,7 +215,7 @@ describe('DIAG-JOURNAL-0 inventory: what a projection would RETAIN', () => {
     // The first half of the ownership falsifier set, measurable without a
     // journal: observation alone changes no restoration state. An undesignated
     // write stays unadmitted even while something is watching it.
-    expect(tree.getHistory().length).toBe(beforeHistory);
+    expect(tree.getRestorationHistory().length).toBe(beforeHistory);
     expect(tree.canUndo()).toBe(beforeCanUndo);
   });
 });

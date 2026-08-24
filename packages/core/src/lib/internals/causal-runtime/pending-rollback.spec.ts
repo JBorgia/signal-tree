@@ -1,6 +1,6 @@
 import { createEntitySignal } from '../../entity-signal';
 import type { PositionId, ReversalEffect } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { rollbackPendingTurnAt } from './pending-rollback';
 import { createPositionRegistry, type PositionRegistry } from '../position-registry';
 import { createRealizationContextSource } from './realization-context';
@@ -19,17 +19,17 @@ const SUBJECT_DRIVER_TWO = 'driver-2';
 
 describe('rollbackPendingTurnAt', () => {
   it('leaves all state untouched when the pending turn is missing', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const confirmed = store.admitConfirmed({
       id: 2,
       effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
 
     expect(
@@ -42,19 +42,19 @@ describe('rollbackPendingTurnAt', () => {
         realizationContext: createRealizationContextSource({
           baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
           store,
-          appliedHistory,
+          appliedTurns,
         }),
       })
-    ).toEqual({ ok: false, refusal: { kind: 'history-evicted' } });
+    ).toEqual({ ok: false, refusal: { kind: 'turn-evicted' } });
 
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('leaves all state untouched when authority assessment refuses', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const pending = store.admitPending({
       id: 1,
@@ -63,7 +63,7 @@ describe('rollbackPendingTurnAt', () => {
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
 
     expect(
@@ -76,7 +76,7 @@ describe('rollbackPendingTurnAt', () => {
         realizationContext: createRealizationContextSource({
           baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
           store,
-          appliedHistory,
+          appliedTurns,
         }),
       })
     ).toEqual({ ok: false, refusal: { kind: 'outside-boundary' } });
@@ -84,11 +84,11 @@ describe('rollbackPendingTurnAt', () => {
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('leaves all state untouched when a later structural dependency blocks rollback', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const pending = store.admitPending({
       id: 1,
@@ -114,11 +114,11 @@ describe('rollbackPendingTurnAt', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
 
     expect(
@@ -131,7 +131,7 @@ describe('rollbackPendingTurnAt', () => {
         realizationContext: createRealizationContextSource({
           baselineValues: new Map([[P_DRIVER_KEY, 'driver-1']]),
           store,
-          appliedHistory,
+          appliedTurns,
         }),
       })
     ).toEqual({ ok: false, refusal: { kind: 'dependency-conflict' } });
@@ -139,7 +139,7 @@ describe('rollbackPendingTurnAt', () => {
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('refuses rollback of a pending remove when a later captured add by a different subject occupies the released location', () => {
@@ -292,7 +292,7 @@ describe('rollbackPendingTurnAt', () => {
       getTurns: () => [],
       prepareDiscardPendingTurn: () => ({
         ok: false as const,
-        reason: 'history-evicted' as const,
+        reason: 'turn-evicted' as const,
       }),
       commitPreparedDiscardPending: vi.fn(),
     };
@@ -312,7 +312,7 @@ describe('rollbackPendingTurnAt', () => {
           getValueWithoutPendingTurn: () => 'Ada',
         },
       })
-    ).toEqual({ ok: false, refusal: { kind: 'history-evicted' } });
+    ).toEqual({ ok: false, refusal: { kind: 'turn-evicted' } });
 
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.commitPreparedDiscardPending).not.toHaveBeenCalled();
@@ -371,7 +371,7 @@ describe('rollbackPendingTurnAt', () => {
   });
 
   it('propagates atomic application failure without discarding the pending turn or mutating confirmed state', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const pending = store.admitPending({
       id: 1,
@@ -381,11 +381,11 @@ describe('rollbackPendingTurnAt', () => {
       id: 2,
       effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const failure = new Error('atomic silent application failed');
 
     expect(() =>
@@ -405,20 +405,20 @@ describe('rollbackPendingTurnAt', () => {
             [P_THEME, 'light'],
           ]),
           store,
-          appliedHistory,
+          appliedTurns,
         }),
       })
     ).toThrow(failure);
 
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('runs physical maintenance after a pending blocker is discarded at the quiescent rollback boundary', () => {
     type User = { id: number; name: string; active: boolean };
 
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
     const notify = vi.fn();
     const owner = createEntitySignal<User, number>(
       { selectId: (user) => user.id },
@@ -454,7 +454,7 @@ describe('rollbackPendingTurnAt', () => {
       runPhysicalMaintenance({
         owner: owner as any,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       candidateSubjectIds: [subjectId],
@@ -513,7 +513,7 @@ describe('rollbackPendingTurnAt', () => {
             runPhysicalMaintenance({
               owner: owner as any,
               store,
-              appliedHistory,
+              appliedTurns,
             })
           );
         },
@@ -554,7 +554,7 @@ describe('rollbackPendingTurnAt', () => {
   it('does not run maintenance when pending rollback realization fails before discard settles', () => {
     type User = { id: number; name: string; active: boolean };
 
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
     const notify = vi.fn();
     const owner = createEntitySignal<User, number>(
       { selectId: (user) => user.id },
@@ -630,7 +630,7 @@ describe('rollbackPendingTurnAt', () => {
   });
 
   it('allows scalar follow-up after a pending rekey while refusing no structural dependency', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const pending = store.admitPending({
       id: 1,
@@ -655,7 +655,7 @@ describe('rollbackPendingTurnAt', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
@@ -663,7 +663,7 @@ describe('rollbackPendingTurnAt', () => {
         [P_DRIVER_NAME, 'Alice'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'driver-2'],
@@ -699,7 +699,7 @@ describe('rollbackPendingTurnAt', () => {
     expect(store.hasPendingTurn(pending.id)).toBe(false);
     expect(values.get(P_DRIVER_KEY)).toBe('driver-1');
     expect(values.get(P_DRIVER_NAME)).toBe('Alicia');
-    expect(appliedHistory.inspect()).toEqual({
+    expect(appliedTurns.inspect()).toEqual({
       appliedTurnIds: [2],
       redoTurnIds: [],
       frontiers: {
@@ -709,7 +709,7 @@ describe('rollbackPendingTurnAt', () => {
   });
 
   it('allows later pending scalar follow-up after a pending rekey', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const pendingRekey = store.admitPending({
       id: 1,
@@ -741,7 +741,7 @@ describe('rollbackPendingTurnAt', () => {
         [P_DRIVER_NAME, 'Alice'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'driver-2'],
@@ -781,7 +781,7 @@ describe('rollbackPendingTurnAt', () => {
   });
 
   it('rolls back sibling pending removes as two independent structural restorations even when they share one owner position', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const pending = store.admitPending({
       id: 1,
@@ -841,7 +841,7 @@ describe('rollbackPendingTurnAt', () => {
 
     expect(store.hasPendingTurn(pending.id)).toBe(false);
     expect(applyAtomically).toHaveBeenCalledTimes(1);
-    expect(appliedHistory.inspect()).toEqual({
+    expect(appliedTurns.inspect()).toEqual({
       appliedTurnIds: [],
       redoTurnIds: [],
       frontiers: {},
@@ -849,7 +849,7 @@ describe('rollbackPendingTurnAt', () => {
   });
 
   it('refuses later pending structural dependency after a pending rekey without changing state', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const pendingRekey = store.admitPending({
       id: 1,
@@ -878,7 +878,7 @@ describe('rollbackPendingTurnAt', () => {
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
 
     expect(
@@ -891,7 +891,7 @@ describe('rollbackPendingTurnAt', () => {
         realizationContext: createRealizationContextSource({
           baselineValues: new Map([[P_DRIVER_KEY, 'driver-1']]),
           store,
-          appliedHistory,
+          appliedTurns,
         }),
       })
     ).toEqual({ ok: false, refusal: { kind: 'dependency-conflict' } });
@@ -899,11 +899,11 @@ describe('rollbackPendingTurnAt', () => {
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('refuses rollback of a pending add when later confirmed same-subject scalar work depends on its existence', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const pendingAdd = store.admitPending({
       id: 1,
@@ -928,11 +928,11 @@ describe('rollbackPendingTurnAt', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
 
     expect(
@@ -945,7 +945,7 @@ describe('rollbackPendingTurnAt', () => {
         realizationContext: createRealizationContextSource({
           baselineValues: new Map(),
           store,
-          appliedHistory,
+          appliedTurns,
         }),
       })
     ).toEqual({ ok: false, refusal: { kind: 'dependency-conflict' } });
@@ -953,11 +953,11 @@ describe('rollbackPendingTurnAt', () => {
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('refuses rollback of a pending add when later pending same-subject scalar work depends on its existence', () => {
-    const { store, appliedHistory, topology } = createPendingRollbackContext();
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
 
     const pendingAdd = store.admitPending({
       id: 1,
@@ -985,7 +985,7 @@ describe('rollbackPendingTurnAt', () => {
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
 
     expect(
@@ -998,7 +998,7 @@ describe('rollbackPendingTurnAt', () => {
         realizationContext: createRealizationContextSource({
           baselineValues: new Map(),
           store,
-          appliedHistory,
+          appliedTurns,
         }),
       })
     ).toEqual({ ok: false, refusal: { kind: 'dependency-conflict' } });
@@ -1006,13 +1006,13 @@ describe('rollbackPendingTurnAt', () => {
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 });
 
 function createPendingRollbackContext(): {
   store: TurnStore;
-  appliedHistory: AppliedHistory;
+  appliedTurns: AppliedTurnProjection;
   topology: PositionRegistry;
 } {
   const topology = createPositionRegistry();
@@ -1034,7 +1034,7 @@ function createPendingRollbackContext(): {
   expect(driverName).toBe(P_DRIVER_NAME);
 
   const store = new TurnStore();
-  const appliedHistory = new AppliedHistory(store);
+  const appliedTurns = new AppliedTurnProjection(store);
 
-  return { store, appliedHistory, topology };
+  return { store, appliedTurns, topology };
 }

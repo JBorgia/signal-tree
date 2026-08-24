@@ -30,7 +30,7 @@ type TimeTravelRows = {
     };
   };
   canUndo(): boolean;
-  getHistory(): unknown[];
+  getRestorationHistory(): unknown[];
 };
 
 function createTimeTravelRows(): TimeTravelRows {
@@ -222,7 +222,7 @@ describe('E-INT — write-path authority', () => {
 
   it('DR-2 — blocked interceptor creates no history residue', async () => {
     const tree = createTimeTravelRows();
-    const initialHistoryLength = tree.getHistory().length;
+    const initialHistoryLength = tree.getRestorationHistory().length;
     tree.$.rows.intercept({
       onAdd: (_entity, ctx) => ctx.block('negative'),
     });
@@ -233,14 +233,14 @@ describe('E-INT — write-path authority', () => {
 
     expect(tree.$.rows.ids()).toEqual([]);
     expect(tree.canUndo()).toBe(false);
-    expect(tree.getHistory()).toHaveLength(initialHistoryLength);
+    expect(tree.getRestorationHistory()).toHaveLength(initialHistoryLength);
   });
 
   it('DR-2 — thenable interceptor failure creates no history residue', async () => {
     const tree = createTimeTravelRows();
     tree.$.rows.addOne({ id: 'a', n: 1 });
     await tick();
-    const historyBeforeFailedUpdate = tree.getHistory().length;
+    const historyBeforeFailedUpdate = tree.getRestorationHistory().length;
     let transformAttempted = false;
     tree.$.rows.intercept({
       onUpdate: (_id, _changes, ctx) => {
@@ -257,7 +257,7 @@ describe('E-INT — write-path authority', () => {
 
     expect(transformAttempted).toBe(true);
     expect(tree.$.rows.byId('a')?.n()).toBe(1);
-    expect(tree.getHistory()).toHaveLength(historyBeforeFailedUpdate);
+    expect(tree.getRestorationHistory()).toHaveLength(historyBeforeFailedUpdate);
   });
 
   it('DEFECT — ctx.blocked / ctx.blockReason are vestigial: block() throws instead of setting them', () => {

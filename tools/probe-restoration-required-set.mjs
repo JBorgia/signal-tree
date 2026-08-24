@@ -123,7 +123,7 @@ async function measure(historySize) {
     await tick();
   }
 
-  const history = tree.getHistory();
+  const history = tree.getRestorationHistory();
   const physicallyRetained = new Set(rows.__listSubjectReclamationCandidates());
   const namedUnion = new Set(
     history.flatMap((entry) => entry.restorationSubjectIds ?? [])

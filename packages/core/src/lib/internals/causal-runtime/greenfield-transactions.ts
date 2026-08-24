@@ -1,6 +1,6 @@
 import type { StructuralEffect } from '../../types';
 
-import type { AppliedHistory } from './applied-history';
+import type { AppliedTurnProjection } from './applied-turn-projection';
 import type { CausalTurn, PositionId, ReversalResult, TurnId } from './causal-types';
 import { confirmPendingTurnAt } from './pending-confirmation';
 import type { RollbackPendingResult } from './pending-rollback';
@@ -24,7 +24,7 @@ export type GreenfieldTransactionLifecycle =
 export interface GreenfieldTransactionDraft {
   capture(effect: ExplicitTransactionEffect): void;
   seal(): CausalTurn;
-  confirm(): ReversalResult<{ readonly kind: 'history-evicted' }>;
+  confirm(): ReversalResult<{ readonly kind: 'turn-evicted' }>;
   abort(): RollbackPendingResult;
   getLifecycle(): GreenfieldTransactionLifecycle;
 }
@@ -35,8 +35,8 @@ export interface CreateGreenfieldTransactionDraftOptions {
     TurnStore,
     'prepareConfirmPendingTurn' | 'commitPreparedConfirmPending'
   >;
-  readonly appliedHistory: Pick<
-    AppliedHistory,
+  readonly appliedTurns: Pick<
+    AppliedTurnProjection,
     'prepareAdmitConfirmedTurn' | 'commitPreparedAdmitConfirmed'
   >;
   readonly abortPendingTurn?: (turnId: TurnId) => RollbackPendingResult;
@@ -76,13 +76,13 @@ class DefaultGreenfieldTransactionDraft implements GreenfieldTransactionDraft {
     return this.sealedTurn;
   }
 
-  confirm(): ReversalResult<{ readonly kind: 'history-evicted' }> {
+  confirm(): ReversalResult<{ readonly kind: 'turn-evicted' }> {
     this.assertState('sealed');
 
     const result = confirmPendingTurnAt({
       turnId: this.options.turnId,
       store: this.options.store,
-      appliedHistory: this.options.appliedHistory,
+      appliedTurns: this.options.appliedTurns,
     });
     if (result.ok) {
       this.state = 'confirmed';

@@ -1,30 +1,30 @@
 import type { PositionId, TurnId } from './causal-types';
 import type { TurnStore } from './turn-store';
 
-type AppliedHistoryResult =
+type AppliedTurnResult =
   | { readonly ok: true }
   | {
       readonly ok: false;
-      readonly reason: 'history-evicted' | 'not-applied-frontier';
+      readonly reason: 'turn-evicted' | 'not-applied-frontier';
     };
 
-export interface PreparedAppliedHistoryUnapply {
+export interface PreparedUnapply {
   readonly turnId: TurnId;
 }
 
-export interface PreparedAppliedHistoryConfirmation {
+export interface PreparedConfirmation {
   readonly turnId: TurnId;
   readonly participants: readonly PositionId[];
 }
 
-type PrepareAppliedHistoryUnapplyResult =
-  | { readonly ok: true; readonly transition: PreparedAppliedHistoryUnapply }
+type PrepareUnapplyResult =
+  | { readonly ok: true; readonly transition: PreparedUnapply }
   | {
       readonly ok: false;
-      readonly reason: 'history-evicted' | 'not-applied-frontier';
+      readonly reason: 'turn-evicted' | 'not-applied-frontier';
     };
 
-export interface PreparedAppliedHistoryReapply {
+export interface PreparedReapply {
   readonly turnId: TurnId;
 }
 
@@ -33,20 +33,20 @@ export interface EvictedConfirmedTurnDisposition {
   readonly wasRedoable: boolean;
 }
 
-type PrepareAppliedHistoryReapplyResult =
-  | { readonly ok: true; readonly transition: PreparedAppliedHistoryReapply }
+type PrepareReapplyResult =
+  | { readonly ok: true; readonly transition: PreparedReapply }
   | {
       readonly ok: false;
-      readonly reason: 'history-evicted' | 'not-redoable-next';
+      readonly reason: 'turn-evicted' | 'not-redoable-next';
     };
 
-export interface AppliedHistorySnapshot {
+export interface AppliedTurnSnapshot {
   readonly appliedTurnIds: TurnId[];
   readonly redoTurnIds: TurnId[];
   readonly frontiers: Record<string, TurnId>;
 }
 
-export class AppliedHistory {
+export class AppliedTurnProjection {
   private readonly appliedTurnIds: TurnId[] = [];
   private readonly redoTurnIds: TurnId[] = [];
 
@@ -54,10 +54,10 @@ export class AppliedHistory {
     private readonly store: Pick<TurnStore, 'getTurn' | 'getTurnIdsForPosition'>
   ) {}
 
-  admitConfirmed(turnId: TurnId): AppliedHistoryResult {
+  admitConfirmed(turnId: TurnId): AppliedTurnResult {
     const turn = this.store.getTurn(turnId);
     if (!turn) {
-      return { ok: false, reason: 'history-evicted' };
+      return { ok: false, reason: 'turn-evicted' };
     }
 
     const transition = this.prepareAdmitConfirmedTurn({
@@ -72,7 +72,7 @@ export class AppliedHistory {
   prepareAdmitConfirmedTurn(turn: {
     readonly turnId: TurnId;
     readonly participants: readonly PositionId[];
-  }): PreparedAppliedHistoryConfirmation {
+  }): PreparedConfirmation {
     return {
       turnId: turn.turnId,
       participants: [...turn.participants],
@@ -80,7 +80,7 @@ export class AppliedHistory {
   }
 
   commitPreparedAdmitConfirmed(
-    transition: PreparedAppliedHistoryConfirmation
+    transition: PreparedConfirmation
   ): readonly TurnId[] {
     this.insertAppliedTurnCanonical(transition.turnId);
     if (this.redoTurnIds.length > 0) {
@@ -92,10 +92,10 @@ export class AppliedHistory {
 
   prepareUnapplyConfirmedTurn(
     turnId: TurnId
-  ): PrepareAppliedHistoryUnapplyResult {
+  ): PrepareUnapplyResult {
     const turn = this.store.getTurn(turnId);
     if (!turn) {
-      return { ok: false, reason: 'history-evicted' };
+      return { ok: false, reason: 'turn-evicted' };
     }
 
     const isApplied = this.appliedTurnIds.includes(turnId);
@@ -112,14 +112,14 @@ export class AppliedHistory {
     };
   }
 
-  commitPreparedUnapply(transition: PreparedAppliedHistoryUnapply): void {
+  commitPreparedUnapply(transition: PreparedUnapply): void {
     const { turnId } = transition;
 
     this.removeAppliedTurn(turnId);
     this.redoTurnIds.unshift(turnId);
   }
 
-  moveConfirmedTurnToRedo(turnId: TurnId): AppliedHistoryResult {
+  moveConfirmedTurnToRedo(turnId: TurnId): AppliedTurnResult {
     const prepared = this.prepareUnapplyConfirmedTurn(turnId);
     if (!prepared.ok) {
       return prepared;
@@ -131,10 +131,10 @@ export class AppliedHistory {
 
   prepareReapplyConfirmedTurn(
     turnId: TurnId
-  ): PrepareAppliedHistoryReapplyResult {
+  ): PrepareReapplyResult {
     const turn = this.store.getTurn(turnId);
     if (!turn) {
-      return { ok: false, reason: 'history-evicted' };
+      return { ok: false, reason: 'turn-evicted' };
     }
 
     const isRedoable = this.redoTurnIds.includes(turnId);
@@ -152,7 +152,7 @@ export class AppliedHistory {
     };
   }
 
-  commitPreparedReapply(transition: PreparedAppliedHistoryReapply): void {
+  commitPreparedReapply(transition: PreparedReapply): void {
     const { turnId } = transition;
 
     this.redoTurnIds.splice(this.redoTurnIds.indexOf(turnId), 1);
@@ -161,7 +161,7 @@ export class AppliedHistory {
 
   moveRedoTurnToApplied(turnId: TurnId):
     | { readonly ok: true }
-    | { readonly ok: false; readonly reason: 'history-evicted' | 'not-redoable-next' } {
+    | { readonly ok: false; readonly reason: 'turn-evicted' | 'not-redoable-next' } {
     const prepared = this.prepareReapplyConfirmedTurn(turnId);
     if (!prepared.ok) {
       return prepared;
@@ -208,7 +208,7 @@ export class AppliedHistory {
     return undefined;
   }
 
-  inspect(): AppliedHistorySnapshot {
+  inspect(): AppliedTurnSnapshot {
     const frontiers = new Map<PositionId, TurnId>();
 
     for (const turnId of this.appliedTurnIds) {

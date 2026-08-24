@@ -46,7 +46,7 @@ function expectInvariant(tree: ReturnType<typeof makeTree>): {
     throw new Error('Expected a tree-scoped restoration claim registry');
   }
 
-  const history = tree.getHistory() as Array<{
+  const history = tree.getRestorationHistory() as Array<{
     restorationSubjectIds?: number[];
   }>;
   const expected = [
@@ -164,7 +164,7 @@ describe('restoration claim boundary', () => {
     await tick();
 
     const claims = getSubjectRestorationClaims(tree);
-    const history = tree.getHistory() as Array<{
+    const history = tree.getRestorationHistory() as Array<{
       restorationSubjectIds?: number[];
     }>;
     const expected = [
@@ -177,7 +177,7 @@ describe('restoration claim boundary', () => {
     expect(claims?.snapshot().owners).toBeLessThanOrEqual(history.length);
   });
 
-  it('releases every owned claim on resetHistory, before turn ids restart', async () => {
+  it('releases every owned claim on resetRestorationHistory, before turn ids restart', async () => {
     const tree = makeTree(20);
     for (let g = 0; g < 5; g++) {
       undoable(() => tree.$.rows.setAll(seed(`g${g}`)));
@@ -186,7 +186,7 @@ describe('restoration claim boundary', () => {
     }
     expect(expectInvariant(tree).claimed.length).toBeGreaterThan(0);
 
-    tree.resetHistory();
+    tree.resetRestorationHistory();
     await tick();
     await tick();
 

@@ -11,7 +11,7 @@ export type ConfirmedReapplyPlanningResult =
   | { readonly ok: true; readonly plan: ConfirmedReapplyPlan }
   | {
       readonly ok: false;
-      readonly refusal: Extract<Extract<ReversalResult, { readonly ok: false }>['refusal'], { kind: 'history-evicted' }>;
+      readonly refusal: Extract<Extract<ReversalResult, { readonly ok: false }>['refusal'], { kind: 'turn-evicted' }>;
     };
 
 export interface PlanConfirmedReapplyOptions {
@@ -25,7 +25,7 @@ export function planConfirmedReapply(
 ): ConfirmedReapplyPlanningResult {
   const turn = options.store.getTurn(options.turnId);
   if (!turn) {
-    return { ok: false, refusal: { kind: 'history-evicted' } };
+    return { ok: false, refusal: { kind: 'turn-evicted' } };
   }
 
   return {

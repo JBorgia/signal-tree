@@ -60,7 +60,7 @@ await settle();
 const retained = heap() - base;
 if (tree.$.rows.count() !== width) throw new Error('collection changed size');
 void tree.$.rows.all()[1].v;  // read back
-const entries = tree.getHistory().length;
+const entries = tree.getRestorationHistory().length;
 console.log(JSON.stringify({
   shape, width, steps,
   retainedMB: +retained.toFixed(3),

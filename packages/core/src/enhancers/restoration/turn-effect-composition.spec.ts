@@ -38,7 +38,7 @@ describe('RESTORE-P0 composition: add + X in one turn', () => {
     const tree = makeTree();
     undoable(() => tree.$.rows.setAll([{ id: 'seed', name: 'Seed' }]));
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     undoable(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     undoable(() => tree.$.rows.removeOne('a'));
@@ -51,7 +51,7 @@ describe('RESTORE-P0 composition: add + X in one turn', () => {
     // never becomes an undo step. Recording one would be a phantom entry —
     // `canUndo()` true, undo changes nothing visible, and the user spends a
     // step they never took.
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
 
     // So undo reverses the PREVIOUS real operation, the seed `setAll`.
     tree.undo();
@@ -102,7 +102,7 @@ describe('RESTORE-P0 composition: rekey + X in one turn', () => {
     undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]));
     await flush();
 
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     undoable(() => tree.$.rows.changeId('a', 'a2'));
     undoable(() => tree.$.rows.changeId('a2', 'a'));
@@ -110,7 +110,7 @@ describe('RESTORE-P0 composition: rekey + X in one turn', () => {
     expect(tree.$.rows.ids()).toEqual(['a']);
 
     // Same contract as annihilation: net nothing means no turn.
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
 
     tree.undo();
     await flush();

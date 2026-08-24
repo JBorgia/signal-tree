@@ -1,4 +1,4 @@
-import type { AppliedHistory } from './applied-history';
+import type { AppliedTurnProjection } from './applied-turn-projection';
 import type { CausalEffect, StructuralEffectKind, TurnId } from './causal-types';
 import type { TurnStore } from './turn-store';
 
@@ -19,15 +19,15 @@ export interface ReclamationEligibility {
 export interface ReclamationEligibilityOptions {
   readonly subjectId: unknown;
   readonly store: Pick<TurnStore, 'getTurns' | 'getPendingTurns'>;
-  readonly appliedHistory: Pick<AppliedHistory, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
+  readonly appliedTurns: Pick<AppliedTurnProjection, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
 }
 
 export function assessReclamationEligibility(
   options: ReclamationEligibilityOptions
 ): ReclamationEligibility {
   const blockers: ReclamationEligibilityBlocker[] = [];
-  const appliedTurnIds = new Set(options.appliedHistory.getAppliedTurnIds());
-  const redoTurnIds = new Set(options.appliedHistory.getRedoTurnIds());
+  const appliedTurnIds = new Set(options.appliedTurns.getAppliedTurnIds());
+  const redoTurnIds = new Set(options.appliedTurns.getRedoTurnIds());
 
   for (const turn of options.store.getPendingTurns()) {
     const effect = findSubjectEffect(turn.effects, options.subjectId);

@@ -22,7 +22,7 @@ export interface EditSession<T> {
   undo(): void;
   redo(): void;
   reset(): void;
-  getHistory(): UndoRedoHistory<T>;
+  getRestorationHistory(): UndoRedoHistory<T>;
 }
 
 /** @internal Dev dedupe for ST2028 — one report per session, not per clone. */
@@ -225,7 +225,7 @@ export function createEditSession<T>(initial: T): EditSession<T> {
     updateCounts();
   }
 
-  function getHistory(): UndoRedoHistory<T> {
+  function getRestorationHistory(): UndoRedoHistory<T> {
     return {
       past: past.map((p) => clone(p)),
       present: clone(present()),
@@ -244,7 +244,7 @@ export function createEditSession<T>(initial: T): EditSession<T> {
     undo,
     redo,
     reset,
-    getHistory,
+    getRestorationHistory,
   };
 }
 

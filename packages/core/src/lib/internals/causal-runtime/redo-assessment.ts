@@ -1,7 +1,7 @@
 import type { PositionRegistry } from '../position-registry';
 
 import type { PositionId, ReversalResult, TurnId } from './causal-types';
-import type { AppliedHistory } from './applied-history';
+import type { AppliedTurnProjection } from './applied-turn-projection';
 import type { TurnStore } from './turn-store';
 
 export type ConfirmedRedoAssessment = ReversalResult<
@@ -12,16 +12,16 @@ export type ConfirmedRedoAssessment = ReversalResult<
 export interface AssessConfirmedRedoOptions {
   readonly authority: PositionId;
   readonly store: Pick<TurnStore, 'getTurns' | 'getTurnIdsForPosition'>;
-  readonly appliedHistory: Pick<AppliedHistory, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
+  readonly appliedTurns: Pick<AppliedTurnProjection, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
   readonly topology: Pick<PositionRegistry, 'contains'>;
 }
 
 export function assessConfirmedRedo(
   options: AssessConfirmedRedoOptions
 ): ConfirmedRedoAssessment {
-  const { authority, appliedHistory, store, topology } = options;
-  const appliedTurnIds = new Set(appliedHistory.getAppliedTurnIds());
-  const redoTurnIds = new Set(appliedHistory.getRedoTurnIds());
+  const { authority, appliedTurns, store, topology } = options;
+  const appliedTurnIds = new Set(appliedTurns.getAppliedTurnIds());
+  const redoTurnIds = new Set(appliedTurns.getRedoTurnIds());
 
   const candidate = store.getTurns().find(
     (turn) =>

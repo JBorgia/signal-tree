@@ -1,4 +1,4 @@
-import type { AppliedHistory } from './applied-history';
+import type { AppliedTurnProjection } from './applied-turn-projection';
 import type { CausalTurn, ReversalResult, TurnId } from './causal-types';
 import type { RealizationContextSource } from './realization-context';
 import type { TurnStore } from './turn-store';
@@ -17,8 +17,8 @@ export interface ConfirmPendingTurnAtOptions {
     TurnStore,
     'prepareConfirmPendingTurn' | 'commitPreparedConfirmPending'
   >;
-  readonly appliedHistory: Pick<
-    AppliedHistory,
+  readonly appliedTurns: Pick<
+    AppliedTurnProjection,
     'prepareAdmitConfirmedTurn' | 'commitPreparedAdmitConfirmed'
   >;
   readonly retentionObserver?: Pick<RealizationContextSource, 'consumeForgottenConfirmedTurns'>;
@@ -33,22 +33,22 @@ export interface ConfirmPendingTurnAtOptions {
 
 export function confirmPendingTurnAt(
   options: ConfirmPendingTurnAtOptions
-): ReversalResult<{ readonly kind: 'history-evicted' }> {
+): ReversalResult<{ readonly kind: 'turn-evicted' }> {
   const prepared = options.store.prepareConfirmPendingTurn(options.turnId);
   if (!prepared.ok) {
     return {
       ok: false,
-      refusal: { kind: 'history-evicted' },
+      refusal: { kind: 'turn-evicted' },
     };
   }
 
-  const preparedAppliedHistory = options.appliedHistory.prepareAdmitConfirmedTurn({
+  const preparedAppliedTurnProjection = options.appliedTurns.prepareAdmitConfirmedTurn({
     turnId: prepared.transition.turnId,
     participants: prepared.transition.pendingTurn.participants,
   });
 
-  const invalidatedRedoTurnIds = options.appliedHistory.commitPreparedAdmitConfirmed(
-    preparedAppliedHistory
+  const invalidatedRedoTurnIds = options.appliedTurns.commitPreparedAdmitConfirmed(
+    preparedAppliedTurnProjection
   );
 
   const confirmedTurn = options.store.commitPreparedConfirmPending(

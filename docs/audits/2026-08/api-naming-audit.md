@@ -107,7 +107,7 @@ take to describe the same end state reached two ways.
 
 ### 1. `get` prefix on two time-travel methods, bare accessors everywhere else
 
-`getHistory()` and `getCurrentIndex()` against `all()`, `count()`, `ids()`, `canUndo()`,
+`getRestorationHistory()` and `getCurrentIndex()` against `all()`, `count()`, `ids()`, `canUndo()`,
 `canRedo()`, `empty()`, `has()`, `activeId()`. The convention in this library is a bare
 noun. Two methods opted out, and both are in the subsystem that already borrowed its
 whole vocabulary from debuggers — which is the same root cause as
@@ -116,10 +116,10 @@ whole vocabulary from debuggers — which is the same root cause as
 Both are moving to the devtools surface anyway, so fix the name at the same time rather
 than twice.
 
-### 2. `resetHistory()` vs `clear()`
+### 2. `resetRestorationHistory()` vs `clear()`
 
 `reset` and `clear` for "empty this thing" in the same library. `clear` is the one used
-on collections, so `resetHistory` is the outlier. (`reset` is defensible where it means
+on collections, so `resetRestorationHistory` is the outlier. (`reset` is defensible where it means
 "restore to the INITIAL value" rather than "empty" — check which this actually does
 before renaming, because those are different operations wearing similar words.)
 

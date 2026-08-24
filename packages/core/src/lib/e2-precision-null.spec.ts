@@ -110,8 +110,8 @@ describe('E2 / P1 — unrelated later truth', () => {
 // P2 — DEFERRED TO E3. Its premise is not part of the confirmed-undo contract.
 //
 // P2 asked what `undo T1` does once T2 has overwritten the same position. But
-// the public surface is `undo` / `redo` / `canUndo` / `canRedo` / `getHistory` /
-// `resetHistory` / `jumpTo(index)` / `getCurrentIndex()` — there is NO selective
+// the public surface is `undo` / `redo` / `canUndo` / `canRedo` / `getRestorationHistory` /
+// `resetRestorationHistory` / `jumpTo(index)` / `getCurrentIndex()` — there is NO selective
 // per-turn reversal, and `jumpTo` is cursor navigation, not "reverse turn N while
 // later turns survive."
 //

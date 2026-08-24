@@ -14,7 +14,7 @@ import type { Enhancer, RestorationMethods } from '../../lib/types';
  *
  * This file does NOT stand in for the consumer contract. Asserting
  * `timeTravel`'s own declared shape says nothing about whether a call site
- * still gets `RestorationHistoryEntry<AppState>[]` out of `getHistory()` — which is the
+ * still gets `RestorationHistoryEntry<AppState>[]` out of `getRestorationHistory()` — which is the
  * one property this migration could plausibly have broken, since the state is
  * recovered from polymorphic `this` and `EnhancerHost` is not a `NodeAccessor`.
  * That is `time-travel-contract.typing.spec.ts`, proven green BEFORE this

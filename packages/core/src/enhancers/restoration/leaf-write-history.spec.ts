@@ -82,12 +82,12 @@ describe('time travel records direct leaf writes', () => {
     await flush();
     undoable(() => tree.$.n.set(3));
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     tree.undo();
     await flush();
 
-    expect(tree.getHistory().length).toBeLessThanOrEqual(before);
+    expect(tree.getRestorationHistory().length).toBeLessThanOrEqual(before);
   });
 
   it('undo on a tree with entity collections keeps redo and records no phantom entry', async () => {
@@ -107,7 +107,7 @@ describe('time travel records direct leaf writes', () => {
     undoable(() => tree.$.rows.addOne({ id: 3, name: 'c' }));
     await flush();
 
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     tree.undo();
     await flush();
@@ -116,7 +116,7 @@ describe('time travel records direct leaf writes', () => {
       rows: { all: Array<{ id: number; name: string }> };
     };
 
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
     expect(tree.canRedo()).toBe(true);
     expect(afterUndo.rows.all.map((row) => row.id)).toEqual([1, 2]);
 

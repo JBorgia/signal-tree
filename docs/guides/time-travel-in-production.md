@@ -231,14 +231,14 @@ whole-state deep compare here undoes the saving.
 | Large server collection + small editable **`form()`** | `entityMap({ recordHistory: false })` beside `form({ history: history() })`          | Yes. Prefer scoped form history when the form should undo independently; global `timeTravel()` also records direct form writes now. |
 | Optimistic write, roll back on error                  | `undo()` in the error path, or `jumpTo(getCurrentIndex() - 1)`                       | Yes — only if nothing else recorded in between                                                                                      |
 | Import/generate, then one undo                        | —                                                                                    | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement                                               |
-| Audit trail rather than undo                          | `createAuditCallback()` or `getHistory()`                                            | Yes. **Not `createAuditTracker()`** — it samples on a 100 ms timer and drops write-then-revert pairs                                |
-| Show the user how far they can go                     | `getCurrentIndex()` back, `getHistory().length - 1 - getCurrentIndex()` fwd          | Yes — reactive since 14.0.0                                                                                                         |
+| Audit trail rather than undo                          | `createAuditCallback()` or `getRestorationHistory()`                                            | Yes. **Not `createAuditTracker()`** — it samples on a 100 ms timer and drops write-then-revert pairs                                |
+| Show the user how far they can go                     | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd          | Yes — reactive since 14.0.0                                                                                                         |
 | Undo per entity, independently                        | —                                                                                    | **No.** elf has this; we do not                                                                                                     |
 | Collaborative editing                                 | A CRDT (Yjs, Automerge) underneath — undo is per-user, not per-document              | **Not a store feature.** Don't                                                                                                      |
 
 ## Reactive readers, and why that mattered
 
-`canUndo()`, `canRedo()`, `getHistory()` and `isRecordingPaused()` are **signals
+`canUndo()`, `canRedo()`, `getRestorationHistory()` and `isRecordingPaused()` are **signals
 since 14.0.0**. Before that they read plain values, so
 `computed(() => tree.canUndo())` evaluated once and cached `false` forever — an
 undo button in a zoneless app never enabled. If you are on 13.x and your undo

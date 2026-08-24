@@ -4,7 +4,7 @@ import type {
   PreparedEntitySubjectReclamation,
 } from '../../entity-signal';
 
-import type { AppliedHistory } from './applied-history';
+import type { AppliedTurnProjection } from './applied-turn-projection';
 import {
   assessReclamationEligibility,
   type ReclamationEligibilityBlocker,
@@ -26,7 +26,7 @@ export interface ReclaimSubjectOptions {
   readonly subjectId: number;
   readonly owner: SubjectReclamationPhysicalOwner;
   readonly store: Pick<TurnStore, 'getTurns' | 'getPendingTurns'>;
-  readonly appliedHistory: Pick<AppliedHistory, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
+  readonly appliedTurns: Pick<AppliedTurnProjection, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
 }
 
 export type ReclaimSubjectResult =
@@ -65,7 +65,7 @@ export function reclaimSubject(
   const initialAssessment = assessReclamationEligibility({
     subjectId: options.subjectId,
     store: options.store,
-    appliedHistory: options.appliedHistory,
+    appliedTurns: options.appliedTurns,
   });
   if (!initialAssessment.eligible) {
     return {
@@ -94,7 +94,7 @@ export function reclaimSubject(
   const finalAssessment = assessReclamationEligibility({
     subjectId: options.subjectId,
     store: options.store,
-    appliedHistory: options.appliedHistory,
+    appliedTurns: options.appliedTurns,
   });
   if (!finalAssessment.eligible) {
     return {
@@ -125,7 +125,7 @@ export interface ReclaimAvailableSubjectsOptions {
   readonly subjectIds: readonly number[];
   readonly owner: SubjectReclamationPhysicalOwner;
   readonly store: Pick<TurnStore, 'getTurns' | 'getPendingTurns'>;
-  readonly appliedHistory: Pick<AppliedHistory, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
+  readonly appliedTurns: Pick<AppliedTurnProjection, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
 }
 
 export interface ReclaimAvailableSubjectsResult {
@@ -170,7 +170,7 @@ export function reclaimAvailableSubjects(
       subjectId,
       owner: options.owner,
       store: options.store,
-      appliedHistory: options.appliedHistory,
+      appliedTurns: options.appliedTurns,
     });
 
     if (result.ok) {
@@ -210,7 +210,7 @@ export function reclaimAvailableSubjects(
 export interface RunPhysicalMaintenanceOptions {
   readonly owner: SubjectReclamationPhysicalOwner;
   readonly store: Pick<TurnStore, 'getTurns' | 'getPendingTurns'>;
-  readonly appliedHistory: Pick<AppliedHistory, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
+  readonly appliedTurns: Pick<AppliedTurnProjection, 'getAppliedTurnIds' | 'getRedoTurnIds'>;
 }
 
 export interface RunPhysicalMaintenanceResult extends ReclaimAvailableSubjectsResult {
@@ -225,7 +225,7 @@ export function runPhysicalMaintenance(
     subjectIds: candidateSubjectIds,
     owner: options.owner,
     store: options.store,
-    appliedHistory: options.appliedHistory,
+    appliedTurns: options.appliedTurns,
   });
 
   return {

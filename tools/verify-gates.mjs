@@ -869,7 +869,7 @@ const GATES = [
     cmd: ['node', 'tools/check-spec-types.mjs'],
     slow: true,
     // The concrete escape this closes: `entityMap({ selectId, history })` in
-    // history-scoped-capture.spec.ts, where `history` had been renamed to
+    // restoration-scoped-capture.spec.ts, where `history` had been renamed to
     // `recordHistory` in 14.1.1. tsconfig.typecheck-all.json excludes
     // `**/*.spec.ts` and core's typecheck config covers only *.typing.spec.ts,
     // so nothing typechecked it; esbuild strips types without checking. Both
