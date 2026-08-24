@@ -25,6 +25,15 @@ export default defineConfig({
       '**/lib/typing.spec.ts',
       '**/*typing-chain.spec.ts',
       '**/*typing*.spec.ts',
+      // DIAG-JOURNAL-1 F6 measures a retention property observable only across
+      // a real garbage collection, so it needs `--expose-gc`. Handing the
+      // workers that flag via `poolOptions.forks.execArgv` was tried first and
+      // silently did nothing on vitest 4 — a config knob that quietly fails is
+      // the exact shape of defect this release keeps finding, so it is not
+      // used. The file runs as its own gate instead (`journal-retention` in
+      // tools/verify-gates.mjs) and FAILS rather than skipping without the
+      // flag: a skipped retention test reads as evidence in a green run.
+      '**/diag-journal-1-eviction.spec.ts',
     ],
     coverage: {
       provider: 'v8',
