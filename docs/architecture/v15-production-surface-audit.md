@@ -7016,6 +7016,143 @@ misattribution, and pass 1's `currentHydrateMode` claim now withdrawn by M6.
 5  RC / final closure
 ```
 
+# CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
+
+Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
+15.0.0-rc.1"*), frozen and immutable. B was conditional on the hardening work
+finding material production-facing changes. **That condition is met and the
+question is no longer whether B is needed — it is whether HEAD qualifies to BE
+it.** This is the evidence package.
+
+```text
+103 commits    377 files    21,690 insertions    25,935 deletions
+91 production source files    138 spec files    NET -4,245 lines
+```
+
+The candidate got SMALLER, which is the shape a hardening pass should have.
+
+## MATERIAL TO CONSUMER — public surface
+
+```text
+REMOVED   timeTravel()            -> restoration()
+          TimeTravelMethods       -> RestorationMethods
+          TimeTravelEntry         -> RestorationHistoryEntry
+          UpdateMetadata          -> WriteMetadata
+          @signaltree/core/security  subpath deleted
+          @signaltree/core/storage   subpath deleted
+          @signaltree/events angular subtree deleted
+          EditSession.getHistory()   -> getEditHistory()
+          getHistory()/resetHistory() -> getRestorationHistory()/
+                                         resetRestorationHistory()
+
+ADDED     undoable()   ⚠️ DID NOT EXIST IN A — grep count 0 in A's barrel
+          external()
+          restoration()
+```
+
+`undoable()` is the single largest consumer-facing difference, and it is not a
+rename: **A had no opt-in restoration door at all.**
+
+## MATERIAL TO CORRECTNESS — semantics that changed, not names
+
+```text
+A                                          HEAD
+---------------------------------------    -----------------------------------
+history admitted by DEFAULT, with          OPT-IN. `isTurnEligible = designated`.
+`recordHistory: false` / `shouldSkip`      Nothing enters restoration history
+opt-OUTS                                   without `undoable()`. (HIST-C2)
+
+TimeTravelMethods EXTENDS                  separated. The duplicate
+TransactionMethods — two `transaction()`   `timeTravel().transaction()` and its
+implementations on one surface             145-line rollback planner deleted
+                                           (TX-SURFACE-0)
+
+a restoration was indistinguishable        origin: 'restoration' propagates;
+from external truth at the observation     P0-C protects realizations; ST1034
+seam                                       refuses a divergent undo
+
+`stored().reload()` applied as AUTHORED    applied as external truth. Two defects
+work                                       fixed: an undo destroying durable
+                                           truth, a rollback reverting a reload
+                                           (PER-B)
+
+a devtools scrub was AUTHORED — it could   participation: 'inspection'. Excluded
+create rollback dependency evidence and    from dependency admission and
+VETO a business rollback                   contribution (DEVTOOLS-JUMP-0/0.1)
+
+TURN-FEED did not exist                    four-event lifecycle channel, owner-
+                                           installed, ST1036 on unresolvable
+                                           (TURN-FEED-0 / 0.2 / 0.2.1)
+
+source: 5-value union + an open            origin: 3 values, then 4 with
+`[key: string]: unknown` escape hatch      'transaction-rollback' earned by a
+                                           consumer. Hatch DELETED — it was what
+                                           let 24 stale reads compile.
+
+no external-truth ingress door             external() — origin external,
+                                           participation realized, ST1035 on an
+                                           async scope (A1)
+```
+
+## INTERNAL HARDENING ONLY
+
+```text
+causal-write-mode.ts        -> write-participation.ts
+time-travel/                -> restoration/
+StructuralHistoryEffect     -> StructuralEffect + StructuralEffectKind (a real
+                               aliasing defect, two concepts one name)
+AppliedHistory              -> AppliedTurnProjection (straddled two authorities)
+seven fabricated `origin: 'system'` publish sites   -> absence
+currentHydrateMode()        -> DELETED (computed a distinction no marker could
+                               act on)
+transactionIdentityKey(owner, id) -> (id), ordinal WeakMap deleted
+NEW: transaction-lifecycle.ts, diagnostic-journal.ts,
+     restoration-eligibility.ts, undoable.ts, external.ts
+```
+
+## DELETED RESIDUE
+
+```text
+mock `.with()` enhancer-safety suites   tested the test's own reimplementation
+WriteMetadata escape hatch + its only   a test asserting the hatch exists
+consumer
+form-history/, security-validator       dead subsystems
+three stale *HistoryEffect* names, one false authority name (EditSession)
+```
+
+## TEST / HARNESS ONLY
+
+```text
+138 spec files changed. New falsification suites: HIST-0, RESTORE-P0, HIST-C2,
+TX-SURFACE-0, TX-LEDGER, TURN-FEED-0/0.2, DEVTOOLS-JUMP-0/0.1, A1 ingress,
+DIAG-JOURNAL-1 (F1-F7), PER-B (P1-P12), MATRIX-CLOSE M6 + S3 recovery.
+Harness fixes: a noisy perf baseline, and the vitest retention gate (37th gate).
+```
+
+## DOC ONLY
+
+The audit itself, the errors catalogue (ST1033-ST1036), the naming grid, the
+DX-NAMES rejection ledger, and the withdrawn outside-check instrument.
+
+## VERDICT
+
+```text
+materially different?   YES — on every axis except doc-only, and the public
+                        surface alone would settle it
+qualifies as B?         YES, subject to the freeze verification below
+```
+
+**Candidate B = the revision frozen at the commit following this record.** A stays
+immutable at `a4c0b747`.
+
+## Why the freeze must precede TruckTrax pass 2
+
+TruckTrax audits a production consumer against a candidate that could actually
+ship. Run it against an unfrozen tree and later cleanup silently moves the thing
+it validated. MATRIX-CLOSE supplies the boundary: six proven survivors, two
+unjustified mechanisms deleted, residue removed or carried out explicitly, and
+the verification set green.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
