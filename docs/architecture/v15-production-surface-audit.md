@@ -1978,6 +1978,136 @@ Steps 3-5 remove machinery already proved unnecessary. **Step 6 is the only one
 expected to be surprising**, because it inverts the semantics under a large
 existing corpus rather than deleting something dead.
 
+# HIST-C2 step 6 — THE FLIP: stopped on a category-C finding
+
+One line changed, nothing else:
+
+```text
+isTurnEligible: config.restorationEligibility !== 'designated' || designated
+             -> config.restorationEligibility === 'all'        || designated
+```
+
+Result: **211 failures across 37 files**, out of 1803.
+
+## ⛔ CATEGORY C — transaction rollback uses the history log as its dependency ledger
+
+Found while classifying, and the pre-registered rule says stop rather than
+migrate. **The flip is reverted; the default is `'all'` again.**
+
+`packages/core/src/lib/internals/causal-runtime/pending-rollback.ts`:
+
+```ts
+function hasLaterStructuralDependency(pendingTurn, store) {
+  const laterTurns = [...store.getTurns(), ...store.getPendingTurns()]
+    .filter((turn) => turn.id > pendingTurn.id);
+  ...
+}
+```
+
+`store.getTurns()` is the **confirmed turn log** — the restoration history. It is
+consulted to decide whether rolling back a pending transaction is SAFE:
+
+```text
+transaction adds row 'a'          pending
+later authored write sets a.field depends on 'a' existing
+rollback                          MUST be refused (SignalTreeRollbackError)
+```
+
+Under opt-in, that later write is not `undoable()`, so it never becomes a
+confirmed turn, so the dependency is invisible and **the rollback proceeds**. The
+seven tests carrying this signature all stop throwing:
+
+```text
+rejects rollback when a later same-microtask update derives from pending state
+treats update then update in one later confirmed turn as derive for rollback
+rejects rollback of a pending add when later same-subject field set depends on it
+rejects rollback of a pending add when later same-subject field update depends on it
+rejects rollback of a pending remove when the restore key is occupied by a
+  different SubjectId
+rejects rollback of a pending rekey when later work touches the same structural
+  dimension
+fails atomically when rolling back a pending rekey would restore into an
+  occupied original key
+```
+
+A further cluster is the same mechanism seen from the positive side — *"rolls back
+a pending write while preserving a later unrelated confirmed write"* — which can
+only preserve later work it knows about.
+
+**This is exactly the failure class the flip was designed to expose.** The later
+write is not a user-restorable operation; nobody wants `undoable()` on it. But
+transaction *correctness* depends on the engine knowing it happened. History had
+become hidden infrastructure for causal dependency detection.
+
+Designating those writes to recover green would be the worst available outcome:
+it would make transaction safety depend on an application remembering to mark
+writes undoable, and would quietly restore the default-reversible world inside
+the very mechanism the flip was meant to separate.
+
+### What the fix has to be, stated but not yet derived
+
+The dependency ledger and the restoration history are two different things that
+happen to share a store today:
+
+```text
+RESTORATION HISTORY   which authored operations a user may reverse
+                      -> admission by undoable()
+
+CAUSAL DEPENDENCY     what happened after a pending turn, so rollback can tell
+LEDGER                whether reversing it is still safe
+                      -> admission by NOTHING; it must see every authored write
+```
+
+The second cannot be opt-in. That is not a weakening of HIST-C — it is the same
+distinction DIAG-JOURNAL already predicted for observability, arriving a layer
+lower and with a correctness consequence rather than a diagnostic one.
+
+## Classification, and an honest note on its completeness
+
+```text
+C   ~14   rollback / pending-dependency tests whose mechanism is the confirmed
+          turn log                                    ⛔ STOPPED HERE
+A   ~197  sampled across every one of the 37 files; every sample was an
+          old-default assumption
+U   0     nothing ambiguous encountered before stopping
+B   0     no product operation needed designation
+```
+
+The A count is **sampled, not individually adjudicated**. Every failing file was
+opened and at least one failure read; all of them were the same shape — a plain
+write expected to produce a history entry — but the remaining ~197 were not
+enumerated one by one, because the rule was to stop on C and because the C fix
+will change which of them still fail.
+
+Two sub-shapes worth separating when the migration does happen:
+
+```text
+A1  the test asserts the old DEFAULT — the expectation itself changes
+A2  the test's SUBJECT is restoration, and it must now designate the operation
+    it exercises. Adding undoable() here is the test expressing its own subject,
+    not migration-by-habit — but each one still needs its reason recorded.
+```
+
+## Findings that came free with the flip
+
+**A pinned defect is repaired by it.** `composed-acquisition.spec.ts` CASE 8
+pinned *"an untagged refresh BECOMES an undoable user turn"* — an A1-0 finding
+where server data arriving without realization classification entered the undo
+stack. Under opt-in it does not, because it was never designated. The flip fixes
+it rather than needing a guard.
+
+**No second admission concept exists.** `history-step-adapter.spec.ts` describes
+a *"seam that demarcates a user-recognizable undo step"*, which read like a rival
+to `undoable()`. It is `transactions()`: a GROUPING concept — several writes
+become one turn — orthogonal to whether that turn is admitted. The step-5
+invariant holds.
+
+## Also observed, not yet explained
+
+`tree-realization-adapter.spec.ts` failed 3 times in the full run and passed when
+run alone. Possible test-order coupling; recorded rather than diagnosed, since it
+may simply disappear once the C is resolved.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
