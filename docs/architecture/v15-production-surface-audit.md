@@ -8113,6 +8113,79 @@ containing `packages/*` + `/src` closed the block comment early. The self-test
 caught it via the gate runner, not the direct invocation — the direct run had
 happened before the comment was added.
 
+# NOTIFIER-SCOPE-0 — the impact audit, and it RECLASSIFIES the defect
+
+`packages/core/src/lib/notifier-scope-0-impact.spec.ts`, 3 pass + 2 KNOWN RED.
+
+The defect, found by A2-4's control arm: the path notifier coalesces pending
+entries by PATH STRING within a flush, with no tree qualification, on a
+process-global notifier that every consumer subscribes to with `'**'`.
+
+It was provisionally classified **release-significant, not release-blocking**,
+on the reading that it is an observation-seam problem. The audit was owed before
+RC. It was run, and that classification does not survive it.
+
+## Every wildcard consumer, classified
+
+```text
+devtools-impl.ts:1830     OBSERVATION ONLY — and it already guards with
+                          `isPathOwnedByTree(path)`
+diagnostic-journal.ts:117 OBSERVATION ONLY — S8 established it owns behaviour,
+                          not authority
+restoration.ts:2878       AUTHORITY — captures into restoration history AND
+                          maintains `externalTruthByPath`, the P0-C protection
+                          map, keyed by BARE PATH STRING
+transactions.ts:1154      AUTHORITY — captures the compensation record a
+                          rollback replays
+```
+
+`serialization.ts:1258` and `audit.ts:153` use `tree.subscribe()`, not the
+notifier, and are unaffected.
+
+## What the two AUTHORITY consumers actually do
+
+Two trees whose states share a top-level property name — `settings`, `items`,
+`loading`, `theme` — written in the SAME notifier flush:
+
+```text
+RESTORATION    b.undo() sets tree B to 'a0', which is TREE A's baseline.
+               Not a lost undo. A FOREIGN value applied to B's state as if B
+               had authored it.
+
+TRANSACTIONS   pa.rollback() leaves tree A at 'a1'. The rollback SILENTLY DOES
+               NOTHING, because tree B's same-path write coalesced over A's
+               capture. A transaction reporting success while its compensation
+               was dropped.
+```
+
+Both are pinned as `it.fails` so the suite stays green and the defect cannot be
+carried silently; fixing it must flip them to plain `it`.
+
+Three arms pass and bound the blast radius, which matters for the fix:
+
+```text
+one tree alone                         correct
+two trees, DIFFERENT paths             correct
+two trees, same path, DIFFERENT flushes correct — B's history does not capture
+                                        A's write, and B's state is untouched
+```
+
+So the trigger is specifically **same path string + same flush**, not merely
+coexistence.
+
+## Reclassification
+
+```text
+WAS   release-significant, not release-blocking
+IS    RELEASE-BLOCKING — silent state corruption in two AUTHORITY consumers,
+      on a collision (two trees, a shared top-level property name) that an
+      ordinary Angular app hits by accident
+```
+
+The provisional classification was made before anyone had asked what reaches
+the consumers, and it was reasonable on the information available. The
+measurement is what changed it, which is the whole reason the audit was owed.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
