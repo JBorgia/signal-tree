@@ -66,7 +66,7 @@ describe('TX-LEDGER-0 case 3: does a REALIZATION create a rollback dependency?',
     expect(kind).toBe('later-confirmed-dependency');
   });
 
-  it('⚠️ FINDING — a REALIZATION does NOT create a dependency; rollback discards it', async () => {
+  it('REPAIRED (C3) — a dependent REALIZATION now refuses the rollback', async () => {
     const tree = makeTree();
     await flush();
 
@@ -86,20 +86,17 @@ describe('TX-LEDGER-0 case 3: does a REALIZATION create a rollback dependency?',
       kind = refusalKind(error);
     }
 
-    // MEASURED: admission follows AUTHORSHIP. A realization creates no
-    // dependency, so the rollback proceeds and REMOVES the row the server had
-    // just written to.
+    // REPAIRED by TX-LEDGER C3. Admission now follows causal EFFECT rather than
+    // authorship: the realization depends on structure the rollback would
+    // invalidate, so the rollback is refused and the server's row survives.
     //
-    // This is the same family as RESTORE-P0 P0-C one layer over: a reversal
-    // discarding truth the reversing authority does not own. There it was undo
-    // overwriting a realization; here it is rollback deleting a row a server
-    // refresh had confirmed.
-    //
-    // Pinned as measured, and NOT repaired here — the disposition belongs with
-    // the ledger design, because it is precisely the question of whether ledger
-    // admission is by authorship or by causal effect.
-    expect(kind).toBe('did-not-refuse');
-    expect(tree.$.rows.ids()).toEqual([]);
+    // This closed the transaction-layer twin of RESTORE-P0 P0-C. There, undo
+    // overwrote a realization; here, rollback deleted a row a server refresh had
+    // confirmed. Same rule now applies to both: a reversal may not destroy a
+    // later consequence outside the reversing authority.
+    expect(kind).toBe('later-confirmed-dependency');
+    expect(tree.$.rows.ids()).toEqual(['a']);
+    expect(tree.$.rows.byId('a')?.()?.name).toBe('FromServer');
   });
 });
 

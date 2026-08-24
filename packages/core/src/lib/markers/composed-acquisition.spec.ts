@@ -207,7 +207,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     expect(tree.$.users.byId('a')?.()?.name).toBe('Server');
   });
 
-  it('CASE 9b — classified as a realization, rollback completes to the baseline', async () => {
+  it('CASE 9b — classified as a realization, rollback is now REFUSED (C3)', async () => {
     const tree = makeTransactionTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
@@ -221,14 +221,29 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     });
     await flush();
 
-    pending.rollback();
+    // ⚠️ POLICY CHANGED, deliberately, by TX-LEDGER C3.
+    //
+    // This case used to assert that rollback restores the pre-transaction
+    // baseline and the concurrent server value is LOST — recorded at the time as
+    // "a policy" and "a statable consequence of classification". C3 rejected
+    // that policy on the same grounds RESTORE-P0 P0-C rejected its undo twin: a
+    // reversal may not destroy a later causal consequence outside the reversing
+    // authority.
+    //
+    // So the classification still does the work A1-0 credited it with — an
+    // untagged refresh cannot be resolved at all — but the resolution is now
+    // REFUSAL rather than silent discard. The caller is told, and the server
+    // value stands.
+    let refused = false;
+    try {
+      pending.rollback();
+    } catch {
+      refused = true;
+    }
     await flush();
 
-    // Rollback restores the PRE-TRANSACTION baseline, so the concurrent server
-    // value is lost. That is a policy, and the point is that it is now a
-    // statable consequence of classification rather than an accident: untagged,
-    // the same sequence cannot be resolved at all.
-    expect(tree.$.users.byId('a')?.()?.name).toBe('Ada');
+    expect(refused).toBe(true);
+    expect(tree.$.users.byId('a')?.()?.name).toBe('Server');
   });
 
   it('case 10: destroying the tree does not require the acquirer to know', async () => {
