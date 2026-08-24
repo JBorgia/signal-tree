@@ -9439,9 +9439,13 @@ that inverts into the reason `link()` must be core.
 
 The composed candidate is the whole surface — `retrieve()`, `settled()`,
 `dispose()`. No `.subscribe()`, no `.then()`, no `afterGet`/`afterSet`, no
-lifecycle callbacks. It carries all ten preserved semantics and passes leaf
-acquire/echo/send, settlement safety, collection turns, disposal and the empty
-endpoint refusal.
+lifecycle callbacks.
+
+⚠️ It is written to the ten preserved semantics, and this file RE-PROVES several
+against the new composition — settlement safety, collection turn coalescing,
+owner isolation, reconciliation, acquisition/echo behaviour, disposal, empty
+endpoint. It is NOT a one-for-one replay of every LINK-0/1/2/RACE case; those
+results stand on their own files.
 
 ## Q2 — the exact private capability required
 
@@ -9499,9 +9503,12 @@ express it by composition. No such case is on record.
 leaves and branch accessors got one in OWNER-REPLAY-2, a marker-materialised
 collection node is neither. So `link(tree.$.data.rows, endpoint)` is refused.
 The PARENT BRANCH covers it, whose late read includes the collection's settled
-contents, so this costs a spelling rather than a capability. Whether a collection
-node SHOULD be directly linkable is an ownership-metadata question, recorded and
-not answered here.
+contents.
+
+⚠️ **I called that "a spelling, not a capability". That is NOT PROVEN.** For
+`{ data: { rows, selectedId, page } }`, linking `data` instead of `data.rows`
+changes both the VALUE SHAPE sent to Y and the SYNCHRONISATION SCOPE — unrelated
+siblings now drive the endpoint. See ENTITY-LINK-0.
 
 ## Q5 — evidence
 
@@ -9520,6 +9527,119 @@ check turned out to be redundant. The reconciliation loop's first iteration
 already compares current X against `knownY` and returns without sending, so
 echo suppression and the convergence test are the same question asked at
 different moments. One equality check, not two.
+
+# ENTITY-LINK-0 — the NULL is falsified. The exclusion is NOT "just a spelling"
+
+`packages/core/src/lib/entity-link-0.spec.ts`, 4/4.
+
+DEMARCATION-0 said excluding `entityMap` from linkable locations "costs a
+spelling rather than a capability". ⚠️ That was not proven, and it is wrong.
+
+```text
+collection carries a positionId allocated from the tree's registry   ✓
+collection carries its own ownerPath ("data.rows")                   ✓
+restoration reverses it as its OWN position, independently           ✓
+collection carries the REGISTRY back-reference                       ✗
+```
+
+So `entityMap` is ALREADY an independently addressable SignalTree position —
+the topology, restoration and the notifier all treat it as one. **The missing
+registry is an ownership hole broader than `link()`; link merely found it.** Same
+class as OWNER-REPLAY-2's authored-collection gap and the branch-accessor gap
+before it.
+
+And the substitute is not equivalent, measured on `{ rows, selectedId, page }`:
+
+```text
+link(tree.$.data, rowsEndpoint)
+  fires for `page` and `selectedId`, which have nothing to do with rows
+  sends { rows, selectedId, page } where the endpoint expects rows
+```
+
+Both SYNCHRONISATION SCOPE and VALUE SHAPE change.
+
+⚠️ The fix is NOT "add a registry to collections so link works" — that is the
+reasoning this audit refuses. The question is whether every addressable position
+should name its owner. Recorded for that decision, not taken here.
+
+# LINK-HANDLE-0 — `settled()` frozen, and the candidate shrank twice
+
+`packages/core/src/lib/link-handle-0.spec.ts`, 10/10.
+
+## 1 — the boundary is STRONG
+
+```text
+WEAK    resolves while an observation is HELD behind settlement. Measured: a
+        host awaiting it before backgrounding is told the link is caught up,
+        and the send happens after confirm.
+STRONG  waits through the held observation AND anything a completed send
+        enqueues behind it.
+```
+
+⚠️ **The first STRONG implementation was wrong, and mutation exposed it.** It
+polled a counter across `await flush()` — microtasks only — so a settlement
+arriving on a MACROTASK could never be observed and the loop hit its own guard.
+The baseline failed the moment the test confirmed via `setTimeout`. Each held
+observation now owns a promise the settlement authority resolves, so `settled()`
+waits on a SIGNAL rather than spinning.
+
+Honest limit, stated not hidden: if nothing ever settles the transaction,
+`settled()` waits forever — the same trade `persistence()` already documents for
+an unresolved optimistic mutation.
+
+## 2 — outbound failure REJECTS `settled()`
+
+A public link otherwise has no way to tell the application that Y refused the
+state, and `settled()` is where the application is already waiting. Verified: it
+rejects, the queue is NOT wedged (a later write still goes out), and the failure
+is reported ONCE rather than on every subsequent call.
+
+No retry, no backoff, no status, no `onTreeError`.
+
+## 3 — disposal
+
+```text
+outbound set IN FLIGHT      not cancelled; nothing new begins
+held observation released   does not send after disposal
+retrieve() in flight        result not applied
+settled() already waiting   RESOLVES rather than hanging
+```
+
+The last one needs disposal to resolve the waiters itself: a held observation's
+count never returns to zero on its own.
+
+## ⚠️ The candidate shrank twice, both times because mutation refused a clause
+
+```text
+`chain === before` re-check   SUBSUMED. Every appended send is preceded by a
+                              held observation, so the release-signal wait
+                              already carries the loop. Removing it failed
+                              nothing — including a test asserting how much work
+                              had finished AT the moment settled() resolved,
+                              which is the direct form of the question.
+`inFlightRetrievals` guard    UNTESTED, so removed rather than kept on faith.
+                              Whether settled() should also wait for an
+                              in-flight retrieve() is an OPEN CONTRACT QUESTION:
+                              retrieve() returns its own promise, so a caller
+                              can already await it.
+```
+
+Same pattern as DEMARCATION-0's redundant echo check. Final mutation state — every
+remaining clause discriminated:
+
+```text
+ignore held observations   1 of 10 fails
+swallow the failure        2 of 10 fail
+dispose leaves waiters     1 of 10 fails
+```
+
+## Test-design corrections made along the way
+
+Three arms passed for the wrong reason before being tightened: a SYNCHRONOUS
+endpoint let a send complete inside the microtask `await settled()` already
+yields; a microtask-fast `confirm()` never exercised the held-observation wait;
+and disposing while a send was in flight exited through the wrong branch. Each
+is noted at the arm it affected.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
