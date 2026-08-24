@@ -7,7 +7,7 @@ export type ConfirmedReversalPlanningResult =
   | { readonly ok: true; readonly plan: ConfirmedReversalPlan }
   | {
       readonly ok: false;
-      readonly refusal: Extract<Extract<ReversalResult, { readonly ok: false }>['refusal'], { kind: 'history-evicted' }>;
+      readonly refusal: Extract<Extract<ReversalResult, { readonly ok: false }>['refusal'], { kind: 'turn-evicted' }>;
     };
 
 export interface PlanConfirmedReversalOptions {
@@ -21,7 +21,7 @@ export function planConfirmedReversal(
 ): ConfirmedReversalPlanningResult {
   const turn = options.store.getTurn(options.turnId);
   if (!turn) {
-    return { ok: false, refusal: { kind: 'history-evicted' } };
+    return { ok: false, refusal: { kind: 'turn-evicted' } };
   }
 
   return {

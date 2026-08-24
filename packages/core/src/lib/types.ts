@@ -408,7 +408,7 @@ export interface TransactionMethods {
 /**
  * Time-travel capability.
  *
- * NOT generic in the state, and that is the point. `getHistory()` returns the
+ * NOT generic in the state, and that is the point. `getRestorationHistory()` returns the
  * history of the tree the methods are attached to, so the state is recovered
  * from polymorphic `this` — which is what the semantics always were. The
  * previous `RestorationMethods<T>` carried a second copy of the state type
@@ -423,7 +423,7 @@ export interface TransactionMethods {
  * That is invisible under `skipLibCheck` and a hard error without it. Inlining
  * makes the emitted signature self-contained without adding a public symbol.
  *
- * State inference is UNCHANGED for consumers: `getHistory()[0].state` is the
+ * State inference is UNCHANGED for consumers: `getRestorationHistory()[0].state` is the
  * exact concrete state, through arbitrarily long `.with()` chains.
  */
 /**
@@ -453,10 +453,10 @@ export interface RestorationMethods {
   redo(): void;
   canUndo(): boolean;
   canRedo(): boolean;
-  getHistory(): RestorationHistoryEntry<
+  getRestorationHistory(): RestorationHistoryEntry<
     this extends NodeAccessor<infer S> ? S : never
   >[];
-  resetHistory(): void;
+  resetRestorationHistory(): void;
   jumpTo(index: number): void;
   getCurrentIndex(): number;
   // `pauseRecording()` / `resumeRecording()` / `isRecordingPaused()` were
@@ -478,9 +478,9 @@ export interface RestorationMethods {
     canRedo(): boolean;
     // `unknown`: this is an inline property type, so `this` is the enclosing
     // interface rather than the tree. Internal tooling surface — state
-    // precision belongs on the public getHistory().
-    getHistory(): RestorationHistoryEntry<unknown>[];
-    resetHistory(): void;
+    // precision belongs on the public getRestorationHistory().
+    getRestorationHistory(): RestorationHistoryEntry<unknown>[];
+    resetRestorationHistory(): void;
     jumpTo(index: number): void;
     getCurrentIndex(): number;
   };

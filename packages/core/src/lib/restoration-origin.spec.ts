@@ -109,12 +109,12 @@ describe('restoration origin: the five falsifiers', () => {
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
-    const afterAuthored = tree.getHistory().length;
+    const afterAuthored = tree.getRestorationHistory().length;
 
     tree.undo();
     await flush();
 
-    expect(tree.getHistory().length).toBe(afterAuthored);
+    expect(tree.getRestorationHistory().length).toBe(afterAuthored);
     expect(tree.$.n()).toBe(0);
   });
 

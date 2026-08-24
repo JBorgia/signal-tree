@@ -603,10 +603,10 @@ export interface RestorationMethods<T> {
   canRedo(): boolean;
 
   /** Get all history entries */
-  getHistory(): RestorationHistoryEntry<T>[];
+  getRestorationHistory(): RestorationHistoryEntry<T>[];
 
   /** Clear all history */
-  resetHistory(): void;
+  resetRestorationHistory(): void;
 
   /** Jump to a specific history index */
   jumpTo(index: number): void;
@@ -1529,8 +1529,8 @@ const ENHANCER_METHOD_MAP: Record<string, { enhancer: string; preset: string }> 
   redo: { enhancer: 'withTimeTravel()', preset: 'createDevTree' },
   canUndo: { enhancer: 'withTimeTravel()', preset: 'createDevTree' },
   canRedo: { enhancer: 'withTimeTravel()', preset: 'createDevTree' },
-  getHistory: { enhancer: 'withTimeTravel()', preset: 'createDevTree' },
-  resetHistory: { enhancer: 'withTimeTravel()', preset: 'createDevTree' },
+  getRestorationHistory: { enhancer: 'withTimeTravel()', preset: 'createDevTree' },
+  resetRestorationHistory: { enhancer: 'withTimeTravel()', preset: 'createDevTree' },
   jumpTo: { enhancer: 'withTimeTravel()', preset: 'createDevTree' },
   getCurrentIndex: { enhancer: 'withTimeTravel()', preset: 'createDevTree' },
 
@@ -2372,9 +2372,9 @@ export interface RestorationConfig {
  * This enhancer provides:
  * - `undo()` / `redo()`: Navigate history
  * - `canUndo()` / `canRedo()`: Check availability
- * - `getHistory()`: Get all history entries
+ * - `getRestorationHistory()`: Get all history entries
  * - `jumpTo(index)`: Jump to specific point
- * - `resetHistory()`: Clear history
+ * - `resetRestorationHistory()`: Clear history
  * - `getCurrentIndex()`: Get current position
  *
  * @example
@@ -2388,7 +2388,7 @@ export interface RestorationConfig {
  * tree.undo();    // text = 'Hello'
  * tree.redo();    // text = 'Hello World'
  *
- * tree.getHistory().length; // 3 (init + 2 changes)
+ * tree.getRestorationHistory().length; // 3 (init + 2 changes)
  * tree.jumpTo(0); // text = '' (back to initial)
  * ```
  */
@@ -2508,7 +2508,7 @@ export function withTimeTravel<T>(config: RestorationConfig = {}): Enhancer<Rest
         return currentIndex < history.length - 1;
       },
 
-      getHistory() {
+      getRestorationHistory() {
         // Return copy to prevent external mutation
         return history.map((entry) => ({
           ...entry,
@@ -2516,7 +2516,7 @@ export function withTimeTravel<T>(config: RestorationConfig = {}): Enhancer<Rest
         }));
       },
 
-      resetHistory() {
+      resetRestorationHistory() {
         history.length = 0;
         currentIndex = -1;
         recordChange('@@RESET');
@@ -2554,7 +2554,7 @@ export function withTimeTravel<T>(config: RestorationConfig = {}): Enhancer<Rest
 
   enhancerFn.metadata = {
     name: 'timeTravel',
-    provides: ['undo', 'redo', 'canUndo', 'canRedo', 'getHistory', 'resetHistory', 'jumpTo', 'getCurrentIndex'],
+    provides: ['undo', 'redo', 'canUndo', 'canRedo', 'getRestorationHistory', 'resetRestorationHistory', 'jumpTo', 'getCurrentIndex'],
   };
 
   return enhancerFn;

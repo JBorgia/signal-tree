@@ -5,7 +5,7 @@
  *   node tools/verify-history-defects.mjs
  *
  * Every check performs writes, lets the microtask queue drain, then calls
- * undo() and inspects the state. Reading getHistory().length or canUndo()
+ * undo() and inspects the state. Reading getRestorationHistory().length or canUndo()
  * without a following undo() is NOT evidence — that is how the original
  * time-travel audit mis-scored itself (see docs/audits/2026-08/).
  *

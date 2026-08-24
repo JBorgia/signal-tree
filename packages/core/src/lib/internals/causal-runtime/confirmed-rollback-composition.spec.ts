@@ -1,5 +1,5 @@
 import type { PositionId, ReversalEffect } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { redoConfirmedAt } from './confirmed-redo';
 import { undoConfirmedAt } from './confirmed-undo';
 import { createPositionRegistry } from '../position-registry';
@@ -22,18 +22,18 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
     expect(firstName).toBe(P_FIRST_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     const t2 = store.admitConfirmed({
       id: 2,
       effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
     });
-    expect(appliedHistory.admitConfirmed(t2.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(t2.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([[P_FIRST_NAME, 'C']]);
     const appliedEffects: ReversalEffect[][] = [];
@@ -59,7 +59,7 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -85,7 +85,7 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
       redoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -119,11 +119,11 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
     expect(firstName).toBe(P_FIRST_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     const t2 = store.admitConfirmed({
@@ -133,7 +133,7 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
         { owner: P_FIRST_NAME, before: 'C', after: 'D' },
       ],
     });
-    expect(appliedHistory.admitConfirmed(t2.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(t2.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([[P_FIRST_NAME, 'D']]);
     const appliedEffects: ReversalEffect[][] = [];
@@ -159,7 +159,7 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -184,7 +184,7 @@ describe('confirmed undo/redo after rejected speculative causality', () => {
       redoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,

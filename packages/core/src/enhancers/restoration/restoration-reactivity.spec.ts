@@ -6,7 +6,7 @@ import { signalTree } from '../../lib/signal-tree';
 import { timeTravel } from './restoration';
 
 /**
- * `canUndo()`, `canRedo()` and `getHistory()` are REACTIVE.
+ * `canUndo()`, `canRedo()` and `getRestorationHistory()` are REACTIVE.
  *
  * They read a plain number and a plain array before this. Called imperatively
  * they were always correct, which is why it survived — and a
@@ -132,13 +132,13 @@ describe('canRedo tracks BOTH the position and the history length', () => {
   });
 });
 
-describe('getHistory is reactive', () => {
+describe('getRestorationHistory is reactive', () => {
   it('a computed over its length sees entries appear', async () => {
     const tree = signalTree(
       { n: 0 },
       { enhancers: [timeTravel({ maxHistorySize: 10 })] }
     );
-    const length = computed(() => tree.getHistory().length);
+    const length = computed(() => tree.getRestorationHistory().length);
     const before = length();
 
     undoable(() => tree.$.n.set(1));
@@ -147,19 +147,19 @@ describe('getHistory is reactive', () => {
     expect(length()).toBe(before + 1);
   });
 
-  it('resetHistory is observed', async () => {
+  it('resetRestorationHistory is observed', async () => {
     const tree = signalTree(
       { n: 0 },
       { enhancers: [timeTravel({ maxHistorySize: 10 })] }
     );
-    const length = computed(() => tree.getHistory().length);
+    const length = computed(() => tree.getRestorationHistory().length);
     undoable(() => tree.$.n.set(1));
     await flush();
     undoable(() => tree.$.n.set(2));
     await flush();
     expect(length()).toBeGreaterThan(1);
 
-    tree.resetHistory();
+    tree.resetRestorationHistory();
     await flush();
 
     expect(length()).toBe(1);
@@ -194,7 +194,7 @@ describe('the imperative API is unchanged', () => {
       undoable(() => tree.$.n.set(i));
       await flush();
     }
-    expect(tree.getHistory().length).toBeLessThanOrEqual(3);
-    expect(tree.getCurrentIndex()).toBe(tree.getHistory().length - 1);
+    expect(tree.getRestorationHistory().length).toBeLessThanOrEqual(3);
+    expect(tree.getCurrentIndex()).toBe(tree.getRestorationHistory().length - 1);
   });
 });

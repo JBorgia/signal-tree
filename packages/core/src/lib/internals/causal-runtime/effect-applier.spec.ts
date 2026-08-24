@@ -1,5 +1,5 @@
 import type { PositionId } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { applyReversalPlan } from './effect-applier';
 import { planConfirmedReversal } from './reversal-planner';
 import { TurnStore } from './turn-store';
@@ -68,7 +68,7 @@ describe('applyReversalPlan', () => {
 
   it('propagates atomic application failure without mutating canonical or applied bookkeeping state', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -80,7 +80,7 @@ describe('applyReversalPlan', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
 
     const planResult = planConfirmedReversal({ turnId: 1, store });
     expect(planResult.ok).toBe(true);
@@ -89,7 +89,7 @@ describe('applyReversalPlan', () => {
     }
 
     const storeBefore = store.inspect();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const failure = new Error('silent application failed');
 
     expect(() =>
@@ -104,7 +104,7 @@ describe('applyReversalPlan', () => {
     ).toThrow(failure);
 
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('does not require access to turn storage or applied history to apply a plan', () => {

@@ -32,7 +32,7 @@ describe('time-travel behavior', () => {
     expect(enhanced.$.count()).toBe(0);
 
     // ensure history is present and jump back to latest entry
-    const history = enhanced.getHistory();
+    const history = enhanced.getRestorationHistory();
     expect(history.length).toBeGreaterThanOrEqual(3);
     enhanced.jumpTo(history.length - 1);
     expect(enhanced.getCurrentIndex()).toBe(history.length - 1);

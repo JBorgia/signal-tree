@@ -353,7 +353,7 @@ describe('a forgotten lifetime stays forgotten', () => {
     const bare = signalTree({
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
     }) as unknown as Record<string, unknown>;
-    for (const surface of ['undo', 'redo', 'jumpTo', 'transaction', 'getHistory']) {
+    for (const surface of ['undo', 'redo', 'jumpTo', 'transaction', 'getRestorationHistory']) {
       expect(bare[surface]).toBeUndefined();
     }
   });

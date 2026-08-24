@@ -1801,7 +1801,7 @@ function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
   //
   // signalTree() now applies enhancers to the base tree BEFORE wrapping it, so
   // by the time the builder is created the tree already carries undo(),
-  // getHistory(), transaction() and whatever else was configured. The chained
+  // getRestorationHistory(), transaction() and whatever else was configured. The chained
   // `.with()` used to copy these across one enhancer at a time; the copy has to
   // happen here instead, or the methods exist on the tree and are invisible on
   // the object the caller holds.

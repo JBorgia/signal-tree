@@ -358,7 +358,7 @@ describe('multi-collection subject id collision', () => {
       await tick();
 
       const claims = getSubjectRestorationClaims(tree);
-      const history = tree.getHistory() as Array<{
+      const history = tree.getRestorationHistory() as Array<{
         restorationSubjectIds?: number[];
       }>;
       const expected = [

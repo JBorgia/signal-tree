@@ -16,7 +16,7 @@ transactional.canUndo();
 // @ts-expect-error transactions-only trees must not expose temporal methods
 transactional.canRedo();
 // @ts-expect-error transactions-only trees must not expose temporal methods
-transactional.getHistory();
+transactional.getRestorationHistory();
 // @ts-expect-error transactions-only trees must not expose temporal methods
 transactional.jumpTo(0);
 // @ts-expect-error transactions-only trees must not expose temporal methods

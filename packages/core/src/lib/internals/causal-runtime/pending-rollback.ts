@@ -11,7 +11,7 @@ import type {
 export type RollbackPendingResult = ReversalResult<
   | { readonly kind: 'outside-boundary' }
   | { readonly kind: 'dependency-conflict' }
-  | { readonly kind: 'history-evicted' }
+  | { readonly kind: 'turn-evicted' }
   | { readonly kind: 'structural-drift' }
 >;
 
@@ -46,7 +46,7 @@ export function rollbackPendingTurnAt(
 ): RollbackPendingResult {
   const turn = options.store.getPendingTurn(options.turnId);
   if (!turn) {
-    return { ok: false, refusal: { kind: 'history-evicted' } };
+    return { ok: false, refusal: { kind: 'turn-evicted' } };
   }
 
   if (
@@ -333,11 +333,11 @@ function deriveCompensationStructuralEffect(
 function mapDiscardFailure(
   result: Extract<PreparePendingTurnDiscardResult, { readonly ok: false }>
 ): RollbackPendingResult {
-  if (result.reason === 'history-evicted') {
-    return { ok: false, refusal: { kind: 'history-evicted' } };
+  if (result.reason === 'turn-evicted') {
+    return { ok: false, refusal: { kind: 'turn-evicted' } };
   }
 
-  return { ok: false, refusal: { kind: 'history-evicted' } };
+  return { ok: false, refusal: { kind: 'turn-evicted' } };
 }
 
 function normalizeError(error: unknown): Error {

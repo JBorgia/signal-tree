@@ -1,5 +1,5 @@
 import type { PositionId, ReversalEffect } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { rollbackPendingTurnAt } from './pending-rollback';
 import { createPositionRegistry } from '../position-registry';
 import { createRealizationContextSource } from './realization-context';
@@ -30,14 +30,14 @@ describe('structural pending rollback production composition', () => {
     expect(driverName).toBe(P_DRIVER_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, 'A'],
         [P_DRIVER_NAME, 'Alice'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -62,7 +62,7 @@ describe('structural pending rollback production composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'B'],
@@ -139,7 +139,7 @@ describe('structural pending rollback production composition', () => {
       participants: [P_DRIVER_NAME],
       state: 'confirmed',
     });
-    expect(appliedHistory.inspect()).toEqual({
+    expect(appliedTurns.inspect()).toEqual({
       appliedTurnIds: [2],
       redoTurnIds: [],
       frontiers: {
@@ -159,11 +159,11 @@ describe('structural pending rollback production composition', () => {
     expect(driverKey).toBe(P_DRIVER_KEY);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_DRIVER_KEY, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -189,11 +189,11 @@ describe('structural pending rollback production composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const values = new Map<PositionId, unknown>([[P_DRIVER_KEY, 'C']]);
     const applyAtomically = vi.fn((effects: readonly ReversalEffect[]) => {
       for (const effect of effects) {
@@ -216,7 +216,7 @@ describe('structural pending rollback production composition', () => {
     expect(values.get(P_DRIVER_KEY)).toBe('C');
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('rolls back a pending add as one structural remove while preserving unrelated surviving work', () => {
@@ -236,11 +236,11 @@ describe('structural pending rollback production composition', () => {
     expect(theme).toBe(P_THEME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'light']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -258,7 +258,7 @@ describe('structural pending rollback production composition', () => {
       id: 2,
       effects: [{ owner: P_THEME, before: 'light', after: 'dark' }],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'A'],
@@ -322,7 +322,7 @@ describe('structural pending rollback production composition', () => {
     expect(values.get(P_DRIVER_KEY)).toBeUndefined();
     expect(values.get(P_THEME)).toBe('dark');
     expect(store.hasPendingTurn(pending.id)).toBe(false);
-    expect(appliedHistory.inspect()).toEqual({
+    expect(appliedTurns.inspect()).toEqual({
       appliedTurnIds: [2],
       redoTurnIds: [],
       frontiers: {
@@ -344,10 +344,10 @@ describe('structural pending rollback production composition', () => {
     expect(driverName).toBe(P_DRIVER_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -445,11 +445,11 @@ describe('structural pending rollback production composition', () => {
     expect(driverKey).toBe(P_DRIVER_KEY);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_DRIVER_KEY, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -475,11 +475,11 @@ describe('structural pending rollback production composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const values = new Map<PositionId, unknown>([[P_DRIVER_KEY, 'B']]);
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
 
@@ -498,7 +498,7 @@ describe('structural pending rollback production composition', () => {
     expect(values.get(P_DRIVER_KEY)).toBe('B');
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('refuses pending remove rollback with structural-drift when uncaptured external occupancy blocks the planned restore', () => {
@@ -514,14 +514,14 @@ describe('structural pending rollback production composition', () => {
     expect(driverName).toBe(P_DRIVER_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, 'A'],
         [P_DRIVER_NAME, 'Alice'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -544,7 +544,7 @@ describe('structural pending rollback production composition', () => {
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'U'],
       [P_DRIVER_NAME, 'Uma'],
@@ -579,7 +579,7 @@ describe('structural pending rollback production composition', () => {
             [P_DRIVER_NAME, 'Alice'],
           ]),
           store,
-          appliedHistory,
+          appliedTurns,
         }),
       })
     ).toEqual({ ok: false, refusal: { kind: 'structural-drift' } });
@@ -589,7 +589,7 @@ describe('structural pending rollback production composition', () => {
     expect(values.get(P_DRIVER_NAME)).toBe('Uma');
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('refuses pending remove rollback with dependency-conflict when later captured add by a different subject occupies the released location', () => {
@@ -605,14 +605,14 @@ describe('structural pending rollback production composition', () => {
     expect(driverName).toBe(P_DRIVER_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, 'A'],
         [P_DRIVER_NAME, 'Alice'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -644,11 +644,11 @@ describe('structural pending rollback production composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const validateEffects = vi.fn();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
 
@@ -670,7 +670,7 @@ describe('structural pending rollback production composition', () => {
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('refuses pending rekey rollback with dependency-conflict when later captured add by a different subject occupies the released location', () => {
@@ -684,11 +684,11 @@ describe('structural pending rollback production composition', () => {
     expect(driverKey).toBe(P_DRIVER_KEY);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_DRIVER_KEY, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -717,7 +717,7 @@ describe('structural pending rollback production composition', () => {
 
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const validateEffects = vi.fn();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
 
@@ -739,6 +739,6 @@ describe('structural pending rollback production composition', () => {
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
     expect(store.getPendingTurnIds()).toEqual(pendingBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 });

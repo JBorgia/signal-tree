@@ -1,5 +1,5 @@
 import type { PositionId } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { TurnStore } from './turn-store';
 
 const P_FIRST_NAME = 3 as PositionId;
@@ -7,10 +7,10 @@ const P_LAST_NAME = 4 as PositionId;
 const P_THEME = 6 as PositionId;
 const P_NOTIFICATIONS = 9 as PositionId;
 
-describe('AppliedHistory', () => {
+describe('AppliedTurnProjection', () => {
   it('refuses admitting a pending turn into the confirmed applied projection', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     const pending = store.admitPending({
       id: 1,
@@ -21,7 +21,7 @@ describe('AppliedHistory', () => {
     expect(store.getPendingTurn(pending.id)).toEqual(pending);
     expect(history.admitConfirmed(pending.id)).toEqual({
       ok: false,
-      reason: 'history-evicted',
+      reason: 'turn-evicted',
     });
     expect(history.inspect()).toEqual({
       appliedTurnIds: [],
@@ -32,7 +32,7 @@ describe('AppliedHistory', () => {
 
   it('distinguishes canonical confirmed history from current applied history after undo bookkeeping', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -70,7 +70,7 @@ describe('AppliedHistory', () => {
 
   it('clears whole-turn redo state when a new confirmed turn is admitted after undo bookkeeping', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -109,7 +109,7 @@ describe('AppliedHistory', () => {
 
   it('refuses removing a confirmed turn that is not the applied frontier for its participant', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -134,7 +134,7 @@ describe('AppliedHistory', () => {
 
   it('allows a disjoint earlier turn to move to redo while an unrelated later turn stays applied', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -163,7 +163,7 @@ describe('AppliedHistory', () => {
 
   it('keeps a disjoint redoable turn when a new confirmed turn lands on an unrelated position', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -196,7 +196,7 @@ describe('AppliedHistory', () => {
 
   it('invalidates an unapplied overlapping turn atomically when a participant takes a new branch', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -226,7 +226,7 @@ describe('AppliedHistory', () => {
 
   it('reapplies a disjoint earlier turn at canonical position instead of appending it after later applied work', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -254,7 +254,7 @@ describe('AppliedHistory', () => {
 
   it('enforces same-position prefix progression for redo and allows the later turn only after the predecessor is reapplied', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,
@@ -296,7 +296,7 @@ describe('AppliedHistory', () => {
 
   it('refuses cross-position reapply atomically when one participant is not ready for that confirmed prefix', () => {
     const store = new TurnStore();
-    const history = new AppliedHistory(store);
+    const history = new AppliedTurnProjection(store);
 
     store.admitConfirmed({
       id: 1,

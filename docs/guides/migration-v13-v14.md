@@ -180,7 +180,7 @@ onTreeError((e) => Sentry.captureException(e.error, { extra: e }));
 > among them. That example used to appear in the list above and was removed from
 > it, because it no longer exists.
 
-`canUndo()`, `canRedo()` and `getHistory()` are now **reactive**. If you worked
+`canUndo()`, `canRedo()` and `getRestorationHistory()` are now **reactive**. If you worked
 around this in 13.x by polling or by forcing change detection, you can stop:
 
 ```ts

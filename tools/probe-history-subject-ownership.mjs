@@ -96,7 +96,7 @@ if (pointFlag !== -1) {
   const physicallyRetained = rows.__listSubjectReclamationCandidates();
   const physicalSet = new Set(physicallyRetained);
 
-  const history = tree.getHistory();
+  const history = tree.getRestorationHistory();
   const claimedByHistory = new Set();
   for (const entry of history) {
     for (const subjectId of entry.restorationSubjectIds ?? []) {

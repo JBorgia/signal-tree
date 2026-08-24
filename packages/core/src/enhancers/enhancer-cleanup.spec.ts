@@ -90,11 +90,11 @@ describe('enhancer cleanup registration', () => {
 
     undoable(() => tree.$.count.set(1));
     await flush();
-    expect(tree.getHistory().length).toBeGreaterThan(1);
+    expect(tree.getRestorationHistory().length).toBeGreaterThan(1);
 
     tree.destroy();
 
-    expect(tree.getHistory().length).toBeLessThanOrEqual(1);
+    expect(tree.getRestorationHistory().length).toBeLessThanOrEqual(1);
   });
 
   it('devTools registers cleanup (enabled=false)', () => {
@@ -141,7 +141,7 @@ describe('destroy() clears enhancer resources', () => {
 
     // After destroy, history should be reset
     // The reset adds 1 initial entry
-    const history = enhanced.getHistory?.();
+    const history = enhanced.getRestorationHistory?.();
     if (history) {
       expect(history.length).toBeLessThanOrEqual(1);
     }

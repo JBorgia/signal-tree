@@ -31,7 +31,7 @@ const flush = async () => {
 /**
  * Typed builders rather than one generic helper with `as never`. An earlier
  * spec in this audit used `as never` on the enhancer array and it silently
- * erased the enhancer type additions — `getHistory`/`undo` vanished from the
+ * erased the enhancer type additions — `getRestorationHistory`/`undo` vanished from the
  * result type and `check-spec-types` caught it. Spelling each tree out keeps
  * the enhancer methods on the inferred type.
  */
@@ -54,8 +54,8 @@ const makeRowsTree = () =>
   );
 
 /** History length excluding the INIT baseline, which is not an authored turn. */
-const turns = (tree: { getHistory(): readonly unknown[] }) =>
-  tree.getHistory().length - 1;
+const turns = (tree: { getRestorationHistory(): readonly unknown[] }) =>
+  tree.getRestorationHistory().length - 1;
 
 describe('HIST-C2 door: turn-level eligibility', () => {
   it('1. an ordinary UNMARKED write records nothing', async () => {

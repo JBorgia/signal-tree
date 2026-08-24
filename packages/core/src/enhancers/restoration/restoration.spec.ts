@@ -85,7 +85,7 @@ describe('time-travel enhancer', () => {
     // Allow microtask flush
     await Promise.resolve();
 
-    const history = t.getHistory();
+    const history = t.getRestorationHistory();
     // INIT + 1 batch
     expect(history.length).toBeGreaterThanOrEqual(2);
     // Ensure the last entry reflects the latest value (not every PathNotifier will change tree, but timeTravel should snapshot tree())
@@ -102,14 +102,14 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    const initial = t.getHistory().length;
+    const initial = t.getRestorationHistory().length;
 
     undoable(() => (store as any).$.count.set(5));
 
     await Promise.resolve();
     await Promise.resolve();
 
-    const history = t.getHistory();
+    const history = t.getRestorationHistory();
     expect(history.length).toBeGreaterThan(initial);
     expect(history[history.length - 1].state).toEqual({ count: 5 });
   });
@@ -123,14 +123,14 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    const initial = t.getHistory().length;
+    const initial = t.getRestorationHistory().length;
 
     undoable(() => (store as any).$.user.profile.name.set('Grace'));
 
     await Promise.resolve();
     await Promise.resolve();
 
-    const history = t.getHistory();
+    const history = t.getRestorationHistory();
     expect(history.length).toBeGreaterThan(initial);
     expect(history[history.length - 1].state).toEqual({
       user: { profile: { name: 'Grace' } },
@@ -159,9 +159,9 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
     const baseline = t.getTurns().length;
-    const baselineHistory = t.getHistory().length;
+    const baselineHistory = t.getRestorationHistory().length;
 
     const pending = store.transaction(() => {
       undoable(() => store.$.drivers.addOne({ id: 7, status: 'assigned' }));
@@ -173,7 +173,7 @@ describe('time-travel enhancer', () => {
     expect(store.$.trucks.all()).toEqual([{ id: 12, driverId: 7 }]);
     expect(store.$.orders.all()).toEqual([{ id: 99, status: 'dispatched' }]);
     expect(store.canUndo()).toBe(false);
-    expect(t.getHistory()).toHaveLength(baselineHistory);
+    expect(t.getRestorationHistory()).toHaveLength(baselineHistory);
     expect(t.getTurns()).toHaveLength(baseline + 1);
 
     const pendingTurn = t.getTurns().at(-1) as {
@@ -187,7 +187,7 @@ describe('time-travel enhancer', () => {
     const turns = t.getTurns();
     expect(turns).toHaveLength(baseline + 1);
     expect(store.canUndo()).toBe(true);
-    expect(t.getHistory()).toHaveLength(baselineHistory + 1);
+    expect(t.getRestorationHistory()).toHaveLength(baselineHistory + 1);
     const confirmedTurn = turns.at(-1) as {
       id: number;
       state: {
@@ -224,9 +224,9 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
     const baseline = t.getTurns().length;
-    const baselineHistory = t.getHistory().length;
+    const baselineHistory = t.getRestorationHistory().length;
 
     const pending = store.transaction(() => {
       undoable(() => store.$.inside.set('grouped'));
@@ -240,7 +240,7 @@ describe('time-travel enhancer', () => {
 
     expect(store()).toEqual({ inside: '', outside: '' });
     expect(store.canUndo()).toBe(false);
-    expect(t.getHistory()).toHaveLength(baselineHistory);
+    expect(t.getRestorationHistory()).toHaveLength(baselineHistory);
     expect(t.getTurns()).toHaveLength(baseline);
   });
 
@@ -256,9 +256,9 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
     const baseline = t.getTurns().length;
-    const baselineHistory = t.getHistory().length;
+    const baselineHistory = t.getRestorationHistory().length;
 
     const pending = store.transaction(() => {
       undoable(() => store.$.inside.set('grouped'));
@@ -271,14 +271,14 @@ describe('time-travel enhancer', () => {
 
     expect(store()).toEqual({ inside: 'grouped', outside: 'later' });
     expect(store.canUndo()).toBe(true);
-    expect(t.getHistory()).toHaveLength(baselineHistory + 1);
+    expect(t.getRestorationHistory()).toHaveLength(baselineHistory + 1);
     expect(t.getTurns()).toHaveLength(baseline + 2);
 
     pending.confirm();
 
     const turns = t.getTurns();
     expect(turns).toHaveLength(baseline + 2);
-    expect(t.getHistory()).toHaveLength(baselineHistory + 2);
+    expect(t.getRestorationHistory()).toHaveLength(baselineHistory + 2);
     const pendingTurn = turns.at(-2) as {
       id: number;
       state: { inside: string; outside: string };
@@ -323,7 +323,7 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
     const baseline = t.getTurns().length;
     const realizationPort = getTreeRealizationPort(store.$);
     if (!realizationPort) {
@@ -355,7 +355,7 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.x.set('pending'));
@@ -467,7 +467,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     expect(store()).toEqual({ x: 'C' });
-    expect(t.getHistory()).toHaveLength(2);
+    expect(t.getRestorationHistory()).toHaveLength(2);
     expect(t.getTurns()).toHaveLength(3);
 
     pending.rollback();
@@ -494,7 +494,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     expect(store()).toEqual({ x: 25 });
-    expect(t.getHistory()).toHaveLength(2);
+    expect(t.getRestorationHistory()).toHaveLength(2);
     expect(t.getTurns()).toHaveLength(3);
     expect(t.getTurnStatus(t.getTurns().at(-2)?.id)).toBe('pending');
     expect(t.getTurnStatus(t.getTurns().at(-1)?.id)).toBe('applied');
@@ -684,7 +684,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 18, name: 'existing' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.addOne({ id: 17, name: 'pending' }));
@@ -779,7 +779,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 18, name: 'C' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const originalSubject = (store.$.rows.byIdOrFail(17).name as any)
       .__subjectIds?.[0] as number;
@@ -819,7 +819,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 17, name: 'pending-remove' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.removeOne(17));
@@ -853,7 +853,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 17, name: 'original' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.removeOne(17));
@@ -895,7 +895,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 18, name: 'other' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const originalSubject = (store.$.rows.byIdOrFail(7).name as any)
       .__subjectIds?.[0] as number;
@@ -933,9 +933,9 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
     const baseline = t.getTurns().length;
-    const baselineHistory = t.getHistory().length;
+    const baselineHistory = t.getRestorationHistory().length;
 
     undoable(() => store.$.status.set('queued-before'));
 
@@ -947,7 +947,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(t.getHistory()).toHaveLength(baselineHistory + 2);
+    expect(t.getRestorationHistory()).toHaveLength(baselineHistory + 2);
 
     pending.confirm();
 
@@ -1009,9 +1009,9 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel(), transactions()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
     const baseline = t.getTurns().length;
-    const baselineHistory = t.getHistory().length;
+    const baselineHistory = t.getRestorationHistory().length;
 
     undoable(() => store.$.a.set(1));
 
@@ -1026,7 +1026,7 @@ describe('time-travel enhancer', () => {
       a: 1,
       rows: { all: [] },
     });
-    expect(t.getHistory()).toHaveLength(baselineHistory + 1);
+    expect(t.getRestorationHistory()).toHaveLength(baselineHistory + 1);
     expect(t.getTurns()).toHaveLength(baseline + 1);
 
     const survivingTurn = t.getTurns().at(-1) as {
@@ -1054,7 +1054,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.changeId(7, 42));
@@ -1094,7 +1094,7 @@ describe('time-travel enhancer', () => {
       };
       transaction(fn: () => void): { confirm(): void; rollback(): void };
       __restoration: {
-        resetHistory(): void;
+        resetRestorationHistory(): void;
         getTurns(): Array<{ id: number; __effects?: Array<{ kind: string }> }>;
       };
     };
@@ -1104,7 +1104,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     const t = store.__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     store.transaction(() => {
       undoable(() => store.$.rows.changeId(7, 42));
@@ -1153,8 +1153,8 @@ describe('time-travel enhancer', () => {
         getPendingTurnCount(): number;
       };
       __restoration: {
-        resetHistory(): void;
-        getHistory(): unknown[];
+        resetRestorationHistory(): void;
+        getRestorationHistory(): unknown[];
         getTurns(): Array<{ id: number; __effects?: Array<{ kind: string }> }>;
         getTurnStatus(id: number | undefined): string | undefined;
       };
@@ -1165,8 +1165,8 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     const t = store.__restoration;
-    t.resetHistory();
-    const baselineHistory = t.getHistory().length;
+    t.resetRestorationHistory();
+    const baselineHistory = t.getRestorationHistory().length;
     const baselineTurns = t.getTurns().length;
     const baselineTransactionConfirmed =
       store.__transactions.getConfirmedTurnCount();
@@ -1192,7 +1192,7 @@ describe('time-travel enhancer', () => {
       store.__transactions.getConfirmedTurnCount(),
       store.__transactions.getPendingTurnCount(),
     ]).toEqual([baselineTransactionConfirmed, baselineTransactionPending + 1]);
-    expect(t.getHistory()).toHaveLength(baselineHistory);
+    expect(t.getRestorationHistory()).toHaveLength(baselineHistory);
     expect(t.getTurns()).toHaveLength(baselineTurns + 1);
     expect(t.getTurnStatus(t.getTurns().at(-1)?.id)).toBe('pending');
     expect(
@@ -1210,7 +1210,7 @@ describe('time-travel enhancer', () => {
       store.__transactions.getConfirmedTurnCount(),
       store.__transactions.getPendingTurnCount(),
     ]).toEqual([baselineTransactionConfirmed, baselineTransactionPending]);
-    expect(t.getHistory()).toHaveLength(baselineHistory);
+    expect(t.getRestorationHistory()).toHaveLength(baselineHistory);
     expect(t.getTurns()).toHaveLength(baselineTurns);
   });
 
@@ -1231,7 +1231,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.changeId(7, 42));
@@ -1264,7 +1264,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.changeId(7, 42));
@@ -1300,7 +1300,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 7, name: 'target' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const originalSubject = (store.$.rows.byIdOrFail(7).name as any)
       .__subjectIds?.[0] as number;
@@ -1350,7 +1350,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 18, name: 'C' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.removeOne(17));
@@ -1386,7 +1386,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 18, name: 'C' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.removeOne(17));
@@ -1422,7 +1422,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 18, name: 'C' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const pending = store.transaction(() => {
       undoable(() => store.$.rows.removeOne(17));
@@ -1509,7 +1509,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const entry = t.getHistory().at(-1) as {
+    const entry = t.getRestorationHistory().at(-1) as {
       __turnId?: number;
       __positionIds?: number[];
     };
@@ -1527,7 +1527,7 @@ describe('time-travel enhancer', () => {
     expect([...(turn.__positionIds ?? [])].sort((a, b) => a - b)).toEqual(
       positionIds
     );
-    expect(turn.historyIndex).toBe(t.getHistory().length - 1);
+    expect(turn.historyIndex).toBe(t.getRestorationHistory().length - 1);
 
     for (const positionId of positionIds) {
       expect(t.getTurnIdsForPosition(positionId)).toEqual([turnId]);
@@ -1603,7 +1603,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const entry = t.getHistory().at(-1) as {
+    const entry = t.getRestorationHistory().at(-1) as {
       __turnId?: number;
       __positionIds?: number[];
     };
@@ -1638,10 +1638,10 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const historyIndex = t.getHistory().length - 1;
-    const turnId = t.getHistory().at(-1).__turnId as number;
+    const historyIndex = t.getRestorationHistory().length - 1;
+    const turnId = t.getRestorationHistory().at(-1).__turnId as number;
 
-    expect(t.getTurnRef(turnId)).toBe(t.getHistoryRef(historyIndex));
+    expect(t.getTurnRef(turnId)).toBe(t.getRestorationHistoryRef(historyIndex));
   });
 
   it('undoes the frontier closure needed to keep every position prefix-closed', async () => {
@@ -1664,7 +1664,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -1738,7 +1738,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -1842,7 +1842,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -1914,7 +1914,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -1989,7 +1989,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -2073,7 +2073,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -2170,7 +2170,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -2253,7 +2253,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -2299,7 +2299,7 @@ describe('time-travel enhancer', () => {
 
     expect(t.getTurn(secondTurn.id)).toBeUndefined();
     expect(t.getTurn(thirdTurn.id)).toBeUndefined();
-    expect(t.getHistory().map((entry: { id: number }) => entry.id)).toEqual([
+    expect(t.getRestorationHistory().map((entry: { id: number }) => entry.id)).toEqual([
       1,
       firstTurn.id,
       fourthTurn.id,
@@ -2330,7 +2330,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.byIdOrFail(7).status.set('two'));
     await Promise.resolve();
@@ -2380,7 +2380,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
     undoable(() => store.$.rows.byIdOrFail(7).name.set('three'));
@@ -2425,9 +2425,9 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
     const baselineTurnCount = t.getTurns().length;
-    const baselineHistoryCount = t.getHistory().length;
+    const baselineRestorationCount = t.getRestorationHistory().length;
 
     undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
     undoable(() => store.$.rows.byIdOrFail(7).name.set('one'));
@@ -2435,7 +2435,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     expect(t.getTurns()).toHaveLength(baselineTurnCount);
-    expect(t.getHistory()).toHaveLength(baselineHistoryCount);
+    expect(t.getRestorationHistory()).toHaveLength(baselineRestorationCount);
   });
 
   it('retains only non-zero scalar effects in a mixed flush', async () => {
@@ -2453,7 +2453,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
     undoable(() => store.$.rows.byIdOrFail(7).name.set('one'));
@@ -2495,7 +2495,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.byIdOrFail(7).name.set('two'));
     undoable(() => store.$.rows.byIdOrFail(7).active.set(true));
@@ -2542,7 +2542,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.removeOne(2));
     await Promise.resolve();
@@ -2602,7 +2602,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.removeOne(2));
     await Promise.resolve();
@@ -2657,7 +2657,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.removeOne(2));
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
@@ -2710,7 +2710,7 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__restoration;
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.addOne({ id: 7, name: 'B' }));
     await Promise.resolve();
@@ -2768,7 +2768,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.prependOne({ id: 2, name: 'B' }));
     await Promise.resolve();
@@ -2823,7 +2823,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.addOne({ id: 2, name: 'B' }));
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
@@ -2872,7 +2872,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.addOne({ id: 2, name: 'B' }));
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
@@ -2930,7 +2930,7 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    const initial = t.getHistory().length;
+    const initial = t.getRestorationHistory().length;
     const seenPaths: string[] = [];
     const notifier = getPathNotifier();
     const unsubscribe = notifier.subscribe('rows.*', (_next, _prev, path) => {
@@ -2940,13 +2940,13 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: -1, name: 'temp' }));
     await Promise.resolve();
     await Promise.resolve();
-    const addEntry = t.getHistory().at(-1);
-    expect(t.getHistory().length).toBeGreaterThan(initial);
+    const addEntry = t.getRestorationHistory().at(-1);
+    expect(t.getRestorationHistory().length).toBeGreaterThan(initial);
 
     undoable(() => store.$.rows.changeId(-1, 42));
     await Promise.resolve();
     await Promise.resolve();
-    const changeIdEntry = t.getHistory().at(-1);
+    const changeIdEntry = t.getRestorationHistory().at(-1);
     const observed = t.getObservedBatches();
 
     unsubscribe();
@@ -2992,7 +2992,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     const historyStates = t
-      .getHistory()
+      .getRestorationHistory()
       .map((entry: { state: { count: number } }) => entry.state.count);
 
     expect(store().count).toBe(3);
@@ -3023,7 +3023,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     const historyStates = t
-      .getHistory()
+      .getRestorationHistory()
       .map((entry: { state: { count: number } }) => entry.state.count);
 
     expect(store().count).toBe(1);
@@ -3082,11 +3082,11 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterFirstAdd = [
-      ...((t.getHistory().at(-1) as { __positionIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { __positionIds?: number[] })
         ?.__positionIds ?? []),
     ];
     const subjectAfterFirstAdd = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3094,11 +3094,11 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterSecondAdd = [
-      ...((t.getHistory().at(-1) as { __positionIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { __positionIds?: number[] })
         ?.__positionIds ?? []),
     ];
     const subjectAfterSecondAdd = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3106,7 +3106,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterRekey = [
-      ...((t.getHistory().at(-1) as { __positionIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { __positionIds?: number[] })
         ?.__positionIds ?? []),
     ];
 
@@ -3118,11 +3118,11 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const ownerAfterReuse = [
-      ...((t.getHistory().at(-1) as { __positionIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { __positionIds?: number[] })
         ?.__positionIds ?? []),
     ];
     const subjectAfterReuse = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3167,7 +3167,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const beforeBoundaryEntry = t.getHistory().at(-1) as {
+    const beforeBoundaryEntry = t.getRestorationHistory().at(-1) as {
       __positionIds?: number[];
       restorationSubjectIds?: number[];
     };
@@ -3177,7 +3177,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const boundaryEntry = t.getHistory().at(-1) as {
+    const boundaryEntry = t.getRestorationHistory().at(-1) as {
       __positionIds?: number[];
       restorationSubjectIds?: number[];
     };
@@ -3241,7 +3241,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const addedToken = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3249,7 +3249,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const rekeyedToken = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3257,7 +3257,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const retainedToken = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3265,7 +3265,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const reusedPathToken = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3307,7 +3307,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     const beforeSubject = store.$.rows.byIdOrFail(7).name
       .__subjectIds?.[0] as number;
@@ -3377,7 +3377,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.changeId(7, 42));
     undoable(() => store.$.drivers.byIdOrFail(1).status.set('assigned'));
@@ -3435,7 +3435,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.changeId(7, 42));
     undoable(() => store.$.drivers.byIdOrFail(1).status.set('assigned'));
@@ -3525,7 +3525,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const originalToken = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3533,7 +3533,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const removedToken = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3541,7 +3541,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
     const replacementToken = [
-      ...((t.getHistory().at(-1) as { restorationSubjectIds?: number[] })
+      ...((t.getRestorationHistory().at(-1) as { restorationSubjectIds?: number[] })
         ?.restorationSubjectIds ?? []),
     ];
 
@@ -3594,7 +3594,7 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
     const t = (store as any).__restoration;
-    const initial = t.getHistory().length;
+    const initial = t.getRestorationHistory().length;
 
     undoable(() => store.$.theme.set('dark'));
     await Promise.resolve();
@@ -3604,9 +3604,9 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(t.getHistory().length).toBeGreaterThan(initial + 1);
-    expect(t.getHistory().at(-1)?.state).toEqual({ theme: 'light' });
-    expect(t.getHistory().at(-1)?.__ownerPaths).toEqual(['theme']);
+    expect(t.getRestorationHistory().length).toBeGreaterThan(initial + 1);
+    expect(t.getRestorationHistory().at(-1)?.state).toEqual({ theme: 'light' });
+    expect(t.getRestorationHistory().at(-1)?.__ownerPaths).toEqual(['theme']);
 
     storage.set(key, JSON.stringify('navy'));
     undoable(() => store.$.theme.set('pink'));
@@ -3626,8 +3626,8 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     expect(store.$.theme()).toBe('navy');
-    expect(t.getHistory().at(-1)?.state).toEqual({ theme: 'navy' });
-    expect(t.getHistory().at(-1)?.__ownerPaths).toEqual(['theme']);
+    expect(t.getRestorationHistory().at(-1)?.state).toEqual({ theme: 'navy' });
+    expect(t.getRestorationHistory().at(-1)?.__ownerPaths).toEqual(['theme']);
   });
 
   // DELETED WITH STATUS-DEL — "records history for status promise-vocabulary
@@ -3672,7 +3672,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.byIdOrFail(7).name.set('B'));
     await Promise.resolve();
@@ -3720,7 +3720,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.removeOne(7));
     await Promise.resolve();
@@ -3735,7 +3735,7 @@ describe('time-travel enhancer', () => {
     expect(store.$.rows.byIdOrFail(7).name()).toBe('A');
     expect(t.getFrontier(removePositionId)).toBe(0);
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.changeId(7, 42));
     await Promise.resolve();
@@ -3832,8 +3832,8 @@ describe('time-travel enhancer', () => {
     expect(fullName.__positionIds).toBeUndefined();
     expect(fullName.__ownerPath).toBeUndefined();
 
-    t.resetHistory();
-    const baselineHistoryCount = t.getHistory().length;
+    t.resetRestorationHistory();
+    const baselineRestorationCount = t.getRestorationHistory().length;
     const baselineTurnCount = t.getTurns().length;
 
     undoable(() => store.$.profile.firstName.set('Jon'));
@@ -3855,7 +3855,7 @@ describe('time-travel enhancer', () => {
 
     expect(store.$.profile.firstName()).toBe('Jon');
     expect(fullName()).toBe('Jon Borgia');
-    expect(t.getHistory()).toHaveLength(baselineHistoryCount + 1);
+    expect(t.getRestorationHistory()).toHaveLength(baselineRestorationCount + 1);
     expect(t.getTurns()).toHaveLength(baselineTurnCount + 1);
     expect(turn.__ownerPaths).toEqual(['profile.firstName']);
     expect(turn.__positionIds).toHaveLength(1);
@@ -3891,8 +3891,8 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__restoration;
 
-    t.resetHistory();
-    const baselineHistoryCount = t.getHistory().length;
+    t.resetRestorationHistory();
+    const baselineRestorationCount = t.getRestorationHistory().length;
     const baselineTurnCount = t.getTurns().length;
 
     undoable(() => store.$.profile.firstName.set('Jon'));
@@ -3903,7 +3903,7 @@ describe('time-travel enhancer', () => {
     const positionId = turn.__positionIds?.[0] as number;
 
     expect(store.$.profile.fullName()).toBe('Jon Borgia');
-    expect(t.getHistory()).toHaveLength(baselineHistoryCount + 1);
+    expect(t.getRestorationHistory()).toHaveLength(baselineRestorationCount + 1);
     expect(t.getTurns()).toHaveLength(baselineTurnCount + 1);
     expect(t.getFrontier(positionId)).toBe(1);
 
@@ -3911,7 +3911,7 @@ describe('time-travel enhancer', () => {
 
     expect(store.$.profile.firstName()).toBe('Jonathan');
     expect(store.$.profile.fullName()).toBe('Jonathan Borgia');
-    expect(t.getHistory()).toHaveLength(baselineHistoryCount + 1);
+    expect(t.getRestorationHistory()).toHaveLength(baselineRestorationCount + 1);
     expect(t.getTurns()).toHaveLength(baselineTurnCount + 1);
     expect(t.getFrontier(positionId)).toBe(0);
     expect(store.canUndo()).toBe(false);
@@ -3924,7 +3924,7 @@ describe('time-travel enhancer', () => {
     );
     const t = (store as any).__restoration;
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     // Designated: this test undoes and redoes the root-callable update, so it
     // has to be an admitted turn.
@@ -4213,7 +4213,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.rows.byIdOrFail(7).name.set('B'));
     await Promise.resolve();
@@ -4277,7 +4277,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     const originalRemoveToken = removeStore.$.rows.byIdOrFail(7).name
       .__subjectIds?.[0] as number;
-    removeTimeTravel.resetHistory();
+    removeTimeTravel.resetRestorationHistory();
 
     undoable(() => removeStore.$.rows.removeOne(7));
     await Promise.resolve();
@@ -4310,7 +4310,7 @@ describe('time-travel enhancer', () => {
     undoable(() => rekeyStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
-    rekeyTimeTravel.resetHistory();
+    rekeyTimeTravel.resetRestorationHistory();
 
     const beforeRekeyToken = rekeyStore.$.rows.byIdOrFail(7).name
       .__subjectIds?.[0] as number;
@@ -4378,7 +4378,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     store
       .transaction(() => {
@@ -4418,7 +4418,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     store
       .transaction(() => {
@@ -4580,7 +4580,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     store
       .transaction(() => {
@@ -4698,7 +4698,7 @@ describe('time-travel enhancer', () => {
     undoable(() => store.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     store
       .transaction(() => {
@@ -4754,7 +4754,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -4821,7 +4821,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     await Promise.resolve();
@@ -4870,7 +4870,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     undoable(() => store.$.trucks.byIdOrFail(12).driverId.set(7));
@@ -4933,7 +4933,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     await Promise.resolve();
@@ -5024,7 +5024,7 @@ describe('time-travel enhancer', () => {
     await Promise.resolve();
 
     const t = (store as any).__restoration;
-    t.resetHistory();
+    t.resetRestorationHistory();
 
     undoable(() => store.$.drivers.byIdOrFail(7).status.set('assigned'));
     await Promise.resolve();
@@ -5079,15 +5079,15 @@ describe('time-travel enhancer', () => {
       { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
     );
 
-    const firstBaseline = first.getHistory().length;
-    const secondBaseline = second.getHistory().length;
+    const firstBaseline = first.getRestorationHistory().length;
+    const secondBaseline = second.getRestorationHistory().length;
 
     undoable(() => first.$.rows.addOne({ id: 1, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(first.getHistory().length).toBeGreaterThan(firstBaseline);
-    expect(second.getHistory().length).toBe(secondBaseline);
+    expect(first.getRestorationHistory().length).toBeGreaterThan(firstBaseline);
+    expect(second.getRestorationHistory().length).toBe(secondBaseline);
     expect(second.canUndo()).toBe(false);
   });
 });

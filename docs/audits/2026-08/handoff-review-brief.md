@@ -106,7 +106,7 @@ Now checked at **record time**, sampled every 16 entries, thresholded on
 guessed row count. A row count called a 20,000-row grid edited twice a problem
 and a 50-row list edited for an hour fine.
 
-**Verify:** `packages/core/src/lib/history-scoped-capture.spec.ts`. Every test
+**Verify:** `packages/core/src/lib/restoration-scoped-capture.spec.ts`. Every test
 uses build → attach → load order. Confirm none of them silently reverts to
 test-friendly ordering. Also confirm `undo()` genuinely does _not_ revert an
 excluded collection — that partial-undo tradeoff is documented in three places

@@ -21,11 +21,11 @@ export interface PreparedPendingTurnConfirmation {
 
 export type PreparePendingTurnDiscardResult =
   | { readonly ok: true; readonly transition: PreparedPendingTurnDiscard }
-  | { readonly ok: false; readonly reason: 'history-evicted' };
+  | { readonly ok: false; readonly reason: 'turn-evicted' };
 
 export type PreparePendingTurnConfirmationResult =
   | { readonly ok: true; readonly transition: PreparedPendingTurnConfirmation }
-  | { readonly ok: false; readonly reason: 'history-evicted' };
+  | { readonly ok: false; readonly reason: 'turn-evicted' };
 
 export interface TurnStoreSnapshot {
   readonly turnIds: TurnId[];
@@ -106,7 +106,7 @@ export class TurnStore {
 
   prepareDiscardPendingTurn(turnId: TurnId): PreparePendingTurnDiscardResult {
     if (!this.pendingTurns.has(turnId)) {
-      return { ok: false, reason: 'history-evicted' };
+      return { ok: false, reason: 'turn-evicted' };
     }
 
     return {
@@ -118,7 +118,7 @@ export class TurnStore {
   prepareConfirmPendingTurn(turnId: TurnId): PreparePendingTurnConfirmationResult {
     const pendingTurn = this.pendingTurns.get(turnId);
     if (!pendingTurn) {
-      return { ok: false, reason: 'history-evicted' };
+      return { ok: false, reason: 'turn-evicted' };
     }
 
     return {

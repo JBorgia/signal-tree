@@ -88,7 +88,7 @@ describe('TURN-FEED-0.1: two transaction owners on one tree', () => {
     // buckets do not collide — which is only observable if both are recorded.
     expect(treeA.$.n()).toBe(1);
     expect(treeB.$.n()).toBe(2);
-    expect(treeA.getHistory().length).toBeGreaterThan(1);
-    expect(treeB.getHistory().length).toBeGreaterThan(1);
+    expect(treeA.getRestorationHistory().length).toBeGreaterThan(1);
+    expect(treeB.getRestorationHistory().length).toBeGreaterThan(1);
   });
 });

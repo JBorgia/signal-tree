@@ -418,7 +418,7 @@ export function createEntitySignal<
   let lastSubjectIds: number[] | undefined;
 
   type PendingStructuralEffect = StructuralEffect;
-  type PendingAddHistoryEffect = Extract<PendingStructuralEffect, { kind: 'add' }>;
+  type PendingAddStructuralEffect = Extract<PendingStructuralEffect, { kind: 'add' }>;
 
   function getPositionIds(): number[] | undefined {
     return positionId === undefined ? undefined : [positionId];
@@ -958,7 +958,7 @@ export function createEntitySignal<
   }
 
   function rewritePendingAddEffect(
-    effect: PendingAddHistoryEffect,
+    effect: PendingAddStructuralEffect,
     beforeSubject?: number,
     afterSubject?: number
   ): void {
@@ -1047,7 +1047,7 @@ export function createEntitySignal<
   function addOneWithHistoryEffect(
     entity: E,
     opts?: AddOptions<E, K>
-  ): { id: K; structuralEffect: PendingAddHistoryEffect } {
+  ): { id: K; structuralEffect: PendingAddStructuralEffect } {
     const id = deriveId(entity, opts);
     const previousLastKey = structuralStore.lastActiveKey();
     recordProductionSubstrateStat('publicAddPreviousTailReads');
@@ -1071,7 +1071,7 @@ export function createEntitySignal<
     };
     frame.stageFreshSubject(freshSubject);
     commitAndProjectEntityMutationFrame(frame);
-    const structuralEffect: PendingAddHistoryEffect = {
+    const structuralEffect: PendingAddStructuralEffect = {
       kind: 'add',
       subject: subjectId,
       key: id,
@@ -1533,7 +1533,7 @@ export function createEntitySignal<
    * `runPhysicalMaintenance` exists for the hard case and asks a real question —
    * is any turn, pending turn, applied-history entry or redo entry still
    * referencing this subject? Answering it requires a `TurnStore` and an
-   * `AppliedHistory`, which a tree without `causal-runtime` does not have. That
+   * `AppliedTurnProjection`, which a tree without `causal-runtime` does not have. That
    * absence is not a gap to work around; it IS the answer. With no owner there
    * are no turns, so there is nothing a turn could be holding.
    *

@@ -21,7 +21,7 @@
     "packages/core/src/lib/entity-wrong-method-guard.spec.ts": 2,
     "packages/core/src/lib/error-reporter.spec.ts": 2,
     "packages/core/src/lib/heterogeneous-atomicity.spec.ts": 1,
-    "packages/core/src/lib/history-scoped-capture.spec.ts": 1,
+    "packages/core/src/lib/restoration-scoped-capture.spec.ts": 1,
     "packages/core/src/lib/internals/atomic-state/atomic-scalar-store.spec.ts": 7,
     "packages/core/src/lib/internals/atomic-state/atomic-signal-tree-prototype.spec.ts": 5,
     "packages/core/src/lib/internals/atomic-state/heterogeneous-physical-frame-prototype.spec.ts": 12,

@@ -436,7 +436,7 @@ window logs **nothing at all**. For healthcare/claims that is a compliance defec
 not a papercut — "a field was set and set back" is exactly what the trail exists to
 record.
 
-Use `createAuditCallback(prev, current)` or read `getHistory()`; both are exact.
+Use `createAuditCallback(prev, current)` or read `getRestorationHistory()`; both are exact.
 Filed in [time-travel-use-case-audit.md](time-travel-use-case-audit.md) case 15.
 
 ### 4. CRUD over moderate lists, server round-trips

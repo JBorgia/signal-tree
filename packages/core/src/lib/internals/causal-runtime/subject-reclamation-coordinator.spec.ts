@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createEntitySignal } from '../../entity-signal';
 import type { PositionId } from '../../types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { TurnStore } from './turn-store';
 import {
   reclaimAvailableSubjects,
@@ -48,7 +48,7 @@ function makeOwner() {
 describe('subject reclamation coordinator', () => {
   it('does not reach physical preparation when causal eligibility is blocked', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const prepare = vi.fn();
     const apply = vi.fn();
 
@@ -72,7 +72,7 @@ describe('subject reclamation coordinator', () => {
           __applyPreparedSubjectReclamation: apply,
         },
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       ok: false,
@@ -93,7 +93,7 @@ describe('subject reclamation coordinator', () => {
   it('reclaims an eligible tombstoned subject without publication or reactive churn', () => {
     const { api, notify } = makeOwner();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldName = api.byIdOrFail(1).name;
@@ -118,7 +118,7 @@ describe('subject reclamation coordinator', () => {
         subjectId,
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       ok: true,
@@ -147,7 +147,7 @@ describe('subject reclamation coordinator', () => {
   it('refuses physical drift between prepare and apply', () => {
     const { api } = makeOwner();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldName = api.byIdOrFail(1).name;
@@ -173,7 +173,7 @@ describe('subject reclamation coordinator', () => {
         subjectId,
         owner: driftingOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       ok: false,
@@ -185,7 +185,7 @@ describe('subject reclamation coordinator', () => {
 
   it('refuses causal drift when a new pending reference appears after assessment', () => {
     const { api } = makeOwner();
-    const appliedHistory = {
+    const appliedTurns = {
       getAppliedTurnIds: () => [],
       getRedoTurnIds: () => [],
     };
@@ -226,7 +226,7 @@ describe('subject reclamation coordinator', () => {
         subjectId,
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       ok: false,
@@ -259,7 +259,7 @@ describe('subject reclamation coordinator', () => {
 
   it('does not let unrelated causal activity invalidate reclamation for this subject', () => {
     const { api } = makeOwner();
-    const appliedHistory = {
+    const appliedTurns = {
       getAppliedTurnIds: () => [],
       getRedoTurnIds: () => [],
     };
@@ -300,7 +300,7 @@ describe('subject reclamation coordinator', () => {
         subjectId,
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       ok: true,
@@ -313,7 +313,7 @@ describe('subject reclamation coordinator', () => {
   it('treats repeated reclamation of the same retired subject as a silent no-op', () => {
     const { api, notify } = makeOwner();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldName = api.byIdOrFail(1).name;
@@ -330,7 +330,7 @@ describe('subject reclamation coordinator', () => {
         subjectId,
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       ok: true,
@@ -344,7 +344,7 @@ describe('subject reclamation coordinator', () => {
         subjectId,
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       ok: false,
@@ -372,7 +372,7 @@ describe('subject reclamation coordinator', () => {
   it('reclaims an explicit best-effort subject sweep without cross-subject rollback', () => {
     const { api, notify } = makeOwner();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     api.addOne({ id: 1, name: 'Alice', active: true });
     api.addOne({ id: 2, name: 'Bob', active: true });
@@ -406,7 +406,7 @@ describe('subject reclamation coordinator', () => {
       subjectIds: [subjectOne, subjectTwo, subjectOne],
       owner: api as unknown as SubjectReclamationPhysicalOwner,
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(result).toEqual({
@@ -464,7 +464,7 @@ describe('subject reclamation coordinator', () => {
   it('runs physical maintenance as a synchronous no-op when no tombstoned candidates exist', () => {
     const { api, notify } = makeOwner();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     api.addOne({ id: 1, name: 'Alice', active: true });
     const notifyCountBefore = notify.mock.calls.length;
@@ -473,7 +473,7 @@ describe('subject reclamation coordinator', () => {
       runPhysicalMaintenance({
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       candidateSubjectIds: [],
@@ -490,7 +490,7 @@ describe('subject reclamation coordinator', () => {
   it('runs physical maintenance with the same mixed outcomes as the explicit sweep', () => {
     const { api, notify } = makeOwner();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     api.addOne({ id: 1, name: 'Alice', active: true });
     api.addOne({ id: 2, name: 'Bob', active: true });
@@ -521,15 +521,15 @@ describe('subject reclamation coordinator', () => {
 
     const turnsBefore = store.getTurns();
     const pendingBefore = store.getPendingTurns();
-    const appliedBefore = appliedHistory.getAppliedTurnIds();
-    const redoBefore = appliedHistory.getRedoTurnIds();
+    const appliedBefore = appliedTurns.getAppliedTurnIds();
+    const redoBefore = appliedTurns.getRedoTurnIds();
     const notifyCountBefore = notify.mock.calls.length;
 
     expect(
       runPhysicalMaintenance({
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       candidateSubjectIds: [subjectOne, subjectTwo],
@@ -555,15 +555,15 @@ describe('subject reclamation coordinator', () => {
 
     expect(store.getTurns()).toEqual(turnsBefore);
     expect(store.getPendingTurns()).toEqual(pendingBefore);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual(appliedBefore);
-    expect(appliedHistory.getRedoTurnIds()).toEqual(redoBefore);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual(appliedBefore);
+    expect(appliedTurns.getRedoTurnIds()).toEqual(redoBefore);
     expect(notify.mock.calls).toHaveLength(notifyCountBefore);
   });
 
   it('runs physical maintenance idempotently across repeated invocations without new state', () => {
     const { api, notify } = makeOwner();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldName = api.byIdOrFail(1).name;
@@ -578,7 +578,7 @@ describe('subject reclamation coordinator', () => {
       runPhysicalMaintenance({
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       candidateSubjectIds: [subjectId],
@@ -595,7 +595,7 @@ describe('subject reclamation coordinator', () => {
       runPhysicalMaintenance({
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       candidateSubjectIds: [],
@@ -613,7 +613,7 @@ describe('subject reclamation coordinator', () => {
   it('reclaims a previously blocked tombstone on the next maintenance run after pending settlement', () => {
     const { api, notify } = makeOwner();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     api.addOne({ id: 1, name: 'Alice', active: true });
     const heldName = api.byIdOrFail(1).name;
@@ -639,7 +639,7 @@ describe('subject reclamation coordinator', () => {
       runPhysicalMaintenance({
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       candidateSubjectIds: [subjectId],
@@ -665,8 +665,8 @@ describe('subject reclamation coordinator', () => {
 
     const notifyCountBeforeSecond = notify.mock.calls.length;
     expect(store.confirmPending(13)?.state).toBe('confirmed');
-    expect(appliedHistory.admitConfirmed(13)).toEqual({ ok: true });
-    expect(appliedHistory.forgetRetainedTurn(13)).toEqual({
+    expect(appliedTurns.admitConfirmed(13)).toEqual({ ok: true });
+    expect(appliedTurns.forgetRetainedTurn(13)).toEqual({
       wasApplied: true,
       wasRedoable: false,
     });
@@ -675,7 +675,7 @@ describe('subject reclamation coordinator', () => {
       runPhysicalMaintenance({
         owner: api as unknown as SubjectReclamationPhysicalOwner,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       candidateSubjectIds: [subjectId],

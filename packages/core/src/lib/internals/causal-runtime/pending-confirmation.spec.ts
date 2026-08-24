@@ -1,6 +1,6 @@
 import { createEntitySignal } from '../../entity-signal';
 import type { PositionId } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { confirmPendingTurnAt } from './pending-confirmation';
 import { createRealizationContextSource } from './realization-context';
 import { runPhysicalMaintenance } from './subject-reclamation-coordinator';
@@ -18,11 +18,11 @@ describe('pending confirmation', () => {
       capacity: 0,
       retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     sourceRef.current = source;
 
@@ -31,14 +31,14 @@ describe('pending confirmation', () => {
       effects: [{ owner: P_THEME, before: 'A', after: 'B' }],
     });
 
-    expect(confirmPendingTurnAt({ turnId: 1, store, appliedHistory })).toEqual({
+    expect(confirmPendingTurnAt({ turnId: 1, store, appliedTurns })).toEqual({
       ok: true,
       turnId: 1,
     });
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
-    expect(appliedHistory.getRedoTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getRedoTurnIds()).toEqual([]);
     expect(source.getCurrentValue(P_THEME)).toBe('B');
   });
 
@@ -50,11 +50,11 @@ describe('pending confirmation', () => {
       capacity: 1,
       retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     sourceRef.current = source;
 
@@ -62,20 +62,20 @@ describe('pending confirmation', () => {
       id: 1,
       effects: [{ owner: P_THEME, before: 'A', after: 'B' }],
     });
-    expect(appliedHistory.admitConfirmed(earlier.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(earlier.id)).toEqual({ ok: true });
     store.admitPending({
       id: 2,
       effects: [{ owner: P_THEME, before: 'B', after: 'C' }],
     });
 
-    expect(confirmPendingTurnAt({ turnId: 2, store, appliedHistory })).toEqual({
+    expect(confirmPendingTurnAt({ turnId: 2, store, appliedTurns })).toEqual({
       ok: true,
       turnId: 2,
     });
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns().map(({ id }) => id)).toEqual([2]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([2]);
-    expect(appliedHistory.getRedoTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([2]);
+    expect(appliedTurns.getRedoTurnIds()).toEqual([]);
     expect(source.getCurrentValue(P_THEME)).toBe('C');
     expect(source.getValueWithoutConfirmedTurn(2, P_THEME)).toBe('B');
   });
@@ -88,11 +88,11 @@ describe('pending confirmation', () => {
       capacity: 1,
       retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     sourceRef.current = source;
 
@@ -100,21 +100,21 @@ describe('pending confirmation', () => {
       id: 1,
       effects: [{ owner: P_THEME, before: 'A', after: 'B' }],
     });
-    expect(appliedHistory.admitConfirmed(earlier.id)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(earlier.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(earlier.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(earlier.id)).toEqual({ ok: true });
     store.admitPending({
       id: 2,
       effects: [{ owner: P_THEME, before: 'A', after: 'C' }],
     });
 
-    expect(confirmPendingTurnAt({ turnId: 2, store, appliedHistory })).toEqual({
+    expect(confirmPendingTurnAt({ turnId: 2, store, appliedTurns })).toEqual({
       ok: true,
       turnId: 2,
     });
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns().map(({ id }) => id)).toEqual([2]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([2]);
-    expect(appliedHistory.getRedoTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([2]);
+    expect(appliedTurns.getRedoTurnIds()).toEqual([]);
     expect(source.getCurrentValue(P_THEME)).toBe('C');
     expect(source.getValueWithoutConfirmedTurn(2, P_THEME)).toBe('A');
   });
@@ -127,11 +127,11 @@ describe('pending confirmation', () => {
       capacity: 2,
       retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     sourceRef.current = source;
 
@@ -143,23 +143,23 @@ describe('pending confirmation', () => {
       id: 2,
       effects: [{ owner: P_THEME, before: 'B', after: 'C' }],
     });
-    expect(appliedHistory.admitConfirmed(first.id)).toEqual({ ok: true });
-    expect(appliedHistory.admitConfirmed(second.id)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(second.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(first.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(second.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(second.id)).toEqual({ ok: true });
 
     store.admitPending({
       id: 3,
       effects: [{ owner: P_THEME, before: 'B', after: 'D' }],
     });
 
-    expect(confirmPendingTurnAt({ turnId: 3, store, appliedHistory })).toEqual({
+    expect(confirmPendingTurnAt({ turnId: 3, store, appliedTurns })).toEqual({
       ok: true,
       turnId: 3,
     });
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns().map(({ id }) => id)).toEqual([2, 3]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([3]);
-    expect(appliedHistory.getRedoTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([3]);
+    expect(appliedTurns.getRedoTurnIds()).toEqual([]);
     expect(source.getCurrentValue(P_THEME)).toBe('D');
     expect(source.getValueWithoutConfirmedTurn(3, P_THEME)).toBe('B');
   });
@@ -179,11 +179,11 @@ describe('pending confirmation', () => {
         observerErrors.push(error);
       },
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_THEME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     sourceRef.current = source;
 
@@ -192,7 +192,7 @@ describe('pending confirmation', () => {
       effects: [{ owner: P_THEME, before: 'A', after: 'B' }],
     });
 
-    expect(confirmPendingTurnAt({ turnId: 1, store, appliedHistory })).toEqual({
+    expect(confirmPendingTurnAt({ turnId: 1, store, appliedTurns })).toEqual({
       ok: true,
       turnId: 1,
     });
@@ -234,10 +234,10 @@ describe('pending confirmation', () => {
       capacity: 0,
       retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       store,
-      appliedHistory,
+      appliedTurns,
     });
     sourceRef.current = source;
 
@@ -258,7 +258,7 @@ describe('pending confirmation', () => {
       runPhysicalMaintenance({
         owner: owner as any,
         store,
-        appliedHistory,
+        appliedTurns,
       })
     ).toEqual({
       candidateSubjectIds: [subjectId],
@@ -287,14 +287,14 @@ describe('pending confirmation', () => {
       confirmPendingTurnAt({
         turnId: 1,
         store,
-        appliedHistory,
+        appliedTurns,
         retentionObserver: source,
         onMaintenanceMayBeUseful: () => {
           maintenanceResults.push(
             runPhysicalMaintenance({
               owner: owner as any,
               store,
-              appliedHistory,
+              appliedTurns,
             })
           );
         },
@@ -317,7 +317,7 @@ describe('pending confirmation', () => {
     ]);
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns()).toEqual([]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([]);
     expect(heldName()).toBeUndefined();
     expect(owner.byIdOrFail(2).name()).toBe('Bob');
     expect(internal.__inspectSubjectResources?.(subjectId)).toEqual({
@@ -361,10 +361,10 @@ describe('pending confirmation', () => {
     const notifyCountBefore = notify.mock.calls.length;
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     store.admitPending({
@@ -386,7 +386,7 @@ describe('pending confirmation', () => {
       confirmPendingTurnAt({
         turnId: 1,
         store,
-        appliedHistory,
+        appliedTurns,
         retentionObserver: source,
         onMaintenanceMayBeUseful: (hint) => {
           maintenanceHints.push(hint);
@@ -394,7 +394,7 @@ describe('pending confirmation', () => {
             runPhysicalMaintenance({
               owner: owner as any,
               store,
-              appliedHistory,
+              appliedTurns,
             })
           );
         },
@@ -424,7 +424,7 @@ describe('pending confirmation', () => {
     ]);
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns().map(({ id }) => id)).toEqual([1]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([1]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([1]);
     expect(heldName()).toBeUndefined();
     expect(owner.byIdOrFail(2).name()).toBe('Bob');
     expect(internal.__inspectSubjectResources?.(subjectId)).toEqual({
@@ -463,10 +463,10 @@ describe('pending confirmation', () => {
     owner.removeOne(1);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     store.admitPending({
@@ -489,7 +489,7 @@ describe('pending confirmation', () => {
       confirmPendingTurnAt({
         turnId: 1,
         store,
-        appliedHistory,
+        appliedTurns,
         retentionObserver: source,
         onMaintenanceMayBeUseful: (hint) => {
           maintenanceHints.push(hint);
@@ -497,7 +497,7 @@ describe('pending confirmation', () => {
             runPhysicalMaintenance({
               owner: owner as any,
               store,
-              appliedHistory,
+              appliedTurns,
             })
           );
         },
@@ -565,10 +565,10 @@ describe('pending confirmation', () => {
     const notifyCountBefore = notify.mock.calls.length;
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     const redoableAdd = store.admitConfirmed({
@@ -583,8 +583,8 @@ describe('pending confirmation', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(redoableAdd.id)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(redoableAdd.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(redoableAdd.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(redoableAdd.id)).toEqual({ ok: true });
 
     store.admitPending({
       id: 2,
@@ -604,7 +604,7 @@ describe('pending confirmation', () => {
       confirmPendingTurnAt({
         turnId: 2,
         store,
-        appliedHistory,
+        appliedTurns,
         retentionObserver: source,
         onMaintenanceMayBeUseful: (hint) => {
           maintenanceHints.push(hint);
@@ -612,7 +612,7 @@ describe('pending confirmation', () => {
             runPhysicalMaintenance({
               owner: owner as any,
               store,
-              appliedHistory,
+              appliedTurns,
             })
           );
         },
@@ -642,8 +642,8 @@ describe('pending confirmation', () => {
     ]);
     expect(store.getPendingTurnIds()).toEqual([]);
     expect(store.getTurns().map(({ id }) => id)).toEqual([1, 2]);
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([2]);
-    expect(appliedHistory.getRedoTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([2]);
+    expect(appliedTurns.getRedoTurnIds()).toEqual([]);
     expect(heldName()).toBeUndefined();
     expect(owner.byIdOrFail(2).name()).toBe('Bob');
     expect(internal.__inspectSubjectResources?.(subjectId)).toEqual({

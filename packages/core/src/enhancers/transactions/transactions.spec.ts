@@ -35,7 +35,7 @@ describe('transactions enhancer', () => {
     expect(store.redo).toBeUndefined();
     expect(store.canUndo).toBeUndefined();
     expect(store.canRedo).toBeUndefined();
-    expect(store.getHistory).toBeUndefined();
+    expect(store.getRestorationHistory).toBeUndefined();
     expect(store.jumpTo).toBeUndefined();
     expect(store.getCurrentIndex).toBeUndefined();
     expect(store.__restoration).toBeUndefined();

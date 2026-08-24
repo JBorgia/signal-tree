@@ -15,7 +15,7 @@ type HistoryStepStore = {
   transaction(fn: () => void): { confirm(): void; rollback(): void };
   undo(): void;
   canUndo(): boolean;
-  getHistory(): unknown[];
+  getRestorationHistory(): unknown[];
 };
 
 type Row = { id: number; label: string };
@@ -34,7 +34,7 @@ type EntityHistoryStepStore = {
   };
   transaction(fn: () => void): { confirm(): void; rollback(): void };
   undo(): void;
-  getHistory(): unknown[];
+  getRestorationHistory(): unknown[];
 };
 
 function createStore(): HistoryStepStore {
@@ -56,7 +56,7 @@ function createEntityStore(): EntityHistoryStepStore {
 describe('history step adapter seam', () => {
   it('confirms several writes as one user-recognizable undo step', async () => {
     const store = createStore();
-    const initialHistoryLength = store.getHistory().length;
+    const initialHistoryLength = store.getRestorationHistory().length;
 
     const step = store.transaction(() => {
       undoable(() => store.$.left.set('L1'));
@@ -66,13 +66,13 @@ describe('history step adapter seam', () => {
     expect(store.$.left()).toBe('L1');
     expect(store.$.right()).toBe('R1');
     expect(store.canUndo()).toBe(false);
-    expect(store.getHistory()).toHaveLength(initialHistoryLength);
+    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength);
 
     step.confirm();
     await tick();
 
     expect(store.canUndo()).toBe(true);
-    expect(store.getHistory()).toHaveLength(initialHistoryLength + 1);
+    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 1);
 
     store.undo();
     await tick();
@@ -89,12 +89,12 @@ describe('history step adapter seam', () => {
     });
     step.confirm();
     await tick();
-    const afterConfirmedStep = store.getHistory().length;
+    const afterConfirmedStep = store.getRestorationHistory().length;
 
     undoable(() => store.$.later.set('Z1'));
     await tick();
 
-    expect(store.getHistory()).toHaveLength(afterConfirmedStep + 1);
+    expect(store.getRestorationHistory()).toHaveLength(afterConfirmedStep + 1);
 
     store.undo();
     await tick();
@@ -112,7 +112,7 @@ describe('history step adapter seam', () => {
 
   it('does not create a history step when the demarcated callback throws', async () => {
     const store = createStore();
-    const initialHistoryLength = store.getHistory().length;
+    const initialHistoryLength = store.getRestorationHistory().length;
 
     expect(() =>
       store.transaction(() => {
@@ -127,12 +127,12 @@ describe('history step adapter seam', () => {
     expect(store.$.left()).toBe('L0');
     expect(store.$.right()).toBe('R0');
     expect(store.canUndo()).toBe(false);
-    expect(store.getHistory()).toHaveLength(initialHistoryLength);
+    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength);
   });
 
   it('keeps writes scheduled after the callback outside the demarcated step', async () => {
     const store = createStore();
-    const initialHistoryLength = store.getHistory().length;
+    const initialHistoryLength = store.getRestorationHistory().length;
     const step = store.transaction(() => {
       undoable(() => store.$.left.set('L1'));
       void Promise.resolve().then(() =>
@@ -144,7 +144,7 @@ describe('history step adapter seam', () => {
     step.confirm();
     await tick();
 
-    expect(store.getHistory()).toHaveLength(initialHistoryLength + 2);
+    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 2);
 
     store.undo();
     await tick();
@@ -174,7 +174,7 @@ describe('history step adapter seam', () => {
     undoable(() => store.$.rows.addOne({ id: 1, label: 'keep' }));
     undoable(() => store.$.rows.addOne({ id: 2, label: 'remove' }));
     await tick();
-    const initialHistoryLength = store.getHistory().length;
+    const initialHistoryLength = store.getRestorationHistory().length;
 
     const step = store.transaction(() => {
       undoable(() => store.$.rows.addOne({ id: 3, label: 'add' }));
@@ -190,7 +190,7 @@ describe('history step adapter seam', () => {
     step.confirm();
     await tick();
 
-    expect(store.getHistory()).toHaveLength(initialHistoryLength + 1);
+    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 1);
 
     store.undo();
     await tick();
@@ -208,7 +208,7 @@ describe('history step adapter seam', () => {
       { id: 2, label: 'remove' },
     ]);
     await tick();
-    const initialHistoryLength = store.getHistory().length;
+    const initialHistoryLength = store.getRestorationHistory().length;
 
     const step = store.transaction(() => {
       undoable(() =>
@@ -227,7 +227,7 @@ describe('history step adapter seam', () => {
     step.confirm();
     await tick();
 
-    expect(store.getHistory()).toHaveLength(initialHistoryLength + 1);
+    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 1);
 
     store.undo();
     await tick();
@@ -242,7 +242,7 @@ describe('history step adapter seam', () => {
     const store = createEntityStore();
     undoable(() => store.$.rows.addOne({ id: 1, label: 'temp' }));
     await tick();
-    const initialHistoryLength = store.getHistory().length;
+    const initialHistoryLength = store.getRestorationHistory().length;
 
     const step = store.transaction(() => {
       undoable(() => store.$.rows.changeId(1, 42));
@@ -256,7 +256,7 @@ describe('history step adapter seam', () => {
     step.confirm();
     await tick();
 
-    expect(store.getHistory()).toHaveLength(initialHistoryLength + 1);
+    expect(store.getRestorationHistory()).toHaveLength(initialHistoryLength + 1);
 
     store.undo();
     await tick();

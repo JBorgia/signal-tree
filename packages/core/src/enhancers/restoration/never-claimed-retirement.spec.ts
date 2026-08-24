@@ -55,7 +55,7 @@ type Rows = {
 
 type Store = {
   $: { rows: Rows; other: Rows };
-  getHistory(): Array<{ restorationSubjectIds?: number[] }>;
+  getRestorationHistory(): Array<{ restorationSubjectIds?: number[] }>;
   undo(): void;
   redo(): void;
 };

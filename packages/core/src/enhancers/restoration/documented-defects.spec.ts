@@ -31,7 +31,7 @@ import { timeTravel } from './restoration';
  *
  * ## The rule every assertion here follows
  *
- * Call `undo()` and inspect the resulting state. Reading `getHistory().length` or
+ * Call `undo()` and inspect the resulting state. Reading `getRestorationHistory().length` or
  * `canUndo()` without a following `undo()` is not evidence.
  */
 

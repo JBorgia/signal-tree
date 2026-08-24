@@ -31,7 +31,7 @@ type TT<S> = {
   undo(): void;
   redo(): void;
   canUndo(): boolean;
-  getHistory(): unknown[];
+  getRestorationHistory(): unknown[];
 };
 
 type Scalar = { x: { (): string; set(v: string): void } };
@@ -52,13 +52,13 @@ describe('E2-C1 — real P3', () => {
       { x: 'A' },
       { enhancers: [timeTravel(), transactions()] }
     ) as unknown as TT<Scalar>;
-    const base = tree.getHistory().length;
+    const base = tree.getRestorationHistory().length;
 
     undoable(() => tree.transaction(() => tree.$.x.set('B')));
     await tick();
 
     expect(tree.$.x()).toBe('B'); // optimistic: visible immediately
-    expect(tree.getHistory().length).toBe(base); // but NOT historied
+    expect(tree.getRestorationHistory().length).toBe(base); // but NOT historied
   });
 
   it('CONFIRMATION historicises; ROLLBACK of a superseded pending turn changes neither truth nor history', async () => {
@@ -69,21 +69,21 @@ describe('E2-C1 — real P3', () => {
 
     const t1 = undoable(() => tree.transaction(() => tree.$.x.set('B'))); // pending
     await tick();
-    const histAfterT1 = tree.getHistory().length;
+    const histAfterT1 = tree.getRestorationHistory().length;
 
     const t2 = undoable(() => tree.transaction(() => tree.$.x.set('C')));
     await tick();
-    expect(tree.getHistory().length).toBe(histAfterT1); // still not historied
+    expect(tree.getRestorationHistory().length).toBe(histAfterT1); // still not historied
     t2.confirm();
     await tick();
-    const histAfterConfirm = tree.getHistory().length;
+    const histAfterConfirm = tree.getRestorationHistory().length;
     expect(histAfterConfirm).toBe(histAfterT1 + 1);
 
     t1.rollback();
     await tick();
 
     expect(tree.$.x()).toBe('C'); // truth untouched — T2 owns the position
-    expect(tree.getHistory().length).toBe(histAfterConfirm); // history NOT rewritten
+    expect(tree.getRestorationHistory().length).toBe(histAfterConfirm); // history NOT rewritten
   });
 
   it('RECORDED: confirmed undo lands on B, not A — and redo returns to C', async () => {
@@ -171,7 +171,7 @@ describe('E2-C3 — real ABA authorship', () => {
     const t1 = undoable(() => tree.transaction(() => tree.$.x.set('B')));
     t1.confirm(); // CONFIRMED — this is the entry undo targets
     await tick();
-    const hist = tree.getHistory().length;
+    const hist = tree.getRestorationHistory().length;
 
     // Later work outside confirmed history, produced by the real mechanism: a
     // PENDING turn is visible in truth and adds no history entry (E2-C1 row 1).
@@ -181,7 +181,7 @@ describe('E2-C3 — real ABA authorship', () => {
     });
     await tick();
     expect(tree.$.x()).toBe('B');
-    expect(tree.getHistory().length).toBe(hist); // still not historied
+    expect(tree.getRestorationHistory().length).toBe(hist); // still not historied
 
     tree.undo();
     await tick();

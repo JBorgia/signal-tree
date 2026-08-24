@@ -55,15 +55,15 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
   it('case 1-2: authored writes to ANY branch enter history equally', async () => {
     const tree = makeTree();
     await flush();
-    const start = tree.getHistory().length;
+    const start = tree.getRestorationHistory().length;
 
     undoable(() => tree.$.document.title.set('v2'));
     await flush();
-    const afterHistorical = tree.getHistory().length;
+    const afterHistorical = tree.getRestorationHistory().length;
 
     undoable(() => tree.$.ui.selectedPanel.set('inspector'));
     await flush();
-    const afterUi = tree.getHistory().length;
+    const afterUi = tree.getRestorationHistory().length;
 
     // BASELINE: there is no notion of a non-historical branch. A pure UI write
     // is indistinguishable from a document edit.
@@ -75,14 +75,14 @@ describe('HIST-0 baseline: what whole-tree history does today', () => {
     const tree = makeTree();
     undoable(() => tree.$.document.title.set('v2'));
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     withWriteContext({ intent: 'system', participation: 'realized' }, () => {
       undoable(() => tree.$.document.title.set('from-server'));
     });
     await flush();
 
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
     expect(tree.$.document.title()).toBe('from-server');
   });
 

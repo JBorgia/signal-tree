@@ -140,7 +140,7 @@ export class WhatsNew14Component {
    *   unrelated writers too.
    * - The comment justifying the seal claimed "collection mutations do not
    *   create history entries at all". That was RETRACTED — it came from
-   *   asserting `getHistory().length` in the same tick as a `queueMicrotask`
+   *   asserting `getRestorationHistory().length` in the same tick as a `queueMicrotask`
    *   flush, without ever calling `undo()`. Collection mutations record fine.
    *
    * What actually makes this one step is that all 25 writes land in ONE

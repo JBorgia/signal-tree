@@ -1,7 +1,7 @@
 import { createPositionRegistry } from '../position-registry';
 
 import type { PositionId } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { assessConfirmedUndo } from './authority-assessment';
 import { TurnStore } from './turn-store';
 
@@ -39,7 +39,7 @@ describe('assessConfirmedUndo', () => {
   it('refuses profile authority when a later mixed-boundary turn blocks the contained turn frontier', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const t1 = store.admitConfirmed({
       id: 1,
@@ -71,14 +71,14 @@ describe('assessConfirmedUndo', () => {
         },
       ],
     });
-    appliedHistory.admitConfirmed(t1.id);
-    appliedHistory.admitConfirmed(t2.id);
+    appliedTurns.admitConfirmed(t1.id);
+    appliedTurns.admitConfirmed(t2.id);
 
     expect(
       assessConfirmedUndo({
         authority: positions.profile,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -90,7 +90,7 @@ describe('assessConfirmedUndo', () => {
   it('selects the latest mixed-family turn for root authority when all participants are contained', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const t1 = store.admitConfirmed({
       id: 1,
@@ -122,14 +122,14 @@ describe('assessConfirmedUndo', () => {
         },
       ],
     });
-    appliedHistory.admitConfirmed(t1.id);
-    appliedHistory.admitConfirmed(t2.id);
+    appliedTurns.admitConfirmed(t1.id);
+    appliedTurns.admitConfirmed(t2.id);
 
     expect(
       assessConfirmedUndo({
         authority: positions.root,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -141,7 +141,7 @@ describe('assessConfirmedUndo', () => {
   it('treats nested authorities as eligible for a single-position confirmed turn', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const t3 = store.admitConfirmed({
       id: 3,
@@ -153,13 +153,13 @@ describe('assessConfirmedUndo', () => {
         },
       ],
     });
-    appliedHistory.admitConfirmed(t3.id);
+    appliedTurns.admitConfirmed(t3.id);
 
     expect(
       assessConfirmedUndo({
         authority: positions.lastName,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -170,7 +170,7 @@ describe('assessConfirmedUndo', () => {
       assessConfirmedUndo({
         authority: positions.profile,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -181,7 +181,7 @@ describe('assessConfirmedUndo', () => {
       assessConfirmedUndo({
         authority: positions.root,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -193,7 +193,7 @@ describe('assessConfirmedUndo', () => {
   it('refuses a cross-boundary turn when no fully contained candidate exists', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const t1 = store.admitConfirmed({
       id: 1,
@@ -210,13 +210,13 @@ describe('assessConfirmedUndo', () => {
         },
       ],
     });
-    appliedHistory.admitConfirmed(t1.id);
+    appliedTurns.admitConfirmed(t1.id);
 
     expect(
       assessConfirmedUndo({
         authority: positions.profile,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -228,7 +228,7 @@ describe('assessConfirmedUndo', () => {
   it('selects an earlier disjoint applied turn when a later unrelated turn remains applied', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const t1 = store.admitConfirmed({
       id: 1,
@@ -250,15 +250,15 @@ describe('assessConfirmedUndo', () => {
         },
       ],
     });
-    appliedHistory.admitConfirmed(t1.id);
-    appliedHistory.admitConfirmed(t2.id);
-    appliedHistory.moveConfirmedTurnToRedo(t1.id);
+    appliedTurns.admitConfirmed(t1.id);
+    appliedTurns.admitConfirmed(t2.id);
+    appliedTurns.moveConfirmedTurnToRedo(t1.id);
 
     expect(
       assessConfirmedUndo({
         authority: positions.firstName,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -270,7 +270,7 @@ describe('assessConfirmedUndo', () => {
       assessConfirmedUndo({
         authority: positions.theme,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -282,7 +282,7 @@ describe('assessConfirmedUndo', () => {
   it('does not let structural coverage expand undo authority beyond actual participants', () => {
     const { topology, positions } = buildTopology();
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
 
     const turn = store.admitConfirmed({
       id: 1,
@@ -302,13 +302,13 @@ describe('assessConfirmedUndo', () => {
         },
       ],
     });
-    appliedHistory.admitConfirmed(turn.id);
+    appliedTurns.admitConfirmed(turn.id);
 
     expect(
       assessConfirmedUndo({
         authority: positions.enabled,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({
@@ -320,7 +320,7 @@ describe('assessConfirmedUndo', () => {
       assessConfirmedUndo({
         authority: positions.profile,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
       })
     ).toEqual({

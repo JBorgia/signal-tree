@@ -173,7 +173,7 @@ export class RestorationDemoComponent {
   }
 
   resetMarkers() {
-    this.markerTT.resetHistory();
+    this.markerTT.resetRestorationHistory();
     this.markerLog.set([]);
     this.refreshMarkerState();
   }
@@ -204,7 +204,7 @@ export class RestorationDemoComponent {
   todos = this.tree.$.todos;
 
   // Time travel signals - derive from the tree (preserves generics)
-  history = signal(this.tree.getHistory());
+  history = signal(this.tree.getRestorationHistory());
   currentIndex = signal(this.tree.getCurrentIndex());
   canUndo = signal(this.tree.canUndo());
   canRedo = signal(this.tree.canRedo());
@@ -212,7 +212,7 @@ export class RestorationDemoComponent {
 
   // Helper to refresh time travel state
   private refreshTimeTravelState() {
-    this.history.set(this.tree.getHistory());
+    this.history.set(this.tree.getRestorationHistory());
     this.currentIndex.set(this.tree.getCurrentIndex());
     this.canUndo.set(this.tree.canUndo());
     this.canRedo.set(this.tree.canRedo());
@@ -398,14 +398,14 @@ export class RestorationDemoComponent {
   }
 
   clearHistory() {
-    this.tree.resetHistory();
+    this.tree.resetRestorationHistory();
     this.refreshTimeTravelState();
   }
 
   // Generate sample actions for easy testing
   generateSampleActions() {
     // Reset history first
-    this.tree.resetHistory();
+    this.tree.resetRestorationHistory();
 
     // Create a sequence of actions with delays for better history visualization
     setTimeout(() => {

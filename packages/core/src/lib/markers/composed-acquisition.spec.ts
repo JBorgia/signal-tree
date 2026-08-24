@@ -58,7 +58,7 @@ const usersState = () => ({
 
 // Three concrete builders rather than one `enhancers: unknown[]` helper. The
 // generic version needed `as never`, which erased the enhancers' type additions
-// and cost `getHistory()` and `transaction()` — `spec-types` caught it. A cast
+// and cost `getRestorationHistory()` and `transaction()` — `spec-types` caught it. A cast
 // that hides the very API under test makes the assertions vacuous.
 const makePlainTree = () => signalTree(usersState());
 const makeTimeTravelTree = () =>
@@ -154,7 +154,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     const tree = makeTimeTravelTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     // A background poll. The user did nothing.
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada-from-server', v: 2 }]);
@@ -171,7 +171,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     // MATTERS, because neither one is admitted without designation. CASE 8b's
     // realization seam remains the right tool for telling them apart when
     // something else needs to.
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
 
     tree.undo();
     await flush();
@@ -182,7 +182,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     const tree = makeTimeTravelTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     // The candidate C2 seam. `withWriteContext` is enhancer-author plumbing and
     // is NOT in the shipped barrel — that is the whole finding. Core already
@@ -192,7 +192,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
     });
     await flush();
 
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
     expect(tree.$.users.byId('a')?.()?.name).toBe('Server');
   });
 

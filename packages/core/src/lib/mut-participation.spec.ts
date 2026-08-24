@@ -43,13 +43,13 @@ async function probe(
   resetPathNotifier();
   const { tree, read } = build();
   const timed = tree as unknown as {
-    getHistory(): unknown[];
+    getRestorationHistory(): unknown[];
     undo(): void;
   };
   await tick();
 
   const before = read();
-  const beforeHistory = timed.getHistory().length;
+  const beforeHistory = timed.getRestorationHistory().length;
   const notified: string[] = [];
   const off = getPathNotifier().subscribe('**', (_n, _p, path) => {
     notified.push(String(path));
@@ -61,7 +61,7 @@ async function probe(
 
   return {
     landed: JSON.stringify(read()) !== JSON.stringify(before),
-    history: timed.getHistory().length - beforeHistory,
+    history: timed.getRestorationHistory().length - beforeHistory,
     notified,
     pulled: read(),
   };
@@ -135,7 +135,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
     undoable(() => tree.$.a({ n: 2 }));
     await tick();
 
-    const beforeHistory = tree.getHistory().length;
+    const beforeHistory = tree.getRestorationHistory().length;
     const notified: string[] = [];
     const off = getPathNotifier().subscribe('**', (_n, _p, path) =>
       notified.push(String(path))
@@ -148,7 +148,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
     // THE DISCRIMINATOR: truth changed and was published, but NO new
     // authorship was created. PathNotifier cannot tell this from a real write.
     expect(tree.$.a().n).toBe(1);
-    expect(tree.getHistory().length - beforeHistory).toBe(0);
+    expect(tree.getRestorationHistory().length - beforeHistory).toBe(0);
     expect(notified).toEqual(['a.n']);
   });
 
@@ -560,14 +560,14 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
   const run = async (meta: Record<string, unknown>) => {
     const tree = signalTree({ a: { n: 0 } }, { enhancers: [timeTravel()] });
     await tick();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     withWriteContext(meta as never, () => {
       undoable(() => tree.$.a.n.set(1));
     });
     await tick();
 
-    return { delta: tree.getHistory().length - before, value: tree.$.a.n() };
+    return { delta: tree.getRestorationHistory().length - before, value: tree.$.a.n() };
   };
 
   it('CONTROL — no write context at all', async () => {
@@ -603,7 +603,7 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
   const withCtx = async (meta: Record<string, unknown> | null) => {
     const tree = signalTree({ a: { n: 0 } }, { enhancers: [timeTravel()] });
     await tick();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
     if (meta === null) {
       undoable(() => tree.$.a.n.set(1));
     } else {
@@ -612,7 +612,7 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
       });
     }
     await tick();
-    return tree.getHistory().length - before;
+    return tree.getRestorationHistory().length - before;
   };
 
   it('the mode FIELD is decisive, not the presence of a context', async () => {
@@ -641,7 +641,7 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
   it('an ORDINARY application write, claimed as realization', async () => {
     const tree = signalTree({ balance: 0 }, { enhancers: [timeTravel()] });
     await tick();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     withWriteContext({ participation: 'realized' } as never, () => {
       undoable(() => tree.$.balance.set(1_000_000));
@@ -651,20 +651,20 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
     // The claim TAKES EFFECT: truth changed, and the change is invisible to
     // causal history.
     expect(tree.$.balance()).toBe(1_000_000);
-    expect(tree.getHistory().length - before).toBe(0);
+    expect(tree.getRestorationHistory().length - before).toBe(0);
     expect(tree.canUndo()).toBe(false);
   });
 
   it('the same write WITHOUT the claim — the control', async () => {
     const tree = signalTree({ balance: 0 }, { enhancers: [timeTravel()] });
     await tick();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     undoable(() => tree.$.balance.set(1_000_000));
     await tick();
 
     expect(tree.$.balance()).toBe(1_000_000);
-    expect(tree.getHistory().length - before).toBe(1);
+    expect(tree.getRestorationHistory().length - before).toBe(1);
     expect(tree.canUndo()).toBe(true);
   });
 });

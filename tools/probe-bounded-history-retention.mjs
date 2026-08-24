@@ -133,7 +133,7 @@ if (pointFlag !== -1) {
     process.exit(1);
   }
 
-  const historyLength = tree.getHistory().length;
+  const historyLength = tree.getRestorationHistory().length;
   const expectedCap = armName === 'bounded' ? BOUNDED_HISTORY : rounds + 1;
   if (armName === 'bounded' && historyLength > BOUNDED_HISTORY) {
     console.error(

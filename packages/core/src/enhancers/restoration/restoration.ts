@@ -361,7 +361,7 @@ class RestorationManager<T> {
    * defaults toward — has nothing to trigger that re-read, so the undo and redo
    * buttons of a zoneless app never enabled.
    *
-   * `historyVersion` covers the other half: `canRedo()` and `getHistory()`
+   * `historyVersion` covers the other half: `canRedo()` and `getRestorationHistory()`
    * depend on the LENGTH of the history array, not just the position, and the
    * array is mutated in place (push/shift/slice-assign). Every mutation bumps
    * it, so a consumer reading history reactively sees entries appear.
@@ -381,7 +381,7 @@ class RestorationManager<T> {
     this.indexSignal.set(value);
   }
   /** Call after any structural change to `this.history`. */
-  private bumpHistory(): void {
+  private bumpRestorationHistory(): void {
     this.historyVersion.update((v) => v + 1);
   }
 
@@ -563,8 +563,8 @@ class RestorationManager<T> {
       // it costs one no-op release. Do not cite it as covered.
       const discarded = this.history.slice(this.currentIndex + 1);
       this.history = this.history.slice(0, this.currentIndex + 1);
-      this.releaseRetainedHistoryEntries(discarded);
-      this.bumpHistory();
+      this.releaseRetainedRestorationEntries(discarded);
+      this.bumpRestorationHistory();
     }
 
     // A history entry IS the snapshot — no clone.
@@ -710,7 +710,7 @@ class RestorationManager<T> {
     } else {
       this.history.splice(insertIndex, 0, entry);
     }
-    this.bumpHistory();
+    this.bumpRestorationHistory();
     this.currentIndex = this.history.length - 1;
     this.isTemporalViewActive = false;
 
@@ -720,9 +720,9 @@ class RestorationManager<T> {
     if (this.history.length > this.maxHistorySize) {
       const evicted = this.history.shift();
       if (evicted) {
-        this.releaseRetainedHistoryEntries([evicted]);
+        this.releaseRetainedRestorationEntries([evicted]);
       }
-      this.bumpHistory();
+      this.bumpRestorationHistory();
       this.currentIndex--;
     }
 
@@ -787,7 +787,7 @@ class RestorationManager<T> {
     return this.turns.get(turnId);
   }
 
-  getHistoryRef(index: number): CanonicalTurn<T> | undefined {
+  getRestorationHistoryRef(index: number): CanonicalTurn<T> | undefined {
     return this.history[index];
   }
 
@@ -1404,7 +1404,7 @@ class RestorationManager<T> {
     return false;
   }
 
-  getHistory(): RestorationHistoryEntry<T>[] {
+  getRestorationHistory(): RestorationHistoryEntry<T>[] {
     // The entry OBJECTS are copied so a caller cannot rewrite history metadata,
     // but the STATE is handed over by reference.
     //
@@ -1420,7 +1420,7 @@ class RestorationManager<T> {
     return this.history.map((entry) => ({ ...entry }));
   }
 
-  resetHistory(): void {
+  resetRestorationHistory(): void {
     // Before `nextTurnId` goes back to 1. Owner strings are derived from turn
     // ids, so releasing after the counter reset would leave the old claims
     // attached to owners the next entries are about to mint.
@@ -1432,7 +1432,7 @@ class RestorationManager<T> {
     this.positionFrontiers.clear();
     this.nextTurnId = 1;
     this.isTemporalViewActive = false;
-    this.bumpHistory();
+    this.bumpRestorationHistory();
     this.currentIndex = -1;
     this.addEntry('RESET');
     this.observedBatches = [];
@@ -1608,11 +1608,11 @@ class RestorationManager<T> {
   // A retained history entry is a REASON to keep retired subjects alive. It
   // stops being one at exactly five moments, and before this there was no code
   // at any of them: max-size eviction, redo truncation on a new write after an
-  // undo, scoped redo truncation, `resetHistory()`, and destroy (which routes
-  // through `resetHistory()`). Every one of them dropped the entry and left the
+  // undo, scoped redo truncation, `resetRestorationHistory()`, and destroy (which routes
+  // through `resetRestorationHistory()`). Every one of them dropped the entry and left the
   // subjects it named pinned forever — 945 B each, 90% of the measured slope.
   //
-  // Every removal path calls `releaseRetainedHistoryEntries`. Nothing else may
+  // Every removal path calls `releaseRetainedRestorationEntries`. Nothing else may
   // remove an entry from `this.history`.
 
   private restorationClaimOwner(turnId: number): RestorationClaimOwner {
@@ -1620,7 +1620,7 @@ class RestorationManager<T> {
     // shared registry. NOT a history index — indices shift when the window
     // slides, and a shifted index re-points a live claim at another record.
     //
-    // Turn ids restart at 1 after `resetHistory()`, so an owner string CAN be
+    // Turn ids restart at 1 after `resetRestorationHistory()`, so an owner string CAN be
     // reused across a reset. That is safe only because the reset releases every
     // owner before the counter goes back; if that order ever inverts, a new
     // entry inherits a dead entry's claims.
@@ -1648,7 +1648,7 @@ class RestorationManager<T> {
    * pending transaction — is skipped rather than freed; that check lives there
    * rather than here because a caller that had to remember it would forget.
    */
-  private releaseRetainedHistoryEntries(
+  private releaseRetainedRestorationEntries(
     entries: readonly CanonicalTurn<T>[]
   ): readonly number[] {
     const claims = getOrCreateSubjectRestorationClaims(this.tree);
@@ -1692,7 +1692,7 @@ class RestorationManager<T> {
    * would also free claims a `transactions()` enhancer on the same tree holds.
    */
   private releaseAllOwnedRestorationClaims(): readonly number[] {
-    return this.releaseRetainedHistoryEntries([...this.history]);
+    return this.releaseRetainedRestorationEntries([...this.history]);
   }
 
   /** Test-only inventory: what this tree currently pins, and for whom. */
@@ -1794,9 +1794,9 @@ class RestorationManager<T> {
       );
     }
     this.history = surviving;
-    this.releaseRetainedHistoryEntries(discarded);
+    this.releaseRetainedRestorationEntries(discarded);
     this.currentIndex = this.history.length - 1;
-    this.bumpHistory();
+    this.bumpRestorationHistory();
     this.rebuildTurnIndexes();
   }
 }
@@ -1865,7 +1865,7 @@ class RestorationManager<T> {
  * store.update(() => ({ document: { title: 'New Title' } }), 'update_title');
  *
  * // View detailed history
- * const history = store.__restoration.getHistory();
+ * const history = store.__restoration.getRestorationHistory();
  * console.log(history[0].action); // 'Update Document Title'
  * console.log(history[0].timestamp); // Date when change occurred
  * ```
@@ -2027,10 +2027,10 @@ export function timeTravel(
         canRedo(): boolean {
           return false;
         },
-        getHistory(): RestorationHistoryEntry<T>[] {
+        getRestorationHistory(): RestorationHistoryEntry<T>[] {
           return [];
         },
-        resetHistory(): void {
+        resetRestorationHistory(): void {
           /* disabled */
         },
         jumpTo(_index: number): void {
@@ -3216,11 +3216,11 @@ export function timeTravel(
     // NOT deleted: the `pendingTransactions` capture buckets, which record a
     // transaction confirmed by `transactions()` as one turn. That is
     // time-travel's own job and the lifecycle observer drives it.
-    (enhancedTree as ISignalTree<T> & RestorationMethods)['getHistory'] = () =>
-      restorationManager.getHistory();
-    (enhancedTree as ISignalTree<T> & RestorationMethods)['resetHistory'] =
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['getRestorationHistory'] = () =>
+      restorationManager.getRestorationHistory();
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['resetRestorationHistory'] =
       () => {
-        restorationManager.resetHistory();
+        restorationManager.resetRestorationHistory();
       };
     (enhancedTree as ISignalTree<T> & RestorationMethods)['jumpTo'] = (
       index: number
@@ -3302,7 +3302,7 @@ export function timeTravel(
         unsubscribeReset = null;
         restoreLeafInterceptors = null;
         releaseCapture?.();
-        restorationManager.resetHistory();
+        restorationManager.resetRestorationHistory();
       });
     }
 
@@ -3323,7 +3323,7 @@ export function timeTravel(
   // takes the neutral `EnhancerHost`, and parameters are contravariant under
   // `strictFunctionTypes`. The body is untouched.
   //
-  // `RestorationMethods.getHistory()` recovers its state from polymorphic
+  // `RestorationMethods.getRestorationHistory()` recovers its state from polymorphic
   // `this`, NOT from anything this cast carries — which is why the public
   // contract stays state-precise across it. `b266457d` removed the old
   // `RestorationMethods<T>` generic for exactly this reason; the rows in

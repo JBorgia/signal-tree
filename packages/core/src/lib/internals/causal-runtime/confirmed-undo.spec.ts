@@ -1,5 +1,5 @@
 import type { PositionId, ReversalEffect } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { undoConfirmedAt } from './confirmed-undo';
 import { createPositionRegistry, type PositionRegistry } from '../position-registry';
 import { createRealizationContextSource } from './realization-context';
@@ -14,7 +14,7 @@ const P_THEME = 6 as PositionId;
 
 describe('undoConfirmedAt', () => {
   it('leaves all state untouched when authority assessment refuses', () => {
-    const { store, appliedHistory, topology } = createConfirmedUndoContext();
+    const { store, appliedTurns, topology } = createConfirmedUndoContext();
 
     store.admitConfirmed({
       id: 1,
@@ -30,11 +30,11 @@ describe('undoConfirmedAt', () => {
         { owner: P_THEME, before: 'light', after: 'dark' },
       ],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
-    expect(appliedHistory.admitConfirmed(2)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
@@ -43,14 +43,14 @@ describe('undoConfirmedAt', () => {
         [P_THEME, 'light'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: { applyAtomically },
         realizationContext,
@@ -59,29 +59,29 @@ describe('undoConfirmedAt', () => {
 
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('leaves all state untouched when applied-history preparation refuses after assessment and planning', () => {
-    const { store, appliedHistory, topology } = createConfirmedUndoContext();
+    const { store, appliedTurns, topology } = createConfirmedUndoContext();
 
     store.admitConfirmed({
       id: 1,
       effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
-    const refusingAppliedHistory = {
-      getAppliedTurnIds: () => appliedHistory.getAppliedTurnIds(),
-      getFrontier: (positionId: PositionId) => appliedHistory.getFrontier(positionId),
+    const refusingAppliedTurns = {
+      getAppliedTurnIds: () => appliedTurns.getAppliedTurnIds(),
+      getFrontier: (positionId: PositionId) => appliedTurns.getFrontier(positionId),
       prepareUnapplyConfirmedTurn: () => ({
         ok: false as const,
         reason: 'not-applied-frontier' as const,
@@ -94,7 +94,7 @@ describe('undoConfirmedAt', () => {
         {
           authority: P_ROOT,
           store,
-          appliedHistory: refusingAppliedHistory,
+          appliedTurns: refusingAppliedTurns,
           topology,
           port: { applyAtomically },
           realizationContext,
@@ -115,32 +115,32 @@ describe('undoConfirmedAt', () => {
 
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('propagates physical application failure without changing canonical or applied state', () => {
-    const { store, appliedHistory, topology } = createConfirmedUndoContext();
+    const { store, appliedTurns, topology } = createConfirmedUndoContext();
 
     store.admitConfirmed({
       id: 1,
       effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
 
     const storeBefore = store.inspect();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const failure = new Error('atomic silent application failed');
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(() =>
       undoConfirmedAt({
         authority: P_ROOT,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         realizationContext,
         port: {
@@ -152,11 +152,11 @@ describe('undoConfirmedAt', () => {
     ).toThrow(failure);
 
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('moves a whole confirmed turn from applied to redoable after successful atomic reversal, without changing canonical history', () => {
-    const { store, appliedHistory, topology } = createConfirmedUndoContext();
+    const { store, appliedTurns, topology } = createConfirmedUndoContext();
 
     store.admitConfirmed({
       id: 1,
@@ -169,8 +169,8 @@ describe('undoConfirmedAt', () => {
       id: 2,
       effects: [{ owner: P_FIRST_NAME, before: 'Grace', after: 'Joan' }],
     });
-    expect(appliedHistory.admitConfirmed(1)).toEqual({ ok: true });
-    expect(appliedHistory.admitConfirmed(2)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(1)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(2)).toEqual({ ok: true });
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const realizationContext = createRealizationContextSource({
@@ -179,14 +179,14 @@ describe('undoConfirmedAt', () => {
         [P_LAST_NAME, 'Lovelace'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(
       undoConfirmedAt({
         authority: P_ROOT,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: { applyAtomically },
         realizationContext,
@@ -204,7 +204,7 @@ describe('undoConfirmedAt', () => {
         [P_LAST_NAME]: 1,
       },
     });
-    expect(appliedHistory.inspect()).toEqual({
+    expect(appliedTurns.inspect()).toEqual({
       appliedTurnIds: [1],
       redoTurnIds: [2],
       frontiers: {
@@ -219,7 +219,7 @@ describe('undoConfirmedAt', () => {
   });
 
   it('ignores later canonical structural consumers once they are redoable rather than applied', () => {
-    const { store, appliedHistory, topology } = createConfirmedUndoContext();
+    const { store, appliedTurns, topology } = createConfirmedUndoContext();
 
     const first = store.admitConfirmed({
       id: 1,
@@ -245,9 +245,9 @@ describe('undoConfirmedAt', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(first.id)).toEqual({ ok: true });
-    expect(appliedHistory.admitConfirmed(second.id)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(second.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(first.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(second.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(second.id)).toEqual({ ok: true });
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const validateEffects = vi.fn();
@@ -257,14 +257,14 @@ describe('undoConfirmedAt', () => {
         [P_THEME, undefined],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     expect(
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: { applyAtomically, validateEffects },
         realizationContext,
@@ -282,7 +282,7 @@ describe('undoConfirmedAt', () => {
         structural: 'rekey',
       },
     ]);
-    expect(appliedHistory.inspect()).toEqual({
+    expect(appliedTurns.inspect()).toEqual({
       appliedTurnIds: [],
       redoTurnIds: [1, 2],
       frontiers: {},
@@ -292,7 +292,7 @@ describe('undoConfirmedAt', () => {
 
 function createConfirmedUndoContext(): {
   store: TurnStore;
-  appliedHistory: AppliedHistory;
+  appliedTurns: AppliedTurnProjection;
   topology: PositionRegistry;
 } {
   const topology = createPositionRegistry();
@@ -313,7 +313,7 @@ function createConfirmedUndoContext(): {
   expect(theme).toBe(P_THEME);
 
   const store = new TurnStore();
-  const appliedHistory = new AppliedHistory(store);
+  const appliedTurns = new AppliedTurnProjection(store);
 
-  return { store, appliedHistory, topology };
+  return { store, appliedTurns, topology };
 }

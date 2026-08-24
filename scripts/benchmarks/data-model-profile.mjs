@@ -697,7 +697,7 @@ if (want('timetravel')) {
     for (let i = 0; i < 100; i++) t.$.g0.f0.set(i);
     await new Promise((r) => setTimeout(r, 5));
     console.log(
-      `  100 SYNCHRONOUS leaf writes → ${t.getHistory().length} history entries ` +
+      `  100 SYNCHRONOUS leaf writes → ${t.getRestorationHistory().length} history entries ` +
         `(INIT + flush-coalesced). Batching is per-microtask, not per-write.`
     );
     const t2 = signalTree(wide(1000)).with(timeTravel({ maxHistorySize: 10000 }));
@@ -706,7 +706,7 @@ if (want('timetravel')) {
       await Promise.resolve();
       await Promise.resolve();
     }
-    console.log(`  100 writes, each awaiting a microtask → ${t2.getHistory().length} history entries`);
+    console.log(`  100 writes, each awaiting a microtask → ${t2.getRestorationHistory().length} history entries`);
   }
 
   // Per-entry recording cost as a function of STATE SIZE (addEntry snapshots
@@ -832,7 +832,7 @@ if (want('timetravel')) {
       KEEP.push(tt);
       gc(); gc(); gc();
       const after = process.memoryUsage().heapUsed;
-      const len = tt.getHistory().length;
+      const len = tt.getRestorationHistory().length;
       KEEP.length = 0;
       gc(); gc();
       return { bytes: after - before, len };
@@ -880,7 +880,7 @@ if (want('ttentity')) {
   t.$.items.setAll(mkItems(N));
   await new Promise((r) => setTimeout(r, 10));
   await measure(t, `entityMap(${N}) updateOne + flush, timeTravel(): `);
-  console.log(`  history after 20 distinct updates: ${t.getHistory().length} entries`);
+  console.log(`  history after 20 distinct updates: ${t.getRestorationHistory().length} entries`);
 }
 
 // timeTravel() subscribes to the GLOBAL PathNotifier flush event, so every live
@@ -916,7 +916,7 @@ if (want('ttleak')) {
     await probe(`same write, with ${k} unrelated 10000-leaf timeTravel tree(s) alive:`.padEnd(70));
   }
   console.log(
-    `  their histories are still ${others.map((t) => t.getHistory().length).join('/')} — ` +
+    `  their histories are still ${others.map((t) => t.getRestorationHistory().length).join('/')} — ` +
       `every one of those snapshots was computed and thrown away.`
   );
 }

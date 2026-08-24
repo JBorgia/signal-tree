@@ -29,14 +29,14 @@ describe('HIST-0 case 4: mixed writes in ONE untransacted turn', () => {
       { enhancers: [timeTravel({ maxHistorySize: 50 })] }
     );
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     // No flush between them — one tick, therefore one turn.
     undoable(() => tree.$.document.title.set('edited'));
     undoable(() => tree.$.ui.panel.set('inspector'));
     await flush();
 
-    const turnsAdded = tree.getHistory().length - before;
+    const turnsAdded = tree.getRestorationHistory().length - before;
 
     tree.undo();
     await flush();
@@ -185,14 +185,14 @@ describe('HIST-0 case 9: does observability create restoration ownership?', () =
       { enhancers: [timeTravel({ maxHistorySize: 5 })] }
     );
     const claims = getSubjectRestorationClaims(tree);
-    const historyBefore = tree.getHistory().length;
+    const historyBefore = tree.getRestorationHistory().length;
 
     for (let g = 0; g < 40; g++) {
       realization(() => tree.$.rows.setAll([{ id: `g${g}`, name: 'n' }]));
       await flush();
     }
 
-    const historyAfter = tree.getHistory().length;
+    const historyAfter = tree.getRestorationHistory().length;
 
     // THE INVARIANT, measured directly on the causal inventories rather than
     // inferred from a heap probe:
@@ -218,7 +218,7 @@ describe('HIST-0 case 9: does observability create restoration ownership?', () =
       { enhancers: [timeTravel({ maxHistorySize: 50 })] }
     );
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     realization(() => tree.$.document.title.set('SERVER'));
     await flush();
@@ -235,7 +235,7 @@ describe('HIST-0 case 9: does observability create restoration ownership?', () =
     // selective model that promises devtools visibility for excluded operations
     // needs a second inventory, which is new machinery — and is exactly the
     // scope HIST-0 should NOT smuggle in.
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
     expect(tree.$.document.title()).toBe('SERVER');
   });
 });

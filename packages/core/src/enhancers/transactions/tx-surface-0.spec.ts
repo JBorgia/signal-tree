@@ -108,7 +108,7 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
       }
     );
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     tree
       .transaction(() => {
@@ -120,7 +120,7 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
     // Grouping without admission: the work landed, and it is not a user undo
     // step.
     expect(tree.$.rows.ids()).toEqual(['a']);
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
   });
 
   it('undoable(() => transaction(...)) commits as ONE undoable turn', async () => {
@@ -136,7 +136,7 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
       }
     );
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     undoable(() => {
       tree
@@ -149,7 +149,7 @@ describe('TX-SURFACE-0: the composed ownership story', () => {
     await flush();
 
     expect(tree.$.rows.ids()).toEqual(['a', 'b']);
-    expect(tree.getHistory().length).toBe(before + 1);
+    expect(tree.getRestorationHistory().length).toBe(before + 1);
 
     tree.undo();
     await flush();

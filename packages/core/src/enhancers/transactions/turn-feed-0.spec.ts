@@ -35,8 +35,8 @@ const designated = <T extends object>(state: T) =>
     ],
   });
 
-const turns = (tree: { getHistory(): readonly unknown[] }) =>
-  tree.getHistory().length - 1;
+const turns = (tree: { getRestorationHistory(): readonly unknown[] }) =>
+  tree.getRestorationHistory().length - 1;
 
 describe('TURN-FEED-0 case 1: pending isolation', () => {
   it('a pending transaction never reaches confirmed history', async () => {
@@ -45,7 +45,7 @@ describe('TURN-FEED-0 case 1: pending isolation', () => {
       { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     const pending = tree.transaction(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
@@ -56,7 +56,7 @@ describe('TURN-FEED-0 case 1: pending isolation', () => {
     // appeared as a confirmed history entry with ownerPaths ['rows'] while the
     // transaction was still pending, because time-travel could not recognise a
     // transaction it did not own.
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
     expect(tree.$.rows.ids()).toEqual(['a']); // visible in STATE, as intended
 
     pending.rollback();
@@ -71,7 +71,7 @@ describe('TURN-FEED-0 case 2: confirmation', () => {
       { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     // Designated: this case asserts the confirmed transaction becomes exactly
     // ONE admitted turn, which requires it to be admitted at all.
@@ -84,12 +84,12 @@ describe('TURN-FEED-0 case 2: confirmation', () => {
     pending.confirm();
     await flush();
 
-    expect(tree.getHistory().length).toBe(before + 1);
+    expect(tree.getRestorationHistory().length).toBe(before + 1);
 
     // Idempotent: confirming twice must not announce twice.
     pending.confirm();
     await flush();
-    expect(tree.getHistory().length).toBe(before + 1);
+    expect(tree.getRestorationHistory().length).toBe(before + 1);
   });
 
   it('and admission is STILL decided by undoable(), not by confirming', async () => {
@@ -144,7 +144,7 @@ describe('TURN-FEED-0 case 3: rollback', () => {
       { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     const pending = tree.transaction(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
@@ -153,7 +153,7 @@ describe('TURN-FEED-0 case 3: rollback', () => {
     pending.rollback();
     await flush();
 
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
     expect(tree.$.rows.ids()).toEqual([]);
   });
 });
@@ -166,7 +166,7 @@ describe('TURN-FEED-0 case 4: surrounding writes', () => {
       { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     // All three designated: the case is about three DISTINCT admitted turns and
     // the absence of cross-bucket contamination between them.
@@ -182,11 +182,11 @@ describe('TURN-FEED-0 case 4: surrounding writes', () => {
     // TWO entries while pending — the before-write and the after-write. The
     // transaction's own contribution is NOT among them. Getting three here was
     // the exact regression that blocked the TX-SURFACE-0 deletion.
-    expect(tree.getHistory().length).toBe(before + 2);
+    expect(tree.getRestorationHistory().length).toBe(before + 2);
 
     pending.confirm();
     await flush();
-    expect(tree.getHistory().length).toBe(before + 3);
+    expect(tree.getRestorationHistory().length).toBe(before + 3);
   });
 });
 
@@ -199,16 +199,16 @@ describe('TURN-FEED-0 case 5: enhancer ordering', () => {
       { enhancers: order === 'tx-first' ? [tx, tt] : [tt, tx] }
     );
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     const pending = tree.transaction(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
     });
     await flush();
-    const whilePending = tree.getHistory().length - before;
+    const whilePending = tree.getRestorationHistory().length - before;
     pending.confirm();
     await flush();
-    return { whilePending, afterConfirm: tree.getHistory().length - before };
+    return { whilePending, afterConfirm: tree.getRestorationHistory().length - before };
   };
 
   it('both orders behave identically', async () => {

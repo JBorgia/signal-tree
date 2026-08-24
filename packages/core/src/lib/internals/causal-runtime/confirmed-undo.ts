@@ -1,6 +1,6 @@
 import type { PositionRegistry } from '../position-registry';
 
-import type { AppliedHistory } from './applied-history';
+import type { AppliedTurnProjection } from './applied-turn-projection';
 import { assessConfirmedUndo } from './authority-assessment';
 import type { PositionId, ReversalResult } from './causal-types';
 import type { EffectApplicationPort } from './effect-applier';
@@ -12,7 +12,7 @@ import type { TurnStore } from './turn-store';
 export type UndoConfirmedResult = ReversalResult<
   | { readonly kind: 'outside-boundary' }
   | { readonly kind: 'frontier-blocked' }
-  | { readonly kind: 'history-evicted' }
+  | { readonly kind: 'turn-evicted' }
   | { readonly kind: 'dependency-conflict' }
   | { readonly kind: 'structural-drift' }
 >;
@@ -26,8 +26,8 @@ export interface UndoConfirmedPort extends EffectApplicationPort {
 export interface UndoConfirmedAtOptions {
   readonly authority: PositionId;
   readonly store: Pick<TurnStore, 'getTurn'>;
-  readonly appliedHistory: Pick<
-    AppliedHistory,
+  readonly appliedTurns: Pick<
+    AppliedTurnProjection,
     | 'getAppliedTurnIds'
     | 'getFrontier'
     | 'prepareUnapplyConfirmedTurn'
@@ -57,14 +57,14 @@ export function undoConfirmedAt(
   const assessment = dependencies.assessConfirmedUndo({
     authority: options.authority,
     store: options.store,
-    appliedHistory: options.appliedHistory,
+    appliedTurns: options.appliedTurns,
     topology: options.topology,
   });
   if (!assessment.ok) {
     return assessment;
   }
 
-  if (hasLaterStructuralDependency(assessment.turnId, options.store, options.appliedHistory)) {
+  if (hasLaterStructuralDependency(assessment.turnId, options.store, options.appliedTurns)) {
     return { ok: false, refusal: { kind: 'dependency-conflict' } };
   }
 
@@ -82,7 +82,7 @@ export function undoConfirmedAt(
     return { ok: false, refusal: validationRefusal };
   }
 
-  const transition = options.appliedHistory.prepareUnapplyConfirmedTurn(
+  const transition = options.appliedTurns.prepareUnapplyConfirmedTurn(
     assessment.turnId
   );
   if (!transition.ok) {
@@ -94,15 +94,15 @@ export function undoConfirmedAt(
     port: options.port,
   });
 
-  options.appliedHistory.commitPreparedUnapply(transition.transition);
+  options.appliedTurns.commitPreparedUnapply(transition.transition);
   return { ok: true, turnId: assessment.turnId };
 }
 
 function mapPrepareFailureToUndoResult(
-  reason: 'history-evicted' | 'not-applied-frontier'
+  reason: 'turn-evicted' | 'not-applied-frontier'
 ): UndoConfirmedResult {
-  if (reason === 'history-evicted') {
-    return { ok: false, refusal: { kind: 'history-evicted' } };
+  if (reason === 'turn-evicted') {
+    return { ok: false, refusal: { kind: 'turn-evicted' } };
   }
 
   return { ok: false, refusal: { kind: 'frontier-blocked' } };
@@ -111,14 +111,14 @@ function mapPrepareFailureToUndoResult(
 function hasLaterStructuralDependency(
   turnId: number,
   store: Pick<TurnStore, 'getTurn'>,
-  appliedHistory: Pick<AppliedHistory, 'getAppliedTurnIds'>
+  appliedTurns: Pick<AppliedTurnProjection, 'getAppliedTurnIds'>
 ): boolean {
   const turn = store.getTurn(turnId);
   if (!turn) {
     return false;
   }
 
-  const laterAppliedTurns = appliedHistory
+  const laterAppliedTurns = appliedTurns
     .getAppliedTurnIds()
     .filter((candidateTurnId) => candidateTurnId > turnId)
     .map((candidateTurnId) => store.getTurn(candidateTurnId))

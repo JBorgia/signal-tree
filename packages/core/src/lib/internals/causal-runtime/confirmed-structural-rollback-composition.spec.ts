@@ -1,5 +1,5 @@
 import type { PositionId, ReversalEffect } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { redoConfirmedAt } from './confirmed-redo';
 import { undoConfirmedAt } from './confirmed-undo';
 import { createPositionRegistry } from '../position-registry';
@@ -31,14 +31,14 @@ describe('confirmed structural undo/redo composition', () => {
     expect(driverName).toBe(P_DRIVER_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, 'A'],
         [P_DRIVER_NAME, 'Alice'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const confirmed = store.admitConfirmed({
       id: 1,
@@ -58,7 +58,7 @@ describe('confirmed structural undo/redo composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'B'],
@@ -87,7 +87,7 @@ describe('confirmed structural undo/redo composition', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -137,7 +137,7 @@ describe('confirmed structural undo/redo composition', () => {
       redoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -179,14 +179,14 @@ describe('confirmed structural undo/redo composition', () => {
     expect(otherDriverKey).toBe(P_OTHER_DRIVER_KEY);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, 'A'],
         [P_OTHER_DRIVER_KEY, undefined],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     const earlier = store.admitConfirmed({
@@ -213,19 +213,19 @@ describe('confirmed structural undo/redo composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(earlier.id)).toEqual({ ok: true });
-    expect(appliedHistory.admitConfirmed(later.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(earlier.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(later.id)).toEqual({ ok: true });
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const validateEffects = vi.fn();
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const storeBefore = store.inspect();
 
     expect(
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: { applyAtomically, validateEffects },
         realizationContext,
@@ -235,7 +235,7 @@ describe('confirmed structural undo/redo composition', () => {
     expect(validateEffects).not.toHaveBeenCalled();
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('allows confirmed structural undo once the later captured consumer is redoable rather than applied', () => {
@@ -253,14 +253,14 @@ describe('confirmed structural undo/redo composition', () => {
     expect(otherDriverKey).toBe(P_OTHER_DRIVER_KEY);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, 'A'],
         [P_OTHER_DRIVER_KEY, undefined],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const first = store.admitConfirmed({
       id: 1,
@@ -286,9 +286,9 @@ describe('confirmed structural undo/redo composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(first.id)).toEqual({ ok: true });
-    expect(appliedHistory.admitConfirmed(second.id)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(second.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(first.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(second.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(second.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'B'],
@@ -317,7 +317,7 @@ describe('confirmed structural undo/redo composition', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -348,11 +348,11 @@ describe('confirmed structural undo/redo composition', () => {
     expect(driverKey).toBe(P_DRIVER_KEY);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_DRIVER_KEY, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const confirmed = store.admitConfirmed({
       id: 1,
@@ -366,18 +366,18 @@ describe('confirmed structural undo/redo composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const validateEffects = vi.fn(() => ({ kind: 'structural-drift' as const }));
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const storeBefore = store.inspect();
 
     expect(
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: { applyAtomically, validateEffects },
         realizationContext,
@@ -387,7 +387,7 @@ describe('confirmed structural undo/redo composition', () => {
     expect(validateEffects).toHaveBeenCalledTimes(1);
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('keeps a structural confirmed turn redoable when redo validation refuses with structural-drift', () => {
@@ -403,14 +403,14 @@ describe('confirmed structural undo/redo composition', () => {
     expect(driverName).toBe(P_DRIVER_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, 'A'],
         [P_DRIVER_NAME, 'Alice'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const confirmed = store.admitConfirmed({
       id: 1,
@@ -430,7 +430,7 @@ describe('confirmed structural undo/redo composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'B'],
@@ -455,7 +455,7 @@ describe('confirmed structural undo/redo composition', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -464,14 +464,14 @@ describe('confirmed structural undo/redo composition', () => {
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const validateEffects = vi.fn(() => ({ kind: 'structural-drift' as const }));
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const storeBefore = store.inspect();
 
     expect(
       redoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: { applyAtomically, validateEffects },
         realizationContext,
@@ -481,7 +481,7 @@ describe('confirmed structural undo/redo composition', () => {
     expect(validateEffects).toHaveBeenCalledTimes(1);
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
   it('undoes and redoes a confirmed add plus scalar turn in authored sequence without collapsing to one remove', () => {
@@ -497,14 +497,14 @@ describe('confirmed structural undo/redo composition', () => {
     expect(driverName).toBe(P_DRIVER_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, undefined],
         [P_DRIVER_NAME, undefined],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const confirmed = store.admitConfirmed({
       id: 1,
@@ -524,7 +524,7 @@ describe('confirmed structural undo/redo composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'A'],
@@ -537,7 +537,7 @@ describe('confirmed structural undo/redo composition', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -567,7 +567,7 @@ describe('confirmed structural undo/redo composition', () => {
       redoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -609,7 +609,7 @@ describe('confirmed structural undo/redo composition', () => {
     expect(driverEnabled).toBe(P_DRIVER_ENABLED);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, undefined],
@@ -617,7 +617,7 @@ describe('confirmed structural undo/redo composition', () => {
         [P_DRIVER_ENABLED, undefined],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const confirmed = store.admitConfirmed({
       id: 1,
@@ -643,7 +643,7 @@ describe('confirmed structural undo/redo composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'A'],
@@ -657,7 +657,7 @@ describe('confirmed structural undo/redo composition', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -695,7 +695,7 @@ describe('confirmed structural undo/redo composition', () => {
       redoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -746,14 +746,14 @@ describe('confirmed structural undo/redo composition', () => {
     expect(driverName).toBe(P_DRIVER_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_DRIVER_KEY, undefined],
         [P_DRIVER_NAME, undefined],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const confirmed = store.admitConfirmed({
       id: 1,
@@ -773,7 +773,7 @@ describe('confirmed structural undo/redo composition', () => {
         },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([
       [P_DRIVER_KEY, 'A'],
@@ -785,7 +785,7 @@ describe('confirmed structural undo/redo composition', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -794,14 +794,14 @@ describe('confirmed structural undo/redo composition', () => {
 
     const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
     const validateEffects = vi.fn(() => ({ kind: 'structural-drift' as const }));
-    const appliedBefore = appliedHistory.inspect();
+    const appliedBefore = appliedTurns.inspect();
     const storeBefore = store.inspect();
 
     expect(
       redoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port: { applyAtomically, validateEffects },
         realizationContext,
@@ -827,7 +827,7 @@ describe('confirmed structural undo/redo composition', () => {
     ]);
     expect(applyAtomically).not.toHaveBeenCalled();
     expect(store.inspect()).toEqual(storeBefore);
-    expect(appliedHistory.inspect()).toEqual(appliedBefore);
+    expect(appliedTurns.inspect()).toEqual(appliedBefore);
   });
 
 });

@@ -1,8 +1,8 @@
 import type { PositionId, TurnId, CausalTurn } from './causal-types';
 
 import type {
-  AppliedHistory,
-} from './applied-history';
+  AppliedTurnProjection,
+} from './applied-turn-projection';
 import type { TurnStore } from './turn-store';
 
 export interface RealizationContext {
@@ -19,7 +19,7 @@ export interface RealizationContextSource extends RealizationContext {
 export interface CreateRealizationContextSourceOptions {
   readonly baselineValues?: ReadonlyMap<PositionId, unknown>;
   readonly store: Pick<TurnStore, 'getTurn' | 'getPendingTurns'>;
-  readonly appliedHistory: Pick<AppliedHistory, 'forgetRetainedTurn' | 'getAppliedTurnIds'>;
+  readonly appliedTurns: Pick<AppliedTurnProjection, 'forgetRetainedTurn' | 'getAppliedTurnIds'>;
   readonly getOverlayValues?: () => ReadonlyMap<PositionId, unknown>;
 }
 
@@ -46,7 +46,7 @@ class ProjectionRealizationContextSource implements RealizationContextSource {
   }
 
   retainEvictedConfirmedTurn(turn: CausalTurn): void {
-    const disposition = this.options.appliedHistory.forgetRetainedTurn(turn.id);
+    const disposition = this.options.appliedTurns.forgetRetainedTurn(turn.id);
     if (!disposition.wasApplied && !disposition.wasRedoable) {
       return;
     }
@@ -71,7 +71,7 @@ class ProjectionRealizationContextSource implements RealizationContextSource {
     excludingPendingTurnId?: TurnId
   ): Map<PositionId, unknown> {
     const values = new Map(this.baselineValues);
-    const activeConfirmedTurns = this.options.appliedHistory
+    const activeConfirmedTurns = this.options.appliedTurns
       .getAppliedTurnIds()
       .filter((turnId) => turnId !== excludingConfirmedTurnId)
       .map((turnId) => this.options.store.getTurn(turnId))

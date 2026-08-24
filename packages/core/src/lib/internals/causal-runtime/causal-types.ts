@@ -66,7 +66,7 @@ export interface ConfirmedReapplyPlan {
 export type ReversalRefusal =
   | { readonly kind: 'outside-boundary' }
   | { readonly kind: 'frontier-blocked' }
-  | { readonly kind: 'history-evicted' }
+  | { readonly kind: 'turn-evicted' }
   | { readonly kind: 'dependency-conflict' }
   | { readonly kind: 'structural-drift' }
   /**

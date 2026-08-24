@@ -136,14 +136,14 @@ describe('DEVTOOLS-JUMP-0: interaction with restoration', () => {
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
-    const historyAfterAuthored = tree.getHistory().length;
+    const historyAfterAuthored = tree.getRestorationHistory().length;
 
     asAuthoredDevtools(() => tree.$.n.set(99));
     await flush();
 
     // Under opt-in it cannot be admitted — it was never designated — so this
     // should hold for a reason that has nothing to do with devtools.
-    expect(tree.getHistory().length).toBe(historyAfterAuthored);
+    expect(tree.getRestorationHistory().length).toBe(historyAfterAuthored);
 
     // And the undo reverses the authored turn, overwriting the scrub — 99 is
     // gone and n is back to 0.

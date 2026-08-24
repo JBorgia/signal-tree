@@ -1,7 +1,7 @@
 import type { PositionRegistry } from '../position-registry';
 
 import type { PositionId, ReversalResult } from './causal-types';
-import type { AppliedHistory } from './applied-history';
+import type { AppliedTurnProjection } from './applied-turn-projection';
 import type { TurnStore } from './turn-store';
 
 export type ConfirmedUndoAssessment = ReversalResult<
@@ -12,15 +12,15 @@ export type ConfirmedUndoAssessment = ReversalResult<
 export interface AssessConfirmedUndoOptions {
   readonly authority: PositionId;
   readonly store: Pick<TurnStore, 'getTurn'>;
-  readonly appliedHistory: Pick<AppliedHistory, 'getAppliedTurnIds' | 'getFrontier'>;
+  readonly appliedTurns: Pick<AppliedTurnProjection, 'getAppliedTurnIds' | 'getFrontier'>;
   readonly topology: Pick<PositionRegistry, 'contains'>;
 }
 
 export function assessConfirmedUndo(
   options: AssessConfirmedUndoOptions
 ): ConfirmedUndoAssessment {
-  const { authority, appliedHistory, store, topology } = options;
-  const latestContainedTurn = [...appliedHistory.getAppliedTurnIds()]
+  const { authority, appliedTurns, store, topology } = options;
+  const latestContainedTurn = [...appliedTurns.getAppliedTurnIds()]
     .reverse()
     .map((turnId) => store.getTurn(turnId))
     .find((turn) =>
@@ -35,7 +35,7 @@ export function assessConfirmedUndo(
   }
 
   const isAtFrontier = latestContainedTurn.participants.every(
-    (participant) => appliedHistory.getFrontier(participant) === latestContainedTurn.id
+    (participant) => appliedTurns.getFrontier(participant) === latestContainedTurn.id
   );
   if (!isAtFrontier) {
     return { ok: false, refusal: { kind: 'frontier-blocked' } };

@@ -1,5 +1,5 @@
 import type { PositionId, ReversalEffect } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { rollbackPendingTurnAt } from './pending-rollback';
 import { redoConfirmedAt } from './confirmed-redo';
 import { undoConfirmedAt } from './confirmed-undo';
@@ -24,11 +24,11 @@ describe('pending rollback production composition', () => {
     expect(firstName).toBe(P_FIRST_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -38,9 +38,9 @@ describe('pending rollback production composition', () => {
       id: 2,
       effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
     const confirmedStoreBeforeRollback = store.inspect();
-    const appliedHistoryBeforeRollback = appliedHistory.inspect();
+    const appliedTurnsBeforeRollback = appliedTurns.inspect();
 
     const values = new Map<PositionId, unknown>([[P_FIRST_NAME, 'C']]);
     const appliedEffects: ReversalEffect[][] = [];
@@ -80,7 +80,7 @@ describe('pending rollback production composition', () => {
     expect(appliedEffects).toEqual([[]]);
     expect(store.hasPendingTurn(pending.id)).toBe(false);
     expect(store.inspect()).toEqual(confirmedStoreBeforeRollback);
-    expect(appliedHistory.inspect()).toEqual(appliedHistoryBeforeRollback);
+    expect(appliedTurns.inspect()).toEqual(appliedTurnsBeforeRollback);
     expect(values.get(P_FIRST_NAME)).toBe('C');
     expect(realizationContext.getCurrentValue(P_FIRST_NAME)).toBe('C');
 
@@ -88,7 +88,7 @@ describe('pending rollback production composition', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -108,7 +108,7 @@ describe('pending rollback production composition', () => {
       redoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -136,11 +136,11 @@ describe('pending rollback production composition', () => {
     expect(firstName).toBe(P_FIRST_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -207,14 +207,14 @@ describe('pending rollback production composition', () => {
     expect(theme).toBe(P_THEME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([
         [P_FIRST_NAME, 'A'],
         [P_THEME, 'X'],
       ]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const pending = store.admitPending({
       id: 1,
@@ -227,7 +227,7 @@ describe('pending rollback production composition', () => {
       id: 2,
       effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     const values = new Map<PositionId, unknown>([
       [P_FIRST_NAME, 'C'],
@@ -280,7 +280,7 @@ describe('pending rollback production composition', () => {
       undoConfirmedAt({
         authority: P_PROFILE,
         store,
-        appliedHistory,
+        appliedTurns,
         topology,
         port,
         realizationContext,
@@ -309,11 +309,11 @@ describe('pending rollback production composition', () => {
     expect(firstName).toBe(P_FIRST_NAME);
 
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const realizationContext = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     const t1 = store.admitPending({
       id: 1,

@@ -45,7 +45,7 @@ describe('time travel snapshot sharing', () => {
     undoable(() => tree.$.a.x.set(20));
     await flush();
 
-    const history = tree.getHistory();
+    const history = tree.getRestorationHistory();
     expect(history.length).toBeGreaterThanOrEqual(2);
 
     // `b` was never written, so every entry must hold the SAME object for it.
@@ -57,12 +57,12 @@ describe('time travel snapshot sharing', () => {
     const tree = signalTree({ n: 1 }, { enhancers: [timeTravel()] });
     undoable(() => tree.$.n.set(2));
     await flush();
-    const before = tree.getHistory().length;
+    const before = tree.getRestorationHistory().length;
 
     tree.$.n.set(2); // same value — no new object, so nothing to record
     await flush();
 
-    expect(tree.getHistory().length).toBe(before);
+    expect(tree.getRestorationHistory().length).toBe(before);
   });
 
   it('undo still restores correctly with shared references', async () => {
@@ -91,7 +91,7 @@ describe('time travel snapshot sharing', () => {
     undoable(() => tree.$.n.set(2));
     await flush();
 
-    const recorded = tree.getHistory().at(-1)?.state as { n: number };
+    const recorded = tree.getRestorationHistory().at(-1)?.state as { n: number };
     expect(recorded.n).toBe(2);
 
     undoable(() => tree.$.n.set(3));

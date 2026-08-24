@@ -1,5 +1,5 @@
 import type { PositionId } from './causal-types';
-import { AppliedHistory } from './applied-history';
+import { AppliedTurnProjection } from './applied-turn-projection';
 import { createRealizationContextSource } from './realization-context';
 import { TurnStore } from './turn-store';
 
@@ -8,11 +8,11 @@ const P_FIRST_NAME = 3 as PositionId;
 describe('realization context source', () => {
   it('projects current value and projected value without a confirmed turn across pending causal disposition', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     store.admitPending({
@@ -23,7 +23,7 @@ describe('realization context source', () => {
       id: 2,
       effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     expect(source.getCurrentValue(P_FIRST_NAME)).toBe('C');
     expect(source.getValueWithoutConfirmedTurn(confirmed.id, P_FIRST_NAME)).toBe('B');
@@ -37,11 +37,11 @@ describe('realization context source', () => {
 
   it('projects only the external predecessor for repeated same-owner effects', () => {
     const store = new TurnStore();
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
 
     store.admitPending({
@@ -55,7 +55,7 @@ describe('realization context source', () => {
         { owner: P_FIRST_NAME, before: 'C', after: 'D' },
       ],
     });
-    expect(appliedHistory.admitConfirmed(confirmed.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(confirmed.id)).toEqual({ ok: true });
 
     expect(store.discardPending(1)?.id).toBe(1);
 
@@ -72,11 +72,11 @@ describe('realization context source', () => {
       capacity: 1,
       retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     sourceRef.current = source;
 
@@ -84,17 +84,17 @@ describe('realization context source', () => {
       id: 1,
       effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
     });
-    expect(appliedHistory.admitConfirmed(t1.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(t1.id)).toEqual({ ok: true });
 
     const t2 = store.admitConfirmed({
       id: 2,
       effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
     });
-    expect(appliedHistory.admitConfirmed(t2.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(t2.id)).toEqual({ ok: true });
 
     expect(store.getTurn(t1.id)).toBeUndefined();
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([2]);
-    expect(appliedHistory.getRedoTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([2]);
+    expect(appliedTurns.getRedoTurnIds()).toEqual([]);
     expect(source.getCurrentValue(P_FIRST_NAME)).toBe('C');
     expect(source.getValueWithoutConfirmedTurn(t2.id, P_FIRST_NAME)).toBe('B');
   });
@@ -107,11 +107,11 @@ describe('realization context source', () => {
       capacity: 1,
       retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     sourceRef.current = source;
 
@@ -119,18 +119,18 @@ describe('realization context source', () => {
       id: 1,
       effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
     });
-    expect(appliedHistory.admitConfirmed(t1.id)).toEqual({ ok: true });
-    expect(appliedHistory.moveConfirmedTurnToRedo(t1.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(t1.id)).toEqual({ ok: true });
+    expect(appliedTurns.moveConfirmedTurnToRedo(t1.id)).toEqual({ ok: true });
 
     const t2 = store.admitConfirmed({
       id: 2,
       effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'C' }],
     });
-    expect(appliedHistory.admitConfirmed(t2.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(t2.id)).toEqual({ ok: true });
 
     expect(store.getTurn(t1.id)).toBeUndefined();
-    expect(appliedHistory.getAppliedTurnIds()).toEqual([2]);
-    expect(appliedHistory.getRedoTurnIds()).toEqual([]);
+    expect(appliedTurns.getAppliedTurnIds()).toEqual([2]);
+    expect(appliedTurns.getRedoTurnIds()).toEqual([]);
     expect(source.getCurrentValue(P_FIRST_NAME)).toBe('C');
     expect(source.getValueWithoutConfirmedTurn(t2.id, P_FIRST_NAME)).toBe('A');
   });
@@ -143,11 +143,11 @@ describe('realization context source', () => {
       capacity: 1,
       retainEvictedConfirmedTurn: (turn) => sourceRef.current?.retainEvictedConfirmedTurn(turn),
     });
-    const appliedHistory = new AppliedHistory(store);
+    const appliedTurns = new AppliedTurnProjection(store);
     const source = createRealizationContextSource({
       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
       store,
-      appliedHistory,
+      appliedTurns,
     });
     sourceRef.current = source;
 
@@ -155,13 +155,13 @@ describe('realization context source', () => {
       id: 1,
       effects: [{ owner: P_FIRST_NAME, before: 'A', after: 'B' }],
     });
-    expect(appliedHistory.admitConfirmed(first.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(first.id)).toEqual({ ok: true });
 
     const second = store.admitConfirmed({
       id: 2,
       effects: [{ owner: P_FIRST_NAME, before: 'B', after: 'C' }],
     });
-    expect(appliedHistory.admitConfirmed(second.id)).toEqual({ ok: true });
+    expect(appliedTurns.admitConfirmed(second.id)).toEqual({ ok: true });
 
     expect(source.consumeForgottenConfirmedTurns()).toEqual([
       {

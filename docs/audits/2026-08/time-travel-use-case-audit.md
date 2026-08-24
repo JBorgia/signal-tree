@@ -16,7 +16,7 @@ rows were as suspect as the ✅ rows, and all 32 were re-run.
 > **Every verdict names the `undo()` / `redo()` / `jumpTo()` it called and the
 > state afterwards.**
 
-Reading `getHistory().length` or `canUndo()` is **not** evidence. That is exactly
+Reading `getRestorationHistory().length` or `canUndo()` is **not** evidence. That is exactly
 how the original scoring went wrong: the counter was read in the same tick as a
 `queueMicrotask` flush and `undo()` was never called. Where a count is quoted
 below, it is quoted as context beside an outcome, never as the verdict.
@@ -91,7 +91,7 @@ not consume undo steps.
 
 ⚠️ **The old evidence for this row is now wrong even though the row is right.**
 `shouldSkip` moved from write time to read time, so entries are retained
-(`getHistory().length === 12` here). "Ten cursor writes recorded nothing" describes
+(`getRestorationHistory().length === 12` here). "Ten cursor writes recorded nothing" describes
 a mechanism that no longer exists; the outcome is what still holds.
 
 ### 7. A bulk operation as ONE undo step ❌
@@ -142,7 +142,7 @@ and so does
 [time-travel-in-production.md:176](../../guides/time-travel-in-production.md#L176).
 
 - `createEditSession(initial: T)` is **value-level**. Its surface is
-  `original/modified/canUndo/canRedo/isDirty/setOriginal/applyChanges/undo/redo/reset/getHistory`.
+  `original/modified/canUndo/canRedo/isDirty/setOriginal/applyChanges/undo/redo/reset/getRestorationHistory`.
   It has **no** `commit` and **no** `discard`.
 - `createTreeEditSession(source)` is the tree-bound one, with `commit()` /
   `cancel()` / `pullFromSource()`.
@@ -280,7 +280,7 @@ healthcare/claims/regulated — where it is a compliance question, not a papercu
 The interval also keeps sampling until the returned stop function is called;
 verified still running 500 ms after the tracker went out of scope.
 
-`createAuditCallback(prev, current)` and reading `getHistory()` are exact; prefer
+`createAuditCallback(prev, current)` and reading `getRestorationHistory()` are exact; prefer
 either. `createAuditTracker` also leaks its interval unless the returned stop
 function is wired to a `DestroyRef`.
 
@@ -299,7 +299,7 @@ Verified by landing state, not list length: `jumpTo(1)` → `n=1`, `jumpTo(4)` �
 
 Entries carry `action`, auto-assigned (`["INIT","BATCH"]`). `tree.addEntry` is
 `undefined` on the built tree, and mutating `entry.action` through the array
-returned by `getHistory()` does not stick. You can read the label, not set it.
+returned by `getRestorationHistory()` does not stick. You can read the label, not set it.
 **Gap B, still the highest-value gap here.**
 
 ### 19. Coalescing rapid keystrokes into one step ❌
@@ -358,10 +358,10 @@ preference; the alternative does not work.
 
 ### 21. Clearing history on save ✅ — and it answers an open naming question
 
-`n` was `3`; `resetHistory()` → `n === 3`, `canUndo() === false`, and a following
+`n` was `3`; `resetRestorationHistory()` → `n === 3`, `canUndo() === false`, and a following
 `undo()` left `n === 3`.
 
-**This settles TODO 5b item 4.** `resetHistory()` **empties the stack and leaves
+**This settles TODO 5b item 4.** `resetRestorationHistory()` **empties the stack and leaves
 state alone** — it does not restore-to-initial. The name is accurate and should not
 be renamed to `clear()`, which would be ambiguous between the two operations.
 
@@ -552,7 +552,7 @@ Ordered by how much damage they do.
    intended behaviour. Not a time-travel defect; filed here because this is where
    it surfaced.
 
-Answered along the way: **TODO 5b item 4** — `resetHistory()` empties, it does not
+Answered along the way: **TODO 5b item 4** — `resetRestorationHistory()` empties, it does not
 restore-to-initial.
 
 **Corrections to this document's own earlier drafts**, kept because the pattern
