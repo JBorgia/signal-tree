@@ -7257,6 +7257,151 @@ verify-gates --fast                        38/38   (36 + the new gate and its
                                                     self-test)
 ```
 
+# TRUCKTRAX PASS 2 — read-only. The frozen failure ledger
+
+Candidate B = `6ee4a27f`. Consumer = `~/code/v3` (scaletrax, trucktrax-geo,
+geotrax) on **@signaltree/core 13.3.0**. **No TruckTrax file was modified.** The
+artifact is the ledger, not a working consumer.
+
+## Consumed surface — 10 symbols, 32 import sites, all from `@signaltree/core`
+
+```text
+symbol                  prod uses   in Candidate B's ONLY entry point?
+signalTree                  11      EXPORTED
+entityMap                   75      EXPORTED
+derivedFrom                 10      EXPORTED
+WithDerived                  5      EXPORTED
+timeTravel                  17      renamed -> restoration()
+stored                      61      *** NOT EXPORTED ***
+status                    (54 marker-shaped)  *** NOT EXPORTED ***
+loader                      50      *** NOT EXPORTED ***
+asyncSource                 17      *** NOT EXPORTED ***
+flushAllStoredSignals        6      *** NOT EXPORTED ***
+```
+
+Parsed from the BUILT declaration's export statements, not from a name grep: 68
+named exports, and six of TruckTrax's ten are absent.
+
+## ⚠️ THE HEADLINE — five markers are deliberately withdrawn, and TruckTrax runs on them
+
+Not a v15 regression. `c53aa416` ("remove stored marker from public rc surface")
+predates Candidate A, and A's barrel is already without them. They are recorded
+decisions in `check-rc-public-dispositions.mjs`'s BLOCKED list:
+
+```text
+asyncSource            "DELETE / named carrier removed"
+loader                 "UNRESOLVED cache-policy carrier; survival requires
+                        independent authority"
+stored                 "NOT EARNED as RC public API; consequence ordering fix is
+                        not survival proof"
+flushAllStoredSignals  "LC page-hide drain for stored debounce hazard"
+```
+
+So the surface decision is deliberate AND a real production consumer uses all of
+it — `stored` at 61 sites, `loader` at 50, `status` markers in five state files
+(`save: status<NotifyErrorModel>()`), `asyncSource` at 17.
+
+**Candidate B offers no documented replacement for any of them.** That is the
+finding pass 2 existed to produce, and internal analysis could not have produced
+it: every gate passes, because the gates check that what IS exported is coherent,
+not that what a consumer NEEDS is exported.
+
+## The ledger
+
+```text
+TT2-1  timeTravel() -> restoration()
+       sites            17
+       failure          symbol not exported
+       replacement      restoration(), same config shape
+       docs sufficient? YES — the rename is in the migration path and the audit
+       shape            mechanical rename
+       class            BREAKING-BY-DESIGN
+
+TT2-2  automatic history -> undoable() opt-in
+       sites            every write in a restoration()-enabled tree
+       failure          COMPILES AND RUNS, records nothing. The dangerous one:
+                        no error, just an undo stack that is silently empty
+       replacement      wrap authored operations in undoable()
+       docs sufficient? PARTIAL — undoable() is documented; nothing tells an
+                        UPGRADING consumer that its existing undo stopped working
+       shape            semantic — requires deciding which operations are
+                        user-reversible
+       class            BREAKING-BY-DESIGN + DOC/DX-GAP
+
+TT2-3  stored()               61 sites   NOT EXPORTED, no replacement
+TT2-4  loader()               50 sites   NOT EXPORTED, no replacement
+TT2-5  status<T>()             5 files    NOT EXPORTED, no replacement
+TT2-6  asyncSource()          17 sites   NOT EXPORTED, no replacement
+TT2-7  flushAllStoredSignals   6 sites    NOT EXPORTED, no replacement
+       docs sufficient? NO — the core README documents `stored()` extensively
+                        while `stored` is not exported
+       shape            UNKNOWN — there is no migration to measure
+       class            DOC/DX-GAP, and arguably SIGNALTREE-DEFECT: a withdrawal
+                        with no replacement path is not a migration
+
+TT2-8  @signaltree/ng-forms in the workspace catalog
+       failure          package deleted (41373050)
+       reality          ZERO imports in apps/*/src or libs — declared, unused
+       class            STALE-TRUCKTRAX
+
+TT2-9  HTTP acquisition applied with no classification
+       sites            19 (the A1 corpus: loader declarations + ops setAll)
+       failure          none at build time. Under 15.0 an untagged refresh is
+                        authored work, so it is NOT protected by P0-C and CAN be
+                        captured into a transaction's contribution
+       replacement      external(() => …)
+       docs sufficient? YES — external() ships with the definition in its first
+                        JSDoc line
+       shape            semantic — 19 sites, mechanical once understood
+       class            BREAKING-BY-DESIGN (a correctness improvement the
+                        consumer must opt into)
+```
+
+## ⚠️ A SECOND GATE GAP, now demonstrated rather than theoretical
+
+`stored()` is documented at length in the SHIPPED core README and is not
+exported. Neither gate sees it:
+
+```text
+check-documented-imports   checks SPECIFIERS. `@signaltree/core` resolves, so it
+                           passes. It never looks at the symbol.
+lint-readme-apis           checks symbols that appear in an IMPORT STATEMENT. The
+                           README shows `stored('key', default)` inside a state
+                           object and never imports it, so there is nothing to
+                           check.
+```
+
+The edit-session finding was documented-but-unpublishable at the SPECIFIER level.
+This is the same defect at the SYMBOL level. **A third gate is owed:** every
+`@signaltree` API named in a live doc as a CALL must be an exported symbol.
+
+## What pass 2 did NOT do
+
+No build or typecheck of v3 against Candidate B — that needs the dependency
+repointed, which modifies the consumer. The analysis is static against the built
+declaration's export list, which is the same authority a compiler would use. The
+failure ledger is complete for the symbol surface; RUNTIME behavioural differences
+(TT2-2 and TT2-9 in particular, which compile cleanly and change meaning) are
+identified but unmeasured, and pass 3 is where they get measured.
+
+## Blocking question for pass 3
+
+**Pass 3 cannot start on TT2-3 through TT2-7.** There is nothing to migrate to.
+The prior decision required is the owner's:
+
+```text
+A  the five markers were withdrawn correctly    -> then v15 owes a documented
+                                                   replacement for each, and
+                                                   pass 3 measures THAT migration
+B  the withdrawal was wrong for stored/status   -> then Candidate B moves and
+   /loader, which have 100+ production sites       they are restored with the
+                                                   authority the disposition
+                                                   demanded
+```
+
+Per the standing rule — *if pass 3 uncovers a Candidate B defect, fix SignalTree,
+not TruckTrax around it* — this is exactly that shape, found one pass early.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
