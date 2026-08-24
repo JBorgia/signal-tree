@@ -5102,6 +5102,164 @@ applyExternal(() => { … });    // applying state under external authority
 tree.transaction(() => { … }); // authored speculatively
 ```
 
+# DX-NAMES-1.2 — `apply` fails isolation, and the leader changes
+
+Three candidates, no scores, two unresolved questions:
+
+```text
+Q1  does `apply` earn its word, or was it credited by inference?
+Q2  is `external` the right CONCEPT, or a positional stand-in for the causal one?
+```
+
+Pre-registered control, from the same rule that made 19 HTTP sites score once:
+
+> **`applyExternal()` gets no credit for scope discipline unless the same R22
+> rendering shows that `external()` or `acquired()` materially invites the wrong
+> boundary more strongly.**
+
+## Q1 — R22 rendered for all three, which had never been done
+
+```ts
+external(() => {
+  ops.tickets.setActiveTicket(ticket);
+  ops.tickets.loadTertiaryData$(ticket.id).subscribe();
+});
+
+acquired(() => { …identical… });
+
+applyExternal(() => { …identical… });
+```
+
+**All three look equally wrong, and for the same reason:** `setActiveTicket` is
+visibly an application decision, and `loadTertiaryData$(…).subscribe()` is
+visibly async. The wrongness is in the CONTENTS, not in the wrapper's grammar.
+
+```text
+WITHDRAWN: "`apply` is the only part of the name doing scope discipline, on the
+           one door in the family that needs it."
+```
+
+That was an inference from grammar, never a controlled comparison — the same
+error as crediting a name 19 times for one situation, and the same shape as the
+"refuses by construction" overclaim withdrawn one round earlier. Under isolation
+`apply` buys nothing measurable.
+
+The one argument left for it is authoring-time affordance: a developer inside a
+socket handler thinking *"this handler is external state arriving"* might wrap
+broadly, whereas `applyExternal` demands they name a thing being applied. **That
+argument is refused as evidence here**, because it is precisely the introspective
+affordance reasoning this study has already classified as its weakest, and it
+cannot be admitted for one candidate while being discounted for another.
+
+## ⚠️ Q1b — a correction to my own strongest evidence
+
+Earlier the worker pair was recorded as:
+
+```text
+applyExternal(() => tree.$.quote.total.set(price));   // "reads WRONG — good"
+```
+
+That was over-credited. A pricing worker runs off the main thread, in another
+module, reached by `postMessage` — a developer may quite reasonably read it as
+*external*. The honest result:
+
+```text
+the worker trap DISCRIMINATES    incoming/received  vs  external/acquired family
+                                 (transport vs authority — this holds)
+it does NOT DISCRIMINATE         within that family
+it does NOT make any of them     safe. C5a stays a genuine trap for every
+                                 surviving candidate.
+```
+
+So the worker pair remains the study's strongest result and a narrower one than
+claimed: it eliminates arrival words. It does not choose between the survivors,
+and it does not license "our winner is immune."
+
+## Q2 — the concept, and the argument that actually decides it
+
+The implemented ontology is:
+
+```ts
+{ origin: 'external', participation: 'realized' }
+```
+
+`acquired` appears nowhere in it. It is the word this audit's PROSE uses
+("externally acquired truth") — good prose, not the model's vocabulary.
+
+```text
+external(() => …)   the door's name IS the origin value it stamps. Learning the
+                    door teaches the metadata, and reading the metadata teaches
+                    the door. One word, one concept, two places.
+
+acquired(() => …)   names neither implemented field, so it adds a third synonym
+                    to an axis this release spent seven batches de-duplicating.
+```
+
+That is the strongest coherence argument produced anywhere in DX-NAMES, and it
+was not visible until the candidate was compared against the SHIPPED metadata
+rather than against the prose.
+
+Also weighed and found not decisive:
+
+```text
+acquire/release collision   real but moderate. The clash is with the VERB
+                            `acquire` (locks, resources); the candidate is a past
+                            participle used as a scope category, like `undoable`.
+grammar                     `acquired(() => …)` can misread as "this callback was
+                            acquired"; `undoable(() => …)` does not have that
+                            problem. Minor once taught.
+```
+
+## Voice, and the cost `external()` actually carries
+
+```ts
+undoable(() => …)      this authored scope may be restored
+external(() => …)      this scope applies state of external origin
+transaction(() => …)   this authored scope is speculative
+```
+
+Three single words naming scope CATEGORIES, which is what the two existing doors
+already are — `undoable` does not mean "make this undoable" and `transaction`
+does not mean "transact this". `applyExternal()` is the only member shaped as a
+verb phrase, and with `apply` no longer earning its keep the voice mismatch is a
+cost with nothing on the other side of it.
+
+The real cost of `external()`, measured rather than asserted: the word appears 64
+times in the TruckTrax apps. Inspected, almost all are comments, strings and test
+titles rather than bindings, so SHADOWING pressure is low — but `grep "external("`
+is noisy in a codebase that already talks about external drivers, external
+haulers and external ids. A light-weight discoverability cost, recorded, not
+disqualifying.
+
+## Revised disposition — the leader CHANGES
+
+```text
+external()        LEADING. Single word, matches the family's voice, and its name
+                  is the origin value it stamps.
+applyExternal()   RUNNER-UP. Identical semantics; `apply` failed isolation, so
+                  the extra word now costs voice coherence and buys nothing
+                  demonstrated.
+acquired()        REJECTED. Not in the implemented ontology — it would add a
+                  third synonym to the axis this release just de-duplicated.
+incoming()        REJECTED. Arrival, not authority (the worker pair, which still
+                  holds for this purpose).
+realize()         REJECTED. Poor situational retrieval after teaching.
+```
+
+DX-NAMES-1 stays NON-TERMINAL, and the remaining question narrowed usefully:
+`external()` vs `applyExternal()` is now purely a DX question — brevity and voice
+against authoring-time affordance — with no safety difference between them. That
+is exactly the question a ten-minute check with a few Angular developers settles
+and this study cannot.
+
+## What changed my own answer, stated plainly
+
+The recommendation moved because a comparison was RUN that had previously been
+INFERRED. Both of the things that made `applyExternal()` look stronger — scope
+discipline and worker-trap immunity — shrank when isolated, and the argument for
+`external()` grew when the candidate was checked against the shipped metadata
+instead of the prose describing it.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
