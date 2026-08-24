@@ -78,15 +78,19 @@ describe('TX-SURFACE-0: the duplicate transaction() surface', () => {
     expect(await probeRollbackOwner(tree)).toBe('later-confirmed-dependency');
   });
 
-  it('timeTravel() ALONE still answers transaction() — the surface under audit', async () => {
+  it('CASE 6 — timeTravel() alone no longer answers transaction() at all', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       { enhancers: [timeTravel({ maxHistorySize: 50 })] }
     );
     await flush();
-    // Present today. Whether it should be is the question.
-    expect(typeof tree.transaction).toBe('function');
-    expect(await probeRollbackOwner(tree)).toBe('later-confirmed-dependency');
+
+    // The deletion, proved rather than assumed. This is the assertion that makes
+    // the ownership change real: a transaction boundary requires the enhancer
+    // that owns one.
+    expect(
+      (tree as unknown as { transaction?: unknown }).transaction
+    ).toBeUndefined();
   });
 });
 

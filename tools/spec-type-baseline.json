@@ -1,5 +1,5 @@
 {
-  "total": 348,
+  "total": 347,
   "files": {
     "packages/core/src/enhancers/batching/batching.spec.ts": 4,
     "packages/core/src/enhancers/devtools/devtools.spec.ts": 4,
@@ -21,7 +21,7 @@
     "packages/core/src/lib/entity-wrong-method-guard.spec.ts": 2,
     "packages/core/src/lib/error-reporter.spec.ts": 2,
     "packages/core/src/lib/heterogeneous-atomicity.spec.ts": 1,
-    "packages/core/src/lib/history-scoped-capture.spec.ts": 2,
+    "packages/core/src/lib/history-scoped-capture.spec.ts": 1,
     "packages/core/src/lib/internals/atomic-state/atomic-scalar-store.spec.ts": 7,
     "packages/core/src/lib/internals/atomic-state/atomic-signal-tree-prototype.spec.ts": 5,
     "packages/core/src/lib/internals/atomic-state/heterogeneous-physical-frame-prototype.spec.ts": 12,

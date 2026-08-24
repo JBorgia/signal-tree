@@ -3354,97 +3354,28 @@ export function timeTravel(
     (enhancedTree as ISignalTree<T> & TimeTravelMethods)['redo'] = () => {
       timeTravelManager.redoConfirmed();
     };
-    (enhancedTree as ISignalTree<T> & TimeTravelMethods)['transaction'] = (
-      fn: () => void
-    ) => {
-      const activeMeta = getActiveWriteContext();
-      const notifier = getPathNotifier();
-      if (typeof activeMeta?.transactionId === 'number') {
-        throw new Error('Nested transaction is not supported');
-      }
-
-      notifier?.flushSync();
-
-      const transactionId = nextTransactionId++;
-      pendingTransactions.set(transactionId, createCaptureBucket());
-
-      try {
-        withWriteContext(
-          {
-            ...(activeMeta ?? {}),
-            transactionId,
-            transactionOwner: transactionOwnerToken,
-          },
-          fn
-        );
-      } catch (error) {
-        notifier?.flushSync();
-        const transactionEffects = drainTransactionEffects(transactionId);
-        if (transactionEffects.length > 0) {
-          applyTurnEffectsThroughRealizationPort(transactionEffects, 'undo');
-        }
-        throw error;
-      }
-
-      notifier?.flushSync();
-      const pendingTurn = materializePendingTransaction(transactionId);
-      const pendingTurnId = pendingTurn?.id;
-      let lifecycle: 'pending' | 'confirmed' | 'rejected' = 'pending';
-
-      return {
-        confirm(): void {
-          if (lifecycle === 'confirmed') {
-            return;
-          }
-          if (lifecycle === 'rejected') {
-            throw new Error('Cannot confirm a rolled back transaction');
-          }
-          lifecycle = 'confirmed';
-          if (pendingTurnId !== undefined) {
-            timeTravelManager.confirmPendingTurn(pendingTurnId);
-          }
-        },
-        rollback(): void {
-          if (lifecycle === 'rejected') {
-            return;
-          }
-          if (lifecycle === 'confirmed') {
-            throw new Error('Cannot rollback a confirmed transaction');
-          }
-
-          const rollbackPlan =
-            pendingTurnId !== undefined
-              ? timeTravelManager.getPendingRollbackPlan(pendingTurnId)
-              : { compensation: [] };
-          if ('conflict' in rollbackPlan) {
-            throw createRollbackError(rollbackPlan.conflict);
-          }
-
-          lifecycle = 'rejected';
-          if (pendingTurnId !== undefined) {
-            timeTravelManager.discardPendingTurn(pendingTurnId);
-          }
-
-          const compensation = rollbackPlan.compensation;
-          if (compensation.length > 0) {
-            try {
-              applyTurnEffectsThroughRealizationPort(compensation, 'undo');
-            } catch (error) {
-              throw createRollbackError({
-                kind: 'effect-validation-failed',
-                pendingTurnId: pendingTurnId as number,
-                compensation,
-                errorMessage:
-                  error instanceof Error
-                    ? error.message
-                    : 'Unknown rollback validation failure',
-                cause: error,
-              });
-            }
-          }
-        },
-      };
-    };
+    // `transaction()` was REMOVED from timeTravel() in 15.0 (TX-SURFACE-0).
+    //
+    // TOMBSTONE. It was a SECOND implementation of a concept `transactions()`
+    // already owns, reaching the public surface silently through
+    // `TimeTravelMethods extends TransactionMethods`.
+    //
+    // It was also the incorrect one. Its rollback plan came from
+    // `getPendingRollbackPlan()`, which read `this.history` as its dependency
+    // ledger. Under opt-in eligibility an ordinary later write is not admitted
+    // to that history, so a dependent rollback stopped being refused: 7 refusal
+    // tests stopped throwing the moment the default flipped, all of them
+    // installing `timeTravel()` alone. `transactions()` was unaffected, because
+    // it builds its dependency store from its OWN captured effects.
+    //
+    // Deleting it needed TURN-FEED-0 first. Without a lifecycle channel,
+    // `transactions()`' speculative writes landed in CONFIRMED restoration
+    // history — measured, in both enhancer orders — because time-travel
+    // recognised a pending transaction only by its own private token.
+    //
+    // NOT deleted: the `pendingTransactions` capture buckets, which record a
+    // transaction confirmed by `transactions()` as one turn. That is
+    // time-travel's own job and the lifecycle observer drives it.
     (enhancedTree as ISignalTree<T> & TimeTravelMethods)['getHistory'] = () =>
       timeTravelManager.getHistory();
     (enhancedTree as ISignalTree<T> & TimeTravelMethods)['resetHistory'] =
