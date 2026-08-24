@@ -9765,6 +9765,99 @@ recent attempt. **No AggregateError is invented** — no case has been shown whe
 a caller acts differently on two failures than on one, and inventing a richer
 error shape is the same move as inventing retry or status.
 
+# NESTED-STRUCTURAL-ROLLBACK-1 — the NULL is falsified, and the defect is WIDER
+
+`packages/core/src/lib/nested-structural-rollback-1.spec.ts`, 10 pass + 5 KNOWN
+RED. **Stopping to report the boundary before patching**, per the rule that a
+broadened inventory exposing a larger defect names it first.
+
+## The inventory — the split is by OPERATION KIND, not depth
+
+```text
+             addOne  addMany  updateOne  upsertOne  removeOne  setAll  clear
+top            ok      ok        ok         ok         ok       ok      ok
+data.rows     THREW   THREW     THREW      THREW       ok       ok      ok
+a.b.rows      THREW   THREW     THREW      THREW       ok       ok      ok
+```
+
+Anything that CREATES OR MODIFIES a subject refuses. Depth beyond one level
+changes nothing. ⚠️ `setAll`/`clear` are recorded from a SEEDED collection and
+are not uniformly safe — `setAll` on an EMPTY nested collection also throws,
+because replacing nothing with something creates a subject. **The dividing line
+is SUBJECT CREATION, not the operation's name.**
+
+## ⚠️ And a second axis: a SECOND TREE makes even the safe cases fail
+
+```text
+NESTED, one tree    removeOne  threw=false  restored ✓
+NESTED, two trees   removeOne  threw=true   NOT RESTORED ✗
+TOP,    one tree               threw=false  restored ✓
+TOP,    two trees              threw=false  restored ✓
+```
+
+With a second same-shaped tree present, a nested rollback fails AND the row is
+gone — silent data loss rather than a refusal that leaves state intact. That is
+worse than the original finding in both reach and consequence.
+
+## The boundary, traced rather than guessed
+
+Every layer that could plausibly lose nested identity was measured and is
+CORRECT:
+
+```text
+delivered ownerPath           "data.rows"           ✓
+delivered positionIds         [3] = the collection  ✓
+registry.contains(root, coll) true                  ✓
+structuralOwnerPaths index    [3 -> "data.rows"]    ✓
+resolveNodeAtPath             splits on "."         ✓
+```
+
+Instrumenting `canApplyEffect` names the single point of loss:
+
+```text
+top     descPath="rows"   resolved="rows"   ownerNode=true
+nested  descPath="data"   resolved="data"   ownerNode=false  -> REJECT
+```
+
+`resolveCollectionPath` prefers `descriptor.collectionPath`, and that descriptor
+holds the PARENT branch's path. It comes from `deriveCollectionPath`
+(`tree-realization-adapter.ts`):
+
+```text
+if (!ownerPath.includes('.')) return ownerPath;   // top-level "rows"       ✓
+if (typeof subjectId !== 'number') return undefined;
+return parentPath(ownerPath);                     // "data.rows" -> "data"  ✗
+```
+
+> ⚠️ **The derivation is STRING-SHAPED AND AMBIGUOUS.** It answers *"given a
+> row-field path, which collection contains it?"* by stripping the last segment
+> — correct when `ownerPath` names a ROW (`rows.x`), wrong when it names a
+> NESTED COLLECTION (`data.rows`). Those are indistinguishable as strings.
+> Top-level works only because a root collection has no dot and takes the
+> earlier branch.
+
+So this is **not a missing identity**. The correct answer already exists in
+`structuralOwnerPaths` (positionId -> collection ownerPath); the string
+derivation overrides it because the descriptor is consulted first.
+
+## What the fix must and must not do
+
+```text
+MUST     derive the collection path from whether the position IS a collection,
+         not from the shape of its path string
+MUST     leave the planner's refusal intact — it behaves correctly given the
+         bad path it was handed
+MUST     explain the two-tree axis, or show it has a separate cause
+MUST NOT patch the thrown SignalTreeRollbackError
+MUST NOT weaken refusal to let the rollback continue
+```
+
+## ⚠️ Release accounting
+
+Core is **2092 passing with 6 expected failures**, and five of those are this
+defect. That is NOT release-green: an expected failure standing in for a
+correctness defect is a deferred bug, not a passing suite.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
