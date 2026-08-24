@@ -4270,9 +4270,21 @@ R24  device-token-manager                     Capacitor Preferences.get         
 
 ### ⚠️ FINDING BEFORE THE STUDY EVEN STARTS: the real corpus is a monoculture
 
-R1-R18 and R20 are **the same scenario seventeen times**: an HTTP GET result
-applied to a keyed collection. The `loader()` uniformity the A1 audit noted is
-not just uniform CONFIGURATION, it is uniform SITUATION.
+There are **17 `loader()` sites** (R1-R17) and **19 real HTTP-acquisition cases**
+once R18 and R20 are counted. The two numbers answer different questions, and
+conflating them is what produced the earlier "19 loader sites" error; both are
+stated here. Nineteen instances of one situation makes the monoculture finding
+stronger, not weaker.
+
+The `loader()` uniformity the A1 audit noted is not just uniform CONFIGURATION,
+it is uniform SITUATION.
+
+> **CORRECTION 1 — real call sites test FLUENCY repeatedly; semantic scenario
+> FAMILIES determine the score.** The 19 HTTP cases are rendered in full, because
+> repetition is what exposes awkward syntax — but they score as ONE family. Left
+> as 19 votes, a name tuned for HTTP would outvote WebSocket, worker, sensor,
+> peer, every authored negative and both ambiguous cases through duplicate
+> weighting alone.
 
 Consequences the study must respect:
 
@@ -4317,9 +4329,10 @@ The corpus cannot exercise these; they are stated now, before candidates:
 ```text
 C1   REST GET result                       acquired
 C2   WebSocket / SSE push                  acquired
-C3   IndexedDB read-back                   PER-B-adjacent (scored, flagged)
-C4   localStorage read-back                PER-B-adjacent (scored, flagged)
-C5   Web Worker computation result         ⚠ acquired? computed elsewhere, not fetched
+C3   IndexedDB read-back                   PER-B PROBE — NOT SCORED
+C4   localStorage read-back                PER-B PROBE — NOT SCORED
+C5a  worker performs app-owned calculation AUTHORED / derived   ⚠ TRAP
+C5b  worker relays a device observation    ACQUIRED             ⚠ TRAP
 C6   native / sensor bridge reading        acquired
 C7   collaborative peer edit               acquired
 C8   user form input                       AUTHORED (negative)
@@ -4330,10 +4343,24 @@ C12  undo / redo                           RESTORATION (negative)
 C13  server response to a user's POST      ⚠ ambiguous (mirrors R19)
 ```
 
-C5 is deliberately included: a worker result is neither authored by the
-application nor fetched from a remote — it is the case most likely to split
-candidates that mean "arrived over a channel" from candidates that mean "not
-authored here".
+> **CORRECTION 2 — C3/C4 are non-binding probes, not scored cases.** The real
+> persistence sites were excluded because PER-B owns whether durable read-back is
+> realized participation; letting CONSTRUCTED persistence cases influence the
+> winner anyway would smuggle that decision back in. They are used only for
+> sensitivity: *if PER-B later classifies durable read-back as acquired, does the
+> candidate still read correctly?*
+
+> **CORRECTION 3 — the worker case splits, and it is a TRAP.** Physical origin is
+> not semantic origin.
+>
+> ```ts
+> const price = await worker.calculatePrice(localInputs);   // C5a — AUTHORED
+> const reading = await hardwareWorker.readSensor();        // C5b — ACQUIRED
+> ```
+>
+> Both literally "came in" over `postMessage`. They are classified differently.
+> **A name that makes a developer wrap both is teaching transport topology
+> instead of causal semantics**, and this is the sharpest falsifier in the study.
 
 ## Split, fixed now
 
@@ -4359,6 +4386,9 @@ HEAVY   wrong-omission       against doing nothing special (`tree.$.x.set(v)`),
                              does the name explain why the scope exists? An
                              ornamental-looking candidate FAILS even if its
                              English is accurate.
+HEAVY   scope-boundary       does the name guide the developer to wrap EXACTLY
+                             the acquired writes, or invite wrapping a whole
+                             callback that also contains authored consequences?
 medium  breadth              does one name cover fetch, disk, worker, sensor,
                              peer without teaching a narrower story?
 medium  family coherence     beside `undoable()`, `transaction()`, `restoration()`
@@ -4366,10 +4396,413 @@ light   discoverability      IDE completion, grep, docs search
 light   prior art collision  established framework meanings
 ```
 
+Scope-boundary is HEAVY because R22 exposed something worse than picking the
+wrong API: a socket callback contains acquired ticket data AND the authored
+decision to make that ticket active. A name describing the surrounding EVENT
+invites "this whole callback is incoming", which classifies authored work as
+external truth — a failure the type system cannot see.
+
+## Elimination BEFORE ranking
+
+A candidate is rejected outright if:
+
+```text
+T1  a cold reader cannot infer when to use it
+T2  it attracts a major negative case (C8-C12)
+T3  it encourages wrapping authored consequences
+T4  its meaning depends on TRANSPORT rather than causal ownership
+T5  it looks ornamental next to a plain `.set()`
+T6  it only works for HTTP / network acquisition
+```
+
+Only survivors get compared. A table reading `realize 71 / incoming 83 /
+applyExternal 85` would let a disqualifying flaw be outscored by fluency.
+
 ## Deliverable
 
 Not a ranking — a **rejection ledger** with an earned reason per candidate, the
 way `origin`, `participation` and `restoration()` were earned.
+
+# DX-NAMES-1 · STEP 2 — elimination, and the rejection ledger
+
+Method note, stated plainly: this is one experienced reader applying fixed
+criteria to real code, not a user study. Every judgement below is attached to a
+specific rendered site so it can be disputed on the evidence rather than on
+taste. Where the criteria did not discriminate, that is recorded too.
+
+## The renderings that decide it
+
+### The HTTP family (19 cases, ONE score) — fluent for almost everything
+
+```ts
+// R18, ticket.ops.loadTickets$, as it exists today
+this._ticketApi.getMyTickets$({ startDate, endDate }).pipe(
+  tap(page => {
+    this._$tickets.entities.setAll(page.items ?? []);
+    this._setLoaded();
+  }),
+);
+```
+
+```ts
+// candidates, same site
+tap(page => { incoming(()      => entities.setAll(page.items ?? [])); … });
+tap(page => { applyExternal(() => entities.setAll(page.items ?? [])); … });
+tap(page => { received(()      => entities.setAll(page.items ?? [])); … });
+tap(page => { setExternal(()   => entities.setAll(page.items ?? [])); … });
+tap(page => { realize(()       => entities.setAll(page.items ?? [])); … });
+```
+
+**Every candidate reads acceptably here.** Nineteen repetitions establish
+fluency and discriminate almost nothing — which is exactly why the family scores
+once.
+
+### C5a / C5b — the trap, and the study's sharpest result
+
+```ts
+// C5a — the worker is an implementation detail of APP-OWNED computation
+const price = await pricingWorker.calculate(localInputs);
+tree.$.quote.total.set(price);            // authored. NO wrapper belongs here.
+
+// C5b — the worker relays a device observation
+const reading = await sensorWorker.read();
+tree.$.telemetry.set(reading);            // acquired. A wrapper belongs here.
+```
+
+Now the same two sites under each family:
+
+```ts
+incoming(() => tree.$.quote.total.set(price));      // ⚠️ reads CORRECT and is WRONG
+incoming(() => tree.$.telemetry.set(reading));      // reads correct, is right
+
+applyExternal(() => tree.$.quote.total.set(price)); // reads WRONG — good
+applyExternal(() => tree.$.telemetry.set(reading)); // reads correct, is right
+```
+
+`incoming()` cannot separate them, because both values did arrive. The word is
+true of the transport in both cases and true of the semantics in only one.
+`applyExternal()` separates them, because a price the application asked its own
+worker to compute is not *external* to the application — the authority never
+left. **T4 fires for the whole event/source family.**
+
+### R22 — scope-boundary, on real mixed code
+
+```ts
+// today, inside TicketingHub.onTicketChange
+this._store.ops.tickets.setActiveTicket(ticket);
+this._store.ops.tickets.loadTertiaryData$(ticket.id).subscribe();
+```
+
+```ts
+// what an event-word invites
+incoming(() => {
+  ops.tickets.setActiveTicket(ticket);      // acquired DATA + authored SELECTION
+  ops.tickets.loadTertiaryData$(ticket.id).subscribe();   // and an async call
+});
+
+// what an action-word invites
+applyExternal(() => {
+  ops.tickets.applyTicketData(ticket);      // just the acquired write
+});
+ops.tickets.selectActive(ticket.id);        // the authored decision, outside
+```
+
+The event word describes the callback, so the callback is what gets wrapped —
+including an authored selection and an async subscribe that `ST1035` would then
+refuse. The action word describes what you are doing to the state, so it
+naturally ends at the acquired write. **T3 fires for the event/source family.**
+
+## The rejection ledger
+
+```text
+realize()                  REJECT  T1
+  The incumbent. Requires SignalTree-specific vocabulary before the call site
+  means anything: a cold reader cannot infer WHEN to use it. Swift's guideline —
+  clarity at the point of use outranks brevity — is decisive against it.
+  NOTE: `realized` survives as the participation VALUE. Values are READ in
+  metadata by people already holding the ontology; doors are TYPED by developers
+  who are not.
+
+incoming()                 REJECT  T3, T4
+  Best five-second read in the study, and it fails on the two heavyweights it
+  was added to test. C5a/C5b: cannot separate an app-owned worker computation
+  from a relayed device observation, because both "came in". R22: describes the
+  surrounding event, so it invites wrapping the whole callback including the
+  authored selection. It classifies ARRIVAL CONTEXT; SignalTree needs AUTHORITY
+  OF THE WRITE.
+
+received()                 REJECT  T3, T4
+  Everything above, worse: past-tense event description pulls even harder toward
+  callback-wide wrapping.
+
+external()                 REJECT  T1, T3
+  No action at all — `external(() => …)` does not say what happens. Adjectival
+  names characterise the surrounding thing, which is the T3 failure again.
+
+fromExternal()             REJECT  T1, T5
+  A prepositional fragment reads as an argument, not an operation. Next to a
+  plain `.set()` it looks like decoration.
+
+applyIncoming()            REJECT  T4
+  `apply` repairs the scope-boundary problem; `incoming` keeps the transport
+  problem. Half a fix.
+
+applyReceived()            REJECT  T4
+  As above.
+
+setExternal()              REJECT  false narrowing
+  Strong discoverability, and Angular's literal `set()`/`update()` is real prior
+  art for it. But SignalTree's door is a SCOPE that may contain `setAll`,
+  `addOne`, `removeOne`, `updateOne` and structural writes. `set` promises one
+  mutation and delivers a region — the same class of error as a name asserting an
+  ownership the code does not have.
+  RECORDED ALTERNATIVE: if the door were a single-write function rather than a
+  scope, `setExternal` would be the strongest name in the study. That is an API
+  SHAPE question, not a naming one, and A1 case 9 already chose the scope.
+
+setFromExternal()          REJECT  false narrowing, T5
+  Same defect, more syllables.
+
+acceptExternal()            REJECT  false affordance
+  "Accept" implies a decision or validation gate. The door performs no gate — it
+  classifies. A name that promises admission control invites someone to look for
+  the rejection path.
+
+writeAsExternal()          SURVIVE (weak)
+  Semantically precise: write these AS external. Two costs — `write` is not the
+  vocabulary applications use (they `set`, `update`, `addOne`), and at 15
+  characters it is the longest survivor. Kept for comparison, not favoured.
+
+ingest()                   REJECT  T1
+  ETL / pipeline jargon. Outside data-engineering it does not read as a state
+  operation, and it carries a whiff of transformation the door does not perform.
+
+hydrate()                  REJECT  T2, prior art
+  Established narrower meaning: TanStack `hydrate()` restores a previously
+  DEHYDRATED representation into a cache; SSR uses it for the same round-trip.
+  It would attract exactly the persistence and SSR cases PER-B has not yet
+  classified.
+
+sync()                     REJECT  T2
+  Attracts bidirectional-sync misuse — the name implies the tree pushes back.
+
+store()                    REJECT  direction collision
+  Means "persist" to most readers, and SignalTree already ships `stored()`. It
+  points the opposite way down the same axis.
+
+remote()                   REJECT  T6
+  Network only, by construction. Fails disk, worker, sensor and peer.
+
+reconcile()                REJECT  false affordance
+  Promises merge semantics. The door applies; it does not reconcile.
+
+applyExternal()            SURVIVE
+  Action + source. Passes T1 (a cold reader can infer it), T2 (it reads WRONG on
+  every C8-C12 negative — the trap set repels it), T3 (describes what you are
+  doing to the state, so the scope ends at the acquired write), T4 ("external"
+  is about authority, not transport — the C5a worker price is not external to
+  the app that asked for it), T5 (it states a classification a plain `.set()`
+  cannot), T6 (fetch, disk, worker-relay, sensor and peer all read correctly).
+  RECORDED WEAKNESS: it can be misread as "apply this VALUE" rather than
+  "classify these writes". The callback form is the mitigation, and the
+  weakness is real rather than dismissed.
+```
+
+## Survivors
+
+```text
+applyExternal()      survives all six thresholds
+writeAsExternal()    survives, weaker on family coherence and length
+```
+
+Two survivors, both from the ACTION+SOURCE family, and the split between the two
+families is the study's actual finding:
+
+> **Event words classify the arrival. Action words classify the write. SignalTree
+> needs the write classified, so the family is decided before the word is.**
+
+## What Step 2 did NOT settle
+
+The holdout is untouched: R15-R22 have not been rendered against any candidate.
+The finalists face it next, and `incoming()` goes with them as a control — an
+elimination reached on constructed evidence should be re-tested on real ambiguous
+code rather than trusted.
+
+C3/C4 sensitivity, non-binding: `applyExternal(() => tree.$.settings.set(saved))`
+reads correctly for an IndexedDB read-back, so the survivor does not pre-empt
+PER-B either way. `incoming()` reads noticeably worse there, which is consistent
+with its T4 rejection but is not part of it.
+
+# DX-NAMES-1 · STEP 3 — the holdout
+
+Untouched until the finalists existed. `incoming()` is carried as a CONTROL: an
+elimination reached on constructed cases should be re-tested on real ambiguous
+code, not trusted.
+
+## R19 — the POST response (the ambiguous one)
+
+```ts
+// today
+return this._deviceService.create$(body).pipe(
+  tap(device => this._$.glinxDevices.upsertMany(this._keyedDevices([device]))),
+);
+```
+
+```ts
+tap(device => applyExternal(() =>
+  this._$.glinxDevices.upsertMany(this._keyedDevices([device]))));
+
+tap(device => incoming(() =>
+  this._$.glinxDevices.upsertMany(this._keyedDevices([device]))));
+```
+
+Both read acceptably, and both are correct — the applied value IS the server's
+record. But they teach differently. `applyExternal` says *the record you are
+storing is the server's, not yours*, which is the fact that matters when someone
+later wonders why creating a device is not an undo step. `incoming` says *this
+arrived*, which is true and does not answer the question.
+
+**Neither is eliminated here. `applyExternal` instructs; `incoming` narrates.**
+
+## R22 — the mixed socket callback (the dangerous one)
+
+The elimination reproduced, and worse than predicted:
+
+```ts
+// what the site actually contains
+this._store.ops.tickets.setActiveTicket(ticket);
+this._store.ops.tickets.loadTertiaryData$(ticket.id).subscribe();
+```
+
+Wrapping this callback in `incoming()` produces three separate defects at once:
+
+```text
+1  the authored ACTIVE-TICKET SELECTION is classified as external truth
+2  `loadTertiaryData$(...).subscribe()` is an async call inside the scope, so
+   the writes it eventually performs land OUTSIDE the classification — the
+   silent trap `ST1035` exists to refuse, reached here by a name rather than by
+   carelessness
+3  under P0-C the falsely-external selection becomes protected from a legitimate
+   undo
+```
+
+`applyExternal()` does not invite the wrap, because there is no externally
+acquired write in that statement to apply — the acquired data is the ticket, and
+the authored act is making it active. The correct rendering separates them, and
+the name is what makes the separation obvious:
+
+```ts
+applyExternal(() => ops.tickets.applyTicketData(ticket));
+ops.tickets.selectActive(ticket.id);
+```
+
+## R21 — the Bluetooth bridge (the only non-HTTP real site)
+
+```ts
+// today: "e.g. BluetoothStore updating a linked device"
+setGlinxDeviceEntity(entity: DeviceDto): void {
+  this._$.glinxDevices.upsertMany(this._keyedDevices([entity]));
+}
+```
+
+```ts
+applyExternal(() => this._$.glinxDevices.upsertMany(…));   // reads correctly
+incoming(() => this._$.glinxDevices.upsertMany(…));        // also reads correctly
+```
+
+No discrimination. Recorded as such rather than credited to either.
+
+## R15-R18, R20 — more HTTP
+
+Fluent for both finalists and for the control. One family, already scored.
+
+## Holdout result
+
+```text
+applyExternal()    survives; instructs rather than narrates on R19; refuses the
+                   R22 mis-wrap by construction
+writeAsExternal()  survives; identical semantics, consistently clumsier at every
+                   real site
+incoming()          ELIMINATION CONFIRMED on real code — R22 reproduced the
+                   scope-boundary failure and added the async-boundary defect
+```
+
+The holdout did not overturn anything, and it did not merely repeat the
+calibration either: R22 produced a defect the constructed cases had not shown —
+the async call inside a wrongly-widened scope.
+
+# DX-NAMES-1 — DISPOSITION
+
+```text
+external ingress door   applyExternal(() => { … })
+```
+
+Earned reason, in one sentence: **event words classify the arrival, action words
+classify the write, and SignalTree needs the write classified** — so the family
+was decided before the word was, and within the action family `applyExternal`
+was the only member that survived all six thresholds.
+
+Against the acceptance bar the owner set:
+
+> The winner must make the correct operation easier to choose than an ordinary
+> `.set()`, across representative external-source scenarios, without attracting
+> materially incorrect uses.
+
+```text
+easier than .set()          yes — it states a classification `.set()` cannot,
+                            and the trap set (C8-C12) reads WRONG under it
+incorrect uses attracted    none found; the R22 mis-wrap that the event family
+                            invites is not invited here
+```
+
+## Not yet done, and deliberately
+
+```text
+RENAME NOT EXECUTED    `realize()` ships today. Renaming a public export is a
+                       surface change and belongs with the other executed
+                       renames, not inside a study.
+`realized` UNCHANGED   the participation VALUE stays. Values are READ by people
+                       already holding the ontology; doors are TYPED by people
+                       who are not. The asymmetry is the point.
+OUTSIDE DEVELOPERS     everything here is one experienced reader against real
+                       code with fixed criteria. It is the strongest evidence
+                       available without external participants, and it is not a
+                       user study.
+TRUCKTRAX UNTOUCHED    no production file was modified. Migration is later, and
+                       optional.
+```
+
+## The other doors, checked for family coherence
+
+```text
+undoable()      KEEP. Says exactly what the application is designating, and the
+                study's own criteria endorse it: action-shaped, infers its own
+                use, and reads WRONG on anything that is not authored work.
+transaction()   KEEP. Accurate, established, and the noun is the thing.
+restoration()   KEEP. Already earned in SEMANTICS-NAMES-1.
+devTools()      KEEP.
+```
+
+`undoable()` and `applyExternal()` are deliberately asymmetric — one designates
+authored work, the other classifies acquired writes — and that asymmetry is
+correct: they are not two directions of one operation.
+
+## Queue
+
+```text
+1  PER-B            stored() semantics, including reload()'s classification  <-- next
+2  MATRIX-CLOSE
+3  Candidate B      only if materially different
+4  TruckTrax pass 2
+5  TruckTrax pass 3
+6  final perf / retention
+7  FULL historical release gate suite (not --fast)
+8  RC / final closure
+```
+
+Carried: the `realize()` -> `applyExternal()` rename, to execute with PER-B's
+naming or at MATRIX-CLOSE; the `enhancer-safety.spec.ts` mock-`.with()`
+harness-validity item.
 
 # RESTORE-P0 — the reversal-validity cluster
 
