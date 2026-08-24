@@ -3723,16 +3723,28 @@ paragraph above says `stored().reload()` is PER-B's to classify. Only A1 leaves
 the queue, because A1 is terminally closed.
 
 ```text
-1  DIAG-JOURNAL-1     read-only bounded projection + reclamation falsifiers  <-- next
-2  PER-B              stored() semantics, including reload()'s classification
-3  MATRIX-CLOSE
-4  Candidate B        only if materially different
-5  TruckTrax pass 2
-6  TruckTrax pass 3
-7  final perf / retention
-8  FULL historical release gate suite (not --fast)
-9  RC / final closure
+1  DIAG-JOURNAL-1     read-only bounded projection + reclamation falsifiers
+2  DIAG-JOURNAL-1.1   rollback provenance AND correlation
+3  DX-NAMES-1         developer vocabulary / misuse-resistance study   <-- next
+4  PER-B              stored() semantics, including reload()'s classification
+5  MATRIX-CLOSE
+6  Candidate B        only if materially different
+7  TruckTrax pass 2
+8  TruckTrax pass 3
+9  final perf / retention
+10 FULL historical release gate suite (not --fast)
+11 RC / final closure
 ```
+
+DX-NAMES-1 is REQUIRED pre-v15, not polish, and it goes before PER-B because
+PER-B and MATRIX-CLOSE would freeze the remaining developer-facing vocabulary.
+Its acceptance bar is not "best-scoring name":
+
+> The winner must make the correct operation easier to choose than an ordinary
+> `.set()`, across representative external-source scenarios, without attracting
+> materially incorrect uses.
+
+A guardrail disguised as vocabulary.
 
 ### Carried: harness-validity cleanup
 
@@ -4142,6 +4154,74 @@ held when its record is evicted, and holds no live handles. No category C.
 Schema and name still deliberately unfrozen. The one thing F1-F7 has EARNED
 beyond the shape is that a compensation turn needs a correlating fact it does not
 currently carry.
+
+# DIAG-JOURNAL-1.1 — provenance and correlation, kept as two facts
+
+DIAG-JOURNAL-1 found that a compensation turn could not be tied to the
+transaction it compensates. `origin: 'transaction-rollback'` alone does NOT close
+that: it answers a different question.
+
+```text
+PROVENANCE    origin: 'transaction-rollback'   why this realized write exists
+CORRELATION   transactionId                    which transaction it compensates
+```
+
+Making one dimension answer both is the compression this release has spent its
+whole length undoing, so both were implemented and proved separately.
+
+## The falsifier ran first
+
+> **Can two transaction authorities visible on one tree produce the same numeric
+> id?**
+
+Measured before stamping anything:
+
+```text
+one tree, both enhancers, three transactions
+  distinct owners announced  1
+  ids                        [1, 2, 3]
+
+CONTROL — two trees
+  ids                        [1, 1]   under DIFFERENT owners
+```
+
+`restoration()` holds a `transactionOwnerToken` of its own but only LISTENS; the
+single per-tree runtime is the only announcer. So a bare `transactionId` is
+unambiguous **within one tree**, which is the only scope a journal ever observes.
+The cross-tree control is what makes that a measured claim rather than an
+assumption — and it is why `{ owner, id }` was NOT collapsed into `id` anywhere
+except the per-tree diagnostic record. The owner object itself stays out of
+retained records, per F7.
+
+## Result
+
+```text
+turn 1   speculative    transactionId 1
+tx 1     rolled-back
+turn 2   compensation   transactionId 1, origin 'transaction-rollback', realized
+```
+
+A reader joins all three on transaction 1 without temporal adjacency. A CONFIRMED
+transaction produces no `'transaction-rollback'` provenance, which keeps the
+origin meaning *compensation* rather than *a write near a transaction*.
+
+The original DIAG-JOURNAL-1 case that measured the gap is kept, updated, and
+points here — the file where a gap was found is worth keeping as the place a
+regression would show.
+
+## Journal schema and name stay UNFROZEN
+
+F1-F7 earned the unit (causal turn), the correlated lifecycle stream, shared
+chronology, bounded retention, and the three ownership negatives. They did not
+earn a public API — and 1.1 is the proof: the journal began without a fact a real
+diagnostic reader demonstrably requires.
+
+> The first consumer earns the primitive. The SECOND independent consumer tests
+> whether the representation is general rather than tailored to the first.
+
+DevTools is the likely second consumer. Until then `DiagnosticJournal`,
+`DiagnosticTurn`, the field set and the lifecycle representation are internal
+working vocabulary.
 
 # RESTORE-P0 — the reversal-validity cluster
 

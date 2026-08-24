@@ -154,14 +154,20 @@ describe('DIAG-JOURNAL-1: can a reader tell the compensation turn from the specu
       participations: [...new Set(t.effects.map((e) => e.participation))],
     }));
 
-    // ⚠️ THE QUESTION THE OWNER FLAGGED. A rollback is two causal turns, and a
-    // diagnostic reader must be able to say the second one IS the compensation
-    // for transaction 1 — WITHOUT inferring it from "it came after the
-    // rolled-back event", which is temporal adjacency, not correlation.
+    // ⚠️ THE QUESTION, AND WHAT IT ORIGINALLY MEASURED. A rollback is two causal
+    // turns, and a diagnostic reader must be able to say the second one IS the
+    // compensation for transaction 1 — WITHOUT inferring it from "it came after
+    // the rolled-back event", which is temporal adjacency, not correlation.
     //
-    // Whatever this measures is the answer: if the facts are there, the journal
-    // uses them; if they are not, that is a missing diagnostic fact and a
-    // candidate for one narrow seam, recorded rather than papered over.
+    // When this ran first it measured the gap:
+    //
+    //     turn 2   txIds [undefined]   origins [undefined]   'realized'
+    //
+    // indistinguishable from external truth. DIAG-JOURNAL-1.1 closed it with two
+    // separate facts rather than one overloaded one — see
+    // `diag-journal-1-1-correlation.spec.ts`, which owns that contract. Kept
+    // here because this file is where the gap was found, and because the shape
+    // regressing would be invisible in the 1.1 file alone.
     expect(shape).toEqual([
       {
         txIds: [1],
@@ -169,8 +175,8 @@ describe('DIAG-JOURNAL-1: can a reader tell the compensation turn from the specu
         participations: [undefined],
       },
       {
-        txIds: [undefined],
-        origins: [undefined],
+        txIds: [1],
+        origins: ['transaction-rollback'],
         participations: ['realized'],
       },
     ]);

@@ -29,8 +29,12 @@ describe('origin union: only owners survive', () => {
     withWriteContext({ origin: 'restoration' }, () => tree.$.n.set(1));
     withWriteContext({ origin: 'devtools' }, () => tree.$.n.set(2));
     withWriteContext({ origin: 'external' }, () => tree.$.n.set(3));
+    // Added by DIAG-JOURNAL-1.1, under the same rule the others live by: a
+    // compensation write is a realization whose reason to exist is a withdrawn
+    // transaction, and a diagnostic reader could not tell it from external truth.
+    withWriteContext({ origin: 'transaction-rollback' }, () => tree.$.n.set(4));
 
-    expect(tree.$.n()).toBe(3);
+    expect(tree.$.n()).toBe(4);
   });
 
   it('absence is a legitimate value, not a missing one', () => {
