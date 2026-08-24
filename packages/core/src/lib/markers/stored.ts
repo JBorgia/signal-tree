@@ -9,6 +9,7 @@ import {
 } from '../internals/owned-mutation';
 
 import { getActiveWriteContext } from '../write-context';
+import { isInspectionWrite } from '../write-participation';
 import { scheduleDurableConsequence } from '../internals/commit-consequence';
 import type { TreeCapability } from '../enhancer-types';
 
@@ -642,11 +643,16 @@ export function createStoredSignal<T>(
     // where the user is inspecting history and would be astonished to find
     // their settings rewritten by dragging a slider.
     //
-    // The two were indistinguishable because devtools tagged its replays
-    // `origin: 'restoration'`, the same as undo. It now sends `'devtools'` —
-    // a value that was already in the union and simply unused — so this needs
-    // no new mode and no new option.
-    if (getActiveWriteContext()?.origin === 'devtools') return;
+    // The two were indistinguishable because devtools tagged its replays with
+    // the same origin as undo.
+    //
+    // Keyed on PARTICIPATION, not on `origin === 'devtools'`. The property that
+    // makes a scrub un-persistable is that it is INSPECTION — a diagnostic
+    // application of state nobody committed — not that DevTools happened to be
+    // the thing performing it. Deriving the policy from the provenance would
+    // recouple the two axes DEVTOOLS-JUMP-0 separated, and would silently
+    // persist an inspection performed by anything other than DevTools.
+    if (isInspectionWrite(getActiveWriteContext())) return;
     writeGeneration++;
     try {
       const versionedData: VersionedStorageData<T> = {
