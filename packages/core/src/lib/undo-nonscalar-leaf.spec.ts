@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { undoable } from '../lib/undoable';
 
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from '../index';
 
 /**
@@ -10,15 +10,15 @@ import { signalTree } from '../index';
  * RELEASE-1.0.md already records this error message under "cross-tree undo
  * contamination", narrowed to:
  *
- *   form-marker patch + a second WRITTEN timeTravel tree   THROWS  (:2175)
- *   two PLAIN timeTravel trees, both written               CLEAN
+ *   form-marker patch + a second WRITTEN restoration tree   THROWS  (:2175)
+ *   two PLAIN restoration trees, both written               CLEAN
  *
  * **That narrowing is incomplete.** The same guard fires with ONE tree, NO
  * marker, and no second tree at all — via `applyTurnEffects` (:1673) rather than
  * `applyTurnEffectsThroughRealizationPort` (:2175). The only requirement is that
  * the leaf value is not scalar.
  *
- *   isSupportedEffect, time-travel.ts:1680-1694
+ *   isSupportedEffect, restoration.ts:1680-1694
  *     case 'set': return (isScalarValue(before) && isScalarValue(after))
  *                     || (subject === undefined && ownerPath !== path);
  *
@@ -33,7 +33,7 @@ const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 
 describe('undo — scalar leaves work', () => {
   it('CONTROL — a number leaf undoes correctly', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     undoable(() => tree.$.n.set(1));
     await tick();
     undoable(() => tree.$.n.set(2));
@@ -44,7 +44,7 @@ describe('undo — scalar leaves work', () => {
   });
 
   it('CONTROL — a string leaf undoes correctly', async () => {
-    const tree = signalTree({ s: '' }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ s: '' }, { enhancers: [restoration()] });
     undoable(() => tree.$.s.set('a'));
     await tick();
     undoable(() => tree.$.s.set('b'));
@@ -59,7 +59,7 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
   it('ARRAY leaf', async () => {
     const tree = signalTree(
       { rows: [] as number[] },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     undoable(() => tree.$.rows.set([1]));
     await tick();
@@ -73,7 +73,7 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       {
         when: new Date('2020-01-01T00:00:00.000Z'),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     undoable(() => tree.$.when.set(new Date('2021-01-01T00:00:00.000Z')));
     await tick();
@@ -87,7 +87,7 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       {
         lookup: new Map<string, number>(),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     undoable(() => tree.$.lookup.set(new Map([['a', 1]])));
     await tick();
@@ -101,7 +101,7 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
   it('SET leaf', async () => {
     const tree = signalTree(
       { seen: new Set<string>() },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     undoable(() => tree.$.seen.set(new Set(['a'])));
     await tick();
@@ -116,7 +116,7 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
     // non-scalar leaf in a turn takes the scalar writes down with it.
     const tree = signalTree(
       { n: 0, rows: [] as number[] },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     undoable(() => tree.$.n.set(1));
     await tick();

@@ -430,7 +430,7 @@ export interface TransactionMethods {
  * `RestorationMethods` deliberately does NOT extend `TransactionMethods` (15.0,
  * TX-SURFACE-0).
  *
- * `timeTravel()` used to ship its own `transaction()` — a second implementation
+ * `restoration()` used to ship its own `transaction()` — a second implementation
  * of a concept `transactions()` already owns and the README already documented
  * as belonging there, reaching the public surface silently through an interface
  * extension. It was also the incorrect one: its rollback dependency check read
@@ -442,7 +442,7 @@ export interface TransactionMethods {
  *
  *   transactions()  groups authored work, owns rollback, announces lifecycle
  *   undoable()      admits the resulting causal turn
- *   timeTravel()    observes that lifecycle and restores admitted turns
+ *   restoration()    observes that lifecycle and restores admitted turns
  *
  * Install `transactions()` for a transaction boundary. There is no shim, and
  * re-adding one via another interface extension would recreate the duplication —
@@ -602,7 +602,7 @@ export interface TreeConfig {
   // `enableTimeTravel` was REMOVED here in 14.1.1: it had ZERO consumers in
   // signal-tree.ts and silently did nothing, while a working flag of the same
   // name lives on `DevToolsConfig`. The one a user reached for first was the
-  // dead one. Attach `timeTravel()` as an enhancer instead.
+  // dead one. Attach `restoration()` as an enhancer instead.
 
   // `useLazySignals` and `lazy` were REMOVED in 15.0 — see the tombstone after
   // this interface. Both were inert: the subpath that supplied the feature was
@@ -744,14 +744,14 @@ export interface LoaderFeature<E, P = void> {
 //
 // TH-0 measured the reason and it is not disuse. `trackHistory` undid by
 // WRITING BACK — `model.update(m => ({...m, ...next}))` — so over a SignalTree
-// branch its undo was a new authored mutation, which `timeTravel()` then
+// branch its undo was a new authored mutation, which `restoration()` then
 // recorded as forward motion. The two systems did not merely overlap: a
 // `tree.undo()` after a `hist.undo()` REDID the edit. Over a plain Angular
 // signal it was correct, but that is the case with no SignalTree involvement,
 // so there was no ownership claim on either branch.
 //
 // Do not reintroduce a generic writable-signal history here. For state in a
-// tree, `timeTravel()` is the restoration authority; for a signal outside one,
+// tree, `restoration()` is the restoration authority; for a signal outside one,
 // this library is not in the picture. See
 // docs/architecture/v15-production-surface-audit.md, TH-0.
 

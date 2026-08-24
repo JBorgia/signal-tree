@@ -3,14 +3,14 @@ import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../restoration/restoration';
+import { restoration } from '../restoration/restoration';
 import { transactions } from './transactions';
 
 /**
  * TURN-FEED-0.1 — does pair identity hold ALL THE WAY DOWN?
  *
  * The protocol justifies carrying `(owner, id)` on the premise that per-enhancer
- * allocators can mint the same numeric id. But time-travel's capture buckets are
+ * allocators can mint the same numeric id. But restoration's capture buckets are
  * `Map<number, CaptureBucket>` — keyed by the id alone. So the stated invariant
  * and the implementation disagree:
  *
@@ -42,7 +42,7 @@ describe('TURN-FEED-0.1: two transaction owners on one tree', () => {
         { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
         {
           enhancers: [
-            timeTravel({ maxHistorySize: 50 }),
+            restoration({ maxHistorySize: 50 }),
             transactions(),
             transactions(),
           ],
@@ -64,11 +64,11 @@ describe('TURN-FEED-0.1: two transaction owners on one tree', () => {
     // the bucket key is an internal detail rather than a load-bearing assumption.
     const treeA = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 }), transactions()] }
+      { enhancers: [restoration({ maxHistorySize: 10 }), transactions()] }
     );
     const treeB = signalTree(
       { n: 0 },
-      { enhancers: [timeTravel({ maxHistorySize: 10 }), transactions()] }
+      { enhancers: [restoration({ maxHistorySize: 10 }), transactions()] }
     );
     await flush();
 

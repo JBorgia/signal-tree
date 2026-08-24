@@ -21,7 +21,7 @@
 // which is the model HIST-0 case 4 refuted. The equivalent question under opt-in
 // eligibility is "how much does an UNDOABLE operation retain", which is measured
 // by designating fewer operations rather than by excluding a location.
-import { signalTree, entityMap, timeTravel } from '/Users/jonathanborgia/code/signaltree/dist/packages/core/dist/index.js';
+import { signalTree, entityMap, restoration } from '/Users/jonathanborgia/code/signaltree/dist/packages/core/dist/index.js';
 const [shape, wArg, sArg] = process.argv.slice(2);
 const width = Number(wArg), steps = Number(sArg);
 const tick = () => new Promise((r) => setTimeout(r, 0));
@@ -31,7 +31,7 @@ const heap = () => process.memoryUsage().heapUsed / 1024 / 1024;
 const tree = signalTree({
   rows: entityMap({ selectId: (r) => r.id }),
   n: 0,
-}, { enhancers: [timeTravel({ maxHistorySize: 10000 })] });
+}, { enhancers: [restoration({ maxHistorySize: 10000 })] });
 tree.$.rows.addMany(Array.from({ length: width }, (_, i) => ({ id: String(i), v: i })));
 await tick();
 await settle();

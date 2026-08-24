@@ -217,7 +217,7 @@ export class PathNotifier {
     const meta: WriteMetadata | undefined = isRestorationDesignated()
       ? markMetaDesignated(ambientMeta)
       : ambientMeta;
-    // Tag the batch with the ambient write origin (e.g. `time-travel` during a
+    // Tag the batch with the ambient write origin (e.g. `restoration` during a
     // history restore). The flush that delivers this entry is DEFERRED to a
     // microtask, so consumers must be able to tell "this write came from a
     // restore" apart from a user change at flush time — `isRestoring`-style
@@ -365,7 +365,7 @@ export class PathNotifier {
       }
     }
 
-    // Call flush listeners (e.g., timeTravel) once per flush
+    // Call flush listeners (e.g., restoration) once per flush
     for (const cb of Array.from(this.flushCallbacks)) {
       try {
         cb();
@@ -525,7 +525,7 @@ export class PathNotifier {
     //
     //   setAll([a,b]) then removeOne('a')   in one tick
     //     -> add(subject 1) coalesced INTO remove(subject 1)
-    //     -> time-travel only ever saw the remove, so undo re-added a row the
+    //     -> restoration only ever saw the remove, so undo re-added a row the
     //        turn had created, and the collection could not return to empty
     //
     // Keeping both entries is the notifier's whole job here: it must not lose

@@ -175,7 +175,7 @@ const transactionsDecl = (): ExtensionDeclaration => ({
 });
 
 const restorationDecl = (): ExtensionDeclaration => ({
-  id: 'timeTravel',
+  id: 'restoration',
   capabilities: ['causal-runtime', 'temporal-snapshots'],
   contributes: ['undo', 'history'],
   interceptsCall: true,

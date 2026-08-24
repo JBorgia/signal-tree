@@ -34,7 +34,7 @@
 import { entityMap } from './markers/entity-map';
 import { undoable } from '../lib/undoable';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 
 type Row = { id: string; name: string };
@@ -132,11 +132,11 @@ describe('zero-owner retirement — isolation without a lifetime ledger', () => 
 describe('a tree WITH a restorer keeps everything', () => {
   const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-  it('timeTravel undo still restores a removed row', async () => {
+  it('restoration undo still restores a removed row', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       {
-        enhancers: [timeTravel({ maxHistorySize: 20 })],
+        enhancers: [restoration({ maxHistorySize: 20 })],
         capabilities: ['causal-runtime'],
       }
     );
@@ -346,7 +346,7 @@ describe('a forgotten lifetime stays forgotten', () => {
 
     // HALF TWO: no public path leads there. A tree with no restoration
     // authority exposes no restoration surface, and `__planRestore` is consumed
-    // only by the causal-runtime adapter that `timeTravel()`/`transactions()`
+    // only by the causal-runtime adapter that `restoration()`/`transactions()`
     // install. If any of these ever appears on a bare tree, forgetting must
     // stop — the guard would then be genuinely unenforced rather than
     // unreachable.

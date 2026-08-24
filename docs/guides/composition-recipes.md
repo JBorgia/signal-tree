@@ -20,7 +20,7 @@ half-right for your app, and you can read the whole thing.
 ## 1. A standard enhancer policy
 
 **The need:** every app re-decides which enhancers to apply and whether to gate
-`timeTravel()` out of production. Two apps in one repo will drift.
+`restoration()` out of production. Two apps in one repo will drift.
 
 **The recipe** — one function in your shared lib. It returns the enhancer
 ARRAY, not an enhanced tree: 15.0 has no `.with()`, and a helper that took a
@@ -51,22 +51,22 @@ const tree = signalTree(state, {
 
 ### The tree-shaking trap — read this before writing your own
 
-The obvious version takes an `isProduction` boolean and gates `timeTravel()`
+The obvious version takes an `isProduction` boolean and gates `restoration()`
 inside:
 
 ```typescript
-// ✗ DON'T — timeTravel ships in every production bundle
-return isProduction ? base : [...base, timeTravel()];
+// ✗ DON'T — restoration ships in every production bundle
+return isProduction ? base : [...base, restoration()];
 ```
 
 That is a **static import behind a runtime check**, so the bundler cannot drop
-`timeTravel` — your production build carries a deep-clone-per-write enhancer it
+`restoration` — your production build carries a deep-clone-per-write enhancer it
 never uses. This is not hypothetical: it is the same mistake
 [RFC 0005 §0](../rfcs/0005-entity-loader-composition.md) documents, where
 `entity-map.ts` statically imported `attachLoader` and shipped the loader in
 every `entityMap` bundle for a full version.
 
-Gate it **structurally** instead — the caller imports `timeTravel` only where it
+Gate it **structurally** instead — the caller imports `restoration` only where it
 is wanted, so a production entry point never references it:
 
 ```typescript
@@ -74,11 +74,11 @@ is wanted, so a production entry point never references it:
 signalTree(state, {
   enhancers: standardEnhancers({
     name: 'MyApp Dev',
-    extra: [timeTravel()], // import lives in the dev-only file
+    extra: [restoration()], // import lives in the dev-only file
   }),
 });
 
-// production entry point — no timeTravel import anywhere in this graph
+// production entry point — no restoration import anywhere in this graph
 signalTree(state, { enhancers: standardEnhancers({ name: 'MyApp' }) });
 ```
 

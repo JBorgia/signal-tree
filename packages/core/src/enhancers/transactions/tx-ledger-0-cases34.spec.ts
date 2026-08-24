@@ -9,7 +9,7 @@ import { transactions } from './transactions';
  * TX-LEDGER-0 cases 3 and 4, asked of the implementation that OWNS rollback.
  *
  * Case 6 showed `transactions()` keeps its own dependency store, so these
- * questions belong here rather than against the duplicate `timeTravel()` path
+ * questions belong here rather than against the duplicate `restoration()` path
  * that TX-SURFACE-0 is auditing for deletion.
  *
  * Both decide ledger admission, and neither answer is pre-registered:

@@ -248,7 +248,7 @@ at the consumer (audit M4). This rule is documented **nowhere** in `docs/`.
 - Show the failing form and the fix side by side.
 - **`null as Nullable<T>` is the canonical answer — there is no `leaf()`/value marker to reach for.**
   (Verified: core's public exports are `signalTree`/`entityMap`/`status`/`asyncSource`/`asyncQuery`/
-  `loader`/`history`/`linked`/`derivedFrom`/`defineStore`/`batching`/`devTools`/`timeTravel` — no leaf
+  `loader`/`history`/`linked`/`derivedFrom`/`defineStore`/`batching`/`devTools`/`restoration` — no leaf
   marker.) Leaf-vs-node is decided by a runtime `value && typeof value === 'object'` test
   (`packages/core/src/lib/signal-tree.ts:273`), which is _why_ `{}` becomes a node and `null` stays a
   settable leaf. A `leaf()` marker is a conceivable alternative but should stay **unshipped absent demand**
@@ -342,7 +342,7 @@ their first-pass placements:
   API.** It's a composition of three exports + an `if`, and RFC 0001 §4.1's decided default for compositions
   is a **recipe/doc, not new surface**. The case for _core_ would have to be made explicitly under RFC 0006
   §2 (universal + agent-guessable) — this audit doesn't consider that proven. And the proposed shape is
-  **broken for tree-shaking**: statically importing `timeTravel` and gating it on a runtime `isProduction`
+  **broken for tree-shaking**: statically importing `restoration` and gating it on a runtime `isProduction`
   boolean is exactly the **RFC 0005 §0 `attachLoader` bug** (static import + runtime gate ships the code in
   every bundle), which RFC 0007 §1 cites to show the package boundary doesn't buy tree-shaking. If ever
   built, gating must be **structural** (separate import path / build-time), in an opt-in `@signaltree/presets`,

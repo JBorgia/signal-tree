@@ -3,7 +3,7 @@ import {
   batching,
   entityMap,
   signalTree,
-  timeTravel,
+  restoration,
 } from '@signaltree/core';
 
 /**
@@ -142,8 +142,8 @@ export class SignalTreeBenchmarkService {
             case 'highPerformanceBatching':
               enhancers.push(highPerformanceBatching());
               break;
-            case 'timeTravel':
-              enhancers.push(timeTravel());
+            case 'restoration':
+              enhancers.push(restoration());
               break;
             default:
               // Unknown enhancer name — ignore to maintain robustness
@@ -1076,7 +1076,7 @@ export class SignalTreeBenchmarkService {
       counter: 0,
       data: { value: 'initial' },
     });
-    const tree = this.applyConfiguredEnhancers(base, [timeTravel()]);
+    const tree = this.applyConfiguredEnhancers(base, [restoration()]);
 
     const start = performance.now();
 
@@ -1108,7 +1108,7 @@ export class SignalTreeBenchmarkService {
       data: { content: 'initial' },
     });
     const tree = this.applyConfiguredEnhancers(base, [
-      timeTravel({ maxHistorySize: historySize }),
+      restoration({ maxHistorySize: historySize }),
     ]);
 
     const start = performance.now();
@@ -1132,7 +1132,7 @@ export class SignalTreeBenchmarkService {
       currentState: 0,
       data: { value: 'initial' },
     });
-    const tree = this.applyConfiguredEnhancers(base, [timeTravel()]);
+    const tree = this.applyConfiguredEnhancers(base, [restoration()]);
 
     const start = performance.now();
 

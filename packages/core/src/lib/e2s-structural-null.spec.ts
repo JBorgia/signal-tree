@@ -2,7 +2,7 @@ import { computed, type Signal } from '@angular/core';
 import { undoable } from '../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { entityMap, signalTree } from '../index';
 
 /**
@@ -67,7 +67,7 @@ describe('E2-S1 — membership reversal', () => {
       {
         rows: entityMap<Row, string>({ selectId: (r) => r.id }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     tree.$.rows.addMany([
       { id: 'a', n: 1 },
@@ -93,7 +93,7 @@ describe('E2-S1 — membership reversal', () => {
       {
         rows: entityMap<Row, string>({ selectId: (r) => r.id }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     undoable(() => tree.$.rows.addMany([{ id: 'a', n: 1 }]));
     await tick();
@@ -147,7 +147,7 @@ describe('E2-S2 — key reuse across undo', () => {
       {
         rows: entityMap<Row, string>({ selectId: (r) => r.id }),
       },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     undoable(() => tree.$.rows.addOne({ id: 'k', n: 111 }));
     await tick();

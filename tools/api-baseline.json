@@ -466,7 +466,7 @@
         "internalDecl": false
       },
       {
-        "name": "timeTravel",
+        "name": "restoration",
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/core/src/enhancers/restoration/restoration.ts",

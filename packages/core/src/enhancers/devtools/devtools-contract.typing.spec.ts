@@ -6,7 +6,7 @@
  * Written and proven GREEN BEFORE the signature change, re-run unchanged after.
  *
  * WHY THIS ONE IS A THIRD SHAPE. `batching` was one implementation;
- * `timeTravel` was one implementation with a receiver-derived method. `devTools`
+ * `restoration` was one implementation with a receiver-derived method. `devTools`
  * is a CONDITIONAL DISPATCH over two different enhancers selected at module
  * load:
  *

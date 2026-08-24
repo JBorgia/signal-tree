@@ -28,7 +28,7 @@ import {
  * ## The last-owner rule is enforced HERE, not at the call site
  *
  * `release()` reports what THAT owner let go. Another system may still hold the
- * same subject — a pending transaction, another history entry — so the sink
+ * same subject — a pending transaction, another restoration history entry — so the sink
  * re-asks the registry before acting. A caller that had to remember to do this
  * would eventually forget.
  */

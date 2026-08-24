@@ -358,7 +358,7 @@ if (process.argv.includes('--self-test')) {
   const MUST_BE_LIVE = [
     ['core', 'signalTree'],
     ['core', 'entityMap'],
-    ['core', 'timeTravel'],
+    ['core', 'restoration'],
     ['core', 'persistence'],
   ];
   for (const [pkg, name] of MUST_BE_LIVE) {

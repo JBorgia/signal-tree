@@ -67,10 +67,10 @@ const ROUND_POINTS = [20, 40, 80, 160, 320];
 const pointFlag = process.argv.indexOf('--point');
 if (pointFlag !== -1) {
   const rounds = Number(process.argv[pointFlag + 1]);
-  const { signalTree, entityMap, timeTravel } = await import(CORE);
+  const { signalTree, entityMap, restoration } = await import(CORE);
   const tree = signalTree(
     { rows: entityMap({ selectId: (r) => r.id }) },
-    { enhancers: [timeTravel({ maxHistorySize: HISTORY })] }
+    { enhancers: [restoration({ maxHistorySize: HISTORY })] }
   );
   const rows = tree.$.rows;
 

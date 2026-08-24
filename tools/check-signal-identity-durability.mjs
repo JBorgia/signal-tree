@@ -114,7 +114,7 @@ if (!existsSync(CORE)) {
   console.error('❌ build first: nx build core');
   process.exit(1);
 }
-const { signalTree, entityMap, timeTravel } = await import(CORE);
+const { signalTree, entityMap, restoration } = await import(CORE);
 const { computed } = await import('@angular/core');
 const cfg = { selectId: (r) => r.id };
 
@@ -139,7 +139,7 @@ const cfg = { selectId: (r) => r.id };
 }
 // 2 — same-subject restore
 {
-  const t = signalTree({ rows: entityMap(cfg) }, { enhancers: [timeTravel({ maxHistorySize: 20 })] });
+  const t = signalTree({ rows: entityMap(cfg) }, { enhancers: [restoration({ maxHistorySize: 20 })] });
   t.$.rows.setAll([
     { id: 1, name: 'Alice' },
     { id: 2, name: 'Bob' },

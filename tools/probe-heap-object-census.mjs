@@ -2,7 +2,7 @@
 /**
  * HEAP OBJECT CENSUS — when a reachability walk finds nothing, ask V8.
  *
- * The staged retention probe shows a `timeTravel({maxHistorySize: 2})` tree
+ * The staged retention probe shows a `restoration({maxHistorySize: 2})` tree
  * growing 47 MB over 64,000 retirements while the entity layer retains only 400
  * subjects and a no-history tree is flat. An in-process census of every
  * reachable Map/Set/Array — collection, structural store, manager, notifier —
@@ -39,11 +39,11 @@ const HISTORY = Number(arg('--history', 2));
 const LOW = Number(arg('--low', 40));
 const HIGH = Number(arg('--high', 320));
 
-const { signalTree, entityMap, timeTravel } = await import(CORE);
+const { signalTree, entityMap, restoration } = await import(CORE);
 
 const tree = signalTree(
   { rows: entityMap({ selectId: (r) => r.id }) },
-  { enhancers: [timeTravel({ maxHistorySize: HISTORY })] }
+  { enhancers: [restoration({ maxHistorySize: HISTORY })] }
 );
 const rows = tree.$.rows;
 const generation = (g) => {

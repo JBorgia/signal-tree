@@ -169,7 +169,7 @@ Asking "did I weigh options, or take the first thing that worked?" about the
 guardrails clone found a redesign. Asked about everything else shipped in
 14.0.0, it found **ST2029 does not work.**
 
-It was checked once when `timeTravel()` attached. That is the one moment it
+It was checked once when `restoration()` attached. That is the one moment it
 cannot work: an app builds its tree and attaches the enhancer in the same
 breath, and the rows arrive later from a fetch. At attach the collection is
 empty, every time.

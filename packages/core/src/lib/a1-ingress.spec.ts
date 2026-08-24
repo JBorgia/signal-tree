@@ -4,7 +4,7 @@ import { entityMap } from './markers/entity-map';
 import { getPathNotifier } from './path-notifier';
 import { realize } from './realize';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 import { undoable } from './undoable';
 
@@ -48,7 +48,7 @@ const observe = () => {
 
 describe('A1 case 1-2: classification', () => {
   it('case 1 — an ordinary authored write', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     const { seen, off } = observe();
     undoable(() => tree.$.n.set(1));
@@ -64,7 +64,7 @@ describe('A1 case 1-2: classification', () => {
   });
 
   it('case 2 — an ingress carries external origin and admits no restoration', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
@@ -182,7 +182,7 @@ describe('A1 case 3-5: transaction interaction', () => {
 
 describe('A1 case 6: restoration cannot destroy external truth', () => {
   it('case 6 — an undo over a realized location is refused', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
@@ -208,7 +208,7 @@ describe('A1 case 6: restoration cannot destroy external truth', () => {
 
 describe('A1 case 7-9: boundary', () => {
   it('case 7 — nesting is idempotent', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     const { seen, off } = observe();
     realize(() => {
@@ -221,7 +221,7 @@ describe('A1 case 7-9: boundary', () => {
   });
 
   it('case 8 — classification does not leak past the callback', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     realize(() => tree.$.n.set(5));
     await flush();
@@ -238,7 +238,7 @@ describe('A1 case 7-9: boundary', () => {
   });
 
   it('case 9 — an async callback is REFUSED rather than silently unclassified', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
 
     let thrown: unknown = 'no-throw';

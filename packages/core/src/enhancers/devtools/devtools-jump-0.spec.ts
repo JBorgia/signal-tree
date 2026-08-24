@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../restoration/restoration';
+import { restoration } from '../restoration/restoration';
 import { transactions } from '../transactions/transactions';
 import { undoable } from '../../lib/undoable';
 import { withWriteContext } from '../../lib/write-context';
@@ -60,7 +60,7 @@ describe('DEVTOOLS-JUMP-0: interaction with a PENDING transaction', () => {
   it('is a devtools application captured into the transaction contribution?', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }), n: 0 },
-      { enhancers: [timeTravel(), transactions()] }
+      { enhancers: [restoration(), transactions()] }
     );
     await flush();
 
@@ -132,7 +132,7 @@ describe('DEVTOOLS-JUMP-0: interaction with a PENDING transaction', () => {
 
 describe('DEVTOOLS-JUMP-0: interaction with restoration', () => {
   it('does a devtools application become an undo step?', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();

@@ -94,7 +94,7 @@ from the set. Declaration order does not matter.
 
 - `batching()` — adds `.batch(fn)` / `.coalesce(fn)` (automatic microtask batching is ALREADY ON by default)
 - `devTools()` — Redux DevTools integration
-- `timeTravel({ maxHistorySize: 50 })` — adds `.undo()` / `.redo()`
+- `restoration({ maxHistorySize: 50 })` — adds `.undo()` / `.redo()`
 - `persistence(config)` — tree-wide storage adapter
 - `serialization()` — JSON serialize/deserialize
 
@@ -204,7 +204,7 @@ This project uses **SignalTree** (`@signaltree/core`) for Angular state manageme
 
 ## SignalTree quick reference
 
-**Imports** all come from `@signaltree/core` unless using an optional package. There is **no** `@signaltree/time-travel`, `@signaltree/storage`, or similar — `timeTravel`, `stored`, `persistence` all live in core.
+**Imports** all come from `@signaltree/core` unless using an optional package. There is **no** `@signaltree/time-travel`, `@signaltree/storage`, or similar — `restoration`, `stored`, `persistence` all live in core.
 
 **Reads:** `store.$.path.to.leaf()` — call it like any Angular signal.
 
@@ -218,7 +218,7 @@ This project uses **SignalTree** (`@signaltree/core`) for Angular state manageme
 
 **Derived state via `.derived($ => ({...}))`:** definitions deep-merge into the existing tree alongside source properties. Use `derivedFrom<TTree>()(fn)` for derived definitions in separate files — it is a typed-identity helper, not a projection utility, signature is curried.
 
-**Enhancers via `{ enhancers: [...] }`:** `batching()`, `devTools()`, `timeTravel({maxHistorySize})`, `persistence(config)`, `serialization()`. Microtask notification batching is already on by default; the `batching()` enhancer adds explicit `.batch(fn)`.
+**Enhancers via `{ enhancers: [...] }`:** `batching()`, `devTools()`, `restoration({maxHistorySize})`, `persistence(config)`, `serialization()`. Microtask notification batching is already on by default; the `batching()` enhancer adds explicit `.batch(fn)`.
 
 **Callable syntax:** branches and the root are callable natively (`$.user({...})`, `$.user(fn)`, `store({...})`); LEAVES ARE NOT — use `.set()`/`.update()`. `@signaltree/callable-syntax` promised the leaf form via a build transform and was deleted in 14.0.0: it could never run inside an Angular app, so the call type-checked and silently did nothing.
 
@@ -276,7 +276,7 @@ Quick rules:
 - Reads: `store.$.path.to.leaf()`. Writes: `.set(v)` / `.update(fn)` — never `leaf(v)`.
 - Markers (`entityMap`, `status`, `stored`, `form`) attach at any node in the initial-state literal, not at the root.
 - Derived state via `.derived($ => ({...}))` deep-merges into the tree. Use `derivedFrom<TTree>()(fn)` (curried) for derived in separate files.
-- Enhancers, all declared in one array: `signalTree(state, { enhancers: [batching(), devTools(), timeTravel({maxHistorySize}), persistence(config), serialization()] })`.
+- Enhancers, all declared in one array: `signalTree(state, { enhancers: [batching(), devTools(), restoration({maxHistorySize}), persistence(config), serialization()] })`.
 - All exports live in `@signaltree/core` except: `@signaltree/ng-forms`, `@signaltree/events`. No `@signaltree/time-travel`, `@signaltree/storage`, `@signaltree/realtime`, `@signaltree/enterprise`, `@signaltree/callable-syntax`, or `@signaltree/guardrails` — those are hallucinations. `@signaltree/schema` was DELETED in 15.0 — SignalTree ships no validation API; validate with your own validator against values read from the tree.
 - For production architecture, wrap the tree in @Injectable() with an `ops.domain.method()` namespace for mutations. See docs/architecture/signaltree-architecture-guide.md.
 

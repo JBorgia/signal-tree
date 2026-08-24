@@ -109,7 +109,7 @@ function structuralClone<T>(value: T, seen: WeakMap<object, unknown>): T {
     const desc = Object.getOwnPropertyDescriptor(value as object, key);
     if (!desc) continue;
     // An accessor is read ONCE and stored as data. Copying the getter itself
-    // would make the history entry re-read live state on every access, which is
+    // would make the restoration history entry re-read live state on every access, which is
     // the opposite of a snapshot.
     const raw = 'value' in desc ? desc.value : desc.get?.call(value);
     Object.defineProperty(out, key, {

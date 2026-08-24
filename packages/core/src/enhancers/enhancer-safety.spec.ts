@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ENHANCER_META } from '../lib/types';
 import { batching } from './batching/batching';
-import { timeTravel } from './restoration/restoration';
+import { restoration } from './restoration/restoration';
 import { devTools } from './devtools/devtools';
 import { serialization } from './serialization/serialization';
 
@@ -90,7 +90,7 @@ function createMockTree() {
 describe('enhancer metadata', () => {
   it.each([
     ['batching', batching],
-    ['timeTravel', timeTravel],
+    ['restoration', restoration],
     ['devTools', devTools],
     ['serialization', serialization],
   ])('%s attaches metadata with name', (expectedName, factory) => {

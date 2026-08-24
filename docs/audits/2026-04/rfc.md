@@ -61,7 +61,7 @@ The audit ran Versus Iterative Convergence methodology (phases 0–5):
 | F-002 | P0       | core/README.md   | `entities()` throws at runtime, not exported, but documented throughout                                                                            |
 | F-003 | P0       | core/README.md   | `effect()`, `subscribe()`, `update()`, `unwrap()` listed in API reference but don't exist on ISignalTree                                           |
 | F-004 | P0       | core/README.md   | README ends with corrupt code fragment (stray delimiters + orphaned tree.unwrap() call)                                                            |
-| F-005 | P1       | core/README.md   | `withTimeTravel` doesn't exist; correct name is `timeTravel`; config key `maxHistory` wrong (should be `maxHistorySize`)                           |
+| F-005 | P1       | core/README.md   | `withTimeTravel` doesn't exist; correct name is `restoration`; config key `maxHistory` wrong (should be `maxHistorySize`)                           |
 | F-006 | P1       | core/README.md   | `.with(a(), b())` multi-arg — silently ignores second arg; must chain `.with(a()).with(b())`                                                       |
 | F-007 | P1       | core/README.md   | `setMany`, `selectAll`, `selectBy`, `selectTotal`, `selectIds` documented — none exist; correct names are `setAll`, `all`, `where`, `count`, `ids` |
 | F-008 | P1       | core/README.md   | Config key `batching` wrong; correct is `batchUpdates`                                                                                             |
@@ -86,7 +86,7 @@ The 3 P0 findings (F-002, F-003, F-004) are each capable of stopping any AI agen
 
 Two clusters explain ~75% of the finding set:
 
-**Cluster A — API name divergence (F-002, F-005, F-007, F-008):** Eight specific API names in the README are wrong. These appear to originate from two sources: (a) older versions where names were different (entities → entityMap, withTimeTravel → timeTravel, batching → batchUpdates), and (b) cross-contamination from NgRx's naming conventions (selectAll, selectIds, selectTotal, selectBy). The NgRx-echo names are particularly harmful for AI agents — they will pick NgRx names from training data even when reading SignalTree docs if the docs reinforce those names.
+**Cluster A — API name divergence (F-002, F-005, F-007, F-008):** Eight specific API names in the README are wrong. These appear to originate from two sources: (a) older versions where names were different (entities → entityMap, withTimeTravel → restoration, batching → batchUpdates), and (b) cross-contamination from NgRx's naming conventions (selectAll, selectIds, selectTotal, selectBy). The NgRx-echo names are particularly harmful for AI agents — they will pick NgRx names from training data even when reading SignalTree docs if the docs reinforce those names.
 
 **Cluster B — Callable syntax: the invisible dependency (F-009):** SignalTree's primary DX differentiator — `tree.$.count(5)` syntax — silently fails without `@signaltree/callable-syntax`. The feature is described in the README but the caveat appears _after_ the Quick Start examples that already use it. An agent reading left-to-right generates non-working code before reaching the warning. This is architecturally significant: the library's best feature becomes a trap.
 
@@ -192,7 +192,7 @@ These are the three highest-leverage changes. Each is concrete enough to impleme
 
 1. Remove all `.with(entities())` references — replace with entityMap() self-registration pattern
 2. Move callable-syntax caveat box to Quick Start section (above the first setter example)
-3. Replace `withTimeTravel` → `timeTravel`, `maxHistory` → `maxHistorySize`
+3. Replace `withTimeTravel` → `restoration`, `maxHistory` → `maxHistorySize`
 4. Replace all multi-arg `.with(a(), b())` → `.with(a()).with(b())`
 5. Replace phantom EntitySignal names: `setMany` → `setAll`, `selectAll` → `all`, `selectBy` → `where`, `selectTotal` → `count`, `selectIds` → `ids`
 6. Fix `{ batching: false }` → `{ batchUpdates: false }`

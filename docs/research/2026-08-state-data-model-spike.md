@@ -1183,7 +1183,7 @@ number, and I could not find it documented anywhere.
 
 Cost of recording ONE history entry, by state size:
 
-| state         | `timeTravel()` | no enhancer | manual immutable snapshot (structural sharing) | manual `structuredClone` snapshot |
+| state         | `restoration()` | no enhancer | manual immutable snapshot (structural sharing) | manual `structuredClone` snapshot |
 | ------------- | -------------- | ----------- | ---------------------------------------------- | --------------------------------- |
 | 1 000 leaves  | **832 µs**     | 0.3 µs      | 0.3 µs                                         | 59 µs                             |
 | 10 000 leaves | **4 342 µs**   | 0.3 µs      | 1.2 µs                                         | 542 µs                            |
@@ -1208,7 +1208,7 @@ Time travel is by a wide margin the most expensive thing in the library.
 | operation                                           | median   |
 | --------------------------------------------------- | -------- |
 | `entityMap(5000).updateOne` + flush, no enhancer    | 0.010 ms |
-| `entityMap(5000).updateOne` + flush, `timeTravel()` | 4.141 ms |
+| `entityMap(5000).updateOne` + flush, `restoration()` | 4.141 ms |
 
 **414x.** `entityMap`'s O(1) write is completely erased by time travel, because
 `snapshotState` materialises the collection — and `tree()` emits **five** keys
@@ -1216,16 +1216,16 @@ for an `entityMap` (`all`, `count`, `ids`, `map`, `empty`), so the snapshot
 contains the collection **three times** (as an array, as a key array, and as a
 `Map`) before `structuredClone` copies all three and `deepEqual` walks all three.
 
-#### F-1d-ter. `timeTravel()` leaks its cost across unrelated trees
+#### F-1d-ter. `restoration()` leaks its cost across unrelated trees
 
-`timeTravel()` subscribes to the **global** `PathNotifier` flush event. Every
-live `timeTravel` tree therefore runs a full `snapshotState` + `structuredClone`
+`restoration()` subscribes to the **global** `PathNotifier` flush event. Every
+live `restoration` tree therefore runs a full `snapshotState` + `structuredClone`
 
 - `deepEqual` on **every flush anywhere in the process** — including flushes
   caused by a completely unrelated tree — and then throws the result away when the
   dedupe finds nothing changed.
 
-| unrelated 10 000-leaf `timeTravel` trees alive | cost of one `entityMap(2000).updateOne` + flush |
+| unrelated 10 000-leaf `restoration` trees alive | cost of one `entityMap(2000).updateOne` + flush |
 | ---------------------------------------------- | ----------------------------------------------- |
 | 0                                              | 0.008 ms                                        |
 | 1                                              | 3.749 ms                                        |
@@ -1613,7 +1613,7 @@ and devtools are why.
 SERIALISATION capture.** Today `transient: true` opts out of both, so a
 10k-row grid that wants persistence is forced into the undo stack, and
 `entityMap`'s `snapshot` hook (`{ all: node.all() }`) makes every
-collection-mutating write O(collection) once `timeTravel()` is attached.
+collection-mutating write O(collection) once `restoration()` is attached.
 `pauseRecording()` is the imperative workaround shipped in 14.0.0; the
 declarative one is a flag on the marker contract, and it fits the M5/M6
 vocabulary the release already built.

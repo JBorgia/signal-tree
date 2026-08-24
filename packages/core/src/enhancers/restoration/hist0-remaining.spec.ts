@@ -5,7 +5,7 @@ import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { withWriteContext } from '../../lib/write-context';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * HIST-0, the three cases the baseline left open: 4, 6 (+redo), and 9's direct
@@ -26,7 +26,7 @@ describe('HIST-0 case 4: mixed writes in ONE untransacted turn', () => {
   it('a document write and a UI write in one tick coalesce into ONE turn', async () => {
     const tree = signalTree(
       { document: { title: 'v1' }, ui: { panel: 'none' } },
-      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [restoration({ maxHistorySize: 50 })] }
     );
     await flush();
     const before = tree.getRestorationHistory().length;
@@ -81,7 +81,7 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
   it('REPAIRED (P0-C): undo is refused rather than discarding server truth', async () => {
     const tree = signalTree(
       { document: { title: 'v1' } },
-      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [restoration({ maxHistorySize: 50 })] }
     );
     await flush();
 
@@ -100,7 +100,7 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
   it('control: a realization to a DIFFERENT leaf DOES survive (10b holds)', async () => {
     const tree = signalTree(
       { document: { title: 'v1', body: 'b1' } },
-      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [restoration({ maxHistorySize: 50 })] }
     );
     await flush();
 
@@ -121,7 +121,7 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
   it('REPAIRED (P0-C-ROW): the same collision inside an entity row', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [restoration({ maxHistorySize: 50 })] }
     );
     undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'orig' }]));
     await flush();
@@ -143,7 +143,7 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
   it('REDO after supersession restores the authored value, not the server value', async () => {
     const tree = signalTree(
       { document: { title: 'v1' } },
-      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [restoration({ maxHistorySize: 50 })] }
     );
     await flush();
 
@@ -167,7 +167,7 @@ describe('HIST-0 case 9: does observability create restoration ownership?', () =
   it('AUTHORED churn — claims stay bounded by the window, not the churn', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 5 })] }
+      { enhancers: [restoration({ maxHistorySize: 5 })] }
     );
     const claims = getSubjectRestorationClaims(tree);
 
@@ -182,7 +182,7 @@ describe('HIST-0 case 9: does observability create restoration ownership?', () =
   it('REALIZATION churn — zero claims, zero history: the target property', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 5 })] }
+      { enhancers: [restoration({ maxHistorySize: 5 })] }
     );
     const claims = getSubjectRestorationClaims(tree);
     const historyBefore = tree.getRestorationHistory().length;
@@ -215,7 +215,7 @@ describe('HIST-0 case 9: does observability create restoration ownership?', () =
   it('but the DIAGNOSTIC half is NOT satisfied: realizations are invisible', async () => {
     const tree = signalTree(
       { document: { title: 'v1' } },
-      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [restoration({ maxHistorySize: 50 })] }
     );
     await flush();
     const before = tree.getRestorationHistory().length;

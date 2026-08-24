@@ -22,7 +22,7 @@ about as one thing.
 - _"Let me scrub the whole app back through 200 states"_ is a debugging tool. It
   wants unbounded history and full fidelity, and it belongs in dev.
 
-`timeTravel()` serves both. The rest of this guide is about the first.
+`restoration()` serves both. The rest of this guide is about the first.
 
 ## Cost 1 — snapshot time. This no longer exists.
 
@@ -82,15 +82,15 @@ removes the width term outright rather than shrinking it (measured flat at
 
 <!-- measured: node tools/size-report.mjs — the per-enhancer delta over a bare tree. -->
 
-`timeTravel()` is a couple of KB you do not want in a build that never undoes
+`restoration()` is a couple of KB you do not want in a build that never undoes
 anything; `node tools/size-report.mjs` prints the current delta.
 
 ⚠️ **Do not gate it on a runtime boolean.** This ships it anyway:
 
 ```ts
-// BROKEN — the static import defeats tree-shaking, so timeTravel is in the bundle
+// BROKEN — the static import defeats tree-shaking, so restoration is in the bundle
 const tree = signalTree(state, {
-  enhancers: isProduction ? [] : [timeTravel()],
+  enhancers: isProduction ? [] : [restoration()],
 });
 ```
 
@@ -103,7 +103,7 @@ production, this cost is simply the price of the feature, and it is small.
 ### 1. Bound the history — `maxHistorySize`
 
 ```ts
-signalTree(state, { enhancers: [timeTravel({ maxHistorySize: 50 })] });
+signalTree(state, { enhancers: [restoration({ maxHistorySize: 50 })] });
 ```
 
 Verified: 20 writes against `maxHistorySize: 5` leaves 5 reversible turns and 5
@@ -121,7 +121,7 @@ signalTree({
   rows: entityMap({ selectId: (r) => r.id, recordHistory: false }),
   // the small editable state the user actually undoes
   draft: { title: '', tags: [] as string[] },
-}, { enhancers: [timeTravel({ maxHistorySize: 50 })] });
+}, { enhancers: [restoration({ maxHistorySize: 50 })] });
 ```
 
 Verified: with `recordHistory: false`, two undos reverted the scalar state to its
@@ -137,10 +137,10 @@ serialisation. Use it for genuinely derived or secret state.
 Arbitrary branches cannot be scoped yet — only markers. That is
 [RFC 0012](../rfcs/0012-history-scoped-marker-capture.md), accepted and deferred.
 
-### 2b. `form()` now records under `timeTravel()`, but scoped form history is still the better UI default
+### 2b. `form()` now records under `restoration()`, but scoped form history is still the better UI default
 
 The old guidance here is stale. Form field writes now announce back onto the form path,
-so a tree with `timeTravel()` attached records and undoes direct `form()` edits again.
+so a tree with `restoration()` attached records and undoes direct `form()` edits again.
 
 That does **not** make scoped form history obsolete. `form({ history: history() })`
 is still the cleaner choice when undo authority should stay inside the panel or draft
@@ -148,7 +148,7 @@ being edited rather than join the app-wide stack.
 
 Today the practical rule is:
 
-- Use global `timeTravel()` when form edits should participate in the same global undo
+- Use global `restoration()` when form edits should participate in the same global undo
   stream as neighbouring tree writes.
 - Use `form({ history: history() })` when the form wants its own local undo model,
   independent of unrelated app activity.
@@ -163,12 +163,12 @@ part of the app-wide history stream:
 signalTree({
   rows: entityMap({ selectId: (r) => r.id, recordHistory: false }), // server-owned
   profile: form({ initial: { name: '' }, history: history() }), // undoable, scoped
-}, { enhancers: [timeTravel({ maxHistorySize: 50 })] }); // covers plain branches only
+}, { enhancers: [restoration({ maxHistorySize: 50 })] }); // covers plain branches only
 
 tree.$.profile.history?.undo(); // reverts the field — this is the working path
 ```
 
-Global `timeTravel()` now records direct form writes too, so this is a UX boundary
+Global `restoration()` now records direct form writes too, so this is a UX boundary
 choice rather than a correctness escape hatch.
 
 ### 3. ~~Make bulk work one step — `pauseRecording()`~~ — REMOVED in 14.1.1
@@ -206,7 +206,7 @@ transaction handle — see
 ### 4. Drop uninteresting transitions — `shouldSkip`
 
 ```ts
-timeTravel({
+restoration({
   // a cursor move is not an undo step
   shouldSkip: (prev, next) => prev.cursor !== next.cursor && prev.doc === next.doc,
 });
@@ -225,10 +225,10 @@ whole-state deep compare here undoes the saving.
 | What you are building                                 | Pattern                                                                              | Supported                                                                                                                           |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
 | Editor undo over a small document                     | `maxHistorySize` + `shouldSkip` for caret/selection                                  | Yes                                                                                                                                 |
-| Bulk-edit grid with cancel                            | `createTreeEditSession` (`@signaltree/core/edit-session`) — `commit()` or `cancel()` | Yes, and independent of `timeTravel`                                                                                                |
+| Bulk-edit grid with cancel                            | `createTreeEditSession` (`@signaltree/core/edit-session`) — `commit()` or `cancel()` | Yes, and independent of `restoration`                                                                                                |
 | Undo one panel, not the whole app                     | `recordHistory: false` on everything outside the panel                               | Yes                                                                                                                                 |
 | Large server collection + small editable **branch**   | `entityMap({ recordHistory: false })` beside an undoable branch                      | Yes — the headline pattern                                                                                                          |
-| Large server collection + small editable **`form()`** | `entityMap({ recordHistory: false })` beside `form({ history: history() })`          | Yes. Prefer scoped form history when the form should undo independently; global `timeTravel()` also records direct form writes now. |
+| Large server collection + small editable **`form()`** | `entityMap({ recordHistory: false })` beside `form({ history: history() })`          | Yes. Prefer scoped form history when the form should undo independently; global `restoration()` also records direct form writes now. |
 | Optimistic write, roll back on error                  | `undo()` in the error path, or `jumpTo(getCurrentIndex() - 1)`                       | Yes — only if nothing else recorded in between                                                                                      |
 | Import/generate, then one undo                        | —                                                                                    | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement                                               |
 | Audit trail rather than undo                          | `createAuditCallback()` or `getRestorationHistory()`                                            | Yes. **Not `createAuditTracker()`** — it samples on a 100 ms timer and drops write-then-revert pairs                                |
@@ -251,7 +251,7 @@ export const appTree = signalTree({
   rows: entityMap({ selectId: (r: Row) => r.id, recordHistory: false }),
   draft: { title: '', body: '' },
   ui: { cursor: 0, hovered: null as string | null },
-}, { enhancers: [timeTravel({
+}, { enhancers: [restoration({
     maxHistorySize: 50,
     shouldSkip: (prev, next) => (prev as State).draft === (next as State).draft,
   })] });

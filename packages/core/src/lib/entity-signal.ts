@@ -1531,7 +1531,7 @@ export function createEntitySignal<
    * ## Why this needs no causal assessment
    *
    * `runPhysicalMaintenance` exists for the hard case and asks a real question —
-   * is any turn, pending turn, applied-history entry or redo entry still
+   * is any turn, pending turn, applied-restoration history entry or redo entry still
    * referencing this subject? Answering it requires a `TurnStore` and an
    * `AppliedTurnProjection`, which a tree without `causal-runtime` does not have. That
    * absence is not a gap to work around; it IS the answer. With no owner there
@@ -2629,7 +2629,7 @@ export function createEntitySignal<
     clear(): void {
       // AUTHORS THE SAME STRUCTURAL REMOVALS `removeMany` DOES, and that is the
       // whole fix. Until 15.0 this tombstoned subjects and told the notifier
-      // nothing, so the turn timeTravel recorded carried no structural effect:
+      // nothing, so the turn restoration recorded carried no structural effect:
       // `canUndo()` reported true, the first undo silently restored nothing, and
       // the next threw "Unsupported scoped undo effect at structural-drift".
       // Removing the same rows one at a time and undoing worked correctly, which

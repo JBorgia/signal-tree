@@ -32,7 +32,7 @@
  * is C1's measurement, not this tool's.
  *
  * What this tool does NOT measure is the capability gap: `entityMap` semantics,
- * markers, `timeTravel`, serialization, undo. Those do not exist in a 50-line
+ * markers, `restoration`, serialization, undo. Those do not exist in a 50-line
  * hand-roll, so there is nothing to time — the honest statement there is the
  * line-count delta printed at the end, not a latency.
  *
@@ -274,7 +274,7 @@ if (process.argv.includes('--json')) {
     `    raw: ${ARMS.raw.lines} lines. signalTree: ${ARMS.signaltree.lines} lines. ` +
       `On a small store the container is a wash.\n` +
       `    The 50-line hand-roll stops being 50 lines the moment you need\n` +
-      `    entityMap semantics, markers, timeTravel, or serialization — those\n` +
+      `    entityMap semantics, markers, restoration, or serialization — those\n` +
       `    are capabilities, and they have no raw-signals equivalent to time.`
   );
 

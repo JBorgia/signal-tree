@@ -4,7 +4,7 @@ import { undoable } from '../../lib/undoable';
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
 import { withWriteContext } from '../../lib/write-context';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * RESTORE-P0 P0-C — world-relative validity.
@@ -41,7 +41,7 @@ const realization = (fn: () => void) =>
 const makeDoc = () =>
   signalTree(
     { doc: { title: 'v1', description: 'd1' } as Doc },
-    { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+    { enhancers: [restoration({ maxHistorySize: 50 })] }
   );
 
 describe('P0-C C1 — scalar collision', () => {
@@ -68,7 +68,7 @@ describe('P0-C C2 — structural collision', () => {
   it('a user rekey and a realization rekey of the same subject', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [restoration({ maxHistorySize: 50 })] }
     );
     undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'Alpha' }]));
     await flush();

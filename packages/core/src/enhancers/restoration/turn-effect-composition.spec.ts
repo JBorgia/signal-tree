@@ -3,7 +3,7 @@ import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * RESTORE-P0 — the full composition table, one case per row.
@@ -30,7 +30,7 @@ const flush = async () => {
 const makeTree = () =>
   signalTree(
     { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-    { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+    { enhancers: [restoration({ maxHistorySize: 50 })] }
   );
 
 describe('RESTORE-P0 composition: add + X in one turn', () => {

@@ -129,7 +129,7 @@ Packaging principle + ng-forms re-slice, `history()`, events↔entityMap bridge,
 ### Internal: replay sites tagged with metadata
 
 - **`devTools.applyExternalState`** (Redux DevTools time-travel) wraps its replay in `withWriteContext({ intent: 'system', source: 'time-travel' })` so downstream enhancers can distinguish replays from user writes.
-- **`timeTravel.restoreState`** (the time-travel enhancer's undo/redo/jumpTo) wraps similarly.
+- **`restoration.restoreState`** (the time-travel enhancer's undo/redo/jumpTo) wraps similarly.
 
 ### Why this matters
 

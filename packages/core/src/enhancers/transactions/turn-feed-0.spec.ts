@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../restoration/restoration';
+import { restoration } from '../restoration/restoration';
 import { transactions } from './transactions';
 import { undoable } from '../../lib/undoable';
 
 /**
  * TURN-FEED-0 — the transaction lifecycle protocol, six pre-registered cases.
  *
- * `transactions()` announces `(owner, id)` lifecycle events; `timeTravel()`
+ * `transactions()` announces `(owner, id)` lifecycle events; `restoration()`
  * observes them. The protocol carries LIFECYCLE ONLY — three events, never a
  * stream of mutation effects.
  *
@@ -28,7 +28,7 @@ const flush = async () => {
 const designated = <T extends object>(state: T) =>
   signalTree(state, {
     enhancers: [
-      timeTravel({
+      restoration({
         maxHistorySize: 50,
       }),
       transactions(),
@@ -42,7 +42,7 @@ describe('TURN-FEED-0 case 1: pending isolation', () => {
   it('a pending transaction never reaches confirmed history', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
+      { enhancers: [restoration({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
     const before = tree.getRestorationHistory().length;
@@ -53,8 +53,8 @@ describe('TURN-FEED-0 case 1: pending isolation', () => {
     await flush();
 
     // THE REGRESSION THIS PREVENTS. Before the protocol, the speculative row
-    // appeared as a confirmed history entry with ownerPaths ['rows'] while the
-    // transaction was still pending, because time-travel could not recognise a
+    // appeared as a confirmed restoration history entry with ownerPaths ['rows'] while the
+    // transaction was still pending, because restoration could not recognise a
     // transaction it did not own.
     expect(tree.getRestorationHistory().length).toBe(before);
     expect(tree.$.rows.ids()).toEqual(['a']); // visible in STATE, as intended
@@ -68,7 +68,7 @@ describe('TURN-FEED-0 case 2: confirmation', () => {
   it('confirming is observed ONCE and does not double-record', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
+      { enhancers: [restoration({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
     const before = tree.getRestorationHistory().length;
@@ -141,7 +141,7 @@ describe('TURN-FEED-0 case 3: rollback', () => {
   it('rolling back leaves no entry and no restoration claim', async () => {
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
+      { enhancers: [restoration({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
     const before = tree.getRestorationHistory().length;
@@ -163,7 +163,7 @@ describe('TURN-FEED-0 case 4: surrounding writes', () => {
     const tree = signalTree(
       { status: 'idle', other: 'before',
         rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-      { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
+      { enhancers: [restoration({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
     const before = tree.getRestorationHistory().length;
@@ -192,7 +192,7 @@ describe('TURN-FEED-0 case 4: surrounding writes', () => {
 
 describe('TURN-FEED-0 case 5: enhancer ordering', () => {
   const probe = async (order: 'tx-first' | 'tt-first') => {
-    const tt = timeTravel({ maxHistorySize: 50 });
+    const tt = restoration({ maxHistorySize: 50 });
     const tx = transactions();
     const tree = signalTree(
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },

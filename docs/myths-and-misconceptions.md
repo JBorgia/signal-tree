@@ -105,18 +105,18 @@ Each marker materializes at its declared path. There is no root-level constraint
 
 ## Myth 4: "Time-travel is in a separate package, `@signaltree/time-travel`."
 
-**Where this comes from:** Plausible package-naming convention. LLMs see `timeTravel()` named as an enhancer and assume a package boundary.
+**Where this comes from:** Plausible package-naming convention. LLMs see `restoration()` named as an enhancer and assume a package boundary.
 
-**The truth:** No such package exists. `timeTravel` is exported from `@signaltree/core`.
+**The truth:** No such package exists. `restoration` is exported from `@signaltree/core`.
 
 ```typescript
-import { signalTree, timeTravel } from '@signaltree/core'; // ← correct
-const store = signalTree({ ... }, { enhancers: [timeTravel({ maxHistorySize: 50 })] });
+import { signalTree, restoration } from '@signaltree/core'; // ← correct
+const store = signalTree({ ... }, { enhancers: [restoration({ maxHistorySize: 50 })] });
 ```
 
-**Source:** [`packages/core/src/index.ts:237`](../packages/core/src/index.ts) — `export { timeTravel } from './enhancers/restoration/restoration';`.
+**Source:** [`packages/core/src/index.ts:237`](../packages/core/src/index.ts) — `export { restoration } from './enhancers/restoration/restoration';`.
 
-**Doc-side action:** None — the enhancer table in the root [README](../README.md) and [`LLM.md`](ai/LLM.md) both clearly list `timeTravel()` under `@signaltree/core`. This is purely an LLM hallucination, not a docs gap.
+**Doc-side action:** None — the enhancer table in the root [README](../README.md) and [`LLM.md`](ai/LLM.md) both clearly list `restoration()` under `@signaltree/core`. This is purely an LLM hallucination, not a docs gap.
 
 ---
 

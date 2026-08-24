@@ -60,7 +60,7 @@ const MARKERS = [
 
 const ENHANCERS = [
   ['batching', 'batching', 'batching()', 't.batch(() => t.$.count.set(2));'],
-  ['timeTravel', 'timeTravel', 'timeTravel()', 't.undo(); t.redo();'],
+  ['restoration', 'restoration', 'restoration()', 't.undo(); t.redo();'],
   ['devTools', 'devTools', 'devTools()', 't.connectDevTools();'],
   ['persistence', 'persistence', "persistence({ key: 'k' })", 't.save();'],
 
@@ -121,11 +121,11 @@ const COMBOS = [
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
   ['current public surface mix', `
     import { signalTree, entityMap,
-             batching, timeTravel } from ${C};
+             batching, restoration } from ${C};
     const t = signalTree({
       rows: entityMap({ selectId: (r) => r.id }),
       count: 0,
-    }, { enhancers: [batching(), timeTravel()] });
+    }, { enhancers: [batching(), restoration()] });
     t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.count.set(1); }); t.undo();
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
 ];
@@ -178,7 +178,7 @@ if (process.argv.includes('--json')) {
       .filter((r) => r.feature !== 'entityMap (plain)')
       .reduce((a, r) => a + r.deltaKB, 0) +
     out.enhancers
-      .filter((r) => ['batching', 'timeTravel', 'serialization'].includes(r.feature))
+      .filter((r) => ['batching', 'restoration', 'serialization'].includes(r.feature))
       .reduce((a, r) => a + r.deltaKB, 0);
   // PRE-EXISTING: this looked up a combo named 'everything' that COMBOS has not
   // contained for some time, so the reporter crashed on its own last line with

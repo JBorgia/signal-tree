@@ -19,7 +19,7 @@ import { visitTree } from './visit-tree';
  * directly without invoking PathNotifier. Entity collections notify through
  * their own internals, but a direct call like `tree.$.user.profile.name.set(x)`
  * never produces a PathNotifier event by itself. Enhancers that need to
- * observe every mutation (DevTools, time-travel, etc.) must intercept those
+ * observe every mutation (DevTools, restoration, etc.) must intercept those
  * leaf writes themselves — this helper centralizes that traversal.
  *
  * The `onWrite` callback receives an optional `meta: WriteMetadata` captured
@@ -36,7 +36,7 @@ import { visitTree } from './visit-tree';
  * original methods.
  *
  * @public — Enhancer-author API. Used by `@signaltree/core`'s built-in
- *   devtools / time-travel enhancers. Application code should not use this
+ *   devtools / restoration enhancers. Application code should not use this
  *   directly, and 15.0 removed its last external consumer: measured against
  *   plain Angular `computed` observation it showed no capability advantage —
  *   it misses writes past `maxDepth` and misses array-valued leaves entirely
@@ -257,7 +257,7 @@ export function interceptLeafSignals(
         // `isWritableSignal` above requires BOTH `set` and `update`. A `form()`
         // node has `set` and `patch` — no `update` — so it failed that test and
         // was never wrapped, which meant its writes were invisible here. The
-        // consequence was not subtle: `timeTravel` sets its self-dirty flag from
+        // consequence was not subtle: `restoration` sets its self-dirty flag from
         // THIS callback, so a form edit never marked the tree dirty and was
         // never recorded. Measured: three writes (form, leaf, form) produced two
         // history entries, the last form edit simply absent — so undo could not
@@ -277,7 +277,7 @@ export function interceptLeafSignals(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const marker = node as any;
           // Every mutator a built-in marker exposes. A marker that notifies the
-          // global PathNotifier itself is NOT enough: `timeTravel` sets its
+          // global PathNotifier itself is NOT enough: `restoration` sets its
           // self-dirty flag from THIS callback, and the notifier is global so a
           // notification carries no ownership. An entityMap-only edit was
           // therefore never recorded — verified, history stayed at ["INIT"].

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { undoable } from '../lib/undoable';
 import { transactions } from '../enhancers/transactions/transactions';
 
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from '../index';
 
 /**
@@ -19,7 +19,7 @@ import { signalTree } from '../index';
  *
  * PUBLIC SURFACE, measured: the `transactions()` enhancer publishes only
  * `transaction()`. `getConfirmedTurnCount` / `getPendingTurnIds` and friends live
- * on the INTERNAL runtime, not the public tree. `timeTravel()` publishes
+ * on the INTERNAL runtime, not the public tree. `restoration()` publishes
  * `transaction()` on its own, so grouping is reachable without `transactions()`.
  */
 
@@ -47,10 +47,10 @@ type Nested = {
 // E2-C1 — the frozen P3 scenario, through the real path
 // ============================================================================
 describe('E2-C1 — real P3', () => {
-  it('a PENDING write is visible in canonical truth but adds NO history entry', async () => {
+  it('a PENDING write is visible in canonical truth but adds NO restoration history entry', async () => {
     const tree = signalTree(
       { x: 'A' },
-      { enhancers: [timeTravel(), transactions()] }
+      { enhancers: [restoration(), transactions()] }
     ) as unknown as TT<Scalar>;
     const base = tree.getRestorationHistory().length;
 
@@ -64,7 +64,7 @@ describe('E2-C1 — real P3', () => {
   it('CONFIRMATION historicises; ROLLBACK of a superseded pending turn changes neither truth nor history', async () => {
     const tree = signalTree(
       { x: 'A' },
-      { enhancers: [timeTravel(), transactions()] }
+      { enhancers: [restoration(), transactions()] }
     ) as unknown as TT<Scalar>;
 
     const t1 = undoable(() => tree.transaction(() => tree.$.x.set('B'))); // pending
@@ -89,7 +89,7 @@ describe('E2-C1 — real P3', () => {
   it('RECORDED: confirmed undo lands on B, not A — and redo returns to C', async () => {
     const tree = signalTree(
       { x: 'A' },
-      { enhancers: [timeTravel(), transactions()] }
+      { enhancers: [restoration(), transactions()] }
     ) as unknown as TT<Scalar>;
 
     const t1 = undoable(() => tree.transaction(() => tree.$.x.set('B')));
@@ -135,7 +135,7 @@ describe('E2-C2 — nested path', () => {
       {
         profile: { name: 'A', age: 30 },
       },
-      { enhancers: [timeTravel(), transactions()] }
+      { enhancers: [restoration(), transactions()] }
     ) as unknown as TT<Nested>;
 
     const t1 = undoable(() => tree.transaction(() => tree.$.profile.name.set('B')));
@@ -165,7 +165,7 @@ describe('E2-C3 — real ABA authorship', () => {
   it('RECORDED: the real kernel does NOT distinguish authorship of an identical value', async () => {
     const tree = signalTree(
       { x: 'A' },
-      { enhancers: [timeTravel(), transactions()] }
+      { enhancers: [restoration(), transactions()] }
     ) as unknown as TT<Scalar>;
 
     const t1 = undoable(() => tree.transaction(() => tree.$.x.set('B')));
@@ -174,7 +174,7 @@ describe('E2-C3 — real ABA authorship', () => {
     const hist = tree.getRestorationHistory().length;
 
     // Later work outside confirmed history, produced by the real mechanism: a
-    // PENDING turn is visible in truth and adds no history entry (E2-C1 row 1).
+    // PENDING turn is visible in truth and adds no restoration history entry (E2-C1 row 1).
     const later = tree.transaction(() => {
       undoable(() => tree.$.x.set('C'));
       tree.$.x.set('B'); // value returns to T1's, authored by THIS turn

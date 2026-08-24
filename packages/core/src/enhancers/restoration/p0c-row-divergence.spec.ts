@@ -4,7 +4,7 @@ import { undoable } from '../../lib/undoable';
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
 import { withWriteContext } from '../../lib/write-context';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * P0-C-ROW — does the provenance guard reach an ENTITY ROW FIELD?
@@ -40,7 +40,7 @@ const realization = (fn: () => void) =>
 const makeTree = () =>
   signalTree(
     { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-    { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+    { enhancers: [restoration({ maxHistorySize: 50 })] }
   );
 
 describe('P0-C-ROW: entity row field divergence', () => {

@@ -3,7 +3,7 @@ import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../restoration/restoration';
+import { restoration } from '../restoration/restoration';
 import { transactions } from './transactions';
 
 /**
@@ -35,7 +35,7 @@ import { transactions } from './transactions';
  * entity, subjectId, ...)`, whose `entity` is required and always becomes
  * `realizedValue`. So the `??` never evaluates its right side.
  *
- * A restorer holds its own copy either way: a time-travel entry carries the
+ * A restorer holds its own copy either way: a restoration entry carries the
  * state snapshot, a transaction turn carries `__baselineValues`, and a
  * structural `remove` effect carries `deepClone(entity)`. The entity layer's
  * retained value is a THIRD copy that nothing reads once the subject is
@@ -225,8 +225,8 @@ describe('ownership of retired value backing', () => {
     expect(heldName()).toBe('Alpha');
   });
 
-  it('a HELD REFERENCE still re-publishes on time-travel undo with the bytes deleted', async () => {
-    const store = makeStore([timeTravel({ maxHistorySize: 20 })]);
+  it('a HELD REFERENCE still re-publishes on restoration undo with the bytes deleted', async () => {
+    const store = makeStore([restoration({ maxHistorySize: 20 })]);
     undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();
@@ -325,7 +325,7 @@ describe('ownership of retired value backing', () => {
   });
 
   it('BOTH ENHANCERS: neither system needs the bytes when the other is present', async () => {
-    const store = makeStore([timeTravel({ maxHistorySize: 20 }), transactions()]);
+    const store = makeStore([restoration({ maxHistorySize: 20 }), transactions()]);
     undoable(() => store.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await tick();
     await tick();

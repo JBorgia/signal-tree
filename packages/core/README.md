@@ -654,7 +654,7 @@ All enhancers are exported directly from `@signaltree/core`:
 **Development Tools:**
 
 - `devTools()` - Redux DevTools auto-connect, path actions, and time-travel dispatch
-- `timeTravel()` - Undo/redo functionality
+- `restoration()` - Undo/redo functionality
 
 `devTools()` also adds `tree.exportDebugSession()`, which returns a
 `DevToolsDebugSession` snapshot — aggregate metrics, per-module activity, and the
@@ -720,12 +720,12 @@ const electronics = tree.$.products.all.filter((p) => p.category === 'electronic
 **Full-Stack Application:**
 
 ```typescript
-import { signalTree, persistence, timeTravel } from '@signaltree/core';
+import { signalTree, persistence, restoration } from '@signaltree/core';
 
 const tree = signalTree({
   user: null as User | null,
   preferences: { theme: 'light' },
-}, { enhancers: [persistence({ key: 'app-state' }), timeTravel()] }); // Undo/redo support
+}, { enhancers: [persistence({ key: 'app-state' }), restoration()] }); // Undo/redo support
 
 // For async operations, use manual async or async helpers
 async function fetchUser(id: string) {
@@ -1440,7 +1440,7 @@ async function fetchUsers() {
 ### Full-Featured Development Composition
 
 ```typescript
-import { signalTree, batching, persistence, timeTravel, devTools } from '@signaltree/core';
+import { signalTree, batching, persistence, restoration, devTools } from '@signaltree/core';
 
 // Full development stack (example)
 const tree = signalTree({
@@ -1453,7 +1453,7 @@ const tree = signalTree({
   enhancers: [
     batching(), // Performance
     persistence({ key: 'my-app-state' }),
-    timeTravel({
+    restoration({
       // Undo/redo
       maxHistory: 50,
     }),
@@ -1501,7 +1501,7 @@ const tree = signalTree(initialState, {
 ### Conditional Enhancement
 
 ```typescript
-import { signalTree, batching, devTools, timeTravel } from '@signaltree/core';
+import { signalTree, batching, devTools, restoration } from '@signaltree/core';
 
 const isDevelopment = process.env['NODE_ENV'] === 'development';
 
@@ -1511,7 +1511,7 @@ const tree = signalTree(state, { enhancers: [batching(), // Always include perfo
     ? [
         // Development-only features
         devTools(),
-        timeTravel(),
+        restoration(),
       ]
     : [])] });
 ```
@@ -1544,7 +1544,7 @@ Conditional features are a conditional ARRAY, decided before the tree exists:
 const enhancers = [
   ...(isDevelopment ? [devTools()] : []),
   ...(needsPerformance ? [batching()] : []),
-  ...(needsTimeTravel ? [timeTravel()] : []),
+  ...(needsTimeTravel ? [restoration()] : []),
 ];
 
 const tree = signalTree(initialState, { enhancers });
@@ -1553,8 +1553,8 @@ const tree = signalTree(initialState, { enhancers });
 This is what replaced reassigning `tree = tree.with(...)` in a chain of `if`s,
 and it is better than a rewrite of the same thing: on the old path the tree was
 already built before the first `if` ran, so it carried the full build plan
-whichever branch was taken. Here a build with no `timeTravel()` does not install
-the machinery `timeTravel()` needs.
+whichever branch was taken. Here a build with no `restoration()` does not install
+the machinery `restoration()` needs.
 
 ### Service-based pattern
 
@@ -1893,9 +1893,9 @@ tree.destroy(); // Cleanup resources
 SignalTree Core includes all enhancers built-in:
 
 ```typescript
-import { signalTree, batching, timeTravel } from '@signaltree/core';
+import { signalTree, batching, restoration } from '@signaltree/core';
 
-const tree = signalTree(initialState, { enhancers: [batching(), timeTravel()] });
+const tree = signalTree(initialState, { enhancers: [batching(), restoration()] });
 ```
 
 ### Available enhancers
@@ -1904,7 +1904,7 @@ All enhancers are included in `@signaltree/core`:
 
 - **batching()** - Batch multiple updates for better performance
 - **devTools()** - Redux DevTools integration for debugging
-- **timeTravel()** - Undo/redo functionality & state history
+- **restoration()** - Undo/redo functionality & state history
 - **serialization()** - State persistence & SSR support
 
 ### Marking an operation undoable
@@ -1913,10 +1913,10 @@ All enhancers are included in `@signaltree/core`:
 eligible for undo. It does **not** create a causal-turn boundary.
 
 ```ts
-import { signalTree, timeTravel, undoable } from '@signaltree/core';
+import { signalTree, restoration, undoable } from '@signaltree/core';
 
 const tree = signalTree({ doc: { title: '' }, ui: { panel: 'none' } }, {
-  enhancers: [timeTravel({ maxHistorySize: 50 })],
+  enhancers: [restoration({ maxHistorySize: 50 })],
 });
 
 function rename(title: string) {
@@ -1970,7 +1970,7 @@ are truth acquired from outside the authored operation, rather than work the use
 did:
 
 ```ts
-import { realize, signalTree, timeTravel } from '@signaltree/core';
+import { realize, signalTree, restoration } from '@signaltree/core';
 
 const rows = await api.getRows();
 realize(() => tree.$.rows.setAll(rows));
@@ -2049,7 +2049,7 @@ Consider enhancers when you need:
 
 - ⚡ Performance optimization (`batching()`)
 - 🐛 Advanced debugging (`devTools()`)
-- ↩️ Undo/redo (`timeTravel()`)
+- ↩️ Undo/redo (`restoration()`)
 
 Consider separate packages when you need:
 
@@ -2186,7 +2186,7 @@ All enhancers are now consolidated in the core package. The following features a
 <!-- measured: historical enhancer delta table; remeasure with `node tools/measure-enhancer-deltas.mjs` before publishing updated figures. -->
 
 - **devTools()** (+2.49KB gzipped) - Development tools & Redux DevTools integration
-- **timeTravel()** (+1.75KB gzipped) - Undo/redo functionality & state history
+- **restoration()** (+1.75KB gzipped) - Undo/redo functionality & state history
 
 ### Integration & Convenience
 
@@ -2207,7 +2207,7 @@ import {
   signalTree,
   batching,
   devTools,
-  timeTravel,
+  restoration,
   persistence,
   entityMap,
 } from '@signaltree/core';

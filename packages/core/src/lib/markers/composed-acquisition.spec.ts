@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { timeTravel } from '../../enhancers/restoration/restoration';
+import { restoration } from '../../enhancers/restoration/restoration';
 import { withWriteContext } from '../write-context';
 import { transactions } from '../../enhancers/transactions/transactions';
 import { entityMap } from './entity-map';
@@ -62,7 +62,7 @@ const usersState = () => ({
 // that hides the very API under test makes the assertions vacuous.
 const makePlainTree = () => signalTree(usersState());
 const makeTimeTravelTree = () =>
-  signalTree(usersState(), { enhancers: [timeTravel({ maxHistorySize: 20 })] });
+  signalTree(usersState(), { enhancers: [restoration({ maxHistorySize: 20 })] });
 const makeTransactionTree = () =>
   signalTree(usersState(), { enhancers: [transactions()] });
 

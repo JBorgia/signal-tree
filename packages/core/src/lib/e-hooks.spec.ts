@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
 import { entityMap } from './types';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 
 /**
  * DERIVATION E — the last two members: `tap` and `intercept`.
@@ -36,7 +36,7 @@ type TimeTravelRows = {
 function createTimeTravelRows(): TimeTravelRows {
   return signalTree(
     { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-    { enhancers: [timeTravel()] }
+    { enhancers: [restoration()] }
   ) as unknown as TimeTravelRows;
 }
 

@@ -190,12 +190,12 @@ describe('undo/redo end to end still reverts a large collection', () => {
     const N = 300;
     const rows: Row[] = [];
     for (let i = 0; i < N; i++) rows.push({ id: i, v: i });
-    const { timeTravel } = await import('../enhancers/restoration/restoration');
+    const { restoration } = await import('../enhancers/restoration/restoration');
     const tree = signalTree(
       {
         rows: entityMap<Row, number>({ selectId: (r) => r.id }),
       },
-      { enhancers: [timeTravel({ maxHistorySize: 100 })] }
+      { enhancers: [restoration({ maxHistorySize: 100 })] }
     );
     undoable(() => tree.$.rows.setAll(rows));
     await flush();

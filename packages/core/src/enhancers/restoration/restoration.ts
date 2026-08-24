@@ -71,7 +71,7 @@ export type { RestorationConfig, RestorationHistoryEntry };
 // (RestorationConfig is imported from canonical types)
 
 /**
- * Internal time travel state management
+ * Internal restoration state management
  */
 
 type CanonicalTurn<T> = RestorationHistoryEntry<T> & {
@@ -171,7 +171,7 @@ type TreeRealizationDescriptorStore = Map<
 // The rollback TYPE cluster — LaterAppliedEffect,
 // PendingRollbackDependencyConflict, PendingRollbackPlan, RollbackTurnLike,
 // RollbackFailureCause, ROLLBACK_ERROR_MESSAGE — was DELETED in 15.0 with
-// timeTravel()'s duplicate transaction() (TX-SURFACE-0).
+// restoration()'s duplicate transaction() (TX-SURFACE-0).
 //
 // Rollback is `transactions()`' concern and it declares its own equivalents,
 // built from its own captured effects rather than from restoration history.
@@ -253,7 +253,7 @@ function toReversalEffect(
 }
 
 // `buildPendingRollbackPlan()` and its `RollbackFailureCause` /
-// `ROLLBACK_ERROR_MESSAGE` helpers were DELETED in 15.0 with timeTravel()'s
+// `ROLLBACK_ERROR_MESSAGE` helpers were DELETED in 15.0 with restoration()'s
 // duplicate `transaction()` (TX-SURFACE-0). Rollback planning belongs to
 // `transactions()`, which has its own equivalent built from its own captured
 // effects rather than from restoration history.
@@ -324,7 +324,7 @@ function normaliseMaxHistorySize(value: number | undefined): number {
   if (!Number.isFinite(value) || value < 2) {
     if (typeof ngDevMode === 'undefined' || ngDevMode) {
       console.error(
-        `SignalTree: timeTravel({ maxHistorySize: ${String(value)} }) cannot ` +
+        `SignalTree: restoration({ maxHistorySize: ${String(value)} }) cannot ` +
           `support undo. maxHistorySize is a buffer LENGTH, so N entries give ` +
           `N-1 undo steps — any value below 2 gives none, and a non-finite value ` +
           `is silently unbounded. Falling back to the default of 50. Pass 2 or ` +
@@ -521,7 +521,7 @@ class RestorationManager<T> {
     return this.history.some((turn) => turn.id > turnId);
   }
 
-  // `getPendingRollbackPlan()` was DELETED in 15.0 with timeTravel()'s duplicate
+  // `getPendingRollbackPlan()` was DELETED in 15.0 with restoration()'s duplicate
   // `transaction()` (TX-SURFACE-0).
   //
   // TOMBSTONE, because this method IS the category-C defect the opt-in flip
@@ -567,11 +567,11 @@ class RestorationManager<T> {
       this.bumpRestorationHistory();
     }
 
-    // A history entry IS the snapshot — no clone.
+    // A restoration history entry IS the snapshot — no clone.
     //
     // This used to `structuredClone` the whole tree per entry, which made every
     // recorded write O(state) and retained a full copy of the state per entry:
-    // 50 root writes each changing ONE number cost 0.03ms without time travel
+    // 50 root writes each changing ONE number cost 0.03ms without restoration
     // and 340.60ms with it, at 10k rows.
     //
     // Materialisation is now memoised and structurally shared, so an unchanged
@@ -1506,7 +1506,7 @@ class RestorationManager<T> {
   }
 
   /**
-   * Restore state without triggering time travel middleware
+   * Restore state without triggering restoration middleware
    */
   private restoreState(
     state: T,
@@ -1605,7 +1605,7 @@ class RestorationManager<T> {
   // RESTORATION CLAIMS — the single boundary
   // ==========================================================================
   //
-  // A retained history entry is a REASON to keep retired subjects alive. It
+  // A retained restoration history entry is a REASON to keep retired subjects alive. It
   // stops being one at exactly five moments, and before this there was no code
   // at any of them: max-size eviction, redo truncation on a new write after an
   // undo, scoped redo truncation, `resetRestorationHistory()`, and destroy (which routes
@@ -1616,7 +1616,7 @@ class RestorationManager<T> {
   // remove an entry from `this.history`.
 
   private restorationClaimOwner(turnId: number): RestorationClaimOwner {
-    // `<system>:<id>` so time-travel and transactions cannot collide in the
+    // `<system>:<id>` so restoration and transactions cannot collide in the
     // shared registry. NOT a history index — indices shift when the window
     // slides, and a shifted index re-points a live claim at another record.
     //
@@ -1624,7 +1624,7 @@ class RestorationManager<T> {
     // reused across a reset. That is safe only because the reset releases every
     // owner before the counter goes back; if that order ever inverts, a new
     // entry inherits a dead entry's claims.
-    return `time-travel:${turnId}`;
+    return `restoration:${turnId}`;
   }
 
   /** Claim the subjects an entry needs kept alive. Idempotent per entry. */
@@ -1813,37 +1813,37 @@ class RestorationManager<T> {
 // whose writes another restoration system reads as new authored mutations.
 
 /**
- * Enhances a SignalTree with comprehensive time travel capabilities.
+ * Enhances a SignalTree with comprehensive restoration capabilities.
  *
  * Adds undo/redo functionality, state history management, and snapshot features.
  * Automatically tracks state changes and provides methods to navigate through
  * the application's state history with configurable limits and optimizations.
  *
  * @template T - The state object type
- * @param config - Configuration options for time travel behavior
- * @returns Function that enhances a SignalTree with time travel capabilities
+ * @param config - Configuration options for restoration behavior
+ * @returns Function that enhances a SignalTree with restoration capabilities
  *
  * @example
  * ```typescript
- * // Basic time travel enhancement
- * const store = signalTree({ count: 0, text: '' }, { enhancers: [timeTravel()] });
+ * // Basic restoration enhancement
+ * const store = signalTree({ count: 0, text: '' }, { enhancers: [restoration()] });
  *
  * // Make some changes
  * store.count.set(1);
  * store.text.set('hello');
  * store.count.set(2);
  *
- * // Access time travel interface
- * const timeTravel = store.__restoration;
+ * // Access restoration interface
+ * const restoration = store.__restoration;
  *
  * // Navigate history
- * console.log(timeTravel.canUndo()); // true
- * timeTravel.undo(); // count: 1, text: 'hello'
- * timeTravel.undo(); // count: 1, text: ''
- * timeTravel.undo(); // count: 0, text: ''
+ * console.log(restoration.canUndo()); // true
+ * restoration.undo(); // count: 1, text: 'hello'
+ * restoration.undo(); // count: 1, text: ''
+ * restoration.undo(); // count: 0, text: ''
  *
- * timeTravel.redo(); // count: 1, text: ''
- * console.log(timeTravel.canRedo()); // true
+ * restoration.redo(); // count: 1, text: ''
+ * console.log(restoration.canRedo()); // true
  * ```
  *
  * @example
@@ -1852,7 +1852,7 @@ class RestorationManager<T> {
  * const store = signalTree({
  *   document: { title: '', content: '' },
  *   settings: { theme: 'light' }
- * }, { enhancers: [timeTravel({
+ * }, { enhancers: [restoration({
  *   maxHistorySize: 50,        // Limit memory usage
  *   includePayload: true,      // Store action metadata
  *   actionNames: {             // Custom action names
@@ -1874,7 +1874,7 @@ class RestorationManager<T> {
 /**
  * @internal Retained collection pointers above which history is worth a word.
  *
- * The unit is the one that actually costs memory: a history entry retains one
+ * The unit is the one that actually costs memory: a restoration history entry retains one
  * POINTER per entity in every included collection, so retention is
  * `entries x collection width`, not either alone. RE-MEASURED for 14.1.1 with
  * `tools/bench-retention-arms.mjs` (50 recorded writes, heap baselined after
@@ -1921,7 +1921,7 @@ let warnedHistoryRetention = false;
  *
  * Checked at RECORD time, not at attach. The first version of this checked once
  * when the enhancer attached, and that is the one moment it cannot work: an app
- * builds its tree, attaches `timeTravel()` in the same breath, and the rows
+ * builds its tree, attaches `restoration()` in the same breath, and the rows
  * arrive later from a fetch. At attach the collection is empty, every time. The
  * check passed its own tests only because those tests populated the collection
  * first — test order chosen to suit the implementation rather than to match
@@ -1983,7 +1983,7 @@ function checkHistoryRetention(root: unknown, entries: number): void {
 
   warnedHistoryRetention = true;
   console.warn(
-    `SignalTree: time travel is retaining roughly ${Math.round(
+    `SignalTree: restoration is retaining roughly ${Math.round(
       retained / 1000
     )}k entity pointers — ${entries} history entries, each holding a fresh ` +
       `array for every collection it captures (widest: "${widestPath}" at ` +
@@ -1994,7 +1994,7 @@ function checkHistoryRetention(root: unknown, entries: number): void {
   );
 }
 
-export function timeTravel(
+export function restoration(
   config: RestorationConfig = {}
 ): Enhancer<RestorationMethods> {
   const { enabled = true } = config;
@@ -2051,7 +2051,7 @@ export function timeTravel(
       }
     ).bind(tree);
 
-    // Flag to prevent time travel during restoration
+    // Flag to prevent restoration during restoration
     let isRestoring = false;
 
     const realizationDescriptors =
@@ -2223,11 +2223,11 @@ export function timeTravel(
     const positionRegistry = getPositionRegistry(tree.$);
     if (!positionRegistry) {
       throw new Error(
-        'SignalTree: timeTravel() requires a tree-owned PositionRegistry.'
+        'SignalTree: restoration() requires a tree-owned PositionRegistry.'
       );
     }
 
-    // Create time travel manager with restoration function
+    // Create restoration manager with restoration function
     const restorationManager = new RestorationManager(
       tree,
       positionRegistry,
@@ -2245,14 +2245,14 @@ export function timeTravel(
 
     // If PathNotifier batching is enabled, use flush events to record
     // a single snapshot per flush; otherwise, keep the existing immediate
-    // update-based history entry.
+    // update-based restoration history entry.
     //
     // IMPORTANT: signalTree's recursive update pipeline writes to leaf
     // signals directly without calling PathNotifier.notify(); only entity
     // collections notify by themselves. To make direct leaf writes such as
     // `tree.$.user.profile.name.set('x')` observable here we recursively
     // intercept every plain writable signal and route their writes through
-    // the global notifier. Without this interception, time-travel would
+    // the global notifier. Without this interception, restoration would
     // silently miss every leaf .set()/.update() in the tree.
     const createCaptureBucket = (): CaptureBucket => ({
       ownerPaths: new Set<string>(),
@@ -2732,7 +2732,7 @@ export function timeTravel(
      * TURN-FEED-0 — active foreign transactions, keyed by `(owner, id)`.
      *
      * This used to compare `meta.transactionOwner` against `transactionOwnerToken`,
-     * time-travel's own private token. That was correct only while time-travel
+     * restoration's own private token. That was correct only while restoration
      * shipped its own `transaction()`; a transaction opened by `transactions()`
      * was invisible, and its speculative writes landed in CONFIRMED restoration
      * history before `confirm()`.
@@ -2853,7 +2853,7 @@ export function timeTravel(
       }
 
       // 'rolled-back'. The writes never happened, so the staged turn is thrown
-      // away rather than admitted. Compensation is the owner's job — time-travel
+      // away rather than admitted. Compensation is the owner's job — restoration
       // neither applies nor validates it.
       restorationManager.discardPendingTurn(stagedTurnId);
     });
@@ -3093,7 +3093,7 @@ export function timeTravel(
       // Ignore - fall back to default behavior
     }
 
-    // Create enhanced tree function that includes time travel tracking
+    // Create enhanced tree function that includes restoration tracking
     const enhancedTree = function (this: ISignalTree<T>, ...args: unknown[]) {
       if (args.length === 0) {
         return originalTreeCall();
@@ -3194,7 +3194,7 @@ export function timeTravel(
     (enhancedTree as ISignalTree<T> & RestorationMethods)['redo'] = () => {
       restorationManager.redoConfirmed();
     };
-    // `transaction()` was REMOVED from timeTravel() in 15.0 (TX-SURFACE-0).
+    // `transaction()` was REMOVED from restoration() in 15.0 (TX-SURFACE-0).
     //
     // TOMBSTONE. It was a SECOND implementation of a concept `transactions()`
     // already owns, reaching the public surface silently through
@@ -3205,17 +3205,17 @@ export function timeTravel(
     // ledger. Under opt-in eligibility an ordinary later write is not admitted
     // to that history, so a dependent rollback stopped being refused: 7 refusal
     // tests stopped throwing the moment the default flipped, all of them
-    // installing `timeTravel()` alone. `transactions()` was unaffected, because
+    // installing `restoration()` alone. `transactions()` was unaffected, because
     // it builds its dependency store from its OWN captured effects.
     //
     // Deleting it needed TURN-FEED-0 first. Without a lifecycle channel,
     // `transactions()`' speculative writes landed in CONFIRMED restoration
-    // history — measured, in both enhancer orders — because time-travel
+    // history — measured, in both enhancer orders — because restoration
     // recognised a pending transaction only by its own private token.
     //
     // NOT deleted: the `pendingTransactions` capture buckets, which record a
     // transaction confirmed by `transactions()` as one turn. That is
-    // time-travel's own job and the lifecycle observer drives it.
+    // restoration's own job and the lifecycle observer drives it.
     (enhancedTree as ISignalTree<T> & RestorationMethods)['getRestorationHistory'] = () =>
       restorationManager.getRestorationHistory();
     (enhancedTree as ISignalTree<T> & RestorationMethods)['resetRestorationHistory'] =
@@ -3310,8 +3310,8 @@ export function timeTravel(
   };
 
   const meta: EnhancerMeta = {
-    name: 'timeTravel',
-    provides: ['timeTravel'],
+    name: 'restoration',
+    provides: ['restoration'],
     capabilities: ['causal-runtime', 'temporal-snapshots'],
   };
   (enhancerFn as unknown as { metadata: EnhancerMeta }).metadata = meta;
@@ -3327,24 +3327,24 @@ export function timeTravel(
   // `this`, NOT from anything this cast carries — which is why the public
   // contract stays state-precise across it. `b266457d` removed the old
   // `RestorationMethods<T>` generic for exactly this reason; the rows in
-  // `time-travel-contract.typing.spec.ts` are what verify it.
+  // `restoration-contract.typing.spec.ts` are what verify it.
   return enhancerFn as unknown as Enhancer<RestorationMethods>;
 }
 
 /**
- * Convenience function to enable basic time travel.
+ * Convenience function to enable basic restoration.
  *
  * NOT PUBLIC — absent from `tools/api-baseline.json` and from every barrel, so
- * it reaches no entry point. Migrated with `timeTravel()` rather than left
+ * it reaches no entry point. Migrated with `restoration()` rather than left
  * declaring the pre-15.0 shape; deletion candidate for the deletion-first
  * utility audit, alongside `batchingWithConfig`.
  */
 export function enableTimeTravel(): Enhancer<RestorationMethods> {
-  return timeTravel({ enabled: true });
+  return restoration({ enabled: true });
 }
 
 /**
- * Time travel with custom history size (v6 pattern).
+ * Restoration with custom history size (v6 pattern).
  *
  * Not exported: reachable only as `withTimeTravel.history`, which is the
  * documented surface. Nothing imports the bare name.
@@ -3352,15 +3352,15 @@ export function enableTimeTravel(): Enhancer<RestorationMethods> {
 function restorationHistory(
   maxHistorySize: number
 ): Enhancer<RestorationMethods> {
-  return timeTravel({ maxHistorySize });
+  return restoration({ maxHistorySize });
 }
 
-// New v6-friendly export: `timeTravel` with named presets.
+// New v6-friendly export: `restoration` with named presets.
 export const withTimeTravel = Object.assign(
-  (config: RestorationConfig = {}) => timeTravel(config),
+  (config: RestorationConfig = {}) => restoration(config),
   {
-    minimal: () => timeTravel({ maxHistorySize: 20, includePayload: false }),
-    debug: () => timeTravel({ maxHistorySize: 200, includePayload: true }),
+    minimal: () => restoration({ maxHistorySize: 20, includePayload: false }),
+    debug: () => restoration({ maxHistorySize: 200, includePayload: true }),
     history: restorationHistory,
   }
 );

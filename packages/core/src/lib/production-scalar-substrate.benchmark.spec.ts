@@ -4,7 +4,7 @@ import { undoable } from '../lib/undoable';
 import type { WritableSignal } from '@angular/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { entityMap } from './markers/entity-map';
 import { EntityMutationFrame } from './physical/entity-mutation-frame';
 import { EntityValueStore } from './physical/entity-value-store';
@@ -327,7 +327,7 @@ function createEntityHarness(size: number): EntityHarness {
 function createUndoEntityHarness(size: number): UndoEntityHarness {
   const tree = signalTree(
     { rows: entityMap<EntityRow, number>() },
-    { enhancers: [timeTravel({ maxHistorySize: size + 10 })] }
+    { enhancers: [restoration({ maxHistorySize: size + 10 })] }
   ) as ISignalTree<{
     rows: EntityCollection;
   }> & {

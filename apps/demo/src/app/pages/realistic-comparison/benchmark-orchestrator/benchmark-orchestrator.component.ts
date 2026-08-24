@@ -691,7 +691,7 @@ export class BenchmarkOrchestratorComponent
   // duplicated data and have drifted apart before.
   //
   // The service handles four names: batching, highPerformanceBatching,
-  // serialization, timeTravel. An unrecognised name falls through the switch
+  // serialization, restoration. An unrecognised name falls through the switch
   // silently, which is how three dead ones survived here: `memoization`,
   // `shallowMemoization` and `lightweightMemoization`, whose tiers were unified
   // and then removed in 9.0.0/9.0.1 when core took over memoising
@@ -794,7 +794,7 @@ export class BenchmarkOrchestratorComponent
     const enhancerDescriptions: Record<string, string> = {
       batching: 'groups multiple state updates for better performance',
       serialization: 'state persistence and snapshot capabilities',
-      timeTravel: 'undo/redo functionality with history management',
+      restoration: 'undo/redo functionality with history management',
       // async removed — async behavior handled by middleware helpers
     };
 

@@ -17,7 +17,7 @@
  * ## Why owner sets rather than a refcount
  *
  * A per-subject integer is one line shorter and wrong in the way that matters.
- * Claims arrive from more than one system — time-travel entries, transaction
+ * Claims arrive from more than one system — restoration entries, transaction
  * turns, and whatever else earns restoration authority — and a system that
  * re-registers the same record twice would increment a counter twice and pin
  * that subject forever, with no way to tell the leak from a real second owner.
@@ -28,7 +28,7 @@
  *
  * An owner is an opaque string. It is NOT a history index, because indices
  * shift when the window slides and a shifted index silently re-points a claim
- * at a different record. Callers mint stable ids — `time-travel:<turnId>`,
+ * at a different record. Callers mint stable ids — `restoration:<turnId>`,
  * `transaction:<turnId>` — and the prefix keeps two systems from colliding.
  */
 
@@ -206,7 +206,7 @@ const SUBJECT_RESTORATION_CLAIMS_SYMBOL = Symbol.for(
  * Attach the registry to a tree, following the same convention as
  * `definePositionRegistry`. TREE-SCOPED ON PURPOSE: claims have to aggregate
  * across SYSTEMS, not merely across the entries of one of them. A tree with
- * both `timeTravel()` and `transactions()` has two independent reasons to keep
+ * both `restoration()` and `transactions()` has two independent reasons to keep
  * a subject alive, and a per-enhancer registry would let either one free
  * backing the other still needs.
  */

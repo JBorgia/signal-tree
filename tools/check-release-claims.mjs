@@ -160,10 +160,10 @@ function barrelsFor(pkgDir) {
 /**
  * `typesOnly` harvests a module's exported TYPE names without its values.
  *
- * Needed because a NAMED re-export — `export { timeTravel } from './…'` — used
+ * Needed because a NAMED re-export — `export { restoration } from './…'` — used
  * to note the value and stop. The module's config interface never entered the
  * public name set, so none of its members were ever diffed, even though every
- * option a user can pass to `timeTravel()` is public API by way of that
+ * option a user can pass to `restoration()` is public API by way of that
  * signature. Proven blind: a brand-new `RestorationConfig` member was invisible
  * and the gate still reported "0 uncovered".
  *

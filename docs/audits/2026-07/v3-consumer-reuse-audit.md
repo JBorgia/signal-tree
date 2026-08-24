@@ -83,7 +83,7 @@ already ships:
   `idle`, `settled`** (`markers/status.ts:58-93`). Note: it is **`hasError`**, not `error`, and
   **both** composites (`idle` + `settled`) shipped.
 - Enhancers export **only** `createEnhancer` / `resolveEnhancerOrder` — **no preset/bundle**.
-  `batching`/`timeTravel`/`devTools` are individual exports; nothing composes them.
+  `batching`/`restoration`/`devTools` are individual exports; nothing composes them.
 - **No** CRUD/optimistic engine and **no** selection layer in core.
 - `rxjs ^7` is already a **core `peerDependency`** (`packages/core/package.json`) — relevant to B.
 - No `leaf()`/value marker exists; leaf-vs-node is a runtime `value && typeof value === 'object'`
@@ -104,12 +104,12 @@ already ships:
 ### A. `withStandardEnhancers` — most likely a DOCS RECIPE, not API
 
 **Consumer:** `packages/store/src/lib/tree-enhancers.ts`. Zero coupling — imports only
-`@signaltree/core` (`batching`, `devTools`, `timeTravel`, `SignalTreeBuilder`, `TreeNode`):
+`@signaltree/core` (`batching`, `devTools`, `restoration`, `SignalTreeBuilder`, `TreeNode`):
 
 ```ts
 export function withStandardEnhancers<T extends object>(tree: SignalTreeBuilder<T, TreeNode<T>>, { treeName, isProduction }: { treeName: string; isProduction: boolean }): SignalTreeBuilder<T, TreeNode<T>> {
   const enhanced = tree.with(batching()).with(devTools({ treeName }));
-  return isProduction ? enhanced : enhanced.with(timeTravel());
+  return isProduction ? enhanced : enhanced.with(restoration());
 }
 ```
 
@@ -125,8 +125,8 @@ explicitly; this audit doesn't consider that case proven.
 **The "tree-shaking open question" is already answered — against the proposed shape.** RFC 0007
 §1 states the package boundary does **not** buy tree-shaking, citing **RFC 0005 §0**: `entity-map.ts`
 statically imported `attachLoader` and gated it on a runtime config check, shipping the loader in
-**every** bundle for a full version. A preset that **statically imports `timeTravel` and gates it on a
-runtime `isProduction` boolean is that exact bug** — `timeTravel` ships to prod. If A is ever built,
+**every** bundle for a full version. A preset that **statically imports `restoration` and gates it on a
+runtime `isProduction` boolean is that exact bug** — `restoration` ships to prod. If A is ever built,
 the gating must be structural (separate import path / build-time), not a runtime `if`, and it belongs
 in an opt-in `@signaltree/presets`, never core.
 

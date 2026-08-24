@@ -2,7 +2,7 @@
  * ENHANCER PROTOCOL CONTINUITY ACROSS IDENTITY REPLACEMENT.
  *
  * An enhancer may return a NEW callable rather than mutating the tree it was
- * given — `batching`, `timeTravel` and `devTools` all do. Two properties must
+ * given — `batching`, `restoration` and `devTools` all do. Two properties must
  * hold across that handoff, and they are INDEPENDENT: an implementation can
  * satisfy either one while failing the other.
  *
@@ -43,7 +43,7 @@ import { describe, expect, it } from 'vitest';
 
 import { batching } from '../enhancers/batching/batching';
 import { createEnhancer } from '../enhancers/index';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
 
 import type { ISignalTree } from '../index';
@@ -189,7 +189,7 @@ describe('enhancer protocol continuity across identity replacement', () => {
     expect(seen).toBe(true);
   });
 
-  it('G — survives TWO real built-in replacements (batching + timeTravel)', () => {
+  it('G — survives TWO real built-in replacements (batching + restoration)', () => {
     expect(() =>
       signalTree(
         { n: 0 },
@@ -197,7 +197,7 @@ describe('enhancer protocol continuity across identity replacement', () => {
           enhancers: [
             provider('gcap') as never,
             batching(),
-            timeTravel() as never,
+            restoration() as never,
             consumer('gcap') as never,
           ],
         }
@@ -215,7 +215,7 @@ describe('enhancer protocol continuity across identity replacement', () => {
         {
           enhancers: [
             batching(),
-            timeTravel() as never,
+            restoration() as never,
             consumer('never-provided', log) as never,
           ],
         }

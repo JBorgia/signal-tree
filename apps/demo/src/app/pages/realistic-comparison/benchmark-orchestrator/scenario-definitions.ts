@@ -277,7 +277,7 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     complexity: 'Medium',
     selected: false,
     category: 'time-travel',
-    // This scenario relies on the timeTravel enhancer from @signaltree/core
+    // This scenario relies on the restoration enhancer from @signaltree/core
     signalTreeOnly: true,
     purpose:
       'Tests time-travel functionality and history navigation performance',
@@ -286,7 +286,7 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     architecturalTradeOffs:
       'Time-travel requires immutable snapshots vs direct mutation benefits',
     enhancers: {
-      required: ['timeTravel'],
+      required: ['restoration'],
       optional: ['batching'],
       rationale:
         'Time-travel enhancer required; batching may improve performance',
@@ -306,7 +306,7 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     complexity: 'High',
     selected: false,
     category: 'time-travel',
-    // This scenario uses timeTravel enhancer from @signaltree/core
+    // This scenario uses restoration enhancer from @signaltree/core
     signalTreeOnly: true,
     purpose: 'Tests time-travel performance with large history buffers',
     frequencyWeight: 0.3, // Rare - Only specific debugging/development scenarios
@@ -314,7 +314,7 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     architecturalTradeOffs:
       'Large history requires significant memory vs lightweight state tracking',
     enhancers: {
-      required: ['timeTravel'],
+      required: ['restoration'],
       optional: [],
       rationale: 'Time-travel enhancer with large history size configuration',
     },
@@ -333,7 +333,7 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     complexity: 'Medium',
     selected: false,
     category: 'time-travel',
-    // This scenario uses timeTravel enhancer from @signaltree/core
+    // This scenario uses restoration enhancer from @signaltree/core
     signalTreeOnly: true,
     purpose: 'Tests random access performance in time-travel history',
     frequencyWeight: 0.2, // Very rare - Only advanced debugging/development tools
@@ -341,7 +341,7 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     architecturalTradeOffs:
       'Random state access requires indexed history vs linear traversal',
     enhancers: {
-      required: ['timeTravel'],
+      required: ['restoration'],
       optional: [],
       rationale: 'Time-travel enhancer for state jumping functionality',
     },

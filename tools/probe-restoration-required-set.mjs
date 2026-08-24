@@ -60,7 +60,7 @@ if (!existsSync(CORE)) {
   process.exit(1);
 }
 
-const { signalTree, entityMap, timeTravel } = await import(CORE);
+const { signalTree, entityMap, restoration } = await import(CORE);
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
 const WIDTH = 5;
@@ -103,7 +103,7 @@ function seed(prefix) {
 const makeTree = () =>
   signalTree(
     { rows: entityMap({ selectId: (r) => r.id }) },
-    { enhancers: [timeTravel({ maxHistorySize: HISTORY })] }
+    { enhancers: [restoration({ maxHistorySize: HISTORY })] }
   );
 
 /** Subject ids of everything currently LIVE. */

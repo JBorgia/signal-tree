@@ -4,7 +4,7 @@ import { of } from 'rxjs';
 import { onHydrateDecision } from './internals/materialize-markers';
 import type { HydrateDecisionEvent } from './internals/materialize-markers';
 import { serialization } from '../enhancers/serialization/serialization';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { entityMap, signalTree } from '../index';
 import { loader } from './markers/loader';
 
@@ -66,13 +66,13 @@ describe('M5 — what is actually reported?', () => {
       // 4. merge — a plain root call
       plain({ rows: [{ id: 'm', n: 5 }] } as never);
 
-      // 5. restore — time-travel undo
+      // 5. restore — restoration undo
       const tt = signalTree(
         {
           rows: entityMap<Row, string>({ selectId: (r) => r.id }),
           draft: '',
         },
-        { enhancers: [timeTravel()] }
+        { enhancers: [restoration()] }
       );
       tt.$.rows.addOne({ id: 'r', n: 6 });
       await tick();

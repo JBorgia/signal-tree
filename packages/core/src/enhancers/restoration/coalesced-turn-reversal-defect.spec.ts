@@ -3,7 +3,7 @@ import { undoable } from '../../lib/undoable';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './restoration';
+import { restoration } from './restoration';
 
 /**
  * ✅ REPAIRED by RESTORE-P0. This file pinned a defect; it now guards the fix.
@@ -72,7 +72,7 @@ type Tree = {
 const makeTree = (): Tree =>
   signalTree(
     { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
-    { enhancers: [timeTravel({ maxHistorySize: 10 })] }
+    { enhancers: [restoration({ maxHistorySize: 10 })] }
   ) as unknown as Tree;
 
 const A = { id: 'a', name: 'Alpha', v: 1 };

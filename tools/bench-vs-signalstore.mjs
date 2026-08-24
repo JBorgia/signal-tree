@@ -21,7 +21,7 @@
 import {
   signalTree,
   entityMap,
-  timeTravel,
+  restoration,
 } from '../dist/packages/core/dist/index.js';
 import { signalState, patchState, getState } from '@ngrx/signals';
 import { setAllEntities, updateEntity } from '@ngrx/signals/entities';
@@ -196,7 +196,7 @@ const t3store = () => {
 // is what the absence forces a consumer to write.
 const N4 = 50;
 const t4tree = () => {
-  const t = signalTree({ rows: entityMap({ selectId: (r) => r.id }) }, { enhancers: [timeTravel()] });
+  const t = signalTree({ rows: entityMap({ selectId: (r) => r.id }) }, { enhancers: [restoration()] });
   t.$.rows.setAll(rows(1_000));
   const s = process.hrtime.bigint();
   for (let i = 0; i < N4; i++) t.$.rows.updateOne(1, { v: i });

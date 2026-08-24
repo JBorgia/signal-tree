@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getPathNotifier } from './path-notifier';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 import { undoable } from './undoable';
 import { withWriteContext } from './write-context';
@@ -54,7 +54,7 @@ const observe = () => {
 
 describe('SEMANTICS-NAMES-0: the measured combination space', () => {
   it('authored — no origin, no participation marker', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     const { seen, off } = observe();
     undoable(() => tree.$.n.set(1));
@@ -65,7 +65,7 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
   });
 
   it('external realization — no origin, realization participation', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     const { seen, off } = observe();
     withWriteContext({ intent: 'system', participation: 'realized' }, () => {
@@ -77,8 +77,8 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
     expect(seen).toEqual([{ origin: null, participation: 'realized' }]);
   });
 
-  it('restoration — time-travel origin, realization participation', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
+  it('restoration — restoration origin, realization participation', async () => {
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     undoable(() => tree.$.n.set(1));
     await flush();
@@ -97,7 +97,7 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
   });
 
   it('THE DECIDING CASE — a devtools state application', async () => {
-    const tree = signalTree({ n: 0 }, { enhancers: [timeTravel(), transactions()] });
+    const tree = signalTree({ n: 0 }, { enhancers: [restoration(), transactions()] });
     await flush();
 
     const { seen, off } = observe();

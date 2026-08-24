@@ -351,7 +351,7 @@ export function rememberTreeRealizationDescriptor(
 }
 
 /**
- * The port applies effects on behalf of two different callers — `timeTravel()`
+ * The port applies effects on behalf of two different callers — `restoration()`
  * restoring, and `transactions()` compensating a rollback — so it no longer
  * asserts an origin of its own. Each site takes `source` from the ambient write
  * context and falls back to `'system'`.

@@ -2,7 +2,7 @@ import { computed, type Signal } from '@angular/core';
 import { undoable } from '../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from '../index';
 
 /**
@@ -157,7 +157,7 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
   it('CANONICALITY — BLOCKED by a 15-branch UNDO REGRESSION, not by array leaves', async () => {
     const tree = signalTree(
       { rows: [] as Row[], draft: '' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     const rows = collectionOver(tree.$.rows);
 
@@ -169,7 +169,7 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
 
     // On THIS BRANCH undo REFUSES a non-scalar leaf effect:
     //
-    //   isSupportedEffect(), time-travel.ts:1680-1694
+    //   isSupportedEffect(), restoration.ts:1680-1694
     //     case 'set': return (isScalarValue(before) && isScalarValue(after))
     //                     || (subject === undefined && ownerPath !== path);
     //

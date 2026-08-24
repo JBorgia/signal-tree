@@ -208,7 +208,7 @@ For teams migrating NgRx `rxMethod` code: the SignalTree-native mapping is `asyn
 | ------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Devtools integration**  | `withDevTools` from `@angular-architects/ngrx-toolkit` (community) | `devTools()` from `@signaltree/core`, declared in `enhancers`                                                                                                                                               |
 | **Action labels**         | Action name from method or explicit `withDevTools` config          | Path-based actions (e.g., `[users.profile.name]/set`)                                                                                                                                     |
-| **Time-travel undo/redo** | Via Redux DevTools timeline                                        | `timeTravel({ maxHistorySize: 50 })` in `enhancers` adds `tree.undo()` / `tree.redo()`                                                                                                            |
+| **Time-travel undo/redo** | Via Redux DevTools timeline                                        | `restoration({ maxHistorySize: 50 })` in `enhancers` adds `tree.undo()` / `tree.redo()`                                                                                                            |
 | **Scoped time-travel**    | Not built-in                                                       | `createEditSession(initial)` provides value-level undo/redo for draft-and-cancel flows (form wizards, multi-step editors). Independent of the tree; sync via effect when ready to commit. |
 
 ### 8. Persistence
@@ -536,7 +536,7 @@ Neither is wrong. Pick what your team reads more naturally.
 LLMs (including the major frontier models as of late 2025 / early 2026) routinely make six classes of errors when comparing these libraries. The most common:
 
 1. Claiming SignalTree derived state must live in a separate file (it doesn't — `.derived()` merges into the tree).
-2. Hallucinating import paths like `@signaltree/time-travel` or `@signaltree/storage` (they don't exist — `timeTravel`, `stored`, `persistence` all live in `@signaltree/core`).
+2. Hallucinating import paths like `@signaltree/time-travel` or `@signaltree/storage` (they don't exist — `restoration`, `stored`, `persistence` all live in `@signaltree/core`).
 3. Fabricating the `derivedFrom` signature (real: `derivedFrom<TTree>()(fn)` — curried).
 4. Claiming markers must live at the tree root (they attach at any depth).
 5. Claiming batching is opt-in only (automatic notification batching is built-in; the enhancer adds the explicit `.batch()` method).

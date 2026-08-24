@@ -494,7 +494,7 @@ class TransactionAuthority {
     this.pendingOpenedAtSeq.delete(turnId);
     // SETTLED. Confirmation discards rollback state rather than becoming
     // permanent history — those are different product concepts. A tree that
-    // also has `timeTravel()` has already claimed these subjects through its
+    // also has `restoration()` has already claimed these subjects through its
     // own capture of the same writes, so the subject is not left unowned by
     // the handoff.
     this.releasePendingClaims(turnId);
@@ -615,7 +615,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     },
     (turnId) => {
       // Releases the claim; deliberately does NOT drive the reclamation sink.
-      // Settlement can land before the notifier flush that lets `timeTravel()`
+      // Settlement can land before the notifier flush that lets `restoration()`
       // claim the same subjects, and reclaiming in that gap is the
       // premature-reclamation hazard `never-claimed-retirement.spec.ts` pins.
       // Reclamation happens at the history eviction boundary, which is late
@@ -719,7 +719,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       // the NET effect. With `kind` in the key, `rekey('a','a2')` and
       // `removeOne('a2')` occupied separate slots and rollback applied both
       // inverses, returning the row under the name it had been renamed TO.
-      // Mirrors the same repair in time-travel.ts.
+      // Mirrors the same repair in restoration.ts.
       case 'remove':
       case 'add':
       case 'rekey':

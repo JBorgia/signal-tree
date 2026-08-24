@@ -92,7 +92,7 @@ exclusions.
 
 **ST2029 as first shipped never fired in a real application.** It checked once
 at enhancer attach — the one moment it cannot work, because an app builds its
-tree and attaches `timeTravel()` in the same breath while rows arrive later from
+tree and attaches `restoration()` in the same breath while rows arrive later from
 a fetch. It passed three tests because all three populated the collection
 _before_ attaching.
 

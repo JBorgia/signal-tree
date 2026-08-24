@@ -27,12 +27,12 @@ State is modeled as the shape of your data, and the capabilities you'd otherwise
 - **`updateAndReport()`** → a changed-paths report for partial server-payload sync, audit trails, and targeted persistence
 - **`form()`** (`@signaltree/ng-forms`) → tree-integrated reactive forms with validation and wizards
 - **`.derived()`** → computed state deep-merged at any path
-- **`timeTravel()`** → undo/redo with configurable history depth
+- **`restoration()`** → undo/redo with configurable history depth
 
 ### Use SignalTree if you need
 
 - Optimistic UI with rollback (snapshot → write → restore; see the [Ops recipe](docs/guides/composition-recipes.md#2-a-reusable-entity-crud-ops-base))
-- Undo / redo (`timeTravel` enhancer)
+- Undo / redo (`restoration` enhancer)
 - Typed normalized collections with O(1) lookups (`entityMap`)
 - Reactive forms with validation, wizards, and persistence (`form()` marker)
 - State that mirrors your data shape, not Redux ceremony
@@ -129,7 +129,7 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
   [Ops recipe](docs/guides/composition-recipes.md#2-a-reusable-entity-crud-ops-base).
 - **Async data** — keep local loading flags as ordinary state and put
   orchestration in application services or framework primitives.
-- **Undo/redo and DevTools** — `timeTravel()` and Redux DevTools integration. Persistence stays in
+- **Undo/redo and DevTools** — `restoration()` and Redux DevTools integration. Persistence stays in
   application services until a new public contract earns the release surface.
 - **State that will grow.** Starting simple is fine — the shape _is_ the API, so adding a domain or
   attaching a marker at a new node doesn't restructure anything you already wrote. You don't need to
@@ -150,7 +150,7 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
 - **Deep undo over large collections.** Restoring writes values back into per-entity signals rather
   than swapping a reference — ~2.5× behind elf at 10,000 rows. If the undo stack _is_ the product
   (design tools, timeline editors), that ratio is the wrong way round for you. If you just need undo
-  over a big grid, `pauseRecording()` and `timeTravel({ shouldSkip })` are the levers.
+  over a big grid, `pauseRecording()` and `restoration({ shouldSkip })` are the levers.
 - **Collaborative document editing.** Merge semantics belong in a CRDT (Yjs, Automerge) underneath
   whatever store you pick; no state library is the right layer for that.
 - **A couple of values in one component.** Raw Angular signals (`signal` / `computed` /
@@ -291,14 +291,14 @@ the same enhancer twice throws a clear error before anything is built —
 fail-fast, no silent fallback.
 
 ```typescript
-import { signalTree, batching, devTools, timeTravel } from '@signaltree/core';
+import { signalTree, batching, devTools, restoration } from '@signaltree/core';
 
 const store = signalTree(
   { count: 0, items: [] },
   {
     enhancers: [
       batching(), // Batch change notifications
-      timeTravel({ maxHistory: 50 }), // Undo/redo with 50-step history
+      restoration({ maxHistorySize: 50 }), // Undo/redo, 50 retained turns
       devTools(), // Redux DevTools integration
     ],
   }
@@ -309,7 +309,7 @@ const store = signalTree(
 | ----------------- | ---------------------------------------------------------------------------------------------- |
 | `batching()`      | Coalesce change-detection notifications into microtask batches                                 |
 | `effects()`       | **Deprecated (11.6.0)** — use native Angular `effect(() => tree.$.path())`; removal next major |
-| `timeTravel()`    | Undo/redo with configurable history depth                                                      |
+| `restoration()`    | Undo/redo with configurable history depth                                                      |
 | `devTools()`      | Redux DevTools integration with path-based actions                                             |
 | `serialization()` | JSON serialize/deserialize with type preservation                                              |
 | `persistence()`   | Auto-save/load to localStorage, IndexedDB, or custom adapters                                  |
@@ -392,7 +392,7 @@ session.commit(); // Write the draft back to the source path
 
 The value-level `createEditSession(initial)` primitive (single-arg, no tree binding) is still available for stateful drafts not bound to a tree path.
 
-> **When to reach for what:** use `createTreeEditSession` when you need an uncommitted draft you can `commit()` or `cancel()` against a specific subtree — distinct from `timeTravel()`, which records the whole tree's history and lets you step backward globally rather than holding a separate draft.
+> **When to reach for what:** use `createTreeEditSession` when you need an uncommitted draft you can `commit()` or `cancel()` against a specific subtree — distinct from `restoration()`, which records the whole tree's history and lets you step backward globally rather than holding a separate draft.
 
 ## Async Orchestration
 
@@ -502,7 +502,7 @@ tree.registerCleanup(fn); // Register custom cleanup
 
 ## Undo/redo vs devtools replay — different features
 
-`timeTravel()` serves two audiences that want opposite things. Undo/redo is a
+`restoration()` serves two audiences that want opposite things. Undo/redo is a
 **product** feature: the user presses Ctrl+Z and expects _their edit_ undone.
 Devtools replay is **forensic**: the point is to see what the app was actually
 doing, spinners and errors included.
@@ -524,7 +524,7 @@ collection entries, plain leaves) and skips in-flight state. Full reasoning in
 
 ## Debugging — `devTools()` enhancer
 
-Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser extension. Every state change appears in the timeline with a **path-based action name** (e.g., `[users.profile.name]/set`) so you can scrub backward and forward through state history and see _which path_ caused each render — not just _that something changed_. `devTools()` alone delivers the in-browser time-travel scrubber (controlled by its own `enableTimeTravel` config flag, default `true`); the separate `timeTravel()` enhancer is an independent API-level surface for programmatic undo/redo/jumpTo from code, useful when you want history control without depending on the browser extension. See [Architecture Guide](docs/architecture/signaltree-architecture-guide.md#devtools-integration) for screenshots and the full action-naming scheme.
+Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser extension. Every state change appears in the timeline with a **path-based action name** (e.g., `[users.profile.name]/set`) so you can scrub backward and forward through state history and see _which path_ caused each render — not just _that something changed_. `devTools()` alone delivers the in-browser time-travel scrubber (controlled by its own `enableTimeTravel` config flag, default `true`); the separate `restoration()` enhancer is an independent API-level surface for programmatic undo/redo/jumpTo from code, useful when you want history control without depending on the browser extension. See [Architecture Guide](docs/architecture/signaltree-architecture-guide.md#devtools-integration) for screenshots and the full action-naming scheme.
 
 ## Documentation
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { undoable } from '../lib/undoable';
 import { batching } from './batching/batching';
-import { timeTravel } from './restoration/restoration';
+import { restoration } from './restoration/restoration';
 import { devTools } from './devtools/devtools';
 import { signalTree } from '../lib/signal-tree';
 
@@ -82,10 +82,10 @@ describe('enhancer cleanup registration', () => {
     expect(tree.__cleanupFns.length).toBeGreaterThan(0);
   });
 
-  it('timeTravel registers cleanup', async () => {
+  it('restoration registers cleanup', async () => {
     const tree = signalTree(
       { count: 0, name: '' },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
 
     undoable(() => tree.$.count.set(1));
@@ -127,10 +127,10 @@ describe('destroy() clears enhancer resources', () => {
     expect(true).toBe(true);
   });
 
-  it('timeTravel: clears history on destroy', () => {
+  it('restoration: clears history on destroy', () => {
     const enhanced = signalTree(
       { count: 0, name: '' },
-      { enhancers: [timeTravel({ maxHistorySize: 50 })] }
+      { enhancers: [restoration({ maxHistorySize: 50 })] }
     );
 
     // Make some changes

@@ -1,7 +1,7 @@
 import { computed } from '@angular/core';
 import { undoable } from '../lib/undoable';
 
-import { entityMap, signalTree, timeTravel } from '../index';
+import { entityMap, signalTree, restoration } from '../index';
 import { getWriteParticipation } from './write-participation';
 import { withWriteContext } from './write-context';
 import {
@@ -71,7 +71,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
   const plain = () => {
     const tree = signalTree(
       { a: { n: 1 }, rows: entityMap<{ id: string; v: number }>() },
-      { enhancers: [timeTravel()] }
+      { enhancers: [restoration()] }
     );
     return { tree, read: () => tree.$.a() };
   };
@@ -129,7 +129,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
 
   it('UNDO — truth changes, but is it AUTHORED?', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [restoration()] });
     await tick();
     // Designated: this test UNDOES this write, so it has to be an admitted turn.
     undoable(() => tree.$.a({ n: 2 }));
@@ -157,7 +157,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
       () => {
         const tree = signalTree(
           { rows: entityMap<{ id: string; v: number }>() },
-          { enhancers: [timeTravel()] }
+          { enhancers: [restoration()] }
         );
         return { tree, read: () => tree.$.rows.all() };
       },
@@ -214,9 +214,9 @@ describe('MUT-1 CONTROL — is notification a property of the WRITE or of an ENH
     expect(notified).toEqual(['a.n']);
   });
 
-  it('the same write WITH timeTravel', async () => {
+  it('the same write WITH restoration', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [restoration()] });
     await tick();
     const notified: string[] = [];
     const off = getPathNotifier().subscribe('**', (_n, _p, path) =>
@@ -366,7 +366,7 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
 
   it('AUTHORED write — what meta reaches the observer?', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [restoration()] });
     await tick();
     const { seen, off } = capture();
 
@@ -385,7 +385,7 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
 
   it('and DESIGNATING it is what adds a positive marker', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [restoration()] });
     await tick();
     const { seen, off } = capture();
 
@@ -407,7 +407,7 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
 
   it('UNDO realization — what meta reaches the observer?', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [restoration()] });
     await tick();
     undoable(() => tree.$.a.n.set(2));
     await tick();
@@ -462,7 +462,7 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
 
   it('REDO is also marked realization', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [restoration()] });
     await tick();
     undoable(() => tree.$.a.n.set(2));
     await tick();
@@ -486,7 +486,7 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
 
   it('THE ASYMMETRY: authorship is signalled by ABSENCE, not by a positive mark', async () => {
     resetPathNotifier();
-    const tree = signalTree({ a: { n: 1 } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: { n: 1 } }, { enhancers: [restoration()] });
     await tick();
 
     const { seen, off } = capture();
@@ -558,7 +558,7 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
    * the requirement stops being a plausibility argument.
    */
   const run = async (meta: Record<string, unknown>) => {
-    const tree = signalTree({ a: { n: 0 } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: { n: 0 } }, { enhancers: [restoration()] });
     await tick();
     const before = tree.getRestorationHistory().length;
 
@@ -587,7 +587,7 @@ describe('MUT-2B — does OMITTING the realization stamp manufacture authorship?
 
   it('B — SAME meta, realization classification OMITTED', async () => {
     const r = await run({ origin: 'external', intent: 'system' });
-    // Identical to A except for the one field. CAPTURED — a history entry that
+    // Identical to A except for the one field. CAPTURED — a restoration history entry that
     // A did not produce. Omission manufactured authorship.
     expect(r).toEqual({ delta: 1, value: 1 });
   });
@@ -601,7 +601,7 @@ describe('MUT-2B CONTROL LADDER — is it the FIELD or merely the CONTEXT?', () 
    * no-context arm and a four-rung ladder.
    */
   const withCtx = async (meta: Record<string, unknown> | null) => {
-    const tree = signalTree({ a: { n: 0 } }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ a: { n: 0 } }, { enhancers: [restoration()] });
     await tick();
     const before = tree.getRestorationHistory().length;
     if (meta === null) {
@@ -639,7 +639,7 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
    * and did the claim take effect?
    */
   it('an ORDINARY application write, claimed as realization', async () => {
-    const tree = signalTree({ balance: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ balance: 0 }, { enhancers: [restoration()] });
     await tick();
     const before = tree.getRestorationHistory().length;
 
@@ -656,7 +656,7 @@ describe('MUT-2C — is realization FORGEABLE from ordinary authoring code?', ()
   });
 
   it('the same write WITHOUT the claim — the control', async () => {
-    const tree = signalTree({ balance: 0 }, { enhancers: [timeTravel()] });
+    const tree = signalTree({ balance: 0 }, { enhancers: [restoration()] });
     await tick();
     const before = tree.getRestorationHistory().length;
 

@@ -970,7 +970,7 @@ export function serialization(
   // the realized tree so its parameter is `ISignalTree<T>`, while
   // `Enhancer<TAdded>` takes the neutral `EnhancerHost` and parameters are
   // contravariant under `strictFunctionTypes`. Body untouched. Unlike
-  // `timeTravel` there is no receiver-derived member here to preserve —
+  // `restoration` there is no receiver-derived member here to preserve —
   // `SerializationMethods` erases state to `SerializedState<unknown>` already.
   return enhancerFn as unknown as Enhancer<SerializationMethods>;
 }

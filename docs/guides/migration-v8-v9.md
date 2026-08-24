@@ -17,7 +17,7 @@ The following convenience aliases were removed from `@signaltree/core`. Replace 
 | `selectorMemoization()`     | `memoization({ equality: 'deep', enableLRU: true })`                          |
 | `enableBatching()`          | `batching()`                                                                  |
 | `enableMemoization()`       | `memoization()`                                                               |
-| `enableTimeTravel()`        | `timeTravel()`                                                                |
+| `enableTimeTravel()`        | `restoration()`                                                                |
 | `enableEffects()`           | `effects()`                                                                   |
 | `enableDevTools()`          | `devTools()`                                                                  |
 | `fullDevTools()`            | `devTools({ enableBrowserDevTools: true, enableLogging: true })`              |

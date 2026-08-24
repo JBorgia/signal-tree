@@ -47,7 +47,7 @@ from a retracted premise rather than only auditing the passes.
 | 8. Undo scoped to a draft           | ✅\* | ✅  | Phantom-step defect **fixed**; option renamed `history` → `recordHistory`.                                                                                                                         |
 | 9. Discarding an in-progress edit   | ✅   | ✅  | Passes, but the audit named the **wrong function** — see the doc defect below.                                                                                                                     |
 | 15. An audit trail rather than undo | ✅   | 🟡  | `createAuditTracker` is a 100 ms **polling sampler** that can miss changes entirely.                                                                                                               |
-| 20. Undo in a form                  | ✅   | ✅  | Re-ran after the 2026-08-11 form notifier fix. Direct `form()` field writes record into `timeTravel()`, undo reverts them, and undoing a neighbouring plain-leaf write no longer rewinds the form. |
+| 20. Undo in a form                  | ✅   | ✅  | Re-ran after the 2026-08-11 form notifier fix. Direct `form()` field writes record into `restoration()`, undo reverts them, and undoing a neighbouring plain-leaf write no longer rewinds the form. |
 | 22. Pausing while replaying         | ✅   | ❌  | `pauseRecording` deleted.                                                                                                                                                                          |
 | 28. Devtools unbounded history      | ✅   | 🟡  | Omitting `maxHistorySize` caps at **50**, and it counts entries not steps — values `< 2` or non-finite warn ST2032 and fall back to 50, so unbounded undo is no longer expressible.                                                            |
 
@@ -123,7 +123,7 @@ in `8f16c9cb`.
 signalTree({
   rows: entityMap({ selectId: (r) => r.id, recordHistory: false }), // saved, never undone
   draft: { title: '', body: '' }, // undoable
-}).with(timeTravel({ maxHistorySize: 50 }));
+}).with(restoration({ maxHistorySize: 50 }));
 ```
 
 ⚠️ **The option was renamed.** `history: false` no longer exists; it is
@@ -221,7 +221,7 @@ user cannot want on its first press, not data loss.
 makes the restored state `INIT`'s baseline so undo has no way past it.
 
 ```
-deserialize() then .with(timeTravel({}))  ->  canUndo() === false, undo() is a no-op
+deserialize() then .with(restoration({}))  ->  canUndo() === false, undo() is a no-op
 ```
 
 ⚠️ **That only covers synchronous hydration**, and it is the narrower half of the
@@ -310,7 +310,7 @@ a letter, not the word. `shouldSkip` can drop an entry but cannot merge a run.
 
 ### 20. Undo after a page of edits, in a form ❌ — **reversed, and this is the biggest finding**
 
-The 14.0.0 verdict said "`form()` state is ordinary tree state, so `timeTravel()`
+The 14.0.0 verdict said "`form()` state is ordinary tree state, so `restoration()`
 covers it." It does not. Form writes never notify the history recorder.
 
 Form-only tree, 3 writes to a form field:
@@ -353,7 +353,7 @@ form({ initial: { name: '' }, history: history() });
 ```
 
 This is also why v3 — the only known adopter shipping 50-step undo — does undo at
-the form layer and type-erases `timeTravel`. Their architecture was not a
+the form layer and type-erases `restoration`. Their architecture was not a
 preference; the alternative does not work.
 
 ### 21. Clearing history on save ✅ — and it answers an open naming question
@@ -568,7 +568,7 @@ would falsify it and either run that too or scope the sentence to what was run.
 
 | Gap                                                           | Blocks                        | Assessment                                                                                                                                                                                                              |
 | ------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **G. Form history needs product guidance, not a bug warning** | 20, and most real editing UIs | The correctness defect is gone: global `timeTravel()` can record direct form writes again. What remains is product guidance about when shared global undo is desirable versus when `form(history())` should stay local. |
+| **G. Form history needs product guidance, not a bug warning** | 20, and most real editing UIs | The correctness defect is gone: global `restoration()` can record direct form writes again. What remains is product guidance about when shared global undo is desirable versus when `form(history())` should stay local. |
 | **B. No settable entry label**                                | 18, and weakens 7, 17         | Cheapest fix with the widest reach. Entries already carry `action`; it needs a public way to set it.                                                                                                                    |
 | **A. No group/transaction API**                               | 7, and any multi-write action | Worse than at 14.0.0: the documented workaround was deleted, so grouping now depends on incidental `await` placement. The transaction handle closes A and B together.                                                   |
 | **D. No coalescing window**                                   | 19, text editing generally    | Needed for per-word undo. Distinct from `shouldSkip`, which drops rather than merges.                                                                                                                                   |

@@ -579,7 +579,7 @@ function buildFromStore<T>(node: object): T {
       // materialized marker that is an unbranded callable (`form`,
       // `asyncSource`) lands here, so its value vanishes from the snapshot and
       // from everything built on one: serialize, persistence, devtools, audit,
-      // time travel. ST2008 previously existed only on the accessor builder,
+      // restoration. ST2008 previously existed only on the accessor builder,
       // which is not the one that runs for a marker behind a store, so this
       // was silent in practice for the whole class it was written for.
       if (typeof ngDevMode === 'undefined' || ngDevMode) {
@@ -719,7 +719,7 @@ function buildFromStore<T>(node: object): T {
  */
 export function snapshotState<T>(state: TreeNode<T>): T {
   // Routed through the memo, not bare `unwrap`. Every snapshot consumer —
-  // time travel, devtools, serialisation — was rebuilding the entire tree on
+  // restoration, devtools, serialisation — was rebuilding the entire tree on
   // every call while `tree()` next door returned a memoised result, because
   // this took the raw store and `unwrap`'s uncached path.
   return state !== null && typeof state === 'object'
@@ -731,7 +731,7 @@ export function snapshotState<T>(state: TreeNode<T>): T {
 
 /**
  * Apply a plain JS snapshot onto a TreeNode (state.$) by writing into signals or node accessors.
- * This is a shallow/apply operation suitable for devtools/time-travel use-cases.
+ * This is a shallow/apply operation suitable for devtools/restoration use-cases.
  */
 export function applyState<T>(stateNode: TreeNode<T>, snapshot: T): void {
   if (snapshot === null || snapshot === undefined) return;
@@ -759,7 +759,7 @@ export function applyState<T>(stateNode: TreeNode<T>, snapshot: T): void {
   // Normalised HERE rather than at capture, so the snapshot stays faithful to
   // the moment it was taken (devtools can still show that the node WAS loading)
   // while every restore path lands somewhere a tree can actually operate from.
-  // This is equally true of a time-travel undo INTO a loading moment: there is
+  // This is equally true of a restoration undo INTO a loading moment: there is
   // no request there either.
   //
   // `Loaded` and `Error` both survive: they describe a finished operation, and

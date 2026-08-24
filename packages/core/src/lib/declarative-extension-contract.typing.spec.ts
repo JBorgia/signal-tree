@@ -255,7 +255,7 @@ const withoutTimeTravel = declareTree({
   store: { count: 0 },
   extensions: [transactionsDecl()],
 });
-// @ts-expect-error timeTravel was not declared here
+// @ts-expect-error restoration was not declared here
 withoutTimeTravel.undo();
 
 // the projector parameter is typed, so a bogus member is rejected

@@ -83,7 +83,7 @@ const SAMPLE = `
 import {
   signalTree,
   entityMap,
-  timeTravel,
+  restoration,
   batching,
 } from '@signaltree/core';
 
@@ -97,7 +97,7 @@ const tree = signalTree(
     user: { name: 'Ada', age: 36 },
     users: entityMap<User, number>({ selectId: (u: User) => u.id }),
   },
-  { enhancers: [timeTravel(), batching()] }
+  { enhancers: [restoration(), batching()] }
 );
 
 // Reads

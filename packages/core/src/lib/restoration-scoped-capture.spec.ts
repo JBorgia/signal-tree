@@ -3,14 +3,14 @@ import { undoable } from '../lib/undoable';
 
 import { entityMap } from './types';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 
 /**
- * ST2029 — time travel retention warning.
+ * ST2029 — restoration retention warning.
  *
  * `entityMap`'s snapshot is `{ all: node.all() }`, an N-pointer array rebuilt
- * whenever the collection changes, and time travel records on every self-dirty
- * flush — so attaching `timeTravel()` to a tree holding a large collection makes
+ * whenever the collection changes, and restoration records on every self-dirty
+ * flush — so attaching `restoration()` to a tree holding a large collection makes
  * every collection-mutating write O(collection width), permanently. MEASURED
  * (`tools/bench-retention-arms.mjs`, 50 recorded writes at 50k rows): 19.38MB
  * retained.
@@ -49,7 +49,7 @@ describe('ST2029 — history retention', () => {
         rows: entityMap<Row, number>(config),
         n: 0,
       },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [restoration()], capabilities: ['causal-runtime'] }
     );
     warn.mockClear();
 

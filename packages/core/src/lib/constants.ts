@@ -40,7 +40,7 @@ const DEV_MESSAGES = {
   MEMOIZE_NOT_ENABLED: 'memoize disabled [ST1015]',
   MIDDLEWARE_NOT_AVAILABLE: 'middleware missing [ST1016]',
   ENTITY_HELPERS_NOT_AVAILABLE: 'entity helpers missing [ST1017]',
-  TIME_TRAVEL_NOT_AVAILABLE: 'time travel missing [ST1018]',
+  TIME_TRAVEL_NOT_AVAILABLE: 'restoration missing [ST1018]',
   OPTIMIZE_NOT_AVAILABLE: 'optimize missing [ST1019]',
   UPDATE_OPTIMIZED_NOT_AVAILABLE: 'update optimized missing [ST1020]',
   CACHE_NOT_AVAILABLE: 'cache missing [ST1021]',

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { signal } from '@angular/core';
 
-import { timeTravel } from '../enhancers/restoration/restoration';
+import { restoration } from '../enhancers/restoration/restoration';
 import { visitTree } from './internals/visit-tree';
 import { signalTree } from './signal-tree';
 import { batching } from '../enhancers/batching/batching';
@@ -302,7 +302,7 @@ timingDescribe('Benchmark: mutation substrate overhead', () => {
     );
     const history = signalTree(
       { value: 0 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
+      { enhancers: [restoration()], capabilities: ['causal-runtime'] }
     );
 
     const ratio = stableRatio(

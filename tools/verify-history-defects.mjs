@@ -32,7 +32,7 @@ if (!existsSync(DIST)) {
   process.exit(1);
 }
 const core = await import(pathToFileURL(DIST).href);
-const { signalTree, timeTravel, createAuditTracker } = core;
+const { signalTree, restoration, createAuditTracker } = core;
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -47,7 +47,7 @@ const check = (name, reproduced, detail) => {
 
 // -- 6a: DELETED WITH ITS SUBJECT ------------------------------------------
 //
-// 6a asked whether `timeTravel()` covers `form()` state, and whether
+// 6a asked whether `restoration()` covers `form()` state, and whether
 // `form({ history: history() })` is the recommended path. Both `form()` and
 // `history()` were deleted from @signaltree/core in b57ba293 (FORM-DEL), so the
 // question no longer has a subject and the checks cannot be rewritten to ask it
@@ -125,7 +125,7 @@ const check = (name, reproduced, detail) => {
     origError(...args);
   };
   for (const cap of [undefined, 0, 1, 2, 5]) {
-    const t = signalTree({ n: 0 }, { enhancers: [timeTravel(cap === undefined ? {} : { maxHistorySize: cap })] });
+    const t = signalTree({ n: 0 }, { enhancers: [restoration(cap === undefined ? {} : { maxHistorySize: cap })] });
     for (let i = 1; i <= 10; i++) {
       t.$.n.set(i);
       await flush();
