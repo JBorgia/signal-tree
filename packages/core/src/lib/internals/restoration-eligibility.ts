@@ -107,7 +107,7 @@ export function withRestorationDesignation<R>(fn: () => R): R {
         'designation is restored before the scope returns, so writes after an ' +
         '`await` inside it would not be designated. Do the async work first, ' +
         'then designate the synchronous write: ' +
-        '`const data = await load(); reversible(() => tree.$.x.set(data));`'
+        '`const data = await load(); undoable(() => tree.$.x.set(data));`'
     );
   }
 

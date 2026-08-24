@@ -3266,6 +3266,301 @@ file for the contract.
 4  DIAG-JOURNAL-1         read-only bounded projection + reclamation falsifiers
 ```
 
+# A1 TERMINAL INGRESS — PRE-REGISTERED before any implementation
+
+A1-0 already established the finding: core knows how to classify an external
+write and applications have no way to say it. `withWriteContext` is enhancer
+plumbing and is not in the barrel. A1 terminal owes exactly two answers:
+
+```text
+1  What does "external truth" mean as an ORIGIN?
+2  What is the narrow PUBLIC operation by which an application declares that a
+   write is externally acquired truth?
+```
+
+## What A1 may NOT reopen
+
+**Participation.** That external truth is `realized` is settled — C3, P0-C,
+HIST-C2 and the shipped runtime all rely on it. A1 is provenance plus an ingress
+operation, nothing more.
+
+## Pre-registered semantic target
+
+```ts
+{ origin: 'external', participation: 'realized' }
+```
+
+Encoded today as `{ source: 'external', causalMode: 'realization' }`; the field
+names change in SEMANTICS-NAMES-1, and adding the value here is what lets that
+rename be mechanical.
+
+The burden is to prove `'external'` is the right canonical origin name and to
+find the public API that establishes it.
+
+## Origin names describe PROVENANCE, not process
+
+```text
+process        realization / acquisition       <- how the value was obtained
+origin         external                        <- where it came from
+participation  realized                        <- how it may take part
+```
+
+`acquisition` describes the process and therefore belongs on neither axis.
+Pre-registered preference: **`external`**, in a set reading
+`application / external / restoration / devtools`.
+
+### Sub-question A1-N — is there a POSITIVE application origin?
+
+The one-axis question is closed, so an absent origin no longer has to
+disambiguate anything.
+
+> **FALSIFIER: if any consumer must distinguish "no origin recorded" from
+> "application origin", absence is not good enough and every ordinary write has
+> to be stamped.** If no consumer needs it, absence stands and we pay nothing.
+
+## Candidate doors
+
+```ts
+realize(() => { tree.$.rows.setAll(serverRows); });        // leading
+applyExternal(() => { … });
+external(() => { … });
+```
+
+`realize()` composes with the ontology (`realize(...)` -> `origin: external`,
+`participation: realized`) but needs SignalTree vocabulary to read.
+`applyExternal()` is more obvious and slightly too mechanical — it sounds like it
+applies a supplied value rather than classifying arbitrary contained writes.
+`external()` is concise but adjective-like and ambiguous.
+
+Names are tested against real call sites, not taste. `withWriteContext` is not a
+candidate: the public door must express the semantic operation, not the mechanism
+that encodes it.
+
+## The nine discriminating cases — pre-registered
+
+```text
+1  ordinary authored write            origin absent/application, participation authored
+2  external ingress                   origin external, participation realized,
+                                      ZERO restoration admission
+3  ingress during a pending tx        dependency evidence where causally relevant,
+                                      NOT an authored transaction contribution
+4  ingress after speculative create   unsafe rollback REFUSES
+5  unrelated ingress                  rollback remains LEGAL
+6  ingress then undo                  later external truth cannot be destroyed
+7  nested ingress                     idempotent / deterministic
+8  synchronous callback boundary      classification cannot leak outside
+9  async work scheduled inside        classification does NOT leak, and the API
+                                      must say so rather than inherit whatever
+                                      `withWriteContext` happens to do
+```
+
+Case 9 is the one PER-0 already drew blood on. The pre-registered answer is the
+one `undoable()` gives: **refuse a thenable rather than document the trap.**
+
+## Pre-registered failure conditions
+
+```text
+A  a name cannot express a real call site           -> name is wrong
+B  case 3/4/5 contradicts C3                        -> the door's context
+                                                       handling is wrong
+C  case 6 lets an undo destroy external truth       -> the door bypasses P0-C
+                                                       and is a second authority
+D  case 8/9 leaks classification                    -> boundary is not stated
+U  evidence does not discriminate the name          -> ship no door this round
+```
+
+A category C halts A1 the way it halted HIST-C2.
+
+# A1 TERMINAL INGRESS — RESULT. `realize()` earns the door
+
+Nine cases, pinned in `a1-ingress.spec.ts`. No pre-registered failure category
+fired: no A (the name expresses the call site), no B (C3 intact), no C (P0-C
+intact), no D (boundary stated), no U.
+
+```text
+case                                      measured
+1  ordinary authored write                 origin null, participation null
+2  realize()                               origin external, participation
+                                           realization, history grew 0
+3  ingress inside a tx callback            rollback succeeds, row withdrawn,
+                                           acquired value stands
+4  ingress on the speculative row          REFUSED later-confirmed-dependency
+5  unrelated ingress                       rollback legal
+6  ingress then undo                       REFUSED ST1034, external truth stands
+7  nested ingress                          one fact, idempotent
+8  after the scope                         authored again; ingress never a step
+9  async callback                          THROWS ST1035
+```
+
+## The door
+
+```ts
+realize(() => {
+  tree.$.rows.setAll(serverRows);
+});
+```
+
+`realize()` is exported from the root barrel — the mirror of `undoable()`, and
+the second half of the sentence A1-0 said core knew how to classify and
+applications had no way to say.
+
+Case 3 is worth reading twice. The context is **merged** onto the ambient one
+rather than replacing it, so an ingress inside a transaction callback keeps the
+enclosing `transactionId` visible. That matters because DEVTOOLS-JUMP-0 caught
+this exact area relying on an accident: replacement DROPS the id, and "excluded
+because the id vanished" is not the same fact as "excluded because a realization
+does not contribute". Case 3 now measures the second.
+
+Cases 4 and 5 differ only in what the ingress touched, which is the bounded
+shape C3 was built for: dependency admission is by causal effect, so an ingress
+that touches nothing speculative costs a transaction nothing.
+
+Case 9 answers the question PER-0 drew blood on, the way `undoable()` answers it:
+**refuse a thenable (`ST1035`) rather than document the trap.** Acquisition is
+asynchronous and belongs to a controller; only the APPLICATION of the result is a
+SignalTree event, and that is synchronous. The API states its boundary instead of
+inheriting whatever `withWriteContext` happens to do.
+
+## Origin: `'external'`, and A1-N answered
+
+`'external'` is the value. `acquisition` describes the process that obtained the
+value and belongs on neither axis.
+
+**A1-N: no positive `'application'` origin.** The pre-registered falsifier did
+not fire — `source`'s three consumers (filter my own output, side-effect policy,
+labelling) all key on POSITIVE values, so nothing must distinguish "no origin
+recorded" from "authored by the application". Absence stands, and the common path
+pays nothing.
+
+> ⚠️ But there IS a real muddle next door, and it is not the application default.
+> `tree-realization-adapter` publishes with `getActiveWriteContext()?.source ??
+> 'system'` at **seven** sites. So an internal write does not fall back to
+> absence; it fabricates `'system'`, which the naming grid rightly wants
+> deprecated. That is the thing to attack — a fake positive origin, not a
+> truthful absent one.
+
+## Demo coverage forced the call site
+
+`check-demo-coverage` failed on `realize` until the demo used it, which is the
+"test names against real call sites" requirement enforced by a gate rather than
+by taste. The usage added is a **Refresh from server** button beside the existing
+`undoable()` Add-todo button in the time-travel demo: the history counter does not
+move, and Undo still points at the user's last real operation.
+
+## Adjacent user-facing corrections found on the way
+
+```text
+ST1033's runtime message told users to call `reversible(...)`  — a candidate name
+                                            that never shipped; now `undoable(...)`
+the root barrel recommended `tree.with(a).with(b)`  — deleted in 15.0, so the
+                                            advice named a method that no longer
+                                            exists; now the declarative form
+```
+
+Neither is reachable by any correctness gate, and both are the same failure mode
+as the docs staleness this audit keeps finding: prose is not type-checked.
+
+---
+
+# THE v15 NAMING GRID — canonical, with two corrections
+
+The owner's full grid is the target vocabulary. Governing rule: **a name
+identifies ONE semantic dimension.** `origin` = provenance. `participation` =
+causal policy. `transaction` = speculative grouping. `restoration` = legal
+reversal. Diagnostics = observation. None may impersonate another.
+
+```ts
+type WriteParticipation = 'authored' | 'realized' | 'inspection';
+
+type WriteOrigin =
+  | 'external'
+  | 'restoration'
+  | 'devtools'
+  | 'transaction-rollback'   // exact value pending its consumer audit
+  ;                          // no 'application' — see A1-N
+```
+
+## ⚠️ Correction 1 — `historyEffect` must NOT become `restorationEffect`
+
+The grid proposes `historyEffect` -> `restorationEffect`, conditioned on "if it
+belongs exclusively to restoration". **It does not.** `StructuralHistoryEffect`
+is consumed by:
+
+```text
+enhancers/transactions/transactions.ts
+lib/internals/causal-runtime/greenfield-transactions.ts
+lib/internals/causal-runtime/transaction-capture-bridge.ts
+lib/internals/causal-runtime/tree-realization-adapter.ts
+lib/path-notifier.ts
+lib/entity-signal.ts
+enhancers/time-travel/time-travel.ts
+```
+
+It is the canonical structural effect that BOTH authorities compose — subject-keyed
+add/remove/rekey composition (RESTORE-P0 A/B) is shared by restoration reversal
+and transaction rollback. Renaming it `restorationEffect` would assert
+single-authority ownership the code contradicts, which is the same class of error
+as calling a diagnostic write authored.
+
+```text
+historyEffect          ->  structuralEffect
+StructuralHistoryEffect ->  StructuralEffect
+```
+
+The grid's instinct is right — "history" must go — but the replacement is
+`structural`, not `restoration`.
+
+## ⚠️ Correction 2 — `isApplyingExternalState` is worse than mis-named
+
+The grid flags it as a rename. It is stronger than that: after DEVTOOLS-JUMP-0
+the name asserts the exact thing the disposition denies — that a DevTools
+application is external truth. It is a false statement in an identifier, not an
+imprecise one. `isApplyingInspectionState`.
+
+## Concurred without reservation
+
+`timeTravel()` -> `restoration()` and the whole vocabulary underneath it
+(`TimeTravelMethods`, the `time-travel` folder, `source: 'time-travel'`,
+`__timeTravel`, docs) — and the grid's closing instruction is the important part:
+**the rename must remove the old ontology, not alias it.** A `restoration()`
+export sitting on top of `time-travel.ts`, `getHistory()` and "history step"
+preserves the old mental model under a new name, which is worse than not
+renaming at all.
+
+`UpdateMetadata` -> `WriteMetadata` (it is a public export, so this is a breaking
+rename and belongs in this pre-1.0 window). `causalMode` -> `participation`,
+`CausalWriteMode` -> `WriteParticipation`, `getCausalWriteMode` ->
+`getWriteParticipation`, `'authoring'` -> `'authored'`, `'realization'` ->
+`'realized'`. `getHistory()` -> `getRestorationHistory()`, `clearHistory()` ->
+`clearRestorationHistory()`, internal `history` -> `restorationHistory`,
+`dependencyLedger` -> `rollbackDependencyLedger`, `pendingSource` ->
+`pendingOrigin`, `maxHistorySize` kept inside `RestorationConfig`.
+
+`cause` / `causation` stay reserved for the dependency relation; `causal` stays as
+an adjective. `undoable()`, `undo()`, `redo()`, `canUndo()`, `canRedo()`,
+`restorationDesignated`, `subject`, `positionId`, `claim`, `reclamation`,
+`transaction*`, the four lifecycle states, `TURN-FEED` as a workstream name only.
+
+## Open, deliberately
+
+```text
+intent                    audit before renaming — overlap with origin /
+                          participation is not proven either way
+transaction-rollback      the origin string needs its consumer audit first
+stored() / reload()       PER-B owns it; classification before name
+DiagnosticJournal etc.    JOURNAL-1 must earn the representation first
+HistoryEntry ->           RestorationTurn if the unit really is turn-scoped;
+                          that is a structural claim to check, not a rename
+```
+
+## Queue
+
+```text
+1  SEMANTICS-NAMES-1   EXECUTE the settled grid, with both corrections   <-- next
+2  full verification   standard set incl. build / spec-types / gates / demo
+3  DIAG-JOURNAL-1
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded

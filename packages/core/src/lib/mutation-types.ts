@@ -69,8 +69,25 @@ export type CausalWriteMode = 'authoring' | 'realization' | 'inspection';
 export interface UpdateMetadata {
   /** Intent of the update (closed union — adding new intents is a core change). */
   intent?: 'hydrate' | 'reset' | 'bulk' | 'migration' | 'user' | 'system';
-  /** Source of the update (closed union). */
-  source?: 'serialization' | 'time-travel' | 'devtools' | 'user' | 'system';
+  /**
+   * Origin of the update — where this application came from (closed union).
+   *
+   * PROVENANCE only. How a write may participate in causal mechanisms is the
+   * separate `causalMode` axis; the two are deliberately independent, so never
+   * infer one from the other.
+   *
+   * An ABSENT origin means ordinary application work. There is no positive
+   * `'application'` value: nothing needs to distinguish "no origin recorded"
+   * from "authored by the application", and stamping every write to say so
+   * would cost the common path for no consumer's benefit.
+   */
+  source?:
+    | 'serialization'
+    | 'time-travel'
+    | 'devtools'
+    | 'user'
+    | 'system'
+    | 'external';
   /** Suppress guardrails for this update. */
   suppressGuardrails?: boolean;
   /** Optional correlation ID for related updates. */

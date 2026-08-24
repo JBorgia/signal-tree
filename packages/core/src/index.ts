@@ -183,8 +183,18 @@ export {
  */
 export { undoable } from './lib/undoable';
 
+/**
+ * @see {@link realize} — declares that the contained writes are externally
+ *   acquired truth (`origin: external`, `participation: realized`) rather than
+ *   authored work. The mirror of `undoable()`, and the one public door onto
+ *   external-truth classification; `withWriteContext` stays enhancer plumbing.
+ */
+export { realize } from './lib/realize';
+
 // `getPathNotifier` is not root app API. `composeEnhancers` left the root barrel
-// in v12 too and was deleted outright in 15.0 — use `tree.with(a).with(b)`.
+// in v12 too and was deleted outright in 15.0 — pass the enhancers declaratively:
+// `signalTree(state, { enhancers: [a, b] })`. (`.with()` was deleted in 15.0 as
+// well; this comment recommended it for one release after it stopped existing.)
 
 // ============================================
 // EDIT SESSION (subpath: @signaltree/core/edit-session)

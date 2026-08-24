@@ -90,6 +90,14 @@
               Add
             </button>
           </div>
+          <div class="input-group">
+            <button (click)="refreshFromServer()" class="btn-secondary btn-sm">
+              Refresh from server
+            </button>
+            <span class="card-description">
+              Applied as external truth — no undo step is created.
+            </span>
+          </div>
           <div class="todos-list">
             @for (todo of todos(); track todo.id) {
             <div class="todo-item" [class.completed]="todo.completed">
