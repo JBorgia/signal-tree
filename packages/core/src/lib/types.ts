@@ -45,19 +45,23 @@ export interface TimeTravelConfig {
   includePayload?: boolean;
 
   /**
-   * HIST-C2 PROTOTYPE — which authored turns are restoration-eligible.
+   * ⚠️ TEMPORARY — the instrument for the opt-in default flip, and nothing else.
    *
-   * - `'all'` (default): today's semantics. Every authored turn is recorded.
-   * - `'designated'`: only turns containing an explicitly designated write are
-   *   recorded, and a non-eligible turn acquires neither a history entry nor
-   *   restoration claims.
+   * - `'all'`: every authored turn is recorded (the pre-15.0 semantic).
+   * - `'designated'`: only turns containing an `undoable()` write are recorded,
+   *   and a non-eligible turn acquires neither a history entry nor restoration
+   *   claims.
    *
-   * The default is deliberately NOT flipped yet. HIST-C2 selected opt-in as the
-   * product semantic, but flipping it before the door is characterised would
-   * change behaviour under every existing suite at once. The flip is a separate,
-   * deliberate change.
+   * This exists ONLY so the existing suites can keep running under the old
+   * semantic while the flip is executed and its failures classified. It is
+   * implementation vocabulary, not a product option: an application should say
+   * `undoable(...)`, never configure an eligibility MODE.
    *
-   * @internal Prototype surface for the HIST-C2 derivation.
+   * **Deleted once `'designated'` is the default and survives.** If you are
+   * reading this in a released version, that deletion was missed and this option
+   * is a bug.
+   *
+   * @internal
    * @default 'all'
    */
   restorationEligibility?: 'all' | 'designated';
