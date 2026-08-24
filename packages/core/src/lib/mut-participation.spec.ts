@@ -354,10 +354,26 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
         _positionIds?: unknown,
         meta?: unknown
       ) => {
+        // ⚠️ `ownerId` and `structuralEffect` are stripped. This test's subject
+        // is whether AUTHORSHIP is positively marked, and both of those are
+        // transport/identity facts that vary per run — `ownerId` is a
+        // process-unique registry namespace (NOTIFIER-SCOPE-0), so baking it
+        // into a deep-equal would make the assertion about test ordering.
+        // Every semantic key is still compared exactly.
+        const raw = (meta as Record<string, unknown>) ?? null;
+        const semantic =
+          raw === null
+            ? null
+            : Object.fromEntries(
+                Object.entries(raw).filter(
+                  ([k, v]) =>
+                    k !== 'ownerId' && !(k === 'structuralEffect' && v === undefined)
+                )
+              );
         seen.push({
           path,
           origin: origin ?? null,
-          meta: (meta as Record<string, unknown>) ?? null,
+          meta: semantic,
         });
       }
     );

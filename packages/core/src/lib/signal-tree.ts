@@ -30,9 +30,13 @@ import {
   isRegisteredMarker,
   materializeMarkers,
 } from './internals/materialize-markers';
-import { definePositionRegistry } from './internals/position-registry';
+import {
+  definePositionRegistry,
+  type PositionRegistry,
+} from './internals/position-registry';
 import {
   defineOwnedOwnerPath,
+  defineOwnedOwnerId,
   defineOwnedPositionIds,
   wrapOwnedWritableSignal,
 } from './internals/owned-mutation';
@@ -145,13 +149,25 @@ function finalizeLeafSignal<TValue>(
   path: string,
   positionIds: readonly number[] | undefined,
   buildPlan: TreeBuildPlan,
-  captureRuntime: MutationCaptureRuntime
+  captureRuntime: MutationCaptureRuntime,
+  registry?: PositionRegistry
 ): void {
+  // A LOCATION MUST BE ABLE TO NAME ITS OWNER. Attaching the registry to the
+  // leaf — not only to `tree` / `tree.$` — is what makes
+  // `resolveScopeKey(leaf)` resolve the SAME scope object as
+  // `resolveScopeKey(tree)`, which is the fact A2-3 measured missing. It needs
+  // no change in `commit-consequence` itself: that code already asks
+  // `getPositionRegistry(node)` and simply never got an answer from a leaf.
+  if (buildPlan.has('position-topology') && registry) {
+    definePositionRegistry(leaf as object, registry);
+  }
+
   if (buildPlan.has('mutation-capture')) {
     wrapOwnedWritableSignal(leaf, {
       path,
       ownerPath: path,
       positionIds,
+      ownerId: registry?.id,
       metadataStorage: buildPlan.leafMetadataStorage,
       captureRuntime,
     });
@@ -160,6 +176,7 @@ function finalizeLeafSignal<TValue>(
 
   if (buildPlan.has('position-topology')) {
     defineOwnedPositionIds(leaf as object, positionIds);
+    defineOwnedOwnerId(leaf as object, registry?.id);
   }
 }
 
@@ -854,12 +871,17 @@ function leafEqual(
 function wrapLeafSignal<TValue>(
   leaf: WritableSignal<TValue>,
   path: string,
-  positionIds: readonly number[] | undefined
+  positionIds: readonly number[] | undefined,
+  registry?: PositionRegistry
 ): void {
+  if (registry) {
+    definePositionRegistry(leaf as object, registry);
+  }
   wrapOwnedWritableSignal(leaf, {
     path,
     ownerPath: path,
     positionIds,
+    ownerId: registry?.id,
   });
 }
 
@@ -902,7 +924,14 @@ function createSignalStore<T>(
         ? leafEqual(equalityFn, path)
         : equalityFn;
     const leaf = createLeafSignal(obj, path, positionIds, equal);
-    finalizeLeafSignal(leaf, path, positionIds, buildPlan, captureRuntime);
+    finalizeLeafSignal(
+      leaf,
+      path,
+      positionIds,
+      buildPlan,
+      captureRuntime,
+      materializationContext.positionRegistry
+    );
     return leaf as unknown as TreeNode<T>;
   }
 
@@ -913,7 +942,14 @@ function createSignalStore<T>(
         ? leafEqual(equalityFn, path)
         : equalityFn;
     const leaf = createLeafSignal(obj, path, positionIds, equal);
-    finalizeLeafSignal(leaf, path, positionIds, buildPlan, captureRuntime);
+    finalizeLeafSignal(
+      leaf,
+      path,
+      positionIds,
+      buildPlan,
+      captureRuntime,
+      materializationContext.positionRegistry
+    );
     return leaf as unknown as TreeNode<T>;
   }
 
@@ -924,7 +960,14 @@ function createSignalStore<T>(
         ? leafEqual(equalityFn, path)
         : equalityFn;
     const leaf = createLeafSignal(obj, path, positionIds, equal);
-    finalizeLeafSignal(leaf, path, positionIds, buildPlan, captureRuntime);
+    finalizeLeafSignal(
+      leaf,
+      path,
+      positionIds,
+      buildPlan,
+      captureRuntime,
+      materializationContext.positionRegistry
+    );
     return leaf as unknown as TreeNode<T>;
   }
 
@@ -983,7 +1026,12 @@ function createSignalStore<T>(
       const leaf = signal(value.value, {
         equal: value.equal as (a: unknown, b: unknown) => boolean,
       });
-      wrapLeafSignal(leaf, childPath, getChildPositionIds());
+      wrapLeafSignal(
+        leaf,
+        childPath,
+        getChildPositionIds(),
+        materializationContext.positionRegistry
+      );
       store[key] = leaf;
       continue;
     }
@@ -1037,7 +1085,8 @@ function createSignalStore<T>(
         childPath,
         childPositionIds,
         buildPlan,
-        captureRuntime
+        captureRuntime,
+        materializationContext.positionRegistry
       );
       store[key] = leaf;
       continue;
@@ -1060,7 +1109,8 @@ function createSignalStore<T>(
         childPath,
         childPositionIds,
         buildPlan,
-        captureRuntime
+        captureRuntime,
+        materializationContext.positionRegistry
       );
       store[key] = leaf;
       continue;

@@ -52,6 +52,13 @@ type PendingEntry = {
   meta?: WriteMetadata;
   subjectId?: number;
   positionId?: number;
+  /**
+   * NOTIFIER-SCOPE-0. `positionId` is allocated PER REGISTRY, so two trees both
+   * call their first leaf 2 and `hasSameSemanticIdentity` coalesced them into
+   * one delivery — silently dropping a write, and with it a restoration entry
+   * and a transaction compensation. The namespace qualifies the number.
+   */
+  ownerId?: number;
   subjectIds?: number[];
   positionIds?: number[];
 };
@@ -132,7 +139,8 @@ export class PathNotifier {
       {
         ...(envelope.attribution ?? {}),
         structuralEffect: envelope.structural,
-      }
+      },
+      envelope.ownerId
     );
   }
 
@@ -205,7 +213,8 @@ export class PathNotifier {
     ownerPath?: string,
     subjectIds?: number[],
     positionIds?: number[],
-    metaOverride?: WriteMetadata
+    metaOverride?: WriteMetadata,
+    ownerId?: number
   ): { blocked: boolean; value: unknown } {
     const ambientMeta = metaOverride ?? getActiveWriteContext();
     // HIST-C2. Captured HERE, at the synchronous observation of the write, for
@@ -214,7 +223,7 @@ export class PathNotifier {
     // that has already returned is invisible to the recorder. Measured — all
     // three `captureIntoBucket` calls for one designated tick ran after the
     // scope had exited.
-    const meta: WriteMetadata | undefined = isRestorationDesignated()
+    const metaBeforeOwner: WriteMetadata | undefined = isRestorationDesignated()
       ? markMetaDesignated(ambientMeta)
       : ambientMeta;
     // Tag the batch with the ambient write origin (e.g. `restoration` during a
@@ -222,6 +231,14 @@ export class PathNotifier {
     // microtask, so consumers must be able to tell "this write came from a
     // restore" apart from a user change at flush time — `isRestoring`-style
     // flags that reset synchronously are already false by then.
+    // The namespace travels WITH the write, so a `'**'` subscriber can tell
+    // whose tree it belongs to. Folded in here rather than added as a delivery
+    // parameter: every consumer already receives `meta`, and the handler
+    // signature is enhancer-facing.
+    const meta = ownerId === undefined
+      ? metaBeforeOwner
+      : { ...(metaBeforeOwner ?? {}), ownerId };
+
     const origin = meta?.origin;
     if (!this.batchingEnabled) {
       // Synchronous path: run interceptors and subscribers immediately
@@ -247,6 +264,7 @@ export class PathNotifier {
       meta,
       subjectId: subjectIds?.[0],
       positionId: positionIds?.[0],
+      ownerId,
       subjectIds,
       positionIds,
     };
@@ -498,6 +516,15 @@ export class PathNotifier {
     }
 
     if (this.crossesCausalModeBoundary(left, right)) {
+      return false;
+    }
+
+    // NOTIFIER-SCOPE-0. A position id is only meaningful WITHIN its registry,
+    // so two entries are the same location only if they agree on the namespace
+    // too. Entries from emitters that do not supply one both carry `undefined`
+    // and compare exactly as they did before — the fix cannot make a
+    // single-tree case newly distinct.
+    if (left.ownerId !== right.ownerId) {
       return false;
     }
 

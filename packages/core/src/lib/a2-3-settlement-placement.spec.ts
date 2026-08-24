@@ -64,7 +64,22 @@ const makePersister = (claimant: unknown, path: string, store: Map<string, unkno
 };
 
 describe('A2-3 arm B: persister given ONLY the leaf node', () => {
-  it('can the consequence authority resolve a scope from a leaf?', async () => {
+  /**
+   * ⚠️ THIS RESULT WAS INVERTED BY THE OWNERSHIP CORRECTION, and the inversion
+   * is the point rather than a regression.
+   *
+   * A2-3 measured arm B FAILING — the speculative value leaked to storage
+   * during the pending transaction — and read that as "a leaf cannot resolve a
+   * commit scope, therefore a persistence API must be handed the tree". The
+   * cause was narrower: `definePositionRegistry` was called on `tree` and
+   * `tree.$` only, so `resolveScopeKey(leaf)` had nothing to resolve. A leaf
+   * now carries the same registry object the tree does, and the SAME code in
+   * `commit-consequence` — unchanged — now answers correctly.
+   *
+   * So the conclusion A2-3 drew is withdrawn: a leaf claimant defers properly,
+   * and an explicit `tree` argument is not earned by settlement.
+   */
+  it('a leaf claimant NOW resolves its own scope and defers correctly', async () => {
     const store = new Map<string, unknown>([['theme', 'light']]);
     const tree = signalTree(
       { theme: 'light' },
@@ -86,17 +101,17 @@ describe('A2-3 arm B: persister given ONLY the leaf node', () => {
     await flush();
     p.off();
 
-    // ⚠️ ARM B FAILS, and this is A2-3's decisive result. The speculative value
-    // LEAKED to durable storage during the pending transaction — precisely the
-    // defect PER-B's rule exists to prevent.
+    // MEASURED BEFORE THE OWNERSHIP CORRECTION: `duringPending` was 'dark' —
+    // the speculative value leaked to storage and was only repaired by a later
+    // overwrite. `resolveScopeKey` asks `getPositionRegistry(candidate.$ ?? node)`,
+    // and a leaf answered nothing, so `hasOpen()` was false and the write ran
+    // immediately. The authority was never wrong; it was asked a question a leaf
+    // could not answer.
     //
-    // WHY: `resolveScopeKey` resolves a per-tree scope via
-    // `getPositionRegistry(candidate.$ ?? node)`. A LEAF node carries no registry
-    // and has no `.$`, so no scope resolves, `hasOpen()` is false, and the write
-    // runs immediately. The authority did not misbehave — it was asked a question
-    // it cannot answer from a leaf.
-    expect(duringPending).toBe('dark');
-    expect(store.get('theme')).toBe('light'); // recovers, but only by overwrite
+    // MEASURED NOW: the leaf resolves the tree's registry, so the same authority
+    // defers the write exactly as the tree-claimant arm does.
+    expect(duringPending).toBe('light');
+    expect(store.get('theme')).toBe('light');
     expect(tree.$.theme()).toBe('light');
   });
 });

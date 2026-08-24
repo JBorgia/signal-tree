@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { getOwnedOwnerPath, getOwnedPositionIds } from './internals/owned-metadata';
+import {
+  getOwnedOwnerId,
+  getOwnedOwnerPath,
+  getOwnedPositionIds,
+} from './internals/owned-metadata';
 import { getPathNotifier } from './path-notifier';
 import { getPositionRegistry } from './internals/position-registry';
 import { restoration } from '../enhancers/restoration/restoration';
@@ -60,18 +64,25 @@ const flush = async () => {
 };
 
 describe('NOTIFIER-SCOPE-0 mechanism: what identity does a location carry?', () => {
-  it('a leaf carries position ids and an owner path — but NOT its registry', async () => {
+  it('a leaf names its own owner — position ids, owner path, AND registry', async () => {
     const a = signalTree({ theme: 'a0' }, { enhancers: [restoration()] });
     await flush();
     const leaf = (a.$ as Record<string, unknown>)['theme'];
 
-    // The half that exists.
     expect(getOwnedPositionIds(leaf)).toEqual([2]);
     expect(getOwnedOwnerPath(leaf)).toBe('theme');
 
-    // The half that does not, and the whole of A2-3's failure.
-    expect(getPositionRegistry(leaf)).toBeUndefined();
-    expect(getPositionRegistry(a.$)).toBeDefined();
+    // ⚠️ FIXED. This measured `undefined` before the ownership correction, and
+    // that absence was the whole of A2-3's failure: `resolveScopeKey` asks
+    // `getPositionRegistry(node)` and simply never got an answer from a leaf.
+    // A leaf now resolves the SAME registry object the tree does, so a location
+    // can name its owner without being handed the tree.
+    expect(getPositionRegistry(leaf)).toBeDefined();
+    expect(getPositionRegistry(leaf)).toBe(getPositionRegistry(a.$));
+
+    // And the namespace is comparable as a value, which is what the notifier
+    // needs — it has no node to ask.
+    expect(getOwnedOwnerId(leaf)).toBe(getPositionRegistry(a.$)?.id);
   });
 
   it('⚠️ two independent trees allocate the SAME local position id', async () => {
@@ -79,13 +90,20 @@ describe('NOTIFIER-SCOPE-0 mechanism: what identity does a location carry?', () 
     const b = signalTree({ theme: 'b0' }, { enhancers: [restoration()] });
     await flush();
 
-    const posA = getOwnedPositionIds((a.$ as Record<string, unknown>)['theme']);
-    const posB = getOwnedPositionIds((b.$ as Record<string, unknown>)['theme']);
+    const leafA = (a.$ as Record<string, unknown>)['theme'];
+    const leafB = (b.$ as Record<string, unknown>)['theme'];
+    const posA = getOwnedPositionIds(leafA);
+    const posB = getOwnedPositionIds(leafB);
 
     // The registries are genuinely different objects — the trees are isolated
     // in every way except the number they hand out.
     expect(getPositionRegistry(a.$)).not.toBe(getPositionRegistry(b.$));
     expect(posA).toEqual(posB);
+
+    // The local numbers still collide — deliberately. The fix NAMES the
+    // namespace rather than making position ids globally unique, so
+    // `positionId` keeps meaning "position N in this tree".
+    expect(getOwnedOwnerId(leafA)).not.toBe(getOwnedOwnerId(leafB));
   });
 });
 
@@ -121,13 +139,12 @@ describe('NOTIFIER-SCOPE-0 invariant: both trees must be delivered', () => {
   });
 
   /**
-   * ⚠️ KNOWN RED — `it.fails` because this SHOULD pass and does not. Measured
-   * delivery is `["theme=b1 pos=[2]"]`: tree A's write is silently dropped,
-   * because both trees call their first leaf position 2.
-   *
-   * Fixing NOTIFIER-SCOPE-0 must flip this to a plain `it`. Do not delete it.
+   * ⚠️ WAS KNOWN RED. Measured before the ownership correction:
+   * `["theme=b1"]` — tree A's write silently dropped, because both trees call
+   * their first leaf position 2 and the notifier compared the number without
+   * its namespace.
    */
-  it.fails('⚠️ two trees, SAME path, same tick — both must deliver', async () => {
+  it('⚠️ two trees, SAME path, same tick — both must deliver', async () => {
     const a = signalTree({ theme: 'a0' }, { enhancers: [restoration()] });
     const b = signalTree({ theme: 'b0' }, { enhancers: [restoration()] });
     await flush();

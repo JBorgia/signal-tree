@@ -113,6 +113,15 @@ export interface WriteMetadata {
   transactionId?: number;
   /** @internal Owning tree token for transaction attribution isolation. */
   transactionOwner?: object;
+  /**
+   * @internal Registry namespace of the location this write touched.
+   *
+   * NOTIFIER-SCOPE-0. The path notifier is process-global and every AUTHORITY
+   * consumer subscribes with `'**'`, so restoration and transactions receive
+   * writes belonging to OTHER trees. Delivered here so they can decline them:
+   * `positionId` alone cannot say which tree it indexes.
+   */
+  ownerId?: number;
   /** @internal Declared leaf-write semantics for scalar rollback classification. */
   mutationIntent?: 'replace' | 'derive';
   /** @internal Explicitly distinguishes causal authorship from causal realization. */
@@ -154,6 +163,12 @@ export interface WriteAttribution {
 
 export interface MutationEnvelope<T = unknown> {
   readonly positionId: PositionId;
+  /**
+   * Registry namespace `positionId` belongs to. Absent for emitters that
+   * predate registry qualification; identity then degrades to the previous
+   * behaviour rather than silently claiming a namespace it does not know.
+   */
+  readonly ownerId?: number;
   readonly path: readonly PropertyKey[];
   readonly ownerPath?: readonly PropertyKey[];
   readonly before: T;
