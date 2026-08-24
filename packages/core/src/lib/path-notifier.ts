@@ -64,13 +64,13 @@ const joinPathSegments = (path: readonly PropertyKey[]): string =>
 const materializeDeliveryMeta = (
   meta?: WriteMetadata
 ): WriteMetadata | undefined => {
-  if (!meta?.historyEffect) {
+  if (!meta?.structuralEffect) {
     return meta;
   }
 
   return {
     ...meta,
-    historyEffect: Object.freeze({ ...meta.historyEffect }),
+    structuralEffect: Object.freeze({ ...meta.structuralEffect }),
   };
 };
 
@@ -131,7 +131,7 @@ export class PathNotifier {
       [envelope.positionId],
       {
         ...(envelope.attribution ?? {}),
-        historyEffect: envelope.structural,
+        structuralEffect: envelope.structural,
       }
     );
   }
@@ -337,13 +337,13 @@ export class PathNotifier {
           entry.ownerPath !== undefined &&
           entry.newValue === undefined &&
           entry.oldValue === undefined;
-        const hasStructuralHistoryEffect =
-          entry.meta?.historyEffect !== undefined;
+        const hasStructuralEffect =
+          entry.meta?.structuralEffect !== undefined;
         // If value didn't change compared to original oldValue, skip
         if (
           entry.newValue === entry.oldValue &&
           !isOwnerOnlyMarkerSignal &&
-          !hasStructuralHistoryEffect
+          !hasStructuralEffect
         ) {
           continue;
         }
@@ -512,8 +512,8 @@ export class PathNotifier {
   }
 
   private crossesStructuralBoundary(left: PendingEntry, right: PendingEntry): boolean {
-    const leftEffect = left.meta?.historyEffect;
-    const rightEffect = right.meta?.historyEffect;
+    const leftEffect = left.meta?.structuralEffect;
+    const rightEffect = right.meta?.structuralEffect;
     const leftStructural = leftEffect !== undefined;
     const rightStructural = rightEffect !== undefined;
     if (leftStructural !== rightStructural) {
@@ -590,10 +590,10 @@ export class PathNotifier {
     ) {
       return undefined;
     }
-    if (left.historyEffect && !right.historyEffect) {
+    if (left.structuralEffect && !right.structuralEffect) {
       return {
         ...right,
-        historyEffect: left.historyEffect,
+        structuralEffect: left.structuralEffect,
       };
     }
     return right;

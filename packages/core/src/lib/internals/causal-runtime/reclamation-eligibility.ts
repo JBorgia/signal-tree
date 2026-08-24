@@ -1,5 +1,5 @@
 import type { AppliedHistory } from './applied-history';
-import type { CausalEffect, StructuralEffect, TurnId } from './causal-types';
+import type { CausalEffect, StructuralEffectKind, TurnId } from './causal-types';
 import type { TurnStore } from './turn-store';
 
 type EligibilityTurnState = 'pending' | 'confirmed-applied' | 'confirmed-redoable';
@@ -8,7 +8,7 @@ export interface ReclamationEligibilityBlocker {
   readonly kind: 'confirmed-restore-path' | 'pending-reference';
   readonly turnId: TurnId;
   readonly state: EligibilityTurnState;
-  readonly structural?: StructuralEffect;
+  readonly structural?: StructuralEffectKind;
 }
 
 export interface ReclamationEligibility {

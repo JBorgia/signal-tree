@@ -1,24 +1,30 @@
-import type { PositionId, StructuralHistoryEffect } from '../../types';
+import type { PositionId, StructuralEffect } from '../../types';
 
 export type { PositionId };
 
 export type TurnId = number;
 export type TurnState = 'pending' | 'confirmed';
-export type StructuralEffect = 'add' | 'remove' | 'rekey';
+/**
+ * WHICH structural transition an effect is, not the effect record itself. The
+ * record is `StructuralEffect` in `lib/types` — a subject-keyed
+ * `{ kind, subject, key, value, … }` — and the two are different enough that
+ * sharing a name shadowed one with the other.
+ */
+export type StructuralEffectKind = 'add' | 'remove' | 'rekey';
 
 export interface CausalEffect {
   readonly owner: PositionId;
   readonly before: unknown;
   readonly after: unknown;
   readonly subjectId?: unknown;
-  readonly structural?: StructuralEffect;
+  readonly structural?: StructuralEffectKind;
   /**
    * Producer-authored structural information required to realize this
    * existence transition after the original mutation context is gone.
    *
    * This is durable canonical history: an authored structural snapshot.
    */
-  readonly structuralContext?: StructuralHistoryEffect;
+  readonly structuralContext?: StructuralEffect;
 }
 
 export interface CausalTurn {
@@ -42,9 +48,9 @@ export interface ReversalEffect {
    */
   readonly path?: string;
   readonly ownerPath?: string;
-  readonly structural?: StructuralEffect;
+  readonly structural?: StructuralEffectKind;
   /** Durable structural recipe carried from canonical history into realization. */
-  readonly structuralContext?: StructuralHistoryEffect;
+  readonly structuralContext?: StructuralEffect;
 }
 
 export interface ConfirmedReversalPlan {

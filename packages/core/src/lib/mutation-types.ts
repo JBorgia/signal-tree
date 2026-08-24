@@ -1,4 +1,4 @@
-export type StructuralHistoryEffect =
+export type StructuralEffect =
   | {
       kind: 'add';
       subject: number;
@@ -114,7 +114,7 @@ export interface WriteMetadata {
   /** @internal Explicitly distinguishes causal authorship from causal realization. */
   participation?: WriteParticipation;
   /** @internal Canonical structural collection effect produced at mutation time. */
-  historyEffect?: StructuralHistoryEffect;
+  structuralEffect?: StructuralEffect;
   /** Open extension for guardrails' historical custom-key shape. */
   [key: string]: unknown;
 }
@@ -136,6 +136,6 @@ export interface MutationEnvelope<T = unknown> {
   readonly after: T;
   readonly kind: MutationKind;
   readonly subjectId?: number;
-  readonly structural?: StructuralHistoryEffect;
+  readonly structural?: StructuralEffect;
   readonly attribution?: WriteAttribution;
 }

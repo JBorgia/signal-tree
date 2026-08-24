@@ -1,4 +1,4 @@
-import type { StructuralHistoryEffect } from '../../types';
+import type { StructuralEffect } from '../../types';
 
 import type { AppliedHistory } from './applied-history';
 import type { CausalTurn, PositionId, ReversalResult, TurnId } from './causal-types';
@@ -12,7 +12,7 @@ export interface ExplicitTransactionEffect {
   readonly after: unknown;
   readonly subjectId?: unknown;
   readonly structural?: 'add' | 'remove' | 'rekey';
-  readonly structuralContext?: StructuralHistoryEffect;
+  readonly structuralContext?: StructuralEffect;
 }
 
 export type GreenfieldTransactionLifecycle =

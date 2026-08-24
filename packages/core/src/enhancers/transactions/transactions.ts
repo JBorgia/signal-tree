@@ -785,7 +785,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     effectMap.set(key, effect);
   };
 
-  const buildTurnEffectFromHistory = (
+  const buildTurnEffectFromStructural = (
     meta: WriteMetadata | undefined,
     ownerPath: string,
     path: string,
@@ -798,7 +798,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       return undefined;
     }
 
-    const effect = meta?.historyEffect;
+    const effect = meta?.structuralEffect;
     if (!effect || effect.subject !== subject) {
       return undefined;
     }
@@ -830,11 +830,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
     subjectIds?: number[],
     positionIds?: number[]
   ): void => {
-    const historyEffect = ownerPath
-      ? buildTurnEffectFromHistory(meta, ownerPath, path, positionIds, subjectIds)
+    const structuralEffect = ownerPath
+      ? buildTurnEffectFromStructural(meta, ownerPath, path, positionIds, subjectIds)
       : undefined;
-    if (historyEffect) {
-      enqueueEffect(bucket, effectMap, historyEffect);
+    if (structuralEffect) {
+      enqueueEffect(bucket, effectMap, structuralEffect);
       return;
     }
 

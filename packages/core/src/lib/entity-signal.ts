@@ -242,7 +242,7 @@ import type {
   AddManyOptions,
   WriteMetadata,
   PositionId,
-  StructuralHistoryEffect,
+  StructuralEffect,
 } from '../lib/types';
 
 /**
@@ -417,8 +417,8 @@ export function createEntitySignal<
   )?.();
   let lastSubjectIds: number[] | undefined;
 
-  type PendingHistoryEffect = StructuralHistoryEffect;
-  type PendingAddHistoryEffect = Extract<PendingHistoryEffect, { kind: 'add' }>;
+  type PendingStructuralEffect = StructuralEffect;
+  type PendingAddHistoryEffect = Extract<PendingStructuralEffect, { kind: 'add' }>;
 
   function getPositionIds(): number[] | undefined {
     return positionId === undefined ? undefined : [positionId];
@@ -428,13 +428,13 @@ export function createEntitySignal<
     return entityPositionIdNotifyEnabled ? getPositionIds() : undefined;
   }
 
-  function createStructuralHistoryMeta(
-    effect: PendingHistoryEffect
+  function createStructuralEffectMeta(
+    effect: PendingStructuralEffect
   ): WriteMetadata {
     const meta = getActiveWriteContext();
     return {
       ...(meta ?? {}),
-      historyEffect: effect,
+      structuralEffect: effect,
     };
   }
 
@@ -540,7 +540,7 @@ export function createEntitySignal<
     }
 
     const subjectId = allocateSubjectId(from);
-    const historyEffect: PendingHistoryEffect = {
+    const structuralEffect: PendingStructuralEffect = {
       kind: 'rekey',
       subject: subjectId,
       beforeKey: from,
@@ -581,7 +581,7 @@ export function createEntitySignal<
           getPositionIdsForNotify(),
           {
             ...(meta ?? {}),
-            historyEffect,
+            structuralEffect,
           }
         );
       },
@@ -608,7 +608,7 @@ export function createEntitySignal<
       };
     }
 
-    const historyEffect: PendingHistoryEffect = {
+    const structuralEffect: PendingStructuralEffect = {
       kind: 'rekey',
       subject: subjectId,
       beforeKey: from,
@@ -649,7 +649,7 @@ export function createEntitySignal<
           getPositionIdsForNotify(),
           {
             ...(meta ?? {}),
-            historyEffect,
+            structuralEffect,
           }
         );
       },
@@ -908,7 +908,7 @@ export function createEntitySignal<
     }
 
     const { beforeSubject, afterSubject } = getNeighborSubjects(key);
-    const historyEffect: PendingHistoryEffect = {
+    const structuralEffect: PendingStructuralEffect = {
       kind: 'remove',
       subject: subjectId,
       key,
@@ -946,7 +946,7 @@ export function createEntitySignal<
           getPositionIdsForNotify(),
           {
             ...(metaOverride ?? getActiveWriteContext() ?? {}),
-            historyEffect,
+            structuralEffect,
           }
         );
 
@@ -1047,7 +1047,7 @@ export function createEntitySignal<
   function addOneWithHistoryEffect(
     entity: E,
     opts?: AddOptions<E, K>
-  ): { id: K; historyEffect: PendingAddHistoryEffect } {
+  ): { id: K; structuralEffect: PendingAddHistoryEffect } {
     const id = deriveId(entity, opts);
     const previousLastKey = structuralStore.lastActiveKey();
     recordProductionSubstrateStat('publicAddPreviousTailReads');
@@ -1071,7 +1071,7 @@ export function createEntitySignal<
     };
     frame.stageFreshSubject(freshSubject);
     commitAndProjectEntityMutationFrame(frame);
-    const historyEffect: PendingAddHistoryEffect = {
+    const structuralEffect: PendingAddHistoryEffect = {
       kind: 'add',
       subject: subjectId,
       key: id,
@@ -1091,14 +1091,14 @@ export function createEntitySignal<
       basePath,
       [subjectId],
       getPositionIdsForNotify(),
-      createStructuralHistoryMeta(historyEffect)
+      createStructuralEffectMeta(structuralEffect)
     );
 
     for (const handler of tapHandlers) {
       handler.onAdd?.(transformedEntity, id);
     }
 
-    return { id, historyEffect };
+    return { id, structuralEffect };
   }
 
   /**
@@ -1857,10 +1857,10 @@ export function createEntitySignal<
      */
     prependOne(entity: E, opts?: AddOptions<E, K>): K {
       const previousFirstKey = structuralStore.firstActiveKey();
-      const { id, historyEffect } = addOneWithHistoryEffect(entity, opts);
+      const { id, structuralEffect } = addOneWithHistoryEffect(entity, opts);
       moveToFront([id]);
       rewritePendingAddEffect(
-        historyEffect,
+        structuralEffect,
         undefined,
         previousFirstKey === undefined
           ? undefined
@@ -2013,7 +2013,7 @@ export function createEntitySignal<
           basePath,
           [subjectIdsForWrite[i]],
           getPositionIdsForNotify(),
-          createStructuralHistoryMeta({
+          createStructuralEffectMeta({
             kind: 'add',
             subject: subjectIdsForWrite[i],
             key: id,
@@ -2313,7 +2313,7 @@ export function createEntitySignal<
 
       // Delete and update signals
       const subjectIdsForWrite = rememberSubjectIds([id]);
-      const historyEffect: PendingHistoryEffect = {
+      const structuralEffect: PendingStructuralEffect = {
         kind: 'remove',
         subject: subjectIdsForWrite[0],
         key: id,
@@ -2346,7 +2346,7 @@ export function createEntitySignal<
         basePath,
         subjectIdsForWrite,
         getPositionIdsForNotify(),
-        createStructuralHistoryMeta(historyEffect)
+        createStructuralEffectMeta(structuralEffect)
       );
 
       // Run tap handlers
@@ -2451,7 +2451,7 @@ export function createEntitySignal<
           basePath,
           [subjectIdsForWrite[i]],
           getPositionIdsForNotify(),
-          createStructuralHistoryMeta({
+          createStructuralEffectMeta({
             kind: 'remove',
             subject: subjectIdsForWrite[i],
             key: id,
@@ -2690,7 +2690,7 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          createStructuralHistoryMeta({
+          createStructuralEffectMeta({
             kind: 'remove',
             subject: subjectId,
             key: id,
@@ -2950,7 +2950,7 @@ export function createEntitySignal<
 
       for (let index = 0; index < stagedRemovals.length; index += 1) {
         const { id, entity, subjectId } = stagedRemovals[index];
-        const historyEffect = stagedRemovalHistoryEffects[index];
+        const structuralEffect = stagedRemovalHistoryEffects[index];
         pathNotifier.notify(
           `${basePath}.${String(id)}`,
           undefined,
@@ -2958,7 +2958,7 @@ export function createEntitySignal<
           basePath,
           [subjectId],
           getPositionIdsForNotify(),
-          createStructuralHistoryMeta(historyEffect)
+          createStructuralEffectMeta(structuralEffect)
         );
       }
 
@@ -2983,7 +2983,7 @@ export function createEntitySignal<
           basePath,
           [addedSubjectIds[i]],
           getPositionIdsForNotify(),
-          createStructuralHistoryMeta(stagedAddHistoryEffects[i])
+          createStructuralEffectMeta(stagedAddHistoryEffects[i])
         );
       }
 

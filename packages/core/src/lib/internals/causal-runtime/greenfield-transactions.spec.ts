@@ -5,7 +5,7 @@ import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
 import type {
   ISignalTree,
-  StructuralHistoryEffect,
+  StructuralEffect,
   WriteMetadata,
 } from '../../types';
 import { withWriteContext } from '../../write-context';

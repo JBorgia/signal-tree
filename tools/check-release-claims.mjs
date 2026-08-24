@@ -339,7 +339,7 @@ const EXEMPT = new Map(
   Object.entries({
     participation:
       'internal WriteMetadata replay discriminator; documented by causal-runtime architecture docs, not app-facing README/changelog',
-    historyEffect:
+    structuralEffect:
       'internal WriteMetadata structural replay payload; documented by causal-runtime architecture docs, not app-facing README/changelog',
     HydrateMode: 'authoring-only type; the modes are documented in prose',
     HydrateReason:

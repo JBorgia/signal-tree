@@ -22,7 +22,7 @@ export type {
   MutationEnvelope,
   MutationKind,
   PositionId,
-  StructuralHistoryEffect,
+  StructuralEffect,
   WriteMetadata,
   WriteAttribution,
 } from './mutation-types';

@@ -12,7 +12,7 @@ describe('transaction capture bridge', () => {
       subjectIds: [17],
       positionIds: [3],
       meta: {
-        historyEffect: {
+        structuralEffect: {
           kind: 'remove',
           subject: 17,
           key: 'u1',
@@ -57,7 +57,7 @@ describe('transaction capture bridge', () => {
     const meta: WriteMetadata = {
       transactionId: 7,
       transactionOwner: owner,
-      historyEffect: {
+      structuralEffect: {
         kind: 'rekey',
         subject: 17,
         beforeKey: 'u1',

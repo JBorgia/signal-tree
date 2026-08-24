@@ -48,7 +48,7 @@ import type {
   Enhancer,
   ISignalTree,
   PositionId,
-  StructuralHistoryEffect,
+  StructuralEffect,
   TimeTravelMethods,
   TimeTravelConfig,
   TimeTravelEntry,
@@ -154,8 +154,8 @@ type TreeRealizationDescriptorStore = Map<
     ownerPath?: string;
     collectionPath?: string;
     fieldPathFromRow?: string;
-    structuralHistoryEffects?: ReadonlyMap<string, StructuralHistoryEffect>;
-    structuralHistoryBySubject?: ReadonlyMap<string, StructuralHistoryEffect>;
+    structuralEffects?: ReadonlyMap<string, StructuralEffect>;
+    structuralEffectBySubject?: ReadonlyMap<string, StructuralEffect>;
     subjectDescriptors?: ReadonlyMap<
       string,
       {
@@ -192,7 +192,7 @@ function toReversalEffect(
         ownerPath: effect.ownerPath,
       };
     case 'remove': {
-      const structuralContext: StructuralHistoryEffect = {
+      const structuralContext: StructuralEffect = {
         kind: effect.kind,
         subject: effect.subject,
         key: effect.key,
@@ -212,7 +212,7 @@ function toReversalEffect(
       };
     }
     case 'add': {
-      const structuralContext: StructuralHistoryEffect = {
+      const structuralContext: StructuralEffect = {
         kind: effect.kind,
         subject: effect.subject,
         key: effect.key,
@@ -232,7 +232,7 @@ function toReversalEffect(
       };
     }
     case 'rekey': {
-      const structuralContext: StructuralHistoryEffect = {
+      const structuralContext: StructuralEffect = {
         kind: effect.kind,
         subject: effect.subject,
         beforeKey: effect.beforeKey,
@@ -2514,7 +2514,7 @@ export function timeTravel(
       }
       effectMap.set(key, effect);
     };
-    const buildTurnEffectFromHistory = (
+    const buildTurnEffectFromStructural = (
       ownerPath: string,
       path: string,
       meta?: WriteMetadata,
@@ -2527,7 +2527,7 @@ export function timeTravel(
         return undefined;
       }
 
-      const effect = meta?.historyEffect;
+      const effect = meta?.structuralEffect;
       if (!effect) {
         return undefined;
       }
@@ -2596,8 +2596,8 @@ export function timeTravel(
         });
       };
 
-      const historyEffect = ownerPath
-        ? buildTurnEffectFromHistory(
+      const structuralEffect = ownerPath
+        ? buildTurnEffectFromStructural(
             ownerPath,
             path,
             meta,
@@ -2605,8 +2605,8 @@ export function timeTravel(
             subjectIds
           )
         : undefined;
-      if (historyEffect) {
-        enqueueEffect(effectMap, historyEffect);
+      if (structuralEffect) {
+        enqueueEffect(effectMap, structuralEffect);
         return;
       }
 
