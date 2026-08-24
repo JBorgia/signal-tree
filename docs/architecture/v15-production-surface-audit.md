@@ -2345,6 +2345,98 @@ The P0-C precedent argues for the second, and for the same remedy — refuse rat
 than destroy. But it is a semantic decision with a cost (more refused rollbacks),
 so it is recorded as open rather than assumed.
 
+# TX-SURFACE-0 execution — DELETE is right, and it is BLOCKED
+
+The deletion was executed and then reverted, because carrying it out surfaced a
+requirement rather than test debt. HEAD stays green at 1793.
+
+## What executing it proved
+
+```text
+remove TimeTravelMethods extends TransactionMethods   builds clean
+remove the 91-line duplicate transaction()            builds clean
+migrate the specs to install transactions()           58 failures -> 20
+```
+
+Those last 20 are **not** migration debt. Measured:
+
+```text
+status.set('queued-before')
+transaction(() => rows.addOne({ id: 17 }))     pending, NOT confirmed
+other.set('queued-after')
+
+confirmed history now contains THREE entries:
+  ['status']   before-write
+  ['rows']     <- THE PENDING ROW, in CONFIRMED history before confirm()
+  ['other']    after-write
+```
+
+A speculative row reaches the confirmed restoration history before the
+transaction is confirmed. Reproduced in **both** enhancer orders, so it is not
+ordering.
+
+## Root cause, and why the fix is a protocol rather than a patch
+
+```ts
+// time-travel.ts
+const resolveTransactionId = (meta) =>
+  typeof meta?.transactionId === 'number' &&
+  meta.transactionOwner === transactionOwnerToken   // <- ITS OWN private token
+    ? meta.transactionId
+    : undefined;
+```
+
+`transactions()` does stamp `transactionId` and `transactionOwner` on the ambient
+write context, and time-travel does have a pending bucket to route them into. But
+it only recognises transactions bearing **its own** token. With its duplicate
+`transaction()` deleted, nothing ever carries that token, so every
+transaction-tagged write falls through into confirmed history.
+
+The obvious minimal fix — honour any foreign owner — was tried and **measured
+worse**: 20 failures became 34. Correct, in hindsight: routing pending writes
+into a bucket is only half a protocol. Nothing tells time-travel when a foreign
+transaction CONFIRMS or ROLLS BACK, so the bucket never drains.
+
+And no such channel exists. `__transactions` is an inspection surface
+(`getConfirmedTurnCount`, `getPendingTurnCount`), not a notification one.
+
+## So the causal-turn feed is a REQUIREMENT, not a preference
+
+The feed sketched for the ledger split turns out to be what this deletion needs
+first, in its narrowest form — a pending-turn lifecycle announcement:
+
+```text
+transactions()  announces  turn opened (pending)
+                           turn confirmed
+                           turn rolled back
+                              |
+                              v
+        any causal-turn consumer, time-travel included
+```
+
+That is strictly smaller than a dependency ledger and strictly smaller than a
+journal. It is the thing that lets one authority own transactions while another
+observes their lifecycle — which is the ownership model, stated as code instead
+of as a diagram.
+
+**Disposition unchanged: DELETE.** It is sequenced behind the announcement
+protocol rather than abandoned.
+
+## A correction to TX-SURFACE-0's own report
+
+I recorded "enhancer order does not change the answer" from a probe where both
+orders returned `later-confirmed-dependency`. That was too strong. The **answer**
+agreed; which **implementation** produced it did not — in
+`[transactions(), timeTravel()]` the later-installed time-travel method
+overwrote the earlier one. Both were correct under the `'all'` default, so the
+probe could not distinguish them, and I read agreement as absence of a collision.
+
+The duplication WAS order-sensitive in exactly the way that made it worth
+deleting; my probe was simply blind to it. The test at
+`time-travel.spec.ts:1113` — *"keeps transaction authority singular for composed
+transactions() + timeTravel()"* — was, all along, exercising time-travel's
+implementation rather than the composition it names.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded

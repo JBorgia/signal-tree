@@ -69,8 +69,12 @@ describe('TX-SURFACE-0: the duplicate transaction() surface', () => {
       { enhancers: [timeTravel({ maxHistorySize: 50 }), transactions()] }
     );
     await flush();
-    // If the two orders disagree, the public contract is "whichever enhancer was
-    // listed last wins", which is not a contract.
+    // ⚠️ NOTE ON WHAT THIS DOES AND DOES NOT PROVE. Both orders return the same
+    // REFUSAL, but that is not the same as both being answered by the same
+    // implementation. Under the 'all' default both implementations are correct,
+    // so this probe cannot distinguish them — and the later-installed enhancer's
+    // `transaction` overwrites the earlier one. Read this as "the answer agrees",
+    // never as "there is no collision".
     expect(await probeRollbackOwner(tree)).toBe('later-confirmed-dependency');
   });
 
