@@ -7520,9 +7520,113 @@ stored()                A2 REOPENS          PER-B is genuinely new evidence
 flushAllStoredSignals() reopens WITH A2     the host-drain half
 ```
 
-Four of five stand. **Only persistence has new evidence** — and it is the one the
-brief was right to single out, because PER-B did not exist when
-*"NOT EARNED as RC public API"* was written.
+**THREE of five stand; TWO reopen.** (An earlier draft of this line said "four of
+five" — wrong arithmetic, corrected here before it could be inherited as fact.
+`loader`, `asyncSource` and `status` stay withheld; `stored` and the host drain
+reopen together, because they are two halves of one capability.)
+
+Only persistence has new evidence, and it is the one the brief was right to single
+out: PER-B did not exist when *"NOT EARNED as RC public API"* was written.
+
+# A2-REOPEN — PRE-REGISTERED. The capability, not the spelling
+
+> **Given PER-B's settled causal semantics, what is the SMALLEST public
+> persistence capability that lets ordinary state survive process lifetime and
+> lets a host synchronously drain pending durable work, WITHOUT making persistence
+> a causal authority?**
+
+⚠️ **`stored()` and `flushAllStoredSignals()` are NOT preregistered as the answer.**
+The whole production-surface process has been about not letting historical
+spelling decide architecture, and `stored` having an implementation is the same
+non-argument that `edit-session` had.
+
+## Settled, and NOT reopened
+
+PER-B established these; A2 may not relitigate them, only prove a proposed surface
+reaches them.
+
+```text
+ordinary app write        AUTHORED; persistence observes it
+construction / autoload   MATERIALISATION — no causal write at all (P1)
+reload into a live tree   EXTERNAL / REALIZED (P2)
+pending transaction       must not become durable before settlement (P5)
+inspection                must not persist (DEVTOOLS-JUMP-0.1)
+host drain                a DURABILITY operation, not a tree-state write
+```
+
+## Three candidate placements
+
+```text
+A2-A  DECLARATION MARKER            signalTree({ theme: stored('theme','light') })
+A2-B  COMPOSITION over a node       persist(tree.$.theme, { key: 'theme' })
+A2-C  TREE-SCOPED CAPABILITY        const durability = persistence(tree, {...})
+```
+
+The discriminating question, and the one Signal Forms already taught once:
+
+> **Does persistence need to change what a BRANCH IS, or is it behaviour attached
+> to ordinary state?**
+
+Forms resolved as *ordinary state + composition* when the capability could live
+outside the tree ontology. Persistence may be the next such case — or may be the
+exception, for one specific reason tested first.
+
+## The five discriminators
+
+```text
+A2-1  CONSTRUCTION MATERIALISATION   ⚠️ run first — it is the only reason a
+      durable value present at construction must be the FIRST publicly observable
+      value, with no transient default, no causal write, no diagnostic turn, no
+      restoration entry, no transaction evidence.
+      If composition cannot reach that without a post-construction write, a
+      declaration-time marker OWNS something composition cannot reproduce — a real
+      semantic reason rather than "we have the code".
+
+A2-2  LIVE RELOAD                    the surviving surface must reach
+      origin external / participation realized, and a prior authored write must
+      not be able to discard the durable truth afterwards.
+
+A2-3  SETTLEMENT                     pending tx -> storage unchanged; confirm ->
+      may update; rollback -> unchanged. No persistence API invents its own
+      settlement rule.
+
+A2-4  HOST DRAIN                     the real Capacitor shape: armed debounce,
+      host says backgrounding, drain returns with the latest value durable.
+      OWNERSHIP IS OPEN — `durability.flush()`, `tree.persistence.flush()`, or a
+      process-global `flushAll…()` only if nothing narrower can find every pending
+      write.
+
+A2-5  LIFETIME                       an armed durable write MAY complete after
+      destroy; nothing may write back INTO the tree, resurrect state, or retain
+      the owner indefinitely. The new placement must not change what PER-B P11
+      measured.
+```
+
+## Excluded unless one of the five demands it
+
+```text
+MigrationFn        tags               storage factories
+collection persistence                prefix-clearing utilities
+custom lifecycle heuristics           a storage-specific origin
+a persistence-specific transaction authority
+```
+
+This is what stops "A2 reopened" becoming "restore the old subsystem". The
+corrected footprint is SEVEN persisted leaves and ONE drain — small enough to
+reason from what production needs rather than from the 61-lexical-hit illusion.
+
+## Stopping rule
+
+> A2 closes when **exactly one** public placement satisfies construction
+> materialisation, live external reload, settlement ordering, native-host drain
+> and lifetime semantics **with the least new authority and surface**.
+
+## Standard of evidence, carried from A3
+
+A new experiment may reopen an old disposition **only where it brings genuinely
+new evidence**. A3-TX did not overturn S1 — `status()` had already been measured as
+ordinary state with unguarded setters, and the replacement was demonstrated
+directly. PER-B is that new evidence for persistence; nothing else here qualifies.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
