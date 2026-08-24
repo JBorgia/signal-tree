@@ -3,7 +3,7 @@
  *
  * Enables:
  * - Entity hooks (tap, intercept) to work without global state
- * - Enhancers (Persistence, TimeTravel, DevTools) to catch all mutations
+ * - Enhancers (Persistence, Restoration, DevTools) to catch all mutations
  * - Clean path-based subscription pattern
  *
  * @internal

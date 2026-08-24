@@ -61,7 +61,7 @@ const usersState = () => ({
 // and cost `getRestorationHistory()` and `transaction()` — `spec-types` caught it. A cast
 // that hides the very API under test makes the assertions vacuous.
 const makePlainTree = () => signalTree(usersState());
-const makeTimeTravelTree = () =>
+const makeRestorationTree = () =>
   signalTree(usersState(), { enhancers: [restoration({ maxHistorySize: 20 })] });
 const makeTransactionTree = () =>
   signalTree(usersState(), { enhancers: [transactions()] });
@@ -151,7 +151,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('CASE 8 — REPAIRED: an untagged refresh does NOT become an undoable turn', async () => {
-    const tree = makeTimeTravelTree();
+    const tree = makeRestorationTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
     const before = tree.getRestorationHistory().length;
@@ -179,7 +179,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('CASE 8b — classifying it as a realization fixes that, and the seam already exists', async () => {
-    const tree = makeTimeTravelTree();
+    const tree = makeRestorationTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
     const before = tree.getRestorationHistory().length;
@@ -256,7 +256,7 @@ describe('A1-0: acquisition composed over an ordinary entityMap', () => {
   });
 
   it('case 10: destroying the tree does not require the acquirer to know', async () => {
-    const tree = makeTimeTravelTree();
+    const tree = makeRestorationTree();
     applyServerTruth(tree.$.users, [{ id: 'a', name: 'Ada', v: 1 }]);
     await flush();
 

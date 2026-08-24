@@ -76,8 +76,10 @@ export type {
   PendingTransaction,
 
   // Enhancer-added method types. Exported so a DOWNSTREAM LIBRARY can name the
-  // return type of its own `.with(...)` chain in its emitted .d.ts. `.with()`
-  // returns `this & TAdded`, so a helper like
+  // return type of its own composition helper in its emitted .d.ts. The finding
+  // predates 15.0 and is described in the `.with()` terms it was found in;
+  // `.with()` itself is gone, and the need survives it. `.with()` returned
+  // `this & TAdded`, so a helper like
   // `withStandardEnhancers(tree) { return tree.with(batching()).with(devTools(...)) }`
   // infers a type referencing these interfaces; if they aren't on the barrel the
   // consumer's declaration emit can't name them and the helper has to erase its

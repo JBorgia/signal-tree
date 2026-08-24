@@ -712,10 +712,10 @@ function getOrCreateDevToolsGroup(
       return;
     }
 
-    const anyTimeTravelEnabled = Array.from(trees.values()).some(
+    const anyDevtoolsTimelineEnabled = Array.from(trees.values()).some(
       (t) => t.enableTimeTravel
     );
-    if (!anyTimeTravelEnabled) return;
+    if (!anyDevtoolsTimelineEnabled) return;
 
     if (messageType !== 'DISPATCH') return;
 

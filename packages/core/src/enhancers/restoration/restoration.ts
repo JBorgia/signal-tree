@@ -3339,14 +3339,14 @@ export function restoration(
  * declaring the pre-15.0 shape; deletion candidate for the deletion-first
  * utility audit, alongside `batchingWithConfig`.
  */
-export function enableTimeTravel(): Enhancer<RestorationMethods> {
+export function enableRestoration(): Enhancer<RestorationMethods> {
   return restoration({ enabled: true });
 }
 
 /**
  * Restoration with custom history size (v6 pattern).
  *
- * Not exported: reachable only as `withTimeTravel.history`, which is the
+ * Not exported: reachable only as `withRestoration.history`, which is the
  * documented surface. Nothing imports the bare name.
  */
 function restorationHistory(
@@ -3356,7 +3356,7 @@ function restorationHistory(
 }
 
 // New v6-friendly export: `restoration` with named presets.
-export const withTimeTravel = Object.assign(
+export const withRestoration = Object.assign(
   (config: RestorationConfig = {}) => restoration(config),
   {
     minimal: () => restoration({ maxHistorySize: 20, includePayload: false }),

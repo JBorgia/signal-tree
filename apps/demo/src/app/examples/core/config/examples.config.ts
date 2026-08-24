@@ -196,20 +196,21 @@ export const serializationExampleMeta: ExampleMeta = {
 /**
  * Time Travel Examples
  */
-export const timeTravelExampleMeta: ExampleMeta = {
-  id: 'time-travel-debugging',
-  title: 'Time Travel Debugging',
+export const restorationExampleMeta: ExampleMeta = {
+  id: 'restoration-debugging',
+  title: 'Restoration — Undo and Redo',
   description:
-    'Undo/redo operations and explore state history with time travel debugging.',
+    'Reverse and reapply designated operations, and see what a restoration ' +
+    'refuses to discard.',
   category: 'Development',
-  focusAreas: ['time-travel', 'debugging', 'history'],
+  focusAreas: ['restoration', 'debugging', 'undo'],
   functionalUse: ['undo-redo', 'debugging', 'state-history'],
-  enhancers: ['time-travel'],
-  route: '/time-travel',
+  enhancers: ['restoration'],
+  route: '/restoration',
   component: RestorationDemoComponent,
   difficulty: 'advanced',
   tags: [
-    'time-travel',
+    'restoration',
     'undo-redo',
     'debugging',
     'history',
@@ -307,7 +308,7 @@ export const EXAMPLES_REGISTRY: ExampleMeta[] = [
   devtoolsExampleMeta,
   persistenceExampleMeta,
   serializationExampleMeta,
-  timeTravelExampleMeta,
+  restorationExampleMeta,
   formsExampleMeta,
   asyncExampleMeta,
   recommendedArchitectureExampleMeta,

@@ -17,7 +17,7 @@ import { restoration } from '../enhancers/restoration/restoration';
 type Row = { id: string; n: number };
 const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 
-type TimeTravelRows = {
+type RestorationRows = {
   $: {
     rows: {
       addOne(row: Row): void;
@@ -33,11 +33,11 @@ type TimeTravelRows = {
   getRestorationHistory(): unknown[];
 };
 
-function createTimeTravelRows(): TimeTravelRows {
+function createRestorationRows(): RestorationRows {
   return signalTree(
     { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
     { enhancers: [restoration()] }
-  ) as unknown as TimeTravelRows;
+  ) as unknown as RestorationRows;
 }
 
 // ============================================================================
@@ -221,7 +221,7 @@ describe('E-INT — write-path authority', () => {
   });
 
   it('DR-2 — blocked interceptor creates no history residue', async () => {
-    const tree = createTimeTravelRows();
+    const tree = createRestorationRows();
     const initialHistoryLength = tree.getRestorationHistory().length;
     tree.$.rows.intercept({
       onAdd: (_entity, ctx) => ctx.block('negative'),
@@ -237,7 +237,7 @@ describe('E-INT — write-path authority', () => {
   });
 
   it('DR-2 — thenable interceptor failure creates no history residue', async () => {
-    const tree = createTimeTravelRows();
+    const tree = createRestorationRows();
     tree.$.rows.addOne({ id: 'a', n: 1 });
     await tick();
     const historyBeforeFailedUpdate = tree.getRestorationHistory().length;

@@ -9,7 +9,7 @@ import { stored } from '../../lib/markers/stored';
 import { signalTree } from '../../lib/signal-tree';
 import { SignalTreeRollbackError } from '../../lib/types';
 import { transactions } from '../transactions/transactions';
-import { enableTimeTravel, restoration, withTimeTravel } from './restoration';
+import { enableRestoration, restoration, withRestoration } from './restoration';
 
 type ScopedAuthorityNode = {
   __positionIds?: number[];
@@ -49,8 +49,8 @@ describe('restoration enhancer', () => {
   it('exports factory and aliases', () => {
     expect(typeof restoration).toBe('function');
     expect(typeof restoration()).toBe('function');
-    expect(typeof withTimeTravel).toBe('function');
-    expect(typeof enableTimeTravel).toBe('function');
+    expect(typeof withRestoration).toBe('function');
+    expect(typeof enableRestoration).toBe('function');
   });
 
   it('records a single restoration history entry per PathNotifier flush when batching is enabled', async () => {
@@ -4240,7 +4240,7 @@ describe('restoration enhancer', () => {
       },
       { enhancers: [restoration()], capabilities: ['causal-runtime'] }
     );
-    const addTimeTravel = (addStore as any).__restoration;
+    const addRestoration = (addStore as any).__restoration;
 
     undoable(() => addStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
@@ -4248,7 +4248,7 @@ describe('restoration enhancer', () => {
 
     const addedToken = addStore.$.rows.byIdOrFail(7).name
       .__subjectIds?.[0] as number;
-    const addTurn = addTimeTravel.getTurns().at(-1) as {
+    const addTurn = addRestoration.getTurns().at(-1) as {
       __positionIds?: number[];
     };
     const addPositionId = addTurn.__positionIds?.[0] as number;
@@ -4258,7 +4258,7 @@ describe('restoration enhancer', () => {
     expect(addStore.$.rows.byIdOrFail(7).name.__subjectIds?.[0]).toBe(
       addedToken
     );
-    expect(addTimeTravel.getFrontier(addPositionId)).toBe(1);
+    expect(addRestoration.getFrontier(addPositionId)).toBe(1);
   });
 
   it('routes public redo through turn frontiers for collection remove while preserving SubjectId on undo', async () => {
@@ -4270,20 +4270,20 @@ describe('restoration enhancer', () => {
       },
       { enhancers: [restoration()], capabilities: ['causal-runtime'] }
     );
-    const removeTimeTravel = (removeStore as any).__restoration;
+    const removeRestoration = (removeStore as any).__restoration;
 
     undoable(() => removeStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
     const originalRemoveToken = removeStore.$.rows.byIdOrFail(7).name
       .__subjectIds?.[0] as number;
-    removeTimeTravel.resetRestorationHistory();
+    removeRestoration.resetRestorationHistory();
 
     undoable(() => removeStore.$.rows.removeOne(7));
     await Promise.resolve();
     await Promise.resolve();
 
-    const removeTurn = removeTimeTravel.getTurns().at(-1) as {
+    const removeTurn = removeRestoration.getTurns().at(-1) as {
       __positionIds?: number[];
     };
     const removePositionId = removeTurn.__positionIds?.[0] as number;
@@ -4293,7 +4293,7 @@ describe('restoration enhancer', () => {
     );
     removeStore.redo();
     expect(removeStore.$.rows.ids()).toEqual([]);
-    expect(removeTimeTravel.getFrontier(removePositionId)).toBe(1);
+    expect(removeRestoration.getFrontier(removePositionId)).toBe(1);
   });
 
   it('routes public redo through turn frontiers for collection rekey while preserving SubjectId', async () => {
@@ -4305,12 +4305,12 @@ describe('restoration enhancer', () => {
       },
       { enhancers: [restoration()], capabilities: ['causal-runtime'] }
     );
-    const rekeyTimeTravel = (rekeyStore as any).__restoration;
+    const rekeyRestoration = (rekeyStore as any).__restoration;
 
     undoable(() => rekeyStore.$.rows.addOne({ id: 7, name: 'A' }));
     await Promise.resolve();
     await Promise.resolve();
-    rekeyTimeTravel.resetRestorationHistory();
+    rekeyRestoration.resetRestorationHistory();
 
     const beforeRekeyToken = rekeyStore.$.rows.byIdOrFail(7).name
       .__subjectIds?.[0] as number;
@@ -4318,7 +4318,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const rekeyTurn = rekeyTimeTravel.getTurns().at(-1) as {
+    const rekeyTurn = rekeyRestoration.getTurns().at(-1) as {
       __positionIds?: number[];
     };
     const rekeyPositionId = rekeyTurn.__positionIds?.[0] as number;
@@ -4328,7 +4328,7 @@ describe('restoration enhancer', () => {
     expect(rekeyStore.$.rows.byIdOrFail(42).name.__subjectIds?.[0]).toBe(
       beforeRekeyToken
     );
-    expect(rekeyTimeTravel.getFrontier(rekeyPositionId)).toBe(1);
+    expect(rekeyRestoration.getFrontier(rekeyPositionId)).toBe(1);
   });
 
   it('attaches one stable realization port per tree instance', () => {

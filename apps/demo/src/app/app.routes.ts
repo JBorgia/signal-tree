@@ -194,7 +194,7 @@ export const appRoutes: Route[] = [
       ).then((c) => c.SerializationDemoComponent),
   },
   {
-    path: 'time-travel',
+    path: 'restoration',
     loadComponent: () =>
       import(
         './examples/features/fundamentals/examples/restoration/restoration-demo.component'
