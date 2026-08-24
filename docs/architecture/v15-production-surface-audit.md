@@ -7016,6 +7016,131 @@ misattribution, and pass 1's `currentHydrateMode` claim now withdrawn by M6.
 5  RC / final closure
 ```
 
+# RELEASE-RESIDUE-0 — the debris sweep. FOUR live findings
+
+> **NULL: does the repository still contain any LIVE artifact that describes,
+> exposes, imports, tests, configures or implies a v15 mechanism that no longer
+> exists?**
+
+⚠️ **ORDERING CORRECTION.** Candidate B was frozen at `ca3663b4` and tagged before
+this pass was requested. That was the wrong order. This scan found live residue,
+so **B moves** — a frozen artifact with debris is worse than a freeze one commit
+later.
+
+Deliberately mechanical. Known-positive control on every zero (`undoable` appears
+in 75 files, so a zero elsewhere is a real zero).
+
+```text
+ZERO HITS   timeTravel, TimeTravel, causalMode, CausalWriteMode, 'authoring',
+            'realization', UpdateMetadata, getHistory(, resetHistory(,
+            historyEffect, StructuralHistoryEffect, isApplyingExternalState,
+            SHOW-, M6-, M7-PROBE
+TOMBSTONES  restorationEligibility (3), currentHydrateMode (6), pauseRecording,
+            transient — all documenting their own removal. KEPT.
+LIVE-VALID  `d.realize(ctx)` in single-pass-construction.spec.ts — an unrelated
+            local descriptor hook, not the deleted door
+```
+
+## FINDING 1 — a production guide taught THREE deleted mechanisms
+
+`docs/guides/time-travel-in-production.md`, current guidance, built around levers
+that no longer exist:
+
+```text
+§2   `entityMap({ recordHistory: false })`   DELETED in 15.0
+§4   `restoration({ shouldSkip })`           DELETED in 15.0
+"A starting configuration"                   used BOTH — the most copy-pasted
+                                             snippet in the guide
+the composition-patterns table               recommended them per row, including
+                                             "Yes — the headline pattern"
+```
+
+⚠️ And the mechanism by which it survived is the one predicted: **my own batch-4
+sweep renamed `timeTravel(` -> `restoration(` INSIDE these instructions**, so the
+file now taught `restoration({ shouldSkip })` — the new name carrying a dead
+option. A rename that touched the file and left the corpse.
+
+Corrected following the guide's own §3 convention (which already marked
+`pauseRecording()` struck-through and REMOVED): §2 and §4 marked removed with the
+opt-in replacement shown, the original §2 text preserved in a `<details>` block
+because its memory arithmetic is still the reason the lever existed, the starting
+configuration rewritten to what actually ships, and all five table rows
+re-pointed at `undoable()` / `external()`.
+
+## FINDING 2 — the root README taught two deleted levers as the answer
+
+> "If you just need undo over a big grid, `pauseRecording()` and
+> `restoration({ shouldSkip })` are the levers."
+
+Both deleted. Replaced with `undoable()`, which is what actually does that job.
+
+## ⚠️ FINDING 3 — THE README TAUGHT THREE SUBPATH IMPORTS, NONE OF WHICH RESOLVE
+
+```typescript
+import { SecurityValidator, SecurityPresets } from '@signaltree/core/security';
+import { createEditSession, createTreeEditSession } from '@signaltree/core/edit-session';
+import { createStorageAdapter, createIndexedDBAdapter } from '@signaltree/core/storage';
+```
+
+```text
+packages/core/package.json exports   { ".", "./package.json" }
+```
+
+`security` and `storage` were deleted in 15.0. **`edit-session` was never in the
+export map at all** — and it is LIVE CODE. So:
+
+```text
+createEditSession / createTreeEditSession   UNREACHABLE by any consumer
+EditSession.getEditHistory()                dead public surface — pass 2A renamed
+                                            something no consumer can call
+```
+
+The barrel's own comment says *"Moved to '@signaltree/core/edit-session' in v9.
+Import from there to reduce main bundle size"* — pointing at a subpath that does
+not exist.
+
+**Why no gate caught it.** `lint-readme-apis` validates symbols against BUILT
+ENTRY POINTS, and there are two (core, shared); an import from a path that is not
+an entry point is not checked against anything. `find-dead-exports` measures
+reachability from barrels and in-repo imports — edit-session's own specs import
+it, so it looks reachable. Neither gate asks *"is this reachable from a PUBLISHED
+entry point?"*
+
+```text
+FIXED     the README block, which no longer teaches unresolvable imports
+CARRIED   whether edit-session should be PUBLISHED or DELETED is a surface
+          decision, not residue cleanup. Recorded, not answered.
+NEW GAP   no gate checks documented-subpath-vs-export-map. Candidate for the
+          gate suite.
+```
+
+## FINDING 4 — an ORPHANED JSDoc block on a live public interface
+
+`TreeConfig` carried twenty lines of JSDoc for a `security` field — import
+instructions, a v11 migration note, two worked examples — and **the field itself
+was already gone with SEC-DEL.** Only the documentation survived, inside a live
+public type, describing a subpath that no longer resolves.
+
+Replaced with a short note recording what was there and why it went.
+
+## Classification — zero unexplained hits
+
+```text
+LIVE-VALID              1   (`d.realize(ctx)`, unrelated concept)
+INTENTIONAL-TOMBSTONE   4   restorationEligibility, currentHydrateMode,
+                            pauseRecording, transient
+DELETED / FIXED         4   the guide's three false levers, the README's two dead
+                            levers, the README's three unresolvable imports, the
+                            orphaned JSDoc
+CARRIED-WORKSTREAM      3   whole-array scoped undo -> RESTORE-P1
+                            149 uncoded throws -> error-taxonomy triage
+                            edit-session publish-or-delete -> surface decision
+```
+
+The two previously-carried items survive this scan **because they are explicitly
+carried**, not because the sweep missed them — which is what the stopping rule
+asked for.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus

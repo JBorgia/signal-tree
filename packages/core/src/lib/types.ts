@@ -660,27 +660,12 @@ export interface TreeConfig {
    */
   derived?: ($: never) => object;
 
-  /**
-   * Construction-time security validation, built with the `security()` helper
-   * from `@signaltree/core/security`. When present, its `validate()` runs
-   * synchronously during construction to reject prototype pollution, XSS, and
-   * function values.
-   *
-   * v11 change: pass `security: security(config)` (from the `/security`
-   * subpath), not a raw `SecurityValidatorConfig`. This keeps `SecurityValidator`
-   * (~2.4KB) out of every bundle that doesn't opt in.
-   *
-   * @default undefined (no security validation)
-   *
-   * @example
-   * ```ts
-   * import { signalTree } from '@signaltree/core';
-   * import { security, SecurityPresets } from '@signaltree/core/security';
-   *
-   * const tree = signalTree(state, { security: security({ preventXSS: true }) });
-   * const strict = signalTree(state, { security: security(SecurityPresets.strict().getConfig()) });
-   * ```
-   */
+  // RELEASE-RESIDUE-0: an ORPHANED JSDoc block sat here — twenty lines telling
+  // readers to `import { security, SecurityPresets } from
+  // '@signaltree/core/security'` and to pass `security: security(config)`. The
+  // FIELD it documented was already gone with SEC-DEL; only its documentation
+  // survived, inside a live public interface, describing a subpath that no
+  // longer resolves. The tombstone that matters is in `signal-tree.ts`.
 
 }
 

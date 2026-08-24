@@ -74,9 +74,11 @@ both wrong.
 
 This is the number to design against. It is bounded by three things you control:
 how many entries you keep, how wide the recorded state is, and how much of it each
-write changes. All three have levers — and `entityMap({ recordHistory: false })`
-removes the width term outright rather than shrinking it (measured flat at
-~0.15 MB across 1k, 10k and 50k).
+write changes. In 15.0 the width term is removed by DESIGNATION rather than by a
+per-marker option: state nobody designates with `undoable()` is never recorded, so
+it contributes nothing to the width. (The removed `recordHistory: false` lever
+measured flat at ~0.15 MB across 1k, 10k and 50k — the arithmetic below still
+describes what opt-in achieves.)
 
 ## Cost 3 — bundle. Real, and a separate question.
 
@@ -110,10 +112,29 @@ Verified: 20 writes against `maxHistorySize: 5` leaves 5 reversible turns and 5
 spendable undo steps. This is your direct control over the retained-turn half of
 history memory.
 
-### 2. Scope what is recorded — `recordHistory: false`
+### 2. ~~Scope what is recorded — `recordHistory: false`~~ — REMOVED in 15.0
 
-The lever no other Angular store has. A collection can persist and serialise
-while staying **out of the undo stack**:
+**This lever is gone, and opt-in designation replaced it.** `entityMap({
+recordHistory: false })` scoped recording by declaring which collections to leave
+OUT. 15.0 inverts that: nothing enters restoration history unless an operation is
+designated with `undoable()`, so a collection stays out of the undo stack by
+default and no per-marker option is needed.
+
+```ts
+// 15.0 — the collection is outside the undo stack because nothing designated it
+signalTree({ rows: entityMap({ selectId: (r: Row) => r.id }) },
+           { enhancers: [restoration()] });
+
+undoable(() => tree.$.draft.title.set('edited'));   // THIS is reversible
+tree.$.rows.setAll(serverRows);                     // this is not
+```
+
+The original text is kept below because the memory arithmetic it reports is still
+the reason the lever existed.
+
+<details><summary>as it read before 15.0</summary>
+
+A collection can persist and serialise while staying **out of the undo stack**:
 
 ```ts
 signalTree({
@@ -136,6 +157,8 @@ serialisation. Use it for genuinely derived or secret state.
 
 Arbitrary branches cannot be scoped yet — only markers. That is
 [RFC 0012](../rfcs/0012-history-scoped-marker-capture.md), accepted and deferred.
+
+</details>
 
 ### 2b. `form()` now records under `restoration()`, but scoped form history is still the better UI default
 
@@ -161,7 +184,7 @@ part of the app-wide history stream:
 
 ```ts
 signalTree({
-  rows: entityMap({ selectId: (r) => r.id, recordHistory: false }), // server-owned
+  rows: entityMap({ selectId: (r) => r.id }), // server-owned; nothing designates it
   profile: form({ initial: { name: '' }, history: history() }), // undoable, scoped
 }, { enhancers: [restoration({ maxHistorySize: 50 })] }); // covers plain branches only
 
@@ -203,19 +226,21 @@ redo → 28.
 transaction handle — see
 [history-the-greenfield-target.md](../architecture/history-the-greenfield-target.md).
 
-### 4. Drop uninteresting transitions — `shouldSkip`
+### 4. ~~Drop uninteresting transitions — `shouldSkip`~~ — REMOVED in 15.0
+
+**Gone, and for the same reason as lever 2.** `shouldSkip` filtered transitions
+AFTER they were recorded by default. Under opt-in designation a cursor move is
+never an undo step in the first place, because nobody designated it:
 
 ```ts
-restoration({
-  // a cursor move is not an undo step
-  shouldSkip: (prev, next) => prev.cursor !== next.cursor && prev.doc === next.doc,
-});
+// 15.0 — no predicate, and no per-write comparator cost
+tree.$.ui.cursor.set(next);              // not designated -> not an undo step
+undoable(() => tree.$.doc.body.set(v));  // designated -> one undo step
 ```
 
-Verified: ten cursor-only writes were all skipped, leaving history at 2 entries.
-
-⚠️ It runs on **every recorded write**, so compare the few fields you mean. A
-whole-state deep compare here undoes the saving.
+That also removes the cost warning this section used to carry: there is no
+comparator running on every recorded write, because there is no
+record-then-filter step.
 
 ## Composition patterns, and whether they hold up
 
@@ -224,11 +249,11 @@ whole-state deep compare here undoes the saving.
 
 | What you are building                                 | Pattern                                                                              | Supported                                                                                                                           |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Editor undo over a small document                     | `maxHistorySize` + `shouldSkip` for caret/selection                                  | Yes                                                                                                                                 |
+| Editor undo over a small document                     | `maxHistorySize`; designate document edits with `undoable()` and leave caret/selection undesignated | Yes                                                                                              |
 | Bulk-edit grid with cancel                            | `createTreeEditSession` (`@signaltree/core/edit-session`) — `commit()` or `cancel()` | Yes, and independent of `restoration`                                                                                                |
-| Undo one panel, not the whole app                     | `recordHistory: false` on everything outside the panel                               | Yes                                                                                                                                 |
-| Large server collection + small editable **branch**   | `entityMap({ recordHistory: false })` beside an undoable branch                      | Yes — the headline pattern                                                                                                          |
-| Large server collection + small editable **`form()`** | `entityMap({ recordHistory: false })` beside `form({ history: history() })`          | Yes. Prefer scoped form history when the form should undo independently; global `restoration()` also records direct form writes now. |
+| Undo one panel, not the whole app                     | designate only the panel's operations with `undoable()`                              | Yes                                                                                                                                 |
+| Large server collection + small editable **branch**   | apply the collection with `external()`; designate the branch's edits with `undoable()` | Yes — the headline pattern                                                                                                        |
+| Large server collection + small editable **`form()`** | `external()` for the collection beside `form({ history: history() })`                | Yes. Prefer scoped form history when the form should undo independently; global `restoration()` also records direct form writes now. |
 | Optimistic write, roll back on error                  | `undo()` in the error path, or `jumpTo(getCurrentIndex() - 1)`                       | Yes — only if nothing else recorded in between                                                                                      |
 | Import/generate, then one undo                        | —                                                                                    | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement                                               |
 | Audit trail rather than undo                          | `createAuditCallback()` or `getRestorationHistory()`                                            | Yes. **Not `createAuditTracker()`** — it samples on a 100 ms timer and drops write-then-revert pairs                                |
@@ -248,18 +273,23 @@ button looks dead, that is the bug.
 
 ```ts
 export const appTree = signalTree({
-  rows: entityMap({ selectId: (r: Row) => r.id, recordHistory: false }),
+  rows: entityMap({ selectId: (r: Row) => r.id }),
   draft: { title: '', body: '' },
   ui: { cursor: 0, hovered: null as string | null },
-}, { enhancers: [restoration({
-    maxHistorySize: 50,
-    shouldSkip: (prev, next) => (prev as State).draft === (next as State).draft,
-  })] });
+}, { enhancers: [restoration({ maxHistorySize: 50 })] });
+
+// Only designated operations are reversible.
+undoable(() => appTree.$.draft.title.set(title));
+
+// Neither of these enters the undo stack — no option required.
+appTree.$.ui.cursor.set(next);
+external(() => appTree.$.rows.setAll(serverRows));
 ```
 
-Fifty steps over a small draft, a large collection deliberately outside the undo
-stack, and cursor churn dropped. Retention is 50 entries over a narrow branch —
-kilobytes, not megabytes — and recording is flat in state size.
+Fifty steps over designated draft edits. The large collection and the cursor churn
+are outside the undo stack because nothing designated them — which is what
+replaced the two removed levers above. Retention is 50 entries over a narrow
+branch: kilobytes, not megabytes.
 
 ## See also
 
