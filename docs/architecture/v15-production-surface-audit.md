@@ -7766,6 +7766,152 @@ has no path notifier wired, not because no write occurred. **Same trap the
 `asyncSource` probe fell into twice.** `restoration()` was added so the notifier is
 live, and the comment says why, so a future zero there means something.
 
+# A2-3 — SETTLEMENT. Per-node composition FAILS; the claimant must be the tree
+
+`a2-3-settlement-placement.spec.ts`. The persister used is deliberately minimal:
+it observes writes through the public notifier and routes every durable write
+through `scheduleDurableConsequence` — **no transaction inspection anywhere**,
+which is the condition the placement had to satisfy.
+
+```text
+arm B  claimant = the LEAF NODE      duringPending "dark"   ⚠️ SPECULATIVE LEAK
+arm C  claimant = the TREE           duringPending "light"  ✓ deferred
+arm C2 confirm                       "light" -> "dark"      ✓
+CONTROL ordinary authored write      persists immediately   ✓
+```
+
+## Why arm B fails, and it is not the authority's fault
+
+`resolveScopeKey` resolves a per-tree scope via
+`getPositionRegistry(candidate.$ ?? node)`. **A leaf node carries no registry and
+has no `.$`**, so no scope resolves, `hasOpen()` is false, and the durable write
+runs immediately — leaking the speculative value into storage during a pending
+transaction.
+
+The authority answered correctly; it was asked a question a leaf cannot answer.
+
+> **A2-B collapses into A2-C.** `persist(tree.$.theme, { key })` cannot obey
+> settlement from the node alone, so a compositional design needs the tree
+> anyway — at which point it IS a tree-scoped capability wearing a per-node
+> signature.
+
+## ⚠️ SECOND FINDING — deferral alone is insufficient
+
+Arm C defers correctly, and then this happened:
+
+```text
+durable writes, in order:  ['dark', 'light']
+final store:               'light'   (correct)
+```
+
+The deferred speculative write STILL RAN after settlement, and was then
+overwritten by the compensation. Final state is right, but **storage transiently
+held rolled-back data**, and a crash in that window leaves durable truth holding
+speculative state.
+
+`stored()` does not have this hazard: it CANCELS pending writes on the discard
+outcome (`cancelPending`) rather than merely re-ordering them. So:
+
+> A persister needs the settlement **OUTCOME** — confirmed vs discarded — not just
+> permission to run. Any A2 surface that only asks "may I run now?" reproduces
+> this hazard.
+
+That is a genuine constraint discovered by measurement, and it raises the bar for
+the write side: the capability must observe settlement resolution, which is
+another reason the owner is tree-scoped.
+
+## Standing after A2-1, A2-1B, A2-3
+
+```text
+A2-A  marker        weakened. Owns no construction capability for sync sources
+                    (A2-1), cannot accept async sources at all (A2-1B).
+A2-B  per-node      ELIMINATED. Cannot obey settlement from a leaf.
+A2-C  tree-scoped   the only placement that satisfies settlement, and the only
+                    one positioned to observe the discard outcome.
+```
+
+A2-4 now asks whether that same tree scope is also the right owner for the host
+drain across MULTIPLE persisted leaves — or whether production needs something
+wider.
+
+# A2-4 — DRAIN OWNERSHIP: tree-scoped works, and the drain is not an override
+
+`a2-4-drain-ownership.spec.ts`, two persisted leaves, because one cannot
+discriminate the three ownership candidates.
+
+```text
+one host invocation, two armed writes    both drained          ✓
+host backgrounds MID-TRANSACTION         nothing durable       ✓
+two independent trees                    each drains its own   (see below)
+```
+
+## The drain must route through the SAME authority
+
+The second case is the one worth keeping. A host backgrounding mid-transaction is
+the worst possible moment for a naive drain: the app is about to stop, so a
+speculative value written durably may never be corrected — there may be no
+rollback at all.
+
+Routing the drain through `scheduleDurableConsequence` rather than writing
+directly means **the host cannot override settlement.** Nothing became durable,
+and the rollback then discarded the value as normal.
+
+## Cross-tree drain: left OPEN, deliberately
+
+A tree-scoped drain reaches one tree. Whether that is a defect depends on whether
+production needs ONE host event to drain MULTIPLE trees, and **TruckTrax does not
+demonstrate it** — its single drain call site backgrounds one app tree. So a
+process-global drain remains unjustified on the evidence, exactly as the
+pre-registration required.
+
+# ⚠️ NOTIFIER-SCOPE-0 — a defect A2-4 walked into, and it is NOT persistence's
+
+A2-4's control originally used the path `theme` in BOTH trees, and failed:
+`storeA` received tree B's value. Reduced:
+
+```text
+same path, SAME tick, two trees    ONE event delivered — 'theme=B1'.
+                                   Tree A's write NEVER reached the stream.
+same path, SEPARATE ticks          both delivered
+DIFFERENT paths, same tick         both delivered
+```
+
+**The path notifier coalesces by PATH STRING within a flush, with no tree
+qualification.** Two independent trees writing the same path in one tick produce
+one notification, and the earlier write is invisible to every `**` observer.
+
+Who is exposed: anything observing the global stream rather than its own tree's
+interceptors — the **diagnostic journal** (which would record one effect and
+attribute the wrong tree's value), **devTools**, and any future capability built
+on `subscribe('**')`. Restoration and transactions are largely insulated because
+they capture through per-tree leaf interceptors.
+
+```text
+CARRIED, not fixed here. This is a shared-observation-seam defect that A2 merely
+walked into — the same shape as the whole-array scoped undo that MATRIX-CLOSE
+carried to RESTORE-P1. Fixing it means tree-qualifying notifier identity, which is
+not persistence's job and must not expand A2 into a notifier redesign.
+```
+
+Its severity depends on how common multi-tree apps with colliding paths are —
+plausible for per-route trees, all of which might have a `loading` or `theme`
+leaf. That assessment is owed before RC.
+
+# A2 — standing after 1, 1B, 3, 4
+
+```text
+A2-A  marker        owns no construction capability for sync sources; cannot
+                    accept async sources at all
+A2-B  per-node      ELIMINATED — cannot obey settlement from a leaf
+A2-C  tree-scoped   satisfies settlement, drains multiple leaves from one call,
+                    and keeps the host from overriding settlement
+```
+
+Owed before A2 closes: **A2-2** (live reload reaches external/realized through
+the proposed surface) and **A2-5** (teardown matches PER-B P11), plus the
+constraint A2-3 discovered — the capability must observe the settlement OUTCOME
+and cancel discarded writes, not merely defer them.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
