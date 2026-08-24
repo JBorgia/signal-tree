@@ -1,3 +1,4 @@
+import { definePositionRegistry } from '../internals/position-registry';
 import { computed, Signal } from '@angular/core';
 
 import { createEntitySignal } from '../entity-signal';
@@ -281,6 +282,16 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
             hasRestorationAuthority:
               context.runtimeTreePlan.hasRestorationAuthority,
           }
+        );
+
+        // OWNER-LOCATION-0. Same reason as `stored()`: a marker builds its own
+        // node, so the registry the leaf/branch sites attach in
+        // `signal-tree.ts` never reaches it. A collection is an addressable
+        // position — positionId, ownerPath, and restoration reverses it
+        // independently — and must be able to name its owning tree.
+        definePositionRegistry(
+          entitySignal as unknown as object,
+          context.positionRegistry
         );
 
         // Register as a reclamation target, but ONLY when something in this
