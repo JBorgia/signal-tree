@@ -320,7 +320,8 @@ function createEqualityFn(useShallowComparison: boolean) {
 function makeNodeAccessor<T>(
   store: TreeNode<T>,
   ownerPath?: string,
-  positionIds?: readonly number[]
+  positionIds?: readonly number[],
+  registry?: PositionRegistry
 ): NodeAccessor<T> {
   // Declared as a METHOD SHORTHAND, not `function () {}`, and this is
   // load-bearing. A node carries the user's state keys as its own enumerable
@@ -388,6 +389,16 @@ function makeNodeAccessor<T>(
 
   if (ownerPath !== undefined) {
     defineOwnedOwnerPath(accessor as object, ownerPath);
+  }
+
+  // A BRANCH is a location too. The ownership correction reached `tree`,
+  // `tree.$` and leaves; an intermediate accessor was the one class left
+  // unable to name its owner, which made `getPositionRegistry(tree.$.settings)`
+  // undefined while both the leaf under it and the root above it answered.
+  // Measured by LINK-1 case 1, where branch is a valid X.
+  if (registry) {
+    definePositionRegistry(accessor as object, registry);
+    defineOwnedOwnerId(accessor as object, registry.id);
   }
 
   return accessor;
@@ -1134,7 +1145,12 @@ function createSignalStore<T>(
           : key
         : ''
     );
-    store[key] = makeNodeAccessor(nested, childPath, getChildPositionIds());
+    store[key] = makeNodeAccessor(
+      nested,
+      childPath,
+      getChildPositionIds(),
+      materializationContext.positionRegistry
+    );
   }
 
   // Register as memoisable. Only stores built here are reactive all the way

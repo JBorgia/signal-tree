@@ -8541,6 +8541,140 @@ That is RESTORE-P0 P0-C, and it is the one measured place where the ingress
 classification changes an outcome. It is why PUSH-IN must go through `external()`
 even though the transaction arm cannot tell the difference.
 
+# LINK-1 — a bidirectional, asynchronous, disposable relationship. 15/15
+
+`packages/core/src/lib/link-1-relationship.spec.ts`. The question LINK-0 could
+not answer: **can one tiny relationship primitive stay correct when the
+relationship is genuinely bidirectional, asynchronous and disposable, without
+rebuilding the policies we deliberately removed?** Measured answer: yes.
+
+Cases 3–5 are properties OF A RELATIONSHIP, so the spec carries a TEST-LOCAL
+REFERENCE HARNESS — `makeLink`, not an export, whose only privilege is using
+core internals exactly as a core `link()` would. Nothing named `link()` ships.
+
+## Mutation check first, because a harness that passes immediately is not evidence
+
+```text
+remove self-echo correlation check     2 failed  ✓
+remove outbound serialization          1 failed  ✓
+remove disposed guard inside run()     1 failed  ✓
+remove ownership acceptance check      2 failed  ✓
+remove disposed guard after get()      15 passed ⚠️ redundant, not vacuous — the
+                                       `acquire` guard covers both inbound entry
+                                       points, so either alone sufficed.
+                                       Removing BOTH fails the test. The
+                                       redundant check was deleted.
+```
+
+## Case 1 — and it found the last unowned location class
+
+The acceptance predicate is the one the ownership correction made possible:
+`getPositionRegistry(X) !== undefined` plus writability.
+
+```text
+tree (callable root)   registry YES   callable   -> ACCEPTED
+tree.$                 registry YES   NOT callable, NOT settable
+                                                 -> a NAMESPACE, not a location
+branch accessor        registry no -> YES        -> ⚠️ FIXED, see below
+leaf                   registry YES   .set       -> ACCEPTED
+bare signal('foo')     registry no    .set       -> REFUSED
+computed               registry no    no set     -> REFUSED
+```
+
+Two results worth carrying:
+
+**The root location is `tree`, not `tree.$`.** `tree.$` resolves a registry but
+is neither callable nor settable. Any `link(x, y)` documentation must say `tree`.
+
+**⚠️ Branch accessors had no owner identity.** The ownership correction reached
+`tree`, `tree.$` and leaves; `makeNodeAccessor` was the one class left out, so
+`getPositionRegistry(tree.$.settings)` was undefined while both the leaf under it
+and the root above it answered. Fixed at its single construction site. The
+invariant is now complete: **every SignalTree location names its owning tree.**
+
+And a bare `WritableSignal` being refused is the case a `WritableSignal<T>` type
+bound would have wrongly admitted — it has a setter but no owner, so no
+settlement authority and no location identity.
+
+## Cases 3 & 4 — echo suppression must be LINK-LOCAL, and that is falsifiable
+
+```text
+value acquired through L        does NOT leave through L      ✓
+authored write on same location DOES leave                    ✓ control
+Y1 --L1--> X                   DOES reach Y2 through L2       ✓
+```
+
+The third arm is what makes this a design constraint rather than a preference.
+Suppressing by PROVENANCE — "external writes never go outbound" — passes the
+first two and silently desynchronises Y2 from truth Y1 supplied. Only a
+link-local correlation gets all three right.
+
+The mechanism already exists: `WriteMetadata.correlationId` survives to the
+subscriber alongside `origin`, `participation` and `ownerId` (measured). But
+`external()`, the public ingress door, does not accept one — so
+`withWriteContext` is required, which means **a correct two-way link must be
+core, not user-land.** That is an argument for `link()` existing, produced by
+measurement rather than by preference.
+
+## Case 5 — order, not a clock
+
+```text
+committed A then B, endpoint takes 50ms for A and 5ms for B
+serialized      Y ends at ['A','B'], last value === X          ✓
+unserialized    Y ends at ['B','A'], Y holds A while X is B     ✓ control
+```
+
+⚠️ This is NOT a debounce. There is no clock window and no interval in which
+committed state is deliberately not durable — only consequence ORDER is
+preserved. Coalescing waiting writes would be an optimisation on top of this
+contract, not a different one.
+
+## Case 6 — the minimum failure contract, and deliberately the whole of it
+
+```text
+rejected set        captured; NO unhandled rejection                 ✓
+the tree            UNMOVED — a failed egress does not un-author X   ✓
+after a rejection   a later write still goes out; the chain is not
+                    wedged forever                                   ✓
+```
+
+No retry, no backoff, no error signal, no status. Those are what `loader()` was.
+The only thing an automatic async link owes is that it must not manufacture
+invisible unhandled rejections.
+
+## Case 2 — dispose() stops NEW activity and claims nothing more
+
+```text
+X no longer reaches Y                                    ✓
+Y no longer reaches X                                    ✓
+a get() resolving AFTER dispose() does not resurrect X    ✓
+an outbound consequence HELD at dispose time, released by a later
+  settlement, does NOT escape                            ✓
+CONTROL: without dispose() that same held write DOES escape ✓
+```
+
+An in-flight `get()` is not cancelled — it cannot be, unless Y supports
+cancellation. The guarantee is that its RESULT is not applied. SignalTree
+promises no new link activity, not retraction of an effect that already escaped.
+
+## What LINK-1 changes about the disposition
+
+```text
+loader()        DELETE — PULL plus orchestration that is not SignalTree's
+asyncSource()   DELETE — PUSH-IN plus stream orchestration
+stored()        link(leaf, keyValueEndpoint) + debounce + init convenience
+persistence()   link(root, serializedEndpoint) + autosave policy
+link(x, y)      CANDIDATE SURVIVOR, and now with a measured contract
+```
+
+The harness needed no new causal machinery. It used ownership qualification,
+`withWriteContext`, `scheduleDurableConsequence` with X ITSELF as claimant
+(possible only since the ownership correction), run-time capture from A2-3.1,
+and a promise chain. Every one of those was earned separately for another reason.
+
+`retrieve()` stays EXPLICIT. Nothing in the lineage has earned automatic initial
+retrieval as fundamental behaviour.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
