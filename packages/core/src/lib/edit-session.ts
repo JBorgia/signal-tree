@@ -4,6 +4,20 @@ import { signal, WritableSignal } from '@angular/core';
 
 import { deepEqual } from './utils';
 
+/**
+ * An edit session's own past/present/future stacks.
+ *
+ * MATRIX-CLOSE M3: this is NOT restoration history, and the accessor is
+ * `getEditHistory()` rather than `getRestorationHistory()` for that reason. An
+ * edit session is a draft over a pair of plain signals — it never touches the
+ * causal runtime, restoration claims, causal turns or designation, and its
+ * `undo()` walks these local stacks rather than the restoration authority's.
+ *
+ * SEMANTICS-NAMES-1 batch 3 renamed this accessor to `getRestorationHistory()`
+ * by sweeping `getHistory` repo-wide, which handed a scratchpad the authority's
+ * vocabulary — precisely the "name implies an ownership the code does not have"
+ * error that batch corrected elsewhere. Reverted here to a session-scoped name.
+ */
 export type UndoRedoHistory<T> = {
   past: T[];
   present: T;
@@ -22,7 +36,7 @@ export interface EditSession<T> {
   undo(): void;
   redo(): void;
   reset(): void;
-  getRestorationHistory(): UndoRedoHistory<T>;
+  getEditHistory(): UndoRedoHistory<T>;
 }
 
 /** @internal Dev dedupe for ST2028 — one report per session, not per clone. */
@@ -225,7 +239,7 @@ export function createEditSession<T>(initial: T): EditSession<T> {
     updateCounts();
   }
 
-  function getRestorationHistory(): UndoRedoHistory<T> {
+  function getEditHistory(): UndoRedoHistory<T> {
     return {
       past: past.map((p) => clone(p)),
       present: clone(present()),
@@ -244,7 +258,7 @@ export function createEditSession<T>(initial: T): EditSession<T> {
     undo,
     redo,
     reset,
-    getRestorationHistory,
+    getEditHistory,
   };
 }
 

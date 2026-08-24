@@ -119,8 +119,28 @@ export interface WriteMetadata {
   participation?: WriteParticipation;
   /** @internal Canonical structural collection effect produced at mutation time. */
   structuralEffect?: StructuralEffect;
-  /** Open extension for guardrails' historical custom-key shape. */
-  [key: string]: unknown;
+  // MATRIX-CLOSE M7 — THE ESCAPE HATCH IS DELETED.
+  //
+  //     /** Open extension for guardrails' historical custom-key shape. */
+  //     [key: string]: unknown;
+  //
+  // Three facts, in order of weight:
+  //
+  // 1. It was ACTIVELY HARMFUL. This is the mechanism that let SEMANTICS-NAMES-1
+  //    batch 1's stale `meta.source` reads keep compiling after the field was
+  //    renamed — every one of them typechecked as `unknown`. Withdrawing the
+  //    signature is what forced the compiler to enumerate all 24 readers, and
+  //    leaving it in place means the next rename can hide the same way.
+  // 2. NOTHING NEEDS IT. Compiler-verified rather than grepped: with the
+  //    signature withdrawn, `npm run typecheck` passes across every package and
+  //    the demo (`packages/*/src/**` + `apps/demo/src/**`).
+  // 3. Its justification names a package that no longer exists — guardrails was
+  //    removed in a4bc5493. The hatch outlived its only stated consumer.
+  //
+  // Per MATRIX-CLOSE's own rule, an open extension nobody uses is UNPROVEN, not
+  // PUBLIC. A third-party enhancer that genuinely needs to carry custom keys can
+  // earn a declared field the way `'transaction-rollback'` earned its origin
+  // value: by producing a consumer.
 }
 
 export interface WriteAttribution {
