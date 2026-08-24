@@ -6070,6 +6070,122 @@ enhancer-safety.spec.ts   the mock-`.with()` harness-validity item
 6  RC / final closure
 ```
 
+# MATRIX-CLOSE — PRE-REGISTERED. A residue audit, not a design round
+
+> **NULL: can every remaining causal / restoration / transaction / diagnostic
+> concept be assigned ONE owner, ONE semantic dimension and the MINIMUM necessary
+> primitive, with no public or internal residue implying authorities or
+> capabilities that no longer exist?**
+
+The work gets SMALLER here. No abstraction may be introduced to make the table
+symmetric.
+
+## The matrix
+
+```text
+FUNCTION | OWNER | PUBLIC NEED | MINIMUM PRIMITIVE | CURRENT FORM | DISPOSITION
+```
+
+```text
+CORE-INTERNAL            the library needs it; nobody outside calls it
+FIRST-PARTY ENHANCER     an enhancer owns it; core does not
+THIRD-PARTY AUTHORING    someone outside this repo demonstrably needs to call it
+```
+
+> **Only DEMONSTRATED third-party authoring need justifies a public primitive.
+> "Might be useful" is UNPROVEN, not PUBLIC.**
+
+## Falsifier classes, searched for BEFORE looking at names
+
+```text
+M1   policy derived from origin — `origin === 'external'` deciding
+     participation or restoration behaviour
+M2   positive metadata with zero consumers
+M3   owner-implying names across authority boundaries ("history", "restore",
+     "transaction", "source" where that subsystem does not own the behaviour)
+M4   mock-only public API
+M5   nonexistent APIs in prose, docs and examples
+M6   green tests because the intended metadata DISAPPEARED — proof must fail when
+     the mechanism is removed, not merely stay green because nothing is observed
+M7   permissive / index-signature typing hiding stale names or stale reads
+M8   generic residue words — system / history / state / source / mode where the
+     code means something more precise
+M9   duplicated causal concepts — two primitives, enums, channels or names
+     carrying the same authority or policy
+M10  a hidden SECOND authority — anything besides restoration() deciding
+     restoration rights, anything besides transactions() deciding settlement
+M11  TRANSPORT-SPECIFIC CAUSAL POLICY — storage / HTTP / worker / socket /
+     adapter branches that change causal semantics with no demonstrated
+     authority difference
+```
+
+**M11 is new, and PER-B earned it.** The same authoritative value behaved
+differently purely because it crossed localStorage rather than HTTP, and fixing
+one classification erased the difference entirely. Any remaining version of that
+mistake is the highest-value thing this audit can find.
+
+## Proof standard — three answers per surviving primitive
+
+```text
+WHAT behaviour does this primitive enable?
+WHY is this a distinct semantic dimension?
+WHAT TEST FAILS if this exact mechanism is removed while incidental behaviour
+     remains?
+```
+
+The third is the one that matters. This release has repeatedly found tests green
+for a reason other than the intended one — TURN-FEED-0's unsubscribed channel,
+DEVTOOLS-JUMP-0's dropped `transactionId`, the `apply` credit that was never
+isolated. A primitive whose removal breaks nothing is residue no matter how
+sensible it reads.
+
+## Method
+
+```text
+COMPILER-DRIVEN where possible   temporarily narrow or remove a permissive type
+                                 or index signature and let TypeScript enumerate
+                                 the stale consumers. Batch 1 proved textual
+                                 search cannot see through `[key: string]:
+                                 unknown`.
+KNOWN-POSITIVE CONTROL on every  a zero-match grep is not evidence unless
+zero-match grep                  something proves the grep can find anything.
+                                 Paid for once already.
+```
+
+## Start with the carried residue, at the TOP rather than inside a global grep
+
+```text
+1  enhancer-safety.spec.ts's mock `.with()`
+   Harmless fixture vocabulary, a masked nonexistent public method, or a
+   weakened harness? MATRIX-CLOSE material either way — it is precisely a
+   harness-validity / public-surface residue (M4).
+
+2  whole-array scoped undo diagnosis ("Unsupported scoped undo effect at rows")
+   CLASSIFY BEFORE FIXING. Is this stale vocabulary caused by the architectural
+   closure, or an independent restoration capability limitation? If the latter,
+   record it and do NOT let MATRIX-CLOSE expand into RESTORE-P1.
+```
+
+## Expected shape of the outcome
+
+```text
+PUBLIC PRIMITIVES        undoable() external() transaction() restoration()
+                         devTools() … and only what independently earned a
+                         third-party authoring need
+INTERNAL DIMENSIONS      origin, participation, transactionId, restoration
+                         designation / provenance, diagnostic sequencing … each
+                         with NAMED consumers
+REJECTED RESIDUE         [item] — no consumer / wrong owner / stale vocabulary /
+                         harness artifact
+CARRIED NON-MATRIX       [item] — real, but architecturally orthogonal
+```
+
+## Stopping rule
+
+> **Complete when every surviving concept has an owner, a consumer, a semantic
+> dimension and a falsifiable proof — and every unexplained residue is either
+> DELETED or explicitly CARRIED outside the matrix.**
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
