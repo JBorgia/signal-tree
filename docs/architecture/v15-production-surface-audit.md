@@ -8006,6 +8006,113 @@ in retention form. Retention is measured on a payload object written into the
 state instead — the technique F6 already uses, which also makes the two results
 directly comparable.
 
+# A2-4.2 — the OTHER drain, and it is the one that decides the freeze
+
+`packages/core/src/lib/markers/a2-4-2-marker-drain-settlement.spec.ts`, 3/3.
+
+A2-4.1 measured the enhancer's drain. This measures the marker's — the one
+TruckTrax actually calls from Capacitor's pause hook — and they are not symmetric:
+
+```text
+__flushAutoSave         serializes the TREE AS IT STANDS      writes 'doomed'  ✗
+flushAllStoredSignals   drains `pendingStoredWrites`, and the ONLY path into
+                        that set is `saveCommitted`, reached only from inside a
+                        durable consequence's `run`                            ✓
+```
+
+So the marker's drain is settlement-safe **by construction rather than by
+checking**: there is no ordering in which it can be asked the wrong question.
+Three arms — an ordinary pending write IS drained, a speculative one is
+unreachable, and confirm-then-drain persists — so the safe result is not a drain
+that simply never writes.
+
+One measured surprise, better than the prediction: after the rollback the drain
+DOES write, because the compensation is itself a marker write that arms its own
+consequence. Storage converges on committed truth rather than merely avoiding
+the speculative value. The invariant is stated over every write ever made.
+
+# A2-C SURFACE FREEZE
+
+## What A2 settles
+
+```text
+PLACEMENT   a TREE-SCOPED ENHANCER, and it already ships as `persistence()`.
+            A2-A falsified (A2-1, A2-1B), A2-B falsified (A2-3 arm B), the
+            post-construction form of A2-C falsified (A2-3.1 Finding 2).
+FIXED       persistence().load() now classifies as external/realized  (A2-2)
+NOT ADDED   per-leaf selection/keying on `persistence()`. It would duplicate
+            what `stored()` already does correctly, and "might be useful" is
+            UNPROVEN, not PUBLIC.
+NOT ADDED   any new durability primitive. A2 designed nothing; it measured.
+```
+
+## The one gap A2 leaves open on the enhancer
+
+```text
+persistence() HAS NO PUBLIC DRAIN.
+  `__flushAutoSave` is underscore-prefixed, typed optional, documented "for
+  testing", and settlement-unsafe (A2-4.1, tripwired). A public drain must be
+  routed through `scheduleDurableConsequence` — which also decides what it
+  returns and what a host may await, so it is one decision, not a rename.
+```
+
+TruckTrax does not need it: its single drain call site is
+`flushAllStoredSignals`, which is already correct. So this is a completeness gap
+in the enhancer, not a migration blocker — and under the standing rule it needs
+a demonstrated need before it becomes public surface.
+
+## ⚠️ What A2 CANNOT settle, and must not decide by itself
+
+The freeze runs into a recorded prior decision, `c53aa416` (2026-08-21, *"remove
+stored marker from public rc surface"*), which unexported `stored`,
+`createStorageKeys`, `clearStoragePrefix`, `flushAllStoredSignals` and their
+types, and swept them out of the README, `docs/ai/LLM.md`, both persistence
+guides and the demo. TT2 already recorded it, with the disposition text from
+`check-rc-public-dispositions.mjs`: *"NOT EARNED as RC public API; consequence
+ordering fix is not survival proof."*
+
+A2's evidence cuts BOTH ways and is now on the record for whoever decides:
+
+```text
+AGAINST re-export   A2-1/A2-1B: construction materialisation is NOT a unique
+                    marker capability — reading synchronous storage before
+                    construction reaches the identical result with no API.
+FOR re-export       A2-4.2: `flushAllStoredSignals` is settlement-safe BY
+                    CONSTRUCTION, which `persistence()`'s drain is not; and
+                    per-leaf KEYING is something `persistence()` structurally
+                    cannot express (one key, whole tree).
+```
+
+TruckTrax imports `stored` and `flushAllStoredSignals` from `@signaltree/core`
+in four files. Under the constraint that no migration may depend on anything the
+frozen surface does not explicitly support, **TT3 cannot proceed on the seven
+persisted leaves until this is decided either way.** The options are: re-export
+the pair, or write the whole-tree `persistence()` migration recipe and accept
+that seven storage keys become one for a shipped app.
+
+# DOCUMENTED-SYMBOLS — the symbol-level gate, earned mid-freeze
+
+Checking whether `stored` was exported found that core's barrel still ADVERTISED
+it. `c53aa416` swept every consumer-facing document and missed the barrel's own
+`PUBLIC API SUMMARY`; `serialization` had been advertised-but-unexported since
+before Candidate A. Every gate stayed green, because:
+
+```text
+lint-readme-apis          reads READMEs, not source barrels
+check-documented-imports  checks SPECIFIERS, not names
+find-dead-exports         checks the other direction
+```
+
+`tools/check-documented-symbols.mjs` closes it, wired as two gate rows
+(`documented-symbols` + self-test). Scope is deliberately just the API-SUMMARY
+bullet list — barrel comments legitimately discuss internal and deleted symbols,
+and a gate that fires on those gets ignored. Two live defects removed.
+
+Its own first version failed for a reason worth keeping: a doc comment
+containing `packages/*` + `/src` closed the block comment early. The self-test
+caught it via the gate runner, not the direct invocation — the direct run had
+happened before the comment was added.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus

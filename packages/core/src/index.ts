@@ -298,21 +298,27 @@ export { devTools } from './enhancers/devtools/devtools';
 // ============================================
 
 /**
- * SignalTree Core API Summary (v9):
+ * SignalTree Core API Summary (15.0):
+ *
+ * ⚠️ This list is a CLAIM OF PUBLIC API and is gated as one
+ * (`documented-symbols` in tools/verify-gates.mjs). Two entries survived their
+ * own removal here and nothing caught it: `c53aa416` ("remove stored marker
+ * from public rc surface") swept the READMEs, guides and demo but left
+ * ``- `stored(key, default)` `` in this summary, and `serialization` stopped
+ * being exported before Candidate A while still being advertised. Adding a
+ * bullet for something this file does not export now fails the gate.
  *
  * **Main Factory:**
  * - `signalTree(state, config?)` - Create a reactive signal tree
  *
  * **Markers (things Angular doesn't have):**
  * - `entityMap<T, K>()` - Normalized collections
- * - `stored(key, default)` - localStorage persistence
  *
  * **Enhancers (one function each):**
  * - `batching(config?)` - Batch CD notifications
  * - `restoration(config?)` - Undo/redo
  * - `transactions()` - Optimistic transaction rollback without undo/redo history
  * - `devTools(config?)` - Redux DevTools integration
- * - `serialization(config?)` - State serialization
  * - `persistence(config?)` - State persistence
  *
  * **Derived State:**
