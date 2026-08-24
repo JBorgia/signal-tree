@@ -4041,6 +4041,108 @@ Still owed by JOURNAL-1: F3-F7 (no restoration rights, no ownership, the
 reclamation comparison, eviction, no live handles) — which need an actual bounded
 journal to measure.
 
+# DIAG-JOURNAL-1 · F3-F7 — the contract holds, and it produced one missing fact
+
+The smallest bounded internal journal now exists
+(`internals/diagnostics/diagnostic-journal.ts`): two retained streams, one
+monotonic sequence, values retained AS OBSERVED rather than cloned, disposable.
+No public API and no schema commitment.
+
+```text
+F3  no restoration rights          HOLDS
+F4  no SignalTree ownership        HOLDS
+F4b disposal ends observation      HOLDS
+F5  reclamation identical ON/OFF   HOLDS
+F6  bounded eviction releases      HOLDS  (own gate, --expose-gc)
+F7  no live handles retained       HOLDS
+```
+
+## Every arm carries a positive control
+
+"OFF equals ON" is vacuously true for a journal that observed NOTHING — and a
+silently-inert observer is precisely the defect TURN-FEED-0.2 found one layer
+down. So each ON arm also proves the journal recorded the occurrence whose
+ownership is being compared: paths for F3, a transaction id for F4, subject ids
+for F5. **An equality result is only evidence if the observer could have been the
+thing that broke it.**
+
+## F5 is the one that matters
+
+```text
+add 'a' -> remove 'a' -> push the removal out of the retention window
+```
+
+The journal holds a description of that subject's add and remove for the whole
+run. `claimedWhileRestorable` true, `claimedAfterEviction` false, `stillRetired`
+false — identical to the no-journal arm. Describing a subject confers no
+retention right.
+
+## F6 needed THREE arms, and the first version was wrong
+
+The first attempt used `undoable()` writes and failed: the payload survived
+eviction. That was the TEST, not the product — a designated write is retained by
+restoration history, which legitimately holds the value and has nothing to do
+with the journal. Two arms cannot tell "the journal still holds it" from
+"something else does".
+
+```text
+A  no journal          payload DIES    nothing else retains it
+B  journal, retained   payload LIVES   the journal really holds it
+C  journal, evicted    payload DIES    the bound is real
+```
+
+A second wrong turn is recorded in the file: arm B first measured ZERO retained
+turns on a bare tree, because the path notifier — the journal's observation seam
+— is not wired without enhancers. That was the journal seeing nothing, not the
+journal releasing something.
+
+`poolOptions.forks.execArgv` was tried first for the `--expose-gc` flag and
+**silently did nothing on vitest 4**, which is the same shape as everything else
+this release has been finding, so it is not used. F6 runs as its own gate
+(`journal-retention`, 36/36) with the flag via `NODE_OPTIONS`, and FAILS rather
+than skipping without it — self-tested by running the gate bare. A skipped
+retention test reads as evidence in a green run.
+
+## ⚠️ THE MISSING FACT — the compensation turn has no correlation
+
+Measured, and it is the result the owner anticipated:
+
+```text
+turn 1   speculative    transactionId 1,  origin -,  participation -
+tx 1     rolled-back
+turn 2   compensation   transactionId -,  origin -,  participation realized
+```
+
+**A diagnostic reader cannot say turn 2 is the compensation for transaction 1.**
+Its only distinguishing fact is `participation: 'realized'`, which it shares with
+external truth and with restoration. The only remaining way to correlate it is
+temporal adjacency — "it came after the rolled-back event" — which is exactly the
+incidental-correctness trap this workstream keeps finding.
+
+This is the same SHAPE as DIAG-JOURNAL-0's case 7, where a restoration was
+indistinguishable from external truth and was fixed by giving it a positive
+origin. And it names the value the naming grid deliberately left open:
+
+```text
+grid, SEMANTICS-NAMES-1   'transaction-rollback' — OPEN, pending a consumer audit
+DIAG-JOURNAL-1            here is the consumer
+```
+
+Recorded as one missing fact and a narrow seam, NOT implemented here: adding an
+origin is a metadata-surface decision, and the grid's own rule is that a positive
+origin exists only where a consumer needs it. There is now exactly one.
+
+## Disposition
+
+**A — the contract holds as stated.** Observation is separable from ownership: a
+bounded read-only journal retains descriptions, grants no restoration rights,
+acquires no SignalTree ownership, does not change reclamation, releases what it
+held when its record is evicted, and holds no live handles. No category C.
+
+Schema and name still deliberately unfrozen. The one thing F1-F7 has EARNED
+beyond the shape is that a compensation turn needs a correlating fact it does not
+currently carry.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
