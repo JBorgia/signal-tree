@@ -7652,10 +7652,31 @@ const raw = storage.getItem('theme');
 const tree = signalTree({ theme: raw ? JSON.parse(raw).data : 'light' });
 ```
 
-Reading durable storage is SYNCHRONOUS on every platform in this footprint —
-`localStorage` and Capacitor Preferences both expose a sync read — so the durable
-value can simply BE the initial value. No transient, no causal write, no
-restoration entry, and it degrades correctly when storage is empty.
+⚠️ **CORRECTION — my justification for this was FALSE.** I wrote that
+"`localStorage` and Capacitor Preferences both expose a sync read". **Capacitor
+Preferences is asynchronous**: `@capacitor/preferences@8.0.1` declares
+`get(options): Promise<GetResult>` and `set(options): Promise<void>`, and
+TruckTrax's own `device-token-manager.ts` awaits both. Verified against the
+installed package, not against either party's recollection.
+
+The measured RESULT survives; its SCOPE does not:
+
+```text
+PROVEN        with a SYNCHRONOUS source, application pre-read reproduces marker
+              materialisation — first public value is the durable value, no
+              transient, no causal write
+NOT PROVEN    the same property for an ASYNCHRONOUS persistence source
+```
+
+And the footprint is genuinely synchronous, which is why the result stands for it:
+**all seven `stored()` leaves pass NO storage adapter**, so they use the default,
+`localStorage`. Being a Capacitor app does not mean those leaves use Preferences —
+TruckTrax's Preferences usage is a separate, hand-rolled async path (device
+tokens) that has never gone through `stored()`.
+
+So the honest claim is: *for the demonstrated localStorage footprint*, `stored()`
+does not uniquely own construction materialisation. Not: *on every platform this
+footprint targets.*
 
 So the answer to A2-1's question is **no**: the marker does not own construction
 materialisation. What it provides over arm C is the read boilerplate, once per
@@ -7682,6 +7703,68 @@ NOT SETTLED  arm C is only an INITIALISATION technique, not a persistence
 The live question is now narrower and better posed: **given that initialisation
 needs no API, what is the smallest surface for the WRITE side — write-through,
 settlement deference, host drain, and teardown?**
+
+# A2-1B — the async-source control. OUTCOME C
+
+Run because A2-1's justification was false, not because TruckTrax needs an async
+source. `a2-1b-async-source.spec.ts`.
+
+```text
+A  marker prevents observability until the read resolves   IMPOSSIBLE
+B  marker starts at default and catches up                 true of EVERY shape
+C  the contract covers SYNCHRONOUS construction only       ✓
+```
+
+## Measured
+
+```text
+stored({ storage })   takes the DOM `Storage` interface. An async source is not
+                      merely unsupported at runtime — it CANNOT BE PASSED, and a
+                      `@ts-expect-error` pins that.
+
+any constructor       `signalTree(...)` returns synchronously, so a value behind a
+                      Promise is not available at that instant. Some observable
+                      value must exist before it arrives. Measured: the transient
+                      IS observable, and the catch-up IS a causal write ('theme'
+                      emitted).
+
+CONTROL               the same source awaited in app bootstrap, BEFORE
+                      construction: durable value first, zero causal writes.
+```
+
+**The transient and the causal write are properties of the ASYNCHRONY, not of the
+API shape.** So async materialisation cannot argue for any placement — it is a
+scope limit to state publicly: *construction materialisation is synchronous-source
+only; asynchronous sources preload in application bootstrap.*
+
+## ⚠️ A fact that carries straight into A2-4
+
+The repo ALREADY has two storage contracts with different synchrony assumptions:
+
+```text
+stored({ storage })            `Storage`                      synchronous by type
+persistence's StorageAdapter   `T | Promise<T>` on every op    async-tolerant
+```
+
+So the drain requirement must split, exactly as the brief said:
+
+```text
+SYNC adapter    flush() may complete synchronously
+ASYNC adapter   flush() must EXPOSE COMPLETION for the caller to await
+INVARIANT       SignalTree must never report durability as complete merely
+                because asynchronous work was dispatched
+```
+
+That last line is the one that matters, and it is now grounded: TruckTrax's own
+Preferences path awaits every write, so a drain that resolved on dispatch would be
+lying to exactly the host it exists to serve.
+
+## Harness note
+
+The first run of the middle case reported ZERO causal writes — because a bare tree
+has no path notifier wired, not because no write occurred. **Same trap the
+`asyncSource` probe fell into twice.** `restoration()` was added so the notifier is
+live, and the comment says why, so a future zero there means something.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
