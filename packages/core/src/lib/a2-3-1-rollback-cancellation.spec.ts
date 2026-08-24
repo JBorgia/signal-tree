@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { getPathNotifier } from './path-notifier';
 import { persistence } from '../enhancers/serialization/serialization';
 import { restoration } from '../enhancers/restoration/restoration';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
@@ -207,6 +208,100 @@ describe('A2-3.1 discriminator: arm-time vs run-time value capture', () => {
 });
 
 /**
+ * ⚠️ FINDING 2 IS WITHDRAWN, AND THIS IS THE MEASUREMENT THAT WITHDRAWS IT.
+ *
+ * A2-3.1 originally concluded: `interceptLeafSignals` is refused on any enhanced
+ * tree, both notifier seams fire at flush after the ambient context is gone,
+ * therefore *"a post-construction durability capability has no usable seam and
+ * A2-C must be an ENHANCER."*
+ *
+ * That conclusion followed from a requirement Finding 1 had already dissolved.
+ * A SYNCHRONOUS seam is only needed to land in the cancellable bucket — and
+ * run-time capture needs no cancellation at all. The flush is late; the READ is
+ * later still, and that is the only ordering that matters.
+ *
+ * Same seam A2-3 arm C used, same authority, same `heldByKey` bucket. Only the
+ * capture timing differs:
+ *
+ * ```text
+ * ARM  durable = ['dark','light']   reproduces A2-3 arm C exactly
+ * RUN  durable = ['light','light']  the discarded value never lands
+ * ```
+ *
+ * So a POST-CONSTRUCTION binding is viable. It is still blocked behind
+ * NOTIFIER-SCOPE-0 — a `'**'` subscription cannot tell two trees apart — but
+ * that is ONE blocker shared with the notifier defect, not a second independent
+ * reason to require an enhancer.
+ *
+ * The generalisation is bigger than persistence:
+ *
+ * ```text
+ * an OUTBOUND binding means
+ *   on change to X   -> schedule a consequence for X
+ *   when legal       -> read CURRENT X, send it to Y
+ * NOT
+ *   on change to X   -> snapshot X, eventually send that snapshot
+ *
+ * unless the operation represents an EVENT rather than state synchronisation.
+ * ```
+ */
+describe('A2-3.1 withdrawal: a post-construction seam, with run-time capture', () => {
+  const viaNotifierFlush = async (capture: 'arm' | 'run') => {
+    const durable: unknown[] = [];
+    const tree = signalTree(
+      { theme: 'light' },
+      { enhancers: [restoration(), transactions()] }
+    );
+    await flush();
+
+    // The seam a post-construction `persist(x, y)` would have to use. One tree
+    // in this test, deliberately: NOTIFIER-SCOPE-0 is a separate finding and
+    // must not be allowed to confound this one.
+    const off = getPathNotifier().subscribe('**', (next, _p, path) => {
+      if (path !== 'theme') return;
+      scheduleDurableConsequence({
+        claimant: tree,
+        key: path,
+        run: () => durable.push(capture === 'arm' ? next : tree.$.theme()),
+      });
+    });
+
+    const pending = tree.transaction(() => {
+      tree.$.theme.set('dark');
+    });
+    await flush();
+    const duringPending = [...durable];
+
+    pending.rollback();
+    await flush();
+    off();
+    return { durable, duringPending, final: tree.$.theme() };
+  };
+
+  it('ARM-TIME on the flush reproduces A2-3 arm C', async () => {
+    const r = await viaNotifierFlush('arm');
+
+    // The positive control for the arm below: this seam CAN carry a value all
+    // the way to storage, so a clean RUN result is not "nothing happened".
+    expect(r.duringPending).toEqual([]);
+    expect(r.durable).toEqual(['dark', 'light']);
+  });
+
+  it('RUN-TIME on the same flush never persists the discarded value', async () => {
+    const r = await viaNotifierFlush('run');
+
+    expect(r.duringPending).toEqual([]);
+    expect(r.durable).not.toContain('dark');
+    // Two consequences ran — the speculative write and the compensation — and
+    // both read the settled value. The duplicate is a COALESCING question
+    // (`stored()` answers it with an `authoredSeq` guard), not a correctness
+    // one.
+    expect(r.durable).toEqual(['light', 'light']);
+    expect(r.final).toBe('light');
+  });
+});
+
+/**
  * ## A2-3.1 RESULT
  *
  * ```text
@@ -223,6 +318,19 @@ describe('A2-3.1 discriminator: arm-time vs run-time value capture', () => {
  * persistence()  reads the tree inside run()          -> nothing to cancel
  * ```
  *
- * A2-3's arm-B/arm-C result stands: a LEAF claimant resolves no scope and
- * defers nothing. What does not stand is its explanation of the arm-C residue.
+ * A2-3's arm-B/arm-C result stands as a MEASUREMENT: a leaf claimant resolves no
+ * scope and defers nothing. Two things do NOT stand:
+ *
+ * ```text
+ * A2-3's explanation of the arm-C residue   -> Finding 1 (capture timing)
+ * A2-3.1's "must be an enhancer"            -> withdrawn above (run-time capture)
+ * ```
+ *
+ * And the leaf result itself has a narrower cause than "a leaf has no owner
+ * identity". NOTIFIER-SCOPE-0's identity probe measures a leaf carrying
+ * `positionIds: [2]` and `ownerPath: 'theme'` while `getPositionRegistry(leaf)`
+ * is undefined — the registry is attached to `tree` and `tree.$` only. The leaf
+ * has a position NUMBER with no way to say which registry indexes it. That is a
+ * deficiency in node ownership metadata, not a reason for a public API to take a
+ * redundant tree argument.
  */

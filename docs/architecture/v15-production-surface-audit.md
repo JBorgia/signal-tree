@@ -7852,7 +7852,12 @@ persistence()  reads the tree inside run()           -> nothing to cancel
 Two sufficient strategies. A durability capability must pick one **explicitly**;
 routing through the consequence authority does not confer safety by itself.
 
-## FINDING 2 — a post-construction capability has NO observation seam, by contract
+## FINDING 2 — ⚠️ WITHDRAWN. See "A2-3.1 FINDING 2 WITHDRAWN" below
+
+*(The measurement in this subsection stands — `interceptLeafSignals` really is
+refused on an enhanced tree. The CONCLUSION drawn from it does not.)*
+
+## FINDING 2 (as originally recorded) — a post-construction capability has NO observation seam
 
 Building the persister on `interceptLeafSignals` (the per-tree seam, synchronous
 with the write) measured:
@@ -8077,10 +8082,14 @@ A2's evidence cuts BOTH ways and is now on the record for whoever decides:
 AGAINST re-export   A2-1/A2-1B: construction materialisation is NOT a unique
                     marker capability — reading synchronous storage before
                     construction reaches the identical result with no API.
-FOR re-export       A2-4.2: `flushAllStoredSignals` is settlement-safe BY
-                    CONSTRUCTION, which `persistence()`'s drain is not; and
-                    per-leaf KEYING is something `persistence()` structurally
-                    cannot express (one key, whole tree).
+~~FOR re-export~~   ⚠️ **WITHDRAWN.** I argued that `flushAllStoredSignals` is
+                    settlement-safe BY CONSTRUCTION and therefore earns public
+                    surface. A2-4.2's result is still true — it IS safe — but
+                    the TruckTrax lineage shows the drain exists only to close a
+                    window `stored()`'s own 100ms debounce opened. A production
+                    call site proves somebody had to close the window; the
+                    history proves SignalTree opened it. Safety of a mitigation
+                    is not evidence for the capability it mitigates.
 ```
 
 TruckTrax imports `stored` and `flushAllStoredSignals` from `@signaltree/core`
@@ -8117,9 +8126,13 @@ happened before the comment was added.
 
 `packages/core/src/lib/notifier-scope-0-impact.spec.ts`, 3 pass + 2 KNOWN RED.
 
-The defect, found by A2-4's control arm: the path notifier coalesces pending
-entries by PATH STRING within a flush, with no tree qualification, on a
-process-global notifier that every consumer subscribes to with `'**'`.
+⚠️ **THE MECHANISM DESCRIPTION BELOW WAS WRONG AND IS CORRECTED IN ITS OWN
+SECTION.** I recorded the cause as "coalesces by PATH STRING with no tree
+qualification". `PathNotifier` defaults to `batchIdentityMode:
+'path-position-subject'` and `hasSameSemanticIdentity` compares `positionId`.
+The real defect is that `positionId` is registry-local while the notifier is
+process-global — see NOTIFIER-SCOPE-0 IDENTITY below. The impact results in this
+section are unaffected; only the explanation was.
 
 It was provisionally classified **release-significant, not release-blocking**,
 on the reading that it is an observation-seam problem. The audit was owed before
@@ -8185,6 +8198,212 @@ IS    RELEASE-BLOCKING — silent state corruption in two AUTHORITY consumers,
 The provisional classification was made before anyone had asked what reaches
 the consumers, and it was reasonable on the information available. The
 measurement is what changed it, which is the whole reason the audit was owed.
+
+# NOTIFIER-SCOPE-0 IDENTITY — the mechanism, and the correction to its diagnosis
+
+`packages/core/src/lib/notifier-scope-0-identity.spec.ts`, 3 pass + 1 KNOWN RED.
+
+## The first explanation was wrong
+
+I recorded the cause as *"the notifier coalesces by PATH STRING within a flush,
+with no tree qualification."* It does not.
+
+```text
+PathNotifier.batchIdentityMode   defaults to 'path-position-subject'
+hasSameSemanticIdentity          compares left.positionId === right.positionId
+```
+
+**The notifier already attempts semantic identity.** The defect is one level
+down, and it is sharper:
+
+```text
+TreePositionRegistry allocates from `nextPositionId = 1`, PER REGISTRY.
+The notifier is PROCESS-GLOBAL.
+
+  tree A `theme` -> positionId 2     distinct registry objects,
+  tree B `theme` -> positionId 2     identical local ids
+
+  2 === 2 -> "same semantic identity" -> coalesced -> one write LOST
+```
+
+Measured delivery for `a.$.theme.set('a1'); b.$.theme.set('b1')` in one flush:
+
+```text
+DELIVERED: [ "theme=b1 pos=[2] subj=undefined" ]
+```
+
+`positionId` means *"position 2 in THIS tree's registry"*. The notifier consumes
+it as *"position 2 in the process"*. A registry-local identifier is being used
+across a namespace boundary it does not span.
+
+## The same missing fact A2-3 hit
+
+```text
+leaf.positionIds        [2]        present
+leaf.ownerPath          "theme"    present
+getPositionRegistry(leaf)          UNDEFINED
+getPositionRegistry(tree.$)        defined
+```
+
+`definePositionRegistry` is called on `tree` and `tree.$` only
+(`signal-tree.ts:1174`). So A2-3's *"a leaf resolves no commit scope"* is not
+"a leaf has no owner identity" — it has a position NUMBER with no way to say
+which registry indexes it. One sentence covers both findings:
+
+> a SignalTree location must be unambiguously owned by ONE tree, and that
+> ownership must be resolvable FROM THE LOCATION.
+
+## The invariant, pinned before either fix is chosen
+
+```text
+two trees / same path / same local positionId / same tick
+  => two DISTINCT pending mutations
+  => BOTH delivered
+  => restoration remains tree-local        (notifier-scope-0-impact.spec)
+  => transaction compensation remains tree-local
+```
+
+## Cost survey of the two fixes
+
+```text
+GLOBAL ALLOCATION            module-level counter instead of per-registry `1`
+  all 24 positionId consumers are ALREADY tree-scoped and need only
+  uniqueness-WITHIN-scope; global allocation is a strict strengthening of that
+  guarantee, so none of them changes
+  positionIds are non-enumerable (4 `enumerable: false` defineProperty sites)
+  or WeakMap-held, and appear nowhere in serialization.ts — they do NOT cross a
+  durable boundary, so there is no cross-process reproducibility risk
+  turn-store's `inspect()` is a diagnostic snapshot, not a rehydration path
+  COST: the identifier stops meaning "position N in this tree" and becomes
+        "runtime-unique object id" — repairing a consumer by redefining the
+        identifier it misused
+
+REGISTRY QUALIFICATION       compare (registry, positionId) instead
+  semantically purer: the namespace is named rather than eliminated
+  touches every keyed structure across 24 files — `turn-store.positionIndex`
+  and `restoration.positionTurnIds` are `Map<PositionId, …>` today
+  ⚠️ AND IT NEEDS THE LEAF->REGISTRY LINK FIRST. `emitOwnedMutation` sends
+  `positionIds` only, and no per-write tree token exists outside a transaction
+  (`WriteMetadata.transactionOwner` is transaction-scoped). So this fix
+  subsumes A2-3's missing link rather than being independent of it
+  COST: strictly larger, and fixes both findings at once
+```
+
+Not chosen here. The survey is the deliverable; the lean on record is toward
+qualification, and the 24 consumers decide it.
+
+# A2-3.1 FINDING 2 WITHDRAWN — a post-construction binding is viable
+
+`a2-3-1-rollback-cancellation.spec.ts` gains two arms.
+
+Finding 2 concluded *"a post-construction durability capability has no usable
+seam, therefore A2-C must be an ENHANCER."* That followed from needing a
+SYNCHRONOUS seam — which was only needed to land in the cancellable bucket —
+which Finding 1 had already shown unnecessary. Same seam A2-3 arm C used, same
+authority, same `heldByKey` bucket; only capture timing differs:
+
+```text
+ARM  durable = ['dark','light']    reproduces A2-3 arm C exactly
+RUN  durable = ['light','light']   the discarded value never lands
+```
+
+The measurement that stands is narrower than the conclusion drawn from it:
+`interceptLeafSignals` really is refused on an enhanced tree
+(`__emitsMutations`). That rules out ONE seam, not the shape.
+
+A post-construction binding is still blocked behind NOTIFIER-SCOPE-0 — `'**'`
+cannot tell two trees apart — but that is ONE shared blocker, not a second
+independent reason to require an enhancer.
+
+## The generalisation, beyond persistence
+
+```text
+an OUTBOUND binding means
+  on change to X   -> schedule a consequence for X
+  when legal       -> read CURRENT X, send it to Y
+NOT
+  on change to X   -> snapshot X, eventually send that snapshot
+
+unless the operation represents an EVENT rather than state synchronisation.
+```
+
+# BIND-BRANCH-0 — external provenance follows SUPPLIED INFORMATION
+
+`packages/core/src/lib/bind-branch-0-acquisition-turn.spec.ts`, 6/6.
+
+## The question was wrong first
+
+It began as *"is a branch retrieve ONE causal turn?"* — too coarse both ways. A
+three-value payload legitimately produces three mutation events; and nothing
+downstream may inherit the acquisition's authority, or provenance becomes
+contagious:
+
+```text
+storage -> external write -> effect -> write -> effect -> write
+                       ALL somehow "external"
+```
+
+The debugger version is the concrete one: load `theme = 'light'` and watch six
+unrelated fields change under one external banner. *Where did all that other
+data come from?* is the correct developer reaction, and the tool caused it.
+
+The invariant under test instead:
+
+```text
+DIRECTLY MATERIALIZED FROM THE PAYLOAD   belongs to the acquisition
+REACTIONS CAUSED BY APPLYING IT          keep their own causal semantics
+```
+
+## Measured — the boundary rule already holds
+
+```text
+external(() => tree.$.settings({theme, units}))
+  settings.theme    origin=external  participation=realized
+  settings.units    origin=external  participation=realized
+  restoration entries 0, transactionId undefined
+
+authored reaction in the SAME TICK, outside the external() scope
+  settings.distancePrecision   origin=undefined  participation=undefined  ✓
+
+a computed reading theme
+  emits NO mutation event at all                                          ✓
+
+CONTROL: the same branch write without external()
+  both effects origin=undefined                                           ✓
+```
+
+So a branch acquisition is not an opaque blob — every payload member is
+individually visible with its own provenance, and timing does not leak
+authority. `persist(x, y)` needs no new machinery for this.
+
+## ⚠️ Two limits the runtime cannot currently express
+
+```text
+1  THERE IS NO WITHIN-TICK TURN BOUNDARY
+   three separate `undoable()` calls in one tick produce ONE history entry,
+   not three; the journal closes a turn on the notifier FLUSH. Both candidate
+   observables are TICK counters. "one retrieve = one causal turn" is therefore
+   not a statable invariant today — which is why the test asserts per-effect
+   provenance instead.
+
+2  THE JOURNAL HAS NO CAUSAL EDGE
+   acquisition and reaction share one turn with one `sequence`. Each effect
+   carries its own origin, so "where did that come from?" IS answerable; "what
+   caused what" is not — there is no `causedBy` on `DiagnosticEffect`, so
+   `external theme -> authored precision` is representable only as
+   co-membership in a flush.
+
+   Restoring the chain is diagnostic-journal CORRELATION METADATA, not a new
+   causal dimension. Execution/settlement grouping and diagnostic causality are
+   different questions; batching must not erase provenance, and today it does
+   not — it erases ORDERING OF CAUSE, which is a smaller and separable gap.
+```
+
+## Sharp edge found while measuring
+
+`DiagnosticJournal.turns()` returns the LIVE array and `dispose()` does
+`turns.length = 0`. A caller that reads the reference and then disposes gets an
+empty result. Cost one debugging round; the spec now copies before disposing.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
