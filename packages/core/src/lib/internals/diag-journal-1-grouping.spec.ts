@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { entityMap } from '../markers/entity-map';
 import { getPathNotifier } from '../path-notifier';
 import { getTransactionLifecycleChannel } from './causal-runtime/transaction-lifecycle';
-import { realize } from '../realize';
+import { external } from '../external';
 import { restoration } from '../../enhancers/restoration/restoration';
 import { signalTree } from '../signal-tree';
 import { transactions } from '../../enhancers/transactions/transactions';
@@ -197,7 +197,7 @@ describe('DIAG-JOURNAL-1 F2: the two axes survive observation', () => {
     // observation rather than about re-measuring P0-C.
     tree.undo();
     await flush();
-    realize(() => tree.$.n.set(7));
+    external(() => tree.$.n.set(7));
     await flush();
     p.stop();
 

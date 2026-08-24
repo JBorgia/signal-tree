@@ -1,5 +1,25 @@
 # DX-NAMES-1 — outside check instrument
 
+> **WITHDRAWN — NOT REQUIRED. Kept as a record and as a reusable pattern.**
+>
+> This instrument was built when the remaining question was framed as a pure DX
+> tie that internal evidence could not settle. Two later results superseded that
+> framing: the reference-frame decision (DX-NAMES-1.4) gave `external` a precise
+> meaning, and the `apply` isolation test (DX-NAMES-1.2) showed the longer form
+> demonstrates no independent semantic value. When two public forms express the
+> same primitive, the longer one has to earn its extra vocabulary; `apply` did
+> not.
+>
+> The topological-ambiguity concern it was built to measure is answered by
+> precedent rather than by survey: a library may define a term of art, and
+> `transaction`, `effect`, `signal`, `subject`, `computed` and `reducer` all
+> require definition too. What matters is whether the definition is coherent and
+> generative rather than a list of exceptions. This one is.
+>
+> The risk did not disappear — it became a DOCUMENTATION OBLIGATION, discharged
+> in `external()`'s first JSDoc line and in docs that teach the decision instead
+> of enumerating sources.
+
 **Purpose:** break one pure-DX tie that internal analysis cannot settle.
 **Not testing:** anything else. `incoming`, `acquired`, `realize`, `received`,
 `setExternal` and the rest are closed for this round.

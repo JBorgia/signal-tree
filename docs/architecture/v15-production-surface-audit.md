@@ -5634,6 +5634,111 @@ because the check was inconvenient to run — the door still ships as `realize()
 which is rejected under every standard this study has used, so the rename is
 owed either way.
 
+# DX-NAMES-1 — FINAL, and EXECUTED
+
+```text
+canonical reference frame   SignalTree / the current authored operation
+
+authored                    the current operation owns the state decision
+external                    the authoritative decision came from outside it
+
+public ingress door         external(() => { … })
+internal metadata           origin: 'external', participation: 'realized'
+```
+
+Rejections, each with its surviving reason:
+
+```text
+applyExternal()   semantically identical. `apply` failed isolation (1.2) and
+                  demonstrated no independent benefit, so the longer form never
+                  earned its extra vocabulary.
+acquired()        valid application-perspective English, rejected because
+                  SignalTree deliberately keeps ONE store-centric frame across
+                  API, metadata, diagnostics and docs.
+incoming()        arrival / transport language.
+realize()         poor situational retrieval after teaching.
+```
+
+## The outside check is WITHDRAWN, not deferred
+
+The instrument stays on disk, marked withdrawn, because the reasoning that
+retired it is worth more than the instrument was. It was built to measure a human
+preference between two names; two results converted the question into an
+architectural-consistency one:
+
+```text
+1.4  the reference frame gave `external` a precise coordinate system
+1.2  `apply` failed isolation — R22 read wrong under BOTH forms because the
+     CONTENTS were wrong, not because one wrapper supplied scope discipline
+```
+
+And the topological-ambiguity worry is answered by precedent rather than by
+survey. **A library may define a term of art.** `transaction`, `effect`, `signal`,
+`subject`, `computed` and `reducer` all need defining; requiring a survey before
+defining a word would make half of software's vocabulary undefinable. What matters
+is whether the definition is coherent and GENERATIVE rather than a list of
+exceptions — and this one derives every case from a single question.
+
+> ⚠️ **The residual risk did not disappear; it changed category.** It is no longer
+> an unmeasured unknown, it is a DOCUMENTATION OBLIGATION — discharged, not
+> promised: the definition is now `external()`'s first JSDoc line, and the docs
+> teach the decision instead of enumerating sources.
+
+```text
+who owned the decision?
+  this operation      ordinary write / undoable() / transaction()
+  another authority   external(() => …)
+```
+
+not
+
+```text
+HTTP -> external    WebSocket -> external    Worker -> maybe    Storage -> …
+```
+
+because the second form degenerates into exceptions at the first unusual source.
+
+## C5a's permanent job
+
+**Retired as a candidate-name comparison, for good.** It was cited that way twice
+and withdrawn twice. Its architectural finding is one sentence:
+
+> A transport or execution boundary is not a causal-authority boundary.
+
+It now tests whether a developer understands the REFERENCE FRAME, which is more
+valuable than testing which word is prettier.
+
+## Executed
+
+```text
+realize()        ->  external()
+lib/realize.ts   ->  lib/external.ts
+```
+
+The rename landed with the disposition rather than being carried, because leaving
+`realize()` in the barrel while the record said `external()` is precisely the
+doc-versus-code drift this release keeps catching. ST1035's runtime message and
+its catalogue row moved with it; the demo's Refresh-from-server button now reads
+`external(() => …)`.
+
+Verified by exit code: nx test core (1877 passed / 208 files), nx lint core,
+npm run typecheck, nx build core, nx build demo, check-spec-types,
+check-error-codes, check-demo-coverage 17/17.
+
+## Queue
+
+```text
+1  PER-B            stored() semantics, including reload()'s classification  <-- next
+2  MATRIX-CLOSE
+3  Candidate B      only if materially different
+4  TruckTrax passes 2-3
+5  final perf / retention
+6  FULL historical release gate suite (not --fast)
+7  RC / final closure
+```
+
+Carried: `enhancer-safety.spec.ts`'s mock-`.with()` harness-validity item.
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded

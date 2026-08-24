@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { entityMap } from './markers/entity-map';
 import { getPathNotifier } from './path-notifier';
-import { realize } from './realize';
+import { external } from './external';
 import { signalTree } from './signal-tree';
 import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
@@ -11,7 +11,7 @@ import { undoable } from './undoable';
 /**
  * A1 TERMINAL INGRESS — the nine discriminating cases.
  *
- * `realize()` is the candidate public door. It declares two facts on the two
+ * `external()` is the candidate public door. It declares two facts on the two
  * independent axes:
  *
  *   origin         external
@@ -71,7 +71,7 @@ describe('A1 case 1-2: classification', () => {
     const historyBefore = tree.getRestorationHistory().length;
 
     const { seen, off } = observe();
-    realize(() => tree.$.n.set(9));
+    external(() => tree.$.n.set(9));
     await flush();
     off();
 
@@ -96,7 +96,7 @@ describe('A1 case 3-5: transaction interaction', () => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       // An acquisition landing INSIDE the callback. Merged context, so the
       // enclosing transactionId is still ambient here.
-      realize(() => tree.$.n.set(7));
+      external(() => tree.$.n.set(7));
     });
     await flush();
 
@@ -130,7 +130,7 @@ describe('A1 case 3-5: transaction interaction', () => {
     });
     await flush();
 
-    realize(() => tree.$.rows.updateOne('a', { name: 'Server' }));
+    external(() => tree.$.rows.updateOne('a', { name: 'Server' }));
     await flush();
 
     let refusal: unknown = 'no-refusal';
@@ -160,7 +160,7 @@ describe('A1 case 3-5: transaction interaction', () => {
     });
     await flush();
 
-    realize(() => tree.$.n.set(7));
+    external(() => tree.$.n.set(7));
     await flush();
 
     let refusal: unknown = 'no-refusal';
@@ -187,7 +187,7 @@ describe('A1 case 6: restoration cannot destroy external truth', () => {
     undoable(() => tree.$.n.set(1));
     await flush();
 
-    realize(() => tree.$.n.set(9));
+    external(() => tree.$.n.set(9));
     await flush();
 
     let refusal: unknown = 'no-refusal';
@@ -211,8 +211,8 @@ describe('A1 case 7-9: boundary', () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     const { seen, off } = observe();
-    realize(() => {
-      realize(() => tree.$.n.set(5));
+    external(() => {
+      external(() => tree.$.n.set(5));
     });
     await flush();
     off();
@@ -223,7 +223,7 @@ describe('A1 case 7-9: boundary', () => {
   it('case 8 — classification does not leak past the callback', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    realize(() => tree.$.n.set(5));
+    external(() => tree.$.n.set(5));
     await flush();
 
     const { seen, off } = observe();
@@ -243,7 +243,7 @@ describe('A1 case 7-9: boundary', () => {
 
     let thrown: unknown = 'no-throw';
     try {
-      realize(async () => {
+      external(async () => {
         await Promise.resolve();
         tree.$.n.set(9);
       });

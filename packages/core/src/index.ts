@@ -186,12 +186,13 @@ export {
 export { undoable } from './lib/undoable';
 
 /**
- * @see {@link realize} — declares that the contained writes are externally
- *   acquired truth (`origin: external`, `participation: realized`) rather than
- *   authored work. The mirror of `undoable()`, and the one public door onto
- *   external-truth classification; `withWriteContext` stays enhancer plumbing.
+ * @see {@link external} — classifies the contained writes as state whose
+ *   authoritative decision came from OUTSIDE the current authored operation
+ *   (`origin: external`, `participation: realized`). Causal authority, not
+ *   threads or processes. The one public door onto external-truth
+ *   classification; `withWriteContext` stays enhancer plumbing.
  */
-export { realize } from './lib/realize';
+export { external } from './lib/external';
 
 // `getPathNotifier` is not root app API. `composeEnhancers` left the root barrel
 // in v12 too and was deleted outright in 15.0 — pass the enhancers declaratively:

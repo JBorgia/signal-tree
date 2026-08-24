@@ -1965,15 +1965,15 @@ see `ST1034` in [docs/errors](../../docs/errors/README.md).
 
 ### Applying externally acquired truth
 
-`realize()` is the mirror of `undoable()`. It declares that the contained writes
+`external()` is the mirror of `undoable()`. It declares that the contained writes
 are truth acquired from outside the authored operation, rather than work the user
 did:
 
 ```ts
-import { realize, signalTree, restoration } from '@signaltree/core';
+import { external, signalTree, restoration } from '@signaltree/core';
 
 const rows = await api.getRows();
-realize(() => tree.$.rows.setAll(rows));
+external(() => tree.$.rows.setAll(rows));
 ```
 
 Without it, a refresh is indistinguishable from a user edit — it becomes an undo
@@ -1997,14 +1997,14 @@ than silently applying the server's value as authored work:
 
 ```ts
 // ❌ throws ST1035 — the write lands after the classification is restored
-realize(async () => {
+external(async () => {
   const rows = await api.getRows();
   tree.$.rows.setAll(rows);
 });
 
 // ✅ acquire first, then classify the synchronous write
 const rows = await api.getRows();
-realize(() => tree.$.rows.setAll(rows));
+external(() => tree.$.rows.setAll(rows));
 ```
 
 That is the shape acquisition actually has: fetching is asynchronous and belongs

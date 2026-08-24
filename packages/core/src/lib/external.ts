@@ -2,12 +2,39 @@ import type { WriteMetadata } from './mutation-types';
 import { getActiveWriteContext, withWriteContext } from './write-context';
 
 /**
- * Apply the contained writes as **externally acquired truth** rather than as
- * work the application authored.
+ * Classifies synchronous writes whose authoritative value comes from **outside
+ * the current authored operation** — not merely from another thread, process,
+ * module, or machine.
+ *
+ * ## The one rule
+ *
+ * SignalTree speaks from the store's causal perspective. A write is AUTHORED
+ * when the current operation owns the decision, and EXTERNAL when the decision
+ * belonged to another authority:
+ *
+ * ```text
+ * who owned the decision?
+ *   this operation      ordinary write / undoable() / transaction()
+ *   another authority   external(() => …)
+ * ```
+ *
+ * That is a coordinate system, not a synonym for "remote". Crossing a transport
+ * or execution boundary does NOT cross a causal-authority boundary:
+ *
+ * ```ts
+ * const price = await pricingWorker.calculate(localInputs);
+ * tree.$.quote.total.set(price);          // AUTHORED — the application
+ *                                         // delegated computation and kept
+ *                                         // authority. No door.
+ *
+ * const reading = await sensorWorker.read();
+ * external(() => tree.$.telemetry.set(reading));   // another authority observed
+ *                                                  // it. Door.
+ * ```
  *
  * ```ts
  * const rows = await api.getRows();
- * realize(() => {
+ * external(() => {
  *   tree.$.rows.setAll(rows);
  * });
  * ```
@@ -32,7 +59,7 @@ import { getActiveWriteContext, withWriteContext } from './write-context';
  *
  * ```ts
  * tree.$.rows.setAll(serverRows);   // ❌ an undo step; undo reverts the SERVER
- * realize(() => tree.$.rows.setAll(serverRows));   // ✅ applied, not authored
+ * external(() => tree.$.rows.setAll(serverRows));   // ✅ applied, not authored
  * ```
  *
  * And a refresh landing while an optimistic transaction holds the row leaves
@@ -52,7 +79,7 @@ import { getActiveWriteContext, withWriteContext } from './write-context';
  * dependency evidence: YES          a rollback that would discard it refuses
  * ```
  *
- * That combination is deliberate. `realize()` classifies provenance; it does not
+ * That combination is deliberate. `external()` classifies provenance; it does not
  * buy exemption from consequences.
  *
  * ## Synchronous only
@@ -64,14 +91,14 @@ import { getActiveWriteContext, withWriteContext } from './write-context';
  *
  * ```ts
  * // ❌ throws ST1035
- * realize(async () => {
+ * external(async () => {
  *   const rows = await api.getRows();
  *   tree.$.rows.setAll(rows);
  * });
  *
  * // ✅ acquire first, then classify the synchronous write
  * const rows = await api.getRows();
- * realize(() => tree.$.rows.setAll(rows));
+ * external(() => tree.$.rows.setAll(rows));
  * ```
  *
  * This is the shape the acquisition seam actually needs: acquisition is
@@ -91,7 +118,7 @@ import { getActiveWriteContext, withWriteContext } from './write-context';
  * @see {@link undoable} — the mirror door, for authored work that should be
  *   reversible.
  */
-export function realize<R>(operation: () => R): R {
+export function external<R>(operation: () => R): R {
   const ambient = getActiveWriteContext();
 
   // MERGED onto the ambient context rather than replacing it. Replacement would
@@ -125,7 +152,7 @@ export function realize<R>(operation: () => R): R {
         'an `await` inside it would be applied as authored work — the server ' +
         'value would become an undo step. Acquire first, then classify the ' +
         'synchronous write: ' +
-        '`const rows = await api.getRows(); realize(() => tree.$.rows.setAll(rows));`'
+        '`const rows = await api.getRows(); external(() => tree.$.rows.setAll(rows));`'
     );
   }
 
