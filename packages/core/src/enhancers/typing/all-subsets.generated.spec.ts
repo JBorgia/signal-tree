@@ -3,7 +3,7 @@
 import type { Equals, Assert } from './helpers-types';
 import type { SignalTree } from '../../lib/types';
 type Tree = { count: number };
-import type { BatchingMethods, TimeTravelMethods, DevToolsMethods } from '../../lib/types';
+import type { BatchingMethods, RestorationMethods, DevToolsMethods } from '../../lib/types';
 
 // Helper to detect method presence
 type HasMethod<T, K extends string> = K extends keyof T ? true : false;
@@ -24,7 +24,7 @@ type Subset_A_has_getCurrentIndex = Assert<Equals<HasMethod<Subset_A, 'getCurren
 type Subset_A_has_connectDevTools = Assert<Equals<HasMethod<Subset_A, 'connectDevTools'>, false>>;
 type Subset_A_has_disconnectDevTools = Assert<Equals<HasMethod<Subset_A, 'disconnectDevTools'>, false>>;
 
-type Subset_C = TimeTravelMethods;
+type Subset_C = RestorationMethods;
 type Subset_C_has_batch = Assert<Equals<HasMethod<Subset_C, 'batch'>, false>>;
 type Subset_C_has_coalesce = Assert<Equals<HasMethod<Subset_C, 'coalesce'>, false>>;
 type Subset_C_has_hasPendingNotifications = Assert<Equals<HasMethod<Subset_C, 'hasPendingNotifications'>, false>>;
@@ -40,7 +40,7 @@ type Subset_C_has_getCurrentIndex = Assert<Equals<HasMethod<Subset_C, 'getCurren
 type Subset_C_has_connectDevTools = Assert<Equals<HasMethod<Subset_C, 'connectDevTools'>, false>>;
 type Subset_C_has_disconnectDevTools = Assert<Equals<HasMethod<Subset_C, 'disconnectDevTools'>, false>>;
 
-type Subset_AC = BatchingMethods & TimeTravelMethods;
+type Subset_AC = BatchingMethods & RestorationMethods;
 type Subset_AC_has_batch = Assert<Equals<HasMethod<Subset_AC, 'batch'>, true>>;
 type Subset_AC_has_coalesce = Assert<Equals<HasMethod<Subset_AC, 'coalesce'>, true>>;
 type Subset_AC_has_hasPendingNotifications = Assert<Equals<HasMethod<Subset_AC, 'hasPendingNotifications'>, true>>;
@@ -88,7 +88,7 @@ type Subset_AD_has_getCurrentIndex = Assert<Equals<HasMethod<Subset_AD, 'getCurr
 type Subset_AD_has_connectDevTools = Assert<Equals<HasMethod<Subset_AD, 'connectDevTools'>, true>>;
 type Subset_AD_has_disconnectDevTools = Assert<Equals<HasMethod<Subset_AD, 'disconnectDevTools'>, true>>;
 
-type Subset_CD = TimeTravelMethods & DevToolsMethods;
+type Subset_CD = RestorationMethods & DevToolsMethods;
 type Subset_CD_has_batch = Assert<Equals<HasMethod<Subset_CD, 'batch'>, false>>;
 type Subset_CD_has_coalesce = Assert<Equals<HasMethod<Subset_CD, 'coalesce'>, false>>;
 type Subset_CD_has_hasPendingNotifications = Assert<Equals<HasMethod<Subset_CD, 'hasPendingNotifications'>, false>>;
@@ -104,7 +104,7 @@ type Subset_CD_has_getCurrentIndex = Assert<Equals<HasMethod<Subset_CD, 'getCurr
 type Subset_CD_has_connectDevTools = Assert<Equals<HasMethod<Subset_CD, 'connectDevTools'>, true>>;
 type Subset_CD_has_disconnectDevTools = Assert<Equals<HasMethod<Subset_CD, 'disconnectDevTools'>, true>>;
 
-type Subset_ACD = BatchingMethods & TimeTravelMethods & DevToolsMethods;
+type Subset_ACD = BatchingMethods & RestorationMethods & DevToolsMethods;
 type Subset_ACD_has_batch = Assert<Equals<HasMethod<Subset_ACD, 'batch'>, true>>;
 type Subset_ACD_has_coalesce = Assert<Equals<HasMethod<Subset_ACD, 'coalesce'>, true>>;
 type Subset_ACD_has_hasPendingNotifications = Assert<Equals<HasMethod<Subset_ACD, 'hasPendingNotifications'>, true>>;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
 import { entityMap } from './types';
 

@@ -30,7 +30,7 @@ const CASES = [
     code: `import { signalTree } from '${CORE}';\nglobalThis.__s = typeof signalTree;\n`,
     forbidden: [
       'coalescedUpdates', // batching internals
-      'timeTravelManager', // time-travel internals
+      'restorationManager', // time-travel internals
       'connectDevTools', // devtools internals
       'autoSaveInterval', // persistence internals
     ],

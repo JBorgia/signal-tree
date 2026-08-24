@@ -197,8 +197,8 @@ export const appRoutes: Route[] = [
     path: 'time-travel',
     loadComponent: () =>
       import(
-        './examples/features/fundamentals/examples/time-travel/time-travel-demo.component'
-      ).then((c) => c.TimeTravelDemoComponent),
+        './examples/features/fundamentals/examples/restoration/restoration-demo.component'
+      ).then((c) => c.RestorationDemoComponent),
   },
   {
     path: 'markers',

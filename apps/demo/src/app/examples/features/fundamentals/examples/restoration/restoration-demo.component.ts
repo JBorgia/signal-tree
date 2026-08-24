@@ -16,7 +16,7 @@ import {
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
-import type { ISignalTree, TimeTravelMethods } from '@signaltree/core';
+import type { ISignalTree, RestorationMethods } from '@signaltree/core';
 
 interface Todo {
   id: number;
@@ -41,7 +41,7 @@ interface AppState {
   todos: Todo[];
 }
 
-interface TimeTravelEntry {
+interface RestorationHistoryEntry {
   action: string;
   timestamp: number;
   state: AppState;
@@ -49,14 +49,14 @@ interface TimeTravelEntry {
 }
 
 @Component({
-  selector: 'app-time-travel-demo',
+  selector: 'app-restoration-demo',
   standalone: true,
   imports: [FormsModule, ExampleComponent],
-  templateUrl: './time-travel-demo.component.html',
+  templateUrl: './restoration-demo.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: './time-travel-demo.component.scss',
+  styleUrl: './restoration-demo.component.scss',
 })
-export class TimeTravelDemoComponent {
+export class RestorationDemoComponent {
   newTodoText = '';
 
   // ===========================================================================
@@ -89,8 +89,8 @@ export class TimeTravelDemoComponent {
     { enhancers: [timeTravel({ maxHistorySize: 50 })] }
   );
 
-  private get markerTT(): TimeTravelMethods {
-    return this.markerTree as unknown as TimeTravelMethods;
+  private get markerTT(): RestorationMethods {
+    return this.markerTree as unknown as RestorationMethods;
   }
 
   private nextPersonId = 1;

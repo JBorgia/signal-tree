@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../time-travel/time-travel';
+import { timeTravel } from '../restoration/restoration';
 import { transactions } from './transactions';
 import { undoable } from '../../lib/undoable';
 
@@ -12,7 +12,7 @@ import { undoable } from '../../lib/undoable';
  * > NULL: `timeTravel()`'s `transaction()` has no independently owned public
  * > role and should be deleted in favour of `transactions()`.
  *
- * Context: `TimeTravelMethods extends TransactionMethods`, so `timeTravel()`
+ * Context: `RestorationMethods extends TransactionMethods`, so `timeTravel()`
  * ships a SECOND `transaction()` implementation — and TX-LEDGER-0 measured that
  * one to be the less correct of the two, because its rollback dependency check
  * reads the restoration history rather than its own captured effects.

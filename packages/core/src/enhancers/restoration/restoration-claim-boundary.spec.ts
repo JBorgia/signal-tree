@@ -4,7 +4,7 @@ import { undoable } from '../../lib/undoable';
 import { entityMap } from '../../lib/markers/entity-map';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 /**
  * THE INVARIANT, and the reason it is written as an invariant rather than as a

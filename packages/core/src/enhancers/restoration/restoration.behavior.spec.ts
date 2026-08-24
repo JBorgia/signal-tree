@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { undoable } from '../../lib/undoable';
 
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 import { signalTree } from '../../lib/signal-tree';
 
 const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 0));

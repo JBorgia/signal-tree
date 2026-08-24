@@ -2,7 +2,7 @@ import { computed, type Signal } from '@angular/core';
 import { undoable } from '../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { entityMap, signalTree } from '../index';
 
 /**

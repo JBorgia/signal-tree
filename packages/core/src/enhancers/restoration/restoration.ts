@@ -49,9 +49,9 @@ import type {
   ISignalTree,
   PositionId,
   StructuralEffect,
-  TimeTravelMethods,
-  TimeTravelConfig,
-  TimeTravelEntry,
+  RestorationMethods,
+  RestorationConfig,
+  RestorationHistoryEntry,
   TreeNode,
   EnhancerMeta,
   WriteMetadata,
@@ -66,15 +66,15 @@ import type {
 } from '../../lib/internals/causal-runtime/causal-types';
 
 // Re-export for convenience (do not redefine locally)
-export type { TimeTravelConfig, TimeTravelEntry };
+export type { RestorationConfig, RestorationHistoryEntry };
 
-// (TimeTravelConfig is imported from canonical types)
+// (RestorationConfig is imported from canonical types)
 
 /**
  * Internal time travel state management
  */
 
-type CanonicalTurn<T> = TimeTravelEntry<T> & {
+type CanonicalTurn<T> = RestorationHistoryEntry<T> & {
   id: number;
   historyIndex: number;
   __turnId: number;
@@ -335,7 +335,7 @@ function normaliseMaxHistorySize(value: number | undefined): number {
   }
   return Math.floor(value);
 }
-class TimeTravelManager<T> {
+class RestorationManager<T> {
   private history: CanonicalTurn<T>[] = [];
   private turns = new Map<number, CanonicalTurn<T>>();
   private pendingTurns = new Map<number, CanonicalTurn<T>>();
@@ -397,7 +397,7 @@ class TimeTravelManager<T> {
   constructor(
     private tree: ISignalTree<T>,
     private positionRegistry: PositionRegistry,
-    private config: TimeTravelConfig = {},
+    private config: RestorationConfig = {},
     private restoreStateFn?: (state: T) => void,
     private applyEffectsFn?: (
       effects: TurnEffect[],
@@ -1307,7 +1307,7 @@ class TimeTravelManager<T> {
   private undoBySnapshot(): boolean {
     const undoneEntry = this.history[
       this.currentIndex
-    ] as TimeTravelEntry<T> & {
+    ] as RestorationHistoryEntry<T> & {
       restorationSubjectIds?: number[];
       __positionIds?: number[];
     };
@@ -1378,7 +1378,7 @@ class TimeTravelManager<T> {
 
     this.currentIndex = this.currentIndex + 1;
     this.isTemporalViewActive = true;
-    const entry = this.history[this.currentIndex] as TimeTravelEntry<T> & {
+    const entry = this.history[this.currentIndex] as RestorationHistoryEntry<T> & {
       restorationSubjectIds?: number[];
       __positionIds?: number[];
     };
@@ -1404,7 +1404,7 @@ class TimeTravelManager<T> {
     return false;
   }
 
-  getHistory(): TimeTravelEntry<T>[] {
+  getHistory(): RestorationHistoryEntry<T>[] {
     // The entry OBJECTS are copied so a caller cannot rewrite history metadata,
     // but the STATE is handed over by reference.
     //
@@ -1445,7 +1445,7 @@ class TimeTravelManager<T> {
 
     this.currentIndex = index;
     this.isTemporalViewActive = true;
-    const entry = this.history[index] as TimeTravelEntry<T> & {
+    const entry = this.history[index] as RestorationHistoryEntry<T> & {
       restorationSubjectIds?: number[];
       __positionIds?: number[];
     };
@@ -1803,7 +1803,7 @@ class TimeTravelManager<T> {
 
 // TOMBSTONE: `ScopedHistoryAuthority` / `createScopedHistoryAuthority`.
 //
-// A private `TimeTravelManager` over a standalone snapshot signal, built by
+// A private `RestorationManager` over a standalone snapshot signal, built by
 // `ed09e864` so form history could share the causal engine. Its only consumer
 // was `trackHistory()`, and TH-DEL took that; `dead-exports` found it the same
 // hour, unreachable from every entry point and every import.
@@ -1834,7 +1834,7 @@ class TimeTravelManager<T> {
  * store.count.set(2);
  *
  * // Access time travel interface
- * const timeTravel = store.__timeTravel;
+ * const timeTravel = store.__restoration;
  *
  * // Navigate history
  * console.log(timeTravel.canUndo()); // true
@@ -1865,7 +1865,7 @@ class TimeTravelManager<T> {
  * store.update(() => ({ document: { title: 'New Title' } }), 'update_title');
  *
  * // View detailed history
- * const history = store.__timeTravel.getHistory();
+ * const history = store.__restoration.getHistory();
  * console.log(history[0].action); // 'Update Document Title'
  * console.log(history[0].timestamp); // Date when change occurred
  * ```
@@ -1995,12 +1995,12 @@ function checkHistoryRetention(root: unknown, entries: number): void {
 }
 
 export function timeTravel(
-  config: TimeTravelConfig = {}
-): Enhancer<TimeTravelMethods> {
+  config: RestorationConfig = {}
+): Enhancer<RestorationMethods> {
   const { enabled = true } = config;
   const enhancerFn = <T>(
     tree: ISignalTree<T>
-  ): ISignalTree<T> & TimeTravelMethods => {
+  ): ISignalTree<T> & RestorationMethods => {
     // Disabled (noop) path
     if (!enabled) {
       const noopMethods = {
@@ -2027,7 +2027,7 @@ export function timeTravel(
         canRedo(): boolean {
           return false;
         },
-        getHistory(): TimeTravelEntry<T>[] {
+        getHistory(): RestorationHistoryEntry<T>[] {
           return [];
         },
         resetHistory(): void {
@@ -2042,7 +2042,7 @@ export function timeTravel(
       };
 
       return Object.assign(tree, noopMethods) as unknown as ISignalTree<T> &
-        TimeTravelMethods;
+        RestorationMethods;
     }
     // Store the original callable tree function
     const originalTreeCall = (
@@ -2228,7 +2228,7 @@ export function timeTravel(
     }
 
     // Create time travel manager with restoration function
-    const timeTravelManager = new TimeTravelManager(
+    const restorationManager = new RestorationManager(
       tree,
       positionRegistry,
       config,
@@ -2711,7 +2711,7 @@ export function timeTravel(
         return false;
       }
 
-      return timeTravelManager.addEntry(
+      return restorationManager.addEntry(
         action,
         undefined,
         ownerPaths.length > 0 ? ownerPaths : undefined,
@@ -2786,7 +2786,7 @@ export function timeTravel(
       if (!isTurnEligible(designated)) {
         return undefined;
       }
-      return timeTravelManager.createPendingEntry(
+      return restorationManager.createPendingEntry(
         'transaction',
         undefined,
         ownerPaths.length > 0 ? ownerPaths : undefined,
@@ -2848,14 +2848,14 @@ export function timeTravel(
       }
 
       if (event.kind === 'confirmed') {
-        timeTravelManager.confirmPendingTurn(stagedTurnId);
+        restorationManager.confirmPendingTurn(stagedTurnId);
         return;
       }
 
       // 'rolled-back'. The writes never happened, so the staged turn is thrown
       // away rather than admitted. Compensation is the owner's job — time-travel
       // neither applies nor validates it.
-      timeTravelManager.discardPendingTurn(stagedTurnId);
+      restorationManager.discardPendingTurn(stagedTurnId);
     });
 
 
@@ -3077,7 +3077,7 @@ export function timeTravel(
                 positionIds.length === 0 &&
                 effects.length === 0)
                 ? false
-                : timeTravelManager.addEntry(
+                : restorationManager.addEntry(
                     'batch',
                     undefined,
                     ownerPaths.length > 0 ? ownerPaths : undefined,
@@ -3085,7 +3085,7 @@ export function timeTravel(
                     positionIds.length > 0 ? positionIds : undefined,
                     effects.length > 0 ? effects : undefined
                   );
-            timeTravelManager.observeBatch('batch', ownerPaths, recorded);
+            restorationManager.observeBatch('batch', ownerPaths, recorded);
           });
         }
       }
@@ -3188,17 +3188,17 @@ export function timeTravel(
       });
     }
 
-    (enhancedTree as ISignalTree<T> & TimeTravelMethods)['undo'] = () => {
-      timeTravelManager.undoConfirmed();
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['undo'] = () => {
+      restorationManager.undoConfirmed();
     };
-    (enhancedTree as ISignalTree<T> & TimeTravelMethods)['redo'] = () => {
-      timeTravelManager.redoConfirmed();
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['redo'] = () => {
+      restorationManager.redoConfirmed();
     };
     // `transaction()` was REMOVED from timeTravel() in 15.0 (TX-SURFACE-0).
     //
     // TOMBSTONE. It was a SECOND implementation of a concept `transactions()`
     // already owns, reaching the public surface silently through
-    // `TimeTravelMethods extends TransactionMethods`.
+    // `RestorationMethods extends TransactionMethods`.
     //
     // It was also the incorrect one. Its rollback plan came from
     // `getPendingRollbackPlan()`, which read `this.history` as its dependency
@@ -3216,27 +3216,27 @@ export function timeTravel(
     // NOT deleted: the `pendingTransactions` capture buckets, which record a
     // transaction confirmed by `transactions()` as one turn. That is
     // time-travel's own job and the lifecycle observer drives it.
-    (enhancedTree as ISignalTree<T> & TimeTravelMethods)['getHistory'] = () =>
-      timeTravelManager.getHistory();
-    (enhancedTree as ISignalTree<T> & TimeTravelMethods)['resetHistory'] =
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['getHistory'] = () =>
+      restorationManager.getHistory();
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['resetHistory'] =
       () => {
-        timeTravelManager.resetHistory();
+        restorationManager.resetHistory();
       };
-    (enhancedTree as ISignalTree<T> & TimeTravelMethods)['jumpTo'] = (
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['jumpTo'] = (
       index: number
     ) => {
-      timeTravelManager.jumpTo(index);
+      restorationManager.jumpTo(index);
     };
-    (enhancedTree as ISignalTree<T> & TimeTravelMethods)['canUndo'] = () =>
-      timeTravelManager.canUndoConfirmed();
-    (enhancedTree as ISignalTree<T> & TimeTravelMethods)['canRedo'] = () =>
-      timeTravelManager.canRedoConfirmed();
-    (enhancedTree as ISignalTree<T> & TimeTravelMethods)['getCurrentIndex'] =
-      () => timeTravelManager.getCurrentIndex();
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['canUndo'] = () =>
+      restorationManager.canUndoConfirmed();
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['canRedo'] = () =>
+      restorationManager.canRedoConfirmed();
+    (enhancedTree as ISignalTree<T> & RestorationMethods)['getCurrentIndex'] =
+      () => restorationManager.getCurrentIndex();
 
     // Expose internal manager for advanced tooling / demo usage
-    (enhancedTree as unknown as Record<string, unknown>)['__timeTravel'] =
-      timeTravelManager;
+    (enhancedTree as unknown as Record<string, unknown>)['__restoration'] =
+      restorationManager;
 
     visitTree((enhancedTree as ISignalTree<T>).$, (node) => {
       const scopedNode = node as {
@@ -3257,10 +3257,10 @@ export function timeTravel(
         typeof scopedNode.history?.__bindSharedAuthority === 'function'
       ) {
         scopedNode.history.__bindSharedAuthority({
-          undo: () => timeTravelManager.undoAt(positionId),
-          redo: () => timeTravelManager.redoAt(positionId),
-          canUndo: () => timeTravelManager.canUndoAt(positionId),
-          canRedo: () => timeTravelManager.canRedoAt(positionId),
+          undo: () => restorationManager.undoAt(positionId),
+          redo: () => restorationManager.redoAt(positionId),
+          canUndo: () => restorationManager.canUndoAt(positionId),
+          canRedo: () => restorationManager.canRedoAt(positionId),
         });
         return false;
       }
@@ -3302,11 +3302,11 @@ export function timeTravel(
         unsubscribeReset = null;
         restoreLeafInterceptors = null;
         releaseCapture?.();
-        timeTravelManager.resetHistory();
+        restorationManager.resetHistory();
       });
     }
 
-    return enhancedTree as unknown as ISignalTree<T> & TimeTravelMethods;
+    return enhancedTree as unknown as ISignalTree<T> & RestorationMethods;
   };
 
   const meta: EnhancerMeta = {
@@ -3323,12 +3323,12 @@ export function timeTravel(
   // takes the neutral `EnhancerHost`, and parameters are contravariant under
   // `strictFunctionTypes`. The body is untouched.
   //
-  // `TimeTravelMethods.getHistory()` recovers its state from polymorphic
+  // `RestorationMethods.getHistory()` recovers its state from polymorphic
   // `this`, NOT from anything this cast carries — which is why the public
   // contract stays state-precise across it. `b266457d` removed the old
-  // `TimeTravelMethods<T>` generic for exactly this reason; the rows in
+  // `RestorationMethods<T>` generic for exactly this reason; the rows in
   // `time-travel-contract.typing.spec.ts` are what verify it.
-  return enhancerFn as unknown as Enhancer<TimeTravelMethods>;
+  return enhancerFn as unknown as Enhancer<RestorationMethods>;
 }
 
 /**
@@ -3339,7 +3339,7 @@ export function timeTravel(
  * declaring the pre-15.0 shape; deletion candidate for the deletion-first
  * utility audit, alongside `batchingWithConfig`.
  */
-export function enableTimeTravel(): Enhancer<TimeTravelMethods> {
+export function enableTimeTravel(): Enhancer<RestorationMethods> {
   return timeTravel({ enabled: true });
 }
 
@@ -3349,18 +3349,18 @@ export function enableTimeTravel(): Enhancer<TimeTravelMethods> {
  * Not exported: reachable only as `withTimeTravel.history`, which is the
  * documented surface. Nothing imports the bare name.
  */
-function timeTravelHistory(
+function restorationHistory(
   maxHistorySize: number
-): Enhancer<TimeTravelMethods> {
+): Enhancer<RestorationMethods> {
   return timeTravel({ maxHistorySize });
 }
 
 // New v6-friendly export: `timeTravel` with named presets.
 export const withTimeTravel = Object.assign(
-  (config: TimeTravelConfig = {}) => timeTravel(config),
+  (config: RestorationConfig = {}) => timeTravel(config),
   {
     minimal: () => timeTravel({ maxHistorySize: 20, includePayload: false }),
     debug: () => timeTravel({ maxHistorySize: 200, includePayload: true }),
-    history: timeTravelHistory,
+    history: restorationHistory,
   }
 );

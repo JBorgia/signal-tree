@@ -2,7 +2,7 @@ import { vi } from 'vitest';
 
 import { batching } from '../enhancers/batching/batching';
 import { devTools } from '../enhancers/devtools/devtools';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { signalTree } from '../index';
 
 /**

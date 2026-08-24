@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { undoable } from '../../lib/undoable';
 
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 /**
  * A history entry IS the snapshot — no clone, no deep compare.

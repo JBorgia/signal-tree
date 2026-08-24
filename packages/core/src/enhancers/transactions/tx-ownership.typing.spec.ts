@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from '../time-travel/time-travel';
+import { timeTravel } from '../restoration/restoration';
 import { transactions } from './transactions';
 
 /**
@@ -11,7 +11,7 @@ import { transactions } from './transactions';
  * This file proves the CONTRACT, so the duplication cannot come back the way it
  * arrived: silently, through an interface extension nobody read.
  *
- * `TimeTravelMethods extends TransactionMethods` is what put a second
+ * `RestorationMethods extends TransactionMethods` is what put a second
  * `transaction()` on the public surface. If someone re-adds that extension, the
  * `@ts-expect-error` below stops being an error and this file fails to compile —
  * which `check-spec-types` runs on.

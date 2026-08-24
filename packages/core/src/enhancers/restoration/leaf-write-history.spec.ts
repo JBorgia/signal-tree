@@ -3,7 +3,7 @@ import { undoable } from '../../lib/undoable';
 
 import { signalTree } from '../../lib/signal-tree';
 import { entityMap } from '../../lib/markers/entity-map';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 /**
  * Direct leaf writes must land in history.

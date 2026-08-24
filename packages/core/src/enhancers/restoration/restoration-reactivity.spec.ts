@@ -3,7 +3,7 @@ import { undoable } from '../../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 /**
  * `canUndo()`, `canRedo()` and `getHistory()` are REACTIVE.

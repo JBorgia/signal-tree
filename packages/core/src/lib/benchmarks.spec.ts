@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { signal } from '@angular/core';
 
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { visitTree } from './internals/visit-tree';
 import { signalTree } from './signal-tree';
 import { batching } from '../enhancers/batching/batching';

@@ -114,7 +114,7 @@ import { signalTree, timeTravel } from '@signaltree/core'; // ← correct
 const store = signalTree({ ... }, { enhancers: [timeTravel({ maxHistorySize: 50 })] });
 ```
 
-**Source:** [`packages/core/src/index.ts:237`](../packages/core/src/index.ts) — `export { timeTravel } from './enhancers/time-travel/time-travel';`.
+**Source:** [`packages/core/src/index.ts:237`](../packages/core/src/index.ts) — `export { timeTravel } from './enhancers/restoration/restoration';`.
 
 **Doc-side action:** None — the enhancer table in the root [README](../README.md) and [`LLM.md`](ai/LLM.md) both clearly list `timeTravel()` under `@signaltree/core`. This is purely an LLM hallucination, not a docs gap.
 

@@ -1,7 +1,7 @@
 import { signalTree } from './signal-tree';
 import { undoable } from '../lib/undoable';
 import { entityMap } from './markers/entity-map';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 
 /**

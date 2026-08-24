@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { undoable } from '../../lib/undoable';
 
-import { timeTravel } from '../../enhancers/time-travel/time-travel';
+import { timeTravel } from '../../enhancers/restoration/restoration';
 import { getPathNotifier, resetPathNotifier } from '../path-notifier';
 import { signalTree } from '../signal-tree';
 import { stored } from './stored';
@@ -242,7 +242,7 @@ describe('stored() and replay side effects', () => {
       },
       { enhancers: [timeTravel()] }
     );
-    const t = (tree as any).__timeTravel;
+    const t = (tree as any).__restoration;
 
     await Promise.resolve();
     await Promise.resolve();
@@ -270,7 +270,7 @@ describe('stored() and replay side effects', () => {
       },
       { enhancers: [timeTravel()] }
     );
-    const t = (tree as any).__timeTravel;
+    const t = (tree as any).__restoration;
 
     undoable(() => tree.$.k.set('dark'));
     await Promise.resolve();

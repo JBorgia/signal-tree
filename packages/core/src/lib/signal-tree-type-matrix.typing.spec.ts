@@ -7,7 +7,7 @@
  *
  * `tools/api-inventory.mjs` compares symbol SETS and metadata, so it
  * structurally cannot see a type-shape change to a symbol that keeps its name —
- * the `TimeTravelMethods<T>` arity change passed the inventory clean. This file
+ * the `RestorationMethods<T>` arity change passed the inventory clean. This file
  * is the missing dimension for the public tree type: it pins what a SignalTree
  * MEANS, as a positive statement of capability rather than the absence of an
  * error.

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ENHANCER_META } from '../lib/types';
 import { batching } from './batching/batching';
-import { timeTravel } from './time-travel/time-travel';
+import { timeTravel } from './restoration/restoration';
 import { devTools } from './devtools/devtools';
 import { serialization } from './serialization/serialization';
 

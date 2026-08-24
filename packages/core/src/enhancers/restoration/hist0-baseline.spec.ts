@@ -5,7 +5,7 @@ import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
 import { getSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
 import { withWriteContext } from '../../lib/write-context';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 import { transactions } from './../transactions/transactions';
 
 /**

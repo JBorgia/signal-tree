@@ -12,14 +12,14 @@
  * reason.
  *
  * `all-chains.spec.ts` did not catch it because it asserts on hand-written type
- * expressions (`BatchingMethods & TimeTravelMethods & …`) rather than on what
+ * expressions (`BatchingMethods & RestorationMethods & …`) rather than on what
  * `.with().with()` actually RETURNS. The intersection was always associative;
  * the builder was what dropped it.
  */
 import { batching } from '../enhancers/batching/batching';
 import { serialization } from '../enhancers/serialization/serialization';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 
 const chained = signalTree(
   { n: 0 },

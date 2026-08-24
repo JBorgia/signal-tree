@@ -399,7 +399,7 @@ describe('commit-consequence boundary — observed through stored()', () => {
     getPathNotifier().setBatchingEnabled(false);
 
     const { timeTravel } = await import(
-      '../../enhancers/time-travel/time-travel'
+      '../../enhancers/restoration/restoration'
     );
 
     const rec = recordingStorage({ 'cc-undo': 'light' });

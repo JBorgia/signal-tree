@@ -38,7 +38,7 @@ const enhancers = [
     id: 'C',
     name: 'TimeTravel',
     importPath: '../../lib/types',
-    typeName: 'TimeTravelMethods',
+    typeName: 'RestorationMethods',
     generic: false,
     methods: [
       'undo',

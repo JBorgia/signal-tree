@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { undoable } from '../lib/undoable';
 import { batching } from './batching/batching';
-import { timeTravel } from './time-travel/time-travel';
+import { timeTravel } from './restoration/restoration';
 import { devTools } from './devtools/devtools';
 import { signalTree } from '../lib/signal-tree';
 

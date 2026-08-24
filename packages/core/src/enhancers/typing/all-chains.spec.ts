@@ -4,7 +4,7 @@
 import type {
   BatchingMethods,
   DevToolsMethods,
-  TimeTravelMethods,
+  RestorationMethods,
   EntitiesEnabled,
 } from '../../lib/types';
 
@@ -25,7 +25,7 @@ type _batch_single = Assert<
   Equals<BatchingMethods & Base, Base & BatchingMethods>
 >;
 type _tt_single = Assert<
-  Equals<TimeTravelMethods & Base, Base & TimeTravelMethods>
+  Equals<RestorationMethods & Base, Base & RestorationMethods>
 >;
 type _dev_single = Assert<
   Equals<DevToolsMethods & Base, Base & DevToolsMethods>
@@ -35,19 +35,19 @@ type _entities_single = Assert<
 >;
 
 // Pair combinations
-type BT = BatchingMethods & TimeTravelMethods & Base;
+type BT = BatchingMethods & RestorationMethods & Base;
 type _pair_batch_tt = Assert<
-  Equals<BT, Base & BatchingMethods & TimeTravelMethods>
+  Equals<BT, Base & BatchingMethods & RestorationMethods>
 >;
 
 type BTD = BatchingMethods &
-  TimeTravelMethods &
+  RestorationMethods &
   DevToolsMethods &
   Base;
 type _triple_btd = Assert<
   Equals<
     BTD,
-    Base & BatchingMethods & TimeTravelMethods & DevToolsMethods
+    Base & BatchingMethods & RestorationMethods & DevToolsMethods
   >
 >;
 
@@ -55,7 +55,7 @@ type _triple_btd = Assert<
 type Composite = Base &
   BatchingMethods &
   DevToolsMethods &
-  TimeTravelMethods &
+  RestorationMethods &
   EntitiesEnabled;
 type _composite_ok = Assert<Equals<Composite, Composite>>;
 

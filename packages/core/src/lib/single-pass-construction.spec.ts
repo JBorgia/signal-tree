@@ -174,7 +174,7 @@ const transactionsDecl = (): ExtensionDeclaration => ({
   }),
 });
 
-const timeTravelDecl = (): ExtensionDeclaration => ({
+const restorationDecl = (): ExtensionDeclaration => ({
   id: 'timeTravel',
   capabilities: ['causal-runtime', 'temporal-snapshots'],
   contributes: ['undo', 'history'],
@@ -196,7 +196,7 @@ const timeTravelDecl = (): ExtensionDeclaration => ({
 
 describe('SHAPE-T1B — single-pass construction', () => {
   it('CASE 1 — runtime contributions bind after CONSTRUCT and before EXPOSE', () => {
-    const tree = compile([transactionsDecl(), timeTravelDecl()]);
+    const tree = compile([transactionsDecl(), restorationDecl()]);
 
     // contributed behaviour is present on the exposed tree
     expect(typeof tree['transaction']).toBe('function');
@@ -211,14 +211,14 @@ describe('SHAPE-T1B — single-pass construction', () => {
 
   it('CASE 1 — the kernel is planned from declared capabilities, not fixed', () => {
     const minimal = compile([]);
-    const full = compile([transactionsDecl(), timeTravelDecl()]);
+    const full = compile([transactionsDecl(), restorationDecl()]);
     expect(minimal()).toBe(0);
     // capability set is derived from the declarations, before construction
     expect(full).toBeDefined();
   });
 
   it('CASE 2 — one callable identity; interception is built in, not bolted on', () => {
-    const tree = compile([timeTravelDecl()]);
+    const tree = compile([restorationDecl()]);
     const before = tree.identity;
 
     tree(1);
@@ -236,7 +236,7 @@ describe('SHAPE-T1B — single-pass construction', () => {
   });
 
   it('CASE 2 — a retained reference stays coherent after later writes', () => {
-    const tree = compile([timeTravelDecl()]);
+    const tree = compile([restorationDecl()]);
     const retained = tree;
     tree(7);
     expect(retained()).toBe(7);
@@ -255,7 +255,7 @@ describe('SHAPE-T1B — single-pass construction', () => {
   });
 
   it('CASE 3 — non-conflicting contributions still compose', () => {
-    const tree = compile([transactionsDecl(), timeTravelDecl()]);
+    const tree = compile([transactionsDecl(), restorationDecl()]);
     expect(typeof tree['transaction']).toBe('function');
     expect(typeof tree['undo']).toBe('function');
   });

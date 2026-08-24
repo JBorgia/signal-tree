@@ -4,7 +4,7 @@ import { undoable } from '../lib/undoable';
 import { entityMap } from './types';
 import { form } from './markers/form';
 import { signalTree } from './signal-tree';
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 
 /**
  * Undo/redo — the production half of time travel.

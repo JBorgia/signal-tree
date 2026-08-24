@@ -91,8 +91,8 @@
         "packages/core/README.md:1747 — devTools(), withTimeTravel()",
         "packages/core/README.md:2119 — withTimeTravel() - Undo/redo functionality",
         "packages/core/README.md:2115 — import { signalTree, batching, timeTravel } from '@signaltree/core'",
-        "packages/core/src/index.ts:209 — export { timeTravel } from './enhancers/time-travel/time-travel'",
-        "packages/core/src/lib/types.ts:9-33 — TimeTravelConfig.maxHistorySize (not maxHistory)"
+        "packages/core/src/index.ts:209 — export { timeTravel } from './enhancers/restoration/restoration'",
+        "packages/core/src/lib/types.ts:9-33 — RestorationConfig.maxHistorySize (not maxHistory)"
       ],
       "proposed_action": "Global search-replace all `withTimeTravel` → `timeTravel` in the README. Fix `maxHistory: 50` → `maxHistorySize: 50` in the withTimeTravel config example. Verify all import lines include `timeTravel` not `withTimeTravel`.",
       "status": "resolved",

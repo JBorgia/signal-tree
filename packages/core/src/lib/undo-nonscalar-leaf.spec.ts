@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { undoable } from '../lib/undoable';
 
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { signalTree } from '../index';
 
 /**

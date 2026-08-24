@@ -37,7 +37,7 @@
 import { entityMap } from '../../lib/markers/entity-map';
 import { undoable } from '../../lib/undoable';
 import { signalTree } from '../../lib/signal-tree';
-import { timeTravel } from './time-travel';
+import { timeTravel } from './restoration';
 
 type Row = { id: string; v: number };
 

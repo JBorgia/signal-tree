@@ -886,7 +886,7 @@ const GATES = [
     //      the mechanism under test is "an unknown option in a spec's entityMap
     //      config is a type error", which never depended on that option existing.
     mutation: {
-      file: 'packages/core/src/enhancers/time-travel/turn-effect-composition.spec.ts',
+      file: 'packages/core/src/enhancers/restoration/turn-effect-composition.spec.ts',
       find: '    { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },',
       replace:
         '    { rows: entityMap<Row, string>({ selectId: (r) => r.id, bogusOption: 1 }) },',

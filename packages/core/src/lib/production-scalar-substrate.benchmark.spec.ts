@@ -4,7 +4,7 @@ import { undoable } from '../lib/undoable';
 import type { WritableSignal } from '@angular/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { timeTravel } from '../enhancers/time-travel/time-travel';
+import { timeTravel } from '../enhancers/restoration/restoration';
 import { entityMap } from './markers/entity-map';
 import { EntityMutationFrame } from './physical/entity-mutation-frame';
 import { EntityValueStore } from './physical/entity-value-store';

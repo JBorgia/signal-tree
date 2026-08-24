@@ -50,7 +50,7 @@ A history entry holds the tree's snapshot, and a collection's snapshot is **one
 pointer per entity**. So `entries x width x ~8 bytes` is the **floor** for
 touching that collection at all:
 
-<!-- measured: node --expose-gc tools/bench-retention-arms.mjs <shape> <width> 50 — heap baselined after seeding, so the figure is history retention alone. Constant is ~8.1-8.3 B/pointer at 10k-50k (a 64-bit pointer); the 1,000-row row reads ~10.5 because fixed per-entry overhead is a large fraction of a 0.5 MB total. Catalogue entry: docs/errors/README.md ST2029; threshold constant: packages/core/src/enhancers/time-travel/time-travel.ts (HISTORY_RETAINED_POINTER_BUDGET). NOT arithmetic — an earlier version of this table asserted a linear model instead of measuring it, and shipped a constant ~28% high. -->
+<!-- measured: node --expose-gc tools/bench-retention-arms.mjs <shape> <width> 50 — heap baselined after seeding, so the figure is history retention alone. Constant is ~8.1-8.3 B/pointer at 10k-50k (a 64-bit pointer); the 1,000-row row reads ~10.5 because fixed per-entry overhead is a large fraction of a 0.5 MB total. Catalogue entry: docs/errors/README.md ST2029; threshold constant: packages/core/src/enhancers/restoration/restoration.ts (HISTORY_RETAINED_POINTER_BUDGET). NOT arithmetic — an earlier version of this table asserted a linear model instead of measuring it, and shipped a constant ~28% high. -->
 
 | collection | 50 entries, collection touched | 50 entries, every row changed |
 | ---------- | ------------------------------ | ----------------------------- |

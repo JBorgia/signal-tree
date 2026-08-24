@@ -6,8 +6,8 @@
 export {
   BatchingMethods,
   BatchingConfig,
-  TimeTravelMethods,
-  TimeTravelConfig,
+  RestorationMethods,
+  RestorationConfig,
   EffectsMethods,
   DevToolsMethods,
   DevToolsConfig,
