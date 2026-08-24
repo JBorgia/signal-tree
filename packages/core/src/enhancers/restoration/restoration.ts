@@ -2765,10 +2765,7 @@ export function restoration(
       // Only while the announcing owner says it is OPEN. A stale id from a
       // settled transaction must not divert writes into a bucket nothing will
       // drain.
-      const key = transactionIdentityKey(
-        meta.transactionOwner as object,
-        meta.transactionId
-      );
+      const key = transactionIdentityKey(meta.transactionId);
       return activeForeignTransactions.has(key)
         ? activeForeignTransactions.get(key)
         : undefined;
@@ -2817,7 +2814,7 @@ export function restoration(
       if (event.owner === transactionOwnerToken) {
         return;
       }
-      const key = transactionIdentityKey(event.owner, event.id);
+      const key = transactionIdentityKey(event.id);
 
       if (event.kind === 'opened') {
         // Registered BEFORE the transaction's writes arrive, which is why the

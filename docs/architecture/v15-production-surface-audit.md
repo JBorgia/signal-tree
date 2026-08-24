@@ -6898,6 +6898,124 @@ OPEN            S3 and S5 — each needs a test written or a mechanism deleted.
                 unilaterally.
 ```
 
+# MATRIX-CLOSE — S3 and S5 RESOLVED. Two mechanisms deleted
+
+Neither was kept on the strength of a plausible rationale.
+
+## S3 — RECOVERY ATTEMPTED, and it found something stronger than "the defect is gone"
+
+The rule was: recover the exact case the comment claims, and let the result
+decide. Do not invent a different scenario that happens to make the branch
+matter.
+
+```text
+the claimed corruption   n=3 rows=3  ->  undo  ->  n=2 rows=3
+reproduced?              NO — both revert (n=2 rows=2)
+```
+
+But the recovery turned up the reason it CANNOT matter, which is a stronger
+result than a defect having been fixed elsewhere:
+
+```text
+currentHydrateMode() produced   'merge' | 'restore'
+every marker branches only on   'rehydrate'
+```
+
+`entity-map.ts` and `async-source.ts` each decline exactly one mode —
+`mode === 'rehydrate'` — and `currentHydrateMode()` never produced it. **Both of
+its return values fell through the same path in every marker processor.** The
+distinction was computed and no consumer could act on it.
+
+```text
+DELETED    currentHydrateMode(); the call site passes 'restore' directly
+KEPT       `origin` — this deletes a POLICY BRANCH, not the axis. Provenance
+           consumers (DevTools action metadata, the diagnostic journal) and
+           DX-NAMES-1.3 Fact 1 are untouched. What is withdrawn is the claim,
+           made in MATRIX-CLOSE pass 1, that origin had a policy consumer.
+PERMANENT  s3-hydrate-mode-recovery.spec.ts holds both halves — the historical
+PROOF      case not reproducing, AND 'merge'/'restore' being indistinguishable to
+           a loader-backed marker while 'rehydrate' is not. The branch cannot
+           return on the strength of its own comment.
+```
+
+A small confirmation arrived from lint: deleting the branch orphaned
+`getActiveWriteContext` in `signal-tree.ts`. That function was the file's ONLY
+consumer of the ambient write context.
+
+## S5 — the owner component DELETED from the key, `event.owner` KEPT
+
+```text
+DELETED   transactionIdentityKey(owner, id) -> transactionIdentityKey(id), and the
+          interned-ordinal WeakMap with it
+KEPT      TransactionLifecycleEvent.owner — a DIFFERENT mechanism, compared
+          directly by restoration (`event.owner === transactionOwnerToken`) to
+          ignore its own announcements and act only on foreign ones
+```
+
+The invariant that makes a bare id sufficient was already measured by
+DIAG-JOURNAL-1.1 and is now asserted where the deletion happened:
+
+> A channel is installed on ONE tree's canonical host and exactly ONE owner
+> announces on it. Two trees both mint id 1 and never share a channel, so the
+> collision the ordinal disambiguated cannot reach any single reader.
+
+Two tests added to `turn-feed-0-1-identity.spec.ts` — the spec that failed to
+falsify — so it now asserts the invariant that replaced what it could not prove:
+
+```text
+two trees each mint id 1, and no observer sees both
+event.owner is still load-bearing — every announcement carries the SAME owner,
+which is what makes the foreign/own comparison a usable filter
+```
+
+The second is worth noting: M6 did not disprove `event.owner`, but nothing
+proved it either. It has a proof now.
+
+```text
+owner on the EVENT    earned, and now tested
+owner inside the KEY  unproven, and gone
+```
+
+## MATRIX-CLOSE — CLOSED
+
+```text
+M1-M5, M7-M11     swept
+M6                8 probes: 6 proven, 2 not
+S3, S5            RESOLVED by deletion, each with a permanent proof of why
+```
+
+Against the stopping rule — *every surviving concept has an owner, a consumer, a
+semantic dimension and a falsifiable proof, and every unexplained residue is
+deleted or explicitly carried*:
+
+```text
+SIX PROVEN SURVIVORS   restoration designation, participation, transaction
+                       correlation, commit-consequence, structural effect,
+                       diagnostic journal
+TWO DELETED            currentHydrateMode's policy branch; the owner ordinal in
+                       the identity key
+RESIDUE DELETED        mock `.with()` suites, the WriteMetadata escape hatch and
+                       its self-referential test, three stale `*HistoryEffect*`
+                       names, one false authority name (`EditSession`)
+CARRIED OUT            whole-array scoped undo (RESTORE-P1); 149 uncoded throws
+                       (own triage); the noisy-baseline perf assertion (fixed
+                       incidentally)
+```
+
+Four of this workstream's findings were the audit correcting ITSELF — the
+`getRestorationHistory` rename, the `asyncSource` harness, the S6 spec
+misattribution, and pass 1's `currentHydrateMode` claim now withdrawn by M6.
+
+## Queue
+
+```text
+1  Candidate B      only if materially different                     <-- next
+2  TruckTrax passes 2-3
+3  final perf / retention
+4  FULL historical release gate suite (not --fast)
+5  RC / final closure
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
