@@ -371,29 +371,14 @@ store.$.count.update((n) => n + 1); // transform
 
 ## Subpath Imports
 
-Everything ships from the single `@signaltree/core` entry point.
+Everything ships from the single `@signaltree/core` entry point. There are no
+subpath imports.
 
-> ⚠️ **This section used to list three subpath imports** —
-> `@signaltree/core/security`, `@signaltree/core/edit-session` and
-> `@signaltree/core/storage`. **None of them resolve.** `package.json` exports
-> only `.`, the `security` and `storage` subpaths were deleted in 15.0, and
-> `edit-session` was never added to the export map. RELEASE-RESIDUE-0 found this;
-> whether edit-session should be published or deleted is an open surface decision,
-> tracked in the audit rather than answered here.
-
-**Tree edit sessions** (`createTreeEditSession`, v10.1+) provide scoped undo/redo bound to a writable tree path — useful for form wizards and multi-step workflows. The session holds a draft separate from the source; `commit()` writes back, `cancel()` discards.
-
-```typescript
-import { createTreeEditSession } from '@signaltree/core/edit-session';
-
-const session = createTreeEditSession(store.$.user.profile);
-session.applyChanges((profile) => ({ ...profile, name: 'Updated' }));
-session.undo(); // Revert last change in the draft
-session.commit(); // Write the draft back to the source path
-// or session.cancel() — discard the draft, re-sync from source
-```
-
-The value-level `createEditSession(initial)` primitive (single-arg, no tree binding) is still available for stateful drafts not bound to a tree path.
+> ⚠️ **This section used to teach three of them** — `@signaltree/core/security`,
+> `@signaltree/core/edit-session` and `@signaltree/core/storage` — and none
+> resolved. `package.json` exports only `.`. RELEASE-RESIDUE-0 found it;
+> `security` and `storage` were deleted in 15.0, and `edit-session` was deleted
+> too, having never been in the export map at all.
 
 > **When to reach for what:** use `createTreeEditSession` when you need an uncommitted draft you can `commit()` or `cancel()` against a specific subtree — distinct from `restoration()`, which records the whole tree's history and lets you step backward globally rather than holding a separate draft.
 

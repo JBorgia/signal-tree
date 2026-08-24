@@ -7141,6 +7141,122 @@ The two previously-carried items survive this scan **because they are explicitly
 carried**, not because the sweep missed them — which is what the stopping rule
 asked for.
 
+# RELEASE-RESIDUE-0.1 — edit-session DELETED, and the gate that would have caught it
+
+## edit-session is deleted, not published
+
+```text
+packages/core/src/lib/edit-session.ts        DELETED
+  + edit-session.spec.ts, -clone-fidelity, -lossless-clone
+```
+
+The evidence pointed at deletion rather than rescue, and none of it is about the
+code's quality:
+
+```text
+no reachable published entry point — never in the export map
+no production consumer has demonstrated a need
+its "public" status came from COMMENTS and a README, not from package.json
+its only importers were its own specs
+Candidate A converged on one package, one "." entry point, no companion subpaths
+MATRIX-CLOSE's rule: only DEMONSTRATED third-party need earns public surface
+```
+
+**Implemented and tested is not evidence that something should ship** — this
+release has deleted several things for exactly that reason. Publishing it now
+would turn an archaeological accident into a permanent v15 commitment.
+
+A consequence worth stating: pass 2A's `getEditHistory()` rename was production
+churn on unreachable code. Both findings are still true — MATRIX-CLOSE caught a
+name claiming an authority it did not have, and RELEASE-RESIDUE then found the
+whole surface was unreachable.
+
+The repo already half-knew. `docs/myths-and-misconceptions.md` said plainly that
+`18fe5781` withdrew the subpath and *"There is no import path for it"*, and
+`check-rc-public-dispositions.mjs` recorded it as **"UNPLACED edit-session
+subpath; null not run"** — while the README taught the import and the barrel
+comment pointed readers at it. **The fact was right in two places and contradicted
+in three.**
+
+## The new gate — `check-documented-imports.mjs`
+
+```text
+lint-readme-apis    does this SYMBOL exist in some built entry point?
+find-dead-exports   is this symbol reachable from barrels or repo imports?
+NEW                 can a USER import the documented SPECIFIER at all?
+```
+
+It resolves every `from '@signaltree/…'` in LIVE docs into package + subpath and
+requires the subpath to be in that package's real `exports`. Historical material
+is excluded **by path and filename**, never by inspecting the snippet — a current
+guide must not pass because a parser guessed it was about the past.
+
+Self-tested, and wired into `verify-gates` with its self-test as a separate row:
+
+```text
+@signaltree/core                          -> resolves
+@signaltree/core/definitely-not-exported  -> rejected
+@signaltree/definitely-not-a-package      -> rejected
+```
+
+### ⚠️ It found two more on its FIRST run, and one is worse than edit-session
+
+```text
+packages/core/README.md — the SHIPPED readme, inside the npm tarball
+
+  @signaltree/ng-forms                     the package was DELETED in 41373050
+                                           (NGF-DEL). Two sections, a full
+                                           validator API, worked examples.
+  @signaltree/core/enhancers/batching      never an export, and presented under
+                                           a ✅ as "Also fine: Explicit subpath"
+```
+
+A deleted package still being taught in the shipped README is the strongest
+possible justification for the gate, and `lint-readme-apis` structurally could
+not see it: a specifier for a package that is not built is checked against
+nothing.
+
+### And the gate suite caught its own follow-on
+
+Deleting edit-session removed the only emitter of **ST2028**, and
+`check-error-codes` failed immediately — documentation obligation surfaced
+mechanically rather than by memory. Marked retired using the catalogue's existing
+convention.
+
+## The two carries, with the dispositions the owner set
+
+```text
+WHOLE-ARRAY SCOPED UNDO / RESTORE-P1
+  Candidate B    does NOT block
+  before final   MUST be explicitly dispositioned
+  the question   does v15 documentation IMPLY that a whole-array replacement
+                 designated with `undoable()` is reversible? If yes, narrow the
+                 docs or fix it. If no, keep the permanent regression showing the
+                 safe outcome and carry the capability work.
+  NOT OPENED NOW — MATRIX-CLOSE proved it is an independent restoration
+  capability problem, and pulling it in now violates the boundary that stopped
+  MATRIX-CLOSE becoming another design cycle. TruckTrax 2-3 is evidence: if a
+  real consumer naturally hits this shape, the priority changes.
+
+149 UNCODED THROWS
+  Candidate B    does NOT block
+  before RC      BOUNDED triage only
+  the question   is there a USER-ACTIONABLE public failure in the shipping v15
+                 surface that the catalogue promises to explain and cannot?
+                 NOT "does every throw have a code" — that is a taxonomy project
+                 with 149 opportunities for arbitrary decisions.
+  Internal invariant-only throws stay out of this release.
+```
+
+## Verification
+
+```text
+nx test core     1871 passed / 209 files   (18 fewer — edit-session's suites)
+lint, typecheck, build core, build demo    all 0
+verify-gates --fast                        38/38   (36 + the new gate and its
+                                                    self-test)
+```
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
