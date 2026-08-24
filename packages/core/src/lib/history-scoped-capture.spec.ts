@@ -3,28 +3,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { entityMap } from './types';
 import { signalTree } from './signal-tree';
 import { timeTravel } from '../enhancers/time-travel/time-travel';
-import { serialization } from '../enhancers/serialization/serialization';
 
 /**
- * RFC 0012 — `entityMap({ recordHistory: false })`.
+ * ST2029 — time travel retention warning.
  *
  * `entityMap`'s snapshot is `{ all: node.all() }`, an N-pointer array rebuilt
- * whenever the collection changes. Time travel records on every self-dirty
- * flush, so attaching `timeTravel()` to a tree holding a large collection made
- * every collection-mutating write O(collection width), permanently. RE-MEASURED
- * for 14.1.1 (`tools/bench-retention-arms.mjs`, 50 recorded writes at 50k rows):
- * 19.38MB retained, against 0.15MB with the flag on. The flag's effect is
- * stronger than first published: retention becomes INDEPENDENT of collection
- * width (~0.15MB at 1k, 10k and 50k alike), because it removes the
- * `entries x width` term rather than shrinking it.
+ * whenever the collection changes, and time travel records on every self-dirty
+ * flush — so attaching `timeTravel()` to a tree holding a large collection makes
+ * every collection-mutating write O(collection width), permanently. MEASURED
+ * (`tools/bench-retention-arms.mjs`, 50 recorded writes at 50k rows): 19.38MB
+ * retained.
  *
- * Before this, `transient: true` was the only opt-out and it opted out of
- * EVERYTHING — the grid either paid that cost or did not persist at all.
- *
- * The flag is time-travel-scoped ONLY. Everything below the first describe
- * exists to pin that boundary, because a flag that quietly removed a collection
- * from `serialization()` too would be a data-loss bug wearing an optimisation's
- * clothes.
+ * This file used to be the RFC 0012 suite for
+ * `entityMap({ recordHistory: false })`, which was DELETED in 15.0 — it
+ * implemented location-scoped history, the model HIST-0 case 4 refuted and which
+ * was measured partially reversing an atomically authored turn. The retention
+ * warning survives it; the escape hatch it used to recommend does not.
  */
 type Row = { id: number; value: number };
 const rows = (n: number): Row[] =>
@@ -32,221 +26,6 @@ const rows = (n: number): Row[] =>
 
 const flush = () => new Promise<void>((r) => setTimeout(r, 0));
 
-describe('recordHistory: false — excluded from time travel', () => {
-  it('keeps the collection out of recorded history entries', async () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<Row, number>({
-          selectId: (r) => r.id,
-          recordHistory: false,
-        }),
-        n: 0,
-      },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
-    );
-    tree.$.rows.setAll(rows(5));
-    await flush();
-
-    (tree as unknown as (v: object) => void)({ n: 1 });
-    await flush();
-
-    const entry = (
-      tree as unknown as {
-        __timeTravel: {
-          getHistory(): Array<{ state: Record<string, unknown> }>;
-        };
-      }
-    ).__timeTravel
-      .getHistory()
-      .at(-1);
-
-    expect(entry?.state).toBeDefined();
-    expect('rows' in (entry?.state ?? {})).toBe(false);
-    expect(entry?.state['n']).toBe(1);
-  });
-
-  it('an INCLUDED collection is still captured — the flag is opt-in', async () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<Row, number>({ selectId: (r) => r.id }),
-        n: 0,
-      },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
-    );
-    tree.$.rows.setAll(rows(5));
-    await flush();
-
-    (tree as unknown as (v: object) => void)({ n: 1 });
-    await flush();
-
-    const entry = (
-      tree as unknown as {
-        __timeTravel: {
-          getHistory(): Array<{ state: Record<string, unknown> }>;
-        };
-      }
-    ).__timeTravel
-      .getHistory()
-      .at(-1);
-
-    expect('rows' in (entry?.state ?? {})).toBe(true);
-  });
-});
-
-describe('recordHistory: false — present everywhere ELSE', () => {
-  it('still appears in tree()', () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<Row, number>({
-          selectId: (r) => r.id,
-          recordHistory: false,
-        }),
-      },
-      { capabilities: ['causal-runtime'] }
-    );
-    tree.$.rows.setAll(rows(3));
-
-    const snap = tree() as { rows: { all: Row[] } };
-    expect(snap.rows.all).toHaveLength(3);
-  });
-
-  it('still round-trips through serialization()', () => {
-    // The parameter MUST be spelled `recordHistory`. Until 14.1.1 this test
-    // passed `history`, the pre-rename name, which `EntityMapConfig` no longer
-    // declares — so both arms built an identical default-configured tree and the
-    // equality assertion held vacuously. Vitest transpiles via esbuild and does
-    // not typecheck, so nothing caught it. Keep the literal key here, not a
-    // shorthand variable, so a future rename breaks the build instead of
-    // quietly emptying the test.
-    const mk = (recordHistory: boolean) => {
-      const t = signalTree(
-        {
-          rows: entityMap<Row, number>({
-            selectId: (r) => r.id,
-            recordHistory,
-          }),
-        },
-        { enhancers: [serialization()], capabilities: ['causal-runtime'] }
-      );
-      t.$.rows.setAll(rows(10));
-      return t;
-    };
-
-    const excluded = mk(false).serialize();
-    const included = mk(true).serialize();
-    const stripTimestamp = (s: string) =>
-      s.replace(/"timestamp":\s*\d+/g, '"timestamp":0');
-
-    // The flag is time-travel-scoped: it must not reach serialize() at all, so
-    // the two payloads are identical despite differing history participation.
-    expect(stripTimestamp(excluded)).toBe(stripTimestamp(included));
-    expect(excluded).not.toContain('recordHistory');
-    // Both still carry the rows — exclusion from history is not exclusion from
-    // persistence. This is the assertion the vacuous version could never make.
-    // The envelope is `{ data, metadata }`; the rows live at `data.rows.all`.
-    expect(JSON.parse(excluded).data.rows.all).toHaveLength(10);
-  });
-});
-
-describe('recordHistory: false — undo is PARTIAL, by design', () => {
-  it('keeps the excluded collection out of confirmed turn participation', async () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<Row, number>({
-          selectId: (r) => r.id,
-          recordHistory: false,
-        }),
-        n: 0,
-      },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
-    );
-    tree.$.rows.setAll(rows(3));
-    await flush();
-
-    (tree as unknown as (v: object) => void)({ n: 1 });
-    await flush();
-    tree.$.rows.addOne({ id: 99, value: 99 });
-    (tree as unknown as (v: object) => void)({ n: 2 });
-    await flush();
-
-    const manager = (
-      tree as unknown as {
-        __timeTravel: {
-          getTurns(): Array<{
-            id: number;
-            __positionIds?: number[];
-            __effects?: Array<{ ownerPath?: string; path?: string }>;
-          }>;
-          getFrontier(positionId: number): number;
-          getAppliedTurnIdsForPosition(positionId: number): number[];
-        };
-      }
-    ).__timeTravel;
-    const rowsPositionId = (tree.$.rows as { __positionIds?: number[] })
-      .__positionIds?.[0];
-    const countPositionId = (tree.$.n as { __positionIds?: number[] })
-      .__positionIds?.[0];
-    const latestTurn = manager.getTurns().at(-1);
-
-    expect(rowsPositionId).toBeTypeOf('number');
-    expect(countPositionId).toBeTypeOf('number');
-    expect(latestTurn?.__positionIds).not.toContain(rowsPositionId);
-    expect(latestTurn?.__positionIds).toContain(countPositionId);
-    expect(
-      latestTurn?.__effects?.some((effect) => effect.ownerPath === 'rows')
-    ).toBe(false);
-    expect(
-      latestTurn?.__effects?.some((effect) => effect.path?.startsWith('rows'))
-    ).toBe(false);
-    expect(
-      manager.getAppliedTurnIdsForPosition(rowsPositionId as number)
-    ).toEqual([]);
-    expect(manager.getFrontier(rowsPositionId as number)).toBe(0);
-  });
-
-  it('undo reverts other state but NOT the excluded collection', async () => {
-    // The documented trade, pinned so it can never become an accidental
-    // regression: "a partial restore is worse than a failed one" is a lesson
-    // this codebase already paid for, so the partiality must be deliberate,
-    // opt-in, and tested.
-    const tree = signalTree(
-      {
-        rows: entityMap<Row, number>({
-          selectId: (r) => r.id,
-          recordHistory: false,
-        }),
-        n: 0,
-      },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
-    );
-    tree.$.rows.setAll(rows(3));
-    await flush();
-
-    (tree as unknown as (v: object) => void)({ n: 1 });
-    await flush();
-    tree.$.rows.addOne({ id: 99, value: 99 });
-    (tree as unknown as (v: object) => void)({ n: 2 });
-    await flush();
-
-    expect(tree.$.n()).toBe(2);
-    expect(tree.$.rows.all()).toHaveLength(4);
-
-    (tree as unknown as { undo(): void }).undo();
-
-    expect(tree.$.n()).toBe(1); // reverted
-    expect(tree.$.rows.all()).toHaveLength(4); // NOT reverted — the point
-  });
-});
-
-/**
- * ST2029 — history retention from included collections.
- *
- * Every test here uses REAL APP ORDER: build the tree, attach the enhancer,
- * THEN let the data arrive. The first version of this diagnostic checked once
- * at enhancer attach, and passed a suite that populated the collection before
- * attaching — an order chosen to suit the implementation. In app order it never
- * fired at all, because at attach the collection is always empty.
- */
 describe('ST2029 — history retention', () => {
   let warn: ReturnType<typeof vi.spyOn>;
   const msg = () => warn.mock.calls.map((c) => String(c[0])).join('\n');
@@ -290,11 +69,11 @@ describe('ST2029 — history retention', () => {
     expect(msg()).toContain('rows');
   });
 
-  it('does NOT fire once the collection opts out', async () => {
-    await appOrder({ selectId: (r) => r.id, recordHistory: false }, 20_000, 34);
-
-    expect(msg()).not.toContain('ST2029');
-  });
+  // The `recordHistory: false` arm was DELETED in 15.0 with the option. It
+  // asserted that opting a collection out silenced the warning — which was true,
+  // and was exactly the location-scoped model HIST-0 case 4 refuted. The two
+  // arms below carry the point that actually matters: this warning is judged on
+  // RETENTION (entries x width), not on row count.
 
   it('does NOT fire for a big collection with a SHORT history', async () => {
     // Retention is entries x width. A row-count threshold judges this wrong.
@@ -308,108 +87,5 @@ describe('ST2029 — history retention', () => {
     await appOrder({ selectId: (r) => r.id }, 50, 34);
 
     expect(msg()).not.toContain('ST2029');
-  });
-});
-
-describe('entityMap({ recordHistory: false }) — no PHANTOM undo steps (14.1.1)', () => {
-  const tick = () => new Promise((r) => setTimeout(r, 0));
-
-  // Before the fix: five excluded-only writes produced FIVE entries with
-  // canUndo() true, and the undo changed nothing a user could see. A dead
-  // Ctrl+Z is worse than no undo — it spends a step the user believes they had.
-  //
-  // Cause: structural sharing makes a new root per write, and pruning copies
-  // every node on the path down to the excluded key, so two snapshots differing
-  // only inside excluded state came back structurally identical but
-  // referentially distinct. `last.state === entry.state` missed them.
-  it('excluded-only writes create NO entries', async () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<{ id: string; n: number }>({ recordHistory: false }),
-        draft: '',
-      },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
-    );
-    tree.$.rows.addMany([{ id: 'a', n: 0 }]);
-    await tick();
-
-    const base = tree.getHistory().length;
-    for (let i = 1; i <= 5; i++) {
-      tree.$.rows.updateOne('a', { n: i });
-      await tick();
-    }
-
-    expect(tree.getHistory().length - base).toBe(0);
-    expect(tree.canUndo()).toBe(false);
-  });
-
-  it('an excluded write does not shift where undo lands', async () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<{ id: string; n: number }>({ recordHistory: false }),
-        draft: '',
-      },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
-    );
-    tree.$.rows.addMany([{ id: 'a', n: 0 }]);
-    await tick();
-
-    tree.$.draft.set('hello');
-    await tick();
-    tree.$.rows.updateOne('a', { n: 9 }); // excluded — must not become a step
-    await tick();
-    tree.$.draft.set('world');
-    await tick();
-
-    tree.undo();
-    expect(tree.$.draft()).toBe('hello');
-    // ...and undo must not roll the excluded collection back either.
-    expect(tree.$.rows.all()[0].n).toBe(9);
-  });
-
-  // The case a SHALLOW reference compare would miss: pruning copies the
-  // intermediate `box` node too, so the root's `box` reference differs even
-  // though nothing observable changed.
-  it('works when the excluded collection is NESTED', async () => {
-    const tree = signalTree(
-      {
-        box: {
-          rows: entityMap<{ id: string; n: number }>({ recordHistory: false }),
-          label: 'x',
-        },
-      },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
-    );
-    tree.$.box.rows.addMany([{ id: 'a', n: 0 }]);
-    await tick();
-
-    const base = tree.getHistory().length;
-    for (let i = 1; i <= 4; i++) {
-      tree.$.box.rows.updateOne('a', { n: i });
-      await tick();
-    }
-    expect(tree.getHistory().length - base).toBe(0);
-
-    // A real sibling write still records.
-    tree.$.box.label.set('y');
-    await tick();
-    expect(tree.getHistory().length - base).toBe(1);
-  });
-
-  it('does not suppress ordinary writes when nothing is excluded', async () => {
-    const tree = signalTree(
-      { n: 0 },
-      { enhancers: [timeTravel()], capabilities: ['causal-runtime'] }
-    );
-    await tick();
-    const base = tree.getHistory().length;
-    tree.$.n.set(1);
-    await tick();
-    tree.$.n.set(2);
-    await tick();
-
-    expect(tree.getHistory().length - base).toBe(2);
-    tree.undo();
-    expect(tree.$.n()).toBe(1);
   });
 });

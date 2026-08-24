@@ -7,10 +7,7 @@ import { signal } from '@angular/core';
 
 import {
   deepEqual,
-  HISTORY_EXCLUDED,
   isTraversableNode,
-  prunedEqual,
-  pruneHistoryExcluded,
   snapshotState,
 } from '../../lib/utils';
 import { copyTreeProperties } from '../utils/copy-tree-properties';
@@ -775,18 +772,10 @@ class TimeTravelManager<T> {
     // This is what makes the snapshot read-only contract load-bearing rather
     // than advisory (nodes are frozen in dev). A caller that mutates a snapshot
     // now corrupts history as well as the cache.
-    // Prune history-excluded nodes AFTER building, not by snapshotting
-    // differently. The memo stays untouched — one snapshot, one cell, sharing
-    // preserved — and the entry simply does not retain what it dropped. A tree
-    // with no `recordHistory: false` anywhere gets the identical object back, so it
-    // pays one shallow walk and allocates nothing. See RFC 0012 option B.
-    const rawSnapshot = snapshotState(this.tree.$ as unknown as TreeNode<T>);
-    const plain = pruneHistoryExcluded(rawSnapshot, this.tree.$);
-    // `pruneHistoryExcluded` returns the IDENTICAL object when nothing was
-    // excluded, so this is an exact O(1) test for "does this tree use
-    // `recordHistory: false` at all" — and it keeps the structural-equality walk below
-    // off the hot path for every tree that does not.
-    const didPrune = plain !== rawSnapshot;
+    // No pruning step. `recordHistory` is gone, so the recorded snapshot IS the
+    // materialised snapshot and the reference-dedupe below is exact again —
+    // which also removes the phantom-entry class that pruning created.
+    const plain = snapshotState(this.tree.$ as unknown as TreeNode<T>);
 
     if (
       (typeof ngDevMode === 'undefined' || ngDevMode) &&
@@ -852,24 +841,15 @@ class TimeTravelManager<T> {
     // that changed something and a later write that changed it back, in
     // separate flushes — which is arguably two user actions and two entries.
     //
-    // The `===` stays FIRST and stays the only check for trees without
-    // exclusions. `prunedEqual` runs ONLY when something was actually pruned,
-    // because it is a walk and the write path is the hot path — putting an
-    // unconditional walk here would repeat the mistake that read-time
-    // `shouldSkip` was introduced to fix.
-    //
-    // Why the extra check is needed at all: a write to an EXCLUDED collection
-    // still makes a new root, and pruning copies every node on the path down to
-    // the excluded key — so two snapshots differing only inside excluded state
-    // are structurally identical and referentially distinct. The `===` missed
-    // them and each became a PHANTOM entry: `canUndo()` true, undo changes
-    // nothing visible, and the user spends a step they never had.
+    // Reference identity is the whole check again. It was not, while
+    // `recordHistory` existed: pruning produced snapshots that were structurally
+    // identical and referentially distinct, so a `prunedEqual` walk had to run
+    // whenever anything had been pruned. Deleting the option deleted the need.
     const last = this.history[this.history.length - 1];
     const isEffectEmpty = !effects || effects.length === 0;
     if (
       last &&
       (last.state === entry.state ||
-        (didPrune && prunedEqual(last.state, entry.state)) ||
         (isEffectEmpty && deepEqual(last.state, entry.state)))
     ) {
       return undefined;
@@ -2173,10 +2153,6 @@ function checkHistoryRetention(root: unknown, entries: number): void {
         typeof (child as { setAll?: unknown }).setAll === 'function';
 
       if (isCollection) {
-        // An excluded collection is not retained, so it is not counted.
-        if ((child as Record<symbol, unknown>)[HISTORY_EXCLUDED] === true) {
-          continue;
-        }
         let size = 0;
         try {
           size = all.call(child).length;
@@ -2211,9 +2187,9 @@ function checkHistoryRetention(root: unknown, entries: number): void {
     )}k entity pointers — ${entries} history entries, each holding a fresh ` +
       `array for every collection it captures (widest: "${widestPath}" at ` +
       `${widest}). Every write to those collections is O(collection), and the ` +
-      `history only grows. If a collection should persist but not be undoable, ` +
-      `pass entityMap({ recordHistory: false }); if it should be neither, use ` +
-      `transient: true. [ST2029]`
+      `history only grows. If a collection should not be captured at all, use ` +
+      `transient: true; otherwise reduce maxHistorySize, or reduce how many ` +
+      `operations are undoable. [ST2029]`
   );
 }
 
@@ -2642,24 +2618,6 @@ export function timeTravel(
 
       return cursor;
     };
-    const isHistoryExcludedCapture = (
-      ownerPath?: string,
-      path?: string
-    ): boolean => {
-      const ownerNode = resolveLiveNodeAtPath(ownerPath);
-      if (
-        ownerNode &&
-        (ownerNode as Record<symbol, unknown>)[HISTORY_EXCLUDED] === true
-      ) {
-        return true;
-      }
-
-      const liveNode = resolveLiveNodeAtPath(path);
-      return Boolean(
-        liveNode &&
-          (liveNode as Record<symbol, unknown>)[HISTORY_EXCLUDED] === true
-      );
-    };
     const effectKey = (effect: TurnEffect): string => {
       switch (effect.kind) {
         case 'set':
@@ -2891,10 +2849,6 @@ export function timeTravel(
       subjectIds?: number[],
       positionIds?: number[]
     ): void => {
-      if (isHistoryExcludedCapture(ownerPath, path)) {
-        return;
-      }
-
       // HIST-C2. OR, never assign: the turn is eligible if ANY of its writes
       // was designated. Assigning would let a later undesignated write in the
       // same turn demote it, which would partially reverse an atomic operation

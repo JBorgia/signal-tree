@@ -3,6 +3,20 @@
 These entries keep release-delta claim checks honest before the actual version
 bump inserts the final dated 15.0.0 heading.
 
+- **BREAKING: `entityMap({ recordHistory: false })` removed.** The option, the
+  `HISTORY_EXCLUDED` mark, `pruneHistoryExcluded()`, `prunedEqual()` and the
+  snapshot-pruning path are all gone. It excluded a collection from history by
+  LOCATION, and a turn touching both an excluded collection and ordinary state
+  was only PARTIALLY reversed — undo reverted the ordinary half and left the
+  excluded half standing. Opt-in eligibility replaces it: designate the
+  operations that should be undoable with `undoable()`, and everything else costs
+  no restoration at all, whatever it touches. Deleting it also removed a bug
+  class of its own — pruning produced snapshots that were structurally identical
+  and referentially distinct, so writes to an excluded collection could create
+  PHANTOM undo steps (`canUndo()` true, undo changes nothing visible), which
+  `prunedEqual()` existed to guard. For a collection that should not be captured
+  at all, `transient: true` is unchanged.
+
 - **`undoable()` — designate an operation as undoable.** Restoration eligibility
   now has one public door. `undoable(fn)` marks the authored causal turn
   containing its writes as eligible for undo; it does not create a turn
