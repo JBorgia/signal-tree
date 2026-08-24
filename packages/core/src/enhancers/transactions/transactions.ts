@@ -1149,6 +1149,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
   try {
     const notifier = getPathNotifier();
     if (notifier) {
+      const treeOwnerId = getPositionRegistry(tree.$)?.id;
       const subscribeCollectionNotifications = (): void => {
         unsubscribeNotifications?.();
         unsubscribeNotifications = notifier.subscribe(
@@ -1157,6 +1158,27 @@ export function getOrCreateInternalTransactionRuntime<T>(
             if (origin === 'restoration') {
               return;
             }
+            // NOTIFIER-SCOPE-0. The notifier is PROCESS-GLOBAL and this
+            // subscription is `'**'`, so writes belonging to OTHER trees
+            // arrive here. Before registry-qualified ownership they were
+            // invisible for the worse reason — coalesced away, taking a real
+            // write with them. Now they are delivered and must be DECLINED:
+            // capturing a foreign write put another tree's baseline into this
+            // tree's history, and `b.undo()` applied tree A's value to tree B.
+            //
+            // An emitter that supplies no namespace is accepted, as before —
+            // the guard can only ever reject a write that positively names a
+            // different owner.
+            const writeOwnerId = (meta as { ownerId?: number } | undefined)
+              ?.ownerId;
+            if (
+              writeOwnerId !== undefined &&
+              treeOwnerId !== undefined &&
+              writeOwnerId !== treeOwnerId
+            ) {
+              return;
+            }
+
             // DEVTOOLS-JUMP-0.1. Inspection contributes NOTHING here: no
             // bucket, no confirmed effect, and above all no dependency
             // evidence. Placed ahead of the realization branch because the C3

@@ -25,6 +25,7 @@ export type OwnedNodeMetadata = {
   subjectIds?: readonly number[];
   ownerPath?: string;
   emitsMutations?: boolean;
+  ownerId?: number;
 };
 
 export const OWNED_NODE_METADATA = new WeakMap<object, OwnedNodeMetadata>();
@@ -65,6 +66,28 @@ export function getOwnedOwnerPath(node: unknown): string | undefined {
     }
 
     return OWNED_NODE_METADATA.get(node as object)?.ownerPath;
+  }
+
+  return undefined;
+}
+
+/**
+ * The registry namespace this location belongs to — the answer to "which tree
+ * owns X?", resolvable FROM the location.
+ *
+ * `getPositionRegistry` only ever answered from `tree` / `tree.$`, which is why
+ * A2-3 measured a leaf resolving no commit scope and read it as "a leaf has no
+ * owner identity". It had a position NUMBER with no way to name the registry
+ * that indexes it.
+ */
+export function getOwnedOwnerId(node: unknown): number | undefined {
+  if (isTraversableNode(node)) {
+    const direct = (node as { __ownerId?: number }).__ownerId;
+    if (direct !== undefined) {
+      return direct;
+    }
+
+    return OWNED_NODE_METADATA.get(node as object)?.ownerId;
   }
 
   return undefined;

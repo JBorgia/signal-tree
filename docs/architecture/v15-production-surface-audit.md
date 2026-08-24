@@ -8289,8 +8289,11 @@ REGISTRY QUALIFICATION       compare (registry, positionId) instead
   COST: strictly larger, and fixes both findings at once
 ```
 
-Not chosen here. The survey is the deliverable; the lean on record is toward
-qualification, and the 24 consumers decide it.
+**CHOSEN: registry qualification, and it is implemented.** The deciding argument
+is the one the survey surfaced rather than the cost: global allocation fixes the
+notifier and leaves "which tree owns X?" unanswered, while qualification is the
+same concept both defects need. Infrastructure that two independently measured
+defects require is not speculative.
 
 # A2-3.1 FINDING 2 WITHDRAWN — a post-construction binding is viable
 
@@ -8404,6 +8407,139 @@ authority. `persist(x, y)` needs no new machinery for this.
 `DiagnosticJournal.turns()` returns the LIVE array and `dispose()` does
 `turns.length = 0`. A caller that reads the reference and then disposes gets an
 empty result. Cost one debugging round; the spec now copies before disposing.
+
+# OWNERSHIP CORRECTION — implemented. Registry-qualified location identity
+
+All three known-red pins are now green and the suite carries **zero** expected
+failures.
+
+## What changed
+
+```text
+PositionRegistry.id            process-unique NAMESPACE id, allocated once per
+                               registry. positionId keeps meaning "position N in
+                               THIS tree" — the namespace is NAMED, not removed.
+
+leaf metadata                  __ownerId (a comparable value, for the notifier,
+                               which has no node to ask) AND the registry object
+                               itself via definePositionRegistry.
+
+MutationEnvelope.ownerId       emitOwnedMutation -> emitMutation -> notify
+WriteMetadata.ownerId          folded into delivered meta in notify(), so every
+                               '**' subscriber can tell whose tree a write is
+
+hasSameSemanticIdentity        rejects on differing ownerId BEFORE comparing
+                               positionId. Entries with no namespace both carry
+                               `undefined` and compare exactly as before — the
+                               fix cannot make a single-tree case newly distinct.
+
+restoration / transactions     decline a write that positively names a different
+                               owner. Absent namespace is accepted, as before.
+```
+
+## ⚠️ Delivery was only half of it
+
+Qualifying the notifier made both trees deliver — and the two AUTHORITY tests
+still failed, differently. Previously restoration and transactions lost one
+tree's write to coalescing; afterwards they received BOTH and captured both,
+because a `'**'` subscription had never filtered by owner. The masking had been
+hiding a second defect of the same origin.
+
+```text
+before   b.undo() -> 'a0'      tree A's baseline applied to tree B
+         pa.rollback() -> 'a1'  the rollback silently did nothing
+after    both correct, both controls green
+```
+
+## What it also fixed, for free
+
+`commit-consequence` is UNCHANGED. `resolveScopeKey` already asked
+`getPositionRegistry(node)`; it simply never got an answer from a leaf. A2-3 arm
+B — which measured a leaf claimant leaking a speculative value and concluded a
+persistence API must be handed the tree — now defers correctly, and the spec is
+inverted with the old measurement recorded in place.
+
+```text
+A2-3's conclusion "an explicit tree argument is required"   WITHDRAWN
+```
+
+## Fallout, and how it was handled
+
+Three specs pinned pre-fix behaviour:
+
+```text
+a2-3-settlement-placement  arm B inverted; the old numbers kept in the comment
+mut-participation x2       asserted an EXACT delivered-meta object, so a
+                           per-run `ownerId` broke a deep-equal about
+                           PARTICIPATION. Narrowed to strip ownerId and an
+                           undefined structuralEffect — every semantic key is
+                           still compared exactly, and the finding is unchanged.
+```
+
+## Process note
+
+The `emitMutation` edit silently no-op'd on a whitespace mismatch and I did not
+assert on that replacement, so `ownerId` never reached `notify()` while the leaf
+metadata looked correct. It presented as "the fix does not work". Every edit in
+the change is now verified present by an explicit count before the suite runs —
+the same rule as "verify by exit code", applied to edits.
+
+# LINK-0 — three causal directions, measured as behaviours
+
+`packages/core/src/lib/link-0-three-directions.spec.ts`, 12/12. Nothing named
+`link()` exists; this asks whether the runtime can already carry what such a
+primitive would have to promise.
+
+```text
+PULL      Y.get()       -> X    on demand
+PUSH-IN   Y.subscribe() -> X    pushed
+PUSH-OUT  committed X   -> Y.set()
+```
+
+NAMING: `bind` is rejected — `ISignalTree` already has `bind(thisArg?)` and
+`Function.prototype.bind` owns the word. `connect` reads as an imperative action.
+`link` names the RELATIONSHIP, and direction falls out of what the endpoint
+supplies (`get` = `X <- Y`, `set` = `X -> Y`, both = `X <-> Y`). Working
+candidate, not frozen.
+
+## Results
+
+```text
+PULL      leaf / branch / root   all apply, all external/realized, zero
+                                 restoration entries
+          wrong shape refused    external(async () => …) throws ST1035, which
+                                 is what makes "await outside, apply inside" a
+                                 contract rather than a convention
+PUSH-IN   every emission is its own acquisition; a stream earns no undo
+PUSH-OUT  leaf / branch / root   only settled state escapes, late read at every
+                                 scope; confirm control lets it through
+```
+
+## ⚠️ A claim I was about to make, and the measurement that stopped it
+
+I wrote an arm expecting `external()` to be what protects a pushed value from a
+rollback. It is not — the AUTHORED control survives identically:
+
+```text
+transaction writes 'speculative', then a source emits 'from-source'
+rollback -> 'from-source' survives, for BOTH classifications
+```
+
+What preserves it is CONSERVATIVE COMPENSATION: the rollback declines to clobber
+a write that landed after the one it is reversing, whatever that write claimed.
+So PUSH-IN's survival across a transaction is not evidence for the ingress
+classification.
+
+The evidence is at the RESTORATION boundary instead, and there it is decisive:
+
+```text
+authored later write   undo SUCCEEDS, 'from-source' silently discarded
+acquired later write   undo REFUSED — ST1034 — value preserved
+```
+
+That is RESTORE-P0 P0-C, and it is the one measured place where the ingress
+classification changes an outcome. It is why PUSH-IN must go through `external()`
+even though the transaction arm cannot tell the difference.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 

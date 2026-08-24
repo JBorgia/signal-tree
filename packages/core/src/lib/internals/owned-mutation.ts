@@ -20,6 +20,7 @@ export {
   getOwnedPositionIds,
   getOwnedSubjectIds,
   getOwnedOwnerPath,
+  getOwnedOwnerId,
   hasIntrinsicMutationEmitter,
 } from './owned-metadata';
 import { getActiveWriteContext } from '../write-context';
@@ -32,6 +33,8 @@ type OwnedMutationOptions = {
   path: string;
   ownerPath?: string;
   positionIds: readonly number[] | undefined;
+  /** Registry namespace the position ids belong to. See PositionRegistry.id. */
+  ownerId?: number;
   subjectIds?: readonly number[];
   metadataStorage?: OwnedMetadataStorage;
   captureRuntime?: MutationCaptureRuntime;
@@ -126,6 +129,27 @@ export function defineOwnedOwnerPath(
   });
 }
 
+export function defineOwnedOwnerId(
+  node: object,
+  ownerId: number | undefined,
+  storage: OwnedMetadataStorage = 'property'
+): void {
+  if (ownerId === undefined) {
+    return;
+  }
+
+  if (storage === 'sidecar') {
+    mergeOwnedNodeMetadata(node, { ownerId });
+    return;
+  }
+
+  Object.defineProperty(node, '__ownerId', {
+    value: ownerId,
+    enumerable: false,
+    configurable: true,
+  });
+}
+
 export function defineIntrinsicMutationEmitter(
   node: object,
   storage: OwnedMetadataStorage = 'property'
@@ -161,6 +185,7 @@ export function emitOwnedMutation(
 
   const envelope: MutationEnvelope = {
     positionId: positionId as PositionId,
+    ownerId: options.ownerId,
     path: toSegments(options.path),
     ownerPath: toSegments(options.ownerPath ?? options.path),
     before,
@@ -201,6 +226,7 @@ export function wrapOwnedWritableSignal<TValue>(
   const metadataStorage = options.metadataStorage ?? 'property';
 
   defineOwnedPositionIds(leaf as object, options.positionIds, metadataStorage);
+  defineOwnedOwnerId(leaf as object, options.ownerId, metadataStorage);
 
   if (options.subjectIds) {
     defineOwnedSubjectIds(leaf as object, options.subjectIds, metadataStorage);

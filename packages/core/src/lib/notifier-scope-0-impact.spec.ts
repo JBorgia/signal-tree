@@ -82,13 +82,12 @@ describe('NOTIFIER-SCOPE-0: what does a second tree do to restoration history?',
   });
 
   /**
-   * ⚠️ KNOWN RED — `it.fails` because this SHOULD pass and does not. Measured:
+   * ⚠️ WAS KNOWN RED, now fixed by registry-qualified ownership. Measured before:
    * `b.undo()` sets tree B to **'a0'**, tree A's baseline. Not a lost undo — a
    * FOREIGN value applied to B's state as if B had authored it.
    *
-   * Fixing NOTIFIER-SCOPE-0 must flip this to a plain `it`. Do not delete it.
    */
-  it.fails('⚠️ THE ORIGINAL DEFECT — same path, both trees written in ONE flush', async () => {
+  it('⚠️ THE ORIGINAL DEFECT — same path, both trees written in ONE flush', async () => {
     const a = signalTree({ dup: 'a0' }, { enhancers: [restoration()] });
     const b = signalTree({ dup: 'b0' }, { enhancers: [restoration()] });
     await flush();
@@ -132,15 +131,14 @@ describe('NOTIFIER-SCOPE-0: what does it do to transaction compensation?', () =>
   });
 
   /**
-   * ⚠️ KNOWN RED, and the more serious of the two. Measured: `pa.rollback()`
+   * ⚠️ WAS KNOWN RED, and the more serious of the two. Measured before: `pa.rollback()`
    * leaves tree A at **'a1'** — the rollback SILENTLY DOES NOTHING, because
    * tree B's same-path write coalesced over A's capture inside the flush. A
    * transaction reporting success while its compensation was dropped is the
    * worst failure mode this release has found.
    *
-   * Fixing NOTIFIER-SCOPE-0 must flip this to a plain `it`. Do not delete it.
    */
-  it.fails('⚠️ two trees, same path, one rolls back and the other must not move', async () => {
+  it('⚠️ two trees, same path, one rolls back and the other must not move', async () => {
     const a = signalTree(
       { tx: 'a0' },
       { enhancers: [restoration(), transactions()] }
