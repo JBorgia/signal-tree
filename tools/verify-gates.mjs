@@ -923,6 +923,25 @@ const GATES = [
     // point is checked against nothing.
   },
   {
+    name: 'documented-symbols',
+    covers:
+      "a package barrel's own API-SUMMARY list does not advertise a symbol the barrel fails to export — the symbol-level complement to documented-imports' specifier-level check",
+    cmd: ['node', 'tools/check-documented-symbols.mjs'],
+    // Earned by A2-REOPEN. `c53aa416` ("remove stored marker from public rc
+    // surface") swept the READMEs, guides and demo but left
+    // "- `stored(key, default)`" in core's own API summary, and `serialization`
+    // stopped being exported before Candidate A while still being advertised
+    // there. Every gate stayed green: lint-readme-apis does not read source
+    // files, and documented-imports checks paths rather than names.
+    provenBy: 'documented-symbols:self',
+  },
+  {
+    name: 'documented-symbols:self',
+    covers:
+      'the barrel-summary checker rejects an advertised-but-unexported symbol, accepts an exported one, and skips `.method` entries',
+    cmd: ['node', 'tools/check-documented-symbols.mjs', '--self-test'],
+  },
+  {
     name: 'documented-imports:self',
     covers:
       'the documented-import checker accepts a real entry point and rejects both a bogus subpath and a bogus package',
