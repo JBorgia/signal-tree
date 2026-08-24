@@ -5260,6 +5260,135 @@ discipline and worker-trap immunity — shrank when isolated, and the argument f
 `external()` grew when the candidate was checked against the shipped metadata
 instead of the prose describing it.
 
+# DX-NAMES-1.3 — is the ONTOLOGY right? Two facts, and one of them changes the argument
+
+"It matches the enum" is coherence with what shipped, not evidence that what
+shipped is accurate. The last round conflated those and stopped asking once it
+found a match. Two facts settle it.
+
+## FACT 1 — `origin` is not a location binary, and `'external'` IS the odd one out
+
+```text
+origin?  'restoration' | 'devtools' | 'external' | 'transaction-rollback'
+absent   ordinary application work (A1-N)
+```
+
+There is no `'internal'`. The axis is **which named originator applied this**,
+with absence meaning the application itself. And in that set:
+
+```text
+restoration          an ACT performed by a SignalTree subsystem
+transaction-rollback an ACT performed by a SignalTree subsystem
+devtools             an AGENT that is a SignalTree subsystem
+external             …not an act, not an agent. The COMPLEMENT of the set.
+```
+
+So the suspicion was right: `'external'` is the only member that names a location
+rather than an originator. A value consistent with its siblings would be an act
+name — `'acquisition'`, matching `restoration` and `transaction-rollback`.
+
+**But the asymmetry is structural, not a naming slip.** SignalTree can enumerate
+its OWN originators and cannot enumerate the world's. Three closed-set members
+naming subsystems, plus one open-set complement naming everything else, will
+never look alike — and the complement's correct name IS "outside". Renaming it
+`'acquisition'` would make the enum look tidier while describing the application's
+act rather than the value's provenance, on an axis defined as provenance.
+
+> **Verdict: the ontology is not wrong.** `'external'` is the right name for the
+> complement of a set the library cannot close.
+
+## FACT 2 — `origin` IS consumer-visible, so the coherence argument earns its keep
+
+```text
+WriteMetadata          exported from the root barrel (index.ts:103)
+devtools timeline      `origin` rides into the Redux action metadata — a
+                       developer literally reads `origin: "external"` in the
+                       DevTools panel
+diagnostic journal     exposes `origin` to a reader
+ST1034                 speaks of "external truth" in a user-facing message
+```
+
+The earlier worry — that "learning the door teaches the metadata" might really
+mean "this keeps our own source self-consistent" — does not hold. A developer
+encounters the string outside the function name, in the tool they debug with.
+
+## The accuracy question, answered on the sharpest case rather than on tidiness
+
+`acquired` describes the application's ACT of obtaining. The door does not
+classify the obtaining — that already happened before the call. It classifies the
+APPLICATION of the value. And the study's sharpest trap discriminates the two
+words:
+
+```ts
+const price = await pricingWorker.calculate(localInputs);   // app-owned
+
+acquired(() => tree.$.quote.total.set(price));
+// "did I acquire this from the worker?"  LITERALLY YES. The word affirms the
+// wrong answer.
+
+external(() => tree.$.quote.total.set(price));
+// "is this external to my application?"  Invites the RIGHT question — external
+// to what, my thread or my app? — and the honest answer is no.
+```
+
+Neither is immune (C5a remains a trap for every survivor, as 1.2 recorded). But
+`acquired` misleads MORE, because acquisition literally occurred while externality
+is at least contestable in the direction of the correct answer.
+
+**Marked honestly: that is a judgement about which question a word provokes, not a
+measurement.** It is the same class of reasoning this study called weak for
+affordance, and it is recorded as such — but it is the only accuracy argument
+anywhere that touches C5a, and it points the same way as Facts 1 and 2.
+
+## Where `acquired` would have been right
+
+Not on `origin`. On **participation**, if that axis had been named for what the
+application did rather than for how the write participates:
+
+```text
+participation   'authored' | 'realized' | 'inspection'
+```
+
+`authored` / `acquired` would be a cleaner OPPOSING PAIR than
+`authored` / `realized` — and this audit's own prose has been saying so all along
+("AUTHORED vs ACQUIRED"). That is a real observation about a shipped name, and it
+is **NOT acted on**: `realized` is deliberately shared by restoration and external
+truth precisely because they participate identically while originating
+differently, which `acquired` would break (a restoration acquires nothing). The
+prose was loose; the enum is right.
+
+## Disposition — `external()`, now on accuracy
+
+```text
+external()        SETTLED as the recommendation. Three independent arguments now
+                  point one way: it names the complement correctly (Fact 1), a
+                  developer meets the word in DevTools (Fact 2), and it provokes
+                  the right question on the worker trap.
+applyExternal()   RUNNER-UP. `apply` still buys nothing demonstrated (1.2).
+acquired()        REJECTED — but on accuracy, not on novelty. It names the app's
+                  act on an axis defined by provenance, and it affirms the wrong
+                  answer on C5a.
+```
+
+## Stopping rule, stated so this does not loop
+
+The name question has now consumed four rounds and each produced a real
+correction — a demoted criterion, a withdrawn overclaim, a failed isolation, and
+this accuracy check. This round is the first that produced **no reversal**, and
+the three arguments it found are independent of one another. That is the signal to
+stop.
+
+```text
+CLOSED BY EVIDENCE     which concept the door names, and why `acquired` loses
+STILL OPEN, and only
+settleable outside      `external()` vs `applyExternal()` — brevity and family
+                        voice against authoring-time affordance. No safety
+                        difference. Ten minutes with a few Angular developers, or
+                        pick `external()` and move on.
+NOT REOPENING           the origin enum, the participation enum, `incoming()`,
+                        `realize()`
+```
+
 # RESTORE-P0 — the reversal-validity cluster
 
 Grouped because they are one defect family, not three bugs: **the recorded
