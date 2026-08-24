@@ -2184,7 +2184,13 @@ export function timeTravel(
 
       isRestoring = true;
       try {
-        realizationPort.applyAtomically(reversalEffects);
+        // State the origin so the port propagates it. `isRestoring` is a
+        // synchronous flag and is already false by the time the notifier
+        // delivers — which is the whole reason provenance has to travel WITH the
+        // write rather than be inferred at delivery.
+        withWriteContext({ source: 'time-travel' }, () => {
+          realizationPort.applyAtomically(reversalEffects);
+        });
       } finally {
         isRestoring = false;
       }
@@ -2196,17 +2202,13 @@ export function timeTravel(
       // them from server truth. Banking them would make the next undo refuse
       // against the previous undo's output.
       //
-      // Cleared here rather than filtered at the subscription because this is
-      // the only place that knows these particular writes came from
-      // restoration.
+      // The restoration's own writes now carry `source: 'time-travel'`, so the
+      // notifier subscription filters them before the external-truth branch is
+      // reached. The consume-once marking that used to be needed here is gone —
+      // see the tombstone at `externalTruthByPath`.
       for (const effect of reversalEffects) {
         if (effect.structural === undefined && typeof effect.path === 'string') {
           externalTruthByPath.delete(effect.path);
-          // Deleting is not enough on its own: the notifier delivers at FLUSH,
-          // after this returns, so the subscription would bank the restoration's
-          // own write as external truth a moment later. Mark the path so the
-          // next delivery for it is skipped once.
-          restorationWrittenPaths.add(effect.path);
         }
         const restoredSubjectKey = subjectTruthKey(
           effect.owner,
@@ -2214,10 +2216,6 @@ export function timeTravel(
         );
         if (restoredSubjectKey !== undefined) {
           externalTruthBySubject.delete(restoredSubjectKey);
-          // Marked unconditionally, not only when an entry existed: the
-          // restoration's own row write must never be banked, whether or not
-          // external truth was present beforehand.
-          restorationWrittenSubjects.add(restoredSubjectKey);
         }
       }
     };
@@ -2314,23 +2312,21 @@ export function timeTravel(
         ? undefined
         : `${String(position)}\u0000${String(subject)}`;
 
-    /**
-     * Paths written by the restoration itself, consumed once on delivery.
-     * Restoration writes are published as realizations with `source: 'system'`,
-     * so the notifier cannot distinguish them from server truth.
-     */
-    const restorationWrittenPaths = new Set<string>();
+    // `restorationWrittenPaths` / `restorationWrittenSubjects` were DELETED once
+    // restoration carried its own origin.
+    //
+    // TOMBSTONE, because the deletion is the point. P0-C needed them because a
+    // restoration published its writes as realizations with `source: 'system'`,
+    // indistinguishable from server truth at the notifier — so each undo banked
+    // its own output as external truth and the NEXT undo refused against it.
+    // They were a consume-once workaround for a missing fact.
+    //
+    // With `source: 'time-travel'` propagated through the write path, the
+    // subscription filters restoration writes before the external-truth branch
+    // is reached, and there is nothing to suppress. Verified by neutering the
+    // mechanism first and confirming the suite stayed correct, then deleting it —
+    // rather than assuming provenance would be sufficient.
 
-    /**
-     * Subjects written by the restoration itself, consumed once on delivery.
-     *
-     * Path-based suppression cannot cover a row: the restoration writes a FIELD
-     * (`rows.0.v`) but the notification arrives at the ROW (`rows.0`), and the
-     * field-to-row split is not derivable from the path. Measured as false
-     * refusals — each undo banked its own output as external truth and the next
-     * undo refused against it.
-     */
-    const restorationWrittenSubjects = new Set<string>();
     const pendingTransactions = new Map<number, CaptureBucket>();
     const transactionOwnerToken = {};
     const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
@@ -2902,13 +2898,6 @@ export function timeTravel(
                   positionIds?.[0],
                   subjectIds?.[0]
                 );
-                if (
-                  restorationWrittenPaths.delete(path) ||
-                  (subjectKey !== undefined &&
-                    restorationWrittenSubjects.delete(subjectKey))
-                ) {
-                  return;
-                }
                 externalTruthByPath.set(path, next);
                 // Only a row-shaped payload is useful here; the collection also
                 // notifies at its own path with an undefined value.

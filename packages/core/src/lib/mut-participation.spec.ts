@@ -416,14 +416,15 @@ describe('MUT-2 — does surviving machinery carry the AUTHORED vs REALIZED dist
     await tick();
     off();
 
-    // Realization IS positively marked, on two independent channels.
+    // Realization IS positively marked, on two independent channels — and the
+    // origin is now specific enough to say WHICH realization this was.
     expect(seen).toEqual([
       {
         path: 'a.n',
-        source: 'system',
+        source: 'time-travel',
         meta: {
           intent: 'system',
-          source: 'system',
+          source: 'time-travel',
           causalMode: 'realization',
           positionIds: [3],
         },
@@ -472,8 +473,13 @@ describe('MUT-2 — is the authored/realized marking SYMMETRIC?', () => {
     await tick();
     off();
 
+    // MUT-2's finding SURVIVES: a redo is still marked realization, because from
+    // the perspective of authorship and history admission it is realization-like.
+    // What is new is the more specific provenance — `source: 'time-travel'` —
+    // added so a diagnostic observer can distinguish a restoration from a server
+    // refresh. The classification did not change; the origin was added.
     expect(seen).toEqual([
-      { path: 'a.n', source: 'system', causalMode: 'realization' },
+      { path: 'a.n', source: 'time-travel', causalMode: 'realization' },
     ]);
   });
 

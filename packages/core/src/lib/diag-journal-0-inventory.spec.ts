@@ -98,7 +98,7 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
     expect(tree.getHistory().length - 1).toBe(0);
   });
 
-  it('⚠️ CASE 7 — is a RESTORATION distinguishable from external truth?', async () => {
+  it('CASE 7 — REPAIRED: a restoration carries its own origin', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [timeTravel()] });
     await flush();
     undoable(() => tree.$.n.set(1));
@@ -109,17 +109,17 @@ describe('DIAG-JOURNAL-0 inventory: what the notifier already exposes', () => {
     await flush();
     off();
 
-    // THE MEASUREMENT THIS FILE EXISTS FOR. A restoration publishes its own
-    // writes as realizations, so at the observation seam an undo is
-    // indistinguishable from a server refresh. MUT-2 already recorded the
-    // symptom ("REDO is also marked realization"); P0-C had to work around it
-    // with an explicit suppression set.
+    // THE MEASUREMENT THIS FILE EXISTED FOR, now the other way round. This was
+    // the one missing fact: a restoration published its writes as realizations
+    // with no more specific origin, so at the observation seam an undo was
+    // indistinguishable from a server refresh.
     //
-    // Case 7 asks for restoration to be observable WITH RESTORATION ORIGIN.
-    // Recorded as measured; the disposition follows from it.
+    // Repaired by propagating origin through the existing write path — the
+    // classification is unchanged (still a realization, which is what stops an
+    // undo recursively admitting itself) and the provenance is now present.
     expect(seen.length).toBeGreaterThan(0);
     expect(seen.every((s) => s.causalMode === 'realization')).toBe(true);
-    expect(seen.some((s) => s.source === 'time-travel')).toBe(false);
+    expect(seen.every((s) => s.source === 'time-travel')).toBe(true);
   });
 
   it('CASE 4+5 — transaction identity is on the fact; lifecycle is separate', async () => {
