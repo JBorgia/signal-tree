@@ -7,6 +7,10 @@ import {
   getOwnedPositionIds,
 } from '../owned-mutation';
 import { getPhysicalCommitClock } from '../physical-commit-clock';
+import {
+  getPositionRegistry,
+  type PositionRegistry,
+} from '../position-registry';
 import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-angular-runtime';
 import { isTraversableNode } from '../../utils';
 import { visitTree } from '../visit-tree';
@@ -226,6 +230,16 @@ export interface TreeRealizationDescriptor {
 
 export interface RememberTreeRealizationDescriptorOptions {
   readonly descriptors: Map<PositionId, TreeRealizationDescriptor>;
+  /**
+   * ADDRESS-REPAIR-1 — canonical collection authority.
+   *
+   * Optional because SUBJECT-ADDRESS-CARDINALITY-0 measured that descriptor
+   * capture is FALLBACK machinery: every effect needing a field coordinate
+   * carries its own inline address, and the inline term wins. Capture still
+   * derives correctly when the registry is supplied, and synthetic callers
+   * without one keep the legacy interpretation.
+   */
+  readonly registry?: PositionRegistry;
   readonly path: string;
   readonly ownerPath?: string;
   readonly positionIds?: readonly number[];
@@ -290,17 +304,13 @@ export function rememberTreeRealizationDescriptor(
 
   const subjectId = options.subjectIds?.[0];
   const ownerPath = options.ownerPath ?? options.path;
-  const collectionPath = deriveCollectionPath(
+  // ADDRESS-REPAIR-1 — the registry answers, the string does not.
+  const { collectionPath, fieldPathFromRow } = deriveRealizationAddress(
     options.path,
     ownerPath,
     subjectId,
-    options.meta?.structuralEffect
-  );
-  const fieldPathFromRow = deriveFieldPathFromRow(
-    options.path,
-    ownerPath,
-    subjectId,
-    options.meta?.structuralEffect
+    options.meta?.structuralEffect,
+    options.registry?.collectionPathFor(owner)
   );
   if (typeof subjectId === 'number') {
     const subjectKey = String(subjectId);
@@ -1010,7 +1020,14 @@ function canApplyEffect(
   }
 
   if (!effect.structural) {
-    if (canResolvePreparedSubjectTarget(descriptor, effect, preparedContext)) {
+    if (
+      canResolvePreparedSubjectTarget(
+        descriptor,
+        effect,
+        preparedContext,
+        getPositionRegistry(tree.$)
+      )
+    ) {
       return true;
     }
 
@@ -1231,7 +1248,8 @@ function resolveLiveScalarNode(
 function canResolvePreparedSubjectTarget(
   descriptor: TreeRealizationDescriptor | undefined,
   effect: ReversalEffect,
-  preparedContext: PreparedRealizationContext | undefined
+  preparedContext: PreparedRealizationContext | undefined,
+  registry: PositionRegistry | undefined
 ): boolean {
   if (typeof effect.subjectId !== 'number') {
     return false;
@@ -1246,7 +1264,7 @@ function canResolvePreparedSubjectTarget(
     return false;
   }
 
-  const fieldPathFromRow = resolveSubjectFieldPath(descriptor, effect);
+  const fieldPathFromRow = resolveSubjectFieldPath(descriptor, effect, registry);
   if (!fieldPathFromRow) {
     return false;
   }
@@ -1344,7 +1362,7 @@ function updatePreparedRealizationContext(
   if (typeof effect.subjectId === 'number' && !effect.structural) {
     const descriptor = descriptors.get(effect.owner);
     const preparedSubject = preparedContext.resolveSubject(effect.subjectId);
-    const fieldPathFromRow = resolveSubjectFieldPath(descriptor, effect);
+    const fieldPathFromRow = resolveSubjectFieldPath(descriptor, effect, getPositionRegistry(tree.$));
     if (preparedSubject && fieldPathFromRow) {
       assignPreparedSubjectValue(preparedSubject.value, fieldPathFromRow, effect.after);
     }
@@ -1474,13 +1492,14 @@ function buildPreparedRealizationContext(
 
 function resolveSubjectFieldPath(
   descriptor: TreeRealizationDescriptor | undefined,
-  effect: ReversalEffect
+  effect: ReversalEffect,
+  registry: PositionRegistry | undefined
 ): string | undefined {
   if (typeof effect.subjectId !== 'number') {
     return undefined;
   }
 
-  const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect);
+  const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect, registry);
   return inlineFieldPathFromRow ??
     descriptor?.subjectDescriptors?.get(String(effect.subjectId))?.fieldPathFromRow ??
     descriptor?.fieldPathFromRow;
@@ -1563,8 +1582,9 @@ function resolveCurrentSubjectTarget(
   subjectId: number,
   effect: ReversalEffect
 ): unknown {
-  const inlineCollectionPath = deriveCollectionPathFromEffect(effect);
-  const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect);
+  const registry = getPositionRegistry(tree.$);
+  const inlineCollectionPath = deriveCollectionPathFromEffect(effect, registry);
+  const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect, registry);
   const subjectDescriptor = descriptor?.subjectDescriptors?.get(String(subjectId));
   const collectionPath =
     inlineCollectionPath ??
@@ -1618,8 +1638,9 @@ function resolveNotifyPath(
     return descriptor?.path;
   }
 
-  const inlineCollectionPath = deriveCollectionPathFromEffect(effect);
-  const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect);
+  const registry = getPositionRegistry(tree.$);
+  const inlineCollectionPath = deriveCollectionPathFromEffect(effect, registry);
+  const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect, registry);
   const collectionPath =
     inlineCollectionPath ??
     descriptor?.subjectDescriptors?.get(String(effect.subjectId))?.collectionPath ??
@@ -1675,34 +1696,47 @@ function hasInlineScopedAddress(
   );
 }
 
+/**
+ * ⚠️ THE INLINE PATH IS THE ONE THAT MATTERED.
+ *
+ * SUBJECT-ADDRESS-CARDINALITY-0 measured that these two win over every
+ * descriptor fallback — `descField=""` sat unused while `inlineField` supplied
+ * the answer on every resolution. So the nested rollback defect lived HERE, not
+ * in descriptor capture or its merge policy, and the registry has to be
+ * reachable from this call site or the repair does nothing.
+ */
 function deriveCollectionPathFromEffect(
-  effect: ReversalEffect
+  effect: ReversalEffect,
+  registry: PositionRegistry | undefined
 ): string | undefined {
   if (!hasInlineSubjectAddress(effect)) {
     return undefined;
   }
 
-  return deriveCollectionPath(
+  return deriveRealizationAddress(
     effect.path,
     effect.ownerPath,
     effect.subjectId as number,
-    undefined
-  );
+    undefined,
+    registry?.collectionPathFor(effect.owner)
+  ).collectionPath;
 }
 
 function deriveFieldPathFromEffect(
-  effect: ReversalEffect
+  effect: ReversalEffect,
+  registry: PositionRegistry | undefined
 ): string | undefined {
   if (!hasInlineSubjectAddress(effect)) {
     return undefined;
   }
 
-  return deriveFieldPathFromRow(
+  return deriveRealizationAddress(
     effect.path,
     effect.ownerPath,
     effect.subjectId as number,
-    undefined
-  );
+    undefined,
+    registry?.collectionPathFor(effect.owner)
+  ).fieldPathFromRow;
 }
 
 function resolveCurrentScopedTarget(
@@ -1812,36 +1846,143 @@ function getStructuralAddEffect(
   return addEffect?.kind === 'add' ? addEffect : undefined;
 }
 
-function deriveCollectionPath(
+/**
+ * ADDRESS-REPAIR-1 — the explicit subject address.
+ *
+ * ```text
+ * undefined            this effect establishes NO subject address
+ * { kind: 'whole' }    it targets the entire current subject
+ * { kind: 'field' }    it targets a coordinate within the current subject
+ * ```
+ *
+ * ⚠️ Absence is a SEPARATE VALUE, not a falsy string. The previous encoding was
+ * `undefined | '' | string`, and DESCRIPTOR-ROLE-0 measured two consumers
+ * disagreeing about `''` — one read it as "no path", the other as "the whole
+ * subject". Those are different answers to the same question, and the collision
+ * is what let an owner-only ping claim a whole-subject address.
+ *
+ * ⚠️ `whole` exists at THIS layer only. REAL-WHOLE-EFFECT-0 captured every
+ * `ReversalEffect` reaching realization and found none that needs it — every
+ * whole-entity operation decomposes into per-field effects. So `whole` is
+ * produced by row-level NOTIFICATION capture and must not be carried into
+ * `ReversalEffect` itself.
+ */
+type SubjectAddress =
+  | { readonly kind: 'whole' }
+  | { readonly kind: 'field'; readonly path: string };
+
+const WHOLE_SUBJECT: SubjectAddress = { kind: 'whole' };
+
+/**
+ * The single canonical derivation, replacing `deriveCollectionPath` and
+ * `deriveFieldPathFromRow` as independent guesses.
+ *
+ * `canonicalCollectionPath` comes from `PositionRegistry.collectionPathFor()` —
+ * the owner position's REGISTERED address — so the collection is never inferred
+ * from a string. Given it, the subject coordinate is pure segment arithmetic:
+ *
+ * ```text
+ * path === collection            owner-only notification   -> NO address
+ * collection + 1 segment         the row itself            -> whole
+ * collection + 2+ segments       a field within the row    -> field(rest)
+ * ```
+ *
+ * ⚠️ The first line is the fix for the owner ping. The old code returned `''`
+ * on `path === ownerPath` BEFORE it ever examined `subjectId`, so a value-less
+ * collection notification carrying no subject still manufactured the strongest
+ * address in the model. Here that case simply has no address to give.
+ *
+ * ⚠️ The entity-key segment is CONSUMED as event addressing and never becomes a
+ * durable coordinate. That is the nested defect that produced `FIELD="seed"` —
+ * the key returned as a field name — and it is now impossible rather than
+ * avoided, because the key's position in the path is known rather than guessed.
+ */
+function deriveSubjectAddress(
+  path: string,
+  subjectId: number | undefined,
+  structuralEffect: StructuralEffect | undefined,
+  canonicalCollectionPath: string
+): SubjectAddress | undefined {
+  // Structural effects address existence and membership, never scalar state.
+  // `structuralContext` carries add / remove / rekey.
+  if (structuralEffect) {
+    return undefined;
+  }
+
+  if (path === canonicalCollectionPath) {
+    return undefined;
+  }
+
+  const prefix = `${canonicalCollectionPath}.`;
+  if (!path.startsWith(prefix)) {
+    return undefined;
+  }
+
+  const relative = path.slice(prefix.length);
+  const firstDot = relative.indexOf('.');
+
+  // `collection.<key>` — the row itself.
+  if (firstDot === -1) {
+    return typeof subjectId === 'number' ? WHOLE_SUBJECT : undefined;
+  }
+
+  // `collection.<key>.<rest>` — a coordinate inside the row.
+  const fieldPath = relative.slice(firstDot + 1);
+  return fieldPath === ''
+    ? undefined
+    : { kind: 'field', path: fieldPath };
+}
+
+/**
+ * The storage encoding, isolated to one place.
+ *
+ * `TreeRealizationDescriptor` and the inline resolution chain still speak
+ * `string | undefined` with `''` meaning whole. That wire format is unchanged by
+ * ADDRESS-REPAIR-1 — only the DERIVATION is corrected — so the ambiguity is now
+ * confined to storage rather than being the semantics.
+ *
+ * ⚠️ It is a real remaining wart. `''` is still falsy at
+ * `canResolvePreparedSubjectTarget` and whole-subject at
+ * `assignPreparedSubjectValue`. Migrating the stored shape is deliberately NOT
+ * part of a correctness fix; it is safe now only because the derivation above no
+ * longer produces `''` for anything that means "no address".
+ */
+function encodeSubjectAddress(
+  address: SubjectAddress | undefined
+): string | undefined {
+  if (!address) return undefined;
+  return address.kind === 'whole' ? '' : address.path;
+}
+
+/**
+ * ⚠️ LEGACY FALLBACK — used only when the owner position has NO registered
+ * canonical collection.
+ *
+ * That happens for synthetic descriptors built directly by the adapter tests,
+ * whose `ownerPath` names a ROW (`data.users.u1`) rather than a collection.
+ * REALIZATION-TARGET-ROLE-1 measured that both shapes are legitimate for the
+ * same owner position and that no string test separates them — which is exactly
+ * why the registry answers instead. Those cases never materialized an entityMap,
+ * so they have nothing registered and keep their existing interpretation by
+ * construction rather than by a special case.
+ */
+function deriveCollectionPathLegacy(
   path: string,
   ownerPath: string,
   subjectId: number | undefined,
   structuralEffect: StructuralEffect | undefined
 ): string | undefined {
-  if (structuralEffect) {
-    return ownerPath;
-  }
-
+  if (structuralEffect) return ownerPath;
   if (path === ownerPath) {
     return ownerPath.includes('.') ? parentPath(ownerPath) : undefined;
   }
-
-  if (!path.startsWith(`${ownerPath}.`)) {
-    return undefined;
-  }
-
-  if (!ownerPath.includes('.')) {
-    return ownerPath;
-  }
-
-  if (typeof subjectId !== 'number') {
-    return undefined;
-  }
-
+  if (!path.startsWith(`${ownerPath}.`)) return undefined;
+  if (!ownerPath.includes('.')) return ownerPath;
+  if (typeof subjectId !== 'number') return undefined;
   return parentPath(ownerPath);
 }
 
-function deriveFieldPathFromRow(
+function deriveFieldPathFromRowLegacy(
   path: string,
   ownerPath: string,
   subjectId: number | undefined,
@@ -1867,6 +2008,48 @@ function deriveFieldPathFromRow(
 
   return relativePath;
 }
+
+/**
+ * The one entry point. Registry first; legacy only when the owner is not a
+ * registered collection.
+ */
+function deriveRealizationAddress(
+  path: string,
+  ownerPath: string,
+  subjectId: number | undefined,
+  structuralEffect: StructuralEffect | undefined,
+  canonicalCollectionPath: string | undefined
+): { collectionPath: string | undefined; fieldPathFromRow: string | undefined } {
+  if (canonicalCollectionPath !== undefined) {
+    return {
+      collectionPath: canonicalCollectionPath,
+      fieldPathFromRow: encodeSubjectAddress(
+        deriveSubjectAddress(
+          path,
+          subjectId,
+          structuralEffect,
+          canonicalCollectionPath
+        )
+      ),
+    };
+  }
+
+  return {
+    collectionPath: deriveCollectionPathLegacy(
+      path,
+      ownerPath,
+      subjectId,
+      structuralEffect
+    ),
+    fieldPathFromRow: deriveFieldPathFromRowLegacy(
+      path,
+      ownerPath,
+      subjectId,
+      structuralEffect
+    ),
+  };
+}
+
 
 function parentPath(path: string): string {
   const lastDot = path.lastIndexOf('.');

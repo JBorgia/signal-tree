@@ -937,6 +937,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
       positionIds: resolvedPositionIds,
       subjectIds,
       meta,
+      registry: getPositionRegistry(tree.$),
     });
     captureEffects(
       bucket,

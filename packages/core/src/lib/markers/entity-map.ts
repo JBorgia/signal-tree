@@ -269,8 +269,24 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
           path,
           {
             physicalCommitClock: context.physicalCommitClock,
+            // ADDRESS-REPAIR-1. The collection's own position is allocated
+            // here, and `path` IS its canonical address — both facts are known
+            // at exactly this point and nowhere later. Registering them makes
+            // every downstream consumer able to ASK which collection owns a
+            // position instead of guessing from a path's dot shape, which
+            // REALIZATION-ADDRESS-0 measured wrong for every nested case.
             positionIdAllocator: hasPositionTopology
-              ? () => context.allocatePositionId(parentPositionId)
+              ? () => {
+                  const positionId =
+                    context.allocatePositionId(parentPositionId);
+                  if (positionId !== undefined) {
+                    context.positionRegistry.registerCollectionPath(
+                      positionId,
+                      path
+                    );
+                  }
+                  return positionId;
+                }
               : () => undefined,
             ownerMetadataEnabled: hasMutationCapture,
             subjectMetadataEnabled: hasMutationCapture,

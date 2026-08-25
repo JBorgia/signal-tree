@@ -12023,3 +12023,100 @@ repaired those tests fail, and that failure is the intended signal.
 "Every blocking question is now closed" was wrong on two counts: REAL-WHOLE-EFFECT-0
 was open and has now flipped the planned representation, and this defect was not
 known at all.
+
+---
+
+# ADDRESS-REPAIR-1 — the production correction
+
+`packages/core/src/lib/address-repair-1.spec.ts`
+
+> **Ask the registry for the owner position's canonical collection address.
+> Never read `ownerPath`'s shape.**
+
+The collection PositionId and its address are BOTH known at entityMap
+materialization, so they are recorded there. Everything downstream asks:
+
+```text
+path === collection        owner-only notification  -> NO address
+collection + 1 segment     the row itself           -> whole
+collection + 2+ segments   a field within the row   -> field(rest)
+```
+
+The derivation is explicit — `undefined | {kind:'whole'} | {kind:'field'}` — and
+the entity-key segment is CONSUMED as addressing rather than returned as a
+coordinate, which makes `FIELD="seed"` unrepresentable rather than merely
+avoided.
+
+## Reached from BOTH call sites
+
+SUBJECT-ADDRESS-CARDINALITY-0 showed the INLINE path is the one that mattered,
+so `collectionPathFor` is reachable from `deriveCollectionPathFromEffect` /
+`deriveFieldPathFromEffect` as well as from `rememberTreeRealizationDescriptor`.
+Threading uses the `tree` each resolver already receives — no new plumbing, and
+no `visitTree()` added to capture or replay.
+
+## Legacy branch preserved BY CONSTRUCTION
+
+Synthetic adapter/rekey callers never materialized an entityMap, so
+`collectionPathFor` returns `undefined` and the legacy string interpretation
+runs. REALIZATION-TARGET-ROLE-1 measured that those cases legitimately use a
+ROW-shaped `ownerPath`; they keep their meaning without a special case.
+
+## Result
+
+```text
+before   2134 passing, 5 expected fail
+after    2153 passing, 0 expected fail
+```
+
+Closed: nested `addOne` / `addMany` / `updateOne` / `upsertOne`, nested
+collection rollback (LINK-COLLECTION-0), the SUBJECT-ADDRESS-0 nested round-trip.
+
+⚠️ **`REPLACE-ONE-SUBJECT-0` still fails, deliberately.** It is the CONTROL for
+this commit — that defect drops `SubjectId` at the mutation producer, upstream of
+address derivation, so a correct address repair must not fix it. It did not.
+
+## Mutation proof — six mutants, six distinct kill sets
+
+```text
+A  registry registration removed        15 failures / 4 files
+B  owner ping manufactures WHOLE         1 failure  / 1 file
+C  entity key retained as coordinate     63 failures / 21 files
+D  inline precedence broken               6 failures / 4 files
+E  collection derived from path shape    13 failures / 4 files
+F  ownerId removed from value-less ping  13 failures / 4 files
+```
+
+## ⚠️ MUTATION B INITIALLY KILLED NOTHING — reported, not papered over
+
+Making the owner ping return `whole` broke zero tests across the whole suite.
+That is a measured reachability fact, not a coverage gap:
+
+```text
+SUBJECT-ADDRESS-CARDINALITY-0   every real effect carries an inline address,
+                                and the inline term wins
+REAL-WHOLE-EFFECT-0             no non-structural effect needs whole; every
+                                structural effect skips field derivation
+```
+
+Together those make the descriptor's subject coordinate **unreachable for real
+production traffic**, so a bogus `''` in it changes nothing observable today.
+
+**So the ping repair is correctness by construction, not a live bug fix**, and
+claiming otherwise would overstate it. It is still worth having — the fallback
+becomes reachable the moment an addressless non-structural effect appears, and
+REPLACE-ONE-SUBJECT-0 is already a defect of exactly that shape. The contract is
+therefore pinned at the derivation boundary (via the exported
+`rememberTreeRealizationDescriptor`), which does kill mutation B.
+
+## ⚠️ What ADDRESS-REPAIR-1 did NOT do
+
+The STORAGE encoding is still `string | undefined` with `''` meaning whole,
+converted at one place (`encodeSubjectAddress`). DESCRIPTOR-ROLE-0's `''`
+disagreement between `canResolvePreparedSubjectTarget` (falsy → no path) and
+`assignPreparedSubjectValue` (whole subject) SURVIVES. It is safe only because
+the derivation no longer produces `''` for anything meaning "no address".
+
+Migrating the stored shape is a representation change, not a correctness fix, and
+is deliberately left out of this commit. DESCRIPTOR-MERGE-0's order-dependent
+two-level merge is likewise untouched and still open.

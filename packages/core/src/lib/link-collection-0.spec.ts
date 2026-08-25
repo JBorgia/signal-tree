@@ -394,7 +394,7 @@ describe('NESTED-COLLECTION-ROLLBACK-0', () => {
     expect(tree.$.rows.ids()).toEqual([]);
   });
 
-  it.fails('⚠️ KNOWN RED — a NESTED collection cannot roll back', async () => {
+  it('a NESTED collection rolls back — closed by ADDRESS-REPAIR-1', async () => {
     const tree = collTree();
     await flush();
 
