@@ -16029,13 +16029,35 @@ defence. If a stop is wanted for traversal cost or blast radius, first establish
 an entity-specific discriminator, or prove every marker-processed node owns an
 independent observation representation. OWNERSHIP-BEFORE-ADOPTION.
 
-### `LINK-BRANCH-NESTED-ENTITY-0` — a fourth public-contract defect
+### ⚠️ `LINK-BRANCH-NESTED-ENTITY-0` — A REGRESSION I INTRODUCED, not a pre-existing defect
+
+⚠️ **CORRECTION. This was recorded as a pre-existing source-interpretation
+defect. It is neither.** Bisected against `48ad4e4a~1`:
+
+```text
+before 48ad4e4a  {"title":"x","rows":{"all":[{"id":1,"n":"a"}]}}   CORRECT
+after  48ad4e4a  {"title":"x","rows":{"1":{...},"all":[]}}         MALFORMED
+```
+
+It is a REGRESSION introduced by the scalar/branch eligible projection in
+`48ad4e4a` — my own change. "Reproduced on production code, no scratch involved"
+was literally true and materially misleading: the production code already
+contained it.
+
+**The mechanism.** A branch source's read is correct — `tree.$.dashboard()`
+returns `{"title":"x","rows":{"all":[...]}}`, identical to `tree()`. The
+malformation happens in the eligible projection: an entity mutation publishes at
+path `dashboard.rows.1`, which passes the branch Link's owner and path-prefix
+filter, and `applyAtRelativePath` then patches it BY PATH into the branch
+snapshot — creating `rows["1"]` while the entity's own `all` stays stale.
+
+So the projection treats a nested entity node as ordinary path-addressable
+structure. That is the same category error the collection gate in
+`advanceEligible` was written to prevent for a DIRECT entity source, and it was
+never extended to an entity nested INSIDE a branch source.
 
 Found while proving that stopping recursion does not blind an ancestor. It does
-not — the parent DOES receive a publication for an entity mutation. What it
-receives is **malformed**.
-
-Reproduced on PRODUCTION code with the capability pair, no scratch involved:
+not — the parent DOES receive a publication. What it receives is malformed:
 
 ```text
 link(tree.$.dashboard) after rows.addOne({id:1,n:'a'})
@@ -16061,8 +16083,9 @@ serialization resumes, trace whether its value production invokes this same
 branch NaturalValue path before assuming it inherits the defect.
 STRUCTURAL REFERENCE != CAUSAL DEPENDENCY.
 
-Independent of the observation substrate and of the other three `link()`
-defects — the capability pair does not fix it.
+It is NOT a source-interpretation defect and does NOT share a cause with
+`LINK-ROOT-SOURCE-0`. It lives in the authority projection, above interpretation
+and below the endpoint.
 
 ### It does not gate the substrate
 
@@ -16406,7 +16429,10 @@ observation substrate's scope, which is why this was kept separate.
 LINK-BARE-SCALAR-0     CLOSED — substrate landed
 LINK-BARE-BRANCH-0     CLOSED — substrate landed
 LINK-ROOT-SOURCE-0             distinct contract defect, undispositioned
-LINK-BRANCH-NESTED-ENTITY-0    branch Link publishes a malformed entity value
+LINK-BRANCH-NESTED-ENTITY-0    REGRESSION from 48ad4e4a — the branch eligible
+                               projection patches nested entity notifications by
+                               path. Cause known, fix scoped, NOT a source
+                               interpretation defect.
 memory                 unmeasured for the dormant representation
 serialization WIP      parked; depends on the substrate landing first
 INSPECTION-EGRESS-0    open — Link green, serialization open
