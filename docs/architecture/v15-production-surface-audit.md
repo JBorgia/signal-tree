@@ -15944,8 +15944,10 @@ SHARED OBSERVATION, SEPARATE AUTHORITY implementable rather than aspirational.
 `O5` and `O7` are the mechanism discriminators. Releasing the parent disarms
 `units` (nobody else claims it) while `theme` stays armed for the child; the
 opposite order keeps `theme` armed for the parent. Neither direction gives a
-claim priority over the other. `POS-A` holds throughout — `theme` keeps
-`positionId 1` across arm, disarm and rearm.
+claim priority over the other. `POS-A` holds here as no identity CHURN under
+overlapping claims and retention after final disarm — `theme` keeps
+`positionId 1` throughout. ⚠️ Reactivation with the same id was proved by
+`OBSERVATION-LIFECYCLE-0`, not by this phase; do not attribute it here.
 
 None of OVERLAP-B (duplicate installation), OVERLAP-C (release stealing another
 consumer's leaf) or OVERLAP-D (identity churn) occurred.
