@@ -14,7 +14,11 @@ import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 
 /**
- * ERROR-SURFACE-2 PUBLIC — the delivery contract through the PACKAGE ROOT.
+ * TREE ERROR — PUBLIC CONTRACT and DELIVERY, through the PACKAGE ROOT.
+ *
+ * Consolidated from ERROR-SURFACE-2-PUBLIC plus the delivery semantics that
+ * ERROR-SURFACE-1 and ERROR-SURFACE-0 had been carrying. The historical
+ * reasoning lives in `v15-production-surface-audit.md`.
  *
  * ⚠️ Everything here imports from `../index`, not from the internals. The
  * earned semantics were all proven internally first; this proves the SHIPPED
