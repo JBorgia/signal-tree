@@ -10176,6 +10176,97 @@ letting the file's title overclaim.
 globally unique would make this test pass vacuously and would have hidden every
 bug in this class.
 
+# REALIZATION-TARGET-ROLE-1 — the six regressions explained, and TWO wrong models corrected
+
+`packages/core/src/lib/realization-target-role-1.spec.ts`, 4/4.
+
+## Two corrections in a row, one of them mine
+
+```text
+1  "ownerPath sometimes names a ROW"     proposed, withdrawn as row-owned
+                                          POSITIONS after measurement
+2  "the adapter tests are scalar leaves"  MINE, and WRONG — I generalised from
+                                          `profile.name` / `preference`, which
+                                          pass no ownerPath and no subjectId.
+                                          The six that break DO pass
+                                          `ownerPath: 'users.u1'`.
+```
+
+## What is actually true
+
+```text
+collection node    positionId YES
+row NODE           positionId NO — no owned metadata at all
+row FIELD LEAF     positionId YES, and it is THE COLLECTION'S position,
+                   plus a subjectId, with ownerPath naming the ROW
+```
+
+Measured on `data.users` containing row `u1`:
+
+```text
+collPos           = 3
+nameLeafPos       = 3                 <- the collection's position
+nameLeafOwnerPath = data.users.u1     <- the ROW path
+nameLeafSubjects  = [1]
+```
+
+So `ownerPath` really does take both shapes and they are indistinguishable as
+strings — while `effect.owner` is the COLLECTION POSITION in both.
+
+## Which half broke the six — isolated
+
+The withdrawn patch had two independent halves. Applied separately:
+
+```text
+A  `path === ownerPath` -> undefined     breaks NOTHING (152 pass)
+B  row-field branch -> `ownerPath`       breaks ALL SIX
+```
+
+⚠️ **The `preference` case needs no explanation** — it was never affected.
+`'preference'` has no dot, so the old code already returned `undefined` there,
+and candidate A is safe. The open item is closed by isolation rather than by
+tracing.
+
+B broke them because `ownerPath` is the COLLECTION in production and the ROW in
+those tests. The old `parentPath(ownerPath)` is right for the row shape and
+wrong for the collection shape; my rule was the exact inverse.
+
+## The rule that is correct for BOTH
+
+```text
+                ownerPath       old parentPath    candidate B      REGISTRY RULE
+production      data.rows       data       ✗      data.rows  ✓     data.rows  ✓
+adapter tests   data.users.u1   data.users ✓      data.users.u1 ✗  data.users ✓
+```
+
+> **Ask the registry for the owner position's canonical collection address.
+> Never read `ownerPath`'s shape.** Correct for both, because it ignores the
+> string entirely.
+
+This is the PositionRegistry-as-authority decision, now EARNED by measurement
+rather than assumed — and it removes the need for the branch I had proposed
+(`isCollection ? new : old`), which would have kept a field whose meaning
+depends on which branch wrote it.
+
+## The separation that makes it simple
+
+```text
+PositionIds identify STATE POSITIONS.
+SubjectIds identify ENTITY LIFETIMES.
+A row never becomes a position so realization can address it.
+```
+
+## Standing
+
+```text
+core   2112 passing, 5 expected failures
+```
+
+Remaining before implementation: DESCRIPTOR-ROLE-0 (which descriptor fields
+serve scalar vs subject resolution) and SUBJECT-ADDRESS-0 (ping != whole
+subject != field — the ping carries `subj=[1]`, measured, so it WILL manufacture
+`fieldPathFromRow = ''` today).
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
