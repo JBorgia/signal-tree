@@ -12931,3 +12931,86 @@ NEVER    add anything to `Link` — no onError, status, failures, error signal,
 before   2190 passing
 after    2197 passing
 ```
+
+---
+
+# ASYNC-SOURCE-RETIRE-0 — the inventory, and TWO plan-changing measurements
+
+`packages/core/src/lib/async-source-retire-0.spec.ts`
+
+The directive was to carve `asyncSource` retirement out as a NARROW prerequisite.
+The inventory says it is not narrow — and separately says retiring it may not be
+what unblocks the error event at all.
+
+## ⚠️ 1. RETIREMENT IS NOT NARROW — ~95 files
+
+```text
+core source (non-spec)   15   signal-tree, types, utils, readonly,
+                              readonly-readers, serialization,
+                              materialize-markers, entity-map, index, ...
+core specs               ~14
+demo app                 ~8   routes, navigation, examples config, components
+tools / release gates      5   verify-gates, check-rc-public-dispositions,
+                              check-contract-neutrality, check-bundle-budget,
+                              bench-ssr-payload
+docs / rfcs / audits     ~50
+```
+
+`asyncSource` is PUBLICLY EXPORTED via `markers/index.ts`, so removal is a
+breaking public change with demo, gate and documentation consequences. **That is
+the migration phase, not a prerequisite to it.**
+
+⚠️ Good news: `async-query.ts` does NOT depend on it — the single reference is a
+comment describing a shape. Retirement does not cascade into the other async
+primitive.
+
+## ⚠️ 2. ITS CENTRAL REPORTING IS ALREADY INCOMPLETE — 1 of 3 failure paths
+
+This is the measurement that matters, because the ONLY reason `asyncSource`
+blocks ERROR-SURFACE-2 is that it is a reporter producer that cannot supply
+`treeId`.
+
+```text
+errorSignal.set(err)     3 failure paths   sync throw, observable error,
+                                           promise rejection
+reportTreeError(...)     1 failure path    the SYNC THROW only
+```
+
+An application observing `asyncSource` through the central reporter today sees
+**one of its three failure modes**. The surface that carries all of them is the
+marker's own public signal, `readonly error: Signal<unknown | null>`.
+
+⚠️ **That reframes the blocker.** `asyncSource`'s central report is not a coherent
+observability guarantee that retirement would remove — it is a partial one that
+never covered the async paths, sitting beside a complete local one.
+
+## The third option the measurement supports
+
+```text
+OPTION 1  plumb ownership context into async-source   spends architecture on a
+                                                      retiring API
+OPTION 2  retire async-source first                   ~95 files; the migration
+                                                      phase, not a prerequisite
+OPTION 3  remove its SINGLE reportTreeError call      one call site
+```
+
+Under OPTION 3 every remaining producer supplies required attribution
+immediately:
+
+```text
+link     registry.id ✓  ownerPath ✓        KEEPS
+stored   ownerRegistry.id ✓  key ✓         RETIRING LATER, already compliant
+```
+
+⚠️ Cost, stated plainly: `asyncSource` users lose the one central-reporter path
+they had and must use `node.error()` — which is public, and is the only surface
+that covered their other two failure modes anyway.
+
+⚠️ **Recorded, NOT taken.** Removing an observability path is a public-surface
+decision even when the path is partial, and the "narrow prerequisite" premise the
+directive rested on is now measured false.
+
+```text
+before   2197 passing
+after    2203 passing
+```
