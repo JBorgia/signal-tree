@@ -274,11 +274,15 @@ export function link<S>(
     //
     // An `EntitySignal`'s NaturalValue is `Row[]`, and its notifications arrive
     // as `rows.<key>` — so applying one by relative path would index an ARRAY
-    // by key and corrupt the value. Worse, rekey (EGRESS-ELIGIBLE-PROJECTION-0)
-    // measured `path: 'rows.1'` carrying `v.id === 77`: the path holds the OLD
-    // key while the value holds the NEW one, and no `structuralEffect` is
-    // emitted. A collection projection therefore has a different identity
-    // basis — SubjectId, not key and not path — and is built separately.
+    // by key and corrupt the value.
+    //
+    // The identity basis also differs. `changeId(1, 77)` emits
+    // `structuralEffect { kind:'rekey', subject:1, beforeKey:1, afterKey:77 }`
+    // while the row PAYLOAD is untouched (a row's own `id` field is data, not
+    // identity — see `changeId` in types.ts). And a removed key that is later
+    // re-added gets a NEW SubjectId, so a key is not a lifetime. A collection
+    // projection is therefore keyed on SubjectId, not key and not path, and is
+    // built separately rather than folded into this reducer.
     //
     // Until then a collection link keeps its previous behaviour: reconciling
     // against current state. That preserves every existing collection contract
