@@ -16222,9 +16222,23 @@ from raw `heapUsed` deltas with no GC control and was recorded as UNMEASURED.
 ```text
                           baseline 61243b92   substrate   delta
 MEM-1 scalar, per leaf          788 B          1232 B     +444 B
-MEM-2 nested,  per leaf         940 B          1206 B     +266 B
+MEM-2 nested,  per leaf        1477 B          1895 B     +417 B
 MEM-5 entity control       42301 B/tree   42282 B/tree      ~0
 ```
+
+⚠️ **MEM-2's per-leaf figures are CORRECTED.** The fixture has SEVEN scalar
+leaves (`d,e,f,g,j,k,l`) and the first pass divided its totals by eleven,
+producing `940 / 1206 / +266`. The totals themselves were right; the denominator
+was not.
+
+The correction strengthens the result rather than weakening it: two very
+different ordinary topologies now land within ~30 bytes of each other, so the
+incremental cost is roughly **420–445 B per ordinary leaf** rather than the
+incoherent `266–444` range the bad arithmetic produced.
+
+⚠️ MEM-2 is also NOT yet a topology control: MEM-1 has 100 leaves and MEM-2 has
+7, so leaf count and topology vary together. A 100-leaf nested fixture is needed
+before topology can be read as the independent variable.
 
 **MEM-5 is the attribution control and it works.** Entity-heavy trees show no
 change, because entity nodes never receive the substrate. So the delta really is
@@ -16253,7 +16267,7 @@ proportional to relationship count. Not MEM-C.**
 
 ### Verdict: MEM-B, with a MEM-D component
 
-Roughly **270–450 bytes retained per ordinary leaf** — about 30–45 KB for a
+Roughly **420–445 bytes retained per ordinary leaf** — about 42–45 KB for a
 100-leaf tree, paid whether or not anything is ever observed. Real, bounded, and
 structurally understood.
 
