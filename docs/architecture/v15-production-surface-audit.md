@@ -12218,3 +12218,68 @@ DESCRIPTOR-MERGE-0   two levels, opposite policies, arrival-order dependent
                      top-level copies: "candidate redundant after semantic
                      repair" — removal mutation not yet re-run
 ```
+
+---
+
+# DESCRIPTOR-TOPLEVEL-RECHECK-0 — the copies are PROVEN redundant
+
+Measurement only. No production change.
+
+## Why the earlier result needed re-running
+
+DESCRIPTOR-ROLE-0 removed the top-level `collectionPath` / `fieldPathFromRow`
+fallbacks and the suite was unchanged — but that was **confounded**. The
+owner-only ping could manufacture a top-level whole-subject address, and
+DESCRIPTOR-MERGE-0 later showed the no-subject case was the ONE path where the
+top-level value was actually reachable (nothing shadows it, because there is no
+`subjectDescriptors` entry to shadow with).
+
+ADDRESS-REPAIR-1 repaired that producer boundary: an owner-only notification now
+establishes no subject address at all. So the measurement was re-run against
+`aff7e6a6 + d50ae108`, with no Link code in the equation.
+
+## The mutation
+
+The STRONG form — all six top-level reads removed, not only the fallback-position
+ones:
+
+```text
+resolveCollectionPath          descriptor?.collectionPath      (primary read)
+resolveSubjectFieldPath        descriptor?.fieldPathFromRow
+resolveCurrentSubjectTarget    descriptor?.collectionPath
+                               descriptor?.fieldPathFromRow
+resolveNotifyPath              descriptor?.collectionPath
+                               descriptor?.fieldPathFromRow
+```
+
+## RESULT — OUTCOME A, and it is now unconfounded
+
+```text
+2159 passing, 1 failed
+```
+
+The single failure is DESCRIPTOR-ROLE-0's own SOURCE-TEXT inventory
+(`expect(ADAPTER).toContain('descriptor?.collectionPath ??')`), which exists to
+detect exactly this shape change. **No behavioural test depends on the top-level
+copies.**
+
+> **Top-level subject-address copies are not fallback authority.** The inline
+> effect address, the per-subject entry, and the structural machinery supply all
+> required realization data.
+
+This closes the DESCRIPTOR-MERGE-0 sub-question. The status moves from
+"candidate redundant after semantic repair" to **proven redundant**.
+
+## ⚠️ DELIBERATELY NOT DELETED
+
+Deleting two fields now buys almost nothing and would add a production commit
+immediately before Link. These are one coherent representation-cleanup problem:
+
+```text
+remove redundant top-level copies
+eliminate the duplicated / opposite-direction merge policy
+resolve the '' representation disagreement
+```
+
+Filed as representation debt, not a correctness defect, and not a release
+blocker. HEAD restored; proceeding to LINK-COLLECTION-TYPE-0.
