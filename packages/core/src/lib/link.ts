@@ -34,6 +34,11 @@ import type { NodeAccessor } from './node-accessor';
  * subscribe  Y -> X   pushed live
  * ```
  *
+ * A rejected `set()` is reported to `onTreeError` — once, with the owning
+ * `treeId` and the linked location's `path`. `X` stays authored, the outbound
+ * queue survives, and `settled()` RESOLVES rather than throwing. That is why the
+ * handle needs no error member of its own.
+ *
  * ⚠️ **X must be an OWNED SignalTree location.** That is enforced at RUNTIME,
  * not by the type: `LINK-2` measured that a `computed` and a bare
  * `WritableSignal` are structurally identical to an owned leaf — same call
@@ -313,13 +318,15 @@ export function link<S>(
             // no `failures`, no error signal, no status. Reusing the reporter
             // is why the handle stays three members.
             //
-            // ⚠️ WORDING. Until ERROR-SURFACE-1 closes, this is "Link reports
-            // rejected outbound sends to SignalTree's INTERNAL error reporter"
-            // — NOT "Link failures are publicly observable". `onTreeError` is
-            // not exported, and ERROR-SURFACE-1 measured two reasons the event
-            // is not yet a truthful public contract: it cannot attribute two
-            // same-shaped trees, and its source union is 4/7 unproduced with
-            // 2 of its 3 live producers retiring.
+            // ⚠️ PUBLICLY OBSERVABLE, as of ERROR-SURFACE-2:
+            //
+            //     Rejected outbound Link sends are publicly observable through
+            //     `onTreeError`.
+            //
+            // ERROR-SURFACE-1 had blocked that claim on two counts, both now
+            // measured closed: the event carries a REQUIRED `treeId`, so two
+            // same-shaped trees are distinguishable; and the `source` union is
+            // deleted rather than frozen into public API.
             //
             // The queue must SURVIVE the failure too. Otherwise one rejection
             // wedges the link forever, which is a retry policy's failure mode

@@ -168,7 +168,8 @@ describe('the stored() marker reports through it', () => {
     // now identified by its OPERATION and attributed by its `treeId`.
     const write = seen.find((e) => e.operation === 'write');
     expect(write, 'the stored write failure reported').toBeDefined();
-    expect(write?.path).toBe('err-spec');
+    // ⚠️ The STATE location, not the storage key ('err-spec').
+    expect(write?.path).toBe('value');
     expect(typeof write?.treeId).toBe('number');
   });
 });

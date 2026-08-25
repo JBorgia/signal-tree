@@ -193,6 +193,18 @@ export { undoable } from './lib/undoable';
  *   classification; `withWriteContext` stays enhancer plumbing.
  */
 export { external } from './lib/external';
+/**
+ * The generic diagnostic observer.
+ *
+ * ⚠️ `reportTreeError` stays INTERNAL — library code reports, applications
+ * observe. `TreeErrorSource` no longer exists, `clearTreeErrorListenersForTesting`
+ * is a test helper, and `PositionRegistry` is not dragged public merely because
+ * `TreeId` is.
+ */
+export { onTreeError } from './lib/internals/error-reporter';
+export type { TreeErrorEvent } from './lib/internals/error-reporter';
+export type { TreeId } from './lib/internals/position-registry';
+
 export { link } from './lib/link';
 // `NaturalValue` is deliberately NOT re-exported. It is type-inference
 // machinery: `link(source, endpoint)` infers without the caller ever naming it,
