@@ -12839,3 +12839,95 @@ only the EVENT is deficient — but it does not authorize it.
 before   2180 passing
 after    2190 passing
 ```
+
+---
+
+# ERROR-OWNER-IDENTITY-0 — falsified by ONE producer, and it is retiring
+
+`packages/core/src/lib/error-owner-identity-0.spec.ts`
+
+```text
+NULL       the PositionRegistry identity already used to isolate notifications
+           is unique across live trees, stable for a tree's lifetime, available
+           at EVERY live error producer, not a PositionId, not path-derived
+FALSIFIER  at least one live producer cannot obtain it without traversal,
+           global lookup, or inventing another registry
+```
+
+**FALSIFIED — by exactly one producer.**
+
+```text
+producer       tree identity            path                    status
+link           registry.id          ✓   getOwnedOwnerPath(x) ✓  KEEPS
+stored         ownerRegistry.id     ✓   `key`                ✓  RETIRING
+async-source   NONE                 ✗   NONE                 ✗  RETIRING
+```
+
+`createAsyncSourceSignal(marker)` takes **only the marker** — no materialization
+context, no path, no registry. It cannot attribute an error without new
+plumbing, which is the falsifier's clause exactly.
+
+## The token's required properties are ALREADY TRUE — measured, not assumed
+
+```text
+unique across simultaneously live trees   ✓  even same-shaped ones
+stable for one tree's lifetime            ✓  across writes, structure, rekey
+NOT a PositionId                          ✓  two trees SHARE position ids
+NOT derived from path                     ✓  same path, different trees
+```
+
+⚠️ The third line is why this cannot be solved with a PositionId. Two
+same-shaped trees deliberately give their positions the SAME local ids — a
+designed falsifier elsewhere (NOTIFIER-OWNERSHIP), and exactly what makes
+PositionId unusable as public attribution.
+
+## Disposition — do NOT weaken the event for a retiring API
+
+The tempting move is `treeId?: TreeId` so `async-source` can omit it. That would
+freeze an optional-attribution wart into v15 **permanently, to accommodate an API
+v15 is deleting** — the same "migration debt becoming API" failure
+ERROR-SURFACE-1 rejected for the `source` union.
+
+```text
+OPTION 1   plumb context into createAsyncSourceSignal, then export with
+           treeId REQUIRED
+OPTION 2   export the reporter AFTER async-source is removed, with treeId
+           REQUIRED from the start
+```
+
+Both keep `treeId` required. ⚠️ Recorded, NOT implemented — the choice depends on
+migration sequencing, which is a decision rather than a measurement.
+
+## The identity model this preserves
+
+```text
+TreeId      the owning LIVE TREE / namespace   (opaque, runtime-local)
+PositionId  a causal position INSIDE that tree
+SubjectId   an entity lifetime inside collection ownership
+path        human / diagnostic location, never identity
+```
+
+⚠️ `TreeId` is CORRELATION ONLY — "event A came from tree X, event B from tree
+Y". Not persistence, not state addressing, not restoration, not cross-process
+identity. The name is deliberately not `ownerId`, which already carries
+causal/runtime meaning internally.
+
+## Decisions taken (pending implementation)
+
+```text
+DROP     `source` from the public contract — 7 values, 4 unproduced, 2 of 3
+         live producers retiring, survivor duplicates `operation`
+KEEP     `operation` as `string`, NOT a frozen union — useful diagnostics, but
+         an enumerated forever-vocabulary is unearned
+ADD      `path` where the producer knows it — Link knows `ownerPath`, so its
+         current omission is needless information loss
+NEVER    export `reportTreeError`, `TreeErrorSource`, the listener registry, or
+         `clearTreeErrorListenersForTesting`
+NEVER    add anything to `Link` — no onError, status, failures, error signal,
+         or rejection from `settled()`
+```
+
+```text
+before   2190 passing
+after    2197 passing
+```
