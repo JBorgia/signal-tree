@@ -15774,8 +15774,8 @@ DESCENDANT-MATERIALIZATION-0     CLOSED — MAT-A
 OBSERVATION-METADATA-FIDELITY-0  CLOSED — GREEN (F1/F2/F3/F4)
 OBSERVATION-OVERLAP-0            CLOSED — OVERLAP-A
 ENTITY-ACQUISITION-CONTROL-0     CLOSED — ENTITY-N (narrowed)
-LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0  NEXT — last planned gate
-    -> if all green, authorize production implementation
+LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0  CLOSED — GREEN
+    -> OBSERVATION-SUBSTRATE-IMPLEMENT-0 unblocked on correctness
     -> retained memory required BEFORE final substrate freeze
 ```
 
@@ -16058,6 +16058,58 @@ before final Link public-contract closure.
 
 Dispositioned separately, unpursued here. It belongs with `LINK-ROOT-SOURCE-0`
 as a source-interpretation defect rather than an observation-carrier one.
+
+## `LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0` — CLOSED, GREEN
+
+The last planned correctness gate: does acquisition survive the failure and
+edge paths of Link construction?
+
+```text
+C1 empty-endpoint refusal        threw, claims 0, not armed     no leak
+C2 unowned-source refusal        threw, claims 0                no leak
+C3 construct + dispose, no write claims 0, disarmed             clean
+C4 25 construct/dispose cycles   claims 0, ONE distinct positionId
+C5 dispose DURING in-flight send claims 0, disarmed; post-dispose write silent
+C6 one link refused, one holding survivor keeps claims 1, armed
+```
+
+Both refusals happen BEFORE acquisition — the registry guard and the
+empty-endpoint guard precede `accessorsFor` — so a rejected `link()` cannot
+strand a claim. `C6` proves a refusal does not disturb an unrelated surviving
+relationship.
+
+`C4` is the one worth keeping: twenty-five complete relationship lifecycles
+leave zero claims and exactly ONE position identity. POS-A holds not just across
+one arm/disarm/rearm but across repeated independent relationships on the same
+source — no accumulation, no identity churn, no slow leak.
+
+`C5` closes the interaction between disposal and an unresolved send: the claim
+releases, the source disarms, and a post-dispose write mutates state while
+publishing nothing.
+
+## ALL PRE-IMPLEMENTATION GATES ARE NOW GREEN
+
+```text
+escaped-callable semantics       GREEN
+inactive write cost              GREEN
+owner discovery from source      GREEN
+branch activation                GREEN
+source scoping                   GREEN
+late descendants                 VACUOUS — MAT-A
+notifier fanout                  GREEN
+activation lifecycle             GREEN
+position-id lifetime             GREEN — POS-A
+metadata fidelity                GREEN
+claim composition under overlap  GREEN — OVERLAP-A
+entity acquisition               GREEN — ENTITY-N (narrowed)
+construction / cleanup           GREEN
+memory                           UNKNOWN — required before final freeze
+```
+
+`OBSERVATION-SUBSTRATE-IMPLEMENT-0` is unblocked on correctness. Two source
+INTERPRETATION defects (`LINK-ROOT-SOURCE-0`, `LINK-BRANCH-NESTED-ENTITY-0`)
+remain open and do not gate it; they gate any claim of general Link
+NaturalValue correctness.
 
 ## OPEN
 
