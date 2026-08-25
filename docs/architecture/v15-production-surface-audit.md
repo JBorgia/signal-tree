@@ -15798,6 +15798,65 @@ that depends on the distinction. Each field is classified REQUIRED / REDUNDANT /
 DEAD TAXONOMY / UNKNOWN by tracing consumers — INVARIANT CARRIER applied to a
 vocabulary rather than to a test. UNKNOWN is a stop, not a default to preserve.
 
+## `OBSERVATION-METADATA-FIDELITY-0` — F2, the field classification
+
+Traced by consumer, not by presence. The two fields whose necessity was genuinely
+unknown resolve in opposite directions.
+
+### `mutationIntent` — REQUIRED
+
+```text
+leaf.set(v)       -> kind 'set'     mutationIntent 'replace'
+leaf.update(fn)   -> kind 'update'  mutationIntent 'derive'
+```
+
+It travels inside `attribution`, so it reaches subscribers as `meta`, and it is
+consumed:
+
+```text
+transactions.ts:249    if (laterEffect.mutationIntent === 'replace')
+transactions.ts:743    combineScalarMutationIntent(existing, effect)
+restoration.ts:2486    combineScalarMutationIntent(existing, effect)
+restoration.ts:2611    mutationIntent: meta?.mutationIntent
+```
+
+And `combineScalarMutationIntent` makes **`replace` dominate `derive`**.
+
+⚠️ **THIS CAUGHT A LATENT DEFECT IN THE DORMANT PROTOTYPE.** The scratch arm
+hardcodes `'set'`/`'replace'` for BOTH `set` and `update`, so every `update()`
+would be reported as a replace. Because replace dominates in the combiner, that
+error PROPAGATES through accumulated effects rather than cancelling out. The
+production carrier must derive intent from the operation, exactly as
+`wrapOwnedWritableSignal` does.
+
+This is why the phase is FIDELITY and not parity: the prototype looked
+functionally correct in every earlier discriminator, because none of them
+exercised `update()` under a transaction.
+
+### `kind` — DEAD TAXONOMY on the notification path
+
+`emitMutation` destructures the envelope and **never reads `kind`**:
+
+```text
+notify(path, after, before, ownerPath, subjectIds, positionIds,
+       { ...attribution, structuralEffect }, ownerId)
+```
+
+`PathHandler` has no `kind` parameter, and the only `.kind` in `path-notifier.ts`
+is `structuralEffect.kind` (add/remove/rekey), a different union. Only
+`owned-mutation.ts:186` constructs an envelope, so there is no second path.
+
+So `MutationKind` is not observable by any notification consumer. Classified DEAD
+TAXONOMY **for the observation carrier** — deliberately not "delete the type",
+which is a separate question about `MutationEnvelope` itself.
+
+### Still open in this phase
+
+`F1` (full envelope inventory, incumbent vs dormant), `F3` (participation
+fidelity for actual physical mutations — carrier only, not authority policy),
+`F4` (the `origin: 'devtools'` vs `participation: 'inspection'` control, so the
+old incorrect predicate is not re-encoded).
+
 ## OPEN
 
 ```text
