@@ -16304,8 +16304,11 @@ entity control      42577 B/tree  42629      42629      +52 B    0
 ```
 
 **The topology control now works.** With leaf count equal, wide and nested land
-within ~27 B of each other. The cost is genuinely per ORDINARY LEAF, independent
-of tree shape.
+within ~27 B of each other.
+
+⚠️ Stated as measured: the incremental retention is PREDOMINANTLY per ordinary
+leaf, and no material topology dependence was measurable in the equal-100-leaf
+wide-vs-nested discriminator. Two shapes are not every shape.
 
 ⚠️ **MEM-D bought 24 B/leaf — about 5% of the substrate's cost.** Worth taking,
 and not the reduction the duplicated-state description might have implied. The
@@ -16336,8 +16339,23 @@ tree, and nothing cheaper has survived a falsifier.
 
 ```text
 RETAINED-MEMORY-0     MEM-B, MEM-C refuted, MEM-D applied
-observation substrate ADOPTED
+observation substrate ADOPTED / ARCHITECTURE FROZEN
 ```
+
+### What "frozen" does and does not mean
+
+FROZEN: the stable dormant observation carrier is the v15 architecture, and the
+permanent carriers pin its semantics. Reopening the architecture requires a NEW
+falsifier, not the observation that the winning mechanism has a nonzero cost.
+
+NOT FROZEN: the implementation's internal representation. A later profiling pass
+may reduce closures, allocations or state layout **provided every permanent
+carrier and frozen semantic still holds**. That is optimization against a frozen
+contract, not architecture discovery.
+
+Recorded as non-blocking future work: **`OBSERVATION-REPRESENTATION-PERF`** — the
+`rawSet`/`rawUpdate` bound callables are the obvious next target. It must not
+gate v15 sequencing.
 
 ## OPEN
 
