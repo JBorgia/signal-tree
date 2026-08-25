@@ -15421,3 +15421,268 @@ Both errors share a shape worth naming alongside
 > order is not insertion order, and a name is not a semantic. Assert against the
 > value, and confirm a vocabulary's meaning against an observable outcome rather
 > than against what the identifier sounds like.
+
+# THE OBSERVATION SUBSTRATE BRANCH
+
+Everything below was reached while trying to give `serialization()` the
+inspection-egress invariant that Link already carries. It ended somewhere else
+entirely: three previously unknown public-contract defects in `link()`, and a
+measured design for the substrate that fixes them.
+
+**No production code changed in this branch.** `15a8cd67` is the clean
+checkpoint throughout; every prototype was env-gated scratch, measured, and
+reverted. Probe files are preserved in the session scratchpad.
+
+## How it started: serialization has no metadata-bearing observation
+
+`persistence()` publishes `tree()` — current observable state — so a DevTools
+scrub becomes durable. Measured at 120ms, past the 100ms autosave poll; a 20ms
+observation had wrongly reported it excluded (see TEMPORAL-ABSENCE CONTROL).
+
+The fix could not be applied, because the enhancer has nowhere to apply it:
+
+```text
+tree.subscribe(fn)          fn: (state: T) => void   — no metadata at all
+poll tree() by reference    — no metadata at all
+scheduleDurableConsequence  — write context already lost
+```
+
+Link had a path-notifier subscription carrying `meta`; serialization has
+nothing. And its entity snapshot grammar `{ all: Row[] }` defeats generic
+whole-tree path patching, which is what forced SOURCE-ADAPTER-EXTRACTION-0
+earlier than planned.
+
+## What the capability probe found instead
+
+Giving serialization a notifier subscription requires the tree to emit at all —
+and a plain tree emits **nothing**:
+
+```text
+signalTree({user:{name:'a'}})  ->  t.$.user.name.set('b')  ->  0 notifications
+```
+
+That is capability-gated. And the capability graph decomposes exactly along two
+previously unnoticed defects:
+
+```text
+'mutation-capture':  []                                         atomic
+'position-topology': []                                         atomic
+'causal-runtime':    ['mutation-capture', 'position-topology']  implies both
+```
+
+| tree capabilities | scalar | branch | entity |
+|---|---|---|---|
+| *(bare)* | **throws** | `[]` inert | works |
+| `position-topology` only | constructs, inert | — | — |
+| `mutation-capture` only | **throws** | — | — |
+| both | works | works | works |
+
+**`causal-runtime` is NOT the required substrate.** It merely implies the pair
+and adds transaction/restoration machinery no consumer here needs. Every Link
+conformance suite in the repo composes `transactions()`, which is why this was
+invisible: "Link is green" meant "green with causal-runtime present."
+
+## THREE PUBLIC-CONTRACT DEFECTS IN `link()`
+
+### `LINK-BARE-SCALAR-0` — false unowned-location rejection
+
+```ts
+const tree = signalTree({ x: 0 });
+link(tree.$.x, endpoint);   // throws "X must be an owned SignalTree location"
+```
+
+`tree.$.x` **is** an owned location. Leaf registry attachment is gated on
+`position-topology` (`signal-tree.ts:161`), so `getPositionRegistry` answers
+nothing and the guard rejects a legitimate source.
+
+⚠️ FAIL-CLOSED IS NOT PROOF OF CONTRACT CORRECTNESS. A guard can reject safely
+and still be wrong, when the operation is inside the supported contract.
+
+### `LINK-BARE-BRANCH-0` — silently inert relationship
+
+```ts
+const tree = signalTree({ s: { theme: 'light' } });
+const l = link(tree.$.s, endpoint);   // constructs happily
+tree.$.s.theme.set('dark');
+await l.settled();                    // resolves
+// endpoint received nothing. Ever.
+```
+
+The branch accessor gets its registry unconditionally (`signal-tree.ts:399`), so
+construction succeeds; leaf writes are wrapped only under `mutation-capture`
+(`:165`), so nothing is ever observed. Fail-open, and the most dangerous of the
+three.
+
+### `LINK-ROOT-SOURCE-0` — type-accepted, always broken
+
+A cast-free `link(tree.$, endpoint)` **typechecks**, and no test in the repo
+exercises it. At runtime it fails in BOTH configurations, by DIFFERENT
+mechanisms:
+
+```text
+bare              "X must be an owned SignalTree location"
++ causal-runtime  "x is not a function"
+```
+
+The second proves this is not the scalar ownership defect wearing a different
+hat — the NaturalValue path assumes a callable source. Dispositioned separately;
+it must not be folded into the substrate work.
+
+## Why the obvious fixes were rejected, in order
+
+### BASE-OBSERVATION-COST-0 — CLOSED, COST-C
+
+Making the capability pair baseline was measured against a tree with NO
+consumer — no Link, no persistence, no transactions:
+
+```text
+construction, 100 scalar leaves   ~+113%
+ordinary leaf write               ~+150%
+nested leaf write                 ~+161%
+```
+
+Rejected. The tax lands on the write hot path, paid by trees that never use it.
+(Memory was measured without forced GC and is therefore UNMEASURED; the entity
+result showing a speedup is noise and non-actionable.)
+
+### LAZY-OBSERVATION-INSTALL-0 — CLOSED, LAZY-E
+
+Retrofit after construction. Ownership retrofit works and preserves identity —
+`definePositionRegistry` is a configurable `defineProperty`, and
+`wrapOwnedWritableSignal` mutates `set`/`update` in place rather than replacing
+the object. With a real position id supplied, an already-held handle emits and
+`link()` works.
+
+But with that positive control in place:
+
+```text
+fresh x.set     -> 1 event
+pre-held set    -> 0 events      (captured before the retrofit)
+```
+
+Rejected. See ESCAPED-CALLABLE RULE.
+
+⚠️ An earlier run of this same probe reported `0 / 0` and proved nothing — the
+retrofit itself was broken because `emitOwnedMutation` returns early without
+`positionIds[0]`. A discriminator without a working positive control is not a
+discriminator.
+
+## THE SUBSTRATE THAT SURVIVED
+
+```text
+ordinary leaf
+  ├── tiny owner seed: registry + ownerPath          (branches/entities already have it)
+  └── STABLE dormant write path, installed at construction
+              │  inactive  -> raw write, no observation work
+              │  armed     -> observe
+              ▼
+      position identity, allocated LAZILY on first activation
+              ▼
+      one shared mutation publication -> PathNotifier
+              ▼
+      many consumers, each owning its authority projection
+```
+
+Characterized across four phases, all green:
+
+| | |
+|---|---|
+| escaped-callable semantics | pre-held `set` AND `update` observed after arming |
+| inactive write cost | flat vs bare; cost sits on construction (~+18% seed, ~+32% seed+hook, 100 leaves) |
+| owner discovery from source alone | registry + ownerPath suffice; no tree/sibling argument |
+| branch activation | reaches pre-materialized descendants |
+| source scoping | verified physically AND behaviourally |
+| notifier fanout | one publication, many consumers |
+| activation lifecycle | claim-based; idempotent disposal |
+| position-id lifetime | **POS-A** — one per source lifetime, retained across disarm/rearm |
+| memory | **UNKNOWN** |
+
+The full lifecycle, with Link itself claiming and releasing:
+
+```text
+before any link   {claims:0,               armed:false}
+link A            {claims:1, positionId:1, armed:true }
+link B            {claims:2, positionId:1, armed:true }   no second identity
+  one write       publications=1  A=[1,2] B=[2]
+dispose A         {claims:1, positionId:1, armed:true }
+dispose A twice   {claims:1, positionId:1, armed:true }   idempotent
+dispose B         {claims:0, positionId:1, armed:false}   returns DORMANT
+  dormant write   value=4  publications=0
+link C            {claims:1, positionId:1, armed:true }   same identity
+  write via the ORIGINAL pre-held callable  ->  endpoint [5]
+```
+
+`L4` is the economic point: a temporary Link must not convert "pay when
+observed" into "pay forever after first observation."
+
+## COMPOSITION LAWS EARNED HERE
+
+**POST-CONSTRUCTION CAPABILITY RULE.** A public operation invoked after tree
+construction cannot depend on an optional construction-time capability unless it
+can install that capability itself, or the requirement is explicitly part of the
+public contract. `link()` satisfies neither, so an implementation-only
+construction requirement cannot be retroactively called a valid precondition.
+
+**ESCAPED-CALLABLE RULE.** Once a public callable has escaped to application
+code, later correctness cannot depend on replacing the property it came from.
+`CallableWritableSignal<T>` extends Angular's `WritableSignal<T>`, so `.set` is
+part of the exposed writable object; a consumer may retain it.
+
+**DORMANCY RULE.** If a future runtime consumer may require interception after
+public callables have escaped, the interception point must exist before escape.
+Expensive behaviour may remain dormant until activated.
+
+**OWNER-DISCOVERABILITY RULE.** A post-construction operation that receives only
+a source must reach every carrier it needs starting FROM that source. A proof
+that borrows metadata from the tree or a sibling proves mutability, not public
+activation reachability.
+
+**OBSERVATION ACTIVATION FOLLOWS SOURCE SCOPE.** `link(a.b)` arms `a.b.deep` and
+leaves `a.sibling` and `top` dormant. A relationship must not convert unrelated
+state into observed state.
+
+**SHARED OBSERVATION, SEPARATE AUTHORITY.** One physical mutation publication
+serves many consumers; each owns its own eligible-authority projection. Fanout
+is the notifier's job; activation ownership is a claim.
+
+**UNIFY SEMANTICS, NOT REPRESENTATION.** Scalar, branch and entity need
+different carriers. The bare inventory: a leaf has nothing, a branch already has
+registry + ownerPath + ownerId, an entity has its own registry, the root has
+none. Do not stamp identical metadata on every shape for symmetry.
+
+## METHODOLOGY RULES EARNED HERE
+
+**MEASURE THE PROPOSED MECHANISM, NOT AN INSTRUMENTED SURROGATE.** The dormant
+hook first measured **+120.5%** and nearly died — because the prototype STACKED
+a wrapper on an already-wrapped leaf. Integrated into the leaf's own write path
+it measured **flat**. A benchmark falsifies an architecture only when the
+measured execution shape preserves the mechanism's dispatch topology.
+
+**FANOUT IS NOT LIFECYCLE.** Proving that multiple consumers receive one
+physical event does not prove that activation ownership, final release, or
+resource identity is correct. The fanout probe pre-armed manually; the lifecycle
+question needed its own phase.
+
+**FAIL-CLOSED IS NOT PROOF OF CONTRACT CORRECTNESS.** Complements
+CONTRACT-BEFORE-DEFECT: first establish the subject is supported, then a false
+rejection is itself a defect.
+
+**STRUCTURAL EDIT CONTROL.** For broad automated edits, assert both the intended
+anchor and adjacent preserved anchors, then trust the compiler's exit status
+rather than a visual diff. A range-slice edit in this branch silently deleted
+`held`/`retrievals` from `link.ts`; typecheck caught it, reading did not.
+
+**VERIFY BY EXIT CODE, NOT BY PIPELINE.** `npm run typecheck | grep error | head`
+reports `head`'s status, not the compiler's. Run the command, then read `$?`.
+
+## OPEN
+
+```text
+LINK-BARE-SCALAR-0     cause identified, substrate designed, NOT fixed
+LINK-BARE-BRANCH-0     cause identified, substrate designed, NOT fixed
+LINK-ROOT-SOURCE-0     distinct contract defect, undispositioned
+memory                 unmeasured for the dormant representation
+serialization WIP      parked; depends on the substrate landing first
+INSPECTION-EGRESS-0    open — Link green, serialization open
+STORED-RETIRE-0        paused; stored-devtools-isolation.spec.ts still load-bearing
+```
