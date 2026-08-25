@@ -14160,3 +14160,68 @@ deleted a caching subsystem on a false premise.
 ⚠️ **Architectural ownership and operational capability are different
 questions.** `loader` fails the first (no causal authority, and caching is a
 data-layer concern) while holding real amounts of the second.
+
+## ⚠️ CORRECTIONS to the LOADER-RETIRE-0 record
+
+**The omitted category, named.** The NULL's four-way decomposition
+(implementation / one-shot acquisition / application async / compatibility) was
+incomplete. It omitted:
+
+```text
+CACHE / REMOTE-DATA POLICY
+  stale/fresh state · stale-while-revalidate · tag invalidation
+  scoped cache entries · cache equality · cache eviction / retention
+```
+
+That omission is what removed deletion authority.
+
+**⚠️ DO NOT OVERCORRECT.** This result does NOT establish any of:
+
+```text
+loader must remain in SignalTree      loader should become public
+caching belongs in core               loader.persist is the right design
+SWR belongs in entityMap              EntityStorageAdapter should survive
+maxScopes belongs to persistence
+```
+
+It establishes only that **meaningful capability exists and its architectural
+owner is not yet dispositioned.** Those statements stay separate.
+
+> **A primitive can fail the ownership test without being semantically empty.**
+> asyncQuery failed ownership AND reduced to RxJS operators. `loader` appears to
+> fail causal ownership while holding a substantial remote-data/cache policy
+> layer. Different findings, different treatment.
+
+**⚠️ `maxScopes` is NOT pre-classified as persistence.** It lives beside
+`loader.persist`, but grouping by implementation proximity is not measurement.
+`PERSISTENCE-DECOMPOSE-0` must establish:
+
+```text
+does maxScopes operate with persist DISABLED?
+does it bound the in-memory scope cache only?
+does it also control durable storage eviction?
+  -> CACHE POLICY / PERSISTENCE POLICY / BOTH
+```
+
+Likewise `tags`, `staleTime`, `swr`, `equal`, `clearOnParamsChange` and `lazy`
+begin as CACHE/ACQUISITION concerns, not persistence concerns.
+
+**`status` is already gone**, confirmed by this probe — no `STATUS_READERS`, and
+only an `EntityLoaderSurface` comment remains. So `STATUS-RESIDUE-0` means
+reference/doc cleanup, NOT retiring a live primitive. No migration phase should
+be spent deleting code that is already absent.
+
+## Revised sequence
+
+```text
+ASYNC-SOURCE-RETIRE-1        next; genuinely independent
+PERSISTENCE-DECOMPOSE-0      stored + loader.persist + EntityStorageAdapter
+LOADER-CACHE-DISPOSITION-0   acquisition + staleTime/SWR/tags/equal/scopes
+LOADER-RETIRE-1              only if the disposition earns deletion
+STATUS-RESIDUE-0             references and docs only
+MIGRATION-CLOSE-0
+DEMO-COVERAGE-0
+```
+
+`loader` is not touched during ASYNC-SOURCE-RETIRE-1 except for stale comments
+whose only purpose was describing `asyncSource`.
