@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { asyncSource } from './markers/async-source';
 import { entityMap } from './types';
 import {
   hydrateMarkerNode,
@@ -45,6 +44,15 @@ afterEach(() => vi.restoreAllMocks());
 // WITHDRAWN WITH STATUS-DEL — two status cases on hydrate-decision reporting.
 // The asyncSource cases are deliberately LEFT for ASYNC-DEL: cleaning them here
 // would blur the commit boundary and weaken that residue measurement.
+/**
+ * ⚠️ THE asyncSource CASES ARE GONE — this file's own comment reserved them for
+ * "ASYNC-DEL", and ASYNC-SOURCE-RETIRE-1 is that phase.
+ *
+ * The generic invariant — "a declined rehydrate is OBSERVABLE" — keeps a
+ * surviving subject: `entity-map.ts` also reports `decision: 'declined'` through
+ * `reportHydrateDecision`, and the loader-backed entityMap case below exercises
+ * it. No coverage was lost.
+ */
 describe('a declined rehydrate is observable', () => {
   it('a loader-backed entityMap reports why it refused', async () => {
     vi.spyOn(console, 'info').mockImplementation(() => undefined);
@@ -75,22 +83,6 @@ describe('a declined rehydrate is observable', () => {
     expect(tree.$.r.count()).toBe(1);
   });
 
-  it('asyncSource reports why it refused', async () => {
-    vi.spyOn(console, 'info').mockImplementation(() => undefined);
-    const tree = signalTree({ s: asyncSource({ load: async () => 'SOURCE' }) });
-    void tree.$.s;
-    await settle();
-
-    const { events, off } = collect();
-    hydrateMarkerNode(tree.$.s, { value: 'PAYLOAD' }, 'rehydrate');
-    off();
-
-    expect(events).toHaveLength(1);
-    expect(events[0].marker).toBe('asyncSource');
-    expect(events[0].decision).toBe('declined');
-    expect(events[0].reason).toBe('loader-owns-source');
-    expect(tree.$.s()).toBe('SOURCE');
-  });
 });
 
 
@@ -131,13 +123,21 @@ describe('what is NOT reported — silence has to stay meaningful', () => {
 describe('the seam itself', () => {
   it('unsubscribes', async () => {
     vi.spyOn(console, 'info').mockImplementation(() => undefined);
-    const tree = signalTree({ s: asyncSource({ load: async () => 'S' }) });
-    void tree.$.s;
+    // ⚠️ SUBJECT MIGRATED from asyncSource to a loader-backed entityMap, which
+    // is the surviving source-owning marker that also declines rehydrate. The
+    // invariant — the seam stops emitting once unsubscribed — is unchanged.
+    const tree = signalTree({
+      r: entityMap<{ id: number }, number>({
+        selectId: (x) => x.id,
+        load: loader(async () => [{ id: 9 }]),
+      }),
+    });
+    void tree.$.r;
     await settle();
 
     const { events, off } = collect();
     off();
-    hydrateMarkerNode(tree.$.s, { value: 'P' }, 'rehydrate');
+    hydrateMarkerNode(tree.$.r, { all: [{ id: 1 }] }, 'rehydrate');
 
     expect(events).toEqual([]);
   });
@@ -175,19 +175,6 @@ describe('RFC 0014 — `transfer` accepts what `rehydrate` declines', () => {
     expect(tree.$.r.count()).toBe(2);
   });
 
-  it('asyncSource ACCEPTS a server payload', async () => {
-    vi.spyOn(console, 'info').mockImplementation(() => undefined);
-    const tree = signalTree({ s: asyncSource({ load: async () => 'SOURCE' }) });
-    void tree.$.s;
-    await settle();
-
-    const { events, off } = collect();
-    hydrateMarkerNode(tree.$.s, { value: 'FROM SERVER' }, 'transfer');
-    off();
-
-    expect(events.filter((e) => e.decision === 'declined')).toHaveLength(0);
-    expect((tree.$.s as unknown as () => unknown)()).toBe('FROM SERVER');
-  });
 
   it('...and `rehydrate` still declines both — the contrast is the point', async () => {
     vi.spyOn(console, 'info').mockImplementation(() => undefined);
@@ -196,19 +183,19 @@ describe('RFC 0014 — `transfer` accepts what `rehydrate` declines', () => {
         selectId: (x) => x.id,
         load: loader(async () => [{ id: 9 }]),
       }),
-      s: asyncSource({ load: async () => 'SOURCE' }),
     });
     void tree.$.r;
-    void tree.$.s;
     await settle();
 
+    // ⚠️ WAS a TWO-marker contrast (entityMap + asyncSource, both declining).
+    // asyncSource is gone, so the surviving source-owning decliner carries it
+    // alone. The invariant is that `rehydrate` DECLINES what `transfer`
+    // accepts — that needs a decliner, not two of them.
     const { events, off } = collect();
     hydrateMarkerNode(tree.$.r, { all: [{ id: 1 }, { id: 2 }] }, 'rehydrate');
-    hydrateMarkerNode(tree.$.s, { value: 'FROM STORAGE' }, 'rehydrate');
     off();
 
-    expect(events.filter((e) => e.decision === 'declined')).toHaveLength(2);
+    expect(events.filter((e) => e.decision === 'declined')).toHaveLength(1);
     expect(tree.$.r.count()).toBe(1);
-    expect((tree.$.s as unknown as () => unknown)()).toBe('SOURCE');
   });
 });

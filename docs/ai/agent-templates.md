@@ -130,7 +130,7 @@ store/
 
 ## Async pattern
 
-SignalTree 15 does not publish the old `asyncSource` / `asyncQuery` markers.
+SignalTree 15 has NO async marker — `asyncSource` and `asyncQuery` are both deleted.
 Keep async orchestration in application services or framework primitives, then
 write resolved values into ordinary tree state.
 

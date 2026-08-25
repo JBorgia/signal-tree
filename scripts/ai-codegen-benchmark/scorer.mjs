@@ -75,9 +75,6 @@ const SIGNALTREE_MARKER_METHODS = {
     'removeOne', 'removeMany', 'removeWhere', 'clear',
     'updateOne', 'updateMany', 'updateWhere',
   ]),
-  asyncSource: new Set([
-    'data', 'loading', 'error', 'refresh', 'set', 'reset',
-  ]),
   stored: new Set([
     'set', 'update', 'reset', 'clear',
   ]),
@@ -113,7 +110,7 @@ export function scoreImports(code) {
 }
 
 const MARKER_DECL_RE =
-  /\b(\w+)\s*:\s*(status|entityMap|asyncSource|stored|form)\s*[<(]/g;
+  /\b(\w+)\s*:\s*(entityMap|stored|form)\s*[<(]/g;
 
 const METHOD_CALL_RE = /(?:\.\$\.|\$\.|\.)(\w+)\.(\w+)\s*\(/g;
 

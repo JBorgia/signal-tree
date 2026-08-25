@@ -14,7 +14,7 @@
 import {
   signalTree,
   entityMap,
-  asyncSource,
+  loader,
   serialization,
 } from '../dist/packages/core/dist/index.js';
 
@@ -42,15 +42,20 @@ const curve = [100, 1000, 10000].map((n) => {
   return { rows: n, kb: kb(t.serialize()) };
 });
 
-// ── 2. asyncSource: shipped, and what arrives ───────────────────────────────
+// ── 2. a source-owning marker: shipped, and what arrives ────────────────────
+// SUBJECT MIGRATED from asyncSource (deleted by ASYNC-SOURCE-RETIRE-1) to a
+// loader-backed entityMap — the surviving marker that owns a live source.
 // The marker owns a live source, so it decides whose data is fresher. Under
 // `rehydrate` it assumes the payload is old storage and declines — the bytes
 // travel and the client refetches. Under `transfer` it accepts. RFC 0014.
 const N = 500;
-const mk = () => ({ feed: asyncSource(() => Promise.resolve([])), n: 0 });
+const mk = () => ({
+  feed: entityMap({ selectId: (r) => r.id, load: loader(async () => []) }),
+  n: 0,
+});
 
 const server = signalTree(mk(), { enhancers: [serialization()] });
-server.$.feed.set(rows(N));
+server.$.feed.setAll(rows(N));
 const withData = server.serialize();
 const emptyPayload = signalTree(mk(), { enhancers: [serialization()] }).serialize();
 
@@ -61,19 +66,19 @@ const accepted = signalTree(mk(), { enhancers: [serialization()] });
 accepted.deserialize(withData, { transfer: true });
 
 const shipped = kb(withData) - kb(emptyPayload);
-const asyncSourceResult = {
+const sourceMarkerResult = {
   rows: N,
   shippedKb: shipped,
-  // `feed` is CALLABLE — there is no `.value`. Reading `.value?.()` here
-  // returns undefined whether hydration worked or not, and an early version of
-  // this measurement did exactly that and "proved" the drop without testing it.
-  underRehydrate: declined.$.feed() === undefined ? 'dropped' : 'delivered',
-  underTransfer: accepted.$.feed() === undefined ? 'dropped' : 'delivered',
+  // Counted, not read through an accessor. An early version of this measurement
+  // read `.value?.()` on a CALLABLE node, which returns undefined whether
+  // hydration worked or not, and so "proved" the drop without testing it.
+  underRehydrate: declined.$.feed.count() === 0 ? 'dropped' : 'delivered',
+  underTransfer: accepted.$.feed.count() === 0 ? 'dropped' : 'delivered',
 };
 
 if (JSON_ONLY) {
   console.log(
-    JSON.stringify({ curve, asyncSource: asyncSourceResult }, null, 2)
+    JSON.stringify({ curve, sourceMarker: sourceMarkerResult }, null, 2)
   );
 } else {
   console.log(
@@ -91,8 +96,8 @@ if (JSON_ONLY) {
   );
   console.log(`asyncSource — a marker that owns a live source (${N} rows)\n`);
   console.log(`  shipped in the payload   ${shipped.toFixed(1)} KB`);
-  console.log(`  deserialize()            ${asyncSourceResult.underRehydrate}`);
-  console.log(`  { transfer: true }       ${asyncSourceResult.underTransfer}`);
+  console.log(`  deserialize()            ${sourceMarkerResult.underRehydrate}`);
+  console.log(`  { transfer: true }       ${sourceMarkerResult.underTransfer}`);
   console.log(
     `\n  Without the flag the bytes travel and the client refetches:` +
       `\n  the payload AND the spinner. See RFC 0014.\n`

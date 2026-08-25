@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import { entityMap } from './types';
-import { asyncSource } from './markers/async-source';
 import { hydrateMarkerNode } from './internals/materialize-markers';
 import { loader } from './markers/loader';
 import { signalTree } from './signal-tree';
@@ -29,6 +28,11 @@ import { signalTree } from './signal-tree';
  */
 const settle = () => new Promise((r) => setTimeout(r, 40));
 
+/**
+ * ⚠️ The asyncSource half of this contrast is gone with the primitive. The
+ * DECLINING side survives through `entityMap`, which also reports
+ * `decision: 'declined'`; the ACCEPTING side (entityMap + loader) is unchanged.
+ */
 describe('rehydrate: source-owning markers decline', () => {
   it('a loader-backed entityMap keeps its own data', async () => {
     const tree = signalTree({
@@ -53,14 +57,6 @@ describe('rehydrate: source-owning markers decline', () => {
     expect(tree.$.r.count()).toBe(1);
   });
 
-  it('asyncSource keeps the value its loader produced', async () => {
-    const tree = signalTree({ s: asyncSource({ load: async () => 'SOURCE' }) });
-    void tree.$.s;
-    await settle();
-
-    hydrateMarkerNode(tree.$.s, { value: 'PAYLOAD' }, 'rehydrate');
-    expect(tree.$.s()).toBe('SOURCE');
-  });
 });
 
 describe('rehydrate: markers with no source accept the payload', () => {
@@ -95,12 +91,4 @@ describe('restore always writes — undo is not competing with a loader', () => 
     expect(tree.$.r.count()).toBe(3);
   });
 
-  it('asyncSource accepts an undo', async () => {
-    const tree = signalTree({ s: asyncSource({ load: async () => 'SOURCE' }) });
-    void tree.$.s;
-    await settle();
-
-    hydrateMarkerNode(tree.$.s, { value: 'UNDONE' }, 'restore');
-    expect(tree.$.s()).toBe('UNDONE');
-  });
 });

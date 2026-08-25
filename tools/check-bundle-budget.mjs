@@ -117,7 +117,7 @@ const TARGETS = {
     // production 5.53KB (dev code still folds fully — check-devmode-foldable
     // confirms ~1.5-1.9KB reclaimed per tree).
     //
-    // What it bought: `form()` and `asyncSource()` values reach snapshots at
+    // What it bought: `form()` and `entityMap()` values reach snapshots at
     // all — before this, `persistence()` wrote `{}` for a form and reported
     // success. The cost is the snapshot/hydrate hooks on status, form and
     // entityMap plus the O(1) processor stamp; it REPLACED two hardcoded
@@ -251,7 +251,7 @@ const TARGETS = {
     // production 8.16KB (dev code still folds fully — check-devmode-foldable
     // confirms ~1.5-1.9KB reclaimed per tree).
     //
-    // What it bought: `form()` and `asyncSource()` values reach snapshots at
+    // What it bought: `form()` and `entityMap()` values reach snapshots at
     // all — before this, `persistence()` wrote `{}` for a form and reported
     // success. The cost is the snapshot/hydrate hooks on status, form and
     // entityMap plus the O(1) processor stamp; it REPLACED two hardcoded

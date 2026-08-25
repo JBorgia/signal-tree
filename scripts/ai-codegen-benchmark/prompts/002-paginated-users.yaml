@@ -22,8 +22,9 @@ prompt: |
 expected_patterns:
   signaltree:
     must_include: ['signalTree(', 'entityMap']
-    # SignalTree-idiomatic: asyncSource OR status marker
-    should_include_one_of: ['asyncSource', 'status(']
+    # SignalTree 15 has no async/status marker: the request pipeline is
+    # application-owned and results land through external().
+    should_include_one_of: ['external(', 'entityMap']
     must_not_include: ['BehaviorSubject', 'signalStore(']
   ngrx-signals:
     must_include: ['signalStore(', 'withEntities', 'rxMethod']

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { asyncSource } from './markers/async-source';
 import { compared } from './markers/compared';
 import { entityMap } from './types';
 import {
@@ -45,7 +44,14 @@ import { transactions } from '../enhancers/transactions/transactions';
  * ```text
  * addressable WITH owner      tree.$, branch, leaf, nested leaf, compared
  * addressable WITHOUT owner   entityMap, stored          <- BOTH, not one
- * not addressable at all      asyncSource (no positionId, no ownerPath)
+ * not addressable at all      (EMPTY as of ASYNC-SOURCE-RETIRE-1)
+ *
+ * The third row is now EMPTY, and that is the desired end state. Its only
+ * occupant was the async marker; OWNER-PING-0 fixed `entityMap` and `stored`
+ * by attaching the registry at their own construction sites, and the async
+ * marker stayed unaddressable only because it was already a frozen DELETE.
+ * Every surviving marker-constructed position is now addressable. The row is
+ * kept, empty, so a NEW unaddressable marker re-populates it visibly.
  * ```
  *
  * The pattern is mechanical rather than semantic: the registry is attached at
@@ -91,7 +97,6 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
         rows: entityMap<Row, string>({ selectId: (r) => r.id }),
         cmp: compared({ a: 1 }, (x, y) => JSON.stringify(x) === JSON.stringify(y)),
         kept: stored('owner-location-0', 'v', { debounceMs: 0 }),
-        src: asyncSource({ initial: 0, load: () => Promise.resolve(1) }),
       },
       { enhancers: [restoration(), transactions()] }
     );
@@ -111,7 +116,6 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
       'entityMap node': shapeOf(tree.$.rows),
       'compared node': shapeOf(tree.$.cmp),
       'stored node': shapeOf(tree.$.kept),
-      'asyncSource node': shapeOf(tree.$.src),
     };
 
     for (const [name, s] of Object.entries(inventory)) {

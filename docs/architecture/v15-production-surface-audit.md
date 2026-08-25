@@ -14225,3 +14225,153 @@ DEMO-COVERAGE-0
 
 `loader` is not touched during ASYNC-SOURCE-RETIRE-1 except for stale comments
 whose only purpose was describing `asyncSource`.
+
+---
+
+# ASYNC-SOURCE-RETIRE-1 — deleted. No falsifier appeared.
+
+## Classification — no real consumers
+
+Recounted post-asyncQuery rather than trusting MIGRATION-MAP-0's numbers:
+
+```text
+production      15 files -> 7 real code, 8 comment-only
+core specs      17
+demo             5 -> ZERO real imports; all HTML code samples
+tools/scripts   11
+```
+
+The seven real files were the primitive, its contract, the dead barrel, and
+marker-resolution type plumbing (`types.ts`, `readonly.ts`,
+`readonly-readers.ts`). ⚠️ **The `index.ts` reference was a COMMENT** — parsed
+exports confirm `asyncSource` was never root-reachable, so public API delta is
+zero.
+
+## Causal integration — all zero
+
+```text
+external()  withWriteContext  positionRegistry  transaction
+scheduleDurableConsequence  getPathNotifier  ownerPath  TreeId   ALL 0
+reportTreeError                                                  comment only
+```
+
+## ⚠️ ITS STALE-RESULT CONTRACT WAS INCONSISTENT — measured, not inferred
+
+Slow A started first, fast B second, A resolving last:
+
+```text
+PROMISE path      started [A,B]  final = A   ⚠️ THE STALE RESULT WINS
+OBSERVABLE path   started [A,B]  final = B   latest-wins
+RECOVERY          value=ok error=null        recovery works
+```
+
+`runLoad()` calls `currentSub?.unsubscribe()`, which cancels an in-flight
+**Observable** — but a Promise cannot be cancelled and there is no sequence
+guard, so a slow earlier load **overwrites a newer one**.
+
+⚠️ So the migration does not "preserve" this contract — the replacement pattern
+(`switchMap`) is strictly BETTER on the Promise path. Recorded as a FIX, not as
+preservation, per the standing instruction not to silently upgrade a contract and
+later claim it was kept.
+
+**The operational guard worth carrying forward:** each `runLoad()` creates a
+FRESH subscription, which is why error recovery works naturally. The asyncQuery
+replacement had to add `catchError` inside `switchMap` to get the same property.
+
+## Bypass probe — 7 files, and every generic invariant has a survivor
+
+```text
+its own specs        async-source.spec · a1-equivalence · m9-ingress
+its retirement rec   async-source-retire-0
+GENERIC              hydrate-decisions · marker-contract · rehydrate-ownership
+```
+
+⚠️ Unlike asyncQuery (2 files, both its own), three GENERIC invariants noticed.
+Each has a surviving subject:
+
+```text
+"a declined rehydrate is observable"   entity-map.ts ALSO reports
+                                       decision: 'declined'
+marker-contract snapshot/transient     entityMap and stored
+rehydrate accept-vs-decline contrast   entityMap (declines) + loader (accepts)
+```
+
+⚠️ **`hydrate-decisions.spec.ts` had already reserved its asyncSource cases
+"deliberately LEFT for ASYNC-DEL"** — this phase — and `m4-reconstruction.spec.ts`
+predicted the consequence outright:
+
+> "The `hydrate` hook has exactly two implementers: `entityMap` and
+> `asyncSource`. `asyncSource` is already a frozen DELETE, so on the far side of
+> that deletion `hydrate` reduces to ONE implementer, exactly as `snapshot` did."
+
+That prediction is now true.
+
+## Migrations, not deletions, where an invariant was generic
+
+```text
+hydrate-decisions   seam-unsubscribe + rehydrate-declines -> loader-backed
+                    entityMap
+ssr-transfer        the whole RFC 0014 transfer fixture -> loader-backed
+                    entityMap; callable reads became count()/ids()
+bench-ssr-payload   same migration, so the SSR payload gate keeps measuring
+                    transfer-vs-rehydrate
+marker-contract     the describe became EMPTY and was removed; entityMap and
+                    stored remain as subjects
+```
+
+## Records retired because their SUBJECT is gone
+
+```text
+owner-location-0    the "not addressable at all" row is now EMPTY. That is the
+                    DESIRED end state — OWNER-PING-0 fixed entityMap and stored,
+                    and asyncSource stayed unaddressable only because it was a
+                    frozen DELETE. The row is KEPT, empty, so a new
+                    unaddressable marker re-populates it visibly.
+m4-reconstruction   the conformance-spectrum MIDDLE point had no survivor with
+                    that shape (callable, isSignal false, MarkerProcessor
+                    symbol), so the row is retired rather than re-subjected.
+ssr-transfer C3     the "ships its payload then drops it" gap has no remaining
+                    carrier. Not a defect FIXED — one whose carrier was removed.
+```
+
+## Tools — two would have kept teaching a deleted API
+
+```text
+bench-ssr-payload.mjs   IMPORTED asyncSource and CRASHED on load; migrated
+scorer.mjs              removed its member set AND the marker-detection regex
+prompts 002 / 007       required `asyncSource` OR `status(` — BOTH deleted, so
+                        these prompts were already stale; now require
+                        `external(` / `entityMap`
+check-contract-neutrality / check-bundle-budget   comments
+verify-gates + check-rc-public-dispositions       KEPT: the disposition ledger
+                                                  correctly records asyncSource
+                                                  as DELETE, and the gate
+                                                  mutation still resolves
+```
+
+## Zero-reference gate
+
+```text
+production CODE            0
+demo live code (.ts)       0
+dead marker barrel         0
+public API delta           0
+production comments       10   historical prose in current code
+core specs                10   retirement records
+demo                       2   dated changelog + the "Removed" page
+current tools/gates        4   disposition ledger + comments
+live docs                  4   all "the OLD markers are deleted" framing
+archived docs             24   intentionally retained
+```
+
+⚠️ `test-setup.ts` and `docs/development/testing.md` both justified the Angular
+TestBed setup by asyncSource's `inject(DestroyRef)`. That justification is now
+false — the setup is still REQUIRED, but by `define-store.ts`, `entity-loader.ts`
+and ordinary injection-context specs. Corrected in both rather than left to rot.
+
+```text
+core   2120 passing, 0 failures     typecheck clean   lint clean
+demo   20 suites / 112 tests        lint clean
+gates  check-rc-public-dispositions · check-bundle-budget ·
+       check-contract-neutrality · check-documented-symbols   all exit 0
+```
