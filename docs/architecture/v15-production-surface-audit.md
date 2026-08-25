@@ -14918,3 +14918,163 @@ STORED-ONLY vs SHARED before anything is deleted, per §2.
 
 **Deletion has NOT begun.** The pins are closed; the mechanical retirement is
 the next step.
+
+## §2/§3 CLASSIFICATION — the footprint was references, not dependencies
+
+⚠️ **CORRECTION to §1 above.** §1 recorded "a real code reference outside the
+primitive: `lib/signal-tree.ts` uses `isStoredMarker`." That is **false**.
+A parsed grep for every stored identifier found no code reference in
+`signal-tree.ts` — its four hits are prose, three of them the ordinary English
+verb ("stored as a plain array leaf", "stored its return value"). The claim
+came from a scan that did not separate comments from code.
+
+Of the 19 production files, **6** carry executable dependencies:
+
+```text
+markers/stored.ts              the primitive
+markers/stored.contract.ts     its contract
+markers/index.ts               barrel re-export
+lib/types.ts                   3x  StoredMarker -> StoredSignal resolution rows
+lib/readonly.ts                ReadonlyStoredSignal + one dispatch row
+lib/readonly-readers.ts        STORED_READERS
+```
+
+The other **13 are comments or prose.** The distinction that mattered was
+"created during the stored era" vs "owned by stored":
+
+- `internals/commit-consequence.ts` — **SHARED, survives independently.**
+  `link.ts:295` and `serialization.ts:1231` both call `scheduleDurableConsequence`
+  with no involvement from `stored`.
+- `internals/intercept-leaf-signals.ts`, `signal-tree.ts`, `restoration.ts` —
+  the ordinary English verb.
+- `error-reporter.ts`, `tree-realization-adapter.ts`, `devtools-impl.ts`,
+  `serialization.ts` — historical prose naming a past producer.
+
+### One structural consequence
+
+`stored` was the **last non-entity marker** in the type resolvers. After its
+removal `TreeNode`, `DeepEntityAwareTreeNode` and `EntityAwareTreeNode` dispatch
+on `LoadingEntityMapMarker` and `EntityMapMarker` only; every other row is a
+shape row. The `asyncQuery -> stored` migrated row in
+`marker-resolution.typing.spec.ts` therefore becomes **vacuous, not orphaned** —
+its subject is deleted with it. Re-pointing it at `entityMap` would fabricate
+coverage, so it is retired with that reasoning recorded inline.
+
+## MARKER-PAYLOAD-LEAK-0 — the invariant `stored-leak` was really carrying
+
+Retiring `stored` reached a **preregistered hard stop**: a generic invariant
+whose only carrier was being deleted, with evidence a surviving implementation
+might violate it. `markers/stored-leak.spec.ts` stated it absolutely —
+
+> a marker must never carry its payload into a snapshot
+
+— and the surviving public marker holds `__entityMapConfig` as a **plain
+enumerable property**, where `stored` had made `options` non-enumerable.
+
+### The question was the marker-location contract, not the fix
+
+Asking "should `__entityMapConfig` be non-enumerable?" presupposes the repair.
+The prior question is where a marker declaration is *interpreted at all*.
+Measured on both sides, with no casts in the type fixtures:
+
+```text
+position                  types     runtime   ST2021   payload in tree()
+────────────────────────  ────────  ────────  ───────  ─────────────────
+root object property      marker    marker    —        absent
+nested object property    marker    marker    —        absent
+class-instance property   marker    marker    —        absent
+array element             data      data      warns    PRESENT (it IS data)
+tuple element             data      data      warns    PRESENT (it IS data)
+Map value                 data      data      SILENT   PRESENT (it IS data)
+Set member                data      data      SILENT   PRESENT (it IS data)
+```
+
+**Types and runtime agree on every row.** Nothing is a type *error*: a container
+position resolves to the raw builder type, which is truthful — the declaration
+is ordinary data there, and the editor says so.
+
+### OUTCOME A. The contract already existed and was already documented
+
+`ST2021` (`signal-tree.ts:414-458`, `docs/errors/README.md:82`) states it:
+**"Markers belong at object positions."** Dev-mode, bounded scan, deduped. The
+leaking path is not a supported marker use; it is a leaf holding an object, and
+`tree()` containing it is `tree()` being correct.
+
+### Severity, kept proportional to evidence
+
+The forced probe injected a field the public API cannot produce. With **every**
+public config field populated, including closures capturing a secret, the same
+position yields:
+
+```json
+{"list":[{"__isEntityMap":true,"__entityMapConfig":{"hooks":{}},"__computedSlices":{}}]}
+```
+
+No application data. The reason is structural, and is the real difference from
+`stored`:
+
+- public `EntityConfig` is **five optional FUNCTIONS** — `selectId`,
+  `sortComparer`, `hooks.{beforeAdd,beforeUpdate,beforeRemove}`;
+- `loader()` — the only route to `persist: { adapter }`, the one
+  `EntityStorageAdapter` shape that *could* carry data the way `stored`'s
+  `Storage` did — is **not exported from any entry point**, and core's
+  `exports` map has no subpath;
+- `entityMap` is the **only public declarative marker factory** (18 value
+  exports; `form`/`compared`/`derived`/`loader`/`stored` are all internal).
+
+So this is **marker payload exposure at an out-of-contract position**, not a
+credential vulnerability. `stored`'s case was genuinely worse: its supported,
+public options held a live `Storage` object with application contents.
+
+### The invariant, narrowed and re-carried
+
+> At **supported** marker positions, snapshots contain the MATERIALIZED VALUE
+> and never the construction payload.
+
+Carried by `lib/marker-location-grammar.spec.ts` (8 tests, over `tree()` and the
+`persistence()` durable path) and the type negative
+`lib/marker-location-grammar.typing.spec.ts`. Both mutation-controlled:
+
+```text
+M1  neuter warnMarkerInArray   -> grammar test FAILS
+M2  isEntityMapMarker => false -> 4 tests FAIL (opacity + grammar)
+```
+
+`stored-leak.spec.ts`'s absolute wording is **retired as broader than the API it
+protected**. Its subject-specific history is preserved as S1 in
+`docs/audits/2026-08/14.0.0-capability-inventory.md`.
+
+### Two items CHARACTERIZED, not fixed
+
+1. **ST2021 scans arrays only.** Map values and Set members reach the same wrong
+   outcome in silence. Extending the scan is a behavior change and was not
+   authorized; the silence is now pinned as a known position.
+2. **`docs/errors/README.md:82` still names `stored()` and `status()`** as
+   example markers. Both are retired; the line needs updating in the doc pass.
+
+### A measurement error, recorded because it nearly became a finding
+
+The first pass reported a type/runtime **disagreement** at class-instance
+properties. There is none. The assertion was written against `$.h` — the branch
+accessor — rather than `$.h.rows`, the actual marker position. The branch's type
+was answering a different question. Both specs now pin the corrected result.
+
+## Two reusable rules this earned
+
+**INVARIANT CARRIER RULE.** Before deleting the last test attached to a retiring
+primitive: state the invariant *without naming the primitive*, find a real
+surviving carrier, or stop and disposition it. Never knowingly drop a live
+invariant because its original carrier is being deleted. Of `stored`'s three
+generic invariants, two had **stronger** surviving carriers — devtools-vs-durable
+moved to `write-participation`'s `participation: 'inspection'`, owner/`treeId`
+moved to Link, which obtains the registry unconditionally where `stored` spelled
+it `context?.positionRegistry`. The third did not, and that is where deletion
+authority stopped.
+
+**VACUOUS vs ORPHANED.** An invariant whose *subject* is deleted alongside its
+carrier is vacuous — retire it and say why. An invariant whose subject survives
+is orphaned — it must be re-carried or dispositioned. `stored`'s non-entity
+marker resolution row was vacuous; `stored-leak` was orphaned. Re-pointing a
+vacuous row at a surviving primitive fabricates coverage; dropping an orphaned
+one loses it. They look identical at the point of deletion, and the only way to
+tell them apart is to name the subject independently of the primitive.
