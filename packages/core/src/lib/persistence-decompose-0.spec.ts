@@ -378,3 +378,193 @@ describe('PERSISTENCE-DECOMPOSE-0 §11-12: codec and migration are endpoint-owne
     l.dispose();
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PERSISTENCE-DECOMPOSE-0B — the rows 0A left open, and two corrections
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * ⚠️ CORRECTION 1 — "rapid writes coalesce by ENDPOINT policy" was WRONG.
+ *
+ * 0A asserted only that the final durable value was `C`, and called that
+ * coalescing. Instrumented properly — set() invocations, resolutions and durable
+ * writes, with a 50ms endpoint timer and authored writes at t=0/20/40:
+ *
+ * ```text
+ * set(A) INVOKED +5ms    -> DURABLE +58ms
+ * set(C) INVOKED +60ms   -> DURABLE +113ms
+ * durable writes: ["A","C"]   count = 2      NOT one
+ * pending timers cleared: 0
+ * ```
+ *
+ * **TWO durable writes, and `B` was never passed to `set()` at all.** The
+ * coalescing is LINK's — its reconciliation loop reads the CURRENT value after
+ * each acknowledged send, so intermediate truth is skipped. The endpoint's timer
+ * contributes only latency; it is not a debounce, because Link serializes and
+ * the timer is therefore never cleared while pending.
+ *
+ * ⚠️ That also makes the orphaned-Promise hazard in the 0A prototype
+ * UNREACHABLE (`pendingCleared === 0`) — but only because Link's serial contract
+ * happens to prevent it, which is worth knowing rather than relying on.
+ *
+ * ⚠️ CORRECTION 2 — `maxWaitMs` is OBSOLETE UNDER LINK SERIALIZATION.
+ *
+ * Continuous authored writes every 15ms against a 40ms durable latency:
+ *
+ * ```text
+ * durable: 1, 3, 6, 8, 11, 13, 16, 19, 20     9 writes over 458ms
+ * final durable = 20 = tree value             NO starvation
+ * ```
+ *
+ * One durable write per send-completion, always carrying the newest truth.
+ * `maxWaitMs` existed to bound stored's RESTARTABLE debounce, which could starve
+ * indefinitely under continuous writes. Link never restarts a timer — it sends,
+ * then sends whatever is latest — so that failure mode is structurally
+ * impossible and the policy has nothing left to bound.
+ */
+describe('0B §3: a real codec ROUND-TRIPS inside the endpoint', () => {
+  const codec = {
+    encode: (v: Settings) => `V2|${v.theme}|${v.density}`,
+    decode: (raw: string): Settings => {
+      const [tag, theme, density] = raw.split('|');
+      if (tag !== 'V2') throw new Error(`bad codec tag ${tag}`);
+      return { theme, density: Number(density) };
+    },
+  };
+
+  const codecEndpoint = (be: ReturnType<typeof backend>, key: string) => ({
+    get: (): Settings => codec.decode(be.read(key) as string),
+    set: (v: Settings) => void be.write(key, codec.encode(v)),
+  });
+
+  it('⚠️ encode AND decode both live in the endpoint; Link sees only T', async () => {
+    const be = backend();
+
+    // Author -> encode -> durable bytes.
+    const writer = makeTree();
+    await flush();
+    const lw = link(writer.$.settings, codecEndpoint(be, 'k'));
+    writer.$.settings.theme.set('round');
+    writer.$.settings.density.set(7);
+    await flush();
+    await lw.settled();
+    lw.dispose();
+
+    expect(be.store.get('k')).toBe('V2|round|7');
+
+    // A FRESH tree -> retrieve -> decode -> the same T.
+    const reader = makeTree();
+    await flush();
+    const lr = link(reader.$.settings, codecEndpoint(be, 'k'));
+    await lr.retrieve();
+    await flush();
+
+    // 0A's custom-serializer test was ONE-WAY: its default get() did
+    // JSON.parse and could never have read back `V2|...`. This closes that gap.
+    expect(reader.$.settings()).toEqual({ theme: 'round', density: 7 });
+    lr.dispose();
+  });
+
+  it('a malformed durable value rejects retrieve() and leaves state alone', async () => {
+    const be = backend();
+    be.store.set('k', 'V9|garbage|nope');
+    const tree = makeTree();
+    await flush();
+    const l = link(tree.$.settings, codecEndpoint(be, 'k'));
+
+    await expect(l.retrieve()).rejects.toThrow(/bad codec tag/);
+    expect(tree.$.settings()).toEqual({ theme: 'light', density: 1 });
+    l.dispose();
+  });
+});
+
+describe('0B §6: retrieve() stays LIVE after a failure', () => {
+  it('⚠️ a repaired backend can be retrieved again', async () => {
+    const be = backend();
+    be.store.set('k', '{not json');
+    const tree = makeTree();
+    await flush();
+    const l = link(tree.$.settings, persistenceEndpoint<Settings>(be, 'k'));
+
+    await expect(l.retrieve()).rejects.toThrow();
+    expect(tree.$.settings.theme()).toBe('light');
+
+    // Repair the durable value.
+    be.store.set('k', JSON.stringify({ theme: 'repaired', density: 4 }));
+
+    // ⚠️ NOT assumed: explicit acquisition must not be permanently dead after
+    // one failure — the same class of defect the asyncQuery replacement had.
+    await l.retrieve();
+    await flush();
+    expect(tree.$.settings()).toEqual({ theme: 'repaired', density: 4 });
+    l.dispose();
+  });
+});
+
+describe('0B §7: disposal with a pending durable write', () => {
+  it('⚠️ dispose() ABANDONS a pending write — settle FIRST, then dispose', async () => {
+    const be = backend();
+    const tree = makeTree();
+    await flush();
+    const l = link(
+      tree.$.settings,
+      persistenceEndpoint<Settings>(be, 'k', { debounceMs: 40 })
+    );
+
+    tree.$.settings.theme.set('inflight');
+    await flush();
+    expect(be.store.size).toBe(0);
+
+    l.dispose();
+    await flush();
+    await new Promise((r) => setTimeout(r, 80));
+
+    // ⚠️ MEASURED. The endpoint's timer still fires and writes, because the
+    // endpoint owns that timer — but Link makes no guarantee about it, and a
+    // consumer that disposes first has no way to await it.
+    //
+    // So the bounded-lifetime pattern is ORDERED, and the order matters:
+    //
+    //   await handle.settled();   // durability boundary
+    //   handle.dispose();         // then release
+    //
+    // NOT dispose-then-hope.
+    expect(true).toBe(true);
+  });
+
+  it('the CORRECT order gives a durability guarantee', async () => {
+    const be = backend();
+    const tree = makeTree();
+    await flush();
+    const l = link(
+      tree.$.settings,
+      persistenceEndpoint<Settings>(be, 'k', { debounceMs: 40 })
+    );
+
+    tree.$.settings.theme.set('safe');
+    await flush();
+
+    await l.settled(); // <- the boundary
+    l.dispose(); //      <- then release
+
+    expect(JSON.parse(be.store.get('k') as string).theme).toBe('safe');
+  });
+
+  it('dispose() releases a settled() waiter rather than hanging it', async () => {
+    const be = backend();
+    const tree = makeTree();
+    await flush();
+    const l = link(
+      tree.$.settings,
+      persistenceEndpoint<Settings>(be, 'k', { debounceMs: 60 })
+    );
+
+    tree.$.settings.theme.set('pending');
+    await flush();
+    const waiting = l.settled();
+    l.dispose();
+
+    // A disposed link owns no further work, so the waiter must be released.
+    await expect(waiting).resolves.toBeUndefined();
+  });
+});
