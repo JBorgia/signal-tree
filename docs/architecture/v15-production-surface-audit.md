@@ -14022,3 +14022,141 @@ core suite                   2168 passing, 0 failures
 demo                         20 suites / 112 tests passing (was 106)
 typecheck / core lint / demo lint   clean
 ```
+
+---
+
+# LOADER-RETIRE-0 — ⚠️ STOPPED BEFORE DELETION. The NULL does not survive.
+
+Classification only. **Nothing deleted.**
+
+```text
+NULL       loader has no unique SignalTree semantic authority; its footprint
+           decomposes into implementation/registration, one-shot external
+           acquisition, ordinary application async, and obsolete plumbing
+FALSIFIER  a legitimate remaining behaviour requires ownership that cannot be
+           expressed through application async, external(), or Link without
+           inventing replacement machinery
+```
+
+**The FALSIFIER holds — but not in the way the NULL anticipated.**
+
+## ⚠️ 1. `loader()` IS NOT A STANDALONE MARKER
+
+It is a FEATURE ATTACHED TO `entityMap`:
+
+```ts
+entityMap({ load: loader(fn, opts) })
+```
+
+```text
+markers/loader.ts          102 lines   a validating factory returning
+                                       LoaderFeature<E, P>
+markers/entity-loader.ts   720 lines   the implementation
+```
+
+So "retire loader" is not a marker deletion. It is a decision about a
+**collection-acquisition subsystem**.
+
+## ⚠️ 2. IT IS NOT AN RxJS WRAPPER — the asyncQuery analogy fails
+
+```text
+rxjs references   6, and ALL type-level:
+                  `Observable` in a union, an rxjs-FREE isObservable check
+switchMap         0
+catchError        0
+distinctUntilChanged  0
+```
+
+asyncQuery was deleted because RxJS already owned every behaviour it claimed.
+**That reasoning does not transfer.** `loader` implements its own machinery.
+
+## 3. What it actually implements — a CACHING + PERSISTENCE layer
+
+```text
+staleTime             8   freshness window
+swr                   5   stale-while-revalidate
+tags                 10   invalidation tags
+persist              21   persisted scope entries
+maxScopes            10   touch-ordered storage GC
+equal                10   param equality
+clearOnParamsChange   4
+lazy                  6
+cache                 6
+EntityStorageAdapter      its OWN storage abstraction —
+                          IndexedDB / localStorage / custom
+```
+
+## 4. Zero causal integration — measured
+
+```text
+external()   withWriteContext   positionRegistry
+transaction  scheduleDurableConsequence   reportTreeError      ALL 0
+```
+
+So it has no causal authority. That part of the NULL is CONFIRMED.
+
+## 5. No real production callers
+
+Every non-primitive reference is type plumbing, a comment, or a guard:
+
+```text
+utils.ts            isLoaderFeature guard
+types.ts            LoaderFeature brand + EntityLoaderSurface
+readonly*.ts        LOADER_READERS / surface typing
+entity-map.ts       accepts + validates the feature
+serialization.ts    two COMMENTS citing `loader({ staleTime })` semantics
+signal-tree.ts, materialize-markers.ts, async-source*.ts, index.ts   plumbing
+```
+
+Demo references are historical prose in the `whats-new` changelog only.
+
+## ⚠️ THE STOP CONDITION
+
+The NULL's four-way decomposition has no bucket for what this actually is. There
+is a FIFTH category:
+
+> **A caching and persistence layer for entity collections, with its own storage
+> adapter.**
+
+Deleting it does not remove an abstraction over machinery someone else owns — it
+**removes user-facing capability**: stale-while-revalidate, tag invalidation,
+multi-scope persistence, and storage GC. Nothing in `external()`, `link()` or
+"ordinary application async" supplies those, and inventing a replacement is
+explicitly prohibited.
+
+⚠️ **AND ITS `persist` MACHINERY OVERLAPS `stored`.** Both own serialized
+durable state with their own storage abstraction. `stored` is
+`STORED-PERSISTENCE-0`, two phases away, and that phase's whole question is
+"who naturally owns each persistence concern if `stored` never existed."
+
+Deciding `loader`'s persistence separately would either delete SWR/tags/scope-GC
+with no disposition, or answer the persistence-ownership question twice — once
+here, informally, and once properly later.
+
+## RECOMMENDED REORDER
+
+```text
+WAS   LOADER-RETIRE-0 -> ASYNC-SOURCE-RETIRE-1 -> STORED-PERSISTENCE-0
+NOW   ASYNC-SOURCE-RETIRE-1
+        ↓
+      PERSISTENCE-DECOMPOSE-0   stored + loader.persist together, since both
+                                own durable serialized state with their own
+                                storage adapter
+        ↓
+      LOADER-RETIRE-1           the acquisition/caching half, once persistence
+                                ownership is settled
+```
+
+`asyncSource` is unaffected and remains next — it is genuinely independent, and
+`ASYNC-SOURCE-RETIRE-0` already measured its supported contract.
+
+## Methodological note carried forward
+
+ASYNC-QUERY-CLOSE-0's lesson applied here and changed the outcome: read every
+branch before deleting. Had the asyncQuery template been applied by analogy —
+"async marker, therefore RxJS wrapper, therefore delete" — this would have
+deleted a caching subsystem on a false premise.
+
+⚠️ **Architectural ownership and operational capability are different
+questions.** `loader` fails the first (no causal authority, and caching is a
+data-layer concern) while holding real amounts of the second.
