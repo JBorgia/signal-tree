@@ -33,7 +33,8 @@ export class AsyncDemoComponent {
       label: 'store.ts',
       language: 'typescript',
       source: `import { signalTree, external } from '@signaltree/core';
-import { Subject, debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs';
+import { Subject, of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs';
 
 // The TREE holds state. It does not own the request pipeline.
 const store = signalTree({
@@ -58,19 +59,19 @@ query$
       return this.api.search$(q);
     })
   )
-  .subscribe({
-    // external() marks this as authored from OUTSIDE the application's own
-    // mutations — the tree records it as an ingress, not a user edit.
-    next: (users) => external(() => {
-      store.$.results.set(users);
-      store.$.loading.set(false);
-      store.$.error.set(null);
-    }),
-    error: (err) => external(() => {
-      store.$.error.set(err);
-      store.$.loading.set(false);
-    }),
-  });
+  // Caught INSIDE switchMap, per query. If an error escapes it, the OUTER
+  // subscription terminates and the pipeline silently stops responding forever.
+  .pipe(
+    map((users) => ({ ok: true as const, users })),
+    catchError((error) => of({ ok: false as const, error }))
+  )
+  // external() marks this as authored from OUTSIDE the application's own
+  // mutations — the tree records an ingress, not a user edit.
+  .subscribe((r) => external(() => {
+    if (r.ok) store.$.results.set(r.users);
+    else store.$.error.set(r.error);
+    store.$.loading.set(false);
+  }));
 
 query$.next('alice');   // drives the debounced pipeline
 store.$.results();      // User[]`,

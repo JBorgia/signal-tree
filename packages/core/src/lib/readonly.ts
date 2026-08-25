@@ -1,4 +1,4 @@
-import type { Signal, WritableSignal } from '@angular/core';
+import type { Signal } from '@angular/core';
 
 import type { SignalTreeBuilder } from './internals/builder-types';
 import type { AsyncSourceSignal } from './markers/async-source';
@@ -45,19 +45,35 @@ import {
 // =============================================================================
 
 /**
- * Demote a `WritableSignal` member to a plain `Signal` read; everything else
- * (reader methods, already-readonly signals) passes through unchanged.
- * Note `CallableWritableSignal` extends `WritableSignal`, so it demotes too.
- */
-type DemoteWritable<T> = T extends WritableSignal<infer V> ? Signal<V> : T;
-
-/**
- * `Pick` over a reader-key allowlist, demoting any picked `WritableSignal`
- * member to `Signal`. Call signatures are NOT carried by mapped types — views
- * that keep the marker's zero-arg read call re-add it via intersection.
+ * `Pick` over a reader-key allowlist. Call signatures are NOT carried by mapped
+ * types — views that keep the marker's zero-arg read call re-add it via
+ * intersection.
+ *
+ * ⚠️ THIS USED TO DEMOTE `WritableSignal` MEMBERS to plain `Signal`, via a
+ * `DemoteWritable<T>` conditional. ASYNC-QUERY-CLOSE-0 measured that branch
+ * UNREACHABLE and deleted it rather than leaving untested machinery behind:
+ *
+ * ```text
+ * ENTITY_READERS         methods and computeds
+ * ENTITY_LOADER_READERS  loading/loaded/error/lastLoadedAt/params — all Signal
+ * ASYNC_SOURCE_READERS   data/loading/error — all Signal
+ * STORED_READERS         key/version — plain values
+ * ```
+ *
+ * Not one surviving allowlist member is a `WritableSignal`. The two that ever
+ * were — `asyncQuery.input` and `status.state` — belonged to primitives that
+ * are now deleted.
+ *
+ * ⚠️ `ReadonlyExtras` demotes writable EXTRAS through `ReadonlyView`, which is a
+ * DIFFERENT mechanism and is unaffected.
+ *
+ * If a future marker exposes a writable reader, the demotion must be
+ * reintroduced WITH a test — the existing `Equal<>` assertions over all four
+ * allowlists are what proved this deletion safe, and they will fail rather than
+ * silently widen.
  */
 type PickReaders<T, K extends keyof T> = {
-  readonly [P in K]: DemoteWritable<T[P]>;
+  readonly [P in K]: T[P];
 };
 
 /**
