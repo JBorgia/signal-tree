@@ -12102,8 +12102,13 @@ REAL-WHOLE-EFFECT-0             no non-structural effect needs whole; every
 Together those make the descriptor's subject coordinate **unreachable for real
 production traffic**, so a bogus `''` in it changes nothing observable today.
 
-**So the ping repair is correctness by construction, not a live bug fix**, and
-claiming otherwise would overstate it. It is still worth having — the fallback
+> **Owner-only ping → no subject address is an ENFORCED CONSTRUCTION INVARIANT,
+> not a currently user-observable failure path.**
+
+The derivation-boundary mutant proves the invariant is encoded; `replaceOne`
+demonstrates why keeping it matters if an addressless non-structural effect ever
+reaches fallback. B must NOT be described as closing a presently manifested
+runtime defect. It is still worth having — the fallback
 becomes reachable the moment an addressless non-structural effect appears, and
 REPLACE-ONE-SUBJECT-0 is already a defect of exactly that shape. The contract is
 therefore pinned at the derivation boundary (via the exported
@@ -12120,3 +12125,96 @@ the derivation no longer produces `''` for anything meaning "no address".
 Migrating the stored shape is a representation change, not a correctness fix, and
 is deliberately left out of this commit. DESCRIPTOR-MERGE-0's order-dependent
 two-level merge is likewise untouched and still open.
+
+---
+
+# REPLACE-ONE-SUBJECT-1 — the producer boundary repair
+
+`packages/core/src/lib/replace-one-subject-1.spec.ts`
+
+```text
+NULL       replaceOne already knows the SubjectId and merely fails to propagate
+           it through the channel upsertOne / setAll use
+FALSIFIER  it lacks the identity at its producer boundary and needs a new lookup
+```
+
+**The NULL SURVIVES.** `replaceOne` resolves
+`structuralStore.subjectIdForKey(id)` and THROWS if it is missing — it has had
+the identity all along. It then passed `undefined` to `pathNotifier.notify`'s
+`subjectIds` parameter:
+
+```text
+entity-signal.ts   updateOne    subjectIdsForWrite      ✓
+                   updateMany   [subjectIdsForWrite[i]] ✓
+                   removeOne    subjectIdsForWrite      ✓
+                   replaceOne   undefined               ✗  <- the only one
+```
+
+The repair is that one argument. No new lookup, no path parsing, no
+key-as-identity fallback, no realization-adapter special case — which the
+standing instruction explicitly ruled out, since inferring the subject from the
+path would recreate the identity-from-strings problem ADDRESS-REPAIR-1 removed.
+
+## The replacement object's `id` is DATA, not identity
+
+The existing contract is explicit and is PRESERVED:
+
+> "The id comes from the caller on purpose. A `setOne` deriving it via
+> `selectId(entity)` writes to whatever slot the entity's own id field names —
+> and `changeId` can leave `entity.id` disagreeing with the storage key."
+
+`replaceOne` is deliberately NOT a rekey, and this fix does not make it one.
+
+## Mutation proof — one mutant, exactly the intended kill set
+
+Removing ONLY the new propagation:
+
+```text
+KILLED   replaceOne TOP transaction rollback
+         replaceOne TOP undo
+         replaceOne NESTED transaction rollback
+         replaceOne NESTED undo
+         rekey -> current-key discriminator
+         rekey inside the transaction
+
+GREEN    upsertOne(existing)
+         setAll(existing)
+         ordinary updateOne
+         every ADDRESS-REPAIR-1 nested battery
+```
+
+Six failures, all in one file. A broader kill set would have meant the fix was
+placed too broadly.
+
+```text
+before   2153 passing
+after    2160 passing
+```
+
+---
+
+# CORRECTNESS-DEFECT LEDGER
+
+⚠️ **"Zero expected failures" is NOT sufficient evidence of correctness.**
+REPLACE-ONE-SUBJECT-0 demonstrated why: a permanent test can PASS while pinning
+known-broken behaviour, so the suite counted five expected failures while six
+defects existed. Keep this ledger alongside the raw counts through Candidate B.
+
+```text
+ADDRESS-REPAIR-1        CLOSED   aff7e6a6
+REPLACE-ONE-SUBJECT-1   CLOSED   this commit
+
+known correctness defects = 0
+zero expected-fails representing correctness defects
+zero passing "known broken behavior" pins awaiting inversion
+```
+
+Still OPEN as measured representation/fallback issues, deliberately not
+correctness defects:
+
+```text
+DESCRIPTOR-ROLE-0    '' falsy at one consumer, whole-subject at another
+DESCRIPTOR-MERGE-0   two levels, opposite policies, arrival-order dependent
+                     top-level copies: "candidate redundant after semantic
+                     repair" — removal mutation not yet re-run
+```
