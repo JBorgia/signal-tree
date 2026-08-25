@@ -172,7 +172,7 @@ describe('REALIZATION-NAMESPACE-0: the discriminator matrix', () => {
     expect(await seedRemoveRollback(a)).toEqual({ threw: false, len: 1 });
   });
 
-  it('⚠️ D — KNOWN RED: a second tree with a COLLECTION mutation breaks A', async () => {
+  it('D — a second tree with a COLLECTION mutation no longer breaks A', async () => {
     const a = nested();
     const b = nested();
     await flush();
@@ -180,9 +180,9 @@ describe('REALIZATION-NAMESPACE-0: the discriminator matrix', () => {
     await flush();
     const r = await seedRemoveRollback(a);
 
-    // Pinned as the CURRENT behaviour. `threw` is the refusal; `len: 0` is the
-    // speculative DELETION left materialised. Fixing must flip both.
-    expect(r).toEqual({ threw: true, len: 0 });
+    // ⚠️ WAS `{ threw: true, len: 0 }` — the refusal, and the speculative
+    // DELETION left materialised. Fixed by STRUCTURAL-PATH-1.
+    expect(r).toEqual({ threw: false, len: 1 });
   });
 
   it('E — padding A so local position ids DIFFER makes it work again', async () => {
@@ -196,24 +196,25 @@ describe('REALIZATION-NAMESPACE-0: the discriminator matrix', () => {
     expect(await seedRemoveRollback(a)).toEqual({ threw: false, len: 1 });
   });
 
-  it('⚠️ F — KNOWN RED: a DIFFERENT path with the same local ids still breaks A', async () => {
+  it('F — a DIFFERENT path with the same local ids is fine', async () => {
     const a = nested();
     const b = nestedOtherPath();
     await flush();
     rowsOf(b, 'others').addOne({ id: 'b-only', n: 1 });
     await flush();
 
-    // So the path is irrelevant; only the colliding local position id matters.
-    expect(await seedRemoveRollback(a)).toEqual({ threw: true, len: 0 });
+    // Pre-fix this failed, which is how the trigger was identified as a local
+    // position-id collision rather than a path collision.
+    expect(await seedRemoveRollback(a)).toEqual({ threw: false, len: 1 });
   });
 
-  it('⚠️ G — KNOWN RED: creation order is irrelevant', async () => {
+  it('G — creation order is irrelevant', async () => {
     const b = nested();
     const a = nested();
     await flush();
     rowsOf(b).addOne({ id: 'b-only', n: 1 });
     await flush();
-    expect(await seedRemoveRollback(a)).toEqual({ threw: true, len: 0 });
+    expect(await seedRemoveRollback(a)).toEqual({ threw: false, len: 1 });
   });
 });
 
@@ -248,7 +249,7 @@ describe('REALIZATION-NAMESPACE-0: descriptor state is OWNER-ISOLATED', () => {
     expect(getOwnedPositionIds(rowsOf(a))).toEqual(getOwnedPositionIds(rowsOf(b)));
   });
 
-  it('⚠️ B never WRITES A descriptor — but changes which of A\'s writes lands last', async () => {
+  it('B never WRITES A descriptor, and no longer changes A\'s derived address', async () => {
     const withB = async (second: boolean) => {
       const a = nested();
       if (second) {
@@ -273,10 +274,15 @@ describe('REALIZATION-NAMESPACE-0: descriptor state is OWNER-ISOLATED', () => {
     expect(two.ownerPath).toBe('data.rows');
     expect(one.pos).toBe(two.pos);
 
-    // ⚠️ And the derived collectionPath diverges, BEFORE any transaction runs.
-    // That is the whole second axis: not contamination, but a different
-    // notification winning the last write.
+    // ⚠️ PRE-FIX these diverged — `'data.rows'` with one tree and `'data'` with
+    // two, before any transaction ran. That divergence WAS the second axis:
+    // not contamination, but a value-less ping winning the FIRST write
+    // (descriptors are first-write-wins) and permanently claiming the parent
+    // branch as the collection address.
+    //
+    // STRUCTURAL-PATH-1 stops a notification about the owner from claiming any
+    // collection path, so both runs now agree.
     expect(one.collectionPath).toBe('data.rows');
-    expect(two.collectionPath).toBe('data');
+    expect(two.collectionPath).toBe('data.rows');
   });
 });
