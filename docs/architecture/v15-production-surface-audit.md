@@ -14978,15 +14978,15 @@ The prior question is where a marker declaration is *interpreted at all*.
 Measured on both sides, with no casts in the type fixtures:
 
 ```text
-position                  types     runtime   ST2021   payload in tree()
-────────────────────────  ────────  ────────  ───────  ─────────────────
-root object property      marker    marker    —        absent
-nested object property    marker    marker    —        absent
-class-instance property   marker    marker    —        absent
-array element             data      data      warns    PRESENT (it IS data)
-tuple element             data      data      warns    PRESENT (it IS data)
-Map value                 data      data      SILENT   PRESENT (it IS data)
-Set member                data      data      SILENT   PRESENT (it IS data)
+position                  type semantics   runtime semantics   diagnostic
+────────────────────────  ───────────────  ──────────────────  ───────────
+root object property      marker           materialized        none needed
+nested object property    marker           materialized        none needed
+class-instance property   marker           materialized        none needed
+array element             ordinary data    ordinary data       ST2021
+tuple element             ordinary data    ordinary data       ST2021
+Map value                 ordinary data    ordinary data       silent gap
+Set member                ordinary data    ordinary data       silent gap
 ```
 
 **Types and runtime agree on every row.** Nothing is a type *error*: a container
@@ -15046,9 +15046,13 @@ protected**. Its subject-specific history is preserved as S1 in
 
 ### Two items CHARACTERIZED, not fixed
 
-1. **ST2021 scans arrays only.** Map values and Set members reach the same wrong
-   outcome in silence. Extending the scan is a behavior change and was not
-   authorized; the silence is now pinned as a known position.
+1. **ST2021 diagnostic completeness — `MARKER-GRAMMAR-DIAGNOSTICS-0`.** Map and
+   Set do **not** produce a wrong state outcome: they are out-of-contract marker
+   positions and are correctly treated as ordinary data. The gap is diagnostic
+   only — array/tuple misuse warns, the identical Map/Set misuse is silent. Held
+   as characterized debt; preferred disposition is GREENFIELD-IMPLEMENTATION-0,
+   which should derive diagnostics from the settled grammar rather than inherit
+   today's array-specific scanner.
 2. **`docs/errors/README.md:82` still names `stored()` and `status()`** as
    example markers. Both are retired; the line needs updating in the doc pass.
 
