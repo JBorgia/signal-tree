@@ -15772,8 +15772,8 @@ OBSERVATION-LIFECYCLE-0          CLOSED — GREEN / POS-A
 DESCENDANT-MATERIALIZATION-0     CLOSED — MAT-A
 
 OBSERVATION-METADATA-FIDELITY-0  CLOSED — GREEN (F1/F2/F3/F4)
-OBSERVATION-OVERLAP-0            NEXT
-ENTITY-ACQUISITION-CONTROL-0     then
+OBSERVATION-OVERLAP-0            CLOSED — OVERLAP-A
+ENTITY-ACQUISITION-CONTROL-0     NEXT
 LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0  then
     -> if all green, authorize production implementation
     -> retained memory required BEFORE final substrate freeze
@@ -15906,6 +15906,49 @@ loop on the F2 defect.
 `OBSERVATION-METADATA-FIDELITY-0` is CLOSED. Remaining before implementation:
 `OBSERVATION-OVERLAP-0`, `ENTITY-ACQUISITION-CONTROL-0`,
 `LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0`.
+
+## `OBSERVATION-OVERLAP-0` — CLOSED, OVERLAP-A
+
+Do claims compose when source scopes OVERLAP? Distinct from two links on the
+same scalar, which `OBSERVATION-LIFECYCLE-0` already proved. Production-shaped:
+Link acquires on construction and releases on dispose, no manual pre-arming, and
+every handle and setter retained BEFORE either Link exists.
+
+```text
+tree: { settings: { theme, units }, outside }
+
+O1  link(settings)              theme{claims 1, pos 1}  units{claims 1, pos 2}  outside{claims 0}
+O2  + link(settings.theme)      theme{claims 2, pos 1}  units{claims 1}      no new identity
+O3  write theme                 publications=1   A={theme:'dark',units:'metric'}  B=['dark']
+O4  write units                 publications=1   A={...,units:'imperial'}         B=[]
+O5  dispose PARENT              theme{claims 1, armed}  units{claims 0, DISARMED}
+      write theme               publications=1   B=['solar']
+      write units               publications=0   value mutates to 'metric'
+O8  double-dispose parent       theme{claims 1}  — B's claim not stolen
+O6  dispose CHILD               theme{claims 0, disarmed, pos 1 RETAINED}
+      write theme               publications=0   value mutates
+O7  child disposed FIRST        theme{claims 2 -> 1, STILL ARMED}  parent keeps
+                                receiving the complete branch; then parent
+                                dispose -> dormant
+```
+
+**OBSERVATION CLAIMS COMPOSE BY PHYSICAL LEAF.** Overlapping consumer scopes
+share one physical installation, one identity and one publication; each claim
+releases only its own ownership of each leaf.
+
+`O4` is the one worth keeping in mind: a single publication feeds both
+consumers, and the child correctly receives NOTHING for a sibling write. Scope
+lives above the shared physical observation, not in it — which is what makes
+SHARED OBSERVATION, SEPARATE AUTHORITY implementable rather than aspirational.
+
+`O5` and `O7` are the mechanism discriminators. Releasing the parent disarms
+`units` (nobody else claims it) while `theme` stays armed for the child; the
+opposite order keeps `theme` armed for the parent. Neither direction gives a
+claim priority over the other. `POS-A` holds throughout — `theme` keeps
+`positionId 1` across arm, disarm and rearm.
+
+None of OVERLAP-B (duplicate installation), OVERLAP-C (release stealing another
+consumer's leaf) or OVERLAP-D (identity churn) occurred.
 
 ## OPEN
 
