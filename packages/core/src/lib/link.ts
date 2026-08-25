@@ -219,6 +219,22 @@ export function link<S>(
   const held = new Set<{ promise: Promise<void>; resolve: () => void }>();
 
   /**
+   * In-flight retrievals, as RELEASE SIGNALS rather than a counter - same
+   * reason as `held`.
+   *
+   * LINK-HANDLE-1 chose INCLUDED over EXCLUDED: `settled()` means "this
+   * relationship has no link-owned work in progress or held", and `retrieve()`
+   * is work the link INITIATED AND OWNS. Having its own promise is not
+   * sufficient to exclude it - per-operation promises and whole-object idle
+   * promises routinely coexist.
+   *
+   * The deciding argument is that an excluded `retrieve()` can MUTATE X after
+   * `settled()` has already returned, which is misleading in exactly the way
+   * the WEAK outbound reading was.
+   */
+  const retrievals = new Set<{ promise: Promise<void>; resolve: () => void }>();
+
+  /**
    * Inbound Y -> X.
    *
    * `external()` marks the write as coming from outside so it is not mistaken
@@ -318,7 +334,18 @@ export function link<S>(
         throw new Error('link: endpoint supplies no get().');
       }
       const seq = ++inboundSeq;
-      acquire((await endpoint.get()) as T, seq);
+      let resolve!: () => void;
+      const promise = new Promise<void>((r) => (resolve = r));
+      const entry = { promise, resolve };
+      retrievals.add(entry);
+      try {
+        acquire((await endpoint.get()) as T, seq);
+      } finally {
+        // `finally`, so a rejected get() releases the waiter too - otherwise a
+        // failing endpoint would wedge every future `settled()`.
+        retrievals.delete(entry);
+        entry.resolve();
+      }
     },
     async settled() {
       // STRONG, not `await chain`. LINK-HANDLE-0 measured that the weak form
@@ -328,6 +355,12 @@ export function link<S>(
       for (;;) {
         await chain;
         if (disposed) return;
+        // Retrieval first: an acquisition can enqueue outbound work, so
+        // draining the chain before the retrieval lands would miss it.
+        if (retrievals.size > 0) {
+          await Promise.race([...retrievals].map((r) => r.promise));
+          continue;
+        }
         if (held.size === 0) break;
         // The RELEASE SIGNAL, not a poll. Every appended send is preceded by a
         // held observation, so this also carries the loop across work enqueued
@@ -346,6 +379,10 @@ export function link<S>(
       for (const h of [...held]) {
         held.delete(h);
         h.resolve();
+      }
+      for (const r of [...retrievals]) {
+        retrievals.delete(r);
+        r.resolve();
       }
     },
   };

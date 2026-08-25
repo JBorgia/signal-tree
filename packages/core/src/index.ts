@@ -194,7 +194,11 @@ export { undoable } from './lib/undoable';
  */
 export { external } from './lib/external';
 export { link } from './lib/link';
-export type { Link, LinkEndpoint, NaturalValue } from './lib/link';
+// `NaturalValue` is deliberately NOT re-exported. It is type-inference
+// machinery: `link(source, endpoint)` infers without the caller ever naming it,
+// and no third-party authoring need has earned the symbol. It stays exported
+// from `link.ts` for declaration emit only.
+export type { Link, LinkEndpoint } from './lib/link';
 
 // `getPathNotifier` is not root app API. `composeEnhancers` left the root barrel
 // in v12 too and was deleted outright in 15.0 — pass the enhancers declaratively:
