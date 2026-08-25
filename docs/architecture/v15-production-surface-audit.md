@@ -13089,3 +13089,65 @@ which is the whole point of the change.
 before   2203 passing
 after    2206 passing
 ```
+
+---
+
+# STORED-OWNER-INVARIANT-0 — required `treeId` is EARNED
+
+`packages/core/src/lib/stored-owner-invariant-0.spec.ts`
+
+```text
+NULL       every materialized stored() capable of reaching reportError has an
+           owner PositionRegistry; the optionality is defensive/type-level
+FALSIFIER  a legitimate stored error can reach reportTreeError with no registry
+```
+
+**The NULL SURVIVES.** Instrumented at the report boundary, for both live report
+operations and both enhancer configurations:
+
+```text
+NO enhancers               op=read   hasContext=true hasRegistry=true id=1
+restoration+transactions   op=read   hasContext=true hasRegistry=true id=2
+NO enhancers               op=write  hasContext=true hasRegistry=true id=1
+restoration+transactions   op=write  hasContext=true hasRegistry=true id=2
+```
+
+## ⚠️ A DISTINCTION THAT NEARLY COST US THE REQUIRED FIELD
+
+The first version of this probe asserted `getPositionRegistry(tree.$)` and FAILED
+on a plain tree. That is a **different question**:
+
+```text
+the registry EXISTS            always — created unconditionally by
+                               createMaterializationContext
+the registry is ATTACHED to $  only when an enhancer enables position topology
+```
+
+`stored()` reads it from the CONTEXT, not the node, so its ownership does not
+depend on enhancers. **Asserting the node attachment would have falsified the
+NULL for the wrong reason and forced `treeId?: TreeId` permanently.**
+
+⚠️ A second trap in the same probe: stored writes are DEBOUNCED. Without
+`flushAllStoredSignals()` the failure never occurs and the test passes with zero
+reports — measured before the flush was added.
+
+## Why the optionality is type-level only
+
+```text
+1  MaterializationContext.positionRegistry is REQUIRED and unconditionally
+   constructed — unlike the capability-gated positionTopologyEnabled
+2  the only production path into createStoredSignal is the marker processor
+   registration; it lives in the INTERNAL lib/markers barrel, and index.ts
+   neither names it nor re-exports that barrel
+```
+
+Both remaining producers can therefore supply ownership at every live report
+path:
+
+```text
+link     registry.id        ownerPath
+stored   ownerRegistry.id   key
+```
+
+⚠️ Had this failed, the correct response was NOT to weaken the event — it was to
+bring back the exact construction path that lacked ownership.
