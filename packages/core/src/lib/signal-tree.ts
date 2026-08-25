@@ -30,6 +30,7 @@ import {
   isRegisteredMarker,
   materializeMarkers,
 } from './internals/materialize-markers';
+import { installDormantObservation } from './internals/observation-substrate';
 import {
   definePositionRegistry,
   type PositionRegistry,
@@ -177,6 +178,22 @@ function finalizeLeafSignal<TValue>(
   if (buildPlan.has('position-topology')) {
     defineOwnedPositionIds(leaf as object, positionIds);
     defineOwnedOwnerId(leaf as object, registry?.id);
+  }
+
+  // THE DORMANT OBSERVATION SUBSTRATE, for leaves that received no capture.
+  //
+  // `link()` runs AFTER construction and cannot ask for a capability, so an
+  // ordinary leaf has to be observable on demand. The interception point is
+  // installed here — before any `set`/`update` reference can escape to
+  // application code — and stays dormant until a relationship claims it. The
+  // owner seed is what lets that claim be made from the SOURCE ALONE.
+  //
+  // Reached only when `mutation-capture` is absent: that path already
+  // intercepts and returned above, and wrapping twice would publish twice.
+  if (registry) {
+    definePositionRegistry(leaf as object, registry);
+    defineOwnedOwnerPath(leaf as object, path);
+    installDormantObservation(leaf, path, registry);
   }
 }
 

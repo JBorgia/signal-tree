@@ -6,6 +6,7 @@ import { getOwnedOwnerPath } from './internals/owned-metadata';
 import { getPathNotifier } from './path-notifier';
 import { reportTreeError } from './internals/error-reporter';
 import { getPositionRegistry } from './internals/position-registry';
+import { acquireObservation } from './internals/observation-substrate';
 import { isInspectionWrite } from './write-participation';
 import { getEntityProjectionSeed } from './internals/entity-projection-seed';
 import {
@@ -219,6 +220,18 @@ export function link<S>(
   }
 
   const { read, write, collection } = accessorsFor<T>(x);
+
+  /**
+   * ⚠️ ACQUIRED AFTER EVERY REJECTION PATH. The ownership guard and the
+   * empty-endpoint refusal both throw above, so a rejected `link()` cannot
+   * strand an observation claim: FAILED CONSTRUCTION LEAVES NO CLAIM.
+   *
+   * Ordinary leaves inside this source are armed on the first claim and share
+   * one physical publication with any other relationship over the same leaf.
+   * A tree built with `mutation-capture` already intercepts its writes, so this
+   * is a no-op there.
+   */
+  const releaseObservation = acquireObservation(x);
   const ownerPath = getOwnedOwnerPath(x) ?? '';
   const notifier = getPathNotifier();
 
@@ -506,6 +519,9 @@ export function link<S>(
     },
     dispose() {
       disposed = true;
+      // Releases only THIS relationship's claim. A leaf shared with another
+      // Link stays armed for it; the last release returns the leaf to dormant.
+      releaseObservation();
       offSub();
       offFlush?.();
       offSource?.();
