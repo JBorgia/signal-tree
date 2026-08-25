@@ -15567,7 +15567,12 @@ retrofit itself was broken because `emitOwnedMutation` returns early without
 `positionIds[0]`. A discriminator without a working positive control is not a
 discriminator.
 
-## THE SUBSTRATE THAT SURVIVED
+## THE SUBSTRATE THAT SURVIVED — `DORMANT-OBSERVATION-HOOK-0`
+
+Characterized across four phases: `DORMANT-OBSERVATION-HOOK-0` (the mechanism
+and its cost), `OWNER-DISCOVERABILITY-0` (activation from the source alone),
+`SOURCE-OBSERVATION-ACTIVATION-0` (branch, scope, fanout) and
+`OBSERVATION-LIFECYCLE-0` (claims, disposal, position identity).
 
 ```text
 ordinary leaf
@@ -15597,7 +15602,8 @@ Characterized across four phases, all green:
 | position-id lifetime | **POS-A** — one per source lifetime, retained across disarm/rearm |
 | memory | **UNKNOWN** |
 
-The full lifecycle, with Link itself claiming and releasing:
+`OBSERVATION-LIFECYCLE-0`, with Link itself claiming and releasing rather than
+a manually pre-armed source:
 
 ```text
 before any link   {claims:0,               armed:false}
@@ -15671,6 +15677,20 @@ rejection is itself a defect.
 anchor and adjacent preserved anchors, then trust the compiler's exit status
 rather than a visual diff. A range-slice edit in this branch silently deleted
 `held`/`retrievals` from `link.ts`; typecheck caught it, reading did not.
+
+**SUBJECT-ADDRESS RULE.** Before interpreting a probe, prove the observation is
+attached to the exact semantic subject under test — not its parent branch,
+wrapper, projection or representation. Earned when a class-instance marker
+position was read as a type/runtime disagreement: the assertion was on `$.h`,
+the branch, rather than `$.h.rows`, the marker position. Both sides had agreed
+all along.
+
+**COMPOUND-OP SUCCESSOR RULE.** When decomposing or replacing a compound
+operation, test the state before, the state after, AND the next valid operation.
+`stored.clear()` looked equivalent after checking absence alone; the next
+authored write revealed the missing lifecycle property — persistence remained
+active. That is what makes `reset -> settled -> remove` correct and
+`dispose`-based recipes wrong.
 
 **VERIFY BY EXIT CODE, NOT BY PIPELINE.** `npm run typecheck | grep error | head`
 reports `head`'s status, not the compiler's. Run the command, then read `$?`.
