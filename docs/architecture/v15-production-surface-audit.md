@@ -15803,7 +15803,29 @@ vocabulary rather than to a test. UNKNOWN is a stop, not a default to preserve.
 Traced by consumer, not by presence. The two fields whose necessity was genuinely
 unknown resolve in opposite directions.
 
-### `mutationIntent` — REQUIRED
+### `mutationIntent` — REQUIRED on the capture path; UNCONSUMED on the dormant one
+
+⚠️ **PATH-SPECIFIC.** The classification below is correct for the incumbent
+`mutation-capture` carrier. It does NOT transfer to the dormant substrate:
+`transactions` and `restoration` are the only readers, both declare
+`causal-runtime`, which implies `mutation-capture`, whose interception returns
+from `finalizeLeafSignal` BEFORE the substrate installs. No configuration can
+both use the dormant carrier and consume its `mutationIntent`.
+
+```text
+mutation-capture path    REQUIRED / consumed
+dormant path             FIDELITY-PRESERVED, currently UNCONSUMED
+```
+
+The dormant carrier still reports `set -> replace` and `update -> derive`,
+because it is semantically faithful and free — not because it repairs a
+reachable defect there.
+
+> **INVARIANT OWNERSHIP IS PATH-SPECIFIC.** A field being consumed on one
+> producer path does not establish ownership for another, mutually exclusive
+> producer path. Trace the consumer FOR THE PATH IN HAND.
+
+#### The original capture-path finding
 
 ```text
 leaf.set(v)       -> kind 'set'     mutationIntent 'replace'
@@ -15822,16 +15844,19 @@ restoration.ts:2611    mutationIntent: meta?.mutationIntent
 
 And `combineScalarMutationIntent` makes **`replace` dominate `derive`**.
 
-⚠️ **THIS CAUGHT A LATENT DEFECT IN THE DORMANT PROTOTYPE.** The scratch arm
-hardcodes `'set'`/`'replace'` for BOTH `set` and `update`, so every `update()`
-would be reported as a replace. Because replace dominates in the combiner, that
-error PROPAGATES through accumulated effects rather than cancelling out. The
-production carrier must derive intent from the operation, exactly as
-`wrapOwnedWritableSignal` does.
+⚠️ The scratch arm hardcoded `'set'`/`'replace'` for BOTH operations, so every
+`update()` was reported as a replace. On the CAPTURE path that would propagate,
+since replace dominates in the combiner.
 
-This is why the phase is FIDELITY and not parity: the prototype looked
-functionally correct in every earlier discriminator, because none of them
-exercised `update()` under a transaction.
+⚠️ **BUT THE PROPAGATION CLAIM DOES NOT APPLY TO THE DORMANT PATH**, as the
+path-specific note above records. An earlier version of this section said the
+error "PROPAGATES through accumulated effects" without that qualification. It
+would — if a consumer could see it. On the dormant path none can. The fix is
+still right; the severity was overstated.
+
+The phase is still named FIDELITY rather than parity for a good reason: the
+distinction had to be traced to a consumer before it could be classified at
+all.
 
 ### `kind` — DEAD TAXONOMY on the notification path
 
@@ -16129,11 +16154,15 @@ intercepts and returns earlier, and wrapping twice would publish twice.
 names no capability; `observation-substrate.spec.ts` covers lifecycle, claim
 composition, cleanup and metadata fidelity.
 
-**Cost.** Write path indistinguishable from the recorded bare baseline
-(~0.054ms/10k scalar, ~0.055 nested). Construction ~0.148ms per 100 leaves
-against ~0.107 bare — roughly +38%, consistent with the characterized candidate
-and nowhere near the ~+150% write-path tax that made the capability pair COST-C.
-No regression toward COST-C.
+**Cost.** No material ordinary write-hot-path regression was measurable in the
+implementation discriminator (~0.054ms/10k scalar, ~0.055 nested, against a bare
+baseline in the same range). Construction rose roughly +38% per 100 leaves
+(~0.148ms against ~0.107) in this microbenchmark.
+
+⚠️ Deliberately not stated as "indistinguishable" or "zero-cost": these runs
+swing widely, and noisy equality must not be promoted into a guarantee. What the
+evidence does support decisively is that COST-C — the ~+150% WRITE-path tax that
+disqualified making the capability pair baseline — is avoided.
 
 ### Mutations
 
@@ -16147,10 +16176,21 @@ M3 reinstall the arm on EVERY claim              SURVIVES
 
 ⚠️ **M3 survives, and it is not a coverage gap.** The arm is a SINGLE SLOT, not
 a subscriber list, so reinstalling an equivalent closure is behaviourally
-identical — there is no second publication to observe. The `claims === 0` guard
-is therefore an EFFICIENCY measure, not a correctness one, and no test was
-invented to pretend otherwise. Fanout belongs to the notifier; the claim count
-governs only lifetime.
+identical — there is no second publication to observe. No test was invented to
+pretend otherwise.
+
+So the frozen correctness properties are OBSERVABLE ones, not an implementation
+branch:
+
+```text
+ONE stable interception point per physical leaf
+ONE physical publication per mutation
+claims compose by physical leaf
+final release controls lifetime
+```
+
+NOT frozen: "the arm slot may only be assigned on the 0 -> 1 transition". That
+guard is an efficiency property of this implementation.
 
 ### ⚠️ A NARROWING OF THE F2 CLAIM
 
