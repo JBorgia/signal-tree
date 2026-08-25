@@ -15082,3 +15082,145 @@ marker resolution row was vacuous; `stored-leak` was orphaned. Re-pointing a
 vacuous row at a surviving primitive fabricates coverage; dropping an orphaned
 one loses it. They look identical at the point of deletion, and the only way to
 tell them apart is to name the subject independently of the primitive.
+
+## ANGULAR-OWNERSHIP-0 — the package boundary is itself a greenfield deliverable
+
+Greenfield asks "does this belong in SignalTree?". That question is too coarse,
+and answering it badly fails in two opposite directions: Angular integration
+concerns sink into core, or every Angular application reinvents the same
+lifecycle glue the library is uniquely placed to provide. The question is
+three-way:
+
+```text
+CORE          defines truth
+ANGULAR       binds that truth safely into Angular's runtime
+APPLICATION   decides what the truth means for this product
+```
+
+Placement in the greenfield program:
+
+```text
+MIGRATION-CLOSE-0 -> GREENFIELD-CONTRACT-EXTRACTION-0 -> ANGULAR-OWNERSHIP-0
+                  -> GREENFIELD-IMPLEMENTATION-0 -> DEMO-COVERAGE-0
+```
+
+`ANGULAR-OWNERSHIP-0` does not add APIs. It answers where responsibilities
+belong, and its output is a matrix with one row per public capability.
+
+### The mechanical test
+
+| Question | Owner |
+|---|---|
+| Would this semantic exist identically in React, Vue, Node or vanilla TS? | core |
+| Does this exist because Angular has DI, `DestroyRef`, injection contexts, Angular Signals? | `@signaltree/angular` |
+| Does this encode a backend, domain, UX, storage format, or retry policy? | application |
+
+Two sharper heuristics, applied in this order:
+
+- **If two well-designed Angular applications could reasonably want different
+  behaviour, it is application policy** — however common the choice.
+- **If every correct Angular application must perform the same ceremony to
+  preserve a SignalTree invariant, that is an Angular-package candidate.**
+
+A third column is required in the matrix: *would three independent Angular apps
+reimplement this identically?* Yes is strong evidence for the Angular package;
+divergence caused by product choices sends it to the application.
+
+### Two frozen constraints
+
+> **Framework adapters may remove framework ceremony; they may not erase core
+> semantic boundaries.**
+
+An Angular helper may make lifecycle, DI and interop convenient. It may not make
+an unowned Angular signal satisfy the owned-location contract that `link()`
+enforces. Make the correct path easy; never hide the ownership violation.
+
+> **`@signaltree/angular` must never become a junk drawer for what felt too
+> opinionated for core.**
+
+A feature earns that package because *Angular creates the requirement*, not
+because it is used in an Angular application. Acceptance criterion for the whole
+greenfield: for every public capability we can say not only why it exists, but
+why it lives in that layer rather than one above or below.
+
+### ⚠️ MEASURED CORRECTION TO THE PREMISE
+
+The three-way split describes core as a *framework-neutral* engine. **Today's
+core is not that**, and the phase must be designed around the real starting
+point rather than the intended one. Measured at `a78696e5`:
+
+```text
+26 of 107 production files import @angular/core
+most-used: computed(44) signal(24) isSignal(10) effect(9) linkedSignal(7)
+```
+
+Angular signals are not a dependency of the engine, they ARE the engine's
+reactive substrate. So the first row of the mechanical test, read literally,
+would classify core's own reactivity as non-core — which is incoherent. The rule
+needs restating for this repo:
+
+> Core may depend on Angular's **reactive primitives**. It may not depend on
+> Angular's **runtime**: DI, injection contexts, lifecycle, components.
+
+Making core genuinely framework-neutral is a separate and much larger decision
+(replacing the reactive substrate), not a package-boundary question. It should
+not be smuggled in under `ANGULAR-OWNERSHIP-0`.
+
+### The Angular-runtime coupling that already exists in core
+
+Under the restated rule the category is not hypothetical — it is already
+populated, and it is small enough to enumerate exactly. Three files, four sites,
+all adjacent to public API:
+
+```text
+lib/utils.ts:240          runInInjectionContext + Injector + effect
+                          (backs the PUBLIC toWritableSignal, index.ts:175)
+lib/define-store.ts:131   inject(DestroyRef).onDestroy(...)
+                          (backs the PUBLIC defineStore)
+markers/entity-loader.ts:319  inject(DestroyRef, { optional: true })
+```
+
+Everything else Angular-shaped in core is reactivity. So
+`ANGULAR-OWNERSHIP-0`'s first job is an inventory of *existing* runtime coupling,
+not only a decision about where new helpers go.
+
+Two consequences worth recording now:
+
+- `defineStore` already binds teardown to `DestroyRef`. The "every Angular
+  consumer hand-codes `destroyRef.onDestroy(() => l.dispose())`" hazard is
+  therefore partly precedented inside core, which is evidence both that the
+  ceremony is real and that core is currently the wrong owner of it.
+- `toWritableSignal` already *warns at runtime* when called outside an injection
+  context. A public core API whose correctness depends on Angular's injection
+  rules is the clearest single instance of the misplacement this phase exists to
+  find.
+
+### Audit areas, and the exclusion list
+
+In scope: lifecycle (`DestroyRef`, Link disposal, subscription cleanup); DI
+(providers, tokens, injection-context requirements, provider-scoped lifetime);
+Angular Signal interop (readable exposure, computed interop, ownership-safe
+writes); Angular-lifecycle-managed Observable integration (generic RxJS is not
+Angular-specific and does not qualify); the Angular-specific half of
+SSR/hydration only; change detection/scheduling **only if measured to require
+library support**; and TestBed-specific helpers, which would belong in
+`@signaltree/angular/testing` while core semantic fixtures stay in core.
+
+Explicitly application-owned, however common in Angular apps: HTTP clients,
+REST/GraphQL policy, auth, storage selection, localStorage/IndexedDB schemas,
+persistence codecs, migration and version policy, retry/backoff, cache freshness
+and SWR policy, business validation, routing, error/toast UX, analytics, feature
+flags, domain forms.
+
+The persistence work makes the line concrete. An Angular helper that disposes a
+Link with `DestroyRef` is a library candidate. An Angular helper that persists
+settings to `localStorage` under `"settings-v3"` with a 250 ms debounce is
+application territory — and PERSISTENCE-DECOMPOSE-0 already proved the frozen
+Link API expresses it without core involvement.
+
+### Repository state this phase inherits
+
+`packages/angular` **does not exist**. Only `core` and `shared` carry package
+manifests at `a78696e5`; `authoring`, `events` and `ng-forms` are directories
+without their own published manifest. So this is a layer to be *designed*, not a
+package to be tidied — which is the right position to be in before greenfield.
