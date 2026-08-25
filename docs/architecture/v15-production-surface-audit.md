@@ -16111,11 +16111,69 @@ INTERPRETATION defects (`LINK-ROOT-SOURCE-0`, `LINK-BRANCH-NESTED-ENTITY-0`)
 remain open and do not gate it; they gate any claim of general Link
 NaturalValue correctness.
 
+## `OBSERVATION-SUBSTRATE-IMPLEMENT-0` — LANDED
+
+`link()` now works on an ordinary tree. `LINK-BARE-SCALAR-0` and
+`LINK-BARE-BRANCH-0` are CLOSED.
+
+```text
+internals/observation-substrate.ts   stable interception + claim lifecycle
+signal-tree.ts finalizeLeafSignal    installs it on leaves WITHOUT capture
+link.ts                              acquires after validation, releases on dispose
+```
+
+Installed only where `mutation-capture` is absent — that path already
+intercepts and returns earlier, and wrapping twice would publish twice.
+
+17 permanent tests: `link-bare-contract.spec.ts` states the PUBLIC contract and
+names no capability; `observation-substrate.spec.ts` covers lifecycle, claim
+composition, cleanup and metadata fidelity.
+
+**Cost.** Write path indistinguishable from the recorded bare baseline
+(~0.054ms/10k scalar, ~0.055 nested). Construction ~0.148ms per 100 leaves
+against ~0.107 bare — roughly +38%, consistent with the characterized candidate
+and nowhere near the ~+150% write-path tax that made the capability pair COST-C.
+No regression toward COST-C.
+
+### Mutations
+
+```text
+M1 replace the method instead of a stable arm   11 tests fail
+M2 update intent derive -> replace               1 test  fails
+M4 final release leaves the source armed         2 tests fail
+M5 reallocate position identity per activation   2 tests fail
+M3 reinstall the arm on EVERY claim              SURVIVES
+```
+
+⚠️ **M3 survives, and it is not a coverage gap.** The arm is a SINGLE SLOT, not
+a subscriber list, so reinstalling an equivalent closure is behaviourally
+identical — there is no second publication to observe. The `claims === 0` guard
+is therefore an EFFICIENCY measure, not a correctness one, and no test was
+invented to pretend otherwise. Fanout belongs to the notifier; the claim count
+governs only lifetime.
+
+### ⚠️ A NARROWING OF THE F2 CLAIM
+
+The record earlier said the hardcoded-intent prototype defect "PROPAGATES
+through accumulated effects". That overstates what can currently happen.
+
+`mutationIntent` has exactly two readers, `transactions` and `restoration`. Both
+declare `causal-runtime`; `causal-runtime` implies `mutation-capture`; and
+`mutation-capture` returns from `finalizeLeafSignal` BEFORE this substrate is
+installed. **So no tree that uses this substrate can have a `mutationIntent`
+consumer.** The distinction is carried faithfully because it is correct and
+free, not because it repairs a reachable defect.
+
+That also means the consumer-level replace-vs-derive test cannot be written
+against this substrate — only against the incumbent capture path, which already
+had it right. `observation-substrate.spec.ts` asserts CARRIAGE and says so
+inline rather than implying a behavioural dependency it does not have.
+
 ## OPEN
 
 ```text
-LINK-BARE-SCALAR-0     cause identified, substrate designed, NOT fixed
-LINK-BARE-BRANCH-0     cause identified, substrate designed, NOT fixed
+LINK-BARE-SCALAR-0     CLOSED — substrate landed
+LINK-BARE-BRANCH-0     CLOSED — substrate landed
 LINK-ROOT-SOURCE-0             distinct contract defect, undispositioned
 LINK-BRANCH-NESTED-ENTITY-0    branch Link publishes a malformed entity value
 memory                 unmeasured for the dormant representation
