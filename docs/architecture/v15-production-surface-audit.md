@@ -12629,3 +12629,99 @@ single shipped behaviour would delete the comparison that chose it.
 before   2171 passing
 after    2171 passing (+ link.ts, + admission typing spec)
 ```
+
+---
+
+# PRODUCTION-LINK-CONFORMANCE-0 — what actually SHIPS
+
+`packages/core/src/lib/production-link-conformance-0.spec.ts`
+
+⚠️ **Preserving the comparison harnesses is not the same as proving the chosen
+semantics in production.** `LINK-HANDLE-0/1` and `LINK-ECHO-1` keep their `mode`
+parameters because they explain WHY a side won. But a winning candidate asserted
+only against a local harness is not evidence about the shipped function.
+
+## ⚠️ THE PREDICTION WAS RIGHT — and the gap was wider
+
+Against `c3d79be0`, **five of nine failed**:
+
+```text
+settled() does NOT resolve while an in-flight retrieve is pending   FAIL
+stays pending through outbound work FOLLOWING the acquisition       FAIL
+a retrieve started after settled() began still holds it open        FAIL
+dispose() releases a settled() waiting on a pending retrieve        FAIL
+a held consequence delays settled() — STRONG                        FAIL
+```
+
+## P0 — retrieve participates in settlement (LINK-HANDLE-1: INCLUDED)
+
+Production had no registration of retrieval as link-owned pending work:
+
+```ts
+const seq = ++inboundSeq;
+acquire(await endpoint.get(), seq);
+```
+
+`INCLUDED` is what LINK-HANDLE-1 chose, and its default. The recorded reason is
+that an EXCLUDED `retrieve()` can MUTATE X after `settled()` has returned —
+misleading in exactly the way the WEAK outbound reading was. Having its own
+promise is not sufficient to exclude it.
+
+Fixed with waiters, not a counter, and released in `finally` so a rejected
+`get()` cannot wedge every future `settled()`. Retrieval is drained BEFORE the
+held set, because an acquisition can enqueue outbound work.
+
+## ⚠️ TWO OF MY FIVE FAILURES WERE THE TEST'S FAULT, NOT PRODUCTION'S
+
+Both were caught by taking the failure seriously instead of changing production
+to satisfy it:
+
+```text
+"a held consequence delays settled()"
+  I called settled() in the SAME TICK as the write, before any flush. No
+  observation had reached the settlement authority yet, so this tested a
+  STRONGER contract than LINK-HANDLE-0 earned. Its shape is a TRANSACTION plus
+  `await flush()` — held, waiting, nothing on the chain.
+
+"stays pending through the work the acquisition CAUSES"
+  I assumed the acquired value produces an outbound send. It does NOT: inbound
+  acquisition is ECHO SUPPRESSED, so `set` is never called for it. The earned
+  shape is an AUTHORED WRITE after the retrieval.
+```
+
+Production was right about both. Only the retrieve-participation failures were
+real defects.
+
+## Mutation — removing retrieval registration
+
+```text
+KILLED  settled() during a pending retrieve
+        retrieve started after settled() began
+        disposal releasing a retrieval waiter
+
+GREEN   ordinary outbound-only settlement
+        held-consequence settlement
+        echo suppression
+        outbound reconciliation
+        the error contract
+```
+
+Three failures, all in the conformance file. The new mechanism is earned
+cleanly.
+
+## Public-surface trim
+
+`NaturalValue` is no longer re-exported from the package root. It is
+type-inference machinery — `link(source, endpoint)` infers without the caller
+ever naming it — and no third-party authoring need has earned the symbol. It
+stays exported from `link.ts` for declaration emit.
+
+```text
+before   2171 passing
+after    2180 passing
+```
+
+## ⚠️ STATUS CORRECTION
+
+`c3d79be0` means production `link()` has **LANDED**, not that it ships. Its
+contract is not frozen while ERROR-SURFACE-1 is open.
