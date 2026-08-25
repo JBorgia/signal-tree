@@ -53,9 +53,11 @@ import { signalTree } from './signal-tree';
  *     at SUPPORTED marker positions, snapshots contain the MATERIALIZED VALUE
  *     and never the construction payload.
  *
- * One open item is CHARACTERIZED here, not fixed, because fixing it is a
- * behavior change that has not been authorized: ST2021 scans arrays only, so
- * Map values and Set members reach the same wrong outcome in silence.
+ * One open item is CHARACTERIZED here, not fixed. It is a DIAGNOSTIC gap, not a
+ * semantic one: Map values and Set members are treated as ordinary data, which
+ * is the grammar behaving correctly. What differs is only that ST2021 scans
+ * arrays, so the identical misuse warns in one container and is silent in the
+ * other. Tracked as MARKER-GRAMMAR-DIAGNOSTICS-0.
  */
 
 type Row = { id: number; name: string };
@@ -188,12 +190,14 @@ describe('marker-location grammar', () => {
     expect(st2021()).toBe(1);
   });
 
-  it('⚠️ GAP — Map values and Set members are data, but SILENTLY', () => {
-    // CHARACTERIZATION, not endorsement. ST2021 scans arrays only, so these two
-    // containers reach the same wrong outcome with no diagnostic at all. Left
-    // as-is: extending the scan is a behavior change, and Map/Set state is rare
-    // enough that the cost/benefit was never measured. Recorded so the silence
-    // is a known position rather than an oversight.
+  it('⚠️ DIAGNOSTIC GAP — Map/Set are data (correct), but SILENTLY', () => {
+    // The STATE outcome here is right: an out-of-contract position holds
+    // ordinary data, exactly as the grammar says. Only the diagnostic differs —
+    // ST2021 scans arrays, so identical misuse warns in one container and not
+    // in the other. Left as-is deliberately: extending the scanner is a
+    // behavior change, and the greenfield implementation should derive
+    // diagnostics from the settled grammar rather than copy today's
+    // array-specific scan. Tracked as MARKER-GRAMMAR-DIAGNOSTICS-0.
     signalTree({ m: new Map<string, unknown>([['a', entityMap<Row, number>(cfg())]]) });
     expect(st2021()).toBe(0);
 
