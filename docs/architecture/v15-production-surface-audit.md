@@ -14414,16 +14414,20 @@ scheduling for exactly this, and Link already has it.
 ```text
 debounced write, before settled()   NOT durable
 await link.settled()                durable
-rapid A/B/C                         coalesced by the ENDPOINT; settled() waits
-                                    for the LAST one
 ```
 
 The endpoint's `set()` returns a Promise that resolves only when the durable
 write lands, so `settled()` means "durably written", not "scheduled".
 
-> **`flushAllStoredSignals()` is unnecessary.** A bounded-lifetime consumer
-> awaits ITS OWN relationship instead of a process-wide drain. That answers the
-> TruckTrax durability requirement without a global API.
+⚠️ **THE COALESCING CLAIM IS WITHDRAWN — see 0B CORRECTION 1.** 0A asserted only
+that the final durable value was `C` and called that endpoint coalescing. It is
+not: instrumenting write COUNT and timing shows TWO durable writes, and the
+coalescing is LINK's, not the endpoint's.
+
+> **A LOCAL Link settlement mechanism exists that can replace the global
+> durability boundary.** Exact `stored` scheduling-policy disposition was still
+> under test at 0A; see 0B for `maxWaitMs`. That direction answers the TruckTrax
+> durability requirement without a global API.
 
 ⚠️ Per the ASYNC-SOURCE lesson, "await write", "flush" and "settled" were treated
 as three separate claims and measured separately rather than as synonyms.
@@ -14513,3 +14517,138 @@ question** — which was its purpose.
 ```text
 core 2130 passing, typecheck clean, lint clean
 ```
+
+---
+
+# PERSISTENCE-DECOMPOSE-0B — two corrections, and a better architecture
+
+⚠️ **0A was accepted as `PERSISTENCE-DECOMPOSE-0A`, NOT as the closed phase.** Its
+own report said the concept-overlap matrix was partial while declaring the
+decomposition done; those cannot both be true.
+
+## ⚠️ CORRECTION 1 — the coalescing claim was WRONG, and the truth is simpler
+
+0A asserted only that the final durable value was `C`. Instrumented properly —
+`set()` invocations, resolutions, durable writes, 50ms endpoint timer, authored
+at t=0/20/40:
+
+```text
+set(A) INVOKED  +5ms    -> DURABLE  +58ms
+set(C) INVOKED +60ms    -> DURABLE +113ms
+durable writes: ["A","C"]     count = 2      NOT one
+pending timers cleared: 0
+```
+
+**TWO durable writes, and `B` was never passed to `set()` at all.**
+
+> **The coalescing is LINK's, not the endpoint's.** Its reconciliation loop reads
+> the CURRENT value after each acknowledged send, so intermediate truth is
+> skipped. The endpoint timer contributes only LATENCY — it is not a debounce,
+> because Link serializes and the timer is never cleared while pending.
+
+⚠️ That also makes the orphaned-Promise hazard in the 0A prototype UNREACHABLE
+(`pendingCleared === 0`) — but only because Link's serial contract prevents it.
+Worth knowing rather than relying on.
+
+## ⚠️ CORRECTION 2 — `maxWaitMs` is OBSOLETE UNDER LINK SERIALIZATION
+
+Continuous authored writes every 15ms against a 40ms durable latency:
+
+```text
+durable: 1, 3, 6, 8, 11, 13, 16, 19, 20      9 writes over 458ms
+final durable = 20 = the tree value          NO starvation
+```
+
+One durable write per send-completion, always carrying the newest truth.
+
+`maxWaitMs` existed to bound `stored`'s **restartable** debounce, which could
+starve indefinitely under continuous writes. Link never restarts a timer — it
+sends, then sends whatever is latest — so **that failure mode is structurally
+impossible and the policy has nothing left to bound.**
+
+```text
+maxWaitMs   OBSOLETE UNDER LINK SERIALIZATION
+debounceMs  ENDPOINT LATENCY POLICY — optional, and NOT the coalescing mechanism
+```
+
+This is a better result than 0A claimed: not "the endpoint reimplements
+debounce", but "the serialization contract already provides the property debounce
+was for."
+
+## §3 CODEC ROUND-TRIP — closed
+
+0A's custom-serializer test was **one-way**: its default `get()` did
+`JSON.parse` and could never have read back the `V2|...` it wrote. Now:
+
+```text
+author -> encode -> durable 'V2|round|7'
+FRESH tree -> retrieve -> decode -> { theme: 'round', density: 7 }
+malformed 'V9|...' -> retrieve REJECTS, state untouched
+```
+
+Encode and decode both live in the endpoint; Link sees only `T`. **No codec hook
+on Link.**
+
+## §6 RETRIEVE RECOVERY — closed
+
+```text
+malformed durable value  -> retrieve() rejects, state untouched
+backend repaired         -> retrieve() SUCCEEDS
+```
+
+Explicit acquisition is not permanently dead after one failure — the same defect
+class the asyncQuery replacement had.
+
+## §7 DISPOSAL WITH PENDING DURABILITY — the ORDER is the contract
+
+⚠️ `dispose()` **abandons** a pending write from Link's perspective. The
+endpoint's own timer may still fire, but Link guarantees nothing about it and a
+consumer that disposed first cannot await it.
+
+```text
+CORRECT     await handle.settled();   // the durability boundary
+            handle.dispose();         // then release
+
+WRONG       handle.dispose();         // then hope storage finishes
+```
+
+And `dispose()` **releases** an in-flight `settled()` waiter rather than hanging
+it, so the pattern is safe to use defensively.
+
+⚠️ This is the CORE mechanism relevant to TruckTrax. It does NOT prove TruckTrax
+is fixed — the production consumer still has to use the order correctly.
+
+## Ownership, updated
+
+```text
+state synchronization        LINK RELATIONSHIP
+outbound coalescing          LINK  (was mis-attributed to the endpoint in 0A)
+storage backend              ENDPOINT / ADAPTER
+codec (encode AND decode)    ENDPOINT / ADAPTER
+version migration            ENDPOINT / ADAPTER
+write latency policy         ENDPOINT (optional)
+maxWaitMs                    OBSOLETE UNDER LINK SERIALIZATION
+durability boundary          LINK settled()  — and dispose AFTER it
+global flush                 DELETE
+```
+
+**Required new core API: still NONE.**
+
+## ⚠️ STILL OPEN — 0B is not the closed phase either
+
+```text
+NOT YET MEASURED
+  clearOnMigrationFailure       stored behaviour + adapter-policy prototype
+  remove / clear                what it means, and whether the ADAPTER OBJECT
+                                may carry it while LinkEndpoint stays get/set/
+                                subscribe
+  maxScopes runtime control     persist-disabled vs enabled churn
+                                (source evidence is strong; the behavioural
+                                discriminator has not been run)
+  full loader.persist inventory adapter contract, key shapes, persisted
+                                metadata, hydration timing/precedence,
+                                staleTime/SWR/tags/equality interaction
+  the loader-cache HALF of the concept-overlap matrix
+```
+
+`PERSISTENCE-DECOMPOSE-0` remains OPEN. `STORED-RETIRE-0` is not yet unblocked.
