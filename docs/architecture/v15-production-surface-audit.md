@@ -12393,3 +12393,116 @@ after    2164 passing
 
 **No production typing change made yet** — the extractor is proven as a candidate
 in the typing spec. It lands with production `link()`, which is next.
+
+---
+
+# LINK-MATERIALIZED-VALUE-0 — FALSIFIED, and NOT root-specific
+
+`packages/core/src/lib/link-materialized-value-0.typing.spec.ts` (compile-time)
+`packages/core/src/lib/link-materialized-value-0.spec.ts` (runtime)
+
+```text
+NULL       callable root/branch natural values already have a public type that
+           truthfully matches their materialized runtime value
+FALSIFIER  a callable source containing entityMap state exposes EntityMapBuilder
+           in its declared value type while runtime natural state differs
+```
+
+**FALSIFIED.**
+
+```text
+cell       TYPE today                            RUNTIME read
+A count    number                                1                          ✓
+B rows     Row[]                                 Row[] via all()            ✓
+C nested   { label, users: EntityMapBuilder }    { label, users:{all:[]} }  ✗
+D root     EntityMapBuilder in 2 positions       { all: [] } in both        ✗
+E plain    { a: number; b: string }              { a, b }                   ✓
+```
+
+## ⚠️ THE DECISIVE RESULT — the nested branch is as broken as the root
+
+`tree.$.nested` has the IDENTICAL defect, and `tree.$.plain` is fine. So:
+
+> **The problem is RECURSIVE MATERIALIZATION, not root identity.**
+
+A policy phrased as "exclude the root" would measure the wrong thing.
+
+## The type matches NEITHER side
+
+```text
+declared   EntityMapBuilder<User, string, ...>    the construction marker
+read       { all: User[] }
+write      { all: User[] }  OR  User[]
+```
+
+Same category as LINK-COLLECTION-TYPE-0, one level up:
+
+> **construction marker type != synchronized runtime state type**
+
+## `{ all: T[] }` is DESIGNED, not an artifact
+
+The live node has 32 own enumerable keys; the snapshot has exactly one. And
+`applyState` has an explicit branch for it:
+
+```ts
+typeof stateNode.setAll === 'function' && Array.isArray(snapshot.all)
+  -> stateNode.setAll(snapshot.all)
+```
+
+It is the serialization / devtools / restore representation.
+
+## The round trip IS coherent — so this is NOT outcome 3
+
+Read a branch, write it straight back, state is preserved: the write side accepts
+both shapes. A full-state contract EXISTS at runtime.
+
+⚠️ But read and write are ASYMMETRIC — read gives `{ all: T[] }`, write accepts
+`{ all: T[] } | T[]`. Link synchronizes complete X with complete Y, so an
+endpoint would RECEIVE an internal snapshot representation and be allowed to SEND
+either shape. That is not something userland should have to speak.
+
+## Disposition — outcome 2, and it WIDENS the earlier plan
+
+```text
+TRUTHFUL, admit      owned scalar leaf
+                     entity collection    (read all() / write setAll())
+                     ordinary branch with NO collection in its state
+
+UNTRUTHFUL, exclude  any callable source whose declared state CONTAINS an
+                     entityMap marker — the root of any tree that has a
+                     collection, AND any branch containing one
+```
+
+Measured as exactly expressible in the type system, with no recursive
+materialization machinery:
+
+```ts
+type ContainsMarker<T> = T extends EntityMapBuilder<...> ? true
+  : T extends object
+    ? true extends { [K in keyof T]: ContainsMarker<T[K]> }[keyof T] ? true : false
+    : false;
+```
+
+⚠️ **Recorded, NOT implemented.** Excluding a public Link target is a
+public-surface decision. The standing authorization was to exclude *the root*
+rather than invent machinery; the measurement shows the truthful rule is broader
+than that, which is new information and wants confirmation before it lands.
+
+⚠️ The typing spec pins the untruthful cells POSITIVELY, so a future
+materialization fix fails there and forces this record to be revisited rather
+than going stale.
+
+```text
+before   2164 passing
+after    2171 passing
+```
+
+## ⚠️ ONE UNREPRODUCED SUITE FAILURE — reported, not resolved
+
+One run showed `2170 passed | 1 failed`. I did not capture the log for that run,
+so the test is unidentified. Six subsequent runs are clean, three of them with
+`--skip-nx-cache` to rule out cached results.
+
+Recorded rather than dismissed: an intermittent at roughly 1-in-7 is worth
+watching, and the procedural lesson is that suite runs whose output is piped
+through `grep` lose the failure detail that identifies it.
