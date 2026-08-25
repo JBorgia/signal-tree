@@ -14375,3 +14375,141 @@ demo   20 suites / 112 tests        lint clean
 gates  check-rc-public-dispositions · check-bundle-budget ·
        check-contract-neutrality · check-documented-symbols   all exit 0
 ```
+
+---
+
+# PERSISTENCE-DECOMPOSE-0 — the frozen Link API expresses persistence
+
+`packages/core/src/lib/persistence-decompose-0.spec.ts`
+
+Analysis and prototype only. **Nothing deleted, and Link was NOT modified.**
+
+The prototype endpoint is exactly `LinkEndpoint<T>` — `get` and `set`. No
+`StoredOptions` shape was copied onto it; every storage concern lives INSIDE
+those two functions.
+
+## §8 TRANSACTION / ROLLBACK — the strongest falsifier, and it held
+
+```text
+rolled-back transaction   NO speculative value ever durable
+committed transaction     ONE write of the COMPLETE committed value
+ordinary authored write   persists normally
+```
+
+⚠️ **My first assertion here was WRONG, and the failure was informative.** I
+asserted `writes === []` after a rollback. It failed — with one write of
+`{ theme: 'light', density: 1 }`, the **post-rollback** state.
+
+So Link did not leak speculative values; the rollback is itself a state change,
+which armed a reconciling send of the committed truth. That is LINK-RACE-1
+behaviour, not a persistence defect. The real invariant — no SPECULATIVE value is
+ever durable — is now asserted directly, per-write.
+
+This is the strongest evidence that persistence belongs on the commit boundary
+rather than inside a marker write path: `stored` needed durable-consequence
+scheduling for exactly this, and Link already has it.
+
+## §9 SETTLEMENT vs DEBOUNCE — `settled()` IS a durability boundary
+
+```text
+debounced write, before settled()   NOT durable
+await link.settled()                durable
+rapid A/B/C                         coalesced by the ENDPOINT; settled() waits
+                                    for the LAST one
+```
+
+The endpoint's `set()` returns a Promise that resolves only when the durable
+write lands, so `settled()` means "durably written", not "scheduled".
+
+> **`flushAllStoredSignals()` is unnecessary.** A bounded-lifetime consumer
+> awaits ITS OWN relationship instead of a process-wide drain. That answers the
+> TruckTrax durability requirement without a global API.
+
+⚠️ Per the ASYNC-SOURCE lesson, "await write", "flush" and "settled" were treated
+as three separate claims and measured separately rather than as synonyms.
+
+## §11-12 SERIALIZATION and MIGRATION are endpoint-owned
+
+```text
+custom serializer     Link transported T; the endpoint chose the wire format
+version migration     v1 payload upgraded inside get() — NO Link involvement
+absent value          the endpoint's decision, not Link's
+```
+
+Migration happens while INTERPRETING the durable representation, which is why it
+belongs to the adapter. No serializer hook on Link, and no pressure to add one.
+
+## §13 ERROR MODEL — the frozen contract holds, with one measured asymmetry
+
+```text
+outbound set() failure   -> onTreeError, once, operation 'link:set',
+                            path = 'settings' (the STATE location)
+                         -> X stays authored, queue survives, later write lands
+```
+
+⚠️ The storage key `'k'` never appears in `path` — the ERROR-PATH-SEMANTICS-0
+separation holds under a persistence workload.
+
+⚠️ **AND A DIRECTIONAL ASYMMETRY, measured not assumed:** a failing `retrieve()`
+**REJECTS to its own caller** and does NOT reach `onTreeError`. The reporter
+covers automatic OUTBOUND egress; an explicitly awaited operation returns its own
+error. Storage-specific detail (key, backend, codec, quota) therefore stays with
+the endpoint/application, and `TreeErrorEvent` needs no widening.
+
+## §4 `maxScopes` — PERSISTENCE RETENTION, measured from code
+
+⚠️ **This contradicts my own earlier speculation** that it sounded like cache
+eviction. The evidence:
+
+```text
+declared on            EntityPersist — inside the persist options object
+gated by               `if (!p || !scoped || p.maxScopes === undefined) return;`
+                       -> persist DISABLED means NO GC at all
+mechanism              adapter.removeItem over a touch-ordered scope index at
+                       `${key}::__scopes`
+its own doc            "This is storage GC only — in-memory multi-scope LRU
+                       caching remains deferred (RFC 0003 §5); the in-memory
+                       cache is still single-scope."
+```
+
+There is no multi-scope in-memory cache for it to bound. **Classification:
+PERSISTENCE RETENTION**, not cache retention and not both.
+
+## Proposed ownership
+
+```text
+state synchronization        LINK RELATIONSHIP
+storage backend             ENDPOINT / ADAPTER
+serialization / codec       ENDPOINT / ADAPTER
+version migration           ENDPOINT / ADAPTER
+debounce / write scheduling ENDPOINT POLICY
+durability boundary         LINK settled()      (already exists)
+storage-specific errors     ENDPOINT / APPLICATION
+generic sync failure        onTreeError         (already exists)
+global flush                DELETE
+maxScopes                   PERSISTENCE RETENTION — travels with whatever owns
+                            durable scope storage
+```
+
+**Required new core API: NONE.** Question 7 answers `no`.
+
+## ⚠️ WHAT THIS PHASE DID NOT COVER
+
+Stated plainly rather than implied by omission:
+
+```text
+NOT measured   clearOnMigrationFailure · remove/clear semantics · maxWaitMs as a
+               distinct policy · the full loader.persist inventory (adapter
+               contract details, persisted metadata shape, hydration timing,
+               staleTime/SWR/tags interaction)
+```
+
+The §5 concept-overlap matrix is therefore PARTIAL: it is established for the
+generic-persistence column (stored's concerns) and NOT yet for the
+loader-cache column. `LOADER-CACHE-DISPOSITION-0` still owns that side, and this
+phase's contribution is that **persistence is now removable from the loader
+question** — which was its purpose.
+
+```text
+core 2130 passing, typecheck clean, lint clean
+```
