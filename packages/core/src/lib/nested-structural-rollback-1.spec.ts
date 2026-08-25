@@ -200,7 +200,13 @@ const OPERATIONS: Array<[string, boolean, (r: Rows) => void]> = [
  * its own inventory to do, and bundling it would repeat the mistake of fixing by
  * reproducer rather than by rule.
  */
-const STILL_RED = ['addOne', 'addMany', 'updateOne', 'upsertOne'];
+/**
+ * ⚠️ EMPTY — ADDRESS-REPAIR-1 closed every one of these.
+ *
+ * Kept as a list rather than deleted so a regression re-reds a NAMED operation
+ * instead of quietly turning one assertion around.
+ */
+const STILL_RED: string[] = [];
 
 describe('NESTED-STRUCTURAL-ROLLBACK-1: top-level CONTROL', () => {
   for (const [name, seed, op] of OPERATIONS) {
@@ -215,8 +221,9 @@ describe('NESTED-STRUCTURAL-ROLLBACK-1: top-level CONTROL', () => {
 describe('NESTED-STRUCTURAL-ROLLBACK-1: nested', () => {
   for (const [name, seed, op] of OPERATIONS) {
     // ⚠️ WAS KNOWN RED for every subject-creating/modifying operation.
-    // STRUCTURAL-PATH-1 fixed addOne, addMany and the two-tree case. The two
-    // subject-MODIFYING operations remain, for a sibling reason recorded below.
+    // STRUCTURAL-PATH-1 fixed addOne, addMany and the two-tree case;
+    // ADDRESS-REPAIR-1 closed the rest by making the owner position's REGISTERED
+    // collection address the authority, so `data.rows` is never read as `data`.
     const stillRed = STILL_RED.includes(name);
     const runner = stillRed ? it.fails : it;
     runner(`${stillRed ? '⚠️ KNOWN RED — ' : ''}${name} rolls back cleanly`, async () => {

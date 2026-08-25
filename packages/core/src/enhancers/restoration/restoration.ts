@@ -2691,6 +2691,7 @@ export function restoration(
         positionIds: resolvedPositionIds,
         subjectIds,
         meta,
+        registry: getPositionRegistry(tree.$),
       });
 
       bucket.ownerPaths.add(ownerPath ?? path);

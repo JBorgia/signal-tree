@@ -111,13 +111,26 @@ const ADAPTER = readFileSync(
 );
 
 describe('DESCRIPTOR-ROLE-0: the consumer shape', () => {
-  it('⚠️ `` \'\' `` is FALSY at one consumer and WHOLE-SUBJECT at another', () => {
-    // The falsy read — `''` is rejected as "no path".
-    expect(ADAPTER).toContain('const fieldPathFromRow = resolveSubjectFieldPath(descriptor, effect);');
+  it('⚠️ `` \'\' `` is STILL falsy at one consumer and whole-subject at another', () => {
+    // ⚠️ ADDRESS-REPAIR-1 did NOT remove this wart, and that is deliberate.
+    //
+    // The DERIVATION is now explicit — `deriveSubjectAddress` returns
+    // `undefined | {kind:'whole'} | {kind:'field'}` — but the STORAGE encoding
+    // is still `string | undefined` with `''` meaning whole, converted at one
+    // place (`encodeSubjectAddress`). So the disagreement below survives in the
+    // consumers.
+    //
+    // It is safe now only because the derivation no longer produces `''` for
+    // anything meaning "no address": the owner-only ping returns `undefined`
+    // before `subjectId` is ever consulted. Migrating the stored shape is a
+    // representation change, not a correctness fix, and belongs in its own step.
     expect(ADAPTER).toMatch(/if \(!fieldPathFromRow\) \{\s*return false;/);
-
-    // The explicit read — `''` is honoured as "the whole subject".
     expect(ADAPTER).toContain("if (fieldPathFromRow === '')");
+
+    // The derivation-side representation that replaced the string heuristics.
+    expect(ADAPTER).toContain("type SubjectAddress");
+    expect(ADAPTER).toContain("function deriveSubjectAddress(");
+    expect(ADAPTER).toContain("function encodeSubjectAddress(");
   });
 
   it('subject field resolution is keyed by subjectId, never by path shape', () => {

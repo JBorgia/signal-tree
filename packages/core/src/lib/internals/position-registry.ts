@@ -20,6 +20,29 @@ export interface PositionRegistry {
    */
   readonly id: number;
   allocate(parent?: PositionId): PositionId;
+  /**
+   * ADDRESS-REPAIR-1 — canonical collection authority.
+   *
+   * Records that `position` IS a collection, and what its canonical address is.
+   * Called once at entityMap materialization, where both facts are already
+   * known, so nothing later has to infer either one from a path's shape.
+   *
+   * ⚠️ This is deliberately NOT a general node-role taxonomy. The only role the
+   * measurements earned is "this position is a collection, and here is its
+   * address" — REALIZATION-ADDRESS-0 showed that single fact classifies every
+   * observed case correctly at every depth.
+   */
+  registerCollectionPath(position: PositionId, path: string): void;
+  /**
+   * The canonical collection address for `position`, or `undefined` if that
+   * position is not a collection.
+   *
+   * ⚠️ `undefined` is a MEANINGFUL answer, not a lookup miss to route around:
+   * an ordinary scalar leaf is not a collection, and REALIZATION-ADDRESS-0's
+   * control proves a nested leaf (`data.count`) must be rejected here even
+   * though its path has a dot.
+   */
+  collectionPathFor(position: PositionId): string | undefined;
   parentOf(position: PositionId): PositionId | undefined;
   contains(authority: PositionId, participant: PositionId): boolean;
 }
@@ -30,6 +53,15 @@ class TreePositionRegistry implements PositionRegistry {
   readonly id = nextRegistryId++;
   private nextPositionId = 1;
   private parents = new Map<PositionId, PositionId | undefined>();
+  private collectionPaths = new Map<PositionId, string>();
+
+  registerCollectionPath(position: PositionId, path: string): void {
+    this.collectionPaths.set(position, path);
+  }
+
+  collectionPathFor(position: PositionId): string | undefined {
+    return this.collectionPaths.get(position);
+  }
 
   allocate(parent?: PositionId): PositionId {
     const positionId = this.nextPositionId++ as PositionId;

@@ -161,7 +161,7 @@ describe('SUBJECT-ADDRESS-0: a whole-subject update is a real operation', () => 
     expect(tree.$.rows.byIdOrFail('seed').n()).toBe(0);
   });
 
-  it('⚠️ KNOWN RED — the same round-trip NESTED fabricates a field coordinate', async () => {
+  it('the same round-trip NESTED — closed by ADDRESS-REPAIR-1', async () => {
     const tree = nestedTree();
     await flush();
     tree.$.data.rows.addOne({ id: 'seed', n: 0 });
@@ -172,18 +172,17 @@ describe('SUBJECT-ADDRESS-0: a whole-subject update is a real operation', () => 
     );
     await flush();
 
-    // Measured: `FIELD="seed"` — the ENTITY KEY as a field name — and
-    // `coll="data"`, the parent branch. The rollback refuses.
-    let threw = false;
-    try {
-      p.rollback();
-    } catch {
-      threw = true;
-    }
+    // ⚠️ WAS KNOWN RED. The derivation used to produce `FIELD="seed"` — the
+    // ENTITY KEY as a field name — and `coll="data"`, the parent branch, so the
+    // rollback refused and the speculative state stayed materialized.
+    //
+    // ADDRESS-REPAIR-1 makes the owner position's REGISTERED collection address
+    // the authority, so `data.rows` is never read as `data`, and the key segment
+    // is consumed as addressing rather than returned as a coordinate.
+    p.rollback();
     await flush();
 
-    expect(threw).toBe(true);
-    expect(tree.$.data.rows.byIdOrFail('seed').n()).toBe(99); // speculative state remains
+    expect(tree.$.data.rows.byIdOrFail('seed').n()).toBe(0);
   });
 });
 
