@@ -128,3 +128,45 @@ assertExact<Exact<ReturnType<typeof connection.dispose>, void>>();
 void connection.subscribe;
 // @ts-expect-error and it is not a thenable
 void connection.then;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// COMPARISON-FULL-STATE-0 — the endpoint speaks T, never Partial<T>
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * ⚠️ The type contract is the authority for "no patch protocol". There is no
+ * runtime patch detector, and there should not be one: `LinkEndpoint<T>` is
+ * parameterised on the COMPLETE natural value, so a partial cannot be supplied
+ * in the first place.
+ */
+declare const partialBranch: Partial<{ a: number; b: string }>;
+declare const fullBranch: { a: number; b: string };
+declare const partialRows: Array<Partial<Row>>;
+
+// A complete branch value is accepted.
+link(tree.$.plain, { get: () => fullBranch });
+
+// @ts-expect-error a PARTIAL branch is not a complete natural value
+link(tree.$.plain, { get: () => partialBranch });
+
+// and it cannot be emitted through subscribe either
+link(tree.$.plain, {
+  subscribe: (next) => {
+    // @ts-expect-error `next` accepts the COMPLETE natural value only
+    next(partialBranch);
+    return unsub;
+  },
+});
+
+// @ts-expect-error partial ROWS are not a complete collection value
+link(tree.$.rows, { get: () => partialRows });
+
+// Inside `set`, the value is the complete branch — every key is present.
+link(tree.$.plain, {
+  set: (value) => {
+    const a: number = value.a;
+    const b: string = value.b;
+    void a;
+    void b;
+  },
+});
