@@ -3,6 +3,38 @@ import { isTraversableNode } from './node-shape';
 
 const POSITION_REGISTRY_SYMBOL = Symbol.for('SignalTree:PositionRegistry');
 
+declare const treeIdBrand: unique symbol;
+
+/**
+ * An opaque, RUNTIME-LOCAL correlation identifier for one live SignalTree.
+ *
+ * ```text
+ * same live tree                     -> same TreeId
+ * different simultaneously-live trees -> different TreeId
+ * ```
+ *
+ * That is the WHOLE contract. Explicitly NOT guaranteed: ordinal meaning,
+ * persistence, serialization identity, recreation, cross-process stability,
+ * state addressing, or restoration identity. The underlying representation is
+ * not part of the contract either — consumers may compare for equality and use
+ * it as a `Map` key, and nothing more.
+ *
+ * ⚠️ The brand prevents an arbitrary number being ACCEPTED AS a `TreeId`:
+ *
+ * ```ts
+ * const id: TreeId = 42;   // rejected
+ * ```
+ *
+ * ⚠️ It does NOT stop numeric arithmetic. `number & Brand` is a SUBTYPE of
+ * `number`, so `treeId + 1` still compiles. Recorded so the docs never promise
+ * something the type cannot enforce — and the alternative, an object-shaped
+ * opaque handle, would reintroduce exactly the type/runtime mismatch we are
+ * removing from the error event.
+ */
+export type TreeId = number & {
+  readonly [treeIdBrand]: 'TreeId';
+};
+
 export interface PositionRegistry {
   /**
    * Process-unique identity for this registry's NAMESPACE.
@@ -18,7 +50,7 @@ export interface PositionRegistry {
    * means for the other 24 consumers, and would still leave a location unable
    * to say which tree owns it — which A2-3 independently needs.
    */
-  readonly id: number;
+  readonly id: TreeId;
   allocate(parent?: PositionId): PositionId;
   /**
    * ADDRESS-REPAIR-1 — canonical collection authority.
@@ -50,7 +82,14 @@ export interface PositionRegistry {
 let nextRegistryId = 1;
 
 class TreePositionRegistry implements PositionRegistry {
-  readonly id = nextRegistryId++;
+  /**
+   * ⚠️ THE ONE PLACE a counter value becomes a tree-namespace identity.
+   *
+   * Branding HERE rather than at each consumer means `registry.id` and
+   * `ownerRegistry.id` are already `TreeId` everywhere downstream — no producer
+   * has to independently assert that some number is a tree identity.
+   */
+  readonly id: TreeId = nextRegistryId++ as TreeId;
   private nextPositionId = 1;
   private parents = new Map<PositionId, PositionId | undefined>();
   private collectionPaths = new Map<PositionId, string>();

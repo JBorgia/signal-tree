@@ -1,3 +1,4 @@
+import type { TreeId } from './position-registry';
 /**
  * One place to observe every error the library catches.
  *
@@ -23,28 +24,47 @@
  */
 
 /** Where the error came from. Closed union — adding a source is a core change. */
-export type TreeErrorSource =
-  | 'stored'
-  | 'async-source'
-  | 'async-query'
-  | 'entity-loader'
-  | 'persistence'
-  | 'effect'
-  // Outbound egress from `link()`. A failed send is a synchronization failure,
-  // not a state-machine failure, and it is reported rather than surfaced on the
-  // handle so `Link` needs no error member of its own.
-  | 'link';
-
+/**
+ * What a listener receives when SignalTree catches an error it cannot handle.
+ *
+ * ⚠️ MINIMAL BY MEASUREMENT, not by taste. `source` and `detail` were both
+ * DELETED rather than hidden:
+ *
+ * ```text
+ * source   7-member union, 4 with no producer; the survivors duplicated
+ *          `operation` ('link' / 'link:set'); ZERO code branched on it
+ * detail   one producer (stored), zero consumers; DEV-only prose
+ * ```
+ *
+ * ⚠️ Deletion rather than a TypeScript-only projection is deliberate. This
+ * reporter hands every listener THE SAME OBJECT it was given — there is no copy
+ * — so narrowing the interface while still passing the fields would leave them
+ * inspectable from JavaScript. That would be two truths about one event, which
+ * is precisely the class of defect this audit keeps finding.
+ */
 export interface TreeErrorEvent {
   /** The thrown value, unwrapped as far as it was thrown. */
-  error: unknown;
-  source: TreeErrorSource;
-  /** What was being attempted, e.g. `read`, `write`, `load`, `flush`. */
-  operation: string;
-  /** Dotted state path when the reporting site knows it. */
-  path?: string;
-  /** Human prose. DEV ONLY — folds away under `ngDevMode: false`. */
-  detail?: string;
+  readonly error: unknown;
+  /**
+   * What was being attempted — `link:set`, `read`, `write`, `migrate`,
+   * `remove`.
+   *
+   * ⚠️ Deliberately `string`, NOT a union. It is a diagnostic vocabulary, and
+   * an exhaustively enumerated forever-list of every internal operation has not
+   * been earned.
+   */
+  readonly operation: string;
+  /**
+   * WHICH TREE emitted this.
+   *
+   * ⚠️ REQUIRED, and that is load-bearing. Two same-shaped trees produce
+   * identical `operation` and `path`, so without this a process-global observer
+   * cannot attribute or route anything — the same lesson NOTIFIER-SCOPE-0 cost
+   * us, arriving in diagnostics.
+   */
+  readonly treeId: TreeId;
+  /** Dotted state path when the reporting site knows it. Location, not identity. */
+  readonly path?: string;
 }
 
 const listeners = new Set<(event: TreeErrorEvent) => void>();

@@ -616,14 +616,18 @@ export function createStoredSignal<T>(
     // Global observation FIRST, and unconditionally — an app reporting to Sentry
     // must see the error whether or not this marker also has a local onError.
     // Reporting cannot throw; see reportTreeError.
-    reportTreeError({
-      error,
-      source: 'stored',
-      operation,
-      path: key,
-      detail:
-        typeof ngDevMode === 'undefined' || ngDevMode ? devMessage : undefined,
-    });
+    // STORED-OWNER-INVARIANT-0 proved `ownerRegistry` is present at EVERY live
+    // report path (read / write / migrate / remove), for both plain and
+    // enhanced trees: it comes from the materialization context, which always
+    // has one, not from the enhancer-gated node attachment.
+    if (ownerRegistry) {
+      reportTreeError({
+        error,
+        operation,
+        treeId: ownerRegistry.id,
+        path: key,
+      });
+    }
 
     if (onError) {
       try {
