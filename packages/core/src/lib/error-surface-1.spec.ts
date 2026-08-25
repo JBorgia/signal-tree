@@ -158,19 +158,22 @@ describe('ERROR-SURFACE-1: can a listener attribute an event to its tree?', () =
     // ⚠️ THE MEASUREMENT. Only the public event is inspected — no closure
     // knowledge, no private registry.
     const asPublicFacts = cap.seen.map((e) => ({
-      source: e.source,
       operation: e.operation,
       path: e.path,
       message: String((e.error as Error)?.message),
     }));
 
+    // ⚠️ HISTORICAL: at the time this was measured the events were identical on
+    // every public fact. They still are on OPERATION and PATH — which is the
+    // point — but `treeId` now separates them. See ERROR-SURFACE-2.
     expect(asPublicFacts[0]).toEqual(asPublicFacts[1]);
+    expect(cap.seen[0].treeId).not.toBe(cap.seen[1].treeId);
 
     // And there is no owner field to fall back on — not even the `ownerId` the
     // notifier invariant already requires of every notification.
+    // The original finding: no owner field of ANY name existed.
     for (const e of cap.seen) {
       expect((e as Record<string, unknown>)['ownerId']).toBeUndefined();
-      expect((e as Record<string, unknown>)['tree']).toBeUndefined();
       expect((e as Record<string, unknown>)['owner']).toBeUndefined();
     }
 
@@ -179,7 +182,7 @@ describe('ERROR-SURFACE-1: can a listener attribute an event to its tree?', () =
     cap.stop();
   });
 
-  it('and Link failures carry no path either, so location is unavailable too', async () => {
+  it('⚠️ RESOLVED — Link now supplies the path it always knew', async () => {
     const cap = capture();
     const tree = makeTree();
     await flush();
@@ -192,11 +195,11 @@ describe('ERROR-SURFACE-1: can a listener attribute an event to its tree?', () =
     await l.settled();
 
     expect(cap.seen).toHaveLength(1);
-    // ⚠️ `path` is optional on the event and Link does not supply it, though
-    // `ownerPath` IS known at the reporting site. Recorded as a measured gap,
-    // not fixed here: path alone is not tree identity, and adding it without
-    // deciding attribution would give a false sense of addressability.
-    expect(cap.seen[0].path).toBeUndefined();
+    // WAS `toBeUndefined()`. `ownerPath` was known at the reporting site and
+    // simply dropped — needless information loss, fixed by ERROR-SURFACE-2.
+    // Location, never identity: the two-tree case proves the same string
+    // belongs to both trees.
+    expect(cap.seen[0].path).toBe('settings.theme');
 
     l.dispose();
     cap.stop();
@@ -220,42 +223,27 @@ const SRC = (() => {
 })();
 
 describe('ERROR-SURFACE-1: the taxonomy is mostly unproduced and mostly retiring', () => {
-  it('⚠️ 7 members, 2 live producers, 1 not scheduled for deletion', () => {
+  it('⚠️ RESOLVED — the union is deleted, and only two producers remain', () => {
     const reporter = readFileSync(
       join(SRC, 'lib/internals/error-reporter.ts'),
       'utf8'
     );
-    const union = reporter.slice(
-      reporter.indexOf('export type TreeErrorSource'),
-      reporter.indexOf('export interface TreeErrorEvent')
-    );
-    const members = [...union.matchAll(/\|\s*'([a-z-]+)'/g)].map((m) => m[1]);
 
-    expect(members.sort()).toEqual([
-      'async-query',
-      'async-source',
-      'effect',
-      'entity-loader',
-      'link',
-      'persistence',
-      'stored',
-    ]);
+    // The measured finding was 7 members / 2 live producers / 1 survivor, with
+    // 4 members having no producer at all. ERROR-SURFACE-2 deleted the union
+    // rather than freezing migration debt into public API.
+    expect(reporter).not.toContain('TreeErrorSource');
 
-    // ⚠️ Only TWO files call the reporter now. ASYNC-SOURCE-REPORT-RETIRE-0
-    // removed the third, which is what makes required `treeId` reachable.
+    // Two producers, both able to attribute.
     for (const f of ['lib/link.ts', 'lib/markers/stored.ts']) {
       expect(readFileSync(join(SRC, f), 'utf8')).toContain('reportTreeError(');
     }
     expect(
       readFileSync(join(SRC, 'lib/markers/async-source.ts'), 'utf8')
     ).not.toContain('reportTreeError(');
-
-    // ⚠️ So four members have NO producer, and of the three that do, `stored`
-    // and `async-source` are both being removed. Freezing this union publicly
-    // would make migration debt permanent API.
   });
 
-  it('⚠️ `source` duplicates `operation` for the one member that survives', async () => {
+  it('⚠️ RESOLVED — `source` is gone; attribution is treeId', async () => {
     const cap = capture();
     const tree = makeTree();
     await flush();
@@ -267,12 +255,15 @@ describe('ERROR-SURFACE-1: the taxonomy is mostly unproduced and mostly retiring
     await flush();
     await l.settled();
 
-    // `source: 'link'` carries no information `operation: 'link:set'` lacks.
-    // That is not proof the field is useless in general, but it IS evidence it
-    // is not earned as PUBLIC information by the surviving producer.
-    expect(cap.seen[0].source).toBe('link');
+    // It duplicated `operation` and nothing branched on it, so it was deleted
+    // from the DELIVERED object — not merely hidden from TypeScript. The
+    // reporter hands listeners the same object it is given, so a type-only
+    // narrowing would have left it inspectable from JavaScript.
+    expect(
+      (cap.seen[0] as unknown as Record<string, unknown>)['source']
+    ).toBeUndefined();
     expect(cap.seen[0].operation).toBe('link:set');
-    expect(cap.seen[0].operation.startsWith(cap.seen[0].source)).toBe(true);
+    expect(cap.seen[0].treeId).toBeDefined();
 
     l.dispose();
     cap.stop();

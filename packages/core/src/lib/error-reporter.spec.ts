@@ -29,10 +29,12 @@ describe('onTreeError', () => {
     const seen: TreeErrorEvent[] = [];
     onTreeError((e) => seen.push(e));
 
-    reportTreeError({ error: new Error('x'), source: 'stored', operation: 'write', path: 'k' });
+    reportTreeError({ error: new Error('x'), treeId: 1 as never, operation: 'write', path: 'k' });
 
     expect(seen).toHaveLength(1);
-    expect(seen[0].source).toBe('stored');
+    // ⚠️ `source` was DELETED by ERROR-SURFACE-2 — zero consumers ever
+    // branched on it. Attribution is `treeId`, which is required.
+    expect(seen[0].treeId).toBe(1);
     expect(seen[0].operation).toBe('write');
     expect(seen[0].path).toBe('k');
   });
@@ -43,7 +45,7 @@ describe('onTreeError', () => {
     onTreeError(() => a++);
     onTreeError(() => b++);
 
-    reportTreeError({ error: 'e', source: 'async-source', operation: 'load' });
+    reportTreeError({ error: 'e', treeId: 1 as never, operation: 'load' });
 
     expect(a).toBe(1);
     expect(b).toBe(1);
@@ -52,16 +54,16 @@ describe('onTreeError', () => {
   it('unsubscribes', () => {
     let count = 0;
     const off = onTreeError(() => count++);
-    reportTreeError({ error: 'e', source: 'stored', operation: 'read' });
+    reportTreeError({ error: 'e', treeId: 1 as never, operation: 'read' });
     off();
-    reportTreeError({ error: 'e', source: 'stored', operation: 'read' });
+    reportTreeError({ error: 'e', treeId: 1 as never, operation: 'read' });
 
     expect(count).toBe(1);
   });
 
   it('with no listeners it is a no-op, not a throw', () => {
     expect(() =>
-      reportTreeError({ error: 'e', source: 'effect', operation: 'run' })
+      reportTreeError({ error: 'e', treeId: 1 as never, operation: 'run' })
     ).not.toThrow();
   });
 
@@ -73,7 +75,7 @@ describe('onTreeError', () => {
       const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
       expect(() =>
-        reportTreeError({ error: 'original', source: 'stored', operation: 'write' })
+        reportTreeError({ error: 'original', treeId: 1 as never, operation: 'write' })
       ).not.toThrow();
 
       spy.mockRestore();
@@ -89,7 +91,7 @@ describe('onTreeError', () => {
       onTreeError((e) => seen.push(e));
       const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-      reportTreeError({ error: 'original', source: 'stored', operation: 'write' });
+      reportTreeError({ error: 'original', treeId: 1 as never, operation: 'write' });
 
       expect(seen).toHaveLength(1);
       spy.mockRestore();
@@ -101,7 +103,7 @@ describe('onTreeError', () => {
       });
       const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-      reportTreeError({ error: 'original', source: 'stored', operation: 'write' });
+      reportTreeError({ error: 'original', treeId: 1 as never, operation: 'write' });
 
       expect(spy.mock.calls.flat().join(' ')).toContain('ST2025');
       spy.mockRestore();
@@ -114,8 +116,8 @@ describe('the stored() marker reports through it', () => {
   afterEach(() => clearTreeErrorListenersForTesting());
 
   it('a failing write is observable globally, with no local onError wired', async () => {
-    const { createStoredSignal, flushAllStoredSignals, STORED_MARKER } =
-      await import('./markers/stored');
+    const { flushAllStoredSignals, stored } = await import('./markers/stored');
+    const { signalTree } = await import('./signal-tree');
     const seen: TreeErrorEvent[] = [];
     onTreeError((e) => seen.push(e));
 
@@ -131,13 +133,24 @@ describe('the stored() marker reports through it', () => {
     };
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-    const sig = createStoredSignal({
-      [STORED_MARKER]: true,
-      key: 'err-spec',
-      defaultValue: 0,
-      options: { storage: throwing, debounceMs: 0 },
+    // ⚠️ CONSTRUCTED THROUGH A REAL TREE, not `createStoredSignal(marker)`.
+    //
+    // The direct call is a TEST-ONLY path — `createStoredSignal` lives in the
+    // internal `lib/markers` barrel and `index.ts` never re-exports it — and it
+    // supplies no materialization context, so the node has no owning registry.
+    // Since ERROR-SURFACE-2 made `treeId` REQUIRED, a contextless node cannot
+    // produce a truthful event and therefore reports nothing.
+    //
+    // Testing the direct call would have asserted the behaviour of a
+    // construction no supported consumer can perform. The marker's actual
+    // reporting is what this case is about, so it now goes through
+    // `signalTree()`, where STORED-OWNER-INVARIANT-0 proved ownership is always
+    // present.
+    const tree = signalTree({
+      value: stored('err-spec', 0, { storage: throwing, debounceMs: 0 }),
     });
-    sig.set(1);
+    await new Promise((r) => queueMicrotask(r));
+    (tree.$.value as unknown as { set(v: number): void }).set(1);
     // Forced rather than slept on: the write is debounced, and a test that
     // waits "long enough" is a flake waiting to happen.
     flushAllStoredSignals();
@@ -150,7 +163,12 @@ describe('the stored() marker reports through it', () => {
     // and a bare "expected false to be true" would send the reader looking in
     // entirely the wrong place. It did exactly that while this test was wrong.
     expect(warned, 'the storage write should have failed and warned').toBeGreaterThan(0);
-    expect(seen.map((e) => e.source)).toContain('stored');
-    expect(seen.find((e) => e.source === 'stored')?.operation).toBe('write');
+    // ⚠️ WAS keyed on `source: 'stored'`. ERROR-SURFACE-2 deleted that field —
+    // nothing branched on it and it duplicated `operation`. A stored failure is
+    // now identified by its OPERATION and attributed by its `treeId`.
+    const write = seen.find((e) => e.operation === 'write');
+    expect(write, 'the stored write failure reported').toBeDefined();
+    expect(write?.path).toBe('err-spec');
+    expect(typeof write?.treeId).toBe('number');
   });
 });

@@ -324,7 +324,14 @@ export function link<S>(
             // The queue must SURVIVE the failure too. Otherwise one rejection
             // wedges the link forever, which is a retry policy's failure mode
             // arriving without a retry policy.
-            reportTreeError({ source: 'link', operation: 'link:set', error });
+            reportTreeError({
+              error,
+              operation: 'link:set',
+              treeId: registry.id,
+              // ⚠️ `ownerPath` was already known here and previously dropped.
+              // Location, never identity — two trees share this string.
+              path: ownerPath === '' ? undefined : ownerPath,
+            });
           });
       },
     });

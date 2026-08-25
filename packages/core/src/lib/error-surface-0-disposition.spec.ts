@@ -6,7 +6,6 @@ import {
   clearTreeErrorListenersForTesting,
   onTreeError,
   reportTreeError,
-  type TreeErrorSource,
 } from './internals/error-reporter';
 
 /**
@@ -102,31 +101,24 @@ describe('ERROR-SURFACE-0: is the central reporter actually central?', () => {
     ]);
   });
 
-  it('⚠️ FIVE of six TreeErrorSource values have NO reporter at all', async () => {
-    const declared: TreeErrorSource[] = [
-      'stored',
-      'async-source',
-      'async-query',
-      'entity-loader',
-      'persistence',
-      'effect',
-    ];
-    const live = declared.filter((s) => countIn(`source: '${s}'`).length > 0);
-    const dead = declared.filter((s) => countIn(`source: '${s}'`).length === 0);
+  it('⚠️ RESOLVED — the TreeErrorSource union no longer exists', () => {
+    // The finding this case recorded was that the taxonomy was mostly
+    // unproduced: seven members, four with no producer at all, and the live
+    // ones attached to APIs being retired.
+    //
+    // ERROR-SURFACE-2 DELETED the union outright rather than projecting it away
+    // from the public event, because the consumer inventory found ZERO code
+    // branching on `source` and the surviving member duplicated `operation`
+    // ('link' / 'link:set').
+    const reporter = readFileSync(
+      join(SRC, 'lib/internals/error-reporter.ts'),
+      'utf8'
+    );
+    expect(reporter).not.toContain('TreeErrorSource');
+    expect(reporter).not.toContain('source:');
 
-    // The control: `live` being non-empty proves the search can find a source
-    // that exists, so `dead` is not an artifact of the matcher.
-    // ⚠️ `async-source` JOINED THE DEAD LIST — its producer was removed by
-    // ASYNC-SOURCE-REPORT-RETIRE-0, so the union's only live members are now
-    // `stored` (retiring) and `link` (not in this older list).
-    expect(live).toEqual(['stored']);
-    expect(dead).toEqual([
-      'async-source',
-      'async-query',
-      'entity-loader',
-      'persistence',
-      'effect',
-    ]);
+    // And what replaced it: required attribution.
+    expect(reporter).toContain('readonly treeId: TreeId;');
   });
 
   it('the listener contract itself is sound — additive, and failure-isolated', () => {

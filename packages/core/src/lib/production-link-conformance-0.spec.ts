@@ -309,7 +309,10 @@ describe('PRODUCTION-LINK-CONFORMANCE-0: the chosen error contract', () => {
 
     expect(seen).toHaveLength(1);
     expect(seen[0].operation).toBe('link:set');
-    expect(seen[0].source).toBe('link');
+    // ⚠️ `source` is GONE — it duplicated `operation` and nothing branched on
+    // it. Attribution is now `treeId`, and `path` names the linked location.
+    expect(seen[0].treeId).toBeDefined();
+    expect(seen[0].path).toBe('leaf');
     expect(String(seen[0].error)).toMatch(/endpoint down/);
 
     // A failed egress does not un-author X.
