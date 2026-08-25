@@ -5,6 +5,12 @@ import { getPathNotifier } from './path-notifier';
 import { getPositionRegistry } from './internals/position-registry';
 import { restoration } from '../enhancers/restoration/restoration';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
+import {
+  clearTreeErrorListenersForTesting,
+  onTreeError,
+  type TreeErrorEvent,
+} from './internals/error-reporter';
+import { link as productionLink } from './link';
 import { signalTree } from './signal-tree';
 import { transactions } from '../enhancers/transactions/transactions';
 import { withWriteContext } from './write-context';
@@ -73,7 +79,6 @@ interface Endpoint<T> {
   subscribe?(next: (value: T) => void): () => void;
 }
 
-let nextLinkId = 1;
 
 /**
  * `X` is accepted only if it is an OWNED WRITABLE SignalTree LOCATION.
@@ -102,100 +107,13 @@ const linkableWrite = <T>(x: unknown): ((value: T) => void) => {
   throw new Error('LINK: X must be writable.');
 };
 
-const makeLink = <T>(x: unknown, endpoint: Endpoint<T>) => {
-  const registry = getPositionRegistry(x);
-  const write = linkableWrite<T>(x);
-  const linkId = `link#${nextLinkId++}`;
-  const ownerPath =
-    (x as { __ownerPath?: string }).__ownerPath ?? '';
-
-  let disposed = false;
-  const failures: unknown[] = [];
-  let chain: Promise<unknown> = Promise.resolve();
-  let unsubscribeSource: (() => void) | undefined;
-
-  /** Y -> X. Stamped with this link's correlation so it cannot echo back. */
-  const acquire = (value: T) => {
-    if (disposed) return;
-    withWriteContext(
-      {
-        origin: 'external',
-        participation: 'realized',
-        correlationId: linkId,
-      },
-      () => write(value)
-    );
-  };
-
-  // X -> Y. Observation is the notifier, filtered to THIS tree — legitimate
-  // only since ownership qualification; before it, a '**' subscription could
-  // not tell two trees apart.
-  const offNotifier = endpoint.set
-    ? getPathNotifier().subscribe(
-        '**',
-        (_next, _prev, path, _owner, _origin, _s, _pos, meta) => {
-          if (disposed) return;
-          const m = (meta ?? {}) as Record<string, unknown>;
-          if (m['ownerId'] !== registry?.id) return;
-          if (ownerPath !== '' && path !== ownerPath && !path.startsWith(`${ownerPath}.`)) {
-            return;
-          }
-          // ⚠️ SELF-ECHO. Not "external writes never go outbound" — case 4
-          // falsifies that. The suppression is LINK-LOCAL: only a value this
-          // link itself acquired is declined, by correlation.
-          if (m['correlationId'] === linkId) return;
-
-          scheduleDurableConsequence({
-            // The claimant is X ITSELF. Before the ownership correction a leaf
-            // resolved no scope and this had to be the tree (A2-3); now every
-            // location answers, which is why `link(x, y)` needs no tree.
-            claimant: x as object,
-            key: linkId,
-            run: () => {
-              // ⚠️ DISPOSAL. A consequence HELD at dispose time must not escape
-              // when the scope later settles.
-              if (disposed) return;
-              // ⚠️ RUN-TIME CAPTURE (A2-3.1): read X now, not when armed.
-              const current = readX() as T;
-              chain = chain
-                .then(() => endpoint.set?.(current))
-                .catch((e) => void failures.push(e));
-            },
-          });
-        }
-      )
-    : undefined;
-
-  const readX = () => (x as () => unknown)();
-
-  if (endpoint.subscribe) {
-    unsubscribeSource = endpoint.subscribe((v) => acquire(v));
-  }
-
-  return {
-    linkId,
-    failures,
-    /** Y -> X, on demand. Await OUTSIDE, apply synchronously INSIDE (ST1035). */
-    async retrieve() {
-      if (!endpoint.get) throw new Error('LINK: endpoint supplies no get().');
-      const value = await endpoint.get();
-      // Disposal is enforced in `acquire`, which covers BOTH inbound entry
-      // points. A second check here was redundant — and the mutation run
-      // proved it: removing either guard alone left the other, so neither
-      // showed up as failable until both were removed together.
-      acquire(value);
-    },
-    /** Settles when every outbound write dispatched so far has completed. */
-    async settled() {
-      await chain;
-    },
-    dispose() {
-      disposed = true;
-      offNotifier?.();
-      unsubscribeSource?.();
-    },
-  };
-};
+/**
+ * PRODUCTION. This battery originally carried a test-local reference
+ * harness, which is how the semantics were DISCOVERED. It now exercises the
+ * shipped function, so the earned contract cannot drift from what ships.
+ */
+const makeLink = <T>(x: unknown, endpoint: Endpoint<T>) =>
+  productionLink<never>(x as never, endpoint as Endpoint<never>);
 
 const makeTree = () =>
   signalTree(
@@ -372,6 +290,10 @@ describe('LINK-1 case 5: Y may not finish stale because completions reordered', 
 
 describe('LINK-1 case 6: where does a rejected outbound write go?', () => {
   it('a rejection is captured, not left as an unhandled rejection', async () => {
+    clearTreeErrorListenersForTesting();
+    const seen: TreeErrorEvent[] = [];
+    const offErr = onTreeError((e) => seen.push(e));
+
     const tree = makeTree();
     await flush();
     const link = makeLink<string>(tree.$.leaf, {
@@ -386,17 +308,30 @@ describe('LINK-1 case 6: where does a rejected outbound write go?', () => {
     // async link must not manufacture invisible unhandled rejections. No retry,
     // no backoff, no error signal, no status — those are what `loader()` was,
     // and they belong to whoever owns the external operation.
-    expect(link.failures).toHaveLength(1);
-    expect(String(link.failures[0])).toMatch(/endpoint down/);
+    //
+    // ⚠️ OBSERVED VIA `onTreeError`, not `link.failures`. LINK-2 case 3 settled
+    // where a rejected send goes: the EXISTING central reporter, so `Link` needs
+    // no error surface of its own. The harness's `failures` array was a test
+    // convenience and is gone from the shipped handle. The SEMANTIC asserted
+    // here is unchanged — only where it is observed moved.
+    expect(seen).toHaveLength(1);
+    expect(seen[0].operation).toBe('link:set');
+    expect(String(seen[0].error)).toMatch(/endpoint down/);
 
     // ⚠️ AND THE TREE IS UNMOVED. A failed egress is not a reason to roll back
     // committed state: X is the truth the application authored, and Y failing
     // to record it does not un-author it.
     expect(tree.$.leaf()).toBe('doomed');
     link.dispose();
+    offErr();
+    clearTreeErrorListenersForTesting();
   });
 
   it('a later successful write still goes out after a failure', async () => {
+    clearTreeErrorListenersForTesting();
+    const seen: TreeErrorEvent[] = [];
+    const offErr = onTreeError((e) => seen.push(e));
+
     const tree = makeTree();
     await flush();
     let fail = true;
@@ -420,8 +355,10 @@ describe('LINK-1 case 6: where does a rejected outbound write go?', () => {
 
     // One rejection must not wedge the serialization chain forever — that would
     // be a retry policy's failure mode arriving without a retry policy.
-    expect(link.failures).toHaveLength(1);
+    expect(seen).toHaveLength(1);
     expect(sent).toEqual(['second']);
+    offErr();
+    clearTreeErrorListenersForTesting();
   });
 });
 

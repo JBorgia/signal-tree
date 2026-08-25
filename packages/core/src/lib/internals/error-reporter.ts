@@ -29,7 +29,11 @@ export type TreeErrorSource =
   | 'async-query'
   | 'entity-loader'
   | 'persistence'
-  | 'effect';
+  | 'effect'
+  // Outbound egress from `link()`. A failed send is a synchronization failure,
+  // not a state-machine failure, and it is reported rather than surfaced on the
+  // handle so `Link` needs no error member of its own.
+  | 'link';
 
 export interface TreeErrorEvent {
   /** The thrown value, unwrapped as far as it was thrown. */

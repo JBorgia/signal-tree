@@ -74,15 +74,24 @@ const countIn = (needle: string) =>
   PRODUCTION.filter((f) => readFileSync(f, 'utf8').includes(needle));
 
 describe('ERROR-SURFACE-0: is the central reporter actually central?', () => {
-  it('⚠️ the ENTIRE library reports from exactly two places', async () => {
+  it('⚠️ the ENTIRE library reports from exactly three places', async () => {
     const reporters = countIn('reportTreeError(');
 
     // ⚠️ THE FINDING IS NOT "it is not exported". It is that the capability was
     // built to be the one place every caught error surfaces, and then wired to
     // two markers — `stored()` and `asyncSource()` — BOTH of which this audit is
     // retiring. Every other catch in the library is still invisible.
+    //
+    // ⚠️ `link.ts` is the THIRD, and it moves the finding rather than closing
+    // it. Production `link()` reports a rejected outbound send here instead of
+    // growing an error member on its handle (LINK-2 case 3), which is the first
+    // reporter wired to something that is NOT being retired. The disposition
+    // question is unchanged: the `TreeErrorSource` taxonomy still needs deciding
+    // before `onTreeError` is exported, and it now has a `'link'` member that a
+    // consumer would see.
     expect(reporters.map((f) => f.split('/').pop()).sort()).toEqual([
       'async-source.ts',
+      'link.ts',
       'stored.ts',
     ]);
   });
