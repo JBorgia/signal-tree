@@ -34,8 +34,15 @@ via `setupFiles: ['src/test-setup.ts']` in `vitest.config.ts`, and is listed in
 published bundle.
 
 Specs that need it: any using `TestBed.runInInjectionContext` / `inject()` —
-currently the `asyncSource` marker specs, and the ASYNC-QUERY-RETIRE-0
-replacement scenario (both call `inject(DestroyRef)` for auto-cleanup).
+currently the `asyncSource` marker specs, because `asyncSource` itself calls
+`inject(DestroyRef)` for auto-cleanup.
+
+⚠️ An earlier revision of this note claimed the ASYNC-QUERY-RETIRE-0 replacement
+scenario also needs the injection context. **It does not.** That replacement is
+an application-owned RxJS pipeline shown as a code panel — it uses no SignalTree
+marker and no `DestroyRef`. The correction is recorded rather than silently
+edited: a cleanup note that invents a dependency is the same class of error as an
+overstated test claim.
 
 **There must be exactly ONE test-setup file** (`src/test-setup.ts`). Do not add
 per-directory `test-setup.ts` files: they are referenced by no runner (dead

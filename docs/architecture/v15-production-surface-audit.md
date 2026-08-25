@@ -13929,3 +13929,96 @@ demo test       19 suites / 106 tests passing
 demo lint       clean
 PUBLIC API      zero delta — asyncQuery was never root-reachable
 ```
+
+---
+
+# ASYNC-QUERY-CLOSE-0 — three corrections to the retirement record
+
+Evidence and docs only. The architectural decision is unchanged.
+
+## ⚠️ 1. The demo claim was OVERSTATED — now genuinely proven
+
+The retirement said the scenario was "preserved". At the TEACHING level that was
+true; as a BEHAVIOURAL claim it was not. The only test asserted the rendered
+snippet contained the word `switchMap`, which proves the panel renders.
+
+**Outcome A taken.** `search-pipeline.ts` extracts the pipeline as ordinary
+application code, and `search-pipeline.spec.ts` EXECUTES it:
+
+```text
+latest-wins   slow A started first, fast B second -> result is B
+debounce      a burst of 3 collapses to 1 request
+dedup         the same query twice issues 1 request
+loading       true while active, false on result
+error         a rejection sets error and clears loading
+recovery      a later successful query still works
+```
+
+## ⚠️ 2. THE RECOVERY TEST FOUND A REAL DEFECT IN MY OWN REPLACEMENT
+
+The first draft of `search-pipeline.ts` handled errors in the SUBSCRIBER. The
+recovery test failed — and the reason is exactly what the retired primitive's
+implementation comment had warned:
+
+> "Errors are caught INSIDE switchMap, per query... if a query error escaped
+> switchMap it would terminate the outer subscription, and the pipeline would
+> silently stop responding to all future inputs."
+
+So the demo would have taught a pattern that **silently dies on the first
+error**. Fixed with `catchError` inside `switchMap`, mapping to an outcome
+object, and the displayed snippet was corrected to match the tested code.
+
+> ⚠️ **A retired primitive can still own a lesson worth carrying forward even
+> when it owned no architecture.** asyncQuery had no causal authority — that
+> finding stands — but its implementation encoded real operational knowledge, and
+> deleting the code without reading it would have discarded that.
+
+This is why the behavioural control was worth adding rather than narrowing the
+claim.
+
+## ⚠️ 3. A cleanup note had invented a dependency
+
+`docs/development/testing.md` was edited during the retirement to say the
+replacement scenario calls `inject(DestroyRef)` alongside `asyncSource`. **It
+does not** — the replacement is an application-owned RxJS pipeline with no
+SignalTree marker and no `DestroyRef`. Corrected in place, with the error
+recorded: a cleanup note that invents a dependency is the same class of defect as
+an overstated test claim.
+
+## `DemoteWritable` — DELETED as UNREACHABLE (Outcome B)
+
+The reachability question was answered mechanically rather than carried as an
+"unexercised forever" comment. Every surviving reader allowlist member:
+
+```text
+ENTITY_READERS         methods and computeds
+ENTITY_LOADER_READERS  loading/loaded/error/lastLoadedAt/params — all Signal
+ASYNC_SOURCE_READERS   data/loading/error — all Signal
+STORED_READERS         key/version — plain values
+```
+
+Not one is a `WritableSignal`. The only two that ever were — `asyncQuery.input`
+and `status.state` — belonged to primitives that no longer exist. `status` is
+already gone, so there was no STATUS-MIGRATION-SENSITIVE case to defer.
+
+⚠️ `ReadonlyExtras` demotes writable EXTRAS through `ReadonlyView`, a DIFFERENT
+mechanism, unaffected by this deletion.
+
+**Deletion safety was proven by the existing `Equal<>` assertions** over all four
+allowlists: had any member been writable, replacing `DemoteWritable<T[P]>` with
+`T[P]` would have widened its type and failed those assertions. Typecheck stayed
+green. No synthetic marker was invented to keep the abstraction alive.
+
+The reintroduction condition is recorded in `readonly.ts` itself: a future marker
+exposing a writable reader must restore the demotion WITH a test.
+
+## Verification
+
+```text
+production asyncQuery refs   1 — a historical note inside the DemoteWritable
+                                 deletion record; zero code references
+public API delta             0
+core suite                   2168 passing, 0 failures
+demo                         20 suites / 112 tests passing (was 106)
+typecheck / core lint / demo lint   clean
+```
