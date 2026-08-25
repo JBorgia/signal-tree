@@ -16209,6 +16209,66 @@ against this substrate — only against the incumbent capture path, which alread
 had it right. `observation-substrate.spec.ts` asserts CARRIAGE and says so
 inline rather than implying a behavioural dependency it does not have.
 
+## `RETAINED-MEMORY-0` — MEASURED, with forced GC
+
+The adoption discriminator, deferred throughout discovery and run against the
+real implementation. `NODE_OPTIONS=--expose-gc`, heap settled with four
+collections before every reading, baseline taken from a real git worktree at
+`61243b92` rather than a feature flag.
+
+⚠️ This supersedes the earlier `29.91 -> 174.09 KB/tree` figure, which was taken
+from raw `heapUsed` deltas with no GC control and was recorded as UNMEASURED.
+
+```text
+                          baseline 61243b92   substrate   delta
+MEM-1 scalar, per leaf          788 B          1232 B     +444 B
+MEM-2 nested,  per leaf         940 B          1206 B     +266 B
+MEM-5 entity control       42301 B/tree   42282 B/tree      ~0
+```
+
+**MEM-5 is the attribution control and it works.** Entity-heavy trees show no
+change, because entity nodes never receive the substrate. So the delta really is
+per ORDINARY LEAF, not global tree overhead.
+
+`MEM-3` — activate then release leaves **179 B/tree** residue, consistent with
+POS-A deliberately retaining position identity for the source's lifetime.
+
+Baseline `MEM-3`/`MEM-4` could not run at all: `link()` on a bare scalar THREW
+there. That is the defect this substrate fixes, showing up as an inability to
+measure.
+
+### MEM-4 — bounded, not linear
+
+The question that decides MEM-C:
+
+```text
+  10 cycles/tree   592 B/tree   59.24 B/cycle
+  50 cycles/tree   277 B/tree    5.54 B/cycle
+ 250 cycles/tree   251 B/tree    1.00 B/cycle
+```
+
+25x the cycles yields LESS residue, and per-cycle cost converges toward zero —
+the signature of a fixed residue over a growing denominator. **No retention
+proportional to relationship count. Not MEM-C.**
+
+### Verdict: MEM-B, with a MEM-D component
+
+Roughly **270–450 bytes retained per ordinary leaf** — about 30–45 KB for a
+100-leaf tree, paid whether or not anything is ever observed. Real, bounded, and
+structurally understood.
+
+Part of it is genuinely representational rather than intrinsic. Each leaf
+currently retains two bound raw callables, two replaced methods, the arm
+variable, and a state record holding `{claims, positionId, slot, registry,
+ownerPath}` — where `registry`, `ownerPath` and `slot` DUPLICATE information
+already on the leaf via `definePositionRegistry`, `defineOwnedOwnerPath` and the
+arm symbol. Reading those at claim time instead of caching them would shrink the
+per-leaf record without touching any frozen semantic.
+
+That optimization is NOT applied here. It is recorded so the adoption decision
+is made against the honest number, and so the reducible portion is not mistaken
+for an intrinsic cost of the design.
+
 ## OPEN
 
 ```text
