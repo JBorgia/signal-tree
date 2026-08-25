@@ -14563,17 +14563,24 @@ One durable write per send-completion, always carrying the newest truth.
 
 `maxWaitMs` existed to bound `stored`'s **restartable** debounce, which could
 starve indefinitely under continuous writes. Link never restarts a timer — it
-sends, then sends whatever is latest — so **that failure mode is structurally
-impossible and the policy has nothing left to bound.**
+sends, then sends whatever is latest — so **that STARVATION failure mode is
+structurally impossible and `maxWaitMs` has nothing left to bound.**
+
+⚠️ **NARROWER THAN IT FIRST READ.** This does NOT mean Link serialization
+supplies every reason someone configured `debounceMs`. Time-based **write-rate
+reduction** remains a distinct endpoint policy — and CORRECTION 1's own
+measurement is the evidence: the 50ms endpoint timer produced **2 durable writes
+where 3 authored writes occurred**, which is rate reduction Link's coalescing did
+not supply on its own.
 
 ```text
-maxWaitMs   OBSOLETE UNDER LINK SERIALIZATION
-debounceMs  ENDPOINT LATENCY POLICY — optional, and NOT the coalescing mechanism
+maxWaitMs   OBSOLETE — its starvation argument is gone under Link serialization
+debounceMs  ENDPOINT POLICY — genuine write-rate reduction, NOT the coalescing
+            mechanism, and NOT made redundant by Link
 ```
 
-This is a better result than 0A claimed: not "the endpoint reimplements
-debounce", but "the serialization contract already provides the property debounce
-was for."
+So the correct statement is narrow: Link removes the starvation ARGUMENT for
+`maxWaitMs`; it does not make `debounceMs` redundant.
 
 ## §3 CODEC ROUND-TRIP — closed
 
@@ -14652,3 +14659,169 @@ NOT YET MEASURED
 ```
 
 `PERSISTENCE-DECOMPOSE-0` remains OPEN. `STORED-RETIRE-0` is not yet unblocked.
+
+---
+
+# PERSISTENCE-DECOMPOSE-0 — CLOSED. Two more corrections first.
+
+## ⚠️ CORRECTION 3 — a test that asserted nothing
+
+The 0B disposal case ended in `expect(true).toBe(true)`. The conclusion was
+plausible from the implementation and **unproven by the test**. It now asserts
+that nothing is durable at the moment of disposal, and records the honest
+boundary fact: the endpoint's own timer is not Link's to cancel, so whether it
+eventually lands is the endpoint's business — what matters is that **Link offers
+no guarantee once disposed**, so a consumer cannot await it.
+
+## ⚠️ CORRECTION 4 — the `maxWaitMs` claim was too broad
+
+```text
+WAS   "maxWaitMs OBSOLETE; serialization already provides what debounce was for"
+NOW   Link removes the STARVATION argument for maxWaitMs. It does NOT make
+      debounceMs redundant.
+```
+
+CORRECTION 1's own measurement is the evidence: the 50ms endpoint timer produced
+**2 durable writes where 3 authored writes occurred**. That is genuine write-rate
+reduction, and Link's coalescing did not supply it.
+
+```text
+maxWaitMs   OBSOLETE — its starvation argument is gone
+debounceMs  ENDPOINT POLICY — real rate reduction, NOT the coalescing mechanism
+```
+
+## §4 `clearOnMigrationFailure` — ADAPTER POLICY
+
+Read from `stored.ts` (two identical paths): report, optionally `removeItem`,
+return the default — **entirely inside the READ path**, while interpreting the
+durable representation. Prototyped inside endpoint `get()`, both settings, no
+SignalTree API addition.
+
+## §5 `remove` / `clear` — TWO responsibilities, and an ORDERING rule
+
+`stored().clear()` is compound: reset the tree value, remove the durable key,
+supersede pending writes, obey the transaction boundary, report as
+`operation: 'remove'`.
+
+⚠️ **Writing the default is NOT removing the key** — absence is what lets an
+endpoint choose a fallback. Measured decomposition:
+
+```text
+remove() THEN reset      ✗ the authored reset re-creates the key
+reset, settle, dispose,
+  THEN remove()          ✓ absence achieved and nothing can re-create it
+```
+
+```text
+LINK CONTRACT       stays get / set / subscribe — SignalTree never calls remove
+ADAPTER OBJECT      may carry storage administration (adapter.remove)
+```
+
+⚠️ **Recorded as a real ergonomic cost, not glossed:** one method became two
+calls plus an ordering rule. `stored` hid the ordering inside `clear()`; an
+application now owns it explicitly.
+
+## §8 `maxScopes` — PERSISTENCE RETENTION, frozen
+
+The gate is **structural**, which is stronger than the preregistered churn test
+for the persist-disabled question:
+
+```text
+touchScopeIndex()   ONE call site: writeThrough()
+writeThrough()      opens `if (!persist) return;`
+touchScopeIndex()   opens `if (!p || !scoped || p.maxScopes === undefined) return;`
+```
+
+Double-gated — with persist disabled the GC is **unreachable**, not merely
+inactive. Mechanism is `adapter.removeItem` over `` `${key}::__scopes` ``, and the
+option's own doc says the in-memory cache is still **single-scope**.
+
+⚠️ Stated honestly: this is a CALL-GRAPH proof. It does **not** measure eviction
+ORDER or revisit-refetch under persist-enabled churn — those belong to
+`LOADER-CACHE-DISPOSITION-0`.
+
+## §9 FULL `loader.persist` INVENTORY — and the surprise
+
+`EntityPersist` has only **four** options:
+
+```text
+adapter                 getItem / setItem / removeItem
+key                     base storage address
+hydrateThenRevalidate   hydration precedence vs a live fetch
+maxScopes               persisted-scope GC
+```
+
+⚠️ **AND ONLY TWO `setItem` CALL SITES EXIST:**
+
+```text
+line 423   JSON.stringify(entity.all())    the ROWS
+line 402   JSON.stringify(index)           a scope-KEY list, for GC
+```
+
+**ZERO cache metadata is persisted.** `lastLoadedAt`, `staleTime`, `tags` and
+`swr` never reach `setItem` or `stringify` — they are in-memory only.
+
+> That answers the discriminating question directly, and **against the
+> hypothesis**: loader's DURABLE surface is not remote-cache persistence. It is
+> generic row persistence plus a scope index. The cache lives in memory.
+
+## §10 THE OVERLAP MATRIX — completed
+
+```text
+concept              STORED                  LOADER.PERSIST          verdict
+storage backend      Storage (injected)      EntityStorageAdapter    SAME CONCEPT
+address / key        `key`                   `key` + scope suffix    SAME CONCEPT
+codec                serialize/deserialize   JSON only               SAME CONCEPT
+                                                                     (stored richer)
+durable payload      the leaf value          entity.all() rows       SAME CONCEPT
+                                                                     (both = the
+                                                                     node's value)
+version / migration  version/migrate/        none                    STORED-ONLY
+                     clearOnMigrationFailure
+write scheduling     debounceMs/maxWaitMs    immediate write-through RELATED,
+                                                                     DIFFERENT
+failure policy       report + local onError  silent best-effort      RELATED,
+                                                                     DIFFERENT
+removal              clear() compound        adapter.removeItem      RELATED,
+                                                                     DIFFERENT
+hydration precedence n/a                     hydrateThenRevalidate   LOADER-CACHE
+scope identity       n/a                     scopeStorageKey(params) LOADER-CACHE
+scope index / GC     n/a                     ::__scopes + maxScopes  LOADER-CACHE
+staleness / SWR      n/a                     IN-MEMORY ONLY          CACHE-ONLY
+tags / equality      n/a                     IN-MEMORY ONLY          CACHE-ONLY
+```
+
+**Generic:** backend, address, codec, durable payload. **Loader-cache:** hydration
+precedence, scope identity, scope GC. **Cache-only and never durable:** staleness,
+SWR, tags, equality.
+
+⚠️ **Do NOT unify these merely because both serialize bytes.** The shared rows are
+a low-level storage/codec concern; the runtime relationships are different
+(one-value synchronization vs scoped remote-cache hydration).
+
+## COMPLETION — every row disposed
+
+```text
+transaction / rollback        LINK — no speculative value durable
+commit                        LINK — complete committed truth
+outbound coalescing           LINK  (mis-attributed to the endpoint in 0A)
+durability boundary           LINK settled(), and dispose AFTER it
+storage backend               ADAPTER
+codec (encode AND decode)     ADAPTER
+version migration             ADAPTER
+clearOnMigrationFailure       ADAPTER POLICY
+debounceMs                    ENDPOINT POLICY (rate reduction)
+maxWaitMs                     OBSOLETE (starvation argument gone)
+remove / clear                APPLICATION — two calls + an ordering rule
+storage-specific errors       ADAPTER / APPLICATION
+generic sync failure          onTreeError (unchanged)
+global flush                  DELETE
+maxScopes                     PERSISTENCE RETENTION (loader-cache side)
+loader durable payload        GENERIC row persistence, NOT cache persistence
+```
+
+**Required new core API: NONE. Link remains frozen and unmodified.**
+
+`PERSISTENCE-DECOMPOSE-0` is **CLOSED**. `STORED-RETIRE-0` is unblocked, and
+should be implementation migration and deletion — not another architecture
+investigation.

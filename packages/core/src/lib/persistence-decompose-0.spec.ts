@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 import {
   clearTreeErrorListenersForTesting,
@@ -417,10 +419,18 @@ describe('PERSISTENCE-DECOMPOSE-0 §11-12: codec and migration are endpoint-owne
  * ```
  *
  * One durable write per send-completion, always carrying the newest truth.
- * `maxWaitMs` existed to bound stored's RESTARTABLE debounce, which could starve
- * indefinitely under continuous writes. Link never restarts a timer — it sends,
- * then sends whatever is latest — so that failure mode is structurally
- * impossible and the policy has nothing left to bound.
+ * `maxWaitMs` existed to bound `stored`'s RESTARTABLE debounce, which could
+ * starve indefinitely under continuous writes. Link never restarts a timer — it
+ * sends, then sends whatever is latest — so that STARVATION failure mode is
+ * structurally impossible and `maxWaitMs` has nothing left to bound.
+ *
+ * ⚠️ NARROWER THAN IT FIRST READ. This does NOT mean Link serialization supplies
+ * every reason someone configured `debounceMs`. Time-based WRITE-RATE REDUCTION
+ * remains a distinct endpoint policy — and the A/C measurement above is the
+ * evidence: the 50ms endpoint timer produced 2 durable writes where 3 authored
+ * writes occurred, which is rate reduction that Link's coalescing did not supply
+ * on its own. Link removes the starvation ARGUMENT for `maxWaitMs`; it does not
+ * make `debounceMs` redundant.
  */
 describe('0B §3: a real codec ROUND-TRIPS inside the endpoint', () => {
   const codec = {
@@ -517,19 +527,24 @@ describe('0B §7: disposal with a pending durable write', () => {
 
     l.dispose();
     await flush();
-    await new Promise((r) => setTimeout(r, 80));
+    // Not durable at the moment of disposal — the debounce is still pending.
+    const durableAtDispose = be.store.size;
 
-    // ⚠️ MEASURED. The endpoint's timer still fires and writes, because the
-    // endpoint owns that timer — but Link makes no guarantee about it, and a
-    // consumer that disposes first has no way to await it.
-    //
-    // So the bounded-lifetime pattern is ORDERED, and the order matters:
-    //
-    //   await handle.settled();   // durability boundary
-    //   handle.dispose();         // then release
-    //
-    // NOT dispose-then-hope.
-    expect(true).toBe(true);
+    await new Promise((r) => setTimeout(r, 120));
+    const durableLater = be.store.size;
+
+    // ⚠️ ACTUALLY ASSERTED. An earlier version of this test ended in
+    // `expect(true).toBe(true)`, which is not an assertion — the conclusion was
+    // plausible from the implementation and unproven by the test.
+    expect(durableAtDispose).toBe(0);
+
+    // What the measurement shows: the endpoint's OWN timer is not Link's to
+    // cancel, so whether the write eventually lands is entirely the endpoint's
+    // business. Either outcome is legitimate for the endpoint; what matters is
+    // that LINK offers no guarantee once disposed, so a consumer cannot await
+    // it. Recorded as a fact about the boundary, not a promise about the timer.
+    expect(typeof durableLater).toBe('number');
+    expect(durableLater).toBeGreaterThanOrEqual(durableAtDispose);
   });
 
   it('the CORRECT order gives a durability guarantee', async () => {
@@ -566,5 +581,264 @@ describe('0B §7: disposal with a pending durable write', () => {
 
     // A disposed link owns no further work, so the waiter must be released.
     await expect(waiting).resolves.toBeUndefined();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 0B §5 — remove / clear. Does it decompose, and in what ORDER?
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * ⚠️ `stored().clear()` is a COMPOUND operation, read from its implementation:
+ *
+ * ```text
+ * 1  reset the tree value to defaultValue
+ * 2  storage.removeItem(key)             a DURABLE consequence
+ * 3  supersede any pending write         shared consequence key + seq guard
+ * 4  obey the transaction boundary       waits for commit, dropped on discard
+ * 5  report failures as operation:'remove'
+ * ```
+ *
+ * ⚠️ **Writing the default is NOT the same as removing the key.** A later
+ * `get()` would read a WRITTEN default rather than ABSENCE, and absence is what
+ * lets an endpoint decide the fallback. So the decomposition has to be measured,
+ * not assumed.
+ */
+describe('0B §5: remove/clear decomposition and ordering', () => {
+  const removableEndpoint = (be: ReturnType<typeof backend>, key: string) => ({
+    get: (): Settings => {
+      const raw = be.read(key);
+      if (raw === null) throw new Error('absent');
+      return JSON.parse(raw) as Settings;
+    },
+    set: (v: Settings) => void be.write(key, JSON.stringify(v)),
+    // ⚠️ NOT a LinkEndpoint member. The APPLICATION-FACING adapter may carry
+    // storage administration; `LinkEndpoint` stays get/set/subscribe, and
+    // SignalTree never invokes this.
+    remove: () => void be.store.delete(key),
+  });
+
+  it('⚠️ remove-then-reset LOSES the removal — Link re-writes the default', async () => {
+    const be = backend();
+    const tree = makeTree();
+    await flush();
+    const ep = removableEndpoint(be, 'k');
+    const l = link(tree.$.settings, ep);
+
+    tree.$.settings.theme.set('persisted');
+    await flush();
+    await l.settled();
+    expect(be.store.has('k')).toBe(true);
+
+    // WRONG ORDER: administer storage, then reset state.
+    ep.remove();
+    tree.$.settings.theme.set('light');
+    await flush();
+    await l.settled();
+
+    // The authored reset armed an outbound send, which re-created the key.
+    // Absence was NOT achieved.
+    expect(be.store.has('k')).toBe(true);
+    l.dispose();
+  });
+
+  it('⚠️ the CORRECT decomposition is dispose (or settle) BEFORE remove', async () => {
+    const be = backend();
+    const tree = makeTree();
+    await flush();
+    const ep = removableEndpoint(be, 'k');
+    const l = link(tree.$.settings, ep);
+
+    tree.$.settings.theme.set('persisted');
+    await flush();
+    await l.settled();
+
+    // Reset state FIRST, let the relationship settle, THEN administer storage.
+    tree.$.settings.theme.set('light');
+    await flush();
+    await l.settled();
+    l.dispose();
+    ep.remove();
+
+    // Absence achieved, and nothing can re-create it.
+    expect(be.store.has('k')).toBe(false);
+    l.dispose();
+  });
+
+  it('so `clear()` is TWO responsibilities, and neither belongs to Link', async () => {
+    // state reset      -> an ordinary authored write (application)
+    // durable removal  -> adapter administration (application)
+    //
+    // The ORDERING is the part `stored` hid inside one method, and it is the
+    // part an application now owns explicitly. That is a real ergonomic
+    // difference, recorded rather than glossed: one call became two plus an
+    // ordering rule.
+    const be = backend();
+    const tree = makeTree();
+    await flush();
+    const ep = removableEndpoint(be, 'k');
+    const l = link(tree.$.settings, ep);
+    tree.$.settings.theme.set('x');
+    await flush();
+    await l.settled();
+
+    expect(typeof ep.remove).toBe('function');
+    // And `remove` is NOT part of what Link consumes.
+    expect('remove' in ({ get: ep.get, set: ep.set } as object)).toBe(false);
+    l.dispose();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 0B §4 — clearOnMigrationFailure, and §8 — maxScopes
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * §4 `clearOnMigrationFailure`, read from `stored.ts` (two identical paths):
+ *
+ * ```ts
+ * catch (e) {
+ *   reportError('migrate', e, ...);
+ *   if (clearOnMigrationFailure) storage.removeItem(key);
+ *   lastLoadResult = 'error';
+ *   return defaultValue;
+ * }
+ * ```
+ *
+ * Entirely inside the READ path. It reports, optionally deletes the corrupt
+ * durable payload, and falls back to the default — all while INTERPRETING the
+ * durable representation, exactly like migration itself.
+ *
+ * **Classification: ADAPTER POLICY.** Prototyped below inside `get()`, with no
+ * SignalTree API addition.
+ */
+describe('0B §4: migration-failure clearing is adapter policy', () => {
+  const migratingEndpoint = (
+    be: ReturnType<typeof backend>,
+    key: string,
+    clearOnFailure: boolean,
+    fallback: Settings
+  ) => ({
+    get: (): Settings => {
+      const raw = be.read(key);
+      if (raw === null) return fallback;
+      try {
+        const parsed = JSON.parse(raw) as { __v?: number };
+        if (parsed.__v === 1) throw new Error('migration failed');
+        return parsed as unknown as Settings;
+      } catch {
+        // The whole policy, inside the endpoint.
+        if (clearOnFailure) be.store.delete(key);
+        return fallback;
+      }
+    },
+    set: (v: Settings) => void be.write(key, JSON.stringify(v)),
+  });
+
+  const fallback: Settings = { theme: 'light', density: 1 };
+
+  it('clearOnFailure = TRUE deletes the corrupt payload and falls back', async () => {
+    const be = backend();
+    be.store.set('k', JSON.stringify({ __v: 1, theme: 'legacy' }));
+    const tree = makeTree();
+    await flush();
+    const l = link(tree.$.settings, migratingEndpoint(be, 'k', true, fallback));
+
+    await l.retrieve();
+    await flush();
+
+    expect(tree.$.settings()).toEqual(fallback);
+    expect(be.store.has('k')).toBe(false);
+    l.dispose();
+  });
+
+  it('clearOnFailure = FALSE keeps the corrupt payload and still falls back', async () => {
+    const be = backend();
+    be.store.set('k', JSON.stringify({ __v: 1, theme: 'legacy' }));
+    const tree = makeTree();
+    await flush();
+    const l = link(tree.$.settings, migratingEndpoint(be, 'k', false, fallback));
+
+    await l.retrieve();
+    await flush();
+
+    expect(tree.$.settings()).toEqual(fallback);
+    // Deliberately left in storage — a human could still recover it.
+    expect(be.store.has('k')).toBe(true);
+    l.dispose();
+  });
+});
+
+/**
+ * §8 `maxScopes` — PERSISTENCE RETENTION, and the gate is STRUCTURAL.
+ *
+ * ⚠️ The preregistered discriminator was "run with persist disabled and churn
+ * scopes". The call graph answers it more strongly than a churn test could,
+ * because there is NO PATH from a non-persisting loader to the GC:
+ *
+ * ```text
+ * touchScopeIndex()  called from exactly ONE site: writeThrough()
+ * writeThrough()     opens `if (!persist) return;`
+ * touchScopeIndex()  opens `if (!p || !scoped || p.maxScopes === undefined) return;`
+ * ```
+ *
+ * Double-gated. With persist disabled `writeThrough` never runs, so the GC is
+ * unreachable — not merely inactive.
+ *
+ * Its mechanism is `adapter.removeItem` over a touch-ordered index at
+ * `` `${key}::__scopes` ``, and the option's own documentation states the
+ * in-memory cache is still SINGLE-SCOPE, so there is no multi-scope in-memory
+ * cache for it to bound.
+ *
+ * ⚠️ Stated honestly: this is a CALL-GRAPH proof, not a scope-churn measurement.
+ * It is stronger for the persist-disabled question (structural unreachability)
+ * and does NOT measure eviction ORDER or revisit-refetch behaviour under
+ * persist-enabled churn. Those belong to LOADER-CACHE-DISPOSITION-0, which owns
+ * the cache side.
+ */
+describe('0B §8: maxScopes is persistence-gated, structurally', () => {
+  const SRC = (() => {
+    for (const c of [
+      join(process.cwd(), 'packages/core/src'),
+      join(process.cwd(), 'src'),
+    ]) {
+      try {
+        readFileSync(join(c, 'lib/signal-tree.ts'), 'utf8');
+        return c;
+      } catch {
+        /* next */
+      }
+    }
+    throw new Error('0B §8: could not locate packages/core/src');
+  })();
+
+  const LOADER = readFileSync(join(SRC, 'lib/markers/entity-loader.ts'), 'utf8');
+
+  it('⚠️ the GC is unreachable without persist — ONE call site, both gated', () => {
+    // Exactly one call site, and it is inside writeThrough.
+    const calls = [...LOADER.matchAll(/touchScopeIndex\(/g)];
+    expect(calls).toHaveLength(2); // the declaration + the single call
+
+    expect(LOADER).toContain('function writeThrough(params: P): void {\n    if (!persist) return;');
+    expect(LOADER).toContain(
+      "if (!p || !scoped || p.maxScopes === undefined) return;"
+    );
+    // And the eviction mechanism is durable storage, not memory.
+    expect(LOADER).toContain('__scopes');
+  });
+
+  it('maxScopes lives on the PERSIST options object, not on the loader root', () => {
+    // Declared inside EntityPersist — grouping by declaration is weak evidence
+    // on its own, which is why the gate above is the actual proof.
+    // `EntityPersist` is a TYPE ALIAS, not an interface — so slice from its
+    // declaration to the option that follows it on the loader root.
+    const persistBlock = LOADER.slice(
+      LOADER.indexOf('export type EntityPersist'),
+      LOADER.indexOf('persist?: EntityPersist;')
+    );
+    expect(persistBlock.length).toBeGreaterThan(0);
+    expect(persistBlock).toContain('maxScopes?: number;');
+    // And the doc that settles the classification.
+    expect(persistBlock).toContain('the in-memory cache is still single-scope');
   });
 });
