@@ -14707,10 +14707,16 @@ supersede pending writes, obey the transaction boundary, report as
 endpoint choose a fallback. Measured decomposition:
 
 ```text
-remove() THEN reset      ✗ the authored reset re-creates the key
+remove() THEN reset          ✗ the authored reset re-creates the key
+reset, SETTLE, THEN remove   ✓ absence achieved AND the relationship stays live
 reset, settle, dispose,
-  THEN remove()          ✓ absence achieved and nothing can re-create it
+  THEN remove                ✗ absence achieved but persistence ENDS — see PIN A
 ```
+
+⚠️ **CORRECTED BY PIN A.** 0B first recommended disposing before removing. That
+achieves absence but ends the relationship, which is NOT what `stored().clear()`
+does. **Settling is what makes removal stable; disposal was never the
+mechanism.**
 
 ```text
 LINK CONTRACT       stays get / set / subscribe — SignalTree never calls remove
@@ -14761,9 +14767,15 @@ line 402   JSON.stringify(index)           a scope-KEY list, for GC
 **ZERO cache metadata is persisted.** `lastLoadedAt`, `staleTime`, `tags` and
 `swr` never reach `setItem` or `stringify` — they are in-memory only.
 
-> That answers the discriminating question directly, and **against the
-> hypothesis**: loader's DURABLE surface is not remote-cache persistence. It is
-> generic row persistence plus a scope index. The cache lives in memory.
+> That answers the discriminating question directly. loader's durable surface is
+> a **generic row-snapshot representation with loader-specific scoped hydration
+> and GC semantics** — not a durable cache with staleness metadata.
+>
+> ⚠️ Phrased carefully: "not remote-cache persistence" would be too broad. Those
+> durable rows DO participate in loader cache hydration
+> (`hydrateThenRevalidate`, scope addressing), so the representation is generic
+> while its SEMANTICS around hydration and eviction are loader-specific. The
+> matrix below says this correctly; the summary sentence did not.
 
 ## §10 THE OVERLAP MATRIX — completed
 
@@ -14825,3 +14837,84 @@ loader durable payload        GENERIC row persistence, NOT cache persistence
 `PERSISTENCE-DECOMPOSE-0` is **CLOSED**. `STORED-RETIRE-0` is unblocked, and
 should be implementation migration and deletion — not another architecture
 investigation.
+
+---
+
+# STORED-RETIRE-0 §0 — the two pre-deletion pins, CLOSED
+
+## ⚠️ PIN A — `stored().clear()` KEEPS PERSISTENCE ACTIVE
+
+The measurement I owed and had not run. Against a real in-memory `Storage`:
+
+```text
+after set(A)    durable {"__v":1,"data":"A"}   tree A
+after clear()   durable ABSENT                 tree default
+after set(B)    durable {"__v":1,"data":"B"}   tree B
+```
+
+So `clear()` is **three** things: remove the durable key, reset the tree value,
+**and keep the relationship alive.**
+
+### ⚠️ AND THE MIGRATION IS CHEAPER THAN 0B CLAIMED
+
+0B recommended `reset → settled → dispose → remove`. That achieves absence but
+**ends persistence**, which would have forced a relink. Measured, the correct
+recipe is three steps with **no dispose and no relink**:
+
+```ts
+tree.$.x.set(defaultValue);   // reset
+await persistence.settled();  // let the outbound send land
+adapter.remove();             // THEN delete
+```
+
+```text
+absence after remove        ✓
+later authored write        ✓ persists again — matches stored()
+```
+
+> **Settling is what makes removal stable; disposal was never the mechanism.**
+> 0B's failing case removed BEFORE the reset settled, which is why the removal
+> was lost — and I then mis-attributed the fix to `dispose()`.
+
+Migration cost, stated honestly: **one method becomes three calls plus an
+ordering rule.** Not a relink. Not a reason to keep `stored`.
+
+## ⚠️ PIN B — migration-failure observability CHANGES OWNER
+
+Today `stored`'s migration failure routes through `reportError('migrate', …)` →
+`reportTreeError`, so it **does** reach `onTreeError` with
+`operation: 'migrate'`.
+
+After deletion that producer is gone, and the adapter prototype catches and
+returns a fallback — so **Link never sees a failure and nothing reaches the
+observer.**
+
+```text
+storage / migration / codec failure   ADAPTER or APPLICATION error handling
+endpoint get() throws                 link.retrieve() REJECTS its caller
+automatic Link set() failure          onTreeError
+```
+
+⚠️ Recorded as an **intentional ownership change, not a regression.** It is
+consistent with the already-measured rule that explicit `retrieve()` failures
+reject their caller rather than entering the global observer. The adapter must
+**not** call the internal `reportTreeError`, and `onTreeError` is **not** widened.
+
+## §1 CURRENT FOOTPRINT — recounted, not inherited
+
+```text
+production      19 files
+core specs      55
+demo            11
+tools/scripts   12
+```
+
+⚠️ Materially larger than `asyncSource`, and unlike it there is a **real code
+reference outside the primitive**: `lib/signal-tree.ts` uses `isStoredMarker`.
+Several enhancers (`restoration`, `serialization`, `devtools`) and internals
+(`commit-consequence`, `intercept-leaf-signals`, `tree-realization-adapter`,
+`error-reporter`) also name it — each needs classifying as
+STORED-ONLY vs SHARED before anything is deleted, per §2.
+
+**Deletion has NOT begun.** The pins are closed; the mechanical retirement is
+the next step.

@@ -642,7 +642,7 @@ describe('0B §5: remove/clear decomposition and ordering', () => {
     l.dispose();
   });
 
-  it('⚠️ the CORRECT decomposition is dispose (or settle) BEFORE remove', async () => {
+  it('⚠️ CORRECTED — SETTLE before remove; dispose is NOT needed and BREAKS it', async () => {
     const be = backend();
     const tree = makeTree();
     await flush();
@@ -653,15 +653,26 @@ describe('0B §5: remove/clear decomposition and ordering', () => {
     await flush();
     await l.settled();
 
-    // Reset state FIRST, let the relationship settle, THEN administer storage.
+    // Reset state FIRST, let the relationship SETTLE, THEN administer storage.
     tree.$.settings.theme.set('light');
     await flush();
     await l.settled();
-    l.dispose();
     ep.remove();
 
-    // Absence achieved, and nothing can re-create it.
+    // Absence achieved.
     expect(be.store.has('k')).toBe(false);
+
+    // ⚠️ AND THE RELATIONSHIP IS STILL LIVE — which is what `stored().clear()`
+    // actually does. PIN A measured it: after clear(), a later authored write
+    // persists again. An earlier version of this test called dispose() before
+    // remove(), which achieves absence but ENDS persistence — semantically
+    // WRONG, and it would have forced a relink into the migration recipe.
+    tree.$.settings.theme.set('after-clear');
+    await flush();
+    await l.settled();
+    expect(be.store.has('k')).toBe(true);
+    expect(JSON.parse(be.store.get('k') as string).theme).toBe('after-clear');
+
     l.dispose();
   });
 
@@ -840,5 +851,75 @@ describe('0B §8: maxScopes is persistence-gated, structurally', () => {
     expect(persistBlock).toContain('maxScopes?: number;');
     // And the doc that settles the classification.
     expect(persistBlock).toContain('the in-memory cache is still single-scope');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PIN A — stored().clear() KEEPS PERSISTENCE ACTIVE (measured)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * ⚠️ THE MEASUREMENT I OWED AND HAD NOT RUN.
+ *
+ * `stored().clear()` against a real in-memory Storage:
+ *
+ * ```text
+ * after set(A)    durable {"__v":1,"data":"A"}   tree A
+ * after clear()   durable ABSENT                 tree default
+ * after set(B)    durable {"__v":1,"data":"B"}   tree B
+ * ```
+ *
+ * So `clear()` is THREE things, not two: remove the durable key, reset the tree
+ * value, **and keep the persistence relationship alive.**
+ *
+ * ## The exact migration recipe — three steps, NO dispose, NO relink
+ *
+ * ```ts
+ * tree.$.x.set(defaultValue);   // reset
+ * await persistence.settled();  // let the outbound send land
+ * adapter.remove();             // THEN delete
+ * ```
+ *
+ * ⚠️ 0B's earlier recipe (`reset -> settled -> dispose -> remove`) achieves
+ * absence but ENDS the relationship, so it would have required a relink — a
+ * materially larger migration cost. **Settling is what makes removal stable;
+ * disposal was never the mechanism.** The failing 0B case removed BEFORE the
+ * reset settled, which is why the removal was lost.
+ *
+ * Migration cost, stated honestly: one method becomes three calls plus an
+ * ordering rule. Not a relink, and not a reason to keep `stored`.
+ */
+describe('PIN A: the clear() replacement keeps persisting', () => {
+  const removable = (be: ReturnType<typeof backend>, key: string) => ({
+    get: (): Settings => JSON.parse(be.read(key) as string) as Settings,
+    set: (v: Settings) => void be.write(key, JSON.stringify(v)),
+    remove: () => void be.store.delete(key),
+  });
+
+  it('reset -> settled -> remove gives ABSENCE and stays LIVE', async () => {
+    const be = backend();
+    const tree = makeTree();
+    await flush();
+    const ep = removable(be, 'k');
+    const l = link(tree.$.settings, { get: ep.get, set: ep.set });
+
+    tree.$.settings.theme.set('A');
+    await flush();
+    await l.settled();
+    expect(be.store.has('k')).toBe(true);
+
+    // the clear()
+    tree.$.settings.theme.set('light');
+    await flush();
+    await l.settled();
+    ep.remove();
+    expect(be.store.has('k')).toBe(false);
+
+    // still live
+    tree.$.settings.theme.set('B');
+    await flush();
+    await l.settled();
+    expect(JSON.parse(be.store.get('k') as string).theme).toBe('B');
+    l.dispose();
   });
 });
