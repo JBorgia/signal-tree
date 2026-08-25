@@ -6,6 +6,7 @@ import { getOwnedOwnerPath } from './internals/owned-metadata';
 import { getPathNotifier } from './path-notifier';
 import { reportTreeError } from './internals/error-reporter';
 import { getPositionRegistry } from './internals/position-registry';
+import { isInspectionWrite } from './write-participation';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
 import type { EntitySignal } from './types';
@@ -151,6 +152,8 @@ export type TruthfulLinkSource<S> =
 function accessorsFor<T>(x: unknown): {
   read: () => T;
   write: (value: T) => void;
+  /** True for an `EntitySignal` source, whose NaturalValue is `Row[]`. */
+  collection: boolean;
 } {
   const node = x as {
     all?: () => T;
@@ -159,16 +162,25 @@ function accessorsFor<T>(x: unknown): {
   };
 
   if (typeof node.all === 'function' && typeof node.setAll === 'function') {
-    return { read: () => node.all!(), write: (v: T) => node.setAll!(v) };
+    return {
+      read: () => node.all!(),
+      write: (v: T) => node.setAll!(v),
+      collection: true,
+    };
   }
 
   if (typeof node.set === 'function') {
-    return { read: () => (x as () => T)(), write: (v: T) => node.set!(v) };
+    return {
+      read: () => (x as () => T)(),
+      write: (v: T) => node.set!(v),
+      collection: false,
+    };
   }
 
   return {
     read: () => (x as () => T)(),
     write: (v: T) => (x as (v: T) => void)(v),
+    collection: false,
   };
 }
 
@@ -200,7 +212,7 @@ export function link<S>(
     );
   }
 
-  const { read, write } = accessorsFor<T>(x);
+  const { read, write, collection } = accessorsFor<T>(x);
   const ownerPath = getOwnedOwnerPath(x) ?? '';
   const notifier = getPathNotifier();
 
@@ -209,6 +221,80 @@ export function link<S>(
   let dirty = false;
   let chain: Promise<unknown> = Promise.resolve();
   let inboundSeq = 0;
+
+  /**
+   * THE EGRESS-ELIGIBLE PROJECTION — the complete value permitted to acquire
+   * external authority. Earned by INSPECTION-EGRESS-0.
+   *
+   * Three concepts that the incumbent compressed into one, and must not be
+   * recompressed:
+   *
+   *   local state       what the tree currently holds, including a devtools scrub
+   *   eligible          the latest state permitted to become external truth
+   *   knownY            what the endpoint has acknowledged
+   *
+   * Authored and restorative work keeps `local === eligible`. An INSPECTION
+   * write moves local state and deliberately leaves `eligible` behind: a
+   * developer looking at state B cannot make B externally authoritative. An
+   * in-flight send keeps `eligible !== knownY` until it lands.
+   *
+   * ⚠️ RELATIONSHIP-CREATION ADOPTION. This `read()` is not a convenience — it
+   * is the authority baseline. A relationship owns authority from the moment it
+   * EXISTS, never retroactively, so an inspection value that predates this
+   * `link()` call is legitimately adopted here. That does not reclassify the
+   * value's provenance, which stays inspection-derived; it defines only what
+   * this new relationship starts from. An inspection occurring AFTER creation
+   * can never advance the projection (BASE-1 vs BASE-2).
+   */
+  let eligible: T = read();
+
+  /**
+   * Immutable application of one eligible leaf value onto the previous eligible
+   * value. Deliberately NOT `read()`-based: re-reading current state after an
+   * eligible notification is exactly how inspection contamination re-enters,
+   * because batched delivery means a later inspection write is already applied.
+   *
+   * INTERNAL reconstruction only. The public boundary stays complete-value in,
+   * complete-value out — no patch protocol is created here.
+   */
+  const setAtPath = (
+    node: unknown,
+    segments: readonly string[],
+    value: unknown
+  ): unknown => {
+    if (segments.length === 0) return value;
+    const [head, ...rest] = segments;
+    const base = (node ?? {}) as Record<string, unknown>;
+    return { ...base, [head]: setAtPath(base[head], rest, value) };
+  };
+
+  const advanceEligible = (path: string, value: unknown): void => {
+    // ⚠️ COLLECTION SOURCES ARE NOT PROJECTED YET, and this is a declared gap
+    // rather than an oversight.
+    //
+    // An `EntitySignal`'s NaturalValue is `Row[]`, and its notifications arrive
+    // as `rows.<key>` — so applying one by relative path would index an ARRAY
+    // by key and corrupt the value. Worse, rekey (EGRESS-ELIGIBLE-PROJECTION-0)
+    // measured `path: 'rows.1'` carrying `v.id === 77`: the path holds the OLD
+    // key while the value holds the NEW one, and no `structuralEffect` is
+    // emitted. A collection projection therefore has a different identity
+    // basis — SubjectId, not key and not path — and is built separately.
+    //
+    // Until then a collection link keeps its previous behaviour: reconciling
+    // against current state. That preserves every existing collection contract
+    // and leaves the inspection defect OPEN for collections only, which is
+    // recorded rather than hidden.
+    if (collection) return;
+    // A whole-source notification already carries the complete value: the
+    // scalar case, where `path === ownerPath`.
+    if (path === ownerPath) {
+      eligible = value as T;
+      return;
+    }
+    const relative =
+      ownerPath === '' ? path : path.slice(ownerPath.length + 1);
+    eligible = setAtPath(eligible, relative.split('.'), value) as T;
+  };
 
   /**
    * WAITERS, NOT A COUNTER - earned by LINK-HANDLE-0.
@@ -250,6 +336,12 @@ export function link<S>(
     if (disposed || seq < inboundSeq) return;
     inboundSeq = seq;
     knownY = { value };
+    // ⚠️ INBOUND AUTHORITY IS DIRECT. Link already holds the complete inbound
+    // value, so the projection is SET from it rather than reconstructed from
+    // the leaf notifications that applying it will generate. External truth is
+    // authoritative for this relationship — it is not inspection, and it is not
+    // an authored mutation to be reduced.
+    eligible = value;
     external(() => write(value));
   };
 
@@ -271,6 +363,13 @@ export function link<S>(
       }
       // A value-less ping is a notification, not a state change.
       if (v === undefined && prev === undefined) return;
+      // ⚠️ INSPECTION DOES NOT ADVANCE EXTERNAL AUTHORITY. Local state has
+      // already moved; the projection deliberately does not follow, and no
+      // outbound work is armed. Keyed on PARTICIPATION, never on
+      // `origin === 'devtools'` — provenance says where a write came from,
+      // participation says which causal mechanisms it may take part in.
+      if (isInspectionWrite(meta)) return;
+      advanceEligible(path, v);
       dirty = true;
     }
   );
@@ -306,7 +405,12 @@ export function link<S>(
             // while an earlier one is in flight is picked up by the next lap.
             for (;;) {
               if (disposed) return;
-              const now = read();
+              // ⚠️ THE PROJECTION, NOT CURRENT LOCAL STATE. Re-read each
+              // lap so a write landing mid-flight is still picked up — that is
+              // LINK-RACE-1 and it is preserved. What changed is WHAT is
+              // reconciled: an inspection write that moved local state cannot
+              // enter here, because it never advanced `eligible`.
+              const now = collection ? read() : eligible;
               if (knownY !== undefined && deepEqual(now, knownY.value)) return;
               await endpoint.set?.(now);
               knownY = { value: now };
