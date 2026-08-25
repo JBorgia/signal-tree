@@ -16485,12 +16485,64 @@ returns exactly what `tree()` does. Only the projection above it was wrong. So
 `LINK-ROOT-SOURCE-0` stands alone, with its two independently measured causes,
 and its scope is now smaller than when the convergence hypothesis was open.
 
+## `LINK-ROOT-SOURCE-0` — CLOSED
+
+Two independent causes, both repaired, which is why supplying the observation
+capabilities never fixed it:
+
+```text
+owner carrier      tree.$ had no registry — capability-gated exactly as ordinary
+                   leaves were. Attached unconditionally now, for the same reason
+                   the substrate seeds leaves: a post-construction operation
+                   cannot ask for a capability.
+
+NaturalValue       accessorsFor fell through to a callable read and tree.$ is a
+                   plain OBJECT. The root is now recognized FIRST and read
+                   through its owning tree: tree() IS the whole-tree snapshot.
+```
+
+`tree.$` is the ADDRESS; the whole-tree snapshot is the VALUE. The root was NOT
+made callable, arbitrary non-callable objects did NOT become readable, and no
+new observation mechanism exists for the root — descendants are observed through
+the adopted substrate exactly as for any branch.
+
+Seven permanent tests: complete whole-tree egress, a descendant setter retained
+BEFORE the link, owner isolation against a same-shaped sibling tree, inspection
+exclusion with no hitchhike, realized eligibility, a collection inside the root
+publishing canonically, and dispose ending the relationship.
+
+Mutations: removing the owner carrier fails all 7; routing back through the
+callable fallback fails all 7; replacing the eligible projection with a current
+whole-tree re-read fails the inspection case ALONE — the same authority
+discriminator R9 provides for nested collections.
+
+### ⚠️ 876 failures, from one line
+
+The first attempt recorded the owning tree as a SYMBOL PROPERTY on the root
+accessor. That failed 876 tests. The tree closes over the accessor, so the
+property creates a cycle the snapshot and unwrap walkers follow. A WeakMap
+sidecar keeps the reference outside anything that enumerates the node, and the
+same change then failed 1.
+
+Bisecting was what made this cheap: the owner carriers alone failed 1, the
+interpretation change alone failed 0, so the 876 had to come from the third
+piece. Assuming the design was at fault would have been the expensive mistake.
+
+### One characterization test flipped
+
+`stored-owner-invariant-0.spec.ts` asserted `getPositionRegistry(tree.$)` was
+UNDEFINED without enhancers, with a comment noting the attachment was
+"enhancer-gated and ABSENT here". That is precisely the gating this phase
+removes, so the assertion now expects it DEFINED. The test's own point — that
+`stored()` takes its registry from the materialization context and reports
+without enhancers — is unaffected.
+
 ## OPEN
 
 ```text
 LINK-BARE-SCALAR-0     CLOSED — substrate landed
 LINK-BARE-BRANCH-0     CLOSED — substrate landed
-LINK-ROOT-SOURCE-0             distinct contract defect, undispositioned
+LINK-ROOT-SOURCE-0             CLOSED — owner carrier + root NaturalValue
 LINK-BRANCH-NESTED-ENTITY-0    CLOSED — regression introduced 48ad4e4a,
                                repaired; each nested collection now carries its
                                own eligible projection.
