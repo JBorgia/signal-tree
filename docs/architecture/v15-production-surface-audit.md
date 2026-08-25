@@ -16357,6 +16357,49 @@ Recorded as non-blocking future work: **`OBSERVATION-REPRESENTATION-PERF`** — 
 `rawSet`/`rawUpdate` bound callables are the obvious next target. It must not
 gate v15 sequencing.
 
+> **REDUCE REPRESENTATION BEFORE REOPENING SEMANTICS.** When an architecture has
+> survived its semantic falsifiers but carries measurable baseline cost, remove
+> demonstrably redundant representation first. Do not reopen previously
+> falsified semantic designs merely because the correct carrier is not free.
+
+`MEM-D` is the canonical instance. The substrate cost ~443 B/leaf; the plainly
+duplicated part came out for 24 B; the remaining ~400 B is the mechanism itself.
+That is NOT a reason to revisit `COST-C` (baseline capabilities, ~150% write-path
+tax) or `LAZY-E` (post-hoc interception, defeated by escaped callables) — both
+were falsified on their own evidence, and neither becomes cheaper because the
+survivor is not free.
+
+## `LINK-ROOT-SOURCE-0` — the mechanism, measured
+
+Re-measured after adoption; the substrate does not change it, because the
+substrate installs on LEAVES and the root is not one.
+
+```text
+root registry   false
+root ownerPath  null
+typeof tree.$   'object'        ← NOT callable
+root own keys   a,b
+
+BARE  link(tree.$)   throws "X must be an owned SignalTree location"
+CAPS  link(tree.$)   throws "x is not a function"
+CONTROL link(tree)   throws "X must be an owned SignalTree location"
+                     (typeof tree is 'function', but it carries no registry either)
+```
+
+Two independent causes, which is why the capability pair never fixed it:
+
+1. **No owner carrier.** The root accessor gets neither a registry nor an
+   ownerPath, so the ownership guard rejects it — the same shape as
+   `LINK-BARE-SCALAR-0`, but at a node the substrate deliberately does not seed.
+2. **`accessorsFor` assumes a callable source.** Its final branch is
+   `read: () => (x as () => T)()`, and `tree.$` is a plain OBJECT. That is the
+   `"x is not a function"` failure, and it is a SOURCE-INTERPRETATION defect
+   independent of observation: supplying a registry would not fix it.
+
+So a fix requires both an owner carrier for the root and a `NaturalValue`
+interpretation that handles a non-callable whole-tree source. Neither is in the
+observation substrate's scope, which is why this was kept separate.
+
 ## OPEN
 
 ```text
