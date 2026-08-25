@@ -41,9 +41,9 @@ import {
  * breaking public change with demo, gate and documentation consequences. That is
  * the full migration phase, not a carve-out.
  *
- * ⚠️ One piece of good news: `async-query.ts` does NOT depend on it. The only
- * reference is a comment describing a shape. So retirement does not cascade into
- * the other async primitive.
+ * ⚠️ One piece of good news: `async-query.ts` did NOT depend on it — the only
+ * reference was a comment describing a shape. That primitive has since been
+ * deleted outright by ASYNC-QUERY-RETIRE-0, so the cascade question is closed.
  *
  * ## ⚠️ 2. ITS CENTRAL REPORTING IS ALREADY INCOMPLETE — 1 of 4 paths
  *
@@ -156,15 +156,16 @@ describe('ASYNC-SOURCE-RETIRE-0: retirement scope', () => {
     expect(markersIndex).toContain('asyncSource,');
   });
 
-  it('⚠️ but async-query does NOT depend on it — retirement does not cascade', () => {
-    const asyncQuery = readFileSync(join(SRC, 'lib/markers/async-query.ts'), 'utf8');
-    const hits = [...asyncQuery.matchAll(/asyncSource|AsyncSource|ASYNC_SOURCE/g)];
-
-    // Exactly one reference, and it is prose.
-    expect(hits).toHaveLength(1);
-    expect(asyncQuery).toContain(
-      '/** Alias for `results` to match the asyncSource shape. */'
-    );
+  it('⚠️ RESOLVED — async-query is GONE, so the cascade question is closed', () => {
+    // This case measured that async-query referenced asyncSource only in a
+    // comment, so retiring asyncSource would not cascade into it.
+    //
+    // ASYNC-QUERY-DECIDE-0 then found async-query had no independent SignalTree
+    // semantic role at all — debounce, dedup, stale suppression and cancellation
+    // were debounceTime / distinctUntilChanged / switchMap — and
+    // ASYNC-QUERY-RETIRE-0 deleted it. The independence finding stands; the file
+    // it was about no longer exists.
+    expect(() => readFileSync(join(SRC, 'lib/markers/async-query.ts'), 'utf8')).toThrow();
   });
 
   it('core source coupling is wide enough to be the migration phase, not a carve-out', () => {

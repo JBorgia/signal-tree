@@ -241,7 +241,7 @@ export class UserOps {
 }
 ````
 
-Async pattern (canonical): `asyncSource` / `asyncQuery` markers at the tree path the data lives at — auto-derive `data`/`loading`/`error` signals, no manual status wiring. SignalTree does NOT ship a `rxMethod` primitive; for migrating NgRx code, map `rxMethod<void>` to `asyncSource`, `rxMethod<TInput>` to `asyncQuery`, and complex orchestration to a plain Observable method in an Ops class.
+Async pattern (canonical): SignalTree 15 ships NO async marker. The request pipeline is ordinary RxJS in a service — `debounceTime` for debounce, `distinctUntilChanged` for dedup, `switchMap` for cancellation and latest-wins — and results are written into plain tree state through `external()`. Use `link()` only where the relationship is a live external synchronization rather than a one-shot fetch. For migrating NgRx code, map any `rxMethod` to that pipeline; there is no marker to reach for.
 
 ## Anti-patterns to refuse
 

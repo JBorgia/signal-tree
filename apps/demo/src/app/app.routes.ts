@@ -63,7 +63,7 @@ export const appRoutes: Route[] = [
         (c) => c.AsyncDemoComponent
       ),
     data: {
-      title: 'Async markers — asyncSource & asyncQuery',
+      title: 'Async state — RxJS pipelines with external()',
       description:
         'SignalTree-native async primitives. Path-attached markers for load-and-expose and input-driven debounced queries, with auto-cleanup.',
     },

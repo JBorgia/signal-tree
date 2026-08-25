@@ -144,7 +144,7 @@ export class NavigationComponent {
     },
     {
       id: 'async-markers',
-      title: 'Async markers (asyncSource & asyncQuery)',
+      title: 'Async state (RxJS + external)',
       description:
         'SignalTree-native async primitives — load-and-expose + debounced input-driven query',
       route: '/async',

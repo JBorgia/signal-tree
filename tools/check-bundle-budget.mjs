@@ -125,7 +125,7 @@ const TARGETS = {
     // Bumped 7.2 → 7.3 for the async-marker snapshot hooks and ST2022.
     // Measured 7.12KB; production 5.59KB.
     //
-    // What it bought: `asyncSource`/`asyncQuery`/`asyncStream` values reach
+    // What it bought: `asyncSource`/`asyncStream` values reach
     // snapshots at all — before this `tree()` dropped them entirely, the same
     // defect `form()` had — plus ST2022, which fires when a marker registers
     // without declaring what of it is state. That diagnostic is the guard
@@ -259,7 +259,7 @@ const TARGETS = {
     // Bumped 10.2 → 10.4 for the async-marker snapshot hooks and ST2022.
     // Measured 10.30KB; production 8.24KB.
     //
-    // What it bought: `asyncSource`/`asyncQuery`/`asyncStream` values reach
+    // What it bought: `asyncSource`/`asyncStream` values reach
     // snapshots at all — before this `tree()` dropped them entirely, the same
     // defect `form()` had — plus ST2022, which fires when a marker registers
     // without declaring what of it is state. That diagnostic is the guard

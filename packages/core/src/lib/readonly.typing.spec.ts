@@ -19,8 +19,8 @@
  *      `refresh`, `invalidate`) are not reachable; `byId` is re-signed to a
  *      read-only entity node;
  *  (e) status / stored / async reader members remain readable, with
- *      `WritableSignal` readers (`status.state`, `asyncQuery.input`) demoted
- *      to plain `Signal`s.
+ *      `WritableSignal` readers (e.g. `status.state`) demoted to plain
+ *      `Signal`s.
  * ((d) — plain-object factory with `expose: 'readonly'` is a compile error —
  * lives in define-store.typing.spec.ts next to the overloads it gates.)
  */
@@ -30,7 +30,6 @@ import {
   entityMap,
   signalTree,
 } from '../index';
-import { asyncQuery } from './markers/async-query';
 import { asyncSource } from './markers/async-source';
 import { loader } from './markers/loader';
 import { stored } from './markers/stored';
@@ -76,10 +75,6 @@ const tree = signalTree({
     initial: [],
     load: () => Promise.resolve([]),
   }),
-  search: asyncQuery<string, User[]>({
-    initialResult: [],
-    query: () => Promise.resolve([]),
-  }),
 }).derived(($) => ({
   doubled: computed(() => $.count() * 2),
   draft: linked(() => $.count()),
@@ -99,7 +94,6 @@ type ROCached = RO$['cached'];
 type ROPlants = RO$['plants'];
 type ROStored = RO$['theme'];
 type ROSource = RO$['reports'];
-type ROQuery = RO$['search'];
 type ROEntityNode = NonNullable<ReturnType<ROUsers['byId']>>;
 
 export type _ReadonlyViewChecks = [
@@ -195,11 +189,20 @@ export type _ReadonlyViewChecks = [
   Expect<NotOffered<ROSource, 'refresh'>>,
   Expect<NotOffered<ROSource, 'reset'>>,
 
-  Expect<Equal<ROQuery['results'], Signal<User[] | undefined>>>,
-  // input is a WritableSignal on the full surface — demoted here.
-  Expect<Equal<ROQuery['input'], Signal<string | undefined>>>,
-  Expect<NotOffered<ROQuery, 'rerun'>>,
-  Expect<NotOffered<ROQuery, 'reset'>>
+  // ⚠️ COVERAGE LOSS, RECORDED RATHER THAN PAPERED OVER.
+  //
+  // `ROQuery['input']` was the ONLY assertion proving `DemoteWritable` turns a
+  // PICKED `WritableSignal` member into a plain `Signal`. asyncQuery was the
+  // only marker with a writable member in its reader allowlist, so after
+  // ASYNC-QUERY-RETIRE-0 that branch of the readonly resolver is UNEXERCISED.
+  //
+  // `ROStored` above covers a DIFFERENT property — the allowlist REMOVING
+  // `set`/`clear`, not demoting a retained member.
+  //
+  // Deliberately NOT substituted with a synthetic re-declaration: copying the
+  // conditional into a spec asserts the copy, not the resolver. The next marker
+  // that exposes a writable member must re-earn this row.
+  Expect<Equal<ROStored['key'], string>>
 ];
 
 // `asReadonly` also accepts the minimal `ISignalTree`/`SignalTree` shape

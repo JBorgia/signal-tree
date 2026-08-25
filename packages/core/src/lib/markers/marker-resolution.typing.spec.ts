@@ -23,7 +23,6 @@ import type {
   EntitySignal,
 } from '../../index';
 import { entityMap, signalTree } from '../../index';
-import { asyncQuery, type AsyncQuerySignal } from './async-query';
 import { asyncSource, type AsyncSourceSignal } from './async-source';
 import { loader } from './loader';
 import { stored, type StoredSignal } from './stored';
@@ -50,10 +49,6 @@ const tree = signalTree({
   users: entityMap<User, number>(),
   theme: stored('theme', 'light' as 'light' | 'dark'),
   reports: asyncSource<User[]>({ initial: [], load: () => Promise.resolve([]) }),
-  search: asyncQuery<string, User[]>({
-    initialResult: [],
-    query: () => Promise.resolve([]),
-  }),
   selectedId: null as number | null, // union leaf
   count: 0, // plain leaf
   nested: {
@@ -67,7 +62,6 @@ export type _MarkerResolutionChecks = [
   Expect<Equal<$['users'], EntitySignal<User, number>>>,
   Expect<Equal<$['theme'], StoredSignal<'light' | 'dark'>>>,
   Expect<Equal<$['reports'], AsyncSourceSignal<User[]>>>,
-  Expect<Equal<$['search'], AsyncQuerySignal<string, User[]>>>,
   // marker nested at depth resolves too (the "any depth" differentiator)
   Expect<Equal<$['nested']['deep'], CallableWritableSignal<number>>>,
   // plain + union leaves stay callable writable signals
@@ -139,7 +133,11 @@ export type _LoadingSliceChecks = [
 // These were missing every non-entityMap marker; now covered.
 type MarkerState = {
   users: ReturnType<typeof entityMap<User, number>>;
-  search: ReturnType<typeof asyncQuery<string, User[]>>;
+  // ⚠️ MIGRATED from `asyncQuery` by ASYNC-QUERY-RETIRE-0. The invariant is
+  // that `DeepEntityAwareTreeNode` resolves a NON-ENTITY marker at the
+  // internal-variant level, which is independent of which marker is used —
+  // so it moves to a surviving one rather than disappearing with asyncQuery.
+  theme: ReturnType<typeof stored<'light' | 'dark'>>;
 };
 export type _InternalVariantChecks = [
   Expect<
@@ -147,8 +145,8 @@ export type _InternalVariantChecks = [
   >,
   Expect<
     Equal<
-      DeepEntityAwareTreeNode<MarkerState>['search'],
-      AsyncQuerySignal<string, User[]>
+      DeepEntityAwareTreeNode<MarkerState>['theme'],
+      StoredSignal<'light' | 'dark'>
     >
   >
 ];

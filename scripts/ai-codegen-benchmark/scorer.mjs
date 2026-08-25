@@ -78,9 +78,6 @@ const SIGNALTREE_MARKER_METHODS = {
   asyncSource: new Set([
     'data', 'loading', 'error', 'refresh', 'set', 'reset',
   ]),
-  asyncQuery: new Set([
-    'input', 'results', 'data', 'loading', 'error', 'rerun',
-  ]),
   stored: new Set([
     'set', 'update', 'reset', 'clear',
   ]),
@@ -116,7 +113,7 @@ export function scoreImports(code) {
 }
 
 const MARKER_DECL_RE =
-  /\b(\w+)\s*:\s*(status|entityMap|asyncSource|asyncQuery|stored|form)\s*[<(]/g;
+  /\b(\w+)\s*:\s*(status|entityMap|asyncSource|stored|form)\s*[<(]/g;
 
 const METHOD_CALL_RE = /(?:\.\$\.|\$\.|\.)(\w+)\.(\w+)\s*\(/g;
 

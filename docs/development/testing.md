@@ -34,8 +34,8 @@ via `setupFiles: ['src/test-setup.ts']` in `vitest.config.ts`, and is listed in
 published bundle.
 
 Specs that need it: any using `TestBed.runInInjectionContext` / `inject()` —
-currently the `asyncSource` and `asyncQuery` marker specs (their markers call
-`inject(DestroyRef)` for auto-cleanup).
+currently the `asyncSource` marker specs, and the ASYNC-QUERY-RETIRE-0
+replacement scenario (both call `inject(DestroyRef)` for auto-cleanup).
 
 **There must be exactly ONE test-setup file** (`src/test-setup.ts`). Do not add
 per-directory `test-setup.ts` files: they are referenced by no runner (dead
@@ -48,9 +48,10 @@ June 2026 for exactly this reason.
 
 - The core suite runs under `@nx/vitest` — there is no Jest config for `core`
   (the Jest workflow `test-packages.yml` covers only guardrails/realtime/schema).
-- The `asyncSource`/`asyncQuery` specs never executed from the day they were
-  added (`bc60988b`) until the `setupFiles` wiring landed, because the
-  `ngModule null` failure blocked the whole file. Wiring the setup surfaced two
-  real `asyncQuery` bugs (error-kills-pipeline and rerun-deduped) — both now
-  fixed and covered by passing specs. If those specs ever start failing again,
-  they are testing real marker behavior, not the harness.
+- The async marker specs never executed from the day they were added
+  (`bc60988b`) until the `setupFiles` wiring landed, because the `ngModule null`
+  failure blocked the whole file. Wiring the setup surfaced two real bugs in the
+  then-existing `asyncQuery` marker (error-kills-pipeline and rerun-deduped).
+  That marker was later deleted outright by ASYNC-QUERY-RETIRE-0 — it packaged an
+  RxJS composition rather than owning any SignalTree semantics — but the harness
+  lesson stands: if a marker spec fails, suspect the marker before the harness.

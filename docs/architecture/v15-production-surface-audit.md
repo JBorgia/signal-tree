@@ -13799,3 +13799,133 @@ staged-vs-unstaged mismatch. ⚠️ It audited a DIRTY working tree and a differ
 test count, so it is not release truth. Those exact gates are to be re-run on a
 CLEAN committed HEAD after migration and disposed from fresh evidence. Migration
 is NOT redesigned around that snapshot.
+
+---
+
+# ASYNC-QUERY-RETIRE-0 — deleted. The lesson survived the primitive.
+
+> **`asyncQuery` did not own asynchronous query semantics; it packaged an RxJS
+> composition inside a SignalTree marker.**
+
+That is why it fails the v15 ownership test. Debounce, equality filtering,
+stale-result suppression and cancellation are already owned by the reactive
+stream doing the work — SignalTree added no causal or state-engine authority
+over any of them.
+
+## Deleted
+
+```text
+markers/async-query.ts                     the primitive
+markers/async-query.contract.ts            its contract
+markers/async-query.spec.ts                its behavioural specs
+markers/async-query-a1-2-equivalence.spec.ts
+markers/index.ts                           the dead-barrel entry
+```
+
+## Type-resolution plumbing — compiler-driven, marker rows only
+
+```text
+types.ts              3 marker-resolution rows
+readonly.ts           ReadonlyAsyncQuerySignal + its conditional branch
+readonly-readers.ts   ASYNC_QUERY_READERS
+```
+
+Neighbouring markers keep their exact typing; nothing generic was simplified
+beyond what the deletion earned.
+
+## ⚠️ ONE GENERIC INVARIANT MIGRATED, ONE COVERAGE LOSS RECORDED
+
+**Migrated.** `marker-resolution.typing.spec.ts` asserted that
+`DeepEntityAwareTreeNode` resolves a NON-ENTITY marker at the internal-variant
+level. That invariant is marker-independent, so it moved onto `stored` rather
+than disappearing.
+
+⚠️ **Lost, and recorded rather than papered over.** `ROQuery['input']` was the
+ONLY assertion proving `DemoteWritable` turns a PICKED `WritableSignal` member
+into a plain `Signal`. asyncQuery was the only marker with a writable member in
+its reader allowlist, so that branch of the readonly resolver is now
+**unexercised**. `ROStored` covers a DIFFERENT property — the allowlist REMOVING
+`set`/`clear`, not demoting a retained member.
+
+Deliberately NOT substituted with a synthetic re-declaration: copying the
+conditional into a spec asserts the copy, not the resolver. The next marker with
+a writable member must re-earn that row. The gap is pinned in the spec itself.
+
+## Demo — the scenario was preserved, the primitive was not
+
+The eight demo references were one live lesson plus wiring and dated history:
+
+```text
+MIGRATED   async/async-demo.component.{ts,html,spec.ts}
+             the snippet now teaches the pipeline that always owned the
+             behaviour: debounceTime -> distinctUntilChanged -> switchMap, with
+             results landed through external(). The spec asserts 'switchMap'
+             where it used to assert 'asyncQuery'.
+RELABELLED app.routes.ts · navigation.component.ts · examples.config.ts
+KEPT       pages/async-demo — already titled "Async Markers Removed"
+KEPT       whats-new — dated changelog entries (v9.5.0, v10.2, v10.3)
+```
+
+⚠️ `apps/demo` live-code references = **0**. Only dated history remains.
+
+## Tools and gates
+
+```text
+UPDATED   check-bundle-budget.mjs           prose
+          route-smoke.spec.ts               route comment
+          ai-codegen-benchmark/scorer.mjs   member set + marker regex —
+                                            it would otherwise have gone on
+                                            REWARDING agents for emitting a
+                                            deleted API
+          prompts/003-debounced-search.yaml now requires `debounceTime`
+ALREADY OK check-rc-public-dispositions.mjs already listed asyncQuery as deleted
+```
+
+Gates run directly: `check-rc-public-dispositions`, `check-bundle-budget`,
+`check-documented-symbols` — all exit 0.
+
+## Live docs vs archived record
+
+```text
+CORRECTED  README.md (snippet + NgRx concept map)
+           docs/ai/agent-templates.md  ⚠️ this file INSTRUCTS agents; it had
+                                       asyncQuery as the "canonical" async
+                                       pattern
+           docs/development/testing.md
+           docs/compare/{ngrx-signalstore,capability-matrix,native-signals}.md
+           docs/guides/{custom-markers-enhancers,streaming-accumulation}.md
+KEPT       docs/architecture, docs/audits, docs/rfcs, CHANGELOGs
+           docs/guides/migration-v13-v14.md  (a v13->v14 historical table)
+```
+
+Remaining live-doc mentions are all "the OLD markers are not part of v15" —
+correct framing.
+
+⚠️ **Those same compare/guide files still name `stored`, `asyncSource` and
+`loader` as current.** They were corrected for asyncQuery only; a full pass
+belongs to MIGRATION-CLOSE-0 rather than touching them four times.
+
+## Zero-reference inventory (all spellings: asyncQuery, async-query, AsyncQuery, ASYNC_QUERY)
+
+```text
+production (core src)     0
+demo live code            0
+dead marker barrel        0
+current tools/gates       0
+live docs                 0 presented as available
+core specs                3   retirement-record prose only
+archived docs            19   intentionally retained
+```
+
+## Verification
+
+```text
+core suite      2168 passing (2189 total)   the one intermittent is the known
+                                            entity-granular-reactivity
+                                            wall-clock flake; green on re-run
+typecheck       clean
+core lint       clean
+demo test       19 suites / 106 tests passing
+demo lint       clean
+PUBLIC API      zero delta — asyncQuery was never root-reachable
+```

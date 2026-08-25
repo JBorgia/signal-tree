@@ -15,7 +15,7 @@ out to be "marker".
 
 ## The problem
 
-`asyncSource` and `asyncQuery` **replace** their value on each emission. That is
+`asyncSource` **replaces** its value on each emission. That is
 correct for a fetch and wrong for a stream: LLM tokens, SSE deltas and
 progressive results need to **accumulate**.
 

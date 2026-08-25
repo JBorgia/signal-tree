@@ -26,7 +26,7 @@ const ROUTES = [
   '/whats-new-14', // 14.0.0 running capability page
   '/does-it-fit', // fit/positioning page
   '/entity-collection', // entityMap cache-aware loading showcase
-  '/async', // asyncSource & asyncQuery markers
+  '/async', // async state via RxJS + external()
   '/marker-zoo', // all 6 markers at 4 depths
   '/events', // events package demo
   '/benchmarks', // live cross-library benchmarks
