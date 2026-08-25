@@ -12,6 +12,7 @@ import {
   createEntityEgressProjection,
   type EntityEgressProjection,
 } from './internals/entity-egress-projection';
+import { applyAtRelativePath } from './internals/source-mutation';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
 import type { EntitySignal } from './types';
@@ -267,54 +268,18 @@ export function link<S>(
     : undefined;
 
   /**
-   * Immutable application of one eligible leaf value onto the previous eligible
-   * value. Deliberately NOT `read()`-based: re-reading current state after an
-   * eligible notification is exactly how inspection contamination re-enters,
-   * because batched delivery means a later inspection write is already applied.
+   * Scalar and branch sources advance their eligible value through shared
+   * source-shape interpretation (`internals/source-mutation.ts`). Only the
+   * AUTHORITY — `eligible` itself — belongs to Link.
    *
-   * INTERNAL reconstruction only. The public boundary stays complete-value in,
-   * complete-value out — no patch protocol is created here.
+   * Deliberately NOT `read()`-based: re-reading current state after an eligible
+   * notification is how inspection contamination re-enters, because batched
+   * delivery means a later inspection write is already applied.
+   *
+   * Collection sources never reach here; they advance `entityProjection`.
    */
-  const setAtPath = (
-    node: unknown,
-    segments: readonly string[],
-    value: unknown
-  ): unknown => {
-    if (segments.length === 0) return value;
-    const [head, ...rest] = segments;
-    const base = (node ?? {}) as Record<string, unknown>;
-    return { ...base, [head]: setAtPath(base[head], rest, value) };
-  };
-
   const advanceEligible = (path: string, value: unknown): void => {
-    // ⚠️ COLLECTION SOURCES ARE NOT PROJECTED YET, and this is a declared gap
-    // rather than an oversight.
-    //
-    // An `EntitySignal`'s NaturalValue is `Row[]`, and its notifications arrive
-    // as `rows.<key>` — so applying one by relative path would index an ARRAY
-    // by key and corrupt the value.
-    //
-    // The identity basis also differs. `changeId(1, 77)` emits
-    // `structuralEffect { kind:'rekey', subject:1, beforeKey:1, afterKey:77 }`
-    // while the row PAYLOAD is untouched (a row's own `id` field is data, not
-    // identity — see `changeId` in types.ts). And a removed key that is later
-    // re-added gets a NEW SubjectId, so a key is not a lifetime. A collection
-    // projection is therefore keyed on SubjectId, not key and not path, and is
-    // built separately rather than folded into this reducer.
-    //
-    // Until then a collection link keeps its previous behaviour: reconciling
-    // against current state. That preserves every existing collection contract
-    // and leaves the inspection defect OPEN for collections only, which is
-    // recorded rather than hidden.
-    // A whole-source notification already carries the complete value: the
-    // scalar case, where `path === ownerPath`.
-    if (path === ownerPath) {
-      eligible = value as T;
-      return;
-    }
-    const relative =
-      ownerPath === '' ? path : path.slice(ownerPath.length + 1);
-    eligible = setAtPath(eligible, relative.split('.'), value) as T;
+    eligible = applyAtRelativePath(eligible, ownerPath, path, value);
   };
 
   /**
