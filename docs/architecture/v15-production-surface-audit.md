@@ -16283,6 +16283,62 @@ That optimization is NOT applied here. It is recorded so the adoption decision
 is made against the honest number, and so the reducible portion is not mistaken
 for an intrinsic cost of the design.
 
+## `MEM-D-REDUCE-0` — applied, and honestly a small win
+
+The per-leaf record dropped `slot`, `registry` and `ownerPath`, all of which are
+already reachable from the leaf itself and are now read at CLAIM time — a rare
+operation — rather than retained by every ordinary leaf forever.
+
+```text
+type LeafObservation = { claims, positionId }   // was: + slot, registry, ownerPath
+```
+
+Re-measured with a corrected fixture holding LEAF COUNT AT 100 in both
+topologies, so topology is finally the independent variable:
+
+```text
+                    A baseline   B landed   C MEM-D    C - A     saved
+wide   100 leaves     789 B       1232 B     1208 B    +419 B    24 B/leaf
+nested 100 leaves     732 B       1148 B     1124 B    +392 B    24 B/leaf
+entity control      42577 B/tree  42629      42629      +52 B    0
+```
+
+**The topology control now works.** With leaf count equal, wide and nested land
+within ~27 B of each other. The cost is genuinely per ORDINARY LEAF, independent
+of tree shape.
+
+⚠️ **MEM-D bought 24 B/leaf — about 5% of the substrate's cost.** Worth taking,
+and not the reduction the duplicated-state description might have implied. The
+remaining **~390–420 B/leaf** is the mechanism itself: two bound raw callables,
+two replaced methods, the arm closure, and a two-field WeakMap record. That is
+what ESCAPED-CALLABLE and DORMANCY cost — interception has to exist before any
+callable escapes, and it has to persist.
+
+The entity control stays flat (+52 B/tree, ~0.1%), confirming the delta is not
+global tree overhead.
+
+Cost after the reduction is unchanged: ~0.054ms/10k scalar writes, ~0.054
+nested, ~0.141ms construction per 100 leaves. Memory was not purchased with a
+write-path regression.
+
+### Adoption
+
+The question was never "can this be free" — stable pre-escape interception
+requires persistent per-leaf machinery by construction. It was whether, after
+obvious duplication is removed, the remainder is intrinsic enough that another
+architecture search would be unjustified.
+
+It is. The two alternatives are already falsified by measurement: making the
+capability pair baseline costs ~+150% on the WRITE path for every tree
+(`COST-C`), and post-hoc installation cannot cover an escaped callable
+(`LAZY-E`). The surviving ~400 B/leaf buys a `link()` that works on an ordinary
+tree, and nothing cheaper has survived a falsifier.
+
+```text
+RETAINED-MEMORY-0     MEM-B, MEM-C refuted, MEM-D applied
+observation substrate ADOPTED
+```
+
 ## OPEN
 
 ```text

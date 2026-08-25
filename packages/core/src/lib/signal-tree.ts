@@ -193,7 +193,7 @@ function finalizeLeafSignal<TValue>(
   if (registry) {
     definePositionRegistry(leaf as object, registry);
     defineOwnedOwnerPath(leaf as object, path);
-    installDormantObservation(leaf, path, registry);
+    installDormantObservation(leaf);
   }
 }
 
