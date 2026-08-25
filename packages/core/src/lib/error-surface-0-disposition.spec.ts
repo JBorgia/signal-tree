@@ -74,7 +74,7 @@ const countIn = (needle: string) =>
   PRODUCTION.filter((f) => readFileSync(f, 'utf8').includes(needle));
 
 describe('ERROR-SURFACE-0: is the central reporter actually central?', () => {
-  it('⚠️ the ENTIRE library reports from exactly three places', async () => {
+  it('⚠️ the ENTIRE library reports from exactly two places', async () => {
     const reporters = countIn('reportTreeError(');
 
     // ⚠️ THE FINDING IS NOT "it is not exported". It is that the capability was
@@ -89,14 +89,20 @@ describe('ERROR-SURFACE-0: is the central reporter actually central?', () => {
     // question is unchanged: the `TreeErrorSource` taxonomy still needs deciding
     // before `onTreeError` is exported, and it now has a `'link'` member that a
     // consumer would see.
+    //
+    // ⚠️ BACK TO TWO, but NOT the original two. ASYNC-SOURCE-REPORT-RETIRE-0
+    // removed `async-source.ts` as a producer: it reported on ONE of its three
+    // failure paths while its public `error` signal carried all three, so the
+    // central call was a partial secondary path rather than its error contract.
+    // Removing it is what lets `treeId` be REQUIRED on the public event instead
+    // of optional, since every surviving producer can name its tree.
     expect(reporters.map((f) => f.split('/').pop()).sort()).toEqual([
-      'async-source.ts',
       'link.ts',
       'stored.ts',
     ]);
   });
 
-  it('⚠️ four of six TreeErrorSource values have NO reporter at all', async () => {
+  it('⚠️ FIVE of six TreeErrorSource values have NO reporter at all', async () => {
     const declared: TreeErrorSource[] = [
       'stored',
       'async-source',
@@ -110,8 +116,12 @@ describe('ERROR-SURFACE-0: is the central reporter actually central?', () => {
 
     // The control: `live` being non-empty proves the search can find a source
     // that exists, so `dead` is not an artifact of the matcher.
-    expect(live).toEqual(['stored', 'async-source']);
+    // ⚠️ `async-source` JOINED THE DEAD LIST — its producer was removed by
+    // ASYNC-SOURCE-REPORT-RETIRE-0, so the union's only live members are now
+    // `stored` (retiring) and `link` (not in this older list).
+    expect(live).toEqual(['stored']);
     expect(dead).toEqual([
+      'async-source',
       'async-query',
       'entity-loader',
       'persistence',

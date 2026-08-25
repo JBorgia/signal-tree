@@ -181,17 +181,19 @@ describe('ERROR-OWNER-IDENTITY-0: producer reachability', () => {
     expect(src).toContain('path: key,');
   });
 
-  it('⚠️ async-source CANNOT — its processor receives only the marker', () => {
+  it('⚠️ async-source COULD NOT — and is no longer a producer at all', () => {
     const src = readFileSync(join(SRC, 'lib/markers/async-source.ts'), 'utf8');
 
-    // The whole falsifier, in one signature.
+    // The original falsifier, in one signature: no materialization context, so
+    // no way to name its tree.
     expect(src).toContain('export function createAsyncSourceSignal<T>(\n  marker: AsyncSourceMarker<T>\n): AsyncSourceSignal<T> {');
-
-    // No registry, no ownership, anywhere in the file.
     expect(src).not.toContain('positionRegistry');
     expect(src).not.toContain('getPositionRegistry');
 
-    // And its report carries no path either.
-    expect(src).toContain("operation: 'load',");
+    // ⚠️ RESOLVED BY REMOVAL, not by plumbing. ASYNC-SOURCE-REPORT-RETIRE-0
+    // deleted its single report call rather than teaching a retiring primitive
+    // to attribute errors, so no unattributable producer remains and `treeId`
+    // can be REQUIRED on the public event.
+    expect(src).not.toContain('reportTreeError(');
   });
 });

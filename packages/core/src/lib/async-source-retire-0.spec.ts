@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { TestBed } from '@angular/core/testing';
+import { Subject } from 'rxjs';
+
+import {
+  asyncSource,
+  createAsyncSourceSignal,
+} from './markers/async-source';
+import {
+  clearTreeErrorListenersForTesting,
+  onTreeError,
+  type TreeErrorEvent,
+} from './internals/error-reporter';
 
 /**
  * ASYNC-SOURCE-RETIRE-0 — the INVENTORY, and ⚠️ TWO measurements that change the
@@ -104,15 +116,16 @@ const SRC = (() => {
 const ASYNC_SOURCE = readFileSync(join(SRC, 'lib/markers/async-source.ts'), 'utf8');
 
 describe('ASYNC-SOURCE-RETIRE-0: the reporting is partial', () => {
-  it('⚠️ ONE central report, but THREE local failure paths', () => {
+  it('⚠️ WAS one central report against three local paths — now ZERO', () => {
     const reports = [...ASYNC_SOURCE.matchAll(/reportTreeError\(\{/g)].length;
     const localSets = [...ASYNC_SOURCE.matchAll(/errorSignal\.set\(err\)/g)].length;
 
-    // The asymmetry is the finding: central observation covers the synchronous
-    // throw only, while the local signal covers every failure mode.
-    expect(reports).toBe(1);
+    // The asymmetry WAS the finding: central observation covered the
+    // synchronous throw only, while the local signal covers every failure mode.
+    // ASYNC-SOURCE-REPORT-RETIRE-0 removed the partial path; the complete one
+    // is untouched.
+    expect(reports).toBe(0);
     expect(localSets).toBe(3);
-    expect(localSets).toBeGreaterThan(reports);
   });
 
   it('the complete surface is the marker\'s own public error signal', () => {
@@ -124,13 +137,16 @@ describe('ASYNC-SOURCE-RETIRE-0: the reporting is partial', () => {
     );
   });
 
-  it('⚠️ the single report site is the SYNCHRONOUS-throw path', () => {
-    const at = ASYNC_SOURCE.indexOf('reportTreeError({');
-    const before = ASYNC_SOURCE.slice(Math.max(0, at - 400), at);
-    // It sits in the `catch` around the synchronous `load()` call, not in the
-    // observable-error or promise-rejection handlers.
-    expect(before).toContain('result = load();');
-    expect(before).toContain('} catch (err) {');
+  it('⚠️ the removed site was the SYNCHRONOUS-throw path, and it still sets error', () => {
+    // The `catch` around the synchronous `load()` call still records locally.
+    // It is the observable-error and promise-rejection handlers that NEVER
+    // reported centrally, which is why the central path was never the contract.
+    const at = ASYNC_SOURCE.indexOf('result = load();');
+    // Wide enough to clear the explanatory comment that replaced the call.
+    const after = ASYNC_SOURCE.slice(at, at + 1800);
+    expect(after).toContain('} catch (err) {');
+    expect(after).toContain('errorSignal.set(err);');
+    expect(after).not.toContain('reportTreeError(');
   });
 });
 
@@ -168,5 +184,99 @@ describe('ASYNC-SOURCE-RETIRE-0: retirement scope', () => {
         `${f} references asyncSource`
       ).toBe(true);
     }
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+// The SUPPORTED error contract — unchanged by the retirement
+// ───────────────────────────────────────────────────────────────────────────
+
+const flush = async () => {
+  for (let i = 0; i < 8; i++) await Promise.resolve();
+};
+
+/**
+ * ⚠️ THE POINT OF THIS BLOCK.
+ *
+ * `asyncSource`'s supported error surface is `node.error()`, and it covers all
+ * THREE failure modes. The central report covered ONE. These pin the complete
+ * contract so the retirement cannot be mistaken for an error-handling
+ * regression, and so a future refactor cannot quietly drop a path.
+ */
+describe('ASYNC-SOURCE-REPORT-RETIRE-0: node.error() still covers all three paths', () => {
+  const observe = () => {
+    clearTreeErrorListenersForTesting();
+    const seen: TreeErrorEvent[] = [];
+    const off = onTreeError((e) => seen.push(e));
+    return {
+      seen,
+      stop: () => {
+        off();
+        clearTreeErrorListenersForTesting();
+      },
+    };
+  };
+
+  it('1. a SYNCHRONOUS load() throw reaches node.error()', async () => {
+    const cap = observe();
+    const boom = new Error('sync boom');
+
+    await TestBed.runInInjectionContext(async () => {
+      const node = createAsyncSourceSignal(
+        asyncSource<number>({
+          initial: 0,
+          load: () => {
+            throw boom;
+          },
+        })
+      );
+      await flush();
+
+      expect(node.error()).toBe(boom);
+      // Loading is released rather than left stuck.
+      expect(node.loading()).toBe(false);
+    });
+
+    // ⚠️ AND NOTHING REACHES THE CENTRAL REPORTER — this is the behaviour the
+    // retirement changed, isolated from the contract above.
+    expect(cap.seen).toHaveLength(0);
+    cap.stop();
+  });
+
+  it('2. a PROMISE rejection reaches node.error()', async () => {
+    const cap = observe();
+    const boom = new Error('promise boom');
+
+    await TestBed.runInInjectionContext(async () => {
+      const node = createAsyncSourceSignal(
+        asyncSource<number>({ initial: 0, load: () => Promise.reject(boom) })
+      );
+      await flush();
+      expect(node.error()).toBe(boom);
+    });
+
+    // This path NEVER reported centrally, before or after.
+    expect(cap.seen).toHaveLength(0);
+    cap.stop();
+  });
+
+  it('3. an OBSERVABLE error reaches node.error()', async () => {
+    const cap = observe();
+    const boom = new Error('observable boom');
+    const subject = new Subject<number>();
+
+    await TestBed.runInInjectionContext(async () => {
+      const node = createAsyncSourceSignal(
+        asyncSource<number>({ initial: 0, load: () => subject.asObservable() })
+      );
+      await flush();
+      subject.error(boom);
+      await flush();
+      expect(node.error()).toBe(boom);
+    });
+
+    // This path never reported centrally either.
+    expect(cap.seen).toHaveLength(0);
+    cap.stop();
   });
 });

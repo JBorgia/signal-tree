@@ -13014,3 +13014,78 @@ directive rested on is now measured false.
 before   2197 passing
 after    2203 passing
 ```
+
+---
+
+# ASYNC-SOURCE-REPORT-RETIRE-0 — one call site, and the blocker is gone
+
+Production change: `async-source.ts` no longer calls `reportTreeError`. Nothing
+else about the marker changed.
+
+## ⚠️ WORDING — this is NOT a public API removal
+
+`onTreeError` is not exported today, so no supported consumer could observe this
+path. It is an **internal observable-behaviour change**, recorded honestly
+because deep-importing tests can notice it.
+
+The marker's SUPPORTED error contract is untouched:
+
+```text
+              node.error()   central report (before)
+sync throw         ✓              ✓
+Observable error   ✓              ✗
+Promise rejection  ✓              ✗
+```
+
+The central call covered ONE of three failure modes and sat beside a complete
+public signal. It was never this marker's error contract.
+
+## Reporter inventory after the change
+
+```text
+link     treeId = registry.id        path = ownerPath      KEEPS
+stored   treeId = ownerRegistry.id   path = key            RETIRING LATER
+```
+
+**No unattributable producer remains**, which is exactly what lets
+`TreeErrorEvent.treeId` be REQUIRED rather than optional — without retiring
+`asyncSource` (~95 files) and without plumbing ownership into an API v15 deletes.
+
+## Permanent controls
+
+Three local error-contract tests, driven through `TestBed.runInInjectionContext`
+because auto-load is deferred off the materialize pass:
+
+```text
+1  synchronous load() throw   -> node.error(), loading released
+2  promise rejection          -> node.error()
+3  observable error           -> node.error()
+```
+
+Each also asserts nothing reaches the central reporter.
+
+## ⚠️ The discriminator — restoring ONLY the central call
+
+```text
+DEAD    the inventory pins (5 files' worth)
+DEAD    control 1's CENTRAL-ABSENCE assertion only
+GREEN   control 1's node.error() assertions
+GREEN   controls 2 and 3 entirely
+```
+
+Control 1 failed on `expected 1 to be +0` — the reporter count — with its local
+assertions already passed. So the mutation cleanly separates:
+
+```text
+LOCAL supported error behaviour     unaffected
+RETIRED internal global reporting   detected
+```
+
+which is the whole point of the change.
+
+`asyncSource` FULL retirement stays in the original migration phase.
+
+```text
+before   2203 passing
+after    2206 passing
+```
