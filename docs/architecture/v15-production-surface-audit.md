@@ -15771,8 +15771,8 @@ SOURCE-OBSERVATION-ACTIVATION-0  CLOSED — GREEN
 OBSERVATION-LIFECYCLE-0          CLOSED — GREEN / POS-A
 DESCENDANT-MATERIALIZATION-0     CLOSED — MAT-A
 
-OBSERVATION-METADATA-FIDELITY-0  NEXT
-OBSERVATION-OVERLAP-0            then
+OBSERVATION-METADATA-FIDELITY-0  CLOSED — GREEN (F1/F2/F3/F4)
+OBSERVATION-OVERLAP-0            NEXT
 ENTITY-ACQUISITION-CONTROL-0     then
 LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0  then
     -> if all green, authorize production implementation
@@ -15850,12 +15850,49 @@ So `MutationKind` is not observable by any notification consumer. Classified DEA
 TAXONOMY **for the observation carrier** — deliberately not "delete the type",
 which is a separate question about `MutationEnvelope` itself.
 
-### Still open in this phase
+## `OBSERVATION-METADATA-FIDELITY-0` — F1/F3/F4, one semantic matrix
 
-`F1` (full envelope inventory, incumbent vs dormant), `F3` (participation
-fidelity for actual physical mutations — carrier only, not authority policy),
-`F4` (the `origin: 'devtools'` vs `participation: 'inspection'` control, so the
-old incorrect predicate is not re-encoded).
+Run with the F2 defect CORRECTED in the scratch, so the arm receives the
+operation and derives intent rather than hardcoding it. Eight cases, incumbent
+carrier (`mutation-capture + position-topology`) against the dormant candidate,
+comparing the actual notifier metadata rather than endpoint behaviour.
+
+```text
+                          intent    participation  origin
+authored / set            replace   null           null      = =  both carriers
+authored / update         derive    null           null      = =
+inspection / set          replace   inspection     devtools  = =
+inspection / update       derive    inspection     devtools  = =
+realized / set            replace   realized       external  = =
+realized / update         derive    realized       external  = =
+devtools+authored / set   replace   NULL           devtools  = =
+devtools+authored / update derive   NULL           devtools  = =
+```
+
+`path`, `ownerPath`, `before`, `after`, `mutationIntent`, `participation`,
+`origin`, `intent` and position-id PRESENCE are identical in every cell.
+
+**F3 green.** Participation attribution survives the dormant carrier for all
+three values across both operations. Carrier fidelity only — inspection
+exclusion, eligible authority and complete acquisition remain consumer semantics
+and were deliberately not exercised here.
+
+**F4 green.** `origin: 'devtools'` with no inspection participation reports
+`participation: null` in BOTH carriers. The rejected "devtools origin means
+inspection" predicate is not re-encoded.
+
+**F1 green, by classification rather than byte equality.** The only difference is
+`ownerId`, which varies because each case constructs a fresh tree with a fresh
+registry — REPRESENTATIONAL, and the closure criterion explicitly does not
+require numeric position/owner identity across separately constructed trees. No
+field was classified UNKNOWN, so there is no stop here.
+
+The corrected `update -> derive` path is confirmed working, which closes the
+loop on the F2 defect.
+
+`OBSERVATION-METADATA-FIDELITY-0` is CLOSED. Remaining before implementation:
+`OBSERVATION-OVERLAP-0`, `ENTITY-ACQUISITION-CONTROL-0`,
+`LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0`.
 
 ## OPEN
 
