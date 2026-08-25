@@ -7,6 +7,11 @@ import { getPathNotifier } from './path-notifier';
 import { reportTreeError } from './internals/error-reporter';
 import { getPositionRegistry } from './internals/position-registry';
 import { isInspectionWrite } from './write-participation';
+import { getEntityProjectionSeed } from './internals/entity-projection-seed';
+import {
+  createEntityEgressProjection,
+  type EntityEgressProjection,
+} from './internals/entity-egress-projection';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
 import type { EntitySignal } from './types';
@@ -249,6 +254,19 @@ export function link<S>(
   let eligible: T = read();
 
   /**
+   * A collection source keeps its eligible value as a SUBJECT-KEYED projection
+   * rather than a patched `Row[]`. `Row[]` carries no identity, and a rekey
+   * moves an address without touching the payload, so nothing in the value
+   * itself can say which lifetime an event refers to.
+   *
+   * Seeded here, at the same RELATIONSHIP-CREATION ADOPTION boundary as
+   * `eligible` above and from the same current truth.
+   */
+  const entityProjection: EntityEgressProjection | undefined = collection
+    ? createEntityEgressProjection(getEntityProjectionSeed(x) ?? [])
+    : undefined;
+
+  /**
    * Immutable application of one eligible leaf value onto the previous eligible
    * value. Deliberately NOT `read()`-based: re-reading current state after an
    * eligible notification is exactly how inspection contamination re-enters,
@@ -288,7 +306,6 @@ export function link<S>(
     // against current state. That preserves every existing collection contract
     // and leaves the inspection defect OPEN for collections only, which is
     // recorded rather than hidden.
-    if (collection) return;
     // A whole-source notification already carries the complete value: the
     // scalar case, where `path === ownerPath`.
     if (path === ownerPath) {
@@ -347,11 +364,18 @@ export function link<S>(
     // an authored mutation to be reduced.
     eligible = value;
     external(() => write(value));
+    // ⚠️ AND THE SUBJECT SHADOW IS RESEEDED, not reduced. Applying inbound truth
+    // may emit no notification at all when it coincides with what is already
+    // shown (the I4 case), so the shadow is rebuilt from the post-apply
+    // topology rather than inferred from events that may never arrive.
+    if (entityProjection) {
+      entityProjection.reseed(getEntityProjectionSeed(x) ?? []);
+    }
   };
 
   const offSub = notifier.subscribe(
     '**',
-    (v, prev, path, _o, _origin, _s, _pos, meta) => {
+    (v, prev, path, _o, _origin, subjectIds, _pos, meta) => {
       if (disposed || !endpoint.set) return;
       // OWNER-PING-0. Two same-shaped trees give their collections the SAME
       // local position id, so identity is (registry, position) — never the
@@ -372,7 +396,24 @@ export function link<S>(
       // outbound work is armed. Keyed on PARTICIPATION, never on
       // `origin === 'devtools'` — provenance says where a write came from,
       // participation says which causal mechanisms it may take part in.
-      if (isInspectionWrite(meta)) return;
+      const inspection = isInspectionWrite(meta);
+      if (entityProjection) {
+        // Inspection reaches the projection, but only to leave latent
+        // structural context — CAUSAL DEPENDENCY ADOPTION. It never advances
+        // authority, and `apply` says so by returning false.
+        const effect = (meta as Record<string, unknown> | undefined)?.[
+          'structuralEffect'
+        ] as Parameters<EntityEgressProjection['apply']>[2];
+        const advanced = entityProjection.apply(
+          subjectIds?.[0],
+          v,
+          effect,
+          inspection
+        );
+        if (advanced) dirty = true;
+        return;
+      }
+      if (inspection) return;
       advanceEligible(path, v);
       dirty = true;
     }
@@ -414,7 +455,9 @@ export function link<S>(
               // LINK-RACE-1 and it is preserved. What changed is WHAT is
               // reconciled: an inspection write that moved local state cannot
               // enter here, because it never advanced `eligible`.
-              const now = collection ? read() : eligible;
+              const now = entityProjection
+                ? (entityProjection.value() as unknown as T)
+                : eligible;
               if (knownY !== undefined && deepEqual(now, knownY.value)) return;
               await endpoint.set?.(now);
               knownY = { value: now };
