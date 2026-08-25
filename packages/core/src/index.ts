@@ -193,6 +193,8 @@ export { undoable } from './lib/undoable';
  *   classification; `withWriteContext` stays enhancer plumbing.
  */
 export { external } from './lib/external';
+export { link } from './lib/link';
+export type { Link, LinkEndpoint, NaturalValue } from './lib/link';
 
 // `getPathNotifier` is not root app API. `composeEnhancers` left the root barrel
 // in v12 too and was deleted outright in 15.0 — pass the enhancers declaratively:

@@ -10,6 +10,7 @@ import { getPathNotifier } from './path-notifier';
 import { getPositionRegistry } from './internals/position-registry';
 import { restoration } from '../enhancers/restoration/restoration';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
+import { link as productionLink } from './link';
 import { signalTree } from './signal-tree';
 import { transactions } from '../enhancers/transactions/transactions';
 import { withWriteContext } from './write-context';
@@ -47,7 +48,6 @@ interface Endpoint<T> {
   subscribe?(next: (value: T) => void): () => void;
 }
 
-let nextLinkId = 1;
 
 const linkableWrite = <T>(x: unknown): ((value: T) => void) => {
   if (!getPositionRegistry(x)) {
@@ -61,106 +61,13 @@ const linkableWrite = <T>(x: unknown): ((value: T) => void) => {
   throw new Error('LINK: X must be writable.');
 };
 
-const makeLink = <T>(x: unknown, endpoint: Endpoint<T>) => {
-  // CASE 1. Every member is optional, so an EMPTY endpoint type-checks. It
-  // describes no relationship at all: nothing enters X, nothing leaves it. That
-  // is a caller mistake and silence would hide it — the link would look
-  // installed and do nothing forever.
-  if (!endpoint.get && !endpoint.set && !endpoint.subscribe) {
-    throw new Error(
-      'LINK: an endpoint must supply at least one of get, set or subscribe.'
-    );
-  }
-
-  const registry = getPositionRegistry(x);
-  const write = linkableWrite<T>(x);
-  const linkId = `link#${nextLinkId++}`;
-  const ownerPath = (x as { __ownerPath?: string }).__ownerPath ?? '';
-
-  let disposed = false;
-  let chain: Promise<unknown> = Promise.resolve();
-  let unsubscribeSource: (() => void) | undefined;
-  /** CASE 5: monotonic inbound sequence, so a slow get cannot land on a newer push. */
-  let inboundSeq = 0;
-
-  const acquire = (value: T, seq: number) => {
-    if (disposed) return;
-    if (seq < inboundSeq) return; // superseded by a newer acquisition
-    inboundSeq = seq;
-    withWriteContext(
-      { origin: 'external', participation: 'realized', correlationId: linkId },
-      () => write(value)
-    );
-  };
-
-  const readX = () => (x as () => unknown)();
-
-  const offNotifier = endpoint.set
-    ? getPathNotifier().subscribe(
-        '**',
-        (_n, _p, path, _o, _origin, _s, _pos, meta) => {
-          if (disposed) return;
-          const m = (meta ?? {}) as Record<string, unknown>;
-          if (m['ownerId'] !== registry?.id) return;
-          if (
-            ownerPath !== '' &&
-            path !== ownerPath &&
-            !path.startsWith(`${ownerPath}.`)
-          ) {
-            return;
-          }
-          if (m['correlationId'] === linkId) return;
-
-          scheduleDurableConsequence({
-            claimant: x as object,
-            key: linkId,
-            run: () => {
-              if (disposed) return;
-              const current = readX() as T;
-              chain = chain
-                .then(() => endpoint.set?.(current))
-                .catch((error) => {
-                  // CASE 3. Routed to the EXISTING central reporter, so `Link`
-                  // needs no error surface of its own.
-                  reportTreeError({
-                    error,
-                    source: 'persistence',
-                    operation: 'link:set',
-                    path: ownerPath || undefined,
-                    detail: 'LINK: outbound set() rejected',
-                  });
-                });
-            },
-          });
-        }
-      )
-    : undefined;
-
-  if (endpoint.subscribe) {
-    unsubscribeSource = endpoint.subscribe((v) => acquire(v, ++inboundSeq));
-  }
-
-  return {
-    linkId,
-    async retrieve() {
-      if (!endpoint.get) throw new Error('LINK: endpoint supplies no get().');
-      // The sequence is claimed BEFORE the await, so a get() that started
-      // earlier and resolves later is knowably older than a push that started
-      // after it.
-      const seq = ++inboundSeq;
-      const value = await endpoint.get();
-      acquire(value, seq);
-    },
-    async settled() {
-      await chain;
-    },
-    dispose() {
-      disposed = true;
-      offNotifier?.();
-      unsubscribeSource?.();
-    },
-  };
-};
+/**
+ * PRODUCTION. This battery originally carried a test-local reference
+ * harness, which is how the semantics were DISCOVERED. It now exercises the
+ * shipped function, so the earned contract cannot drift from what ships.
+ */
+const makeLink = <T>(x: unknown, endpoint: Endpoint<T>) =>
+  productionLink<never>(x as never, endpoint as Endpoint<never>);
 
 const makeTree = () =>
   signalTree(
@@ -190,7 +97,19 @@ describe('LINK-2 cases 1 & 5: the endpoint contract', () => {
     const pull = makeLink<string>(tree.$.leaf, { get: () => 'g' });
     const push = makeLink<string>(tree.$.leaf, { set: () => void 0 });
     const live = makeLink<string>(tree.$.leaf, { subscribe: () => () => void 0 });
-    for (const l of [pull, push, live]) expect(l.linkId).toMatch(/^link#/);
+
+    // WAS `expect(l.linkId).toMatch(/^link#/)`. `linkId` was a REFERENCE-HARNESS
+    // artifact and is not on the shipped handle, which is deliberately three
+    // members. Asserting it against production would have grown the public
+    // surface to satisfy a test rather than a demonstrated need — so the
+    // assertion now states the case's actual point: each single-direction
+    // endpoint constructs a usable link on its own.
+    for (const l of [pull, push, live]) {
+      expect(typeof l.retrieve).toBe('function');
+      expect(typeof l.settled).toBe('function');
+      expect(typeof l.dispose).toBe('function');
+      expect((l as Record<string, unknown>)['linkId']).toBeUndefined();
+    }
     for (const l of [pull, push, live]) l.dispose();
   });
 

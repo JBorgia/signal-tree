@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { deepEqual } from './utils';
 import { entityMap } from './types';
-import { external } from './external';
-import { getPathNotifier } from './path-notifier';
-import { getPositionRegistry } from './internals/position-registry';
+import { link as productionLink } from './link';
 import { restoration } from '../enhancers/restoration/restoration';
-import { scheduleDurableConsequence } from './internals/commit-consequence';
 import { signalTree } from './signal-tree';
 import { transactions } from '../enhancers/transactions/transactions';
 import { undoable } from './undoable';
@@ -54,107 +50,14 @@ interface LinkEndpoint<T> {
 }
 
 /**
- * A collection-aware read/write pair, resolved from the NODE rather than
- * configured by the caller. This is the whole question: whether the shape can be
- * inferred, or whether it leaks into the public surface.
+ * ⚠️ PRODUCTION. This battery originally carried a test-local reference harness
+ * plus its own `accessorsFor`, which is how the collection read/write rule was
+ * DISCOVERED. Both now live in `link.ts`, and this file exercises the shipped
+ * function so the earned semantics cannot drift from the implementation.
  */
-const accessorsFor = <T>(x: unknown) => {
-  const coll = x as {
-    all?: () => T;
-    setAll?: (v: T) => void;
-    set?: (v: T) => void;
-  };
-  if (typeof coll.all === 'function' && typeof coll.setAll === 'function') {
-    return { read: () => coll.all!() as T, write: (v: T) => coll.setAll!(v) };
-  }
-  if (typeof coll.set === 'function') {
-    return { read: () => (x as () => T)(), write: (v: T) => coll.set!(v) };
-  }
-  return { read: () => (x as () => T)(), write: (v: T) => (x as (v: T) => void)(v) };
-};
+const link = <T>(x: unknown, endpoint: LinkEndpoint<T>) =>
+  productionLink<never>(x as never, endpoint as LinkEndpoint<never>);
 
-const link = <T>(x: unknown, endpoint: LinkEndpoint<T>) => {
-  const registry = getPositionRegistry(x);
-  if (!registry) throw new Error('link: X must be an owned SignalTree location.');
-  const { read, write } = accessorsFor<T>(x);
-  const ownerPath = (x as { __ownerPath?: string }).__ownerPath ?? '';
-  const notifier = getPathNotifier();
-
-  let knownY: { value: T } | undefined;
-  let disposed = false;
-  let dirty = false;
-  let chain: Promise<unknown> = Promise.resolve();
-  let inboundSeq = 0;
-
-  const acquire = (value: T, seq: number) => {
-    if (disposed || seq < inboundSeq) return;
-    inboundSeq = seq;
-    knownY = { value };
-    external(() => write(value));
-  };
-
-  const offSub = notifier.subscribe(
-    '**',
-    (v, prev, path, _o, _origin, _s, _pos, meta) => {
-      if (disposed || !endpoint.set) return;
-      const m = (meta ?? {}) as Record<string, unknown>;
-      if (m['ownerId'] !== registry.id) return;
-      if (
-        ownerPath !== '' &&
-        path !== ownerPath &&
-        !path.startsWith(`${ownerPath}.`)
-      ) {
-        return;
-      }
-      if (v === undefined && prev === undefined) return;
-      dirty = true;
-    }
-  );
-
-  const offFlush = notifier.onFlush?.(() => {
-    if (disposed || !dirty) return;
-    dirty = false;
-    scheduleDurableConsequence({
-      claimant: x as object,
-      key: link,
-      run: () => {
-        if (disposed) return;
-        chain = chain
-          .then(async () => {
-            for (;;) {
-              if (disposed) return;
-              const now = read();
-              if (knownY !== undefined && deepEqual(now, knownY.value)) return;
-              await endpoint.set?.(now);
-              knownY = { value: now };
-            }
-          })
-          .catch(() => void 0);
-      },
-    });
-  });
-
-  const offSource = endpoint.subscribe
-    ? endpoint.subscribe((v) => acquire(v, ++inboundSeq))
-    : undefined;
-
-  return {
-    async retrieve() {
-      if (!endpoint.get) throw new Error('link: endpoint supplies no get().');
-      const seq = ++inboundSeq;
-      acquire((await endpoint.get()) as T, seq);
-    },
-    async settled() {
-      await chain;
-    },
-    dispose() {
-      disposed = true;
-      offSub();
-      offFlush?.();
-      offSource?.();
-    },
-  };
-};
 
 const collTree = () =>
   signalTree(

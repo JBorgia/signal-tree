@@ -12506,3 +12506,126 @@ so the test is unidentified. Six subsequent runs are clean, three of them with
 Recorded rather than dismissed: an intermittent at roughly 1-in-7 is worth
 watching, and the procedural lesson is that suite runs whose output is piped
 through `grep` lose the failure detail that identifies it.
+
+---
+
+# FLAKE-HUNT-0 — the intermittent is IDENTIFIED
+
+Bounded hunt: 10 uncached runs with full logs retained, stop on first failure.
+All 10 clean.
+
+⚠️ **But the culprit surfaced anyway, during the Link port.**
+
+```text
+entity-granular-reactivity.spec.ts
+  "a single-entity update does not rebuild the collection"
+  expect(perUpdate).toBeLessThan(0.05)   measured 0.082
+```
+
+A wall-clock assertion. It passed 6/6 in isolation immediately afterwards and
+has failed once under full-suite load — the same signature as the earlier
+unidentified failure (one test, unreproducible, no state change).
+
+**So the flake is a machine-speed-dependent timing bound, not a correctness
+defect.** It belongs to the already-filed performance-proof work: replace fragile
+single-best timing with warmup plus a robust statistic. Not fixed here — that is
+a separate change and folding it into the Link commit would confound both.
+
+---
+
+# PRODUCTION `link()` — shipped
+
+`packages/core/src/lib/link.ts`
+
+```ts
+const connection = link(source, endpoint);
+await connection.retrieve();
+await connection.settled();
+connection.dispose();
+```
+
+Source-driven `NaturalValue<S>`, marker-based truthful-source admission, and the
+three-member handle. No `linkCollection()`, no mode flag, no required generic, no
+`afterCommit`/`onCommitted`, no public settlement hooks.
+
+## Admission — TYPE TRUTHFULNESS, not topology
+
+```text
+ADMIT    tree.$.count      number
+         tree.$.rows       Row[]
+         tree.$.nested.users   User[]   (the escape hatch for a bad enclosure)
+         tree.$.plain      { a, b }
+         a root with NO collection anywhere
+
+REJECT   tree.$.nested     contains an EntityMapBuilder
+         a root WITH a collection
+```
+
+⚠️ Rejection is at the SOURCE parameter, not by collapsing the endpoint value —
+proven with two negatives that would otherwise slip through: a subscribe-only
+endpoint and an empty one, neither of which contributes inference.
+
+## ⚠️ FOUR EARNED SEMANTICS THE PORT CAUGHT
+
+Running the permanent batteries against production found four gaps in my first
+implementation. Each was a contract a battery had already earned:
+
+```text
+DEMARCATION-0   an EMPTY endpoint must be REFUSED, not silently inert
+LINK-HANDLE-0   settled() is STRONG, not `await chain` — the weak form means
+                only "the chain I can currently see is drained" and misses
+                observations HELD behind settlement
+LINK-HANDLE-0   held observations are WAITERS, not a counter — a macrotask
+                settlement is invisible to a microtask poll
+LINK-2 case 3   a rejected send reaches the EXISTING central reporter, so the
+                handle needs no error member
+```
+
+**This is exactly why the batteries are ported rather than trusted.** A local
+harness that agrees with itself proves nothing about what ships.
+
+## ⚠️ TWO BATTERY CONFLICTS, RESOLVED IN FAVOUR OF THE LATER CONTRACT
+
+```text
+LINK-HANDLE-0   settled() THROWS the last failure
+LINK-2 case 3   errors go to onTreeError; settled() does NOT throw
+```
+
+LINK-2 is the public-contract battery and explicitly retires the earlier
+mechanism — "the harness's `failures` array in LINK-1 was a test convenience and
+is gone". Production reports centrally and `settled()` does not throw. LINK-1
+case 6's two tests were moved onto `onTreeError`; the SEMANTIC is unchanged, only
+where it is observed.
+
+```text
+LINK-2   expect(l.linkId).toMatch(/^link#/)
+```
+
+`linkId` was a REFERENCE-HARNESS artifact and is not on the shipped handle.
+⚠️ Adding it to satisfy the test would have grown the public surface for a test
+rather than a demonstrated need, so the assertion now states the case's actual
+point — each single-direction endpoint constructs a usable link — and pins that
+`linkId` is ABSENT.
+
+## `TreeErrorSource` gains `'link'`
+
+⚠️ This MOVES the ERROR-SURFACE-0 finding rather than closing it. `link.ts` is
+the third reporter and the first wired to something NOT being retired. The
+taxonomy still needs disposition before `onTreeError` is exported, and it now has
+a member a consumer would see.
+
+## Batteries running against production
+
+```text
+LINK-1  LINK-2  LINK-COLLECTION-0  DEMARCATION-0
+```
+
+⚠️ `LINK-HANDLE-0`, `LINK-HANDLE-1` and `LINK-ECHO-1` keep their local harnesses
+DELIBERATELY: each takes a `mode` parameter and exists to CONTRAST two candidate
+semantics. Their parameterization is the experiment, and collapsing them onto the
+single shipped behaviour would delete the comparison that chose it.
+
+```text
+before   2171 passing
+after    2171 passing (+ link.ts, + admission typing spec)
+```

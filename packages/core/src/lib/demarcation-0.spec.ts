@@ -9,6 +9,7 @@ import { getPathNotifier } from './path-notifier';
 import { getPositionRegistry } from './internals/position-registry';
 import { restoration } from '../enhancers/restoration/restoration';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
+import { link as productionLink } from './link';
 import { signalTree } from './signal-tree';
 import { transactions } from '../enhancers/transactions/transactions';
 
@@ -432,78 +433,13 @@ interface LinkEndpoint<T> {
  * `afterSet` / `afterChange`, no lifecycle callbacks: the application already
  * has X and reacts to it with ordinary Angular reactivity.
  */
-const link = <T>(x: unknown, endpoint: LinkEndpoint<T>) => {
-  if (!endpoint.get && !endpoint.set && !endpoint.subscribe) {
-    throw new Error('link: endpoint must supply at least one of get/set/subscribe.');
-  }
-  const leafSet = (x as { set?: (v: T) => void }).set;
-  const write =
-    typeof leafSet === 'function'
-      ? (v: T) => leafSet.call(x, v)
-      : (v: T) => (x as (v: T) => void)(v);
-  const readX = () => (x as () => unknown)() as T;
-
-  let knownY: { value: T } | undefined;
-  let disposed = false;
-  let chain: Promise<unknown> = Promise.resolve();
-  let inboundSeq = 0;
-
-  const acquire = (value: T, seq: number) => {
-    if (disposed || seq < inboundSeq) return;
-    inboundSeq = seq;
-    knownY = { value };
-    external(() => write(value)); // (1) inbound acquisition is external
-  };
-
-  const offCommitted = endpoint.set
-    ? observeCommitted<T>(x, (current) => {
-        if (disposed) return;
-        void current; // the late read happens inside the loop, not here
-        // ⚠️ NO SEPARATE ECHO CHECK. A guard here was redundant and mutation
-        // proved it: the reconciliation loop's FIRST iteration already compares
-        // current X against `knownY` and returns without sending. One equality
-        // check does both jobs — (6) echo suppression and (7) the convergence
-        // test are the same question asked at different moments.
-        //
-        // (4) async outbound writes serialise
-        chain = chain
-          .then(async () => {
-            // (7) LINK-RACE-1: reconcile until X equals Y's acknowledged state
-            for (;;) {
-              if (disposed) return;
-              const now = readX();
-              if (knownY !== undefined && deepEqual(now, knownY.value)) return;
-              await endpoint.set?.(now);
-              // (5) a successful set means Y acknowledges that value
-              knownY = { value: now };
-            }
-          })
-          .catch(() => void 0); // (8) no retry/backoff/status
-      })
-    : undefined;
-
-  const offSource = endpoint.subscribe
-    ? endpoint.subscribe((v) => acquire(v, ++inboundSeq))
-    : undefined;
-
-  return {
-    /** (2) explicit; there is no auto-hydration. */
-    async retrieve() {
-      if (!endpoint.get) throw new Error('link: endpoint supplies no get().');
-      // (3) a slow get cannot overwrite a newer inbound value
-      const seq = ++inboundSeq;
-      acquire((await endpoint.get()) as T, seq);
-    },
-    async settled() {
-      await chain;
-    },
-    dispose() {
-      disposed = true;
-      offCommitted?.();
-      offSource?.();
-    },
-  };
-};
+/**
+ * ⚠️ PRODUCTION. The demarcation controls now run against the shipped `link()`,
+ * so "userland can build this with public parts" is asserted about the real
+ * function rather than a local reimplementation of it.
+ */
+const link = <T>(x: unknown, endpoint: LinkEndpoint<T>) =>
+  productionLink<never>(x as never, endpoint as LinkEndpoint<never>);
 
 describe('DEMARCATION-0 Q1: does public link work on PRIVATE machinery?', () => {
   it('leaf — acquire, echo-suppress, and send an authored change', async () => {
