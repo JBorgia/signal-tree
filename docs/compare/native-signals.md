@@ -47,7 +47,7 @@ What native signals do **not** provide (and won't — they're primitives, not a 
 | Axis                                        | Raw signals                                       | SignalTree                                            |
 | ------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------- |
 | Single value / derived / writable-derived   | ✅ `signal`/`computed`/`linkedSignal`             | ✅ leaves + `.derived()` (heavier for this)           |
-| One async fetch                             | ✅ `resource`/`rxResource`                        | ✅ `asyncSource`/`asyncQuery` (comparable)            |
+| One async fetch                             | ✅ `resource`/`rxResource`                        | ✅ `asyncSource` (comparable)            |
 | **Deep nested state, signal at every path** | ⚠️ manual (signal-per-field or immutable replace) | ✅ automatic via the tree + partial deep-merge writes |
 | **Entity CRUD**                             | ❌ hand-rolled                                    | ✅ `entityMap`                                        |
 | **Forms / persistence / undo / DevTools**   | ❌ none                                           | ✅ markers + enhancers, **at any depth**              |

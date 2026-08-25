@@ -1,7 +1,6 @@
 import type { Signal, WritableSignal } from '@angular/core';
 
 import type { SignalTreeBuilder } from './internals/builder-types';
-import type { AsyncQuerySignal } from './markers/async-query';
 import type { AsyncSourceSignal } from './markers/async-source';
 import type { EntityLoaderSurface } from './markers/entity-loader';
 import type { StoredSignal } from './markers/stored';
@@ -13,7 +12,6 @@ import type {
   TreeNode,
 } from './types';
 import {
-  ASYNC_QUERY_READERS,
   ASYNC_SOURCE_READERS,
   ENTITY_LOADER_READERS,
   ENTITY_READERS,
@@ -144,14 +142,6 @@ export type ReadonlyAsyncSourceSignal<V> = {
   (): V | undefined;
 } & PickReaders<AsyncSourceSignal<V>, (typeof ASYNC_SOURCE_READERS)[number]>;
 
-/** Read-only view of {@link AsyncQuerySignal}: callable read + demoted `input` + results. */
-export type ReadonlyAsyncQuerySignal<In, Out> = {
-  (): Out | undefined;
-} & PickReaders<
-  AsyncQuerySignal<In, Out>,
-  (typeof ASYNC_QUERY_READERS)[number]
->;
-
 // =============================================================================
 // THE VIEW
 // =============================================================================
@@ -199,9 +189,6 @@ type ReadonlyViewOf<T> = T extends EntitySignal<
   ? ReadonlyEntitySignal<E, K> & ReadonlyExtras<T, EntitySignal<E, K>>
   : T extends StoredSignal<infer V>
   ? ReadonlyStoredSignal<V> & ReadonlyExtras<T, StoredSignal<V>>
-  : T extends AsyncQuerySignal<infer In, infer Out>
-  ? ReadonlyAsyncQuerySignal<In, Out> &
-      ReadonlyExtras<T, AsyncQuerySignal<In, Out>>
   : T extends AsyncSourceSignal<infer V>
   ? ReadonlyAsyncSourceSignal<V> & ReadonlyExtras<T, AsyncSourceSignal<V>>
   : T extends CallableWritableSignal<infer V>

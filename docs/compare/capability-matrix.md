@@ -351,7 +351,7 @@ get observability would import the ceremony the library exists to avoid.
 
 **Verdict: decline the action model; take the requirement.** The real gap is
 that a failed async operation has no global observation point. That is
-answerable within our model via `asyncQuery`/`asyncSource` status transitions —
+answerable within our model via `asyncSource` status transitions —
 closer to a `onAsyncSettled` hook than to NGXS actions.
 
 ### 7. Global unhandled-error hook — NGXS only
@@ -620,7 +620,7 @@ before treating any row of this document as a strategy.
   every consumer of that slice recomputes. This is the only row in the matrix
   where the answer is ✅/❌/❌/❌/❌, and it is the actual thesis of the library.
 - **Markers as one concept** — `form()`, `status()`, `stored()`, `asyncSource()`,
-  `asyncQuery()`, `loader()`, `compared()`, `derived()`, `linked()` all register
+  `loader()`, `compared()`, `derived()`, `linked()` all register
   through one extension point, `registerMarkerProcessor`. The others solve each
   of these with a differently-shaped plugin, or not at all.
 - **Forms** — a form model with validators and a wizard, in the state library.

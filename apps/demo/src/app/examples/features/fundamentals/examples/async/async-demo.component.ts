@@ -9,7 +9,8 @@ import {
 /**
  * Async Operations — fundamentals tour entry.
  *
- * The canonical async demo lives at /async (asyncSource + asyncQuery markers).
+ * The canonical async demo lives at /async. SignalTree 15 has no async marker:
+ * debouncing, dedup and latest-wins are RxJS, and the tree only stores the result.
  * This entry exists in the fundamentals tour as a pointer so the tour
  * acknowledges async without duplicating the full interactive demo.
  *
@@ -31,29 +32,48 @@ export class AsyncDemoComponent {
     {
       label: 'store.ts',
       language: 'typescript',
-      source: `import { signalTree, asyncSource, asyncQuery } from '@signaltree/core';
+      source: `import { signalTree, external } from '@signaltree/core';
+import { Subject, debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs';
 
+// The TREE holds state. It does not own the request pipeline.
 const store = signalTree({
-  users: asyncSource<User[]>({
-    initial: [],
-    load: () => this.api.list$(),
-  }),
-  search: asyncQuery<string, User[]>({
-    initialResult: [],
-    debounce: 300,
-    filter: (q) => q.length > 0,
-    query: (q) => this.api.search$(q),
-  }),
+  results: [] as User[],
+  loading: false,
+  error: null as unknown,
 });
 
-// Uniform reads:
-store.$.users();           // User[] | undefined
-store.$.users.loading();   // boolean
-store.$.users.error();     // unknown | null
-store.$.users.refresh();   // reload (cancels in-flight)
+// The PIPELINE is ordinary RxJS, owned by your service.
+//   debounceTime           -> debounce
+//   distinctUntilChanged   -> dedup
+//   switchMap              -> cancellation AND latest-wins
+const query$ = new Subject<string>();
 
-store.$.search.input.set('alice');  // drives debounced pipeline
-store.$.search();                    // results`,
+query$
+  .pipe(
+    debounceTime(300),
+    filter((q) => q.length > 0),
+    distinctUntilChanged(),
+    switchMap((q) => {
+      store.$.loading.set(true);
+      return this.api.search$(q);
+    })
+  )
+  .subscribe({
+    // external() marks this as authored from OUTSIDE the application's own
+    // mutations — the tree records it as an ingress, not a user edit.
+    next: (users) => external(() => {
+      store.$.results.set(users);
+      store.$.loading.set(false);
+      store.$.error.set(null);
+    }),
+    error: (err) => external(() => {
+      store.$.error.set(err);
+      store.$.loading.set(false);
+    }),
+  });
+
+query$.next('alice');   // drives the debounced pipeline
+store.$.results();      // User[]`,
     },
   ];
 }

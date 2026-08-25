@@ -1,4 +1,3 @@
-import type { AsyncQuerySignal } from './markers/async-query';
 import type { AsyncSourceSignal } from './markers/async-source';
 import type { EntityLoaderSurface } from './markers/entity-loader';
 import type { StoredSignal } from './markers/stored';
@@ -43,14 +42,3 @@ export const ASYNC_SOURCE_READERS = [
   'error',
 ] as const satisfies readonly (keyof AsyncSourceSignal<unknown>)[];
 
-/**
- * Readers on {@link AsyncQuerySignal}. `input` is demoted to a plain Signal in
- * the readonly view; `rerun`/`reset` are absent.
- */
-export const ASYNC_QUERY_READERS = [
-  'input',
-  'results',
-  'data',
-  'loading',
-  'error',
-] as const satisfies readonly (keyof AsyncQuerySignal<unknown, unknown>)[];

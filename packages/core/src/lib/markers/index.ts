@@ -47,16 +47,6 @@ export {
 } from './async-source';
 
 // Async-query marker - input-driven debounced query primitive (v9.5)
-export {
-  asyncQuery,
-  isAsyncQueryMarker,
-  createAsyncQuerySignal,
-  ASYNC_QUERY_MARKER,
-  type AsyncQueryMarker,
-  type AsyncQuerySignal,
-  type AsyncQueryConfig,
-  type AsyncQueryFn,
-} from './async-query';
 
 // Cache-aware (single-scope) loading for entityMap (RFC 0002/0003) — the loader surface that
 // `entityMap({ load, … })` attaches. `entityMap` itself is exported from ./types.

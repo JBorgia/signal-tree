@@ -14,11 +14,13 @@
           <code>reset</code>. Accepts Observable or Promise loaders.
         </li>
         <li>
-          <strong><code>asyncQuery&lt;TInput, TResult&gt;(config)</code></strong> —
-          input-driven debounced query. Writable <code>input</code> signal
-          drives a built-in <code>debounce → filter → distinctUntilChanged →
-          switchMap</code> pipeline. Race conditions, cancellation, dedup all
-          handled automatically.
+          <strong>Input-driven debounced search</strong> — no SignalTree marker.
+          The pipeline is ordinary RxJS in your service:
+          <code>debounceTime → filter → distinctUntilChanged → switchMap</code>.
+          <code>switchMap</code> already gives cancellation and latest-wins, and
+          <code>distinctUntilChanged</code> already gives dedup — SignalTree adds
+          no causal authority over any of them, so it owns none of them. Results
+          land in plain tree state through <code>external()</code>.
         </li>
       </ul>
       <p>

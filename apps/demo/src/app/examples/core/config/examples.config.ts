@@ -289,7 +289,7 @@ export const EXAMPLES_REGISTRY: ExampleMeta[] = [
     id: 'whats-new',
     title: "What's New",
     description:
-      'Latest: v9.6.0 removed rxMethod; v9.5.x shipped asyncSource/asyncQuery markers plus AI-discoverability docs.',
+      'Latest: SignalTree 15 retires the async markers — debounce, dedup and\n      latest-wins are RxJS, and the tree stores the result.',
     category: 'General',
     focusAreas: ['news', 'changelog'],
     functionalUse: ['release-notes'],

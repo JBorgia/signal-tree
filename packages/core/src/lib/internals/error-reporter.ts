@@ -12,7 +12,7 @@ import type { TreeId } from './position-registry';
  * A capability audit against NGXS found `NgxsUnhandledErrorHandler` and nothing
  * equivalent anywhere else, ours included. The gap is real and narrow: a
  * `stored()` write that fails, an `asyncSource` loader that rejects, an
- * `asyncQuery` that throws — each is caught at its own site and turned into
+ * an async loader that rejects — each is caught at its own site and turned into
  * local error state, which is correct, and each is therefore invisible to
  * anything that wants to see ALL of them. Reporting to Sentry meant wiring a
  * per-marker `onError` at every call site and remembering to do it forever.

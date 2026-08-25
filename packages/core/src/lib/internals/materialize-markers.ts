@@ -431,7 +431,7 @@ export function registerMarkerProcessor<T, R>(
 
 /**
  * Register a built-in marker processor (status, entityMap, stored, form,
- * asyncSource, asyncQuery).
+ * asyncSource).
  *
  * Built-in markers self-register lazily on first factory call (for tree-shaking).
  * That factory call always happens INSIDE the state literal — `signalTree({ x:

@@ -437,7 +437,7 @@ Snapshot from one production Angular mobile app's NgRx Signal Store → SignalTr
 
 This is the most common migration path. We ship a complete, AI-agent-ready migration guide that covers:
 
-- A concept map that's mechanical for the common cases (`signalStore` → tree slice + `Ops`, `withState` → initial state, `withEntities` → `entityMap()` marker) and supplies a decision tree for `rxMethod` migrations (`asyncSource` for load-and-expose, `asyncQuery` for input-driven, plain Observable method on an Ops class for multi-stage orchestration)
+- A concept map that's mechanical for the common cases (`signalStore` → tree slice + `Ops`, `withState` → initial state, `withEntities` → `entityMap()` marker) and supplies a decision tree for `rxMethod` migrations (an ordinary RxJS pipeline in a service, with results landed through `external()`; `link()` where the relationship is genuinely a live external synchronization)
 - **Three migration strategies** with explicit decision criteria — big-bang (one PR), incremental per-domain (one PR per store), and hybrid legacy-facade (permanent coexistence fallback)
 - A **`Phase 0` recipe** for landing the foundation in a single dependency-only PR before touching any consumer
 - The [`scripts/verify-signaltree-migration.sh`](scripts/verify-signaltree-migration.sh) script — drop-in, package-manager-agnostic, runs `build` + `test` + `lint` and asserts `@ngrx/signals` is gone from source and `package.json`
@@ -470,17 +470,12 @@ tree.$.users.all();
 signalTree(state, { enhancers: [enhancer()], derived: derivedFn });
 tree.derived(derivedFn); // Derived state can also be added after construction
 
-// Async — markers attach at any tree path (rxMethod was removed in v9.6.0)
-const tree = signalTree({
-  users: asyncSource<User[]>({ initial: [], load: () => api.list$() }),
-  search: asyncQuery<string, User[]>({
-    initialResult: [],
-    debounce: 300,
-    query: (q) => api.search$(q),
-  }),
-});
-tree.$.users.refresh(); // reload (cancels in-flight)
-tree.$.search.input.set('q'); // drives the debounced pipeline
+// Async — the tree stores results; the pipeline is ordinary RxJS
+const tree = signalTree({ results: [] as User[], loading: false });
+query$
+  .pipe(debounceTime(300), distinctUntilChanged(), switchMap(api.search$))
+  .subscribe((users) => external(() => tree.$.results.set(users)));
+// switchMap gives cancellation and latest-wins; SignalTree owns neither.
 
 // Lifecycle
 tree.destroy(); // Clean up all resources

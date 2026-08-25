@@ -22,7 +22,7 @@ prompt: |
 expected_patterns:
   signaltree:
     must_include: ['signalTree(']
-    should_include_one_of: ['asyncQuery', 'debounceTime']
+    should_include_one_of: ['debounceTime']
   ngrx-signals:
     must_include: ['rxMethod', 'debounceTime', 'switchMap']
 

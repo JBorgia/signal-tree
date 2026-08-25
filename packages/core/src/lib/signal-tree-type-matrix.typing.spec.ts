@@ -68,7 +68,6 @@
 import type { Signal } from '@angular/core';
 
 import { entityMap, signalTree } from '../index';
-import { asyncQuery } from './markers/async-query';
 import { stored } from './markers/stored';
 import type {
   AccessibleNode,
@@ -79,7 +78,6 @@ import type {
   SignalTree,
   TreeNode,
 } from '../index';
-import type { AsyncQuerySignal } from './markers/async-query';
 import type { StoredSignal } from './markers/stored';
 
 // --- compile-time assertion helpers -----------------------------------------
@@ -302,18 +300,11 @@ built.$.user.set({ name: 'Bob', age: 1, address: { city: 'x' } });
 // B3 — markers resolve through the constructed value, including at depth.
 const builtMarkers = signalTree({
   theme: stored('theme', 'light' as 'light' | 'dark'),
-  search: asyncQuery<string, User[]>({
-    initialResult: [],
-    query: () => Promise.resolve([]),
-  }),
   plain: 0,
   nested: { deep: 0 },
 });
 export type _BuiltMarkers = [
   Expect<Equal<(typeof builtMarkers)['$']['theme'], StoredSignal<'light' | 'dark'>>>,
-  Expect<
-    Equal<(typeof builtMarkers)['$']['search'], AsyncQuerySignal<string, User[]>>
-  >,
   Expect<Equal<(typeof builtMarkers)['$']['plain'], CallableWritableSignal<number>>>,
   // a marker at depth still resolves — the "any depth" claim
   Expect<Equal<(typeof builtMarkers)['$']['nested']['deep'], CallableWritableSignal<number>>>
