@@ -15773,8 +15773,8 @@ DESCENDANT-MATERIALIZATION-0     CLOSED — MAT-A
 
 OBSERVATION-METADATA-FIDELITY-0  CLOSED — GREEN (F1/F2/F3/F4)
 OBSERVATION-OVERLAP-0            CLOSED — OVERLAP-A
-ENTITY-ACQUISITION-CONTROL-0     PARTIAL — stop works, E2 control is a no-op
-LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0  then
+ENTITY-ACQUISITION-CONTROL-0     CLOSED — ENTITY-N (narrowed)
+LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0  NEXT — last planned gate
     -> if all green, authorize production implementation
     -> retained memory required BEFORE final substrate freeze
 ```
@@ -15952,7 +15952,7 @@ overlapping claims and retention after final disarm — `theme` keeps
 None of OVERLAP-B (duplicate installation), OVERLAP-C (release stealing another
 consumer's leaf) or OVERLAP-D (identity churn) occurred.
 
-## `ENTITY-ACQUISITION-CONTROL-0` — PARTIAL, and it uncovered a fourth defect
+## `ENTITY-ACQUISITION-CONTROL-0` — CLOSED, ENTITY-N (narrowed)
 
 Two results, and only one of them is what the phase was looking for.
 
@@ -15969,12 +15969,40 @@ generic walk recurses through `byId`, `all`, `asMap` and the mutators — and ar
 exactly the same set: none. Those members are functions and computeds without an
 `__arm`, so `claimLeaf` declines them and the recursion finds nothing to claim.
 
-So the E2 control does not cross an authoritative checker, and by the rule that
-governs it — **mutation evidence only matters if it crosses a checker** — this
-phase CANNOT be closed ENTITY-A on the evidence gathered. The stop is defensible
-on cost and blast-radius grounds, but "recursion would arm entity internals" is
-NOT demonstrated. A load-bearing discriminator has to be designed against the
-actual entity surface, or the claim has to be narrowed to what was measured.
+So the E2 control does not cross an authoritative checker. The hypothesis
+**"generic recursion would instrument entity internals" is REFUTED for the
+current representation**, not merely unproven — and the phase is closed by
+NARROWING rather than by inventing a harmful surface to justify a design
+preference.
+
+### ENTITY-N, the frozen narrow result
+
+```text
+direct entity source           native observation works
+ordinary claims beneath entity NONE
+same, with the stop REMOVED    NONE
+ancestor branch                receives the native entity publication
+```
+
+> **ENTITY OBSERVATION REMAINS NATIVE.** Entity collections use their existing
+> structural carrier and require no ordinary dormant leaf claims. Generic
+> acquisition never needs to manufacture a second physical representation for
+> entity state.
+
+Do NOT freeze "generic recursion is harmful". It was measured benign with
+respect to ordinary claims.
+
+### ⚠️ And do NOT freeze `getNodeProcessor()` as the entity predicate
+
+It is proven to be the marker subsystem's canonical MATERIALIZATION stamp. It is
+NOT proven to mean *entity specifically* — it may match other marker-processed
+representations whose descendants DO require ordinary observation.
+
+Since the stop has no demonstrated correctness necessity, a blanket
+`if (getNodeProcessor(node)) return` must not go into production for symmetry or
+defence. If a stop is wanted for traversal cost or blast radius, first establish
+an entity-specific discriminator, or prove every marker-processed node owns an
+independent observation representation. OWNERSHIP-BEFORE-ADOPTION.
 
 ### `LINK-BRANCH-NESTED-ENTITY-0` — a fourth public-contract defect
 
@@ -15997,10 +16025,36 @@ snapshot, producing a phantom `"1"` key AND an empty `all` — wrong in two
 directions at once. `tree()` and `all()` are both correct, so this is specific to
 the value a branch Link publishes.
 
-Severity is real: a Link or `persistence()` on a branch CONTAINING a collection
-externalizes truth that round-trips to an EMPTY collection. Independent of the
-observation substrate, and of the other three `link()` defects — the capability
-pair does not fix it.
+Severity is real: **`link()`** on a branch containing a collection externalizes
+truth that round-trips to an EMPTY collection.
+
+⚠️ **Only `link()` was reproduced.** An earlier draft of this record also named
+`persistence()`. That was an overclaim — architectural adjacency is not a traced
+dependency. Other consumers are affected ONLY if they reuse this branch
+source-interpretation mechanism, and that has not been established. When
+serialization resumes, trace whether its value production invokes this same
+branch NaturalValue path before assuming it inherits the defect.
+STRUCTURAL REFERENCE != CAUSAL DEPENDENCY.
+
+Independent of the observation substrate and of the other three `link()`
+defects — the capability pair does not fix it.
+
+### It does not gate the substrate
+
+The observation carrier did its job: the entity mutation published natively and
+the ancestor Link WAS notified. The corruption happens afterwards, when the
+branch's complete value is interpreted. That localization is itself evidence
+that observation and source interpretation are genuinely separate
+responsibilities rather than two words for one thing:
+
+```text
+entity mutation -> native publication -> ancestor notified   GREEN
+                                      -> branch value built  DEFECT
+```
+
+So it does not block `OBSERVATION-SUBSTRATE-IMPLEMENT-0`. It DOES block any
+claim of general branch-Link NaturalValue correctness, and must be resolved
+before final Link public-contract closure.
 
 Dispositioned separately, unpursued here. It belongs with `LINK-ROOT-SOURCE-0`
 as a source-interpretation defect rather than an observation-carrier one.
