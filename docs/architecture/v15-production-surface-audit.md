@@ -15773,7 +15773,7 @@ DESCENDANT-MATERIALIZATION-0     CLOSED — MAT-A
 
 OBSERVATION-METADATA-FIDELITY-0  CLOSED — GREEN (F1/F2/F3/F4)
 OBSERVATION-OVERLAP-0            CLOSED — OVERLAP-A
-ENTITY-ACQUISITION-CONTROL-0     NEXT
+ENTITY-ACQUISITION-CONTROL-0     PARTIAL — stop works, E2 control is a no-op
 LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0  then
     -> if all green, authorize production implementation
     -> retained memory required BEFORE final substrate freeze
@@ -15952,12 +15952,66 @@ overlapping claims and retention after final disarm — `theme` keeps
 None of OVERLAP-B (duplicate installation), OVERLAP-C (release stealing another
 consumer's leaf) or OVERLAP-D (identity churn) occurred.
 
+## `ENTITY-ACQUISITION-CONTROL-0` — PARTIAL, and it uncovered a fourth defect
+
+Two results, and only one of them is what the phase was looking for.
+
+### The stop condition works, but its mutation control is a NO-OP
+
+`getNodeProcessor()` — the marker subsystem's own `Symbol.for('SignalTree:MarkerProcessor')`
+recognizer — is the right canonical stop: reused rather than duck-typed from
+method names. With it, acquisition stops at the entity boundary (`stopped: ['']`
+direct, `['rows']` nested), nothing under the entity is armed, and native
+add/update/remove are still observed by a direct entity Link.
+
+⚠️ **But removing the stop changes NOTHING measurable.** With `ST_STOP=off` the
+generic walk recurses through `byId`, `all`, `asMap` and the mutators — and arms
+exactly the same set: none. Those members are functions and computeds without an
+`__arm`, so `claimLeaf` declines them and the recursion finds nothing to claim.
+
+So the E2 control does not cross an authoritative checker, and by the rule that
+governs it — **mutation evidence only matters if it crosses a checker** — this
+phase CANNOT be closed ENTITY-A on the evidence gathered. The stop is defensible
+on cost and blast-radius grounds, but "recursion would arm entity internals" is
+NOT demonstrated. A load-bearing discriminator has to be designed against the
+actual entity surface, or the claim has to be narrowed to what was measured.
+
+### `LINK-BRANCH-NESTED-ENTITY-0` — a fourth public-contract defect
+
+Found while proving that stopping recursion does not blind an ancestor. It does
+not — the parent DOES receive a publication for an entity mutation. What it
+receives is **malformed**.
+
+Reproduced on PRODUCTION code with the capability pair, no scratch involved:
+
+```text
+link(tree.$.dashboard) after rows.addOne({id:1,n:'a'})
+
+branch link value  {"title":"x","rows":{"1":{"id":1,"n":"a"},"all":[]}}   WRONG
+tree() says        {"title":"x","rows":{"all":[{"id":1,"n":"a"}]}}        correct
+rows.all()         [{"id":1,"n":"a"}]                                     correct
+```
+
+The branch's `read()` enumerates the entity node's own keys instead of using its
+snapshot, producing a phantom `"1"` key AND an empty `all` — wrong in two
+directions at once. `tree()` and `all()` are both correct, so this is specific to
+the value a branch Link publishes.
+
+Severity is real: a Link or `persistence()` on a branch CONTAINING a collection
+externalizes truth that round-trips to an EMPTY collection. Independent of the
+observation substrate, and of the other three `link()` defects — the capability
+pair does not fix it.
+
+Dispositioned separately, unpursued here. It belongs with `LINK-ROOT-SOURCE-0`
+as a source-interpretation defect rather than an observation-carrier one.
+
 ## OPEN
 
 ```text
 LINK-BARE-SCALAR-0     cause identified, substrate designed, NOT fixed
 LINK-BARE-BRANCH-0     cause identified, substrate designed, NOT fixed
-LINK-ROOT-SOURCE-0     distinct contract defect, undispositioned
+LINK-ROOT-SOURCE-0             distinct contract defect, undispositioned
+LINK-BRANCH-NESTED-ENTITY-0    branch Link publishes a malformed entity value
 memory                 unmeasured for the dormant representation
 serialization WIP      parked; depends on the substrate landing first
 INSPECTION-EGRESS-0    open — Link green, serialization open
