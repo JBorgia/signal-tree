@@ -15673,9 +15673,15 @@ cannot appear after it. Entity structural additions are the third category and
 are out of scope here: collections carry their own observation and work on a
 bare tree.
 
-⚠️ Recorded separately, unpursued: `applyState` silently drops an unknown key —
-no error, no warning, no leaf. Outside this phase, but the same class of silent
-no-op this work has named elsewhere.
+⚠️ Recorded separately, unpursued, as `APPLYSTATE-UNKNOWN-KEY-0`:
+
+> `applyState` currently ignores unknown ordinary object keys without
+> materializing new state.
+
+Deliberately NOT called a defect. Whether silent ignore is wrong is a
+CONTRACT-BEFORE-DEFECT question, and answering it here would contaminate the
+observation-substrate work with an unrelated contract dispute. No work on it in
+this branch.
 
 ## COMPOSITION LAWS EARNED HERE
 
@@ -15750,6 +15756,47 @@ active. That is what makes `reset -> settled -> remove` correct and
 
 **VERIFY BY EXIT CODE, NOT BY PIPELINE.** `npm run typecheck | grep error | head`
 reports `head`'s status, not the compiler's. Run the command, then read `$?`.
+
+## PHASE STATUS
+
+```text
+BASE-OBSERVATION-COST-0          CLOSED — COST-C   (pair-as-baseline rejected)
+LAZY-OBSERVATION-INSTALL-0       CLOSED — LAZY-E   (post-hoc replacement rejected)
+OWNER-DISCOVERABILITY-0          CLOSED — GREEN
+SOURCE-OBSERVATION-ACTIVATION-0  CLOSED — GREEN
+    pre-existing descendants     GREEN
+    source scope / nested scope  GREEN
+    notifier fanout              GREEN
+    late ordinary descendants    VACUOUS — MAT-A
+OBSERVATION-LIFECYCLE-0          CLOSED — GREEN / POS-A
+DESCENDANT-MATERIALIZATION-0     CLOSED — MAT-A
+
+OBSERVATION-METADATA-FIDELITY-0  NEXT
+OBSERVATION-OVERLAP-0            then
+ENTITY-ACQUISITION-CONTROL-0     then
+LINK-CONSTRUCTION-ACQUIRE-CLEANUP-0  then
+    -> if all green, authorize production implementation
+    -> retained memory required BEFORE final substrate freeze
+```
+
+`SOURCE-OBSERVATION-ACTIVATION-0` is closed. Do not reopen it for late
+descendants: MAT-A settled that.
+
+### `OBSERVATION-METADATA-FIDELITY-0` — the framing that matters
+
+Named FIDELITY, not parity. The incumbent mutation-capture envelope is a
+**characterization control**, not a specification to copy forward.
+
+> **CHARACTERIZATION CONTROL != REPLACEMENT SPECIFICATION.** The question is what
+> mutation MEANING the surviving carrier must preserve for real consumers and
+> invariants — never which incumbent fields exist and could be copied.
+
+Fields like `owner`, `path`, `ownerPath`, `before`, `after` and `participation`
+have obvious semantic necessity. `kind` and `mutationIntent` do not: the
+prototype hardcodes `'set'`/`'replace'` and nothing has yet shown a consumer
+that depends on the distinction. Each field is classified REQUIRED / REDUNDANT /
+DEAD TAXONOMY / UNKNOWN by tracing consumers — INVARIANT CARRIER applied to a
+vocabulary rather than to a test. UNKNOWN is a stop, not a default to preserve.
 
 ## OPEN
 
