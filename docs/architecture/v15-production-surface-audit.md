@@ -15224,3 +15224,107 @@ Link API expresses it without core involvement.
 manifests at `a78696e5`; `authoring`, `events` and `ng-forms` are directories
 without their own published manifest. So this is a layer to be *designed*, not a
 package to be tidied — which is the right position to be in before greenfield.
+
+## ⚠️ CORRECTION — the rekey evidence was wrong; the conclusion survives
+
+`48ad4e4a`'s commit message and a comment in `link.ts` claimed:
+
+> rekey measured `path: 'rows.1'` carrying `v.id === 77` — the path holds the OLD
+> key while the value holds the NEW one, and no `structuralEffect` is emitted.
+
+**Every particular of that is false.** It was not a rekey. `updateOne(1, { id: 77 })`
+merely merges a field named `id` into a row's payload; the collection index is
+untouched, and that is DOCUMENTED behaviour — `types.ts:972` states outright that
+a row's own `id` field may disagree with its key once `changeId` has moved it.
+Measured after `updateOne(1, { id: 77 })`:
+
+```text
+all()      [{"id":77,...},{"id":2,...}]     payload changed
+ids()      [1, 2]                           index UNCHANGED
+has(1)     true       has(77)  false
+```
+
+So the earlier "two rows with the same id, no error" reading was also wrong: keys
+`1` and `2` remain distinct; only two payloads happen to carry the same `id`
+value, which is meaningless data.
+
+### The real rekey, measured
+
+`EntitySignal.changeId(from, to)` is the rekey operation. `changeId(1, 77)`:
+
+```text
+path                rows.77                        the NEW key
+v / prev            {id:1,name:'a'} (identical)    payload UNTOUCHED
+subjectIds          [1]                            stable subject
+structuralEffect    { kind:'rekey', subject:1, beforeKey:1, afterKey:77 }
+ids()               [77, 2]                        index MOVED
+has(1) false        has(77) true
+```
+
+And the collision policy is explicit rejection, not silent corruption:
+
+```text
+changeId(1, 2)  ->  throws "Cannot change id to 2: already in use"
+```
+
+### What this changes, and what it does not
+
+The **conclusion is unchanged**: an entity projection must be keyed on SubjectId,
+never on key or path. But it now rests on sound evidence rather than an artefact:
+
+- `structuralEffect { kind:'rekey', subject, beforeKey, afterKey }` states the
+  address transition and the stable subject explicitly.
+- Independently, a removed key that is later re-added receives a **NEW**
+  SubjectId — measured: remove key 1 (subject 1), add key 1 again → subject 3,
+  with `afterSubject`/`beforeSubject` ordering carriers on both events. A key is
+  therefore not a lifetime, which forbids `Map<Key, Row>` regardless of rekey.
+
+The entity projection is in fact **easier** than reported: rekey is a first-class
+structural effect carrying complete information, not a silent payload mutation to
+be inferred.
+
+### The methodology failure
+
+The probe exercised `updateOne` with an `id` in its patch and assumed that was
+the rekey path, because the source contained `kind: 'rekey'`. The presence of a
+mechanism in the source was taken as proof that the operation reached it. The
+missing step was a CONTROL asserting the index actually moved — `ids()` would
+have shown `[1,2]` immediately. This earns:
+
+> **OPERATION-REACHED-MECHANISM CONTROL.** When measuring a named mechanism,
+> assert that the operation under test actually reached it. Finding the mechanism
+> in the source and finding an operation whose output looks related are two
+> different facts. Prefer asserting the mechanism's own observable effect (here,
+> the moved index) over inferring it from a plausible payload.
+
+## ENTITY-PROJECTION-BASELINE-IDENTITY-0 — OUTCOME B
+
+The required information exists, but not at the boundary a Link can reach.
+
+`StructuralStore` (`lib/physical/structural-store.ts`) already provides
+everything a seed needs, in O(n):
+
+```text
+activeKeysSnapshot(): readonly K[]        ORDERED active keys
+subjectIdForKey(key): number | undefined  key   -> SubjectId
+activeKeyForSubject(subject): K | undefined  SubjectId -> current key
+```
+
+Ordering is guaranteed **by construction, not by coincidence**:
+`getProjectedEntries()` builds `all()` by iterating `activeKeysSnapshot()`, so a
+seed built the same way cannot diverge from `all()`'s order. The store maintains
+an explicit linked list (`ActiveNode.prev/next`), which is the carrier
+`beforeSubject`/`afterSubject` refer to.
+
+What the materialized `EntitySignal` exposes is NOT sufficient:
+
+```text
+__subjectIds            the LAST operation's subjects only, and gated on a
+                        `subjectMetadataEnabled` capability flag
+__findKeyBySubjectId    the reverse direction (subject -> key)
+```
+
+So this is Outcome B: design the smallest INTERNAL seed — conceptually
+`ordered [{ subjectId, row }]` — reusing the exact `getProjectedEntity(key)` path
+`all()` uses so the seed and the public value cannot diverge. `SubjectId` is not
+exposed publicly, and no `Map<Key, Row>` bootstrap is used at any point.
