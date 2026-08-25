@@ -24,6 +24,7 @@ import type { PhysicalCommitClock } from './internals/physical-commit-clock';
 import { PathNotifier } from '../lib/path-notifier';
 import { getActiveWriteContext } from '../lib/write-context';
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
+import { defineEntityProjectionSeed } from './internals/entity-projection-seed';
 
 // Angular's global dev-mode flag (defined by the Angular CLI; undefined in
 // plain test/node contexts, treated as dev there).
@@ -3084,6 +3085,31 @@ export function createEntitySignal<
   if (ownerMetadataEnabled) {
     defineOwnedOwnerPath(api, basePath);
   }
+  // ⚠️ THE PROJECTION SEED — internal, WeakMap-carried, never public.
+  //
+  // Built from the SAME ordered active-key snapshot `getProjectedEntries()`
+  // uses, and the SAME `getProjectedEntity` row path, so a consumer's seeded
+  // projection cannot drift from `all()` by construction.
+  //
+  // `key` is carried explicitly alongside `subjectId` because it is genuinely
+  // separate information: after `changeId(1, 77)` the row payload still reads
+  // `{ id: 1 }` while the address is 77, so `selectId(row)` cannot recover it.
+  defineEntityProjectionSeed(api as object, () => {
+    const seed: Array<{ subjectId: number; key: K; row: E }> = [];
+    for (const key of structuralStore.activeKeysSnapshot()) {
+      const subjectId = structuralStore.subjectIdForKey(key);
+      if (subjectId === undefined) continue;
+      const row = getProjectedEntity(key);
+      if (row === undefined) continue;
+      seed.push({ subjectId, key, row });
+    }
+    return seed as readonly {
+      subjectId: number;
+      key: string | number;
+      row: unknown;
+    }[];
+  });
+
   Object.defineProperty(api, '__findKeyBySubjectId', {
     value: findKeyBySubjectId,
     enumerable: false,
