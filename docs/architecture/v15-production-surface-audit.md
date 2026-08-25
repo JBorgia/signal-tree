@@ -15872,8 +15872,21 @@ devtools+authored / update derive   NULL           devtools  = =
 `path`, `ownerPath`, `before`, `after`, `mutationIntent`, `participation`,
 `origin`, `intent` and position-id PRESENCE are identical in every cell.
 
-**F3 green.** Participation attribution survives the dormant carrier for all
-three values across both operations. Carrier fidelity only — inspection
+**F3 green.** Participation attribution survives the dormant carrier across both
+operations. ⚠️ Note the REPRESENTATION, which is not one literal per semantic
+state:
+
+```text
+semantic state    notifier representation
+authored          absent / null          (NOT a literal 'authored')
+inspection        'inspection'
+realized          'realized'
+```
+
+Both carriers represent it identically. This is a fact about the physical
+encoding, not a change to the three-state semantic model — `getWriteParticipation`
+already defaults absence to `'authored'`, and the runtime deliberately does not
+materialize the default on every write. Carrier fidelity only — inspection
 exclusion, eligible authority and complete acquisition remain consumer semantics
 and were deliberately not exercised here.
 
