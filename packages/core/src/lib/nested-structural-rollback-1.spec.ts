@@ -188,11 +188,13 @@ const OPERATIONS: Array<[string, boolean, (r: Rows) => void]> = [
  *         subjDesc { path: "data.rows", fieldPathFromRow: "" }
  * ```
  *
- * `collectionPath` is now CORRECT — the fix landed — but `resolveLiveScalarNode`
- * still fails, because the SUBJECT DESCRIPTOR is wrong: it records subject 1 as
- * living at path `"data.rows"` with an empty field path. That is written by
- * `deriveFieldPathFromRow`, the sibling of `deriveCollectionPath`, which carries
- * THE SAME `path === ownerPath` ambiguity.
+ * ⚠️ THAT READING WAS TAKEN UNDER THE FALSIFIED CANDIDATE. `descColl=data.rows`
+ * was true only while the reverted patch was applied; at HEAD it is `"data"`
+ * again. What the experiment actually proved is NARROWER and still useful:
+ * fixing `collectionPath` alone is INSUFFICIENT, because the subject descriptor
+ * — written by `deriveFieldPathFromRow`, the sibling helper — records subject 1
+ * at path `"data.rows"` with an empty field path and carries the SAME overloaded
+ * `ownerPath` ambiguity.
  *
  * Recorded rather than patched in the same pass: it is a second derivation with
  * its own inventory to do, and bundling it would repeat the mistake of fixing by

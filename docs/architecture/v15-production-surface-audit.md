@@ -10049,8 +10049,11 @@ nested  path=data.rows.seed.n  descColl=data.rows  target=FALSE
         subjDesc { path: "data.rows", fieldPathFromRow: "" }
 ```
 
-`collectionPath` is correct there — the fix landed — and resolution still fails,
-so the subject-descriptor derivation needs its own inventory.
+⚠️ **That reading was taken UNDER the falsified candidate.** `descColl=data.rows`
+held only while the reverted patch was applied; at HEAD it is `"data"` again.
+What the experiment proved is narrower and still useful: fixing `collectionPath`
+alone is INSUFFICIENT, because the subject-descriptor derivation carries the same
+ambiguity independently.
 
 ## Standing
 
@@ -10060,6 +10063,118 @@ core   2102 passing, 5 expected failures
 
 Still NOT release-green: four are nested rollback (addOne, addMany, updateOne,
 upsertOne) and one is `link-collection-0`'s duplicate pin of the same defect.
+
+# REALIZATION-ADDRESS-0 — the NULL survives. The role IS knowable from position
+
+`packages/core/src/lib/realization-address-0.spec.ts`, 3/3.
+
+The remaining defect is renamed for what it is:
+
+> **REALIZATION ADDRESS ROLE AMBIGUITY.** `ownerPath` is not one semantic thing.
+> Sometimes it names a COLLECTION (`data.rows`); sometimes it legitimately names
+> a ROW (`rows.someKey`). The adapter and rekey controls prove both, so no string
+> test can separate them. Dots encode NESTING, not role.
+
+```text
+INVALID DISCRIMINATORS
+  ownerPath.includes('.')      path === ownerPath      parentPath(ownerPath)
+```
+
+That is why my candidate broke five adapter tests and a restoration rekey test:
+it changed the rule for BOTH roles at once.
+
+## The measured inventory
+
+Instrumenting `rememberTreeRealizationDescriptor` and classifying `effect.owner`
+against the set of positions that ARE collections:
+
+```text
+shape   op         owner ROLE        path            derived collectionPath
+TOP     addOne       2   COLLECTION  rows.x          rows        ✓
+TOP     addMany      2   COLLECTION  rows.x          rows        ✓
+TOP     updateOne    2   COLLECTION  rows.seed       rows        ✓
+TOP     upsertOne    2   COLLECTION  rows.seed       rows        ✓
+TOP     removeOne    2   COLLECTION  rows.seed       rows        ✓
+NESTED  addOne       3   COLLECTION  data.rows.x     data.rows   ✓
+NESTED  addOne       3   COLLECTION  data.rows       data        ✗
+NESTED  updateOne    3   COLLECTION  data.rows.seed  data        ✗
+NESTED  upsertOne    3   COLLECTION  data.rows.seed  data        ✗
+NESTED  removeOne    3   COLLECTION  data.rows       data        ✗
+```
+
+⚠️ **`ROLE` is `COLLECTION` in every single row** — the position discriminator is
+exact at depth 0, 1 and 3, and rejects a nested plain leaf whose ownerPath also
+contains a dot. Meanwhile the string derivation is wrong for every NESTED
+non-structural notification.
+
+## Answers to the preregistered questions
+
+```text
+1  roles ownerPath can have         COLLECTION and ROW — both legitimate
+2  can owner position separate them YES, measured, no exceptions
+3  what the adapter tests protect   the ROW-OWNED reading — which is exactly why
+                                    a blanket change broke them
+4  canonical containing collection  the owner position's own address, when that
+                                    position IS a collection
+5  canonical field in a subject     path relative to the collection, minus the
+                                    subject-key segment
+6  can the derived strings stay
+   cached descriptor authority?     OPEN
+7  zero-tree-visit preserved?       OPEN
+```
+
+## The rule the inventory supports
+
+```text
+if effect.owner IS a collection position
+     collectionPath   = that collection's address       (no dot counting)
+     fieldPathFromRow = relative path minus the subject-key segment
+else
+     the existing ROW-OWNED rules, UNCHANGED
+```
+
+Role-conditional, so the adapter and rekey tests are preserved BY CONSTRUCTION —
+they are row-owned and take the other branch untouched.
+
+## ⚠️ Why it is not implemented: a measured plumbing constraint
+
+`structuralOwnerPaths` is built inside `createTreeRealizationAdapter`'s closure.
+`rememberTreeRealizationDescriptor` is a FREE FUNCTION called from `transactions`
+and `restoration` and cannot reach it. **The role classification the fix needs is
+not available where the derivation happens.**
+
+That is a design decision — where the collection-position index lives, and
+whether the derived strings should remain descriptor state at all — and it is
+entangled with the two open questions. Descriptors are FIRST-WRITE-WINS
+(`existing?.collectionPath ?? collectionPath`), so caching an ambiguous
+derivation is unsafe independently of ordering; OWNER-PING-0 fixed the
+cross-tree ordering that exposed it, not the caching.
+
+Also confirmed: `deriveFieldPathFromRow` carries the identical dot-based guess —
+stripping the entity-key segment when `ownerPath` has no dot and keeping the
+whole relative path when it does.
+
+# The notifier ownership invariant, made permanent
+
+`packages/core/src/lib/notifier-ownership-invariant.spec.ts`, 3/3, with no
+`transactions()`.
+
+```text
+two trees give their collections the SAME local position id      ✓ precondition
+alternating structural writes stay owner-distinguishable         ✓
+   — asserted over EVERY delivered notification, value-less included
+a scalar write is owner-qualified too                            ✓
+```
+
+⚠️ A tree with NO enhancers resolves no registry and emits NO notifications at
+all — position topology and mutation capture are enabler-gated — so
+`restoration()` is present only to turn the notifier on. Stated rather than
+letting the file's title overclaim.
+
+⚠️ Local position ids deliberately COLLIDE here. Identity is
+`(registry, local position)`, never the number alone; making position ids
+globally unique would make this test pass vacuously and would have hidden every
+bug in this class.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
