@@ -13473,3 +13473,159 @@ Production currently has two mechanisms carrying one invariant; that is
 redundancy, and removing one needs its own preregistered experiment
 (`RECONCILIATION-REDUNDANCY-0`) proving flush-driven rearm is guaranteed across
 every lifecycle, disposal and settlement case. Not now.
+
+---
+
+# MIGRATION-MAP-0 — inventory and replacement matrix. NO DELETIONS.
+
+## ⚠️ THE HEADLINE, AND IT CORRECTS AN EARLIER RECORD
+
+**None of the retiring primitives is publicly reachable.** Retiring them is
+therefore **NOT a breaking public change**.
+
+```text
+package.json exports    { ".": ..., "./package.json": ... }   NO subpath
+root exports            70 symbols, parsed from export statements
+  loader                not exported
+  asyncSource           not exported
+  stored                not exported
+  flushAllStoredSignals not exported
+  asyncQuery            not exported
+  export * from         (none)
+```
+
+⚠️ **ASYNC-SOURCE-RETIRE-0 said "asyncSource is PUBLICLY EXPORTED (via
+markers/index.ts), so removal is a breaking public change." That was WRONG.** It
+checked the barrel and not the `exports` map. The barrel is unreachable: the map
+publishes no subpath, `index.ts` never re-exports it, and the root exposes the
+markers it does want by DIRECT FILE PATH (`./lib/markers/entity-map`,
+`./lib/markers/derived`).
+
+**Nothing in the repository imports the markers barrel at all.** It is dead.
+
+That does not shrink the ~95-file *work*; it reclassifies the *risk*. These are
+internal deletions plus demo/doc/tool updates, not a consumer break.
+
+## Consumer counts
+
+```text
+symbol                  prodTS  specs  demo  tools  docs
+loader                      15     24     3      7    44
+asyncSource                 13     17     9     12    33
+stored                      20     58    11     12    55
+flushAllStoredSignals        2      6     1      1     9
+asyncQuery                   7      6     8      5    26
+```
+
+Docs split — archived record must KEEP historical names:
+
+```text
+                live  archived
+asyncSource        8        20
+stored            11        31
+loader            12        24
+```
+
+## Replacement matrix — ⚠️ VERIFY, do not assume
+
+```text
+loader                  DELETE. Acquisition is `link({ get })` where the need is
+                        external synchronization, or ordinary application async
+                        composition where it is not. A3-0 already found not one
+                        call site was an optimistic mutation.
+
+asyncSource             DELETE. Its supported contract is `node.error()` plus
+                        local loading state; ASYNC-SOURCE-RETIRE-0 measured the
+                        central report covered 1 of 3 failure paths and removed
+                        it. Replacement is ordinary async state, or `link` where
+                        the behaviour is genuinely external synchronization.
+
+stored                  NEEDS ITS OWN SEMANTIC MATRIX — see below. ⚠️ Do NOT
+                        write "superseded by Link" until the behaviour matrix is
+                        compared. Its surface is materially wider than Link's.
+
+flushAllStoredSignals   Likely DELETE. Already recorded as a MITIGATION for a
+                        SignalTree-introduced hazard, not a capability. Its
+                        replacement must FOLLOW from the persistence decision,
+                        not be reinvented as another global drain.
+
+asyncQuery              ⚠️ NEEDS DECISION. Not in the previously-decided set, not
+                        root-exported, 7 production files and 8 demo files. Its
+                        `'async-query'` TreeErrorSource member never had a
+                        producer. Classify before sequencing.
+```
+
+## `stored` behaviour matrix — enumerated, NOT yet dispositioned
+
+```text
+initial read           serialize / deserialize hooks
+storage injection      storage?: Storage | null
+debounce               debounceMs, maxWaitMs
+versioning             version, migrate, clearOnMigrationFailure
+local errors           onError(error, { key, operation })
+operations             read | write | migrate | remove
+global participation   onTreeError with treeId + state path
+global drain           flushAllStoredSignals
+transaction behaviour  durable-consequence scheduling, rollback interaction
+```
+
+⚠️ Nine behaviours. Link supplies three directions and a settlement handle. The
+question for STORED-PERSISTENCE-0 is **"if `stored` never existed, what would
+the architecture naturally use?"** — not "what object has the same shape".
+
+## Demo — inventory now, rebuild at DEMO-COVERAGE-0
+
+```text
+internal / deep imports                 0     ⚠️ negative gate ALREADY satisfied
+imports from '@signaltree/core'        48
+link                                   75     already exercising the new surface
+external                               19
+onTreeError                             1     ⚠️ the public error contract is
+                                              essentially undemonstrated
+
+retiring API references
+  stored        36 refs / 10 files
+  asyncSource   19 refs /  9 files
+  asyncQuery    13 refs /  8 files
+  loader         9 refs /  3 files
+  flushAll       2 refs /  1 file
+```
+
+## Tools and gates — 23 files reference retiring APIs
+
+Including `verify-gates.mjs`, `check-bundle-budget.mjs`,
+`check-contract-neutrality.mjs`, `check-rc-public-dispositions.mjs`,
+`check-documented-symbols.mjs`, `size-report.mjs`, tree-shaking and
+AI-codegen-benchmark prompts. ⚠️ Several are RELEASE GATES — they must be
+updated in the same phase as the primitive they reference, or the gate run at
+the end will fail for migration reasons rather than real ones.
+
+## Recommended phase boundaries
+
+```text
+MIGRATION-MAP-0        this record. No deletion.
+ASYNC-QUERY-DECIDE-0   ⚠️ NEW — classify asyncQuery before ordering
+LOADER-RETIRE-0        smallest: 15 prod / 3 demo files
+ASYNC-SOURCE-RETIRE-1  ~95 files, its own phase
+STORED-PERSISTENCE-0   the nine-behaviour matrix; heaviest
+STATUS-RESIDUE-0       sweep once the majors are gone
+MIGRATION-CLOSE-0      zero-reference + public-surface proof
+DEMO-COVERAGE-0        release gate, BEFORE full gates and Candidate B
+PERF-PROOF-0
+```
+
+⚠️ `asyncQuery` is inserted ahead of LOADER because its disposition changes
+whether `loader` retirement is truly the smallest first step.
+
+## Held decisions
+
+```text
+public error contract FROZEN — onTreeError / TreeErrorEvent / TreeId. When
+stored disappears and Link is briefly the only producer, that is NOT evidence
+the observer should become Link-specific. Its genericity is already earned.
+
+migration-sensitive specs stay until their primitive is retired:
+  stored-owner-invariant-0    async-source-retire-0
+
+the entity-granular-reactivity wall-clock flake is NOT touched during migration.
+```
