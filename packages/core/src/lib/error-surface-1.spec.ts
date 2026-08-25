@@ -269,11 +269,27 @@ describe('ERROR-SURFACE-1: the taxonomy is mostly unproduced and mostly retiring
     cap.stop();
   });
 
-  it('the reporter is NOT exported from the package root — the claim is not yet public', () => {
+  it('⚠️ RESOLVED — the reporter IS public now, after the event was repaired', () => {
     const index = readFileSync(join(SRC, 'index.ts'), 'utf8');
-    expect(index).not.toContain('onTreeError');
-    expect(index).not.toContain('TreeErrorEvent');
-    expect(index).not.toContain('error-reporter');
+
+    // This case recorded that Link's failure contract pointed at a channel no
+    // consumer could reach. ERROR-SURFACE-2 closed it — but by repairing the
+    // event first, not by exporting the one this file measured as untruthful.
+    expect(index).toContain('onTreeError');
+    expect(index).toContain('TreeErrorEvent');
+
+    // And only the three symbols. The internals this file catalogued as unfit
+    // for public life never became public.
+    //
+    // ⚠️ Matched against EXPORT STATEMENTS, not raw text — a first draft matched
+    // the whole file and failed on index.ts's own comment ABOUT not exporting
+    // the taxonomy. Same trap caught twice in this session.
+    const exported = [...index.matchAll(/^export\s+(?:type\s+)?\{([^}]*)\}/gm)]
+      .flatMap((m) => m[1].split(','))
+      .map((n) => n.trim().replace(/^type\s+/, ''))
+      .filter(Boolean);
+    expect(exported).not.toContain('TreeErrorSource');
+    expect(exported).not.toContain('reportTreeError');
   });
 });
 

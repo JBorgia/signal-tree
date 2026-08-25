@@ -123,7 +123,9 @@ describe('STORED-OWNER-INVARIANT-0: the report boundary has ownership', () => {
 
     const write = cap.seen.find((e) => e.operation === 'write');
     expect(write, 'the write path reported').toBeDefined();
-    expect(write?.path).toBe('soi-plain');
+    // The STATE location. `soi-plain` is the storage key, a different domain —
+    // see ERROR-PATH-SEMANTICS-0.
+    expect(write?.path).toBe('prefs');
 
     // ⚠️ The node attachment is enhancer-gated and ABSENT here — which is why
     // this is not the question. `stored()` takes its registry from the

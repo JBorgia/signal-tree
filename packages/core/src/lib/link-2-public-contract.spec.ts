@@ -250,7 +250,7 @@ describe('LINK-2 case 3: a rejected outbound set() is observable', () => {
     expect(sent).toEqual(['second']);
   });
 
-  it('⚠️ FINDING — `onTreeError` is not exported from the barrel', async () => {
+  it('⚠️ RESOLVED — `onTreeError` IS exported, once the event became truthful', async () => {
     const barrel = await import('../index');
 
     // So the mechanism that makes case 3 observable is currently unreachable
@@ -259,7 +259,15 @@ describe('LINK-2 case 3: a rejected outbound set() is observable', () => {
     // that reports through it is equally invisible today, not just a link.
     //
     // This assertion PINS the gap. Exporting it must flip this test.
-    expect('onTreeError' in barrel).toBe(false);
+    // ⚠️ RESOLVED by ERROR-SURFACE-2. This case recorded that the reporter was
+    // built to be observed and then never exported, so the "observable"
+    // property was true only for the library's own tests.
+    //
+    // It is exported now, but NOT as it stood: the event first had to become
+    // truthful — a REQUIRED `treeId` so two same-shaped trees are
+    // distinguishable, `source` and `detail` DELETED from the delivered object,
+    // and `path` given one meaning across producers.
+    expect('onTreeError' in barrel).toBe(true);
   });
 });
 

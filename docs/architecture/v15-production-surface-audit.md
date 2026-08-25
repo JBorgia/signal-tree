@@ -13151,3 +13151,88 @@ stored   ownerRegistry.id   key
 
 ⚠️ Had this failed, the correct response was NOT to weaken the event — it was to
 bring back the exact construction path that lacked ownership.
+
+---
+
+# ERROR-PATH-SEMANTICS-0 → ERROR-SURFACE-2 CLOSED. The reporter is PUBLIC.
+
+## ERROR-PATH-SEMANTICS-0 — OUTCOME A
+
+The candidate event documented `path` as a state location while producers
+supplied two different domains:
+
+```text
+Link     ownerPath      a state location
+stored   storage key    NOT a state location
+```
+
+That is the same type/runtime mismatch class `source` and `detail` were just
+deleted for. Measured — the two are fully independent:
+
+```text
+stored('storage-key-xyz') at `prefs`      key = storage-key-xyz   ownerPath = prefs
+nested at `settings.prefs`                key = storage-key-abc   ownerPath = settings.prefs
+```
+
+`stored` already captured `ownerPath` and simply reported the wrong one. Changed
+to `path: ownerPath`, so **`path` has ONE meaning for every producer**: the
+SignalTree state location associated with the report.
+
+The storage key remains available through `stored`'s own
+`onError({ key, operation })` context, where it belongs. No `storageKey` field
+was added to the event.
+
+Permanent controls include the strongest form: **a Link and a `stored` node at
+the same location report the same `path`.**
+
+## Reporter header corrected
+
+```text
+WAS   "one place to observe every error the library catches"
+NOW   "a process-wide observer for errors SignalTree explicitly REPORTS"
+```
+
+The original was an aspiration that was never true, and the measured producer
+inventory is deliberately narrow: `link` and `stored`. Every other catch site
+handles its error locally and does not participate.
+
+## PUBLIC — exactly three symbols
+
+```text
+onTreeError      the observer
+TreeErrorEvent   what it receives
+TreeId           only because the event names it
+```
+
+NOT public: `reportTreeError`, `clearTreeErrorListenersForTesting`,
+`TreeErrorSource` (deleted outright), the listener registry, `PositionRegistry`,
+`treeIdBrand`. Pinned by matching EXPORT STATEMENTS rather than file text.
+
+## The public delivery contract, proven through root imports
+
+```text
+two identical trees          distinct treeId, same path, same operation
+same tree                    stable treeId
+path                         state location for BOTH producers
+one failure                  one event
+throwing listener            damages neither the link nor its peers
+unsubscribe / zero / many    clean, harmless, independent
+failed Link send             observable once, X authored, queue alive,
+                             settled() RESOLVES
+Link handle                  still exactly retrieve / settled / dispose
+```
+
+## Link may now say it
+
+> **Rejected outbound Link sends are publicly observable through `onTreeError`.**
+
+```text
+before   2222 passing
+after    2235 passing
+```
+
+⚠️ **A test-hygiene lesson, caught twice.** Two assertions matched raw
+`index.ts` text and failed on the file's own comments ABOUT not exporting
+something. Both are now matched against parsed export statements. A test that
+cannot distinguish an export from prose about an export is not testing the
+surface.

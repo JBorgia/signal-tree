@@ -1,6 +1,11 @@
 import type { TreeId } from './position-registry';
 /**
- * One place to observe every error the library catches.
+ * A process-wide observer for errors SignalTree explicitly REPORTS.
+ *
+ * ⚠️ NOT "every error the library catches" — that was the original aspiration
+ * and it was never true. The measured producer inventory is deliberately narrow:
+ * `link` and `stored`. Every other catch site still handles its own error
+ * locally and does not participate here.
  *
  * ## Why this exists
  *
@@ -63,7 +68,18 @@ export interface TreeErrorEvent {
    * us, arriving in diagnostics.
    */
   readonly treeId: TreeId;
-  /** Dotted state path when the reporting site knows it. Location, not identity. */
+  /**
+   * The SignalTree STATE LOCATION associated with the report, when the
+   * reporting site knows it.
+   *
+   * ⚠️ ONE meaning for every producer — Link reports the linked source's
+   * `ownerPath`, `stored` reports its node's `ownerPath`, NOT its storage key.
+   * A field whose meaning varied by producer would be the same defect as the
+   * `source` and `detail` fields this event deleted.
+   *
+   * Location, never identity: two trees of the same shape share this string,
+   * which is exactly why `treeId` is required.
+   */
   readonly path?: string;
 }
 

@@ -145,13 +145,21 @@ describe('ERROR-SURFACE-0: is the central reporter actually central?', () => {
     clearTreeErrorListenersForTesting();
   });
 
-  it('⚠️ PINNED — `onTreeError` is not exported from the barrel', async () => {
+  it('⚠️ RESOLVED — `onTreeError` IS exported, once the event became truthful', async () => {
     const barrel = await import('../index');
 
     // Exporting it must flip this. Do NOT flip it without also disposing the
     // taxonomy: shipping `TreeErrorSource` as-is would publish a public union
     // in which four members name nothing and the other two name retiring APIs.
-    expect('onTreeError' in barrel).toBe(false);
+    // ⚠️ RESOLVED by ERROR-SURFACE-2. This case recorded that the reporter was
+    // built to be observed and then never exported, so the "observable"
+    // property was true only for the library's own tests.
+    //
+    // It is exported now, but NOT as it stood: the event first had to become
+    // truthful — a REQUIRED `treeId` so two same-shaped trees are
+    // distinguishable, `source` and `detail` DELETED from the delivered object,
+    // and `path` given one meaning across producers.
+    expect('onTreeError' in barrel).toBe(true);
   });
 });
 

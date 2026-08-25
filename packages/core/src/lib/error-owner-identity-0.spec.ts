@@ -177,8 +177,9 @@ describe('ERROR-OWNER-IDENTITY-0: producer reachability', () => {
   it('stored can too — the registry is in scope at its report site', () => {
     const src = readFileSync(join(SRC, 'lib/markers/stored.ts'), 'utf8');
     expect(src).toContain('const ownerRegistry = context?.positionRegistry;');
-    // And it already supplies a path.
-    expect(src).toContain('path: key,');
+    // And it supplies a path — the node's STATE location, not its storage key.
+    // ERROR-PATH-SEMANTICS-0 measured the two as fully independent.
+    expect(src).toContain('path: ownerPath || undefined,');
   });
 
   it('⚠️ async-source COULD NOT — and is no longer a producer at all', () => {

@@ -625,7 +625,23 @@ export function createStoredSignal<T>(
         error,
         operation,
         treeId: ownerRegistry.id,
-        path: key,
+        // ERROR-PATH-SEMANTICS-0. This was `key` — the STORAGE key — while the
+        // event documents `path` as a SignalTree state location. Two semantic
+        // domains behind one public field name, which is the same mismatch
+        // class `source` and `detail` were deleted for.
+        //
+        // Measured: the two are fully independent.
+        //
+        //     stored('storage-key-xyz') at `prefs`
+        //       key       = storage-key-xyz
+        //       ownerPath = prefs
+        //
+        //     nested at `settings.prefs`
+        //       ownerPath = settings.prefs
+        //
+        // The storage key remains available through this marker's own
+        // `onError({ key, operation })` context, which is where it belongs.
+        path: ownerPath || undefined,
       });
     }
 
