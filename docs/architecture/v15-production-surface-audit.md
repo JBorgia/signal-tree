@@ -11706,3 +11706,130 @@ The migration guidance an LLM will need is generated from these dossiers, not
 written separately. "`loader(...)` → `<x>`" is only trustworthy if the reason is
 recorded next to it, because otherwise the next agent re-litigates the decision
 from the historical spelling — which is the weakest evidence there is.
+
+---
+
+# SUBJECT-ADDRESS-0 — the whole-subject address is EARNED
+
+`packages/core/src/lib/subject-address-0.spec.ts`
+
+```text
+NULL       a genuine causal event exists whose target is an existing subject AS
+           A WHOLE, distinct from structural lifetime transitions, from
+           collection-owner notifications, and from field mutations
+FALSIFIER  no production event needs it
+```
+
+**The NULL SURVIVES.** My expectation went the other way and was wrong.
+
+Instrumenting `deriveFieldPathFromRow`'s output across every entity operation at
+both depths:
+
+```text
+TOP    updateOne  path=rows.seed       ownerPath=rows       coll=rows  FIELD=""
+NESTED updateOne  path=data.rows.seed  ownerPath=data.rows  coll=data  FIELD="seed"
+```
+
+A top-level row update legitimately produces `''` — it addresses the WHOLE ROW,
+not a field within it. So CASE A ("delete `''`") is falsified, and the answer to
+the one sentence is:
+
+> **A whole existing subject IS a realizable scalar target.**
+
+⚠️ **The nested defect is worse than previously recorded.** It does not merely
+derive the wrong collection — it FABRICATES A FIELD COORDINATE EQUAL TO THE
+ENTITY KEY. `FIELD="seed"` claims the row has a field called `seed`.
+
+⚠️ **Why this was invisible at top level.** The owner-only ping and a genuine
+whole-row update produce the same derived output there — both `''`. The bogus one
+is masked by a legitimate one.
+
+So the disposition is CASE B: three states, represented explicitly.
+
+```text
+undefined     this event establishes NO subject address
+whole         this event targets the entire current subject
+field 'name'  this event targets a field within the current subject
+```
+
+⚠️ Do NOT resolve the DESCRIPTOR-ROLE-0 `''` disagreement by changing the falsy
+test to `=== undefined`. That makes the inconsistency work without deciding
+whether the state should exist — and it demonstrably should.
+
+---
+
+# DESCRIPTOR-MERGE-0 — the two descriptor levels have OPPOSITE policies
+
+`packages/core/src/lib/descriptor-merge-0.spec.ts`
+
+Driven directly through the exported `rememberTreeRealizationDescriptor`, so
+these are the real production merge rules under controlled inputs.
+
+```text
+NULL       descriptor accumulation is monotonic in information
+FALSIFIER  the two levels disagree, so which address survives depends on
+           arrival order rather than information content
+```
+
+**The NULL IS FALSIFIED.**
+
+```text
+top-level descriptor      existing?.fieldPathFromRow ?? fieldPathFromRow
+                          FIRST-WRITE-WINS
+subjectDescriptors entry  unconditional overwrite when anything differs
+                          LAST-WRITE-WINS
+```
+
+⚠️ And `''` is not nullish, so at the top level a whole-subject `''` written by a
+weak early notification permanently blocks every later field address.
+
+## This explains the DESCRIPTOR-ROLE-0 result
+
+DESCRIPTOR-ROLE-0 measured that deleting both top-level copies changed nothing,
+and recorded them as vestigial without an explanation. This is it: consumers read
+`inline ?? subjectDescriptors[subjectId] ?? descriptor.<field>`, and the
+per-subject entry is LAST-write-wins, so it is always current and permanently
+shadows the frozen top-level copy. **Unread because unreachable, not because the
+information is unnecessary.**
+
+## And it explains the NESTED failure's exact mechanism
+
+```text
+addOne     path=data.rows        FIELD=""      <- correct: whole subject
+updateOne  path=data.rows.seed   FIELD="seed"  <- fabricated: the entity KEY
+```
+
+Last-write-wins at the subject level means the FABRICATED address wins. Had that
+level been first-write-wins, the correct `''` would have survived and the nested
+rollback would have worked by accident.
+
+**So the nested defect is two things: a bad derivation PLUS a merge policy that
+specifically prefers the later, worse answer.** Fixing the derivation alone would
+leave an order-dependent merge.
+
+## ⚠️ AND THE PING NEEDS NO SUBJECT AT ALL
+
+```text
+if (structuralEffect) return undefined;
+if (path === ownerPath) return '';                        <- returns here
+if (typeof subjectId !== 'number' || ...) return undefined;
+```
+
+`''` is returned BEFORE `subjectId` is examined. An owner-only ping carrying NO
+SUBJECT still establishes "the whole subject" as its address — which answers the
+remaining SUBJECT-ADDRESS-0 case:
+
+> The owner-only ping must establish NO subject address. Today it establishes the
+> strongest address in the model, for a subject that does not exist.
+
+In that one case nothing shadows it — there is no `subjectDescriptors` entry — so
+the frozen top-level copy IS what consumers reach. The vestigial finding holds
+for every case EXCEPT this one.
+
+## Consequence for the pending correction
+
+"Make descriptor writes monotonic in information" was underspecified: **neither**
+current policy is monotonic. The correction must name a rule under which a weaker
+notification cannot displace a stronger one **in either direction**, and the
+three address states must be representable so that "no address" and "the whole
+subject" cannot collide.
