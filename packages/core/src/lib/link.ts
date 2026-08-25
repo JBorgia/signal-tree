@@ -310,10 +310,16 @@ export function link<S>(
           .catch((error) => {
             // LINK-2 case 3. A rejected outbound `set()` reaches the EXISTING
             // central reporter, so `Link` needs NO error surface of its own:
-            // no `failures`, no error signal, no status. `onTreeError` was
-            // built for exactly this - one place to observe every error the
-            // library catches - and reusing it is why the handle stays three
-            // members.
+            // no `failures`, no error signal, no status. Reusing the reporter
+            // is why the handle stays three members.
+            //
+            // ⚠️ WORDING. Until ERROR-SURFACE-1 closes, this is "Link reports
+            // rejected outbound sends to SignalTree's INTERNAL error reporter"
+            // — NOT "Link failures are publicly observable". `onTreeError` is
+            // not exported, and ERROR-SURFACE-1 measured two reasons the event
+            // is not yet a truthful public contract: it cannot attribute two
+            // same-shaped trees, and its source union is 4/7 unproduced with
+            // 2 of its 3 live producers retiring.
             //
             // The queue must SURVIVE the failure too. Otherwise one rejection
             // wedges the link forever, which is a retry policy's failure mode

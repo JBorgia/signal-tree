@@ -12725,3 +12725,117 @@ after    2180 passing
 
 `c3d79be0` means production `link()` has **LANDED**, not that it ships. Its
 contract is not frozen while ERROR-SURFACE-1 is open.
+
+---
+
+# ERROR-SURFACE-1 — OUTCOME B. The event is not yet a public contract.
+
+`packages/core/src/lib/error-surface-1.spec.ts`
+
+```text
+NULL       the existing reporter can become the v15 generic public
+           error-observation mechanism with a small, truthful, stable event
+FALSIFIER  it cannot identify which tree emitted an otherwise identical error;
+           or the taxonomy would freeze obsolete categories
+```
+
+**FALSIFIED on both counts.**
+
+## ⚠️ 1. Two same-shaped trees are INDISTINGUISHABLE
+
+Two independent trees, both linked, both endpoints failing identically:
+
+```text
+{ source: 'link', operation: 'link:set', error: Error('endpoint down') }
+{ source: 'link', operation: 'link:set', error: Error('endpoint down') }
+```
+
+Byte-identical on every public fact. A listener wired to logging, Sentry or
+recovery routing cannot tell A from B.
+
+⚠️ **This is the SAME lesson NOTIFIER-SCOPE-0 and OWNER-PING-0 already cost us,
+arriving in diagnostics.** Two same-shaped trees give their positions the same
+local ids by design, and `settings.theme` names a location in both. The reporter
+carries no owner at all — not even the `ownerId` the notifier ownership
+invariant already requires of *every notification*.
+
+`path` is absent too, though `ownerPath` IS known at the Link reporting site.
+
+## ⚠️ 2. The taxonomy is mostly UNPRODUCED and mostly RETIRING
+
+```text
+member          live producer?   status
+stored          YES              RETIRING
+async-source    YES              RETIRING
+link            YES              keeps
+async-query     NO               no producer
+entity-loader   NO               no producer
+persistence     NO               no producer
+effect          NO               no producer
+```
+
+Seven members, three producers, **one producer not scheduled for deletion**.
+Exporting this union would freeze `'stored'` and `'async-source'` as permanent
+public strings naming APIs v15 is removing — migration debt becoming API.
+
+And `source` duplicates `operation` for the surviving member:
+
+```text
+source = 'link'    operation = 'link:set'
+```
+
+So `source` is not obviously earned as public information even there.
+
+## What DID hold — the mechanism is repairable, not wrong
+
+```text
+one failure -> listener invoked exactly once          ✓
+a throwing listener damages neither link nor peers    ✓
+unsubscribe is clean                                  ✓
+reporting with no listeners is harmless               ✓
+multiple listeners are independent                    ✓
+failed send: X stays authored, queue usable,
+             settled() RESOLVES per LINK-2            ✓
+```
+
+## Disposition — recorded, NOT fixed, NOT exported
+
+```text
+MISSING   owner attribution, without which a process-global observer cannot
+          route or attribute anything in a multi-tree application
+UNEARNED  a 7-member source union, 4/7 unproduced, 2 of 3 live producers
+          retiring, surviving member duplicating `operation`
+```
+
+⚠️ Adding owner attribution is a real change with its own question — WHICH stable
+tree identity, given PositionIds are deliberately tree-local and must not become
+public global identity. That is a decision, not a measurement, and it is left to
+be taken rather than assumed here.
+
+## ⚠️ WORDING RULE, now enforced in `link.ts`
+
+Until this closes:
+
+> **Link reports rejected outbound sends to SignalTree's INTERNAL error
+> reporter.**
+
+NOT "Link failures are publicly observable". `onTreeError` is not exported —
+asserted permanently by this battery against `index.ts`.
+
+## Consequence for the Link freeze
+
+Public Link CANNOT be frozen yet. Its failure contract points at a channel users
+cannot reach, so one of two things must happen first:
+
+```text
+A  repair the event (owner attribution + a truthful minimal shape), then export
+B  reopen where automatic Link egress failure becomes publicly observable
+```
+
+The measurement supports A being achievable — every delivery semantic holds and
+only the EVENT is deficient — but it does not authorize it.
+
+```text
+before   2180 passing
+after    2190 passing
+```
