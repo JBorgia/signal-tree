@@ -2183,7 +2183,18 @@ export function createEntitySignal<
         next,
         prev,
         basePath,
-        undefined,
+        // REPLACE-ONE-SUBJECT-1. This was `undefined`, and it was the ONLY
+        // entity notification in this file that dropped subject identity —
+        // `updateOne`, `updateMany` and `removeOne` all pass theirs. The id
+        // above is DATA; `subjectId` is IDENTITY, and it was already resolved
+        // from `structuralStore` a few lines up, so nothing new is looked up
+        // here.
+        //
+        // Without it, reversal effects arrive with `subjectId: undefined`,
+        // `hasInlineSubjectAddress` is false, no inline subject address is
+        // derived, and no fallback descriptor can be keyed — so rollback and
+        // undo both REFUSE, at TOP level as well as nested.
+        [subjectId],
         getPositionIdsForNotify(),
         ambientMeta()
       );
