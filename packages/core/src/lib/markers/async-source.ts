@@ -15,7 +15,6 @@ import {
   type AsyncSourceConfig,
   type AsyncSourceMarker,
 } from './async-source.contract';
-import { reportTreeError } from '../internals/error-reporter';
 import {
   registerBuiltinMarkerProcessor,
   reportHydrateDecision,
@@ -234,12 +233,23 @@ export function createAsyncSourceSignal<T>(
       result = load();
     } catch (err) {
       loadingSignal.set(false);
+      // ASYNC-SOURCE-REPORT-RETIRE-0. This path used to ALSO call
+      // `reportTreeError`, and it was the only one of this marker's three
+      // failure paths that did - the Observable-error and Promise-rejection
+      // handlers below never reported centrally.
+      //
+      // So the central report was never this marker's error contract, only a
+      // partial secondary path beside a complete one. `error` is public and
+      // carries all three:
+      //
+      //     readonly error: Signal<unknown | null>;
+      //
+      // Removed so that EVERY remaining reporter producer can identify its
+      // owning tree, which is what lets `TreeErrorEvent.treeId` be REQUIRED
+      // rather than optional. `createAsyncSourceSignal(marker)` receives no
+      // materialization context, so it cannot attribute an error without
+      // plumbing an API that v15 retires anyway.
       errorSignal.set(err);
-      reportTreeError({
-        error: err,
-        source: 'async-source',
-        operation: 'load',
-      });
       return;
     }
 

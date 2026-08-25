@@ -220,7 +220,7 @@ const SRC = (() => {
 })();
 
 describe('ERROR-SURFACE-1: the taxonomy is mostly unproduced and mostly retiring', () => {
-  it('⚠️ 7 members, 3 live producers, 1 not scheduled for deletion', () => {
+  it('⚠️ 7 members, 2 live producers, 1 not scheduled for deletion', () => {
     const reporter = readFileSync(
       join(SRC, 'lib/internals/error-reporter.ts'),
       'utf8'
@@ -241,11 +241,14 @@ describe('ERROR-SURFACE-1: the taxonomy is mostly unproduced and mostly retiring
       'stored',
     ]);
 
-    // Only three files call the reporter at all.
-    const producers = ['lib/link.ts', 'lib/markers/async-source.ts', 'lib/markers/stored.ts'];
-    for (const f of producers) {
+    // ⚠️ Only TWO files call the reporter now. ASYNC-SOURCE-REPORT-RETIRE-0
+    // removed the third, which is what makes required `treeId` reachable.
+    for (const f of ['lib/link.ts', 'lib/markers/stored.ts']) {
       expect(readFileSync(join(SRC, f), 'utf8')).toContain('reportTreeError(');
     }
+    expect(
+      readFileSync(join(SRC, 'lib/markers/async-source.ts'), 'utf8')
+    ).not.toContain('reportTreeError(');
 
     // ⚠️ So four members have NO producer, and of the three that do, `stored`
     // and `async-source` are both being removed. Freezing this union publicly
