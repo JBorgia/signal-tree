@@ -11792,20 +11792,12 @@ per-subject entry is LAST-write-wins, so it is always current and permanently
 shadows the frozen top-level copy. **Unread because unreachable, not because the
 information is unnecessary.**
 
-## And it explains the NESTED failure's exact mechanism
+## ⚠️ WITHDRAWN — this does NOT explain the nested failure
 
-```text
-addOne     path=data.rows        FIELD=""      <- correct: whole subject
-updateOne  path=data.rows.seed   FIELD="seed"  <- fabricated: the entity KEY
-```
-
-Last-write-wins at the subject level means the FABRICATED address wins. Had that
-level been first-write-wins, the correct `''` would have survived and the nested
-rollback would have worked by accident.
-
-**So the nested defect is two things: a bad derivation PLUS a merge policy that
-specifically prefers the later, worse answer.** Fixing the derivation alone would
-leave an order-dependent merge.
+This section originally claimed last-write-wins made the fabricated address win,
+and that first-write-wins would have made nested rollback work by accident.
+**SUBJECT-ADDRESS-CARDINALITY-0 falsified that** — see below. The merge
+asymmetry is real; it is not the nested mechanism.
 
 ## ⚠️ AND THE PING NEEDS NO SUBJECT AT ALL
 
@@ -11833,3 +11825,95 @@ current policy is monotonic. The correction must name a rule under which a weake
 notification cannot displace a stronger one **in either direction**, and the
 three address states must be representable so that "no address" and "the whole
 subject" cannot collide.
+
+---
+
+# SUBJECT-ADDRESS-CARDINALITY-0 — one retained slot IS sufficient
+
+`packages/core/src/lib/subject-address-cardinality-0.spec.ts`
+
+```text
+NULL       within one causal/restoration frame a subject requires at most one
+           ADDRESSLESS fallback coordinate
+FALSIFIER  two effects for the SAME owner PositionId and SubjectId
+           simultaneously require two different retained coordinates AND cannot
+           be distinguished from the effects themselves
+```
+
+**The NULL SURVIVES — on the falsifier's second clause.**
+
+Two different coordinates ARE simultaneously required. They are not *retained*,
+because every effect that needs a field coordinate carries its own complete
+inline address. Captured `ReversalEffect`s for a two-field update:
+
+```text
+EFFECT owner=2 subj=1 struct=undefined path=rows.r1.name    ownerPath=rows
+EFFECT owner=2 subj=1 struct=undefined path=rows.r1.enabled ownerPath=rows
+```
+
+And at resolution the inline term wins every time:
+
+```text
+RESOLVE inlineField="name"    descField="" => field="name"
+RESOLVE inlineField="enabled" descField="" => field="enabled"
+```
+
+⚠️ `descField=""` on both lines — present and unused. The single retained slot
+holds **neither** of the two coordinates that were applied.
+
+## The only addressless effects are structural
+
+```text
+EFFECT owner=2 subj=1 struct=rekey path=undefined ownerPath=undefined
+```
+
+And a structural effect needs a COLLECTION path, never a subject FIELD
+coordinate. So the addressless case never contends for the slot.
+
+> **`Map<SubjectId, one address>` is not the wrong data structure.** Field
+> coordinates travel with their effects; the retained entry is a fallback for
+> addressless effects, and those need only a collection.
+
+Plan item 5's second branch ("if two legitimate coordinates can coexist, the map
+is wrong") is therefore **not taken**. The first branch applies.
+
+## ⚠️ TWO CORRECTIONS THIS FORCES
+
+**1. DESCRIPTOR-MERGE-0's mechanism claim is withdrawn.** The descriptor is never
+consulted for these effects — the inline term short-circuits the `??` chain
+before either level is reached. Neither merge policy participates in the nested
+failure. The measured merge asymmetry stands as a fact; its explanatory role does
+not.
+
+**2. The corrected nested mechanism is purely inline:**
+
+```text
+deriveCollectionPathFromEffect(path=data.rows.r1.name, ownerPath=data.rows)
+  ownerPath.includes('.') -> parentPath('data.rows') -> 'data'
+```
+
+`data` is a branch, not a collection, so resolution bails at `isCollectionNode`
+before a field coordinate is even considered. Nested probes produce no resolve
+line at all, which is how this was located.
+
+## ⚠️ AND THIS CHANGES WHERE THE REGISTRY RULE MUST BE REACHABLE
+
+```ts
+function deriveCollectionPathFromEffect(effect) {
+  if (!hasInlineSubjectAddress(effect)) return undefined;
+  return deriveCollectionPath(effect.path, effect.ownerPath, effect.subjectId, undefined);
+}
+```
+
+**Inline is not an independent address.** It is the same two broken helpers
+applied to the effect's own strings. So:
+
+- Correcting the derivation corrects both paths at once — good.
+- But `registry.collectionPathFor(positionId)` must be reachable from the
+  **inline resolution path inside the adapter**, not only from descriptor capture
+  in `rememberTreeRealizationDescriptor`. The adapter already closes over the
+  tree, so this is reachable; it is called out because the plan's step 1 wording
+  ("record at entityMap materialization") describes only the capture half.
+
+`effect.owner` is the PositionId and is present on every effect, so the lookup
+has its key at both sites.
