@@ -127,10 +127,15 @@ describe('STORED-OWNER-INVARIANT-0: the report boundary has ownership', () => {
     // see ERROR-PATH-SEMANTICS-0.
     expect(write?.path).toBe('prefs');
 
-    // ⚠️ The node attachment is enhancer-gated and ABSENT here — which is why
-    // this is not the question. `stored()` takes its registry from the
-    // materialization context.
-    expect(getPositionRegistry(tree.$)).toBeUndefined();
+    // ⚠️ UPDATED BY LINK-ROOT-SOURCE-0. This asserted the node attachment was
+    // ABSENT without enhancers, characterizing the gating that made
+    // `link(tree.$)` reject a genuinely owned root. The root now carries its
+    // registry unconditionally, for the same reason ordinary leaves do: a
+    // post-construction operation cannot ask for a capability.
+    //
+    // The point of THIS test is unaffected — `stored()` takes its registry from
+    // the materialization context, and reporting works without enhancers.
+    expect(getPositionRegistry(tree.$)).toBeDefined();
 
     cap.stop();
   });

@@ -15,6 +15,7 @@ import {
 } from './internals/entity-egress-projection';
 import { applyAtRelativePath } from './internals/source-mutation';
 import { isTraversableNode } from './internals/node-shape';
+import { getRootTree } from './internals/root-source';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
 import type { EntitySignal } from './types';
@@ -168,6 +169,20 @@ function accessorsFor<T>(x: unknown): {
     setAll?: (v: T) => void;
     set?: (v: T) => void;
   };
+
+  // THE ROOT ACCESSOR, checked FIRST: it is a plain object, so every later
+  // branch misreads it — the callable fallback is what produced
+  // "x is not a function". Its canonical value is the whole-tree snapshot, and
+  // the tree itself both reads and writes that. Only an explicitly recorded
+  // SignalTree root matches; arbitrary objects do not become readable.
+  const rootTree = getRootTree(x);
+  if (rootTree) {
+    return {
+      read: () => rootTree() as T,
+      write: (v: T) => rootTree(v as unknown),
+      collection: false,
+    };
+  }
 
   if (typeof node.all === 'function' && typeof node.setAll === 'function') {
     return {

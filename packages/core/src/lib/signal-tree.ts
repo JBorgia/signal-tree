@@ -31,6 +31,7 @@ import {
   materializeMarkers,
 } from './internals/materialize-markers';
 import { installDormantObservation } from './internals/observation-substrate';
+import { defineRootTree } from './internals/root-source';
 import {
   definePositionRegistry,
   type PositionRegistry,
@@ -1263,6 +1264,27 @@ function create<T extends object>(
       materializationContext.positionRegistry
     );
   }
+  // THE ROOT AS A SUPPORTED LINK SOURCE.
+  //
+  // `link(tree.$, endpoint)` typechecks, so the root is supported — but its
+  // owner carriers were capability-gated exactly as ordinary leaves' were, so a
+  // plain tree rejected it as unowned. Attached unconditionally for the same
+  // reason the dormant substrate seeds leaves: a post-construction operation
+  // cannot ask for a capability.
+  if (materializationContext.positionRegistry) {
+    definePositionRegistry(
+      signalState as object,
+      materializationContext.positionRegistry
+    );
+    defineOwnedOwnerPath(signalState as object, '');
+  }
+  // The root accessor is not callable, so its canonical reader/writer is the
+  // tree itself. Recorded here; `accessorsFor` consults it.
+  defineRootTree(
+    signalState as object,
+    tree as unknown as { (): unknown; (value: unknown): void }
+  );
+
   if (materializationContext.physicalCommitClock) {
     definePhysicalCommitClock(
       tree as object,
