@@ -1,8 +1,9 @@
 import type { WritableSignal } from '@angular/core';
 
 import { emitOwnedMutation } from './owned-mutation';
+import { getOwnedOwnerPath } from './owned-metadata';
+import { getPositionRegistry } from './position-registry';
 import { isTraversableNode } from './node-shape';
-import type { PositionRegistry } from './position-registry';
 
 /**
  * THE DORMANT OBSERVATION SUBSTRATE.
@@ -47,13 +48,20 @@ const ARM = Symbol('signaltree.observationArm');
 type Arm = (before: unknown, after: unknown, intent: 'replace' | 'derive') => void;
 type ArmSlot = (arm: Arm | null) => void;
 
+/**
+ * Deliberately only what is NOT already reachable from the leaf.
+ *
+ * `slot`, `registry` and `ownerPath` were cached here originally and are
+ * duplicates: the arm slot lives on the leaf under `ARM`, and the registry and
+ * owner path were attached during materialization. Reading them at claim time —
+ * a rare operation — instead of retaining them per leaf costs nothing and
+ * removes bookkeeping paid by every ordinary leaf whether or not it is ever
+ * observed. RETAINED-MEMORY-0 / MEM-D.
+ */
 type LeafObservation = {
   claims: number;
   /** Allocated on first activation, retained for the source's lifetime. */
   positionId: number | undefined;
-  slot: ArmSlot;
-  registry: PositionRegistry;
-  ownerPath: string;
 };
 
 const OBSERVATION = new WeakMap<object, LeafObservation>();
@@ -65,11 +73,7 @@ const OBSERVATION = new WeakMap<object, LeafObservation>();
  * `set` or `update`. The functions installed here are the ones that must live
  * for the leaf's lifetime.
  */
-export function installDormantObservation<T>(
-  leaf: WritableSignal<T>,
-  ownerPath: string,
-  registry: PositionRegistry
-): void {
+export function installDormantObservation<T>(leaf: WritableSignal<T>): void {
   const rawSet = leaf.set.bind(leaf);
   const rawUpdate = leaf.update.bind(leaf);
   let arm: Arm | null = null;
@@ -100,13 +104,7 @@ export function installDormantObservation<T>(
     arm(before, leaf(), 'derive');
   };
 
-  OBSERVATION.set(leaf as object, {
-    claims: 0,
-    positionId: undefined,
-    slot: (leaf as unknown as Record<symbol, ArmSlot>)[ARM],
-    registry,
-    ownerPath,
-  });
+  OBSERVATION.set(leaf as object, { claims: 0, positionId: undefined });
 }
 
 /** Claim observation for one leaf, or `undefined` if it is not one. */
@@ -114,13 +112,18 @@ function claimLeaf(node: object): (() => void) | undefined {
   const state = OBSERVATION.get(node);
   if (!state) return undefined;
 
+  // Read at CLAIM time rather than retained per leaf — see LeafObservation.
+  const slot = (node as Record<symbol, ArmSlot>)[ARM];
+  const registry = getPositionRegistry(node);
+  const ownerPath = getOwnedOwnerPath(node);
+  if (!slot || !registry || ownerPath === undefined) return undefined;
+
   if (state.claims === 0) {
     if (state.positionId === undefined) {
-      state.positionId = state.registry.allocate();
+      state.positionId = registry.allocate();
     }
     const positionIds = [state.positionId];
-    const { registry, ownerPath } = state;
-    state.slot((before, after, intent) =>
+    slot((before, after, intent) =>
       emitOwnedMutation(
         { path: ownerPath, ownerPath, positionIds, ownerId: registry.id },
         before,
@@ -142,7 +145,7 @@ function claimLeaf(node: object): (() => void) | undefined {
     if (released) return; // dispose is idempotent
     released = true;
     state.claims--;
-    if (state.claims === 0) state.slot(null);
+    if (state.claims === 0) slot(null);
   };
 }
 
