@@ -10251,9 +10251,12 @@ depends on which branch wrote it.
 ## The separation that makes it simple
 
 ```text
-PositionIds identify STATE POSITIONS.
-SubjectIds identify ENTITY LIFETIMES.
-A row never becomes a position so realization can address it.
+PositionId  = the CAUSAL / OWNERSHIP position
+SubjectId   = an ENTITY LIFETIME
+field path  = a coordinate WITHIN the current subject
+⚠️ "PositionIds identify state positions" was too strong — a row field leaf
+reports the collection's P3, so a PositionId does not uniquely identify that
+leaf. It identifies who OWNS it.
 ```
 
 ## Standing
@@ -10266,6 +10269,84 @@ Remaining before implementation: DESCRIPTOR-ROLE-0 (which descriptor fields
 serve scalar vs subject resolution) and SUBJECT-ADDRESS-0 (ping != whole
 subject != field — the ping carries `subj=[1]`, measured, so it WILL manufacture
 `fieldPathFromRow = ''` today).
+
+# DESCRIPTOR-ROLE-0 — the NULL survives, and the overload is NARROWER than I claimed
+
+`packages/core/src/lib/descriptor-role-0.spec.ts`, 4/4.
+
+```text
+NULL       collectionPath / fieldPathFromRow serve SUBJECT realization
+           exclusively; ordinary scalar replay uses its own machinery
+RESULT     SURVIVES
+```
+
+Every production read traced through its consumer branch:
+
+```text
+collectionPath
+  occupancy tracking          SUBJECT (keyed by subjectId)
+  descriptor write / merge    capture-side, not resolution
+  resolveCollectionPath       STRUCTURAL / subject
+  resolveCurrentSubjectTarget SUBJECT — resolves a collection node
+fieldPathFromRow
+  canResolvePreparedSubjectTarget   requires effect.subjectId
+  assignPreparedSubjectValue        requires a prepared SUBJECT
+  resolveSubjectFieldPath           keyed by effect.subjectId
+```
+
+`resolveLiveScalarNode` falls back to `descriptor.path` for a non-subject effect
+and never consults either field.
+
+⚠️ **So the overload I named does not exist in the CONSUMERS.** I said
+`collectionPath` doubles as a parent/scope coordinate for scalars. It does not:
+the DERIVATION computes a parent-shaped string for scalar-looking inputs that
+nothing then reads. Narrower, and better-behaved, than a genuinely overloaded
+field.
+
+## ⚠️ The top-level copies are VESTIGIAL
+
+Both fields exist twice — on the descriptor and per `subjectDescriptors` entry —
+with the top-level as a last-resort fallback. Removing BOTH:
+
+```text
+baseline                          2112 passing, 5 expected fail
+both top-level fallbacks dropped  2112 passing, 5 expected fail
+```
+
+Identical across the entire suite. **Historical convenience, not required
+fallback authority.** Not deleted here — what the descriptor must retain for
+zero-tree-visit replay is an implementation question, and deleting for elegance
+is what this audit refuses. Recorded so the implementation does not preserve
+them believing something depends on them.
+
+## ⚠️ A THIRD meaning for `''`, found while tracing
+
+```text
+canResolvePreparedSubjectTarget   if (!fieldPathFromRow) return false;
+                                  -> '' is FALSY, so it reads as NO PATH
+assignPreparedSubjectValue        if (fieldPathFromRow === '') { ... }
+                                  -> '' reads as WHOLE SUBJECT
+```
+
+Two consumers, two meanings for the same value. That bears directly on
+SUBJECT-ADDRESS-0: the owner-only ping manufactures `''`, and which consumer
+sees it decides whether the effect is REFUSED or applied to the ENTIRE ROW.
+
+The three states must stay distinct — `undefined` (no information), `''` (whole
+subject), `'name'` (a field) — and today two of them already collide at one call
+site, independently of the ping.
+
+## Theorem, tightened
+
+```text
+PositionId  = the CAUSAL / OWNERSHIP position
+SubjectId   = an ENTITY LIFETIME
+field path  = a coordinate WITHIN the current subject
+```
+
+⚠️ "PositionIds identify STATE positions" was too strong: a row field leaf
+reports the collection's P3, so a PositionId does not uniquely identify that
+leaf — it identifies who OWNS it.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 

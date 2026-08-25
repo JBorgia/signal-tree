@@ -84,10 +84,14 @@ import { undoable } from './undoable';
  * ## The separation that makes it simple
  *
  * ```text
- * PositionIds identify STATE POSITIONS.
- * SubjectIds identify ENTITY LIFETIMES.
- * A row never becomes a position so realization can address it.
+ * PositionId  = the CAUSAL / OWNERSHIP position
+ * SubjectId   = an ENTITY LIFETIME
+ * field path  = a coordinate WITHIN the current subject
  * ```
+ *
+ * ⚠️ "PositionIds identify STATE positions" was TOO STRONG, and this file's own
+ * measurement is why: a row field leaf reports the COLLECTION's P3, so a
+ * PositionId does not uniquely identify that leaf — it identifies who OWNS it.
  */
 
 const flush = async () => {
