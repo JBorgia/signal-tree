@@ -15328,3 +15328,96 @@ So this is Outcome B: design the smallest INTERNAL seed — conceptually
 `ordered [{ subjectId, row }]` — reusing the exact `getProjectedEntity(key)` path
 `all()` uses so the seed and the public value cannot diverge. `SubjectId` is not
 exposed publicly, and no `Map<Key, Row>` bootstrap is used at any point.
+
+## ENTITY-INSPECTION-TOPOLOGY-0 — measured
+
+Scalar and branch inspection contaminates a VALUE at a location that keeps
+existing. Entity inspection can change **which lifetimes exist**, so local and
+egress-eligible topology can diverge. Measured before writing any reducer.
+
+### T0 — the production path reaches the entity mechanisms
+
+The `OPERATION-REACHED-MECHANISM` control, applied to the mechanism this phase
+is about to implement against. A real `applyState` scrub inside the production
+DevTools write context decomposes into the same subject-addressed vocabulary the
+synthetic probes use:
+
+```text
+rows.1  subj[1]     part:inspection  se:{kind:remove, subject:1, afterSubject:2}
+rows.2  subj[2]     part:inspection  se:null   v:{id:2,name:'b'}
+rows.3  subj[3]     part:inspection  se:{kind:add, subject:3, key:3, beforeSubject:2}
+rows    subj[1,2,3] part:inspection
+```
+
+So synthetic inspection operations are valid proxies for the production scrub.
+
+### T5 — routing needs no address metadata
+
+After an inspection `changeId(1, 88)`, a later authored update at the new local
+address arrives carrying `subjectIds: [1]` — it names the subject directly. The
+projection therefore never looks up an address to route an event, and the seed's
+`key` is needed for BOOTSTRAP only, not steady state.
+
+### T6 — VACUOUS
+
+The only order-affecting public operations are `prependOne`/`prependMany`, which
+add rather than reorder. No independent reorder operation exists to characterize.
+
+### T3 / T4 — the two cases that stopped implementation
+
+```text
+T3  eligible [S1] · inspection add S2 · authored update S2
+    the authored event carries subjectIds:[2] and a complete row, but NO
+    structural effect and NO ordering carrier. S2 is not in the eligible
+    projection, so adopting it would mean inventing an insertion position that
+    no eligible operation ever specified.
+
+T4  eligible [S1@1, S2@2] · inspection remove S1 · authored add S3@1
+    the authored add DOES carry a full structural effect with ordering, and
+    S3 != S1 correctly. But applying it to a projection that still holds S1
+    yields TWO live subjects at key 1 — an internally invalid collection, in a
+    system that rejects key collisions outright (`changeId(1,2)` throws).
+```
+
+Both were referred for ruling rather than decided by the reducer's control flow.
+
+## THE ORDERING CARRIER — a misreading, caught by measurement
+
+`beforeSubject` and `afterSubject` are **NEIGHBOUR DESCRIPTORS, not insertion
+directives**:
+
+```text
+operation                effect                              result
+addOne D onto [1,2,3]    beforeSubject: 3                    [1,2,3,4]
+prependOne D             afterSubject: 1                     [4,1,2,3]
+remove FIRST             afterSubject: 2                     (no predecessor)
+remove MIDDLE            beforeSubject: 1, afterSubject: 3   (both neighbours)
+remove LAST              beforeSubject: 2                    (no successor)
+add into empty           neither                             [1]
+```
+
+`beforeSubject` is the subject immediately BEFORE this one — its PREDECESSOR.
+So an add inserts AFTER `beforeSubject`, or BEFORE `afterSubject`, or is the
+only element.
+
+⚠️ The earlier T4 note read `beforeSubject: 2` as "insert before subject 2",
+which would have built eligible order backwards on every append. The measured
+local order disproved it immediately. Pinned permanently in
+`entity-order-carrier.spec.ts`.
+
+### A second inference error in the same pass
+
+The permanent assertions first used `not.toHaveProperty('beforeSubject')` for
+the end-of-collection cases, because the key was absent from the probe's
+`JSON.stringify` output. It is not absent — it is present and `undefined`, and
+`JSON.stringify` omits undefined values. Absence from serialized output is not
+absence from the object. The assertions now check the VALUE.
+
+Both errors share a shape worth naming alongside
+`OPERATION-REACHED-MECHANISM CONTROL`:
+
+> **READ THE OBSERVATION, NOT ITS RENDERING.** A probe's printed form is a lossy
+> projection of the thing measured — `JSON.stringify` drops `undefined`, key
+> order is not insertion order, and a name is not a semantic. Assert against the
+> value, and confirm a vocabulary's meaning against an observable outcome rather
+> than against what the identifier sounds like.
