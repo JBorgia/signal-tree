@@ -15429,9 +15429,19 @@ inspection-egress invariant that Link already carries. It ended somewhere else
 entirely: three previously unknown public-contract defects in `link()`, and a
 measured design for the substrate that fixes them.
 
-**No production code changed in this branch.** `15a8cd67` is the clean
-checkpoint throughout; every prototype was env-gated scratch, measured, and
-reverted. Probe files are preserved in the session scratchpad.
+**No production code changed in this branch.** Every prototype was env-gated
+scratch, measured, and reverted; probe files are preserved in the session
+scratchpad.
+
+```text
+production-code baseline   15a8cd67
+current clean HEAD         this record and its successors
+commits since baseline     DOCUMENTATION ONLY
+```
+
+⚠️ `15a8cd67` is the last production-code checkpoint, NOT current HEAD. Reverting
+"back to the clean checkpoint" through the documentation commits would erase the
+only repository evidence that any of this was discovered.
 
 ## How it started: serialization has no metadata-bearing observation
 
@@ -15593,9 +15603,9 @@ Characterized across four phases, all green:
 | | |
 |---|---|
 | escaped-callable semantics | pre-held `set` AND `update` observed after arming |
-| inactive write cost | flat vs bare; cost sits on construction (~+18% seed, ~+32% seed+hook, 100 leaves) |
+| inactive write cost | no material regression measurable in the discriminator; the measurable cost sits on construction (~+18% seed, ~+32% seed+hook, 100 leaves) |
 | owner discovery from source alone | registry + ownerPath suffice; no tree/sibling argument |
-| branch activation | reaches pre-materialized descendants |
+| branch activation | reaches PRE-EXISTING descendants — and `DESCENDANT-MATERIALIZATION-0` proves ordinary state cannot arrive later |
 | source scoping | verified physically AND behaviourally |
 | notifier fanout | one publication, many consumers |
 | activation lifecycle | claim-based; idempotent disposal |
@@ -15620,6 +15630,52 @@ link C            {claims:1, positionId:1, armed:true }   same identity
 
 `L4` is the economic point: a temporary Link must not convert "pay when
 observed" into "pay forever after first observation."
+
+## `DESCENDANT-MATERIALIZATION-0` — the late-descendant question, MEASURED
+
+`SOURCE-OBSERVATION-ACTIVATION-0` proved that an ancestor claim arms descendants
+**that already exist**. It left open whether a descendant can first materialize
+AFTER its ancestor is claimed — in which case the one-shot recursive walk in
+`acquireObservation` would be insufficient and nothing would propagate the claim.
+
+Measured by tracing actual `finalizeLeafSignal` execution, not proxy rendering:
+
+```text
+--- constructing, no access yet ---
+[LEAF] settings.theme
+[LEAF] settings.units
+[LEAF] top
+--- construction returned ---
+--- first access to settings.theme ---
+(no [LEAF] trace — the object already existed)
+
+[LEAF] a.b.c.d        deep nesting, also at construction
+```
+
+**MAT-A. Every ordinary leaf at every depth is created during construction.**
+What looks late from the application's side is first ACCESS to an object the
+ancestor's walk has already seen.
+
+The second category — later STRUCTURAL creation of ordinary state — is closed
+too. Both routes fail:
+
+```text
+tree.$.settings.set({theme, added})    TypeError: set is not a function
+applyState({settings:{theme, extra}})  key absent, and NO [LEAF] trace fired
+```
+
+A branch accessor has no `.set`, and `applyState` with an unknown key neither
+creates a leaf nor exposes one. Ordinary object shape is fixed at construction.
+
+So `LATE-DESCENDANT-0` is **VACUOUS for ordinary state, in both categories** —
+not missing coverage. The one-shot walk is sufficient because ordinary state
+cannot appear after it. Entity structural additions are the third category and
+are out of scope here: collections carry their own observation and work on a
+bare tree.
+
+⚠️ Recorded separately, unpursued: `applyState` silently drops an unknown key —
+no error, no warning, no leaf. Outside this phase, but the same class of silent
+no-op this work has named elsewhere.
 
 ## COMPOSITION LAWS EARNED HERE
 
@@ -15660,8 +15716,8 @@ none. Do not stamp identical metadata on every shape for symmetry.
 
 **MEASURE THE PROPOSED MECHANISM, NOT AN INSTRUMENTED SURROGATE.** The dormant
 hook first measured **+120.5%** and nearly died — because the prototype STACKED
-a wrapper on an already-wrapped leaf. Integrated into the leaf's own write path
-it measured **flat**. A benchmark falsifies an architecture only when the
+a wrapper on an already-wrapped leaf. Integrated into the leaf's own
+write path, no material regression was measurable. A benchmark falsifies an architecture only when the
 measured execution shape preserves the mechanism's dispatch topology.
 
 **FANOUT IS NOT LIFECYCLE.** Proving that multiple consumers receive one
