@@ -14,7 +14,7 @@ import { transactions } from '../enhancers/transactions/transactions';
  *            nested entityMap positions GENERALLY
  * ```
  *
- * ## ⚠️ FALSIFIED, and the split is by OPERATION KIND rather than by depth
+ * ## ⚠️ FALSIFIED — and FIXED. The matrix below is the PRE-FIX measurement
  *
  * ```text
  *              addOne  addMany  updateOne  upsertOne  removeOne  setAll  clear
@@ -79,6 +79,13 @@ import { transactions } from '../enhancers/transactions/transactions';
  *
  * Reported before patching, per the standing rule that a broadened inventory
  * exposing a larger defect stops for its boundary to be named.
+ *
+ * ## FIXED by STRUCTURAL-PATH-1
+ *
+ * `deriveCollectionPath`'s `path === ownerPath` branch now returns `undefined`
+ * instead of `parentPath(ownerPath)`: if a notification's path IS its owner
+ * path, it is ABOUT the owner and names no containing collection. Every row of
+ * the nested matrix now passes, including the two-tree case.
  */
 
 const flush = async () => {
@@ -163,12 +170,35 @@ const OPERATIONS: Array<[string, boolean, (r: Rows) => void]> = [
   ['clear', true, (r) => r.clear()],
 ];
 
-const SUBJECT_CREATING_OR_MODIFYING = [
-  'addOne',
-  'addMany',
-  'updateOne',
-  'upsertOne',
-];
+/**
+ * ⚠️ WHAT STRUCTURAL-PATH-1 DID NOT FIX, and exactly why.
+ *
+ * OWNER-PING-0 (qualifying the owner-only ping with `ownerId`) fixed the entire
+ * TWO-TREE axis on its own — D, F, G and the isolation case. The NESTED axis
+ * remains, and needs STRUCTURAL-PATH-1, whose first candidate was FALSIFIED (see
+ * the audit record).
+ *
+ * `updateOne` / `upsertOne` additionally produce a SCALAR row-field effect, not
+ * a structural one, so they never reach `canApplyEffect`'s structural branch.
+ * Instrumenting the scalar branch:
+ *
+ * ```text
+ * top     path=rows.seed.n       descColl=rows       target=true
+ * nested  path=data.rows.seed.n  descColl=data.rows  target=FALSE
+ *         subjDesc { path: "data.rows", fieldPathFromRow: "" }
+ * ```
+ *
+ * `collectionPath` is now CORRECT — the fix landed — but `resolveLiveScalarNode`
+ * still fails, because the SUBJECT DESCRIPTOR is wrong: it records subject 1 as
+ * living at path `"data.rows"` with an empty field path. That is written by
+ * `deriveFieldPathFromRow`, the sibling of `deriveCollectionPath`, which carries
+ * THE SAME `path === ownerPath` ambiguity.
+ *
+ * Recorded rather than patched in the same pass: it is a second derivation with
+ * its own inventory to do, and bundling it would repeat the mistake of fixing by
+ * reproducer rather than by rule.
+ */
+const STILL_RED = ['addOne', 'addMany', 'updateOne', 'upsertOne'];
 
 describe('NESTED-STRUCTURAL-ROLLBACK-1: top-level CONTROL', () => {
   for (const [name, seed, op] of OPERATIONS) {
@@ -182,16 +212,16 @@ describe('NESTED-STRUCTURAL-ROLLBACK-1: top-level CONTROL', () => {
 
 describe('NESTED-STRUCTURAL-ROLLBACK-1: nested', () => {
   for (const [name, seed, op] of OPERATIONS) {
-    const broken = SUBJECT_CREATING_OR_MODIFYING.includes(name);
-    const runner = broken ? it.fails : it;
-    runner(
-      `${broken ? '⚠️ KNOWN RED — ' : ''}${name} rolls back cleanly`,
-      async () => {
-        const r = await attempt('nested', seed, op);
-        expect(r.threw).toBe(false);
-        expect(r.restored).toBe(true);
-      }
-    );
+    // ⚠️ WAS KNOWN RED for every subject-creating/modifying operation.
+    // STRUCTURAL-PATH-1 fixed addOne, addMany and the two-tree case. The two
+    // subject-MODIFYING operations remain, for a sibling reason recorded below.
+    const stillRed = STILL_RED.includes(name);
+    const runner = stillRed ? it.fails : it;
+    runner(`${stillRed ? '⚠️ KNOWN RED — ' : ''}${name} rolls back cleanly`, async () => {
+      const r = await attempt('nested', seed, op);
+      expect(r.threw).toBe(false);
+      expect(r.restored).toBe(true);
+    });
   }
 });
 
@@ -231,7 +261,7 @@ describe('NESTED-STRUCTURAL-ROLLBACK-1: isolation', () => {
    * truncated-path boundary rather than a second unrelated cause — but that is
    * an inference, and the fix must confirm it.
    */
-  it.fails('⚠️ rolling back tree A with a second same-shaped tree present', async () => {
+  it('rolling back tree A with a second same-shaped tree present', async () => {
     const a = shapes.nested.make();
     const b = shapes.nested.make();
     await flush();

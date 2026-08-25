@@ -3085,6 +3085,8 @@ export function restoration(
                 subjectIds,
                 positionIds,
                 effectiveMeta
+              ,
+                treeOwnerId
               );
             }
           );

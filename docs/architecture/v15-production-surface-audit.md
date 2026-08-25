@@ -9954,6 +9954,113 @@ the vehicle that corrupts realization state here.
 
 Both records are corrected in place.
 
+# OWNER-PING-0 — the ping is QUALIFIED, and that alone fixed the two-tree axis
+
+The owner-only collection ping's two producers were found by instrumenting
+`notify` and capturing the stack:
+
+```text
+restoration.ts:3080     forwarding an interceptLeafSignals mutator event
+transactions.ts:1321    the same shape
+```
+
+Both values are `undefined` because `wrapMutator` deliberately skips
+snapshotting for collections, and both forwarded to `notify` POSITIONALLY —
+without an `ownerId`. Both call sites already had `treeOwnerId` in scope, from
+the guard added in OWNER-REPLAY-1.
+
+**Qualifying the ping fixed the ENTIRE two-tree axis on its own** — D, F, G and
+the isolation case. With the namespace present the notifier's semantic identity
+separates A's ping from B's, coalescing behaves as it does with one tree, and
+the ping no longer survives to claim the descriptor first.
+
+The invariant is promoted accordingly, and this is the third widening:
+
+```text
+WAS  every VALUE-CARRYING mutation names its owning tree
+IS   every notification that participates in a global SignalTree mechanism —
+     batching, coalescing, delivery, attribution or authority — names its owning
+     tree, WHETHER OR NOT IT CARRIES A VALUE
+```
+
+REALIZATION-NAMESPACE-0 is what forced it: a value-less notification changed
+causal state indirectly.
+
+⚠️ And PositionIds are deliberately NOT made globally unique. The probe proved
+local ids are viable — distinct registries, distinct descriptor maps, no
+cross-writes — and colliding local numbers are the falsifier that exposed this
+class of bug. Globally uniquifying them would have hidden it.
+
+# STRUCTURAL-PATH-1 — ⚠️ MY CANDIDATE FIX IS FALSIFIED
+
+The diagnosis stands. The fix I wrote does not.
+
+## The candidate
+
+`deriveCollectionPath`'s two ambiguous branches, changed so that
+
+```text
+path === ownerPath          -> undefined   (was parentPath(ownerPath))
+path under ownerPath + subj -> ownerPath   (was parentPath(ownerPath))
+```
+
+on the premise that **`ownerPath` never names a ROW** — since `entity-signal`
+always notifies with `basePath`, the collection, as the owner path.
+
+## What it did
+
+```text
+nested addOne / addMany     FIXED
+nested removeOne two-tree   already fixed by OWNER-PING-0
+nested updateOne/upsertOne  still red — they are SCALAR effects and never reach
+                            the structural branch at all
+5 tree-realization-adapter tests   BROKEN
+1 restoration rekey test           BROKEN
+```
+
+## Why it is wrong
+
+Those adapter tests construct descriptors where **`ownerPath` DOES name a row**.
+So the premise is false, `path === ownerPath` does not imply "about the owner",
+and no string rule can separate the cases — which is the original finding,
+turned back on my own fix.
+
+Reverted. The ping qualification is kept, because it is independently correct
+and breaks nothing.
+
+## What the real fix needs
+
+```text
+CONSULT POSITION IDENTITY, not path shape. `structuralOwnerPaths` already knows
+which positions ARE collections; the derivation must ask that rather than infer
+from dots.
+
+AND a second derivation has the same ambiguity: `deriveFieldPathFromRow` writes
+a SUBJECT DESCRIPTOR recording subject 1 at path "data.rows" with an empty field
+path, which is why `resolveLiveScalarNode` fails for updateOne/upsertOne even
+once `collectionPath` is correct.
+```
+
+Instrumented evidence for the remaining reds:
+
+```text
+top     path=rows.seed.n       descColl=rows       target=true
+nested  path=data.rows.seed.n  descColl=data.rows  target=FALSE
+        subjDesc { path: "data.rows", fieldPathFromRow: "" }
+```
+
+`collectionPath` is correct there — the fix landed — and resolution still fails,
+so the subject-descriptor derivation needs its own inventory.
+
+## Standing
+
+```text
+core   2102 passing, 5 expected failures
+```
+
+Still NOT release-green: four are nested rollback (addOne, addMany, updateOne,
+upsertOne) and one is `link-collection-0`'s duplicate pin of the same defect.
+
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
 Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
