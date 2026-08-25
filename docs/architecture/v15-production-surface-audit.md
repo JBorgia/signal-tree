@@ -13358,3 +13358,118 @@ Internal granular reactivity is INDEPENDENT of Link's full-value boundary.
 before   2235 passing
 after    2250 passing
 ```
+
+---
+
+# CONSOLIDATION-0 — the experiments are archived; the invariants remain
+
+Evidence and scaffolding only. **No production change, no API change.**
+
+## ⚠️ THE MEASUREMENT THAT DECIDED THE HARNESS DISPOSITION
+
+A catastrophic production mutation — outbound sends never arm — fails **9 spec
+files**, and **NONE of the three comparison harnesses**:
+
+```text
+FAILED   comparison-full-state-0   demarcation-0   link-1-relationship
+         link-2-public-contract    link-collection-0
+         production-link-conformance-0   tree-error-attribution   ...
+
+DID NOT NOTICE
+         link-handle-0   link-handle-1   link-echo-1-suppression
+```
+
+They each carry a LOCAL `link` implementation with a `mode` parameter, so no
+production change can ever fail them. **They are structurally incapable of
+protecting production.** That is the argument for archiving them — not a
+judgement about their past value, which was decisive.
+
+## The three experiments, and what they decided
+
+```text
+LINK-HANDLE-0   'weak' | 'strong' settled()
+                STRONG won. The weak reading resolves while an observation is
+                still HELD behind settlement, so a host that awaited it before
+                backgrounding was told the link was caught up when it was not.
+
+LINK-HANDLE-1   'included' | 'excluded' retrieve
+                INCLUDED won. An excluded retrieve() can MUTATE X after
+                settled() has returned — misleading in exactly the way the weak
+                outbound reading was. Having its own promise is not sufficient
+                to exclude it; per-operation and whole-object idle promises
+                routinely coexist.
+
+LINK-ECHO-1     'correlation' | 'equality-said' | 'equality-held'
+                EQUALITY won. No causal token, no provenance metadata, and no
+                correlation id is needed: the reconciliation loop's own
+                first-iteration equality check already suppresses the echo.
+                DEMARCATION-0 had independently found that a separate
+                echo-suppression check WAS that first iteration.
+```
+
+Each winning outcome is now asserted against production:
+
+```text
+STRONG settlement    production-link-conformance-0 (held consequence)
+INCLUDED retrieve    production-link-conformance-0 (3 retrieve cases)
+equality echo        comparison-full-state-0 (fresh-but-deep-equal)
+```
+
+⚠️ **LINK-RACE-1 has no file to dispose.** It never was a separate harness — it
+is a named invariant carried by the conformance and demarcation batteries.
+
+## ERROR-SURFACE archaeology → three permanent batteries
+
+```text
+DELETED   error-surface-0-disposition.spec.ts     4 tests
+          error-surface-1.spec.ts                10 tests
+          error-owner-identity-0.spec.ts          7 tests
+
+KEPT      tree-error-attribution.spec.ts    <- ERROR-SURFACE-2 + the four
+                                               TreeId property tests
+          tree-error-public-contract.spec.ts <- exports, runtime shape, and
+                                               the delivery semantics the two
+                                               deleted files had been carrying
+          error-reporter.spec.ts             <- reporter unit delivery
+```
+
+Falsifier coverage for every deletion:
+
+```text
+"listener contract is sound"        -> public-contract: throwing listener
+5 delivery cases (ES-1)             -> public-contract: exactly-once, isolation,
+                                       unsubscribe/zero/many, failed send
+4 TreeId property cases (EOI-0)     -> MIGRATED verbatim into attribution
+"reports from exactly two places"   -> superseded by a STRONGER guarantee: a
+                                       third producer that cannot supply treeId
+                                       does not typecheck, since the field is
+                                       required
+producer-reachability source-text   -> behavioural: link and stored both report
+                                       with treeId + path; async-source's
+                                       non-participation is pinned in
+                                       async-source-retire-0
+```
+
+Every remaining `RESOLVED — what used to be false is now true` assertion is
+gone. Those were archaeology; this document is where archaeology belongs.
+
+## KEPT, tagged MIGRATION-SENSITIVE
+
+```text
+stored-owner-invariant-0.spec.ts    ownership at stored's report boundary
+async-source-retire-0.spec.ts       the three local error paths, and the
+                                    reporting-retirement record
+```
+
+Both protect behaviour of primitives scheduled for retirement. They are
+deliberately NOT deleted ahead of that migration.
+
+## Mutation D — disposition, NOT deletion
+
+The reconciliation loop's continuation stays. `COMPARISON-FULL-STATE-0` measured
+that removing it kills zero tests because flush-driven rescheduling carries the
+same property — but a surviving mutation is **not deletion authority**.
+Production currently has two mechanisms carrying one invariant; that is
+redundancy, and removing one needs its own preregistered experiment
+(`RECONCILIATION-REDUNDANCY-0`) proving flush-driven rearm is guaranteed across
+every lifecycle, disposal and settlement case. Not now.

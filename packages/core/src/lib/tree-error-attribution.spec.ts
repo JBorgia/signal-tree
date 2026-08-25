@@ -7,14 +7,23 @@ import {
 } from './internals/error-reporter';
 import { entityMap } from './types';
 import { flushAllStoredSignals, stored } from './markers/stored';
-import { getOwnedOwnerPath } from './internals/owned-metadata';
+import {
+  getOwnedOwnerPath,
+  getOwnedPositionIds,
+} from './internals/owned-metadata';
+import { getPositionRegistry } from './internals/position-registry';
 import { link } from './link';
 import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
 import { transactions } from '../enhancers/transactions/transactions';
 
 /**
- * ERROR-SURFACE-2 — the repaired event, proven BEFORE any public export.
+ * TREE ERROR — ATTRIBUTION.
+ *
+ * Consolidated from ERROR-SURFACE-2 and the behavioural half of
+ * ERROR-OWNER-IDENTITY-0. The archaeology that produced these invariants —
+ * seven probes' worth — lives in `v15-production-surface-audit.md`; this file
+ * states what must remain TRUE.
  *
  * ```text
  * error       unknown
@@ -435,5 +444,67 @@ describe('ERROR-PATH-SEMANTICS-0: one meaning for path', () => {
     expect(linkPath).toBe('settings.theme');
     expect(storedPath).toBe('settings.theme');
     expect(linkPath).toBe(storedPath);
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────
+// The TreeId properties themselves (from ERROR-OWNER-IDENTITY-0)
+// ───────────────────────────────────────────────────────────────────────────
+
+/**
+ * ⚠️ These four are why `treeId` is the registry's identity and NOT a
+ * PositionId. The second is the load-bearing one: two same-shaped trees give
+ * their positions the SAME local ids BY DESIGN, so a diagnostic channel keyed
+ * on PositionId would merge two independent applications' trees — the
+ * NOTIFIER-SCOPE-0 defect, arriving in telemetry.
+ */
+describe('TREE ERROR: the TreeId contract', () => {
+  const idTree = () =>
+    signalTree(
+      {
+        settings: { theme: 'light' },
+        rows: entityMap<Row, string>({ selectId: (r: Row) => r.id }),
+      },
+      { enhancers: [restoration(), transactions()] }
+    );
+
+  it('two SAME-SHAPED trees have distinct identity', async () => {
+    const a = idTree();
+    const b = idTree();
+    await flush();
+    expect(getPositionRegistry(a.$)?.id).toBeDefined();
+    expect(getPositionRegistry(a.$)?.id).not.toBe(getPositionRegistry(b.$)?.id);
+  });
+
+  it('⚠️ while their POSITION ids COLLIDE — why PositionId cannot serve', async () => {
+    const a = idTree();
+    const b = idTree();
+    await flush();
+    expect(getOwnedPositionIds(a.$.rows)).toEqual(getOwnedPositionIds(b.$.rows));
+    expect(getPositionRegistry(a.$)?.id).not.toBe(getPositionRegistry(b.$)?.id);
+  });
+
+  it('stable across writes, structural change and rekey', async () => {
+    const tree = idTree();
+    await flush();
+    const before = getPositionRegistry(tree.$)?.id;
+
+    tree.$.settings.theme.set('dark');
+    tree.$.rows.addOne({ id: 'r1', n: 1 });
+    await flush();
+    tree.$.rows.changeId('r1', 'r9');
+    await flush();
+
+    expect(getPositionRegistry(tree.$)?.id).toBe(before);
+  });
+
+  it('not derived from path — same path, different trees', async () => {
+    const a = idTree();
+    const b = idTree();
+    await flush();
+    expect(getOwnedOwnerPath(a.$.settings.theme)).toBe(
+      getOwnedOwnerPath(b.$.settings.theme)
+    );
+    expect(getPositionRegistry(a.$)?.id).not.toBe(getPositionRegistry(b.$)?.id);
   });
 });
