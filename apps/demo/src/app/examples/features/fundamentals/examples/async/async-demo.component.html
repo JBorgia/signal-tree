@@ -7,11 +7,11 @@
       </p>
       <ul>
         <li>
-          <strong><code>asyncSource&lt;T&gt;(config)</code></strong> —
-          load-and-expose. Auto-loads on materialization. Exposes
-          <code>data</code>, <code>loading</code>, <code>error</code>, plus
-          <code>refresh</code> / <code>set</code> / <code>update</code> /
-          <code>reset</code>. Accepts Observable or Promise loaders.
+          <strong>Load-and-expose</strong> — no SignalTree marker. Fetch in a
+          service, keep <code>data</code>/<code>loading</code>/<code>error</code>
+          as plain tree state, and land the result through
+          <code>external()</code>. Use <code>link()</code> only when the external
+          value stays synchronized rather than being fetched once.
         </li>
         <li>
           <strong>Input-driven debounced search</strong> — no SignalTree marker.

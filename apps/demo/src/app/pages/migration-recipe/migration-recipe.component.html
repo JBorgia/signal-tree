@@ -546,12 +546,12 @@ export class CartComponent &#123;
     <div class="compare-grid example-grid">
       <div class="lib-pane">
         <h3 class="pane-title pane-signaltree">
-          SignalTree (using the <code>asyncSource()</code> marker)
+          SignalTree (plain state + <code>external()</code>)
         </h3>
         <pre ngNonBindable><code>// profile.service.ts
 import &#123; Injectable, inject &#125; from '&#64;angular/core';
 import &#123; HttpClient &#125; from '&#64;angular/common/http';
-import &#123; signalTree, asyncSource &#125; from '&#64;signaltree/core';
+import &#123; signalTree, external &#125; from '&#64;signaltree/core';
 
 interface Profile &#123; id: string; name: string; email: string; &#125;
 
@@ -562,9 +562,8 @@ export class ProfileService &#123;
   // Marker materializes into data/loading/error signals + refresh()/set()/reset() —
   // no manual setLoading/setLoaded wiring.
   readonly $ = signalTree(&#123;
-    profile: asyncSource&lt;Profile&gt;(&#123;
-      load: () =&gt; this.http.get&lt;Profile&gt;('/api/me'),
-    &#125;),
+    profile: null as Profile | null,
+    loading: false,
   &#125;).$;
 
   retry() &#123; this.$.profile.refresh(); &#125;
@@ -1943,7 +1942,7 @@ cp -r node_modules/&#64;signaltree/core/skills/using-signaltree \
         become <code>Ops</code> methods, reducers become signal writes,
         selectors become <code>computed()</code> / derived tiers, and the
         <code>load</code> &rarr; effect &rarr; <code>loadSuccess</code> action
-        round-trip collapses into a single <code>asyncSource</code> marker or
+        round-trip collapses into plain state written through <code>external()</code>, or
         <code>Ops</code> method. NGXS, Elf, and the others shown above are
         illustrated side-by-side but not yet in the skill &mdash; PRs welcome.
       </li>

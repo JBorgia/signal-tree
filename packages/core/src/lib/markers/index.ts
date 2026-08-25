@@ -35,16 +35,6 @@ export {
 } from './stored';
 
 // Async-source marker - load-and-expose async primitive (v9.5)
-export {
-  asyncSource,
-  isAsyncSourceMarker,
-  createAsyncSourceSignal,
-  ASYNC_SOURCE_MARKER,
-  type AsyncSourceMarker,
-  type AsyncSourceSignal,
-  type AsyncSourceConfig,
-  type AsyncSourceLoader,
-} from './async-source';
 
 // Async-query marker - input-driven debounced query primitive (v9.5)
 

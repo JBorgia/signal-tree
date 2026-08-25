@@ -109,7 +109,7 @@ The walker (`materializeMarkers`) tracks the path during tree construction and s
 | **State definition**   | `withState({...})`                                           | First argument to `signalTree({...})`                                                               |
 | **Computed state**     | `withComputed(({ keys }) => ({ ... }))`                      | `.derived($ => ({ ... }))` — deep-merged into the tree                                              |
 | **Methods/mutations**  | `withMethods((store) => ({ ... }))`                          | Direct on leaf, or in an Ops service class (recommended)                                            |
-| **Async/streaming**    | `rxMethod(pipeline)` — callable factory inside `withMethods` | `asyncSource` marker for load-and-expose; input-driven queries are an ordinary RxJS pipeline landed with `external()` |
+| **Async/streaming**    | `rxMethod(pipeline)` — callable factory inside `withMethods` | no marker — the request pipeline is ordinary RxJS in a service, and results land through `external()` |
 
 ### 2. Read syntax
 
@@ -163,10 +163,10 @@ The "any component can mutate" concern is overstated on both sides:
 
 |                                    | NgRx SignalStore                                                    | SignalTree                                                                   |
 | ---------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **Canonical async primitive**      | `rxMethod(pipeline)` — callable factory living inside `withMethods` | `asyncSource(config)` marker — **at the tree path**; input-driven queries are ordinary RxJS  |
+| **Canonical async primitive**      | `rxMethod(pipeline)` — callable factory living inside `withMethods` | none — ordinary RxJS in a service, results landed through `external()`  |
 | **Status wiring**                  | Manual `tap(() => setLoading())` / `setLoaded()` inside pipeline    | **Automatic** — materializer derives `loading` / `error` signals             |
 | **Race conditions / cancellation** | `switchMap` in pipeline                                             | Standard RxJS `switchMap` — SignalTree owns no cancellation primitive                 |
-| **Input flexibility**              | Raw value, Signal, or Observable                                    | Your own Subject/signal drives the pipeline; `refresh()` on `asyncSource` |
+| **Input flexibility**              | Raw value, Signal, or Observable                                    | Your own Subject/signal drives the pipeline; you own re-fetching |
 | **Auto-cleanup**                   | `DestroyRef`                                                        | `DestroyRef` (same)                                                          |
 | **Event-bus pattern**              | `@ngrx/store` (classic) or community packages                       | `@signaltree/events` provides typed events                                   |
 | **WebSocket/SSE sync**             | Manual wiring                                                       | Manual wiring to entity-map operations                                       |
@@ -176,10 +176,7 @@ The "any component can mutate" concern is overstated on both sides:
 ```typescript
 // SignalTree (canonical):
 const store = signalTree({
-  users: asyncSource<User[]>({
-    initial: [],
-    load: () => this.api.list$(),
-  }),
+  users: [] as User[],   // written from the service through external()
 });
 // .loading / .error / .data / .refresh derive automatically — no manual wiring.
 
@@ -200,7 +197,7 @@ withMethods((store) => ({
 // Same expressiveness, but you write the status wiring manually every time.
 ```
 
-For teams migrating NgRx `rxMethod` code: the SignalTree-native mapping is `asyncSource` for load-and-expose patterns, and an ordinary RxJS pipeline (`debounceTime` → `distinctUntilChanged` → `switchMap`) landed through `external()` for input-driven debounced queries. SignalTree ships no marker for the latter, because RxJS already owns debounce, dedup, cancellation and latest-wins.
+For teams migrating NgRx `rxMethod` code: the SignalTree-native mapping is an ordinary RxJS pipeline (`debounceTime` → `distinctUntilChanged` → `switchMap`) landed through `external()`, for load-and-expose and input-driven alike. SignalTree ships NO async marker, because RxJS already owns debounce, dedup, cancellation and latest-wins, and the tree only stores the result.
 
 ### 7. Devtools and time-travel
 
@@ -566,7 +563,7 @@ In v10.2 (2026-05-29), we ran a reproducible benchmark across 6 agents (4 fronti
 
 ## Migration paths
 
-- **From `@ngrx/signals` (SignalStore):** NgRx `rxMethod` does not have a 1:1 SignalTree primitive — map it to the `asyncSource` marker (load-and-expose) or an ordinary RxJS pipeline landed through `external()` (input-driven and orchestration).
+- **From `@ngrx/signals` (SignalStore):** NgRx `rxMethod` does not have a 1:1 SignalTree primitive — map it to an ordinary RxJS pipeline landed through `external()`.
 - **From classic NgRx (`@ngrx/store` + `@ngrx/effects`):** **honest recommendation — consider `@ngrx/signals` first, not SignalTree.** A team with heavy classic-NgRx + RxJS muscle memory will transfer to NgRx SignalStore with much less cognitive cost. SignalTree is worth the larger rewrite if your team is _also_ trying to escape the Redux mental model entirely (actions / reducers / effects / selectors → JSON tree + Ops). Treat it as a domain-by-domain rewrite, not a mechanical migration. If your goal is "less boilerplate, same patterns," NgRx SignalStore is the better destination.
 - **From plain signals:** trivial — wrap your state object in `signalTree()` and you're done.
 

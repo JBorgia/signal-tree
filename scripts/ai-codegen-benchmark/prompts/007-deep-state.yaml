@@ -26,7 +26,7 @@ prompt: |
 expected_patterns:
   signaltree:
     must_include: ['signalTree(']
-    should_include_one_of: ['entityMap', 'asyncSource', 'status(']
+    should_include_one_of: ['entityMap', 'external(']
     must_not_include: ['signalStore(', 'BehaviorSubject', 'createStore']
   ngrx-signals:
     must_include: ['signalStore(']

@@ -2,7 +2,6 @@ import { Signal, WritableSignal } from '@angular/core';
 
 import type { WriteMetadata } from './mutation-types';
 import type { NodeAccessor } from './node-accessor';
-import { AsyncSourceMarker, AsyncSourceSignal } from './markers/async-source';
 import type { EntityLoaderSurface } from './markers/entity-loader';
 import { StoredMarker, StoredSignal } from './markers/stored';
 
@@ -201,8 +200,6 @@ export type TreeNode<T> = {
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
     : T[K] extends StoredMarker<infer V>
     ? StoredSignal<V>
-    : T[K] extends AsyncSourceMarker<infer V>
-    ? AsyncSourceSignal<V>
     : T[K] extends Primitive
     ? CallableWritableSignal<T[K]>
     : T[K] extends readonly unknown[]
@@ -1114,8 +1111,6 @@ export type DeepEntityAwareTreeNode<T> = {
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
     : T[K] extends StoredMarker<infer V>
     ? StoredSignal<V>
-    : T[K] extends AsyncSourceMarker<infer V>
-    ? AsyncSourceSignal<V>
     : T[K] extends object
     ? DeepEntityAwareTreeNode<T[K]>
     : CallableWritableSignal<T[K]>;
@@ -1139,8 +1134,6 @@ export type EntityAwareTreeNode<T> = {
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
     : T[K] extends StoredMarker<infer V>
     ? StoredSignal<V>
-    : T[K] extends AsyncSourceMarker<infer V>
-    ? AsyncSourceSignal<V>
     : CallableWritableSignal<T[K]>;
 };
 

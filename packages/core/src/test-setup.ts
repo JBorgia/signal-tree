@@ -2,7 +2,7 @@
 //
 // Initializes the Angular TestBed environment so specs that use
 // `TestBed.runInInjectionContext()` / `inject(DestroyRef)` (e.g. the
-// asyncSource marker specs) have a platform to run against.
+// entity-loader and defineStore specs) have a platform to run against.
 // Without this, those specs fail with "Cannot read properties of null
 // (reading 'ngModule')". Wired via `setupFiles` in vitest.config.ts.
 import '@angular/compiler';

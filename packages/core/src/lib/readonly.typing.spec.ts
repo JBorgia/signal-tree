@@ -30,7 +30,6 @@ import {
   entityMap,
   signalTree,
 } from '../index';
-import { asyncSource } from './markers/async-source';
 import { loader } from './markers/loader';
 import { stored } from './markers/stored';
 import { linked } from './linked';
@@ -71,10 +70,6 @@ const tree = signalTree({
     load: loader(() => Promise.resolve([] as User[])),
   }),
   theme: stored('theme', 'light' as 'light' | 'dark'),
-  reports: asyncSource<User[]>({
-    initial: [],
-    load: () => Promise.resolve([]),
-  }),
 }).derived(($) => ({
   doubled: computed(() => $.count() * 2),
   draft: linked(() => $.count()),
@@ -93,7 +88,6 @@ type ROUsers = RO$['users'];
 type ROCached = RO$['cached'];
 type ROPlants = RO$['plants'];
 type ROStored = RO$['theme'];
-type ROSource = RO$['reports'];
 type ROEntityNode = NonNullable<ReturnType<ROUsers['byId']>>;
 
 export type _ReadonlyViewChecks = [
@@ -183,11 +177,9 @@ export type _ReadonlyViewChecks = [
   Expect<NotOffered<ROStored, 'set'>>,
   Expect<NotOffered<ROStored, 'clear'>>,
 
-  Expect<Equal<ROSource['data'], Signal<User[] | undefined>>>,
-  Expect<Equal<ReturnType<ROSource>, User[] | undefined>>,
-  Expect<NotOffered<ROSource, 'set'>>,
-  Expect<NotOffered<ROSource, 'refresh'>>,
-  Expect<NotOffered<ROSource, 'reset'>>,
+  // ⚠️ The ROSource rows were REMOVED with asyncSource. Every invariant they
+  // held is duplicated by `ROStored` on a surviving marker: the callable read
+  // and the allowlist REMOVING writes. No coverage was lost.
 
   // ⚠️ COVERAGE LOSS, RECORDED RATHER THAN PAPERED OVER.
   //

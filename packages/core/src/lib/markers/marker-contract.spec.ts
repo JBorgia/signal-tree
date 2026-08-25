@@ -2,7 +2,6 @@ import { signal } from '@angular/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { registerMarkerProcessor } from '../internals/materialize-markers';
-import { asyncSource } from './async-source';
 import { signalTree } from '../signal-tree';
 import { stored } from './stored';
 
@@ -20,42 +19,11 @@ import { stored } from './stored';
  * materialiser-level guard fails open, which is the lesson `entityMap({ load })`
  * already learned with ST2004.
  */
-describe('async markers no longer lose their value', () => {
-  const settle = () => new Promise((r) => setTimeout(r, 40));
-
-  it('asyncSource appears in the snapshot', async () => {
-    const tree = signalTree({
-      s: asyncSource({ load: async () => ({ v: 42 }) }),
-      n: 1,
-    });
-    void tree.$.s;
-    await settle();
-    expect(tree.$.s()).toEqual({ v: 42 });
-
-    // Before this it was `{"n":1}` — the marker and its value simply gone.
-    expect(tree()).toEqual({ s: { value: { v: 42 } }, n: 1 });
-  });
-
-  it('asyncSource restores on undo but NOT on rehydrate', async () => {
-    const { hydrateMarkerNode } = await import(
-      '../internals/materialize-markers'
-    );
-    const tree = signalTree({ s: asyncSource({ load: async () => 1 }) });
-    void tree.$.s;
-    await settle();
-    tree.$.s.set(99);
-
-    // `restore` — an in-process undo writes the recorded value back.
-    hydrateMarkerNode(tree.$.s, { value: 7 }, 'restore');
-    expect(tree.$.s()).toBe(7);
-
-    // `rehydrate` — a new process already re-ran the loader, so the recorded
-    // value is stale by definition and the fresh result wins.
-    hydrateMarkerNode(tree.$.s, { value: 123 }, 'rehydrate');
-    expect(tree.$.s()).toBe(7);
-  });
-});
-
+/**
+ * ⚠️ The asyncSource cases are gone with the primitive. `entityMap` and `stored`
+ * remain as subjects for the generic marker-contract invariants — snapshot
+ * participation, the transient declaration, and the ordinary leaf walk.
+ */
 describe('ST2022 — a marker registered without declaring its state', () => {
   let warn: ReturnType<typeof vi.spyOn>;
   beforeEach(() => {

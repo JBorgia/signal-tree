@@ -1,4 +1,3 @@
-import type { AsyncSourceSignal } from './markers/async-source';
 import type { EntityLoaderSurface } from './markers/entity-loader';
 import type { StoredSignal } from './markers/stored';
 import type { EntitySignal } from './types';
@@ -35,10 +34,4 @@ export const ENTITY_LOADER_READERS = [
 /** Readers on {@link StoredSignal}. The mutators are absent. */
 export const STORED_READERS = ['key', 'version'] as const satisfies readonly (keyof StoredSignal<unknown>)[];
 
-/** Readers on {@link AsyncSourceSignal}. Mutators are absent. */
-export const ASYNC_SOURCE_READERS = [
-  'data',
-  'loading',
-  'error',
-] as const satisfies readonly (keyof AsyncSourceSignal<unknown>)[];
 

@@ -23,7 +23,6 @@ import type {
   EntitySignal,
 } from '../../index';
 import { entityMap, signalTree } from '../../index';
-import { asyncSource, type AsyncSourceSignal } from './async-source';
 import { loader } from './loader';
 import { stored, type StoredSignal } from './stored';
 // Internal (not barrel-exported) tree-node variants — imported relatively so the
@@ -48,7 +47,6 @@ interface User {
 const tree = signalTree({
   users: entityMap<User, number>(),
   theme: stored('theme', 'light' as 'light' | 'dark'),
-  reports: asyncSource<User[]>({ initial: [], load: () => Promise.resolve([]) }),
   selectedId: null as number | null, // union leaf
   count: 0, // plain leaf
   nested: {
@@ -61,7 +59,6 @@ type $ = typeof tree.$;
 export type _MarkerResolutionChecks = [
   Expect<Equal<$['users'], EntitySignal<User, number>>>,
   Expect<Equal<$['theme'], StoredSignal<'light' | 'dark'>>>,
-  Expect<Equal<$['reports'], AsyncSourceSignal<User[]>>>,
   // marker nested at depth resolves too (the "any depth" differentiator)
   Expect<Equal<$['nested']['deep'], CallableWritableSignal<number>>>,
   // plain + union leaves stay callable writable signals

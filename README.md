@@ -384,7 +384,7 @@ subpath imports.
 
 ## Async Orchestration
 
-The old `asyncSource` and `asyncQuery` markers are not part of the SignalTree 15
+The old `asyncSource` and `asyncQuery` markers are deleted and not part of the SignalTree 15
 public surface. Keep async orchestration in application services or framework
 primitives, then write resolved values into plain tree state or an independently
 justified collection surface.

@@ -6,7 +6,7 @@ removed in 14.0.0. What it did is three lines of composition, and the
 composition is easier to reason about than the marker was.
 
 The reason it never shipped is worth stating: the API question — _a distinct
-`asyncStream` marker, or an `accumulate` option on `asyncSource`?_ — was never
+`asyncStream` marker, or an `accumulate` option on an async marker?_ — was never
 settled. Leaving 372 lines of one candidate sitting in the tree biased that
 decision toward itself without anyone choosing. Git has it if the answer turns
 out to be "marker".
@@ -15,13 +15,13 @@ out to be "marker".
 
 ## The problem
 
-`asyncSource` **replaces** its value on each emission. That is
+An ordinary `external()` write **replaces** the value on each emission. That is
 correct for a fetch and wrong for a stream: LLM tokens, SSE deltas and
 progressive results need to **accumulate**.
 
 ```ts
 // ❌ WRONG — each token replaces the last, so you see only the final chunk
-reply: asyncSource({ load: () => streamTokens() });
+reply: '' as string, // written from streamTokens() through external()
 ```
 
 ---

@@ -15,7 +15,7 @@
  *
  * IT ALSO GUARDS TREE-SHAKING, which is the non-obvious half. Each marker
  * registers its builtin processor LAZILY, on first call to its authorship
- * factory (`stored()`, `asyncSource()`, ...), so a bundle that never calls the
+ * factory (`stored()`, `entityMap()`, ...), so a bundle that never calls the
  * factory never pays for the machinery. That registration necessarily names the
  * Angular realization. So if a future cleanup "simplifies" the split by moving
  * registration to a contract module's top level, the realization joins the

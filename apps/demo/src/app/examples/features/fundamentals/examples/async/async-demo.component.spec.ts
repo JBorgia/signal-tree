@@ -18,7 +18,7 @@ describe('AsyncDemoComponent (fundamentals tour pointer)', () => {
   it('renders the fundamentals-tour pointer card without errors', () => {
     const host: HTMLElement = fixture.nativeElement;
     expect(host.textContent).toContain('Async Operations');
-    expect(host.textContent).toContain('asyncSource');
+    expect(host.textContent).toContain('external()');
     // The lesson survived the primitive: this example now teaches the RxJS
     // pipeline that always owned debounce, dedup and latest-wins.
     expect(host.textContent).toContain('switchMap');
