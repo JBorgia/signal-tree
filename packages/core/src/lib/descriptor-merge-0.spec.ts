@@ -50,22 +50,28 @@ import type { PositionId } from './internals/position-registry';
  * top-level copy is therefore permanently shadowed. It is unread because it is
  * unreachable, not because the information is unnecessary.
  *
- * ## ⚠️ And it explains the NESTED failure's exact mechanism
+ * ## ⚠️ WITHDRAWN — this does NOT explain the nested failure
  *
- * For a nested collection the same subject is described twice, with different
- * derived field paths:
+ * This record originally claimed:
+ *
+ * > "Last-write-wins at the subject level means the FABRICATED address wins.
+ * > Had that level been first-write-wins, the correct `''` would have survived
+ * > and the nested rollback would have worked by accident."
+ *
+ * **SUBJECT-ADDRESS-CARDINALITY-0 falsified that.** Real effects carry a
+ * complete INLINE address, and the inline term short-circuits the `??` chain
+ * before either descriptor level is reached:
  *
  * ```text
- * addOne     path=data.rows        FIELD=""      <- correct: whole subject
- * updateOne  path=data.rows.seed   FIELD="seed"  <- fabricated: the entity KEY
+ * RESOLVE inlineField="name"    descField="" => field="name"
+ * RESOLVE inlineField="enabled" descField="" => field="enabled"
  * ```
  *
- * Last-write-wins at the subject level means the FABRICATED address wins. Had
- * that level been first-write-wins like the top level, the correct `''` would
- * have survived and the nested rollback would have worked by accident.
+ * `descField` is present and unused. Neither merge policy participates in the
+ * nested failure, which lives entirely in the inline derivation.
  *
- * So the nested defect is not one bug. It is a bad derivation (SUBJECT-ADDRESS-0)
- * PLUS a merge policy that specifically prefers the later, worse answer.
+ * The merge asymmetry measured below is real and still stands as a fact about
+ * the two levels. What does not stand is that it explains the nested defect.
  *
  * ⚠️ Neither policy is "monotonic in information", which was the pending plan's
  * wording. Fixing the derivation alone would leave an order-dependent merge; the
