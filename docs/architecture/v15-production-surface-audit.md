@@ -13629,3 +13629,173 @@ migration-sensitive specs stay until their primitive is retired:
 
 the entity-granular-reactivity wall-clock flake is NOT touched during migration.
 ```
+
+---
+
+# ASYNC-QUERY-DECIDE-0 — OUTCOME A: DELETE
+
+Disposition experiment. No deletion in this commit.
+
+```text
+QUESTION   does asyncQuery provide any semantic capability the final v15
+           architecture would independently invent if it had never existed?
+```
+
+**No. Every capability it provides is an RxJS operator.**
+
+## 1. The behaviour matrix, read from the pipeline
+
+```ts
+merge(
+  trigger$.pipe(debounceTime(debounce), filter(predicate), distinctUntilChanged(equal)),
+  rerun$
+).pipe(switchMap(...), catchError(...))
+```
+
+```text
+owns                     mechanism
+value / loading / error  three Angular signals
+debounce                 debounceTime          RxJS
+dedup                    distinctUntilChanged  RxJS
+stale suppression        switchMap             RxJS
+cancellation             switchMap             RxJS
+refetch                  rerun() -> Subject, merged AFTER dedup
+reset                    re-set the initial signals
+
+does NOT own
+  sequence counter · cache · retry · AbortController · explicit unsubscribe
+```
+
+⚠️ **Zero causal / tree integration**, measured by direct search:
+
+```text
+positionRegistry   0     withWriteContext   0     external      0
+transaction        0     reportTreeError    0
+```
+
+It has no owned position, no path, no write context, no durable consequence, and
+no participation in the error channel. It is a reactive convenience wrapper that
+happens to live in the tree, not a causal participant.
+
+## 2. The load-bearing discriminator — measured, not argued
+
+Slow A started, fast B started after, A resolves last:
+
+```text
+asyncQuery      started ['A','B']   final 'result:B'
+plain RxJS      started ['A','B']   final 'result:B'
+```
+
+The plain version uses `Subject` + `switchMap` and **no SignalTree at all**.
+Stale-response suppression is `switchMap`, not a SignalTree semantic.
+
+## 3. No real production consumer
+
+All seven "production" files are registration or TYPE plumbing:
+
+```text
+async-query.ts / .contract.ts   the primitive itself
+markers/index.ts                the DEAD barrel (nothing imports it)
+materialize-markers.ts          marker registration
+types.ts, readonly.ts,          marker-resolution TYPE machinery
+readonly-readers.ts
+error-reporter.ts               the 'async-query' source member — which never
+                                had a producer, and is now deleted
+entity-loader.ts                a COMMENT: "mirrors asyncQuery"
+test-setup.ts                   test wiring
+```
+
+## 4. Independence — both sequencing questions answered
+
+```text
+asyncSource   asyncQuery's ONLY reference is a comment ("alias for results to
+              match the asyncSource shape"). INDEPENDENT — asyncSource
+              retirement order does not block this.
+loader        entity-loader.ts references asyncQuery only in a comment about
+              scope-param equality. Deleting asyncQuery does NOT remove a
+              migration target for loader callers. INDEPENDENT.
+```
+
+## 5. Bypass probe — ⚠️ the strongest evidence
+
+Making the pipeline permanently inert (no query ever runs) fails **two spec
+files, both its own**:
+
+```text
+FAILED   markers/async-query.spec.ts
+         markers/async-query-a1-2-equivalence.spec.ts
+
+DID NOT NOTICE   every other spec in the suite
+```
+
+The other referencing specs are TYPING specs — marker resolution, readonly, the
+type matrix — which assert the type system resolves the marker, not that it
+behaves. **No independent consumer invariant detects its absence.**
+
+Per the decision rule, a primitive's own unit tests are not evidence that the
+abstraction deserves to exist.
+
+## 6. Error and loading semantics — for the record
+
+```text
+sync throw / rejection / observable error
+  -> errorSignal set, loading false, and the PREVIOUS RESULT IS RETAINED
+     (`resultsSignal.set` runs only on ok:true)
+  -> nothing reaches onTreeError; there was never a producer
+```
+
+Applying the standard test: *if SignalTree launched at v15 with Link, external()
+and ordinary Angular available, would we add a core marker solely to manufacture
+data/loading/error over an RxJS pipeline?* **No.** That is application async
+state.
+
+## DISPOSITION — DELETE
+
+```text
+no unique causal/tree role              ✓
+no unique public contract               ✓  not root-reachable
+strongest behaviour = plain switchMap   ✓
+loading/error are convenience state     ✓
+races/cancellation owned by RxJS        ✓
+no independent consumer invariant       ✓
+```
+
+## Demo — preserve the SCENARIO, not the primitive
+
+Eight files, and the teaching scenario is one thing: **debounced search with
+loading and error states**.
+
+```text
+app.routes.ts · navigation.component.ts · examples.config.ts     wiring
+whats-new.component.html                                         changelog prose
+pages/async-demo/async-demo.component.html                       page shell
+examples/.../async/async-demo.component.{ts,html,spec.ts}        THE scenario
+```
+
+⚠️ DEMO-COVERAGE-0 must keep "debounced search, loading, error, cancellation"
+as a demonstrated scenario — expressed with an application-owned RxJS pipeline
+plus `external()` to land results, or `link({ get })` where the relationship is
+genuinely a synchronization. **Deleting the primitive must not delete the
+lesson.**
+
+## Revised sequence
+
+```text
+ASYNC-QUERY-RETIRE-0     independent of both loader and asyncSource
+LOADER-RETIRE-0
+ASYNC-SOURCE-RETIRE-1
+STORED-PERSISTENCE-0
+STATUS-RESIDUE-0
+MIGRATION-CLOSE-0
+DEMO-COVERAGE-0
+PERF-PROOF-0
+```
+
+## Advisory findings held at arm's length
+
+A separate local review reported a stale tarball `/storage` expectation, an
+Angular consumer fixture failure, a README missing `link`/`onTreeError`, and a
+staged-vs-unstaged mismatch. ⚠️ It audited a DIRTY working tree and a different
+test count, so it is not release truth. Those exact gates are to be re-run on a
+CLEAN committed HEAD after migration and disposed from fresh evidence. Migration
+is NOT redesigned around that snapshot.
