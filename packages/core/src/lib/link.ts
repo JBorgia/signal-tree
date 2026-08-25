@@ -14,6 +14,7 @@ import {
   type EntityEgressProjection,
 } from './internals/entity-egress-projection';
 import { applyAtRelativePath } from './internals/source-mutation';
+import { isTraversableNode } from './internals/node-shape';
 import { scheduleDurableConsequence } from './internals/commit-consequence';
 import type { EntityMapBuilder } from './markers/entity-map';
 import type { EntitySignal } from './types';
@@ -291,8 +292,65 @@ export function link<S>(
    *
    * Collection sources never reach here; they advance `entityProjection`.
    */
+  /**
+   * NESTED COLLECTIONS INSIDE A BRANCH SOURCE.
+   *
+   * ⚠️ REGRESSION REPAIR. A branch source's eligible value was patched purely by
+   * path, so an entity mutation publishing at `dashboard.rows.<key>` was written
+   * into the snapshot as `rows["<key>"]` while the collection's own `all` went
+   * stale. The projection was treating a collection as ordinary
+   * path-addressable structure — the same category error the `collection` gate
+   * below prevents for a DIRECT collection source, never extended to one nested
+   * inside a branch.
+   *
+   * Each nested collection therefore gets its OWN projection instance: same
+   * algorithm as a direct collection source, separate state. Shared algorithm,
+   * separate authority.
+   *
+   * ⚠️ AND NOT A RE-READ. The obvious repair — "a collection changed, so re-read
+   * the branch" — produces the right SHAPE and destroys the reason this
+   * projection exists: current branch state may hold an inspection-only change,
+   * which a later eligible write would then carry outward. The nested
+   * collection's ELIGIBLE value is adopted, never its current one.
+   */
+  const nestedCollections = new Map<string, EntityEgressProjection>();
+  if (!collection) {
+    const prefix = ownerPath === '' ? '' : `${ownerPath}.`;
+    const discover = (node: unknown, path: string): void => {
+      if (!isTraversableNode(node)) return;
+      const seed = getEntityProjectionSeed(node);
+      if (seed) {
+        nestedCollections.set(path, createEntityEgressProjection(seed));
+        return; // its interior is its own business
+      }
+      for (const key of Object.keys(node as Record<string, unknown>)) {
+        discover(
+          (node as Record<string, unknown>)[key],
+          path === '' ? key : `${path}.${key}`
+        );
+      }
+    };
+    discover(x, ownerPath);
+    void prefix;
+  }
+
+  /** The nested collection owning this notification, if any. */
+  const nestedFor = (notificationOwnerPath: string | undefined) =>
+    notificationOwnerPath === undefined
+      ? undefined
+      : nestedCollections.get(notificationOwnerPath);
+
   const advanceEligible = (path: string, value: unknown): void => {
     eligible = applyAtRelativePath(eligible, ownerPath, path, value);
+  };
+
+  /** Write a nested collection's eligible value into the branch snapshot. */
+  const advanceNested = (collectionPath: string, projection: EntityEgressProjection): void => {
+    // The snapshot grammar for a collection is `{ all: Row[] }` — the same
+    // shape `tree()` produces, so the published branch value stays canonical.
+    eligible = applyAtRelativePath(eligible, ownerPath, collectionPath, {
+      all: projection.value(),
+    });
   };
 
   /**
@@ -375,6 +433,21 @@ export function link<S>(
       // `origin === 'devtools'` — provenance says where a write came from,
       // participation says which causal mechanisms it may take part in.
       const inspection = isInspectionWrite(meta);
+
+      // A notification owned by a collection NESTED in this branch source.
+      const nested = nestedFor(_o);
+      if (nested) {
+        const effect = (meta as Record<string, unknown> | undefined)?.[
+          'structuralEffect'
+        ] as Parameters<EntityEgressProjection['apply']>[2];
+        const advanced = nested.apply(subjectIds?.[0], v, effect, inspection);
+        if (advanced) {
+          advanceNested(_o as string, nested);
+          dirty = true;
+        }
+        return;
+      }
+
       if (entityProjection) {
         // Inspection reaches the projection, but only to leave latent
         // structural context — CAUSAL DEPENDENCY ADOPTION. It never advances

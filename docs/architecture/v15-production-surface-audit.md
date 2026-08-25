@@ -16423,16 +16423,77 @@ So a fix requires both an owner carrier for the root and a `NaturalValue`
 interpretation that handles a non-callable whole-tree source. Neither is in the
 observation substrate's scope, which is why this was kept separate.
 
+## `LINK-BRANCH-NESTED-ENTITY-0` — REPAIRED
+
+Handled as a REGRESSION against frozen semantics, not as a new architecture
+question. Each collection nested inside a branch source now gets its own
+`EntityEgressProjection` instance — the same algorithm a direct collection
+source uses, with separate state — and its ELIGIBLE value is written into the
+branch snapshot under the canonical `{ all: Row[] }` grammar.
+
+```text
+introduced   48ad4e4a
+repaired     this commit
+```
+
+Nine permanent tests. `R1`–`R3` add/update/remove publish canonical values with
+no phantom address key; `R4` keeps ordinary sibling path-patching working;
+`R5` places a collection at deeper ordinary depth so no one-level `rows` special
+case can pass; `R6` holds the direct collection source unchanged; `R8` keeps
+`realized` eligible.
+
+### ⚠️ R9 exists because a mutation survived
+
+The tempting repair — "a collection changed, so re-read the branch" — produces
+the correct SHAPE while destroying the reason the projection exists. `R7` was
+written to catch it and **did not**: its later write was to a SIBLING, so a
+re-read never fired, and the mutation passed all eight tests.
+
+The hitchhike needs an authored COLLECTION event AFTER an inspection one:
+
+```text
+authored   add row 1 'authored'
+inspection update row 1 -> 'SCRUBBED'
+authored   add row 2 'second'
+
+published   [{1,'authored'}, {2,'second'}]     correct
+re-read     [{1,'SCRUBBED'}, {2,'second'}]     the scrub rides out
+```
+
+`R9` is that case, and it kills the re-read mutation alone. Recorded because a
+shape-only assertion would have ratified the wrong repair — MECHANISM-
+DISCRIMINATING CASE, and the reason M2 was worth running at all.
+
+Mutations: reverting to path-patching beneath the collection fails 6; the
+re-read fails R9 alone.
+
+## `LINK-NONLEAF-SOURCE-INTERPRETATION-0` — closed, convergence NEGATIVE
+
+The question was whether root and nested-collection failures shared one
+defective non-leaf `NaturalValue` interpreter. They do not.
+
+```text
+                        ROOT    NESTED COLLECTION
+observation              ok            ok
+ownership carrier      MISSING         ok
+NaturalValue interp    WRONG           ok  (never broken)
+authority projection     ok          WAS WRONG  (ours)
+```
+
+The branch accessor's own read was correct throughout — `tree.$.dashboard()`
+returns exactly what `tree()` does. Only the projection above it was wrong. So
+`LINK-ROOT-SOURCE-0` stands alone, with its two independently measured causes,
+and its scope is now smaller than when the convergence hypothesis was open.
+
 ## OPEN
 
 ```text
 LINK-BARE-SCALAR-0     CLOSED — substrate landed
 LINK-BARE-BRANCH-0     CLOSED — substrate landed
 LINK-ROOT-SOURCE-0             distinct contract defect, undispositioned
-LINK-BRANCH-NESTED-ENTITY-0    REGRESSION from 48ad4e4a — the branch eligible
-                               projection patches nested entity notifications by
-                               path. Cause known, fix scoped, NOT a source
-                               interpretation defect.
+LINK-BRANCH-NESTED-ENTITY-0    CLOSED — regression introduced 48ad4e4a,
+                               repaired; each nested collection now carries its
+                               own eligible projection.
 memory                 unmeasured for the dormant representation
 serialization WIP      parked; depends on the substrate landing first
 INSPECTION-EGRESS-0    open — Link green, serialization open
