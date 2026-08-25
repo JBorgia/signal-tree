@@ -13236,3 +13236,125 @@ after    2235 passing
 something. Both are now matched against parsed export statements. A test that
 cannot distinguish an export from prose about an export is not testing the
 surface.
+
+---
+
+# COMPARISON-FULL-STATE-0 — the NULL survives; Link is a full-value boundary
+
+`packages/core/src/lib/comparison-full-state-0.spec.ts`
+
+⚠️ **"Full-state" describes the LINK BOUNDARY, not SignalTree's internal
+mutation granularity.** The tree keeps granular entity notifications, granular
+reversal and per-position causal identity; a Link endpoint nonetheless exchanges
+`Row[]` as one complete collection value. Conflating the two levels would be a
+false claim about the internals.
+
+## Production makes exactly ONE equality decision
+
+```ts
+if (knownY !== undefined && deepEqual(now, knownY.value)) return;
+```
+
+One line, serving echo suppression AND acknowledgement reconciliation — which
+DEMARCATION-0 already found were the same mechanism, not two.
+
+## The equality guarantee, phrased truthfully
+
+`deepEqual` is neither "JSON-like only" nor arbitrary JS semantic equality:
+
+```text
+primitives      SameValueZero — NaN equals NaN
+arrays          element-wise          plain objects   key-wise
+Date            by time value         RegExp          source + flags
+Map / Set       structural            Error           name + message
+boxed Number/String/Boolean           cycles          co-inductive, depth 64
+functions       BY REFERENCE — two identical closures are NOT equal
+```
+
+Link is not extended to accommodate exotic values; the inventory exists so the
+documented promise matches the code.
+
+## Full-value proofs
+
+```text
+scalar      inbound replaces
+branch      inbound { a: 9, b: 2 } is COMPLETE, not a patch
+branch      outbound sends { a: 5, b: 2 } when only `a` changed
+collection  inbound [B, C] over [A, B] REPLACES — A is gone
+collection  outbound sends the complete all() snapshot
+equality    a FRESH but deep-equal inbound value does not echo back
+equality    reconciliation is driven by the rule, not object identity
+equality    re-writing an EQUAL value manufactures no send
+```
+
+Type negatives prove no patch protocol: `Partial<T>` is rejected for `get`,
+`subscribe`'s `next`, and collection rows. No runtime patch detector exists —
+the type is the authority.
+
+## No comparator is earned
+
+The question was never whether one could be useful, but whether any EARNED
+behaviour required one. None did. `LinkEndpoint` has no `equals` / `comparator`
+/ `compare` / `identityFn`.
+
+## The experiment chose the architecture; users do not choose the experiment
+
+Three harnesses carry a mode parameter and NONE is a user option:
+
+```text
+LINK-HANDLE-0    'weak' | 'strong'
+LINK-HANDLE-1    'included' | 'excluded'
+LINK-ECHO-1      'correlation' | 'equality-said' | 'equality-held'
+```
+
+Pinned: production `link.ts` contains no mode, no `Suppression`, and none of
+those literals.
+
+## Mutation results — five kill, ⚠️ ONE SURVIVES
+
+```text
+A  structural -> reference equality      4 failures
+B  collection inbound merges              3 failures (one is the known flaky
+                                          wall-clock test, not a real kill)
+C  endpoint accepts Partial<T>            typecheck
+E  acquisition echoes back out            8 failures
+F  settled() ignores in-flight retrieve   3 failures
+
+D  no follow-up reconciliation            ⚠️ ZERO
+```
+
+### ⚠️ Mutation D survives — reported, not hidden
+
+Making the reconciliation loop send once and return kills nothing. Not the race
+case, and not the tightest form either: authoring X from INSIDE `endpoint.set()`
+during its own await window still reconciles.
+
+The reason is that a write marks the notifier dirty, the next flush schedules
+another durable consequence, and that re-entry performs the follow-up send. The
+loop is **redundant with flush-driven rescheduling** for every case constructible
+through the public API.
+
+⚠️ This does not mean LINK-RACE-1 was wrong — its harness had no flush-driven
+rearm, so the loop was load-bearing THERE. The property is now carried by a
+different mechanism, and the loop is belt-and-braces.
+
+**Left in place deliberately.** Removing it is a production behaviour change with
+no failing test to justify it, and "delete code no test covers" is how a subtle
+race returns. Recorded so nobody assumes a passing suite vouches for it.
+
+## Frozen semantic statements
+
+```text
+Link exchanges COMPLETE values.
+get() returns a complete value; subscribe(next) supplies complete values;
+set(value) receives a complete value.
+Collections cross the boundary as complete Row[] snapshots.
+Equality is the earned structural rule, for echo suppression AND reconciliation.
+Link exposes no comparator and defines no patch/merge protocol.
+Internal granular reactivity is INDEPENDENT of Link's full-value boundary.
+```
+
+```text
+before   2235 passing
+after    2250 passing
+```
