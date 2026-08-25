@@ -12283,3 +12283,113 @@ resolve the '' representation disagreement
 
 Filed as representation debt, not a correctness defect, and not a release
 blocker. HEAD restored; proceeding to LINK-COLLECTION-TYPE-0.
+
+---
+
+# LINK-COLLECTION-TYPE-0 — the NULL is falsified at the SOURCE
+
+`packages/core/src/lib/link-collection-type-0.typing.spec.ts` (compile-time)
+`packages/core/src/lib/link-collection-type-0.spec.ts` (runtime companion)
+
+```text
+NULL       the existing Link typing machinery can infer a collection node's
+           natural value as Row[] across every endpoint combination, without a
+           collection-specific public API
+FALSIFIER  at least one legitimate endpoint shape cannot
+```
+
+**FALSIFIED — and not for the reason the matrix was designed to find.**
+
+It is not endpoint variance, overload ordering, or subscribe generics. The
+existing target union does not admit a collection node at all:
+
+```text
+tree.$.rows()                                   NOT callable        (correct)
+NodeAccessor<T> | WritableSignal<T> admits it?  NO
+
+Argument of type 'EntitySignal<Row, string>' is not assignable to
+parameter of type 'LinkTarget<unknown>'
+```
+
+So `link(tree.$.rows, ...)` does not type-check today and inference never reaches
+the endpoint. All seven cells fail for one upstream reason.
+
+> **node access shape != linked value shape.** A collection node is deliberately
+> non-callable, and that must not deny it a natural value.
+
+## The correction — one conditional branch, no public API expansion
+
+No `linkCollection()`, no `collection: true`, no `mode`, no required
+`link<Row[]>`:
+
+```ts
+type NaturalValue<S> =
+  S extends EntitySignal<infer R, infer _K> ? R[]
+  : S extends NodeAccessor<infer T> ? T
+  : S extends WritableSignal<infer T> ? T
+  : never;
+
+declare function link<S>(source: S, endpoint: Endpoint<NaturalValue<S>>): void;
+```
+
+Making `link` generic over the SOURCE is what lets contextual typing flow into
+the endpoint callbacks. Every callback in the spec is UNANNOTATED and every
+assertion is `Exact<>` — an annotated `(value: Row[])` would prove only that an
+annotated callback compiles, which is strictly weaker.
+
+## Result — all seven cells, both `get` forms, all controls
+
+```text
+get / set / subscribe / get+set / get+subscribe / set+subscribe / all three
+sync get and async get, no separate overload
+scalar control      tree.$.count    -> number
+object control      tree.$.settings -> { theme: string }
+negatives           wrong get, wrong subscribe emission, wrong set,
+                    scalar endpoint given Row[], Row-field access inside set
+shape pins          tree.$.rows() rejected; rows.all() is Row[]
+```
+
+## ⚠️ A measurement that corrected me mid-probe
+
+I expected the naive wrong-`set` negative to be swallowed by parameter
+bivariance. It is NOT: `set` is a PROPERTY with a function type, not a method
+shorthand, so `strictFunctionTypes` checks it contravariantly. Recorded because
+the opposite belief would have justified a weaker negative control.
+
+## Type mutation proof — five mutants, narrow distinct kill sets
+
+```text
+A  natural value -> the node type          14 errors, collection cells
+B  natural value -> Row (not Row[])        14 errors, collection cells
+C  collection branch removed                15 errors; scalar (186) and object
+                                            (192) controls stay GREEN
+D  broad "non-callable => array" rule        1 error — the ORDINARY-OBJECT
+                                            control, and nothing else
+E  subscribe generic decoupled from T        5 errors — the four subscribe cells
+                                            plus its now-unused negative;
+                                            get/set survive
+```
+
+⚠️ **D is the important one.** A broad rule satisfies every collection cell while
+silently breaking ordinary objects, and it kills exactly one assertion — the
+control that exists for it. C leaving both controls green proves the branch is
+scoped to collections rather than widening the extractor.
+
+## Runtime companion
+
+```text
+outbound   rows.all()          -> Row[] crosses the endpoint
+inbound    Row[] -> rows.setAll(value), REPLACEMENT not append
+empty      [] empties the collection (the append control)
+shape      the node is not callable at runtime either
+```
+
+Deliberately small; LINK-COLLECTION-0 remains the full runtime battery.
+
+```text
+before   2160 passing
+after    2164 passing
+```
+
+**No production typing change made yet** — the extractor is proven as a candidate
+in the typing spec. It lands with production `link()`, which is next.
