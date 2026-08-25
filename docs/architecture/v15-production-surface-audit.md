@@ -11917,3 +11917,109 @@ applied to the effect's own strings. So:
 
 `effect.owner` is the PositionId and is present on every effect, so the lookup
 has its key at both sites.
+
+---
+
+# REAL-WHOLE-EFFECT-0 — WHOLE is NOT earned at the effect layer
+
+`packages/core/src/lib/real-whole-effect-0.spec.ts`
+
+```text
+NULL       at least one real non-structural ReversalEffect requires
+           WHOLE-subject scalar targeting
+FALSIFIER  all real non-structural subject effects are FIELD-addressed; WHOLE
+           exists only in descriptor/notification derivation
+```
+
+**The NULL IS FALSIFIED. OUTCOME A.**
+
+Every `ReversalEffect` reaching `validateEffects` / `applyAtomically` captured
+across the full matrix. **Not one non-structural effect addresses a whole
+subject.** Every one is a field coordinate carrying a SCALAR before/after — never
+a row object:
+
+```text
+updateOne 1 field   subj=1 path=rows.r1.n     before=number:99  after=number:1
+updateOne 2 fields  subj=1 path=rows.r1.name  before=string:"X"
+                    subj=1 path=rows.r1.n     before=number:99
+replaceOne          path=rows.r1.name / rows.r1.n   (scalars)
+upsertOne existing  subj=1 path=rows.r1.name / rows.r1.n
+setAll replacing    subj=1 path=rows.r1.name / rows.r1.n
+```
+
+Every whole-entity-looking operation DECOMPOSES. Every lifetime transition is
+structural and ADDRESSLESS:
+
+```text
+addOne / addMany / upsertOne new   struct=remove  path=undefined
+removeOne / clear                  struct=add     path=undefined
+changeId                           struct=rekey   path=undefined
+```
+
+## ⚠️ SUBJECT-ADDRESS-0 asked the right question at the WRONG LAYER
+
+`''` is produced by descriptor/notification derivation, and that finding stands
+as a fact about that layer. But no `ReversalEffect` ever needs it. The two layers
+were conflated in that record; the effect layer is what the repair targets.
+
+**So do NOT put WHOLE in the effect representation:**
+
+```text
+subject scalar effect   FIELD(path)
+absence                 not a subject scalar effect / structural
+```
+
+No `{ kind: 'whole' }` on `ReversalEffect`. Subject effect identity becomes:
+
+```text
+owner PositionId  -> canonical collection (registry)
+SubjectId         -> current entity lifetime / key
+fieldPath         -> coordinate inside the entity
+```
+
+with `structuralContext` handling existence, membership and rekey.
+
+The permanent test asserts the observable consequence: a sibling field written
+OUTSIDE the transaction survives rollback of a field written inside it. A single
+whole-row effect would clobber it.
+
+---
+
+# ⚠️ REPLACE-ONE-SUBJECT-0 — a SEPARATE P0, and it is TOP-LEVEL
+
+`packages/core/src/lib/replace-one-subject-0.spec.ts`
+
+Found by the traffic inventory above, not sought. `replaceOne` emits reversal
+effects with **no SubjectId**, while the operations either side of it emit one:
+
+```text
+upsertOne existing  subj=1          path=rows.r1.name / rows.r1.n
+setAll replacing    subj=1          path=rows.r1.name / rows.r1.n
+replaceOne          subj=undefined  path=rows.r1.name / rows.r1.n   <- HERE
+```
+
+All three are the same semantic operation and decompose identically. Only
+`replaceOne` drops subject identity, and it fails:
+
+```text
+transaction rollback  "SignalTree could not rollback the pending transaction"
+undoable() + undo     "Unsupported scoped undo effect at structural-drift"
+```
+
+⚠️ **This is a TOP-LEVEL failure.** Every previously recorded rollback defect in
+this class is nested-only, and all five expected failures are nested — so this is
+not covered by them. It is also not the inline collection derivation, which is
+correct at top level. The mechanism is upstream: with no SubjectId,
+`hasInlineSubjectAddress` is false, so no inline subject address is derived and
+no fallback descriptor can be keyed.
+
+**Recorded, NOT fixed** — a distinct defect found while answering a different
+question, and fixing it inside the address repair would confound both. The spec
+pins current behaviour with `upsertOne` as the control; when `replaceOne` is
+repaired those tests fail, and that failure is the intended signal.
+
+## Correction to the previous summary
+
+"Every blocking question is now closed" was wrong on two counts: REAL-WHOLE-EFFECT-0
+was open and has now flipped the planned representation, and this defect was not
+known at all.
