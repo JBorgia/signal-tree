@@ -386,3 +386,269 @@ replace/derive distinction is load-bearing elsewhere (transactions branch on
 `mutationIntent === 'replace'`; `combineScalarMutationIntent` has replace DOMINATE derive).
 Also rejected: banning function-valued state merely because the callable grammar makes it
 inconvenient, unless the existing contract independently forbids functions as state.
+
+---
+
+# GREENFIELD-ROOT-ACCESSOR-SHAPE-0 — B1 FROZEN
+
+## FUNCTION-AS-STATE-0 — disposition: FNS-A (ADMITTED)
+
+Function-valued state is a surviving, admitted, **defect-driven** requirement.
+
+| dimension | finding |
+|---|---|
+| public typing | `TreeNode<T>` has an explicit arm grouping `((...args) => unknown)` with `Date \| RegExp \| Map \| Set \| Error` as "Built-in objects → treat as atomic values" (`types.ts:204`). Load-bearing: without it a function matches `extends object` and becomes a traversed branch. |
+| runtime | probed 5/5 — leaf; read returns the same function identity; `.set()` replaces; `.update()` receives it as current value; survives `tree()` snapshot egress with identity intact |
+| permanent tests | `change-reporting.spec.ts:242-292`, four of them, each encoding a fixed defect |
+| docs | none teach it |
+| real consumers | none in `apps/` (matches were marker config callbacks, not state) |
+| serialization | no function-as-data handling — a function in state is not JSON-representable |
+
+The tests are the decisive evidence, and they are regression tests, not examples:
+
+```
+stores a handler assigned to a callback leaf sitting at null   onConfirm: null | (() => void)
+                                                               — and assigning must never RUN it
+survives the clear-then-reassign cycle
+stores a class constructor without invoking it                 invoking one threw mid-loop, leaving
+                                                               `a` written, `b` unwritten, nothing reported
+still lets a leaf that HOLDS a function be replaced
+```
+
+⚠️ Nearly ruled FNS-B. The first sweep's grep shape found no tests and the disposition
+was about to be "technically representable, not admitted." Two real carriers existed.
+
+## THE PRECEDENT THAT GOVERNS B — `change-reporting.spec.ts:233`
+
+> **A leaf NEVER invokes a function value.** Updaters are a branch/root form;
+> `tree.$.count.update(fn)` is the leaf form […] A revision of this suite once
+> asserted the opposite — that a function at a leaf is resolved as an updater —
+> guarded on *"the current value is not a function"*. **That predicate is unknowable
+> at runtime**, and the tests below are the states it got wrong.
+
+This is B's question, already asked and answered **against inference**. Three consequences:
+
+1. Every value-inspecting heuristic is **pre-rejected** — implemented, shipped, reverted,
+   with the broken states enumerated. Not a fresh design space; a reopened one.
+2. The incumbent resolved the ambiguity by making leaves **non-callable** — `.update(fn)`
+   is an explicit method, so no ambiguity can arise. Greenfield removes exactly that, so
+   `location(fn)` ⇒ DERIVE **reintroduces a settled defect** unless disambiguation is
+   explicit and static.
+3. The ambiguity already exists at branch level and is only *diagnosed*, not solved:
+   `tree.updateAndReport({ user: () => null })` returns `[]` and logs `console.error`.
+
+### FROZEN RULE
+
+> **FUNCTION INTENT MAY NOT BE INFERRED FROM CURRENT STATE.**
+>
+> Not from the current value, the previous value, function shape, arity, or the
+> class/function distinction. **THE ARGUMENT SHAPE DECIDES.**
+
+## FROZEN — CANONICAL LOCATION GRAMMAR
+
+```
+location()                              READ
+location(updaterFunction)               DERIVE
+location(functionValueMarker(callable)) REPLACE callable AS DATA
+
+tree.$() / tree.$(updater) / tree.$(marker(callable))
+    the root is the SAME location grammar
+tree                                    controller, NOT callable
+```
+
+⚠️ DELIBERATELY NARROWER THAN IT FIRST READ. An earlier draft of this section
+froze `location(nonCallableValue) => REPLACE` for every location shape. That
+overreaches: it would silently settle **branch object write semantics** — whether
+`tree.$.user({name:'Bob'})` merges or replaces — which FUNCTION-AS-STATE-0 has no
+authority to decide. Function disambiguation only needs to establish what a
+CALLABLE argument means. The non-callable value case is left open below.
+Ownership: the canonical location object belongs to the kernel; an Angular
+`WritableSignal` is an adapter view.
+
+### The marker is EPHEMERAL
+
+**AN AMBIGUITY MARKER CLASSIFIES THE INVOCATION; IT IS NOT PART OF THE VALUE.**
+
+```
+callback(marker(fn))  →  classify REPLACE  →  unwrap at the boundary  →  kernel stores raw fn
+```
+
+so `callback(marker(handler))` is immediately followed by `callback() === handler`.
+
+The marker MUST NOT enter state, snapshots, Link values, persistence, serialization,
+restoration facts or causal payloads. Conceptual internal shape (public name NOT frozen):
+
+```ts
+interface FunctionValue<T extends Function> {
+  readonly /* private brand */: true;
+  readonly value: T;
+}
+```
+
+⚠️ A "does the wrapper survive persistence/Link?" experiment was proposed and is
+**wrong by construction** — there is no wrapper to survive. Only *authored callable
+invocation* carries the ambiguity; Link acquisition, restoration and deserialization are
+distinct causal operations and need no marker at all. Do not infect every value channel
+with a solution to a syntax-only problem.
+
+### Why FN-A over FN-B
+
+FN-B's only claimed advantage was that it never touches the value — but a correctly
+designed FN-A does not either. REPLACE already has an authoritative spelling,
+`location(value)`; only the callable subset collides syntactically with DERIVE. That
+calls for an argument disambiguator, not a second mutation API.
+(ONE SEMANTIC JOB, ONE AUTHORITATIVE PUBLIC SURFACE; SPECIALIZE THE RARE CASE BEFORE
+TAXING THE COMMON CASE.) **FN-C is dead** — excluding function state would re-break
+`onConfirm` and class-constructor fields.
+
+## B1 DISCRIMINATOR — RESULT: PASS
+
+Boundary-consumption discriminator over the **real neutral kernel**, zero Angular.
+19/19 assertions across the seven required cases:
+
+```
+C1 n(5)                       replace, stored 5
+C2 n(c => c + 1)              derive, stored 2
+C3 null → marker(handler)     NOT invoked; replace; cb() === handler
+C4 fn → marker(handlerB)      replace; cb() === handlerB; neither invoked
+C5 marker(class Thing)        NOT instantiated; replace; ctor() === Thing
+C6 derive on a fn location    derive; updater receives the RAW stored fn
+C7 marker does not leak       kernel stores the raw fn; no marker object retained;
+                              no brand symbol on the stored value; observation and
+                              read both see the raw fn
+```
+
+### The falsifier
+
+Reintroducing the reverted heuristic — *"if the current value is a function, the argument
+must be data"* — turns **C6 red** (3 assertions). Under that heuristic a function-valued
+location can never be DERIVED at all: every callable argument is swallowed as data. That
+is the historical defect reproduced on demand, and it is the mutation B must carry.
+
+### Typing carrier
+
+`NotFn<T>` — currently exported from the barrel with **no live consumer**, residue of the
+incumbent's own attempt at this disambiguation — turns out to be exactly the right tool.
+It is distributive, so `NotFn<null | (() => void)>` = `null`.
+
+```ts
+type Loc<T> = {
+  (): T;
+  (next: NotFn<T>): void;             // REPLACE a non-callable
+  (marker: FunctionValue<T>): void;   // REPLACE a callable AS DATA
+  (updater: (current: T) => T): void; // DERIVE
+};
+```
+
+For `State = { onConfirm: null | (() => void) }` — all compile: `$.onConfirm()`,
+`$.onConfirm(null)`, `$.onConfirm(mark(handler))`, `$.onConfirm(c => c)`. Correctly
+**rejected**: `$.onConfirm(handler)` — a naked callable is DERIVE, and `() => void` is not
+a valid updater for that type. Verified by positive control (breaking a MUST-COMPILE line
+→ tsc exit 2; restored → 0; every `@ts-expect-error` fires, since an unused directive is
+itself an error).
+
+Adversarial case — a location whose value is **itself updater-shaped**
+(`transform: (n: number) => number`) — also resolves: `$.transform(double)` is rejected,
+`$.transform(c => n => c(n) + 1)` derives, `$.transform(mark(double))` replaces. Even
+`$.transform(c => c)` is unambiguously DERIVE (returns the stored fn unchanged); storing
+the identity function as data requires the marker. **The argument shape decides, never the
+stored value.**
+
+## STILL OPEN
+
+- the marker's public name — deferred to the public API naming review
+- branch/root deep-merge vs replace: the incumbent's `NodeAccessor` deep-merges
+  (`tree.$.user({name:'Bob'})` preserves `age`). The frozen greenfield operation is
+  REPLACE. **The incumbent branch callable is evidence about old behaviour, not veto
+  power** — this must be decided explicitly, not inherited.
+
+## FROZEN — NON-AUTHORED ENTRANCES
+
+> **AN OPERATION THAT ALREADY KNOWS ITS MUTATION SEMANTICS MUST NOT RE-ENTER
+> THROUGH SYNTAX WHOSE JOB IS TO INFER THOSE SEMANTICS.**
+
+```
+AUTHORED CALLABLE ENTRANCE          REALIZATION / RESTORE / HYDRATE / LINK ACQUISITION
+
+location(mark(fn))                  operation already knows its causal class
+  → classify as DATA                  → install the raw value directly
+  → mutationIntent = REPLACE          → do NOT reinterpret through authored
+  → unwrap to fn                        callable syntax
+  → marker dies
+location(fn)  → DERIVE
+```
+
+Generalizes beyond functions. If Link realization ever implemented function ingress by
+internally calling `location(rawFunction)`, the defect would not be "the marker got lost"
+— it would be that **realization crossed the wrong authority entrance**.
+
+### C8 — non-authored raw-function ingress (added, PASS)
+
+```
+realization acquires a raw fn   → raw fn stored; fn NOT invoked; no marker required;
+                                  causal class stays 'realized'; read returns the raw fn
+```
+
+Falsifier: routing ingress through the authored callable entrance turns C8 red —
+`ran=1`, the incoming function is **invoked as an updater** and its return value
+`'from-server'` is stored in place of the function itself.
+
+**Discriminator total: 24/24 across 8 cases, two independent falsifiers proven.**
+
+## ⚠️ TYPING DEFECT FOUND — `NotFn` IS INSUFFICIENT
+
+A class constructor is `typeof === 'function'` at runtime but is **not callable without
+`new`**, so `typeof Thing` does NOT extend `(...args: never[]) => unknown`. The exported
+`NotFn` therefore lets a bare class through the *value* overload:
+
+```ts
+$.ctor(Thing);   // COMPILES as REPLACE under the shipped NotFn
+```
+
+while the runtime classifies it DERIVE and invokes it. Measured:
+
+```
+RUNTIME THREW: Class constructor Thing cannot be invoked without 'new'
+```
+
+That is the same failure `change-reporting.spec.ts` already fixed once — "invoking one
+throws, which used to escape mid-loop leaving `a` written, `b` unwritten and nothing
+reported." A runtime/type divergence, and the type is the wrong half.
+
+Required widening (verified: rejects a bare class AND a bare callable, while
+`mark(Thing)`, `null` and updaters all still compile):
+
+```ts
+type AnyCallable =
+  | ((...args: never[]) => unknown)
+  | (abstract new (...args: never[]) => unknown);
+type NotFn<T> = T extends AnyCallable ? never : T;
+```
+
+⚠️ `NotFn` is a **public export**. Widening it is a public type change and must go through
+the §C public-surface work, not be slipped in.
+
+## FUNCTION-AS-STATE-0 — CLOSED (FNS-A)
+
+```
+FROZEN
+    function-valued state is admitted
+    intent may NOT depend on: current value, previous value,
+                              function arity, function/class distinction
+    authored naked callable            => DERIVE
+    authored explicitly marked callable => REPLACE
+    marker is invocation-only encoding; it dies before kernel mutation
+    stored values are raw functions
+    non-authored entrances receive raw values directly, retain their
+      already-known causal classification, and MUST NOT route through
+      authored callable interpretation
+
+OPEN
+    public marker/helper name
+    exact TS overloads (NotFn must be widened for constructors — see above)
+    branch object write semantics (merge vs replace) — NOT settled here
+```
+
+The conceptual error in the first FN-A objection was treating an **ambiguity escape** as a
+**value wrapper**. Once the marker is understood as command encoding rather than data
+representation, FN-A is the cleaner option and FN-B loses most of its justification.

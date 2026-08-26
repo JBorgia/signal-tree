@@ -11120,15 +11120,40 @@ Production files importing Angular: 25 → **19**.
 Must complete BEFORE retyping the 132 Angular-shaped public type sites.
 
 ```text
-[ ] freeze the accessor grammar
-        tree              controller, non-callable
-        tree.$()          READ root        tree.$.x()        READ location
-        tree.$(value)     REPLACE root     tree.$.x(value)   REPLACE location
-        tree.$(fn)        DERIVE root      tree.$.x(fn)      DERIVE location
-[ ] canonical location object owned by the KERNEL, not a WritableSignal
-[ ] Angular WritableSignal = explicit adapter view (spelling NOT yet frozen)
-[ ] resolve function-valued-state disambiguation
+[x] freeze the callable grammar        B1 FROZEN
+        tree                  controller, non-callable
+        location()            READ
+        location(fn)          DERIVE
+        location(mark(fn))    REPLACE the callable AS DATA
+        the root tree.$ uses the SAME location grammar
+[x] canonical location object owned by the KERNEL, not a WritableSignal
+[x] Angular WritableSignal = explicit adapter view (spelling NOT yet frozen)
+[x] resolve function-valued-state disambiguation   FUNCTION-AS-STATE-0 = FNS-A
+[ ] branch object write semantics (merge vs replace)   STILL OPEN — deliberately
+                                                       NOT settled by B1
 ```
+
+FUNCTION-AS-STATE-0 closed as **FNS-A (admitted)**: function-valued state is a
+defect-driven requirement with four regression tests behind it. The incumbent
+already tried inferring intent from the current value and REVERTED it as
+unknowable at runtime, so:
+
+> **FUNCTION INTENT MAY NOT BE INFERRED FROM CURRENT STATE. THE ARGUMENT SHAPE DECIDES.**
+
+> **AN OPERATION THAT ALREADY KNOWS ITS MUTATION SEMANTICS MUST NOT RE-ENTER
+> THROUGH SYNTAX WHOSE JOB IS TO INFER THOSE SEMANTICS.** — realization,
+> restoration, hydrate and Link acquisition install raw values directly.
+
+The marker is invocation-only encoding: consumed at the boundary, never entering
+state, snapshots, Link values, persistence, restoration facts or causal payloads.
+
+Discriminator over the real neutral kernel: **24/24 across 8 cases**, with two
+independent falsifiers (reintroducing the inference heuristic; routing ingress
+through the authored entrance) both proven to turn it red.
+
+⚠️ CARRIED INTO §C: the exported `NotFn` is INSUFFICIENT — it does not filter
+class constructors, so `$.ctor(Thing)` typechecks as REPLACE while the runtime
+invokes it and throws. Widening it is a public type change.
 
 FROZEN — **GREENFIELD LEAF OWNERSHIP**: the kernel owns the canonical callable
 location; a framework representation is a VIEW of SignalTree truth, never the truth.
