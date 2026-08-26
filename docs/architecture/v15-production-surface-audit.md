@@ -17987,3 +17987,148 @@ unrelated equal value cannot stand in for causal applicability.
 
 `dependency evidence does not outlive the transaction that needed it` is a
 permanent row, and M1 kills it. The ledger is not an unbounded authored history.
+
+# CURRENT FRONTIER — reconciled from artifacts
+
+⚠️ **This section is the reconciled current status as of this commit.** Every
+section above it preserves the state at the time it was written, including
+statements later entries supersede. Read those as history.
+
+> **A LONG APPEND-ONLY RECORD IS A HISTORY, NOT A STATUS.**
+
+`FRONTIER-RECONCILIATION-0`, ADSP MODE: IMPLEMENTATION. Status was derived from
+code, tests and git log — never from a document's own label. 37 distinct
+identifiers appeared near an OPEN-ish word across the two live records; after
+reconciliation:
+
+```text
+CLOSED       17     RETIRED/VACUOUS  6     SUPERSEDED  3
+HISTORICAL   4      OPEN             6     BLOCKED     1
+```
+
+## CLOSED — closure commit + surviving carrier
+
+```text
+HIST-0                  HIST-C selected                        record + histc2-* specs
+HIST-C2                 e046c394; opt-in flip landed           M2 fails 16 across 10 files
+TX-LEDGER C3            e4e0463b                               M1 fails 4
+RESTORE-P0  A/B/C/D     p0c-divergence, p0c-row-divergence     M3 fails 4
+A1 ingress door         98edd3c1 realize() is external()       external() exported
+PERSISTENCE-DECOMPOSE-0 08e38603                               record
+INSPECTION-EGRESS-0     539408a3                               serialization-egress-disposition
+STORED-RETIRE-0         47e07100                               stored absent from source
+LINK-* (5 defects)      1c93fa6f and predecessors              link-*-conformance specs
+OBSERVATION SUBSTRATE   fab04961 / 8b611b38                    observation-substrate.spec
+PERSISTENCE-AS-LINK     910f9d61                               persistence-as-link-swap-0
+ERROR-SURFACE-1/2       d4d97b9f                               tree-error-* specs
+MATRIX-CLOSE            6ee4a27f                               record
+NOTIFIER-SCOPE-0        d4d97b9f                               record
+PER-B                   888c61bb                               per-b rows migrated to SER-3
+B2-1 .with()            223b355a                               `with` unreachable (controlled)
+signaltree-bare budget  031ec775                               ✅ 9.66/9.7 · 11.65/11.7
+```
+
+## RETIRED / VACUOUS — subject gone, no surviving invariant
+
+```text
+stored() atomic consequence semantics   release step 1 — VACUOUS, stored() deleted
+stored().reload() classification        VACUOUS, carried by HIST-C2 but stored() is gone
+loader / entityMap({ load })            RETIRED c52e8fc0 — link() is the successor
+compared / byKeys / linked              RETIRED 031ec775
+derived MARKER                          RETIRED 0e20eff3 — .derived() is a different feature
+hydrate DECLINE + onHydrateDecision     VACUOUS — no marker in core owns an external source
+```
+
+## SUPERSEDED — a later ruling absorbed the question
+
+```text
+HydrateMode "PUBLIC, no repair owed"
+    The recorded decision rests on `onHydrateDecision` being exported so
+    `HydrateDecisionEvent.mode` is nameable. That facility is DELETED (nothing
+    declines hydration). Verified: HydrateMode was never in index.ts — not at
+    session start either — `registerMarkerProcessor` is not public, and
+    packages/authoring/src/lib is an empty stub. No public surface needs it, so
+    no contract was removed. ⚠️ IF an authoring SDK later ships
+    `registerMarkerProcessor`, the hydrate hook's parameter becomes nameable-by-
+    third-parties again and this decision must be re-taken, not assumed.
+
+ENTITY_LOADER_READERS pending disposition   deleted with loader
+bind / requires / isDev pending disposition all unreachable (controlled)
+```
+
+## OPEN — surviving requirement, owner, evidence, next action
+
+```text
+1 PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0
+    requirement  one semantic job, one authoritative public surface
+    owner        public API surface
+    evidence     4 whole-tree READ paths (tree/toJSON/serialize/snapshot) and 5
+                 WRITE entry points converging on 2; deepEqual (11 consumers),
+                 asReadonly (13), toWritableSignal (1) still reachable
+    next         disposition each; the deletion-first three need consumer
+                 migration, not just a decision
+
+2 PER-LOCATION-EQUALITY-0
+    requirement  may a location carry its own comparator?
+    owner        greenfield contract, unassigned
+    evidence     compared() deleted 031ec775; no successor and none owed yet
+    next         performance evidence, or leave out by default bias
+
+3 raw-NUL harness gate
+    carried by e046c394, no resolution commit
+
+4 rollback-message legibility regression (from TX-SURFACE-0)
+    carried by e046c394, no resolution commit
+
+5 MARKER-GRAMMAR-DIAGNOSTICS-0
+    ST2021 is silent for Map/Set positions (marker-location-grammar records the
+    gap as a live DIAGNOSTIC GAP row)
+
+6 APPLYSTATE-UNKNOWN-KEY-0
+    recorded, unresolved
+```
+
+## BLOCKED
+
+```text
+tools/api-baseline.json re-baseline
+    blocked on B2 AND B3 settling. Regenerating earlier produces a baseline B3
+    invalidates, and a baseline regenerated twice is one nobody trusts.
+    ⚠️ Three of the five symbols that blocking note names — `.with()`,
+    `requires`, ENTITY_LOADER_READERS — are already gone, so the blocker's SCOPE
+    has shrunk even though the blocker itself stands.
+```
+
+## HISTORICAL — investigations, not work items
+
+`HIST-C2 step 6 category-C stop` (resolved by TX-LEDGER C3) · `LOADER-RETIRE-0`
+(superseded by the authority flip) · `SCHEMA-DEL` / `FORM-DEL` (executed) ·
+the `isDev` episode (closed, kept as a methodology note).
+
+## PARKED BY DESIGN — recorded targets, not current work
+
+`GREENFIELD-FRAMEWORK-HANDOFF-0` (frozen; waits for HIST) ·
+`GREENFIELD-ROOT-ACCESSOR-SHAPE-0` (preregistered) ·
+`OBSERVATION-REPRESENTATION-PERF` · `ANGULAR-OWNERSHIP-0`
+
+## THE EXECUTION FRONTIER
+
+```text
+NOW                        4 raw-NUL harness gate
+                           4 rollback-message legibility
+                           (both small, both carried without resolution)
+
+BEFORE PUBLIC SURFACE      PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0
+FREEZE                     MARKER-GRAMMAR-DIAGNOSTICS-0
+                           APPLYSTATE-UNKNOWN-KEY-0
+                           PER-LOCATION-EQUALITY-0 (decide, or decline by default)
+
+AT THE FREEZE              api-baseline re-baseline (after B2 + B3)
+
+AFTER THE FREEZE           GREENFIELD implementation — below publication is
+                           SignalTree, above publication is framework
+```
+
+⚠️ The release plan's 28-step list is still valid FROM step 3 onward. Step 1
+("finish stored()/persistence atomic consequence semantics") is vacuous and step
+2's heterogeneous-atomicity test exists and is green.
