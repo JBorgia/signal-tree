@@ -11129,9 +11129,29 @@ Must complete BEFORE retyping the 132 Angular-shaped public type sites.
 [x] canonical location object owned by the KERNEL, not a WritableSignal
 [x] Angular WritableSignal = explicit adapter view (spelling NOT yet frozen)
 [x] resolve function-valued-state disambiguation   FUNCTION-AS-STATE-0 = FNS-A
-[ ] branch object write semantics (merge vs replace)   STILL OPEN — deliberately
-                                                       NOT settled by B1
+[x] branch object write semantics                      RULED — whole-value T
 ```
+
+GREENFIELD-BRANCH-WRITE-0 ruled on the principle, not on merge-vs-replace:
+
+> **THE LOCATION TYPE DEFINES WHAT CONSTITUTES A COMPLETE VALUE.
+> THE MUTATION SURFACE MUST NOT IMPLICITLY WEAKEN IT.**
+
+The canonical callable takes a WHOLE `T`. A state author writing `user: User`
+gets a required complete `User`; one writing `user: Partial<User>` gets partials
+— because that IS a complete value of that location's type. Measured: weakening
+the overload to `Partial<T>` kills all three strictness rejections, including
+erasing the `name` requirement from an author's own
+`{ name: string; age?: number }`.
+
+Entity parity falls out — `$.user(fullUser)` and `$.rows.byId(1)(fullRow)` mean
+the same thing, retiring the incumbent's plain-branch-merges/entity-replaces
+special case. Patching stays accurate as a DERIVE; a `patch()` convenience may
+earn its own spelling later.
+
+⚠️ CARRIED TO §C: partial EXTERNAL acquisition (bind-branch-0) is admitted and
+RELOCATES to an explicit ingress capability — it must not survive as a second
+meaning on the authored callable.
 
 FUNCTION-AS-STATE-0 closed as **FNS-A (admitted)**: function-valued state is a
 defect-driven requirement with four regression tests behind it. The incumbent
@@ -11165,16 +11185,76 @@ Angular interop is explicit and does not define `tree.$.count`.
 A and B are one public-contract problem; do not implement callable leaves until the
 function-as-data disambiguation is settled.
 
-### C. IMPLEMENT FRAMEWORK HANDOFF
+### C. GREENFIELD IMPLEMENTATION
+
+> **AUTHORITY.** §B contracts are FROZEN. Incumbent behaviour is reference and
+> evidence only. Implementation does NOT get to renegotiate: canonical
+> `Location<T>`; whole-value `T` assignment; updater ⇒ DERIVE; marked callable ⇒
+> whole-value assignment of the raw callable; the kernel owns the canonical
+> location; an Angular `WritableSignal` is a VIEW; non-authored ingress bypasses
+> authored syntax. **§C must not reopen §B because implementation is awkward.**
 
 ```text
-[ ] create @signaltree/kernel  and  @signaltree/angular
-[ ] move Angular scalar publication adapter   tree-scalar-slot-angular-runtime.ts
-[ ] move defineStore Angular DI facade        all 15 DI sites live here
-[ ] move toWritableSignal                     Injector/runInInjectionContext/effect
-[ ] neutral memo contract where actually required
-[ ] remove Angular type shapes from kernel closure
+C1 REAL LOCATION SUBJECT
+   [ ] implement kernel Location<T> over the neutral scalar runtime
+   [ ] move the §B discriminator onto the REAL subject — cases 1–8, the
+       historical-inference mutation, the wrong-authority-ingress mutation
+   [ ] do NOT create another prototype carrier
+
+C2 TYPE CONTRACT
+   [ ] author strictness preserved: User rejects a partial; Partial<User>
+       accepts one; { name; age? } keeps name required; entity Row same grammar
+   [ ] ordinary-value overload excludes callables AND constructors
+   [ ] NOTFN-GREENFIELD-DISPOSITION — prove an independent author-facing job or
+       DELETE. Expected: delete public NotFn, use an internal exclusion type.
+
+C3 MARKER PUBLIC SURFACE
+   [ ] smallest author-facing spelling for "this callable is DATA"
+   [ ] no global augmentation, no transform, no Angular dep, no persistent
+       wrapper, no second assignment verb; good inference for callbacks,
+       constructors, null unions, updater-shaped stored functions
+
+C4 NON-AUTHORED INGRESS
+   [ ] explicit realization/acquisition entrance taking raw values and
+       preserving the caller's known causal class
+   [ ] the three bind-branch partial-acquisition cases relocate here
+   [ ] NOT location(partialPayload), NOT location(rawFunction)
+   [ ] not public unless a public consumer proves it belongs there
+
+C5 REMOVE INCUMBENT CALLABLE SEMANTICS
+   [ ] retire NodeAccessor Partial<T> callable + merging updater
+   [ ] retire incumbent tree(); migrate the root to tree.$
+   [ ] the merge carrier is CONTRADICTED — do NOT mutate it into a passing test
+   [ ] the 9 fixture-only callers migrate to COMPLETE values, ASSERTIONS UNCHANGED
+
+C6 ANGULAR HANDOFF
+   [ ] move the Angular scalar publication adapter, the WritableSignal view, the
+       DI/lifecycle facade, toWritableSignal, Angular memo/invalidation
+   [ ] kernel stays neutral under the existing closure gate
+   [ ] do NOT make Angular signal identity canonical again to ease migration
+
+C7 ENTITY DISCRIMINATOR — CLOSURE EVIDENCE, NOT PLANNING EVIDENCE
+   [ ] real entity path through a NON-Angular publication adapter: neutral
+       physical truth, structural/value mutation, commit/publication result,
+       non-Angular observation, same semantic result as the Angular view
+   [ ] required before GREENFIELD-FRAMEWORK-HANDOFF-0 closes
+
+C8 SURFACE REVIEW — before regenerating the baseline
+   [ ] NotFn disposition · marker spelling · Angular bridge spelling
+   [ ] no duplicate mutation verbs
+   [ ] no leaked SlotIndex / revision / frame / internal marker types
+   [ ] no incumbent tree() · no WritableSignal as canonical location
+   [ ] THEN regenerate the baseline for the ACTUAL greenfield surface and
+       rerun the C/D/E release gates
 ```
+
+⚠️ **WHOLE-VALUE ASSIGNMENT MUST NOT BE IMPLEMENTED AS "PARTIAL WRITE WITH
+OMITTED KEYS CLEARED."** The §B probe manufactured `undefined` writes for omitted
+descendants; it was fine for measurement but misbehaved twice in ways that would
+be production defects — a spurious mutation event per omitted key, and unknown
+keys discarded before the diagnostic could see them. The kernel installs the
+complete `T`. This matters for notifications, causal events, structural deletion,
+entity-containing branches and diagnostics.
 
 ⚠️ The §13 target packages do not exist: `authoring/` is an empty `src/`, `events/`
 and `ng-forms/` hold only `node_modules`. No `kernel/`, no `angular/`.

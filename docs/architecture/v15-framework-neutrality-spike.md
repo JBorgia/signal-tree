@@ -905,3 +905,220 @@ authored callable syntax, which B1 already froze against. BR-A + an explicit ing
 operation preserves the requirement and removes the double meaning.
 
 ⚠️ STILL THE REVIEWER'S RULING. Recorded as earned, not as decided.
+
+---
+
+# GREENFIELD-BRANCH-WRITE-0 — RULED
+
+Not "REPLACE beats MERGE." The ruling is about **who owns strictness**:
+
+> **THE LOCATION TYPE DEFINES WHAT CONSTITUTES A COMPLETE VALUE.
+> THE MUTATION SURFACE MUST NOT IMPLICITLY WEAKEN IT.**
+
+```
+T             describes what values this location is allowed to contain
+Partial<T>    describes a mutation convenience that WEAKENS that contract
+```
+
+If every object call accepts `Partial<T>`, the API has said *"for writes through this
+surface you need not satisfy `T`"* — and the state author's declaration stops protecting
+the operation. Recovering that later with a stricter second operation
+(`location.replace(fullValue)`) would be backwards: the primary API would have discarded
+the safety the secondary API exists to restore.
+
+## FROZEN
+
+```ts
+type Location<T> = {
+  (): T;
+  (value: NonCallableValue<T>): void;   // a WHOLE value of T
+  (updater: (current: T) => T): void;   // DERIVE the whole next T
+  (marked: FunctionValue<T>): void;     // a callable T as a whole value
+};
+```
+
+The state author keeps authority in every direction, and SignalTree second-guesses none
+of it:
+
+| author writes | callable requires |
+|---|---|
+| `user: User` | a complete `User` |
+| `user: Partial<User>` | any partial — that IS a complete value of this location's type |
+| `user: { name: string; age?: number }` | `name`; `age` optional |
+| `user: DeepPartial<User>` | whatever that type defines |
+
+Verified (tsc exit 0 — every allowed form compiles and every rejection fires):
+
+```ts
+A.user({ name: 'Dave', age: 42 });   // strict T = User      ✓
+A.user({ name: 'Dave' });            // strict T = User      ✗ rejected
+B.user({ name: 'Dave' });            // T = Partial<User>    ✓
+C.user({ name: 'Dave' });            // age? optional        ✓
+C.user({ age: 42 });                 // name required        ✗ rejected
+D.byId(1)({ id: 1, name: 'b' });     // entity parity        ✓
+D.byId(1)({ name: 'b' });            // partial Row          ✗ rejected
+```
+
+### Positive control — the cost of `Partial<T>`, measured
+
+Weakening only the value overload to `Partial<NonCallableValue<T>>` produces **3 unused
+`@ts-expect-error` directives**: every strictness rejection stops firing.
+
+The third is the sharpest. Under `Partial<T>`, the author's own type
+`{ name: string; age?: number }` — where they deliberately marked `age` optional and
+`name` required — loses the `name` requirement too. `Partial<T>` does not merely add
+convenience; **it erases a distinction the author explicitly drew.**
+
+## Consequences
+
+**Patching keeps an accurate spelling** — it is a DERIVE, because the result depends on
+current state:
+
+```ts
+$.user((current) => ({ ...current, name: 'Dave' }));
+```
+
+If that proves common enough to be annoying, a dedicated convenience can earn its
+existence later (`patch($.user, { name: 'Dave' })`, spelling unfrozen). It would say
+PATCH explicitly rather than silently weakening the canonical assignment.
+
+**Entity parity falls out for free** — the special case disappears instead of being
+carried forward:
+
+```ts
+$.user(fullUser);         // whole-location assignment
+$.rows.byId(1)(fullRow);  // whole-location assignment — same grammar, same meaning
+```
+
+**Dispositions:**
+
+- `callable-contract > a BRANCH called with an object merges it` — RETIRED as a
+  contradicted incumbent contract.
+- `NodeAccessor<T>`'s `(value: Partial<T>)` and merging updater — replaced by the frozen
+  `Location<T>`.
+- `bind-branch-0`'s three rows — RELOCATE. Partial external acquisition remains admitted
+  and becomes an explicit ingress capability in §C; it does not survive as a second
+  meaning on the authored callable.
+
+---
+
+# GREENFIELD-BRANCH-WRITE-0 — CLOSED (BR-A)
+
+## ⚠️ VOCABULARY CORRECTION — "REPLACE" IS NOT THE PUBLIC CONTRACT WORD
+
+This record used REPLACE throughout. That biases the reading toward an implementation
+interpretation, and it collides with vocabulary that already exists — in **two** places,
+not one (`mutation-types.ts`):
+
+```ts
+export type MutationKind = … | 'replace';        // :37   a causal KIND
+mutationIntent?: 'replace' | 'derive';           // :126  a causal INTENT
+```
+
+So `replace` is already spoken for twice internally. The public contract word is
+**whole-value assignment** (or whole-value SET). The layers are distinct and the mapping
+is one-way:
+
+```
+PUBLIC GRAMMAR                     INTERNAL CAUSALITY
+location(value)                →   mutationIntent 'replace'
+location(updater)              →   mutationIntent 'derive'
+location(mark(callable))       →   mutationIntent 'replace'
+```
+
+`mutationIntent: 'replace'` from B1 stays correct — it is the internal causal term and
+was never the public word. Read every earlier "REPLACE" in this record as **whole-value
+assignment** where it describes the public grammar.
+
+## FROZEN
+
+> **A VALUE-FORM LOCATION CALL SUPPLIES THE NEXT VALUE OF THAT LOCATION.**
+>
+> **THE STATE TYPE DEFINES ITS OWN STRICTNESS. THE MUTATION API MUST NOT WEAKEN IT.**
+
+```
+location(value)     authored WHOLE-VALUE assignment    value parameter is T, NOT Partial<T>
+location(updater)   authored derivation                current T -> whole next T
+```
+
+The incumbent's split disappears rather than being reconciled:
+
+```
+                       INCUMBENT                GREENFIELD
+plain branch value     MERGE                    whole next T
+plain branch updater   MERGE                    current T -> whole next T
+entity node value      whole-value assignment   whole next T
+entity node updater    whole-value assignment   current T -> whole next T
+```
+
+## DISPOSITIONS
+
+**`callable-contract > a BRANCH called with an object merges it` — CONTRADICTED.**
+Explicitly NOT vacuous: the subject survives, and the architecture deliberately chooses
+the opposite behaviour. Reason of record — incumbent plain-branch callable semantics
+conflict with the frozen whole-location assignment contract AND with the entity half of
+the same callable grammar.
+
+**`bind-branch-0` ×3 — RELOCATE.** They prove *partial external acquisition*. They do NOT
+prove that authored `location(value)` must mean patch. Governed by B1: an operation that
+already knows its mutation semantics must not re-enter through syntax whose job is to
+infer them.
+
+```
+AUTHORED                              NON-AUTHORED ACQUISITION
+$.settings(fullSettings)              acquire the payload through its own
+$.settings(cur => nextSettings)       realization path, which may apply a
+                                      partial external projection
+                                      NOT: $.settings(partialPayload)
+```
+
+**Patch** keeps an accurate authored spelling — `$.user(cur => ({...cur, name:'Dave'}))`
+is a derivation, because the result depends on current state. A dedicated `patch()`
+convenience may earn its own spelling later; it would say PATCH rather than silently
+weakening canonical assignment.
+
+## §C OBLIGATIONS
+
+```text
+1. callable value overload uses T, not Partial<T>
+2. callable updater returns T, not Partial<T>
+3. functions/constructors excluded from the ordinary-value overload unless
+   explicitly marked as data
+4. the 9 FIXTURE-ONLY tests migrate to complete values, ASSERTIONS UNCHANGED
+5. the 1 MERGE-DEPENDENT carrier retires as CONTRADICTED
+6. the 1 MIS-SPECIFIED probe contributes NO semantic evidence
+7. the 3 RELOCATE cases move to an explicit non-authored partial-ingress carrier
+8. TYPE CARRIER    User requires name+age; $.user({name:'Dave'}) MUST NOT compile
+                   control: Partial<User> state allows it
+9. RUNTIME CARRIER omitted keys are ACTUALLY ABSENT after whole-value assignment,
+                   not silently preserved
+```
+
+Obligation 9 is the one with no evidence yet. Every measurement so far probed the
+*authored-call* side; nothing has confirmed that a real implementation leaves omitted keys
+absent rather than preserved. The BR-A probe wrote `undefined` into them, which is not the
+same thing — and that probe also mis-specified the unknown-key diagnostic. It must be
+proven on the real implementation, not inherited from the spike.
+
+## ⚠️ IMPLEMENTATION RULE — THE MECHANISM IS NOT THE PROBE
+
+> **WHOLE-VALUE ASSIGNMENT MUST NOT BE IMPLEMENTED AS
+> "PARTIAL WRITE WITH OMITTED KEYS CLEARED."**
+
+The BR-A discriminator built its next value as
+`Object.fromEntries(Object.keys(store).map(k => [k, arg[k]]))`, manufacturing `undefined`
+writes for every omitted descendant. That was a serviceable way to *measure* which tests
+depended on merge. It is **not** the target mechanism, and it visibly misbehaved in two
+ways that would be defects in production:
+
+- it emitted a spurious mutation event for each omitted key (`['a.n','a.s']` where the
+  claim was `['a.n']`)
+- it discarded unknown keys before `recursiveUpdate` saw them, suppressing the
+  unknown-key diagnostic entirely (`expected 0 to be 2`)
+
+The kernel must install the complete `T` as the location's next value. The distinction is
+load-bearing for notifications, causal events, structural deletion, entity-containing
+branches, and diagnostics — every one of which the probe got wrong.
+
+This supersedes the weaker phrasing of obligation 9: it is not only that omitted keys must
+end up absent, but that they must never be *written* to get there.
