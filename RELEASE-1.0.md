@@ -11151,9 +11151,12 @@ Discriminator over the real neutral kernel: **24/24 across 8 cases**, with two
 independent falsifiers (reintroducing the inference heuristic; routing ingress
 through the authored entrance) both proven to turn it red.
 
-⚠️ CARRIED INTO §C: the exported `NotFn` is INSUFFICIENT — it does not filter
-class constructors, so `$.ctor(Thing)` typechecks as REPLACE while the runtime
-invokes it and throws. Widening it is a public type change.
+⚠️ CARRIED INTO §C — as a REQUIREMENT, not a presumed fix. The ordinary-value
+overload must exclude callable functions AND constructors: today `$.ctor(Thing)`
+typechecks as REPLACE while the runtime invokes it and throws. Public `NotFn`
+itself gets `NOTFN-GREENFIELD-DISPOSITION` — DO NOT ASSUME KEEP. It has no live
+consumer, and INTERNAL IMPLEMENTATION NEED DOES NOT MANUFACTURE PUBLIC API VALUE;
+expectation is delete-and-use-an-internal-type.
 
 FROZEN — **GREENFIELD LEAF OWNERSHIP**: the kernel owns the canonical callable
 location; a framework representation is a VIEW of SignalTree truth, never the truth.
