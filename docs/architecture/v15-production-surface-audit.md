@@ -17517,3 +17517,106 @@ core 2090 · workspace exit 0 · typecheck 0 · lint 0 · doc gate 0
 public API delta   2 type removals, INTENDED
 bundle             signaltree-bare still 9.77/9.7 KB — PRE-EXISTING, not raised
 ```
+
+## `loader` — DELETED. Successor established, and the mode changed
+
+### ⚠️ THE MODE SWITCH THAT MADE THIS POSSIBLE
+
+The previous entry held `loader` at a HARD STOP on the reasoning that real
+behavior needs a successor before deletion. That instinct is correct for
+incumbent solidification and WRONG for a greenfield replacement, and it was
+recreating the incumbent one careful relocation at a time.
+
+> **GREENFIELD INVARIANT CARRIER.** Before asking where an incumbent behavior
+> goes, ask whether the SEMANTIC REQUIREMENT belongs in the new contract at all.
+> ORPHANED means a GREENFIELD invariant has no carrier — not that an incumbent
+> behavior disappeared.
+
+Three-way disposition, and real behavior does not imply the first:
+
+```text
+1 GREENFIELD CONTRACT     intentionally SignalTree -> minimum clean carrier
+2 APPLICATION / POLICY    useful, not SignalTree   -> remove, no successor owed
+3 HISTORICAL / ACCIDENTAL the implementation accumulated it -> delete
+```
+
+`LOADER-RETIRE-0` was right that loader was not semantically empty. It was
+answering a different question than greenfield asks.
+
+### The split
+
+```text
+external acquisition / synchronization   -> link()        (category 1)
+entity state and topology                -> entityMap()   (category 1)
+staleTime, SWR, tags, scoped cache,
+eviction, maxScopes, loading status      -> application   (category 2)
+```
+
+Same shape as persistence: relationship authority moved to Link, and the policy
+half left core rather than justifying the wrapper's survival. We did not keep the
+old persistence authority because codec and key and debounce remained; loader gets
+the same treatment.
+
+The successor was already proven. `composed-acquisition.spec.ts` — "can remote
+keyed acquisition compose with an ORDINARY `entityMap`? No `loader()`" —
+deliberately excluded staleTime/swr/lazy/tags so the spike could not conclude
+that composition "needs machinery" when the machinery came from the API under
+test. `link()` makes that composition first-class.
+
+### Deleted
+
+```text
+markers/loader.ts, markers/entity-loader.ts        822 lines
+loader(), LoaderFeature, attachLoader, EntityLoaderSurface, EntityPersist,
+EntityStorageAdapter, invalidateTag, parseDuration, stableStringify
+entityMap({ load }) — the whole loading overload and builder
+LoadingEntityMapMarker / LoadingEntitySignal / LoadingEntityMapBuilder
+ReadonlyEntityLoaderSurface, ReadonlyLoadingEntitySignal, ENTITY_LOADER_READERS
+isLoaderFeature
+ST2004
+3 subject specs + loader rows across 11 more
+```
+
+⚠️ AND `rxjs` LEFT WITH IT. It was an optional peer dependency of `@signaltree/core`
+and loader was its only consumer. The lint's dependency check caught that
+immediately: core no longer uses rxjs at all, so the peer dependency is removed.
+A subsystem's true cost includes the dependencies it alone justified.
+
+### ⚠️ NOTHING DECLINES HYDRATION ANY MORE
+
+The `entityMap` hydrate processor declined tree-level rehydration when a loader
+owned the collection — guarded by `typeof node.load === 'function'`, and `load`
+was attached only by the loader feature. With loader gone the predicate can never
+be true.
+
+M4 had already traced the trajectory: `hydrate` had two implementers,
+`asyncSource` and `entityMap`; asyncSource's deletion left one, and loader's
+leaves ZERO declining paths. "A source-owning marker declines rehydration" is not
+an invariant that lost its carrier — it is a rule with no subject, because no
+marker in core owns an external source. Relationships do, and a relationship is
+`link()`. The RFC 0014 contrast — `transfer` accepts what `rehydrate` declines —
+retires with it: both modes accept.
+
+`reportHydrateDecision` now has zero producers. Recorded, not yet deleted.
+
+### Empty suites, classified
+
+```text
+VACUOUS   RFC 0014 transfer-vs-rehydrate contrast   no declining implementer
+VACUOUS   rehydrate: source-owning markers decline  same
+VACUOUS   S3-RECOVER branch analysis                subject was loader hydration
+VACUOUS   0B §8 maxScopes/GC source-text pins       read a deleted FILE's text
+MIGRATED  readonly parity `plants` fixture          the invariant is readonly ×
+                                                    merged-derived, not loading;
+                                                    now a plain entityMap
+VACUOUS   TreeNode loading-slice typing arm         the arm no longer exists
+```
+
+### Gates
+
+```text
+core 2017 · workspace exit 0 · typecheck 0 · lint 0 · doc gate 0
+public export delta   ZERO — loader was never exported
+package.json          rxjs peer dependency REMOVED
+bundle                signaltree-bare unchanged; still pre-existing over budget
+```

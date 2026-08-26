@@ -30,12 +30,10 @@ import {
   entityMap,
   signalTree,
 } from '../index';
-import { loader } from './markers/loader';
 import { linked } from './linked';
 import type {
   ReadonlyEntityNode,
   ReadonlyEntitySignal,
-  ReadonlyLoadingEntitySignal,
 } from './readonly';
 import { asReadonly } from './readonly';
 import type { ISignalTree } from './types';
@@ -61,13 +59,11 @@ const tree = signalTree({
   selectedId: null as number | null,
   branch: { leaf: 'x', deep: { n: 1 } },
   users: entityMap<User, number>(),
-  cached: entityMap<User, number>({
-    load: loader(() => Promise.resolve([] as User[])),
-  }),
-  // M3 fixture shape: loading entityMap that a later .derived() merges INTO.
-  plants: entityMap<User, number>({
-    load: loader(() => Promise.resolve([] as User[])),
-  }),
+  // ⚠️ WAS A LOADING entityMap. The invariant below — a `.derived()` merged
+  // INTO a marker node survives the readonly view — is about MERGED DERIVED
+  // STATE, not about loading; the loading collection was only the specimen that
+  // happened to be handy. FIXTURE DEPENDENCY IS NOT SEMANTIC DEPENDENCY.
+  plants: entityMap<User, number>(),
 }).derived(($) => ({
   doubled: computed(() => $.count() * 2),
   draft: linked(() => $.count()),
@@ -83,7 +79,6 @@ type RO$ = RO['$'];
 
 // Runtime-reachable member types used in assertions below.
 type ROUsers = RO$['users'];
-type ROCached = RO$['cached'];
 type ROPlants = RO$['plants'];
 type ROEntityNode = NonNullable<ReturnType<ROUsers['byId']>>;
 
@@ -143,26 +138,15 @@ export type _ReadonlyViewChecks = [
   Expect<Equal<Parameters<ROEntityNode>, []>>, // write call overloads gone
   Expect<NotOffered<ROEntityNode['name'], 'set'>>,
 
-  // cached entityMap({ load }): loader status readable, triggers not offered
-  Expect<Equal<ROCached, ReadonlyLoadingEntitySignal<User, number, void>>>,
-  Expect<Equal<ROCached['loading'], Signal<boolean>>>,
-  Expect<Equal<ROCached['lastLoadedAt'], Signal<number | null>>>,
-  Expect<NotOffered<ROCached, 'load'>>,
-  Expect<NotOffered<ROCached, 'loadOrThrow'>>,
-  Expect<NotOffered<ROCached, 'refresh'>>,
-  Expect<NotOffered<ROCached, 'invalidate'>>,
 
   // derived merged INTO a marker node survives the readonly view
   // (readonly×merged-derived gap, M3): the extra key is kept as a Signal…
   Expect<Equal<ROPlants['total'], Signal<number>>>,
   // …the marker's own readers remain readable…
   Expect<Equal<ROPlants['all'], Signal<User[]>>>,
-  Expect<Equal<ROPlants['loading'], Signal<boolean>>>,
   // …and the mutators/triggers are still not offered.
   Expect<NotOffered<ROPlants, 'upsertOne'>>,
   Expect<NotOffered<ROPlants, 'setAll'>>,
-  Expect<NotOffered<ROPlants, 'load'>>,
-  Expect<NotOffered<ROPlants, 'refresh'>>,
 
   // ---------------------------------------------------------------------------
   // (e) the retired single-value marker rows

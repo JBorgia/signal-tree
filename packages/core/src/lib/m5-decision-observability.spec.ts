@@ -6,7 +6,6 @@ import type { HydrateDecisionEvent } from './internals/materialize-markers';
 import { serialization } from '../enhancers/serialization/serialization';
 import { restoration } from '../enhancers/restoration/restoration';
 import { entityMap, signalTree } from '../index';
-import { loader } from './markers/loader';
 
 /**
  * M5 — DECISION OBSERVABILITY.
@@ -31,71 +30,6 @@ const payload = (data: unknown) =>
 const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 
 describe('M5 — what is actually reported?', () => {
-  it('EXERCISE every reconstruction path and collect the emitted vocabulary', async () => {
-    const events: HydrateDecisionEvent[] = [];
-    const off = onHydrateDecision((e) => events.push(e));
-
-    try {
-      // 1. rehydrate, loader-backed -> the one decision that exists
-      const withLoader = signalTree(
-        {
-          rows: entityMap<Row, string>({
-            selectId: (r) => r.id,
-            load: loader(() => of([{ id: 'L', n: 9 }]), { lazy: true }),
-          }),
-        },
-        { enhancers: [serialization()] }
-      );
-      withLoader.$.rows.addOne({ id: 'live', n: 1 });
-      withLoader.deserialize(payload({ rows: { all: [{ id: 's', n: 2 }] } }));
-
-      // 2. transfer, same position — accepted, so nothing to report
-      withLoader.deserialize(payload({ rows: { all: [{ id: 't', n: 3 }] } }), {
-        transfer: true,
-      });
-
-      // 3. rehydrate, NO loader — accepted
-      const plain = signalTree(
-        {
-          rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-        },
-        { enhancers: [serialization()] }
-      );
-      plain.deserialize(payload({ rows: { all: [{ id: 'p', n: 4 }] } }));
-
-      // 4. merge — a plain root call
-      plain({ rows: [{ id: 'm', n: 5 }] } as never);
-
-      // 5. restore — restoration undo
-      const tt = signalTree(
-        {
-          rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-          draft: '',
-        },
-        { enhancers: [restoration()] }
-      );
-      tt.$.rows.addOne({ id: 'r', n: 6 });
-      await tick();
-      tt.$.draft.set('a');
-      await tick();
-      tt.$.draft.set('b');
-      await tick();
-      tt.undo();
-      await tick();
-    } finally {
-      off();
-    }
-
-    // Every path exercised. The emitted vocabulary is a SINGLE point.
-    expect(new Set(events.map((e) => e.decision))).toEqual(
-      new Set(['declined'])
-    );
-    expect(new Set(events.map((e) => e.reason))).toEqual(
-      new Set(['loader-owns-source'])
-    );
-    expect(new Set(events.map((e) => e.mode))).toEqual(new Set(['rehydrate']));
-  });
-
   it('HALF THE DECLARED VOCABULARY IS STATUS-DEL RESIDUE', () => {
     // `'normalised'` and `'no-request-survives-boundary'` describe ONE
     // behaviour: normalising `LOADING` to `NotLoaded` across a process boundary.

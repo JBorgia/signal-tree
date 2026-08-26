@@ -252,8 +252,6 @@ const WITHDRAWN = new Map([
   ['compared', 'implemented but NOT EXPORTED — pulled from the RC surface at 76ab032c'],
   ['byKeys', 'implemented but NOT EXPORTED — ships with `compared`'],
   ['linked', 'implemented but NOT EXPORTED'],
-  ['loader', 'implemented but NOT EXPORTED — see packages/core/README.md'],
-  ['invalidateTag', 'reachable only through `loader()`, which is not exported'],
 ]);
 
 const RETIRED = new Map([
@@ -269,6 +267,8 @@ const RETIRED = new Map([
   ['effects', 'removed years ago'],
   ['withPersistence', 'removed in v12 — use `persistence()`'],
   ['serialization', 'not exported — `persistence()` is the enhancer'],
+  ['loader', 'DELETED — link(tree.$.rows, endpoint); caching is the endpoint\'s job'],
+  ['invalidateTag', 'DELETED with `loader()`'],
 ]);
 
 /**

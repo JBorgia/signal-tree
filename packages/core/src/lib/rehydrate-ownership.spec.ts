@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import { entityMap } from './types';
 import { hydrateMarkerNode } from './internals/materialize-markers';
-import { loader } from './markers/loader';
 import { signalTree } from './signal-tree';
 
 /**
@@ -33,32 +32,6 @@ const settle = () => new Promise((r) => setTimeout(r, 40));
  * DECLINING side survives through `entityMap`, which also reports
  * `decision: 'declined'`; the ACCEPTING side (entityMap + loader) is unchanged.
  */
-describe('rehydrate: source-owning markers decline', () => {
-  it('a loader-backed entityMap keeps its own data', async () => {
-    const tree = signalTree({
-      r: entityMap<{ id: number }, number>({
-        selectId: (x) => x.id,
-        load: loader(async () => [{ id: 9 }]),
-      }),
-    });
-    void tree.$.r;
-    await settle();
-    expect(tree.$.r.count()).toBe(1);
-
-    hydrateMarkerNode(
-      tree.$.r,
-      { all: [{ id: 1 }, { id: 2 }, { id: 3 }] },
-      'rehydrate'
-    );
-
-    // The loader owns this collection's persistence. Tree-level rehydration
-    // must not overwrite it — `hydrateThenRevalidate` is where that policy
-    // lives, per instance, and it already handles offline-first.
-    expect(tree.$.r.count()).toBe(1);
-  });
-
-});
-
 describe('rehydrate: markers with no source accept the payload', () => {
   it('a bare entityMap restores', () => {
     const tree = signalTree({ r: entityMap<{ id: number }, number>() });
@@ -70,25 +43,4 @@ describe('rehydrate: markers with no source accept the payload', () => {
   // subject is generic marker rehydration via hydrateMarkerNode, which is
   // UNPROVEN. The loader-backed entityMap case below covers rehydrate ownership
   // with an independent specimen.
-});
-
-describe('restore always writes — undo is not competing with a loader', () => {
-  it('a loader-backed entityMap accepts an undo', async () => {
-    const tree = signalTree({
-      r: entityMap<{ id: number }, number>({
-        selectId: (x) => x.id,
-        load: loader(async () => [{ id: 9 }]),
-      }),
-    });
-    void tree.$.r;
-    await settle();
-
-    hydrateMarkerNode(
-      tree.$.r,
-      { all: [{ id: 1 }, { id: 2 }, { id: 3 }] },
-      'restore'
-    );
-    expect(tree.$.r.count()).toBe(3);
-  });
-
 });

@@ -162,7 +162,7 @@ export class NavigationComponent {
       id: 'entity-collection',
       title: 'entityMap cache-aware loading (v11.2)',
       description:
-        'Cache-aware collections, visualized: single-flight, staleTime, invalidateTag, SWR, offline-first',
+        'Collections synchronized with a remote source through link()',
       route: '/entity-collection',
       category: 'examples',
     },

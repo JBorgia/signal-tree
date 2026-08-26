@@ -2,7 +2,6 @@ import { Signal, WritableSignal } from '@angular/core';
 
 import type { WriteMetadata } from './mutation-types';
 import type { NodeAccessor } from './node-accessor';
-import type { EntityLoaderSurface } from './markers/entity-loader';
 
 import type { EnhancerWithMeta, TreeCapability } from './enhancer-types';
 
@@ -158,7 +157,7 @@ type LiteralKeys<S> = keyof {
  * signal type.
  *
  * `entityMap()`'s builders track their slices at the type level in a phantom
- * `__sliceTypes` property (`EntityMapBuilder`/`LoadingEntityMapBuilder` in
+ * `__sliceTypes` property (`EntityMapBuilder` in
  * `markers/entity-map.ts`). The runtime already attaches each slice as a
  * `computed` on the materialized entity signal, so `tree.$.plants.byUrl()` has
  * always WORKED — this type is what makes it *typed* rather than requiring
@@ -189,13 +188,7 @@ type ApplyComputedSlices<TMarker, TBase> = TMarker extends {
 // Default TreeNode maps known keys to either EntitySignal, StoredSignal,
 // or CallableWritableSignal and still allows dynamic string indexing at runtime.
 export type TreeNode<T> = {
-  [K in keyof T]: T[K] extends LoadingEntityMapMarker<
-    infer LE,
-    infer LK,
-    infer LP
-  >
-    ? ApplyComputedSlices<T[K], LoadingEntitySignal<LE, LK, LP>>
-    : T[K] extends EntityMapMarker<infer E, infer Key>
+  [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
     : T[K] extends Primitive
     ? CallableWritableSignal<T[K]>
@@ -691,30 +684,6 @@ export interface TreeConfig {
  */
 
 
-/**
- * Branded loading feature produced by the `loader()` helper and passed as the
- * `load` option of {@link EntityMapMarker}'s config:
- * `entityMap({ load: loader(fn, opts) })`.
- *
- * Exact `security()` precedent: the helper closure is the *only* reference to
- * the loader machinery (`attachLoader`), so importing `entityMap` without
- * `loader` tree-shakes the loader/cache/SWR code out. The phantom `__entity`/
- * `__params` members carry `E`/`P` so the loading overload can recover the
- * entity and scope-param types for inference; they never exist at runtime.
- *
- * @typeParam E - entity row type
- * @typeParam P - scope-param type (`void` for a global collection)
- */
-export interface LoaderFeature<E, P = void> {
-  readonly __signalTreeLoader: true;
-  /** @internal Attaches loader machinery to a materialized entity signal. */
-  attach(entity: unknown): void;
-  /** @internal Type-level only — carries `E` for inference. */
-  readonly __entity?: E;
-  /** @internal Type-level only — carries the scope-param type `P`. */
-  readonly __params?: P;
-}
-
 // TOMBSTONE: `FormHistoryOptions`, `FormHistoryApi` and
 // `FormHistorySharedAuthority` went with `trackHistory()` in TH-DEL.
 //
@@ -794,30 +763,6 @@ export interface EntityMapMarker<E, K extends string | number> {
   /** Persisted config used when materializing the EntitySignal */
   readonly __entityMapConfig?: EntityConfig<E, K>;
 }
-
-/**
- * A cache-aware (single-scope) loading entityMap marker — produced by `entityMap({ load, … })`.
- * Materializes into an {@link EntitySignal} plus the loader surface
- * ({@link EntityLoaderSurface}). Distinguished from a plain marker by `__hasLoad`
- * so the type resolver can add the loader methods only when `load` is configured.
- *
- * @typeParam P - scope/params type (`void` for the global, parameterless form).
- */
-export interface LoadingEntityMapMarker<E, K extends string | number, P = void>
-  extends EntityMapMarker<E, K> {
-  readonly __hasLoad: true;
-  readonly __loadParams?: P;
-}
-
-/**
- * An {@link EntitySignal} augmented with the cache-aware (single-scope) loader surface — the
- * materialized form of `entityMap({ load, … })`.
- */
-export type LoadingEntitySignal<
-  E,
-  K extends string | number = string,
-  P = void
-> = EntitySignal<E, K> & EntityLoaderSurface<P>;
 
 /**
  * Create an entity map marker for use in signalTree state definition.
@@ -1098,13 +1043,7 @@ export interface DevToolsConfig {
  * the full deep inference.
  */
 export type DeepEntityAwareTreeNode<T> = {
-  [K in keyof T]: T[K] extends LoadingEntityMapMarker<
-    infer LE,
-    infer LK,
-    infer LP
-  >
-    ? ApplyComputedSlices<T[K], LoadingEntitySignal<LE, LK, LP>>
-    : T[K] extends EntityMapMarker<infer E, infer Key>
+  [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
     : T[K] extends object
     ? DeepEntityAwareTreeNode<T[K]>
@@ -1119,13 +1058,7 @@ export type DeepEntityAwareTreeNode<T> = {
  * `TypedSignalTree<T>` (see below) or use `DeepEntityAwareTreeNode`.
  */
 export type EntityAwareTreeNode<T> = {
-  [K in keyof T]: T[K] extends LoadingEntityMapMarker<
-    infer LE,
-    infer LK,
-    infer LP
-  >
-    ? ApplyComputedSlices<T[K], LoadingEntitySignal<LE, LK, LP>>
-    : T[K] extends EntityMapMarker<infer E, infer Key>
+  [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
     : CallableWritableSignal<T[K]>;
 };

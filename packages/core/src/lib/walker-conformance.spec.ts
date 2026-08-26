@@ -22,9 +22,7 @@ import { of } from 'rxjs';
 
 import { batching, entityMap, signalTree } from '../index';
 import { serialization } from '../enhancers/serialization/serialization';
-import { invalidateTag } from './markers/entity-loader';
 import { getPathNotifier, resetPathNotifier } from './path-notifier';
-import { loader } from './markers/loader';
 
 interface Member extends Record<string, unknown> {
   id: number;
@@ -156,34 +154,4 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
     unsubscribe();
   });
 
-  it('invalidateTag finds a tagged collection nested past a built-in leaf sibling', async () => {
-    let calls = 0;
-    const tree = signalTree(
-      {
-        catalog: {
-          stamp: new Date('2021-01-01T00:00:00Z'), // sibling the walk must step over, not choke on
-          nursery: {
-            plants: entityMap<Member, number>({
-              load: loader(
-                () => {
-                  calls++;
-                  return of([{ id: 1, name: 'Fern' }]);
-                },
-                { staleTime: '1h', tags: ['plants'] }
-              ),
-            }),
-          },
-        },
-      },
-      { capabilities: ['causal-runtime'] }
-    );
-
-    tree.$.catalog.nursery.plants.all();
-    await Promise.resolve(); // deferred auto-load settles
-    expect(calls).toBe(1);
-
-    expect(invalidateTag(tree, 'plants')).toBe(1);
-    await tree.$.catalog.nursery.plants.load();
-    expect(calls).toBe(2);
-  });
 });

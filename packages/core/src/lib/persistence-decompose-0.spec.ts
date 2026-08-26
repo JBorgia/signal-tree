@@ -807,52 +807,12 @@ describe('0B §4: migration-failure clearing is adapter policy', () => {
  * persist-enabled churn. Those belong to LOADER-CACHE-DISPOSITION-0, which owns
  * the cache side.
  */
-describe('0B §8: maxScopes is persistence-gated, structurally', () => {
-  const SRC = (() => {
-    for (const c of [
-      join(process.cwd(), 'packages/core/src'),
-      join(process.cwd(), 'src'),
-    ]) {
-      try {
-        readFileSync(join(c, 'lib/signal-tree.ts'), 'utf8');
-        return c;
-      } catch {
-        /* next */
-      }
-    }
-    throw new Error('0B §8: could not locate packages/core/src');
-  })();
-
-  const LOADER = readFileSync(join(SRC, 'lib/markers/entity-loader.ts'), 'utf8');
-
-  it('⚠️ the GC is unreachable without persist — ONE call site, both gated', () => {
-    // Exactly one call site, and it is inside writeThrough.
-    const calls = [...LOADER.matchAll(/touchScopeIndex\(/g)];
-    expect(calls).toHaveLength(2); // the declaration + the single call
-
-    expect(LOADER).toContain('function writeThrough(params: P): void {\n    if (!persist) return;');
-    expect(LOADER).toContain(
-      "if (!p || !scoped || p.maxScopes === undefined) return;"
-    );
-    // And the eviction mechanism is durable storage, not memory.
-    expect(LOADER).toContain('__scopes');
-  });
-
-  it('maxScopes lives on the PERSIST options object, not on the loader root', () => {
-    // Declared inside EntityPersist — grouping by declaration is weak evidence
-    // on its own, which is why the gate above is the actual proof.
-    // `EntityPersist` is a TYPE ALIAS, not an interface — so slice from its
-    // declaration to the option that follows it on the loader root.
-    const persistBlock = LOADER.slice(
-      LOADER.indexOf('export type EntityPersist'),
-      LOADER.indexOf('persist?: EntityPersist;')
-    );
-    expect(persistBlock.length).toBeGreaterThan(0);
-    expect(persistBlock).toContain('maxScopes?: number;');
-    // And the doc that settles the classification.
-    expect(persistBlock).toContain('the in-memory cache is still single-scope');
-  });
-});
+// ⚠️ 0B §8 IS RETIRED, NOT MIGRATED. Its rows read the SOURCE TEXT of
+// `entity-loader.ts` to pin where `maxScopes` was declared and that the scope GC
+// had exactly one gated call site. That file is deleted: loader's acquisition
+// job went to `link()`, and its staleTime/SWR/tags/scope-eviction options are
+// application cache policy that greenfield does not admit into core. A pin on
+// the internal layout of a file that no longer exists has no subject.
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PIN A — stored().clear() KEEPS PERSISTENCE ACTIVE (measured)
