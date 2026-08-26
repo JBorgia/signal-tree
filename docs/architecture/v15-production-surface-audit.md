@@ -17904,3 +17904,86 @@ still change the required physical and causal contract, and extracting a kernel
 against a contract that is still moving would be building on sand. When greenfield
 starts, the cut is already known — BELOW PUBLICATION IS SIGNALTREE, ABOVE
 PUBLICATION IS FRAMEWORK.
+
+## `HIST-C2` + `RESTORE-P0` — CLOSED, PROVEN BY MUTATION
+
+ADSP MODE: IMPLEMENTATION.
+
+Both were already landed and green. Rather than re-report that, they were proven
+closed to the enforcement directive's own standard: both mutation directions must
+bite, or the separation is not load-bearing.
+
+```text
+M1  rollback dependency by AUTHORSHIP, not causal effect
+    (drop the observed-effect projection from getPendingRollbackPlan)
+    -> 4 FAIL, incl. "REPAIRED (C3) — a dependent REALIZATION now refuses the
+       rollback" and "dependency evidence does not outlive the transaction"
+
+M2  restoration selection ignores undoable()  (isTurnEligible -> true)
+    -> 16 FAIL across 10 files: every histc2-* spec, devtools-jump-0,
+       turn-feed-0
+
+M3  undo ignores later external truth  (drop the externalConflict refusal)
+    -> 4 FAIL: both P0-C repros, the whole-turn refusal, and the redo-cursor pin
+```
+
+Both directions bite. The separation is load-bearing in each.
+
+### ⚠️ MY FIRST M1 WAS A NO-OP, AND ITS FAILURE IS THE BETTER EVIDENCE
+
+The first attempt filtered later turns on `effect.origin !== 'external'`. Thirteen
+tests passed and the mutation looked survived — but `CausalEffect` has **no
+`origin` field at all**:
+
+```text
+CausalEffect { owner, before, after, subjectId?, structural?, structuralContext? }
+```
+
+So the predicate was always true and nothing changed. The separation was not
+weak; the mutation was invalid.
+
+> **A MUTATION NEEDS ITS OWN POSITIVE CONTROL.** A mutation that "survives"
+> proves nothing until you have shown it changed behaviour at all.
+
+And the absence it revealed is stronger evidence than the mutation would have
+been: rollback dependency **cannot** discriminate by authorship, because
+authorship is not in the causal record. TX-LEDGER C3's "relevance is decided by
+position and subject overlap" is enforced by the data shape, not by policy.
+
+### The architecture, as implemented
+
+```text
+confirmedTurns          canonical authored causal facts
+dependencyLedger        BOUNDED PROJECTION for effects with no authored turn of
+                        their own — a realization, typically; entries filtered by
+                        `seq > openedAt` and discarded with the transaction
+getPendingRollbackPlan  authoredLater + observedLater, relevance by position and
+                        subject overlap
+isTurnEligible          restoration selection ONLY — never causal admission
+externalConflict        world-relative applicability at the reversal boundary
+```
+
+One causal system. One restoration authority. A projection, not a second
+canonical history — exactly what the frozen model requires.
+
+### P0's frozen policy
+
+> an undo either reverses the authored operation, or it does not happen
+
+Refusal, not partial application, not overwriting later truth. P0-D settled
+FRAME-relative validity ("given what this same frame will also do"); P0-C settled
+WORLD-relative validity ("given what happened AFTER the turn"), which is not
+derivable and therefore a policy. Skipping the conflicting effect would make an
+authored turn partially reversible — the HIST-B failure through a different door.
+Letting the inverse win would make history an authority over facts it does not
+own.
+
+⚠️ AND IT IS NOT BARE VALUE EQUALITY. The check is `externalTruthBySubject` —
+later external authority FOR THAT SUBJECT — and only then a drift comparison. The
+subject gate is what keeps `AUTHORITY TRANSITION != STATE TRANSITION` intact; an
+unrelated equal value cannot stand in for causal applicability.
+
+### Retention, already implemented
+
+`dependency evidence does not outlive the transaction that needed it` is a
+permanent row, and M1 kills it. The ledger is not an unbounded authored history.
