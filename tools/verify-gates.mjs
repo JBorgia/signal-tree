@@ -355,6 +355,33 @@ const GATES = [
     },
   },
   {
+    name: 'source-controls',
+    covers:
+      'no raw NUL or unexpected C0 control character in any tracked source',
+    cmd: ['node', 'tools/check-source-controls.mjs'],
+    // Earned by a real incident: an invisible NUL reached committed source,
+    // propagated into the script written to fix it, and was found only because
+    // Python refused to parse that script. TypeScript, ESLint and the tests were
+    // all blind to it — which is the argument for a gate that reads BYTES.
+    mutation: {
+      file: 'packages/core/src/lib/constants.ts',
+      find: 'export',
+      replace: '\u0000export',
+    },
+  },
+  {
+    name: 'source-controls:self',
+    covers:
+      "the NUL detector itself — a checker whose only evidence is 'found " +
+      "nothing' is indistinguishable from one that cannot find anything",
+    cmd: ['node', 'tools/check-source-controls.mjs', '--self-test'],
+    mutation: {
+      file: 'tools/check-source-controls.mjs',
+      find: 'const ALLOWED = new Set([0x09, 0x0a, 0x0d]);',
+      replace: 'const ALLOWED = new Set([0x09, 0x0a, 0x0d, 0x00]);',
+    },
+  },
+  {
     name: 'readme-apis:teaching',
     covers:
       'the retired-API half of the doc gate — proven separately because one ' +

@@ -18074,12 +18074,6 @@ bind / requires / isDev pending disposition all unreachable (controlled)
     evidence     compared() deleted 031ec775; no successor and none owed yet
     next         performance evidence, or leave out by default bias
 
-3 raw-NUL harness gate
-    carried by e046c394, no resolution commit
-
-4 rollback-message legibility regression (from TX-SURFACE-0)
-    carried by e046c394, no resolution commit
-
 5 MARKER-GRAMMAR-DIAGNOSTICS-0
     ST2021 is silent for Map/Set positions (marker-location-grammar records the
     gap as a live DIAGNOSTIC GAP row)
@@ -18148,9 +18142,7 @@ the `isDev` episode (closed, kept as a methodology note).
 ## THE EXECUTION FRONTIER
 
 ```text
-NOW                        4 raw-NUL harness gate
-                           4 rollback-message legibility
-                           (both small, both carried without resolution)
+NOW                        (empty — both carried items closed)
 
 BEFORE PUBLIC SURFACE      PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0
 FREEZE                     MARKER-GRAMMAR-DIAGNOSTICS-0
@@ -18166,3 +18158,75 @@ AFTER THE FREEZE           GREENFIELD implementation — below publication is
 ⚠️ The release plan's 28-step list is still valid FROM step 3 onward. Step 1
 ("finish stored()/persistence atomic consequence semantics") is vacuous and step
 2's heterogeneous-atomicity test exists and is green.
+
+## `NOW-CLOSE-0` — both carried items CLOSED
+
+### raw-NUL harness gate
+
+Requirement, verbatim from the carry: _a cheap syntactic gate rejecting raw NUL
+and unexpected C0 controls in tracked sources._ Earned by a real incident — an
+invisible NUL reached committed source, propagated into the script written to fix
+it, and was found only because Python refused to parse that script.
+
+Owner: TOOLING. No runtime semantics were touched, and none needed to be — the
+defect is that a byte no semantic tool can see reached a commit.
+
+```text
+tools/check-source-controls.mjs   C0 minus TAB/LF/CR, plus DEL, over
+                                  `git ls-files` (not a glob — an ignore list
+                                  drifts; the tracked set is by definition what a
+                                  commit can carry)
+gate  source-controls             mutation: plant \0 in constants.ts -> caught
+gate  source-controls:self        mutation: allow 0x00 in the detector  -> caught
+scan at HEAD                      1065 tracked files, clean
+```
+
+⚠️ IT SHIPS WITH ITS OWN POSITIVE CONTROL, in the tool itself. A checker whose
+only evidence is "found nothing" is indistinguishable from a checker that cannot
+find anything — twice this session, in a mutation filtering a non-existent field
+and a reachability grep that called `entityMap` unreachable. `--self-test` plants
+a NUL in a synthetic buffer and requires exactly one hit, then requires TAB/LF/CR
+to pass untouched.
+
+### rollback-message legibility
+
+Requirement: _`transactions()`' compensation path surfaces the wrapped error's
+message rather than the underlying refusal kind._ Measured cause:
+`ROLLBACK_ERROR_MESSAGE` is a CONSTANT, so both refusal kinds produced one
+identical sentence and the kind survived only on `.cause`.
+
+That is the defect stated precisely: a thrown error's MESSAGE is what reaches a
+console, a bug report and a log aggregator; `.cause` is what reaches a debugger
+someone already opened. So one sentence served two opposite situations —
+
+```text
+later-confirmed-dependency   later work relies on facts the rollback would
+                             invalidate. REFUSING IS CORRECT; nothing to fix.
+effect-validation-failed     the compensation could not be applied. Something IS
+                             wrong.
+```
+
+⚠️ SEMANTICS UNCHANGED, DELIBERATELY. Same refusal in the same cases, same error
+type, same `cause` payload, and the constant survives as a PREFIX so every
+existing matcher still matches. Only the rendering of an already-made decision
+improved.
+
+**And the assertion that hid it was strengthened, not loosened.**
+`restoration.spec.ts`'s shared helper asserted the message was EXACTLY the
+constant — which is precisely what made the regression invisible. It now requires
+the constant as a prefix AND requires the message to name the refusal kind, so
+those 7 rows became tripwires: the mutation reinstating the regression fails all
+7 plus both new rows.
+
+⚠️ THE CARRIER'S FIRST VERSION WAS WORTHLESS. It reimplemented the renderer
+inside the spec and passed while proving nothing about shipped code. Repointed at
+the production `explainRollbackFailure` — DELETE THE DUPLICATE TO MAKE THE CLAIM
+FALSIFIABLE.
+
+### Gates
+
+```text
+core 1992 · workspace exit 0 · typecheck 0 · lint 0 · doc gate 0 · NUL gate 0
+gates proven   47/51 (was 45/49)
+public export delta   ZERO
+```
