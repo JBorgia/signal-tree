@@ -17863,7 +17863,44 @@ authoritative values staying in the kernel rather than moving into tokens.
 Whether `isSignal(location)` is true is NOT a kernel requirement, and must not be
 allowed to force kernel representation.
 
-⚠️ NOT SCHEDULED HERE. This is the recovered target, recorded so the greenfield
-build starts from it. The incumbent is evidence of how far it got — the neutral
-runtime and its publication adapter are the parts worth carrying; `createLeaf`
-returning a `WritableSignal` is the part to stop reproducing.
+### FROZEN AT THE ARCHITECTURE LEVEL
+
+> **SignalTree owns truth. The framework owns observation. The framework handoff
+> occurs at COMMITTED PUBLICATION.**
+
+No longer a candidate. This is why React and Vue later need ADAPTERS rather than
+SignalTree rewrites.
+
+> **FRAMEWORK NEUTRALITY IS A TYPE-CLOSURE PROPERTY, NOT AN IMPORT-LINE
+> PROPERTY.** A kernel file importing no framework package is insufficient if one
+> of its dependencies hands it a `WritableSignal`. The shadow pair above is the
+> proof: a direct-import gate stayed green while Angular-shaped semantics sat
+> transitively beneath the causal runtime.
+
+That is the same lesson the documentation gate taught — checking the superficial
+spelling misses the semantic dependency. Two independent gates, one failure mode.
+
+### ⚠️ WHEN IMPLEMENTATION STARTS, THE INCUMBENT IS EVIDENCE — NOT THE TARGET
+
+```text
+neutral runtime          SEMANTIC SHAPE is evidence; its representation is NOT
+                         automatically the target
+publication adapter      PROVEN ARCHITECTURE; the implementation may be reused
+                         if it is still minimal
+createLeaf -> Writable   transitional incumbent shape — DO NOT REPRODUCE
+```
+
+The same caution applies to the envelope. `ScalarSlotCommitResult`'s
+`{ revision, changedSlots }` is useful evidence, but `transactionId`,
+`revisionFrom` and `structuralChanges` must NOT be bolted on merely because an
+older note sketched a `CommittedChangeSet` with them. The final shape comes from
+what transactions, structural realization and adapters actually require once
+`HIST` closes — otherwise recovering an architecture note becomes another
+incumbent-preservation exercise, which is the failure this whole mode switch
+exists to avoid.
+
+⚠️ NOT SCHEDULED. Implementation waits for `HIST`: restoration semantics can
+still change the required physical and causal contract, and extracting a kernel
+against a contract that is still moving would be building on sand. When greenfield
+starts, the cut is already known — BELOW PUBLICATION IS SIGNALTREE, ABOVE
+PUBLICATION IS FRAMEWORK.
