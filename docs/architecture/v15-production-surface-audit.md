@@ -17713,3 +17713,157 @@ bundle                BOTH TARGETS GREEN for the first time this session
 
 Next: `HIST-SCOPE` and the realization/undo correctness defect. No further
 legacy-feature preservation phase.
+
+## `GREENFIELD-FRAMEWORK-HANDOFF-0` — the boundary, RESTORED not rediscovered
+
+> **SignalTree owns truth. The framework owns observation.**
+
+```text
+                ┌────────────────────┐
+                │   neutral kernel   │  state / slots / entities
+                │                    │  transactions / causal authority
+                │                    │  Link / history
+                └─────────┬──────────┘
+                          │  physical commit
+                          │  CommittedChangeSet
+                 ═════════╪═════════
+                   FRAMEWORK HANDOFF
+                 ═════════╪═════════
+                          │  PublicationAdapter
+                 /        |        \
+          Angular       React       Vue
+           token      subscriber   trigger
+```
+
+The handoff is at COMMITTED PUBLICATION. Not at `signalTree()` construction, not
+inside `Link`, not at `TreeRealizationPort`, not at entity storage, not at causal
+interpretation.
+
+### ⚠️ THE INCUMBENT GOT FURTHER THAN THE PLAN REMEMBERED — measured
+
+**1. The neutral kernel exists, and it is genuinely neutral.**
+`internals/tree-scalar-slot-runtime.ts` imports only `PositionId`,
+`PhysicalCommitClock` and the stats counter. Zero framework imports. Its surface
+is already the one the plan calls for:
+
+```text
+createSlot(initial, equal, positionId?) -> SlotIndex
+readSlot / commitSlot / updateSlot      over SlotIndex
+beginFrame() -> { set, update, discard, commit }
+resolveScalarSlot(positionId) · revision() · slotCount()
+```
+
+**2. The PublicationAdapter is already IMPLEMENTED, not merely sketched.**
+`AngularScalarSlotPublicationAdapter` in the Angular runtime is exactly the
+proposed contract:
+
+```text
+observe(slotIndex)   reads a hidden WritableSignal<number> token
+publish(result)      bumps the token for every result.changedSlots entry
+```
+
+`SlotIndex -> hidden Angular reactive token` is not a design to build. It ships.
+
+**3. The Angular runtime is a genuine ADAPTER, not a fork.** It imports the
+neutral module and delegates — `kernel.createSlot(initialValue, equal,
+positionId)`. The layering the plan wants already exists in the dependency graph.
+
+**4. `CommittedChangeSet` half-exists.** `ScalarSlotCommitResult` is
+`{ revision, changedSlots }` — the skeleton. Missing: `transactionId`,
+`revisionFrom` (only the post-commit `revision` is carried), and
+`structuralChanges`.
+
+### So the blocker is NARROWER than "migrate the realization port"
+
+Two files import the WRAPPER instead of the kernel:
+
+```text
+lib/signal-tree.ts:54                          -> tree-scalar-slot-angular-runtime
+internals/causal-runtime/tree-realization-adapter.ts:14 -> same
+```
+
+and the wrapper's storage handle is Angular-shaped where the kernel's is not:
+
+```text
+NEUTRAL   createSlot(...)          -> SlotIndex
+          resolveScalarSlot(pos)   -> SlotIndex | undefined
+
+ANGULAR   createLeaf(...)          -> WritableSignal<T>      ← the leak
+          resolveScalarLeaf(pos)   -> WritableSignal<unknown>← the leak
+          publishPrepared(result)                            ← adapter fused in
+```
+
+⚠️ AND THE TWO MODULES EXPORT THE SAME NAMES — `TreeScalarSlotRuntime`,
+`createTreeScalarSlotRuntime`, `ScalarSlotMutationFrame`. A shadowing pair
+distinguished only by import path is exactly how a transitive coupling passes a
+direct-import check, which is why the neutrality gate must be transitive.
+
+### The neutrality map, measured
+
+```text
+23 non-spec files in packages/core import '@angular/core'
+```
+
+Including `link.ts`, whose `NaturalValue` still has a `WritableSignal<infer T>`
+arm and whose `accessorsFor` branches on `.set()` — adapter shape leaking into
+authority machinery. Link is causal: eligible truth, knownY, external
+acquisition, settlement, inspection exclusion. None of that is observation.
+
+`signal-tree.ts` is explicit that this is transitional:
+
+> "for this release `@signaltree/core` IS the Angular adapter, so the binding
+> lives here rather than in the neutral materializer"
+
+```ts
+installMaterializationRealization({
+  isReactiveNode: (node) => isSignal(node),
+  memoizeSnapshot: (_node, compute) => computed(compute),
+});
+```
+
+That seam is evidence the plan was already partly executed, not evidence that
+Angular is the permanent substrate.
+
+### ⚠️ ARCHITECTURE IS PRESERVED; OLD PUBLIC GRAMMAR IS NOT
+
+The original cross-framework document showed leaves as `tree.$.a.name.set('x')`.
+That is NOT grandfathered by recovering the architecture:
+
+```text
+ORIGINAL ARCHITECTURAL BOUNDARY   preserve
+OLD PUBLIC GRAMMAR                do NOT automatically preserve
+GREENFIELD GRAMMAR                location() / location(value) / location(fn)
+```
+
+Uniform callable locations are also what removes Link's need to branch on
+Angular's `.set()`, so the grammar decision and the neutrality work reinforce
+each other. See `GREENFIELD-ROOT-ACCESSOR-SHAPE-0` for the root's half.
+
+### The second neutrality problem, also already identified
+
+`@signaltree/authoring` and `@signaltree/kernel` solve different problems:
+
+```text
+@signaltree/authoring   marker contracts, descriptors, guards,
+                        registerMarkerProcessor, enhancer protocol — neutral
+                        because authorship factories are INERT DESCRIPTORS
+@signaltree/kernel      authoritative engine
+framework adapter       Angular / React / Vue observation
+```
+
+The marker analysis had already shown Angular primitives live exclusively inside
+`create*Signal` realization functions, never in the authoring factories.
+
+### The discriminator
+
+One kernel tree, NO framework installed: reads, writes, updater writes,
+transactions, `entityMap`, `link()`, history/restoration all work. Attach the
+Angular adapter and the SAME tree becomes Angular-reactively observable, with
+authoritative values staying in the kernel rather than moving into tokens.
+Whether `isSignal(location)` is true is NOT a kernel requirement, and must not be
+allowed to force kernel representation.
+
+⚠️ NOT SCHEDULED HERE. This is the recovered target, recorded so the greenfield
+build starts from it. The incumbent is evidence of how far it got — the neutral
+runtime and its publication adapter are the parts worth carrying; `createLeaf`
+returning a `WritableSignal` is the part to stop reproducing.
