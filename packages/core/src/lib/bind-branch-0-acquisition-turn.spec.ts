@@ -2,9 +2,12 @@ import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { createDiagnosticJournal } from './internals/diagnostics/diagnostic-journal';
-import { external } from './external';
 import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
+import {
+  acquireScalarProjection,
+  EXTERNAL_ACQUISITION,
+} from './internals/acquire-projection';
 import { transactions } from '../enhancers/transactions/transactions';
 import { undoable } from './undoable';
 
@@ -102,7 +105,11 @@ describe('BIND-BRANCH-0: what belongs to an external acquisition?', () => {
     const journal = createDiagnosticJournal(tree as object);
     const historyBefore = tree.getRestorationHistory().length;
 
-    external(() => tree.$.settings(PAYLOAD));
+    acquireScalarProjection(
+      tree.$.settings as unknown as Record<string, unknown>,
+      PAYLOAD,
+      EXTERNAL_ACQUISITION
+    );
     await flush();
     const effects = drain(journal);
 
@@ -149,7 +156,11 @@ describe('BIND-BRANCH-0: what belongs to an external acquisition?', () => {
     await flush();
     const journal = createDiagnosticJournal(tree as object);
 
-    external(() => tree.$.settings(PAYLOAD));
+    acquireScalarProjection(
+      tree.$.settings as unknown as Record<string, unknown>,
+      PAYLOAD,
+      EXTERNAL_ACQUISITION
+    );
     // Application logic reacting to metric units. Storage never said the
     // precision was 1 — the application rule did. Same tick, deliberately: if
     // provenance were contagious, timing would be what leaked it.
@@ -176,7 +187,11 @@ describe('BIND-BRANCH-0: what belongs to an external acquisition?', () => {
     expect(foreground()).toBe('black');
 
     const journal = createDiagnosticJournal(tree as object);
-    external(() => tree.$.settings(PAYLOAD));
+    acquireScalarProjection(
+      tree.$.settings as unknown as Record<string, unknown>,
+      PAYLOAD,
+      EXTERNAL_ACQUISITION
+    );
     await flush();
     const effects = drain(journal);
 
@@ -215,7 +230,11 @@ describe('BIND-BRANCH-0: the limits of the current turn model', () => {
     await flush();
     const journal = createDiagnosticJournal(tree as object);
 
-    external(() => tree.$.settings(PAYLOAD));
+    acquireScalarProjection(
+      tree.$.settings as unknown as Record<string, unknown>,
+      PAYLOAD,
+      EXTERNAL_ACQUISITION
+    );
     tree.$.settings.distancePrecision.set(1);
     await flush();
     const turns = journal.turns();
