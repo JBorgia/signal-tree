@@ -38,8 +38,17 @@ describe('restoration enhancer', () => {
       expect(error).toBeInstanceOf(SignalTreeRollbackError);
       const rollbackError = error as SignalTreeRollbackError;
       expect(rollbackError.code).toBe('SIGNALTREE_ROLLBACK_FAILED');
-      expect(rollbackError.message).toBe(
+      // ⚠️ STRENGTHENED, NOT LOOSENED. This asserted the message was EXACTLY
+      // the constant — which is what made the TX-SURFACE-0 legibility
+      // regression invisible: both refusal kinds produced that identical
+      // sentence, and the kind survived only on `.cause`, which a thrown
+      // error's message never shows. The assertion now requires the constant as
+      // a PREFIX and requires the message to name which refusal happened.
+      expect(rollbackError.message).toContain(
         'SignalTree could not rollback the pending transaction'
+      );
+      expect(rollbackError.message).toContain(
+        (expectedCause as { kind: string }).kind
       );
       expect(rollbackError.cause).toMatchObject(expectedCause);
     }

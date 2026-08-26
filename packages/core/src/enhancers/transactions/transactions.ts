@@ -95,7 +95,7 @@ type LaterAppliedEffect = {
   effect: TurnEffect;
 };
 
-type PendingRollbackDependencyConflict = {
+export type PendingRollbackDependencyConflict = {
   kind: 'later-confirmed-dependency';
   pendingTurnId: number;
   pendingEffect: TurnEffect;
@@ -107,7 +107,7 @@ type PendingRollbackPlan =
   | { compensation: TurnEffect[] }
   | { conflict: PendingRollbackDependencyConflict };
 
-type RollbackFailureCause =
+export type RollbackFailureCause =
   | PendingRollbackDependencyConflict
   | {
       kind: 'effect-validation-failed';
@@ -175,10 +175,45 @@ const INTERNAL_TRANSACTION_RUNTIME = Symbol(
 const ROLLBACK_ERROR_MESSAGE =
   'SignalTree could not rollback the pending transaction';
 
+/**
+ * Why the rollback was refused, as a sentence rather than only as a `cause`.
+ *
+ * ⚠️ A LEGIBILITY REGRESSION FROM TX-SURFACE-0, repaired here. Both refusal
+ * kinds produced the SAME constant message; the kind survived only on `.cause`,
+ * which a thrown-error message in a console never shows. A developer saw
+ * "could not rollback" and had no way to tell a dependency conflict — where
+ * later work relies on facts the rollback would invalidate, and refusing is
+ * CORRECT — from a compensation that simply failed to validate.
+ *
+ * ⚠️ SEMANTICS ARE UNCHANGED, DELIBERATELY. Same refusal in the same cases, same
+ * error type, same `cause` payload. Only the rendering of an already-made
+ * decision improves. The constant remains the PREFIX so existing matchers keep
+ * matching — the message is additive, not replaced.
+ */
+export const explainRollbackFailure = (
+  cause: RollbackFailureCause
+): string => {
+  if (cause.kind === 'later-confirmed-dependency') {
+    const at =
+      cause.conflictingTurnId === undefined
+        ? 'later work'
+        : `turn ${cause.conflictingTurnId}`;
+    return (
+      `${ROLLBACK_ERROR_MESSAGE}: ${at} depends on state this rollback would ` +
+      `invalidate, so reversing turn ${cause.pendingTurnId} is no longer safe ` +
+      `[later-confirmed-dependency]`
+    );
+  }
+  return (
+    `${ROLLBACK_ERROR_MESSAGE}: compensating turn ${cause.pendingTurnId} ` +
+    `failed validation — ${cause.errorMessage} [effect-validation-failed]`
+  );
+};
+
 const createRollbackError = (
   cause: RollbackFailureCause
 ): SignalTreeRollbackError =>
-  new SignalTreeRollbackError(ROLLBACK_ERROR_MESSAGE, { cause });
+  new SignalTreeRollbackError(explainRollbackFailure(cause), { cause });
 
 function cloneTurnEffect(effect: TurnEffect): TurnEffect {
   return { ...effect };
