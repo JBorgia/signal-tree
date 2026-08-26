@@ -2508,6 +2508,24 @@ Two instances, one session: a mutation filtering `effect.origin` on a type with 
 reported `entityMap` and `link` unreachable, which the controls immediately
 exposed as a broken pattern rather than a finding.
 
+## 29.7a Casts invalidate type-evidence
+
+> **CASTS INVALIDATE TYPE-EVIDENCE UNLESS THE CAST ITSELF IS THE SUBJECT UNDER
+> TEST.** `as never`, `as any` and `as unknown as X` in a fixture do not merely
+> silence a complaint — they remove the check whose result you are about to
+> report.
+
+Measured: a carrier passed `tree.$ as never` to an API whose parameter type
+already rejects `TreeNode`, hit a runtime failure, and produced a report of a
+public-contract defect that did not exist. Without the cast the call does not
+compile, which was the contract working.
+
+Same family as the no-op mutation and the broken absence grep. The unifying
+statement:
+
+> **EVIDENCE INFRASTRUCTURE MUST ITSELF BE DEMONSTRATED CAPABLE OF OBSERVING THE
+> PROPERTY IT CLAIMS TO PROTECT.**
+
 ## 29.7b Two rules from tightening a proof
 
 > **A TEST TITLE IS A CLAIM.** If the fixture does not deterministically produce

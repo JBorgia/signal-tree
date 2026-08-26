@@ -190,18 +190,45 @@ describe('marker-location grammar', () => {
     expect(st2021()).toBe(1);
   });
 
-  it('⚠️ DIAGNOSTIC GAP — Map/Set are data (correct), but SILENTLY', () => {
-    // The STATE outcome here is right: an out-of-contract position holds
-    // ordinary data, exactly as the grammar says. Only the diagnostic differs —
-    // ST2021 scans arrays, so identical misuse warns in one container and not
-    // in the other. Left as-is deliberately: extending the scanner is a
-    // behavior change, and the greenfield implementation should derive
-    // diagnostics from the settled grammar rather than copy today's
-    // array-specific scan. Tracked as MARKER-GRAMMAR-DIAGNOSTICS-0.
-    signalTree({ m: new Map<string, unknown>([['a', entityMap<Row, number>(cfg())]]) });
-    expect(st2021()).toBe(0);
+  it('CLOSED — Map values and Set members are data, and ST2021 now says so', () => {
+    // ⚠️ THE GAP THIS REPLACES. ST2021 scanned arrays only, so identical misuse
+    // warned in one non-traversable container and was SILENT in the others.
+    // MARKER-GRAMMAR-DIAGNOSTICS-0 extended the diagnostic at the branch that
+    // already decides a position becomes a leaf.
+    //
+    // ⚠️ THE GRAMMAR IS UNCHANGED, and both halves are asserted below: the value
+    // stays RAW DATA — not materialised, no marker semantics — and the developer
+    // is now told.
+    warns = [];
+    const mapTree = signalTree({
+      m: new Map<string, unknown>([['a', entityMap<Row, number>(cfg())]]),
+    });
+    expect(st2021()).toBe(1);
+    // …and it is STILL ordinary data. This is the row that fails if a repair
+    // ever "fixes" the diagnostic by materialising the marker.
+    const mapValue = (mapTree.$.m() as Map<string, unknown>).get('a');
+    expect(materialized(mapValue)).toBe(false);
+    // The position is rendered HONESTLY — a Map value is not a property path.
+    expect(warns.find((w) => w.includes('ST2021'))).toContain(
+      'Map value at key "a"'
+    );
 
-    signalTree({ s: new Set<unknown>([entityMap<Row, number>(cfg())]) });
+    warns = [];
+    const setTree = signalTree({
+      s: new Set<unknown>([entityMap<Row, number>(cfg())]),
+    });
+    expect(st2021()).toBe(1);
+    const setMember = [...(setTree.$.s() as Set<unknown>)][0];
+    expect(materialized(setMember)).toBe(false);
+    expect(warns.find((w) => w.includes('ST2021'))).toContain('Set member #0');
+  });
+
+  it('CONTROL — a Map or Set holding no marker stays silent', () => {
+    // Without this, "Map/Set now warn" would be satisfied by warning on every
+    // Map and Set in the tree.
+    warns = [];
+    signalTree({ m: new Map<string, unknown>([['a', { plain: 1 }]]) });
+    signalTree({ s: new Set<unknown>([1, 'two', { three: 3 }]) });
     expect(st2021()).toBe(0);
   });
 
