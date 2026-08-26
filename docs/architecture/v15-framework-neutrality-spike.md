@@ -1122,3 +1122,184 @@ branches, and diagnostics — every one of which the probe got wrong.
 
 This supersedes the weaker phrasing of obligation 9: it is not only that omitted keys must
 end up absent, but that they must never be *written* to get there.
+
+---
+
+# §C PROGRESS — C1 AND C2
+
+## C1 — the real `Location<T>` exists
+
+`packages/core/src/lib/internals/tree-location.ts`, built over the neutral scalar runtime.
+Neutral: no `@angular/*` in the file or its closure.
+
+```ts
+location()                 READ
+location(value)            authored WHOLE-VALUE assignment
+location(updater)          authored DERIVE
+location(mark(callable))   whole-value assignment of the raw callable
+```
+
+The marker is consumed in the dispatcher; the kernel only ever receives the raw function.
+`acquireScalarLocation` is the non-authored ingress seam (C4 owns its full form) and is
+deliberately not exported publicly.
+
+**The §B discriminator moved onto the real subject and the scratchpad prototype was not
+kept** — a permanent fake implementation carrying a real invariant is the
+prototype-retirement problem again. `tree-location.spec.ts`: **9/9**, cases 1–8 plus a new
+row, *classification never consults the stored value*, which pins the rule directly rather
+than through a symptom.
+
+Both falsifiers re-proven on the real subject:
+
+```
+reintroduce inference-from-current-state   → 2 failed  (C6 + the classification row)
+route ingress through authored callable    → 1 failed  (C8)
+restored                                   → 9 passed
+```
+
+## C2 — the type contract holds, and is non-vacuous
+
+`tree-location.typing.spec.ts` (typechecked, not executed — the repo convention, covered
+by the `spec-types` gate). Every allowed form compiles; every `@ts-expect-error` fires.
+
+```
+Location<User>                      { name, age } ✓      { name } ✗
+Location<Partial<User>>             { name } ✓           {} ✓
+Location<{name; age?}>              { name } ✓           { age } ✗
+Location<Row>                       whole Row ✓          partial ✗
+Location<null | (() => void)>       mark(handler) ✓      naked handler ✗
+Location<typeof Thing | null>       mark(Thing) ✓        bare class ✗
+Location<(n:number)=>number>        updater-shaped value resolves by ARGUMENT SHAPE
+```
+
+Control: weakening only the value overload to `Partial<NonCallableValue<T>>` produces
+**3 unused `@ts-expect-error` directives** — every strictness rejection stops firing.
+Restored: 0 errors.
+
+## NOTFN-GREENFIELD-DISPOSITION — DELETE (earned, execution deferred to C8)
+
+Repo-wide, `NotFn` has **zero type positions**. Every reference is inert:
+
+```
+types.ts:76        its own definition
+index.ts:63        its barrel export
+api-baseline.json  a record OF the export
+types.ts:1137      inside a commented-out overload
+callable-contract.spec.ts:21, CHANGELOG, docs/archive, docs/audits   prose
+```
+
+Control: the same search shape returns 58 references for `CallableWritableSignal`.
+
+**No independent author-facing job. Verdict: DELETE from the greenfield public surface**,
+with the internal `NonCallableValue<T>` in `tree-location.ts` carrying the job instead.
+Internal implementation need does not manufacture public API value.
+
+⚠️ EXECUTION DEFERRED, not softened. The `api-baseline` gate covers "no undeclared export
+added **or removed**", so removing the export fails it until the baseline is regenerated —
+and C8 regenerates the baseline once, for the whole greenfield surface, after the surface
+review. Deleting it now would mean either a premature baseline regen or a worked-around
+gate. It lands with the coordinated change.
+
+⚠️ A probe that "confirmed" this by running `tools/check-api-baseline.mjs` was INVALID —
+that file does not exist, and the run returned exit 1 in BOTH the mutated and restored
+arms. The real gate is `tools/api-inventory.mjs --check` with `needsBuild: true`. Recorded
+because the failing arm looked like evidence and was not; only the restored-arm control
+exposed it.
+
+## C2 CORRECTIONS
+
+**The marker was broader than the frozen contract.** `FunctionValue<T>` and its factory
+accepted any `T`, so `asValue(42)` was conceptually admitted — a second spelling for
+something `location(42)` already says unambiguously.
+
+> **AN AMBIGUITY ESCAPE MUST NOT ACCEPT VALUES THAT ARE NOT AMBIGUOUS.**
+
+Narrowed: the escape is bounded to exactly the values the runtime would misread.
+
+```ts
+export type CallableSyntax =
+  | ((...args: never[]) => unknown)
+  | (abstract new (...args: never[]) => unknown);
+export type CallablePart<T> = Extract<T, CallableSyntax>;
+
+export interface FunctionValue<T extends CallableSyntax> { … }
+export function asValue<T extends CallableSyntax>(value: T): FunctionValue<T>;
+
+interface Location<T> { …; (marked: FunctionValue<CallablePart<T>>): void; }
+```
+
+Carrier added — `asValue(handler)` and `asValue(Thing)` compile; `asValue(42)`,
+`asValue({x:1})` and `asValue('nope')` are rejected. Control: widening the parameter back
+to `unknown` makes **3 rejections stop firing**.
+
+### ⚠️ EVIDENCE CORRECTION — A PIPED TSC EXIT IS NOT A COMPILER EXIT
+
+C1/C2 were reported with `npx tsc … | head -5; echo "tsc exit=$?"`, which prints **`head`'s**
+status. It printed `tsc exit=0` while TS6305 errors were visible in the same output. That
+is the recorded rule — VERIFY BY EXIT CODE, NOT BY PIPELINE — broken in the act of
+claiming verification.
+
+Re-run unpiped, and the honest result is more interesting than a green tick:
+
+```
+npx tsc --noEmit -p packages/core/tsconfig.spec.json > /tmp/c2.out 2>&1   →  exit 2
+                                                        340 errors
+grep -c "tree-location" /tmp/c2.out                                       →  0
+node tools/check-spec-types.mjs                                           →  exit 0
+```
+
+**The raw spec typecheck is non-zero BY DESIGN** — 340 pre-existing errors are what the
+`spec-types` ratchet exists to hold down. So a bare `tsc` exit could never have been the
+evidence here. The valid evidence is: zero `tree-location` errors in the output, and the
+ratchet gate green with no new baseline entry. Recorded so the next reader does not
+"fix" a red raw exit that is the baseline working as intended.
+
+## C3 — MARKER SPELLING FROZEN: `asValue(callable)`
+
+> Treat this otherwise-callable argument as the value being assigned by this invocation.
+
+Rejected: `markFunctionValue` (exposes architecture vocabulary), `value` (too generic, and
+visually resembles another mutation operation), `literal` (a constructor is not naturally
+a literal).
+
+Implemented internally. **NOT barrel-exported** — the public surface flips once, at C8,
+with the coordinated baseline regeneration.
+
+## C4-INGRESS-CONTRACT — derived from the three carriers, nothing assumed
+
+Fixture: `settings: { theme, units, distancePrecision }` — **one flat branch of scalar
+leaves**. `PAYLOAD = { theme, units }` deliberately omits `distancePrecision`.
+
+| # | question | answer | proven by |
+|---|---|---|---|
+| 1 | omitted descendants | **UNTOUCHED — no claim, no write.** And a later authored write to the omitted key does NOT inherit external provenance, even in the SAME tick | "⚠️ THE BOUNDARY": `byPath['settings.distancePrecision'].origin` is `undefined` after `external(...)` then `.set(1)` |
+| 2 | supplied descendants | **REALIZED, per subject** — `origin: 'external'`, `participation: 'realized'`, one effect per supplied leaf (`settings.theme`, `settings.units`), never one opaque branch effect | "every value the payload supplied…" |
+| 3 | one causal turn / transaction? | **NO.** `transactionId` is `undefined` on every effect; restoration history gains **0**; `canUndo()` is `false`. Acquiring durable truth is not authored work and earns no undo | same |
+| 4 | unknown keys | **NOT PROVEN HERE.** No carrier in this file covers them; `traversal-diagnostics` owns that contract. Preserve it, do not guess | absence |
+| 5 | function-valued supplied leaves | **NOT PROVEN HERE.** Governed by the B1 freeze — raw install, never authored-dispatched — and carried by `tree-location.spec.ts` C8 | absence |
+| 6 | nested branches / entities | **NOT PROVEN.** The fixture has no nested branch and no `entityMap` (grep: 0). Admit only what the carriers prove | absence |
+
+### The rule this yields
+
+> **OMISSION IN A WHOLE VALUE IS VALUE SEMANTICS.
+> OMISSION IN AN ACQUISITION PROJECTION IS SCOPE.**
+
+and, from question 1's boundary test:
+
+> **PROVENANCE FOLLOWS SUPPLIED INFORMATION, NOT DOWNSTREAM CAUSATION.**
+
+So C4 must NOT be modelled as `acquire(branch, payload as Partial<T>)` — that reintroduces
+the weakening just removed from authored syntax. The shape the artifacts support is a
+projection walk that realizes exactly the supplied subjects and makes **no claim** on the
+rest:
+
+```
+acquireProjection(branch, payload, causalClass)
+    traverse the SUPPLIED projection only
+    realize each supplied subject, per subject
+    omitted ⇒ NO CLAIM / NO WRITE
+    scope is limited to flat scalar leaves until a carrier proves more
+```
+
+⚠️ Questions 4–6 are open by ABSENCE of evidence, not by evidence of absence. C4
+implements the smallest ingress satisfying 1–3 and does not generalize past it.
