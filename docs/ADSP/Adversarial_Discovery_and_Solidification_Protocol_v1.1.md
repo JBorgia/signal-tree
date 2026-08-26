@@ -2480,7 +2480,35 @@ designing a second causal ledger, when the frozen answer was already _one causal
 system_ — and the real repair was a corrected admission criterion inside the
 existing owner, plus a bounded projection. Pattern 4 above exists because of it.
 
-## 29.7 A corollary for long-lived records
+## 29.7 Every negative observation needs a positive control
+
+> **A MUTATION NEEDS ITS OWN POSITIVE CONTROL.**
+
+Broader than mutation testing. It governs every observation whose CONCLUSION IS
+AN ABSENCE:
+
+```text
+mutation testing     a mutation that "survives" proves nothing until you have
+                     shown it changed behaviour at all
+grep audits          a zero-match search proves nothing until the same pattern
+                     is shown to match a known positive
+reachability         "not exported" needs a symbol you KNOW is exported to
+                     resolve through the same extractor
+dependency checks    "no consumer" needs a known consumer to be found
+status reconciliation "no closure commit" needs a known closure to be located by
+                     the same query
+```
+
+The shared failure mode:
+
+> **THE OBSERVATION ITSELF MAY HAVE DONE NOTHING.**
+
+Two instances, one session: a mutation filtering `effect.origin` on a type with no
+`origin` field passed 13 tests while changing nothing; and a reachability grep
+reported `entityMap` and `link` unreachable, which the controls immediately
+exposed as a broken pattern rather than a finding.
+
+## 29.8 A corollary for long-lived records
 
 An append-only architecture record accumulates statements that later entries
 supersede. Reading such a document top-down produces confident, stale answers.
