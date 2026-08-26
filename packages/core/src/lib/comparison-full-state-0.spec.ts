@@ -182,12 +182,14 @@ describe('COMPARISON-FULL-STATE-0: collection boundary is full-value', () => {
     await flush();
 
     let emit!: (v: Row[]) => void;
+    // ⚠️ THE SOURCE CAST ERASES THE ENDPOINT'S VALUE TYPE TOO, so the endpoint
+    // is typed at the same subject rather than left to infer from `never`.
     const l = link(tree.$.rows as never, {
       subscribe: (next: (v: Row[]) => void) => {
         emit = next;
-        return () => void 0;
+        return (): void => void 0;
       },
-    });
+    } as never);
 
     emit([
       { id: 'B', n: 2 },

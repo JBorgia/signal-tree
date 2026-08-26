@@ -4,7 +4,7 @@ import {
   rememberTreeRealizationDescriptor,
   type TreeRealizationDescriptor,
 } from './internals/causal-runtime/tree-realization-adapter';
-import type { PositionId } from './internals/position-registry';
+import type { PositionId } from './types';
 
 /**
  * DESCRIPTOR-MERGE-0 — the two descriptor levels have OPPOSITE merge policies.

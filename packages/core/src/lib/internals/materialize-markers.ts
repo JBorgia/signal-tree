@@ -253,36 +253,6 @@ export function hydrateMarkerNode(
 // =============================================================================
 
 /**
- * What a marker DID with a payload, when it did not simply accept it.
- *
- * - `declined`   — the marker owns a source and refused a `rehydrate` payload.
- *                  Its own loader is the authority on that data.
- * - `normalised` — the payload was accepted but adjusted, because a value that
- *                  described this process cannot describe a new one (a
- *                  `LOADING` status after a process boundary).
- *
- * Accepting is the default and is NOT reported: a report on every restored leaf
- * is noise, and noise is how the interesting lines get missed.
- */
-export type HydrateDecision = 'declined' | 'normalised';
-
-/**
- * WHY a marker decided what it did — stable, machine-readable, and it SHIPS.
- *
- * Split from the prose deliberately, following the rule in
- * docs/performance/dropping-dev-code.md: *advisory prose is removable, identity
- * is not.* A listener in production needs to know a rehydrate was declined and
- * why; it does not need the paragraph explaining it to a human. So `reason` is
- * a stable union that survives a production build, and `detail` is prose that
- * folds away with `ngDevMode`.
- */
-export type HydrateReason =
-  /** A loader owns this data and is the authority on its freshness. */
-  | 'loader-owns-source'
-  /** No in-flight request survives a process boundary. */
-  | 'no-request-survives-boundary';
-
-/**
  * Registry of marker processors.
  * Order matters: first match wins.
  */

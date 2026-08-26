@@ -223,19 +223,6 @@ export function scheduleDurableConsequence(request: {
 }
 
 /**
- * Drop a held consequence, for teardown. A tree destroyed with speculative
- * state in flight must not resurrect a write when something later settles.
- */
-export function cancelDurableConsequence(claimant: unknown, key: unknown): void {
-  const scopeKey = resolveScopeKey(claimant);
-  if (!scopeKey) return;
-  const held = heldByKey.get(scopeKey);
-  if (!held) return;
-  held.delete(key);
-  if (held.size === 0) heldByKey.delete(scopeKey);
-}
-
-/**
  * Settle a scope: run its consequences on `'commit'`, drop them on
  * `'discard'`. Idempotent — settling twice does nothing the second time, so a
  * `confirm()` after a `rollback()` cannot resurrect dropped work.

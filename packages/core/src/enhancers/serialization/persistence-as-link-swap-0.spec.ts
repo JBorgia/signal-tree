@@ -342,7 +342,7 @@ describe('P7 — a collection inside the persisted root publishes canonically', 
 
   const makeEntityTree = (adapter: StorageAdapter, key: string) =>
     signalTree(
-      { rows: entityMap<Row>((r) => r.id) },
+      { rows: entityMap<Row, string>({ selectId: (r: Row) => r.id }) },
       {
         enhancers: [
           transactions(),

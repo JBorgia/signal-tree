@@ -2,10 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { signal } from '@angular/core';
 
 import { entityMap } from './types';
-import { form } from './markers/form';
 import { registerMarkerProcessor } from './internals/materialize-markers';
 import { signalTree } from './signal-tree';
-import { stored } from './markers/stored';
 
 /**
  * ST2023 — a marker that can be snapshotted but never restored.

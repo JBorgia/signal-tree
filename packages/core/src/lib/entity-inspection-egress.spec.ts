@@ -340,7 +340,7 @@ describe('races and inbound authority', () => {
     let push!: (v: readonly Ent[]) => void;
     const l = track(
       link(tree.$.rows, {
-        ...(r.endpoint as never),
+        ...(r.endpoint as Record<string, unknown>),
         subscribe: (next: (v: readonly Ent[]) => void) => {
           push = next;
           return () => undefined;

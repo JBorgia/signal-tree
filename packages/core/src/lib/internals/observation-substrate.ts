@@ -200,7 +200,3 @@ export function observationStateForTesting(node: unknown): {
   };
 }
 
-/** @internal Does this node carry a dormant interception point? */
-export function hasDormantObservation(node: unknown): boolean {
-  return OBSERVATION.has(node as object);
-}

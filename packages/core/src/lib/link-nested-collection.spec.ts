@@ -47,8 +47,23 @@ async function branchLink() {
   const tree = signalTree({ dashboard: { title: 'x', rows: em() } });
   await flush();
   const got: unknown[] = [];
+  // ⚠️ THE SOURCE CAST IS REQUIRED, AND IT IS THE DOCUMENTED SITUATION.
+  // `TruthfulLinkSource` narrows a source whose DECLARED type still contains an
+  // `EntityMapBuilder` to `never`, because a caller writing endpoint callbacks
+  // would be handed a value type matching neither the construction marker nor
+  // the runtime state. A branch containing a nested collection is exactly that
+  // shape, so the public type refuses it and names the escape: link the
+  // collection ITSELF.
+  //
+  // This file's SUBJECT is the branch source — LINK-BRANCH-NESTED-ENTITY-0
+  // repaired a real runtime defect there, reached in production through
+  // persistence's own internal cast. So the same cast appears here, for the same
+  // reason, rather than the spec pretending the public type admits it.
+  //
+  // Not a contract contradiction: the runtime supports the source, the type
+  // declines to type it, and the documented alternative exists.
   const l = track(
-    link(tree.$.dashboard, { set: (v: unknown) => void got.push(v) } as never)
+    link(tree.$.dashboard as never, { set: (v: unknown) => void got.push(v) } as never)
   );
   return { tree, got, l, last: () => got[got.length - 1] };
 }
@@ -103,7 +118,10 @@ describe('a collection nested under a branch Link', () => {
     await flush();
     const got: unknown[] = [];
     const l = track(
-      link(tree.$.dashboard, { set: (v: unknown) => void got.push(v) } as never)
+      // same documented cast as the helper above
+      link(tree.$.dashboard as never, {
+        set: (v: unknown) => void got.push(v),
+      } as never)
     );
     tree.$.dashboard.panel.rows.addOne({ id: 2, n: 'deep' });
     await flush();

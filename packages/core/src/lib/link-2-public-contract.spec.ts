@@ -108,7 +108,7 @@ describe('LINK-2 cases 1 & 5: the endpoint contract', () => {
       expect(typeof l.retrieve).toBe('function');
       expect(typeof l.settled).toBe('function');
       expect(typeof l.dispose).toBe('function');
-      expect((l as Record<string, unknown>)['linkId']).toBeUndefined();
+      expect((l as unknown as Record<string, unknown>)['linkId']).toBeUndefined();
     }
     for (const l of [pull, push, live]) l.dispose();
   });
