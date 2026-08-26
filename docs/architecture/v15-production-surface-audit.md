@@ -18616,3 +18616,95 @@ went 11.65 → 11.79 KB for two more diagnostic sentences; the ceiling is raised
 the strings provably do not ship — which is the condition the budget tool's own
 guidance names for a dev bump. A prod change would have been a regression to fix
 instead of a ceiling to move.
+
+## `APPLYSTATE-UNKNOWN-KEY-0` — CLOSED, **UNKNOWN-A (IGNORE)**. No production change
+
+### Scope, established before anything else
+
+```text
+applyState        NOT exported from @signaltree/core
+production callers  ONE — devtools time-travel, devtools-impl.ts:1457
+that call declares  { intent: 'system', origin: 'devtools',
+                      participation: 'inspection' }
+```
+
+So this was never a public policy question. It is the internal contract of a
+devtools replay path.
+
+### Characterized — positive control first
+
+```text
+control   known key            -> written                    (known = 2)
+root      { known, unknown }   -> known applies; `unknown` absent from `$`
+                                  AND absent from tree()
+nested    { b: { known, unknown } } -> same
+refusal   { unknown } only     -> does NOT throw; known untouched
+```
+
+### The contract, on three independent grounds
+
+⚠️ NONE OF THEM IS "THE IMPLEMENTATION DOES IT."
+
+**1. Security.** The mechanism is one line,
+`if (!Object.prototype.hasOwnProperty.call(stateNode, key)) continue;`, and it is
+documented as load-bearing against a real prototype-pollution incident: the
+devtools channel reaches `applyState` through a bare `JSON.parse` of a
+`postMessage` payload, `JSON.parse` mints a real OWN `__proto__`, and the walk
+recursed into `Object.prototype`.
+
+> **"UNKNOWN KEY" AND "PROTOTYPE-CHAIN KEY" ARE THE SAME TEST.** Choosing CREATE
+> would reintroduce the incident class, not merely change a convenience.
+
+**2. Causal class.** The single caller declares `participation: 'inspection'`.
+`INSPECTION-EGRESS-0` forbids an inspection write acquiring external causal
+authority; creating tree structure is strictly stronger than that.
+
+**3. Construction model.** Ordinary locations materialise at construction, and a
+late ordinary descendant is not assumed to exist because incoming data names it
+— `DESCENDANT-MATERIALIZATION-0`.
+
+### Carrier gap found and closed
+
+`apply-state-pollution.spec.ts` already had "the OWN-NESS check refuses a key the
+tree does not have" — but it uses `toString`, a PROTOTYPE-CHAIN key. That carries
+the security half. The ORDINARY unknown key (`{ unknown: 3 }`, neither inherited
+nor dangerous) had no carrier at all. `apply-state-unknown-key.spec.ts` adds it,
+including the row that separates A from B: an unknown-only snapshot neither
+throws nor disturbs.
+
+```text
+M1  CREATE — assign unknown keys instead of skipping   3 rows fail, incl. the
+                                                      pollution carrier
+M2  REJECT — throw on an unknown key                   4 rows fail
+```
+
+### Diagnostic disposition — SILENT, retained
+
+Asked separately from the semantics, as required. Silent ignore stands:
+
+```text
+the payload is UNTRUSTED and attacker-influenced through postMessage, so a
+per-unknown-key warning is a log-spam vector aimed at the developer console
+the guard's purpose is refusal-by-omission, not education
+default bias for a new diagnostic policy is OUT
+```
+
+⚠️ THE COST IS REAL AND RECORDED: a developer hand-editing state in the Redux
+DevTools panel and mistyping a key gets silence. That is a genuine DX gap, and it
+is accepted here rather than paid for by warning on hostile input.
+
+### Greenfield disposition
+
+```text
+applyState itself          HISTORICAL — an internal devtools replay helper, not
+                           a greenfield primitive
+surviving requirement      GREENFIELD CONTRACT — "a devtools replay must not
+                           create structure", which belongs to the
+                           observation/devtools side of the publication boundary
+unknown-key policy API     NOT ADMITTED — no first-class option earned
+```
+
+### Result
+
+Contract derived, already in force, now carried. **No production change was
+owed** — the behavior that looked surprising is a security invariant.
