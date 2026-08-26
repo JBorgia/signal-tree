@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { compared } from './markers/compared';
 import { signalTree } from './signal-tree';
 
 /**
@@ -87,13 +86,6 @@ describe('ST2018 — entity array stored as a plain leaf', () => {
 
   it('stays quiet for an array of nulls', () => {
     signalTree({ rows: Array.from({ length: 500 }, () => null) });
-    expect(fired()).toBe(false);
-  });
-
-  it('stays quiet for legacy compared markers', () => {
-    signalTree({
-      rows: compared(entities(500), (a, b) => a.length === b.length),
-    });
     expect(fired()).toBe(false);
   });
 

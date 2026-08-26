@@ -96,7 +96,7 @@ export const linkedDerivedExampleMeta: ExampleMeta = {
   id: 'linked-derived',
   title: 'Derived-but-writable (linked)',
   description:
-    "linked() inside .derived() gives a value derived from a source that is also writable and re-derives on change — sticky selection. SignalTree's answer to NgRx withLinkedState (wraps Angular's linkedSignal). v11+.",
+    "Sticky selection: a value derived from a source that is also writable and re-derives on change. SignalTree's `linked()` wrapper is deleted — call Angular's `linkedSignal()` inside `.derived()` directly.",
   category: 'Fundamentals',
   focusAreas: ['derived', 'reactivity'],
   functionalUse: ['derived-state', 'selection'],

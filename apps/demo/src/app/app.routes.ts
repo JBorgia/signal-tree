@@ -30,7 +30,7 @@ export const appRoutes: Route[] = [
     data: {
       title: "What's new in 14.0.0 — running",
       description:
-        'Every 14.0.0 capability callable in the page: prepend, active entity, changeId, pause/resume recording, onTreeError, onHydrateDecision — plus ST2026 and fan-out measured live in your browser.',
+        'Every 14.0.0 capability callable in the page: prepend, active entity, changeId, pause/resume recording, onTreeError — plus ST2026 and fan-out measured live in your browser.',
     },
   },
   {

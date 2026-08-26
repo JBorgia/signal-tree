@@ -12,7 +12,7 @@
  *
  * Asserts, over `asReadonly(tree)`:
  *  (a) derived computeds SURVIVE readonly exposure (RFC 0004 F1) and
- *      `linked()` WritableSignals narrow to `Signal`;
+ *      `linkedSignal()` WritableSignals narrow to `Signal`;
  *  (b) leaf `.set`/`.update` and branch write call signatures are not
  *      reachable;
  *  (c) entity mutators (`upsertOne`, …) and loader triggers (`load`,
@@ -24,13 +24,12 @@
  * ((d) — plain-object factory with `expose: 'readonly'` is a compile error —
  * lives in define-store.typing.spec.ts next to the overloads it gates.)
  */
-import { computed, type Signal } from '@angular/core';
+import { linkedSignal, computed, type Signal } from '@angular/core';
 
 import {
   entityMap,
   signalTree,
 } from '../index';
-import { linked } from './linked';
 import type {
   ReadonlyEntityNode,
   ReadonlyEntitySignal,
@@ -66,7 +65,11 @@ const tree = signalTree({
   plants: entityMap<User, number>(),
 }).derived(($) => ({
   doubled: computed(() => $.count() * 2),
-  draft: linked(() => $.count()),
+  // ⚠️ WAS SignalTree's `linked()`. The invariant is that ANY WritableSignal
+  // merged through `.derived()` narrows to `Signal` in the readonly view —
+  // nothing about the deleted wrapper. Angular's own `linkedSignal` is now
+  // the supported way to write this, so the specimen IS the successor.
+  draft: linkedSignal(() => $.count()),
   group: { total: computed(() => $.count() + 1) },
   // Derived deep-merged INTO a marker node (the readonly×merged-derived gap):
   // the marker dispatch row must preserve this beyond its Pick allowlist.
@@ -84,10 +87,10 @@ type ROEntityNode = NonNullable<ReturnType<ROUsers['byId']>>;
 
 export type _ReadonlyViewChecks = [
   // ---------------------------------------------------------------------------
-  // (a) derived layers survive; linked() narrows
+  // (a) derived layers survive; a WritableSignal narrows
   // ---------------------------------------------------------------------------
   Expect<Equal<RO$['doubled'], Signal<number>>>,
-  Expect<Equal<RO$['draft'], Signal<number>>>, // linked() WritableSignal → Signal
+  Expect<Equal<RO$['draft'], Signal<number>>>, // WritableSignal → Signal
   Expect<Equal<RO$['group']['total'], Signal<number>>>, // derived-only group recurses
 
   // ---------------------------------------------------------------------------

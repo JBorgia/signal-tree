@@ -249,9 +249,6 @@ console.log('✓ every @signaltree symbol named in a README exists.');
  * were unreachable.
  */
 const WITHDRAWN = new Map([
-  ['compared', 'implemented but NOT EXPORTED — pulled from the RC surface at 76ab032c'],
-  ['byKeys', 'implemented but NOT EXPORTED — ships with `compared`'],
-  ['linked', 'implemented but NOT EXPORTED'],
 ]);
 
 const RETIRED = new Map([
@@ -269,6 +266,10 @@ const RETIRED = new Map([
   ['serialization', 'not exported — `persistence()` is the enhancer'],
   ['loader', 'DELETED — link(tree.$.rows, endpoint); caching is the endpoint\'s job'],
   ['invalidateTag', 'DELETED with `loader()`'],
+  ['compared', 'DELETED — see PER-LOCATION-EQUALITY-0'],
+  ['byKeys', 'DELETED with `compared()`'],
+  ['linked', "DELETED — call Angular's `linkedSignal()` inside `.derived()`"],
+  ['onHydrateDecision', 'DELETED — nothing declines hydration any more'],
 ]);
 
 /**

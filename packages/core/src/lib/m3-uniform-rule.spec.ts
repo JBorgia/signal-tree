@@ -2,7 +2,6 @@ import { isSignal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
-import { compared } from './markers/compared';
 import { entityMap } from './types';
 import { isNodeAccessor } from './utils';
 
@@ -32,17 +31,6 @@ const mem = () => {
 };
 
 describe('M3 — is state reachable by the uniform rules?', () => {
-  it('a marker CONFORMS: it is a signal, so the walk needs no kind knowledge', () => {
-    const tree = signalTree({
-      theme: compared('light', (x, y) => x === y),
-    });
-    const node = tree.$.theme as unknown;
-
-    expect(isSignal(node)).toBe(true);
-    // A signal's state IS its read. No hook, no convention, no synthetic key.
-    expect(tree()).toEqual({ theme: 'light' });
-  });
-
   it('entityMap does NOT conform: neither guard reaches its state', () => {
     const tree = signalTree({
       rows: entityMap<{ id: number; n: string }, number>({
