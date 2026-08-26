@@ -1,7 +1,12 @@
 /**
  * Storage adapter implementations for the serialization and persistence
- * enhancers. Split out of serialization.ts so '@signaltree/core/storage' can
- * expose the adapters without pulling in the full enhancer module.
+ * enhancers. Split out of serialization.ts so a storage subpath could expose the
+ * adapters without pulling in the full enhancer module.
+ *
+ * ⚠️ THAT SUBPATH NEVER SHIPPED. `@signaltree/core/storage` had a workspace path
+ * mapping but no source file and no package export, so the import typechecked
+ * inside this repo and failed for every real consumer. The mapping is deleted;
+ * `StorageAdapter` reaches users through the root barrel.
  */
 
 /**
