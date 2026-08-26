@@ -1,4 +1,4 @@
-import { isTraversableNode } from '../utils';
+import { isTraversableNode } from './node-shape';
 
 const PHYSICAL_COMMIT_CLOCK = Symbol.for('SignalTree:PhysicalCommitClock');
 

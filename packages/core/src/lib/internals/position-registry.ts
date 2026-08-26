@@ -1,4 +1,4 @@
-import type { PositionId } from '../types';
+import type { PositionId } from '../mutation-types';
 import { isTraversableNode } from './node-shape';
 
 const POSITION_REGISTRY_SYMBOL = Symbol.for('SignalTree:PositionRegistry');

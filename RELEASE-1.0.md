@@ -11089,17 +11089,84 @@ old spelling *because the RC shipped it* — the prematurely published incumbent
 vetoing the architecture. It also violates ONE SEMANTIC JOB, ONE AUTHORITATIVE
 PUBLIC SURFACE, by advertising a spelling already decided to die.
 
+> ⚠️ RE-SEQUENCED after `GREENFIELD-FRAMEWORK-NEUTRALITY-SPIKE-0`. The spike found
+> the framework handoff **already physically present** for scalar truth: a neutral
+> kernel owns values, equality, revision and `changedSlots`, while Angular holds
+> only per-slot publication tokens. `GREENFIELD-FRAMEWORK-HANDOFF-0` was LOCATED,
+> not invented — so this is adapter extraction plus type-closure work, not a
+> framework-neutral rewrite. Full evidence:
+> [`docs/architecture/v15-framework-neutrality-spike.md`](docs/architecture/v15-framework-neutrality-spike.md).
+
+### A. MECHANICAL FLOOR — DONE
+
 ```text
-[ ] GREENFIELD-FRAMEWORK-HANDOFF-0        named architectural owner
-[ ] neutral kernel                        below committed publication
-[ ] callable `tree.$` root                GREENFIELD-ROOT-ACCESSOR-SHAPE-0,
-                                          a COUPLED public-surface requirement
-[ ] resolve function-valued-state ambiguity   `tree.$(fn)` derive vs a function
-                                              stored AS state
-[ ] framework publication adapters        Angular first; React/Vue prove the seam
-[ ] authoring / kernel separation
-[ ] migrate surviving public contracts    the frozen incumbent is the reference
-[ ] delete incumbent `tree()` from greenfield
+[x] extract neutral foundational types    3 one-line redirects; the types were
+                                          already neutral, the kernel was importing
+                                          them from a re-exporting hub
+[x] neutral type-closure gate             kernel-neutrality + :self, mutation-proven
+[x] audit atomic-state invariant carriers ATOMIC-STATE-RETIREMENT; 2 ORPHANED
+                                          subjects recovered as carriers first
+[x] delete atomic-state prototypes        15 files, one bounded batch
+[x] full gate register                    54/54
+```
+
+Kernel type closure: 27 files / 6 Angular-tainted → **6 files / 0**.
+Production files importing Angular: 25 → **19**.
+
+⚠️ Public Angular APIs were NOT moved in this step, by design.
+
+### B. CLOSE GREENFIELD-ROOT-ACCESSOR-SHAPE-0 — NEXT
+
+Must complete BEFORE retyping the 132 Angular-shaped public type sites.
+
+```text
+[ ] freeze the accessor grammar
+        tree              controller, non-callable
+        tree.$()          READ root        tree.$.x()        READ location
+        tree.$(value)     REPLACE root     tree.$.x(value)   REPLACE location
+        tree.$(fn)        DERIVE root      tree.$.x(fn)      DERIVE location
+[ ] canonical location object owned by the KERNEL, not a WritableSignal
+[ ] Angular WritableSignal = explicit adapter view (spelling NOT yet frozen)
+[ ] resolve function-valued-state disambiguation
+```
+
+FROZEN — **GREENFIELD LEAF OWNERSHIP**: the kernel owns the canonical callable
+location; a framework representation is a VIEW of SignalTree truth, never the truth.
+Angular interop is explicit and does not define `tree.$.count`.
+
+A and B are one public-contract problem; do not implement callable leaves until the
+function-as-data disambiguation is settled.
+
+### C. IMPLEMENT FRAMEWORK HANDOFF
+
+```text
+[ ] create @signaltree/kernel  and  @signaltree/angular
+[ ] move Angular scalar publication adapter   tree-scalar-slot-angular-runtime.ts
+[ ] move defineStore Angular DI facade        all 15 DI sites live here
+[ ] move toWritableSignal                     Injector/runInInjectionContext/effect
+[ ] neutral memo contract where actually required
+[ ] remove Angular type shapes from kernel closure
+```
+
+⚠️ The §13 target packages do not exist: `authoring/` is an empty `src/`, `events/`
+and `ng-forms/` hold only `node_modules`. No `kernel/`, no `angular/`.
+
+### D. ENTITY DISCRIMINATOR
+
+The spike's vanilla-adapter proof covered **scalars only**. Before the handoff can be
+called closed — not merely before planning:
+
+```text
+[ ] one entity vertical slice through neutral stores + neutral commit +
+    a vanilla publication adapter, yielding the SAME semantic result as Angular
+```
+
+### E. DELETE INCUMBENT REPRESENTATION
+
+```text
+[ ] delete incumbent `tree()`
+[ ] delete Angular-owned leaf representation from the kernel
+[ ] compiler-drive the fallout
 ```
 
 Then, before any RC:
