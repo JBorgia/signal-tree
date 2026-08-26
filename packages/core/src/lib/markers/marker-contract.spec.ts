@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { registerMarkerProcessor } from '../internals/materialize-markers';
 import { signalTree } from '../signal-tree';
-import { stored } from './stored';
 
 /**
  * Every marker must say what of it is state.
@@ -61,29 +60,5 @@ describe('ST2022 — a marker registered without declaring its state', () => {
       { transient: true }
     );
     expect(fired()).toBe(false);
-  });
-});
-
-describe('stored() declares transient — explicitly, not by omission', () => {
-  it('still round-trips through the ordinary leaf walk', () => {
-    // `transient` means "I need no snapshot hook", not "I have no state". A
-    // materialised stored() IS a real WritableSignal, so the ordinary walk
-    // reads it, writes it, and records it for undo — which is why declaring
-    // transient costs it nothing.
-    const tree = signalTree({ k: stored('mc-spec-1', 'a') });
-    tree.$.k.set('b');
-    expect(tree()).toEqual({ k: 'b' });
-  });
-
-  it('self-restores from its own source with no snapshot applied', () => {
-    // The property that makes `transient` correct rather than lossy: a fresh
-    // tree re-reads its own storage during construction, before any snapshot
-    // arrives.
-    const a = signalTree({ k: stored('mc-spec-2', 'light') });
-    a.$.k.set('dark');
-    a.$.k.flush?.();
-
-    const b = signalTree({ k: stored('mc-spec-2', 'light') });
-    expect(b.$.k()).toBe('dark');
   });
 });

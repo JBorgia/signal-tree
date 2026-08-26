@@ -1,6 +1,5 @@
 import { computed } from '@angular/core';
 import { signalTree } from './signal-tree';
-import { stored } from './markers/stored';
 
 describe('F4: tree() must not lock out .derived()', () => {
   it('allows .derived() after a read through tree()', () => {
@@ -19,20 +18,4 @@ describe('F4: tree() must not lock out .derived()', () => {
     expect(extended.$.dbl()).toBe(10);
   });
 
-  it('still materializes markers when read via tree() first', () => {
-    const m = new Map<string, string>();
-    const st: Storage = {
-      getItem: (k) => m.get(k) ?? null,
-      setItem: (k, v) => m.set(k, v),
-      removeItem: (k) => m.delete(k),
-      clear: () => m.clear(),
-      get length() {
-        return m.size;
-      },
-      key: (i) => Array.from(m.keys())[i] ?? null,
-    };
-    const tree = signalTree({ theme: stored('f4', 'light', { storage: st }) });
-    expect((tree() as { theme: string }).theme).toBe('light');
-    expect(JSON.stringify(tree())).not.toContain('defaultValue');
-  });
 });

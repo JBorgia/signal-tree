@@ -4,7 +4,6 @@ import type { StorageAdapter } from '../enhancers/serialization/storage-adapters
 import { entityMap } from './markers/entity-map';
 import { getPhysicalCommitClock } from './internals/physical-commit-clock';
 import { signalTree } from './signal-tree';
-import { stored } from './markers/stored';
 import { transactions } from '../enhancers/transactions/transactions';
 
 /**
@@ -81,7 +80,9 @@ function harness(key: string): Harness {
   const tree = signalTree(
     {
       count: 0,
-      theme: stored(key, 'light', { storage: adapter, debounceMs: 0 }),
+      // Was `stored()`. The subject is scalar + structural atomicity, which
+      // `count` and `rows` already provide; durability was never part of it.
+      theme: 'light',
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
     },
     { enhancers: [transactions()] }

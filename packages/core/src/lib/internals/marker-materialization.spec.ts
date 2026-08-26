@@ -1,6 +1,5 @@
 import { signalTree } from '../signal-tree';
 import { entityMap } from '../markers/entity-map';
-import { stored } from '../markers/stored';
 
 interface User {
   id: number;
@@ -38,14 +37,6 @@ describe('W4: no marker leaks its raw form from a nested position', () => {
     const json = JSON.stringify(tree());
     expect(json).not.toContain('__isEntityMap');
     expect(typeof tree.$.outer.users.addOne).toBe('function');
-  });
-
-  it('stored() nested under a parent', () => {
-    const tree = signalTree({
-      outer: { theme: stored('w4-theme', 'light', { storage: mockStorage() }) },
-    });
-    void tree.$;
-    expect(JSON.stringify(tree())).not.toContain('defaultValue');
   });
 
   // STATUS-DEL: the status specimen was trimmed; entityMap keeps the

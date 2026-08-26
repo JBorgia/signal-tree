@@ -68,7 +68,6 @@
 import type { Signal } from '@angular/core';
 
 import { entityMap, signalTree } from '../index';
-import { stored } from './markers/stored';
 import type {
   AccessibleNode,
   CallableWritableSignal,
@@ -78,7 +77,6 @@ import type {
   SignalTree,
   TreeNode,
 } from '../index';
-import type { StoredSignal } from './markers/stored';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
@@ -299,12 +297,10 @@ built.$.user.set({ name: 'Bob', age: 1, address: { city: 'x' } });
 
 // B3 — markers resolve through the constructed value, including at depth.
 const builtMarkers = signalTree({
-  theme: stored('theme', 'light' as 'light' | 'dark'),
   plain: 0,
   nested: { deep: 0 },
 });
 export type _BuiltMarkers = [
-  Expect<Equal<(typeof builtMarkers)['$']['theme'], StoredSignal<'light' | 'dark'>>>,
   Expect<Equal<(typeof builtMarkers)['$']['plain'], CallableWritableSignal<number>>>,
   // a marker at depth still resolves — the "any depth" claim
   Expect<Equal<(typeof builtMarkers)['$']['nested']['deep'], CallableWritableSignal<number>>>

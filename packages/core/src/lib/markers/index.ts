@@ -20,19 +20,8 @@ export {
 } from './derived';
 
 
-// Stored marker - localStorage persistence (v7)
-export {
-  stored,
-  isStoredMarker,
-  createStoredSignal,
-  createStorageKeys,
-  clearStoragePrefix,
-  STORED_MARKER,
-  type StoredMarker,
-  type StoredSignal,
-  type StoredOptions,
-  type MigrationFn,
-} from './stored';
+// Stored marker - RETIRED in v15 (STORED-RETIRE-0). Durable state is now
+// application-owned: an ordinary leaf plus `link()` to a storage endpoint.
 
 // Async-source marker - load-and-expose async primitive (v9.5)
 

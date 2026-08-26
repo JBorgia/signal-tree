@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { getPathNotifier } from './path-notifier';
 import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
-import { stored } from './markers/stored';
 
 /**
  * A2-1 — CONSTRUCTION MATERIALISATION. The discriminator that runs first.
@@ -52,28 +51,6 @@ const observe = () => {
   });
   return { seen, off };
 };
-
-describe('A2-1 arm A: the DECLARATION MARKER', () => {
-  it('durable value is the first observable value, with no causal write', async () => {
-    const { adapter } = fakeStorage({ 'a2-theme': 'dark' });
-
-    const { seen, off } = observe();
-    const tree = signalTree(
-      { theme: stored('a2-theme', 'light', { storage: adapter, debounceMs: 0 }) },
-      { enhancers: [restoration()] }
-    );
-    const firstObserved = tree.$.theme();
-    await flush();
-    off();
-
-    // The default 'light' is never publicly observable, and materialisation
-    // emits nothing causal — PER-B P1, restated here as the marker's baseline.
-    expect(firstObserved).toBe('dark');
-    expect(seen).toEqual([]);
-    expect(tree.getRestorationHistory().length).toBe(1);
-    expect(tree.canUndo()).toBe(false);
-  });
-});
 
 describe('A2-1 arm B: COMPOSITION, adapter reads AFTER construction', () => {
   it('⚠️ the transient is observable and the catch-up write IS causal', async () => {

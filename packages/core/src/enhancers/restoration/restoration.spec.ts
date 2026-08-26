@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { getTreeRealizationPort } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import { entityMap } from '../../lib/markers/entity-map';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
-import { stored } from '../../lib/markers/stored';
 import { signalTree } from '../../lib/signal-tree';
 import { SignalTreeRollbackError } from '../../lib/types';
 import { transactions } from '../transactions/transactions';
@@ -3564,73 +3563,6 @@ describe('restoration enhancer', () => {
     expect(liveSubjectTokens).toContainEqual(replacementToken);
     expect(replaySubjectTokens).toContainEqual(replacementToken);
     expect(replaySubjectTokens).toContainEqual(removedToken);
-  });
-
-  it('records history for stored clear(), and NOT for reload()', async () => {
-    const storage = new Map<string, string>();
-    const key = 'restoration-stored-clear-reload';
-    const store = signalTree(
-      {
-        theme: stored(key, 'light', {
-          storage: {
-            getItem: (key: string) => storage.get(key) ?? null,
-            setItem: (key: string, value: string) => {
-              storage.set(key, value);
-            },
-            removeItem: (key: string) => {
-              storage.delete(key);
-            },
-            clear: () => {
-              storage.clear();
-            },
-            key: (index: number) => Array.from(storage.keys())[index] ?? null,
-            get length() {
-              return storage.size;
-            },
-          },
-          debounceMs: 100,
-        }),
-      },
-      { enhancers: [restoration()], capabilities: ['causal-runtime'] }
-    );
-    const t = (store as any).__restoration;
-    const initial = t.getRestorationHistory().length;
-
-    undoable(() => store.$.theme.set('dark'));
-    await Promise.resolve();
-    await Promise.resolve();
-
-    undoable(() => store.$.theme.clear());
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(t.getRestorationHistory().length).toBeGreaterThan(initial + 1);
-    expect(t.getRestorationHistory().at(-1)?.state).toEqual({ theme: 'light' });
-    expect(t.getRestorationHistory().at(-1)?.__ownerPaths).toEqual(['theme']);
-
-    storage.set(key, JSON.stringify('navy'));
-    undoable(() => store.$.theme.set('pink'));
-    await Promise.resolve();
-    await Promise.resolve();
-    const beforeReload = t.getRestorationHistory().length;
-
-    // ⚠️ THE OPEN QUESTION THIS TEST RECORDED IS NOW ANSWERED, and the assertion
-    // inverted as predicted. The old note said: "if reload is reclassified as a
-    // realization, this designation goes and the assertion inverts."
-    //
-    // PER-B P2 reclassified it. `reload()` is the operation LEARNING what the
-    // durable authority now says, so it applies as external truth — and an
-    // `undoable()` scope CANNOT promote it, because designation only ever
-    // promotes AUTHORED work. That is the same rule that stops `undoable()`
-    // making a server refresh undoable.
-    undoable(() => store.$.theme.reload());
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(store.$.theme()).toBe('navy');
-    expect(t.getRestorationHistory().length).toBe(beforeReload);
-    // The last entry is still the authored 'pink' write, not the reload.
-    expect(t.getRestorationHistory().at(-1)?.state).toEqual({ theme: 'pink' });
   });
 
   // DELETED WITH STATUS-DEL — "records history for status promise-vocabulary

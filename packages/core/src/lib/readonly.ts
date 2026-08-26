@@ -2,7 +2,6 @@ import type { Signal } from '@angular/core';
 
 import type { SignalTreeBuilder } from './internals/builder-types';
 import type { EntityLoaderSurface } from './markers/entity-loader';
-import type { StoredSignal } from './markers/stored';
 import type {
   CallableWritableSignal,
   EntitySignal,
@@ -13,7 +12,6 @@ import type {
 import {
   ENTITY_LOADER_READERS,
   ENTITY_READERS,
-  STORED_READERS,
 } from './readonly-readers';
 
 /**
@@ -146,11 +144,6 @@ export type ReadonlyLoadingEntitySignal<
   P = void
 > = ReadonlyEntitySignal<E, K> & ReadonlyEntityLoaderSurface<P>;
 
-/** Read-only view of {@link StoredSignal}: callable read + storage metadata. */
-export type ReadonlyStoredSignal<V> = {
-  (): V;
-} & PickReaders<StoredSignal<V>, (typeof STORED_READERS)[number]>;
-
 // =============================================================================
 // THE VIEW
 // =============================================================================
@@ -196,8 +189,6 @@ type ReadonlyViewOf<T> = T extends EntitySignal<
       ReadonlyExtras<T, EntitySignal<E, K> & EntityLoaderSurface<P>>
   : T extends EntitySignal<infer E, infer K extends string | number>
   ? ReadonlyEntitySignal<E, K> & ReadonlyExtras<T, EntitySignal<E, K>>
-  : T extends StoredSignal<infer V>
-  ? ReadonlyStoredSignal<V> & ReadonlyExtras<T, StoredSignal<V>>
   : T extends CallableWritableSignal<infer V>
   ? Signal<V>
   : T extends Signal<infer V>

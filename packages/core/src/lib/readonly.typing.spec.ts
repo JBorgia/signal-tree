@@ -18,7 +18,7 @@
  *  (c) entity mutators (`upsertOne`, …) and loader triggers (`load`,
  *      `refresh`, `invalidate`) are not reachable; `byId` is re-signed to a
  *      read-only entity node;
- *  (e) status / stored / async reader members remain readable, with
+ *  (e) marker reader members remain readable, with
  *      `WritableSignal` readers (e.g. `status.state`) demoted to plain
  *      `Signal`s.
  * ((d) — plain-object factory with `expose: 'readonly'` is a compile error —
@@ -31,7 +31,6 @@ import {
   signalTree,
 } from '../index';
 import { loader } from './markers/loader';
-import { stored } from './markers/stored';
 import { linked } from './linked';
 import type {
   ReadonlyEntityNode,
@@ -69,7 +68,6 @@ const tree = signalTree({
   plants: entityMap<User, number>({
     load: loader(() => Promise.resolve([] as User[])),
   }),
-  theme: stored('theme', 'light' as 'light' | 'dark'),
 }).derived(($) => ({
   doubled: computed(() => $.count() * 2),
   draft: linked(() => $.count()),
@@ -87,7 +85,6 @@ type RO$ = RO['$'];
 type ROUsers = RO$['users'];
 type ROCached = RO$['cached'];
 type ROPlants = RO$['plants'];
-type ROStored = RO$['theme'];
 type ROEntityNode = NonNullable<ReturnType<ROUsers['byId']>>;
 
 export type _ReadonlyViewChecks = [
@@ -168,33 +165,31 @@ export type _ReadonlyViewChecks = [
   Expect<NotOffered<ROPlants, 'refresh'>>,
 
   // ---------------------------------------------------------------------------
-  // (e) status / stored / async readers remain readable
+  // (e) the retired single-value marker rows
   // ---------------------------------------------------------------------------
-  // Source WritableSignals demoted to plain Signal reads.
-
-  Expect<Equal<ReturnType<ROStored>, 'light' | 'dark'>>,
-  Expect<Equal<ROStored['key'], string>>,
-  Expect<NotOffered<ROStored, 'set'>>,
-  Expect<NotOffered<ROStored, 'clear'>>,
-
-  // ⚠️ The ROSource rows were REMOVED with asyncSource. Every invariant they
-  // held is duplicated by `ROStored` on a surviving marker: the callable read
-  // and the allowlist REMOVING writes. No coverage was lost.
-
-  // ⚠️ COVERAGE LOSS, RECORDED RATHER THAN PAPERED OVER.
+  // ⚠️ THE ROSOURCE, ROQUERY AND ROSTORED ROWS ARE ALL GONE, IN THAT ORDER.
   //
-  // `ROQuery['input']` was the ONLY assertion proving `DemoteWritable` turns a
-  // PICKED `WritableSignal` member into a plain `Signal`. asyncQuery was the
-  // only marker with a writable member in its reader allowlist, so after
-  // ASYNC-QUERY-RETIRE-0 that branch of the readonly resolver is UNEXERCISED.
+  // ASYNC-SOURCE-RETIRE-1 folded the ROSource invariants into `ROStored`, then
+  // STORED-RETIRE-0 deleted `ROStored` itself along with `ReadonlyStoredSignal`
+  // — so there is no longer a resolver branch for "a marker surface that is
+  // itself callable AND has its mutators stripped." That branch is not merely
+  // unexercised: the type it dispatched to no longer exists.
   //
-  // `ROStored` above covers a DIFFERENT property — the allowlist REMOVING
-  // `set`/`clear`, not demoting a retained member.
+  // What those rows asserted generically still has carriers in this file:
+  //   • allowlist REMOVES writes — 32 surviving `NotOffered` rows on
+  //     `ROUsers` / `ROCached` / `ROPlants` / `ROEntityNode`.
+  //   • callable read demoted to a read-only call — `RO$['branch']` (a) and
+  //     `ROUsers['byId']` (c).
+  //
+  // What is genuinely unexercised, restated from ASYNC-QUERY-RETIRE-0: no
+  // surviving marker has a WRITABLE member inside its reader allowlist, so the
+  // picked-member demotion path has no fixture. `DemoteWritable` was itself
+  // deleted as unreachable in the ERROR-SURFACE-2 consolidation, so the gap is
+  // now a gap in `PickReaders`, not in a live conditional.
   //
   // Deliberately NOT substituted with a synthetic re-declaration: copying the
   // conditional into a spec asserts the copy, not the resolver. The next marker
   // that exposes a writable member must re-earn this row.
-  Expect<Equal<ROStored['key'], string>>
 ];
 
 // `asReadonly` also accepts the minimal `ISignalTree`/`SignalTree` shape

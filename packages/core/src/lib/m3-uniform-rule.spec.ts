@@ -2,7 +2,7 @@ import { isSignal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
-import { stored } from './markers/stored';
+import { compared } from './markers/compared';
 import { entityMap } from './types';
 import { isNodeAccessor } from './utils';
 
@@ -32,9 +32,9 @@ const mem = () => {
 };
 
 describe('M3 — is state reachable by the uniform rules?', () => {
-  it('stored CONFORMS: it is a signal, so the walk needs no kind knowledge', () => {
+  it('a marker CONFORMS: it is a signal, so the walk needs no kind knowledge', () => {
     const tree = signalTree({
-      theme: stored('m3u-theme', 'light', { storage: mem() }),
+      theme: compared('light', (x, y) => x === y),
     });
     const node = tree.$.theme as unknown;
 

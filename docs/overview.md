@@ -95,7 +95,7 @@ these figures, which is why the numbers above — what a consumer actually ships
 | Metric                                              | Budget | Current |
 | --------------------------------------------------- | ------ | ------- |
 | minimal tree, no markers (prod, `ngDevMode: false`) | 6000 B | 5918 B  |
-| tree + `stored()` (prod, `ngDevMode: false`)        | 7400 B | 7246 B  |
+| tree + `stored()` — ⚠️ HISTORICAL, primitive deleted        | 7400 B | 7246 B  |
 | core value exports                                  | 60     | 39      |
 
 Gated by `npm run validate:budget`. Raw unbundled `dist/` across every entry

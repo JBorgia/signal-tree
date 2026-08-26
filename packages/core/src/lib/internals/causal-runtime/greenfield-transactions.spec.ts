@@ -10,7 +10,6 @@ import type {
 } from '../../types';
 import { withWriteContext } from '../../write-context';
 import { entityMap } from '../../markers/entity-map';
-import { stored } from '../../markers/stored';
 import { getOwnedPositionIds } from '../owned-mutation';
 import { createPositionRegistry } from '../position-registry';
 import { getPositionRegistry } from '../position-registry';
@@ -1233,10 +1232,9 @@ describe('greenfield transactions', () => {
         users: entityMap<{ id: string; name: string }, string>({
           selectId: (user) => user.id,
         }),
-        preference: stored('greenfield-live-preference', 'compact', {
-          storage,
-          debounceMs: 0,
-        }),
+        // Was `stored()`. The subject here never needed a DURABLE leaf —
+        // only a leaf. Durability moved to persistence()/Link.
+        preference: 'compact',
       },
       { capabilities: ['causal-runtime'] }
     ) as unknown as {
@@ -1301,9 +1299,9 @@ describe('greenfield transactions', () => {
     expect(tree.$.profile.firstName()).toBe('Jane');
     expect(tree.$.users.ids()).toEqual(['u2']);
     expect(tree.$.preference()).toBe('spacious');
-    expect(
-      JSON.parse(storage.getItem('greenfield-live-preference') as string).data
-    ).toBe('spacious');
+    // (the durable assertion moved out with `stored()`; the draft's own
+    // durable-consequence boundary is carried by
+    // persistence-commit-boundary-carrier.spec.ts)
     expect(store.getPendingTurnIds()).toEqual([]);
 
     const profileOwner = getOwnedPositionIds(

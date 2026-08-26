@@ -3,7 +3,6 @@ import { Signal, WritableSignal } from '@angular/core';
 import type { WriteMetadata } from './mutation-types';
 import type { NodeAccessor } from './node-accessor';
 import type { EntityLoaderSurface } from './markers/entity-loader';
-import { StoredMarker, StoredSignal } from './markers/stored';
 
 import type { EnhancerWithMeta, TreeCapability } from './enhancer-types';
 
@@ -198,8 +197,6 @@ export type TreeNode<T> = {
     ? ApplyComputedSlices<T[K], LoadingEntitySignal<LE, LK, LP>>
     : T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
-    : T[K] extends StoredMarker<infer V>
-    ? StoredSignal<V>
     : T[K] extends Primitive
     ? CallableWritableSignal<T[K]>
     : T[K] extends readonly unknown[]
@@ -1109,8 +1106,6 @@ export type DeepEntityAwareTreeNode<T> = {
     ? ApplyComputedSlices<T[K], LoadingEntitySignal<LE, LK, LP>>
     : T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
-    : T[K] extends StoredMarker<infer V>
-    ? StoredSignal<V>
     : T[K] extends object
     ? DeepEntityAwareTreeNode<T[K]>
     : CallableWritableSignal<T[K]>;
@@ -1132,8 +1127,6 @@ export type EntityAwareTreeNode<T> = {
     ? ApplyComputedSlices<T[K], LoadingEntitySignal<LE, LK, LP>>
     : T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
-    : T[K] extends StoredMarker<infer V>
-    ? StoredSignal<V>
     : CallableWritableSignal<T[K]>;
 };
 

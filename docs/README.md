@@ -32,7 +32,7 @@ Use this index to navigate the documentation.
 | Document                                                           | Description                                        |
 | ------------------------------------------------------------------ | -------------------------------------------------- |
 | [Migration Guide](guides/MIGRATION.md)                             | Upgrading from v4 package structure                |
-| [Persistence and Security](guides/persistence-and-security.md)     | Threat model and hardening patterns for `stored()` |
+| [Persistence and Security](guides/persistence-and-security.md)     | Withdrawn: its subject, the `stored()` marker, is deleted    |
 | [Typing Patterns](guides/typing-patterns.md)                       | Preferred TypeScript typing patterns               |
 | [Local Development Symlinks](guides/local-development-symlinks.md) | Troubleshooting dual Angular instance issues       |
 

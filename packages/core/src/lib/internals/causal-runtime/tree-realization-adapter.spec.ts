@@ -4,7 +4,6 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { entityMap } from '../../markers/entity-map';
-import { stored } from '../../markers/stored';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
 import { signalTree } from '../../signal-tree';
 import type { ISignalTree, WriteMetadata } from '../../types';
@@ -125,59 +124,6 @@ describe('tree realization adapter', () => {
     getPathNotifier().flushSync();
 
     expect(tree.$.profile.name()).toBe('Alicia');
-    expect(captureSpy.capture).not.toHaveBeenCalled();
-
-    captureSpy.dispose();
-  });
-
-  it('applies stored effects, persists restored state, and avoids transaction recapture', async () => {
-    const storage = createMockStorage();
-    const tree = signalTree(
-      {
-        preference: stored('realization-preference', 'compact', {
-          storage,
-          debounceMs: 0,
-        }),
-      },
-      { capabilities: ['causal-runtime'] }
-    ) as unknown as {
-      $: {
-        preference: {
-          (): string;
-          set(value: string): void;
-        };
-    };
-      destroy(): void;
-    };
-    const owner = getOwnedPositionIds(tree.$.preference)?.[0];
-    if (owner === undefined) {
-      throw new Error('Expected owned position for preference');
-    }
-
-    const descriptors = new Map<number, TreeRealizationDescriptor>();
-    rememberTreeRealizationDescriptor({
-      descriptors,
-      path: 'preference',
-      positionIds: [owner],
-    });
-
-    const adapter = createTreeRealizationAdapter({
-      tree: tree as unknown as ISignalTree<object>,
-      descriptors,
-    });
-    const captureSpy = createCaptureSpy();
-
-    adapter.applyAtomically([{ owner, before: 'compact', after: 'spacious' }]);
-    getPathNotifier().flushSync();
-    await new Promise((resolve) => queueMicrotask(resolve));
-
-    expect(tree.$.preference()).toBe('spacious');
-    expect(
-      JSON.parse(storage.getItem('realization-preference') ?? 'null')
-    ).toEqual({
-      __v: 1,
-      data: 'spacious',
-    });
     expect(captureSpy.capture).not.toHaveBeenCalled();
 
     captureSpy.dispose();
@@ -3802,57 +3748,6 @@ describe('tree realization adapter', () => {
     expect(tree.$.right()).toBe('C');
     expect(afterAuthoredLeft).toBe(baselineHistory + 1);
     expect(tree.getRestorationHistory().length).toBe(baselineHistory + 2);
-  });
-
-  it('keeps stored realization causally silent while preserving persistence consequences', async () => {
-    const storage = createMockStorage();
-    const tree = signalTree(
-      {
-        preference: stored('realization-non-authoring-preference', 'compact', {
-          storage,
-          debounceMs: 0,
-        }),
-      },
-      { enhancers: [restoration()] }
-    ) as unknown as {
-      $: {
-        preference: { (): string; set(value: string): void };
-    };
-      destroy(): void;
-    } & {
-      getRestorationHistory(): unknown[];
-    };
-    const owner = getOwnedPositionIds(tree.$.preference)?.[0];
-    if (owner === undefined) {
-      throw new Error('Expected owned position for preference');
-    }
-
-    const descriptors = new Map<number, TreeRealizationDescriptor>();
-    rememberTreeRealizationDescriptor({
-      descriptors,
-      path: 'preference',
-      positionIds: [owner],
-    });
-    const adapter = createTreeRealizationAdapter({
-      tree: tree as unknown as ISignalTree<object>,
-      descriptors,
-    });
-
-    const baselineHistory = tree.getRestorationHistory().length;
-    adapter.applyAtomically([{ owner, before: 'compact', after: 'spacious' }]);
-    getPathNotifier().flushSync();
-    await new Promise((resolve) => queueMicrotask(resolve));
-
-    expect(tree.$.preference()).toBe('spacious');
-    expect(
-      JSON.parse(
-        storage.getItem('realization-non-authoring-preference') ?? 'null'
-      )
-    ).toEqual({
-      __v: 1,
-      data: 'spacious',
-    });
-    expect(tree.getRestorationHistory().length).toBe(baselineHistory);
   });
 
   it('keeps structural realization causally silent while preserving subject identity', async () => {
