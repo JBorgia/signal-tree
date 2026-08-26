@@ -172,27 +172,14 @@ export function createAuditTracker<T extends Record<string, unknown>>(
   };
 }
 
-/**
- * Creates a simple audit callback that can be used with `tree.subscribe()`.
- * For more control, use {@link createAuditTracker} instead.
- *
- * @param auditLog - Array to collect audit entries
- * @param getMetadata - Optional function to provide metadata
- * @returns A callback function suitable for `tree.subscribe()`
- */
-export function createAuditCallback<T extends Record<string, unknown>>(
-  auditLog: AuditEntry<T>[],
-  getMetadata?: () => AuditMetadata
-): (previousState: T, currentState: T) => void {
-  return (previousState: T, currentState: T) => {
-    const changes = getChanges(previousState, currentState) as Partial<T>;
-
-    if (Object.keys(changes).length > 0) {
-      auditLog.push({
-        timestamp: Date.now(),
-        changes,
-        metadata: getMetadata?.(),
-      });
-    }
-  };
-}
+// TOMBSTONE: `createAuditCallback`.
+//
+// ⚠️ ITS DOCUMENTED PURPOSE WAS FALSE. It returned
+// `(previousState: T, currentState: T) => void` and said it was "suitable for
+// `tree.subscribe()`" — but the public `subscribe` takes a `PathHandler`
+// `(value, prev, path, ownerPath?, source?, subjectIds?, …)`. Proven with a
+// `@ts-expect-error`: the two-state callback cannot be passed to it. Zero
+// consumers anywhere, and no public wiring it could satisfy.
+//
+// `createAuditTracker(tree, log, config)` survives — it attaches itself and
+// samples, so it needs no handler signature from the caller.
