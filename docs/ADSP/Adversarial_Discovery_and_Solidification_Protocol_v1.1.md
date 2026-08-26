@@ -2615,6 +2615,20 @@ checking them eventually: a framing built on a stale premise survives every
 subsequent step, because each step is then validated against the FRAMING rather
 than against the artifact.
 
+### A controller is an artifact too
+
+> **THE RULE APPLIES TO PLANS, NOT ONLY TO PHASES.** A sequencing document is
+> read as authority precisely because it is the controller — which is what lets
+> its stale premises survive unexamined.
+
+Measured: a release controller's next checkbox was "publish the release
+candidate", and executing it was nearly correct procedure and entirely wrong,
+because the plan predated a frozen decision to replace the primary public
+grammar. The phases were all satisfied; the SEQUENCE they implied was not.
+
+Before executing a planned step, ask what the plan ASSUMED and whether a later
+ruling changed it.
+
 ### The required first move on any reopened item
 
 ```text
