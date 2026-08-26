@@ -17,6 +17,7 @@ import type { HydrateMode } from '../../lib/internals/materialize-markers';
 import { isSignal, Signal, WritableSignal } from '@angular/core';
 
 import { hydrateMarkerNode } from '../../lib/internals/materialize-markers';
+import { external } from '../../lib/external';
 import { isTraversableNode } from '../../lib/utils';
 import { ISignalTree } from '../../lib/types';
 import type { Enhancer, EnhancerMeta } from '../../lib/types';
@@ -692,7 +693,7 @@ export function serialization(
     /**
      * Restore from plain object
      */
-    enhanced.fromJSON = (
+    const applyJSON = (
       data: T,
       metadata?: SerializedState<T>['metadata']
     ): void => {
@@ -874,6 +875,39 @@ export function serialization(
         tree.$ as Record<string, unknown>,
         restoredData as Record<string, unknown>
       );
+    };
+
+    /**
+     * Restore from plain object.
+     *
+     * ⚠️ THE ONE EXTERNAL-TRUTH ACQUISITION POINT. `deserialize()`, `restore()`
+     * and `fromJSON()` all converge here, and MEASURED, all three applied their
+     * payload with NO classification at all — `{}`, neither origin nor
+     * participation — while `load()` on the same tree measured
+     * `{ origin: 'external', participation: 'realized' }`.
+     *
+     * That gap is the A2-2 defect resurfacing on a sibling path. The incumbent
+     * fixed it by hand-wrapping ONE CALLER, `load()`; the swap moved that
+     * caller's job into Link's `acquire()`. Neither ever covered the PUBLIC
+     * methods, so an application calling `deserialize()` directly applied
+     * external truth that every participation-keyed consumer then read as
+     * authored work — revocable by a transaction, and indistinguishable from
+     * something the user did.
+     *
+     *     FIX THE CONVERGENCE POINT, NOT THE CALLER THAT REVEALED IT.
+     *
+     * ⚠️ AND THIS IS CLASSIFICATION, NOT A RELATIONSHIP. It declares what the
+     * write IS; it does not give serialization an eligible projection, a
+     * knownY, or any egress authority. A serializer with no relationship
+     * attached maintains nothing — OWNERSHIP-BEFORE-ADOPTION. When a
+     * relationship IS attached, it observes a correctly classified write and
+     * decides authority itself.
+     */
+    enhanced.fromJSON = (
+      data: T,
+      metadata?: SerializedState<T>['metadata']
+    ): void => {
+      external(() => applyJSON(data, metadata));
     };
 
     /**
