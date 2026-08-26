@@ -80,7 +80,7 @@
  * that is what the number means.
  */
 import { execFileSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 const BASELINE = new URL('./spec-type-baseline.json', import.meta.url);
 const PROJECT = 'tsconfig.typecheck-specs.json';
@@ -149,6 +149,66 @@ try {
     'check-spec-types: no baseline. Run `node tools/check-spec-types.mjs --update`.'
   );
   process.exit(2);
+}
+
+/**
+ * SPEC-TYPE-BASELINE-HYGIENE — every permanent baseline entry must address a
+ * SURVIVING subject.
+ *
+ * A baseline entry for a deleted spec is not protection: nothing can regress
+ * against it, so it can only ever report a phantom "improvement". Left alone it
+ * accumulates — 13 such entries had built up from earlier deletions
+ * (`stored.spec.ts`, `compared.spec.ts`, `linked.spec.ts`, the `atomic-state/**`
+ * prototypes) and made the improvement list unreadable, which is where a REAL
+ * improvement goes unnoticed.
+ *
+ * This is the baseline analogue of the carrier rule that governed
+ * ATOMIC-STATE-RETIREMENT: A BOUND ATTACHED TO NO SURVIVING SUBJECT IS NOT
+ * PROTECTION.
+ *
+ * ⚠️ PRUNE, NEVER REBASELINE. Removing a dead entry preserves every surviving
+ * bound exactly. Running `--update` to "clean up" instead would silently convert
+ * every current improvement into the new allowed ceiling and discard the ratchet.
+ */
+function deadBaselineEntries(files) {
+  return Object.keys(files).filter((file) => !existsSync(`${ROOT}/${file}`));
+}
+
+if (process.argv.includes('--self-test')) {
+  // POSITIVE CONTROL: a checker that only ever reports "no dead entries" is
+  // indistinguishable from one that cannot detect them. Inject a subject that
+  // certainly does not exist and require the detector to name it.
+  const fake = 'packages/core/src/lib/__no_such_spec__.spec.ts';
+  const found = deadBaselineEntries({ ...baseline.files, [fake]: 1 });
+  if (!found.includes(fake)) {
+    console.error(
+      `✗ SELF-TEST FAILED: dead-entry detector did not flag ${fake}, which does not exist.`
+    );
+    process.exit(1);
+  }
+  const real = deadBaselineEntries(baseline.files);
+  if (real.length > 0) {
+    console.error(
+      `✗ SELF-TEST FAILED: ${real.length} dead entry/entries in the committed baseline.`
+    );
+    process.exit(1);
+  }
+  console.log(
+    '✓ self-test: dead-entry detector flags an injected phantom subject and the committed baseline is clean.'
+  );
+  process.exit(0);
+}
+
+const dead = deadBaselineEntries(baseline.files);
+if (dead.length > 0) {
+  console.error(
+    `check-spec-types: ${dead.length} baseline entry/entries address a spec that no longer exists.\n` +
+      `A bound attached to no surviving subject is not protection — nothing can\n` +
+      `regress against it. PRUNE these entries by hand; do NOT run --update, which\n` +
+      `would rebaseline every surviving file and discard the ratchet.\n`
+  );
+  for (const file of dead) console.error(`  ${file}: ${baseline.files[file]}`);
+  process.exit(1);
 }
 
 const regressions = [];
