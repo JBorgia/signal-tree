@@ -18324,3 +18324,51 @@ core public exports   72 -> 68
 serialization methods  6 -> 2
 core 1991 · typecheck 0 · lint 0 · doc gate 0 · NUL gate 0
 ```
+
+## PUBLIC-CARRIER — the two KEEPs proved through the barrel
+
+The batch-1 retractions were semantically plausible and evidentially weak. Both
+now have carriers that import from `@signaltree/core` itself.
+
+> **A SPEC REACHING PAST THE BARREL CANNOT TESTIFY ABOUT THE BARREL.**
+
+⚠️ NO SPEC IN THIS PACKAGE COULD OBSERVE ITS OWN PUBLIC EXPORT LIST. Every one
+imports relatively, so deleting a re-export left them all green while breaking
+every external consumer — which is exactly what happened to `toWritableSignal`.
+`public-barrel-carrier.spec.ts` and its typing sibling are the deliberate
+exception, and the only two; the Nx boundary rule is disabled in them with that
+reason stated, and a `resolve.alias` makes `@signaltree/core` resolve to the
+source barrel so a missing export fails the row.
+
+### `toWritableSignal` — KEEP
+
+```text
+requirement  form(model) needs a WritableSignal, and `{ undoable: true }` is the
+             only public way to make a form edit a restoration-eligible turn
+carrier      a real Angular component: barrel import -> toWritableSignal(node,
+             injector, { undoable: true }) -> form(...) -> edit -> the
+             restoration history grows
+control      an ordinary write does NOT grow it, and the SAME write DOES once
+             wrapped in undoable() — so the mechanism is exercised both ways
+mutation     remove the re-export -> "toWritableSignal is not a function"
+```
+
+### `asReadonly` — KEEP, and the KEEPER is pinned at the subject
+
+⚠️ SHOWING THE ALTERNATIVE FAILS WOULD PROVE THE PROBLEM EXISTS, NOT THAT THIS
+API SOLVES IT. Both halves are asserted:
+
+```text
+keeper       asReadonly(tree) stays CALLABLE, types descendant reads, returns
+             the identical runtime object, and `.set` is unavailable
+             (@ts-expect-error)
+control      `ReadonlyView<typeof tree> = tree` is NOT callable — pinned with
+             its own @ts-expect-error, so if that ever starts compiling the
+             justification is gone and the row says so
+specificity  the annotation's DESCENDANT reads do work, so the failure is
+             located at the call signature rather than general
+mutation     remove the re-export -> "asReadonly is not a function"
+```
+
+The probe that argued for deletion addressed `tree.$`, the NAMESPACE. The API
+projects the CALLABLE TREE. SUBJECT-ADDRESS RULE, re-earned.
