@@ -1595,6 +1595,19 @@ export function getOrCreateInternalTransactionRuntime<T>(
                 );
               } catch (error) {
                 compensated = false;
+                // ⚠️ DO NOT RE-WRAP AN ALREADY-RENDERED ROLLBACK REFUSAL. A
+                // refusal thrown deeper is a SignalTreeRollbackError whose
+                // message already names its kind; stuffing that message into
+                // `errorMessage` and wrapping again produced a DOUBLED
+                // sentence — prefix, reason, prefix, reason, and two `[kind]`
+                // tags. The constant message hid this for as long as it existed:
+                // both layers rendered identically, so the duplication was
+                // invisible until the reason became legible.
+                //
+                // Rethrowing preserves the INNERMOST, most specific refusal,
+                // which is the whole point of making the reason legible. Same
+                // error type, same refusal, same cause chain.
+                if (error instanceof SignalTreeRollbackError) throw error;
                 throw createRollbackError({
                   kind: 'effect-validation-failed',
                   pendingTurnId: pendingTurnId as number,
