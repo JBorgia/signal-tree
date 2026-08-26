@@ -18947,7 +18947,7 @@ A dedicated field would be a REPRESENTATION REFINEMENT, not a demonstrated
 missing capability. Do not reopen it without a consumer that cannot correctly
 interpret the existing pair.
 
-## `PERF-GATE-DETERMINISM-0` — recorded, NOT started
+## `PERF-GATE-DETERMINISM-0` — CLOSED (recorded below as first stated, then executed)
 
 The demo batching benchmark has now interrupted the full gate register three
 times. Each occurrence was handled correctly — identified, isolated, rerun,
@@ -18985,3 +18985,56 @@ diagnostic cluster is solidified. No further historical semantic archaeology
 unless `RELEASE-1.0.md` names an unresolved item — opportunistically starting
 whichever architecture topic looks interesting is what §29.7f exists to stop one
 level down.
+
+## `PERF-GATE-DETERMINISM-0` — CLOSED. Tooling only
+
+⚠️ §29.7f FOUND THE PRECEDENT, so this was not investigated as a new question.
+Phase 5 had already established the remedy at `1c67f91b`, and core's
+`benchmarks.spec.ts` states the rationale verbatim:
+
+> "parallel test pool — CPU/memory contention across Vitest workers skews
+> absolute times and ratios independent of the code under test, causing
+> intermittent false failures … The CORRECTNESS suites always run — they assert
+> behavior, not timing."
+
+The demo suite is exactly that class. Every case is a wall-clock measurement and
+one asserts a RATIO of two timings, `(single * 10) / batched > 0.5`, so either
+term being perturbed decides the result.
+
+```text
+correctness suite   deterministic semantic/complexity assertions — always run
+performance suite   wall-clock measurement — explicitly opted into
+```
+
+### What was done, and what deliberately was not
+
+```text
+DONE      the whole suite runs on demand via ST_PERF=1
+NOT DONE  the 0.5 threshold was NOT raised. Nudging it until CI usually passes
+          deletes the falsifier and keeps the flake.
+```
+
+Verified both arms, and the falsifier itself:
+
+```text
+default            4 skipped, 10 passed   — out of the correctness gate
+ST_PERF=1          14 passed              — the benchmark still runs
+ST_PERF=1 + M      exit 1                 — threshold raised to 1e9 FAILS, so the
+                                            assertion is still a real falsifier
+workspace  x3      exit 0, 0, 0
+52-gate register x2 exit 0, 0
+```
+
+⚠️ AND THE ESTABLISHED IDIOM DID NOT COPY VERBATIM. Core uses
+`describe.runIf(...)`, which is VITEST; the demo runs JEST. Copying it threw
+`describe.runIf is not a function` — and the run still reported passes while the
+suite silently stopped loading, which is the same shape as an inert observer. The
+Jest form is `RUN_TIMING ? describe : describe.skip`.
+
+> **A PRECEDENT IS A DECISION, NOT A SNIPPET.** Reusing the ruling is right;
+> reusing the code across two different runners is how a gate becomes inert
+> while still reporting green.
+
+The batching CLAIM remains covered deterministically in core, where notification
+coalescing is asserted by counting notifications. This suite measures how fast it
+is, not whether it is correct.
