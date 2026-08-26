@@ -388,6 +388,21 @@ const GATES = [
     },
   },
   {
+    name: 'spec-types:hygiene',
+    covers:
+      'every spec-type baseline entry addresses a SURVIVING spec — a bound ' +
+      'attached to no surviving subject is not protection',
+    cmd: ['node', 'tools/check-spec-types.mjs', '--self-test'],
+    // 13 entries for deleted specs had accumulated, each reporting a phantom
+    // "improvement" that buried the three real ones. Prune, never --update:
+    // rebaselining would convert every current improvement into the new ceiling.
+    mutation: {
+      file: 'tools/spec-type-baseline.json',
+      find: '  "files": {',
+      replace: '  "files": {\n    "packages/core/src/lib/__gone__.spec.ts": 1,',
+    },
+  },
+  {
     name: 'kernel-neutrality',
     covers:
       'every declared-neutral kernel root has an Angular-free TRANSITIVE TYPE ' +
