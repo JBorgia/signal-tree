@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { compared } from './markers/compared';
 import { entityMap } from './types';
 import {
   getOwnedOwnerPath,
@@ -56,7 +55,7 @@ import { transactions } from '../enhancers/transactions/transactions';
  * The pattern is mechanical rather than semantic: the registry is attached at
  * the leaf/branch construction sites in `signal-tree.ts`, and a MARKER builds
  * its own node, so both marker-constructed positions missed it. `compared` has
- * it only because it routes through `wrapLeafSignal`.
+ * it only because it routed through the marker leaf-wrapping path.
  *
  * So the invariant the inventory supports is:
  *
@@ -94,13 +93,11 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
         leaf: 'l0',
         branch: { nested: 1 },
         rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-        cmp: compared({ a: 1 }, (x, y) => JSON.stringify(x) === JSON.stringify(y)),
       },
       { enhancers: [restoration(), transactions()] }
     );
     await flush();
     // Force marker materialisation.
-    void tree.$.cmp;
     void tree.$.src;
     await flush();
 
@@ -111,7 +108,6 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
       leaf: shapeOf(tree.$.leaf),
       'nested leaf': shapeOf(tree.$.branch.nested),
       'entityMap node': shapeOf(tree.$.rows),
-      'compared node': shapeOf(tree.$.cmp),
     };
 
     for (const [name, s] of Object.entries(inventory)) {

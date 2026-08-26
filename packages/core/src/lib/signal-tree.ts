@@ -62,7 +62,6 @@ import {
 } from './internals/tree-capabilities';
 import type { MaterializationContext } from './internals/materialize-markers';
 import { applyDerivedFactories } from './internals/merge-derived';
-import { isComparedMarker } from './markers/compared';
 import { hydrateMarkerNode } from './internals/materialize-markers';
 import { getPathNotifier } from './path-notifier';
 import {
@@ -897,23 +896,6 @@ function leafEqual(
   };
 }
 
-function wrapLeafSignal<TValue>(
-  leaf: WritableSignal<TValue>,
-  path: string,
-  positionIds: readonly number[] | undefined,
-  registry?: PositionRegistry
-): void {
-  if (registry) {
-    definePositionRegistry(leaf as object, registry);
-  }
-  wrapOwnedWritableSignal(leaf, {
-    path,
-    ownerPath: path,
-    positionIds,
-    ownerId: registry?.id,
-  });
-}
-
 function createSignalStore<T>(
   obj: T,
   equalityFn: (a: unknown, b: unknown) => boolean,
@@ -1043,25 +1025,6 @@ function createSignalStore<T>(
     // Entity map markers - preserve for entities() enhancer
     if (isEntityMapMarker(value)) {
       store[key] = value;
-      continue;
-    }
-
-    // compared() — this position supplies its own equality function. Checked
-    // before the registered-marker lookup and before the Symbol-key warning
-    // below, because it needs no processor: it only swaps the `equal` option.
-    // Note this makes the position a LEAF even when the value is an object,
-    // which is the intent (the object is compared as a unit).
-    if (isComparedMarker(value)) {
-      const leaf = signal(value.value, {
-        equal: value.equal as (a: unknown, b: unknown) => boolean,
-      });
-      wrapLeafSignal(
-        leaf,
-        childPath,
-        getChildPositionIds(),
-        materializationContext.positionRegistry
-      );
-      store[key] = leaf;
       continue;
     }
 

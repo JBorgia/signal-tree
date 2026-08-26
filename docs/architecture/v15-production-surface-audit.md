@@ -17620,3 +17620,96 @@ public export delta   ZERO — loader was never exported
 package.json          rxjs peer dependency REMOVED
 bundle                signaltree-bare unchanged; still pre-existing over budget
 ```
+
+## `REMAINING-FEATURE-DISPOSITION-BATCH-0` — CLOSED
+
+### `compared` / `byKeys` — DELETED, question preserved
+
+The representation went wholesale: the factory, `ComparedMarker`,
+`isComparedMarker`, the materialization branch, ST2019, and every test whose
+subject it was. Not kept "in case custom equality matters later".
+
+> **PER-LOCATION-EQUALITY-0 — OPEN.** Whether a location may carry its own
+> comparator is an unresolved greenfield PERFORMANCE question. If evidence later
+> admits it, it gets designed from the measured requirement — not inherited as
+> `compared(value, equal)`. Preserving an old answer is not the same as
+> preserving the question.
+
+### `linked` — DELETED, and the name was not evidence
+
+Traced only far enough to check for a frozen invariant, per the caution that
+`linked` is not `Link`. It is not: `linked()` is a thin wrapper over Angular's
+native `linkedSignal` — derived-but-writable state, no relationship semantics at
+all. Its whole job is already covered by a primitive users can call directly,
+and the demo page was titled "linked() Removed From RC" before this batch began.
+
+The `ProcessDerived` behaviour it motivated SURVIVES on its own terms: a
+`WritableSignal` merged through `.derived()` still keeps `.set()`, because that
+rule was always about WritableSignals and never about the wrapper. Its readonly
+parity fixture now uses `linkedSignal` directly — MIGRATED, and the new specimen
+IS the successor.
+
+### Dead hydration observability — DELETED
+
+`reportHydrateDecision`, `onHydrateDecision`, `HydrateDecisionEvent` and the
+listener set: unexported, zero producers once nothing declines hydration. Two
+specs existed solely to observe those decisions and are retired VACUOUS.
+
+### ⚠️ THE DELETIONS KEPT PRODUCING DELETIONS
+
+Each removal exposed the next, and the compiler found every one:
+
+```text
+loader deleted        -> rxjs was core's only rxjs consumer   -> peer dep removed
+compared deleted      -> wrapLeafSignal had one caller        -> helper removed
+nothing declines      -> reportHydrateDecision had 0 producers-> facility removed
+```
+
+> **A SUBSYSTEM'S COST INCLUDES DEPENDENCIES IT ALONE JUSTIFIES.** `rxjs` leaving
+> with `loader` is architectural evidence, not package hygiene: a subsystem
+> imposes bundle, dependency, maintenance and security cost even when its own
+> implementation looks isolated.
+
+> **NO SURVIVING SUBJECT, NO SURVIVING INVARIANT.** "Source-owning markers
+> decline rehydration" needed no replacement carrier because there are no
+> source-owning markers. External source ownership moved to relationships, and
+> relationships are `link()`.
+
+### Empty suites, classified
+
+```text
+VACUOUS   compared.spec, linked.spec, linked-null, linked-inference
+VACUOUS   hydrate-decisions, m5-decision-observability   facility has no producer
+VACUOUS   M3's "a marker materialises to a signal" rows  no core marker does any
+                                                         more; `form()` in
+                                                         ng-forms carries it
+MIGRATED  readonly parity `draft` fixture                invariant is about ANY
+                                                         WritableSignal; specimen
+                                                         swapped to linkedSignal
+MIGRATED  entity-array marker-in-array row               entityMap serves it
+```
+
+### ⚠️ THE BUNDLE BUDGET IS GREEN, AND IT WAS NOT RAISED
+
+```text
+before   signaltree-bare  ❌ 9.77/9.7 KB prod   ❌ 11.79/11.7 KB dev
+after    signaltree-bare  ✅ 9.66/9.7 KB prod   ✅ 11.65/11.7 KB dev
+```
+
+That overage was flagged as PRE-EXISTING three phases ago and deliberately left
+open rather than accommodated. It was fixed by deleting code nobody could reach —
+`compared`'s materialization branch and `wrapLeafSignal` were both in the bare
+path. Raising the ceiling would have hidden the fact that the bare bundle was
+carrying an unreachable marker.
+
+### Gates
+
+```text
+core 1990 · workspace exit 0 · typecheck 0 · lint 0 · doc gate 0
+public export delta   ZERO — none of these were exported
+peer dependencies     @angular/core, tslib   (rxjs reclaimed)
+bundle                BOTH TARGETS GREEN for the first time this session
+```
+
+Next: `HIST-SCOPE` and the realization/undo correctness defect. No further
+legacy-feature preservation phase.

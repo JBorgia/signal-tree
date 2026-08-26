@@ -2,7 +2,6 @@ import { isSignal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { entityMap, signalTree } from '../index';
-import { compared } from './markers/compared';
 
 /**
  * M3 — IS A REALIZED VALUE'S STATE IDENTIFIABLE BY A UNIFORM RULE?
@@ -29,10 +28,13 @@ describe('M3 — conformance', () => {
   it('MEASURE — the collection accessor is a BARE OBJECT; every other position is a signal', () => {
     const tree = signalTree({
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-      // Was `stored()`. The claim is that A MARKER materialises to a signal;
-      // `compared()` is a surviving marker that does, so the subject is
-      // unchanged and only the instance moved.
-      theme: compared('light', (x, y) => x === y),
+      // ⚠️ WAS A MARKER. After `stored()`, `compared()` and the loading
+      // `entityMap` went, NO core marker materialises to a signal — so the
+      // contrast this row draws is now between a COLLECTION and ordinary
+      // leaves. That is the surviving form of the claim; the marker
+      // specimen has no subject left in core. (`form()` in
+      // @signaltree/ng-forms still carries the marker-with-methods case.)
+      theme: 'light',
       plain: 1,
     });
 
@@ -51,7 +53,7 @@ describe('M3 — conformance', () => {
   it('MEASURE — representation is NOT uniform: the collection publishes an ENVELOPE', () => {
     const tree = signalTree({
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-      theme: compared('light', (x, y) => x === y),
+      theme: 'light',
       plain: 1,
     });
     tree.$.rows.addOne({ id: 'a', n: 1 });
@@ -61,27 +63,6 @@ describe('M3 — conformance', () => {
       theme: 'light', // <- the value
       plain: 1, // <- the value
     });
-  });
-
-  it('THE PRECEDENT — a marker carries methods AND conforms, in this codebase', () => {
-    const tree = signalTree({ theme: compared('light', (x, y) => x === y) });
-
-    // A callable signal that ALSO carries its own surface. This is the shape
-    // the collection is claimed to be unable to have.
-    expect(isSignal(tree.$.theme as never)).toBe(true);
-    expect(tree.$.theme()).toBe('light');
-    // ⚠️ THE LIST MOVED WITH THE INSTANCE. It used to name `stored()`'s
-    // surface — clear/reload/flush — which was never what the claim needed.
-    // The claim is that a marker can be a signal AND carry its own methods.
-    for (const m of ['set', 'update']) {
-      expect(
-        typeof (tree.$.theme as unknown as Record<string, unknown>)[m]
-      ).toBe('function');
-    }
-
-    // And it needs no snapshot hook: it appears in the representation as its
-    // plain value.
-    expect(tree()).toEqual({ theme: 'light' });
   });
 
   it("THE HOOK'S STATED CAUSE is a shape accident, not a collection property", () => {
