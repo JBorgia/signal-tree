@@ -5,7 +5,6 @@ import { Signal, WritableSignal } from '@angular/core';
  *
  * Type definitions for the derived state system in SignalTree v7.
  */
-import type { DerivedMarker } from '../markers/derived';
 
 // =============================================================================
 // DERIVED STATE TYPES
@@ -13,7 +12,6 @@ import type { DerivedMarker } from '../markers/derived';
 
 /**
  * Converts a derived state definition into its signal representation.
- * - DerivedMarker<T> → Signal<T> (read-only computed signal)
  * - WritableSignal<T> → WritableSignal<T> (preserved — e.g. `linked()`, so `.set()` type-checks)
  * - Signal<T> → Signal<T> (pass through unchanged)
  * - Objects → Recursive processing
@@ -22,9 +20,7 @@ import type { DerivedMarker } from '../markers/derived';
  * checking Signal first would widen `linked()`/`linkedSignal()` results to
  * read-only and break `$.x.set()`.
  */
-export type ProcessDerived<T> = T extends DerivedMarker<infer R>
-  ? Signal<R>
-  : T extends WritableSignal<infer W>
+export type ProcessDerived<T> = T extends WritableSignal<infer W>
   ? WritableSignal<W>
   : T extends Signal<infer S>
   ? Signal<S>
@@ -47,10 +43,8 @@ export type DeepMergeTree<TSource, TDerived> = {
       ? // Key exists in both - merge recursively or derived overwrites
         TSource[K] extends object
         ? TDerived[K] extends object
-          ? TDerived[K] extends DerivedMarker<infer R>
-            ? Signal<R> // Derived marker overwrites source object
-            : TSource[K] &
-                DeepMergeTree<TSource[K], ProcessDerived<TDerived[K]>> // Merge objects
+          ? TSource[K] &
+              DeepMergeTree<TSource[K], ProcessDerived<TDerived[K]>> // Merge objects
           : TSource[K] // Derived is non-object, keep source
         : ProcessDerived<TDerived[K]> // Source is primitive, derived overwrites
       : // Key only in source

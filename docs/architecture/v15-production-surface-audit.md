@@ -17376,3 +17376,144 @@ UNREACHABLE today: stored, status, asyncSource, asyncQuery, serialization,
 markers. That is a whole `ALREADY UNREACHABLE` category for
 `REMAINING-FEATURE-DISPOSITION-BATCH-0`, and it says the public surface is
 considerably smaller than the `markers/` directory implies.
+
+## `REMAINING-FEATURE-DISPOSITION-BATCH-0` — PARTIAL. One deletion, one HARD STOP
+
+### The census, verified against the BUILT surface with reachable controls
+
+```text
+reachable      signalTree  entityMap  link  external  persistence
+UNREACHABLE    compared  byKeys  linked  loader  invalidateTag  derived
+```
+
+⚠️ THE CENSUS ITSELF NEEDED A CORRECTION. `derived` appeared as "named in
+index.ts" and "unreachable in the build" at the same time, and both were right:
+the `derived()` FUNCTION was removed in v6.3.1, and only the TYPES
+`DerivedMarker`/`DerivedType` remained exported.
+
+### C. `derived` — DELETED, and it was unreachable, not merely unused
+
+Nothing in production could construct a `DerivedMarker`: its only factory went
+in v6.3.1, nine major versions ago. Deleted: `markers/derived.ts`, the
+`isDerivedMarker` branch in `mergeDerivedState`, and the two public type exports.
+
+> **A SHARED WORD KEEPS DEAD CODE ALIVE.** `.derived(($) => ({ … }))` is a very
+> live feature that takes a factory returning ordinary computeds — handled by
+> the `isSignalLike` branch, and always was. The dead MARKER and the live
+> FEATURE share a name, and that resemblance is what made the marker look
+> load-bearing for nine versions.
+
+⚠️ IT WAS NOT AS CLEAN AS FIRST JUDGED. Removing the import alone broke
+`.derived()`'s RETURN TYPE — `DerivedMarker` is an arm of `ProcessDerived` and
+of `DeepMergeTree`, so a live public feature's types depended on a marker no
+value could ever be. Both arms removed properly; typecheck 0, 2090 tests green.
+
+Public API delta: **two type removals, INTENDED** — `DerivedMarker`,
+`DerivedType`. Exporting a type whose only constructor is gone does not preserve
+compatibility, it advertises one.
+
+### A. `loader` — HARD STOP, and the reason is new
+
+`LOADER-RETIRE-0` already refuted deletion: loader holds a real remote-data cache
+layer (stale/fresh, SWR, tag invalidation, scoped entries, cache equality,
+eviction) whose owner is undispositioned. That stop was not re-litigated.
+
+What is NEW is reachability, and it is worse than "internal-only":
+
+```text
+v12 removed the raw `load: fn` path
+entityMap({ load }) now requires a LoaderFeature
+only loader() produces a LoaderFeature
+loader() is not exported
+```
+
+⚠️ AND THE RUNTIME SAYS SO. `entity-map.ts:249` throws:
+
+> `SignalTree: entityMap({ load }) requires the loader() helper —
+entityMap({ load: loader(fn, { staleTime, swr, tags }) }). The raw "load: fn"
+form was removed in v12 …`
+
+A user who writes `entityMap({ load: fn })` is told to use a function they
+cannot import. **`entityMap({ load })` is a dead end at runtime**, and the error
+message documents the dead end as the solution.
+
+That is a product decision, not a compiler-driven cleanup — export `loader`, or
+reject `load` differently, or remove the option. STOP condition: distinct
+behavior with unclear owner.
+
+### B. `compared` — HARD STOP, same class
+
+Withdrawn from the RC surface deliberately at `76ab032c`; `byKeys` and `linked`
+are in the same position. Nothing in production constructs one, and its only job
+is to hand a leaf a custom `equal`. Deleting it is defensible — but it was
+withdrawn ON PURPOSE, and "ship it or delete it" is the same product decision
+`loader` needs. Both are held for one disposition rather than resolved by
+whichever happened to be smaller.
+
+⚠️ A FIXTURE NOTE. `compared()` is now the specimen for M3's "a marker
+materialises to a signal" rows, because after `stored()` it is the only core
+marker that does. If it is deleted, those rows lose their subject and the
+surviving carrier is `form()` in `@signaltree/ng-forms`. Recorded so the
+decision is made knowingly — FIXTURE DEPENDENCY IS NOT SEMANTIC DEPENDENCY cuts
+both ways.
+
+## ⚠️ THE FINDING THAT MATTERS MOST — docs advertised what nobody can reach
+
+The census was meant to feed a deletion batch. Instead it exposed that live docs
+CLAIMED six unreachable capabilities, including in competitive material:
+
+```text
+docs/compare/capability-matrix.md   "Per-leaf equality — `compared()` /
+                                    `byKeys()`" listed as a SignalTree
+                                    capability others lack (❌ for every rival)
+                                    and a "Markers as one concept" bullet naming
+                                    SIX markers, FIVE of them unreachable
+docs/compare/ngrx-signalstore.md    an entire persistence section: `stored()`
+                                    per-leaf, `stored(key, default, { version,
+                                    migrate })`, `createIndexedDBAdapter()` /
+                                    `createStorageAdapter()` from
+                                    `@signaltree/core/storage` — an entry point
+                                    that does not exist — and
+                                    `flushAllStoredSignals()`
+docs/errors/README.md               ST2019 for `compared()` and ST2004 pointing
+                                    at `loader()`, diagnostics whose producers
+                                    or remedies are unreachable
+```
+
+> **AN UNREACHABLE CAPABILITY IS A FALSE CLAIM, NOT A STALE DOC.** A comparison
+> table is read by someone deciding whether to adopt the library. Listing a
+> capability a user cannot invoke is not documentation drift; it is a claim we
+> cannot honour.
+
+### The gate grew to catch this class
+
+`WITHDRAWN` joins `RETIRED` — implemented-but-unexported alongside deleted —
+because the difference is nil for a reader: both lead to an import that does not
+resolve. Both share the absent-from-surface control.
+
+Three corrections were needed, each earned by a false positive on the first run:
+
+```text
+method form         `derived` matched `.derived(`, the live tree method.
+                    Fixed with a `(?<![.\w])` guard.
+local bindings      `const derived = derivedFrom<T>(); derived(($) => …)` is the
+                    idiomatic form the root README teaches, and is
+                    indistinguishable BY NAME from the removed free function.
+                    `derived` is therefore NOT in either list:
+                        A NAME-BASED GATE CANNOT OUTLIVE A NAME COLLISION.
+explaining vs       widening to whole table rows flagged "Withdrawn: its
+teaching            subject, the `stored()` marker, is deleted" — a row doing
+                    this gate's job. Rows announcing a removal are exempt.
+```
+
+And the widening was itself necessary: the original rule matched only rows
+STARTING with a backticked name, so the capability-matrix claim — whose cell
+opens with prose — passed cleanly.
+
+### Gates
+
+```text
+core 2090 · workspace exit 0 · typecheck 0 · lint 0 · doc gate 0
+public API delta   2 type removals, INTENDED
+bundle             signaltree-bare still 9.77/9.7 KB — PRE-EXISTING, not raised
+```

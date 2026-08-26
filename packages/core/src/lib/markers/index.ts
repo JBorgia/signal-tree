@@ -13,11 +13,6 @@
  */
 
 // Derived state types (derived() function removed - use computed() directly)
-export {
-  isDerivedMarker,
-  type DerivedMarker,
-  type DerivedType,
-} from './derived';
 
 
 // Stored marker - RETIRED in v15 (STORED-RETIRE-0). Durable state is now

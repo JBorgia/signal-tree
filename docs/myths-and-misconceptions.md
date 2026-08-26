@@ -360,7 +360,7 @@ This was a real DX bug — humans had to remember which marker used which shape,
 | Marker                       | v10.3 canonical                                                                                      | Old `is`-prefix (deprecated, removed v11)             |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | `status`                     | `.loading`, `.loaded`, `.notLoaded`, `.hasError`                                                     | `.isLoading`, `.isLoaded`, `.isNotLoaded`, `.isError` |
-| `entityMap`                  | `.empty`; with `load: loader(fn)` in config (cache-aware form), also `.loading`, `.loaded`, `.error` | `.isEmpty`                                            |
+| `entityMap`                  | `.empty`; the cache-aware `load:` form is not part of the public surface | `.isEmpty`                                            |
 | `form`                       | `.dirty`, `.valid`, `.touched`, `.pristine`                                                          | (already bare — unchanged)                            |
 | `asyncSource` / `asyncQuery` | `.loading`, `.error`, `.data`                                                                        | (already bare — unchanged)                            |
 

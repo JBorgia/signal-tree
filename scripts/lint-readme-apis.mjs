@@ -117,7 +117,7 @@ if (SURFACE.size === 0) {
  * will generate.
  */
 const HISTORICAL_DIRS = new Set(['archive', 'rfcs', 'audits', 'learnings']);
-const HISTORICAL_FILE = /migration|MIGRATION|CHANGELOG/;
+const HISTORICAL_FILE = /migration|MIGRATION|CHANGELOG|HANDOFF/;
 
 /** Everything a user or an agent reads: shipped READMEs plus all of docs/. */
 function markdownUnder(dir, out = []) {
@@ -229,6 +229,33 @@ console.log('✓ every @signaltree symbol named in a README exists.');
  * for a migration note to say, so only fenced code blocks and API-table rows
  * count as teaching.
  */
+/**
+ * ⚠️ WITHDRAWN IS NOT RETIRED, and live docs must not advertise either.
+ *
+ * These are IMPLEMENTED and deliberately NOT EXPORTED — `compared` was pulled
+ * from the RC surface at `76ab032c`, `loader` is absent by the same decision
+ * (packages/core/README.md says so in prose). A user cannot import any of them.
+ *
+ * Retired means "the code is gone"; withdrawn means "the code is here and you
+ * cannot have it". For a READER the difference is nil — following either leads
+ * to an import that does not resolve — which is why both are checked, with
+ * different wording so the fix is obvious: a retired name must be rewritten, a
+ * withdrawn one is a product decision about whether to ship the capability.
+ *
+ * ⚠️ THIS LIST EXISTS BECAUSE A COMPETITIVE DOCUMENT MADE A CLAIM WE COULD NOT
+ * HONOUR. `docs/compare/capability-matrix.md` listed "Per-leaf equality —
+ * `compared()` / `byKeys()`" as a SignalTree capability that other libraries
+ * lack, and its "Markers as one concept" bullet named six markers of which five
+ * were unreachable.
+ */
+const WITHDRAWN = new Map([
+  ['compared', 'implemented but NOT EXPORTED — pulled from the RC surface at 76ab032c'],
+  ['byKeys', 'implemented but NOT EXPORTED — ships with `compared`'],
+  ['linked', 'implemented but NOT EXPORTED'],
+  ['loader', 'implemented but NOT EXPORTED — see packages/core/README.md'],
+  ['invalidateTag', 'reachable only through `loader()`, which is not exported'],
+]);
+
 const RETIRED = new Map([
   ['stored', 'deleted — use `persistence()` over ordinary state'],
   ['flushAllStoredSignals', 'deleted with `stored()`'],
@@ -245,6 +272,26 @@ const RETIRED = new Map([
 ]);
 
 /**
+ * ⚠️ `derived` IS DELIBERATELY ABSENT FROM BOTH LISTS, and the reason is a limit
+ * of the technique rather than an oversight.
+ *
+ * The `derived()` MARKER was removed in v6.3.1 and is deleted outright now — but
+ * the name cannot be gated. It collides with two live, correct usages:
+ *
+ *     tree.derived(fn)                       the live tree method
+ *     const derived = derivedFrom<T>();      the idiomatic local binding,
+ *     derived(($) => ({ … }))                which the root README teaches
+ *
+ * Excluding the method form is easy (`(?<![.\w])`). Excluding a LOCAL CONST is
+ * not: `derived(($) => …)` is indistinguishable, by name alone, from the removed
+ * free function it replaced. Both remaining hits were of exactly that kind.
+ *
+ *     A NAME-BASED GATE CANNOT OUTLIVE A NAME COLLISION. Listing it anyway would
+ *     buy nothing and cost two false positives in the most-read docs — and a
+ *     gate that cries wolf is the failure this file's header already warns about.
+ */
+
+/**
  * ⚠️ THE DENYLIST'S OWN CONTROL. A denylist rots silently: if a name is ever
  * re-introduced, every entry naming it becomes a lie that still passes. So each
  * entry is asserted ABSENT from the built surface. Re-adding an API makes this
@@ -252,12 +299,14 @@ const RETIRED = new Map([
  */
 const reachableNames = new Set();
 for (const names of SURFACE.values()) for (const n of names) reachableNames.add(n);
-const stale = [...RETIRED.keys()].filter((n) => reachableNames.has(n));
+const stale = [...RETIRED.keys(), ...WITHDRAWN.keys()].filter((n) =>
+  reachableNames.has(n)
+);
 if (stale.length > 0) {
   console.error(
     `\n✗ the RETIRED denylist is out of date — these are reachable again:\n` +
       stale.map((n) => `    ${n}`).join('\n') +
-      `\n\n  Remove them from RETIRED in scripts/lint-readme-apis.mjs. An entry\n` +
+      `\n\n  Remove them from RETIRED/WITHDRAWN in scripts/lint-readme-apis.mjs. An\n  entry` +
       `  that names a live API silently stops protecting anything.\n`
   );
   process.exit(1);
@@ -270,10 +319,17 @@ function teachingRegions(text) {
   for (const m of text.matchAll(fence)) {
     out.push({ text: m[0], line: text.slice(0, m.index).split('\n').length });
   }
+  // ⚠️ ANY TABLE ROW, not just one whose first cell is a signature.
+  //
+  // The first version matched `/^\|\s*`([^`]+)`\s*\|/` — a row STARTING with a
+  // backticked name. It passed clean while docs/compare/capability-matrix.md
+  // advertised "**Per-leaf equality** — `compared()` / `byKeys()`" as a
+  // SignalTree capability other libraries lack, because that cell opens with
+  // prose. A capability table is the most load-bearing kind of teaching there
+  // is: it is what a prospective user compares libraries with.
   const lines = text.split('\n');
   lines.forEach((l, i) => {
-    const cell = /^\|\s*`([^`]+)`\s*\|/.exec(l);
-    if (cell) out.push({ text: cell[1], line: i + 1 });
+    if (l.trimStart().startsWith('|')) out.push({ text: l, line: i + 1 });
   });
   return out;
 }
@@ -296,9 +352,27 @@ for (const rel of READMES) {
   const text = readFileSync(join(ROOT, rel), 'utf8');
   for (const region of teachingRegions(text)) {
     if (/@skip-lint/.test(region.text)) continue;
-    for (const [name, why] of RETIRED) {
-      // A call site or a signature cell — not a bare mention in prose.
-      if (new RegExp(`\\b${name}\\s*[(<]`).test(region.text)) {
+    // ⚠️ EXPLAINING IS NOT TEACHING, and widening to whole table rows made this
+    // necessary immediately: a row reading "Withdrawn: its subject, the
+    // `stored()` marker, is deleted" is the CORRECT thing for an index to say,
+    // and the first widened run flagged it. A row that announces the removal is
+    // doing this gate's job, not violating it.
+    if (
+      /\b(deleted|removed|withdrawn|retired|no longer|not part of|does not exist|gone)\b/i.test(
+        region.text
+      )
+    ) {
+      continue;
+    }
+    for (const [name, why] of [...RETIRED, ...WITHDRAWN]) {
+      // A FREE call site — not a bare mention in prose, and not a METHOD.
+      //
+      // ⚠️ `(?<![.\w])` is load-bearing and was earned immediately: without it
+      // `derived` matched `.derived(`, the live tree method, and reported ten
+      // false positives across the docs. The dead `derived()` MARKER and the
+      // live `.derived()` FEATURE share a word — which is exactly why the marker
+      // survived nine major versions after its factory was removed.
+      if (new RegExp(`(?<![.\\w])${name}\\s*[(<]`).test(region.text)) {
         taught.push({ rel, line: region.line, name, why });
       }
     }
@@ -306,7 +380,9 @@ for (const rel of READMES) {
 }
 
 if (taught.length > 0) {
-  console.error(`\n✗ ${taught.length} live doc example(s) teach a retired API:\n`);
+  console.error(
+    `\n✗ ${taught.length} live doc example(s) teach an API no user can reach:\n`
+  );
   for (const t of taught) {
     console.error(`  ${t.rel}:${t.line}  ${t.name}()  — ${t.why}`);
   }
@@ -317,6 +393,7 @@ if (taught.length > 0) {
   process.exit(1);
 }
 console.log(
-  `✓ no live doc example teaches any of the ${RETIRED.size} retired API(s).`
+  `✓ no live doc example teaches any of the ${RETIRED.size} retired or ` +
+    `${WITHDRAWN.size} withdrawn API(s).`
 );
 

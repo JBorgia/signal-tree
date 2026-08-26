@@ -1,6 +1,5 @@
-import { computed, isSignal, Signal } from '@angular/core';
+import { isSignal, Signal } from '@angular/core';
 
-import { isDerivedMarker } from '../markers/derived';
 import { stampDerived } from '../utils';
 
 /**
@@ -15,7 +14,6 @@ import { stampDerived } from '../utils';
  *
  * When you define a derived namespace at the same path as a source namespace:
  * - All source properties are **preserved** (signals, entityMaps, nested objects)
- * - Derived markers become computed signals at the target path
  * - Only conflicting keys trigger overwrites (with dev warning)
  *
  * ## Example
@@ -103,7 +101,6 @@ function ensurePathAndGetTarget($: AnyRecord, path: string): AnyRecord {
  *
  * ## Processing Rules
  *
- * - **DerivedMarker** → computed signal (lazy - factory runs on first read)
  * - **Nested objects** → recursive merge into existing structure (DEEP MERGE)
  * - **Collisions** → derived signals overwrite source signals with warning
  *
@@ -155,23 +152,16 @@ function mergeDerivedState(
   for (const [key, value] of Object.entries(derivedDef as AnyRecord)) {
     const currentPath = path ? `${path}.${key}` : key;
 
-    if (isDerivedMarker(value)) {
-      // Convert derived marker to computed signal
-      const target = ensurePathAndGetTarget($, path);
-
-      // Check for collision with existing signal
-      if (key in target && isSignalLike(target[key])) {
-        if (typeof ngDevMode === 'undefined' || ngDevMode) {
-          console.warn(
-            `SignalTree: Derived "${currentPath}" overwrites source signal. ` +
-              `Consider using a different key to avoid confusion.`
-          );
-        }
-      }
-
-      // Create computed signal - factory is lazy (won't execute until read)
-      target[key] = stampDerived(computed(value.factory));
-    } else if (isSignalLike(value)) {
+    // ⚠️ THE `DerivedMarker` BRANCH IS GONE, and it was unreachable, not merely
+    // unused. `derived()` — the only thing that ever produced a DerivedMarker —
+    // was removed in v6.3.1, so from that release onward nothing a caller could
+    // write reached this branch. `.derived(($) => ({ … }))` is a DIFFERENT and
+    // very much live feature: it takes a factory returning ordinary computeds,
+    // which the `isSignalLike` branch below has always handled.
+    //
+    // Sharing the word "derived" is what kept this alive: the live feature's
+    // name made the dead marker look load-bearing.
+    if (isSignalLike(value)) {
       // Already a signal (computed, signal, etc.) - add directly
       const target = ensurePathAndGetTarget($, path);
 
