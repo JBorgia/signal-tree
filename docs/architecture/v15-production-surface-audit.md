@@ -94,7 +94,7 @@ second case needs.
 The temptation is `withCausalContext({...})` because both are implemented with
 causal metadata. That exposes mechanism, and it is the same mistake as exposing
 `withWriteContext` wholesale. The public doors should encode the narrow intents
-that earned access — *apply external truth*, *act after committed truth* —
+that earned access — _apply external truth_, _act after committed truth_ —
 possibly as two APIs over one constrained protocol.
 
 **One causal boundary, possibly multiple intention-specific doors.** Not "one
@@ -109,7 +109,7 @@ determine that boundary through the public API.
 
 That does NOT revive `PathNotifier`, `interceptLeafSignals`, or a general
 `observeCommittedWrites()`. Handing outsiders a mutation stream is a much larger
-claim than *schedule this consequence when the relevant truth is settled* — and
+claim than _schedule this consequence when the relevant truth is settled_ — and
 PER-0 must keep alive the possibility that `persistence()` owns the integration
 internally and gains scoped selection, in which case **no public egress door is
 needed at all**.
@@ -328,20 +328,20 @@ freeze the Candidate B surface
 
 ## Register
 
-| id | capability | v13 spelling | status |
-| --- | --- | --- | --- |
-| **NGF-0** | **does `@signaltree/ng-forms` exist at all?** | whole package | **DELETED — NGF-DEL executed** |
-| **TH-0** | **generic `WritableSignal` history** | `trackHistory` | **DELETED — TH-DEL executed** |
-| **PER-0** | **does `persistence()` deserve to ship, and in this form?** | `persistence`, `StorageAdapter`, `./storage` | **REDESIGN — function survives, form does not** |
-| **EVT-0** | **does `@signaltree/events` exist at all?** | the package and its four entry points | **DELETED — EVT-DEL executed** |
-| **SEC-0** | **does `@signaltree/core/security` exist at all?** | the subpath and `security()` | **DELETED — SEC-DEL executed** |
-| **HIST-0** | **is history participation whole-tree, or selective?** | `timeTravel()` scope | **CLOSED — HIST-C, operation/turn-scoped eligibility** |
-| A1 | remote acquisition / loading | `loader` | **RESOLVED — C1 yes, C2 is one narrow seam** |
-| A2 | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath | **RESOLVED — A2-B, and one new MATRIX-CLOSE row** |
-| A3 | async / status representation | `status` | **RESOLVED — function yes, ownership no** |
-| A4+A5 | form integration and its history | `form`, `FormSignal`, `history`, `@signaltree/ng-forms/signals` | **resolved — one consumer, proven path, one gap** |
-| A6 | collection projections | `EntitySignal.map` | **RESOLVED — no gap; `asMap` already ships** |
-| A7 | tree composition | `.with()` | decided in 15.0 — declarative construction |
+| id         | capability                                                                             | v13 spelling                                                    | status                                                 |
+| ---------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------ |
+| **NGF-0**  | **does `@signaltree/ng-forms` exist at all?**                                          | whole package                                                   | **DELETED — NGF-DEL executed**                         |
+| **TH-0**   | **generic `WritableSignal` history**                                                   | `trackHistory`                                                  | **DELETED — TH-DEL executed**                          |
+| **PER-0**  | **does `persistence()` deserve to ship, and in this form?**                            | `persistence`, `StorageAdapter`, `./storage`                    | **REDESIGN — function survives, form does not**        |
+| **EVT-0**  | **does `@signaltree/events` exist at all?**                                            | the package and its four entry points                           | **DELETED — EVT-DEL executed**                         |
+| **SEC-0**  | **does `@signaltree/core/security` exist at all?**                                     | the subpath and `security()`                                    | **DELETED — SEC-DEL executed**                         |
+| **HIST-0** | **is history participation whole-tree, or selective?**                                 | `timeTravel()` scope                                            | **CLOSED — HIST-C, operation/turn-scoped eligibility** |
+| A1         | remote acquisition / loading                                                           | `loader`                                                        | **RESOLVED — C1 yes, C2 is one narrow seam**           |
+| A2         | **durability/persistence, INCLUDING whether `@signaltree/core/storage` exists at all** | `stored`, `flushAllStoredSignals`, the `./storage` subpath      | **RESOLVED — A2-B, and one new MATRIX-CLOSE row**      |
+| A3         | async / status representation                                                          | `status`                                                        | **RESOLVED — function yes, ownership no**              |
+| A4+A5      | form integration and its history                                                       | `form`, `FormSignal`, `history`, `@signaltree/ng-forms/signals` | **resolved — one consumer, proven path, one gap**      |
+| A6         | collection projections                                                                 | `EntitySignal.map`                                              | **RESOLVED — no gap; `asMap` already ships**           |
+| A7         | tree composition                                                                       | `.with()`                                                       | decided in 15.0 — declarative construction             |
 
 ---
 
@@ -408,7 +408,7 @@ architecture the project already rejected.** The Signal Forms result was
 celebrated for "one shared model, no synchronization copy, no sync loop".
 `createFormTree` is the sync loop. Internally it does not even compose over the
 caller's tree: it calls `signalTree(hydratedInitialValues, treeConfig)` and
-manufactures its *own*, so the application's state is not involved at all.
+manufactures its _own_, so the application's state is not involved at all.
 
 It also carries `persistKey`, `storage`, `persistDebounceMs` — a second
 implementation of A2's persistence capability, inside a forms package.
@@ -456,15 +456,15 @@ a template literal is not an import.)
 
 ## Result
 
-Every falsification attempt failed, and two of them produced evidence *against*
+Every falsification attempt failed, and two of them produced evidence _against_
 the package:
 
-| test | outcome |
-| --- | --- |
-| Does anything need SignalTree semantics? | only `createFormTree`, and it is the rejected two-model sync |
-| Is a template seam missing? | no — the directive takes a plain signal |
-| Is there production demand? | none; the one consumer is gate-mandated |
-| Does the SignalTree-coupled entry point have a future? | it is deprecated with no chosen replacement |
+| test                                                   | outcome                                                      |
+| ------------------------------------------------------ | ------------------------------------------------------------ |
+| Does anything need SignalTree semantics?               | only `createFormTree`, and it is the rejected two-model sync |
+| Is a template seam missing?                            | no — the directive takes a plain signal                      |
+| Is there production demand?                            | none; the one consumer is gate-mandated                      |
+| Does the SignalTree-coupled entry point have a future? | it is deprecated with no chosen replacement                  |
 
 **Disposition: DELETED.** Executed as NGF-DEL. Not tidied — removed.
 `createWizardForm` and `withFormHistory` lost their subject with
@@ -509,7 +509,7 @@ package's peer range. Re-add it the moment one does.
 
 ```ts
 const model = toWritableSignal(tree.$.editForm);
-const fields = form(model, schema);   // Angular Signal Forms
+const fields = form(model, schema); // Angular Signal Forms
 ```
 
 Undo/redo over that model is **deliberately not documented yet** - that is the
@@ -565,13 +565,13 @@ whether its undo routes back through the canonical mutation path — the way
 **It is independent, and the two systems fight.** Over a tree that also has
 `timeTravel()`:
 
-| step | result |
-| --- | --- |
-| `hist.undo()` | value reverts, **and time-travel's history GROWS** |
-| `tree.undo()` afterwards | **REDOES the edit** — the model moves forward |
-| both after two edits | `hist.canUndo()` and `tree.canUndo()` are both true |
+| step                     | result                                              |
+| ------------------------ | --------------------------------------------------- |
+| `hist.undo()`            | value reverts, **and time-travel's history GROWS**  |
+| `tree.undo()` afterwards | **REDOES the edit** — the model moves forward       |
+| both after two edits     | `hist.canUndo()` and `tree.canUndo()` are both true |
 
-Because the undo is a `model.update(...)`, it is a *new write*. Time-travel
+Because the undo is a `model.update(...)`, it is a _new write_. Time-travel
 records it as forward motion. An application wiring a single undo button to
 either system gets a stack the other one is actively corrupting.
 
@@ -589,7 +589,7 @@ makes undo incorrect rather than richer.
 **Over an arbitrary Angular `WritableSignal`** — it works correctly. But that is
 precisely the case with no SignalTree involvement at all. As you put it: a
 useful generic Angular primitive is not a SignalTree public capability. If
-anything, this branch *weakens* the ownership case, because the thing it does
+anything, this branch _weakens_ the ownership case, because the thing it does
 well is the thing that has nothing to do with this library.
 
 ## The other questions
@@ -619,7 +619,7 @@ the justified capability is `timeTravel()`, and this conflicts with it. 3 is
 possible in principle but has no destination and no consumer asking for one.
 
 **Disposition: DELETED.** Executed as TH-DEL. The old negative — "LC /
-mechanically retained" — was wrong about the *reason*, and correcting a reason
+mechanically retained" — was wrong about the _reason_, and correcting a reason
 does not produce a positive. `trackHistory` survived FORM-DEL because it was
 already compositional, which made it a coherent primitive; the audit asked
 whether that makes it SignalTree's to publish, and the answer is no on both
@@ -710,8 +710,8 @@ separable questions:
 **Part 2 is the one to attack.** Identity can be perfect while the causal
 classification is wrong. If `setAll()` puts a background refresh into
 `timeTravel()` as something the user can undo, the missing primitive is not
-"loader" — it is closer to *apply externally acquired collection truth, with
-entity lifetime preserved and the correct causal classification*. That is a far
+"loader" — it is closer to _apply externally acquired collection truth, with
+entity lifetime preserved and the correct causal classification_. That is a far
 more general seam than a loader, and it is the shape the forms work produced.
 
 If current public collection replacement already gets all three right, C2
@@ -745,18 +745,18 @@ A3's deletion creates no hole for `loader` to fill.
 
 ## The cases
 
-| # | case | tests |
-| --- | --- | --- |
-| 1 | initial load `[A,B]` | basic external acquisition |
-| 2 | refresh `[A',B']`, same keys | surviving subject identity |
-| 3 | refresh `[B,C]` | B survives, A retires, C is new |
-| 4 | A returns later | key reuse must NOT resurrect A's old subject |
-| 5 | params P1 → P2 | who owns clearing and supersession |
-| 6 | P1 slow, P2 fast | a stale response must not overwrite a newer scope |
-| 7 | refresh with identical values | no false semantic work |
-| 8 | `timeTravel()` enabled | does acquisition pollute user history? |
-| 9 | pending transaction on a refreshed row | whose truth wins |
-| 10 | destroy a route-scoped tree | controller lifecycle terminates |
+| #   | case                                   | tests                                             |
+| --- | -------------------------------------- | ------------------------------------------------- |
+| 1   | initial load `[A,B]`                   | basic external acquisition                        |
+| 2   | refresh `[A',B']`, same keys           | surviving subject identity                        |
+| 3   | refresh `[B,C]`                        | B survives, A retires, C is new                   |
+| 4   | A returns later                        | key reuse must NOT resurrect A's old subject      |
+| 5   | params P1 → P2                         | who owns clearing and supersession                |
+| 6   | P1 slow, P2 fast                       | a stale response must not overwrite a newer scope |
+| 7   | refresh with identical values          | no false semantic work                            |
+| 8   | `timeTravel()` enabled                 | does acquisition pollute user history?            |
+| 9   | pending transaction on a refreshed row | whose truth wins                                  |
+| 10  | destroy a route-scoped tree            | controller lifecycle terminates                   |
 
 Case 9 is the one that could force a statement we have been getting for free:
 when server truth arrives for a row an unresolved optimistic transaction is
@@ -790,13 +790,13 @@ Run with an ordinary `entityMap` and acquisition composed beside it. No
 
 ## C1 — structural identity composes PERFECTLY, with nothing added
 
-| case | result |
-| --- | --- |
+| case                                              | result                                                                                       |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | 1-2 initial load, then refresh with the same keys | surviving key keeps its `SubjectId`; a reference held across the refresh reads the new value |
-| 3 refresh drops A, keeps B, adds C | B's lifetime survives, A retires, C is new |
-| 4 A returns later | new lifetime; the reference held before the gap stays `undefined` — no resurrection |
-| 7 refresh with identical values | no identity churn |
-| 10 destroy, then a late response | does not throw into the acquirer |
+| 3 refresh drops A, keeps B, adds C                | B's lifetime survives, A retires, C is new                                                   |
+| 4 A returns later                                 | new lifetime; the reference held before the gap stays `undefined` — no resurrection          |
+| 7 refresh with identical values                   | no identity churn                                                                            |
+| 10 destroy, then a late response                  | does not throw into the acquirer                                                             |
 
 Part 1 of C2 — the thing the earlier note guessed was the missing seam — is
 **already correct**. `setAll` over an ordinary `entityMap` is a
@@ -806,7 +806,7 @@ needs. Nothing has to be added for it.
 ## C2 — the real gap is SEMANTIC CLASSIFICATION, and the seam already exists
 
 **Case 8.** An untagged refresh is indistinguishable from an authored mutation:
-time-travel's history GROWS, and the user's undo reverts *the server's truth* to
+time-travel's history GROWS, and the user's undo reverts _the server's truth_ to
 a stale client value.
 
 ```text
@@ -845,7 +845,7 @@ the spike is a primitive that already exists internally and is unreachable.
 
 Note what 9b's policy actually is — rollback restores the pre-transaction
 baseline, so the concurrent server value is discarded. That is arguable. The
-point is that it is now a *statable consequence of classification* rather than
+point is that it is now a _statable consequence of classification_ rather than
 an accident: untagged, the same sequence cannot be resolved at all.
 
 ## Part 3 — request ownership is correctly external
@@ -855,7 +855,7 @@ scope simply replaces it, because `setAll` applies whatever it is given.
 
 That is right, not a defect. Params, cancellation, supersession and staleness
 belong to the resource/controller — which is what Angular's `resource()` already
-owns. Composition therefore *requires* a controller; it does not require
+owns. Composition therefore _requires_ a controller; it does not require
 SignalTree to grow one.
 
 ## Outcome
@@ -874,8 +874,8 @@ ordinary `entityMap` already does. What is missing is one narrow door.
 **What that door should NOT be: `withWriteContext` as-is.** It is
 enhancer-author plumbing carrying `intent`, `source`, `causalMode`, `subjectIds`
 and `positionIds`; exposing it wholesale would ship a large surface to buy one
-sentence. The earned primitive is the sentence: *apply this write as externally
-acquired truth rather than as something the user did.* Naming and shape are open
+sentence. The earned primitive is the sentence: _apply this write as externally
+acquired truth rather than as something the user did._ Naming and shape are open
 — that is a design step, not a finding.
 
 ## What A1-0 does NOT settle
@@ -883,7 +883,7 @@ acquired truth rather than as something the user did.* Naming and shape are open
 The cache conveniences, deliberately excluded from this spike. 19 production
 sites configure `staleTime: '30m'`, `swr`, `lazy` identically, which looks far
 more like a default than a feature; `tags` has zero exercised invalidation. Ask
-that question *after* the seam exists, and ask it as "which of these is missing
+that question _after_ the seam exists, and ask it as "which of these is missing
 from composition", not "how do we keep loader".
 
 ---
@@ -911,14 +911,14 @@ entityMap<ClearViewCustomerDto, string, { regionUrl: string }>({
 })
 ```
 
-| file | sites | params |
-| --- | ---: | --- |
-| `scaletrax/…/clearview.state.ts` | 6 | `{ regionUrl }`, `{ regionUrl, customerExternalId }` |
-| `scaletrax/…/dispatch.state.ts` | 4 | none, and one `{ … }` filter |
-| `trucktrax-geo/…/catalog.state.ts` | 3 | `PlantFilter` |
-| `scaletrax/…/v3edge.state.ts` | 2 | none |
-| `trucktrax-geo/…/device.state.ts` | 1 | `{ region }` |
-| `trucktrax-geo/…/work.state.ts` | 1 | `{ partyMember }` |
+| file                               | sites | params                                               |
+| ---------------------------------- | ----: | ---------------------------------------------------- |
+| `scaletrax/…/clearview.state.ts`   |     6 | `{ regionUrl }`, `{ regionUrl, customerExternalId }` |
+| `scaletrax/…/dispatch.state.ts`    |     4 | none, and one `{ … }` filter                         |
+| `trucktrax-geo/…/catalog.state.ts` |     3 | `PlantFilter`                                        |
+| `scaletrax/…/v3edge.state.ts`      |     2 | none                                                 |
+| `trucktrax-geo/…/device.state.ts`  |     1 | `{ region }`                                         |
+| `trucktrax-geo/…/work.state.ts`    |     1 | `{ partyMember }`                                    |
 
 **The uniformity is the finding.** Every site without exception uses
 `staleTime: '30m'`, `swr: true`, `lazy: true`. The only variation is
@@ -930,7 +930,7 @@ different jobs wearing one abstraction — it is one job, configured identically
 The runtime surface actually consumed is two methods on the collection node:
 
 ```ts
-force ? this._$.orders.refresh(params) : this._$.orders.load(params)
+force ? this._$.orders.refresh(params) : this._$.orders.load(params);
 ```
 
 ## ⚠️ Tags are declared 78 times and invalidated ZERO times
@@ -986,7 +986,7 @@ vocabulary.
 
 **C2 — what would core have to provide?** The seam. For forms it was
 `toWritableSignal`; here it is whatever lets an external acquirer replace a
-collection's contents *as one causal event* — preserving subject identity for
+collection's contents _as one causal event_ — preserving subject identity for
 rows that survive the refresh, so held references, transactions and undo behave.
 That is the `setAll`-with-identity question, and it is exactly the kind of core
 primitive the forms work produced. **If the answer to C2 is a small identity
@@ -1047,17 +1047,17 @@ Both are already evidence-backed:
 
 ## Cases
 
-| # | case | tests |
-| --- | --- | --- |
-| 1 | authored write to historical state | history grows; undo restores |
-| 2 | authored write to non-historical state | history does not grow |
-| 3 | realization into historical state | still does not grow |
-| 4 | historical + non-historical in one TURN | what does one undo mean |
-| 5 | historical + non-historical in one TRANSACTION | **the model discriminator** |
-| 6 | same location: authored edit, then server realization | authored reversible, realization not |
-| 7 | entity remove/rekey in a historical collection | SubjectId and restoration guarantees unchanged |
-| 8 | undo after unrelated UI mutations | the product edit reverses without rewinding unrelated state |
-| 9 | retention | non-participating state must not acquire restoration lifetime merely because `timeTravel()` exists |
+| #   | case                                                  | tests                                                                                              |
+| --- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| 1   | authored write to historical state                    | history grows; undo restores                                                                       |
+| 2   | authored write to non-historical state                | history does not grow                                                                              |
+| 3   | realization into historical state                     | still does not grow                                                                                |
+| 4   | historical + non-historical in one TURN               | what does one undo mean                                                                            |
+| 5   | historical + non-historical in one TRANSACTION        | **the model discriminator**                                                                        |
+| 6   | same location: authored edit, then server realization | authored reversible, realization not                                                               |
+| 7   | entity remove/rekey in a historical collection        | SubjectId and restoration guarantees unchanged                                                     |
+| 8   | undo after unrelated UI mutations                     | the product edit reverses without rewinding unrelated state                                        |
+| 9   | retention                                             | non-participating state must not acquire restoration lifetime merely because `timeTravel()` exists |
 
 **Case 5 is expected to decide location versus operation.** A transaction that
 atomically changes `document.content` (historical) and `ui.selectedTab`
@@ -1115,9 +1115,9 @@ when selective-history requirements are put to it.
 
 ## The headline: the mechanics are ALREADY operation-scoped
 
-The hardest semantic target named for this audit — *reverse an operation's own
+The hardest semantic target named for this audit — _reverse an operation's own
 effects against intervening non-restorable truth, rather than rewinding a
-whole-tree snapshot* — **is already met**.
+whole-tree snapshot_ — **is already met**.
 
 ```text
 edit title -> 'A'
@@ -1134,23 +1134,23 @@ truth standing.
 
 **⚠️ My first formulation of this case did not discriminate**, and I nearly
 recorded the weaker result as the finding. Placing the intervening writes
-*before* the undone operation gives the same answer under both models, because
-they are already inside the prior snapshot. Only truth arriving *after*
+_before_ the undone operation gives the same answer under both models, because
+they are already inside the prior snapshot. Only truth arriving _after_
 separates them. Same "control first" lesson as the four earlier false signals,
 in a new costume: a case that passes is not automatically a case that tested
 anything.
 
 ## The nine cases
 
-| # | measured today |
-| --- | --- |
+| #   | measured today                                                                                                                 |
+| --- | ------------------------------------------------------------------------------------------------------------------------------ |
 | 1-2 | **no notion of a non-historical branch** — a `ui.scrollTop` write and a document edit are indistinguishable; both create turns |
-| 3 | a realization into a historical branch does NOT enter history ✓ |
-| 5 | a transaction spanning both branches reverses **both**, atomically |
-| 7 | entity subject lifetime survives undo — a held reference re-publishes ✓ |
-| 9 | UI churn creates history entries; subject claims tracked separately |
-| 10a | intervening truth *before* the undone operation survives (does not discriminate) |
-| 10b | intervening truth *after* survives — **per-turn reversal confirmed** |
+| 3   | a realization into a historical branch does NOT enter history ✓                                                                |
+| 5   | a transaction spanning both branches reverses **both**, atomically                                                             |
+| 7   | entity subject lifetime survives undo — a held reference re-publishes ✓                                                        |
+| 9   | UI churn creates history entries; subject claims tracked separately                                                            |
+| 10a | intervening truth _before_ the undone operation survives (does not discriminate)                                               |
+| 10b | intervening truth _after_ survives — **per-turn reversal confirmed**                                                           |
 
 ## What this does to the model space
 
@@ -1213,21 +1213,21 @@ undo               -> 'v1'      MEASURED
                    -> 'SERVER'  what correctness requires
 ```
 
-Control (case 10b's shape): a realization to a *different* leaf **does** survive.
+Control (case 10b's shape): a realization to a _different_ leaf **does** survive.
 So this is a location-collision defect, not a general failure to respect
 realizations. Reproduced identically through the structural path
 (`updateOne` on an entity row → reverts to `orig`, discarding `SERVER`).
 
 Per-turn reversal restores the turn's recorded before-value **unconditionally**.
-It reverses the right *locations* but never asks whether its recorded
+It reverses the right _locations_ but never asks whether its recorded
 before-value is still authoritative at those locations. The consequence:
 
 > an undo silently discards server state whenever the user's last edit and a
 > later server response touched the same location
 
 That is the ordinary optimistic-update collision, not an edge case. It joins the
-two pinned P0s as the same class of bug — reversal is per-turn in *what* it
-touches but not in *whether* what it recorded still holds.
+two pinned P0s as the same class of bug — reversal is per-turn in _what_ it
+touches but not in _whether_ what it recorded still holds.
 
 Redo is consistent with undo: `canRedo()` is true and redo replays `'A'`, not
 `'SERVER'`. The realization is absent from both directions. Whatever HIST decides
@@ -1242,12 +1242,12 @@ chosen model alongside the coalesced-turn P0.
 
 Measured on the causal inventories directly, not from a heap probe:
 
-| | authored churn (40 rounds, window 5) | realization churn (40 rounds) |
-| --- | --- | --- |
-| history entries | bounded by the window | **0** |
-| claim owners | ≤ 5 | **0** |
-| claimed subjects | tracked | **0** |
-| collection correct | yes | yes (control: `ids() === ['g39']`) |
+|                    | authored churn (40 rounds, window 5) | realization churn (40 rounds)      |
+| ------------------ | ------------------------------------ | ---------------------------------- |
+| history entries    | bounded by the window                | **0**                              |
+| claim owners       | ≤ 5                                  | **0**                              |
+| claimed subjects   | tracked                              | **0**                              |
+| collection correct | yes                                  | yes (control: `ids() === ['g39']`) |
 
 ```text
 RESTORATION consequence   SATISFIED      no claim, no SubjectId retained for undo
@@ -1262,7 +1262,7 @@ classification.
 
 The diagnostic half is a different axis. There is exactly one inventory today and
 exclusion means erasure. Promising devtools visibility for excluded operations
-requires a *second* inventory — new machinery, and exactly the scope HIST-0
+requires a _second_ inventory — new machinery, and exactly the scope HIST-0
 should not smuggle in.
 
 ## HIST-0 DISPOSITION — **HIST-C, operation/turn-scoped eligibility**
@@ -1338,7 +1338,7 @@ HIST-C3  DERIVED    eligibility falls out of the existing intent/causal
 "apply external truth" ingress door. External truth is exactly the
 non-reversible class. If those are the same door, C3 is nearly free and the two
 audits converge on one public surface. What that would still leave uncovered is
-the *authored but non-reversible* case — a UI change the user genuinely caused
+the _authored but non-reversible_ case — a UI change the user genuinely caused
 but should not be able to undo — which no existing classification expresses.
 Whether that case is real is a question for evidence, not for the design.
 
@@ -1384,8 +1384,8 @@ wired to `canUndo` / `canRedo` / `undo()` / `redo()` in
 
 **Correction to how this was filed.** `trucktrax-rc1-findings.md` lists
 `history` absent with 7 call sites under "migration", and FORM-DEL (`b57ba293`)
-justified removing it with *"history() had exactly one consumer,
-form({ history }), and dies with it."* That was true of the repository and false
+justified removing it with _"history() had exactly one consumer,
+form({ history }), and dies with it."_ That was true of the repository and false
 of the product: `form({ history })` is precisely the pattern production shipped,
 and it was the **only restoration authority that survived to a production
 build**. Deleting it was still correct under TH-0 — it was a second independent
@@ -1414,7 +1414,7 @@ HIST-C3  DERIVED   INSUFFICIENT ALONE. A1's ingress door classifies EXTERNAL
                    class separates.
 ```
 
-The earlier open question — *is "authored but non-reversible" real?* — is
+The earlier open question — _is "authored but non-reversible" real?_ — is
 answered, but inverted. It is not that a few authored operations need excluding;
 it is that **almost all of them are already excluded in practice**, and the
 reversible ones are the small, deliberately designated set.
@@ -1435,7 +1435,7 @@ second engine bolted to a subtree.
 
 ### One honest limit on this evidence
 
-The stated reason for compiling `timeTravel()` out is *cost*, not semantics — and
+The stated reason for compiling `timeTravel()` out is _cost_, not semantics — and
 a note records that the runtime gate never actually fired (DEV-2367), so
 production builds were running the enhancer for some time without functional
 complaint. So Fact 1 is strong evidence about cost and only suggestive about
@@ -1494,7 +1494,7 @@ RECONCILIATION      recordHistory:false is subsumed by opt-in eligibility and
 ```
 
 That also sharpens the requirement on the prototype: the eligibility bit must not
-merely be *sufficient* to express designation — it must be sufficient to
+merely be _sufficient_ to express designation — it must be sufficient to
 **subsume** the one location-scoped exclusion already in the product.
 
 ## The contract being tested
@@ -1556,8 +1556,8 @@ ambient flag is invisible there.
 
 **`path-notifier.ts` had already solved this once.** Its `source` field is
 captured at `notify()` time with a comment naming the identical trap —
-*"the flush that delivers this entry is DEFERRED to a microtask … `isRestoring`-
-style flags that reset synchronously are already false by then."* The fix
+_"the flush that delivers this entry is DEFERRED to a microtask … `isRestoring`-
+style flags that reset synchronously are already false by then."_ The fix
 follows that precedent exactly: stamp the designation onto the write's metadata
 at `notify()`, the one synchronous choke point every write passes through, and
 read it off the delivered meta at record time.
@@ -1582,21 +1582,21 @@ Prototype: internal `withRestorationDesignation()`, `restorationEligibility:
 'designated'`. All 13 assertions in `histc2-door.spec.ts` pass; core stays at
 1771 passing and 35/35 fast gates.
 
-| # | case | result |
-| --- | --- | --- |
-| 1 | ordinary unmarked write | no entry, no undo — **and the write still lands** |
-| 2 | one marked write | exactly one turn; undo restores |
-| 3 | several marked writes, one turn | ONE atomic entry |
-| 4 | **marked + unmarked, one turn** | **the WHOLE turn reverses** |
-| 5 | two marked scopes, one tick | **one** turn — see below |
-| 6 | transaction inside a marked scope | one reversible transaction |
-| 7 | unmarked transaction | no entry; **the transaction still commits** |
-| 8 | realization inside a marked scope | stays non-historical — rule 4 holds |
-| 9 | restoration inside a marked scope | no new history — rule 5 holds |
-| 10 | nested marked scopes | idempotent, one turn |
-| — | non-eligible entity churn | **zero claims, zero claimed subjects** |
-| — | designated turn (control) | claims acquired — the zero above means something |
-| — | async designation scope | **throws ST1033**, never silently ignored |
+| #   | case                              | result                                            |
+| --- | --------------------------------- | ------------------------------------------------- |
+| 1   | ordinary unmarked write           | no entry, no undo — **and the write still lands** |
+| 2   | one marked write                  | exactly one turn; undo restores                   |
+| 3   | several marked writes, one turn   | ONE atomic entry                                  |
+| 4   | **marked + unmarked, one turn**   | **the WHOLE turn reverses**                       |
+| 5   | two marked scopes, one tick       | **one** turn — see below                          |
+| 6   | transaction inside a marked scope | one reversible transaction                        |
+| 7   | unmarked transaction              | no entry; **the transaction still commits**       |
+| 8   | realization inside a marked scope | stays non-historical — rule 4 holds               |
+| 9   | restoration inside a marked scope | no new history — rule 5 holds                     |
+| 10  | nested marked scopes              | idempotent, one turn                              |
+| —   | non-eligible entity churn         | **zero claims, zero claimed subjects**            |
+| —   | designated turn (control)         | claims acquired — the zero above means something  |
+| —   | async designation scope           | **throws ST1033**, never silently ignored         |
 
 **Case 4 is the one that had to hold** and does: one designated write promotes
 the whole turn, so the door cannot reintroduce partial reversal by another
@@ -1607,7 +1607,7 @@ restoration, never whether a write lands.
 
 ```ts
 reversible(() => tree.$.a.set(10));
-reversible(() => tree.$.b.set(20));   // same tick
+reversible(() => tree.$.b.set(20)); // same tick
 ```
 
 collapses to **one** undo step. That is the honest measurement, and it is
@@ -1643,8 +1643,8 @@ that writes entering through an editable form model are reversible, and with
 Angular Signal Forms those writes may not have a convenient callback around
 them. If the framework lets the event be wrapped, no extra API is earned. If it
 does not, the candidate is a designating mutation adapter —
-*an authored write entering through THIS adapter marks its causal operation
-reversible* — which is **not** location-scoped history, because writes to the
+_an authored write entering through THIS adapter marks its causal operation
+reversible_ — which is **not** location-scoped history, because writes to the
 same branch from another source stay ordinary. It gets added only if the real
 migration needs it.
 
@@ -1694,7 +1694,7 @@ FINDING   the same edit produces NO turn         no application callback exists
 There is nowhere to put `reversible(() => …)`. **FORM-C2-B**: the smallest
 mutation-ingress adapter is earned.
 
-One measurement shapes the adapter: wrapping the *dispatch* does designate the
+One measurement shapes the adapter: wrapping the _dispatch_ does designate the
 turn (measured: 1). No real application can exploit that — the browser
 dispatches — but it proves the directive's write is **synchronous** inside the
 event, so there is no scheduling gap for a designation to fall into. An adapter
@@ -1705,11 +1705,11 @@ that designates inside its own `set()` is therefore sound.
 `toWritableSignal(node, injector, { designatesRestoration: true })` wraps the
 write-back in the designation. `histc2-form-ingress.spec.ts`:
 
-| | result |
-| --- | --- |
-| real DOM edit through the adapter | **one reversible turn**; undo restores tree and form |
-| same branch, ordinary tree handle | **non-reversible** — the HIST-B control |
-| adapter WITHOUT the option | non-reversible — the option does the work, not the form |
+|                                   | result                                                  |
+| --------------------------------- | ------------------------------------------------------- |
+| real DOM edit through the adapter | **one reversible turn**; undo restores tree and form    |
+| same branch, ordinary tree handle | **non-reversible** — the HIST-B control                 |
+| adapter WITHOUT the option        | non-reversible — the option does the work, not the form |
 
 ```text
 NOT THIS       all writes to branch X are historical          (HIST-B)
@@ -1826,8 +1826,8 @@ rather than being fixed.
 
 ## Naming — analysis, with one candidate ruled out on evidence
 
-The public API should carry **one bit**: *this write belongs to the user's
-reversible action model.* Everything else (`intent`, `source`, `causalMode`,
+The public API should carry **one bit**: _this write belongs to the user's
+reversible action model._ Everything else (`intent`, `source`, `causalMode`,
 `subjectIds`, `positionIds`, `restorationEligibility`) is the engine's reasoning
 and stays internal.
 
@@ -1900,14 +1900,14 @@ toWritableSignal(node, injector, { undoable: true });
 That second sentence is the one the evidence forced. Case 5 measured two
 designation scopes in a single tick collapsing into ONE turn, so a name implying
 a boundary (`markRestorationBoundary`) would have shipped a promise the engine
-does not keep. Case 4 measured one designated write promoting an *undesignated*
+does not keep. Case 4 measured one designated write promoting an _undesignated_
 sibling in the same turn, so a name implying per-write scope
 (`withRestorableWrite`) would have mis-stated the unit.
 
 Not public, and deliberately: `restorationEligible`, `restorationDesignated`,
 `causalMode`, `intent`, `source`, `restorationEligibility`. Those are the
-engine's reasoning. The public surface carries one bit — *this is an undoable
-user operation.*
+engine's reasoning. The public surface carries one bit — _this is an undoable
+user operation._
 
 ## PRE-REGISTERED before the default flip
 
@@ -1932,7 +1932,7 @@ ENGINE USED HISTORY AS AN ACCIDENTAL INTERNAL TRANSPORT
 ```
 
 The third class is the one to watch. A test failing after the flip does not earn
-a wrapper; the question is whether a *product user* should be able to undo that
+a wrapper; the question is whether a _product user_ should be able to undo that
 operation.
 
 Pre-registered answers, so they are not decided under pressure:
@@ -2030,13 +2030,13 @@ fails atomically when rolling back a pending rekey would restore into an
   occupied original key
 ```
 
-A further cluster is the same mechanism seen from the positive side — *"rolls back
-a pending write while preserving a later unrelated confirmed write"* — which can
+A further cluster is the same mechanism seen from the positive side — _"rolls back
+a pending write while preserving a later unrelated confirmed write"_ — which can
 only preserve later work it knows about.
 
 **This is exactly the failure class the flip was designed to expose.** The later
 write is not a user-restorable operation; nobody wants `undoable()` on it. But
-transaction *correctness* depends on the engine knowing it happened. History had
+transaction _correctness_ depends on the engine knowing it happened. History had
 become hidden infrastructure for causal dependency detection.
 
 Designating those writes to recover green would be the worst available outcome:
@@ -2091,13 +2091,13 @@ A2  the test's SUBJECT is restoration, and it must now designate the operation
 ## Findings that came free with the flip
 
 **A pinned defect is repaired by it.** `composed-acquisition.spec.ts` CASE 8
-pinned *"an untagged refresh BECOMES an undoable user turn"* — an A1-0 finding
+pinned _"an untagged refresh BECOMES an undoable user turn"_ — an A1-0 finding
 where server data arriving without realization classification entered the undo
 stack. Under opt-in it does not, because it was never designated. The flip fixes
 it rather than needing a guard.
 
 **No second admission concept exists.** `history-step-adapter.spec.ts` describes
-a *"seam that demarcates a user-recognizable undo step"*, which read like a rival
+a _"seam that demarcates a user-recognizable undo step"_, which read like a rival
 to `undoable()`. It is `transactions()`: a GROUPING concept — several writes
 become one turn — orthogonal to whether that turn is admitted. The step-5
 invariant holds.
@@ -2141,7 +2141,7 @@ TransactionMethods` — and it is a **different implementation** from the
 `getPendingRollbackPlan()`, whose first line is:
 
 ```ts
-const laterEffects = this.history
+const laterEffects = this.history;
 ```
 
 That is the restoration history. Under opt-in, ordinary authored writes are not
@@ -2203,8 +2203,8 @@ that an UNRELATED later write leaves rollback legal — so the ledger is not mer
 ```
 
 Neither is assumed. In particular "all authored turns" is NOT pre-registered as
-the admission rule — the question is *which causal origins can create or remove a
-rollback dependency*, and authored/realization/restoration get falsified
+the admission rule — the question is _which causal origins can create or remove a
+rollback dependency_, and authored/realization/restoration get falsified
 separately.
 
 ## Relationship to DIAG-JOURNAL, kept explicit
@@ -2330,7 +2330,7 @@ server had just written to.
 here, rollback deletes a row a server refresh had confirmed. Same shape: a
 reversal discarding truth the reversing authority does not own.
 
-Not repaired here, deliberately — it *is* the ledger-admission question. Deciding
+Not repaired here, deliberately — it _is_ the ledger-admission question. Deciding
 it decides the rule:
 
 ```text
@@ -2380,8 +2380,7 @@ ordering.
 ```ts
 // time-travel.ts
 const resolveTransactionId = (meta) =>
-  typeof meta?.transactionId === 'number' &&
-  meta.transactionOwner === transactionOwnerToken   // <- ITS OWN private token
+  typeof meta?.transactionId === 'number' && meta.transactionOwner === transactionOwnerToken // <- ITS OWN private token
     ? meta.transactionId
     : undefined;
 ```
@@ -2433,8 +2432,8 @@ probe could not distinguish them, and I read agreement as absence of a collision
 
 The duplication WAS order-sensitive in exactly the way that made it worth
 deleting; my probe was simply blind to it. The test at
-`time-travel.spec.ts:1113` — *"keeps transaction authority singular for composed
-transactions() + timeTravel()"* — was, all along, exercising time-travel's
+`time-travel.spec.ts:1113` — _"keeps transaction authority singular for composed
+transactions() + timeTravel()"_ — was, all along, exercising time-travel's
 implementation rather than the composition it names.
 
 # TURN-FEED-0 — pre-registered, and deliberately narrower than its name
@@ -2474,8 +2473,8 @@ Internal. The identity is the PAIR, which is what preserves the reason
   rolled-back  its writes never happened
 ```
 
-`timeTravel()` stops asking *"is this MY transaction?"* and starts asking *"does
-this write carry a recognised ACTIVE transaction identity?"*.
+`timeTravel()` stops asking _"is this MY transaction?"_ and starts asking _"does
+this write carry a recognised ACTIVE transaction identity?"_.
 
 **The lifecycle signal does not grant restoration rights.** That separation is
 the whole point, and it gets its own control:
@@ -2552,8 +2551,8 @@ Flip 1's A count was sampled and I said so. This one is classified by cause
 shape across all 194, with the one risky shape enumerated exhaustively.
 
 The distribution is uniform: `canUndo` false, counts short, `[]` where a
-restored value was expected. Every shape reduces to *the operation was not
-designated, so no turn exists*.
+restored value was expected. Every shape reduces to _the operation was not
+designated, so no turn exists_.
 
 The shape that could hide a C is **"expected [Function] to throw an error"** — a
 refusal that stopped firing, which is exactly how flip 1's C presented. All 15
@@ -2762,8 +2761,8 @@ tree.undo()  ->  every delivered write carries causalMode 'realization'
 ```
 
 So a diagnostic projection can see that something happened and can see it was
-non-authored, but cannot say *this was a restoration* rather than *this was a
-server refresh*.
+non-authored, but cannot say _this was a restoration_ rather than _this was a
+server refresh_.
 
 Not a new discovery so much as a third sighting of the same gap:
 
@@ -2897,7 +2896,7 @@ devtools       realization      devtools
 ### ⚠️ CORRECTION — that collapse does not follow, and I claimed it did
 
 I wrote that flipping the devtools row makes participation derivable —
-*authored iff origin is absent*. **That is wrong**, and the table I had just
+_authored iff origin is absent_. **That is wrong**, and the table I had just
 recorded refutes it:
 
 ```text
@@ -2956,8 +2955,8 @@ source      ->  origin
 ```
 
 `realization` survives as a VALUE. The audit supports the reading that the
-mistake was the field name rather than the word: *apply this as established truth
-rather than as newly authored work* is a coherent participation mode that
+mistake was the field name rather than the word: _apply this as established truth
+rather than as newly authored work_ is a coherent participation mode that
 restoration and external truth can legitimately share, precisely because origin
 now distinguishes them.
 
@@ -3052,8 +3051,8 @@ ownership relationship for another.
 
 Routing a jump through the restoration authority would require it to satisfy
 designation, validity, refusal and claim semantics. But a scrub is not asking
-*reverse one previously designated operation legally*; it is asking *show the tree
-as this snapshot*. Most jump targets were never designated at all, so the
+_reverse one previously designated operation legally_; it is asking _show the tree
+as this snapshot_. Most jump targets were never designated at all, so the
 authority would have to refuse nearly every one — which is not a DevTools feature,
 it is its removal.
 
@@ -3434,7 +3433,7 @@ pays nothing.
 
 > ⚠️ But there IS a real muddle next door, and it is not the application default.
 > `tree-realization-adapter` publishes with `getActiveWriteContext()?.source ??
-> 'system'` at **seven** sites. So an internal write does not fall back to
+'system'` at **seven** sites. So an internal write does not fall back to
 > absence; it fabricates `'system'`, which the naming grid rightly wants
 > deprecated. That is the thing to attack — a fake positive origin, not a
 > truthful absent one.
@@ -3472,12 +3471,7 @@ reversal. Diagnostics = observation. None may impersonate another.
 ```ts
 type WriteParticipation = 'authored' | 'realized' | 'inspection';
 
-type WriteOrigin =
-  | 'external'
-  | 'restoration'
-  | 'devtools'
-  | 'transaction-rollback'   // exact value pending its consumer audit
-  ;                          // no 'application' — see A1-N
+type WriteOrigin = 'external' | 'restoration' | 'devtools' | 'transaction-rollback'; // exact value pending its consumer audit // no 'application' — see A1-N
 ```
 
 ## ⚠️ Correction 1 — `historyEffect` must NOT become `restorationEffect`
@@ -3580,7 +3574,7 @@ c52b0932  batch 6+7 finish and grep
 
 ```ts
 type WriteParticipation = 'authored' | 'realized' | 'inspection';
-type WriteOrigin        = 'restoration' | 'devtools' | 'external';
+type WriteOrigin = 'restoration' | 'devtools' | 'external';
 ```
 
 ```ts
@@ -3850,8 +3844,8 @@ enhancer host  !== the public tree        applyEnhancers runs, THEN createBuilde
 ```
 
 The channel was a symbol on whatever object was asked, and
-`getTransactionLifecycleChannel()` did two jobs at once — *create if missing* for
-the owner, *find* for an observer. So an observer asking the public tree did not
+`getTransactionLifecycleChannel()` did two jobs at once — _create if missing_ for
+the owner, _find_ for an observer. So an observer asking the public tree did not
 fail: it silently got a brand-new channel that could never fire. **Fail-open by
 construction.**
 
@@ -3898,7 +3892,7 @@ is keyed on having no OWNER, not on the `transactions()` enhancer specifically.
 
 Every case that SUBSCRIBES composes `restoration() + transactions()`. The one
 single-enhancer case asserts only that behaviour is unchanged and never
-subscribes — its comment, *"announcing to nobody is not an error"*, was true of
+subscribes — its comment, _"announcing to nobody is not an error"_, was true of
 what it tested and quietly normalised the missing condition.
 
 ```text
@@ -3973,8 +3967,8 @@ the requirement.
 8c  no owner, no channel                      -> legitimate absence
 ```
 
-13 cases green. This is the third finding in this seam produced by asking *why*
-a green test is green rather than *whether* it is green.
+13 cases green. This is the third finding in this seam produced by asking _why_
+a green test is green rather than _whether_ it is green.
 
 # F1 REPRESENTATION — TERMINAL
 
@@ -4204,7 +4198,7 @@ turn 2   compensation   transactionId 1, origin 'transaction-rollback', realized
 
 A reader joins all three on transaction 1 without temporal adjacency. A CONFIRMED
 transaction produces no `'transaction-rollback'` provenance, which keeps the
-origin meaning *compensation* rather than *a write near a transaction*.
+origin meaning _compensation_ rather than _a write near a transaction_.
 
 The original DIAG-JOURNAL-1 case that measured the gap is kept, updated, and
 points here — the file where a gap was found is worth keeping as the place a
@@ -4348,15 +4342,15 @@ C13  server response to a user's POST      ⚠ ambiguous (mirrors R19)
 > persistence sites were excluded because PER-B owns whether durable read-back is
 > realized participation; letting CONSTRUCTED persistence cases influence the
 > winner anyway would smuggle that decision back in. They are used only for
-> sensitivity: *if PER-B later classifies durable read-back as acquired, does the
-> candidate still read correctly?*
+> sensitivity: _if PER-B later classifies durable read-back as acquired, does the
+> candidate still read correctly?_
 
 > **CORRECTION 3 — the worker case splits, and it is a TRAP.** Physical origin is
 > not semantic origin.
 >
 > ```ts
-> const price = await worker.calculatePrice(localInputs);   // C5a — AUTHORED
-> const reading = await hardwareWorker.readSensor();        // C5b — ACQUIRED
+> const price = await worker.calculatePrice(localInputs); // C5a — AUTHORED
+> const reading = await hardwareWorker.readSensor(); // C5b — ACQUIRED
 > ```
 >
 > Both literally "came in" over `postMessage`. They are classified differently.
@@ -4449,10 +4443,10 @@ taste. Where the criteria did not discriminate, that is recorded too.
 ```ts
 // R18, ticket.ops.loadTickets$, as it exists today
 this._ticketApi.getMyTickets$({ startDate, endDate }).pipe(
-  tap(page => {
+  tap((page) => {
     this._$tickets.entities.setAll(page.items ?? []);
     this._setLoaded();
-  }),
+  })
 );
 ```
 
@@ -4474,18 +4468,18 @@ once.
 ```ts
 // C5a — the worker is an implementation detail of APP-OWNED computation
 const price = await pricingWorker.calculate(localInputs);
-tree.$.quote.total.set(price);            // authored. NO wrapper belongs here.
+tree.$.quote.total.set(price); // authored. NO wrapper belongs here.
 
 // C5b — the worker relays a device observation
 const reading = await sensorWorker.read();
-tree.$.telemetry.set(reading);            // acquired. A wrapper belongs here.
+tree.$.telemetry.set(reading); // acquired. A wrapper belongs here.
 ```
 
 Now the same two sites under each family:
 
 ```ts
-incoming(() => tree.$.quote.total.set(price));      // ⚠️ reads CORRECT and is WRONG
-incoming(() => tree.$.telemetry.set(reading));      // reads correct, is right
+incoming(() => tree.$.quote.total.set(price)); // ⚠️ reads CORRECT and is WRONG
+incoming(() => tree.$.telemetry.set(reading)); // reads correct, is right
 
 applyExternal(() => tree.$.quote.total.set(price)); // reads WRONG — good
 applyExternal(() => tree.$.telemetry.set(reading)); // reads correct, is right
@@ -4494,7 +4488,7 @@ applyExternal(() => tree.$.telemetry.set(reading)); // reads correct, is right
 `incoming()` cannot separate them, because both values did arrive. The word is
 true of the transport in both cases and true of the semantics in only one.
 `applyExternal()` separates them, because a price the application asked its own
-worker to compute is not *external* to the application — the authority never
+worker to compute is not _external_ to the application — the authority never
 left. **T4 fires for the whole event/source family.**
 
 ### R22 — scope-boundary, on real mixed code
@@ -4508,15 +4502,15 @@ this._store.ops.tickets.loadTertiaryData$(ticket.id).subscribe();
 ```ts
 // what an event-word invites
 incoming(() => {
-  ops.tickets.setActiveTicket(ticket);      // acquired DATA + authored SELECTION
-  ops.tickets.loadTertiaryData$(ticket.id).subscribe();   // and an async call
+  ops.tickets.setActiveTicket(ticket); // acquired DATA + authored SELECTION
+  ops.tickets.loadTertiaryData$(ticket.id).subscribe(); // and an async call
 });
 
 // what an action-word invites
 applyExternal(() => {
-  ops.tickets.applyTicketData(ticket);      // just the acquired write
+  ops.tickets.applyTicketData(ticket); // just the acquired write
 });
-ops.tickets.selectActive(ticket.id);        // the authored decision, outside
+ops.tickets.selectActive(ticket.id); // the authored decision, outside
 ```
 
 The event word describes the callback, so the callback is what gets wrapped —
@@ -4675,24 +4669,20 @@ code, not trusted.
 
 ```ts
 // today
-return this._deviceService.create$(body).pipe(
-  tap(device => this._$.glinxDevices.upsertMany(this._keyedDevices([device]))),
-);
+return this._deviceService.create$(body).pipe(tap((device) => this._$.glinxDevices.upsertMany(this._keyedDevices([device]))));
 ```
 
 ```ts
-tap(device => applyExternal(() =>
-  this._$.glinxDevices.upsertMany(this._keyedDevices([device]))));
+tap((device) => applyExternal(() => this._$.glinxDevices.upsertMany(this._keyedDevices([device]))));
 
-tap(device => incoming(() =>
-  this._$.glinxDevices.upsertMany(this._keyedDevices([device]))));
+tap((device) => incoming(() => this._$.glinxDevices.upsertMany(this._keyedDevices([device]))));
 ```
 
 Both read acceptably, and both are correct — the applied value IS the server's
-record. But they teach differently. `applyExternal` says *the record you are
-storing is the server's, not yours*, which is the fact that matters when someone
-later wonders why creating a device is not an undo step. `incoming` says *this
-arrived*, which is true and does not answer the question.
+record. But they teach differently. `applyExternal` says _the record you are
+storing is the server's, not yours_, which is the fact that matters when someone
+later wonders why creating a device is not an undo step. `incoming` says _this
+arrived_, which is true and does not answer the question.
 
 **Neither is eliminated here. `applyExternal` instructs; `incoming` narrates.**
 
@@ -4905,7 +4895,7 @@ Both C5a and R22 survive the reweighting intact:
 
 ```ts
 const price = await pricingWorker.calculate(localInputs);
-incoming(() => tree.$.quote.total.set(price));   // feels right, IS WRONG
+incoming(() => tree.$.quote.total.set(price)); // feels right, IS WRONG
 ```
 
 That is not a cold-reader problem. It is precisely **misuse attraction** — the
@@ -4959,7 +4949,7 @@ acquired()            ★       ★         ★~     ~✗      ★★★    REJE
 `acquired()` was generated by the reframing itself — adjective-shaped like
 `undoable`, and about authority rather than transport. It is rejected on the new
 heavyweight it was built for: writing `api.get().subscribe(r => …)`, a developer
-retrieves *incoming*, *external*, *received* long before *acquired*.
+retrieves _incoming_, _external_, _received_ long before _acquired_.
 
 `external()` is the honest runner-up and its only remaining defect is scope
 guidance: as an adjective it characterises the surrounding context, so R22's
@@ -5034,8 +5024,8 @@ The worker pair is the load-bearing evidence and it is untouched by the criterio
 change, because it was never a comprehension result:
 
 ```ts
-const price   = await pricingWorker.calculate(localInputs);  // app-owned
-const reading = await sensorWorker.read();                   // acquired
+const price = await pricingWorker.calculate(localInputs); // app-owned
+const reading = await sensorWorker.read(); // acquired
 ```
 
 ```text
@@ -5146,7 +5136,7 @@ error as crediting a name 19 times for one situation, and the same shape as the
 `apply` buys nothing measurable.
 
 The one argument left for it is authoring-time affordance: a developer inside a
-socket handler thinking *"this handler is external state arriving"* might wrap
+socket handler thinking _"this handler is external state arriving"_ might wrap
 broadly, whereas `applyExternal` demands they name a thing being applied. **That
 argument is refused as evidence here**, because it is precisely the introspective
 affordance reasoning this study has already classified as its weakest, and it
@@ -5162,7 +5152,7 @@ applyExternal(() => tree.$.quote.total.set(price));   // "reads WRONG — good"
 
 That was over-credited. A pricing worker runs off the main thread, in another
 module, reached by `postMessage` — a developer may quite reasonably read it as
-*external*. The honest result:
+_external_. The honest result:
 
 ```text
 the worker trap DISCRIMINATES    incoming/received  vs  external/acquired family
@@ -5321,7 +5311,7 @@ APPLICATION of the value. And the study's sharpest trap discriminates the two
 words:
 
 ```ts
-const price = await pricingWorker.calculate(localInputs);   // app-owned
+const price = await pricingWorker.calculate(localInputs); // app-owned
 
 acquired(() => tree.$.quote.total.set(price));
 // "did I acquire this from the worker?"  LITERALLY YES. The word affirms the
@@ -5451,11 +5441,11 @@ it does NOT mean another thread, module, worker, tab, process, server or machine
 
 ```ts
 const price = await pricingWorker.calculate(inputs);
-tree.$.price.set(price);              // authored. The app delegated COMPUTATION;
-                                      // authority never left.
+tree.$.price.set(price); // authored. The app delegated COMPUTATION;
+// authority never left.
 
 const reading = await sensorWorker.readSensor();
-external(() => tree.$.temperature.set(reading));   // another authority observed it
+external(() => tree.$.temperature.set(reading)); // another authority observed it
 ```
 
 **The frame requires no implementation change**, which is the strongest evidence
@@ -5475,9 +5465,9 @@ STANDS      external() wins because SignalTree's causal perspective is chosen as
             `external` is the term that perspective uses.
 ```
 
-`acquired` is application-perspective language — *I acquired this value*.
-`external` is store-perspective language — *this write's authority is outside
-this operation*. Had the application's perspective been chosen as canonical,
+`acquired` is application-perspective language — _I acquired this value_.
+`external` is store-perspective language — _this write's authority is outside
+this operation_. Had the application's perspective been chosen as canonical,
 `acquired()` could have won **and the metadata should have moved with it**. What
 is not available is mixing them.
 
@@ -5508,7 +5498,7 @@ never reads the definition will reason:
 
 ```ts
 // the worker is a different thread, therefore external
-external(() => tree.$.price.set(price));   // ⚠️ WRONG, and it reads fine
+external(() => tree.$.price.set(price)); // ⚠️ WRONG, and it reads fine
 ```
 
 **The frame does not remove the C5a trap. It relocates it from the choice of word
@@ -5527,8 +5517,8 @@ with the frame      ask who owned the DECISION, from the current operation's
 
 Net assessment: a simplification, with the residual risk being that the word's
 plain meaning competes with its defined meaning. That risk is measurable, and it
-is precisely question 2 of the outside check already on the board — *given
-`const price = await pricingWorker.calculate(inputs)`, does the door belong?* A
+is precisely question 2 of the outside check already on the board — _given
+`const price = await pricingWorker.calculate(inputs)`, does the door belong?_ A
 developer pool that answers "yes" is measuring the topological misreading, and
 that would be real evidence against `external()` rather than against the frame.
 
@@ -5544,8 +5534,8 @@ NOT REOPENING       C5a as a word discriminator (failed twice), either enum,
                     incoming(), realize()
 ```
 
-The definition must ship WITH the door — the JSDoc's first line has to be *outside
-the authority of the current authored operation, not outside your process* —
+The definition must ship WITH the door — the JSDoc's first line has to be _outside
+the authority of the current authored operation, not outside your process_ —
 because that sentence is now load-bearing rather than explanatory.
 
 # DX-NAMES-1 · STEP 5 — the outside check, pre-registered and BLOCKED on people
@@ -5823,11 +5813,11 @@ P12  repeated reload of the same value     no fake authored turns or restoration
 
 ```ts
 const saved = await adapter.load();
-external(() => tree.$.settings.set(saved));   // synchronous application
+external(() => tree.$.settings.set(saved)); // synchronous application
 ```
 
-Stronger now that `external()` has a coordinate system — *did the current
-authored operation own the state decision?* For an explicit reload the answer is
+Stronger now that `external()` has a coordinate system — _did the current
+authored operation own the state decision?_ For an explicit reload the answer is
 usually no. **But PER-B must PROVE that rather than assume "storage = external".**
 
 ## Transaction expectation, stated before measuring
@@ -5838,7 +5828,7 @@ would turn rollback-able work into an external observation of its own speculatio
 
 Prior art already in the tree, to be tested rather than trusted:
 `internals/commit-consequence.ts` claims a single commit-scope authority with the
-rule *durable storage never gets ahead of the tree's settled commit state*, and
+rule _durable storage never gets ahead of the tree's settled commit state_, and
 `transactions()` opens that scope before the callback runs. Whether it holds for
 `reload()` as well as for saves is P4's question.
 
@@ -5920,14 +5910,14 @@ P5   speculative state never reached storage; after rollback live and durable
 P7   persistence observes a confirmed transaction only AFTER settlement
 ```
 
-`internals/commit-consequence.ts`'s rule — *durable storage never gets ahead of
-the tree's settled commit state* — is doing real work rather than asserting
+`internals/commit-consequence.ts`'s rule — _durable storage never gets ahead of
+the tree's settled commit state_ — is doing real work rather than asserting
 itself. Tested rather than trusted, as pre-registered.
 
 ## A falsifier left in place by an earlier session, and it tripped
 
-`restoration.spec.ts` carried a test titled *"records history for stored clear()
-and reload()"* whose comment pre-registered this exact outcome:
+`restoration.spec.ts` carried a test titled _"records history for stored clear()
+and reload()"_ whose comment pre-registered this exact outcome:
 
 > ⚠️ OPEN QUESTION for PER-B … If reload is reclassified as a realization, this
 > designation goes and the assertion inverts.
@@ -6005,7 +5995,7 @@ armed write commits even if its tree is gone. Losing a user's last setting becau
 a per-route tree was torn down is the worse behaviour, and a mobile WebView kill is
 the common case rather than a corner one.
 
-The pre-registered question was *"no late write into dead ownership"*, and the
+The pre-registered question was _"no late write into dead ownership"_, and the
 refined probe answers the direction that actually matters:
 
 ```text
@@ -6027,9 +6017,9 @@ answer     YES, once reload() is classified. One misclassification produced two
            not have.
 ```
 
-Against the acceptance bar — *persistence may observe and reproduce state, and
+Against the acceptance bar — _persistence may observe and reproduce state, and
 must never manufacture authorship, restoration rights, transaction settlement or
-causal authority merely because data crossed durable storage*:
+causal authority merely because data crossed durable storage_:
 
 ```text
 authorship              no — reload is realized, autoload is not a causal event
@@ -6039,8 +6029,8 @@ transaction settlement  no — P5/P7, the commit-scope authority already held
 causal authority        no — no `origin: 'storage'`, no branch on the adapter
 ```
 
-And against the falsifier — *if the same authoritative value gets different
-restoration/transaction semantics because the adapter changed, PER-B fails*:
+And against the falsifier — _if the same authoritative value gets different
+restoration/transaction semantics because the adapter changed, PER-B fails_:
 
 ```text
 BEFORE   HTTP via external()  protected by P0-C, excluded from contribution
@@ -6253,8 +6243,8 @@ edit inside an unexamined class.
 
 ## M1 — policy derived from origin: ONE branch, and it is CORRECT
 
-Five live `origin ===` branches. Four are self- or foreign-filtering (*don't
-observe my own output*, *another authority's replay is not my business*) plus one
+Five live `origin ===` branches. Four are self- or foreign-filtering (_don't
+observe my own output_, _another authority's replay is not my business_) plus one
 coalescing-identity check, none of which derives policy from provenance.
 
 The fifth is real policy — and it is the strongest evidence in the repo that
@@ -6275,7 +6265,7 @@ merge while an undo must restore. Only origin separates them.
 > So `origin` is a DIAGNOSTIC axis with exactly one policy consumer, by design.
 > That is not M1; it is the two-axis result being load-bearing. And it sharpens
 > the prohibition rather than weakening it: policy keys on PARTICIPATION unless
-> the question is literally *which authority replayed this*.
+> the question is literally _which authority replayed this_.
 
 ## M2 — the origin values, each with a named consumer
 
@@ -6673,7 +6663,7 @@ boundedly, observes lifecycle facts, preserves a monotonic sequence for
 correlation, exposes `turns()` / `transactionEvents()`, and disposes cleanly.
 That behaviour is READ-ONLY, which is a different thing from absent.
 
-And MATRIX-CLOSE's null explicitly covers *diagnostic* concepts, so excluding the
+And MATRIX-CLOSE's null explicitly covers _diagnostic_ concepts, so excluding the
 journal would have defined **every observation-only mechanism out of M6** — a
 rule that would have exempted exactly the kind of mechanism most likely to be
 silently inert. TURN-FEED-0.2 is the standing proof that an observer can be
@@ -6703,8 +6693,8 @@ restoration rights   unchanged
 transaction result   unchanged
 ```
 
-The original entry's own words — *"removing it must break nothing except its own
-specs"* — were already almost the right expectation. Its specs ARE the proof of
+The original entry's own words — _"removing it must break nothing except its own
+specs"_ — were already almost the right expectation. Its specs ARE the proof of
 the behaviour it owns; "nothing else breaks" is the non-interference half.
 
 ### And this repairs S3 rather than weakening it
@@ -6813,7 +6803,7 @@ full suite 1885 passed, 20 skipped                                     -> GREEN
 ```
 
 **Forcing the mode breaks nothing in the entire suite.** So the row's claimed
-behaviour — *a restoration replay is applied exactly; a rehydrate normalises* —
+behaviour — _a restoration replay is applied exactly; a rehydrate normalises_ —
 has no proof.
 
 This retracts a claim MATRIX-CLOSE pass 1 made:
@@ -6985,9 +6975,9 @@ M6                8 probes: 6 proven, 2 not
 S3, S5            RESOLVED by deletion, each with a permanent proof of why
 ```
 
-Against the stopping rule — *every surviving concept has an owner, a consumer, a
+Against the stopping rule — _every surviving concept has an owner, a consumer, a
 semantic dimension and a falsifiable proof, and every unexplained residue is
-deleted or explicitly carried*:
+deleted or explicitly carried_:
 
 ```text
 SIX PROVEN SURVIVORS   restoration designation, participation, transaction
@@ -7096,16 +7086,16 @@ EditSession.getEditHistory()                dead public surface — pass 2A rena
                                             something no consumer can call
 ```
 
-The barrel's own comment says *"Moved to '@signaltree/core/edit-session' in v9.
-Import from there to reduce main bundle size"* — pointing at a subpath that does
+The barrel's own comment says _"Moved to '@signaltree/core/edit-session' in v9.
+Import from there to reduce main bundle size"_ — pointing at a subpath that does
 not exist.
 
 **Why no gate caught it.** `lint-readme-apis` validates symbols against BUILT
 ENTRY POINTS, and there are two (core, shared); an import from a path that is not
 an entry point is not checked against anything. `find-dead-exports` measures
 reachability from barrels and in-repo imports — edit-session's own specs import
-it, so it looks reachable. Neither gate asks *"is this reachable from a PUBLISHED
-entry point?"*
+it, so it looks reachable. Neither gate asks _"is this reachable from a PUBLISHED
+entry point?"_
 
 ```text
 FIXED     the README block, which no longer teaches unresolvable imports
@@ -7173,7 +7163,7 @@ name claiming an authority it did not have, and RELEASE-RESIDUE then found the
 whole surface was unreachable.
 
 The repo already half-knew. `docs/myths-and-misconceptions.md` said plainly that
-`18fe5781` withdrew the subpath and *"There is no import path for it"*, and
+`18fe5781` withdrew the subpath and _"There is no import path for it"_, and
 `check-rc-public-dispositions.mjs` recorded it as **"UNPLACED edit-session
 subpath; null not run"** — while the README taught the import and the barrel
 comment pointed readers at it. **The fact was right in two places and contradicted
@@ -7463,8 +7453,8 @@ case 2  imperative feature-flag load
 
 ## ⚠️ BUT THE PREMISE WAS WRONG, and it changes the outcome
 
-The brief said A3 *"was explicitly left unresolved and then disappeared behind a
-blocked-symbol list"*. **It was resolved, by measurement.** `4decd287` deleted the
+The brief said A3 _"was explicitly left unresolved and then disappeared behind a
+blocked-symbol list"_. **It was resolved, by measurement.** `4decd287` deleted the
 marker with a rationale from derivation S1:
 
 > the two capabilities the API implied — **transition governance** and **lifecycle
@@ -7527,7 +7517,7 @@ five" — wrong arithmetic, corrected here before it could be inherited as fact.
 reopen together, because they are two halves of one capability.)
 
 Only persistence has new evidence, and it is the one the brief was right to single
-out: PER-B did not exist when *"NOT EARNED as RC public API"* was written.
+out: PER-B did not exist when _"NOT EARNED as RC public API"_ was written.
 
 # A2-REOPEN — PRE-REGISTERED. The capability, not the spelling
 
@@ -7568,7 +7558,7 @@ The discriminating question, and the one Signal Forms already taught once:
 > **Does persistence need to change what a BRANCH IS, or is it behaviour attached
 > to ordinary state?**
 
-Forms resolved as *ordinary state + composition* when the capability could live
+Forms resolved as _ordinary state + composition_ when the capability could live
 outside the tree ontology. Persistence may be the next such case — or may be the
 exception, for one specific reason tested first.
 
@@ -7675,9 +7665,9 @@ And the footprint is genuinely synchronous, which is why the result stands for i
 TruckTrax's Preferences usage is a separate, hand-rolled async path (device
 tokens) that has never gone through `stored()`.
 
-So the honest claim is: *for the demonstrated localStorage footprint*, `stored()`
-does not uniquely own construction materialisation. Not: *on every platform this
-footprint targets.*
+So the honest claim is: _for the demonstrated localStorage footprint_, `stored()`
+does not uniquely own construction materialisation. Not: _on every platform this
+footprint targets._
 
 So the answer to A2-1's question is **no**: the marker does not own construction
 materialisation. What it provides over arm C is the read boilerplate, once per
@@ -7735,8 +7725,8 @@ CONTROL               the same source awaited in app bootstrap, BEFORE
 
 **The transient and the causal write are properties of the ASYNCHRONY, not of the
 API shape.** So async materialisation cannot argue for any placement — it is a
-scope limit to state publicly: *construction materialisation is synchronous-source
-only; asynchronous sources preload in application bootstrap.*
+scope limit to state publicly: _construction materialisation is synchronous-source
+only; asynchronous sources preload in application bootstrap._
 
 ## ⚠️ A fact that carries straight into A2-4
 
@@ -7854,8 +7844,8 @@ routing through the consequence authority does not confer safety by itself.
 
 ## FINDING 2 — ⚠️ WITHDRAWN. See "A2-3.1 FINDING 2 WITHDRAWN" below
 
-*(The measurement in this subsection stands — `interceptLeafSignals` really is
-refused on an enhanced tree. The CONCLUSION drawn from it does not.)*
+_(The measurement in this subsection stands — `interceptLeafSignals` really is
+refused on an enhanced tree. The CONCLUSION drawn from it does not.)_
 
 ## FINDING 2 (as originally recorded) — a post-construction capability has NO observation seam
 
@@ -8068,13 +8058,13 @@ a demonstrated need before it becomes public surface.
 
 ## ⚠️ What A2 CANNOT settle, and must not decide by itself
 
-The freeze runs into a recorded prior decision, `c53aa416` (2026-08-21, *"remove
-stored marker from public rc surface"*), which unexported `stored`,
+The freeze runs into a recorded prior decision, `c53aa416` (2026-08-21, _"remove
+stored marker from public rc surface"_), which unexported `stored`,
 `createStorageKeys`, `clearStoragePrefix`, `flushAllStoredSignals` and their
 types, and swept them out of the README, `docs/ai/LLM.md`, both persistence
 guides and the demo. TT2 already recorded it, with the disposition text from
-`check-rc-public-dispositions.mjs`: *"NOT EARNED as RC public API; consequence
-ordering fix is not survival proof."*
+`check-rc-public-dispositions.mjs`: _"NOT EARNED as RC public API; consequence
+ordering fix is not survival proof."_
 
 A2's evidence cuts BOTH ways and is now on the record for whoever decides:
 
@@ -8205,8 +8195,8 @@ measurement is what changed it, which is the whole reason the audit was owed.
 
 ## The first explanation was wrong
 
-I recorded the cause as *"the notifier coalesces by PATH STRING within a flush,
-with no tree qualification."* It does not.
+I recorded the cause as _"the notifier coalesces by PATH STRING within a flush,
+with no tree qualification."_ It does not.
 
 ```text
 PathNotifier.batchIdentityMode   defaults to 'path-position-subject'
@@ -8232,8 +8222,8 @@ Measured delivery for `a.$.theme.set('a1'); b.$.theme.set('b1')` in one flush:
 DELIVERED: [ "theme=b1 pos=[2] subj=undefined" ]
 ```
 
-`positionId` means *"position 2 in THIS tree's registry"*. The notifier consumes
-it as *"position 2 in the process"*. A registry-local identifier is being used
+`positionId` means _"position 2 in THIS tree's registry"_. The notifier consumes
+it as _"position 2 in the process"_. A registry-local identifier is being used
 across a namespace boundary it does not span.
 
 ## The same missing fact A2-3 hit
@@ -8246,7 +8236,7 @@ getPositionRegistry(tree.$)        defined
 ```
 
 `definePositionRegistry` is called on `tree` and `tree.$` only
-(`signal-tree.ts:1174`). So A2-3's *"a leaf resolves no commit scope"* is not
+(`signal-tree.ts:1174`). So A2-3's _"a leaf resolves no commit scope"_ is not
 "a leaf has no owner identity" — it has a position NUMBER with no way to say
 which registry indexes it. One sentence covers both findings:
 
@@ -8299,8 +8289,8 @@ defects require is not speculative.
 
 `a2-3-1-rollback-cancellation.spec.ts` gains two arms.
 
-Finding 2 concluded *"a post-construction durability capability has no usable
-seam, therefore A2-C must be an ENHANCER."* That followed from needing a
+Finding 2 concluded _"a post-construction durability capability has no usable
+seam, therefore A2-C must be an ENHANCER."_ That followed from needing a
 SYNCHRONOUS seam — which was only needed to land in the cancellable bucket —
 which Finding 1 had already shown unnecessary. Same seam A2-3 arm C used, same
 authority, same `heldByKey` bucket; only capture timing differs:
@@ -8336,7 +8326,7 @@ unless the operation represents an EVENT rather than state synchronisation.
 
 ## The question was wrong first
 
-It began as *"is a branch retrieve ONE causal turn?"* — too coarse both ways. A
+It began as _"is a branch retrieve ONE causal turn?"_ — too coarse both ways. A
 three-value payload legitimately produces three mutation events; and nothing
 downstream may inherit the acquisition's authority, or provenance becomes
 contagious:
@@ -8347,8 +8337,8 @@ storage -> external write -> effect -> write -> effect -> write
 ```
 
 The debugger version is the concrete one: load `theme = 'light'` and watch six
-unrelated fields change under one external banner. *Where did all that other
-data come from?* is the correct developer reaction, and the tool caused it.
+unrelated fields change under one external banner. _Where did all that other
+data come from?_ is the correct developer reaction, and the tool caused it.
 
 The invariant under test instead:
 
@@ -9221,9 +9211,9 @@ and inherits the namespace from `emitOwnedMutation`.
 
 # AFTER-COMMIT-0 — ⚠️ ITS HEADLINE IS WITHDRAWN BY AFTER-COMMIT-1
 
-*(Everything below about the CONTRACT stands. The conclusion that `X` is earned
+_(Everything below about the CONTRACT stands. The conclusion that `X` is earned
 does not — see AFTER-COMMIT-1. What this file actually falsified is that
-`transactionOwner` is a valid TREE CLAIMANT, which was already known.)*
+`transactionOwner` is a valid TREE CLAIMANT, which was already known.)_
 
 # AFTER-COMMIT-0 — the claimant form is falsified
 
@@ -9338,8 +9328,8 @@ scheduleDurableConsequence({ claimant: transactionOwner, ... })
 It never tested whether AMBIENT OPERATION IDENTITY is sufficient.
 
 I leaned on `scopeOwns` to justify the anchor, and misapplied it. Its rule —
-*"presence of a transaction is not evidence that THE WRITE is speculative under
-it"* — governs MUTATION ATTRIBUTION: a write to tree B inside a transaction on
+_"presence of a transaction is not evidence that THE WRITE is speculative under
+it"_ — governs MUTATION ATTRIBUTION: a write to tree B inside a transaction on
 tree A must not become speculative under A. An explicit consequence registration
 is a different act. Nothing is inferred from a mutation; the application named
 the operation by running inside it and saying so.
@@ -9764,8 +9754,8 @@ set(A) rejects, set(B) rejects, then settled()
   -> BOTH failures happen; ONE is reported (the latest)
 ```
 
-Chosen as the minimum that makes no false claim: `settled()`'s contract is *this
-relationship is caught up*, and a rejection communicates *it is not*. WHICH
+Chosen as the minimum that makes no false claim: `settled()`'s contract is _this
+relationship is caught up_, and a rejection communicates _it is not_. WHICH
 failure is reported is not part of that claim, and the latest describes the most
 recent attempt. **No AggregateError is invented** — no case has been shown where
 a caller acts differently on two failures than on one, and inventing a richer
@@ -9846,8 +9836,8 @@ if (typeof subjectId !== 'number') return undefined;
 return parentPath(ownerPath);                     // "data.rows" -> "data"  ✗
 ```
 
-> ⚠️ **The derivation is STRING-SHAPED AND AMBIGUOUS.** It answers *"given a
-> row-field path, which collection contains it?"* by stripping the last segment
+> ⚠️ **The derivation is STRING-SHAPED AND AMBIGUOUS.** It answers _"given a
+> row-field path, which collection contains it?"_ by stripping the last segment
 > — correct when `ownerPath` names a ROW (`rows.x`), wrong when it names a
 > NESTED COLLECTION (`data.rows`). Those are indistinguishable as strings.
 > Top-level works only because a root collection has no dot and takes the
@@ -10350,8 +10340,8 @@ leaf — it identifies who OWNS it.
 
 # CANDIDATE B — the reconciliation. A -> HEAD is materially different, many times over
 
-Candidate A is `a4c0b747` (*"the published manifests were not installable — plus
-15.0.0-rc.1"*), frozen and immutable. B was conditional on the hardening work
+Candidate A is `a4c0b747` (_"the published manifests were not installable — plus
+15.0.0-rc.1"_), frozen and immutable. B was conditional on the hardening work
 finding material production-facing changes. **That condition is met and the
 question is no longer whether B is needed — it is whether HEAD qualifies to BE
 it.** This is the evidence package.
@@ -10489,9 +10479,9 @@ the verification set green.
 
 Grouped because they are one defect family, not three bugs: **the recorded
 inverse is valid at capture time, but unconditional replay later can violate
-intervening state.** The engine knows *what effect belonged to the authored
-operation*; what it does not ask is *is this authored effect still causally
-applicable to the current truth?*
+intervening state.** The engine knows _what effect belonged to the authored
+operation_; what it does not ask is _is this authored effect still causally
+applicable to the current truth?_
 
 ```text
 P0-A  same-turn setAll/remove structural reversal
@@ -10570,7 +10560,7 @@ pristine rehearsal -> MATRIX-CLOSE -> Candidate B -> TruckTrax 2/3
 
 DIAG-JOURNAL sits before PER-B because it is still part of settling the causal
 architecture. Persistence and acquisition should plug into a causal model whose
-restoration *and* diagnostic projections are both known.
+restoration _and_ diagnostic projections are both known.
 
 ## What HIST-C actually buys
 
@@ -10586,7 +10576,6 @@ The level shift is smaller internally than feared and larger architecturally:
 **one causal stream, operation-scoped restoration eligibility, one restoration
 authority, and a separate whole-tree diagnostic projection that carries
 observation without restoration ownership.**
-
 
 # SEC-0 — `@signaltree/core/security`
 
@@ -10606,7 +10595,7 @@ signalTree(JSON.parse('{"a":1,"__proto__":{"polluted":true}}'))   // NO security
 ```
 
 The actual vector is handled unconditionally by core. What `security()` adds is
-blocking `constructor` and `prototype` as *literal data keys* — which are
+blocking `constructor` and `prototype` as _literal data keys_ — which are
 harmless own-properties on a plain object, and which real data contains:
 
 ```text
@@ -10818,8 +10807,8 @@ real and predates this API.
 **SIGNALTREE-SPECIFIC: yes, and this is what separates it from `ng-forms`.**
 A2 measured it: `persistence()` withholds speculative transaction state and
 re-arms on settlement, via `scheduleDurableConsequence`. A generic storage
-effect cannot know *"this value exists physically but is not yet eligible to
-escape as a durable consequence"* — SignalTree can. That is a genuine ownership
+effect cannot know _"this value exists physically but is not yet eligible to
+escape as a durable consequence"_ — SignalTree can. That is a genuine ownership
 claim, not merely working code.
 
 **CURRENT FORM: cannot express the one production need we have evidence for.**
@@ -10926,8 +10915,7 @@ changed underneath it.
 The obvious move is A1's wrapper. It does not work:
 
 ```ts
-await withWriteContext({ intent: 'system', causalMode: 'realization' },
-  () => tree.load());
+await withWriteContext({ intent: 'system', causalMode: 'realization' }, () => tree.load());
 // history STILL grows 1 -> 2, canUndo() still true
 ```
 
@@ -11042,21 +11030,21 @@ and `pagehide` never fires. Composition must stay **host-drainable**.
 
 ## Discriminators
 
-| # | case | question |
-| --- | --- | --- |
-| 1 | hydrate a scalar | can external storage establish initial truth without creating bogus authored history? |
-| 2 | normal write | does persistence observe the settled value, or intermediate physical writes? |
-| 3 | transaction rollback | is the rolled-back intermediate value ever persisted? |
-| 4 | time-travel undo | is restored state meant to become durable, and when? |
-| 5 | debounce + immediate background | can the host force the latest value durable when lifecycle hooks never fire? |
-| 6 | storage write failure | who owns the error; does state stay authoritative? |
-| 7 | destroy with a pending write | drain, cancel, or an explicit host decision? |
-| 8 | SSR / no storage platform | can the tree exist without a storage implementation? |
-| 9 | multiple persisted leaves | does one drain require a tree-wide registry? |
-| 10 | custom adapter | does `./storage` provide anything SignalTree-specific beyond a key/value adapter? |
+| #   | case                            | question                                                                              |
+| --- | ------------------------------- | ------------------------------------------------------------------------------------- |
+| 1   | hydrate a scalar                | can external storage establish initial truth without creating bogus authored history? |
+| 2   | normal write                    | does persistence observe the settled value, or intermediate physical writes?          |
+| 3   | transaction rollback            | is the rolled-back intermediate value ever persisted?                                 |
+| 4   | time-travel undo                | is restored state meant to become durable, and when?                                  |
+| 5   | debounce + immediate background | can the host force the latest value durable when lifecycle hooks never fire?          |
+| 6   | storage write failure           | who owns the error; does state stay authoritative?                                    |
+| 7   | destroy with a pending write    | drain, cancel, or an explicit host decision?                                          |
+| 8   | SSR / no storage platform       | can the tree exist without a storage implementation?                                  |
+| 9   | multiple persisted leaves       | does one drain require a tree-wide registry?                                          |
+| 10  | custom adapter                  | does `./storage` provide anything SignalTree-specific beyond a key/value adapter?     |
 
 **Case 3 may be A2's version of A1's discovery.** Persistence should be a
-consequence of *committed* truth. If the mechanism sees private intermediate
+consequence of _committed_ truth. If the mechanism sees private intermediate
 transaction writes, that is a missing semantic seam of the same family as
 causal classification. If it already observes only settled truth, that is
 evidence against needing a marker at all.
@@ -11100,11 +11088,11 @@ Pinned in `a2-persistence-discriminators.spec.ts`.
 
 ## The four jobs are all covered — for whole-tree persistence
 
-| job | shipped `persistence()` |
-| --- | --- |
-| RESTORE | `autoLoad` on construction, `load()` |
-| PUBLISH | debounced autoSave |
-| DRAIN | **public `save()`** — plus `__flushAutoSave` |
+| job       | shipped `persistence()`                               |
+| --------- | ----------------------------------------------------- |
+| RESTORE   | `autoLoad` on construction, `load()`                  |
+| PUBLISH   | debounced autoSave                                    |
+| DRAIN     | **public `save()`** — plus `__flushAutoSave`          |
 | MECHANISM | `StorageAdapter`, defaulting to `window.localStorage` |
 
 **Case 5 — the drain works, and needs no global function.** With
@@ -11122,8 +11110,8 @@ happens, after settlement, with the rolled-back value.
 The implementation says why, and names the same defect this audit was chasing:
 
 > autoSave serializes the WHOLE tree, so a snapshot taken while an explicit
-> transaction is open would persist speculative state — *the same defect
-> `stored()` had, reached through a different API*.
+> transaction is open would persist speculative state — _the same defect
+> `stored()` had, reached through a different API_.
 
 It defers by asking whether the tree has an unsettled scope, and re-arms on
 settlement, via `scheduleDurableConsequence`.
@@ -11139,8 +11127,8 @@ scoped persistence would be — cannot reproduce case 3's correctness. A naive
 because there is no public way to ask "is this committed truth yet?".
 
 **This is the same shape as A1's finding, and they may be one seam.** A1 needs
-*classify this incoming write as realization rather than authored action*; A2
-needs *run this outgoing side effect only on committed truth*. Both are about
+_classify this incoming write as realization rather than authored action_; A2
+needs _run this outgoing side effect only on committed truth_. Both are about
 the causal status of a write crossing the boundary to an external system, and
 both already exist internally.
 
@@ -11175,7 +11163,7 @@ capability.
 **CORRECTION — the CONTRACT may be entailed; the SUBPATH is not.** Saying
 "`./storage` survives if `persistence()` survives" repeats NGF-0's error one
 level up, at packaging instead of function. If `persistence()` survives, what is
-entailed is the `StorageAdapter` *contract*; the generic implementations and the
+entailed is the `StorageAdapter` _contract_; the generic implementations and the
 subpath that ships them are independently unproven. Both of these remain open:
 
 ```text
@@ -11195,7 +11183,7 @@ NGF-0 found: a shipped artifact whose existence nobody proved.
 
 **A2-B.** `stored` and `flushAllStoredSignals` stay deleted — the shipped
 enhancer already does RESTORE, PUBLISH, DRAIN and MECHANISM, and does the
-transaction case *better* than `stored()` did. The earned seam is:
+transaction case _better_ than `stored()` did. The earned seam is:
 
 > a public way to run a durable consequence only on committed truth
 
@@ -11239,7 +11227,7 @@ evidence justifies a fraction of that.
 // background-mode.service.ts — the ONLY production call
 App.addListener('appStateChange', ({ isActive }) => {
   if (!isActive) {
-    flushAllStoredSignals();   // beat the ~100ms debounce window
+    flushAllStoredSignals(); // beat the ~100ms debounce window
   }
 });
 ```
@@ -11251,9 +11239,9 @@ does not fire when a native app backgrounds. A persistence capability that
 owns its own lifecycle via `pagehide`/`visibilitychange` would silently lose
 the last write on exactly the platform this consumer ships.
 
-So the requirement is not "expose a global flush function". It is: *the
+So the requirement is not "expose a global flush function". It is: _the
 persistence capability must be drainable by a host that knows something the web
-platform cannot tell it.* That could be a method on the capability, a
+platform cannot tell it._ That could be a method on the capability, a
 tree-level `flush()`, or a registered lifecycle adapter — but it cannot be an
 internal `pagehide` listener alone.
 
@@ -11266,7 +11254,7 @@ capability-scoped, because the host calls it once for everything.
 
 - Is the debounce (~100ms) part of the contract? The drain exists only because
   of it.
-- Does anything need persisted *collections*, or only scalar leaves? No
+- Does anything need persisted _collections_, or only scalar leaves? No
   production evidence for collections.
 - Migration (`MigrationFn`) has zero production use. Same question as `tags`.
 - Interaction with `stored()` traversal invisibility (a known core defect where
@@ -11283,7 +11271,7 @@ lifecycle concern the branch cannot own.
 **C2** — a way for a host to say "everything is about to stop", reaching every
 persisted leaf. That is a tree-level or capability-level lifecycle hook, not a
 marker feature. Note the forms lesson applies literally here: `stored()` changes
-what a branch *is*, where an attached behaviour would leave it ordinary state.
+what a branch _is_, where an attached behaviour would leave it ordinary state.
 
 **Disposition: NOT TAKEN.** Needs the offline/local-preferences scenario and an
 answer to C2 that works on a platform where `pagehide` never fires.
@@ -11301,13 +11289,13 @@ rescuing `status()`. `transactions()` is a CONTROL here and is not modified
 during the characterization pass — changing it to absorb status would
 manufacture the answer.
 
-| case | supports a SignalTree primitive | argues against one |
-| --- | --- | --- |
-| optimistic mutation | lifecycle unrepresentable by `transactions()` without losing semantics | the transaction already owns pending/confirm/reject |
-| non-optimistic save | the lifecycle must participate in SignalTree semantics *before* state changes | ordinary async/controller state handles it |
-| external async op | some SignalTree-owned state or causal property is required despite no tree mutation | the lifecycle lives entirely outside SignalTree |
-| concurrent operations | SignalTree has a coherent identity/concurrency model the app needs | the single `status` slot collapses distinct operations |
-| typed errors | errors need durable or tree-owned semantics | errors belong to the request/controller/UI layer |
+| case                  | supports a SignalTree primitive                                                     | argues against one                                     |
+| --------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| optimistic mutation   | lifecycle unrepresentable by `transactions()` without losing semantics              | the transaction already owns pending/confirm/reject    |
+| non-optimistic save   | the lifecycle must participate in SignalTree semantics _before_ state changes       | ordinary async/controller state handles it             |
+| external async op     | some SignalTree-owned state or causal property is required despite no tree mutation | the lifecycle lives entirely outside SignalTree        |
+| concurrent operations | SignalTree has a coherent identity/concurrency model the app needs                  | the single `status` slot collapses distinct operations |
+| typed errors          | errors need durable or tree-owned semantics                                         | errors belong to the request/controller/UI layer       |
 
 Two verdicts are required, and they are independent:
 
@@ -11341,23 +11329,23 @@ pre-registered matrix is above; this is what the cases returned.
 
 ## The site classification
 
-| site | job | case |
-| --- | --- | --- |
-| `ticket.save` | POST create ticket | non-optimistic mutation |
-| `ticket.useLast` | recall-most-recent request | non-optimistic mutation |
-| `v3edge.capture` | scale capture request | non-optimistic mutation |
-| `v3edge.netWeight` | ask backend to compute net weight | external async op |
-| `work/messages.loading` | message POST failure state | non-optimistic mutation |
-| `work/tickets.loading` | imperative load of a loader-less `entityMap` | external async op |
-| `device.loading` | request lifecycle beside a loader-backed collection | external async op |
-| `feature-flag.load` | fetch flags, land them on a separate leaf | external async op |
+| site                    | job                                                 | case                    |
+| ----------------------- | --------------------------------------------------- | ----------------------- |
+| `ticket.save`           | POST create ticket                                  | non-optimistic mutation |
+| `ticket.useLast`        | recall-most-recent request                          | non-optimistic mutation |
+| `v3edge.capture`        | scale capture request                               | non-optimistic mutation |
+| `v3edge.netWeight`      | ask backend to compute net weight                   | external async op       |
+| `work/messages.loading` | message POST failure state                          | non-optimistic mutation |
+| `work/tickets.loading`  | imperative load of a loader-less `entityMap`        | external async op       |
+| `device.loading`        | request lifecycle beside a loader-backed collection | external async op       |
+| `feature-flag.load`     | fetch flags, land them on a separate leaf           | external async op       |
 
 ## Finding 1 — NOT ONE SITE IS AN OPTIMISTIC MUTATION
 
 This is the headline, and it settles the question the audit was opened to ask.
 `transactions()` owns optimistic local mutation with rollback. **Zero of the
 eight sites mutate local state before the server answers.** `netWeight` and
-`feature-flag` are explicit about it — the result lands on a *separate* leaf
+`feature-flag` are explicit about it — the result lands on a _separate_ leaf
 (`netWeightResult`, `flags`) that is written only on success.
 
 So the "transactions subsumes status" hypothesis is refuted by absence, not by
@@ -11369,7 +11357,7 @@ overfitted a use case that does not occur here.
 
 `messagesState()` declares both: a `loader()` on the `threads` collection, and a
 `status()` named `loading` whose doc comment says it is send-failure state for
-message *posts*. Different operations on the same slice. `work/tickets` is the
+message _posts_. Different operations on the same slice. `work/tickets` is the
 mirror image — an `entityMap` with **no** loader, populated imperatively, with
 `status` tracking that acquisition.
 
@@ -11441,8 +11429,8 @@ OWNERSHIP   does SignalTree need to own a public primitive for it?
 "Several components read it" is a shared-state argument, and shared state is
 already served — by an ordinary branch. `{ pending: false, error: null }` with
 derived predicates expresses all eight sites, which is precisely what S1
-concluded: *workflow state is ordinary store truth; its predicates are ordinary
-derived projections.*
+concluded: _workflow state is ordinary store truth; its predicates are ordinary
+derived projections._
 
 **Disposition: `status` stays deleted. No replacement primitive.** The outcome
 is the second row of the pre-registered outcome space — transaction lifecycle
@@ -11469,7 +11457,7 @@ does not prevent.
 
 ## What A3-0 does NOT establish
 
-That a well-specified operation-lifecycle primitive *with* operation identity
+That a well-specified operation-lifecycle primitive _with_ operation identity
 would be wrong for SignalTree. It establishes that the deleted one was
 under-specified and that nothing in the production evidence requires SignalTree
 to own the concept. If a future case shows lifecycle state that must line up
@@ -11590,7 +11578,7 @@ The compositional model gives the same property without the marker, because
 ```ts
 const tree = signalTree({ editForm: createEntityModel(metadata, defaults) });
 const model = toWritableSignal(tree.$.editForm);
-const fields = form(model, schema);        // Angular Signal Forms
+const fields = form(model, schema); // Angular Signal Forms
 const undo = trackHistory(model, { capacity: 50 });
 ```
 
@@ -11602,17 +11590,17 @@ is not new code.
 
 ## The one gap
 
-| piece | shipped in `15.0.0-rc.1`? |
-| --- | --- |
-| `toWritableSignal` — the seam | **yes** |
-| Angular Signal Forms — validation, touched, dirty | external, fine |
-| `trackHistory` — undo/redo over a plain signal | **implemented, WITHHELD** |
+| piece                                             | shipped in `15.0.0-rc.1`? |
+| ------------------------------------------------- | ------------------------- |
+| `toWritableSignal` — the seam                     | **yes**                   |
+| Angular Signal Forms — validation, touched, dirty | external, fine            |
+| `trackHistory` — undo/redo over a plain signal    | **implemented, WITHHELD** |
 
 `trackHistory` lives at `core/src/lib/form-history/form-history.ts:206`, appears
 zero times in the core barrel and zero times in the shipped `.d.ts`, and its
 disposition reads "LC / mechanically retained after form deletion".
 
-The *wording* of that disposition is falsified. `trackHistory` was not
+The _wording_ of that disposition is falsified. `trackHistory` was not
 mechanically retained — it survived FORM-DEL **because it was already the
 compositional shape**, taking a plain `WritableSignal` and never touching the
 marker.
@@ -11672,8 +11660,8 @@ Keyed by the collection's own `selectId`, reactive, and covered by eight
 assertions across three core specs. The migration is a rename:
 
 ```ts
-Object.fromEntries(this.slice.entities.map())     // v13
-Object.fromEntries(this.slice.entities.asMap())   // v15
+Object.fromEntries(this.slice.entities.map()); // v13
+Object.fromEntries(this.slice.entities.asMap()); // v15
 ```
 
 and the better form drops `fromEntries` entirely, since a `ReadonlyMap` is what
@@ -11842,7 +11830,7 @@ FALSIFIER  two effects for the SAME owner PositionId and SubjectId
 
 **The NULL SURVIVES — on the falsifier's second clause.**
 
-Two different coordinates ARE simultaneously required. They are not *retained*,
+Two different coordinates ARE simultaneously required. They are not _retained_,
 because every effect that needs a field coordinate carries its own complete
 inline address. Captured `ReversalEffect`s for a two-field update:
 
@@ -12323,11 +12311,7 @@ No `linkCollection()`, no `collection: true`, no `mode`, no required
 `link<Row[]>`:
 
 ```ts
-type NaturalValue<S> =
-  S extends EntitySignal<infer R, infer _K> ? R[]
-  : S extends NodeAccessor<infer T> ? T
-  : S extends WritableSignal<infer T> ? T
-  : never;
+type NaturalValue<S> = S extends EntitySignal<infer R, infer _K> ? R[] : S extends NodeAccessor<infer T> ? T : S extends WritableSignal<infer T> ? T : never;
 
 declare function link<S>(source: S, endpoint: Endpoint<NaturalValue<S>>): void;
 ```
@@ -12484,7 +12468,7 @@ type ContainsMarker<T> = T extends EntityMapBuilder<...> ? true
 ```
 
 ⚠️ **Recorded, NOT implemented.** Excluding a public Link target is a
-public-surface decision. The standing authorization was to exclude *the root*
+public-surface decision. The standing authorization was to exclude _the root_
 rather than invent machinery; the measurement shows the truthful rule is broader
 than that, which is new information and wants confirmation before it lands.
 
@@ -12757,7 +12741,7 @@ recovery routing cannot tell A from B.
 arriving in diagnostics.** Two same-shaped trees give their positions the same
 local ids by design, and `settings.theme` names a location in both. The reporter
 carries no owner at all — not even the `ownerId` the notifier ownership
-invariant already requires of *every notification*.
+invariant already requires of _every notification_.
 
 `path` is absent too, though `ownerPath` IS known at the Link reporting site.
 
@@ -13503,7 +13487,7 @@ markers it does want by DIRECT FILE PATH (`./lib/markers/entity-map`,
 
 **Nothing in the repository imports the markers barrel at all.** It is dead.
 
-That does not shrink the ~95-file *work*; it reclassifies the *risk*. These are
+That does not shrink the ~95-file _work_; it reclassifies the _risk_. These are
 internal deletions plus demo/doc/tool updates, not a consumer break.
 
 ## Consumer counts
@@ -13744,9 +13728,9 @@ sync throw / rejection / observable error
   -> nothing reaches onTreeError; there was never a producer
 ```
 
-Applying the standard test: *if SignalTree launched at v15 with Link, external()
+Applying the standard test: _if SignalTree launched at v15 with Link, external()
 and ordinary Angular available, would we add a core marker solely to manufacture
-data/loading/error over an RxJS pipeline?* **No.** That is application async
+data/loading/error over an RxJS pipeline?_ **No.** That is application async
 state.
 
 ## DISPOSITION — DELETE
@@ -14045,7 +14029,7 @@ FALSIFIER  a legitimate remaining behaviour requires ownership that cannot be
 It is a FEATURE ATTACHED TO `entityMap`:
 
 ```ts
-entityMap({ load: loader(fn, opts) })
+entityMap({ load: loader(fn, opts) });
 ```
 
 ```text
@@ -14862,9 +14846,9 @@ So `clear()` is **three** things: remove the durable key, reset the tree value,
 recipe is three steps with **no dispose and no relink**:
 
 ```ts
-tree.$.x.set(defaultValue);   // reset
-await persistence.settled();  // let the outbound send land
-adapter.remove();             // THEN delete
+tree.$.x.set(defaultValue); // reset
+await persistence.settled(); // let the outbound send land
+adapter.remove(); // THEN delete
 ```
 
 ```text
@@ -14974,7 +14958,7 @@ enumerable property**, where `stored` had made `options` non-enumerable.
 ### The question was the marker-location contract, not the fix
 
 Asking "should `__entityMapConfig` be non-enumerable?" presupposes the repair.
-The prior question is where a marker declaration is *interpreted at all*.
+The prior question is where a marker declaration is _interpreted at all_.
 Measured on both sides, with no casts in the type fixtures:
 
 ```text
@@ -14989,7 +14973,7 @@ Map value                 ordinary data    ordinary data       silent gap
 Set member                ordinary data    ordinary data       silent gap
 ```
 
-**Types and runtime agree on every row.** Nothing is a type *error*: a container
+**Types and runtime agree on every row.** Nothing is a type _error_: a container
 position resolves to the raw builder type, which is truthful — the declaration
 is ordinary data there, and the editor says so.
 
@@ -15007,7 +14991,7 @@ public config field populated, including closures capturing a secret, the same
 position yields:
 
 ```json
-{"list":[{"__isEntityMap":true,"__entityMapConfig":{"hooks":{}},"__computedSlices":{}}]}
+{ "list": [{ "__isEntityMap": true, "__entityMapConfig": { "hooks": {} }, "__computedSlices": {} }] }
 ```
 
 No application data. The reason is structural, and is the real difference from
@@ -15016,7 +15000,7 @@ No application data. The reason is structural, and is the real difference from
 - public `EntityConfig` is **five optional FUNCTIONS** — `selectId`,
   `sortComparer`, `hooks.{beforeAdd,beforeUpdate,beforeRemove}`;
 - `loader()` — the only route to `persist: { adapter }`, the one
-  `EntityStorageAdapter` shape that *could* carry data the way `stored`'s
+  `EntityStorageAdapter` shape that _could_ carry data the way `stored`'s
   `Storage` did — is **not exported from any entry point**, and core's
   `exports` map has no subpath;
 - `entityMap` is the **only public declarative marker factory** (18 value
@@ -15066,7 +15050,7 @@ was answering a different question. Both specs now pin the corrected result.
 ## Two reusable rules this earned
 
 **INVARIANT CARRIER RULE.** Before deleting the last test attached to a retiring
-primitive: state the invariant *without naming the primitive*, find a real
+primitive: state the invariant _without naming the primitive_, find a real
 surviving carrier, or stop and disposition it. Never knowingly drop a live
 invariant because its original carrier is being deleted. Of `stored`'s three
 generic invariants, two had **stronger** surviving carriers — devtools-vs-durable
@@ -15075,7 +15059,7 @@ moved to Link, which obtains the registry unconditionally where `stored` spelled
 it `context?.positionRegistry`. The third did not, and that is where deletion
 authority stopped.
 
-**VACUOUS vs ORPHANED.** An invariant whose *subject* is deleted alongside its
+**VACUOUS vs ORPHANED.** An invariant whose _subject_ is deleted alongside its
 carrier is vacuous — retire it and say why. An invariant whose subject survives
 is orphaned — it must be re-carried or dispositioned. `stored`'s non-entity
 marker resolution row was vacuous; `stored-leak` was orphaned. Re-pointing a
@@ -15109,11 +15093,11 @@ belong, and its output is a matrix with one row per public capability.
 
 ### The mechanical test
 
-| Question | Owner |
-|---|---|
-| Would this semantic exist identically in React, Vue, Node or vanilla TS? | core |
+| Question                                                                                   | Owner                 |
+| ------------------------------------------------------------------------------------------ | --------------------- |
+| Would this semantic exist identically in React, Vue, Node or vanilla TS?                   | core                  |
 | Does this exist because Angular has DI, `DestroyRef`, injection contexts, Angular Signals? | `@signaltree/angular` |
-| Does this encode a backend, domain, UX, storage format, or retry policy? | application |
+| Does this encode a backend, domain, UX, storage format, or retry policy?                   | application           |
 
 Two sharper heuristics, applied in this order:
 
@@ -15122,8 +15106,8 @@ Two sharper heuristics, applied in this order:
 - **If every correct Angular application must perform the same ceremony to
   preserve a SignalTree invariant, that is an Angular-package candidate.**
 
-A third column is required in the matrix: *would three independent Angular apps
-reimplement this identically?* Yes is strong evidence for the Angular package;
+A third column is required in the matrix: _would three independent Angular apps
+reimplement this identically?_ Yes is strong evidence for the Angular package;
 divergence caused by product choices sends it to the application.
 
 ### Two frozen constraints
@@ -15138,14 +15122,14 @@ enforces. Make the correct path easy; never hide the ownership violation.
 > **`@signaltree/angular` must never become a junk drawer for what felt too
 > opinionated for core.**
 
-A feature earns that package because *Angular creates the requirement*, not
+A feature earns that package because _Angular creates the requirement_, not
 because it is used in an Angular application. Acceptance criterion for the whole
 greenfield: for every public capability we can say not only why it exists, but
 why it lives in that layer rather than one above or below.
 
 ### ⚠️ MEASURED CORRECTION TO THE PREMISE
 
-The three-way split describes core as a *framework-neutral* engine. **Today's
+The three-way split describes core as a _framework-neutral_ engine. **Today's
 core is not that**, and the phase must be designed around the real starting
 point rather than the intended one. Measured at `a78696e5`:
 
@@ -15181,7 +15165,7 @@ markers/entity-loader.ts:319  inject(DestroyRef, { optional: true })
 ```
 
 Everything else Angular-shaped in core is reactivity. So
-`ANGULAR-OWNERSHIP-0`'s first job is an inventory of *existing* runtime coupling,
+`ANGULAR-OWNERSHIP-0`'s first job is an inventory of _existing_ runtime coupling,
 not only a decision about where new helpers go.
 
 Two consequences worth recording now:
@@ -15190,7 +15174,7 @@ Two consequences worth recording now:
   consumer hand-codes `destroyRef.onDestroy(() => l.dispose())`" hazard is
   therefore partly precedented inside core, which is evidence both that the
   ceremony is real and that core is currently the wrong owner of it.
-- `toWritableSignal` already *warns at runtime* when called outside an injection
+- `toWritableSignal` already _warns at runtime_ when called outside an injection
   context. A public core API whose correctness depends on Angular's injection
   rules is the clearest single instance of the misplacement this phase exists to
   find.
@@ -15222,7 +15206,7 @@ Link API expresses it without core involvement.
 
 `packages/angular` **does not exist**. Only `core` and `shared` carry package
 manifests at `a78696e5`; `authoring`, `events` and `ng-forms` are directories
-without their own published manifest. So this is a layer to be *designed*, not a
+without their own published manifest. So this is a layer to be _designed_, not a
 package to be tidied — which is the right position to be in before greenfield.
 
 ## ⚠️ CORRECTION — the rekey evidence was wrong; the conclusion survives
@@ -15480,12 +15464,12 @@ previously unnoticed defects:
 'causal-runtime':    ['mutation-capture', 'position-topology']  implies both
 ```
 
-| tree capabilities | scalar | branch | entity |
-|---|---|---|---|
-| *(bare)* | **throws** | `[]` inert | works |
-| `position-topology` only | constructs, inert | — | — |
-| `mutation-capture` only | **throws** | — | — |
-| both | works | works | works |
+| tree capabilities        | scalar            | branch     | entity |
+| ------------------------ | ----------------- | ---------- | ------ |
+| _(bare)_                 | **throws**        | `[]` inert | works  |
+| `position-topology` only | constructs, inert | —          | —      |
+| `mutation-capture` only  | **throws**        | —          | —      |
+| both                     | works             | works      | works  |
 
 **`causal-runtime` is NOT the required substrate.** It merely implies the pair
 and adds transaction/restoration machinery no consumer here needs. Every Link
@@ -15498,7 +15482,7 @@ invisible: "Link is green" meant "green with causal-runtime present."
 
 ```ts
 const tree = signalTree({ x: 0 });
-link(tree.$.x, endpoint);   // throws "X must be an owned SignalTree location"
+link(tree.$.x, endpoint); // throws "X must be an owned SignalTree location"
 ```
 
 `tree.$.x` **is** an owned location. Leaf registry attachment is gated on
@@ -15512,9 +15496,9 @@ and still be wrong, when the operation is inside the supported contract.
 
 ```ts
 const tree = signalTree({ s: { theme: 'light' } });
-const l = link(tree.$.s, endpoint);   // constructs happily
+const l = link(tree.$.s, endpoint); // constructs happily
 tree.$.s.theme.set('dark');
-await l.settled();                    // resolves
+await l.settled(); // resolves
 // endpoint received nothing. Ever.
 ```
 
@@ -15600,17 +15584,17 @@ ordinary leaf
 
 Characterized across four phases, all green:
 
-| | |
-|---|---|
-| escaped-callable semantics | pre-held `set` AND `update` observed after arming |
-| inactive write cost | no material regression measurable in the discriminator; the measurable cost sits on construction (~+18% seed, ~+32% seed+hook, 100 leaves) |
-| owner discovery from source alone | registry + ownerPath suffice; no tree/sibling argument |
-| branch activation | reaches PRE-EXISTING descendants — and `DESCENDANT-MATERIALIZATION-0` proves ordinary state cannot arrive later |
-| source scoping | verified physically AND behaviourally |
-| notifier fanout | one publication, many consumers |
-| activation lifecycle | claim-based; idempotent disposal |
-| position-id lifetime | **POS-A** — one per source lifetime, retained across disarm/rearm |
-| memory | **UNKNOWN** |
+|                                   |                                                                                                                                            |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| escaped-callable semantics        | pre-held `set` AND `update` observed after arming                                                                                          |
+| inactive write cost               | no material regression measurable in the discriminator; the measurable cost sits on construction (~+18% seed, ~+32% seed+hook, 100 leaves) |
+| owner discovery from source alone | registry + ownerPath suffice; no tree/sibling argument                                                                                     |
+| branch activation                 | reaches PRE-EXISTING descendants — and `DESCENDANT-MATERIALIZATION-0` proves ordinary state cannot arrive later                            |
+| source scoping                    | verified physically AND behaviourally                                                                                                      |
+| notifier fanout                   | one publication, many consumers                                                                                                            |
+| activation lifecycle              | claim-based; idempotent disposal                                                                                                           |
+| position-id lifetime              | **POS-A** — one per source lifetime, retained across disarm/rearm                                                                          |
+| memory                            | **UNKNOWN**                                                                                                                                |
 
 `OBSERVATION-LIFECYCLE-0`, with Link itself claiming and releasing rather than
 a manually pre-armed source:
@@ -16020,7 +16004,7 @@ respect to ordinary claims.
 ### ⚠️ And do NOT freeze `getNodeProcessor()` as the entity predicate
 
 It is proven to be the marker subsystem's canonical MATERIALIZATION stamp. It is
-NOT proven to mean *entity specifically* — it may match other marker-processed
+NOT proven to mean _entity specifically_ — it may match other marker-processed
 representations whose descendants DO require ordinary observation.
 
 Since the stop has no demonstrated correctness necessity, a blanket
@@ -16537,6 +16521,112 @@ removes, so the assertion now expects it DEFINED. The test's own point — that
 `stored()` takes its registry from the materialization context and reports
 without enhancers — is unaffected.
 
+### What root actually cost — `ROOT-COST-SCOPE-0`, answered by the diff
+
+The question was whether root could be supported as a per-tree special case with
+essentially no effect on ordinary source representation or hot paths. It is an
+implementation-diff question, so it is answered by reading the diff rather than
+by opening a phase:
+
+```text
+root-source.ts        47 lines, a WeakMap        ONE ENTRY PER TREE
+signal-tree.ts        2 defineProperty + 1 set   ONCE PER TREE, at construction
+link.ts               1 branch in accessorsFor   ONCE PER link() CALL
+```
+
+`accessorsFor` has exactly one call site and it is construction-time, so the root
+check is one WeakMap lookup per relationship — never per write, per read, or per
+notification.
+
+⚠️ AND THE HONEST PART: ordinary leaves DID get heavier in this era, but not for
+root. `installDormantObservation` per leaf belongs to the observation substrate,
+which was adopted and frozen on its own measured evidence for bare scalar and
+branch Link. Root neither caused it nor extended it. Attributing that cost to
+root would make the case for root look worse than it is, and would also hide
+which decision actually owns the memory.
+
+## RULES EARNED — COST vs UNIFORMITY
+
+> **UNIFORMITY MUST EARN ITS COST.** Prefer one semantic model, but do not
+> require one physical representation when doing so imposes avoidable cost on
+> the common case.
+
+The distinction that makes it actionable:
+
+```text
+semantic uniformity          GOOD
+representation uniformity    only good when cheap
+```
+
+`link()` must have ONE understandable contract — source, observation, eligible
+authority, semantic value, endpoint. That does not require every source type to
+pay for the same machinery. A healthy implementation is allowed to look like:
+
+```text
+scalar     optimized scalar path
+branch     compose ordinary descendants
+entity     native structural carrier
+root       one per-tree special case
+future     a specialized adapter, if justified
+```
+
+with all five obeying the same external semantics.
+
+> **SPECIALIZE THE RARE CASE BEFORE TAXING THE COMMON CASE.**
+
+> **SPECIALIZE RARE STRUCTURAL CASES OUTSIDE THE HOT REPRESENTATION.** If an
+> uncommon semantic case needs metadata that would distort traversal or tax
+> common nodes, keep that metadata in a SIDECAR or a specialized adapter rather
+> than forcing representation uniformity.
+
+The 876-failure incident is the evidence for the third rule, and it is easy to
+misread. Supporting root did not have huge systemic blast radius. Putting one
+exceptional relationship into the representation that everything else traverses
+did. Moving it to a WeakMap reduced 876 failures to 1 — and that 1 was a
+characterization test whose premise was being changed deliberately.
+
+⚠️ COST MEANS EVERY DIMENSION, not runtime speed:
+
+```text
+write hot-path CPU      retained memory        bundle size
+read cost               allocation/GC          startup cost
+construction cost       type complexity        debugging complexity
+common-path complexity  maintenance burden
+```
+
+An abstraction that removes 30 lines of special-case code and adds 400 bytes to
+every leaf is not elegant. One that makes root beautifully symmetric at the cost
+of a conditional on every scalar write, forever, is a bad trade.
+
+### The procedure
+
+```text
+Semantics proved correct?
+  yes ↓
+Is there measurable cost?
+  yes ↓
+Can redundant representation be removed?        REDUCE REPRESENTATION BEFORE
+  yes -> remove it                              REOPENING SEMANTICS
+  ↓
+Is the remaining cost caused by a rare case?
+  yes -> specialize the rare case               SPECIALIZE THE RARE CASE BEFORE
+  ↓                                             TAXING THE COMMON CASE
+Only if neither works: reconsider architecture
+```
+
+Rare cases are ALLOWED to be structurally exceptional when that keeps the common
+case simple. That is good architecture, not impurity.
+
+### ⚠️ A disposition question this leaves OPEN, deliberately
+
+Whether `link(tree.$, endpoint)` should be part of the INTENTIONAL public API is
+a different question from whether the incumbent's type system admits it. It does
+admit it cast-free, so CONTRACT-BEFORE-DEFECT made the runtime failure a defect
+and the repair was localized enough to be worth making. That settles the
+incumbent. It does not settle greenfield, and persistence needing whole-tree
+semantics must NOT be allowed to settle it either — the semantic machinery can be
+shared without the public source form being advertised.
+
 ## OPEN
 
 ```text
@@ -16546,8 +16636,180 @@ LINK-ROOT-SOURCE-0             CLOSED — owner carrier + root NaturalValue
 LINK-BRANCH-NESTED-ENTITY-0    CLOSED — regression introduced 48ad4e4a,
                                repaired; each nested collection now carries its
                                own eligible projection.
+PERSISTENCE-AS-LINK-SWAP-0     CLOSED — SWAP-A. persistence() relationship
+                               authority is Link.
 memory                 unmeasured for the dormant representation
-serialization WIP      parked; depends on the substrate landing first
-INSPECTION-EGRESS-0    open — Link green, serialization open
+INSPECTION-EGRESS-0    open — Link green; persistence green via the swap;
+                       standalone serialization() unmeasured
 STORED-RETIRE-0        paused; stored-devtools-isolation.spec.ts still load-bearing
 ```
+
+## `PERSISTENCE-AS-LINK-SWAP-0` — CLOSED, SWAP-A
+
+The hypothesis put directly under load rather than diagrammed:
+
+> Persistence does not need its own relationship authority model.
+> Persistence = Link + application/durability policy.
+
+### The baseline, measured BEFORE the substitution
+
+The nine-row matrix was written against the INCUMBENT first, so a row that fails
+after the swap can be classified rather than assumed to be a regression. The
+prediction was preregistered: `persistence()` detected change by WHOLE-TREE
+REFERENCE IDENTITY (`tree() !== previousState`, with a 100 ms polling fallback
+outside Angular) and gated the write on a whole-tree STRING compare. That is
+structurally the same mechanism as `LINK-ROOT-SOURCE-0`'s M3 mutation — "replace
+the eligible projection with a current whole-tree re-read" — which passed six
+rows and killed the inspection row alone.
+
+```text
+P1 authored              PASS
+P2 inspection            FAIL   ← predicted
+P3 inspection hitchhike  FAIL   ← predicted, load-bearing
+P4 realized              PASS
+P5 I4 authority          PASS   (non-discriminating on the incumbent — see below)
+P6 no bad echo           PASS
+P7 entity whole tree     PASS
+P8 owner isolation       PASS
+P9 dispose               PASS
+```
+
+Exactly the two predicted rows, and nothing else. The incumbent's shape was
+complete and its authority was wrong:
+
+> **CORRECT COMPLETE SHAPE IS NOT CORRECT EXTERNALLY-AUTHORIZED TRUTH.**
+
+⚠️ P5 passing on the incumbent is NOT evidence that the incumbent had I4 right.
+It passes because the incumbent has no eligible authority at all and simply
+persists current state. P5's value is as a guard against OVERCORRECTION — an
+authored-only projection that refused to move on external acquisition would fail
+it — so it only becomes discriminating once P2/P3 are fixed.
+
+### The seam
+
+One line bound encoding to "whatever the tree currently holds":
+
+```ts
+const raw = tree(); // inside enhanced.serialize
+```
+
+Everything else in the serializer — special types, circular refs, nodeMap,
+metadata, replacer — is pure encoding over `raw` and always was. Extracting
+`encodeSnapshot(raw, tree, config)` is what let `persistence()` encode the value
+Link says is EGRESS-ELIGIBLE. `serialize(config?)` is unchanged and still means
+"encode current state"; only an internal caller may name a different value.
+
+### What Link took over, and what persistence kept
+
+```text
+LINK NOW OWNS                     WAS, IN persistence()
+change detection                  tree() !== previousState + 100ms POLLING
+turn coalescing                   debounceMs doing double duty as correctness
+transaction gating                a bespoke scheduleDurableConsequence claim
+echo suppression                  lastCacheKey, a STRING compare of the payload
+realized inbound                  hand-written withWriteContext({ origin:
+                                  'external', participation: 'realized' })
+owner isolation                   implicit in one-subscription-per-tree
+inspection exclusion              ABSENT — the defect
+
+PERSISTENCE KEEPS                 because none of it is relationship semantics
+storage adapter, key, codec + metadata/version, debounce, skipCache,
+load()/autoLoad lifecycle
+```
+
+Four imports became unused, which is the receipt: `withWriteContext`,
+`getActiveWriteContext`, `scheduleDurableConsequence`, `cancelDurableConsequence`.
+Persistence no longer reaches for causal primitives at all.
+
+### Mutations
+
+```text
+M1  publish tree() instead of the eligible value    P3 alone
+M2  save() publishes tree()                         P2c alone
+M3  load() applies without Link acquiring           P6 alone
+M4  drain awaits settlement                         the A2-4.1 drain row (HANG)
+    the incumbent baseline itself                   P2 + P3
+```
+
+P2 is pinned by the measured incumbent rather than by a synthetic mutation, and
+that is recorded as such.
+
+### ⚠️ TWO ROWS THAT DID NOT DISCRIMINATE, AND WHAT FIXED THEM
+
+**The manual path was missing.** M2 kills a row that did not exist in the
+original matrix: a devtools scrub followed by an explicit `save()`. An
+autoSave-only matrix never reaches it, and `save()` publishing `tree()` is the
+obvious implementation. `save()` publishes `latestEligible`.
+
+**M3 survived the entire matrix at first** — the inbound half of the swap was
+UNPINNED. The cause was a line of mine:
+
+```ts
+lastCacheKey = encodeSnapshot(inbound, tree, cacheKeyConfig); // after load()
+```
+
+That is the incumbent's echo suppression rebuilt on top of the primitive that
+replaced it. While it stood, a mutation that applied the payload without telling
+the relationship still passed P6, because this line suppressed the echo on its
+own. Deleting it made the claim falsifiable and M3 immediately killed P6.
+
+> **DELETE THE DUPLICATE TO MAKE THE CLAIM FALSIFIABLE.** A redundant
+> reimplementation of the mechanism under test does not merely add code — it
+> makes the test unable to detect the mechanism's absence.
+
+A third attempt, "acquired truth survives a transaction rollback", could not be
+made to discriminate at all: `load()` is async, so the payload lands after the
+transaction callback has returned and rollback has no claim on it regardless of
+classification. It is kept as an explicitly labelled CHARACTERIZATION row, not
+counted as evidence.
+
+### Two behaviours changed, both SWAP-D
+
+**`autoSave: false` no longer means "no relationship".** The first attempt
+disposed the Link, which also disposed `save()`'s authority: `save()` fell back
+to the construction baseline and wrote `0` where the tree held `7`. Turning off
+the pump is not the same as cutting the pipe. The relationship stays live and
+tracks eligible authority; `outbound` records and returns without publishing.
+
+⚠️ That is a real, accepted cost: with `autoSave: false` the projection work
+still happens per write. It is the same work `autoSave: true` does, and the
+alternative is a `save()` that publishes the wrong value. Recorded rather than
+hidden.
+
+**The A2-4.1 drain tripwire fired and was inverted, as its own instructions
+required.** It predicted that routing the drain through the consequence
+authority would make its completion asynchronous with respect to settlement.
+That prediction was correct and the first attempt walked into it: a drain that
+awaited settlement HUNG while a transaction was open — a hang at the moment a
+host is trying to leave, which is worse than the defect being fixed.
+
+The resolution is that the boundary stopped being the drain's problem. Link hands
+a value to the endpoint only from inside its own durable consequence, so anything
+drainable has ALREADY cleared settlement. The drain neither bypasses the
+authority nor waits on it.
+
+> **AN UNRESOLVED OPTIMISTIC MUTATION HAS NO COMMITTED TRUTH TO PERSIST.**
+
+### The type-surface note
+
+`TruthfulLinkSource` rejects a root whose declared type still contains an
+`entityMap` construction marker, because a CALLER writing endpoint callbacks
+would be handed a value type matching neither the marker nor the runtime state.
+Persistence has no such caller: the endpoint is internal, its value is consumed
+only by the codec, and no `NaturalValue<T>` reaches application code. One
+documented internal cast, protecting an authoring surface that does not exist
+here. This is NOT a reason to weaken the public rule.
+
+### Result
+
+```text
+SWAP-A.   PERSISTENCE RELATIONSHIP AUTHORITY = LINK
+```
+
+Thirteen permanent rows; the existing persistence contract passes unchanged
+except for the one inverted tripwire; zero public API delta.
+
+> **SUBSTITUTE THE ARCHITECTURE, DON'T DIAGRAM IT.** Running the real contract
+> against the proposed engine produced two defects, one hang and two vacuous
+> tests in a single pass. A call-graph audit showing the two mechanisms "appear
+> similar" would have produced none of them.

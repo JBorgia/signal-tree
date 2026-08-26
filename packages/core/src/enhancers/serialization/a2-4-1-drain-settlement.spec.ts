@@ -92,7 +92,7 @@ describe('A2-4.1: the drain vs. the commit boundary', () => {
     expect(rec.payloads[rec.payloads.length - 1]).toMatchObject({ a: 'a1' });
   });
 
-  it('⚠️ DEFECT — the drain writes SPECULATIVE state mid-transaction', async () => {
+  it('the drain writes NOTHING speculative mid-transaction', async () => {
     const rec = recordingStorage();
     const tree = makeTree(rec.adapter, 'a2-4-1-open');
 
@@ -107,47 +107,54 @@ describe('A2-4.1: the drain vs. the commit boundary', () => {
     // The host backgrounds. This is the drain the surface offers.
     await tree.__flushAutoSave?.();
 
-    // ⚠️ It bypasses `scheduleDurableConsequence` entirely and serializes the
-    // tree as it stands — speculative state, at the moment least able to
-    // survive being wrong.
-    expect(rec.payloads.length).toBeGreaterThan(0);
-    expect(rec.payloads[rec.payloads.length - 1]).toMatchObject({ a: 'doomed' });
+    // ⚠️ INVERTED BY PERSISTENCE-AS-LINK-SWAP-0, exactly as this file's own
+    // instruction required. The drain no longer bypasses the consequence
+    // authority, because it no longer reaches the tree at all: Link hands a
+    // value to the endpoint only from inside its durable-consequence `run`, so
+    // a write still held behind an open transaction was never handed over and
+    // there is nothing for the drain to flush.
+    expect(rec.payloads).toEqual([]);
 
     pending.rollback();
     await new Promise((r) => setTimeout(r, 60));
 
-    // And the tree recovers while storage does not: durable truth is now
-    // permanently inconsistent with the tree, with no further write coming to
-    // correct it, because the drain also tore down autoSave.
+    // Tree and storage agree. The rolled-back value was never made durable, so
+    // there is no inconsistency for a later write to correct.
     expect(tree.$.a()).toBe('a0');
-    expect(rec.payloads[rec.payloads.length - 1]).toMatchObject({ a: 'doomed' });
+    expect(rec.payloads.every((p) => p.a !== 'doomed')).toBe(true);
   });
 });
 
 /**
- * ## A2-4.1 RESULT
+ * ## A2-4.1 RESULT — CLOSED BY PERSISTENCE-AS-LINK-SWAP-0
  *
  * ```text
- * autoSave timer   defers to settlement                    ✓
- * __flushAutoSave  bypasses it, writes speculative state   ✗
+ * autoSave timer   defers to settlement   ✓
+ * __flushAutoSave  defers to settlement   ✓   (was ✗)
  * ```
  *
- * So the enhancer's commit boundary is not a property of the enhancer — it is a
- * property of ONE path through it, and the other path is the one production
- * would call. `__flushAutoSave` is also underscore-prefixed and typed optional,
- * i.e. not a public drain at all.
+ * The tripwire fired and was inverted rather than deleted, as instructed.
  *
- * A2's remaining work therefore includes a REAL drain: public, tree-scoped, and
- * routed through the same consequence authority the timer already uses, so that
- * a host event cannot outrank settlement.
+ * ⚠️ THE FIX WAS NOT A ROUTING CHANGE, WHICH IS WHY THE OLD FRAMING COULD NOT
+ * FIND IT. This file predicted that routing the drain through
+ * `scheduleDurableConsequence` would make its completion asynchronous with
+ * respect to settlement, turning "what does the drain return" into part of the
+ * same decision. That prediction was correct, and the first attempt at the swap
+ * walked straight into it: a drain that awaited settlement HUNG while a
+ * transaction was open — a hang at the exact moment a host is trying to leave,
+ * which is a worse failure than the one being fixed.
  *
- * ⚠️ THIS FILE IS A TRIPWIRE. It asserts the CURRENT, DEFECTIVE behaviour so the
- * defect cannot be quietly carried into the release. Fixing the drain MUST break
- * the second test — invert it then, do not delete it.
+ * The resolution is that the commit boundary stopped being the drain's problem.
+ * Link hands a value to the endpoint only from inside its own durable
+ * consequence, so by the time anything is drainable it has ALREADY cleared
+ * settlement. The drain neither bypasses the authority nor waits on it; it
+ * flushes what is settled and returns.
  *
- * The fix is deferred to the A2-C surface freeze rather than applied here,
- * because it is not only a routing change: routing through
- * `scheduleDurableConsequence` makes the drain's completion asynchronous with
- * respect to settlement, so what the drain RETURNS and what a host may await
- * are part of the same decision.
+ *     AN UNRESOLVED OPTIMISTIC MUTATION HAS NO COMMITTED TRUTH TO PERSIST.
+ *
+ * The observation that the boundary was "a property of ONE path through the
+ * enhancer" also stands, and is now moot for the same reason: there is one
+ * relationship, so there is one boundary. `__flushAutoSave` remains
+ * underscore-prefixed and optional — a public drain is still unearned, and is
+ * a smaller question now that both paths agree.
  */

@@ -1,17 +1,27 @@
 declare const ngDevMode: boolean | undefined;
-import { getActiveWriteContext, withWriteContext } from '../../lib/write-context';
+// ⚠️ FOUR IMPORTS DELETED BY PERSISTENCE-AS-LINK-SWAP-0, and they are the
+// receipt for what the swap actually removed rather than moved:
+//
+//   withWriteContext / getActiveWriteContext   `load()` hand-tagging inbound
+//                                              writes `{ origin: 'external',
+//                                              participation: 'realized' }`.
+//                                              Link's `external()` IS that pair.
+//   scheduleDurableConsequence                 autoSave's own settlement claim
+//   cancelDurableConsequence                   and its own teardown of it.
+//                                              Link owns one claim for the
+//                                              whole relationship.
+//
+// Persistence no longer reaches for causal primitives at all. It supplies a
+// codec, a key and a backend; the relationship is Link's.
 import type { HydrateMode } from '../../lib/internals/materialize-markers';
 import { isSignal, Signal, WritableSignal } from '@angular/core';
 
 import { hydrateMarkerNode } from '../../lib/internals/materialize-markers';
-import {
-  cancelDurableConsequence,
-  scheduleDurableConsequence,
-} from '../../lib/internals/commit-consequence';
 import { isTraversableNode } from '../../lib/utils';
 import { ISignalTree } from '../../lib/types';
 import type { Enhancer, EnhancerMeta } from '../../lib/types';
 import { ENHANCER_META } from '../../lib/types';
+import { link, type LinkEndpoint } from '../../lib/link';
 import { TYPE_MARKERS } from './constants';
 import type { StorageAdapter } from './storage-adapters';
 
@@ -444,6 +454,210 @@ function resolveCircularReferences(
 /**
  * Enhances a SignalTree with serialization capabilities
  */
+/**
+ * DECODE, the mirror of `encodeSpecials`. Hoisted to module scope for the same
+ * reason: it closes over nothing but module-level TYPE_MARKERS, and
+ * `persistence()` needs to decode a payload WITHOUT applying it — Link owns the
+ * apply, because acquiring external truth is a relationship act, not a codec
+ * act.
+ */
+const restoreSpecialTypes = (value: unknown): unknown => {
+  if (!value || typeof value !== 'object') {
+    return value;
+  }
+
+  // Check for type markers
+  if (TYPE_MARKERS.UNDEFINED in value) {
+    return undefined;
+  }
+  if (TYPE_MARKERS.NAN in value) {
+    return NaN;
+  }
+  if (TYPE_MARKERS.INFINITY in value) {
+    return Infinity;
+  }
+  if (TYPE_MARKERS.NEG_INFINITY in value) {
+    return -Infinity;
+  }
+  if (TYPE_MARKERS.BIGINT in value) {
+    return BigInt(value[TYPE_MARKERS.BIGINT] as string);
+  }
+  if (TYPE_MARKERS.SYMBOL in value) {
+    return Symbol.for(value[TYPE_MARKERS.SYMBOL] as string);
+  }
+  if (TYPE_MARKERS.DATE in value) {
+    return new Date(value[TYPE_MARKERS.DATE] as string);
+  }
+  if (TYPE_MARKERS.REGEXP in value) {
+    const regexpData = value[TYPE_MARKERS.REGEXP] as {
+      source: string;
+      flags: string;
+    };
+    return new RegExp(regexpData.source, regexpData.flags);
+  }
+  if (TYPE_MARKERS.MAP in value) {
+    return new Map(value[TYPE_MARKERS.MAP] as Array<[unknown, unknown]>);
+  }
+  if (TYPE_MARKERS.SET in value) {
+    return new Set(value[TYPE_MARKERS.SET] as Array<unknown>);
+  }
+
+  // Handle arrays
+  if (Array.isArray(value)) {
+    return value.map(restoreSpecialTypes);
+  }
+
+  // Handle objects
+  const result: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(value)) {
+    result[k] = restoreSpecialTypes(v);
+  }
+  return result;
+};
+
+// Encode helper over already-unwrapped plain data. Hoisted to module scope
+// with the codec: it closes over nothing but module-level TYPE_MARKERS.
+function encodeSpecials(v: unknown, preserveTypes: boolean): unknown {
+  if (!preserveTypes) return v;
+  if (v === undefined) return { [TYPE_MARKERS.UNDEFINED]: true };
+  if (typeof v === 'number') {
+    if (Number.isNaN(v)) return { [TYPE_MARKERS.NAN]: true };
+    if (v === Infinity) return { [TYPE_MARKERS.INFINITY]: true };
+    if (v === -Infinity) return { [TYPE_MARKERS.NEG_INFINITY]: true };
+    return v;
+  }
+  if (typeof v === 'bigint') return { [TYPE_MARKERS.BIGINT]: String(v) };
+  if (typeof v === 'symbol') return { [TYPE_MARKERS.SYMBOL]: String(v) };
+
+  if (v instanceof Date) return { [TYPE_MARKERS.DATE]: v.toISOString() };
+  if (v instanceof RegExp)
+    return {
+      [TYPE_MARKERS.REGEXP]: { source: v.source, flags: v.flags },
+    };
+  if (v instanceof Map) return { [TYPE_MARKERS.MAP]: Array.from(v.entries()) };
+  if (v instanceof Set) return { [TYPE_MARKERS.SET]: Array.from(v.values()) };
+
+  if (Array.isArray(v)) return v.map((x) => encodeSpecials(x, preserveTypes));
+  if (v && typeof v === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [k, val] of Object.entries(v as Record<string, unknown>))
+      out[k] = encodeSpecials(val, preserveTypes);
+    return out;
+  }
+  return v;
+}
+
+/**
+ * THE CODEC, over a SUPPLIED VALUE.
+ *
+ * ⚠️ EXTRACTED AT THE SEAM `const raw = tree()` — the ONE line that bound
+ * encoding to "whatever the tree currently holds". Everything else here
+ * (special types, circular refs, nodeMap, metadata, replacer) is pure encoding
+ * over `raw` and always was.
+ *
+ * That binding is exactly what PERSISTENCE-AS-LINK-SWAP-0 had to break.
+ * `persistence()` must encode the value Link says is EGRESS-ELIGIBLE, which is
+ * not in general the value `tree()` returns — an inspection write moves the
+ * latter and deliberately leaves the former behind. The public
+ * `serialize(config?)` signature is UNCHANGED and still means "encode current
+ * state"; only an internal caller may name a different value.
+ */
+function encodeSnapshot<T>(
+  raw: T,
+  tree: ISignalTree<T>,
+  fullConfig: InternalSerializationConfig
+): string {
+  // ONE materialiser. `serialize()` used to walk the tree itself with a
+  // private `unwrapObjectSafely`, three hundred lines from `toJSON()` which
+  // already delegated to `tree()` — so the enhancer disagreed with itself
+  // about what a snapshot is, and the private copy never learned the marker
+  // rule. That is why it emitted 17 keys for a `status()` node (2 state, 6
+  // computeds, 9 SETTER METHODS) and then threw on restore when it tried to
+  // `.set()` a computed back.
+  //
+  // The stated reason for keeping it — "we need type-preserving markers" —
+  // does not hold: `tree()` returns LIVE Date/Map/Set/RegExp/bigint
+  // instances (verified for all six, nested included) and `encodeSpecials`
+  // below does the marking. It was never `unwrapObjectSafely` that
+  // preserved the types.
+  const state = encodeSpecials(raw, fullConfig.preserveTypes) as T;
+
+  // Detect circular references if needed
+  const circularPaths = fullConfig.handleCircular
+    ? detectCircularReferences(state)
+    : [];
+
+  // Prepare data
+  const data: SerializedState<T> = {
+    data: state,
+  };
+
+  // Build a compact nodeMap by traversing the callable proxy alias (tree.$)
+  // and marking any signal-like branch node we encounter. Also mark a
+  // root-as-signal marker ('r') if the root alias exposes a .set().
+  const nodeMap: Record<string, 'b' | 'r'> = {};
+  try {
+    type Alias = { set?: (v: unknown) => void } & Record<string, unknown>;
+    const rootAlias = (tree as unknown as { $?: Alias }).$;
+    if (rootAlias && typeof rootAlias.set === 'function') {
+      nodeMap[''] = 'r';
+    }
+
+    const visited = new WeakSet<object>();
+    const isBranch = (v: unknown): boolean =>
+      isSignal(v) ||
+      (typeof v === 'function' &&
+        'set' in (v as object) &&
+        typeof (v as { set?: unknown }).set === 'function');
+
+    const walkAlias = (obj: unknown, path = '') => {
+      if (!isTraversableNode(obj)) return;
+      const ref = obj as object;
+      if (visited.has(ref)) return;
+      visited.add(ref);
+
+      if (path && isBranch(obj)) {
+        nodeMap[path] = 'b';
+      }
+
+      // Traverse own enumerable properties (callable proxies expose children here)
+      for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+        const childPath = path ? `${path}.${k}` : k;
+        walkAlias(v, childPath);
+      }
+    };
+
+    if (rootAlias) walkAlias(rootAlias);
+  } catch {
+    // Do not block serialization on nodeMap errors
+  }
+
+  // Add metadata if requested
+  if (fullConfig.includeMetadata) {
+    data.metadata = {
+      // `timestamp` answers "when was this written" — useful for
+      // staleness ("this draft is three weeks old, discard it"), which is
+      // the job `loader({ staleTime })` already does via `lastLoadedAt`.
+      // It is deliberately excluded from the change-detection cache key so
+      // it cannot cause false positives.
+      //
+      // It is NOT a compatibility signal: see the note on `version` in the
+      // metadata type. Both fields are currently read only into a
+      // debugMode console.log.
+      timestamp: Date.now(),
+      version: SNAPSHOT_FORMAT_VERSION,
+      ...(circularPaths.length > 0 && { circularRefs: circularPaths }),
+      ...(Object.keys(nodeMap).length > 0 && { nodeMap }),
+    };
+  }
+
+  // Serialize with custom replacer
+  const replacer = createReplacer(fullConfig);
+  const json = JSON.stringify(data, replacer, 2);
+  // Extra debug: if JSON contains MAP or SET markers, print compact preview
+  return json;
+}
+
 export function serialization(
   defaultConfig: SerializationConfig = {}
 ): Enhancer<SerializationMethods> {
@@ -482,61 +696,6 @@ export function serialization(
       data: T,
       metadata?: SerializedState<T>['metadata']
     ): void => {
-      // Convert special type markers back to their actual types
-      const restoreSpecialTypes = (value: unknown): unknown => {
-        if (!value || typeof value !== 'object') {
-          return value;
-        }
-
-        // Check for type markers
-        if (TYPE_MARKERS.UNDEFINED in value) {
-          return undefined;
-        }
-        if (TYPE_MARKERS.NAN in value) {
-          return NaN;
-        }
-        if (TYPE_MARKERS.INFINITY in value) {
-          return Infinity;
-        }
-        if (TYPE_MARKERS.NEG_INFINITY in value) {
-          return -Infinity;
-        }
-        if (TYPE_MARKERS.BIGINT in value) {
-          return BigInt(value[TYPE_MARKERS.BIGINT] as string);
-        }
-        if (TYPE_MARKERS.SYMBOL in value) {
-          return Symbol.for(value[TYPE_MARKERS.SYMBOL] as string);
-        }
-        if (TYPE_MARKERS.DATE in value) {
-          return new Date(value[TYPE_MARKERS.DATE] as string);
-        }
-        if (TYPE_MARKERS.REGEXP in value) {
-          const regexpData = value[TYPE_MARKERS.REGEXP] as {
-            source: string;
-            flags: string;
-          };
-          return new RegExp(regexpData.source, regexpData.flags);
-        }
-        if (TYPE_MARKERS.MAP in value) {
-          return new Map(value[TYPE_MARKERS.MAP] as Array<[unknown, unknown]>);
-        }
-        if (TYPE_MARKERS.SET in value) {
-          return new Set(value[TYPE_MARKERS.SET] as Array<unknown>);
-        }
-
-        // Handle arrays
-        if (Array.isArray(value)) {
-          return value.map(restoreSpecialTypes);
-        }
-
-        // Handle objects
-        const result: Record<string, unknown> = {};
-        for (const [k, v] of Object.entries(value)) {
-          result[k] = restoreSpecialTypes(v);
-        }
-        return result;
-      };
-
       // Restore special types in the data
       const restoredData = restoreSpecialTypes(data);
 
@@ -717,141 +876,15 @@ export function serialization(
       );
     };
 
-    // Encode/decode helpers that work on already-unwrapped plain data
-    function encodeSpecials(v: unknown, preserveTypes: boolean): unknown {
-      if (!preserveTypes) return v;
-      if (v === undefined) return { [TYPE_MARKERS.UNDEFINED]: true };
-      if (typeof v === 'number') {
-        if (Number.isNaN(v)) return { [TYPE_MARKERS.NAN]: true };
-        if (v === Infinity) return { [TYPE_MARKERS.INFINITY]: true };
-        if (v === -Infinity) return { [TYPE_MARKERS.NEG_INFINITY]: true };
-        return v;
-      }
-      if (typeof v === 'bigint') return { [TYPE_MARKERS.BIGINT]: String(v) };
-      if (typeof v === 'symbol') return { [TYPE_MARKERS.SYMBOL]: String(v) };
-
-      if (v instanceof Date) return { [TYPE_MARKERS.DATE]: v.toISOString() };
-      if (v instanceof RegExp)
-        return {
-          [TYPE_MARKERS.REGEXP]: { source: v.source, flags: v.flags },
-        };
-      if (v instanceof Map)
-        return { [TYPE_MARKERS.MAP]: Array.from(v.entries()) };
-      if (v instanceof Set)
-        return { [TYPE_MARKERS.SET]: Array.from(v.values()) };
-
-      if (Array.isArray(v))
-        return v.map((x) => encodeSpecials(x, preserveTypes));
-      if (v && typeof v === 'object') {
-        const out: Record<string, unknown> = {};
-        for (const [k, val] of Object.entries(v as Record<string, unknown>))
-          out[k] = encodeSpecials(val, preserveTypes);
-        return out;
-      }
-      return v;
-    }
-
     /**
      * Serialize to JSON string
      */
-    enhanced.serialize = (config?: SerializationConfig): string => {
-      const fullConfig: InternalSerializationConfig = {
+    enhanced.serialize = (config?: SerializationConfig): string =>
+      encodeSnapshot(tree(), tree, {
         ...DEFAULT_CONFIG,
         ...defaultConfig,
         ...config,
-      };
-
-      // ONE materialiser. `serialize()` used to walk the tree itself with a
-      // private `unwrapObjectSafely`, three hundred lines from `toJSON()` which
-      // already delegated to `tree()` — so the enhancer disagreed with itself
-      // about what a snapshot is, and the private copy never learned the marker
-      // rule. That is why it emitted 17 keys for a `status()` node (2 state, 6
-      // computeds, 9 SETTER METHODS) and then threw on restore when it tried to
-      // `.set()` a computed back.
-      //
-      // The stated reason for keeping it — "we need type-preserving markers" —
-      // does not hold: `tree()` returns LIVE Date/Map/Set/RegExp/bigint
-      // instances (verified for all six, nested included) and `encodeSpecials`
-      // below does the marking. It was never `unwrapObjectSafely` that
-      // preserved the types.
-      const raw = tree();
-      const state = encodeSpecials(raw, fullConfig.preserveTypes) as T;
-
-      // Detect circular references if needed
-      const circularPaths = fullConfig.handleCircular
-        ? detectCircularReferences(state)
-        : [];
-
-      // Prepare data
-      const data: SerializedState<T> = {
-        data: state,
-      };
-
-      // Build a compact nodeMap by traversing the callable proxy alias (tree.$)
-      // and marking any signal-like branch node we encounter. Also mark a
-      // root-as-signal marker ('r') if the root alias exposes a .set().
-      const nodeMap: Record<string, 'b' | 'r'> = {};
-      try {
-        type Alias = { set?: (v: unknown) => void } & Record<string, unknown>;
-        const rootAlias = (tree as unknown as { $?: Alias }).$;
-        if (rootAlias && typeof rootAlias.set === 'function') {
-          nodeMap[''] = 'r';
-        }
-
-        const visited = new WeakSet<object>();
-        const isBranch = (v: unknown): boolean =>
-          isSignal(v) ||
-          (typeof v === 'function' &&
-            'set' in (v as object) &&
-            typeof (v as { set?: unknown }).set === 'function');
-
-        const walkAlias = (obj: unknown, path = '') => {
-          if (!isTraversableNode(obj)) return;
-          const ref = obj as object;
-          if (visited.has(ref)) return;
-          visited.add(ref);
-
-          if (path && isBranch(obj)) {
-            nodeMap[path] = 'b';
-          }
-
-          // Traverse own enumerable properties (callable proxies expose children here)
-          for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
-            const childPath = path ? `${path}.${k}` : k;
-            walkAlias(v, childPath);
-          }
-        };
-
-        if (rootAlias) walkAlias(rootAlias);
-      } catch {
-        // Do not block serialization on nodeMap errors
-      }
-
-      // Add metadata if requested
-      if (fullConfig.includeMetadata) {
-        data.metadata = {
-          // `timestamp` answers "when was this written" — useful for
-          // staleness ("this draft is three weeks old, discard it"), which is
-          // the job `loader({ staleTime })` already does via `lastLoadedAt`.
-          // It is deliberately excluded from the change-detection cache key so
-          // it cannot cause false positives.
-          //
-          // It is NOT a compatibility signal: see the note on `version` in the
-          // metadata type. Both fields are currently read only into a
-          // debugMode console.log.
-          timestamp: Date.now(),
-          version: SNAPSHOT_FORMAT_VERSION,
-          ...(circularPaths.length > 0 && { circularRefs: circularPaths }),
-          ...(Object.keys(nodeMap).length > 0 && { nodeMap }),
-        };
-      }
-
-      // Serialize with custom replacer
-      const replacer = createReplacer(fullConfig);
-      const json = JSON.stringify(data, replacer, 2);
-      // Extra debug: if JSON contains MAP or SET markers, print compact preview
-      return json;
-    };
+      });
 
     /**
      * Deserialize from JSON string
@@ -1070,88 +1103,233 @@ export function persistence(
       SerializationMethods &
       PersistenceMethods;
 
-    // Cache to avoid redundant storage writes. Use a metadata-free cache key
-    // so timestamps in metadata don't cause false positives for changes.
+    // ══════════════════════════════════════════════════════════════════════
+    // THE RELATIONSHIP IS A LINK.            PERSISTENCE-AS-LINK-SWAP-0
+    // ══════════════════════════════════════════════════════════════════════
+    //
+    // THE HYPOTHESIS THIS IMPLEMENTS:
+    //
+    //     Persistence does not need its own relationship authority model.
+    //     Persistence = Link + application/durability policy.
+    //
+    // WHAT LINK NOW OWNS — every one of these was hand-rolled here, and each
+    // hand-rolled copy was WEAKER than the primitive that replaced it:
+    //
+    //   change detection    was `tree() !== previousState` off `subscribe()`,
+    //                       with a 100ms POLLING FALLBACK outside Angular.
+    //                       Now: the path notifier, per notification.
+    //   turn coalescing     was a `debounceMs` timer doing double duty as both
+    //                       policy and correctness. Now: Link's flush boundary
+    //                       sends one value per settled turn; the debounce
+    //                       below is policy ONLY.
+    //   transaction gating  was a bespoke `scheduleDurableConsequence` claim on
+    //                       an `autoSaveKey` symbol. Now: Link's own.
+    //   echo suppression    was `lastCacheKey`, a STRING compare of the whole
+    //                       serialized payload. Now: `knownY` + `deepEqual`,
+    //                       which is semantic and needs no serialization to
+    //                       answer. The cache key survives BELOW, where it
+    //                       belongs — as a storage-write optimization.
+    //   realized inbound    was a hand-written `withWriteContext({ origin:
+    //                       'external', participation: 'realized' })`. Now:
+    //                       Link's `external()`, which declares exactly that.
+    //   owner isolation     was implicit in one-subscription-per-tree. Now:
+    //                       explicit `(registry, position)` identity.
+    //
+    // ⚠️ AND THE ONE THAT WAS NOT MERELY WEAKER — IT WAS ABSENT.
+    //
+    // Whole-tree reference identity cannot tell an AUTHORED write from an
+    // INSPECTION write, because both move `tree()`. That is structurally the
+    // same mechanism as LINK-ROOT-SOURCE-0's M3 mutation — "replace the
+    // eligible projection with a current whole-tree re-read" — which passed six
+    // rows and killed the inspection row ALONE. Measured here before the swap,
+    // P2 and P3 failed for exactly that reason and nothing else did:
+    //
+    //     CORRECT COMPLETE SHAPE IS NOT CORRECT EXTERNALLY-AUTHORIZED TRUTH.
+    //
+    // WHAT PERSISTENCE KEEPS, because none of it is relationship semantics:
+    // the storage adapter, the key, the codec and its metadata/version, the
+    // debounce, `skipCache`, and the `load()`/`autoLoad` lifecycle.
+
+    const codecConfig: InternalSerializationConfig = {
+      ...DEFAULT_CONFIG,
+      ...serializationConfig,
+    };
+    /** Metadata-free, so a timestamp can never look like a state change. */
+    const cacheKeyConfig: InternalSerializationConfig = {
+      ...codecConfig,
+      includeMetadata: false,
+    };
+
+    const debug = () =>
+      (typeof ngDevMode === 'undefined' || ngDevMode) &&
+      !!(tree as SignalTreeWithConfig).__config?.debugMode;
+
+    // A STORAGE-WRITE optimization, no longer a correctness mechanism. Link
+    // decides whether a value is worth sending; this decides only whether an
+    // identical payload is worth re-writing to a backend.
     let lastCacheKey: string | null = null;
 
     /**
-     * Save current state to storage
+     * The latest EGRESS-ELIGIBLE whole-tree value, as Link computed it.
+     *
+     * Seeded from `tree()` at construction — the same read, at the same moment,
+     * that Link makes for its own authority baseline — and advanced only by
+     * Link handing a value to the endpoint. Deliberately never re-read from
+     * `tree()` afterwards: that re-read is precisely the mechanism that made
+     * inspection state durable.
      */
-    enhanced.save = async (): Promise<void> => {
-      try {
-        // Compute a deterministic cache key that excludes metadata (timestamps)
-        const cacheKey = enhanced.serialize({
-          ...serializationConfig,
-          includeMetadata: false,
-        });
+    let latestEligible: T = tree();
 
-        // Only write to storage if the state has changed (by cacheKey), unless skipCache is true
-        if (config.skipCache || cacheKey !== lastCacheKey) {
-          // Persist the full payload (respecting includeMetadata from config)
-          const serialized = enhanced.serialize(serializationConfig);
-          await Promise.resolve(storageAdapter.setItem(key, serialized));
-          lastCacheKey = cacheKey;
-
-          if (
-            (typeof ngDevMode === 'undefined' || ngDevMode) &&
-            (tree as SignalTreeWithConfig).__config?.debugMode
-          ) {
-            console.log(`[SignalTree] State saved to storage key: ${key}`);
-          }
-        } else if (
-          (typeof ngDevMode === 'undefined' || ngDevMode) &&
-          (tree as SignalTreeWithConfig).__config?.debugMode
-        ) {
+    /** Encode ONE egress-eligible whole-tree value and make it durable. */
+    const persist = async (value: T): Promise<void> => {
+      const cacheKey = encodeSnapshot(value, tree, cacheKeyConfig);
+      if (!config.skipCache && cacheKey === lastCacheKey) {
+        if (debug()) {
           console.log(
             `[SignalTree] State unchanged, skipping storage write for key: ${key}`
           );
         }
+        return;
+      }
+      await Promise.resolve(
+        storageAdapter.setItem(key, encodeSnapshot(value, tree, codecConfig))
+      );
+      lastCacheKey = cacheKey;
+      if (debug()) {
+        console.log(`[SignalTree] State saved to storage key: ${key}`);
+      }
+    };
+
+    // ── DEBOUNCE: POLICY, LAYERED ON TOP ──────────────────────────────────
+    //
+    // Link already sends at most one value per settled turn, so this is no
+    // longer load-bearing for correctness — it is the public `debounceMs`
+    // contract and nothing else. It is safe to hold ONE pending value because
+    // Link's reconciler AWAITS `endpoint.set` and never overlaps two sends.
+    let pending: {
+      value: T;
+      resolve: () => void;
+      reject: (e: unknown) => void;
+    } | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let immediate = false;
+
+    const flushPending = async (): Promise<void> => {
+      if (timer !== undefined) {
+        clearTimeout(timer);
+        timer = undefined;
+      }
+      const p = pending;
+      pending = null;
+      if (!p) return;
+      try {
+        await persist(p.value);
+        p.resolve();
+      } catch (error) {
+        p.reject(error);
+      }
+    };
+
+    const outbound = (value: T): Promise<void> => {
+      // ⚠️ RECORD BEFORE DECIDING WHETHER TO WRITE. `autoSave: false` must
+      // suppress AUTOMATIC publication, never the relationship — the eligible
+      // value is what a manual `save()` publishes, and the only thing that
+      // knows it is Link. Disposing here instead (the first attempt) made
+      // `save()` fall back to the construction baseline and write 0 where the
+      // tree held 7. Turning off the pump is not the same as cutting the pipe.
+      latestEligible = value;
+      if (!autoSave) return Promise.resolve();
+      if (immediate || debounceMs <= 0) return persist(value);
+      return new Promise<void>((resolve, reject) => {
+        if (timer !== undefined) clearTimeout(timer);
+        pending = { value, resolve, reject };
+        timer = setTimeout(() => void flushPending(), debounceMs);
+      });
+    };
+
+    // ── INBOUND: ONE DECODED PAYLOAD, HANDED TO LINK ──────────────────────
+    //
+    // `get()` returns a value Link then ACQUIRES: it moves `knownY` (so the
+    // value is not echoed straight back out), moves `eligible` (so external
+    // truth becomes authoritative even when it coincides with what inspection
+    // is already displaying — the I4 case), and applies it through `external()`,
+    // which declares `{ origin: 'external', participation: 'realized' }` — the
+    // exact pair this function used to spell out by hand.
+    //
+    // ⚠️ `load()` reads storage FIRST and only then retrieves, because "no
+    // stored payload" is not a value. Link has no absent-value protocol and
+    // acquiring `undefined` would wipe the tree.
+    let inbound: T | undefined;
+
+    const endpoint: LinkEndpoint<T> = {
+      get: () => inbound as T,
+      set: outbound,
+    };
+
+    // ⚠️ THE ONE CAST, AND WHAT IT IS FOR. `TruthfulLinkSource` rejects a root
+    // whose declared type still contains an `entityMap` construction marker,
+    // because a CALLER writing endpoint callbacks would be handed a value type
+    // that matches neither the marker nor the runtime state. Persistence has no
+    // such caller: this endpoint is internal, its value is consumed only by the
+    // codec, and no `NaturalValue<T>` ever reaches application code. The type
+    // rule protects an authoring surface that does not exist here.
+    const relationship = link(
+      (tree as unknown as { $: object }).$ as never,
+      endpoint as never
+    );
+
+    /**
+     * Save current state to storage.
+     *
+     * Publishes the EGRESS-ELIGIBLE value, not `tree()` — that is the whole
+     * point of the swap and it must hold for the manual path too, or a devtools
+     * scrub followed by an explicit `save()` would make the scrub durable.
+     */
+    enhanced.save = async (): Promise<void> => {
+      immediate = true;
+      try {
+        await flushPending();
+        await relationship.settled();
+        // The eligible value, never `tree()`. On an untouched tree this is
+        // still the baseline Link adopted at construction — which is the point:
+        // an inspection write cannot have advanced it, so a devtools scrub
+        // followed by an explicit `save()` cannot make the scrub durable.
+        await persist(latestEligible);
       } catch (error) {
         console.error('[SignalTree] Failed to save state:', error);
         throw error; // Re-throw for tests to catch
+      } finally {
+        immediate = false;
       }
     };
 
     /**
-     * Load state from storage
+     * Load state from storage.
+     *
+     * The LIFECYCLE is unchanged — `load()` is still callable by hand and
+     * `autoLoad` still runs before autosave can publish. What changed is what
+     * owns the acquisition beneath it.
      */
     enhanced.load = async (): Promise<void> => {
       try {
         const data = await Promise.resolve(storageAdapter.getItem(key));
-        if (data) {
-          // A2-2. Rehydrating durable truth into a LIVE tree is a realization
-          // of external truth, not authored work — the same rule PER-B P2 fixed
-          // one level down for `stored().reload()`, which measured
-          // `{ origin: null, participation: null }` before its fix and let an
-          // enclosing transaction roll a durable read back (PER-B P4).
-          //
-          // Measured here before this fix: `load()` emitted exactly one write,
-          // classified AUTHORED. The tree-scoped surface had the marker's old
-          // defect, unfixed.
-          //
-          // Only the SYNCHRONOUS application is wrapped. The `await` above is
-          // the storage READ; the write itself happens inside the context, so
-          // this is not the async application ST1035 refuses.
-          withWriteContext(
-            {
-              ...(getActiveWriteContext() ?? {}),
-              origin: 'external',
-              participation: 'realized',
-            },
-            () => enhanced.deserialize(data, serializationConfig)
-          );
-          // Reset cache after loading new data using a metadata-free key
-          lastCacheKey = enhanced.serialize({
-            ...serializationConfig,
-            includeMetadata: false,
-          });
-
-          if (
-            (typeof ngDevMode === 'undefined' || ngDevMode) &&
-            (tree as SignalTreeWithConfig).__config?.debugMode
-          ) {
-            console.log(`[SignalTree] State loaded from storage key: ${key}`);
-          }
+        if (data == null) return;
+        const parsed = JSON.parse(data) as SerializedState<T>;
+        inbound = restoreSpecialTypes(parsed.data) as T;
+        await relationship.retrieve();
+        // ⚠️ NO CACHE-KEY PRIMING HERE, DELIBERATELY. The obvious line —
+        // `lastCacheKey = encodeSnapshot(inbound, ...)` — was written first and
+        // then DELETED, because it is the incumbent's echo suppression rebuilt
+        // on top of the primitive that replaced it. Link acquires the payload,
+        // so `knownY` already holds it and the reconciler's `deepEqual` stops
+        // the echo without serializing anything.
+        //
+        // It was not merely redundant: while it stood, a mutation that applied
+        // the payload WITHOUT telling the relationship passed every row in the
+        // matrix, because this line suppressed the echo on its own. Deleting it
+        // is what makes the inbound half of the swap FALSIFIABLE.
+        if (debug()) {
+          console.log(`[SignalTree] State loaded from storage key: ${key}`);
         }
       } catch (error) {
         console.error('[SignalTree] Failed to load state:', error);
@@ -1167,10 +1345,7 @@ export function persistence(
         await Promise.resolve(storageAdapter.removeItem(key));
         lastCacheKey = null;
 
-        if (
-          (typeof ngDevMode === 'undefined' || ngDevMode) &&
-          (tree as SignalTreeWithConfig).__config?.debugMode
-        ) {
+        if (debug()) {
           console.log(`[SignalTree] State cleared from storage key: ${key}`);
         }
       } catch (error) {
@@ -1189,127 +1364,48 @@ export function persistence(
       }, 0);
     }
 
-    // Auto-save on updates if enabled
-    if (autoSave) {
-      let saveTimeout: ReturnType<typeof setTimeout> | undefined;
-      // Change detection by REFERENCE, not by stringifying the whole tree.
-      //
-      // This polled `JSON.stringify(tree())` — materialise the entire tree AND
-      // serialise it, every 100ms, to answer a yes/no question the write path
-      // already knew the answer to. Materialisation is now memoised and
-      // `tree()` returns the IDENTICAL object when nothing changed, so an
-      // identity check is exact and O(1).
-      //
-      // It is slightly MORE sensitive than the string compare, in the right
-      // direction: a write that JSON collapses (`{a: undefined}` vs `{}`) now
-      // triggers a save, where before it was silently dropped. It can never be
-      // less sensitive — a changed signal always produces a new object.
-      let previousState: unknown = tree();
-      let pollingActive = true;
-
-      // Persistence is post-commit. autoSave serializes the WHOLE tree, so a
-      // snapshot taken while an explicit transaction is open would persist
-      // speculative state — the same defect stored() had, reached through a
-      // different API.
-      //
-      // stored() can read the transaction off the mutation's write context
-      // because it writes in that mutation's own stack. autoSave cannot: by
-      // the time this timer fires the transaction callback has returned while
-      // the transaction itself may still be pending. So it asks whether the
-      // tree has an unsettled scope instead, and re-arms on settlement.
-      //
-      // Deliberate consequence: a transaction that is never confirmed or
-      // rolled back holds autoSave indefinitely. That is the correct trade —
-      // an unresolved optimistic mutation has no committed truth to persist,
-      // and persisting it anyway is the bug being fixed.
-      // One durable-consequence token for this enhancer instance: repeated
-      // autoSaves collapse to the latest, exactly as repeated writes to one
-      // stored() node do.
-      const autoSaveKey = Symbol('persistence:autoSave');
-
-      const runAutoSave = () => {
-        scheduleDurableConsequence({
-          claimant: tree as object,
-          key: autoSaveKey,
-          run: () => {
-            enhanced.save().catch((error) => {
-              console.error('[SignalTree] Auto-save failed:', error);
-            });
-          },
-        });
-      };
-
-      // Hook into state changes to trigger auto-save
-      const triggerAutoSave = () => {
-        // Debounce saves
-        if (saveTimeout) {
-          clearTimeout(saveTimeout);
-        }
-
-        saveTimeout = setTimeout(runAutoSave, debounceMs);
-      };
-
-      // Try to use tree.subscribe() for reactive state watching
-      // This leverages Angular's effect system - no polling needed in production
-      let unsubscribeAutoSave: (() => void) | null = null;
+    /**
+     * Force a drain — the host is backgrounding, or a test needs determinism.
+     *
+     * ⚠️ IT DOES NOT AWAIT SETTLEMENT, AND THAT IS THE FIX. Link hands a value
+     * to `outbound` only from inside its durable-consequence `run`, so anything
+     * sitting in `pending` has ALREADY cleared settlement. Flushing it is
+     * therefore complete — there is nothing else this drain is entitled to
+     * write.
+     *
+     * A2-4.1 characterised the incumbent drain as writing SPECULATIVE state:
+     * it bypassed the consequence authority and serialized the tree as it
+     * stood, so backgrounding mid-transaction made a doomed value durable and
+     * the rollback could never correct it. Awaiting settlement instead is the
+     * opposite failure — the drain would never resolve while a transaction is
+     * open, which is a hang at the moment a host is trying to leave.
+     *
+     * Neither is needed. An unresolved optimistic mutation has NO COMMITTED
+     * TRUTH TO PERSIST, so the correct drain writes what is settled and returns.
+     */
+    (enhanced as unknown as EnhancedSignalTree).__flushAutoSave = async () => {
+      immediate = true;
       try {
-        unsubscribeAutoSave = (
-          tree as unknown as { subscribe: (fn: () => void) => () => void }
-        ).subscribe(() => {
-          const currentState: unknown = tree();
-          if (currentState !== previousState) {
-            previousState = currentState;
-            triggerAutoSave();
-          }
-        });
-      } catch {
-        // subscribe() threw - not in Angular injection context
-        // Fall back to setTimeout-based polling for non-Angular environments or tests
-        const checkForChanges = () => {
-          if (!pollingActive) return;
-          const currentState: unknown = tree();
-          if (currentState !== previousState) {
-            previousState = currentState;
-            triggerAutoSave();
-          }
-          // Use longer interval (100ms) to reduce CPU usage
-          setTimeout(checkForChanges, 100);
-        };
-        setTimeout(checkForChanges, 0); // Start immediately
+        await flushPending();
+      } finally {
+        immediate = false;
       }
+    };
 
-      // Store cleanup function for testing
-      (enhanced as unknown as EnhancedSignalTree).__flushAutoSave = () => {
-        pollingActive = false;
-        if (unsubscribeAutoSave) {
-          unsubscribeAutoSave();
-          unsubscribeAutoSave = null;
+    // Register cleanup so destroy() stops auto-save automatically
+    if (typeof tree.registerCleanup === 'function') {
+      tree.registerCleanup(() => {
+        if (timer !== undefined) {
+          clearTimeout(timer);
+          timer = undefined;
         }
-        if (saveTimeout) {
-          clearTimeout(saveTimeout);
-          saveTimeout = undefined;
-          return enhanced.save();
-        }
-        return Promise.resolve();
-      };
-
-      // Register cleanup so destroy() stops auto-save automatically
-      if (typeof tree.registerCleanup === 'function') {
-        tree.registerCleanup(() => {
-          pollingActive = false;
-          if (unsubscribeAutoSave) {
-            unsubscribeAutoSave();
-            unsubscribeAutoSave = null;
-          }
-          if (saveTimeout) {
-            clearTimeout(saveTimeout);
-            saveTimeout = undefined;
-          }
-          // A held save must not outlive the tree: settling a scope after
-          // destroy() would otherwise resurrect a save on a dead tree.
-          cancelDurableConsequence(tree as object, autoSaveKey);
-        });
-      }
+        // A held save must not outlive the tree: settling a scope after
+        // destroy() would otherwise resurrect a save on a dead tree. Link's
+        // dispose() drops its own durable-consequence claim; dropping the
+        // debounced value here is this layer's half of the same rule.
+        pending = null;
+        relationship.dispose();
+      });
     }
 
     return enhanced as unknown as ISignalTree<T> &
