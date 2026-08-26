@@ -1,4 +1,4 @@
-import type { PositionId } from '../types';
+import type { PositionId } from '../mutation-types';
 import type { PhysicalCommitClock } from './physical-commit-clock';
 
 import {

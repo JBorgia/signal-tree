@@ -194,4 +194,101 @@ describe('tree scalar slot runtime', () => {
     expect(throwsOnChange()).toBe('B');
     expect(runtime.revision()).toBe(0);
   });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ATOMIC-STATE-RETIREMENT — ORPHANED INVARIANT RECOVERY.
+  //
+  // The `atomic-state/**` prototypes were production-UNREACHABLE (zero non-spec
+  // importers) but were NOT vacuous: a carrier audit found two subjects that
+  // survive into the shipped flat-slot kernel and had NO permanent carrier
+  // anywhere outside those prototypes.
+  //
+  //   atomic-scalar-store.spec.ts   'discard is inert'
+  //                                 'does not allow a discarded frame to publish later'
+  //                                 'refuses the second of two frames that began
+  //                                  from the same base revision'
+  //   slot-token-tree-prototype     'commits slot frames atomically without
+  //                                  exposing a partial pair'
+  //
+  // Zero production importers proves no REACHABILITY. It does not prove no
+  // surviving invariant carrier — deleting on import count alone would have
+  // silently dropped these. Recovered here, at the boundary the claims are
+  // actually about (the kernel), before the prototypes are retired.
+  // ─────────────────────────────────────────────────────────────────────────
+
+  it('keeps staged frame writes out of committed truth until commit', () => {
+    const kernel = createTreeScalarSlotKernel();
+    const a = kernel.createSlot(1, Object.is);
+    const frame = kernel.beginFrame();
+
+    frame.set(a, 99);
+
+    // Staged, not committed: truth and revision are both untouched.
+    expect(kernel.readSlot<number>(a)).toBe(1);
+    expect(kernel.revision()).toBe(0);
+  });
+
+  it('discard is inert and a discarded frame can never commit', () => {
+    const kernel = createTreeScalarSlotKernel();
+    const a = kernel.createSlot(1, Object.is);
+    const frame = kernel.beginFrame();
+    frame.set(a, 99);
+
+    frame.discard();
+
+    expect(kernel.readSlot<number>(a)).toBe(1);
+    expect(kernel.revision()).toBe(0);
+    // A discarded frame is CLOSED — it cannot publish later on a retry.
+    expect(() => frame.commit()).toThrow(/already closed/i);
+  });
+
+  it('commits a multi-slot frame atomically under one revision', () => {
+    const kernel = createTreeScalarSlotKernel();
+    const a = kernel.createSlot(1, Object.is);
+    const b = kernel.createSlot('x', Object.is);
+    const frame = kernel.beginFrame();
+    frame.set(a, 2);
+    frame.set(b, 'y');
+
+    const result: ScalarSlotCommitResult = frame.commit();
+
+    // ONE revision for the whole frame — never one per slot, which is what
+    // would expose a partial pair to an observer counting revisions.
+    expect(result.revision).toBe(1);
+    expect([...result.changedSlots].sort()).toEqual([a, b].sort());
+    expect(kernel.readSlot<number>(a)).toBe(2);
+    expect(kernel.readSlot<string>(b)).toBe('y');
+  });
+
+  it('omits equal slots from changedSlots and commits nothing when all are equal', () => {
+    const kernel = createTreeScalarSlotKernel();
+    const a = kernel.createSlot(1, Object.is);
+    const b = kernel.createSlot('x', Object.is);
+    const frame = kernel.beginFrame();
+    frame.set(a, 2);
+    frame.set(b, 'x'); // unchanged
+
+    expect(frame.commit().changedSlots).toEqual([a]);
+
+    const noop = kernel.beginFrame();
+    noop.set(a, 2); // already 2
+    const result = noop.commit();
+    expect(result.changedSlots).toEqual([]);
+    expect(result.revision).toBe(1); // no advance on an empty commit
+  });
+
+  it('refuses the second of two frames opened from the same base revision', () => {
+    const kernel = createTreeScalarSlotKernel();
+    const a = kernel.createSlot(1, Object.is);
+    const first = kernel.beginFrame();
+    const second = kernel.beginFrame();
+
+    first.set(a, 2);
+    first.commit();
+
+    // `second` based its read on revision 0, which no longer holds.
+    second.set(a, 3);
+    expect(() => second.commit()).toThrow(/stale/i);
+    expect(kernel.readSlot<number>(a)).toBe(2);
+  });
 });

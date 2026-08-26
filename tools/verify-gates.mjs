@@ -388,6 +388,35 @@ const GATES = [
     },
   },
   {
+    name: 'kernel-neutrality',
+    covers:
+      'every declared-neutral kernel root has an Angular-free TRANSITIVE TYPE ' +
+      'closure — type-only edges included',
+    cmd: ['node', 'tools/check-kernel-neutrality.mjs'],
+    // The spike found the kernel's own file Angular-free while its 27-file type
+    // closure carried six tainted members, through two single-symbol imports
+    // that named a re-exporting hub instead of the defining module. Runtime
+    // probes cannot see this: the RUNTIME closure was already clean. Public
+    // contracts are types, so the type closure is the property worth gating.
+    mutation: {
+      file: 'packages/core/src/lib/internals/physical-commit-clock.ts',
+      find: "import { isTraversableNode } from './node-shape';",
+      replace: "import { isTraversableNode } from '../utils';",
+    },
+  },
+  {
+    name: 'kernel-neutrality:self',
+    covers:
+      "the closure walker itself — pointed at the known-tainted Angular " +
+      'runtime, it must report taint',
+    cmd: ['node', 'tools/check-kernel-neutrality.mjs', '--self-test'],
+    mutation: {
+      file: 'tools/check-kernel-neutrality.mjs',
+      find: "const tainted = (file) => /@angular\\//.test(readFileSync(file, 'utf8'));",
+      replace: 'const tainted = () => false;',
+    },
+  },
+  {
     name: 'source-controls:self',
     covers:
       "the NUL detector itself — a checker whose only evidence is 'found " +
