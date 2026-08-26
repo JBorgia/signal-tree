@@ -16932,3 +16932,192 @@ special case:
 > **Can an exceptional representation be DELETED by choosing a better primitive
 > shape, without paying for it elsewhere?** If yes, take it. That is the
 > shortcut worth having.
+
+## `INSPECTION-EGRESS-0` — CLOSED. Standalone serialization: SER-EGRESS-A
+
+### Reachability first, because it narrows everything
+
+`serialization()` is not exported from any entrypoint. `@signaltree/core` has
+exactly one (`.`) and it exports `persistence` alone. "Standalone serialization"
+is therefore reachable only as the `SerializationMethods` half of a persisted
+tree, which is what the disposition rows drive.
+
+### The classification, traced rather than inferred from names
+
+```text
+serialize    ENCODE    encodeSnapshot(tree())            -> string to caller
+toJSON       ENCODE    tree()
+snapshot     ENCODE    toJSON() + metadata + deep clone
+deserialize  ACQUIRE   -> fromJSON
+restore      ACQUIRE   -> fromJSON
+fromJSON     ACQUIRE   the one application point
+load         ACQUIRE   -> Link acquire() -> external(() => tree(value))
+
+EGRESS       NONE
+```
+
+No serialization method owns a durable or external consequence. Calling
+`serialize()` twice against an attached `link(tree.$, …)` publishes NOTHING.
+The durable write that DOES follow a `deserialize()` belongs to Link observing a
+state change — persistence's egress doing its job, not serialization's.
+
+> **ENCODING DOES NOT CHOOSE AUTHORITY. THE CALLER DOES.**
+
+### ⚠️ `serialize()` showing inspected state is CORRECT, and is now pinned
+
+A caller asking for bytes is asking about the state it can see. The tempting
+"fix" — making `serialize()` encode eligible authority because persistence does
+— would be wrong, so SER-1 asserts the scrub IS in the output, next to a row
+asserting the same scrub never becomes durable. The invariant is narrower than
+"inspection must never be visible":
+
+```text
+inspection MAY alter observable and diagnostic state
+inspection MAY NOT acquire external causal authority
+```
+
+### The defect that was actually there — and it was not an egress defect
+
+Measured participation on each inbound path, BEFORE any change:
+
+```text
+load()          { origin: 'external', participation: 'realized' }
+deserialize()   {}     <- nothing at all
+restore()       {}     <- nothing at all
+```
+
+All three converge on `fromJSON`, which declared nothing. Every
+participation-keyed consumer therefore read a `deserialize()` as authored work:
+revocable by a transaction, indistinguishable from something the user did. That
+is the A2-2 defect resurfacing on a sibling path. The incumbent had fixed it by
+hand-wrapping ONE CALLER — `load()` — and the swap moved that caller's job into
+Link's `acquire()`. Neither ever covered the public methods.
+
+The fix is one `external()` at the convergence point.
+
+> **FIX THE CONVERGENCE POINT, NOT THE CALLER THAT REVEALED IT.**
+
+⚠️ It is CLASSIFICATION, NOT A RELATIONSHIP. It declares what the write IS. It
+does not give serialization an eligible projection, a `knownY`, or any egress
+authority — a serializer with no relationship attached maintains nothing.
+OWNERSHIP-BEFORE-ADOPTION. When a relationship IS attached, it observes a
+correctly classified write and decides authority itself.
+
+Mutation: dropping the `external()` fails the `deserialize()` and `restore()`
+rows and leaves `load()` green, because `load()` reaches truth through Link.
+
+### `SERIALIZATION-ELIGIBLE-PROJECTION-0` — RETIRED AS SUPERSEDED
+
+Deleted, not parked, and not "unfinished". Every piece it was building has a
+surviving carrier in Link:
+
+```text
+createTreeEgressProjection      -> eligible + entityProjection +
+                                   nestedCollections in link.ts
+adoptRealized()                 -> acquire(), which sets eligible AND knownY
+                                   directly rather than reducing notifications
+notifier '**' + owner filter    -> link.ts's offSub, keyed on
+                                   (registry, position)
+lastCacheKey from eligible      -> knownY + deepEqual, which needs no encoding
+                                   to answer
+```
+
+Its one known outstanding defect — a missing tree-owner filter on the `'**'`
+subscription — is a defect Link never had, because Link was built with the
+filter. That is the clearest possible signal that the responsibility moved
+rather than the code.
+
+> **A PLAN CAN BE RETIRED BY THE ARCHITECTURE THAT SURVIVED IT.** This one is
+> not abandoned or deferred; the concept it was built around stopped existing.
+
+### The split, frozen
+
+```text
+serialization   TRANSFORMS VALUES — encode out, acquire in
+Link            DECIDES AUTHORIZED EXTERNAL TRUTH
+persistence     APPLIES DURABILITY POLICY to that relationship
+```
+
+### `STORED-RETIRE-0` — the carrier requirement is now satisfied
+
+`stored-devtools-isolation.spec.ts` was the last blocker. It pins a TWO-SIDED
+invariant: an undo rewrites storage (correct — the user is undoing the persisted
+change), a devtools scrub does not. Both halves now have carriers independent of
+`stored()`:
+
+```text
+inspection does NOT egress   inspection-egress-conformance.spec.ts,
+                             persistence-as-link-swap-0.spec.ts P2/P2c/P3
+undo/restoration DOES egress inspection-egress-conformance.spec.ts:144
+```
+
+So the invariant survives `stored()`'s deletion. Whether every remaining row in
+that file has a carrier is the check `STORED-RETIRE-0` itself must run when it
+resumes — this clears the blocker, it does not pre-approve the deletion.
+
+## `PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0` — A RELEASE GATE, not cleanup
+
+> **ONE SEMANTIC JOB, ONE AUTHORITATIVE PUBLIC SURFACE.** If two public APIs
+> differ only in spelling or convenience, one should normally die — and it must
+> die BEFORE release, because afterwards deletion is expensive while before it
+> is merely a refusal to institutionalize duplication.
+
+Every public API overlapping another must prove it owns a distinct semantic job:
+
+```text
+DISTINCT SEMANTIC OWNER?      KEEP
+PURE CONVENIENCE?             justify explicitly, or delete
+DUPLICATES ANOTHER AUTHORITY? DELETE
+HISTORICAL COMPATIBILITY?     migrate/delete before release if feasible
+```
+
+Scope is not serialization alone: duplicate state reads, duplicate mutation
+routes, duplicate external-sync mechanisms, duplicate lifecycle APIs, duplicate
+history/restoration entry points, and legacy enhancer APIs whose semantics now
+belong to Link/core.
+
+### First concrete disposition — the snapshot surface, CENSUSED
+
+⚠️ There are more duplicates than the framing assumed. Measured on a persisted
+tree today:
+
+```text
+WHOLE-TREE READ — four public paths, all rooted in tree()
+    tree()          the materialiser
+    toJSON()        -> tree()
+    serialize()     -> encodeSnapshot(tree())
+    snapshot()      -> toJSON() + metadata + a JSON deep clone
+
+WHOLE-TREE WRITE — five public entry points, two convergence points
+    tree(value)     the root write path
+    fromJSON()      the application point
+    deserialize()   -> fromJSON
+    restore()       -> fromJSON
+    load()          -> Link acquire() -> external(() => tree(value))
+```
+
+`snapshot()` and the write cluster were both missing from the initial framing.
+That the write cluster already converges on TWO points — proved by this phase,
+since one `external()` fixed all three inbound methods at once — is direct
+evidence that the public multiplicity is spelling, not semantics.
+
+Candidate target, to be argued at the gate rather than assumed here:
+
+```text
+tree.$()              canonical whole-tree NaturalValue
+serialize(value, o?)  a codec PRIMITIVE over a supplied value, and only if
+                      SignalTree-specific encoding is genuinely required
+tree()                disposition before release
+tree.toJSON()         DELETE unless it proves unique value
+tree.serialize()      DELETE unless convenience is intentionally worth it
+tree.snapshot()       DELETE unless metadata+clone is a distinct job
+```
+
+⚠️ AND THE COST IS ALREADY KNOWN TO BE LARGE. `tree()` is not a minor reader:
+`serialize()`, `toJSON()` and `snapshot()` are all built on it, `persistence()`
+reads it, and the test and documentation surface assumes it throughout. The gate
+decides whether that migration is worth paying; it must not be entered believing
+the surface is small.
+
+This gate belongs immediately BEFORE the final greenfield contract freeze /
+Candidate B, with the snapshot surface as its first disposition.
