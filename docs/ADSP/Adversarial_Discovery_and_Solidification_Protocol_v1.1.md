@@ -2583,6 +2583,28 @@ public-boundary carrier    MAY cross through the package barrel, exception
 That is not weakening the rule. It is testing the thing the rule exists to stop
 internal code from depending on.
 
+## 29.7d A gate register is not its members
+
+> **A GATE REGISTER IS NOT ITS MEMBERS.** Running components opportunistically is
+> not equivalent to proving the release gate as a composed artifact.
+
+Measured at a release freeze: every individual gate had been run during the
+preceding batches, and running all 52 together found EIGHT failures — spec files
+that never typechecked because the runner transpiles without checking, four
+exports orphaned by deletions, two probes left stale by a landed semantic flip,
+and two shipped capabilities missing from the package README. Every one was
+reachable the whole time; nothing had executed the register end to end.
+
+## 29.7e Stage only reviewed paths
+
+> **STAGE ONLY REVIEWED PATHS.** A commit boundary cannot certify review if the
+> staging operation can include material never inspected.
+
+The version-control form of the same evidence problem. Measured: a blanket
+`git add -A` swept an untracked 2,420-line document and a 4 MB binary into a
+commit about something else entirely, carrying 25 unresolvable links that no gate
+could see until one was pointed at them.
+
 ## 29.8 A corollary for long-lived records
 
 An append-only architecture record accumulates statements that later entries
