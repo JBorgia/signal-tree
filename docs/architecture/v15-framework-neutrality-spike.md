@@ -625,8 +625,42 @@ type AnyCallable =
 type NotFn<T> = T extends AnyCallable ? never : T;
 ```
 
-⚠️ `NotFn` is a **public export**. Widening it is a public type change and must go through
-the §C public-surface work, not be slipped in.
+### ⚠️ DO NOT CARRY "WIDEN PUBLIC `NotFn`" AS THE PRESUMED FIX
+
+The measured finding is that the greenfield overloads need a type meaning
+**non-callable AND non-constructable value**. It is NOT that the public `NotFn` export
+must acquire that meaning. `NotFn` currently has **no live consumer** — it is residue of
+an earlier disambiguation attempt — so reusing it would take a currently-unused public
+type and make it load-bearing merely because the implementation can.
+
+> **INTERNAL IMPLEMENTATION NEED DOES NOT MANUFACTURE PUBLIC API VALUE.**
+
+```text
+NOTFN-GREENFIELD-DISPOSITION            (required in §C)
+
+Does `NotFn` have an independent AUTHOR-FACING semantic job?
+
+NO   delete it from the greenfield public surface;
+     use an internal type for the callable-location overloads
+YES  prove the public consumer/job, then decide whether its contract widens
+```
+
+Expectation is DELETE, with something internal such as `CallableLike` /
+`NonCallableValue<T>` (exact names irrelevant).
+
+**The constructor invariant survives independently of `NotFn`:**
+
+> **ANYTHING THE RUNTIME CLASSIFIES AS CALLABLE SYNTAX MUST BE EXCLUDED FROM THE
+> ORDINARY-VALUE OVERLOAD UNLESS EXPLICITLY MARKED AS DATA** — ordinary functions and
+> constructors alike.
+
+### Why the discriminator stays in the scratchpad
+
+The subject — the real greenfield callable location — does not exist yet. Building a
+permanent fake location implementation to carry a future invariant would repeat exactly
+the prototype-retirement problem ATOMIC-STATE-RETIREMENT just cleaned up. The evidence
+lives in this record; when §C creates the real callable, the eight cases move onto that
+real subject immediately.
 
 ## FUNCTION-AS-STATE-0 — CLOSED (FNS-A)
 
@@ -652,3 +686,222 @@ OPEN
 The conceptual error in the first FN-A objection was treating an **ambiguity escape** as a
 **value wrapper**. Once the marker is understood as command encoding rather than data
 representation, FN-A is the cleaner option and FN-B loses most of its justification.
+
+---
+
+# GREENFIELD-BRANCH-WRITE-0 — ARTIFACT AUDIT (open, not ruled)
+
+> What does `location(objectValue)` mean at a branch/root?
+> BR-A REPLACE · BR-B MERGE · BR-C canonical REPLACE + merge as a separate operation
+
+## Measured current behaviour
+
+```
+state = { user: { name: 'Ada', age: 40 } };  tree.$.user({ name: 'Grace' })
+
+plain branch   {"name":"Grace","age":40}     MERGE
+nested         {"b":{"x":9,"y":2}}           MERGE, deep
+root           {"p":1,"q":{"r":9,"s":3}}     MERGE, deep
+entity node    {"id":1,"name":"b"}           REPLACE — `note` dropped
+```
+
+## ⚠️ THE INCUMBENT IS ALREADY INTERNALLY INCONSISTENT
+
+The same callable grammar means MERGE at a plain branch and REPLACE at an entity node.
+The entity path did not drift there — it moved deliberately, and recorded why
+(`entity-signal.spec.ts:2399`):
+
+> *"The updater form is the argument for replace: it returns a full `E`, so **under merge
+> semantics removing a key was silently impossible**."*
+
+with two permanent carriers: `node(updater) REPLACES, so an updater that drops a key
+drops it` and `node(value) REPLACES rather than merging`.
+
+So one half of the public grammar already chose BR-A, **because merge was a defect there**.
+That is not an aesthetic prior for BR-A; it is an artifact precedent, and it violates
+ONE SEMANTIC JOB, ONE AUTHORITATIVE PUBLIC SURFACE as it stands.
+
+## Requirement evidence for MERGE
+
+| dimension | finding |
+|---|---|
+| causal class | **`MutationKind` has NO `merge`** — `set \| update \| insert \| remove \| move \| rekey \| replace`. Merge decomposes into per-leaf writes; it is a surface convenience, not a semantic primitive. |
+| permanent tests whose SUBJECT is merge | **one** — `callable-contract.spec.ts:38` "a BRANCH called with an object merges it" |
+| docs | none teach merge-vs-replace as a contract |
+| real consumers | none found in `apps/` |
+| entity path | actively moved AWAY from merge, with a recorded defect as the reason |
+
+## Blast radius — measured, not estimated
+
+Flipping the plain-branch object call to REPLACE (unpassed keys cleared) and running the
+full suite:
+
+```
+14 failed / 1936 passed  (7 of 239 files)   =  0.7% of the suite
+```
+
+518 branch/root object call sites exist across 97 spec files, so **the vast majority are
+already insensitive to the distinction** — they pass complete values.
+
+### Classification of the 14 — NOW FULLY VERIFIED
+
+Every failing fixture was completed and re-run under BR-A. **14 → 5.**
+
+| # | tests | class | evidence |
+|---|---|---|---|
+| 8 | 3 `auto-batching`, 4 `egress-1`, 1 `angular-validation-null` | **FIXTURE-DEPENDENT** | pass unchanged once given complete values; their subjects (batching, observer firing, computed invalidation) are untouched by the rule |
+| 1 | `mut-participation > BRANCH call form` | **FIXTURE-DEPENDENT** | `{a:{n:1,s:'x'}}` written with `{n:3}`; completing to `{n:3,s:'x'}` passes |
+| 1 | `traversal-diagnostics > DIFFERENT namespace` | **ARTIFACT OF THE PROBE** | `expected 0 to be 2` — my `full` construction builds from `Object.keys(store)` and so DISCARDS the unknown key before `recursiveUpdate` sees it, suppressing the very diagnostic under test. A real BR-A must still diagnose unknown keys. Not a merge dependency. |
+| 1 | `callable-contract > a BRANCH called with an object merges it` | **GENUINE BR-B CARRIER** | its subject IS merge |
+| **3** | `bind-branch-0-acquisition-turn` | **GENUINE SEMANTIC DEPENDENCY — and the real finding** | see below |
+
+### ⚠️ THE FINDING: partial writes have a surviving job, but NOT in authored syntax
+
+`bind-branch-0-acquisition-turn.spec.ts` cannot be fixed by completing its fixture,
+because the partiality **is** the subject:
+
+```ts
+/** What Y actually supplied. `distancePrecision` is deliberately NOT in it. */
+const PAYLOAD = { theme: 'dark', units: 'metric' };
+
+external(() => tree.$.settings(PAYLOAD));
+
+// Both payload members are individually VISIBLE — the acquisition is not an
+// opaque blob. That is what lets a debugger say which values storage supplied.
+expect(effects.map((e) => e.path).sort()).toEqual([
+  'settings.theme',
+  'settings.units',
+]);
+```
+
+Under BR-A, clearing `distancePrecision` emits a THIRD effect, and the claim "the effects
+are exactly what storage supplied" is false. **An external system supplying a subset of
+fields is a real, admitted requirement.**
+
+But look at how it is spelled: `external(() => tree.$.settings(PAYLOAD))` — a non-authored
+acquisition **re-entering through the authored callable**. That is precisely what B1 froze
+against:
+
+> AN OPERATION THAT ALREADY KNOWS ITS MUTATION SEMANTICS MUST NOT RE-ENTER THROUGH SYNTAX
+> WHOSE JOB IS TO INFER THOSE SEMANTICS.
+
+So BR-A does not destroy this requirement — **it relocates it.** Partial application is an
+INGRESS concern (external acquisition, hydrate, Link realization, restoration), and those
+entrances already know their causal class. They need an ingress operation that installs
+exactly the supplied keys, not a borrowed authored-merge.
+
+This answers the question the audit was posed to answer:
+
+> If MERGE proves a distinct surviving job, does it belong in the canonical callable?
+
+**It has a job. The job is not authored syntax.**
+
+### Corrected blast radius for BR-A
+
+```
+authored-syntax cost      1 test  (callable-contract) + 9 fixture completions
+probe artifact            1 test  (would not occur in a real BR-A)
+relocation required       3 tests (bind-branch-0) — partial EXTERNAL acquisition
+                                   needs its own ingress spelling
+```
+
+### Superseded classification (kept for the record)
+
+- **1 genuine BR-B carrier**: `callable-contract.spec.ts` — its subject IS merge.
+- **13 appear fixture-dependent**: their subjects are batching, notifier reach, external
+  acquisition classification and observation — not merge. They pass partial objects
+  because the incumbent permits it.
+
+Mechanism verified on ONE case (`mut-participation.spec.ts > BRANCH call form`):
+`expected ['a.n','a.s'] to deeply equal ['a.n']` — clearing the unpassed `a.s` emitted an
+extra mutation event. Under BR-A with correct typing, a partial object at a branch would
+not compile at all; these call sites would be given complete values.
+
+⚠️ I did NOT individually re-run all 13 with completed fixtures. The class is inferred
+from one verified example. **FIXTURE DEPENDENCY IS NOT SEMANTIC DEPENDENCY** — but that
+rule is being applied here by inference, and the remaining 12 should be confirmed before
+BR-A is ruled, not after.
+
+## Where this points (NOT a ruling)
+
+BR-A is supported by: no causal class, one subject-level carrier, no docs, no consumers,
+0.7% blast radius, and an existing half of the grammar that already chose it for cause.
+BR-C remains live if merge proves an independent job — but nothing found so far gives it
+one, and `tree.$.user({name:'Bob'})` merging while `byId(1)({...})` replaces is the strongest
+argument against keeping both meanings on the same spelling.
+
+⚠️ NOT DECIDED HERE. The 12 unverified fixtures must be confirmed first.
+
+## PER-ROW CLASSIFICATION — all 14 closed
+
+| test | subject | class |
+|---|---|---|
+| `auto-batching > auto-batch partial object updates` | batching | FIXTURE-ONLY |
+| `auto-batching > handle nested partial updates` | batching | FIXTURE-ONLY |
+| `auto-batching > batchScope called for object partial updates` | batching | FIXTURE-ONLY |
+| `egress-1 > CONTROL — an authored write fires it` | observer firing | FIXTURE-ONLY |
+| `egress-1 > an EXTERNAL acquisition fires it too` | observer firing | FIXTURE-ONLY |
+| `egress-1 > an UNDO fires it — twice` | observer firing | FIXTURE-ONLY |
+| `egress-1 > repeated A→B→A→B fires four times` | observer firing | FIXTURE-ONLY |
+| `angular-validation-null > branch read invalidates on a BRANCH call-form write` | computed invalidation | FIXTURE-ONLY |
+| `mut-participation > BRANCH call form` | notifier reach | FIXTURE-ONLY |
+| `traversal-diagnostics > DIFFERENT namespace` | unknown-key diagnostics | **MIS-SPECIFIED PROBE** — my `full` construction discarded the unknown key before `recursiveUpdate` saw it, suppressing the diagnostic under test. Not a merge dependency; a defect in the experiment. |
+| `callable-contract > a BRANCH called with an object merges it` | **merge itself** | MERGE-DEPENDENT (the explicit BR-B carrier — not to be "fixed") |
+| `bind-branch-0 > every value the payload supplied is materialized and classified external` | partial EXTERNAL acquisition | MERGE-DEPENDENT → **RELOCATE** |
+| `bind-branch-0 > CONTROL — the same branch write WITHOUT external() is authored` | same, control arm | MERGE-DEPENDENT → **RELOCATE** |
+| `bind-branch-0 > a DERIVATION produces no mutation event at all` | same fixture | MERGE-DEPENDENT → **RELOCATE** |
+
+### Positive control (required, executed)
+
+Runtime held constant at BR-A; only the fixture changed:
+
+```
+arm A  partial fixture   → 3 failed
+arm B  complete fixture  → 9 passed      ⚠️ ASSERTIONS UNCHANGED
+arm C  revert to partial → 3 failed again
+```
+
+Arm B is the strongest row in the audit: `expect(tree.$.user()).toEqual({name:'Bob', age:30})`
+still holds under REPLACE once the call supplies the complete value. **The assertion never
+encoded merge — only the final state**, which is identical under either rule when the
+caller passes what they mean.
+
+## ⚠️ THE INCONSISTENCY IS DEEPER THAN FIRST REPORTED
+
+`NodeAccessor<T>` (node-accessor.ts:5):
+
+```ts
+/** Write: deep partial merge — keys not present are preserved. */
+(value: Partial<T>): void;
+/** Write: receives the current unwrapped value; the result is merged. */
+(updater: (current: T) => T): void;
+```
+
+**Both forms merge** at a plain branch. At an entity node **both replace** —
+`node(updater) REPLACES, so an updater that drops a key drops it`. The earlier entry in
+this record said the split was in the value form; it is in the value form AND the updater
+form. Two callable spellings, each meaning opposite things depending on which half of the
+tree you are in.
+
+The type is also the wrong half under BR-A: `Partial<T>` actively *invites* merge-style
+calls. A BR-A branch write must require a complete `T`, or the runtime replaces while the
+type encourages partials — the same runtime/type divergence found in the `NotFn`
+constructor case.
+
+```ts
+location(fullValue: T): void              // REPLACE
+location(updater: (current: T) => T): void // DERIVE
+```
+
+## DISPOSITION — BR-A EARNED, one relocation required
+
+13 of 14 rows are fixture-only or a mis-specified probe. The lone authored-syntax merge
+carrier is `callable-contract`, whose claim is contradicted by the entity half of the same
+grammar and by `MutationKind` having no `merge`.
+
+The three `bind-branch-0` rows do NOT block BR-A. They prove partial application is real,
+and that it is currently mis-spelled: a non-authored acquisition re-entering through
+authored callable syntax, which B1 already froze against. BR-A + an explicit ingress
+operation preserves the requirement and removes the double meaning.
+
+⚠️ STILL THE REVIEWER'S RULING. Recorded as earned, not as decided.
