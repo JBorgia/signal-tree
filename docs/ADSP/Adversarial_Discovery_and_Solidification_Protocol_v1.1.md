@@ -2508,6 +2508,24 @@ Two instances, one session: a mutation filtering `effect.origin` on a type with 
 reported `entityMap` and `link` unreachable, which the controls immediately
 exposed as a broken pattern rather than a finding.
 
+## 29.7b Two rules from tightening a proof
+
+> **A TEST TITLE IS A CLAIM.** If the fixture does not deterministically produce
+> the condition the title names, the test is mis-specified even when its
+> assertions pass. That is how a characterization row masquerades as a
+> discriminator.
+
+> **DO NOT RE-WRAP AN ALREADY-CLASSIFIED DOMAIN FAILURE AT THE SAME AUTHORITY
+> BOUNDARY.** If an inner error already carries the authoritative classification,
+> preserve it. A higher layer may add context only when it represents a
+> genuinely DIFFERENT failure domain.
+
+Both were earned in one repair. Removing a vacuity escape from a rollback carrier
+revealed that the fixture produced a different refusal kind than its title named,
+and that a refusal thrown deeper was being caught and re-wrapped at the same
+boundary — producing a doubled message that a constant error string had hidden
+for as long as it existed.
+
 ## 29.8 A corollary for long-lived records
 
 An append-only architecture record accumulates statements that later entries

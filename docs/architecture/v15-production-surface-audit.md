@@ -18230,3 +18230,97 @@ core 1992 · workspace exit 0 · typecheck 0 · lint 0 · doc gate 0 · NUL gate
 gates proven   47/51 (was 45/49)
 public export delta   ZERO
 ```
+
+## `PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0` — batch 1
+
+ADSP MODE: IMPLEMENTATION. Decisions in the required form, or deletion.
+
+### DELETED — no surviving public semantic job
+
+```text
+toJSON()          MEASURED EXACTLY EQUAL to `tree()`. Its one distinct job was
+                  `JSON.stringify(tree)` protocol conformance — which worked
+                  ONLY with persistence() installed, so on a bare tree
+                  `JSON.stringify(tree)` returned `undefined`. A protocol hook
+                  that silently yields undefined in the DEFAULT case is a trap.
+snapshot()        toJSON() + metadata + a JSON deep clone. Nothing public
+                  consumed it; its only pair was restore().
+restore(s)        fromJSON(s.data, s.metadata) — a synonym whose English name
+                  emphasises a different part of one operation.
+EffectsMethods    a PUBLIC TYPE describing an enhancer removed years ago.
+                  Nothing implemented it. A type nobody can obtain is not
+                  compatibility.
+deepEqual         re-export removed. Eleven internal callers prove the ALGORITHM
+                  is needed, not that users need the comparator. It still ships
+                  from @signaltree/shared, where it lives.
+```
+
+### INTERNALIZED — capability survives, public spelling does not
+
+```text
+fromJSON()   the external-truth acquisition point where `external()` classifies
+             the write. Now the private `acquireJSON`; `deserialize` is its only
+             caller.
+```
+
+### KEPT — distinct admitted job proved
+
+```text
+serialize / deserialize   the one job `tree()`/`tree(value)` CANNOT do: a
+                          type-preserving durable representation. `tree()` hands
+                          back live Date/Map/Set/bigint and no version envelope.
+```
+
+⚠️ AND TWO KEPT ON EVIDENCE AFTER I HAD ALREADY DELETED THEM. Both retractions
+are the process working — the deterministic case decided, not my expectation.
+
+```text
+toWritableSignal  It is the Angular Signal Forms bridge: `form(model)` needs a
+                  WritableSignal, and `{ undoable: true }` is the only public
+                  way to make a form edit a restoration-eligible turn. Three
+                  HIST-C2 form-ingress carriers express that and have no other
+                  door.
+
+                  ⚠️ DELETING THE EXPORT LEFT THEM GREEN, because they import
+                  from `lib/utils` directly. A SPEC REACHING PAST THE BARREL
+                  CANNOT TESTIFY ABOUT THE BARREL — consumer evidence gathered
+                  inside the package is blind to exactly the third-party need
+                  the export exists for.
+
+asReadonly        A probe showed `ReadonlyView<typeof tree.$> = tree.$` narrows
+                  correctly AND blocks `.set` (controlled with
+                  `@ts-expect-error`), which argued for deletion. It addressed
+                  the NAMESPACE. For the CALLABLE tree,
+                  `ReadonlyView<typeof tree>` loses the call signature, so the
+                  annotation cannot express a tree's readonly projection at all.
+                  SUBJECT-ADDRESS RULE: a probe must address the same node the
+                  API does.
+```
+
+### `PER-LOCATION-EQUALITY-0` — CLOSED **OUT**
+
+No first-class public comparator contract is admitted in v15. `compared()` is
+deleted, no existing evidence contradicts the disposition, and no experiment is
+owed to give a deleted idea another chance. Future MEASURED performance
+requirements may reopen it under ADSP §29 — that is a contract disposition, not
+a claim that custom equality can never have value.
+
+### ⚠️ NOT TOUCHED, DELIBERATELY — `tree()`
+
+```text
+CURRENT incumbent canonical surface  !=  GREENFIELD target surface
+during dedupe    remove multiplicity
+during greenfield  replace the surviving canonical spelling
+```
+
+`tree()` is destined to become `tree.$()`, and that does NOT make it eligible for
+deletion before the replacement authority exists. Dedupe removed four spellings
+AROUND it; greenfield replaces it.
+
+### Result
+
+```text
+core public exports   72 -> 68
+serialization methods  6 -> 2
+core 1991 · typecheck 0 · lint 0 · doc gate 0 · NUL gate 0
+```

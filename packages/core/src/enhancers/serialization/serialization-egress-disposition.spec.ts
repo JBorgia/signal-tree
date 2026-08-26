@@ -74,7 +74,6 @@ const lastDurable = (writes: string[]): S | null =>
 type Ser = {
   serialize(): string;
   deserialize(json: string): void;
-  restore(snapshot: { data: S }): void;
   load(): Promise<void>;
 };
 
@@ -206,15 +205,12 @@ describe('SER-3 — every inbound method declares external truth identically', (
     expect(meta).toEqual(REALIZED);
   });
 
-  it('restore() — the direct public path', async () => {
-    const { adapter } = recordingAdapter();
-    const tree = makeTree(adapter, 'ser3c');
-    await flush();
-    const meta = await firstMeta(() =>
-      tree.restore({ data: { a: 'X', b: 'b0', c: 'c0' } })
-    );
-    expect(meta).toEqual(REALIZED);
-  });
+  // ⚠️ THE `restore()` ROW IS RETIRED WITH ITS SUBJECT.
+  // PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0 deleted `restore`, `toJSON`, `snapshot`
+  // and the public `fromJSON` as spellings of two jobs. The invariant this
+  // block carries — every inbound method declares external truth identically —
+  // is unchanged; it simply has two members now instead of three, and
+  // `deserialize` still converges on the same internal acquisition point.
 });
 
 // ============================================================================

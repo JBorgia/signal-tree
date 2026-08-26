@@ -34,14 +34,15 @@ export const _clear: Promise<void> = tree.clear();
 
 // ── SerializationMethods — the type is NOT named in the barrel. Are its
 //    members nonetheless reachable through the accumulated enhancer additions?
-// ⚠️ The reachable `toJSON()` returns `unknown`, not `State`. Recorded rather
-// than asserted away: the enhancer declares two variants and the one a consumer
-// reaches is the erased one, so a caller must re-narrow what the tree already
-// knew. Out of scope for INSPECTION-EGRESS-0; noted for the greenfield surface
-// review, and it is an EGRESS read rather than an acquisition path.
-export const _toJSON: unknown = tree.toJSON();
+// ⚠️ AND A RECORDED GREENFIELD CONCERN IS NOW MOOT. This flagged that the
+//    reachable `toJSON()` returned `unknown` rather than `State` — the enhancer
+//    declared two variants and a consumer reached the erased one, so a caller
+//    had to re-narrow what the tree already knew. It was noted for the
+//    greenfield surface review. PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0 deleted the
+//    method, so the widening has no subject: `tree()` returns `State`.
+//
+//    Four spellings went with it — toJSON, fromJSON, snapshot, restore. What
+//    remains is the codec pair, and the question this file exists to ask still
+//    stands for them.
 export const _serialize: string = tree.serialize();
 tree.deserialize('{}');
-tree.fromJSON({} as Partial<State>);
-const snap = tree.snapshot();
-tree.restore(snap);

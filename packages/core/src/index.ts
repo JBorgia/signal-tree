@@ -29,9 +29,17 @@ export { defineStore, type DefineStoreConfig } from './lib/define-store';
  * @see {@link asReadonly}
  */
 export {
-  asReadonly,
   // The per-marker reader-key allowlists are not root app API. They exist to
   // TYPE `asReadonly`; an app calls `asReadonly(tree)` and never names them.
+  //
+  // ⚠️ `asReadonly` IS KEPT BY PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0, on a FAILED
+  // deterministic case rather than on inertia. A probe suggesting deletion
+  // showed `ReadonlyView<typeof tree.$> = tree.$` expresses the narrowing and
+  // blocks `.set` — but it addressed the NAMESPACE. For the CALLABLE tree,
+  // `ReadonlyView<typeof tree>` loses the call signature, so the annotation
+  // cannot express a tree's readonly projection at all. SUBJECT-ADDRESS RULE:
+  // a probe must address the same node the API does.
+  asReadonly,
   type ReadonlyStore,
   type ReadonlyView,
   type ReadonlyNodeAccessor,
@@ -97,7 +105,6 @@ export type {
   EnhancerCleanup,
 
   // Effects
-  EffectsMethods,
 
   // Update metadata (lifted from guardrails in v9.3 for cross-enhancer use)
   WriteMetadata,
@@ -170,11 +177,20 @@ export {
 
 export {
   // Core utilities - Primary helper functions
-  // `equal` (an alias of `deepEqual`) was removed in 14.1.1 — see deep-equal.ts.
-  deepEqual,
-  toWritableSignal,
   // isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath are not
   // root app API.
+  //
+  // ⚠️ `toWritableSignal` IS KEPT BY PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0, on
+  // evidence. It is the Angular Signal Forms bridge — `form(model)` needs a
+  // WritableSignal, and `{ undoable: true }` is the only public way to make a
+  // form edit a restoration-eligible turn. Three HIST-C2 form-ingress carriers
+  // express that requirement through it and have no other door.
+  //
+  // Those carriers import it from `lib/utils` directly, which is why deleting
+  // the EXPORT left them green — a spec reaching past the barrel cannot testify
+  // about the barrel. Consumer-count evidence gathered from inside the package
+  // is blind to exactly the third-party need this export exists for.
+  toWritableSignal,
 } from './lib/utils';
 
 /**

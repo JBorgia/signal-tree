@@ -277,14 +277,12 @@ export interface ISignalTree<T> extends NodeAccessor<T> {
 export type EnhancerCleanup = () => void;
 
 // Method interfaces
-export interface EffectsMethods<T> {
-  /** Register an effect that can optionally return a cleanup function */
-  effect(fn: (state: T) => void | (() => void)): () => void;
-
-  /** Subscribe to state changes (simpler alternative to effect) */
-  subscribe(fn: (state: T) => void): () => void;
-}
-
+// TOMBSTONE: `EffectsMethods`.
+//
+// A PUBLIC TYPE DESCRIBING AN ENHANCER THAT NO LONGER EXISTS. `effects()` was
+// removed years ago; the interface kept shipping, nothing implemented it, and
+// the root README still listed the enhancer as "deprecated, removal next major"
+// long after the removal. A type nobody can obtain is not compatibility.
 /**
  * Configuration for the batching enhancer.
  *

@@ -8,7 +8,6 @@ export {
   BatchingConfig,
   RestorationMethods,
   RestorationConfig,
-  EffectsMethods,
   DevToolsMethods,
   DevToolsConfig,
   EntitiesEnabled,
