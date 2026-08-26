@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { entityMap } from '../../lib/markers/entity-map';
 import { signalTree } from '../../lib/signal-tree';
 import { explainRollbackFailure, transactions } from './transactions';
+import { SignalTreeRollbackError } from '../../lib/types';
 import { undoable } from '../../lib/undoable';
 
 /**
@@ -49,7 +50,18 @@ const makeTree = () =>
   };
 
 describe('a refused rollback names its refusal', () => {
-  it('a dependency conflict says so, and identifies the turn', async () => {
+  it('a refused rollback throws, and the thrown MESSAGE names the kind', async () => {
+    // ⚠️ NO ESCAPE HATCH. A first version allowed `message === ''` to fall
+    // through to a state assertion and return, which would have let this row
+    // quietly become a NON-REFUSAL test the first time a causal change stopped
+    // the refusal firing. It refuses deterministically; the row requires that.
+    //
+    // ⚠️ AND THE TITLE WAS WRONG BEFORE THE PROBE. This fixture produces
+    // `effect-validation-failed` (structural-drift on the restore), not
+    // `later-confirmed-dependency`. The dependency kind is carried by
+    // restoration.spec's seven rows, which assert `cause.kind` directly. Naming
+    // the kind the fixture does NOT produce is how a green row ends up proving
+    // something other than its title.
     const tree = makeTree();
     tree.$.rows.addOne({ id: 'a', n: 1 });
     await tick();
@@ -59,29 +71,41 @@ describe('a refused rollback names its refusal', () => {
     });
     await tick();
 
-    // Later authored work that depends on the removal having happened.
     tree.$.rows.addOne({ id: 'a', n: 99 });
     await tick();
 
+    expect(() => pending.rollback()).toThrow(SignalTreeRollbackError);
+
+    // Re-run the refusal and inspect the message this time.
+    const t2 = makeTree();
+    t2.$.rows.addOne({ id: 'a', n: 1 });
+    await tick();
+    const p2 = t2.transaction(() => {
+      undoable(() => t2.$.rows.removeOne('a'));
+    });
+    await tick();
+    t2.$.rows.addOne({ id: 'a', n: 99 });
+    await tick();
+
     let message = '';
+    let cause: unknown;
     try {
-      pending.rollback();
+      p2.rollback();
     } catch (e) {
       message = (e as Error).message;
+      cause = (e as { cause?: unknown }).cause;
     }
 
-    if (message === '') {
-      // The refusal did not fire for this shape; the row below is what carries
-      // the claim, and a silent pass here would be a vacuous assertion.
-      expect(tree.$.rows.ids()).toContain('a');
-      return;
-    }
-
-    // Same refusal, legible reason.
+    expect(message).not.toBe('');
     expect(message).toContain(
       'SignalTree could not rollback the pending transaction'
     );
-    expect(message).toMatch(/later-confirmed-dependency|effect-validation-failed/);
+    expect(message).toContain((cause as { kind: string }).kind);
+    // ⚠️ AND IT IS NOT DOUBLED. The prefix appears exactly once. A refusal
+    // thrown deeper used to be caught and re-wrapped, producing prefix-reason-
+    // prefix-reason; the constant message hid it because both layers rendered
+    // identically.
+    expect(message.split('SignalTree could not rollback').length - 1).toBe(1);
   });
 
   it('the two refusal kinds do not produce the same sentence', () => {
