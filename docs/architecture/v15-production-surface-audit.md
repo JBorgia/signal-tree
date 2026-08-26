@@ -19038,3 +19038,57 @@ Jest form is `RUN_TIMING ? describe : describe.skip`.
 The batching CLAIM remains covered deterministically in core, where notification
 coalescing is asserted by counting notifications. This suite measures how fast it
 is, not whether it is correct.
+
+# ⚠️ RC-PUBLISH — STOPPED, and the controller was the stale artifact
+
+I prepared to publish and was stopped. Three errors, and the third is the one
+worth keeping.
+
+```text
+1  read "1.0" as a semver literal    the line is 15.x — npm has 14.1.3, core is
+                                     locally 15.0.0-rc.1. Publishing literal
+                                     1.0.0-rc.1 would DOWN-number below what is
+                                     already published.
+2  asked about npm auth and CI       treated the mechanism as the blocker. It
+                                     was never the blocker.
+3  executed a controller checkbox    §29.7f applied to architecture items and
+   without checking its premise      NOT to the controller itself.
+```
+
+The third is the general failure. I had just recorded "read the artifact before
+deriving the question" and then treated `RELEASE-1.0.md` as authority because it
+is the controller — without asking whether later rulings had superseded its
+sequencing. **A controller is an artifact too.** Its Phase 6 was written before
+`GREENFIELD-ROOT-ACCESSOR-SHAPE-0` and `GREENFIELD-FRAMEWORK-HANDOFF-0` were
+frozen, and nothing had reconciled the two.
+
+## What Gate B actually bought, stated correctly
+
+> **"STOP MODIFYING THE INCUMBENT WHILE WE BUILD ITS REPLACEMENT."**
+> NOT "this incumbent is the 1.0 release candidate."
+
+The freeze produces a stable reference — known semantics, contracts,
+compatibility, gates and performance — so the greenfield implementation can
+replace representation and public spelling **without rediscovering semantics**.
+I let "frozen" read as "ready", which are opposite conclusions from the same
+fact.
+
+## Why an RC cannot precede the greenfield work
+
+An RC asserts _this is what we intend to ship_. `tree()` → `tree.$()` replaces the
+PRIMARY read/write grammar, so the assertion would be false on the most-used API
+in the library. And publishing it first inverts the authority flip: external RC
+users depend on `tree()`, and then the shipped incumbent starts vetoing the
+architecture — _"we can't remove it, the RC shipped it."_
+
+Framework neutrality alone might arguably have been post-1.0 internal work, since
+it need not change the public contract. **Callable root is not** — it is an
+intentional public API replacement, which is exactly what an RC must not
+pre-empt.
+
+The controller is patched: Phase 5.5 (Greenfield Implementation / Convergence)
+now sits between Gate E and the RC, Phase 6 is marked blocked, and Gates C/D/E
+are recorded as certifying the INCUMBENT artifact — their tooling survives, their
+conclusions do not carry to a replaced kernel, package layout and public surface.
+
+Nothing was versioned, tagged, pushed or published.

@@ -11055,7 +11055,80 @@ Gate E independent review at `f0dadad4`: no blocker demonstrated after the
 publishing workflow has not fired against npm yet because no `1.0.0` tag exists;
 first real publish remains the RC task.
 
+## Phase 5.5 — Greenfield Implementation / Convergence
+
+> ⚠️ **INSERTED AFTER GATE E, AND IT BLOCKS PHASE 6.** The controller had Gate E
+> flowing straight into `publish 1.0.0-rc.1`. That sequencing predates the frozen
+> greenfield decisions and is wrong.
+
+**Gate B froze the INCUMBENT. It did not establish that incumbent `tree()` is the
+final public API.** The freeze means *stop modifying the incumbent while we build
+its replacement* — a stable semantic reference point — not *this is the release
+candidate*.
+
+An RC asserts: "this is the product we intend to release unless testing finds
+defects." We already know it is not:
+
+```text
+CURRENT FROZEN INCUMBENT          KNOWN 1.0 TARGET
+  tree()                            tree                  controller, not callable
+  Angular-shaped core               tree.$()              root read
+  69-export contract                tree.$(value)         authored replace
+                                    tree.$(fn)            authored derive
+                                    framework-neutral kernel
+                                    Angular/React/Vue above publication
+```
+
+Those are not bug fixes between RC and final. They are deliberate public API and
+architecture replacements, and `tree()` → `tree.$()` replaces the PRIMARY
+read/write grammar.
+
+⚠️ PUBLISHING FIRST WOULD REVERSE THE AUTHORITY FLIP. External RC users would
+depend on `tree()`, and we would then either break them before final or keep the
+old spelling *because the RC shipped it* — the prematurely published incumbent
+vetoing the architecture. It also violates ONE SEMANTIC JOB, ONE AUTHORITATIVE
+PUBLIC SURFACE, by advertising a spelling already decided to die.
+
+```text
+[ ] GREENFIELD-FRAMEWORK-HANDOFF-0        named architectural owner
+[ ] neutral kernel                        below committed publication
+[ ] callable `tree.$` root                GREENFIELD-ROOT-ACCESSOR-SHAPE-0,
+                                          a COUPLED public-surface requirement
+[ ] resolve function-valued-state ambiguity   `tree.$(fn)` derive vs a function
+                                              stored AS state
+[ ] framework publication adapters        Angular first; React/Vue prove the seam
+[ ] authoring / kernel separation
+[ ] migrate surviving public contracts    the frozen incumbent is the reference
+[ ] delete incumbent `tree()` from greenfield
+```
+
+Then, before any RC:
+
+```text
+[ ] exhaustive public API review of the GREENFIELD surface
+[ ] regenerate `tools/api-baseline.json` for the ACTUAL 1.0 surface
+[ ] prove package/type closure on that artifact
+[ ] rerun Phase 3/4/5 gates against the greenfield artifact
+```
+
+⚠️ **GATES C/D/E DO NOT CARRY OVER AUTOMATICALLY.** Their TOOLING stays valid;
+their CONCLUSIONS concern the incumbent artifact. Replacing the kernel, the
+package layout and the public surface invalidates what they certified, so they
+are re-run against what we actually intend to publish.
+
+Exit condition: the greenfield public surface is frozen and its gates are green.
+
 ## Phase 6 — Release Candidate
+
+> ⚠️ **BLOCKED ON PHASE 5.5.** Every item below was written against the incumbent
+> artifact. Do not version, tag, push or publish until the greenfield surface is
+> the one being shipped.
+>
+> ⚠️ AND "1.0" HERE IS NOT A SEMVER LITERAL. The published line is `15.x` —
+> npm holds `14.1.3` and `packages/core` is locally `15.0.0-rc.1`. "1.0" in this
+> file means *the first stable release of the reworked library*. Publishing a
+> literal `1.0.0-rc.1` would be a down-numbering below what is already published.
+
 
 - [x] **Resolve RC public surface reconciliation before publishing.**
       `docs/audits/2026-08/rc-public-surface-reconciliation.md` maps the
@@ -11214,6 +11287,18 @@ recommend speculative optimizations.
 ```
 
 ## Current Sequence From Here
+
+> ⚠️ **THE TAIL OF THIS FILE IS STALE, AND THE 28-STEP LIST BELOW IS INCUMBENT-
+> SCOPED.** Steps 1–21 describe reaching a stable release of the INCUMBENT
+> surface. Phase 5.5 now sits between the Gate B freeze and any RC, because the
+> greenfield decisions replace the primary public grammar. Read the phase
+> headings, not this list, for sequencing.
+>
+> Individually stale as of the Gate B freeze: step 1 ("finish stored()/
+> persistence atomic consequence semantics") is VACUOUS — `stored()` is deleted.
+> Step 5 ("freeze public API") is done for the INCUMBENT and owed again for the
+> greenfield surface.
+
 
 **THE DECLARATION ARTIFACT IS NOW TRUSTWORTHY. The precondition on the API
 cleanup queue is DISCHARGED.** Re-measured at HEAD on a freshly built artifact
