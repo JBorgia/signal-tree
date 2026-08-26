@@ -452,26 +452,80 @@ function makeNodeAccessor<T>(
  */
 const MARKER_IN_ARRAY_WARNED = new Set<string>();
 
-function warnMarkerInArray(key: string, value: readonly unknown[]): void {
+const looksLikeMarker = (item: unknown): boolean =>
+  item !== null &&
+  typeof item === 'object' &&
+  (isEntityMapMarker(item) || isRegisteredMarker(item));
+
+/**
+ * ⚠️ EXTENDED TO Map AND Set BY MARKER-GRAMMAR-DIAGNOSTICS-0, and the GRAMMAR IS
+ * UNCHANGED. A Map value and a Set member are ordinary data exactly as before —
+ * they are not materialised, acquire no marker semantics, and are not recursed
+ * into. Only the diagnostic changed.
+ *
+ * The gap this closes: ST2021 scanned arrays only, so identical misuse warned in
+ * one non-traversable container and was SILENT in the others. `marker-location-
+ * grammar.spec.ts` recorded that with the Map/Set rows asserting zero warnings.
+ *
+ * ⚠️ NO NEW SCAN OF ORDINARY VALUES. This runs at the one branch that already
+ * decided the position becomes a leaf whose interior is never traversed, under
+ * the same dev guard, the same 64-element sample bound and the same per-key
+ * dedupe the array scan always had. A Map or Set that holds no marker costs one
+ * bounded sample in dev and nothing in production.
+ *
+ * ⚠️ THE POSITION IS RENDERED HONESTLY. A Map value is not a property path, so
+ * it is not spelled like one: `m -> Map value at key "a"`, `s -> Set member #0`.
+ * READ THE OBSERVATION, NOT ITS RENDERING — writing `m.a` would name a location
+ * that does not exist and cannot be addressed.
+ */
+function warnMarkerInContainer(key: string, value: unknown): void {
   if (typeof ngDevMode !== 'undefined' && !ngDevMode) return;
   if (MARKER_IN_ARRAY_WARNED.has(key)) return;
 
-  const limit = Math.min(value.length, ENTITY_ARRAY_SAMPLE);
-  for (let i = 0; i < limit; i++) {
-    const item = value[i];
-    if (item === null || typeof item !== 'object') continue;
-    if (!isEntityMapMarker(item) && !isRegisteredMarker(item)) continue;
+  let where: string | undefined;
+  let container: string | undefined;
 
-    MARKER_IN_ARRAY_WARNED.add(key);
-    console.warn(
-      `SignalTree: "${key}[${i}]" holds a MARKER inside an array. Array ` +
-        `elements are never traversed, so the marker is never materialised — ` +
-        `it stays a raw object, it is not a signal, and writes to it are lost. ` +
-        `Markers belong at object positions; for a keyed collection use ` +
-        `entityMap({ selectId }). [ST2021]`
-    );
-    return;
+  if (Array.isArray(value)) {
+    const limit = Math.min(value.length, ENTITY_ARRAY_SAMPLE);
+    for (let i = 0; i < limit; i++) {
+      if (looksLikeMarker(value[i])) {
+        where = `"${key}[${i}]"`;
+        container = 'an array. Array elements';
+        break;
+      }
+    }
+  } else if (value instanceof Map) {
+    let i = 0;
+    for (const [k, v] of value) {
+      if (i++ >= ENTITY_ARRAY_SAMPLE) break;
+      if (looksLikeMarker(v)) {
+        where = `"${key}" -> Map value at key ${JSON.stringify(String(k))}`;
+        container = 'a Map. Map values';
+        break;
+      }
+    }
+  } else if (value instanceof Set) {
+    let i = 0;
+    for (const member of value) {
+      if (i >= ENTITY_ARRAY_SAMPLE) break;
+      if (looksLikeMarker(member)) {
+        where = `"${key}" -> Set member #${i}`;
+        container = 'a Set. Set members';
+        break;
+      }
+      i++;
+    }
   }
+
+  if (where === undefined || container === undefined) return;
+
+  MARKER_IN_ARRAY_WARNED.add(key);
+  console.warn(
+    `SignalTree: ${where} holds a MARKER inside ${container} are never ` +
+      `traversed, so the marker is never materialised — it stays a raw object, ` +
+      `it is not a signal, and writes to it are lost. Markers belong at object ` +
+      `positions; for a keyed collection use entityMap({ selectId }). [ST2021]`
+  );
 }
 
 /**
@@ -1086,8 +1140,11 @@ function createSignalStore<T>(
 
     // Arrays, built-ins
     if (Array.isArray(value) || isBuiltInObject(value)) {
+      // The one branch that already knows BOTH facts the diagnostic needs:
+      // the value looks like a marker, and this position is not marker-
+      // admissible because its interior is never traversed.
+      warnMarkerInContainer(key, value);
       if (Array.isArray(value)) {
-        warnMarkerInArray(key, value);
         warnEntityArrayLeaf(key, value);
       }
       const childPositionIds = getChildPositionIds();

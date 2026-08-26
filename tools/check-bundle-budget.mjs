@@ -190,7 +190,13 @@ const TARGETS = {
     // Re-tightened rather than left at 10.0: a budget kept loose after a shrink
     // stops measuring, which is the defect just fixed in dead-exports and the
     // lint ledger.
-    devKB: 11.7,
+    // Bumped 11.7 → 11.9 for MARKER-GRAMMAR-DIAGNOSTICS-0: ST2021 grew arms for
+    // Map values and Set members, so it carries two more diagnostic sentences.
+    // Raised only because PROD IS FLAT — 9.66 KB before and after — and
+    // `check-devmode-foldable` is green, so the strings provably do not ship.
+    // That is the condition this file's own guidance states for a dev bump; a
+    // prod change would have been a regression to fix instead.
+    devKB: 11.9,
     prodKB: 9.7,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};

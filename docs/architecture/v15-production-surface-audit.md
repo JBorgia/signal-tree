@@ -18547,3 +18547,72 @@ polling contract                zero-polling was never an admitted contract for
 defect repair                   documentation only; no type or runtime change
                                 was owed
 ```
+
+## `MARKER-GRAMMAR-DIAGNOSTICS-0` — CLOSED. Grammar unchanged, coverage extended
+
+### The detector, traced
+
+```text
+warnMarkerInArray(key, value: readonly unknown[])
+    sampled 64 elements, checked isEntityMapMarker || isRegisteredMarker,
+    warned "key[i] … [ST2021]"
+```
+
+It was ARRAY-SHAPED BY CONSTRUCTION — the parameter is an array — so Map and Set
+escaped because it was never called for them. Its call site is the branch
+`if (Array.isArray(value) || isBuiltInObject(value))`, which is the one place
+that already knows both facts the diagnostic needs: this value looks like a
+marker, and this position is not marker-admissible because its interior is never
+traversed.
+
+### Positive controls already existed
+
+`marker-location-grammar.spec.ts` carried all three before any change: an object
+position stays quiet, an array position WARNS, and Map/Set assert zero warnings.
+So the checker was provably alive and the gap provably real without building
+anything.
+
+### Repair — at the convergence point, not beside it
+
+`warnMarkerInArray` became `warnMarkerInContainer` with Map and Set arms. No
+second marker parser, no Map- or Set-specific materializer, no general recursive
+walk.
+
+⚠️ THE GRAMMAR IS UNCHANGED, and the row asserts BOTH halves. A Map value and a
+Set member are still ordinary data — not materialised, no marker semantics, not
+recursed into — and the developer is now told. The `materialized(...) === false`
+assertions are what fail if a future repair "fixes" the diagnostic by
+materialising the marker.
+
+⚠️ THE POSITION IS RENDERED HONESTLY.
+
+```text
+m -> Map value at key "a"
+s -> Set member #0
+```
+
+Not `m.a`. READ THE OBSERVATION, NOT ITS RENDERING — a property path would name
+a location that does not exist and cannot be addressed.
+
+### Mutations
+
+```text
+M1  disable the Map arm                        Map row fails
+M2  disable the Set arm                        Set row fails
+M3  admit Map/Set to the materialising branch  the grammar row fails
+control  a Map or Set holding NO marker stays silent — without it, "Map/Set now
+         warn" would be satisfied by warning on every Map and Set in the tree
+```
+
+### Cost
+
+No new scan of ordinary values. The diagnostic runs at the branch that had
+already decided the position becomes a leaf, under the same dev guard, the same
+64-element sample bound and the same per-key dedupe the array scan always had.
+
+⚠️ THE DEV BUDGET MOVED, AND ONLY BECAUSE PROD DID NOT. `signaltree-bare` dev
+went 11.65 → 11.79 KB for two more diagnostic sentences; the ceiling is raised
+11.7 → 11.9. Prod is FLAT at 9.66 KB and `check-devmode-foldable` is green, so
+the strings provably do not ship — which is the condition the budget tool's own
+guidance names for a dev bump. A prod change would have been a regression to fix
+instead of a ceiling to move.
