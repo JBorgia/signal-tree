@@ -18426,18 +18426,10 @@ glossed: barrel coverage is 4 of 17. The four chosen are the ones whose public
 need was contested or unevidenced; extending coverage to the rest is cheap now
 that the alias and the exception exist.
 
-### ⚠️ A DEFECT FOUND BY WRITING THE CARRIER
+### ⚠️ A DEFECT FOUND BY WRITING THE CARRIER — AND HALF OF IT WAS MINE
 
-`createAuditTracker(tree, log, config)` declares its first parameter
-`NodeAccessor<T>`. `tree.$` satisfies that structurally — and passing it throws
-`"tree is not a function"`, because the namespace is a plain object while the
-implementation calls `tree()`.
-
-Same class as `LINK-ROOT-SOURCE-0`: a type admits a node the implementation
-cannot read. Recorded in the carrier rather than silently worked around. Also
-confirmed in passing: the doc's "zero-polling overhead in Angular contexts" claim
-holds only for a tree exposing `subscribe`, which core's does not — so the
-tracker always takes its 100 ms polling fallback.
+Two claims came out of that carrier. See `AUDIT-TRACKER-CONTRACT-0` below: the
+subject claim was **my own error**, and the polling claim was real.
 
 ### B2 — SETTLED? **YES**
 
@@ -18491,4 +18483,67 @@ core 1995 · workspace exit 0 · typecheck 0 · lint 0
 doc gate 0 · NUL gate 0 · api-baseline 0
 bundle  signaltree-bare ✅ 9.66/9.7 · entities ✅ 20.07/21
 gates proven  48/52
+```
+
+## `AUDIT-TRACKER-CONTRACT-0` — CLOSED. One retraction, one real defect
+
+B2 stays closed; `createAuditTracker`'s public job was never in question.
+
+### 1. The subject defect was MINE, and the type was already correct
+
+I reported that `NodeAccessor<T>` admits `tree.$`, which then throws
+`"tree is not a function"` — filed as the same class as `LINK-ROOT-SOURCE-0`.
+
+Measured without a cast:
+
+```text
+createAuditTracker(tree, log)     compiles
+createAuditTracker(tree.$, log)   error TS2345 — TreeNode<S> is not assignable
+                                  to NodeAccessor<S>
+```
+
+The type ALREADY rejects it. My carrier had written `tree.$ as never`, and the
+cast admitted what the parameter refuses.
+
+> **A CAST DEFEATS THE OBSERVATION** exactly as a no-op mutation does, and for
+> the same reason: the check never ran.
+
+Third member of that family today, after a mutation filtering a field the type
+does not have and a reachability grep that called `entityMap` unreachable. The
+disposition is therefore **Outcome A, already satisfied** — the accepted subject
+is the callable tree, and the compiler enforces it.
+
+Kept as an asserted row rather than an assumption: a `@ts-expect-error` on
+`createAuditTracker(tree.$, log)` in the typing carrier, with a mutation widening
+the parameter to `NodeAccessor<T> | Record<string, unknown>` that makes it bite.
+If `TreeNode` ever becomes assignable to `NodeAccessor`, the runtime failure
+returns and that line starts compiling.
+
+### 2. The polling claim was real — FALSE CLAIM, corrected
+
+```text
+doc said     "Uses tree.subscribe() for reactive change detection in Angular
+              contexts, providing zero-polling overhead"
+measured     signalTree({...}) has NO `subscribe` property at all
+             -> the detector can never select the fast path for a public tree
+control      handed a subscribe-capable specimen, the detector DOES take that
+             branch — so the detector is fine and the claim is not
+```
+
+Disposition: **documentation defect, not implementation.** The claim is corrected
+rather than rescued. Giving the tree a `subscribe` to make the sentence true would
+add a second subscription architecture, and framework observation belongs at
+committed publication (`GREENFIELD-FRAMEWORK-HANDOFF-0`, frozen). A 100 ms poll is
+the honest description of what the tracker does today.
+
+### Recorded separately, as required
+
+```text
+createAuditTracker public job   KEEP — B2 already decided, unaffected
+accepted subject                the CALLABLE tree; `tree.$` rejected at compile
+                                time, asserted and mutation-proven
+polling contract                zero-polling was never an admitted contract for
+                                a publicly constructible tree; claim corrected
+defect repair                   documentation only; no type or runtime change
+                                was owed
 ```
