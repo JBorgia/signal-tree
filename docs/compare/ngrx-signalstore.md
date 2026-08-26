@@ -62,7 +62,7 @@ const store = signalTree({
   tickets: {
     entities: entityMap<Ticket, number>(), // ← marker at depth 1
     activeId: null as number | null,
-    submission: status<ApiError>(), // ← marker at depth 1
+    submission: { state: 'idle', error: null as ApiError | null },
   },
   users: {
     byOrg: {
@@ -438,7 +438,7 @@ export function usersState() {
     selectedId: null as number | null,
     lastSearchFilter: '',
     loadStatus: 'not-loaded' as 'not-loaded' | 'loading' | 'loaded' | 'error',
-    loading: status<ApiError>(),
+    loadError: null as ApiError | null,
   };
 }
 

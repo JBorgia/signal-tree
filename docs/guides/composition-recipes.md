@@ -112,7 +112,7 @@ Most of this already ships. Before writing any of it, note what you get for free
 | Normalized collection, O(1) `byId` | `entityMap()`                                |
 | Fetch + caching + freshness        | app-owned service / framework data primitive |
 | Load status                        | ordinary state in the slice                  |
-| Save/submit lifecycle              | `status<Err>()` + its predicates             |
+| Save/submit lifecycle              | ordinary state in the slice                  |
 | Batch writes in one notification   | `upsertMany` / `updateMany` / `removeMany`   |
 
 What is **not** provided is the opinionated glue: your REST verb/URL conventions,
@@ -130,7 +130,10 @@ export function entityCrudState<T extends { id: string }>(api: ApiService, confi
       selectId: (e) => e.id,
     }),
     loadStatus: 'not-loaded' as 'not-loaded' | 'loading' | 'loaded' | 'error',
-    save: status<AppError>(),
+    save: {
+      state: 'idle' as 'idle' | 'saving' | 'saved' | 'error',
+      error: null as AppError | null,
+    },
     selection: { selectedIds: [] as string[], isAdding: false },
   };
 }

@@ -17224,7 +17224,13 @@ assertion about the meaning of `path` had been written against the marker. Added
 as §7d: an error names WHERE IN THE TREE the failure happened, never where the
 endpoint chose to put the bytes.
 
-> **AN EMPTY SUITE IS A CARRIER ALARM.** Three suites emptied during this batch.
+> **EMPTY SUITE = CARRIER ALARM.** When retirement empties a permanent suite,
+> classify the suite explicitly: VACUOUS because its subject disappeared, or
+> ORPHANED because a general invariant just lost its last carrier. Never delete
+> an empty suite without making that disposition.
+
+Three suites emptied during this batch.
+
 > Two were correctly vacuous — their premise was the deleted primitive. The
 > third had been the only home of a general invariant, and only the empty shell
 > revealed it.
@@ -17251,9 +17257,9 @@ interception, traversal and M3 conformance. Most did not need a DURABLE leaf at
 all — only a leaf — and were migrated to `compared()`, `entityMap()`, or plain
 state. That is worth recording as a hazard rather than a footnote:
 
-> **A CONVENIENT FIXTURE BECOMES INVISIBLE COUPLING.** The blast radius of a
-> deletion is not measured by who depends on the feature; it is measured by who
-> reached for it because it was nearby.
+> **FIXTURE DEPENDENCY IS NOT SEMANTIC DEPENDENCY.** Blast radius from deleting
+> a feature must distinguish code that depended on the feature's SEMANTICS from
+> tests that merely used the feature as a convenient SPECIMEN.
 
 ### Gates
 
@@ -17283,3 +17289,90 @@ persistence enhancer when `serialization` is not exported at all — only
 `persistence` is. `scripts/lint-readme-apis.mjs` did not catch any of it because
 it checks READMEs only, which is the doc-example lint gap restated: the
 AI-facing document is the one an agent reads first and the one nothing gates.
+
+## `AI-DOC-SURFACE-GATE-0` — CLOSED
+
+Scope was deliberately narrow: live docs may not teach APIs already proven
+unreachable. It did NOT disposition still-live duplicates — those remain
+`PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0`.
+
+### ⚠️ A CORRECTION TO MY OWN DIAGNOSIS
+
+I first reported that the doc lint "isn't a registered gate — an npm script
+nothing in CI invokes." **That was wrong.** `readme-apis` has been a registered
+gate in `tools/verify-gates.mjs`, running in CI via `npm run gates`, with a
+proving mutation. I concluded otherwise from a truncated grep and did not check
+the rest of the file.
+
+The real defect is narrower and more interesting: the gate ran, passed, and
+protected nothing here, because the SCRIPT only inspected import statements.
+
+```text
+what it checked      an ES import statement naming @signaltree symbols
+what it missed       | `stored(key, default)` | ... |     an API table
+                     theme: stored('app-theme', 'light')  a block with no import
+```
+
+> **A DOC TEACHES BY EXAMPLE, NOT BY IMPORT.** An agent reading a table of
+> markers needs no import line to be misled.
+
+### What the widened gate found
+
+A denylist pass over fenced code blocks and API-table rows, in live docs only:
+
+```text
+docs/ai/agent-templates.md   a `.cursorrules` template that told agents to use
+                             `status()` and `stored()` — and explicitly FORBADE
+                             the correct shape: "DO NOT generate manual
+                             `loading: { state, error }` shapes"
+docs/ai/LLM.md               a migration section teaching the migration BACKWARDS,
+                             from ordinary state TO the deleted `status()`
+docs/compare/ngrx-signalstore.md   `status<ApiError>()` in two comparison examples
+docs/guides/composition-recipes.md `status<Err>()` in a capability table and a slice
+README.md                    `effects()` (removed years ago, its own row said
+                             "removal next major") and `serialization()`, which is
+                             not exported at all
+```
+
+The `.cursorrules` template is the worst of these by a distance: it did not merely
+mention a deleted API, it instructed agents to prefer it and prohibited the
+replacement.
+
+### Design of the check, and its limits
+
+It is a DENYLIST, not "every identifier must resolve". Doc examples legitimately
+call application-owned helpers, and a checker that flagged those would be
+permanently red — which teaches people to ignore gates, the exact failure the
+lint's own header already warns about.
+
+Two controls keep it honest:
+
+```text
+denylist rot     every RETIRED entry is asserted ABSENT from the built surface,
+                 so re-adding an API fails the gate loudly instead of leaving a
+                 lie that still passes
+records exempt   docs/architecture/** and docs/research/** are excluded from the
+                 TEACHING pass — a record of a deletion must be able to show what
+                 was deleted. The import pass still covers them.
+```
+
+⚠️ AND THE NEW HALF NEEDED ITS OWN PROOF. One mutation cannot exercise two
+independent checks, so `readme-apis:teaching` is a companion gate whose mutation
+re-teaches a deleted API in `docs/ai/LLM.md`. Both halves now fail on demand:
+45/49 gates proven, up from 44/48.
+
+### Census datum for the next batch
+
+Verified against the BUILT surface, with reachable controls (`signalTree`,
+`entityMap`, `link`, `external`, `persistence` all resolve):
+
+```text
+UNREACHABLE today: stored, status, asyncSource, asyncQuery, serialization,
+                   flushAllStoredSignals, effects, withPersistence,
+                   loader, compared, derived
+```
+
+`loader`, `compared` and `derived` are NOT retired — they are INTERNAL-ONLY
+markers. That is a whole `ALREADY UNREACHABLE` category for
+`REMAINING-FEATURE-DISPOSITION-BATCH-0`, and it says the public surface is
+considerably smaller than the `markers/` directory implies.

@@ -309,11 +309,9 @@ const store = signalTree(
 | Enhancer          | Purpose                                                                                        |
 | ----------------- | ---------------------------------------------------------------------------------------------- |
 | `batching()`      | Coalesce change-detection notifications into microtask batches                                 |
-| `effects()`       | **Deprecated (11.6.0)** — use native Angular `effect(() => tree.$.path())`; removal next major |
 | `restoration()`    | Undo/redo with configurable history depth                                                      |
 | `devTools()`      | Redux DevTools integration with path-based actions                                             |
-| `serialization()` | JSON serialize/deserialize with type preservation                                              |
-| `persistence()`   | Auto-save/load to localStorage, IndexedDB, or custom adapters                                  |
+| `persistence()`   | Auto-save/load to localStorage, IndexedDB, or custom adapters; includes JSON serialize/deserialize with type preservation |
 
 > **9.0.1:** The `memoization()` enhancer was removed. Use Angular's built-in `computed()` — it memoizes its result and only re-runs when a tracked signal changes, with no extra cost over what Angular already provides.
 
