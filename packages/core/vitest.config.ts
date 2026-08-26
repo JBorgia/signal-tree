@@ -1,6 +1,20 @@
+import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      // ⚠️ THE BARREL, RESOLVABLE FROM A SPEC. Every spec here imports through a
+      // relative path, so nothing could testify about the PUBLIC export list —
+      // deleting a re-export left specs green because they reached past it. This
+      // alias lets `public-barrel-carrier.spec.ts` import from
+      // '@signaltree/core' and fail when a symbol leaves the barrel.
+      '@signaltree/core': fileURLToPath(
+        new URL('./src/index.ts', import.meta.url)
+      ),
+    },
+  },
   test: {
     globals: true,
     environment: 'happy-dom',
