@@ -18914,3 +18914,74 @@ corollary already recorded — a long append-only record is a history, not a sta
 > not after the framing is built — a framing built on a stale premise survives
 > every subsequent step, because each step is checked against the framing rather
 > than against the artifact.
+
+## `DIAG-JOURNAL` — **CLOSED, DJ-C**
+
+```text
+mechanism              bounded internal diagnostic journal
+lifecycle              dormant — zero production instantiation by default
+authority              observation only
+restoration rights     none
+ownership              none over SignalTree subjects
+retention              bounded; eviction releases
+compensation identity  participation = realized
+                       origin        = transaction-rollback
+                       transactionId = correlating transaction
+public API delta       zero
+Gate B                 unchanged
+```
+
+The thread required no architecture, no implementation and no Gate-B change. The
+artifact already contained the answer, including the compensation seam.
+
+### `compensatesTransactionId` — NOT reopened
+
+The existing pair is semantically readable:
+
+```text
+transactionId = 1, origin absent                  member of transaction 1
+transactionId = 1, origin transaction-rollback    compensation caused by tx 1
+```
+
+A dedicated field would be a REPRESENTATION REFINEMENT, not a demonstrated
+missing capability. Do not reopen it without a consumer that cannot correctly
+interpret the existing pair.
+
+## `PERF-GATE-DETERMINISM-0` — recorded, NOT started
+
+The demo batching benchmark has now interrupted the full gate register three
+times. Each occurrence was handled correctly — identified, isolated, rerun,
+verified by exit code — but repeated reruns must not become permanent release
+procedure.
+
+> **A KNOWN FLAKE REDUCES THE INFORMATION CONTENT OF A RED GATE.** If a red
+> register routinely means "run it again", the register stops being evidence.
+
+```text
+QUESTION   is that test proving a PERFORMANCE INVARIANT, or comparing wall-clock
+           timing under uncontrollable parallel load?
+GOAL       preserve the performance falsifier without making gate success
+           scheduler-dependent
+SCOPE      tooling. Not architecture, and it does not interrupt the sequence.
+```
+
+## Where the API question now stands
+
+```text
+INCUMBENT    Gate B frozen · stable release contract · no cleanup-driven churn
+GREENFIELD   owns future representation · callable `tree.$` target unchanged ·
+             framework-neutral kernel target unchanged · B3 remains greenfield
+```
+
+Nothing in `DIAG-JOURNAL` pulled legacy representation forward, and nothing
+reopened Gate B.
+
+> **THE TUG-OF-WAR PHASE IS OVER.** The incumbent contract is frozen; the
+> next-generation implementation gets built against the frozen greenfield
+> decisions rather than negotiated against the incumbent line by line.
+
+⚠️ AND SEQUENCING NOW FOLLOWS THE RELEASE CONTROLLER. The history / restoration /
+diagnostic cluster is solidified. No further historical semantic archaeology
+unless `RELEASE-1.0.md` names an unresolved item — opportunistically starting
+whichever architecture topic looks interesting is what §29.7f exists to stop one
+level down.

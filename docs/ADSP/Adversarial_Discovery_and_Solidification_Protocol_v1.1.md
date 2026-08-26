@@ -2615,6 +2615,23 @@ checking them eventually: a framing built on a stale premise survives every
 subsequent step, because each step is then validated against the FRAMING rather
 than against the artifact.
 
+### The required first move on any reopened item
+
+```text
+OLD RECORD SAYS OPEN
+        ↓
+DO NOT begin derivation
+        ↓
+inspect HEAD code · permanent tests · gate registrations · later rulings · git
+        ↓
+reconstruct CURRENT status
+        ↓
+only THEN formulate the unresolved question
+```
+
+Without this ordering, ADSP can be extremely rigorous about answering a question
+that ceased to exist.
+
 Measured in one workstream: four separate items — a semantic flip, a correctness
 family, a subsystem disposition, and a metadata seam — were each already resolved
 in the code while being re-derived from the record. In the third case the
