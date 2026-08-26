@@ -5,8 +5,43 @@ import { batching, signalTree } from '@signaltree/core';
 /**
  * Quick SignalTree Performance Test
  * This runs actual SignalTree operations to get real performance data
+ *
+ * ⚠️ ON DEMAND VIA `ST_PERF=1` — PERF-GATE-DETERMINISM-0.
+ *
+ * Every case here is a WALL-CLOCK measurement, and one of them asserts a RATIO
+ * of two timings (`(single * 10) / batched > 0.5`). Under the parallel test pool
+ * CPU and memory contention across workers skews absolute times and ratios
+ * independently of the code under test, so this suite interrupted the full
+ * 52-gate release register three times while passing 3/3 in isolation.
+ *
+ * The remedy is the one Phase 5 already established for
+ * `benchmarks.spec.ts` and the stored-marker timing suite, applied verbatim
+ * rather than reinvented:
+ *
+ * ```text
+ * correctness suite   deterministic semantic/complexity assertions — always run
+ * performance suite   wall-clock measurement — explicitly opted into
+ * ```
+ *
+ * ⚠️ THE THRESHOLD WAS NOT RAISED. Nudging `0.5` down until CI usually passes
+ * would delete the falsifier while keeping the flake; the assertion is intact
+ * and still fails under `ST_PERF=1` if batching genuinely regresses. And a red
+ * gate that routinely means "run it again" is not evidence — that is the whole
+ * cost this pays off.
+ *
+ * The batching claim is ALSO covered deterministically elsewhere: the
+ * notification-coalescing behaviour is asserted by counting notifications in
+ * core's batching specs, which is where the real invariant lives. This suite
+ * measures how fast it is, not whether it is correct.
  */
-describe('SignalTree Performance Benchmarks', () => {
+// ⚠️ NOT `describe.runIf` — that is Vitest, and the demo runs JEST. Core's
+// benchmarks.spec.ts uses `runIf` because core runs Vitest; copying the idiom
+// verbatim threw `describe.runIf is not a function` and the suite silently
+// stopped loading while the run still reported passes.
+const RUN_TIMING = process.env['ST_PERF'] === '1';
+const timingDescribe = RUN_TIMING ? describe : describe.skip;
+
+timingDescribe('SignalTree Performance Benchmarks', () => {
   let performanceResults: any;
 
   beforeAll(() => {
