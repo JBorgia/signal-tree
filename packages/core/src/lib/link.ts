@@ -184,18 +184,24 @@ function accessorsFor<T>(x: unknown): {
     };
   }
 
-  if (typeof node.all === 'function' && typeof node.setAll === 'function') {
+  // The functions are captured rather than re-read behind a non-null
+  // assertion: `node` is a loose cast, so a `typeof` guard on the property does
+  // not narrow the property itself on later access.
+  const all = node.all;
+  const setAll = node.setAll;
+  if (typeof all === 'function' && typeof setAll === 'function') {
     return {
-      read: () => node.all!(),
-      write: (v: T) => node.setAll!(v),
+      read: () => all(),
+      write: (v: T) => setAll(v),
       collection: true,
     };
   }
 
-  if (typeof node.set === 'function') {
+  const set = node.set;
+  if (typeof set === 'function') {
     return {
       read: () => (x as () => T)(),
-      write: (v: T) => node.set!(v),
+      write: (v: T) => set(v),
       collection: false,
     };
   }

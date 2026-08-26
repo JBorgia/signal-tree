@@ -296,6 +296,8 @@ describe('ERROR-SURFACE-2: the delivered object is exactly the contract', () => 
  * on PositionId would merge two independent applications' trees — the
  * NOTIFIER-SCOPE-0 defect, arriving in telemetry.
  */
+type Row = { id: string; n: number };
+
 describe('TREE ERROR: the TreeId contract', () => {
   const idTree = () =>
     signalTree(

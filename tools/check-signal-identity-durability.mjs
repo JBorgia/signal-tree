@@ -114,7 +114,7 @@ if (!existsSync(CORE)) {
   console.error('❌ build first: nx build core');
   process.exit(1);
 }
-const { signalTree, entityMap, restoration } = await import(CORE);
+const { signalTree, entityMap, restoration, undoable } = await import(CORE);
 const { computed } = await import('@angular/core');
 const cfg = { selectId: (r) => r.id };
 
@@ -148,7 +148,12 @@ const cfg = { selectId: (r) => r.id };
   const field = t.$.rows.byId(1).name;
   const seen = computed(() => field());
   const a = seen();
-  t.$.rows.removeOne(1);
+  // ⚠️ DESIGNATED. HIST-C2 made restoration eligibility OPT-IN, and this probe
+  // lives outside the test suite so the 194-row migration never reached it.
+  // Undesignated, the remove never enters restoration history, `t.undo()` does
+  // nothing, and the row reported "reactive identity is not durable" — a stale
+  // instrument, not a product defect.
+  undoable(() => t.$.rows.removeOne(1));
   await turn();
   const gone = seen();
   await pressure();

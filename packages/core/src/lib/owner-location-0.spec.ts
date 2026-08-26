@@ -97,8 +97,6 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
       { enhancers: [restoration(), transactions()] }
     );
     await flush();
-    // Force marker materialisation.
-    void tree.$.src;
     await flush();
 
     const inventory: Record<string, Shape> = {
@@ -111,7 +109,6 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
     };
 
     for (const [name, s] of Object.entries(inventory)) {
-      // eslint-disable-next-line no-console
       console.log(
         `${name.padEnd(20)} pos=${s.positionIds ? 'Y' : 'n'} ownerPath=${
           s.ownerPath ? 'Y' : 'n'
@@ -125,8 +122,6 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
     const addressableWithoutOwner = Object.entries(inventory)
       .filter(([, s]) => s.positionIds && s.ownerPath && !s.registry)
       .map(([name]) => name);
-
-    // eslint-disable-next-line no-console
     console.log('ADDRESSABLE-WITHOUT-OWNER:', JSON.stringify(addressableWithoutOwner));
 
     // The control: SOMETHING must be addressable-with-owner, or the query is

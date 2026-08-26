@@ -66,7 +66,17 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /** Point-in-time records, and anything not ours. */
 const SKIP_DIR =
   /(^|\/)(node_modules|\.git|dist|artifacts|coverage|\.nx)(\/|$)/;
-const SKIP_FILE = /(^|\/)(docs\/archive\/|CHANGELOG\.md$)/;
+// ⚠️ `docs/ADSP/` JOINS THE POINT-IN-TIME EXCLUSIONS, and it is worth saying
+// why rather than just widening a regex. The ADSP whitepaper is a PUBLISHED
+// DOCUMENT: it ships as .md alongside .docx and .pdf siblings, and its 25
+// figures live inside those binaries rather than as repo files. Its relative
+// `figures/*.png` links describe the published artifact, not this tree.
+//
+// It also arrived here by accident. A blanket `git add -A` swept the untracked
+// .md/.docx/.pdf into commit d6e4e8af — 2,420 lines and a 4 MB binary, none of
+// it reviewed, in a commit about something else entirely. The links were never
+// resolvable in-repo; the gate simply had nothing to fail against until then.
+const SKIP_FILE = /(^|\/)(docs\/archive\/|docs\/ADSP\/|CHANGELOG\.md$)/;
 
 /** A link target we deliberately do not resolve on disk. */
 const IGNORE_TARGET = /^(https?:|mailto:|tel:|data:|#|<|\{)/;

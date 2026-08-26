@@ -1055,14 +1055,65 @@ tree.$.users.loadStatus(); // 'idle' | 'loading' | 'loaded' | 'error'
 tree.$.users.loadStatus.set('loaded');
 ```
 
-### 11) Persistence
+### 11) `link()` — synchronize a location with an external endpoint
+
+One primitive, three directions. `link(x, y)` keeps a SignalTree location in step
+with something outside the tree, and decides for itself what the location's value
+is — you never annotate it.
+
+```ts
+import { link, signalTree } from '@signaltree/core';
+
+const tree = signalTree({ settings: { theme: 'light' } });
+
+const connection = link(tree.$.settings, {
+  get: () => api.load(),                       // Y -> X, on retrieve()
+  set: (value) => api.save(value),             // X -> Y, once per settled turn
+  subscribe: (next) => socket.on('cfg', next), // Y -> X, live
+});
+
+await connection.retrieve();
+await connection.settled();
+connection.dispose();
+```
+
+The handle has exactly three members. A rejected outbound `set()` is reported to
+`onTreeError` with the owning `treeId` and the linked `path`; the authored value
+is NOT rolled back, the queue survives, and `settled()` resolves rather than
+throwing — which is why the handle needs no error member of its own.
+
+**What it will not carry.** An inspection write — a devtools scrub — moves what
+you see and deliberately does not become external truth. `link()` publishes the
+value that is *eligible* to be authoritative, not whatever the tree currently
+holds.
+
+⚠️ `x` must be an OWNED SignalTree location, enforced at runtime rather than by
+the type: a `computed` and a bare `WritableSignal` are structurally identical to
+an owned leaf.
+
+### 12) `onTreeError()` — the one error surface
+
+```ts
+import { onTreeError } from '@signaltree/core';
+
+const off = onTreeError((e) => {
+  console.error(e.operation, e.treeId, e.path, e.error);
+});
+```
+
+Every failure the library reports for itself arrives here: a rejected
+`link:set`, a refused restoration, a persistence write that threw. `treeId`
+distinguishes two same-shaped trees; `path` is the STATE location, never a
+storage key or an endpoint address.
+
+### 13) Persistence
 
 The old `stored(key, default, options?)` marker and storage-key helpers are not
 part of the current release-candidate public surface. Keep persistence in an
 application service for now, then write the resulting values into SignalTree
 through ordinary state or `entityMap()` APIs.
 
-### 12) ~~Angular Forms Integration~~ — `@signaltree/ng-forms` was DELETED
+### 14) ~~Angular Forms Integration~~ — `@signaltree/ng-forms` was DELETED
 
 **This section taught `import { createFormTree, ngFormValidators } from
 '@signaltree/ng-forms'`, and that package no longer exists** — deleted in

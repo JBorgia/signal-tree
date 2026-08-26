@@ -91,7 +91,7 @@ if (pointFlag !== -1) {
   const maxHistorySize =
     armName === 'bounded' ? BOUNDED_HISTORY : UNBOUNDED_HISTORY;
 
-  const { signalTree, entityMap, restoration } = await import(CORE);
+  const { signalTree, entityMap, restoration, undoable} = await import(CORE);
   const tree = signalTree(
     { rows: entityMap({ selectId: (r) => r.id }) },
     { enhancers: [restoration({ maxHistorySize })] }
@@ -105,7 +105,12 @@ if (pointFlag !== -1) {
     return rows;
   };
 
-  tree.$.rows.setAll(generation(0));
+  // ⚠️ DESIGNATED. HIST-C2 made restoration eligibility OPT-IN, and this probe
+  // lives outside the test suite, so the 194-row migration never reached it.
+  // Undesignated, nothing enters restoration history, `undo()` does nothing, and
+  // the probe reported INVALID — "undo stopped working" — which is a stale
+  // instrument rather than a retention defect.
+  undoable(() => tree.$.rows.setAll(generation(0)));
   await new Promise((r) => setTimeout(r, 0));
 
   // Baseline AFTER the first generation, so the figure is growth per RETIRED
@@ -114,7 +119,7 @@ if (pointFlag !== -1) {
     .heapUsed;
 
   for (let g = 1; g <= rounds; g++) {
-    tree.$.rows.setAll(generation(g));
+    undoable(() => tree.$.rows.setAll(generation(g)));
     // A turn per round: the notifier flushes on a microtask and history records
     // on a flush, so rounds without one coalesce and the arm measures fewer
     // logical generations than it claims to.

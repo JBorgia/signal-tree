@@ -137,7 +137,7 @@ const store = signalTree({
 });
 ```
 
-**Source:** [`packages/core/src/lib/markers/stored.ts`](../packages/core/src/lib/markers/stored.ts), [`packages/core/src/enhancers/serialization/`](../packages/core/src/enhancers/serialization/).
+**Source:** `packages/core/src/lib/markers/stored.ts` (in `packages/core/src/lib/markers/stored.ts`, deleted in 15.0), [`packages/core/src/enhancers/serialization/`](../packages/core/src/enhancers/serialization/).
 
 **Doc-side action:** The "Optional Packages" table in the root README clearly does _not_ list a `@signaltree/storage` package, so the hallucination is unfounded. No doc change needed.
 

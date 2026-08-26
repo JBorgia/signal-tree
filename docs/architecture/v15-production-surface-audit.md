@@ -18708,3 +18708,111 @@ unknown-key policy API     NOT ADMITTED — no first-class option earned
 
 Contract derived, already in force, now carried. **No production change was
 owed** — the behavior that looked surprising is a security invariant.
+
+# GATE B — FROZEN
+
+The public surface at this commit is **authoritative for the incumbent release**.
+
+```text
+core public exports   69   =  17 runtime  +  52 type-only
+entrypoints           .    (only one; five phantom tsconfig subpaths deleted)
+api-baseline          tools/api-baseline.json  sha1 5a0064ee…
+bundle  bare          prod 9.66/9.7 KB   dev 11.79/11.9 KB
+bundle  entities      prod 20.07/21 KB   dev 22.74/23.7 KB
+gates                 52 run, ALL GREEN; 48/52 proven able to fail
+core tests            2000 passed · workspace exit 0 · typecheck 0 · lint 0
+```
+
+## This is an authority transition, not a checkpoint
+
+```text
+BEFORE GATE B   a public API candidate had to prove it SURVIVES
+AFTER GATE B    a proposed public API change must prove the FROZEN SURFACE
+                CANNOT satisfy an admitted requirement
+```
+
+No casual additions. No convenience aliases. No "while we're here" exports. The
+public-surface analogue of ADSP §29's architecture authority flip.
+
+## ⚠️ FREEZE DOES NOT CANONIZE IMPLEMENTATION REPRESENTATION
+
+Gate B freezes the incumbent RELEASE CONTRACT. It reverses nothing decided for
+greenfield:
+
+```text
+incumbent tree()          remains the frozen current spelling
+greenfield tree.$()       remains the chosen replacement target
+Angular representation    NOT blessed as kernel architecture — the handoff at
+                          committed publication stays frozen
+B3                        remains SUPERSEDED into GREENFIELD-FRAMEWORK-HANDOFF-0
+```
+
+Public release freeze ≠ representation freeze.
+
+## The frontier was proven empty, and the checker was fixed first
+
+⚠️ MY FIRST EMPTINESS CHECK COULD NOT DISTINGUISH CLOSED FROM OPEN. Grepping the
+log for an item's name found `DIAG-JOURNAL` in a commit that merely MENTIONS it,
+which would have "proven" a still-open item closed. Replaced with a reading of
+the last record heading naming each item: five read CLOSED, `DIAG-JOURNAL` reads
+NOT MARKED CLOSED. The control had to work before the freeze could rely on it.
+
+## ⚠️ THE FREEZE ATTEMPT FOUND EIGHT FAILING GATES
+
+`verify-gates` had never been run end-to-end during the pre-freeze batches — only
+its individual members. Running all 52 found eight failures, and the split matters:
+
+```text
+MINE, from this session's deletions
+  spec-types        6 type errors in specs — vitest TRANSPILES WITHOUT
+                    TYPECHECKING, so 2000 green tests hid them. A dangling
+                    `void tree.$.src`, a `Row` type deleted with its block, two
+                    dead imports of deleted markers, an implicit any.
+  dead-exports      4 exports my deletions orphaned — cancelDurableConsequence,
+                    HydrateDecision, HydrateReason, hasDormantObservation. The
+                    only "consumer" of the first was a comment in my own
+                    tombstone.
+  lint:budget       core 0 -> 5 warnings. Two were eslint-disable directives my
+                    own edit made dead; three were non-null assertions that
+                    disappear when the function is captured in a local rather
+                    than re-read behind `!`.
+  doc-links         3 links to files I deleted, converted to prose.
+
+STALE INSTRUMENTS, not product defects
+  bounded-history-retention      both probes live OUTSIDE the test suite, so
+  signal-identity-durability     HIST-C2's 194-row opt-in migration never
+                                 reached them. Undesignated writes never enter
+                                 restoration history, so `undo()` did nothing —
+                                 and the second reported "reactive identity is
+                                 not durable". Designating one write per probe:
+                                 4/4 properties pass and retention plateaus.
+
+A REAL GAP THE GATE CAUGHT
+  release-claims    `link` and `onTreeError` — two of this release's primary
+                    capabilities — were absent from the core README, which
+                    SHIPS IN THE TARBALL. Documented now, with what `link()`
+                    will not carry: an inspection write does not become external
+                    truth.
+```
+
+> **A GATE REGISTER IS NOT ITS MEMBERS.** Every one of those eight was reachable
+> the whole time; nothing had run them together. Same family as the baseline
+> nothing verified.
+
+## ⚠️ AND ONE THING I DID, WHICH THE GATES SURFACED
+
+`docs/ADSP/` did not exist at session start. A blanket `git add -A` in `d6e4e8af`
+— a commit about the observation substrate — swept in an untracked 2,420-line
+whitepaper and a 4 MB PDF, unreviewed, carrying 25 unresolvable `figures/*.png`
+links. It is excluded from the link gate as a point-in-time published artifact,
+which is honest, but the lesson is the commit hygiene: `git add -A` stages what
+you have not read.
+
+## Post-freeze rule
+
+A deterministic counterexample to a frozen public contract reopens Gate B, via
+the ADSP §29.5 six-condition gate. Desire for better diagnostics, architectural
+elegance, an empty capability cell, easier DevTools work, or internal convenience
+do NOT.
+
+Next: `DIAG-JOURNAL`, which works UNDER this frozen contract.
