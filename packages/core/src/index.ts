@@ -134,11 +134,11 @@ export type { SignalTreeBuilder } from './lib/internals/builder-types';
 // MARKER EXPORTS
 // ============================================
 
-export {
-  // derived() function removed in v6.3.1 - use computed() directly
-  type DerivedMarker,
-  type DerivedType,
-} from './lib/markers/derived';
+// TOMBSTONE: `DerivedMarker` / `DerivedType`.
+//
+// `derived()` was removed in v6.3.1, so for nine major versions these named a
+// shape no caller could produce. Exporting a type whose only constructor is gone
+// does not preserve compatibility — it advertises one.
 
 // Audit tracker — framework-agnostic tree change logging (moved from
 // @signaltree/ng-forms in v13, RFC 0006). Tree-shakeable: unused → not bundled.

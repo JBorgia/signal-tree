@@ -167,7 +167,6 @@ of these.**
 
 | SignalTree capability                                        | Others | What it is                                                                                                                                        |
 | ------------------------------------------------------------ | :----: | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Per-leaf equality** — `compared()` / `byKeys()`            |   ❌   | One position gets its own comparator without changing the tree's type                                                                             |
 | **Changed-path reporting** — `tree.updateAndReport(partial)` |   ❌   | Returns the dot-paths of leaves that ACTUALLY changed; a deep-equal re-fetch reports `[]`                                                         |
 | **Type-only read-only view** — `asReadonly(tree)`            |   ❌   | Same object, narrower type. Zero runtime cost                                                                                                     |
 | **Structural sharing as a change oracle**                    |   ❌   | `tree()` returns the identical object when nothing changed, so `prev !== next` is a meaningful check                                              |
@@ -619,10 +618,10 @@ before treating any row of this document as a strategy.
   coarse outside its entity collection: change one field of a nested object and
   every consumer of that slice recomputes. This is the only row in the matrix
   where the answer is ✅/❌/❌/❌/❌, and it is the actual thesis of the library.
-- **Markers as one concept** — `form()`, `stored()`,
-  `loader()`, `compared()`, `derived()`, `linked()` all register
-  through one extension point, `registerMarkerProcessor`. The others solve each
-  of these with a differently-shaped plugin, or not at all.
+- **Markers as one concept** — `entityMap()` and `form()` register through one
+  extension point, `registerMarkerProcessor`, rather than a differently-shaped
+  plugin each. (This bullet named six markers until 15.0; four of them were
+  never exported and one was deleted, so it now names what a user can reach.)
 - **Forms** — a form model with validators and a wizard, in the state library.
   Akita persists an Angular form; nobody else models one.
 - **Diagnostics with stable codes** (ST2001–ST2024) that fold out of production

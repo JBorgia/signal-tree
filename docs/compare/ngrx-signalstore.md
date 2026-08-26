@@ -212,10 +212,10 @@ For teams migrating NgRx `rxMethod` code: the SignalTree-native mapping is an or
 
 |                                   | NgRx SignalStore                              | SignalTree                                                                                                                                                                               |
 | --------------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **localStorage**                  | Community plugins or hand-roll in `withHooks` | `stored('key', default)` marker per-leaf, or the `persistence()` enhancer for tree-wide                                                                                               |
-| **IndexedDB / custom adapters**   | Hand-roll                                     | `createIndexedDBAdapter()` or `createStorageAdapter()` from `@signaltree/core/storage`                                                                                                   |
-| **Versioning + migrations**       | Hand-roll                                     | `stored(key, default, { version, migrate })`                                                                                                                                             |
-| **Durability on background/kill** | Hand-roll                                     | Debounced writes drain automatically on `visibilitychange`/`pagehide`; `.flush()` / `flushAllStoredSignals()` for native lifecycle hooks; `debounceMs: 0` for synchronous writes (13.3+) |
+| **localStorage**                  | Community plugins or hand-roll in `withHooks` | The `persistence()` enhancer, tree-wide                                                                                                                                               |
+| **IndexedDB / custom adapters**   | Hand-roll                                     | Any object satisfying the three-method `StorageAdapter` interface, passed to `persistence({ storage })`                                                                                  |
+| **Versioning + migrations**       | Hand-roll                                     | Hand-roll — the payload carries a format version, but no migration hook is public                                                                                                        |
+| **Durability on background/kill** | Hand-roll                                     | Hand-roll — `persistence({ debounceMs: 0 })` writes synchronously; the automatic `visibilitychange`/`pagehide` drain went with the per-leaf marker                                       |
 
 ### 9. Forms
 

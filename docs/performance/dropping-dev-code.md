@@ -86,7 +86,7 @@ external) — the same methodology as the bundle-budget gate:
 | Tree                 | Default | `ngDevMode: false` | Saved       |
 | -------------------- | ------- | ------------------ | ----------- |
 | bare `signalTree()`  | 5.86 KB | 5.05 KB            | **0.82 KB** |
-| with `stored()`      | 7.19 KB | 6.23 KB            | **0.96 KB** |
+| with `stored()` ⚠️   | 7.19 KB | 6.23 KB            | **0.96 KB** | (historical — the marker is deleted) |
 | with `form()`        | 7.96 KB | 7.00 KB            | **0.96 KB** |
 | with `entityMap()`   | 8.76 KB | 7.61 KB            | **1.15 KB** |
 | with `persistence()` | 8.55 KB | 7.69 KB            | **0.86 KB** |
