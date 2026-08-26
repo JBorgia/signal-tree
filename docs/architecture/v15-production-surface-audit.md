@@ -16813,3 +16813,122 @@ except for the one inverted tripwire; zero public API delta.
 > against the proposed engine produced two defects, one hang and two vacuous
 > tests in a single pass. A call-graph audit showing the two mechanisms "appear
 > similar" would have produced none of them.
+
+## `GREENFIELD-ROOT-ACCESSOR-SHAPE-0` — PREREGISTERED, NOT DECIDED
+
+⚠️ NOT A CHANGE TO THE INCUMBENT. `1c93fa6f` is cheap, green and correct for the
+incumbent, and changing `$` semantics there would create migration noise without
+teaching us anything. This section records a greenfield hypothesis and what would
+have to be measured to adopt it.
+
+### The decomposition that produced it
+
+`link(tree.$)` failed for THREE separable reasons, and conflating them is what
+made the root look expensive:
+
+```text
+tree.$ is not callable          -> the NaturalValue read failure
+                                   ("x is not a function")
+tree.$ carried no owner         -> the ownership-guard failure
+backreference stored ON tree.$  -> the 876-test traversal/cycle explosion
+```
+
+Only the FIRST is what a callable root would eliminate. A callable `tree.$`
+would still have needed to say which tree it belonged to, and the 876 came from
+the attempted fix, not from the root's shape.
+
+### The hypothesis
+
+```text
+tree()        NO      the tree owns the state system, lifecycle and
+                      facilities — it is not a state-value function
+tree.$()      YES     root state location, callable, NaturalValue = whole tree
+tree.$.b()    YES     unchanged
+```
+
+Link's source rule would then collapse to one line — _an ordinary state location
+is callable and calling it returns its NaturalValue_ — with entities remaining
+the intentional specialized case because their representation warrants one.
+
+### What the incumbent already tells us, measured not assumed
+
+**Traversal is ALREADY function-aware, by design.** `isTraversableNode` accepts
+functions explicitly, and its own comment says why: a SignalTree leaf IS a
+callable, so a bare `typeof === 'object'` check "silently skips every signal in
+the tree." Branch accessors are callable today and are traversed today. Making
+the root callable does not change its traversability class, which lowers the
+ROOT-CALL-C risk considerably.
+
+**Observation does not care.** `path-notifier.ts` contains no callability check
+of any kind — no `typeof … === 'function'`, no `isSignal`, no accessor
+recognition. Its contract is pattern subscription over
+`(value, prev, path, owner, origin, subjectIds, position, meta)`.
+
+> **CALLABILITY IS A SOURCE-INTERFACE CONCERN, NOT AN OBSERVATION CONCERN.**
+
+So a callable root could simplify NaturalValue/source interpretation without
+touching observation, authority or notification.
+
+**The one concrete site that could bite.** `isNodeAccessor` is
+`typeof value === 'function' && CALLABLE_SIGNAL_SYMBOL in value`. Today `tree.$`
+is a plain object and therefore is NOT a node accessor by this predicate. A
+callable, branded root would begin matching it everywhere that predicate runs.
+That is the "runtime-shape ambiguity" risk in concrete form, and it is a
+checkable list of call sites rather than a worry.
+
+### What must be measured before adopting
+
+```text
+construction cost     per TREE, and confirmed not per node
+retained memory       per tree only; must not change any leaf
+traversal/snapshot    no cycles, no function internals walked,
+                      byte-identical serialized state
+type surface          tree.$() infers the complete state type; every
+                      descendant API survives unchanged
+shape ambiguity       every isNodeAccessor / marker-recognition call site
+                      re-checked against a branded callable root
+Link simplification   DELETE the root branch in accessorsFor and prove the
+                      same Link contract still passes
+```
+
+### Read-callability first, replacement separately
+
+```text
+tree.$()            read          <- test this alone first
+tree.$(newState)    replacement   <- NOT automatic
+tree.$.set(v)       replacement   <- the signal-shaped alternative
+```
+
+Value-reading symmetry is what simplifies source interpretation. A second public
+whole-tree mutation surface has to earn its own keep, and the incumbent's
+`RootReadWrite` (`internals/root-source.ts`) is compatibility machinery, not
+evidence that the greenfield root must be writable through the same door.
+
+### Outcomes
+
+```text
+ROOT-CALL-A  simplifies interpretation, no meaningful perf/memory regression,
+             no traversal/type complications        -> adopt in greenfield
+ROOT-CALL-B  works, but measurable or structural cost
+                                                    -> keep the isolated root adapter
+ROOT-CALL-C  runtime-shape ambiguity or contamination of common machinery
+                                                    -> reject, however clean it looks
+```
+
+### ⚠️ One correction to the framing that produced this
+
+"Do not preserve incumbent `tree()` callability merely because root Link uses it
+as its canonical reader" is the right conclusion from an understated premise.
+`tree()` is not merely root Link's reader — it is the incumbent's PRIMARY
+whole-tree snapshot API: `serialize()` and `toJSON()` are built on it,
+`persistence()` reads it, and the test and documentation surface assumes it
+throughout. Greenfield inherits none of that, so the recommendation stands
+unchanged; but the migration is a large surface, not a single reader, and a
+later reader should not be led to think otherwise.
+
+This is the rule from the cost work applied to a primitive rather than to a
+special case:
+
+> **Can an exceptional representation be DELETED by choosing a better primitive
+> shape, without paying for it elsewhere?** If yes, take it. That is the
+> shortcut worth having.
