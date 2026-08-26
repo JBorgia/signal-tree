@@ -18446,3 +18446,49 @@ tracker always takes its 100 ms polling fallback.
 
 Yes. 17 runtime symbols with owners, 52 types all claimed, zero unclassified, and
 the one export whose contract turned out to be fictional is deleted.
+
+## B2 CLOSED — the baseline regenerated once, and given a gate
+
+```text
+before   71 symbols · entrypoints  .  ./security  ./storage
+after    69 symbols · entrypoints  .
+```
+
+### ⚠️ THE BASELINE HAD DRIFTED, AND ITS CHECK EXISTED AND RAN NOWHERE
+
+`api-inventory.mjs --check` has been in the tool the whole time — wired to no
+gate and no CI job. So the baseline recorded `./security` and `./storage` as
+shipping entrypoints long after those subpaths stopped existing, and 71 symbols
+against a real 69.
+
+> **A BASELINE NOTHING VERIFIES IS A MEMO, NOT A GATE.**
+
+Now registered as `api-baseline`, with a mutation that adds an undeclared export
+and is caught. 48/52 gates proven, up from 47/51. Third instance this session of
+the same shape: `readme-apis` ran but inspected only imports; `lint:readmes`
+looked unwired until the register was read properly; this one genuinely ran
+nowhere.
+
+### Five dangling subpath mappings deleted
+
+`tsconfig.base.json` mapped `@signaltree/core/{lazy,security,edit-session,storage,
+authoring}` to source files that DO NOT EXIST, against a package declaring only
+`.`. Each mapping let an import typecheck inside this repo and fail for every
+real consumer — the same false-negative shape as a spec importing past the
+barrel, one layer up. The only remaining references were stale comments, one of
+which claimed `@signaltree/core/storage` exposes the adapters; corrected in
+place.
+
+⚠️ `@signaltree/core/authoring` was among them. That is the package
+`GREENFIELD-FRAMEWORK-HANDOFF-0` names as a future boundary — the mapping was an
+option someone reserved and never took, and it is not evidence the extraction
+happened. `packages/authoring` remains an empty directory.
+
+### Gates at B2 close
+
+```text
+core 1995 · workspace exit 0 · typecheck 0 · lint 0
+doc gate 0 · NUL gate 0 · api-baseline 0
+bundle  signaltree-bare ✅ 9.66/9.7 · entities ✅ 20.07/21
+gates proven  48/52
+```

@@ -355,6 +355,24 @@ const GATES = [
     },
   },
   {
+    name: 'api-baseline',
+    covers:
+      'the committed public API baseline matches the built surface — no ' +
+      'undeclared export added or removed',
+    cmd: ['node', 'tools/api-inventory.mjs', '--check'],
+    needsBuild: true,
+    // ⚠️ THE CHECK EXISTED AND RAN NOWHERE. `--check` has been in the tool the
+    // whole time, wired to no gate and no CI job — so the baseline drifted
+    // silently: it still recorded `./security` and `./storage` entrypoints long
+    // after those subpaths stopped shipping, and 71 symbols against a real 69.
+    // A baseline nothing verifies is a memo, not a gate.
+    mutation: {
+      file: 'packages/core/src/index.ts',
+      find: 'export { defineStore',
+      replace: 'export const __surfaceDrift = 1;\nexport { defineStore',
+    },
+  },
+  {
     name: 'source-controls',
     covers:
       'no raw NUL or unexpected C0 control character in any tracked source',

@@ -1,9 +1,7 @@
 {
   "core": {
     "entrypoints": [
-      ".",
-      "./security",
-      "./storage"
+      "."
     ],
     "symbols": [
       {
@@ -115,28 +113,10 @@
         "internalDecl": false
       },
       {
-        "name": "createAuditCallback",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/audit/audit.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "createAuditTracker",
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/core/src/lib/audit/audit.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "deepEqual",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/shared/src/lib/deep-equal.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -178,29 +158,29 @@
         "internalDecl": true
       },
       {
-        "name": "DerivedMarker",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/derived.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "DerivedType",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/markers/derived.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "devTools",
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/core/src/enhancers/devtools/devtools.ts",
         "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsDebugSession",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/types.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsLogEntry",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/types.ts",
+        "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false
       },
@@ -214,7 +194,16 @@
         "internalDecl": false
       },
       {
-        "name": "EffectsMethods",
+        "name": "DevToolsModuleMetadata",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/types.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsPerformanceMetrics",
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/types.ts",
@@ -313,10 +302,46 @@
         "internalDecl": false
       },
       {
+        "name": "external",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/core/src/lib/external.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ISignalTree",
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/core/src/lib/types.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "link",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/core/src/lib/link.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "Link",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/link.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "LinkEndpoint",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/link.ts",
         "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false
@@ -338,6 +363,15 @@
         "angularInDecl": true,
         "angularInType": false,
         "internalDecl": false
+      },
+      {
+        "name": "onTreeError",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/core/src/lib/internals/error-reporter.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
       },
       {
         "name": "PendingTransaction",
@@ -430,6 +464,33 @@
         "internalDecl": false
       },
       {
+        "name": "restoration",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/core/src/enhancers/restoration/restoration.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "RestorationHistoryEntry",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/types.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "RestorationMethods",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/types.ts",
+        "angularInDecl": true,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "signalTree",
         "subpath": ".",
         "kind": "runtime",
@@ -466,29 +527,11 @@
         "internalDecl": false
       },
       {
-        "name": "restoration",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/core/src/enhancers/restoration/restoration.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "RestorationHistoryEntry",
+        "name": "StorageAdapter",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "RestorationMethods",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
+        "declFile": "packages/core/src/enhancers/serialization/storage-adapters.ts",
+        "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
       },
@@ -529,6 +572,24 @@
         "internalDecl": false
       },
       {
+        "name": "TreeErrorEvent",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/internals/error-reporter.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
+        "name": "TreeId",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/core/src/lib/internals/position-registry.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "TreeNode",
         "subpath": ".",
         "kind": "type-only",
@@ -538,10 +599,10 @@
         "internalDecl": false
       },
       {
-        "name": "WriteMetadata",
+        "name": "undoable",
         "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/mutation-types.ts",
+        "kind": "runtime",
+        "declFile": "packages/core/src/lib/undoable.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -556,1316 +617,12 @@
         "internalDecl": true
       },
       {
-        "name": "security",
-        "subpath": "./security",
-        "kind": "runtime",
-        "declFile": "packages/core/src/security.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SecurityEvent",
-        "subpath": "./security",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/security/security-validator.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SecurityEventType",
-        "subpath": "./security",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/security/security-validator.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SecurityFeature",
-        "subpath": "./security",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/types.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SecurityPresets",
-        "subpath": "./security",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/security/security-validator.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SecurityValidator",
-        "subpath": "./security",
-        "kind": "runtime",
-        "declFile": "packages/core/src/lib/security/security-validator.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SecurityValidatorConfig",
-        "subpath": "./security",
-        "kind": "type-only",
-        "declFile": "packages/core/src/lib/security/security-validator.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createIndexedDBAdapter",
-        "subpath": "./storage",
-        "kind": "runtime",
-        "declFile": "packages/core/src/enhancers/serialization/storage-adapters.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createStorageAdapter",
-        "subpath": "./storage",
-        "kind": "runtime",
-        "declFile": "packages/core/src/enhancers/serialization/storage-adapters.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "StorageAdapter",
-        "subpath": "./storage",
-        "kind": "type-only",
-        "declFile": "packages/core/src/enhancers/serialization/storage-adapters.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      }
-    ]
-  },
-  "events": {
-    "entrypoints": [
-      ".",
-      "./nestjs",
-      "./angular",
-      "./testing"
-    ],
-    "symbols": [
-      {
-        "name": "BaseEvent",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "BaseEventSchema",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ClassificationResult",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "classifyError",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createErrorClassifier",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createEvent",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/factory.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createEventFactory",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/factory.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "CreateEventOptions",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/factory.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createEventRegistry",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/registry.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createEventSchema",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createEventSchemaFromZod",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createInMemoryIdempotencyStore",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/idempotency.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "DEFAULT_EVENT_VERSION",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "DEFAULT_RETRY_CONFIGS",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "defaultErrorClassifier",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ErrorClassification",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ErrorClassifier",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ErrorClassifierConfig",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EVENT_PRIORITIES",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventActor",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventActorSchema",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventCatalog",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/registry.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventCatalogEntry",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/registry.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventFactory",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/factory.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventFactoryConfig",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/factory.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventMetadata",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventMetadataSchema",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventPriority",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventRegistry",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/registry.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventRegistryConfig",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/registry.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventValidationError",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventVersion",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventVersionSchema",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "generateCorrelationId",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/factory.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "generateCorrelationKey",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/idempotency.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "generateEventId",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/factory.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "generateIdempotencyKey",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/idempotency.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "IdempotencyCheckOptions",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/idempotency.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "IdempotencyCheckResult",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/idempotency.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "IdempotencyStore",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/idempotency.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "InMemoryIdempotencyStore",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/idempotency.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "InMemoryIdempotencyStoreConfig",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/idempotency.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "isRetryableError",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "isValidEvent",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "parseEvent",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProcessedEventRecord",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/idempotency.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "RegisteredEvent",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/registry.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "RetryConfig",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/events/src/core/error-classification.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "safeParseEvent",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/events/src/core/validation.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "z",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/external.d.cts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "applyOptimisticEntityChange",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/optimistic-updates.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "batchedHandler",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/handlers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "composeHandlers",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/handlers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "conditionalHandler",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/handlers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createEventHandler",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/handlers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createHandlerRegistry",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/handlers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createOptimisticUpdateManager",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/optimistic-updates.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createTypedHandler",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/handlers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "debouncedHandler",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/handlers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "entityEventHandler",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/entity-events.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EntityEventMapping",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/entity-events.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EntityEventOp",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/entity-events.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EntityOptimisticPatch",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/optimistic-updates.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EntitySnapshotAccessor",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/optimistic-updates.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventHandler",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/handlers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "OptimisticUpdate",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/optimistic-updates.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "OptimisticUpdateManager",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/optimistic-updates.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "TypedEventHandler",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/handlers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "UpdateResult",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/optimistic-updates.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "WebSocketConfig",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/websocket.service.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "WebSocketConnectionState",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/websocket.service.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "WebSocketMessage",
-        "subpath": "./angular",
-        "kind": "type-only",
-        "declFile": "packages/events/src/angular/websocket.service.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "WebSocketService",
-        "subpath": "./angular",
-        "kind": "runtime",
-        "declFile": "packages/events/src/angular/websocket.service.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "BaseSubscriber",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/base.subscriber.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "CreateEventServiceOptions",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/event-bus.service.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "DLQ_SERVICE",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/tokens.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "DlqEntry",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/dlq.service.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "DlqQueryOptions",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/dlq.service.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "DlqService",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/dlq.service.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "DlqStats",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/dlq.service.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ERROR_CLASSIFIER",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/tokens.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EVENT_BUS_CONFIG",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/tokens.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EVENT_HANDLER_METADATA",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/decorators.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EVENT_REGISTRY",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/tokens.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventBusModule",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/event-bus.module.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventBusModuleAsyncConfig",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/event-bus.module.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventBusModuleConfig",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/event-bus.module.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventBusService",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/event-bus.service.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "IDEMPOTENCY_STORE",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/tokens.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "OnEvent",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/decorators.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ProcessingResult",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/base.subscriber.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "PublishOptions",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/event-bus.service.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "PublishResult",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/event-bus.service.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "QUEUE_PRESETS",
-        "subpath": "./nestjs",
-        "kind": "runtime",
-        "declFile": "packages/events/src/nestjs/event-bus.module.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "QueueConfig",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/event-bus.module.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "QueuePreset",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/event-bus.module.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "RedisConfig",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/event-bus.module.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SubscriberConfig",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/base.subscriber.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SubscriberMetrics",
-        "subpath": "./nestjs",
-        "kind": "type-only",
-        "declFile": "packages/events/src/nestjs/base.subscriber.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "AssertionResult",
-        "subpath": "./testing",
-        "kind": "type-only",
-        "declFile": "packages/events/src/testing/assertions.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "collectEvents",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/helpers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createEventAssertions",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/assertions.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createMockEventBus",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/mock-event-bus.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createTestEvent",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/factories.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createTestEventFactory",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/factories.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "EventAssertions",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/assertions.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "MockCreateEventOptions",
-        "subpath": "./testing",
-        "kind": "type-only",
-        "declFile": "packages/events/src/testing/mock-event-bus.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "mockErrorClassifier",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/helpers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "MockEventBus",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/mock-event-bus.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "MockEventBusOptions",
-        "subpath": "./testing",
-        "kind": "type-only",
-        "declFile": "packages/events/src/testing/mock-event-bus.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "mockIdempotencyStore",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/helpers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "PublishedEvent",
-        "subpath": "./testing",
-        "kind": "type-only",
-        "declFile": "packages/events/src/testing/mock-event-bus.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "TestEventFactory",
-        "subpath": "./testing",
-        "kind": "type-only",
-        "declFile": "packages/events/src/testing/factories.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "TestEventOptions",
-        "subpath": "./testing",
-        "kind": "type-only",
-        "declFile": "packages/events/src/testing/factories.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "waitForEvent",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/helpers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "waitForEvents",
-        "subpath": "./testing",
-        "kind": "runtime",
-        "declFile": "packages/events/src/testing/helpers.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      }
-    ]
-  },
-  "ng-forms": {
-    "entrypoints": [
-      "."
-    ],
-    "symbols": [
-      {
-        "name": "ConditionalField",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createFormTree",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "createVirtualFormArray",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": true,
-        "internalDecl": false
-      },
-      {
-        "name": "createWizardForm",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/ng-forms/src/wizard/wizard.ts",
-        "angularInDecl": true,
-        "angularInType": true,
-        "internalDecl": false
-      },
-      {
-        "name": "EnhancedArraySignal",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "FieldConfig",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "FieldValidator",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "FormHistory",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/ng-forms/src/history/history.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "FormStep",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/ng-forms/src/wizard/wizard.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "FormTree",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "FormTreeAsyncValidatorFn",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "FormTreeOptions",
+        "name": "WriteMetadata",
         "subpath": ".",
         "kind": "type-only",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "FormValidationError",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "ngFormValidators",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/ng-forms/src/index.ts",
+        "declFile": "packages/core/src/lib/mutation-types.ts",
         "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SIGNAL_FORM_DIRECTIVES",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SignalValueDirective",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
         "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "TypedFormGroup",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/ng-forms/src/core/ng-forms.ts",
-        "angularInDecl": true,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "withFormHistory",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/ng-forms/src/history/history.ts",
-        "angularInDecl": true,
-        "angularInType": true,
         "internalDecl": false
       }
     ]
