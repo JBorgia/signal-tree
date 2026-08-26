@@ -2605,6 +2605,22 @@ The version-control form of the same evidence problem. Measured: a blanket
 commit about something else entirely, carrying 25 unresolvable links that no gate
 could see until one was pointed at them.
 
+## 29.7f Read the artifact before deriving the question
+
+> **READ THE ARTIFACT BEFORE DERIVING THE QUESTION.** A phase that NAMES a
+> problem is not evidence the problem is OPEN.
+
+The active form of §29.8. Checking the code and the log first is not the same as
+checking them eventually: a framing built on a stale premise survives every
+subsequent step, because each step is then validated against the FRAMING rather
+than against the artifact.
+
+Measured in one workstream: four separate items — a semantic flip, a correctness
+family, a subsystem disposition, and a metadata seam — were each already resolved
+in the code while being re-derived from the record. In the third case the
+re-derivation also measured the WRONG COMPONENT, selecting between two outcomes
+using an observation that could not distinguish them.
+
 ## 29.8 A corollary for long-lived records
 
 An append-only architecture record accumulates statements that later entries

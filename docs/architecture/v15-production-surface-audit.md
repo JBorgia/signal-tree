@@ -18816,3 +18816,101 @@ elegance, an empty capability cell, easier DevTools work, or internal convenienc
 do NOT.
 
 Next: `DIAG-JOURNAL`, which works UNDER this frozen contract.
+
+# `DIAG-JOURNAL` — DISPOSITION CORRECTED, and the metadata seam is already closed
+
+⚠️ THIS SECTION SUPERSEDES THE "MISSING FACT" SUBSECTION OF DIAG-JOURNAL-1. That
+text is accurate as history and stale as status.
+
+## The disposition is DJ-C, not DJ-B
+
+I re-derived the question from first principles as a four-way choice (no journal /
+live feed / bounded journal / existing data suffices) and provisionally selected
+DJ-B — "the live PathNotifier stream already satisfies it." That was wrong,
+because it was reasoned without reading the artifact:
+
+```text
+internals/diagnostics/diagnostic-journal.ts     EXISTS — 170 lines
+F3  no restoration rights                       HOLDS
+F4  no SignalTree ownership                     HOLDS
+F4b disposal ends observation                   HOLDS
+F5  reclamation identical ON/OFF                HOLDS
+F6  bounded eviction releases                   HOLDS (own --expose-gc gate)
+F7  no live handles retained                    HOLDS
+production instantiation                        NONE
+```
+
+> **DJ-C — a bounded, non-authoritative, disposable internal journal EXISTS and
+> is proven. It is DORMANT BY DEFAULT: zero production instantiation, therefore
+> zero always-on cost.**
+
+My `lateSaw = 0` measurement was about the NOTIFIER, and retention is precisely
+what the journal adds — so it could not have selected between DJ-B and DJ-C at
+all. Measuring the wrong component answers a different question.
+
+⚠️ AND THE EXISTING OWNERSHIP EVIDENCE IS STRONGER THAN THE MUTATIONS I PROPOSED.
+`diag-journal-1-ownership.spec.ts` proves separation on the REAL mechanism —
+restoration facts identical with the journal on, no restoration or planning
+operation exposed, claims and reclamation candidates unchanged, and a subject
+whose only remaining reason to exist is the journal is STILL reclaimed. The
+eviction gate carries a no-journal control arm. Mutating production to route the
+notifier through restoration would have tested a system that does not exist.
+
+## The compensation-correlation seam — CLOSED by DIAG-JOURNAL-1.1
+
+The record says a diagnostic reader cannot tell a compensation turn from external
+truth. Measured at HEAD, it can:
+
+```text
+SPEC  origin=-                     part=-         txId=1   member of tx 1
+v0    origin=transaction-rollback  part=realized  txId=1   COMPENSATES tx 1
+EXT   origin=external              part=realized  txId=-   external truth
+```
+
+`'transaction-rollback'` was already in the `WriteMetadata['origin']` union and is
+now emitted at the compensation write context, closing the SEMANTICS-NAMES-1 cell
+that was left open pending a consumer.
+
+> **PARTICIPATION CLASSIFIES THE CHANGE'S AUTHORITY ROLE. ORIGIN CLASSIFIES THE
+> CAUSE THAT PRODUCED IT.** A compensation stays `realized`; the origin does not
+> make it authored, undoable, externally authoritative, or part of restoration
+> history.
+
+⚠️ ON THE `transactionId` OVERLOADING CONCERN, which was raised before this was
+known to be implemented. The compensation turn DOES carry `transactionId`, and
+the same field marks membership on the speculative turn. It is not ambiguous,
+because the PAIR disambiguates:
+
+```text
+txId present, no rollback origin      -> MEMBER of that transaction
+txId present, origin transaction-rollback -> COMPENSATES that transaction
+```
+
+A distinct `compensatesTransactionId` would also have worked and would carry the
+relation in one field rather than two. The existing pair is sufficient and is
+carried by `diag-journal-1-1-correlation.spec.ts`; recorded so the choice is
+visible rather than assumed.
+
+## Nothing owed
+
+```text
+public API delta        ZERO
+causal authority delta  ZERO
+restoration delta       ZERO
+retention mechanism     NONE ADDED — the journal predates this phase and stays
+                        dormant
+Gate B                  UNCHANGED
+```
+
+## ⚠️ FOUR TIMES IN ONE THREAD
+
+`HIST-C2`, `RESTORE-P0`, the DJ disposition, and this seam were each already
+resolved in the artifacts while I derived them again from the record. The
+corollary already recorded — a long append-only record is a history, not a status
+— needs its active form:
+
+> **READ THE ARTIFACT BEFORE DERIVING THE QUESTION.** A phase that names a
+> problem is not evidence the problem is open. Check the code and the log FIRST,
+> not after the framing is built — a framing built on a stale premise survives
+> every subsequent step, because each step is checked against the framing rather
+> than against the artifact.
