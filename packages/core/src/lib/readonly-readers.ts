@@ -1,4 +1,3 @@
-import type { EntityLoaderSurface } from './markers/entity-loader';
 import type { EntitySignal } from './types';
 
 /**
@@ -17,17 +16,4 @@ export const ENTITY_READERS = [
   'where',
   'find',
 ] as const satisfies readonly (keyof EntitySignal<unknown, string | number>)[];
-
-/**
- * Readers on {@link EntityLoaderSurface}. `load`/`loadOrThrow`/`refresh`/
- * `invalidate` all mutate loader state and are deliberately absent.
- */
-export const ENTITY_LOADER_READERS = [
-  'loading',
-  'loaded',
-  'error',
-  'lastLoadedAt',
-  'params',
-] as const satisfies readonly (keyof EntityLoaderSurface<unknown>)[];
-
 

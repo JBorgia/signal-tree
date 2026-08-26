@@ -4,7 +4,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { entityMap } from './types';
 import { signalTree } from './signal-tree';
 import { serialization } from '../enhancers/serialization/serialization';
-import { loader } from './markers/loader';
 
 /**
  * C3 — can an Angular app move server-built state to the client TODAY?
@@ -101,59 +100,3 @@ describe('C3 — server → TransferState → client', () => {
  * Same payload, same markers, one flag. What changes is only the decision a
  * source-owning marker makes about whose data is fresher.
  */
-describe('RFC 0014 — deserialize({ transfer: true })', () => {
-  // ⚠️ SUBJECT MIGRATED from asyncSource to a loader-backed entityMap. The RFC
-  // 0014 invariant needs A source-owning marker that declines `rehydrate`, and
-  // entityMap is the surviving one — not asyncSource specifically.
-  const make = () => ({
-    feed: entityMap<{ id: string }, string>({
-      selectId: (x) => x.id,
-      load: loader(async () => []),
-    }),
-    n: 0,
-  });
-
-  it('DELIVERS the server payload that rehydrate drops', () => {
-    const server = signalTree(make(), { enhancers: [serialization()] });
-    server.$.feed.setAll([{ id: 'SERVER' }]);
-    const payload = server.serialize();
-
-    const dropped = signalTree(make(), { enhancers: [serialization()] });
-    dropped.deserialize(payload);
-    expect(dropped.$.feed.count()).toBe(0);
-
-    const delivered = signalTree(make(), { enhancers: [serialization()] });
-    delivered.deserialize(payload, { transfer: true });
-    expect(delivered.$.feed.ids()).toEqual([
-      'SERVER',
-    ]);
-  });
-
-  // WITHDRAWN WITH STATUS-DEL — same subject, freshness variant.
-
-  it('leaves the storage path alone — no flag, no change in behaviour', () => {
-    const server = signalTree(make(), { enhancers: [serialization()] });
-    server.$.feed.setAll([{ id: 'STALE' }]);
-    const payload = server.serialize();
-
-    const client = signalTree(make(), { enhancers: [serialization()] });
-    client.deserialize(payload, { transfer: false });
-    expect(client.$.feed.count()).toBe(0);
-  });
-
-  it('the mode does not leak into a later deserialize', () => {
-    // `hydrateMode` is closure state restored in a `finally`; this is the test
-    // that keeps that honest.
-    const server = signalTree(make(), { enhancers: [serialization()] });
-    server.$.feed.setAll([{ id: 'X' }]);
-    const payload = server.serialize();
-
-    const client = signalTree(make(), { enhancers: [serialization()] });
-    client.deserialize(payload, { transfer: true });
-    expect(client.$.feed.ids()).toEqual(['X']);
-
-    const after = signalTree(make(), { enhancers: [serialization()] });
-    after.deserialize(payload); // default: rehydrate
-    expect(after.$.feed.count()).toBe(0);
-  });
-});

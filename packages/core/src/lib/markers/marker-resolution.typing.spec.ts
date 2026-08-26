@@ -23,7 +23,6 @@ import type {
   EntitySignal,
 } from '../../index';
 import { entityMap, signalTree } from '../../index';
-import { loader } from './loader';
 // Internal (not barrel-exported) tree-node variants — imported relatively so the
 // harness can gate their marker resolution too.
 import type {
@@ -93,15 +92,6 @@ export type _ComputedSliceChecks = [
   Expect<Equal<$['users'], EntitySignal<User, number>>>
 ];
 
-// Slices on a LOADER-BACKED collection resolve too (the loading branch of
-// TreeNode is a separate arm — `LoadingEntitySignal`, not `EntitySignal`).
-const loadingSliceTree = signalTree({
-  remote: entityMap<User, number>({
-    load: loader(() => Promise.resolve([] as User[])),
-  }).computed('names', (all) => all.map((u) => u.name)),
-});
-type Loading$ = typeof loadingSliceTree.$;
-
 // The two INTERNAL tree-node variants resolve slices as well. Previously only
 // `TreeNode` did, so `TypedSignalTree` (which builds on these) would have silently
 // dropped slice names — the same class of gap the 13.2 fix closed for `tree.$`.
@@ -115,12 +105,6 @@ export type _InternalVariantSliceChecks = [
   Expect<
     Equal<DeepEntityAwareTreeNode<SliceState>['stock']['names'], Signal<string[]>>
   >
-];
-
-export type _LoadingSliceChecks = [
-  Expect<Equal<Loading$['remote']['names'], Signal<string[]>>>,
-  // the loader surface survives alongside the slice
-  Expect<Equal<Loading$['remote']['loading'], Signal<boolean>>>
 ];
 
 // Internal (unexported) variants — imported relatively so they're gated too.

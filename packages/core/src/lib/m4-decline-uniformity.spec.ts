@@ -3,7 +3,6 @@ import { of } from 'rxjs';
 
 import { serialization } from '../enhancers/serialization/serialization';
 import { entityMap, signalTree } from '../index';
-import { loader } from './markers/loader';
 
 /**
  * M4 — CLOSING THE OWNERSHIP HALF.
@@ -50,74 +49,4 @@ describe('M4 — is the decline a uniform rule?', () => {
     expect(tree.$.rows.ids()).toEqual(['stored']);
   });
 
-  it('THE SAME KIND DECLINES once it owns a live source', () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<Row, string>({
-          selectId: (r) => r.id,
-          load: loader(() => of([{ id: 'fromLoader', n: 9 }]), { lazy: true }),
-        }),
-      },
-      { enhancers: [serialization()] }
-    );
-    tree.$.rows.addOne({ id: 'live', n: 1 });
-
-    tree.deserialize(payload({ rows: { all: [{ id: 'stored', n: 2 }] } }));
-
-    // Declined — the loader owns the source, so the aged payload loses.
-    expect(tree.$.rows.ids()).toEqual(['live']);
-  });
-
-  it('MODE, NOT PAYLOAD — the identical payload APPLIES under transfer', () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<Row, string>({
-          selectId: (r) => r.id,
-          load: loader(() => of([{ id: 'fromLoader', n: 9 }]), { lazy: true }),
-        }),
-      },
-      { enhancers: [serialization()] }
-    );
-    tree.$.rows.addOne({ id: 'live', n: 1 });
-
-    // Same position, same live source, same bytes — opposite answer, decided
-    // entirely by where the payload came from. RFC 0014's 54.3KB regression is
-    // the cost of collapsing these two modes into one.
-    tree.deserialize(payload({ rows: { all: [{ id: 'ssr', n: 3 }] } }), {
-      transfer: true,
-    });
-
-    expect(tree.$.rows.ids()).toEqual(['ssr']);
-  });
-
-  it('THE RULE READS NOTHING FROM THE PAYLOAD', () => {
-    const tree = signalTree(
-      {
-        rows: entityMap<Row, string>({
-          selectId: (r) => r.id,
-          load: loader(() => of([{ id: 'fromLoader', n: 9 }]), { lazy: true }),
-        }),
-      },
-      { enhancers: [serialization()] }
-    );
-    tree.$.rows.addOne({ id: 'live', n: 1 });
-
-    // An empty collection, a full one, a malformed one — all declined
-    // identically, because the predicate never inspects `value`.
-    for (const body of [
-      { rows: { all: [] } },
-      {
-        rows: {
-          all: [
-            { id: 'a', n: 1 },
-            { id: 'b', n: 2 },
-          ],
-        },
-      },
-      { rows: {} },
-    ]) {
-      tree.deserialize(payload(body));
-      expect(tree.$.rows.ids()).toEqual(['live']);
-    }
-  });
 });

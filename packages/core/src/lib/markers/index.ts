@@ -24,13 +24,3 @@
 
 // Cache-aware (single-scope) loading for entityMap (RFC 0002/0003) — the loader surface that
 // `entityMap({ load, … })` attaches. `entityMap` itself is exported from ./types.
-export {
-  invalidateTag,
-  parseDuration,
-  stableStringify,
-  type EntityLoader,
-  type EntityLoadOptions,
-  type EntityLoaderSurface,
-  type EntityPersist,
-  type EntityStorageAdapter,
-} from './entity-loader';

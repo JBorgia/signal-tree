@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { entityMap } from './markers/entity-map';
 import { hydrateMarkerNode } from './internals/materialize-markers';
-import { loader } from './markers/loader';
 import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
 import { undoable } from './undoable';
@@ -76,52 +75,5 @@ describe('S3-RECOVER: the historical n/rows corruption', () => {
       n: 2,
       rows: 2,
     });
-  });
-});
-
-describe("S3-RECOVER: why the branch could not have mattered", () => {
-  it("'merge' and 'restore' are indistinguishable to every marker", async () => {
-    vi.spyOn(console, 'info').mockImplementation(() => undefined);
-
-    const make = () => {
-      const tree = signalTree({
-        r: entityMap<{ id: number }, number>({
-          selectId: (x) => x.id,
-          // A loader-backed marker is the ONLY thing that declines a payload, so
-          // if any mode difference exists it has to show up here.
-          load: loader(async () => [{ id: 9 }]),
-        }),
-      });
-      void tree.$.r;
-      return tree;
-    };
-
-    const underMerge = make();
-    await settle();
-    hydrateMarkerNode(underMerge.$.r, { all: [{ id: 1 }, { id: 2 }] }, 'merge');
-
-    const underRestore = make();
-    await settle();
-    hydrateMarkerNode(
-      underRestore.$.r,
-      { all: [{ id: 1 }, { id: 2 }] },
-      'restore'
-    );
-
-    // Identical. Both accept, because the decline is keyed on 'rehydrate' and
-    // neither of these is it.
-    expect(underMerge.$.r.count()).toBe(underRestore.$.r.count());
-    expect(underMerge.$.r.count()).toBe(2);
-
-    // And the mode that DOES discriminate, for contrast — this is the behaviour
-    // the marker actually owns, and it is unreachable from the deleted branch.
-    const underRehydrate = make();
-    await settle();
-    hydrateMarkerNode(
-      underRehydrate.$.r,
-      { all: [{ id: 1 }, { id: 2 }] },
-      'rehydrate'
-    );
-    expect(underRehydrate.$.r.count()).not.toBe(2);
   });
 });

@@ -18,13 +18,7 @@
   },
   "peerDependencies": {
     "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
-    "rxjs": "^7.0.0",
     "tslib": "^2.0.0"
-  },
-  "peerDependenciesMeta": {
-    "rxjs": {
-      "optional": true
-    }
   },
   "publishConfig": {
     "access": "public"

@@ -1,7 +1,6 @@
 import type { Signal } from '@angular/core';
 
 import type { SignalTreeBuilder } from './internals/builder-types';
-import type { EntityLoaderSurface } from './markers/entity-loader';
 import type {
   CallableWritableSignal,
   EntitySignal,
@@ -9,10 +8,7 @@ import type {
   NodeAccessor,
   TreeNode,
 } from './types';
-import {
-  ENTITY_LOADER_READERS,
-  ENTITY_READERS,
-} from './readonly-readers';
+import { ENTITY_READERS } from './readonly-readers';
 
 /**
  * READ-ONLY VIEW TYPES (RFC 0004 §4 step 2 — "Readonly, truthful and minimal")
@@ -51,7 +47,6 @@ import {
  *
  * ```text
  * ENTITY_READERS         methods and computeds
- * ENTITY_LOADER_READERS  loading/loaded/error/lastLoadedAt/params — all Signal
  * ASYNC_SOURCE_READERS   data/loading/error — all Signal
  * STORED_READERS         key/version — plain values
  * ```
@@ -131,19 +126,6 @@ export type ReadonlyEntitySignal<
   byIdOrFail(id: K): ReadonlyEntityNode<E>;
 };
 
-/** Read-only view of {@link EntityLoaderSurface}: status signals only. */
-export type ReadonlyEntityLoaderSurface<P = void> = PickReaders<
-  EntityLoaderSurface<P>,
-  (typeof ENTITY_LOADER_READERS)[number]
->;
-
-/** Read-only view of a loading `entityMap({ load, … })` collection. */
-export type ReadonlyLoadingEntitySignal<
-  E,
-  K extends string | number = string,
-  P = void
-> = ReadonlyEntitySignal<E, K> & ReadonlyEntityLoaderSurface<P>;
-
 // =============================================================================
 // THE VIEW
 // =============================================================================
@@ -183,11 +165,7 @@ export type ReadonlyLoadingEntitySignal<
 type ReadonlyViewOf<T> = T extends EntitySignal<
   infer E,
   infer K extends string | number
-> &
-  EntityLoaderSurface<infer P>
-  ? ReadonlyLoadingEntitySignal<E, K, P> &
-      ReadonlyExtras<T, EntitySignal<E, K> & EntityLoaderSurface<P>>
-  : T extends EntitySignal<infer E, infer K extends string | number>
+>
   ? ReadonlyEntitySignal<E, K> & ReadonlyExtras<T, EntitySignal<E, K>>
   : T extends CallableWritableSignal<infer V>
   ? Signal<V>

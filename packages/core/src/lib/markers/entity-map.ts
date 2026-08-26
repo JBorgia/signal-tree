@@ -4,9 +4,8 @@ import { computed, Signal } from '@angular/core';
 import { createEntitySignal } from '../entity-signal';
 import {
   registerBuiltinMarkerProcessor,
-  reportHydrateDecision,
 } from '../internals/materialize-markers';
-import { isEntityMapMarker, isLoaderFeature } from '../utils';
+import { isEntityMapMarker } from '../utils';
 
 // Re-export isEntityMapMarker for convenience
 export { isEntityMapMarker };
@@ -33,8 +32,6 @@ import type {
   EntityConfig,
   EntityMapMarker,
   EntitySignal,
-  LoaderFeature,
-  LoadingEntityMapMarker,
 } from '../types';
 
 // =============================================================================
@@ -108,27 +105,6 @@ export interface EntityMapBuilder<
 
   /** Finalize and return the marker (usually unnecessary — the builder is a marker). */
   build(): EntityMapMarkerWithSlices<E, K, Slices>;
-}
-
-/**
- * Builder for a cache-aware (loading) entityMap — produced when `load` is
- * configured. Its materialized signal carries the loader surface.
- */
-export interface LoadingEntityMapBuilder<
-  E,
-  K extends string | number,
-  P = void,
-  Slices extends Record<string, unknown> = Record<string, never>
-> extends LoadingEntityMapMarker<E, K, P> {
-  __computedSlices?: EntityMapComputedSlices<E>;
-  __sliceTypes?: Slices;
-
-  computed<N extends string, R>(
-    name: N,
-    compute: (entities: E[]) => R
-  ): LoadingEntityMapBuilder<E, K, P, Slices & Record<N, R>>;
-
-  build(): LoadingEntityMapMarker<E, K, P>;
 }
 
 // =============================================================================
@@ -219,40 +195,18 @@ export type DefaultKey<E> = E extends { id: infer I extends string | number }
  *
  * @see RFC 0002, RFC 0003, RFC 0005
  */
-// Overload order matters: the LOADING overload is declared first so a config
-// carrying `load: loader(...)` resolves to a loading builder (recovering `P`
-// from the feature); the PLAIN overload is declared LAST so that
-// `ReturnType<typeof entityMap<E, K>>` (a common user idiom, and what the demos
-// use) resolves to the plain builder rather than the loading one.
-export function entityMap<
-  E,
-  K extends string | number = DefaultKey<E>,
-  P = void
->(
-  config: EntityConfig<E, K> & { load: LoaderFeature<E, P> }
-): LoadingEntityMapBuilder<E, K, P, Record<string, never>>;
+// ⚠️ ONE OVERLOAD NOW. There were two, ordered so that a config carrying
+// `load: loader(...)` resolved to a LOADING builder. That form is gone: a
+// collection's relationship with external truth is `link(tree.$.rows, endpoint)`,
+// and how that endpoint fetches or caches is the application's business.
 export function entityMap<E, K extends string | number = DefaultKey<E>>(
   config?: EntityConfig<E, K>
-): EntityMapBuilder<E, K, Record<string, never>>;
-export function entityMap<E, K extends string | number = DefaultKey<E>>(
-  config?: EntityConfig<E, K> & { load?: LoaderFeature<E, unknown> }
 ): EntityMapBuilder<E, K, Record<string, never>> {
-  // Fail closed at the call site (v12): `load` must be a `loader()` feature.
-  // Checked HERE, synchronously, rather than in the marker processor —
-  // `materializeMarkers()` wraps `processor.create()` in a try/catch that
-  // swallows throws (dev console.error, silent in prod), so a processor-level
-  // throw would not actually fail closed. Throwing in the factory surfaces the
-  // error where the user wrote `entityMap({ load: fn })`, and cannot be
-  // swallowed. Raw `load: fn` was removed in v12 (RFC 0005 §6). [ST2004]
-  const rawLoad = (config as { load?: unknown } | undefined)?.load;
-  if (rawLoad != null && !isLoaderFeature(rawLoad)) {
-    throw new Error(
-      `SignalTree: entityMap({ load }) requires the loader() helper — ` +
-        `entityMap({ load: loader(fn, { staleTime, swr, tags }) }). The raw ` +
-        `"load: fn" form was removed in v12 so the loader machinery ` +
-        `tree-shakes out of plain collections. [ST2004]`
-    );
-  }
+  // ⚠️ [ST2004] IS GONE, AND IT WAS A DEAD END. It threw
+  // "entityMap({ load }) requires the loader() helper" at anyone who passed a
+  // raw function — while `loader()` was never exported, so the remedy the error
+  // named could not be imported. The check documented an unreachable path as
+  // the solution.
 
   // Self-register on first use (tree-shakeable)
   if (!entityMapRegistered) {
@@ -333,21 +287,6 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
           }
         }
 
-        // Cache-aware loading — reached ONLY through a `loader()` feature, the
-        // sole holder of the `attachLoader` reference. This file does not
-        // import `attachLoader`, so a plain `entityMap()` tree-shakes the
-        // loader machinery out (RFC 0005 §6). A non-feature `load` is rejected
-        // at the `entityMap()` call site (fail-closed [ST2004]), so by the time
-        // the processor runs `load` is either absent or a loader feature.
-        const load = cfg.load;
-        if (isLoaderFeature(load)) {
-          load.attach(
-            entitySignal as EntitySignal<
-              Record<string, unknown>,
-              string | number
-            >
-          );
-        }
 
         return entitySignal;
       },
@@ -358,58 +297,23 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
         // collection was EMPTY while holding 10,000 entities.
         snapshot: (node) => ({ all: node.all() }),
 
-        hydrate: (node, value, mode) => {
-          // A LOADER-BACKED collection declines tree-level rehydration.
+        hydrate: (node, value) => {
+          // ⚠️ NOTHING DECLINES HYDRATION ANY MORE, and that is the whole
+          // finding rather than a side effect. The decline here was
+          // loader-conditional — `typeof node.load === 'function'`, and `load`
+          // was attached only by the `loader()` feature. With loader deleted the
+          // predicate can never be true, so the branch was dead the moment its
+          // one producer went.
           //
-          // The loader already owns this collection's persistence, and owns it
-          // better: `loader({ persist: { adapter, key, hydrateThenRevalidate } })`
-          // seeds rows from its own store, marks them stale, and revalidates in
-          // the background — per-scope storage keys, touch-ordered GC and all.
-          // That IS offline-first rehydration, shipped and documented.
+          // M4 traced this trajectory already: `hydrate` had two implementers,
+          // `asyncSource` and `entityMap`; asyncSource's deletion left one, and
+          // loader's leaves ZERO declining paths. "A source-owning marker
+          // declines rehydration" is not an invariant that lost its carrier —
+          // it is a rule with no subject, because no marker in core owns an
+          // external source. Relationships do, and a relationship is `link()`.
           //
-          // Writing the tree snapshot over it does not add a second opinion, it
-          // WINS PERMANENTLY. Measured: a collection seeded by its loader, then
-          // hydrated from a tree snapshot, still held the tree's rows after
-          // revalidation. Two mechanisms writing one collection, and the one
-          // that knows least about freshness was last.
-          //
-          // So the answer to "payload or source on rehydrate" is not a new
-          // config knob — it is `hydrateThenRevalidate`, which already exists,
-          // is already per-instance, and is already the right granularity. This
-          // also settles an inconsistency: `asyncSource` already declined here
-          // while `entityMap` did not, for the identical situation.
-          //
-          // `restore` and `merge` still write: undo/redo and `tree(partial)` are
-          // not competing with the loader's persistence.
-          // `load` is attached by the loader feature, so it is absent from the
-          // base EntitySignal type — presence at runtime IS the discriminator.
-          // `rehydrate` only — `transfer` falls through and ACCEPTS. A
-          // loader-backed collection had exactly the asyncSource defect: an SSR
-          // payload the server had just fetched was declined because the local
-          // loader "owns" the source, so the rows shipped inside the page and
-          // were then fetched again. Under `transfer` the local loader has not
-          // run, so the payload is the freshest thing available. [RFC 0014]
-          if (
-            mode === 'rehydrate' &&
-            typeof (node as { load?: unknown }).load === 'function'
-          ) {
-            reportHydrateDecision({
-              marker: 'entityMap',
-              decision: 'declined',
-              mode,
-              reason: 'loader-owns-source',
-              // Prose only — folds under `ngDevMode: false`. The inline guard
-              // is what lets esbuild drop the string; `reason` above still
-              // reaches production listeners.
-              detail:
-                typeof ngDevMode === 'undefined' || ngDevMode
-                  ? 'a loader owns this collection, so it is the authority ' +
-                    'on freshness. For offline-first seeding use ' +
-                    'loader({ persist: { hydrateThenRevalidate: true } }).'
-                  : undefined,
-            });
-            return;
-          }
+          // The RFC 0014 contrast — `transfer` accepts what `rehydrate`
+          // declines — is retired with it: both modes now accept.
 
           if (value === null || typeof value !== 'object') return;
           // A BARE ARRAY is a valid payload, not a malformed one.
