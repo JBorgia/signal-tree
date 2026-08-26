@@ -55,3 +55,33 @@ annotated();
 
 /** …while its descendant reads do work, so the failure is specific. */
 export const _annotLeaf: number = annotated.$.a();
+
+// ════════════════════════════════════════════════════════════════════════════
+// createAuditTracker — the accepted subject is the CALLABLE tree
+// ════════════════════════════════════════════════════════════════════════════
+import { createAuditTracker } from '@signaltree/core';
+import type { AuditEntry } from '@signaltree/core';
+
+type S = { n: number };
+const auditTree = signalTree<S>({ n: 1 });
+const auditLog: AuditEntry<S>[] = [];
+
+/** The documented subject — "accepts the value returned by signalTree() directly". */
+createAuditTracker(auditTree, auditLog);
+
+/**
+ * ⚠️ AND `tree.$` IS REJECTED AT COMPILE TIME, which is the row that matters.
+ *
+ * A carrier once passed `tree.$ as never`, got "tree is not a function" at
+ * runtime, and I recorded a public-contract defect: a type admitting a node the
+ * implementation cannot read. That was wrong. `TreeNode` is not assignable to
+ * `NodeAccessor` — the CAST admitted it, not the type.
+ *
+ *     A CAST DEFEATS THE OBSERVATION exactly as a no-op mutation does.
+ *
+ * This row exists so the protection is asserted rather than assumed: if
+ * `TreeNode` ever becomes assignable to `NodeAccessor`, the runtime failure
+ * returns and this line starts compiling.
+ */
+// @ts-expect-error — TreeNode is not a NodeAccessor; the namespace is not callable
+createAuditTracker(auditTree.$, auditLog);

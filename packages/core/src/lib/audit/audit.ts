@@ -58,8 +58,22 @@ export interface AuditTrackerConfig<T> {
 
 /**
  * Creates an audit tracker for tree change tracking.
- * Uses `tree.subscribe()` for reactive change detection in Angular contexts,
- * providing zero-polling overhead.
+ *
+ * ⚠️ IT POLLS, AT 100ms. This said "Uses `tree.subscribe()` for reactive change
+ * detection in Angular contexts, providing zero-polling overhead" — and that was
+ * FALSE for every tree a caller can construct.
+ *
+ * Measured: `signalTree({...})` has no `subscribe` property at all, so the
+ * detector below (`'subscribe' in tree && typeof tree.subscribe === 'function'`)
+ * can never select the fast path for a public tree. The detector itself is
+ * fine — a positive control handing it a subscribe-capable object DOES take that
+ * branch — so this was a documentation defect, not an implementation one.
+ *
+ * The claim is corrected rather than rescued. Giving the tree a `subscribe` to
+ * make the sentence true would add a second subscription architecture, and
+ * framework observation belongs at committed publication
+ * (GREENFIELD-FRAMEWORK-HANDOFF-0). A 100ms poll is the honest description of
+ * what this does today.
  *
  * This function is tree-shakeable - if not imported, it won't be included in
  * your bundle.

@@ -154,13 +154,14 @@ describe('PUBLIC CARRIER — createAuditTracker records changes', () => {
     // Its distinct job vs the deleted createAuditCallback: it ATTACHES ITSELF,
     // so it needs no handler signature from the caller — which is exactly what
     // made the callback form unusable against the public `subscribe`.
-    // ⚠️ IT NEEDS THE CALLABLE TREE, NOT `tree.$`. The declared parameter is
-    // `NodeAccessor<T>`, which `tree.$` satisfies structurally — and passing it
-    // throws "tree is not a function" at runtime, because the namespace is a
-    // plain object. Same class of defect as LINK-ROOT-SOURCE-0: a type admits a
-    // node the implementation cannot read. Recorded here rather than silently
-    // worked around.
-    const stop = createAuditTracker(tree as never, log as never, {
+    // ⚠️ THE SUBJECT IS THE CALLABLE TREE, and the type already enforces that.
+    // An earlier version of this row passed `tree.$ as never`, got "tree is not
+    // a function", and I recorded a public-contract defect. The defect was mine:
+    // `TreeNode` is NOT assignable to `NodeAccessor`, so `createAuditTracker(
+    // tree.$)` does not compile — the `as never` cast admitted it. A CAST
+    // DEFEATS THE OBSERVATION exactly as a no-op mutation does. The negative
+    // type carrier is in the typing sibling.
+    const stop = createAuditTracker(tree, log as never, {
       includePreviousValues: true,
     });
 
