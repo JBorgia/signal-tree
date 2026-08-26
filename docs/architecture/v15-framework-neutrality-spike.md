@@ -1303,3 +1303,94 @@ acquireProjection(branch, payload, causalClass)
 
 ⚠️ Questions 4–6 are open by ABSENCE of evidence, not by evidence of absence. C4
 implements the smallest ingress satisfying 1–3 and does not generalize past it.
+
+## C4 — NON-AUTHORED FLAT-SCALAR INGRESS: IMPLEMENTED
+
+`packages/core/src/lib/internals/acquire-projection.ts`. Angular-free, not barrel-exported.
+
+### ⚠️ THE ARTIFACT READ CHANGED THE IMPLEMENTATION
+
+`external()` is **ambient** — `withWriteContext(meta, operation)` around a caller-supplied
+callback. The existing boundary carrier only passes because that scope is the SYNCHRONOUS
+CALLBACK, not the tick: `external(() => …)` followed by `.set(1)` puts the second write
+outside the frame.
+
+C4 takes a payload, not a callback, so it does not need ambience at all. Provenance is
+attached **per subject** — one `withWriteContext` opened and closed around each single
+write — so it cannot outlive the subject it describes:
+
+```
+for each SUPPLIED key
+    resolve the subject
+    withWriteContext(EXTERNAL_ACQUISITION, () => subject.set(value))   ← closes here
+omitted keys
+    nothing happens at all
+```
+
+### Carriers
+
+The three `bind-branch-0` rows now exercise the real ingress instead of
+`external(() => tree.$.settings(PAYLOAD))`. **Assertions untouched; 6/6.** The CONTROL arm
+deliberately still uses the authored callable — it is the contrast that makes the others
+mean anything, and C5 migrates it to a complete value.
+
+New direct carriers (`acquire-projection.spec.ts`, 3/3):
+
+```
+realizes exactly the supplied subjects, omitted untouched
+    realized === ['a','c']            per-subject INVENTORY, not just final values
+    effects  === ['box.a','box.c']
+    box.b unchanged                   no write, no claim
+
+acquisition is not authored work
+    restoration history +0 · canUndo() false
+
+⚠️ THE BOUNDARY
+    ingress { a: 1 }  then SAME TICK  tree.$.box.b.set(2)
+    box.a external/realized · box.b origin and participation BOTH undefined
+```
+
+### Falsifiers — both required, both proven
+
+```
+1  provenance broadened from per-subject to an ambient TICK scope
+       → THE BOUNDARY red: "expected 'external' to be undefined"
+         the omitted sibling's authored write inherited external provenance
+
+2  acquisition collapsed into one opaque branch realization
+       → inventory red: "expected [ 'box' ] to deeply equal [ 'a', 'c' ]"
+         right final state, causal information destroyed
+```
+
+Falsifier 1 is the novel one. Merely writing omitted keys was already known to be wrong;
+the invariant this pins is isolation:
+
+> **PROVENANCE FOLLOWS SUPPLIED INFORMATION, NOT EXECUTION PROXIMITY.**
+
+### Deliberately not decided
+
+**Atomicity.** Two supplied leaves produce two realized subjects; how many physical commit
+frames carry them is private representation. No carrier freezes either "one atomic
+multi-leaf acquisition" or "independent commits", and none was written.
+
+**Unknown / non-scalar keys** are skipped with no throw, no diagnostic and no recursion —
+adding any would invent a contract the carriers do not prove and would collide with the
+unknown-key diagnostics `traversal-diagnostics` owns. Still OPEN.
+
+Scope stayed flat: the only `nested|entities|recurse|deep` match in the file is the comment
+naming what remains unproven.
+
+### C4 close conditions
+
+```
+[x] real flat-scalar ingress exists
+[x] three relocated bind-branch carriers pass on it (6/6, assertions unchanged)
+[x] omitted subject gets no write / no claim
+[x] supplied leaves appear as separate realized subjects
+[x] no transaction / authored turn / restoration entry
+[x] same-tick omitted authored write stays authored
+[x] ambient-provenance mutation turns red
+[x] opaque-branch-effect mutation turns red
+[x] no nested / entity / general projection API introduced
+[x] core 1961 passed · register 55/55
+```
