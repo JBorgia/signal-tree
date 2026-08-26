@@ -39,6 +39,7 @@ const SRC = resolve('packages/core/src');
  */
 const NEUTRAL_ROOTS = [
   'lib/internals/tree-scalar-slot-runtime.ts',
+  'lib/internals/tree-location.ts',
   'lib/internals/position-registry.ts',
   'lib/internals/physical-commit-clock.ts',
   'lib/mutation-types.ts',
