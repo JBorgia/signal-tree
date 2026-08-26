@@ -151,7 +151,6 @@ export type { SignalTreeBuilder } from './lib/internals/builder-types';
 // @signaltree/ng-forms in v13, RFC 0006). Tree-shakeable: unused → not bundled.
 export {
   createAuditTracker,
-  createAuditCallback,
   type AuditEntry,
   type AuditMetadata,
   type AuditTrackerConfig,

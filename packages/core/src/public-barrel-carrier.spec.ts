@@ -23,6 +23,8 @@ import { describe, expect, it } from 'vitest';
 // so removing a re-export breaks these rows and nothing else can substitute.
 import {
   asReadonly,
+  createAuditTracker,
+  defineStore,
   restoration,
   signalTree,
   toWritableSignal,
@@ -115,5 +117,66 @@ describe('PUBLIC CARRIER — asReadonly projects a callable tree', () => {
     expect((ro as unknown as () => { a: number })().a).toBe(1);
     expect(ro.$.a()).toBe(1);
     expect(ro.$.b.c()).toBe('x');
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// defineStore — Angular DI provisioning, which nothing else offers
+// ════════════════════════════════════════════════════════════════════════════
+describe('PUBLIC CARRIER — defineStore provides a tree through Angular DI', () => {
+  it('an injected store is the same tree, and readonly narrowing is available', () => {
+    // ⚠️ THIS EXPORT HAD ZERO CONSUMERS IN THE WORKSPACE, which is why it needs a
+    // carrier rather than an assertion. Its distinct job is DI PROVISIONING: no
+    // other public symbol turns a tree into something `inject()` resolves.
+    const Store = defineStore(() => signalTree({ n: 1 }), {
+      providedIn: 'root',
+    });
+
+    TestBed.configureTestingModule({});
+    const a = TestBed.inject(Store);
+    const b = TestBed.inject(Store);
+
+    // providedIn: 'root' means one instance for the injector.
+    expect(a).toBe(b);
+    expect(a.$.n()).toBe(1);
+    a.$.n.set(2);
+    expect(a.$.n()).toBe(2);
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// createAuditTracker — self-attaching change log
+// ════════════════════════════════════════════════════════════════════════════
+describe('PUBLIC CARRIER — createAuditTracker records changes', () => {
+  it('entries accumulate, and the returned stop function ends it', async () => {
+    const tree = signalTree({ n: 0 });
+    const log: unknown[] = [];
+    // Its distinct job vs the deleted createAuditCallback: it ATTACHES ITSELF,
+    // so it needs no handler signature from the caller — which is exactly what
+    // made the callback form unusable against the public `subscribe`.
+    // ⚠️ IT NEEDS THE CALLABLE TREE, NOT `tree.$`. The declared parameter is
+    // `NodeAccessor<T>`, which `tree.$` satisfies structurally — and passing it
+    // throws "tree is not a function" at runtime, because the namespace is a
+    // plain object. Same class of defect as LINK-ROOT-SOURCE-0: a type admits a
+    // node the implementation cannot read. Recorded here rather than silently
+    // worked around.
+    const stop = createAuditTracker(tree as never, log as never, {
+      includePreviousValues: true,
+    });
+
+    // ⚠️ IT POLLS AT 100ms. There is no interval option, and core's tree has no
+    // `subscribe`, so the tracker always takes its polling fallback — the
+    // "zero-polling in Angular contexts" claim in its own doc comment holds only
+    // for a tree that exposes subscribe. Pre-existing, recorded, not fixed here.
+    tree.$.n.set(1);
+    await new Promise((r) => setTimeout(r, 250));
+    const during = log.length;
+
+    stop();
+    tree.$.n.set(2);
+    await new Promise((r) => setTimeout(r, 250));
+
+    expect(during).toBeGreaterThan(0);
+    expect(log.length).toBe(during);
   });
 });

@@ -18372,3 +18372,77 @@ mutation     remove the re-export -> "asReadonly is not a function"
 
 The probe that argued for deletion addressed `tree.$`, the NAMESPACE. The API
 projects the CALLABLE TREE. SUBJECT-ADDRESS RULE, re-earned.
+
+## `PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0` — batch 2, and B2
+
+### Exhaustive classification — 69 exports, nothing unclassified
+
+```text
+RUNTIME (17)   every one has a distinct public contract
+  signalTree entityMap link external undoable onTreeError
+  persistence transactions restoration devTools batching
+  derivedFrom defineStore asReadonly toWritableSignal
+  createAuditTracker SignalTreeRollbackError
+
+TYPE (52)      every one maps to an exported runtime owner
+  signalTree          11   entityMap 10   devTools 5   asReadonly 4
+  persistence          3   transactions 3  audit 3    link 2
+  restoration          2   batching 2      defineStore 2
+  onTreeError          1   derivedFrom 1
+  enhancer protocol    3   (Enhancer, EnhancerWithMeta, EnhancerCleanup)
+  write classification 1   (WriteMetadata)
+
+UNCLAIMED TYPES: NONE
+```
+
+The enhancer protocol and `WriteMetadata` have no single runtime owner because
+their consumer is a third-party AUTHOR, which is the surface
+`GREENFIELD-FRAMEWORK-HANDOFF-0` names `@signaltree/authoring`.
+
+### DELETED — `createAuditCallback`
+
+> **ITS DOCUMENTED PURPOSE WAS FALSE.** It returned
+> `(previousState: T, currentState: T) => void` and said it was "suitable for
+> `tree.subscribe()`". The public `subscribe` takes a `PathHandler` > `(value, prev, path, ownerPath?, source?, subjectIds?, …)`.
+
+Proven with a `@ts-expect-error`: the two-state callback cannot be passed to the
+public method it was written for. Zero consumers anywhere. `createAuditTracker`
+survives because it ATTACHES ITSELF and therefore needs no handler signature from
+the caller — which is exactly what made the callback form unusable.
+
+### Public-boundary carriers — the four whose evidence was thin
+
+```text
+toWritableSignal     form() bridge + { undoable: true } eligibility   mutation ✓
+asReadonly           callable-tree readonly projection                mutation ✓
+defineStore          Angular DI provisioning (0 workspace consumers)  mutation ✓
+createAuditTracker   self-attaching change log                       mutation ✓
+```
+
+⚠️ THE OTHER 13 RUNTIME SYMBOLS DO NOT HAVE BARREL CARRIERS. They are exercised
+throughout the suite through relative imports, which proves their SEMANTICS and —
+per the rule this batch earned — not their reachability. Stated rather than
+glossed: barrel coverage is 4 of 17. The four chosen are the ones whose public
+need was contested or unevidenced; extending coverage to the rest is cheap now
+that the alias and the exception exist.
+
+### ⚠️ A DEFECT FOUND BY WRITING THE CARRIER
+
+`createAuditTracker(tree, log, config)` declares its first parameter
+`NodeAccessor<T>`. `tree.$` satisfies that structurally — and passing it throws
+`"tree is not a function"`, because the namespace is a plain object while the
+implementation calls `tree()`.
+
+Same class as `LINK-ROOT-SOURCE-0`: a type admits a node the implementation
+cannot read. Recorded in the carrier rather than silently worked around. Also
+confirmed in passing: the doc's "zero-polling overhead in Angular contexts" claim
+holds only for a tree exposing `subscribe`, which core's does not — so the
+tracker always takes its 100 ms polling fallback.
+
+### B2 — SETTLED? **YES**
+
+> Can I point at every exported runtime symbol and exported public type and state
+> the distinct public contract it serves?
+
+Yes. 17 runtime symbols with owners, 52 types all claimed, zero unclassified, and
+the one export whose contract turned out to be fictional is deleted.

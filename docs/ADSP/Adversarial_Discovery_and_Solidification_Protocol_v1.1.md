@@ -2526,6 +2526,45 @@ and that a refusal thrown deeper was being caught and re-wrapped at the same
 boundary — producing a doubled message that a constant error string had hidden
 for as long as it existed.
 
+## 29.7c Test the claim at the boundary the claim is about
+
+> **TEST THE CLAIM AT THE BOUNDARY THE CLAIM IS ABOUT.** A causal claim is tested
+> at the causal owner. A subject claim is tested at the subject. A public-export
+> claim is tested THROUGH the public export.
+
+The packaging analogue of the subject-address rule, and it has its own corollary:
+
+> **PUBLIC-BOUNDARY CARRIER RULE.** A claim about PUBLIC REACHABILITY must cross
+> the public boundary.
+>
+> Package-internal relative imports can prove runtime semantics, causal
+> behaviour and implementation invariants. They CANNOT prove package export
+> existence, barrel reachability, subpath reachability, or external type
+> usability. A spec that imports the implementation directly is not evidence that
+> the public API exists.
+
+For a public KEEP: import through the published package or subpath — or through a
+deliberate source-barrel alias that exercises the same boundary — and the carrier
+must FAIL when the export is removed.
+
+⚠️ A CLASS OF FALSE-NEGATIVE TEST, not one bad spec. A package whose every spec
+imports relatively has no test that can observe its own export list: deleting a
+re-export leaves the suite green while breaking every external consumer. Measured
+— removing `toWritableSignal` from a barrel left its three carriers passing,
+because they imported the implementation path.
+
+The module-boundary lint is right for ordinary code and is also why the blind spot
+exists. So:
+
+```text
+ordinary package code      MUST obey module-boundary lint
+public-boundary carrier    MAY cross through the package barrel, exception
+                           documented, and only for that purpose
+```
+
+That is not weakening the rule. It is testing the thing the rule exists to stop
+internal code from depending on.
+
 ## 29.8 A corollary for long-lived records
 
 An append-only architecture record accumulates statements that later entries

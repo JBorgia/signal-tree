@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { signalTree } from '../signal-tree';
-import { createAuditCallback, createAuditTracker } from './audit';
+import { createAuditTracker } from './audit';
 import type { AuditEntry } from './audit';
 
 interface Data extends Record<string, unknown> {
@@ -32,11 +32,4 @@ describe('audit (moved to core, RFC 0007)', () => {
     stop();
   });
 
-  it('createAuditCallback captures changes between two states', () => {
-    const log: AuditEntry<Data>[] = [];
-    const cb = createAuditCallback(log);
-    cb({ name: '', email: '' }, { name: 'Ada', email: '' });
-    expect(log).toHaveLength(1);
-    expect(log[0].changes.name).toBe('Ada');
-  });
 });
