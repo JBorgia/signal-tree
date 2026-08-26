@@ -18092,12 +18092,46 @@ bind / requires / isDev pending disposition all unreachable (controlled)
 
 ```text
 tools/api-baseline.json re-baseline
-    blocked on B2 AND B3 settling. Regenerating earlier produces a baseline B3
-    invalidates, and a baseline regenerated twice is one nobody trusts.
-    ⚠️ Three of the five symbols that blocking note names — `.with()`,
-    `requires`, ENTITY_LOADER_READERS — are already gone, so the blocker's SCOPE
-    has shrunk even though the blocker itself stands.
+    blocked on B2 alone. ⚠️ NO LONGER ON B3 — see the patch below.
+    Three of the five symbols the blocking note names — `.with()`, `requires`,
+    ENTITY_LOADER_READERS — are already gone, so the blocker's SCOPE has shrunk
+    even though the blocker itself stands.
 ```
+
+### ⚠️ FRONTIER PATCH — `B3` is SUPERSEDED, and the reconciliation found this by
+
+### contradicting itself
+
+The first reconciliation left a hole: it recorded the baseline as blocked on
+`B2 AND B3` while listing no `B3` anywhere in the execution frontier, and
+`packages/authoring` contains no files at all. One of those had to be wrong.
+
+Resolved from artifacts, three agreeing independently:
+
+```text
+RELEASE-1.0.md:150   "Gate B waits on the declaration artifact, not on
+                     architecture." And package verdicts (Tier 4) wait on their
+                     SEMANTIC OWNERS being known — which is a derivation-lane
+                     dependency, not a Gate-B one.
+this record:17844    GREENFIELD-FRAMEWORK-HANDOFF-0 claims
+                     `@signaltree/authoring` and `@signaltree/kernel` as the
+                     greenfield target, explicitly NOT SCHEDULED, waiting on HIST
+packages/authoring/  EMPTY — no extraction has begun, and none is queued
+```
+
+B3 is the authoring/realization package separation. It is greenfield work owned
+by `GREENFIELD-FRAMEWORK-HANDOFF-0`, executed AFTER the surface freeze. Its
+original blocking rationale — "B3 can move declaration locations and exported
+paths, and the baseline records both" — was sound while B3 sat before the freeze.
+It no longer does: the baseline taken at the freeze records the FROZEN surface,
+and greenfield will produce its own.
+
+> **B3-SUPERSEDED.** The api-baseline blocker stops naming it. Owner:
+> `GREENFIELD-FRAMEWORK-HANDOFF-0`.
+
+Positive control for the artifact query: the same log method locates known closed
+package decisions (`SCHEMA-DEL`, `FORM-DEL`), so the absence of any authoring-
+extraction commit is a finding rather than a broken search.
 
 ## HISTORICAL — investigations, not work items
 
