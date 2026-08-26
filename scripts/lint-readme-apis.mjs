@@ -201,3 +201,122 @@ if (problems.length) {
 }
 
 console.log('✓ every @signaltree symbol named in a README exists.');
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * RETIRED APIs MAY NOT BE TAUGHT.        AI-DOC-SURFACE-GATE-0
+ * ══════════════════════════════════════════════════════════════════════════
+ *
+ * ⚠️ WHY THE IMPORT CHECK ABOVE WAS NOT ENOUGH, measured rather than assumed.
+ * That check already walks all of `docs/`, `docs/ai/LLM.md` included — and it
+ * still passed while LLM.md taught `stored(key, default)` in a marker table,
+ * taught the retired `status<E>()` beside it, and named `serialization()` as
+ * the persistence enhancer when `serialization` is not exported at all.
+ *
+ * It passed because it only inspects IMPORT STATEMENTS. A table row teaches
+ * without importing, and so does a code block that assumes the import. An agent
+ * reading a table of markers needs no import line to be misled — and the
+ * AI-facing document is the one an agent reads FIRST.
+ *
+ *     A DOC TEACHES BY EXAMPLE, NOT BY IMPORT.
+ *
+ * So this second pass looks for CALL SITES of names that are known to be gone.
+ * It is deliberately a denylist rather than "every identifier must resolve":
+ * doc examples legitimately call application-owned helpers, and a checker that
+ * flagged those would be permanently red — which teaches people to ignore gates,
+ * the exact failure this file's header already warns about.
+ *
+ * PROSE IS ALLOWED. "the old `stored()` marker is deleted" is a correct thing
+ * for a migration note to say, so only fenced code blocks and API-table rows
+ * count as teaching.
+ */
+const RETIRED = new Map([
+  ['stored', 'deleted — use `persistence()` over ordinary state'],
+  ['flushAllStoredSignals', 'deleted with `stored()`'],
+  ['createStoredSignal', 'deleted with `stored()`'],
+  ['isStoredMarker', 'deleted with `stored()`'],
+  ['createStorageKeys', 'deleted with `stored()`'],
+  ['clearStoragePrefix', 'deleted with `stored()`'],
+  ['status', 'deleted — model loading state as ordinary tree state'],
+  ['asyncSource', 'deleted — application-owned async + `external()`'],
+  ['asyncQuery', 'deleted — application-owned async + `external()`'],
+  ['effects', 'removed years ago'],
+  ['withPersistence', 'removed in v12 — use `persistence()`'],
+  ['serialization', 'not exported — `persistence()` is the enhancer'],
+]);
+
+/**
+ * ⚠️ THE DENYLIST'S OWN CONTROL. A denylist rots silently: if a name is ever
+ * re-introduced, every entry naming it becomes a lie that still passes. So each
+ * entry is asserted ABSENT from the built surface. Re-adding an API makes this
+ * gate fail loudly and demands the entry be removed on purpose.
+ */
+const reachableNames = new Set();
+for (const names of SURFACE.values()) for (const n of names) reachableNames.add(n);
+const stale = [...RETIRED.keys()].filter((n) => reachableNames.has(n));
+if (stale.length > 0) {
+  console.error(
+    `\n✗ the RETIRED denylist is out of date — these are reachable again:\n` +
+      stale.map((n) => `    ${n}`).join('\n') +
+      `\n\n  Remove them from RETIRED in scripts/lint-readme-apis.mjs. An entry\n` +
+      `  that names a live API silently stops protecting anything.\n`
+  );
+  process.exit(1);
+}
+
+/** Fenced code blocks, plus rows of a table whose first cell is a signature. */
+function teachingRegions(text) {
+  const out = [];
+  const fence = /```[\s\S]*?```/g;
+  for (const m of text.matchAll(fence)) {
+    out.push({ text: m[0], line: text.slice(0, m.index).split('\n').length });
+  }
+  const lines = text.split('\n');
+  lines.forEach((l, i) => {
+    const cell = /^\|\s*`([^`]+)`\s*\|/.exec(l);
+    if (cell) out.push({ text: cell[1], line: i + 1 });
+  });
+  return out;
+}
+
+/**
+ * ⚠️ A RECORD IS NOT A LESSON. `docs/architecture/**` and `docs/research/**` are
+ * accounts of decisions already taken, and a record of a DELETION has to be able
+ * to show what was deleted — in a fence, with its real call shape. Holding them
+ * to "never name a retired API in an example" would force the audit trail to
+ * paraphrase its own evidence, which is how a record stops being one.
+ *
+ * The import pass above still covers them: a record may SHOW a deleted call, but
+ * it may not tell a reader to import something that does not exist.
+ */
+const RECORD_DIRS = /^docs\/(architecture|research)\//;
+
+const taught = [];
+for (const rel of READMES) {
+  if (RECORD_DIRS.test(rel)) continue;
+  const text = readFileSync(join(ROOT, rel), 'utf8');
+  for (const region of teachingRegions(text)) {
+    if (/@skip-lint/.test(region.text)) continue;
+    for (const [name, why] of RETIRED) {
+      // A call site or a signature cell — not a bare mention in prose.
+      if (new RegExp(`\\b${name}\\s*[(<]`).test(region.text)) {
+        taught.push({ rel, line: region.line, name, why });
+      }
+    }
+  }
+}
+
+if (taught.length > 0) {
+  console.error(`\n✗ ${taught.length} live doc example(s) teach a retired API:\n`);
+  for (const t of taught) {
+    console.error(`  ${t.rel}:${t.line}  ${t.name}()  — ${t.why}`);
+  }
+  console.error(
+    `\n  Live docs may not teach APIs that no longer exist. Prose may NAME one\n` +
+      `  (a migration note should), but an example or an API table must not.\n`
+  );
+  process.exit(1);
+}
+console.log(
+  `✓ no live doc example teaches any of the ${RETIRED.size} retired API(s).`
+);
+

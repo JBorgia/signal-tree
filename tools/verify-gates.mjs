@@ -355,8 +355,33 @@ const GATES = [
     },
   },
   {
+    name: 'readme-apis:teaching',
+    covers:
+      'the retired-API half of the doc gate — proven separately because one ' +
+      'mutation cannot exercise two independent checks',
+    cmd: ['node', 'scripts/lint-readme-apis.mjs'],
+    needsBuild: true,
+    // ⚠️ THE IMPORT CHECK WAS NOT THE WHOLE GATE, and for a long time it was
+    // the only half that existed. `readme-apis` already ran in CI and passed
+    // while docs/ai/LLM.md taught `stored(key, default)` in a marker table,
+    // taught the retired `status<E>()` beside it, and named `serialization()`
+    // as the persistence enhancer — because a table teaches without importing.
+    //
+    // So the gate grew a second check, and a second check needs its own proof:
+    // this mutation re-teaches a deleted API in the AI-facing document, which is
+    // the file an agent reads first.
+    mutation: {
+      file: 'docs/ai/LLM.md',
+      find: '### Pattern 3: Settings with Persistence',
+      replace:
+        '### Pattern 3: Settings with Persistence\n\n```ts\ntheme: stored("t", "light")\n```',
+    },
+  },
+  {
     name: 'readme-apis',
-    covers: 'every @signaltree symbol named in a shipped README exists',
+    covers:
+      'every @signaltree symbol named in a shipped README or live doc exists, ' +
+      'and no live doc EXAMPLE teaches a retired API',
     cmd: ['node', 'scripts/lint-readme-apis.mjs'],
     needsBuild: true,
     // READMEs ship inside the tarball. A user's first action is copying an

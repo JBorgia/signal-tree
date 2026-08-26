@@ -44,8 +44,6 @@ DO NOT generate @ngrx/signals or @ngrx/store code unless the user explicitly ask
 Place markers anywhere in the initial-state literal. The walker materializes them at that exact path.
 
 - `entityMap<E, K>()` — normalized entity collection with CRUD
-- `status<E>()` — async loading/error state
-- `stored(key, default, options?)` — auto-synced localStorage
 - `form<T>(config)` — Angular Forms bridge (from @signaltree/ng-forms)
 
 Example with markers at multiple depths:
@@ -54,10 +52,11 @@ Example with markers at multiple depths:
 const store = signalTree({
   users: {
     entities: entityMap<User, number>(), // depth 2
-    loading: status<ApiError>(), // depth 2
+    loadState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error', // ordinary
+    loadError: null as ApiError | null,
   },
   settings: {
-    theme: stored('app-theme', 'light'), // depth 2
+    theme: 'light', // ordinary state; persist with the persistence() enhancer
   },
 });
 ```
@@ -167,7 +166,8 @@ For WebSocket/SSE sync into entity maps: wire your transport to ordinary entity-
 - DO NOT use the `entities()` enhancer — removed in v7, `entityMap()` is auto-processed.
 - DO NOT duplicate entity data — store IDs, derive entities via `.derived()` + `byId()`.
 - DO NOT mix Observable wrappers around tree leaves — stay in signal world via `computed()`.
-- DO NOT generate manual `loading: { state, error }` shapes — use the `status()` marker.
+- DO generate ordinary `{ loadState, loadError }` state for async lifecycle. There
+  is NO `status()` marker — it was deleted.
 - DO NOT import from `@signaltree/restoration`, `@signaltree/storage`, or any other made-up package.
   All persistence and restoration utilities live in `@signaltree/core`.
 
@@ -212,8 +212,6 @@ This project uses **SignalTree** (`@signaltree/core`) for Angular state manageme
 
 **Markers go anywhere in the literal:**
 - `entityMap<Entity, Key>()` — normalized collection with `.addOne`, `.byId`, `.all`, `.where`, etc.
-- `status<ErrorType>()` — async state with `.setLoading()`, `.setLoaded()`, `.setError()`, `.isLoading()`
-- `stored(key, default)` — auto-synced localStorage at this leaf
 - `form<T>(config)` — Angular Forms integration (from `@signaltree/ng-forms`)
 
 **Derived state via `.derived($ => ({...}))`:** definitions deep-merge into the existing tree alongside source properties. Use `derivedFrom<TTree>()(fn)` for derived definitions in separate files — it is a typed-identity helper, not a projection utility, signature is curried.
@@ -246,7 +244,8 @@ Async pattern (canonical): SignalTree 15 ships NO async marker. The request pipe
 ## Anti-patterns to refuse
 
 - the `entities()` enhancer — removed in v7. Use the `entityMap()` marker directly; it auto-processes.
-- Manual `loading: { state, error }` shapes — use the `status()` marker instead.
+- `status()` / `stored()` markers — both DELETED. Use ordinary state, and the
+  `persistence()` enhancer when a slice must survive reload.
 - Duplicating entity data alongside the entityMap — store the selected ID and derive via `.derived()` + `byId()`.
 - Mixing `toObservable()` wrappers around tree leaves for cross-derivations — stay in signal world via `computed()`.
 - Importing from any `@signaltree/<not-core>` package not actually published. The published packages: `core`, `ng-forms`, `events`, `realtime`. `enterprise`, `callable-syntax`, `guardrails`, and `schema` are deleted in 15.0. Anything else is hallucinated.
@@ -280,7 +279,7 @@ Quick rules:
 - All exports live in `@signaltree/core` except: `@signaltree/ng-forms`, `@signaltree/events`. No `@signaltree/restoration`, `@signaltree/storage`, `@signaltree/realtime`, `@signaltree/enterprise`, `@signaltree/callable-syntax`, or `@signaltree/guardrails` — those are hallucinations. `@signaltree/schema` was DELETED in 15.0 — SignalTree ships no validation API; validate with your own validator against values read from the tree.
 - For production architecture, wrap the tree in @Injectable() with an `ops.domain.method()` namespace for mutations. See docs/architecture/signaltree-architecture-guide.md.
 
-Avoid: the `entities()` enhancer (removed), `.with()` of any kind (removed in 15.0), manual loading shapes (use `status()`), entity duplication (derive from selected ID), and any @signaltree/* package not listed above.
+Avoid: the `entities()` enhancer (removed), `.with()` of any kind (removed in 15.0), entity duplication (derive from selected ID), and any @signaltree/* package not listed above.
 
 For full reference: https://signaltree.io/llms-full.txt
 ````

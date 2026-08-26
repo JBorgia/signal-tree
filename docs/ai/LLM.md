@@ -510,7 +510,8 @@ export class TicketListComponent {
 const store = signalTree({
   tickets: {
     entities: entityMap<Ticket, number>(),
-    status: status<NotifyError>(),
+    loadState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
+    loadError: null as NotifyError | null,
     activeId: null as number | null,
     filters: {
       startDate: new Date(),
@@ -739,17 +740,13 @@ const store = signalTree({
 const store = signalTree({
   users: {
     entities: entityMap<User, number>(),
--   loading: {
--     state: 'idle' as LoadingState,
--     error: null as Error | null
--   }
-+   status: status()
++   loadState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
++   loadError: null as Error | null,
   }
 });
 
-// Update usage:
-- tree.$.users.loading.state.set('loading');
-+ tree.$.users.status.setLoading();
+// Usage stays ordinary — there is no status marker to learn:
++ tree.$.users.loadState.set('loading');
 
 - tree.$.users.loading.state.set('loaded');
 + tree.$.users.status.setLoaded();
