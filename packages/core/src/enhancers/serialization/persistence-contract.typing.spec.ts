@@ -71,14 +71,20 @@ export const _clear: Promise<void> = persisted.clear();
 // 2 — the SerializationMethods half, which the composite must ALSO carry
 // ============================================================================
 // The row that catches a migration dropping half the intersection.
+// ⚠️ FOUR SPELLINGS DELETED by PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0. This pinned
+// six methods over two jobs. `toJSON()` measured EXACTLY EQUAL to `tree()`;
+// `snapshot()`/`restore()` were its metadata-and-clone pair; `fromJSON()` is
+// internalized as the external-truth acquisition point. What survives is the one
+// job `tree()`/`tree(value)` cannot do — a type-preserving durable
+// representation — so the rows now assert ABSENCE as well as presence.
 export const _json: string = persisted.serialize();
 persisted.deserialize('{}');
-export const _plain: unknown = persisted.toJSON();
-export const _snap: SerializedState<unknown> = persisted.snapshot();
-persisted.restore(_snap);
 export type _SerializationHalf = [
-  Expect<Equal<(typeof persisted)['toJSON'], () => unknown>>,
-  Expect<Equal<(typeof persisted)['snapshot'], () => SerializedState<unknown>>>
+  // Still catches a migration dropping half the intersection — now via the
+  // surviving codec pair rather than the deleted spellings.
+  Expect<Equal<ReturnType<(typeof persisted)['serialize']>, string>>,
+  Expect<Equal<'toJSON' extends keyof typeof persisted ? true : false, false>>,
+  Expect<Equal<'snapshot' extends keyof typeof persisted ? true : false, false>>
 ];
 
 // ============================================================================

@@ -55,21 +55,24 @@ const tree = signalTree(initial);
 const serial = signalTree(initial, { enhancers: [serialization()] });
 
 // ============================================================================
-// 1 — the six methods are inferred, with exact signatures
+// 1 — the TWO surviving methods are inferred, with exact signatures
 // ============================================================================
+// ⚠️ FOUR SPELLINGS DELETED by PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0. This pinned
+// six methods over two jobs. `toJSON()` measured EXACTLY EQUAL to `tree()`;
+// `snapshot()`/`restore()` were its metadata-and-clone pair; `fromJSON()` is
+// internalized as the external-truth acquisition point. What survives is the one
+// job `tree()`/`tree(value)` cannot do — a type-preserving durable
+// representation — so the rows now assert ABSENCE as well as presence.
 export const _json: string = serial.serialize();
 serial.deserialize('{}');
-export const _plain: unknown = serial.toJSON();
-serial.fromJSON({});
-export const _snap: SerializedState<unknown> = serial.snapshot();
-serial.restore(_snap);
 
 export type _MethodTypes = [
-  Expect<Equal<(typeof serial)['toJSON'], () => unknown>>,
-  Expect<Equal<(typeof serial)['snapshot'], () => SerializedState<unknown>>>,
-  Expect<
-    Equal<(typeof serial)['restore'], (snapshot: SerializedState<unknown>) => void>
-  >
+  Expect<Equal<ReturnType<(typeof serial)['serialize']>, string>>,
+  // The deleted spellings must STAY deleted.
+  Expect<Equal<'toJSON' extends keyof typeof serial ? true : false, false>>,
+  Expect<Equal<'fromJSON' extends keyof typeof serial ? true : false, false>>,
+  Expect<Equal<'snapshot' extends keyof typeof serial ? true : false, false>>,
+  Expect<Equal<'restore' extends keyof typeof serial ? true : false, false>>
 ];
 
 // ============================================================================

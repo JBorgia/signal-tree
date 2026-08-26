@@ -250,37 +250,54 @@ interface SerializableSignalTree<T> extends ISignalTree<T> {
   /**
    * Get a plain object representation of the current state
    */
-  toJSON(): T;
 
   /**
    * Restore state from a plain object
    */
-  fromJSON(data: T, metadata?: SerializedState<T>['metadata']): void;
 
   /**
    * Create a snapshot of the current state
    */
-  snapshot(): SerializedState<T>;
 
   /**
    * Restore state from a snapshot
    */
-  restore(snapshot: SerializedState<T>): void;
 }
 
 /**
  * Just the methods added by serialization (for Tree-polymorphic pattern)
  */
+/**
+ * ONE SEMANTIC JOB, ONE AUTHORITATIVE PUBLIC SURFACE.
+ *
+ * This carried SIX methods over two jobs. Four were spellings, deleted by
+ * `PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0`:
+ *
+ * ```text
+ * toJSON()    MEASURED EXACTLY EQUAL to `tree()`. Its one distinct job was
+ *             `JSON.stringify(tree)` protocol conformance — which worked ONLY
+ *             with `persistence()` installed, so on a bare tree
+ *             `JSON.stringify(tree)` returned `undefined`. A protocol hook that
+ *             silently yields undefined in the DEFAULT case is a trap, not a
+ *             contract. `JSON.stringify(tree())` works on every tree.
+ * snapshot()  toJSON() plus metadata plus a JSON deep clone. Diagnostic
+ *             cloning survives privately; nothing public consumed it, and the
+ *             only thing it paired with was restore().
+ * restore(s)  fromJSON(s.data, s.metadata). A synonym whose English name
+ *             emphasises a different part of one operation.
+ * fromJSON()  INTERNALIZED, not deleted — it is the convergence point where
+ *             `external()` classifies the acquisition, and it stays a private
+ *             function. DELETE THE PUBLIC SPELLING, NOT THE CAPABILITY.
+ * ```
+ *
+ * What survives is the one job `tree()`/`tree(value)` genuinely cannot do:
+ * a TYPE-PRESERVING DURABLE REPRESENTATION. `tree()` hands back live
+ * Date/Map/Set/bigint instances and no version envelope; `serialize` encodes
+ * them and stamps the snapshot format, and `deserialize` is its inverse.
+ */
 export interface SerializationMethods {
   serialize(config?: SerializationConfig): string;
   deserialize(json: string, config?: SerializationConfig): void;
-  toJSON(): unknown;
-  fromJSON(
-    data: unknown,
-    metadata?: SerializedState<unknown>['metadata']
-  ): void;
-  snapshot(): SerializedState<unknown>;
-  restore(snapshot: SerializedState<unknown>): void;
 }
 
 /**
@@ -681,16 +698,6 @@ export function serialization(
      */
     let hydrateMode: HydrateMode = 'rehydrate';
     /**
-     * Get plain object representation
-     */
-    enhanced.toJSON = (): T => {
-      // Delegate to the tree's public unwrap(), which strips helper methods
-      // like `set`/`update`. `serialize()` now does the same — there is one
-      // materialiser again.
-      return tree();
-    };
-
-    /**
      * Restore from plain object
      */
     const applyJSON = (
@@ -903,7 +910,11 @@ export function serialization(
      * relationship IS attached, it observes a correctly classified write and
      * decides authority itself.
      */
-    enhanced.fromJSON = (
+    /**
+     * The one external-truth acquisition point, now PRIVATE. `deserialize()` is
+     * its only caller; the public `fromJSON` spelling is deleted.
+     */
+    const acquireJSON = (
       data: T,
       metadata?: SerializedState<T>['metadata']
     ): void => {
@@ -954,7 +965,7 @@ export function serialization(
         // `restore()`, which shares `fromJSON` — running in the wrong mode.
         hydrateMode = fullConfig.transfer ? 'transfer' : 'rehydrate';
         try {
-          enhanced.fromJSON(
+          acquireJSON(
             data as T,
             metadata as SerializedState<T>['metadata']
           );
@@ -980,50 +991,6 @@ export function serialization(
         );
       }
     };
-
-    /**
-     * Create a snapshot
-     */
-    enhanced.snapshot = (): SerializedState<T> => {
-      const state = enhanced.toJSON();
-      const circularPaths = detectCircularReferences(state);
-
-      return {
-        data: JSON.parse(JSON.stringify(state)) as T, // Deep clone
-        metadata: {
-          // `timestamp` answers "when was this written" — useful for
-          // staleness ("this draft is three weeks old, discard it"), which is
-          // the job `loader({ staleTime })` already does via `lastLoadedAt`.
-          // It is deliberately excluded from the change-detection cache key so
-          // it cannot cause false positives.
-          //
-          // It is NOT a compatibility signal: see the note on `version` in the
-          // metadata type. Both fields are currently read only into a
-          // debugMode console.log.
-          timestamp: Date.now(),
-          version: SNAPSHOT_FORMAT_VERSION,
-          ...(circularPaths.length > 0 && { circularRefs: circularPaths }),
-        },
-      };
-    };
-
-    /**
-     * Restore from snapshot
-     */
-    enhanced.restore = (snapshot: SerializedState<T>): void => {
-      const { data, metadata } = snapshot;
-
-      // Resolve circular references if present
-      if (metadata?.circularRefs) {
-        resolveCircularReferences(
-          data as Record<string, unknown>,
-          metadata.circularRefs
-        );
-      }
-
-      enhanced.fromJSON(data as T, metadata as SerializedState<T>['metadata']);
-    };
-
     return enhanced as unknown as ISignalTree<T> & SerializationMethods;
   };
 
