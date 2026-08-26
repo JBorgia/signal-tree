@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { signal } from '@angular/core';
 
 import { entityMap } from '../markers/entity-map';
-import { stored } from '../markers/stored';
 import { signalTree } from '../signal-tree';
 import { interceptLeafSignals } from './intercept-leaf-signals';
 import { withWriteContext } from '../write-context';
@@ -101,25 +100,9 @@ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
         rows: entityMap<{ id: number; name: string }, number>({
           selectId: (row) => row.id,
         }),
-        theme: stored('intercept-owner-theme', 'light', {
-          storage: {
-            getItem: (key: string) => storage.get(key) ?? null,
-            setItem: (key: string, value: string) => {
-              storage.set(key, value);
-            },
-            removeItem: (key: string) => {
-              storage.delete(key);
-            },
-            clear: () => {
-              storage.clear();
-            },
-            key: (index: number) => Array.from(storage.keys())[index] ?? null,
-            get length() {
-              return storage.size;
-            },
-          },
-          debounceMs: 0,
-        }),
+        // Was `stored()`. The subject here never needed a DURABLE leaf —
+        // only a leaf. Durability moved to persistence()/Link.
+        theme: 'light',
       },
       { capabilities: ['causal-runtime'] }
     );

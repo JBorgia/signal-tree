@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { getTreeRealizationPort } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import { getOwnedPositionIds } from '../../lib/internals/owned-mutation';
 import { entityMap } from '../../lib/markers/entity-map';
-import { stored } from '../../lib/markers/stored';
 import { signalTree } from '../../lib/signal-tree';
 import { SignalTreeRollbackError } from '../../lib/types';
 import { transactions } from './transactions';
@@ -98,66 +97,6 @@ describe('transactions enhancer', () => {
   // here, including the `stored()` case immediately below which existed on its
   // own merits. Marker PARTICIPATION in the causal path is UNPROVEN, so the
   // specimen is withdrawn rather than migrated.
-
-  it('rolls back pending stored writes and restores persisted state', async () => {
-    const { resetPathNotifier } = await import('../../lib/path-notifier');
-    resetPathNotifier();
-
-    const map = new Map<string, string>();
-    const adapter: Storage = {
-      getItem: (key: string) => map.get(key) ?? null,
-      setItem: (key: string, value: string) => {
-        map.set(key, value);
-      },
-      removeItem: (key: string) => {
-        map.delete(key);
-      },
-      clear: () => {
-        map.clear();
-      },
-      key: (index: number) => Array.from(map.keys())[index] ?? null,
-      get length() {
-        return map.size;
-      },
-    };
-    map.set('tx-stored', JSON.stringify({ __v: 1, data: 'light' }));
-
-    const store = signalTree(
-      {
-        theme: stored('tx-stored', 'light', {
-          storage: adapter,
-          debounceMs: 0,
-        }),
-      },
-      { enhancers: [transactions()] }
-    ) as {
-      $: { theme: { (): string; set(value: string): void } };
-      transaction: (fn: () => void) => { confirm(): void; rollback(): void };
-      __transactions: {
-        getConfirmedTurnCount(): number;
-        getPendingTurnCount(): number;
-      };
-    };
-
-    const pending = store.transaction(() => {
-      store.$.theme.set('dark');
-    });
-
-    // Persistence is post-commit. The live tree carries the speculative value
-    // immediately, but storage must not: this assertion read 'dark' until the
-    // 1.0 ordering decision, which is precisely the defect it was pinning.
-    expect(store.$.theme()).toBe('dark');
-    expect(JSON.parse(map.get('tx-stored') as string).data).toBe('light');
-
-    pending.rollback();
-
-    // The rollback restores the tree; storage needs no compensating write
-    // because the speculative value was never durable.
-    expect(store.$.theme()).toBe('light');
-    expect(JSON.parse(map.get('tx-stored') as string).data).toBe('light');
-    expect(store.__transactions.getConfirmedTurnCount()).toBe(0);
-    expect(store.__transactions.getPendingTurnCount()).toBe(0);
-  });
 
   it('aborts a thrown transaction callback by undoing only transaction writes', async () => {
     const { getPathNotifier, resetPathNotifier } = await import(

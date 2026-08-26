@@ -1,5 +1,5 @@
 import { signalTree } from './signal-tree';
-import { stored } from './markers/stored';
+import { entityMap } from './types';
 
 function createMockStorage(): Storage {
   const store = new Map<string, string>();
@@ -19,7 +19,7 @@ describe('W2: builder call path finalizes', () => {
   it('tree() before any tree.$ access returns values, not raw markers', () => {
     const mockStorage = createMockStorage();
     const tree = signalTree({
-      theme: stored('w2-theme', 'light', { storage: mockStorage }),
+      rows: entityMap<{ id: string }, string>({ selectId: (r) => r.id }),
       plain: 1,
     });
 
@@ -27,7 +27,7 @@ describe('W2: builder call path finalizes', () => {
     const snap = tree() as Record<string, unknown>;
 
     expect(snap['plain']).toBe(1);
-    expect(JSON.stringify(snap)).not.toContain('defaultValue');
+    expect(JSON.stringify(snap)).not.toContain('selectId');
     expect(JSON.stringify(snap)).not.toContain('initialState');
   });
 

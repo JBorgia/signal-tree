@@ -3,13 +3,13 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { link, onTreeError, signalTree } from '../index';
-// ⚠️ `stored` is NOT a package-root export — it is being retired, and this file
+// ⚠️ `stored` is DELETED. The assertion near the end of this file that it is
+// absent from the package root is kept deliberately: a deleted API staying
+// deleted is worth a tripwire, and this file
 // does not resurrect it. Imported from its module purely to exercise the
 // REPORTER's path semantics for a second producer.
-import { stored } from './markers/stored';
 import type { TreeErrorEvent } from '../index';
 import { clearTreeErrorListenersForTesting } from './internals/error-reporter';
-import { flushAllStoredSignals } from './markers/stored';
 import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
 
@@ -112,27 +112,6 @@ describe('PUBLIC: attribution', () => {
     cap.stop();
   });
 
-  it('path is the state location for BOTH producers', async () => {
-    const cap = capture();
-    const tree = signalTree({
-      settings: {
-        theme: stored('public-key', 'light', {
-          storage: writeFails(),
-          debounceMs: 0,
-        }),
-      },
-    });
-    await flush();
-    (tree.$.settings.theme as unknown as { set(v: string): void }).set('dark');
-    flushAllStoredSignals();
-    await flush();
-
-    // NOT `public-key`.
-    expect(cap.seen.find((e) => e.operation === 'write')?.path).toBe(
-      'settings.theme'
-    );
-    cap.stop();
-  });
 });
 
 describe('PUBLIC: delivery semantics', () => {

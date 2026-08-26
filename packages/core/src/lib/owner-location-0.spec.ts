@@ -9,7 +9,6 @@ import {
 import { getPositionRegistry } from './internals/position-registry';
 import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
-import { stored } from './markers/stored';
 import { transactions } from '../enhancers/transactions/transactions';
 
 /**
@@ -96,14 +95,12 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
         branch: { nested: 1 },
         rows: entityMap<Row, string>({ selectId: (r) => r.id }),
         cmp: compared({ a: 1 }, (x, y) => JSON.stringify(x) === JSON.stringify(y)),
-        kept: stored('owner-location-0', 'v', { debounceMs: 0 }),
       },
       { enhancers: [restoration(), transactions()] }
     );
     await flush();
     // Force marker materialisation.
     void tree.$.cmp;
-    void tree.$.kept;
     void tree.$.src;
     await flush();
 
@@ -115,7 +112,6 @@ describe('OWNER-LOCATION-0: which node kinds name their owning tree?', () => {
       'nested leaf': shapeOf(tree.$.branch.nested),
       'entityMap node': shapeOf(tree.$.rows),
       'compared node': shapeOf(tree.$.cmp),
-      'stored node': shapeOf(tree.$.kept),
     };
 
     for (const [name, s] of Object.entries(inventory)) {
@@ -179,21 +175,4 @@ describe('OWNER-LOCATION-0: the invariant holds across trees', () => {
     );
   });
 
-  it('a stored() node likewise names its own tree', async () => {
-    const make = (key: string) =>
-      signalTree(
-        { kept: stored(key, 'v', { debounceMs: 0 }) },
-        { enhancers: [restoration()] }
-      );
-    const a = make('owner-location-0-a');
-    const b = make('owner-location-0-b');
-    await flush();
-    void a.$.kept;
-    void b.$.kept;
-    await flush();
-
-    expect(getPositionRegistry(a.$.kept)).toBe(getPositionRegistry(a.$));
-    expect(getPositionRegistry(b.$.kept)).toBe(getPositionRegistry(b.$));
-    expect(getPositionRegistry(a.$.kept)).not.toBe(getPositionRegistry(b.$.kept));
-  });
 });

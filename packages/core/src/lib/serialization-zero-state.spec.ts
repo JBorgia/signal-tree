@@ -2,7 +2,6 @@ import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { entityMap, signalTree } from '../index';
-import { stored } from './markers/stored';
 
 /**
  * DERIVATION — SERIALIZATION, FROM ZERO.
@@ -192,18 +191,6 @@ describe('S-3 — values JSON cannot carry', () => {
 // hold at a process boundary, for a marker-bearing tree?
 // ============================================================================
 describe('S-4 — M3 tested against a boundary', () => {
-  it('a stored() position externalizes as its plain value and restores', () => {
-    const tree = signalTree({ theme: stored('s4-theme', 'light') });
-
-    // stored conforms (isSignal), so M3 predicts: no envelope, just the value.
-    expect(tree()).toEqual({ theme: 'light' });
-
-    const wire = roundTripJson(tree());
-    const fresh = signalTree({ theme: stored('s4-theme-b', 'dark') });
-    fresh(wire as never);
-    expect(fresh.$.theme()).toBe('light');
-  });
-
   it('the COLLECTION is where the rule is under strain — it publishes an envelope', () => {
     const tree = signalTree({
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),

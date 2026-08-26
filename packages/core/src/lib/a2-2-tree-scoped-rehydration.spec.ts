@@ -4,7 +4,6 @@ import { getPathNotifier } from './path-notifier';
 import { persistence } from '../enhancers/serialization/serialization';
 import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
-import { stored } from './markers/stored';
 
 import type { StorageAdapter } from '../enhancers/serialization/storage-adapters';
 
@@ -162,42 +161,6 @@ describe('A2-2: what does a TREE-SCOPED durable re-read claim causally?', () => 
     ]);
   });
 
-  it('KNOWN-POSITIVE — the marker-level reload still reports external/realized', async () => {
-    const map = new Map<string, string>([
-      ['a2-2-marker', JSON.stringify({ __v: 1, data: 'from-storage' })],
-    ]);
-    const markerStorage = {
-      getItem: (k: string) => map.get(k) ?? null,
-      setItem: (k: string, v: string) => void map.set(k, v),
-      removeItem: (k: string) => void map.delete(k),
-      key: () => null,
-      length: 0,
-    } as unknown as Storage;
-
-    const tree = signalTree(
-      {
-        gamma: stored('a2-2-marker', 'initial', {
-          storage: markerStorage,
-          debounceMs: 0,
-        }),
-      },
-      { enhancers: [restoration()] }
-    );
-    tree.$.gamma();
-    await flush();
-    map.set('a2-2-marker', JSON.stringify({ __v: 1, data: 'reloaded' }));
-
-    const { seen, off } = observe();
-    (tree.$.gamma as unknown as { reload?: () => void }).reload?.();
-    await flush();
-    off();
-
-    // The observer CAN report external/realized. Without this the first test's
-    // expectation could be satisfied by an observer that never sees metadata.
-    expect(classifications(seen)).toEqual([
-      { origin: 'external', participation: 'realized' },
-    ]);
-  });
 });
 
 /**

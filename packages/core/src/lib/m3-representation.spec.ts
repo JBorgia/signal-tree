@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
-import { stored } from './markers/stored';
 import { entityMap } from './types';
 
 /**
@@ -27,18 +26,6 @@ const mem = () => {
 };
 
 describe('M3 — representation contents', () => {
-  it('stored is PRESENT as a plain value — the skip warning is stale', () => {
-    const tree = signalTree({
-      theme: stored('m3-theme', 'light', { storage: mem() }),
-      plain: 1,
-    });
-
-    // Indistinguishable from ordinary state. `stored` supplies no snapshot hook
-    // and needs none: it conforms to the ordinary signal protocol, so the
-    // uniform walk already handles it.
-    expect(tree()).toEqual({ theme: 'light', plain: 1 });
-  });
-
   it('entityMap introduces a SYNTHETIC key that has no counterpart in the declaration', () => {
     const tree = signalTree({
       rows: entityMap<{ id: number; n: string }, number>({

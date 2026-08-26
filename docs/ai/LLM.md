@@ -84,8 +84,6 @@ v7 introduces **markers** - declarative placeholders that are auto-processed dur
 | Marker                 | Purpose                       | Example                               |
 | ---------------------- | ----------------------------- | ------------------------------------- |
 | `entityMap<E, K>()`    | Entity collection with CRUD   | `users: entityMap<User, number>()`    |
-| `status<E>()`          | Async loading state tracking  | `loading: status<MyError>()`          |
-| `stored(key, default)` | Auto localStorage persistence | `theme: stored('app-theme', 'light')` |
 
 ---
 
@@ -148,9 +146,9 @@ store.$.users.error.set(null);
 
 ### Persistence
 
-The old `stored(key, defaultValue, options?)` marker is not part of the current
-release-candidate public API. Keep browser persistence in an application-owned
-service and write resolved values into ordinary SignalTree state.
+The old `stored(key, defaultValue, options?)` marker is DELETED. Persist with
+the `persistence()` enhancer over ordinary state, or keep browser persistence in
+an application-owned service and write resolved values in through `external()`.
 
 ---
 
@@ -272,7 +270,7 @@ const store = signalTree(
 | `devTools()`      | Redux DevTools integration    | Development/debugging     |
 | `batching()`      | Batch multiple signal updates | Performance optimization  |
 | `restoration()`    | Undo/redo functionality       | Form editing, canvas apps |
-| `serialization()` | State persistence             | App reload persistence    |
+| `persistence()`   | State persistence             | App reload persistence    |
 
 ---
 
@@ -557,15 +555,25 @@ const store = signalTree({
 
 ### Pattern 3: Settings with Persistence
 
+Persistence is an ENHANCER over ordinary state, not a marker on a leaf. There is
+no `stored()`.
+
 ```typescript
-const store = signalTree({
-  settings: {
-    theme: stored('app-theme', 'light' as 'light' | 'dark'),
-    language: stored('app-lang', 'en'),
-    notifications: stored('app-notifications', true),
-    lastSyncDate: stored('app-last-sync', null as Date | null),
+const store = signalTree(
+  {
+    settings: {
+      theme: 'light' as 'light' | 'dark',
+      language: 'en',
+      notifications: true,
+      lastSyncDate: null as Date | null,
+    },
   },
-});
+  {
+    enhancers: [
+      persistence({ key: 'app-settings', storage: localStorage }),
+    ],
+  }
+);
 ```
 
 ### Pattern 4: Async Operations (with Angular resource)

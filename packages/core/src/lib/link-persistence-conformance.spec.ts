@@ -263,6 +263,78 @@ describe('Link persistence — transactional truth', () => {
 
 // ═══════════════════════════════════════════════════════════════════════════
 describe('Link persistence — failure and recovery', () => {
+  it('§7d the reported path is the STATE location, not the endpoint key', async () => {
+    // ⚠️ MIGRATED FROM `stored()` (ERROR-PATH-SEMANTICS-0). That row set held
+    // the only assertions on what `path` MEANS, and every one of them was
+    // written against the marker — so retiring `stored()` emptied the suite.
+    // The surviving half is this: an error names WHERE IN THE TREE the failure
+    // happened, never where the endpoint chose to put the bytes.
+    const seen: TreeErrorEvent[] = [];
+    onTreeError((e) => void seen.push(e));
+
+    const be = backend();
+    const tree = makeTree();
+    track(link(tree.$.settings, endpointFor(be, 'a-storage-key-nobody-sees')));
+
+    be.failSetOnce(new Error('disk full'));
+    tree.$.settings.theme.set('dark');
+    await flush();
+
+    const failure = seen.find((e) => e.operation === 'link:set');
+    expect(failure?.path).toBe('settings');
+  });
+
+  it('§7b two SAME-SHAPED trees failing on the same key are DISTINGUISHABLE', async () => {
+    // ⚠️ MIGRATED FROM `stored()` (ERROR-SURFACE-2 C). The existing §7 row only
+    // asserts `treeId` is DEFINED, which a constant would satisfy. The claim
+    // ERROR-SURFACE-2 actually earned is that two trees of the same shape,
+    // failing at the same PATH, are told apart — and `path` is the STATE
+    // location, never the storage key, so path alone cannot do it.
+    const seen: TreeErrorEvent[] = [];
+    onTreeError((e) => void seen.push(e));
+
+    const beA = backend();
+    const beB = backend();
+    const a = makeTree();
+    const b = makeTree();
+    track(link(a.$.settings, endpointFor(beA, 'same-key')));
+    track(link(b.$.settings, endpointFor(beB, 'same-key')));
+
+    beA.failSetOnce(new Error('disk full'));
+    beB.failSetOnce(new Error('disk full'));
+    a.$.settings.theme.set('dark');
+    b.$.settings.theme.set('dark');
+    await flush();
+
+    const failures = seen.filter((e) => e.operation === 'link:set');
+    expect(failures.length).toBe(2);
+    expect(failures[0].path).toBe(failures[1].path); // same location...
+    expect(failures[0].treeId).not.toBe(failures[1].treeId); // ...different tree
+  });
+
+  it('§7c repeated failures from ONE relationship keep the SAME treeId', async () => {
+    // MIGRATED FROM `stored()` (ERROR-SURFACE-2 D). The mirror of §7b: identity
+    // must be stable as well as distinct, or it is a counter rather than an id.
+    const seen: TreeErrorEvent[] = [];
+    onTreeError((e) => void seen.push(e));
+
+    const be = backend();
+    const tree = makeTree();
+    track(link(tree.$.settings, endpointFor(be, 'stable')));
+
+    for (const v of ['one', 'two', 'three']) {
+      be.failSetOnce(new Error('disk full'));
+      tree.$.settings.theme.set(v);
+      await flush();
+    }
+
+    const ids = new Set(
+      seen.filter((e) => e.operation === 'link:set').map((e) => e.treeId)
+    );
+    expect(seen.filter((e) => e.operation === 'link:set').length).toBeGreaterThan(1);
+    expect(ids.size).toBe(1);
+  });
+
   it('§7 a FAILED set reports, keeps the authored value, and stays live', async () => {
     const seen: TreeErrorEvent[] = [];
     onTreeError((e) => void seen.push(e));

@@ -24,7 +24,6 @@ import type {
 } from '../../index';
 import { entityMap, signalTree } from '../../index';
 import { loader } from './loader';
-import { stored, type StoredSignal } from './stored';
 // Internal (not barrel-exported) tree-node variants — imported relatively so the
 // harness can gate their marker resolution too.
 import type {
@@ -46,7 +45,6 @@ interface User {
 }
 const tree = signalTree({
   users: entityMap<User, number>(),
-  theme: stored('theme', 'light' as 'light' | 'dark'),
   selectedId: null as number | null, // union leaf
   count: 0, // plain leaf
   nested: {
@@ -58,7 +56,6 @@ type $ = typeof tree.$;
 // Every marker resolves to its materialized signal type on `tree.$`.
 export type _MarkerResolutionChecks = [
   Expect<Equal<$['users'], EntitySignal<User, number>>>,
-  Expect<Equal<$['theme'], StoredSignal<'light' | 'dark'>>>,
   // marker nested at depth resolves too (the "any depth" differentiator)
   Expect<Equal<$['nested']['deep'], CallableWritableSignal<number>>>,
   // plain + union leaves stay callable writable signals
@@ -130,20 +127,23 @@ export type _LoadingSliceChecks = [
 // These were missing every non-entityMap marker; now covered.
 type MarkerState = {
   users: ReturnType<typeof entityMap<User, number>>;
-  // ⚠️ MIGRATED from `asyncQuery` by ASYNC-QUERY-RETIRE-0. The invariant is
-  // that `DeepEntityAwareTreeNode` resolves a NON-ENTITY marker at the
-  // internal-variant level, which is independent of which marker is used —
-  // so it moves to a surviving one rather than disappearing with asyncQuery.
-  theme: ReturnType<typeof stored<'light' | 'dark'>>;
 };
 export type _InternalVariantChecks = [
   Expect<
     Equal<EntityAwareTreeNode<MarkerState>['users'], EntitySignal<User, number>>
-  >,
-  Expect<
-    Equal<
-      DeepEntityAwareTreeNode<MarkerState>['theme'],
-      StoredSignal<'light' | 'dark'>
-    >
   >
+  // ⚠️ THE NON-ENTITY MARKER ROW IS RETIRED, AND ITS SUBJECT WENT WITH IT.
+  //
+  // This row migrated once already (asyncQuery → stored, ASYNC-QUERY-RETIRE-0)
+  // on the reasoning that "resolves a NON-ENTITY marker" is independent of which
+  // marker is used. STORED-RETIRE-0 ends that: `stored` was the LAST non-entity
+  // marker in the resolvers. `TreeNode`, `DeepEntityAwareTreeNode` and
+  // `EntityAwareTreeNode` now dispatch on `LoadingEntityMapMarker` and
+  // `EntityMapMarker` only — every other row is a shape row (Primitive, array,
+  // Date/RegExp/Map, object), not a marker row.
+  //
+  // So the row is not orphaned, it is VACUOUS: there is no third marker branch
+  // left to assert. It is deliberately not re-pointed at `entityMap`, which the
+  // row above already covers, and not re-created synthetically. If a future
+  // marker earns a resolution row, this assertion must be rebuilt for it.
 ];

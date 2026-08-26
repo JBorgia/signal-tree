@@ -6,7 +6,6 @@ import {
   type TreeErrorEvent,
 } from './internals/error-reporter';
 import { entityMap } from './types';
-import { flushAllStoredSignals, stored } from './markers/stored';
 import {
   getOwnedOwnerPath,
   getOwnedPositionIds,
@@ -224,51 +223,6 @@ const writeFails = (): Storage => ({
   },
 });
 
-describe('ERROR-SURFACE-2 C/D: stored attribution', () => {
-  it('⚠️ two trees, SAME storage key — same path, different treeId', async () => {
-    const cap = capture();
-    const a = signalTree({ v: stored('es2-same', 0, { storage: writeFails(), debounceMs: 0 }) });
-    const b = signalTree({ v: stored('es2-same', 0, { storage: writeFails(), debounceMs: 0 }) });
-    await flush();
-
-    (a.$.v as unknown as { set(n: number): void }).set(1);
-    (b.$.v as unknown as { set(n: number): void }).set(1);
-    flushAllStoredSignals();
-    await flush();
-
-    // ⚠️ `path` is the STATE location `v`, NOT the storage key `es2-same`.
-    const writes = cap.seen.filter(
-      (e) => e.operation === 'write' && e.path === 'v'
-    );
-    expect(writes.length).toBeGreaterThanOrEqual(2);
-
-    // The key cannot separate them; the owner can. Note these are PLAIN trees —
-    // no enhancers — because stored's ownership comes from the materialization
-    // context, not the enhancer-gated node attachment.
-    expect(writes[0].treeId).not.toBe(writes[1].treeId);
-    cap.stop();
-  });
-
-  it('repeated failures from ONE stored node keep the same treeId', async () => {
-    const cap = capture();
-    const tree = signalTree({
-      v: stored('es2-stable', 0, { storage: writeFails(), debounceMs: 0 }),
-    });
-    await flush();
-
-    for (const n of [1, 2, 3]) {
-      (tree.$.v as unknown as { set(x: number): void }).set(n);
-      flushAllStoredSignals();
-      await flush();
-    }
-
-    const writes = cap.seen.filter((e) => e.operation === 'write');
-    expect(writes.length).toBeGreaterThanOrEqual(2);
-    expect(new Set(writes.map((e) => e.treeId)).size).toBe(1);
-    cap.stop();
-  });
-});
-
 // ───────────────────────────────────────────────────────────────────────────
 // The delivered runtime shape
 // ───────────────────────────────────────────────────────────────────────────
@@ -296,27 +250,6 @@ describe('ERROR-SURFACE-2: the delivered object is exactly the contract', () => 
     expect('detail' in e).toBe(false);
 
     l.dispose();
-    cap.stop();
-  });
-
-  it('stored omits `path` never, and omits nothing else either', async () => {
-    const cap = capture();
-    const tree = signalTree({
-      v: stored('es2-shape', 0, { storage: writeFails(), debounceMs: 0 }),
-    });
-    await flush();
-    (tree.$.v as unknown as { set(n: number): void }).set(1);
-    flushAllStoredSignals();
-    await flush();
-
-    const write = cap.seen.find((e) => e.operation === 'write');
-    expect(write).toBeDefined();
-    expect(Object.keys(write as object).sort()).toEqual([
-      'error',
-      'operation',
-      'path',
-      'treeId',
-    ]);
     cap.stop();
   });
 
@@ -352,101 +285,6 @@ describe('ERROR-SURFACE-2: the delivered object is exactly the contract', () => 
  *   ownerPath = settings.prefs
  * ```
  */
-describe('ERROR-PATH-SEMANTICS-0: one meaning for path', () => {
-  it('⚠️ stored path is the STATE location, unrelated to the storage key', async () => {
-    const cap = capture();
-    const tree = signalTree({
-      prefs: stored('completely-unrelated-key', 0, {
-        storage: writeFails(),
-        debounceMs: 0,
-      }),
-    });
-    await flush();
-    (tree.$.prefs as unknown as { set(n: number): void }).set(1);
-    flushAllStoredSignals();
-    await flush();
-
-    const write = cap.seen.find((e) => e.operation === 'write');
-    expect(write?.path).toBe('prefs');
-    expect(write?.path).not.toBe('completely-unrelated-key');
-    cap.stop();
-  });
-
-  it('and it nests like any other state location', async () => {
-    const cap = capture();
-    const tree = signalTree({
-      settings: {
-        prefs: stored('another-key', 0, { storage: writeFails(), debounceMs: 0 }),
-      },
-    });
-    await flush();
-    (tree.$.settings.prefs as unknown as { set(n: number): void }).set(1);
-    flushAllStoredSignals();
-    await flush();
-
-    expect(cap.seen.find((e) => e.operation === 'write')?.path).toBe(
-      'settings.prefs'
-    );
-    cap.stop();
-  });
-
-  it('⚠️ changing the STORAGE KEY does not change the reported path', async () => {
-    const at = async (storageKey: string) => {
-      const cap = capture();
-      const tree = signalTree({
-        settings: {
-          prefs: stored(storageKey, 0, { storage: writeFails(), debounceMs: 0 }),
-        },
-      });
-      await flush();
-      (tree.$.settings.prefs as unknown as { set(n: number): void }).set(1);
-      flushAllStoredSignals();
-      await flush();
-      const path = cap.seen.find((e) => e.operation === 'write')?.path;
-      cap.stop();
-      return path;
-    };
-
-    // The discriminator for "one meaning": the key varies, the location does not.
-    expect(await at('key-one')).toBe('settings.prefs');
-    expect(await at('key-two')).toBe('settings.prefs');
-  });
-
-  it('a Link and a stored node at the SAME location report the same path', async () => {
-    // The strongest form: two DIFFERENT producers, one meaning.
-    const capA = capture();
-    const linked = makeTree();
-    await flush();
-    const l = link(linked.$.settings.theme, { set: failing });
-    linked.$.settings.theme.set('dark');
-    await flush();
-    await l.settled();
-    const linkPath = capA.seen[0].path;
-    l.dispose();
-    capA.stop();
-
-    const capB = capture();
-    const persisted = signalTree({
-      settings: {
-        theme: stored('theme-key', 'light', {
-          storage: writeFails(),
-          debounceMs: 0,
-        }),
-      },
-    });
-    await flush();
-    (persisted.$.settings.theme as unknown as { set(v: string): void }).set('dark');
-    flushAllStoredSignals();
-    await flush();
-    const storedPath = capB.seen.find((e) => e.operation === 'write')?.path;
-    capB.stop();
-
-    expect(linkPath).toBe('settings.theme');
-    expect(storedPath).toBe('settings.theme');
-    expect(linkPath).toBe(storedPath);
-  });
-});
-
 // ───────────────────────────────────────────────────────────────────────────
 // The TreeId properties themselves (from ERROR-OWNER-IDENTITY-0)
 // ───────────────────────────────────────────────────────────────────────────

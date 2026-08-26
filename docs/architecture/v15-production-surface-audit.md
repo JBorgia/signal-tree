@@ -17121,3 +17121,165 @@ the surface is small.
 
 This gate belongs immediately BEFORE the final greenfield contract freeze /
 Candidate B, with the snapshot surface as its first disposition.
+
+## `STORED-RETIRE-0` — CLOSED, STORED-R-A. `stored()` IS DELETED
+
+Run in RETIREMENT MODE: compiler-driven deletion in one batch, not a phase per
+helper. There was no architectural question left — `PERSISTENCE-AS-LINK-SWAP-0`
+had already proved where every responsibility went:
+
+```text
+BEFORE                          AFTER
+stored()                        ordinary state location
+  state                           + Link                (relationship authority)
+  persistence                     + persistence policy  (endpoint, codec, key,
+  authority                                              lifecycle)
+  lifecycle
+  its own marker/API
+```
+
+⚠️ AND IT WAS NOT REBUILT ON LINK. `stored(key, initial, options)` is now
+expressible as ordinary state plus a relationship plus policy, so keeping the
+name would have been a second spelling of a job that already has an owner —
+exactly what `PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0` exists to refuse.
+
+### ⚠️ THE PUBLIC API DELTA IS ZERO, which the framing did not expect
+
+`stored` was ALREADY unreachable: `@signaltree/core` has one entrypoint (`.`),
+it does not export `stored`, it does not re-export `lib/markers/index.ts`, and
+`stored` does not appear in `tools/api-baseline.json` at all. Its removal from
+the public surface happened earlier, at `c53aa416`.
+
+```text
+diff of `export` lines in packages/core/src/index.ts, HEAD vs now:  EMPTY
+```
+
+So this batch removed an INTERNAL subsystem. Nothing needed classifying as an
+intended public removal, and "do not require zero API delta during retirement"
+turned out not to be needed.
+
+The only type-level trace was three `StoredMarker -> StoredSignal` branches in
+`types.ts`'s node resolution. Users could never construct a `StoredMarker`
+without a public `stored()`, so removing those branches is unreachable-type
+cleanup, not a contract change.
+
+### What was deleted
+
+```text
+implementation      markers/stored.ts (1082 lines), markers/stored.contract.ts
+type machinery      StoredMarker/StoredSignal branches in types.ts,
+                    readonly.ts, readonly-readers.ts, markers/index.ts exports
+helpers             flushAllStoredSignals, createStoredSignal, isStoredMarker,
+                    createStorageKeys, clearStoragePrefix, STORED_MARKER
+diagnostics         ST2020 (duplicate stored() key) — NO PRODUCER REMAINS
+tests               12 whole spec files + ~20 blocks inside general specs
+docs                the marker row and Pattern 3 in docs/ai/LLM.md, the ST2020
+                    row and the ST2021 marker list, two stale index entries
+```
+
+Total: 49 files, +349 / −6611.
+
+### The invariant-carrier table
+
+```text
+INVARIANT                          OLD CARRIER              SURVIVING CARRIER
+inspection does NOT egress         stored-devtools-isolation inspection-egress-conformance,
+                                                            persistence-as-link P2/P2c/P3
+undo/restoration DOES egress       stored-devtools-isolation inspection-egress-conformance:144
+a rolled-back value is not durable stored-commit-ordering    a2-persistence-discriminators c3
+the drain respects settlement      a2-4-2-marker-drain       a2-4-1-drain-settlement
+owner isolation                    stored-commit-ordering    persistence-as-link P8
+external truth is REALIZED         per-b-classification      serialization-egress-disposition SER-3
+marker never leaks into a snapshot stored-leak               marker-location-grammar
+                                                            ("persistence() — the durable path
+                                                             the stored leak actually reached")
+a marker materialises to a signal  m3-* stored rows          same rows, on compared()
+a marker nests without leaking     marker-materialization    its entityMap() sibling row
+```
+
+### ⚠️ THREE ORPHANS FOUND — carriers ADDED BEFORE deleting
+
+Not everything had a carrier, and the checks that found the gaps were cheap:
+
+**1. The durable commit boundary.** `CONFIRM` (as opposed to rollback), a THROWN
+transaction, a SUPERSEDED intermediate, OUT-OF-ORDER confirm of overlapping
+transactions, and FOREIGN-tree scope absorption were observed ONLY through
+`stored()`. New carrier: `persistence-commit-boundary-carrier.spec.ts`, 5 rows.
+Mutation — publishing without Link's settlement claim — fails 2 of them.
+
+The subject moved from the marker to the enhancer, which is the point: the
+boundary was never `stored()`'s property. It belongs to the durable-consequence
+authority, which Link now claims on persistence's behalf.
+
+**2. Error attribution DISTINCTNESS.** `link-persistence-conformance` §7
+asserted only that `treeId` is DEFINED — which a constant would satisfy. The
+claim ERROR-SURFACE-2 actually earned is that two same-shaped trees failing at
+the same PATH are told apart, and its mirror, that repeated failures from one
+relationship keep the SAME id. Both lived only in `stored` rows. Added as §7b
+and §7c.
+
+**3. What `path` MEANS.** Retiring `stored` emptied
+`describe('ERROR-PATH-SEMANTICS-0: one meaning for path')` completely — every
+assertion about the meaning of `path` had been written against the marker. Added
+as §7d: an error names WHERE IN THE TREE the failure happened, never where the
+endpoint chose to put the bytes.
+
+> **AN EMPTY SUITE IS A CARRIER ALARM.** Three suites emptied during this batch.
+> Two were correctly vacuous — their premise was the deleted primitive. The
+> third had been the only home of a general invariant, and only the empty shell
+> revealed it.
+
+### Retired as VACUOUS — subject gone, no independent requirement
+
+```text
+versioning/migration, key prefixing, debounce, drain-on-pagehide, storage error
+handling, flushAllStoredSignals   -> stored-specific POLICY, frozen DELETE
+construction-time durable pre-emption (A2-1 "the DECLARATION MARKER")
+    -> only stored loaded at construction; persistence() autoLoad is
+       post-construction by design, so the premise itself is gone
+"path is the state location for BOTH producers"
+    -> there is one producer now; the comparison has no second term
+"stored is PRESENT as a plain value", "stored() declares transient"
+    -> assertions about the deleted marker's own declaration
+```
+
+### Unexpected coupling discovered
+
+`stored()` was the codebase's default "here is a marker" fixture: 22 general
+specs used it incidentally, in files about transactions, realization, leaf
+interception, traversal and M3 conformance. Most did not need a DURABLE leaf at
+all — only a leaf — and were migrated to `compared()`, `entityMap()`, or plain
+state. That is worth recording as a hazard rather than a footnote:
+
+> **A CONVENIENT FIXTURE BECOMES INVISIBLE COUPLING.** The blast radius of a
+> deletion is not measured by who depends on the feature; it is measured by who
+> reached for it because it was nearby.
+
+### Gates
+
+```text
+core tests        2090 passed, 18 skipped, 1 todo    (was 2261 — the delta is
+                  retired stored-specific policy, plus 12 new carrier rows)
+workspace         exit 0, all 4 projects
+typecheck         0
+lint              0 errors (5 pre-existing warnings)
+README API lint   exit 0 — every @signaltree symbol named in a README exists
+public API delta  ZERO — see above
+```
+
+⚠️ ONE PRE-EXISTING GATE FAILURE, NOT INTRODUCED HERE. `signaltree-bare` is over
+budget at 9.77/9.7 KB prod and 11.79/11.7 KB dev. Measured identical at HEAD, and
+attributed by removing `LINK-ROOT-SOURCE-0`'s root carriers from the bare path:
+that yields 9.76 KB, still over. So the root work costs about **10 bytes of prod
+bundle** — a useful datum for `ROOT-COST-SCOPE-0`'s bundle dimension — and is
+not the cause. The overage predates this session's work and is left open.
+
+### Also fixed while sweeping — live docs teaching deleted APIs
+
+`docs/ai/LLM.md` contradicted itself: a marker table taught `stored(key,
+default)` while a later section said it was removed. The same table also still
+taught `status<E>()`, retired earlier, and named `serialization()` as the
+persistence enhancer when `serialization` is not exported at all — only
+`persistence` is. `scripts/lint-readme-apis.mjs` did not catch any of it because
+it checks READMEs only, which is the doc-example lint gap restated: the
+AI-facing document is the one an agent reads first and the one nothing gates.
