@@ -139,11 +139,11 @@ The protocol is intentionally rigorous, but rigor must be proportional to semant
 
 Use the smallest profile that can still falsify the meaningful failure modes:
 
-| Profile | Use when | Minimum expected discipline |
-|---|---|---|
-| **P0 - Routine** | Internal-only change, no public semantics, no concurrency/lifecycle/persistence ambiguity | Property statement, direct behavioral test, type/lint/build gates |
-| **P1 - Focused** | One meaningful semantic risk, localized ownership, low migration blast radius | Falsifier, positive control, focused experiment card, permanent behavioral carrier |
-| **P2 - Full ADSP** | Public API, identity, persistence, transactions, async races, lifecycle, retirement, or nontrivial ownership | Full lifecycle, matrices as applicable, mutation/gate validation, freeze record |
+| Profile                   | Use when                                                                                                                       | Minimum expected discipline                                                                            |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| **P0 - Routine**          | Internal-only change, no public semantics, no concurrency/lifecycle/persistence ambiguity                                      | Property statement, direct behavioral test, type/lint/build gates                                      |
+| **P1 - Focused**          | One meaningful semantic risk, localized ownership, low migration blast radius                                                  | Falsifier, positive control, focused experiment card, permanent behavioral carrier                     |
+| **P2 - Full ADSP**        | Public API, identity, persistence, transactions, async races, lifecycle, retirement, or nontrivial ownership                   | Full lifecycle, matrices as applicable, mutation/gate validation, freeze record                        |
 | **P3 - Release-critical** | Major-version architecture, multiple interacting semantic domains, production-consumer migration, or performance/memory claims | P2 plus production-consumer proof, release claim matrix, robust performance gates, consolidation audit |
 
 Escalate the profile when a falsifier reveals hidden capability or ambiguity. De-escalate only when the remaining question is demonstrably local.
@@ -311,7 +311,7 @@ When a new falsifier does reopen something frozen, record:
 5. which permanent conformance changed; and
 6. the new freeze boundary.
 
-**Evidence-coverage note (v1.1):** the SignalTree program has a clean example of reopening and replacing *supporting evidence* while preserving the conclusion (the incorrectly characterized rekey probe was falsified by an operation-reached-mechanism control). It does **not yet** contain an equally clean example of a frozen public contract being reversed by later falsifying evidence. That remains an explicit case-study coverage gap rather than being filled with a manufactured example.
+**Evidence-coverage note (v1.1):** the SignalTree program has a clean example of reopening and replacing _supporting evidence_ while preserving the conclusion (the incorrectly characterized rekey probe was falsified by an operation-reached-mechanism control). It does **not yet** contain an equally clean example of a frozen public contract being reversed by later falsifying evidence. That remains an explicit case-study coverage gap rather than being filled with a manufactured example.
 
 ## R-17 — Non-claims are first-class engineering output
 
@@ -568,16 +568,16 @@ Authority, ownership, lifecycle, acknowledgement, or baseline state may change e
 
 ADSP requires claims to carry a provenance category.
 
-| Category | Meaning | Allowed use |
-|---|---|---|
-| **Observed** | Directly measured in code, runtime, production consumer, controlled test, benchmark, GC probe, or package artifact | May support a concrete claim |
-| **Strategic assumption** | Deliberately chosen workload/product envelope | May guide optimization, must not be presented as observed usage |
-| **Inference** | Architectural explanation consistent with evidence | May guide next experiment, not closure by itself |
-| **Advisory** | External/local review or dirty-tree observation not reproduced on authoritative state | Hypothesis only |
-| **Historical** | True of an earlier version/commit/architecture | Preserve in record, do not present as current behavior |
-| **Open** | Not established | Must not be silently filled in |
-| **Quarantined** | Measurement exists but controls disagree or harness is suspect | Excluded from quotable evidence |
-| **Non-claim** | Explicitly outside the guarantee | Protects against later overstatement |
+| Category                 | Meaning                                                                                                            | Allowed use                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| **Observed**             | Directly measured in code, runtime, production consumer, controlled test, benchmark, GC probe, or package artifact | May support a concrete claim                                    |
+| **Strategic assumption** | Deliberately chosen workload/product envelope                                                                      | May guide optimization, must not be presented as observed usage |
+| **Inference**            | Architectural explanation consistent with evidence                                                                 | May guide next experiment, not closure by itself                |
+| **Advisory**             | External/local review or dirty-tree observation not reproduced on authoritative state                              | Hypothesis only                                                 |
+| **Historical**           | True of an earlier version/commit/architecture                                                                     | Preserve in record, do not present as current behavior          |
+| **Open**                 | Not established                                                                                                    | Must not be silently filled in                                  |
+| **Quarantined**          | Measurement exists but controls disagree or harness is suspect                                                     | Excluded from quotable evidence                                 |
+| **Non-claim**            | Explicitly outside the guarantee                                                                                   | Protects against later overstatement                            |
 
 ## Evidence priority
 
@@ -861,7 +861,7 @@ Prevents repository presence from being confused with published or production-us
 ### Columns
 
 | Symbol / file | Root export | Secondary export | Deep import | Prod code | Demo | Docs | Tools | Tests | Historical | Disposition |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| ------------- | ----------: | ---------------: | ----------: | --------: | ---: | ---: | ----: | ----: | ---------: | ----------- |
 
 ### Rules
 
@@ -910,7 +910,7 @@ error reporting
 ### Columns
 
 | Behavior | Mechanism | Observable result | SignalTree-specific? | Independent consumer? | Preserve? | Final owner |
-|---|---|---|---:|---:|---:|---|
+| -------- | --------- | ----------------- | -------------------: | --------------------: | --------: | ----------- |
 
 ### Rules
 
@@ -964,16 +964,16 @@ Do not confuse a **reactive/runtime substrate dependency** with **framework-runt
 Ensures every hypothesis has a concrete disproof path.
 
 | Hypothesis | Falsifier | Control | Expected if true | Expected if false | Result | Decision impact |
-|---|---|---|---|---|---|---|
+| ---------- | --------- | ------- | ---------------- | ----------------- | ------ | --------------- |
 
 ### Example
 
-| Hypothesis | Falsifier |
-|---|---|
-| Promise and Observable async acquisition have equivalent stale semantics | Slow A, fast B, A resolves last |
-| Persistence rides committed truth | Rollback after speculative A/B and inspect every durable write |
-| Historical mode harness protects production | Catastrophic mutation in production Link |
-| Weak interning preserves stale-handle correctness | Force GC while holding old facade |
+| Hypothesis                                                               | Falsifier                                                      |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| Promise and Observable async acquisition have equivalent stale semantics | Slow A, fast B, A resolves last                                |
+| Persistence rides committed truth                                        | Rollback after speculative A/B and inspect every durable write |
+| Historical mode harness protects production                              | Catastrophic mutation in production Link                       |
+| Weak interning preserves stale-handle correctness                        | Force GC while holding old facade                              |
 
 ---
 
@@ -1010,13 +1010,13 @@ Mutate the alias/conditional deliberately and prove the type test fails before d
 
 Prevents several forms of identity from being collapsed.
 
-| Concept | Meaning | Reusable? | Persistent? | Scope | Example |
-|---|---|---:|---:|---|---|
-| Public path | User-facing coordinate | yes | maybe | tree | `orders.42.total` |
-| Subject ID | Lifetime identity | no reuse | runtime | subject | entity lifetime |
-| Tree ID | Owner correlation | runtime-local | no | process | error attribution |
-| Position ID | causal/ownership position | tree-local | no | tree | restoration target |
-| Revision | mutation/version sequence | monotonic | not identity | storage/transaction | commit revision |
+| Concept     | Meaning                   |     Reusable? |  Persistent? | Scope               | Example            |
+| ----------- | ------------------------- | ------------: | -----------: | ------------------- | ------------------ |
+| Public path | User-facing coordinate    |           yes |        maybe | tree                | `orders.42.total`  |
+| Subject ID  | Lifetime identity         |      no reuse |      runtime | subject             | entity lifetime    |
+| Tree ID     | Owner correlation         | runtime-local |           no | process             | error attribution  |
+| Position ID | causal/ownership position |    tree-local |           no | tree                | restoration target |
+| Revision    | mutation/version sequence |     monotonic | not identity | storage/transaction | commit revision    |
 
 ### Rule
 
@@ -1030,12 +1030,12 @@ If two values are equal in one implementation, do not promote that coincidence i
 
 For every asynchronous primitive, distinguish mechanism-specific race behavior.
 
-| Case | Promise | Observable | Subscription | After failure | After dispose |
-|---|---|---|---|---|---|
-| overlapping A/B | ? | ? | ? | ? | ? |
-| cancellation | ? | ? | ? | ? | ? |
-| stale suppression | ? | ? | ? | ? | ? |
-| recovery | ? | ? | ? | ? | ? |
+| Case              | Promise | Observable | Subscription | After failure | After dispose |
+| ----------------- | ------- | ---------- | ------------ | ------------- | ------------- |
+| overlapping A/B   | ?       | ?          | ?            | ?             | ?             |
+| cancellation      | ?       | ?          | ?            | ?             | ?             |
+| stale suppression | ?       | ?          | ?            | ?             | ?             |
+| recovery          | ?       | ?          | ?            | ?             | ?             |
 
 ### Required discriminators
 
@@ -1057,15 +1057,15 @@ Do not assume two asynchronous mechanisms have the same semantics merely because
 
 Separates synchronization, storage, codec, migration, scheduling, cache, and administration.
 
-| Concept | Historical primitive A | Historical primitive B | Final owner | Preserve? | Notes |
-|---|---|---|---|---:|---|
-| state relationship | stored | loader.persist | Link / loader cache | yes | semantics differ |
-| backend | Storage | EntityStorageAdapter | adapter | yes | low-level concept |
-| codec | custom | JSON | adapter | yes | Link transports T |
-| migration | version/migrate | none | adapter/app | optional | not Link |
-| write scheduling | debounce/maxWait | immediate | endpoint policy | optional | maxWait may die |
-| removal | compound clear | removeItem | application/adapter | yes | ordering matters |
-| scope GC | n/a | maxScopes | loader persistence | maybe | cache-specific |
+| Concept            | Historical primitive A | Historical primitive B | Final owner         | Preserve? | Notes             |
+| ------------------ | ---------------------- | ---------------------- | ------------------- | --------: | ----------------- |
+| state relationship | stored                 | loader.persist         | Link / loader cache |       yes | semantics differ  |
+| backend            | Storage                | EntityStorageAdapter   | adapter             |       yes | low-level concept |
+| codec              | custom                 | JSON                   | adapter             |       yes | Link transports T |
+| migration          | version/migrate        | none                   | adapter/app         |  optional | not Link          |
+| write scheduling   | debounce/maxWait       | immediate              | endpoint policy     |  optional | maxWait may die   |
+| removal            | compound clear         | removeItem             | application/adapter |       yes | ordering matters  |
+| scope GC           | n/a                    | maxScopes              | loader persistence  |     maybe | cache-specific    |
 
 ### Rule
 
@@ -1095,7 +1095,7 @@ HISTORICAL ONLY
 ### Columns
 
 | Symbol | Reachability | Live consumers | Behavior provided | Final owner | Semantic or syntactic replacement? | Migration order | Demo impact | Tool/doc impact |
-|---|---|---:|---|---|---|---|---|---|
+| ------ | ------------ | -------------: | ----------------- | ----------- | ---------------------------------- | --------------- | ----------- | --------------- |
 
 ### Rule
 
@@ -1110,7 +1110,7 @@ HISTORICAL ONLY
 Makes the demo a public-API usability gate, not decoration.
 
 | Public concept | Scenario | Automated proof | No internal API? | Ergonomic findings |
-|---|---|---|---:|---|
+| -------------- | -------- | --------------- | ---------------: | ------------------ |
 
 ### Example rows
 
@@ -1150,7 +1150,7 @@ unjustified casts = investigate
 Prevents unfair comparisons and isolates semantic cost.
 
 | Workload | Raw/base configuration | Featured configuration | Competitor equivalent | Semantics equal? | Scaling axis | Metric |
-|---|---|---|---|---:|---|---|
+| -------- | ---------------------- | ---------------------- | --------------------- | ---------------: | ------------ | ------ |
 
 ### Required dimensions
 
@@ -1188,7 +1188,7 @@ Do not promote a single favorable timing into an architectural claim.
 Proves the release system can detect what it claims to protect.
 
 | Gate | Claim protected | Relevant mutation | Mutation kills gate? | Blind? | Permanent? |
-|---|---|---|---:|---:|---:|
+| ---- | --------------- | ----------------- | -------------------: | -----: | ---------: |
 
 ### Rule
 
@@ -1211,7 +1211,7 @@ All three require investigation.
 Removes experiment residue without weakening protection.
 
 | Historical harness | Original question | Winning result | Permanent surviving test | Catastrophic mutation caught by old harness? | Disposition |
-|---|---|---|---|---:|---|
+| ------------------ | ----------------- | -------------- | ------------------------ | -------------------------------------------: | ----------- |
 
 ### Deletion authority
 
@@ -1235,7 +1235,7 @@ Test count is not a quality metric. Redundant tests can reduce signal.
 Prevents marketing/release prose from outrunning evidence.
 
 | Claim | Evidence | Scope | Non-claim | Gate | Current status |
-|---|---|---|---|---|---|
+| ----- | -------- | ----- | --------- | ---- | -------------- |
 
 ### Example
 
@@ -1696,14 +1696,14 @@ A useful performance contract is not “the new design is faster.” It is a vec
 
 For a consumer-local entity authority projection, a preregistration might state:
 
-| Dimension | Allowed / expected shape | Forbidden interpretation |
-|---|---|---|
-| Retained projection state | `O(current subjects)` per participating consumer | Growth proportional to historical inspection operations |
-| Ordinary single-row update bookkeeping | Target `O(1)` | Re-materializing the entire collection on every mutation |
-| Exceptional topology placement | Up to `O(n)` worst case when traversing current non-authoritative neighbours | Treating an occasional linear traversal as proof of unbounded history |
-| Complete outbound `Row[]` materialization | `O(n)` by contract | Claiming this inherent complete-value cost is a regression without an equivalent-operation baseline |
-| Consumer fan-out | Explicitly measured across 1, N consumers | Hiding duplicated consumer-local state inside one latency number |
-| Historical retention | `O(0)` beyond current topology | A journal whose memory grows with number of past inspections |
+| Dimension                                 | Allowed / expected shape                                                     | Forbidden interpretation                                                                            |
+| ----------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Retained projection state                 | `O(current subjects)` per participating consumer                             | Growth proportional to historical inspection operations                                             |
+| Ordinary single-row update bookkeeping    | Target `O(1)`                                                                | Re-materializing the entire collection on every mutation                                            |
+| Exceptional topology placement            | Up to `O(n)` worst case when traversing current non-authoritative neighbours | Treating an occasional linear traversal as proof of unbounded history                               |
+| Complete outbound `Row[]` materialization | `O(n)` by contract                                                           | Claiming this inherent complete-value cost is a regression without an equivalent-operation baseline |
+| Consumer fan-out                          | Explicitly measured across 1, N consumers                                    | Hiding duplicated consumer-local state inside one latency number                                    |
+| Historical retention                      | `O(0)` beyond current topology                                               | A journal whose memory grows with number of past inspections                                        |
 
 This illustrates **R-27**: cost is a vector, not one scalar.
 
@@ -2040,24 +2040,24 @@ project: example
 experiment:
   id: CAPABILITY-QUESTION-0
   status: OPEN
-  question: ""
+  question: ''
   scope:
     include: []
     exclude: []
 
   hypothesis:
-    null: ""
+    null: ''
     alternatives:
-      A: ""
-      B: ""
-      C: ""
+      A: ''
+      B: ''
+      C: ''
 
   falsifiers:
     - id: F1
-      property: ""
-      probe: ""
-      expected_if_null: ""
-      expected_if_false: ""
+      property: ''
+      probe: ''
+      expected_if_null: ''
+      expected_if_false: ''
 
   prohibited_changes: []
 
@@ -2081,7 +2081,7 @@ experiment:
 
   decision:
     outcome: null
-    rationale: ""
+    rationale: ''
     ownership: []
     frozen: false
 
@@ -2335,49 +2335,202 @@ The Skill should ask the minimum questions needed to make the current risk falsi
 
 ---
 
+# 29. The Architecture Authority Flip
+
+ADSP already knew how to falsify an architecture. It did not know **when to stop
+letting the incumbent architecture vote.** This section closes that gap.
+
+Discovery asks what the system _is_ and which semantics must survive.
+Implementation asks how to realize the architecture we _chose_. Once the
+architecture is frozen, the relationship reverses:
+
+> **ARCHITECTURE AUTHORITY FLIP.** After the freeze, incumbent implementation is
+> no longer an authority. It is evidence, fixtures, algorithms and historical
+> context only.
+
+```text
+DISCOVERY            incumbent implementation = primary evidence
+                     proposed architecture    = hypothesis
+      ↓ falsify / measure / solidify
+ARCHITECTURE FREEZE  contracts, invariants and ownership become authoritative
+      ↓ AUTHORITY FLIP
+IMPLEMENTATION       frozen architecture      = authority
+                     incumbent implementation = evidence only
+      ↓
+VALIDATION           attack the new implementation; reopen architecture ONLY on
+                     demonstrated contradiction
+```
+
+Without an explicit transition, an agent keeps using discovery behaviour during
+implementation and slowly **reconstructs the old system**.
+
+## 29.1 The three complementary rules
+
+```text
+DISCOVERY RULE      REAL BEHAVIOR MAY NOT BE DISMISSED WITHOUT CLASSIFICATION.
+
+AUTHORITY-FLIP RULE AFTER ARCHITECTURE FREEZE, INCUMBENT BEHAVIOR HAS NO CLAIM
+                    ON THE TARGET UNLESS THE FROZEN CONTRACT ADMITS IT.
+
+IMPLEMENTATION RULE ENFORCE THE FROZEN OWNER UNTIL REQUIRED FUNCTIONALITY
+                    DEMONSTRATES THAT OWNER CANNOT CARRY IT.
+```
+
+The diagnostic question, asked out loud before reasoning:
+
+> **Am I currently learning what the system must be, or implementing what we
+> already decided it will be?**
+
+If the answer is implementation, any sentence beginning _"the old implementation
+needs…"_ triggers scrutiny.
+
+## 29.2 Mandatory question before preserving any incumbent mechanism
+
+> **What frozen requirement would be violated if this mechanism disappeared
+> completely?**
+
+These do NOT qualify: _tests use it · the old code needs it · it contains useful
+behavior · we haven't found its successor · it was previously important._
+
+Valid answers name a requirement, not a mechanism — and then you preserve the
+REQUIREMENT, not necessarily the mechanism.
+
+## 29.3 ARCHITECTURE-OVERRIDE detection
+
+Flag the work if any appear during implementation:
+
+```text
+1  OLD-OWNER PRESERVATION      "this subsystem has meaningful behavior, so it
+                               must survive or find a successor"
+2  REPRESENTATION VETO         "the current implementation stores X this way, so
+                               the replacement must accommodate that shape"
+3  TEST-LED DESIGN             "these incumbent tests fail, so the architecture
+                               needs more machinery" — classify the tests first
+4  PARALLEL-OWNER CREATION     a failure in an existing authority spawns another
+                               ledger/history/projection/lifecycle owner
+                               ⚠️ FLAG HARD — repair the frozen owner first
+5  RELOCATION NOT RETIREMENT   old behavior moved to a new module merely so
+                               deletion can proceed
+6  COMPATIBILITY-BY-INERTIA    an old API survives because existing code depends
+                               on it, despite a frozen canonical surface
+7  DIFFICULTY AS FALSIFICATION "this is hard to implement cleanly, maybe the
+                               architecture was wrong" — difficulty is not
+                               falsification
+8  MECHANISM BEFORE OWNER      a mechanism is proposed before identifying which
+                               frozen owner is responsible
+9  ABSENCE AS REQUIREMENT LOSS "the old implementation did not support this
+                               cleanly" — greenfield exists to escape that
+10 PRESENCE AS REQUIREMENT     "this behavior exists and is tested" — presence
+                               proves existence, not admission
+```
+
+## 29.4 Phase declaration
+
+Every substantial work unit declares its mode, so leakage is catchable:
+
+```text
+ADSP MODE:  DISCOVERY | SOLIDIFICATION | IMPLEMENTATION | ARCHITECTURE-REOPEN
+```
+
+```text
+DISCOVERY        incumbent behavior presumed meaningful until classified;
+                 architecture aggressively challenged; real behavior cannot be
+                 casually discarded
+IMPLEMENTATION   frozen architecture presumed correct until falsified; incumbent
+                 behavior presumed non-binding unless admitted; representation
+                 freely replaceable; old machinery deletable wholesale
+```
+
+## 29.5 The ARCHITECTURE-REOPEN gate
+
+Enforcement must not become dogma. Implementation may return to discovery ONLY
+with all six:
+
+```text
+REQUIRED        a previously admitted requirement is threatened
+REPRODUCED      a deterministic failing discriminator exists
+OWNER           the frozen architecture identifies who should provide it
+ATTEMPTED       reasonable compliant implementations were tried
+FALSIFIED       they fail because of the ARCHITECTURE, not the representation
+CONTRADICTION   the smallest incompatible frozen claims are stated
+```
+
+Anything less: keep implementing.
+
+## 29.6 The canonical example — `loader`
+
+Discovery correctly found that `loader` was not semantically empty: it held
+stale/fresh state, SWR, tag invalidation, scoped cache entries and eviction.
+Deleting it then, as "useless", would have been bad discovery.
+
+After the architecture solidified — relationship authority to `Link`, entity
+topology to `entityMap`, cache/query policy outside core — the correct
+implementation conclusion was that **`loader`'s representation had no surviving
+owner, so it should be deleted.**
+
+The mistake was carrying a DISCOVERY rule across the flip:
+
+```text
+discovery rule carried wrongly   real behavior needs a successor
+implementation rule required     only ADMITTED GREENFIELD SEMANTICS need one
+```
+
+The same failure recurred immediately afterwards: a red rollback suite prompted
+designing a second causal ledger, when the frozen answer was already _one causal
+system_ — and the real repair was a corrected admission criterion inside the
+existing owner, plus a bounded projection. Pattern 4 above exists because of it.
+
+## 29.7 A corollary for long-lived records
+
+An append-only architecture record accumulates statements that later entries
+supersede. Reading such a document top-down produces confident, stale answers.
+
+> **A LONG APPEND-ONLY RECORD IS A HISTORY, NOT A STATUS.** Before treating any
+> recorded "OPEN" as current, check the code and the commit log.
+
 # Appendix A — Blank matrix templates
 
 ## A.1 Consumer inventory
 
 | Symbol | Public root | Secondary/deep | Prod | Demo | Docs | Tools | Tests | Historical | Disposition |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| | | | | | | | | | |
+| ------ | ----------: | -------------: | ---: | ---: | ---: | ----: | ----: | ---------: | ----------- |
+|        |             |                |      |      |      |       |       |            |             |
 
 ## A.2 Behavior matrix
 
 | Behavior | Mechanism | Observable contract | Final owner | Preserve? | Proof |
-|---|---|---|---|---:|---|
-| | | | | | |
+| -------- | --------- | ------------------- | ----------- | --------: | ----- |
+|          |           |                     |             |           |       |
 
 ## A.3 Falsifier matrix
 
 | Hypothesis | Falsifier | Control | Result | Interpretation |
-|---|---|---|---|---|
-| | | | | |
+| ---------- | --------- | ------- | ------ | -------------- |
+|            |           |         |        |                |
 
 ## A.4 Ownership matrix
 
 | Responsibility | Candidate owners | Needed information | Lifecycle owner | Decision | Why |
-|---|---|---|---|---|---|
-| | | | | | |
+| -------------- | ---------------- | ------------------ | --------------- | -------- | --- |
+|                |                  |                    |                 |          |     |
 
 ## A.5 Migration matrix
 
 | Caller | Old behavior | Final expression | Semantic delta | Tool/doc/demo impact | Status |
-|---|---|---|---|---|---|
-| | | | | | |
+| ------ | ------------ | ---------------- | -------------- | -------------------- | ------ |
+|        |              |                  |                |                      |        |
 
 ## A.6 Performance matrix
 
 | Operation | Semantics | Size | Raw | Featured | Comparator | A/A spread | Shape | Claim status |
-|---|---|---:|---:|---:|---:|---:|---|---|
-| | | | | | | | | |
+| --------- | --------- | ---: | --: | -------: | ---------: | ---------: | ----- | ------------ |
+|           |           |      |     |          |            |            |       |              |
 
 ## A.7 Gate matrix
 
 | Gate | Claim | Mutation | Expected fail | Actual | Blind? | Action |
-|---|---|---|---:|---:|---:|---|
-| | | | | | | |
+| ---- | ----- | -------- | ------------: | -----: | -----: | ------ |
+|      |       |          |               |        |        |        |
 
 ---
 
