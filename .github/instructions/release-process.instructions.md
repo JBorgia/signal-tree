@@ -210,7 +210,7 @@ This pushes:
 
 ### 1. Verify npm packages
 
-Visit https://www.npmjs.com/package/@signaltree/core and confirm:
+Visit https://www.npmjs.com/package/@signal-tree/kernel and confirm:
 
 - New version is published
 - Package size is reasonable (check "Unpacked Size")
@@ -221,14 +221,14 @@ Visit https://www.npmjs.com/package/@signaltree/core and confirm:
 ```bash
 mkdir /tmp/test-signaltree && cd /tmp/test-signaltree
 npm init -y
-npm install @signaltree/core@latest
-node -e "import('@signaltree/core').then(m => console.log(typeof m.signalTree))"
+npm install @signal-tree/kernel@latest
+node -e "import('@signal-tree/kernel').then(m => console.log(typeof m.signalTree))"
 # Should print: "function"
 ```
 
 ### 3. Create GitHub release
 
-- Go to https://github.com/JBorgia/signaltree/releases
+- Go to https://github.com/JBorgia/signal-tree/releases
 - Click "Draft a new release"
 - Select the version tag (vX.X.X)
 - Copy CHANGELOG.md entry for this version
@@ -253,7 +253,7 @@ If you publish a broken release:
 ### 1. Deprecate the broken version immediately
 
 ```bash
-npm deprecate @signaltree/core@X.X.X "Broken release, use X.X.Y instead"
+npm deprecate @signal-tree/kernel@X.X.X "Broken release, use X.X.Y instead"
 npm deprecate @signaltree/enterprise@X.X.X "Broken release, use X.X.Y instead"
 # ... repeat for all packages
 ```

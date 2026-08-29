@@ -21,7 +21,7 @@ console.log(
 const packages = [
   {
     name: 'core',
-    path: 'packages/core',
+    path: 'packages/kernel',
     features: ['Recursive Typing', 'Signal Tree', 'Built-in Enhancers'],
   },
   {

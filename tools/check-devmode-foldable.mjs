@@ -51,7 +51,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const CORE = new URL('../dist/packages/core/dist/index.js', import.meta.url)
+const CORE = new URL('../dist/packages/kernel/dist/index.js', import.meta.url)
   .pathname;
 const REPO_NODE_MODULES = new URL('../node_modules', import.meta.url).pathname;
 const EXTERNAL = ['@angular/*', 'rxjs', 'rxjs/*', 'tslib'];

@@ -49,7 +49,7 @@
 		{
 			"label": "Build and Deploy SignalTree",
 			"type": "shell",
-			"command": "cd /Users/jonathanborgia/code/signaltree && pnpm nx build core && cp -r packages/core/dist/* /Users/jonathanborgia/code/v3/frontend/node_modules/@signaltree/core/dist/",
+			"command": "cd /Users/jonathanborgia/code/signaltree && pnpm nx build core && cp -r packages/kernel/dist/* /Users/jonathanborgia/code/v3/frontend/node_modules/@signal-tree/kernel/dist/",
 			"isBackground": false
 		}
 	]

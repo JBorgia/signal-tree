@@ -13,7 +13,7 @@ if (typeof globalThis.gc !== 'function') {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const CORE_LIB = join(ROOT, 'dist/packages/core/dist/lib/path-notifier.js');
+const CORE_LIB = join(ROOT, 'dist/packages/kernel/dist/lib/path-notifier.js');
 const TMP_ROOT = process.env.TMPDIR ?? '/tmp';
 const COMMITTED_3ARG_LIB = join(
   TMP_ROOT,
@@ -198,7 +198,7 @@ function classifyStructuralOverheadVerdict({
 function ensureCommitted3ArgPathNotifierModule() {
   const source = execFileSync(
     'git',
-    ['show', 'HEAD:packages/core/src/lib/path-notifier.ts'],
+    ['show', 'HEAD:packages/kernel/src/lib/path-notifier.ts'],
     { cwd: ROOT, encoding: 'utf8' }
   );
 
@@ -229,7 +229,7 @@ function ensureCommitted3ArgPathNotifierModule() {
   );
   writeFileSync(
     COMMITTED_3ARG_LIB,
-    `// transpiled from HEAD:packages/core/src/lib/path-notifier.ts\n${compiled.outputText
+    `// transpiled from HEAD:packages/kernel/src/lib/path-notifier.ts\n${compiled.outputText
       .replace("'./write-context'", "'./write-context.mjs'")
       .replace("'./write-participation'", "'./write-participation.mjs'")}`,
     'utf8'

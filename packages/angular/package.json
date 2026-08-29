@@ -1,0 +1,31 @@
+{
+  "name": "@signal-tree/angular",
+  "version": "15.0.0-rc.1",
+  "description": "Angular realization for SignalTree \u2014 native signals over the framework-neutral @signal-tree/kernel.",
+  "license": "Apache-2.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**/*.js",
+    "src/**/*.d.ts",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "dependencies": {
+    "@signal-tree/kernel": "15.0.0-rc.1"
+  },
+  "peerDependencies": {
+    "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "tslib": "^2.0.0"
+  }
+}

@@ -56,7 +56,7 @@ import { quiesce, requireExposeGc, MB } from './lib/heap-quiescence.mjs';
 
 requireExposeGc('tools/probe-history-sample-isolation.mjs');
 
-const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
+const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!existsSync(CORE)) {
   console.error('❌ build first: nx run-many -t build --all');
   process.exit(1);

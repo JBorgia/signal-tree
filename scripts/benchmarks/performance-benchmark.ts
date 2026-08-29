@@ -1,4 +1,4 @@
-import { signalTree } from '@signaltree/core';
+import { signalTree } from '@signal-tree/kernel';
 import { performance } from 'perf_hooks';
 
 /**

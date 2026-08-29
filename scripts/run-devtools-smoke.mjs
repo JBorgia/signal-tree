@@ -1,6 +1,6 @@
 import path from 'path';
 
-const corePath = path.resolve('./dist/packages/core/dist/index.js');
+const corePath = path.resolve('./dist/packages/kernel/dist/index.js');
 const { signalTree, devTools, entityMap } = await import(`file://${corePath}`);
 
 console.log('signalTree available:', typeof signalTree);

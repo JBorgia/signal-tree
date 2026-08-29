@@ -63,7 +63,7 @@ import { join } from 'node:path';
 import { measureRetained, requireExposeGc } from './lib/heap-quiescence.mjs';
 
 requireExposeGc('tools/bench-compare.mjs');
-const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
+const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!existsSync(CORE)) {
   console.error('❌ build first: nx run-many -t build --all');
   process.exit(1);
@@ -330,7 +330,7 @@ if (armName) {
     // `make()` does `await import(...)` for its library, and ESM caches
     // modules — so without this the FIRST arm construction charges the whole
     // library's module graph to the collection. That is not a rounding error
-    // and it is not equal across arms: @signaltree/core (which pulls Angular)
+    // and it is not equal across arms: @signal-tree/kernel (which pulls Angular)
     // retains 6.67 MB of module graph, @ngrx/signals 5.88 MB, @angular/core
     // alone 5.75 MB, @ngneat/elf 2.18 MB. Charging each arm its own library's
     // load made SignalTree read 18.12 MB against an isolated-probe 11.41 MB for

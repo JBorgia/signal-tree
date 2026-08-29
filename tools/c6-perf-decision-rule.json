@@ -1,0 +1,54 @@
+{
+  "method": "interleaved-v1",
+  "preregisteredBefore": "any S1 implementation existed",
+  "aaEnvelope": {
+    "construct-plain": {
+      "median": -4.81,
+      "p10": -7.11,
+      "p90": 9.54
+    },
+    "scalar-read": {
+      "median": 1.79,
+      "p10": -6.44,
+      "p90": 22.92
+    },
+    "scalar-write": {
+      "median": 0.11,
+      "p10": -6.19,
+      "p90": 3.29
+    },
+    "merge-write-many": {
+      "median": 2.2,
+      "p10": -5.34,
+      "p90": 5.08
+    }
+  },
+  "knownBad": {
+    "construct-plain": {
+      "median": 1.56,
+      "blocksSlower": 12
+    },
+    "scalar-read": {
+      "median": 19.24,
+      "blocksSlower": 16
+    },
+    "scalar-write": {
+      "median": 19.27,
+      "blocksSlower": 20
+    },
+    "merge-write-many": {
+      "median": -0.57,
+      "blocksSlower": 7
+    }
+  },
+  "authoritativeOps": [
+    "scalar-write",
+    "scalar-read"
+  ],
+  "note": "construct-plain and merge-write-many showed NO separation under the known-bad arm, so this harness has no authority over them; a candidate result on those ops is INCONCLUSIVE by construction.",
+  "decision": {
+    "GREEN": "median delta within the A/A envelope for that op AND blocksSlower not systematically >15/20",
+    "RED": "median delta separates in the regression direction beyond the A/A p90 AND blocksSlower >=16/20, i.e. resembling the known-bad signature",
+    "INCONCLUSIVE": "anything between, or any result on a non-authoritative op"
+  }
+}

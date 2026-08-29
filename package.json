@@ -8,13 +8,13 @@
     "url": "https://github.com/sponsors/JBorgia"
   },
   "author": "Jonathan D Borgia",
-  "homepage": "https://github.com/JBorgia/signaltree#readme",
+  "homepage": "https://github.com/JBorgia/signal-tree#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JBorgia/signaltree.git"
+    "url": "git+https://github.com/JBorgia/signal-tree.git"
   },
   "bugs": {
-    "url": "https://github.com/JBorgia/signaltree/issues"
+    "url": "https://github.com/JBorgia/signal-tree/issues"
   },
   "scripts": {
     "build": "nx run-many -t build --projects=core,shared",
@@ -66,7 +66,7 @@
     "lint:all": "nx run-many -t lint --projects=core,shared,demo",
     "lint:core": "nx lint core",
     "lint:fix:all": "nx run-many -t lint --fix --projects=core,shared,demo",
-    "typecheck": "tsc --noEmit -p packages/core/tsconfig.typecheck.json && tsc --noEmit -p tsconfig.typecheck-all.json",
+    "typecheck": "tsc --noEmit -p packages/kernel/tsconfig.typecheck.json && tsc --noEmit -p tsconfig.typecheck-all.json",
     "quality:check": "npm run lint:all && npm run typecheck && npm run test:all && npm run build:all",
     "quality:simple": "npm run test:core && npm run build:core",
     "quality:fix": "npm run lint:fix:all && npm run test:all",
@@ -104,7 +104,7 @@
     "perf:test": "npm run test:performance",
     "perf:build": "npm run build:production && npm run analyze:bundle",
     "perf:run": "node scripts/perf-suite.js",
-    "test:history-spike": "pnpm exec vitest run packages/core/src/lib/path-notifier.spec.ts packages/core/src/lib/internals/intercept-leaf-signals.spec.ts packages/core/src/lib/markers/form.spec.ts packages/core/src/lib/entity-active-prepend-changeid.spec.ts packages/core/src/enhancers/time-travel/time-travel.spec.ts packages/core/src/enhancers/time-travel/documented-defects.spec.ts packages/core/src/enhancers/time-travel/leaf-write-history.spec.ts packages/core/src/lib/undo-redo.spec.ts packages/core/src/lib/rollback-viability-prototype.spec.ts packages/core/src/lib/position-identity-prototype.spec.ts",
+    "test:history-spike": "pnpm exec vitest run packages/kernel/src/lib/path-notifier.spec.ts packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts packages/kernel/src/lib/markers/form.spec.ts packages/kernel/src/lib/entity-active-prepend-changeid.spec.ts packages/kernel/src/enhancers/time-travel/time-travel.spec.ts packages/kernel/src/enhancers/time-travel/documented-defects.spec.ts packages/kernel/src/enhancers/time-travel/leaf-write-history.spec.ts packages/kernel/src/lib/undo-redo.spec.ts packages/kernel/src/lib/rollback-viability-prototype.spec.ts packages/kernel/src/lib/position-identity-prototype.spec.ts",
     "bench:history-spike": "npm run bench:history-ownership",
     "bench:history-spike:smoke": "npm run bench:history-ownership:smoke",
     "bench:positionid-substrate": "node tools/bench-positionid-substrate.mjs",
@@ -129,7 +129,7 @@
     "update:deps": "nx migrate latest && npm install && nx migrate --run-migrations",
     "workspace:info": "nx report",
     "check:devmode-foldable": "node tools/check-devmode-foldable.mjs",
-    "typecheck:typing": "tsc --noEmit -p packages/core/tsconfig.typecheck.json",
+    "typecheck:typing": "tsc --noEmit -p packages/kernel/tsconfig.typecheck.json",
     "typecheck:source": "tsc --noEmit -p tsconfig.typecheck-all.json",
     "gates": "node tools/verify-gates.mjs",
     "gates:fast": "node tools/verify-gates.mjs --fast",
@@ -201,7 +201,7 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",
     "@schematics/angular": "22.0.7",
-    "@signaltree/core": "workspace:*",
+    "@signal-tree/kernel": "workspace:*",
     "@signaltree/shared": "workspace:*",
     "@swc-node/register": "1.12.1",
     "@swc/core": "~1.15.17",

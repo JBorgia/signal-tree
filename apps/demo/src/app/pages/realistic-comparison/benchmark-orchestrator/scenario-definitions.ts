@@ -277,7 +277,7 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     complexity: 'Medium',
     selected: false,
     category: 'time-travel',
-    // This scenario relies on the restoration enhancer from @signaltree/core
+    // This scenario relies on the restoration enhancer from @signal-tree/kernel
     signalTreeOnly: true,
     purpose:
       'Tests time-travel functionality and history navigation performance',
@@ -306,7 +306,7 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     complexity: 'High',
     selected: false,
     category: 'time-travel',
-    // This scenario uses restoration enhancer from @signaltree/core
+    // This scenario uses restoration enhancer from @signal-tree/kernel
     signalTreeOnly: true,
     purpose: 'Tests time-travel performance with large history buffers',
     frequencyWeight: 0.3, // Rare - Only specific debugging/development scenarios
@@ -333,7 +333,7 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     complexity: 'Medium',
     selected: false,
     category: 'time-travel',
-    // This scenario uses restoration enhancer from @signaltree/core
+    // This scenario uses restoration enhancer from @signal-tree/kernel
     signalTreeOnly: true,
     purpose: 'Tests random access performance in time-travel history',
     frequencyWeight: 0.2, // Very rare - Only advanced debugging/development tools

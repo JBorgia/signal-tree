@@ -12,11 +12,11 @@ import {
   signalTree,
   restoration,
   undoable,
-} from '@signaltree/core';
+} from '@signal-tree/kernel';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
-import type { ISignalTree, RestorationMethods } from '@signaltree/core';
+import type { ISignalTree, RestorationMethods } from '@signal-tree/kernel';
 
 interface Todo {
   id: number;

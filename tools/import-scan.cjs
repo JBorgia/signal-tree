@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const roots = ['packages/core/src', 'packages/ng-forms/src'];
+const roots = ['packages/kernel/src', 'packages/ng-forms/src'];
 const exts = [
   '.ts',
   '.tsx',

@@ -30,7 +30,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 
-const SRC = resolve('packages/core/src');
+const SRC = resolve('packages/kernel/src');
 
 /**
  * Modules declared framework-neutral. Adding a root here is a CLAIM that its

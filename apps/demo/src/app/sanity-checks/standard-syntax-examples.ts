@@ -1,4 +1,4 @@
-import { signalTree } from '@signaltree/core';
+import { signalTree } from '@signal-tree/kernel';
 
 // ==============================================
 // Example 1: Basic Operations
@@ -204,14 +204,21 @@ const callableTree = signalTree({
 // Branch — read the whole subtree
 callableTree.$.user(); // → { name: 'John', age: 30 }
 
-// Branch — PARTIAL write; unlisted keys are left alone
-callableTree.$.user({ name: 'Bob' }); // age stays 30
+// Branch — WHOLE-VALUE write. 15.0: the value form supplies the next value of
+// this location, so every key is stated. `Partial<T>` was removed from the
+// callable because it overrode the state author's own strictness —
+// GREENFIELD-BRANCH-WRITE-0.
+callableTree.$.user({ name: 'Bob', age: 30 });
 
-// Branch — updater form
+// Branch — updater form. This is how you PATCH: depending on current state is
+// exactly what the updater is for, and the call site says so.
 callableTree.$.ui((current) => ({ ...current, loading: !current.loading }));
 
-// Root — callable too, and merges the same way
-callableTree({ ui: { loading: false, error: null } });
+// Root — the same grammar, so the root also takes a whole value.
+callableTree({
+  user: { name: 'Bob', age: 30 },
+  ui: { loading: false, error: null },
+});
 
 // The leaves underneath are still written the normal way:
 callableTree.$.ui.error.set('Request failed');

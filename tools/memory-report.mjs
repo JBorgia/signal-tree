@@ -51,7 +51,7 @@ import {
 
 requireExposeGc('tools/memory-report.mjs');
 
-const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
+const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!existsSync(CORE)) {
   console.error('❌ build first: nx run-many -t build --all');
   process.exit(1);

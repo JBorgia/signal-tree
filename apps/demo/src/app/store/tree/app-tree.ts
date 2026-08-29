@@ -1,4 +1,4 @@
-import { batching, devTools, signalTree, WithDerived } from '@signaltree/core';
+import { batching, devTools, signalTree, WithDerived } from '@signal-tree/kernel';
 
 import { tier1Derived, tier2Derived, tier3Derived } from './derived';
 import { postsState, uiState, usersState } from './state';

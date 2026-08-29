@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { batching, signalTree } from '@signaltree/core';
+import { batching, signalTree } from '@signal-tree/kernel';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
@@ -214,7 +214,7 @@ timingDescribe('SignalTree Performance Benchmarks', () => {
   // 'lazy loading vs eager loading' lived here and is deleted with the lazy
   // feature in 15.0. It compared two trees built with `lazy: lazy()` against
   // one built eagerly — and since v11 the lazy branch only differed if the
-  // feature was injected from `@signaltree/core/lazy`, a subpath withdrawn
+  // feature was injected from `@signal-tree/kernel/lazy`, a subpath withdrawn
   // from the published surface. There is one construction path now, so there
   // is nothing left to compare.
 });

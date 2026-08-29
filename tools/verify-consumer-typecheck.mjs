@@ -22,7 +22,7 @@
  * compile against the tarball.
  *
  * Usage: node tools/verify-consumer-typecheck.mjs
- *        (requires dist/packages/core — run the build first)
+ *        (requires dist/packages/kernel — run the build first)
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, mkdirSync, writeFileSync, readdirSync } from 'node:fs';
@@ -43,15 +43,15 @@ import { join } from 'node:path';
  */
 const STRICT_LIBS = process.argv.includes('--strict-libs');
 const ROOT = process.cwd();
-const CORE_DIST = join(ROOT, 'dist/packages/core');
+const CORE_DIST = join(ROOT, 'dist/packages/kernel');
 
 if (!existsSync(CORE_DIST)) {
-  console.error('❌ dist/packages/core not found — run the build first.');
+  console.error('❌ dist/packages/kernel not found — run the build first.');
   process.exit(1);
 }
 
 const work = mkdtempSync(join(tmpdir(), 'st-consumer-tsc-'));
-console.log('📦 Packing @signaltree/core and type-checking a real consumer\n');
+console.log('📦 Packing @signal-tree/kernel and type-checking a real consumer\n');
 
 // --- pack -------------------------------------------------------------------
 execFileSync('npm', ['pack', '--pack-destination', work], {
@@ -85,7 +85,7 @@ import {
   entityMap,
   restoration,
   batching,
-} from '@signaltree/core';
+} from '@signal-tree/kernel';
 
 type User = { id: number; name: string; version: number };
 

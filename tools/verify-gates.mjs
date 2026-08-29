@@ -59,7 +59,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 //
 // Found during the 15.0 pristine rehearsal. A fresh worktree reported a build
 // cache hit it could not possibly have, `nx build` printed "created
-// ../../dist/packages/core" while that directory did not exist, the build wrote
+// ../../dist/packages/kernel" while that directory did not exist, the build wrote
 // into a different clone entirely, and 19 gates failed for reasons that looked
 // like a broken repository. The variable was set in the operator's shell.
 //
@@ -95,7 +95,7 @@ const GATES = [
     cmd: ['npm', 'run', 'typecheck'],
     slow: true,
     mutation: {
-      file: 'packages/core/src/lib/utils.ts',
+      file: 'packages/kernel/src/lib/utils.ts',
       append: '\nconst __gateMutation: number = "not a number";\n',
     },
   },
@@ -124,7 +124,7 @@ const GATES = [
     // must catch it. Chosen over a trivially-broken function because it targets a
     // fix whose whole risk is that it is INVISIBLE when it regresses.
     mutation: {
-      file: 'packages/core/src/lib/internals/materialize-markers.ts',
+      file: 'packages/kernel/src/lib/internals/materialize-markers.ts',
       find: '  let memo = SNAPSHOT_MEMO.get(node as object);\n  if (!memo) {',
       replace:
         '  let memo = undefined as Signal<{ value: unknown }> | undefined;\n  if (!memo) {',
@@ -181,7 +181,7 @@ const GATES = [
     // discipline of whoever last paid a warning down. An error-based mutation
     // cannot be absorbed by slack.
     mutation: {
-      file: 'packages/core/src/lib/utils.ts',
+      file: 'packages/kernel/src/lib/utils.ts',
       append: '\nfunction __gateMutation() {\n  debugger;\n}\n',
     },
   },
@@ -191,7 +191,7 @@ const GATES = [
     cmd: ['node', 'tools/verify-built-barrels.mjs'],
     needsBuild: true,
     mutation: {
-      file: 'dist/packages/core/dist/index.js',
+      file: 'dist/packages/kernel/dist/index.js',
       find: 'export { signalTree }',
       replace: 'export { signalTree as signalTreeRenamedByGateSelfTest }',
     },
@@ -239,7 +239,7 @@ const GATES = [
     covers: 'every documented Angular-version claim matches peerDependencies',
     cmd: ['node', 'scripts/verify-version-claims.js'],
     mutation: {
-      file: 'packages/core/package.json',
+      file: 'packages/kernel/package.json',
       find: '"@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0"',
       replace: '"@angular/core": "^19.0.0 || ^20.0.0 || ^21.0.0 || ^22.0.0"',
     },
@@ -252,7 +252,7 @@ const GATES = [
     // Ran nowhere: an npm script nothing invoked, absent from CI. It passed the
     // whole time, which is the only reason that was survivable.
     mutation: {
-      file: 'dist/packages/core/package.json',
+      file: 'dist/packages/kernel/package.json',
       find: '"import": "./dist/index.js"',
       replace: '"import": "./dist/does-not-exist.js"',
     },
@@ -279,7 +279,7 @@ const GATES = [
     // work either: `needsBuild` gates build BEFORE the mutation is applied, so
     // a source edit never reaches dist.
     mutation: {
-      file: 'dist/packages/core/dist/index.js',
+      file: 'dist/packages/kernel/dist/index.js',
       generate: (original) => {
         let seed = 0x2545f491;
         let pad = '';
@@ -331,7 +331,7 @@ const GATES = [
     // this used to mutate no longer exists, and a missing anchor is a hard error
     // rather than a silent skip, which is how it surfaced immediately.
     mutation: {
-      file: 'packages/core/src/enhancers/batching/batching.ts',
+      file: 'packages/kernel/src/enhancers/batching/batching.ts',
       generate: (original) =>
         original.replace(/batching/g, 'renamedByGateSelfTest'),
     },
@@ -367,7 +367,7 @@ const GATES = [
     // after those subpaths stopped shipping, and 71 symbols against a real 69.
     // A baseline nothing verifies is a memo, not a gate.
     mutation: {
-      file: 'packages/core/src/index.ts',
+      file: 'packages/kernel/src/index.ts',
       find: 'export { defineStore',
       replace: 'export const __surfaceDrift = 1;\nexport { defineStore',
     },
@@ -382,7 +382,7 @@ const GATES = [
     // Python refused to parse that script. TypeScript, ESLint and the tests were
     // all blind to it — which is the argument for a gate that reads BYTES.
     mutation: {
-      file: 'packages/core/src/lib/constants.ts',
+      file: 'packages/kernel/src/lib/constants.ts',
       find: 'export',
       replace: '\u0000export',
     },
@@ -399,7 +399,7 @@ const GATES = [
     mutation: {
       file: 'tools/spec-type-baseline.json',
       find: '  "files": {',
-      replace: '  "files": {\n    "packages/core/src/lib/__gone__.spec.ts": 1,',
+      replace: '  "files": {\n    "packages/kernel/src/lib/__gone__.spec.ts": 1,',
     },
   },
   {
@@ -414,7 +414,7 @@ const GATES = [
     // probes cannot see this: the RUNTIME closure was already clean. Public
     // contracts are types, so the type closure is the property worth gating.
     mutation: {
-      file: 'packages/core/src/lib/internals/physical-commit-clock.ts',
+      file: 'packages/kernel/src/lib/internals/physical-commit-clock.ts',
       find: "import { isTraversableNode } from './node-shape';",
       replace: "import { isTraversableNode } from '../utils';",
     },
@@ -477,9 +477,9 @@ const GATES = [
     // import out of one, and nothing checked that the symbol existed: the first
     // run found 13 dead references across four packages.
     mutation: {
-      file: 'packages/core/README.md',
+      file: 'packages/kernel/README.md',
       append:
-        "\n```ts\nimport { thisSymbolDoesNotExist } from '@signaltree/core';\n```\n",
+        "\n```ts\nimport { thisSymbolDoesNotExist } from '@signal-tree/kernel';\n```\n",
     },
   },
   {
@@ -503,9 +503,33 @@ const GATES = [
     // grew back.
     cmd: ['node', 'tools/find-dead-exports.mjs', '--max=0'],
     mutation: {
-      file: 'packages/core/src/lib/utils.ts',
+      file: 'packages/kernel/src/lib/utils.ts',
       append: '\nexport const __gateUnreachableExport = 1;\n',
     },
+  },
+  {
+    name: 'angular-coupling-budget',
+    covers:
+      'Angular RUNTIME coupling (value-position use) never grows — the C6 ratchet',
+    // Zero is the eventual target and is deliberately NOT asserted yet: core IS
+    // the Angular adapter for this release, so a zero assertion would be a
+    // permanently red gate, and a normally-red gate teaches people to ignore it.
+    // The ratchet is honest today and tightens as C6 lands.
+    cmd: ['node', 'tools/check-angular-coupling-budget.mjs'],
+    mutation: {
+      file: 'packages/kernel/src/lib/internals/tracking-suppression.ts',
+      append: "\nimport { untracked } from '@angular/core';\nexport const __gateCoupling = () => untracked(() => 1);\n",
+    },
+  },
+  {
+    name: 'c6-neutrality-invariants',
+    covers:
+      'an ordinary Angular leaf stays the framework cell itself — no wrapper, no second reactive graph, no per-read allocation',
+    // The DETERMINISTIC half of the C6 performance requirement. Wall-clock lives
+    // in tools/bench-c6-baseline.mjs, which records and does not gate, because
+    // timings move with the machine and these facts do not.
+    cmd: ['npx', 'vitest', 'run', '--root', 'packages/kernel',
+          'src/lib/c6-neutrality-invariants.spec.ts'],
   },
   {
     name: 'numeric-claims',
@@ -556,7 +580,7 @@ const GATES = [
     // substitutes only the FIRST match and would leave the symbol still present.
     // Re-check this target whenever the base tag moves: `--list` prints the delta.
     mutation: {
-      file: 'packages/core/README.md',
+      file: 'packages/kernel/README.md',
       find: 'asMap',
       replace: '__gateRemovedFromPriming',
     },
@@ -589,7 +613,7 @@ const GATES = [
     // two reachability checks: dead-exports asks whether anything IMPORTS a
     // symbol, this asks whether anything SHOWS it to a person.
     mutation: {
-      file: 'dist/packages/core/dist/index.js',
+      file: 'dist/packages/kernel/dist/index.js',
       append: '\nexport const __gateUndemoedExport = 1;\n',
     },
   },
@@ -972,7 +996,7 @@ const GATES = [
     // which is the failure mode that matters for a REPORTER: a size table built
     // from nothing looks like a very good result.
     mutation: {
-      file: 'dist/packages/core/dist/index.js',
+      file: 'dist/packages/kernel/dist/index.js',
       generate: () => '',
     },
   },
@@ -1000,7 +1024,7 @@ const GATES = [
     //      the mechanism under test is "an unknown option in a spec's entityMap
     //      config is a type error", which never depended on that option existing.
     mutation: {
-      file: 'packages/core/src/enhancers/restoration/turn-effect-composition.spec.ts',
+      file: 'packages/kernel/src/enhancers/restoration/turn-effect-composition.spec.ts',
       find: '    { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },',
       replace:
         '    { rows: entityMap<Row, string>({ selectId: (r) => r.id, bogusOption: 1 }) },',
@@ -1018,7 +1042,7 @@ const GATES = [
       'vitest',
       'run',
       '--root',
-      'packages/core',
+      'packages/kernel',
       '--config',
       'vitest.retention.config.ts',
     ],
@@ -1031,7 +1055,7 @@ const GATES = [
     cmd: ['node', 'tools/check-documented-imports.mjs'],
     // Earned by RELEASE-RESIDUE-0: the shipped core README taught
     // `@signaltree/ng-forms` (deleted in 41373050) and
-    // `@signaltree/core/enhancers/batching` (never an export), while the root
+    // `@signal-tree/kernel/enhancers/batching` (never an export), while the root
     // README taught three subpaths that resolve to nothing. lint-readme-apis
     // could not see any of it — a specifier for a path that is not an entry
     // point is checked against nothing.
@@ -1170,7 +1194,7 @@ const GATES = [
     covers:
       'the BUILT manifests are installable off this machine — no workspace/file/link protocols, internal ranges admit the versions shipping beside them',
     // Found by the 15.0 release rehearsal, not by any existing check. Every
-    // internal dependency was `"@signaltree/core": "workspace:*"`, and whether
+    // internal dependency was `"@signal-tree/kernel": "workspace:*"`, and whether
     // that reached the registry depended on which command was run:
     // `npm pack` from dist ships it SILENTLY, `pnpm pack` from dist refuses,
     // and `nx release version` rewrites only `version`. A manifest defect fails
@@ -1209,7 +1233,7 @@ const GATES = [
     // ships light. Removing a real entry's source must fail here, because
     // nothing downstream will notice.
     mutation: {
-      file: 'dist/packages/core/package.json',
+      file: 'dist/packages/kernel/package.json',
       find: '"files": [',
       replace: '"files": [\n    "this-entry-matches-nothing/**/*",',
     },
@@ -1244,7 +1268,7 @@ const GATES = [
     //   left the gate "proven" by a check of the compiler, not of the budget.
     //   The cast is what makes the proof mean what it says.
     mutation: {
-      file: 'packages/core/src/lib/utils.ts',
+      file: 'packages/kernel/src/lib/utils.ts',
       generate: (original) => {
         const parts = [];
         for (let i = 0; i < 900; i++) {

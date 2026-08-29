@@ -181,4 +181,4 @@ None at this time. All v4.2.1 regressions resolved in v5.0.
 
 ---
 
-For questions or feedback, open an issue on [GitHub](https://github.com/JBorgia/signaltree).
+For questions or feedback, open an issue on [GitHub](https://github.com/JBorgia/signal-tree).

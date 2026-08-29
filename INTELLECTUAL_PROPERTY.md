@@ -85,7 +85,7 @@ state otherwise explicitly.
 ## Contact
 
 Questions about attribution, trademark use, or this document:
-<https://github.com/JBorgia/signaltree/issues>
+<https://github.com/JBorgia/signal-tree/issues>
 
 ---
 

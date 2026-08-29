@@ -23,6 +23,12 @@ tree.$.user({ name: 'Bob' }); // ✅ still a deep partial merge
 tree({ user: { name: 'Bob' } }); // ✅ still works
 ```
 
+> ⚠️ **True for 14.0, CHANGED in 15.0.** This guide documents the 13 → 14 step and
+> the statement above was accurate then. In 15.0 the value form takes a whole `T`
+> rather than a `Partial<T>` — see
+> [`migration-v14-v15.md`](migration-v14-v15.md). Patch with the updater form:
+> `tree.$.user(current => ({ ...current, name: 'Bob' }))`.
+
 **Why it is a removal rather than a deprecation.** A leaf _is_ a real Angular
 signal, and calling a signal is a READ that discards its argument. Measured:
 `tree.$.count(5)` on a leaf holding `0` returned `0` and left it at `0`. The

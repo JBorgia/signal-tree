@@ -1,0 +1,6190 @@
+[
+  {
+    "file": "lib/physical/entity-value-store.ts",
+    "fn": "backingForSubject",
+    "name": "subjectId",
+    "line": 6,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/entity-value-store.ts",
+    "fn": "backingForSubject",
+    "name": "subjectId",
+    "line": 7,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-value-store.ts",
+    "fn": "retainSubjectValue",
+    "name": "subjectId",
+    "line": 10,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/entity-value-store.ts",
+    "fn": "retainSubjectValue",
+    "name": "subjectId",
+    "line": 12,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-value-store.ts",
+    "fn": "hasRetainedValueBacking",
+    "name": "subjectId",
+    "line": 15,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/entity-value-store.ts",
+    "fn": "hasRetainedValueBacking",
+    "name": "subjectId",
+    "line": 16,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-value-store.ts",
+    "fn": "retireSubjectValue",
+    "name": "subjectId",
+    "line": 19,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/entity-value-store.ts",
+    "fn": "retireSubjectValue",
+    "name": "subjectId",
+    "line": 20,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "(top)",
+    "name": "subjectIds",
+    "line": 49,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "(top)",
+    "name": "nextSubjectId",
+    "line": 54,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "planFreshSubjectIds",
+    "name": "planFreshSubjectIds",
+    "line": 60,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "planFreshSubjectIds",
+    "name": "nextSubjectId",
+    "line": 61,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "allocateFreshSubjectId",
+    "name": "allocateFreshSubjectId",
+    "line": 64,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "allocateFreshSubjectId",
+    "name": "subjectId",
+    "line": 65,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "allocateFreshSubjectId",
+    "name": "nextSubjectId",
+    "line": 65,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "allocateFreshSubjectId",
+    "name": "nextSubjectId",
+    "line": 66,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "allocateFreshSubjectId",
+    "name": "subjectId",
+    "line": 67,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "subjectIdForKey",
+    "name": "subjectIdForKey",
+    "line": 70,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "subjectIdForKey",
+    "name": "subjectIds",
+    "line": 71,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "acquireSubjectHandleForKey",
+    "name": "subjectId",
+    "line": 75,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "acquireSubjectHandleForKey",
+    "name": "subjectIds",
+    "line": 75,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "acquireSubjectHandleForKey",
+    "name": "subjectId",
+    "line": 76,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "acquireSubjectHandleForKey",
+    "name": "subjectId",
+    "line": 79,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "acquireSubjectHandleForKey",
+    "name": "subjectId",
+    "line": 80,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 89,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 89,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 94,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 99,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 99,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 107,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 113,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 113,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 115,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 121,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 121,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectHandle",
+    "name": "subjectId",
+    "line": 123,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "stateForSubject",
+    "name": "subjectId",
+    "line": 127,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "stateForSubject",
+    "name": "subjectId",
+    "line": 128,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "hasSubject",
+    "name": "subjectId",
+    "line": 131,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "hasSubject",
+    "name": "subjectId",
+    "line": 132,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "subjectRevision",
+    "name": "subjectId",
+    "line": 135,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "subjectRevision",
+    "name": "subjectId",
+    "line": 136,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "bumpSubjectRevision",
+    "name": "subjectId",
+    "line": 139,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "bumpSubjectRevision",
+    "name": "subjectId",
+    "line": 140,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "bumpSubjectRevision",
+    "name": "subjectId",
+    "line": 140,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "activeKeyForSubject",
+    "name": "subjectId",
+    "line": 143,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "activeKeyForSubject",
+    "name": "subjectId",
+    "line": 144,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "hasActiveKey",
+    "name": "subjectIds",
+    "line": 149,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreIndexForSubjects",
+    "name": "beforeSubject",
+    "line": 210,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreIndexForSubjects",
+    "name": "afterSubject",
+    "line": 211,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreIndexForSubjects",
+    "name": "beforeSubject",
+    "line": 214,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreIndexForSubjects",
+    "name": "beforeSubject",
+    "line": 216,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreIndexForSubjects",
+    "name": "afterSubject",
+    "line": 218,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreIndexForSubjects",
+    "name": "afterSubject",
+    "line": 220,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "neighborSubjectsForKey",
+    "name": "beforeSubject",
+    "line": 250,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "neighborSubjectsForKey",
+    "name": "subjectId",
+    "line": 250,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "neighborSubjectsForKey",
+    "name": "afterSubject",
+    "line": 251,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "neighborSubjectsForKey",
+    "name": "subjectId",
+    "line": 251,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "tombstonedSubjectsSnapshot",
+    "name": "subjectId",
+    "line": 258,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "tombstonedSubjectsSnapshot",
+    "name": "subjectId",
+    "line": 258,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createSubject",
+    "name": "createSubject",
+    "line": 262,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createSubject",
+    "name": "subjectId",
+    "line": 262,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createSubject",
+    "name": "nextSubjectId",
+    "line": 264,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createSubject",
+    "name": "nextSubjectId",
+    "line": 264,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createSubject",
+    "name": "subjectId",
+    "line": 264,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createSubject",
+    "name": "activateSubject",
+    "line": 265,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createSubject",
+    "name": "subjectId",
+    "line": 265,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createSubject",
+    "name": "subjectId",
+    "line": 266,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createSubject",
+    "name": "subjectId",
+    "line": 267,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "transferSubject",
+    "name": "transferSubject",
+    "line": 270,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "transferSubject",
+    "name": "subjectId",
+    "line": 270,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "transferSubject",
+    "name": "subjectIds",
+    "line": 273,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "transferSubject",
+    "name": "activateSubject",
+    "line": 274,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "transferSubject",
+    "name": "subjectId",
+    "line": 274,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "transferSubject",
+    "name": "subjectId",
+    "line": 277,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "transferSubject",
+    "name": "subjectId",
+    "line": 284,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "tombstoneSubject",
+    "name": "tombstoneSubject",
+    "line": 287,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "tombstoneSubject",
+    "name": "subjectId",
+    "line": 287,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "tombstoneSubject",
+    "name": "subjectIds",
+    "line": 289,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "tombstoneSubject",
+    "name": "subjectId",
+    "line": 298,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubject",
+    "name": "subjectId",
+    "line": 305,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubject",
+    "name": "beforeSubject",
+    "line": 307,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubject",
+    "name": "afterSubject",
+    "line": 308,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubject",
+    "name": "beforeSubject",
+    "line": 312,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubject",
+    "name": "afterSubject",
+    "line": 313,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubject",
+    "name": "subjectId",
+    "line": 316,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "beforeSubject",
+    "line": 324,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "afterSubject",
+    "line": 325,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "beforeSubject",
+    "line": 328,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "beforeSubject",
+    "line": 330,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "afterSubject",
+    "line": 332,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "afterSubject",
+    "line": 334,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "beforeSubject",
+    "line": 339,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "subjectId",
+    "line": 339,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "afterSubject",
+    "line": 340,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "subjectId",
+    "line": 340,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "beforeSubject",
+    "line": 347,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "subjectId",
+    "line": 347,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "afterSubject",
+    "line": 348,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "subjectId",
+    "line": 348,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "beforeSubject",
+    "line": 356,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "subjectId",
+    "line": 356,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "afterSubject",
+    "line": 357,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "subjectId",
+    "line": 357,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "beforeSubject",
+    "line": 365,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "subjectId",
+    "line": 365,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "afterSubject",
+    "line": 366,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "subjectId",
+    "line": 366,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "beforeSubject",
+    "line": 373,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "resolveSubjectRestorePlacement",
+    "name": "subjectId",
+    "line": 373,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubjectAtResolvedPlacement",
+    "name": "subjectId",
+    "line": 379,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubjectAtResolvedPlacement",
+    "name": "activateSubject",
+    "line": 384,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubjectAtResolvedPlacement",
+    "name": "subjectId",
+    "line": 384,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubjectAtResolvedPlacement",
+    "name": "subjectId",
+    "line": 388,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubjectAtResolvedPlacement",
+    "name": "subjectId",
+    "line": 394,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubjectAtResolvedPlacement",
+    "name": "beforeSubject",
+    "line": 398,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubjectAtResolvedPlacement",
+    "name": "beforeSubject",
+    "line": 400,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubjectAtResolvedPlacement",
+    "name": "afterSubject",
+    "line": 402,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "restoreSubjectAtResolvedPlacement",
+    "name": "afterSubject",
+    "line": 404,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "retireSubject",
+    "name": "retireSubject",
+    "line": 419,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "retireSubject",
+    "name": "subjectId",
+    "line": 419,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "retireSubject",
+    "name": "subjectId",
+    "line": 420,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "forgetSubject",
+    "name": "forgetSubject",
+    "line": 448,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "forgetSubject",
+    "name": "subjectId",
+    "line": 448,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "forgetSubject",
+    "name": "subjectId",
+    "line": 449,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "forgetSubject",
+    "name": "subjectId",
+    "line": 450,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "forgetSubject",
+    "name": "subjectId",
+    "line": 451,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "clear",
+    "name": "subjectIds",
+    "line": 455,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "clear",
+    "name": "nextSubjectId",
+    "line": 463,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "__assertActiveOrderIntegrityForTesting",
+    "name": "subjectId",
+    "line": 495,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "__assertActiveOrderIntegrityForTesting",
+    "name": "subjectId",
+    "line": 496,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "__assertActiveOrderIntegrityForTesting",
+    "name": "subjectId",
+    "line": 503,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "__assertActiveOrderIntegrityForTesting",
+    "name": "subjectId",
+    "line": 504,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "__assertActiveOrderIntegrityForTesting",
+    "name": "subjectIds",
+    "line": 507,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "__assertActiveOrderIntegrityForTesting",
+    "name": "subjectId",
+    "line": 507,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "__assertActiveOrderIntegrityForTesting",
+    "name": "subjectId",
+    "line": 511,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "__assertActiveOrderIntegrityForTesting",
+    "name": "subjectId",
+    "line": 513,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "__assertActiveOrderIntegrityForTesting",
+    "name": "subjectId",
+    "line": 517,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createAndAppendActiveNode",
+    "name": "subjectId",
+    "line": 540,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createAndAppendActiveNode",
+    "name": "subjectId",
+    "line": 543,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "createAndAppendActiveNode",
+    "name": "subjectId",
+    "line": 549,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "unregisterActiveNode",
+    "name": "subjectId",
+    "line": 556,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "activateSubject",
+    "name": "activateSubject",
+    "line": 646,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "activateSubject",
+    "name": "subjectId",
+    "line": 646,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "activateSubject",
+    "name": "subjectIds",
+    "line": 647,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "activateSubject",
+    "name": "subjectId",
+    "line": 647,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/structural-store.ts",
+    "fn": "activateSubject",
+    "name": "subjectId",
+    "line": 648,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "createSubject",
+    "line": 148,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 148,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 150,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 153,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 159,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 166,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 171,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 177,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 185,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "forgetSubject",
+    "line": 188,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 188,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "retireSubject",
+    "line": 190,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 190,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 193,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "transferSubject",
+    "line": 199,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 200,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 204,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "tombstoneSubject",
+    "line": 208,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 209,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 213,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "prepareCommitInstructions",
+    "name": "subjectId",
+    "line": 232,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "prepareCommitInstructions",
+    "name": "beforeSubject",
+    "line": 234,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-mutation-frame.ts",
+    "fn": "prepareCommitInstructions",
+    "name": "afterSubject",
+    "line": 235,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-handle-resolution.ts",
+    "fn": "resolveEntityHandle",
+    "name": "subjectId",
+    "line": 37,
+    "role": "READ"
+  },
+  {
+    "file": "lib/physical/entity-handle-resolution.ts",
+    "fn": "resolveEntityHandle",
+    "name": "subjectId",
+    "line": 41,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/physical/entity-handle-resolution.ts",
+    "fn": "resolveEntityHandle",
+    "name": "subjectId",
+    "line": 41,
+    "role": "READ"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "notify",
+    "name": "subjectIds",
+    "line": 183,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "notify",
+    "name": "subjectIds",
+    "line": 221,
+    "role": "READ"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "notify",
+    "name": "subjectId",
+    "line": 234,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "notify",
+    "name": "subjectIds",
+    "line": 234,
+    "role": "READ"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "notify",
+    "name": "subjectIds",
+    "line": 237,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "_runNotify",
+    "name": "subjectIds",
+    "line": 261,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "_runNotify",
+    "name": "subjectIds",
+    "line": 293,
+    "role": "READ"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "flush",
+    "name": "subjectIds",
+    "line": 340,
+    "role": "READ"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "hasSameSemanticIdentity",
+    "name": "subjectId",
+    "line": 498,
+    "role": "READ"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "hasSameSemanticIdentity",
+    "name": "subjectId",
+    "line": 498,
+    "role": "READ"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "coalesceEntry",
+    "name": "subjectId",
+    "line": 548,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "coalesceEntry",
+    "name": "subjectId",
+    "line": 548,
+    "role": "READ"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "coalesceEntry",
+    "name": "subjectIds",
+    "line": 550,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "coalesceEntry",
+    "name": "subjectIds",
+    "line": 550,
+    "role": "READ"
+  },
+  {
+    "file": "lib/path-notifier.ts",
+    "fn": "getCompositeBatchKey",
+    "name": "subjectIds",
+    "line": 592,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/path-observation-port.ts",
+    "fn": "notify",
+    "name": "subjectIds",
+    "line": 122,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/path-observation-port.ts",
+    "fn": "notify",
+    "name": "subjectIds",
+    "line": 128,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planEntitySubjectReclamation",
+    "name": "subjectId",
+    "line": 177,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planEntitySubjectReclamation",
+    "name": "subjectId",
+    "line": 177,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planEntitySubjectReclamation",
+    "name": "subjectId",
+    "line": 187,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planEntitySubjectReclamation",
+    "name": "subjectId",
+    "line": 187,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planEntitySubjectReclamation",
+    "name": "subjectId",
+    "line": 213,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planEntitySubjectReclamation",
+    "name": "subjectId",
+    "line": 213,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getProjectedEntity",
+    "name": "subjectId",
+    "line": 324,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getProjectedEntity",
+    "name": "subjectIdForKey",
+    "line": 324,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getProjectedEntity",
+    "name": "subjectId",
+    "line": 325,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getProjectedEntity",
+    "name": "subjectId",
+    "line": 327,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntitySignal",
+    "name": "lastSubjectIds",
+    "line": 432,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRekey",
+    "name": "subjectId",
+    "line": 570,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRekey",
+    "name": "allocateSubjectId",
+    "line": 570,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRekey",
+    "name": "subjectId",
+    "line": 573,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 584,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 592,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "publish",
+    "name": "subjectId",
+    "line": 608,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planPreparedRekey",
+    "name": "subjectId",
+    "line": 622,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planPreparedRekey",
+    "name": "subjectId",
+    "line": 641,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 652,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 660,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "publish",
+    "name": "subjectId",
+    "line": 676,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "resolveSubjectId",
+    "name": "resolveSubjectId",
+    "line": 704,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "resolveSubjectId",
+    "name": "subjectIdForKey",
+    "line": 705,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "resolveSubjectState",
+    "name": "subjectId",
+    "line": 709,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "resolveSubjectState",
+    "name": "subjectId",
+    "line": 711,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getSubjectRevision",
+    "name": "subjectId",
+    "line": 714,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getSubjectRevision",
+    "name": "subjectId",
+    "line": 715,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "bumpSubjectRevision",
+    "name": "subjectId",
+    "line": 718,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "bumpSubjectRevision",
+    "name": "subjectId",
+    "line": 719,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getEntitySignal",
+    "name": "subjectId",
+    "line": 724,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getEntitySignal",
+    "name": "resolveSubjectId",
+    "line": 724,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getEntitySignal",
+    "name": "subjectId",
+    "line": 725,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getEntitySignal",
+    "name": "subjectId",
+    "line": 729,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getEntitySignal",
+    "name": "subjectId",
+    "line": 731,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getEntitySignal",
+    "name": "subjectId",
+    "line": 732,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getSubjectStateSignal",
+    "name": "subjectId",
+    "line": 737,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getSubjectStateSignal",
+    "name": "subjectId",
+    "line": 738,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getSubjectStateSignal",
+    "name": "subjectId",
+    "line": 741,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "bumpSubjectStateSignal",
+    "name": "subjectId",
+    "line": 746,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "bumpSubjectStateSignal",
+    "name": "subjectId",
+    "line": 750,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "publishSubjectPhysicalChange",
+    "name": "subjectId",
+    "line": 753,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "publishSubjectPhysicalChange",
+    "name": "subjectId",
+    "line": 754,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "publishSubjectPhysicalChange",
+    "name": "subjectId",
+    "line": 755,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "allocateSubjectId",
+    "name": "allocateSubjectId",
+    "line": 758,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "allocateSubjectId",
+    "name": "subjectIdForKey",
+    "line": 759,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commitFreshSubject",
+    "name": "subjectId",
+    "line": 768,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commitFreshSubject",
+    "name": "allocateFreshSubjectId",
+    "line": 768,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commitFreshSubject",
+    "name": "createSubject",
+    "line": 769,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commitFreshSubject",
+    "name": "subjectId",
+    "line": 769,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commitFreshSubject",
+    "name": "subjectId",
+    "line": 770,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "rememberSubjectIds",
+    "name": "rememberSubjectIds",
+    "line": 777,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "rememberSubjectIds",
+    "name": "allocateSubjectId",
+    "line": 778,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "rememberSubjectIds",
+    "name": "lastSubjectIds",
+    "line": 779,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "findKeyBySubjectId",
+    "name": "subjectId",
+    "line": 783,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "findKeyBySubjectId",
+    "name": "subjectId",
+    "line": 784,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "restoreOne",
+    "name": "subjectId",
+    "line": 797,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "restoreOne",
+    "name": "beforeSubject",
+    "line": 798,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "restoreOne",
+    "name": "afterSubject",
+    "line": 799,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "restoreOne",
+    "name": "subjectId",
+    "line": 804,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "restoreOne",
+    "name": "beforeSubject",
+    "line": 805,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "restoreOne",
+    "name": "afterSubject",
+    "line": 806,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRestore",
+    "name": "subjectId",
+    "line": 815,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRestore",
+    "name": "beforeSubject",
+    "line": 816,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRestore",
+    "name": "afterSubject",
+    "line": 817,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRestore",
+    "name": "subjectId",
+    "line": 839,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRestore",
+    "name": "subjectId",
+    "line": 842,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRestore",
+    "name": "subjectId",
+    "line": 849,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRestore",
+    "name": "beforeSubject",
+    "line": 851,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRestore",
+    "name": "afterSubject",
+    "line": 852,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "lastSubjectIds",
+    "line": 864,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 864,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "publish",
+    "name": "subjectId",
+    "line": 874,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planFreshAdd",
+    "name": "subjectId",
+    "line": 885,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planFreshAdd",
+    "name": "subjectId",
+    "line": 890,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planFreshAdd",
+    "name": "subjectId",
+    "line": 893,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 903,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "lastSubjectIds",
+    "line": 907,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 907,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "publish",
+    "name": "subjectId",
+    "line": 918,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRemove",
+    "name": "subjectId",
+    "line": 928,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRemove",
+    "name": "beforeSubject",
+    "line": 938,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRemove",
+    "name": "afterSubject",
+    "line": 938,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRemove",
+    "name": "subjectId",
+    "line": 941,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRemove",
+    "name": "beforeSubject",
+    "line": 944,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRemove",
+    "name": "afterSubject",
+    "line": 945,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRemove",
+    "name": "subjectId",
+    "line": 947,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "planRemove",
+    "name": "subjectId",
+    "line": 951,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "lastSubjectIds",
+    "line": 963,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 963,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 964,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "publish",
+    "name": "subjectId",
+    "line": 973,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "rewritePendingAddEffect",
+    "name": "beforeSubject",
+    "line": 990,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "rewritePendingAddEffect",
+    "name": "afterSubject",
+    "line": 991,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "rewritePendingAddEffect",
+    "name": "beforeSubject",
+    "line": 993,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "rewritePendingAddEffect",
+    "name": "beforeSubject",
+    "line": 993,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "rewritePendingAddEffect",
+    "name": "afterSubject",
+    "line": 994,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "rewritePendingAddEffect",
+    "name": "afterSubject",
+    "line": 994,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "subjectId",
+    "line": 1088,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "planFreshSubjectIds",
+    "line": 1088,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "subjectId",
+    "line": 1089,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "subjectId",
+    "line": 1097,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "subjectId",
+    "line": 1104,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "beforeSubject",
+    "line": 1107,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "allocateSubjectId",
+    "line": 1108,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "lastSubjectIds",
+    "line": 1110,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "subjectId",
+    "line": 1110,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addOneWithStructuralEffect",
+    "name": "subjectId",
+    "line": 1120,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "syncEntitySignal",
+    "name": "subjectId",
+    "line": 1138,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "syncEntitySignal",
+    "name": "resolveSubjectId",
+    "line": 1138,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "syncEntitySignal",
+    "name": "subjectId",
+    "line": 1139,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "syncEntitySignal",
+    "name": "subjectId",
+    "line": 1143,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "syncEntitySignal",
+    "name": "subjectId",
+    "line": 1144,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "tombstoneSubjectSignal",
+    "name": "subjectId",
+    "line": 1153,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "tombstoneSubjectSignal",
+    "name": "subjectId",
+    "line": 1154,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntitySignal",
+    "name": "subjectId",
+    "line": 1195,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntitySignal",
+    "name": "subjectId",
+    "line": 1198,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntitySignal",
+    "name": "subjectId",
+    "line": 1199,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "invalidateNodeCache",
+    "name": "subjectId",
+    "line": 1205,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "invalidateNodeCache",
+    "name": "resolveSubjectId",
+    "line": 1205,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "invalidateNodeCache",
+    "name": "subjectId",
+    "line": 1206,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "invalidateNodeCache",
+    "name": "subjectId",
+    "line": 1207,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntityNode",
+    "name": "subjectId",
+    "line": 1265,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntityNode",
+    "name": "subjectId",
+    "line": 1304,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntityNode",
+    "name": "subjectId",
+    "line": 1304,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "currentKey",
+    "name": "subjectId",
+    "line": 1311,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntityNode",
+    "name": "subjectId",
+    "line": 1327,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "set",
+    "name": "subjectId",
+    "line": 1353,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "update",
+    "name": "subjectId",
+    "line": 1362,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "get",
+    "name": "subjectId",
+    "line": 1383,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getOrCreateNode",
+    "name": "subjectId",
+    "line": 1407,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getOrCreateNode",
+    "name": "resolveSubjectId",
+    "line": 1407,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getOrCreateNode",
+    "name": "subjectId",
+    "line": 1408,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getOrCreateNode",
+    "name": "subjectId",
+    "line": 1412,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getOrCreateNode",
+    "name": "subjectId",
+    "line": 1414,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getOrCreateNode",
+    "name": "subjectId",
+    "line": 1415,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "getOrCreateNode",
+    "name": "subjectId",
+    "line": 1416,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "inspectSubjectResources",
+    "name": "subjectId",
+    "line": 1422,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "inspectSubjectResources",
+    "name": "subjectId",
+    "line": 1424,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "inspectSubjectResources",
+    "name": "subjectId",
+    "line": 1429,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "inspectSubjectResources",
+    "name": "subjectId",
+    "line": 1438,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "inspectSubjectResources",
+    "name": "subjectId",
+    "line": 1440,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "inspectSubjectResources",
+    "name": "subjectId",
+    "line": 1442,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "inspectSubjectResources",
+    "name": "subjectId",
+    "line": 1443,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "inspectSubjectResources",
+    "name": "subjectId",
+    "line": 1444,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "inspectSubjectResources",
+    "name": "subjectId",
+    "line": 1448,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "listSubjectReclamationCandidates",
+    "name": "subjectId",
+    "line": 1457,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "listSubjectReclamationCandidates",
+    "name": "subjectId",
+    "line": 1457,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "prepareSubjectReclamation",
+    "name": "subjectId",
+    "line": 1461,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "prepareSubjectReclamation",
+    "name": "subjectId",
+    "line": 1464,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "prepareSubjectReclamation",
+    "name": "subjectId",
+    "line": 1475,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1486,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1489,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1494,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1497,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1499,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1504,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1519,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1519,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1523,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "applyPreparedSubjectReclamation",
+    "name": "subjectId",
+    "line": 1528,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "reclaimRetiredSubjectsWithoutOwner",
+    "name": "subjectIds",
+    "line": 1607,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "reclaimRetiredSubjectsWithoutOwner",
+    "name": "subjectIds",
+    "line": 1609,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "reclaimRetiredSubjectsWithoutOwner",
+    "name": "subjectId",
+    "line": 1615,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "reclaimRetiredSubjectsWithoutOwner",
+    "name": "subjectIds",
+    "line": 1615,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "reclaimRetiredSubjectsWithoutOwner",
+    "name": "subjectId",
+    "line": 1616,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "reclaimRetiredSubjectsWithoutOwner",
+    "name": "subjectId",
+    "line": 1622,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "reclaimRetiredSubjectsWithoutOwner",
+    "name": "subjectId",
+    "line": 1627,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "reclaimRetiredSubjectsWithoutOwner",
+    "name": "subjectId",
+    "line": 1631,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "retireSubjectRetainedValueBackingForTesting",
+    "name": "subjectId",
+    "line": 1653,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "retireSubjectRetainedValueBackingForTesting",
+    "name": "subjectId",
+    "line": 1654,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "retireSubjectRetainedValueBackingForTesting",
+    "name": "subjectId",
+    "line": 1657,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "retireSubjectRetainedValueBackingForTesting",
+    "name": "subjectId",
+    "line": 1661,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "retireSubjectRetainedValueBackingForTesting",
+    "name": "subjectId",
+    "line": 1662,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "prependOne",
+    "name": "allocateSubjectId",
+    "line": 1895,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectIdForKey",
+    "line": 1939,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "planFreshSubjectIds",
+    "line": 1960,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 1968,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 1977,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 1983,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 1992,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectIdsByKey",
+    "line": 1998,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 1999,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectIdsByKey",
+    "line": 2000,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 2000,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 2011,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectIdsByKey",
+    "line": 2011,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 2012,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 2018,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectIdsForWrite",
+    "line": 2024,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 2025,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectIdsByKey",
+    "line": 2025,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 2026,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectId",
+    "line": 2029,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "lastSubjectIds",
+    "line": 2031,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectIdsForWrite",
+    "line": 2031,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectIdsForWrite",
+    "line": 2042,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "subjectIdsForWrite",
+    "line": 2046,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "beforeSubject",
+    "line": 2049,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "addMany",
+    "name": "allocateSubjectId",
+    "line": 2050,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateOne",
+    "name": "subjectIdsForWrite",
+    "line": 2099,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateOne",
+    "name": "rememberSubjectIds",
+    "line": 2099,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateOne",
+    "name": "subjectId",
+    "line": 2103,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateOne",
+    "name": "subjectIdsForWrite",
+    "line": 2103,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateOne",
+    "name": "subjectIdsForWrite",
+    "line": 2118,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "replaceOne",
+    "name": "subjectId",
+    "line": 2168,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "replaceOne",
+    "name": "subjectIdForKey",
+    "line": 2168,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "replaceOne",
+    "name": "subjectId",
+    "line": 2169,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "replaceOne",
+    "name": "subjectId",
+    "line": 2176,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "replaceOne",
+    "name": "subjectId",
+    "line": 2200,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateMany",
+    "name": "subjectId",
+    "line": 2250,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateMany",
+    "name": "subjectIdForKey",
+    "line": 2250,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateMany",
+    "name": "subjectId",
+    "line": 2251,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateMany",
+    "name": "subjectId",
+    "line": 2257,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateMany",
+    "name": "subjectId",
+    "line": 2265,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateMany",
+    "name": "subjectId",
+    "line": 2269,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateMany",
+    "name": "subjectIdsForWrite",
+    "line": 2282,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateMany",
+    "name": "rememberSubjectIds",
+    "line": 2282,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "updateMany",
+    "name": "subjectIdsForWrite",
+    "line": 2292,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "beforeSubject",
+    "line": 2331,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "afterSubject",
+    "line": 2331,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "subjectIdsForWrite",
+    "line": 2354,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "rememberSubjectIds",
+    "line": 2354,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "subjectIdsForWrite",
+    "line": 2357,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "beforeSubject",
+    "line": 2360,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "afterSubject",
+    "line": 2361,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "subjectIdsForWrite",
+    "line": 2363,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "subjectId",
+    "line": 2367,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "subjectIdsForWrite",
+    "line": 2367,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "subjectIdsForWrite",
+    "line": 2376,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "subjectIdsForWrite",
+    "line": 2377,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeOne",
+    "name": "subjectIdsForWrite",
+    "line": 2386,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2413,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "resolveSubjectId",
+    "line": 2413,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2414,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "beforeSubject",
+    "line": 2417,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "afterSubject",
+    "line": 2417,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2442,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "beforeSubject",
+    "line": 2443,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "afterSubject",
+    "line": 2444,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectIdsForWrite",
+    "line": 2448,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2448,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2448,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "lastSubjectIds",
+    "line": 2449,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectIdsForWrite",
+    "line": 2449,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2453,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2454,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2458,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2468,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2469,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2472,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectId",
+    "line": 2472,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "beforeSubject",
+    "line": 2483,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "afterSubject",
+    "line": 2484,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectIdsForWrite",
+    "line": 2491,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "subjectIdsForWrite",
+    "line": 2495,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "beforeSubject",
+    "line": 2498,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "removeMany",
+    "name": "afterSubject",
+    "line": 2499,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2550,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "resolveSubjectId",
+    "line": 2550,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2551,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2554,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2565,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2569,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2585,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2586,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2589,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2592,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2604,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2609,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2611,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2617,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2617,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2618,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "subjectId",
+    "line": 2618,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "upsertMany",
+    "name": "lastSubjectIds",
+    "line": 2619,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2683,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "resolveSubjectId",
+    "line": 2683,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2684,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "beforeSubject",
+    "line": 2688,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "afterSubject",
+    "line": 2688,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2689,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "beforeSubject",
+    "line": 2689,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "afterSubject",
+    "line": 2689,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2692,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2693,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "tombstoneSubject",
+    "line": 2694,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2695,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2699,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2707,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2708,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2711,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2711,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "lastSubjectIds",
+    "line": 2714,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2714,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2714,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2719,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "beforeSubject",
+    "line": 2721,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "afterSubject",
+    "line": 2722,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2730,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "subjectId",
+    "line": 2734,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "beforeSubject",
+    "line": 2737,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "clear",
+    "name": "afterSubject",
+    "line": 2738,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2812,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "resolveSubjectId",
+    "line": 2812,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2813,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2819,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2832,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "resolveSubjectId",
+    "line": 2832,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2833,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2841,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2868,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "beforeSubject",
+    "line": 2872,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "afterSubject",
+    "line": 2873,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "beforeSubject",
+    "line": 2878,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "resolveSubjectId",
+    "line": 2878,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "afterSubject",
+    "line": 2890,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "resolveSubjectId",
+    "line": 2890,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2897,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "beforeSubject",
+    "line": 2900,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "afterSubject",
+    "line": 2901,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2906,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2907,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2908,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "tombstoneSubject",
+    "line": 2909,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2910,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2914,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2917,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2917,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2920,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2921,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2925,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2926,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2929,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2931,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "lastSubjectIds",
+    "line": 2940,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2941,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2941,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2942,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2942,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2947,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "beforeSubject",
+    "line": 2949,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "afterSubject",
+    "line": 2950,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "beforeSubject",
+    "line": 2957,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "resolveSubjectId",
+    "line": 2957,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "beforeSubject",
+    "line": 2958,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "afterSubject",
+    "line": 2972,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "resolveSubjectId",
+    "line": 2972,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "afterSubject",
+    "line": 2973,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2980,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "beforeSubject",
+    "line": 2983,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "afterSubject",
+    "line": 2984,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2991,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 2998,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 3004,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 3010,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "setAll",
+    "name": "subjectId",
+    "line": 3010,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "get",
+    "name": "lastSubjectIds",
+    "line": 3075,
+    "role": "READ"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntitySignal",
+    "name": "subjectId",
+    "line": 3102,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntitySignal",
+    "name": "subjectIdForKey",
+    "line": 3102,
+    "role": "ALLOCATE_OR_OP"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntitySignal",
+    "name": "subjectId",
+    "line": 3103,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "createEntitySignal",
+    "name": "subjectId",
+    "line": 3106,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "value",
+    "name": "subjectId",
+    "line": 3177,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/entity-signal.ts",
+    "fn": "value",
+    "name": "subjectId",
+    "line": 3180,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/owned-metadata.ts",
+    "fn": "getOwnedSubjectIds",
+    "name": "__subjectIds",
+    "line": 48,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/source-mutation.ts",
+    "fn": "reload",
+    "name": "subjectId",
+    "line": 120,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/source-mutation.ts",
+    "fn": "reload",
+    "name": "subjectId",
+    "line": 121,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/source-mutation.ts",
+    "fn": "observe",
+    "name": "beforeSubject",
+    "line": 137,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/source-mutation.ts",
+    "fn": "observe",
+    "name": "beforeSubject",
+    "line": 138,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/source-mutation.ts",
+    "fn": "observe",
+    "name": "afterSubject",
+    "line": 141,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/source-mutation.ts",
+    "fn": "observe",
+    "name": "afterSubject",
+    "line": 142,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "load",
+    "name": "subjectId",
+    "line": 66,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "load",
+    "name": "subjectId",
+    "line": 67,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "load",
+    "name": "subjectId",
+    "line": 68,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "apply",
+    "name": "subjectId",
+    "line": 113,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "apply",
+    "name": "subjectId",
+    "line": 143,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "apply",
+    "name": "subjectId",
+    "line": 144,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "apply",
+    "name": "subjectId",
+    "line": 145,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "apply",
+    "name": "subjectId",
+    "line": 146,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "apply",
+    "name": "subjectId",
+    "line": 147,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "apply",
+    "name": "subjectId",
+    "line": 148,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "apply",
+    "name": "subjectId",
+    "line": 149,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/entity-egress-projection.ts",
+    "fn": "apply",
+    "name": "subjectId",
+    "line": 151,
+    "role": "READ"
+  },
+  {
+    "file": "lib/link.ts",
+    "fn": "link",
+    "name": "subjectIds",
+    "line": 435,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/link.ts",
+    "fn": "link",
+    "name": "subjectIds",
+    "line": 464,
+    "role": "READ"
+  },
+  {
+    "file": "lib/link.ts",
+    "fn": "link",
+    "name": "subjectIds",
+    "line": 480,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "addClaim",
+    "name": "subjectId",
+    "line": 97,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "addClaim",
+    "name": "subjectId",
+    "line": 98,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "addClaim",
+    "name": "subjectId",
+    "line": 101,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "dropClaim",
+    "name": "subjectId",
+    "line": 107,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "dropClaim",
+    "name": "subjectId",
+    "line": 108,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "dropClaim",
+    "name": "subjectId",
+    "line": 116,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "retain",
+    "name": "subjectId",
+    "line": 127,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "retain",
+    "name": "subjectId",
+    "line": 128,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "retain",
+    "name": "subjectId",
+    "line": 131,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "retain",
+    "name": "subjectId",
+    "line": 132,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "retain",
+    "name": "subjectId",
+    "line": 145,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "retain",
+    "name": "subjectId",
+    "line": 146,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "release",
+    "name": "subjectId",
+    "line": 160,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "release",
+    "name": "subjectId",
+    "line": 161,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "release",
+    "name": "subjectId",
+    "line": 162,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "isClaimed",
+    "name": "subjectId",
+    "line": 175,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "isClaimed",
+    "name": "subjectId",
+    "line": 176,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "ownersOf",
+    "name": "subjectId",
+    "line": 179,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "fn": "ownersOf",
+    "name": "subjectId",
+    "line": 180,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-reclamation-sink.ts",
+    "fn": "offerUnclaimed",
+    "name": "subjectIds",
+    "line": 63,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/subject-reclamation-sink.ts",
+    "fn": "offerUnclaimed",
+    "name": "subjectIds",
+    "line": 64,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-reclamation-sink.ts",
+    "fn": "offerUnclaimed",
+    "name": "subjectId",
+    "line": 68,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/internals/subject-reclamation-sink.ts",
+    "fn": "offerUnclaimed",
+    "name": "subjectIds",
+    "line": 68,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-reclamation-sink.ts",
+    "fn": "offerUnclaimed",
+    "name": "subjectId",
+    "line": 72,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-reclamation-sink.ts",
+    "fn": "offerUnclaimed",
+    "name": "subjectId",
+    "line": 78,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/subject-reclamation-sink.ts",
+    "fn": "offerUnclaimed",
+    "name": "subjectId",
+    "line": 80,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/intercept-leaf-signals.ts",
+    "fn": "wrapWritableSignal",
+    "name": "subjectIds",
+    "line": 102,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/internals/intercept-leaf-signals.ts",
+    "fn": "wrapWritableSignal",
+    "name": "subjectIds",
+    "line": 111,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/intercept-leaf-signals.ts",
+    "fn": "wrapWritableSignal",
+    "name": "subjectIds",
+    "line": 122,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/internals/intercept-leaf-signals.ts",
+    "fn": "wrapWritableSignal",
+    "name": "subjectIds",
+    "line": 131,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRestoredSubject",
+    "name": "subjectId",
+    "line": 137,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRestoredSubject",
+    "name": "subjectId",
+    "line": 142,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRestoredSubject",
+    "name": "subjectId",
+    "line": 144,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRestoredSubject",
+    "name": "subjectId",
+    "line": 149,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRekeyedSubject",
+    "name": "subjectId",
+    "line": 152,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRekeyedSubject",
+    "name": "subjectId",
+    "line": 153,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRekeyedSubject",
+    "name": "subjectId",
+    "line": 163,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRekeyedSubject",
+    "name": "subjectId",
+    "line": 165,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRemovedSubject",
+    "name": "subjectId",
+    "line": 173,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRemovedSubject",
+    "name": "subjectId",
+    "line": 178,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRemovedSubject",
+    "name": "subjectId",
+    "line": 187,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberRemovedSubject",
+    "name": "subjectId",
+    "line": 189,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveSubject",
+    "name": "subjectId",
+    "line": 196,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveSubject",
+    "name": "subjectId",
+    "line": 197,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberTreeRealizationDescriptor",
+    "name": "subjectId",
+    "line": 305,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberTreeRealizationDescriptor",
+    "name": "subjectIds",
+    "line": 305,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberTreeRealizationDescriptor",
+    "name": "subjectId",
+    "line": 311,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberTreeRealizationDescriptor",
+    "name": "subjectId",
+    "line": 315,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "rememberTreeRealizationDescriptor",
+    "name": "subjectId",
+    "line": 316,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 543,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 612,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 666,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 680,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 698,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 715,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "beforeSubject",
+    "line": 716,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "afterSubject",
+    "line": 717,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 755,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 756,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 763,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 782,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 784,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 792,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "planHeterogeneousFrame",
+    "name": "subjectId",
+    "line": 816,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 905,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 905,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 975,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "commit",
+    "name": "subjectId",
+    "line": 975,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "canApplyEffect",
+    "name": "subjectId",
+    "line": 1039,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "canApplyEffect",
+    "name": "subjectId",
+    "line": 1040,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "canApplyEffect",
+    "name": "subjectId",
+    "line": 1060,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "canApplyEffect",
+    "name": "subjectId",
+    "line": 1067,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "canApplyEffect",
+    "name": "subjectId",
+    "line": 1072,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "canApplyEffect",
+    "name": "subjectId",
+    "line": 1075,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "canApplyEffect",
+    "name": "subjectId",
+    "line": 1080,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "applyEffect",
+    "name": "subjectId",
+    "line": 1160,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "applyEffect",
+    "name": "subjectId",
+    "line": 1187,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "applyEffect",
+    "name": "beforeSubject",
+    "line": 1188,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "applyEffect",
+    "name": "afterSubject",
+    "line": 1189,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveLiveScalarNode",
+    "name": "subjectId",
+    "line": 1204,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveLiveScalarNode",
+    "name": "subjectId",
+    "line": 1205,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "canResolvePreparedSubjectTarget",
+    "name": "subjectId",
+    "line": 1236,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "canResolvePreparedSubjectTarget",
+    "name": "subjectId",
+    "line": 1240,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolvePreparedOrLiveSubjectKey",
+    "name": "subjectId",
+    "line": 1311,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolvePreparedOrLiveSubjectKey",
+    "name": "subjectId",
+    "line": 1313,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolvePreparedOrLiveSubjectKey",
+    "name": "subjectId",
+    "line": 1318,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveEffectiveRemoveKey",
+    "name": "subjectId",
+    "line": 1326,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "updatePreparedRealizationContext",
+    "name": "subjectId",
+    "line": 1344,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "updatePreparedRealizationContext",
+    "name": "subjectId",
+    "line": 1346,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "updatePreparedRealizationContext",
+    "name": "subjectId",
+    "line": 1354,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "updatePreparedRealizationContext",
+    "name": "subjectId",
+    "line": 1375,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "updatePreparedRealizationContext",
+    "name": "subjectId",
+    "line": 1385,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "updatePreparedRealizationContext",
+    "name": "subjectId",
+    "line": 1431,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveSubjectFieldPath",
+    "name": "subjectId",
+    "line": 1480,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveSubjectFieldPath",
+    "name": "subjectId",
+    "line": 1486,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "isPreparedSubjectScalarEffect",
+    "name": "subjectId",
+    "line": 1525,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "isPreparedSubjectScalarEffect",
+    "name": "subjectId",
+    "line": 1527,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveCurrentSubjectTarget",
+    "name": "subjectId",
+    "line": 1564,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveCurrentSubjectTarget",
+    "name": "subjectId",
+    "line": 1570,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveCurrentSubjectTarget",
+    "name": "subjectId",
+    "line": 1587,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveNotifyPath",
+    "name": "subjectId",
+    "line": 1619,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveNotifyPath",
+    "name": "subjectId",
+    "line": 1628,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveNotifyPath",
+    "name": "subjectId",
+    "line": 1643,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "resolveNotifyPath",
+    "name": "subjectId",
+    "line": 1650,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "hasInlineSubjectAddress",
+    "name": "subjectId",
+    "line": 1665,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveCollectionPathFromEffect",
+    "name": "subjectId",
+    "line": 1701,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveFieldPathFromEffect",
+    "name": "subjectId",
+    "line": 1718,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "getStructuralAddEffect",
+    "name": "subjectId",
+    "line": 1800,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "getStructuralAddEffect",
+    "name": "subjectId",
+    "line": 1812,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "getStructuralAddEffect",
+    "name": "subjectId",
+    "line": 1819,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "getStructuralAddEffect",
+    "name": "subjectId",
+    "line": 1826,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveSubjectAddress",
+    "name": "subjectId",
+    "line": 1884,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveSubjectAddress",
+    "name": "subjectId",
+    "line": 1908,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveCollectionPathLegacy",
+    "name": "subjectId",
+    "line": 1954,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveCollectionPathLegacy",
+    "name": "subjectId",
+    "line": 1963,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveFieldPathFromRowLegacy",
+    "name": "subjectId",
+    "line": 1970,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveFieldPathFromRowLegacy",
+    "name": "subjectId",
+    "line": 1981,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveRealizationAddress",
+    "name": "subjectId",
+    "line": 2001,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveRealizationAddress",
+    "name": "subjectId",
+    "line": 2011,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveRealizationAddress",
+    "name": "subjectId",
+    "line": 2023,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "deriveRealizationAddress",
+    "name": "subjectId",
+    "line": 2029,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "forgetSubjectsInTreeRealizationDescriptors",
+    "name": "subjectIds",
+    "line": 2078,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "forgetSubjectsInTreeRealizationDescriptors",
+    "name": "subjectIds",
+    "line": 2080,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "fn": "forgetSubjectsInTreeRealizationDescriptors",
+    "name": "subjectIds",
+    "line": 2083,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "subjectId",
+    "line": 190,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "beforeSubject",
+    "line": 200,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "beforeSubject",
+    "line": 200,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "afterSubject",
+    "line": 201,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "afterSubject",
+    "line": 201,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "subjectId",
+    "line": 207,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "beforeSubject",
+    "line": 220,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "beforeSubject",
+    "line": 220,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "afterSubject",
+    "line": 221,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "afterSubject",
+    "line": 221,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "subjectId",
+    "line": 227,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "toReversalEffect",
+    "name": "subjectId",
+    "line": 245,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "addEntry",
+    "name": "subjectIds",
+    "line": 447,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "addEntry",
+    "name": "subjectIds",
+    "line": 456,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "createPendingEntry",
+    "name": "subjectIds",
+    "line": 472,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "createPendingEntry",
+    "name": "subjectIds",
+    "line": 481,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "buildTurn",
+    "name": "subjectIds",
+    "line": 544,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "buildTurn",
+    "name": "subjectIds",
+    "line": 657,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "buildTurn",
+    "name": "subjectIds",
+    "line": 657,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "buildTurn",
+    "name": "subjectIds",
+    "line": 657,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "applyTurnEffectsThroughRealizationPort",
+    "name": "subjectId",
+    "line": 2139,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "applyTurnEffectsThroughRealizationPort",
+    "name": "subjectId",
+    "line": 2231,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "createCaptureBucket",
+    "name": "subjectIds",
+    "line": 2275,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "drainCaptureBucket",
+    "name": "subjectIds",
+    "line": 2366,
+    "role": "WRITE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "drainCaptureBucket",
+    "name": "subjectIds",
+    "line": 2366,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "drainCaptureBucket",
+    "name": "subjectIds",
+    "line": 2369,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "drainCaptureBucket",
+    "name": "subjectIds",
+    "line": 2378,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "buildTurnEffectFromStructural",
+    "name": "subjectIds",
+    "line": 2538,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "buildTurnEffectFromStructural",
+    "name": "subjectIds",
+    "line": 2541,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureEffects",
+    "name": "subjectIds",
+    "line": 2582,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enqueueScalarDiff",
+    "name": "subjectIds",
+    "line": 2608,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureEffects",
+    "name": "subjectIds",
+    "line": 2621,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureEffects",
+    "name": "subjectIds",
+    "line": 2652,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 2665,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 2692,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectId",
+    "line": 2698,
+    "role": "WRITE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 2698,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 2699,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectId",
+    "line": 2699,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 2711,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "recordCaptureBucket",
+    "name": "subjectIds",
+    "line": 2719,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "recordCaptureBucket",
+    "name": "subjectIds",
+    "line": 2724,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "recordCaptureBucket",
+    "name": "subjectIds",
+    "line": 2735,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "recordCaptureBucket",
+    "name": "subjectIds",
+    "line": 2735,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "materializePendingTransaction",
+    "name": "subjectIds",
+    "line": 2798,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "materializePendingTransaction",
+    "name": "subjectIds",
+    "line": 2807,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "materializePendingTransaction",
+    "name": "subjectIds",
+    "line": 2807,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "subscribeCollectionNotifications",
+    "name": "subjectIds",
+    "line": 2904,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "subscribeCollectionNotifications",
+    "name": "subjectIds",
+    "line": 2947,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "subscribeCollectionNotifications",
+    "name": "subjectIds",
+    "line": 2968,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "subscribeCollectionNotifications",
+    "name": "subjectIds",
+    "line": 2982,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "subscribeCollectionNotifications",
+    "name": "subjectIds",
+    "line": 2995,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3010,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3028,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3042,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3060,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3077,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3086,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3114,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3119,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3127,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/restoration/restoration.ts",
+    "fn": "enhancerFn",
+    "name": "subjectIds",
+    "line": 3127,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffects",
+    "name": "subjectId",
+    "line": 109,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffects",
+    "name": "subjectId",
+    "line": 112,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffects",
+    "name": "subjectId",
+    "line": 129,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffects",
+    "name": "subjectId",
+    "line": 131,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffect",
+    "name": "subjectId",
+    "line": 162,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffect",
+    "name": "subjectId",
+    "line": 162,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffect",
+    "name": "subjectId",
+    "line": 173,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffect",
+    "name": "subjectId",
+    "line": 173,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffect",
+    "name": "subjectId",
+    "line": 185,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "createPendingRollbackEffect",
+    "name": "subjectId",
+    "line": 185,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "hasLaterStructuralDependency",
+    "name": "subjectId",
+    "line": 263,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "hasLaterStructuralDependency",
+    "name": "subjectId",
+    "line": 269,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "hasLaterStructuralDependency",
+    "name": "subjectId",
+    "line": 269,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "hasLaterStructuralDependency",
+    "name": "subjectId",
+    "line": 288,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-rollback.ts",
+    "fn": "hasLaterStructuralDependency",
+    "name": "subjectId",
+    "line": 288,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "buildTurn",
+    "name": "subjectIds",
+    "line": 437,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "buildTurn",
+    "name": "subjectIds",
+    "line": 444,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "buildTurn",
+    "name": "subjectIds",
+    "line": 454,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "buildTurn",
+    "name": "subjectIds",
+    "line": 454,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "recordConfirmed",
+    "name": "subjectIds",
+    "line": 463,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "recordConfirmed",
+    "name": "subjectIds",
+    "line": 467,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "createPending",
+    "name": "subjectIds",
+    "line": 477,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "createPending",
+    "name": "subjectIds",
+    "line": 484,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "createCaptureBucket",
+    "name": "subjectIds",
+    "line": 627,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "getOrCreateInternalTransactionRuntime",
+    "name": "subjectIds",
+    "line": 645,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "getOrCreateInternalTransactionRuntime",
+    "name": "subjectIds",
+    "line": 646,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "getOrCreateInternalTransactionRuntime",
+    "name": "subjectIds",
+    "line": 651,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "drainCaptureBucket",
+    "name": "subjectIds",
+    "line": 718,
+    "role": "WRITE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "drainCaptureBucket",
+    "name": "subjectIds",
+    "line": 718,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "drainCaptureBucket",
+    "name": "subjectIds",
+    "line": 719,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "drainCaptureBucket",
+    "name": "subjectIds",
+    "line": 726,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "buildTurnEffectFromStructural",
+    "name": "subjectIds",
+    "line": 831,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "buildTurnEffectFromStructural",
+    "name": "subjectIds",
+    "line": 834,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureEffects",
+    "name": "subjectIds",
+    "line": 868,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureEffects",
+    "name": "subjectIds",
+    "line": 872,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureEffects",
+    "name": "subjectIds",
+    "line": 885,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureEffects",
+    "name": "subjectIds",
+    "line": 920,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 951,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectId",
+    "line": 955,
+    "role": "WRITE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 955,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 956,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectId",
+    "line": 956,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 973,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "captureIntoBucket",
+    "name": "subjectIds",
+    "line": 985,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "recordConfirmedBucket",
+    "name": "subjectIds",
+    "line": 991,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "recordConfirmedBucket",
+    "name": "subjectIds",
+    "line": 995,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "recordConfirmedBucket",
+    "name": "subjectIds",
+    "line": 995,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "materializePendingTransaction",
+    "name": "subjectIds",
+    "line": 1026,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "materializePendingTransaction",
+    "name": "subjectIds",
+    "line": 1030,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "materializePendingTransaction",
+    "name": "subjectIds",
+    "line": 1030,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "subjectId",
+    "line": 1056,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "subjectId",
+    "line": 1065,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "beforeSubject",
+    "line": 1074,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "beforeSubject",
+    "line": 1074,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "afterSubject",
+    "line": 1075,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "afterSubject",
+    "line": 1075,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "subjectId",
+    "line": 1083,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "beforeSubject",
+    "line": 1092,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "beforeSubject",
+    "line": 1092,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "afterSubject",
+    "line": 1093,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "afterSubject",
+    "line": 1093,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "toCausalEffect",
+    "name": "subjectId",
+    "line": 1101,
+    "role": "FORWARD"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "subscribeCollectionNotifications",
+    "name": "subjectIds",
+    "line": 1200,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "subscribeCollectionNotifications",
+    "name": "subjectIds",
+    "line": 1252,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "subscribeCollectionNotifications",
+    "name": "subjectIds",
+    "line": 1274,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "subscribeCollectionNotifications",
+    "name": "subjectIds",
+    "line": 1287,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "getOrCreateInternalTransactionRuntime",
+    "name": "subjectIds",
+    "line": 1303,
+    "role": "DECLARE"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "getOrCreateInternalTransactionRuntime",
+    "name": "subjectIds",
+    "line": 1320,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "getOrCreateInternalTransactionRuntime",
+    "name": "subjectIds",
+    "line": 1341,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "getOrCreateInternalTransactionRuntime",
+    "name": "subjectIds",
+    "line": 1353,
+    "role": "READ"
+  },
+  {
+    "file": "enhancers/transactions/transactions.ts",
+    "fn": "getOrCreateInternalTransactionRuntime",
+    "name": "subjectIds",
+    "line": 1362,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reapply-planner.ts",
+    "fn": "createReapplyEffects",
+    "name": "subjectId",
+    "line": 49,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reapply-planner.ts",
+    "fn": "createReapplyEffects",
+    "name": "subjectId",
+    "line": 49,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reapply-planner.ts",
+    "fn": "createReapplyEffects",
+    "name": "subjectId",
+    "line": 65,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reapply-planner.ts",
+    "fn": "createReapplyEffects",
+    "name": "subjectId",
+    "line": 65,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reapply-planner.ts",
+    "fn": "createReapplyEffects",
+    "name": "subjectId",
+    "line": 81,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reapply-planner.ts",
+    "fn": "createReapplyEffects",
+    "name": "subjectId",
+    "line": 81,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reversal-planner.ts",
+    "fn": "createReversalEffects",
+    "name": "subjectId",
+    "line": 47,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reversal-planner.ts",
+    "fn": "createReversalEffects",
+    "name": "subjectId",
+    "line": 47,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reversal-planner.ts",
+    "fn": "createReversalEffects",
+    "name": "subjectId",
+    "line": 81,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reversal-planner.ts",
+    "fn": "createReversalEffects",
+    "name": "subjectId",
+    "line": 81,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/confirmed-undo.ts",
+    "fn": "hasLaterStructuralDependency",
+    "name": "subjectId",
+    "line": 128,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/confirmed-undo.ts",
+    "fn": "hasLaterStructuralDependency",
+    "name": "subjectId",
+    "line": 147,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/confirmed-undo.ts",
+    "fn": "hasLaterStructuralDependency",
+    "name": "subjectId",
+    "line": 147,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/pending-confirmation.ts",
+    "fn": "deriveMaintenanceHint",
+    "name": "subjectId",
+    "line": 90,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/greenfield-transactions.ts",
+    "fn": "capture",
+    "name": "subjectId",
+    "line": 60,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/greenfield-transactions.ts",
+    "fn": "capture",
+    "name": "subjectId",
+    "line": 60,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/greenfield-transactions.ts",
+    "fn": "shouldPreserveAuthoredEffect",
+    "name": "subjectId",
+    "line": 162,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/greenfield-transactions.ts",
+    "fn": "copyEffect",
+    "name": "subjectId",
+    "line": 175,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/greenfield-transactions.ts",
+    "fn": "copyEffect",
+    "name": "subjectId",
+    "line": 175,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reclamation-eligibility.ts",
+    "fn": "assessReclamationEligibility",
+    "name": "subjectId",
+    "line": 33,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reclamation-eligibility.ts",
+    "fn": "assessReclamationEligibility",
+    "name": "subjectId",
+    "line": 47,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reclamation-eligibility.ts",
+    "fn": "findSubjectEffect",
+    "name": "subjectId",
+    "line": 80,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reclamation-eligibility.ts",
+    "fn": "findSubjectEffect",
+    "name": "subjectId",
+    "line": 82,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/reclamation-eligibility.ts",
+    "fn": "findSubjectEffect",
+    "name": "subjectId",
+    "line": 82,
+    "role": "COMPARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimSubject",
+    "name": "subjectId",
+    "line": 66,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimSubject",
+    "name": "subjectId",
+    "line": 66,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimSubject",
+    "name": "subjectId",
+    "line": 78,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimSubject",
+    "name": "subjectId",
+    "line": 95,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimSubject",
+    "name": "subjectId",
+    "line": 95,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimAvailableSubjects",
+    "name": "subjectId",
+    "line": 168,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimAvailableSubjects",
+    "name": "subjectIds",
+    "line": 168,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimAvailableSubjects",
+    "name": "subjectId",
+    "line": 170,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimAvailableSubjects",
+    "name": "subjectId",
+    "line": 177,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimAvailableSubjects",
+    "name": "subjectId",
+    "line": 183,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimAvailableSubjects",
+    "name": "subjectId",
+    "line": 186,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimAvailableSubjects",
+    "name": "subjectId",
+    "line": 189,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimAvailableSubjects",
+    "name": "subjectId",
+    "line": 192,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "reclaimAvailableSubjects",
+    "name": "subjectId",
+    "line": 195,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "fn": "runPhysicalMaintenance",
+    "name": "subjectIds",
+    "line": 225,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "toExplicitTransactionEffect",
+    "name": "subjectId",
+    "line": 21,
+    "role": "WRITE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "toExplicitTransactionEffect",
+    "name": "subjectIds",
+    "line": 21,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "toExplicitTransactionEffect",
+    "name": "subjectId",
+    "line": 28,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "toExplicitTransactionEffect",
+    "name": "subjectId",
+    "line": 32,
+    "role": "READ"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "createTransactionCaptureBridge",
+    "name": "subjectIds",
+    "line": 46,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "createTransactionCaptureBridge",
+    "name": "subjectIds",
+    "line": 64,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "mapStructuralEffect",
+    "name": "subjectId",
+    "line": 78,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "mapStructuralEffect",
+    "name": "subjectId",
+    "line": 87,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "mapStructuralEffect",
+    "name": "subjectId",
+    "line": 96,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "fn": "mapStructuralEffect",
+    "name": "subjectId",
+    "line": 105,
+    "role": "FORWARD"
+  },
+  {
+    "file": "lib/internals/diagnostics/diagnostic-journal.ts",
+    "fn": "createDiagnosticJournal",
+    "name": "subjectIds",
+    "line": 119,
+    "role": "DECLARE"
+  },
+  {
+    "file": "lib/internals/diagnostics/diagnostic-journal.ts",
+    "fn": "createDiagnosticJournal",
+    "name": "subjectIds",
+    "line": 129,
+    "role": "FORWARD"
+  }
+]

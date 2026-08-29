@@ -12,8 +12,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const CORE_DIST = path.resolve(__dirname, '../dist/packages/core/dist');
-const CORE_INDEX = path.resolve(__dirname, '../packages/core/src/index.ts');
+const CORE_DIST = path.resolve(__dirname, '../dist/packages/kernel/dist');
+const CORE_INDEX = path.resolve(__dirname, '../packages/kernel/src/index.ts');
 
 // Budget thresholds
 const MAX_EXPORTS = 60;

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { batching, signalTree } from '@signaltree/core';
+import { batching, signalTree } from '@signal-tree/kernel';
 
 import {
   generatePosts,
@@ -207,7 +207,7 @@ export class BatchingDemoComponent {
   }
 
   addBulkUserOperations() {
-    // Use batching from batching enhancer (@signaltree/core)
+    // Use batching from batching enhancer (@signal-tree/kernel)
     const newUsers: User[] = [];
     for (let i = 0; i < 3; i++) {
       newUsers.push({
@@ -307,7 +307,7 @@ export class BatchingDemoComponent {
     const users = this.users();
     if (users.length === 0) return;
 
-    // Use batching from batching enhancer (@signaltree/core)
+    // Use batching from batching enhancer (@signal-tree/kernel)
     const newPosts: Post[] = [];
     for (let i = 0; i < 4; i++) {
       const randomUser = users[Math.floor(Math.random() * users.length)];

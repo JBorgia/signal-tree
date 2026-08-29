@@ -44,7 +44,7 @@ When you use `pnpm link`:
 consumer-app/
 ├── node_modules/
 │   ├── @angular/core@20.2.3     ← Consumer's Angular
-│   └── @signaltree/core → SYMLINK → /path/to/signaltree/dist/packages/core
+│   └── @signal-tree/kernel → SYMLINK → /path/to/signaltree/dist/packages/core
 │                                      ↑
 │                                      bundler follows symlink
 │                                      ↓
@@ -91,10 +91,10 @@ Both have a `Symbol(SIGNAL)`, but they are **different symbol instances**.
 
 ```bash
 # Remove the symlink
-pnpm remove @signaltree/core
+pnpm remove @signal-tree/kernel
 
 # Install from npm registry
-pnpm add @signaltree/core@5.1.2
+pnpm add @signal-tree/kernel@5.1.2
 ```
 
 When installed from npm, the package files exist directly in the consumer's `node_modules/`, so `@angular/core` imports resolve from the consumer's `node_modules/` - ensuring a single Angular instance.

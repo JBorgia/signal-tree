@@ -5,7 +5,7 @@
  * ==========================================================
  *
  * CHECK-ONLY (no generation). The authoritative Angular support range is
- * packages/core/package.json -> peerDependencies["@angular/core"]. Every
+ * packages/kernel/package.json -> peerDependencies["@angular/core"]. Every
  * canonical claim site must state that same range, both as prose
  * ("Angular 20, 21, or 22") and — where ranges are quoted — as the semver
  * range ("^20.0.0 || ^21.0.0 || ^22.0.0"). Precedent for the failure mode:
@@ -14,7 +14,7 @@
  *
  * Canonical claim sites checked:
  *   - README.md
- *   - packages/core/README.md
+ *   - packages/kernel/README.md
  *   (the llms.txt / llms-full.txt claim sites were removed in 15.0 with the
  *    artifacts themselves — see RELEASE-1.0.md, "AI DISCOVERABILITY")
  *
@@ -44,7 +44,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 const CLAIM_SITES = [
   'README.md',
-  'packages/core/README.md',
+  'packages/kernel/README.md',
   // Added 2026-07-28: this page had drifted to "Latest release (7.6.0)" and
   // "Angular 20.3+" while the packages shipped 13.2.0 on Angular 20/21/22.
   // It rotted precisely because it wasn't gated.
@@ -98,7 +98,7 @@ function checkSite(text, site, majors) {
   if (!text.includes(human)) {
     violations.push(
       `${site}: missing the canonical support claim "${human}" ` +
-        `(derived from packages/core/package.json peerDependencies)`
+        `(derived from packages/kernel/package.json peerDependencies)`
     );
   }
 
@@ -221,13 +221,13 @@ function selfTest(majors) {
 function main() {
   const corePkgPath = path.join(ROOT, 'packages', 'core', 'package.json');
   if (!fs.existsSync(corePkgPath)) {
-    console.error('Missing packages/core/package.json');
+    console.error('Missing packages/kernel/package.json');
     process.exit(2);
   }
   const range = JSON.parse(fs.readFileSync(corePkgPath, 'utf8'))
     .peerDependencies?.['@angular/core'];
   if (!range) {
-    console.error('packages/core/package.json has no @angular/core peer dependency');
+    console.error('packages/kernel/package.json has no @angular/core peer dependency');
     process.exit(2);
   }
   const majors = parseMajors(range);

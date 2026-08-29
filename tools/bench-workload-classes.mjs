@@ -44,7 +44,7 @@ import { join } from 'node:path';
 import { measureRetained, requireExposeGc } from './lib/heap-quiescence.mjs';
 
 requireExposeGc('tools/bench-workload-classes.mjs');
-const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
+const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!existsSync(CORE)) {
   console.error('❌ build first: nx build core');
   process.exit(1);

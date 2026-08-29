@@ -51,7 +51,7 @@ import { measureRetained, requireExposeGc } from './lib/heap-quiescence.mjs';
 
 requireExposeGc('tools/bench-entity-layers.mjs');
 
-const DIST = join(process.cwd(), 'dist/packages/core/dist');
+const DIST = join(process.cwd(), 'dist/packages/kernel/dist');
 if (!existsSync(join(DIST, 'index.js'))) {
   console.error('❌ build first: nx run-many -t build --all');
   process.exit(1);

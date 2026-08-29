@@ -234,7 +234,7 @@ console.log('✓ every @signaltree symbol named in a README exists.');
  *
  * These are IMPLEMENTED and deliberately NOT EXPORTED — `compared` was pulled
  * from the RC surface at `76ab032c`, `loader` is absent by the same decision
- * (packages/core/README.md says so in prose). A user cannot import any of them.
+ * (packages/kernel/README.md says so in prose). A user cannot import any of them.
  *
  * Retired means "the code is gone"; withdrawn means "the code is here and you
  * cannot have it". For a READER the difference is nil — following either leads

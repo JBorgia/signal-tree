@@ -3238,11 +3238,11 @@ Full guide: [docs/guides/MIGRATION.md](docs/guides/MIGRATION.md#901).
 
 ### 🚀 Features
 
-- ⚠️ **core:** add generic error type to status() marker ([13a6ef2](https://github.com/JBorgia/signaltree/commit/13a6ef2))
+- ⚠️ **core:** add generic error type to status() marker ([13a6ef2](https://github.com/JBorgia/signal-tree/commit/13a6ef2))
 
 ### 🩹 Fixes
 
-- **guardrails:** update @signaltree/shared peer dependency to ^7.0.0 ([50a21d9](https://github.com/JBorgia/signaltree/commit/50a21d9))
+- **guardrails:** update @signaltree/shared peer dependency to ^7.0.0 ([50a21d9](https://github.com/JBorgia/signal-tree/commit/50a21d9))
 
 ### ⚠️ Breaking Changes
 
@@ -3939,9 +3939,9 @@ function withServiceRead<T extends BaseState>(tree: ISignalTree<T>) { ... }
 
 ### 🩹 Fixes
 
-- Remove circular import in types.ts ([5ed4601](https://github.com/JBorgia/signaltree/commit/5ed4601))
-- Add depth limit to DeepPath type to prevent TypeScript infinite recursion ([90e0816](https://github.com/JBorgia/signaltree/commit/90e0816))
-- Exclude demo from release pre-build command ([61c7ea8](https://github.com/JBorgia/signaltree/commit/61c7ea8))
+- Remove circular import in types.ts ([5ed4601](https://github.com/JBorgia/signal-tree/commit/5ed4601))
+- Add depth limit to DeepPath type to prevent TypeScript infinite recursion ([90e0816](https://github.com/JBorgia/signal-tree/commit/90e0816))
+- Exclude demo from release pre-build command ([61c7ea8](https://github.com/JBorgia/signal-tree/commit/61c7ea8))
 
 ### ❤️ Thank You
 
@@ -3951,14 +3951,14 @@ function withServiceRead<T extends BaseState>(tree: ISignalTree<T>) { ... }
 
 ### 🚀 Features
 
-- add support for nested entity paths with dot notation ([e0bef8d](https://github.com/JBorgia/signaltree/commit/e0bef8d))
+- add support for nested entity paths with dot notation ([e0bef8d](https://github.com/JBorgia/signal-tree/commit/e0bef8d))
 
 ### 🩹 Fixes
 
-- remove circular import in types.ts ([5ed4601](https://github.com/JBorgia/signaltree/commit/5ed4601))
-- add depth limit to DeepPath type to prevent TypeScript infinite recursion ([90e0816](https://github.com/JBorgia/signaltree/commit/90e0816))
-- revert entities signature to keyof T for type safety while maintaining runtime nested path support ([28885d3](https://github.com/JBorgia/signaltree/commit/28885d3))
-- exclude demo from release pre-build command ([61c7ea8](https://github.com/JBorgia/signaltree/commit/61c7ea8))
+- remove circular import in types.ts ([5ed4601](https://github.com/JBorgia/signal-tree/commit/5ed4601))
+- add depth limit to DeepPath type to prevent TypeScript infinite recursion ([90e0816](https://github.com/JBorgia/signal-tree/commit/90e0816))
+- revert entities signature to keyof T for type safety while maintaining runtime nested path support ([28885d3](https://github.com/JBorgia/signal-tree/commit/28885d3))
+- exclude demo from release pre-build command ([61c7ea8](https://github.com/JBorgia/signal-tree/commit/61c7ea8))
 
 ### ❤️ Thank You
 
@@ -3990,8 +3990,8 @@ function withServiceRead<T extends BaseState>(tree: ISignalTree<T>) { ... }
 
 ### 🩹 Fixes
 
-- **core,enterprise:** add types subpath condition to exports field ([57d101f](https://github.com/JBorgia/signaltree/commit/57d101f))
-- **guardrails:** update peerDependency to @signaltree/core 4.1.6 ([4e05a85](https://github.com/JBorgia/signaltree/commit/4e05a85))
+- **core,enterprise:** add types subpath condition to exports field ([57d101f](https://github.com/JBorgia/signal-tree/commit/57d101f))
+- **guardrails:** update peerDependency to @signaltree/core 4.1.6 ([4e05a85](https://github.com/JBorgia/signal-tree/commit/4e05a85))
 
 ### ❤️ Thank You
 
@@ -4001,14 +4001,14 @@ function withServiceRead<T extends BaseState>(tree: ISignalTree<T>) { ... }
 
 ### 🚀 Features
 
-- add automated version injection for demo app ([b209d34](https://github.com/JBorgia/signaltree/commit/b209d34))
-- add GitHub and npm links to navigation menu ([ec366c6](https://github.com/JBorgia/signaltree/commit/ec366c6))
-- **demo:** add automated version constant generator and integrate in navigation ([311d50b](https://github.com/JBorgia/signaltree/commit/311d50b))
+- add automated version injection for demo app ([b209d34](https://github.com/JBorgia/signal-tree/commit/b209d34))
+- add GitHub and npm links to navigation menu ([ec366c6](https://github.com/JBorgia/signal-tree/commit/ec366c6))
+- **demo:** add automated version constant generator and integrate in navigation ([311d50b](https://github.com/JBorgia/signal-tree/commit/311d50b))
 
 ### 🩹 Fixes
 
-- **demo:** update displayed SignalTree versions to 4.1.5 ([22d28d6](https://github.com/JBorgia/signaltree/commit/22d28d6))
-- **ng-forms:** add proper type declarations and ESM configuration to package.json ([885769f](https://github.com/JBorgia/signaltree/commit/885769f))
+- **demo:** update displayed SignalTree versions to 4.1.5 ([22d28d6](https://github.com/JBorgia/signal-tree/commit/22d28d6))
+- **ng-forms:** add proper type declarations and ESM configuration to package.json ([885769f](https://github.com/JBorgia/signal-tree/commit/885769f))
 
 ### ❤️ Thank You
 
@@ -4018,18 +4018,18 @@ function withServiceRead<T extends BaseState>(tree: ISignalTree<T>) { ... }
 
 ### 🚀 Features
 
-- **benchmarks:** add contextual explanations for enterprise, rapid updates, and subscriber scaling ([94ad851](https://github.com/JBorgia/signaltree/commit/94ad851))
+- **benchmarks:** add contextual explanations for enterprise, rapid updates, and subscriber scaling ([94ad851](https://github.com/JBorgia/signal-tree/commit/94ad851))
 
 ### 🩹 Fixes
 
-- move jest-preset-angular to devDependencies in ng-forms ([a4d7c8c](https://github.com/JBorgia/signaltree/commit/a4d7c8c))
-- ignore jest-preset-angular in ng-forms dependency checks ([cc837c8](https://github.com/JBorgia/signaltree/commit/cc837c8))
-- remove outdated ng-forms special case in declaration verification ([a08a941](https://github.com/JBorgia/signaltree/commit/a08a941))
-- use hardcoded version in navigation component ([d679a15](https://github.com/JBorgia/signaltree/commit/d679a15))
-- **benchmarks:** rename 'Large History Size' to 'History Buffer Scaling' for consistency ([a267852](https://github.com/JBorgia/signaltree/commit/a267852))
-- **benchmarks:** align rank badges and enterprise badges in results table ([2041375](https://github.com/JBorgia/signaltree/commit/2041375))
-- **demo:** use relative logo paths for GitHub Pages subfolder deployment ([318fb22](https://github.com/JBorgia/signaltree/commit/318fb22))
-- **demo:** use relative asset paths for documentation README files ([ad3f3eb](https://github.com/JBorgia/signaltree/commit/ad3f3eb))
+- move jest-preset-angular to devDependencies in ng-forms ([a4d7c8c](https://github.com/JBorgia/signal-tree/commit/a4d7c8c))
+- ignore jest-preset-angular in ng-forms dependency checks ([cc837c8](https://github.com/JBorgia/signal-tree/commit/cc837c8))
+- remove outdated ng-forms special case in declaration verification ([a08a941](https://github.com/JBorgia/signal-tree/commit/a08a941))
+- use hardcoded version in navigation component ([d679a15](https://github.com/JBorgia/signal-tree/commit/d679a15))
+- **benchmarks:** rename 'Large History Size' to 'History Buffer Scaling' for consistency ([a267852](https://github.com/JBorgia/signal-tree/commit/a267852))
+- **benchmarks:** align rank badges and enterprise badges in results table ([2041375](https://github.com/JBorgia/signal-tree/commit/2041375))
+- **demo:** use relative logo paths for GitHub Pages subfolder deployment ([318fb22](https://github.com/JBorgia/signal-tree/commit/318fb22))
+- **demo:** use relative asset paths for documentation README files ([ad3f3eb](https://github.com/JBorgia/signal-tree/commit/ad3f3eb))
 
 ### ❤️ Thank You
 
@@ -4039,17 +4039,17 @@ function withServiceRead<T extends BaseState>(tree: ISignalTree<T>) { ... }
 
 ### 🚀 Features
 
-- **demo:** add value propositions to all demo pages ([2024c32](https://github.com/JBorgia/signaltree/commit/2024c32))
+- **demo:** add value propositions to all demo pages ([2024c32](https://github.com/JBorgia/signal-tree/commit/2024c32))
 
 ### 🩹 Fixes
 
-- **demo:** escape curly braces in ng-forms template code block ([98ab328](https://github.com/JBorgia/signaltree/commit/98ab328))
-- **demo:** improve benchmark comparison display and update enterprise enhancer page ([526a72e](https://github.com/JBorgia/signaltree/commit/526a72e))
-- **demo:** use correct SignalTree callable API instead of non-existent setState method ([15a5547](https://github.com/JBorgia/signaltree/commit/15a5547))
+- **demo:** escape curly braces in ng-forms template code block ([98ab328](https://github.com/JBorgia/signal-tree/commit/98ab328))
+- **demo:** improve benchmark comparison display and update enterprise enhancer page ([526a72e](https://github.com/JBorgia/signal-tree/commit/526a72e))
+- **demo:** use correct SignalTree callable API instead of non-existent setState method ([15a5547](https://github.com/JBorgia/signal-tree/commit/15a5547))
 
 ### 🔥 Performance
 
-- **enterprise:** fix large array regression by simplifying diff; guard instrumentation in PathIndex/Scheduler; middleware no-mutation fast path; UI: add scoring formula spacing\n\n- Remove suffix/segmentation array heuristics; keep prefix + whole-array\n- Add PathIndex.enableInstrumentation + setInstrumentation(); guard metrics\n- Guard Scheduler metrics and performance.now() under instrumentation flag\n- Implement middleware no-mutation fast path in core\n- Update demo scoring formula spacing and benchmark text\n- Rebuild enterprise/core; validations pending ([aa75653](https://github.com/JBorgia/signaltree/commit/aa75653))
+- **enterprise:** fix large array regression by simplifying diff; guard instrumentation in PathIndex/Scheduler; middleware no-mutation fast path; UI: add scoring formula spacing\n\n- Remove suffix/segmentation array heuristics; keep prefix + whole-array\n- Add PathIndex.enableInstrumentation + setInstrumentation(); guard metrics\n- Guard Scheduler metrics and performance.now() under instrumentation flag\n- Implement middleware no-mutation fast path in core\n- Update demo scoring formula spacing and benchmark text\n- Rebuild enterprise/core; validations pending ([aa75653](https://github.com/JBorgia/signal-tree/commit/aa75653))
 
 ### ❤️ Thank You
 
@@ -4059,100 +4059,100 @@ function withServiceRead<T extends BaseState>(tree: ISignalTree<T>) { ... }
 
 ### 🚀 Features
 
-- enable automatic benchmark saving without consent requirement ([a8bf071](https://github.com/JBorgia/signaltree/commit/a8bf071))
-- Add SignalTree logo and improve demo UX ([66564d5](https://github.com/JBorgia/signaltree/commit/66564d5))
-- complete Phase 0 - baseline preparation and shared utilities ([afcbacf](https://github.com/JBorgia/signaltree/commit/afcbacf))
-- add package deprecation tooling and migration guide ([a14072a](https://github.com/JBorgia/signaltree/commit/a14072a))
-- add OTP support to deprecation script ([9d2913f](https://github.com/JBorgia/signaltree/commit/9d2913f))
-- prepare @signaltree/enterprise for npm publication ([1a78a43](https://github.com/JBorgia/signaltree/commit/1a78a43))
-- enhance benchmark details dialog with better formatting ([01e43ad](https://github.com/JBorgia/signaltree/commit/01e43ad))
-- always show signaltree as first column in benchmark tables ([f383955](https://github.com/JBorgia/signaltree/commit/f383955))
-- add comprehensive pre-publish validation and release process automation ([ed84bc0](https://github.com/JBorgia/signaltree/commit/ed84bc0))
-- add comprehensive .cursorrules for AI context preloading ([c07695e](https://github.com/JBorgia/signaltree/commit/c07695e))
-- **core:** implement SignalMemoryManager with WeakRef and FinalizationRegistry ([3b3be73](https://github.com/JBorgia/signaltree/commit/3b3be73))
-- **core:** integrate SignalMemoryManager with lazy trees ([88f92c3](https://github.com/JBorgia/signaltree/commit/88f92c3))
-- **demo:** comprehensive demo pages overhaul ([6251ee8](https://github.com/JBorgia/signaltree/commit/6251ee8))
-- **demo,core:** Angular Signal Forms demo polish and reactive slice sync ([43b43a6](https://github.com/JBorgia/signaltree/commit/43b43a6))
-- **demo/fundamentals:** pin What's New card first and keep stable ordering ([962802f](https://github.com/JBorgia/signaltree/commit/962802f))
-- **performance:** add PathIndex, DiffEngine, and OptimizedUpdateEngine ([8db34a3](https://github.com/JBorgia/signaltree/commit/8db34a3))
-- **phase2:** complete Phase 2 Performance Architecture implementation ([d3df6c7](https://github.com/JBorgia/signaltree/commit/d3df6c7))
-- **security:** add SecurityValidator with function blocking ([590bf83](https://github.com/JBorgia/signaltree/commit/590bf83))
-- **security:** integrate SecurityValidator into signalTree ([bde199f](https://github.com/JBorgia/signaltree/commit/bde199f))
-- **size:** add size claim verification to prevent barrel-only measurements ([1ca8b59](https://github.com/JBorgia/signaltree/commit/1ca8b59))
+- enable automatic benchmark saving without consent requirement ([a8bf071](https://github.com/JBorgia/signal-tree/commit/a8bf071))
+- Add SignalTree logo and improve demo UX ([66564d5](https://github.com/JBorgia/signal-tree/commit/66564d5))
+- complete Phase 0 - baseline preparation and shared utilities ([afcbacf](https://github.com/JBorgia/signal-tree/commit/afcbacf))
+- add package deprecation tooling and migration guide ([a14072a](https://github.com/JBorgia/signal-tree/commit/a14072a))
+- add OTP support to deprecation script ([9d2913f](https://github.com/JBorgia/signal-tree/commit/9d2913f))
+- prepare @signaltree/enterprise for npm publication ([1a78a43](https://github.com/JBorgia/signal-tree/commit/1a78a43))
+- enhance benchmark details dialog with better formatting ([01e43ad](https://github.com/JBorgia/signal-tree/commit/01e43ad))
+- always show signaltree as first column in benchmark tables ([f383955](https://github.com/JBorgia/signal-tree/commit/f383955))
+- add comprehensive pre-publish validation and release process automation ([ed84bc0](https://github.com/JBorgia/signal-tree/commit/ed84bc0))
+- add comprehensive .cursorrules for AI context preloading ([c07695e](https://github.com/JBorgia/signal-tree/commit/c07695e))
+- **core:** implement SignalMemoryManager with WeakRef and FinalizationRegistry ([3b3be73](https://github.com/JBorgia/signal-tree/commit/3b3be73))
+- **core:** integrate SignalMemoryManager with lazy trees ([88f92c3](https://github.com/JBorgia/signal-tree/commit/88f92c3))
+- **demo:** comprehensive demo pages overhaul ([6251ee8](https://github.com/JBorgia/signal-tree/commit/6251ee8))
+- **demo,core:** Angular Signal Forms demo polish and reactive slice sync ([43b43a6](https://github.com/JBorgia/signal-tree/commit/43b43a6))
+- **demo/fundamentals:** pin What's New card first and keep stable ordering ([962802f](https://github.com/JBorgia/signal-tree/commit/962802f))
+- **performance:** add PathIndex, DiffEngine, and OptimizedUpdateEngine ([8db34a3](https://github.com/JBorgia/signal-tree/commit/8db34a3))
+- **phase2:** complete Phase 2 Performance Architecture implementation ([d3df6c7](https://github.com/JBorgia/signal-tree/commit/d3df6c7))
+- **security:** add SecurityValidator with function blocking ([590bf83](https://github.com/JBorgia/signal-tree/commit/590bf83))
+- **security:** integrate SecurityValidator into signalTree ([bde199f](https://github.com/JBorgia/signal-tree/commit/bde199f))
+- **size:** add size claim verification to prevent barrel-only measurements ([1ca8b59](https://github.com/JBorgia/signal-tree/commit/1ca8b59))
 
 ### 🩹 Fixes
 
-- update GitHub Packages publishing and repository URLs ([50cbbee](https://github.com/JBorgia/signaltree/commit/50cbbee))
-- update GitHub Packages publishing and repository URLs ([d471d93](https://github.com/JBorgia/signaltree/commit/d471d93))
-- update Node.js version to 20 and clear Nx cache in CI workflow ([95fe516](https://github.com/JBorgia/signaltree/commit/95fe516))
-- improve CI build reliability - explicit production config, disable daemon, add debugging ([1d9fcae](https://github.com/JBorgia/signaltree/commit/1d9fcae))
-- correct Nx build and test commands in release script ([07272a8](https://github.com/JBorgia/signaltree/commit/07272a8))
-- update outdated version and bundle size information ([d2ff81a](https://github.com/JBorgia/signaltree/commit/d2ff81a))
-- correct benchmark duration calculation ([952a490](https://github.com/JBorgia/signaltree/commit/952a490))
-- Remove white background from SVG logo and improve sizing ([bcb7aee](https://github.com/JBorgia/signaltree/commit/bcb7aee))
-- Reduce hero logo size for better proportions ([599dead](https://github.com/JBorgia/signaltree/commit/599dead))
-- resolve npm publishing issues and update to v4.0.1 ([f750e8c](https://github.com/JBorgia/signaltree/commit/f750e8c))
-- correct SCSS import paths for new example components ([935fb3c](https://github.com/JBorgia/signaltree/commit/935fb3c))
-- update deprecation script for bash 3 compatibility ([4b17fcf](https://github.com/JBorgia/signaltree/commit/4b17fcf))
-- remove progressive-rpg-demo component references and fix TS config ([11efa05](https://github.com/JBorgia/signaltree/commit/11efa05))
-- update release script to only publish existing packages ([072286e](https://github.com/JBorgia/signaltree/commit/072286e))
-- correct file paths in sanity checks script ([8ff6459](https://github.com/JBorgia/signaltree/commit/8ff6459))
-- update build scripts to reflect v4.0.0+ package consolidation ([1034ab2](https://github.com/JBorgia/signaltree/commit/1034ab2))
-- correct package.json export paths for enterprise and callable-syntax ([ebcb5c5](https://github.com/JBorgia/signaltree/commit/ebcb5c5))
-- resolve build issues for callable-syntax and ng-forms packages ([05b0631](https://github.com/JBorgia/signaltree/commit/05b0631))
-- resolve linter errors for release ([426c2b1](https://github.com/JBorgia/signaltree/commit/426c2b1))
-- transform benchmark data structure for table display ([1e99626](https://github.com/JBorgia/signaltree/commit/1e99626))
-- prioritize fallback data for benchmark details ([04a905f](https://github.com/JBorgia/signaltree/commit/04a905f))
-- modal backdrop now displays as overlay instead of inline ([ae2d7ed](https://github.com/JBorgia/signaltree/commit/ae2d7ed))
-- disable view encapsulation for modal to display as overlay ([d50dc22](https://github.com/JBorgia/signaltree/commit/d50dc22))
-- correct data structure for benchmark details modal ([c3cb5ea](https://github.com/JBorgia/signaltree/commit/c3cb5ea))
-- add fallback background colors to modal dialog ([#1](https://github.com/JBorgia/signaltree/issues/1))
-- use light background for modal dialog ([25166a8](https://github.com/JBorgia/signaltree/commit/25166a8))
-- prevent modal CSS variables from affecting table styles ([#212121](https://github.com/JBorgia/signaltree/issues/212121))
-- ensure close button is perfectly round ([63035eb](https://github.com/JBorgia/signaltree/commit/63035eb))
-- replace all CSS variables with explicit light theme colors in modal ([#212121](https://github.com/JBorgia/signaltree/issues/212121), [#757575](https://github.com/JBorgia/signaltree/issues/757575), [#1976](https://github.com/JBorgia/signaltree/issues/1976))
-- remove @signaltree/shared from runtime dependencies ([0c4f957](https://github.com/JBorgia/signaltree/commit/0c4f957))
-- add @signaltree/core devDependency to enterprise and fix ng-forms tsconfig paths ([1a4dcaf](https://github.com/JBorgia/signaltree/commit/1a4dcaf))
-- update validation scripts to use correct npm scripts ([1b76809](https://github.com/JBorgia/signaltree/commit/1b76809))
-- resolve linting errors for pre-publish validation ([915d7c7](https://github.com/JBorgia/signaltree/commit/915d7c7))
-- improve PathIndex performance test reliability ([9e8574f](https://github.com/JBorgia/signaltree/commit/9e8574f))
-- correct TypeScript path mappings for production builds ([8a71270](https://github.com/JBorgia/signaltree/commit/8a71270))
-- correct dist path for TypeScript module resolution ([097959b](https://github.com/JBorgia/signaltree/commit/097959b))
-- exclude packages with peer dependencies from pre-publish validation builds ([8bdd003](https://github.com/JBorgia/signaltree/commit/8bdd003))
-- update verify-dist script to match actual dist directory structure ([9a680aa](https://github.com/JBorgia/signaltree/commit/9a680aa))
-- rewrite verify-dist script to handle both Nx and tsup output structures ([13a7b73](https://github.com/JBorgia/signaltree/commit/13a7b73))
-- replace duplicate dist verification logic with call to verify-dist.sh ([7382fb5](https://github.com/JBorgia/signaltree/commit/7382fb5))
-- handle missing timeout command on macOS in validation script ([1548f3d](https://github.com/JBorgia/signaltree/commit/1548f3d))
-- skip performance benchmarks during validation ([6ebeea2](https://github.com/JBorgia/signaltree/commit/6ebeea2))
-- use gtimeout for performance benchmarks on macOS ([4d81cd9](https://github.com/JBorgia/signaltree/commit/4d81cd9))
-- remove duplicate TypeScript path mappings that broke SWC ([bc9136f](https://github.com/JBorgia/signaltree/commit/bc9136f))
-- improve .gitignore patterns for coverage and artifacts ([5878e7c](https://github.com/JBorgia/signaltree/commit/5878e7c))
-- make bundle analysis and performance benchmarks non-blocking ([b3d891a](https://github.com/JBorgia/signaltree/commit/b3d891a))
-- override types in guardrails tsconfig to exclude Angular ([c678c91](https://github.com/JBorgia/signaltree/commit/c678c91))
-- add TestBed.flushEffects() to fix flaky ng-forms test ([1573b27](https://github.com/JBorgia/signaltree/commit/1573b27))
-- add TestBed import for ng-forms test ([cb859b4](https://github.com/JBorgia/signaltree/commit/cb859b4))
-- use async/await with setTimeout for ng-forms test instead of TestBed ([c2debb0](https://github.com/JBorgia/signaltree/commit/c2debb0))
-- update ng-forms reset test to check form control values instead of signals ([6834db8](https://github.com/JBorgia/signaltree/commit/6834db8))
-- remove build-time dependencies from core peerDependencies ([82468cf](https://github.com/JBorgia/signaltree/commit/82468cf))
-- ignore rollup packages in dependency-checks lint rule ([b004374](https://github.com/JBorgia/signaltree/commit/b004374))
-- remove unnecessary TestBed usage from core tests ([5d11d0f](https://github.com/JBorgia/signaltree/commit/5d11d0f))
-- add jest-preset-angular to ignored dependencies in lint config ([8334682](https://github.com/JBorgia/signaltree/commit/8334682))
-- apply type declaration fix to all Rollup-built packages + documentation ([d39f81b](https://github.com/JBorgia/signaltree/commit/d39f81b))
-- **build:** disable declaration generation to prevent stray .d.ts files ([2b469c6](https://github.com/JBorgia/signaltree/commit/2b469c6))
-- **build:** add post-build cleanup for stray .d.ts files ([5f0596b](https://github.com/JBorgia/signaltree/commit/5f0596b))
-- **core:** exclude stray dist/\*.d.ts files that conflicted with type resolution ([9e1286e](https://github.com/JBorgia/signaltree/commit/9e1286e))
-- **demo:** update home page with correct package installation instructions ([a36477c](https://github.com/JBorgia/signaltree/commit/a36477c))
-- **demo:** fix lint errors in ng-forms demo ([948ba76](https://github.com/JBorgia/signaltree/commit/948ba76))
-- **enterprise:** remove duplicate WeakRef declaration ([d162bdf](https://github.com/JBorgia/signaltree/commit/d162bdf))
-- **ng-forms:** fix conditional field synchronization with nested objects ([8e58e31](https://github.com/JBorgia/signaltree/commit/8e58e31))
-- **ng-forms): nested signal path traversal bug chore(build): align declaration layout with Nx preserveModules design chore(validation:** update scripts for src-based d.ts structure ([627551d](https://github.com/JBorgia/signaltree/commit/627551d))
-- **phase2:** correct buildFromTree signal detection - reorder type checks ([1451b17](https://github.com/JBorgia/signaltree/commit/1451b17))
-- **size:** update size claims to match actual measured values - core ~27KB, enterprise ~7KB, shared ~3.8KB ([f63dc3c](https://github.com/JBorgia/signaltree/commit/f63dc3c))
-- **tree-shaking:** verify barrel imports are tree-shakeable, update guidance ([ed6f28e](https://github.com/JBorgia/signaltree/commit/ed6f28e))
+- update GitHub Packages publishing and repository URLs ([50cbbee](https://github.com/JBorgia/signal-tree/commit/50cbbee))
+- update GitHub Packages publishing and repository URLs ([d471d93](https://github.com/JBorgia/signal-tree/commit/d471d93))
+- update Node.js version to 20 and clear Nx cache in CI workflow ([95fe516](https://github.com/JBorgia/signal-tree/commit/95fe516))
+- improve CI build reliability - explicit production config, disable daemon, add debugging ([1d9fcae](https://github.com/JBorgia/signal-tree/commit/1d9fcae))
+- correct Nx build and test commands in release script ([07272a8](https://github.com/JBorgia/signal-tree/commit/07272a8))
+- update outdated version and bundle size information ([d2ff81a](https://github.com/JBorgia/signal-tree/commit/d2ff81a))
+- correct benchmark duration calculation ([952a490](https://github.com/JBorgia/signal-tree/commit/952a490))
+- Remove white background from SVG logo and improve sizing ([bcb7aee](https://github.com/JBorgia/signal-tree/commit/bcb7aee))
+- Reduce hero logo size for better proportions ([599dead](https://github.com/JBorgia/signal-tree/commit/599dead))
+- resolve npm publishing issues and update to v4.0.1 ([f750e8c](https://github.com/JBorgia/signal-tree/commit/f750e8c))
+- correct SCSS import paths for new example components ([935fb3c](https://github.com/JBorgia/signal-tree/commit/935fb3c))
+- update deprecation script for bash 3 compatibility ([4b17fcf](https://github.com/JBorgia/signal-tree/commit/4b17fcf))
+- remove progressive-rpg-demo component references and fix TS config ([11efa05](https://github.com/JBorgia/signal-tree/commit/11efa05))
+- update release script to only publish existing packages ([072286e](https://github.com/JBorgia/signal-tree/commit/072286e))
+- correct file paths in sanity checks script ([8ff6459](https://github.com/JBorgia/signal-tree/commit/8ff6459))
+- update build scripts to reflect v4.0.0+ package consolidation ([1034ab2](https://github.com/JBorgia/signal-tree/commit/1034ab2))
+- correct package.json export paths for enterprise and callable-syntax ([ebcb5c5](https://github.com/JBorgia/signal-tree/commit/ebcb5c5))
+- resolve build issues for callable-syntax and ng-forms packages ([05b0631](https://github.com/JBorgia/signal-tree/commit/05b0631))
+- resolve linter errors for release ([426c2b1](https://github.com/JBorgia/signal-tree/commit/426c2b1))
+- transform benchmark data structure for table display ([1e99626](https://github.com/JBorgia/signal-tree/commit/1e99626))
+- prioritize fallback data for benchmark details ([04a905f](https://github.com/JBorgia/signal-tree/commit/04a905f))
+- modal backdrop now displays as overlay instead of inline ([ae2d7ed](https://github.com/JBorgia/signal-tree/commit/ae2d7ed))
+- disable view encapsulation for modal to display as overlay ([d50dc22](https://github.com/JBorgia/signal-tree/commit/d50dc22))
+- correct data structure for benchmark details modal ([c3cb5ea](https://github.com/JBorgia/signal-tree/commit/c3cb5ea))
+- add fallback background colors to modal dialog ([#1](https://github.com/JBorgia/signal-tree/issues/1))
+- use light background for modal dialog ([25166a8](https://github.com/JBorgia/signal-tree/commit/25166a8))
+- prevent modal CSS variables from affecting table styles ([#212121](https://github.com/JBorgia/signal-tree/issues/212121))
+- ensure close button is perfectly round ([63035eb](https://github.com/JBorgia/signal-tree/commit/63035eb))
+- replace all CSS variables with explicit light theme colors in modal ([#212121](https://github.com/JBorgia/signal-tree/issues/212121), [#757575](https://github.com/JBorgia/signal-tree/issues/757575), [#1976](https://github.com/JBorgia/signal-tree/issues/1976))
+- remove @signaltree/shared from runtime dependencies ([0c4f957](https://github.com/JBorgia/signal-tree/commit/0c4f957))
+- add @signaltree/core devDependency to enterprise and fix ng-forms tsconfig paths ([1a4dcaf](https://github.com/JBorgia/signal-tree/commit/1a4dcaf))
+- update validation scripts to use correct npm scripts ([1b76809](https://github.com/JBorgia/signal-tree/commit/1b76809))
+- resolve linting errors for pre-publish validation ([915d7c7](https://github.com/JBorgia/signal-tree/commit/915d7c7))
+- improve PathIndex performance test reliability ([9e8574f](https://github.com/JBorgia/signal-tree/commit/9e8574f))
+- correct TypeScript path mappings for production builds ([8a71270](https://github.com/JBorgia/signal-tree/commit/8a71270))
+- correct dist path for TypeScript module resolution ([097959b](https://github.com/JBorgia/signal-tree/commit/097959b))
+- exclude packages with peer dependencies from pre-publish validation builds ([8bdd003](https://github.com/JBorgia/signal-tree/commit/8bdd003))
+- update verify-dist script to match actual dist directory structure ([9a680aa](https://github.com/JBorgia/signal-tree/commit/9a680aa))
+- rewrite verify-dist script to handle both Nx and tsup output structures ([13a7b73](https://github.com/JBorgia/signal-tree/commit/13a7b73))
+- replace duplicate dist verification logic with call to verify-dist.sh ([7382fb5](https://github.com/JBorgia/signal-tree/commit/7382fb5))
+- handle missing timeout command on macOS in validation script ([1548f3d](https://github.com/JBorgia/signal-tree/commit/1548f3d))
+- skip performance benchmarks during validation ([6ebeea2](https://github.com/JBorgia/signal-tree/commit/6ebeea2))
+- use gtimeout for performance benchmarks on macOS ([4d81cd9](https://github.com/JBorgia/signal-tree/commit/4d81cd9))
+- remove duplicate TypeScript path mappings that broke SWC ([bc9136f](https://github.com/JBorgia/signal-tree/commit/bc9136f))
+- improve .gitignore patterns for coverage and artifacts ([5878e7c](https://github.com/JBorgia/signal-tree/commit/5878e7c))
+- make bundle analysis and performance benchmarks non-blocking ([b3d891a](https://github.com/JBorgia/signal-tree/commit/b3d891a))
+- override types in guardrails tsconfig to exclude Angular ([c678c91](https://github.com/JBorgia/signal-tree/commit/c678c91))
+- add TestBed.flushEffects() to fix flaky ng-forms test ([1573b27](https://github.com/JBorgia/signal-tree/commit/1573b27))
+- add TestBed import for ng-forms test ([cb859b4](https://github.com/JBorgia/signal-tree/commit/cb859b4))
+- use async/await with setTimeout for ng-forms test instead of TestBed ([c2debb0](https://github.com/JBorgia/signal-tree/commit/c2debb0))
+- update ng-forms reset test to check form control values instead of signals ([6834db8](https://github.com/JBorgia/signal-tree/commit/6834db8))
+- remove build-time dependencies from core peerDependencies ([82468cf](https://github.com/JBorgia/signal-tree/commit/82468cf))
+- ignore rollup packages in dependency-checks lint rule ([b004374](https://github.com/JBorgia/signal-tree/commit/b004374))
+- remove unnecessary TestBed usage from core tests ([5d11d0f](https://github.com/JBorgia/signal-tree/commit/5d11d0f))
+- add jest-preset-angular to ignored dependencies in lint config ([8334682](https://github.com/JBorgia/signal-tree/commit/8334682))
+- apply type declaration fix to all Rollup-built packages + documentation ([d39f81b](https://github.com/JBorgia/signal-tree/commit/d39f81b))
+- **build:** disable declaration generation to prevent stray .d.ts files ([2b469c6](https://github.com/JBorgia/signal-tree/commit/2b469c6))
+- **build:** add post-build cleanup for stray .d.ts files ([5f0596b](https://github.com/JBorgia/signal-tree/commit/5f0596b))
+- **core:** exclude stray dist/\*.d.ts files that conflicted with type resolution ([9e1286e](https://github.com/JBorgia/signal-tree/commit/9e1286e))
+- **demo:** update home page with correct package installation instructions ([a36477c](https://github.com/JBorgia/signal-tree/commit/a36477c))
+- **demo:** fix lint errors in ng-forms demo ([948ba76](https://github.com/JBorgia/signal-tree/commit/948ba76))
+- **enterprise:** remove duplicate WeakRef declaration ([d162bdf](https://github.com/JBorgia/signal-tree/commit/d162bdf))
+- **ng-forms:** fix conditional field synchronization with nested objects ([8e58e31](https://github.com/JBorgia/signal-tree/commit/8e58e31))
+- **ng-forms): nested signal path traversal bug chore(build): align declaration layout with Nx preserveModules design chore(validation:** update scripts for src-based d.ts structure ([627551d](https://github.com/JBorgia/signal-tree/commit/627551d))
+- **phase2:** correct buildFromTree signal detection - reorder type checks ([1451b17](https://github.com/JBorgia/signal-tree/commit/1451b17))
+- **size:** update size claims to match actual measured values - core ~27KB, enterprise ~7KB, shared ~3.8KB ([f63dc3c](https://github.com/JBorgia/signal-tree/commit/f63dc3c))
+- **tree-shaking:** verify barrel imports are tree-shakeable, update guidance ([ed6f28e](https://github.com/JBorgia/signal-tree/commit/ed6f28e))
 
 ### 🔥 Performance
 
-- improve measurement robustness (non-zero medians & hrtime batching) ([b2ae452](https://github.com/JBorgia/signaltree/commit/b2ae452))
+- improve measurement robustness (non-zero medians & hrtime batching) ([b2ae452](https://github.com/JBorgia/signal-tree/commit/b2ae452))
 
 ### ❤️ Thank You
 
@@ -4162,11 +4162,11 @@ function withServiceRead<T extends BaseState>(tree: ISignalTree<T>) { ... }
 
 ### 🩹 Fixes
 
-- **build:** disable declaration generation to prevent stray .d.ts files ([52d70b7](https://github.com/JBorgia/signaltree/commit/52d70b7))
-- **build:** add post-build cleanup for stray .d.ts files ([3ac04f2](https://github.com/JBorgia/signaltree/commit/3ac04f2))
-- **demo:** fix lint errors in ng-forms demo ([1d2a7ca](https://github.com/JBorgia/signaltree/commit/1d2a7ca))
-- **ng-forms:** fix conditional field synchronization with nested objects ([ce3ec52](https://github.com/JBorgia/signaltree/commit/ce3ec52))
-- **ng-forms): nested signal path traversal bug chore(build): align declaration layout with Nx preserveModules design chore(validation:** update scripts for src-based d.ts structure ([816f49c](https://github.com/JBorgia/signaltree/commit/816f49c))
+- **build:** disable declaration generation to prevent stray .d.ts files ([52d70b7](https://github.com/JBorgia/signal-tree/commit/52d70b7))
+- **build:** add post-build cleanup for stray .d.ts files ([3ac04f2](https://github.com/JBorgia/signal-tree/commit/3ac04f2))
+- **demo:** fix lint errors in ng-forms demo ([1d2a7ca](https://github.com/JBorgia/signal-tree/commit/1d2a7ca))
+- **ng-forms:** fix conditional field synchronization with nested objects ([ce3ec52](https://github.com/JBorgia/signal-tree/commit/ce3ec52))
+- **ng-forms): nested signal path traversal bug chore(build): align declaration layout with Nx preserveModules design chore(validation:** update scripts for src-based d.ts structure ([816f49c](https://github.com/JBorgia/signal-tree/commit/816f49c))
 
 ### ❤️ Thank You
 
@@ -4176,8 +4176,8 @@ function withServiceRead<T extends BaseState>(tree: ISignalTree<T>) { ... }
 
 ### 🩹 Fixes
 
-- apply type declaration fix to all Rollup-built packages + documentation ([d39f81b](https://github.com/JBorgia/signaltree/commit/d39f81b))
-- **core:** exclude stray dist/\*.d.ts files that conflicted with type resolution ([9e1286e](https://github.com/JBorgia/signaltree/commit/9e1286e))
+- apply type declaration fix to all Rollup-built packages + documentation ([d39f81b](https://github.com/JBorgia/signal-tree/commit/d39f81b))
+- **core:** exclude stray dist/\*.d.ts files that conflicted with type resolution ([9e1286e](https://github.com/JBorgia/signal-tree/commit/9e1286e))
 
 ### ❤️ Thank You
 

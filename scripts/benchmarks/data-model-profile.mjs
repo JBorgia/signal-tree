@@ -26,7 +26,7 @@ import {
   entityMap,
   signalTree,
   restoration,
-} from '../../dist/packages/core/dist/index.js';
+} from '../../dist/packages/kernel/dist/index.js';
 import { deepEqual } from '../../dist/packages/shared/dist/index.js';
 
 // ---------------------------------------------------------------- harness ---

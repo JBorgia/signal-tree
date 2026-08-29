@@ -3,10 +3,10 @@ const path = require('path');
 
 const out = path.join(
   __dirname,
-  '../packages/core/src/enhancers/typing/all-subsets.generated.spec.ts'
+  '../packages/kernel/src/enhancers/typing/all-subsets.generated.spec.ts'
 );
 
-// Kept in sync with the REAL interfaces in packages/core/src/lib/types.ts.
+// Kept in sync with the REAL interfaces in packages/kernel/src/lib/types.ts.
 //
 // This list rotted badly and nothing noticed, because a type-level test that is
 // not type-checked is not a test: vitest strips types without checking them,

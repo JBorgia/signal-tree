@@ -1,0 +1,43 @@
+{
+  "measuredAt": "unstamped (Date is not used so runs stay comparable)",
+  "reps": 7,
+  "n": 2000,
+  "node": "v24.3.0",
+  "results": [
+    {
+      "label": "construct-plain-tree",
+      "medianMs": 22.3729,
+      "n": 2000
+    },
+    {
+      "label": "construct-wide-tree-256",
+      "medianMs": 5.1625,
+      "n": 2000
+    },
+    {
+      "label": "scalar-read",
+      "medianMs": 0.0417,
+      "n": 2000
+    },
+    {
+      "label": "scalar-write-leaf-set",
+      "medianMs": 0.093,
+      "n": 2000
+    },
+    {
+      "label": "merge-write-same-leaf",
+      "medianMs": 0.4773,
+      "n": 2000
+    },
+    {
+      "label": "merge-write-many-leaves",
+      "medianMs": 0.6596,
+      "n": 2000
+    },
+    {
+      "label": "causal-tree-write",
+      "medianMs": 0.4351,
+      "n": 2000
+    }
+  ]
+}

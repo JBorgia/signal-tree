@@ -25,9 +25,9 @@ const packages = [
   {
     name: 'core',
     path: [
-      'dist/packages/core/dist/index.js',
-      'dist/packages/core/src/index.js',
-      'dist/packages/core/fesm2022/signaltree-core.mjs',
+      'dist/packages/kernel/dist/index.js',
+      'dist/packages/kernel/src/index.js',
+      'dist/packages/kernel/fesm2022/signaltree-core.mjs',
     ],
     maxSize: 30000,
     // v13.1.0: core grew ~2.36KB (history()/audit/trackHistory; audit moved in
@@ -51,31 +51,31 @@ const packages = [
   },
   {
     name: 'core/enhancers/batching',
-    path: 'dist/packages/core/dist/enhancers/batching/lib/batching.js',
+    path: 'dist/packages/kernel/dist/enhancers/batching/lib/batching.js',
     maxSize: 1400,
     claimed: 1280,
   },
   {
     name: 'core/enhancers/restoration',
-    path: 'dist/packages/core/dist/enhancers/restoration/lib/time-travel.js',
+    path: 'dist/packages/kernel/dist/enhancers/restoration/lib/time-travel.js',
     maxSize: 1950,
     claimed: 1350,
   },
   {
     name: 'core/enhancers/middleware',
-    path: 'dist/packages/core/dist/enhancers/middleware/lib/middleware.js',
+    path: 'dist/packages/kernel/dist/enhancers/middleware/lib/middleware.js',
     maxSize: 2000,
     claimed: 1360,
   },
   {
     name: 'core/enhancers/devtools',
-    path: 'dist/packages/core/dist/enhancers/devtools/lib/devtools.js',
+    path: 'dist/packages/kernel/dist/enhancers/devtools/lib/devtools.js',
     maxSize: 2600,
     claimed: 2470,
   },
   {
     name: 'core/enhancers/serialization',
-    path: 'dist/packages/core/dist/enhancers/serialization/lib/serialization.js',
+    path: 'dist/packages/kernel/dist/enhancers/serialization/lib/serialization.js',
     maxSize: 5200,
     claimed: 4860,
   },

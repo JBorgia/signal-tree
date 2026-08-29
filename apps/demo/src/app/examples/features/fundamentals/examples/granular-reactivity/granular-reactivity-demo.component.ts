@@ -1,8 +1,8 @@
 
 import { Component, computed, signal, Signal, ChangeDetectionStrategy } from '@angular/core';
-import { entityMap, signalTree } from '@signaltree/core';
+import { entityMap, signalTree } from '@signal-tree/kernel';
 
-import type { EntityMapMarker } from '@signaltree/core';
+import type { EntityMapMarker } from '@signal-tree/kernel';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 

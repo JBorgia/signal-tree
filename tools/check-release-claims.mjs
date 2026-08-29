@@ -307,7 +307,7 @@ function codesAt(rev) {
 const SURFACES = [
   {
     name: 'core README',
-    files: ['packages/core/README.md'],
+    files: ['packages/kernel/README.md'],
     applies: (r) =>
       !r.isCode &&
       (r.kind === 'value' || r.kind === 'member') &&
@@ -346,15 +346,11 @@ const EXEMPT = new Map(
       'authoring-only type; reasons documented with onHydrateDecision',
     mutationIntent:
       'internal WriteMetadata rollback classifier; documented by causal-runtime architecture docs, not app-facing README/changelog',
-    positionIds:
-      'internal WriteMetadata/MutationEnvelope ownership ids; not an application-facing option',
     SerializedState: 'return type of an already-documented method',
     SerializationMethods:
       'method bag type; the methods are documented individually',
     PersistenceMethods:
       'method bag type; the methods are documented individually',
-    subjectIds:
-      'internal WriteMetadata/MutationEnvelope structural subject ids; not an application-facing option',
     transactionId:
       'internal WriteMetadata transaction token used by transactions()',
     transactionOwner:

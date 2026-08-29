@@ -19,7 +19,7 @@ import { writeFileSync, mkdtempSync, writeFileSync as wf } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const CORE = new URL('../dist/packages/core/dist/index.js', import.meta.url)
+const CORE = new URL('../dist/packages/kernel/dist/index.js', import.meta.url)
   .pathname;
 
 const ENTRIES = {

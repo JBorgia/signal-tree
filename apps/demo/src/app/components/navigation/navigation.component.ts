@@ -222,7 +222,7 @@ export class NavigationComponent {
   externalLinks: ExternalLink[] = [
     {
       label: 'GitHub',
-      url: 'https://github.com/JBorgia/signaltree',
+      url: 'https://github.com/JBorgia/signal-tree',
       icon: '🔗',
       title: 'View source code on GitHub',
     },

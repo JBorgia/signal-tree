@@ -37,7 +37,7 @@ export class DocumentationComponent implements OnInit {
   packages: DocPackage[] = [
     {
       id: 'core',
-      name: '@signaltree/core',
+      name: '@signal-tree/kernel',
       description: 'Core tree, entities, enhancers, DevTools, and persistence primitives',
       readmePath: 'assets/docs/core/README.md',
     },

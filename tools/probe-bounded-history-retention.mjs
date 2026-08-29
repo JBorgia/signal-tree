@@ -64,7 +64,7 @@ if (!SELF_TEST) {
 // at all, only recorded tables — printed "build first" and exited on any
 // unbuilt checkout. Invisible in a warm tree; the 15.0 pristine-checkout
 // rehearsal is what surfaced it.
-const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
+const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!SELF_TEST && !existsSync(CORE)) {
   console.error('❌ build first: npx nx build core');
   process.exit(1);

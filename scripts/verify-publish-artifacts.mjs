@@ -74,7 +74,7 @@ export function globMatches(root, pattern) {
 
 function selfTest() {
   console.log('🧪 verify-publish-artifacts --self-test\n');
-  const root = join(process.cwd(), 'dist/packages/core');
+  const root = join(process.cwd(), 'dist/packages/kernel');
   const cases = [
     { p: 'README.md', expect: true, name: 'literal file that exists' },
     { p: 'NOPE.md', expect: false, name: 'literal file that does not' },
@@ -89,7 +89,7 @@ function selfTest() {
     console.log(`${pass ? '✅' : '❌'} self-test: ${c.name} (${c.p})`);
   }
   if (!existsSync(root)) {
-    console.log('⚠️  self-test needs dist/packages/core — build first');
+    console.log('⚠️  self-test needs dist/packages/kernel — build first');
     process.exit(1);
   }
   process.exit(ok ? 0 : 1);

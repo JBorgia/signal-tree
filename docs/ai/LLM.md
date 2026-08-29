@@ -803,7 +803,7 @@ store.$.users.byId('1'); // Error: expected number key
 
 ## Resources
 
-- [SignalTree GitHub](https://github.com/JBorgia/signaltree)
+- [SignalTree GitHub](https://github.com/JBorgia/signal-tree)
 - [SignalTree npm](https://www.npmjs.com/package/@signaltree/core)
 - [Angular Signals Guide](https://angular.dev/guide/signals)
 - [Angular Resource Guide](https://angular.dev/guide/signals/resource)

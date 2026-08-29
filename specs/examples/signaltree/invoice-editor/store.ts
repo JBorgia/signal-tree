@@ -14,7 +14,7 @@
  */
 
 import { computed, Injectable } from '@angular/core';
-import { signalTree, entityMap } from '@signaltree/core';
+import { signalTree, entityMap } from '@signal-tree/kernel';
 
 // ============================================================================
 // DOMAIN TYPES

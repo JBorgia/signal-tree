@@ -6,13 +6,13 @@ module.exports = {
   maxWorkers: 2,
   testPathIgnorePatterns: ['demo-e2e'],
   moduleNameMapper: {
-    '^@signaltree/core$': '<rootDir>/../../packages/core/src/index.ts',
+    '^@signal-tree/kernel$': '<rootDir>/../../packages/kernel/src/index.ts',
     // Flat-file subpaths (no index.ts inside a same-named directory) — must be
     // matched before the generic `/$1/index.ts` fallback below, which only
     // resolves subpaths that ARE directories (e.g. `enhancers`).
-    '^@signaltree/core/(authoring)$':
-      '<rootDir>/../../packages/core/src/$1.ts',
-    '^@signaltree/core/(.*)$': '<rootDir>/../../packages/core/src/$1/index.ts',
+    '^@signal-tree/kernel/(authoring)$':
+      '<rootDir>/../../packages/kernel/src/$1.ts',
+    '^@signal-tree/kernel/(.*)$': '<rootDir>/../../packages/kernel/src/$1/index.ts',
     '^@signaltree/(.*)$': '<rootDir>/../../packages/$1/src/index.ts',
     '^@app/(.*)$': '<rootDir>/src/app/$1',
     '^@benchmark/(.*)$': '<rootDir>/src/app/services/benchmark/$1',

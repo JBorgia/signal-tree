@@ -966,7 +966,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
     <h4>💥 Breaking</h4>
     <ul>
       <li>
-        <strong><code>@signaltree/core/rxjs-interop</code> subpath removed.</strong>
+        <strong><code>@signal-tree/kernel/rxjs-interop</code> subpath removed.</strong>
         <code>import &#123; rxMethod &#125; from '&#64;signaltree/core/rxjs-interop'</code> no longer resolves.
         <code>/rxmethod</code> demo route now 301-redirects to <a routerLink="/async">/async</a>.
       </li>
@@ -1022,7 +1022,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
     </p>
     <ul>
       <li><strong><code>/llms.txt</code> and <code>/llms-full.txt</code></strong> at site root — canonical references following the emerging convention.</li>
-      <li><strong>NgRx SignalStore comparison page</strong> — honest axis-by-axis comparison at <a href="https://github.com/JBorgia/signaltree/blob/main/docs/compare/ngrx-signalstore.md">docs/compare/ngrx-signalstore.md</a>.</li>
+      <li><strong>NgRx SignalStore comparison page</strong> — honest axis-by-axis comparison at <a href="https://github.com/JBorgia/signal-tree/blob/main/docs/compare/ngrx-signalstore.md">docs/compare/ngrx-signalstore.md</a>.</li>
       <li><strong>Myths &amp; misconceptions doc</strong> — 16+ catalogued false claims LLMs frequently propagate, with source-code citations.</li>
       <li><strong>Drop-in AI agent templates</strong> — <code>.cursorrules</code>, <code>CLAUDE.md</code>, <code>copilot-instructions.md</code> for downstream projects.</li>
     </ul>
@@ -1054,7 +1054,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
     <p>
       Breaking type-only change (invisible for almost all users): removed the global
       <code>declare module '@angular/core'</code> augmentation from
-      <code>@signaltree/core</code> that added callable overloads to Angular's
+      <code>@signal-tree/kernel</code> that added callable overloads to Angular's
       <code>WritableSignal&lt;T&gt;</code>. Augmentation now lives exclusively in
       <code>@signaltree/callable-syntax</code>. Unblocks <strong>gradual adoption alongside
       <code>@ngrx/signals</code></strong> in monorepos.
@@ -1110,7 +1110,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
     </ul>
     <p>
       See the
-      <a href="https://github.com/JBorgia/signaltree/blob/main/docs/guides/migration-v8-v9.md"
+      <a href="https://github.com/JBorgia/signal-tree/blob/main/docs/guides/migration-v8-v9.md"
         >v8 → v9 migration guide</a
       >
       for before/after code and the full list of changes.
@@ -1138,7 +1138,7 @@ tree.$.load.fail(err);      // equivalent (v10.2+)</code></pre>
       <div class="metric">
         <span class="value">75%</span>
         <span class="label">Fewer Packages</span>
-        <span class="detail">4 @ngrx/* → 1 @signaltree/core</span>
+        <span class="detail">4 @ngrx/* → 1 @signal-tree/kernel</span>
       </div>
     </div>
     <p class="disclaimer">

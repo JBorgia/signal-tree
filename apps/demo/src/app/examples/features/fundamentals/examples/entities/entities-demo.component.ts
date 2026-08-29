@@ -1,7 +1,7 @@
 
 import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { entityMap, signalTree } from '@signaltree/core';
+import { entityMap, signalTree } from '@signal-tree/kernel';
 
 import {
   generatePosts,
@@ -10,7 +10,7 @@ import {
   User,
 } from '../../../../../shared/models';
 
-import type { EntityMapMarker } from '@signaltree/core';
+import type { EntityMapMarker } from '@signal-tree/kernel';
 
 interface EntitiesState {
   users: EntityMapMarker<User, number>;

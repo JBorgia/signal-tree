@@ -26,7 +26,7 @@
  *   node tools/bench-predicate-memo.mjs --json
  *   node tools/bench-predicate-memo.mjs --n 5000 --reads 200
  */
-import { signalTree, entityMap } from '../dist/packages/core/dist/index.js';
+import { signalTree, entityMap } from '../dist/packages/kernel/dist/index.js';
 
 const argv = process.argv.slice(2);
 const asJson = argv.includes('--json');

@@ -51,7 +51,7 @@ in §4.
 Release notes for the GitHub release page are written and staged at
 `RELEASE-NOTES-13.5.0.md` (gitignored). **They were never posted** — the `gh`
 CLI is authenticated as `jborgia_ttrax`, which has read-only access to
-`JBorgia/signaltree`.
+`JBorgia/signal-tree`.
 
 ---
 

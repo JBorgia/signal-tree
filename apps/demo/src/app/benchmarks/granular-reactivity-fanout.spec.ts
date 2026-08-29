@@ -20,7 +20,7 @@
  *   - Raw signal(bigObject) → the hand-rolled baseline: one signal holding the
  *     whole object. Any change dirties every reader. Fan-out = N.
  *   - entityMap via `byId(id).v()` → per-entity fan-out 1. Guarded in
- *     `packages/core/src/lib/entity-granular-reactivity.spec.ts` and documented
+ *     `packages/kernel/src/lib/entity-granular-reactivity.spec.ts` and documented
  *     in the skills docs; NOT re-asserted here so two specs cannot drift.
  *   - entityMap via `map()`/`all()` (the collection signals) → every per-entity
  *     read through the whole-collection signal re-runs on any write. Fan-out =
@@ -30,7 +30,7 @@
  *     caching, and snapshot semantics).
  */
 import { computed, signal } from '@angular/core';
-import { entityMap, signalTree } from '@signaltree/core';
+import { entityMap, signalTree } from '@signal-tree/kernel';
 
 const N = 100;
 const TARGET = 42; // the single index we mutate
@@ -93,7 +93,7 @@ describe('granular-reactivity fan-out', () => {
   });
 
   // entityMap via byId() (per-entity fan-out 1) is NOT re-tested here — the
-  // authoritative guard lives in packages/core/src/lib/entity-granular-
+  // authoritative guard lives in packages/kernel/src/lib/entity-granular-
   // reactivity.spec.ts ("updating one entity does NOT re-run a reader of
   // another"). This spec deliberately keeps only the arms core does not pin.
 

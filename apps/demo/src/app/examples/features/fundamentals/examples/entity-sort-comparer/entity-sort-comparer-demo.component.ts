@@ -1,10 +1,10 @@
 
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { entityMap, signalTree } from '@signaltree/core';
+import { entityMap, signalTree } from '@signal-tree/kernel';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
-import type { EntityMapMarker } from '@signaltree/core';
+import type { EntityMapMarker } from '@signal-tree/kernel';
 
 interface Player {
   id: number;

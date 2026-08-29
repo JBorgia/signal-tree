@@ -35,7 +35,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 const REPO_NODE_MODULES = join(process.cwd(), 'node_modules');
-const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
+const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 const dir = mkdtempSync(join(tmpdir(), 'st-size-compare-'));
 
 /** Capability, then one entry per library implementing it. */

@@ -18,9 +18,9 @@ const api = JSON.parse(
   })
 );
 
-const core = api['@signaltree/core'];
+const core = api['@signal-tree/kernel'];
 if (!core) {
-  console.error('❌ @signaltree/core is missing from API surface output.');
+  console.error('❌ @signal-tree/kernel is missing from API surface output.');
   process.exit(1);
 }
 

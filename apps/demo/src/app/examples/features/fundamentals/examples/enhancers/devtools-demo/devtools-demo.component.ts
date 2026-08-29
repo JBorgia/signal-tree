@@ -1,13 +1,13 @@
 import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { devTools, signalTree } from '@signaltree/core';
+import { devTools, signalTree } from '@signal-tree/kernel';
 
 import {
   type CodeFile,
   ExampleComponent,
 } from '../../../../../shared/components/example-shell';
 
-import type { DevToolsDebugSession } from '@signaltree/core';
+import type { DevToolsDebugSession } from '@signal-tree/kernel';
 
 interface DevtoolsState {
   counter: number;
@@ -34,7 +34,7 @@ interface ActionRecord {
 }
 
 // Source shown in the st-example code panel (mirrors the store setup below).
-const STORE_SOURCE = `import { devTools, signalTree } from '@signaltree/core';
+const STORE_SOURCE = `import { devTools, signalTree } from '@signal-tree/kernel';
 
 const store = signalTree(
   {

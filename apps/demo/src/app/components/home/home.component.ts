@@ -92,7 +92,7 @@ export class HomeComponent {
 
   readonly packageCards: HomeLinkCard[] = [
     {
-      title: '@signaltree/core',
+      title: '@signal-tree/kernel',
       description:
         'The main package: state tree, entity maps, batching, DevTools, time travel, persistence, and serialization.',
       route: '/docs',
@@ -202,7 +202,7 @@ export class HomeComponent {
       label: 'install.sh',
       language: 'bash',
       source: `# Install the core package
-npm install @signaltree/core
+npm install @signal-tree/kernel
 `,
     },
     {
@@ -214,7 +214,7 @@ import {
   batching,
   devTools,
   restoration
-} from '@signaltree/core';
+} from '@signal-tree/kernel';
 
 const appTree = signalTree({
   user: {
@@ -283,7 +283,7 @@ appTree.$.user.profile.name.set('Grace Hopper');`,
     {
       label: 'extreme-depth.ts',
       language: 'typescript',
-      source: `import { signalTree } from '@signaltree/core';
+      source: `import { signalTree } from '@signal-tree/kernel';
 
 // Deep nested state with strong type inference
 const extremeDepth = signalTree({

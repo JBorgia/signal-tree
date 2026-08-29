@@ -1,5 +1,5 @@
 import { Component, effect, inject, Injector, signal, ChangeDetectionStrategy } from '@angular/core';
-import { batching, signalTree } from '@signaltree/core';
+import { batching, signalTree } from '@signal-tree/kernel';
 
 import { ExampleComponent } from '../../../../../shared/components/example-shell';
 

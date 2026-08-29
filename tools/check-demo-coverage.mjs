@@ -45,7 +45,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ROOT = process.cwd();
-const CORE = join(ROOT, 'dist/packages/core/dist/index.js');
+const CORE = join(ROOT, 'dist/packages/kernel/dist/index.js');
 const DEMO = join(ROOT, 'apps/demo/src');
 
 const SKIP = new Set(['node_modules', 'dist', '.angular', '.nx']);

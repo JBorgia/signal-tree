@@ -3,7 +3,7 @@
   "displayName": "SignalTree",
   "version": "10.0.0",
   "packages": [
-    "@signaltree/core",
+    "@signal-tree/kernel",
     "@signaltree/ng-forms",
     "@signaltree/events",
     "@signaltree/guardrails",

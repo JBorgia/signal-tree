@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { batching, signalTree } from '@signaltree/core';
+import { batching, signalTree } from '@signal-tree/kernel';
 
 /**
  * @fileoverview Comprehensive benchmarking suite for SignalTree Demo
@@ -478,7 +478,7 @@ export class BenchmarkService {
 
   // `benchmarkLazyLoading()` lived here and is deleted with the lazy feature
   // in 15.0. It had no caller, and its lazy branch imported
-  // `@signaltree/core/lazy` — a subpath withdrawn from the published surface,
+  // `@signal-tree/kernel/lazy` — a subpath withdrawn from the published surface,
   // so the benchmark could not have run against a published build anyway.
 
   /**

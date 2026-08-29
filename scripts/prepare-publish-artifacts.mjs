@@ -6,12 +6,12 @@
  *
  * Three publish scripts each carried the same block:
  *
- *     if [ -f "apps/demo/public/llms.txt" ] && [ -d "dist/packages/core" ]; then
- *         cp apps/demo/public/llms.txt dist/packages/core/llms.txt
+ *     if [ -f "apps/demo/public/llms.txt" ] && [ -d "dist/packages/kernel" ]; then
+ *         cp apps/demo/public/llms.txt dist/packages/kernel/llms.txt
  *     fi
  *
  * If either path is missing, all three **silently skip it** and publish
- * `@signaltree/core` without the `llms.txt` that primes retrieval-aware agents —
+ * `@signal-tree/kernel` without the `llms.txt` that primes retrieval-aware agents —
  * a stated differentiator, absent, with no error anywhere. npm compounds it: a
  * `files` glob that matches nothing produces no warning at all, so the tarball
  * ships light and looks fine.
@@ -68,9 +68,9 @@ function run(label, argv) {
   }
 }
 
-if (!existsSync(join(ROOT, 'dist/packages/core'))) {
+if (!existsSync(join(ROOT, 'dist/packages/kernel'))) {
   console.error(
-    '✗ dist/packages/core is missing — run `npm run build:all` first.\n' +
+    '✗ dist/packages/kernel is missing — run `npm run build:all` first.\n' +
       '  This script prepares a build; it does not produce one.'
   );
   process.exit(1);
@@ -90,7 +90,7 @@ if (!VERIFY_ONLY) {
         `\n✗ ${from} does not exist.\n` +
           `  The publish scripts used to skip this silently and ship core\n` +
           `  without it. Either produce the file or remove its entry from\n` +
-          `  @signaltree/core's "files" — do not restore the silent skip.`
+          `  @signal-tree/kernel's "files" — do not restore the silent skip.`
       );
       process.exit(1);
     }
