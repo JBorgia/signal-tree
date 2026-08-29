@@ -21,14 +21,14 @@ import { existsSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
+const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 const NM = join(process.cwd(), 'node_modules');
 if (!existsSync(CORE)) {
   console.error('❌ build first: nx run-many -t build --all');
   process.exit(1);
 }
 const dir = mkdtempSync(join(tmpdir(), 'st-size-'));
-const sub = (p) => JSON.stringify(join(process.cwd(), `dist/packages/core/dist/${p}`));
+const sub = (p) => JSON.stringify(join(process.cwd(), `dist/packages/kernel/dist/${p}`));
 
 async function kb(code, id) {
   const entry = join(dir, `${id}.js`);

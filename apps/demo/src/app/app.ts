@@ -22,7 +22,7 @@ import { SIGNALTREE_VERSION_SUMMARY } from './version';
         <nav class="topbar-actions" aria-label="External links">
           <span class="topbar-version">{{ versionSummary }}</span>
           <a
-            href="https://github.com/JBorgia/signaltree"
+            href="https://github.com/JBorgia/signal-tree"
             target="_blank"
             rel="noopener noreferrer"
             class="topbar-link"

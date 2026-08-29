@@ -22,7 +22,7 @@ import {
   signalTree,
   entityMap,
   restoration,
-} from '../dist/packages/core/dist/index.js';
+} from '../dist/packages/kernel/dist/index.js';
 import { signalState, patchState, getState } from '@ngrx/signals';
 import { setAllEntities, updateEntity } from '@ngrx/signals/entities';
 

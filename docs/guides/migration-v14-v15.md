@@ -82,7 +82,7 @@ the tree callable is for whole-tree reads and writes:
 
 ```ts
 tree(); // read the whole state
-tree({ count: 1 }); // partial merge
+tree({ count: 1 }); // 14.x: partial merge — REMOVED in 15.0
 tree((current) => ({ ...current, count: 2 })); // functional update
 ```
 

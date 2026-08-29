@@ -7,7 +7,7 @@ import {
   map,
   switchMap,
 } from 'rxjs';
-import { external, signalTree } from '@signaltree/core';
+import { external, signalTree } from '@signal-tree/kernel';
 
 /**
  * The debounced-search scenario that `asyncQuery` used to own — as ordinary

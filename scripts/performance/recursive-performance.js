@@ -3,7 +3,7 @@
  * 🚀 SignalTree Comprehensive Performance Analysis
  *
  * This script provides standalone performance testing that complements
- * the Vitest tests in packages/core. It focuses on runtime performance
+ * the Vitest tests in packages/kernel. It focuses on runtime performance
  * measurement without framework complexity.
  */
 

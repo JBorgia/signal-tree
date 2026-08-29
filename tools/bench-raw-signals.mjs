@@ -39,7 +39,7 @@
  *   node tools/bench-raw-signals.mjs
  *   node tools/bench-raw-signals.mjs --json
  */
-import { signalTree } from '../dist/packages/core/dist/index.js';
+import { signalTree } from '../dist/packages/kernel/dist/index.js';
 import { signal, computed } from '@angular/core';
 
 const arg = (name, dflt) => {

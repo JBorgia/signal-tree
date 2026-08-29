@@ -1,5 +1,5 @@
 import { computed } from '@angular/core';
-import { derivedFrom } from '@signaltree/core';
+import { derivedFrom } from '@signal-tree/kernel';
 
 import { LoadingState } from '../../types';
 import type { AppTreeWithFilters } from '../app-tree';

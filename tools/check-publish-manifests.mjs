@@ -9,7 +9,7 @@
  * ## Why this exists
  *
  * Found during the 15.0 release rehearsal. Every internal dependency is written
- * `"@signaltree/core": "workspace:*"`, which is pnpm's workspace protocol and
+ * `"@signal-tree/kernel": "workspace:*"`, which is pnpm's workspace protocol and
  * is meaningless to npm, yarn, bun, or a CI runner installing from the
  * registry. Whether it reaches the registry depends on which command someone
  * happens to run:
@@ -18,7 +18,7 @@
  *   pnpm pack  from dist/    refuses — ERR_PNPM_CANNOT_RESOLVE_WORKSPACE_PROTOCOL
  *   nx release version       rewrites `version` only, not the protocol
  *
- * The published 14.1.3 has `"@signaltree/core": "^14.1.3"`, so the real release
+ * The published 14.1.3 has `"@signal-tree/kernel": "^14.1.3"`, so the real release
  * went through a path that resolved it. That is the problem: the outcome is a
  * property of the operator's muscle memory rather than of the repository. One
  * of the available paths produces a package that cannot be installed, and it is
@@ -214,23 +214,23 @@ function selfTest() {
   const clean = {
     name: '@signaltree/events',
     version: '15.0.0-rc.1',
-    peerDependencies: { '@signaltree/core': '^15.0.0-rc.1' },
+    peerDependencies: { '@signal-tree/kernel': '^15.0.0-rc.1' },
   };
   const withProtocol = {
     name: '@signaltree/events',
     version: '15.0.0-rc.1',
     // The exact string the 15.0 rehearsal found in dist/.
-    peerDependencies: { '@signaltree/core': 'workspace:*' },
+    peerDependencies: { '@signal-tree/kernel': 'workspace:*' },
   };
   const withDeadRange = {
     name: '@signaltree/events',
     version: '15.0.0-rc.1',
     // Valid semver, admits nothing being shipped — a caret on a stable version
     // does NOT admit a prerelease of the same version.
-    peerDependencies: { '@signaltree/core': '^15.0.0' },
+    peerDependencies: { '@signal-tree/kernel': '^15.0.0' },
   };
 
-  const versions = new Map([['@signaltree/core', '15.0.0-rc.1']]);
+  const versions = new Map([['@signal-tree/kernel', '15.0.0-rc.1']]);
   const check = (manifest) => inspectManifest(manifest, '<fixture>', versions);
 
   const failures = [];

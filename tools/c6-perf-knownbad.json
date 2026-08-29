@@ -1,0 +1,48 @@
+{
+  "method": "interleaved-v1",
+  "label": "known-bad",
+  "node": "v24.3.0",
+  "n": 20000,
+  "blocks": 20,
+  "warm": 3,
+  "seed": 1,
+  "ops": [
+    "construct-plain",
+    "scalar-read",
+    "scalar-write",
+    "merge-write-many"
+  ],
+  "aBuild": "./dist/packages/kernel/dist/index.js",
+  "bBuild": "./dist/packages/kernel/dist/index.js",
+  "bMode": "wrapped",
+  "summary": [
+    {
+      "op": "construct-plain",
+      "medianDeltaPct": 1.56,
+      "p10": -6.25,
+      "p90": 39.78,
+      "blocksSlower": 12
+    },
+    {
+      "op": "scalar-read",
+      "medianDeltaPct": 19.24,
+      "p10": -4.08,
+      "p90": 35.7,
+      "blocksSlower": 16
+    },
+    {
+      "op": "scalar-write",
+      "medianDeltaPct": 19.27,
+      "p10": 14.93,
+      "p90": 44.35,
+      "blocksSlower": 20
+    },
+    {
+      "op": "merge-write-many",
+      "medianDeltaPct": -0.57,
+      "p10": -6.99,
+      "p90": 3.33,
+      "blocksSlower": 7
+    }
+  ]
+}

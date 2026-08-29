@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { signalTree } from '@signaltree/core';
+import { signalTree } from '@signal-tree/kernel';
 
 import { BenchmarkService } from '../services/benchmarks.service';
 

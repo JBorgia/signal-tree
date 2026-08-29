@@ -1,0 +1,304 @@
+version: '1.1'
+name: Adversarial Discovery & Solidification Protocol
+short_name: ADSP
+purpose: Reusable, evidence-driven protocol for architecture discovery, falsification, solidification, migration, consolidation, greenfield reimplementation, performance proof, and release.
+lifecycle:
+- INVENTORY
+- FRAME
+- PREREGISTER
+- CHARACTERIZE
+- FALSIFY
+- CONTROL_THE_HARNESS
+- INTERPRET
+- PROTOTYPE_SMALLEST_TRUTHFUL_OWNER
+- CLOSE_OR_SPLIT
+- FREEZE
+- CONSOLIDATE
+- MIGRATE
+- CONSUMER_PROVE
+- RELEASE
+rules:
+- id: R-01
+  title: Property before mechanism
+  requirement: State the semantic property before proposing an implementation.
+- id: R-02
+  title: Falsifier before fix
+  requirement: Define the observation that would make the hypothesis false before production changes.
+- id: R-03
+  title: Direct property beats proxy absence
+  requirement: Assert the desired property directly whenever possible.
+- id: R-04
+  title: Positive evidence for positive claims
+  requirement: Absence of failure is insufficient for a positive semantic claim.
+- id: R-05
+  title: Ownership is behavioral
+  requirement: Assign responsibilities by semantic authority, not file/API location.
+- id: R-06
+  title: Convenience is not architecture
+  requirement: Packaging ordinary operations is insufficient to earn core ownership.
+- id: R-07
+  title: No causal authority does not mean no capability
+  requirement: Inventory non-causal behavior before retirement.
+- id: R-08
+  title: Operational knowledge may survive deletion
+  requirement: Preserve correctness guards even when the containing abstraction retires.
+- id: R-09
+  title: Never-existed test
+  requirement: Ask whether the concept would be invented from first principles today.
+- id: R-10
+  title: Impossibility test
+  requirement: Ask what user-visible behavior becomes impossible if the API disappears.
+- id: R-11
+  title: Sophistication is not ownership
+  requirement: Code size/complexity does not establish architectural legitimacy.
+- id: R-12
+  title: Measure public reachability
+  requirement: Inspect actual package exports and supported entrypoints.
+- id: R-13
+  title: One experiment one question
+  requirement: Keep evidence boundaries attributable.
+- id: R-14
+  title: Stop when falsified
+  requirement: Do not continue deletion/repair after a preregistered falsifier fires.
+- id: R-15
+  title: Freeze only after closure
+  requirement: Characterize, falsify, and add permanent conformance before freeze.
+- id: R-16
+  title: Frozen means frozen
+  requirement: Reopen only on new falsifying evidence.
+- id: R-17
+  title: Non-claims are first-class
+  requirement: Every closure record states what is not established.
+- id: R-18
+  title: Preserve historical truth
+  requirement: Update current guidance without rewriting old records.
+- id: R-19
+  title: Compiler-driven deletion
+  requirement: Let typecheck reveal dependency surface during type/API cleanup.
+- id: R-20
+  title: Delete unreachable generic machinery
+  requirement: Do not invent synthetic consumers to preserve dead abstraction.
+- id: R-21
+  title: Tests must test claims
+  requirement: Reject source-spelling/proxy assertions when behavior can be executed directly.
+- id: R-22
+  title: Gate the gate
+  requirement: Every custom gate must fail under a relevant mutation or known-bad fixture.
+- id: R-23
+  title: Mutation must cross checker
+  requirement: Mutation evidence is valid only when the mutation reaches the observed code path.
+- id: R-24
+  title: Quarantine unresolved evidence
+  requirement: Do not average or narratively explain inconsistent benchmark cells.
+- id: R-25
+  title: Harnesses are systems under test
+  requirement: Validate scripts, greps, benchmark harnesses, and gates.
+- id: R-26
+  title: Measure shapes
+  requirement: Prefer scaling/asymptotic evidence over isolated points.
+- id: R-27
+  title: Cost is a vector
+  requirement: Track latency, CPU, retained memory, peak memory, and coordination separately.
+- id: R-28
+  title: Equivalent operations only
+  requirement: Performance comparisons must preserve semantics.
+- id: R-29
+  title: Quiescence is part of memory measurement
+  requirement: Define repeated GC/event-loop stabilization protocol.
+- id: R-30
+  title: A/A defines noise floor
+  requirement: Candidate deltas inside harness spread are inconclusive.
+- id: R-31
+  title: Preregister asymptotic criterion
+  requirement: Define boundedness/slope success before optimization.
+- id: R-32
+  title: Separate identity dimensions
+  requirement: Keep address, subject lifetime, owner/tree identity, position, and revision distinct.
+- id: R-33
+  title: Separate truth/authorship/publication/persistence
+  requirement: External consequence is not mutation authority.
+- id: R-34
+  title: Lifecycle boundary explicit
+  requirement: Destroy/dispose semantics are part of ownership.
+- id: R-35
+  title: Settlement semantics measured
+  requirement: Do not conflate settled, scheduled, flushed, and durable.
+- id: R-36
+  title: Explicit and automatic error channels may differ
+  requirement: Do not force symmetry without evidence.
+- id: R-37
+  title: Preserve user need not old noun
+  requirement: Migration keeps scenarios while changing architectural owner.
+- id: R-38
+  title: Production consumer outranks toy proof
+  requirement: Use real consumer conformance before release.
+- id: R-39
+  title: Consolidate by evidence
+  requirement: Retire archaeological harness only after production conformance subsumes its falsifier.
+- id: R-40
+  title: Closed architecture can have open migration
+  requirement: Do not reopen semantics for cleanup convenience.
+- id: R-41
+  title: Solidify then reimplement
+  requirement: For greenfield work, preserve frozen contracts, evidence, ownership, and conformance; do not treat historical implementation as design authority.
+- id: R-42
+  title: Compound operations need successor controls
+  requirement: Characterize a compound operation with at least one valid successor operation, not only its immediate final state.
+- id: R-43
+  title: Every surviving invariant needs a carrier
+  requirement: Classify retirement invariants as CARRIED, VACUOUS, or ORPHANED; ORPHANED is a hard stop.
+- id: R-44
+  title: Contract before defect
+  requirement: Determine whether the operation and semantics are supported before labeling surprising behavior a defect.
+- id: R-45
+  title: Temporal absence requires temporal authority
+  requirement: Negative async claims must observe beyond every relevant scheduler/debounce/poll/retry window or control time deterministically.
+- id: R-46
+  title: Reach read discriminate
+  requirement: Mechanism claims require proof that the operation reached the mechanism, the value was read directly, and the case discriminates that mechanism.
+- id: R-47
+  title: Shared law does not require shared mutable state
+  requirement: Share common semantic laws/algorithms without centralizing consumer-specific mutable authority state.
+- id: R-48
+  title: Unify semantics not representation
+  requirement: Use common protocols/adapters for shared laws while preserving source-native representations and identity semantics.
+- id: R-49
+  title: Semantic transitions may be value-neutral
+  requirement: Test transitions such as authority/ownership/lifecycle directly even when the observable value does not change.
+matrices:
+- id: M-01
+  name: Public Reachability & Consumer Inventory
+- id: M-02
+  name: Capability / Behavior
+- id: M-03
+  name: Ownership
+- id: M-04
+  name: Falsifier
+- id: M-05
+  name: Type Contract
+- id: M-06
+  name: Identity / Address / Ownership
+- id: M-07
+  name: Async / Race / Recovery
+- id: M-08
+  name: Persistence Decomposition
+- id: M-09
+  name: Migration / Retirement
+- id: M-10
+  name: Demo Coverage
+- id: M-11
+  name: Equivalent-Operation Performance
+- id: M-12
+  name: Release Gate / Mutation Coverage
+- id: M-13
+  name: Consolidation / Archaeology
+- id: M-14
+  name: Release Claim
+experiment_schema:
+  required:
+  - id
+  - status
+  - question
+  - null
+  - falsifiers
+  - outcomes
+  - prohibited_changes
+  - controls
+  - success_criterion
+  closure_required:
+  - result
+  - corrections
+  - ownership_disposition
+  - permanent_conformance
+  - claims
+  - non_claims
+  - open_items
+  - commit
+release_layers:
+- core_invariants
+- demo_public_usability
+- production_consumer
+gate_states:
+- PROVEN
+- BLIND
+- ERRORED
+- NOT_APPLICABLE
+decision_states:
+- OPEN
+- STOPPED_FALSIFIER_FIRED
+- CLOSED
+- FROZEN_ABSENT_NEW_FALSIFIER
+- SUPERSEDED
+- RETIRED_HISTORICAL_ONLY
+- QUARANTINED
+rigor_profiles:
+- id: P0
+  name: Routine
+  use_when: Internal-only change with low semantic ambiguity and no public/concurrency/lifecycle/persistence risk
+  minimum:
+  - property
+  - direct_behavior_test
+  - type_lint_build
+- id: P1
+  name: Focused
+  use_when: One meaningful semantic risk with localized ownership
+  minimum:
+  - property
+  - falsifier
+  - positive_control
+  - focused_experiment_card
+  - permanent_behavioral_carrier
+- id: P2
+  name: Full ADSP
+  use_when: Public API, identity, persistence, transactions, async races, lifecycle, retirement, or nontrivial ownership
+  minimum:
+  - full_lifecycle
+  - applicable_matrices
+  - mutation_or_gate_validation
+  - freeze_record
+- id: P3
+  name: Release-critical
+  use_when: Major-version architecture, interacting semantic domains, production migration, or performance/memory claims
+  minimum:
+  - P2
+  - production_consumer_proof
+  - release_claim_matrix
+  - robust_performance_gates
+  - consolidation_audit
+evidence_integrity:
+  triad:
+  - REACH
+  - READ
+  - DISCRIMINATE
+  REACH: Assert an observable effect proving the operation actually exercised the named mechanism.
+  READ: Assert the measured value rather than a lossy rendering, serializer, grep, or pretty-printer.
+  DISCRIMINATE: A plausible implementation omitting/replacing the claimed mechanism must fail the mechanism-discriminating case.
+invariant_carrier_states:
+  CARRIED: A surviving permanent test or gate proves the invariant.
+  VACUOUS: The final architecture makes the scenario impossible; no carrier is required.
+  ORPHANED: The scenario remains possible but no surviving carrier proves it; stop retirement.
+greenfield:
+  principle: Preserve evidence, contracts, matrices, ownership, non-claims, and permanent conformance; do not preserve incumbent implementation by default.
+  sequence:
+  - SOLIDIFY
+  - EXTRACT_CONTRACTS
+  - REIMPLEMENT_FROM_SOLIDIFIED_MODEL
+  - CONSUMER_PROVE
+  - RELEASE
+artifact_roles:
+  protocol: Normative rules, lifecycle, matrices, templates, and gates.
+  case_study: Evidence receipts and corrections; prefer rule-ID cross-references over restating normative text.
+  rulebook_or_skill: Machine-enforceable summary of the normative protocol.
+skill_guidance:
+  classify_rigor_first: true
+  enforce_stop_on_falsifier: true
+  track_freeze_reopen: true
+  track_carried_vacuous_orphaned: true
+  require_reach_read_discriminate_for_mechanism_claims: true
+  distinguish_permanent_conformance_from_archaeology: true
+  human_decisions:
+  - ownership
+  - public_contract_freeze
+  - deliberate_product_semantic_change
+coverage_gaps:
+- No clean SignalTree case yet demonstrates a frozen public contract being reversed by later falsifying evidence; current example reopens supporting evidence while preserving the conclusion.

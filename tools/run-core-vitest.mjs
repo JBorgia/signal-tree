@@ -5,12 +5,12 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, relative } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const CORE_ROOT = join(ROOT, 'packages/core');
+const CORE_ROOT = join(ROOT, 'packages/kernel');
 
 function normalizeTestFile(value) {
   const normalized = value.replace(/\\/g, '/');
-  return normalized.startsWith('packages/core/')
-    ? normalized.slice('packages/core/'.length)
+  return normalized.startsWith('packages/kernel/')
+    ? normalized.slice('packages/kernel/'.length)
     : normalized;
 }
 

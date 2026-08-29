@@ -5,7 +5,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { persistence, signalTree } from '@signaltree/core';
+import { persistence, signalTree } from '@signal-tree/kernel';
 
 import { ExampleComponent } from '../../../../../shared/components/example-shell';
 

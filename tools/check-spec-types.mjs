@@ -178,7 +178,7 @@ if (process.argv.includes('--self-test')) {
   // POSITIVE CONTROL: a checker that only ever reports "no dead entries" is
   // indistinguishable from one that cannot detect them. Inject a subject that
   // certainly does not exist and require the detector to name it.
-  const fake = 'packages/core/src/lib/__no_such_spec__.spec.ts';
+  const fake = 'packages/kernel/src/lib/__no_such_spec__.spec.ts';
   const found = deadBaselineEntries({ ...baseline.files, [fake]: 1 });
   if (!found.includes(fake)) {
     console.error(

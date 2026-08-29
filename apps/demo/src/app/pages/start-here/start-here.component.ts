@@ -33,8 +33,10 @@ tree.$.count();              // 0
 tree.$.user.name.set('Bo');
 tree.$.count.update((n) => n + 1);
 
-// 4. Branches are callable — call with a partial to deep-merge
-tree.$.user({ age: 37 });    // { name: 'Bo', age: 37 }`;
+// 4. Branches are callable — the value form supplies the WHOLE next value
+tree.$.user({ name: 'Bo', age: 37 });
+// ...and the updater form is how you patch
+tree.$.user((u) => ({ ...u, age: 38 }));`;
 
   readonly ngrxCounterCode = `// counter.actions.ts
 export const increment = createAction('[Counter] Increment');

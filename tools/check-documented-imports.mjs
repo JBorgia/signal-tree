@@ -13,8 +13,8 @@
  *                       published package at all?
  *
  * RELEASE-RESIDUE-0 found the consequence. The root README taught three subpath
- * imports — `@signaltree/core/security`, `@signaltree/core/edit-session` and
- * `@signaltree/core/storage` — while `packages/core/package.json` exports only
+ * imports — `@signal-tree/kernel/security`, `@signal-tree/kernel/edit-session` and
+ * `@signal-tree/kernel/storage` — while `packages/kernel/package.json` exports only
  * `"."`. `security` and `storage` had been deleted; `edit-session` was never in
  * the export map at all, yet was implemented, tested and documented for six major
  * versions. `lint-readme-apis` could not see it because a path that is not an
@@ -48,8 +48,8 @@ const ROOT = new URL('..', import.meta.url).pathname;
  */
 const LIVE_DOCS = [
   'README.md',
-  'packages/core/README.md',
-  'packages/core/ENHANCERS.md',
+  'packages/kernel/README.md',
+  'packages/kernel/ENHANCERS.md',
   'packages/shared/README.md',
   'packages/events/README.md',
   'packages/ng-forms/README.md',
@@ -86,16 +86,51 @@ function collect(target) {
     .map((f) => join(target, f));
 }
 
+/**
+ * ⚠️ PACKAGE NAME IS NOT DIRECTORY NAME, and after the v15 identity move it is
+ * not even the same SCOPE. `@signal-tree/kernel` lives in `packages/kernel`, and
+ * historical documents legitimately still name `@signaltree/*` — the v14
+ * generation. Deriving the directory by stripping a hard-coded scope silently
+ * stopped resolving anything once the rename landed, and the self-test caught it
+ * exactly as designed.
+ *
+ * The manifest is located by NAME rather than guessed from the specifier.
+ */
+/**
+ * ⚠️ A HISTORICAL DOCUMENT TEACHES A HISTORICAL SPECIFIER, AND THAT IS CORRECT.
+ * `docs/ai/LLM.md` is titled "SignalTree v7" and pins `@signaltree/core@^7.0.0`
+ * — the package that generation actually shipped. Rewriting it to the v15 name
+ * would make the record lie about what v7 users installed.
+ *
+ *     A HISTORICAL RECORD IS EVIDENCE. DO NOT EDIT IT TO SATISFY A GATE.
+ *
+ * Same marker the doc-link gate uses, so the two gates agree on what "live"
+ * means.
+ */
+const HISTORICAL_MARKER =
+  /^\s*(>\s*)?\*\*Status:\s*HISTORICAL|^#\s.*Migration Guide:\s*v[0-9]|^#\s*SignalTree\s+v[0-9]+\s*[-–]/im;
+
+function packageDirsByName() {
+  const out = new Map();
+  for (const dir of readdirSync(join(ROOT, 'packages'))) {
+    const manifest = join(ROOT, 'packages', dir, 'package.json');
+    if (!existsSync(manifest)) continue;
+    try {
+      const pkg = JSON.parse(readFileSync(manifest, 'utf8'));
+      if (pkg.name) out.set(pkg.name, pkg);
+    } catch { /* unparseable manifest is not a package */ }
+  }
+  return out;
+}
+const PACKAGES = packageDirsByName();
+
 function exportsOf(pkgName) {
-  // @signaltree/core -> packages/core
-  const short = pkgName.replace(/^@signaltree\//, '');
-  const manifest = join(ROOT, 'packages', short, 'package.json');
-  if (!existsSync(manifest)) return null;
-  const pkg = JSON.parse(readFileSync(manifest, 'utf8'));
+  const pkg = PACKAGES.get(pkgName);
+  if (!pkg) return null;
   return pkg.exports ?? { '.': true };
 }
 
-/** `@signaltree/core/edit-session` -> ['@signaltree/core', './edit-session'] */
+/** `@signal-tree/kernel/edit-session` -> ['@signal-tree/kernel', './edit-session'] */
 function split(specifier) {
   const parts = specifier.split('/');
   const pkgName = parts.slice(0, 2).join('/');
@@ -108,8 +143,9 @@ function check(files) {
   let checked = 0;
   for (const rel of files) {
     const text = readFileSync(join(ROOT, rel), 'utf8');
+    if (HISTORICAL_MARKER.test(text)) continue;
     const seen = new Set();
-    for (const m of text.matchAll(/from '(@signaltree\/[^']+)'/g)) {
+    for (const m of text.matchAll(/from '(@signal-?tree\/[^']+)'/g)) {
       if (seen.has(m[1])) continue;
       seen.add(m[1]);
       checked++;
@@ -142,8 +178,8 @@ function liveFiles() {
 
 if (process.argv.includes('--self-test')) {
   const cases = [
-    ['@signaltree/core', true],
-    ['@signaltree/core/definitely-not-exported', false],
+    ['@signal-tree/kernel', true],
+    ['@signal-tree/kernel/definitely-not-exported', false],
     ['@signaltree/definitely-not-a-package', false],
   ];
   let ok = true;

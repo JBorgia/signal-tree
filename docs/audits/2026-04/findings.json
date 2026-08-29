@@ -90,7 +90,7 @@
         "packages/core/README.md:1730 — withTimeTravel()",
         "packages/core/README.md:1747 — devTools(), withTimeTravel()",
         "packages/core/README.md:2119 — withTimeTravel() - Undo/redo functionality",
-        "packages/core/README.md:2115 — import { signalTree, batching, restoration } from '@signaltree/core'",
+        "packages/core/README.md:2115 — import { signalTree, batching, restoration } from '@signal-tree/kernel'",
         "packages/core/src/index.ts:209 — export { restoration } from './enhancers/restoration/restoration'",
         "packages/core/src/lib/types.ts:9-33 — RestorationConfig.maxHistorySize (not maxHistory)"
       ],

@@ -12,7 +12,7 @@
  *      files. Catches "exports points at a file the `files` field didn't
  *      include" (the guardrails@10.6 barrel bug class) and the v12 subpath
  *      moves (e.g. `/authoring`) shipping their JS + d.ts.
- *   B. For `@signaltree/core` (the flagship; no workspace deps so it installs
+ *   B. For `@signal-tree/kernel` (the flagship; no workspace deps so it installs
  *      cleanly), `npm install` the tarball into a throwaway consumer and
  *      `require.resolve()` every documented subpath — proving Node's resolver +
  *      a real install accept the published `exports` end-to-end. `--legacy-peer-
@@ -135,7 +135,7 @@ function checkCoreConsumerResolves(coreTgz, tmp) {
   writeFileSync(
     join(consumer, 'package.json'),
     JSON.stringify(
-      { name: 'st-tarball-consumer', private: true, version: '0.0.0', dependencies: { '@signaltree/core': `file:${coreTgz}` } },
+      { name: 'st-tarball-consumer', private: true, version: '0.0.0', dependencies: { '@signal-tree/kernel': `file:${coreTgz}` } },
       null,
       2
     )
@@ -151,7 +151,7 @@ function checkCoreConsumerResolves(coreTgz, tmp) {
     return;
   }
   const req = createRequire(join(consumer, 'index.js'));
-  const subpaths = ['@signaltree/core', '@signaltree/core/storage'];
+  const subpaths = ['@signal-tree/kernel', '@signal-tree/kernel/storage'];
   for (const sp of subpaths) {
     try {
       req.resolve(sp);
@@ -204,4 +204,4 @@ if (errors.length) {
   for (const e of errors) console.error('   - ' + e);
   process.exit(1);
 }
-console.log('\n✅ Tarball-consumer gate passed: every packed exports target ships, and @signaltree/core resolves from a real install.');
+console.log('\n✅ Tarball-consumer gate passed: every packed exports target ships, and @signal-tree/kernel resolves from a real install.');

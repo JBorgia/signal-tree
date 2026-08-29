@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "compilerOptions": {
+    "declarationMap": false,
+    "declaration": true,
+    "stripInternal": true,
+    "sourceMap": false,
+    "outDir": "../../dist/packages/kernel/dist",
+    "declarationDir": "../../dist/packages/kernel/dist"
+  },
+  "angularCompilerOptions": {
+    "compilationMode": "partial",
+    "extendedDiagnostics": {
+      "checks": {
+        "nullishCoalescingNotNullable": "suppress",
+        "optionalChainNotNullable": "suppress"
+      }
+    }
+  }
+}

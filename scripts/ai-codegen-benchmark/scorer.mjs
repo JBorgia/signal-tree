@@ -18,7 +18,7 @@
 // is a hallucination.
 const VALID_PACKAGES = new Set([
   // SignalTree
-  '@signaltree/core',
+  '@signal-tree/kernel',
   '@signaltree/events',
   '@signaltree/ng-forms',
   '@signaltree/shared',

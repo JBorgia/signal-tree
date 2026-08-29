@@ -26,7 +26,7 @@ import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const DIST = resolve('dist/packages/core/dist/index.js');
+const DIST = resolve('dist/packages/kernel/dist/index.js');
 if (!existsSync(DIST)) {
   console.error('✗ dist not found — run `npx nx build core` first.');
   process.exit(1);
@@ -49,7 +49,7 @@ const check = (name, reproduced, detail) => {
 //
 // 6a asked whether `restoration()` covers `form()` state, and whether
 // `form({ history: history() })` is the recommended path. Both `form()` and
-// `history()` were deleted from @signaltree/core in b57ba293 (FORM-DEL), so the
+// `history()` were deleted from @signal-tree/kernel in b57ba293 (FORM-DEL), so the
 // question no longer has a subject and the checks cannot be rewritten to ask it
 // of anything else.
 //
@@ -63,7 +63,7 @@ const check = (name, reproduced, detail) => {
 
 // -- 6b: createAuditTracker samples, so it drops changes -------------------
 // NB: the 100 ms interval is NOT measured here. It is a source constant —
-// `setInterval(handleChange, 100)` at packages/core/src/lib/audit/audit.ts:156.
+// `setInterval(handleChange, 100)` at packages/kernel/src/lib/audit/audit.ts:156.
 // The sleeps below are CHOSEN from that constant; what these checks establish
 // is the consequence (changes are dropped), not the number.
 {

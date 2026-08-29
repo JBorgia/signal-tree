@@ -164,7 +164,10 @@ store.batch(() => {
 }); // Explicit batch boundary.
 ```
 
-To **disable** automatic batching: `signalTree(state, { batchUpdates: false })`.
+⚠️ The `batchUpdates: false` opt-out was **retired in 15.0**. Automatic
+notification batching is now unconditional: it is an optimization owned by the
+observer-delivery layer, not a per-tree policy. Signal writes remain ALWAYS
+synchronous — batching only ever affected notification timing.
 
 **Source:** [`packages/core/src/enhancers/batching/batching.ts:11-19`](../packages/core/src/enhancers/batching/batching.ts) — "Signal writes are ALWAYS synchronous. Batching only affects change detection notification timing." The default-on behavior is in the core tree config.
 

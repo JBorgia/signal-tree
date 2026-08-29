@@ -22,7 +22,7 @@ if (typeof globalThis.gc !== 'function') {
 }
 
 const ROOT = process.cwd();
-const CORE = join(ROOT, 'dist/packages/core/dist/index.js');
+const CORE = join(ROOT, 'dist/packages/kernel/dist/index.js');
 if (!existsSync(CORE)) {
   console.error('build first: nx run-many -t build --all');
   process.exit(1);

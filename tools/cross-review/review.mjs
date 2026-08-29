@@ -17,8 +17,8 @@
  * Usage:
  *   node tools/cross-review/review.mjs --row M3 \
  *     --rfc "DERIVATION M3" \
- *     --spec packages/core/src/lib/foo.spec.ts \
- *     --src  packages/core/src/lib/foo.ts \
+ *     --spec packages/kernel/src/lib/foo.spec.ts \
+ *     --src  packages/kernel/src/lib/foo.ts \
  *     [--model openai/gpt-5] [--dry-run]
  *
  *   node tools/cross-review/review.mjs --self-test [--model <provider/model>]
@@ -111,7 +111,7 @@ const runSpec = (path) => {
     const out = execFileSync(
       'npx',
       ['vitest', 'run', path.replace(/^packages\/core\//, '')],
-      { cwd: join(ROOT, 'packages/core'), encoding: 'utf8', stdio: 'pipe' }
+      { cwd: join(ROOT, 'packages/kernel'), encoding: 'utf8', stdio: 'pipe' }
     );
     return out.split('\n').filter((l) => /Test Files|Tests |✓|×|FAIL/.test(l)).join('\n');
   } catch (e) {

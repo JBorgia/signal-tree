@@ -79,7 +79,7 @@ export const tier2Derived = derived(($) => ({
 
 /** Self-contained single-file version of the pattern for the StackBlitz playground. */
 const PLAYGROUND_APP = `import { Component, computed, effect, inject, Injectable } from '@angular/core';
-import { signalTree } from '@signaltree/core';
+import { signalTree } from '@signal-tree/kernel';
 
 // One tree per app, assembled once.
 const APP_TREE = signalTree({

@@ -28,7 +28,7 @@
 
 - **npm trusted publishing** — for each publishable package, configure npm →
   Package → Settings → Trusted publishing with GitHub Actions, repository
-  `JBorgia/signaltree`, workflow filename `publish.yml`, and allowed action
+  `JBorgia/signal-tree`, workflow filename `publish.yml`, and allowed action
   `npm publish`.
 - **Tag protection** — Settings → Rules → Rulesets: a tag ruleset for `v*`
   restricting creation to the owner.

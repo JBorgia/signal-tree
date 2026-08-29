@@ -9,7 +9,7 @@
  * - Zero performance degradation with complexity
  */
 
-import { signalTree } from '@signaltree/core';
+import { signalTree } from '@signal-tree/kernel';
 
 // 🎯 REVOLUTIONARY RECURSIVE STRUCTURES
 interface RecursivePerformanceStructure {

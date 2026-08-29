@@ -41,7 +41,7 @@ export default [
     },
   },
   {
-    files: ['packages/core/src/**/*.spec.ts'],
+    files: ['packages/kernel/src/**/*.spec.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
@@ -68,8 +68,8 @@ export default [
     ignores: [
       '**/*.spec.ts',
       'packages/shared/src/lib/is-traversable-node.ts',
-      'packages/core/src/lib/utils.ts',
-      'packages/core/src/lib/internals/node-shape.ts',
+      'packages/kernel/src/lib/utils.ts',
+      'packages/kernel/src/lib/internals/node-shape.ts',
     ],
     rules: {
       'no-restricted-syntax': [
@@ -98,8 +98,8 @@ export default [
     rules: {
       // NOTE: Tree-shaking test shows barrel imports work fine with modern bundlers.
       // Both patterns produce identical bundles (~9.3KB for core+batching):
-      //   import { signalTree, batching } from '@signaltree/core';
-      //   import { batching } from '@signaltree/core/enhancers/batching';
+      //   import { signalTree, batching } from '@signal-tree/kernel';
+      //   import { batching } from '@signal-tree/kernel/enhancers/batching';
       //
       // Subpath imports are supported for developer preference, but not required.
       // The ESLint rule below is DISABLED by default - enable only if your
@@ -110,13 +110,13 @@ export default [
       //   {
       //     paths: [
       //       {
-      //         name: '@signaltree/core',
+      //         name: '@signal-tree/kernel',
       //         importNames: [
       //           'batching', 'memoization', 'devTools',
       //           'entities', 'serialization', 'timeTravel',
       //           'middleware', 'createAsyncOperation', 'TREE_PRESETS'
       //         ],
-      //         message: 'Consider subpath imports like @signaltree/core/enhancers/<name> for explicit control'
+      //         message: 'Consider subpath imports like @signal-tree/kernel/enhancers/<name> for explicit control'
       //       }
       //     ]
       //   }
@@ -212,8 +212,8 @@ export default [
     // none should be created before GATE A: re-slicing packages during kernel
     // freeze reopens the thing the freeze exists to close.
     files: [
-      'packages/core/src/lib/physical/**/*.ts',
-      'packages/core/src/lib/internals/causal-runtime/**/*.ts',
+      'packages/kernel/src/lib/physical/**/*.ts',
+      'packages/kernel/src/lib/internals/causal-runtime/**/*.ts',
     ],
     ignores: ['**/*.spec.ts'],
     rules: {

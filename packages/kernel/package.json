@@ -1,0 +1,46 @@
+{
+  "name": "@signal-tree/kernel",
+  "version": "15.0.0-rc.1",
+  "description": "Reactive JSON for Angular. State as shape. Signals at every path.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json",
+    "./adapter": {
+      "types": "./src/adapter.d.ts",
+      "import": "./dist/adapter.js",
+      "default": "./dist/adapter.js"
+    }
+  },
+  "peerDependencies": {
+    "tslib": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist/**/*.js",
+    "src/**/*.d.ts",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JBorgia/signal-tree.git",
+    "directory": "packages/kernel"
+  },
+  "bugs": {
+    "url": "https://github.com/JBorgia/signal-tree/issues"
+  },
+  "homepage": "https://github.com/JBorgia/signal-tree/tree/main/packages/kernel#readme"
+}

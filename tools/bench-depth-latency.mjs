@@ -19,7 +19,7 @@
  *   node tools/bench-depth-latency.mjs
  *   node tools/bench-depth-latency.mjs --json
  */
-import { signalTree } from '../dist/packages/core/dist/index.js';
+import { signalTree } from '../dist/packages/kernel/dist/index.js';
 
 const DEPTHS = [5, 10, 15, 20];
 const BATCH = 2000;

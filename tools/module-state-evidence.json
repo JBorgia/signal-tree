@@ -1,0 +1,3338 @@
+[
+  {
+    "subject": "state:lib/internals/materialization-realization.ts:installed",
+    "file": "lib/internals/materialization-realization.ts",
+    "name": "installed",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "installMaterializationRealization",
+        "file": "lib/internals/materialization-realization.ts"
+      }
+    ],
+    "writerLocations": [
+      "installMaterializationRealization"
+    ],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "getMaterializationRealization"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 installed runtime / mutable callback"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/tracking-suppression.ts:installed",
+    "file": "lib/internals/tracking-suppression.ts",
+    "name": "installed",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "installTrackingSuppression",
+        "file": "lib/internals/tracking-suppression.ts"
+      }
+    ],
+    "writerLocations": [
+      "installTrackingSuppression"
+    ],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "withoutTracking"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 installed runtime / mutable callback"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/cell-runtime.ts:installed",
+    "file": "lib/internals/cell-runtime.ts",
+    "name": "installed",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "installCellRuntime",
+        "file": "lib/internals/cell-runtime.ts"
+      }
+    ],
+    "writerLocations": [
+      "installCellRuntime"
+    ],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "getCellRuntime"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 installed runtime / mutable callback"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/constants.ts:DEV_MESSAGES",
+    "file": "lib/constants.ts",
+    "name": "DEV_MESSAGES",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "AsExpression",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "(module top level)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/constants.ts:PROD_MESSAGES",
+    "file": "lib/constants.ts",
+    "name": "PROD_MESSAGES",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Identifier",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "(module top level)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/constants.ts:ngDevMode",
+    "file": "lib/constants.ts",
+    "name": "ngDevMode",
+    "kind": "const",
+    "ambient": true,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "(module top level)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/constants.ts:_isProdByEnv",
+    "file": "lib/constants.ts",
+    "name": "_isProdByEnv",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Boolean()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "(module top level)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/constants.ts:_isDev",
+    "file": "lib/constants.ts",
+    "name": "_isDev",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "ConditionalExpression",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "(module top level)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/constants.ts:SIGNAL_TREE_MESSAGES",
+    "file": "lib/constants.ts",
+    "name": "SIGNAL_TREE_MESSAGES",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "Object.freeze()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 3,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [
+      "enhancers/index.ts",
+      "lib/signal-tree.ts"
+    ],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/enhancer-types.ts:ENHANCER_META",
+    "file": "lib/enhancer-types.ts",
+    "name": "ENHANCER_META",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "Symbol()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 10,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [
+      "enhancers/index.ts",
+      "lib/types.ts",
+      "lib/signal-tree.ts",
+      "enhancers/batching/batching.ts",
+      "enhancers/restoration/restoration.ts",
+      "enhancers/devtools/devtools-impl.ts",
+      "enhancers/devtools/devtools.ts",
+      "enhancers/transactions/transactions.ts",
+      "enhancers/serialization/serialization.ts"
+    ],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/member-membership.ts:DORMANT",
+    "file": "lib/internals/member-membership.ts",
+    "name": "DORMANT",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "memberBinding",
+      "deactivateOne"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/member-membership.ts:HAS_DORMANT",
+    "file": "lib/internals/member-membership.ts",
+    "name": "HAS_DORMANT",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "hasDormantMembers",
+      "markHasDormant"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/member-membership.ts:NODE_STORE_SYMBOL",
+    "file": "lib/internals/member-membership.ts",
+    "name": "NODE_STORE_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "peerOf"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/member-membership.ts:NODE_ACCESSOR_PEER",
+    "file": "lib/internals/member-membership.ts",
+    "name": "NODE_ACCESSOR_PEER",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "peerOf"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/node-shape.ts:CALLABLE_SIGNAL_SYMBOL",
+    "file": "lib/internals/node-shape.ts",
+    "name": "CALLABLE_SIGNAL_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "isNodeAccessor"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/position-registry.ts:POSITION_REGISTRY_SYMBOL",
+    "file": "lib/internals/position-registry.ts",
+    "name": "POSITION_REGISTRY_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "definePositionRegistry",
+      "getPositionRegistry"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 identity-shaped name (weak: name hint)",
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/position-registry.ts:treeIdBrand",
+    "file": "lib/internals/position-registry.ts",
+    "name": "treeIdBrand",
+    "kind": "const",
+    "ambient": true,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "(module top level)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/position-registry.ts:nextRegistryId",
+    "file": "lib/internals/position-registry.ts",
+    "name": "nextRegistryId",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 1",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "increment",
+        "where": "TreePositionRegistry.id (property initializer, per construction)",
+        "file": "lib/internals/position-registry.ts"
+      }
+    ],
+    "writerLocations": [
+      "TreePositionRegistry.id (property initializer, per construction)"
+    ],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "TreePositionRegistry.id (property initializer, per construction)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 identity-shaped name (weak: name hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/physical-commit-clock.ts:PHYSICAL_COMMIT_CLOCK",
+    "file": "lib/internals/physical-commit-clock.ts",
+    "name": "PHYSICAL_COMMIT_CLOCK",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "definePhysicalCommitClock",
+      "getPhysicalCommitClock"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/production-substrate-stats.ts:PRODUCTION_SUBSTRATE_STATS_ENABLED",
+    "file": "lib/internals/production-substrate-stats.ts",
+    "name": "PRODUCTION_SUBSTRATE_STATS_ENABLED",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "literal true",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 13,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [
+      "lib/internals/tree-scalar-slot-runtime.ts",
+      "lib/internals/tree-scalar-slot-angular-runtime.ts",
+      "lib/internals/visit-tree.ts"
+    ],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/production-substrate-stats.ts:activeStats",
+    "file": "lib/internals/production-substrate-stats.ts",
+    "name": "activeStats",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "installProductionSubstrateStatsForTesting",
+        "file": "lib/internals/production-substrate-stats.ts"
+      },
+      {
+        "kind": "assign",
+        "where": "clearProductionSubstrateStatsForTesting",
+        "file": "lib/internals/production-substrate-stats.ts"
+      }
+    ],
+    "writerLocations": [
+      "installProductionSubstrateStatsForTesting",
+      "clearProductionSubstrateStatsForTesting"
+    ],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "recordProductionSubstrateStat"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 6,
+    "anomalyReasons": [
+      "+3 multiple independent writers",
+      "+2 installed runtime / mutable callback",
+      "+2 has a reset path",
+      "+-1 test-only writer"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/write-context.ts:activeContext",
+    "file": "lib/write-context.ts",
+    "name": "activeContext",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "withWriteContext",
+        "file": "lib/write-context.ts"
+      },
+      {
+        "kind": "assign",
+        "where": "withWriteContext",
+        "file": "lib/write-context.ts"
+      }
+    ],
+    "writerLocations": [
+      "withWriteContext"
+    ],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "withWriteContext",
+      "getActiveWriteContext"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 installed runtime / mutable callback"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/restoration-eligibility.ts:designated",
+    "file": "lib/internals/restoration-eligibility.ts",
+    "name": "designated",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal false",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "withRestorationDesignation",
+        "file": "lib/internals/restoration-eligibility.ts"
+      },
+      {
+        "kind": "assign",
+        "where": "withRestorationDesignation",
+        "file": "lib/internals/restoration-eligibility.ts"
+      }
+    ],
+    "writerLocations": [
+      "withRestorationDesignation"
+    ],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "isRestorationDesignated",
+      "withRestorationDesignation"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/write-participation.ts:getWriteParticipation",
+    "file": "lib/write-participation.ts",
+    "name": "getWriteParticipation",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 11,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [
+      "lib/path-notifier.ts",
+      "enhancers/restoration/restoration.ts",
+      "enhancers/transactions/transactions.ts",
+      "lib/internals/causal-runtime/transaction-capture-bridge.ts"
+    ],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/write-participation.ts:isInspectionWrite",
+    "file": "lib/write-participation.ts",
+    "name": "isInspectionWrite",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 7,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [
+      "lib/link.ts",
+      "enhancers/restoration/restoration.ts",
+      "enhancers/transactions/transactions.ts",
+      "lib/internals/causal-runtime/transaction-capture-bridge.ts"
+    ],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/path-notifier.ts:materializeDeliveryMeta",
+    "file": "lib/path-notifier.ts",
+    "name": "materializeDeliveryMeta",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "notify",
+      "flush"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-2 const function declaration, not state",
+      "+2 cache — correctness depends on invalidation"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/path-notifier.ts:globalPathNotifier",
+    "file": "lib/path-notifier.ts",
+    "name": "globalPathNotifier",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "null",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "getPathNotifier",
+        "file": "lib/path-notifier.ts"
+      },
+      {
+        "kind": "assign",
+        "where": "resetPathNotifier",
+        "file": "lib/path-notifier.ts"
+      }
+    ],
+    "writerLocations": [
+      "getPathNotifier",
+      "resetPathNotifier"
+    ],
+    "symbolResolvedReadsInFile": 7,
+    "readerLocationsInFile": [
+      "getPathNotifier",
+      "resetPathNotifier"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "clear"
+    ],
+    "anomalyScore": 7,
+    "anomalyReasons": [
+      "+3 multiple independent writers",
+      "+2 installed runtime / mutable callback",
+      "+2 has a reset path"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/internals/path-observation-port.ts:runtime",
+    "file": "lib/internals/path-observation-port.ts",
+    "name": "runtime",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "installPathDeliveryRuntime",
+        "file": "lib/internals/path-observation-port.ts"
+      },
+      {
+        "kind": "assign",
+        "where": "resetPathDeliveryRuntime",
+        "file": "lib/internals/path-observation-port.ts"
+      }
+    ],
+    "writerLocations": [
+      "installPathDeliveryRuntime",
+      "resetPathDeliveryRuntime"
+    ],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "resetPathDeliveryRuntime",
+      "hasPathObservers",
+      "notify"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "clear"
+    ],
+    "anomalyScore": 7,
+    "anomalyReasons": [
+      "+3 multiple independent writers",
+      "+2 installed runtime / mutable callback",
+      "+2 has a reset path"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/internals/path-observation-port.ts:PORT",
+    "file": "lib/internals/path-observation-port.ts",
+    "name": "PORT",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "object literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "pathObservation"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/entity-projection-seed.ts:SEED",
+    "file": "lib/internals/entity-projection-seed.ts",
+    "name": "SEED",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "defineEntityProjectionSeed",
+      "getEntityProjectionSeed"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/entity-signal.ts:ngDevMode",
+    "file": "lib/entity-signal.ts",
+    "name": "ngDevMode",
+    "kind": "const",
+    "ambient": true,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 8,
+    "readerLocationsInFile": [
+      "deriveId",
+      "where",
+      "find",
+      "(anonymous fn)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/entity-signal.ts:WRONG_ENTITY_METHODS",
+    "file": "lib/entity-signal.ts",
+    "name": "WRONG_ENTITY_METHODS",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "object literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "(anonymous fn)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/entity-signal.ts:nextStandaloneEntityPositionId",
+    "file": "lib/entity-signal.ts",
+    "name": "nextStandaloneEntityPositionId",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 1",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "increment",
+        "where": "standaloneEntityPositionIdAllocator",
+        "file": "lib/entity-signal.ts"
+      }
+    ],
+    "writerLocations": [
+      "standaloneEntityPositionIdAllocator"
+    ],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "standaloneEntityPositionIdAllocator"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 identity-shaped name (weak: name hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/entity-signal.ts:standaloneEntityPositionIdAllocator",
+    "file": "lib/entity-signal.ts",
+    "name": "standaloneEntityPositionIdAllocator",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "createEntitySignal"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 identity-shaped name (weak: name hint)",
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/entity-signal.ts:entityPositionIdAllocatorOverride",
+    "file": "lib/entity-signal.ts",
+    "name": "entityPositionIdAllocatorOverride",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "setEntityPositionIdAllocatorForTesting",
+        "file": "lib/entity-signal.ts"
+      }
+    ],
+    "writerLocations": [
+      "setEntityPositionIdAllocatorForTesting"
+    ],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "createEntitySignal"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+1 identity-shaped name (weak: name hint)",
+      "+2 installed runtime / mutable callback",
+      "+-1 test-only writer"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/entity-signal.ts:entityPositionIdNotifyEnabled",
+    "file": "lib/entity-signal.ts",
+    "name": "entityPositionIdNotifyEnabled",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal true",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "setEntityPositionIdNotifyEnabledForTesting",
+        "file": "lib/entity-signal.ts"
+      }
+    ],
+    "writerLocations": [
+      "setEntityPositionIdNotifyEnabledForTesting"
+    ],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "getPositionIdsForNotify"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 identity-shaped name (weak: name hint)",
+      "+-1 test-only writer"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/types.ts:ENTITY_MAP_BRAND",
+    "file": "lib/types.ts",
+    "name": "ENTITY_MAP_BRAND",
+    "kind": "const",
+    "ambient": true,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "(module top level)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/runtime-tree-plan.ts:RESTORATION_CAPABILITIES",
+    "file": "lib/internals/runtime-tree-plan.ts",
+    "name": "RESTORATION_CAPABILITIES",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "array literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "createRuntimeTreePlan"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 3,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+2 strong collection — retention is not the key's lifetime"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:NODE_STORE_SYMBOL",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "NODE_STORE_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "materializeMember",
+      "materializeMarkers"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:PROCESSOR_STAMP",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "PROCESSOR_STAMP",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "getNodeProcessor",
+      "materializeMarkers"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:SNAPSHOT_MEMO",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "SNAPSHOT_MEMO",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "snapshotMarkerNode"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set"
+    ],
+    "anomalyScore": 4,
+    "anomalyReasons": [
+      "+2 insertion with no removal path",
+      "+2 cache — correctness depends on invalidation"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:MARKER_PROCESSORS",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "MARKER_PROCESSORS",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "array literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "isRegisteredMarker",
+      "registerProcessor",
+      "materializeMarkers"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "push"
+    ],
+    "anomalyScore": 4,
+    "anomalyReasons": [
+      "+2 insertion with no removal path",
+      "+2 strong collection — retention is not the key's lifetime"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:warnedWriteOnly",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "warnedWriteOnly",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakSet",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "warnWriteOnlyMarker"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "add"
+    ],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 insertion with no removal path"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:treesConstructedCount",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "treesConstructedCount",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 0",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "_recordTreeConstruction",
+        "file": "lib/internals/materialize-markers.ts"
+      }
+    ],
+    "writerLocations": [
+      "_recordTreeConstruction"
+    ],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "registerProcessor",
+      "_recordTreeConstruction"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:ORDINARY_STATE",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "ORDINARY_STATE",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "(module top level)",
+      "ordinaryBranch",
+      "isOrdinaryStateRequest"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:KEY_INDEX",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "KEY_INDEX",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "attachKeyIndex",
+      "materializeMember"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:MEMBER_MATERIALIZER",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "MEMBER_MATERIALIZER",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "materializeMember",
+      "materializeKeyedAware"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/materialize-markers.ts:applyMemberValue",
+    "file": "lib/internals/materialize-markers.ts",
+    "name": "applyMemberValue",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "setMemberValueApplier",
+        "file": "lib/internals/materialize-markers.ts"
+      }
+    ],
+    "writerLocations": [
+      "setMemberValueApplier"
+    ],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "materializeMember"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 installed runtime / mutable callback"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/utils.ts:ngDevMode",
+    "file": "lib/utils.ts",
+    "name": "ngDevMode",
+    "kind": "const",
+    "ambient": true,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 10,
+    "readerLocationsInFile": [
+      "toWritableSignal",
+      "(anonymous fn)",
+      "buildFromStore",
+      "applyState"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/utils.ts:MATERIALIZED",
+    "file": "lib/utils.ts",
+    "name": "MATERIALIZED",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "materialized"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set"
+    ],
+    "anomalyScore": 4,
+    "anomalyReasons": [
+      "+2 insertion with no removal path",
+      "+2 cache — correctness depends on invalidation"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/utils.ts:NODE_STORE_SYMBOL",
+    "file": "lib/utils.ts",
+    "name": "NODE_STORE_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "memoKey"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/utils.ts:TREE_STORES",
+    "file": "lib/utils.ts",
+    "name": "TREE_STORES",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakSet",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "markTreeStore",
+      "isMemoisable"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "add"
+    ],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 insertion with no removal path"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/utils.ts:MEMBERSHIP_REVISION",
+    "file": "lib/utils.ts",
+    "name": "MEMBERSHIP_REVISION",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "membershipRevisionFor",
+      "publishMembershipChange"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set"
+    ],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 insertion with no removal path"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/utils.ts:DERIVED_STAMP",
+    "file": "lib/utils.ts",
+    "name": "DERIVED_STAMP",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "stampDerived",
+      "buildFromStore"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/mutation-capture-runtime.ts:MUTATION_CAPTURE_RUNTIME",
+    "file": "lib/internals/mutation-capture-runtime.ts",
+    "name": "MUTATION_CAPTURE_RUNTIME",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "getMutationCaptureRuntime"
+    ],
+    "symbolResolvedCrossFileReads": 1,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [
+      "lib/signal-tree.ts"
+    ],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/owned-metadata.ts:OWNED_NODE_METADATA",
+    "file": "lib/internals/owned-metadata.ts",
+    "name": "OWNED_NODE_METADATA",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "getOwnedPositionIds",
+      "getOwnedOwnerPath",
+      "getOwnedOwnerId",
+      "hasIntrinsicMutationEmitter"
+    ],
+    "symbolResolvedCrossFileReads": 2,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [
+      "lib/internals/owned-mutation.ts"
+    ],
+    "mutationCandidates": [
+      "set"
+    ],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 insertion with no removal path"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/enhancer-requirements.ts:describe",
+    "file": "lib/internals/enhancer-requirements.ts",
+    "name": "describe",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "findEnhancerConfigurationProblems"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/observation-substrate.ts:ARM",
+    "file": "lib/internals/observation-substrate.ts",
+    "name": "ARM",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "installDormantObservation",
+      "claimLeaf"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/observation-substrate.ts:OBSERVATION",
+    "file": "lib/internals/observation-substrate.ts",
+    "name": "OBSERVATION",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "installDormantObservation",
+      "claimLeaf",
+      "observationStateForTesting"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set"
+    ],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 insertion with no removal path"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/root-source.ts:ROOT_TREES",
+    "file": "lib/internals/root-source.ts",
+    "name": "ROOT_TREES",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "defineRootTree",
+      "getRootTree"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set"
+    ],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 insertion with no removal path"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/tree-scalar-slot-angular-runtime.ts:TREE_SCALAR_SLOT_RUNTIME",
+    "file": "lib/internals/tree-scalar-slot-angular-runtime.ts",
+    "name": "TREE_SCALAR_SLOT_RUNTIME",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "defineTreeScalarSlotRuntime",
+      "getTreeScalarSlotRuntime"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/tree-capabilities.ts:TREE_CAPABILITY_ORDER",
+    "file": "lib/internals/tree-capabilities.ts",
+    "name": "TREE_CAPABILITY_ORDER",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "array literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "canonicalizeCapabilities",
+      "assertTreeCapabilityGraphAcyclic"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 strong collection — retention is not the key's lifetime"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/tree-capabilities.ts:TREE_CAPABILITY_DEPENDENCIES",
+    "file": "lib/internals/tree-capabilities.ts",
+    "name": "TREE_CAPABILITY_DEPENDENCIES",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "object literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "resolveTreeCapabilities",
+      "visit"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/tree-capabilities.ts:canonicalizeCapabilities",
+    "file": "lib/internals/tree-capabilities.ts",
+    "name": "canonicalizeCapabilities",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "collectRequestedTreeCapabilities",
+      "resolveTreeCapabilities"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/merge-derived.ts:ngDevMode",
+    "file": "lib/internals/merge-derived.ts",
+    "name": "ngDevMode",
+    "kind": "const",
+    "ambient": true,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "mergeDerivedState"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:isRealizedNode",
+    "file": "lib/signal-tree.ts",
+    "name": "isRealizedNode",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "createSignalStore"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:NODE_ACCESSOR_SYMBOL",
+    "file": "lib/signal-tree.ts",
+    "name": "NODE_ACCESSOR_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "isNodeAccessor",
+      "makeNodeAccessor",
+      "create",
+      "createBuilder"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:ENTITY_ARRAY_MIN_LENGTH",
+    "file": "lib/signal-tree.ts",
+    "name": "ENTITY_ARRAY_MIN_LENGTH",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 32",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "warnEntityArrayLeaf"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:ENTITY_ARRAY_SAMPLE",
+    "file": "lib/signal-tree.ts",
+    "name": "ENTITY_ARRAY_SAMPLE",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 64",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "warnMarkerInContainer",
+      "warnEntityArrayLeaf"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:ENTITY_ID_KEYS",
+    "file": "lib/signal-tree.ts",
+    "name": "ENTITY_ID_KEYS",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "AsExpression",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "warnEntityArrayLeaf"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:ENTITY_ARRAY_WARNED",
+    "file": "lib/signal-tree.ts",
+    "name": "ENTITY_ARRAY_WARNED",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new Set",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "warnEntityArrayLeaf"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "add"
+    ],
+    "anomalyScore": 4,
+    "anomalyReasons": [
+      "+2 insertion with no removal path",
+      "+2 strong collection — retention is not the key's lifetime"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:ENTITY_ARRAY_WARN_CAP",
+    "file": "lib/signal-tree.ts",
+    "name": "ENTITY_ARRAY_WARN_CAP",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 256",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "warnEntityArrayLeaf"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:NODE_STORE_SYMBOL",
+    "file": "lib/signal-tree.ts",
+    "name": "NODE_STORE_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "makeNodeAccessor"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:NODE_ACCESSOR_PEER",
+    "file": "lib/signal-tree.ts",
+    "name": "NODE_ACCESSOR_PEER",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "makeNodeAccessor"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:MARKER_IN_ARRAY_WARNED",
+    "file": "lib/signal-tree.ts",
+    "name": "MARKER_IN_ARRAY_WARNED",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new Set",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "warnMarkerInContainer"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "add"
+    ],
+    "anomalyScore": 4,
+    "anomalyReasons": [
+      "+2 insertion with no removal path",
+      "+2 strong collection — retention is not the key's lifetime"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:looksLikeMarker",
+    "file": "lib/signal-tree.ts",
+    "name": "looksLikeMarker",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "warnMarkerInContainer"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:warnedNoopPaths",
+    "file": "lib/signal-tree.ts",
+    "name": "warnedNoopPaths",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new Set",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "recursiveUpdate"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "add"
+    ],
+    "anomalyScore": 4,
+    "anomalyReasons": [
+      "+2 insertion with no removal path",
+      "+2 strong collection — retention is not the key's lifetime"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/signal-tree.ts:warnedNoopCopyPaths",
+    "file": "lib/signal-tree.ts",
+    "name": "warnedNoopCopyPaths",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new Set",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "(anonymous fn)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "add"
+    ],
+    "anomalyScore": 4,
+    "anomalyReasons": [
+      "+2 insertion with no removal path",
+      "+2 strong collection — retention is not the key's lifetime"
+    ],
+    "lane": "DEEP"
+  },
+  {
+    "subject": "state:lib/readonly-readers.ts:ENTITY_READERS",
+    "file": "lib/readonly-readers.ts",
+    "name": "ENTITY_READERS",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "SatisfiesExpression",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 1,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [
+      "lib/readonly.ts"
+    ],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/error-reporter.ts:listeners",
+    "file": "lib/internals/error-reporter.ts",
+    "name": "listeners",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new Set",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 5,
+    "readerLocationsInFile": [
+      "onTreeError",
+      "(anonymous fn)",
+      "reportTreeError",
+      "clearTreeErrorListenersForTesting"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "add",
+      "delete",
+      "clear"
+    ],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 strong collection — retention is not the key's lifetime"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/commit-consequence.ts:scopesByOwner",
+    "file": "lib/internals/commit-consequence.ts",
+    "name": "scopesByOwner",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 6,
+    "readerLocationsInFile": [
+      "openCommitScope",
+      "deferCommitConsequence",
+      "deferOperationConsequence",
+      "settleCommitScope"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set",
+      "delete"
+    ],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/commit-consequence.ts:openScopesByKey",
+    "file": "lib/internals/commit-consequence.ts",
+    "name": "openScopesByKey",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 5,
+    "readerLocationsInFile": [
+      "hasOpen",
+      "openCommitScope",
+      "settleCommitScope"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set",
+      "delete"
+    ],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/commit-consequence.ts:settleListenersByKey",
+    "file": "lib/internals/commit-consequence.ts",
+    "name": "settleListenersByKey",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "settleCommitScope",
+      "onCommitScopesSettled",
+      "(anonymous fn)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set"
+    ],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 insertion with no removal path"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/commit-consequence.ts:heldByKey",
+    "file": "lib/internals/commit-consequence.ts",
+    "name": "heldByKey",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "new WeakMap",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "scheduleDurableConsequence",
+      "settleCommitScope"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set",
+      "delete"
+    ],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/batching/batching.types.ts:_neutralTest",
+    "file": "enhancers/batching/batching.types.ts",
+    "name": "_neutralTest",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal true",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/subject-restoration-claims.ts:SUBJECT_RESTORATION_CLAIMS_SYMBOL",
+    "file": "lib/internals/subject-restoration-claims.ts",
+    "name": "SUBJECT_RESTORATION_CLAIMS_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "defineSubjectRestorationClaims",
+      "read"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+1 identity-shaped name (weak: name hint)",
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/subject-reclamation-sink.ts:SUBJECT_PHYSICAL_OWNERS_SYMBOL",
+    "file": "lib/internals/subject-reclamation-sink.ts",
+    "name": "SUBJECT_PHYSICAL_OWNERS_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "getOrCreateSubjectReclamationSink"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 identity-shaped name (weak: name hint)",
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/subject-reclamation-sink.ts:SUBJECT_RECLAMATION_SINK_SYMBOL",
+    "file": "lib/internals/subject-reclamation-sink.ts",
+    "name": "SUBJECT_RECLAMATION_SINK_SYMBOL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "getOrCreateSubjectReclamationSink"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 identity-shaped name (weak: name hint)",
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/causal-runtime/tree-realization-adapter.ts:TREE_REALIZATION_DESCRIPTORS",
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "name": "TREE_REALIZATION_DESCRIPTORS",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "defineTreeRealizationDescriptors",
+      "getTreeRealizationDescriptors"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/causal-runtime/tree-realization-adapter.ts:TREE_REALIZATION_PORT",
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "name": "TREE_REALIZATION_PORT",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "defineTreeRealizationPort",
+      "getTreeRealizationPort"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/causal-runtime/tree-realization-adapter.ts:WHOLE_SUBJECT",
+    "file": "lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "name": "WHOLE_SUBJECT",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "object literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "deriveSubjectAddress"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+1 identity-shaped name (weak: name hint)"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:lib/internals/causal-runtime/transaction-lifecycle.ts:TRANSACTION_LIFECYCLE",
+    "file": "lib/internals/causal-runtime/transaction-lifecycle.ts",
+    "name": "TRANSACTION_LIFECYCLE",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "installTransactionLifecycleChannel",
+      "tryGetTransactionLifecycleChannel"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/causal-runtime/transaction-lifecycle.ts:TRANSACTION_LIFECYCLE_OWNER",
+    "file": "lib/internals/causal-runtime/transaction-lifecycle.ts",
+    "name": "TRANSACTION_LIFECYCLE_OWNER",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol.for()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "installTransactionLifecycleChannel",
+      "hasTransactionOwner"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+-4 Symbol.for() key, censused as a structural symbol"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/restoration/restoration.ts:HISTORY_RETAINED_POINTER_BUDGET",
+    "file": "enhancers/restoration/restoration.ts",
+    "name": "HISTORY_RETAINED_POINTER_BUDGET",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 500_000",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "checkHistoryRetention"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/restoration/restoration.ts:RETENTION_CHECK_INTERVAL",
+    "file": "enhancers/restoration/restoration.ts",
+    "name": "RETENTION_CHECK_INTERVAL",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 16",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "buildTurn"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/restoration/restoration.ts:MAX_OBSERVED_BATCHES",
+    "file": "enhancers/restoration/restoration.ts",
+    "name": "MAX_OBSERVED_BATCHES",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 1_000",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "observeBatch"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/restoration/restoration.ts:warnedHistoryRetention",
+    "file": "enhancers/restoration/restoration.ts",
+    "name": "warnedHistoryRetention",
+    "kind": "let",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal false",
+    "mutableCandidate": true,
+    "writes": [
+      {
+        "kind": "assign",
+        "where": "checkHistoryRetention",
+        "file": "enhancers/restoration/restoration.ts"
+      }
+    ],
+    "writerLocations": [
+      "checkHistoryRetention"
+    ],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "checkHistoryRetention"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/restoration/restoration.ts:withRestoration",
+    "file": "enhancers/restoration/restoration.ts",
+    "name": "withRestoration",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "Object.assign()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/devtools/devtools-impl.ts:ngDevMode",
+    "file": "enhancers/devtools/devtools-impl.ts",
+    "name": "ngDevMode",
+    "kind": "const",
+    "ambient": true,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 10,
+    "readerLocationsInFile": [
+      "(anonymous fn)",
+      "initBrowserDevTools"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/devtools/devtools-impl.ts:GLOBAL_GROUPS_KEY",
+    "file": "enhancers/devtools/devtools-impl.ts",
+    "name": "GLOBAL_GROUPS_KEY",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal '__SIGNALTREE_DEVTOOLS_GROUPS__'",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "(module top level)",
+      "getGlobalDevToolsGroups"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/devtools/devtools-impl.ts:GLOBAL_MARKER_KEY",
+    "file": "enhancers/devtools/devtools-impl.ts",
+    "name": "GLOBAL_MARKER_KEY",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal '__SIGNALTREE_DEVTOOLS_GLOBAL_MARKER__'",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "(module top level)",
+      "ensureGlobalMarker"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/devtools/devtools-impl.ts:devToolsGroups",
+    "file": "enhancers/devtools/devtools-impl.ts",
+    "name": "devToolsGroups",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "getGlobalDevToolsGroups()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 5,
+    "readerLocationsInFile": [
+      "getOrCreateDevToolsGroup",
+      "(anonymous fn)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "delete",
+      "set"
+    ],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/devtools/devtools-impl.ts:GLOBAL_CONNECTIONS_KEY",
+    "file": "enhancers/devtools/devtools-impl.ts",
+    "name": "GLOBAL_CONNECTIONS_KEY",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal '__SIGNALTREE_DEVTOOLS_CONNECTIONS__'",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "(module top level)",
+      "getGlobalDevToolsConnections"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/devtools/devtools-impl.ts:devToolsConnections",
+    "file": "enhancers/devtools/devtools-impl.ts",
+    "name": "devToolsConnections",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "getGlobalDevToolsConnections()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 10,
+    "readerLocationsInFile": [
+      "initBrowserDevTools",
+      "(anonymous fn)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [
+      "set",
+      "delete"
+    ],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/devtools/devtools.ts:ngDevMode",
+    "file": "enhancers/devtools/devtools.ts",
+    "name": "ngDevMode",
+    "kind": "const",
+    "ambient": true,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "(module top level)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/devtools/devtools.ts:devToolsImpl",
+    "file": "enhancers/devtools/devtools.ts",
+    "name": "devToolsImpl",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "ConditionalExpression",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "devTools"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/transactions/transactions.ts:INTERNAL_TRANSACTION_RUNTIME",
+    "file": "enhancers/transactions/transactions.ts",
+    "name": "INTERNAL_TRANSACTION_RUNTIME",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "getOrCreateInternalTransactionRuntime"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/transactions/transactions.ts:ROLLBACK_ERROR_MESSAGE",
+    "file": "enhancers/transactions/transactions.ts",
+    "name": "ROLLBACK_ERROR_MESSAGE",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 'SignalTree could not rollback the pending transaction'",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "explainRollbackFailure"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/transactions/transactions.ts:explainRollbackFailure",
+    "file": "enhancers/transactions/transactions.ts",
+    "name": "explainRollbackFailure",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "createRollbackError"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/transactions/transactions.ts:createRollbackError",
+    "file": "enhancers/transactions/transactions.ts",
+    "name": "createRollbackError",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "rollbackPendingEffectsThroughRealizationPort",
+      "rollback"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/serialization/constants.ts:TYPE_MARKERS",
+    "file": "enhancers/serialization/constants.ts",
+    "name": "TYPE_MARKERS",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "AsExpression",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 27,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [
+      "enhancers/serialization/serialization.ts"
+    ],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/serialization/serialization.ts:ngDevMode",
+    "file": "enhancers/serialization/serialization.ts",
+    "name": "ngDevMode",
+    "kind": "const",
+    "ambient": true,
+    "exported": false,
+    "retainedFact": "uninitialised",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 2,
+    "readerLocationsInFile": [
+      "debug"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/serialization/serialization.ts:isSignal",
+    "file": "enhancers/serialization/serialization.ts",
+    "name": "isSignal",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 6,
+    "readerLocationsInFile": [
+      "(anonymous fn)",
+      "isBranch",
+      "resolveAliasSignal",
+      "updateSignals",
+      "applyJSON"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/serialization/serialization.ts:SNAPSHOT_FORMAT_VERSION",
+    "file": "enhancers/serialization/serialization.ts",
+    "name": "SNAPSHOT_FORMAT_VERSION",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal '2.0.0'",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "encodeSnapshot"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 2,
+    "anomalyReasons": [
+      "+2 cache — correctness depends on invalidation"
+    ],
+    "lane": "REVIEW-TABLE"
+  },
+  {
+    "subject": "state:enhancers/serialization/serialization.ts:DEFAULT_CONFIG",
+    "file": "enhancers/serialization/serialization.ts",
+    "name": "DEFAULT_CONFIG",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "object literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "(anonymous fn)",
+      "persistenceFn"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:enhancers/serialization/serialization.ts:restoreSpecialTypes",
+    "file": "enhancers/serialization/serialization.ts",
+    "name": "restoreSpecialTypes",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 4,
+    "readerLocationsInFile": [
+      "restoreSpecialTypes",
+      "applyJSON",
+      "(anonymous fn)"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)",
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/acquire-projection.ts:isRealizableSubject",
+    "file": "lib/internals/acquire-projection.ts",
+    "name": "isRealizableSubject",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "function",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "acquireScalarProjection"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [
+      "+1 identity-shaped name (weak: name hint)",
+      "+-2 const function declaration, not state"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/acquire-projection.ts:EXTERNAL_ACQUISITION",
+    "file": "lib/internals/acquire-projection.ts",
+    "name": "EXTERNAL_ACQUISITION",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "object literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/production-substrate-stats.prod.ts:PRODUCTION_SUBSTRATE_STATS_ENABLED",
+    "file": "lib/internals/production-substrate-stats.prod.ts",
+    "name": "PRODUCTION_SUBSTRATE_STATS_ENABLED",
+    "kind": "const",
+    "ambient": false,
+    "exported": true,
+    "retainedFact": "literal false",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 0,
+    "readerLocationsInFile": [],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/tree-location.ts:FUNCTION_VALUE",
+    "file": "lib/internals/tree-location.ts",
+    "name": "FUNCTION_VALUE",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "Symbol()",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 3,
+    "readerLocationsInFile": [
+      "(module top level)",
+      "asValue",
+      "isFunctionValue"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/causal-runtime/confirmed-redo.ts:defaultDependencies",
+    "file": "lib/internals/causal-runtime/confirmed-redo.ts",
+    "name": "defaultDependencies",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "object literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "redoConfirmedAt"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/causal-runtime/confirmed-undo.ts:defaultDependencies",
+    "file": "lib/internals/causal-runtime/confirmed-undo.ts",
+    "name": "defaultDependencies",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "object literal",
+    "mutableCandidate": true,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "undoConfirmedAt"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/diagnostics/diagnostic-journal.ts:DEFAULT_MAX_TURNS",
+    "file": "lib/internals/diagnostics/diagnostic-journal.ts",
+    "name": "DEFAULT_MAX_TURNS",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 50",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "createDiagnosticJournal"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 1,
+    "anomalyReasons": [
+      "+1 restoration / causal domain (weak: name/path hint)"
+    ],
+    "lane": "FAST-LANE"
+  },
+  {
+    "subject": "state:lib/internals/diagnostics/diagnostic-journal.ts:DEFAULT_MAX_EVENTS",
+    "file": "lib/internals/diagnostics/diagnostic-journal.ts",
+    "name": "DEFAULT_MAX_EVENTS",
+    "kind": "const",
+    "ambient": false,
+    "exported": false,
+    "retainedFact": "literal 200",
+    "mutableCandidate": false,
+    "writes": [],
+    "writerLocations": [],
+    "symbolResolvedReadsInFile": 1,
+    "readerLocationsInFile": [
+      "createDiagnosticJournal"
+    ],
+    "symbolResolvedCrossFileReads": 0,
+    "symbolResolvedCrossFileWrites": 0,
+    "referencingFiles": [],
+    "mutationCandidates": [],
+    "anomalyScore": 0,
+    "anomalyReasons": [],
+    "lane": "FAST-LANE"
+  }
+]

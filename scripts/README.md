@@ -41,7 +41,7 @@ npm run quality:simple    # Bypasses complex cross-package linting
 
 # Step 3: Manual fixes for peer dependencies (if needed)
 cd packages/[package-name]
-npm install @signaltree/core --save-peer
+npm install @signal-tree/kernel --save-peer
 ```
 
 ### Build Cache Issues
@@ -60,10 +60,10 @@ If a release fails partway through:
 # For npm publish failures after git push, you may need manual cleanup:
 
 # Check what was published
-npm view @signaltree/core versions --json
+npm view @signal-tree/kernel versions --json
 
 # If needed, unpublish specific versions (within 72 hours)
-npm unpublish @signaltree/core@2.0.0
+npm unpublish @signal-tree/kernel@2.0.0
 
 # Or create a patch release to fix issues
 npm run release:patch

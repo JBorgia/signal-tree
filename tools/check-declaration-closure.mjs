@@ -49,11 +49,11 @@ import { join } from 'node:path';
 async function emit(out, strip) {
   rmSync(out, { recursive: true, force: true });
   const b = await rollup({
-    input: ['packages/core/src/index.ts'],
+    input: ['packages/kernel/src/index.ts'],
     external: (id) => !id.startsWith('.') && !id.startsWith('/'),
     plugins: [
       typescript({
-        tsconfig: 'packages/core/tsconfig.lib.prod.json',
+        tsconfig: 'packages/kernel/tsconfig.lib.prod.json',
         declaration: true,
         declarationDir: out,
         outDir: out,

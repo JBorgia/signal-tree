@@ -4,7 +4,7 @@
  * semver range, then PROVE none survive.
  *
  * `npm publish` does not rewrite these. A published
- * `peerDependencies: { "@signaltree/core": "workspace:*" }` is not a valid
+ * `peerDependencies: { "@signal-tree/kernel": "workspace:*" }` is not a valid
  * semver range, so `npm install @signaltree/ng-forms` fails outright — and it
  * would ship on six of the seven packages, i.e. everything except core.
  *
@@ -58,7 +58,7 @@ function selfTest() {
   const cases = [
     {
       name: 'rewrites peerDependencies',
-      m: { peerDependencies: { '@signaltree/core': 'workspace:*' } },
+      m: { peerDependencies: { '@signal-tree/kernel': 'workspace:*' } },
       expectChanged: 1,
       expectLeft: 0,
     },
@@ -76,13 +76,13 @@ function selfTest() {
     },
     {
       name: 'DEV dependencies are not rewritten (consumers never see them)',
-      m: { devDependencies: { '@signaltree/core': 'workspace:*' } },
+      m: { devDependencies: { '@signal-tree/kernel': 'workspace:*' } },
       expectChanged: 0,
       expectLeft: 0,
     },
     {
       name: 'detector fires on an unrewritten manifest',
-      m: { peerDependencies: { '@signaltree/core': 'workspace:*' } },
+      m: { peerDependencies: { '@signal-tree/kernel': 'workspace:*' } },
       skipRewrite: true,
       expectLeft: 1,
     },

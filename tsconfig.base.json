@@ -19,7 +19,13 @@
     "baseUrl": ".",
     "types": ["@angular/core", "vitest/globals"],
     "paths": {
-      "@signaltree/core": ["packages/core/src/index.ts"],
+      "@signal-tree/angular": [
+        "packages/angular/src/index.ts"
+      ],
+      "@signal-tree/kernel/adapter": [
+        "packages/kernel/src/adapter.ts"
+      ],
+      "@signal-tree/kernel": ["packages/kernel/src/index.ts"],
       "@signaltree/events": ["packages/events/src/index.ts"],
       "@signaltree/events/*": ["packages/events/src/*"],
       "@signaltree/ng-forms": ["packages/ng-forms/src/index.ts"],

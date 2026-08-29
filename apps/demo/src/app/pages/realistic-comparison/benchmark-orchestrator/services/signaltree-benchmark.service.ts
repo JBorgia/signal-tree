@@ -4,7 +4,7 @@ import {
   entityMap,
   signalTree,
   restoration,
-} from '@signaltree/core';
+} from '@signal-tree/kernel';
 
 /**
  * The zero-delay batching preset, local to this benchmark.
@@ -75,7 +75,7 @@ import {
  */
 
 // Consider importing performance preset for consistency
-// import { createPresetConfig } from '@signaltree/core';
+// import { createPresetConfig } from '@signal-tree/kernel';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 @Injectable({ providedIn: 'root' })

@@ -3,7 +3,7 @@
  * Per-leaf equality (`compared()` / `byKeys()`) and the materialisation memo.
  *
  * These figures are quoted on `llms.txt`, `llms-full.txt` and
- * `packages/core/README.md` — roughly 50 numbers across the three — and until
+ * `packages/kernel/README.md` — roughly 50 numbers across the three — and until
  * this file existed NOTHING produced them. They were the same class of claim as
  * the "Performance targets (Sept 2025)" table, which turned out to be wrong by
  * 10x-1000x once someone finally measured it.
@@ -19,7 +19,7 @@ import {
   compared,
   byKeys,
   deepEqual,
-} from '../dist/packages/core/dist/index.js';
+} from '../dist/packages/kernel/dist/index.js';
 
 /**
  * The baseline is `compared(value, deepEqual)`, NOT a bare object.

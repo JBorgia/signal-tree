@@ -26,7 +26,7 @@ export interface CodeFile {
 
 /**
  * Config for the "Edit in StackBlitz" button. `files` are merged over a base
- * standalone-Angular + `@signaltree/core` template provided by
+ * standalone-Angular + `@signal-tree/kernel` template provided by
  * {@link StackblitzService}; provide at least `src/app/app.component.ts`.
  */
 export interface StackblitzConfig {

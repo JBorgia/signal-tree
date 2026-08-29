@@ -30,7 +30,7 @@
           },
           {
             "glob": "README.md",
-            "input": "packages/core",
+            "input": "packages/kernel",
             "output": "assets/docs/core"
           },
           {

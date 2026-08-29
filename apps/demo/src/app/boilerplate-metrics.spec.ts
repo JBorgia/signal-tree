@@ -1,4 +1,4 @@
-import { signalTree } from '@signaltree/core';
+import { signalTree } from '@signal-tree/kernel';
 
 /**
  * Boilerplate and Code Metrics Analysis
@@ -26,7 +26,7 @@ describe('SignalTree Boilerplate & Code Metrics', () => {
         setupComplexity: 1,
         maintainabilityScore: 10,
         example: `
-      import { signalTree } from '@signaltree/core';
+      import { signalTree } from '@signal-tree/kernel';
 
       const tree = signalTree({ count: 0 });
       // Access: tree.$.count()
@@ -121,8 +121,8 @@ const count = signal(0);
         setupComplexity: 3,
         maintainabilityScore: 9,
         example: `
-import { signalTree } from '@signaltree/core';
-import { batching } from '@signaltree/core';
+import { signalTree } from '@signal-tree/kernel';
+import { batching } from '@signal-tree/kernel';
 // async removed: recommend middleware/manual helpers for loading/error states
 // entities() enhancer removed in v9 — entityMap marker is used directly
 

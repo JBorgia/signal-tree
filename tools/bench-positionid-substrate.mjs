@@ -9,11 +9,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const ENTITY_SIGNAL_LIB = join(
   ROOT,
-  'dist/packages/core/dist/lib/entity-signal.js'
+  'dist/packages/kernel/dist/lib/entity-signal.js'
 );
 const PATH_NOTIFIER_LIB = join(
   ROOT,
-  'dist/packages/core/dist/lib/path-notifier.js'
+  'dist/packages/kernel/dist/lib/path-notifier.js'
 );
 
 const arg = (name, dflt) => {

@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": false,
+    "module": "ESNext",
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@signal-tree/kernel": [
+        "packages/kernel/src/index.ts"
+      ],
+      "@signal-tree/kernel/adapter": [
+        "packages/kernel/src/adapter.ts"
+      ]
+    },
+    "noEmit": true
+  },
+  "exclude": [
+    "src/test-setup.ts",
+    "vitest.config.ts"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
+}

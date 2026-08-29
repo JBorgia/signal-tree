@@ -102,8 +102,8 @@ function analyzeBundle(testCase) {
       skipLibCheck: true,
       baseUrl: '..',
       paths: {
-        '@signaltree/core': ['packages/core/src/index.ts'],
-        '@signaltree/core/*': ['packages/core/src/*'],
+        '@signaltree/core': ['packages/kernel/src/index.ts'],
+        '@signaltree/core/*': ['packages/kernel/src/*'],
       },
     },
     include: ['test.ts'],

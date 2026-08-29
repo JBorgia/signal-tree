@@ -8,7 +8,7 @@ import type { StackblitzConfig } from './example.types';
  * Opens a runnable, editable StackBlitz sandbox for a demo — the "Edit like a
  * playground" affordance. Demos supply their own source via
  * {@link StackblitzConfig.files} (at minimum `src/app/app.component.ts`); this
- * service wraps them in one shared, standalone-Angular + `@signaltree/core`
+ * service wraps them in one shared, standalone-Angular + `@signal-tree/kernel`
  * project template so every "Edit" button boots the same known-good app.
  *
  * NOTE: the template targets a modern standalone Angular app (v20). Multi-file
@@ -51,7 +51,7 @@ export class StackblitzService {
             '@angular/forms': this.ngVersion,
             '@angular/platform-browser': this.ngVersion,
             '@angular/router': this.ngVersion,
-            '@signaltree/core': 'latest',
+            '@signal-tree/kernel': 'latest',
             rxjs: '^7.8.0',
             tslib: '^2.6.0',
             'zone.js': '^0.15.0',
@@ -128,7 +128,7 @@ bootstrapApplication(AppComponent).catch((err) => console.error(err));
       'src/styles.css': `body { font-family: system-ui, sans-serif; margin: 2rem; }`,
       // Sensible placeholder; demos override src/app/app.component.ts.
       'src/app/app.component.ts': `import { Component } from '@angular/core';
-import { signalTree } from '@signaltree/core';
+import { signalTree } from '@signal-tree/kernel';
 
 @Component({
   selector: 'app-root',

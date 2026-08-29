@@ -3,7 +3,7 @@
 Three capabilities get asked for often enough that they look like missing features:
 a standard enhancer policy, a reusable entity-CRUD Ops base, and a selection
 read-model. All three are **compositions of primitives that already ship**, and
-each is deliberately _not_ in `@signaltree/core`.
+each is deliberately _not_ in `@signal-tree/kernel`.
 
 They live here because a recipe is the better answer when the composition is
 short and the opinions are yours: it costs no API surface, it can't be
@@ -27,8 +27,8 @@ ARRAY, not an enhanced tree: 15.0 has no `.with()`, and a helper that took a
 tree could not add anything to it.
 
 ```typescript
-import { batching, devTools } from '@signaltree/core';
-import type { Enhancer } from '@signaltree/core';
+import { batching, devTools } from '@signal-tree/kernel';
+import type { Enhancer } from '@signal-tree/kernel';
 
 export interface StandardEnhancerOptions {
   name: string;
@@ -96,7 +96,7 @@ infer, or write the array inline at the construction site.
 If your helper lives in a **library** and you let TypeScript infer, the emitted
 `.d.ts` will reference the enhancer method interfaces — `BatchingMethods`,
 `DevToolsMethods`, `RestorationMethods`, `OptimizedUpdateMethods`,
-`EffectsMethods`. All five are exported from `@signaltree/core`, so this works.
+`EffectsMethods`. All five are exported from `@signal-tree/kernel`, so this works.
 
 ---
 
@@ -122,7 +122,7 @@ recipe is.
 ### State: one slice factory per domain
 
 ```typescript
-import { entityMap } from '@signaltree/core';
+import { entityMap } from '@signal-tree/kernel';
 
 export function entityCrudState<T extends { id: string }>(api: ApiService, config: { name: string; endpoint: string; staleTime?: string }) {
   return {
@@ -272,7 +272,7 @@ rather than a slice — see the
 ### If your derived reads come back `undefined`
 
 That has one overwhelmingly common cause: **two copies of `@angular/core`**. Each
-copy has its own `Symbol(SIGNAL)`, so `isSignal()` inside `@signaltree/core`
+copy has its own `Symbol(SIGNAL)`, so `isSignal()` inside `@signal-tree/kernel`
 rejects a `computed()` your code created, and `.derived()` drops every value.
 Since 13.2.0 this warns as `[ST2007]`; before that it failed silently. Fix the
 duplication in your bundler (Vite: `resolve: { dedupe: ['@angular/core'] }`;

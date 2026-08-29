@@ -16,7 +16,7 @@ import {
   entityMap,
   loader,
   serialization,
-} from '../dist/packages/core/dist/index.js';
+} from '../dist/packages/kernel/dist/index.js';
 
 const JSON_ONLY = process.argv.includes('--json');
 if (JSON_ONLY) {

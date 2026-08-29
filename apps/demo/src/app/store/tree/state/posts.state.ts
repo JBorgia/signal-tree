@@ -1,4 +1,4 @@
-import { entityMap } from '@signaltree/core';
+import { entityMap } from '@signal-tree/kernel';
 
 import { Nullable, Post } from '../../types';
 import { loadingSlice } from './shared.state';

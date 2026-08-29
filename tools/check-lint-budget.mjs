@@ -46,7 +46,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BASELINE = join(ROOT, 'tools', 'lint-budget.json');
 
 const PROJECTS = [
-  'packages/core',
+  'packages/kernel',
   'packages/shared',
   'apps/demo',
   // tools/ and scripts/ are NOT nx projects, so `nx run-many -t lint` never

@@ -1,6 +1,6 @@
 
 import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
-import { derivedFrom, entityMap, signalTree, WithDerived } from '@signaltree/core';
+import { derivedFrom, entityMap, signalTree, WithDerived } from '@signal-tree/kernel';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 

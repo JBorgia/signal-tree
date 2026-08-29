@@ -8,7 +8,7 @@
  * Angular consumer. Runtime/browser execution belongs to Gate D.
  *
  * Usage: node tools/verify-angular-consumer.mjs
- *        (requires dist/packages/core — run the build first)
+ *        (requires dist/packages/kernel — run the build first)
  */
 import { execFileSync } from 'node:child_process';
 import {
@@ -90,7 +90,7 @@ import {
   signalTree,
   restoration,
   toWritableSignal,
-} from '@signaltree/core';
+} from '@signal-tree/kernel';
 
 type User = { id: number; name: string };
 

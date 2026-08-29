@@ -130,8 +130,8 @@ It was a duplicate of the tree callable: its body was exactly what `tree(partial
 already does, and with `batching()` attached `tree.batchUpdate(x)` was precisely
 `tree.batch(() => tree(x))`. Measured equivalent before removal.
 
-Note the `batchUpdates` **config option** is unrelated and still exists:
-`signalTree(state, { batchUpdates: false })`.
+Note the `batchUpdates` **config option** was unrelated to this change, and was
+**retired in 15.0** — see the 15.0 notes. It is not available in 15.0+.
 
 ## 7. `pauseRecording()` / `resumeRecording()` / `isRecordingPaused()` removed
 

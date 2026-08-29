@@ -29,8 +29,8 @@ export class ArchitectureOverviewComponent {
   comparisons: ArchitectureComparison[] = [
     {
       aspect: 'Dependencies',
-      separate: 'Multiple packages (@signaltree/core, @signaltree/entities, @signaltree/computed…)',
-      consolidated: '@signaltree/core (includes all enhancers)',
+      separate: 'Multiple packages (@signal-tree/kernel, @signaltree/entities, @signaltree/computed…)',
+      consolidated: '@signal-tree/kernel (includes all enhancers)',
       benefit: 'Simplified dependency management',
     },
     {
@@ -102,7 +102,7 @@ import {
   batching,
   devTools,
   entityMap,
-} from '@signaltree/core';`,
+} from '@signal-tree/kernel';`,
     },
   ];
 

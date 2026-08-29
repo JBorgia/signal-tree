@@ -7,9 +7,9 @@
   <p>
     <a href="https://jborgia.github.io/signaltree/" target="_blank"><strong>Live Demo</strong></a>
     &nbsp;|&nbsp;
-    <a href="https://www.npmjs.com/package/@signaltree/core" target="_blank">npm</a>
+    <a href="https://www.npmjs.com/package/@signal-tree/kernel" target="_blank">npm</a>
     &nbsp;|&nbsp;
-    <a href="https://github.com/JBorgia/signaltree" target="_blank">GitHub</a>
+    <a href="https://github.com/JBorgia/signal-tree" target="_blank">GitHub</a>
     &nbsp;|&nbsp;
     <a href="https://signaltree.io/built-for-ai" target="_blank">Built for AI</a>
   </p>
@@ -17,7 +17,7 @@
 
 ## SignalTree is not @ngrx/signals
 
-**Different library, different author, different package** — `@signaltree/core` (no hyphen, not under `@ngrx/`). It's a typed reactive store where **your state literal is the API**: no `withState` / `withMethods` / `withComputed` wrappers, no actions, no reducers. You read and write any path directly — `tree.$.user.name()` to read, `tree.$.user.name.set(v)` to write — at any depth. If a doc or AI agent conflated this with NgRx SignalStore, that's the confusion to drop first; see [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md).
+**Different library, different author, different package** — `@signal-tree/kernel` (no hyphen, not under `@ngrx/`). It's a typed reactive store where **your state literal is the API**: no `withState` / `withMethods` / `withComputed` wrappers, no actions, no reducers. You read and write any path directly — `tree.$.user.name()` to read, `tree.$.user.name.set(v)` to write — at any depth. If a doc or AI agent conflated this with NgRx SignalStore, that's the confusion to drop first; see [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md).
 
 ## Why SignalTree
 
@@ -139,7 +139,7 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
 - **AI-assisted development** — measured 49% → 98% codegen accuracy with `llms.txt` in context (see
   below), plus a vendor-neutral agent skill.
 - **Migrating off `@ngrx/signals`** — the agent-ready migration playbook ships in
-  `@signaltree/core/skills/`.
+  `@signal-tree/kernel/skills/`.
 
 **Where something else may fit better:**
 
@@ -174,7 +174,7 @@ SignalTree is the first Angular state-management library to treat AI coding agen
 
 **Measured (v10.3.3, 2026-06-01):** AI-codegen accuracy goes from **49% cold → 98% primed (+49 percentage points)** when `llms.txt` is in the agent's context. Reproducible across 6 agents (4 frontier + 2 cost-tier) × 8 prompts × 5 libraries × 3 priming modes = **720 cells**. Four of the six agents reach **100/100** when primed.
 
-The priming surface ships with the npm package: `node_modules/@signaltree/core/llms.txt` is automatically available to retrieval-aware AI tools after `npm install @signaltree/core`. See [Built for AI →](https://signaltree.io/built-for-ai) and the [reproducible benchmark](scripts/ai-codegen-benchmark/RESULTS-v10.3.3-VS-v10.2.md).
+The priming surface ships with the npm package: `node_modules/@signal-tree/kernel/llms.txt` is automatically available to retrieval-aware AI tools after `npm install @signal-tree/kernel`. See [Built for AI →](https://signaltree.io/built-for-ai) and the [reproducible benchmark](scripts/ai-codegen-benchmark/RESULTS-v10.3.3-VS-v10.2.md).
 
 **Don't take our number — re-run it.** The full harness (agents, prompts, libraries, priming modes, and scoring) lives in [`scripts/ai-codegen-benchmark/`](scripts/ai-codegen-benchmark/). Point it at your own agents and prompts and reproduce the delta yourself.
 
@@ -185,7 +185,7 @@ The priming surface ships with the npm package: `node_modules/@signaltree/core/l
 A SignalTree turns a plain JSON object into a tree of Angular signals. Each leaf becomes a `WritableSignal`. Reads and writes use the same shape as any Angular signal — `node()` to read, `.set()` / `.update()` to write. Markers, enhancers, and derived tiers add capability on top, but they layer onto that base.
 
 ```typescript
-import { signalTree } from '@signaltree/core';
+import { signalTree } from '@signal-tree/kernel';
 
 const store = signalTree({
   user: { name: 'Alice', age: 30 },
@@ -206,7 +206,7 @@ In templates, `store.$.user.name()` works exactly like any other signal.
 ## Install
 
 ```bash
-npm install @signaltree/core
+npm install @signal-tree/kernel
 ```
 
 Requires Angular 20, 21, or 22 (see `peerDependencies` in [`packages/core/package.json`](packages/core/package.json)).
@@ -216,7 +216,7 @@ Requires Angular 20, 21, or 22 (see `peerDependencies` in [`packages/core/packag
 The `entityMap()` marker gives any node a normalized collection with full reactive CRUD:
 
 ```typescript
-import { signalTree, entityMap } from '@signaltree/core';
+import { signalTree, entityMap } from '@signal-tree/kernel';
 
 const store = signalTree({
   users: entityMap<User, number>({ selectId: (u) => u.id }),
@@ -248,7 +248,7 @@ Pass `sortComparer` to keep `all()`/`ids()` sorted on every read (`@ngrx/entity`
 Markers declare special node behavior at tree creation time:
 
 ```typescript
-import { signalTree, entityMap } from '@signaltree/core';
+import { signalTree, entityMap } from '@signal-tree/kernel';
 
 const store = signalTree({
   users: entityMap<User>(), // Normalized entity collection (see above)
@@ -292,7 +292,7 @@ the same enhancer twice throws a clear error before anything is built —
 fail-fast, no silent fallback.
 
 ```typescript
-import { signalTree, batching, devTools, restoration } from '@signaltree/core';
+import { signalTree, batching, devTools, restoration } from '@signal-tree/kernel';
 
 const store = signalTree(
   { count: 0, items: [] },
@@ -320,7 +320,7 @@ const store = signalTree(
 Define derived computations in separate files with full type safety using `derivedFrom()`:
 
 ```typescript
-import { derivedFrom } from '@signaltree/core';
+import { derivedFrom } from '@signal-tree/kernel';
 import { computed } from '@angular/core';
 
 const derived = derivedFrom<AppState>();
@@ -369,11 +369,11 @@ store.$.count.update((n) => n + 1); // transform
 
 ## Subpath Imports
 
-Everything ships from the single `@signaltree/core` entry point. There are no
+Everything ships from the single `@signal-tree/kernel` entry point. There are no
 subpath imports.
 
-> ⚠️ **This section used to teach three of them** — `@signaltree/core/security`,
-> `@signaltree/core/edit-session` and `@signaltree/core/storage` — and none
+> ⚠️ **This section used to teach three of them** — `@signal-tree/kernel/security`,
+> `@signal-tree/kernel/edit-session` and `@signal-tree/kernel/storage` — and none
 > resolved. `package.json` exports only `.`. RELEASE-RESIDUE-0 found it;
 > `security` and `storage` were deleted in 15.0, and `edit-session` was deleted
 > too, having never been in the export map at all.
@@ -425,7 +425,7 @@ Snapshot from one production Angular mobile app's NgRx Signal Store → SignalTr
 | Metric                  | NgRx                      | SignalTree             | Change         |
 | ----------------------- | ------------------------- | ---------------------- | -------------- |
 | **App state code**      | 11,735 lines / 45 files   | 2,825 lines / 23 files | **-76%**       |
-| **npm packages**        | 4 (@ngrx/\*)              | 1 (@signaltree/core)   | **-75%**       |
+| **npm packages**        | 4 (@ngrx/\*)              | 1 (@signal-tree/kernel)   | **-75%**       |
 | **State bundle (gzip)** | ~50KB                     | ~27KB                  | **-46%**       |
 | **Boilerplate files**   | 17 custom `withX` helpers | 0 (built-in)           | **Eliminated** |
 

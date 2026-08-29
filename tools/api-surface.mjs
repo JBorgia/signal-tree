@@ -50,7 +50,7 @@ const PACKAGES = [
   // reading source follows re-export chains into internal modules and counted
   // 227 against @ngrx/signals' 25 — an apples-to-oranges number that would have
   // made the matrix look like a rout on surface area alone.
-  { name: '@signaltree/core', dir: 'dist/packages/core' },
+  { name: '@signal-tree/kernel', dir: 'dist/packages/kernel' },
   { name: '@ngrx/signals', dir: 'node_modules/@ngrx/signals' },
   { name: '@ngrx/store', dir: 'node_modules/@ngrx/store' },
   { name: '@ngneat/elf', dir: 'node_modules/@ngneat/elf' },

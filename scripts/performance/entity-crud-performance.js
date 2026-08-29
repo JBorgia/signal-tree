@@ -11,7 +11,7 @@
  */
 
 // Import only the items we need; avoid destructuring `entities` to prevent TDZ and deprecation spam
-const core = require('../../dist/packages/core');
+const core = require('../../dist/packages/kernel');
 const { signalTree, entityMap } = core;
 
 console.log('🧪 SignalTree Entity CRUD Performance Benchmarks\n');

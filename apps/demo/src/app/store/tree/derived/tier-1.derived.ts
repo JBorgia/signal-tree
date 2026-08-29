@@ -1,5 +1,5 @@
 import { computed } from '@angular/core';
-import { derivedFrom } from '@signaltree/core';
+import { derivedFrom } from '@signal-tree/kernel';
 
 import type { AppTreeBase } from '../app-tree';
 

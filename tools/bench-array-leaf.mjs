@@ -34,7 +34,7 @@
  *   node tools/bench-array-leaf.mjs --n 5000
  *   node tools/bench-array-leaf.mjs --n 50000 --updates 1000
  */
-import { signalTree, entityMap } from '../dist/packages/core/dist/index.js';
+import { signalTree, entityMap } from '../dist/packages/kernel/dist/index.js';
 import { signalState, patchState } from '@ngrx/signals';
 import { setAllEntities, updateEntity } from '@ngrx/signals/entities';
 

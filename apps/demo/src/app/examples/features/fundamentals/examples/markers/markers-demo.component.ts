@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { entityMap, signalTree } from '@signaltree/core';
+import { entityMap, signalTree } from '@signal-tree/kernel';
 
 import {
   type CodeFile,

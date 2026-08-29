@@ -16,7 +16,7 @@
  *                           things the barrel does not export?
  *
  * A2-REOPEN found the consequence. `c53aa416` ("remove stored marker from public
- * rc surface") deleted the `stored` export block from `packages/core/src/index.ts`
+ * rc surface") deleted the `stored` export block from `packages/kernel/src/index.ts`
  * and swept the READMEs, guides and demo — but left the barrel's own API summary
  * still teaching ``- `stored(key, default)` - localStorage persistence``. Every
  * gate stayed green: the README linter does not read source files, and the

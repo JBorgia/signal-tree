@@ -34,7 +34,7 @@ import { execSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const CORE = new URL('../dist/packages/core/dist/index.js', import.meta.url)
+const CORE = new URL('../dist/packages/kernel/dist/index.js', import.meta.url)
   .pathname;
 const REPO_NODE_MODULES = new URL('../node_modules', import.meta.url).pathname;
 

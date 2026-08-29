@@ -9,7 +9,7 @@
  * `docs/archive/`. Five sat in files that ship inside the npm tarballs, where a
  * README is immutable for the life of a published version:
  *
- *   - `packages/core/README.md` pointed at `../enterprise/README.md` for the
+ *   - `packages/kernel/README.md` pointed at `../enterprise/README.md` for the
  *     migration table — the package deleted in the same release.
  *   - `packages/guardrails/README.md` pointed at a `docs/guardrails` directory
  *     that has never existed.
@@ -41,9 +41,9 @@
  *
  * ## Install instructions
  *
- * A second check, same principle. `packages/core/README.md` — the page npm
+ * A second check, same principle. `packages/kernel/README.md` — the page npm
  * renders, immutable once published — told readers to run
- * `npm install @signaltree/core @signaltree/enterprise` for a package removed in
+ * `npm install @signal-tree/kernel @signaltree/enterprise` for a package removed in
  * 14.0.0 and unpublished for 14.x. It survived the removal commit and a manual
  * sweep of the npm-facing surfaces. `readme-apis` cannot catch it, because a
  * package name is not a symbol.
@@ -76,7 +76,36 @@ const SKIP_DIR =
 // .md/.docx/.pdf into commit d6e4e8af — 2,420 lines and a 4 MB binary, none of
 // it reviewed, in a commit about something else entirely. The links were never
 // resolvable in-repo; the gate simply had nothing to fail against until then.
-const SKIP_FILE = /(^|\/)(docs\/archive\/|docs\/ADSP\/|CHANGELOG\.md$)/;
+/**
+ * ⚠️ `docs/reference/` IS A CLASS, NOT A LIST OF EXCEPTIONS. Whitepapers, case
+ * studies, protocol rulebooks and strategy papers are EVIDENCE — judged against
+ * the world as it was when they were written, not against this checkout.
+ *
+ *     A REFERENCE ARTIFACT IS NOT A LIVE DOCUMENTATION SURFACE.
+ *
+ * The alternative was 25 filename exceptions for one whitepaper's missing
+ * `figures/` set, which fixes a symptom and leaves the denominator wrong. Live
+ * documentation — README, current guides, API docs, current migration guides,
+ * release instructions, package READMEs, examples — is unaffected and still
+ * fully gated.
+ */
+const SKIP_FILE = /(^|\/)(docs\/archive\/|docs\/ADSP\/|docs\/reference\/|CHANGELOG\.md$)/;
+
+/**
+ * ⚠️ A DOCUMENT THAT DECLARES ITSELF HISTORICAL IS POINT-IN-TIME WHEREVER IT
+ * LIVES. `docs/archive/**` is the convention, but `V9_PLAN.md` and the v4.0.0
+ * `MIGRATION.md` sit outside it while carrying an explicit historical status —
+ * and their install lines legitimately name `@signaltree/core`, the package that
+ * generation actually shipped.
+ *
+ * Rewriting those to the current name would falsify the record, and the standing
+ * rule is the opposite: archived and historical documents KEEP their historical
+ * names. So the marker is honoured instead of the path.
+ *
+ *     A HISTORICAL RECORD IS EVIDENCE. DO NOT EDIT IT TO SATISFY A GATE.
+ */
+const HISTORICAL_MARKER =
+  /^\s*(>\s*)?\*\*Status:\s*HISTORICAL|^#\s.*Migration Guide:\s*v[0-9]|^#\s*SignalTree\s+v[0-9]+\s*[-–]/im;
 
 /** A link target we deliberately do not resolve on disk. */
 const IGNORE_TARGET = /^(https?:|mailto:|tel:|data:|#|<|\{)/;
@@ -113,7 +142,7 @@ export function scanInstalls() {
   const bad = [];
   for (const abs of walk(ROOT)) {
     const rel = relative(ROOT, abs);
-    if (SKIP_FILE.test(rel)) continue;
+    if (SKIP_FILE.test(rel) || HISTORICAL_MARKER.test(readFileSync(abs, 'utf8'))) continue;
     const lines = readFileSync(abs, 'utf8').split('\n');
     // Only inside fenced code — that is where an instruction a reader will COPY
     // lives. Prose that mentions a bad install in order to describe it is not an
@@ -140,7 +169,7 @@ export function scan() {
   const links = [];
   for (const abs of walk(ROOT)) {
     const rel = relative(ROOT, abs);
-    if (SKIP_FILE.test(rel)) continue;
+    if (SKIP_FILE.test(rel) || HISTORICAL_MARKER.test(readFileSync(abs, 'utf8'))) continue;
     const text = readFileSync(abs, 'utf8');
     const lines = text.split('\n');
     lines.forEach((line, i) => {

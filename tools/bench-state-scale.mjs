@@ -59,7 +59,7 @@
  */
 import { join } from 'node:path';
 
-const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
+const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 const WRITES = 200;
 const WARMUP = 5;
 const QUICK = process.argv.includes('--quick');

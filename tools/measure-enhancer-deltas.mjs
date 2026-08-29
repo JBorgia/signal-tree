@@ -3,7 +3,7 @@
  * Measure what each enhancer actually ADDS to a production bundle, so the
  * per-enhancer numbers in the README are derived rather than remembered.
  *
- * Three of the four figures in `packages/core/README.md` were wrong when this
+ * Three of the four figures in `packages/kernel/README.md` were wrong when this
  * was written, and the errors ran in both directions:
  *
  *     enhancer         claimed    measured (prod main bundle)
@@ -32,7 +32,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const CORE = join(process.cwd(), 'dist/packages/core/dist/index.js');
+const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 const NODE_MODULES = join(process.cwd(), 'node_modules');
 const EXTERNAL = ['@angular/*', 'rxjs', 'rxjs/*', 'tslib'];
 
@@ -102,7 +102,7 @@ for (const e of ENHANCERS) {
 
 // A lazily-loaded implementation is a real cost, just not a main-bundle one.
 const lazyChunks = [
-  ['devtools-impl', 'dist/packages/core/dist/enhancers/devtools/devtools-impl.js'],
+  ['devtools-impl', 'dist/packages/kernel/dist/enhancers/devtools/devtools-impl.js'],
 ]
   .filter(([, p]) => existsSync(join(process.cwd(), p)))
   .map(([name, p]) => ({

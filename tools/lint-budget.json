@@ -1,6 +1,6 @@
 {
   "counts": {
-    "packages/core": 0,
+    "packages/kernel": 0,
     "packages/shared": 0,
     "packages/events": 1,
     "apps/demo": 10,
