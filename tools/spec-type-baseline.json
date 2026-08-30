@@ -1,15 +1,14 @@
 {
-  "total": 277,
+  "total": 261,
   "files": {
     "packages/kernel/src/enhancers/batching/batching.spec.ts": 4,
     "packages/kernel/src/enhancers/devtools/devtools.spec.ts": 4,
     "packages/kernel/src/enhancers/enhancer-cleanup.spec.ts": 1,
     "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts": 1,
     "packages/kernel/src/enhancers/restoration/restoration.spec.ts": 21,
-    "packages/kernel/src/enhancers/transactions/transactions.spec.ts": 14,
+    "packages/kernel/src/enhancers/transactions/transactions.spec.ts": 13,
     "packages/kernel/src/lib/declaration-extensibility-e0.spec.ts": 4,
     "packages/kernel/src/lib/declaration-extensibility-e5-fork.spec.ts": 1,
-    "packages/kernel/src/lib/derived-after-tree-call.spec.ts": 1,
     "packages/kernel/src/lib/enhancer-accumulation-survival.spec.ts": 1,
     "packages/kernel/src/lib/entity-array-diagnostic.spec.ts": 5,
     "packages/kernel/src/lib/entity-bare-array-hydrate.spec.ts": 5,
@@ -18,8 +17,6 @@
     "packages/kernel/src/lib/entity-predicate-churn.spec.ts": 6,
     "packages/kernel/src/lib/entity-signal.spec.ts": 22,
     "packages/kernel/src/lib/entity-wrong-method-guard.spec.ts": 2,
-    "packages/kernel/src/lib/error-reporter.spec.ts": 2,
-    "packages/kernel/src/lib/heterogeneous-atomicity.spec.ts": 1,
     "packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts": 27,
     "packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.spec.ts": 3,
     "packages/kernel/src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts": 4,
@@ -31,7 +28,7 @@
     "packages/kernel/src/lib/internals/causal-runtime/reversal-planner.spec.ts": 3,
     "packages/kernel/src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts": 4,
     "packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts": 20,
-    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": 5,
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": 3,
     "packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts": 6,
     "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts": 8,
     "packages/kernel/src/lib/marker-roundtrip.spec.ts": 1,
@@ -41,15 +38,12 @@
     "packages/kernel/src/lib/noop-copy-write.spec.ts": 2,
     "packages/kernel/src/lib/noop-write-warning.spec.ts": 3,
     "packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts": 2,
-    "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts": 6,
     "packages/kernel/src/lib/restoration-scoped-capture.spec.ts": 1,
     "packages/kernel/src/lib/snapshot-builder.spec.ts": 3,
-    "packages/kernel/src/lib/ssr-transfer.spec.ts": 2,
     "packages/kernel/src/lib/traversal-diagnostics.spec.ts": 4,
     "packages/kernel/src/lib/types-schema.spec.ts": 1,
     "packages/kernel/src/lib/undo-redo.spec.ts": 1,
     "packages/kernel/src/lib/unwrap-symbol-keys.spec.ts": 1,
-    "packages/kernel/src/lib/update-and-report.spec.ts": 1,
-    "packages/kernel/src/lib/write-only-marker.spec.ts": 1
+    "packages/kernel/src/lib/update-and-report.spec.ts": 1
   }
 }

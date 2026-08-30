@@ -707,10 +707,13 @@ const tree = signalTree(
 ```typescript
 import { signalTree, batching, entityMap } from '@signal-tree/kernel';
 
-const tree = signalTree({
-  products: entityMap<Product>(),
-  ui: { loading: false },
-}, { enhancers: [batching()] }); // Batch updates for optimal rendering
+const tree = signalTree(
+  {
+    products: entityMap<Product>(),
+    ui: { loading: false },
+  },
+  { enhancers: [batching()] }
+); // Batch updates for optimal rendering
 
 // Entity CRUD operations
 tree.$.products.addOne(newProduct);
@@ -725,10 +728,13 @@ const electronics = tree.$.products.all.filter((p) => p.category === 'electronic
 ```typescript
 import { signalTree, persistence, restoration } from '@signal-tree/kernel';
 
-const tree = signalTree({
-  user: null as User | null,
-  preferences: { theme: 'light' },
-}, { enhancers: [persistence({ key: 'app-state' }), restoration()] }); // Undo/redo support
+const tree = signalTree(
+  {
+    user: null as User | null,
+    preferences: { theme: 'light' },
+  },
+  { enhancers: [persistence({ key: 'app-state' }), restoration()] }
+); // Undo/redo support
 
 // For async operations, use manual async or async helpers
 async function fetchUser(id: string) {
@@ -775,14 +781,12 @@ Core includes several performance optimizations:
 
 ```typescript
 // Lazy signal creation (default)
-const tree = signalTree(
-  {
-    largeObject: {
-      // Signals only created when accessed
-      level1: { level2: { level3: { data: 'value' } } },
-    },
+const tree = signalTree({
+  largeObject: {
+    // Signals only created when accessed
+    level1: { level2: { level3: { data: 'value' } } },
   },
-);
+});
 
 // Custom equality function
 const tree2 = signalTree(
@@ -811,33 +815,33 @@ tree you own.
 #### Helper Example
 
 ```typescript
-import { signal, Signal } from '@angular/core';
-import type { ISignalTree } from '@signal-tree/kernel';
+import { signal, type Signal } from '@angular/core';
+import { signalTree } from '@signal-tree/kernel';
 
 interface WithLogger {
   log(message: string): void;
   history: Signal<string[]>;
 }
 
-function withLogger(config?: { maxHistory?: number }) {
+function createLoggedTree(config?: { maxHistory?: number }) {
   const maxHistory = config?.maxHistory ?? 100;
-  return <T>(tree: ISignalTree<T>): ISignalTree<T> & WithLogger => {
-    const historySignal = signal<string[]>([]);
-    return Object.assign(tree, {
-      log: (msg: string) => historySignal.update((h) => [...h, `[${new Date().toLocaleTimeString()}] ${msg}`].slice(-maxHistory)),
-      history: historySignal.asReadonly(),
-    });
-  };
+  const tree = signalTree({ count: 0 });
+  const historySignal = signal<string[]>([]);
+  return Object.assign(tree, {
+    log: (msg: string) => historySignal.update((history) => [...history, msg].slice(-maxHistory)),
+    history: historySignal.asReadonly(),
+  } satisfies WithLogger);
 }
 
 // Usage
-const tree = signalTree({ count: 0 }, { enhancers: [withLogger()] });
+const tree = createLoggedTree();
 tree.log('Tree created');
 ```
 
-### 8) Derived State Tiers
+### 8) Derived State
 
-SignalTree supports **derived state** via the `.derived()` method, which allows you to add computed signals that build on base state or previous derived tiers.
+SignalTree declares **derived state** with one config-level factory. Compose
+dependencies with ordinary local `computed` references inside that factory.
 
 #### Basic Usage (Inline Derived)
 
@@ -847,110 +851,34 @@ When derived functions are defined inline, TypeScript automatically infers all t
 import { signalTree, entityMap } from '@signal-tree/kernel';
 import { computed } from '@angular/core';
 
-const tree = signalTree({
-  users: entityMap<User, number>(),
-  selectedUserId: null as number | null,
-})
-  .derived(($) => ({
-    // Tier 1: Entity resolution
-    selectedUser: computed(() => {
-      const id = $.selectedUserId();
-      return id != null ? $.users.byId(id)?.() ?? null : null;
-    }),
-  }))
-  .derived(($) => ({
-    // Tier 2: Complex logic (can access $.selectedUser from Tier 1)
-    isAdmin: computed(() => $.selectedUser()?.role === 'admin'),
-  }));
+const tree = signalTree(
+  {
+    users: entityMap<User, number>(),
+    selectedUserId: null as number | null,
+  },
+  {
+    derived: ($) => {
+      const selectedUser = computed(() => {
+        const id = $.selectedUserId();
+        return id != null ? $.users.byId(id)?.() ?? null : null;
+      });
+      return {
+        selectedUser,
+        isAdmin: computed(() => selectedUser()?.role === 'admin'),
+      };
+    },
+  }
+);
 
 // Usage
 tree.$.selectedUser(); // User | null (computed signal)
 tree.$.isAdmin(); // boolean (computed signal)
 ```
 
-#### External Derived Functions (Modular Architecture)
-
-For larger applications, you may want to organize derived tiers into separate files. **This requires explicit typing** because TypeScript cannot infer types across file boundaries.
-
-SignalTree provides two utilities for external derived functions:
-
-- **`derivedFrom<TTree>()`** - Curried helper function that provides type context for your derived function
-- **`WithDerived<TTree, TDerivedFn>`** - Type utility to build intermediate tree types
-
-```typescript
-// app-tree.ts
-import { signalTree, entityMap, WithDerived } from '@signal-tree/kernel';
-import { entityResolutionDerived } from './derived/tier-entity-resolution';
-import { complexLogicDerived } from './derived/tier-complex-logic';
-
-// Define base tree type
-export type AppTreeBase = ReturnType<typeof signalTree<ReturnType<typeof createBaseState>>>;
-
-// Build intermediate types using WithDerived
-export type AppTreeWithTier1 = WithDerived<AppTreeBase, typeof entityResolutionDerived>;
-export type AppTreeWithTier2 = WithDerived<AppTreeWithTier1, typeof complexLogicDerived>;
-
-function createBaseState() {
-  return {
-    users: entityMap<User, number>(),
-    selectedUserId: null as number | null,
-  };
-}
-
-export function createAppTree() {
-  return signalTree(createBaseState()).derived(entityResolutionDerived).derived(complexLogicDerived);
-}
-```
-
-```typescript
-// derived/tier-entity-resolution.ts
-import { computed } from '@angular/core';
-import { derivedFrom } from '@signal-tree/kernel';
-import type { AppTreeBase } from '../app-tree';
-
-// derivedFrom provides the type context for $ via curried syntax
-export const entityResolutionDerived = derivedFrom<AppTreeBase>()(($) => ({
-  selectedUser: computed(() => {
-    const id = $.selectedUserId();
-    return id != null ? $.users.byId(id)?.() ?? null : null;
-  }),
-}));
-```
-
-```typescript
-// derived/tier-complex-logic.ts
-import { computed } from '@angular/core';
-import { derivedFrom } from '@signal-tree/kernel';
-import type { AppTreeWithTier1 } from '../app-tree';
-
-// This tier has access to $.selectedUser from Tier 1
-export const complexLogicDerived = derivedFrom<AppTreeWithTier1>()(($) => ({
-  isAdmin: computed(() => $.selectedUser()?.role === 'admin'),
-  displayName: computed(() => {
-    const user = $.selectedUser();
-    return user ? `${user.firstName} ${user.lastName}` : 'No user selected';
-  }),
-}));
-```
-
-#### Why External Functions Need Typing
-
-When a function is defined in a separate file, TypeScript analyzes it **in isolation** before knowing how it will be used. The type inference happens at the **definition site**, not the **call site**:
-
-```typescript
-// ❌ TypeScript can't infer $ - this file is compiled before app-tree.ts uses it
-export function myDerived($) {
-  // $ is 'any'
-  return { foo: computed(() => $.bar()) }; // Error: $ has no properties
-}
-
-// ✅ derivedFrom provides the type context (curried syntax)
-export const myDerived = derivedFrom<AppTreeBase>()(($) => ({
-  foo: computed(() => $.bar()), // $ is properly typed
-}));
-```
-
-**Key point**: `derivedFrom` is **only needed for functions defined in separate files**. Inline functions automatically inherit types from the chain. Note the curried syntax: `derivedFrom<TreeType>()(fn)` - this allows TypeScript to infer the return type while you specify the tree type.
+Keep the factory beside tree construction so contextual typing flows from
+`signalTree`. Application modules may still own ordinary helper functions that
+return signals; call those helpers from the one factory rather than creating a
+staged construction protocol.
 
 ## Built-in Markers
 
@@ -1069,8 +997,8 @@ import { link, signalTree } from '@signal-tree/kernel';
 const tree = signalTree({ settings: { theme: 'light' } });
 
 const connection = link(tree.$.settings, {
-  get: () => api.load(),                       // Y -> X, on retrieve()
-  set: (value) => api.save(value),             // X -> Y, once per settled turn
+  get: () => api.load(), // Y -> X, on retrieve()
+  set: (value) => api.save(value), // X -> Y, once per settled turn
   subscribe: (next) => socket.on('cfg', next), // Y -> X, live
 });
 
@@ -1086,7 +1014,7 @@ throwing — which is why the handle needs no error member of its own.
 
 **What it will not carry.** An inspection write — a devtools scrub — moves what
 you see and deliberately does not become external truth. `link()` publishes the
-value that is *eligible* to be authoritative, not whatever the tree currently
+value that is _eligible_ to be authoritative, not whatever the tree currently
 holds.
 
 ⚠️ `x` must be an OWNED SignalTree location, enforced at runtime rather than by
@@ -1255,10 +1183,13 @@ import { computed } from '@angular/core';
 import { signalTree, batching } from '@signal-tree/kernel';
 
 // Add performance optimizations
-const tree = signalTree({
-  products: [] as Product[],
-  filters: { category: '', search: '' },
-}, { enhancers: [batching()] });
+const tree = signalTree(
+  {
+    products: [] as Product[],
+    filters: { category: '', search: '' },
+  },
+  { enhancers: [batching()] }
+);
 
 tree.batch(() => {
   tree.$.products.update((products) => [...products, ...newProducts]);
@@ -1333,29 +1264,32 @@ async function fetchUsers() {
 import { signalTree, batching, persistence, restoration, devTools } from '@signal-tree/kernel';
 
 // Full development stack (example)
-const tree = signalTree({
-  app: {
-    user: null as User | null,
-    preferences: { theme: 'light' },
-    data: { users: [], posts: [] },
+const tree = signalTree(
+  {
+    app: {
+      user: null as User | null,
+      preferences: { theme: 'light' },
+      data: { users: [], posts: [] },
+    },
   },
-}, {
-  enhancers: [
-    batching(), // Performance
-    persistence({ key: 'my-app-state' }),
-    restoration({
-      // Undo/redo
-      maxHistory: 50,
-    }),
-    devTools({
-      // Debug tools (dev only)
-      name: 'MyApp',
-      enableTimeTravel: true,
-      includePaths: ['app.*', 'ui.*'],
-      formatPath: (path) => path.replace(/\.(\d+)/g, '[$1]'),
-    }),
-  ],
-});
+  {
+    enhancers: [
+      batching(), // Performance
+      persistence({ key: 'my-app-state' }),
+      restoration({
+        // Undo/redo
+        maxHistory: 50,
+      }),
+      devTools({
+        // Debug tools (dev only)
+        name: 'MyApp',
+        enableTimeTravel: true,
+        includePaths: ['app.*', 'ui.*'],
+        formatPath: (path) => path.replace(/\.(\d+)/g, '[$1]'),
+      }),
+    ],
+  }
+);
 
 // Rich feature set available
 async function fetchUser(id: string) {
@@ -1396,14 +1330,18 @@ import { signalTree, batching, devTools, restoration } from '@signal-tree/kernel
 const isDevelopment = process.env['NODE_ENV'] === 'development';
 
 // Conditional enhancement based on environment
-const tree = signalTree(state, { enhancers: [batching(), // Always include performance
-  ...(isDevelopment
-    ? [
-        // Development-only features
-        devTools(),
-        restoration(),
-      ]
-    : [])] });
+const tree = signalTree(state, {
+  enhancers: [
+    batching(), // Always include performance
+    ...(isDevelopment
+      ? [
+          // Development-only features
+          devTools(),
+          restoration(),
+        ]
+      : []),
+  ],
+});
 ```
 
 ### Measuring bundle size
@@ -1431,11 +1369,7 @@ const tree3 = signalTree({ users: entityMap<User>() }, { enhancers: [batching()]
 Conditional features are a conditional ARRAY, decided before the tree exists:
 
 ```typescript
-const enhancers = [
-  ...(isDevelopment ? [devTools()] : []),
-  ...(needsPerformance ? [batching()] : []),
-  ...(needsTimeTravel ? [restoration()] : []),
-];
+const enhancers = [...(isDevelopment ? [devTools()] : []), ...(needsPerformance ? [batching()] : []), ...(needsTimeTravel ? [restoration()] : [])];
 
 const tree = signalTree(initialState, { enhancers });
 ```
@@ -1805,9 +1739,12 @@ eligible for undo. It does **not** create a causal-turn boundary.
 ```ts
 import { signalTree, restoration, undoable } from '@signal-tree/kernel';
 
-const tree = signalTree({ doc: { title: '' }, ui: { panel: 'none' } }, {
-  enhancers: [restoration({ maxHistorySize: 50 })],
-});
+const tree = signalTree(
+  { doc: { title: '' }, ui: { panel: 'none' } },
+  {
+    enhancers: [restoration({ maxHistorySize: 50 })],
+  }
+);
 
 function rename(title: string) {
   undoable(() => tree.$.doc.title.set(title));
@@ -1836,7 +1773,7 @@ silently designating nothing:
 
 ```ts
 const data = await load();
-undoable(() => tree.$.x.set(data));   // ✅ designate the synchronous write
+undoable(() => tree.$.x.set(data)); // ✅ designate the synchronous write
 ```
 
 When a framework owns the write and there is no callback to wrap — Angular
@@ -1922,8 +1859,7 @@ measurement behind that.
 With `transfer: true`, a loader-backed `entityMap` accepts the
 payload. It deliberately does not change two things: an in-flight `LOADING`
 status is still normalised (a request in flight on the server is not in flight
-here), and a form's `touched` is still not restored. Defaults to `false`. RFC
-0014.
+here), and a form's `touched` is still not restored. Defaults to `false`. RFC 0014.
 
 ## When to use core only
 
@@ -2118,8 +2054,8 @@ While `@signal-tree/kernel` includes comprehensive built-in enhancers for most u
 
 **Add companion packages when you need:**
 
-| Package                | When to Add                        | Bundle Impact |
-| ---------------------- | ---------------------------------- | ------------- |
+| Package | When to Add | Bundle Impact |
+| ------- | ----------- | ------------- |
 
 **Installation:**
 

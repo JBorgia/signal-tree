@@ -24,21 +24,36 @@ import { applyState, unwrap } from './utils';
  */
 describe('snapshots carry state, not derived views', () => {
   it('omits derived computeds — the rule markers now follow too', () => {
-    const tree = signalTree({ a: 2, b: 3 }).derived(($) => ({
-      sum: computed(() => $.a() + $.b()),
-    }));
+    const tree = signalTree(
+      { a: 2, b: 3 },
+      {
+        derived: ($) => ({
+          sum: computed(() => $.a() + $.b()),
+        }),
+      }
+    );
     expect(tree()).toEqual({ a: 2, b: 3 });
   });
 
   it('recomputes a derived value after rehydrate', () => {
-    const source = signalTree({ a: 2, b: 3 }).derived(($) => ({
-      sum: computed(() => $.a() + $.b()),
-    }));
+    const source = signalTree(
+      { a: 2, b: 3 },
+      {
+        derived: ($) => ({
+          sum: computed(() => $.a() + $.b()),
+        }),
+      }
+    );
     const snapshot = source();
 
-    const fresh = signalTree({ a: 0, b: 0 }).derived(($) => ({
-      sum: computed(() => $.a() + $.b()),
-    }));
+    const fresh = signalTree(
+      { a: 0, b: 0 },
+      {
+        derived: ($) => ({
+          sum: computed(() => $.a() + $.b()),
+        }),
+      }
+    );
     fresh(snapshot);
 
     expect(fresh.$.a()).toBe(2);
@@ -61,10 +76,7 @@ describe('snapshots carry state, not derived views', () => {
     expect(fresh.$.rows.count()).toBe(3);
     expect(fresh.$.rows.byId(2)?.()).toEqual({ id: 2 });
   });
-
-
 });
-
 
 /**
  * `isStatusNode` is a three-clause duck-type: `setLoading` + `state` + `error`.

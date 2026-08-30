@@ -13,13 +13,13 @@ publication. If one does not compile for you, that is a bug — please report it
 
 ## At a glance
 
-| Removed                                          | Replacement                                     |
-| ------------------------------------------------ | ----------------------------------------------- |
-| `SignalTreeBase<T>`                              | `SignalTree<T>`                                 |
-| root state properties on the tree (`tree.count`) | `tree.$.count()`                                |
-| `tree.with(a)` / `.with(a).with(b)`              | `signalTree(state, { enhancers: [a, b] })`      |
-| `composeEnhancers(a, b)`                         | `signalTree(state, { enhancers: [a, b] })`      |
-| `tree.derived(fn)` after construction            | `signalTree(state, { derived: fn })` (both work) |
+| Removed                                             | Replacement                                 |
+| --------------------------------------------------- | ------------------------------------------- |
+| `SignalTreeBase<T>`                                 | `SignalTree<T>`                             |
+| root state properties on the tree (`tree.count`)    | `tree.$.count()`                            |
+| `tree.with(a)` / `.with(a).with(b)`                 | `signalTree(state, { enhancers: [a, b] })`  |
+| `composeEnhancers(a, b)`                            | `signalTree(state, { enhancers: [a, b] })`  |
+| `signalTree(state, derivedFn)` / `tree.derived(fn)` | `signalTree(state, { derived: derivedFn })` |
 
 ---
 
@@ -125,10 +125,7 @@ enhancer to a tree. The whole enhancer set is passed to `signalTree`:
 const tree = signalTree({ count: 0 }).with(restoration()).with(batching());
 
 // after
-const tree = signalTree(
-  { count: 0 },
-  { enhancers: [restoration(), batching()] }
-);
+const tree = signalTree({ count: 0 }, { enhancers: [restoration(), batching()] });
 ```
 
 `composeEnhancers(a, b)` is removed in the same change, and has the same
@@ -223,21 +220,24 @@ widening it to `Enhancer<unknown>[]` is how the accumulated additions get lost.
 
 ### Derived state
 
-`.derived()` still works after construction. It can also be declared alongside
-the enhancers, which is the shape to prefer when you are already passing config:
+Derived state is declared once with the rest of the construction plan. The
+positional factory and fluent method are removed; dependencies among derived
+values use ordinary local reactive composition:
 
 ```ts
 const tree = signalTree(
   { first: 'Ada', last: 'Lovelace' },
   {
     enhancers: [restoration()],
-    derived: ($) => ({ full: computed(() => `${$.first()} ${$.last()}`) }),
+    derived: ($) => {
+      const full = computed(() => `${$.first()} ${$.last()}`);
+      return { full, greeting: computed(() => `Hello ${full()}`) };
+    },
   }
 );
 ```
 
-Both forms apply the factory at the same point — lazily, on first `$` access,
-after every enhancer.
+The configured factory applies lazily on first `$` access, after every enhancer.
 
 ---
 
@@ -251,7 +251,8 @@ after every enhancer.
   to migrate: the subpath had already been withdrawn from the published surface,
   so neither option could be satisfied and `useLazySignals: true` was a no-op.
   Incremental materialization gives large trees cheap reads on the default path.
-- `ISignalTree.with()` and `SignalTreeBuilder.with()` — see section 3
+- `ISignalTree.with()` and the public `SignalTreeBuilder` abstraction — see section 3
+- positional `signalTree(state, derivedFactory)` and fluent `tree.derived()` — use `derived: factory`
 - `plannedSignalTree()` / `.build()` — the planned-construction prototype. Its
   behaviour is what `signalTree(state, { enhancers })` now does, so there is no
   second construction path to choose between.
@@ -267,5 +268,6 @@ after every enhancer.
 [ ] replace composeEnhancers(a, b) the same way
 [ ] rewrite conditional enhancement as a conditional ARRAY, not a conditional tree
 [ ] make sure built-in enhancers are CALLED: [batching()], not [batching]
+[ ] move derived state into the constructor's singular `derived` factory
 [ ] typecheck — every change above is compile-time visible
 ```

@@ -1,4 +1,11 @@
-import { Component, computed, effect, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import {
@@ -17,8 +24,8 @@ type Pillar = 'read' | 'write' | 'react';
 const FACADE_SOURCE = `// store/app-store.ts — the one injectable components see
 @Injectable({ providedIn: 'root' })
 export class AppStore {
-  readonly tree = inject(APP_TREE);
-  readonly $ = this.tree.$;              // READ  → store.$.<domain>.<path>()
+  private readonly tree = inject(APP_TREE);
+  readonly $ = asReadonly(this.tree).$;  // READ  → no write path exposed
 
   readonly ops = {                        // WRITE → store.ops.<domain>.<method>()
     users: inject(UserOps),
@@ -60,33 +67,37 @@ export class PostOps {
   }
 }`;
 
-const DERIVED_SOURCE = `// store/tree/derived/tier-2.derived.ts — computed on $, not in components
-export const tier2Derived = derived(($) => ({
-  posts: {
-    // Reads search + published filter straight from the tree.
-    filtered: computed(() => {
-      const all = $.posts.entities.all();
+const DERIVED_SOURCE = `// store/tree/app-tree.ts — one derived factory at construction
+const tree = signalTree(createBaseState(), {
+  derived: ($) => {
+    const filteredPosts = computed(() => {
       const search = $.posts.filters.search().toLowerCase();
-      const publishedFilter = $.posts.filters.published();
-      return all.filter((p) => {
-        if (publishedFilter !== null && p.published !== publishedFilter) return false;
-        return !search || p.title.toLowerCase().includes(search)
-                        || p.content.toLowerCase().includes(search);
+      const published = $.posts.filters.published();
+      return $.posts.entities.all().filter((post) => {
+        if (published !== null && post.published !== published) return false;
+        return !search || post.title.toLowerCase().includes(search)
+                       || post.content.toLowerCase().includes(search);
       });
-    }),
+    });
+    return {
+      posts: { filtered: filteredPosts },
+      ui: { filteredCount: computed(() => filteredPosts().length) },
+    };
   },
-}));`;
+});`;
 
 /** Self-contained single-file version of the pattern for the StackBlitz playground. */
 const PLAYGROUND_APP = `import { Component, computed, effect, inject, Injectable } from '@angular/core';
 import { signalTree } from '@signal-tree/kernel';
 
 // One tree per app, assembled once.
-const APP_TREE = signalTree({
-  count: 0,
-  history: [] as number[],
-})
-  .derived(($) => ({ doubled: computed(() => $.count() * 2) }));
+const APP_TREE = signalTree(
+  {
+    count: 0,
+    history: [] as number[],
+  },
+  { derived: ($) => ({ doubled: computed(() => $.count() * 2) }) }
+);
 
 // WRITE — mutations go through an ops service.
 @Injectable({ providedIn: 'root' })
@@ -204,7 +215,11 @@ export class RecommendedArchitectureComponent {
   readonly codeFiles: CodeFile[] = [
     { label: 'app-store.ts', language: 'typescript', source: FACADE_SOURCE },
     { label: 'post.ops.ts', language: 'typescript', source: OPS_SOURCE },
-    { label: 'tier-2.derived.ts', language: 'typescript', source: DERIVED_SOURCE },
+    {
+      label: 'app-tree.ts',
+      language: 'typescript',
+      source: DERIVED_SOURCE,
+    },
   ];
 
   /** StackBlitz playground config. */
@@ -275,8 +290,6 @@ export class RecommendedArchitectureComponent {
       .all()
       .filter((p) => p.authorId === user.id)
       .map((p) => p.id);
-
-    // SignalTree v9+ auto-batches sequential mutations on the same tick.
     this.store.ops.posts.removeMany(userPosts);
     this.store.ops.users.remove(user.id);
   }

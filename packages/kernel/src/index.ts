@@ -47,7 +47,6 @@ export {
 
 export type {
   // Core types - Main SignalTree interfaces
-  ISignalTree,
   SignalTree,
   TreeNode,
   WritableLeaf,
@@ -110,14 +109,6 @@ export type {
   EntitySignalWithSlices,
   EntityMapMarkerWithSlices,
 } from './lib/markers/entity-map';
-// Derived state types (v7)
-export type { DerivedOf } from './lib/internals/derived-types';
-
-// Derived helper (v7.2) - for defining derived functions in separate files with proper typing
-export { derivedFrom } from './lib/internals/derived-types';
-
-// Builder types (v7)
-export type { SignalTreeBuilder } from './lib/internals/builder-types';
 
 // ============================================
 // MARKER EXPORTS
@@ -131,8 +122,7 @@ export type { SignalTreeBuilder } from './lib/internals/builder-types';
 
 // Audit tracker — framework-agnostic tree change logging (moved from
 // @signaltree/ng-forms in v13, RFC 0006). Tree-shakeable: unused → not bundled.
-export {
-} from './lib/audit/audit';
+export {} from './lib/audit/audit';
 
 // Async-stream marker — DELETED in 14.0.0, along with its implementation and
 // tests. It sat here unexported for several releases while the API question (a
@@ -152,22 +142,21 @@ export {
 // UTILITY EXPORTS
 // ============================================
 
-export {
-  // Core utilities - Primary helper functions
-  // isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath are not
-  // root app API.
-  //
-  // ⚠️ `toWritableSignal` IS KEPT BY PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0, on
-  // evidence. It is the Angular Signal Forms bridge — `form(model)` needs a
-  // WritableSignal, and `{ undoable: true }` is the only public way to make a
-  // form edit a restoration-eligible turn. Three HIST-C2 form-ingress carriers
-  // express that requirement through it and have no other door.
-  //
-  // Those carriers import it from `lib/utils` directly, which is why deleting
-  // the EXPORT left them green — a spec reaching past the barrel cannot testify
-  // about the barrel. Consumer-count evidence gathered from inside the package
-  // is blind to exactly the third-party need this export exists for.
-} from './lib/utils';
+export {} from // Core utilities - Primary helper functions
+// isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath are not
+// root app API.
+//
+// ⚠️ `toWritableSignal` IS KEPT BY PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0, on
+// evidence. It is the Angular Signal Forms bridge — `form(model)` needs a
+// WritableSignal, and `{ undoable: true }` is the only public way to make a
+// form edit a restoration-eligible turn. Three HIST-C2 form-ingress carriers
+// express that requirement through it and have no other door.
+//
+// Those carriers import it from `lib/utils` directly, which is why deleting
+// the EXPORT left them green — a spec reaching past the barrel cannot testify
+// about the barrel. Consumer-count evidence gathered from inside the package
+// is blind to exactly the third-party need this export exists for.
+'./lib/utils';
 
 /**
  * @see {@link undoable} — designates an authored causal turn as eligible for
@@ -263,8 +252,14 @@ export { batching } from './enhancers/batching/batching';
 // declaration, beside the enhancer that owns it.
 //
 //     A PUBLIC RE-EXPORT MAY SURVIVE A MOVE. A SECOND DECLARATION MAY NOT.
-export type { BatchingConfig, BatchingMethods } from './enhancers/batching/batching.types';
-export type { RestorationMethods, RestorationHistoryEntry } from './enhancers/restoration/restoration.types';
+export type {
+  BatchingConfig,
+  BatchingMethods,
+} from './enhancers/batching/batching.types';
+export type {
+  RestorationMethods,
+  RestorationHistoryEntry,
+} from './enhancers/restoration/restoration.types';
 export type {
   DevToolsMethods,
   DevToolsLogEntry,
@@ -292,8 +287,7 @@ export type { PendingTransaction } from './enhancers/transactions/transactions.t
 export type { TransactionMethods } from './enhancers/transactions/transactions.types';
 export { transactions } from './enhancers/transactions/transactions';
 
-export type {
-} from './enhancers/serialization/serialization';
+export type {} from './enhancers/serialization/serialization';
 
 /**
  * DevTools enhancer for development and debugging
@@ -346,8 +340,7 @@ export { devTools } from './enhancers/devtools/devtools';
  * - `devTools(config?)` - Redux DevTools integration
  *
  * **Derived State:**
- * - `.derived($)` - Add computed state to tree
- * - `derivedFrom()` - Helper for separate files
+ * - `signalTree(state, { derived })` - Declare computed state
  *
  * @example Basic Usage
  * ```typescript

@@ -173,7 +173,9 @@ type ApplyComputedSlices<TMarker, TBase> = TMarker extends {
   ? [LiteralKeys<NonNullable<S>>] extends [never]
     ? TBase
     : TBase & {
-        readonly [P in LiteralKeys<NonNullable<S>>]: ReadableCell<NonNullable<S>[P]>;
+        readonly [P in LiteralKeys<NonNullable<S>>]: ReadableCell<
+          NonNullable<S>[P]
+        >;
       }
   : TBase;
 
@@ -239,7 +241,7 @@ export type TreeNodeOf<T, C extends CarrierKind> = {
 // `ReadonlyNodeAccessor`, the per-marker `Readonly*Signal` views and their
 // reader-key allowlists, and `asReadonly()`) live in `./readonly.ts`. They
 // are computed over a tree's ACCUMULATED `$` type (the builder's `TAccum`),
-// not over the source `T` — a source-computed view drops every `.derived()`
+// not over the source `T` — a source-computed view drops configured derived
 // computed (RFC 0004 F1), which is why no `ReadonlyTreeNode<T>` mirror of
 // `TreeNode<T>` exists here.
 
@@ -271,10 +273,15 @@ export type ReadonlyOf<K extends CarrierKind, T> = LeafOf<T, K> extends {
  *
  * Ordinary users never write a carrier: both roots expose `ISignalTree<T>`.
  */
-export interface ISignalTreeOf<T, K extends CarrierKind>
-  extends NodeAccessor<T> {
+export interface ISignalTreeOf<
+  T,
+  K extends CarrierKind,
+  TAccum = TreeNodeOf<T, K>
+> extends NodeAccessor<T> {
+  /** Root writes merge a partial state payload; branch accessors assign whole values. */
+  (value: Partial<T>): void;
   /** Reactive tree-node accessor — the canonical entry point. */
-  readonly $: TreeNodeOf<T, K>;
+  readonly $: TAccum;
   /**
    * `with()` IS GONE, ON PURPOSE — this note is the tombstone.
    *
@@ -348,7 +355,6 @@ export type EnhancerCleanup = () => void;
  * Batching only affects change detection notification timing.
  */
 
-
 /**
  * Time-travel capability.
  *
@@ -397,12 +403,6 @@ export class SignalTreeRollbackError extends Error {
   }
 }
 
-
-
-
-
-
-
 /**
  * Marker interface indicating entities have been materialized at runtime.
  * Prefer accessing entity collections via `tree.$.prop` (typed as `EntitySignal`).
@@ -411,7 +411,6 @@ export interface EntitiesEnabled {
   /** @internal */
   readonly __entitiesEnabled?: true;
 }
-
 
 // ============================================
 // CONFIGURATION TYPES
@@ -518,9 +517,7 @@ export interface TreeConfig {
    * Derived state, declared with the enhancers rather than chained after them.
    *
    * Runs against the tree's `$` and returns a partial shape of `computed()`
-   * signals, which are merged in at the same point a chained `.derived()` call
-   * would have applied them: lazily, on first `$` access, after every enhancer
-   * has been applied.
+   * signals, merged lazily on first `$` access after every enhancer is applied.
    *
    * The parameter is typed `never` here on purpose. `TreeConfig` has no `T` to
    * name, so the honest declaration is the bottom type — every concrete factory
@@ -536,7 +533,6 @@ export interface TreeConfig {
   // FIELD it documented was already gone with SEC-DEL; only its documentation
   // survived, inside a live public interface, describing a subpath that no
   // longer resolves. The tombstone that matters is in `signal-tree.ts`.
-
 }
 
 /**
@@ -568,7 +564,6 @@ export interface TreeConfig {
  * and let the number justify the mechanism. Do not restore this on the argument
  * that it used to be here.
  */
-
 
 // TOMBSTONE: `FormHistoryOptions`, `FormHistoryApi` and
 // `FormHistorySharedAuthority` went with `trackHistory()` in TH-DEL.
@@ -614,7 +609,6 @@ export interface EntityConfig<E, K extends string | number = string> {
    * entityMap<User>({ sortComparer: (a, b) => a.name.localeCompare(b.name) })
    */
   sortComparer?: (a: E, b: E) => number;
-
 
   /**
    * Entity-level hooks (run before collection hooks)
@@ -834,8 +828,10 @@ export interface EntitySignalOf<
 }
 
 /** PUBLIC kernel entity contract. Carrier bound to the neutral cell. */
-export type EntitySignal<E, K extends string | number = string> =
-  EntitySignalOf<E, K, 'cell'>;
+export type EntitySignal<
+  E,
+  K extends string | number = string
+> = EntitySignalOf<E, K, 'cell'>;
 
 /**
  * @deprecated The old EntityHelpers interface is deprecated and will be removed in v6.0.
@@ -1203,47 +1199,35 @@ export type SignalTree<T> = ISignalTree<T>;
  * realization — a fact already proven at runtime by S1 and by the root
  * initialization control.
  */
-import type {
-  SignalTreeBuilderOf,
-} from './internals/builder-types';
 import type { ProcessDerivedOf } from './internals/derived-types';
 import type { Enhancer } from '../enhancers/types';
 import type { AccumulatedEnhancerAdditions } from './enhancer-types';
 
 export interface SignalTreeFactoryOf<K extends CarrierKind> {
-  <T extends object, TDerived extends object>(
-    initialState: T,
-    derivedFactory: ($: TreeNodeOf<T, K>) => TDerived
-  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K> & ProcessDerivedOf<TDerived, K>, K>;
   <
     T extends object,
-    const E extends readonly Enhancer<unknown>[],
-    TDerived extends object
+    TDerived extends object,
+    const E extends readonly Enhancer<unknown>[] = readonly []
   >(
     initialState: T,
     config: Omit<TreeConfig, 'enhancers' | 'derived'> & {
-      enhancers: E;
+      enhancers?: E;
       derived: ($: TreeNodeOf<T, K>) => TDerived;
     }
-  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K> & ProcessDerivedOf<TDerived, K>, K> &
+  ): ISignalTreeOf<T, K, TreeNodeOf<T, K> & ProcessDerivedOf<TDerived, K>> &
     AccumulatedEnhancerAdditions<E>;
-
-  // Overload: enhancers
-  <
-    T extends object,
-    const E extends readonly Enhancer<unknown>[]
-  >(
+  <T extends object, const E extends readonly Enhancer<unknown>[]>(
     initialState: T,
-    config: Omit<TreeConfig, 'enhancers'> & { enhancers: E }
-  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K>, K> & AccumulatedEnhancerAdditions<E>;
-  <T extends object, TDerived extends object>(
-    initialState: T,
-    config: Omit<TreeConfig, 'derived'> & {
-      derived: ($: TreeNodeOf<T, K>) => TDerived;
+    config: Omit<TreeConfig, 'enhancers' | 'derived'> & {
+      enhancers: E;
+      derived?: never;
     }
-  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K> & ProcessDerivedOf<TDerived, K>, K>;
+  ): ISignalTreeOf<T, K> & AccumulatedEnhancerAdditions<E>;
   <T extends object>(
     initialState: T,
-    config?: TreeConfig
-  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K>, K>;
+    config?: Omit<TreeConfig, 'enhancers' | 'derived'> & {
+      enhancers?: never;
+      derived?: never;
+    }
+  ): ISignalTreeOf<T, K>;
 }

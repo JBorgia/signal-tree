@@ -25,7 +25,9 @@ const ROOT = process.cwd();
 const DIST = join(ROOT, 'dist/packages');
 const PACKAGES = ['kernel', 'angular'];
 const ANGULAR_VERSION = process.env['NG_VERSION'] || '^22.0.0';
-const VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version;
+const VERSION = JSON.parse(
+  readFileSync(join(ROOT, 'package.json'), 'utf8')
+).version;
 
 for (const pkg of PACKAGES) {
   if (!existsSync(join(DIST, pkg, 'package.json'))) {
@@ -48,10 +50,12 @@ execFileSync(
 
 const tarballs = [];
 for (const pkg of PACKAGES) {
-  const packed = JSON.parse(execFileSync('npm', ['pack', '--pack-destination', tgzDir, '--json'], {
-    cwd: join(DIST, pkg),
-    encoding: 'utf8',
-  }));
+  const packed = JSON.parse(
+    execFileSync('npm', ['pack', '--pack-destination', tgzDir, '--json'], {
+      cwd: join(DIST, pkg),
+      encoding: 'utf8',
+    })
+  );
   const tarball = packed[0]?.filename;
   if (!tarball) {
     console.error(`❌ npm pack produced no ${pkg} tarball.`);
@@ -101,10 +105,14 @@ const tree = signalTree({
 tree.$.users.addOne({ id: 1, name: 'Ada' });
 tree.batch(() => tree.$.count.set(1));
 
-const derivedTree = signalTree({ count: 1 }).derived(($) => ({
-  doubled: computed(() => $.count() * 2),
-  draft: linkedSignal(() => $.count()),
-}));
+const derivedTree = signalTree(
+  { count: 1 },
+  { derived: ($) => ({
+      doubled: computed(() => $.count() * 2),
+      draft: linkedSignal(() => $.count()),
+    })
+  }
+);
 const reader = asReadonly(derivedTree);
 const doubled: Signal<number> = reader.$.doubled;
 const draft: Signal<number> = reader.$.draft;
@@ -112,9 +120,10 @@ type DraftHasSet = 'set' extends keyof typeof reader.$.draft ? true : false;
 const draftHasSet: DraftHasSet = false;
 
 const ReadonlyStore = defineStore(
-  () => signalTree({ count: 1 }).derived(($) => ({
-    doubled: computed(() => $.count() * 2),
-  })),
+  () => signalTree(
+    { count: 1 },
+    { derived: ($) => ({ doubled: computed(() => $.count() * 2) }) }
+  ),
   { expose: 'readonly' }
 );
 type Injected = InstanceType<typeof ReadonlyStore>;
@@ -174,7 +183,9 @@ writeFileSync(
   )
 );
 
-console.log(`  installing Angular ${ANGULAR_VERSION} + packed SignalTree tarballs...`);
+console.log(
+  `  installing Angular ${ANGULAR_VERSION} + packed SignalTree tarballs...`
+);
 try {
   execFileSync(
     'npm',

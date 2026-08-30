@@ -3,16 +3,10 @@ import type {
   EntitySignalOf,
   ISignalTreeOf,
   ReadonlyOf,
-  TreeNodeOf,
 } from './types';
 import type { ReadableCell } from './internals/cell-runtime';
 
-import type { SignalTreeBuilderOf } from './internals/builder-types';
-import type {
-  WritableLeaf,
-  NodeAccessor,
-  TreeNode,
-} from './types';
+import type { WritableLeaf, NodeAccessor, TreeNode } from './types';
 import { ENTITY_READERS } from './readonly-readers';
 
 /**
@@ -127,7 +121,7 @@ type ReadonlyEntityNodeOf<E, C extends CarrierKind> = {
     : ReadonlyOf<C, E[P]>;
 };
 
-  export type ReadonlyEntityNode<E> = ReadonlyEntityNodeOf<E, 'cell'>;
+export type ReadonlyEntityNode<E> = ReadonlyEntityNodeOf<E, 'cell'>;
 
 /**
  * Read-only view of {@link EntitySignal}: query surface only. `byId`/
@@ -198,12 +192,12 @@ type ReadonlyNodeView<T, C extends CarrierKind> = T extends EntitySignalOf<
       ? ReadonlyOf<C, V>
       : T
     : ReadonlyNodeAccessor<U> & ReadonlyViewOf<T, C>
-  // ⚠️ ORDER: `NodeAccessor` MUST be tested before `ReadableCell`.
+  : // ⚠️ ORDER: `NodeAccessor` MUST be tested before `ReadableCell`.
   // The call-grammar check above keeps a foreign zero-argument reader from
   // being captured as a branch while preserving real accessors here.
   //
   //     REMOVING A NOMINAL BRAND MAKES STRUCTURAL ORDER LOAD-BEARING.
-  : T extends ReadableCell<infer V>
+  T extends ReadableCell<infer V>
   ? ReadonlyOf<C, V>
   : T extends object
   ? ReadonlyViewOf<T, C>
@@ -252,8 +246,10 @@ export interface ReadonlyStoreOf<TSource, TAccum, C extends CarrierKind> {
 }
 
 /** PUBLIC kernel spelling. `@signal-tree/angular` binds `'angular'`. */
-export type ReadonlyStore<TSource, TAccum = TreeNode<TSource>> =
-  ReadonlyStoreOf<TSource, TAccum, 'cell'>;
+export type ReadonlyStore<
+  TSource,
+  TAccum = TreeNode<TSource>
+> = ReadonlyStoreOf<TSource, TAccum, 'cell'>;
 
 // =============================================================================
 // asReadonly()
@@ -286,11 +282,8 @@ export type ReadonlyStore<TSource, TAccum = TreeNode<TSource>> =
  * `asReadonly(tree)` got a store whose leaves typed as `ReadableCell`.
  */
 export function asReadonly<TSource, TAccum, C extends CarrierKind = 'cell'>(
-  tree: SignalTreeBuilderOf<TSource, TAccum, C>
+  tree: ISignalTreeOf<TSource, C, TAccum>
 ): ReadonlyStoreOf<TSource, TAccum, C>;
-export function asReadonly<TSource, C extends CarrierKind = 'cell'>(
-  tree: ISignalTreeOf<TSource, C>
-): ReadonlyStoreOf<TSource, TreeNodeOf<TSource, C>, C>;
 export function asReadonly(tree: object): object {
   return tree;
 }

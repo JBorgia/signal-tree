@@ -14,12 +14,10 @@
  *
  * This exact harness caught two real bugs during development:
  * 1. The readonly overload was first constrained on `factory: () =>
- *    SignalTree<T>`, but `signalTree(...)` actually returns
- *    `SignalTreeBuilder<T, TreeNode<T>>` — a structurally different type — so
- *    the constraint never matched and every real call silently fell through
- *    to the untransformed generic overload (`expose` was a silent no-op).
+ *    a source-only tree shape, so accumulated configured derived state was not
+ *    available to readonly projection.
  * 2. The overload then returned `Type<ReadonlyStore<T>>` computed over the
- *    SOURCE type, silently dropping every `.derived()` computed (RFC 0004
+ *    SOURCE type, silently dropping every configured derived computed (RFC 0004
  *    F1). It is now parameterized over the builder's accumulated type.
  * Keep this file up to date if `signalTree()`'s return type ever changes.
  */
@@ -31,9 +29,9 @@ import type { ReadonlyStore } from '../index';
 import type { WritableLeaf, TreeNode } from '../index';
 
 // --- compile-time assertion helpers -----------------------------------------
-type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <
-  T
->() => T extends B ? 1 : 2
+type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
+  ? 1
+  : 2
   ? true
   : false;
 type Expect<T extends true> = T;
@@ -41,18 +39,20 @@ type Expect<T extends true> = T;
 interface CounterState {
   count: number;
 }
+const counterState: CounterState = { count: 0 };
 
-const DefaultStore = defineStore(() => signalTree<CounterState>({ count: 0 }));
-const ReadonlyCounterStore = defineStore(
-  () => signalTree<CounterState>({ count: 0 }),
-  { expose: 'readonly' }
-);
+const DefaultStore = defineStore(() => signalTree(counterState));
+const ReadonlyCounterStore = defineStore(() => signalTree(counterState), {
+  expose: 'readonly',
+});
 // The F1 case: readonly exposure of a builder with accumulated derived state.
 const ReadonlyDerivedStore = defineStore(
   () =>
-    signalTree<CounterState>({ count: 0 }).derived(($) => ({
-      doubled: computed(() => $.count() * 2),
-    })),
+    signalTree(counterState, {
+      derived: ($) => ({
+        doubled: computed(() => $.count() * 2),
+      }),
+    }),
   { expose: 'readonly' }
 );
 
@@ -71,13 +71,30 @@ export type _DefineStoreTypeChecks = [
 
   // `expose: 'readonly'` overload: narrows to ReadonlyStore over the
   // accumulated type (TreeNode<T> when no derived layers exist).
-  Expect<Equal<ReadonlyInjected, ReadonlyStore<CounterState, TreeNode<CounterState>>>>,
+  Expect<
+    Equal<ReadonlyInjected, ReadonlyStore<CounterState, TreeNode<CounterState>>>
+  >,
   // The readonly leaf is a plain Signal read, not a WritableLeaf —
   // `.set`/`.update` are not own members of its type.
-  Expect<Equal<'set' extends keyof ReadonlyInjected['$']['count'] ? true : false, false>>,
-  Expect<Equal<'update' extends keyof ReadonlyInjected['$']['count'] ? true : false, false>>,
+  Expect<
+    Equal<
+      'set' extends keyof ReadonlyInjected['$']['count'] ? true : false,
+      false
+    >
+  >,
+  Expect<
+    Equal<
+      'update' extends keyof ReadonlyInjected['$']['count'] ? true : false,
+      false
+    >
+  >,
 
   // F1: derived computeds SURVIVE readonly exposure through defineStore.
   Expect<Equal<ReadonlyDerivedInjected['$']['doubled'], Signal<number>>>,
-  Expect<Equal<'set' extends keyof ReadonlyDerivedInjected['$']['count'] ? true : false, false>>
+  Expect<
+    Equal<
+      'set' extends keyof ReadonlyDerivedInjected['$']['count'] ? true : false,
+      false
+    >
+  >
 ];

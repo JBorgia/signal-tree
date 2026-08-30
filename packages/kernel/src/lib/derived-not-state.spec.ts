@@ -14,7 +14,7 @@ import { signalTree } from './signal-tree';
  *   tree() first, never touch `$`  → absent   (correct, by accident)
  *   touch `$` at all, then tree()  → PRESENT  (wrong)
  *
- * because `finalize()` (the `$` getter) runs `applyDerivedFactories` while the
+ * because `finalize()` (the `$` getter) applies configured derived state while the
  * `tree()` call path runs only `materializeOnly()`. **Every real application is
  * the second case** — you write state through `$`, then persist — so derived
  * values were reaching localStorage, devtools and audit in practice.
@@ -31,9 +31,14 @@ import { signalTree } from './signal-tree';
  * avoid.
  */
 const mk = () =>
-  signalTree({ a: 2, b: 3 }).derived(($) => ({
-    sum: computed(() => $.a() + $.b()),
-  }));
+  signalTree(
+    { a: 2, b: 3 },
+    {
+      derived: ($) => ({
+        sum: computed(() => $.a() + $.b()),
+      }),
+    }
+  );
 
 describe('derived state never reaches a snapshot', () => {
   it('tree() first, never touching $', () => {
@@ -89,12 +94,17 @@ describe('derived state never reaches a snapshot', () => {
   });
 
   it('holds with markers in the tree too', () => {
-    const tree = signalTree({
-      rows: entityMap<{ id: number }, number>({ selectId: (r) => r.id }),
-      n: 1,
-    }).derived(($) => ({
-      total: computed(() => $.rows.all().length + $.n()),
-    }));
+    const tree = signalTree(
+      {
+        rows: entityMap<{ id: number }, number>({ selectId: (r) => r.id }),
+        n: 1,
+      },
+      {
+        derived: ($) => ({
+          total: computed(() => $.rows.all().length + $.n()),
+        }),
+      }
+    );
     tree.$.rows.setAll([{ id: 1 }]);
 
     expect(tree()).toEqual({ rows: { all: [{ id: 1 }] }, n: 1 });
@@ -104,9 +114,14 @@ describe('derived state never reaches a snapshot', () => {
     // `.derived()` is for derived state, but a writable signal placed there is
     // not recomputable. Excluding it would trade one silent data loss for
     // another, so only non-writable signals are stamped.
-    const tree = signalTree({ a: 1 }).derived(() => ({
-      manual: signal(42),
-    }));
+    const tree = signalTree(
+      { a: 1 },
+      {
+        derived: () => ({
+          manual: signal(42),
+        }),
+      }
+    );
     void tree.$;
 
     expect(tree()).toEqual({ a: 1, manual: 42 });

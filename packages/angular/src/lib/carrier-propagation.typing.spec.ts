@@ -5,9 +5,8 @@
  *     ONLY A PACKAGE REALIZATION BOUNDARY BINDS IT.
  *
  * One row per transformation CLASS, not per overload. Nested paths are included
- * deliberately: carrier loss hides one transformation deep — `.derived()`
- * returning the neutral public alias dropped C exactly one call into the chain,
- * and `defineStore` bound neutral through its own internal imports.
+ * deliberately: carrier loss hides inside derived projection, and `defineStore`
+ * previously bound neutral through its own internal imports.
  *
  * The implementation rule this enforces:
  *     inside carrier-parametric machinery, self-reference `SomeOf<..., C>` —
@@ -15,10 +14,20 @@
  */
 import { describe, expect, it } from 'vitest';
 import type { Signal, WritableSignal } from '@angular/core';
-import { signalTree, entityMap, asReadonly, toWritableSignal, defineStore } from '../index';
-import type { DerivedOf, ReadonlyStore, TreeNode } from '../index';
+import {
+  signalTree,
+  entityMap,
+  asReadonly,
+  toWritableSignal,
+  defineStore,
+} from '../index';
+import type { ReadonlyStore, TreeNode } from '../index';
 
-interface Row { id: number; name: string; tags: string[] }
+interface Row {
+  id: number;
+  name: string;
+  tags: string[];
+}
 interface S {
   count: number;
   branch: { leaf: string; deep: { n: number } };
@@ -26,10 +35,6 @@ interface S {
 }
 
 declare const roStore: ReadonlyStore<S, TreeNode<S>>;
-
-const derivedBase = signalTree({ count: 2 });
-type DerivedFn = ($: typeof derivedBase.$) => { doubled: Signal<number> };
-declare const derivedTree: DerivedOf<typeof derivedBase, DerivedFn>;
 
 describe('PCP — Angular public transformations keep the Angular carrier', () => {
   it('construction: top-level AND nested leaves are native', () => {
@@ -41,10 +46,15 @@ describe('PCP — Angular public transformations keep the Angular carrier', () =
     expect([top, nested, deep, destroyed].length).toBe(4);
   });
 
-  it('builder chaining: .derived() keeps the carrier one call deep', () => {
-    const t = signalTree({ count: 1 }).derived(($) => ({
-      doubled: (() => $.count() * 2) as unknown as Signal<number>,
-    }));
+  it('declarative derived state keeps the carrier', () => {
+    const t = signalTree(
+      { count: 1 },
+      {
+        derived: ($) => ({
+          doubled: (() => $.count() * 2) as unknown as Signal<number>,
+        }),
+      }
+    );
     const base: WritableSignal<number> = t.$.count;
     const derived: Signal<number> = t.$.doubled;
     const destroyed: Signal<boolean> = t.destroyed;
@@ -87,18 +97,13 @@ describe('PCP — Angular public transformations keep the Angular carrier', () =
     expect(w).toBe(w);
   });
 
-  it('DerivedOf: preserves the supplied Angular carrier', () => {
-    const base: WritableSignal<number> = derivedTree.$.count;
-    const derived: Signal<number> = derivedTree.$.doubled;
-    expect([base, derived].length).toBe(2);
-  });
-
   // `defineStore` is ANGULAR-OWNED and was shown to bypass the package-level
   // binding through its own kernel imports, so it gets consumer-shaped rows.
   it('defineStore default: injected store is native', () => {
     const Store = defineStore(() => signalTree({ count: 0, b: { leaf: 'x' } }));
     type Injected = InstanceType<typeof Store>;
-    const leaf: WritableSignal<number> = null as unknown as Injected['$']['count'];
+    const leaf: WritableSignal<number> =
+      null as unknown as Injected['$']['count'];
     const nested: WritableSignal<string> =
       null as unknown as Injected['$']['b']['leaf'];
     const destroyed: Signal<boolean> = null as unknown as Injected['destroyed'];

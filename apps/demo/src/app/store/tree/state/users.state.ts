@@ -1,4 +1,4 @@
-import { entityMap } from '@signal-tree/kernel';
+import { entityMap } from '@signal-tree/angular';
 
 import { Nullable, User } from '../../types';
 import { loadingSlice } from './shared.state';

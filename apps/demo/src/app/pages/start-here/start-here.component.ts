@@ -77,8 +77,10 @@ export const appTree = signalTree({
   user: { name: '', email: '' },
   ui: { theme: 'light', sidebarOpen: false },
   cart: { items: [] as CartItem[], total: 0 },
-}, { enhancers: [devTools()] })      // Redux DevTools at the root
-  .derived(tier1Derived);
+}, {
+  enhancers: [devTools()],
+  derived: appDerived,
+});
 
 // Use it anywhere — features get typed slices
 @Component({ /* ... */ })

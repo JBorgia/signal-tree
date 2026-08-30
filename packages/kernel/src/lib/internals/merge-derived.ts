@@ -26,12 +26,14 @@ import { stampDerived } from '../utils';
  *     entities: entityMap<Ticket, number>(),
  *     activeId: null,
  *   }
- * }).derived(($) => ({
- *   tickets: {
- *     // This EXTENDS tickets, doesn't replace it
- *     active: derived(() => $.tickets.entities.byId($.tickets.activeId())?.())
- *   }
- * }));
+ * }, {
+ *   derived: ($) => ({
+ *     tickets: {
+ *       // This EXTENDS tickets, doesn't replace it
+ *       active: computed(() => $.tickets.entities.byId($.tickets.activeId())?.())
+ *     }
+ *   })
+ * });
  *
  * // After merge, $.tickets contains:
  * // - entities (preserved from source)
@@ -116,8 +118,6 @@ function ensurePathAndGetTarget($: AnyRecord, path: string): AnyRecord {
 // MAIN MERGE FUNCTION
 // =============================================================================
 
-
-
 /**
  * Merges derived state definitions into the processed source state.
  *
@@ -162,11 +162,7 @@ function ensurePathAndGetTarget($: AnyRecord, path: string): AnyRecord {
  * // Result: $.tickets now has entities, activeId, AND active
  * ```
  */
-function mergeDerivedState(
-  $: AnyRecord,
-  derivedDef: unknown,
-  path = ''
-): void {
+function mergeDerivedState($: AnyRecord, derivedDef: unknown, path = ''): void {
   if (!derivedDef || typeof derivedDef !== 'object') {
     return;
   }
@@ -262,19 +258,10 @@ function mergeDerivedState(
   }
 }
 
-/**
- * Applies multiple derived factories in sequence.
- * Each factory receives the $ with all previous derived merged in.
- *
- * @param $ - The processed source state tree
- * @param factories - Array of derived factory functions
- */
-export function applyDerivedFactories(
+/** Applies the configured derived factory to the processed source tree. */
+export function applyDerivedFactory(
   $: AnyRecord,
-  factories: Array<($: AnyRecord) => object>
+  factory: ($: AnyRecord) => object
 ): void {
-  for (const factory of factories) {
-    const derivedDef = factory($);
-    mergeDerivedState($, derivedDef);
-  }
+  mergeDerivedState($, factory($));
 }

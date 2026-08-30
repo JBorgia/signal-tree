@@ -26,7 +26,7 @@ State is modeled as the shape of your data, and the capabilities you'd otherwise
 - **`entityMap()`** → normalized collections with O(1) lookups and reactive CRUD
 - **`updateAndReport()`** → a changed-paths report for partial server-payload sync, audit trails, and targeted persistence
 - **`form()`** (`@signaltree/ng-forms`) → tree-integrated reactive forms with validation and wizards
-- **`.derived()`** → computed state deep-merged at any path
+- **`derived`** → one computed-state factory deep-merged at any path
 - **`restoration()`** → undo/redo with configurable history depth
 
 ### Use SignalTree if you need
@@ -39,9 +39,9 @@ State is modeled as the shape of your data, and the capabilities you'd otherwise
 
 ### Production architecture
 
-For anything beyond a prototype, wrap the tree in a service and expose **`$` reads + Ops methods**: keep `computed()` / `.derived()` for reads and `@Injectable` Ops services for writes and async. This keeps agent-generated code architecturally sound, not just API-correct. See [Recommended Architecture](docs/architecture/signaltree-architecture-guide.md#recommended-architecture-tldr).
+For anything beyond a prototype, wrap the tree in a service and expose **`$` reads + Ops methods**: declare computed state in `signalTree(..., { derived })` and use `@Injectable` Ops services for writes and async. See [Recommended Architecture](docs/architecture/signaltree-architecture-guide.md#recommended-architecture-tldr).
 
-For components that should only ever read the store, `asReadonly(tree)` narrows the tree to a `ReadonlyStore` — read-only `$` over the tree's full accumulated type (leaf `Signal` reads, `.derived()` computeds preserved, `linked()` narrowed to `Signal`) plus `destroy()`/`destroyed`. Marker surfaces are genuinely narrowed to per-marker reader allowlists: entity mutators (`upsertOne`, `removeWhere`, …), loader triggers (`load`/`refresh`/`invalidate`), `status` setters, and `form` writes are not offered on the readonly type, and `byId()` is re-signed to a read-only entity node (deep `Signal` leaves, no `.set`). `defineStore(factory, { expose: 'readonly' })` is sugar over the same view for injected stores. This is a compile-time narrowing only — the same runtime object, no runtime guard — so it stops the type system from _offering_ a write, not a determined `as any`; pair it with a separate Ops service for the write path.
+For components that should only ever read the store, `asReadonly(tree)` narrows the tree to a `ReadonlyStore` — read-only `$` over the tree's full accumulated type (leaf `Signal` reads, configured derived computeds preserved, `linkedSignal()` narrowed to `Signal`) plus `destroy()`/`destroyed`. Marker surfaces are genuinely narrowed to per-marker reader allowlists: entity mutators (`upsertOne`, `removeWhere`, …) are not offered on the readonly type, and `byId()` is re-signed to a read-only entity node (deep `Signal` leaves, no `.set`). `defineStore(factory, { expose: 'readonly' })` is sugar over the same view for injected stores. This is a compile-time narrowing only — the same runtime object, no runtime guard — so it stops the type system from _offering_ a write, not a determined `as any`; pair it with a separate Ops service for the write path.
 
 ## When to Use SignalTree
 
@@ -269,12 +269,12 @@ membership and write resolved rows from app-owned services.
 
 A SignalTree store is composed from four distinct, type-safe mechanisms — each handles one concern, rather than funneling everything through a single primitive:
 
-| Concern           | Mechanism                                                                                                  | Example                                                      |
-| ----------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap` | `signalTree({ users: entityMap<User>() })`                   |
-| **Derived state** | `.derived()` / `derivedFrom()` — computed signals deep-merged at any path                                  | `.derived($ => ({ activeCount: computed(...) }))`            |
-| **Capabilities**  | the `enhancers` config array — opt-in, tree-shakeable, and reusable (author your own custom enhancers)     | `signalTree(state, { enhancers: [batching(), devTools()] })` |
-| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes  | `ops.users.select(id)`                                       |
+| Concern           | Mechanism                                                                                                  | Example                                                                 |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap` | `signalTree({ users: entityMap<User>() })`                              |
+| **Derived state** | one config-level `derived` factory — computed signals deep-merged at any path                              | `signalTree(state, { derived: $ => ({ activeCount: computed(...) }) })` |
+| **Capabilities**  | the `enhancers` config array — opt-in, tree-shakeable, and reusable (author your own custom enhancers)     | `signalTree(state, { enhancers: [batching(), devTools()] })`            |
+| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes  | `ops.users.select(id)`                                                  |
 
 This deliberately splits across four purpose-built tools what NgRx SignalStore unifies under one `with*` composition primitive (`withState` / `withComputed` / `withMethods` / `signalStoreFeature`). The closest analog to NgRx's reusable-feature primitive (`signalStoreFeature` / `withFeature`) is the `enhancers` array; state, derived state, and actions live in the other three mechanisms. For an honest, axis-by-axis comparison — including where NgRx wins — see [docs/compare/ngrx-signalstore.md](docs/compare/ngrx-signalstore.md).
 
@@ -317,21 +317,19 @@ const store = signalTree(
 
 ## Derived State
 
-Define derived computations in separate files with full type safety using `derivedFrom()`:
+An external derived factory can name the canonical state facade directly:
 
 ```typescript
-import { derivedFrom } from '@signal-tree/kernel';
+import type { TreeNode } from '@signal-tree/angular';
 import { computed } from '@angular/core';
 
-const derived = derivedFrom<AppState>();
-
-export const dashboardDerived = derived(($) => ({
+export const dashboardDerived = ($: TreeNode<AppState>) => ({
   activeUserCount: computed(() => $.users.where((u) => u.active)().length),
   totalRevenue: computed(() => $.orders.all().reduce((sum, o) => sum + o.total, 0)),
-}));
+});
 
 // Attach to tree
-const store = signalTree(initialState).derived(dashboardDerived);
+const store = signalTree(initialState, { derived: dashboardDerived });
 store.$.activeUserCount(); // reactive, type-safe
 ```
 
@@ -466,7 +464,6 @@ tree.$.users.all();
 
 // Enhance & derive — enhancers are DECLARED, not attached later
 signalTree(state, { enhancers: [enhancer()], derived: derivedFn });
-tree.derived(derivedFn); // Derived state can also be added after construction
 
 // Async — the tree stores results; the pipeline is ordinary RxJS
 const tree = signalTree({ results: [] as User[], loading: false });

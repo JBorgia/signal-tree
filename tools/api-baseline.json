@@ -104,24 +104,6 @@
         "internalDecl": false
       },
       {
-        "name": "derivedFrom",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "DerivedOf",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "(unresolved)",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "devTools",
         "subpath": ".",
         "kind": "runtime",
@@ -248,15 +230,6 @@
         "internalDecl": false
       },
       {
-        "name": "ISignalTree",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/angular/src/index.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "link",
         "subpath": ".",
         "kind": "runtime",
@@ -357,15 +330,6 @@
       },
       {
         "name": "SignalTree",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/angular/src/index.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
-        "name": "SignalTreeBuilder",
         "subpath": ".",
         "kind": "type-only",
         "declFile": "packages/angular/src/index.ts",
@@ -553,24 +517,6 @@
         "internalDecl": false
       },
       {
-        "name": "derivedFrom",
-        "subpath": ".",
-        "kind": "runtime",
-        "declFile": "packages/kernel/src/lib/internals/derived-types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
-        "name": "DerivedOf",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/derived-types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
         "name": "devTools",
         "subpath": ".",
         "kind": "runtime",
@@ -724,15 +670,6 @@
         "internalDecl": false
       },
       {
-        "name": "ISignalTree",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": false
-      },
-      {
         "name": "link",
         "subpath": ".",
         "kind": "runtime",
@@ -866,15 +803,6 @@
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
-      },
-      {
-        "name": "SignalTreeBuilder",
-        "subpath": ".",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/builder-types.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
       },
       {
         "name": "SignalTreeRollbackError",
@@ -1133,15 +1061,6 @@
         "subpath": "./adapter",
         "kind": "type-only",
         "declFile": "packages/kernel/src/lib/internals/scalar-leaf-realization.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
-        "name": "SignalTreeBuilderOf",
-        "subpath": "./adapter",
-        "kind": "type-only",
-        "declFile": "packages/kernel/src/lib/internals/builder-types.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": true

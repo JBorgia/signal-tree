@@ -234,7 +234,7 @@ same branded-helper rule, not take a raw `load:` function.
 **The need:** `selectedIds` plus the derived reads every table UI wants.
 
 `selectedIds` is app-owned writable state. The reads are four one-line
-`computed`s, so they belong in `.derived()`:
+`computed`s, so they belong in the configured derived factory:
 
 ```typescript
 export function selectionDerived<T extends { id: string }>(slice: { entities: Pick<EntitySignal<T, string>, 'byId'>; selection: { selectedIds: Signal<string[]> } }) {
@@ -257,10 +257,12 @@ export function selectionDerived<T extends { id: string }>(slice: { entities: Pi
 Merge it per domain:
 
 ```typescript
-signalTree(createBaseState(api)).derived(($) => ({
-  plant: selectionDerived($.plant),
-  driver: selectionDerived($.driver),
-}));
+signalTree(createBaseState(api), {
+  derived: ($) => ({
+    plant: selectionDerived($.plant),
+    driver: selectionDerived($.driver),
+  }),
+});
 ```
 
 **Why not an `entityMap().computed()` slice?** A slice's `compute` receives only
@@ -273,7 +275,7 @@ rather than a slice — see the
 
 That has one overwhelmingly common cause: **two copies of `@angular/core`**. Each
 copy has its own `Symbol(SIGNAL)`, so `isSignal()` inside `@signal-tree/kernel`
-rejects a `computed()` your code created, and `.derived()` drops every value.
+rejects a `computed()` your code created, and the configured tier drops every value.
 Since 13.2.0 this warns as `[ST2007]`; before that it failed silently. Fix the
 duplication in your bundler (Vite: `resolve: { dedupe: ['@angular/core'] }`;
 Jest: `moduleNameMapper`).

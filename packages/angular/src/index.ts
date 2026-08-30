@@ -29,7 +29,6 @@ import type {
   EntitySignalOf,
   EntitySignalWithSlicesOf,
   ReadonlyStoreOf,
-  SignalTreeBuilderOf,
   ISignalTreeOf,
   LeafOf,
   SignalTreeFactoryOf,
@@ -78,7 +77,6 @@ export {
   restoration,
   undoable,
   external,
-  derivedFrom,
   asReadonly,
   batching,
   devTools,
@@ -88,7 +86,6 @@ export {
 } from '@signal-tree/kernel';
 
 export type {
-  DerivedOf,
   TreeConfig,
   NodeAccessor,
   AccessibleNode,
@@ -126,13 +123,15 @@ export type WritableLeaf<T> = LeafOf<T, 'angular'>;
 // re-exported from the kernel they resolved `destroyed`, `.empty`, `.all`,
 // entity fields and `.asReadonly()` to neutral cells. Same semantic authority,
 // bound to Angular's carrier — no duplicated type system, no star export.
-export type SignalTreeBuilder<TSource, TAccum = TreeNode<TSource>> =
-  SignalTreeBuilderOf<TSource, TAccum, 'angular'>;
-export type EntitySignal<E, K extends string | number = string> =
-  EntitySignalOf<E, K, 'angular'>;
+export type EntitySignal<
+  E,
+  K extends string | number = string
+> = EntitySignalOf<E, K, 'angular'>;
 export type EntityNode<E> = EntityNodeOf<E, 'angular'>;
-export type ReadonlyStore<TSource, TAccum = TreeNode<TSource>> =
-  ReadonlyStoreOf<TSource, TAccum, 'angular'>;
+export type ReadonlyStore<
+  TSource,
+  TAccum = TreeNode<TSource>
+> = ReadonlyStoreOf<TSource, TAccum, 'angular'>;
 export type EntitySignalWithSlices<
   E,
   K extends string | number,
@@ -143,7 +142,6 @@ export type EntitySignalWithSlices<
  * The Angular tree contract. Same one parameter users always wrote; the carrier
  * differs because THIS package installed the Angular realization.
  */
-export type ISignalTree<T> = ISignalTreeOf<T, 'angular'>;
 export type SignalTree<T> = ISignalTreeOf<T, 'angular'>;
 
 // Angular-owned API, which the kernel deliberately does not export.

@@ -2,7 +2,7 @@
 // package still binds the Angular carrier publicly; the split rebinds it per
 // package. No Angular VALUE is imported here any more.
 import type { WritableCell } from './internals/cell-runtime';
-import type { SignalTreeFactoryOf } from './types';
+import type { ISignalTreeOf, SignalTreeFactoryOf } from './types';
 
 import { getMaterializationRealization } from './internals/materialization-realization';
 import { withoutTracking } from './internals/tracking-suppression';
@@ -50,7 +50,9 @@ import { markTreeCell } from './internals/cell-identity';
  *
  *     THE KERNEL MUST NOT ASK AN OPTIONAL ADAPTER WHETHER ITS OWN STATE EXISTS.
  */
-const isWritableCell = (v: unknown): v is { (): unknown; set(value: unknown): void } =>
+const isWritableCell = (
+  v: unknown
+): v is { (): unknown; set(value: unknown): void } =>
   typeof v === 'function' &&
   'set' in (v as object) &&
   typeof (v as { set?: unknown }).set === 'function';
@@ -73,8 +75,6 @@ import {
 } from './internals/member-membership';
 import { getOwnedPositionIds } from './internals/owned-mutation';
 import { getOwnedOwnerPath } from './internals/owned-metadata';
-import { SignalTreeBuilder } from './internals/builder-types';
-import { ProcessDerived } from './internals/derived-types';
 import { assertEnhancerConfigurationValid } from './internals/enhancer-requirements';
 import {
   createMaterializationContext,
@@ -119,7 +119,7 @@ import {
   resolveTreeCapabilities,
 } from './internals/tree-capabilities';
 import type { MaterializationContext } from './internals/materialize-markers';
-import { applyDerivedFactories } from './internals/merge-derived';
+import { applyDerivedFactory } from './internals/merge-derived';
 import { hydrateMarkerNode } from './internals/materialize-markers';
 import {
   deepEqual,
@@ -355,7 +355,6 @@ function createEqualityFn(useShallowComparison: boolean) {
 // a construction-time sanitiser: sanitising on the way INTO state corrupts data
 // and does not protect the rendering sink, which is where XSS is decided and
 // which Angular already escapes.
-
 
 // =============================================================================
 // NODE ACCESSOR CREATION
@@ -2031,8 +2030,7 @@ function applyEnhancers<T extends object>(
 /**
  * Create a minimal SignalTree.
  *
- * Returns ISignalTree<T> with only core functionality.
- * Use .with() to add enhancers for additional features.
+ * Returns the configured tree contract.
  *
  * @example
  * ```typescript
@@ -2042,28 +2040,18 @@ function applyEnhancers<T extends object>(
  * // Minimal tree
  * const tree = signalTree({ count: 0 });
  *
- * // With multiple enhancers
- * const tree = signalTree({ count: 0 })
- *   .with(restoration())
- *   .with(batching());
- *
- * // With derived state (v7) - chained syntax
- * const tree = signalTree({ count: 0 })
- *   .derived(($) => ({
- *     doubled: computed(() => $.count() * 2)
- *   }));
- *
- * // With derived state (v7) - second argument syntax
+ * // Enhancers and derived state share one declarative construction plan.
  * const tree = signalTree(
  *   { count: 0 },
- *   ($) => ({
- *     doubled: computed(() => $.count() * 2)
- *   })
+ *   {
+ *     enhancers: [restoration(), batching()],
+ *     derived: ($) => ({
+ *       doubled: computed(() => $.count() * 2)
+ *     })
+ *   }
  * );
  * ```
  */
-// Overload: with derived factory as second argument
-
 /**
  * THE RETURN TYPE IS WHERE `.with()` WENT.
  *
@@ -2079,20 +2067,11 @@ function applyEnhancers<T extends object>(
  * change the result type, most specific first.
  */
 
-// Overload: enhancers AND a derived factory
-
-// Overload: config object carrying a derived factory
-
-// Overload: with config object
-
 // Implementation
-function signalTreeImpl<T extends object, TDerived extends object>(
+function signalTreeImpl<T extends object>(
   initialState: T,
-  configOrDerived?: TreeConfig | (($: TreeNode<T>) => TDerived)
-): SignalTreeBuilder<T, TreeNode<T>> {
-  const isFactory = typeof configOrDerived === 'function';
-  const config: TreeConfig = isFactory ? {} : configOrDerived ?? {};
-
+  config: TreeConfig = {}
+): ISignalTree<T> {
   // CONFIGURE -> FINALIZE. The whole enhancer set is known here, so the plan
   // can be truthful. The chained builder could not do this: `.with()` had to
   // materialize before applying each enhancer, so the plan was fixed before the
@@ -2176,42 +2155,26 @@ function signalTreeImpl<T extends object, TDerived extends object>(
     tree = applyEnhancers(tree, ordered);
   }
 
-  const builder = createBuilder<T, TreeNode<T>>(
+  return createConfiguredTree<T, TreeNode<T>>(
     tree as ISignalTree<T>,
     materializationContext,
     hasEnhancers,
-    authority
+    authority,
+    config.derived
   );
-
-  // A derived factory may arrive either as the whole second argument (the v7
-  // shorthand) or as `config.derived`. Both queue on the builder, so both apply
-  // at the same point a chained `.derived()` would have: lazily, on first `$`
-  // access, after every enhancer.
-  const derivedFactory = isFactory
-    ? (configOrDerived as ($: TreeNode<T>) => TDerived)
-    : (config.derived as unknown as
-        | (($: TreeNode<T>) => TDerived)
-        | undefined);
-
-  if (derivedFactory) {
-    return builder.derived(
-      derivedFactory
-    ) as unknown as SignalTreeBuilder<T, TreeNode<T>>;
-  }
-
-  return builder;
 }
 
 // =============================================================================
-// BUILDER FACTORY
+// CONFIGURED TREE
 // =============================================================================
 
 /**
- * Creates a SignalTreeBuilder that wraps an ISignalTree and adds:
- * - .derived() method for adding derived state layers
- * - Lazy finalization (derived factories run on first $ access)
+ * Wraps the tree with lazy finalization for configured derived state.
  */
-function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
+function createConfiguredTree<
+  TSource extends object,
+  TAccum = TreeNode<TSource>
+>(
   baseTree: ISignalTree<TSource>,
   materializationContext: MaterializationContext,
   /**
@@ -2220,23 +2183,28 @@ function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
    * idempotent instead of walking an already-materialized tree again.
    */
   alreadyMaterialized = false,
-  authority?: OrdinaryConstructionAuthority
-): SignalTreeBuilder<TSource, TAccum> {
-  const derivedQueue: Array<($: unknown) => object> = [];
+  authority?: OrdinaryConstructionAuthority,
+  derivedFactory?: ($: never) => object
+): ISignalTreeOf<TSource, 'cell', TAccum> {
   let isFinalized = false;
 
   let markersMaterialized = alreadyMaterialized;
 
   /**
    * Materialize markers only — idempotent, and deliberately does NOT latch
-   * `isFinalized`, so it stays legal to add `.derived()` afterwards. Reading
-   * or writing through the tree needs real signals; it does not need the
-   * derived queue applied.
+   * `isFinalized`. Snapshot reads need materialized state but do not need
+   * configured derived state applied because it is not snapshot data.
    */
   const materializeOnly = () => {
     if (markersMaterialized) return;
     markersMaterialized = true;
-    materializeMarkers(baseTree.$, undefined, [], materializationContext, authority);
+    materializeMarkers(
+      baseTree.$,
+      undefined,
+      [],
+      materializationContext,
+      authority
+    );
     _recordTreeConstruction();
   };
 
@@ -2249,19 +2217,19 @@ function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
     // can reference entity methods, status signals, and stored signals.
     materializeOnly();
 
-    // Step 2: Apply all queued derived factories
-    if (derivedQueue.length > 0) {
-      applyDerivedFactories(baseTree.$, derivedQueue);
+    // Step 2: Apply the configured derived factory
+    if (derivedFactory) {
+      applyDerivedFactory(
+        baseTree.$ as Record<string, unknown>,
+        derivedFactory as ($: Record<string, unknown>) => object
+      );
     }
   };
 
-  // Create callable builder function that delegates to baseTree
+  // Create a callable configured tree that delegates to baseTree
   const builder = function (arg?: unknown): TSource | void {
-    // Materialize markers WITHOUT finalizing. Calling tree() used to return
-    // raw markers because this path skipped materialization entirely; but a
-    // full finalize() here would also latch `isFinalized`, and `.derived()`
-    // throws on that flag — so `tree(); tree.derived(...)` would start failing
-    // with a message about `$` that the caller never touched.
+    // Materialize markers WITHOUT finalizing derived state. Calling tree()
+    // returns source state only; derived state is structure under `$`.
     materializeOnly();
 
     // Delegate to baseTree's call signature
@@ -2269,7 +2237,7 @@ function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
       return (baseTree as unknown as () => TSource)();
     }
     return (baseTree as unknown as (arg: unknown) => void)(arg);
-  } as SignalTreeBuilder<TSource, TAccum>;
+  } as ISignalTreeOf<TSource, 'cell', TAccum>;
 
   // Mark as NodeAccessor
   (builder as unknown as Record<symbol, boolean>)[NODE_ACCESSOR_SYMBOL] = true;
@@ -2370,29 +2338,6 @@ function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
   // The `batchUpdate` forward was REMOVED in 14.1.1 along with the method it
   // forwarded. Use `tree(partial)`, or `tree.batch(() => tree(partial))`.
 
-  // Add derived() method
-  Object.defineProperty(builder, 'derived', {
-    value: function <TDerived extends object>(
-      factory: ($: TAccum) => TDerived
-    ): SignalTreeBuilder<TSource, TAccum & ProcessDerived<TDerived>> {
-      if (isFinalized) {
-        throw new Error(
-          'SignalTree: Cannot add derived() after tree.$ has been accessed. ' +
-            'Chain all .derived() calls before accessing $.'
-        );
-      }
-      derivedQueue.push(factory as ($: unknown) => object);
-      // Return same builder - types are updated at compile time
-      return builder as unknown as SignalTreeBuilder<
-        TSource,
-        TAccum & ProcessDerived<TDerived>
-      >;
-    },
-    enumerable: false,
-    writable: false,
-    configurable: true,
-  });
-
   // Forward everything the enhancers added.
   //
   // signalTree() now applies enhancers to the base tree BEFORE wrapping it, so
@@ -2409,7 +2354,6 @@ function createBuilder<TSource extends object, TAccum = TreeNode<TSource>>(
     'destroy',
     'destroyed',
     'registerCleanup',
-    'derived',
   ]);
   for (const key of Object.keys(baseTree)) {
     if (RESERVED.has(key)) continue;

@@ -6,8 +6,8 @@ import { DestroyRef, inject, Injectable, type Type } from '@angular/core';
 // whose leaves typed as ReadableCell — the same carrier lie the star export had.
 // Imported from the binders rather than `../index` to avoid a cycle.
 import type {
+  ISignalTreeOf,
   ReadonlyStoreOf,
-  SignalTreeBuilderOf,
   TreeNodeOf,
 } from '@signal-tree/kernel/adapter';
 
@@ -16,8 +16,11 @@ type ReadonlyStore<T, TAccum = TreeNodeOf<T, 'angular'>> = ReadonlyStoreOf<
   TAccum,
   'angular'
 >;
-type SignalTreeBuilder<T, TAccum = TreeNodeOf<T, 'angular'>> =
-  SignalTreeBuilderOf<T, TAccum, 'angular'>;
+type AngularSignalTree<T, TAccum = TreeNodeOf<T, 'angular'>> = ISignalTreeOf<
+  T,
+  'angular',
+  TAccum
+>;
 
 /**
  * Config for {@link defineStore}.
@@ -45,7 +48,7 @@ export interface DefineStoreConfig {
    * architecture" in the root README).
    *
    * Only accepted when the factory returns a real tree
-   * (`signalTree(...)`-shaped, i.e. a `SignalTreeBuilder`); combining it with
+   * (`signalTree(...)`-shaped); combining it with
    * a plain-object factory is a compile error rather than a silent no-op.
    */
   expose?: 'readonly';
@@ -56,14 +59,14 @@ export interface DefineStoreConfig {
  * idiomatic Angular DI pattern for a tree, comparable to NgRx SignalStore's
  * `signalStore()`.
  *
- * `inject(MyStore)` resolves to the **real tree** — callable, with `$`, `state`,
- * `.with(...)`, and any enhancer-added methods — not a wrapper. The tree's
+ * `inject(MyStore)` resolves to the **real tree** — callable, with `$` and any
+ * configured enhancer methods — not a wrapper. The tree's
  * `destroy()` is tied to the host injector's lifecycle via `DestroyRef`, so a
  * component-provided store tears down with the component and a root store with
  * the app.
  *
  * The factory runs inside Angular's injection context, so it may call `inject()`
- * (e.g. to read other services) and use `.with(enhancer())` / `.derived(...)`.
+ * (e.g. to read other services).
  *
  * @example
  * ```ts
@@ -107,19 +110,17 @@ export interface DefineStoreConfig {
 // here, both verified by the type-test harness (define-store.typing.spec.ts
 // / readonly.typing.spec.ts):
 //
-// 1. Constrained on `SignalTreeBuilder<T, A>` (not `SignalTree<T>`/
-//    `ISignalTree<T>`) because that's what `signalTree(...)` actually
-//    returns — an earlier constraint on `SignalTree<T>` never matched and
-//    every real call silently fell through to the generic overload.
-// 2. Parameterized over the builder's accumulated `A` (not just the source
-//    `T`) so `ReadonlyStore<T, A>` preserves `.derived()` computeds
+// 1. Constrained on the accumulated Angular tree contract because an earlier
+//    source-only constraint silently dropped configured derived state.
+// 2. Parameterized over the tree's accumulated `A` (not just the source `T`)
+//    so `ReadonlyStore<T, A>` preserves configured derived computeds
 //    (RFC 0004 F1), and the generic fallback overload rejects
 //    `expose: 'readonly'` (`expose?: undefined`) so a factory that does NOT
 //    return a builder — e.g. a plain object — is a compile error instead of
 //    a silently-unnarrowed store (RFC 0004 F2 / §5 rule 4: silent-inert is
 //    the priority defect class).
 export function defineStore<T, A>(
-  factory: () => SignalTreeBuilder<T, A>,
+  factory: () => AngularSignalTree<T, A>,
   config: DefineStoreConfig & { expose: 'readonly' }
 ): Type<ReadonlyStore<T, A>>;
 /**

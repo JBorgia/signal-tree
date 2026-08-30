@@ -1,6 +1,7 @@
 import { forkJoin, map, Observable } from 'rxjs';
 
 import { inject, Injectable } from '@angular/core';
+import { asReadonly } from '@signal-tree/angular';
 
 import { PostOps, UiOps, UserOps } from './ops';
 import { APP_TREE } from './tree';
@@ -18,8 +19,8 @@ import { APP_TREE } from './tree';
  */
 @Injectable({ providedIn: 'root' })
 export class AppStore {
-  readonly tree = inject(APP_TREE);
-  readonly $ = this.tree.$;
+  private readonly tree = inject(APP_TREE);
+  readonly $ = asReadonly(this.tree).$;
 
   /** Domain operations, addressed as `store.ops.<domain>.<method>()`. */
   readonly ops = {
