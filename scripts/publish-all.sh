@@ -3,7 +3,7 @@
 # SignalTree Publishing Script
 # Publishes all packages in the correct dependency order
 
-set -e  # Exit on any error
+set -euo pipefail
 
 echo "🚀 Starting SignalTree package publishing process..."
 
@@ -37,20 +37,23 @@ if [ ! -f "package.json" ] || [ ! -d "packages" ]; then
     exit 1
 fi
 
-# Check if user is logged into npm
-if ! npm whoami > /dev/null 2>&1; then
-    print_error "You must be logged into npm. Run 'npm login' first."
-    exit 1
-fi
-
-print_status "Verified npm authentication"
-
 # Load packages in dependency order from the release authority.
 VERSION=$(node -p "require('./package.json').version")
 # shellcheck source=release-packages.sh
 source "scripts/release-packages.sh"
 PACKAGES=("${PUBLISHABLE_PACKAGES[@]}")
 
+# Check if dry-run flag is passed.
+DRY_RUN=""
+if [ "${1:-}" = "--dry-run" ]; then
+    DRY_RUN="--dry-run"
+    print_warning "Running in DRY RUN mode - no packages will actually be published"
+elif ! npm whoami > /dev/null 2>&1; then
+    print_error "You must be logged into npm. Run 'npm login' first."
+    exit 1
+else
+    print_status "Verified npm authentication"
+fi
 
 # ---------------------------------------------------------------------------
 # DIST-TAG — derived from the version, never assumed.
@@ -75,6 +78,11 @@ case "$VERSION" in
         ;;
 esac
 
+# Build the complete candidate once before mutating or verifying dist manifests.
+BUILD_LIST=$(IFS=,; echo "${BUILD_PACKAGES[*]}")
+print_status "Building candidate packages: $BUILD_LIST"
+pnpm nx run-many -t build --projects="$BUILD_LIST" --configuration=production
+
 # Prepare any generated publish artifacts, then VERIFY every declared `files`
 # entry resolves. The 15.0 release removed the stale AI-skill and llms artifacts;
 # this script remains the single shared preparation hook.
@@ -92,26 +100,10 @@ node scripts/resolve-workspace-specs.mjs "$VERSION" "${PACKAGES[@]}" || exit 1
 # ships a tarball missing an unmatched glob without a word.
 node scripts/verify-publish-artifacts.mjs "${PACKAGES[@]}" || exit 1
 
-# Check if dry-run flag is passed
-DRY_RUN=""
-if [ "$1" = "--dry-run" ]; then
-    DRY_RUN="--dry-run"
-    print_warning "Running in DRY RUN mode - no packages will actually be published"
-fi
-
 # Function to publish a single package
 publish_package() {
     local package_name=$1
-    local package_path="packages/$package_name"
     local dist_path="dist/packages/$package_name"
-
-    print_status "Building package: @signal-tree/$package_name"
-
-    # Build the package via Nx
-    if ! pnpm nx build "$package_name" --configuration=production; then
-        print_error "Failed to build package: $package_name"
-        return 1
-    fi
 
     # Check if dist directory exists
     if [ ! -d "$dist_path" ]; then
@@ -119,24 +111,8 @@ publish_package() {
         return 1
     fi
 
-    # Resolve workspace specs HERE, after the build, immediately before publish.
-    #
-    # This has to happen inside this function and not once up front. `nx build`
-    # above REGENERATES dist/packages/<pkg>/package.json from the source
-    # manifest, so anything rewritten before the build loop is silently undone.
-    # That is exactly how 14.1.0 shipped `"@signaltree/core": "workspace:*"` in
-    # peerDependencies on all five non-core packages — an unresolvable range that
-    # fails on install. The resolve step existed and ran; it just ran where the
-    # build overwrote it, so the fix the comment above describes never took
-    # effect. Verified against the registry after publishing, which is the only
-    # place this is observable.
-    if ! node scripts/resolve-workspace-specs.mjs "$VERSION" "$package_name"; then
-        print_error "Could not resolve workspace specs for $package_name"
-        return 1
-    fi
-
     # Independent guard on the actual bytes about to be published, so that a
-    # future reordering of this function cannot reintroduce the bug quietly.
+    # future reordering cannot reintroduce unresolved workspace specs quietly.
     # Checks only the fields a consumer installs from; devDependencies keeping
     # `workspace:*` is correct and must not trip this.
     if ! node -e "
@@ -161,9 +137,9 @@ publish_package() {
 
     if [ -n "$DRY_RUN" ]; then
         print_warning "DRY RUN: Would publish @signal-tree/$package_name"
-        npm publish --tag "$NPM_TAG" $DRY_RUN
+        npm publish --access public --tag "$NPM_TAG" $DRY_RUN
     else
-        if npm publish --tag "$NPM_TAG"; then
+        if npm publish --access public --tag "$NPM_TAG"; then
             print_success "Successfully published @signal-tree/$package_name"
         else
             print_error "Failed to publish @signal-tree/$package_name"
