@@ -19,6 +19,26 @@ were removed, reviewer-found internal spec imports were repaired, and
 
 `GATE A` is **SATISFIED**. The kernel is FROZEN as of `4f7a2169`.
 
+`DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
+Angular consumer falsified the previous freeze by exposing multiple public
+construction models and a staged-derived abstraction with no surviving user
+job. The corrected surface has one constructor, `signalTree(initialState,
+config?)`; one derived declaration, singular `config.derived`; and one state
+facade, `tree.$`. The positional derived factory, fluent `.derived()`, public
+builder, duplicate public `ISignalTree`, `DerivedOf`, `derivedFrom`, tier arrays,
+and the internal derived queue/plural dispatcher are deleted. Dependencies among
+derived values use ordinary local reactive composition inside the one factory.
+
+`PRODUCTION-CONSUMER-0` is **CLOSED GREEN** at `75c003c2`. The demo application
+constructs its real store through `@signal-tree/angular`, keeps the writable tree
+private, exposes readonly `$`, and exercises nested state, entity collections,
+derived values, and ops-driven writes. Validation: both TypeScript passes; kernel
+2,011 passed / 3 expected failures / 16 skipped / 1 todo; Angular 24 passed; demo
+110 passed / 4 skipped; kernel, Angular, and demo lint/build targets; packed
+Angular 22 consumer typecheck; 16/16 production route smoke tests; API and spec
+baseline checks; independent release review; and `npm run gates -- --release`
+66/66 with zero known-red.
+
 Post-`84d39ae8` type/surface closure is checkpointed at `1c021fb6`.
 `READONLY-FOREIGN-REACTIVE-0` is **RF-A / CLOSED GREEN**: readonly projection
 uses the existing callable grammar to distinguish zero-argument foreign readers
@@ -46,12 +66,14 @@ failures, Angular 24 passed, demo 108 passed with 4 skipped, packed Angular
 consumer typecheck, signal identity durability 4/4, and
 `NX_DAEMON=false NX_ISOLATE_PLUGINS=false npm run gates -- --release` 66/66.
 
-## V15 Public API Freeze — AUTHORIZED
+## V15 Public API Freeze — RE-AUTHORIZED
 
-The V15 public API is **FROZEN**. No public rename, removal, signature reshape,
-new adapter contract or semantic API addition is permitted unless a production
-consumer or release-blocking falsifier demonstrates that the frozen contract
-cannot ship.
+The V15 public API is **FROZEN AGAIN** at `75c003c2`. The prior freeze was
+properly suspended by the `PRODUCTION-CONSUMER-0` counterexample and replaced by
+the `DOW-A` singular construction model above. No public rename, removal,
+signature reshape, new adapter contract or semantic API addition is permitted
+unless another production consumer or release-blocking falsifier demonstrates
+that this corrected contract cannot ship.
 
 ```text
 public signature closure       GREEN / FROZEN
@@ -75,9 +97,8 @@ production 19.50/21 KB, EntityMap development 22.11/23.7 KB; kernel tarball
 the existing public-surface mix 33.74 KB gzip. These figures authorize no
 optimization work.
 
-The next phase is release productization beginning with
-`PRODUCTION-CONSUMER-0`. The `15.0.0-rc.1` manifest values remain placeholders;
-this freeze is not RC authorization.
+The `15.0.0-rc.1` manifest values remain placeholders; this freeze is not RC
+authorization.
 
 ### FROZEN — persistence invariants
 
