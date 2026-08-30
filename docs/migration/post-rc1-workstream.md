@@ -150,6 +150,11 @@ to `+37.5%`, with no consistent direction or scaling trend. No meaningful
 steady-state tax is established. An initial always-allocated registry measured
 worse and was replaced by a registry that does not exist until first demand.
 
+After the invalidation rename and separate membership controls, one final run
+of the same existing workload measured `-7.7%`, `+6.3%`, `+1.8%`, `+5.9%`, and
+`+3.1%` against the three-run baseline medians. The unused capability remains
+inside the established noise envelope with no directional tax.
+
 The React reference now consumes only this adapter primitive. It does not
 define or freeze a React hook. Selector-result caching is observational
 memoization, not a writable state authority, but changing-selector and
