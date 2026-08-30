@@ -138,26 +138,6 @@ export {} from './lib/audit/audit';
 
 // Marker processing (v7): `registerMarkerProcessor` is not root app API.
 
-// ============================================
-// UTILITY EXPORTS
-// ============================================
-
-export {} from // Core utilities - Primary helper functions
-// isNodeAccessor / isTraversableNode / isBuiltInObject / parsePath are not
-// root app API.
-//
-// ⚠️ `toWritableSignal` IS KEPT BY PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0, on
-// evidence. It is the Angular Signal Forms bridge — `form(model)` needs a
-// WritableSignal, and `{ undoable: true }` is the only public way to make a
-// form edit a restoration-eligible turn. Three HIST-C2 form-ingress carriers
-// express that requirement through it and have no other door.
-//
-// Those carriers import it from `lib/utils` directly, which is why deleting
-// the EXPORT left them green — a spec reaching past the barrel cannot testify
-// about the barrel. Consumer-count evidence gathered from inside the package
-// is blind to exactly the third-party need this export exists for.
-'./lib/utils';
-
 /**
  * @see {@link undoable} — designates an authored causal turn as eligible for
  *   undo. The one public door onto restoration eligibility; the engine's own

@@ -1,10 +1,12 @@
 # SignalTree v15
+
 ## Engineering a Reactive State Engine
+
 ### Architecture, semantics, falsification, performance, lifecycle, and the evidence behind the rewrite
 
-**Engineering whitepaper - architecture cut: August 25, 2026**
+**Engineering whitepaper - RC1 cut: August 30, 2026**
 
-**Document status:** Pre-RC engineering whitepaper. Core architecture and the public Link/error contract are substantially closed and frozen absent a new falsifier. `MIGRATION-MAP-0` is complete; compatibility retirement now begins with an `asyncQuery` disposition, followed by loader/asyncSource/stored-persistence cleanup. Full demo coverage, performance-proof correction, final release gates, and owned-history reclamation remain open.
+**Document status:** RC1 engineering whitepaper. The v15 public API and construction/access surface are frozen. Candidate source `4020b7dd` has one constructor (`signalTree(initialState, config?)`), one recursive `$` facade, and one singular `config.derived` factory. The public package graph is `@signal-tree/kernel` plus `@signal-tree/angular`, with private `@signaltree/shared` bundled at build time. The complete release matrix is green; later sections retain the chronology of hypotheses that were subsequently retired or moved across the package boundary.
 
 > This paper is reconstructed from the v15 engineering record: code audits, commit history, decision documents, benchmark outputs, falsification probes, type-contract tests, GC tests, and the latest lifecycle discriminator. The separately supplied `Signaltree15.pdf` was explicitly excluded as a source.
 
@@ -49,45 +51,44 @@ SignalTree v15 can be summarized as a transition from a reactive object-building
 > **Comparison:** v15 does not ask Angular signals to simultaneously be storage, history, lifecycle identity, synchronization protocol, and diagnostics.
 > **Takeaway:** the rewrite is primarily a separation-of-responsibilities architecture, not one exotic data structure.
 
-
 At the public surface, SignalTree remains recognizably SignalTree: structured state is navigated through the recursive `tree.$` facade, leaves are reactive and writable, entities use `entityMap`, enhancers add capabilities, derived state remains supported, and lifecycle methods remain part of the tree contract. Underneath, however, v15 has been systematically reworked around one constructor, one build plan, one physical representation, one capability dependency graph, and one materialization boundary.
 
 A useful way to read the rest of the paper is as a before/after comparison. v15 does not replace the public mental model with a lower-level kernel API; it moves complexity behind a more explicit construction and lifecycle contract.
 
-| Concern | Earlier shape / failure mode | v15 shape | Engineering consequence |
-|---|---|---|---|
-| Enhancer composition | Chained `.with()` could finalize physical state before all enhancers were known | All enhancers declared in the constructor configuration | Planning can see the whole configuration before materialization |
-| Capability plan | Legacy all-on plan made bare trees look causally capable | Resolved `TreeBuildPlan` from requested capabilities and enhancer dependencies | Optional machinery can be omitted truthfully |
-| Entity bulk load | Eager generalized position/node machinery inflated `setAll` | Authoritative stores first; activation/observation machinery is lazy where semantics allow | Bulk population no longer pays for every possible future observer |
-| Ordered collection projection | Permanent second ordered representation | Derive whole projections from authoritative storage when realized | More work on uncached `all()`, materially less permanent memory |
-| Retired entity lifetime | Central records accumulated after retirement | Zero-owner subjects reclaim backing and are fully forgotten | No-history churn becomes asymptotically flat |
-| Reactive identity optimization | Weak interning looked attractive from ordinary tests | Strong continuity retained where required; GC gate guards it | Correctness wins over attractive but unsafe memory savings |
-| History / rollback | Physical restoration and causal meaning were easy to conflate | Authorship, realization, publication, and persistence are separate concepts | Rollback/undo can restore truth without pretending to author a new user mutation |
-| Tree lifetime | Abandonment was implicitly treated like collection garbage collection | `destroy()` is an explicit tree ownership boundary | Tests, SSR, routes, and temporary stores need lifecycle teardown |
-| External synchronization | Ad hoc external effects risked conflating commit timing, hydration, echo suppression, and failure | Public `link(source, endpoint)` relationship with explicit `retrieve()`, strong `settled()`, and `dispose()` | SignalTree exposes the relationship, not its private settlement machinery |
-| Link value semantics | Patch/merge/comparator modes were plausible but unearned | Complete `NaturalValue` snapshots with the existing structural `deepEqual` rule | Collections cross the boundary as complete `Row[]`; internal granularity remains independent |
-| Global error observation | Internal reporter events lacked tree attribution and carried dead taxonomy | Public `onTreeError` with `{ error, operation, treeId, path? }` | Same-shaped trees are distinguishable without exposing reporter internals |
-| Benchmarking | Single-run or single-GC observations could look architectural | Interleaved arms, quiescence, A/A controls, gate self-tests, quarantine | The harness itself must survive falsification before its numbers become claims |
+| Concern                        | Earlier shape / failure mode                                                                      | v15 shape                                                                                                    | Engineering consequence                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| Enhancer composition           | Chained `.with()` could finalize physical state before all enhancers were known                   | All enhancers declared in the constructor configuration                                                      | Planning can see the whole configuration before materialization                              |
+| Capability plan                | Legacy all-on plan made bare trees look causally capable                                          | Resolved `TreeBuildPlan` from requested capabilities and enhancer dependencies                               | Optional machinery can be omitted truthfully                                                 |
+| Entity bulk load               | Eager generalized position/node machinery inflated `setAll`                                       | Authoritative stores first; activation/observation machinery is lazy where semantics allow                   | Bulk population no longer pays for every possible future observer                            |
+| Ordered collection projection  | Permanent second ordered representation                                                           | Derive whole projections from authoritative storage when realized                                            | More work on uncached `all()`, materially less permanent memory                              |
+| Retired entity lifetime        | Central records accumulated after retirement                                                      | Zero-owner subjects reclaim backing and are fully forgotten                                                  | No-history churn becomes asymptotically flat                                                 |
+| Reactive identity optimization | Weak interning looked attractive from ordinary tests                                              | Strong continuity retained where required; GC gate guards it                                                 | Correctness wins over attractive but unsafe memory savings                                   |
+| History / rollback             | Physical restoration and causal meaning were easy to conflate                                     | Authorship, realization, publication, and persistence are separate concepts                                  | Rollback/undo can restore truth without pretending to author a new user mutation             |
+| Tree lifetime                  | Abandonment was implicitly treated like collection garbage collection                             | `destroy()` is an explicit tree ownership boundary                                                           | Tests, SSR, routes, and temporary stores need lifecycle teardown                             |
+| External synchronization       | Ad hoc external effects risked conflating commit timing, hydration, echo suppression, and failure | Public `link(source, endpoint)` relationship with explicit `retrieve()`, strong `settled()`, and `dispose()` | SignalTree exposes the relationship, not its private settlement machinery                    |
+| Link value semantics           | Patch/merge/comparator modes were plausible but unearned                                          | Complete `NaturalValue` snapshots with the existing structural `deepEqual` rule                              | Collections cross the boundary as complete `Row[]`; internal granularity remains independent |
+| Global error observation       | Internal reporter events lacked tree attribution and carried dead taxonomy                        | Public `onTreeError` with `{ error, operation, treeId, path? }`                                              | Same-shaped trees are distinguishable without exposing reporter internals                    |
+| Benchmarking                   | Single-run or single-GC observations could look architectural                                     | Interleaved arms, quiescence, A/A controls, gate self-tests, quarantine                                      | The harness itself must survive falsification before its numbers become claims               |
 
 The most important closed decisions are:
 
-| Area | v15 decision | Why |
-|---|---|---|
-| Construction | Declarative enhancer configuration; `.with()` deleted | The complete enhancer set must be known before materialization for the build plan to be truthful. |
-| Capability planning | Resolve dependencies once and materialize only required machinery | Physical support should correspond to actual configured capabilities rather than a legacy all-on plan. |
-| Entity projection | Delete permanent `MaterializedEntityProjection` | It made uncached `all()` faster, but cost about 126 B/entity everywhere and did not help downstream fan-out. |
-| Activation metadata | Realize subject activation tokens on demand; delete unearned subject-position transport | Removed a major `setAll` regression and large existence/transient overhead without losing semantics. |
-| Entity reactive identity | Keep durable subject-scoped signal interning for live/restorable subjects | Weak interning passed ordinary tests but failed forced-GC correctness. |
-| Subject identity | Key reuse creates a new subject lifetime | Old handles must never follow a fresh occupant of the same key. |
-| Zero-owner retirement | Reclaim value/signal immediately and forget the whole subject lifetime | A permanent tombstone ledger was falsified; stale-handle safety survives without it. |
-| Transactions | Preserve both subject ID and scoped leaf address during rollback | Entity-field rollback had silently replaced whole rows with scalar field values. |
-| Tree lifecycle | `destroy()` is a real ownership boundary | Abandoned write-active trees remain retained; destroyed trees do not accumulate. |
-| External relationship | Ship one public `link()` API; keep settlement/notifier machinery private | Strong settlement, explicit retrieval, serialized egress, echo suppression, and disposal are proven without adding mode/status/retry APIs. |
-| Link boundary | Exchange complete values; use one structural equality rule; no comparator/patch protocol | Fresh-but-equal values suppress echo; entity collections synchronize as complete `Row[]` snapshots. |
-| Error observation | Publish `onTreeError`, `TreeErrorEvent`, and `TreeId` only after attribution repair | `TreeId` distinguishes live tree namespaces; `path` consistently names the SignalTree state location; internal report machinery stays private. |
-| Evidence consolidation | Archive experiment harnesses once production conformance subsumes them | Comparison modes that could not detect a catastrophic production break were removed; the winning invariants remain in production-facing tests. |
-| Metadata layout | Keep property metadata for now; sidecar deferred | Measured live-node delta is only about 6-7 B/entity, too small to justify conflating it with larger work. |
-| Owned history reclamation | Open Step 8 | `timeTravel` retains retired subjects and is not visible to the existing `TurnStore`-based eligibility assessor. |
+| Area                      | v15 decision                                                                             | Why                                                                                                                                            |
+| ------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Construction              | Declarative enhancer configuration; `.with()` deleted                                    | The complete enhancer set must be known before materialization for the build plan to be truthful.                                              |
+| Capability planning       | Resolve dependencies once and materialize only required machinery                        | Physical support should correspond to actual configured capabilities rather than a legacy all-on plan.                                         |
+| Entity projection         | Delete permanent `MaterializedEntityProjection`                                          | It made uncached `all()` faster, but cost about 126 B/entity everywhere and did not help downstream fan-out.                                   |
+| Activation metadata       | Realize subject activation tokens on demand; delete unearned subject-position transport  | Removed a major `setAll` regression and large existence/transient overhead without losing semantics.                                           |
+| Entity reactive identity  | Keep durable subject-scoped signal interning for live/restorable subjects                | Weak interning passed ordinary tests but failed forced-GC correctness.                                                                         |
+| Subject identity          | Key reuse creates a new subject lifetime                                                 | Old handles must never follow a fresh occupant of the same key.                                                                                |
+| Zero-owner retirement     | Reclaim value/signal immediately and forget the whole subject lifetime                   | A permanent tombstone ledger was falsified; stale-handle safety survives without it.                                                           |
+| Transactions              | Preserve both subject ID and scoped leaf address during rollback                         | Entity-field rollback had silently replaced whole rows with scalar field values.                                                               |
+| Tree lifecycle            | `destroy()` is a real ownership boundary                                                 | Abandoned write-active trees remain retained; destroyed trees do not accumulate.                                                               |
+| External relationship     | Ship one public `link()` API; keep settlement/notifier machinery private                 | Strong settlement, explicit retrieval, serialized egress, echo suppression, and disposal are proven without adding mode/status/retry APIs.     |
+| Link boundary             | Exchange complete values; use one structural equality rule; no comparator/patch protocol | Fresh-but-equal values suppress echo; entity collections synchronize as complete `Row[]` snapshots.                                            |
+| Error observation         | Publish `onTreeError`, `TreeErrorEvent`, and `TreeId` only after attribution repair      | `TreeId` distinguishes live tree namespaces; `path` consistently names the SignalTree state location; internal report machinery stays private. |
+| Evidence consolidation    | Archive experiment harnesses once production conformance subsumes them                   | Comparison modes that could not detect a catastrophic production break were removed; the winning invariants remain in production-facing tests. |
+| Metadata layout           | Keep property metadata for now; sidecar deferred                                         | Measured live-node delta is only about 6-7 B/entity, too small to justify conflating it with larger work.                                      |
+| Owned history reclamation | Open Step 8                                                                              | `timeTravel` retains retired subjects and is not visible to the existing `TurnStore`-based eligibility assessor.                               |
 
 The result is not "SignalTree is always O(1)" and not "SignalTree keeps stable signal objects forever." The defensible statement is narrower and stronger:
 
@@ -248,7 +249,6 @@ This is why the project evaluates construction separately from steady state inst
 > **Comparison:** the old path could materialize before seeing later enhancers, while v15 validates and plans from the entire enhancer set.
 > **Takeaway:** deleting `.with()` made the public API break and the truthful-planning fix the same change.
 
-
 A recurring release rule was that v15 should not ship as:
 
 ```text
@@ -332,9 +332,9 @@ The rewrite did not abandon SignalTree's core developer experience. A normal tre
 const tree = signalTree({
   user: {
     profile: {
-      name: 'Ada'
-    }
-  }
+      name: 'Ada',
+    },
+  },
 });
 
 const name = tree.$.user.profile.name();
@@ -388,7 +388,7 @@ The new return type derives additions from the enhancer tuple:
 const tree = signalTree(
   { count: 0 },
   {
-    enhancers: [timeTravel(), batching()]
+    enhancers: [timeTravel(), batching()],
   }
 );
 
@@ -425,7 +425,6 @@ The practical rule is:
 > **Freeze what consumers can do, not how the implementation happens to be decomposed today.**
 
 That rule is why the type matrix focuses on call forms, marker resolution, entity access, enhancer additions, and lifecycle methods instead of pinning internal aliases or module boundaries.
-
 
 ## 3.8 External relationships are intentionally small
 
@@ -472,7 +471,6 @@ Two dead fields were removed before publication. `source` was a mostly unproduce
 
 `path` also received a final semantic repair before export: it now means the SignalTree state location for every producer. A `stored()` node reports its `ownerPath`, not its unrelated storage key. This lets `(treeId, path)` act as truthful runtime attribution without confusing location with identity.
 
-
 ---
 
 # 4. Declarative construction and truthful capability planning
@@ -482,7 +480,6 @@ Two dead fields were removed before publication. `source` was a mostly unproduce
 > **What it shows:** the complete configure -> validate -> order -> plan -> materialize -> run pipeline.
 > **How to read it:** each stage consumes facts established by the previous stage; runtime begins only after the configuration has been frozen.
 > **Takeaway:** there is one construction path rather than a legacy path plus a planned path.
-
 
 ## 4.1 Why `.with()` had to go
 
@@ -502,11 +499,7 @@ The v15 constructor takes the complete enhancer set:
 
 ```ts
 const tree = signalTree(state, {
-  enhancers: [
-    timeTravel(),
-    transactions(),
-    batching()
-  ]
+  enhancers: [timeTravel(), transactions(), batching()],
 });
 ```
 
@@ -539,7 +532,6 @@ temporal-snapshots    -> []
 > **Comparison:** `causal-runtime` can mean machinery exists; it does not by itself prove a particular retired subject still has a legal restore path.
 > **Takeaway:** zero-owner reclaim can use the static finalized configuration, while history-owned reclaim still needs causal eligibility.
 
-
 ## 4.4 Build capability and runtime authority are intentionally distinct
 
 This distinction became one of the most important semantic corrections in v15.
@@ -560,6 +552,13 @@ subject-level eligibility
 ```
 
 Declarative construction makes the first authority fact static: enhancers cannot appear after runtime begins. This is what made zero-owner reclamation safely decidable at the retirement boundary.
+
+As of the RC1 cut, that static fact comes through one construction path only:
+state, enhancers, capabilities, and the optional singular derived factory are
+declared in `signalTree(initialState, config?)`. It does not imply a public
+builder or staged-derived lifecycle. Angular runtime interop, including
+`toWritableSignal`, is owned by `@signal-tree/angular`; it is not a kernel
+utility or a second construction surface.
 
 ## 4.5 The phase model
 
@@ -618,12 +617,12 @@ The most durable rule is not a particular array layout. It is ownership:
 
 The architecture keeps four identity categories conceptually separate:
 
-| Concept | Meaning | Reuse? | Typical owner |
-|---|---|---:|---|
-| logical key/path | where state is addressed publicly | yes | public namespace |
-| `SubjectId` | one entity/structural lifetime | no | entity structural semantics |
-| `PositionId` | semantic causal/topological identity | stable semantic identity | causal/realization layer |
-| `SlotIndex` | physical storage address | implementation-dependent | physical kernel |
+| Concept          | Meaning                              |                   Reuse? | Typical owner               |
+| ---------------- | ------------------------------------ | -----------------------: | --------------------------- |
+| logical key/path | where state is addressed publicly    |                      yes | public namespace            |
+| `SubjectId`      | one entity/structural lifetime       |                       no | entity structural semantics |
+| `PositionId`     | semantic causal/topological identity | stable semantic identity | causal/realization layer    |
+| `SlotIndex`      | physical storage address             | implementation-dependent | physical kernel             |
 
 Even if a prototype maps a `PositionId` to the same integer as a slot, v15 does not make that equivalence a contract.
 
@@ -636,7 +635,6 @@ The physical design preserves a preparation/commit seam. For entities:
 > **What it shows:** entity operations become coherent through a mutation-frame boundary over authoritative structural/value stores.
 > **Comparison:** v15 keeps the commit seam but removes the permanent duplicate ordered projection.
 > **Takeaway:** removing a representation did not require collapsing the architecture that made later rollback/reclamation work possible.
-
 
 A mutation may need to change more than one physical fact - values, active-key topology, subject state, rekey mappings, restoration placement, and reactive publication. An `EntityMutationFrame` stages coherent operations and commits them against authoritative stores.
 
@@ -678,14 +676,14 @@ This decomposition avoids the historical tendency to treat every write as one un
 
 A production application audit was used to constrain the entity workload model. After correcting a grep bug that had included tests, the authoritative production-only static counts on the v14.0.0 upgrade branch were:
 
-| API | production call sites |
-|---|---:|
-| `entityMap(...)` declarations | 7 |
-| `.all()` | 44 |
-| `.byId(` | 28 |
-| `.ids()` | 0 |
-| `.asMap()` | 0 |
-| `.where(` | 0 |
+| API                           | production call sites |
+| ----------------------------- | --------------------: |
+| `entityMap(...)` declarations |                     7 |
+| `.all()`                      |                    44 |
+| `.byId(`                      |                    28 |
+| `.ids()`                      |                     0 |
+| `.asMap()`                    |                     0 |
+| `.where(`                     |                     0 |
 
 The same profile appeared on the application's main branch, making it at least stable across that upgrade interval. These counts are **API-shape evidence**, not dynamic runtime frequency. [E01]
 
@@ -706,7 +704,7 @@ Therefore at least 23% of the apparent whole-collection reads were actually poin
 TruckTrax also contained a pattern like:
 
 ```ts
-setAll(all().map(e => e.id === incoming.id ? incoming : e));
+setAll(all().map((e) => (e.id === incoming.id ? incoming : e)));
 ```
 
 At first glance this looked like a point update implemented as whole-collection read/modify/write. Source inspection showed the developer was deliberately avoiding `updateOne`/`upsertOne` because those merge. The application needed exact replacement so properties absent from a server/rollback snapshot would actually disappear.
@@ -740,19 +738,18 @@ The project deliberately did **not** claim a global distribution of collection s
 
 A v15 development state had made `setAll` dramatically slower than the v14 baseline. Representative early measurements showed the same linear shape but much worse per-member constant cost:
 
-| N | v14-ish path | regressed v15 path |
-|---:|---:|---:|
-| 100 | ~0.147 ms | ~1.100 ms |
-| 1,000 | ~0.233 ms | ~9.964 ms |
-| 10,000 | ~2.193 ms | ~90.436 ms |
-| 50,000 | ~12.699 ms | ~528.467 ms |
+|      N | v14-ish path | regressed v15 path |
+| -----: | -----------: | -----------------: |
+|    100 |    ~0.147 ms |          ~1.100 ms |
+|  1,000 |    ~0.233 ms |          ~9.964 ms |
+| 10,000 |    ~2.193 ms |         ~90.436 ms |
+| 50,000 |   ~12.699 ms |        ~528.467 ms |
 
 ![Figure 6. 10k setAll regression and recovery](figures/fig16_setall_journey.png)
 
 > **What it shows:** the 10k bulk-load regression was real and very large; the subsequent cleanup recovered most of it.
 > **Comparison:** ~90.4 ms in the regressed development state fell to ~17.4 ms after deleting unearned/eager machinery; the v14-ish reference was ~2.19 ms.
 > **Takeaway:** v15 preferred a correct new architecture with a known remaining gap over restoring the old implementation just to recover one number.
-
 
 The graph deliberately separates the old reference, the regressed v15 development state, and the post-cleanup v15 architecture. The cleanup did not simply restore the old implementation; it recovered most of the lost performance while preserving the new representation and lifecycle boundaries.
 
@@ -810,22 +807,20 @@ A was dominated by B: if the permanent structure stays, using it for reads captu
 > **Comparison:** the speed advantage grows with collection size, but so does the absolute permanent memory bill.
 > **Takeaway:** v15 accepts the slower `all()` because the no-projection path remains inside the 100k performance guard and avoids charging every entity for one projection optimization.
 
-
 ![Figure 8. Projection A/B/C workload comparison](figures/fig17_projection_workloads.png)
 
 > **What it shows:** candidate B wins clearly on some workload fixtures but not universally.
 > **Comparison:** the projection-heavy and bulk-load fixtures favor keep+use; point-heavy, fan-out, and realtime differences overlap run spread more heavily.
 > **Takeaway:** the final decision used both workload behavior and permanent memory, not the best-looking microbenchmark.
 
-
 The B/C comparison measured:
 
-| N | keep+use `all()` | delete `all()` | delete memory recovery |
-|---:|---:|---:|---:|
-| 1,000 | 0.0319 ms | 0.0546 ms | 145 B/entity |
-| 10,000 | 0.2391 ms | 0.3211 ms | 126 B/entity |
-| 50,000 | 1.3218 ms | 1.9379 ms | 116 B/entity |
-| 100,000 | 3.1761 ms | 5.0675 ms | 128 B/entity |
+|       N | keep+use `all()` | delete `all()` | delete memory recovery |
+| ------: | ---------------: | -------------: | ---------------------: |
+|   1,000 |        0.0319 ms |      0.0546 ms |           145 B/entity |
+|  10,000 |        0.2391 ms |      0.3211 ms |           126 B/entity |
+|  50,000 |        1.3218 ms |      1.9379 ms |           116 B/entity |
+| 100,000 |        3.1761 ms |      5.0675 ms |           128 B/entity |
 
 The read win was real and outside ordinary benchmark spread. Mutation deltas were sub-microsecond/noise at the per-operation harness scale. [E03]
 
@@ -881,7 +876,6 @@ If the project had relied on the ordinary suite alone, weak interning would have
 > **Comparison:** weak interning reduced retention, but a live computed could later serve stale data because the signal target had been collected.
 > **Takeaway:** subject-scoped reactive durability is an earned semantic requirement; the weak representation was rejected.
 
-
 The decisive probe created a live `computed` consumer, stopped reading it temporarily, forced repeated GC and allocation pressure, mutated the underlying entity, then read the consumer again.
 
 With weak interning, the underlying entity signal could be collected. Angular's dependency relationship did not guarantee that the weak target itself remained strongly reachable. The subsequent write found the cleared weak entry and silently skipped publication. The consumer served stale data with no error.
@@ -915,7 +909,6 @@ A self-test proves the gate can fail. The project records honestly that a simple
 > **What it shows:** reusable key, non-reused subject lifetime, revision, scoped leaf address, and reactive view are distinct identities.
 > **Comparison:** recreating key A does not recreate the prior subject; rollback of `A.name` needs both subject and leaf scope.
 > **Takeaway:** many v15 bugs disappeared once identity questions stopped being represented as one path/string/object.
-
 
 ## 10.1 Key identity is not lifetime identity
 
@@ -958,12 +951,12 @@ This distinction enabled the final zero-owner reclamation result.
 
 With 1,000 live rows held constant and a completely new key generation inserted each round, a no-history tree showed linear retained growth:
 
-| rounds | retired subjects | growth | B/retired |
-|---:|---:|---:|---:|
-| 10 | 10,000 | 2.75 MB | 288 |
-| 50 | 50,000 | 11.88 MB | 249 |
-| 100 | 100,000 | 22.47 MB | 236 |
-| 250 | 250,000 | 52.45 MB | 220 |
+| rounds | retired subjects |   growth | B/retired |
+| -----: | ---------------: | -------: | --------: |
+|     10 |           10,000 |  2.75 MB |       288 |
+|     50 |           50,000 | 11.88 MB |       249 |
+|    100 |          100,000 | 22.47 MB |       236 |
+|    250 |          250,000 | 52.45 MB |       220 |
 
 Nothing referenced those retired subjects and no history owner existed, yet the store lifetime accumulated their value/lifetime records.
 
@@ -997,12 +990,12 @@ The new path was wired into `removeOne`, `removeMany`, `setAll`, and `clear`.
 
 The matched churn arms changed as follows:
 
-| arm | before | after zero-owner value reclamation |
-|---|---:|---:|
-| no history | 249 B/retired | 117 B/retired |
-| no history + reads | 797 B/retired | 117 B/retired |
-| time travel | 1,310 B/retired | 1,310 B/retired |
-| time travel + reads | 1,859 B/retired | 1,859 B/retired |
+| arm                 |          before | after zero-owner value reclamation |
+| ------------------- | --------------: | ---------------------------------: |
+| no history          |   249 B/retired |                      117 B/retired |
+| no history + reads  |   797 B/retired |                      117 B/retired |
+| time travel         | 1,310 B/retired |                    1,310 B/retired |
+| time travel + reads | 1,859 B/retired |                    1,859 B/retired |
 
 The time-travel controls remaining byte-identical is what makes the no-history result trustworthy; unconditional reclamation would have produced the same no-history win while corrupting undo.
 
@@ -1061,20 +1054,18 @@ The resulting invariant is:
 > **Comparison:** a zero-owner subject can be fully forgotten immediately; a history-owned subject must retain backing until no restore path remains.
 > **Takeaway:** Step 8 is not a redo of zero-owner reclamation - it solves the owned branch of the diagram.
 
-
 ![Figure 12. Retired-subject retention progression](figures/fig09_retirement_churn.png)
 
 > **What it shows:** successive falsifiers removed observation residue, retained value, and finally the permanent zero-owner lifetime ledger.
 > **Comparison:** no-history retirement moved from ~249 B/retired to ~117 B and then to a flat single-digit-noise asymptote; time-travel ownership remains intentionally expensive.
 > **Takeaway:** the result is about slope/asymptotic growth, not celebrating a literal 6 B sample.
 
-
 After whole-lifetime forgetting:
 
-| fixture | retained growth | reported B/retired |
-|---|---:|---:|
-| 50 rounds, no history | ~0.30 MB | ~6 B |
-| 150 rounds, no history | ~-0.83 MB | ~-6 B |
+| fixture                | retained growth | reported B/retired |
+| ---------------------- | --------------: | -----------------: |
+| 50 rounds, no history  |        ~0.30 MB |               ~6 B |
+| 150 rounds, no history |       ~-0.83 MB |              ~-6 B |
 
 The literal small positive/negative values are measurement noise around a flat asymptote. The important result is that tripling retirements no longer scales total retained memory.
 
@@ -1205,13 +1196,11 @@ Measured earlier in the v15 program:
 > **Comparison:** wide-collection writes retained ~19.5 MB versus ~0.45 MB for scalar writes beside that collection - about a 43x difference.
 > **Takeaway:** history limits and reclamation policy must reason about semantic ownership/write shape, not only a count of low-level entries.
 
-
 ![Figure 14. Whole-state undo scaling](figures/fig19_undo_scaling.png)
 
 > **What it shows:** whole-state restore remains proportional to state size in the measured path.
 > **Comparison:** undo grew from ~25.4 us at 1k to ~436.7 us at 50k even after recording became cheap.
 > **Takeaway:** v15 does not pretend pointer-swap rewind is its unique advantage; the stronger opportunity is effect/ownership-aware history.
-
 
 The conclusion was deliberately modest:
 
@@ -1229,7 +1218,6 @@ That finding was important even apart from its eventual implementation dispositi
 
 The causal model must define participation intentionally. The whitepaper does not assert that the earlier form asymmetry remains on the current release line; it records the audit result because it helped motivate the separation of semantic mutation, causal authorship, realization, and publication.
 
-
 ---
 
 # 15. Transaction rollback defect uncovered by lifecycle testing
@@ -1239,7 +1227,6 @@ The causal model must define participation intentionally. The whitepaper does no
 > **What it shows:** the rollback defect was an identity-scope bug, not a generic transaction-order bug.
 > **Comparison:** the captured effect had both subject and leaf information; a bad classifier discarded the leaf and wrote the scalar into the row slot.
 > **Takeaway:** semantic location for an entity field is `(subject lifetime, scoped leaf address)`.
-
 
 ## 15.1 The failure
 
@@ -1321,7 +1308,6 @@ CONSEQUENCES
 > **Comparison:** restore/rollback may change truth without creating new authorship; persistence should observe a successful committed outcome rather than participate in the write itself.
 > **Takeaway:** external systems never need to see a half-applied multi-position frame.
 
-
 Older design sketches sometimes called an intermediate stage "PROJECT." After the permanent materialized entity projection was deleted, that word should not be read as requiring an always-maintained entity snapshot cache.
 
 ## 16.2 Persistence is a consequence, not mutation authority
@@ -1384,7 +1370,6 @@ A rejected outbound endpoint `set()` produces one public `onTreeError` event wit
 
 This contract deliberately keeps `Link` at exactly three methods. Failure observation belongs to the generic process-wide channel; reporting internals remain private.
 
-
 ---
 
 # 17. Tree lifecycle and `destroy()`
@@ -1408,7 +1393,6 @@ A late v15 memory investigation measured repeated store creation in three contro
 > **What it shows:** repeated abandoned stores accumulate, repeated destroyed stores stay flat, and one store per isolated process is individually stable.
 > **Comparison:** the in-process growth was ownership accumulation, not a write-history leak inside one tree.
 > **Takeaway:** `destroy()` is an API/lifecycle contract that must be documented for tests, SSR, routes, and temporary stores.
-
 
 ```text
                     build 1  build 2  build 3  build 4  build 5  build 6
@@ -1472,27 +1456,26 @@ The correct disposition is **QUARANTINED**. That benchmark row must not be quote
 
 A current 10k public-layer run records approximately:
 
-| operation | median |
-|---|---:|
-| plain array construct | 1.60 ms |
-| entityMap declaration | 0.72 ms |
-| `setAll` | 18.16 ms |
-| `addMany` | 18.14 ms |
-| `updateOne` | 0.19 ms |
-| `updateOne` + dependent read | 0.33 ms |
-| `addOne` | 0.19 ms |
-| `removeOne` | 0.31 ms |
-| `changeId` | 0.24 ms |
-| projection `all()` | 1.28 ms |
-| projection `ids()` | 0.30 ms |
-| projection `asMap()` | 1.46 ms |
+| operation                    |   median |
+| ---------------------------- | -------: |
+| plain array construct        |  1.60 ms |
+| entityMap declaration        |  0.72 ms |
+| `setAll`                     | 18.16 ms |
+| `addMany`                    | 18.14 ms |
+| `updateOne`                  |  0.19 ms |
+| `updateOne` + dependent read |  0.33 ms |
+| `addOne`                     |  0.19 ms |
+| `removeOne`                  |  0.31 ms |
+| `changeId`                   |  0.24 ms |
+| projection `all()`           |  1.28 ms |
+| projection `ids()`           |  0.30 ms |
+| projection `asMap()`         |  1.46 ms |
 
 ![Figure 18. Current public entityMap operation envelope](figures/fig25_public_entity_operations.png)
 
 > **What it shows:** current 10k public-layer latency spans roughly two orders of magnitude between bulk population and local point operations.
 > **Comparison:** `setAll`/`addMany` are ~18 ms, whole projections are ~1.3-1.5 ms, and local update/add/remove/rekey operations are ~0.2-0.3 ms in this harness.
 > **Takeaway:** the operation class matters; one headline latency cannot describe the entity engine.
-
 
 These figures belong to this public-layer harness. They should not be mixed directly with sub-microsecond per-operation loop harnesses without labeling the different measurement context.
 
@@ -1504,19 +1487,18 @@ These figures belong to this public-layer harness. They should not be mixed dire
 > **Comparison:** public entityMap baseline is ~487 B/entity; holding all node/field views is ~3,859 B/entity, while metadata accessors change only ~6-7 B/entity.
 > **Takeaway:** the old hypothesis that property metadata represented a ~1.7 KB/entity prize was disproved.
 
-
 At 10k entities with three fields each and the quiescence protocol:
 
-| layer | retained | B/entity | interpretation |
-|---|---:|---:|---|
-| payload floor | 1.14 MB | 120 | data only |
-| physical stores | 4.34 MB | 455 | authoritative entity storage |
-| entity semantics, no metadata | 4.59 MB | 481 | includes Angular realization |
-| entity semantics | 4.59 MB | 481 | metadata flags before node realization |
-| public entityMap baseline | 4.64 MB | 487 | normal live collection baseline |
-| post-read transient residue | 10.06 MB | 1,055 | after full read, nodes dropped |
-| every row/node/field held | 36.80 MB | 3,859 | dominant held-facade cost |
-| held nodes, metadata disabled | 36.75 MB | 3,853 | control |
+| layer                         | retained | B/entity | interpretation                         |
+| ----------------------------- | -------: | -------: | -------------------------------------- |
+| payload floor                 |  1.14 MB |      120 | data only                              |
+| physical stores               |  4.34 MB |      455 | authoritative entity storage           |
+| entity semantics, no metadata |  4.59 MB |      481 | includes Angular realization           |
+| entity semantics              |  4.59 MB |      481 | metadata flags before node realization |
+| public entityMap baseline     |  4.64 MB |      487 | normal live collection baseline        |
+| post-read transient residue   | 10.06 MB |    1,055 | after full read, nodes dropped         |
+| every row/node/field held     | 36.80 MB |    3,859 | dominant held-facade cost              |
+| held nodes, metadata disabled | 36.75 MB |    3,853 | control                                |
 
 The last pair corrected another important earlier claim. Metadata accessors account for only about **6-7 B/entity**, not a previously reported ~1,710 B/entity. Most held-node cost is node/field reactive realization itself.
 
@@ -1526,13 +1508,13 @@ This is why the property-vs-sidecar representation trial is deferred: its potent
 
 Assumption-based workloads are reported with construction and steady-state time separately:
 
-| workload | N | construction | steady state | B/entity |
-|---|---:|---:|---:|---:|
-| POINT_HEAVY | 10k | 18.23 +/- 7.57 ms | 45.18 +/- 37.38 ms | 468 |
-| PROJECTION_HEAVY | 10k | 14.49 +/- 2.80 | 477.44 +/- 26.58 | 464 |
-| REACTIVE_FANOUT | 10k | 14.80 +/- 14.31 | 221.24 +/- 13.88 | 465 |
-| BULK_LOAD | 100k | 159.32 +/- 24.88 | 283.88 +/- 44.02 | 406 |
-| REALTIME | 10k | 13.73 +/- 3.45 | 850.50 +/- 252.08 | 466 |
+| workload         |    N |      construction |       steady state | B/entity |
+| ---------------- | ---: | ----------------: | -----------------: | -------: |
+| POINT_HEAVY      |  10k | 18.23 +/- 7.57 ms | 45.18 +/- 37.38 ms |      468 |
+| PROJECTION_HEAVY |  10k |    14.49 +/- 2.80 |   477.44 +/- 26.58 |      464 |
+| REACTIVE_FANOUT  |  10k |   14.80 +/- 14.31 |   221.24 +/- 13.88 |      465 |
+| BULK_LOAD        | 100k |  159.32 +/- 24.88 |   283.88 +/- 44.02 |      406 |
+| REALTIME         |  10k |    13.73 +/- 3.45 |  850.50 +/- 252.08 |      466 |
 
 The `+/-` is max-min spread across samples, not a statistical confidence interval. A delta inside the spread is treated as inconclusive.
 
@@ -1552,14 +1534,13 @@ This section deliberately uses three different comparison views because they ans
 > **Comparison:** the useful result is the different slope, not a single multiplier at one N.
 > **Takeaway:** the evidence supports "not inherently O(n) in unrelated collection width" for this point-update path, not a blanket claim that every update is O(1).
 
-
 A current interleaved comparison against `@ngrx/signals` 21.1.1 measured single-entity update plus dependent read as collection size grew:
 
 | collection size | SignalStore | SignalTree |
-|---:|---:|---:|
-| 1,000 | 13.57 us | 1.331 us |
-| 10,000 | 51.47 us | 0.469 us |
-| 50,000 | 870.45 us | 0.574 us |
+| --------------: | ----------: | ---------: |
+|           1,000 |    13.57 us |   1.331 us |
+|          10,000 |    51.47 us |   0.469 us |
+|          50,000 |   870.45 us |   0.574 us |
 
 The useful claim is not one dramatic multiplier. The multiplier changes with N. The architectural result is the scaling shape: on this path, SignalTree remains effectively flat with respect to unrelated collection size while the compared SignalStore path scales with collection size because it rebuilds the entity map. [E10]
 
@@ -1578,12 +1559,12 @@ With `n` unrelated entities and `k` genuinely affected consumers, the important 
 
 The same current comparison reported approximately:
 
-| task | SignalTree | SignalStore |
-|---|---:|---:|
-| deep field write, 10 levels | 0.011 us | 1.109 us |
-| update 1 row of 50k + dependent read | 1.075 us | 795.337 us |
-| write then whole-state read x10 | 0.744 us | 2.596 us |
-| 50 writes with undo | 1.046 us | 311.071 us |
+| task                                 | SignalTree | SignalStore |
+| ------------------------------------ | ---------: | ----------: |
+| deep field write, 10 levels          |   0.011 us |    1.109 us |
+| update 1 row of 50k + dependent read |   1.075 us |  795.337 us |
+| write then whole-state read x10      |   0.744 us |    2.596 us |
+| 50 writes with undo                  |   1.046 us |  311.071 us |
 
 ![Figure 21. Current SignalTree versus SignalStore task comparison](figures/fig21_competitor_tasks.png)
 
@@ -1591,26 +1572,24 @@ The same current comparison reported approximately:
 > **Comparison:** deep point writes and 50k entity updates are especially favorable to SignalTree; the whole-state read difference is much smaller, and the history arm is capability-shaped.
 > **Takeaway:** use this chart to understand workload shape, not to declare a universal library winner.
 
-
 These are fixture results, not universal library rankings. The undo comparison is also capability-shaped: SignalTree has built-in history semantics, while the comparison implementation must construct equivalent behavior.
 
 ## 19.3 Small-N cross-library result is deliberately unflattering
 
 At `n=200`, a cross-library benchmark measured:
 
-| implementation | collection arm | undo/redo arm | history mechanism |
-|---|---:|---:|---|
-| raw Angular signals | 0.10 ms | 5.87 ms | hand-rolled |
-| Elf | 0.26 ms | 0.14 ms | built-in |
-| NgRx Signals | 0.51 ms | 3.97 ms | hand-rolled |
-| SignalTree | 0.74 ms | 2.96 ms | built-in |
+| implementation      | collection arm | undo/redo arm | history mechanism |
+| ------------------- | -------------: | ------------: | ----------------- |
+| raw Angular signals |        0.10 ms |       5.87 ms | hand-rolled       |
+| Elf                 |        0.26 ms |       0.14 ms | built-in          |
+| NgRx Signals        |        0.51 ms |       3.97 ms | hand-rolled       |
+| SignalTree          |        0.74 ms |       2.96 ms | built-in          |
 
 ![Figure 22. Small-N cross-library comparison](figures/fig22_smalln_crosslibrary.png)
 
 > **What it shows:** at n=200, fixed overhead dominates and SignalTree does not win the collection arm.
 > **Comparison:** Elf wins both measured arms; raw Angular signals win the simple collection arm but pay much more in the hand-rolled history arm.
 > **Takeaway:** v15 deliberately preserves evidence that is unfavorable when it helps separate fixed semantic cost from large-N scaling behavior.
-
 
 Elf wins both arms at this size. SignalTree is last on the 200-entity collection arm. The repo intentionally keeps this result because the v15 claim is not "SignalTree wins every microbenchmark." The claim is that its architecture keeps local mutation cost from scaling with unrelated collection width while carrying richer semantics such as subject lifetime, transactions, history, and reclamation.
 
@@ -1646,7 +1625,6 @@ A rerun after adding correct teardown measured:
 > **Comparison:** absolute values moved slightly, but not enough to support a new architectural conclusion.
 > **Takeaway:** adding correct lifecycle teardown did not invalidate the point-update checkpoint because teardown occurs outside the timed region.
 
-
 The differences were ordinary variance and the scaling shape was unchanged. Because `destroy()` occurs outside the timed region, no re-freeze was required.
 
 The single 100-field/10k "featured" cell that still OOMs is excluded from this checkpoint and remains quarantined as described in the lifecycle section.
@@ -1657,17 +1635,16 @@ The single 100-field/10k "featured" cell that still OOMs is excluded from this c
 
 Current performance documentation records approximately:
 
-| target | production gzip | budget |
-|---|---:|---:|
-| bare SignalTree | 9.92 KB | 10.0 KB |
-| entity-enabled | 20.27 KB | 21.0 KB |
+| target          | production gzip |  budget |
+| --------------- | --------------: | ------: |
+| bare SignalTree |         9.92 KB | 10.0 KB |
+| entity-enabled  |        20.27 KB | 21.0 KB |
 
 ![Figure 24. Measured production gzip versus v15 budgets](figures/fig24_bundle_budget.png)
 
 > **What it shows:** both the bare and entity-enabled builds remain inside explicit gzip ceilings.
 > **Comparison:** the bare build sits close to its 10 KB budget; declarative planning consumed intentional budget rather than being treated as free.
 > **Takeaway:** v15 optimizes within product budgets instead of treating minimum byte count as the architecture.
-
 
 The declarative construction migration intentionally consumed roughly 0.47 KB gzip of the bare budget. This is an example of v15 treating bundle bytes as a budgeted resource rather than an absolute optimization target. The architecture would not reintroduce an ambiguous legacy constructor simply to win back that space.
 
@@ -1808,16 +1785,14 @@ These corrections are not embarrassing footnotes. They are the mechanism by whic
 Before:
 
 ```ts
-const tree = signalTree(state)
-  .with(timeTravel())
-  .with(batching());
+const tree = signalTree(state).with(timeTravel()).with(batching());
 ```
 
 After:
 
 ```ts
 const tree = signalTree(state, {
-  enhancers: [timeTravel(), batching()]
+  enhancers: [timeTravel(), batching()],
 });
 ```
 
@@ -1837,7 +1812,7 @@ After, build the configuration rather than mutating a live tree:
 
 ```ts
 const tree = signalTree(state, {
-  enhancers: isProd ? [] : [timeTravel()]
+  enhancers: isProd ? [] : [timeTravel()],
 });
 ```
 
@@ -1876,7 +1851,6 @@ The migration inventory also found that `asyncQuery` had not yet been dispositio
 The demo is no longer treated as a collection of examples that merely compile. After compatibility cleanup it must be rebuilt against the final public surface and exercise the supported architecture using package-root APIs. Required scenarios include ordinary tree state, entity collections, retained enhancer capabilities, `external()`, Link in all three directions, explicit retrieval, strong settlement, disposal, collection snapshots, public error observation, `TreeId` attribution, state-path diagnostics, and failed-send recovery.
 
 The negative gate is equally important: zero internal imports, zero deleted APIs, zero experimental Link modes, zero patch/`Partial` Link semantics, and no test helpers. This makes the demo an ergonomics and coverage layer between core invariants and a real production consumer.
-
 
 ---
 

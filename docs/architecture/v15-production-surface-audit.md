@@ -1,5 +1,10 @@
 # v15 production surface audit
 
+**Engineering status updated August 30, 2026.** This is an append-only decision
+record. Historical measurements below remain dated evidence; the current RC1
+surface is `@signal-tree/kernel` plus `@signal-tree/angular`, and supersedes old
+claims that Angular runtime adapters are exported by kernel.
+
 The RC withholds 57 symbols and ships 34. TruckTrax pass 1 proved that a real
 consumer needs several of the withheld ones — see
 [`trucktrax-rc1-findings.md`](trucktrax-rc1-findings.md). This document decides
@@ -15204,10 +15209,12 @@ Link API expresses it without core involvement.
 
 ### Repository state this phase inherits
 
-`packages/angular` **does not exist**. Only `core` and `shared` carry package
-manifests at `a78696e5`; `authoring`, `events` and `ng-forms` are directories
-without their own published manifest. So this is a layer to be _designed_, not a
-package to be tidied — which is the right position to be in before greenfield.
+**Historical starting state at `a78696e5`:** `packages/angular` did not exist;
+only `core` and `shared` carried package manifests. This evidence established
+the ownership problem, not the final package state. It is superseded by the RC1
+split: `@signal-tree/kernel` is framework-neutral, `@signal-tree/angular` owns
+Angular runtime adapters such as `defineStore` and `toWritableSignal`, and
+`@signaltree/shared` remains private and bundled.
 
 ## ⚠️ CORRECTION — the rekey evidence was wrong; the conclusion survives
 
@@ -17990,9 +17997,19 @@ permanent row, and M1 kills it. The ledger is not an unbounded authored history.
 
 # CURRENT FRONTIER — reconciled from artifacts
 
-⚠️ **This section is the reconciled current status as of this commit.** Every
+⚠️ **This section was the reconciled status at its original checkpoint.** Every
 section above it preserves the state at the time it was written, including
 statements later entries supersede. Read those as history.
+
+### August 30, 2026 RC1 ownership correction
+
+Rendered references previously labeled falsifier #3 and K.1 described
+`toWritableSignal` as kernel-owned and treated `packages/angular` as absent.
+Those claims no longer describe the repository. The surviving public function
+is exported only by `@signal-tree/angular`; kernel declarations contain no
+`toWritableSignal` reference. The kernel barrel's empty `export {} from
+'./lib/utils'` and its stale KEEP commentary were removed rather than retained
+as a false public-surface witness.
 
 > **A LONG APPEND-ONLY RECORD IS A HISTORY, NOT A STATUS.**
 
