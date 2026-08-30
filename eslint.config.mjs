@@ -19,7 +19,10 @@ export default [
       // ignored here too so a probe in flight cannot fail the lint gate. A test
       // worth keeping gets a real name and is not matched by this pattern.
       '**/zz-*.ts',
-      'scripts/ai-codegen-benchmark/results/**', // raw LLM outputs, malformed by design
+      'scripts/ai-codegen-benchmark/results/**',
+      // Generated when Vite configuration is loaded through a TypeScript shim.
+      '**/vite.config.*.timestamp*',
+      '**/vitest.config.*.timestamp*',
     ],
   },
   {

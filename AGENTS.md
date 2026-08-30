@@ -2,6 +2,30 @@
 
 Guidance for AI agents working with this repository. Two audiences: contributors changing SignalTree source, and agents consuming `@signaltree/*` packages in downstream apps.
 
+## Target-state-first migration
+
+> **Migration pressure may reveal a missing property, but it never determines
+> the replacement architecture.** A legacy application can falsify an
+> architecture. It cannot define one.
+
+For every framework integration or application migration:
+
+1. Derive the canonical greenfield v15 architecture without legacy constraints.
+2. Implement and validate that architecture independently.
+3. Freeze the target contract only from greenfield evidence.
+4. Migrate applications toward that target.
+5. Prefer deleting obsolete concepts over adapting them.
+
+Do not create temporary compatibility APIs, intermediate architectures, legacy
+bridges, or migration-only conveniences. Do not preserve old ownership because
+moving it is expensive. Migration complexity is evidence to document, not a
+reason to pollute the architecture applications should use five years from now.
+
+`@signal-tree/kernel/adapter` is the realization SDK, not a compatibility
+layer. A new export belongs there only when it is framework-neutral, expresses
+a semantic fact already owned by the kernel, is required by a correct
+realization, and is neither application convenience nor compatibility machinery.
+
 ## Do not write RFCs
 
 We make the change. `TODO.md` is where decided-but-not-done work lives; put it
