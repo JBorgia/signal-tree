@@ -75,7 +75,7 @@ let exports;
 try {
   exports = Object.keys(await import(CORE)).sort();
 } catch (err) {
-  console.error(`✗ could not load the built core barrel — run \`nx build core\` first.\n  ${err.message}`);
+  console.error(`✗ could not load the built core barrel — run \`nx build kernel\` first.\n  ${err.message}`);
   process.exit(1);
 }
 

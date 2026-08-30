@@ -191,7 +191,7 @@ class PerformanceAnalyzer {
 
     console.log('\n✅ Performance analysis completed successfully!');
     console.log('\n💡 For actual SignalTree integration tests, run:');
-    console.log('   npx nx test core --testNamePattern="performance"');
+    console.log('   npx nx test kernel --testNamePattern="performance"');
   }
 }
 

@@ -258,7 +258,7 @@ print_step "Running production builds"
 print_info "Building all packages that are published by scripts/release.sh"
 
 # Build packages in dependency order (core first, then the rest)
-if NX_DAEMON=false npx nx build core --configuration=production 2>&1 | tee /tmp/build-core.log; then
+if NX_DAEMON=false npx nx build kernel --configuration=production 2>&1 | tee /tmp/build-core.log; then
     print_success "Core built successfully"
 else
     print_error "Core build failed"

@@ -29,23 +29,46 @@ import { ANGULAR_SCALAR_LEAF_REALIZATION } from './scalar-leaf-realization';
  *
  * Which is why this package must NOT claim `sideEffects: false`.
  */
-installMaterializationRealization({
-  isReactiveNode: (node) => isSignal(node),
-  memoizeSnapshot: (_node, compute) => computed(compute),
-});
+let installed = false;
+
+/**
+ * Idempotently install the Angular realization.
+ *
+ * ⚠️ THIS MUST BE A CALLED FUNCTION, NOT A BARE `import` FOR SIDE EFFECTS.
+ *
+ * The root previously did `import './lib/install-realization';`. Rollup ELIDED
+ * that import entirely: the packed `index.js` contained no `installCellRuntime`
+ * at all, so a clean consumer installing the tarball got neutral kernel cells —
+ * `isSignal` false, no `asReadonly`, no dependency tracking. Dropping
+ * `sideEffects: false` from the manifest did not prevent it, because the
+ * bundler judged the module pure on its own.
+ *
+ * A module-scope CALL of an imported binding cannot be elided, so the guarantee
+ * survives bundling — including a consumer's own production tree-shake.
+ */
+export function ensureAngularRealization(): void {
+  if (installed) return;
+  installed = true;
+
+  installMaterializationRealization({
+    isReactiveNode: (node) => isSignal(node),
+    memoizeSnapshot: (_node, compute) => computed(compute),
+  });
 
 installTrackingSuppression(<T,>(fn: () => T): T => untracked(fn));
 
-installScalarLeafRealization(ANGULAR_SCALAR_LEAF_REALIZATION);
+  installScalarLeafRealization(ANGULAR_SCALAR_LEAF_REALIZATION);
 
-installDerivedRuntime({
-  createDerived: <T,>(compute: () => T) => computed(compute),
-});
+  installDerivedRuntime({
+    createDerived: <T,>(compute: () => T) => computed(compute),
+  });
 
-// The ordinary leaf carrier. Angular's `WritableSignal` satisfies `WritableCell`
-// STRUCTURALLY, so this hands back the native object with no wrapper — one cell
-// per leaf, in Angular's own graph (S1).
-installCellRuntime({
-  createCell: <T,>(initial: T, equal?: (a: T, b: T) => boolean) =>
-    signal(initial, equal ? { equal } : undefined),
-});
+  // The ordinary leaf carrier. Angular's `WritableSignal` satisfies `WritableCell`
+  // STRUCTURALLY, so this hands back the native object with no wrapper — one cell
+  // per leaf, in Angular's own graph (S1).
+  installCellRuntime({
+    createCell: <T,>(initial: T, equal?: (a: T, b: T) => boolean) =>
+      signal(initial, equal ? { equal } : undefined),
+  });
+
+}

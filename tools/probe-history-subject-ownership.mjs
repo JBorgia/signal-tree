@@ -50,7 +50,7 @@ requireExposeGc('tools/probe-history-subject-ownership.mjs');
 
 const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!existsSync(CORE)) {
-  console.error('❌ build first: npx nx build core');
+  console.error('❌ build first: npx nx build kernel');
   process.exit(1);
 }
 

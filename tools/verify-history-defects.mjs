@@ -20,7 +20,7 @@
  * docs/guides/time-travel-in-production.md, not a regression test.
  *
  * Runs against the BUILT package, because an `as any` attachment is invisible
- * to a type-level read. Requires `npx nx build core` first.
+ * to a type-level read. Requires `npx nx build kernel` first.
  */
 import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
@@ -28,7 +28,7 @@ import { resolve } from 'node:path';
 
 const DIST = resolve('dist/packages/kernel/dist/index.js');
 if (!existsSync(DIST)) {
-  console.error('✗ dist not found — run `npx nx build core` first.');
+  console.error('✗ dist not found — run `npx nx build kernel` first.');
   process.exit(1);
 }
 const core = await import(pathToFileURL(DIST).href);

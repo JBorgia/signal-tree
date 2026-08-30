@@ -46,7 +46,7 @@ import { measureRetained, requireExposeGc } from './lib/heap-quiescence.mjs';
 requireExposeGc('tools/bench-workload-classes.mjs');
 const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!existsSync(CORE)) {
-  console.error('❌ build first: nx build core');
+  console.error('❌ build first: nx build kernel');
   process.exit(1);
 }
 const { signalTree, entityMap } = await import(CORE);

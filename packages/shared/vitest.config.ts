@@ -15,7 +15,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@signal-tree/kernel': resolve(__dirname, '../core/src'),
+      '@signal-tree/kernel': resolve(__dirname, '../kernel/src'),
     },
   },
   define: {

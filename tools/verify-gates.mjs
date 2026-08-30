@@ -102,7 +102,7 @@ const GATES = [
   {
     name: 'test:all',
     covers: 'behaviour across all 6 published packages AND the demo app',
-    // Was `nx test core`. The gate's own name said "core" and its summary line
+    // Was `nx test kernel`. The gate's own name said "core" and its summary line
     // said "core behaviour", so it was honest about what it covered — and what
     // it covered was one package of eight. The other seven have real suites
     // (ng-forms alone has 44) and nothing in the gate suite ran them.
@@ -116,7 +116,7 @@ const GATES = [
       // `nx test demo` by hand. It is also the app the demo-coverage gate holds
       // up as proof every export is demonstrated — so it breaking silently would
       // undermine that gate too.
-      '--projects=core,shared,demo',
+      '--projects=kernel,shared,demo',
       '--skip-nx-cache',
     ],
     slow: true,
@@ -1034,7 +1034,7 @@ const GATES = [
     name: 'retention-gc',
     covers:
       "the GC-requiring retention proofs: a diagnostic journal releases the values it described once its bounded record is evicted, and a persistence() tree is released by destroy() (both three-armed: control dies -> held lives -> released dies)",
-    // Runs outside `nx test core` because it needs --expose-gc, and it FAILS
+    // Runs outside `nx test kernel` because it needs --expose-gc, and it FAILS
     // rather than skips without it: a WeakRef that is merely eligible for
     // collection proves nothing, and a skipped retention test reads as evidence.
     cmd: [

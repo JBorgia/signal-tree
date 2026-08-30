@@ -111,7 +111,7 @@ if (process.argv.includes('--self-test')) {
 
 const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!existsSync(CORE)) {
-  console.error('❌ build first: nx build core');
+  console.error('❌ build first: nx build kernel');
   process.exit(1);
 }
 const { signalTree, entityMap, restoration, undoable } = await import(CORE);
