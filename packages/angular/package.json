@@ -24,7 +24,7 @@
     "NOTICE"
   ],
   "dependencies": {
-    "@signal-tree/kernel": "15.0.0-rc.1"
+    "@signal-tree/kernel": "workspace:*"
   },
   "peerDependencies": {
     "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",

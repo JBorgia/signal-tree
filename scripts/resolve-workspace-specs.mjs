@@ -23,7 +23,7 @@ import { join } from 'node:path';
 const DEP_FIELDS = ['dependencies', 'peerDependencies', 'optionalDependencies'];
 
 /** Pure core, so the self-test can drive it without touching disk. */
-export function resolveSpecs(manifest, range) {
+export function resolveSpecs(manifest, version) {
   let changed = 0;
   for (const field of DEP_FIELDS) {
     const deps = manifest[field];
@@ -35,7 +35,7 @@ export function resolveSpecs(manifest, range) {
         spec === '*' ||
         (typeof spec === 'string' && spec.startsWith('workspace:'))
       ) {
-        deps[name] = range;
+        deps[name] = field === 'peerDependencies' ? `^${version}` : version;
         changed++;
       }
     }
@@ -67,12 +67,14 @@ function selfTest() {
       m: { peerDependencies: { '@signal-tree/kernel': 'workspace:*' } },
       expectChanged: 1,
       expectLeft: 0,
+      expectSpec: '^1.2.3',
     },
     {
       name: 'rewrites a bare *',
       m: { dependencies: { '@signal-tree/shared': '*' } },
       expectChanged: 1,
       expectLeft: 0,
+      expectSpec: '1.2.3',
     },
     {
       name: 'leaves third-party specs alone',
@@ -96,11 +98,15 @@ function selfTest() {
 
   let ok = true;
   for (const c of cases) {
-    const changed = c.skipRewrite ? 0 : resolveSpecs(c.m, '^1.2.3');
+    const changed = c.skipRewrite ? 0 : resolveSpecs(c.m, '1.2.3');
     const left = findUnresolved(c.m).length;
+    const resolvedSpec = Object.values(
+      c.m.dependencies ?? c.m.peerDependencies ?? {}
+    )[0];
     const pass =
       (c.expectChanged === undefined || changed === c.expectChanged) &&
-      left === c.expectLeft;
+      left === c.expectLeft &&
+      (c.expectSpec === undefined || resolvedSpec === c.expectSpec);
     if (!pass) ok = false;
     console.log(`${pass ? '✅' : '❌'} self-test: ${c.name}`);
   }
@@ -117,7 +123,6 @@ if (!version || packages.length === 0) {
   process.exit(1);
 }
 
-const range = `^${version}`;
 let totalChanged = 0;
 const failures = [];
 
@@ -129,7 +134,7 @@ for (const pkg of packages) {
     continue;
   }
   const manifest = JSON.parse(readFileSync(path, 'utf8'));
-  const changed = resolveSpecs(manifest, range);
+  const changed = resolveSpecs(manifest, version);
   if (changed) {
     writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
     totalChanged += changed;
@@ -137,7 +142,7 @@ for (const pkg of packages) {
   const left = findUnresolved(manifest);
   if (left.length) failures.push(`${pkg}: ${left.join(', ')}`);
   console.log(
-    `  ${pkg.padEnd(12)} ${changed} spec(s) -> ${range}${
+    `  ${pkg.padEnd(12)} ${changed} internal spec(s) resolved for ${version}${
       left.length ? '  ❌ UNRESOLVED' : ''
     }`
   );
@@ -154,5 +159,5 @@ if (failures.length) {
 }
 
 console.log(
-  `\n✅ ${packages.length} manifest(s) checked, ${totalChanged} spec(s) resolved to ${range}, 0 unresolved.`
+  `\n✅ ${packages.length} manifest(s) checked, ${totalChanged} internal spec(s) resolved for ${version}, 0 unresolved.`
 );

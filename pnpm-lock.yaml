@@ -316,7 +316,7 @@ importers:
         specifier: ^20.0.0 || ^21.0.0 || ^22.0.0
         version: 22.0.7(@angular/compiler@22.0.7)(rxjs@7.8.2)(zone.js@0.16.2)
       '@signal-tree/kernel':
-        specifier: 15.0.0-rc.1
+        specifier: workspace:*
         version: link:../kernel
       tslib:
         specifier: ^2.0.0

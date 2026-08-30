@@ -1,6 +1,5 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import ts from 'typescript';
 
 import { createLibraryRollupConfig } from '../../tools/build/create-rollup-config.mjs';
 
@@ -47,26 +46,28 @@ export default (config, options) => {
         return null;
       }
 
-      const source = ts.createSourceFile(
-        id,
-        code,
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS
-      );
+      const source = this.parse(code);
       const removals = [];
 
       const visit = (node) => {
         if (
-          ts.isExpressionStatement(node) &&
-          ts.isCallExpression(node.expression) &&
-          ts.isIdentifier(node.expression.expression) &&
-          node.expression.expression.text === 'recordProductionSubstrateStat'
+          node.type === 'ExpressionStatement' &&
+          node.expression?.type === 'CallExpression' &&
+          node.expression.callee?.type === 'Identifier' &&
+          node.expression.callee.name === 'recordProductionSubstrateStat'
         ) {
-          removals.push([node.getFullStart(), node.getEnd()]);
+          removals.push([node.start, node.end]);
           return;
         }
-        ts.forEachChild(node, visit);
+        for (const value of Object.values(node)) {
+          if (Array.isArray(value)) {
+            for (const child of value) {
+              if (child?.type) visit(child);
+            }
+          } else if (value?.type) {
+            visit(value);
+          }
+        }
       };
       visit(source);
 
@@ -91,9 +92,9 @@ export default (config, options) => {
   return {
     ...baseConfig,
     plugins: [
-      stripProductionStatsCallsPlugin,
       productionStatsStubPlugin,
       ...existingPlugins,
+      stripProductionStatsCallsPlugin,
     ],
   };
 };
