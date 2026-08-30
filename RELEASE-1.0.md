@@ -19,6 +19,26 @@ were removed, reviewer-found internal spec imports were repaired, and
 
 `GATE A` is **SATISFIED**. The kernel is FROZEN as of `4f7a2169`.
 
+`OWNER-INVALIDATION-0` is **CLOSED GREEN** at `cb2a276f`, under an explicitly
+authorized frozen-kernel exception. `@signal-tree/kernel/adapter` exposes one
+framework-neutral `observeOwnerInvalidation(owner, callback)` fact: the
+callback carries no value, path, metadata, selector, framework concept, or
+event cardinality. Multiple coherent public changes may coalesce into one later
+request to reread canonical truth. Demand activation, membership omission and
+equal-value reactivation, scalar/nested/entity/selection/derived/inspection/
+restoration/batching truth, deferred transaction settlement, owner isolation,
+independent idempotent cleanup, dormancy, and terminal destruction are pinned
+by 21 direct law controls. The React 19 greenfield reference passes 14 behavior
+controls using only the adapter primitive. Kernel 2,034 passed with three
+expected failures; Angular 24 passed; typecheck, lint, preserve-modules builds,
+API/spec baselines, bounded no-subscriber production-substrate comparison, and
+the release ladder are green at 66/66 with zero known-red.
+
+`CONSTRUCTION-BOUND-REALIZATION-0` is the next open architecture row. React,
+React Native, and TruckTrax v2/v3 migration implementation remain blocked until
+realization ownership is construction-bound rather than mutable process-global
+state.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
