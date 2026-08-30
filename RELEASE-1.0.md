@@ -39,6 +39,29 @@ Angular 22 consumer typecheck; 16/16 production route smoke tests; API and spec
 baseline checks; independent release review; and `npm run gates -- --release`
 66/66 with zero known-red.
 
+`RC-CANDIDATE-PREP-0` is **CLOSED GREEN** at candidate commit `4020b7dd`.
+Current v15 guidance teaches only singular `config.derived`; historical material
+remains historical; and the v14-to-v15 migration names the removed duplicate
+construction forms. `15.0.0-rc.1` is normalized across the workspace and package
+version authorities. A clean no-cache build produced the kernel and Angular
+tarballs; direct inspection proved their exports, declarations, notices, package
+hygiene, versions, and exact Angular-to-kernel candidate dependency. A fresh
+Angular 22 consumer installed those exact tarballs, typechecked, bundled, and ran
+the singular-derived/entity/readonly scenario. Publish artifacts, exports, built
+manifests, production instrumentation stripping, and release claims pass;
+`npm run gates -- --release` is 66/66 with zero known-red. Final independent
+review found no blocker.
+
+The package/build arrangement is accepted for greenfield v15: public `kernel`
+then `angular`, private bundled `shared`, preserve-modules ESM Rollup, workspace
+dependency ownership in source, exact runtime dependency resolution in built
+manifests, and one self-validating ordered release set used by every publish
+path. Empty legacy package directories are local cleanup only and do not enter
+the project graph, manifests, build, or tarballs.
+
+This checkpoint does **not** authorize tagging, publishing, or creating a GitHub
+release. RC authorization remains a human decision.
+
 Post-`84d39ae8` type/surface closure is checkpointed at `1c021fb6`.
 `READONLY-FOREIGN-REACTIVE-0` is **RF-A / CLOSED GREEN**: readonly projection
 uses the existing callable grammar to distinguish zero-argument foreign readers
