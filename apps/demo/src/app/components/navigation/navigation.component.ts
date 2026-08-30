@@ -122,13 +122,6 @@ export class NavigationComponent {
       category: 'examples',
     },
     {
-      id: 'persistence',
-      title: 'Persistence',
-      description: 'Persist state deliberately to local storage',
-      route: '/persistence',
-      category: 'examples',
-    },
-    {
       id: 'serialization',
       title: 'Serialization',
       description: 'Export/import state with explicit serialization',

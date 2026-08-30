@@ -22,7 +22,7 @@ import { PathNotifier } from './path-notifier';
 const notifier = new PathNotifier();
 
 describe('entity signals under the Angular realization', () => {
-  interface User { id: number; name: string; active: boolean }
+  type User = { id: number; name: string; active: boolean };
   const makeApi = () =>
     createEntitySignal<User, number>(
       { selectId: (u: User) => u.id },

@@ -2,9 +2,6 @@ import { AsyncDemoComponent } from '../../features/fundamentals/examples/async/a
 import { BatchingDemoComponent } from '../../features/fundamentals/examples/enhancers/batching-demo/batching-demo.component';
 import { DevtoolsDemoComponent } from '../../features/fundamentals/examples/enhancers/devtools-demo/devtools-demo.component';
 import {
-    PersistenceDemoComponent,
-} from '../../features/fundamentals/examples/enhancers/persistence-demo/persistence-demo.component';
-import {
     SerializationDemoComponent,
 } from '../../features/fundamentals/examples/enhancers/serialization-demo/serialization-demo.component';
 import { EntitiesDemoComponent } from '../../features/fundamentals/examples/entities/entities-demo.component';
@@ -148,30 +145,6 @@ export const devtoolsExampleMeta: ExampleMeta = {
  */
 
 /**
- * Persistence Examples
- */
-export const persistenceExampleMeta: ExampleMeta = {
-  id: 'persistence',
-  title: 'Persistence & Auto-Save',
-  description:
-    'Automatically save and restore state from localStorage with debounced auto-save.',
-  category: 'Data Management',
-  focusAreas: ['persistence', 'localStorage', 'auto-save'],
-  functionalUse: ['state-persistence', 'data-storage', 'offline'],
-  enhancers: ['persistence', 'serialization'],
-  route: '/persistence',
-  component: PersistenceDemoComponent,
-  difficulty: 'intermediate',
-  tags: [
-    'persistence',
-    'localStorage',
-    'auto-save',
-    'serialization',
-    'offline',
-  ],
-};
-
-/**
  * Serialization Examples
  */
 export const serializationExampleMeta: ExampleMeta = {
@@ -306,7 +279,6 @@ export const EXAMPLES_REGISTRY: ExampleMeta[] = [
   linkedDerivedExampleMeta,
   batchingExampleMeta,
   devtoolsExampleMeta,
-  persistenceExampleMeta,
   serializationExampleMeta,
   restorationExampleMeta,
   formsExampleMeta,

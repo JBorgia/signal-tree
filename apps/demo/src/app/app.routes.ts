@@ -180,13 +180,6 @@ export const appRoutes: Route[] = [
       ).then((c) => c.LinkedDerivedDemoComponent),
   },
   {
-    path: 'persistence',
-    loadComponent: () =>
-      import(
-        './examples/features/fundamentals/examples/enhancers/persistence-demo/persistence-demo.component'
-      ).then((c) => c.PersistenceDemoComponent),
-  },
-  {
     path: 'serialization',
     loadComponent: () =>
       import(
@@ -223,7 +216,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Recommended architecture',
       description:
-        'The recommended SignalTree pattern: one runtime tree, typed feature slices, root-level enhancers (DevTools, time travel, persistence).',
+        'The recommended SignalTree pattern: one runtime tree, typed feature slices, and root-level enhancers.',
     },
   },
   {

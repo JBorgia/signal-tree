@@ -353,13 +353,13 @@ if (process.argv.includes('--self-test')) {
   // list and is not public — its disposition in
   // tools/check-rc-public-dispositions.mjs reads "NOT EARNED / unplaced as RC
   // public API" — so the fixture asserted the opposite of a recorded decision
-  // and this self-test had been failing on it. `persistence` is the enhancer
-  // that IS exported from that module, and it replaces it.
+  // and this self-test had been failing on it. Keep this list on current root
+  // exports from both public packages so package discovery is exercised too.
   const MUST_BE_LIVE = [
-    ['core', 'signalTree'],
-    ['core', 'entityMap'],
-    ['core', 'restoration'],
-    ['core', 'persistence'],
+    ['kernel', 'signalTree'],
+    ['kernel', 'entityMap'],
+    ['kernel', 'restoration'],
+    ['angular', 'signalTree'],
   ];
   for (const [pkg, name] of MUST_BE_LIVE) {
     const isPublic = publicByPackage.get(pkg)?.has(name);
@@ -376,7 +376,7 @@ if (process.argv.includes('--self-test')) {
 
   // 2. A genuinely unreachable export must be caught. `zz-` files are gitignored
   //    and eslint-ignored by design, so this leaves nothing behind.
-  const probe = join(ROOT, 'packages', 'core', 'src', 'lib', 'zz-dead-export-probe.ts');
+  const probe = join(ROOT, 'packages', 'kernel', 'src', 'lib', 'zz-dead-export-probe.ts');
   try {
     writeFileSync(probe, 'export const zzProbeSymbolNoOneImports = 1;\n');
     const out = execFileSync(process.execPath, [fileURLToPath(import.meta.url), '--json'], {

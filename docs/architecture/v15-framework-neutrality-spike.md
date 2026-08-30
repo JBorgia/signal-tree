@@ -8,7 +8,7 @@ No production code changed. Spike scripts live in the session scratchpad.
 ## Headline
 
 The ownership cut the frozen direction asks for **already exists in production
-for scalars**, and it is load-bearing — not a prototype. What is *not* neutral is
+for scalars**, and it is load-bearing — not a prototype. What is _not_ neutral is
 the **type closure**, and that is caused by one import edge plus one public type
 declaration, not by architecture.
 
@@ -21,19 +21,19 @@ Measured: the neutral kernel executes all its semantics with
 (6 Angular files, **0 non-spec importers** — research prototypes, not production)
 and `test-setup.ts`.
 
-| symbol | sites | role | disposition |
-|---|---|---|---|
-| `Signal` | 80 | TYPE-ONLY LEAK | neutral `ReadSignal<T>` in kernel |
-| `WritableSignal` | 52 | TYPE-ONLY LEAK | the public taint — see B |
-| `computed` | 31 | DERIVED (memo+invalidation) | adapter-supplied `memo` |
-| `isSignal` | 21 | ADAPTER-ONLY predicate | adapter |
-| `signal` | 19 | **OBSERVATION/PUBLICATION** | adapter (tokens, not storage) |
-| `Type` | 12 | DI | `@signaltree/angular` |
-| `effect` | 8 | LIFECYCLE | adapter |
-| `inject` | 8 | DI | `@signaltree/angular` |
-| `untracked` | 6 | ACCIDENTAL | unnecessary once reads don't track |
-| `linkedSignal` | 2 | PUBLICATION | adapter |
-| `Injector` / `runInInjectionContext` | 3 | DI | `@signaltree/angular` |
+| symbol                               | sites | role                        | disposition                        |
+| ------------------------------------ | ----- | --------------------------- | ---------------------------------- |
+| `Signal`                             | 80    | TYPE-ONLY LEAK              | neutral `ReadSignal<T>` in kernel  |
+| `WritableSignal`                     | 52    | TYPE-ONLY LEAK              | the public taint — see B           |
+| `computed`                           | 31    | DERIVED (memo+invalidation) | adapter-supplied `memo`            |
+| `isSignal`                           | 21    | ADAPTER-ONLY predicate      | adapter                            |
+| `signal`                             | 19    | **OBSERVATION/PUBLICATION** | adapter (tokens, not storage)      |
+| `Type`                               | 12    | DI                          | `@signaltree/angular`              |
+| `effect`                             | 8     | LIFECYCLE                   | adapter                            |
+| `inject`                             | 8     | DI                          | `@signaltree/angular`              |
+| `untracked`                          | 6     | ACCIDENTAL                  | unnecessary once reads don't track |
+| `linkedSignal`                       | 2     | PUBLICATION                 | adapter                            |
+| `Injector` / `runInInjectionContext` | 3     | DI                          | `@signaltree/angular`              |
 
 **144 of 245 sites (59%) are type-level.** Runtime is 98 sites.
 
@@ -47,10 +47,10 @@ Angular is confined to **17 production files**.
 
 Measured on `tree-scalar-slot-runtime.ts` (the kernel):
 
-| closure | files | Angular-tainted |
-|---|---|---|
-| **runtime** (type-only imports stripped) | 2 | **0** |
-| **full type** | 27 | 6 |
+| closure                                  | files | Angular-tainted |
+| ---------------------------------------- | ----- | --------------- |
+| **runtime** (type-only imports stripped) | 2     | **0**           |
+| **full type**                            | 27    | 6               |
 
 The entire type taint enters through **one edge**:
 
@@ -80,7 +80,7 @@ NaturalValue<S>  — pattern-matches S extends WritableSignal<infer T>
 reverted (read `types.ts:78-89` before touching it):
 
 - a `declare module '@angular/core'` augmentation adding callable overloads — removed
-  because it is *global*: it broke `@ngrx/signals`' `WritableStateSource<T>` invariance,
+  because it is _global_: it broke `@ngrx/signals`' `WritableStateSource<T>` invariance,
   ~30 TS2345 errors in mixed codebases.
 - `@signaltree/callable-syntax` — DELETED in 14.0.0, same conflict, and its build
   transform could never run inside an Angular app.
@@ -94,7 +94,7 @@ is a READ; it returns the value and discards the argument."** Measured there:
 But `tree.$.user({name:'Bob'})` **works** — "because a branch is our own accessor and
 we own its call semantics."
 
-So the reason callable-leaf/callable-root syntax died twice is *precisely* that leaves
+So the reason callable-leaf/callable-root syntax died twice is _precisely_ that leaves
 are Angular's objects rather than SignalTree's. **Neutrality is the enabling condition
 for `GREENFIELD-ROOT-ACCESSOR-SHAPE-0`**, not an orthogonal cleanup. Once the kernel
 owns the leaf, `leaf(v)` can be a setter for the same reason `node({...})` already is.
@@ -132,7 +132,7 @@ and `resolveScalarLeaf(): WritableSignal<unknown>`.
 
 **ANGULAR REQUIRED FOR SEMANTICS:** nothing in the kernel. One case above the handoff:
 user-authored `computed(() => $.count() * 2)`. That dependency graph is Angular's by
-construction; `merge-derived.ts` only *hosts* the signal (`isSignal` detection) and
+construction; `merge-derived.ts` only _hosts_ the signal (`isSignal` detection) and
 never owns the graph.
 
 **ANGULAR REQUIRED ONLY FOR OBSERVATION/PUBLICATION:** `signal` (tokens), `linkedSignal`,
@@ -153,7 +153,7 @@ a kernel read doesn't), `isSignal`, all DI, all 132 `Signal`/`WritableSignal` ty
 Semantic requirement, measured (`link.ts:256, 436, 570-585`): read current value,
 observe committed changes (`acquireObservation`), apply external realization. Exactly
 the predicted minimum. `LinkEndpoint` (get/set/subscribe) is **already neutral**.
-`WritableSignal` in `NaturalValue<S>` is a *type pattern-match* to compute the natural
+`WritableSignal` in `NaturalValue<S>` is a _type pattern-match_ to compute the natural
 value type — it does not require Angular semantics. `observation-substrate.ts` uses
 `WritableSignal` as a structural `{(), set, update}` shape, `import type` only.
 
@@ -185,28 +185,28 @@ restoration were audited statically, not driven through a second adapter.
 
 ## §11 COST
 
-| | raw | gzip |
-|---|---|---|
-| neutral kernel | 2,113 B | **925 B** |
-| + Angular adapter | 3,900 B | 1,543 B |
-| publication layer | | **+618 B** |
+|                   | raw     | gzip       |
+| ----------------- | ------- | ---------- |
+| neutral kernel    | 2,113 B | **925 B**  |
+| + Angular adapter | 3,900 B | 1,543 B    |
+| publication layer |         | **+618 B** |
 
 Current shipped core: prod 9.66/9.7KB, entities 20.07/21KB — green. Neutrality here
-*removes* bytes from a framework-agnostic kernel rather than adding indirection: the
+_removes_ bytes from a framework-agnostic kernel rather than adding indirection: the
 adapter is 40% of the scalar substrate and is the part that becomes swappable.
 
 ## D. MIGRATION PLAN — ordered, smallest-first
 
-| # | step | sites | risk | unblocks |
-|---|---|---|---|---|
-| 1 | extract neutral types (`PositionId`, `SlotIndex`, commit results) out of `types.ts` into a neutral module; re-export for compatibility | 1 file split | **very low** — type-only, 22 importers unaffected | kernel **type** closure = 0 |
-| 2 | add a type-closure gate to `verify-gates.mjs` asserting the kernel closure never re-imports Angular | new gate | none | prevents regression |
-| 3 | delete `lib/internals/atomic-state/**` (0 production importers) | 7 files | low | −6 Angular files from census |
-| 4 | move `define-store.ts` + `toWritableSignal` to `@signaltree/angular` | ~19 | low — additive package | all DI out of kernel |
-| 5 | move `tree-scalar-slot-angular-runtime.ts` to `@signaltree/angular` | 12 | medium — `signal-tree.ts` imports it | scalar cut complete |
-| 6 | introduce kernel `memo(dep, fn)`; adapter supplies `computed` | 31 | medium | derived cut |
-| 7 | replace `untracked` with kernel reads | 6 | low | — |
-| 8 | **the leaf type decision** — what is `tree.$.count`? | 132 type sites + every consumer | **HIGH** | callable root |
+| #   | step                                                                                                                                   | sites                           | risk                                              | unblocks                     |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------------------- | ---------------------------- |
+| 1   | extract neutral types (`PositionId`, `SlotIndex`, commit results) out of `types.ts` into a neutral module; re-export for compatibility | 1 file split                    | **very low** — type-only, 22 importers unaffected | kernel **type** closure = 0  |
+| 2   | add a type-closure gate to `verify-gates.mjs` asserting the kernel closure never re-imports Angular                                    | new gate                        | none                                              | prevents regression          |
+| 3   | delete `lib/internals/atomic-state/**` (0 production importers)                                                                        | 7 files                         | low                                               | −6 Angular files from census |
+| 4   | move `define-store.ts` + `toWritableSignal` to `@signaltree/angular`                                                                   | ~19                             | low — additive package                            | all DI out of kernel         |
+| 5   | move `tree-scalar-slot-angular-runtime.ts` to `@signaltree/angular`                                                                    | 12                              | medium — `signal-tree.ts` imports it              | scalar cut complete          |
+| 6   | introduce kernel `memo(dep, fn)`; adapter supplies `computed`                                                                          | 31                              | medium                                            | derived cut                  |
+| 7   | replace `untracked` with kernel reads                                                                                                  | 6                               | low                                               | —                            |
+| 8   | **the leaf type decision** — what is `tree.$.count`?                                                                                   | 132 type sites + every consumer | **HIGH**                                          | callable root                |
 
 Steps 1–4 are mechanical and independently landable. Step 8 is the real decision and
 is where `GREENFIELD-ROOT-ACCESSOR-SHAPE-0` must be answered first.
@@ -230,7 +230,7 @@ The `packages/` shells for §13's shape do **not** exist yet: `authoring/` is an
 
 Exactly one, and it is a **decision**, not an impossibility.
 
-**ECOSYSTEM INTEROP INVARIANT.** Today a leaf *is* a real Angular `WritableSignal`, so it
+**ECOSYSTEM INTEROP INVARIANT.** Today a leaf _is_ a real Angular `WritableSignal`, so it
 can be handed to any Angular API and to `@ngrx/signals`. If the kernel owns the leaf, that
 guarantee is no longer free — and the two prior reverts show what breaks.
 
@@ -270,7 +270,7 @@ once called `entityMap` unreachable.
 
 The spike said "extract neutral foundational types out of the hub." Measurement showed
 that was unnecessary: the types were **already defined in neutral modules** and the
-kernel was importing them from a *re-exporting hub* instead.
+kernel was importing them from a _re-exporting hub_ instead.
 
 ```
 lib/mutation-types.ts    zero imports, defines `export type PositionId = number`
@@ -279,11 +279,11 @@ internals/node-shape.ts  zero Angular, defines `isTraversableNode`
 
 Three one-line redirects, no new module, no compatibility shim, no runtime change:
 
-| file | was | now |
-|---|---|---|
-| `internals/tree-scalar-slot-runtime.ts` | `import type { PositionId } from '../types'` | `from '../mutation-types'` |
-| `internals/position-registry.ts` | `import type { PositionId } from '../types'` | `from '../mutation-types'` |
-| `internals/physical-commit-clock.ts` | `import { isTraversableNode } from '../utils'` | `from './node-shape'` |
+| file                                    | was                                            | now                        |
+| --------------------------------------- | ---------------------------------------------- | -------------------------- |
+| `internals/tree-scalar-slot-runtime.ts` | `import type { PositionId } from '../types'`   | `from '../mutation-types'` |
+| `internals/position-registry.ts`        | `import type { PositionId } from '../types'`   | `from '../mutation-types'` |
+| `internals/physical-commit-clock.ts`    | `import { isTraversableNode } from '../utils'` | `from './node-shape'`      |
 
 ⚠️ The spike's "the taint enters through ONE edge" claim was also wrong — it was **two**.
 The `PositionId` fix alone left the closure at 27 files / 6 tainted, because
@@ -302,28 +302,28 @@ roots over **all** relative edges, type-only included, and fails on any `@angula
 - live mutation (redirect one edge back to the hub): **exit 1**, restored: exit 0
 - registered as `kernel-neutrality` + `kernel-neutrality:self`; **register is 54/54**
 
-Runtime probes cannot see this class of defect — the runtime closure was *already* clean
+Runtime probes cannot see this class of defect — the runtime closure was _already_ clean
 while the type closure was not.
 
 ## A3 — ATOMIC-STATE-RETIREMENT: carrier disposition
 
 Audited all 15 files / 56 test claims before deleting anything.
 
-| subject | disposition | surviving carrier |
-|---|---|---|
-| PositionId ↔ SlotIndex binding | MIGRATED | `tree-scalar-slot-runtime.spec.ts` |
-| single-slot commit result shape | MIGRATED | same, `SingleSlotCommitResult` assertion |
-| equality-throw leaves truth intact | MIGRATED | same |
-| one publication per changed slot | MIGRATED | `tree-physical-substrate.spec.ts` |
-| slot-backed substrate is the default path | MIGRATED | same |
-| stale frame refusal (realization) | MIGRATED | `tree-realization-adapter.spec.ts` |
-| rekey / SubjectId continuity | MIGRATED | `lib/physical/structural-store` suites |
-| subject reclamation, tombstones, no identity reuse | MIGRATED | `reclamation-eligibility.spec.ts`, `subject-reclamation-coordinator.spec.ts`, `never-claimed-retirement.spec.ts` (shipped 87a790eb) |
-| nested path lenses / root snapshot swap | VACUOUS | design not adopted — shipped kernel is flat slots |
-| native-vs-atomic benchmark timings | VACUOUS | historical measurement, no invariant |
-| **"leaves are still native Angular signals with `.set()`/`.update()`"** | **CONTRADICTED** | deliberately retired — see the leaf-ownership freeze below. Recorded rather than silently dropped: this prototype asserted precisely what the greenfield now rejects. |
-| **`discard` is inert / a discarded frame cannot publish later** | **ORPHANED → CARRIED** | recovered, see below |
-| **multi-slot frame `changedSlots` atomicity** | **ORPHANED → CARRIED** | recovered, see below |
+| subject                                                                 | disposition            | surviving carrier                                                                                                                                                     |
+| ----------------------------------------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PositionId ↔ SlotIndex binding                                          | MIGRATED               | `tree-scalar-slot-runtime.spec.ts`                                                                                                                                    |
+| single-slot commit result shape                                         | MIGRATED               | same, `SingleSlotCommitResult` assertion                                                                                                                              |
+| equality-throw leaves truth intact                                      | MIGRATED               | same                                                                                                                                                                  |
+| one publication per changed slot                                        | MIGRATED               | `tree-physical-substrate.spec.ts`                                                                                                                                     |
+| slot-backed substrate is the default path                               | MIGRATED               | same                                                                                                                                                                  |
+| stale frame refusal (realization)                                       | MIGRATED               | `tree-realization-adapter.spec.ts`                                                                                                                                    |
+| rekey / SubjectId continuity                                            | MIGRATED               | `lib/physical/structural-store` suites                                                                                                                                |
+| subject reclamation, tombstones, no identity reuse                      | MIGRATED               | `reclamation-eligibility.spec.ts`, `subject-reclamation-coordinator.spec.ts`, `never-claimed-retirement.spec.ts` (shipped 87a790eb)                                   |
+| nested path lenses / root snapshot swap                                 | VACUOUS                | design not adopted — shipped kernel is flat slots                                                                                                                     |
+| native-vs-atomic benchmark timings                                      | VACUOUS                | historical measurement, no invariant                                                                                                                                  |
+| **"leaves are still native Angular signals with `.set()`/`.update()`"** | **CONTRADICTED**       | deliberately retired — see the leaf-ownership freeze below. Recorded rather than silently dropped: this prototype asserted precisely what the greenfield now rejects. |
+| **`discard` is inert / a discarded frame cannot publish later**         | **ORPHANED → CARRIED** | recovered, see below                                                                                                                                                  |
+| **multi-slot frame `changedSlots` atomicity**                           | **ORPHANED → CARRIED** | recovered, see below                                                                                                                                                  |
 
 Two subjects survived into the shipped kernel with **no permanent carrier anywhere**.
 Deleting on import count alone would have dropped them silently. Recovered as 5 specs in
@@ -395,14 +395,14 @@ inconvenient, unless the existing contract independently forbids functions as st
 
 Function-valued state is a surviving, admitted, **defect-driven** requirement.
 
-| dimension | finding |
-|---|---|
-| public typing | `TreeNode<T>` has an explicit arm grouping `((...args) => unknown)` with `Date \| RegExp \| Map \| Set \| Error` as "Built-in objects → treat as atomic values" (`types.ts:204`). Load-bearing: without it a function matches `extends object` and becomes a traversed branch. |
-| runtime | probed 5/5 — leaf; read returns the same function identity; `.set()` replaces; `.update()` receives it as current value; survives `tree()` snapshot egress with identity intact |
-| permanent tests | `change-reporting.spec.ts:242-292`, four of them, each encoding a fixed defect |
-| docs | none teach it |
-| real consumers | none in `apps/` (matches were marker config callbacks, not state) |
-| serialization | no function-as-data handling — a function in state is not JSON-representable |
+| dimension       | finding                                                                                                                                                                                                                                                                        |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| public typing   | `TreeNode<T>` has an explicit arm grouping `((...args) => unknown)` with `Date \| RegExp \| Map \| Set \| Error` as "Built-in objects → treat as atomic values" (`types.ts:204`). Load-bearing: without it a function matches `extends object` and becomes a traversed branch. |
+| runtime         | probed 5/5 — leaf; read returns the same function identity; `.set()` replaces; `.update()` receives it as current value; survives `tree()` snapshot egress with identity intact                                                                                                |
+| permanent tests | `change-reporting.spec.ts:242-292`, four of them, each encoding a fixed defect                                                                                                                                                                                                 |
+| docs            | none teach it                                                                                                                                                                                                                                                                  |
+| real consumers  | none in `apps/` (matches were marker config callbacks, not state)                                                                                                                                                                                                              |
+| serialization   | no function-as-data handling — a function in state is not JSON-representable                                                                                                                                                                                                   |
 
 The tests are the decisive evidence, and they are regression tests, not examples:
 
@@ -423,7 +423,7 @@ was about to be "technically representable, not admitted." Two real carriers exi
 > **A leaf NEVER invokes a function value.** Updaters are a branch/root form;
 > `tree.$.count.update(fn)` is the leaf form […] A revision of this suite once
 > asserted the opposite — that a function at a leaf is resolved as an updater —
-> guarded on *"the current value is not a function"*. **That predicate is unknowable
+> guarded on _"the current value is not a function"_. **That predicate is unknowable
 > at runtime**, and the tests below are the states it got wrong.
 
 This is B's question, already asked and answered **against inference**. Three consequences:
@@ -434,7 +434,7 @@ This is B's question, already asked and answered **against inference**. Three co
    is an explicit method, so no ambiguity can arise. Greenfield removes exactly that, so
    `location(fn)` ⇒ DERIVE **reintroduces a settled defect** unless disambiguation is
    explicit and static.
-3. The ambiguity already exists at branch level and is only *diagnosed*, not solved:
+3. The ambiguity already exists at branch level and is only _diagnosed_, not solved:
    `tree.updateAndReport({ user: () => null })` returns `[]` and logs `console.error`.
 
 ### FROZEN RULE
@@ -480,14 +480,14 @@ restoration facts or causal payloads. Conceptual internal shape (public name NOT
 
 ```ts
 interface FunctionValue<T extends Function> {
-  readonly /* private brand */: true;
+  readonly: /* private brand */ true;
   readonly value: T;
 }
 ```
 
 ⚠️ A "does the wrapper survive persistence/Link?" experiment was proposed and is
-**wrong by construction** — there is no wrapper to survive. Only *authored callable
-invocation* carries the ambiguity; Link acquisition, restoration and deserialization are
+**wrong by construction** — there is no wrapper to survive. Only _authored callable
+invocation_ carries the ambiguity; Link acquisition, restoration and deserialization are
 distinct causal operations and need no marker at all. Do not infect every value channel
 with a solution to a syntax-only problem.
 
@@ -520,8 +520,8 @@ C7 marker does not leak       kernel stores the raw fn; no marker object retaine
 
 ### The falsifier
 
-Reintroducing the reverted heuristic — *"if the current value is a function, the argument
-must be data"* — turns **C6 red** (3 assertions). Under that heuristic a function-valued
+Reintroducing the reverted heuristic — _"if the current value is a function, the argument
+must be data"_ — turns **C6 red** (3 assertions). Under that heuristic a function-valued
 location can never be DERIVED at all: every callable argument is swallowed as data. That
 is the historical defect reproduced on demand, and it is the mutation B must carry.
 
@@ -534,8 +534,8 @@ It is distributive, so `NotFn<null | (() => void)>` = `null`.
 ```ts
 type Loc<T> = {
   (): T;
-  (next: NotFn<T>): void;             // REPLACE a non-callable
-  (marker: FunctionValue<T>): void;   // REPLACE a callable AS DATA
+  (next: NotFn<T>): void; // REPLACE a non-callable
+  (marker: FunctionValue<T>): void; // REPLACE a callable AS DATA
   (updater: (current: T) => T): void; // DERIVE
 };
 ```
@@ -599,10 +599,10 @@ Falsifier: routing ingress through the authored callable entrance turns C8 red �
 
 A class constructor is `typeof === 'function'` at runtime but is **not callable without
 `new`**, so `typeof Thing` does NOT extend `(...args: never[]) => unknown`. The exported
-`NotFn` therefore lets a bare class through the *value* overload:
+`NotFn` therefore lets a bare class through the _value_ overload:
 
 ```ts
-$.ctor(Thing);   // COMPILES as REPLACE under the shipped NotFn
+$.ctor(Thing); // COMPILES as REPLACE under the shipped NotFn
 ```
 
 while the runtime classifies it DERIVE and invokes it. Measured:
@@ -619,9 +619,7 @@ Required widening (verified: rejects a bare class AND a bare callable, while
 `mark(Thing)`, `null` and updaters all still compile):
 
 ```ts
-type AnyCallable =
-  | ((...args: never[]) => unknown)
-  | (abstract new (...args: never[]) => unknown);
+type AnyCallable = ((...args: never[]) => unknown) | (abstract new (...args: never[]) => unknown);
 type NotFn<T> = T extends AnyCallable ? never : T;
 ```
 
@@ -711,8 +709,8 @@ The same callable grammar means MERGE at a plain branch and REPLACE at an entity
 The entity path did not drift there — it moved deliberately, and recorded why
 (`entity-signal.spec.ts:2399`):
 
-> *"The updater form is the argument for replace: it returns a full `E`, so **under merge
-> semantics removing a key was silently impossible**."*
+> _"The updater form is the argument for replace: it returns a full `E`, so **under merge
+> semantics removing a key was silently impossible**."_
 
 with two permanent carriers: `node(updater) REPLACES, so an updater that drops a key
 drops it` and `node(value) REPLACES rather than merging`.
@@ -723,13 +721,13 @@ ONE SEMANTIC JOB, ONE AUTHORITATIVE PUBLIC SURFACE as it stands.
 
 ## Requirement evidence for MERGE
 
-| dimension | finding |
-|---|---|
-| causal class | **`MutationKind` has NO `merge`** — `set \| update \| insert \| remove \| move \| rekey \| replace`. Merge decomposes into per-leaf writes; it is a surface convenience, not a semantic primitive. |
-| permanent tests whose SUBJECT is merge | **one** — `callable-contract.spec.ts:38` "a BRANCH called with an object merges it" |
-| docs | none teach merge-vs-replace as a contract |
-| real consumers | none found in `apps/` |
-| entity path | actively moved AWAY from merge, with a recorded defect as the reason |
+| dimension                              | finding                                                                                                                                                                                            |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| causal class                           | **`MutationKind` has NO `merge`** — `set \| update \| insert \| remove \| move \| rekey \| replace`. Merge decomposes into per-leaf writes; it is a surface convenience, not a semantic primitive. |
+| permanent tests whose SUBJECT is merge | **one** — `callable-contract.spec.ts:38` "a BRANCH called with an object merges it"                                                                                                                |
+| docs                                   | none teach merge-vs-replace as a contract                                                                                                                                                          |
+| real consumers                         | none found in `apps/`                                                                                                                                                                              |
+| entity path                            | actively moved AWAY from merge, with a recorded defect as the reason                                                                                                                               |
 
 ## Blast radius — measured, not estimated
 
@@ -747,13 +745,13 @@ already insensitive to the distinction** — they pass complete values.
 
 Every failing fixture was completed and re-run under BR-A. **14 → 5.**
 
-| # | tests | class | evidence |
-|---|---|---|---|
-| 8 | 3 `auto-batching`, 4 `egress-1`, 1 `angular-validation-null` | **FIXTURE-DEPENDENT** | pass unchanged once given complete values; their subjects (batching, observer firing, computed invalidation) are untouched by the rule |
-| 1 | `mut-participation > BRANCH call form` | **FIXTURE-DEPENDENT** | `{a:{n:1,s:'x'}}` written with `{n:3}`; completing to `{n:3,s:'x'}` passes |
-| 1 | `traversal-diagnostics > DIFFERENT namespace` | **ARTIFACT OF THE PROBE** | `expected 0 to be 2` — my `full` construction builds from `Object.keys(store)` and so DISCARDS the unknown key before `recursiveUpdate` sees it, suppressing the very diagnostic under test. A real BR-A must still diagnose unknown keys. Not a merge dependency. |
-| 1 | `callable-contract > a BRANCH called with an object merges it` | **GENUINE BR-B CARRIER** | its subject IS merge |
-| **3** | `bind-branch-0-acquisition-turn` | **GENUINE SEMANTIC DEPENDENCY — and the real finding** | see below |
+| #     | tests                                                          | class                                                  | evidence                                                                                                                                                                                                                                                           |
+| ----- | -------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 8     | 3 `auto-batching`, 4 `egress-1`, 1 `angular-validation-null`   | **FIXTURE-DEPENDENT**                                  | pass unchanged once given complete values; their subjects (batching, observer firing, computed invalidation) are untouched by the rule                                                                                                                             |
+| 1     | `mut-participation > BRANCH call form`                         | **FIXTURE-DEPENDENT**                                  | `{a:{n:1,s:'x'}}` written with `{n:3}`; completing to `{n:3,s:'x'}` passes                                                                                                                                                                                         |
+| 1     | `traversal-diagnostics > DIFFERENT namespace`                  | **ARTIFACT OF THE PROBE**                              | `expected 0 to be 2` — my `full` construction builds from `Object.keys(store)` and so DISCARDS the unknown key before `recursiveUpdate` sees it, suppressing the very diagnostic under test. A real BR-A must still diagnose unknown keys. Not a merge dependency. |
+| 1     | `callable-contract > a BRANCH called with an object merges it` | **GENUINE BR-B CARRIER**                               | its subject IS merge                                                                                                                                                                                                                                               |
+| **3** | `bind-branch-0-acquisition-turn`                               | **GENUINE SEMANTIC DEPENDENCY — and the real finding** | see below                                                                                                                                                                                                                                                          |
 
 ### ⚠️ THE FINDING: partial writes have a surviving job, but NOT in authored syntax
 
@@ -768,10 +766,7 @@ external(() => tree.$.settings(PAYLOAD));
 
 // Both payload members are individually VISIBLE — the acquisition is not an
 // opaque blob. That is what lets a debugger say which values storage supplied.
-expect(effects.map((e) => e.path).sort()).toEqual([
-  'settings.theme',
-  'settings.units',
-]);
+expect(effects.map((e) => e.path).sort()).toEqual(['settings.theme', 'settings.units']);
 ```
 
 Under BR-A, clearing `distancePrecision` emits a THIRD effect, and the claim "the effects
@@ -834,22 +829,22 @@ argument against keeping both meanings on the same spelling.
 
 ## PER-ROW CLASSIFICATION — all 14 closed
 
-| test | subject | class |
-|---|---|---|
-| `auto-batching > auto-batch partial object updates` | batching | FIXTURE-ONLY |
-| `auto-batching > handle nested partial updates` | batching | FIXTURE-ONLY |
-| `auto-batching > batchScope called for object partial updates` | batching | FIXTURE-ONLY |
-| `egress-1 > CONTROL — an authored write fires it` | observer firing | FIXTURE-ONLY |
-| `egress-1 > an EXTERNAL acquisition fires it too` | observer firing | FIXTURE-ONLY |
-| `egress-1 > an UNDO fires it — twice` | observer firing | FIXTURE-ONLY |
-| `egress-1 > repeated A→B→A→B fires four times` | observer firing | FIXTURE-ONLY |
-| `angular-validation-null > branch read invalidates on a BRANCH call-form write` | computed invalidation | FIXTURE-ONLY |
-| `mut-participation > BRANCH call form` | notifier reach | FIXTURE-ONLY |
-| `traversal-diagnostics > DIFFERENT namespace` | unknown-key diagnostics | **MIS-SPECIFIED PROBE** — my `full` construction discarded the unknown key before `recursiveUpdate` saw it, suppressing the diagnostic under test. Not a merge dependency; a defect in the experiment. |
-| `callable-contract > a BRANCH called with an object merges it` | **merge itself** | MERGE-DEPENDENT (the explicit BR-B carrier — not to be "fixed") |
-| `bind-branch-0 > every value the payload supplied is materialized and classified external` | partial EXTERNAL acquisition | MERGE-DEPENDENT → **RELOCATE** |
-| `bind-branch-0 > CONTROL — the same branch write WITHOUT external() is authored` | same, control arm | MERGE-DEPENDENT → **RELOCATE** |
-| `bind-branch-0 > a DERIVATION produces no mutation event at all` | same fixture | MERGE-DEPENDENT → **RELOCATE** |
+| test                                                                                       | subject                      | class                                                                                                                                                                                                  |
+| ------------------------------------------------------------------------------------------ | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `auto-batching > auto-batch partial object updates`                                        | batching                     | FIXTURE-ONLY                                                                                                                                                                                           |
+| `auto-batching > handle nested partial updates`                                            | batching                     | FIXTURE-ONLY                                                                                                                                                                                           |
+| `auto-batching > batchScope called for object partial updates`                             | batching                     | FIXTURE-ONLY                                                                                                                                                                                           |
+| `egress-1 > CONTROL — an authored write fires it`                                          | observer firing              | FIXTURE-ONLY                                                                                                                                                                                           |
+| `egress-1 > an EXTERNAL acquisition fires it too`                                          | observer firing              | FIXTURE-ONLY                                                                                                                                                                                           |
+| `egress-1 > an UNDO fires it — twice`                                                      | observer firing              | FIXTURE-ONLY                                                                                                                                                                                           |
+| `egress-1 > repeated A→B→A→B fires four times`                                             | observer firing              | FIXTURE-ONLY                                                                                                                                                                                           |
+| `angular-validation-null > branch read invalidates on a BRANCH call-form write`            | computed invalidation        | FIXTURE-ONLY                                                                                                                                                                                           |
+| `mut-participation > BRANCH call form`                                                     | notifier reach               | FIXTURE-ONLY                                                                                                                                                                                           |
+| `traversal-diagnostics > DIFFERENT namespace`                                              | unknown-key diagnostics      | **MIS-SPECIFIED PROBE** — my `full` construction discarded the unknown key before `recursiveUpdate` saw it, suppressing the diagnostic under test. Not a merge dependency; a defect in the experiment. |
+| `callable-contract > a BRANCH called with an object merges it`                             | **merge itself**             | MERGE-DEPENDENT (the explicit BR-B carrier — not to be "fixed")                                                                                                                                        |
+| `bind-branch-0 > every value the payload supplied is materialized and classified external` | partial EXTERNAL acquisition | MERGE-DEPENDENT → **RELOCATE**                                                                                                                                                                         |
+| `bind-branch-0 > CONTROL — the same branch write WITHOUT external() is authored`           | same, control arm            | MERGE-DEPENDENT → **RELOCATE**                                                                                                                                                                         |
+| `bind-branch-0 > a DERIVATION produces no mutation event at all`                           | same fixture                 | MERGE-DEPENDENT → **RELOCATE**                                                                                                                                                                         |
 
 ### Positive control (required, executed)
 
@@ -883,7 +878,7 @@ this record said the split was in the value form; it is in the value form AND th
 form. Two callable spellings, each meaning opposite things depending on which half of the
 tree you are in.
 
-The type is also the wrong half under BR-A: `Partial<T>` actively *invites* merge-style
+The type is also the wrong half under BR-A: `Partial<T>` actively _invites_ merge-style
 calls. A BR-A branch write must require a complete `T`, or the runtime replaces while the
 type encourages partials — the same runtime/type divergence found in the `NotFn`
 constructor case.
@@ -920,8 +915,8 @@ T             describes what values this location is allowed to contain
 Partial<T>    describes a mutation convenience that WEAKENS that contract
 ```
 
-If every object call accepts `Partial<T>`, the API has said *"for writes through this
-surface you need not satisfy `T`"* — and the state author's declaration stops protecting
+If every object call accepts `Partial<T>`, the API has said _"for writes through this
+surface you need not satisfy `T`"_ — and the state author's declaration stops protecting
 the operation. Recovering that later with a stricter second operation
 (`location.replace(fullValue)`) would be backwards: the primary API would have discarded
 the safety the secondary API exists to restore.
@@ -931,32 +926,32 @@ the safety the secondary API exists to restore.
 ```ts
 type Location<T> = {
   (): T;
-  (value: NonCallableValue<T>): void;   // a WHOLE value of T
-  (updater: (current: T) => T): void;   // DERIVE the whole next T
-  (marked: FunctionValue<T>): void;     // a callable T as a whole value
+  (value: NonCallableValue<T>): void; // a WHOLE value of T
+  (updater: (current: T) => T): void; // DERIVE the whole next T
+  (marked: FunctionValue<T>): void; // a callable T as a whole value
 };
 ```
 
 The state author keeps authority in every direction, and SignalTree second-guesses none
 of it:
 
-| author writes | callable requires |
-|---|---|
-| `user: User` | a complete `User` |
-| `user: Partial<User>` | any partial — that IS a complete value of this location's type |
-| `user: { name: string; age?: number }` | `name`; `age` optional |
-| `user: DeepPartial<User>` | whatever that type defines |
+| author writes                          | callable requires                                              |
+| -------------------------------------- | -------------------------------------------------------------- |
+| `user: User`                           | a complete `User`                                              |
+| `user: Partial<User>`                  | any partial — that IS a complete value of this location's type |
+| `user: { name: string; age?: number }` | `name`; `age` optional                                         |
+| `user: DeepPartial<User>`              | whatever that type defines                                     |
 
 Verified (tsc exit 0 — every allowed form compiles and every rejection fires):
 
 ```ts
-A.user({ name: 'Dave', age: 42 });   // strict T = User      ✓
-A.user({ name: 'Dave' });            // strict T = User      ✗ rejected
-B.user({ name: 'Dave' });            // T = Partial<User>    ✓
-C.user({ name: 'Dave' });            // age? optional        ✓
-C.user({ age: 42 });                 // name required        ✗ rejected
-D.byId(1)({ id: 1, name: 'b' });     // entity parity        ✓
-D.byId(1)({ name: 'b' });            // partial Row          ✗ rejected
+A.user({ name: 'Dave', age: 42 }); // strict T = User      ✓
+A.user({ name: 'Dave' }); // strict T = User      ✗ rejected
+B.user({ name: 'Dave' }); // T = Partial<User>    ✓
+C.user({ name: 'Dave' }); // age? optional        ✓
+C.user({ age: 42 }); // name required        ✗ rejected
+D.byId(1)({ id: 1, name: 'b' }); // entity parity        ✓
+D.byId(1)({ name: 'b' }); // partial Row          ✗ rejected
 ```
 
 ### Positive control — the cost of `Partial<T>`, measured
@@ -986,8 +981,8 @@ PATCH explicitly rather than silently weakening the canonical assignment.
 carried forward:
 
 ```ts
-$.user(fullUser);         // whole-location assignment
-$.rows.byId(1)(fullRow);  // whole-location assignment — same grammar, same meaning
+$.user(fullUser); // whole-location assignment
+$.rows.byId(1)(fullRow); // whole-location assignment — same grammar, same meaning
 ```
 
 **Dispositions:**
@@ -1059,7 +1054,7 @@ the opposite behaviour. Reason of record — incumbent plain-branch callable sem
 conflict with the frozen whole-location assignment contract AND with the entity half of
 the same callable grammar.
 
-**`bind-branch-0` ×3 — RELOCATE.** They prove *partial external acquisition*. They do NOT
+**`bind-branch-0` ×3 — RELOCATE.** They prove _partial external acquisition_. They do NOT
 prove that authored `location(value)` must mean patch. Governed by B1: an operation that
 already knows its mutation semantics must not re-enter through syntax whose job is to
 infer them.
@@ -1095,7 +1090,7 @@ weakening canonical assignment.
 ```
 
 Obligation 9 is the one with no evidence yet. Every measurement so far probed the
-*authored-call* side; nothing has confirmed that a real implementation leaves omitted keys
+_authored-call_ side; nothing has confirmed that a real implementation leaves omitted keys
 absent rather than preserved. The BR-A probe wrote `undefined` into them, which is not the
 same thing — and that probe also mis-specified the unknown-key diagnostic. It must be
 proven on the real implementation, not inherited from the spike.
@@ -1107,7 +1102,7 @@ proven on the real implementation, not inherited from the spike.
 
 The BR-A discriminator built its next value as
 `Object.fromEntries(Object.keys(store).map(k => [k, arg[k]]))`, manufacturing `undefined`
-writes for every omitted descendant. That was a serviceable way to *measure* which tests
+writes for every omitted descendant. That was a serviceable way to _measure_ which tests
 depended on merge. It is **not** the target mechanism, and it visibly misbehaved in two
 ways that would be defects in production:
 
@@ -1121,7 +1116,7 @@ load-bearing for notifications, causal events, structural deletion, entity-conta
 branches, and diagnostics — every one of which the probe got wrong.
 
 This supersedes the weaker phrasing of obligation 9: it is not only that omitted keys must
-end up absent, but that they must never be *written* to get there.
+end up absent, but that they must never be _written_ to get there.
 
 ---
 
@@ -1146,7 +1141,7 @@ deliberately not exported publicly.
 **The §B discriminator moved onto the real subject and the scratchpad prototype was not
 kept** — a permanent fake implementation carrying a real invariant is the
 prototype-retirement problem again. `tree-location.spec.ts`: **9/9**, cases 1–8 plus a new
-row, *classification never consults the stored value*, which pins the rule directly rather
+row, _classification never consults the stored value_, which pins the rule directly rather
 than through a symptom.
 
 Both falsifiers re-proven on the real subject:
@@ -1270,14 +1265,14 @@ with the coordinated baseline regeneration.
 Fixture: `settings: { theme, units, distancePrecision }` — **one flat branch of scalar
 leaves**. `PAYLOAD = { theme, units }` deliberately omits `distancePrecision`.
 
-| # | question | answer | proven by |
-|---|---|---|---|
-| 1 | omitted descendants | **UNTOUCHED — no claim, no write.** And a later authored write to the omitted key does NOT inherit external provenance, even in the SAME tick | "⚠️ THE BOUNDARY": `byPath['settings.distancePrecision'].origin` is `undefined` after `external(...)` then `.set(1)` |
-| 2 | supplied descendants | **REALIZED, per subject** — `origin: 'external'`, `participation: 'realized'`, one effect per supplied leaf (`settings.theme`, `settings.units`), never one opaque branch effect | "every value the payload supplied…" |
-| 3 | one causal turn / transaction? | **NO.** `transactionId` is `undefined` on every effect; restoration history gains **0**; `canUndo()` is `false`. Acquiring durable truth is not authored work and earns no undo | same |
-| 4 | unknown keys | **NOT PROVEN HERE.** No carrier in this file covers them; `traversal-diagnostics` owns that contract. Preserve it, do not guess | absence |
-| 5 | function-valued supplied leaves | **NOT PROVEN HERE.** Governed by the B1 freeze — raw install, never authored-dispatched — and carried by `tree-location.spec.ts` C8 | absence |
-| 6 | nested branches / entities | **NOT PROVEN.** The fixture has no nested branch and no `entityMap` (grep: 0). Admit only what the carriers prove | absence |
+| #   | question                        | answer                                                                                                                                                                           | proven by                                                                                                            |
+| --- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| 1   | omitted descendants             | **UNTOUCHED — no claim, no write.** And a later authored write to the omitted key does NOT inherit external provenance, even in the SAME tick                                    | "⚠️ THE BOUNDARY": `byPath['settings.distancePrecision'].origin` is `undefined` after `external(...)` then `.set(1)` |
+| 2   | supplied descendants            | **REALIZED, per subject** — `origin: 'external'`, `participation: 'realized'`, one effect per supplied leaf (`settings.theme`, `settings.units`), never one opaque branch effect | "every value the payload supplied…"                                                                                  |
+| 3   | one causal turn / transaction?  | **NO.** `transactionId` is `undefined` on every effect; restoration history gains **0**; `canUndo()` is `false`. Acquiring durable truth is not authored work and earns no undo  | same                                                                                                                 |
+| 4   | unknown keys                    | **NOT PROVEN HERE.** No carrier in this file covers them; `traversal-diagnostics` owns that contract. Preserve it, do not guess                                                  | absence                                                                                                              |
+| 5   | function-valued supplied leaves | **NOT PROVEN HERE.** Governed by the B1 freeze — raw install, never authored-dispatched — and carried by `tree-location.spec.ts` C8                                              | absence                                                                                                              |
+| 6   | nested branches / entities      | **NOT PROVEN.** The fixture has no nested branch and no `entityMap` (grep: 0). Admit only what the carriers prove                                                                | absence                                                                                                              |
 
 ### The rule this yields
 
@@ -1403,7 +1398,7 @@ Both the object path and the updater path already call `recursiveUpdate`, which 
 exactly the keys it is handed. Given a complete `T` that **is** whole-value assignment:
 merge was a consequence of ACCEPTING `Partial<T>`, never a separate merging mechanism.
 
-So C5's runtime change is *nothing*, which is precisely what the implementation rule
+So C5's runtime change is _nothing_, which is precisely what the implementation rule
 demanded — the kernel installs the complete `T` and nothing manufactures `undefined`
 writes for omitted descendants. The BR-A probe DID manufacture them and misbehaved twice
 as a result; the real path never had that defect because it never had that mechanism.
@@ -1455,14 +1450,14 @@ That file did not merely USE a partial write, it **taught** one:
 Four live teaching surfaces corrected: `standard-syntax-examples.ts`,
 `start-here.component.ts`, `packages/core/README.md`, `migration-v14-v15.md`.
 
-`docs/guides/migration-v13-v14.md` says *"still a deep partial merge"*, which was TRUE FOR
+`docs/guides/migration-v13-v14.md` says _"still a deep partial merge"_, which was TRUE FOR
 14.0. It is live instruction rather than archive, so it was annotated forward — the
 historical claim stays accurate for the step it documents, with a pointer to 15.0.
 
 ### ⚠️ DOC-GATE GAP FOUND
 
 `readme-apis` passed BEFORE those corrections. The teaching-region lint catches retired
-*symbols*, not prose describing retired *semantics* — "merges partial values" names no dead
+_symbols_, not prose describing retired _semantics_ — "merges partial values" names no dead
 API while teaching a dead contract. Raised for C8; not patched mid-migration.
 
 ### Still open in C5
@@ -1471,8 +1466,7 @@ Retiring incumbent `tree()` and migrating the root to `tree.$`.
 
 ## TYPE-SURFACE-PROTECTION-0 — FROZEN PROCESS RULE
 
-> **RUNTIME FAILURE DOES NOT AUTHORIZE A PUBLIC TYPE CHANGE.**
-> **First attempt to make the runtime satisfy the existing type contract.**
+> **RUNTIME FAILURE DOES NOT AUTHORIZE A PUBLIC TYPE CHANGE.** > **First attempt to make the runtime satisfy the existing type contract.**
 
 Through the C8 public-surface review, no change to `TreeNode<T>`, recursive branch
 inference, `EntitySignal` inference, readonly inference, callable/state overload
@@ -1497,7 +1491,7 @@ PUBLIC TYPE CHANGE AS FIX FOR A RUNTIME BUG   PROHIBITED without a ruling
 
 Deliberately widening a type to prove a gate can see the property — then restoring it
 immediately — is good evidence infrastructure and should not be discouraged. What is
-prohibited is *keeping* a type change because the runtime could not carry the contract.
+prohibited is _keeping_ a type change because the runtime could not carry the contract.
 
 ### The excursion this rule exists to prevent
 
@@ -1517,8 +1511,8 @@ special case yields **4 errors**; restored, 0.
 
 ### Wording correction
 
-`NodeAccessor<T>`'s JSDoc said *"an author who wants partial writes declares the location
-`Partial<T>`"* — which resurrects the semantics BR-A removed. Corrected and frozen:
+`NodeAccessor<T>`'s JSDoc said _"an author who wants partial writes declares the location
+`Partial<T>`"_ — which resurrects the semantics BR-A removed. Corrected and frozen:
 
 > **`Partial<T>` DESCRIBES THE SHAPE OF STATE. IT DOES NOT MEAN PARTIAL-WRITE SEMANTICS.**
 
@@ -1717,26 +1711,26 @@ address both objects, not just the one in hand.
 
 `packages/core/src/lib/dynamic-member-reactivation.spec.ts`
 
-| # | carrier |
-|---|---|
-| 1 | dormant re-add returns the identical Location object |
-| 2 | reacquired member keeps its original PositionId |
-| 3 | index entry is reused, not rewritten (same Map, same size, same value) |
-| 4 | the supplied value wins over the retained one |
-| 5 | same-value reactivation wakes an already-held consumer |
-| 6 | reacquisition publishes membership exactly once |
-| 7 | reacquisition never re-enters the owner-bound constructor |
-| 8 | ME-A: an ACTIVE key reuses identity and takes the supplied value |
+| #   | carrier                                                                |
+| --- | ---------------------------------------------------------------------- |
+| 1   | dormant re-add returns the identical Location object                   |
+| 2   | reacquired member keeps its original PositionId                        |
+| 3   | index entry is reused, not rewritten (same Map, same size, same value) |
+| 4   | the supplied value wins over the retained one                          |
+| 5   | same-value reactivation wakes an already-held consumer                 |
+| 6   | reacquisition publishes membership exactly once                        |
+| 7   | reacquisition never re-enters the owner-bound constructor              |
+| 8   | ME-A: an ACTIVE key reuses identity and takes the supplied value       |
 
 Mutation controls, each killing its intended carriers and no others:
 
-| mutation | carriers killed |
-|---|---|
-| bypass the dormant lookup (always construct) | 1, 2, 3, 7, 8 |
-| skip the value write (retained value wins) | 4, 8 |
-| rewrite the index entry with a wrapper | 1, 2, 3, 8 |
-| omit the membership publication | 5, 6 |
-| activate the accessor but not the backing store | 4, 5, 6 |
+| mutation                                        | carriers killed |
+| ----------------------------------------------- | --------------- |
+| bypass the dormant lookup (always construct)    | 1, 2, 3, 7, 8   |
+| skip the value write (retained value wins)      | 4, 8            |
+| rewrite the index entry with a wrapper          | 1, 2, 3, 8      |
+| omit the membership publication                 | 5, 6            |
+| activate the accessor but not the backing store | 4, 5, 6         |
 
 Carrier 5 is held-consumer, not fresh-read: a fresh `users()` rebuilds from
 current membership and passes even when the memo is stale, which is how three
@@ -1855,7 +1849,7 @@ beside the existing store link.
 
 **NO NEW MEMBERSHIP STATE.** Enumerability remains the sole authority; this
 changes only where it is written. The two halves agreeing is precisely what
-makes enumerability *one* answer instead of two.
+makes enumerability _one_ answer instead of two.
 
 ### ⚠️ I REPRODUCED THE EXACT BUG THE LINT RULE EXISTS TO PREVENT
 
@@ -1863,7 +1857,7 @@ The first extraction changed nothing — all three divergences survived. The cau
 was inside the new helper:
 
 ```ts
-typeof peer === 'object'   // a NodeAccessor is CALLABLE
+typeof peer === 'object'; // a NodeAccessor is CALLABLE
 ```
 
 so every accessor peer was silently discarded while the store side still
@@ -1881,19 +1875,19 @@ symbol — was WRONG, and a direct measurement said so before any code changed.
 OBSERVABLE surfaces rather than the descriptors, because the descriptors are the
 mechanism and the surfaces are the contract:
 
-| carrier | |
-|---|---|
-| static branch agrees across removal and re-add | |
-| the retained Location survives removal WITHOUT being a member (`'age' in user` stays true; it is still a Location) | |
-| dynamic branch agrees across materialize, removal, reacquisition | |
-| a leaf waking through its own `set()` agrees on both halves | |
-| the single-object primitives are not reachable (with a positive control on `setMemberPresence`) | |
+| carrier                                                                                                            |     |
+| ------------------------------------------------------------------------------------------------------------------ | --- |
+| static branch agrees across removal and re-add                                                                     |     |
+| the retained Location survives removal WITHOUT being a member (`'age' in user` stays true; it is still a Location) |     |
+| dynamic branch agrees across materialize, removal, reacquisition                                                   |     |
+| a leaf waking through its own `set()` agrees on both halves                                                        |     |
+| the single-object primitives are not reachable (with a positive control on `setMemberPresence`)                    |     |
 
-| mutation | carriers killed |
-|---|---|
-| helper skips the peer (the original three-time bug) | 4 |
-| `peerOf` reverts to the object-only guard | 4 |
-| re-export a single-object primitive | 1 |
+| mutation                                            | carriers killed |
+| --------------------------------------------------- | --------------- |
+| helper skips the peer (the original three-time bug) | 4               |
+| `peerOf` reverts to the object-only guard           | 4               |
+| re-export a single-object primitive                 | 1               |
 
 ### Status
 
@@ -2598,10 +2592,10 @@ asking for the engine installs it · **a facade captured BEFORE installation
 observes an engine installed after** · several consumers share one authority ·
 installation is idempotent, not additive.
 
-| mutation | effect |
-|---|---|
-| `getPathNotifier` stops installing | 3 carriers fail |
-| duplicate runtime per ask | 1 carrier fails (uniqueness) |
+| mutation                                                    | effect                                                |
+| ----------------------------------------------------------- | ----------------------------------------------------- |
+| `getPathNotifier` stops installing                          | 3 carriers fail                                       |
+| duplicate runtime per ask                                   | 1 carrier fails (uniqueness)                          |
 | facade captures `runtime` at module load — THE ORIGINAL BUG | 4 carriers fail, **266 tests fail** in the full suite |
 
 A first attempt at the capture mutation (`return runtime ?? PORT`) killed
@@ -2659,17 +2653,17 @@ matches, queues or flushes.
 
 Four more carriers, two mutations:
 
-| carrier | |
-|---|---|
-| `false` before install survives installation | |
-| the `true`/default direction is preserved (so the fix cannot pass by hardcoding) | |
-| a REAL optional consumer — `restoration()` reaching `getPathNotifier()` itself — inherits it | |
-| positive control: an already-installed runtime changes immediately | |
+| carrier                                                                                      |     |
+| -------------------------------------------------------------------------------------------- | --- |
+| `false` before install survives installation                                                 |     |
+| the `true`/default direction is preserved (so the fix cannot pass by hardcoding)             |     |
+| a REAL optional consumer — `restoration()` reaching `getPathNotifier()` itself — inherits it |     |
+| positive control: an already-installed runtime changes immediately                           |     |
 
-| mutation | carriers killed |
-|---|---|
-| `setBatchingEnabled` forwards only, retains nothing | 2 |
-| config retained but never applied on install | 2 |
+| mutation                                            | carriers killed |
+| --------------------------------------------------- | --------------- |
+| `setBatchingEnabled` forwards only, retains nothing | 2               |
+| config retained but never applied on install        | 2               |
 
 ### Status
 
@@ -2702,8 +2696,8 @@ NOT PROVE THAT THE DISCOVERY MECHANISM CAN OBSERVE EVERY SUBJECT IT CLAIMS TO
 FIND
 ```
 
-The census's self-check proved *discovered → gated*. It said nothing about
-*exists → discovered*, and this tool had already suffered three parser failures,
+The census's self-check proved _discovered → gated_. It said nothing about
+_exists → discovered_, and this tool had already suffered three parser failures,
 two of which returned EMPTY or WRONG results that read as facts about the
 repository.
 
@@ -2731,14 +2725,14 @@ contained no line comment carrying `/*`. The control was decorative for its own
 motivating failure. The fixture now plants `packages/*/src/**` inside a line
 comment, and that mutation kills two controls.
 
-| mutation | controls killed |
-|---|---|
-| public value export detector | 2 |
-| public type export detector | 2 |
-| interface field detector | 2 |
-| module state — uninitialised `let` | 1 |
-| structural symbol detector | 1 |
-| comment-stripping order (the historical bug) | 2 |
+| mutation                                     | controls killed |
+| -------------------------------------------- | --------------- |
+| public value export detector                 | 2               |
+| public type export detector                  | 2               |
+| interface field detector                     | 2               |
+| module state — uninitialised `let`           | 1               |
+| structural symbol detector                   | 1               |
+| comment-stripping order (the historical bug) | 2               |
 
 `check-kernel-ownership.mjs` now runs `--self-test` FIRST and refuses to certify
 anything if an observer control fails — proven by breaking a detector and
@@ -2760,8 +2754,8 @@ Phase 3E                         BLOCKED
 ```
 
 Not wired into `npm run gates`: it exits non-zero, and admitting it as known-red
-would normalise an intentionally incomplete inventory. Red here means *the
-architecture derivation is unfinished*, which is a project phase, not a defect.
+would normalise an intentionally incomplete inventory. Red here means _the
+architecture derivation is unfinished_, which is a project phase, not a defect.
 
 Ordering for the burn-down — deliberately most-likely-to-reveal-a-second-authority
 first, not easiest-first:
@@ -3036,7 +3030,7 @@ Note what this means about the earlier row: `PATH-NOTIFIER-PREINSTALL-CONTROL-0`
 made the value survive installation ORDER. It did not make it survive a second
 TREE, because nobody had asked what the value's lifetime was.
 
-```text
+````text
 subject         state:lib/internals/path-observation-port.ts:batchingEnabled
 retained fact   desired delivery batching policy
 writers         setBatchingEnabled (from signalTree construction), reset
@@ -3053,8 +3047,9 @@ is not where to store it but whether it survives.
 ```text
 DELIVERY POLICY IS NOT TREE TRUTH
 REMOVE A REDUNDANT POLICY KNOB BEFORE DISTRIBUTING IT CORRECTLY
-```
-```
+````
+
+````
 
 Not repaired in this row. The fix is not obviously "make it per-tree": the
 delivery engine is deliberately ONE shared authority, so per-tree batching
@@ -3072,7 +3067,7 @@ path-observation-port.ts:runtime     package-global delivery authority
 path-notifier.ts:globalPathNotifier  the singleton behind it
 materialization-realization:installed package-global installation
 materialize-markers.ts:applyMemberValue package-global applier
-```
+````
 
 Each needs the same question: **is the FACT it retains package-scoped, or is the
 storage merely convenient?**
@@ -3103,10 +3098,10 @@ declaration (`types.ts:607`).
 
 So the cross-tree collision is confirmed twice, independently, and long
 predates the delivery split. The same spike records a sibling defect from the
-identical cause — one global notifier with no tree identity: *"guardrails and
+identical cause — one global notifier with no tree identity: _"guardrails and
 devtools both subscribe `'**'` to the same global notifier, but only devtools
 filters by tree ownership … guardrails on tree A will receive tree B's paths
-verbatim."*
+verbatim."_
 
 ### What `false` actually changes — measured
 
@@ -3158,9 +3153,9 @@ batchUpdates: false   -> value committed, 99
 ```
 
 Interception timing follows the batching switch (0 vs 3 same-tick invocations),
-which is itself the coupling worth questioning — *synchronous interception is
+which is itself the coupling worth questioning — _synchronous interception is
 authority; deferred subscriber delivery is scheduling, and one flag must not own
-both.* But the block failed in BOTH arms, so **this is not attributable to
+both._ But the block failed in BOTH arms, so **this is not attributable to
 batching** and must not be folded into its verdict. It is a separate open
 question about whether interception can block a leaf write on this path at all.
 Recorded, not diagnosed.
@@ -3223,13 +3218,13 @@ an edge case.
 
 ### 13 controls, 5 mutations
 
-| mutation | controls killed |
-|---|---|
-| drop `++`/`--` writer location | 2 |
-| stop recording `++`/`--` entirely | 4 |
-| ignore shadowing | 2 |
-| assignment targets counted as reads | 1 |
-| drop mutating-call detection | 1 |
+| mutation                            | controls killed |
+| ----------------------------------- | --------------- |
+| drop `++`/`--` writer location      | 2               |
+| stop recording `++`/`--` entirely   | 4               |
+| ignore shadowing                    | 2               |
+| assignment targets counted as reads | 1               |
+| drop mutating-call detection        | 1               |
 
 ⚠️ TWO OF MY OWN CONTROLS WERE DEFECTIVE, both caught by the sweep rather than by
 review. The read control used a binding that is never assigned, so the
@@ -3279,14 +3274,14 @@ after    nextRegistryId  writers: ['TreePositionRegistry.id (property
 
 ### 18 controls, 6 mutations, multi-file
 
-| mutation | controls killed |
-|---|---|
-| compare by SPELLING instead of declaration identity | 7 |
-| ignore alias resolution | 4 |
-| disable symbol resolution for reads | 3 |
-| drop `++`/`--` writer location | 1 |
-| drop mutation-candidate detection | 1 |
-| treat class property initializers as module top level | 1 |
+| mutation                                              | controls killed |
+| ----------------------------------------------------- | --------------- |
+| compare by SPELLING instead of declaration identity   | 7               |
+| ignore alias resolution                               | 4               |
+| disable symbol resolution for reads                   | 3               |
+| drop `++`/`--` writer location                        | 1               |
+| drop mutation-candidate detection                     | 1               |
+| treat class property initializers as module top level | 1               |
 
 Fixture spans four modules: A exports a binding, B exports the SAME SPELLING,
 C imports only from B, D imports A's under an alias and reads, writes and
@@ -3613,8 +3608,8 @@ to the `TreeConfig.batchUpdates` signature — and its comment claimed aliased a
 spread forms "cannot be missed". False in a structurally typed language:
 
 ```ts
-const options = { batchUpdates: false };   // anonymous inferred type
-signalTree(state, options);                // assignable at the CALL
+const options = { batchUpdates: false }; // anonymous inferred type
+signalTree(state, options); // assignable at the CALL
 ```
 
 The property belongs to an anonymous object type; declaration identity never
@@ -3699,8 +3694,10 @@ unrelated. The conclusion about `recursive-metrics.ts` was right; the RULE was
 not:
 
 ```ts
-interface Metrics { batchUpdates: number }      // in the same file
-signalTree(state, { batchUpdates: false });     // a GENUINE claimant
+interface Metrics {
+  batchUpdates: number;
+} // in the same file
+signalTree(state, { batchUpdates: false }); // a GENUINE claimant
 ```
 
 would have been discarded on the strength of its neighbour.
@@ -3833,12 +3830,12 @@ I had counted `batchUpdates` OCCURRENCES (3) and reported them as carriers. The
 marker-to-end deletion removed four `it()` blocks, and the fourth never mentions
 `batchUpdates` at all:
 
-| removed test | contract it protected | why it died |
-|---|---|---|
-| `batchUpdates:false set before install survives installation` | pre-install config survives runtime installation | the config no longer exists |
-| `the default direction is preserved too` | the `true` direction was not hardcoded | same |
-| `a REAL optional consumer inherits the pre-install setting` | `restoration()` reaching `getPathNotifier()` inherits it | same |
-| `positive control — an ALREADY-INSTALLED runtime changes immediately` | the PORT's `setBatchingEnabled` reaches the engine | the port no longer carries batching policy, and **nothing calls its batching surface at all** |
+| removed test                                                          | contract it protected                                    | why it died                                                                                   |
+| --------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `batchUpdates:false set before install survives installation`         | pre-install config survives runtime installation         | the config no longer exists                                                                   |
+| `the default direction is preserved too`                              | the `true` direction was not hardcoded                   | same                                                                                          |
+| `a REAL optional consumer inherits the pre-install setting`           | `restoration()` reaching `getPathNotifier()` inherits it | same                                                                                          |
+| `positive control — an ALREADY-INSTALLED runtime changes immediately` | the PORT's `setBatchingEnabled` reaches the engine       | the port no longer carries batching policy, and **nothing calls its batching surface at all** |
 
 None protected a surviving delivery-engine semantic. The engine's own batching
 is exercised by the engine's suites; `restoration` reads
@@ -4187,12 +4184,12 @@ writer            withWriteContext (assign, save/restore in finally)
 readers           2 in-file, 0 cross-file
 ```
 
-| carrier | result |
-|---|---|
-| nesting | `[undefined, A, B, A, undefined]` — inner restores outer |
-| exception | restores to `undefined` |
-| cross-tree | one context, two trees, both written under it |
-| `await` | context does NOT survive — correct and documented |
+| carrier    | result                                                   |
+| ---------- | -------------------------------------------------------- |
+| nesting    | `[undefined, A, B, A, undefined]` — inner restores outer |
+| exception  | restores to `undefined`                                  |
+| cross-tree | one context, two trees, both written under it            |
+| `await`    | context does NOT survive — correct and documented        |
 
 The cross-tree result is the ownership answer: the semantic subject is the
 AUTHORED OPERATION, not either tree, so package allocation is the right scope
@@ -4292,12 +4289,12 @@ before 2027 total   after 2023 total   delta 4
 
 `batch-scope.spec.ts` contained exactly four, all asserting the deleted counter:
 
-| removed test | what it protected |
-|---|---|
+| removed test                            | what it protected                                               |
+| --------------------------------------- | --------------------------------------------------------------- |
 | `should execute function synchronously` | that the wrapper called `fn` — the call sites now call directly |
-| `should track batch depth` | the counter |
-| `should reset depth on error` | the counter's `try/finally` |
-| `should handle nested errors` | nested counter restore |
+| `should track batch depth`              | the counter                                                     |
+| `should reset depth on error`           | the counter's `try/finally`                                     |
+| `should handle nested errors`           | nested counter restore                                          |
 
 None protected surviving product behaviour.
 
@@ -4677,15 +4674,15 @@ fails a test rather than waiting for someone to call a silent no-op.
 
 ### Cluster 2 ruling — authority pair closed, five rows still open
 
-| subject | owner | action |
-|---|---|---|
-| `runtime` | KERNEL INTEGRATION PORT | **CONVERGED** — narrow contract landed |
-| `globalPathNotifier` | OPTIONAL-CAPABILITY / delivery | **CONVERGED** — reset coherence landed |
-| `resetPathDeliveryRuntime` | test seam | **CONVERGED** — no longer independently detaches |
-| `port.intercept` | — | **DELETED** with the cast that permitted it |
-| `installed` | FRAMEWORK-ADAPTER boundary | **REIMPLEMENT at C6** |
-| `applyMemberValue` | KERNEL membership authority | **REIMPLEMENT** — cycle seam, no independent owner |
-| `treesConstructedCount` | — | **REVIEW** — not yet characterized, carried to the next batch |
+| subject                    | owner                          | action                                                        |
+| -------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| `runtime`                  | KERNEL INTEGRATION PORT        | **CONVERGED** — narrow contract landed                        |
+| `globalPathNotifier`       | OPTIONAL-CAPABILITY / delivery | **CONVERGED** — reset coherence landed                        |
+| `resetPathDeliveryRuntime` | test seam                      | **CONVERGED** — no longer independently detaches              |
+| `port.intercept`           | —                              | **DELETED** with the cast that permitted it                   |
+| `installed`                | FRAMEWORK-ADAPTER boundary     | **REIMPLEMENT at C6**                                         |
+| `applyMemberValue`         | KERNEL membership authority    | **REIMPLEMENT** — cycle seam, no independent owner            |
+| `treesConstructedCount`    | —                              | **REVIEW** — not yet characterized, carried to the next batch |
 
 ⚠️ THE HEADING ABOVE ORIGINALLY READ "no REVIEW rows remain" while the table
 below it still carried `treesConstructedCount` as REVIEW and four rows marked
@@ -4754,9 +4751,9 @@ DECISION       link.ts:441  `if (m['ownerId'] !== registry.id) return;`
 ```
 
 A Link decides whether a delivered mutation belongs to ITS tree by comparing
-registry ids. The code says why in place: *"Two same-shaped trees give their
+registry ids. The code says why in place: _"Two same-shaped trees give their
 collections the SAME local position id, so identity is (registry, position) —
-never the position alone."*
+never the position alone."_
 
 Falsifier: force every registry to id 1. **19 tests fail**, including
 `owner isolation — a second tree does not drive this link` and
@@ -4954,13 +4951,13 @@ TREE_CAPABILITY_DEPENDENCIES · TREE_CAPABILITY_ORDER · RESTORATION_CAPABILITIE
 AN INDEX MAY LOCATE AN AUTHORITY WITHOUT OWNING THE AUTHORITY.
 ```
 
-| subject | membership means | owner | action |
-|---|---|---|---|
+| subject               | membership means                            | owner  | action    |
+| --------------------- | ------------------------------------------- | ------ | --------- |
 | `OWNED_NODE_METADATA` | node → its positionIds/subjectIds/ownerPath | KERNEL | CONVERGED |
-| `ROOT_TREES` | root accessor → its tree | KERNEL | CONVERGED |
-| `OBSERVATION` | leaf → dormant observation claims | KERNEL | CONVERGED |
-| `TREE_STORES` | "this object is a tree store" | KERNEL | CONVERGED |
-| `MEMBERSHIP_REVISION` | branch → its membership carrier signal | KERNEL | CONVERGED |
+| `ROOT_TREES`          | root accessor → its tree                    | KERNEL | CONVERGED |
+| `OBSERVATION`         | leaf → dormant observation claims           | KERNEL | CONVERGED |
+| `TREE_STORES`         | "this object is a tree store"               | KERNEL | CONVERGED |
+| `MEMBERSHIP_REVISION` | branch → its membership carrier signal      | KERNEL | CONVERGED |
 
 All WeakMap/WeakSet keyed by the node itself, so retention is the node's
 lifetime — no independent eviction policy to get wrong.
@@ -4973,8 +4970,8 @@ frozen `ONE MEMBERSHIP CARRIER PER BRANCH` shape.
 
 ### B. Observation registry
 
-| subject | membership means | owner | action |
-|---|---|---|---|
+| subject                      | membership means                  | owner  | action    |
+| ---------------------------- | --------------------------------- | ------ | --------- |
 | `listeners` (error-reporter) | who receives `onTreeError` events | KERNEL | CONVERGED |
 
 Strong `Set`, but user-controlled: `subscribe` returns an unsubscribe, and a
@@ -4982,20 +4979,20 @@ test-seam reset exists. Membership decides delivery, never tree state.
 
 ### C. Causal / consequence retention
 
-| subject | membership means | owner | action |
-|---|---|---|---|
-| `scopesByOwner` | owner → open commit scopes by id | OPTIONAL-CAPABILITY | CONVERGED |
-| `openScopesByKey` | key → currently open scope ids | OPTIONAL-CAPABILITY | CONVERGED |
-| `settleListenersByKey` | key → settle callbacks | OPTIONAL-CAPABILITY | CONVERGED |
-| `heldByKey` | key → held consequences | OPTIONAL-CAPABILITY | CONVERGED |
+| subject                | membership means                 | owner               | action    |
+| ---------------------- | -------------------------------- | ------------------- | --------- |
+| `scopesByOwner`        | owner → open commit scopes by id | OPTIONAL-CAPABILITY | CONVERGED |
+| `openScopesByKey`      | key → currently open scope ids   | OPTIONAL-CAPABILITY | CONVERGED |
+| `settleListenersByKey` | key → settle callbacks           | OPTIONAL-CAPABILITY | CONVERGED |
+| `heldByKey`            | key → held consequences          | OPTIONAL-CAPABILITY | CONVERGED |
 
 All four WeakMap-keyed by owner/scope key, so retention ends with the owner.
 None decides restorability — that stays with the single restoration authority.
 
 ### D. Capability / marker registry
 
-| subject | membership means | owner | action |
-|---|---|---|---|
+| subject             | membership means                       | owner  | action    |
+| ------------------- | -------------------------------------- | ------ | --------- |
 | `MARKER_PROCESSORS` | registered marker processors, in order | KERNEL | CONVERGED |
 
 Push-only, never cleared, monotonic for the process. It is the authority
@@ -5004,13 +5001,13 @@ why that boolean could be deleted.
 
 ### E. Diagnostics — all dev-only, verified
 
-| subject | bound | owner | action |
-|---|---|---|---|
-| `warnedWriteOnly` | WeakSet on the processor | DIAGNOSTIC | CONVERGED |
-| `ENTITY_ARRAY_WARNED` | explicit cap of 256 | DIAGNOSTIC | CONVERGED |
-| `MARKER_IN_ARRAY_WARNED` | dev-gated | DIAGNOSTIC | CONVERGED |
-| `warnedNoopPaths` | dev-gated inline | DIAGNOSTIC | CONVERGED |
-| `warnedNoopCopyPaths` | dev-gated AT INSTALLATION | DIAGNOSTIC | CONVERGED |
+| subject                  | bound                     | owner      | action    |
+| ------------------------ | ------------------------- | ---------- | --------- |
+| `warnedWriteOnly`        | WeakSet on the processor  | DIAGNOSTIC | CONVERGED |
+| `ENTITY_ARRAY_WARNED`    | explicit cap of 256       | DIAGNOSTIC | CONVERGED |
+| `MARKER_IN_ARRAY_WARNED` | dev-gated                 | DIAGNOSTIC | CONVERGED |
+| `warnedNoopPaths`        | dev-gated inline          | DIAGNOSTIC | CONVERGED |
+| `warnedNoopCopyPaths`    | dev-gated AT INSTALLATION | DIAGNOSTIC | CONVERGED |
 
 ⚠️ `warnedNoopCopyPaths` LOOKED LIKE UNBOUNDED PRODUCTION GROWTH. It is a strong
 `Set<string>` keyed by PATH with no cap, and its guard condition contains no
@@ -5021,9 +5018,7 @@ It does not. `leafEqual` — the only thing that touches it — is installed onl
 when dev mode is on:
 
 ```ts
-const equal = typeof ngDevMode === 'undefined' || ngDevMode
-  ? leafEqual(equalityFn, path)
-  : equalityFn;
+const equal = typeof ngDevMode === 'undefined' || ngDevMode ? leafEqual(equalityFn, path) : equalityFn;
 ```
 
 The guard sits at the INSTALLATION site rather than inside the function, which
@@ -5036,10 +5031,10 @@ misleads. Chased to the call site rather than accepted from the condition.
 A CACHE MAY RETAIN A DERIVATION. IT MUST NOT BECOME A SECOND OBSERVABLE STATE.
 ```
 
-| subject | source of truth | invalidation | owner | action |
-|---|---|---|---|---|
-| `MATERIALIZED` | the branch's live signals | `MEMBERSHIP_REVISION` dependency inside the memo | KERNEL | CONVERGED |
-| `SNAPSHOT_MEMO` | the marker node | the memo's own dependencies | KERNEL | CONVERGED |
+| subject         | source of truth           | invalidation                                     | owner  | action    |
+| --------------- | ------------------------- | ------------------------------------------------ | ------ | --------- |
+| `MATERIALIZED`  | the branch's live signals | `MEMBERSHIP_REVISION` dependency inside the memo | KERNEL | CONVERGED |
+| `SNAPSHOT_MEMO` | the marker node           | the memo's own dependencies                      | KERNEL | CONVERGED |
 
 Both WeakMap-keyed by the node, both storing a `computed` rather than a value —
 so invalidation is the reactive graph's, not a hand-rolled eviction rule. That
@@ -5131,10 +5126,10 @@ ABSENCE OF SEMANTIC AUTHORITY` — but as constants and structural keys, under
    2 pending, both in devtools-impl
 ```
 
-| subject | retained fact | owner | action |
-|---|---|---|---|
-| `devToolsGroups` | `Map` of devtools groups, held on a global registry host | DIAGNOSTIC | CONVERGED |
-| `devToolsConnections` | `Map` of devtools connections, same host | DIAGNOSTIC | CONVERGED |
+| subject               | retained fact                                            | owner      | action    |
+| --------------------- | -------------------------------------------------------- | ---------- | --------- |
+| `devToolsGroups`      | `Map` of devtools groups, held on a global registry host | DIAGNOSTIC | CONVERGED |
+| `devToolsConnections` | `Map` of devtools connections, same host                 | DIAGNOSTIC | CONVERGED |
 
 Both are `const` bindings caching a Map that lives on a documented global
 registry host (`__SIGNALTREE_DEVTOOLS_*`), which is how devtools survives module
@@ -5176,14 +5171,14 @@ given real traces below.
 
 ### The last two mutable-authority subjects
 
-| | `devToolsGroups` | `devToolsConnections` |
-|---|---|---|
-| membership means | a devtools group exists for this groupId | a live/connecting devtools connection for this groupId |
-| writers | `set` at group creation | `set` on connect and reconnect |
-| removers | `delete` on teardown | `delete` on disconnect, failure, teardown |
-| readers | `get` for reuse; `get` for aggregated-instance lookup | `get` before send/subscribe |
-| decision | reuse the existing group vs create one | send to an existing connection vs open one |
-| lifetime | the devtools session, not any tree | same |
+|                   | `devToolsGroups`                                                                                                                                                                                                  | `devToolsConnections`                                  |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| membership means  | a devtools group exists for this groupId                                                                                                                                                                          | a live/connecting devtools connection for this groupId |
+| writers           | `set` at group creation                                                                                                                                                                                           | `set` on connect and reconnect                         |
+| removers          | `delete` on teardown                                                                                                                                                                                              | `delete` on disconnect, failure, teardown              |
+| readers           | `get` for reuse; `get` for aggregated-instance lookup                                                                                                                                                             | `get` before send/subscribe                            |
+| decision          | reuse the existing group vs create one                                                                                                                                                                            | send to an existing connection vs open one             |
+| lifetime          | the devtools session, not any tree                                                                                                                                                                                | same                                                   |
 | why a global host | `window`/`globalThis` keyed by `__SIGNALTREE_DEVTOOLS_*` so duplicate module instances share one devtools registry — the browser extension is process-wide, so a package-local Map would split one session in two |
 
 ```text
@@ -5243,12 +5238,12 @@ comes from its consumers.
 
 ### The four escalated
 
-| subject | fact | owner | action |
-|---|---|---|---|
-| `TREE_CAPABILITY_ORDER` | capability visiting order — **order IS consumed**, it drives dependency resolution | KERNEL | CONVERGED |
-| `RESTORATION_CAPABILITIES` | which capabilities grant `hasRestorationAuthority` | OPTIONAL-CAPABILITY | CONVERGED |
-| `WHOLE_SUBJECT` | shared `{kind:'whole'}` sentinel for whole-subject addresses | KERNEL | CONVERGED |
-| `SNAPSHOT_FORMAT_VERSION` | `'2.0.0'` stamped into every snapshot | OPTIONAL-CAPABILITY | **REVIEW** |
+| subject                    | fact                                                                               | owner               | action     |
+| -------------------------- | ---------------------------------------------------------------------------------- | ------------------- | ---------- |
+| `TREE_CAPABILITY_ORDER`    | capability visiting order — **order IS consumed**, it drives dependency resolution | KERNEL              | CONVERGED  |
+| `RESTORATION_CAPABILITIES` | which capabilities grant `hasRestorationAuthority`                                 | OPTIONAL-CAPABILITY | CONVERGED  |
+| `WHOLE_SUBJECT`            | shared `{kind:'whole'}` sentinel for whole-subject addresses                       | KERNEL              | CONVERGED  |
+| `SNAPSHOT_FORMAT_VERSION`  | `'2.0.0'` stamped into every snapshot                                              | OPTIONAL-CAPABILITY | **REVIEW** |
 
 ⚠️ `SNAPSHOT_FORMAT_VERSION` IS WRITTEN AND NEVER READ. It is stamped into every
 persisted snapshot and **nothing validates or migrates on it** — no comparison,
@@ -5270,10 +5265,10 @@ serialization-contract decision, not a constant-policy one.
 positional `notify(...)` call. Two of its nine fields were dead in **opposite
 directions**, which is why neither was visible from one side alone:
 
-| field | producer | consumer | verdict |
-|---|---|---|---|
-| `kind` | set on **every** mutation | **none** | DELETE |
-| `structural` | **never set** | `meta.structuralEffect` | DELETE |
+| field        | producer                  | consumer                | verdict |
+| ------------ | ------------------------- | ----------------------- | ------- |
+| `kind`       | set on **every** mutation | **none**                | DELETE  |
+| `structural` | **never set**             | `meta.structuralEffect` | DELETE  |
 
 **`kind`.** Three producers, all reachable, none informative. Two threaded a
 literal `'set'`/`'update'` from `leaf.set`/`leaf.update`. The third —
@@ -5318,7 +5313,7 @@ private  StructuralEffect
 private  __DefinitelyNotAType__   ← known-negative control
 ```
 
-An earlier run of this probe reported *everything* private including the
+An earlier run of this probe reported _everything_ private including the
 negative control — a dead instrument from an unresolved path mapping. The
 result above is only admissible because the positive control passes.
 
@@ -5381,17 +5376,17 @@ ARM D            throw when ownerPath !== path         exit 0   ← never differ
 ARM F            throw when ownerPath is undefined     exit 0   ← never absent
 ```
 
-So `envelope.ownerPath` is **always exactly `envelope.path`**, and *both*
+So `envelope.ownerPath` is **always exactly `envelope.path`**, and _both_
 defaults written to handle their disagreement are dead: the producer's
 `options.ownerPath ?? options.path` and the consumer's `envelope.ownerPath ??
 envelope.path`.
 
 This is deliberately **not** treated as dead-code removal. Unlike `kind`,
-`structural` and `subjectId`, `ownerPath` is produced *and* read — it merely
+`structural` and `subjectId`, `ownerPath` is produced _and_ read — it merely
 always equals its neighbour, and it does so for two **different** reasons:
 `signal-tree.ts` sets both to the leaf path, while `observation-substrate.ts`
-sets `{ path: ownerPath, ownerPath }`, deliberately reporting the mutation *at
-the owner path*. Same value, different semantic domain. Collapsing them would
+sets `{ path: ownerPath, ownerPath }`, deliberately reporting the mutation _at
+the owner path_. Same value, different semantic domain. Collapsing them would
 be a representation choice about whether this transport should preserve a
 distinction the `notify(...)` protocol maintains for its other callers — which
 is the ME-A/ME-B/ME-C question, not a mechanical cleanup.
@@ -5427,8 +5422,8 @@ entities **19.41**/21 KB (from 19.46), dev 11.12 and 22.02.
 340 censused subjects, 340 ledger rows, **0 stale**, 279 UNKNOWN. Two repairs
 were needed to get there, both pre-existing:
 
-1. The census self-check was hard-failing with *"the parser is broken, not the
-   repository"* — because its known-present anchor was `batchUpdates`, a field
+1. The census self-check was hard-failing with _"the parser is broken, not the
+   repository"_ — because its known-present anchor was `batchUpdates`, a field
    BATCH-UPDATES-INTENT-0 had already retired. A `mustFind` anchor must name
    something the audit is not trying to delete, or the gate dies of its own
    success. Repointed to `enhancers`, with a bogus-name control confirming the
@@ -5476,7 +5471,7 @@ Deleted: `MutationEnvelope`, `PathNotifier.emitMutation`,
 split a string path on `.` so the envelope could carry `PropertyKey[]`;
 `joinPathSegments` rejoined it with the same delimiter one hop later. That
 round-trip is string identity, so nothing observable depended on it — and the
-intermediate array was *wrong* for any key containing a dot, which never
+intermediate array was _wrong_ for any key containing a dot, which never
 mattered because **no consumer ever read the segments**. The one representation
 the envelope added over the protocol was the one nothing used. Both helpers were
 checked for independent consumers before deletion, as the ruling required; each
@@ -5521,18 +5516,18 @@ and it cannot be made without turning five tests red.
 Two carriers were **updated in place, not retired**: the uninstalled-port
 inertness test now exercises `notify`, and the port's member list now asserts
 `['notify']`. That second assertion is the structural guard against a future
-parameter object appearing *beside* the protocol instead of replacing it.
+parameter object appearing _beside_ the protocol instead of replacing it.
 
 **The census anchor defect recurred immediately — and that is the finding.**
-`mustFind('mutationEnvelopeFields', …, 'positionId')` failed with *"the parser is
-broken, not the repository"* the moment the interface was deleted. That is the
+`mustFind('mutationEnvelopeFields', …, 'positionId')` failed with _"the parser is
+broken, not the repository"_ the moment the interface was deleted. That is the
 second occurrence in two passes, after `batchUpdates`. Twice is not coincidence:
 
 > **A KNOWN-PRESENT ANCHOR MUST NAME SOMETHING THE AUDIT IS NOT TRYING TO
 > DELETE, OR SUCCESSFUL CLEANUP REPORTS ITSELF AS TOOL FAILURE.**
 
 A convergence audit deletes subjects by design, so any anchor pinned to a subject
-under disposition is a *scheduled* false alarm. The whole `mutationEnvelopeFields`
+under disposition is a _scheduled_ false alarm. The whole `mutationEnvelopeFields`
 category was retired — discovery, anchor, emit, and category accounting — rather
 than repointed to another field of a dying interface, and the seven `envelope:*`
 rulings were removed from the generator for the same reason: a ruling for a
@@ -5548,7 +5543,7 @@ subject identity is live with 70+ readers and is untouched.
 consumers, not from this deletion.
 
 **Positional `notify(...)` is not frozen by ME-B.** One protocol is frozen, not
-its parameter syntax. A typed `PathNotification` object derived from *all*
+its parameter syntax. A typed `PathNotification` object derived from _all_
 current producers and consumers remains admissible as representation cleanup —
 but only as an in-place replacement. Adding one beside the positional API would
 recreate the exact dual-protocol shape this ruling removed.
@@ -5606,39 +5601,39 @@ by two families, by none, or if a family names a file with no sites.
 
 ### Producer families
 
-| producer family | allocation / source | lifetime | owner |
-|---|---|---|---|
-| fresh member | `StructuralStore.allocateFreshSubjectId()` — per-store counter from 1 | until forgotten | entity/structural |
-| planned batch add | `planFreshSubjectIds(n)` (reserve, then commit) | same | entity/structural |
-| replay reinstatement | `createSubject(id, key)` with a **given** id; bumps `nextSubjectId` past it | preserves identity across rollback/restore | causal replay |
+| producer family      | allocation / source                                                         | lifetime                                   | owner             |
+| -------------------- | --------------------------------------------------------------------------- | ------------------------------------------ | ----------------- |
+| fresh member         | `StructuralStore.allocateFreshSubjectId()` — per-store counter from 1       | until forgotten                            | entity/structural |
+| planned batch add    | `planFreshSubjectIds(n)` (reserve, then commit)                             | same                                       | entity/structural |
+| replay reinstatement | `createSubject(id, key)` with a **given** id; bumps `nextSubjectId` past it | preserves identity across rollback/restore | causal replay     |
 
 There is **no generic producer.** The ME-B result already proved the generic
 authored-scalar route never produced one.
 
 ### Consumer families
 
-| family | sites | decision made from subject id | needs independent identity? |
-|---|---|---|---|
-| A entity structural identity | 575 | which member a key/position currently denotes; rekey, replace, tombstone, reactivate | **yes** |
-| B notification / link routing | 39 | routes a delivery to the member it concerns | carries, does not decide |
-| C restoration claim / reclamation | 130 | whether a physical backing may be released | **yes** |
-| D causal transaction / rollback | 105 | which member an effect compensates | **yes** |
-| E realization / replay | 143 | which member to reinstate, and its neighbours | **yes** |
-| F diagnostics | 3 | reporting only | no |
+| family                            | sites | decision made from subject id                                                        | needs independent identity? |
+| --------------------------------- | ----- | ------------------------------------------------------------------------------------ | --------------------------- |
+| A entity structural identity      | 575   | which member a key/position currently denotes; rekey, replace, tombstone, reactivate | **yes**                     |
+| B notification / link routing     | 39    | routes a delivery to the member it concerns                                          | carries, does not decide    |
+| C restoration claim / reclamation | 130   | whether a physical backing may be released                                           | **yes**                     |
+| D causal transaction / rollback   | 105   | which member an effect compensates                                                   | **yes**                     |
+| E realization / replay            | 143   | which member to reinstate, and its neighbours                                        | **yes**                     |
+| F diagnostics                     | 3     | reporting only                                                                       | no                          |
 
 ### Lifecycle matrix — measured, not inferred
 
-| scenario | key/address | positionId | subjectId |
-|---|---|---|---|
-| ordinary scalar | path | present | **none** (proved by ME-B) |
-| entity member | key | present | present |
-| same-key update | unchanged | unchanged | unchanged |
-| **rekey** (`changeId(1,2)`) | **1 → 2** | 2 → 2 | **1 → 1 (preserved)** |
-| replace value | unchanged | unchanged | preserved |
-| remove → tombstone | key released | retained | retained, `state: tombstoned` |
-| **retire + re-add same key** | **1 → 1** | **1 → 1** | **1 → 2 (fresh)** |
-| same key, two collections | 7 / 7 | 3 / 4 | **1 / 1 (collide)** |
-| replay reinstatement | restored | restored | **preserved** |
+| scenario                     | key/address  | positionId | subjectId                     |
+| ---------------------------- | ------------ | ---------- | ----------------------------- |
+| ordinary scalar              | path         | present    | **none** (proved by ME-B)     |
+| entity member                | key          | present    | present                       |
+| same-key update              | unchanged    | unchanged  | unchanged                     |
+| **rekey** (`changeId(1,2)`)  | **1 → 2**    | 2 → 2      | **1 → 1 (preserved)**         |
+| replace value                | unchanged    | unchanged  | preserved                     |
+| remove → tombstone           | key released | retained   | retained, `state: tombstoned` |
+| **retire + re-add same key** | **1 → 1**    | **1 → 1**  | **1 → 2 (fresh)**             |
+| same key, two collections    | 7 / 7        | 3 / 4      | **1 / 1 (collide)**           |
+| replay reinstatement         | restored     | restored   | **preserved**                 |
 
 ### The decisive result
 
@@ -5855,10 +5850,10 @@ and then stopped at the branch it defined for itself:
 
 **Step 1 — producers.** Eight writers, two causal sources, not eight authorities:
 
-| producer family | source record | why that subject is the effect subject |
-|---|---|---|
-| tree realization / replay (7 sites) | `effect.subjectId` on the planned causal effect | the effect *is* the reinstatement of that subject — add, remove, rekey and the heterogeneous frame each name the one row they realize |
-| restoration replay (1 site) | `entry.restorationSubjectIds` on the history record | the record names exactly the subjects that entry is responsible for restoring |
+| producer family                     | source record                                       | why that subject is the effect subject                                                                                                |
+| ----------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| tree realization / replay (7 sites) | `effect.subjectId` on the planned causal effect     | the effect _is_ the reinstatement of that subject — add, remove, rekey and the heterogeneous frame each name the one row they realize |
+| restoration replay (1 site)         | `entry.restorationSubjectIds` on the history record | the record names exactly the subjects that entry is responsible for restoring                                                         |
 
 **Step 2 — the split could not find a destination.** The narrowest internal
 carrier does not exist, and could not be created without new machinery:
@@ -5929,15 +5924,15 @@ different facts. Being distinct is not the same as earning a public slot:
 **Why no replacement channel was built.** The only route where this copy was the
 sole carrier is `interceptLeafSignals` — unexported, explicitly "not root app
 API", no consumer outside core. Production readers of the replay effect subject:
-zero; the causal runtime *holds* `effect.subjectId` when it stamps the meta and
+zero; the causal runtime _holds_ `effect.subjectId` when it stamps the meta and
 never reads it back. The two alternatives were both dead ends, measured rather
 than assumed: the exposed `CanonicalTurn.__effects[]` carry no numeric
 `subjectId`, and re-reading `restorationSubjectIds` would be circular because the
 carriers already derive their EXPECTED tokens from that field.
 
 **What was retired: one assertion, not two tests.** The carriers lost only
-*"a private test observer can re-read the exact causal effect subject through
-public WriteMetadata"*. Every semantic claim survives, and the test count is
+_"a private test observer can re-read the exact causal effect subject through
+public WriteMetadata"_. Every semantic claim survives, and the test count is
 unchanged at 2026:
 
 ```text
@@ -6029,13 +6024,13 @@ silently widening the action.
 Denominator re-derived after the move (not the ~35 estimate): **41 subjects**.
 Closed **36**; escalated **5**.
 
-| group | n | owner | action |
-|---|---|---|---|
-| config with a proven reader | 5 | KERNEL | CONVERGED |
-| capability declarations + construction param | 5 | KERNEL | CONVERGED |
-| marker factories (authoring syntax) | 2 | DOMAIN-SPECIALIZATION | CONVERGED |
-| marker registration / materialization | 4 | KERNEL ×3, DOMAIN ×1 | CONVERGED |
-| structural symbols | 20 | KERNEL ×13, OPTIONAL ×5, DOMAIN ×1, FRAMEWORK ×1 | CONVERGED |
+| group                                        | n   | owner                                            | action    |
+| -------------------------------------------- | --- | ------------------------------------------------ | --------- |
+| config with a proven reader                  | 5   | KERNEL                                           | CONVERGED |
+| capability declarations + construction param | 5   | KERNEL                                           | CONVERGED |
+| marker factories (authoring syntax)          | 2   | DOMAIN-SPECIALIZATION                            | CONVERGED |
+| marker registration / materialization        | 4   | KERNEL ×3, DOMAIN ×1                             | CONVERGED |
+| structural symbols                           | 20  | KERNEL ×13, OPTIONAL ×5, DOMAIN ×1, FRAMEWORK ×1 | CONVERGED |
 
 Config rows carry their proven reader site, resolved by declaration symbol via a
 new `tools/tree-config-consumers.mjs` generalized from the `batchUpdates`
@@ -6087,11 +6082,11 @@ detector seeing nothing.
 
 **Contract sweep — one pass, and it found no contract but two hazards.**
 
-1. `TreeConfig.name` carried the doc *"Name shown in devtools."* It was shown
+1. `TreeConfig.name` carried the doc _"Name shown in devtools."_ It was shown
    nowhere; the working field is **`DevToolsConfig.name`**, which survives. That
    is the same shape this very file already tombstones for `enableTimeTravel`:
-   *"it had ZERO consumers in signal-tree.ts and silently did nothing, while a
-   working flag of the same name lives on `DevToolsConfig`."* Twice is a pattern,
+   _"it had ZERO consumers in signal-tree.ts and silently did nothing, while a
+   working flag of the same name lives on `DevToolsConfig`."_ Twice is a pattern,
    and it is an argument for deletion, not against it.
 2. **`enableDevTools` is also a live exported FUNCTION** (`devtools.ts:87`,
    `enableDevTools(name?)`). The dead config field was a same-spelled twin of a
@@ -6157,8 +6152,8 @@ Cause: a public type reaches the barrel by **two spellings**, and the detector
 knew one —
 
 ```ts
-export type { PlantedType } from './c';                 // matched
-export { defineStore, type DefineStoreConfig } from '…' // NOT matched
+export type { PlantedType } from './c'; // matched
+export { defineStore, type DefineStoreConfig } from '…'; // NOT matched
 ```
 
 The value detector was never wrong about these (it filters `type ` members out),
@@ -6240,15 +6235,15 @@ evidence rows          120      NEW 0        ABSENT 0
 The prior `module-state-evidence` rows carry the same `state:<file>:<name>` key
 the ledger uses, so this is an identity join, not resemblance.
 
-| owner / action | n |
-|---|---|
-| KERNEL / CONVERGED | 71 |
-| OPTIONAL-CAPABILITY / CONVERGED | 26 |
-| DIAGNOSTIC / CONVERGED | 13 |
-| DOMAIN-SPECIALIZATION / CONVERGED | 6 |
-| FRAMEWORK-ADAPTER / CONVERGED | 1 |
-| TEST-SEAM / CONVERGED | 1 |
-| **KERNEL / REIMPLEMENT** | 1 — `applyMemberValue` |
+| owner / action                      | n                                            |
+| ----------------------------------- | -------------------------------------------- |
+| KERNEL / CONVERGED                  | 71                                           |
+| OPTIONAL-CAPABILITY / CONVERGED     | 26                                           |
+| DIAGNOSTIC / CONVERGED              | 13                                           |
+| DOMAIN-SPECIALIZATION / CONVERGED   | 6                                            |
+| FRAMEWORK-ADAPTER / CONVERGED       | 1                                            |
+| TEST-SEAM / CONVERGED               | 1                                            |
+| **KERNEL / REIMPLEMENT**            | 1 — `applyMemberValue`                       |
 | **FRAMEWORK-ADAPTER / REIMPLEMENT** | 1 — `installed`, the C6 realization boundary |
 
 Both pre-existing named actions were carried forward rather than cleared by
@@ -6376,8 +6371,7 @@ module. The first pass called it CONVERGED off the wrong basename match.
 
 ### D. Action accounting — the two missing rows were `REVIEW`
 
-My tally regexed four action spellings and printed 23 against a checker total of
-25. The gap was two `REVIEW` rows — `public:batching` and `public:entityMap` —
+My tally regexed four action spellings and printed 23 against a checker total of 25. The gap was two `REVIEW` rows — `public:batching` and `public:entityMap` —
 which are not generic review at all but the named BATCHING-OWNERSHIP-0 and
 ENTITY-REPRESENTATION-OWNERSHIP-0 discriminators. Renamed to REIMPLEMENT with the
 named issue in the rationale.
@@ -6418,7 +6412,7 @@ bare 8.92/9.7 KB · entities 19.35/21 KB
 ### A. `JOB-INVENTORY` inheritance deleted
 
 The objection was right: inheriting an owner from a module's other agreeing jobs
-detects a *known* mixed module but cannot detect a binding that **is** the
+detects a _known_ mixed module but cannot detect a binding that **is** the
 module's undiscovered minority job.
 
 > **AGREEMENT AMONG KNOWN JOBS IN A MODULE DOES NOT PROVE THAT AN UNCLASSIFIED
@@ -6560,13 +6554,13 @@ state provenance revealed diagnostic and framework bindings.
 > **SPLIT WHEN CO-LOCATION CREATES DEPENDENCY, AUTHORITY, OR MATERIAL COST — NOT
 > TO MAKE THE OWNERSHIP TABLE MONOCHROME.**
 
-| module | runtime Angular | ngDevMode guards | disposition |
-|---|---|---|---|
-| `lib/utils.ts` | signal, computed, isSignal, **effect, Injector, runInInjectionContext** | 10 | **SPLIT held** — the DI work is a different job from the kernel utilities beside it |
-| `lib/signal-tree.ts` | signal, isSignal, untracked, computed | 32 | **REIMPLEMENT** — coupling belongs to the kernel job itself; no diagnostic split |
-| `lib/internals/merge-derived.ts` | isSignal | 4 | **REIMPLEMENT** — re-evaluate after `isReactiveNode` |
-| `lib/internals/materialize-markers.ts` | **none** | 8 | **CONVERGED** — dev-guarded co-location, no dependency or cost |
-| `lib/constants.ts` | **none** | 2 | **REIMPLEMENT (DEV-ENV)** — fix S4 first, then re-evaluate |
+| module                                 | runtime Angular                                                         | ngDevMode guards | disposition                                                                         |
+| -------------------------------------- | ----------------------------------------------------------------------- | ---------------- | ----------------------------------------------------------------------------------- |
+| `lib/utils.ts`                         | signal, computed, isSignal, **effect, Injector, runInInjectionContext** | 10               | **SPLIT held** — the DI work is a different job from the kernel utilities beside it |
+| `lib/signal-tree.ts`                   | signal, isSignal, untracked, computed                                   | 32               | **REIMPLEMENT** — coupling belongs to the kernel job itself; no diagnostic split    |
+| `lib/internals/merge-derived.ts`       | isSignal                                                                | 4                | **REIMPLEMENT** — re-evaluate after `isReactiveNode`                                |
+| `lib/internals/materialize-markers.ts` | **none**                                                                | 8                | **CONVERGED** — dev-guarded co-location, no dependency or cost                      |
+| `lib/constants.ts`                     | **none**                                                                | 2                | **REIMPLEMENT (DEV-ENV)** — fix S4 first, then re-evaluate                          |
 
 ### Denominator
 
@@ -6604,12 +6598,16 @@ read, `.set`, `.update`, `.asReadonly` (one use, `destroyed`). Compiled against
 `@angular/core`:
 
 ```ts
-interface ReadableCell<T> { (): T }
-interface WritableCell<T> extends ReadableCell<T> {
-  set(v: T): void; update(fn: (c: T) => T): void; asReadonly(): ReadableCell<T>;
+interface ReadableCell<T> {
+  (): T;
 }
-const a: WritableCell<number> = angularWritableSignal;  // COMPILES
-const b: ReadableCell<number> = angularSignal;          // COMPILES
+interface WritableCell<T> extends ReadableCell<T> {
+  set(v: T): void;
+  update(fn: (c: T) => T): void;
+  asReadonly(): ReadableCell<T>;
+}
+const a: WritableCell<number> = angularWritableSignal; // COMPILES
+const b: ReadableCell<number> = angularSignal; // COMPILES
 ```
 
 Negative control (adding a member Angular lacks) fails, so the probe
@@ -6638,13 +6636,13 @@ canonical storage. **S1 is therefore not "replace Angular signals" — it is
 "extend the storage model the causal path already uses to the plain path."**
 
 **3. The realization port's own documentation already assigns installation
-correctly.** `materialization-realization.ts` states: *"INSTALLATION is once per
+correctly.** `materialization-realization.ts` states: _"INSTALLATION is once per
 process by whichever package supplies the reactive runtime; `@signaltree/core`
-does it for Angular."* The contract is deliberately two methods and warns
+does it for Angular."_ The contract is deliberately two methods and warns
 against becoming a signals abstraction. Its only consumer is
-`materialize-markers.ts` (2 sites), and it degrades by design — *"a neutral
+`materialize-markers.ts` (2 sites), and it degrades by design — _"a neutral
 consumer with no framework installed is a supported configuration, not an
-error."* Moving the install call out of `signal-tree.ts` is a topology fix with a
+error."_ Moving the install call out of `signal-tree.ts` is a topology fix with a
 documented safe degradation, not a redesign.
 
 **4. `ngDevMode` is DEV-C — there is no runtime Angular dependency.** It is
@@ -6680,7 +6678,7 @@ move that failed to install would be caught.
 ```ts
 export type TrackingSuppression = <T>(fn: () => T) => T;
 export function installTrackingSuppression(next: TrackingSuppression): void;
-export function withoutTracking<T>(fn: () => T): T;   // default: fn()
+export function withoutTracking<T>(fn: () => T): T; // default: fn()
 ```
 
 All four `untracked` sites converted. **`owned-mutation.ts`'s only Angular VALUE
@@ -6770,7 +6768,7 @@ eventual package split would be a file move. The ratchet rejected it: **10 → 1
 coupled modules.
 
 It was right. `signal-tree.ts` still imports `signal` to create leaves and
-`isSignal` in `recursiveUpdate` for its own work, so isolating the *install*
+`isSignal` in `recursiveUpdate` for its own work, so isolating the _install_
 removed no coupling and added a module that had it.
 
 > **CONCENTRATING A DEPENDENCY IS NOT REMOVING IT.**
@@ -6805,8 +6803,8 @@ publishable manifest) plus the current workspace, then reconciled against the
 ```
 
 Dispositions come from the deleting commit's own stated reason where one exists
-— *"SignalTree ships no validation API"* (schema), *"the transform can never
-run"* (callable-syntax), *"not published in 14.0.0"* (enterprise) — and from
+— _"SignalTree ships no validation API"_ (schema), _"the transform can never
+run"_ (callable-syntax), _"not published in 14.0.0"_ (enterprise) — and from
 whether the semantic job is reachable in the v15 public surface today (`batching()`,
 `devTools()`, `persistence()`, `restoration()`, `entityMap` all are).
 
@@ -6820,7 +6818,7 @@ enterprise · callable-syntax                                13.5.0
 
 ### A warning I raised and then had to withdraw
 
-From the git manifests I flagged six packages as *"⚠ ADMITS v15"* — `events` and
+From the git manifests I flagged six packages as _"⚠ ADMITS v15"_ — `events` and
 `ng-forms` carried `@signaltree/core@^15.0.0-rc.1`, and four others carried
 `workspace:*`. Against the registry that is **wrong**: no 15.x of anything was
 ever published, and every published companion pins core to a **14.x or 13.x
@@ -6868,16 +6866,16 @@ C  names published (probed)        8
 U  union                          38    dispositioned 38    unexplained 0
 ```
 
-| disposition | n | names |
-|---|---|---|
-| SEE-GENERATION-CENSUS | 21 | the manifest denominator, dispositioned by PACKAGE-GENERATION-CENSUS-0 |
-| PROSE-ONLY | 8 | doc/history prose, never a package contract |
-| TEST-FIXTURE | 3 | `fake`, `x`, `definitely-not-a-package` — deliberate negative controls |
-| PROPOSED-FUTURE | 2 | `kernel`, `angular` — belong to the `@signal-tree` generation |
-| PROPOSED-NOT-EARNED | 1 | `authoring` — RELEASE-1.0.md: *"STOPPED. Package/form is UNPROVEN."* |
-| NEVER-EXISTED | 1 | `storage` — documented in myths-and-misconceptions as a myth |
-| NOT-A-PACKAGE | 1 | `source` — the Nx workspace root project name |
-| NON-PACKAGE | 1 | `persist` — see below |
+| disposition           | n   | names                                                                  |
+| --------------------- | --- | ---------------------------------------------------------------------- |
+| SEE-GENERATION-CENSUS | 21  | the manifest denominator, dispositioned by PACKAGE-GENERATION-CENSUS-0 |
+| PROSE-ONLY            | 8   | doc/history prose, never a package contract                            |
+| TEST-FIXTURE          | 3   | `fake`, `x`, `definitely-not-a-package` — deliberate negative controls |
+| PROPOSED-FUTURE       | 2   | `kernel`, `angular` — belong to the `@signal-tree` generation          |
+| PROPOSED-NOT-EARNED   | 1   | `authoring` — RELEASE-1.0.md: _"STOPPED. Package/form is UNPROVEN."_   |
+| NEVER-EXISTED         | 1   | `storage` — documented in myths-and-misconceptions as a myth           |
+| NOT-A-PACKAGE         | 1   | `source` — the Nx workspace root project name                          |
+| NON-PACKAGE           | 1   | `persist` — see below                                                  |
 
 **Names absent from the earlier 21-row census, and why:** `authoring`, `kernel`,
 `angular`, `storage`, `source`, `persist`, plus the prose and fixture names.
@@ -7044,11 +7042,11 @@ Mutation-proven: forcing the predicate to `false` turns
 
 **And the substitution exposed a contract asymmetry worth keeping.** The neutral
 predicate degrades to `false` when no realization is installed. For
-`materialize-markers` that is documented as *"the conservative direction: the
-walk treats the node as ordinary data"*. In `merge-derived` the identical
+`materialize-markers` that is documented as _"the conservative direction: the
+walk treats the node as ordinary data"_. In `merge-derived` the identical
 degradation is the OPPOSITE of conservative — a caller-supplied `computed()`
-treated as ordinary data is silently dropped, which that file calls *"historically
-the single most expensive failure mode"*.
+treated as ordinary data is silently dropped, which that file calls _"historically
+the single most expensive failure mode"_.
 
 Measured: with the realization uninstalled, the substitution takes the failure
 count from **4 to 8**. The scenario is incoherent in practice (Angular
@@ -7060,8 +7058,8 @@ coupling of correctness to installation.
 
 **S2b-2 `signal-tree.ts` — two of three sites substituted; NOT neutralized.**
 Line 26 is the realization binding itself (`isReactiveNode: (node) =>
-isSignal(node)`) — Angular *answering* the question, where the other two were the
-kernel *asking* it. It stays until S1 frees leaf creation from Angular `signal`.
+isSignal(node)`) — Angular _answering_ the question, where the other two were the
+kernel _asking_ it. It stays until S1 frees leaf creation from Angular `signal`.
 
 ```text
 signal-tree.js runtime imports: signal, isSignal, computed, untracked   (unchanged)
@@ -7130,8 +7128,8 @@ bare 8.93/9.7 KB · entities 19.38/21 KB
 > package topology rather than a configuration the kernel must support.
 
 **The 4→8 result was never a product defect**, and the contract says so
-plainly: `TreeConfig.derived` is documented as *"returns a partial shape of
-`computed()` signals"*, so its input is framework-created by definition. Nothing
+plainly: `TreeConfig.derived` is documented as _"returns a partial shape of
+`computed()` signals"_, so its input is framework-created by definition. Nothing
 there needed adjudicating.
 
 **The measurement did find a real defect — in my own S2b-2.**
@@ -7144,7 +7142,7 @@ realization absent, after S2b-2 (both sites)      169   ← 151 from ONE site
 realization absent, line 941 reverted              37
 ```
 
-Line 941 asks *"is this leaf, which the kernel itself created, writable?"* — and
+Line 941 asks _"is this leaf, which the kernel itself created, writable?"_ — and
 routing it through the realization predicate made every merge write silently do
 nothing when no adapter was installed. The kernel's canonical write path had
 become contingent on an optional adapter.
@@ -7227,10 +7225,10 @@ defends this decision.
 The cause is visible in the code: several sites already read
 
 ```ts
-isSignal(v) || (typeof v === 'function' && 'set' in v && typeof v.set === 'function')
+isSignal(v) || (typeof v === 'function' && 'set' in v && typeof v.set === 'function');
 ```
 
-SignalTree leaves *are* functions with `.set`, so the structural fallback catches
+SignalTree leaves _are_ functions with `.set`, so the structural fallback catches
 every writable leaf whether or not `isSignal` answers. `isSignal` only adds
 coverage for READONLY reactive values (a `computed()`), and no exercised path
 appears to depend on that.
@@ -7253,16 +7251,16 @@ core 2012 | 3 expected fail · gates --fast 49/49 · coupled modules 8
 
 ### SERIALIZATION-REACTIVE-NEED-0 — SER-A, REDUNDANT
 
-The failed mutation control was the real signal. Asked narrowly — *does any
+The failed mutation control was the real signal. Asked narrowly — _does any
 supported path need reactive classification beyond the structural
-writable-callable check?* — the answer is no, per path:
+writable-callable check?_ — the answer is no, per path:
 
-| path | input | readonly reactive reachable? | what `isSignal` contributed |
-|---|---|---|---|
-| ENCODE (416) | `encodeSnapshot(tree(), …)` — the MATERIALIZED snapshot | **no** — probed: `tree()` on a tree with `.derived()` yields `["a","b"]`, no `sum` | nothing; the code's own comment already said *"we already unwrapped them"* |
-| HYDRATE branch/leaf (626, 837) | walks `$` | yes | nothing — already paired with the identical structural fallback |
-| HYDRATE write target (731, 762) | walks `$` | yes | **worse than nothing** — see below |
-| HYDRATE recursion guard (787) | walks `$` | yes | gated anyway by `isTraversableNode` + `isWritableCallable` |
+| path                            | input                                                   | readonly reactive reachable?                                                       | what `isSignal` contributed                                                |
+| ------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ENCODE (416)                    | `encodeSnapshot(tree(), …)` — the MATERIALIZED snapshot | **no** — probed: `tree()` on a tree with `.derived()` yields `["a","b"]`, no `sum` | nothing; the code's own comment already said _"we already unwrapped them"_ |
+| HYDRATE branch/leaf (626, 837)  | walks `$`                                               | yes                                                                                | nothing — already paired with the identical structural fallback            |
+| HYDRATE write target (731, 762) | walks `$`                                               | yes                                                                                | **worse than nothing** — see below                                         |
+| HYDRATE recursion guard (787)   | walks `$`                                               | yes                                                                                | gated anyway by `isTraversableNode` + `isWritableCallable`                 |
 
 Probed directly: a `.derived()` value in `$` is a function with **no `.set`** — a
 readonly computed. The structural check answers `false` for it, which is correct:
@@ -7381,11 +7379,11 @@ for. The control below covers the whole change set.
 Arm A = commit `97e304cf`, pre-split, built from its own sources.
 Arm B = current working tree.
 
-| arm | A (pre-split) | B (current) | disposition |
-| --- | --- | --- | --- |
-| `bench-compare` undo-redo | RED | RED | pre-existing; very likely stale harness — 224 restoration tests are GREEN, but that proves the product's *exercised* restoration contract, not that every assumption in the arm is wrong |
-| `bench-history-ownership` | RED | RED | pre-existing; exact disposition **OPEN** |
-| `size-report` | RED, identical unresolved `storage-adapters.js` | RED | stale harness **confirmed** |
+| arm                       | A (pre-split)                                   | B (current) | disposition                                                                                                                                                                              |
+| ------------------------- | ----------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bench-compare` undo-redo | RED                                             | RED         | pre-existing; very likely stale harness — 224 restoration tests are GREEN, but that proves the product's _exercised_ restoration contract, not that every assumption in the arm is wrong |
+| `bench-history-ownership` | RED                                             | RED         | pre-existing; exact disposition **OPEN**                                                                                                                                                 |
+| `size-report`             | RED, identical unresolved `storage-adapters.js` | RED         | stale harness **confirmed**                                                                                                                                                              |
 
 None of the three is a regression from the split work.
 
@@ -7401,7 +7399,7 @@ None of the three is a regression from the split work.
 3. The root cause: **`NX_WORKSPACE_ROOT_PATH` was exported in the environment**,
    so every "isolated" worktree build compiled main-repo sources and rewrote the
    main `dist`. Builds must override it (`NX_WORKSPACE_ROOT_PATH=<worktree>
-   NX_DAEMON=false`) or they silently measure the wrong repository.
+NX_DAEMON=false`) or they silently measure the wrong repository.
 
 Arm A was only trusted after asserting the built artifact carried `isSignal` and
 **zero** split markers. Reproduce the baseline from commit `97e304cf`; the
@@ -7429,12 +7427,12 @@ SignalTree cell identity. v15 separates them.
     REALIZATION CREATES AN OBJECT.
     SEMANTIC ADOPTION GIVES IT STATE-CELL IDENTITY.
 
-| acquires cell identity | does NOT |
-| --- | --- |
-| owned tree leaf (at installation) | unadopted `CellRuntime` value |
-| `DerivedRuntime` value | publication token (`signal(0)`) |
-| explicit `stampDerived` adoption | `toWritableSignal` Angular view |
-| `linkedSignal` owned leaf | foreign consumer signal |
+| acquires cell identity            | does NOT                        |
+| --------------------------------- | ------------------------------- |
+| owned tree leaf (at installation) | unadopted `CellRuntime` value   |
+| `DerivedRuntime` value            | publication token (`signal(0)`) |
+| explicit `stampDerived` adoption  | `toWritableSignal` Angular view |
+| `linkedSignal` owned leaf         | foreign consumer signal         |
 
 Foreign reactivity is recognised ONLY at the walker boundary, via the
 realization port — never by widening cell ownership.
@@ -7455,12 +7453,12 @@ runtime, wearing `__ownerId` / `__ownerPath` / `__positionIds`.
 
 ### CELL-IDENTITY-CARRIER-0 — FROZEN: private non-enumerable symbol
 
-| arm | wide construction | heap/tree |
-| --- | --- | --- |
-| WeakSet, all runtime cells | +12.2% | +1.9% — RED |
-| symbol, all runtime cells | +6.1% | 0.0% |
-| **symbol, sparse (accepted)** | **+6.7%** | **0.0%** |
-| A/A noise floor | ±2.1% | ±0.0% |
+| arm                           | wide construction | heap/tree   |
+| ----------------------------- | ----------------- | ----------- |
+| WeakSet, all runtime cells    | +12.2%            | +1.9% — RED |
+| symbol, all runtime cells     | +6.1%             | 0.0%        |
+| **symbol, sparse (accepted)** | **+6.7%**         | **0.0%**    |
+| A/A noise floor               | ±2.1%             | ±0.0%       |
 
 The cost is REAL, not neutral: ~0.078 ms once, on a 1000-field construction.
 Accepted under the preregistered stop rule — sparse did not materially beat
@@ -7472,14 +7470,14 @@ or production falsifier.
 
 One semantic implementation; two truthful package declarations.
 
-|  | `@signal-tree/kernel` | `@signal-tree/angular` |
-| --- | --- | --- |
-| leaf / nested leaf | `WritableCell<T>` | `WritableSignal<T>` |
-| `destroyed` | `ReadableCell<boolean>` | `Signal<boolean>` |
-| entity field | `WritableCell<T>` | `WritableSignal<T>` |
-| entity `asReadonly()` | `ReadableCell<T>` | `Signal<T>` |
-| `EntityMap.empty` | `ReadableCell<boolean>` | `Signal<boolean>` |
-| Angular assignment | REJECTED | — |
+|                       | `@signal-tree/kernel`   | `@signal-tree/angular` |
+| --------------------- | ----------------------- | ---------------------- |
+| leaf / nested leaf    | `WritableCell<T>`       | `WritableSignal<T>`    |
+| `destroyed`           | `ReadableCell<boolean>` | `Signal<boolean>`      |
+| entity field          | `WritableCell<T>`       | `WritableSignal<T>`    |
+| entity `asReadonly()` | `ReadableCell<T>`       | `Signal<T>`            |
+| `EntityMap.empty`     | `ReadableCell<boolean>` | `Signal<boolean>`      |
+| Angular assignment    | REJECTED                | —                      |
 
 TA-A carried the kernel; TA-B fired at the npm boundary. The kernel cannot
 describe `AngularLeaf`: its content is the private brands `[SIGNAL]` /
@@ -7533,26 +7531,26 @@ Deliberately NOT renamed here — that is a surface-quality ruling for
 v15 physically exists as a neutral kernel plus a native Angular realization, in
 real installable artifacts — not merely as a workspace architecture.
 
-| packed `@signal-tree/kernel` (Angular absent) | |
-| --- | --- |
-| `npm ls @angular/core` | empty |
-| manifest Angular dep / peer | none |
-| packed JS Angular imports | **0** (detector control: 1) |
-| packed `.d.ts` Angular refs | **0** (detector control: 1) |
-| root + `/adapter` resolution | PASS |
-| tree · nested · entityMap · derived · function-as-state · destroy | PASS |
-| restoration eligibility, both sides | PASS |
-| Link push-out · settled · retrieve · dispose | PASS |
+| packed `@signal-tree/kernel` (Angular absent)                     |                             |
+| ----------------------------------------------------------------- | --------------------------- |
+| `npm ls @angular/core`                                            | empty                       |
+| manifest Angular dep / peer                                       | none                        |
+| packed JS Angular imports                                         | **0** (detector control: 1) |
+| packed `.d.ts` Angular refs                                       | **0** (detector control: 1) |
+| root + `/adapter` resolution                                      | PASS                        |
+| tree · nested · entityMap · derived · function-as-state · destroy | PASS                        |
+| restoration eligibility, both sides                               | PASS                        |
+| Link push-out · settled · retrieve · dispose                      | PASS                        |
 
-| packed `@signal-tree/angular` (both tarballs) | |
-| --- | --- |
-| dependency direction | angular -> kernel, no reverse |
-| public-root installs realization | PASS, no manual installer |
-| native `WritableSignal` · stable identity · graph participation | PASS |
-| merge reaches the same native cell | PASS |
-| `destroyed` / entity / `asReadonly` / `.empty` are Signals | PASS |
-| installed `.d.ts` TYPE-A | PASS |
-| minified, tree-shaken production bundle | PASS |
+| packed `@signal-tree/angular` (both tarballs)                   |                               |
+| --------------------------------------------------------------- | ----------------------------- |
+| dependency direction                                            | angular -> kernel, no reverse |
+| public-root installs realization                                | PASS, no manual installer     |
+| native `WritableSignal` · stable identity · graph participation | PASS                          |
+| merge reaches the same native cell                              | PASS                          |
+| `destroyed` / entity / `asReadonly` / `.empty` are Signals      | PASS                          |
+| installed `.d.ts` TYPE-A                                        | PASS                          |
+| minified, tree-shaken production bundle                         | PASS                          |
 
 ### Packing earned its keep
 
@@ -7600,11 +7598,11 @@ pre-existing placeholder string.
 
     MULTIPLE PHYSICAL STRUCTURES DO NOT IMPLY MULTIPLE SEMANTIC AUTHORITIES.
 
-| structure | owns | keyed by |
-| --- | --- | --- |
-| `StructuralStore<K>` | identity, lifetime, revision, active-node structure | `K` -> subjectId |
-| `EntityValueStore<E>` | retained row value | subjectId |
-| per-entity cells | observation projection | subjectId |
+| structure             | owns                                                | keyed by         |
+| --------------------- | --------------------------------------------------- | ---------------- |
+| `StructuralStore<K>`  | identity, lifetime, revision, active-node structure | `K` -> subjectId |
+| `EntityValueStore<E>` | retained row value                                  | subjectId        |
+| per-entity cells      | observation projection                              | subjectId        |
 
 Complementary, joined by subject identity — no two hold the same fact. Exactly ONE
 `new StructuralStore` site in the kernel; row values appear only in `lib/physical/`
@@ -7651,11 +7649,11 @@ authorities to unify, and not an API-freeze risk.
 
 Post-rewrite ledger, measured from installed tarballs (not `src/index.ts`):
 
-| package | exports | star exports |
-| --- | --- | --- |
-| `@signal-tree/kernel` | 47 | **0** |
-| `@signal-tree/kernel/adapter` | 18 | **0** |
-| `@signal-tree/angular` | 48 | **0** |
+| package                       | exports | star exports |
+| ----------------------------- | ------- | ------------ |
+| `@signal-tree/kernel`         | 47      | **0**        |
+| `@signal-tree/kernel/adapter` | 18      | **0**        |
+| `@signal-tree/angular`        | 48      | **0**        |
 
 Pre-rewrite the kernel had 66. Reconciled exactly: 33 KEEP + 2 RENAME +
 9 INTERNALIZE + 5 DELETE + 17 ruled = 66. (The earlier prose said "18 unresolved"
@@ -7745,12 +7743,12 @@ carrier-insensitive, re-exported without binding.
 
 ### Final package-qualified ledger
 
-| package | exports | star |
-| --- | --- | --- |
-| `@signal-tree/kernel` | 47 | 0 |
-| `@signal-tree/kernel/adapter` | 24 | 0 |
-| `@signal-tree/angular` | 51 | 0 |
-| **total** | **122** | **0** |
+| package                       | exports | star  |
+| ----------------------------- | ------- | ----- |
+| `@signal-tree/kernel`         | 55      | 0     |
+| `@signal-tree/kernel/adapter` | 24      | 0     |
+| `@signal-tree/angular`        | 51      | 0     |
+| **total**                     | **130** | **0** |
 
     angular carrier-bound names        9 of 9
     angular internals leaked           NONE
@@ -7760,9 +7758,9 @@ carrier-insensitive, re-exported without binding.
 
 ## GREENFIELD-V15-SURFACE-0 — CLOSED GREEN / FROZEN
 
-    @signal-tree/kernel          47 exports  0 star
-    @signal-tree/kernel/adapter  24 exports  0 star
-    @signal-tree/angular         51 exports  0 star
+@signal-tree/kernel 55 exports 0 star
+@signal-tree/kernel/adapter 24 exports 0 star
+@signal-tree/angular 51 exports 0 star
 
     old transitional names gone · deleted APIs unreachable
     Angular internal binders leaked NONE
@@ -7776,3 +7774,32 @@ compiler failure. No physical machinery crossed.
 **SURFACE SHAPE IS FROZEN. The API is NOT yet frozen** — final release evidence
 and RC-HARNESS-1/2/3 must clear first. No further renames, removals or shape
 changes absent a release-blocking falsifier.
+
+## READONLY-FOREIGN-REACTIVE-0 — RF-A / CLOSED GREEN
+
+`ReadableCell<T>` and `NodeAccessor<T>` overlap structurally because both are
+zero-argument readers. Reordering the readable branch first is invalid: a real
+node accessor also satisfies that shape and loses its child topology.
+
+The discriminator is the existing call grammar. TypeScript's effective
+`Parameters<T>` tuple is empty for Angular `Signal` / `WritableSignal`, and
+non-empty for `NodeAccessor`, including an empty-object accessor and the bare
+accessor returned by `bind()`. The readonly dispatch keeps its marker, writable,
+accessor, readable, object order and refines only the accessor arm.
+
+The same closure exposed one remaining neutral alias inside the entity readonly
+helpers. Threading their existing carrier parameter made entity readers,
+entity fields and computed slices native in the Angular package without adding
+another type system or changing runtime behavior.
+
+Initial evidence at `1c021fb6`: Angular and kernel typechecks green; kernel 2016 passed
+with 3 expected failures; Angular 24 passed; both lints exit 0; packed installed
+PCP/RF controls compile; packed runtime controls kernel 3/3 and Angular 8/8.
+
+Release-gate synchronization then found one missing PCP control: the builder row
+asserted the base leaf and `destroyed`, but not the derived member itself.
+`SignalTreeBuilderOf.derived()` preserved `C` around a neutral
+`ProcessDerived<T>`, so external Angular-native derived tiers exposed the gap.
+`ProcessDerivedOf<T, C>` now carries the existing realization through derived
+readers and writers, and both package matrices assert the derived result. The
+full release matrix is green: 66/66 gates.

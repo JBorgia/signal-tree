@@ -1,4 +1,5 @@
 import type { ReadableCell, WritableCell } from './cell-runtime';
+import type { CarrierKind, LeafOf, ReadonlyOf } from '../types';
 
 /**
  * Derived State Type Utilities
@@ -20,13 +21,16 @@ import type { ReadableCell, WritableCell } from './cell-runtime';
  * checking Signal first would widen `linked()`/`linkedSignal()` results to
  * read-only and break `$.x.set()`.
  */
-export type ProcessDerived<T> = T extends WritableCell<infer W>
-  ? WritableCell<W>
+export type ProcessDerivedOf<T, C extends CarrierKind> =
+  T extends WritableCell<infer W>
+  ? LeafOf<W, C>
   : T extends ReadableCell<infer S>
-  ? ReadableCell<S>
+  ? ReadonlyOf<C, S>
   : T extends object
-  ? { [P in keyof T]: ProcessDerived<T[P]> }
+  ? { [P in keyof T]: ProcessDerivedOf<T[P], C> }
   : never;
+
+export type ProcessDerived<T> = ProcessDerivedOf<T, 'cell'>;
 
 /**
  * Deep merges source TreeNode and derived types.

@@ -278,7 +278,7 @@ all of them."
 ## 8. Status
 
 Implemented as scoped/cache-aware `load` support on
-[`markers/entity-map.ts`](../../packages/core/src/lib/markers/entity-map.ts) (loader
+[`markers/entity-map.ts`](../../packages/kernel/src/lib/markers/entity-map.ts) (loader
 mechanics factored into
 `markers/entity-loader.ts` (was `packages/core/src/lib/markers/entity-loader.ts`, deleted with loader in 15.0));
 tests in `markers/entity-map-loading.spec.ts` (was `packages/core/src/lib/markers/entity-map-loading.spec.ts`, deleted with loader in 15.0)

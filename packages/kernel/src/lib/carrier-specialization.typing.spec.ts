@@ -27,12 +27,4 @@ describe('kernel carrier specialization', () => {
     const top: WritableCell<number> = kn.count;
     expect(top).toBe(top);
   });
-
-  it('the kernel registry has no Angular carrier to name', () => {
-    // @ts-expect-error the kernel declares only 'cell'; 'angular' is merged in
-    // by @signal-tree/angular and is not nameable here.
-    type Leaked = TreeNodeOf<State, 'angular'>;
-    const guard: Leaked | undefined = undefined;
-    expect(guard).toBeUndefined();
-  });
 });

@@ -25,7 +25,8 @@
 import { build } from 'esbuild';
 
 const PKGS = [
-  'core',
+  'kernel',
+  'angular',
 ];
 const ROOT = new URL('..', import.meta.url).pathname;
 const NM = `${ROOT}node_modules`;
@@ -35,6 +36,7 @@ const EXTERNAL = [
   'rxjs',
   'rxjs/*',
   'tslib',
+  '@signal-tree/*',
   '@signaltree/*',
   'zod',
   'valibot',

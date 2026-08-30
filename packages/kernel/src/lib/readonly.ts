@@ -135,11 +135,6 @@ type ReadonlyEntityNodeOf<E, C extends CarrierKind> = {
  * surface returns a deep-writable `EntityNode`, which would leak the write
  * path through a "readonly" view (RFC 0004 §3 V-P2).
  */
-export type ReadonlyEntitySignal<
-  E,
-  K extends string | number = string
-> = ReadonlyEntitySignalOf<E, K, 'cell'>;
-
 type ReadonlyEntitySignalOf<
   E,
   K extends string | number,

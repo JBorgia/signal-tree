@@ -5,7 +5,7 @@
  * ==========================================================
  *
  * CHECK-ONLY (no generation). The authoritative Angular support range is
- * packages/kernel/package.json -> peerDependencies["@angular/core"]. Every
+ * packages/angular/package.json -> peerDependencies["@angular/core"]. Every
  * canonical claim site must state that same range, both as prose
  * ("Angular 20, 21, or 22") and — where ranges are quoted — as the semver
  * range ("^20.0.0 || ^21.0.0 || ^22.0.0"). Precedent for the failure mode:
@@ -219,15 +219,15 @@ function selfTest(majors) {
 // ---------------------------------------------------------------------------
 
 function main() {
-  const corePkgPath = path.join(ROOT, 'packages', 'core', 'package.json');
-  if (!fs.existsSync(corePkgPath)) {
-    console.error('Missing packages/kernel/package.json');
+  const angularPkgPath = path.join(ROOT, 'packages', 'angular', 'package.json');
+  if (!fs.existsSync(angularPkgPath)) {
+    console.error('Missing packages/angular/package.json');
     process.exit(2);
   }
-  const range = JSON.parse(fs.readFileSync(corePkgPath, 'utf8'))
+  const range = JSON.parse(fs.readFileSync(angularPkgPath, 'utf8'))
     .peerDependencies?.['@angular/core'];
   if (!range) {
-    console.error('packages/kernel/package.json has no @angular/core peer dependency');
+    console.error('packages/angular/package.json has no @angular/core peer dependency');
     process.exit(2);
   }
   const majors = parseMajors(range);

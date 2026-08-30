@@ -866,15 +866,6 @@ export type EntitySignal<E, K extends string | number = string> =
 // described enhancers that do not exist on this surface, were reachable from no
 // entry point, and were referenced by nothing — de-exporting them is what let
 // eslint finally see they were dead.
-export interface PersistenceConfig {
-  key: string;
-  storage?: Storage;
-  debounceMs?: number;
-  filter?: (path: string) => boolean;
-  serialize?: (state: unknown) => string;
-  deserialize?: (json: string) => unknown;
-}
-
 export interface DevToolsConfig {
   /** Enable Redux DevTools browser extension */
   enableBrowserDevTools?: boolean;
@@ -1215,7 +1206,7 @@ export type SignalTree<T> = ISignalTree<T>;
 import type {
   SignalTreeBuilderOf,
 } from './internals/builder-types';
-import type { ProcessDerived } from './internals/derived-types';
+import type { ProcessDerivedOf } from './internals/derived-types';
 import type { Enhancer } from '../enhancers/types';
 import type { AccumulatedEnhancerAdditions } from './enhancer-types';
 
@@ -1223,7 +1214,7 @@ export interface SignalTreeFactoryOf<K extends CarrierKind> {
   <T extends object, TDerived extends object>(
     initialState: T,
     derivedFactory: ($: TreeNodeOf<T, K>) => TDerived
-  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K> & ProcessDerived<TDerived>, K>;
+  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K> & ProcessDerivedOf<TDerived, K>, K>;
   <
     T extends object,
     const E extends readonly Enhancer<unknown>[],
@@ -1234,17 +1225,10 @@ export interface SignalTreeFactoryOf<K extends CarrierKind> {
       enhancers: E;
       derived: ($: TreeNodeOf<T, K>) => TDerived;
     }
-  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K> & ProcessDerived<TDerived>, K> &
+  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K> & ProcessDerivedOf<TDerived, K>, K> &
     AccumulatedEnhancerAdditions<E>;
-  
+
   // Overload: enhancers
-  <
-    T extends object,
-    const E extends readonly Enhancer<unknown>[]
-  >(
-    initialState: T,
-    config: Omit<TreeConfig, 'enhancers'> & { enhancers: E }
-  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K>, K> & AccumulatedEnhancerAdditions<E>;
   <
     T extends object,
     const E extends readonly Enhancer<unknown>[]
@@ -1257,7 +1241,7 @@ export interface SignalTreeFactoryOf<K extends CarrierKind> {
     config: Omit<TreeConfig, 'derived'> & {
       derived: ($: TreeNodeOf<T, K>) => TDerived;
     }
-  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K> & ProcessDerived<TDerived>, K>;
+  ): SignalTreeBuilderOf<T, TreeNodeOf<T, K> & ProcessDerivedOf<TDerived, K>, K>;
   <T extends object>(
     initialState: T,
     config?: TreeConfig

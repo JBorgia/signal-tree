@@ -29,12 +29,12 @@ Use this index to navigate the documentation.
 
 ## 📖 Guides
 
-| Document                                                           | Description                                        |
-| ------------------------------------------------------------------ | -------------------------------------------------- |
-| [Migration Guide](guides/MIGRATION.md)                             | Upgrading from v4 package structure                |
-| [Persistence and Security](guides/persistence-and-security.md)     | Withdrawn: its subject, the `stored()` marker, is deleted    |
-| [Typing Patterns](guides/typing-patterns.md)                       | Preferred TypeScript typing patterns               |
-| [Local Development Symlinks](guides/local-development-symlinks.md) | Troubleshooting dual Angular instance issues       |
+| Document                                                           | Description                                               |
+| ------------------------------------------------------------------ | --------------------------------------------------------- |
+| [Migration Guide](guides/MIGRATION.md)                             | Upgrading from v4 package structure                       |
+| [Persistence and Security](guides/persistence-and-security.md)     | Withdrawn: its subject, the `stored()` marker, is deleted |
+| [Typing Patterns](guides/typing-patterns.md)                       | Preferred TypeScript typing patterns                      |
+| [Local Development Symlinks](guides/local-development-symlinks.md) | Troubleshooting dual Angular instance issues              |
 
 ---
 
@@ -54,7 +54,7 @@ Use this index to navigate the documentation.
 
 | Document                                               | Description                                                                                     |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [Core](../packages/core/README.md)                     | @signaltree/core package                                                                        |
+| [Kernel](../packages/kernel/README.md)                 | @signal-tree/kernel package                                                                     |
 | [Migration v13 → v14](guides/migration-v13-v14.md)     | `@signaltree/enterprise` was REMOVED in 14.0.0 — §6 has the migration                           |
 | [Migration v14 → v14.1](guides/migration-v14-v14.1.md) | 14.1.1 renames/removes API in a MINOR — `asMap`, `name`, `recordHistory`, `pauseRecording` gone |
 

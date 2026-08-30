@@ -22,6 +22,16 @@ describe('PCP — kernel public transformations stay neutral', () => {
     expect([top, nested, deep, destroyed].length).toBe(4);
   });
 
+  it('builder chaining: .derived() keeps the neutral carrier', () => {
+    const t = signalTree({ count: 1 }).derived(($) => ({
+      doubled: (() => $.count() * 2) as ReadableCell<number>,
+    }));
+    const derived: ReadableCell<number> = t.$.doubled;
+    // @ts-expect-error the kernel derived reader has no Angular signal brand
+    const angularLie: WritableSignal<number> = t.$.doubled;
+    expect([derived, angularLie].length).toBe(2);
+  });
+
   it('entity + slices: neutral readers and writers, at depth', () => {
     const t = signalTree({ rows: entityMap<Row, number>() });
     const rows = t.$.rows;

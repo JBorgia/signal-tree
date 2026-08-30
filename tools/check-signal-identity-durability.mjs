@@ -43,8 +43,17 @@
  *
  * Usage: node --expose-gc tools/check-signal-identity-durability.mjs [--self-test]
  */
-import { existsSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+} from 'node:fs';
 import { join } from 'node:path';
+import { tmpdir } from 'node:os';
+import { pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
 
 if (typeof globalThis.gc !== 'function') {
   console.error(
@@ -109,13 +118,43 @@ if (process.argv.includes('--self-test')) {
   process.exit(0);
 }
 
-const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
-if (!existsSync(CORE)) {
-  console.error('❌ build first: nx build kernel');
+const ROOT = process.cwd();
+const ANGULAR = join(ROOT, 'dist/packages/angular');
+const KERNEL = join(ROOT, 'dist/packages/kernel');
+if (!existsSync(ANGULAR) || !existsSync(KERNEL)) {
+  console.error('❌ build first: nx build angular');
   process.exit(1);
 }
-const { signalTree, entityMap, restoration, undoable } = await import(CORE);
-const { computed } = await import('@angular/core');
+const fixture = mkdtempSync(join(tmpdir(), 'st-signal-identity-'));
+const modules = join(fixture, 'node_modules');
+const scope = join(modules, '@signal-tree');
+mkdirSync(scope, { recursive: true });
+cpSync(ANGULAR, join(scope, 'angular'), { recursive: true });
+cpSync(KERNEL, join(scope, 'kernel'), { recursive: true });
+mkdirSync(join(modules, '@angular'), { recursive: true });
+for (const dependency of ['core']) {
+  cpSync(
+    join(ROOT, 'node_modules', '@angular', dependency),
+    join(modules, '@angular', dependency),
+    { recursive: true, dereference: true }
+  );
+}
+for (const dependency of ['rxjs', 'tslib']) {
+  cpSync(join(ROOT, 'node_modules', dependency), join(modules, dependency), {
+    recursive: true,
+    dereference: true,
+  });
+}
+process.on('exit', () => rmSync(fixture, { recursive: true, force: true }));
+
+const angularEntry = join(scope, 'angular', 'dist/index.js');
+const { signalTree, entityMap, restoration, undoable } = await import(
+  pathToFileURL(angularEntry).href
+);
+const requireFromFixture = createRequire(join(fixture, 'package.json'));
+const { computed } = await import(
+  pathToFileURL(requireFromFixture.resolve('@angular/core')).href
+);
 const cfg = { selectId: (r) => r.id };
 
 // 1 — the decisive one

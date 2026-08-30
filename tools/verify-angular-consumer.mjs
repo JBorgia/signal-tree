@@ -15,7 +15,6 @@ import {
   existsSync,
   mkdtempSync,
   mkdirSync,
-  readdirSync,
   readFileSync,
   writeFileSync,
 } from 'node:fs';
@@ -24,7 +23,7 @@ import { join } from 'node:path';
 
 const ROOT = process.cwd();
 const DIST = join(ROOT, 'dist/packages');
-const PACKAGES = ['core'];
+const PACKAGES = ['kernel', 'angular'];
 const ANGULAR_VERSION = process.env['NG_VERSION'] || '^22.0.0';
 const VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version;
 
@@ -49,13 +48,11 @@ execFileSync(
 
 const tarballs = [];
 for (const pkg of PACKAGES) {
-  execFileSync('npm', ['pack', '--pack-destination', tgzDir], {
+  const packed = JSON.parse(execFileSync('npm', ['pack', '--pack-destination', tgzDir, '--json'], {
     cwd: join(DIST, pkg),
-    stdio: 'pipe',
-  });
-  const tarball = readdirSync(tgzDir)
-    .filter((file) => file.endsWith('.tgz'))
-    .find((file) => file.includes(`signaltree-${pkg}`));
+    encoding: 'utf8',
+  }));
+  const tarball = packed[0]?.filename;
   if (!tarball) {
     console.error(`❌ npm pack produced no ${pkg} tarball.`);
     process.exit(1);
@@ -82,15 +79,17 @@ writeFileSync(
 writeFileSync(
   join(proj, 'src', 'main.ts'),
   `
-import { Component, signal } from '@angular/core';
+import { Component, computed, linkedSignal, type Signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import {
+  asReadonly,
   batching,
+  defineStore,
   entityMap,
   signalTree,
   restoration,
   toWritableSignal,
-} from '@signal-tree/kernel';
+} from '@signal-tree/angular';
 
 type User = { id: number; name: string };
 
@@ -102,13 +101,32 @@ const tree = signalTree({
 tree.$.users.addOne({ id: 1, name: 'Ada' });
 tree.batch(() => tree.$.count.set(1));
 
+const derivedTree = signalTree({ count: 1 }).derived(($) => ({
+  doubled: computed(() => $.count() * 2),
+  draft: linkedSignal(() => $.count()),
+}));
+const reader = asReadonly(derivedTree);
+const doubled: Signal<number> = reader.$.doubled;
+const draft: Signal<number> = reader.$.draft;
+type DraftHasSet = 'set' extends keyof typeof reader.$.draft ? true : false;
+const draftHasSet: DraftHasSet = false;
+
+const ReadonlyStore = defineStore(
+  () => signalTree({ count: 1 }).derived(($) => ({
+    doubled: computed(() => $.count() * 2),
+  })),
+  { expose: 'readonly' }
+);
+type Injected = InstanceType<typeof ReadonlyStore>;
+const injectedDoubled: Signal<number> = null as unknown as Injected['$']['doubled'];
+
 // Forms are COMPOSED, not provided. The ng-forms package is deleted, so this
 // fixture exercises the seam the project actually ships: an ordinary branch
 // handed to Angular as a writable signal.
 // (No backticks in this comment on purpose — it lives inside a template
 // literal, and a backtick here silently ends the fixture source.)
-const profile = signalTree({ email: '' });
-const control = new FormControl(toWritableSignal(profile.$)().email);
+const profile = signalTree({ profile: { email: '' } });
+const control = new FormControl(toWritableSignal(profile.$.profile)().email);
 
 
 @Component({
@@ -121,7 +139,15 @@ class SmokeComponent {
   readonly tree = tree;
 }
 
-export const used = [SmokeComponent, profile, tree];
+export const used = [
+  SmokeComponent,
+  profile,
+  tree,
+  doubled,
+  draft,
+  draftHasSet,
+  injectedDoubled,
+];
 `
 );
 

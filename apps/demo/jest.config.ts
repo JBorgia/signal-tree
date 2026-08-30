@@ -6,7 +6,10 @@ module.exports = {
   maxWorkers: 2,
   testPathIgnorePatterns: ['demo-e2e'],
   moduleNameMapper: {
+    '^@signal-tree/angular$': '<rootDir>/../../packages/angular/src/index.ts',
     '^@signal-tree/kernel$': '<rootDir>/../../packages/kernel/src/index.ts',
+    '^@signal-tree/kernel/adapter$':
+      '<rootDir>/../../packages/kernel/src/adapter.ts',
     // Flat-file subpaths (no index.ts inside a same-named directory) — must be
     // matched before the generic `/$1/index.ts` fallback below, which only
     // resolves subpaths that ARE directories (e.g. `enhancers`).

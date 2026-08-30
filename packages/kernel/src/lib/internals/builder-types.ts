@@ -5,7 +5,7 @@
  */
 import type { CarrierKind, ReadonlyOf } from '../types';
 
-import type { ProcessDerived } from './derived-types';
+import type { ProcessDerivedOf } from './derived-types';
 import type { NodeAccessor, TreeNode } from '../types';
 
 // =============================================================================
@@ -125,7 +125,7 @@ export interface SignalTreeBuilderOf<
   // `SignalTreeBuilder` alias here dropped `C`, so `.derived(...)` handed an
   // Angular consumer a builder whose `destroyed` was a `ReadableCell` — a
   // carrier lie one call into the chain.
-  ): SignalTreeBuilderOf<TSource, TAccum & ProcessDerived<TDerived>, C>;
+  ): SignalTreeBuilderOf<TSource, TAccum & ProcessDerivedOf<TDerived, C>, C>;
 }
 
 /**

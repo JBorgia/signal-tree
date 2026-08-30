@@ -1,4 +1,4 @@
-import { batching, devTools, signalTree, WithDerived } from '@signal-tree/kernel';
+import { batching, devTools, signalTree, DerivedOf } from '@signal-tree/angular';
 
 import { tier1Derived, tier2Derived, tier3Derived } from './derived';
 import { postsState, uiState, usersState } from './state';
@@ -29,13 +29,13 @@ export type AppTreeBase = ReturnType<
 >;
 
 /** Tree type after tier 1 (entity resolution) — used to type tier 2. */
-export type AppTreeWithEntityResolution = WithDerived<
+export type AppTreeWithEntityResolution = DerivedOf<
   AppTreeBase,
   typeof tier1Derived
 >;
 
 /** Tree type after tier 2 (filters/aggregates) — used to type tier 3. */
-export type AppTreeWithFilters = WithDerived<
+export type AppTreeWithFilters = DerivedOf<
   AppTreeWithEntityResolution,
   typeof tier2Derived
 >;
