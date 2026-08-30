@@ -282,7 +282,8 @@ if [ "$KEEP_VERSION" != true ]; then
     "
 fi
 
-# Update each package version and dependencies
+# Update each package version. Internal source dependencies remain workspace
+# protocols; resolve-workspace-specs.mjs rewrites only the built manifests.
 for package in "${PACKAGES[@]}"; do
     PACKAGE_JSON="./packages/$package/package.json"
     if [ -f "$PACKAGE_JSON" ]; then
@@ -294,26 +295,8 @@ for package in "${PACKAGES[@]}"; do
                             pkg.version = '$NEW_VERSION';
                         }
 
-            // Update internal peer dependencies to the compatible release line.
-            if (pkg.peerDependencies) {
-                Object.keys(pkg.peerDependencies).forEach(dep => {
-                    if (dep.startsWith('@signal-tree/')) {
-                        pkg.peerDependencies[dep] = '^' + '$NEW_VERSION';
-                    }
-                });
-            }
-
-            // Public packages in one candidate depend on that exact candidate.
-            if (pkg.dependencies) {
-                Object.keys(pkg.dependencies).forEach(dep => {
-                    if (dep.startsWith('@signal-tree/')) {
-                        pkg.dependencies[dep] = '$NEW_VERSION';
-                    }
-                });
-            }
-
             fs.writeFileSync('$PACKAGE_JSON', JSON.stringify(pkg, null, 2) + '\n');
-            'Package $package version and dependencies updated successfully'
+            'Package $package version updated successfully'
         "
     else
         print_warning "Package.json not found for $package"

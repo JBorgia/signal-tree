@@ -2,11 +2,10 @@
   "counts": {
     "packages/kernel": 0,
     "packages/shared": 0,
-    "packages/events": 1,
-    "apps/demo": 10,
-    "tools": 4,
+    "apps/demo": 9,
+    "tools": 3,
     "scripts": 54
   },
-  "total": 69,
-  "filesLinted": 655
+  "total": 66,
+  "filesLinted": 720
 }
