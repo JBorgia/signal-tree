@@ -1,3 +1,4 @@
+import type { CarrierKind, EntitySignalOf, ReadonlyOf } from './types';
 import type { ReadableCell } from './internals/cell-runtime';
 
 import type { SignalTreeBuilder } from './internals/builder-types';
@@ -87,9 +88,12 @@ export interface ReadonlyNodeAccessor<T> {
  * offered). Resolves to `unknown` (identity under `&`) when there are no
  * extras, so marker-only nodes keep types exactly equal to their views.
  */
-type ReadonlyExtras<N, Base> = keyof Omit<N, keyof Base> extends never
+type ReadonlyExtras<N, Base, C extends CarrierKind> = keyof Omit<
+  N,
+  keyof Base
+> extends never
   ? unknown
-  : ReadonlyView<Omit<N, keyof Base>>;
+  : ReadonlyViewOf<Omit<N, keyof Base>, C>;
 
 // =============================================================================
 // PER-MARKER READ-ONLY VIEWS
@@ -162,15 +166,16 @@ export type ReadonlyEntitySignal<
  * is the maintained guard (RFC 0004 §3 V-P2). Add a row + fixture line for
  * every new marker.
  */
-type ReadonlyViewOf<T> = T extends EntitySignal<
+type ReadonlyNodeView<T, C extends CarrierKind> = T extends EntitySignalOf<
   infer E,
-  infer K extends string | number
+  infer K extends string | number,
+  C
 >
-  ? ReadonlyEntitySignal<E, K> & ReadonlyExtras<T, EntitySignal<E, K>>
+  ? ReadonlyEntitySignal<E, K> & ReadonlyExtras<T, EntitySignal<E, K>, C>
   : T extends WritableLeaf<infer V>
-  ? ReadableCell<V>
+  ? ReadonlyOf<C, V>
   : T extends NodeAccessor<infer U>
-  ? ReadonlyNodeAccessor<U> & ReadonlyView<T>
+  ? ReadonlyNodeAccessor<U> & ReadonlyViewOf<T, C>
   // ⚠️ ORDER: `NodeAccessor` MUST be tested before `ReadableCell`.
   // This used to read `Signal<infer V>`, and Angular's `[SIGNAL]` brand did the
   // discrimination for us: a bare `() => T` accessor could not match it. The
@@ -180,9 +185,9 @@ type ReadonlyViewOf<T> = T extends EntitySignal<
   //
   //     REMOVING A NOMINAL BRAND MAKES STRUCTURAL ORDER LOAD-BEARING.
   : T extends ReadableCell<infer V>
-  ? ReadableCell<V>
+  ? ReadonlyOf<C, V>
   : T extends object
-  ? ReadonlyView<T>
+  ? ReadonlyViewOf<T, C>
   : T;
 
 /**
@@ -196,9 +201,12 @@ type ReadonlyViewOf<T> = T extends EntitySignal<
  * - derived `Signal`s pass through; `linked()` `WritableSignal`s narrow to `Signal`
  * - marker surfaces → their `Readonly*` views (reader allowlists above)
  */
-export type ReadonlyView<T> = {
-  readonly [K in keyof T]: ReadonlyViewOf<T[K]>;
+export type ReadonlyViewOf<T, C extends CarrierKind> = {
+  readonly [K in keyof T]: ReadonlyNodeView<T[K], C>;
 };
+
+/** PUBLIC kernel spelling, bound to the neutral carrier. */
+export type ReadonlyView<T> = ReadonlyViewOf<T, 'cell'>;
 
 /**
  * The read-only store surface: read-only `$` plus the zero-arg snapshot read
@@ -215,14 +223,18 @@ export type ReadonlyView<T> = {
  * @typeParam TSource - the raw source state type (snapshot shape)
  * @typeParam TAccum - the accumulated `$` type; defaults to `TreeNode<TSource>`
  */
-export interface ReadonlyStore<TSource, TAccum = TreeNode<TSource>> {
+export interface ReadonlyStoreOf<TSource, TAccum, C extends CarrierKind> {
   /** Zero-arg snapshot read — the write overloads are not offered. */
   (): TSource;
-  readonly $: ReadonlyView<TAccum>;
+  readonly $: ReadonlyViewOf<TAccum, C>;
   /** Whether this tree has been destroyed. */
-  readonly destroyed: ReadableCell<boolean>;
+  readonly destroyed: ReadonlyOf<C, boolean>;
   destroy(): void;
 }
+
+/** PUBLIC kernel spelling. `@signal-tree/angular` binds `'angular'`. */
+export type ReadonlyStore<TSource, TAccum = TreeNode<TSource>> =
+  ReadonlyStoreOf<TSource, TAccum, 'cell'>;
 
 // =============================================================================
 // asReadonly()

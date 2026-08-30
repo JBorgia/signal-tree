@@ -102,4 +102,13 @@ export type {
   LeafOf,
   ISignalTreeOf,
   SignalTreeFactoryOf,
+  // EARNED BY THE INSTALLED SURFACE, not by convenience. A packed-consumer probe
+  // proved `SignalTreeBuilder.destroyed`, `EntitySignal.empty`/`.all`, entity
+  // fields and `.asReadonly()` all resolved NEUTRAL when re-exported from the
+  // Angular package. Binding them needs these two binders by name.
+  EntitySignalOf,
+  EntityNodeOf,
 } from './lib/types';
+export type { SignalTreeBuilderOf } from './lib/internals/builder-types';
+export type { EntitySignalWithSlicesOf } from './lib/markers/entity-map';
+export type { ReadonlyStoreOf, ReadonlyViewOf } from './lib/readonly';

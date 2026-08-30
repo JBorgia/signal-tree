@@ -25,6 +25,11 @@ import './lib/carrier';
 // the published bundle, shipping an Angular package that installed nothing.
 ensureAngularRealization();
 import type {
+  EntityNodeOf,
+  EntitySignalOf,
+  EntitySignalWithSlicesOf,
+  ReadonlyStoreOf,
+  SignalTreeBuilderOf,
   ISignalTreeOf,
   LeafOf,
   SignalTreeFactoryOf,
@@ -83,6 +88,7 @@ export {
 } from '@signal-tree/kernel';
 
 export type {
+  DerivedOf,
   TreeConfig,
   NodeAccessor,
   AccessibleNode,
@@ -93,12 +99,10 @@ export type {
   LinkEndpoint,
   TreeId,
   TreeErrorEvent,
-  EntitySignal,
   EntityMapMarker,
   EntityMapBuilder,
   EntityMapComputedSlices,
   EntityMapMarkerWithSlices,
-  EntitySignalWithSlices,
   ComputedSliceConfig,
   AddOptions,
   AddManyOptions,
@@ -110,7 +114,6 @@ export type {
   DevToolsMethods,
   DevToolsLogEntry,
   TransactionMethods,
-  SignalTreeBuilder,
 } from '@signal-tree/kernel';
 
 // --- carrier-SENSITIVE: same semantic names, bound to Angular's carrier ---
@@ -118,6 +121,23 @@ export type {
 // implementation vocabulary. Users write the same names they would in the kernel.
 export type TreeNode<T> = TreeNodeOf<T, 'angular'>;
 export type WritableLeaf<T> = LeafOf<T, 'angular'>;
+
+// A packed-consumer probe proved these three were NOT carrier-insensitive:
+// re-exported from the kernel they resolved `destroyed`, `.empty`, `.all`,
+// entity fields and `.asReadonly()` to neutral cells. Same semantic authority,
+// bound to Angular's carrier — no duplicated type system, no star export.
+export type SignalTreeBuilder<TSource, TAccum = TreeNode<TSource>> =
+  SignalTreeBuilderOf<TSource, TAccum, 'angular'>;
+export type EntitySignal<E, K extends string | number = string> =
+  EntitySignalOf<E, K, 'angular'>;
+export type EntityNode<E> = EntityNodeOf<E, 'angular'>;
+export type ReadonlyStore<TSource, TAccum = TreeNode<TSource>> =
+  ReadonlyStoreOf<TSource, TAccum, 'angular'>;
+export type EntitySignalWithSlices<
+  E,
+  K extends string | number,
+  Slices extends Record<string, unknown>
+> = EntitySignalWithSlicesOf<E, K, Slices, 'angular'>;
 
 /**
  * The Angular tree contract. Same one parameter users always wrote; the carrier
