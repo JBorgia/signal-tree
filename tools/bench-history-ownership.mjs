@@ -222,6 +222,37 @@ function ensureCommitted3ArgPathNotifierModule() {
       `export function getActiveWriteContext() { return activeContext; }\n`,
     'utf8'
   );
+  // RC-HARNESS-2. Stage the real committed dependencies rather than maintaining
+  // behavioral shims beside the benchmark. Stub drift previously made this arm
+  // die during module resolution before it measured an ownership assertion.
+  mkdirSync(join(dirname(COMMITTED_3ARG_LIB), 'internals'), { recursive: true });
+  for (const [sourcePath, outputPath] of [
+    [
+      'packages/kernel/src/lib/internals/restoration-eligibility.ts',
+      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'restoration-eligibility.mjs'),
+    ],
+    [
+      'packages/kernel/src/lib/internals/path-observation-port.ts',
+      join(dirname(COMMITTED_3ARG_LIB), 'internals', 'path-observation-port.mjs'),
+    ],
+  ]) {
+    const dependencySource = execFileSync('git', ['show', `HEAD:${sourcePath}`], {
+      cwd: ROOT,
+      encoding: 'utf8',
+    });
+    const dependency = ts.transpileModule(dependencySource, {
+      compilerOptions: {
+        module: ts.ModuleKind.ESNext,
+        target: ts.ScriptTarget.ES2022,
+      },
+      fileName: sourcePath,
+    });
+    writeFileSync(
+      outputPath,
+      `// transpiled from HEAD:${sourcePath}\n${dependency.outputText}`,
+      'utf8'
+    );
+  }
   writeFileSync(
     join(dirname(COMMITTED_3ARG_LIB), 'write-participation.mjs'),
     `export function getWriteParticipation(meta) { return meta?.participation ?? 'authored'; }\n`,
@@ -231,7 +262,15 @@ function ensureCommitted3ArgPathNotifierModule() {
     COMMITTED_3ARG_LIB,
     `// transpiled from HEAD:packages/kernel/src/lib/path-notifier.ts\n${compiled.outputText
       .replace("'./write-context'", "'./write-context.mjs'")
-      .replace("'./write-participation'", "'./write-participation.mjs'")}`,
+      .replace("'./write-participation'", "'./write-participation.mjs'")
+      .replace(
+        "'./internals/restoration-eligibility'",
+        "'./internals/restoration-eligibility.mjs'"
+      )
+      .replace(
+        "'./internals/path-observation-port'",
+        "'./internals/path-observation-port.mjs'"
+      )}`,
     'utf8'
   );
   return COMMITTED_3ARG_LIB;

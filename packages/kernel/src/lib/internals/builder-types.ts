@@ -121,7 +121,11 @@ export interface SignalTreeBuilderOf<
    */
   derived<TDerived extends object>(
     factory: ($: TAccum) => TDerived
-  ): SignalTreeBuilder<TSource, TAccum & ProcessDerived<TDerived>>;
+  // ⚠️ SELF-REFERENCE MUST PRESERVE THE CARRIER. Returning the neutral
+  // `SignalTreeBuilder` alias here dropped `C`, so `.derived(...)` handed an
+  // Angular consumer a builder whose `destroyed` was a `ReadableCell` — a
+  // carrier lie one call into the chain.
+  ): SignalTreeBuilderOf<TSource, TAccum & ProcessDerived<TDerived>, C>;
 }
 
 /**

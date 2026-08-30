@@ -62,24 +62,25 @@ const ENHANCERS = [
   ['batching', 'batching', 'batching()', 't.batch(() => t.$.count.set(2));'],
   ['restoration', 'restoration', 'restoration()', 't.undo(); t.redo();'],
   ['devTools', 'devTools', 'devTools()', 't.connectDevTools();'],
-  ['persistence', 'persistence', "persistence({ key: 'k' })", 't.save();'],
 
 ];
 
-// `audit` is not an enhancer — it is `createAuditTracker(tree, config)`,
-// measured separately below rather than pretended into the enhancer shape.
-const STANDALONE = [
-  ['createAuditTracker', `
-    import { signalTree, createAuditTracker } from ${C};
-    const t = signalTree({ count: 0 });
-    const a = createAuditTracker(t, {});
-    t.$.count.set(1);
-    globalThis.__sink = [a];`],
-];
+// Empty since GREENFIELD-V15-SURFACE-0: the only standalone arm measured
+// `createAuditTracker`, which is no longer part of the v15 public surface.
+const STANDALONE = [];
 
+// RC-HARNESS-3. This measured `core/storage`, importing a VALUE
+// (`createIndexedDBAdapter`) from a module that emits no JS — the persistence
+// enhancer and `StorageAdapter` were deleted from the public v15 surface, and
+// Link + endpoint is the persistence architecture now. The arm was not repaired
+// by resurrecting a dead adapter; it measures the ONE subpath v15 actually
+// ships instead.
 const SUBPATHS = [
-  ['core/storage', `import { createIndexedDBAdapter } from ${sub('enhancers/serialization/storage-adapters.js')};
-     globalThis.__sink = createIndexedDBAdapter();`],
+  [
+    'kernel/adapter',
+    `import { installCellRuntime } from ${sub('adapter.js')};
+     globalThis.__sink = installCellRuntime;`,
+  ],
 ];
 
 const base = await kb(BASE, 'base');

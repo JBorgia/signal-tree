@@ -94,19 +94,34 @@ const seed = (n) => {
 // ---------------------------------------------------------------------------
 const IMPLS = {
   signaltree: async (withHistory) => {
-    const { signalTree, entityMap, restoration } = await import(CORE);
+    const { signalTree, entityMap, restoration, undoable } = await import(
+      CORE
+    );
     // v15: the enhancer is DECLARED, so the two arms differ in their build
     // plan as well as their history. That is the real shape now — a tree with
     // no restoration no longer pays for the causal runtime — and it is exactly
     // what the comparison should measure.
     const tree = signalTree(
       { rows: entityMap({ selectId: (r) => r.id }) },
-      { enhancers: withHistory ? [restoration({ maxHistorySize: 200 })] : [] }
+      {
+        enhancers: withHistory ? [restoration({ maxHistorySize: 200 })] : [],
+        ...(withHistory ? { capabilities: ['causal-runtime'] } : {}),
+      }
     );
     return {
       store: tree,
       setAll: (d) => tree.$.rows.setAll(d),
-      updateOne: (id, changes) => tree.$.rows.updateOne(id, changes),
+      // RC-HARNESS-1. This called `updateOne` bare while the undo workload
+      // described these as "50 undoable USER ACTIONS". v15 restoration is
+      // OPT-IN: an undesignated write is deliberately NOT restorable, so the
+      // arm measured a contract SignalTree no longer offers and reported
+      // "undo restored NOTHING". `undoable(...)` is the public door, so a
+      // benchmark user action goes through it — the harness now expresses the
+      // frozen contract instead of the pre-v15 automatic-history model.
+      updateOne: (id, changes) =>
+        withHistory
+          ? undoable(() => tree.$.rows.updateOne(id, changes))
+          : tree.$.rows.updateOne(id, changes),
       readAll: () => tree.$.rows.all(),
       readOne: (id) => tree.$.rows.byId(id)?.(),
       historyLength: () => tree.getRestorationHistory().length,

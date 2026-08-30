@@ -1,11 +1,15 @@
-import type { CarrierKind, EntitySignalOf, ReadonlyOf } from './types';
+import type {
+  CarrierKind,
+  EntitySignalOf,
+  ISignalTreeOf,
+  ReadonlyOf,
+  TreeNodeOf,
+} from './types';
 import type { ReadableCell } from './internals/cell-runtime';
 
-import type { SignalTreeBuilder } from './internals/builder-types';
+import type { SignalTreeBuilderOf } from './internals/builder-types';
 import type {
   WritableLeaf,
-  EntitySignal,
-  ISignalTree,
   NodeAccessor,
   TreeNode,
 } from './types';
@@ -84,9 +88,9 @@ export interface ReadonlyNodeAccessor<T> {
  * intersects its readonly marker view with the {@link ReadonlyView}-mapped
  * remainder beyond the marker interface: derived `Signal`s survive,
  * `WritableSignal` extras demote to `Signal`, unknown functions degrade to
- * `{}` (fail-safe — a function we can't classify may mutate, so it is not
- * offered). Resolves to `unknown` (identity under `&`) when there are no
- * extras, so marker-only nodes keep types exactly equal to their views.
+ * `{}` unless they already satisfy the kernel's zero-argument `ReadableCell`
+ * contract. Resolves to `unknown` (identity under `&`) when there are no extras,
+ * so marker-only nodes keep types exactly equal to their views.
  */
 type ReadonlyExtras<N, Base, C extends CarrierKind> = keyof Omit<
   N,
@@ -94,6 +98,15 @@ type ReadonlyExtras<N, Base, C extends CarrierKind> = keyof Omit<
 > extends never
   ? unknown
   : ReadonlyViewOf<Omit<N, keyof Base>, C>;
+
+/**
+ * The effective parameter tuple of a callable. For an overloaded
+ * `NodeAccessor`, TypeScript selects its final write overload; a foreign
+ * readable reactive callable has only the zero-argument read signature.
+ */
+type EffectiveParameters<T> = T extends (...args: infer P) => unknown
+  ? P
+  : never;
 
 // =============================================================================
 // PER-MARKER READ-ONLY VIEWS
@@ -104,15 +117,17 @@ type ReadonlyExtras<N, Base, C extends CarrierKind> = keyof Omit<
  * `Signal` leaves, no write call signatures and no leaf `.set`/`.update`.
  * Mirrors `EntityNode`'s branch/array/leaf shape exactly.
  */
-export type ReadonlyEntityNode<E> = {
+type ReadonlyEntityNodeOf<E, C extends CarrierKind> = {
   (): E;
 } & {
   readonly [P in keyof E]: E[P] extends object
     ? E[P] extends readonly unknown[]
-      ? ReadableCell<E[P]>
-      : ReadonlyEntityNode<E[P]>
-    : ReadableCell<E[P]>;
+      ? ReadonlyOf<C, E[P]>
+      : ReadonlyEntityNodeOf<E[P], C>
+    : ReadonlyOf<C, E[P]>;
 };
+
+  export type ReadonlyEntityNode<E> = ReadonlyEntityNodeOf<E, 'cell'>;
 
 /**
  * Read-only view of {@link EntitySignal}: query surface only. `byId`/
@@ -123,11 +138,17 @@ export type ReadonlyEntityNode<E> = {
 export type ReadonlyEntitySignal<
   E,
   K extends string | number = string
-> = PickReaders<EntitySignal<E, K>, (typeof ENTITY_READERS)[number]> & {
+> = ReadonlyEntitySignalOf<E, K, 'cell'>;
+
+type ReadonlyEntitySignalOf<
+  E,
+  K extends string | number,
+  C extends CarrierKind
+> = PickReaders<EntitySignalOf<E, K, C>, (typeof ENTITY_READERS)[number]> & {
   /** Re-signed: same node at runtime, typed without write reachability. */
-  byId(id: K): ReadonlyEntityNode<E> | undefined;
+  byId(id: K): ReadonlyEntityNodeOf<E, C> | undefined;
   /** Re-signed: same node at runtime, typed without write reachability. */
-  byIdOrFail(id: K): ReadonlyEntityNode<E>;
+  byIdOrFail(id: K): ReadonlyEntityNodeOf<E, C>;
 };
 
 // =============================================================================
@@ -145,20 +166,21 @@ export type ReadonlyEntitySignal<
  *   structurally satisfies `NodeAccessor` (a single `(): T` call signature
  *   satisfies all three `NodeAccessor` overloads under TS's fewer-params
  *   rule), so a later row would swallow them.
- * - `WritableLeaf` before `Signal`: it extends `Signal`.
- * - `Signal` before `NodeAccessor`: `ReadableCell<V>`'s bare `() => V` structurally
- *   satisfies `NodeAccessor<V>` (fewer-params rule again), so putting
- *   `NodeAccessor` first would capture every derived computed as a "branch".
- *   The converse is safe: a branch accessor can never match `Signal` because
- *   it lacks Angular's `SIGNAL` brand property. This row also catches plain
- *   `WritableSignal`s from `linked()` and narrows them to `Signal`.
+ * - `WritableLeaf` before `NodeAccessor`: a writable foreign reactive callable
+ *   is demoted through its carrier before the structural callable overlap.
+ * - `NodeAccessor` before `ReadableCell`: a real accessor structurally satisfies
+ *   `ReadableCell`, so moving the readable row first collapses branch topology.
+ *   The accessor row therefore inspects the callable grammar: a zero-parameter
+ *   callable is a foreign reader, while the effective one-parameter overload is
+ *   SignalTree's whole-value/updater write grammar.
  * - Branch accessors (`NodeAccessor<U> & TreeNode<U>`) recurse; the mapped
  *   type drops the write call signatures, `ReadonlyNodeAccessor` re-adds the
  *   zero-arg read.
  * - Bare objects (derived-only groups, `{ group: { total: computed(…) } }`)
  *   have no call signature — they miss the `NodeAccessor` row and recurse
- *   through the object row. Plain function members degrade to `{}` there:
- *   fail-safe (an unknown function may mutate; it is not offered).
+ *   through the object row. Function members with another call grammar degrade
+ *   to `{}` there. A zero-argument function is structurally a `ReadableCell`
+ *   throughout the neutral derived type system and follows the reader row.
  *
  * Dispatch is structural (the accumulated `$` type carries materialized
  * signal surfaces, not brandable markers), so a future marker without a row
@@ -171,17 +193,19 @@ type ReadonlyNodeView<T, C extends CarrierKind> = T extends EntitySignalOf<
   infer K extends string | number,
   C
 >
-  ? ReadonlyEntitySignal<E, K> & ReadonlyExtras<T, EntitySignal<E, K>, C>
+  ? ReadonlyEntitySignalOf<E, K, C> &
+      ReadonlyExtras<T, EntitySignalOf<E, K, C>, C>
   : T extends WritableLeaf<infer V>
   ? ReadonlyOf<C, V>
   : T extends NodeAccessor<infer U>
-  ? ReadonlyNodeAccessor<U> & ReadonlyViewOf<T, C>
+  ? EffectiveParameters<T> extends []
+    ? T extends ReadableCell<infer V>
+      ? ReadonlyOf<C, V>
+      : T
+    : ReadonlyNodeAccessor<U> & ReadonlyViewOf<T, C>
   // ⚠️ ORDER: `NodeAccessor` MUST be tested before `ReadableCell`.
-  // This used to read `Signal<infer V>`, and Angular's `[SIGNAL]` brand did the
-  // discrimination for us: a bare `() => T` accessor could not match it. The
-  // neutral carrier has no brand, so a NodeAccessor DOES structurally satisfy
-  // `ReadableCell` and was being collapsed to `ReadableCell<void>`, losing the
-  // whole child topology of a readonly branch.
+  // The call-grammar check above keeps a foreign zero-argument reader from
+  // being captured as a branch while preserving real accessors here.
   //
   //     REMOVING A NOMINAL BRAND MAKES STRUCTURAL ORDER LOAD-BEARING.
   : T extends ReadableCell<infer V>
@@ -260,12 +284,18 @@ export type ReadonlyStore<TSource, TAccum = TreeNode<TSource>> =
  * // reader.$.count.set(1) // ❌ compile error — not offered
  * ```
  */
-export function asReadonly<TSource, TAccum>(
-  tree: SignalTreeBuilder<TSource, TAccum>
-): ReadonlyStore<TSource, TAccum>;
-export function asReadonly<TSource>(
-  tree: ISignalTree<TSource>
-): ReadonlyStore<TSource>;
+/**
+ * ⚠️ CARRIER-GENERIC. `asReadonly` is re-exported by BOTH packages, so its
+ * declared result must follow the carrier of the tree it was handed rather than
+ * being pinned to the kernel's `'cell'`. Pinned, an Angular consumer calling
+ * `asReadonly(tree)` got a store whose leaves typed as `ReadableCell`.
+ */
+export function asReadonly<TSource, TAccum, C extends CarrierKind = 'cell'>(
+  tree: SignalTreeBuilderOf<TSource, TAccum, C>
+): ReadonlyStoreOf<TSource, TAccum, C>;
+export function asReadonly<TSource, C extends CarrierKind = 'cell'>(
+  tree: ISignalTreeOf<TSource, C>
+): ReadonlyStoreOf<TSource, TreeNodeOf<TSource, C>, C>;
 export function asReadonly(tree: object): object {
   return tree;
 }
