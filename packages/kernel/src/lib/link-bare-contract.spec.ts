@@ -15,7 +15,7 @@ import { signalTree } from './signal-tree';
  * Every case retains the writable callable BEFORE the relationship exists,
  * because that is the shape that broke every alternative design: a `set` or
  * `update` reference that escaped to application code keeps whatever write path
- * it captured, and `CallableWritableSignal` extends Angular's `WritableSignal`,
+ * it captured, and `WritableLeaf` extends Angular's `WritableSignal`,
  * so holding one is ordinary use of a public object.
  *
  * ⚠️ HISTORY. Before the observation substrate, on a plain tree:

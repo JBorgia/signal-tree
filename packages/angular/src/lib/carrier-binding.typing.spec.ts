@@ -35,7 +35,7 @@ describe('Angular package declares Angular carriers', () => {
     rows.addOne({ id: 1, name: 'Ada' });
 
     const empty: Signal<boolean> = rows.empty;
-    const row = rows.byId(1);
+    const row = rows.byIdOrFail(1);
     const field: Signal<string> = row.name;
     const ro: Signal<string> = row.name.asReadonly();
 

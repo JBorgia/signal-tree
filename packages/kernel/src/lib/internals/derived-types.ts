@@ -76,12 +76,12 @@ export type DeepMergeTree<TSource, TDerived> = {
  *   $: AppTreeBase['$'] & ReturnType<typeof tier1Derived>;
  * };
  *
- * // Use WithDerived:
- * type AppTreeWithTier1 = WithDerived<AppTreeBase, typeof tier1Derived>;
- * type AppTreeWithTier2 = WithDerived<AppTreeWithTier1, typeof tier2Derived>;
+ * // Use DerivedOf:
+ * type AppTreeWithTier1 = DerivedOf<AppTreeBase, typeof tier1Derived>;
+ * type AppTreeWithTier2 = DerivedOf<AppTreeWithTier1, typeof tier2Derived>;
  * ```
  */
-export type WithDerived<
+export type DerivedOf<
   TTree extends { $: object },
   TDerivedFn extends ($: TTree['$']) => object
 > = TTree & {

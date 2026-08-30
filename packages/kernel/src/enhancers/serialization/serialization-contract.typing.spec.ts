@@ -32,7 +32,7 @@
 import { signalTree } from '../../lib/signal-tree';
 import { serialization } from './serialization';
 
-import type { CallableWritableSignal, Enhancer } from '../../index';
+import type { WritableLeaf, Enhancer } from '../../index';
 import type { SerializedState } from './serialization';
 
 // --- compile-time assertion helpers -----------------------------------------
@@ -79,9 +79,9 @@ export type _MethodTypes = [
 // 2 — the state surface is untouched by enhancement
 // ============================================================================
 export type _StateSurvives = [
-  Expect<Equal<(typeof serial)['$']['count'], CallableWritableSignal<number>>>,
+  Expect<Equal<(typeof serial)['$']['count'], WritableLeaf<number>>>,
   Expect<
-    Equal<(typeof serial)['$']['user']['name'], CallableWritableSignal<string>>
+    Equal<(typeof serial)['$']['user']['name'], WritableLeaf<string>>
   >
 ];
 export const _count: number = serial.$.count();

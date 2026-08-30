@@ -1,7 +1,7 @@
 {
   "name": "@signal-tree/kernel",
   "version": "15.0.0-rc.1",
-  "description": "Reactive JSON for Angular. State as shape. Signals at every path.",
+  "description": "SignalTree: framework-neutral reactive application state with causal semantics.",
   "license": "Apache-2.0",
   "type": "module",
   "sideEffects": false,

@@ -34,7 +34,7 @@ import { signalTree } from '../../lib/signal-tree';
 import { transactions } from './transactions';
 
 import type {
-  CallableWritableSignal,
+  WritableLeaf,
   Enhancer,
   PendingTransaction,
 } from '../../index';
@@ -69,8 +69,8 @@ export const _pending: PendingTransaction = txn.transaction(() => undefined);
 // 2 — the state surface is untouched by enhancement
 // ============================================================================
 export type _StateSurvives = [
-  Expect<Equal<(typeof txn)['$']['count'], CallableWritableSignal<number>>>,
-  Expect<Equal<(typeof txn)['$']['user']['name'], CallableWritableSignal<string>>>
+  Expect<Equal<(typeof txn)['$']['count'], WritableLeaf<number>>>,
+  Expect<Equal<(typeof txn)['$']['user']['name'], WritableLeaf<string>>>
 ];
 export const _count: number = txn.$.count();
 export const _user: { name: string; age: number } = txn.$.user();

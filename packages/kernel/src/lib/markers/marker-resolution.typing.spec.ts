@@ -19,7 +19,7 @@
 import type { Signal } from '@angular/core';
 
 import type {
-  CallableWritableSignal,
+  WritableLeaf,
   EntitySignal,
 } from '../../index';
 import { entityMap, signalTree } from '../../index';
@@ -56,10 +56,10 @@ type $ = typeof tree.$;
 export type _MarkerResolutionChecks = [
   Expect<Equal<$['users'], EntitySignal<User, number>>>,
   // marker nested at depth resolves too (the "any depth" differentiator)
-  Expect<Equal<$['nested']['deep'], CallableWritableSignal<number>>>,
+  Expect<Equal<$['nested']['deep'], WritableLeaf<number>>>,
   // plain + union leaves stay callable writable signals
-  Expect<Equal<$['count'], CallableWritableSignal<number>>>,
-  Expect<Equal<$['selectedId'], CallableWritableSignal<number | null>>>
+  Expect<Equal<$['count'], WritableLeaf<number>>>,
+  Expect<Equal<$['selectedId'], WritableLeaf<number | null>>>
 ];
 
 // --- `.computed()` slice names are typed on `tree.$` (no `as any`) -----------

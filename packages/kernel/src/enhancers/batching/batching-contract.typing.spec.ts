@@ -28,7 +28,7 @@
 import { signalTree } from '../../lib/signal-tree';
 import { batching } from './batching';
 
-import type { CallableWritableSignal, Enhancer } from '../../index';
+import type { WritableLeaf, Enhancer } from '../../index';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
@@ -69,9 +69,9 @@ batched.flushNotifications();
 // 2 — the state surface is untouched by enhancement
 // ============================================================================
 export type _StateSurvives = [
-  Expect<Equal<(typeof batched)['$']['count'], CallableWritableSignal<number>>>,
+  Expect<Equal<(typeof batched)['$']['count'], WritableLeaf<number>>>,
   Expect<
-    Equal<(typeof batched)['$']['user']['name'], CallableWritableSignal<string>>
+    Equal<(typeof batched)['$']['user']['name'], WritableLeaf<string>>
   >
 ];
 export const _count: number = batched.$.count();

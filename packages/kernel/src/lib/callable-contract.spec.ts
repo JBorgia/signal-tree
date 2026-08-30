@@ -17,7 +17,7 @@ import { signalTree } from './signal-tree';
  * the current value and changed nothing — silently, with no error at compile
  * time or run time.
  *
- * Through 13.x the type said otherwise. `CallableWritableSignal<T>` carried
+ * Through 13.x the type said otherwise. `WritableLeaf<T>` carried
  * `(value: NotFn<T>): void`, so the no-op typechecked.
  * `@signaltree/callable-syntax` was supposed to make it true by rewriting
  * `leaf(v)` to `leaf.set(v)` at build time, and it cannot be delivered to an

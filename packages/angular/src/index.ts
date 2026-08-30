@@ -55,14 +55,69 @@ export const signalTree =
 
 // The semantic API. Identical spelling to the kernel — the difference is which
 // carrier realizes it, which is a packaging decision, never a consumer one.
-// Carrier-INSENSITIVE semantic API comes straight from the kernel.
-export * from '@signal-tree/kernel';
+// ⚠️ NO `export * from '@signal-tree/kernel'`.
+//
+// The star export republished the kernel's NEUTRAL carrier-sensitive types into
+// this package, so `TreeNode<State>` and `WritableLeaf<T>` annotated from
+// `@signal-tree/angular` resolved to `WritableCell` — a carrier lie, even though
+// `signalTree()` INFERENCE was correct. Patching the two known names would leave
+// the same trap for the next carrier-sensitive type, so the star is gone: every
+// name below is re-exported deliberately.
+//
+//     ONE SEMANTIC TYPE AUTHORITY, PACKAGE-SPECIFIC CARRIER BINDING.
 
-// Carrier-SENSITIVE public types, bound to Angular's carrier. Same runtime
-// implementation as the kernel — only the declared carrier differs.
-export type { AngularLeaf } from './lib/carrier';
-export type SignalTreeNode<T> = TreeNodeOf<T, 'angular'>;
-export type AngularCallableLeaf<T> = LeafOf<T, 'angular'>;
+// --- carrier-INSENSITIVE: identical in both packages, re-exported as-is ---
+export {
+  entityMap,
+  link,
+  restoration,
+  undoable,
+  external,
+  derivedFrom,
+  asReadonly,
+  batching,
+  devTools,
+  transactions,
+  onTreeError,
+  SignalTreeRollbackError,
+} from '@signal-tree/kernel';
+
+export type {
+  TreeConfig,
+  NodeAccessor,
+  AccessibleNode,
+  Primitive,
+  Enhancer,
+  EnhancerCleanup,
+  Link,
+  LinkEndpoint,
+  TreeId,
+  TreeErrorEvent,
+  EntitySignal,
+  EntityMapMarker,
+  EntityMapBuilder,
+  EntityMapComputedSlices,
+  EntityMapMarkerWithSlices,
+  EntitySignalWithSlices,
+  ComputedSliceConfig,
+  AddOptions,
+  AddManyOptions,
+  DefaultKey,
+  RestorationMethods,
+  RestorationHistoryEntry,
+  BatchingConfig,
+  BatchingMethods,
+  DevToolsMethods,
+  DevToolsLogEntry,
+  TransactionMethods,
+  SignalTreeBuilder,
+} from '@signal-tree/kernel';
+
+// --- carrier-SENSITIVE: same semantic names, bound to Angular's carrier ---
+// `AngularLeaf`, and the `TreeNodeOf`/`LeafOf` machinery, stay INTERNAL: they are
+// implementation vocabulary. Users write the same names they would in the kernel.
+export type TreeNode<T> = TreeNodeOf<T, 'angular'>;
+export type WritableLeaf<T> = LeafOf<T, 'angular'>;
 
 /**
  * The Angular tree contract. Same one parameter users always wrote; the carrier
