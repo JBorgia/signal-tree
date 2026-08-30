@@ -46,6 +46,39 @@ failures, Angular 24 passed, demo 108 passed with 4 skipped, packed Angular
 consumer typecheck, signal identity durability 4/4, and
 `NX_DAEMON=false NX_ISOLATE_PLUGINS=false npm run gates -- --release` 66/66.
 
+## V15 Public API Freeze — AUTHORIZED
+
+The V15 public API is **FROZEN**. No public rename, removal, signature reshape,
+new adapter contract or semantic API addition is permitted unless a production
+consumer or release-blocking falsifier demonstrates that the frozen contract
+cannot ship.
+
+```text
+public signature closure       GREEN / FROZEN
+carrier propagation            GREEN / FROZEN
+readonly foreign reactive      GREEN / FROZEN
+kernel neutrality              GREEN / FROZEN
+Angular realization            GREEN / FROZEN
+RC harness 1/2/3               GREEN
+final runtime                  GREEN
+final memory / retention       GREEN
+final restoration retention    GREEN
+final shipping cost            GREEN
+release gates                  66 / 66
+regressions over budget        NONE
+```
+
+`FINAL-RELEASE-EVIDENCE-0` is **CLOSED GREEN**. Enforced shipping evidence:
+bare production 9.07/9.7 KB, bare development 11.22/11.9 KB, EntityMap
+production 19.50/21 KB, EntityMap development 22.11/23.7 KB; kernel tarball
+193,607 bytes, Angular tarball 10,248 bytes, `kernel/adapter` 0.06 KB gzip and
+the existing public-surface mix 33.74 KB gzip. These figures authorize no
+optimization work.
+
+The next phase is release productization beginning with
+`PRODUCTION-CONSUMER-0`. The `15.0.0-rc.1` manifest values remain placeholders;
+this freeze is not RC authorization.
+
 ### FROZEN — persistence invariants
 
 Burden of proof is now reversed. Do NOT reopen kernel architecture to inspect
