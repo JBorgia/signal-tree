@@ -112,7 +112,7 @@ export type NotFn<T> = T extends (...args: unknown[]) => unknown ? never : T;
  * extra arguments.
  *
  * As of 14.0.0 that is a COMPILE ERROR rather than a silent no-op:
- * `CallableWritableSignal` no longer declares setter overloads.
+ * `WritableLeaf` no longer declares setter overloads.
  * `@signaltree/callable-syntax` used to promise the leaf form via a build
  * transform and was deleted — it could not run inside an Angular app at all.
  *
@@ -953,7 +953,7 @@ export type DeepEntityAwareTreeNode<T> = {
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
     : T[K] extends object
     ? DeepEntityAwareTreeNode<T[K]>
-    : CallableWritableSignal<T[K]>;
+    : WritableLeaf<T[K]>;
 };
 
 /**
@@ -966,7 +966,7 @@ export type DeepEntityAwareTreeNode<T> = {
 export type EntityAwareTreeNode<T> = {
   [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
-    : CallableWritableSignal<T[K]>;
+    : WritableLeaf<T[K]>;
 };
 
 /**
@@ -1029,7 +1029,7 @@ type PathInterceptor = (
 // These are intentionally simple aliases or fallbacks to keep the public API stable
 // while allowing internal refactors of the type system.
 
-// `CallableWritableSignal<T>` is declared as an interface (not an
+// `WritableLeaf<T>` is declared as an interface (not an
 // intersection) so TypeScript's overload-resolution picks the getter
 // `(): T` first when `ReadableCell<T>` inference walks the call signatures —
 // e.g. for `toObservable(tree.$.x)`. Prior to 9.2.0 the global
@@ -1110,7 +1110,7 @@ export type CarrierKind = keyof LeafCarriers<unknown>;
 /**
  * The ordinary leaf, resolved against a carrier.
  *
- * The default keeps every existing annotation — `CallableWritableSignal<T>` —
+ * The default keeps every existing annotation — `WritableLeaf<T>` —
  * meaning exactly what it meant before, so this parameter is INVISIBLE to
  * ordinary code. Users never write a carrier: each package binds it once and
  * `signalTree()` infers the rest.
@@ -1140,7 +1140,7 @@ export type LeafOf<T, K extends CarrierKind> = LeafCarriers<T>[K];
 export type TreeNode<T> = TreeNodeOf<T, 'cell'>;
 
 /** PUBLIC leaf type. One parameter, for the same reason as `TreeNode`. */
-export type CallableWritableSignal<T> = LeafOf<T, 'cell'>;
+export type WritableLeaf<T> = LeafOf<T, 'cell'>;
 
 export type AccessibleNode<T> = NodeAccessor<T> & TreeNode<T>;
 

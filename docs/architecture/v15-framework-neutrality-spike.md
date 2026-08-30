@@ -7646,3 +7646,64 @@ No meaningful duality survives the split. The "store" concept
 (`NODE_STORE_SYMBOL` / `TREE_STORES`) is internal to four modules with **0**
 references on the public surface — an internal memo-keying detail, not two public
 authorities to unify, and not an API-freeze risk.
+
+## GREENFIELD-V15-SURFACE-0 — IMPLEMENTED
+
+Post-rewrite ledger, measured from installed tarballs (not `src/index.ts`):
+
+| package | exports | star exports |
+| --- | --- | --- |
+| `@signal-tree/kernel` | 47 | **0** |
+| `@signal-tree/kernel/adapter` | 18 | **0** |
+| `@signal-tree/angular` | 48 | **0** |
+
+Pre-rewrite the kernel had 66. Reconciled exactly: 33 KEEP + 2 RENAME +
+9 INTERNALIZE + 5 DELETE + 17 ruled = 66. (The earlier prose said "18 unresolved"
+and "DELETE 4" — both were miscounts in the summary, not gaps in the inventory.)
+
+### The defect the census found
+
+`@signal-tree/angular` did `export * from '@signal-tree/kernel'`, republishing the
+kernel's NEUTRAL carrier-sensitive types. An Angular user annotating
+`TreeNode<State>` got `WritableCell`, not `WritableSignal` — a carrier lie, even
+though `signalTree()` INFERENCE was correct. Patching the two known names would
+have left the trap for the next carrier-sensitive type, so the star export is gone
+and every name is re-exported deliberately.
+
+    ONE SEMANTIC TYPE AUTHORITY, PACKAGE-SPECIFIC CARRIER BINDING.
+
+Both packages now spell the same concepts identically; only the carrier differs:
+
+    kernel   WritableLeaf<T> -> neutral writable cell
+    angular  WritableLeaf<T> -> Angular WritableSignal<T>
+
+### Renames — no compatibility aliases
+
+    CallableWritableSignal -> WritableLeaf   ("callable" described the
+                                              representation; "writable" is the
+                                              capability a user cares about)
+    WithDerived            -> DerivedOf      (`.with()` was removed on purpose)
+
+### Two conflicts the implementation surfaced
+
+- **`TransactionMethods`** was collateral damage of the `PendingTransaction`
+  removal. It is a KEEP; restored.
+- **`ReadonlyStore` could not be internalized.** `defineStore(..., 'readonly')`
+  RETURNS it, so a kept public API would have had an unnameable return type. It
+  stays public; the rest of the readonly machinery is internal.
+
+### Verification
+
+    installed type controls        kernel neutral / Angular native   PASS
+    Angular TreeNode<S>.count      WritableSignal<number>            PASS (leak fixed)
+    kernel -> WritableSignal       REJECTED via @ts-expect-error     PASS
+    negative control               every removed name unreachable    PASS
+    packed runtime controls        kernel 10/10, Angular 7/7         PASS
+    restoration eligibility        both sides                        PASS
+
+Package identity corrected: the kernel no longer describes itself as
+"Reactive JSON for Angular".
+
+**RC-HARNESS-3 is NOT closed by this.** Deleting `StorageAdapter` gives it the
+right disposition; the stale `size-report` arm that imports a nonexistent
+`createIndexedDBAdapter` must still be repaired and the gate rerun.

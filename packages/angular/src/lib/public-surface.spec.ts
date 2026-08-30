@@ -14,7 +14,6 @@ import { describe, expect, it } from 'vitest';
 // so removing a re-export breaks these rows and nothing else can substitute.
 import {
   asReadonly,
-  createAuditTracker,
   restoration,
   signalTree,
   undoable,
@@ -141,39 +140,10 @@ describe('PUBLIC CARRIER — defineStore (Angular package) provides a tree throu
 });
 
 // ════════════════════════════════════════════════════════════════════════════
-// createAuditTracker — self-attaching change log
+// createAuditTracker / persistence — DELETED from the v15 public surface
+// (GREENFIELD-V15-SURFACE-0): audit is a later layer above the kernel, and
+// persistence is Link + endpoint, not an enhancer.
 // ════════════════════════════════════════════════════════════════════════════
-describe('PUBLIC CARRIER — createAuditTracker records changes', () => {
-  it('entries accumulate, and the returned stop function ends it', async () => {
-    const tree = signalTree({ n: 0 });
-    const log: unknown[] = [];
-    // Its distinct job vs the deleted createAuditCallback: it ATTACHES ITSELF,
-    // so it needs no handler signature from the caller — which is exactly what
-    // made the callback form unusable against the public `subscribe`.
-    // ⚠️ THE SUBJECT IS THE CALLABLE TREE, and the type already enforces that.
-    // An earlier version of this row passed `tree.$ as never`, got "tree is not
-    // a function", and I recorded a public-contract defect. The defect was mine:
-    // `TreeNode` is NOT assignable to `NodeAccessor`, so `createAuditTracker(
-    // tree.$)` does not compile — the `as never` cast admitted it. A CAST
-    // DEFEATS THE OBSERVATION exactly as a no-op mutation does. The negative
-    // type carrier is in the typing sibling.
-    const stop = createAuditTracker(tree, log as never, {
-      includePreviousValues: true,
-    });
-
-    // ⚠️ IT POLLS AT 100ms. There is no interval option, and core's tree has no
-    // `subscribe`, so the tracker always takes its polling fallback — the
-    // "zero-polling in Angular contexts" claim in its own doc comment holds only
-    // for a tree that exposes subscribe. Pre-existing, recorded, not fixed here.
-    tree.$.n.set(1);
-    await new Promise((r) => setTimeout(r, 250));
-    const during = log.length;
-
-    stop();
-    tree.$.n.set(2);
-    await new Promise((r) => setTimeout(r, 250));
-
-    expect(during).toBeGreaterThan(0);
-    expect(log.length).toBe(during);
-  });
-});
+// GREENFIELD-V15-SURFACE-0: the `createAuditTracker` public carrier was removed
+// with the symbol itself. Audit is a later layer above the kernel and has no
+// v15 public surface, so there is nothing left here to carry.

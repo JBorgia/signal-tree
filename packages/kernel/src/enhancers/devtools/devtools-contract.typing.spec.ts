@@ -32,7 +32,7 @@
 import { signalTree } from '../../lib/signal-tree';
 import { devTools } from './devtools';
 
-import type { CallableWritableSignal, Enhancer } from '../../index';
+import type { WritableLeaf, Enhancer } from '../../index';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
@@ -68,9 +68,9 @@ devved.disconnectDevTools();
 // 2 — the state surface is untouched by enhancement
 // ============================================================================
 export type _StateSurvives = [
-  Expect<Equal<(typeof devved)['$']['count'], CallableWritableSignal<number>>>,
+  Expect<Equal<(typeof devved)['$']['count'], WritableLeaf<number>>>,
   Expect<
-    Equal<(typeof devved)['$']['user']['name'], CallableWritableSignal<string>>
+    Equal<(typeof devved)['$']['user']['name'], WritableLeaf<string>>
   >
 ];
 export const _count: number = devved.$.count();

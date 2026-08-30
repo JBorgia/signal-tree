@@ -1,5 +1,5 @@
 /**
- * SignalTree: Reactive JSON for Angular
+ * SignalTree: framework-neutral reactive application state with causal semantics
  *
  * JSON branches, reactive leaves.
  * No actions. No reducers. No selectors.
@@ -39,11 +39,6 @@ export {
   // cannot express a tree's readonly projection at all. SUBJECT-ADDRESS RULE:
   // a probe must address the same node the API does.
   asReadonly,
-  type ReadonlyStore,
-  type ReadonlyView,
-  type ReadonlyNodeAccessor,
-  type ReadonlyEntityNode,
-  type ReadonlyEntitySignal,
 } from './lib/readonly';
 
 // ============================================
@@ -55,11 +50,10 @@ export type {
   ISignalTree,
   SignalTree,
   TreeNode,
-  CallableWritableSignal,
+  WritableLeaf,
   AccessibleNode,
   NodeAccessor,
   Primitive,
-  NotFn,
 
   // Deep path types - For nested entity access (removed in v6)
 
@@ -68,7 +62,6 @@ export type {
 
   // Enhancer system types
   Enhancer,
-  EnhancerWithMeta,
   // ChainResult removed in v6
   // WithMethod removed in v6 (single-enhancer runtime)
 
@@ -97,7 +90,6 @@ export type {
   // Effects
 
   // Update metadata (lifted from guardrails in v9.3 for cross-enhancer use)
-  WriteMetadata,
 } from './lib/types';
 
 export { SignalTreeRollbackError } from './lib/types';
@@ -119,7 +111,7 @@ export type {
   EntityMapMarkerWithSlices,
 } from './lib/markers/entity-map';
 // Derived state types (v7)
-export type { WithDerived } from './lib/internals/derived-types';
+export type { DerivedOf } from './lib/internals/derived-types';
 
 // Derived helper (v7.2) - for defining derived functions in separate files with proper typing
 export { derivedFrom } from './lib/internals/derived-types';
@@ -140,10 +132,6 @@ export type { SignalTreeBuilder } from './lib/internals/builder-types';
 // Audit tracker — framework-agnostic tree change logging (moved from
 // @signaltree/ng-forms in v13, RFC 0006). Tree-shakeable: unused → not bundled.
 export {
-  createAuditTracker,
-  type AuditEntry,
-  type AuditMetadata,
-  type AuditTrackerConfig,
 } from './lib/audit/audit';
 
 // Async-stream marker — DELETED in 14.0.0, along with its implementation and
@@ -276,14 +264,10 @@ export { batching } from './enhancers/batching/batching';
 //
 //     A PUBLIC RE-EXPORT MAY SURVIVE A MOVE. A SECOND DECLARATION MAY NOT.
 export type { BatchingConfig, BatchingMethods } from './enhancers/batching/batching.types';
-export type { TransactionMethods, PendingTransaction } from './enhancers/transactions/transactions.types';
 export type { RestorationMethods, RestorationHistoryEntry } from './enhancers/restoration/restoration.types';
 export type {
   DevToolsMethods,
-  DevToolsDebugSession,
   DevToolsLogEntry,
-  DevToolsModuleMetadata,
-  DevToolsPerformanceMetrics,
 } from './enhancers/devtools/devtools.types';
 
 // The `effects()` enhancer was removed in v12 — a SignalTree is made of
@@ -299,13 +283,13 @@ export { restoration } from './enhancers/restoration/restoration';
 /**
  * Transaction enhancer for optimistic updates without temporal history APIs.
  */
+// PUBLIC because `defineStore(..., 'readonly')` RETURNS it: a kept public API
+// must have a nameable return type. The rest of the readonly machinery stays internal.
+export type { ReadonlyStore } from './lib/readonly';
+export type { TransactionMethods } from './enhancers/transactions/transactions.types';
 export { transactions } from './enhancers/transactions/transactions';
 
-export { persistence } from './enhancers/serialization/serialization';
-export type { StorageAdapter } from './enhancers/serialization/storage-adapters';
 export type {
-  PersistenceConfig,
-  PersistenceMethods,
 } from './enhancers/serialization/serialization';
 
 /**

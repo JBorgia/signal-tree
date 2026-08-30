@@ -20,7 +20,7 @@ import { isTraversableNode } from './node-shape';
  *
  *   Installing interception LATER cannot work: a `set`/`update` reference that
  *   escaped to application code keeps the original write path, and
- *   `CallableWritableSignal` extends Angular's `WritableSignal`, so retaining
+ *   `WritableLeaf` extends Angular's `WritableSignal`, so retaining
  *   one is ordinary use of a public object.
  *
  * Hence: the interception point exists BEFORE anything can escape and is never

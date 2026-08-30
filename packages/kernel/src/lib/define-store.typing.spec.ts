@@ -28,7 +28,7 @@ import { computed, type Signal } from '@angular/core';
 import { signalTree } from '../index';
 import { defineStore } from './define-store';
 import type { ReadonlyStore } from './readonly';
-import type { CallableWritableSignal, TreeNode } from './types';
+import type { WritableLeaf, TreeNode } from './types';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <
@@ -67,12 +67,12 @@ defineStore(() => ({ count: 0 }), { expose: 'readonly' });
 
 export type _DefineStoreTypeChecks = [
   // Default overload: unchanged — writes still reachable through `$.count.set(...)`.
-  Expect<Equal<DefaultInjected['$']['count'], CallableWritableSignal<number>>>,
+  Expect<Equal<DefaultInjected['$']['count'], WritableLeaf<number>>>,
 
   // `expose: 'readonly'` overload: narrows to ReadonlyStore over the
   // accumulated type (TreeNode<T> when no derived layers exist).
   Expect<Equal<ReadonlyInjected, ReadonlyStore<CounterState, TreeNode<CounterState>>>>,
-  // The readonly leaf is a plain Signal read, not a CallableWritableSignal —
+  // The readonly leaf is a plain Signal read, not a WritableLeaf —
   // `.set`/`.update` are not own members of its type.
   Expect<Equal<'set' extends keyof ReadonlyInjected['$']['count'] ? true : false, false>>,
   Expect<Equal<'update' extends keyof ReadonlyInjected['$']['count'] ? true : false, false>>,

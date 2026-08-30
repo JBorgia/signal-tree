@@ -1,7 +1,7 @@
 {
   "name": "@signal-tree/angular",
   "version": "15.0.0-rc.1",
-  "description": "Angular realization for SignalTree \u2014 native signals over the framework-neutral @signal-tree/kernel.",
+  "description": "Angular realization for SignalTree.",
   "license": "Apache-2.0",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

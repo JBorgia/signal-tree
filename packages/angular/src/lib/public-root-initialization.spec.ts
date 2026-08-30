@@ -22,8 +22,7 @@ describe('@signal-tree/angular public root', () => {
     const api = tree.$.users;
     api.addOne({ id: 1, name: 'Ada' });
 
-    const row = api.byId(1);
-    expect(row).toBeDefined();
+    const row = api.byIdOrFail(1);
     expect(isSignal(row.name)).toBe(true);
     expect(isSignal(row.name.asReadonly())).toBe(true);
     expect(isSignal(api.empty)).toBe(true);

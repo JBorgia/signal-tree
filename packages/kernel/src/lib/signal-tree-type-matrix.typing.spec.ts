@@ -70,7 +70,7 @@ import type { Signal } from '@angular/core';
 import { entityMap, signalTree } from '../index';
 import type {
   AccessibleNode,
-  CallableWritableSignal,
+  WritableLeaf,
   EntitySignal,
   Enhancer,
   NodeAccessor,
@@ -179,18 +179,18 @@ export type _NestedAccess = [
       AccessibleNode<{ city: string }>
     >
   >,
-  Expect<Equal<(typeof rootTree)['$']['user']['name'], CallableWritableSignal<string>>>,
+  Expect<Equal<(typeof rootTree)['$']['user']['name'], WritableLeaf<string>>>,
   Expect<
     Equal<
       (typeof rootTree)['$']['user']['address']['city'],
-      CallableWritableSignal<string>
+      WritableLeaf<string>
     >
   >,
   // A leaf is a signal; a branch is not. This pair is the whole distinction.
-  Expect<Equal<(typeof rootTree)['$']['count'], CallableWritableSignal<number>>>,
-  Expect<Equal<(typeof rootTree)['$']['tags'], CallableWritableSignal<string[]>>>,
+  Expect<Equal<(typeof rootTree)['$']['count'], WritableLeaf<number>>>,
+  Expect<Equal<(typeof rootTree)['$']['tags'], WritableLeaf<string[]>>>,
   ExpectFalse<
-    Equal<(typeof rootTree)['$']['user'], CallableWritableSignal<RootState['user']>>
+    Equal<(typeof rootTree)['$']['user'], WritableLeaf<RootState['user']>>
   >
 ];
 
@@ -280,16 +280,16 @@ built.$.user({ name: 'Ada', age: 44, address: { city: 'Boise' } });
 built.$.user((current) => ({ ...current, age: current.age + 1 }));
 built.$.user.address({ city: 'Boise' });
 export type _BuiltNested = [
-  Expect<Equal<(typeof built)['$']['count'], CallableWritableSignal<number>>>,
-  Expect<Equal<(typeof built)['$']['user']['name'], CallableWritableSignal<string>>>,
+  Expect<Equal<(typeof built)['$']['count'], WritableLeaf<number>>>,
+  Expect<Equal<(typeof built)['$']['user']['name'], WritableLeaf<string>>>,
   Expect<
     Equal<
       (typeof built)['$']['user']['address']['city'],
-      CallableWritableSignal<string>
+      WritableLeaf<string>
     >
   >,
   ExpectFalse<
-    Equal<(typeof built)['$']['user'], CallableWritableSignal<RootState['user']>>
+    Equal<(typeof built)['$']['user'], WritableLeaf<RootState['user']>>
   >
 ];
 // @ts-expect-error branch accessors are not Angular signals
@@ -301,9 +301,9 @@ const builtMarkers = signalTree({
   nested: { deep: 0 },
 });
 export type _BuiltMarkers = [
-  Expect<Equal<(typeof builtMarkers)['$']['plain'], CallableWritableSignal<number>>>,
+  Expect<Equal<(typeof builtMarkers)['$']['plain'], WritableLeaf<number>>>,
   // a marker at depth still resolves — the "any depth" claim
-  Expect<Equal<(typeof builtMarkers)['$']['nested']['deep'], CallableWritableSignal<number>>>
+  Expect<Equal<(typeof builtMarkers)['$']['nested']['deep'], WritableLeaf<number>>>
 ];
 
 // B4 — entityMap resolves through the constructed value.
@@ -314,7 +314,7 @@ const builtEntities = signalTree({
 export type _BuiltEntities = [
   Expect<Equal<(typeof builtEntities)['$']['users'], EntitySignal<User, number>>>,
   Expect<Equal<(typeof builtEntities)['$']['users']['all'], Signal<User[]>>>,
-  Expect<Equal<(typeof builtEntities)['$']['count'], CallableWritableSignal<number>>>
+  Expect<Equal<(typeof builtEntities)['$']['count'], WritableLeaf<number>>>
 ];
 
 // B5 — enhancer accumulation on the constructed value.

@@ -2,7 +2,7 @@ import type { ReadableCell } from './internals/cell-runtime';
 
 import type { SignalTreeBuilder } from './internals/builder-types';
 import type {
-  CallableWritableSignal,
+  WritableLeaf,
   EntitySignal,
   ISignalTree,
   NodeAccessor,
@@ -141,7 +141,7 @@ export type ReadonlyEntitySignal<
  *   structurally satisfies `NodeAccessor` (a single `(): T` call signature
  *   satisfies all three `NodeAccessor` overloads under TS's fewer-params
  *   rule), so a later row would swallow them.
- * - `CallableWritableSignal` before `Signal`: it extends `Signal`.
+ * - `WritableLeaf` before `Signal`: it extends `Signal`.
  * - `Signal` before `NodeAccessor`: `ReadableCell<V>`'s bare `() => V` structurally
  *   satisfies `NodeAccessor<V>` (fewer-params rule again), so putting
  *   `NodeAccessor` first would capture every derived computed as a "branch".
@@ -167,7 +167,7 @@ type ReadonlyViewOf<T> = T extends EntitySignal<
   infer K extends string | number
 >
   ? ReadonlyEntitySignal<E, K> & ReadonlyExtras<T, EntitySignal<E, K>>
-  : T extends CallableWritableSignal<infer V>
+  : T extends WritableLeaf<infer V>
   ? ReadableCell<V>
   : T extends NodeAccessor<infer U>
   ? ReadonlyNodeAccessor<U> & ReadonlyView<T>
@@ -191,7 +191,7 @@ type ReadonlyViewOf<T> = T extends EntitySignal<
  * raw source `T`. Computing the view from the source type was the original
  * bug (RFC 0004 F1): it silently dropped every derived computed.
  *
- * - leaf `CallableWritableSignal<V>` → `ReadableCell<V>`
+ * - leaf `WritableLeaf<V>` → `ReadableCell<V>`
  * - branch `NodeAccessor<U> & children` → zero-arg read + mapped children
  * - derived `Signal`s pass through; `linked()` `WritableSignal`s narrow to `Signal`
  * - marker surfaces → their `Readonly*` views (reader allowlists above)

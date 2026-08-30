@@ -34,7 +34,7 @@
 import { signalTree } from '../../lib/signal-tree';
 import { persistence } from './serialization';
 
-import type { CallableWritableSignal, Enhancer } from '../../index';
+import type { WritableLeaf, Enhancer } from '../../index';
 import type { SerializedState } from './serialization';
 
 // --- compile-time assertion helpers -----------------------------------------
@@ -91,9 +91,9 @@ export type _SerializationHalf = [
 // 3 — the state surface is untouched by enhancement
 // ============================================================================
 export type _StateSurvives = [
-  Expect<Equal<(typeof persisted)['$']['count'], CallableWritableSignal<number>>>,
+  Expect<Equal<(typeof persisted)['$']['count'], WritableLeaf<number>>>,
   Expect<
-    Equal<(typeof persisted)['$']['user']['name'], CallableWritableSignal<string>>
+    Equal<(typeof persisted)['$']['user']['name'], WritableLeaf<string>>
   >
 ];
 export const _count: number = persisted.$.count();

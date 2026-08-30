@@ -43,7 +43,7 @@ import { transactions } from '../transactions/transactions';
 import { restoration } from './restoration';
 
 import type {
-  CallableWritableSignal,
+  WritableLeaf,
   Enhancer,
   PendingTransaction,
   RestorationHistoryEntry,
@@ -121,9 +121,9 @@ export const _pending: PendingTransaction = travelled.transaction(() => undefine
 // 4 — the state surface is untouched by enhancement
 // ============================================================================
 export type _StateSurvives = [
-  Expect<Equal<(typeof travelled)['$']['count'], CallableWritableSignal<number>>>,
+  Expect<Equal<(typeof travelled)['$']['count'], WritableLeaf<number>>>,
   Expect<
-    Equal<(typeof travelled)['$']['user']['name'], CallableWritableSignal<string>>
+    Equal<(typeof travelled)['$']['user']['name'], WritableLeaf<string>>
   >
 ];
 export const _count: number = travelled.$.count();
