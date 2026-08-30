@@ -7593,3 +7593,56 @@ operations as undoable. **RC-HARNESS-2 remains independently OPEN.**
 
 Not authorized by this closure: no tag, no RC declaration. `15.0.0-rc.1` remains a
 pre-existing placeholder string.
+
+## Pre-freeze ownership dispositions
+
+### ENTITY-REPRESENTATION-OWNERSHIP-0 — ER-A, CLOSED GREEN / FROZEN
+
+    MULTIPLE PHYSICAL STRUCTURES DO NOT IMPLY MULTIPLE SEMANTIC AUTHORITIES.
+
+| structure | owns | keyed by |
+| --- | --- | --- |
+| `StructuralStore<K>` | identity, lifetime, revision, active-node structure | `K` -> subjectId |
+| `EntityValueStore<E>` | retained row value | subjectId |
+| per-entity cells | observation projection | subjectId |
+
+Complementary, joined by subject identity — no two hold the same fact. Exactly ONE
+`new StructuralStore` site in the kernel; row values appear only in `lib/physical/`
+and its owner; `entity-map.ts` (433 lines) keeps no competing row store, it
+delegates to `createEntitySignal`.
+
+Carrier: `er-divergence-probe.spec.ts` reads the same fact through three routes —
+`rows.all()`, the per-entity cell, and the whole-value snapshot — across add,
+field write, bulk update, removal, re-add, `setAll` replacement, and
+remove-then-restore. Mutation-controlled: forcing one route stale turns all 3 red.
+**No refactor earned.** Do not expand this into a representation matrix.
+
+### BATCHING-OWNERSHIP-0 — BO-A, CLOSED GREEN / FROZEN
+
+    BATCHING MAY CHANGE WHEN OBSERVERS ARE TOLD. IT MAY NOT OWN CAUSAL TRUTH.
+
+`batching.ts` references to causal/commit authority — `PhysicalCommitClock`,
+`commitSlot`, `beginFrame`, `subjectId`, `positionId`, `revision`, `restoration`:
+
+    batching.ts                   0
+    tree-scalar-leaf-runtime.ts  18   <- control: the pattern DOES match
+    entity-signal.ts            279   <- control
+
+It imports `copyTreeProperties`, `visitTree`, types and `ENHANCER_META`; its state
+is `notificationDelayMs`, a timeout id, pending-writes-by-path, and a flush via
+`queueMicrotask`/`setTimeout`. Orchestration, not a second transaction engine.
+
+Carrier: `batching-ownership.spec.ts` — final authoritative value agrees batched vs
+unbatched; batching cannot MINT restoration eligibility (undesignated writes inside
+`batch()` stay undesignated); batching cannot STRIP it (`undoable(() => t.batch(…))`
+stays undoable and `undo()` restores). Mutation-controlled.
+
+Notification counts are deliberately NOT asserted: coalescing publication is the
+enhancer's declared job, so differing delivery is correct behaviour.
+
+### ACCESSOR-STORE-UNIFICATION-0 — NOT REQUIRED
+
+No meaningful duality survives the split. The "store" concept
+(`NODE_STORE_SYMBOL` / `TREE_STORES`) is internal to four modules with **0**
+references on the public surface — an internal memo-keying detail, not two public
+authorities to unify, and not an API-freeze risk.
