@@ -37,6 +37,15 @@ the benchmark now transpiles the real committed `restoration-eligibility` and
 `path-observation-port` implementations instead of maintaining behavioral
 stubs. Smoke and full 21-sample history-ownership runs exit 0.
 
+Release-gate synchronization is checkpointed at `ca519588`. It repaired the
+derived-result carrier gap, migrated live Angular demo consumers, removed the
+retired persistence demo, regenerated the public API baseline, and retargeted
+release tools and self-tests from deleted `core` paths to the kernel/Angular
+split. Validation: `npm run typecheck`, kernel 2016 passed with 3 expected
+failures, Angular 24 passed, demo 108 passed with 4 skipped, packed Angular
+consumer typecheck, signal identity durability 4/4, and
+`NX_DAEMON=false NX_ISOLATE_PLUGINS=false npm run gates -- --release` 66/66.
+
 ### FROZEN — persistence invariants
 
 Burden of proof is now reversed. Do NOT reopen kernel architecture to inspect
