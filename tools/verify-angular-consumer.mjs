@@ -161,6 +161,21 @@ export const used = [
 );
 
 writeFileSync(
+  join(proj, 'src', 'side-effect-install.ts'),
+  `
+import '@signal-tree/angular';
+import { isSignal } from '@angular/core';
+import { signalTree } from '@signal-tree/kernel';
+
+const tree = signalTree({ count: 1 });
+if (!isSignal(tree.$.count)) {
+  throw new Error('side-effect import did not install the Angular realization');
+}
+tree.destroy();
+`
+);
+
+writeFileSync(
   join(proj, 'tsconfig.json'),
   JSON.stringify(
     {
@@ -201,6 +216,7 @@ try {
       'tslib@^2.0.0',
       'zod@^3.0.0',
       'typescript@^5.6.0',
+      'esbuild@^0.25.0',
     ],
     { cwd: proj, stdio: 'pipe' }
   );
@@ -227,3 +243,28 @@ try {
 }
 
 console.log('✅ Angular consumer smoke type-check passed.');
+
+try {
+  execFileSync(
+    'npx',
+    [
+      'esbuild',
+      'src/side-effect-install.ts',
+      '--bundle',
+      '--platform=node',
+      '--format=esm',
+      '--outfile=side-effect-install.mjs',
+    ],
+    { cwd: proj, stdio: 'pipe' }
+  );
+  execFileSync('node', ['side-effect-install.mjs'], {
+    cwd: proj,
+    stdio: 'pipe',
+  });
+} catch (err) {
+  console.error('❌ Angular side-effect installation smoke failed:\n');
+  console.error(`${err.stdout || ''}${err.stderr || ''}`.trim());
+  process.exit(1);
+}
+
+console.log('✅ Angular side-effect import installs the native realization.');

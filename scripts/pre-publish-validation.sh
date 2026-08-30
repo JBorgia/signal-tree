@@ -384,6 +384,19 @@ else
     cat /tmp/tarball-selftest.log
     exit 1
 fi
+
+# 9f. Angular Packed-Consumer Gate (BLOCKING)
+# Typechecks representative Angular usage and bundles a side-effect-only package
+# import. The second arm catches a false `sideEffects: false` declaration that
+# lets consumer bundlers erase structural realization installation.
+print_header "9f. Angular Packed-Consumer Gate"
+if node tools/verify-angular-consumer.mjs 2>&1 | tee /tmp/angular-consumer.log; then
+    print_success "Packed Angular consumer typecheck + realization passed"
+else
+    print_error "Packed Angular consumer failed"
+    cat /tmp/angular-consumer.log
+    exit 1
+fi
 print_step "Packing + resolving every published package as a real consumer"
 if node tools/verify-tarball-consumer.mjs 2>&1 | tee /tmp/tarball-consumer.log; then
     print_success "Published tarballs install + resolve"

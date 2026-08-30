@@ -7,8 +7,11 @@ Angular realization for SignalTree. It uses native Angular `Signal` and
 ## Install
 
 ```bash
-npm install @signal-tree/angular @signal-tree/kernel @angular/core
+npm install @signal-tree/angular
 ```
+
+`@signal-tree/angular` installs `@signal-tree/kernel` as an exact dependency.
+Angular itself remains a peer dependency supplied by the application.
 
 Angular applications should construct state through this package, not through
 the neutral kernel package:

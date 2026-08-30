@@ -68,9 +68,15 @@ for pkg in "${PACKAGES[@]}"; do
         ((ISSUES_FOUND++))
     fi
 
-    # Check sideEffects is false (for tree-shaking)
+    # Kernel is side-effect-free. Angular installs its realization at package
+    # initialization, so declaring it side-effect-free is a correctness bug.
     sideEffects=$(node -p "try { const p = require('./$pkg_json'); String(p.sideEffects) } catch { '' }")
-    if [ "$sideEffects" = "false" ]; then
+    if [ "$pkg" = "angular" ] && [ "$sideEffects" = "false" ]; then
+        print_error "✗ Angular must not declare sideEffects: false (structural realization would be removable)"
+        ((ISSUES_FOUND++))
+    elif [ "$pkg" = "angular" ]; then
+        print_success "✓ Angular package initialization is retained"
+    elif [ "$sideEffects" = "false" ]; then
         print_success "✓ sideEffects: false (tree-shaking enabled)"
     else
         print_warning "⚠ sideEffects not set to false (recommend for tree-shaking)"

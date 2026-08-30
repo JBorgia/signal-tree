@@ -59,8 +59,17 @@ manifests, and one self-validating ordered release set used by every publish
 path. Empty legacy package directories are local cleanup only and do not enter
 the project graph, manifests, build, or tarballs.
 
-This checkpoint does **not** authorize tagging, publishing, or creating a GitHub
-release. RC authorization remains a human decision.
+RC authorization was granted after this candidate checkpoint. RC1 is now live:
+tag `v15.0.0-rc.1` points to candidate source `4020b7dd`; both public packages
+were published from the exact validated tarballs; registry downloads were
+byte-identical; normal npm install, strict typecheck, and runtime passed; and the
+GitHub release is marked prerelease.
+
+Two bounded post-RC findings are queued for the next candidate/GA without
+reopening v15 semantics: Angular's manifest incorrectly declared
+`sideEffects: false`, allowing a side-effect-only package import to be removed
+before realization installation; and emitted kernel JSDoc still taught deleted
+`.with()` construction. Both repository fixes have direct controls.
 
 Post-`84d39ae8` type/surface closure is checkpointed at `1c021fb6`.
 `READONLY-FOREIGN-REACTIVE-0` is **RF-A / CLOSED GREEN**: readonly projection
@@ -120,8 +129,9 @@ production 19.50/21 KB, EntityMap development 22.11/23.7 KB; kernel tarball
 the existing public-surface mix 33.74 KB gzip. These figures authorize no
 optimization work.
 
-`15.0.0-rc.1` is now the authoritative candidate version for
-`RC-CANDIDATE-PREP-0`; this does not authorize tagging or publishing.
+`15.0.0-rc.1` is the published first release candidate. Candidate source remains
+`4020b7dd`; later evidence and documentation commits do not change its artifact
+authority.
 
 ### FROZEN — persistence invariants
 
@@ -11400,14 +11410,13 @@ Exit condition: the greenfield public surface is frozen and its gates are green.
 
 ## Phase 6 — Release Candidate
 
-> ⚠️ **BLOCKED ON PHASE 5.5.** Every item below was written against the incumbent
-> artifact. Do not version, tag, push or publish until the greenfield surface is
-> the one being shipped.
->
+RC1 is live. Phase 5.5's former block is discharged by the frozen greenfield
+surface and the exact-artifact release evidence above.
+
 > ⚠️ AND "1.0" HERE IS NOT A SEMVER LITERAL. The published line is `15.x` —
-> npm holds `14.1.3` and `packages/core` is locally `15.0.0-rc.1`. "1.0" in this
-> file means _the first stable release of the reworked library_. Publishing a
-> literal `1.0.0-rc.1` would be a down-numbering below what is already published.
+> npm now holds `@signal-tree/kernel` and `@signal-tree/angular` at
+> `15.0.0-rc.1`. "1.0" in this file means _the first stable release of the
+> reworked library_, not a literal semver line.
 
 - [x] **Resolve RC public surface reconciliation before publishing.**
       `docs/audits/2026-08/rc-public-surface-reconciliation.md` maps the
@@ -11485,9 +11494,12 @@ Exit condition: the greenfield public surface is frozen and its gates are green.
       BASE-SUBJECT-STATE-SIGNAL next (an Angular `WritableSignal` per unobserved
       subject is an ownership question) ahead of BASE-STRUCTURED-CLONE (likely
       only a representation choice).
-- [ ] publish `1.0.0-rc.1`
-- [ ] install from npm in external projects
-- [ ] collect RC packaging/DX/docs failures
+- [x] publish `15.0.0-rc.1` — exact kernel then Angular tarballs under the `rc`
+      dist-tag; tag points to `4020b7dd`
+- [x] install from npm in an external project — exact names, strict typecheck,
+      bundle, and runtime green
+- [x] collect RC packaging/DX/docs failures — Angular `sideEffects` metadata and
+      stale emitted `.with()` JSDoc recorded; no semantic/API falsifier
 - [ ] fix RC issues only
 - [ ] final public API review
 

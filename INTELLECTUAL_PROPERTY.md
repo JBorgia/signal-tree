@@ -40,41 +40,42 @@ expression (17 U.S.C. §102(b)).
 Recorded for attribution and as prior art, not as a restriction. Independent
 reimplementation of any of these is permitted.
 
-### TreeNode&lt;T&gt; recursive type system
+### Carrier-neutral recursive tree type
 
-Recursive type transformation preserving inference through unlimited nesting depth:
+The kernel maps source state recursively without naming a UI framework. Each
+framework package binds the leaf carrier once at its public boundary:
 
 ```typescript
-export type TreeNode<T> = {
-  [K in keyof T]: T[K] extends (infer U)[]
-    ? WritableSignal<U[]>
-    : T[K] extends object
-    ? T[K] extends Signal<infer TK>
-      ? WritableSignal<TK>
-      : TreeNode<T[K]>
-    : WritableSignal<T[K]>;
+export type TreeNodeOf<T, C extends CarrierKind> = {
+  [K in keyof T]: T[K] extends Primitive | readonly unknown[] ? LeafOf<T[K], C> : T[K] extends object ? NodeAccessor<T[K]> & TreeNodeOf<T[K], C> : LeafOf<T[K], C>;
 };
 ```
+
+`@signal-tree/kernel` binds neutral cells. `@signal-tree/angular` binds native
+Angular `Signal` / `WritableSignal` shapes and installs the Angular realization.
 
 ### Type–runtime alignment
 
 Runtime construction that mirrors the type recursion exactly, so the structure the
 compiler infers and the structure built at run time cannot drift apart.
 
-### "Initiation defines structure"
+### One declarative construction model
 
-The initial object literal fixes the complete type system: inference holds at any
-depth thereafter, with no configuration and no per-depth annotation.
+The initial object and one optional config declare state, enhancers,
+capabilities, and one derived factory before materialization. State access has
+one recursive facade, `tree.$`; no public builder or staged-derived construction
+path exists.
 
 ### Built-in object detection
 
 `Date`, `RegExp`, `Map`, `Set` and similar built-ins are treated as leaf values rather
 than recursively signalified, so their internal slots are never destructured.
 
-### Lazy tree materialisation
+### Incremental materialization
 
-Proxy-based on-demand signal creation that preserves the eager type surface, so paths
-that are never read are never allocated.
+Materialization is incremental and memoized at owned nodes. The former public
+lazy feature, lazy proxy, and related configuration were deleted in v15 because
+their published path was unreachable and their options were inert.
 
 ## Contributing
 
