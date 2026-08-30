@@ -35,12 +35,10 @@ print_coverage() {
     echo -e "${PURPLE}📊 $1${NC}"
 }
 
-# List of packages to test
-# Note: batching, middleware, entities, devtools, time-travel were consolidated
-# into @signaltree/core in v4.0.0. Memoization & presets were removed in v10.0.0.
+# Public packages with test targets.
 PACKAGES=(
-    "core"
-    "ng-forms"
+    "kernel"
+    "angular"
 )
 
 print_step "Starting comprehensive test coverage analysis..."
@@ -63,7 +61,7 @@ for i in "${!PACKAGES[@]}"; do
 
     print_step "[$current/$TOTAL_PACKAGES] Testing package: $pkg"
 
-    if nx test "$pkg" --coverage --silent; then
+    if pnpm nx test "$pkg" --coverage --silent; then
         print_success "✓ $pkg - Tests passed"
         ((SUCCESSFUL_TESTS++))
     else
@@ -132,11 +130,11 @@ if [ ${#COVERAGE_REPORTS[@]} -gt 0 ]; then
         echo "  file://$(pwd)/coverage/packages/$pkg/index.html"
     done
 
-    # Open the core package coverage by default
-    if [[ " ${COVERAGE_REPORTS[@]} " =~ " core " ]]; then
-        print_coverage "Opening core package coverage in browser..."
+    # Open the kernel package coverage by default
+    if [[ " ${COVERAGE_REPORTS[@]} " =~ " kernel " ]]; then
+        print_coverage "Opening kernel package coverage in browser..."
         # Uncomment the next line if you want auto-open
-        # open "coverage/packages/core/index.html" 2>/dev/null || true
+        # open "coverage/packages/kernel/index.html" 2>/dev/null || true
     fi
 fi
 

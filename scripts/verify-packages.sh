@@ -31,13 +31,9 @@ print_error() {
 print_step "Verifying package configurations for NPM publishing..."
 echo ""
 
-# Note: batching, middleware, entities, devtools, time-travel were
-# consolidated into @signaltree/core in v4.0.0; memoization & presets removed in v10.
-PACKAGES=(
-    "core"
-    "ng-forms"
-    "events"
-)
+# shellcheck source=release-packages.sh
+source "scripts/release-packages.sh"
+PACKAGES=("${PUBLISHABLE_PACKAGES[@]}")
 
 ISSUES_FOUND=0
 
@@ -54,7 +50,7 @@ for pkg in "${PACKAGES[@]}"; do
 
     # Check package name format
     name=$(cat "$pkg_json" | grep '"name"' | sed 's/.*"name": "\(.*\)".*/\1/')
-    expected_name="@signaltree/$pkg"
+    expected_name="@signal-tree/$pkg"
 
     if [ "$name" = "$expected_name" ]; then
         print_success "✓ Name: $name"
@@ -94,13 +90,13 @@ else
     # ((ISSUES_FOUND++))
 fi
 
-# Check if @signaltree org exists (this will fail if not accessible, which is fine)
-print_step "Checking @signaltree organization access..."
-if npm org ls signaltree &>/dev/null; then
-    print_success "✓ Access to @signaltree organization confirmed"
+# Check if @signal-tree org exists (this will fail if not accessible, which is fine)
+print_step "Checking @signal-tree organization access..."
+if npm org ls signal-tree &>/dev/null; then
+    print_success "✓ Access to @signal-tree organization confirmed"
 else
-    print_warning "⚠ Cannot access @signaltree organization. You may need to:"
-    echo "  1. Create it: npm org create signaltree"
+    print_warning "⚠ Cannot access @signal-tree organization. You may need to:"
+    echo "  1. Create it: npm org create signal-tree"
     echo "  2. Get added to it if it exists"
 fi
 
@@ -122,11 +118,11 @@ fi
 echo ""
 print_step "Package publication will create:"
 for pkg in "${PACKAGES[@]}"; do
-    echo "  📦 @signaltree/$pkg"
+    echo "  📦 @signal-tree/$pkg"
 done
 
 echo ""
 print_step "Users will install with:"
-echo "  npm install @signaltree/core                    # Core with all enhancers"
-echo "  npm install @signaltree/ng-forms                # Angular forms integration"
+echo "  npm install @signal-tree/kernel"
+echo "  npm install @signal-tree/angular"
 echo ""

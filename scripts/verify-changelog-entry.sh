@@ -28,7 +28,7 @@ CHANGELOG="CHANGELOG.md"
 has_entry() {
     local version="$1"
     local escaped="${version//./\\.}"
-    grep -qE "^#{1,6} (.*[^0-9.])?${escaped}([^0-9.]|$)" "$CHANGELOG"
+    grep -qE "^#{1,6} (.*[^0-9.])?${escaped}([^0-9.A-Za-z-]|$)" "$CHANGELOG"
 }
 
 if [ "${1:-}" = "--self-test" ]; then
@@ -43,9 +43,17 @@ if [ "${1:-}" = "--self-test" ]; then
         echo "  ✅ self-test: gate refuses a version with no CHANGELOG heading"
     fi
 
+    # A prerelease heading must not satisfy a request for the final version.
+    if printf '%s\n' '## 15.0.0-rc.1' | grep -qE '^#{1,6} (.*[^0-9.])?15\.0\.0([^0-9.A-Za-z-]|$)'; then
+        echo "  ❌ self-test FAILED: prerelease heading satisfied final version"
+        FAILED=1
+    else
+        echo "  ✅ self-test: prerelease heading does not satisfy final version"
+    fi
+
     # Must PASS on a version that demonstrably has a heading (take the first
     # version-looking token from an existing heading).
-    KNOWN=$(grep -oE "^#{1,6} .*" "$CHANGELOG" | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | head -1 || true)
+    KNOWN=$(grep -oE "^#{1,6} .*" "$CHANGELOG" | grep -oE "[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?" | head -1 || true)
     if [ -z "$KNOWN" ]; then
         echo "  ❌ self-test FAILED: no versioned heading found in $CHANGELOG at all"
         FAILED=1

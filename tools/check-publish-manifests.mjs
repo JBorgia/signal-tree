@@ -30,7 +30,7 @@
  *
  *   1. no `workspace:`, `file:`, `link:` or `portal:` specifier in
  *      dependencies / peerDependencies / optionalDependencies
- *   2. every internal `@signaltree/*` range is satisfied by the version that
+ *   2. every internal `@signal-tree/*` range is satisfied by the version that
  *      package is being published at — a range that admits nothing is the same
  *      defect wearing a valid-looking string
  *   3. not `private: true` — an unpublishable package in the publish set
@@ -40,19 +40,29 @@
  * Usage:
  *   node tools/check-publish-manifests.mjs [--json]
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-/** The fixed release group — the projects `build:all` produces and we publish. */
-const PUBLISHABLE = ['core'];
+/** Discover the release set from source manifests; private packages never ship. */
+const PUBLISHABLE = readdirSync(join(process.cwd(), 'packages'), {
+  withFileTypes: true,
+})
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .filter((project) => {
+    const manifestPath = join(
+      process.cwd(),
+      'packages',
+      project,
+      'package.json'
+    );
+    if (!existsSync(manifestPath)) return false;
+    return JSON.parse(readFileSync(manifestPath, 'utf8')).private !== true;
+  })
+  .sort();
 
 const BAD_PROTOCOLS = ['workspace:', 'file:', 'link:', 'portal:'];
-const DEP_BLOCKS = [
-  'dependencies',
-  'peerDependencies',
-  'optionalDependencies',
-];
-
+const DEP_BLOCKS = ['dependencies', 'peerDependencies', 'optionalDependencies'];
 
 /**
  * Minimal semver satisfaction, prerelease-aware, no dependency.
@@ -134,8 +144,8 @@ function satisfies(version, range) {
           bound.major !== 0
             ? v.major === bound.major
             : bound.minor !== 0
-              ? v.major === 0 && v.minor === bound.minor
-              : v.major === 0 && v.minor === 0 && v.patch === bound.patch;
+            ? v.major === 0 && v.minor === bound.minor
+            : v.major === 0 && v.minor === 0 && v.patch === bound.patch;
         if (sameLeadingNonZero) return true;
         break;
       }

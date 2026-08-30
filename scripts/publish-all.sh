@@ -45,15 +45,11 @@ fi
 
 print_status "Verified npm authentication"
 
-# Define packages in dependency order (core first, then others)
-# Keep this list aligned with scripts/release.sh PACKAGES.
+# Load packages in dependency order from the release authority.
 VERSION=$(node -p "require('./package.json').version")
-
-PACKAGES=(
-    "core"
-    "events"
-    "ng-forms"
-)
+# shellcheck source=release-packages.sh
+source "scripts/release-packages.sh"
+PACKAGES=("${PUBLISHABLE_PACKAGES[@]}")
 
 
 # ---------------------------------------------------------------------------
@@ -109,10 +105,10 @@ publish_package() {
     local package_path="packages/$package_name"
     local dist_path="dist/packages/$package_name"
 
-    print_status "Building package: @signaltree/$package_name"
+    print_status "Building package: @signal-tree/$package_name"
 
     # Build the package via Nx
-    if ! nx build "$package_name" --configuration=production; then
+    if ! pnpm nx build "$package_name" --configuration=production; then
         print_error "Failed to build package: $package_name"
         return 1
     fi
@@ -158,19 +154,19 @@ publish_package() {
         return 1
     fi
 
-    print_status "Publishing package: @signaltree/$package_name"
+    print_status "Publishing package: @signal-tree/$package_name"
 
     # Change to dist directory and publish
     cd "$dist_path"
 
     if [ -n "$DRY_RUN" ]; then
-        print_warning "DRY RUN: Would publish @signaltree/$package_name"
+        print_warning "DRY RUN: Would publish @signal-tree/$package_name"
         npm publish --tag "$NPM_TAG" $DRY_RUN
     else
         if npm publish --tag "$NPM_TAG"; then
-            print_success "Successfully published @signaltree/$package_name"
+            print_success "Successfully published @signal-tree/$package_name"
         else
-            print_error "Failed to publish @signaltree/$package_name"
+            print_error "Failed to publish @signal-tree/$package_name"
             cd - > /dev/null
             return 1
         fi
@@ -211,14 +207,14 @@ echo "===================="
 if [ ${#SUCCESSFUL_PACKAGES[@]} -gt 0 ]; then
     print_success "Successfully published packages:"
     for package in "${SUCCESSFUL_PACKAGES[@]}"; do
-        echo "  ✅ @signaltree/$package"
+        echo "  ✅ @signal-tree/$package"
     done
 fi
 
 if [ ${#FAILED_PACKAGES[@]} -gt 0 ]; then
     print_error "Failed to publish packages:"
     for package in "${FAILED_PACKAGES[@]}"; do
-        echo "  ❌ @signaltree/$package"
+        echo "  ❌ @signal-tree/$package"
     done
     echo
     print_error "Publication process stopped due to failures."

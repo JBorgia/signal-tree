@@ -34,17 +34,30 @@
  *   node scripts/prepare-publish-artifacts.mjs --verify-only
  */
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+} from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const VERIFY_ONLY = process.argv.includes('--verify-only');
 
-const PACKAGES = [
-  'core',
-  'shared',
-];
+const PACKAGES = readdirSync(join(ROOT, 'packages'), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .filter((pkg) => {
+    const manifest = join(ROOT, 'packages', pkg, 'package.json');
+    return (
+      existsSync(manifest) &&
+      JSON.parse(readFileSync(manifest, 'utf8')).private !== true
+    );
+  })
+  .sort();
 
 /**
  * Source → destination, relative to the repo root. Both must exist.
@@ -78,7 +91,6 @@ if (!existsSync(join(ROOT, 'dist/packages/kernel'))) {
 
 if (!VERIFY_ONLY) {
   console.log('\nPreparing publish artifacts\n');
-
 
   for (const [from, to] of COPIES) {
     const src = join(ROOT, from);

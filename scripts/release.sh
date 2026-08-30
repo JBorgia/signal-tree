@@ -35,16 +35,9 @@ if [ ! -f "package.json" ] || [ ! -d "packages" ]; then
     exit 1
 fi
 
-# List of packages to release
-# Note: batching, middleware, entities, devtools, time-travel, serialization
-# were consolidated into @signaltree/core in v4.0.0 and are no longer separate packages
-# Note: memoization & presets were removed entirely in v10.0.0
-# Note: "shared" is private (bundled into core) and should NOT be in this list
-PACKAGES=(
-    "core"            # Main package with all enhancers (batching, devtools, etc.)
-    "events"          # Event-driven architecture (BullMQ, NestJS, testing)
-    "ng-forms"        # Angular forms integration
-)
+# shellcheck source=release-packages.sh
+source "scripts/release-packages.sh"
+PACKAGES=("${PUBLISHABLE_PACKAGES[@]}")
 
 # Parse command line arguments
 RELEASE_TYPE=${1:-patch}
@@ -293,7 +286,7 @@ fi
 for package in "${PACKAGES[@]}"; do
     PACKAGE_JSON="./packages/$package/package.json"
     if [ -f "$PACKAGE_JSON" ]; then
-        print_step "Updating version for @signaltree/$package..."
+        print_step "Updating version for @signal-tree/$package..."
                 node -p "
             const fs = require('fs');
             const pkg = JSON.parse(fs.readFileSync('$PACKAGE_JSON', 'utf8'));
@@ -301,20 +294,20 @@ for package in "${PACKAGES[@]}"; do
                             pkg.version = '$NEW_VERSION';
                         }
 
-            // Update peer dependencies to use specific versions for other @signaltree packages
+            // Update internal peer dependencies to the compatible release line.
             if (pkg.peerDependencies) {
                 Object.keys(pkg.peerDependencies).forEach(dep => {
-                    if (dep.startsWith('@signaltree/') && pkg.peerDependencies[dep] === '*') {
+                    if (dep.startsWith('@signal-tree/')) {
                         pkg.peerDependencies[dep] = '^' + '$NEW_VERSION';
                     }
                 });
             }
 
-            // Update dependencies if any
+            // Public packages in one candidate depend on that exact candidate.
             if (pkg.dependencies) {
                 Object.keys(pkg.dependencies).forEach(dep => {
-                    if (dep.startsWith('@signaltree/') && pkg.dependencies[dep] === '*') {
-                        pkg.dependencies[dep] = '^' + '$NEW_VERSION';
+                    if (dep.startsWith('@signal-tree/')) {
+                        pkg.dependencies[dep] = '$NEW_VERSION';
                     }
                 });
             }
@@ -403,20 +396,19 @@ fi
 # Step 3: Build all packages
 print_step "Building all packages..."
 
-# Build packages in dependency order to ensure proper resolution
-# Core first, then everything else
-print_step "Building @signaltree/core first..."
-npx nx build kernel --configuration=production || {
-    print_error "Core package build failed! Rolling back version changes."
+# Build packages in dependency order to ensure proper resolution.
+print_step "Building @signal-tree/kernel first..."
+pnpm nx build kernel --configuration=production || {
+    print_error "Kernel package build failed! Rolling back version changes."
     rollback_versions
     exit 1
 }
-print_success "Core package built successfully"
+print_success "Kernel package built successfully"
 
-# Build remaining packages that depend on core
+# Build remaining public packages that depend on kernel.
 REMAINING_PACKAGES=()
 for package in "${PACKAGES[@]}"; do
-    if [ "$package" != "core" ]; then
+    if [ "$package" != "kernel" ]; then
         REMAINING_PACKAGES+=("$package")
     fi
 done
@@ -424,7 +416,7 @@ done
 if [ ${#REMAINING_PACKAGES[@]} -gt 0 ]; then
     print_step "Building remaining Nx packages..."
     REMAINING_LIST=$(IFS=,; echo "${REMAINING_PACKAGES[*]}")
-    npx nx run-many -t build --projects=$REMAINING_LIST --configuration=production
+    pnpm nx run-many -t build --projects=$REMAINING_LIST --configuration=production
 fi
 
 print_success "Package builds completed"
@@ -548,7 +540,7 @@ fi
 for package in "${PACKAGES[@]}"; do
     DIST_PATH="./dist/packages/$package"
     if [ -d "$DIST_PATH" ]; then
-        print_step "Publishing @signaltree/$package..."
+        print_step "Publishing @signal-tree/$package..."
         cd "$DIST_PATH"
 
         # Check if package.json exists in dist
@@ -584,7 +576,7 @@ for package in "${PACKAGES[@]}"; do
             trap on_error ERR
 
             if [ $PUBLISH_EXIT_CODE -eq 0 ]; then
-                print_success "Published @signaltree/$package successfully"
+                print_success "Published @signal-tree/$package successfully"
                 PUBLISHED_PACKAGES+=("$package")
                 PUBLISH_SUCCESS=true
                 break
@@ -595,7 +587,7 @@ for package in "${PACKAGES[@]}"; do
 
             # Check if it's a "cannot publish over existing version" error
             if grep -q "cannot publish over the previously published versions" /tmp/npm_publish_$package.log 2>/dev/null; then
-                print_warning "@signaltree/$package@$NEW_VERSION already published, skipping..."
+                print_warning "@signal-tree/$package@$NEW_VERSION already published, skipping..."
                 PUBLISHED_PACKAGES+=("$package")
                 PUBLISH_SUCCESS=true
                 break
@@ -604,10 +596,10 @@ for package in "${PACKAGES[@]}"; do
                 if [ $attempt -eq 1 ]; then
                     print_error "2FA token expired. Re-logging in..."
                     npm login --auth-type=web
-                    print_step "Retrying publish for @signaltree/$package..."
+                    print_step "Retrying publish for @signal-tree/$package..."
                     continue  # Retry with fresh auth
                 else
-                    print_error "npm publish failed for @signaltree/$package after re-authentication!"
+                    print_error "npm publish failed for @signal-tree/$package after re-authentication!"
                     FAILED_PACKAGES+=("$package")
                     break
                 fi
@@ -616,15 +608,15 @@ for package in "${PACKAGES[@]}"; do
                 if [ $attempt -eq 1 ]; then
                     print_warning "Authentication error. Re-logging in..."
                     npm login --auth-type=web
-                    print_step "Retrying publish for @signaltree/$package..."
+                    print_step "Retrying publish for @signal-tree/$package..."
                     continue
                 else
-                    print_error "npm publish failed for @signaltree/$package after re-authentication!"
+                    print_error "npm publish failed for @signal-tree/$package after re-authentication!"
                     FAILED_PACKAGES+=("$package")
                     break
                 fi
             else
-                print_error "npm publish failed for @signaltree/$package! (Exit code: $PUBLISH_EXIT_CODE)"
+                print_error "npm publish failed for @signal-tree/$package! (Exit code: $PUBLISH_EXIT_CODE)"
                 cat /tmp/npm_publish_$package.log | tail -10
                 FAILED_PACKAGES+=("$package")
                 break
@@ -692,7 +684,7 @@ print_success "🎉 Modular release $NEW_VERSION completed successfully!"
 echo ""
 print_step "Published packages:"
 for package in "${PACKAGES[@]}"; do
-    echo -e "${GREEN}📦 @signaltree/$package@$NEW_VERSION${NC}"
+    echo -e "${GREEN}📦 @signal-tree/$package@$NEW_VERSION${NC}"
 done
 echo ""
 echo -e "${GREEN}🏷️  GitHub: https://github.com/JBorgia/signaltree/releases/tag/v$NEW_VERSION${NC}"

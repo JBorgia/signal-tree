@@ -98,7 +98,7 @@
   },
   "release": {
     "version": {
-      "preVersionCommand": "npx nx run-many -t build --projects=kernel,ng-forms,shared"
+      "preVersionCommand": "pnpm nx run-many -t build --projects=shared,kernel,angular"
     }
   },
   "analytics": false

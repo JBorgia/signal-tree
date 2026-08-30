@@ -10,13 +10,10 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-# Verify the packages that scripts/release.sh publishes.
-NX_PACKAGES=(
-    "core"
-    "shared"
-    "events"
-    "ng-forms"
-)
+# Verify the private build dependency and the public release set.
+# shellcheck source=release-packages.sh
+source "scripts/release-packages.sh"
+NX_PACKAGES=("${BUILD_PACKAGES[@]}")
 ERRORS=0
 
 echo "Verifying distribution files for independent packages..."
@@ -50,68 +47,20 @@ for package in "${NX_PACKAGES[@]}"; do
         echo -e "${RED}❌ Missing compiled output directory: $JS_DIR${NC}"
         ((ERRORS++))
     else
-        if [ "$package" = "events" ]; then
-            EVENTS_EXPECTED=(
-                "$JS_DIR/index.js"
-                "$JS_DIR/nestjs/index.js"
-                "$JS_DIR/angular/index.js"
-                "$JS_DIR/testing/index.js"
-            )
-            for expected in "${EVENTS_EXPECTED[@]}"; do
-                RELATIVE_PATH="${expected#$JS_DIR/}"
-                if [ ! -f "$expected" ]; then
-                    echo -e "${RED}❌ Missing events artifact: $RELATIVE_PATH${NC}"
-                    ((ERRORS++))
-                else
-                    echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
-                fi
-            done
+        if [ ! -f "$JS_DIR/index.js" ]; then
+            echo -e "${RED}❌ Missing index.js in $JS_DIR${NC}"
+            ((ERRORS++))
         else
-            if [ ! -f "$JS_DIR/index.js" ]; then
-                echo -e "${RED}❌ Missing index.js in $JS_DIR${NC}"
-                ((ERRORS++))
-            else
-                echo -e "${GREEN}✓ index.js found${NC}"
-            fi
+            echo -e "${GREEN}✓ index.js found${NC}"
         fi
     fi
 
     # Check for TypeScript declarations
-    if [ "$package" = "events" ]; then
-        EVENTS_DTS=(
-            "$DIST_DIR/src/index.d.ts"
-            "$DIST_DIR/src/nestjs/index.d.ts"
-            "$DIST_DIR/src/angular/index.d.ts"
-            "$DIST_DIR/src/testing/index.d.ts"
-        )
-        for expected in "${EVENTS_DTS[@]}"; do
-            RELATIVE_PATH="${expected#$DIST_DIR/}"
-            if [ ! -f "$expected" ]; then
-                echo -e "${RED}❌ Missing events declaration: $RELATIVE_PATH${NC}"
-                ((ERRORS++))
-            else
-                echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
-            fi
-        done
-    elif [ "$package" = "ng-forms" ]; then
-        NG_FORMS_DTS=(
-            "$DIST_DIR/src/index.d.ts"
-            "$DIST_DIR/src/audit/index.d.ts"
-        )
-        for expected in "${NG_FORMS_DTS[@]}"; do
-            RELATIVE_PATH="${expected#$DIST_DIR/}"
-            if [ ! -f "$expected" ]; then
-                echo -e "${RED}❌ Missing ng-forms declaration: $RELATIVE_PATH${NC}"
-                ((ERRORS++))
-            else
-                echo -e "${GREEN}✓ $RELATIVE_PATH found${NC}"
-            fi
-        done
-    elif [ ! -f "$JS_DIR/index.d.ts" ]; then
-        echo -e "${RED}❌ Missing index.d.ts in $JS_DIR${NC}"
+    if [ ! -f "$DIST_DIR/src/index.d.ts" ]; then
+        echo -e "${RED}❌ Missing declaration entry: $DIST_DIR/src/index.d.ts${NC}"
         ((ERRORS++))
     else
-        echo -e "${GREEN}✓ index.d.ts found${NC}"
+        echo -e "${GREEN}✓ src/index.d.ts found${NC}"
     fi
 
     echo -e "${GREEN}✅ $package verified${NC}\n"

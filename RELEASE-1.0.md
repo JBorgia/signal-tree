@@ -97,8 +97,8 @@ production 19.50/21 KB, EntityMap development 22.11/23.7 KB; kernel tarball
 the existing public-surface mix 33.74 KB gzip. These figures authorize no
 optimization work.
 
-The `15.0.0-rc.1` manifest values remain placeholders; this freeze is not RC
-authorization.
+`15.0.0-rc.1` is now the authoritative candidate version for
+`RC-CANDIDATE-PREP-0`; this does not authorize tagging or publishing.
 
 ### FROZEN — persistence invariants
 

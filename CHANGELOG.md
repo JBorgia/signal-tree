@@ -1,7 +1,6 @@
-**15.0.0 release-claim staging note.**
+## 15.0.0-rc.1 (2026-08-30)
 
-These entries keep release-delta claim checks honest before the actual version
-bump inserts the final dated 15.0.0 heading.
+First public candidate for the v15 package and API reset.
 
 - **Framework adapter installation hooks are now explicit.** The
   `@signal-tree/kernel/adapter` entry point exports `installCellRuntime`,

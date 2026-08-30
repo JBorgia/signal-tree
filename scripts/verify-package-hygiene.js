@@ -27,10 +27,23 @@ const { execSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-// Keep aligned with scripts/release.sh / ci-publish.sh PACKAGES.
-const PACKAGES = [
-  'core',
-];
+const PACKAGES = fs
+  .readdirSync(path.join(process.cwd(), 'packages'), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .filter((pkg) => {
+    const manifestPath = path.join(
+      process.cwd(),
+      'packages',
+      pkg,
+      'package.json'
+    );
+    return (
+      fs.existsSync(manifestPath) &&
+      JSON.parse(fs.readFileSync(manifestPath, 'utf8')).private !== true
+    );
+  })
+  .sort();
 
 /** Files that must NEVER appear in a published tarball. */
 const FORBIDDEN = [
@@ -75,7 +88,8 @@ function checkPackage(files, distDir) {
     fs.readFileSync(path.join(distDir, 'package.json'), 'utf8')
   );
   const main = (pkg.module || pkg.main || '').replace(/^\.\//, '');
-  if (main && !has(main)) violations.push(`main/module entry not packed: ${main}`);
+  if (main && !has(main))
+    violations.push(`main/module entry not packed: ${main}`);
   if (!files.some((f) => f.endsWith('.d.ts')))
     violations.push('no .d.ts types packed');
 
@@ -143,7 +157,9 @@ function main() {
       );
     }
     console.log('A publishable tarball ships junk or is missing an entry.');
-    console.log('Fix the package `files`/exports (or the build) — not this gate.');
+    console.log(
+      'Fix the package `files`/exports (or the build) — not this gate.'
+    );
     process.exit(1);
   }
   console.log(
@@ -175,9 +191,18 @@ function selfTest() {
     JSON.stringify({ main: './dist/index.js', exports: {} })
   );
   const v = checkPackage(dirty, tmp);
-  expect('flags a .spec file', v.some((x) => x.includes('.spec')));
-  expect('flags a source map', v.some((x) => x.includes('source map')));
-  expect('flags raw .ts source', v.some((x) => x.includes('raw .ts')));
+  expect(
+    'flags a .spec file',
+    v.some((x) => x.includes('.spec'))
+  );
+  expect(
+    'flags a source map',
+    v.some((x) => x.includes('source map'))
+  );
+  expect(
+    'flags raw .ts source',
+    v.some((x) => x.includes('raw .ts'))
+  );
 
   const clean = [
     'package.json',
@@ -187,9 +212,24 @@ function selfTest() {
     'dist/index.d.ts',
   ];
   expect('passes a clean package', checkPackage(clean, tmp).length === 0);
-  expect('keeps .d.ts (not flagged as raw .ts)', !checkPackage(clean, tmp).some((x) => x.includes('raw .ts')));
-  expect('requires LICENSE', checkPackage(clean.filter((f) => f !== 'LICENSE'), tmp).some((x) => x.includes('LICENSE')));
-  expect('requires NOTICE', checkPackage(clean.filter((f) => f !== 'NOTICE'), tmp).some((x) => x.includes('NOTICE')));
+  expect(
+    'keeps .d.ts (not flagged as raw .ts)',
+    !checkPackage(clean, tmp).some((x) => x.includes('raw .ts'))
+  );
+  expect(
+    'requires LICENSE',
+    checkPackage(
+      clean.filter((f) => f !== 'LICENSE'),
+      tmp
+    ).some((x) => x.includes('LICENSE'))
+  );
+  expect(
+    'requires NOTICE',
+    checkPackage(
+      clean.filter((f) => f !== 'NOTICE'),
+      tmp
+    ).some((x) => x.includes('NOTICE'))
+  );
 
   fs.rmSync(tmp, { recursive: true, force: true });
   if (failed) {

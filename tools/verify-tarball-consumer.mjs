@@ -39,14 +39,17 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist', 'packages');
-// Every publishable workspace package. `schema` was removed by SCHEMA-DEL —
-// leaving it here made the gate report `no built dist ... run the build first`,
-// which is indistinguishable from a genuinely missing build, so the gate could
-// not pass at HEAD no matter what the artifacts contained.
-const PACKAGES = [
-  'core',
-  'shared',
-];
+const PACKAGES = readdirSync(join(ROOT, 'packages'), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .filter((pkg) => {
+    const manifestPath = join(ROOT, 'packages', pkg, 'package.json');
+    return (
+      existsSync(manifestPath) &&
+      JSON.parse(readFileSync(manifestPath, 'utf8')).private !== true
+    );
+  })
+  .sort();
 
 const errors = [];
 const info = [];
@@ -105,7 +108,9 @@ function checkPackedExports(pkg, tmp) {
     return;
   }
   const pkgRoot = extract(tgz, join(tmp, 'x', pkg));
-  const manifest = JSON.parse(readFileSync(join(pkgRoot, 'package.json'), 'utf8'));
+  const manifest = JSON.parse(
+    readFileSync(join(pkgRoot, 'package.json'), 'utf8')
+  );
   const targets = exportTargets(manifest.exports);
   if (targets.length === 0) {
     info.push(`${pkg}: no exports subpaths (ok)`);
@@ -124,10 +129,10 @@ function checkPackedExports(pkg, tmp) {
   return tgz;
 }
 
-// --- Part B: core installs into a real consumer and resolves every subpath ---
-function checkCoreConsumerResolves(coreTgz, tmp) {
-  if (!coreTgz) {
-    errors.push('core: tarball not produced — cannot run consumer resolve.');
+// --- Part B: kernel installs into a real consumer and resolves every subpath ---
+function checkKernelConsumerResolves(kernelTgz, tmp) {
+  if (!kernelTgz) {
+    errors.push('kernel: tarball not produced — cannot run consumer resolve.');
     return;
   }
   const consumer = join(tmp, 'consumer');
@@ -135,7 +140,12 @@ function checkCoreConsumerResolves(coreTgz, tmp) {
   writeFileSync(
     join(consumer, 'package.json'),
     JSON.stringify(
-      { name: 'st-tarball-consumer', private: true, version: '0.0.0', dependencies: { '@signal-tree/kernel': `file:${coreTgz}` } },
+      {
+        name: 'st-tarball-consumer',
+        private: true,
+        version: '0.0.0',
+        dependencies: { '@signal-tree/kernel': `file:${kernelTgz}` },
+      },
       null,
       2
     )
@@ -143,21 +153,42 @@ function checkCoreConsumerResolves(coreTgz, tmp) {
   try {
     execFileSync(
       'npm',
-      ['install', '--legacy-peer-deps', '--no-audit', '--no-fund', '--no-package-lock'],
+      [
+        'install',
+        '--legacy-peer-deps',
+        '--no-audit',
+        '--no-fund',
+        '--no-package-lock',
+      ],
       { cwd: consumer, stdio: 'ignore' }
     );
   } catch (e) {
-    errors.push(`core consumer: npm install of the tarball failed — ${String(e).split('\n')[0]}`);
+    errors.push(
+      `kernel consumer: npm install of the tarball failed — ${
+        String(e).split('\n')[0]
+      }`
+    );
     return;
   }
   const req = createRequire(join(consumer, 'index.js'));
-  const subpaths = ['@signal-tree/kernel', '@signal-tree/kernel/storage'];
+  const manifest = JSON.parse(
+    readFileSync(join(DIST, 'kernel', 'package.json'), 'utf8')
+  );
+  const subpaths = Object.keys(manifest.exports ?? {})
+    .filter((subpath) => subpath !== './package.json')
+    .map((subpath) =>
+      subpath === '.'
+        ? '@signal-tree/kernel'
+        : `@signal-tree/kernel/${subpath.slice(2)}`
+    );
   for (const sp of subpaths) {
     try {
       req.resolve(sp);
-      info.push(`core consumer: resolved ${sp} ✓`);
+      info.push(`kernel consumer: resolved ${sp} ✓`);
     } catch {
-      errors.push(`core consumer: could NOT resolve '${sp}' from an installed tarball — exports/files broken.`);
+      errors.push(
+        `kernel consumer: could NOT resolve '${sp}' from an installed tarball — exports/files broken.`
+      );
     }
   }
 }
@@ -180,9 +211,13 @@ if (process.argv.includes('--self-test')) {
   const tgz = pack(fakePkg, join(tmp, 'tgz'));
   const root = extract(tgz, join(tmp, 'x'));
   const manifest = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
-  const missing = exportTargets(manifest.exports).filter((t) => !existsSync(join(root, t)));
+  const missing = exportTargets(manifest.exports).filter(
+    (t) => !existsSync(join(root, t))
+  );
   if (missing.length === 1 && missing[0] === './dist/nope.js') {
-    console.log('✅ self-test: gate detects an exports target missing from the tarball');
+    console.log(
+      '✅ self-test: gate detects an exports target missing from the tarball'
+    );
     process.exit(0);
   }
   console.error('❌ self-test FAILED: gate did not detect the missing target');
@@ -191,12 +226,12 @@ if (process.argv.includes('--self-test')) {
 
 // --- run ---------------------------------------------------------------------
 const tmp = mkdtempSync(join(tmpdir(), 'st-tarball-'));
-let coreTgz;
+let kernelTgz;
 for (const pkg of PACKAGES) {
   const tgz = checkPackedExports(pkg, tmp);
-  if (pkg === 'core') coreTgz = tgz;
+  if (pkg === 'kernel') kernelTgz = tgz;
 }
-checkCoreConsumerResolves(coreTgz, tmp);
+checkKernelConsumerResolves(kernelTgz, tmp);
 
 for (const line of info) console.log('  ' + line);
 if (errors.length) {
@@ -204,4 +239,6 @@ if (errors.length) {
   for (const e of errors) console.error('   - ' + e);
   process.exit(1);
 }
-console.log('\n✅ Tarball-consumer gate passed: every packed exports target ships, and @signal-tree/kernel resolves from a real install.');
+console.log(
+  '\n✅ Tarball-consumer gate passed: every packed exports target ships, and @signal-tree/kernel resolves from a real install.'
+);
