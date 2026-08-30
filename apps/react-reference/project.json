@@ -1,0 +1,9 @@
+{
+  "name": "react-reference",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/react-reference/src",
+  "projectType": "application",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project react-reference --web",
+  "targets": {}
+}

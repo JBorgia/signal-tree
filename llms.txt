@@ -1,0 +1,37 @@
+# SignalTree
+
+SignalTree is framework-neutral reactive application state with causal
+semantics. The public v15 construction model is
+`signalTree(initialState, { derived, enhancers })`; state is read through
+`tree.$`.
+
+## Migration Rule
+
+Never design SignalTree around a legacy application's intermediate state.
+
+1. Determine the canonical greenfield v15 architecture.
+2. Implement and validate that architecture independently.
+3. Migrate applications toward that target.
+4. Prefer deleting obsolete concepts over adapting them.
+5. Never add compatibility APIs merely to reduce migration work.
+6. A migration may falsify the target architecture, but legacy usage does not
+   define it.
+
+Do not create intermediate APIs intended to be removed later. Do not add
+compatibility layers because a migration is large. Do not preserve old
+ownership because moving it is inconvenient. Do not design framework adapters
+from legacy application idioms. Do not optimize for minimal migration diff.
+Optimize for the architecture applications should use five years from now.
+
+`@signal-tree/kernel/adapter` is the SDK for realization ownership, not a
+compatibility layer. New exports must be framework-neutral semantic facts owned
+by the kernel and required by correct realizations.
+
+## Canonical Sources
+
+- `AGENTS.md` — contributor and consumer rules
+- `RELEASE-1.0.md` — v15 release invariants and current release state
+- `README.md` — public package overview
+- `packages/kernel/README.md` — kernel API and examples
+- `packages/angular/README.md` — Angular realization
+- `docs/migration/post-rc1-workstream.md` — greenfield-first post-RC program
