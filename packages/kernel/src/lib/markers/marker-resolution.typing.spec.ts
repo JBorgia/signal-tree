@@ -16,7 +16,10 @@
  * here — including `.computed()` slice resolution. Leaving them unchecked is how
  * they drifted out of sync with `TreeNode` in the first place.
  */
-import type { Signal } from '@angular/core';
+// GREENFIELD-V15-SURFACE-0: the kernel is carrier-NEUTRAL, so its marker
+// surfaces resolve to cells. The Angular-bound equivalents are asserted in
+// `packages/angular`, where that carrier is registered.
+import type { ReadableCell } from '../internals/cell-runtime';
 
 import type {
   WritableLeaf,
@@ -78,15 +81,15 @@ const sliceTree = signalTree({
 type Slice$ = typeof sliceTree.$;
 
 export type _ComputedSliceChecks = [
-  // a slice resolves to Signal<R> with R inferred from the compute fn
+  // a slice resolves to ReadableCell<R> with R inferred from the compute fn
   Expect<
-    Equal<Slice$['plants']['byId2'], Signal<{ [k: string]: User }>>
+    Equal<Slice$['plants']['byId2'], ReadableCell<{ [k: string]: User }>>
   >,
   // the base EntitySignal surface survives alongside the slice
-  Expect<Equal<Slice$['plants']['all'], Signal<User[]>>>,
+  Expect<Equal<Slice$['plants']['all'], ReadableCell<User[]>>>,
   // chained slices accumulate — both names present, independently typed
-  Expect<Equal<Slice$['chained']['names'], Signal<string[]>>>,
-  Expect<Equal<Slice$['chained']['total'], Signal<number>>>,
+  Expect<Equal<Slice$['chained']['names'], ReadableCell<string[]>>>,
+  Expect<Equal<Slice$['chained']['total'], ReadableCell<number>>>,
   // REGRESSION: a slice-free collection stays EXACTLY EntitySignal — the
   // `Record<string, never>` default must not graft an index signature on
   Expect<Equal<$['users'], EntitySignal<User, number>>>
@@ -101,9 +104,9 @@ type SliceState = {
   };
 };
 export type _InternalVariantSliceChecks = [
-  Expect<Equal<EntityAwareTreeNode<SliceState>['stock']['names'], Signal<string[]>>>,
+  Expect<Equal<EntityAwareTreeNode<SliceState>['stock']['names'], ReadableCell<string[]>>>,
   Expect<
-    Equal<DeepEntityAwareTreeNode<SliceState>['stock']['names'], Signal<string[]>>
+    Equal<DeepEntityAwareTreeNode<SliceState>['stock']['names'], ReadableCell<string[]>>
   >
 ];
 

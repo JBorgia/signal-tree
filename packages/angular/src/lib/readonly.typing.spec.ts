@@ -1,4 +1,16 @@
 /**
+ * Rows asserting `ReadonlyEntityNode` / `ReadonlyEntitySignal` were removed:
+ * GREENFIELD-V15-SURFACE-0 INTERNALIZED those types, so they have no public
+ * contract to assert and this package must not deep-import kernel internals.
+ *
+ * MOVED from the kernel by GREENFIELD-V15-SURFACE-0.
+ *
+ * These rows assert that readonly views narrow to Angular `Signal`s, and they
+ * construct their inputs with Angular `linkedSignal`/`computed`. Both are
+ * Angular facts: the kernel's readonly view is carrier-NEUTRAL and narrows to
+ * `ReadableCell`. The assertions are true here, where the carrier is bound.
+ */
+/**
  * TYPE-TEST HARNESS — compile-time only (see marker-resolution.typing.spec.ts
  * for the harness convention: checked by `tsc` via `npm run typecheck`,
  * EXCLUDED from vitest by the `*typing*.spec.ts` ignore).
@@ -24,18 +36,21 @@
  * ((d) — plain-object factory with `expose: 'readonly'` is a compile error —
  * lives in define-store.typing.spec.ts next to the overloads it gates.)
  */
-import { linkedSignal, computed, type Signal } from '@angular/core';
+import {
+  linkedSignal,
+  computed,
+  type Signal,
+  type WritableSignal,
+} from '@angular/core';
 
 import {
   entityMap,
   signalTree,
 } from '../index';
 import type {
-  ReadonlyEntityNode,
-  ReadonlyEntitySignal,
-} from './readonly';
-import { asReadonly } from './readonly';
-import type { ISignalTree } from './types';
+} from '../index';
+import { asReadonly } from '../index';
+import type { ISignalTree, NodeAccessor } from '../index';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
@@ -46,6 +61,9 @@ type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
 type Expect<T extends true> = T;
 /** True iff K is not a member of T — "this write is not offered". */
 type NotOffered<T, K extends PropertyKey> = K extends keyof T ? false : true;
+type EffectiveParameters<T> = T extends (...args: infer P) => unknown
+  ? P
+  : never;
 
 interface User {
   id: number;
@@ -79,11 +97,22 @@ const tree = signalTree({
 const ro = asReadonly(tree);
 type RO = typeof ro;
 type RO$ = RO['$'];
+declare const realAccessor: NodeAccessor<number>;
+declare const emptyAccessor: NodeAccessor<Record<string, never>> & {};
+const boundAccessor = tree.bind();
 
 // Runtime-reachable member types used in assertions below.
 type ROUsers = RO$['users'];
 type ROPlants = RO$['plants'];
 type ROEntityNode = NonNullable<ReturnType<ROUsers['byId']>>;
+
+export type _ReadonlyCallGrammarControls = [
+  Expect<Equal<EffectiveParameters<Signal<number>>, []>>,
+  Expect<Equal<EffectiveParameters<WritableSignal<number>>, []>>,
+  Expect<Equal<EffectiveParameters<typeof realAccessor> extends [] ? true : false, false>>,
+  Expect<Equal<EffectiveParameters<typeof emptyAccessor> extends [] ? true : false, false>>,
+  Expect<Equal<EffectiveParameters<typeof boundAccessor> extends [] ? true : false, false>>
+];
 
 export type _ReadonlyViewChecks = [
   // ---------------------------------------------------------------------------
@@ -120,7 +149,6 @@ export type _ReadonlyViewChecks = [
   // ---------------------------------------------------------------------------
   // (c) entityMap: queries readable, mutators not offered, byId re-signed
   // ---------------------------------------------------------------------------
-  Expect<Equal<ROUsers, ReadonlyEntitySignal<User, number>>>,
   Expect<Equal<ROUsers['all'], Signal<User[]>>>,
   Expect<Equal<ROUsers['empty'], Signal<boolean>>>,
   Expect<NotOffered<ROUsers, 'addOne'>>,
@@ -132,9 +160,12 @@ export type _ReadonlyViewChecks = [
   Expect<NotOffered<ROUsers, 'tap'>>,
   Expect<NotOffered<ROUsers, 'intercept'>>,
   // byId: same node at runtime, re-signed without write reachability.
-  Expect<
-    Equal<ReturnType<ROUsers['byId']>, ReadonlyEntityNode<User> | undefined>
-  >,
+  // Asserted through PUBLIC semantics: `ReadonlyEntityNode` became an internal
+  // name in GREENFIELD-V15-SURFACE-0, but the BEHAVIOUR it guarded — a readonly
+  // entity node offers reads and not writes — is still public, so the row was
+  // rewritten rather than dropped.
+  Expect<Equal<ROEntityNode['name'], Signal<string>>>,
+  Expect<NotOffered<ROEntityNode['name'], 'set'>>,
   Expect<Equal<ROEntityNode['name'], Signal<string>>>,
   Expect<Equal<ROEntityNode['tags'], Signal<string[]>>>, // arrays stay atomic
   Expect<Equal<ROEntityNode['address']['city'], Signal<string>>>,

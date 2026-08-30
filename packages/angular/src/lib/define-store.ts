@@ -1,6 +1,23 @@
 import { DestroyRef, inject, Injectable, type Type } from '@angular/core';
 
-import type { ReadonlyStore, SignalTreeBuilder } from '@signal-tree/kernel';
+// Bound to Angular's carrier, not imported from the kernel. `defineStore` is an
+// ANGULAR API: its injected store must report native Angular signals. Importing
+// the kernel's neutral aliases made `defineStore(..., 'readonly')` return a store
+// whose leaves typed as ReadableCell — the same carrier lie the star export had.
+// Imported from the binders rather than `../index` to avoid a cycle.
+import type {
+  ReadonlyStoreOf,
+  SignalTreeBuilderOf,
+  TreeNodeOf,
+} from '@signal-tree/kernel/adapter';
+
+type ReadonlyStore<T, TAccum = TreeNodeOf<T, 'angular'>> = ReadonlyStoreOf<
+  T,
+  TAccum,
+  'angular'
+>;
+type SignalTreeBuilder<T, TAccum = TreeNodeOf<T, 'angular'>> =
+  SignalTreeBuilderOf<T, TAccum, 'angular'>;
 
 /**
  * Config for {@link defineStore}.

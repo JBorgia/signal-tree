@@ -7757,3 +7757,22 @@ carrier-insensitive, re-exported without binding.
     removed names reachable            NONE
     packed type controls               5/5 PASS
     packed runtime  kernel 10/10 · angular 7/7 · Link 4/4
+
+## GREENFIELD-V15-SURFACE-0 — CLOSED GREEN / FROZEN
+
+    @signal-tree/kernel          47 exports  0 star
+    @signal-tree/kernel/adapter  24 exports  0 star
+    @signal-tree/angular         51 exports  0 star
+
+    old transitional names gone · deleted APIs unreachable
+    Angular internal binders leaked NONE
+    carrier-sensitive Angular names 9/9 truthful
+    installed type controls 5/5 · packed runtime GREEN
+
+The `/adapter` growth 18 -> 24 is accepted as the preregistered TA-B exception:
+every addition is TYPE-ONLY and each was forced by a concrete installed-consumer
+compiler failure. No physical machinery crossed.
+
+**SURFACE SHAPE IS FROZEN. The API is NOT yet frozen** — final release evidence
+and RC-HARNESS-1/2/3 must clear first. No further renames, removals or shape
+changes absent a release-blocking falsifier.

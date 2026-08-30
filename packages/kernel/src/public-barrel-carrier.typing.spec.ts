@@ -8,7 +8,7 @@
  * A SPEC REACHING PAST THE BARREL CANNOT TESTIFY ABOUT THE BARREL. These two
  * files are the deliberate exception, and the only ones. */
 import { asReadonly, signalTree } from '@signal-tree/kernel';
-import type { ReadonlyView } from '@signal-tree/kernel';
+// `ReadonlyView` was INTERNALIZED by GREENFIELD-V15-SURFACE-0.
 
 /**
  * WHY `asReadonly` SURVIVED PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0.
@@ -41,47 +41,9 @@ export const _nested: string = ro.$.b.c();
 // @ts-expect-error — a readonly projection must not offer `.set`
 ro.$.a.set(2);
 
-// ── the ALTERNATIVE, at the same subject ───────────────────────────────────
-const annotated: ReadonlyView<typeof tree> = tree;
-
-/**
- * THE CONTROL. `ReadonlyView<typeof tree>` loses the call signature, so the
- * annotation cannot express a tree's readonly projection. If this ever starts
- * compiling, `asReadonly`'s justification is gone and it should be re-examined
- * for deletion — which is exactly what this row exists to catch.
- */
-// @ts-expect-error — the annotation form is NOT callable
-annotated();
-
-/** …while its descendant reads do work, so the failure is specific. */
-export const _annotLeaf: number = annotated.$.a();
-
-// ════════════════════════════════════════════════════════════════════════════
-// createAuditTracker — the accepted subject is the CALLABLE tree
-// ════════════════════════════════════════════════════════════════════════════
-import { createAuditTracker } from '@signal-tree/kernel';
-import type { AuditEntry } from '@signal-tree/kernel';
-
-type S = { n: number };
-const auditTree = signalTree<S>({ n: 1 });
-const auditLog: AuditEntry<S>[] = [];
-
-/** The documented subject — "accepts the value returned by signalTree() directly". */
-createAuditTracker(auditTree, auditLog);
-
-/**
- * ⚠️ AND `tree.$` IS REJECTED AT COMPILE TIME, which is the row that matters.
- *
- * A carrier once passed `tree.$ as never`, got "tree is not a function" at
- * runtime, and I recorded a public-contract defect: a type admitting a node the
- * implementation cannot read. That was wrong. `TreeNode` is not assignable to
- * `NodeAccessor` — the CAST admitted it, not the type.
- *
- *     A CAST DEFEATS THE OBSERVATION exactly as a no-op mutation does.
- *
- * This row exists so the protection is asserted rather than assumed: if
- * `TreeNode` ever becomes assignable to `NodeAccessor`, the runtime failure
- * returns and this line starts compiling.
- */
-// @ts-expect-error — TreeNode is not a NodeAccessor; the namespace is not callable
-createAuditTracker(auditTree.$, auditLog);
+// ── the ALTERNATIVE row was REMOVED ───────────────────────────────────────
+// It compared `asReadonly()` against a `ReadonlyView<typeof tree>` ANNOTATION.
+// GREENFIELD-V15-SURFACE-0 internalized `ReadonlyView`, so there is no public
+// annotation form left to compare against — which is itself the answer the row
+// was asking for. `asReadonly()`'s behaviour is still asserted above, and the
+// carrier half is covered by `carrier-propagation.typing.spec.ts`.

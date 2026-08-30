@@ -26,9 +26,9 @@
 import { computed, type Signal } from '@angular/core';
 
 import { signalTree } from '../index';
-import { defineStore } from './define-store';
-import type { ReadonlyStore } from './readonly';
-import type { WritableLeaf, TreeNode } from './types';
+import { defineStore } from '../index';
+import type { ReadonlyStore } from '../index';
+import type { WritableLeaf, TreeNode } from '../index';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <

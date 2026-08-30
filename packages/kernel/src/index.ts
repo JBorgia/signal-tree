@@ -286,6 +286,9 @@ export { restoration } from './enhancers/restoration/restoration';
 // PUBLIC because `defineStore(..., 'readonly')` RETURNS it: a kept public API
 // must have a nameable return type. The rest of the readonly machinery stays internal.
 export type { ReadonlyStore } from './lib/readonly';
+// PUBLIC for the same reason as `ReadonlyStore`: `TransactionMethods.transaction()`
+// RETURNS it, and a kept public API must have a nameable return type.
+export type { PendingTransaction } from './enhancers/transactions/transactions.types';
 export type { TransactionMethods } from './enhancers/transactions/transactions.types';
 export { transactions } from './enhancers/transactions/transactions';
 
@@ -368,3 +371,23 @@ export { devTools } from './enhancers/devtools/devtools';
  * store.$.users.addOne({ id: 1, name: 'Alice' });
  * ```
  */
+
+// PUBLIC-SIGNATURE-CLOSURE-0. Each of these is a FIRST-ORDER CONTRACT TYPE: it
+// appears directly in the signature of a KEEP public API and names a value the
+// consumer supplies or receives. Found mechanically, not one failure at a time —
+// `PendingTransaction` and `ReadonlyStore` were the same class, discovered the
+// hard way.
+//
+//     A TYPE NAMED BY A KEPT PUBLIC API'S SIGNATURE CANNOT BE INTERNAL.
+//
+// Implementation machinery (the `*Of` carrier binders, ProcessDerived,
+// AccumulatedEnhancerAdditions, NaturalValue) stays internal: consumers never
+// name it, and exporting it would be "export everything the compiler touches".
+export type {
+  DevToolsConfig,
+  EntityConfig,
+  RestorationConfig,
+  MutationOptions,
+} from './lib/types';
+export type { TreeCapability, EnhancerWithMeta } from './lib/enhancer-types';
+export type { DevToolsDebugSession } from './enhancers/devtools/devtools.types';

@@ -66,6 +66,7 @@
  * re-measuring.
  */
 import type { Signal } from '@angular/core';
+import type { ReadableCell } from './internals/cell-runtime';
 
 import { entityMap, signalTree } from '../index';
 import type {
@@ -211,7 +212,7 @@ rootTree.$.user.set({ name: 'Bob', age: 1, address: { city: 'x' } });
 export type _LifecycleSurface = [
   Expect<Equal<(typeof rootTree)['bind'], (thisArg?: unknown) => NodeAccessor<RootState>>>,
   Expect<Equal<(typeof rootTree)['destroy'], () => void>>,
-  Expect<Equal<(typeof rootTree)['destroyed'], Signal<boolean>>>,
+  Expect<Equal<(typeof rootTree)['destroyed'], ReadableCell<boolean>>>,
   Expect<Equal<(typeof rootTree)['registerCleanup'], (fn: () => void) => void>>,
   Expect<
     Equal<
@@ -313,7 +314,7 @@ const builtEntities = signalTree({
 });
 export type _BuiltEntities = [
   Expect<Equal<(typeof builtEntities)['$']['users'], EntitySignal<User, number>>>,
-  Expect<Equal<(typeof builtEntities)['$']['users']['all'], Signal<User[]>>>,
+  Expect<Equal<(typeof builtEntities)['$']['users']['all'], ReadableCell<User[]>>>,
   Expect<Equal<(typeof builtEntities)['$']['count'], WritableLeaf<number>>>
 ];
 
@@ -352,7 +353,11 @@ export const _stillLabelled: string = enhancedTwice.label();
 // never by a gate. These rows are that gate.
 built.destroy();
 built.registerCleanup(() => undefined);
-export const _builtDestroyed: Signal<boolean> = built.destroyed;
+// GREENFIELD-V15-SURFACE-0: this row's docblock records that `destroyed` being
+// an Angular Signal was a gated contract. It still is — in @signal-tree/angular,
+// where the carrier is bound. The KERNEL's contract is the neutral cell, and the
+// Angular row lives in packages/angular.
+export const _builtDestroyed: ReadableCell<boolean> = built.destroyed;
 export const _builtChanged: string[] = built.updateAndReport({ count: 3 });
 
 // ############################################################################

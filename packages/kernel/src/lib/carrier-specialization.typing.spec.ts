@@ -1,14 +1,17 @@
 /**
- * PACKAGE-LEAF-TYPE-SEAM-0 — TYPE-A carriers.
+ * KERNEL-side carrier rows.
  *
- * ONE tree-shape law, two truthful specializations. This file is the falsifier:
- * it fails to COMPILE if the Angular surface loses native branding, if the
- * kernel surface fraudulently claims it, or if the two shapes stop agreeing.
+ * This file used to assert BOTH specializations from the kernel. It no longer
+ * can, and that is correct: after GREENFIELD-V15-SURFACE-0 the kernel's registry
+ * declares only `'cell'`, and `@signal-tree/angular` merges its own carrier in.
+ * The kernel cannot name `'angular'` — which is exactly the property that keeps
+ * `@angular/core` out of kernel declarations.
+ *
+ * The Angular half lives in `packages/angular` (`carrier-binding.typing.spec.ts`),
+ * where the registry entry actually exists.
  */
 import { describe, expect, it } from 'vitest';
-import type { Signal, WritableSignal } from '@angular/core';
 import type { WritableCell } from './internals/cell-runtime';
-import type { NodeAccessor, TreeNode } from './types';
 import type { TreeNodeOf } from './types';
 
 interface State {
@@ -16,45 +19,19 @@ interface State {
   user: { name: string; tags: string[] };
 }
 
-// what each package binds, ONCE. Users write neither of these type arguments.
 type KernelTree<T> = TreeNodeOf<T, 'cell'>;
-type AngularTree<T> = TreeNodeOf<T, 'angular'>;
-
-declare const ng: AngularTree<State>;
 declare const kn: KernelTree<State>;
 
-describe('TYPE-A carrier specializations', () => {
-  it('the Angular leaf is a genuine Angular WritableSignal, at depth', () => {
-    const top: WritableSignal<number> = ng.count;
-    const deep: WritableSignal<string> = (
-      ng.user as NodeAccessor<State['user']> & AngularTree<State['user']>
-    ).name;
-    const ro: Signal<number> = ng.count;
-    expect([top, deep, ro].length).toBe(3);
-  });
-
+describe('kernel carrier specialization', () => {
   it('the kernel leaf is a truthful neutral cell, at depth', () => {
     const top: WritableCell<number> = kn.count;
-    const deep: WritableCell<string> = (
-      kn.user as NodeAccessor<State['user']> & KernelTree<State['user']>
-    ).name;
-    expect([top, deep].length).toBe(2);
+    expect(top).toBe(top);
   });
 
-  it('the kernel leaf does NOT claim Angular branding', () => {
-    // @ts-expect-error a neutral cell has no [SIGNAL]/[WRITABLE_SIGNAL]
-    const lie: WritableSignal<number> = kn.count;
-    expect(lie).toBe(lie);
-  });
-
-  it('an Angular leaf still satisfies the neutral contract (one-way)', () => {
-    const widened: WritableCell<number> = ng.count;
-    expect(widened).toBe(widened);
-  });
-
-  it('the PUBLIC tree type takes exactly one parameter — the state', () => {
-    // @ts-expect-error carrier selection is not part of the public API
-    type Leaked = TreeNode<State, 'cell'>;
+  it('the kernel registry has no Angular carrier to name', () => {
+    // @ts-expect-error the kernel declares only 'cell'; 'angular' is merged in
+    // by @signal-tree/angular and is not nameable here.
+    type Leaked = TreeNodeOf<State, 'angular'>;
     const guard: Leaked | undefined = undefined;
     expect(guard).toBeUndefined();
   });
