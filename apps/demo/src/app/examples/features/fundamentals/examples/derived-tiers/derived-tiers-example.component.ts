@@ -1,6 +1,5 @@
-
 import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
-import { derivedFrom, entityMap, signalTree, DerivedOf } from '@signal-tree/angular';
+import { entityMap, signalTree, type TreeNode } from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
@@ -21,39 +20,37 @@ interface User {
  * No special utilities needed - this is the simplest approach for small trees.
  */
 function createInlineTree() {
-  return signalTree({
-    users: entityMap<User, number>(),
-    selectedUserId: null as number | null,
-  })
-    .derived(($) => ({
-      // Tier 1: Entity resolution
-      selectedUser: computed(() => {
-        const id = $.selectedUserId();
-        return id != null ? $.users.byId(id)?.() ?? null : null;
-      }),
-    }))
-    .derived(($) => ({
-      // Tier 2: Complex logic - $.selectedUser is available and typed!
-      isAdmin: computed(() => $.selectedUser()?.role === 'admin'),
-      displayName: computed(() => {
-        const user = $.selectedUser();
-        return user ? `${user.name} (${user.email})` : 'No user selected';
-      }),
-    }));
+  return signalTree(
+    {
+      users: entityMap<User, number>(),
+      selectedUserId: null as number | null,
+    },
+    {
+      derived: ($) => {
+        const selectedUser = computed(() => {
+          const id = $.selectedUserId();
+          return id != null ? $.users.byId(id)?.() ?? null : null;
+        });
+        return {
+          selectedUser,
+          isAdmin: computed(() => selectedUser()?.role === 'admin'),
+          displayName: computed(() => {
+            const user = selectedUser();
+            return user ? `${user.name} (${user.email})` : 'No user selected';
+          }),
+        };
+      },
+    }
+  );
 }
 
 // =============================================================================
-// EXAMPLE 2: EXTERNAL DERIVED (Modular - Requires explicit typing)
+// EXAMPLE 2: EXTRACTED HELPERS
 // =============================================================================
 
 /**
- * For larger applications, you may want to organize derived tiers into separate
- * files. This requires explicit typing because TypeScript cannot infer types
- * across file boundaries.
- *
- * Use these utilities:
- * - derivedFrom<TTree>() - Provides type context for the $ parameter
- * - DerivedOf<TTree, TDerivedFn> - Builds intermediate tree types
+ * Larger applications can extract ordinary signal-producing helpers while
+ * keeping one derived factory at the construction site.
  */
 
 // Step 1: Define base state factory
@@ -67,55 +64,40 @@ function createExternalBaseState() {
   };
 }
 
-// Step 2: Define base tree type using ReturnType
-type ExternalTreeBase = ReturnType<
-  typeof signalTree<ReturnType<typeof createExternalBaseState>>
->;
+// Step 2: Type the extracted helper from the state shape
+type ExternalState = ReturnType<typeof createExternalBaseState>;
 
-// Step 3: Define derived tier functions using derivedFrom
-// NOTE: These would normally be in separate files!
-// derivedFrom uses curried syntax: derivedFrom<TreeType>()(fn)
-
-const entityResolutionDerived = derivedFrom<ExternalTreeBase>()(($) => ({
-  selectedProduct: computed(() => {
+const externalDerived = ($: TreeNode<ExternalState>) => {
+  const selectedProduct = computed(() => {
     const id = $.selectedProductId();
     return id != null ? $.products.byId(id)?.() ?? null : null;
-  }),
-  cartTotal: computed(() => {
+  });
+  const cartTotal = computed(() => {
     return $.cart
       .items()
       .reduce(
         (sum: number, item: CartItem) => sum + item.price * item.quantity,
         0
       );
-  }),
-}));
-
-// Step 4: Build intermediate type for next tier
-type TreeWithTier1 = DerivedOf<
-  ExternalTreeBase,
-  typeof entityResolutionDerived
->;
-
-const complexLogicDerived = derivedFrom<TreeWithTier1>()(($) => ({
-  // Can access $.selectedProduct from Tier 1!
-  isSelectedInCart: computed(() => {
-    const product = $.selectedProduct();
-    if (!product) return false;
-    return $.cart
-      .items()
-      .some((item: CartItem) => item.productId === product.id);
-  }),
-  formattedTotal: computed(() => {
-    return `$${$.cartTotal().toFixed(2)}`;
-  }),
-}));
+  });
+  return {
+    selectedProduct,
+    cartTotal,
+    isSelectedInCart: computed(() => {
+      const product = selectedProduct();
+      return product
+        ? $.cart.items().some((item: CartItem) => item.productId === product.id)
+        : false;
+    }),
+    formattedTotal: computed(() => `$${cartTotal().toFixed(2)}`),
+  };
+};
 
 // Step 5: Assemble the tree
 function createExternalTree() {
-  return signalTree(createExternalBaseState())
-    .derived(entityResolutionDerived)
-    .derived(complexLogicDerived);
+  return signalTree(createExternalBaseState(), {
+    derived: externalDerived,
+  });
 }
 
 // =============================================================================
@@ -145,13 +127,12 @@ interface CartItem {
   standalone: true,
   imports: [ExampleComponent],
   template: `
-    <st-example heading="Derived Tiers Example">
+    <st-example heading="Derived State Example">
       <div intro>
         <h4>💡 Key Point</h4>
         <p>
-          <code>derivedFrom</code> is
-          <strong>only needed for functions defined in separate files</strong>.
-          Inline functions automatically inherit types from the chain.
+          Declare one derived factory in <code>signalTree</code>. Compose its
+          values with local <code>computed</code> references.
         </p>
       </div>
 
@@ -183,10 +164,10 @@ interface CartItem {
       </section>
 
       <section class="example-section">
-        <h3>Example 2: External Derived (Modular)</h3>
+        <h3>Example 2: Extracted Helper</h3>
         <p class="description">
-          For larger apps, organize derived tiers into separate files. Use
-          <code>derivedFrom&lt;TTree&gt;</code> for type safety.
+          Larger apps can extract ordinary typed helpers while keeping the
+          singular derived factory at the construction site.
         </p>
 
         <div class="demo-area">

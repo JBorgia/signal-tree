@@ -46,12 +46,12 @@ import { createEnhancer } from '../enhancers/index';
 import { restoration } from '../enhancers/restoration/restoration';
 import { signalTree } from './signal-tree';
 
-import type { ISignalTree } from '../index';
+import type { SignalTree } from '../index';
 
 const MARK = Symbol.for('signaltree.test.replacedIdentity');
 
 /** A minimal identity-replacing enhancer: new callable, own keys copied over. */
-const REPLACE = <T>(tree: ISignalTree<T>) => {
+const REPLACE = <T>(tree: SignalTree<T>) => {
   const next = ((...args: unknown[]) =>
     (tree as unknown as (...a: unknown[]) => unknown)(
       ...args
@@ -68,7 +68,7 @@ const REPLACE = <T>(tree: ISignalTree<T>) => {
     }
   }
   next[MARK] = true;
-  return next as unknown as ISignalTree<T>;
+  return next as unknown as SignalTree<T>;
 };
 
 const provider = (cap: string, log: string[] = []) =>

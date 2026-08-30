@@ -28,10 +28,7 @@ function isReactiveStateValue(value: unknown): boolean {
 }
 import { getDerivedRuntime } from './internals/derived-runtime';
 import { deepEqual, isBuiltInObject, parsePath } from '@signaltree/shared';
-import {
-  dormantKeys,
-  hasDormantMembers,
-} from './internals/member-membership';
+import { dormantKeys, hasDormantMembers } from './internals/member-membership';
 import {
   hydrateMarkerNode,
   snapshotMarkerNode,
@@ -332,7 +329,7 @@ export function materializeNode<T>(store: object): T {
  *   tree() first, never touch `$`  → absent   (correct, by accident)
  *   touch `$` at all, then tree()  → PRESENT  (wrong)
  *
- * because `finalize()` (the `$` getter) runs `applyDerivedFactories`, while the
+ * because `finalize()` (the `$` getter) applies configured derived state, while the
  * `tree()` call path runs only `materializeOnly()`. Every real application is
  * the second case — you write state through `$`, then persist. So in practice
  * derived values were being persisted, and going stale in storage.

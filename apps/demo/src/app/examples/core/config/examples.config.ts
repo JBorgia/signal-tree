@@ -1,17 +1,13 @@
 import { AsyncDemoComponent } from '../../features/fundamentals/examples/async/async-demo.component';
 import { BatchingDemoComponent } from '../../features/fundamentals/examples/enhancers/batching-demo/batching-demo.component';
 import { DevtoolsDemoComponent } from '../../features/fundamentals/examples/enhancers/devtools-demo/devtools-demo.component';
-import {
-    SerializationDemoComponent,
-} from '../../features/fundamentals/examples/enhancers/serialization-demo/serialization-demo.component';
+import { SerializationDemoComponent } from '../../features/fundamentals/examples/enhancers/serialization-demo/serialization-demo.component';
 import { EntitiesDemoComponent } from '../../features/fundamentals/examples/entities/entities-demo.component';
 import { EntitySortComparerDemoComponent } from '../../features/fundamentals/examples/entity-sort-comparer/entity-sort-comparer-demo.component';
 import { GranularReactivityDemoComponent } from '../../features/fundamentals/examples/granular-reactivity/granular-reactivity-demo.component';
 import { LinkedDerivedDemoComponent } from '../../features/fundamentals/examples/linked-derived/linked-derived-demo.component';
 import { FormsDemoComponent } from '../../features/fundamentals/examples/forms/forms-demo.component';
-import {
-    RecommendedArchitectureComponent,
-} from '../../features/fundamentals/examples/recommended-architecture/recommended-architecture.component';
+import { RecommendedArchitectureComponent } from '../../features/fundamentals/examples/recommended-architecture/recommended-architecture.component';
 import { SignalsExamplesComponent } from '../../features/fundamentals/examples/signals/signals-examples.component';
 import { RestorationDemoComponent } from '../../features/fundamentals/examples/restoration/restoration-demo.component';
 import { WhatsNewComponent } from '../../features/fundamentals/examples/whats-new/whats-new.component';
@@ -93,7 +89,7 @@ export const linkedDerivedExampleMeta: ExampleMeta = {
   id: 'linked-derived',
   title: 'Derived-but-writable (linked)',
   description:
-    "Sticky selection: a value derived from a source that is also writable and re-derives on change. SignalTree's `linked()` wrapper is deleted — call Angular's `linkedSignal()` inside `.derived()` directly.",
+    "Sticky selection: a value derived from a source that is also writable and re-derives on change. SignalTree's `linked()` wrapper is deleted — call Angular's `linkedSignal()` inside the configured derived factory.",
   category: 'Fundamentals',
   focusAreas: ['derived', 'reactivity'],
   functionalUse: ['derived-state', 'selection'],

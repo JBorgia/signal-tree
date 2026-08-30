@@ -1,4 +1,4 @@
-import { entityMap } from '@signal-tree/kernel';
+import { entityMap } from '@signal-tree/angular';
 
 import { Nullable, Post } from '../../types';
 import { loadingSlice } from './shared.state';
@@ -6,7 +6,7 @@ import { loadingSlice } from './shared.state';
 /**
  * Initial state for the `posts` domain.
  *
- * Filters live alongside the entity collection so derived tier 2 can compose
+ * Filters live alongside the entity collection so configured derived state can compose
  * `entities.all()` with `filters.*()` to produce `filteredPosts`.
  */
 export function postsState() {

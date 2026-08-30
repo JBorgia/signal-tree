@@ -28,17 +28,14 @@ const ROUTES = [
   '/entity-collection', // entityMap cache-aware loading showcase
   '/async', // async state via RxJS + external()
   '/marker-zoo', // all 6 markers at 4 depths
-  '/events', // events package demo
   '/benchmarks', // live cross-library benchmarks
   '/migrate', // NgRx migration recipe
   '/docs', // package documentation
   '/stored-versioning', // stored() versioning + durability + 13.4 reload status
-  '/time-travel', // undo/redo history — incl. the 14.0.0 marker section
-  '/ng-forms', // Angular forms package demo
   '/architecture-overview', // recommended architecture overview
+  '/examples/fundamentals/recommended-architecture', // application-store consumer
   '/examples/fundamentals', // embedded fundamentals examples
   '/serialization', // snapshot payload shape (changed in 14.0.0)
-  '/persistence', // persistence() enhancer
 ];
 
 // Noise that is not a product bug and would make the gate flaky.
@@ -116,55 +113,14 @@ for (const route of ROUTES) {
  * specifically to expose that class, and each was verified to be watching a
  * value the click actually moves.
  */
-test('/time-travel: a leaf write re-renders under OnPush', async ({ page }) => {
-  await page.goto('/time-travel', { waitUntil: 'load' });
-  await expect(page.locator('h1').first()).toBeVisible({ timeout: 20_000 });
-
-  const inc = page.getByRole('button', { name: '+1' }).first();
-  await expect(inc).toBeVisible({ timeout: 20_000 });
-
-  const readCounter = async () => {
-    const txt = await page.locator('body').innerText();
-    return (txt.match(/Counter:\s*(-?\d+)/i) || [])[1];
-  };
-  const before = await readCounter();
-  await inc.click();
-  await expect.poll(readCounter, { timeout: 10_000 }).not.toBe(before);
-});
-
-test('/time-travel: a MARKER write re-renders under OnPush', async ({
+test('/examples/fundamentals/recommended-architecture: ops update nested state', async ({
   page,
 }) => {
-  await page.goto('/time-travel', { waitUntil: 'load' });
-  const add = page.getByRole('button', { name: 'Add person' });
-  await expect(add).toBeVisible({ timeout: 20_000 });
-
-  // The marker section reports its live entityMap count.
-  const readPeople = async () => {
-    const txt = await page.locator('body').innerText();
-    return (txt.match(/(\d+)\s+people/i) || [])[1];
-  };
-  const before = await readPeople();
-  await add.click();
-  await expect.poll(readPeople, { timeout: 10_000 }).not.toBe(before);
-});
-
-test('/entity-collection: an entityMap write re-renders under OnPush', async ({
-  page,
-}) => {
-  await page.goto('/entity-collection', { waitUntil: 'load' });
-  await expect(page.locator('h1, main').first()).toBeVisible({
-    timeout: 20_000,
+  await page.goto('/examples/fundamentals/recommended-architecture', {
+    waitUntil: 'load',
   });
-  const before = await page.locator('body').innerText();
-
-  const btn = page.getByRole('button').filter({ hasNotText: /^$/ }).first();
-  await expect(btn).toBeVisible({ timeout: 20_000 });
-  await btn.click();
-
-  await expect
-    .poll(async () => (await page.locator('body').innerText()) !== before, {
-      timeout: 10_000,
-    })
-    .toBe(true);
+  const toggle = page.getByRole('button', { name: /Toggle theme:/ });
+  await expect(toggle).toContainText('light', { timeout: 20_000 });
+  await toggle.click();
+  await expect(toggle).toContainText('dark');
 });

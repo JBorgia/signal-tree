@@ -13,10 +13,13 @@ describe('derived() marker pattern', () => {
         count: number;
       }
 
-      const tree = signalTree<CounterState>({ count: 5 }).derived(($) => ({
-        doubled: computed(() => $.count() * 2),
-        tripled: computed(() => $.count() * 3),
-      }));
+      const initial: CounterState = { count: 5 };
+      const tree = signalTree(initial, {
+        derived: ($) => ({
+          doubled: computed(() => $.count() * 2),
+          tripled: computed(() => $.count() * 3),
+        }),
+      });
 
       // Access $ to finalize
       expect(tree.$.doubled()).toBe(10);
@@ -38,14 +41,19 @@ describe('derived() marker pattern', () => {
         };
       }
 
-      const tree = signalTree<AppState>({
+      const initial: AppState = {
         user: {
           firstName: 'John',
           lastName: 'Doe',
         },
-      }).derived(($) => ({
-        fullName: computed(() => `${$.user.firstName()} ${$.user.lastName()}`),
-      }));
+      };
+      const tree = signalTree(initial, {
+        derived: ($) => ({
+          fullName: computed(
+            () => `${$.user.firstName()} ${$.user.lastName()}`
+          ),
+        }),
+      });
 
       expect(tree.$.fullName()).toBe('John Doe');
 
@@ -55,15 +63,20 @@ describe('derived() marker pattern', () => {
     });
   });
 
-  describe('chained derived layers', () => {
+  describe('derived composition', () => {
     it('should support derived-of-derived', () => {
-      const tree = signalTree({ value: 2 })
-        .derived(($) => ({
-          doubled: computed(() => $.value() * 2),
-        }))
-        .derived(($) => ({
-          quadrupled: computed(() => $.doubled() * 2),
-        }));
+      const tree = signalTree(
+        { value: 2 },
+        {
+          derived: ($) => {
+            const doubled = computed(() => $.value() * 2);
+            return {
+              doubled,
+              quadrupled: computed(() => doubled() * 2),
+            };
+          },
+        }
+      );
 
       expect(tree.$.doubled()).toBe(4);
       expect(tree.$.quadrupled()).toBe(8);
@@ -77,16 +90,18 @@ describe('derived() marker pattern', () => {
     it('should maintain correct dependency tracking', () => {
       let computeCount = 0;
 
-      const tree = signalTree({ a: 1, b: 2 })
-        .derived(($) => ({
-          sum: computed(() => {
-            computeCount++;
-            return $.a() + $.b();
-          }),
-        }))
-        .derived(($) => ({
-          doubleSum: computed(() => $.sum() * 2),
-        }));
+      const tree = signalTree(
+        { a: 1, b: 2 },
+        {
+          derived: ($) => {
+            const sum = computed(() => {
+              computeCount++;
+              return $.a() + $.b();
+            });
+            return { sum, doubleSum: computed(() => sum() * 2) };
+          },
+        }
+      );
 
       // Initial access
       expect(tree.$.sum()).toBe(3);
@@ -103,16 +118,21 @@ describe('derived() marker pattern', () => {
 
   describe('derived with nested objects', () => {
     it('should support nested derived definitions', () => {
-      const tree = signalTree({
-        items: [1, 2, 3],
-      }).derived(($) => ({
-        stats: {
-          count: computed(() => $.items().length),
-          sum: computed(() =>
-            $.items().reduce((a: number, b: number) => a + b, 0)
-          ),
+      const tree = signalTree(
+        {
+          items: [1, 2, 3],
         },
-      }));
+        {
+          derived: ($) => ({
+            stats: {
+              count: computed(() => $.items().length),
+              sum: computed(() =>
+                $.items().reduce((a: number, b: number) => a + b, 0)
+              ),
+            },
+          }),
+        }
+      );
 
       expect(tree.$.stats.count()).toBe(3);
       expect(tree.$.stats.sum()).toBe(6);
@@ -131,24 +151,31 @@ describe('derived() marker pattern', () => {
         status: string;
       }
 
-      const tree = signalTree({
-        tickets: {
-          entities: entityMap<TicketEntity, number>(),
-          activeId: null as number | null,
-          startDate: new Date('2024-01-01'),
-          endDate: new Date('2024-12-31'),
+      const tree = signalTree(
+        {
+          tickets: {
+            entities: entityMap<TicketEntity, number>(),
+            activeId: null as number | null,
+            startDate: new Date('2024-01-01'),
+            endDate: new Date('2024-12-31'),
+          },
         },
-      }).derived(($) => ({
-        // Derived namespace with same path as source
-        tickets: {
-          // Add derived signals
-          active: computed(() => {
-            const id = $.tickets.activeId();
-            return id != null ? $.tickets.entities.byId(id)?.() ?? null : null;
+        {
+          derived: ($) => ({
+            // Derived namespace with same path as source
+            tickets: {
+              // Add derived signals
+              active: computed(() => {
+                const id = $.tickets.activeId();
+                return id != null
+                  ? $.tickets.entities.byId(id)?.() ?? null
+                  : null;
+              }),
+              all: computed(() => $.tickets.entities.all()),
+            },
           }),
-          all: computed(() => $.tickets.entities.all()),
-        },
-      }));
+        }
+      );
 
       // Verify derived signals work
       expect(tree.$.tickets.active()).toBe(null);
@@ -184,20 +211,27 @@ describe('derived() marker pattern', () => {
         name: string;
       }
 
-      const tree = signalTree({
-        items: {
-          entities: entityMap<Item, number>(),
-          selectedId: null as number | null,
+      const tree = signalTree(
+        {
+          items: {
+            entities: entityMap<Item, number>(),
+            selectedId: null as number | null,
+          },
         },
-      }).derived(($) => ({
-        items: {
-          selected: computed(() => {
-            const id = $.items.selectedId();
-            return id != null ? $.items.entities.byId(id)?.() ?? null : null;
+        {
+          derived: ($) => ({
+            items: {
+              selected: computed(() => {
+                const id = $.items.selectedId();
+                return id != null
+                  ? $.items.entities.byId(id)?.() ?? null
+                  : null;
+              }),
+              count: computed(() => $.items.entities.count()),
+            },
           }),
-          count: computed(() => $.items.entities.count()),
-        },
-      }));
+        }
+      );
 
       // EntityMap methods should be preserved
       expect(tree.$.items.entities.addOne).toBeDefined();
@@ -236,9 +270,14 @@ describe('derived() marker pattern', () => {
     });
 
     it('should preserve state and $ accessors', () => {
-      const tree = signalTree({ name: 'test' }).derived(($) => ({
-        upper: computed(() => $.name().toUpperCase()),
-      }));
+      const tree = signalTree(
+        { name: 'test' },
+        {
+          derived: ($) => ({
+            upper: computed(() => $.name().toUpperCase()),
+          }),
+        }
+      );
 
       // Both accessors should work
       expect(tree.$.name()).toBe('test');
@@ -265,83 +304,55 @@ describe('derived() marker pattern', () => {
     });
   });
 
-  describe('error handling', () => {
-    it('should throw if derived() called after $ access', () => {
-      const tree = signalTree({ count: 0 });
-
-      // Access $ to finalize
-      tree.$.count();
-
-      // Now derived() should throw
-      expect(() => {
-        tree.derived(($) => ({
-          doubled: computed(() => $.count() * 2),
-        }));
-      }).toThrow(/Cannot add derived\(\) after tree\.\$ has been accessed/);
-    });
-  });
-
   describe('mixed derived and computed', () => {
     it('should work alongside regular computed signals', () => {
-      const tree = signalTree({ value: 10 }).derived(($) => ({
-        // derived() marker
-        markerDerived: computed(() => $.value() + 1),
-        // Regular computed (should also work)
-        regularComputed: computed(() => $.value() + 2),
-      }));
+      const tree = signalTree(
+        { value: 10 },
+        {
+          derived: ($) => ({
+            // derived() marker
+            markerDerived: computed(() => $.value() + 1),
+            // Regular computed (should also work)
+            regularComputed: computed(() => $.value() + 2),
+          }),
+        }
+      );
 
       expect(tree.$.markerDerived()).toBe(11);
       expect(tree.$.regularComputed()).toBe(12);
     });
   });
 
-  describe('second-argument syntax', () => {
-    it('should accept derived factory as second argument', () => {
-      const tree = signalTree({ count: 5 }, ($) => ({
-        doubled: computed(() => $.count() * 2),
-        tripled: computed(() => $.count() * 3),
-      }));
-
-      expect(tree.$.doubled()).toBe(10);
-      expect(tree.$.tripled()).toBe(15);
-
-      tree.$.count.set(10);
-      expect(tree.$.doubled()).toBe(20);
-    });
-
-    it('should be equivalent to .derived() chaining', () => {
-      const tree1 = signalTree({ value: 2 }).derived(($) => ({
-        squared: computed(() => $.value() ** 2),
-      }));
-
-      const tree2 = signalTree({ value: 2 }, ($) => ({
-        squared: computed(() => $.value() ** 2),
-      }));
-
-      expect(tree1.$.squared()).toBe(tree2.$.squared());
-      expect(tree1.$.squared()).toBe(4);
-    });
-
-    it('should allow further .derived() chaining after second-argument', () => {
-      const tree = signalTree({ base: 2 }, ($) => ({
-        doubled: computed(() => $.base() * 2),
-      })).derived(($) => ({
-        quadrupled: computed(() => $.doubled() * 2),
-      }));
+  describe('declarative composition', () => {
+    it('allows local derived values to depend on each other', () => {
+      const tree = signalTree(
+        { base: 2 },
+        {
+          derived: ($) => {
+            const doubled = computed(() => $.base() * 2);
+            return { doubled, quadrupled: computed(() => doubled() * 2) };
+          },
+        }
+      );
 
       expect(tree.$.doubled()).toBe(4);
       expect(tree.$.quadrupled()).toBe(8);
     });
 
-    it('should work with nested derived definitions', () => {
-      const tree = signalTree({ items: [1, 2, 3, 4, 5] }, ($) => ({
-        stats: {
-          count: computed(() => $.items().length),
-          sum: computed(() =>
-            $.items().reduce((a: number, b: number) => a + b, 0)
-          ),
-        },
-      }));
+    it('works with nested derived definitions', () => {
+      const tree = signalTree(
+        { items: [1, 2, 3, 4, 5] },
+        {
+          derived: ($) => ({
+            stats: {
+              count: computed(() => $.items().length),
+              sum: computed(() =>
+                $.items().reduce((a: number, b: number) => a + b, 0)
+              ),
+            },
+          }),
+        }
+      );
 
       expect(tree.$.stats.count()).toBe(5);
       expect(tree.$.stats.sum()).toBe(15);
@@ -373,81 +384,89 @@ describe('derived() marker pattern', () => {
       // Before: AppStore had separate computed() calls
       // After: Using derived() in the tree definition
 
-      const tree = signalTree({
-        driver: {
-          current: null as DriverDto | null,
-        },
-        selected: {
-          haulerId: null as number | null,
-          truckId: null as number | null,
-        },
-        trucks: [
-          {
-            id: 1,
-            name: 'Truck A',
-            haulerIds: [10],
-            primaryProductLine: 'Concrete',
+      const tree = signalTree(
+        {
+          driver: {
+            current: null as DriverDto | null,
           },
-          {
-            id: 2,
-            name: 'Truck B',
-            haulerIds: [10, 20],
-            primaryProductLine: 'Asphalt',
+          selected: {
+            haulerId: null as number | null,
+            truckId: null as number | null,
           },
-        ] as TruckDto[],
-        haulers: [
-          { id: 10, name: 'Hauler X' },
-          { id: 20, name: 'Hauler Y' },
-        ] as HaulerDto[],
-      }).derived(($) => ({
-        // Migrated from AppStore.isExternalDriver
-        isExternalDriver: computed(
-          () => $.driver.current()?.isExternal ?? true
-        ),
+          trucks: [
+            {
+              id: 1,
+              name: 'Truck A',
+              haulerIds: [10],
+              primaryProductLine: 'Concrete',
+            },
+            {
+              id: 2,
+              name: 'Truck B',
+              haulerIds: [10, 20],
+              primaryProductLine: 'Asphalt',
+            },
+          ] as TruckDto[],
+          haulers: [
+            { id: 10, name: 'Hauler X' },
+            { id: 20, name: 'Hauler Y' },
+          ] as HaulerDto[],
+        },
+        {
+          derived: ($) => ({
+            // Migrated from AppStore.isExternalDriver
+            isExternalDriver: computed(
+              () => $.driver.current()?.isExternal ?? true
+            ),
 
-        // Migrated from AppStore.isDriverLoaded
-        isDriverLoaded: computed(() => $.driver.current() != null),
+            // Migrated from AppStore.isDriverLoaded
+            isDriverLoaded: computed(() => $.driver.current() != null),
 
-        // Migrated from AppStore.driverUrl
-        driverUrl: computed(() => $.driver.current()?.url ?? ''),
+            // Migrated from AppStore.driverUrl
+            driverUrl: computed(() => $.driver.current()?.url ?? ''),
 
-        // Migrated from AppStore.selectedTruck
-        selectedTruck: computed(() => {
-          const id = $.selected.truckId();
-          return id != null
-            ? $.trucks().find((t) => t.id === id) ?? null
-            : null;
-        }),
+            // Migrated from AppStore.selectedTruck
+            selectedTruck: computed(() => {
+              const id = $.selected.truckId();
+              return id != null
+                ? $.trucks().find((t) => t.id === id) ?? null
+                : null;
+            }),
 
-        // Migrated from AppStore.selectedProductLine
-        selectedProductLine: computed(() => {
-          const id = $.selected.truckId();
-          const truck = id != null ? $.trucks().find((t) => t.id === id) : null;
-          return truck?.primaryProductLine ?? null;
-        }),
+            // Migrated from AppStore.selectedProductLine
+            selectedProductLine: computed(() => {
+              const id = $.selected.truckId();
+              const truck =
+                id != null ? $.trucks().find((t) => t.id === id) : null;
+              return truck?.primaryProductLine ?? null;
+            }),
 
-        // Migrated from AppStore.selectableTrucks
-        selectableTrucks: computed(() => {
-          const driver = $.driver.current();
-          if (!driver) return [];
-          if (!driver.isExternal) return $.trucks();
+            // Migrated from AppStore.selectableTrucks
+            selectableTrucks: computed(() => {
+              const driver = $.driver.current();
+              if (!driver) return [];
+              if (!driver.isExternal) return $.trucks();
 
-          const haulerId = $.selected.haulerId();
-          if (haulerId == null) return [];
+              const haulerId = $.selected.haulerId();
+              if (haulerId == null) return [];
 
-          return $.trucks().filter((truck) =>
-            truck.haulerIds.includes(haulerId)
-          );
-        }),
+              return $.trucks().filter((truck) =>
+                truck.haulerIds.includes(haulerId)
+              );
+            }),
 
-        // Migrated from AppStore.areHaulerAndTruckSelected
-        areHaulerAndTruckSelected: computed(() => {
-          const driver = $.driver.current();
-          if (!driver) return false;
-          if (!driver.isExternal) return $.selected.truckId() != null;
-          return $.selected.haulerId() != null && $.selected.truckId() != null;
-        }),
-      }));
+            // Migrated from AppStore.areHaulerAndTruckSelected
+            areHaulerAndTruckSelected: computed(() => {
+              const driver = $.driver.current();
+              if (!driver) return false;
+              if (!driver.isExternal) return $.selected.truckId() != null;
+              return (
+                $.selected.haulerId() != null && $.selected.truckId() != null
+              );
+            }),
+          }),
+        }
+      );
 
       // Test initial state (no driver)
       expect(tree.$.isExternalDriver()).toBe(true);
@@ -501,45 +520,46 @@ describe('derived() marker pattern', () => {
 
     it('should support derived-of-derived for complex computations', () => {
       // Simulating AppStore.ticketWorkflow which depends on activeProductLine
-      const tree = signalTree({
-        selected: { truckId: null as number | null },
-        trucks: [
-          { id: 1, productLine: 'Concrete' },
-          { id: 2, productLine: 'Asphalt' },
-        ],
-      })
-        .derived(($) => ({
-          // First layer: selectedTruck
-          selectedTruck: computed(() => {
-            const id = $.selected.truckId();
-            return $.trucks().find((t) => t.id === id) ?? null;
-          }),
-        }))
-        .derived(($) => ({
-          // Second layer: depends on selectedTruck
-          activeProductLine: computed(
-            () => $.selectedTruck()?.productLine ?? null
-          ),
-        }))
-        .derived(($) => ({
-          // Third layer: depends on activeProductLine
-          ticketWorkflow: computed(() => {
-            const productLine = $.activeProductLine();
-            if (productLine === 'Concrete') {
-              return [
-                'Batching',
-                'Loading',
-                'InTransit',
-                'Pouring',
-                'Complete',
-              ];
-            }
-            if (productLine === 'Asphalt') {
-              return ['Loading', 'InTransit', 'Dumping', 'Complete'];
-            }
-            return ['Loading', 'Complete'];
-          }),
-        }));
+      const tree = signalTree(
+        {
+          selected: { truckId: null as number | null },
+          trucks: [
+            { id: 1, productLine: 'Concrete' },
+            { id: 2, productLine: 'Asphalt' },
+          ],
+        },
+        {
+          derived: ($) => {
+            const selectedTruck = computed(() => {
+              const id = $.selected.truckId();
+              return $.trucks().find((truck) => truck.id === id) ?? null;
+            });
+            const activeProductLine = computed(
+              () => selectedTruck()?.productLine ?? null
+            );
+            return {
+              selectedTruck,
+              activeProductLine,
+              ticketWorkflow: computed(() => {
+                const productLine = activeProductLine();
+                if (productLine === 'Concrete') {
+                  return [
+                    'Batching',
+                    'Loading',
+                    'InTransit',
+                    'Pouring',
+                    'Complete',
+                  ];
+                }
+                if (productLine === 'Asphalt') {
+                  return ['Loading', 'InTransit', 'Dumping', 'Complete'];
+                }
+                return ['Loading', 'Complete'];
+              }),
+            };
+          },
+        }
+      );
 
       // No truck selected
       expect(tree.$.activeProductLine()).toBe(null);
@@ -578,29 +598,34 @@ describe('derived() marker pattern', () => {
     }
 
     it('should work with entityMap queries in derived()', () => {
-      const tree = signalTree({
-        users: entityMap<UserEntity, number>(),
-        selectedUserId: null as number | null,
-      }).derived(($) => ({
-        // Derived from entityMap.byId()
-        selectedUser: computed(() => {
-          const id = $.selectedUserId();
-          return id != null ? $.users.byId(id)?.() ?? null : null;
-        }),
+      const tree = signalTree(
+        {
+          users: entityMap<UserEntity, number>(),
+          selectedUserId: null as number | null,
+        },
+        {
+          derived: ($) => ({
+            // Derived from entityMap.byId()
+            selectedUser: computed(() => {
+              const id = $.selectedUserId();
+              return id != null ? $.users.byId(id)?.() ?? null : null;
+            }),
 
-        // Derived from entityMap.all()
-        activeUsers: computed(() =>
-          $.users.all().filter((u: UserEntity) => u.active)
-        ),
+            // Derived from entityMap.all()
+            activeUsers: computed(() =>
+              $.users.all().filter((u: UserEntity) => u.active)
+            ),
 
-        // Derived from entityMap.count
-        userCount: computed(() => $.users.count()),
+            // Derived from entityMap.count
+            userCount: computed(() => $.users.count()),
 
-        // Derived from entityMap.where()
-        adminUsers: computed(() =>
-          $.users.all().filter((u: UserEntity) => u.role === 'admin')
-        ),
-      }));
+            // Derived from entityMap.where()
+            adminUsers: computed(() =>
+              $.users.all().filter((u: UserEntity) => u.role === 'admin')
+            ),
+          }),
+        }
+      );
 
       // Initial state - no users
       expect(tree.$.selectedUser()).toBe(null);
@@ -659,45 +684,51 @@ describe('derived() marker pattern', () => {
         status: 'pending' | 'shipped' | 'delivered';
       }
 
-      const tree = signalTree({
-        users: entityMap<UserEntity, number>(),
-        orders: entityMap<OrderEntity, number>(),
-        selectedUserId: null as number | null,
-      })
-        .derived(($) => ({
-          selectedUser: computed(() => {
-            const id = $.selectedUserId();
-            return id != null ? $.users.byId(id)?.() ?? null : null;
-          }),
+      const tree = signalTree(
+        {
+          users: entityMap<UserEntity, number>(),
+          orders: entityMap<OrderEntity, number>(),
+          selectedUserId: null as number | null,
+        },
+        {
+          derived: ($) => {
+            const selectedUserOrders = computed(() => {
+              const userId = $.selectedUserId();
+              if (userId == null) return [];
+              return $.orders
+                .all()
+                .filter((order: OrderEntity) => order.userId === userId);
+            });
+            return {
+              selectedUser: computed(() => {
+                const id = $.selectedUserId();
+                return id != null ? $.users.byId(id)?.() ?? null : null;
+              }),
 
-          // Cross-entity derived: orders for selected user
-          selectedUserOrders: computed(() => {
-            const userId = $.selectedUserId();
-            if (userId == null) return [];
-            return $.orders
-              .all()
-              .filter((o: OrderEntity) => o.userId === userId);
-          }),
+              // Cross-entity derived: orders for selected user
+              selectedUserOrders,
 
-          // Aggregation: total revenue per user status
-          totalPendingRevenue: computed(() =>
-            $.orders
-              .all()
-              .filter((o: OrderEntity) => o.status === 'pending')
-              .reduce((sum: number, o: OrderEntity) => sum + o.total, 0)
-          ),
-        }))
-        .derived(($) => ({
-          // Second layer: depends on selectedUserOrders
-          selectedUserOrderCount: computed(() => $.selectedUserOrders().length),
+              // Aggregation: total revenue per user status
+              totalPendingRevenue: computed(() =>
+                $.orders
+                  .all()
+                  .filter((o: OrderEntity) => o.status === 'pending')
+                  .reduce((sum: number, o: OrderEntity) => sum + o.total, 0)
+              ),
+              selectedUserOrderCount: computed(
+                () => selectedUserOrders().length
+              ),
 
-          selectedUserTotalSpent: computed(() =>
-            $.selectedUserOrders().reduce(
-              (sum: number, o: OrderEntity) => sum + o.total,
-              0
-            )
-          ),
-        }));
+              selectedUserTotalSpent: computed(() =>
+                selectedUserOrders().reduce(
+                  (sum: number, o: OrderEntity) => sum + o.total,
+                  0
+                )
+              ),
+            };
+          },
+        }
+      );
 
       // Setup data
       tree.$.users.addMany([
@@ -733,27 +764,32 @@ describe('derived() marker pattern', () => {
     });
 
     it('should handle entity mutations reactively', () => {
-      const tree = signalTree({
-        items: entityMap<{ id: number; value: number }, number>(),
-      }).derived(($) => ({
-        sum: computed(() =>
-          $.items
-            .all()
-            .reduce(
-              (acc: number, item: { value: number }) => acc + item.value,
-              0
-            )
-        ),
-        average: computed(() => {
-          const all = $.items.all();
-          if (all.length === 0) return 0;
-          const sum = all.reduce(
-            (acc: number, item: { value: number }) => acc + item.value,
-            0
-          );
-          return sum / all.length;
-        }),
-      }));
+      const tree = signalTree(
+        {
+          items: entityMap<{ id: number; value: number }, number>(),
+        },
+        {
+          derived: ($) => ({
+            sum: computed(() =>
+              $.items
+                .all()
+                .reduce(
+                  (acc: number, item: { value: number }) => acc + item.value,
+                  0
+                )
+            ),
+            average: computed(() => {
+              const all = $.items.all();
+              if (all.length === 0) return 0;
+              const sum = all.reduce(
+                (acc: number, item: { value: number }) => acc + item.value,
+                0
+              );
+              return sum / all.length;
+            }),
+          }),
+        }
+      );
 
       expect(tree.$.sum()).toBe(0);
       expect(tree.$.average()).toBe(0);
@@ -781,15 +817,20 @@ describe('derived() marker pattern', () => {
         name: string;
       }
 
-      const tree = signalTree({
-        products: entityMap<ProductEntity>(),
-        activeProductId: undefined as string | undefined,
-      }).derived(($) => ({
-        activeProduct: computed(() => {
-          const id = $.activeProductId();
-          return id != null ? $.products.byId(id)?.() : undefined;
-        }),
-      }));
+      const tree = signalTree(
+        {
+          products: entityMap<ProductEntity>(),
+          activeProductId: undefined as string | undefined,
+        },
+        {
+          derived: ($) => ({
+            activeProduct: computed(() => {
+              const id = $.activeProductId();
+              return id != null ? $.products.byId(id)?.() : undefined;
+            }),
+          }),
+        }
+      );
 
       // Set id first (entity not present yet)
       tree.$.activeProductId.set('1');
@@ -852,104 +893,118 @@ describe('derived() marker pattern', () => {
 
   // Timing-ratio microbenchmarks — flaky on loaded machines; run on demand via
   // ST_PERF=1 (matches the convention in benchmarks.spec.ts / stored.spec.ts).
-  describe.runIf(process.env['ST_PERF'] === '1')('performance characteristics', () => {
-    it('should not add significant overhead to tree creation', () => {
-      const iterations = 1000;
+  describe.runIf(process.env['ST_PERF'] === '1')(
+    'performance characteristics',
+    () => {
+      it('should not add significant overhead to tree creation', () => {
+        const iterations = 1000;
 
-      // Measure tree creation with derived()
-      const startWithDerived = performance.now();
-      for (let i = 0; i < iterations; i++) {
-        const tree = signalTree({ count: i }).derived(($) => ({
-          doubled: computed(() => $.count() * 2),
-        }));
-        // Access $ to finalize (this is the typical usage pattern)
-        void tree.$.doubled();
-      }
-      const endWithDerived = performance.now();
-      const timeWithDerived = endWithDerived - startWithDerived;
-
-      // Measure tree creation without derived() for comparison
-      const startWithout = performance.now();
-      for (let i = 0; i < iterations; i++) {
-        const tree = signalTree({ count: i });
-        // Access $ similarly
-        void tree.$.count();
-      }
-      const endWithout = performance.now();
-      const timeWithout = endWithout - startWithout;
-
-      // derived() should add less than 5x overhead (generous margin for CI variance)
-      // In practice, it's typically <2x on warm runs
-      const ratio = timeWithDerived / timeWithout;
-      console.log(
-        `Performance: ${iterations} iterations - with derived: ${timeWithDerived.toFixed(
-          2
-        )}ms, without: ${timeWithout.toFixed(2)}ms, ratio: ${ratio.toFixed(2)}x`
-      );
-      expect(ratio).toBeLessThan(5);
-    });
-
-    it('should not recalculate derived values on unrelated state changes', () => {
-      let derivedCallCount = 0;
-
-      const tree = signalTree({
-        relatedValue: 1,
-        unrelatedValue: 'hello',
-      }).derived(($) => ({
-        doubledRelated: computed(() => {
-          derivedCallCount++;
-          return $.relatedValue() * 2;
-        }),
-      }));
-
-      // Initial access
-      expect(tree.$.doubledRelated()).toBe(2);
-      const initialCallCount = derivedCallCount;
-
-      // Change unrelated value - should NOT trigger recalculation
-      tree.$.unrelatedValue.set('world');
-      // Access derived again - should use cached value
-      expect(tree.$.doubledRelated()).toBe(2);
-      expect(derivedCallCount).toBe(initialCallCount); // No new call
-
-      // Change related value - SHOULD trigger recalculation
-      tree.$.relatedValue.set(5);
-      expect(tree.$.doubledRelated()).toBe(10);
-      expect(derivedCallCount).toBe(initialCallCount + 1); // One new call
-    });
-
-    it('should handle deep chaining without exponential overhead', () => {
-      const chainDepth = 10;
-      const iterations = 100;
-
-      const start = performance.now();
-      for (let i = 0; i < iterations; i++) {
-        let builder = signalTree({ base: i });
-        for (let d = 0; d < chainDepth; d++) {
-          builder = builder.derived(($) => {
-            // Cast needed because computed property keys create index signature
-            const accessor = $ as Record<string, () => number>;
-            return {
-              [`level${d}`]: computed(() => accessor['base']() + d),
-            };
-          }) as typeof builder;
+        // Measure tree creation with derived()
+        const startWithDerived = performance.now();
+        for (let i = 0; i < iterations; i++) {
+          const tree = signalTree(
+            { count: i },
+            {
+              derived: ($) => ({
+                doubled: computed(() => $.count() * 2),
+              }),
+            }
+          );
+          // Access $ to finalize (this is the typical usage pattern)
+          void tree.$.doubled();
         }
-        // Access the final derived value
-        void (builder.$ as Record<string, () => number>)[
-          `level${chainDepth - 1}`
-        ]();
-      }
-      const end = performance.now();
-      const totalTime = end - start;
+        const endWithDerived = performance.now();
+        const timeWithDerived = endWithDerived - startWithDerived;
 
-      console.log(
-        `Deep chaining: ${iterations} trees with ${chainDepth} derived layers each: ${totalTime.toFixed(
-          2
-        )}ms`
-      );
+        // Measure tree creation without derived() for comparison
+        const startWithout = performance.now();
+        for (let i = 0; i < iterations; i++) {
+          const tree = signalTree({ count: i });
+          // Access $ similarly
+          void tree.$.count();
+        }
+        const endWithout = performance.now();
+        const timeWithout = endWithout - startWithout;
 
-      // Should complete reasonably fast (less than 500ms for 100 iterations with 10 layers)
-      expect(totalTime).toBeLessThan(500);
-    });
-  });
+        // derived() should add less than 5x overhead (generous margin for CI variance)
+        // In practice, it's typically <2x on warm runs
+        const ratio = timeWithDerived / timeWithout;
+        console.log(
+          `Performance: ${iterations} iterations - with derived: ${timeWithDerived.toFixed(
+            2
+          )}ms, without: ${timeWithout.toFixed(2)}ms, ratio: ${ratio.toFixed(
+            2
+          )}x`
+        );
+        expect(ratio).toBeLessThan(5);
+      });
+
+      it('should not recalculate derived values on unrelated state changes', () => {
+        let derivedCallCount = 0;
+
+        const tree = signalTree(
+          {
+            relatedValue: 1,
+            unrelatedValue: 'hello',
+          },
+          {
+            derived: ($) => ({
+              doubledRelated: computed(() => {
+                derivedCallCount++;
+                return $.relatedValue() * 2;
+              }),
+            }),
+          }
+        );
+
+        // Initial access
+        expect(tree.$.doubledRelated()).toBe(2);
+        const initialCallCount = derivedCallCount;
+
+        // Change unrelated value - should NOT trigger recalculation
+        tree.$.unrelatedValue.set('world');
+        // Access derived again - should use cached value
+        expect(tree.$.doubledRelated()).toBe(2);
+        expect(derivedCallCount).toBe(initialCallCount); // No new call
+
+        // Change related value - SHOULD trigger recalculation
+        tree.$.relatedValue.set(5);
+        expect(tree.$.doubledRelated()).toBe(10);
+        expect(derivedCallCount).toBe(initialCallCount + 1); // One new call
+      });
+
+      it('should handle deep chaining without exponential overhead', () => {
+        const chainDepth = 3;
+        const iterations = 100;
+
+        const start = performance.now();
+        for (let i = 0; i < iterations; i++) {
+          const derived = [] as Array<
+            ($: Record<string, () => number>) => Record<string, unknown>
+          >;
+          for (let d = 0; d < chainDepth; d++) {
+            derived.push(($) => ({
+              [`level${d}`]: computed(() => $['base']() + d),
+            }));
+          }
+          const builder = signalTree({ base: i }, { derived } as never);
+          // Access the final derived value
+          void (builder.$ as Record<string, () => number>)[
+            `level${chainDepth - 1}`
+          ]();
+        }
+        const end = performance.now();
+        const totalTime = end - start;
+
+        console.log(
+          `Declarative tiers: ${iterations} trees with ${chainDepth} derived layers each: ${totalTime.toFixed(
+            2
+          )}ms`
+        );
+
+        // Should complete reasonably fast (less than 500ms for 100 iterations with 10 layers)
+        expect(totalTime).toBeLessThan(500);
+      });
+    }
+  );
 });

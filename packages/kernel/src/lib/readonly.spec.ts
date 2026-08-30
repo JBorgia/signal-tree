@@ -36,12 +36,17 @@ describe('asReadonly()', () => {
   });
 
   it('derived computeds and marker readers remain readable', () => {
-    const tree = signalTree({
-      count: 2,
-      users: entityMap<User, number>(),
-    }).derived(($) => ({
-      doubled: computed(() => $.count() * 2),
-    }));
+    const tree = signalTree(
+      {
+        count: 2,
+        users: entityMap<User, number>(),
+      },
+      {
+        derived: ($) => ({
+          doubled: computed(() => $.count() * 2),
+        }),
+      }
+    );
     const reader = asReadonly(tree);
 
     expect(reader.$.doubled()).toBe(4);

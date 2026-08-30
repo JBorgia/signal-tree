@@ -1,6 +1,4 @@
-import {
-  getMaterializationRealization,
-} from './materialization-realization';
+import { getMaterializationRealization } from './materialization-realization';
 
 /**
  * "Has the adapter already realized this node?" — see
@@ -34,7 +32,6 @@ import { isNodeAccessor, isTraversableNode } from './node-shape';
 // API, and the kernel's declarations must not depend on Angular for it.
 declare const ngDevMode: boolean | undefined;
 
-
 /** @internal Must match the symbol set by `makeNodeAccessor`. */
 const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
 
@@ -47,7 +44,7 @@ const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
  *
  * Processing order (in finalize()):
  * 1. materializeMarkers() - entityMap, status, stored markers → signals
- * 2. applyDerivedFactories() - derived factories → computed signals
+ * 2. applyDerivedFactory() - configured derived state → computed signals
  *
  * TREE-SHAKING: This module has NO side effects at import time.
  * Built-in markers (entityMap, status, stored) self-register when
@@ -642,7 +639,11 @@ export function ordinaryBranch(
   options?: { keyedLookup?: boolean }
 ): OrdinaryStateRequest {
   if (typeof ngDevMode === 'undefined' || ngDevMode) {
-    if (!isTraversableNode(seed) || Array.isArray(seed) || typeof seed === 'function') {
+    if (
+      !isTraversableNode(seed) ||
+      Array.isArray(seed) ||
+      typeof seed === 'function'
+    ) {
       throw new Error(
         'SignalTree: ordinaryBranch() takes a plain object branch payload.'
       );
@@ -750,9 +751,9 @@ export function materializeMember(
     });
   };
   define(branch as object);
-  const backingStore = (branch as Record<symbol, unknown>)[NODE_STORE_SYMBOL] as
-    | object
-    | undefined;
+  const backingStore = (branch as Record<symbol, unknown>)[
+    NODE_STORE_SYMBOL
+  ] as object | undefined;
   if (backingStore && backingStore !== branch) define(backingStore);
 
   index?.set(key, child);
@@ -781,7 +782,10 @@ export function setMemberValueApplier(
 // (ORPHAN sweep, 15.0. Same-file-only proves the EXPORT is unnecessary — it says
 // nothing about who owns the code, and this code is live.)
 function isOrdinaryStateRequest(v: unknown): v is OrdinaryStateRequest {
-  return isTraversableNode(v) && (v as Record<symbol, unknown>)[ORDINARY_STATE] === true;
+  return (
+    isTraversableNode(v) &&
+    (v as Record<symbol, unknown>)[ORDINARY_STATE] === true
+  );
 }
 
 /**
@@ -878,9 +882,8 @@ export function materializeMarkers(
     for (const processor of MARKER_PROCESSORS) {
       if (processor.check(value)) {
         try {
-          const parentPositionId = (
-            node as { __positionIds?: number[] }
-          ).__positionIds?.[0];
+          const parentPositionId = (node as { __positionIds?: number[] })
+            .__positionIds?.[0];
           const produced = processor.create(
             value,
             getNotifier(),

@@ -43,14 +43,10 @@ import {
   type WritableSignal,
 } from '@angular/core';
 
-import {
-  entityMap,
-  signalTree,
-} from '../index';
-import type {
-} from '../index';
+import { entityMap, signalTree } from '../index';
+import type {} from '../index';
 import { asReadonly } from '../index';
-import type { ISignalTree, NodeAccessor } from '../index';
+import type { SignalTree, NodeAccessor } from '../index';
 
 // --- compile-time assertion helpers -----------------------------------------
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B
@@ -71,28 +67,23 @@ interface User {
   address: { city: string };
   tags: string[];
 }
-const tree = signalTree({
-  count: 0,
-  selectedId: null as number | null,
-  branch: { leaf: 'x', deep: { n: 1 } },
-  users: entityMap<User, number>(),
-  // ⚠️ WAS A LOADING entityMap. The invariant below — a `.derived()` merged
-  // INTO a marker node survives the readonly view — is about MERGED DERIVED
-  // STATE, not about loading; the loading collection was only the specimen that
-  // happened to be handy. FIXTURE DEPENDENCY IS NOT SEMANTIC DEPENDENCY.
-  plants: entityMap<User, number>(),
-}).derived(($) => ({
-  doubled: computed(() => $.count() * 2),
-  // ⚠️ WAS SignalTree's `linked()`. The invariant is that ANY WritableSignal
-  // merged through `.derived()` narrows to `Signal` in the readonly view —
-  // nothing about the deleted wrapper. Angular's own `linkedSignal` is now
-  // the supported way to write this, so the specimen IS the successor.
-  draft: linkedSignal(() => $.count()),
-  group: { total: computed(() => $.count() + 1) },
-  // Derived deep-merged INTO a marker node (the readonly×merged-derived gap):
-  // the marker dispatch row must preserve this beyond its Pick allowlist.
-  plants: { total: computed(() => $.plants.count()) },
-}));
+const tree = signalTree(
+  {
+    count: 0,
+    selectedId: null as number | null,
+    branch: { leaf: 'x', deep: { n: 1 } },
+    users: entityMap<User, number>(),
+    plants: entityMap<User, number>(),
+  },
+  {
+    derived: ($) => ({
+      doubled: computed(() => $.count() * 2),
+      draft: linkedSignal(() => $.count()),
+      group: { total: computed(() => $.count() + 1) },
+      plants: { total: computed(() => $.plants.count()) },
+    }),
+  }
+);
 
 const ro = asReadonly(tree);
 type RO = typeof ro;
@@ -109,9 +100,24 @@ type ROEntityNode = NonNullable<ReturnType<ROUsers['byId']>>;
 export type _ReadonlyCallGrammarControls = [
   Expect<Equal<EffectiveParameters<Signal<number>>, []>>,
   Expect<Equal<EffectiveParameters<WritableSignal<number>>, []>>,
-  Expect<Equal<EffectiveParameters<typeof realAccessor> extends [] ? true : false, false>>,
-  Expect<Equal<EffectiveParameters<typeof emptyAccessor> extends [] ? true : false, false>>,
-  Expect<Equal<EffectiveParameters<typeof boundAccessor> extends [] ? true : false, false>>
+  Expect<
+    Equal<
+      EffectiveParameters<typeof realAccessor> extends [] ? true : false,
+      false
+    >
+  >,
+  Expect<
+    Equal<
+      EffectiveParameters<typeof emptyAccessor> extends [] ? true : false,
+      false
+    >
+  >,
+  Expect<
+    Equal<
+      EffectiveParameters<typeof boundAccessor> extends [] ? true : false,
+      false
+    >
+  >
 ];
 
 export type _ReadonlyViewChecks = [
@@ -172,7 +178,6 @@ export type _ReadonlyViewChecks = [
   Expect<Equal<Parameters<ROEntityNode>, []>>, // write call overloads gone
   Expect<NotOffered<ROEntityNode['name'], 'set'>>,
 
-
   // derived merged INTO a marker node survives the readonly view
   // (readonly×merged-derived gap, M3): the extra key is kept as a Signal…
   Expect<Equal<ROPlants['total'], Signal<number>>>,
@@ -180,7 +185,7 @@ export type _ReadonlyViewChecks = [
   Expect<Equal<ROPlants['all'], Signal<User[]>>>,
   // …and the mutators/triggers are still not offered.
   Expect<NotOffered<ROPlants, 'upsertOne'>>,
-  Expect<NotOffered<ROPlants, 'setAll'>>,
+  Expect<NotOffered<ROPlants, 'setAll'>>
 
   // ---------------------------------------------------------------------------
   // (e) the retired single-value marker rows
@@ -212,7 +217,7 @@ export type _ReadonlyViewChecks = [
 
 // `asReadonly` also accepts the minimal `ISignalTree`/`SignalTree` shape
 // (second overload) so service code holding the wide type can narrow too.
-declare const minimal: ISignalTree<{ n: number }>;
+declare const minimal: SignalTree<{ n: number }>;
 const roMinimal = asReadonly(minimal);
 export type _ReadonlyMinimalChecks = [
   Expect<Equal<(typeof roMinimal)['$']['n'], Signal<number>>>,

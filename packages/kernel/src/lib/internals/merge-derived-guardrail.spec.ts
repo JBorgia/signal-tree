@@ -12,9 +12,14 @@ describe('[ST2007] derived value dropped — dev-mode guardrail', () => {
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     try {
-      const tree = signalTree({ w: { n: 1 } }).derived(() => ({
-        w: { bad: foreign },
-      }));
+      const tree = signalTree(
+        { w: { n: 1 } },
+        {
+          derived: () => ({
+            w: { bad: foreign },
+          }),
+        }
+      );
       // Touch `$` so markers materialize and the derived queue is applied.
       expect(tree.$.w).toBeDefined();
       const msgs = warn.mock.calls.map((c) => String(c[0]));
@@ -30,9 +35,14 @@ describe('[ST2007] derived value dropped — dev-mode guardrail', () => {
   it('warns generically for a plainly invalid derived value', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     try {
-      const tree = signalTree({ w: { n: 1 } }).derived(() => ({
-        w: { bad: 42 as never },
-      }));
+      const tree = signalTree(
+        { w: { n: 1 } },
+        {
+          derived: () => ({
+            w: { bad: 42 as never },
+          }),
+        }
+      );
       // Touch `$` so markers materialize and the derived queue is applied.
       expect(tree.$.w).toBeDefined();
       const hit = warn.mock.calls
@@ -48,12 +58,19 @@ describe('[ST2007] derived value dropped — dev-mode guardrail', () => {
   it('does NOT warn for a legitimate computed', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     try {
-      const t = signalTree({ w: { ids: ['a'] } }).derived(($) => ({
-        w: { count: computed(() => $.w.ids().length) },
-      }));
+      const t = signalTree(
+        { w: { ids: ['a'] } },
+        {
+          derived: ($) => ({
+            w: { count: computed(() => $.w.ids().length) },
+          }),
+        }
+      );
       expect(t.$.w.count()).toBe(1);
       expect(
-        warn.mock.calls.map((c) => String(c[0])).filter((m) => m.includes('ST2007'))
+        warn.mock.calls
+          .map((c) => String(c[0]))
+          .filter((m) => m.includes('ST2007'))
       ).toEqual([]);
     } finally {
       warn.mockRestore();

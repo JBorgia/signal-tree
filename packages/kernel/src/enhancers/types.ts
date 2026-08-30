@@ -4,7 +4,7 @@
 // per type — since 15.0 that means the owner module for capability and
 // diagnostic types, and `src/lib/types.ts` only for kernel/common ones.
 
-export {
+export type {
   RestorationConfig,
   DevToolsConfig,
   EntitiesEnabled,
@@ -17,6 +17,9 @@ export {
 // header above still states the intent correctly — one source of truth per type
 // — but `lib/types.ts` is no longer that source for capability and diagnostic
 // method bags.
-export { BatchingMethods, BatchingConfig } from './batching/batching.types';
-export { RestorationMethods } from './restoration/restoration.types';
-export { DevToolsMethods } from './devtools/devtools.types';
+export type {
+  BatchingMethods,
+  BatchingConfig,
+} from './batching/batching.types';
+export type { RestorationMethods } from './restoration/restoration.types';
+export type { DevToolsMethods } from './devtools/devtools.types';

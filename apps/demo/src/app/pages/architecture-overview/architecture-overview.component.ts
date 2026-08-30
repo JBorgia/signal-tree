@@ -1,4 +1,3 @@
-
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import { CodeTabsComponent } from '../../examples/shared/components/example-shell';
@@ -29,7 +28,8 @@ export class ArchitectureOverviewComponent {
   comparisons: ArchitectureComparison[] = [
     {
       aspect: 'Dependencies',
-      separate: 'Multiple packages (@signal-tree/kernel, @signaltree/entities, @signaltree/computed…)',
+      separate:
+        'Multiple packages (@signal-tree/kernel, @signaltree/entities, @signaltree/computed…)',
       consolidated: '@signal-tree/kernel (includes all enhancers)',
       benefit: 'Simplified dependency management',
     },
@@ -43,7 +43,8 @@ export class ArchitectureOverviewComponent {
       aspect: 'Tree Shaking',
       separate: 'Limited optimization between packages',
       consolidated: 'Cross-package tree-shaking',
-      benefit: 'Unused enhancers don\'t ship; you pay only for the imports you use',
+      benefit:
+        "Unused enhancers don't ship; you pay only for the imports you use",
     },
     {
       aspect: 'API Consistency',
@@ -57,7 +58,8 @@ export class ArchitectureOverviewComponent {
     {
       label: 'App Code Reduction',
       value: '76%',
-      description: '11,735 → 2,825 lines of state code (one app snapshot — YMMV)',
+      description:
+        '11,735 → 2,825 lines of state code (one app snapshot — YMMV)',
     },
     {
       label: 'State Bundle Reduction',
@@ -111,14 +113,17 @@ import {
       label: 'app.tree.ts',
       language: 'typescript',
       source: `// app.tree.ts
-signalTree({ tickets: entityMap<Ticket>(), filter: '' })
-  .derived($ => ({
-    tickets: {
-      visible: computed(() =>
-        $.tickets.all().filter(t => t.title.includes($.filter()))
-      )
-    }
-  }));
+signalTree(
+  { tickets: entityMap<Ticket>(), filter: '' },
+  { derived: $ => ({
+      tickets: {
+        visible: computed(() =>
+          $.tickets.all().filter(t => t.title.includes($.filter()))
+        )
+      }
+    })
+  }
+);
 
 // component — one inject, all reads available
 tree.$.tickets.visible()`,

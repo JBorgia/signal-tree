@@ -1,19 +1,19 @@
-import { batching, devTools, signalTree, DerivedOf } from '@signal-tree/angular';
+import { computed } from '@angular/core';
+import { batching, devTools, signalTree } from '@signal-tree/angular';
 
-import { tier1Derived, tier2Derived, tier3Derived } from './derived';
 import { postsState, uiState, usersState } from './state';
+import { LoadingState, type Post, type User } from '../types';
 
 /**
  * Application Tree Assembly
  *
  * Mirrors the v3 trax-mobile canonical pattern:
  *   - State definitions live in `./state/*.state.ts`
- *   - Derived tiers live in `./derived/tier-*.derived.ts`
+ *   - Derived reads are composed in one constructor factory
  *   - Operations live in `../ops/*.ops.ts`
  *   - The thin `AppStore` facade in `../app-store.ts` composes ops by domain.
  *
- * Each tier extends `$` with new computed signals; later tiers may reference
- * the computeds added by earlier tiers thanks to deep-merge in `.derived()`.
+ * Derived values that depend on each other close over ordinary local computeds.
  */
 
 export const STORE_NAME = 'DemoAppTree';
@@ -22,23 +22,6 @@ export const STORE_NAME = 'DemoAppTree';
 
 /** Final tree type after every tier has been applied. */
 export type AppTree = ReturnType<typeof createAppTree>;
-
-/** Base tree type (before any derived tier) — used to type tier 1. */
-export type AppTreeBase = ReturnType<
-  typeof signalTree<ReturnType<typeof createBaseState>>
->;
-
-/** Tree type after tier 1 (entity resolution) — used to type tier 2. */
-export type AppTreeWithEntityResolution = DerivedOf<
-  AppTreeBase,
-  typeof tier1Derived
->;
-
-/** Tree type after tier 2 (filters/aggregates) — used to type tier 3. */
-export type AppTreeWithFilters = DerivedOf<
-  AppTreeWithEntityResolution,
-  typeof tier2Derived
->;
 
 // ─── Base state factory ─────────────────────────────────────────────────────
 
@@ -53,7 +36,7 @@ function createBaseState() {
 // ─── Tree creation ──────────────────────────────────────────────────────────
 
 /**
- * Creates the demo application tree with all enhancers and derived tiers.
+ * Creates the demo application tree with its enhancers and derived state.
  *
  * @example
  * ```ts
@@ -62,18 +45,87 @@ function createBaseState() {
  * // Read base state
  * tree.$.users.entities.all();
  *
- * // Read derived (tier 1)
+ * // Read derived entity state
  * tree.$.users.selected();
  *
- * // Read derived (tier 3)
+ * // Read derived UI state
  * tree.$.ui.totals();
  * ```
  */
 export function createAppTree() {
   return signalTree(createBaseState(), {
     enhancers: [devTools({ name: STORE_NAME }), batching()],
-  })
-    .derived(tier1Derived)
-    .derived(tier2Derived)
-    .derived(tier3Derived);
+    derived: ($) => {
+      const selectedUser = computed(() => {
+        const id = $.users.selectedId();
+        return id === null ? null : $.users.entities.byId(id)?.() ?? null;
+      });
+      const selectedPost = computed(() => {
+        const id = $.posts.selectedId();
+        return id === null ? null : $.posts.entities.byId(id)?.() ?? null;
+      });
+      const filteredPosts = computed(() => {
+        const search = $.posts.filters.search().toLowerCase();
+        const published = $.posts.filters.published();
+        return $.posts.entities.all().filter((post: Post) => {
+          if (published !== null && post.published !== published) return false;
+          return (
+            !search ||
+            post.title.toLowerCase().includes(search) ||
+            post.content.toLowerCase().includes(search)
+          );
+        });
+      });
+
+      return {
+        users: {
+          selected: selectedUser,
+          count: computed(() => $.users.entities.all().length),
+          byRole: computed(() => {
+            const groups: Record<User['role'], User[]> = {
+              admin: [],
+              user: [],
+              moderator: [],
+            };
+            for (const user of $.users.entities.all())
+              groups[user.role].push(user);
+            return groups;
+          }),
+        },
+        posts: {
+          selected: selectedPost,
+          filtered: filteredPosts,
+          forSelectedUser: computed(() => {
+            const user = selectedUser();
+            return user === null
+              ? []
+              : $.posts.entities
+                  .all()
+                  .filter((post: Post) => post.authorId === user.id);
+          }),
+          canPublishSelected: computed(() => {
+            const post = selectedPost();
+            if (post === null) return false;
+            const author = $.users.entities.byId(post.authorId)?.();
+            return author?.role === 'admin' && !post.published;
+          }),
+        },
+        ui: {
+          isLoading: computed(
+            () =>
+              $.users.loading.state() === LoadingState.Loading ||
+              $.posts.loading.state() === LoadingState.Loading
+          ),
+          firstError: computed(
+            () => $.users.loading.error() ?? $.posts.loading.error() ?? null
+          ),
+          totals: computed(() => ({
+            users: $.users.entities.all().length,
+            posts: $.posts.entities.all().length,
+            filteredPosts: filteredPosts().length,
+          })),
+        },
+      };
+    },
+  });
 }

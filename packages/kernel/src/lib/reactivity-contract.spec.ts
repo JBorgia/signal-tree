@@ -56,9 +56,14 @@ describe('SignalTree reactivity contract', () => {
     });
 
     it('derived: recomputes only when its actual source changes', () => {
-      const tree = signalTree({ a: 0, b: 0 }).derived(($) => ({
-        da: computed(() => $.a() * 2),
-      }));
+      const tree = signalTree(
+        { a: 0, b: 0 },
+        {
+          derived: ($) => ({
+            da: computed(() => $.a() * 2),
+          }),
+        }
+      );
       const t = track(() => (tree.$ as { da: () => number }).da());
       t.read();
       expect(t.runs()).toBe(1);

@@ -1940,11 +1940,12 @@ cp -r node_modules/&#64;signaltree/core/skills/using-signaltree \
         <code>createEffect</code> + <code>&#64;ngrx/entity</code>) &rarr;
         <code>reference/migration-from-ngrx-store.md</code> &mdash; actions
         become <code>Ops</code> methods, reducers become signal writes,
-        selectors become <code>computed()</code> / derived tiers, and the
-        <code>load</code> &rarr; effect &rarr; <code>loadSuccess</code> action
-        round-trip collapses into plain state written through <code>external()</code>, or
-        <code>Ops</code> method. NGXS, Elf, and the others shown above are
-        illustrated side-by-side but not yet in the skill &mdash; PRs welcome.
+        selectors become <code>computed()</code> / configured derived state, and
+        the <code>load</code> &rarr; effect &rarr;
+        <code>loadSuccess</code> action round-trip collapses into plain state
+        written through <code>external()</code>, or <code>Ops</code> method.
+        NGXS, Elf, and the others shown above are illustrated side-by-side but
+        not yet in the skill &mdash; PRs welcome.
       </li>
       <li>
         <strong>Definition of done.</strong> (1) Zero imports of the legacy

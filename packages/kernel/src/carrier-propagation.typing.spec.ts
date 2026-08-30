@@ -10,7 +10,11 @@ import type { WritableSignal } from '@angular/core';
 import { signalTree, entityMap, asReadonly } from './index';
 import type { ReadableCell, WritableCell } from './lib/internals/cell-runtime';
 
-interface Row { id: number; name: string; tags: string[] }
+interface Row {
+  id: number;
+  name: string;
+  tags: string[];
+}
 
 describe('PCP — kernel public transformations stay neutral', () => {
   it('construction: top-level AND nested leaves are neutral cells', () => {
@@ -22,10 +26,15 @@ describe('PCP — kernel public transformations stay neutral', () => {
     expect([top, nested, deep, destroyed].length).toBe(4);
   });
 
-  it('builder chaining: .derived() keeps the neutral carrier', () => {
-    const t = signalTree({ count: 1 }).derived(($) => ({
-      doubled: (() => $.count() * 2) as ReadableCell<number>,
-    }));
+  it('declarative derived state keeps the neutral carrier', () => {
+    const t = signalTree(
+      { count: 1 },
+      {
+        derived: ($) => ({
+          doubled: (() => $.count() * 2) as ReadableCell<number>,
+        }),
+      }
+    );
     const derived: ReadableCell<number> = t.$.doubled;
     // @ts-expect-error the kernel derived reader has no Angular signal brand
     const angularLie: WritableSignal<number> = t.$.doubled;

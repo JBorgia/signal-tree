@@ -120,9 +120,14 @@ describe('S-1 — the null on ordinary state', () => {
 // ============================================================================
 describe('S-2 — derived must not be externalized', () => {
   it('MEASURE — does the snapshot include derived?', () => {
-    const tree = signalTree({ a: 2, b: 3 }).derived(($) => ({
-      sum: computed(() => $.a() + $.b()),
-    }));
+    const tree = signalTree(
+      { a: 2, b: 3 },
+      {
+        derived: ($) => ({
+          sum: computed(() => $.a() + $.b()),
+        }),
+      }
+    );
 
     expect(tree.$.sum()).toBe(5);
 
@@ -203,7 +208,12 @@ describe('S-4 — M3 tested against a boundary', () => {
 
     const snap = tree() as Record<string, unknown>;
     expect(snap['n']).toBe(1); // plain position: the value
-    expect(snap['rows']).toEqual({ all: [{ id: 'a', n: 1 }, { id: 'b', n: 2 }] });
+    expect(snap['rows']).toEqual({
+      all: [
+        { id: 'a', n: 1 },
+        { id: 'b', n: 2 },
+      ],
+    });
 
     // Round-trips through JSON and back into a fresh tree.
     const fresh = signalTree({
@@ -222,7 +232,13 @@ describe('S-4 — M3 tested against a boundary', () => {
     });
 
     // The shape M3 predicts a conforming accessor would publish.
-    fresh({ rows: [{ id: 'a', n: 1 }, { id: 'b', n: 2 }], n: 1 } as never);
+    fresh({
+      rows: [
+        { id: 'a', n: 1 },
+        { id: 'b', n: 2 },
+      ],
+      n: 1,
+    } as never);
 
     expect(fresh.$.rows.ids()).toEqual(['a', 'b']);
     expect(fresh.$.rows.byId('b')?.n()).toBe(2);
