@@ -406,7 +406,7 @@ print_step "Building all packages..."
 # Build packages in dependency order to ensure proper resolution
 # Core first, then everything else
 print_step "Building @signaltree/core first..."
-npx nx build core --configuration=production || {
+npx nx build kernel --configuration=production || {
     print_error "Core package build failed! Rolling back version changes."
     rollback_versions
     exit 1

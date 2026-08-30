@@ -17,9 +17,13 @@
  *
  * This is why the package must not claim `sideEffects: false`.
  */
-import './lib/install-realization';
+import { ensureAngularRealization } from './lib/install-realization';
 // Registers the Angular leaf carrier with the kernel's type registry (TA-B).
 import './lib/carrier';
+
+// A CALL, not a bare side-effect import: a bare import was tree-shaken out of
+// the published bundle, shipping an Angular package that installed nothing.
+ensureAngularRealization();
 import type {
   ISignalTreeOf,
   LeafOf,

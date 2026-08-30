@@ -7527,3 +7527,69 @@ runtime implementation to `'cell'` and `'angular'`.
 `CallableWritableSignal` now resolves to a neutral cell and reads as a misnomer.
 Deliberately NOT renamed here — that is a surface-quality ruling for
 `GREENFIELD-V15-SURFACE-0`.
+
+## C6 — CLOSED GREEN, FROZEN
+
+v15 physically exists as a neutral kernel plus a native Angular realization, in
+real installable artifacts — not merely as a workspace architecture.
+
+| packed `@signal-tree/kernel` (Angular absent) | |
+| --- | --- |
+| `npm ls @angular/core` | empty |
+| manifest Angular dep / peer | none |
+| packed JS Angular imports | **0** (detector control: 1) |
+| packed `.d.ts` Angular refs | **0** (detector control: 1) |
+| root + `/adapter` resolution | PASS |
+| tree · nested · entityMap · derived · function-as-state · destroy | PASS |
+| restoration eligibility, both sides | PASS |
+| Link push-out · settled · retrieve · dispose | PASS |
+
+| packed `@signal-tree/angular` (both tarballs) | |
+| --- | --- |
+| dependency direction | angular -> kernel, no reverse |
+| public-root installs realization | PASS, no manual installer |
+| native `WritableSignal` · stable identity · graph participation | PASS |
+| merge reaches the same native cell | PASS |
+| `destroyed` / entity / `asReadonly` / `.empty` are Signals | PASS |
+| installed `.d.ts` TYPE-A | PASS |
+| minified, tree-shaken production bundle | PASS |
+
+### Packing earned its keep
+
+The split itself was already committed. What a green workspace could NOT see is
+that the SHIPPED Angular package installed nothing:
+
+`packages/angular/src/index.ts` carried `import './lib/install-realization';` —
+a bare side-effect import. The bundler ELIDED it. The published `index.js`
+contained zero occurrences of `installCellRuntime`, so a clean consumer got
+neutral kernel cells: `isSignal` false, no `asReadonly`, no dependency tracking.
+The packed consumer scored **2/7**. Dropping `sideEffects: false` from the
+manifest did not prevent it — the bundler judged the module pure on its own.
+
+Repaired by making installation a module-scope CALL of an imported binding
+(`ensureAngularRealization()`), which cannot be elided. **7/7** afterwards,
+including a minified, tree-shaken production bundle.
+
+    A BARE SIDE-EFFECT IMPORT IS NOT A PACKAGING GUARANTEE. A CALLED BINDING IS.
+
+2010 kernel tests, 25 Angular tests, lint and typecheck were ALL GREEN with that
+defect in place. Only installing the tarball exposed it.
+
+Two supporting repairs the same pass required: `packages/angular`'s
+`tsconfig.lib.prod.json` had `outDir`/`declarationDir` pointing into the KERNEL's
+dist (build contamination that would have made packed evidence untrustworthy),
+and `restoration-eligibility.ts` carried `@internal`, which stripped the earned
+`/adapter` semantic-ingress export out of the emitted declarations. The built
+manifests were verified installable.
+
+### One retraction
+
+`restoration()` appearing not to record was MY probe testing the wrong contract:
+v15 restoration is OPT-IN, so `canUndo() === false` for undesignated writes is the
+frozen semantic. The two-sided control (undesignated stays unadmitted; `undoable()`
+admits and `undo()` restores) passes from the tarball. RC-HARNESS-1 is therefore a
+stale benchmark contract — it calls ordinary `updateOne()` while describing those
+operations as undoable. **RC-HARNESS-2 remains independently OPEN.**
+
+Not authorized by this closure: no tag, no RC declaration. `15.0.0-rc.1` remains a
+pre-existing placeholder string.

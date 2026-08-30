@@ -45,22 +45,24 @@ export { installScalarLeafRealization } from './lib/internals/scalar-leaf-realiz
 export { installTrackingSuppression } from './lib/internals/tracking-suppression';
 
 /**
- * ⚠️ NEEDS A RULING — the one export here that is NOT a realization contract.
+ * SEMANTIC INGRESS — the one export here that is not a realization contract.
  *
  * `toWritableSignal` (the Angular Signal Forms bridge) wraps its writes in this
  * so a user's form edit becomes a restoration-eligible causal turn. The kernel
  * CANNOT infer that: only the integration knows a write originated from a human
  * editing a control rather than from program logic.
  *
- * It is included because the seam question was asked first and the answer was
- * "the adapter genuinely owns this fact", not because it made a file compile —
- * a deep kernel import was flagged as a split falsifier and refused by
- * `@nx/enforce-module-boundaries` rather than being quietly used.
+ * RULED: it stays here. It does not go on the kernel root, it is not
+ * deep-imported, and the behaviour is not removed from `toWritableSignal`. That
+ * revises this SDK's definition to: realization contracts PLUS the minimum
+ * semantic facts only an integration can truthfully assert. It is the only
+ * earned example today; adjacent history/restoration internals do NOT follow it
+ * in. The final spelling is open until the pre-freeze surface pass.
  *
- * But it is `@internal`, it is restoration semantics rather than realization,
- * and it widens the SDK beyond "install a runtime". If the ruling is that
- * write-intent belongs on the kernel ROOT (app authors may want it too) or that
- * `toWritableSignal` should not designate at all, this export moves or dies.
+ * DO NOT mark this export with the internal-marker tag, or mention that tag as
+ * a bare token in this docblock: the build runs `stripInternal`, which erases
+ * the export from the emitted declarations and breaks the Angular package's
+ * compile — measured, twice.
  */
 export { withRestorationDesignation } from './lib/internals/restoration-eligibility';
 

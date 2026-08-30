@@ -66,7 +66,7 @@ if (!SELF_TEST) {
 // rehearsal is what surfaced it.
 const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!SELF_TEST && !existsSync(CORE)) {
-  console.error('❌ build first: npx nx build core');
+  console.error('❌ build first: npx nx build kernel');
   process.exit(1);
 }
 

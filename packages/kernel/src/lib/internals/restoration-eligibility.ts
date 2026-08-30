@@ -84,7 +84,17 @@ export function isRestorationDesignated(): boolean {
  *
  * @throws If `fn` returns a thenable. The designation cannot survive an `await`,
  *   so an async callback would silently designate nothing.
- * @internal
+ *
+ * PUBLISHED, deliberately: this is the first SEMANTIC-INGRESS export of
+ * `@signal-tree/kernel/adapter`. Only a framework integration can truthfully
+ * assert "this write is authored activity entering through my boundary" — the
+ * kernel cannot infer it from the mutation. `@signal-tree/angular`'s
+ * `toWritableSignal` calls it across the package boundary.
+ *
+ * DO NOT re-add the internal-marker tag here. The build runs `stripInternal`,
+ * so the tag erases this symbol from the emitted declarations and the Angular
+ * package stops compiling against it. Even a quoted mention of the tag inside
+ * this docblock is parsed as the tag itself.
  */
 export function withRestorationDesignation<R>(fn: () => R): R {
   const previous = designated;

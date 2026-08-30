@@ -5,8 +5,8 @@
     "declaration": true,
     "stripInternal": true,
     "sourceMap": false,
-    "outDir": "../../dist/packages/kernel/dist",
-    "declarationDir": "../../dist/packages/kernel/dist"
+    "outDir": "../../dist/packages/angular/dist",
+    "declarationDir": "../../dist/packages/angular/dist"
   },
   "angularCompilerOptions": {
     "compilationMode": "partial",

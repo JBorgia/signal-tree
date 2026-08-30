@@ -8,10 +8,10 @@ export default defineConfig({
         new URL('./src/index.ts', import.meta.url)
       ),
       '@signal-tree/kernel/adapter': fileURLToPath(
-        new URL('../core/src/adapter.ts', import.meta.url)
+        new URL('../kernel/src/adapter.ts', import.meta.url)
       ),
       '@signal-tree/kernel': fileURLToPath(
-        new URL('../core/src/index.ts', import.meta.url)
+        new URL('../kernel/src/index.ts', import.meta.url)
       ),
     },
   },

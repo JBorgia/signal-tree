@@ -25,7 +25,7 @@ requireExposeGc('tools/probe-heap-object-census.mjs');
 
 const CORE = join(process.cwd(), 'dist/packages/kernel/dist/index.js');
 if (!existsSync(CORE)) {
-  console.error('❌ build first: npx nx build core');
+  console.error('❌ build first: npx nx build kernel');
   process.exit(1);
 }
 

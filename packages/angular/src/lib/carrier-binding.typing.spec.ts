@@ -36,8 +36,8 @@ describe('Angular package declares Angular carriers', () => {
 
     const empty: Signal<boolean> = rows.empty;
     const row = rows.byId(1);
-    const field: Signal<string> = row!.name;
-    const ro: Signal<string> = row!.name.asReadonly();
+    const field: Signal<string> = row.name;
+    const ro: Signal<string> = row.name.asReadonly();
 
     expect(empty()).toBe(false);
     expect(field()).toBe('Ada');

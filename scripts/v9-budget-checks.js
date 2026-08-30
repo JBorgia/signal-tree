@@ -130,7 +130,7 @@ function checkBundleSize() {
   console.log('\n📏 Checking bundle size...');
 
   if (!fs.existsSync(CORE_DIST)) {
-    console.error('  ❌ dist/ not found. Run `npx nx build core` first.');
+    console.error('  ❌ dist/ not found. Run `npx nx build kernel` first.');
     failed = true;
     return;
   }
@@ -203,7 +203,7 @@ function checkDevCodeLeaks() {
   console.log('\n🔍 Checking for dev-code leaks in dist/...');
 
   if (!fs.existsSync(CORE_DIST)) {
-    console.error('  ❌ dist/ not found. Run `npx nx build core` first.');
+    console.error('  ❌ dist/ not found. Run `npx nx build kernel` first.');
     failed = true;
     return;
   }
