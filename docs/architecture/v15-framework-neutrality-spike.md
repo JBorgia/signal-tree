@@ -7707,3 +7707,53 @@ Package identity corrected: the kernel no longer describes itself as
 **RC-HARNESS-3 is NOT closed by this.** Deleting `StorageAdapter` gives it the
 right disposition; the stale `size-report` arm that imports a nonexistent
 `createIndexedDBAdapter` must still be repaired and the gate rerun.
+
+## ANGULAR-SURFACE-CARRIER-CLOSURE-0 — CLOSED GREEN
+
+The explicit Angular barrel from `e764938d` classified three names as
+carrier-INSENSITIVE without proving it. A packed-consumer probe proved five
+annotations lied, and following the thread found two more:
+
+    SignalTreeBuilder.destroyed    -> ReadableCell<boolean>
+    EntitySignal.empty             -> ReadableCell<boolean>
+    EntitySignal.all               -> ReadableCell<Row[]>
+    entity field                   -> WritableCell<string>
+    entity .asReadonly()           -> ReadableCell<string>
+    EntitySignalWithSlices         -> inherited the lie from EntitySignal
+    ReadonlyStore                  -> NOT EXPORTED from Angular at all, so the
+                                      return of `defineStore(..., 'readonly')`
+                                      could not be named; once bound it still
+                                      yielded neutral leaves because
+                                      `ReadonlyNodeView` hardcoded `ReadableCell`
+
+    INFERENCE BEING CORRECT IS NOT ENOUGH IF A NAMED PUBLIC ANNOTATION CAN LIE.
+
+Fixed by binding the existing semantic authorities — no duplicated type system,
+no restored star export. The compiler proved the preregistered condition, so
+`/adapter` gained six type-only binders and nothing else:
+
+    EntitySignalOf · EntityNodeOf · EntitySignalWithSlicesOf
+    SignalTreeBuilderOf · ReadonlyStoreOf · ReadonlyViewOf
+
+No physical machinery, membership, clocks, subjects, slots or stats crossed.
+`ReadonlyNodeView`'s leaf branches now derive `ReadonlyOf<C, V>`; the
+`NodeAccessor`-before-`ReadableCell` ordering fix was threaded around, not through.
+
+`DerivedOf` was measured, not assumed: it takes the tree type as a PARAMETER and
+mints no leaves, so it PRESERVES whatever carrier the caller supplies —
+carrier-insensitive, re-exported without binding.
+
+### Final package-qualified ledger
+
+| package | exports | star |
+| --- | --- | --- |
+| `@signal-tree/kernel` | 47 | 0 |
+| `@signal-tree/kernel/adapter` | 24 | 0 |
+| `@signal-tree/angular` | 51 | 0 |
+| **total** | **122** | **0** |
+
+    angular carrier-bound names        9 of 9
+    angular internals leaked           NONE
+    removed names reachable            NONE
+    packed type controls               5/5 PASS
+    packed runtime  kernel 10/10 · angular 7/7 · Link 4/4

@@ -1,6 +1,6 @@
 import { definePositionRegistry } from '../internals/position-registry';
 import { getDerivedRuntime } from '../internals/derived-runtime';
-import type { ReadableCell } from '../internals/cell-runtime';
+import type { CarrierKind, EntitySignalOf, ReadonlyOf } from '../types';
 
 import { createEntitySignal } from '../entity-signal';
 import {
@@ -38,7 +38,6 @@ export { isEntityMapMarker };
 import type {
   EntityConfig,
   EntityMapMarker,
-  EntitySignal,
 } from '../types';
 
 // =============================================================================
@@ -76,13 +75,21 @@ export interface EntityMapMarkerWithSlices<
 /**
  * EntitySignal extended with computed slices
  */
+export type EntitySignalWithSlicesOf<
+  E,
+  K extends string | number,
+  Slices extends Record<string, unknown>,
+  C extends CarrierKind
+> = EntitySignalOf<E, K, C> & {
+  [P in keyof Slices]: ReadonlyOf<C, Slices[P]>;
+};
+
+/** PUBLIC kernel spelling. Carrier bound to the neutral cell. */
 export type EntitySignalWithSlices<
   E,
   K extends string | number,
   Slices extends Record<string, unknown>
-> = EntitySignal<E, K> & {
-  [P in keyof Slices]: ReadableCell<Slices[P]>;
-};
+> = EntitySignalWithSlicesOf<E, K, Slices, 'cell'>;
 
 /**
  * Builder for chainable computed slices on a plain entityMap.
