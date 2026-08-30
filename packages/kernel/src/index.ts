@@ -336,9 +336,10 @@ export { devTools } from './enhancers/devtools/devtools';
  * ```typescript
  * import { signalTree, entityMap, devTools, batching } from '@signal-tree/kernel';
  *
- * const store = signalTree({ users: entityMap<User, number>() })
- *   .with(batching())
- *   .with(devTools({ name: 'MyStore' }));
+ * const store = signalTree(
+ *   { users: entityMap<User, number>() },
+ *   { enhancers: [batching(), devTools({ name: 'MyStore' })] }
+ * );
  *
  * store.$.users.addOne({ id: 1, name: 'Alice' });
  * ```

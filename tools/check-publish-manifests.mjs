@@ -174,6 +174,13 @@ function inspectManifest(json, path, versionByName) {
     );
   }
 
+  if (json.name === '@signal-tree/angular' && json.sideEffects === false) {
+    found.push(
+      `${path}: @signal-tree/angular declares sideEffects:false, so a consumer bundler may ` +
+        `erase a side-effect-only import before it installs the Angular realization.`
+    );
+  }
+
   for (const block of DEP_BLOCKS) {
     for (const [dep, range] of Object.entries(json[block] ?? {})) {
       if (typeof range !== 'string') continue;
@@ -239,6 +246,11 @@ function selfTest() {
     // does NOT admit a prerelease of the same version.
     peerDependencies: { '@signal-tree/kernel': '^15.0.0' },
   };
+  const withInertAngularImport = {
+    name: '@signal-tree/angular',
+    version: '15.0.0-rc.1',
+    sideEffects: false,
+  };
 
   const versions = new Map([['@signal-tree/kernel', '15.0.0-rc.1']]);
   const check = (manifest) => inspectManifest(manifest, '<fixture>', versions);
@@ -252,6 +264,11 @@ function selfTest() {
   }
   if (check(withDeadRange).length === 0) {
     failures.push('accepted `^15.0.0` alongside a 15.0.0-rc.1 release');
+  }
+  if (check(withInertAngularImport).length === 0) {
+    failures.push(
+      'accepted sideEffects:false for the structural Angular initializer'
+    );
   }
   // And the comparator itself, since every range verdict rests on it.
   if (satisfies('15.0.0-rc.1', '^15.0.0-rc.1') !== true) {
@@ -276,7 +293,7 @@ function selfTest() {
     process.exit(1);
   }
   console.log(
-    '✅ the manifest checker rejects `workspace:*` and a range that admits nothing,\n' +
+    '✅ the manifest checker rejects `workspace:*`, dead ranges and inert Angular initialization,\n' +
       '   accepts a clean manifest, and its comparator handles prerelease ranges'
   );
   process.exit(0);

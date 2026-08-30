@@ -1821,46 +1821,6 @@ function create<T extends object>(
     writable: false,
   });
 
-  /**
-   * Apply a single enhancer to this SignalTree instance and return the enhanced tree.
-   *
-   * Enhancers extend the tree with additional capabilities (batching, restoration, dev tools, entities, serialization, etc).
-   *
-   * Usage:
-   * ```ts
-   * const enhanced = tree.with(batching());
-   * // Chain multiple enhancers:
-   * const fullyEnhanced = tree
-   *   .with(batching())
-   *   .with(restoration({ maxHistorySize: 100 }))
-   *   .with(devTools({ name: 'MyTree' }));
-   * ```
-   *
-   * Supported enhancers and their options:
-   *
-   * - `batching(config?: BatchingConfig)`
-   *   - Batches change detection notifications for performance.
-   *   - Signal writes are always synchronous.
-   *   - Options: `enabled`, `notificationDelayMs`.
-   *
-   * - `restoration(config?: RestorationConfig)`
-   *   - Enables undo/redo and state history.
-   *   - Options: `maxHistorySize`, `includePayload`, `actionNames`, `enabled`.
-   *
-   * - `devTools(config?: DevToolsConfig)`
-   *   - Integrates with browser devtools and logs state changes.
-   *   - Options: `name`, `enableBrowserDevTools`, `enableLogging`, `performanceThreshold`, `enabled`.
-   *
-   * - `serialization(config?: SerializationConfig)`
-   *   - Adds state serialization and persistence helpers.
-   *   - Options: `includeMetadata`, `replacer`, `reviver`, `preserveTypes`, `maxDepth`.
-   *
-   * @template R The return type of the enhancer (usually the enhanced tree).
-   * @param enhancer A function that takes the current tree and returns an enhanced tree.
-   * @returns The enhanced tree with additional methods or capabilities.
-   * @see BatchingConfig, RestorationConfig, DevToolsConfig, SerializationConfig
-   */
-
   // bind()
   Object.defineProperty(tree, 'bind', {
     value: function (thisArg?: unknown): NodeAccessor<T> {

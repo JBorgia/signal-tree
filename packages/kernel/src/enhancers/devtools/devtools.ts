@@ -70,7 +70,8 @@ const devToolsImpl =
  * tracking, and composition logging.
  *
  * Production (`ngDevMode === false`): resolves to a noop and the entire
- * implementation tree-shakes out — `.with(devTools())` costs ~nothing in prod.
+ * implementation tree-shakes out — declaring `devTools()` in `enhancers` costs
+ * ~nothing in prod.
  * Apps that genuinely need devtools in production should use a non-prod build.
  */
 export function devTools(config: DevToolsConfig = {}): Enhancer<DevToolsMethods> {
