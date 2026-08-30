@@ -135,7 +135,7 @@ type PersistOption =
   | { adapter: StorageAdapter; key: string; hydrateThenRevalidate?: boolean };
 ```
 
-Reuses the existing [`StorageAdapter` + `createIndexedDBAdapter`](../../packages/core/src/enhancers/serialization/serialization.ts) — **no new persistence mechanism, no merge of `stored`/`persistence`.** When `hydrateThenRevalidate: true`, on materialize the collection seeds `all` from the persisted snapshot _instantly_ (offline-first), marks itself stale, and revalidates via `load()` in the background — the SWR/offline story from gap 5, delivered through this marker rather than a persistence rewrite.
+Reuses the existing [`StorageAdapter` + `createIndexedDBAdapter`](../../packages/kernel/src/enhancers/serialization/serialization.ts) — **no new persistence mechanism, no merge of `stored`/`persistence`.** When `hydrateThenRevalidate: true`, on materialize the collection seeds `all` from the persisted snapshot _instantly_ (offline-first), marks itself stale, and revalidates via `load()` in the background — the SWR/offline story from gap 5, delivered through this marker rather than a persistence rewrite.
 
 ## 5. Interaction with existing primitives
 
@@ -157,7 +157,7 @@ Net **positive** for the audit's #3 priority. Before: an agent must know to asse
 ## 8. Next steps
 
 1. ~~Land this RFC (Proposed → Accepted) — resolve the three flagged defaults in §7 first.~~ **Done (2026-07-20).**
-2. ~~Implement `entityCollection` marker + `invalidateTag` in core, mirroring the `asyncSource` marker structure and finalization path.~~ **Done** — [`markers/entity-map.ts`](../../packages/core/src/lib/markers/entity-map.ts) (named `entity-collection.ts` when this RFC was written), wired into the three marker→signal type chains in `types.ts` and the public barrels.
-3. ~~Test suite~~ **Done** — [`markers/entity-map.spec.ts`](../../packages/core/src/lib/markers/entity-map.spec.ts), 22 tests covering load-guard/single-flight, `staleTime`, `swr`, `invalidate()`/`invalidateTag`, `persist` hydrate-then-revalidate. Full core suite green.
+2. ~~Implement `entityCollection` marker + `invalidateTag` in core, mirroring the `asyncSource` marker structure and finalization path.~~ **Done** — [`markers/entity-map.ts`](../../packages/kernel/src/lib/markers/entity-map.ts) (named `entity-collection.ts` when this RFC was written), wired into the three marker→signal type chains in `types.ts` and the public barrels.
+3. ~~Test suite~~ **Done** — [`markers/entity-map.spec.ts`](../../packages/kernel/src/lib/markers/entity-map.spec.ts), 22 tests covering load-guard/single-flight, `staleTime`, `swr`, `invalidate()`/`invalidateTag`, `persist` hydrate-then-revalidate. Full core suite green.
 4. ~~Docs: llms.txt / SKILL.md one-liner; ETag + SSE cookbook (gap 6).~~ **Done** — SKILL.md + llms.txt entries; [`guides/entity-collection-cookbook.md`](../guides/entity-collection-cookbook.md).
 5. Remaining: pick the release version (comments say `v11.2`; `package.json` still `11.1.1`) and bump on publish; measure the gzip delta (§7.4).

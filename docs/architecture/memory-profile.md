@@ -92,7 +92,7 @@ is Angular's, not ours — but it is the number that matters when someone asks
 `entityMap` 10k retains 2.85 MB; the same collection with a `tree()` snapshot
 **held live** retains 2.86 MB. Structural sharing means the snapshot shares the
 entity objects by reference rather than copying them — which is exactly the
-property [`snapshot-aliasing.spec.ts`](../../packages/core/src/lib/snapshot-aliasing.spec.ts)
+property [`snapshot-aliasing.spec.ts`](../../packages/kernel/src/lib/snapshot-aliasing.spec.ts)
 documents from the correctness side. Read whole state as often as you like; it
 is not a memory event.
 

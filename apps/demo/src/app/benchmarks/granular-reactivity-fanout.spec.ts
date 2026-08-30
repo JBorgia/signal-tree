@@ -30,7 +30,7 @@
  *     caching, and snapshot semantics).
  */
 import { computed, signal } from '@angular/core';
-import { entityMap, signalTree } from '@signal-tree/kernel';
+import { entityMap, signalTree } from '@signal-tree/angular';
 
 const N = 100;
 const TARGET = 42; // the single index we mutate
@@ -106,7 +106,7 @@ describe('granular-reactivity fan-out', () => {
     const rows = tree.$.rows as unknown as {
       addMany: (r: Row[]) => void;
       updateOne: (id: number, patch: Partial<Row>) => void;
-      map: () => ReadonlyMap<number, Row>;
+      asMap: () => ReadonlyMap<number, Row>;
     };
     rows.addMany(Array.from({ length: N }, (_, i) => ({ id: i, v: 0 })));
 

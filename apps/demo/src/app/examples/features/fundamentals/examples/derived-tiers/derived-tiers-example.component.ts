@@ -1,6 +1,6 @@
 
 import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
-import { derivedFrom, entityMap, signalTree, WithDerived } from '@signal-tree/kernel';
+import { derivedFrom, entityMap, signalTree, DerivedOf } from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
@@ -53,7 +53,7 @@ function createInlineTree() {
  *
  * Use these utilities:
  * - derivedFrom<TTree>() - Provides type context for the $ parameter
- * - WithDerived<TTree, TDerivedFn> - Builds intermediate tree types
+ * - DerivedOf<TTree, TDerivedFn> - Builds intermediate tree types
  */
 
 // Step 1: Define base state factory
@@ -92,7 +92,7 @@ const entityResolutionDerived = derivedFrom<ExternalTreeBase>()(($) => ({
 }));
 
 // Step 4: Build intermediate type for next tier
-type TreeWithTier1 = WithDerived<
+type TreeWithTier1 = DerivedOf<
   ExternalTreeBase,
   typeof entityResolutionDerived
 >;

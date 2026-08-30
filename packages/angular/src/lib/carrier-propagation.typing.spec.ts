@@ -46,8 +46,9 @@ describe('PCP — Angular public transformations keep the Angular carrier', () =
       doubled: (() => $.count() * 2) as unknown as Signal<number>,
     }));
     const base: WritableSignal<number> = t.$.count;
+    const derived: Signal<number> = t.$.doubled;
     const destroyed: Signal<boolean> = t.destroyed;
-    expect([base, destroyed].length).toBe(2);
+    expect([base, derived, destroyed].length).toBe(3);
   });
 
   it('entity + slices: readers and writers are native, at depth', () => {

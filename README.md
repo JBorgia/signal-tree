@@ -209,7 +209,7 @@ In templates, `store.$.user.name()` works exactly like any other signal.
 npm install @signal-tree/kernel
 ```
 
-Requires Angular 20, 21, or 22 (see `peerDependencies` in [`packages/core/package.json`](packages/core/package.json)).
+Requires Angular 20, 21, or 22 (see `peerDependencies` in [`packages/angular/package.json`](packages/angular/package.json)).
 
 ## Entity Collections
 
@@ -269,12 +269,12 @@ membership and write resolved rows from app-owned services.
 
 A SignalTree store is composed from four distinct, type-safe mechanisms — each handles one concern, rather than funneling everything through a single primitive:
 
-| Concern           | Mechanism                                                                                                  | Example                                           |
-| ----------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap` | `signalTree({ users: entityMap<User>() })`        |
-| **Derived state** | `.derived()` / `derivedFrom()` — computed signals deep-merged at any path                                  | `.derived($ => ({ activeCount: computed(...) }))` |
+| Concern           | Mechanism                                                                                                  | Example                                                      |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap` | `signalTree({ users: entityMap<User>() })`                   |
+| **Derived state** | `.derived()` / `derivedFrom()` — computed signals deep-merged at any path                                  | `.derived($ => ({ activeCount: computed(...) }))`            |
 | **Capabilities**  | the `enhancers` config array — opt-in, tree-shakeable, and reusable (author your own custom enhancers)     | `signalTree(state, { enhancers: [batching(), devTools()] })` |
-| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes  | `ops.users.select(id)`                            |
+| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes  | `ops.users.select(id)`                                       |
 
 This deliberately splits across four purpose-built tools what NgRx SignalStore unifies under one `with*` composition primitive (`withState` / `withComputed` / `withMethods` / `signalStoreFeature`). The closest analog to NgRx's reusable-feature primitive (`signalStoreFeature` / `withFeature`) is the `enhancers` array; state, derived state, and actions live in the other three mechanisms. For an honest, axis-by-axis comparison — including where NgRx wins — see [docs/compare/ngrx-signalstore.md](docs/compare/ngrx-signalstore.md).
 
@@ -306,12 +306,12 @@ const store = signalTree(
 );
 ```
 
-| Enhancer          | Purpose                                                                                        |
-| ----------------- | ---------------------------------------------------------------------------------------------- |
-| `batching()`      | Coalesce change-detection notifications into microtask batches                                 |
-| `restoration()`    | Undo/redo with configurable history depth                                                      |
-| `devTools()`      | Redux DevTools integration with path-based actions                                             |
-| `persistence()`   | Auto-save/load to localStorage, IndexedDB, or custom adapters; includes JSON serialize/deserialize with type preservation |
+| Enhancer        | Purpose                                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `batching()`    | Coalesce change-detection notifications into microtask batches                                                            |
+| `restoration()` | Undo/redo with configurable history depth                                                                                 |
+| `devTools()`    | Redux DevTools integration with path-based actions                                                                        |
+| `persistence()` | Auto-save/load to localStorage, IndexedDB, or custom adapters; includes JSON serialize/deserialize with type preservation |
 
 > **9.0.1:** The `memoization()` enhancer was removed. Use Angular's built-in `computed()` — it memoizes its result and only re-runs when a tracked signal changes, with no extra cost over what Angular already provides.
 
@@ -422,12 +422,12 @@ store.registerCleanup(() => ws.close());
 
 Snapshot from one production Angular mobile app's NgRx Signal Store → SignalTree migration. Original migration measured ~11,700 → ~2,800 lines of state code (~76%) and ~50KB → ~27KB gzipped state bundle (~46%). Both codebases have continued to evolve; re-measuring today the same scope yields a 60–70% reduction depending on definition (apps-only vs apps+libs, narrow vs broad import filter). The directional finding is reproducible — the exact percentages are not. **YMMV** — your migration's reduction depends on app complexity, prior architecture, and how heavily the original code leaned on custom `withX` helpers. The most concretely-attributable single reduction was `entityMap()` replacing a 222-line `withEntityCrud` wrapper. The remaining bulk of the savings appears to come from cross-cutting concerns (devtools, error banners, telemetry, refresh handling) consolidating into tree-level enhancers, though we have not separately measured each category.
 
-| Metric                  | NgRx                      | SignalTree             | Change         |
-| ----------------------- | ------------------------- | ---------------------- | -------------- |
-| **App state code**      | 11,735 lines / 45 files   | 2,825 lines / 23 files | **-76%**       |
-| **npm packages**        | 4 (@ngrx/\*)              | 1 (@signal-tree/kernel)   | **-75%**       |
-| **State bundle (gzip)** | ~50KB                     | ~27KB                  | **-46%**       |
-| **Boilerplate files**   | 17 custom `withX` helpers | 0 (built-in)           | **Eliminated** |
+| Metric                  | NgRx                      | SignalTree              | Change         |
+| ----------------------- | ------------------------- | ----------------------- | -------------- |
+| **App state code**      | 11,735 lines / 45 files   | 2,825 lines / 23 files  | **-76%**       |
+| **npm packages**        | 4 (@ngrx/\*)              | 1 (@signal-tree/kernel) | **-75%**       |
+| **State bundle (gzip)** | ~50KB                     | ~27KB                   | **-46%**       |
+| **Boilerplate files**   | 17 custom `withX` helpers | 0 (built-in)            | **Eliminated** |
 
 > 13 separate stores → 1 unified tree. `entityMap()` replaced a 222-line `withEntityCrud` wrapper. Derived tiers replaced scattered `withComputed` blocks.
 
@@ -470,9 +470,7 @@ tree.derived(derivedFn); // Derived state can also be added after construction
 
 // Async — the tree stores results; the pipeline is ordinary RxJS
 const tree = signalTree({ results: [] as User[], loading: false });
-query$
-  .pipe(debounceTime(300), distinctUntilChanged(), switchMap(api.search$))
-  .subscribe((users) => external(() => tree.$.results.set(users)));
+query$.pipe(debounceTime(300), distinctUntilChanged(), switchMap(api.search$)).subscribe((users) => external(() => tree.$.results.set(users)));
 // switchMap gives cancellation and latest-wins; SignalTree owns neither.
 
 // Lifecycle

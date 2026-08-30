@@ -1,4 +1,4 @@
-import { linkedSignal, signal, type WritableSignal } from '@angular/core';
+import { linkedSignal, signal } from '@angular/core';
 
 import type {
   ObservationToken,
@@ -39,5 +39,3 @@ export const ANGULAR_SCALAR_LEAF_REALIZATION: ScalarLeafRealization = {
   },
 };
 
-/** Exposed for the S1 identity proof: the realization returns a native signal. */
-export type AngularScalarLeaf<T> = WritableSignal<T>;

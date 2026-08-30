@@ -3,6 +3,13 @@
 These entries keep release-delta claim checks honest before the actual version
 bump inserts the final dated 15.0.0 heading.
 
+- **Framework adapter installation hooks are now explicit.** The
+  `@signal-tree/kernel/adapter` entry point exports `installCellRuntime`,
+  `installDerivedRuntime`, `installMaterializationRealization`,
+  `installScalarLeafRealization`, `installTrackingSuppression`, and
+  `withRestorationDesignation` so framework packages can install native
+  reactive behavior without putting framework dependencies in the kernel.
+
 - **BREAKING: `timeTravel({ shouldSkip })` removed.** The comparator and the
   `skipsBackward()`/`skipsForward()` traversal it drove are gone; `undo()` and
   `redo()` move one turn. It looked like navigation and was not — the predicate

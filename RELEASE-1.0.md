@@ -19,6 +19,24 @@ were removed, reviewer-found internal spec imports were repaired, and
 
 `GATE A` is **SATISFIED**. The kernel is FROZEN as of `4f7a2169`.
 
+Post-`84d39ae8` type/surface closure is checkpointed at `1c021fb6`.
+`READONLY-FOREIGN-REACTIVE-0` is **RF-A / CLOSED GREEN**: readonly projection
+uses the existing callable grammar to distinguish zero-argument foreign readers
+from SignalTree accessors with effective write parameters. Carrier propagation
+remains **PCP-A / CLOSED / FROZEN** after release synchronization found and
+closed one missing test row: derived-result projection now carries `C` through
+`ProcessDerivedOf<T, C>`, and both package matrices assert the derived member
+itself. Source typechecks, kernel/Angular tests and lints, package builds,
+installed PCP/RF declaration controls and isolated packed runtime controls are
+green. The authoritative public ledger is now kernel root 55, kernel adapter 24,
+Angular 51. After synchronizing package names, demo consumers, live links and
+self-test anchors, `npm run gates -- --release` passes 66/66.
+
+`RC-HARNESS-2` is **CLOSED GREEN**. The product-defect hypothesis was refuted;
+the benchmark now transpiles the real committed `restoration-eligibility` and
+`path-observation-port` implementations instead of maintaining behavioral
+stubs. Smoke and full 21-sample history-ownership runs exit 0.
+
 ### FROZEN — persistence invariants
 
 Burden of proof is now reversed. Do NOT reopen kernel architecture to inspect
@@ -1657,7 +1675,7 @@ from the 15.0 work, and they look nothing alike until you line them up:
 | ------------------------------------------- | ------------------------------------------------------ | ------------------------------------------- |
 | Is the SDK neutral?                         | module-graph traversal                                 | retained runtime / declaration closure      |
 | Does variadic `.with()` work?               | neutral tuple, realization enhancer chained separately | a realization enhancer INSIDE the tuple     |
-| Does `T` flow through `restoration`?         | annotated call sites                                   | unannotated inferred consumer type          |
+| Does `T` flow through `restoration`?        | annotated call sites                                   | unannotated inferred consumer type          |
 | Is the declaration valid?                   | source typecheck                                       | packed `.d.ts`, consumer compile            |
 | Did the build succeed?                      | absence of `error TS`                                  | exit 0 AND artifact exists                  |
 | Is the API unchanged?                       | exported symbol names                                  | public type contract                        |
@@ -3582,7 +3600,7 @@ controls that pass only if the shipped types are precise:
 | `HydrateMode`      | all four members accepted; `'nope'` rejected                                                                                     |
 | `createFormSignal` | callable at its emitted signature (the value re-export the differential cannot see)                                              |
 | `entityMap`        | `DefaultKey` / computed-slice declarations resolve                                                                               |
-| `restoration`       | `entry.state.count: number`, `.profile.name: string`, rejects `string` — receiver-derived inference surviving the packed `.d.ts` |
+| `restoration`      | `entry.state.count: number`, `.profile.name: string`, rejects `string` — receiver-derived inference surviving the packed `.d.ts` |
 
 One failure during construction was correctly classified as a FIXTURE defect, not a
 package defect: the fixture invented an `initial` member on `EntityConfig`. No
@@ -3667,7 +3685,7 @@ while another failed:
 
 | dimension             | question                                  | failure it missed                                                                                                                                            |
 | --------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Export inventory      | what names exist?                         | `RestorationMethods<T>` -> `RestorationMethods` (arity change, symbol set identical); `StateOf` (inventory clean, declaration invalid)                         |
+| Export inventory      | what names exist?                         | `RestorationMethods<T>` -> `RestorationMethods` (arity change, symbol set identical); `StateOf` (inventory clean, declaration invalid)                       |
 | Public type contracts | what do those names mean to TypeScript?   | not yet systematic — targeted contract tests are sufficient for 1.0. `SignalTree<T>` is now covered by `signal-tree-type-matrix.typing.spec.ts` (`9f0d1464`) |
 | Declaration closure   | can the shipped types be consumed at all? | the entity-map blocker above                                                                                                                                 |
 
@@ -11036,9 +11054,10 @@ repair before publishing release candidate docs; closed during Phase 5.
       scripts. `tools/size-report.mjs` was updated to remove deleted
       `status`/`form` scenarios, and `tools/bench-ssr-payload.mjs --json` now
       suppresses dev warnings so JSON output stays machine-readable.
-      `tools/bench-history-ownership.mjs` now emits temporary shims for its
-      transpiled `path-notifier` dependency graph, restoring the release-only
-      harness gate. Validation: `node tools/size-report.mjs --json`,
+      `tools/bench-history-ownership.mjs` now stages the real committed modules
+      in its transpiled `path-notifier` dependency graph, removing the stub
+      drift that broke the release-only harness gate. Validation:
+      `node tools/size-report.mjs --json`,
       `node --expose-gc tools/bench-compare.mjs --n 10000 --json`,
       `NODE_OPTIONS=--max-old-space-size=8192 node tools/bench-vs-signalstore.mjs --json`,
       `node tools/bench-depth-latency.mjs --json`,
@@ -11062,9 +11081,9 @@ first real publish remains the RC task.
 > greenfield decisions and is wrong.
 
 **Gate B froze the INCUMBENT. It did not establish that incumbent `tree()` is the
-final public API.** The freeze means *stop modifying the incumbent while we build
-its replacement* — a stable semantic reference point — not *this is the release
-candidate*.
+final public API.** The freeze means _stop modifying the incumbent while we build
+its replacement_ — a stable semantic reference point — not _this is the release
+candidate_.
 
 An RC asserts: "this is the product we intend to release unless testing finds
 defects." We already know it is not:
@@ -11085,7 +11104,7 @@ read/write grammar.
 
 ⚠️ PUBLISHING FIRST WOULD REVERSE THE AUTHORITY FLIP. External RC users would
 depend on `tree()`, and we would then either break them before final or keep the
-old spelling *because the RC shipped it* — the prematurely published incumbent
+old spelling _because the RC shipped it_ — the prematurely published incumbent
 vetoing the architecture. It also violates ONE SEMANTIC JOB, ONE AUTHORITATIVE
 PUBLIC SURFACE, by advertising a spelling already decided to die.
 
@@ -11301,9 +11320,8 @@ Exit condition: the greenfield public surface is frozen and its gates are green.
 >
 > ⚠️ AND "1.0" HERE IS NOT A SEMVER LITERAL. The published line is `15.x` —
 > npm holds `14.1.3` and `packages/core` is locally `15.0.0-rc.1`. "1.0" in this
-> file means *the first stable release of the reworked library*. Publishing a
+> file means _the first stable release of the reworked library_. Publishing a
 > literal `1.0.0-rc.1` would be a down-numbering below what is already published.
-
 
 - [x] **Resolve RC public surface reconciliation before publishing.**
       `docs/audits/2026-08/rc-public-surface-reconciliation.md` maps the
@@ -11473,7 +11491,6 @@ recommend speculative optimizations.
 > persistence atomic consequence semantics") is VACUOUS — `stored()` is deleted.
 > Step 5 ("freeze public API") is done for the INCUMBENT and owed again for the
 > greenfield surface.
-
 
 **THE DECLARATION ARTIFACT IS NOW TRUSTWORTHY. The precondition on the API
 cleanup queue is DISCHARGED.** Re-measured at HEAD on a freshly built artifact

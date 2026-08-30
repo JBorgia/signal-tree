@@ -36,7 +36,7 @@ store.$.users.all(); // from entityMap (source)
 store.$.users.current(); // from .derived (computed)
 ```
 
-**Source:** [`packages/core/src/lib/internals/merge-derived.ts`](../packages/core/src/lib/internals/merge-derived.ts) — `mergeDerivedState` performs a deep merge via `ensurePathAndGetTarget`, navigating to the existing object at any path and adding derived properties alongside source properties. The "single tree" is preserved.
+**Source:** [`packages/kernel/src/lib/internals/merge-derived.ts`](../packages/kernel/src/lib/internals/merge-derived.ts) — `mergeDerivedState` performs a deep merge via `ensurePathAndGetTarget`, navigating to the existing object at any path and adding derived properties alongside source properties. The "single tree" is preserved.
 
 **Doc-side action:** None — the root README, [`docs/ai/LLM.md`](ai/LLM.md), and [`docs/compare/ngrx-signalstore.md`](compare/ngrx-signalstore.md) all show this correctly. Future audits should preserve this framing in summaries.
 
@@ -66,7 +66,7 @@ const store = signalTree(initialState).derived(tier1Derived);
 
 `derivedFrom` is **not** a "view-model isolation" pattern. It is **not** a write-encapsulation utility. It does **not** return a read-only projection. Anyone telling you otherwise is confabulating.
 
-**Source:** [`packages/core/src/lib/internals/derived-types.ts:136-145`](../packages/core/src/lib/internals/derived-types.ts) — function definition. Cast is a typed-identity (`fn as ($: any) => TReturn`); zero runtime cost.
+**Source:** [`packages/kernel/src/lib/internals/derived-types.ts:136-145`](../packages/kernel/src/lib/internals/derived-types.ts) — function definition. Cast is a typed-identity (`fn as ($: any) => TReturn`); zero runtime cost.
 
 **Doc-side action:** None — the [README](../README.md) and [LLM.md](ai/LLM.md) both document this correctly. Consider whether the name `derivedFrom` is misleading enough to warrant a rename in a future major.
 
@@ -97,7 +97,7 @@ const store = signalTree({
 
 Each marker materializes at its declared path. There is no root-level constraint.
 
-**Source:** [`packages/core/src/lib/internals/materialize-markers.ts:137-203`](../packages/core/src/lib/internals/materialize-markers.ts) — `materializeMarkers(node, notifier, path: string[] = [])` walks recursively, tracking `path`, and processes each marker via registered processors at the discovered location.
+**Source:** [`packages/kernel/src/lib/internals/materialize-markers.ts:137-203`](../packages/kernel/src/lib/internals/materialize-markers.ts) — `materializeMarkers(node, notifier, path: string[] = [])` walks recursively, tracking `path`, and processes each marker via registered processors at the discovered location.
 
 **Doc-side action:** Lead with this in the marketing hero. It's the load-bearing differentiator vs. NgRx SignalStore and currently buried. (Will be addressed in a future hero rewrite.)
 
@@ -114,7 +114,7 @@ import { signalTree, restoration } from '@signaltree/core'; // ← correct
 const store = signalTree({ ... }, { enhancers: [restoration({ maxHistorySize: 50 })] });
 ```
 
-**Source:** [`packages/core/src/index.ts:237`](../packages/core/src/index.ts) — `export { restoration } from './enhancers/restoration/restoration';`.
+**Source:** [`packages/kernel/src/index.ts:237`](../packages/kernel/src/index.ts) — `export { restoration } from './enhancers/restoration/restoration';`.
 
 **Doc-side action:** None — the enhancer table in the root [README](../README.md) and [`LLM.md`](ai/LLM.md) both clearly list `restoration()` under `@signaltree/core`. This is purely an LLM hallucination, not a docs gap.
 
@@ -137,7 +137,7 @@ const store = signalTree({
 });
 ```
 
-**Source:** `packages/core/src/lib/markers/stored.ts` (in `packages/core/src/lib/markers/stored.ts`, deleted in 15.0), [`packages/core/src/enhancers/serialization/`](../packages/core/src/enhancers/serialization/).
+**Source:** `packages/kernel/src/lib/markers/stored.ts` (deleted in 15.0), [`packages/kernel/src/enhancers/serialization/`](../packages/kernel/src/enhancers/serialization/).
 
 **Doc-side action:** The "Optional Packages" table in the root README clearly does _not_ list a `@signaltree/storage` package, so the hallucination is unfounded. No doc change needed.
 
@@ -169,7 +169,7 @@ notification batching is now unconditional: it is an optimization owned by the
 observer-delivery layer, not a per-tree policy. Signal writes remain ALWAYS
 synchronous — batching only ever affected notification timing.
 
-**Source:** [`packages/core/src/enhancers/batching/batching.ts:11-19`](../packages/core/src/enhancers/batching/batching.ts) — "Signal writes are ALWAYS synchronous. Batching only affects change detection notification timing." The default-on behavior is in the core tree config.
+**Source:** [`packages/kernel/src/enhancers/batching/batching.ts:11-19`](../packages/kernel/src/enhancers/batching/batching.ts) — "Signal writes are ALWAYS synchronous. Batching only affects change detection notification timing." The default-on behavior is in the core tree config.
 
 **Doc-side action:** Add a one-line clarification in the root README enhancer table noting that core already batches and the enhancer adds explicit grouping APIs. (Future minor improvement.)
 
@@ -181,7 +181,7 @@ synchronous — batching only ever affected notification timing.
 
 **The truth (updated for 14.0.0):** there is no runtime proxy — and there is no longer a transform either. Branches are callable because a branch is SignalTree's own accessor function, not a signal; that is plain JavaScript, no tooling involved. **Leaves were never callable for writes.** `@signaltree/callable-syntax` was a build-time Babel transform meant to rewrite `tree.$.x.name('Bob')` into `.set('Bob')`, and it could not run inside an Angular app at all, so that call type-checked and then silently did nothing. Both the package and the type overloads were removed in 14.0.0; the leaf form is now a compile error. Leaves remain real Angular signals (`isSignal()` is `true`), which is exactly why wrapping them to make the sugar work was refused.
 
-**Source:** [`packages/core/src/lib/callable-contract.spec.ts`](../packages/core/src/lib/callable-contract.spec.ts) and its `.typing` sibling pin the contract in both directions; [RFC 0008 §4](rfcs/0008-post-13.3-open-items.md) records why the transform could not be delivered.
+**Source:** [`packages/kernel/src/lib/callable-contract.spec.ts`](../packages/kernel/src/lib/callable-contract.spec.ts) and its `.typing` sibling pin the contract in both directions; [RFC 0008 §4](rfcs/0008-post-13.3-open-items.md) records why the transform could not be delivered.
 
 **Doc-side action:** None — already clearly documented in the package README and root README.
 
@@ -294,7 +294,7 @@ interface SignalTree<T> {
 
 If you want a non-reactive snapshot of the underlying values, call `tree()` to get the full state snapshot, or read individual leaves via `tree.$.path.to.leaf()`.
 
-**Source:** [`packages/core/src/lib/types.ts`](../packages/core/src/lib/types.ts) — `$` is the only node accessor; `state` was removed in v11.
+**Source:** [`packages/kernel/src/lib/types.ts`](../packages/kernel/src/lib/types.ts) — `$` is the only node accessor; `state` was removed in v11.
 
 **Doc-side action:** Ensure no current docs reference `tree.state`.
 
@@ -360,12 +360,12 @@ This was a real DX bug — humans had to remember which marker used which shape,
 
 **The v10.3 truth:** **Bare predicates everywhere.** Matches `FormControl.dirty` / `.valid` / `.touched` and Angular signals conventions.
 
-| Marker                       | v10.3 canonical                                                                                      | Old `is`-prefix (deprecated, removed v11)             |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `status`                     | `.loading`, `.loaded`, `.notLoaded`, `.hasError`                                                     | `.isLoading`, `.isLoaded`, `.isNotLoaded`, `.isError` |
+| Marker                       | v10.3 canonical                                                          | Old `is`-prefix (deprecated, removed v11)             |
+| ---------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------- |
+| `status`                     | `.loading`, `.loaded`, `.notLoaded`, `.hasError`                         | `.isLoading`, `.isLoaded`, `.isNotLoaded`, `.isError` |
 | `entityMap`                  | `.empty`; the cache-aware `load:` form is not part of the public surface | `.isEmpty`                                            |
-| `form`                       | `.dirty`, `.valid`, `.touched`, `.pristine`                                                          | (already bare — unchanged)                            |
-| `asyncSource` / `asyncQuery` | `.loading`, `.error`, `.data`                                                                        | (already bare — unchanged)                            |
+| `form`                       | `.dirty`, `.valid`, `.touched`, `.pristine`                              | (already bare — unchanged)                            |
+| `asyncSource` / `asyncQuery` | `.loading`, `.error`, `.data`                                            | (already bare — unchanged)                            |
 
 The deprecated `is`-prefix accessors return the **same Signal instance** as the canonical bare versions — no double computed cost, no migration urgency.
 

@@ -344,7 +344,6 @@ export { devTools } from './enhancers/devtools/devtools';
  * - `restoration(config?)` - Undo/redo
  * - `transactions()` - Optimistic transaction rollback without undo/redo history
  * - `devTools(config?)` - Redux DevTools integration
- * - `persistence(config?)` - State persistence
  *
  * **Derived State:**
  * - `.derived($)` - Add computed state to tree
