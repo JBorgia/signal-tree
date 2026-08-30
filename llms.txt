@@ -27,6 +27,15 @@ Optimize for the architecture applications should use five years from now.
 compatibility layer. New exports must be framework-neutral semantic facts owned
 by the kernel and required by correct realizations.
 
+## Framework Realization Rule
+
+Framework packages may realize SignalTree truth for their runtime. They must
+not create another state authority.
+
+Never use process-global mutable framework installation merely to make a legacy
+integration work if construction-bound ownership can express the long-term
+architecture. A migration cannot determine realization ownership.
+
 ## Canonical Sources
 
 - `AGENTS.md` — contributor and consumer rules

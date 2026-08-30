@@ -4,6 +4,7 @@ import type { ReadableCell, WritableCell } from './internals/cell-runtime';
 import { getCellRuntime } from './internals/cell-runtime';
 import { isTreeCell, markTreeCell } from './internals/cell-identity';
 import { getMaterializationRealization } from './internals/materialization-realization';
+import { markOwnerInvalidatedFrom } from './internals/owner-invalidation';
 
 /**
  * Snapshot/apply walkers must recurse into anything that CARRIES state
@@ -250,6 +251,7 @@ function membershipRevisionFor(key: object): WritableCell<number> {
  */
 export function publishMembershipChange(node: object): void {
   MEMBERSHIP_REVISION.get(memoKey(node))?.update((v) => v + 1);
+  markOwnerInvalidatedFrom(node);
 }
 
 function materialized<T>(node: object, build: () => T): T {

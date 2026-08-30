@@ -22,6 +22,7 @@ export {
 } from './owned-metadata';
 import { getActiveWriteContext } from '../write-context';
 import { withoutTracking } from './tracking-suppression';
+import { markOwnerInvalidated } from './owner-invalidation';
 
 type OwnedMutationIntent = NonNullable<WriteMetadata['mutationIntent']>;
 
@@ -173,6 +174,8 @@ export function emitOwnedMutation(
   after: unknown,
   mutationIntent: OwnedMutationIntent
 ): void {
+  markOwnerInvalidated(options.ownerId);
+
   const positionId = options.positionIds?.[0];
   if (positionId === undefined) {
     return;

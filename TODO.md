@@ -2,6 +2,13 @@
 
 Work that is decided and not yet done. **This is not an RFC list.**
 
+## V15 pre-GA source hygiene
+
+- Remove stale internal comments in `signal-tree.ts` that still teach the
+  deleted builder, `.with()`, `.state`, or historical overload architecture.
+  This is documentation/source hygiene only; do not reopen the one-way public
+  construction surface while cleaning it.
+
 We do not write RFCs for our own work — we make the change. An RFC is what an
 outside contributor writes to propose something, and `docs/rfcs/` is the archive
 of decisions already taken, kept for the options that were REJECTED and why. If
@@ -1417,9 +1424,9 @@ which is worse than no undo because it burns a step the user believes they spent
 **Fix the option, not just the symptom — breaking changes make the real fix available.**
 The `history` option name carries **two opposite meanings** today:
 
-| Marker        | `history` today      | Means                                          |
-| ------------- | -------------------- | ---------------------------------------------- |
-| `form()`      | `history: history()` | **Opt IN** to this form's own undo stack       |
+| Marker        | `history` today      | Means                                           |
+| ------------- | -------------------- | ----------------------------------------------- |
+| `form()`      | `history: history()` | **Opt IN** to this form's own undo stack        |
 | `entityMap()` | `history?: boolean`  | **Opt OUT** of the global `restoration()` stack |
 
 One name, opt-in at one position and opt-out at another. Patching the phantom entry

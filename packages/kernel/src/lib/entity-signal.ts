@@ -29,6 +29,7 @@ import type { PathObservationPort } from './internals/path-observation-port';
 import { getActiveWriteContext } from '../lib/write-context';
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
 import { defineEntityProjectionSeed } from './internals/entity-projection-seed';
+import { markOwnerInvalidated } from './internals/owner-invalidation';
 
 // Angular's global dev-mode flag (defined by the Angular CLI; undefined in
 // plain test/node contexts, treated as dev there).
@@ -1268,6 +1269,7 @@ export function createEntitySignal<
   /** Mark the collection dirty. O(1) — see the `version` docs above. */
   function updateSignals(): void {
     version.update((v) => v + 1);
+    markOwnerInvalidated(ownerId);
   }
 
   function createEntityNode(subjectId: number, initialKey: K, entity: E): EntityNode<E> {
@@ -1770,11 +1772,15 @@ export function createEntitySignal<
       // Not an error when the id is absent: selection frequently outlives the
       // row (a delete arriving from a socket while a detail pane is open), and
       // `activeEntity` already resolves to undefined in that case.
+      const previous = activeIdSignal();
       activeIdSignal.set(id);
+      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
     },
 
     clearActiveId(): void {
+      const previous = activeIdSignal();
       activeIdSignal.set(undefined);
+      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
     },
 
     has(id: K): ReadableCell<boolean> {

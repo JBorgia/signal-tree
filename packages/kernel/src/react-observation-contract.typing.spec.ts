@@ -1,4 +1,8 @@
-import type { ReadableCell } from './adapter';
+import {
+	observeOwnerInvalidation,
+	type ReadableCell,
+} from './adapter';
+import * as kernelRoot from './index';
 import type { SignalTree } from './index';
 
 declare const cell: ReadableCell<number>;
@@ -11,10 +15,16 @@ cell();
 // @ts-expect-error neutral cells intentionally expose no subscription contract
 cell.subscribe(() => undefined);
 
-// REACT-REALIZATION-0 discriminator: no public owner-wide invalidation source
-// currently pairs tree reads with cleanup. If this starts compiling, R-A must
-// be reevaluated against the newly public observation fact.
 // @ts-expect-error SignalTree exposes no public change subscription
 tree.subscribe(() => undefined);
+
+const cleanup: () => void = observeOwnerInvalidation(tree, () => undefined);
+cleanup();
+
+// @ts-expect-error owner invalidation carries no value or metadata
+observeOwnerInvalidation(tree, (_value: unknown) => undefined);
+
+// @ts-expect-error owner invalidation is adapter SDK, not root application API
+kernelRoot.observeOwnerInvalidation(tree, () => undefined);
 
 export {};
