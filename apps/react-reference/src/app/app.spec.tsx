@@ -15,7 +15,7 @@ import {
 } from './reference-store';
 import {
   observerCountForTesting,
-  publicationCountForTesting,
+  invalidationCountForTesting,
   useSignalTree,
 } from './use-signal-tree.proof';
 
@@ -149,19 +149,19 @@ describe('greenfield React reference', () => {
 
   });
 
-  it('characterizes active selection as missing owner publication', async () => {
+  it('publishes active selection through the owner primitive', async () => {
     const store = makeStore();
     await settleKernel();
     const rendered = render(<App store={store} />);
-    const publicationsBefore = publicationCountForTesting(store);
+    const publicationsBefore = invalidationCountForTesting(store);
 
     fireEvent.click(screen.getByRole('button', { name: /Inspect transfer pump/ }));
     await act(async () => settleKernel());
 
     expect(store.$.jobs.activeId()).toBe('J-105');
-    expect(publicationCountForTesting(store)).toBe(publicationsBefore);
-    expect(screen.queryByText('Theo Martin')).toBeNull();
-    expect(screen.getByText('Mina Okafor')).toBeTruthy();
+    expect(invalidationCountForTesting(store)).toBe(publicationsBefore + 1);
+    expect(screen.getByText('Theo Martin')).toBeTruthy();
+    expect(screen.queryByText('Mina Okafor')).toBeNull();
 
     rendered.unmount();
   });
@@ -216,8 +216,8 @@ describe('greenfield React reference', () => {
 
     expect(screen.getByLabelText('first owner').textContent).toBe('active');
     expect(screen.getByLabelText('second owner').textContent).toBe('queued');
-    expect(publicationCountForTesting(first)).toBe(1);
-    expect(publicationCountForTesting(second)).toBe(0);
+    expect(invalidationCountForTesting(first)).toBe(1);
+    expect(invalidationCountForTesting(second)).toBe(0);
 
     await act(async () => {
       second.$.jobs.updateOne('J-105', { status: 'active' });
@@ -225,8 +225,8 @@ describe('greenfield React reference', () => {
     });
 
     expect(screen.getByLabelText('second owner').textContent).toBe('active');
-    expect(publicationCountForTesting(first)).toBe(1);
-    expect(publicationCountForTesting(second)).toBe(1);
+    expect(invalidationCountForTesting(first)).toBe(1);
+    expect(invalidationCountForTesting(second)).toBe(1);
 
   });
 

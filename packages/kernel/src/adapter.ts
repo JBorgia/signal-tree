@@ -34,6 +34,32 @@ export type {
 import type { WritableCell } from './lib/internals/cell-runtime';
 export { installCellRuntime } from './lib/internals/cell-runtime';
 
+import { acquireObservation } from './lib/internals/observation-substrate';
+import { observeOwnerInvalidationInternal } from './lib/internals/owner-invalidation';
+
+interface OwnerInvalidationTarget {
+  (): unknown;
+  readonly $: object;
+  readonly destroyed: () => boolean;
+}
+
+/**
+ * Observe coherent publication by one SignalTree owner.
+ *
+ * The callback is invalidation only: it carries no value, path, metadata, or
+ * framework concept. Read current truth from the owner after it fires.
+ */
+export function observeOwnerInvalidation(
+  owner: OwnerInvalidationTarget,
+  callback: () => void
+): () => void {
+  return observeOwnerInvalidationInternal(
+    owner,
+    callback,
+    () => acquireObservation(owner)
+  );
+}
+
 export type { DerivedRuntime } from './lib/internals/derived-runtime';
 export { installDerivedRuntime } from './lib/internals/derived-runtime';
 

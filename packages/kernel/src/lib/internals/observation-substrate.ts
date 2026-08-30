@@ -123,7 +123,8 @@ function claimLeaf(node: object): (() => void) | undefined {
       state.positionId = registry.allocate();
     }
     const positionIds = [state.positionId];
-    slot((before, after, intent) =>
+    slot((before, after, intent) => {
+      if (Object.is(before, after)) return;
       emitOwnedMutation(
         // ⚠️ `path` IS THE OWNER PATH HERE, DELIBERATELY. This site reports the
         // mutation AT the owning node's address, which is why it read
@@ -145,8 +146,8 @@ function claimLeaf(node: object): (() => void) | undefined {
         // carries no independent fact, which is why nothing downstream ever
         // read it. Deleted with `MutationEnvelope.kind` in 15.0.
         intent
-      )
-    );
+      );
+    });
   }
   state.claims++;
 

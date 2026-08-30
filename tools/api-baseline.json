@@ -1030,6 +1030,15 @@
         "internalDecl": true
       },
       {
+        "name": "observeOwnerInvalidation",
+        "subpath": "./adapter",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/adapter.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ReadableCell",
         "subpath": "./adapter",
         "kind": "type-only",

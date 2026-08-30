@@ -4,6 +4,7 @@ import {
   type RestorationClaimOwner,
 } from '../../lib/internals/subject-restoration-claims';
 import { getCellRuntime } from '../../lib/internals/cell-runtime';
+import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation';
 
 import {
   deepEqual,
@@ -384,15 +385,18 @@ class RestorationManager<T> {
   }
   private set currentIndex(value: number) {
     this.indexSignal.set(value);
+    markOwnerInvalidatedFrom(this.tree);
   }
   /** Call after any structural change to `this.history`. */
   private bumpRestorationHistory(): void {
     this.historyVersion.update((v) => v + 1);
+    markOwnerInvalidatedFrom(this.tree);
   }
 
   /** Call after any structural change to frontier-derived turn state. */
   private bumpFrontiers(): void {
     this.frontierVersion.update((v) => v + 1);
+    markOwnerInvalidatedFrom(this.tree);
   }
 
   private maxHistorySize: number;

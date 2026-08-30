@@ -14,6 +14,7 @@ import {
 import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-port';
 import { isTraversableNode } from '../../utils';
 import { visitTree } from '../visit-tree';
+import { markOwnerInvalidatedFrom } from '../owner-invalidation';
 
 import type { ReversalEffect, ReversalRefusal } from './causal-types';
 import { normalizeScopedValuePath } from './scoped-value-addressing';
@@ -911,6 +912,8 @@ function planHeterogeneousFrame(
           }
         );
       }
+
+      markOwnerInvalidatedFrom(tree as object);
     },
   };
 }

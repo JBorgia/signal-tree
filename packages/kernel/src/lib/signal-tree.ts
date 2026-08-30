@@ -86,6 +86,9 @@ import {
   type OrdinaryStateMaterializer,
 } from './internals/materialize-markers';
 import { installDormantObservation } from './internals/observation-substrate';
+import {
+  terminateOwnerInvalidation,
+} from './internals/owner-invalidation';
 import { defineRootTree } from './internals/root-source';
 import {
   definePositionRegistry,
@@ -546,6 +549,8 @@ function makeNodeAccessor<T>(
   if (registry) {
     definePositionRegistry(accessor as object, registry);
     defineOwnedOwnerId(accessor as object, registry.id);
+    definePositionRegistry(store as object, registry);
+    defineOwnedOwnerId(store as object, registry.id);
   }
 
   return accessor;
@@ -1842,6 +1847,7 @@ function create<T extends object>(
     value: function (): void {
       if (destroyedSig()) return; // Already destroyed
       destroyedSig.set(true);
+      terminateOwnerInvalidation(tree as object);
       // Run registered cleanup functions (enhancers, subscriptions, etc.)
       for (const fn of cleanupFns) {
         try {

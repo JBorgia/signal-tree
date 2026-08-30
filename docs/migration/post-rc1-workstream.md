@@ -84,7 +84,7 @@ Property:
 ```text
 R-A  Existing public kernel capabilities are sufficient.
 
-R-B  One neutral owner-publication observation fact is genuinely missing.
+R-B  One neutral owner invalidation fact is genuinely missing.
 
 R-C  Correct React support requires a larger mechanism.
 ```
@@ -104,12 +104,10 @@ compile-time inference. SSR is opened only by a real consumer requirement.
 RxJS, or React Native premise. Its local `useSignalTree` is a proof surface, not
 a proposed package API.
 
-Candidate A is falsified. With only public kernel capabilities, the app can read
-current values but cannot be notified after a write. The proof becomes reactive
-only by crossing three forbidden internal boundaries: observation activation,
-owner identity, and coherent flush notification.
+Candidate A was falsified. With the pre-exception public kernel capabilities,
+the app could read current values but could not be notified after a write.
 
-The app-local owner-publication proof passes:
+The app-local owner-invalidation proof passes:
 
 - scalar, nested, entity-map, and selected entity reads;
 - direct writes and bulk upserts;
@@ -119,26 +117,43 @@ The app-local owner-publication proof passes:
 - retained entity identity across removal and same-key successor creation;
 - same-address writes from two owners without cross-owner loss.
 
-One characterization is decisive: `setActiveId()` changes the canonical public
-read while the mounted React view and owner publication count remain unchanged.
-Therefore the semantic seam cannot be a public alias for `PathNotifier`; it must
-cover every owner change that can alter a public synchronous read.
+One pre-implementation characterization was decisive: `setActiveId()` changed
+the canonical public read while the mounted React view and invalidation count
+remained unchanged. Therefore the semantic seam could not be a public alias for
+`PathNotifier`; it had to cover every owner change that can alter a public
+synchronous read.
 
-Candidate B is established for the observation row only:
+Candidate B is established and implemented for the observation row only:
 
-> An adapter can subscribe to the fact that one owner has coherently published
-> new externally observable truth. Publication occurs after coherence, is
-> owner-qualified, covers all public read changes including active selection,
-> returns idempotent cleanup, and terminates with owner destruction.
+> An adapter can subscribe to invalidation of one owner's externally readable
+> truth. One or more coherent public changes produce at least one later
+> invalidation instructing the adapter to reread canonical state.
 
-The capability carries no value, path, causal metadata, selector, React type,
-or compatibility policy. The adapter continues to read canonical values
-synchronously. Selector-result caching is observational memoization, not a
-writable state authority, but changing-selector and abandoned-render controls
-remain required before a hook contract can freeze.
+`observeOwnerInvalidation(owner, callback)` now exposes that fact only from
+`@signal-tree/kernel/adapter`. Its callback carries no value, path, causal
+metadata, selector, React type, or compatibility policy. Demand activation is
+shared per owner, last cleanup returns observation to dormancy, destruction is
+terminal, and subscribing after destruction cannot reactivate it.
 
-No kernel implementation is authorized by this record alone. The smallest
-proposed seam is the capability above, not the current internal mechanism.
+The callback is invalidation, not an event. Multiple changes may coalesce;
+callback count has no mutation, transaction, publication, or causal meaning.
+The transaction and commit machinery remains coherence authority. The
+invalidation scheduler only marks an owner dirty and later asks adapters to
+reread canonical truth.
+
+The no-subscriber cost control used the existing production-substrate report at
+the pushed `72da5f2a` baseline and the implementation, three runs each. Median
+compiled-write deltas across 10 to 100,000 positions were `+1.4%`, `-2.6%`,
+`+14.0%`, `+16.3%`, and `+5.1%`. The existing harness records `+77%` to `+190%`
+sequential A/A variance. Existing EntityMap mutation rows ranged from `-48.0%`
+to `+37.5%`, with no consistent direction or scaling trend. No meaningful
+steady-state tax is established. An initial always-allocated registry measured
+worse and was replaced by a registry that does not exist until first demand.
+
+The React reference now consumes only this adapter primitive. It does not
+define or freeze a React hook. Selector-result caching is observational
+memoization, not a writable state authority, but changing-selector and
+abandoned-render controls remain required before a hook contract can freeze.
 
 The alternatives were tested separately:
 
@@ -155,10 +170,11 @@ The alternatives were tested separately:
   external-store contract in principle without copied state; unrelated
   publications cause snapshot rechecks, not necessarily renders.
 
-Pinned by `packages/kernel/src/react-observation-contract.typing.spec.ts`: a
-public neutral cell is readable, but neither it nor its owner exposes a public
-change subscription. `packages/kernel/src/lib/react-link-observation-discriminator.spec.ts`
-proves that `link()` cannot substitute for observation.
+Pinned by `packages/kernel/src/react-observation-contract.typing.spec.ts`: cells
+and tree roots still expose no subscription API; only the adapter SDK exposes
+owner invalidation. `packages/kernel/src/lib/owner-invalidation.spec.ts` freezes
+the semantic law, and `packages/kernel/src/lib/react-link-observation-discriminator.spec.ts`
+retains the negative proof that `link()` cannot substitute for observation.
 
 Any proposed adapter export must be framework-neutral, express a semantic fact
 already owned by the kernel, be required by a correct realization, and be
@@ -192,6 +208,60 @@ construction-bound ownership across cells, derived values, marker snapshots,
 scalar leaves, and tracking suppression. It is a larger architecture decision,
 not a React convenience and not authorized here. `@signal-tree/react` remains
 unfrozen until this row is adversarially closed.
+
+## CONSTRUCTION-BOUND-REALIZATION-0
+
+Property:
+
+> The realization used to materialize one SignalTree is determined at
+> construction and remains bound to that tree; realization selection is not
+> mutable process-global state.
+
+Pre-registered outcomes:
+
+```text
+CBR-A — expected
+
+signalTree construction can receive or bind one immutable realization bundle.
+kernel construction binds neutral realization.
+Angular construction binds Angular realization.
+React construction binds React realization.
+
+Multiple realization families coexist in one process. Existing trees cannot
+change realization because another package loads.
+
+-> adopt
+
+CBR-B
+
+A smaller construction-owned mechanism satisfies the same law without an
+explicit realization-bundle public concept.
+
+-> adopt the smaller mechanism
+
+CBR-C
+
+Correct construction ownership requires substantial new public framework
+machinery or duplicated state authority.
+
+-> stop and report
+```
+
+Do not assume public spelling. A package-owned factory bound to its realization
+is preferable to application configuration such as `{ runtime }`. Reassess the
+global installer family as one system; preserve no installer merely because it
+already exists.
+
+Current status:
+
+```text
+OWNER-INVALIDATION-0                IMPLEMENTED; LAW GREEN
+CONSTRUCTION-BOUND-REALIZATION-0    OPEN NEXT
+@signal-tree/react                  BLOCKED
+TruckTrax v2 migration              BLOCKED
+TruckTrax v3 migration              BLOCKED
+React Native                        BLOCKED
+```
 
 ## GREENFIELD-APPLICATION-PATTERNS-0
 

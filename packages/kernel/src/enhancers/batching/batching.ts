@@ -8,6 +8,7 @@ import type {
 } from '../../lib/types';
 import type { BatchingConfig, BatchingMethods } from './batching.types';
 import { ENHANCER_META } from '../../lib/types';
+import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation';
 
 type ChangeDetectionAwareTree = {
   __notifyChangeDetection?: () => void;
@@ -90,6 +91,7 @@ export function batching(
     const scheduleNotification = (): void => {
       if (notificationPending) return;
       notificationPending = true;
+      markOwnerInvalidatedFrom(tree);
 
       if (notificationDelayMs > 0) {
         notificationTimeoutId = setTimeout(
@@ -108,6 +110,7 @@ export function batching(
       if (!notificationPending) return;
 
       notificationPending = false;
+      markOwnerInvalidatedFrom(tree);
       if (notificationTimeoutId !== undefined) {
         clearTimeout(notificationTimeoutId);
         notificationTimeoutId = undefined;

@@ -26,6 +26,11 @@ layer. A new export belongs there only when it is framework-neutral, expresses
 a semantic fact already owned by the kernel, is required by a correct
 realization, and is neither application convenience nor compatibility machinery.
 
+Framework packages may realize SignalTree truth for their runtime. They must
+not create another state authority. Do not use mutable process-global framework
+installation when construction-bound ownership can express the long-term
+architecture, and never let a migration determine realization ownership.
+
 ## Do not write RFCs
 
 We make the change. `TODO.md` is where decided-but-not-done work lives; put it
