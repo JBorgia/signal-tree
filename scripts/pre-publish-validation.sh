@@ -140,11 +140,11 @@ release_provenance_ok() {
     return 0
 }
 
-# Release-managed manifests, EXACTLY the packages scripts/release.sh publishes
-# (its PACKAGES array). Deliberately excludes the private `packages/shared`
-# (bundled into core, never published) and any other package.json — the old
+# Release-managed manifests, EXACTLY the packages release-packages.sh publishes.
+# Deliberately excludes the private `packages/shared` (bundled, never published)
+# and any other package.json — the old
 # `packages/[^/]+/package.json` wildcard tolerated dirt in non-released manifests.
-RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(core|events|ng-forms)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
+RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(kernel|angular)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
 
 if [ -z "$(git status --porcelain)" ]; then
     print_success "Working directory is clean"
@@ -184,7 +184,7 @@ print_header "3. Type Checking"
 print_step "Running TypeScript compiler checks"
 # Type checking happens during build, so we'll verify TypeScript configs exist
 TYPECHECK_PASSED=true
-for package in core ng-forms; do
+for package in kernel angular; do
     TSCONFIG="./packages/$package/tsconfig.json"
     if [ ! -f "$TSCONFIG" ]; then
         print_error "Missing tsconfig.json for $package"
@@ -257,18 +257,18 @@ print_header "7. Building All Packages"
 print_step "Running production builds"
 print_info "Building all packages that are published by scripts/release.sh"
 
-# Build packages in dependency order (core first, then the rest)
+# Build packages in dependency order (private shared first, then public packages).
 if NX_DAEMON=false npx nx build kernel --configuration=production 2>&1 | tee /tmp/build-core.log; then
-    print_success "Core built successfully"
+    print_success "Kernel built successfully"
 else
-    print_error "Core build failed"
+    print_error "Kernel build failed"
     cat /tmp/build-core.log
     exit 1
 fi
 
-PUBLISHED_PACKAGES="shared,events,ng-forms"
-if NX_DAEMON=false npx nx run-many -t build --projects=$PUBLISHED_PACKAGES --configuration=production 2>&1 | tee /tmp/build.log; then
-    print_success "All published packages built successfully"
+REMAINING_BUILD_PACKAGES="angular"
+if NX_DAEMON=false npx nx run-many -t build --projects=$REMAINING_BUILD_PACKAGES --configuration=production 2>&1 | tee /tmp/build.log; then
+    print_success "All public packages built successfully"
 else
     print_error "Build failed"
     cat /tmp/build.log

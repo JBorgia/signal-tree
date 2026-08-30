@@ -41,8 +41,10 @@ if [ -f "CHANGELOG.md" ]; then
     fi
 fi
 
-# Check for package-specific READMEs
-PACKAGES=("core" "ng-forms")
+# Check the package-specific READMEs for the public release set.
+# shellcheck source=release-packages.sh
+source "scripts/release-packages.sh"
+PACKAGES=("${PUBLISHABLE_PACKAGES[@]}")
 
 for package in "${PACKAGES[@]}"; do
     README_PATH="./packages/$package/README.md"
@@ -69,7 +71,7 @@ fi
 
 # Check for bundle size documentation
 if [ -f "scripts/consolidated-bundle-analysis.js" ]; then
-    if ! grep -q "bundle size" README.md; then
+    if ! grep -qiE "bundle.*(size|gzip)" README.md; then
         echo -e "${YELLOW}⚠️  README.md may not document bundle sizes${NC}"
         ((WARNINGS++))
     fi

@@ -29,9 +29,12 @@ export function resolveSpecs(manifest, range) {
     const deps = manifest[field];
     if (!deps) continue;
     for (const name of Object.keys(deps)) {
-      if (!name.startsWith('@signaltree/')) continue;
+      if (!name.startsWith('@signal-tree/')) continue;
       const spec = deps[name];
-      if (spec === '*' || (typeof spec === 'string' && spec.startsWith('workspace:'))) {
+      if (
+        spec === '*' ||
+        (typeof spec === 'string' && spec.startsWith('workspace:'))
+      ) {
         deps[name] = range;
         changed++;
       }
@@ -45,7 +48,10 @@ export function findUnresolved(manifest) {
   const bad = [];
   for (const field of DEP_FIELDS) {
     for (const [name, spec] of Object.entries(manifest[field] || {})) {
-      if (spec === '*' || (typeof spec === 'string' && spec.startsWith('workspace:'))) {
+      if (
+        spec === '*' ||
+        (typeof spec === 'string' && spec.startsWith('workspace:'))
+      ) {
         bad.push(`${field}.${name} = ${spec}`);
       }
     }
@@ -64,7 +70,7 @@ function selfTest() {
     },
     {
       name: 'rewrites a bare *',
-      m: { dependencies: { '@signaltree/shared': '*' } },
+      m: { dependencies: { '@signal-tree/shared': '*' } },
       expectChanged: 1,
       expectLeft: 0,
     },

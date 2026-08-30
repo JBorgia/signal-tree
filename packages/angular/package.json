@@ -3,6 +3,8 @@
   "version": "15.0.0-rc.1",
   "description": "Angular realization for SignalTree.",
   "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./src/index.d.ts",
@@ -27,5 +29,8 @@
   "peerDependencies": {
     "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
     "tslib": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -10,11 +10,25 @@
 const fs = require('fs');
 const path = require('path');
 
-// Default: verify every package that scripts/release.sh publishes.
-// (Pre-publish validation now builds all of these.)
-const PUBLISHED_PACKAGES = [
-  'core',
-];
+// Discover every non-private source package. A stale hardcoded name must not
+// allow an old dist folder to satisfy this release check.
+const PUBLISHED_PACKAGES = fs
+  .readdirSync(path.join(__dirname, '..', 'packages'), { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name)
+  .filter((pkg) => {
+    const manifestPath = path.join(
+      __dirname,
+      '..',
+      'packages',
+      pkg,
+      'package.json'
+    );
+    return (
+      fs.existsSync(manifestPath) && require(manifestPath).private !== true
+    );
+  })
+  .sort();
 
 const PACKAGES = PUBLISHED_PACKAGES;
 

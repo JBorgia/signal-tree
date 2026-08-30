@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const workspaceRoot = path.resolve(import.meta.dirname, '..');
-const coreDistRoot = path.join(workspaceRoot, 'dist', 'packages', 'core');
-const runtimeRoot = path.join(coreDistRoot, 'dist');
+const kernelDistRoot = path.join(workspaceRoot, 'dist', 'packages', 'kernel');
+const runtimeRoot = path.join(kernelDistRoot, 'dist');
 const jsExtensions = new Set(['.js', '.mjs', '.cjs']);
 
 const forbiddenMarkers = [
@@ -57,14 +57,20 @@ function walkFiles(rootDir) {
 
 if (!fs.existsSync(runtimeRoot)) {
   fail(
-    `Missing built core runtime directory at ${path.relative(workspaceRoot, runtimeRoot)}. Build core before running this guard.`
+    `Missing built kernel runtime directory at ${path.relative(
+      workspaceRoot,
+      runtimeRoot
+    )}. Build kernel before running this guard.`
   );
 }
 
 const runtimeFiles = walkFiles(runtimeRoot);
 if (runtimeFiles.length === 0) {
   fail(
-    `No emitted JS artifacts found under ${path.relative(workspaceRoot, runtimeRoot)}.`
+    `No emitted JS artifacts found under ${path.relative(
+      workspaceRoot,
+      runtimeRoot
+    )}.`
   );
 }
 
@@ -85,7 +91,9 @@ for (const filePath of runtimeFiles) {
 }
 
 if (violations.length > 0) {
-  console.error('❌ Production core bundle still contains perf instrumentation markers:');
+  console.error(
+    '❌ Production kernel bundle still contains perf instrumentation markers:'
+  );
   for (const violation of violations) {
     console.error(`   ${violation.filePath}: ${violation.marker}`);
   }
@@ -93,5 +101,5 @@ if (violations.length > 0) {
 }
 
 console.log(
-  `✅ Verified ${runtimeFiles.length} built core runtime artifacts contain no live perf instrumentation markers.`
+  `✅ Verified ${runtimeFiles.length} built kernel runtime artifacts contain no live perf instrumentation markers.`
 );

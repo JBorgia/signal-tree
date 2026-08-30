@@ -54,12 +54,9 @@ else
     exit 1
 fi
 
-# Keep this list aligned with scripts/release.sh PACKAGES.
-PACKAGES=(
-    "core"
-    "events"
-    "ng-forms"
-)
+# shellcheck source=release-packages.sh
+source "scripts/release-packages.sh"
+PACKAGES=("${PUBLISHABLE_PACKAGES[@]}")
 
 VERSION=$(node -p "require('./package.json').version")
 print_step "CI publish of workspace version $VERSION"
@@ -157,7 +154,7 @@ FAILED_PACKAGES=()
 
 for package in "${PACKAGES[@]}"; do
     DIST_PATH="./dist/packages/$package"
-    print_step "Publishing @signaltree/$package@$VERSION..."
+    print_step "Publishing @signal-tree/$package@$VERSION..."
 
     PUBLISH_CMD=(npm publish --access public --tag "$NPM_TAG")
     if [ -n "$NPMRC_TEMP" ]; then
@@ -178,13 +175,13 @@ for package in "${PACKAGES[@]}"; do
     set -e
 
     if [ "$PUBLISH_EXIT_CODE" -eq 0 ]; then
-        print_success "Published @signaltree/$package@$VERSION (tag: $NPM_TAG)"
+        print_success "Published @signal-tree/$package@$VERSION (tag: $NPM_TAG)"
         PUBLISHED_PACKAGES+=("$package")
     elif grep -q "cannot publish over the previously published versions" "$LOG_FILE" 2>/dev/null; then
-        print_warning "@signaltree/$package@$VERSION already published, skipping"
+        print_warning "@signal-tree/$package@$VERSION already published, skipping"
         PUBLISHED_PACKAGES+=("$package")
     else
-        print_error "npm publish failed for @signaltree/$package (exit $PUBLISH_EXIT_CODE)"
+        print_error "npm publish failed for @signal-tree/$package (exit $PUBLISH_EXIT_CODE)"
         tail -10 "$LOG_FILE"
         FAILED_PACKAGES+=("$package")
         rm -f "$LOG_FILE"
@@ -208,5 +205,5 @@ else
     print_success "All ${#PUBLISHED_PACKAGES[@]} packages published at $VERSION"
 fi
 for package in "${PUBLISHED_PACKAGES[@]}"; do
-    echo -e "${GREEN}📦 @signaltree/$package@$VERSION${NC}"
+    echo -e "${GREEN}📦 @signal-tree/$package@$VERSION${NC}"
 done
