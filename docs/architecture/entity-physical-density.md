@@ -262,6 +262,72 @@ retention, and no meaningful point-operation regression. The E2 compact
 size tuning, slot reuse, an address Map, SubjectId reuse, generational identity,
 and production migration are not authorized by this result.
 
+> **Do not optimize SubjectId storage for dense allocation unless the
+> representation also wins under realistic sparse retirement and churn.**
+
+## E4 Result — Realization Retention Attributed
+
+Generator checkpoint: `6c8f9e44`.
+
+```bash
+pnpm nx build kernel
+node --expose-gc tools/bench-entity-realization-retention.mjs
+```
+
+E4 measures the production public EntityMap at 0/1k/10k/100k. Every arm runs in
+an isolated process, uses the shared heap-quiescence protocol, requires every
+released facade WeakRef to clear while its tree remains live, and rejects a
+linear fit below $R^2 = 0.995$.
+
+| Realization state | Marginal bytes/entity | 10k retained heap |
+| --- | ---: | ---: |
+| untouched | 403.2 B | 4.53 MB |
+| `byId()` then release without reading node | 759.5 B | 8.08 MB |
+| read node then release | 1,115.9 B | 11.57 MB |
+| read fields then release | 1,115.9 B | 11.57 MB |
+| hold nodes without reading | 2,981.0 B | 29.33 MB |
+| hold and read fields | 3,337.5 B | 32.83 MB |
+| release, mutate, reacquire, release | 1,106.8 B | 11.54 MB |
+
+The released-realization residual has two independently triggered strong
+owners:
+
+| Exclusive retained owner | Marginal increment |
+| --- | ---: |
+| `entitySignals` entry + entity value cell | 356.3 B/realized subject |
+| `subjectStateSignals` entry + activation cell | 356.4 B/read subject |
+| released facade/field-derived graph beyond the two cells | approximately 0 B |
+| held facade, field cells, closures, descriptors, metadata | 2,221.6 B/held subject |
+| held field reads beyond their activation cell | 0.1 B/held subject |
+| second acquisition cycle beyond first released field read | -9.1 B/subject, noise-level |
+
+`byId()` creates the entity cell and the facade/field graph, but does not execute
+the node. The facade graph is weakly cached and collects after external
+references disappear. Calling the node or a field executes `currentKey()` and
+interns the separate activation cell; that cell remains strongly indexed after
+the facade collects. Reading every field adds no further released slope.
+
+The weak facade cache therefore works as intended. Reacquisition does not add a
+positive slope and reads current canonical truth after intervening updates.
+Simultaneous consumers receive the same live facade. Held facades remain
+reactive across forced GC, and remove plus fresh same-key occupation preserves
+distinct SubjectIds and realization identities. Each returned tree owner is
+collectible after release.
+
+The existing forced-GC durability gate remains decisive: live consumers update
+after GC, held references survive remove/undo of the same subject, stale held
+references do not follow a fresh same-key occupant, and independent consumers
+all invalidate. E4 therefore does not authorize replacing either strong cell
+Map with naive WeakRefs; that experiment has previously produced stale UI while
+ordinary tests remained green.
+
+E4 is **closed attribution evidence**. It proves the approximately 356 B
+released-`byId` residual belongs to the durable entity cell, not retained facade
+objects. Actual node/field observation adds a second approximately 356 B durable
+activation cell. It does not prove either cost irreducible, but any ownership
+redesign must preserve the forced-GC laws above. No production retention change
+is authorized.
+
 ## E5 Featured-Memory Law
 
 E5 must test this density law explicitly:

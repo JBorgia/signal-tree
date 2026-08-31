@@ -252,6 +252,23 @@ meets E3's combined material-density, bounded-sparsity, and latency condition,
 so E2's compact SubjectId Map remains the best external candidate and no
 production migration is authorized.
 
+`ENTITY-REALIZATION-RETENTION-0 / E4` is **CLOSED ATTRIBUTION EVIDENCE /
+PRODUCTION CHANGE NOT AUTHORIZED** at `6c8f9e44`. Production public EntityMap
+slopes are 403.2 B/entity untouched, 759.5 after `byId()` and facade release,
+1,115.9 after an actual node/field read and release, 2,981.0 while nodes are
+held, and 3,337.5 while held fields are read. At 10k, untouched is 4.53 MB and
+released `byId()` is 8.08 MB. Exhaustive facade WeakRefs prove released facades
+collect while the tree remains live; inventory and matched arms attribute the
+remaining slopes to a 356.3 B entity cell and a separately triggered 356.4 B
+activation cell. Released facade/field graphs add approximately 0 B beyond
+those cells; the held facade graph costs 2,221.6 B/held subject. Reacquisition
+adds no positive slope and reads current truth. Every fit passes $R^2 >= 0.995$,
+each returned owner collects, lint is green, and independent review is clean.
+The forced-GC durability gate passes live invalidation, same-subject undo,
+fresh-key isolation, and multiple-consumer laws. Naive weak cells remain
+rejected; E4 attributes current ownership but authorizes no production retention
+change. E5 restoration/history capability density remains a separate row.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
