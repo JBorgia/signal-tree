@@ -38,9 +38,11 @@ export interface TreeScalarLeafRuntime {
   createLeaf<T>(
     initialValue: T,
     equal: (current: T, next: T) => boolean,
-    positionId?: PositionId
+    positionId?: PositionId,
+    snapshotOwner?: object
   ): WritableCell<T>;
   beginFrame(): ScalarSlotMutationFrame;
+  runInvalidationGroup(run: () => void): void;
   publishPrepared(result: ScalarSlotCommitResult): void;
   resolveScalarSlot(positionId: PositionId): SlotIndex | undefined;
   resolveScalarLeaf(positionId: PositionId): WritableCell<unknown> | undefined;

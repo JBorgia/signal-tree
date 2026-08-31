@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { signal } from '@angular/core';
 
+import { createReactiveTestRealization } from '../../reactive-test-realization';
 import { entityMap } from '../markers/entity-map';
 import { signalTree } from '../signal-tree';
 import { interceptLeafSignals } from './intercept-leaf-signals';
 import { withWriteContext } from '../write-context';
 import type { WriteMetadata } from '../types';
+
+const signal = createReactiveTestRealization().cell.createCell;
 
 interface Captured {
   path: string;

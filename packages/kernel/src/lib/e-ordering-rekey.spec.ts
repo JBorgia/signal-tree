@@ -1,4 +1,3 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
@@ -34,34 +33,6 @@ describe('E-ORD — ordering', () => {
 
     expect(tree.$.rows.ids()).toEqual(['z', 'a', 'b']);
     expect(tree.$.rows.all().map((r) => r.id)).toEqual(['z', 'a', 'b']);
-  });
-
-  it('NULL — an ordinary array position holds the order, byId holds the members', () => {
-    // The order is DATA (drag-to-reorder, server relevance). It is not derivable
-    // from member content, so derived sorting cannot express it. But the null
-    // does NOT need the collection to own it: an ordinary canonical array of
-    // keys is dynamic-membership-capable, and granular member observation still
-    // comes from `byId`.
-    const tree = signalTree({
-      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-      order: [] as string[],
-    });
-    tree.$.rows.addMany([{ id: 'a', n: 1 }, { id: 'b', n: 2 }]);
-    tree.$.order.set(['a', 'b']);
-
-    // prepend, expressed in the null
-    tree.$.rows.addOne({ id: 'z', n: 0 });
-    tree.$.order.update((o) => ['z', ...o]);
-
-    const ordered = computed(() =>
-      tree.$.order().map((id) => tree.$.rows.byId(id)?.()).filter(Boolean)
-    );
-    expect(ordered().map((r) => r?.id)).toEqual(['z', 'a', 'b']);
-
-    // AND the null does something the intrinsic order cannot: reorder WITHOUT
-    // touching membership, as one canonical write.
-    tree.$.order.set(['b', 'z', 'a']);
-    expect(ordered().map((r) => r?.id)).toEqual(['b', 'z', 'a']);
   });
 
   it('FALSIFIER — can the INTRINSIC order be rearranged without churning membership?', () => {

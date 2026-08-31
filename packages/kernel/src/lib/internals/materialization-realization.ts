@@ -1,6 +1,5 @@
 /**
- * The two operations marker materialization needs from a reactive framework —
- * and deliberately nothing more.
+ * The one operation marker materialization needs from a reactive framework.
  *
  * WHY THIS EXISTS. `materialize-markers.ts` owns framework-NEUTRAL concerns:
  * the processor registry, marker registration and its validation, the hydrate
@@ -21,60 +20,20 @@
  *                    walking into, or re-processing, a node the adapter owns.
  *                    It never creates anything.
  *
- *   memoizeSnapshot  "cache this marker's snapshot, and invalidate it when the
- *                    marker's own state changes."
- *                    Reference stability is the point: a snapshot recomputed on
- *                    every unrelated write churns the wrapper object and makes
- *                    an OnPush consumer bound to the whole marker re-render.
- *                    The adapter's dependency graph already knows exactly when
- *                    the marker is stale, so it — not this layer — owns the
- *                    invalidation. A caller that supplies no adapter still gets
- *                    correct values, just without the memo.
+ * Snapshot identity is kernel-owned read semantics. It is deliberately absent
+ * here: framework dependency tracking must never be required to make snapshot
+ * caching or structural sharing correct.
  *
- * INSTALLATION is once per process by whichever package supplies the reactive
- * runtime; `@signal-tree/kernel` does it for Angular. That is a framework-adapter
- * registration, not per-tree attribution — the distinction that matters after
- * GATE A, where ambient state was the defect generator precisely because it was
- * used to answer per-mutation ownership questions. This answers none.
+ * A framework package supplies this operation through its construction-bound
+ * `TreeRealization`; the neutral package uses the implementation below.
  */
 
 export interface MaterializationRealization {
   /** True when the adapter has already realized this node as a reactive node. */
   isReactiveNode(node: unknown): boolean;
-  /**
-   * Return a stable accessor for `compute`, invalidated by the adapter when the
-   * node's own reactive state changes. Keyed by `node`; calling twice for the
-   * same node must return the same accessor.
-   */
-  memoizeSnapshot<T>(node: object, compute: () => T): () => T;
 }
 
-let installed: MaterializationRealization | undefined;
-
-/**
- * Install the reactive adapter. Called once by the package that owns the
- * framework binding.
- */
-export function installMaterializationRealization(
-  realization: MaterializationRealization
-): void {
-  installed = realization;
-
-}
-
-/**
- * The installed adapter, or `undefined` when none is.
- *
- * Callers must degrade rather than throw: materialization stays correct without
- * an adapter, it merely loses reference stability and the "already realized"
- * shortcut. A neutral consumer with no framework installed is a supported
- * configuration, not an error.
- */
-export function getMaterializationRealization():
-  | MaterializationRealization
-  | undefined {
-  return installed;
-}
-
-/** Test seam. Never called by production code. */
+export const NEUTRAL_MATERIALIZATION_REALIZATION: MaterializationRealization = {
+  isReactiveNode: () => false,
+};
 

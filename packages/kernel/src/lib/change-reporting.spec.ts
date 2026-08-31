@@ -1,8 +1,14 @@
-import { computed, effect } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 
-import { signalTree } from '../index';
+import {
+  createReactiveTestRealization,
+  observeReactiveTestValue,
+} from '../reactive-test-realization';
+import { bindSignalTreeRealization } from './signal-tree';
+
+const signalTree = bindSignalTreeRealization(
+  createReactiveTestRealization()
+);
 
 /**
  * Change reporting: `updateAndReport()`.
@@ -87,59 +93,38 @@ describe('updateAndReport — reports only what landed', () => {
   // the deepEqual fix and the whole repo stayed green. The user-visible symptom
   // is REACTIVITY, so that is what these measure.
   it('a NaN rewrite notifies nobody', () => {
-    TestBed.runInInjectionContext(() => {
-      const tree = signalTree({ n: Number.NaN });
-      let runs = 0;
-      effect(() => {
-        tree.$.n();
-        runs++;
-      });
-      TestBed.flushEffects();
-      const base = runs;
+    const tree = signalTree({ n: Number.NaN });
+    let runs = 0;
+    observeReactiveTestValue(() => tree.$.n(), () => runs++);
+    const base = runs;
 
-      tree.updateAndReport({ n: Number.NaN });
-      TestBed.flushEffects();
+    tree.updateAndReport({ n: Number.NaN });
 
-      expect(runs).toBe(base);
-    });
+    expect(runs).toBe(base);
   });
 
   it('an Invalid Date rewrite notifies nobody', () => {
     // Same class as NaN and reached the same way — `new Date(blankField)`.
     // getTime() is NaN, so `===` called two Invalid Dates different.
-    TestBed.runInInjectionContext(() => {
-      const tree = signalTree({ d: new Date(Number.NaN) });
-      let runs = 0;
-      effect(() => {
-        tree.$.d();
-        runs++;
-      });
-      TestBed.flushEffects();
-      const base = runs;
+    const tree = signalTree({ d: new Date(Number.NaN) });
+    let runs = 0;
+    observeReactiveTestValue(() => tree.$.d(), () => runs++);
+    const base = runs;
 
-      const changed = tree.updateAndReport({ d: new Date(Number.NaN) });
-      TestBed.flushEffects();
+    const changed = tree.updateAndReport({ d: new Date(Number.NaN) });
 
-      expect(changed).toEqual([]);
-      expect(runs).toBe(base);
-    });
+    expect(changed).toEqual([]);
+    expect(runs).toBe(base);
   });
 
   it('a real Date change is still reported and notified', () => {
-    TestBed.runInInjectionContext(() => {
-      const tree = signalTree({ d: new Date(0) });
-      let runs = 0;
-      effect(() => {
-        tree.$.d();
-        runs++;
-      });
-      TestBed.flushEffects();
-      const base = runs;
+    const tree = signalTree({ d: new Date(0) });
+    let runs = 0;
+    observeReactiveTestValue(() => tree.$.d(), () => runs++);
+    const base = runs;
 
-      expect(tree.updateAndReport({ d: new Date(5) })).toEqual(['d']);
-      TestBed.flushEffects();
-      expect(runs).toBe(base + 1);
-    });
+    expect(tree.updateAndReport({ d: new Date(5) })).toEqual(['d']);
+    expect(runs).toBe(base + 1);
   });
 
   it('reports nested paths with dots', () => {
@@ -149,32 +134,22 @@ describe('updateAndReport — reports only what landed', () => {
   });
 
   it('agrees with the reactive system: every reported path notified', () => {
-    TestBed.runInInjectionContext(() => {
-      const tree = signalTree({ users: [{ id: 1 }], count: 0 });
-      let usersRuns = 0;
-      let countRuns = 0;
-      effect(() => {
-        tree.$.users();
-        usersRuns++;
-      });
-      effect(() => {
-        tree.$.count();
-        countRuns++;
-      });
-      TestBed.flushEffects();
-      const baseUsers = usersRuns;
-      const baseCount = countRuns;
+    const tree = signalTree({ users: [{ id: 1 }], count: 0 });
+    let usersRuns = 0;
+    let countRuns = 0;
+    observeReactiveTestValue(() => tree.$.users(), () => usersRuns++);
+    observeReactiveTestValue(() => tree.$.count(), () => countRuns++);
+    const baseUsers = usersRuns;
+    const baseCount = countRuns;
 
-      const changed = tree.updateAndReport({
-        users: [{ id: 1 }], // deep-equal, must not notify
-        count: 5, // real
-      });
-      TestBed.flushEffects();
-
-      expect(changed).toEqual(['count']);
-      expect(usersRuns).toBe(baseUsers); // not reported, not notified
-      expect(countRuns).toBe(baseCount + 1); // reported, notified
+    const changed = tree.updateAndReport({
+      users: [{ id: 1 }], // deep-equal, must not notify
+      count: 5, // real
     });
+
+    expect(changed).toEqual(['count']);
+    expect(usersRuns).toBe(baseUsers); // not reported, not notified
+    expect(countRuns).toBe(baseCount + 1); // reported, notified
   });
 });
 

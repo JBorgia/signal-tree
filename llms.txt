@@ -36,6 +36,20 @@ Never use process-global mutable framework installation merely to make a legacy
 integration work if construction-bound ownership can express the long-term
 architecture. A migration cannot determine realization ownership.
 
+## Framework Ownership Ratchet
+
+`@signal-tree/kernel` owns framework-independent SignalTree semantics.
+`@signal-tree/kernel/adapter` owns only neutral ports for semantic questions
+the kernel owns. Framework packages own their implementations, lifecycle,
+diagnostics, schedulers, rendering behavior, primitive identity rules, and
+quirks. Neutral naming does not establish neutral ownership.
+
+Every new realization contract must state its SignalTree semantic job, provide
+a neutral implementation, be implementable by a tiny framework-free fake, and
+name the kernel authority deciding when and why it runs. Reject contracts that
+exist only for one framework. If Angular and React disappeared, the contract
+must remain meaningful to SignalTree or another reactive runtime.
+
 ## Canonical Sources
 
 - `AGENTS.md` — contributor and consumer rules

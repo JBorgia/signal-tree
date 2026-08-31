@@ -31,6 +31,39 @@ not create another state authority. Do not use mutable process-global framework
 installation when construction-bound ownership can express the long-term
 architecture, and never let a migration determine realization ownership.
 
+## Framework ownership ratchet
+
+Place code by the question it answers, not by whether its names or types look
+framework-neutral:
+
+- `@signal-tree/kernel` owns behavior SignalTree requires regardless of
+  framework: state and identity, EntityMap, causal turns, links, restoration,
+  and owner invalidation semantics.
+- `@signal-tree/kernel/adapter` owns only neutral ports that multiple runtime
+  realizations can implement for a semantic requirement owned by the kernel.
+- A framework package owns anything that exists because of that framework's
+  API, lifecycle, diagnostics, scheduler, rendering model, identity rules, or
+  quirks. A neutral interface may live in the kernel; its framework
+  implementation must not.
+
+For every field proposed for `TreeRealization` or another kernel adapter
+contract:
+
+1. State the SignalTree semantic job it serves.
+2. Provide a neutral implementation.
+3. Prove that a tiny fake realization importing no framework can implement it.
+4. Identify the kernel authority that decides when and why it is invoked.
+5. Reject it when its purpose is only framework lifecycle, diagnostics,
+   rendering, hooks, dependency injection, context, scheduling, primitive
+   identity detection, or compatibility with one framework primitive.
+
+Ask two questions. If Angular and React disappeared, would the contract still
+describe a meaningful SignalTree requirement or useful port for another
+reactive runtime? Could Solid, Vue, Preact, Svelte, or a tiny fake implement it
+naturally without pretending to be Angular or React? A neutral name alone is
+not evidence of neutral ownership. Vanilla need not use every adapter port;
+the kernel must own the semantic question the port answers.
+
 ## Do not write RFCs
 
 We make the change. `TODO.md` is where decided-but-not-done work lives; put it

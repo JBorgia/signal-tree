@@ -1,9 +1,14 @@
-import { computed, type Signal } from '@angular/core';
 import { undoable } from '../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
+import { createReactiveTestRealization } from '../reactive-test-realization';
 import { restoration } from '../enhancers/restoration/restoration';
-import { signalTree } from '../index';
+import type { ReadableCell } from './internals/cell-runtime';
+import { bindSignalTreeRealization } from './signal-tree';
+
+const testRealization = createReactiveTestRealization();
+const signalTree = bindSignalTreeRealization(testRealization);
+const computed = testRealization.derived.createDerived;
 
 /**
  * THE CONFORMING-COLLECTION PROTOTYPE — the uncontaminated experiment.
@@ -54,11 +59,11 @@ function collectionOver(leaf: {
   set(v: Row[]): void;
   update(fn: (c: Row[]) => Row[]): void;
 }) {
-  const byIdCache = new Map<string, Signal<Row | undefined>>();
+  const byIdCache = new Map<string, ReadableCell<Row | undefined>>();
   return {
     all: (): Row[] => leaf(),
     ids: computed(() => leaf().map((r) => r.id)),
-    byId(id: string): Signal<Row | undefined> {
+    byId(id: string): ReadableCell<Row | undefined> {
       let s = byIdCache.get(id);
       if (!s) {
         s = computed(() => leaf().find((r) => r.id === id));

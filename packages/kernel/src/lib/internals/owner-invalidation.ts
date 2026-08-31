@@ -3,6 +3,7 @@ import {
   hasOpenCommitScope,
   onCommitScopesSettled,
 } from './commit-consequence';
+import { installOwnerInvalidationDispatch } from './owner-invalidation-port';
 
 interface OwnerInvalidationTarget {
   (): unknown;
@@ -153,3 +154,9 @@ export function ownerInvalidationStateForTesting(owner: object): {
     pending: state?.pending ?? false,
   };
 }
+
+installOwnerInvalidationDispatch({
+  mark: markOwnerInvalidated,
+  markFrom: markOwnerInvalidatedFrom,
+  terminate: terminateOwnerInvalidation,
+});

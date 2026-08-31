@@ -1,9 +1,11 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
+import { createReactiveTestRealization } from '../reactive-test-realization';
 import { link } from './link';
 import { signalTree } from './signal-tree';
 import { withWriteContext } from './write-context';
+
+const computed = createReactiveTestRealization().derived.createDerived;
 
 const flush = async () => {
   for (let index = 0; index < 8; index++) await Promise.resolve();

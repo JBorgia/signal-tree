@@ -19,45 +19,10 @@
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-
-const DEP_FIELDS = ['dependencies', 'peerDependencies', 'optionalDependencies'];
-
-/** Pure core, so the self-test can drive it without touching disk. */
-export function resolveSpecs(manifest, version) {
-  let changed = 0;
-  for (const field of DEP_FIELDS) {
-    const deps = manifest[field];
-    if (!deps) continue;
-    for (const name of Object.keys(deps)) {
-      if (!name.startsWith('@signal-tree/')) continue;
-      const spec = deps[name];
-      if (
-        spec === '*' ||
-        (typeof spec === 'string' && spec.startsWith('workspace:'))
-      ) {
-        deps[name] = field === 'peerDependencies' ? `^${version}` : version;
-        changed++;
-      }
-    }
-  }
-  return changed;
-}
-
-/** Any `workspace:`/`*` spec still present in a shippable field. */
-export function findUnresolved(manifest) {
-  const bad = [];
-  for (const field of DEP_FIELDS) {
-    for (const [name, spec] of Object.entries(manifest[field] || {})) {
-      if (
-        spec === '*' ||
-        (typeof spec === 'string' && spec.startsWith('workspace:'))
-      ) {
-        bad.push(`${field}.${name} = ${spec}`);
-      }
-    }
-  }
-  return bad;
-}
+import {
+  findUnresolvedWorkspaceSpecs,
+  resolveWorkspaceSpecs,
+} from '../tools/build/workspace-specs.mjs';
 
 function selfTest() {
   console.log('🧪 resolve-workspace-specs --self-test\n');
@@ -98,8 +63,8 @@ function selfTest() {
 
   let ok = true;
   for (const c of cases) {
-    const changed = c.skipRewrite ? 0 : resolveSpecs(c.m, '1.2.3');
-    const left = findUnresolved(c.m).length;
+    const changed = c.skipRewrite ? 0 : resolveWorkspaceSpecs(c.m, '1.2.3');
+    const left = findUnresolvedWorkspaceSpecs(c.m).length;
     const resolvedSpec = Object.values(
       c.m.dependencies ?? c.m.peerDependencies ?? {}
     )[0];
@@ -134,12 +99,12 @@ for (const pkg of packages) {
     continue;
   }
   const manifest = JSON.parse(readFileSync(path, 'utf8'));
-  const changed = resolveSpecs(manifest, version);
+  const changed = resolveWorkspaceSpecs(manifest, version);
   if (changed) {
     writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
     totalChanged += changed;
   }
-  const left = findUnresolved(manifest);
+  const left = findUnresolvedWorkspaceSpecs(manifest);
   if (left.length) failures.push(`${pkg}: ${left.join(', ')}`);
   console.log(
     `  ${pkg.padEnd(12)} ${changed} internal spec(s) resolved for ${version}${

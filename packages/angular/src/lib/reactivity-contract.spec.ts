@@ -1,7 +1,6 @@
 import { computed } from '@angular/core';
 
-import { entityMap } from '../index';
-import { signalTree } from './signal-tree';
+import { entityMap, signalTree } from '../index';
 
 /**
  * SIGNALTREE REACTIVITY CONTRACT
@@ -32,9 +31,87 @@ function track<T>(read: () => T) {
   return { runs: () => runs, read: () => c() };
 }
 
-type AnyRows = any;
+type AnyRows = {
+  addMany(rows: Array<Record<string, unknown>>): void;
+  updateOne(id: number, changes: Record<string, unknown>): void;
+  byId(id: number): { v(): number } | undefined;
+  all(): unknown[];
+  where(predicate: (row: { active: boolean }) => boolean): () => unknown[];
+  active(): unknown[];
+};
 
 describe('SignalTree reactivity contract', () => {
+  describe('memoization correctness', () => {
+    it('skips recompute when unrelated tree leaves change', () => {
+      const tree = signalTree(
+        { a: 1, b: 2, unrelated: 0 },
+        { capabilities: ['causal-runtime'] }
+      );
+      let computeCount = 0;
+      const sum = computed(() => {
+        computeCount += 1;
+        return tree.$.a() + tree.$.b();
+      });
+
+      expect(sum()).toBe(3);
+      expect(computeCount).toBe(1);
+
+      tree.$.unrelated.set(99);
+      expect(sum()).toBe(3);
+      expect(computeCount).toBe(1);
+
+      tree.$.a.set(10);
+      expect(sum()).toBe(12);
+      expect(computeCount).toBe(2);
+
+      tree.destroy();
+    });
+
+    it('treats same-value writes as no-op', () => {
+      const tree = signalTree({ x: 5 }, { capabilities: ['causal-runtime'] });
+      let computeCount = 0;
+      const doubled = computed(() => {
+        computeCount += 1;
+        return tree.$.x() * 2;
+      });
+
+      expect(doubled()).toBe(10);
+      expect(computeCount).toBe(1);
+      expect(doubled()).toBe(10);
+      expect(computeCount).toBe(1);
+
+      tree.$.x.set(5);
+      expect(doubled()).toBe(10);
+      expect(computeCount).toBe(1);
+
+      tree.$.x.set(7);
+      expect(doubled()).toBe(14);
+      expect(computeCount).toBe(2);
+
+      tree.destroy();
+    });
+  });
+
+  it('keeps a materialized tree snapshot reactive inside a computed', () => {
+    const tree = signalTree(
+      { a: { x: 1 }, b: { y: 10 } },
+      { capabilities: ['causal-runtime'] }
+    );
+    let runs = 0;
+    const total = computed(() => {
+      runs++;
+      const snapshot = tree();
+      return snapshot.a.x + snapshot.b.y;
+    });
+
+    expect(total()).toBe(11);
+    expect(runs).toBe(1);
+
+    tree.$.a.x.set(5);
+    expect(total()).toBe(15);
+    expect(runs).toBe(2);
+  });
+
   describe('BODY-GRANULAR — an unrelated update must not recompute', () => {
     it('nested leaf: a sibling leaf update does not recompute the reader', () => {
       const tree = signalTree({ a: { v: 0 }, b: { v: 0 } });
@@ -79,7 +156,7 @@ describe('SignalTree reactivity contract', () => {
       const tree = signalTree({
         rows: entityMap<{ id: number; v: number }, number>(),
       });
-      const rows = tree.$.rows as AnyRows;
+      const rows = tree.$.rows as unknown as AnyRows;
       rows.addMany([
         { id: 1, v: 0 },
         { id: 2, v: 0 },
@@ -98,7 +175,7 @@ describe('SignalTree reactivity contract', () => {
       const tree = signalTree({
         rows: entityMap<{ id: number; v: number }, number>(),
       });
-      const rows = tree.$.rows as AnyRows;
+      const rows = tree.$.rows as unknown as AnyRows;
       rows.addMany([
         { id: 1, v: 0 },
         { id: 2, v: 0 },
@@ -114,7 +191,7 @@ describe('SignalTree reactivity contract', () => {
       const tree = signalTree({
         rows: entityMap<{ id: number; active: boolean }, number>(),
       });
-      const rows = tree.$.rows as AnyRows;
+      const rows = tree.$.rows as unknown as AnyRows;
       rows.addMany([
         { id: 1, active: true },
         { id: 2, active: false },

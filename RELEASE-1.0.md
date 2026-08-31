@@ -34,10 +34,15 @@ expected failures; Angular 24 passed; typecheck, lint, preserve-modules builds,
 API/spec baselines, bounded no-subscriber production-substrate comparison, and
 the release ladder are green at 66/66 with zero known-red.
 
-`CONSTRUCTION-BOUND-REALIZATION-0` is the next open architecture row. React,
-React Native, and TruckTrax v2/v3 migration implementation remain blocked until
-realization ownership is construction-bound rather than mutable process-global
-state.
+`CONSTRUCTION-BOUND-REALIZATION-0` is **CLOSED GREEN**. Kernel and framework
+factories bind immutable realization bundles at construction; neutral and
+Angular trees coexist in N→A→N→A order with later lazy allocations; mutable
+process-global realization installers are deleted. The kernel test target is
+framework-free, and `ScalarLeafRealization.runInvalidationGroup()` supplies the
+narrow mechanism required to prevent one atomic SignalTree operation from
+exposing partial state through synchronous realizations. Kernel, Angular,
+typecheck, lint, builds, package coexistence, independent review, and the
+release ladder pass at 66/66 with zero known-red.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public

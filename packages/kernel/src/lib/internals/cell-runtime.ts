@@ -73,38 +73,5 @@ function createPlainCell<T>(initial: T, equal?: (a: T, b: T) => boolean): Writab
   return cell;
 }
 
-/** The kernel's default carrier factory. Replaced by whatever a realization installs. */
-const PLAIN_RUNTIME: CellRuntime = { createCell: createPlainCell };
-
-let installed: CellRuntime | undefined;
-
-/** Install the realization's carrier factory. Once per process, by the adapter. */
-export function installCellRuntime(next: CellRuntime): void {
-  // Registration happens HERE, at the one choke point every cell passes
-  // through, so an adapter cannot forget it and cell identity never depends on
-  // which runtime is installed.
-  // REALIZATION CREATES AN OBJECT. SEMANTIC ADOPTION GIVES IT STATE-CELL
-  // IDENTITY. This runtime also mints membership revisions, history counters
-  // and diagnostic carriers — none of which are tree state cells — so identity
-  // is granted by the authority that installs a cell AS A TREE LEAF, not here.
-  installed = next;
-}
-
-/**
- * The installed carrier factory, or `undefined`.
- *
- * ⚠️ CALLERS MUST NOT DEGRADE TO "NO CELL". Leaf allocation is the kernel's own
- * canonical state, and `signal-tree.ts` line 941 already proved what happens
- * when the kernel asks an optional adapter about its own state: 151 tests failed
- * because every merge write silently did nothing.
- *
- *     THE KERNEL MUST NOT ASK AN OPTIONAL ADAPTER WHETHER ITS OWN STATE EXISTS.
- *
- * So this NEVER returns undefined: with no realization installed the kernel
- * falls back to its own plain carrier and a tree still builds, reads and writes.
- * What a plain carrier does not provide is reactivity — that is what installing
- * a realization buys.
- */
-export function getCellRuntime(): CellRuntime {
-  return installed ?? PLAIN_RUNTIME;
-}
+/** The kernel's default carrier factory. */
+export const NEUTRAL_CELL_RUNTIME: CellRuntime = { createCell: createPlainCell };

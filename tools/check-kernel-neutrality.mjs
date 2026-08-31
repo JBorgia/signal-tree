@@ -27,10 +27,12 @@
  *   node tools/check-kernel-neutrality.mjs
  *   node tools/check-kernel-neutrality.mjs --self-test
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 
 const SRC = resolve('packages/kernel/src');
+const DIST = resolve('dist/packages/kernel');
+const FRAMEWORK_IMPORT = /(?:from\s*|import\s*\(\s*)['"](@angular\/[^'"]+|react(?:\/[^'"]*)?)['"]/g;
 
 /**
  * Modules declared framework-neutral. Adding a root here is a CLAIM that its
@@ -72,6 +74,43 @@ function closure(entry) {
 
 const tainted = (file) => /@angular\//.test(readFileSync(file, 'utf8'));
 
+function filesUnder(root) {
+  if (!existsSync(root)) return [];
+  const files = [];
+  const visit = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) visit(path);
+      else files.push(path);
+    }
+  };
+  visit(root);
+  return files;
+}
+
+function frameworkImports(text) {
+  return [...text.matchAll(FRAMEWORK_IMPORT)].map((match) => match[1]);
+}
+
+function productionFrameworkViolations() {
+  const source = filesUnder(SRC).filter(
+    (file) =>
+      file.endsWith('.ts') &&
+      !file.endsWith('.spec.ts') &&
+      !file.endsWith('.typing.spec.ts') &&
+      !file.endsWith('/test-setup.ts')
+  );
+  const built = filesUnder(DIST).filter(
+    (file) => file.endsWith('.js') || file.endsWith('.d.ts')
+  );
+  return [...source, ...built].flatMap((file) =>
+    frameworkImports(readFileSync(file, 'utf8')).map((specifier) => ({
+      file: relative(resolve('.'), file),
+      specifier,
+    }))
+  );
+}
+
 function violations(roots) {
   const out = [];
   for (const root of roots) {
@@ -88,35 +127,35 @@ function violations(roots) {
 }
 
 if (process.argv.includes('--self-test')) {
-  // ⚠️ THE GATE'S OWN POSITIVE CONTROL. "Found nothing" is indistinguishable
-  // from "cannot find anything" — this repository has been burned by exactly
-  // that twice. So the detector is pointed at a root KNOWN to be tainted: the
-  // Angular scalar runtime, which imports `linkedSignal`/`signal` directly and
-  // is the deliberate peer of the neutral kernel.
-  const control = violations(['lib/internals/tree-scalar-slot-angular-runtime.ts']);
-  if (control.length === 0) {
+  const angular = frameworkImports("import type { Signal } from '@angular/core';");
+  const react = frameworkImports("const x = import('react/jsx-runtime');");
+  const neutral = frameworkImports("import { signalTree } from './signal-tree';");
+  if (angular.length !== 1 || react.length !== 1 || neutral.length !== 0) {
     console.error(
-      '✗ SELF-TEST FAILED: the closure walker found NO Angular taint in ' +
-        'tree-scalar-slot-angular-runtime.ts, which imports @angular/core on line 1. ' +
-        'The detector is broken, not the kernel.'
+      '✗ SELF-TEST FAILED: framework import detection did not distinguish ' +
+        'Angular, React, and neutral imports.'
     );
     process.exit(1);
   }
-  console.log(
-    `✓ self-test: walker found ${control.length} tainted closure member(s) in the known-positive Angular runtime.`
-  );
+  console.log('✓ self-test: Angular and React imports detected; neutral import accepted.');
   process.exit(0);
 }
 
 const found = violations(NEUTRAL_ROOTS);
-if (found.length > 0) {
+const frameworkFound = productionFrameworkViolations();
+if (found.length > 0 || frameworkFound.length > 0) {
   console.error('✗ KERNEL NEUTRALITY VIOLATED — a declared-neutral root reaches @angular/* through its type closure:\n');
   for (const v of found) {
     if (v.missing) console.error(`  ${v.root}\n      MISSING — declared neutral but does not exist`);
     else console.error(`  ${v.root}\n      reaches  ${v.member}`);
   }
+  for (const violation of frameworkFound) {
+    console.error(`  ${violation.file}\n      imports  ${violation.specifier}`);
+  }
   console.error('\n  Usually the fix is a one-line redirect to the module that DEFINES the symbol,');
   console.error('  not the barrel/hub that re-exports it. See the header of this file.');
   process.exit(1);
 }
-console.log(`✓ ${NEUTRAL_ROOTS.length} neutral kernel roots — type closures are Angular-free.`);
+console.log(
+  `✓ ${NEUTRAL_ROOTS.length} neutral roots plus all kernel production source/build artifacts — no Angular or React imports.`
+);

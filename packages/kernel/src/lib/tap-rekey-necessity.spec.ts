@@ -1,7 +1,8 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { entityMap, signalTree } from '../index';
+
+const computed = <T>(read: () => T): (() => T) => read;
 
 /**
  * TWO CORRECTED FALSIFIERS. Both earlier verdicts proved a DIFFERENCE and were

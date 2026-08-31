@@ -1,4 +1,3 @@
-import { computed } from '@angular/core';
 import { undoable } from '../../lib/undoable';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -3773,9 +3772,8 @@ describe('restoration enhancer', () => {
         enhancers: [restoration()],
         derived: ($) => ({
           profile: {
-            fullName: computed(
-              () => `${$.profile.firstName()} ${$.profile.lastName()}`
-            ),
+            fullName: () =>
+              `${$.profile.firstName()} ${$.profile.lastName()}`,
           },
         }),
       }
@@ -3841,9 +3839,8 @@ describe('restoration enhancer', () => {
         enhancers: [restoration()],
         derived: ($) => ({
           profile: {
-            fullName: computed(
-              () => `${$.profile.firstName()} ${$.profile.lastName()}`
-            ),
+            fullName: () =>
+              `${$.profile.firstName()} ${$.profile.lastName()}`,
           },
         }),
       }

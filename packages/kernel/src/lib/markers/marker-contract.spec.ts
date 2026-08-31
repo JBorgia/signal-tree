@@ -1,8 +1,10 @@
-import { signal } from '@angular/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createReactiveTestRealization } from '../../reactive-test-realization';
 import { registerMarkerProcessor } from '../internals/materialize-markers';
 import { signalTree } from '../signal-tree';
+
+const signal = createReactiveTestRealization().cell.createCell;
 
 /**
  * Every marker must say what of it is state.

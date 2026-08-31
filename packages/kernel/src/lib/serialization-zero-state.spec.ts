@@ -1,7 +1,12 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
-import { entityMap, signalTree } from '../index';
+import { createReactiveTestRealization } from '../reactive-test-realization';
+import { entityMap } from '../index';
+import { bindSignalTreeRealization } from './signal-tree';
+
+const testRealization = createReactiveTestRealization();
+const signalTree = bindSignalTreeRealization(testRealization);
+const computed = testRealization.derived.createDerived;
 
 /**
  * DERIVATION — SERIALIZATION, FROM ZERO.

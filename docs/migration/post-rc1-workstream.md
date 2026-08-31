@@ -194,8 +194,9 @@ reference app pin two separate neutral-runtime facts:
 
 1. repeated `tree()` reads allocate new snapshots without an installed
    realization, so the whole owner cannot directly be React's cached snapshot;
-2. a callable returned from `config.derived` is dropped with ST2007 because
-   derived admission recognizes only a globally installed framework runtime.
+2. before CBR, a callable returned from `config.derived` was dropped with
+   ST2007 because derived admission recognized only a globally installed
+   framework runtime. Construction-bound recipe realization closes this gap.
 
 The first can plausibly remain adapter-owned selector memoization and does not
 yet justify a kernel change. The second blocks the required greenfield
@@ -257,15 +258,300 @@ is preferable to application configuration such as `{ runtime }`. Reassess the
 global installer family as one system; preserve no installer merely because it
 already exists.
 
+### FRAMEWORK-OWNERSHIP-RATCHET
+
+During `CONSTRUCTION-BOUND-REALIZATION-0`, audit every `TreeRealization` member
+and every realization-dependent kernel branch by the semantic question it
+answers. Retain a kernel adapter contract only when all of these hold:
+
+1. Its SignalTree semantic job is stated.
+2. A neutral implementation exists.
+3. A tiny realization importing neither Angular nor React implements it.
+4. A kernel authority decides when and why it is invoked.
+5. Its purpose is not framework lifecycle, diagnostics, rendering, hooks,
+   dependency injection, context, scheduling behavior, framework-specific
+   identity detection, or compatibility with one framework primitive.
+
+If Angular and React disappeared, a retained contract must still describe a
+meaningful SignalTree requirement or a useful port for another reactive
+runtime. Solid, Vue, Preact, Svelte, or a tiny fake must be able to implement it
+naturally. Vanilla need not benefit from every port; the kernel must own the
+question being asked. A neutral interface may live in the kernel because
+adapters implement it. Framework implementations and framework-only questions
+must live in their framework packages.
+
+The current candidates remain admitted only while their evidence stays green:
+
+| Port                         | SignalTree semantic job                                               | Kernel invocation authority                        |
+| ---------------------------- | --------------------------------------------------------------------- | -------------------------------------------------- |
+| `CellRuntime`                | create readable/writable carriers for materialized state leaves       | tree construction and marker materialization       |
+| `DerivedRuntime`             | realize readonly computations declared by SignalTree                  | derived merge and EntityMap computed allocation    |
+| `TrackingSuppression`        | prevent kernel bookkeeping reads from becoming user dependencies      | owned mutation and snapshot bookkeeping            |
+| `MaterializationRealization` | recognize caller-supplied carriers owned by this realization          | construction and derived merge admission           |
+| `ScalarLeafRealization`      | expose scalar truth and deliver one commit's invalidations atomically | scalar slot creation and atomic commit publication |
+
+Angular `computed`, `isSignal`, `untracked`, duplicate-package diagnostics, and
+Angular primitive identity belong in `@signal-tree/angular`. React hooks,
+`useSyncExternalStore`, StrictMode integration, and render scheduling belong in
+`@signal-tree/react`. No new `TreeRealization` member is admitted merely because
+one framework requests it.
+
+### ATOMIC-OBSERVATION-DELIVERY-0 — AOD-A / CLOSED GREEN
+
+One atomic SignalTree operation cannot become observable as a partial state.
+The kernel owns the operation boundary, changed-slot selection, and publication
+order. `ScalarLeafRealization.runInvalidationGroup()` supplies only the runtime
+mechanism that prevents dependent consumers from observing between the grouped
+invalidations.
+
+The neutral realization executes the group directly because it has no reactive
+observers. The synchronous fake defers invalidated producers, stabilizes them
+before terminal observers, and discards queued delivery when grouped work
+throws. Angular executes directly because its native effect scheduling already
+defers external observation until the operation returns.
+
+This capability was earned by removing Angular from the kernel test target. A
+two-slot fake-realization frame observed `A2|B` before `A2|B2`; the Angular
+scheduler had concealed the portability defect. Permanent controls now reject
+either partial ordering while allowing any callback cardinality. The same law
+is pinned for scalar frames, scalar plus rekey, restore plus subject scalar,
+root scalar plus structural mutation, membership reactivation, stale frames,
+and failed planning/application.
+
+### TEST-OWNERSHIP-REATTRIBUTION-0
+
+Authorized while CBR remains open. The first full neutral-default kernel run
+produced 31 failing files and 87 failing assertions. Every assertion was read
+and classified before modification:
+
+```text
+KERNEL-LAW        9 files / 29 tests
+ANGULAR-LAW      19 files (16 exclusive, 3 mixed) / 45 tests
+OBSOLETE          0 files / 0 tests
+CBR-FALSIFIER     6 files (3 exclusive, 3 mixed) / 13 tests
+SETUP/IMPORT      0 files / 0 tests
+TOTAL            31 unique files / 87 tests
+```
+
+Mixed files are `e-granularity.spec.ts` (1 CBR falsifier, 1 Angular),
+`entity-granular-reactivity.spec.ts` (1 CBR falsifier, 1 Angular), and
+`incremental-materialization.spec.ts` (5 CBR falsifiers, 1 Angular).
+
+The assertion ledger, frozen before reattribution:
+
+```text
+KERNEL-LAW
+bind-branch-0-acquisition-turn.spec.ts                 1  mutation silence of derived allocation
+declaration-extensibility-e0.spec.ts                   3  custom value preservation and snapshot
+declaration-extensibility-e5-fork.spec.ts              2  noncanonical exclusion and derived composition
+derived-not-state.spec.ts                              2  current derived truth and writable derived state
+production-scalar-substrate.benchmark.spec.ts          1  constant logical scalar work
+unwrap-symbol-keys.spec.ts                             4  symbol traversal and derived omission
+write-only-marker.spec.ts                              1  realized marker diagnostic silence
+enhancers/restoration/restoration.spec.ts              2  derived truth after undo
+internals/derived.spec.ts                             13  nested/composed/EntityMap current derived truth
+
+ANGULAR-LAW
+benchmarks.spec.ts                                     2  Angular computed dependency memoization
+c6-neutrality-invariants.spec.ts                       3  native Angular identity and graph participation
+callable-contract.spec.ts                              1  Angular signal identity
+demarcation-0.spec.ts                                  1  Angular effect observes speculative state
+dynamic-member-reactivation.spec.ts                    2  Angular dependency invalidation/cardinality
+e-active-selection.spec.ts                             1  Angular computed granularity
+e-granularity.spec.ts                                  1  Angular array dependency granularity
+e-hooks.spec.ts                                        1  Angular computed collection observation
+e-ordering-rekey.spec.ts                               1  Angular computed order observation
+entity-active-prepend-changeid.spec.ts                 1  Angular active-row recomputation
+entity-granular-reactivity.spec.ts                     1  Angular absent-entity dependency tracking
+entity-signal-angular-realization.spec.ts              3  native Angular entity carrier identity
+incremental-materialization.spec.ts                    1  Angular computed snapshot observation
+reactivity-contract.spec.ts                            4  Angular recomputation cardinality
+scalar-realization-s1.spec.ts                          2  native Angular scalar identity and graph
+whole-value-membership.spec.ts                         9  Angular membership dependency publication
+enhancers/restoration/restoration-reactivity.spec.ts   6  Angular restoration dependency tracking
+internals/tree-physical-substrate.spec.ts              2  Angular effect publication coherence
+internals/causal-runtime/tree-realization-adapter.spec.ts 3 Angular effect publication coherence
+
+CBR-FALSIFIER
+e-granularity.spec.ts                                  1  unchanged-record structural identity
+entity-granular-reactivity.spec.ts                     1  stable collection read identity
+incremental-materialization.spec.ts                    5  snapshot sharing, no-op identity, and idle O(1)
+marker-snapshot-memo.spec.ts                           4  stable independent marker wrappers
+snapshot-builder.spec.ts                               1  unchanged subtree identity
+enhancers/restoration/snapshot-sharing.spec.ts         1  history subtree sharing
+```
+
+`KERNEL-LAW` preserves the framework-independent claim using neutral recipes
+or a tiny fake realization. `ANGULAR-LAW` preserves the assertion under
+`@signal-tree/angular`; moving a file is not itself evidence that every
+assertion in it is Angular-owned. A correctly owned assertion that remains red
+is a `CBR-FALSIFIER` and stops this row. Ambient realization is not an
+admissible repair.
+
+Classification correction: a first pass proposed proving the 13 identity
+assertions with a memoizing fake. That would only prove adapter capability while
+the neutral package retained pathological full reconstruction. Focused neutral
+controls failed 5/5 in `incremental-materialization.spec.ts`, including
+idle-read cost and wide-grid sharing. Those failures established a kernel
+performance and representation defect, not a causal theorem or public
+entitlement to POJO identity. The assertions remain implementation/performance
+controls unless a separate product contract earns stronger status.
+
+Final ownership disposition:
+
+- kernel-private publication and held-consumer laws use a framework-free fake
+  realization;
+- Angular computed/effect, native carrier identity, tracking suppression, and
+  TransferState laws live under `packages/angular`;
+- comparative raw-Angular timing lives in the Angular test target;
+- kernel typing tests use only `ReadableCell` and `WritableCell`; Angular
+  carrier typing remains in the Angular package;
+- the kernel Vitest target has no Angular compiler, TestBed, Zone, Angular
+  factory, runtime import, or type-only Angular import;
+- real package coexistence is pinned in neutral, Angular, neutral, Angular
+  construction order with lazy EntityMap allocations after every boundary.
+
+Focused validation is generated by `nx test kernel`, `nx test angular`,
+`npm run typecheck`, `nx lint kernel`, `nx lint angular`,
+`node tools/check-kernel-neutrality.mjs`, and the `retention-gc` release gate.
+The broader release ladder remains open; test ownership closure does not waive
+API baseline, spec baseline, release-claim, or package-manifest gates.
+
+### KERNEL-SNAPSHOT-AUTHORITY-0 — KSA-B / CLOSED GREEN
+
+Snapshot correctness is kernel read semantics. Incremental materialization and
+structural sharing are the current kernel-owned performance representation;
+they no longer depend on adapter dependency tracking:
+
+- ordinary branches use a small kernel-owned per-node cache with synchronous
+  dirty propagation to snapshot ancestors;
+- scalar-slot publication marks the owning branch dirty after both direct
+  commits and causal replay, so restoration does not need cache-specific logic;
+- membership transitions dirty the branch before consulting optional causal or
+  observation machinery;
+- EntityMap reuses its existing collection version to cache projections and its
+  existing `updateSignals()` authority to dirty marker and ancestor snapshots;
+- owner invalidation remains uninvolved because it is owner-wide, coalesced,
+  and asynchronous.
+
+KSA-A was sufficient for EntityMap because its collection version already
+exists. Ordinary trees have no universal revision unless optional causal
+capabilities are present, so KSA-B supplies the minimum additional state: one
+cache record and parent edge per materialized branch, with no dependency
+collection, subscribers, effects, or scheduler.
+
+`MaterializationRealization.memoizeSnapshot` had no independent framework job
+after this result and was deleted. `MaterializationRealization.isReactiveNode`
+remains admitted only for recognizing caller-supplied native carriers. Direct
+bare-kernel controls pin current performance behavior: root/no-op identity,
+changed-path sibling reuse,
+membership omission and same-value reactivation, EntityMap invalidation with
+an untouched sibling, and independent marker stability. They do not make
+object identity causal authority or a public compatibility promise.
+
+Representation evidence and dispositions:
+
+- `KSA-WRITE-COST-0` selected A. Scalar commit authority now reports its
+  existing changed/no-op result through a private intrinsic-mutation channel;
+  the permanent logical-work control remains one slot read, one equality check,
+  and one write/publication. The proposed 1 -> 2 baseline change was reverted.
+- Dirty ancestry stops at the first cached node already dirty. A partial-child-
+  read interleaving control remains current. Disabling the stop measured 47.3 ->
+  1060.7 ns for depth-50 dirty writes and 189.5 -> 1199.9 ns per write for
+  100-write/read bursts; shallow movement (43.4 vs 41.7 ns) was noise-sized.
+  On the final demand-driven representation, medians were 38.3 ns shallow,
+  34.0 ns depth-50 while dirty, and 203.6 ns/write for a 100-write/read burst.
+- Snapshot machinery moved from `utils.ts` to a dedicated internal authority;
+  the Rollup `materialize-markers -> utils -> materialize-markers` cycle is gone.
+- Public custom markers have no generic snapshot-change evidence. Their marker
+  path is therefore uncached and a framework-free mutation/fresh-read control
+  passes. No extension API was added. EntityMap keeps caching through its
+  existing version authority.
+- Ordinary parent links are allocated on first snapshot traversal rather than
+  at construction. Snapshot parent links and scalar slot-to-owner links are weak. An
+  `--expose-gc` gate proves a held nested accessor remains readable while its
+  root backing store is collected.
+- Neutral trees allocate no dependency carrier for snapshot caches; tracking
+  realizations retain one only because they have an observation graph. Isolated
+  10k ordinary-branch arms retain 17.87 MB when `tree()` is never read and
+  22.74 MB after snapshot materialization: 4.88 MB incremental, about 511 B per
+  materialized branch including cached view objects. Demand-driven ancestry
+  saved about 0.56 MB from the unread arm, and neutral specialization saved a
+  further 4.61 MB from the read arm. Both arms are collectable. These are
+  current representation figures, not an attributable pre/post-KSA delta.
+- A same-build esbuild ablation measured snapshot authority at 288 gzip bytes.
+  The ablated CBR bundle was still over budget, so KSA was not the sole cause.
+  Folding duplicate enhancer validation, tree-shaking subscriber-only owner
+  invalidation through a tiny dispatch port, and canonicalizing NodeStore/node
+  traversal recovered the remaining slice cost without weakening semantics.
+  Final enforced sizes: bare 9.70/9.7 KB production and 11.87/11.9 KB
+  development; EntityMap 20.28/21 KB and 22.96/23.7 KB.
+
+Cache-authority census currently has two distinct laws: branch snapshots use
+dirty ancestry; EntityMap projections use one monotonic collection version.
+EntityMap already centralizes all its projections through one local helper.
+There is no second revision-keyed implementation to consolidate, so a generic
+`cacheByRevision` helper would add an abstraction without removing duplication.
+
+Validation: dedicated KSA 7/7, marker snapshot 10/10, restoration sharing 5/5,
+owner invalidation 21/21, one-read scalar logical work, custom-marker freshness,
+held-child/root GC, Angular tracking suppression, both TypeScript passes,
+kernel build without cycles, neutrality, and all four bundle budgets are green.
+
+### SNAPSHOT-IDENTITY-CONTRACT-0 — FUNCTION NOT ESTABLISHED
+
+Adversarial confirmation reopened classification after KSA closure. Frozen
+causal premises establish current natural-state correctness, committed snapshot
+correctness, speculative isolation, and transition/restoration authority
+independent of POJO identity. They do not establish incremental subtree identity
+as causal structure, kernel semantics, or public API contract.
+
+Consumer audit:
+
+- restoration admits turns from causal effects and uses snapshot `===` only as
+  an O(1) dedupe after admission;
+- devtools uses identity to avoid repeated serialization;
+- persistence no longer derives change authority from `tree() !== previous`;
+- the React reference maintains adapter-local snapshot equality;
+- no frozen causal workflow uses identity to decide truth, transition meaning,
+  commit status, or restoration eligibility.
+
+Disposition:
+
+```text
+A  correct natural state, no identity promise
+B  stable root between natural-state changes, no subtree promise
+C  incremental identity-preserving subtree sharing
+
+causal/state correctness          A sufficient
+public/kernel contract for C      FUNCTION NOT ESTABLISHED
+current implementation choice     C retained as measured optimization
+```
+
+Premise 6 (full reconstruction on every read is bad behavior) establishes an
+efficient-materialization obligation, not a required consumer-observable
+identity mechanism. The measured 10k-branch incremental cost remains explicit:
+4.88 MB, about 511 B per materialized branch; unread snapshot surfaces avoid
+that cache-materialization cost. This cost describes the current optimization
+and does not justify its own contract.
+
+Reopen C as a public/kernel product contract only if a required
+framework-neutral workflow must process only changed branches using the
+materialized snapshot alone, the kernel exposes no equivalent authoritative
+change signal, and the workflow's correctness or required complexity therefore
+depends on unchanged subtrees retaining reference identity.
+
 Current status:
 
 ```text
 OWNER-INVALIDATION-0                CLOSED GREEN — cb2a276f
-CONSTRUCTION-BOUND-REALIZATION-0    OPEN NEXT
-@signal-tree/react                  BLOCKED
-TruckTrax v2 migration              BLOCKED
-TruckTrax v3 migration              BLOCKED
-React Native                        BLOCKED
+CONSTRUCTION-BOUND-REALIZATION-0    CLOSED GREEN — checkpoint pending
+TEST-OWNERSHIP-REATTRIBUTION-0      CLOSED GREEN — framework-free kernel target
+ATOMIC-OBSERVATION-DELIVERY-0       CLOSED GREEN — narrow invalidation group
+@signal-tree/react                  UNBLOCKED FOR GREENFIELD DERIVATION
+TruckTrax v2 migration              BLOCKED ON REACT CONTRACT
+TruckTrax v3 migration              BLOCKED ON GREENFIELD APPLICATION PATTERNS
+React Native                        BLOCKED ON REACT CONTRACT
 ```
 
 ## GREENFIELD-APPLICATION-PATTERNS-0

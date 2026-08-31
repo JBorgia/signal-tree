@@ -65,7 +65,6 @@
  * a complete causal model without neutralizing the reported cause and
  * re-measuring.
  */
-import type { Signal } from '@angular/core';
 import type { ReadableCell } from './internals/cell-runtime';
 
 import { entityMap, signalTree } from '../index';
@@ -117,7 +116,7 @@ interface RootState {
 
 interface CounterMethods {
   increment(): void;
-  readonly total: Signal<number>;
+  readonly total: ReadableCell<number>;
 }
 
 declare const rootTree: SignalTree<RootState>;

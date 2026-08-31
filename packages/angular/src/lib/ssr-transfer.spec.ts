@@ -1,9 +1,10 @@
 import { TransferState, makeStateKey } from '@angular/core';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { entityMap } from './types';
-import { signalTree } from './signal-tree';
-import { serialization } from '../enhancers/serialization/serialization';
+import { entityMap, signalTree } from '../index';
+// This historical recipe measures an internal enhancer that is deliberately not public.
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { serialization } from '../../../kernel/src/enhancers/serialization/serialization';
 
 /**
  * C3 — can an Angular app move server-built state to the client TODAY?

@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createReactiveTestRealization } from '../reactive-test-realization';
 import { form } from './markers';
-import { signal } from '@angular/core';
 
 import { registerMarkerProcessor } from './internals/materialize-markers';
 import { signalTree } from './signal-tree';
 import { unwrap } from './utils';
+
+const signal = createReactiveTestRealization().cell.createCell;
 
 /**
  * ONE BUILDER.

@@ -43,10 +43,14 @@
  * consequence is that `link()`'s X parameter cannot be trusted to reject at
  * compile time.
  */
-import { computed, signal, type WritableSignal } from '@angular/core';
-
+import { createReactiveTestRealization } from '../reactive-test-realization';
+import type { WritableCell } from './internals/cell-runtime';
 import { signalTree } from './signal-tree';
 import type { NodeAccessor } from './node-accessor';
+
+const testRealization = createReactiveTestRealization();
+const computed = testRealization.derived.createDerived;
+const signal = testRealization.cell.createCell;
 
 const tree = signalTree({
   leaf: 'l0',
@@ -61,7 +65,7 @@ const tree = signalTree({
  * callable nor settable — the NAMESPACE through which locations are reached,
  * not a location.
  */
-type LinkTarget<T> = NodeAccessor<T> | WritableSignal<T>;
+type LinkTarget<T> = NodeAccessor<T> | WritableCell<T>;
 
 declare function linkTarget<T>(x: LinkTarget<T>): void;
 

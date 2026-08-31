@@ -13,16 +13,22 @@ import {
   type ScalarSlotMutationFrame as ScalarSlotKernelMutationFrame,
   type TreeScalarSlotRuntime as TreeScalarSlotKernel,
 } from './tree-scalar-slot-runtime';
-import {
-  getScalarLeafRealization,
-  type ObservationToken,
+import type {
+  ObservationToken,
+  ScalarLeafRealization,
 } from './scalar-leaf-realization';
+import { NEUTRAL_SCALAR_LEAF_REALIZATION } from './scalar-leaf-realization';
 import type {
   ScalarSlotMutationFrame,
   SlotIndex,
   TreeScalarLeafRuntime,
 } from './tree-scalar-slot-port';
 import type { WritableCell } from './cell-runtime';
+import {
+  getIntrinsicMutationObserver,
+  registerIntrinsicMutationSource,
+} from './intrinsic-mutation';
+import { markSnapshotDirty } from './snapshot-authority';
 
 /**
  * TREE-FACING SCALAR LEAF ORCHESTRATION — kernel-owned.
@@ -40,8 +46,10 @@ import type { WritableCell } from './cell-runtime';
  */
 
 class ScalarSlotPublication {
-  private readonly realization = getScalarLeafRealization();
   private readonly tokens: ObservationToken[] = [];
+  private readonly snapshotOwners: Array<WeakRef<object> | undefined> = [];
+
+  constructor(private readonly realization: ScalarLeafRealization) {}
 
   observe(slotIndex: SlotIndex): void {
     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
@@ -54,9 +62,13 @@ class ScalarSlotPublication {
     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
       recordProductionSubstrateStat('publications', result.changedSlots.length);
     }
-    for (const slotIndex of result.changedSlots) {
-      this.getToken(slotIndex).invalidate();
-    }
+    this.realization.runInvalidationGroup(() => {
+      for (const slotIndex of result.changedSlots) {
+        const owner = this.snapshotOwners[slotIndex]?.deref();
+        if (owner) markSnapshotDirty(owner);
+        this.getToken(slotIndex).invalidate();
+      }
+    });
   }
 
   publishSlot(result: SingleSlotCommitResult): void {
@@ -67,7 +79,13 @@ class ScalarSlotPublication {
     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
       recordProductionSubstrateStat('publications');
     }
+    const owner = this.snapshotOwners[result.slot]?.deref();
+    if (owner) markSnapshotDirty(owner);
     this.getToken(result.slot).invalidate();
+  }
+
+  bindSnapshotOwner(slotIndex: SlotIndex, owner: object | undefined): void {
+    this.snapshotOwners[slotIndex] = owner ? new WeakRef(owner) : undefined;
   }
 
   private getToken(slotIndex: SlotIndex): ObservationToken {
@@ -114,9 +132,9 @@ class ScalarSlotMutationFrameOrchestrator implements ScalarSlotMutationFrame {
 function createScalarLeaf<T>(
   kernel: TreeScalarSlotKernel,
   publication: ScalarSlotPublication,
+  realization: ScalarLeafRealization,
   slotIndex: SlotIndex
 ): WritableCell<T> {
-  const realization = getScalarLeafRealization();
   const holder: { leaf?: WritableCell<T> } = {};
 
   const leaf = markTreeCell(
@@ -142,6 +160,7 @@ function createScalarLeaf<T>(
   ) as WritableCell<T>;
 
   holder.leaf = leaf;
+  registerIntrinsicMutationSource(leaf as object);
 
   const commitThenActivate = (result: SingleSlotCommitResult) => {
     const reactivated = reactivateOnWrite(leaf);
@@ -157,7 +176,18 @@ function createScalarLeaf<T>(
   };
 
   leaf.set = (value: T) => {
-    commitThenActivate(kernel.commitSlot(slotIndex, value));
+    const observer = getIntrinsicMutationObserver<T>(leaf as object);
+    const before = observer ? leaf() : undefined;
+    const result = kernel.commitSlot(slotIndex, value);
+    commitThenActivate(result);
+    if (observer) {
+      observer({
+        intent: 'replace',
+        before: before as T,
+        after: result.changed ? value : (before as T),
+        changed: result.changed,
+      });
+    }
   };
 
   leaf.update = (updater: (value: T) => T) => {
@@ -166,27 +196,44 @@ function createScalarLeaf<T>(
       commitThenActivate(kernel.commitSlot(slotIndex, next));
       return;
     }
-    publication.publishSlot(kernel.updateSlot(slotIndex, updater));
+    const observer = getIntrinsicMutationObserver<T>(leaf as object);
+    if (!observer) {
+      publication.publishSlot(kernel.updateSlot(slotIndex, updater));
+      return;
+    }
+    const before = leaf();
+    const next = updater(before);
+    const result = kernel.commitSlot(slotIndex, next);
+    publication.publishSlot(result);
+    observer({
+      intent: 'derive',
+      before,
+      after: result.changed ? next : before,
+      changed: result.changed,
+    });
   };
 
   return leaf;
 }
 
 export function createTreeScalarLeafRuntime(
-  physicalCommitClock?: PhysicalCommitClock
+  physicalCommitClock: PhysicalCommitClock | undefined,
+  realization: ScalarLeafRealization = NEUTRAL_SCALAR_LEAF_REALIZATION
 ): TreeScalarLeafRuntime {
   const kernel = createTreeScalarSlotKernel(physicalCommitClock);
-  const publication = new ScalarSlotPublication();
+  const publication = new ScalarSlotPublication(realization);
   const leafByPositionId = new Map<PositionId, WritableCell<unknown>>();
 
   return {
     createLeaf<T>(
       initialValue: T,
       equal: (current: T, next: T) => boolean,
-      positionId?: PositionId
+      positionId?: PositionId,
+      snapshotOwner?: object
     ): WritableCell<T> {
       const slotIndex = kernel.createSlot(initialValue, equal, positionId);
-      const leaf = createScalarLeaf<T>(kernel, publication, slotIndex);
+      publication.bindSnapshotOwner(slotIndex, snapshotOwner);
+      const leaf = createScalarLeaf<T>(kernel, publication, realization, slotIndex);
       if (positionId !== undefined) {
         leafByPositionId.set(positionId, leaf as WritableCell<unknown>);
       }
@@ -194,6 +241,9 @@ export function createTreeScalarLeafRuntime(
     },
     beginFrame(): ScalarSlotMutationFrame {
       return new ScalarSlotMutationFrameOrchestrator(kernel.beginFrame(), publication);
+    },
+    runInvalidationGroup(run: () => void): void {
+      realization.runInvalidationGroup(run);
     },
     publishPrepared(result: ScalarSlotCommitResult): void {
       publication.publish(result);

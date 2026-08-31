@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { resolveWorkspaceSpecs } from './workspace-specs.mjs';
 
 const workspaceRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -326,6 +327,26 @@ declare const DEFAULT_PATH_CACHE_SIZE: number;
       },
     };
 
+    const resolveWorkspaceManifestPlugin = {
+      name: 'signaltree-resolve-workspace-manifest',
+      async closeBundle() {
+        const manifestPath = path.join(targetRoot, 'package.json');
+        let content;
+        try {
+          content = await fs.readFile(manifestPath, 'utf8');
+        } catch {
+          return;
+        }
+        const manifest = JSON.parse(content);
+        if (resolveWorkspaceSpecs(manifest, manifest.version) > 0) {
+          await fs.writeFile(
+            manifestPath,
+            `${JSON.stringify(manifest, null, 2)}\n`
+          );
+        }
+      },
+    };
+
     return {
       ...config,
       plugins: [
@@ -333,6 +354,7 @@ declare const DEFAULT_PATH_CACHE_SIZE: number;
         ...plugins,
         stripJsCommentsPlugin,
         inlineSharedTypesPlugin,
+        resolveWorkspaceManifestPlugin,
       ],
       // Entry barrels must keep their re-exports even when the module body is
       // empty after bundling (pure re-export barrels).

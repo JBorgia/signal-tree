@@ -1,9 +1,15 @@
-import { computed, type Signal } from '@angular/core';
 import { undoable } from '../lib/undoable';
 import { describe, expect, it } from 'vitest';
 
+import { createReactiveTestRealization } from '../reactive-test-realization';
 import { restoration } from '../enhancers/restoration/restoration';
-import { entityMap, signalTree } from '../index';
+import { entityMap } from '../index';
+import type { ReadableCell } from './internals/cell-runtime';
+import { bindSignalTreeRealization } from './signal-tree';
+
+const testRealization = createReactiveTestRealization();
+const signalTree = bindSignalTreeRealization(testRealization);
+const computed = testRealization.derived.createDerived;
 
 /**
  * ⚠️ ARCHITECTURAL FALSIFIER STATUS: **WITHDRAWN**.
@@ -43,11 +49,11 @@ function collectionOver(leaf: {
   set(v: Row[]): void;
   update(fn: (c: Row[]) => Row[]): void;
 }) {
-  const cache = new Map<string, Signal<Row | undefined>>();
+  const cache = new Map<string, ReadableCell<Row | undefined>>();
   return {
     all: () => leaf(),
     ids: computed(() => leaf().map((r) => r.id)),
-    byId(id: string): Signal<Row | undefined> {
+    byId(id: string): ReadableCell<Row | undefined> {
       let s = cache.get(id);
       if (!s) {
         s = computed(() => leaf().find((r) => r.id === id));

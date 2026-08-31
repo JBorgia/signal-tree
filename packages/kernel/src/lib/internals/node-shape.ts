@@ -32,6 +32,16 @@ export function isTraversableNode(value: unknown): value is object {
  * identity. `Symbol.for` so the brand survives duplicate module instances.
  */
 export const CALLABLE_SIGNAL_SYMBOL = Symbol.for('SignalTree:NodeAccessor');
+export const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
+
+export function nodeStoreOf(node: object): object | undefined {
+  const store = (node as Record<symbol, unknown>)[NODE_STORE_SYMBOL];
+  return store !== undefined && store !== null ? (store as object) : undefined;
+}
+
+export function snapshotNodeKey(node: object): object {
+  return nodeStoreOf(node) ?? node;
+}
 
 /**
  * Is this a SignalTree node accessor?

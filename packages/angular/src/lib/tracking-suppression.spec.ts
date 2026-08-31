@@ -2,7 +2,7 @@ import { effect } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { describe, expect, it } from 'vitest';
 
-import { signalTree } from './signal-tree';
+import { signalTree } from '../index';
 
 /**
  * C6 / S3 — the kernel's ONE tracking-suppression requirement.
@@ -17,8 +17,8 @@ import { signalTree } from './signal-tree';
  * so it cannot be asserted by "did it finish". `RUN_CAP` turns an unbounded
  * self-trigger into a finite, reportable number.
  *
- * Mutation that must turn it RED: make `withoutTracking` ignore the installed
- * suppression and call `fn()` directly while Angular is the realization.
+ * Mutation that must turn it RED: make the bound realization's suppression
+ * call `fn()` in Angular's tracked context.
  */
 const RUN_CAP = 50;
 

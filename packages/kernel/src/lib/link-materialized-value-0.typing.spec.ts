@@ -23,9 +23,8 @@
  * 2. that a truthful admission rule is exactly expressible without any
  *    recursive materialization machinery
  */
-import type { WritableSignal } from '@angular/core';
-
 import { entityMap } from './types';
+import type { WritableCell } from './internals/cell-runtime';
 import type { EntityMapBuilder } from './markers/entity-map';
 import type { EntitySignal } from './types';
 import type { NodeAccessor } from './node-accessor';
@@ -49,7 +48,7 @@ type NaturalValue<S> =
     ? R[]
     : S extends NodeAccessor<infer T>
       ? T
-      : S extends WritableSignal<infer T>
+      : S extends WritableCell<infer T>
         ? T
         : never;
 

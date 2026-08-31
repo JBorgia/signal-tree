@@ -1,8 +1,40 @@
-import { computed, signal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { entityMap } from './types';
-import { signalTree } from './signal-tree';
+import { bindSignalTreeRealization, signalTree } from './signal-tree';
+import { NEUTRAL_TREE_REALIZATION } from './internals/tree-realization';
+
+const FAKE_REACTIVE = Symbol('fake-reactive');
+
+type FakeWritable<T> = {
+  (): T;
+  set(value: T): void;
+  update(update: (value: T) => T): void;
+  asReadonly(): () => T;
+  readonly [FAKE_REACTIVE]: true;
+};
+
+const fakeWritable = <T,>(initial: T): FakeWritable<T> => {
+  let value = initial;
+  const cell = (() => value) as FakeWritable<T>;
+  cell.set = (next) => {
+    value = next;
+  };
+  cell.update = (update) => cell.set(update(value));
+  cell.asReadonly = () => cell;
+  Object.defineProperty(cell, FAKE_REACTIVE, { value: true });
+  return cell;
+};
+
+const fakeSignalTree = bindSignalTreeRealization({
+  ...NEUTRAL_TREE_REALIZATION,
+  cell: { createCell: fakeWritable },
+  materialization: {
+    isReactiveNode: (value) =>
+      typeof value === 'function' &&
+      (value as Partial<FakeWritable<unknown>>)[FAKE_REACTIVE] === true,
+  },
+});
 
 /**
  * A DERIVED VALUE IS NOT STATE, AT ANY TOUCH ORDER.
@@ -35,7 +67,7 @@ const mk = () =>
     { a: 2, b: 3 },
     {
       derived: ($) => ({
-        sum: computed(() => $.a() + $.b()),
+        sum: () => $.a() + $.b(),
       }),
     }
   );
@@ -101,7 +133,7 @@ describe('derived state never reaches a snapshot', () => {
       },
       {
         derived: ($) => ({
-          total: computed(() => $.rows.all().length + $.n()),
+          total: () => $.rows.all().length + $.n(),
         }),
       }
     );
@@ -110,15 +142,15 @@ describe('derived state never reaches a snapshot', () => {
     expect(tree()).toEqual({ rows: { all: [{ id: 1 }] }, n: 1 });
   });
 
-  it('a WRITABLE signal in derived() is real state and IS captured', () => {
+  it('a recognized writable value in derived() is real state and IS captured', () => {
     // `.derived()` is for derived state, but a writable signal placed there is
     // not recomputable. Excluding it would trade one silent data loss for
     // another, so only non-writable signals are stamped.
-    const tree = signalTree(
+    const tree = fakeSignalTree(
       { a: 1 },
       {
         derived: () => ({
-          manual: signal(42),
+          manual: fakeWritable(42),
         }),
       }
     );

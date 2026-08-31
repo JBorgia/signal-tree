@@ -2,12 +2,23 @@
 
 First public candidate for the v15 package and API reset.
 
-- **Framework adapter installation hooks are now explicit.** The
-  `@signal-tree/kernel/adapter` entry point exports `installCellRuntime`,
+- **Framework realization is construction-bound.** The
+  `@signal-tree/kernel/adapter` entry point exports `TreeRealization` and
+  `createSignalTreeFactory()` so each framework package binds its native
+  carriers when it creates a tree. Loading another package cannot change an
+  existing tree, and neutral and Angular trees can coexist in one process.
+  Atomic SignalTree operations group observation-token invalidations so no
+  realization can expose a partially committed state.
+  The earlier RC implementation exported `installCellRuntime`,
   `installDerivedRuntime`, `installMaterializationRealization`,
   `installScalarLeafRealization`, `installTrackingSuppression`, and
-  `withRestorationDesignation` so framework packages can install native
-  reactive behavior without putting framework dependencies in the kernel.
+  `withRestorationDesignation`; all six were superseded before the final v15
+  surface because mutable process-global installation violated tree ownership.
+
+- **Owner invalidation is available to framework adapters.**
+  `observeOwnerInvalidation(owner, callback)` requests a reread of canonical
+  truth after coherent public changes without exporting values, paths,
+  framework concepts, or event-cardinality promises.
 
 - **BREAKING: `timeTravel({ shouldSkip })` removed.** The comparator and the
   `skipsBackward()`/`skipsForward()` traversal it drove are gone; `undo()` and

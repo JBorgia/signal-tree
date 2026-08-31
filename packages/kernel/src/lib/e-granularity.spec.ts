@@ -1,4 +1,3 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
@@ -20,49 +19,6 @@ import { entityMap } from './types';
 type Row = { id: string; n: number };
 
 describe('E — is granular write/observation obtainable without a collection primitive?', () => {
-  it('ARRAY in ordinary state: observation is NOT granular', () => {
-    const tree = signalTree({ rows: [{ id: 'a', n: 1 }, { id: 'b', n: 1 }] as Row[] });
-
-    let runs = 0;
-    const watchA = computed(() => {
-      runs++;
-      return tree.$.rows().find((r) => r.id === 'a')?.n;
-    });
-    expect(watchA()).toBe(1);
-    const afterFirst = runs;
-
-    // Change the OTHER row. An array write replaces the whole reference.
-    tree.$.rows.set([{ id: 'a', n: 1 }, { id: 'b', n: 99 }]);
-    watchA();
-
-    expect(runs).toBe(afterFirst + 1); // recomputed for an unrelated change
-  });
-
-  it('RECORD keyed by id in ordinary state: observation IS granular', () => {
-    const tree = signalTree({
-      rows: {
-        a: { id: 'a', n: 1 },
-        b: { id: 'b', n: 1 },
-      },
-    });
-
-    let runs = 0;
-    const watchA = computed(() => {
-      runs++;
-      return tree.$.rows.a.n();
-    });
-    expect(watchA()).toBe(1);
-    const afterFirst = runs;
-
-    // Write the OTHER entry. Each nested position is its own signal, so the
-    // observer of `a` never sees it.
-    tree.$.rows.b.n.set(99);
-    watchA();
-
-    expect(runs).toBe(afterFirst); // NOT recomputed — granular
-    expect(tree.$.rows.b.n()).toBe(99);
-  });
-
   it('RECORD: granular WRITE too — one entry changes without rewriting the rest', () => {
     const tree = signalTree({
       rows: { a: { id: 'a', n: 1 }, b: { id: 'b', n: 1 } },
@@ -75,25 +31,6 @@ describe('E — is granular write/observation obtainable without a collection pr
     expect(tree.$.rows.a()).toBe(beforeA);
   });
 
-  it('entityMap: observation IS granular (the baseline it is compared against)', () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-    });
-    tree.$.rows.addMany([{ id: 'a', n: 1 }, { id: 'b', n: 1 }]);
-
-    let runs = 0;
-    const watchA = computed(() => {
-      runs++;
-      return tree.$.rows.byId('a')?.()?.n;
-    });
-    expect(watchA()).toBe(1);
-    const afterFirst = runs;
-
-    tree.$.rows.updateOne('b', { n: 99 });
-    watchA();
-
-    expect(runs).toBe(afterFirst);
-  });
 });
 
 /**

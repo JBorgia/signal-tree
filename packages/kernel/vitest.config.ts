@@ -4,24 +4,35 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
-    alias: {
+    alias: [
       // ⚠️ THE BARREL, RESOLVABLE FROM A SPEC. Every spec here imports through a
       // relative path, so nothing could testify about the PUBLIC export list —
       // deleting a re-export left specs green because they reached past it. This
       // alias lets `public-barrel-carrier.spec.ts` import from
       // '@signal-tree/kernel' and fail when a symbol leaves the barrel.
-      '@signal-tree/kernel': fileURLToPath(
-        new URL('./src/index.ts', import.meta.url)
-      ),
-    },
+      {
+        find: '@signal-tree/kernel/adapter',
+        replacement: fileURLToPath(
+          new URL('./src/adapter.ts', import.meta.url)
+        ),
+      },
+      {
+        find: '@signal-tree/kernel',
+        replacement: fileURLToPath(
+          new URL('./src/index.ts', import.meta.url)
+        ),
+      },
+      {
+        find: '@signal-tree/angular',
+        replacement: fileURLToPath(
+          new URL('../angular/src/index.ts', import.meta.url)
+        ),
+      },
+    ],
   },
   test: {
     globals: true,
     environment: 'happy-dom',
-    // Initializes the Angular TestBed environment for specs that use
-    // TestBed/inject (asyncSource, asyncQuery markers). Without it those
-    // specs fail with "Cannot read properties of null (reading 'ngModule')".
-    setupFiles: ['src/test-setup.ts'],
     include: [
       '**/*.spec.ts',
       'tests/**/*.spec.ts',

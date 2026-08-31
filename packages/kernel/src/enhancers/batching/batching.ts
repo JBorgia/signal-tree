@@ -8,7 +8,7 @@ import type {
 } from '../../lib/types';
 import type { BatchingConfig, BatchingMethods } from './batching.types';
 import { ENHANCER_META } from '../../lib/types';
-import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation';
+import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 
 type ChangeDetectionAwareTree = {
   __notifyChangeDetection?: () => void;

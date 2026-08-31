@@ -1,5 +1,3 @@
-import { effect, Injector, runInInjectionContext } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
 import { describe, expect, it } from 'vitest';
 
 import { deepEqual } from './utils';
@@ -315,36 +313,6 @@ describe('DEMARCATION-0: the observer sees every cause link needs', () => {
 // ───────────────────────────────────────────────────────────────────────────
 
 describe('DEMARCATION-0: what an ordinary Angular effect sees', () => {
-  it('⚠️ an Angular effect DOES observe speculative transaction state', async () => {
-    const tree = collectionTree();
-    await flush();
-    const seen: string[] = [];
-    const injector = TestBed.inject(Injector);
-
-    runInInjectionContext(injector, () => {
-      effect(() => void seen.push(tree.$.theme()));
-    });
-    TestBed.tick();
-
-    const p = tree.transaction(() => tree.$.theme.set('speculative'));
-    TestBed.tick();
-    await flush();
-
-    // ⚠️ THE PIN. This is the strongest argument someone will make for making
-    // committed observation public: ordinary Angular reactivity cannot tell
-    // settled state from speculative state.
-    expect(seen).toContain('speculative');
-
-    p.rollback();
-    TestBed.tick();
-    await flush();
-
-    // And it then observes the reversal, so it is eventually correct — it is
-    // TRANSIENTLY wrong, not permanently.
-    expect(tree.$.theme()).toBe('light');
-    expect(seen[seen.length - 1]).toBe('light');
-  });
-
   it('...which does NOT by itself earn a public API', async () => {
     const tree = collectionTree();
     await flush();

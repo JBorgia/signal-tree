@@ -1,4 +1,3 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
@@ -63,34 +62,6 @@ describe('E-TAP — push observation', () => {
     expect(seen).toEqual(['add:a:1', 'upd:a:{"n":2}', 'rem:a']);
   });
 
-  it('NULL — the pull surface carries the same information, recovered by diff', () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-    });
-
-    // ANG-V0-D already established entityMap CRUD is fully visible through its
-    // own read surface. The only thing push adds is CHANGE IDENTITY, which pull
-    // recovers by diffing — at O(width) per change rather than O(delta).
-    let prev = new Map<string, number>();
-    const events = computed(() => {
-      const next = new Map(tree.$.rows.all().map((r) => [r.id, r.n]));
-      const out: string[] = [];
-      for (const [id, n] of next) {
-        if (!prev.has(id)) out.push(`add:${id}:${n}`);
-        else if (prev.get(id) !== n) out.push(`upd:${id}:{"n":${n}}`);
-      }
-      for (const id of prev.keys()) if (!next.has(id)) out.push(`rem:${id}`);
-      prev = next;
-      return out;
-    });
-
-    tree.$.rows.addOne({ id: 'a', n: 1 });
-    expect(events()).toEqual(['add:a:1']);
-    tree.$.rows.updateOne('a', { n: 2 });
-    expect(events()).toEqual(['upd:a:{"n":2}']);
-    tree.$.rows.removeOne('a');
-    expect(events()).toEqual(['rem:a']);
-  });
 });
 
 // ============================================================================

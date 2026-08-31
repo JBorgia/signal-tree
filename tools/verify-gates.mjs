@@ -528,8 +528,8 @@ const GATES = [
     // The DETERMINISTIC half of the C6 performance requirement. Wall-clock lives
     // in tools/bench-c6-baseline.mjs, which records and does not gate, because
     // timings move with the machine and these facts do not.
-    cmd: ['npx', 'vitest', 'run', '--root', 'packages/kernel',
-          'src/lib/c6-neutrality-invariants.spec.ts'],
+        cmd: ['npx', 'vitest', 'run', '--root', 'packages/angular',
+          'src/lib/angular-realization-invariants.spec.ts'],
   },
   {
     name: 'numeric-claims',

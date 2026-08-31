@@ -13,16 +13,22 @@ describe('greenfield reference state', () => {
     }
   });
 
-  it('currently rejects a neutral callable returned from config.derived', () => {
+  it('realizes a neutral callable returned from config.derived', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const store = createDerivedReferenceStore();
     try {
+      store.$.jobs.addOne({
+        id: 'a',
+        title: 'Inspect neutral derivation',
+        site: 'Reference app',
+        owner: 'SignalTree',
+        priority: 'routine',
+        status: 'active',
+      });
+      expect(store.$.activeCount()).toBe(1);
       expect(
-        (store.$ as unknown as Record<string, unknown>)['activeCount']
-      ).toBeUndefined();
-      expect(warn).toHaveBeenCalledWith(
-        expect.stringContaining('[ST2007] Derived "activeCount" dropped')
-      );
+        warn.mock.calls.some((call) => String(call[0]).includes('ST2007'))
+      ).toBe(false);
     } finally {
       store.destroy();
       warn.mockRestore();

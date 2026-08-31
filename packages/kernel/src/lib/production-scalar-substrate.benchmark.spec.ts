@@ -1,9 +1,9 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { undoable } from '../lib/undoable';
 
-import type { WritableSignal } from '@angular/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import type { WritableCell } from './internals/cell-runtime';
 import { restoration } from '../enhancers/restoration/restoration';
 import { entityMap } from './markers/entity-map';
 import { EntityMutationFrame } from './physical/entity-mutation-frame';
@@ -38,7 +38,7 @@ const MEASURE_RUNS = 3;
 const TIMING_RATIO_LIMIT = 40;
 const MAX_FRAME_WIDTH = FRAME_WIDTHS[FRAME_WIDTHS.length - 1];
 
-type ScalarLeaf = WritableSignal<number>;
+type ScalarLeaf = WritableCell<number>;
 
 type ScalarTimingOperation =
   | 'compiled-read'

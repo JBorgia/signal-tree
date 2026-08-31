@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { isSignal } from '@angular/core';
 
 import { signalTree } from './signal-tree';
 
@@ -132,17 +131,4 @@ describe('the callable contract', () => {
     expect(tree.$.tags()).toEqual(['a', 'b']);
   });
 
-  it('LEAVES ARE REAL ANGULAR SIGNALS — the reason the sugar was refused', () => {
-    const tree = signalTree({ count: 0, user: { name: 'x' } });
-
-    // If leaves were ever wrapped to make `leaf(5)` work, this would be false
-    // and Angular interop would break with it.
-    expect(isSignal(tree.$.count)).toBe(true);
-    expect(
-      Object.getOwnPropertySymbols(tree.$.count).map(String)
-    ).toContain('Symbol(SIGNAL)');
-
-    // A branch is deliberately NOT a signal — it is our accessor.
-    expect(isSignal(tree.$.user)).toBe(false);
-  });
 });

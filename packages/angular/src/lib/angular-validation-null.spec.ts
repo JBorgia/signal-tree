@@ -230,8 +230,10 @@ describe('ANG-V0-C — async validation owned entirely by the consumer', () => {
     let generation = 0;
     const resolvers: Array<(v: string | null) => void> = [];
 
-    const runValidator = (_name: string) =>
-      new Promise<string | null>((res) => resolvers.push(res));
+    const runValidator = (name: string) => {
+      void name;
+      return new Promise<string | null>((res) => resolvers.push(res));
+    };
 
     TestBed.runInInjectionContext(() => {
       effect(() => {

@@ -386,9 +386,8 @@ else
 fi
 
 # 9f. Angular Packed-Consumer Gate (BLOCKING)
-# Typechecks representative Angular usage and bundles a side-effect-only package
-# import. The second arm catches a false `sideEffects: false` declaration that
-# lets consumer bundlers erase structural realization installation.
+# Typechecks representative Angular usage and bundles package-bound
+# construction. No package import mutates process-global realization state.
 print_header "9f. Angular Packed-Consumer Gate"
 if node tools/verify-angular-consumer.mjs 2>&1 | tee /tmp/angular-consumer.log; then
     print_success "Packed Angular consumer typecheck + realization passed"

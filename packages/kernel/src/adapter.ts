@@ -32,7 +32,6 @@ export type {
   CellRuntime,
 } from './lib/internals/cell-runtime';
 import type { WritableCell } from './lib/internals/cell-runtime';
-export { installCellRuntime } from './lib/internals/cell-runtime';
 
 import { acquireObservation } from './lib/internals/observation-substrate';
 import { observeOwnerInvalidationInternal } from './lib/internals/owner-invalidation';
@@ -61,18 +60,15 @@ export function observeOwnerInvalidation(
 }
 
 export type { DerivedRuntime } from './lib/internals/derived-runtime';
-export { installDerivedRuntime } from './lib/internals/derived-runtime';
 
 export type { MaterializationRealization } from './lib/internals/materialization-realization';
-export { installMaterializationRealization } from './lib/internals/materialization-realization';
 
 export type {
   ObservationToken,
   ScalarLeafRealization,
 } from './lib/internals/scalar-leaf-realization';
-export { installScalarLeafRealization } from './lib/internals/scalar-leaf-realization';
-
-export { installTrackingSuppression } from './lib/internals/tracking-suppression';
+export type { TreeRealization } from './lib/internals/tree-realization';
+export { bindSignalTreeRealization as createSignalTreeFactory } from './lib/signal-tree';
 
 /**
  * SEMANTIC INGRESS — the one export here that is not a realization contract.

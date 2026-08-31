@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 // This suite proves KERNEL reclamation semantics. It used to observe through
-// Angular's `getDerivedRuntime().createDerived()`, which silently made the assertion carrier-dependent:
+// Angular computed, which silently made the assertion carrier-dependent:
 // a neutral cell is not an Angular signal, so that computed never invalidated
 // and kept returning its first value. The law under test is the kernel's, so
 // the observer is the kernel's too.
 //     MOVE FRAMEWORK ASSERTIONS. KEEP SEMANTIC ASSERTIONS WITH THEIR OWNER.
-import { getDerivedRuntime } from '../derived-runtime';
+import { NEUTRAL_DERIVED_RUNTIME } from '../derived-runtime';
 
 import { createEntitySignal } from '../../entity-signal';
 import type { PositionId } from '../../types';
@@ -109,7 +109,7 @@ describe('subject reclamation coordinator', () => {
     }
 
     let runs = 0;
-    const observedName = getDerivedRuntime().createDerived(() => {
+    const observedName = NEUTRAL_DERIVED_RUNTIME.createDerived(() => {
       runs++;
       return heldName() ?? 'absent';
     });
