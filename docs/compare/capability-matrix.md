@@ -137,13 +137,13 @@ than removed, because the audit has not been done:
 | Predicate **count**       | Yes — `where(p)().length`                                               |
 | Per-entity UI state       | Yes — a sibling collection keyed by the same id                         |
 | Reorder / move            | Yes — an `order` field plus `sortComparer` (see below)                  |
-| Dirty checking            | Yes, cheaply here — structural sharing makes `prev !== next` meaningful |
+| Dirty checking            | Yes, cheaply here — stable root snapshots make `prev !== next` meaningful |
 
 And these rows are NOT composable — they follow from the design and cannot be
 added by a consumer:
 
 O(1) per-entity read that invalidates only that row · granular signals for
-arbitrary nested state · structural sharing as a change oracle · reactive
+arbitrary nested state · stable root snapshots as a change oracle · reactive
 `canUndo`/`canRedo` · per-entity undo · scoped history · SSR transfer mode ·
 diagnostics with stable codes.
 
@@ -169,7 +169,7 @@ of these.**
 | ------------------------------------------------------------ | :----: | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Changed-path reporting** — `tree.updateAndReport(partial)` |   ❌   | Returns the dot-paths of leaves that ACTUALLY changed; a deep-equal re-fetch reports `[]`                                                         |
 | **Type-only read-only view** — `asReadonly(tree)`            |   ❌   | Same object, narrower type. Zero runtime cost                                                                                                     |
-| **Structural sharing as a change oracle**                    |   ❌   | `tree()` returns the identical object when nothing changed, so `prev !== next` is a meaningful check                                              |
+| **Stable root snapshot as a change oracle**                  |   ❌   | `tree()` returns the identical root while committed truth is unchanged, so `prev !== next` is a meaningful check; descendant identity is not promised |
 | **Diagnostics scoped by retention, not count** — ST2029      |   ❌   | Warns on `entries x width`, so a wide-short and a narrow-long history are judged the same                                                         |
 
 **How these were graded.** Each was probed against every competitor's `.d.ts`:

@@ -4,10 +4,13 @@ import {
 } from './reference-store';
 
 describe('greenfield reference state', () => {
-  it('currently allocates a neutral owner snapshot on every read', () => {
+  it('keeps the root snapshot stable while committed truth is unchanged', () => {
     const store = createReferenceStore();
     try {
-      expect(store()).not.toBe(store());
+      const first = store();
+      expect(store()).toBe(first);
+      store.$.filters.team.set('South');
+      expect(store()).not.toBe(first);
     } finally {
       store.destroy();
     }

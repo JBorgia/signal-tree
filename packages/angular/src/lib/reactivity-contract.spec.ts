@@ -112,6 +112,21 @@ describe('SignalTree reactivity contract', () => {
     expect(runs).toBe(2);
   });
 
+  it('observes correct snapshots when every computed result has fresh identity', () => {
+    const tree = signalTree({ left: { value: 1 }, right: { value: 2 } });
+    const snapshot = computed(() => structuredClone(tree()));
+
+    const first = snapshot();
+    expect(first).toEqual({ left: { value: 1 }, right: { value: 2 } });
+
+    tree.$.left.value.set(3);
+    const second = snapshot();
+
+    expect(second).toEqual({ left: { value: 3 }, right: { value: 2 } });
+    expect(second).not.toBe(first);
+    expect(second.right).not.toBe(first.right);
+  });
+
   describe('BODY-GRANULAR — an unrelated update must not recompute', () => {
     it('nested leaf: a sibling leaf update does not recompute the reader', () => {
       const tree = signalTree({ a: { v: 0 }, b: { v: 0 } });

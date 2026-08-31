@@ -22,9 +22,9 @@ import { restoration } from './restoration';
  *    1,000   29.51ms      0.08ms
  *   10,000  340.60ms      0.04ms     <- flat in state size
  *
- * These tests pin the behaviour that makes the shortcut legitimate. If any of
- * them fail, the reference identity that restoration now depends on is gone and
- * the `===` comparisons silently stop detecting changes.
+ * These tests pin the current incremental representation and its recording-cost
+ * shortcut. Restoration admission and turn meaning come from causal effects;
+ * descendant reference identity is not their authority or a public contract.
  */
 describe('restoration snapshot sharing', () => {
   const flush = () => new Promise((r) => setTimeout(r, 0));

@@ -30,7 +30,7 @@ You don't model state as actions, reducers, selectors, or classes — you model 
 - Recursive typing with deep nesting and accurate type inference
 - Fast operations with sub‑millisecond measurements at 5–20+ levels
 - Strong TypeScript safety across nested structures
-- Memory efficiency via structural sharing and lazy signals
+- Memory efficiency via incremental snapshot materialization
 - Small API surface with minimal runtime overhead
 - Compact bundle size suited for production
 
@@ -798,7 +798,7 @@ const tree2 = signalTree(
   }
 );
 
-// Structural sharing for memory efficiency
+// Immutable update; snapshot materialization reuses internal work where possible
 tree.update((state) => ({
   ...state, // Reuses unchanged parts
   newField: 'value',

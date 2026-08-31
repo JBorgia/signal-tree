@@ -498,7 +498,7 @@ owner invalidation 21/21, one-read scalar logical work, custom-marker freshness,
 held-child/root GC, Angular tracking suppression, both TypeScript passes,
 kernel build without cycles, neutrality, and all four bundle budgets are green.
 
-### SNAPSHOT-IDENTITY-CONTRACT-0 — FUNCTION NOT ESTABLISHED
+### SNAPSHOT-IDENTITY-CONTRACT-0 — SIC-B / CLOSED GREEN
 
 Adversarial confirmation reopened classification after KSA closure. Frozen
 causal premises establish current natural-state correctness, committed snapshot
@@ -508,8 +508,8 @@ as causal structure, kernel semantics, or public API contract.
 
 Consumer audit:
 
-- restoration admits turns from causal effects and uses snapshot `===` only as
-  an O(1) dedupe after admission;
+- restoration admits turns from causal effects and uses root snapshot `===`
+  only as an O(1) dedupe after admission;
 - devtools uses identity to avoid repeated serialization;
 - persistence no longer derives change authority from `tree() !== previous`;
 - the React reference maintains adapter-local snapshot equality;
@@ -524,9 +524,34 @@ B  stable root between natural-state changes, no subtree promise
 C  incremental identity-preserving subtree sharing
 
 causal/state correctness          A sufficient
+public/kernel product contract    B
 public/kernel contract for C      FUNCTION NOT ESTABLISHED
 current implementation choice     C retained as measured optimization
 ```
+
+Gate 2 found that B is not forced by the causal premises: A plus consumer-owned
+stabilization is coherent. B is therefore recorded as a PRODUCT DECISION. It
+gives every framework-independent consumer a cheap conservative root change
+oracle without requiring a deep comparator or another public revision API.
+That decision does not make identity causal authority.
+
+Direct controls establish the boundary:
+
+- two separately committed `A -> B` and `B -> A` operations remain two causal
+  turns although final natural state equals the initial state;
+- one same-turn scalar `A -> B -> A` remains the already-frozen net-zero rule
+  and creates no turn from its causal effects, not from snapshot identity;
+- equivalent final truth written with realized participation stays classified
+  as realized and creates no restoration admission;
+- React's direct root path is stable while unchanged, while a selector that
+  clones every entity remains correct with semantic equality;
+- Angular remains correct when its computed result clones the complete root and
+  every descendant, so Angular establishes no root or descendant identity law.
+
+The causal audit also found `Object.is` checks over scalar/object leaf values in
+restoration conflict detection. Those compare realized values, not materialized
+natural snapshot objects, and are outside SIC-0; they must not be cited as
+snapshot-identity authority or changed under this row.
 
 Premise 6 (full reconstruction on every read is bad behavior) establishes an
 efficient-materialization obligation, not a required consumer-observable
@@ -548,6 +573,7 @@ OWNER-INVALIDATION-0                CLOSED GREEN — cb2a276f
 CONSTRUCTION-BOUND-REALIZATION-0    CLOSED GREEN — 23c6de5a
 TEST-OWNERSHIP-REATTRIBUTION-0      CLOSED GREEN — framework-free kernel target
 ATOMIC-OBSERVATION-DELIVERY-0       CLOSED GREEN — narrow invalidation group
+SNAPSHOT-IDENTITY-CONTRACT-0        SIC-B / CLOSED GREEN — checkpoint pending
 @signal-tree/react                  UNBLOCKED FOR GREENFIELD DERIVATION
 TruckTrax v2 migration              BLOCKED ON REACT CONTRACT
 TruckTrax v3 migration              BLOCKED ON GREENFIELD APPLICATION PATTERNS
