@@ -169,14 +169,14 @@ describe('HIST-0 case 9: does observability create restoration ownership?', () =
       { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
       { enhancers: [restoration({ maxHistorySize: 5 })] }
     );
-    const claims = getSubjectRestorationClaims(tree);
-
     for (let g = 0; g < 40; g++) {
       undoable(() => tree.$.rows.setAll([{ id: `g${g}`, name: 'n' }]));
       await flush();
     }
 
-    expect(claims?.snapshot().owners).toBeLessThanOrEqual(5);
+    expect(
+      getSubjectRestorationClaims(tree)?.snapshot().owners ?? 0
+    ).toBeLessThanOrEqual(5);
   });
 
   it('REALIZATION churn — zero claims, zero history: the target property', async () => {

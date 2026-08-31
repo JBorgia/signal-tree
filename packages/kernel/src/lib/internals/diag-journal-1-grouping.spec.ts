@@ -103,10 +103,10 @@ describe('DIAG-JOURNAL-1 F1: does a flush-bounded entry equal one causal turn?',
 
     // ONE group for one causal turn, both paths inside it — the flush boundary
     // agrees with HIST-C's turn boundary rather than inventing a finer one.
-    // (Restoration history is baseline + 1, i.e. the same single turn.)
+    // Restoration retains the same single turn; there is no installation entry.
     expect(p.groups.length).toBe(1);
     expect(p.groups[0].paths).toEqual(['a', 'b']);
-    expect(tree.getRestorationHistory().length).toBe(2);
+    expect(tree.getRestorationHistory().length).toBe(1);
   });
 
   it('two authored writes in SEPARATE ticks', async () => {

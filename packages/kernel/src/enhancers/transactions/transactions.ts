@@ -1,4 +1,7 @@
-import { getOrCreateSubjectRestorationClaims } from '../../lib/internals/subject-restoration-claims';
+import {
+  getOrCreateSubjectRestorationClaims,
+  getSubjectRestorationClaims,
+} from '../../lib/internals/subject-restoration-claims';
 import type {
   Enhancer,
   EnhancerMeta,
@@ -31,6 +34,7 @@ import {
   createTreeRealizationAdapter,
   defineTreeRealizationDescriptors,
   defineTreeRealizationPort,
+  forgetSubjectsInTreeRealizationDescriptors,
   getTreeRealizationDescriptors,
   getTreeRealizationPort,
   rememberTreeRealizationDescriptor,
@@ -692,6 +696,32 @@ export function getOrCreateInternalTransactionRuntime<T>(
     });
   defineTreeRealizationPort(treeWrapper, realizationPort);
   defineTreeRealizationPort(stateRoot, realizationPort);
+
+  const forgetUnclaimedDescriptorSubjects = (
+    subjectIds: readonly number[],
+    descriptorOwnersBefore: ReadonlySet<number>
+  ): void => {
+    const claims = getSubjectRestorationClaims(tree);
+    const unclaimed = [...new Set(subjectIds)].filter(
+      (subjectId) => !claims?.isClaimed(subjectId)
+    );
+    forgetSubjectsInTreeRealizationDescriptors(
+      realizationDescriptors,
+      unclaimed
+    );
+    for (const [owner, descriptor] of realizationDescriptors) {
+      if (descriptorOwnersBefore.has(owner)) {
+        continue;
+      }
+      if (
+        (descriptor.subjectDescriptors?.size ?? 0) === 0 &&
+        (descriptor.structuralEffects?.size ?? 0) === 0 &&
+        (descriptor.structuralEffectBySubject?.size ?? 0) === 0
+      ) {
+        realizationDescriptors.delete(owner);
+      }
+    }
+  };
 
   const notifyListeners = (
     listeners: Set<TransactionLifecycleListener>,
@@ -1392,6 +1422,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
 
       notifier?.flushSync();
       const transactionId = nextTransactionId++;
+      const descriptorOwnersBefore = new Set(realizationDescriptors.keys());
       pendingTransactions.set(transactionId, createCaptureBucket());
 
       // TURN-FEED-0. Announced BEFORE the callback runs, because an observer has
@@ -1427,6 +1458,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
         const { effects, baselineValues } = drainTransactionRollbackInput(
           transactionId
         );
+        const rollbackSubjectIds = effects
+          .map((effect) => effect.subject)
+          .filter((subjectId): subjectId is number => subjectId !== undefined);
         // Starts true: "nothing to reverse" is a rollback that succeeded
         // trivially, NOT a refusal. Only the port throwing means nothing was
         // compensated.
@@ -1446,7 +1480,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
             }
           }
         } finally {
-          // Settle AFTER compensation, but UNCONDITIONALLY. Late, so consumers
+          try {
+            // Settle AFTER compensation, but UNCONDITIONALLY. Late, so consumers
           // released by this scope observe the RESTORED state rather than the
           // doomed one. In a `finally`, because compensation is fallible — it
           // throws SignalTreeRollbackError on a conservative refusal, which is
@@ -1461,11 +1496,22 @@ export function getOrCreateInternalTransactionRuntime<T>(
           // their consequences must FLUSH; discarding them would make durable
           // truth disagree with live truth to honour a reversal that did not
           // happen. This is the same rule the plan-level door already applies.
-          settleCommitScope(
-            transactionOwnerToken,
-            transactionId,
-            compensated ? 'discard' : 'commit'
-          );
+            settleCommitScope(
+              transactionOwnerToken,
+              transactionId,
+              compensated ? 'discard' : 'commit'
+            );
+            forgetUnclaimedDescriptorSubjects(
+              rollbackSubjectIds,
+              descriptorOwnersBefore
+            );
+          } finally {
+            lifecycleChannel.announce({
+              kind: 'rolled-back',
+              owner: transactionOwnerToken,
+              id: transactionId,
+            });
+          }
         }
       } finally {
         try {
@@ -1535,6 +1581,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
             // rollback() throws). Discarding would drop durable consequences
             // for state the tree is still showing.
             settleCommitScope(transactionOwnerToken, transactionId, 'commit');
+            forgetUnclaimedDescriptorSubjects(
+              pendingTurn?.restorationSubjectIds ?? [],
+              descriptorOwnersBefore
+            );
           }
         },
         rollback(): void {
@@ -1634,6 +1684,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
               transactionOwnerToken,
               transactionId,
               compensated ? 'discard' : 'commit'
+            );
+            forgetUnclaimedDescriptorSubjects(
+              discardedTurn?.restorationSubjectIds ?? [],
+              descriptorOwnersBefore
             );
           }
 

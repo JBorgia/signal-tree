@@ -272,6 +272,9 @@ type CaptureBucket = {
   subjectIds: Set<number>;
   positionIds: Set<number>;
   effects: PendingEffectMap;
+  descriptorInputs: Array<
+    Omit<Parameters<typeof rememberTreeRealizationDescriptor>[0], 'descriptors'>
+  >;
   /**
    * HIST-C2: whether any write accumulated into this turn was designated
    * restoration-eligible. Turn-WIDE by construction — one designated write
@@ -306,36 +309,16 @@ function combineScalarMutationIntent(
   return undefined;
 }
 
-/**
- * @internal Validate `maxHistorySize`, because two plausible values silently
- * disabled undo entirely.
- *
- * `maxHistorySize` is a BUFFER LENGTH, not a step count: N retained entries yield
- * N-1 undo steps, because the oldest retained entry is the state you land ON rather
- * than a step you spend. MEASURED after 10 writes — omitted: 10 steps, 5: 4, 2: 1,
- * **1: 0, 0: 0**.
- *
- * So `0` (which reads as "no limit") and `1` (which reads as "one step") both leave
- * `canUndo()` permanently false. `-1` additionally drives `getCurrentIndex()` to -1,
- * since the trim runs `currentIndex--` against an already-empty buffer. And `NaN` was
- * silently UNBOUNDED, because `length > NaN` is never true.
- *
- * A silently dead undo button is the same failure class as the phantom-step defect:
- * the API reports that undo is available and it does nothing. Fail loud instead.
- *
- * The `??` is deliberately preserved — it correctly distinguishes "not supplied"
- * from "supplied as 0", and the fix belongs in validation rather than in coalescing.
- */
+/** @internal Zero is no retention; every positive integer is an explicit capacity. */
 function normaliseMaxHistorySize(value: number | undefined): number {
   if (value === undefined) return 50;
-  if (!Number.isFinite(value) || value < 2) {
+  if (!Number.isFinite(value) || value < 0) {
     if (typeof ngDevMode === 'undefined' || ngDevMode) {
       console.error(
         `SignalTree: restoration({ maxHistorySize: ${String(value)} }) cannot ` +
-          `support undo. maxHistorySize is a buffer LENGTH, so N entries give ` +
-          `N-1 undo steps — any value below 2 gives none, and a non-finite value ` +
-          `is silently unbounded. Falling back to the default of 50. Pass 2 or ` +
-          `more, or omit it. [ST2032]`
+          `express a supported retention policy. Pass 0 to retain no completed ` +
+          `history, a positive integer for bounded undo, or omit it for the default ` +
+          `of 50. Falling back to 50. [ST2032]`
       );
     }
     return 50;
@@ -400,6 +383,10 @@ class RestorationManager<T> {
     markOwnerInvalidatedFrom(this.tree);
   }
 
+  retainsCompletedHistory(): boolean {
+    return this.maxHistorySize > 0;
+  }
+
   private maxHistorySize: number;
   private includePayload: boolean;
   private actionNames: Record<string, string>;
@@ -426,9 +413,9 @@ class RestorationManager<T> {
       batch: 'BATCH',
       ...config.actionNames,
     };
-
-    // Add initial state to history
-    this.addEntry('INIT');
+    if (this.maxHistorySize > 0) {
+      snapshotState(this.tree.$ as unknown as TreeNode<T>);
+    }
   }
 
   /**
@@ -461,7 +448,8 @@ class RestorationManager<T> {
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
-    explicitTurnId?: number
+    explicitTurnId?: number,
+    beforeInsert?: () => void
   ): boolean {
     const entry = this.buildTurn(
       action,
@@ -476,6 +464,7 @@ class RestorationManager<T> {
       return false;
     }
 
+    beforeInsert?.();
     return this.insertConfirmedTurn(entry);
   }
 
@@ -513,12 +502,13 @@ class RestorationManager<T> {
     };
   }
 
-  confirmPendingTurn(turnId: number): boolean {
+  confirmPendingTurn(turnId: number, beforeInsert?: () => void): boolean {
     const entry = this.pendingTurns.get(turnId);
     if (!entry) {
       return false;
     }
 
+    beforeInsert?.();
     this.pendingTurns.delete(turnId);
     return this.insertConfirmedTurn(entry);
   }
@@ -1442,7 +1432,6 @@ class RestorationManager<T> {
     this.isTemporalViewActive = false;
     this.bumpRestorationHistory();
     this.currentIndex = -1;
-    this.addEntry('RESET');
     this.observedBatches = [];
   }
 
@@ -1827,7 +1816,7 @@ class RestorationManager<T> {
 /**
  * Enhances a SignalTree with comprehensive restoration capabilities.
  *
- * Adds undo/redo functionality, state history management, and snapshot features.
+ * Adds undo/redo for explicitly designated turns and bounded history management.
  * Automatically tracks state changes and provides methods to navigate through
  * the application's state history with configurable limits and optimizations.
  *
@@ -2288,6 +2277,7 @@ export function restoration(
       subjectIds: new Set<number>(),
       positionIds: new Set<number>(),
       effects: new Map(),
+      descriptorInputs: [],
       designated: false,
     });
     const pendingCapture = createCaptureBucket();
@@ -2357,6 +2347,10 @@ export function restoration(
     // rather than assuming provenance would be sufficient.
 
     const pendingTransactions = new Map<number, CaptureBucket>();
+    const pendingDescriptorInputs = new Map<
+      number,
+      CaptureBucket['descriptorInputs']
+    >();
     const transactionOwnerToken = {};
     const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
       value !== null &&
@@ -2372,6 +2366,7 @@ export function restoration(
       subjectIds: number[];
       positionIds: number[];
       effects: TurnEffect[];
+      descriptorInputs: CaptureBucket['descriptorInputs'];
       designated: boolean;
     } => {
       const ownerPaths = Array.from(bucket.ownerPaths).sort();
@@ -2386,9 +2381,31 @@ export function restoration(
       bucket.positionIds.clear();
       const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
       bucket.effects.clear();
+      const descriptorInputs = bucket.descriptorInputs.splice(0);
       const designated = bucket.designated;
       bucket.designated = false;
-      return { ownerPaths, subjectIds, positionIds, effects, designated };
+      return {
+        ownerPaths,
+        subjectIds,
+        positionIds,
+        effects,
+        descriptorInputs,
+        designated,
+      };
+    };
+
+    const retainDescriptorInputs = (
+      descriptorInputs: CaptureBucket['descriptorInputs']
+    ): void => {
+      if (!restorationManager.retainsCompletedHistory()) {
+        return;
+      }
+      for (const input of descriptorInputs) {
+        rememberTreeRealizationDescriptor({
+          ...input,
+          descriptors: realizationDescriptors,
+        });
+      }
     };
 
     /**
@@ -2697,15 +2714,14 @@ export function restoration(
               return fallback === undefined ? [] : [fallback];
             })();
 
-      rememberTreeRealizationDescriptor({
-        descriptors: realizationDescriptors,
-        path,
-        ownerPath,
-        positionIds: resolvedPositionIds,
-        subjectIds,
-        meta,
-        registry: getPositionRegistry(tree.$),
-      });
+          bucket.descriptorInputs.push({
+            path,
+            ownerPath,
+            positionIds: resolvedPositionIds,
+            subjectIds,
+            meta,
+            registry: getPositionRegistry(tree.$),
+          });
 
       bucket.ownerPaths.add(ownerPath ?? path);
       for (const subjectId of subjectIds ?? []) {
@@ -2783,12 +2799,25 @@ export function restoration(
       if (!bucket) {
         return undefined;
       }
-      const { ownerPaths, subjectIds, positionIds, effects, designated } =
+      const {
+        ownerPaths,
+        subjectIds,
+        positionIds,
+        effects,
+        descriptorInputs,
+        designated,
+      } =
         drainCaptureBucket(bucket);
       if (!isTurnEligible(designated)) {
         return undefined;
       }
-      return restorationManager.createPendingEntry(
+      if (!restorationManager.retainsCompletedHistory()) {
+        return undefined;
+      }
+      if (effects.length === 0) {
+        return undefined;
+      }
+      const entry = restorationManager.createPendingEntry(
         'transaction',
         undefined,
         ownerPaths.length > 0 ? ownerPaths : undefined,
@@ -2796,6 +2825,10 @@ export function restoration(
         positionIds.length > 0 ? positionIds : undefined,
         effects.length > 0 ? effects : undefined
       );
+      if (entry) {
+        pendingDescriptorInputs.set(entry.id, descriptorInputs);
+      }
+      return entry;
     };
     /**
      * TURN-FEED-0 — observe a FOREIGN transaction's lifecycle.
@@ -2846,6 +2879,9 @@ export function restoration(
       }
 
       activeForeignTransactions.delete(key);
+      if (event.kind === 'rolled-back') {
+        pendingTransactions.delete(event.id);
+      }
       const stagedTurnId = stagedForeignTurns.get(key);
       stagedForeignTurns.delete(key);
       if (stagedTurnId === undefined) {
@@ -2855,7 +2891,13 @@ export function restoration(
       }
 
       if (event.kind === 'confirmed') {
-        restorationManager.confirmPendingTurn(stagedTurnId);
+        const descriptorInputs = pendingDescriptorInputs.get(stagedTurnId) ?? [];
+        const confirmed = restorationManager.confirmPendingTurn(stagedTurnId, () =>
+          retainDescriptorInputs(descriptorInputs)
+        );
+        if (confirmed) {
+          pendingDescriptorInputs.delete(stagedTurnId);
+        }
         return;
       }
 
@@ -2863,6 +2905,7 @@ export function restoration(
       // away rather than admitted. Compensation is the owner's job — restoration
       // neither applies nor validates it.
       restorationManager.discardPendingTurn(stagedTurnId);
+      pendingDescriptorInputs.delete(stagedTurnId);
     });
 
 
@@ -3099,23 +3142,31 @@ export function restoration(
             // people's trees is the worst kind.
             if (!selfDirty) return;
             selfDirty = false;
-            const { ownerPaths, subjectIds, positionIds, effects, designated } =
+            const {
+              ownerPaths,
+              subjectIds,
+              positionIds,
+              effects,
+              descriptorInputs,
+              designated,
+            } =
               drainCaptureBucket(pendingCapture);
-            const recorded =
-              !isTurnEligible(designated) ||
-              (ownerPaths.length === 0 &&
-                subjectIds.length === 0 &&
-                positionIds.length === 0 &&
-                effects.length === 0)
-                ? false
-                : restorationManager.addEntry(
+            const eligible =
+              isTurnEligible(designated) &&
+              restorationManager.retainsCompletedHistory() &&
+              effects.length > 0;
+            const recorded = eligible
+              ? restorationManager.addEntry(
                     'batch',
                     undefined,
                     ownerPaths.length > 0 ? ownerPaths : undefined,
                     subjectIds.length > 0 ? subjectIds : undefined,
                     positionIds.length > 0 ? positionIds : undefined,
-                    effects.length > 0 ? effects : undefined
-                  );
+                    effects.length > 0 ? effects : undefined,
+                    undefined,
+                    () => retainDescriptorInputs(descriptorInputs)
+                  )
+              : false;
             restorationManager.observeBatch('batch', ownerPaths, recorded);
           });
         }
@@ -3163,9 +3214,14 @@ export function restoration(
     // restoration's own job and the lifecycle observer drives it.
     (enhancedTree as ISignalTree<T> & RestorationMethods)['getRestorationHistory'] = () =>
       restorationManager.getRestorationHistory();
+    const resetRestorationRetention = (): void => {
+      restorationManager.resetRestorationHistory();
+      pendingDescriptorInputs.clear();
+      stagedForeignTurns.clear();
+    };
     (enhancedTree as ISignalTree<T> & RestorationMethods)['resetRestorationHistory'] =
       () => {
-        restorationManager.resetRestorationHistory();
+        resetRestorationRetention();
       };
     (enhancedTree as ISignalTree<T> & RestorationMethods)['jumpTo'] = (
       index: number
@@ -3247,7 +3303,9 @@ export function restoration(
         unsubscribeReset = null;
         restoreLeafInterceptors = null;
         releaseCapture?.();
-        restorationManager.resetRestorationHistory();
+        resetRestorationRetention();
+        pendingTransactions.clear();
+        activeForeignTransactions.clear();
       });
     }
 

@@ -157,16 +157,10 @@ describe('SUBJECT-ADDRESS-CARDINALITY-0: two coordinates, one slot', () => {
     expect(tree.$.rows.byIdOrFail('r1').name()).toBe('before');
     expect(tree.$.rows.byIdOrFail('r1').enabled()).toBe(false);
 
-    // ⚠️ Yet exactly ONE coordinate is retained for the subject, and it is
-    // NEITHER of the two that were applied. So the retained slot did not carry
-    // them — the effects did.
+    // No fallback coordinate is retained. The two inline effects carried the
+    // exact coordinates required by rollback.
     const slots = retainedSlots(tree.$ as unknown as object);
-    expect(slots.length).toBeGreaterThan(0);
-    for (const s of slots) {
-      expect(s.count).toBe(1);
-      expect(s.field).not.toBe('name');
-      expect(s.field).not.toBe('enabled');
-    }
+    expect(slots).toEqual([]);
   });
 
   it('the same holds with the two writes in the opposite order', async () => {

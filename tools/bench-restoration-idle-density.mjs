@@ -68,9 +68,6 @@ const extractProductionIdleArtifacts = async (count) => {
   const tree = await createProductionTree(count, true);
   const descriptors = getTreeRealizationDescriptors(tree);
   const initialState = tree.getRestorationHistory()[0]?.state;
-  if (descriptors === undefined || initialState === undefined) {
-    throw new Error('production restoration did not expose idle artifacts');
-  }
   tree.destroy();
   return { descriptors, initialState };
 };
@@ -329,6 +326,8 @@ const exactGraph =
   byName.get('synthetic-canonical-baseline').bytesPerSubject;
 const closure = exactGraph / productionDelta;
 const productionArtifactClosure = productionArtifacts / productionDelta;
+const repairedIdleState =
+  Math.abs(productionDelta) <= 32 && Math.abs(productionArtifacts) <= 32;
 const primary = {
   initialSnapshotMaterialized:
     byName.get('initial-snapshot-materialized').bytesPerSubject,
@@ -354,7 +353,10 @@ for (const row of rows) {
     }
   }
 }
-if (productionArtifactClosure < 0.9 || productionArtifactClosure > 1.1) {
+if (
+  !repairedIdleState &&
+  (productionArtifactClosure < 0.9 || productionArtifactClosure > 1.1)
+) {
   problems.push(
     `extracted production artifacts ${productionArtifacts.toFixed(1)} vs production ${productionDelta.toFixed(1)} B/subject close at ${(productionArtifactClosure * 100).toFixed(1)}%`
   );
@@ -364,7 +366,7 @@ if (problems.length > 0) {
 }
 
 if (process.argv.includes('--json')) {
-  console.log(JSON.stringify({ sizes: SIZES, samples: SAMPLES, rows, productionDelta, productionArtifacts, productionArtifactClosure, exactGraph, closure, primary, primarySum, diagnostics }, null, 2));
+  console.log(JSON.stringify({ sizes: SIZES, samples: SAMPLES, rows, repairedIdleState, productionDelta, productionArtifacts, productionArtifactClosure, exactGraph, closure, primary, primarySum, diagnostics }, null, 2));
   process.exit(0);
 }
 
@@ -391,12 +393,13 @@ for (const [name, bytes] of Object.entries(diagnostics)) {
   console.log(`  ${name.padEnd(27)} ${bytes.toFixed(1).padStart(8)} B/subject`);
 }
 console.log('\nAttribution closure');
+console.log(`  live disposition                           ${repairedIdleState ? 'REPAIRED / ZERO IDLE SUBJECT SLOPE' : 'EAGER ARTIFACTS PRESENT'}`);
 console.log(`  production restoration-over-causal delta  ${productionDelta.toFixed(1)} B/subject`);
 console.log(`  extracted actual production artifacts     ${productionArtifacts.toFixed(1)} B/subject`);
-console.log(`  extracted artifacts / production          ${(productionArtifactClosure * 100).toFixed(1)}%`);
+console.log(`  extracted artifacts / production          ${repairedIdleState ? 'n/a (idle slope is zero)' : `${(productionArtifactClosure * 100).toFixed(1)}%`}`);
 console.log(`  shape-matched synthetic idle graph        ${exactGraph.toFixed(1)} B/subject`);
-console.log(`  synthetic / production (diagnostic only)  ${(closure * 100).toFixed(1)}%`);
+console.log(`  synthetic / production (diagnostic only)  ${repairedIdleState ? 'n/a (historical shape)' : `${(closure * 100).toFixed(1)}%`}`);
 console.log(
-  '\nExtracted production artifacts are the closure authority. Standalone diagnostics overlap through allocation context, keys, and objects.\n' +
+  '\nExtracted production artifacts are the historical eager-state closure authority. Standalone diagnostics overlap through allocation context, keys, and objects.\n' +
     'No production representation or restoration semantics changed.'
 );

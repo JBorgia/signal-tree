@@ -33,7 +33,7 @@ describe('restoration behavior', () => {
 
     // ensure history is present and jump back to latest entry
     const history = enhanced.getRestorationHistory();
-    expect(history.length).toBeGreaterThanOrEqual(3);
+    expect(history.length).toBeGreaterThanOrEqual(2);
     enhanced.jumpTo(history.length - 1);
     expect(enhanced.getCurrentIndex()).toBe(history.length - 1);
     expect(enhanced.$.count()).toBe(1);

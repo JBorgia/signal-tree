@@ -99,7 +99,7 @@ describe('A2-1 arm C: COMPOSITION, application reads BEFORE construction', () =>
     // Identical to arm A on every assertion that matters.
     expect(firstObserved).toBe('dark');
     expect(seen).toEqual([]);
-    expect(tree.getRestorationHistory().length).toBe(1);
+    expect(tree.getRestorationHistory().length).toBe(0);
     expect(tree.canUndo()).toBe(false);
   });
 

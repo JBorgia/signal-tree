@@ -234,7 +234,7 @@ describe('A1 case 7-9: boundary', () => {
     // No leak. The write after the scope is authored again, and it is the only
     // restoration step — the ingress before it never became one.
     expect(seen).toEqual([{ origin: null, participation: null }]);
-    expect(tree.getRestorationHistory().length).toBe(2);
+    expect(tree.getRestorationHistory().length).toBe(1);
   });
 
   it('case 9 — an async callback is REFUSED rather than silently unclassified', async () => {
