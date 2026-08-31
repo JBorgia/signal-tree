@@ -61,16 +61,22 @@ controller shape. `CANONICAL-SNAPSHOT-HANDOFF-0` is closed at `3b572fe7`.
 The root-controller blocker on `@signal-tree/react` is discharged; React work
 may proceed when selected by the remaining Phase 5.5 sequence.
 
-`SELECTOR-SNAPSHOT-COST-0` is **OPEN / BLOCKS REACT API FREEZE, NOT ROOT OR
-KERNEL**. Measured cold whole-root materialization after one EntityMap mutation
+`SELECTOR-SNAPSHOT-COST-0` is **CLOSED / PROPERTY FROZEN** at `eea160b9`.
+Measured cold whole-root materialization after one EntityMap mutation
 was about 245 us at 10k rows and 2.2 ms at 50k, while an entity update plus
 direct `byId()` reread was about 1.2-1.6 us. Therefore owner invalidation is only
 the wake-up fact for React selectors: selector `getSnapshot` must reread the
 selected location/value directly and must not be forced through whole-root
 NaturalValue materialization. Whole-root consumers may still read the whole
-root. This is a pre-freeze adapter constraint, not a hook spelling or new kernel
-port. The React reference carries unrelated-owner-wake/no-rerender and
-selected-mutation/rerender controls at `eea160b9`.
+root.
+
+> **SHARED OWNER INVALIDATION DOES NOT IMPLY SHARED SNAPSHOT SCOPE.**
+
+Semantic equality may suppress a rerender after the selected reread. This
+freezes no hook name, selector API spelling, equality option spelling, cache API,
+or new kernel port. The React public API remains open. The React reference
+carries unrelated-owner-wake/no-rerender and selected-mutation/rerender controls
+at `eea160b9`.
 
 Measurement provenance: `node --expose-gc
 scripts/benchmarks/data-model-profile.mjs entitymap` against the `1495f713`
