@@ -136,13 +136,13 @@ Generator checkpoint: `1bc53ae8`.
 node --expose-gc tools/bench-subject-record-consolidation.mjs
 ```
 
-| Prototype arm | Marginal bytes/entity | Saving from production |
-| --- | ---: | ---: |
-| production `StructuralStore` + `EntityValueStore` control | 394.0 B | — |
-| consolidated record, both active indexes retained | 345.3 B | 48.7 B |
-| consolidated record, only key active index retained | 309.0 B | 85.0 B |
-| consolidated record, only SubjectId active index retained | 309.0 B | 85.0 B |
-| consolidated record, neither active index retained | 272.7 B | 121.4 B |
+| Prototype arm                                             | Marginal bytes/entity | Saving from production |
+| --------------------------------------------------------- | --------------------: | ---------------------: |
+| production `StructuralStore` + `EntityValueStore` control |               394.0 B |                      — |
+| consolidated record, both active indexes retained         |               345.3 B |                 48.7 B |
+| consolidated record, only key active index retained       |               309.0 B |                 85.0 B |
+| consolidated record, only SubjectId active index retained |               309.0 B |                 85.0 B |
+| consolidated record, neither active index retained        |               272.7 B |                121.4 B |
 
 The production control reproduces E0's 393.9 B/entity slope. Consolidating the
 two extra SubjectId-indexed facts saves 48.7 B/entity, not the theoretical
@@ -165,6 +165,53 @@ semantically necessary. This prototype does not test production restoration
 placement, reorder/move/transfer, causal integration, external ingress, owner
 invalidation, facade GC, or hot-path latency. Therefore 272.7 B/entity is a
 plausible measured layout, not an authorized production target.
+
+## E2 Result — Exceptional Lifetime Evidence
+
+Generator checkpoint: `e07ac9d3`.
+
+```bash
+node --expose-gc tools/bench-active-retired-lifetime.mjs
+```
+
+| Population | Marginal bytes/unit | Interpretation |
+| --- | ---: | --- |
+| E1 active control | 272.7 B/entity | explicit `active` and `restoreAllowed` |
+| compact active | 256.6 B/entity | active implicit from `activeNode` |
+| mutated compact active | 256.6 B/entity | ordinary updates add 0.0 B/entity |
+| retired, strong exceptional state | 248.7 B/retired subject | no active key or ordering node |
+| attribution control without lifetime truth | 164.4 B/retired subject | invalid candidate; isolates overflow |
+| held retired | 257.9 B/held retired subject | external strong held-record reference |
+| reactivated | 295.1 B/entity | compact record plus key-index churn |
+| fresh same-key occupant | 553.0 B/old-new pair | held retired subject plus distinct live subject |
+
+The common active record saves 16.1 B/entity by omitting the two explicit
+lifetime fields. Mutating active value/revision adds no measurable subject
+slope. The strong exceptional lifetime Map plus record costs 84.3 B/retired
+subject, matching E0's lifetime attribution, but only exceptional populations
+pay it.
+
+Reactivation initially appeared to retain 38.5 B/entity beyond pristine compact
+construction. A key-index delete/reinsert control attributes 36.3 B/entity of
+that difference to V8 Map churn; reactivation is only 2.2 B/entity beyond that.
+Replacing the emptied exceptional Map changes its marginal slope by 0.0 B/entity.
+This says nothing about a fixed empty-container residue.
+
+The synthetic production-shaped restoration claim graph adds 294.3 B/claimed
+retired subject in its chosen owner-Set representation. That is not an abstract
+minimum claim cost and does not belong to the raw lifetime floor; E5 owns the
+production capability measurement.
+
+Controls preserve stable non-reused SubjectId, in-place mutation, held retired
+identity, occupied-key restore rejection, fresh same-key occupation, exact
+same-subject restoration, rekey identity, forward/reverse order integrity, and
+constant-hop Map lookup. All arms collect after release.
+
+E2 is **admissible representation evidence only**. Production promotion must
+first make active `restoreAllowed === true` an enforced invariant or represent
+its exceptional false case, and must cover the intermediate tombstone state,
+mixed populations, production restoration/causal paths, and hot-path latency.
+No weak canonical truth, production change, or public change is authorized.
 
 ## E5 Featured-Memory Law
 

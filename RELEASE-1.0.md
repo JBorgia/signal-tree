@@ -218,6 +218,23 @@ split stores remain coherent, and no production conclusion follows before
 restoration placement, reorder/move/transfer, causal/external/owner integration,
 facade GC, and hot-path latency survive direct controls.
 
+`ENTITY-PHYSICAL-DENSITY-0 / E2` is **CLOSED EXTERNAL PROTOTYPE /
+PRODUCTION NOT AUTHORIZED** at `e07ac9d3`. E1's 272.7 B/entity active control is
+reproduced. Making active lifetime implicit lowers the common active slope to
+256.6 B/entity, saving 16.1 B/entity; ordinary active mutation adds 0.0. A
+strong exceptional lifetime Map+record costs 84.3 B/retired subject and is
+absent from common active records. Reactivation's 38.5 B/entity difference from
+pristine construction is almost entirely key-index Map churn (36.3 B/entity),
+not retained exceptional state; the residual beyond that control is 2.2.
+Stable/held identity, fresh same-key occupation, occupied-key restore rejection,
+exact same-subject restoration, rekey and order integrity, constant-hop Map
+paths, and collectability are controlled. The 294.3 B/claimed-subject arm is one
+synthetic production-shaped claim graph, not a semantic minimum; E5 owns actual
+optional-capability density. Independent review is clean. Production promotion
+still requires an enforced active `restoreAllowed` invariant, intermediate
+tombstone and mixed-population evidence, full restoration/causal integration,
+and latency controls.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
