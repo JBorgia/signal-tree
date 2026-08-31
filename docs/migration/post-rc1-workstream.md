@@ -160,7 +160,7 @@ define or freeze a React hook. Selector-result caching is observational
 memoization, not a writable state authority, but changing-selector and
 abandoned-render controls remain required before a hook contract can freeze.
 
-### SELECTOR-SNAPSHOT-COST-0 — OPENED / PRE-FREEZE CONSTRAINT
+### SELECTOR-SNAPSHOT-COST-0 — CLOSED / PROPERTY FROZEN (`eea160b9`)
 
 The post-root-retirement performance audit supplies a direct React design
 falsifier:
@@ -177,12 +177,19 @@ scripts/benchmarks/data-model-profile.mjs entitymap` against the `1495f713`
 root-retirement build. That generator measures both paths in the same fixture
 family; these are shape constraints, not portable hardware budgets.
 
+> **SHARED OWNER INVALIDATION DOES NOT IMPLY SHARED SNAPSHOT SCOPE.**
+
 **PRODUCT/ADAPTER AUTHORITY:** React selectors must not require whole-root
 NaturalValue materialization after every owner invalidation. Owner invalidation
 is the wake-up fact; a selector's `getSnapshot` rereads its selected location or
 value directly. A consumer that actually selects the whole root may materialize
 the whole root. This constrains the future hook substrate but freezes no hook
 name, overload, equality API, cache policy, or package surface.
+
+Semantic equality may suppress a rerender after the selected reread. The React
+public API remains open: hook name, selector spelling, equality option spelling,
+cache API, lifecycle ergonomics, SSR/React Native requirements, and package
+surface are not decided by this row.
 
 The reference carrier in `apps/react-reference` now proves the boundary. An
 unrelated entity mutation wakes and reruns a direct `byId` selector, semantic
