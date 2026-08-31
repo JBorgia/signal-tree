@@ -32,9 +32,8 @@ if (!existsSync(DIST)) {
   process.exit(1);
 }
 const core = await import(pathToFileURL(DIST).href);
-const { signalTree, restoration, createAuditTracker } = core;
+const { signalTree, createAuditTracker } = core;
 
-const flush = () => new Promise((r) => setTimeout(r, 0));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = [];
 const check = (name, reproduced, detail) => {
@@ -110,40 +109,6 @@ const check = (name, reproduced, detail) => {
   console.log(
     `    (why it polls: tree has .subscribe? ${hasSubscribe ? 'yes' : 'NO'} ` +
       `-> the setInterval fallback at audit.ts:160 always runs)`
-  );
-}
-
-// -- 6d: maxHistorySize is a buffer length, not a step count ---------------
-// Validated since 4835da80: a cap below 2 warns ST2032 and FALLS BACK to the
-// default of 50 rather than silently disabling undo.
-{
-  const rows = [];
-  const warnings = [];
-  const origError = console.error;
-  console.error = (...args) => {
-    if (String(args[0] ?? '').includes('[ST2032]')) warnings.push(args[0]);
-    origError(...args);
-  };
-  for (const cap of [undefined, 0, 1, 2, 5]) {
-    const t = signalTree({ n: 0 }, { enhancers: [restoration(cap === undefined ? {} : { maxHistorySize: cap })] });
-    for (let i = 1; i <= 10; i++) {
-      t.$.n.set(i);
-      await flush();
-    }
-    let spent = 0;
-    while (t.canUndo() && spent < 50) {
-      t.undo();
-      spent++;
-    }
-    rows.push(`${cap === undefined ? 'omitted' : cap}=${spent}`);
-  }
-  console.error = origError;
-  check(
-    '6d maxHistorySize < 2 warns ST2032 and falls back to 50 (undo not disabled)',
-    warnings.length === 2 && rows.includes('0=10') && rows.includes('1=10'),
-    `undo steps spendable after 10 writes — ${rows.join(
-      ', '
-    )}; ST2032 warnings for caps 0 and 1: ${warnings.length}`
   );
 }
 

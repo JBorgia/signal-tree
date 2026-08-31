@@ -808,6 +808,13 @@ const GATES = [
     },
   },
   {
+    name: 'restoration-turn-capacity',
+    covers:
+      'maxHistorySize retains completed designated turns exactly: omitted defaults, zero retains none, and positive N retains N',
+    cmd: ['node', 'tools/verify-restoration-capacity.mjs'],
+    needsBuild: true,
+  },
+  {
     name: 'signal-identity-durability',
     covers:
       'a live consumer keeps receiving updates across garbage collection — the property the test suite structurally cannot check',
