@@ -87,7 +87,7 @@ Validation: React reference 16/16, production reference build, both TypeScript
 passes, numeric/link checks, independent review, and the full release ladder at
 66/66 with zero known-red.
 
-`REACT-API-DERIVATION-0` is **SELECTOR INPUT FROZEN / PRODUCT PRESENTATION OPEN**.
+`REACT-API-DERIVATION-0` is **SELECTOR INPUT FROZEN / PRODUCT PRESENTATION OPEN** at `9b84c14e`.
 The derived package behavior is owner-bound subscription and cleanup,
 synchronous selected canonical reads, Object.is-stable React snapshots while
 selected truth is unchanged, explicit whole-root observation, and no mirrored
