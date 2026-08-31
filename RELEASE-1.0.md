@@ -469,20 +469,34 @@ O(collection) `bySubject` / `byOwner` claim graph are eliminated, recovering
 about 22.6 MB at 100k. The residual is the shared
 `CanonicalTurn.state.<collection>.all` materialization, which belongs to
 `RESTORATION-TURN-STATE-0`. `rekey-claim-width-0.spec.ts` pins the fix at the
-producer (`__subjectIds` after `changeId`, ordinary and prepared/transactional
-paths) and at the restoration outcome (one retained claim independent of
-collection size, held identity across the rekey, undo/redo key restoration,
-order preservation, rolled-back-transaction atomicity, eviction release, fresh
-same-key occupant distinctness). The redo path was traced: `redo()` of a
-designated rekey turn replays through `__planPreparedRekey.commit()` and
-delivers one `structural=rekey` notify with `nSubjects=1`; after settlement the
-retained turn's `restorationSubjectIds` and the claim registry stay at one at N
-of 20/30/600/1,000. An interim draft assertion reading `80` after redo was a
+producer (`__subjectIds` after `changeId`, ordinary and transactional paths)
+and at the restoration outcome (one retained claim independent of collection
+size, held identity across the rekey, undo/redo key restoration, order
+preservation, rolled-back-transaction atomicity, eviction release, fresh
+same-key occupant distinctness, no-op and rejected rekey latch behavior). The
+redo path was traced and the first account of it was WRONG: a pure rekey
+reversal replays through `__planRekey.commit()`, not the prepared planner --
+instrumenting both across pure rekey undo/redo, composed turns, transactional
+confirm/rollback, and multi-turn `jumpTo`, the prepared planner fired ZERO
+times, because the prepared context only holds a subject an earlier
+restore/add effect in the same batch introduced and capture-time coalescing
+merges a same-subject rekey into the structural effect that preceded it.
+`planPreparedRekey.commit()` is patched for sibling consistency and is
+reachable only through a hand-composed realization batch; that route has no
+direct spec yet. After redo settles, the retained turn's
+`restorationSubjectIds` and the claim registry stay at one at N of
+20/30/600/1,000. An interim draft assertion reading `80` after redo was a
 broken test (it redid an unrelated bulk `setAll`, whose last-write latch
 legitimately spans the collection), now replaced by one that redoes the rekey
-turn itself. Kernel 247 files / 2,002 passed / 3 expected failures / 13 skipped
-/ 1 todo; both TypeScript passes; kernel lint/build; the rekey arm of the A0
-harness now asserts the repaired one-claim cardinality.
+turn itself. The no-op branch was a residual hazard found by review:
+`wrapMutator` fires on every mutator call with no `next !== prev` guard, so a
+no-op `changeId(k, k)` re-published the previous bulk write's participation
+set into the capture bucket of a designated write sharing the tick (measured:
+50 claims for a one-subject turn); both no-op branches now narrow the latch to
+the addressed subject, and a rejected rekey throws before any frame commits.
+Kernel 247 files / 2,002 passed / 3 expected failures / 13 skipped / 1 todo;
+both TypeScript passes; kernel lint/build; the rekey arm of the A0 harness now
+asserts the repaired one-claim cardinality.
 `RESTORATION-TURN-STATE-0` is the active row; `REALIZATION-OWNERSHIP-0` stays
 queued behind it.
 
