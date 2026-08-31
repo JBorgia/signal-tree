@@ -174,16 +174,16 @@ Generator checkpoint: `e07ac9d3`.
 node --expose-gc tools/bench-active-retired-lifetime.mjs
 ```
 
-| Population | Marginal bytes/unit | Interpretation |
-| --- | ---: | --- |
-| E1 active control | 272.7 B/entity | explicit `active` and `restoreAllowed` |
-| compact active | 256.6 B/entity | active implicit from `activeNode` |
-| mutated compact active | 256.6 B/entity | ordinary updates add 0.0 B/entity |
-| retired, strong exceptional state | 248.7 B/retired subject | no active key or ordering node |
-| attribution control without lifetime truth | 164.4 B/retired subject | invalid candidate; isolates overflow |
-| held retired | 257.9 B/held retired subject | external strong held-record reference |
-| reactivated | 295.1 B/entity | compact record plus key-index churn |
-| fresh same-key occupant | 553.0 B/old-new pair | held retired subject plus distinct live subject |
+| Population                                 |          Marginal bytes/unit | Interpretation                                  |
+| ------------------------------------------ | ---------------------------: | ----------------------------------------------- |
+| E1 active control                          |               272.7 B/entity | explicit `active` and `restoreAllowed`          |
+| compact active                             |               256.6 B/entity | active implicit from `activeNode`               |
+| mutated compact active                     |               256.6 B/entity | ordinary updates add 0.0 B/entity               |
+| retired, strong exceptional state          |      248.7 B/retired subject | no active key or ordering node                  |
+| attribution control without lifetime truth |      164.4 B/retired subject | invalid candidate; isolates overflow            |
+| held retired                               | 257.9 B/held retired subject | external strong held-record reference           |
+| reactivated                                |               295.1 B/entity | compact record plus key-index churn             |
+| fresh same-key occupant                    |         553.0 B/old-new pair | held retired subject plus distinct live subject |
 
 The common active record saves 16.1 B/entity by omitting the two explicit
 lifetime fields. Mutating active value/revision adds no measurable subject
@@ -212,6 +212,55 @@ first make active `restoreAllowed === true` an enforced invariant or represent
 its exceptional false case, and must cover the intermediate tombstone state,
 mixed populations, production restoration/causal paths, and hot-path latency.
 No weak canonical truth, production change, or public change is authorized.
+
+## E3 Result — Segmented Storage Rejected
+
+Generator checkpoint: `86b6aee7`.
+
+```bash
+node --expose-gc tools/bench-segmented-subject-storage.mjs
+```
+
+E3 compares the complete synthetic E2 layout with four SubjectId-record
+containers at segment size 1,024: Map, dense outer chunk arrays, sparse
+reclaiming object segments, and sparse field-packed segments with stable record
+handles. Every variant retains the unchanged key-to-SubjectId Map and ordering
+nodes. SubjectIds remain positive safe integers, monotonic, and never reused;
+segment and offset derive directly from SubjectId without an address Map.
+
+| Population                                |     Map | Chunked objects | Sparse objects | Packed stable handles |
+| ----------------------------------------- | ------: | --------------: | -------------: | --------------------: |
+| dense                                     | 256.6 B |         228.4 B |        228.4 B |               229.3 B |
+| dispersed 10% occupancy, direct           | 320.8 B |         365.1 B |        365.5 B |               517.2 B |
+| dispersed 10% occupancy, after retirement | 357.1 B |         364.9 B |        365.6 B |               517.2 B |
+| clustered 10% survivors after retirement  | 293.0 B |         301.0 B |        228.5 B |               229.4 B |
+| repeated high-water churn                 | 256.7 B |         301.0 B |        228.5 B |               229.7 B |
+| mixed active/restoration-retained         | 214.5 B |         186.2 B |        186.3 B |               187.2 B |
+
+Dense segmentation saves only 27.4-28.3 B/retained subject once stable access
+identity is included. Field packing provides no additional dense win over object
+segments. The dispersed sparse population reverses the result: every segmented
+variant is larger than the churned Map, and packed segments are much larger.
+
+Sparse object and packed variants correctly reclaim whole empty segments. That
+makes clustered and repeated-high-water survivors dense again and removes the
+high-water penalty. Dense outer chunk arrays cannot reclaim those segments and
+retain a 72.6 B/subject repeated-high-water penalty. A held old SubjectId while
+new IDs grow remains correct in every variant.
+
+The direct-versus-retired dispersed pair attributes 36.3 B/retained subject to
+Map churn. Segmented variants add approximately no retirement residue of their
+own, but pay for low occupancy directly. Iteration walks allocated segment
+capacity, so dispersed segmented iteration is materially slower than Map
+iteration; segmented random lookup/update also generally regress. Dense timing
+does not show a meaningful regression, but the sparse result controls the row.
+
+E3 is **closed negative representation evidence**. No segmented candidate meets
+the combined requirement of a material density win, bounded sparse/high-water
+retention, and no meaningful point-operation regression. The E2 compact
+`Map<SubjectId, SubjectRecord>` remains the best external candidate. Segment
+size tuning, slot reuse, an address Map, SubjectId reuse, generational identity,
+and production migration are not authorized by this result.
 
 ## E5 Featured-Memory Law
 

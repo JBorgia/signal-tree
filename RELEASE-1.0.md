@@ -235,6 +235,23 @@ still requires an enforced active `restoreAllowed` invariant, intermediate
 tombstone and mixed-population evidence, full restoration/causal integration,
 and latency controls.
 
+`ENTITY-PHYSICAL-DENSITY-0 / E3` is **CLOSED NEGATIVE EVIDENCE /
+SEGMENTED CANDIDATES REJECTED** at `86b6aee7`. Against E2's complete compact
+Map layout at 256.6 B/subject, chunked and sparse object segments measure
+228.4 B dense and packed stable-handle segments measure 229.3 B: only a
+27.4-28.3 B dense saving. At dispersed 10% occupancy after allocation and
+retirement, Map measures 357.1 B/retained subject, chunked 364.9, sparse 365.6,
+and packed 517.2. Sparse/packed variants reclaim empty clustered segments and
+avoid high-water retention, but dispersed lookup/update and capacity-based
+iteration regress; dense outer chunks retain a 72.6 B/subject high-water
+penalty. The Map's direct-versus-retired sparse pair independently reproduces
+the 36.3 B churn cost. All arms collect; SubjectIds remain safe-integer,
+monotonic, non-reused, and directly addressed without a slot Map; stable record
+and ordering-node identity survive. Independent review is clean. No variant
+meets E3's combined material-density, bounded-sparsity, and latency condition,
+so E2's compact SubjectId Map remains the best external candidate and no
+production migration is authorized.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
