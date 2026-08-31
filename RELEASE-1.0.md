@@ -169,8 +169,8 @@ B/scalar leaf and about 150 ms at 100k leaves, versus roughly 523 B for a raw
 Angular signal in the same decomposition. It does not block React, root
 retirement, or the current release phase unless a later product budget says so.
 
-`ENTITY-PHYSICAL-DENSITY-0 / E0` is **CLOSED GREEN / BYTE ATTRIBUTION
-COMPLETE** at `82b487da`. `node --expose-gc
+`ENTITY-PHYSICAL-DENSITY-0 / E0` is **CLOSED EVIDENCE / BYTE ATTRIBUTION
+FROZEN** at `82b487da`. `node --expose-gc
 tools/bench-entity-physical-density.mjs` measures
 three isolated, quiesced samples per arm at 0/1k/10k/100k and fails unless every
 arm is collectable and synthetic/exclusive accounting closes within 90-110% of
@@ -180,7 +180,18 @@ production. The measured physical-store marginal slope is 394 B/entity:
 Exact-shape synthetic and exclusive accounting each close at 100% against both
 `StructuralStore` (286 B/entity) and the combined physical stores. The familiar
 10k point remains 4.35 MB / about 456 B/entity because point retention includes
-capacity/fixed effects; it is not contradicted by the marginal slope.
+capacity/fixed effects; at 100k production is 37.82 MB and the fitted slope is
+393.9 B/entity. Do not restate the 10k point as the marginal physical floor.
+Structural bookkeeping is 286 B/entity, about 72.5% of that marginal floor.
+
+Validation disposition: focused E0 harness, attribution closure, lint budget,
+numeric claims, links, diff integrity, and independent review are GREEN. The
+post-commit full `npm run validate` is INCOMPLETE: its bundle-analysis phase
+built only `shared`, then gate 10b found the expected kernel artifact absent.
+The subsequent explicit `pnpm nx build kernel` plus
+`node tools/check-bundle-budget.mjs` completed with exit 0. Do not record this
+slice as a 66/66 full-pipeline pass; the failure is a pipeline prerequisite
+issue, not an E0 product or bundle-budget failure.
 
 Independent review found no E0 blocker. E1 is authorized only as an external
 record-consolidation prototype under
@@ -191,6 +202,21 @@ representation change. Revision and value-address Maps establish an immediate
 72 B/entity consolidation target; the 129 B/live-subject ordering/index group
 must prove whether two-hop record lookup preserves each index's O(1) job before
 any index can be rejected.
+
+`ENTITY-PHYSICAL-DENSITY-0 / E1` is **CLOSED EXTERNAL PROTOTYPE /
+PRODUCTION NOT AUTHORIZED** at `1bc53ae8`. Its production control reproduces E0
+at 394.0 B/entity. One mutable SubjectId-indexed record with both active indexes
+retained measures 345.3 B/entity, a 48.7 B saving after record-layout cost.
+Replacing either active index independently with O(1) record lookup measures
+309.0 B/entity; replacing both measures 272.7 B/entity, a total 121.4 B saving.
+Synthetic controls preserve linked-node identity, in-place value/revision
+updates, retirement, held identity, fresh same-key occupation, reactivation,
+missing lookup behavior, and forward/reverse ordering integrity. Three-sample
+0/1k/10k/100k measurement, lint budget, and diff integrity are green.
+Adversarial confirmation found the representation admissible but not necessary:
+split stores remain coherent, and no production conclusion follows before
+restoration placement, reorder/move/transfer, causal/external/owner integration,
+facade GC, and hot-path latency survive direct controls.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
