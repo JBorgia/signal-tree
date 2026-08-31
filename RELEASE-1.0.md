@@ -87,7 +87,7 @@ Validation: React reference 16/16, production reference build, both TypeScript
 passes, numeric/link checks, independent review, and the full release ladder at
 66/66 with zero known-red.
 
-`REACT-API-DERIVATION-0` is **SELECTOR INPUT FROZEN / PRODUCT PRESENTATION OPEN** at `9b84c14e`.
+`REACT-API-DERIVATION-0` is **CLOSED GREEN** at `9b84c14e` and `dadf60fb`.
 The derived package behavior is owner-bound subscription and cleanup,
 synchronous selected canonical reads, Object.is-stable React snapshots while
 selected truth is unchanged, explicit whole-root observation, and no mirrored
@@ -100,9 +100,21 @@ dirty owner invalidation forces the O(n) whole-root materialization forbidden by
 application, but does not survive as the package selector model because it binds
 the definition to ambient tree identity and weakens reuse, isolated testing, and
 future selector-level memoization. Cross-owner capture is possible under either
-function spelling and did not decide the row. Still open: hook names and count,
-equality policy, changing-selector cache behavior, SSR/RSC/hydration, React Native,
-cross-component subscription sharing, and package exports.
+function spelling and did not decide the selector-input row. The target-state
+product pass then froze one universal observation hook:
+`useSignalTree(owner, selector)`, with whole-root expressed as `($) => $()`.
+The initial package uses React's `Object.is` contract and exposes no custom
+comparator, root alias, React realization, or public helper types. Owner changes
+resubscribe, changing selectors are current, and SignalTree remains sole state
+authority.
+
+`dadf60fb` adds the publishable `@signal-tree/react` package and migrates the
+greenfield reference off its local proof hook. Validation: React package 6/6,
+reference 16/16, React 18/19 packed-consumer typecheck + bundle + runtime,
+workspace build/test/lint/typecheck, API/barrel/package/manifests gates,
+independent review, and **66/66 with zero known-red**. Still separate and open:
+SSR/RSC/hydration, React Native validation, cross-component subscription sharing,
+and first-party memoized selectors.
 
 `ROOT-READ-COST-0` is **CLOSED A / NO REGRESSION**. The production Rollup build
 was measured against a separately built `e243a569` pre-retirement artifact with

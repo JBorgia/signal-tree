@@ -226,17 +226,16 @@ neither application convenience nor compatibility machinery. Per-location
 subscription, paths, causal metadata, compatibility APIs, context ergonomics,
 and hook names remain unopened.
 
-### REACT-GREENFIELD-0 remains open
+### REACT-GREENFIELD-0 — INITIAL PACKAGE CLOSED (`dadf60fb`)
 
 Observation is not the whole realization. Passing characterizations in the
 reference app now pin construction-bound derived realization, coherent owner
 invalidation, stable whole-root snapshots, and selected-location rereads. The
-remaining open work is the React package contract: changing selectors,
-abandoned renders, SSR/React Native requirements when earned, equality/cache
-policy, lifecycle ergonomics, and public naming. `@signal-tree/react` remains
-unfrozen until those package questions are adversarially closed.
+initial package now owns the frozen observation contract. Separate capabilities
+remain open only when earned: SSR/hydration, React Native validation,
+cross-component subscription sharing, and selector memoization.
 
-### REACT-API-DERIVATION-0 — SELECTOR INPUT FROZEN / PRODUCT PRESENTATION OPEN
+### REACT-API-DERIVATION-0 — CLOSED (`9b84c14e`, `dadf60fb`)
 
 Product authority chooses a public `@signal-tree/react` package. Correctness
 premises alone did not establish package ownership: applications can compose a
@@ -311,11 +310,24 @@ The protocol rejected three overclaims:
   Equality support remains a possible convenience whose canonical-result,
   selector-change, and SSR interactions must be chosen explicitly.
 
-Still open by product authority: one selector-capable hook versus split
-root/selector hooks; initial custom equality support and spelling;
-changing-selector cache behavior; SSR/RSC/hydration mechanics; React Native
-requirements; cross-component subscription sharing; public names and package
-exports. The selector input decision does not answer any of them.
+The target-state presentation is one selector-capable hook because whole-root
+observation is the same user job at root projection scope, not a distinct
+authority or lifecycle. `useSignalTree(owner, selector)` is the sole initial
+runtime export; whole-root is `($) => $()`. The initial equality contract is
+React's `Object.is`; no comparator option ships. Owner changes clean up and
+resubscribe, changing selectors are evaluated immediately, and no copied state
+or React-specific SignalTree realization exists.
+
+Validation at `dadf60fb`: package compile/runtime contract 6/6, greenfield
+reference 16/16, all workspace package builds, all six test projects, all five
+lint projects, full TypeScript passes, API/lint/barrel/package/manifests gates,
+packed React 18 and React 19 consumer typecheck + bundle + runtime smokes,
+independent review, and release ladder 66/66 with zero known-red. Shipped
+preserve-modules implementation: one runtime export, 682 bytes before gzip.
+
+Still open as separate rows, not holes in the initial package: SSR/RSC/hydration
+policy; React Native validation; cross-component subscription sharing; and a
+first-party memoized selector primitive for allocating composite results.
 
 ## CONSTRUCTION-BOUND-REALIZATION-0
 
