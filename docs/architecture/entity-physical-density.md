@@ -667,7 +667,9 @@ whole-turn capture for writes without structural effects, and narrowing it to
 
 ### RESTORATION-REKEY-CLAIM-WIDTH-0 — closed
 
-Production checkpoint: `1bd52ed0`.
+Production checkpoint: `1bd52ed0` (primary N-wide defect); residuals
+closed at `0e47de5c` (no-op stale-participation fix at both `from === to`
+branches, rejected-rekey control, corrected prepared-path trace).
 
 `planRekey.commit()` and `planPreparedRekey.commit()` now set
 `lastSubjectIds = [subjectId]`, joining every sibling mutator. That is the only
@@ -748,8 +750,15 @@ shape. (2) Blind semantic falsifier: independently derive the minimum
 information each frozen operation needs and try to break a turn-local
 delta/effect representation, weighting `jumpTo` (forward/backward/across
 eviction), redo branching, transactions, structural identity, address fallback,
-held references, and later authoritative realization truth. (3) Choose the
-representation from evidence.
+held references, and later authoritative realization truth, and EFFECT
+COALESCING — the `0e47de5c` sweep proved same-subject structural effects
+coalesce at capture time (a `changeId` followed by a `removeOne` of the same
+subject retains only the remove effect), so the adversary must explicitly
+inspect whether the canonical composed effect representation retains all
+semantic information needed to reconstruct every supported transition, or
+whether some information is currently supplied only by `CanonicalTurn.state`.
+"Effects are compact" is not sufficient; the question is whether the composed
+effect graph is COMPLETE. (3) Choose the representation from evidence.
 
 **Mandatory proof set:** ordinary reversal (scalar, nested field, whole-entity
 replacement, add, remove, rekey, reorder/prepend); identity/address (held

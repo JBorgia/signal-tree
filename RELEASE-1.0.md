@@ -457,7 +457,10 @@ compact effects are the leading candidate, not the conclusion. Claim-registry
 representation is not a detour -- once the producer says 1, the ~241 B/subject
 registry cost is no longer pathological. `REALIZATION-OWNERSHIP-0` stays queued.
 
-`RESTORATION-REKEY-CLAIM-WIDTH-0` is **CLOSED GREEN** at `1bd52ed0`.
+`RESTORATION-REKEY-CLAIM-WIDTH-0` is **CLOSED GREEN** at `1bd52ed0`
+(primary N-wide defect) with residuals closed at `0e47de5c` (false
+prepared-path coverage claim corrected in docs; live no-op
+stale-participation defect fixed at both `from === to` branches).
 `planRekey.commit()` and `planPreparedRekey.commit()` now set
 `lastSubjectIds = [subjectId]`, the sole
 production change; `restoration.ts:660`, the claim registry, restoration-side
@@ -553,9 +556,27 @@ backward, jumpTo forward, jump across an evicted-window boundary, later
 external/realization truth after authored work); lifecycle (eviction, reset,
 destroy, descriptor/claim release). The later-realization-truth case is a killer
 falsifier: a naive before/after delta must not restore stale authored truth over
-later authoritative truth. No representation or public-surface change is
+later authoritative truth. EFFECT COALESCING is a mandatory falsifier leg: the
+`0e47de5c` sweep proved same-subject structural effects coalesce at capture
+time (a `changeId` followed by a `removeOne` of the same subject retains only
+the remove effect), so the adversary must inspect whether the composed effect
+graph retains ALL semantic information needed to reconstruct every supported
+transition, or whether some is supplied only by `CanonicalTurn.state` —
+"effects are compact" is not sufficient; the question is whether they are
+COMPLETE. No representation or public-surface change is
 authorized until the inventory and the falsifier are both in and a candidate has
 passed the mandatory proof set. `REALIZATION-OWNERSHIP-0` stays queued behind it.
+
+`PREPARED-REKEY-REACHABILITY` is **QUEUED (architecture cleanup, not blocking)**.
+The `0e47de5c` public-route sweep measured zero calls to
+`__planPreparedRekey` across pure rekey undo/redo, composed turns,
+transactional confirm/rollback, and multi-turn `jumpTo`: the prepared
+context only holds a subject an earlier restore/add effect in the same
+batch introduced, and capture-time coalescing merges a same-subject rekey
+into the structural effect that preceded it. Prove whether
+`__planPreparedRekey` has a legitimate production semantic caller; if not,
+delete it rather than preserving an unexercised intermediate mechanism. Do
+not let this distract from `RESTORATION-TURN-STATE-0`.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
