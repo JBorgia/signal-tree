@@ -52,15 +52,61 @@ identity, identity is never causal authority, and arbitrary unchanged descendant
 carry no public `===` promise after a change. KSA's current incremental subtree
 reuse remains an internal measured optimization.
 
-`GREENFIELD-ROOT-ACCESSOR-SHAPE-0` is **CONTRACT FROZEN / IMPLEMENTATION
-PENDING**. The tree is a non-callable controller and `tree.$` is its non-callable
-root state facade; neither is the public whole-tree materialization function.
-Descendant locations retain their callable grammar. Framework adapters pair
+`GREENFIELD-ROOT-ACCESSOR-SHAPE-0` is **CLOSED GREEN** at `1495f713`. The tree is a non-callable controller and `tree.$` is the callable
+root state accessor with the same read / whole-value replace / updater grammar
+as ordinary state nodes. It has no `.set()` or `.update()` methods. Framework adapters pair
 `observeOwnerInvalidation(owner, callback)` with
 `readCanonicalSnapshot(owner)`; neither operation revives an obsolete callable
-root shape. `CANONICAL-SNAPSHOT-HANDOFF-0` is closed at `3b572fe7`.
-`@signal-tree/react` remains blocked until incumbent controller callability is
-retired.
+controller shape. `CANONICAL-SNAPSHOT-HANDOFF-0` is closed at `3b572fe7`.
+The root-controller blocker on `@signal-tree/react` is discharged; React work
+may proceed when selected by the remaining Phase 5.5 sequence.
+
+`ROOT-READ-COST-0` is **CLOSED A / NO REGRESSION**. The production Rollup build
+was measured against a separately built `e243a569` pre-retirement artifact with
+`tools/bench-root-read-cost.mjs`: 1,000,000 cached reads per arm, 15 measured
+samples after warmup, rotated arm order. Direct canonical materialization was
+43.93 ns/call (MAD 0.31), current `tree.$()` was 41.42 ns/call (MAD 0.47), and
+historical `tree()` was 42.14 ns/call (MAD 0.32). The initial red exposed two
+avoidable position-zero costs: a permanent lazy `$` getter and a descendant
+dormancy lookup that root can never satisfy. Removing both restored the original
+five-rebuild guard 5/5; the guard remains unchanged.
+
+Configured-derived ownership remains unchanged by root retirement. A writable
+carrier returned by `config.derived` remains writable structure under `$` but is
+not mirrored into the backing source store and is absent from the NaturalValue
+snapshot. Writability is not snapshot authority.
+
+Restoration reentrancy is **SUPPORTED**, but the deleted scenario was not a
+valid characterization: direct external `PathNotifier.notify(...)` injection is
+internal delivery machinery, and one-microtask completion is not promised. The
+replacement carrier starts with a real designated tree write, performs a
+reentrant designated tree mutation from the subscriber, drains queued delivery
+with `flushSync()`, and proves restoration records the final state.
+
+Final root-retirement validation at `1495f713`: kernel 245 files / 1,983 passed
+/ 3 expected failures / 13 skipped / 1 todo; Angular 90 passed / 3 skipped;
+demo performance mode 114/114; both TypeScript passes; kernel lint; live README,
+documented-import, documented-symbol, link, and numeric-claim checks; independent
+adversarial review; and `NX_DAEMON=false NX_ISOLATE_PLUGINS=false npm run gates
+-- --release` at **66/66, zero known-red**. A final search found no live public
+tree call signature, `tree.bind`, callable enhancer wrapper, `originalTreeCall`,
+or `copyTreeProperties`; surviving `tree()` text is confined to explicit negative
+type controls, a historical A/B benchmark label, local non-SignalTree prototypes,
+and clearly versioned historical migration/archive material.
+
+Full performance audit after retirement used the repository generators, not
+`artifacts/*.json`. Root read remained neutral (41.42 ns current `tree.$()` vs
+42.14 ns historical `tree()`); unchanged 10k-leaf reads measured 0.250 us;
+recursive root updates scaled 0.00281 ms at depth 5 to 0.01043 ms at depth 20;
+bare package gzip was 9.50 KB against 9.7 KB and entityMap was 20.08 KB against
+21 KB. Update cost stayed approximately flat with collection/state size, while
+the known tradeoffs remained visible: Elf led the raw 10k collection workload
+(1.35 ms vs SignalTree 19.51 ms), a cold whole-collection projection remained
+O(collection), and featured retained heap reached 92.11 MB at 100k rows. Every
+memory scenario was collectable; bounded history plateaued (1.2x growth across
+16x rounds vs 13.7x control), retired-subject slope was unmeasurable, and live
+reactive identity survived forced GC. No performance result reopens the frozen
+root grammar.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
@@ -11380,10 +11426,12 @@ C4 NON-AUTHORED INGRESS
    [ ] not public unless a public consumer proves it belongs there
 
 C5 REMOVE INCUMBENT CALLABLE SEMANTICS
-   [ ] retire NodeAccessor Partial<T> callable + merging updater
-   [ ] retire incumbent tree(); migrate the root to tree.$
-   [ ] the merge carrier is CONTRADICTED — do NOT mutate it into a passing test
-   [ ] the 9 fixture-only callers migrate to COMPLETE values, ASSERTIONS UNCHANGED
+  [x] retire NodeAccessor Partial<T> callable + merging updater — 1495f713
+  [x] retire incumbent tree(); migrate the root to tree.$ — 1495f713
+     [x] merge carrier contradicted; strict whole-value and explicit runtime
+      permissiveness controls retained — 1495f713
+  [x] fixture-only callers migrate to complete values or explicit runtime probes,
+    assertions unchanged — 1495f713
 
 C6 ANGULAR HANDOFF
    [ ] move the Angular scalar publication adapter, the WritableSignal view, the

@@ -557,13 +557,14 @@ snapshot-identity authority or changed under this row.
 
 Root-shape correction: SIC-B freezes the canonical materialization property,
 not callable `tree()` syntax. The already-frozen greenfield root contract keeps
-both the controller and `tree.$` facade non-callable. Framework adapters read
+the controller non-callable and gives `tree.$` the ordinary callable location
+grammar. Framework adapters read
 the canonical snapshot through `readCanonicalSnapshot(owner)` and subscribe
 through `observeOwnerInvalidation(owner, callback)`.
 
 An adversarial absence pass proposed returning `owner.$` directly. That rival
 was invalid: it silently equated the non-callable navigation facade with its
-NaturalValue snapshot, contradicting the frozen root premise. The adapter read
+NaturalValue snapshot instead of invoking it, contradicting the frozen root premise. The adapter read
 operation enters the kernel's canonical memoized materialization authority and
 adds no `TreeRealization` field or public root call syntax. Owner invalidation
 uses the same operation internally, removing its dependency on callable
@@ -590,9 +591,9 @@ CONSTRUCTION-BOUND-REALIZATION-0    CLOSED GREEN — 23c6de5a
 TEST-OWNERSHIP-REATTRIBUTION-0      CLOSED GREEN — framework-free kernel target
 ATOMIC-OBSERVATION-DELIVERY-0       CLOSED GREEN — narrow invalidation group
 SNAPSHOT-IDENTITY-CONTRACT-0        SIC-B / CLOSED GREEN — d8ad11da
-GREENFIELD-ROOT-ACCESSOR-SHAPE-0    CONTRACT FROZEN — controller retirement pending
+GREENFIELD-ROOT-ACCESSOR-SHAPE-0    CLOSED GREEN — 1495f713
 CANONICAL-SNAPSHOT-HANDOFF-0        CLOSED GREEN — 3b572fe7
-@signal-tree/react                  BLOCKED ON ROOT CONTROLLER RETIREMENT
+@signal-tree/react                  ROOT BLOCKER DISCHARGED — sequencing pending
 TruckTrax v2 migration              BLOCKED ON REACT CONTRACT
 TruckTrax v3 migration              BLOCKED ON GREENFIELD APPLICATION PATTERNS
 React Native                        BLOCKED ON REACT CONTRACT
