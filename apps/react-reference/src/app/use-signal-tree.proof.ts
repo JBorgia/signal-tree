@@ -63,8 +63,11 @@ const publicationSourceFor = (owner: SignalTreeOwner) => {
 /**
  * REACT-OBSERVATION-0 proof only. This is not a proposed package API.
  *
- * It consumes only the framework-neutral owner invalidation fact. Hook naming,
- * selectors, and caching remain unfrozen React-package questions.
+ * It consumes only the framework-neutral owner invalidation fact. Owner
+ * invalidation wakes the hook; `getSnapshot` rereads the selected location or
+ * value directly. A selector must not be forced through whole-root NaturalValue
+ * materialization. Hook naming and public caching policy remain unfrozen
+ * React-package questions.
  */
 export function useSignalTree<T>(
   owner: SignalTreeOwner,
