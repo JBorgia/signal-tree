@@ -584,9 +584,17 @@ export function createEntitySignal<
       throw new Error(`Entity with id ${String(from)} not found`);
     }
     if (from === to) {
+      // A no-op rekey still ADDRESSES this subject, and the leaf-signal
+      // interceptor fires on every mutator call — including one that changes
+      // nothing. Every sibling mutator narrows the latch unconditionally, so
+      // the no-op must too: leaving the latch at the previous write's
+      // participation set lets a no-op rekey re-publish a bulk write's
+      // subject inventory into the capture bucket of whatever designated
+      // write shares the tick. RESTORATION-REKEY-CLAIM-WIDTH-0.
+      const noOpSubjectId = allocateSubjectId(from);
       return {
         commit(): void {
-          // no-op
+          lastSubjectIds = [noOpSubjectId];
         },
         publish(): void {
           // no-op
@@ -663,9 +671,12 @@ export function createEntitySignal<
     publish(metaOverride?: WriteMetadata): void;
   } {
     if (from === to) {
+      // Same rule as `planRekey`'s no-op branch: the interceptor fires on the
+      // call, so the latch must name the addressed subject even when the
+      // rekey changes nothing. RESTORATION-REKEY-CLAIM-WIDTH-0.
       return {
         commit(): void {
-          // no-op
+          lastSubjectIds = [subjectId];
         },
         publish(): void {
           // no-op

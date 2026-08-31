@@ -119,10 +119,68 @@ describe('RESTORATION-REKEY-CLAIM-WIDTH-0 — producer participation', () => {
     expect(participation(tree)).toEqual([rekeyed]);
   });
 
-  it('redo of a designated rekey turn re-narrows through the prepared path', async () => {
-    // `redo()` replays the rekey through `__planPreparedRekey.commit()` — the
-    // second of the two patched paths. Participation and the retained turn must
-    // still name exactly the one rekeyed subject, at any collection size.
+  it('a no-op rekey cannot re-publish a prior bulk write into a designated turn', async () => {
+    // The leaf-signal interceptor fires on EVERY mutator call, including one
+    // that changes nothing, and there is no next!==prev guard on that route.
+    // Before the no-op branch narrowed the latch, a no-op `changeId(k, k)`
+    // preceding a real designated write in the same tick re-published the
+    // previous bulk write's participation set into the capture bucket —
+    // 50 claims for a turn that touched one subject. The latch is a
+    // LAST-write latch, so what must hold is the captured turn's subject set,
+    // not the post-turn latch value.
+    const tree = makeTree();
+    undoable(() => tree.$.rows.setAll(seed(50)));
+    await settle();
+    expect(participation(tree)?.length).toBe(50);
+
+    const noOpSubject = (tree.$.rows.byIdOrFail(10).name as unknown as {
+      __subjectIds?: number[];
+    }).__subjectIds?.[0];
+    const realSubject = (tree.$.rows.byIdOrFail(20).name as unknown as {
+      __subjectIds?: number[];
+    }).__subjectIds?.[0];
+
+    undoable(() => {
+      tree.$.rows.changeId(10, 10); // no-op: same key, fires the interceptor
+      tree.$.rows.updateOne(20, { v: 99 });
+    });
+    await settle();
+
+    const history = tree.getRestorationHistory() as Array<{
+      restorationSubjectIds?: number[];
+    }>;
+    const last = history[history.length - 1];
+    // The turn names only the subjects its own calls addressed — the no-op's
+    // one subject and the real write's one subject — never the stale 50.
+    expect(last.restorationSubjectIds).toHaveLength(2);
+    expect(last.restorationSubjectIds).toContain(realSubject);
+    expect(last.restorationSubjectIds).toContain(noOpSubject);
+    expect(claimedCount(tree)).toBe(2);
+  });
+
+  it('a rejected rekey (occupied destination) captures nothing and leaves history unchanged', async () => {
+    const tree = makeTree();
+    undoable(() => tree.$.rows.setAll(seed(50)));
+    await settle();
+    const entriesBefore = tree.getRestorationHistory().length;
+    const latchBefore = participation(tree);
+
+    expect(() => tree.$.rows.changeId(10, 11)).toThrow(/already in use/);
+    await settle();
+
+    // The throw happens before any frame commits, so the latch is untouched
+    // and no turn is recorded.
+    expect(participation(tree)).toBe(latchBefore);
+    expect(tree.getRestorationHistory().length).toBe(entriesBefore);
+  });
+
+  it('redo of a designated rekey turn re-narrows participation', async () => {
+    // A PURE rekey reversal replays through `__planRekey.commit()` — the
+    // prepared planner is only reached when the reversal batch first
+    // introduces the subject via a restore/add effect, which capture-time
+    // coalescing prevents for a same-subject rekey inside one turn. This pins
+    // the observable law either way: after redo settles, participation and
+    // the retained turn name exactly the one rekeyed subject, at any size.
     for (const width of [30, 600]) {
       const tree = makeTree(5);
       tree.$.rows.setAll(seed(width));

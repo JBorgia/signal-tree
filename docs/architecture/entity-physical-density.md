@@ -687,17 +687,36 @@ key restoration, order preservation, rolled-back-transaction atomicity, eviction
 release, and fresh same-key occupant distinctness). Full kernel suite, both
 TypeScript passes, and kernel lint/build are green.
 
-Redo path traced explicitly. `redo()` of a designated rekey turn replays through
-`__planPreparedRekey.commit()` — the second patched site — and the sole notify
-delivered is `path=rows.<newKey> owner=rows nSubjects=1 structural=rekey`. After
-redo settles, the retained turn's `restorationSubjectIds` and the claim registry
-stay at one, at N of 20 / 30 / 600 / 1,000. An earlier draft assertion that read
-`80` after redo was invalid: it made a bulk `setAll(80)` the only designated
-turn and left the rekey as a bare `transaction().confirm()` (which creates no
-restoration entry), so `undo()` / `redo()` replayed the `setAll` and correctly
-re-latched participation to the collection — the assertion observed the
-last-write latch after redoing an unrelated bulk turn, a property the latch was
-never promised to hold. The replacement test redoes the rekey turn itself.
+Redo path traced explicitly, and the first account of it was WRONG. A pure
+rekey reversal replays through `__planRekey.commit()`, not
+`__planPreparedRekey.commit()`: instrumenting both planners across pure rekey
+undo/redo, composed add+rekey and rekey+remove turns, transactional
+confirm/rollback, and multi-turn `jumpTo`, the prepared planner fired ZERO
+times. The prepared context only holds a subject an earlier restore/add effect
+in the same batch introduced, and capture-time coalescing (the structural effect
+key is `owner/position/subject`) merges a same-subject rekey into the structural
+effect that preceded it — so no public route currently composes
+`[restore, rekey]` for one subject. `planPreparedRekey.commit()` is patched for
+consistency with its sibling and is reachable only through a hand-composed
+realization batch; that route has no direct spec yet. After redo settles, the
+retained turn's `restorationSubjectIds` and the claim registry stay at one, at
+N of 20 / 30 / 600 / 1,000. An earlier draft assertion that read `80` after redo
+was invalid: it made a bulk `setAll(80)` the only designated turn and left the
+rekey as a bare `transaction().confirm()` (which creates no restoration entry),
+so `undo()` / `redo()` replayed the `setAll` and correctly re-latched
+participation to the collection — the assertion observed the last-write latch
+after redoing an unrelated bulk turn, a property the latch was never promised to
+hold. The replacement test redoes the rekey turn itself.
+
+The no-op branch was a residual hazard found by review and closed with the same
+producer rule. `wrapMutator` fires on EVERY mutator call with no
+`next !== prev` guard, and `planRekey`'s `from === to` early return was the one
+path that never touched the latch — so a no-op `changeId(k, k)` re-published the
+previous bulk write's participation set into the capture bucket of a designated
+write sharing the tick (measured: 50 claims for a one-subject turn). Both no-op
+branches now narrow the latch to the addressed subject, and a rejected rekey
+(occupied destination) throws before any frame commits, leaving the latch and
+history untouched. `rekey-claim-width-0.spec.ts` pins both.
 
 ## RESTORATION-TURN-STATE-0 (pre-registered)
 
