@@ -272,9 +272,11 @@ export type ReadonlyOf<K extends CarrierKind, T> = LeafOf<T, K> extends {
  *     @signal-tree/angular   ISignalTree<T> = ISignalTreeOf<T, 'angular'>
  *
  * Ordinary users never write a carrier: both roots expose `ISignalTree<T>`.
- * Calling the tree returns the correct committed natural snapshot. Repeated
- * reads return the same root object while committed truth is unchanged. After
- * a change, identity of arbitrary unchanged descendants is not a public
+ * The canonical whole-tree NaturalValue reader returns the correct committed
+ * snapshot. Repeated reads return the same root object while committed truth is
+ * unchanged. SIC-B assigns no public callable syntax to that materialization;
+ * the greenfield tree controller and root `$` facade are both non-callable.
+ * After a change, identity of arbitrary unchanged descendants is not a public
  * contract; implementations may reuse them to materialize snapshots cheaply.
  */
 export interface ISignalTreeOf<

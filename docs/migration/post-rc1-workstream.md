@@ -533,7 +533,9 @@ Gate 2 found that B is not forced by the causal premises: A plus consumer-owned
 stabilization is coherent. B is therefore recorded as a PRODUCT DECISION. It
 gives every framework-independent consumer a cheap conservative root change
 oracle without requiring a deep comparator or another public revision API.
-That decision does not make identity causal authority.
+That decision does not make identity causal authority and assigns no public
+callable syntax to canonical materialization. `tree()` in the SIC controls is
+only the incumbent carrier used to test the property before its retirement.
 
 Direct controls establish the boundary:
 
@@ -552,6 +554,20 @@ The causal audit also found `Object.is` checks over scalar/object leaf values in
 restoration conflict detection. Those compare realized values, not materialized
 natural snapshot objects, and are outside SIC-0; they must not be cited as
 snapshot-identity authority or changed under this row.
+
+Root-shape correction: SIC-B freezes the canonical materialization property,
+not callable `tree()` syntax. The already-frozen greenfield root contract keeps
+both the controller and `tree.$` facade non-callable. Framework adapters read
+the canonical snapshot through `readCanonicalSnapshot(owner)` and subscribe
+through `observeOwnerInvalidation(owner, callback)`.
+
+An adversarial absence pass proposed returning `owner.$` directly. That rival
+was invalid: it silently equated the non-callable navigation facade with its
+NaturalValue snapshot, contradicting the frozen root premise. The adapter read
+operation enters the kernel's canonical memoized materialization authority and
+adds no `TreeRealization` field or public root call syntax. Owner invalidation
+uses the same operation internally, removing its dependency on callable
+controller compatibility.
 
 Premise 6 (full reconstruction on every read is bad behavior) establishes an
 efficient-materialization obligation, not a required consumer-observable
@@ -574,7 +590,9 @@ CONSTRUCTION-BOUND-REALIZATION-0    CLOSED GREEN — 23c6de5a
 TEST-OWNERSHIP-REATTRIBUTION-0      CLOSED GREEN — framework-free kernel target
 ATOMIC-OBSERVATION-DELIVERY-0       CLOSED GREEN — narrow invalidation group
 SNAPSHOT-IDENTITY-CONTRACT-0        SIC-B / CLOSED GREEN — d8ad11da
-@signal-tree/react                  UNBLOCKED FOR GREENFIELD DERIVATION
+GREENFIELD-ROOT-ACCESSOR-SHAPE-0    CONTRACT FROZEN — controller retirement pending
+CANONICAL-SNAPSHOT-HANDOFF-0        CLOSED GREEN — checkpoint pending
+@signal-tree/react                  BLOCKED ON ROOT CONTROLLER RETIREMENT
 TruckTrax v2 migration              BLOCKED ON REACT CONTRACT
 TruckTrax v3 migration              BLOCKED ON GREENFIELD APPLICATION PATTERNS
 React Native                        BLOCKED ON REACT CONTRACT

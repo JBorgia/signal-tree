@@ -35,9 +35,9 @@ import type { WritableCell } from './lib/internals/cell-runtime';
 
 import { acquireObservation } from './lib/internals/observation-substrate';
 import { observeOwnerInvalidationInternal } from './lib/internals/owner-invalidation';
+import { readCanonicalSnapshotInternal } from './lib/internals/canonical-snapshot';
 
 interface OwnerInvalidationTarget {
-  (): unknown;
   readonly $: object;
   readonly destroyed: () => boolean;
 }
@@ -57,6 +57,19 @@ export function observeOwnerInvalidation(
     callback,
     () => acquireObservation(owner)
   );
+}
+
+/**
+ * Read the kernel-owned canonical whole-tree snapshot for a framework adapter.
+ *
+ * The tree controller and root `$` facade are not public snapshot functions.
+ * Pair this read with `observeOwnerInvalidation` when adapting an external
+ * observation runtime.
+ */
+export function readCanonicalSnapshot<T>(
+  owner: { readonly $: object }
+): T {
+  return readCanonicalSnapshotInternal<T>(owner);
 }
 
 export type { DerivedRuntime } from './lib/internals/derived-runtime';

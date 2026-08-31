@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { readCanonicalSnapshot } from '../adapter';
 import { restoration } from '../enhancers/restoration/restoration';
 import { external } from './external';
 import { getPathNotifier, resetPathNotifier } from './path-notifier';
@@ -12,16 +13,21 @@ const flush = async (): Promise<void> => {
 };
 
 describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
-  it('keeps the public root snapshot stable while committed truth is unchanged', () => {
+  it('keeps canonical materialization stable while committed truth is unchanged', () => {
     const tree = signalTree({ count: 1, nested: { value: 2 } });
-    const first = tree();
+    const read = () =>
+      readCanonicalSnapshot<{
+        count: number;
+        nested: { value: number };
+      }>(tree);
+    const first = read();
 
-    expect(tree()).toBe(first);
+    expect(read()).toBe(first);
     tree.$.count.set(1);
-    expect(tree()).toBe(first);
+    expect(read()).toBe(first);
 
     tree.$.count.set(2);
-    expect(tree()).not.toBe(first);
+    expect(read()).not.toBe(first);
   });
 
   it('keeps two committed A-to-B and B-to-A transitions as two causal turns', async () => {
@@ -29,7 +35,7 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
       { value: 'A' },
       { enhancers: [restoration()] }
     );
-    const initial = tree();
+    const initial = readCanonicalSnapshot<{ value: string }>(tree);
     const baseline = tree.getRestorationHistory().length;
 
     undoable(() => tree.$.value.set('B'));
@@ -37,7 +43,7 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
     undoable(() => tree.$.value.set('A'));
     await flush();
 
-    expect(tree()).toEqual(initial);
+    expect(readCanonicalSnapshot(tree)).toEqual(initial);
     expect(tree.getRestorationHistory()).toHaveLength(baseline + 2);
   });
 
@@ -54,7 +60,7 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
     });
     await flush();
 
-    expect(tree().value).toBe('A');
+    expect(readCanonicalSnapshot<{ value: string }>(tree).value).toBe('A');
     expect(tree.getRestorationHistory()).toHaveLength(baseline);
   });
 
@@ -64,7 +70,7 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
       { value: 'A' },
       { enhancers: [restoration()] }
     );
-    const initial = tree();
+    const initial = readCanonicalSnapshot<{ value: string }>(tree);
     const baseline = tree.getRestorationHistory().length;
     const participation: Array<string | undefined> = [];
     const unsubscribe = getPathNotifier().subscribe(
@@ -80,7 +86,7 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
     await flush();
     unsubscribe();
 
-    expect(tree()).toEqual(initial);
+    expect(readCanonicalSnapshot(tree)).toEqual(initial);
     expect(participation).toEqual(['realized', 'realized']);
     expect(tree.getRestorationHistory()).toHaveLength(baseline);
   });
@@ -89,9 +95,15 @@ describe('SNAPSHOT-IDENTITY-CONTRACT-0', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     try {
       const tree = signalTree({ left: { value: 1 }, right: { value: 2 } });
-      const before = tree();
+      const before = readCanonicalSnapshot<{
+        left: { value: number };
+        right: { value: number };
+      }>(tree);
       tree.$.left.value.set(3);
-      const after = tree();
+      const after = readCanonicalSnapshot<{
+        left: { value: number };
+        right: { value: number };
+      }>(tree);
 
       expect(after).not.toBe(before);
       expect(after).toEqual({ left: { value: 3 }, right: { value: 2 } });

@@ -4,9 +4,9 @@ import {
   onCommitScopesSettled,
 } from './commit-consequence';
 import { installOwnerInvalidationDispatch } from './owner-invalidation-port';
+import { readCanonicalSnapshotInternal } from './canonical-snapshot';
 
 interface OwnerInvalidationTarget {
-  (): unknown;
   readonly $: object;
   readonly destroyed: () => boolean;
 }
@@ -113,7 +113,7 @@ function scheduleInvalidation(
     }
     state.pending = false;
     state.requested = 0;
-    state.owner();
+    readCanonicalSnapshotInternal(state.owner);
     for (const subscription of [...state.listeners]) {
       try {
         subscription.callback();

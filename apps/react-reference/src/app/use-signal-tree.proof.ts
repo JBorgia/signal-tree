@@ -1,8 +1,11 @@
 import { useRef, useSyncExternalStore } from 'react';
-import { observeOwnerInvalidation } from '@signal-tree/kernel/adapter';
+import {
+  observeOwnerInvalidation,
+  readCanonicalSnapshot,
+} from '@signal-tree/kernel/adapter';
 
 type SignalTreeOwner = object &
-  (() => unknown) & {
+  {
     readonly $: object;
     destroyed(): boolean;
   };
@@ -97,6 +100,9 @@ export function useSignalTree<T>(
     getStableSnapshot
   );
 }
+
+export const readSignalTreeSnapshot = <T>(owner: SignalTreeOwner): T =>
+  readCanonicalSnapshot<T>(owner);
 
 export const observerCountForTesting = (owner: SignalTreeOwner): number =>
   publicationSourceFor(owner).observerCount();
