@@ -169,6 +169,29 @@ B/scalar leaf and about 150 ms at 100k leaves, versus roughly 523 B for a raw
 Angular signal in the same decomposition. It does not block React, root
 retirement, or the current release phase unless a later product budget says so.
 
+`ENTITY-PHYSICAL-DENSITY-0 / E0` is **CLOSED GREEN / BYTE ATTRIBUTION
+COMPLETE** at `82b487da`. `node --expose-gc
+tools/bench-entity-physical-density.mjs` measures
+three isolated, quiesced samples per arm at 0/1k/10k/100k and fails unless every
+arm is collectable and synthetic/exclusive accounting closes within 90-110% of
+production. The measured physical-store marginal slope is 394 B/entity:
+72 payload, 36 subject-value index, 36 key-to-subject, 84 lifetime Map+record,
+36 revision, 56 ordering node, 36 active-by-key, and 36 active-by-subject.
+Exact-shape synthetic and exclusive accounting each close at 100% against both
+`StructuralStore` (286 B/entity) and the combined physical stores. The familiar
+10k point remains 4.35 MB / about 456 B/entity because point retention includes
+capacity/fixed effects; it is not contradicted by the marginal slope.
+
+Independent review found no E0 blocker. E1 is authorized only as an external
+record-consolidation prototype under
+[entity-physical-density.md](docs/architecture/entity-physical-density.md):
+unify allocation, not authority; preserve every frozen entity law and O(1) point
+operation; no SubjectId reuse, weak canonical truth, public API, or production
+representation change. Revision and value-address Maps establish an immediate
+72 B/entity consolidation target; the 129 B/live-subject ordering/index group
+must prove whether two-hop record lookup preserves each index's O(1) job before
+any index can be rejected.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
