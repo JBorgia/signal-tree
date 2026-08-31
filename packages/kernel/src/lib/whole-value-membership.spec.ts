@@ -68,9 +68,9 @@ describe('whole-value membership', () => {
   it('4 — ROOT parity', () => {
     const tree = signalTree({ a: 1, b: 2 as number | undefined });
 
-    (tree as unknown as (v: object) => void)({ a: 9 });
+    tree.$({ a: 9 } as never);
 
-    const value = tree() as Record<string, unknown>;
+    const value = tree.$() as Record<string, unknown>;
     expect(value).toEqual({ a: 9 });
     expect(Object.prototype.hasOwnProperty.call(value, 'b')).toBe(false);
   });
@@ -357,7 +357,7 @@ describe('whole-value membership', () => {
 
     // semantic absence, at BOTH the parent snapshot and the direct read
     expect(tree.$.box()).toEqual({ keep: { v: 1 } });
-    expect((tree() as Record<string, unknown>)['box']).toEqual({ keep: { v: 1 } });
+    expect((tree.$() as Record<string, unknown>)['box']).toEqual({ keep: { v: 1 } });
     expect((drop as unknown as () => unknown)()).toBeUndefined();
 
     // physical retention

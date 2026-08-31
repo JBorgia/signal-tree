@@ -30,7 +30,7 @@ The reason every other library says dev-only: a snapshot is a deep clone, so
 recording costs O(state) **per write**. At 10,000 rows that is unusable, so it
 gets gated to dev and nobody revisits it.
 
-Since 13.5.0, `tree()` is memoised and structurally shared — materialisation
+Since 13.5.0, the whole-tree read (now `tree.$()`) is memoised and structurally shared — materialisation
 rebuilds only the nodes beneath a signal that actually changed, and clean
 subtrees come back **by reference**. A history entry is therefore a pointer graph
 over shared structure, not a copy.
@@ -122,11 +122,10 @@ default and no per-marker option is needed.
 
 ```ts
 // 15.0 — the collection is outside the undo stack because nothing designated it
-signalTree({ rows: entityMap({ selectId: (r: Row) => r.id }) },
-           { enhancers: [restoration()] });
+signalTree({ rows: entityMap({ selectId: (r: Row) => r.id }) }, { enhancers: [restoration()] });
 
-undoable(() => tree.$.draft.title.set('edited'));   // THIS is reversible
-tree.$.rows.setAll(serverRows);                     // this is not
+undoable(() => tree.$.draft.title.set('edited')); // THIS is reversible
+tree.$.rows.setAll(serverRows); // this is not
 ```
 
 The original text is kept below because the memory arithmetic it reports is still
@@ -137,12 +136,15 @@ the reason the lever existed.
 A collection can persist and serialise while staying **out of the undo stack**:
 
 ```ts
-signalTree({
-  // 50,000 server-owned rows: saved and restored, never undone
-  rows: entityMap({ selectId: (r) => r.id, recordHistory: false }),
-  // the small editable state the user actually undoes
-  draft: { title: '', tags: [] as string[] },
-}, { enhancers: [restoration({ maxHistorySize: 50 })] });
+signalTree(
+  {
+    // 50,000 server-owned rows: saved and restored, never undone
+    rows: entityMap({ selectId: (r) => r.id, recordHistory: false }),
+    // the small editable state the user actually undoes
+    draft: { title: '', tags: [] as string[] },
+  },
+  { enhancers: [restoration({ maxHistorySize: 50 })] }
+);
 ```
 
 Verified: with `recordHistory: false`, two undos reverted the scalar state to its
@@ -183,10 +185,13 @@ Use the form's **own** scoped stack when the form should undo locally rather tha
 part of the app-wide history stream:
 
 ```ts
-signalTree({
-  rows: entityMap({ selectId: (r) => r.id }), // server-owned; nothing designates it
-  profile: form({ initial: { name: '' }, history: history() }), // undoable, scoped
-}, { enhancers: [restoration({ maxHistorySize: 50 })] }); // covers plain branches only
+signalTree(
+  {
+    rows: entityMap({ selectId: (r) => r.id }), // server-owned; nothing designates it
+    profile: form({ initial: { name: '' }, history: history() }), // undoable, scoped
+  },
+  { enhancers: [restoration({ maxHistorySize: 50 })] }
+); // covers plain branches only
 
 tree.$.profile.history?.undo(); // reverts the field — this is the working path
 ```
@@ -234,8 +239,8 @@ never an undo step in the first place, because nobody designated it:
 
 ```ts
 // 15.0 — no predicate, and no per-write comparator cost
-tree.$.ui.cursor.set(next);              // not designated -> not an undo step
-undoable(() => tree.$.doc.body.set(v));  // designated -> one undo step
+tree.$.ui.cursor.set(next); // not designated -> not an undo step
+undoable(() => tree.$.doc.body.set(v)); // designated -> one undo step
 ```
 
 That also removes the cost warning this section used to carry: there is no
@@ -244,27 +249,26 @@ record-then-filter step.
 
 ## Composition patterns, and whether they hold up
 
-<!-- measured: the 100 ms sampling interval is a source constant — `setInterval(handleChange, 100)` at packages/core/src/lib/audit/audit.ts:156 (and :160). Cited rather than benchmarked on purpose: a constant breaks greppably when someone changes it, where a timing run only breaks when re-run. -->
+<!-- measured: the 100 ms sampling interval is a source constant — `setInterval(handleChange, 100)` in packages/kernel/src/lib/audit/audit.ts. Cited rather than benchmarked on purpose: a constant breaks greppably when someone changes it, where a timing run only breaks when re-run. -->
 <!-- measured: node tools/verify-history-defects.mjs — reproduces the CONSEQUENCES by outcome (every check calls undo() and inspects state): the fixed form-coverage behaviour, that write-then-revert pairs are dropped, and the maxHistorySize fallback. It does NOT measure the 100 ms figure — its sleeps are chosen from the constant above. -->
 
-| What you are building                                 | Pattern                                                                              | Supported                                                                                                                           |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Editor undo over a small document                     | `maxHistorySize`; designate document edits with `undoable()` and leave caret/selection undesignated | Yes                                                                                              |
-| Bulk-edit grid with cancel                            | `transaction()` — `confirm()` or `rollback()`                                        | Yes, and independent of `restoration`                                                                                                |
-| Undo one panel, not the whole app                     | designate only the panel's operations with `undoable()`                              | Yes                                                                                                                                 |
-| Large server collection + small editable **branch**   | apply the collection with `external()`; designate the branch's edits with `undoable()` | Yes — the headline pattern                                                                                                        |
-| Large server collection + small editable **`form()`** | `external()` for the collection beside `form({ history: history() })`                | Yes. Prefer scoped form history when the form should undo independently; global `restoration()` also records direct form writes now. |
-| Optimistic write, roll back on error                  | `undo()` in the error path, or `jumpTo(getCurrentIndex() - 1)`                       | Yes — only if nothing else recorded in between                                                                                      |
-| Import/generate, then one undo                        | —                                                                                    | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement                                               |
-| Audit trail rather than undo                          | `createAuditCallback()` or `getRestorationHistory()`                                            | Yes. **Not `createAuditTracker()`** — it samples on a 100 ms timer and drops write-then-revert pairs                                |
-| Show the user how far they can go                     | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd          | Yes — reactive since 14.0.0                                                                                                         |
-| Undo per entity, independently                        | —                                                                                    | **No.** elf has this; we do not                                                                                                     |
-| Collaborative editing                                 | A CRDT (Yjs, Automerge) underneath — undo is per-user, not per-document              | **Not a store feature.** Don't                                                                                                      |
+| What you are building                                 | Pattern                                                                                                      | Supported                                                                                                                            |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Editor undo over a small document                     | `maxHistorySize`; designate document edits with `undoable()` and leave caret/selection undesignated          | Yes                                                                                                                                  |
+| Bulk-edit grid with cancel                            | `transaction()` — `confirm()` or `rollback()`                                                                | Yes, and independent of `restoration`                                                                                                |
+| Undo one panel, not the whole app                     | designate only the panel's operations with `undoable()`                                                      | Yes                                                                                                                                  |
+| Large server collection + small editable **branch**   | apply the collection with `external()`; designate the branch's edits with `undoable()`                       | Yes — the headline pattern                                                                                                           |
+| Large server collection + small editable **`form()`** | `external()` for the collection beside `form({ history: history() })`                                        | Yes. Prefer scoped form history when the form should undo independently; global `restoration()` also records direct form writes now. |
+| Optimistic write, roll back on error                  | `undo()` in the error path, or `jumpTo(getCurrentIndex() - 1)`                                               | Yes — only if nothing else recorded in between                                                                                       |
+| Import/generate, then one undo                        | —                                                                                                            | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement                                                |
+| Audit trail rather than undo                          | `getRestorationHistory()` for retained undo entries; use an application event log for a complete audit trail | Restoration history is not a complete audit log                                                                                      |
+| Show the user how far they can go                     | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd                       | Yes — reactive since 14.0.0                                                                                                          |
+| Undo per entity, independently                        | —                                                                                                            | **No.** elf has this; we do not                                                                                                      |
+| Collaborative editing                                 | A CRDT (Yjs, Automerge) underneath — undo is per-user, not per-document                                      | **Not a store feature.** Don't                                                                                                       |
 
 ## Reactive readers, and why that mattered
 
-`canUndo()`, `canRedo()`, `getRestorationHistory()` and `isRecordingPaused()` are **signals
-since 14.0.0**. Before that they read plain values, so
+`canUndo()`, `canRedo()` and `getRestorationHistory()` are signals. Before that they read plain values, so
 `computed(() => tree.canUndo())` evaluated once and cached `false` forever — an
 undo button in a zoneless app never enabled. If you are on 13.x and your undo
 button looks dead, that is the bug.
@@ -272,11 +276,14 @@ button looks dead, that is the bug.
 ## A starting configuration
 
 ```ts
-export const appTree = signalTree({
-  rows: entityMap({ selectId: (r: Row) => r.id }),
-  draft: { title: '', body: '' },
-  ui: { cursor: 0, hovered: null as string | null },
-}, { enhancers: [restoration({ maxHistorySize: 50 })] });
+export const appTree = signalTree(
+  {
+    rows: entityMap({ selectId: (r: Row) => r.id }),
+    draft: { title: '', body: '' },
+    ui: { cursor: 0, hovered: null as string | null },
+  },
+  { enhancers: [restoration({ maxHistorySize: 50 })] }
+);
 
 // Only designated operations are reversible.
 undoable(() => appTree.$.draft.title.set(title));

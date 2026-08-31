@@ -134,6 +134,6 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
     tree.$.s.n.update((v) => v + 1);
     expect(tree.$.x()).toBe(5);
     expect(tree.$.s.n()).toBe(2);
-    expect(tree()).toEqual({ x: 5, s: { n: 2 } });
+    expect(tree.$()).toEqual({ x: 5, s: { n: 2 } });
   });
 });

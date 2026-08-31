@@ -135,7 +135,7 @@ describe('link(tree.$) on an ordinary tree', () => {
     });
     await flush();
     const got: unknown[] = [];
-    const l = track(link(tree.$, { set: (v: unknown) => void got.push(v) } as never));
+    const l = track(link(tree.$ as never, { set: (v: unknown) => void got.push(v) } as never));
 
     tree.$.rows.addOne({ id: 1, n: 'a' });
     await flush();

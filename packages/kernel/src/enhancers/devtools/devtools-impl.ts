@@ -2,9 +2,9 @@ declare const ngDevMode: boolean | undefined;
 import type { ReadableCell } from '../../lib/internals/cell-runtime';
 import { NEUTRAL_CELL_RUNTIME } from '../../lib/internals/cell-runtime';
 import { getTreeRealization } from '../../lib/internals/tree-realization';
+import { rootAuthorityFor } from '../../lib/internals/root-source';
 
-import { copyTreeProperties } from '../utils/copy-tree-properties';
-import { applyState, snapshotState } from '../../lib/utils';
+import { applyState } from '../../lib/utils';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import { getPathNotifier } from '../../lib/path-notifier';
 import { withWriteContext } from '../../lib/write-context';
@@ -1163,6 +1163,7 @@ export function createDevToolsEnhancer(
       ? createCompositionLogger({ enableConsole: true })
       : createNoopLogger();
     const metrics = createModularMetrics(tree);
+    const rootAuthority = rootAuthorityFor(tree);
 
     const activeProfiles = new Map<
       string,
@@ -1206,14 +1207,7 @@ export function createDevToolsEnhancer(
     };
 
     const readSnapshot = (): unknown => {
-      try {
-        if ('$' in tree) {
-          return snapshotState((tree as ISignalTree<T>).$ as TreeNode<T>);
-        }
-      } catch {
-        // fall back to tree call
-      }
-      return originalTreeCall();
+      return rootAuthority.read();
     };
 
     const buildSerializedState = (rawState: unknown): unknown => {
@@ -1455,7 +1449,7 @@ export function createDevToolsEnhancer(
             if ('$' in tree) {
               applyState((tree as ISignalTree<T>).$ as TreeNode<T>, state as T);
             } else {
-              originalTreeCall(state as T);
+              rootAuthority.replace(state as T);
             }
           }
         );
@@ -1655,82 +1649,7 @@ export function createDevToolsEnhancer(
       }
     };
 
-    // Store original tree call
-    const originalTreeCall = (
-      tree as unknown as {
-        bind: (t: unknown) => (...args: unknown[]) => unknown;
-      }
-    ).bind(tree);
-
-    // Create enhanced tree function with tracking
-    const enhancedTree = function (
-      this: ISignalTree<T>,
-      ...args: unknown[]
-    ): T | void {
-      if (args.length === 0) {
-        return originalTreeCall() as T;
-      }
-
-      const startTime = performance.now();
-
-      // Execute update
-      let result: void;
-      if (args.length === 1) {
-        const arg = args[0];
-        if (typeof arg === 'function') {
-          result = originalTreeCall(arg as (current: T) => T) as void;
-        } else {
-          result = originalTreeCall(arg as T) as void;
-        }
-      }
-
-      const duration = performance.now() - startTime;
-      originalTreeCall();
-
-      metrics.trackModuleUpdate('core', duration);
-
-      if (duration > performanceThreshold) {
-        logger.logPerformanceWarning(
-          'core',
-          'update',
-          duration,
-          performanceThreshold
-        );
-      }
-
-      if (aggregatedReduxInstance) {
-        const group = devToolsGroups.get(aggregatedReduxInstance.id);
-        if (group) {
-          group.enqueue(displayName, [], undefined, {
-            timestamp: Date.now(),
-            origin: 'tree.update',
-            duration,
-          });
-        }
-      } else if (browserDevTools) {
-        scheduleSend(undefined, {
-          origin: 'tree.update',
-          duration,
-        });
-      }
-
-      return result;
-    } as unknown as ISignalTree<T>;
-
-    // Copy properties from original tree using utility that handles non-enumerable properties
-    Object.setPrototypeOf(enhancedTree, Object.getPrototypeOf(tree));
-    copyTreeProperties(tree as object, enhancedTree as object);
-
-    // Define new .with() method that passes enhancedTree (not the original tree)
-    // to subsequent enhancers. This is critical for preserving the enhancer chain.
-
-    if ('$' in tree) {
-      Object.defineProperty(enhancedTree, '$', {
-        value: tree.$,
-        enumerable: false,
-        configurable: true,
-      });
-    }
+    const enhancedTree = tree;
 
     // DevTools interface
     const devToolsInterface: ModularDevToolsInterface = {
@@ -1868,7 +1787,7 @@ export function createDevToolsEnhancer(
     // and aggregated). Angular effect() was removed because:
     // 1. tree.$ may contain computed signals (entity collections) that produce
     //    new object references on every read, causing infinite effect re-runs.
-    // 2. originalTreeCall() does not reliably create signal dependencies when
+    // 2. the legacy controller read does not reliably create signal dependencies when
     //    the tree is wrapped by enhancers like batching().
     // NOTE: The signalTree mutation pipeline (recursiveUpdate) writes to leaf
     // signals directly and does NOT call PathNotifier.notify itself — only

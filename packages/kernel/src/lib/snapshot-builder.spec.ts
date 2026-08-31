@@ -75,7 +75,7 @@ const treeWithNestedForm = () =>
     // The regression test for the shared memo cell. Before the merge this was
     // 0 in one order and 1 in the other — same tree, same reads.
     const storeFirst = treeWithNestedForm();
-    void storeFirst();
+    void storeFirst.$();
     const afterStoreFirst = countST2008();
 
     err.mockClear();
@@ -90,7 +90,7 @@ const treeWithNestedForm = () =>
 
   it('produces the same snapshot whichever entry point populates the memo', () => {
     const a = treeWithNestedForm();
-    const viaStore = JSON.stringify(a().grp);
+    const viaStore = JSON.stringify(a.$().grp);
     const viaAccessorSecond = JSON.stringify(
       unwrap((a.$ as unknown as { grp: unknown }).grp)
     );
@@ -99,7 +99,7 @@ const treeWithNestedForm = () =>
     const viaAccessor = JSON.stringify(
       unwrap((b.$ as unknown as { grp: unknown }).grp)
     );
-    const viaStoreSecond = JSON.stringify(b().grp);
+    const viaStoreSecond = JSON.stringify(b.$().grp);
 
     expect(viaStore).toBe(viaAccessor);
     expect(viaAccessorSecond).toBe(viaStoreSecond);
@@ -112,7 +112,7 @@ const treeWithNestedForm = () =>
     signalTree({
       top: hooklessMarker() as unknown as number,
       grp: { nested: hooklessMarker() as unknown as number },
-    })();
+    }).$();
 
     const msg = err.mock.calls.map((c) => String(c[0])).join('\n');
     expect(msg).toContain('ST2008');
@@ -144,7 +144,7 @@ describe('one builder: the properties that made "build from the store" correct',
         );
     };
 
-    expect(symbolsIn(tree())).toEqual([]);
+    expect(symbolsIn(tree.$())).toEqual([]);
     expect(
       symbolsIn(unwrap((tree.$ as unknown as { grp: unknown }).grp))
     ).toEqual([]);
@@ -160,7 +160,7 @@ describe('one builder: the properties that made "build from the store" correct',
       n: 1,
     });
 
-    expect(tree()).toEqual({
+    expect(tree.$()).toEqual({
       cfg: { length: 3, name: 'x', prototype: 'p' },
       n: 1,
     });
@@ -181,11 +181,11 @@ describe('one builder: the properties that made "build from the store" correct',
     for (let i = 0; i < 20; i++) rows['r' + i] = { a: i, b: i };
     const tree = signalTree(rows);
 
-    const before = tree() as Record<string, unknown>;
+    const before = tree.$() as Record<string, unknown>;
     (tree.$ as unknown as Record<string, { a: { set(v: number): void } }>)[
       'r0'
     ].a.set(999);
-    const after = tree() as Record<string, unknown>;
+    const after = tree.$() as Record<string, unknown>;
 
     expect(after).not.toBe(before); // the root rebuilt
     expect(after['r0']).not.toBe(before['r0']); // the touched subtree rebuilt

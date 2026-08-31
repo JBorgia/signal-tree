@@ -32,7 +32,7 @@ describe('M3 — conformance', () => {
     });
     tree.$.rows.addOne({ id: 'a', n: 1 });
 
-    expect(tree()).toEqual({
+    expect(tree.$()).toEqual({
       rows: { all: [{ id: 'a', n: 1 }] }, // <- a WRAPPER, not the value
       theme: 'light', // <- the value
       plain: 1, // <- the value
@@ -69,10 +69,10 @@ describe('M3 — conformance', () => {
     // Both payload shapes are accepted, and the source says why: "An entityMap
     // SNAPSHOT always emits `{ all: [...] }`, so a bare array can never be
     // mistaken for the snapshot shape."
-    tree({ rows: [{ id: 'x', n: 1 }] } as never);
+    tree.$({ rows: [{ id: 'x', n: 1 }] } as never);
     expect(tree.$.rows.ids()).toEqual(['x']);
 
-    tree({ rows: { all: [{ id: 'y', n: 2 }] } } as never);
+    tree.$({ rows: { all: [{ id: 'y', n: 2 }] } } as never);
     expect(tree.$.rows.ids()).toEqual(['y']);
 
     // The disambiguation is only necessary because a SECOND canonical shape

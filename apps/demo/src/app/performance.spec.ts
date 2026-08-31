@@ -117,17 +117,17 @@ timingDescribe('SignalTree Performance Benchmarks', () => {
 
     const smallTime = measureTime(() => {
       const tree = signalTree(smallState);
-      tree();
+      tree.$();
     });
 
     const mediumTime = measureTime(() => {
       const tree = signalTree(mediumState);
-      tree();
+      tree.$();
     });
 
     const largeTime = measureTime(() => {
       const tree = signalTree(largeState);
-      tree();
+      tree.$();
     });
 
     performanceResults.initialization = {
@@ -147,11 +147,11 @@ timingDescribe('SignalTree Performance Benchmarks', () => {
     const tree = signalTree(state);
 
     const shallowTime = measureTime(() => {
-      tree((state: NestedState) => ({ ...state, counter: Math.random() }));
+      tree.$((state: NestedState) => ({ ...state, counter: Math.random() }));
     });
 
     const deepTime = measureTime(() => {
-      tree((state: any) => {
+      tree.$((state: any) => {
         const newState = { ...state };
         if (newState.level_3_item_0) {
           newState.level_3_item_0 = {
@@ -181,13 +181,13 @@ timingDescribe('SignalTree Performance Benchmarks', () => {
     const batchTree = signalTree(state, { enhancers: [batching()] }) as any;
 
     const singleUpdateTime = measureTime(() => {
-      regularTree((state: any) => ({ ...state, value: Math.random() }));
+      regularTree.$((state: any) => ({ ...state, value: Math.random() }));
     });
 
     const batchedUpdateTime = measureTime(() => {
       batchTree.batch(() => {
         for (let i = 0; i < 10; i++) {
-          batchTree((s: any) => ({ ...s, [`field_${i}`]: Math.random() }));
+          batchTree.$((s: any) => ({ ...s, [`field_${i}`]: Math.random() }));
         }
       });
     }, 100); // Fewer iterations for batched operations

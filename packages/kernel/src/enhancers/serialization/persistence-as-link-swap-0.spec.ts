@@ -22,7 +22,7 @@ import type { StorageAdapter } from './storage-adapters';
  * introduced.
  *
  * ⚠️ THE PREREGISTERED PREDICTION. `persistence()` detects change by WHOLE-TREE
- * REFERENCE IDENTITY (`tree()` !== previousState) and gates the write on a
+ * REFERENCE IDENTITY (`tree.$()` !== previousState) and gates the write on a
  * whole-tree string compare. That is structurally the SAME mechanism as
  * LINK-ROOT-SOURCE-0's M3 mutation — "replace the eligible projection with a
  * current whole-tree re-read" — which passed six rows and killed the inspection
@@ -143,7 +143,7 @@ describe('P2 — an inspection write changes state but not durable truth', () =>
     // ⚠️ THE MANUAL PATH IS A SEPARATE ROUTE TO THE SAME DEFECT, and it is the
     // one an autoSave-only matrix misses entirely: a developer scrubs a value
     // in devtools, the application calls `save()`, and the scrub is durable.
-    // `save()` therefore publishes the ELIGIBLE value, never `tree()`.
+    // `save()` therefore publishes the ELIGIBLE value, never `tree.$()`.
     const { adapter, writes } = recordingAdapter();
     const tree = makeTree(adapter, 'p2c');
     await flush();

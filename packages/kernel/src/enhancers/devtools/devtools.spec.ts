@@ -8,11 +8,12 @@ import {
 } from './devtools';
 import { getPathNotifier, resetPathNotifier } from '../../lib/path-notifier';
 import { signalTree } from '../../lib/signal-tree';
+import { defineRootTree } from '../../lib/internals/root-source';
 
 function createMockTree(initialState: Record<string, any> = { count: 0 }) {
   const state = { ...initialState } as Record<string, any>;
 
-  const tree = function (...args: any[]) {
+  const root = function (...args: any[]) {
     if (args.length === 0) return state;
     const arg = args[0];
     if (typeof arg === 'function') {
@@ -25,13 +26,37 @@ function createMockTree(initialState: Record<string, any> = { count: 0 }) {
       return;
     }
   } as any;
+  const tree = {} as any;
 
   tree.state = state;
-  tree.$ = state;
-  tree.bind =
-    (_: unknown) =>
-    (...a: unknown[]) =>
-      tree(...(a as any));
+  for (const [key, value] of Object.entries(state)) {
+    const node =
+      value !== null && typeof value === 'object'
+        ? value
+        : Object.assign(
+            () => state[key],
+            {
+              set: (next: unknown) => {
+                state[key] = next;
+              },
+              update: (derive: (current: unknown) => unknown) => {
+                state[key] = derive(state[key]);
+              },
+            }
+          );
+    Object.defineProperty(root, key, {
+      value: node,
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
+  }
+  tree.$ = root;
+  defineRootTree(root, {
+    read: () => root(),
+    replace: (value) => root(value),
+    derive: (update) => root(update),
+  });
   tree.destroy = () => void 0;
 
   return tree as any;
@@ -63,7 +88,7 @@ describe('devTools enhancer (v6 API)', () => {
     expect(typeof dev.exportDebugSession).toBe('function');
 
     // perform an update via the enhanced tree and verify metrics changed
-    enhanced({ count: 1 });
+    enhanced.$({ count: 1 });
 
     const snapshot = dev.exportDebugSession();
     expect(snapshot.metrics).toBeDefined();
@@ -107,7 +132,7 @@ describe('devTools enhancer (v6 API)', () => {
       devTools({ enabled: true, enableBrowserDevTools: true })(tree);
 
       expect(connect).toHaveBeenCalled();
-      expect(send).toHaveBeenCalledWith('@@INIT', tree());
+      expect(send).toHaveBeenCalledWith('@@INIT', tree.$());
 
       // Let any scheduled sends flush (should be none on first run)
       await Promise.resolve();
@@ -188,7 +213,7 @@ describe('devTools enhancer (v6 API)', () => {
           timestamp: expect.any(Number),
         },
       });
-      expect(send.mock.calls[0][1]).toEqual(tree());
+      expect(send.mock.calls[0][1]).toEqual(tree.$());
     } finally {
       (globalThis as any).window = originalWindow;
     }
@@ -312,7 +337,7 @@ describe('devTools enhancer (v6 API)', () => {
     };
 
     try {
-      const tree = createMockTree();
+      const tree = signalTree({ count: 0 });
       devTools({ enabled: true, enableBrowserDevTools: true })(tree);
 
       const nextState = { count: 42 };
@@ -322,7 +347,7 @@ describe('devTools enhancer (v6 API)', () => {
         state: JSON.stringify(nextState),
       });
 
-      expect(tree()).toEqual(nextState);
+      expect(tree.$()).toEqual(nextState);
 
       // Allow any scheduled sends to complete
       await Promise.resolve();
@@ -485,8 +510,8 @@ describe('devTools enhancer (v6 API)', () => {
     };
 
     try {
-      const treeA = createMockTree();
-      const treeB = createMockTree();
+      const treeA = signalTree({ count: 0 });
+      const treeB = signalTree({ count: 0 });
 
       devTools({
         enabled: true,
@@ -508,8 +533,8 @@ describe('devTools enhancer (v6 API)', () => {
         state: JSON.stringify({ A: { count: 10 }, B: { count: 20 } }),
       });
 
-      expect((treeA() as any).count).toBe(10);
-      expect((treeB() as any).count).toBe(20);
+      expect((treeA.$() as any).count).toBe(10);
+      expect((treeB.$() as any).count).toBe(20);
 
       await Promise.resolve();
     } finally {

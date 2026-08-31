@@ -168,7 +168,7 @@ export { isTraversableNode, isNodeAccessor } from './internals/node-shape';
 /**
  * A node is reachable two ways — as the accessor (`tree.$.a`) and as the raw
  * store the accessor wraps — and both materialise the same subtree. Keying the
- * memo on the STORE collapses them onto one cache entry, so `tree()` and
+ * memo on the STORE collapses them onto one cache entry, so `tree.$()` and
  * `unwrap(tree.$.a)` hand back the SAME object rather than two equal copies.
  * Without this the structural sharing silently splits in half.
  */
@@ -232,24 +232,25 @@ export function materializeNode<T>(store: object): T {
  * state, so freezing one into a payload produces a number that was true once —
  * the `map: {}` failure in a different costume: not absent data, WRONG data.
  *
- * Before this stamp, whether a derived appeared in `tree()` depended on TOUCH
+ * Before this stamp, whether a derived appeared in the root snapshot depended on TOUCH
  * ORDER, which nothing documented and no test covered:
  *
- *   tree() first, never touch `$`  → absent   (correct, by accident)
- *   touch `$` at all, then tree()  → PRESENT  (wrong)
+ *   read the root first, never touch `$`  → absent   (correct, by accident)
+ *   touch `$` first, then read the root    → PRESENT  (wrong)
  *
  * because `finalize()` (the `$` getter) applies configured derived state, while the
- * `tree()` call path runs only `materializeOnly()`. Every real application is
- * the second case — you write state through `$`, then persist. So in practice
- * derived values were being persisted, and going stale in storage.
+ * NaturalValue path reads the backing source store. Every real application
+ * touches `$` before persistence, so derived values must remain accessor
+ * structure rather than becoming snapshot data as a side effect of touch order.
  *
  * The `SignalTree:` prefix is load-bearing for the same reason it is on
  * `PROCESSOR_STAMP`: `unwrap`'s symbol loop skips that prefix by identity, so
  * the stamp itself can never leak into a payload.
  *
- * Only NON-WRITABLE signals are stamped. `.derived()` is for derived state, but
- * a writable signal placed there is real state and must still be captured —
- * excluding it would trade one silent data loss for another.
+ * Only NON-WRITABLE signals are stamped. A writable carrier returned by
+ * `config.derived` stays writable under `$`, but configured-derived ownership
+ * still excludes it from the backing source store and NaturalValue snapshot.
+ * Writability is an access capability, not snapshot authority.
  */
 const DERIVED_STAMP = Symbol.for('SignalTree:Derived');
 
@@ -348,7 +349,7 @@ export function unwrap<T>(node: unknown): T {
 
 /**
  * @internal THE builder. Every snapshot of a tree node is produced here —
- * `tree()`, `snapshotState()`, `unwrap()` of an accessor, and every nested
+ * `tree.$()`, `snapshotState()`, `unwrap()` of an accessor, and every nested
  * child — so there is exactly one place that decides what a property
  * contributes to a snapshot.
  *
@@ -576,7 +577,7 @@ function buildFromStore<T>(node: object): T {
 export function snapshotState<T>(state: TreeNode<T>): T {
   // Routed through the memo, not bare `unwrap`. Every snapshot consumer —
   // restoration, devtools, serialisation — was rebuilding the entire tree on
-  // every call while `tree()` next door returned a memoised result, because
+  // every call while `tree.$()` next door returned a memoised result, because
   // this took the raw store and `unwrap`'s uncached path.
   return state !== null && typeof state === 'object'
     ? materializeNode<T>(state as unknown as object)

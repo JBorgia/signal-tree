@@ -6,13 +6,13 @@ import {
 import { NEUTRAL_CELL_RUNTIME } from '../../lib/internals/cell-runtime';
 import { getTreeRealization } from '../../lib/internals/tree-realization';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
+import { rootAuthorityFor } from '../../lib/internals/root-source';
 
 import {
   deepEqual,
   isTraversableNode,
   snapshotState,
 } from '../../lib/utils';
-import { copyTreeProperties } from '../utils/copy-tree-properties';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-runtime';
 import {
@@ -437,7 +437,7 @@ class RestorationManager<T> {
   // NOTE: there is deliberately NO `state` parameter.
   //
   // There used to be one, and it was a lie: every caller computed a snapshot to
-  // pass in — `this.tree()`, `originalTreeCall()` — and this method ignored it
+  // pass in — the legacy controller read, `the legacy controller read` — and this method ignored it
   // and called `snapshotState()` itself. Harmless in cost (both hit the same
   // memo) and NOT harmless in contract: the signature promised "record this
   // state" while the body recorded "whatever the tree is right now". A caller
@@ -681,7 +681,7 @@ class RestorationManager<T> {
       entry.__effects = effects.map(cloneTurnEffect);
     }
 
-    // Dedupe by REFERENCE. `tree()` returns the identical object when nothing
+    // Dedupe by REFERENCE. `tree.$()` returns the identical object when nothing
     // changed, so this is exact for the case that matters and O(1) — the
     // deepEqual it replaces was a second full-state walk on every recorded
     // write, on top of the clone.
@@ -1542,7 +1542,7 @@ class RestorationManager<T> {
           this.restoreStateFn(state);
         } else {
           // Fallback if no restoration function provided
-          this.tree(state);
+          rootAuthorityFor(this.tree).replace(state);
         }
       }
     );
@@ -1944,7 +1944,13 @@ let warnedHistoryRetention = false;
  * not a tripwire that must fire on an exact entry.
  */
 function checkHistoryRetention(root: unknown, entries: number): void {
-  if (warnedHistoryRetention || !root || typeof root !== 'object') return;
+  if (
+    warnedHistoryRetention ||
+    !root ||
+    !isTraversableNode(root)
+  ) {
+    return;
+  }
 
   let widest = 0;
   let widestPath = '';
@@ -2056,12 +2062,7 @@ export function restoration(
       return Object.assign(tree, noopMethods) as unknown as ISignalTree<T> &
         RestorationMethods;
     }
-    // Store the original callable tree function
-    const originalTreeCall = (
-      tree as unknown as {
-        bind: (t: unknown) => (...args: unknown[]) => T;
-      }
-    ).bind(tree);
+    const rootAuthority = rootAuthorityFor(tree);
 
     // Flag to prevent restoration during restoration
     let isRestoring = false;
@@ -2263,7 +2264,7 @@ export function restoration(
       (state: T) => {
         isRestoring = true;
         try {
-          originalTreeCall(state);
+          rootAuthority.replace(state);
         } finally {
           isRestoring = false;
         }
@@ -2724,31 +2725,6 @@ export function restoration(
         resolvedPositionIds
       );
     };
-    const recordCaptureBucket = (
-      bucket: CaptureBucket,
-      action: string
-    ): boolean => {
-      const { ownerPaths, subjectIds, positionIds, effects, designated } =
-        drainCaptureBucket(bucket);
-      if (
-        !isTurnEligible(designated) ||
-        (ownerPaths.length === 0 &&
-          subjectIds.length === 0 &&
-          positionIds.length === 0 &&
-          effects.length === 0)
-      ) {
-        return false;
-      }
-
-      return restorationManager.addEntry(
-        action,
-        undefined,
-        ownerPaths.length > 0 ? ownerPaths : undefined,
-        subjectIds.length > 0 ? subjectIds : undefined,
-        positionIds.length > 0 ? positionIds : undefined,
-        effects.length > 0 ? effects : undefined
-      );
-    };
     const getTransactionBucket = (transactionId: number): CaptureBucket => {
       let bucket = pendingTransactions.get(transactionId);
       if (!bucket) {
@@ -3148,72 +3124,7 @@ export function restoration(
       // Ignore - fall back to default behavior
     }
 
-    // Create enhanced tree function that includes restoration tracking
-    const enhancedTree = function (this: ISignalTree<T>, ...args: unknown[]) {
-      if (args.length === 0) {
-        return originalTreeCall();
-      } else {
-        if (isRestoring) {
-          if (args.length === 1) {
-            const arg = args[0];
-            if (typeof arg === 'function') {
-              return originalTreeCall(arg as (current: T) => T);
-            } else {
-              return originalTreeCall(arg as T);
-            }
-          }
-          return;
-        }
-
-        const beforeState = originalTreeCall();
-
-        let result: unknown;
-        if (args.length === 1) {
-          const arg = args[0];
-          if (typeof arg === 'function') {
-            result = originalTreeCall(arg as (current: T) => T);
-          } else {
-            result = originalTreeCall(arg as T);
-          }
-        }
-
-        const afterState = originalTreeCall();
-
-        // Reference compare, not deepEqual. Both sides come from the memoised
-        // root materialisation, which returns the IDENTICAL object when nothing
-        // changed — so this is exact, and O(1) instead of a full-state walk on
-        // every single root write. That walk was the dominant remaining cost:
-        // 50 writes changing ONE number cost 57.49ms at 10k rows with it and
-        // 0.44ms without.
-        if (beforeState !== afterState) {
-          const activeMeta = getActiveWriteContext();
-          if (
-            isInspectionWrite(activeMeta) ||
-            getWriteParticipation(activeMeta) === 'realized'
-          ) {
-            return result;
-          }
-          const transactionId = resolveTransactionId(activeMeta);
-          if (transactionId !== undefined) {
-            return result;
-          }
-          const notifier = getPathNotifier();
-          // Root writes must still commit synchronously. Under the intrinsic
-          // leaf substrate, the leaf effects now arrive through the notifier,
-          // so flush them immediately and let the normal flush hook record the
-          // indexed turn.
-          if (notifier?.isBatchingEnabled()) {
-            notifier.flushSync();
-          } else {
-            selfDirty = false;
-            recordCaptureBucket(pendingCapture, 'update');
-          }
-        }
-        return result;
-      }
-    } as unknown as ISignalTree<T>;
-
-    Object.setPrototypeOf(enhancedTree, Object.getPrototypeOf(tree));
+    const enhancedTree = tree;
     defineTreeRealizationDescriptors(
       enhancedTree as unknown as object,
       realizationDescriptors
@@ -3222,27 +3133,6 @@ export function restoration(
       enhancedTree as unknown as object,
       realizationPort
     );
-    // copyTreeProperties, NOT Object.assign: `Object.assign` copies only
-    // ENUMERABLE own properties, and every tree method (`updateAndReport`,
-    // `batchUpdate`, `onPathChange`, `registerCleanup`, …) is defined
-    // `enumerable: false`. They were silently dropped, so the builder that
-    // wraps this enhanced tree found no method to forward to and returned an
-    // empty result — `updateAndReport({count:1})` returned [] and never wrote.
-    copyTreeProperties(
-      tree as unknown as object,
-      enhancedTree as unknown as object
-    );
-    // Define new .with() method that passes enhancedTree (not the original tree)
-    // to subsequent enhancers. This is critical for preserving the enhancer chain.
-
-    if ('$' in tree) {
-      Object.defineProperty(enhancedTree, '$', {
-        value: (tree as ISignalTree<T>).$,
-        enumerable: false,
-        configurable: true,
-      });
-    }
-
     (enhancedTree as ISignalTree<T> & RestorationMethods)['undo'] = () => {
       restorationManager.undoConfirmed();
     };

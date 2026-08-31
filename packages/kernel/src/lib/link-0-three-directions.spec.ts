@@ -140,7 +140,7 @@ describe('LINK-0 PULL: an awaited read applied as external truth', () => {
       leaf: 'l1',
       settings: { theme: 'dark', units: 'metric' },
     });
-    external(() => tree(value));
+    external(() => tree.$(value));
     await flush();
 
     const effects = drain(j);
@@ -332,7 +332,7 @@ describe('LINK-0 PUSH-OUT: only settled state escapes, at every scope', () => {
       tree,
       leaf: () => tree.$.leaf(),
       branch: () => tree.$.settings(),
-      root: () => tree(),
+      root: () => tree.$(),
     };
   };
 
@@ -377,7 +377,9 @@ describe('LINK-0 PUSH-OUT: only settled state escapes, at every scope', () => {
     await flush();
     const out = outbound(s.tree, s.root);
 
-    const pending = s.tree.transaction(() => s.tree({ leaf: 'doomed' }));
+    const pending = s.tree.transaction(() =>
+      s.tree.$((current) => ({ ...current, leaf: 'doomed' }))
+    );
     out.push();
     await flush();
     expect(out.sent).toEqual([]);

@@ -11,14 +11,14 @@ import { serialization } from './serialization';
  * function` — and had since the markers existed. Two causes, both now gone:
  *
  *  1. `serialize()` had a PRIVATE second materialiser, `unwrapObjectSafely`,
- *     three hundred lines from `toJSON()` which already delegated to `tree()`.
+ *     three hundred lines from `toJSON()` which already delegated to `tree.$()`.
  *     The enhancer disagreed with itself about what a snapshot is, and the
  *     private copy never learned the marker rule — so it emitted 17 keys for a
  *     `status()` node: 2 state, 6 computeds, and 9 setter METHODS.
  *  2. `deserialize()` then walked that payload and tried to `.set()` each key
  *     back. A computed has no setter, so the whole restore threw.
  *
- * `serialize()` now calls `tree()`, and `deserialize()` routes markers through
+ * `serialize()` now calls `tree.$()`, and `deserialize()` routes markers through
  * `hydrate` in `rehydrate` mode. The private walker is deleted — 133 lines.
  */
 describe('serialization round-trips every marker', () => {
@@ -55,7 +55,7 @@ describe('serialization round-trips every marker', () => {
 describe('special types still survive — one materialiser, same result', () => {
   it('preserves Date, Map, Set, BigInt and RegExp, nested included', () => {
     // `unwrapObjectSafely` was kept on the grounds that serialize() "needs
-    // type-preserving markers". That was never true: `tree()` returns LIVE
+    // type-preserving markers". That was never true: `tree.$()` returns LIVE
     // Date/Map/Set/RegExp/bigint instances and `encodeSpecials` does the
     // marking. This pins that deleting the private walker changed nothing here.
     const shape = () => ({

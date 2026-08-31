@@ -134,10 +134,9 @@ describe('LINK-1 case 1: X must be an owned writable SignalTree location', () =>
     const tree = makeTree();
     await flush();
 
-    // The ROOT location is `tree`, not `tree.$` — measured: `tree.$` resolves a
-    // registry but is neither callable nor settable, so it is a namespace, not
-    // a writable location.
-    expect(() => linkableWrite(tree)).not.toThrow();
+    // The root state location is the callable root accessor; the controller
+    // itself owns lifecycle and capabilities but is not writable.
+    expect(() => linkableWrite(tree.$)).not.toThrow();
     expect(() => linkableWrite(tree.$.settings)).not.toThrow();
     expect(() => linkableWrite(tree.$.leaf)).not.toThrow();
     expect(() => linkableWrite(tree.$.settings.theme)).not.toThrow();

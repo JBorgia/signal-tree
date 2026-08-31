@@ -67,7 +67,7 @@ describe('NOTIFIER-SCOPE-0 mechanism: what identity does a location carry?', () 
   it('a leaf names its own owner — position ids, owner path, AND registry', async () => {
     const a = signalTree({ theme: 'a0' }, { enhancers: [restoration()] });
     await flush();
-    const leaf = (a.$ as Record<string, unknown>)['theme'];
+    const leaf = (a.$ as unknown as Record<string, unknown>)['theme'];
 
     expect(getOwnedPositionIds(leaf)).toEqual([2]);
     expect(getOwnedOwnerPath(leaf)).toBe('theme');
@@ -90,8 +90,8 @@ describe('NOTIFIER-SCOPE-0 mechanism: what identity does a location carry?', () 
     const b = signalTree({ theme: 'b0' }, { enhancers: [restoration()] });
     await flush();
 
-    const leafA = (a.$ as Record<string, unknown>)['theme'];
-    const leafB = (b.$ as Record<string, unknown>)['theme'];
+    const leafA = (a.$ as unknown as Record<string, unknown>)['theme'];
+    const leafB = (b.$ as unknown as Record<string, unknown>)['theme'];
     const posA = getOwnedPositionIds(leafA);
     const posB = getOwnedPositionIds(leafB);
 

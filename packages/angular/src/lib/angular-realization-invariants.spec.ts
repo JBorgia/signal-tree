@@ -42,7 +42,7 @@ describe('Angular realization invariants', () => {
     const tree = signalTree({ a: 1 });
     const leaf = tree.$.a;
 
-    tree({ a: 7 });
+    tree.$({ a: 7 });
 
     expect(tree.$.a).toBe(leaf);
     expect(untracked(() => leaf())).toBe(7);
@@ -88,7 +88,7 @@ describe('Angular realization invariants', () => {
     const tree = causal();
     const leaf = tree.$.a;
 
-    tree({ a: 9, b: 2 });
+    tree.$({ a: 9, b: 2 });
 
     expect(untracked(() => leaf())).toBe(9);
     expect(tree.$.a).toBe(leaf);

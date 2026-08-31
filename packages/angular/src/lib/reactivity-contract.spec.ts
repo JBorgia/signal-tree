@@ -100,7 +100,7 @@ describe('SignalTree reactivity contract', () => {
     let runs = 0;
     const total = computed(() => {
       runs++;
-      const snapshot = tree();
+      const snapshot = tree.$();
       return snapshot.a.x + snapshot.b.y;
     });
 
@@ -114,7 +114,7 @@ describe('SignalTree reactivity contract', () => {
 
   it('observes correct snapshots when every computed result has fresh identity', () => {
     const tree = signalTree({ left: { value: 1 }, right: { value: 2 } });
-    const snapshot = computed(() => structuredClone(tree()));
+    const snapshot = computed(() => structuredClone(tree.$()));
 
     const first = snapshot();
     expect(first).toEqual({ left: { value: 1 }, right: { value: 2 } });

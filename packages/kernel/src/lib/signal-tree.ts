@@ -424,6 +424,7 @@ function makeNodeAccessor<T>(
   realization?: TreeLazyRealization,
   suppressTracking?: TrackingSuppression
 ): NodeAccessor<T> {
+  const isRoot = ownerPath === '';
   // Declared as a METHOD SHORTHAND, not `function () {}`, and this is
   // load-bearing. A node carries the user's state keys as its own enumerable
   // properties, so every own property name a function already has is a name
@@ -462,7 +463,11 @@ function makeNodeAccessor<T>(
         // ⚠️ The read boundary alone is NOT sufficient: a branch has no
         // publication token, so a held parent consumer sees nothing. The
         // membership carrier in `publishMembershipChange` is what wakes it.
-        if (self.accessor !== undefined && isDormantMember(self.accessor)) {
+        if (
+          !isRoot &&
+          self.accessor !== undefined &&
+          isDormantMember(self.accessor)
+        ) {
           return undefined as unknown as T;
         }
         return materializeNode(store as object) as unknown as T;
@@ -592,7 +597,7 @@ function makeNodeAccessor<T>(
  * array is what does not survive measurement: a per-node Map index cost +12.1%
  * on subtree reads and 310B/node in this repo (built, measured, reverted), an
  * index-keyed structure pays O(n) to reindex on any insert or reorder, and
- * `tree()` has to hand back a real Array regardless. Most arrays in a tree are
+ * `tree.$()` has to hand back a real Array regardless. Most arrays in a tree are
  * ordered lists of primitives and would pay that for nothing.
  *
  * So: a keyed collection is an `entityMap`; an ordered list is an array leaf;
@@ -782,7 +787,7 @@ function warnMissingForward(method: string): void {
       `SignalTree: "${method}" could not be forwarded — an enhancer in the ` +
         `chain returned a tree without it, so this call did NOTHING. An ` +
         `enhancer that builds a new tree object must copy own property ` +
-        `DESCRIPTORS (see copyTreeProperties), not Object.assign, which skips ` +
+        `DESCRIPTORS, not Object.assign, which skips ` +
         `non-enumerable methods. [ST2017]`
     );
   }
@@ -1092,7 +1097,7 @@ function recursiveUpdate(
       }
     } else if (isNodeAccessor(prop)) {
       if (typeof value === 'function') {
-        // Updater function aimed at a BRANCH, e.g. tree({ user: u => ({...}) }).
+        // Updater function aimed at a BRANCH, e.g. tree.$({ user: u => ({...}) }).
         // Resolve it here and recurse rather than handing it to the accessor:
         // the accessor's own updater path drops `out` and `pathPrefix`, so the
         // reported path was the branch ('user') instead of the leaves that
@@ -1149,16 +1154,16 @@ function recursiveUpdate(
     // next person does not re-derive it.
     //
     // Its 13.x removal note said a diagnostic here "would fire on
-    // `tree(tree())`, the ordinary snapshot-restore pattern", and that markers
+    // `tree.$(tree.$())`, the ordinary snapshot-restore pattern", and that markers
     // "do not accept merge writes BY DESIGN". Both were true then. Neither is
     // now: every marker declares `hydrate`, the branch above routes to it, and
-    // `tree(tree())` is pinned by a round-trip test that reads LIVE node values
+    // `tree.$(tree.$())` is pinned by a round-trip test that reads LIVE node values
     // (the naive snapshot-vs-snapshot form passes vacuously when both sides
     // drop the same key).
     //
     // So the reasoning did expire — but restoring the diagnostic at THIS site
     // still cries wolf, measured: it fired on an ordinary leaf write
-    // (`tree({known: 2})`) and on `{ user: undefined }`, which is type-legal
+    // (`tree.$({known: 2})`) and on `{ user: undefined }`, which is type-legal
     // `Partial<T>` and exactly what `{ ...defaults, ...patch }` produces for an
     // absent optional key. This is the tail of the outer dispatch, not the
     // "matched neither guard" branch the note described.
@@ -1172,7 +1177,7 @@ function recursiveUpdate(
     // The real remaining gap was narrower than this note assumed. A marker that
     // declares `snapshot` but no `hydrate`, whose node is not a writable
     // signal, snapshots perfectly and silently discards every write — measured:
-    // `tree()` gave `{"p":1}`, `tree({p: 99})` left it at `1`, nothing reported
+    // `tree.$()` gave `{"p":1}`, `tree.$({p: 99})` left it at `1`, nothing reported
     // at either end. [ST2022] stays quiet because `snapshot` IS declared.
     //
     // That is now [ST2023], reported at MATERIALISATION (materialize-markers.ts),
@@ -1499,9 +1504,9 @@ function createSignalStore<T>(
     //
     // The damage is contained but real: the ROOT store IS `tree.$`, so its
     // prototype became an attacker-controlled node. `tree.$.isAdmin` then read
-    // back a live signal holding `true` while `tree()` reported only the
+    // back a live signal holding `true` while `tree.$()` reported only the
     // legitimate keys — invisible to snapshots, serialization, persistence,
-    // devtools and restoration — and a later `tree({ isAdmin: … })` wrote
+    // devtools and restoration — and a later `tree.$({ isAdmin: … })` wrote
     // THROUGH to it, bypassing the ST2010 not-in-initial-shape discard.
     // Nested branches were safe (each accessor gets a fresh Function.prototype);
     // the root is the only victim, which is exactly why it was easy to miss.
@@ -1805,32 +1810,21 @@ function create<T extends object>(
     rootPositionIds
   );
 
-  // Create root callable function
-  const tree = function (arg?: unknown): T | void {
-    if (arguments.length === 0) {
-      return materializeNode(signalState as object) as unknown as T;
-    }
+  const rootAccessor = makeNodeAccessor(
+    signalState,
+    '',
+    rootPositionIds,
+    materializationContext.positionRegistry,
+    {
+      cell: materializationContext.cellRuntime,
+      derived: materializationContext.derivedRuntime,
+      materialization: materializationContext.materializationRealization,
+      scalarLeaf: materializationContext.scalarLeafRealization,
+    },
+    materializationContext.suppressTracking
+  );
 
-    if (typeof arg === 'function') {
-      const updater = arg as (current: T) => T;
-      const current = unwrap(signalState) as T;
-      recursiveUpdate(
-        signalState,
-        updater(current),
-        undefined,
-        '',
-        materializationContext.suppressTracking
-      );
-    } else {
-      recursiveUpdate(
-        signalState,
-        arg,
-        undefined,
-        '',
-        materializationContext.suppressTracking
-      );
-    }
-  } as ISignalTree<T>;
+  const tree = {} as ISignalTree<T>;
 
   const lazyRealization = {
     cell: materializationContext.cellRuntime,
@@ -1840,19 +1834,20 @@ function create<T extends object>(
   };
   bindTreeRealization(tree as object, lazyRealization);
   bindTreeRealization(signalState as object, lazyRealization);
+  bindTreeRealization(rootAccessor as object, lazyRealization);
 
-  // Mark as NodeAccessor
-  (tree as unknown as Record<symbol, boolean>)[NODE_ACCESSOR_SYMBOL] = true;
   (tree as unknown as Record<symbol, MutationCaptureRuntime>)[
     MUTATION_CAPTURE_RUNTIME
   ] = captureRuntime;
   if (rootPositionIds) {
     defineOwnedPositionIds(tree as object, rootPositionIds);
     defineOwnedPositionIds(signalState as object, rootPositionIds);
+    defineOwnedPositionIds(rootAccessor as object, rootPositionIds);
   }
   if (buildPlan.has('mutation-capture')) {
     defineOwnedOwnerPath(tree as object, '');
     defineOwnedOwnerPath(signalState as object, '');
+    defineOwnedOwnerPath(rootAccessor as object, '');
   }
   if (materializationContext.positionTopologyEnabled) {
     definePositionRegistry(
@@ -1861,6 +1856,10 @@ function create<T extends object>(
     );
     definePositionRegistry(
       signalState as object,
+      materializationContext.positionRegistry
+    );
+    definePositionRegistry(
+      rootAccessor as object,
       materializationContext.positionRegistry
     );
   }
@@ -1877,13 +1876,14 @@ function create<T extends object>(
       materializationContext.positionRegistry
     );
     defineOwnedOwnerPath(signalState as object, '');
+    defineOwnedOwnerPath(rootAccessor as object, '');
   }
-  // The root accessor is not callable, so its canonical reader/writer is the
-  // tree itself. Recorded here; `accessorsFor` consults it.
-  defineRootTree(
-    signalState as object,
-    tree as unknown as { (): unknown; (value: unknown): void }
-  );
+  defineRootTree(rootAccessor as object, {
+    read: () => rootAccessor(),
+    replace: (value) => rootAccessor(value as T),
+    derive: (update) =>
+      rootAccessor(update as (current: T) => T),
+  });
 
   if (materializationContext.physicalCommitClock) {
     definePhysicalCommitClock(
@@ -1894,10 +1894,15 @@ function create<T extends object>(
       signalState as object,
       materializationContext.physicalCommitClock
     );
+    definePhysicalCommitClock(
+      rootAccessor as object,
+      materializationContext.physicalCommitClock
+    );
   }
   if (scalarSlotRuntime && scalarSlotRuntime.slotCount() > 0) {
     defineTreeScalarSlotRuntime(tree as object, scalarSlotRuntime);
     defineTreeScalarSlotRuntime(signalState as object, scalarSlotRuntime);
+    defineTreeScalarSlotRuntime(rootAccessor as object, scalarSlotRuntime);
   }
 
   // Lifecycle: cleanup registry and destroyed flag
@@ -1906,24 +1911,9 @@ function create<T extends object>(
 
   // Add core properties
   Object.defineProperty(tree, '$', {
-    value: signalState,
+    value: rootAccessor,
     enumerable: false,
     writable: false,
-  });
-
-  // bind()
-  Object.defineProperty(tree, 'bind', {
-    value: function (thisArg?: unknown): NodeAccessor<T> {
-      // Use native Function.prototype.bind to avoid calling this custom
-      // `bind` property (which would cause infinite recursion).
-      return Function.prototype.bind.call(
-        tree,
-        thisArg
-      ) as unknown as NodeAccessor<T>;
-    },
-    enumerable: false,
-    // Allow enhancers or consumers to bind/override if necessary
-    writable: true,
     configurable: true,
   });
 
@@ -2037,18 +2027,6 @@ function create<T extends object>(
     writable: true,
     configurable: true,
   });
-
-  // Copy state properties to root for direct access (DEPRECATED - will be removed in v7)
-  // Consumers should use tree.$ for state access
-  for (const key of Object.keys(signalState as object)) {
-    if (!(key in tree)) {
-      Object.defineProperty(tree, key, {
-        value: (signalState as Record<string, unknown>)[key],
-        enumerable: true,
-        configurable: true,
-      });
-    }
-  }
 
   return { tree, authority: constructionAuthority };
 }
@@ -2299,155 +2277,36 @@ function createConfiguredTree<
     }
   };
 
-  // Create a callable configured tree that delegates to baseTree
-  const builder = function (arg?: unknown): TSource | void {
-    // Materialize markers WITHOUT finalizing derived state. Calling tree()
-    // returns source state only; derived state is structure under `$`.
-    materializeOnly();
-
-    // Delegate to baseTree's call signature
-    if (arguments.length === 0) {
-      return (baseTree as unknown as () => TSource)();
-    }
-    return (baseTree as unknown as (arg: unknown) => void)(arg);
-  } as ISignalTreeOf<TSource, 'cell', TAccum>;
-
-  // Mark as NodeAccessor
-  (builder as unknown as Record<symbol, boolean>)[NODE_ACCESSOR_SYMBOL] = true;
-
-  // Copy all properties from baseTree to builder
-  Object.defineProperty(builder, '$', {
+  const rootAccessor = baseTree.$;
+  Object.defineProperty(baseTree, '$', {
     get() {
       finalize();
-      return baseTree.$;
+      Object.defineProperty(baseTree, '$', {
+        value: rootAccessor,
+        enumerable: false,
+        configurable: true,
+      });
+      return rootAccessor;
     },
     enumerable: false,
     configurable: true,
   });
 
-  // Override 'with' method to maintain builder chain
-
-  // Copy 'bind' method from baseTree (if it exists)
-  if (typeof baseTree.bind === 'function') {
-    Object.defineProperty(builder, 'bind', {
-      value: baseTree.bind.bind(baseTree),
-      enumerable: false,
-      writable: false,
-      configurable: true,
-    });
-  } else {
-    Object.defineProperty(builder, 'bind', {
-      value: () => builder,
-      enumerable: false,
-      writable: false,
-      configurable: true,
-    });
-  }
-
-  // Copy 'destroy' method from baseTree (if it exists)
-  // Note: writable: true allows enhancers like guardrails() to override destroy
-  if (typeof baseTree.destroy === 'function') {
-    Object.defineProperty(builder, 'destroy', {
-      value: baseTree.destroy.bind(baseTree),
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    });
-  } else {
-    Object.defineProperty(builder, 'destroy', {
-      value: () => {
-        /* noop */
-      },
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    });
-  }
-
-  // Copy 'destroyed' signal from baseTree
-  if (baseTree.destroyed) {
-    Object.defineProperty(builder, 'destroyed', {
-      value: baseTree.destroyed,
-      enumerable: false,
-      writable: false,
-      configurable: true,
-    });
-  }
-
-  // Copy 'registerCleanup' from baseTree
-  if (typeof baseTree.registerCleanup === 'function') {
-    Object.defineProperty(builder, 'registerCleanup', {
-      value: baseTree.registerCleanup.bind(baseTree),
-      enumerable: false,
-      writable: false,
-      configurable: true,
-    });
-  }
-
-  // Forward 'updateAndReport' from baseTree (apply partial update +
-  // return changed paths). Defined as non-enumerable on baseTree, so it
-  // isn't picked up by the generic key copy above.
-  Object.defineProperty(builder, 'updateAndReport', {
-    value: function (this: unknown, arg?: unknown): string[] {
+  const updateAndReport = baseTree.updateAndReport?.bind(baseTree);
+  Object.defineProperty(baseTree, 'updateAndReport', {
+    value: function (arg?: unknown): string[] {
       finalize();
-      const fn = (baseTree as unknown as Record<string, unknown>)[
-        'updateAndReport'
-      ] as ((a?: unknown) => string[]) | undefined;
-      if (!fn) {
-        // This is what made the enhancer bug SILENT: a missing method meant an
-        // empty report and a dropped write, indistinguishable from "nothing
-        // changed". A missing forward target is a broken enhancer chain, never
-        // a legitimate state, so say so.
+      if (!updateAndReport) {
         warnMissingForward('updateAndReport');
         return [];
       }
-      return fn.call(baseTree, arg);
+      return updateAndReport(arg as never);
     },
     enumerable: false,
     writable: false,
     configurable: true,
   });
-
-  // The `batchUpdate` forward was REMOVED in 14.1.1 along with the method it
-  // forwarded. Use `tree(partial)`, or `tree.batch(() => tree(partial))`.
-
-  // Forward everything the enhancers added.
-  //
-  // signalTree() now applies enhancers to the base tree BEFORE wrapping it, so
-  // by the time the builder is created the tree already carries undo(),
-  // getRestorationHistory(), transaction() and whatever else was configured. The chained
-  // `.with()` used to copy these across one enhancer at a time; the copy has to
-  // happen here instead, or the methods exist on the tree and are invisible on
-  // the object the caller holds.
-  const RESERVED = new Set([
-    '$',
-    'state',
-    'with',
-    'bind',
-    'destroy',
-    'destroyed',
-    'registerCleanup',
-  ]);
-  for (const key of Object.keys(baseTree)) {
-    if (RESERVED.has(key)) continue;
-    const descriptor = Object.getOwnPropertyDescriptor(baseTree, key);
-    if (!descriptor) continue;
-    try {
-      Object.defineProperty(builder, key, descriptor);
-    } catch {
-      /* non-configurable on the source: nothing useful to do */
-    }
-  }
-  for (const symbolKey of Object.getOwnPropertySymbols(baseTree)) {
-    const descriptor = Object.getOwnPropertyDescriptor(baseTree, symbolKey);
-    if (!descriptor) continue;
-    try {
-      Object.defineProperty(builder, symbolKey, descriptor);
-    } catch {
-      /* ignore */
-    }
-  }
-  return builder;
+  return baseTree as unknown as ISignalTreeOf<TSource, 'cell', TAccum>;
 }
 
 /**

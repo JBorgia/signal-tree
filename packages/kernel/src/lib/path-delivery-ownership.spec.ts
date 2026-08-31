@@ -71,7 +71,7 @@ describe('PATH-NOTIFIER-DELIVERY-OWNERSHIP-0', () => {
       const tree = signalTree({ count: 0, user: { name: 'a' } }, CAPS);
       tree.$.count.set(5);
       tree.$.user.name.set('b');
-      expect(tree()).toEqual({ count: 5, user: { name: 'b' } });
+      expect(tree.$()).toEqual({ count: 5, user: { name: 'b' } });
     } finally {
       getPathNotifier();
     }

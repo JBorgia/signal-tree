@@ -75,7 +75,7 @@ export interface RestorationMethods {
   canUndo(): boolean;
   canRedo(): boolean;
   getRestorationHistory(): RestorationHistoryEntry<
-    this extends NodeAccessor<infer S> ? S : never
+    this extends { readonly $: NodeAccessor<infer S> } ? S : never
   >[];
   resetRestorationHistory(): void;
   jumpTo(index: number): void;

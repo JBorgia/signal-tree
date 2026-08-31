@@ -208,7 +208,7 @@ This project uses **SignalTree** (`@signaltree/core`) for Angular state manageme
 
 **Reads:** `store.$.path.to.leaf()` — call it like any Angular signal.
 
-**Writes:** `.set(v)` / `.update(fn)` on a LEAF. A leaf is a real Angular signal, so calling it with an argument is a compile error (14.0.0). Whole-branch update: `store.$.user({...})` or `store.$.user(fn)` — branches ARE callable. Whole-state replace: `store({...})`.
+**Writes:** `.set(v)` / `.update(fn)` on a LEAF. A leaf is a real Angular signal, so calling it with an argument is a compile error (14.0.0). Whole-branch replacement/update: `store.$.user(value)` or `store.$.user(fn)`. Whole-state replacement/update: `store.$(value)` or `store.$(fn)`; the store controller is not callable.
 
 **Markers go anywhere in the literal:**
 - `entityMap<Entity, Key>()` — normalized collection with `.addOne`, `.byId`, `.all`, `.where`, etc.
@@ -218,7 +218,7 @@ This project uses **SignalTree** (`@signaltree/core`) for Angular state manageme
 
 **Enhancers via `{ enhancers: [...] }`:** `batching()`, `devTools()`, `restoration({maxHistorySize})`, `persistence(config)`, `serialization()`. Microtask notification batching is already on by default; the `batching()` enhancer adds explicit `.batch(fn)`.
 
-**Callable syntax:** branches and the root are callable natively (`$.user({...})`, `$.user(fn)`, `store({...})`); LEAVES ARE NOT — use `.set()`/`.update()`. `@signaltree/callable-syntax` promised the leaf form via a build transform and was deleted in 14.0.0: it could never run inside an Angular app, so the call type-checked and silently did nothing.
+**Callable syntax:** root and branch state locations are callable natively (`store.$()`, `store.$(value)`, `store.$(fn)`, `store.$.user(value)`, `store.$.user(fn)`); the store controller is not callable. LEAVES ARE NOT writable by call — use `.set()`/`.update()`. `@signaltree/callable-syntax` promised the leaf form via a build transform and was deleted in 14.0.0: it could never run inside an Angular app, so the call type-checked and silently did nothing.
 
 ## Production architecture
 

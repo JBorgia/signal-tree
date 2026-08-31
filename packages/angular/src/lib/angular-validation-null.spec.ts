@@ -113,17 +113,20 @@ describe('ANG-V0-A — computed over published truth tracks every write form', (
 
   it('ROOT read invalidates on a root write', () => {
     const tree = signalTree(initial());
-    const result = computed(() => validateUser(tree().user));
+    const result = computed(() => validateUser(tree.$().user));
     expect(result().issues).toEqual([]);
 
-    tree({ user: { name: 'B', age: 36 } });
+    tree.$((current) => ({
+      ...current,
+      user: { name: 'B', age: 36 },
+    }));
 
     expect(result().issues.map((i) => i.message)).toEqual(['too short']);
   });
 
   it('root read invalidates on a DEEP LEAF write (root read is not stale)', () => {
     const tree = signalTree(initial());
-    const result = computed(() => validateUser(tree().user));
+    const result = computed(() => validateUser(tree.$().user));
     expect(result().issues).toEqual([]);
 
     tree.$.user.name.set('C');
@@ -357,7 +360,7 @@ describe('ANG-V0-D — is any truth change invisible to the pull surface?', () =
 // ============================================================================
 // ANG-V0-E — THE ROOT-SNAPSHOT NULL.
 //
-// The most natural whole-object form is `computed(() => validate(tree()))`.
+// The most natural whole-object form is `computed(() => validate(tree.$()))`.
 // It is the form a schema over an entire state shape wants. Measured
 // separately because a marker-bearing tree is where root projection is known
 // to be fragile.
@@ -368,7 +371,7 @@ describe('ANG-V0-E — root snapshot as the validated value', () => {
     let runs = 0;
     const snap = computed(() => {
       runs++;
-      return tree();
+      return tree.$();
     });
     snap();
     tree.$.user.name.set('Q');

@@ -260,12 +260,12 @@ describe('derived() marker pattern', () => {
     it('should remain callable like the original signalTree', () => {
       const tree = signalTree({ count: 0 });
 
-      // tree() should return the unwrapped state
-      expect(tree()).toEqual({ count: 0 });
+      // tree.$() should return the unwrapped state
+      expect(tree.$()).toEqual({ count: 0 });
 
-      // tree(newValue) should update
-      tree({ count: 5 });
-      expect(tree()).toEqual({ count: 5 });
+      // tree.$(newValue) should update
+      tree.$({ count: 5 });
+      expect(tree.$()).toEqual({ count: 5 });
     });
 
     it('should preserve state and $ accessors', () => {

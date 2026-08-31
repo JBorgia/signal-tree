@@ -184,19 +184,19 @@ type _c7_coexist = Expect<
   >
 >;
 
-// 8. the callable-tree contract survives accumulation
+// 8. the root-accessor contract survives accumulation
 const _c8_callable_read: {
   count: number;
   label: string;
   nested: { depth: number; flag: boolean };
-} = tree();
+} = tree.$();
 declare const accessorCheck: NodeAccessor<{
   count: number;
   label: string;
   nested: { depth: number; flag: boolean };
 }>;
 type _c8_is_node_accessor = Expect<
-  typeof tree extends typeof accessorCheck ? true : false
+  typeof tree.$ extends typeof accessorCheck ? true : false
 >;
 
 /* ------------------------------------------------------------------ *

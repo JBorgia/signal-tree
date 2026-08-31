@@ -97,13 +97,13 @@ describe('undo/redo restores what the user edited', () => {
   });
 });
 
-describe('tree(partial) writes markers — the same path undo uses', () => {
+describe('tree.$(partial) writes markers — the same path undo uses', () => {
   it('restores a collection', () => {
     const src = signalTree({ rows: entityMap<{ id: number }, number>() });
     undoable(() => src.$.rows.setAll([{ id: 1 }, { id: 2 }]));
 
     const fresh = signalTree({ rows: entityMap<{ id: number }, number>() });
-    fresh(src());
+    fresh.$(src.$());
 
     expect(fresh.$.rows.count()).toBe(2);
   });

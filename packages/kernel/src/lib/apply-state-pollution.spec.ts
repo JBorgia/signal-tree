@@ -111,7 +111,7 @@ describe('applyState — prototype pollution', () => {
 
     applyState(tree.$ as never, { a: 9, b: { c: 8 } } as never);
 
-    expect(tree()).toEqual({ a: 9, b: { c: 8 } });
+    expect(tree.$()).toEqual({ a: 9, b: { c: 8 } });
   });
 
   it('still applies state under keys named constructor or prototype', () => {
@@ -124,7 +124,7 @@ describe('applyState — prototype pollution', () => {
       { constructor: 'z', prototype: 'y', ok: 2 } as never
     );
 
-    expect(tree()).toEqual({ constructor: 'z', prototype: 'y', ok: 2 });
+    expect(tree.$()).toEqual({ constructor: 'z', prototype: 'y', ok: 2 });
   });
 });
 
@@ -178,6 +178,6 @@ describe('applyState — each guard pinned separately', () => {
     expect(
       Object.prototype.hasOwnProperty.call(tree.$, 'toString')
     ).toBe(false);
-    expect(tree()).toEqual({ a: 1 });
+    expect(tree.$()).toEqual({ a: 1 });
   });
 });

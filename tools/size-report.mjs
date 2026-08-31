@@ -48,7 +48,7 @@ const BASE = `
   import { signalTree } from ${C};
   const t = signalTree({ count: 0, user: { name: 'a' } });
   t.$.count.set(1); t.$.user({ name: 'b' });
-  globalThis.__sink = [t.$.count(), t()];
+  globalThis.__sink = [t.$.count(), t.$()];
 `;
 
 const MARKERS = [

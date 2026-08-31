@@ -240,7 +240,7 @@ appTree.$.user.profile.name.set('Grace Hopper');
 appTree.$.settings.theme.set('light');
 
 // Update with one root-level operation when needed
-appTree((current) => ({
+appTree.$((current) => ({
   ...current,
   cart: {
     ...current.cart,
@@ -249,7 +249,7 @@ appTree((current) => ({
 }));
 
 // Read the full unwrapped snapshot
-const snapshot = appTree();`,
+const snapshot = appTree.$();`,
     },
   ];
 

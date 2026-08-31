@@ -78,12 +78,18 @@ If your code compiled _and_ ran on v14, it already used `$` and needs no change.
 
 That would give two ways to address one node — `tree.count()` beside
 `tree.$.count()` — and this API deliberately has one. `$` is the state accessor;
-the tree callable is for whole-tree reads and writes:
+the tree is a non-callable controller.
 
 ```ts
-tree(); // read the whole state
-tree({ count: 1 }); // 14.x: partial merge — REMOVED in 15.0
-tree((current) => ({ ...current, count: 2 })); // functional update
+// 14.x retired syntax
+tree();
+tree({ count: 1 });
+tree((current) => ({ ...current, count: 2 }));
+
+// 15.0
+tree.$();
+tree.$({ count: 1 });
+tree.$((current) => ({ ...current, count: 2 }));
 ```
 
 ### Annotating a tree
@@ -92,7 +98,7 @@ tree((current) => ({ ...current, count: 2 })); // functional update
 constructor's return satisfies it:
 
 ```ts
-import { signalTree, type SignalTree } from '@signaltree/core';
+import { signalTree, type SignalTree } from '@signal-tree/kernel';
 
 interface AppState {
   count: number;
@@ -134,7 +140,7 @@ replacement — put `a` and `b` in the array.
 Built-in enhancers are **factories**; call them:
 
 ```ts
-import { signalTree, batching, devTools } from '@signaltree/core';
+import { signalTree, batching, devTools } from '@signal-tree/kernel';
 
 const tree = signalTree({ count: 0 }, { enhancers: [batching(), devTools()] });
 
@@ -247,7 +253,7 @@ The configured factory applies lazily on first `$` access, after every enhancer.
 - `resolveEnhancerOrder`
 - `ENHANCER_META`
 - `TreeConfig.lazy`, `TreeConfig.useLazySignals`, `LazyFeature` and the
-  `@signaltree/core/lazy` subpath — with diagnostics ST1032 and ST1004. Nothing
+  `@signal-tree/kernel/lazy` subpath — with diagnostics ST1032 and ST1004. Nothing
   to migrate: the subpath had already been withdrawn from the published surface,
   so neither option could be satisfied and `useLazySignals: true` was a no-op.
   Incremental materialization gives large trees cheap reads on the default path.

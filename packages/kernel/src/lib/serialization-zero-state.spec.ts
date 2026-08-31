@@ -32,9 +32,9 @@ const computed = testRealization.derived.createDerived;
  *
  * THE NULLS are ordinary, and they exist because of what M3 established:
  *
- *   F1 -> `tree()` is already callable and returns a plain snapshot.
- *   F2 -> `tree(payload)` is already the write path.
- *   F3 -> the application wraps it: `{ v: 1, data: tree() }`.
+ *   F1 -> `tree.$()` is already callable and returns a plain snapshot.
+ *   F2 -> `tree.$(payload)` is already the write path.
+ *   F3 -> the application wraps it: `{ v: 1, data: tree.$() }`.
  *   F5 -> a plain JS value is transport-neutral by construction.
  *
  * THE REAL TEST. M3 concluded "a realized value's state is what the accessor
@@ -60,7 +60,7 @@ describe('S-1 — the null on ordinary state', () => {
       nothing: null as string | null,
     });
 
-    const wire = roundTripJson(tree()); // F1 + F5, via JSON
+    const wire = roundTripJson(tree.$()); // F1 + F5, via JSON
 
     const fresh = signalTree({
       count: 0,
@@ -69,9 +69,9 @@ describe('S-1 — the null on ordinary state', () => {
       flag: false,
       nothing: null as string | null,
     });
-    fresh(wire as never); // F2
+    fresh.$(wire as never); // F2
 
-    expect(fresh()).toEqual({
+    expect(fresh.$()).toEqual({
       count: 1,
       user: { name: 'Ada', age: 36 },
       tags: ['a', 'b'],
@@ -80,9 +80,9 @@ describe('S-1 — the null on ordinary state', () => {
     });
   });
 
-  it('F1 IS NOT SATISFIED BY `tree()` ALONE — the read-only guarantee is CONTRACT', () => {
+  it('F1 IS NOT SATISFIED BY `tree.$()` ALONE — the read-only guarantee is CONTRACT', () => {
     const tree = signalTree({ user: { name: 'Ada', pets: ['cat'] } });
-    const snap = tree() as { user: { name: string; pets: string[] } };
+    const snap = tree.$() as { user: { name: string; pets: string[] } };
 
     // The node object IS frozen (dev only), so the common mistake throws.
     expect(Object.isFrozen(snap)).toBe(true);
@@ -103,14 +103,14 @@ describe('S-1 — the null on ordinary state', () => {
     expect(snap.user.pets).toBe(tree.$.user.pets());
 
     // THE DERIVATION POINT, which is why this row is here and not a bug report:
-    // `tree()` is a read-only view BY CONTRACT, aliasing live state. So F1
+    // `tree.$()` is a read-only view BY CONTRACT, aliasing live state. So F1
     // ("produce a value that survives leaving the process") is NOT satisfied by
-    // `tree()` on its own — an external representation that aliases internal
+    // `tree.$()` on its own — an external representation that aliases internal
     // truth has not actually left.
     //
     // The null already handles it: a codec COPIES. That copy is the boundary,
     // and it is work the transport was going to do anyway.
-    const detached = roundTripJson(tree()) as {
+    const detached = roundTripJson(tree.$()) as {
       user: { pets: string[] };
     };
     detached.user.pets.push('dog');
@@ -136,7 +136,7 @@ describe('S-2 — derived must not be externalized', () => {
 
     expect(tree.$.sum()).toBe(5);
 
-    const snap = tree() as Record<string, unknown>;
+    const snap = tree.$() as Record<string, unknown>;
     // The finding either way: if `sum` is present, the external form carries a
     // value that must never be believed on the way back in.
     expect(Object.keys(snap).sort()).toEqual(['a', 'b']);
@@ -157,7 +157,7 @@ describe('S-3 — values JSON cannot carry', () => {
       big: 1,
     });
 
-    const wire = roundTripJson(tree()) as Record<string, unknown>;
+    const wire = roundTripJson(tree.$()) as Record<string, unknown>;
 
     // JSON's limits, not SignalTree's: a Date becomes a string, a Set and a Map
     // become {}, and an undefined key disappears entirely.
@@ -175,7 +175,7 @@ describe('S-3 — values JSON cannot carry', () => {
       lookup: new Map<string, number>([['k', 1]]),
     });
 
-    const cloned = structuredClone(tree()) as {
+    const cloned = structuredClone(tree.$()) as {
       when: Date;
       seen: Set<string>;
       lookup: Map<string, number>;
@@ -186,7 +186,7 @@ describe('S-3 — values JSON cannot carry', () => {
     expect(cloned.lookup.get('k')).toBe(1);
 
     // F5, stated precisely. NOT "the snapshot is a plain JS value so transport
-    // neutrality is free" — it demonstrably is not free, since `tree()` can
+    // neutrality is free" — it demonstrably is not free, since `tree.$()` can
     // carry Date, Map, Set, cycles and shared mutable references, and the row
     // above shows JSON silently destroys four of those.
     //
@@ -211,7 +211,7 @@ describe('S-4 — M3 tested against a boundary', () => {
       { id: 'b', n: 2 },
     ]);
 
-    const snap = tree() as Record<string, unknown>;
+    const snap = tree.$() as Record<string, unknown>;
     expect(snap['n']).toBe(1); // plain position: the value
     expect(snap['rows']).toEqual({
       all: [
@@ -225,7 +225,7 @@ describe('S-4 — M3 tested against a boundary', () => {
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
       n: 0,
     });
-    fresh(roundTripJson(snap) as never);
+    fresh.$(roundTripJson(snap) as never);
     expect(fresh.$.rows.ids()).toEqual(['a', 'b']);
     expect(fresh.$.n()).toBe(1);
   });
@@ -237,7 +237,7 @@ describe('S-4 — M3 tested against a boundary', () => {
     });
 
     // The shape M3 predicts a conforming accessor would publish.
-    fresh({
+    fresh.$({
       rows: [
         { id: 'a', n: 1 },
         { id: 'b', n: 2 },
@@ -283,13 +283,13 @@ describe('S-5 — identification', () => {
   it('the null carries a version as ordinary application data', () => {
     const tree = signalTree({ user: { name: 'Ada' } });
 
-    const envelope = { v: 2, data: tree() };
+    const envelope = { v: 2, data: tree.$() };
     const wire = roundTripJson(envelope) as { v: number; data: unknown };
 
     // Internalizing is a branch the application already owns, exactly as the
     // `stored` derivation found for `{ version, migrate }`.
     const fresh = signalTree({ user: { name: '' } });
-    if (wire.v === 2) fresh(wire.data as never);
+    if (wire.v === 2) fresh.$(wire.data as never);
 
     expect(fresh.$.user.name()).toBe('Ada');
   });
@@ -298,9 +298,9 @@ describe('S-5 — identification', () => {
     const tree = signalTree({ known: 1 });
     // A payload from an older/newer schema. Measured, not assumed: this is the
     // case F3 exists to make safe.
-    tree({ known: 2, gone: 'stale' } as never);
+    tree.$({ known: 2, gone: 'stale' } as never);
     expect(tree.$.known()).toBe(2);
-    expect((tree() as Record<string, unknown>)['gone']).toBeUndefined();
+    expect((tree.$() as Record<string, unknown>)['gone']).toBeUndefined();
   });
 });
 
@@ -322,7 +322,7 @@ describe('S-6 — what the serializer adds', () => {
 
     // No metadata at all, no nodeMap: the ordinary write path reconstructs
     // branches, leaves and a collection alike.
-    fresh({
+    fresh.$({
       user: { name: 'Ada', age: 36 },
       rows: [{ id: 'a', n: 1 }],
       n: 7,
@@ -360,7 +360,7 @@ describe('S-6 — what the serializer adds', () => {
     //   cycle policy, owned at the external-representation boundary.
     //
     // Current permissiveness must not manufacture a permanent codec requirement.
-    expect(() => JSON.stringify(tree())).toThrow(/circular|cyclic/i);
+    expect(() => JSON.stringify(tree.$())).toThrow(/circular|cyclic/i);
     expect(tree.$.items()[0].label).toBe('b');
   });
 });

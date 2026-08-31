@@ -56,5 +56,7 @@ tree.$.user({ name: 'Bob', age: 31 });
 tree.$.user({ name: 'Bob' });
 tree.$.user((c) => ({ ...c, age: c.age + 1 }));
 
-// --- ROOT: still callable ---------------------------------------------------
-tree({ count: 1 });
+// --- ROOT: state grammar is on `$`; controller is not callable -------------
+tree.$({ count: 1, name: 'x', tags: [], user: { name: 'Ada', age: 1 } });
+// @ts-expect-error the tree is a controller, not a state location
+tree();

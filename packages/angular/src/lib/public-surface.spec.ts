@@ -98,18 +98,16 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
 });
 
 // ════════════════════════════════════════════════════════════════════════════
-// asReadonly — the readonly projection of a CALLABLE tree
+// asReadonly — the readonly projection of a tree controller
 // ════════════════════════════════════════════════════════════════════════════
-describe('PUBLIC CARRIER — asReadonly projects a callable tree', () => {
-  it('the projection is the same runtime object, and stays callable', () => {
+describe('PUBLIC CARRIER — asReadonly projects a tree controller', () => {
+  it('the projection is the same runtime object with a callable root', () => {
     const tree = signalTree({ a: 1, b: { c: 'x' } });
     const ro = asReadonly(tree);
 
     // Type-only narrowing: zero runtime cost, same object.
     expect(ro).toBe(tree);
-    // The callable contract survives — this is the part the type annotation
-    // cannot express (see the typing rows below).
-    expect((ro as unknown as () => { a: number })().a).toBe(1);
+    expect(ro.$().a).toBe(1);
     expect(ro.$.a()).toBe(1);
     expect(ro.$.b.c()).toBe('x');
   });

@@ -81,7 +81,7 @@ link(tree.$.plain, {
 });
 
 // ⚠️ A ROOT with no collection anywhere — ADMITTED. The rule is not about roots.
-link(cleanTree, {
+link(cleanTree.$, {
   set: (value) => {
     assertExact<Exact<typeof value, { count: number; plain: { a: number; b: string } }>>();
   },
@@ -93,7 +93,7 @@ link(cleanTree, {
 link(tree.$.nested, { set: () => void 0 });
 
 // @ts-expect-error a root containing an entityMap is not a truthful source
-link(tree, { set: () => void 0 });
+link(tree.$, { set: () => void 0 });
 
 // ⚠️ REJECTED AT THE SOURCE, NOT VIA THE ENDPOINT VALUE. A subscribe-only
 // endpoint contributes no inference at all, so if admission were expressed by
@@ -102,7 +102,7 @@ link(tree, { set: () => void 0 });
 link(tree.$.nested, { subscribe: () => unsub });
 
 // @ts-expect-error an empty endpoint must not sneak one through either
-link(tree, {});
+link(tree.$, {});
 
 // ─── ENDPOINT NEGATIVES on an admitted source ───────────────────────────────
 

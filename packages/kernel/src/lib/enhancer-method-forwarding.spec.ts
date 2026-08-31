@@ -41,10 +41,9 @@ describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => 
     expect(changed).toEqual(['count']);
   });
 
-  // `batchUpdate` and its builder forward were REMOVED in 14.1.1 — a duplicate of
-  // the tree callable. The replacement is the callable itself, which the builder
-  // already exposes, so this asserts the write path that survives.
-  it('the tree callable writes through the builder (batchUpdate is gone)', () => {
+  // `batchUpdate` and its builder forward were REMOVED in 14.1.1. Root writes
+  // now use the root state accessor, so this asserts the surviving write path.
+  it('the root accessor writes through the controller (batchUpdate is gone)', () => {
     const tree = signalTree(
       { count: 0 },
       { enhancers: [make() as never], capabilities: ['causal-runtime'] }
@@ -54,7 +53,7 @@ describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => 
       (tree as unknown as { batchUpdate?: unknown }).batchUpdate
     ).toBeUndefined();
 
-    (tree as unknown as (p: { count: number }) => void)({ count: 3 });
+    tree.$({ count: 3 });
     expect(tree.$.count()).toBe(3);
   });
 
@@ -112,30 +111,23 @@ describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => 
     // A write through the PRE-enhancer leaf reference must be visible through
     // the enhanced tree.
     (seenLeaf as { set: (v: number) => void }).set(42);
-    expect((tree as unknown as () => { count: number })().count).toBe(42);
+    expect(tree.$().count).toBe(42);
   });
 
-  it('bind() survives and still writes', () => {
+  it('does not expose the retired bind helper', () => {
     const tree = signalTree(
       { count: 0 },
       { enhancers: [make() as never], capabilities: ['causal-runtime'] }
     );
-    const bound = (
-      tree as unknown as { bind: () => (v?: unknown) => unknown }
-    ).bind();
-
-    expect(typeof bound).toBe('function');
-    (bound as (v: unknown) => void)({ count: 6 });
-    expect(tree.$.count()).toBe(6);
+    expect((tree as unknown as { bind?: unknown }).bind).toBeUndefined();
   });
 
-  it('the call form still writes', () => {
+  it('the controller is not callable', () => {
     const tree = signalTree(
       { count: 0 },
       { enhancers: [make() as never], capabilities: ['causal-runtime'] }
     );
-    (tree as unknown as (u: unknown) => void)({ count: 8 });
-    expect(tree.$.count()).toBe(8);
+    expect(typeof tree).toBe('object');
   });
 });
 

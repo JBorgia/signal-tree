@@ -55,7 +55,7 @@ export function observeOwnerInvalidation(
   return observeOwnerInvalidationInternal(
     owner,
     callback,
-    () => acquireObservation(owner)
+    () => acquireObservation(owner.$)
   );
 }
 

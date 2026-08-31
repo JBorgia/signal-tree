@@ -32,7 +32,7 @@ describe('snapshot aliasing — the documented shape of the contract', () => {
       s: new Set<number>([1]),
       arr: [1, 2, 3],
     });
-    const snap = tree();
+    const snap = tree.$();
 
     expect(snap.d).toBe(tree.$.d());
     expect(snap.m).toBe(tree.$.m());
@@ -43,7 +43,7 @@ describe('snapshot aliasing — the documented shape of the contract', () => {
   it('copies plain object leaves, so those cannot alias', () => {
     const held = { nested: { n: 1 } };
     const tree = signalTree({ obj: { held } });
-    const snap = tree() as { obj: { held: typeof held } };
+    const snap = tree.$() as { obj: { held: typeof held } };
 
     expect(snap.obj.held).not.toBe(held);
     expect(snap.obj.held).toEqual(held);
@@ -55,7 +55,7 @@ describe('snapshot aliasing — the documented shape of the contract', () => {
       m: new Map<string, number>([['a', 1]]),
       s: new Set<number>([1]),
     });
-    const snap = tree();
+    const snap = tree.$();
 
     snap.d.setFullYear(1999);
     snap.m.set('b', 2);
@@ -70,7 +70,7 @@ describe('snapshot aliasing — the documented shape of the contract', () => {
 
   it('the node-level freeze still catches the common mistake', () => {
     const tree = signalTree({ a: { x: 1 } });
-    const snap = tree();
+    const snap = tree.$();
 
     expect(Object.isFrozen(snap)).toBe(true);
     expect(Object.isFrozen(snap.a)).toBe(true);

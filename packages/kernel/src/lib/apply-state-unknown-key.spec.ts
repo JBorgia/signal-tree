@@ -58,7 +58,7 @@ describe('applyState — an unknown key is ignored, and creates nothing', () => 
       Object.prototype.hasOwnProperty.call(tree.$, 'unknown')
     ).toBe(false);
     // …and it is absent from the snapshot, so nothing was created out of view.
-    expect(tree()).toEqual({ known: 2 });
+    expect(tree.$()).toEqual({ known: 2 });
   });
 
   it('a NESTED unknown key is ignored the same way', () => {
@@ -69,7 +69,7 @@ describe('applyState — an unknown key is ignored, and creates nothing', () => 
     expect(
       Object.prototype.hasOwnProperty.call(tree.$.b, 'unknown')
     ).toBe(false);
-    expect(tree()).toEqual({ b: { known: 2 } });
+    expect(tree.$()).toEqual({ b: { known: 2 } });
   });
 
   it('IGNORE, not REJECT — an unknown-only snapshot neither throws nor disturbs', () => {

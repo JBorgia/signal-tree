@@ -26,8 +26,13 @@ import {
   entityMap,
   signalTree,
   restoration,
+  undoable,
 } from '../../dist/packages/kernel/dist/index.js';
+import { createSignalTreeFactory } from '../../dist/packages/kernel/dist/adapter.js';
+import { ANGULAR_TREE_REALIZATION } from '../../dist/packages/angular/dist/lib/angular-realization.js';
 import { deepEqual } from '../../dist/packages/shared/dist/index.js';
+
+const angularSignalTree = createSignalTreeFactory(ANGULAR_TREE_REALIZATION);
 
 // ---------------------------------------------------------------- harness ---
 
@@ -205,17 +210,17 @@ if (want('write')) {
 }
 
 if (want('read')) {
-  console.log('\n=== 1b. WHOLE-STATE READ — tree() materialisation ===');
+  console.log('\n=== 1b. WHOLE-STATE READ — tree.$() materialisation ===');
   for (const n of [1000, 10000, 100000]) {
     const shape = wide(n);
     race(
-      `${n} leaves  (per tree() call)`,
+      `${n} leaves  (per tree.$() call)`,
       [
         [
-          'tree()',
+          'tree.$()',
           () => {
             const t = signalTree(shape);
-            return () => t();
+            return () => t.$();
           },
         ],
         [
@@ -534,7 +539,7 @@ if (want('entitymap')) {
   console.log('\n-- 2b. fan-out (granularity) --');
   {
     const N = 1000;
-    const t = signalTree({ items: entityMap() });
+    const t = angularSignalTree({ items: entityMap() });
     t.$.items.setAll(mkItems(N));
 
     let bFieldRuns = 0;
@@ -583,7 +588,7 @@ if (want('entitymap')) {
     );
 
     // array-leaf comparison: any computed over the array re-runs on any write
-    const t2 = signalTree({ items: mkItems(N) });
+    const t2 = angularSignalTree({ items: mkItems(N) });
     let arrRuns = 0;
     const arrC = computed(() => {
       arrRuns++;
@@ -606,38 +611,38 @@ if (want('entitymap')) {
   console.log('\n-- 2c. whole-collection read --');
   for (const n of [1000, 10000]) {
     race(
-      `${n} entities  (per tree() call)`,
+      `${n} entities  (per tree.$() call)`,
       [
         // entityMap's collection queries are `computed`s over a version
         // counter, so a repeated read with no mutation in between is a cache
         // hit. Both regimes are measured: CACHED (read twice, nothing changed)
         // and COLD (one updateOne invalidates the version, then read).
         [
-          'tree() with entityMap, CACHED',
+          'tree.$() with entityMap, CACHED',
           () => {
             const t = signalTree({ items: entityMap() });
             t.$.items.setAll(mkItems(n));
-            t();
-            return () => t();
+            t.$();
+            return () => t.$();
           },
         ],
         [
-          'tree() with entityMap, COLD (1 update first)',
+          'tree.$() with entityMap, COLD (1 update first)',
           () => {
             const t = signalTree({ items: entityMap() });
             t.$.items.setAll(mkItems(n));
             let k = 0;
             return () => {
               t.$.items.updateOne(0, { value: --k });
-              return t();
+              return t.$();
             };
           },
         ],
         [
-          'tree() with array leaf',
+          'tree.$() with array leaf',
           () => {
             const t = signalTree({ items: mkItems(n) });
-            return () => t();
+            return () => t.$();
           },
         ],
         [
@@ -677,12 +682,12 @@ if (want('entitymap')) {
     );
   }
 
-  // ---- what does tree() actually emit for an entityMap? ---------------------
+  // ---- what does tree.$() actually emit for an entityMap? -------------------
   {
     const t = signalTree({ items: entityMap() });
     t.$.items.setAll(mkItems(3));
-    const snap = t().items;
-    console.log(`  tree() emits for entityMap: keys=[${Object.keys(snap).join(', ')}]`);
+    const snap = t.$().items;
+    console.log(`  tree.$() emits for entityMap: keys=[${Object.keys(snap).join(', ')}]`);
   }
 }
 
@@ -693,16 +698,20 @@ if (want('timetravel')) {
 
   // How many history entries does a synchronous burst of leaf writes produce?
   {
-    const t = signalTree(wide(1000)).with(restoration({ maxHistorySize: 10000 }));
-    for (let i = 0; i < 100; i++) t.$.g0.f0.set(i);
+    const t = signalTree(wide(1000), {
+      enhancers: [restoration({ maxHistorySize: 10000 })],
+    });
+    for (let i = 0; i < 100; i++) undoable(() => t.$.g0.f0.set(i));
     await new Promise((r) => setTimeout(r, 5));
     console.log(
       `  100 SYNCHRONOUS leaf writes → ${t.getRestorationHistory().length} history entries ` +
         `(INIT + flush-coalesced). Batching is per-microtask, not per-write.`
     );
-    const t2 = signalTree(wide(1000)).with(restoration({ maxHistorySize: 10000 }));
+    const t2 = signalTree(wide(1000), {
+      enhancers: [restoration({ maxHistorySize: 10000 })],
+    });
     for (let i = 0; i < 100; i++) {
-      t2.$.g0.f0.set(i);
+      undoable(() => t2.$.g0.f0.set(i));
       await Promise.resolve();
       await Promise.resolve();
     }
@@ -719,12 +728,12 @@ if (want('timetravel')) {
         [
           'with restoration()',
           () => {
-            const t = signalTree(structuredClone(shape)).with(
-              restoration({ maxHistorySize: 100000 })
-            );
+            const t = signalTree(structuredClone(shape), {
+              enhancers: [restoration({ maxHistorySize: 100000 })],
+            });
             return async () => {
               for (let i = 0; i < ENTRIES; i++) {
-                t.$.g0.f0.set(i);
+                undoable(() => t.$.g0.f0.set(i));
                 await Promise.resolve();
                 await Promise.resolve();
               }
@@ -737,7 +746,7 @@ if (want('timetravel')) {
             const t = signalTree(structuredClone(shape));
             return async () => {
               for (let i = 0; i < ENTRIES; i++) {
-                t.$.g0.f0.set(i);
+                undoable(() => t.$.g0.f0.set(i));
                 await Promise.resolve();
                 await Promise.resolve();
               }
@@ -796,9 +805,11 @@ if (want('timetravel')) {
       );
 
     // undo() cost
-    const t = signalTree(structuredClone(shape)).with(restoration({ maxHistorySize: 100000 }));
+    const t = signalTree(structuredClone(shape), {
+      enhancers: [restoration({ maxHistorySize: 100000 })],
+    });
     for (let i = 0; i < 60; i++) {
-      t.$.g0.f0.set(i);
+      undoable(() => t.$.g0.f0.set(i));
       await Promise.resolve();
       await Promise.resolve();
     }
@@ -820,11 +831,11 @@ if (want('timetravel')) {
       KEEP.length = 0;
       gc(); gc(); gc();
       const before = process.memoryUsage().heapUsed;
-      const tt = signalTree(structuredClone(shape)).with(
-        restoration({ maxHistorySize: 100000 })
-      );
+      const tt = signalTree(structuredClone(shape), {
+        enhancers: [restoration({ maxHistorySize: 100000 })],
+      });
       for (let i = 0; i < k; i++) {
-        tt.$.g0.f0.set(-(i + 1));
+        undoable(() => tt.$.g0.f0.set(-(i + 1)));
         await Promise.resolve();
         await Promise.resolve();
       }
@@ -863,7 +874,9 @@ if (want('ttentity')) {
     const xs = [];
     for (let i = 0; i < 20; i++) {
       const t0 = performance.now();
-      t.$.items.updateOne(i, { value: -i - Math.random() });
+      undoable(() =>
+        t.$.items.updateOne(i, { value: -i - Math.random() })
+      );
       await Promise.resolve();
       await Promise.resolve();
       xs.push(performance.now() - t0);
@@ -876,22 +889,20 @@ if (want('ttentity')) {
   await new Promise((r) => setTimeout(r, 10));
   await measure(tNo, `entityMap(${N}) updateOne + flush, NO enhancer:  `);
 
-  const t = signalTree({ items: entityMap() }).with(restoration({ maxHistorySize: 1000 }));
+  const t = signalTree(
+    { items: entityMap() },
+    { enhancers: [restoration({ maxHistorySize: 1000 })] }
+  );
   t.$.items.setAll(mkItems(N));
   await new Promise((r) => setTimeout(r, 10));
   await measure(t, `entityMap(${N}) updateOne + flush, restoration(): `);
   console.log(`  history after 20 distinct updates: ${t.getRestorationHistory().length} entries`);
 }
 
-// restoration() subscribes to the GLOBAL PathNotifier flush event, so every live
-// restoration tree runs a full snapshotState + structuredClone + deepEqual on
-// EVERY flush in the process — including flushes caused by a completely
-// unrelated tree. The result is then discarded (addEntry dedupes an unchanged
-// state), so it is pure waste. MUST run in its own process.
-//
-// The trigger has to be a write that actually NOTIFIES: a plain leaf .set() on
-// an unenhanced tree never calls the notifier, so it never reveals this. An
-// entityMap mutation does.
+// Cross-tree isolation control. Restoration subscribes to the process-global
+// PathNotifier, so this measures whether unrelated live restoration trees add
+// work to an entityMap flush. It must report the measurements rather than assume
+// the pre-fix global-snapshot behavior still exists.
 if (want('ttleak')) {
   console.log('\n=== 1d-ter. cross-tree cost of a live restoration() tree (CLEAN process) ===');
   const A = signalTree({ items: entityMap() });
@@ -911,13 +922,17 @@ if (want('ttleak')) {
   await probe('entityMap(2000).updateOne + flush, no restoration tree alive:      '.padEnd(70));
   const others = [];
   for (let k = 1; k <= 3; k++) {
-    others.push(signalTree(wide(10000)).with(restoration({ maxHistorySize: 5 })));
+    others.push(
+      signalTree(wide(10000), {
+        enhancers: [restoration({ maxHistorySize: 5 })],
+      })
+    );
     await new Promise((r) => setTimeout(r, 10));
     await probe(`same write, with ${k} unrelated 10000-leaf restoration tree(s) alive:`.padEnd(70));
   }
   console.log(
-    `  their histories are still ${others.map((t) => t.getRestorationHistory().length).join('/')} — ` +
-      `every one of those snapshots was computed and thrown away.`
+    `  unrelated histories: ${others.map((t) => t.getRestorationHistory().length).join('/')} ` +
+      `(unchanged histories and flat timings indicate isolation).`
   );
 }
 

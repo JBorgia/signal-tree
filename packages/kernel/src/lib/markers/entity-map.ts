@@ -341,7 +341,7 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
           if (value === null || typeof value !== 'object') return;
           // A BARE ARRAY is a valid payload, not a malformed one.
           //
-          // `tree({ rows: [...] })` is what a person or an AI writes to seed or
+          // `tree.$({ rows: [...] })` is what a person or an AI writes to seed or
           // reset a collection, and it used to half-apply: sibling leaves in the
           // same payload took their values while the collection silently kept
           // its old contents. In dev that emitted ST2024; in production it did

@@ -23,7 +23,7 @@ function mockStorage(): Storage {
 /**
  * RC-2 was generic: materializeMarkers wrote only to the accessor while its
  * call path closed over the original store, so EVERY marker nested under a
- * parent leaked its raw marker into tree(). Only stored() got noticed because
+ * parent leaked its raw marker into tree.$(). Only stored() got noticed because
  * its marker carries a Storage handle.
  */
 describe('W4: no marker leaks its raw form from a nested position', () => {
@@ -34,7 +34,7 @@ describe('W4: no marker leaks its raw form from a nested position', () => {
   it('entityMap() nested under a parent', () => {
     const tree = signalTree({ outer: { users: entityMap<User>(), n: 1 } });
     void tree.$;
-    const json = JSON.stringify(tree());
+    const json = JSON.stringify(tree.$());
     expect(json).not.toContain('__isEntityMap');
     expect(typeof tree.$.outer.users.addOne).toBe('function');
   });
@@ -46,7 +46,7 @@ describe('W4: no marker leaks its raw form from a nested position', () => {
       a: { b: { c: { users: entityMap<User>() } } },
     });
     void tree.$;
-    const json = JSON.stringify(tree());
+    const json = JSON.stringify(tree.$());
     expect(json).not.toContain('initialState');
     expect(json).not.toContain('__isEntityMap');
     expect(typeof tree.$.a.b.c.users.addOne).toBe('function');
@@ -59,7 +59,7 @@ describe('W4: no marker leaks its raw form from a nested position', () => {
   it('the internal store back-reference never reaches a snapshot', () => {
     const tree = signalTree({ outer: { n: 1 } });
     void tree.$;
-    expect(JSON.stringify(tree())).toBe('{"outer":{"n":1}}');
+    expect(JSON.stringify(tree.$())).toBe('{"outer":{"n":1}}');
     expect(Object.keys(tree.$.outer)).toEqual(['n']);
   });
 });

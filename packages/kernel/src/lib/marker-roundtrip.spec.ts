@@ -31,7 +31,7 @@ describe('markers round-trip through snapshot → hydrate', () => {
     expect(src.$.rows.count()).toBe(3);
 
     const fresh = signalTree({ rows: entityMap<{ id: number }, number>() });
-    applyState(fresh.$, src());
+    applyState(fresh.$, src.$());
 
     expect(fresh.$.rows.count()).toBe(3);
     expect(fresh.$.rows.byId(2)?.()).toEqual({ id: 2 });

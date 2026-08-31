@@ -1,3 +1,5 @@
+import { isTraversableNode } from './node-shape';
+
 /**
  * THE ROOT AS A LINK SOURCE.
  *
@@ -10,11 +12,10 @@
  *   2. `accessorsFor` fell through to a callable read, and `tree.$` is a plain
  *      OBJECT. That is the `"x is not a function"` failure.
  *
- * A branch accessor is callable and answers with its own value; the root
- * accessor is not. Rather than make it callable — a shape consumers already
- * observe — the owning tree is recorded here, because the tree IS the root's
- * canonical reader and writer: `tree()` produces the whole-tree snapshot and
- * `tree(value)` applies one.
+ * The root accessor now follows the same callable grammar as a branch. This
+ * sidecar retains the privileged read/write authority used by Link and kernel
+ * internals without making the controller callable or adding `.set`/`.update`
+ * to the root location.
  *
  * ⚠️ ADDRESS vs VALUE. `tree.$` is the address; the whole-tree snapshot is the
  * value. This does not make arbitrary non-callable objects readable — only a
@@ -28,20 +29,34 @@
  * property creates a cycle that the snapshot/unwrap walkers follow. A sidecar
  * keeps the reference entirely outside anything that enumerates the node.
  */
-type RootReadWrite = {
-  (): unknown;
-  (value: unknown): void;
+export interface RootStateAuthority {
+  read(): unknown;
+  replace(value: unknown): void;
+  derive(update: (current: unknown) => unknown): void;
 };
 
-const ROOT_TREES = new WeakMap<object, RootReadWrite>();
+const ROOT_AUTHORITIES = new WeakMap<object, RootStateAuthority>();
 
-/** @internal Record the tree that owns this root accessor. */
-export function defineRootTree(rootAccessor: object, tree: RootReadWrite): void {
-  ROOT_TREES.set(rootAccessor, tree);
+/** @internal Record the authority that owns this root accessor. */
+export function defineRootTree(
+  rootAccessor: object,
+  authority: RootStateAuthority
+): void {
+  ROOT_AUTHORITIES.set(rootAccessor, authority);
 }
 
-/** @internal The owning tree, if this node is a recorded root accessor. */
-export function getRootTree(node: unknown): RootReadWrite | undefined {
-  if (node === null || typeof node !== 'object') return undefined;
-  return ROOT_TREES.get(node as object);
+/** @internal The root authority, if this is a recorded root accessor. */
+export function getRootTree(node: unknown): RootStateAuthority | undefined {
+  if (!isTraversableNode(node)) {
+    return undefined;
+  }
+  return ROOT_AUTHORITIES.get(node as object);
+}
+
+export function rootAuthorityFor(owner: { readonly $: object }): RootStateAuthority {
+  const authority = getRootTree(owner.$);
+  if (!authority) {
+    throw new Error('SignalTree root authority is unavailable.');
+  }
+  return authority;
 }

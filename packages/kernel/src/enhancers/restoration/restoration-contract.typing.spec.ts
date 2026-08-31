@@ -129,8 +129,8 @@ export type _StateSurvives = [
 export const _count: number = travelled.$.count();
 export const _user: { name: string; age: number } = travelled.$.user();
 travelled.$.user({ name: 'Ada', age: 37 });
-export const _snapshot: AppState = travelled();
-travelled({ count: 1 });
+export const _snapshot: AppState = travelled.$();
+travelled.$({ count: 1, user: { name: 'Ada', age: 37 } });
 
 // ============================================================================
 // 5 — accumulation in BOTH orders, with history state still concrete

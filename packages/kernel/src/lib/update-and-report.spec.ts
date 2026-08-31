@@ -35,11 +35,11 @@ describe('updateAndReport + ref-equality short-circuit', () => {
     const setSpy = vi.spyOn(sig, 'set');
 
     // Same value: should be skipped
-    tree({ count: 0 });
+    tree.$({ count: 0 });
     expect(setSpy).not.toHaveBeenCalled();
 
     // Different value: should fire
-    tree({ count: 1 });
+    tree.$({ count: 1 });
     expect(setSpy).toHaveBeenCalledTimes(1);
   });
 

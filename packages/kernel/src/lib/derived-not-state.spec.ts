@@ -43,16 +43,16 @@ const fakeSignalTree = bindSignalTreeRealization({
  * anything recomputable is structure — but `.derived()` did not follow it, and
  * whether it did depended on the order the tree was first touched:
  *
- *   tree() first, never touch `$`  → absent   (correct, by accident)
- *   touch `$` at all, then tree()  → PRESENT  (wrong)
+ *   tree.$() first, never touch `$`  → absent   (correct, by accident)
+ *   touch `$` at all, then tree.$()  → PRESENT  (wrong)
  *
  * because `finalize()` (the `$` getter) applies configured derived state while the
- * `tree()` call path runs only `materializeOnly()`. **Every real application is
+ * `tree.$()` call path runs only `materializeOnly()`. **Every real application is
  * the second case** — you write state through `$`, then persist — so derived
  * values were reaching localStorage, devtools and audit in practice.
  *
  * The existing test in `rehydration.spec.ts` covers only the first order:
- * `signalTree(...).derived(...)` then immediately `expect(tree())`, never
+ * `signalTree(...).derived(...)` then immediately `expect(tree.$())`, never
  * touching `$`. It passed, and it pinned the one order nobody uses.
  *
  * Confirmed pre-existing: the same probe against the `v13.5.0` tag produces
@@ -73,26 +73,26 @@ const mk = () =>
   );
 
 describe('derived state never reaches a snapshot', () => {
-  it('tree() first, never touching $', () => {
-    expect(mk()()).toEqual({ a: 2, b: 3 });
+  it('tree.$() first, never touching $', () => {
+    expect(mk().$()).toEqual({ a: 2, b: 3 });
   });
 
   it('merely touching $ first — the case that used to leak', () => {
     const tree = mk();
     void tree.$;
-    expect(tree()).toEqual({ a: 2, b: 3 });
+    expect(tree.$()).toEqual({ a: 2, b: 3 });
   });
 
   it('writing through $ first — what every real app does', () => {
     const tree = mk();
     tree.$.a.set(7);
-    expect(tree()).toEqual({ a: 7, b: 3 });
+    expect(tree.$()).toEqual({ a: 7, b: 3 });
   });
 
   it('reading the derived first', () => {
     const tree = mk();
     expect(tree.$.sum()).toBe(5);
-    expect(tree()).toEqual({ a: 2, b: 3 });
+    expect(tree.$()).toEqual({ a: 2, b: 3 });
   });
 
   it('THE SNAPSHOT IS ORDER-INDEPENDENT — the deeper guarantee', () => {
@@ -102,8 +102,8 @@ describe('derived state never reaches a snapshot', () => {
     const written = mk();
     written.$.a.set(2); // same value, but through `$`
 
-    expect(untouched()).toEqual(touched());
-    expect(touched()).toEqual(written());
+    expect(untouched.$()).toEqual(touched.$());
+    expect(touched.$()).toEqual(written.$());
   });
 
   it('the derived still WORKS and still recomputes', () => {
@@ -116,13 +116,13 @@ describe('derived state never reaches a snapshot', () => {
   it('a stale derived can no longer be persisted', () => {
     const tree = mk();
     void tree.$;
-    const before = tree() as Record<string, unknown>;
+    const before = tree.$() as Record<string, unknown>;
     tree.$.a.set(100);
 
     // Previously `before.sum` was 5 while the live value had become 103 — a
     // number that was true once, sitting in storage.
     expect(before).not.toHaveProperty('sum');
-    expect(tree()).not.toHaveProperty('sum');
+    expect(tree.$()).not.toHaveProperty('sum');
   });
 
   it('holds with markers in the tree too', () => {
@@ -139,13 +139,13 @@ describe('derived state never reaches a snapshot', () => {
     );
     tree.$.rows.setAll([{ id: 1 }]);
 
-    expect(tree()).toEqual({ rows: { all: [{ id: 1 }] }, n: 1 });
+    expect(tree.$()).toEqual({ rows: { all: [{ id: 1 }] }, n: 1 });
   });
 
-  it('a recognized writable value in derived() is real state and IS captured', () => {
-    // `.derived()` is for derived state, but a writable signal placed there is
-    // not recomputable. Excluding it would trade one silent data loss for
-    // another, so only non-writable signals are stamped.
+  it('a recognized writable value in derived() stays writable but is not snapshot state', () => {
+    // Writable carrier capability does not change configured-derived
+    // ownership. The location remains available under `$`, while NaturalValue
+    // snapshots continue to contain source and marker state only.
     const tree = fakeSignalTree(
       { a: 1 },
       {
@@ -156,20 +156,23 @@ describe('derived state never reaches a snapshot', () => {
     );
     void tree.$;
 
-    expect(tree()).toEqual({ a: 1, manual: 42 });
+    expect(tree.$.manual()).toBe(42);
+    tree.$.manual.set(7);
+    expect(tree.$.manual()).toBe(7);
+    expect(tree.$()).toEqual({ a: 1 });
   });
 
   it('a snapshot round-trips and the derived recomputes from it', () => {
     const src = mk();
     void src.$;
     src.$.a.set(10);
-    const snap = src();
+    const snap = src.$();
 
     const dst = mk();
     void dst.$;
-    dst(snap);
+    dst.$(snap);
 
     expect(dst.$.sum()).toBe(13); // recomputed, not restored
-    expect(dst()).toEqual({ a: 10, b: 3 });
+    expect(dst.$()).toEqual({ a: 10, b: 3 });
   });
 });

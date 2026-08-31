@@ -22,7 +22,7 @@ describe('serialization round-trip', () => {
 
     const json = enhanced.serialize();
     // Mutate to wrong values, then deserialize must restore the originals.
-    tree(() => ({
+    tree.$(() => ({
       count: 999,
       date: new Date(0),
       map: new Map<string, number>(),
@@ -32,7 +32,7 @@ describe('serialization round-trip', () => {
 
     enhanced.deserialize(json);
 
-    const restored = tree();
+    const restored = tree.$();
     expect(restored.count).toBe(1);
     expect(restored.date instanceof Date).toBe(true);
     expect(restored.date.toISOString()).toBe(initial.date.toISOString());

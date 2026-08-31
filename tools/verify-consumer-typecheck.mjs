@@ -102,16 +102,16 @@ const tree = signalTree(
 
 // Reads
 const n: number = tree.$.count();
-const whole: { count: number } = tree() as { count: number };
+const whole: { count: number } = tree.$() as { count: number };
 const rows: User[] = tree.$.users.all();
 
 // Leaf writes — .set()/.update(), NOT leaf(value)
 tree.$.count.set(5);
 tree.$.count.update((c: number) => c + 1);
 
-// Branch + root writes ARE callable
+// Branch + root state locations ARE callable
 tree.$.user({ name: 'Grace' });
-tree({ count: 9 });
+tree.$((current) => ({ ...current, count: 9 }));
 
 // Marker APIs
 tree.$.users.addOne({ id: 1, name: 'a', version: 1 });

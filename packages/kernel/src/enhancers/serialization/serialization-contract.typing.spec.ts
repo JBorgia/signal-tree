@@ -58,10 +58,10 @@ const serial = signalTree(initial, { enhancers: [serialization()] });
 // 1 — the TWO surviving methods are inferred, with exact signatures
 // ============================================================================
 // ⚠️ FOUR SPELLINGS DELETED by PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0. This pinned
-// six methods over two jobs. `toJSON()` measured EXACTLY EQUAL to `tree()`;
+// six methods over two jobs. `toJSON()` measured EXACTLY EQUAL to `tree.$()`;
 // `snapshot()`/`restore()` were its metadata-and-clone pair; `fromJSON()` is
 // internalized as the external-truth acquisition point. What survives is the one
-// job `tree()`/`tree(value)` cannot do — a type-preserving durable
+// job `tree.$()`/`tree.$(value)` cannot do — a type-preserving durable
 // representation — so the rows now assert ABSENCE as well as presence.
 export const _json: string = serial.serialize();
 serial.deserialize('{}');
@@ -87,8 +87,8 @@ export type _StateSurvives = [
 export const _count: number = serial.$.count();
 export const _user: { name: string; age: number } = serial.$.user();
 serial.$.user({ name: 'Ada', age: 37 });
-export const _snapshotState: AppState = serial();
-serial({ count: 1 });
+export const _snapshotState: AppState = serial.$();
+serial.$({ count: 1, user: { name: 'Ada', age: 37 } });
 
 // ============================================================================
 // 3 — accumulation in BOTH orders

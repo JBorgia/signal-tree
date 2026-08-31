@@ -44,9 +44,8 @@ describe('transactions enhancer', () => {
     const { resetPathNotifier } = await import('../../lib/path-notifier');
     resetPathNotifier();
 
-    const store = signalTree({ count: 0 }, { enhancers: [transactions()] }) as {
-      (): { count: number };
-      $: { count: () => number };
+    const store = signalTree({ count: 0 }, { enhancers: [transactions()] }) as unknown as {
+      $: { (): { count: number }; count: () => number };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
       __transactions: {
         getConfirmedTurnCount(): number;
@@ -88,7 +87,7 @@ describe('transactions enhancer', () => {
 
     pending.rollback();
 
-    expect(store()).toEqual({ inside: '', outside: 'later' });
+    expect(store.$()).toEqual({ inside: '', outside: 'later' });
   });
 
   // WITHDRAWN WITH STATUS-DEL — "rolls back pending status source-signal writes
@@ -123,7 +122,7 @@ describe('transactions enhancer', () => {
     ).toThrow('boom');
 
     await Promise.resolve();
-    expect(store()).toEqual({ left: '', right: '', outside: 'stable' });
+    expect(store.$()).toEqual({ left: '', right: '', outside: 'stable' });
   });
 
   it('aborts a mixed structural thrown rollback through the realization port, restores baseline state, and does not reuse the fresh subject id', async () => {
@@ -141,9 +140,9 @@ describe('transactions enhancer', () => {
         }),
       },
       { enhancers: [transactions()] }
-    ) as {
-      (): { count: number; rows: { all: Array<{ id: string; name: string }> } };
+    ) as unknown as {
       $: {
+        (): { count: number; rows: { all: Array<{ id: string; name: string }> } };
         count: () => number;
         rows: {
           addOne(row: { id: string; name: string }): void;
@@ -190,7 +189,7 @@ describe('transactions enhancer', () => {
     expect(abortedFreshSubject).toBe(2);
     expect(store.$.count()).toBe(0);
     expect(store.$.rows.ids()).toEqual(['b']);
-    expect(store()).toEqual({
+    expect(store.$()).toEqual({
       count: 0,
       rows: { all: [{ id: 'b', name: 'Base' }] },
     });
@@ -361,7 +360,7 @@ describe('transactions enhancer', () => {
 
     expect(store.$.count()).toBe(0);
     expect(store.$.rows.ids()).toEqual(['b']);
-    expect(store()).toEqual({
+    expect(store.$()).toEqual({
       count: 0,
       rows: { all: [{ id: 'b', name: 'Base' }] },
     });
@@ -542,7 +541,7 @@ describe('transactions enhancer', () => {
 
     pending.rollback();
 
-    expect(store()).toEqual({
+    expect(store.$()).toEqual({
       order: { status: 'open' },
       driver: { orderId: null },
       telemetry: { all: [{ id: 9, lat: 42 }] },

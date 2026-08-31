@@ -33,14 +33,14 @@ describe('C6/S3 — tracking suppression', () => {
         if (runs >= RUN_CAP) return; // hard stop: a runaway must not hang the suite
         runs++;
         tree.$.trigger();
-        tree({ a: runs }); // merge path -> recursiveUpdate -> withoutTracking(() => sig())
+        tree.$({ a: runs } as never);
       });
     });
     (TestBed as unknown as { flushEffects?: () => void }).flushEffects?.();
 
     const settled = runs;
     // An external write to the leaf the effect writes must NOT re-run it.
-    tree({ a: 999 });
+    tree.$({ a: 999 } as never);
     (TestBed as unknown as { flushEffects?: () => void }).flushEffects?.();
 
     expect(runs).toBeLessThan(RUN_CAP);

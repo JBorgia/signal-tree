@@ -7,7 +7,7 @@ import { entityMap } from './types';
  * M3 — WHAT THE REPRESENTATION ACTUALLY CONTAINS.
  *
  * Measured rather than read, because `stored.ts` carries two docblocks that
- * disagree: one warns that `tree()`/`unwrap()` SKIP stored values, the other
+ * disagree: one warns that `tree.$()`/`unwrap()` SKIP stored values, the other
  * records that conforming to the signal/accessor protocol fixed exactly that.
  * Only one can be current.
  */
@@ -39,6 +39,6 @@ describe('M3 — representation contents', () => {
     // The `all` key is invented by the hook's return value, not by the
     // declaration — and a collection's obvious plain-data representation is the
     // array itself.
-    expect(tree()).toEqual({ rows: { all: [{ id: 1, n: 'a' }] }, plain: 1 });
+    expect(tree.$()).toEqual({ rows: { all: [{ id: 1, n: 'a' }] }, plain: 1 });
   });
 });

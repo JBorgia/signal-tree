@@ -164,7 +164,7 @@ describe('change reporting — defects found by adversarial audit', () => {
       // always discarded, but the path was reported as changed anyway.
       expect(tree.updateAndReport({ user: null } as never)).toEqual([]);
       expect(tree.updateAndReport({ user: 5 } as never)).toEqual([]);
-      expect(tree()).toEqual({ user: { name: 'Ada' } });
+      expect(tree.$()).toEqual({ user: { name: 'Ada' } });
       // And it says so, rather than failing silently.
       expect(spy).toHaveBeenCalled();
     } finally {
@@ -222,7 +222,7 @@ describe('change reporting — second-round audit findings', () => {
     const tree = signalTree({ onConfirm: null as null | (() => void) });
 
     // No cast: Partial<T>['onConfirm'] already includes the function type.
-    tree({ onConfirm: handler });
+    tree.$({ onConfirm: handler });
 
     expect(tree.$.onConfirm()).toBe(handler);
     expect(ran).toBe(0); // assigning a handler must never RUN it
@@ -233,8 +233,8 @@ describe('change reporting — second-round audit findings', () => {
     const second = () => 'b';
     const tree = signalTree({ cb: first as (() => string) | null });
 
-    tree({ cb: null });
-    tree({ cb: second });
+    tree.$({ cb: null });
+    tree.$({ cb: second });
 
     expect(tree.$.cb()).toBe(second);
   });
@@ -285,7 +285,7 @@ describe('change reporting — second-round audit findings', () => {
       // Previously this half asserted nothing after mockClear() — it documented
       // a diagnostic that did not exist, over a write that vanished silently.
       expect(spy).toHaveBeenCalled();
-      expect(tree()).toEqual({ user: { name: 'Ada' } });
+      expect(tree.$()).toEqual({ user: { name: 'Ada' } });
       spy.mockClear();
 
       // An updater returning undefined is a discard too, unlike a LITERAL
@@ -342,7 +342,7 @@ describe('change reporting — fourth-round audit findings', () => {
         tree.updateAndReport({ user: () => () => 1 } as never)
       ).toEqual([]);
       expect(spy).toHaveBeenCalled();
-      expect(tree()).toEqual({ user: { name: 'Ada' } });
+      expect(tree.$()).toEqual({ user: { name: 'Ada' } });
     } finally {
       spy.mockRestore();
     }
@@ -358,7 +358,7 @@ describe('change reporting — fourth-round audit findings', () => {
         expect(tree.updateAndReport({ user: bad } as never)).toEqual([]);
         expect(spy).toHaveBeenCalled();
       }
-      expect(tree()).toEqual({ user: { name: 'Ada' } });
+      expect(tree.$()).toEqual({ user: { name: 'Ada' } });
     } finally {
       spy.mockRestore();
     }
@@ -386,9 +386,9 @@ describe('signalTree construction — prototype pollution', () => {
       );
       const $ = tree.$ as unknown as Record<string, unknown>;
 
-      expect(Object.getPrototypeOf($)).toBe(Object.prototype);
+      expect(Object.getPrototypeOf($)).toBe(Function.prototype);
       expect($['isAdmin']).toBeUndefined();
-      expect(tree()).toEqual({ a: 1 });
+      expect(tree.$()).toEqual({ a: 1 });
       expect(spy).toHaveBeenCalled();
     } finally {
       spy.mockRestore();
@@ -403,12 +403,12 @@ describe('signalTree construction — prototype pollution', () => {
       );
 
       // The hidden node used to accept writes, bypassing the ST2010
-      // not-in-initial-shape discard while staying invisible to tree().
+      // not-in-initial-shape discard while staying invisible to tree.$().
       // Completed to a whole value — `a` must be re-supplied or 15.0 membership
       // would drop it, which is not what this test is about.
-      tree({ a: 1, zzCtor: 'written-through' } as never);
+      tree.$({ a: 1, zzCtor: 'written-through' } as never);
 
-      expect(tree()).toEqual({ a: 1 });
+      expect(tree.$()).toEqual({ a: 1 });
       expect(({} as Record<string, unknown>)['zzCtor']).toBeUndefined();
     } finally {
       spy.mockRestore();
@@ -418,6 +418,6 @@ describe('signalTree construction — prototype pollution', () => {
   it('still accepts nested state and ordinary keys', () => {
     const tree = signalTree(JSON.parse('{"a":1,"b":{"c":2}}'));
 
-    expect(tree()).toEqual({ a: 1, b: { c: 2 } });
+    expect(tree.$()).toEqual({ a: 1, b: { c: 2 } });
   });
 });

@@ -1,4 +1,5 @@
 import { materializeNode } from '../utils';
+import { snapshotNodeKey } from './node-shape';
 
 export interface CanonicalSnapshotOwner {
   readonly $: object;
@@ -8,5 +9,5 @@ export interface CanonicalSnapshotOwner {
 export function readCanonicalSnapshotInternal<T>(
   owner: CanonicalSnapshotOwner
 ): T {
-  return materializeNode<T>(owner.$);
+  return materializeNode<T>(snapshotNodeKey(owner.$));
 }

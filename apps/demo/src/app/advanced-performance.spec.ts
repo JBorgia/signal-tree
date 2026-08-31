@@ -151,7 +151,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
       const newNumbers = Array.from({ length: 1000 }, () =>
         Math.floor(Math.random() * 1000)
       );
-      tree(() => ({
+      tree.$(() => ({
         numbers: newNumbers,
         sum: newNumbers.reduce((a, b) => a + b, 0),
         average: newNumbers.reduce((a, b) => a + b, 0) / newNumbers.length,
@@ -164,7 +164,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
     // Test partial state updates
     const partialUpdateTime = measureTime(() => {
       // Use the updater form and preserve other properties.
-      tree((current) => ({ ...current, sum: Math.random() * 10000 }));
+      tree.$((current) => ({ ...current, sum: Math.random() * 10000 }));
     }, 1000);
 
     expect(cascadingUpdateTime).toBeLessThan(10);
@@ -186,7 +186,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
 
     // Test array updates
     const arrayUpdateTime = measureTime(() => {
-      tree((currentState) => ({
+      tree.$((currentState) => ({
         ...currentState,
         matrix: currentState.matrix.map((row) => row.map((cell) => cell * 1.1)),
         stats: {
@@ -234,7 +234,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
         return results;
       };
 
-      tree((state) => ({
+      tree.$((state) => ({
         ...state,
         searchResults: findInTree(state.root, (node) => node.value > 500),
       }));
@@ -266,7 +266,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
     // Perform updates on all trees
     const updateTime = measureTime(() => {
       trees.forEach((tree) => {
-        tree((state) => ({
+        tree.$((state) => ({
           ...state,
           data: state.data.map((item) => ({ ...item, value: Math.random() })),
         }));
@@ -294,7 +294,7 @@ describe('Advanced SignalTree Performance Benchmarks', () => {
     const rapidUpdates = measureTime(() => {
       for (let i = 0; i < 100; i++) {
         // Use the updater form to avoid losing other required fields.
-        tree((current) => ({ ...current, filter: 'Item 1' }));
+        tree.$((current) => ({ ...current, filter: 'Item 1' }));
       }
     }, 100);
 

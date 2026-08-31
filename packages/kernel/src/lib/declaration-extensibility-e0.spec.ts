@@ -94,7 +94,7 @@ describe('E0 — custom declaration without a registration protocol', () => {
 
   it('the custom value participates in the tree snapshot', () => {
     const tree = signalTree({ counter: makeCounter(3), plain: 'x' });
-    expect(tree()).toEqual({ counter: 3, plain: 'x' });
+    expect(tree.$()).toEqual({ counter: 3, plain: 'x' });
   });
 
   it('nesting works — no path/position protocol was needed', () => {

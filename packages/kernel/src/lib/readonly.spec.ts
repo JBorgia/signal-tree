@@ -30,7 +30,7 @@ describe('asReadonly()', () => {
     expect(reader.$.count()).toBe(1);
     expect(reader.$.branch.leaf()).toBe('x');
     expect(reader.$.branch()).toEqual({ leaf: 'x' });
-    expect(reader()).toEqual({ count: 1, branch: { leaf: 'x' } });
+    expect(reader.$()).toEqual({ count: 1, branch: { leaf: 'x' } });
 
     // Reads are live: a write through the underlying tree is visible.
     tree.$.count.set(2);

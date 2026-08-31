@@ -195,7 +195,7 @@ export class RestorationDemoComponent {
 
   // Type-safe tree updater
   private updateTree = (updater: (state: AppState) => AppState) => {
-    this.tree(updater);
+    this.tree.$(updater);
   };
 
   // State signals

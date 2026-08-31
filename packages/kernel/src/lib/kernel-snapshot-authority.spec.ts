@@ -9,23 +9,23 @@ type Row = { id: number; value: number };
 describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
   it('preserves root identity until semantic truth changes', () => {
     const tree = signalTree({ count: 1, nested: { value: 2 } });
-    const initial = tree();
+    const initial = tree.$();
 
-    expect(tree()).toBe(initial);
+    expect(tree.$()).toBe(initial);
 
     tree.$.count.set(1);
-    expect(tree()).toBe(initial);
+    expect(tree.$()).toBe(initial);
 
     tree.$.count.set(2);
-    expect(tree()).not.toBe(initial);
+    expect(tree.$()).not.toBe(initial);
   });
 
   it('implementation control: rebuilds only the changed path and reuses an unchanged sibling', () => {
     const tree = signalTree({ left: { value: 1 }, right: { value: 2 } });
-    const before = tree();
+    const before = tree.$();
 
     tree.$.left.value.set(3);
-    const after = tree();
+    const after = tree.$();
 
     expect(after).not.toBe(before);
     expect(after.left).not.toBe(before.left);
@@ -37,13 +37,13 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
       branch: { nested: { value: 1 } },
       sibling: { value: 2 },
     });
-    const before = tree();
+    const before = tree.$();
 
     tree.$.branch.nested.value.set(3);
     expect(tree.$.branch.nested()).toEqual({ value: 3 });
 
     tree.$.branch.nested.value.set(4);
-    const after = tree();
+    const after = tree.$();
 
     expect(after.branch.nested.value).toBe(4);
     expect(after.sibling).toBe(before.sibling);
@@ -53,12 +53,12 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
     const tree = signalTree({
       user: { name: 'Ada', age: 42 as number | undefined },
     });
-    const before = tree();
+    const before = tree.$();
 
     (tree.$.user as unknown as (value: { name: string }) => void)({
       name: 'Grace',
     });
-    const omitted = tree();
+    const omitted = tree.$();
 
     expect(omitted).not.toBe(before);
     expect(omitted.user).toEqual({ name: 'Grace' });
@@ -66,7 +66,7 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
     (tree.$.user as unknown as (
       value: { name: string; age: number }
     ) => void)({ name: 'Grace', age: 42 });
-    const reactivated = tree();
+    const reactivated = tree.$();
 
     expect(reactivated).not.toBe(omitted);
     expect(reactivated.user).toEqual({ name: 'Grace', age: 42 });
@@ -81,10 +81,10 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
       { id: 1, value: 10 },
       { id: 2, value: 20 },
     ]);
-    const before = tree();
+    const before = tree.$();
 
     tree.$.rows.updateOne(2, { value: 21 });
-    const after = tree();
+    const after = tree.$();
 
     expect(after).not.toBe(before);
     expect(after.rows).not.toBe(before.rows);
@@ -100,10 +100,10 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
     });
     tree.$.left.addOne({ id: 1, value: 10 });
     tree.$.right.addOne({ id: 2, value: 20 });
-    const before = tree();
+    const before = tree.$();
 
     tree.$.left.updateOne(1, { value: 11 });
-    const after = tree();
+    const after = tree.$();
 
     expect(after.left).not.toBe(before.left);
     expect(after.right).toBe(before.right);
@@ -130,10 +130,10 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
     const tree = signalTree({
       custom: { [CUSTOM]: true, initial: 1 } as Marker,
     });
-    expect(tree().custom).toBe(1);
+    expect(tree.$().custom).toBe(1);
 
     (tree.$.custom as unknown as Node).increment();
 
-    expect(tree().custom).toBe(2);
+    expect(tree.$().custom).toBe(2);
   });
 });

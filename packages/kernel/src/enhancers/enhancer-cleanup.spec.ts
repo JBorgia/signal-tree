@@ -50,7 +50,7 @@ function createMockTree() {
   tree.bind =
     (_: unknown) =>
     (...a: unknown[]) =>
-      tree(...(a as any));
+      tree.$(...(a as any));
   tree.registerCleanup = (fn: () => void) => {
     cleanupFns.push(fn);
   };

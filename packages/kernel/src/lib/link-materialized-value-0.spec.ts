@@ -115,9 +115,8 @@ const makeTree = () =>
     },
     plain: { a: 1, b: 'two' },
   }) as unknown as {
-    (value: unknown): void;
-    (): unknown;
     $: {
+      (): unknown;
       count: () => number;
       rows: { addOne(r: Row): void; all(): Row[] };
       nested: {
@@ -172,7 +171,7 @@ describe('LINK-MATERIALIZED-VALUE-0: the runtime natural value', () => {
 
   it('the root has the same defect, in every collection position', async () => {
     const tree = await seeded();
-    const value = tree() as Record<string, unknown>;
+    const value = tree.$() as Record<string, unknown>;
 
     expect(Object.keys(value['rows'] as object)).toEqual(['all']);
     expect(

@@ -85,9 +85,9 @@ describe('E2-B / ABA — value equality is not causal ownership', () => {
   it('THE FALSIFIER — later work returns the value to T1.after, and undo T1 destroys it', () => {
     const tree = signalTree({ x: 'A' });
 
-    const before = tree() as Root;
+    const before = tree.$() as Root;
     tree.$.x.set('B'); // T1 authors B
-    const T1: Turn = { id: 'T1', before, after: tree() as Root };
+    const T1: Turn = { id: 'T1', before, after: tree.$() as Root };
 
     // Later surviving work. It moves the position away and then back.
     tree.$.x.set('C');
@@ -95,12 +95,12 @@ describe('E2-B / ABA — value equality is not causal ownership', () => {
 
     expect(tree.$.x()).toBe('B');
 
-    const patches = undoTurn(T1, tree() as Root);
+    const patches = undoTurn(T1, tree.$() as Root);
 
     // The rule sees current 'B' === T1.after 'B' and concludes T1 still owns the
     // position. It does not. T1's contribution was overwritten by 'C'.
     expect(patches).toHaveLength(1);
-    for (const p of patches) tree(p as never);
+    for (const p of patches) tree.$(p as never);
 
     // WRONG — surviving later truth has been destroyed.
     expect(tree.$.x()).toBe('A');
@@ -130,13 +130,13 @@ describe('E2-B / nested clobber — the "~10 lines" repair loses siblings', () =
     const tree = signalTree({ profile: { name: 'n1', age: 30 } });
     const history: Turn[] = [];
 
-    let before = tree() as Root;
+    let before = tree.$() as Root;
     tree.$.profile.name.set('n2'); // T1, speculative
-    history.push({ id: 'T1', before, after: tree() as Root });
+    history.push({ id: 'T1', before, after: tree.$() as Root });
 
-    before = tree() as Root;
+    before = tree.$() as Root;
     tree.$.profile.name.set('n3'); // T2, confirmed
-    history.push({ id: 'T2', before, after: tree() as Root });
+    history.push({ id: 'T2', before, after: tree.$() as Root });
 
     // The P3 repair, VERBATIM: spread `patch()` over the retained root.
     const rollback = (turnId: string): void => {

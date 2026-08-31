@@ -67,7 +67,7 @@
       <li>
         The unexported <code>asyncStream</code> marker is removed. Accumulation
         is three lines of composition over a plain leaf, and a leaf is captured
-        by <code>restoration()</code>, appears in <code>tree()</code> and persists
+        by <code>restoration()</code>, appears in <code>tree.$()</code> and persists
         with no marker contract to satisfy.
       </li>
     </ul>
@@ -167,7 +167,7 @@
   </div>
 
   <h3>
-    ⚡ v13.5.0 — <code>tree()</code> rebuilds only what changed (August 2026)
+    ⚡ v13.5.0 — <code>tree.$()</code> rebuilds only what changed (August 2026)
   </h3>
   <div class="release-highlights">
     <p>
@@ -181,7 +181,7 @@
     <h4>⚡ Performance</h4>
     <ul>
       <li>
-        <strong><code>tree()</code> is memoised and structurally shared.</strong>
+        <strong><code>tree.$()</code> is memoised and structurally shared.</strong>
         A node rebuilds only when a signal beneath it actually changed; clean
         subtrees come back <em>by reference</em>. Reading the whole state after a
         one-leaf write went <strong>1807.8µs → 149.2µs</strong> on a 10,000-leaf
@@ -202,7 +202,7 @@
       <li>
         <strong>Serialisation stopped stringifying the tree to ask "did anything
         change?"</strong> <code>autoSave</code> polled
-        <code>JSON.stringify(tree())</code> every 100ms to answer a yes/no
+        <code>JSON.stringify(tree.$())</code> every 100ms to answer a yes/no
         question the write path already knew. It is now an O(1) identity check.
       </li>
     </ul>
@@ -267,7 +267,7 @@
     <h4>⚠️ Breaking</h4>
     <ul>
       <li>
-        <strong><code>tree()</code> no longer returns a freshly allocated
+        <strong><code>tree.$()</code> no longer returns a freshly allocated
         object.</strong> Mutating a snapshot would corrupt the cache and survive
         into every later read. Snapshots were always meant to be read-only; that
         is now load-bearing, so each node is frozen in dev and a mutation throws
@@ -299,7 +299,7 @@
         <strong>An explicit <code>storage:</code> option no longer reaches
         snapshots.</strong> A <code>stored()</code> marker nested under an object
         parent used to surface as its <em>raw marker</em> from
-        <code>tree()</code>, carrying <code>options.storage</code> with it — and
+        <code>tree.$()</code>, carrying <code>options.storage</code> with it — and
         <code>unwrap</code> deep-copied that storage object, enumerating
         unrelated keys into the snapshot. Anyone passing <code>storage:</code>
         explicitly <em>and</em> using <code>serialization()</code>,
@@ -319,7 +319,7 @@
         was a plain callable satisfying neither <code>isSignal</code> nor the
         node-accessor guard — and every traversal in the library branches on
         exactly those two. So a top-level stored leaf was missing from
-        <code>tree()</code>, a merge write through a parent was silently
+        <code>tree.$()</code>, a merge write through a parent was silently
         dropped, and <code>applyState()</code> (the devtools replay path)
         <em>replaced</em> the live signal with a raw value, after which reading
         it threw.
@@ -331,13 +331,13 @@
         This hit <em>every</em> marker — nested <code>status()</code>,
         <code>entityMap()</code>, <code>form()</code> and
         <code>asyncSource()</code> all leaked raw markers into
-        <code>tree()</code>. Only <code>stored()</code> got noticed, because its
+        <code>tree.$()</code>. Only <code>stored()</code> got noticed, because its
         marker carries a <code>Storage</code> handle.
       </li>
       <li>
-        <strong><code>tree()</code> called before <code>tree.$</code> now
+        <strong><code>tree.$()</code> called before <code>tree.$</code> now
         finalizes.</strong> Every other entry point did; the builder's own call
-        path was the sole omission, so <code>tree()</code> as a first operation
+        path was the sole omission, so <code>tree.$()</code> as a first operation
         returned raw markers.
       </li>
     </ul>
@@ -365,7 +365,7 @@
     <h4>⚠️ Changed (behavior)</h4>
     <ul>
       <li>
-        Stored leaves now appear in <code>tree()</code>/<code>unwrap()</code>
+        Stored leaves now appear in <code>tree.$()</code>/<code>unwrap()</code>
         output, and a merge write through a parent reaches them — so it also
         writes to storage. A merge <strong>replaces</strong> an object-valued
         stored leaf rather than merging into it, where a plain nested namespace
@@ -380,7 +380,7 @@ if (outcome === 'error') &#123;
 &#125;
 
 // A snapshot now contains stored values instead of omitting them
-tree();  // &#123; settings: &#123; theme: 'dark' &#125; &#125;  — not a raw marker</code></pre>
+tree.$();  // &#123; settings: &#123; theme: 'dark' &#125; &#125;  — not a raw marker</code></pre>
   </div>
 
   <h3>

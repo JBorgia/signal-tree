@@ -75,29 +75,17 @@ const tree = signalTree({ count: 0 });
 - If you never call a marker factory, its code is completely eliminated
 - Zero import-time side effects - registration is lazy and automatic
 
-**When to use subpath imports:**
-
-- Older bundlers (webpack <5) with poor tree-shaking
-- Explicit control over what gets included
-- Personal/team preference for clarity
-
 This repo's ESLint rule is **disabled by default** since testing confirms effective tree-shaking with barrel imports.
 
-### Callable leaf signals (DX sugar only)
+### Leaf signal writes
 
-SignalTree provides TypeScript support for callable syntax on leaf signals as developer experience sugar:
+Leaves use their native signal write methods:
 
 ```typescript
-// TypeScript accepts this syntax (with proper tooling):
-tree.$.name('Jane'); // Set value
-tree.$.count((n) => n + 1); // Update with function
+tree.$.name.set('Jane');
+tree.$.count.update((n) => n + 1);
 
-// At build time, transforms convert to:
-tree.$.name.set('Jane'); // Direct Angular signal API
-tree.$.count.update((n) => n + 1); // Direct Angular signal API
-
-// Reading always works directly:
-const name = tree.$.name(); // No transform needed
+const name = tree.$.name();
 ```
 
 **Key Points:**
@@ -216,16 +204,6 @@ it('updates state', () => {
 
 Alternatively, await a microtask (`await Promise.resolve()`) to allow the automatic flush to occur.
 
-**Opting out**
-
-To disable automatic microtask batching for a specific tree instance:
-
-```typescript
-const tree = signalTree(initialState, { batching: false });
-```
-
-Use this only for rare cases that truly require synchronous notifications (most apps should keep batching enabled).
-
 ## Quick start
 
 ### Installation
@@ -301,8 +279,8 @@ console.log(tree.$.count()); // 0
 console.log(tree.$.message()); // 'Hello World'
 
 // Update values
-tree.$.count(5);
-tree.$.message('Updated!');
+tree.$.count.set(5);
+tree.$.message.set('Updated!');
 
 // Use in an Angular component
 @Component({
@@ -314,7 +292,7 @@ class SimpleComponent {
   tree = tree;
 
   increment() {
-    this.tree.$.count((n) => n + 1);
+    this.tree.$.count.update((n) => n + 1);
   }
 }
 ```
@@ -339,9 +317,9 @@ const tree = signalTree({
 });
 
 // Access nested signals with full type safety
-tree.$.user.name('Jane Doe');
-tree.$.user.preferences.theme('light');
-tree.$.ui.loading(true);
+tree.$.user.name.set('Jane Doe');
+tree.$.user.preferences.theme.set('light');
+tree.$.ui.loading.set(true);
 
 // Computed values from nested state
 const userDisplayName = computed(() => {
@@ -494,7 +472,7 @@ const tree = signalTree<AppState>({
 });
 
 // Complex updates with type safety
-tree((state) => ({
+tree.$((state) => ({
   auth: {
     ...state.auth,
     user: { id: '1', name: 'John' },
@@ -507,7 +485,7 @@ tree((state) => ({
 }));
 
 // Get entire state as plain object
-const currentState = tree();
+const currentState = tree.$();
 console.log('Current app state:', currentState);
 ```
 
@@ -750,7 +728,7 @@ async function fetchUser(id: string) {
 }
 
 // Automatic state persistence
-tree.$.preferences.theme('dark'); // Auto-saved
+tree.$.preferences.theme.set('dark'); // Auto-saved
 
 // Time travel
 tree.undo(); // Revert changes
