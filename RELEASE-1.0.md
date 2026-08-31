@@ -58,8 +58,9 @@ root state facade; neither is the public whole-tree materialization function.
 Descendant locations retain their callable grammar. Framework adapters pair
 `observeOwnerInvalidation(owner, callback)` with
 `readCanonicalSnapshot(owner)`; neither operation revives an obsolete callable
-root shape. `@signal-tree/react` remains blocked until incumbent controller
-callability is retired.
+root shape. `CANONICAL-SNAPSHOT-HANDOFF-0` is closed at `3b572fe7`.
+`@signal-tree/react` remains blocked until incumbent controller callability is
+retired.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
