@@ -108,7 +108,9 @@ const inspectEntry = (entry, tree, subjectId, count) => {
       : OPERATION === 'remove'
         ? count - 1
         : count;
-  const expectedClaimedSubjects = OPERATION === 'rekey' ? count : 1;
+  // Every one-subject op retains one claim, rekey included since
+  // RESTORATION-REKEY-CLAIM-WIDTH-0 narrowed the producer participation latch.
+  const expectedClaimedSubjects = 1;
   const expectedEffects = OPERATION === 'replace' ? 2 : 1;
   if (
     rows.length !== expectedLength ||
@@ -295,7 +297,7 @@ console.log(
     `stateRows=${byName.get('capacity-one-tree').points.at(-1).stateRows}.\n` +
     'The first turn forces canonical materialization; HistoryEntry.state and the live snapshot cache share that N-wide object.\n' +
     (OPERATION === 'rekey'
-      ? 'REKEY FALSIFIER: one effect retains the entire stale collection subject inventory.\n'
+      ? 'REKEY: one claimed subject and one position, since RESTORATION-REKEY-CLAIM-WIDTH-0 (was the entire stale collection inventory).\n'
       : 'The one-subject operation retains exactly one claimed subject and one position.\n') +
     'A0 attributes current production retention; E5 owns lifecycle collectability.'
 );

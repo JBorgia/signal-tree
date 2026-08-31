@@ -333,7 +333,157 @@ memory gates; net-zero, rollback, reset-before-confirm, destroy-before-confirm,
 throw-abort, transaction persistence, structural restoration, lazy claim
 registry, and exact cleanup controls; independent review clean. No full release
 66/66 claim is made because the previously recorded gate-10b pipeline
-prerequisite issue remains separate. `REALIZATION-OWNERSHIP-0` remains queued.
+prerequisite issue remains separate. `RESTORATION-ACTIVE-DENSITY-0` opens next
+as the retained-history scaling row (below); `REALIZATION-OWNERSHIP-0` re-queues
+behind it.
+
+`RESTORATION-ACTIVE-DENSITY-0` is **PRE-REGISTERED / ACTIVE NEXT**. `ea521d7e`
+closes the _idle_ restoration slope only. E5's own matrix still shows _retained_
+history scaling with collection width rather than with reversible work: at 100k
+live subjects configured-unused is 39.10 MB, capacity 2 is 40.02 MB, capacity 20
+is 53.81 MB, and capacity 100 is 114.91 MB, while 100 retained _scalar_ turns
+over the same subtree stay at 40.14 MB. The entity-turn increment is about
+771 KB/retained turn at capacity 20 and about 795 KB at capacity 100, for
+workloads where each designated turn touches a tiny fraction of the 100,000-
+subject collection: a suspected O(collection-size x retained-turns)
+characteristic. Bounded cardinalities (2/2/2, 20/20/20, 100/100/100) are not the
+same claim as bounded bytes, so "positive capacities retain only participating
+subjects" is not yet demonstrated for entity turns.
+
+Frozen target law (pre-experiment): retained restoration cost scales primarily
+with retained causal work and the subjects and positions required to reverse
+that work, not with unrelated live subjects. For a one-entity value change the
+durable representation conceptually needs only TurnId, SubjectId, the prior
+affected truth, causal metadata, and claim/ownership; a structural operation
+adds only the placement or neighbour facts its reversal requires. A full-width
+collection image must prove semantic necessity, not survive for reconstruction
+convenience.
+
+Pre-registered falsifier: at collection sizes 1k, 10k, and 100k, independently,
+retain exactly one designated turn of each kind (one-field scalar change on one
+existing entity, whole-entity replacement, add, remove, rekey, and
+reorder/move) and compare configured restoration with zero history against
+configured restoration plus that one retained turn, inventorying the retained
+owners. The primary question is whether the incremental retained cost of one
+one-subject turn grows materially with unrelated collection size; an
+approximately 8 KB / 80 KB / 800 KB progression is a decisive O(N) result.
+Attribution measures the actual retained owner before any optimization is
+designed; the collection-width snapshot or projection is the suspect, not the
+premise. No production change is authorized until the owner is attributed and
+each redesign candidate passes the frozen undo/redo, structural, transaction,
+atomicity, and address-fallback laws.
+
+Automation and generated docs must assert the repaired result (403.2 B/live
+subject, 0.0 B idle slope, and the `maxHistorySize` turn-capacity contract of
+undefined -> 50, 0 -> none, 1 -> one undo/redo, N -> at most N completed
+designated turns) as current expectations. E5's and R0's red tables, the
+437.0 B slope, and the 0 -> 50 fallback are retained as historical defect
+evidence only and must not be consumed by live gates.
+
+`RESTORATION-ACTIVE-DENSITY-0 / A0` is **CLOSED OWNER ATTRIBUTION /
+PRODUCTION REDESIGN NOT AUTHORIZED** at `93bd4d15`. One retained one-entity turn
+over 1k/10k/100k subjects costs 69.6 / 137.2 / 840.1 KB. The retained entry has
+one effect, one claim, and one position, but `state.rows.all` has collection
+cardinality and is identical to the live canonical snapshot array. A matched
+zero-history `tree.$()` materialization accounts for 34.1 / 107.0 / 820.2 KB;
+at 100k only about 20 KB remains turn-specific. Whole replacement, add, remove,
+and prepend reproduce 830-840 KB at 100k with 800-813 KB explained by canonical
+materialization and exact one-subject claim cardinality.
+
+Rekey is a separate direct falsifier: one effect/position retains 1k/10k/100k
+claimed subjects and costs 275.6 KB / 2.48 MB / 22.62 MB. `setAll` leaves
+collection-wide `lastSubjectIds`; `changeId` does not narrow it before mutation
+capture. `RESTORATION-REKEY-CLAIM-WIDTH-0` and `RESTORATION-TURN-STATE-0` are
+the next active subrows. The former owns claim precision at the producer; the
+latter derives the minimum retained reversal representation and tests whether
+effect-only turns are sufficient without forcing full-width canonical
+materialization. `REALIZATION-OWNERSHIP-0` remains queued behind active
+restoration density.
+
+Live automation is current at `839d4133`: the shipped-API capacity gate asserts
+omitted -> 50, 0 -> none, 1 -> one, and positive N -> at most N completed
+designated turns. Historical E5/R0 red tables remain evidence only.
+
+`RESTORATION-ACTIVE-DENSITY-0 / A0` attribution is **INDEPENDENTLY REPLICATED /
+FROZEN**. A blind agent given only the raw 1k/10k/100k symptom magnitudes, and
+walled off from the A0 harness and write-ups, reached the same two owners with
+its own probes. One-field turn: the owner is `CanonicalTurn.state`, a full
+materialized root snapshot built by `snapshotState(tree.$)` at settlement, whose
+O(N) part is the collection projection array `state.<collection>.all`. A single
+retained turn shares the live snapshot array, but 20 retained turns pin 20
+distinct `.all` arrays (20/20 by `===`); retained cost is therefore
+`entries x N` pointer slots at about 8 B each across four capacities and three
+sizes, and the row objects stay structurally shared (1,019 distinct for 20
+turns over 1,000 rows). An exhaustive own-property, symbol, descriptor, and
+deep-subgraph scan of a retained entry finds zero function or accessor fields:
+closure capture is falsified as the dominant O(N) retained-turn mechanism -- the
+retained `CanonicalTurn` graph carries no function or accessor edges and the
+~8 B/slot array term accounts for essentially the whole multiplicative slope,
+though lexical environments elsewhere cannot be enumerated by reflection. Rekey:
+`entry.restorationSubjectIds` is N-wide and feeds the `SubjectRestorationClaims`
+`bySubject` / `byOwner` reverse index (one Map entry plus a one-element Set per
+subject, about 241 B/subject, ~98% of the retained rekey cost). Cause confirmed
+causally: `planRekey.commit()` and `planPreparedRekey.commit()` never call
+`rememberSubjectIds()`, so the `lastSubjectIds` latch (`entity-signal.ts:462`)
+stays at the prior wide write; `wrapMutator` reads it at
+`intercept-leaf-signals.ts:208` and the precedence at `restoration.ts:660`
+prefers that N-wide set over the correct one-element `effectSubjectIds`.
+Interposing any narrow undesignated write before the rekey collapses claims
+from N to 2 and retained bytes by 98% with the effect record byte-identical.
+
+Disposition: `RESTORATION-REKEY-CLAIM-WIDTH-0` production fix is **AUTHORIZED AT
+THE PRODUCER**. The ordinary and prepared/transactional rekey commit paths must
+emit exactly the current rekeyed subject as last-write participation metadata;
+the specific mechanism (the `lastSubjectIds` latch or a better one) is the
+implementer's choice. The restoration subject/effect precedence at
+`restoration.ts:660`, the claim registry, restoration-side filtering, and public
+API are **not to be modified** -- the consumer is correctly trusting the
+participation fact it was given, and its conservative breadth serves whole-turn
+capture beyond rekey. Target: one rekey retains exactly one participating
+SubjectId (exactly 1, not merely small; the residual 2 in the discriminator
+experiment was the interposed narrow write plus the rekeyed subject, not the
+intended end state). Two producer-level controls guard the metadata contract at
+its owner: after `setAll(N) -> changeId(one)` and after an arbitrary prior
+mutator `-> changeId(one)`, producer participation equals `[rekeyed SubjectId]`,
+for both rekey paths. The restoration controls stand: held ref stays the same
+logical subject; old key stops resolving; fresh old-key occupant gets a distinct
+SubjectId; undo restores the old key; redo restores the new key;
+ordering/position exact; transactional rekey atomic; rollback retains zero
+claim; eviction releases the claim; one rekey at 1k/10k/100k retains exactly one
+claim. `RESTORATION-TURN-STATE-0` then derives the minimum retained reversal
+representation and tests whether effect-only turns satisfy every frozen
+restoration operation including `jumpTo()` and historical-state exposure;
+compact effects are the leading candidate, not the conclusion. Claim-registry
+representation is not a detour -- once the producer says 1, the ~241 B/subject
+registry cost is no longer pathological. `REALIZATION-OWNERSHIP-0` stays queued.
+
+`RESTORATION-REKEY-CLAIM-WIDTH-0` is **CLOSED GREEN**. `planRekey.commit()` and
+`planPreparedRekey.commit()` now set `lastSubjectIds = [subjectId]`, the sole
+production change; `restoration.ts:660`, the claim registry, restoration-side
+filtering, and public API are untouched. `bench-restoration-active-density.mjs
+--operation rekey` at 100k now reports `effects=1, claimedSubjects=1,
+positions=1` and a one-turn increment of 70.6 / 138.2 / 841.7 KB at 1k/10k/100k,
+matching an ordinary field turn -- the N-wide `restorationSubjectIds` and the
+O(collection) `bySubject` / `byOwner` claim graph are eliminated, recovering
+about 22.6 MB at 100k. The residual is the shared
+`CanonicalTurn.state.<collection>.all` materialization, which belongs to
+`RESTORATION-TURN-STATE-0`. `rekey-claim-width-0.spec.ts` pins the fix at the
+producer (`__subjectIds` after `changeId`, ordinary and prepared/transactional
+paths) and at the restoration outcome (one retained claim independent of
+collection size, held identity across the rekey, undo/redo key restoration,
+order preservation, rolled-back-transaction atomicity, eviction release, fresh
+same-key occupant distinctness). The redo path was traced: `redo()` of a
+designated rekey turn replays through `__planPreparedRekey.commit()` and
+delivers one `structural=rekey` notify with `nSubjects=1`; after settlement the
+retained turn's `restorationSubjectIds` and the claim registry stay at one at N
+of 20/30/600/1,000. An interim draft assertion reading `80` after redo was a
+broken test (it redid an unrelated bulk `setAll`, whose last-write latch
+legitimately spans the collection), now replaced by one that redoes the rekey
+turn itself. Kernel 247 files / 2,002 passed / 3 expected failures / 13 skipped
+/ 1 todo; both TypeScript passes; kernel lint/build; the rekey arm of the A0
+harness now asserts the repaired one-claim cardinality.
+`RESTORATION-TURN-STATE-0` is the active row; `REALIZATION-OWNERSHIP-0` stays
+queued behind it.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public

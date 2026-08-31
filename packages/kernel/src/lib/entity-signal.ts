@@ -620,6 +620,13 @@ export function createEntitySignal<
           publishSubjectPhysicalChange(changedSubjectId);
         }
         rekeyedSubjects.add(subjectId);
+        // Narrow last-write participation to the one rekeyed subject. The
+        // leaf-signal interceptor re-reads `__subjectIds` after `changeId`
+        // returns; without this it reports every subject of the prior
+        // collection write as a participant, and restoration then retains a
+        // claim per live subject. Sibling mutators all narrow this latch.
+        // RESTORATION-REKEY-CLAIM-WIDTH-0.
+        lastSubjectIds = [subjectId];
 
         if (activeIdSignal() === from) {
           activeIdSignal.set(to);
@@ -688,6 +695,13 @@ export function createEntitySignal<
           publishSubjectPhysicalChange(changedSubjectId);
         }
         rekeyedSubjects.add(subjectId);
+        // Narrow last-write participation to the one rekeyed subject. The
+        // leaf-signal interceptor re-reads `__subjectIds` after `changeId`
+        // returns; without this it reports every subject of the prior
+        // collection write as a participant, and restoration then retains a
+        // claim per live subject. Sibling mutators all narrow this latch.
+        // RESTORATION-REKEY-CLAIM-WIDTH-0.
+        lastSubjectIds = [subjectId];
 
         if (activeIdSignal() === from) {
           activeIdSignal.set(to);

@@ -481,7 +481,7 @@ The live E5 matrix after the correction is:
 | `maxHistorySize: 0` after 100 designated writes |         approximately 394 B | approximately 38.3 MB | 0 / 0 / 0                              |
 | capacity 2                                      |                     409.9 B |              40.02 MB | 2 / 2 / 2                              |
 | capacity 20                                     |                     554.3 B |              53.81 MB | 20 / 20 / 20                           |
-| configured capacity 101, 100 turns authored    |                   1,194.1 B |             114.91 MB | 100 / 100 / 100                        |
+| configured capacity 101, 100 turns authored     |                   1,194.1 B |             114.91 MB | 100 / 100 / 100                        |
 
 Configured-unused restoration falls from 840.2 to 403.2 B/live subject and
 80.88 to 39.10 MB at 100k, recovering approximately 41.8 MB. Its incremental
@@ -507,3 +507,192 @@ gates, and independent adversarial review are green. This closes
 `RESTORATION-IDLE-DENSITY-0` and `ZERO-HISTORY-RETENTION-0` without reopening
 designation, SubjectId, structural restoration, transaction atomicity, durable
 settlement, or public root semantics.
+
+## RESTORATION-ACTIVE-DENSITY-0 (pre-registered)
+
+`ea521d7e` closes the idle slope. It does not close _retained_ history density.
+The matrix above still scales with collection width: capacity 2 / 20 / 100 cost
+40.02 / 53.81 / 114.91 MB at 100k live subjects, an increment of roughly
+771-795 KB per retained entity turn, while 100 retained scalar turns over the
+same subtree stay near 40 MB. Bounded cardinalities (100 / 100 / 100) are not
+bounded bytes; "positive capacities retain only participating subjects" is
+asserted, not yet demonstrated, for entity turns.
+
+Frozen target law: retained restoration cost scales with retained causal work
+and the subjects and positions needed to reverse it, not with unrelated live
+subjects. A one-entity value change conceptually needs TurnId, SubjectId, prior
+affected truth, causal metadata, and claim/ownership; structural operations add
+only the placement or neighbour facts reversal requires. A full-width collection
+image must prove semantic necessity.
+
+Pre-registered falsifier: at 1k / 10k / 100k subjects, independently, retain one
+designated turn of each kind (one-field scalar change, whole-entity replacement,
+add, remove, rekey, reorder/move) and compare configured restoration with zero
+history against the same plus one retained turn, inventorying retained owners.
+An approximately 8 KB / 80 KB / 800 KB progression for a one-subject turn is a
+decisive O(N) result. The retained owner is attributed from measurement before
+any redesign; the collection-width snapshot or projection is the suspect, not
+the premise. `REALIZATION-OWNERSHIP-0` re-queues behind this row.
+
+## RESTORATION-ACTIVE-DENSITY-0 / A0 — Owner Located
+
+Generator checkpoint: `93bd4d15`.
+
+```bash
+node --expose-gc tools/bench-restoration-active-density.mjs \
+  --operation field
+```
+
+A0 stops at the actual retained production graph. With capacity 1, one
+designated one-entity field turn retains one history entry, one effect, one
+claimed SubjectId, and one position. That entry's `state.rows.all` has
+cardinality equal to the whole collection and is the **same object** as the live
+canonical root snapshot's collection array.
+
+| Live subjects | One-turn increment | Matched canonical materialization | Turn beyond materialization |
+| ------------: | -----------------: | --------------------------------: | --------------------------: |
+|         1,000 |            69.6 KB |                           34.1 KB |                     35.5 KB |
+|        10,000 |           137.2 KB |                          107.0 KB |                     30.1 KB |
+|       100,000 |           840.1 KB |                          820.2 KB |                     20.0 KB |
+
+At 100k, a zero-history tree that merely materializes `tree.$()` reproduces
+approximately 820 KB of the 840 KB one-turn increment. Clearing only the
+history entry's `state` reference reclaims nothing because the live snapshot
+cache co-owns the same object. The first-order O(N) owner is therefore the
+collection-wide canonical materialization forced by `buildTurn()`, not the
+one-effect/one-claim metadata graph.
+
+The same three-sample 100k result holds across the preregistered operations:
+
+| One turn                 | Production increment | Canonical materialization | Effects / claims / positions |
+| ------------------------ | -------------------: | ------------------------: | ---------------------------: |
+| field update             |             840.1 KB |                  820.2 KB |                    1 / 1 / 1 |
+| whole-entity replacement |             840.1 KB |                  812.6 KB |                    2 / 1 / 1 |
+| add                      |             833.1 KB |                  801.7 KB |                    1 / 1 / 1 |
+| remove                   |             830.3 KB |                  800.1 KB |                    1 / 1 / 1 |
+| prepend placement        |             832.2 KB |                  810.4 KB |                    1 / 1 / 1 |
+
+Rekey exposes a second, larger owner. Its one structural effect and one position
+retain **every live SubjectId as a claim**: 1k / 10k / 100k claims and
+275.6 KB / 2.48 MB / 22.62 MB respectively. The source is stale collection
+metadata: `setAll` leaves `lastSubjectIds` at collection width and `changeId`
+does not replace it with the rekeyed subject before interception reads the
+metadata.
+
+A0 is **closed owner attribution**, not a production optimization. The next
+active subrows are independent:
+
+1. `RESTORATION-REKEY-CLAIM-WIDTH-0` must make one rekey retain exactly its one
+   SubjectId, fixed at the mutation/rekey producer so every downstream causal
+   consumer sees the correct participation set, without changing held identity,
+   key reuse, undo/redo, or position.
+2. `RESTORATION-TURN-STATE-0` must derive the minimum retained reversal
+   representation and test whether effect-only turns can reverse every
+   scalar/entity/structural/transaction turn -- and satisfy `jumpTo()` and
+   historical-state exposure -- without forcing or retaining a full-width
+   canonical snapshot. Compact effects are the leading candidate, not the
+   conclusion. The snapshot cache may still own the current materialization for
+   ordinary reads; restoration must not require it merely to retain a
+   one-subject turn.
+
+No active-history representation change is authorized by A0.
+
+### Independent replication
+
+A second agent, given only the raw 1k/10k/100k symptom magnitudes and blocked
+from the A0 harness, this document, and `RELEASE-1.0.md`, independently
+confirmed both owners:
+
+- **One-field turn.** Owner is `CanonicalTurn.state` (a full materialized root
+  snapshot from `snapshotState(tree.$)` at settlement); its O(N) term is the
+  collection array `state.<collection>.all`. A single retained turn shares the
+  live snapshot array; 20 retained turns pin 20 distinct `.all` arrays
+  (`===`-checked), so retention is `entries x N` pointer slots at ~8 B, not
+  `entries x N` row objects (rows stay structurally shared, 1,019 distinct
+  across 20 turns over 1,000 rows). An exhaustive own-property / symbol /
+  descriptor / deep-subgraph scan of a retained entry found zero function or
+  accessor fields: closure capture is falsified as the dominant O(N)
+  retained-turn mechanism (no function or accessor edges in the retained graph,
+  and the ~8 B/slot array term carries essentially the whole multiplicative
+  slope; lexical environments elsewhere are not reflection-enumerable).
+- **Rekey.** `entry.restorationSubjectIds` is N-wide and populates the
+  `SubjectRestorationClaims` `bySubject` / `byOwner` reverse index (~241 B per
+  subject, ~98% of the retained rekey cost). `planRekey.commit()` and
+  `planPreparedRekey.commit()` never call `rememberSubjectIds()`, leaving the
+  `lastSubjectIds` latch at the prior wide write; `wrapMutator`
+  (`intercept-leaf-signals.ts:208`) reads it and the precedence at
+  `restoration.ts:660` admits it over the correct one-element `effectSubjectIds`.
+  Interposing any narrow undesignated write before the rekey collapses claims
+  from N to 2 and retained bytes by 98%, effect record unchanged.
+
+Both accounts agree. The attribution is frozen.
+
+Disposition:
+
+```text
+A0 OWNER ATTRIBUTION
+    CLOSED / independently replicated
+
+ordinary entity-turn O(N) owner
+    CanonicalTurn.state.<collection>.all
+    distinct N-wide projection array per retained turn
+
+rekey O(N) owner
+    stale producer participation metadata
+    -> N-wide restorationSubjectIds
+    -> N-wide claim ownership graph
+
+closure capture
+    FALSIFIED AS DOMINANT O(N) TURN-RETENTION MECHANISM
+
+RESTORATION-REKEY-CLAIM-WIDTH-0
+    PRODUCTION FIX AUTHORIZED AT PRODUCER
+    do not modify restoration.ts:660 precedence, claim registry,
+    restoration filtering, or public API
+
+RESTORATION-TURN-STATE-0
+    DERIVE MINIMUM RETAINED REVERSAL REPRESENTATION
+    effect-only is candidate, not yet conclusion
+
+REALIZATION-OWNERSHIP-0
+    QUEUED
+```
+
+The rekey producer must emit exactly the current rekeyed subject as its
+last-write participation metadata; `rememberSubjectIds()` / `lastSubjectIds` may
+be the implementation but the requirement is the fact, not the mechanism. The
+`restoration.ts:660` precedence is left intact deliberately: it carries
+whole-turn capture for writes without structural effects, and narrowing it to
+`effectSubjectIds` would turn a provenance bug into a restoration special case.
+
+### RESTORATION-REKEY-CLAIM-WIDTH-0 — closed
+
+`planRekey.commit()` and `planPreparedRekey.commit()` now set
+`lastSubjectIds = [subjectId]`, joining every sibling mutator. That is the only
+production change; `restoration.ts:660`, the claim registry, restoration-side
+filtering, and public API are untouched. `tools/bench-restoration-active-density.mjs
+--operation rekey` at 100k live subjects now reports `effects=1,
+claimedSubjects=1, positions=1`, and the one-turn increment (70.6 / 138.2 /
+841.7 KB at 1k/10k/100k) is identical to an ordinary field turn -- the N-wide
+`restorationSubjectIds` and the O(collection) `bySubject` / `byOwner` claim
+graph are gone, removing ~22.6 MB of retained heap at 100k. What remains is the
+shared `CanonicalTurn.state.<collection>.all` materialization, which is
+`RESTORATION-TURN-STATE-0`'s subject. `rekey-claim-width-0.spec.ts` pins the fix
+at the producer (`__subjectIds` after `changeId`, ordinary and
+transactional/prepared paths) and at the restoration outcome (one retained
+claim regardless of collection size, held identity across the rekey, undo/redo
+key restoration, order preservation, rolled-back-transaction atomicity, eviction
+release, and fresh same-key occupant distinctness). Full kernel suite, both
+TypeScript passes, and kernel lint/build are green.
+
+Redo path traced explicitly. `redo()` of a designated rekey turn replays through
+`__planPreparedRekey.commit()` — the second patched site — and the sole notify
+delivered is `path=rows.<newKey> owner=rows nSubjects=1 structural=rekey`. After
+redo settles, the retained turn's `restorationSubjectIds` and the claim registry
+stay at one, at N of 20 / 30 / 600 / 1,000. An earlier draft assertion that read
+`80` after redo was invalid: it made a bulk `setAll(80)` the only designated
+turn and left the rekey as a bare `transaction().confirm()` (which creates no
+restoration entry), so `undo()` / `redo()` replayed the `setAll` and correctly
+re-latched participation to the collection — the assertion observed the
+last-write latch after redoing an unrelated bulk turn, a property the latch was
+never promised to hold. The replacement test redoes the rekey turn itself.
