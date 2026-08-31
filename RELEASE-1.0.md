@@ -34,7 +34,7 @@ expected failures; Angular 24 passed; typecheck, lint, preserve-modules builds,
 API/spec baselines, bounded no-subscriber production-substrate comparison, and
 the release ladder are green at 66/66 with zero known-red.
 
-`CONSTRUCTION-BOUND-REALIZATION-0` is **CLOSED GREEN**. Kernel and framework
+`CONSTRUCTION-BOUND-REALIZATION-0` is **CLOSED GREEN** at `23c6de5a`. Kernel and framework
 factories bind immutable realization bundles at construction; neutral and
 Angular trees coexist in N→A→N→A order with later lazy allocations; mutable
 process-global realization installers are deleted. The kernel test target is
