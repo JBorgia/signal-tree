@@ -426,6 +426,7 @@ store.registerCleanup(() => ws.close());
 
 | Package                | Purpose                                                             |
 | ---------------------- | ------------------------------------------------------------------- |
+| `@signal-tree/react`   | Owner-bound React observation through selector projections          |
 | `@signaltree/ng-forms` | Two-way binding between SignalTree nodes and Angular reactive forms |
 | `@signaltree/events`   | Event-oriented helpers for reacting to state changes                |
 

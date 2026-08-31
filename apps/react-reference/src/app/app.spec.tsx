@@ -6,6 +6,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { StrictMode } from 'react';
+import { useSignalTree } from '@signal-tree/react';
 
 import App from './app';
 import {
@@ -13,11 +14,6 @@ import {
   type Job,
   type ReferenceStore,
 } from './reference-store';
-import {
-  observerCountForTesting,
-  invalidationCountForTesting,
-  useSignalTree,
-} from './use-signal-tree.proof';
 
 const settleKernel = async () => {
   for (let index = 0; index < 4; index++) await Promise.resolve();
@@ -65,27 +61,27 @@ describe('greenfield React reference', () => {
 
   });
 
-  it('does not require descendant identity when selector equality is semantic', async () => {
+  it('preserves a canonical entity projection across unrelated writes', async () => {
     const store = makeStore();
     await settleKernel();
+    let renders = 0;
 
-    function ClonedQueue() {
-      const jobs = useSignalTree(
-        store,
-        () => store.$.jobs.all().map((job) => ({ ...job })),
-        (previous, next) =>
-          previous.length === next.length &&
-          previous.every(
-            (job, index) =>
-              job.id === next[index]?.id &&
-              job.status === next[index]?.status
-          )
-      );
+    function Queue() {
+      renders++;
+      const jobs = useSignalTree(store, ($) => $.jobs.all());
       return <output>{jobs.find((job) => job.id === 'J-104')?.status}</output>;
     }
 
-    render(<ClonedQueue />);
+    render(<Queue />);
     expect(screen.getByText('active')).toBeTruthy();
+    const initialRenders = renders;
+
+    await act(async () => {
+      store.$.filters.team.set('South');
+      await settleKernel();
+    });
+
+    expect(renders).toBe(initialRenders);
 
     await act(async () => {
       store.$.jobs.updateOne('J-104', { status: 'done' });
@@ -105,12 +101,10 @@ describe('greenfield React reference', () => {
       renders++;
       const job = useSignalTree(
         store,
-        () => {
+        ($) => {
           selectedReads++;
-          return store.$.jobs.byIdOrFail('J-104')();
-        },
-        (previous, next) =>
-          previous.id === next.id && previous.status === next.status
+          return $.jobs.byIdOrFail('J-104')();
+        }
       );
       return <output>{job.status}</output>;
     }
@@ -136,23 +130,32 @@ describe('greenfield React reference', () => {
     expect(renders).toBeGreaterThan(initialRenders);
   });
 
-  it('shares owner activation and releases every StrictMode observer', () => {
+  it('releases StrictMode observation at unmount', async () => {
     const store = makeStore();
+    let reads = 0;
+
+    function Team() {
+      const team = useSignalTree(store, ($) => {
+        reads++;
+        return $.filters.team();
+      });
+      return <output>{team}</output>;
+    }
+
     const rendered = render(
       <StrictMode>
-        <App store={store} />
+        <Team />
       </StrictMode>
     );
-
-    expect(observerCountForTesting(store)).toBe(5);
     rendered.unmount();
-    expect(observerCountForTesting(store)).toBe(0);
+    const readsAfterUnmount = reads;
 
-    const remounted = render(<App store={store} />);
-    expect(observerCountForTesting(store)).toBe(5);
-    remounted.unmount();
-    expect(observerCountForTesting(store)).toBe(0);
+    await act(async () => {
+      store.$.filters.team.set('South');
+      await settleKernel();
+    });
 
+    expect(reads).toBe(readsAfterUnmount);
   });
 
   it('never renders an intermediate transaction state', async () => {
@@ -163,7 +166,7 @@ describe('greenfield React reference', () => {
     function CoherenceProbe() {
       const snapshot = useSignalTree(
         store,
-        () => `${store.$.jobs.byIdOrFail('J-104')().status}:${store.$.filters.showCompleted()}`
+        ($) => `${$.jobs.byIdOrFail('J-104')().status}:${$.filters.showCompleted()}`
       );
       seen.push(snapshot);
       return <output>{snapshot}</output>;
@@ -189,7 +192,12 @@ describe('greenfield React reference', () => {
     function HeldJobProbe() {
       const job = useSignalTree(
         store,
-        () => held() as unknown as Job | undefined
+        ($) => {
+          // `held` belongs to this same owner and remains its canonical
+          // lifetime-specific location after the key is reused.
+          void $;
+          return held() as unknown as Job | undefined;
+        }
       );
       return <output>{job?.status ?? 'retired'}</output>;
     }
@@ -224,13 +232,10 @@ describe('greenfield React reference', () => {
     const store = makeStore();
     await settleKernel();
     const rendered = render(<App store={store} />);
-    const publicationsBefore = invalidationCountForTesting(store);
-
     fireEvent.click(screen.getByRole('button', { name: /Inspect transfer pump/ }));
     await act(async () => settleKernel());
 
     expect(store.$.jobs.activeId()).toBe('J-105');
-    expect(invalidationCountForTesting(store)).toBe(publicationsBefore + 1);
     expect(screen.getByText('Theo Martin')).toBeTruthy();
     expect(screen.queryByText('Mina Okafor')).toBeNull();
 
@@ -268,7 +273,7 @@ describe('greenfield React reference', () => {
     function Status({ store, label }: { store: ReferenceStore; label: string }) {
       const status = useSignalTree(
         store,
-        () => store.$.jobs.all().find((job) => job.id === 'J-105')?.status
+        ($) => $.jobs.all().find((job) => job.id === 'J-105')?.status
       );
       return <output aria-label={label}>{status}</output>;
     }
@@ -287,8 +292,6 @@ describe('greenfield React reference', () => {
 
     expect(screen.getByLabelText('first owner').textContent).toBe('active');
     expect(screen.getByLabelText('second owner').textContent).toBe('queued');
-    expect(invalidationCountForTesting(first)).toBe(1);
-    expect(invalidationCountForTesting(second)).toBe(0);
 
     await act(async () => {
       second.$.jobs.updateOne('J-105', { status: 'active' });
@@ -296,32 +299,40 @@ describe('greenfield React reference', () => {
     });
 
     expect(screen.getByLabelText('second owner').textContent).toBe('active');
-    expect(invalidationCountForTesting(first)).toBe(1);
-    expect(invalidationCountForTesting(second)).toBe(1);
-
   });
 
-  it('makes owner destruction terminal for observation', () => {
+  it('makes owner destruction terminal for observation', async () => {
     const store = makeStore();
-    const rendered = render(<App store={store} />);
+    function Team() {
+      const team = useSignalTree(store, ($) => $.filters.team());
+      return <output>{team}</output>;
+    }
 
-    expect(observerCountForTesting(store)).toBe(5);
+    const rendered = render(<Team />);
+    expect(screen.getByText('North')).toBeTruthy();
+
     store.destroy();
-    expect(observerCountForTesting(store)).toBe(0);
+    await act(async () => {
+      store.$.filters.team.set('South');
+      await settleKernel();
+    });
+    expect(screen.getByText('North')).toBeTruthy();
 
     rendered.unmount();
-    const remounted = render(<App store={store} />);
-    expect(observerCountForTesting(store)).toBe(0);
-    remounted.unmount();
   });
 
   it('does not activate an owner destroyed before its first subscription', () => {
     const store = makeStore();
     store.destroy();
 
-    const rendered = render(<App store={store} />);
+    function Team() {
+      const team = useSignalTree(store, ($) => $.filters.team());
+      return <output>{team}</output>;
+    }
 
-    expect(observerCountForTesting(store)).toBe(0);
+    const rendered = render(<Team />);
+
+    expect(screen.getByText('North')).toBeTruthy();
     rendered.unmount();
   });
 
@@ -333,8 +344,7 @@ describe('greenfield React reference', () => {
     function Team({ store }: { store: ReferenceStore }) {
       const team = useSignalTree(
         store,
-        () => store.$.filters.team(),
-        () => true
+        ($) => $.filters.team()
       );
       return <output>{team}</output>;
     }

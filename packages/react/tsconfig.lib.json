@@ -1,0 +1,34 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "outDir": "../../dist/packages/react/dist",
+    "declarationDir": "../../dist/packages/react/dist",
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": false,
+    "module": "ESNext",
+    "types": [
+      "node",
+      "react"
+    ],
+    "paths": {
+      "@signal-tree/kernel": [
+        "packages/kernel/src/index.ts"
+      ],
+      "@signal-tree/kernel/adapter": [
+        "packages/kernel/src/adapter.ts"
+      ]
+    }
+  },
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
+    "src/**/*.typing.spec.ts",
+    "vitest.config.ts"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
+}

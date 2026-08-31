@@ -2,16 +2,16 @@ import {
   createDerivedReferenceStore,
   createReferenceStore,
 } from './reference-store';
-import { readSignalTreeSnapshot } from './use-signal-tree.proof';
+import { readCanonicalSnapshot } from '@signal-tree/kernel/adapter';
 
 describe('greenfield reference state', () => {
   it('keeps the root snapshot stable while committed truth is unchanged', () => {
     const store = createReferenceStore();
     try {
-      const first = readSignalTreeSnapshot(store);
-      expect(readSignalTreeSnapshot(store)).toBe(first);
+      const first = readCanonicalSnapshot(store);
+      expect(readCanonicalSnapshot(store)).toBe(first);
       store.$.filters.team.set('South');
-      expect(readSignalTreeSnapshot(store)).not.toBe(first);
+      expect(readCanonicalSnapshot(store)).not.toBe(first);
     } finally {
       store.destroy();
     }

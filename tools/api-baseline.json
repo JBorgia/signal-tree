@@ -1093,5 +1093,21 @@
         "internalDecl": true
       }
     ]
+  },
+  "react": {
+    "entrypoints": [
+      "."
+    ],
+    "symbols": [
+      {
+        "name": "useSignalTree",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/react/src/use-signal-tree.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      }
+    ]
   }
 }

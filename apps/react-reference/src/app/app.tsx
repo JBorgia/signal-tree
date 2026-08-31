@@ -1,19 +1,12 @@
 import type { ReferenceStore } from './reference-store';
-import { useSignalTree } from './use-signal-tree.proof';
-
-const sameJobs = (
-  previous: ReturnType<ReferenceStore['$']['jobs']['all']>,
-  next: ReturnType<ReferenceStore['$']['jobs']['all']>
-) =>
-  previous.length === next.length &&
-  previous.every((job, index) => job === next[index]);
+import { useSignalTree } from '@signal-tree/react';
 
 function Summary({ store }: { store: ReferenceStore }) {
   const activeCount = useSignalTree(
     store,
-    () => store.$.jobs.all().filter((job) => job.status === 'active').length
+    ($) => $.jobs.all().filter((job) => job.status === 'active').length
   );
-  const team = useSignalTree(store, () => store.$.filters.team());
+  const team = useSignalTree(store, ($) => $.filters.team());
 
   return (
     <header className="summary">
@@ -33,8 +26,8 @@ function Summary({ store }: { store: ReferenceStore }) {
 }
 
 function WorkQueue({ store }: { store: ReferenceStore }) {
-  const jobs = useSignalTree(store, () => store.$.jobs.all(), sameJobs);
-  const selectedId = useSignalTree(store, () => store.$.jobs.activeId());
+  const jobs = useSignalTree(store, ($) => $.jobs.all());
+  const selectedId = useSignalTree(store, ($) => $.jobs.activeId());
 
   return (
     <section className="queue" aria-labelledby="queue-title">
@@ -85,7 +78,7 @@ function WorkQueue({ store }: { store: ReferenceStore }) {
 }
 
 function ActiveJob({ store }: { store: ReferenceStore }) {
-  const active = useSignalTree(store, () => store.$.jobs.activeEntity());
+  const active = useSignalTree(store, ($) => $.jobs.activeEntity());
 
   return (
     <aside className="active-job" aria-live="polite">

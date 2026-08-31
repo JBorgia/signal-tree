@@ -144,7 +144,7 @@ release_provenance_ok() {
 # Deliberately excludes the private `packages/shared` (bundled, never published)
 # and any other package.json — the old
 # `packages/[^/]+/package.json` wildcard tolerated dirt in non-released manifests.
-RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(kernel|angular)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
+RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(kernel|angular|react)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
 
 if [ -z "$(git status --porcelain)" ]; then
     print_success "Working directory is clean"
@@ -184,7 +184,7 @@ print_header "3. Type Checking"
 print_step "Running TypeScript compiler checks"
 # Type checking happens during build, so we'll verify TypeScript configs exist
 TYPECHECK_PASSED=true
-for package in kernel angular; do
+for package in kernel angular react; do
     TSCONFIG="./packages/$package/tsconfig.json"
     if [ ! -f "$TSCONFIG" ]; then
         print_error "Missing tsconfig.json for $package"
@@ -266,7 +266,7 @@ else
     exit 1
 fi
 
-REMAINING_BUILD_PACKAGES="angular"
+REMAINING_BUILD_PACKAGES="angular,react"
 if NX_DAEMON=false npx nx run-many -t build --projects=$REMAINING_BUILD_PACKAGES --configuration=production 2>&1 | tee /tmp/build.log; then
     print_success "All public packages built successfully"
 else
@@ -396,6 +396,19 @@ else
     cat /tmp/angular-consumer.log
     exit 1
 fi
+
+# 9g. React Packed-Consumer Gate (BLOCKING)
+# Typechecks the selector-first API, bundles a clean consumer, and executes one
+# owner-invalidation update through React's external-store lifecycle.
+print_header "9g. React Packed-Consumer Gate"
+if node tools/verify-react-consumer.mjs 2>&1 | tee /tmp/react-consumer.log; then
+    print_success "Packed React consumer typecheck + runtime passed"
+else
+    print_error "Packed React consumer failed"
+    cat /tmp/react-consumer.log
+    exit 1
+fi
+
 print_step "Packing + resolving every published package as a real consumer"
 if node tools/verify-tarball-consumer.mjs 2>&1 | tee /tmp/tarball-consumer.log; then
     print_success "Published tarballs install + resolve"

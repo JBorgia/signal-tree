@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.lib.json",
+  "compilerOptions": {
+    "declarationMap": false,
+    "declaration": true,
+    "stripInternal": true,
+    "sourceMap": false,
+    "outDir": "../../dist/packages/react/dist",
+    "declarationDir": "../../dist/packages/react/dist"
+  }
+}

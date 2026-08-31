@@ -101,7 +101,7 @@ const GATES = [
   },
   {
     name: 'test:all',
-    covers: 'behaviour across all 6 published packages AND the demo app',
+    covers: 'behaviour across all published packages AND the demo app',
     // Was `nx test kernel`. The gate's own name said "core" and its summary line
     // said "core behaviour", so it was honest about what it covered — and what
     // it covered was one package of eight. The other seven have real suites
@@ -116,7 +116,7 @@ const GATES = [
       // `nx test demo` by hand. It is also the app the demo-coverage gate holds
       // up as proof every export is demonstrated — so it breaking silently would
       // undermine that gate too.
-      '--projects=kernel,shared,demo',
+      '--projects=kernel,angular,react,shared,demo,react-reference',
       '--skip-nx-cache',
     ],
     slow: true,
