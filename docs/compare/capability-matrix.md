@@ -129,14 +129,14 @@ That is a page-state handler, not a capability.
 The same objection applies, to varying degrees, to these rows — flagged rather
 than removed, because the audit has not been done:
 
-| Row                       | Composable in any of them?                                              |
-| ------------------------- | ----------------------------------------------------------------------- |
-| Bounded / FIFO collection | Yes — a size check on add                                               |
-| Union / merge collections | Yes — a `computed` over two collections                                 |
-| First / last              | Yes — `all()[0]` / `all().at(-1)`                                       |
-| Predicate **count**       | Yes — `where(p)().length`                                               |
-| Per-entity UI state       | Yes — a sibling collection keyed by the same id                         |
-| Reorder / move            | Yes — an `order` field plus `sortComparer` (see below)                  |
+| Row                       | Composable in any of them?                                                |
+| ------------------------- | ------------------------------------------------------------------------- |
+| Bounded / FIFO collection | Yes — a size check on add                                                 |
+| Union / merge collections | Yes — a `computed` over two collections                                   |
+| First / last              | Yes — `all()[0]` / `all().at(-1)`                                         |
+| Predicate **count**       | Yes — `where(p)().length`                                                 |
+| Per-entity UI state       | Yes — a sibling collection keyed by the same id                           |
+| Reorder / move            | Yes — an `order` field plus `sortComparer` (see below)                    |
 | Dirty checking            | Yes, cheaply here — stable root snapshots make `prev !== next` meaningful |
 
 And these rows are NOT composable — they follow from the design and cannot be
@@ -165,12 +165,12 @@ Now audited against the installed declarations of `@ngrx/signals` 21.1.1, elf
 2.5.1 / elf-state-history 1.4.0 and `@ngxs/store` 20.1.0: **none of them ships any
 of these.**
 
-| SignalTree capability                                        | Others | What it is                                                                                                                                        |
-| ------------------------------------------------------------ | :----: | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Changed-path reporting** — `tree.updateAndReport(partial)` |   ❌   | Returns the dot-paths of leaves that ACTUALLY changed; a deep-equal re-fetch reports `[]`                                                         |
-| **Type-only read-only view** — `asReadonly(tree)`            |   ❌   | Same object, narrower type. Zero runtime cost                                                                                                     |
-| **Stable root snapshot as a change oracle**                  |   ❌   | `tree()` returns the identical root while committed truth is unchanged, so `prev !== next` is a meaningful check; descendant identity is not promised |
-| **Diagnostics scoped by retention, not count** — ST2029      |   ❌   | Warns on `entries x width`, so a wide-short and a narrow-long history are judged the same                                                         |
+| SignalTree capability                                        | Others | What it is                                                                                                                                                           |
+| ------------------------------------------------------------ | :----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Changed-path reporting** — `tree.updateAndReport(partial)` |   ❌   | Returns the dot-paths of leaves that ACTUALLY changed; a deep-equal re-fetch reports `[]`                                                                            |
+| **Type-only read-only view** — `asReadonly(tree)`            |   ❌   | Same object, narrower type. Zero runtime cost                                                                                                                        |
+| **Stable root snapshot as a change oracle**                  |   ❌   | The canonical whole-tree reader returns the identical root while committed truth is unchanged, so `prev !== next` is meaningful; descendant identity is not promised |
+| **Diagnostics scoped by retention, not count** — ST2029      |   ❌   | Warns on `entries x width`, so a wide-short and a narrow-long history are judged the same                                                                            |
 
 **How these were graded.** Each was probed against every competitor's `.d.ts`:
 `equal|comparator|equalityFn`, `changedPaths|affectedPaths`,

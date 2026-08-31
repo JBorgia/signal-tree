@@ -1012,6 +1012,15 @@
         "internalDecl": true
       },
       {
+        "name": "readCanonicalSnapshot",
+        "subpath": "./adapter",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/adapter.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "ReadonlyStoreOf",
         "subpath": "./adapter",
         "kind": "type-only",

@@ -18,7 +18,9 @@ First public candidate for the v15 package and API reset.
 - **Owner invalidation is available to framework adapters.**
   `observeOwnerInvalidation(owner, callback)` requests a reread of canonical
   truth after coherent public changes without exporting values, paths,
-  framework concepts, or event-cardinality promises.
+  framework concepts, or event-cardinality promises. Adapters pair it with
+  `readCanonicalSnapshot(owner)` rather than relying on callable controller or
+  root-facade syntax.
 
 - **BREAKING: `timeTravel({ shouldSkip })` removed.** The comparator and the
   `skipsBackward()`/`skipsForward()` traversal it drove are gone; `undo()` and

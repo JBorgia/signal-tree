@@ -45,12 +45,21 @@ typecheck, lint, builds, package coexistence, independent review, and the
 release ladder pass at 66/66 with zero known-red.
 
 `SNAPSHOT-IDENTITY-CONTRACT-0` is **SIC-B / CLOSED GREEN** at `d8ad11da`. As an explicit
-product-surface decision, `tree()` returns the same root while committed natural
-truth is unchanged. Correctness does not depend on snapshot identity, identity
-is never causal authority, and arbitrary unchanged descendants carry no public
-`===` promise after a change. KSA's current incremental subtree reuse remains
-an internal measured optimization. `@signal-tree/react` is now unblocked for
-greenfield derivation.
+product-surface decision, the canonical whole-tree NaturalValue reader returns
+the same root while committed truth is unchanged. SIC assigns no public callable
+syntax to canonical materialization. Correctness does not depend on snapshot
+identity, identity is never causal authority, and arbitrary unchanged descendants
+carry no public `===` promise after a change. KSA's current incremental subtree
+reuse remains an internal measured optimization.
+
+`GREENFIELD-ROOT-ACCESSOR-SHAPE-0` is **CONTRACT FROZEN / IMPLEMENTATION
+PENDING**. The tree is a non-callable controller and `tree.$` is its non-callable
+root state facade; neither is the public whole-tree materialization function.
+Descendant locations retain their callable grammar. Framework adapters pair
+`observeOwnerInvalidation(owner, callback)` with
+`readCanonicalSnapshot(owner)`; neither operation revives an obsolete callable
+root shape. `@signal-tree/react` remains blocked until incumbent controller
+callability is retired.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public

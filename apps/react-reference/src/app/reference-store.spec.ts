@@ -2,15 +2,16 @@ import {
   createDerivedReferenceStore,
   createReferenceStore,
 } from './reference-store';
+import { readSignalTreeSnapshot } from './use-signal-tree.proof';
 
 describe('greenfield reference state', () => {
   it('keeps the root snapshot stable while committed truth is unchanged', () => {
     const store = createReferenceStore();
     try {
-      const first = store();
-      expect(store()).toBe(first);
+      const first = readSignalTreeSnapshot(store);
+      expect(readSignalTreeSnapshot(store)).toBe(first);
       store.$.filters.team.set('South');
-      expect(store()).not.toBe(first);
+      expect(readSignalTreeSnapshot(store)).not.toBe(first);
     } finally {
       store.destroy();
     }
