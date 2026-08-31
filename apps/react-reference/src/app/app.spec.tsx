@@ -95,6 +95,47 @@ describe('greenfield React reference', () => {
     await waitFor(() => expect(screen.getByText('done')).toBeTruthy());
   });
 
+  it('uses owner invalidation only to wake a selected-location reread', async () => {
+    const store = makeStore();
+    await settleKernel();
+    let renders = 0;
+    let selectedReads = 0;
+
+    function SelectedJob() {
+      renders++;
+      const job = useSignalTree(
+        store,
+        () => {
+          selectedReads++;
+          return store.$.jobs.byIdOrFail('J-104')();
+        },
+        (previous, next) =>
+          previous.id === next.id && previous.status === next.status
+      );
+      return <output>{job.status}</output>;
+    }
+
+    render(<SelectedJob />);
+    const initialRenders = renders;
+    const initialReads = selectedReads;
+
+    await act(async () => {
+      store.$.jobs.updateOne('J-105', { status: 'done' });
+      await settleKernel();
+    });
+
+    expect(selectedReads).toBeGreaterThan(initialReads);
+    expect(renders).toBe(initialRenders);
+
+    await act(async () => {
+      store.$.jobs.updateOne('J-104', { status: 'done' });
+      await settleKernel();
+    });
+
+    await waitFor(() => expect(screen.getByText('done')).toBeTruthy());
+    expect(renders).toBeGreaterThan(initialRenders);
+  });
+
   it('shares owner activation and releases every StrictMode observer', () => {
     const store = makeStore();
     const rendered = render(
