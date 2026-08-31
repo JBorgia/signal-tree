@@ -44,7 +44,7 @@ exposing partial state through synchronous realizations. Kernel, Angular,
 typecheck, lint, builds, package coexistence, independent review, and the
 release ladder pass at 66/66 with zero known-red.
 
-`SNAPSHOT-IDENTITY-CONTRACT-0` is **SIC-B / CLOSED GREEN**. As an explicit
+`SNAPSHOT-IDENTITY-CONTRACT-0` is **SIC-B / CLOSED GREEN** at `d8ad11da`. As an explicit
 product-surface decision, `tree()` returns the same root while committed natural
 truth is unchanged. Correctness does not depend on snapshot identity, identity
 is never causal authority, and arbitrary unchanged descendants carry no public
