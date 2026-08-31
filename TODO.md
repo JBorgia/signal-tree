@@ -9,6 +9,16 @@ Work that is decided and not yet done. **This is not an RFC list.**
   This is documentation/source hygiene only; do not reopen the one-way public
   construction surface while cleaning it.
 
+## CONSTRUCTION-DENSITY-0
+
+Investigate scalar-tree construction density without attributing it to the root
+accessor migration. Current generator evidence measures approximately
+1,233-1,240 retained bytes per scalar leaf and about 150 ms to construct 100k
+leaves; raw Angular signals in the same decomposition retain about 523 bytes
+each. Determine where the additional roughly 700 B/leaf belongs before proposing
+an optimization. This is non-blocking for root retirement and React selector
+work; preserve behavior, public types, and construction-bound ownership.
+
 We do not write RFCs for our own work — we make the change. An RFC is what an
 outside contributor writes to propose something, and `docs/rfcs/` is the archive
 of decisions already taken, kept for the options that were REJECTED and why. If

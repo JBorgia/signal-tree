@@ -160,6 +160,38 @@ define or freeze a React hook. Selector-result caching is observational
 memoization, not a writable state authority, but changing-selector and
 abandoned-render controls remain required before a hook contract can freeze.
 
+### SELECTOR-SNAPSHOT-COST-0 — OPENED / PRE-FREEZE CONSTRAINT
+
+The post-root-retirement performance audit supplies a direct React design
+falsifier:
+
+```text
+whole-root cached read, 10k entities              ~0.5 us
+whole-root cold read after entity mutation, 10k   ~245 us
+whole-root cold read after entity mutation, 50k   ~2.2 ms
+entity update + selected byId() reread             ~1.2-1.6 us
+```
+
+Reproduce with `node --expose-gc
+scripts/benchmarks/data-model-profile.mjs entitymap` against the `1495f713`
+root-retirement build. That generator measures both paths in the same fixture
+family; these are shape constraints, not portable hardware budgets.
+
+**PRODUCT/ADAPTER AUTHORITY:** React selectors must not require whole-root
+NaturalValue materialization after every owner invalidation. Owner invalidation
+is the wake-up fact; a selector's `getSnapshot` rereads its selected location or
+value directly. A consumer that actually selects the whole root may materialize
+the whole root. This constrains the future hook substrate but freezes no hook
+name, overload, equality API, cache policy, or package surface.
+
+The reference carrier in `apps/react-reference` now proves the boundary. An
+unrelated entity mutation wakes and reruns a direct `byId` selector, semantic
+equality prevents a rerender, and mutation of the selected entity rerenders.
+The hook does not route selector evaluation through `readCanonicalSnapshot`;
+that operation remains the explicit whole-root helper. Carrier checkpoint:
+`eea160b9`; validation: React 16/16, production build, both TypeScript passes,
+and release ladder 66/66 with zero known-red.
+
 The alternatives were tested separately:
 
 - generic Observable-to-`useState` hooks create a lagging second read authority;
@@ -190,30 +222,12 @@ and hook names remain unopened.
 ### REACT-GREENFIELD-0 remains open
 
 Observation is not the whole realization. Passing characterizations in the
-reference app pin two separate neutral-runtime facts:
-
-1. repeated `tree()` reads allocate new snapshots without an installed
-   realization, so the whole owner cannot directly be React's cached snapshot;
-2. before CBR, a callable returned from `config.derived` was dropped with
-   ST2007 because derived admission recognized only a globally installed
-   framework runtime. Construction-bound recipe realization closes this gap.
-
-The first can plausibly remain adapter-owned selector memoization and does not
-yet justify a kernel change. The second blocks the required greenfield
-`config.derived` workflow.
-
-The strongest current derived candidate treats callable terminals in the
-explicit derived factory as computation recipes, then realizes each recipe
-through a construction-bound realization bundle. The neutral factory would
-produce current-on-read cells; framework-bound factories could produce truthful
-native carriers. This avoids function-as-state ambiguity because initial state,
-not `config.derived`, owns persistent functions.
-
-That candidate also implies replacing process-global realization selection with
-construction-bound ownership across cells, derived values, marker snapshots,
-scalar leaves, and tracking suppression. It is a larger architecture decision,
-not a React convenience and not authorized here. `@signal-tree/react` remains
-unfrozen until this row is adversarially closed.
+reference app now pin construction-bound derived realization, coherent owner
+invalidation, stable whole-root snapshots, and selected-location rereads. The
+remaining open work is the React package contract: changing selectors,
+abandoned renders, SSR/React Native requirements when earned, equality/cache
+policy, lifecycle ergonomics, and public naming. `@signal-tree/react` remains
+unfrozen until those package questions are adversarially closed.
 
 ## CONSTRUCTION-BOUND-REALIZATION-0
 
