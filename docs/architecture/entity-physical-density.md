@@ -449,3 +449,61 @@ measured, not endorsed.
 owned and reconstructible when unowned, with E4's four forced-GC laws plus held
 cell/subscriber ownership, owner release, reacquisition truth, same-subject undo,
 fresh-key isolation, and repeated acquire/release boundedness as killer controls.
+
+## E5 / R0 Production Closure
+
+Production checkpoint: `ea521d7e`.
+
+The red E5 and R0 measurements above remain the historical defect evidence. The
+production correction applies **ownership before retention**:
+
+- ordinary settled turns discard transient capture and retain no restoration
+  descriptors, effects, claims, or history;
+- a turn-wide designation stages every write's reversal facts and commits them
+  only after the composed turn is non-empty and accepted;
+- descriptors are retained before claims only for an accepted positive-capacity
+  turn, then released when no restoration or transaction authority owns their
+  subjects;
+- pending transactions hold fallback facts until confirmation and discard them
+  on rollback, reset, destroy, net-zero composition, or thrown callback;
+- canonical snapshot priming remains a fixed tree-level operation for positive
+  capacities, not a retained INIT entry;
+- reset and destroy retain no RESET or INIT checkpoint.
+
+The live E5 matrix after the correction is:
+
+| Capability state                                | Marginal bytes/live subject |    100k retained heap | History / claims / subject descriptors |
+| ----------------------------------------------- | --------------------------: | --------------------: | -------------------------------------- |
+| raw                                             |                     403.2 B |              38.92 MB | 0 / 0 / 0                              |
+| causal-runtime only                             |                     403.2 B |              38.94 MB | 0 / 0 / 0                              |
+| restoration configured, zero designated writes  |                     403.2 B |              39.10 MB | 0 / 0 / 0                              |
+| restoration plus 1,000 undesignated writes      |                     394.1 B |              38.33 MB | 0 / 0 / 0                              |
+| `maxHistorySize: 0` after 100 designated writes |         approximately 394 B | approximately 38.3 MB | 0 / 0 / 0                              |
+| capacity 2                                      |                     409.9 B |              40.02 MB | 2 / 2 / 2                              |
+| capacity 20                                     |                     554.3 B |              53.81 MB | 20 / 20 / 20                           |
+| configured capacity 101, 100 turns authored    |                   1,194.1 B |             114.91 MB | 100 / 100 / 100                        |
+
+Configured-unused restoration falls from 840.2 to 403.2 B/live subject and
+80.88 to 39.10 MB at 100k, recovering approximately 41.8 MB. Its incremental
+subject slope is 0.0 B. R0 independently reports 0.0 B/subject production idle
+delta and 0.0 B/subject extracted idle artifacts.
+
+`maxHistorySize` now means completed designated turns retained:
+
+```text
+undefined   default capacity 50
+0           retain no completed entries, claims, or reversal payloads
+1           retain one completed turn and support one undo/redo
+N           retain at most N completed turns
+```
+
+Zero capacity may capture transient facts while a turn executes, but it bypasses
+snapshot/history construction at settlement and retains none. Positive
+capacities retain only participating subjects and exact bounded cardinalities.
+
+Kernel validation after the change: 246 files, 1,992 passed, 3 expected
+failures, 13 skipped, 1 todo; typecheck, kernel lint/build, E5 and R0 memory
+gates, and independent adversarial review are green. This closes
+`RESTORATION-IDLE-DENSITY-0` and `ZERO-HISTORY-RETENTION-0` without reopening
+designation, SubjectId, structural restoration, transaction atomicity, durable
+settlement, or public root semantics.

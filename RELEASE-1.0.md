@@ -307,6 +307,34 @@ forced-GC durability, same-subject undo, fresh-key isolation, shared-consumer,
 reacquisition, and repeated-cycle laws remain mandatory. Naive WeakRefs remain
 rejected.
 
+`RESTORATION-IDLE-DENSITY-0` and `ZERO-HISTORY-RETENTION-0` are **CLOSED
+GREEN** at `ea521d7e`. E5's red baseline remains frozen evidence: configured
+unused restoration was 840.2 B/live subject and 80.88 MB at 100k, with 100,000
+eager descriptors/effects. Ownership-before-retention now stages turn facts
+transiently and commits descriptors only for a non-empty, accepted, positive-
+capacity designated turn. Net-zero/deduped turns, ordinary turns, rollback,
+reset, destroy, and thrown transactions retain none; confirmed transaction
+fallback facts survive only while restoration or transaction claims own them.
+Positive-capacity construction primes snapshot invalidation without retaining an
+INIT entry.
+
+Post-fix E5: raw, causal-only, and configured-unused each measure 403.2 B/live
+subject; configured-unused is 39.10 MB at 100k, recovering about 41.8 MB and
+reducing restoration's idle subject slope to 0.0 B. One thousand undesignated
+writes retain 0 entries / 0 claims / 0 descriptors. `maxHistorySize: 0` now
+retains 0 / 0 / 0 after 100 designated writes; capacity 1 supports exactly one
+undo/redo; positive N retains at most N completed designated turns. Capacities
+2/20/100 retain exact entry/claim/descriptor cardinalities 2/20/100. R0 reports
+0.0 B/subject live idle delta and 0.0 B extracted artifacts.
+
+Validation: kernel 246 files / 1,992 passed / 3 expected failures / 13 skipped /
+1 todo; both TypeScript passes; kernel lint/build; authoritative E5 and R0
+memory gates; net-zero, rollback, reset-before-confirm, destroy-before-confirm,
+throw-abort, transaction persistence, structural restoration, lazy claim
+registry, and exact cleanup controls; independent review clean. No full release
+66/66 claim is made because the previously recorded gate-10b pipeline
+prerequisite issue remains separate. `REALIZATION-OWNERSHIP-0` remains queued.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
