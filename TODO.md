@@ -19,6 +19,46 @@ each. Determine where the additional roughly 700 B/leaf belongs before proposing
 an optimization. This is non-blocking for root retirement and React selector
 work; preserve behavior, public types, and construction-bound ownership.
 
+## ENTITY-PHYSICAL-DENSITY-0
+
+Optimize representation under frozen semantics. ER-A membership, public API,
+stable SubjectId behavior, held-reference correctness, rekey/remove/reactivation,
+ordering, restoration, causal behavior, owner invalidation, and O(1) point
+operations do not reopen. **Unify allocation, not authority:** StructuralStore
+continues to own key, identity/lifetime, revision, and membership; EntityValueStore
+continues to own value even if both address fields in one physical record.
+
+1. **E0 — byte attribution.** Measure fixed and marginal retained bytes at
+  0/1k/10k/100k for key-to-subject, lifetime, revision, active-by-key,
+  active-by-subject, ordering, value storage, and fixed collection machinery.
+  Explain at least 90-95% of the current marginal physical bytes before changing
+  production representation.
+2. **E1 — record consolidation prototype.** Compare the current stores with
+  `key -> SubjectId` plus `SubjectId -> SubjectRecord`. Both active-node indexes
+  must prove an independent algorithmic job. Preserve authority boundaries;
+  no unowned mutable record bag.
+3. **E2 — active/retired compaction.** Derive minimum facts for active,
+  retired-unclaimed, retired-claimed, and held subjects under no restoration,
+  bounded restoration, rekey history, and fresh occupation of an old key.
+4. **E3 — segmented subject storage.** Compare consolidated numeric-key Map
+  storage with monotonic-ID segments/slabs. No SubjectId reuse or generational
+  identity change in this row; reclaim only whole segments proven disposable.
+5. **E4 — ENTITY-REALIZATION-RETENTION-0.** Independently attribute the
+  untouched -> realize-all -> release-all -> forced-GC residual. Canonical truth
+  stays strong; unheld facades/cells/publication resources should be reclaimable
+  where semantics permit; held facades remain durable and truthful.
+6. **E5 — featured-memory decomposition.** Measure raw, batching, transactions,
+  restoration-unused, restoration-designated at bounded history sizes,
+  observation, realization, and combinations. Separate fixed/tree,
+  live-subject, participating-subject, realized-subject, retained-turn, and
+  history-entry slopes.
+
+Every candidate runs add/update/replace/remove/reactivate/fresh-key-occupant/
+rekey/order/held-GC/released-GC/undo-redo/rollback/external-ingress/
+owner-invalidation controls. A semantic failure rejects the representation; it
+does not reopen the law. This work is independent and does not block React or
+root retirement absent a genuine package-boundary or semantic falsifier.
+
 We do not write RFCs for our own work — we make the change. An RFC is what an
 outside contributor writes to propose something, and `docs/rfcs/` is the archive
 of decisions already taken, kept for the options that were REJECTED and why. If
