@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Ordered public release set. Kernel must be packed/published before Angular.
+# Ordered public release set. Kernel must be packed/published before adapters.
 PUBLISHABLE_PACKAGES=(
     "kernel"
     "angular"
+    "react"
 )
 
 # Shared is private and bundled into public packages; it is built, never published.
@@ -11,6 +12,7 @@ BUILD_PACKAGES=(
     "shared"
     "kernel"
     "angular"
+    "react"
 )
 
 node - "${PUBLISHABLE_PACKAGES[@]}" <<'NODE'

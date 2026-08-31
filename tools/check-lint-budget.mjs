@@ -47,6 +47,7 @@ const BASELINE = join(ROOT, 'tools', 'lint-budget.json');
 
 const PROJECTS = [
   'packages/kernel',
+  'packages/react',
   'packages/shared',
   'apps/demo',
   // tools/ and scripts/ are NOT nx projects, so `nx run-many -t lint` never
