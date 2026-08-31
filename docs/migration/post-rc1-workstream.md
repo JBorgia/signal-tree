@@ -236,6 +236,47 @@ abandoned renders, SSR/React Native requirements when earned, equality/cache
 policy, lifecycle ergonomics, and public naming. `@signal-tree/react` remains
 unfrozen until those package questions are adversarially closed.
 
+### REACT-API-DERIVATION-0 — BEHAVIOR FROZEN / PRODUCT PRESENTATION OPEN
+
+Product authority chooses a public `@signal-tree/react` package. Correctness
+premises alone did not establish package ownership: applications can compose a
+correct local boundary from public kernel adapter primitives. The package is a
+product decision, recorded as such rather than misreported as derivation.
+
+Adversarial confirmation froze the maximum ownership-neutral contract:
+
+```text
+owner                     establishes invalidation/subscription scope
+stable subscription       for the same owner
+owner change              cleanup old registration; subscribe to new owner
+selected read             synchronous canonical truth
+React snapshot            Object.is-stable while selected truth is unchanged
+cleanup                    at the React ownership boundary
+whole-root read            expressible, and materialized only when requested
+state authority            remains SignalTree; no mirrored React state
+```
+
+Selected reads outside the supplied owner's invalidation domain are invalid.
+Passing the typed root accessor to a selector improves inference and makes the
+intended scope auditable, but JavaScript capture means it cannot enforce this
+rule structurally.
+
+The protocol rejected three overclaims:
+
+- package correctness does not require one shared cross-component subscription;
+- one hook versus split whole-root/selector hooks is product presentation, not
+  a semantic distinction;
+- custom equality is not required if selectors return Object.is-stable results.
+  Equality support remains a possible convenience whose canonical-result,
+  selector-change, and SSR interactions must be chosen explicitly.
+
+Still open by product authority: selector-first versus zero-argument reader;
+one selector-capable hook versus split root/selector hooks; initial custom
+equality support and spelling; changing-selector cache behavior; SSR/hydration;
+React Native requirements; cross-component subscription sharing; public names
+and package exports. No implementation begins until the materially different
+public presentations are chosen.
+
 ## CONSTRUCTION-BOUND-REALIZATION-0
 
 Property:
