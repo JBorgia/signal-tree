@@ -279,26 +279,26 @@ an isolated process, uses the shared heap-quiescence protocol, requires every
 released facade WeakRef to clear while its tree remains live, and rejects a
 linear fit below $R^2 = 0.995$.
 
-| Realization state | Marginal bytes/entity | 10k retained heap |
-| --- | ---: | ---: |
-| untouched | 403.2 B | 4.53 MB |
-| `byId()` then release without reading node | 759.5 B | 8.08 MB |
-| read node then release | 1,115.9 B | 11.57 MB |
-| read fields then release | 1,115.9 B | 11.57 MB |
-| hold nodes without reading | 2,981.0 B | 29.33 MB |
-| hold and read fields | 3,337.5 B | 32.83 MB |
-| release, mutate, reacquire, release | 1,106.8 B | 11.54 MB |
+| Realization state                          | Marginal bytes/entity | 10k retained heap |
+| ------------------------------------------ | --------------------: | ----------------: |
+| untouched                                  |               403.2 B |           4.53 MB |
+| `byId()` then release without reading node |               759.5 B |           8.08 MB |
+| read node then release                     |             1,115.9 B |          11.57 MB |
+| read fields then release                   |             1,115.9 B |          11.57 MB |
+| hold nodes without reading                 |             2,981.0 B |          29.33 MB |
+| hold and read fields                       |             3,337.5 B |          32.83 MB |
+| release, mutate, reacquire, release        |             1,106.8 B |          11.54 MB |
 
 The released-realization residual has two independently triggered strong
 owners:
 
-| Exclusive retained owner | Marginal increment |
-| --- | ---: |
-| `entitySignals` entry + entity value cell | 356.3 B/realized subject |
-| `subjectStateSignals` entry + activation cell | 356.4 B/read subject |
-| released facade/field-derived graph beyond the two cells | approximately 0 B |
-| held facade, field cells, closures, descriptors, metadata | 2,221.6 B/held subject |
-| held field reads beyond their activation cell | 0.1 B/held subject |
+| Exclusive retained owner                                  |          Marginal increment |
+| --------------------------------------------------------- | --------------------------: |
+| `entitySignals` entry + entity value cell                 |    356.3 B/realized subject |
+| `subjectStateSignals` entry + activation cell             |        356.4 B/read subject |
+| released facade/field-derived graph beyond the two cells  |           approximately 0 B |
+| held facade, field cells, closures, descriptors, metadata |      2,221.6 B/held subject |
+| held field reads beyond their activation cell             |          0.1 B/held subject |
 | second acquisition cycle beyond first released field read | -9.1 B/subject, noise-level |
 
 `byId()` creates the entity cell and the facade/field graph, but does not execute
@@ -346,3 +346,106 @@ Retention 0 means completed turns are immediately discarded; it does not remove
 designation semantics. A bounded hot undo window may evict older turns. Any
 persistent cold diagnostic journal remains separate from restoration authority
 unless a future product contract explicitly makes those records restorable.
+
+## E5 Result — Direct Falsifiers Found
+
+Generator checkpoint: `bc6ab836`.
+
+```bash
+node --expose-gc tools/bench-capability-density.mjs
+```
+
+E5 measures the production public tree at 0/1k/10k/100k with three isolated
+samples per arm, a matched post-seed settlement boundary, exact history/claim
+cardinality, and post-`destroy()` collection of the tree, claim registry, and
+descriptor store. Every fit passes $R^2 >= 0.99$.
+
+| Capability state                                          | Marginal bytes/live subject | 100k retained heap | History / claims / subject descriptors |
+| --------------------------------------------------------- | --------------------------: | -----------------: | -------------------------------------- |
+| raw                                                       |                     403.2 B |           38.92 MB | 0 / 0 / 0                              |
+| causal-runtime only                                       |                     403.2 B |           38.94 MB | 0 / 0 / 0                              |
+| restoration configured, zero designated writes            |                     840.2 B |           80.88 MB | 1 / 0 / 100,000                        |
+| restoration plus 1,000 undesignated writes                |                     831.1 B |           80.12 MB | 1 / 0 / 100,000                        |
+| requested `maxHistorySize: 0` after 100 designated writes |                   1,231.0 B |          118.50 MB | 50 / 50 / 99,950                       |
+| buffer length 2                                           |                     847.1 B |           81.75 MB | 2 / 2 / 99,902                         |
+| buffer length 20                                          |                     991.4 B |           95.55 MB | 20 / 20 / 99,920                       |
+| buffer length 101                                         |                   1,631.2 B |          156.65 MB | 101 / 100 / 100,000                    |
+
+The law dispositions are:
+
+- **Unconfigured capability: PASS.** Causal-runtime alone adds 0.0 B/live
+  subject. Its overhead is fixed/tree-level.
+- **Configured but unused: FAIL.** Restoration adds 437.0 B/live subject before
+  any designated write. At 100k this is about 42 MB, with one subject descriptor
+  and one structural-effect-by-subject entry per live subject despite zero
+  claims.
+- **Undesignated activity: PASS / no accumulation found.** One thousand
+  ordinary writes add -9.1 B/live subject, retain no new entry or claim, and do
+  not increase descriptor cardinality.
+- **Zero retention: UNSUPPORTED / CONTRACT FALSIFIER.** `maxHistorySize: 0`
+  emits the exact ST2032 diagnostic and falls back to 50. After 100 designated
+  writes it retains exactly 50 entries and 50 claimed subjects. The product
+  cannot currently express zero completed-history retention.
+- **Bounded retention mechanics: PASS.** Buffer lengths 2, 20, and 101 retain
+  exactly their expected entry and claim counts, and eviction releases claims.
+
+Matched scalar controls remain approximately 848.3-848.7 B/live subject at 2,
+20, and 101 retained entries, with zero entity claims. Entity-designated turns
+add approximately 0.79-0.81 MB per additional retained entry at 100k, but this
+is a composite of the collection pointer snapshot, turn/effect metadata, and
+claim graph. It is not a general per-entry or per-claim cost. The key result is
+that entity-history retention scales with retained entries multiplied by the
+affected collection's pointer width, while total undesignated writes do not
+accumulate history.
+
+E5 is **red evidence**, not a green closure. It authorizes attribution and
+bounded production-design work, not a representation or public API change.
+
+## RESTORATION-IDLE-DENSITY-0 / R0 — Byte Attribution
+
+Generator checkpoint: `3013b735`.
+
+```bash
+node --expose-gc tools/bench-restoration-idle-density.mjs
+```
+
+R0 extracts the actual production realization-descriptor Map and INIT state,
+destroys the tree, and measures those artifacts independently. They retain
+437.2 B/subject against the 437.0 B/subject restoration-over-causal production
+delta: **100.0% accounting closure**.
+
+The extracted graph contains one descriptor owner and, per subject:
+
+- one four-field subject address descriptor in `subjectDescriptors`;
+- one cloned structural add effect indexed by both operation identity and
+  SubjectId;
+- one distinct entity in the materialized INIT collection snapshot.
+
+Standalone owner-family probes are intentionally non-additive because hidden
+classes, strings, and payload objects share allocation context. They measure
+approximately 80.0 B/subject for the INIT materialized snapshot, 116.3 B for
+the subject descriptor Map, and 304.7 B for the dual-index effect graph. Their
+501.0 B sum over-closes production and is diagnostic only; extracted production
+artifacts are the closure authority.
+
+The idle cost is therefore not unexplained causal machinery. It is eager
+restoration representation created for the initial population before any turn
+is designated. Semantic necessity is not established: production resolution
+prefers inline effect addresses, while subject descriptors are documented as
+fallback machinery.
+
+`RESTORATION-IDLE-DENSITY-0` may now test lazy acquisition and release under the
+frozen restoration and transaction laws. No descriptor/effect/INIT artifact may
+be removed until first designated entity undo, structural add/remove/rekey,
+same-subject restoration, transaction composition, atomicity, and fallback
+address resolution all remain correct.
+
+`ZERO-HISTORY-RETENTION-0` is a separate product-contract decision. R0 does not
+decide whether 0 means no retained completed entries, whether INIT survives, or
+how `canUndo`, reset, and diagnostics behave. Current fallback-to-50 behavior is
+measured, not endorsed.
+
+`REALIZATION-OWNERSHIP-0` remains queued after E5. Its property is durable while
+owned and reconstructible when unowned, with E4's four forced-GC laws plus held
+cell/subscriber ownership, owner release, reacquisition truth, same-subject undo,
+fresh-key isolation, and repeated acquire/release boundedness as killer controls.
