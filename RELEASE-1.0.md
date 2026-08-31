@@ -87,15 +87,22 @@ Validation: React reference 16/16, production reference build, both TypeScript
 passes, numeric/link checks, independent review, and the full release ladder at
 66/66 with zero known-red.
 
-`REACT-API-DERIVATION-0` is **BEHAVIOR FROZEN / PRODUCT DECISION REQUIRED**.
+`REACT-API-DERIVATION-0` is **SELECTOR INPUT FROZEN / PRODUCT PRESENTATION OPEN**.
 The derived package behavior is owner-bound subscription and cleanup,
 synchronous selected canonical reads, Object.is-stable React snapshots while
 selected truth is unchanged, explicit whole-root observation, and no mirrored
-state authority. Adversarial confirmation did not derive selector-first versus
-closure-reader syntax, one versus split hooks, custom equality support, SSR,
-cross-component subscription sharing, or public names. Product authority has
-chosen that `@signal-tree/react` exists; it must now choose the materially
-different presentation and equality surface before implementation.
+state authority. The selector input is the supplied owner's typed root accessor:
+`(rootAccessor) => selectedValue`. This preserves direct location reads and gives
+selector definitions an explicit, reusable, composable, framework-independent
+input. A NaturalValue selector is rejected because supplying its argument after a
+dirty owner invalidation forces the O(n) whole-root materialization forbidden by
+`SELECTOR-SNAPSHOT-COST-0`. A zero-argument closure can still be composed by an
+application, but does not survive as the package selector model because it binds
+the definition to ambient tree identity and weakens reuse, isolated testing, and
+future selector-level memoization. Cross-owner capture is possible under either
+function spelling and did not decide the row. Still open: hook names and count,
+equality policy, changing-selector cache behavior, SSR/RSC/hydration, React Native,
+cross-component subscription sharing, and package exports.
 
 `ROOT-READ-COST-0` is **CLOSED A / NO REGRESSION**. The production Rollup build
 was measured against a separately built `e243a569` pre-retirement artifact with
