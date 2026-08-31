@@ -698,3 +698,48 @@ restoration entry), so `undo()` / `redo()` replayed the `setAll` and correctly
 re-latched participation to the collection — the assertion observed the
 last-write latch after redoing an unrelated bulk turn, a property the latch was
 never promised to hold. The replacement test redoes the rekey turn itself.
+
+## RESTORATION-TURN-STATE-0 (pre-registered)
+
+Known defect: every retained restoration turn forces and pins
+`CanonicalTurn.state = snapshotState(tree.$)` at settlement, which for an
+EntityMap is a distinct collection-width `state.<collection>.all` array per
+retained turn (~810 KB of an ~842 KB one-turn increment at 100k; 20 retained
+turns pin 20 distinct arrays). `entry.state` is consumed by `restoreState()` in
+undo, redo, and `jumpTo`, by the net-zero/dedup `===` / `deepEqual`
+discriminator, and is a non-optional field of the public
+`RestorationHistoryEntry<T>` from the public `getRestorationHistory()`.
+
+**Frozen law:** a retained restoration turn owns only the information required to
+reverse and reapply that causal turn. Historical-state materialization is a
+distinct semantic job and must not force every retained turn to own a full-tree
+snapshot unless a direct semantic falsifier proves that coupling necessary.
+
+**Not frozen:** effect-only representation, checkpoint cadence, checkpoint plus
+replay, lazy historical materialization, public history-state redesign. Compact
+effect/delta turns lead; none is the conclusion.
+
+**Sequence.** (1) Source inventory of every read/copy/comparison/serialization/
+public-type exposure of `RestorationHistoryEntry.state` (tests and docs
+included), classified semantic requirement / public contract / diagnostic
+convenience / incumbent mechanism, resolving whether `.state` on
+`getRestorationHistory()` is (A) a frozen promise of eagerly-stored historical
+NaturalValue, (B) a promise the API can provide it, or (C) unfrozen inherited
+shape. (2) Blind semantic falsifier: independently derive the minimum
+information each frozen operation needs and try to break a turn-local
+delta/effect representation, weighting `jumpTo` (forward/backward/across
+eviction), redo branching, transactions, structural identity, address fallback,
+held references, and later authoritative realization truth. (3) Choose the
+representation from evidence.
+
+**Mandatory proof set:** ordinary reversal (scalar, nested field, whole-entity
+replacement, add, remove, rekey, reorder/prepend); identity/address (held
+subject across remove/undo, fresh same-key occupant isolation, address fallback,
+position restoration); causal composition (multi-write one subject, multi-field
+one entity, mixed scalar+entity turn, net-zero composed turn, transaction
+confirm/rollback/atomicity); temporal authority (undo, redo, redo
+truncation/branching, jumpTo backward/forward, jump across an evicted-window
+boundary, later realization truth after authored work); lifecycle (eviction,
+reset, destroy, descriptor/claim release). The later-realization-truth case is a
+killer falsifier: a naive before/after delta must not restore stale authored
+truth over later authoritative truth.

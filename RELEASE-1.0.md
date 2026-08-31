@@ -486,6 +486,63 @@ harness now asserts the repaired one-claim cardinality.
 `RESTORATION-TURN-STATE-0` is the active row; `REALIZATION-OWNERSHIP-0` stays
 queued behind it.
 
+`RESTORATION-TURN-STATE-0` is **PRE-REGISTERED / ACTIVE NEXT**. Known defect:
+every retained restoration turn forces and pins
+`CanonicalTurn.state = snapshotState(tree.$)` at settlement (`restoration.ts:618`,
+stored `:650`); for an EntityMap that is a distinct collection-width
+`state.<collection>.all` array per retained turn (A0: 20 turns pin 20 distinct
+arrays; ~810 KB of an ~842 KB one-turn increment at 100k).
+`restoreState(entry.state)` is called by undo (`:1319`), redo (`:1383`), and
+`jumpTo` (`:1449`); the net-zero/dedup discriminator compares
+`last.state === entry.state` / `deepEqual` (`:692`); and `state: T` is a
+non-optional field of the public `RestorationHistoryEntry<T>` returned by the
+public `getRestorationHistory()`.
+
+Frozen law (this row): a retained restoration turn owns only the information
+required to reverse and reapply that causal turn. Historical-state
+materialization is a distinct semantic job and must not force every retained
+turn to own a full-tree snapshot unless a direct semantic falsifier proves that
+coupling necessary. Not frozen: effect-only representation, checkpoint cadence,
+checkpoint plus replay, lazy historical materialization, and any public
+history-state redesign -- each a candidate, compact effect/delta turns leading.
+
+First action: a source inventory (not a benchmark) of every read, copy,
+comparison, serialization, and public-type exposure of
+`RestorationHistoryEntry.state`, tests and docs included, each classified as
+semantic requirement, public contract, diagnostic convenience, or incumbent
+implementation mechanism. It must resolve whether `.state` on
+`getRestorationHistory()` is (A) a frozen promise that historical NaturalValue
+is eagerly stored and always present, (B) a promise the API can provide it, or
+(C) inherited implementation shape never intentionally frozen.
+
+Second action: a blind semantic falsifier. The adversary independently
+determines whether full `CanonicalTurn.state` snapshots are semantically
+required, enumerates every production and public consumer of historical state,
+derives the minimum information each frozen operation needs, and attempts to
+construct a case where a turn-local delta/effect representation is insufficient
+-- with attention to `jumpTo` (forward, backward, across an evicted-window
+boundary), redo truncation and branching, transaction confirm/rollback/
+atomicity, structural identity, address fallback, held references, and later
+authoritative realization truth overwriting authored truth. It proposes no fix
+until it can name the semantic information each operation requires.
+
+Third action: choose the target-state representation from the combined evidence.
+
+Mandatory proof set for any candidate: ordinary reversal (scalar, nested field,
+whole-entity replacement, add, remove, rekey, reorder/prepend); identity and
+address (held subject across remove/undo, fresh same-key occupant isolation,
+address fallback, position restoration); causal composition (multiple writes to
+one subject, multiple fields of one entity, mixed scalar plus entity turn,
+net-zero composed turn, transaction confirm, transaction rollback, transaction
+atomicity); temporal authority (undo, redo, redo truncation/branching, jumpTo
+backward, jumpTo forward, jump across an evicted-window boundary, later
+external/realization truth after authored work); lifecycle (eviction, reset,
+destroy, descriptor/claim release). The later-realization-truth case is a killer
+falsifier: a naive before/after delta must not restore stale authored truth over
+later authoritative truth. No representation or public-surface change is
+authorized until the inventory and the falsifier are both in and a candidate has
+passed the mandatory proof set. `REALIZATION-OWNERSHIP-0` stays queued behind it.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
