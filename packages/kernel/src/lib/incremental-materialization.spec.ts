@@ -1,4 +1,3 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { visitTree } from './internals/visit-tree';
@@ -110,26 +109,6 @@ describe('incremental materialisation', () => {
     expect(after.a.b.c.d.e).toBe(2);
     expect(after.a).not.toBe(before.a);
     expect(before.a.b.c.d.e).toBe(1);
-  });
-
-  it('stays reactive when read inside a computed', () => {
-    const tree = signalTree(
-      { a: { x: 1 }, b: { y: 10 } },
-      { capabilities: ['causal-runtime'] }
-    );
-    let runs = 0;
-    const total = computed(() => {
-      runs++;
-      const s = tree();
-      return s.a.x + s.b.y;
-    });
-
-    expect(total()).toBe(11);
-    expect(runs).toBe(1);
-
-    tree.$.a.x.set(5);
-    expect(total()).toBe(15);
-    expect(runs).toBe(2);
   });
 
   it('freezes snapshots in dev so mutation cannot corrupt the cache', () => {

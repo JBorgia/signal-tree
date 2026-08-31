@@ -1,10 +1,8 @@
 /**
  * `@signal-tree/angular` — SignalTree realized with native Angular signals.
  *
- * INSTALLATION IS STRUCTURAL. The import below is evaluated before anything
- * runtime-bearing is re-exported, so the Angular realization is in force before
- * a consumer can allocate a tree or an entity. There is no initializer for
- * users to call and no second module to remember.
+ * REALIZATION IS CONSTRUCTION-BOUND. This package exports the same semantic
+ * factory grammar as the kernel, bound once to Angular's native mechanisms.
  *
  * That ordering is the fix for a MEASURED defect: entity APIs used without
  * first calling `signalTree()` silently received neutral kernel cells — no
@@ -12,18 +10,12 @@
  * installed Angular as a side effect of importing `signal-tree.ts`, so the
  * guarantee depended on which module a consumer happened to touch first.
  *
- *     REALIZATION IS SELECTED DURING PACKAGE INITIALIZATION, NOT MUTATED AS
- *     APPLICATION STATE.
- *
- * This is why the package must not claim `sideEffects: false`.
+ *     REALIZATION IS SELECTED AT CONSTRUCTION AND OWNED FOR THE TREE LIFETIME.
  */
-import { ensureAngularRealization } from './lib/install-realization';
 // Registers the Angular leaf carrier with the kernel's type registry (TA-B).
 import './lib/carrier';
-
-// A CALL, not a bare side-effect import: a bare import was tree-shaken out of
-// the published bundle, shipping an Angular package that installed nothing.
-ensureAngularRealization();
+import { ANGULAR_TREE_REALIZATION } from './lib/angular-realization';
+import { createSignalTreeFactory } from '@signal-tree/kernel/adapter';
 import type {
   EntityNodeOf,
   EntitySignalOf,
@@ -34,16 +26,11 @@ import type {
   SignalTreeFactoryOf,
   TreeNodeOf,
 } from '@signal-tree/kernel/adapter';
-import { signalTree as kernelSignalTree } from '@signal-tree/kernel';
 
 /**
  * The kernel's `signalTree`, DECLARED with Angular's carrier.
  *
- * Same runtime function — not a re-implementation and not a cast asserting the
- * conclusion. This package installed the Angular realization (proven by the
- * root-initialization control) and registered `AngularLeaf` in the carrier
- * registry, so `SignalTreeFactoryOf<'angular'>` is what this function actually
- * returns here.
+ * Same kernel construction authority, package-bound to Angular mechanisms.
  */
 // TypeScript cannot connect "this package installed the Angular realization"
 // to "therefore these leaves carry Angular's brands" — the kernel's declaration
@@ -55,7 +42,7 @@ import { signalTree as kernelSignalTree } from '@signal-tree/kernel';
 // independently — the root-initialization control (realization installed before
 // allocation) and runtime S1 (the leaves ARE native Angular signals).
 export const signalTree =
-  kernelSignalTree as unknown as SignalTreeFactoryOf<'angular'>;
+  createSignalTreeFactory(ANGULAR_TREE_REALIZATION) as unknown as SignalTreeFactoryOf<'angular'>;
 
 // The semantic API. Identical spelling to the kernel — the difference is which
 // carrier realizes it, which is a packaging decision, never a consumer one.

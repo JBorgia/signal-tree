@@ -81,7 +81,7 @@ import { serialization } from '@signaltree/serialization';
 // ✅ New way - single package import
 import { signalTree, batching, memoization, withDevtools, withTimeTravel, serialization, ecommercePreset, dashboardPreset } from '@signaltree/core';
 
-// Note: the `entities()` enhancer was deprecated in v6 and removed in v7 — remove any calls in your code.
+// Note: `.with(entities())` was deprecated in v6 and removed in v7 — remove any calls in your code.
 // Note: devTools auto-connects to Redux DevTools and supports time-travel dispatch.
 ```
 
@@ -91,7 +91,7 @@ The **API remains 100% compatible** - only import statements change. Your existi
 
 ```typescript
 // Your existing code works exactly the same
-const tree = signalTree(state, { enhancers: [batching(), memoization(), withDevtools()] });
+const tree = signalTree(state).with(batching(), memoization(), withDevtools());
 ```
 
 ---
@@ -108,7 +108,7 @@ import { signalTree } from '@signaltree/core';
 import { batching } from '@signaltree/batching';
 import { memoization } from '@signaltree/memoization';
 
-const tree = signalTree(state, { enhancers: [batching(), memoization()] });
+const tree = signalTree(state).with(batching(), memoization());
 ```
 
 **After:**
@@ -117,7 +117,7 @@ const tree = signalTree(state, { enhancers: [batching(), memoization()] });
 // ✅ v4.0.0+
 import { signalTree, batching, memoization } from '@signaltree/core';
 
-const tree = signalTree(state, { enhancers: [batching(), memoization()] });
+const tree = signalTree(state).with(batching(), memoization());
 ```
 
 ### Example 2: Full Stack with DevTools
@@ -133,7 +133,7 @@ import { withDevtools } from '@signaltree/devtools';
 import { withTimeTravel } from '@signaltree/time-travel';
 import { entities } from '@signaltree/entities';
 
-const tree = signalTree(state, { enhancers: [batching(), memoization(), entities(), withTimeTravel(), withDevtools()] });
+const tree = signalTree(state).with(batching(), memoization(), entities(), withTimeTravel(), withDevtools());
 ```
 
 **After:**
@@ -142,7 +142,7 @@ const tree = signalTree(state, { enhancers: [batching(), memoization(), entities
 // ✅ v4.0.0+
 import { signalTree, batching, memoization, withDevtools, withTimeTravel, entities } from '@signaltree/core';
 
-const tree = signalTree(state, { enhancers: [batching(), memoization(), entities(), withTimeTravel(), withDevtools()] });
+const tree = signalTree(state).with(batching(), memoization(), entities(), withTimeTravel(), withDevtools());
 ```
 
 ### Example 3: E-commerce Preset
@@ -154,7 +154,7 @@ const tree = signalTree(state, { enhancers: [batching(), memoization(), entities
 import { signalTree } from '@signaltree/core';
 import { ecommercePreset } from '@signaltree/presets';
 
-const tree = signalTree(state, { enhancers: [ecommercePreset()] });
+const tree = signalTree(state).with(ecommercePreset());
 ```
 
 **After:**
@@ -163,7 +163,7 @@ const tree = signalTree(state, { enhancers: [ecommercePreset()] });
 // ✅ v4.0.0+
 import { signalTree, ecommercePreset } from '@signaltree/core';
 
-const tree = signalTree(state, { enhancers: [ecommercePreset()] });
+const tree = signalTree(state).with(ecommercePreset());
 ```
 
 ### Example 4: Serialization
@@ -175,10 +175,12 @@ const tree = signalTree(state, { enhancers: [ecommercePreset()] });
 import { signalTree } from '@signaltree/core';
 import { serialization } from '@signaltree/serialization';
 
-const tree = signalTree(state, { enhancers: [serialization({
+const tree = signalTree(state).with(
+  serialization({
     autoSave: true,
     key: 'app-state',
-  })] });
+  })
+);
 ```
 
 **After:**
@@ -187,10 +189,12 @@ const tree = signalTree(state, { enhancers: [serialization({
 // ✅ v4.0.0+
 import { signalTree, serialization } from '@signaltree/core';
 
-const tree = signalTree(state, { enhancers: [serialization({
+const tree = signalTree(state).with(
+  serialization({
     autoSave: true,
     key: 'app-state',
-  })] });
+  })
+);
 ```
 
 ---
@@ -234,16 +238,7 @@ echo "sed -i '' 's/@signaltree\\/batching/@signaltree\\/core/g' your-file.ts"
 
 ## Benefits of Migration
 
-### 1. Smaller Bundle Size
-
-<!-- measured: historical v4 consolidation figures; remeasure with `node tools/size-report.mjs` before publishing updated migration numbers. -->
-
-**16.2% reduction** when using multiple enhancers:
-
-- **Before (v3.x)**: ~27.50KB (core + 3 enhancers)
-- **After (v4.0.0+)**: ~23.05KB (consolidated)
-
-### 2. Better Tree-Shaking
+### Better Tree-Shaking
 
 Consolidated exports enable more efficient bundling:
 
@@ -331,9 +326,9 @@ Module '"@signaltree/core"' has no exported member 'batching'.
 
 If you encounter issues during migration:
 
-1. **Check the changelog**: [CHANGELOG.md](../../CHANGELOG.md)
-2. **Open an issue**: [GitHub Issues](https://github.com/JBorgia/signal-tree/issues)
-3. **Review documentation**: [README.md](../../README.md)
+1. **Check the changelog**: [CHANGELOG.md](./CHANGELOG.md)
+2. **Open an issue**: [GitHub Issues](https://github.com/JBorgia/signaltree/issues)
+3. **Review documentation**: [README.md](./README.md)
 
 ---
 

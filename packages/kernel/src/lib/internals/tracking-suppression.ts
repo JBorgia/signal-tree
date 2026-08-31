@@ -26,21 +26,6 @@
  */
 export type TrackingSuppression = <T>(fn: () => T) => T;
 
-let installed: TrackingSuppression | undefined;
-
-/**
- * Install the realization's suppression. Called once by the package that owns
- * the framework binding.
- */
-export function installTrackingSuppression(next: TrackingSuppression): void {
-  installed = next;
-}
-
-// ⚠️ NO RESET SEAM. One was written here and deleted before it shipped: nothing
-// reached it, and `dead-exports` said so. An unused seam is machinery added for
-// a test that does not exist yet — add it with the test that needs it.
-
-/** Read `fn()` without registering the read as a reactive dependency. */
-export function withoutTracking<T>(fn: () => T): T {
-  return installed ? installed(fn) : fn();
-}
+export const NEUTRAL_TRACKING_SUPPRESSION: TrackingSuppression = <T>(
+  fn: () => T
+): T => fn();

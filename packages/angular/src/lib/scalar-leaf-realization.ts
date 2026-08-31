@@ -37,5 +37,9 @@ export const ANGULAR_SCALAR_LEAF_REALIZATION: ScalarLeafRealization = {
     // S1: this IS the native Angular cell handed to consumers — no wrapper.
     return linkedSignal(compute) as unknown as WritableCell<T>;
   },
+
+  runInvalidationGroup(run): void {
+    run();
+  },
 };
 

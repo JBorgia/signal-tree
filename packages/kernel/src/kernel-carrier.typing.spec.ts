@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import type { WritableSignal } from '@angular/core';
 import { signalTree, entityMap } from './index';
 import type { ReadableCell, WritableCell } from './lib/internals/cell-runtime';
 
@@ -20,12 +19,5 @@ describe('kernel declares neutral carriers', () => {
     const empty: ReadableCell<boolean> = rows.empty;
     const field: WritableCell<string> = rows.byIdOrFail(1).name;
     expect([empty, field].length).toBe(2);
-  });
-
-  it('the kernel makes NO Angular promise', () => {
-    const tree = signalTree({ count: 0 });
-    // @ts-expect-error a neutral cell is not an Angular WritableSignal
-    const angular: WritableSignal<number> = tree.$.count;
-    expect(angular).toBe(angular);
   });
 });

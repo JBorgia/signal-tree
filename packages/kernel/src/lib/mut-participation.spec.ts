@@ -1,7 +1,8 @@
-import { computed } from '@angular/core';
 import { undoable } from '../lib/undoable';
 
-import { entityMap, signalTree, restoration } from '../index';
+import { createReactiveTestRealization } from '../reactive-test-realization';
+import { entityMap, restoration, signalTree } from '../index';
+import { bindSignalTreeRealization } from './signal-tree';
 import { getWriteParticipation } from './write-participation';
 import { withWriteContext } from './write-context';
 import {
@@ -9,6 +10,10 @@ import {
   PathNotifier,
   resetPathNotifier,
 } from './path-notifier';
+
+const testRealization = createReactiveTestRealization();
+const reactiveSignalTree = bindSignalTreeRealization(testRealization);
+const computed = testRealization.derived.createDerived;
 
 /**
  * MUT-1 — EVIDENCE. What distinguishes a physical change that merely REALIZES
@@ -182,7 +187,7 @@ describe('MUT-1 — landed vs semantic vs causally authored', () => {
   // specimen; the ordinary-leaf, branch-call-form and deep-equal rows remain.
 
   it('PUBLICATION is independent — every landed change is pull-visible', async () => {
-    const tree = signalTree(
+    const tree = reactiveSignalTree(
       { a: { n: 1 } },
       { capabilities: ['causal-runtime'] }
     );

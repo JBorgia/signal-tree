@@ -1,11 +1,13 @@
-import { effect } from '@angular/core';
 import { undoable } from '../../../lib/undoable';
-import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import {
+  createReactiveTestRealization,
+  observeReactiveTestValue,
+} from '../../../reactive-test-realization';
 import { entityMap } from '../../markers/entity-map';
 import { getPathNotifier, resetPathNotifier } from '../../path-notifier';
-import { signalTree } from '../../signal-tree';
+import { bindSignalTreeRealization, signalTree } from '../../signal-tree';
 import type { ISignalTree, WriteMetadata } from '../../types';
 import { restoration } from '../../../enhancers/restoration/restoration';
 import { transactions } from '../../../enhancers/transactions/transactions';
@@ -21,6 +23,7 @@ import {
 } from '../production-substrate-stats';
 import { getPhysicalCommitClock } from '../physical-commit-clock';
 import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-port';
+import { getTreeRealization } from '../tree-realization';
 
 import { createTransactionCaptureBridge } from './transaction-capture-bridge';
 import {
@@ -28,6 +31,10 @@ import {
   rememberTreeRealizationDescriptor,
   type TreeRealizationDescriptor,
 } from './tree-realization-adapter';
+
+const testRealization = createReactiveTestRealization();
+const reactiveSignalTree = bindSignalTreeRealization(testRealization);
+const computed = testRealization.derived.createDerived;
 
 function createMockStorage(): Storage {
   const store = new Map<string, string>();
@@ -613,8 +620,8 @@ describe('tree realization adapter', () => {
     notifier.setBatchingEnabled(false);
 
     try {
-      TestBed.runInInjectionContext(() => {
-        const tree = signalTree(
+      {
+        const tree = reactiveSignalTree(
           {
             users: entityMap<{ id: string; name: string }, string>({
               selectId: (user) => user.id,
@@ -673,11 +680,15 @@ describe('tree realization adapter', () => {
           tree: tree as unknown as ISignalTree<object>,
           descriptors,
         });
-        const seen: string[] = [];
-        effect(() => {
-          seen.push(`${tree.$.users.ids()[0]}|${nameLeaf()}`);
-        });
-        TestBed.flushEffects();
+        expect(getTreeRealization(tree.$)?.scalarLeaf).toBe(
+          testRealization.scalarLeaf
+        );
+        const observedValues: string[] = [];
+        const observed = observeReactiveTestValue(
+          () => `${tree.$.users.ids()[0]}|${nameLeaf()}`,
+          (value) => observedValues.push(value)
+        );
+        expect(observed()).toBe('u1|Alice');
 
         adapter.applyAtomically([
           {
@@ -694,11 +705,12 @@ describe('tree realization adapter', () => {
             subjectId,
           },
         ]);
-        TestBed.flushEffects();
-
         expect(tree.$.users.byIdOrFail('u2').name()).toBe('Alicia');
-        expect(seen).toEqual(['u1|Alice', 'u2|Alicia']);
-      });
+        expect(observed()).toBe('u2|Alicia');
+        expect(observedValues).toContain('u2|Alicia');
+        expect(observedValues).not.toContain('u2|Alice');
+        expect(observedValues).not.toContain('u1|Alicia');
+      }
     } finally {
       notifier.setBatchingEnabled(previousBatching);
     }
@@ -897,8 +909,8 @@ describe('tree realization adapter', () => {
     notifier.setBatchingEnabled(false);
 
     try {
-      TestBed.runInInjectionContext(() => {
-        const tree = signalTree(
+      {
+        const tree = reactiveSignalTree(
           {
             users: entityMap<{ id: string; name: string }, string>({
               selectId: (user) => user.id,
@@ -998,16 +1010,14 @@ describe('tree realization adapter', () => {
           adapter.validateEffects([addEffect, scalarEffect])
         ).toBeUndefined();
 
-        const seen: string[] = [];
-        effect(() => {
-          seen.push(
-            `${tree.$.users.ids()[0] ?? '<none>'}|${heldName() ?? '<none>'}`
-          );
-        });
-        TestBed.flushEffects();
+        const observedValues: string[] = [];
+        const observed = observeReactiveTestValue(
+          () => `${tree.$.users.ids()[0] ?? '<none>'}|${heldName() ?? '<none>'}`,
+          (value) => observedValues.push(value)
+        );
+        expect(observed()).toBe('<none>|<none>');
 
         adapter.applyAtomically([addEffect, scalarEffect]);
-        TestBed.flushEffects();
         getPathNotifier().flushSync();
 
         expect(tree.$.users.ids()).toEqual(['u1']);
@@ -1017,8 +1027,11 @@ describe('tree realization adapter', () => {
         expect(physicalCommitClock?.revision()).toBe(
           beforeRevision === undefined ? undefined : beforeRevision + 1
         );
-        expect(seen).toEqual(['<none>|<none>', 'u1|Alicia']);
-      });
+        expect(observed()).toBe('u1|Alicia');
+        expect(observedValues).toContain('u1|Alicia');
+        expect(observedValues).not.toContain('u1|<none>');
+        expect(observedValues).not.toContain('<none>|Alicia');
+      }
     } finally {
       notifier.setBatchingEnabled(previousBatching);
     }
@@ -4249,8 +4262,8 @@ describe('tree realization adapter', () => {
     notifier.setBatchingEnabled(false);
 
     try {
-      TestBed.runInInjectionContext(() => {
-        const tree = signalTree(
+      {
+        const tree = reactiveSignalTree(
           {
             status: 'pending',
             users: entityMap<{ id: string; name: string }, string>({
@@ -4313,11 +4326,12 @@ describe('tree realization adapter', () => {
           getPhysicalCommitClock(tree) ?? getPhysicalCommitClock(tree.$);
         const beforeRevision = physicalCommitClock?.revision();
 
-        const seen: string[] = [];
-        effect(() => {
-          seen.push(`${tree.$.users.ids()[0]}|${tree.$.status()}`);
-        });
-        TestBed.flushEffects();
+        const observedValues: string[] = [];
+        const observed = observeReactiveTestValue(
+          () => `${tree.$.users.ids()[0]}|${tree.$.status()}`,
+          (value) => observedValues.push(value)
+        );
+        expect(observed()).toBe('u1|pending');
 
         adapter.applyAtomically([
           {
@@ -4329,15 +4343,16 @@ describe('tree realization adapter', () => {
           },
           { owner: statusOwner, before: 'pending', after: 'shipped' },
         ]);
-        TestBed.flushEffects();
-
         expect(tree.$.users.ids()).toEqual(['u2']);
         expect(tree.$.status()).toBe('shipped');
-        expect(seen).toEqual(['u1|pending', 'u2|shipped']);
+        expect(observed()).toBe('u2|shipped');
+        expect(observedValues).toContain('u2|shipped');
+        expect(observedValues).not.toContain('u2|pending');
+        expect(observedValues).not.toContain('u1|shipped');
         expect(physicalCommitClock?.revision()).toBe(
           beforeRevision === undefined ? undefined : beforeRevision + 1
         );
-      });
+      }
     } finally {
       notifier.setBatchingEnabled(previousBatching);
     }

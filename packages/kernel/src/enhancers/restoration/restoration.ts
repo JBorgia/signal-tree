@@ -3,8 +3,9 @@ import {
   getOrCreateSubjectRestorationClaims,
   type RestorationClaimOwner,
 } from '../../lib/internals/subject-restoration-claims';
-import { getCellRuntime } from '../../lib/internals/cell-runtime';
-import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation';
+import { NEUTRAL_CELL_RUNTIME } from '../../lib/internals/cell-runtime';
+import { getTreeRealization } from '../../lib/internals/tree-realization';
+import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 
 import {
   deepEqual,
@@ -375,9 +376,9 @@ class RestorationManager<T> {
    * Found by comparing against elf, which exposes `hasPast$`/`hasFuture$` as
    * observables for exactly this reason.
    */
-  private readonly indexSignal = getCellRuntime().createCell(-1);
-  private readonly historyVersion = getCellRuntime().createCell(0);
-  private readonly frontierVersion = getCellRuntime().createCell(0);
+  private readonly indexSignal;
+  private readonly historyVersion;
+  private readonly frontierVersion;
   private isTemporalViewActive = false;
 
   private get currentIndex(): number {
@@ -413,6 +414,10 @@ class RestorationManager<T> {
       direction: 'undo' | 'redo'
     ) => void
   ) {
+    const cellRuntime = getTreeRealization(tree)?.cell ?? NEUTRAL_CELL_RUNTIME;
+    this.indexSignal = cellRuntime.createCell(-1);
+    this.historyVersion = cellRuntime.createCell(0);
+    this.frontierVersion = cellRuntime.createCell(0);
     this.maxHistorySize = normaliseMaxHistorySize(config.maxHistorySize);
     this.includePayload = config.includePayload ?? true;
     this.actionNames = {

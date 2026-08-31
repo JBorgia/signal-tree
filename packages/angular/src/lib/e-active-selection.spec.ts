@@ -1,8 +1,7 @@
 import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
-import { signalTree } from './signal-tree';
-import { entityMap } from './types';
+import { entityMap, signalTree } from '../index';
 
 /**
  * DERIVATION E — legacy's LAST LOOK, on the one group that is not obviously a
@@ -27,7 +26,10 @@ describe('E — is `activeEntity` granularity reachable by ordinary composition?
     const tree = signalTree({
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
     });
-    tree.$.rows.addMany([{ id: 'a', n: 1 }, { id: 'b', n: 1 }]);
+    tree.$.rows.addMany([
+      { id: 'a', n: 1 },
+      { id: 'b', n: 1 },
+    ]);
     tree.$.rows.setActiveId('a');
 
     let runs = 0;
@@ -48,7 +50,10 @@ describe('E — is `activeEntity` granularity reachable by ordinary composition?
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),
       selectedId: 'a' as string | null,
     });
-    tree.$.rows.addMany([{ id: 'a', n: 1 }, { id: 'b', n: 1 }]);
+    tree.$.rows.addMany([
+      { id: 'a', n: 1 },
+      { id: 'b', n: 1 },
+    ]);
 
     // Exactly the composition the docblock says teams "hand-roll": an ordinary
     // canonical position holding the id, plus a derived lookup through the

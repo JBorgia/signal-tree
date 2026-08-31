@@ -1,6 +1,40 @@
-import { signal, computed, type Signal, type WritableSignal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
-import { signalTree } from './signal-tree';
+import { bindSignalTreeRealization } from './signal-tree';
+import { markTreeCell } from './internals/cell-identity';
+import { NEUTRAL_TREE_REALIZATION } from './internals/tree-realization';
+
+const FAKE_REACTIVE = Symbol('fake-reactive');
+
+interface FakeWritable<T> {
+  (): T;
+  set(value: T): void;
+  update(update: (value: T) => T): void;
+  asReadonly(): () => T;
+  readonly [FAKE_REACTIVE]: true;
+}
+
+const fakeWritable = <T,>(initial: T): FakeWritable<T> => {
+  let value = initial;
+  const cell = (() => value) as FakeWritable<T>;
+  cell.set = (next) => {
+    value = next;
+  };
+  cell.update = (update) => cell.set(update(value));
+  cell.asReadonly = () => cell;
+  Object.defineProperty(cell, FAKE_REACTIVE, { value: true });
+  return markTreeCell(cell);
+};
+
+const signalTree = bindSignalTreeRealization({
+  ...NEUTRAL_TREE_REALIZATION,
+  cell: { createCell: fakeWritable },
+  derived: { createDerived: (compute) => fakeWritable(compute()) },
+  materialization: {
+    isReactiveNode: (value) =>
+      typeof value === 'function' &&
+      (value as Partial<FakeWritable<unknown>>)[FAKE_REACTIVE] === true,
+  },
+});
 
 /**
  * M1+M2-E0 — THIRD-PARTY DECLARATION EXTENSIBILITY.
@@ -20,19 +54,19 @@ import { signalTree } from './signal-tree';
  * notifier, commit authority or persistence. This probe asks whether an author
  * can obtain the same thing by building it and handing it to the tree.
  */
-interface Counter extends WritableSignal<number> {
+interface Counter extends FakeWritable<number> {
   increment(): void;
   decrement(): void;
   reset(): void;
-  doubled: Signal<number>;
+  doubled: () => number;
 }
 
 function makeCounter(initial: number, step = 1): Counter {
-  const s = signal(initial) as Counter;
+  const s = fakeWritable(initial) as Counter;
   s.increment = () => s.update((v) => v + step);
   s.decrement = () => s.update((v) => v - step);
   s.reset = () => s.set(initial);
-  s.doubled = computed(() => s() * 2);
+  s.doubled = () => s() * 2;
   return s;
 }
 

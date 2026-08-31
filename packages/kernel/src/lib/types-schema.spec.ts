@@ -6,7 +6,6 @@ import type {
   NodeAccessor,
   AccessibleNode,
 } from './types';
-import { Signal, WritableSignal } from '@angular/core';
 
 /**
  * Phase 6: Schema-level type tests

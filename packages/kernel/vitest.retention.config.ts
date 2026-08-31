@@ -14,7 +14,6 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
-    setupFiles: ['src/test-setup.ts'],
     include: [
       'src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts',
       'src/enhancers/serialization/a2-5-lifetime.spec.ts',

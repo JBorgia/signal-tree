@@ -1,6 +1,10 @@
 import type { ReadableCell } from './cell-runtime';
 
-import { getMaterializationRealization } from './materialization-realization';
+import {
+  NEUTRAL_MATERIALIZATION_REALIZATION,
+  type MaterializationRealization,
+} from './materialization-realization';
+import type { TreeRealization } from './tree-realization';
 
 import { stampDerived } from '../utils';
 
@@ -81,8 +85,12 @@ type AnyRecord = Record<string, unknown>;
  */
 declare const ngDevMode: boolean | undefined;
 
-function isSignalLike(value: unknown): value is ReadableCell<unknown> {
-  return getMaterializationRealization()?.isReactiveNode(value) ?? false;
+function isSignalLike(
+  value: unknown,
+  realization: MaterializationRealization =
+    NEUTRAL_MATERIALIZATION_REALIZATION
+): value is ReadableCell<unknown> {
+  return realization.isReactiveNode(value);
 }
 
 // =============================================================================
@@ -162,7 +170,12 @@ function ensurePathAndGetTarget($: AnyRecord, path: string): AnyRecord {
  * // Result: $.tickets now has entities, activeId, AND active
  * ```
  */
-function mergeDerivedState($: AnyRecord, derivedDef: unknown, path = ''): void {
+function mergeDerivedState(
+  $: AnyRecord,
+  derivedDef: unknown,
+  path = '',
+  realization?: TreeRealization
+): void {
   if (!derivedDef || typeof derivedDef !== 'object') {
     return;
   }
@@ -179,12 +192,15 @@ function mergeDerivedState($: AnyRecord, derivedDef: unknown, path = ''): void {
     //
     // Sharing the word "derived" is what kept this alive: the live feature's
     // name made the dead marker look load-bearing.
-    if (isSignalLike(value)) {
+    if (isSignalLike(value, realization?.materialization)) {
       // Already a signal (computed, signal, etc.) - add directly
       const target = ensurePathAndGetTarget($, path);
 
       // Check for collision with existing signal
-      if (key in target && isSignalLike(target[key])) {
+      if (
+        key in target &&
+        isSignalLike(target[key], realization?.materialization)
+      ) {
         if (typeof ngDevMode === 'undefined' || ngDevMode) {
           console.warn(
             `SignalTree: Derived signal "${currentPath}" overwrites source signal. ` +
@@ -194,6 +210,11 @@ function mergeDerivedState($: AnyRecord, derivedDef: unknown, path = ''): void {
       }
 
       target[key] = stampDerived(value);
+    } else if (typeof value === 'function' && realization) {
+      const target = ensurePathAndGetTarget($, path);
+      target[key] = stampDerived(
+        realization.derived.createDerived(value as () => unknown)
+      );
     } else if (typeof value === 'object' && value !== null) {
       // =========================================================================
       // DEEP MERGE: Nested derived object - merge into existing structure
@@ -210,7 +231,9 @@ function mergeDerivedState($: AnyRecord, derivedDef: unknown, path = ''): void {
       // Ensure nested object exists in target (create if new path)
       if (!(key in target)) {
         target[key] = {};
-      } else if (isSignalLike(target[key])) {
+      } else if (
+        isSignalLike(target[key], realization?.materialization)
+      ) {
         // Target is a signal - can't merge object into it
         throw new Error(
           `SignalTree: Cannot merge derived object into "${currentPath}" ` +
@@ -223,37 +246,17 @@ function mergeDerivedState($: AnyRecord, derivedDef: unknown, path = ''): void {
       // Recurse into nested object - this preserves existing properties
       // while adding new derived signals. The key insight is that target[key]
       // still references the ORIGINAL object from the source tree.
-      mergeDerivedState($, value, currentPath);
+      mergeDerivedState($, value, currentPath, realization);
     } else if (typeof ngDevMode === 'undefined' || ngDevMode) {
       // Anything else is silently dropped — historically the single most
       // expensive failure mode in this file, because a dropped derived value
       // looks exactly like "the feature doesn't work" with no diagnostic.
       //
-      // The dominant real-world cause is a DUPLICATED @angular/core: if the app
-      // (or test runner) loads one copy for its own code and another for
-      // @signal-tree/kernel, each has its own `Symbol(SIGNAL)`, so `isSignal()`
-      // here returns false for a perfectly good `computed()` created by the
-      // caller. Every derived value then falls through to this branch. Detect it
-      // precisely — a function carrying an own symbol named SIGNAL that
-      // `isSignal()` nonetheless rejects — and say so, because the generic
-      // message would send people hunting in the wrong place. [ST2007]
-      const looksLikeForeignSignal =
-        typeof value === 'function' &&
-        Object.getOwnPropertySymbols(value).some(
-          (sym) => sym.description === 'SIGNAL'
-        );
-
-      if (looksLikeForeignSignal) {
-        console.warn(
-          `[SignalTree] [ST2007] Derived "${currentPath}" dropped: signal from a ` +
-            `different @angular/core instance. Dedupe @angular/core. See ST2007.`
-        );
-      } else {
-        console.warn(
-          `[SignalTree] [ST2007] Derived "${currentPath}" dropped: not a signal, ` +
-            `marker, or object. See ST2007.`
-        );
-      }
+      console.warn(
+        `[SignalTree] [ST2007] Derived "${currentPath}" dropped: the value ` +
+          `could not be realized by this tree. Return a computation recipe, ` +
+          `a value recognized by the package realization, or a nested object. See ST2007.`
+      );
     }
   }
 }
@@ -261,7 +264,8 @@ function mergeDerivedState($: AnyRecord, derivedDef: unknown, path = ''): void {
 /** Applies the configured derived factory to the processed source tree. */
 export function applyDerivedFactory(
   $: AnyRecord,
-  factory: ($: AnyRecord) => object
+  factory: ($: AnyRecord) => object,
+  realization?: TreeRealization
 ): void {
-  mergeDerivedState($, factory($));
+  mergeDerivedState($, factory($), '', realization);
 }

@@ -1,4 +1,3 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { entityMap } from './types';
@@ -103,42 +102,6 @@ describe('active entity', () => {
     t.$.r.setActiveId(2);
     t.$.r.updateOne(2, { v: 22 });
     expect(t.$.r.activeEntity()?.v).toBe(22);
-  });
-
-  it('does NOT recompute when an UNRELATED row changes', () => {
-    // The whole reason this is built in rather than left to the app: a
-    // hand-rolled computed over all() recomputes on every collection change.
-    const t = mk();
-    t.$.r.setActiveId(2);
-    let evaluations = 0;
-    const active = computed(() => {
-      evaluations++;
-      return t.$.r.activeEntity()?.v;
-    });
-    active();
-    const before = evaluations;
-
-    t.$.r.updateOne(3, { v: 99 });
-    active();
-
-    expect(evaluations).toBe(before);
-  });
-
-  it('DOES recompute when the active row changes', () => {
-    const t = mk();
-    t.$.r.setActiveId(2);
-    let evaluations = 0;
-    const active = computed(() => {
-      evaluations++;
-      return t.$.r.activeEntity()?.v;
-    });
-    active();
-    const before = evaluations;
-
-    t.$.r.updateOne(2, { v: 22 });
-    active();
-
-    expect(evaluations).toBeGreaterThan(before);
   });
 
   it('follows a change of selection', () => {

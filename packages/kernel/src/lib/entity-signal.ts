@@ -1,5 +1,5 @@
-import { getCellRuntime } from './internals/cell-runtime';
-import { getDerivedRuntime } from './internals/derived-runtime';
+import { NEUTRAL_CELL_RUNTIME } from './internals/cell-runtime';
+import { NEUTRAL_DERIVED_RUNTIME } from './internals/derived-runtime';
 import type { ReadableCell, WritableCell } from './internals/cell-runtime';
 import { deepClone } from '@signaltree/shared';
 
@@ -29,7 +29,10 @@ import type { PathObservationPort } from './internals/path-observation-port';
 import { getActiveWriteContext } from '../lib/write-context';
 import { recordProductionSubstrateStat } from './internals/production-substrate-stats';
 import { defineEntityProjectionSeed } from './internals/entity-projection-seed';
-import { markOwnerInvalidated } from './internals/owner-invalidation';
+import { markOwnerInvalidated } from './internals/owner-invalidation-port';
+import { markSnapshotDirty } from './internals/snapshot-authority';
+import type { CellRuntime } from './internals/cell-runtime';
+import type { DerivedRuntime } from './internals/derived-runtime';
 
 // Angular's global dev-mode flag (defined by the Angular CLI; undefined in
 // plain test/node contexts, treated as dev there).
@@ -286,6 +289,8 @@ export function createEntitySignal<
      * observer was therefore blind to every authored collection change.
      */
     ownerId?: number;
+    cellRuntime?: CellRuntime;
+    derivedRuntime?: DerivedRuntime;
     /**
      * Whether anything in this tree could restore a subject after it retires.
      *
@@ -300,6 +305,8 @@ export function createEntitySignal<
     hasRestorationAuthority?: boolean;
   }
 ): EntitySignal<E, K> {
+  const cellRuntime = options?.cellRuntime ?? NEUTRAL_CELL_RUNTIME;
+  const derivedRuntime = options?.derivedRuntime ?? NEUTRAL_DERIVED_RUNTIME;
   // ==================
   // CLOSURE STATE (no `this` needed)
   // ==================
@@ -327,7 +334,25 @@ export function createEntitySignal<
    * computed caches them until the next mutation — so a grid that reads `all()`
    * once per frame pays once per frame instead of once per write.
    */
-  const version = getCellRuntime().createCell(0);
+  const version = cellRuntime.createCell(0);
+  const snapshotOwner: { node?: object } = {};
+
+  const createVersionedProjection = <TValue>(
+    compute: () => TValue
+  ): ReadableCell<TValue> => {
+    let projectedVersion = -1;
+    let initialized = false;
+    let value: TValue;
+    return derivedRuntime.createDerived(() => {
+      const currentVersion = version();
+      if (!initialized || projectedVersion !== currentVersion) {
+        value = compute();
+        projectedVersion = currentVersion;
+        initialized = true;
+      }
+      return value;
+    });
+  };
 
   function getProjectedEntity(id: K): E | undefined {
     const subjectId = structuralStore.subjectIdForKey(id);
@@ -381,27 +406,23 @@ export function createEntitySignal<
   }
 
   /** Reactive signals for queries — all derived, none eagerly maintained. */
-  const allSignal: ReadableCell<E[]> = getDerivedRuntime().createDerived(() => {
-    version();
+  const allSignal: ReadableCell<E[]> = createVersionedProjection(() => {
     const entities = getProjectedEntities();
     // `sortComparer` gives `all`/`ids` a stable sorted order (parity with
     // @ngrx/entity); `map` keeps insertion order.
     if (config.sortComparer) entities.sort(config.sortComparer);
     return entities;
   });
-  const countSignal: ReadableCell<number> = getDerivedRuntime().createDerived(() => {
-    version();
+  const countSignal: ReadableCell<number> = createVersionedProjection(() => {
     // O(1) — this used to be `entities.length` on a freshly built array.
     return structuralStore.activeKeyCount();
   });
-  const idsSignal: ReadableCell<K[]> = getDerivedRuntime().createDerived(() => {
-    version();
+  const idsSignal: ReadableCell<K[]> = createVersionedProjection(() => {
     return config.sortComparer
       ? allSignal().map((e) => selectId(e))
       : [...structuralStore.activeKeysSnapshot()];
   });
-  const mapSignal: ReadableCell<ReadonlyMap<K, E>> = getDerivedRuntime().createDerived(() => {
-    version();
+  const mapSignal: ReadableCell<ReadonlyMap<K, E>> = createVersionedProjection(() => {
     // Still a copy: callers may hold the result across mutations and must not
     // see it change underneath them. But it is paid on read, not on write.
     return new Map(getProjectedEntries());
@@ -694,7 +715,7 @@ export function createEntitySignal<
   }
 
   /** Active-entity selection. See the `activeId`/`activeEntity` accessors. */
-  const activeIdSignal = getCellRuntime().createCell<K | undefined>(undefined);
+  const activeIdSignal = cellRuntime.createCell<K | undefined>(undefined);
   let cachedActiveEntity: ReadableCell<E | undefined> | undefined;
 
   /**
@@ -732,12 +753,12 @@ export function createEntitySignal<
   function getEntitySignal(id: K): WritableCell<E | undefined> {
     const subjectId = resolveSubjectId(id);
     if (subjectId === undefined) {
-      return getCellRuntime().createCell<E | undefined>(getProjectedEntity(id));
+      return cellRuntime.createCell<E | undefined>(getProjectedEntity(id));
     }
 
     let s = entitySignals.get(subjectId);
     if (!s) {
-      s = getCellRuntime().createCell<E | undefined>(valueStore.backingForSubject(subjectId));
+      s = cellRuntime.createCell<E | undefined>(valueStore.backingForSubject(subjectId));
       entitySignals.set(subjectId, s);
     }
     return s;
@@ -746,7 +767,7 @@ export function createEntitySignal<
   function getSubjectStateSignal(subjectId: number): WritableCell<number> {
     let s = subjectStateSignals.get(subjectId);
     if (!s) {
-      s = getCellRuntime().createCell(0);
+      s = cellRuntime.createCell(0);
       subjectStateSignals.set(subjectId, s);
     }
     return s;
@@ -1023,6 +1044,7 @@ export function createEntitySignal<
     hookName: string
   ): void {
     if (result && typeof result.then === 'function') {
+      void result.catch(() => undefined);
       throw new Error(
         `SignalTree: ${hookName} interceptors must be synchronous. ` +
           `Async interceptors cannot safely block a synchronous mutation path. [ST2033]`
@@ -1269,6 +1291,7 @@ export function createEntitySignal<
   /** Mark the collection dirty. O(1) — see the `version` docs above. */
   function updateSignals(): void {
     version.update((v) => v + 1);
+    if (snapshotOwner.node) markSnapshotDirty(snapshotOwner.node);
     markOwnerInvalidated(ownerId);
   }
 
@@ -1354,7 +1377,7 @@ export function createEntitySignal<
     // Writes delegate to api.updateOne which runs interceptors and tap handlers.
     for (const key of Object.keys(entity)) {
       const fieldKey = key as keyof E;
-      const fieldSignal = getDerivedRuntime().createDerived(() => entitySig()?.[fieldKey]);
+      const fieldSignal = derivedRuntime.createDerived(() => entitySig()?.[fieldKey]);
 
       Object.assign(fieldSignal, {
         set: (value: E[typeof fieldKey]) => {
@@ -1761,7 +1784,7 @@ export function createEntitySignal<
      * that row changes — which is what `byId` exists for.
      */
     get activeEntity(): ReadableCell<E | undefined> {
-      return (cachedActiveEntity ??= getDerivedRuntime().createDerived(() => {
+      return (cachedActiveEntity ??= derivedRuntime.createDerived(() => {
         const id = activeIdSignal();
         if (id === undefined) return undefined;
         return getEntitySignal(id)();
@@ -1784,15 +1807,12 @@ export function createEntitySignal<
     },
 
     has(id: K): ReadableCell<boolean> {
-      return getDerivedRuntime().createDerived(() => {
-        version();
-        return structuralStore.hasActiveKey(id);
-      });
+      return createVersionedProjection(() => structuralStore.hasActiveKey(id));
     },
 
     // Bare canonical name (the `.isEmpty` alias was removed in v11).
     get empty(): ReadableCell<boolean> {
-      return (cachedEmpty ??= getDerivedRuntime().createDerived(() => countSignal() === 0));
+      return (cachedEmpty ??= derivedRuntime.createDerived(() => countSignal() === 0));
     },
 
     where(predicate: (entity: E) => boolean): ReadableCell<E[]> {
@@ -1830,9 +1850,8 @@ export function createEntitySignal<
       //
       // `version()` is read directly for the same invalidation `allSignal()`
       // has; the sorted branch gets it transitively.
-      const s = getDerivedRuntime().createDerived(() => {
+      const s = createVersionedProjection(() => {
         if (config.sortComparer) return allSignal().filter(predicate);
-        version();
         const out: E[] = [];
         for (const entity of getProjectedEntities()) {
           if (predicate(entity)) out.push(entity);
@@ -1864,9 +1883,8 @@ export function createEntitySignal<
       // Sorted collections keep the old path: `find` returns the FIRST match,
       // which is order-dependent, so with a `sortComparer` the sorted array is
       // the only correct thing to scan. See the note on `where` above.
-      const s = getDerivedRuntime().createDerived(() => {
+      const s = createVersionedProjection(() => {
         if (config.sortComparer) return allSignal().find(predicate);
-        version();
         for (const entity of getProjectedEntities()) {
           if (predicate(entity)) return entity;
         }
@@ -3220,7 +3238,7 @@ export function createEntitySignal<
   // The Proxy only handles bracket notation access (signal[id])
   // All methods are direct properties on api - no binding needed
   const warnedWrongMethods = new Set<string>();
-  return new Proxy(api as unknown as EntitySignal<E, K>, {
+  const proxy = new Proxy(api as unknown as EntitySignal<E, K>, {
     get: (target: EntitySignal<E, K>, prop: string | symbol) => {
       // Handle string/number bracket access: signal[123] or signal['abc']
       if (typeof prop === 'string' && !isNaN(Number(prop))) {
@@ -3246,6 +3264,8 @@ export function createEntitySignal<
       return (target as unknown as Record<string | symbol, unknown>)[prop];
     },
   });
+  snapshotOwner.node = proxy as object;
+  return proxy;
 }
 
 Object.defineProperty(createEntitySignal, '__setPositionIdAllocatorForTesting', {

@@ -1,13 +1,17 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
+import { createReactiveTestRealization } from '../reactive-test-realization';
+import { bindSignalTreeRealization } from './signal-tree';
 import {
   materializeMember,
   ordinaryBranch,
   registerMarkerProcessor,
 } from './internals/materialize-markers';
 import { getOwnedPositionIds } from './internals/owned-metadata';
-import { signalTree } from './signal-tree';
+
+const testRealization = createReactiveTestRealization();
+const signalTree = bindSignalTreeRealization(testRealization);
+const computed = testRealization.derived.createDerived;
 
 /**
  * `DYN-MATERIALIZE-REACTIVATION-0` — re-adding a removed dynamic member

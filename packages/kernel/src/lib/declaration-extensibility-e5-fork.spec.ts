@@ -1,15 +1,41 @@
-import {
-  computed,
-  signal,
-  type Signal,
-  type WritableSignal,
-} from '@angular/core';
 import { describe, expect, it } from 'vitest';
 import { undoable } from './undoable';
 
-import { signalTree } from './signal-tree';
+import { bindSignalTreeRealization, signalTree } from './signal-tree';
+import { NEUTRAL_TREE_REALIZATION } from './internals/tree-realization';
 import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
+
+const FAKE_REACTIVE = Symbol('fake-reactive');
+
+interface FakeWritable<T> {
+  (): T;
+  set(value: T): void;
+  update(update: (value: T) => T): void;
+  asReadonly(): () => T;
+  readonly [FAKE_REACTIVE]: true;
+}
+
+const fakeWritable = <T,>(initial: T): FakeWritable<T> => {
+  let value = initial;
+  const cell = (() => value) as FakeWritable<T>;
+  cell.set = (next) => {
+    value = next;
+  };
+  cell.update = (update) => cell.set(update(value));
+  cell.asReadonly = () => cell;
+  Object.defineProperty(cell, FAKE_REACTIVE, { value: true });
+  return cell;
+};
+
+const fakeSignalTree = bindSignalTreeRealization({
+  ...NEUTRAL_TREE_REALIZATION,
+  materialization: {
+    isReactiveNode: (value) =>
+      typeof value === 'function' &&
+      (value as Partial<FakeWritable<unknown>>)[FAKE_REACTIVE] === true,
+  },
+});
 
 /**
  * M1+M2-E5 — THE EQUIVALENCE FORK.
@@ -31,14 +57,14 @@ import { transactions } from '../enhancers/transactions/transactions';
  */
 
 /* PATH A — the shape the E0 probe used. */
-interface CounterA extends WritableSignal<number> {
+interface CounterA extends FakeWritable<number> {
   increment(): void;
-  doubled: Signal<number>;
+  doubled: () => number;
 }
 function makeCounterSignal(initial: number): CounterA {
-  const s = signal(initial) as CounterA;
+  const s = fakeWritable(initial) as CounterA;
   s.increment = () => s.update((v) => v + 1);
-  s.doubled = computed(() => s() * 2);
+  s.doubled = () => s() * 2;
   return s;
 }
 
@@ -47,7 +73,7 @@ function makeCounterApi(accessor: { (): number; set(v: number): void }) {
   return {
     read: () => accessor(),
     increment: () => accessor.set(accessor() + 1),
-    doubled: computed(() => accessor() * 2),
+    doubled: () => accessor() * 2,
   };
 }
 
@@ -58,7 +84,7 @@ const flush = async () => {
 
 describe('E5 fork — canonical participation of the two candidate paths', () => {
   it('PATH A: a preserved Angular signal is NOT captured by undo', async () => {
-    const tree = signalTree(
+    const tree = fakeSignalTree(
       { counter: makeCounterSignal(10) },
       { enhancers: [restoration()] }
     );

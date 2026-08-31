@@ -1,4 +1,12 @@
-import { getMaterializationRealization } from './materialization-realization';
+import {
+  NEUTRAL_MATERIALIZATION_REALIZATION,
+  type MaterializationRealization,
+} from './materialization-realization';
+import {
+  NEUTRAL_TREE_REALIZATION,
+  bindTreeRealization,
+  type TreeRealization,
+} from './tree-realization';
 
 /**
  * "Has the adapter already realized this node?" — see
@@ -6,8 +14,12 @@ import { getMaterializationRealization } from './materialization-realization';
  * which is the conservative direction: the walk treats the node as ordinary
  * data rather than skipping it.
  */
-function isReactiveNode(node: unknown): boolean {
-  return getMaterializationRealization()?.isReactiveNode(node) ?? false;
+function isReactiveNode(
+  node: unknown,
+  realization: MaterializationRealization =
+    NEUTRAL_MATERIALIZATION_REALIZATION
+): boolean {
+  return realization.isReactiveNode(node);
 }
 
 import {
@@ -18,22 +30,28 @@ import type { PhysicalCommitClock } from './physical-commit-clock';
 import { createRuntimeTreePlan } from './runtime-tree-plan';
 import type { RuntimeTreePlan } from './runtime-tree-plan';
 import type { TreeCapability } from '../types';
-import { publishMembershipChange } from '../utils';
+import {
+  bindSnapshotParent,
+  markSnapshotVolatile,
+  materializeSnapshotNode,
+  publishMembershipChange,
+} from './snapshot-authority';
 import { pathObservation } from './path-observation-port';
 // ⚠️ THE PORT, NOT THE ENGINE. Marker processors are handed the neutral
 // observation port; the only thing any of them calls on it is `notify`. Typing
 // this as `PathObservationPort` claimed the whole engine surface and is what let a
 // deleted method survive as a silent no-op.
 import type { PathObservationPort } from './path-observation-port';
-import { isNodeAccessor, isTraversableNode } from './node-shape';
+import {
+  isNodeAccessor,
+  isTraversableNode,
+  NODE_STORE_SYMBOL,
+} from './node-shape';
 
 // Build-time dev flag. Declared locally rather than inherited from
 // `@angular/core`'s ambient types: it is a bundler convention, not a framework
 // API, and the kernel's declarations must not depend on Angular for it.
 declare const ngDevMode: boolean | undefined;
-
-/** @internal Must match the symbol set by `makeNodeAccessor`. */
-const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
 
 /**
  * Unified Marker Processing
@@ -81,6 +99,11 @@ const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
 export type HydrateMode = 'merge' | 'restore' | 'rehydrate' | 'transfer';
 
 export interface MaterializationContext {
+  readonly cellRuntime: TreeRealization['cell'];
+  readonly derivedRuntime: TreeRealization['derived'];
+  readonly materializationRealization: TreeRealization['materialization'];
+  readonly scalarLeafRealization: TreeRealization['scalarLeaf'];
+  readonly suppressTracking: TreeRealization['suppressTracking'];
   positionRegistry: PositionRegistry;
   positionTopologyEnabled: boolean;
   physicalCommitClock?: PhysicalCommitClock;
@@ -127,10 +150,16 @@ export function createMaterializationContext(
    */
   hasCapability: (capability: TreeCapability) => boolean = (capability) =>
     capability === 'position-topology' ? positionTopologyEnabled : true,
-  physicalCommitClock?: PhysicalCommitClock
+  physicalCommitClock?: PhysicalCommitClock,
+  realization: TreeRealization = NEUTRAL_TREE_REALIZATION
 ): MaterializationContext {
   const positionRegistry = createPositionRegistry();
   return {
+    cellRuntime: realization.cell,
+    derivedRuntime: realization.derived,
+    materializationRealization: realization.materialization,
+    scalarLeafRealization: realization.scalarLeaf,
+    suppressTracking: realization.suppressTracking,
     positionRegistry,
     positionTopologyEnabled,
     physicalCommitClock,
@@ -163,6 +192,7 @@ interface MarkerProcessor {
   snapshot?: (node: unknown) => unknown;
   /** Payload → live node. See {@link HydrateMode}. */
   hydrate?: (node: unknown, value: unknown, mode: HydrateMode) => void;
+  cacheSnapshot: boolean;
 }
 
 /**
@@ -218,31 +248,23 @@ export function getNodeProcessor(node: unknown): MarkerProcessor | undefined {
  * figures in docs/architecture/memory-profile.md, which are the entityMap's id
  * index and storage.
  */
-const SNAPSHOT_MEMO = new WeakMap<object, () => { value: unknown }>();
-
 export function snapshotMarkerNode(
-  node: unknown
+  node: unknown,
+  parent?: object
 ): { value: unknown } | undefined {
   const proc = getNodeProcessor(node);
   if (!proc?.snapshot) return undefined;
   if (!isTraversableNode(node)) return { value: proc.snapshot(node) };
-
-  const realization = getMaterializationRealization();
-  if (!realization) {
-    // No adapter: still correct, just recomputed. Reference stability is an
-    // optimisation the adapter's dependency graph provides, not a semantic.
+  if (parent) bindSnapshotParent(node as object, parent);
+  if (!proc.cacheSnapshot) {
+    markSnapshotVolatile(node as object);
     return { value: proc.snapshot(node) };
   }
 
-  let memo = SNAPSHOT_MEMO.get(node as object);
-  if (!memo) {
-    const snapshot = proc.snapshot;
-    memo = realization.memoizeSnapshot(node as object, () => ({
-      value: snapshot(node),
-    }));
-    SNAPSHOT_MEMO.set(node as object, memo);
-  }
-  return memo();
+  const snapshot = proc.snapshot;
+  return materializeSnapshotNode(node as object, () => ({
+    value: snapshot(node),
+  }));
 }
 
 /** @internal Hydrate a materialised marker node. Returns false if unhandled. */
@@ -350,7 +372,13 @@ export function registerMarkerProcessor<T, R>(
   // Public entry point — used for custom markers. Emits the post-construction
   // timing warning, because an imperative custom-marker registration that lands
   // after trees already exist is a genuine footgun.
-  registerProcessor(check, create, /* suppressTimingWarning */ false, hooks);
+  registerProcessor(
+    check,
+    create,
+    /* suppressTimingWarning */ false,
+    /* cacheSnapshot */ false,
+    hooks
+  );
 }
 
 /**
@@ -382,7 +410,13 @@ export function registerBuiltinMarkerProcessor<T, R>(
     transient?: true;
   }
 ): void {
-  registerProcessor(check, create, /* suppressTimingWarning */ true, hooks);
+  registerProcessor(
+    check,
+    create,
+    /* suppressTimingWarning */ true,
+    /* cacheSnapshot */ true,
+    hooks
+  );
 }
 
 /**
@@ -465,12 +499,16 @@ function warnUndeclaredMarker(): void {
  */
 const warnedWriteOnly = new WeakSet<object>();
 
-function warnWriteOnlyMarker(processor: MarkerProcessor, node: unknown): void {
+function warnWriteOnlyMarker(
+  processor: MarkerProcessor,
+  node: unknown,
+  realization: MaterializationRealization
+): void {
   if (typeof ngDevMode !== 'undefined' && !ngDevMode) return;
   if (!processor.snapshot || processor.hydrate) return;
   // Exactly what `recursiveUpdate` falls through to. If that can write the
   // node, no hook is needed and there is nothing to report.
-  if (isReactiveNode(node) && 'set' in (node as object)) return;
+  if (isReactiveNode(node, realization) && 'set' in (node as object)) return;
   if (warnedWriteOnly.has(processor as object)) return;
   warnedWriteOnly.add(processor as object);
   console.warn(
@@ -492,6 +530,7 @@ function registerProcessor<T, R>(
     context: MaterializationContext
   ) => R,
   suppressTimingWarning: boolean,
+  cacheSnapshot: boolean,
   hooks?: {
     snapshot?: (node: R) => unknown;
     hydrate?: (node: R, value: unknown, mode: HydrateMode) => void;
@@ -551,6 +590,7 @@ function registerProcessor<T, R>(
     hydrate: hooks?.hydrate as
       | ((node: unknown, value: unknown, mode: HydrateMode) => void)
       | undefined,
+    cacheSnapshot,
   });
 }
 
@@ -857,7 +897,7 @@ export function materializeMarkers(
   authority?: OrdinaryConstructionAuthority
 ): void {
   if (!isTraversableNode(node)) return;
-  if (isReactiveNode(node)) return;
+  if (context.materializationRealization.isReactiveNode(node)) return;
 
   // Handle NodeAccessors (functions with properties)
   const isAccessor = typeof node === 'function' && isNodeAccessor(node);
@@ -909,6 +949,15 @@ export function materializeMarkers(
           // it cannot reach a string-key walk; the `SignalTree:` prefix keeps
           // it out of the symbol walk too.
           if (isTraversableNode(materialized)) {
+            bindTreeRealization(
+              materialized as object,
+              {
+                cell: context.cellRuntime,
+                derived: context.derivedRuntime,
+                materialization: context.materializationRealization,
+                scalarLeaf: context.scalarLeafRealization,
+              }
+            );
             Object.defineProperty(materialized, PROCESSOR_STAMP, {
               value: processor,
               enumerable: false,
@@ -921,7 +970,11 @@ export function materializeMarkers(
           // dropping-dev-code.md), so a guard hidden in the function body
           // ships its message string to production.
           if (typeof ngDevMode === 'undefined' || ngDevMode) {
-            warnWriteOnlyMarker(processor, materialized);
+            warnWriteOnlyMarker(
+              processor,
+              materialized,
+              context.materializationRealization
+            );
           }
           (node as Record<string, unknown>)[key] = materialized;
           // A node accessor copies its store's properties, but its CALL path
@@ -957,7 +1010,7 @@ export function materializeMarkers(
       } else if (
         typeof value === 'object' &&
         !Array.isArray(value) &&
-        !isReactiveNode(value)
+        !isReactiveNode(value, context.materializationRealization)
       ) {
         // Plain object - recurse
         materializeMarkers(value, notifier, currentPath, context, authority);

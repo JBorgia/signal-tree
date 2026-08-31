@@ -14,7 +14,8 @@ import {
 import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-port';
 import { isTraversableNode } from '../../utils';
 import { visitTree } from '../visit-tree';
-import { markOwnerInvalidatedFrom } from '../owner-invalidation';
+import { markOwnerInvalidatedFrom } from '../owner-invalidation-port';
+import { getTreeRealization } from '../tree-realization';
 
 import type { ReversalEffect, ReversalRefusal } from './causal-types';
 import { normalizeScopedValuePath } from './scoped-value-addressing';
@@ -411,39 +412,48 @@ export function createTreeRealizationAdapter(
       return undefined;
     },
     applyAtomically(effects) {
-      const heterogeneousFrame = planHeterogeneousFrame(
-        options.tree,
-        options.descriptors,
-        structuralOwnerPaths,
-        scalarSlotRuntime,
-        physicalCommitClock,
-        effects
-      );
-      if (heterogeneousFrame) {
-        heterogeneousFrame.commit();
-        return;
-      }
-
-      const scalarFrame = planScalarFrame(
-        options.tree,
-        options.descriptors,
-        structuralOwnerPaths,
-        scalarSlotRuntime,
-        effects
-      );
-      if (scalarFrame) {
-        scalarFrame.commit();
-        return;
-      }
-
-      for (const effect of effects) {
-        applyEffect(
+      const apply = () => {
+        const heterogeneousFrame = planHeterogeneousFrame(
           options.tree,
           options.descriptors,
           structuralOwnerPaths,
           scalarSlotRuntime,
-          effect
+          physicalCommitClock,
+          effects
         );
+        if (heterogeneousFrame) {
+          heterogeneousFrame.commit();
+          return;
+        }
+
+        const scalarFrame = planScalarFrame(
+          options.tree,
+          options.descriptors,
+          structuralOwnerPaths,
+          scalarSlotRuntime,
+          effects
+        );
+        if (scalarFrame) {
+          scalarFrame.commit();
+          return;
+        }
+
+        for (const effect of effects) {
+          applyEffect(
+            options.tree,
+            options.descriptors,
+            structuralOwnerPaths,
+            scalarSlotRuntime,
+            effect
+          );
+        }
+      };
+
+      const scalarRealization = getTreeRealization(options.tree.$)?.scalarLeaf;
+      if (scalarRealization) {
+        scalarRealization.runInvalidationGroup(apply);
+      } else {
+        apply();
       }
     },
   };
@@ -828,92 +838,103 @@ function planHeterogeneousFrame(
         throw new Error('Heterogeneous realization base revision is stale.');
       }
 
-      const scalarCommitResult = scalarFrame?.commit({
-        advanceRevision: false,
-        publish: false,
-      });
-
-      for (const { plan } of plannedRemoves) {
-        plan.commit({ advancePhysicalRevision: false });
-      }
-
-      for (const { plan } of plannedFreshAdds) {
-        plan.commit({ advancePhysicalRevision: false });
-      }
-
-      for (const { plan } of plannedRestores) {
-        plan.commit({ advancePhysicalRevision: false });
-      }
-
-      for (const { plan } of plannedRekeys) {
-        plan.commit({ advancePhysicalRevision: false });
-      }
-
-      physicalCommitClock?.advance();
-      if (scalarCommitResult && scalarSlotRuntime) {
-        scalarSlotRuntime.publishPrepared(scalarCommitResult);
-      }
-
-      for (const { plan } of plannedRemoves) {
-        plan.publish({
-          ...(getActiveWriteContext() ?? {}),
-          intent: 'system',
-          participation: 'realized',
+      const commitAndPublish = () => {
+        const scalarCommitResult = scalarFrame?.commit({
+          advanceRevision: false,
+          publish: false,
         });
-      }
 
-      for (const { plan } of plannedRestores) {
-        plan.publish({
-          ...(getActiveWriteContext() ?? {}),
-          intent: 'system',
-          participation: 'realized',
-        });
-      }
-
-      for (const { plan } of plannedFreshAdds) {
-        plan.publish({
-          ...(getActiveWriteContext() ?? {}),
-          intent: 'system',
-          participation: 'realized',
-        });
-      }
-
-      for (const { plan } of plannedRekeys) {
-        plan.publish({
-          ...(getActiveWriteContext() ?? {}),
-          intent: 'system',
-          participation: 'realized',
-        });
-      }
-
-      for (const effect of [...preparedSubjectScalarEffects, ...framedScalarEffects]) {
-        const descriptor = descriptors.get(effect.owner);
-        const notifyPath = resolveNotifyPath(
-          tree,
-          descriptor,
-          structuralOwnerPaths,
-          effect
-        );
-        if (!notifyPath) {
-          continue;
+        for (const { plan } of plannedRemoves) {
+          plan.commit({ advancePhysicalRevision: false });
         }
 
-        getPathNotifier().notify(
-          notifyPath,
-          effect.after,
-          effect.before,
-          descriptor?.ownerPath ?? notifyPath,
-          typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
-          [effect.owner],
-          {
+        for (const { plan } of plannedFreshAdds) {
+          plan.commit({ advancePhysicalRevision: false });
+        }
+
+        for (const { plan } of plannedRestores) {
+          plan.commit({ advancePhysicalRevision: false });
+        }
+
+        for (const { plan } of plannedRekeys) {
+          plan.commit({ advancePhysicalRevision: false });
+        }
+
+        physicalCommitClock?.advance();
+        if (scalarCommitResult && scalarSlotRuntime) {
+          scalarSlotRuntime.publishPrepared(scalarCommitResult);
+        }
+
+        for (const { plan } of plannedRemoves) {
+          plan.publish({
             ...(getActiveWriteContext() ?? {}),
             intent: 'system',
             participation: 'realized',
-          }
-        );
-      }
+          });
+        }
 
-      markOwnerInvalidatedFrom(tree as object);
+        for (const { plan } of plannedRestores) {
+          plan.publish({
+            ...(getActiveWriteContext() ?? {}),
+            intent: 'system',
+            participation: 'realized',
+          });
+        }
+
+        for (const { plan } of plannedFreshAdds) {
+          plan.publish({
+            ...(getActiveWriteContext() ?? {}),
+            intent: 'system',
+            participation: 'realized',
+          });
+        }
+
+        for (const { plan } of plannedRekeys) {
+          plan.publish({
+            ...(getActiveWriteContext() ?? {}),
+            intent: 'system',
+            participation: 'realized',
+          });
+        }
+
+        for (const effect of [...preparedSubjectScalarEffects, ...framedScalarEffects]) {
+          const descriptor = descriptors.get(effect.owner);
+          const notifyPath = resolveNotifyPath(
+            tree,
+            descriptor,
+            structuralOwnerPaths,
+            effect
+          );
+          if (!notifyPath) {
+            continue;
+          }
+
+          getPathNotifier().notify(
+            notifyPath,
+            effect.after,
+            effect.before,
+            descriptor?.ownerPath ?? notifyPath,
+            typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
+            [effect.owner],
+            {
+              ...(getActiveWriteContext() ?? {}),
+              intent: 'system',
+              participation: 'realized',
+            }
+          );
+        }
+
+        markOwnerInvalidatedFrom(tree as object);
+      };
+
+      const scalarRealization = getTreeRealization(tree.$)?.scalarLeaf;
+      if (scalarRealization) {
+        scalarRealization.runInvalidationGroup(commitAndPublish);
+      } else if (scalarSlotRuntime) {
+        scalarSlotRuntime.runInvalidationGroup(commitAndPublish);
+      } else {
+        commitAndPublish();
+      }
     },
   };
 }

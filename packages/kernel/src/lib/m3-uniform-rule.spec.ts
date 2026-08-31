@@ -1,4 +1,3 @@
-import { isSignal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from './signal-tree';
@@ -31,7 +30,7 @@ const mem = () => {
 };
 
 describe('M3 — is state reachable by the uniform rules?', () => {
-  it('entityMap does NOT conform: neither guard reaches its state', () => {
+  it('entityMap does NOT conform to the neutral accessor guard', () => {
     const tree = signalTree({
       rows: entityMap<{ id: number; n: string }, number>({
         selectId: (e) => e.id,
@@ -40,8 +39,6 @@ describe('M3 — is state reachable by the uniform rules?', () => {
     tree.$.rows.addOne({ id: 1, n: 'a' });
     const node = tree.$.rows as unknown;
 
-    // MEASURED: the accessor satisfies NEITHER uniform guard.
-    expect(isSignal(node)).toBe(false);
     expect(isNodeAccessor(node)).toBe(false);
   });
 

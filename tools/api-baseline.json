@@ -904,6 +904,15 @@
         "internalDecl": true
       },
       {
+        "name": "createSignalTreeFactory",
+        "subpath": "./adapter",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/signal-tree.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "DerivedRuntime",
         "subpath": "./adapter",
         "kind": "type-only",
@@ -938,51 +947,6 @@
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
-      },
-      {
-        "name": "installCellRuntime",
-        "subpath": "./adapter",
-        "kind": "runtime",
-        "declFile": "packages/kernel/src/lib/internals/cell-runtime.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
-        "name": "installDerivedRuntime",
-        "subpath": "./adapter",
-        "kind": "runtime",
-        "declFile": "packages/kernel/src/lib/internals/derived-runtime.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
-        "name": "installMaterializationRealization",
-        "subpath": "./adapter",
-        "kind": "runtime",
-        "declFile": "packages/kernel/src/lib/internals/materialization-realization.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
-        "name": "installScalarLeafRealization",
-        "subpath": "./adapter",
-        "kind": "runtime",
-        "declFile": "packages/kernel/src/lib/internals/scalar-leaf-realization.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
-      },
-      {
-        "name": "installTrackingSuppression",
-        "subpath": "./adapter",
-        "kind": "runtime",
-        "declFile": "packages/kernel/src/lib/internals/tracking-suppression.ts",
-        "angularInDecl": false,
-        "angularInType": false,
-        "internalDecl": true
       },
       {
         "name": "ISignalTreeOf",
@@ -1091,6 +1055,15 @@
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
+      },
+      {
+        "name": "TreeRealization",
+        "subpath": "./adapter",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/internals/tree-realization.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
       },
       {
         "name": "withRestorationDesignation",

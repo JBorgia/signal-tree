@@ -6,7 +6,6 @@
  * carrier it was handed, and only a package realization boundary binds it.
  */
 import { describe, expect, it } from 'vitest';
-import type { WritableSignal } from '@angular/core';
 import { signalTree, entityMap, asReadonly } from './index';
 import type { ReadableCell, WritableCell } from './lib/internals/cell-runtime';
 
@@ -36,9 +35,7 @@ describe('PCP — kernel public transformations stay neutral', () => {
       }
     );
     const derived: ReadableCell<number> = t.$.doubled;
-    // @ts-expect-error the kernel derived reader has no Angular signal brand
-    const angularLie: WritableSignal<number> = t.$.doubled;
-    expect([derived, angularLie].length).toBe(2);
+    expect(derived).toBe(derived);
   });
 
   it('entity + slices: neutral readers and writers, at depth', () => {
@@ -61,14 +58,5 @@ describe('PCP — kernel public transformations stay neutral', () => {
     type HasSet = 'set' extends keyof typeof ro.$.count ? true : false;
     const noSet: HasSet = false;
     expect([leaf, nested, destroyed, noSet].length).toBe(4);
-  });
-
-  it('THE NEGATIVE CONTROL: the kernel makes no Angular promise', () => {
-    const t = signalTree({ count: 0, branch: { leaf: 'a' } });
-    // @ts-expect-error a neutral cell has no [SIGNAL]/[WRITABLE_SIGNAL] brand
-    const topLie: WritableSignal<number> = t.$.count;
-    // @ts-expect-error ...and the same holds one transformation deep
-    const nestedLie: WritableSignal<string> = t.$.branch.leaf;
-    expect([topLie, nestedLie].length).toBe(2);
   });
 });

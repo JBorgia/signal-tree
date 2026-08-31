@@ -1,8 +1,8 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
+import { createReactiveTestRealization } from '../reactive-test-realization';
 import { acquireScalarProjection, EXTERNAL_ACQUISITION } from './internals/acquire-projection';
-import { signalTree } from './signal-tree';
+import { bindSignalTreeRealization, signalTree } from './signal-tree';
 import { getOwnedPositionIds } from './internals/owned-mutation';
 import { getPositionRegistry } from './internals/position-registry';
 import {
@@ -10,6 +10,10 @@ import {
   installProductionSubstrateStatsForTesting,
   resetProductionSubstrateStatsForTesting,
 } from './internals/production-substrate-stats';
+
+const testRealization = createReactiveTestRealization();
+const reactiveSignalTree = bindSignalTreeRealization(testRealization);
+const computed = testRealization.derived.createDerived;
 
 /**
  * C5-WHOLE-VALUE-MEMBERSHIP — GREENFIELD-BRANCH-WRITE-0.
@@ -112,7 +116,7 @@ describe('whole-value membership', () => {
   });
 
   it('7b — SAME-VALUE parent reintroduction wakes an existing subscriber', () => {
-    const tree = signalTree(
+    const tree = reactiveSignalTree(
       { user: { name: 'Ada', age: 42 as number | undefined } },
       { capabilities: ['causal-runtime'] }
     );
@@ -137,7 +141,7 @@ describe('whole-value membership', () => {
   });
 
   it('9 — SAME-VALUE child reactivation wakes an existing subscriber', () => {
-    const tree = signalTree(
+    const tree = reactiveSignalTree(
       { user: { name: 'Ada', age: 42 as number | undefined } },
       { capabilities: ['causal-runtime'] }
     );
@@ -155,7 +159,7 @@ describe('whole-value membership', () => {
   });
 
   it('10 — DEACTIVATION wakes an existing subscriber and retains the slot', () => {
-    const tree = signalTree(
+    const tree = reactiveSignalTree(
       { user: { name: 'Ada', age: 42 as number | undefined } },
       { capabilities: ['causal-runtime'] }
     );
@@ -172,7 +176,7 @@ describe('whole-value membership', () => {
   });
 
   it('12 — HELD PARENT + CHILD consumers across the full membership cycle', () => {
-    const tree = signalTree(
+    const tree = reactiveSignalTree(
       { user: { name: 'Ada', age: 42 as number | undefined } },
       { capabilities: ['causal-runtime'] }
     );
@@ -199,7 +203,7 @@ describe('whole-value membership', () => {
   });
 
   it('13 — HELD consumers across SAME-VALUE parent reintroduction', () => {
-    const tree = signalTree(
+    const tree = reactiveSignalTree(
       { user: { name: 'Ada', age: 42 as number | undefined } },
       { capabilities: ['causal-runtime'] }
     );
@@ -265,7 +269,7 @@ describe('whole-value membership', () => {
     // parent's membership reconciliation afterwards finds the key already
     // enumerable and adds nothing.
     const make = () => {
-      const tree = signalTree(
+      const tree = reactiveSignalTree(
         { user: { name: 'Ada', age: 42 as number | undefined } },
         { capabilities: ['causal-runtime'] }
       );
@@ -393,7 +397,7 @@ describe('whole-value membership', () => {
     //
     //     REACTIVITY CONTRACTS MUST BE TESTED THROUGH A HELD CONSUMER,
     //     NOT ONLY BY RE-READING THE SOURCE.
-    const tree = signalTree(
+    const tree = reactiveSignalTree(
       { box: { keep: { v: 1 }, drop: { v: 2 } } },
       { capabilities: ['causal-runtime', 'position-topology'] }
     );
@@ -418,7 +422,7 @@ describe('whole-value membership', () => {
 
   it('20 — an ordinary value write must NOT be a membership transition', () => {
     // Guards against making membership observation a generic branch-write tax.
-    const tree = signalTree(
+    const tree = reactiveSignalTree(
       { box: { keep: { v: 1 }, other: { v: 2 } } },
       { capabilities: ['causal-runtime', 'position-topology'] }
     );
@@ -462,7 +466,10 @@ describe('whole-value membership', () => {
   });
 
   it('FIRST-DEACTIVATION CONTROL — the SAME subscribed consumer reacts', () => {
-    const tree = signalTree({ user: { name: 'Ada', age: 42 as number | undefined } }, { capabilities: ['causal-runtime'] });
+    const tree = reactiveSignalTree(
+      { user: { name: 'Ada', age: 42 as number | undefined } },
+      { capabilities: ['causal-runtime'] }
+    );
 
     // Subscribed BEFORE any transition and never recreated.
     const observed = computed(() => tree.$.user.age());

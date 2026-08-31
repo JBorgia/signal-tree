@@ -1,4 +1,3 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { createDiagnosticJournal } from './internals/diagnostics/diagnostic-journal';
@@ -183,9 +182,9 @@ describe('BIND-BRANCH-0: what belongs to an external acquisition?', () => {
   it('a DERIVATION produces no mutation event at all', async () => {
     const tree = makeTree();
     await flush();
-    const foreground = computed(() =>
+    const foreground = () =>
       tree.$.settings.theme() === 'light' ? 'black' : 'white'
-    );
+    ;
     expect(foreground()).toBe('black');
 
     const journal = createDiagnosticJournal(tree as object);

@@ -1,4 +1,4 @@
-import { isTraversableNode } from '@signaltree/shared';
+import { isTraversableNode, NODE_STORE_SYMBOL } from './node-shape';
 
 /**
  * BRANCH MEMBER MEMBERSHIP — §C / C5, GREENFIELD-BRANCH-WRITE-0.
@@ -213,7 +213,6 @@ export function dormantKeys(parent: object): string[] {
  * and every snapshot, the accessor through `Object.keys(branch)`, `'k' in
  * branch` and spread.
  */
-const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
 const NODE_ACCESSOR_PEER = Symbol.for('SignalTree:NodeAccessorPeer');
 
 /** Resolve the other physical half of a branch, from either side. */

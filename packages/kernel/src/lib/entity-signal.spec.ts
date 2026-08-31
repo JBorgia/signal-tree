@@ -1,8 +1,8 @@
 // KERNEL semantics only. Observation goes through the neutral derived runtime:
-// observing a kernel law through Angular's `getDerivedRuntime().createDerived()` made these assertions
+// observing a kernel law through Angular computed made these assertions
 // carrier-dependent. Angular REALIZATION assertions live in
 // `entity-signal-angular-realization.spec.ts`.
-import { getDerivedRuntime } from './internals/derived-runtime';
+import { NEUTRAL_DERIVED_RUNTIME } from './internals/derived-runtime';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createEntitySignal, planEntitySubjectReclamation } from './entity-signal';
@@ -400,11 +400,11 @@ describe('entity subject physical inventory', () => {
 
     let rowRuns = 0;
     let nameRuns = 0;
-    const observedRow = getDerivedRuntime().createDerived(() => {
+    const observedRow = NEUTRAL_DERIVED_RUNTIME.createDerived(() => {
       rowRuns++;
       return heldRow()?.name ?? 'absent';
     });
-    const observedName = getDerivedRuntime().createDerived(() => {
+    const observedName = NEUTRAL_DERIVED_RUNTIME.createDerived(() => {
       nameRuns++;
       return heldName() ?? 'absent';
     });
@@ -470,7 +470,7 @@ describe('entity subject physical inventory', () => {
     }
 
     let nameRuns = 0;
-    const observedName = getDerivedRuntime().createDerived(() => {
+    const observedName = NEUTRAL_DERIVED_RUNTIME.createDerived(() => {
       nameRuns++;
       return heldName() ?? 'absent';
     });

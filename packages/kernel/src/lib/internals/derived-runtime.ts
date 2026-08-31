@@ -41,24 +41,7 @@ export interface DerivedRuntime {
 }
 
 /** The neutral default: recompute on read. Correct, with no framework. */
-const PLAIN_DERIVED: DerivedRuntime = {
+export const NEUTRAL_DERIVED_RUNTIME: DerivedRuntime = {
   createDerived: <T,>(compute: () => T): ReadableCell<T> =>
     markTreeCell((() => compute()) as ReadableCell<T>),
 };
-
-let installed: DerivedRuntime | undefined;
-
-/** Install the adapter's derived realization. Once per process, by the package
- *  that owns the framework binding — never by the kernel. */
-export function installDerivedRuntime(next: DerivedRuntime): void {
-  installed = {
-    createDerived: <T,>(compute: () => T) =>
-      markTreeCell(next.createDerived(compute)),
-  };
-}
-
-/** The derived realization in force. Never undefined: absent an adapter the
- *  kernel still produces correct values, just without memoization. */
-export function getDerivedRuntime(): DerivedRuntime {
-  return installed ?? PLAIN_DERIVED;
-}

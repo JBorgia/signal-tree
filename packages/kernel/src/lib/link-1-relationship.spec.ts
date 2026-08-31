@@ -1,6 +1,6 @@
-import { computed, signal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
+import { createReactiveTestRealization } from '../reactive-test-realization';
 import { getPathNotifier } from './path-notifier';
 import { getPositionRegistry } from './internals/position-registry';
 import { restoration } from '../enhancers/restoration/restoration';
@@ -14,6 +14,10 @@ import { link as productionLink } from './link';
 import { signalTree } from './signal-tree';
 import { transactions } from '../enhancers/transactions/transactions';
 import { withWriteContext } from './write-context';
+
+const testRealization = createReactiveTestRealization();
+const computed = testRealization.derived.createDerived;
+const signal = testRealization.cell.createCell;
 
 /**
  * LINK-1 — can ONE tiny relationship primitive stay correct when the

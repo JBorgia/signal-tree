@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getDerivedRuntime } from './derived-runtime';
-import { getCellRuntime } from './cell-runtime';
+import { NEUTRAL_DERIVED_RUNTIME } from './derived-runtime';
+import { NEUTRAL_CELL_RUNTIME } from './cell-runtime';
 
 /**
  * Why `DerivedRuntime` exists rather than `memoizeSnapshot`.
@@ -13,8 +13,8 @@ import { getCellRuntime } from './cell-runtime';
  */
 describe('DerivedRuntime — neutral derived realization', () => {
   it('two derivations from ONE source stay distinct and current', () => {
-    const d = getDerivedRuntime();
-    const source = getCellRuntime().createCell(2);
+    const d = NEUTRAL_DERIVED_RUNTIME;
+    const source = NEUTRAL_CELL_RUNTIME.createCell(2);
 
     const isEmpty = d.createDerived(() => source() === 0);
     const doubled = d.createDerived(() => source() * 2);
@@ -38,8 +38,8 @@ describe('DerivedRuntime — neutral derived realization', () => {
   it('neutral derived values need no framework', () => {
     // Nothing in this file imports @angular/core, and no realization is
     // installed by it: the default carrier must already be correct.
-    const d = getDerivedRuntime();
-    const cell = getCellRuntime().createCell('a');
+    const d = NEUTRAL_DERIVED_RUNTIME;
+    const cell = NEUTRAL_CELL_RUNTIME.createCell('a');
     const upper = d.createDerived(() => cell().toUpperCase());
     expect(upper()).toBe('A');
     cell.set('b');

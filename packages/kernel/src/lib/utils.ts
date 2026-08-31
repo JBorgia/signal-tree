@@ -1,10 +1,16 @@
 // TYPE-ONLY: this transitional package still names Angular's types publicly;
 // the split rebinds them per package. No Angular VALUE remains in kernel utils.
-import type { ReadableCell, WritableCell } from './internals/cell-runtime';
-import { getCellRuntime } from './internals/cell-runtime';
+import type { ReadableCell } from './internals/cell-runtime';
 import { isTreeCell, markTreeCell } from './internals/cell-identity';
-import { getMaterializationRealization } from './internals/materialization-realization';
-import { markOwnerInvalidatedFrom } from './internals/owner-invalidation';
+import { NEUTRAL_MATERIALIZATION_REALIZATION } from './internals/materialization-realization';
+import {
+  getTreeRealization,
+} from './internals/tree-realization';
+import {
+  bindSnapshotParent,
+  isSnapshotNode,
+  materializeSnapshotNode,
+} from './internals/snapshot-authority';
 
 /**
  * Snapshot/apply walkers must recurse into anything that CARRIES state
@@ -22,12 +28,14 @@ import { markOwnerInvalidatedFrom } from './internals/owner-invalidation';
  * reactive" — the conflation that `isAnySignal` died of. Local to this file
  * because these walkers are its only users.
  */
-function isReactiveStateValue(value: unknown): boolean {
+function isReactiveStateValue(value: unknown, owner: unknown = value): boolean {
   if (isTreeCell(value)) return true;
   if (typeof value !== 'function') return false;
-  return getMaterializationRealization()?.isReactiveNode(value) ?? false;
+  return (
+    getTreeRealization(owner)?.materialization.isReactiveNode(value) ??
+    NEUTRAL_MATERIALIZATION_REALIZATION.isReactiveNode(value)
+  );
 }
-import { getDerivedRuntime } from './internals/derived-runtime';
 import { deepEqual, isBuiltInObject, parsePath } from '@signaltree/shared';
 import { dormantKeys, hasDormantMembers } from './internals/member-membership';
 import {
@@ -147,21 +155,15 @@ import type { NodeAccessor, TreeNode } from './types';
 
 // Structural predicate extracted to a framework-neutral module so a neutral
 // consumer can reach it; re-exported here so the public surface is unchanged.
-import { isTraversableNode, isNodeAccessor } from './internals/node-shape';
+import {
+  isTraversableNode,
+  isNodeAccessor,
+  snapshotNodeKey,
+} from './internals/node-shape';
 
 // Structural guards live in a framework-neutral module so neutral consumers can
 // reach them; re-exported here so the public surface is unchanged.
 export { isTraversableNode, isNodeAccessor } from './internals/node-shape';
-
-const MATERIALIZED = new WeakMap<object, ReadableCell<unknown>>();
-
-/**
- * Same symbol `makeNodeAccessor` stamps on every accessor. Duplicated here
- * rather than imported because signal-tree.ts imports THIS module — and
- * `Symbol.for` is a global registry lookup, so both spellings resolve to the
- * identical symbol.
- */
-const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
 
 /**
  * A node is reachable two ways — as the accessor (`tree.$.a`) and as the raw
@@ -182,20 +184,8 @@ const NODE_STORE_SYMBOL = Symbol.for('SignalTree:NodeStore');
  * A WeakSet rather than a stamped symbol: `unwrap` copies own symbol keys into
  * the snapshot, so a marker property would leak into every materialised result.
  */
-const TREE_STORES = new WeakSet<object>();
-
-/** @internal Registers a store created by `createSignalStore` as memoisable. */
-export function markTreeStore(store: object): void {
-  TREE_STORES.add(store);
-}
-
 function isMemoisable(node: object): boolean {
-  return TREE_STORES.has(node) || isNodeAccessor(node);
-}
-
-function memoKey(node: object): object {
-  const store = (node as Record<symbol, unknown>)[NODE_STORE_SYMBOL];
-  return store !== undefined && store !== null ? (store as object) : node;
+  return isSnapshotNode(node);
 }
 
 /**
@@ -226,96 +216,13 @@ function memoKey(node: object): object {
  * dependency exists before any transition can occur. A branch nobody ever
  * materializes allocates nothing — and can have no held consumer to wake.
  */
-const MEMBERSHIP_REVISION = new WeakMap<object, WritableCell<number>>();
-
-function membershipRevisionFor(key: object): WritableCell<number> {
-  let rev = MEMBERSHIP_REVISION.get(key);
-  if (rev === undefined) {
-    rev = getCellRuntime().createCell(0);
-    MEMBERSHIP_REVISION.set(key, rev);
-  }
-  return rev;
-}
-
-/**
- * @internal Announce that `node`'s membership set changed.
- *
- * A no-op when the branch was never materialized: no memo exists, so no held
- * consumer can exist either, and the next materialization reads current
- * membership directly.
- *
- *     FIX THE OBSERVATION CARRIER, NOT THE CACHE TABLE.
- *
- * The memo object is NOT replaced — its dependency is invalidated, so consumers
- * holding it are notified through the dependency graph.
- */
-export function publishMembershipChange(node: object): void {
-  MEMBERSHIP_REVISION.get(memoKey(node))?.update((v) => v + 1);
-  markOwnerInvalidatedFrom(node);
-}
-
-function materialized<T>(node: object, build: () => T): T {
-  const key = memoKey(node);
-  let memo = MATERIALIZED.get(key) as ReadableCell<T> | undefined;
-  if (memo === undefined) {
-    // The carrier is established WITH the memo and read INSIDE it, so the
-    // dependency edge exists before any membership transition can happen.
-    const membershipRevision = membershipRevisionFor(key);
-    memo = getDerivedRuntime().createDerived(() => {
-      membershipRevision();
-      const built = build();
-      // Snapshots were always meant to be read-only; with the memo in place it
-      // is load-bearing, because a mutated result IS the cache and the change
-      // would silently survive into every later read. Freezing each node in dev
-      // turns that into an immediate TypeError in strict mode (all ES modules)
-      // instead of a corrupted tree discovered much later.
-      //
-      // Shallow, per node: the node's own object is frozen, and every child
-      // node is frozen by its own memo. A deep freeze would have to walk leaf
-      // VALUES too, which is O(state) — exactly the cost this exists to avoid.
-      // Leaf values are already defensive copies (see the isSignal branch in
-      // unwrap), so mutating one cannot reach live state; it can only corrupt
-      // that snapshot.
-      if (typeof ngDevMode === 'undefined' || ngDevMode) {
-        if (built !== null && typeof built === 'object') Object.freeze(built);
-      }
-      // ⚠️ THE FREEZE IS PER NODE AND DOES NOT REACH LEAF VALUES.
-      //
-      // `snapshot.a = x` throws. `snapshot.someDate.setFullYear(1999)` does
-      // not — and it corrupts LIVE STATE, because a leaf holding a Date, Map,
-      // Set or Array is handed out BY REFERENCE. Measured: mutating any of the
-      // four through a snapshot changes what the tree returns. Only plain
-      // object leaves are copied (see the isSignal branch in unwrap).
-      //
-      // Deliberately not fixed, on measurement rather than principle:
-      //  - Copying leaf values costs +54us against 1.0us on a 50k array —
-      //    55x, which is precisely the materialisation tax the memo exists to
-      //    remove, paid on every read.
-      //  - Freezing them does not work. `Object.freeze` protects Array.push
-      //    and nothing else here: Date.setFullYear, Map.set and Set.add all
-      //    mutate through internal slots and ignore it entirely. Half a
-      //    guarantee reads as a whole one.
-      //  - Freezing would also freeze LIVE state, since the value is shared.
-      //
-      // So this is contract, not enforcement: a snapshot is read-only ALL THE
-      // WAY DOWN. Mutating a value you got out of `tree()` is the same class of
-      // mistake as mutating a signal's value in place, which is already ST2003.
-      // Pinned by snapshot-aliasing.spec.ts so it stays known rather than
-      // rediscovered.
-      return built;
-    });
-    MATERIALIZED.set(key, memo as ReadableCell<unknown>);
-  }
-  return memo();
-}
-
 /**
  * @internal Materialise one tree node, memoised. This is the entry point the
  * tree callables use — see {@link materialized} for why it is a `computed`.
  */
 export function materializeNode<T>(store: object): T {
   if (!isMemoisable(store)) return unwrap<T>(store);
-  return materialized(store, () => unwrap<T>(store));
+  return materializeSnapshotNode(store, () => unwrap<T>(store));
 }
 
 /**
@@ -406,9 +313,9 @@ export function unwrap<T>(node: unknown): T {
     // convenience: it guarantees the object we BUILD FROM is the same object the
     // memo is KEYED ON. Two different answers to that question is what produced
     // the shared-cell bug in the first place.
-    const target = memoKey(node as object);
+    const target = snapshotNodeKey(node as object);
     return isMemoisable(node)
-      ? materialized(node, () => buildFromStore<T>(target))
+      ? materializeSnapshotNode(node, () => buildFromStore<T>(target))
       : buildFromStore<T>(target);
   }
   if (isReactiveStateValue(node)) {
@@ -512,7 +419,7 @@ function buildFromStore<T>(node: object): T {
       continue;
     }
 
-    const markerSnapshot = snapshotMarkerNode(value);
+    const markerSnapshot = snapshotMarkerNode(value, node);
     if (markerSnapshot) {
       result[key] = markerSnapshot.value;
       continue;
@@ -537,6 +444,7 @@ function buildFromStore<T>(node: object): T {
     }
 
     if (isNodeAccessor(value)) {
+      bindSnapshotParent(value as object, node);
       // Take the child's materialisation AS IS. Calling `unwrap()` on it again
       // deep-copied a plain object that was already plain — pure waste, and it
       // destroyed the structural sharing the memo exists to produce: every
@@ -606,7 +514,7 @@ function buildFromStore<T>(node: object): T {
     }
 
     // Same as the string-key loop: ask the registry before skipping a callable.
-    const markerSnapshotSym = snapshotMarkerNode(value);
+    const markerSnapshotSym = snapshotMarkerNode(value, node);
     if (markerSnapshotSym) {
       (result as Record<symbol, unknown>)[sym] = markerSnapshotSym.value;
       continue;

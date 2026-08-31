@@ -44,10 +44,12 @@ export interface ScalarLeafRealization {
   /** A writable cell that reads through `compute`. Write semantics are the
    *  kernel's and are installed over the result. */
   createLeaf<T>(compute: () => T): WritableCell<T>;
+  /** Deliver one committed operation's dependency invalidations atomically. */
+  runInvalidationGroup(run: () => void): void;
 }
 
 /** Neutral realization: correct truth, no framework, no dependency graph. */
-const PLAIN_SCALAR_REALIZATION: ScalarLeafRealization = {
+export const NEUTRAL_SCALAR_LEAF_REALIZATION: ScalarLeafRealization = {
   createToken: () => ({
     observe: () => undefined,
     invalidate: () => undefined,
@@ -59,14 +61,5 @@ const PLAIN_SCALAR_REALIZATION: ScalarLeafRealization = {
     cell.asReadonly = () => cell;
     return cell;
   },
+  runInvalidationGroup: (run) => run(),
 };
-
-let installed: ScalarLeafRealization | undefined;
-
-export function installScalarLeafRealization(next: ScalarLeafRealization): void {
-  installed = next;
-}
-
-export function getScalarLeafRealization(): ScalarLeafRealization {
-  return installed ?? PLAIN_SCALAR_REALIZATION;
-}

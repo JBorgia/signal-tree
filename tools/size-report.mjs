@@ -78,8 +78,8 @@ const STANDALONE = [];
 const SUBPATHS = [
   [
     'kernel/adapter',
-    `import { installCellRuntime } from ${sub('adapter.js')};
-     globalThis.__sink = installCellRuntime;`,
+    `import { createSignalTreeFactory } from ${sub('adapter.js')};
+     globalThis.__sink = createSignalTreeFactory;`,
   ],
 ];
 

@@ -1,9 +1,14 @@
-import { computed, signal } from '@angular/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { entityMap } from './types';
 import { signalTree } from './signal-tree';
+import { markTreeCell } from './internals/cell-identity';
+import { NEUTRAL_CELL_RUNTIME } from './internals/cell-runtime';
+import { NEUTRAL_DERIVED_RUNTIME } from './internals/derived-runtime';
 import { stampDerived, unwrap } from './utils';
+
+const cell = <T,>(value: T) =>
+  markTreeCell(NEUTRAL_CELL_RUNTIME.createCell(value));
 
 /**
  * `unwrap()`'s SYMBOL-KEY walk — previously the largest untested block in
@@ -62,7 +67,7 @@ describe('SignalTree-branded symbols never reach a snapshot', () => {
     // symbols. Reproduce the hazard directly — a branded key whose value is a
     // whole subtree, exactly the shape of `SignalTree:NodeStore`.
     const BRAND = Symbol.for('SignalTree:NodeStore');
-    const store: Record<string | symbol, unknown> = { a: signal(1) };
+    const store: Record<string | symbol, unknown> = { a: cell(1) };
     store[BRAND] = { the: 'entire backing store', nested: { deep: true } };
 
     const out = unwrap(store) as Record<string | symbol, unknown>;
@@ -86,8 +91,8 @@ describe('SignalTree-branded symbols never reach a snapshot', () => {
 describe('non-branded symbol keys are ordinary state', () => {
   it('a symbol holding a signal is captured', () => {
     const KEY = Symbol('user-key');
-    const store: Record<string | symbol, unknown> = { a: signal(1) };
-    store[KEY] = signal(99);
+    const store: Record<string | symbol, unknown> = { a: cell(1) };
+    store[KEY] = cell(99);
 
     const out = unwrap(store) as Record<string | symbol, unknown>;
     expect(out['a']).toBe(1);
@@ -110,8 +115,10 @@ describe('non-branded symbol keys are ordinary state', () => {
 
   it('a symbol holding a DERIVED signal is skipped — same rule as string keys', () => {
     const KEY = Symbol('derived');
-    const store: Record<string | symbol, unknown> = { a: signal(1) };
-    store[KEY] = stampDerived(computed(() => 5));
+    const store: Record<string | symbol, unknown> = { a: cell(1) };
+    store[KEY] = stampDerived(
+      NEUTRAL_DERIVED_RUNTIME.createDerived(() => 5)
+    );
 
     const out = unwrap(store) as Record<string | symbol, unknown>;
     expect(out['a']).toBe(1);
@@ -121,7 +128,7 @@ describe('non-branded symbol keys are ordinary state', () => {
   it('a symbol holding a plain function is skipped AND reported (ST2008)', () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const KEY = Symbol('callback');
-    const store: Record<string | symbol, unknown> = { a: signal(1) };
+    const store: Record<string | symbol, unknown> = { a: cell(1) };
     store[KEY] = () => 'nope';
 
     const out = unwrap(store) as Record<string | symbol, unknown>;

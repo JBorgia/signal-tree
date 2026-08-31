@@ -1,9 +1,11 @@
-import { computed } from '@angular/core';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createReactiveTestRealization } from '../../reactive-test-realization';
 import { batching } from '../../enhancers/batching/batching';
 import { devTools } from '../../enhancers/devtools/devtools';
 import { signalTree } from '../signal-tree';
+
+const computed = createReactiveTestRealization().derived.createDerived;
 import { entityMap } from '../types';
 
 describe('derived() marker pattern', () => {
@@ -16,8 +18,8 @@ describe('derived() marker pattern', () => {
       const initial: CounterState = { count: 5 };
       const tree = signalTree(initial, {
         derived: ($) => ({
-          doubled: computed(() => $.count() * 2),
-          tripled: computed(() => $.count() * 3),
+          doubled: () => $.count() * 2,
+          tripled: () => $.count() * 3,
         }),
       });
 
@@ -49,9 +51,7 @@ describe('derived() marker pattern', () => {
       };
       const tree = signalTree(initial, {
         derived: ($) => ({
-          fullName: computed(
-            () => `${$.user.firstName()} ${$.user.lastName()}`
-          ),
+          fullName: () => `${$.user.firstName()} ${$.user.lastName()}`,
         }),
       });
 
@@ -69,10 +69,10 @@ describe('derived() marker pattern', () => {
         { value: 2 },
         {
           derived: ($) => {
-            const doubled = computed(() => $.value() * 2);
+            const doubled = () => $.value() * 2;
             return {
               doubled,
-              quadrupled: computed(() => doubled() * 2),
+              quadrupled: () => doubled() * 2,
             };
           },
         }
@@ -94,11 +94,11 @@ describe('derived() marker pattern', () => {
         { a: 1, b: 2 },
         {
           derived: ($) => {
-            const sum = computed(() => {
+            const sum = () => {
               computeCount++;
               return $.a() + $.b();
-            });
-            return { sum, doubleSum: computed(() => sum() * 2) };
+            };
+            return { sum, doubleSum: () => sum() * 2 };
           },
         }
       );
@@ -125,10 +125,9 @@ describe('derived() marker pattern', () => {
         {
           derived: ($) => ({
             stats: {
-              count: computed(() => $.items().length),
-              sum: computed(() =>
-                $.items().reduce((a: number, b: number) => a + b, 0)
-              ),
+              count: () => $.items().length,
+              sum: () =>
+                $.items().reduce((a: number, b: number) => a + b, 0),
             },
           }),
         }
@@ -165,13 +164,13 @@ describe('derived() marker pattern', () => {
             // Derived namespace with same path as source
             tickets: {
               // Add derived signals
-              active: computed(() => {
+              active: () => {
                 const id = $.tickets.activeId();
                 return id != null
                   ? $.tickets.entities.byId(id)?.() ?? null
                   : null;
-              }),
-              all: computed(() => $.tickets.entities.all()),
+              },
+              all: () => $.tickets.entities.all(),
             },
           }),
         }
@@ -221,13 +220,13 @@ describe('derived() marker pattern', () => {
         {
           derived: ($) => ({
             items: {
-              selected: computed(() => {
+              selected: () => {
                 const id = $.items.selectedId();
                 return id != null
                   ? $.items.entities.byId(id)?.() ?? null
                   : null;
-              }),
-              count: computed(() => $.items.entities.count()),
+              },
+              count: () => $.items.entities.count(),
             },
           }),
         }
@@ -415,34 +414,32 @@ describe('derived() marker pattern', () => {
         {
           derived: ($) => ({
             // Migrated from AppStore.isExternalDriver
-            isExternalDriver: computed(
-              () => $.driver.current()?.isExternal ?? true
-            ),
+            isExternalDriver: () => $.driver.current()?.isExternal ?? true,
 
             // Migrated from AppStore.isDriverLoaded
-            isDriverLoaded: computed(() => $.driver.current() != null),
+            isDriverLoaded: () => $.driver.current() != null,
 
             // Migrated from AppStore.driverUrl
-            driverUrl: computed(() => $.driver.current()?.url ?? ''),
+            driverUrl: () => $.driver.current()?.url ?? '',
 
             // Migrated from AppStore.selectedTruck
-            selectedTruck: computed(() => {
+            selectedTruck: () => {
               const id = $.selected.truckId();
               return id != null
                 ? $.trucks().find((t) => t.id === id) ?? null
                 : null;
-            }),
+            },
 
             // Migrated from AppStore.selectedProductLine
-            selectedProductLine: computed(() => {
+            selectedProductLine: () => {
               const id = $.selected.truckId();
               const truck =
                 id != null ? $.trucks().find((t) => t.id === id) : null;
               return truck?.primaryProductLine ?? null;
-            }),
+            },
 
             // Migrated from AppStore.selectableTrucks
-            selectableTrucks: computed(() => {
+            selectableTrucks: () => {
               const driver = $.driver.current();
               if (!driver) return [];
               if (!driver.isExternal) return $.trucks();
@@ -453,17 +450,17 @@ describe('derived() marker pattern', () => {
               return $.trucks().filter((truck) =>
                 truck.haulerIds.includes(haulerId)
               );
-            }),
+            },
 
             // Migrated from AppStore.areHaulerAndTruckSelected
-            areHaulerAndTruckSelected: computed(() => {
+            areHaulerAndTruckSelected: () => {
               const driver = $.driver.current();
               if (!driver) return false;
               if (!driver.isExternal) return $.selected.truckId() != null;
               return (
                 $.selected.haulerId() != null && $.selected.truckId() != null
               );
-            }),
+            },
           }),
         }
       );
@@ -530,17 +527,15 @@ describe('derived() marker pattern', () => {
         },
         {
           derived: ($) => {
-            const selectedTruck = computed(() => {
+            const selectedTruck = () => {
               const id = $.selected.truckId();
               return $.trucks().find((truck) => truck.id === id) ?? null;
-            });
-            const activeProductLine = computed(
-              () => selectedTruck()?.productLine ?? null
-            );
+            };
+            const activeProductLine = () => selectedTruck()?.productLine ?? null;
             return {
               selectedTruck,
               activeProductLine,
-              ticketWorkflow: computed(() => {
+              ticketWorkflow: () => {
                 const productLine = activeProductLine();
                 if (productLine === 'Concrete') {
                   return [
@@ -555,7 +550,7 @@ describe('derived() marker pattern', () => {
                   return ['Loading', 'InTransit', 'Dumping', 'Complete'];
                 }
                 return ['Loading', 'Complete'];
-              }),
+              },
             };
           },
         }
@@ -606,23 +601,21 @@ describe('derived() marker pattern', () => {
         {
           derived: ($) => ({
             // Derived from entityMap.byId()
-            selectedUser: computed(() => {
+            selectedUser: () => {
               const id = $.selectedUserId();
               return id != null ? $.users.byId(id)?.() ?? null : null;
-            }),
+            },
 
             // Derived from entityMap.all()
-            activeUsers: computed(() =>
-              $.users.all().filter((u: UserEntity) => u.active)
-            ),
+            activeUsers: () =>
+              $.users.all().filter((u: UserEntity) => u.active),
 
             // Derived from entityMap.count
-            userCount: computed(() => $.users.count()),
+            userCount: () => $.users.count(),
 
             // Derived from entityMap.where()
-            adminUsers: computed(() =>
-              $.users.all().filter((u: UserEntity) => u.role === 'admin')
-            ),
+            adminUsers: () =>
+              $.users.all().filter((u: UserEntity) => u.role === 'admin'),
           }),
         }
       );
@@ -692,39 +685,37 @@ describe('derived() marker pattern', () => {
         },
         {
           derived: ($) => {
-            const selectedUserOrders = computed(() => {
+            const selectedUserOrders = () => {
               const userId = $.selectedUserId();
               if (userId == null) return [];
               return $.orders
                 .all()
                 .filter((order: OrderEntity) => order.userId === userId);
-            });
+            };
             return {
-              selectedUser: computed(() => {
+              selectedUser: () => {
                 const id = $.selectedUserId();
                 return id != null ? $.users.byId(id)?.() ?? null : null;
-              }),
+              },
 
               // Cross-entity derived: orders for selected user
               selectedUserOrders,
 
               // Aggregation: total revenue per user status
-              totalPendingRevenue: computed(() =>
+              totalPendingRevenue: () =>
                 $.orders
                   .all()
                   .filter((o: OrderEntity) => o.status === 'pending')
                   .reduce((sum: number, o: OrderEntity) => sum + o.total, 0)
-              ),
-              selectedUserOrderCount: computed(
-                () => selectedUserOrders().length
-              ),
+              ,
+              selectedUserOrderCount: () => selectedUserOrders().length,
 
-              selectedUserTotalSpent: computed(() =>
+              selectedUserTotalSpent: () =>
                 selectedUserOrders().reduce(
                   (sum: number, o: OrderEntity) => sum + o.total,
                   0
                 )
-              ),
+              ,
             };
           },
         }
@@ -770,15 +761,15 @@ describe('derived() marker pattern', () => {
         },
         {
           derived: ($) => ({
-            sum: computed(() =>
+            sum: () =>
               $.items
                 .all()
                 .reduce(
                   (acc: number, item: { value: number }) => acc + item.value,
                   0
                 )
-            ),
-            average: computed(() => {
+            ,
+            average: () => {
               const all = $.items.all();
               if (all.length === 0) return 0;
               const sum = all.reduce(
@@ -786,7 +777,7 @@ describe('derived() marker pattern', () => {
                 0
               );
               return sum / all.length;
-            }),
+            },
           }),
         }
       );
@@ -824,10 +815,10 @@ describe('derived() marker pattern', () => {
         },
         {
           derived: ($) => ({
-            activeProduct: computed(() => {
+            activeProduct: () => {
               const id = $.activeProductId();
               return id != null ? $.products.byId(id)?.() : undefined;
-            }),
+            },
           }),
         }
       );

@@ -74,9 +74,8 @@
  * collection, and nothing in this probe depends on it. Recorded so it is not
  * mistaken for a consequence of this branch.
  */
-import type { WritableSignal } from '@angular/core';
-
 import { entityMap } from './types';
+import type { WritableCell } from './internals/cell-runtime';
 import type { EntitySignal } from './types';
 import type { NodeAccessor } from './node-accessor';
 import { signalTree } from './signal-tree';
@@ -96,7 +95,7 @@ type NaturalValue<S> =
     ? R[]
     : S extends NodeAccessor<infer T>
       ? T
-      : S extends WritableSignal<infer T>
+      : S extends WritableCell<infer T>
         ? T
         : never;
 

@@ -21,8 +21,12 @@ export {
   hasIntrinsicMutationEmitter,
 } from './owned-metadata';
 import { getActiveWriteContext } from '../write-context';
-import { withoutTracking } from './tracking-suppression';
-import { markOwnerInvalidated } from './owner-invalidation';
+import {
+  NEUTRAL_TRACKING_SUPPRESSION,
+  type TrackingSuppression,
+} from './tracking-suppression';
+import { markOwnerInvalidated } from './owner-invalidation-port';
+import { observeIntrinsicMutations } from './intrinsic-mutation';
 
 type OwnedMutationIntent = NonNullable<WriteMetadata['mutationIntent']>;
 
@@ -35,6 +39,7 @@ type OwnedMutationOptions = {
   ownerId?: number;
   metadataStorage?: OwnedMetadataStorage;
   captureRuntime?: MutationCaptureRuntime;
+  suppressTracking?: TrackingSuppression;
 };
 
 type OwnedWriteHooks<TValue> = {
@@ -224,11 +229,12 @@ export function runOwnedMutation<TValue>(
   read: () => TValue,
   apply: () => void,
   options: OwnedMutationOptions,
-  mutationIntent: OwnedMutationIntent
+  mutationIntent: OwnedMutationIntent,
+  suppressTracking: TrackingSuppression = NEUTRAL_TRACKING_SUPPRESSION
 ): { before: TValue; after: TValue; changed: boolean } {
-  const before = withoutTracking(read);
+  const before = suppressTracking(read);
   apply();
-  const after = withoutTracking(read);
+  const after = suppressTracking(read);
   const changed = !Object.is(before, after);
   if (changed) {
     emitOwnedMutation(options, before, after, mutationIntent);
@@ -255,6 +261,35 @@ export function wrapOwnedWritableSignal<TValue>(
   defineOwnedOwnerPath(leaf as object, options.path, metadataStorage);
   defineIntrinsicMutationEmitter(leaf as object, metadataStorage);
 
+  if (
+    observeIntrinsicMutations<TValue>(leaf as object, (mutation) => {
+      if (mutation.changed) {
+        emitOwnedMutation(
+          options,
+          mutation.before,
+          mutation.after,
+          mutation.intent
+        );
+      }
+      if (mutation.intent === 'replace') {
+        hooks.afterSet?.(
+          mutation.after,
+          mutation.before,
+          mutation.after,
+          mutation.changed
+        );
+      } else {
+        hooks.afterUpdate?.(
+          mutation.before,
+          mutation.after,
+          mutation.changed
+        );
+      }
+    })
+  ) {
+    return;
+  }
+
   const originalSet = leaf.set.bind(leaf);
   const originalUpdate = leaf.update.bind(leaf);
 
@@ -263,7 +298,8 @@ export function wrapOwnedWritableSignal<TValue>(
       leaf,
       () => originalSet(value),
       options,
-      'replace'
+      'replace',
+      options.suppressTracking
     );
 
     hooks.afterSet?.(value, before, after, changed);
@@ -274,7 +310,8 @@ export function wrapOwnedWritableSignal<TValue>(
       leaf,
       () => originalUpdate(updater),
       options,
-      'derive'
+      'derive',
+      options.suppressTracking
     );
 
     hooks.afterUpdate?.(before, after, changed);

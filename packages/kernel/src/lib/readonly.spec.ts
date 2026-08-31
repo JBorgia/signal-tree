@@ -1,8 +1,10 @@
-import { computed } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
+import { createReactiveTestRealization } from '../reactive-test-realization';
 import { asReadonly } from './readonly';
 import { signalTree } from './signal-tree';
+
+const computed = createReactiveTestRealization().derived.createDerived;
 import { entityMap } from './markers/entity-map';
 
 interface User {

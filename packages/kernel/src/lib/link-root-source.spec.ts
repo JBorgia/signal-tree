@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import type { WritableSignal } from '@angular/core';
+import type { WritableCell } from './internals/cell-runtime';
 
 import { entityMap } from './types';
 import { link, type Link } from './link';
@@ -60,7 +60,7 @@ describe('link(tree.$) on an ordinary tree', () => {
   it('R4 a descendant setter retained BEFORE the link still reaches it', async () => {
     const tree = signalTree({ a: 1, b: { c: 2 } });
     await flush();
-    const leaf = tree.$.b.c as unknown as WritableSignal<number>;
+    const leaf = tree.$.b.c as unknown as WritableCell<number>;
     const held = leaf.set.bind(leaf); // escapes before the link exists
 
     const got: unknown[] = [];

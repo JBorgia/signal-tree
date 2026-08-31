@@ -1,6 +1,6 @@
-import { computed, signal } from '@angular/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createReactiveTestRealization } from '../../reactive-test-realization';
 import { signalTree } from '../signal-tree';
 import {
   hasUnregisteredSymbolKeys,
@@ -8,6 +8,10 @@ import {
   materializeMarkers,
   registerMarkerProcessor,
 } from './materialize-markers';
+
+const testRealization = createReactiveTestRealization();
+const computed = testRealization.derived.createDerived;
+const signal = testRealization.cell.createCell;
 
 /**
  * Custom Marker Registration Tests

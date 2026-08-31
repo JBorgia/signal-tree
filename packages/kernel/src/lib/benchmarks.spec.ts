@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { signal } from '@angular/core';
 
 import { restoration } from '../enhancers/restoration/restoration';
 import { visitTree } from './internals/visit-tree';
@@ -97,90 +96,6 @@ function bestOf(
   return best;
 }
 
-timingDescribe('Benchmark: signalTree vs raw signal()', () => {
-  it('creation overhead is bounded (< 50x for 20 keys)', () => {
-    const ratio = stableRatio(
-      'Creation',
-      () => {
-        for (let i = 0; i < 100; i++) {
-          const signals: any = {};
-          for (let j = 0; j < 20; j++) {
-            signals[`key_${j}`] = signal(j);
-          }
-        }
-      },
-      () => {
-        for (let i = 0; i < 100; i++) {
-          const state: Record<string, number> = {};
-          for (let j = 0; j < 20; j++) {
-            state[`key_${j}`] = j;
-          }
-          const tree = signalTree(state, { capabilities: ['causal-runtime'] });
-          tree.destroy();
-        }
-      }
-    );
-
-    // signalTree does more work (recursion, NodeAccessor creation, config init)
-    // so some overhead is expected. 50x is a generous bound.
-    expect(ratio).toBeLessThan(50);
-  });
-
-  it('read overhead is bounded (< 5x per access)', () => {
-    const state: Record<string, number> = {};
-    for (let i = 0; i < 20; i++) {
-      state[`key_${i}`] = i;
-    }
-
-    const signals: Record<string, any> = {};
-    for (let i = 0; i < 20; i++) {
-      signals[`key_${i}`] = signal(i);
-    }
-    const tree = signalTree(state, { capabilities: ['causal-runtime'] });
-
-    const ratio = stableRatio(
-      'Read',
-      () => {
-        for (let i = 0; i < ITERATIONS; i++) {
-          signals[`key_${i % 20}`]();
-        }
-      },
-      () => {
-        for (let i = 0; i < ITERATIONS; i++) {
-          (tree.$ as any)[`key_${i % 20}`]();
-        }
-      }
-    );
-
-    expect(ratio).toBeLessThan(5);
-
-    tree.destroy();
-  });
-
-  it('write overhead is bounded (< 7x per set)', () => {
-    const rawSig = signal(0);
-    const tree = signalTree({ value: 0 }, { capabilities: ['causal-runtime'] });
-
-    const ratio = stableRatio(
-      'Write',
-      () => {
-        for (let i = 0; i < ITERATIONS; i++) {
-          rawSig.set(i);
-        }
-      },
-      () => {
-        for (let i = 0; i < ITERATIONS; i++) {
-          tree.$.value.set(i);
-        }
-      }
-    );
-
-    expect(ratio).toBeLessThan(7);
-
-    tree.destroy();
-  });
-});
-
 timingDescribe('Benchmark: enhancer overhead', () => {
   it('batching overhead is bounded (< 2x per write)', () => {
     const plain = signalTree(
@@ -252,7 +167,6 @@ timingDescribe('Benchmark: enhancer overhead', () => {
     withDt.destroy();
   });
 });
-
 timingDescribe('Benchmark: mutation substrate overhead', () => {
   it('multi-leaf callable subtree updates stay within 6x of two direct leaf sets', () => {
     const callableIterations = 2_500;
@@ -455,68 +369,5 @@ timingDescribe('Benchmark: per-mutation throughput at depth', () => {
 
     shallow.destroy();
     deep.destroy();
-  });
-});
-
-// =============================================================================
-// v10 — Memoization correctness (computed reference equality + skip-recompute)
-// =============================================================================
-
-describe('Memoization correctness', () => {
-  it('Angular computed skips recompute when unrelated tree leaves change', async () => {
-    const { computed } = await import('@angular/core');
-    const tree = signalTree(
-      { a: 1, b: 2, unrelated: 0 },
-      { capabilities: ['causal-runtime'] }
-    );
-    let computeCount = 0;
-    const sumSig = computed(() => {
-      computeCount += 1;
-      return tree.$.a() + tree.$.b();
-    });
-
-    expect(sumSig()).toBe(3);
-    expect(computeCount).toBe(1);
-
-    // Mutate an unrelated leaf — sumSig should NOT recompute.
-    tree.$.unrelated.set(99);
-    expect(sumSig()).toBe(3);
-    expect(computeCount).toBe(1);
-
-    // Mutate one of the inputs — recomputes.
-    tree.$.a.set(10);
-    expect(sumSig()).toBe(12);
-    expect(computeCount).toBe(2);
-
-    tree.destroy();
-  });
-
-  it('computed treats same-value writes as no-op (Object.is equality)', async () => {
-    const { computed } = await import('@angular/core');
-    const tree = signalTree({ x: 5 }, { capabilities: ['causal-runtime'] });
-    let computeCount = 0;
-    const doubled = computed(() => {
-      computeCount += 1;
-      return tree.$.x() * 2;
-    });
-
-    expect(doubled()).toBe(10);
-    expect(computeCount).toBe(1);
-
-    // Re-read cached — no recompute.
-    expect(doubled()).toBe(10);
-    expect(computeCount).toBe(1);
-
-    // Set to same value — Object.is equality holds, no recompute.
-    tree.$.x.set(5);
-    expect(doubled()).toBe(10);
-    expect(computeCount).toBe(1);
-
-    // Set to new value — recomputes.
-    tree.$.x.set(7);
-    expect(doubled()).toBe(14);
-    expect(computeCount).toBe(2);
-
-    tree.destroy();
   });
 });

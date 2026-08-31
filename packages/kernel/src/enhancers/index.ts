@@ -75,6 +75,39 @@ export function resolveEnhancerOrder(
     provides: new Set<string>(e.metadata?.provides ?? []),
   }));
 
+  const provided = new Set<string>(availableCapabilities);
+  const nameCounts = new Map<string, number>();
+  for (const node of nodes) {
+    for (const capability of node.provides) provided.add(capability);
+    if (node.fn.metadata?.name) {
+      nameCounts.set(node.name, (nameCounts.get(node.name) ?? 0) + 1);
+    }
+  }
+
+  const problems: string[] = [];
+  for (const node of nodes) {
+    for (const capability of node.requires) {
+      if (!provided.has(capability)) {
+        problems.push(
+          `  - ${node.fn.metadata?.name ? `"${node.name}"` : 'an unnamed enhancer'} ` +
+            `requires capability "${capability}", but no configured enhancer provides it.`
+        );
+      }
+    }
+  }
+  for (const [name, count] of nameCounts) {
+    if (count > 1) {
+      problems.push(
+        `  - enhancer "${name}" is configured ${count} times; each enhancer may appear once.`
+      );
+    }
+  }
+  if (problems.length > 0) {
+    throw new Error(
+      `SignalTree could not finalize the enhancer configuration:\n${problems.join('\n')}`
+    );
+  }
+
   // Build dependency graph
   const adj = new Map<string, Set<string>>();
   const nameToNode = new Map<string, (typeof nodes)[0]>();

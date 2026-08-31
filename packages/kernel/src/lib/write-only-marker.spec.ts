@@ -1,9 +1,40 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { signal } from '@angular/core';
 
 import { entityMap } from './types';
 import { registerMarkerProcessor } from './internals/materialize-markers';
-import { signalTree } from './signal-tree';
+import { bindSignalTreeRealization, signalTree } from './signal-tree';
+import { NEUTRAL_TREE_REALIZATION } from './internals/tree-realization';
+
+const FAKE_REACTIVE = Symbol('fake-reactive');
+
+type FakeWritable<T> = {
+  (): T;
+  set(value: T): void;
+  update(update: (value: T) => T): void;
+  asReadonly(): () => T;
+  readonly [FAKE_REACTIVE]: true;
+};
+
+const fakeWritable = <T,>(initial: T): FakeWritable<T> => {
+  let value = initial;
+  const cell = (() => value) as FakeWritable<T>;
+  cell.set = (next) => {
+    value = next;
+  };
+  cell.update = (update) => cell.set(update(value));
+  cell.asReadonly = () => cell;
+  Object.defineProperty(cell, FAKE_REACTIVE, { value: true });
+  return cell;
+};
+
+const fakeSignalTree = bindSignalTreeRealization({
+  ...NEUTRAL_TREE_REALIZATION,
+  materialization: {
+    isReactiveNode: (value) =>
+      typeof value === 'function' &&
+      (value as Partial<FakeWritable<unknown>>)[FAKE_REACTIVE] === true,
+  },
+});
 
 /**
  * ST2023 — a marker that can be snapshotted but never restored.
@@ -80,15 +111,15 @@ describe('ST2023 — snapshot without hydrate', () => {
     registerMarkerProcessor<Mk, unknown>(
       (v): v is Mk => !!v && typeof v === 'object' && KEY in (v as object),
       (m) => {
-        // A real writable signal: `recursiveUpdate` writes it with no hook, so
+        // A recognized writable carrier: `recursiveUpdate` writes it with no hook, so
         // `snapshot` without `hydrate` is CORRECT here and must not be flagged.
-        return signal(m.init);
+        return fakeWritable(m.init);
       },
       { snapshot: (n) => (n as () => number)() }
     );
 
     const calls = capture();
-    const tree = signalTree({ p: { [KEY]: true, init: 1 } as Mk });
+    const tree = fakeSignalTree({ p: { [KEY]: true, init: 1 } as Mk });
     void tree.$.p;
 
     expect(calls.filter((c) => c.includes('ST2023'))).toHaveLength(0);

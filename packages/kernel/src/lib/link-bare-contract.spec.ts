@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import type { WritableSignal } from '@angular/core';
+import type { WritableCell } from './internals/cell-runtime';
 
 import { entityMap } from './types';
 import { link, type Link } from './link';
@@ -40,7 +40,7 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
   it('BARE-LINK-SCALAR — a retained setter reaches the endpoint', async () => {
     const tree = signalTree({ x: 0 });
     await flush();
-    const leaf = tree.$.x as unknown as WritableSignal<number>;
+    const leaf = tree.$.x as unknown as WritableCell<number>;
     const heldSet = leaf.set.bind(leaf); // escapes BEFORE the link exists
 
     const got: number[] = [];
@@ -55,7 +55,7 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
   it('BARE-LINK-SCALAR — a retained updater reaches the endpoint', async () => {
     const tree = signalTree({ x: 0 });
     await flush();
-    const leaf = tree.$.x as unknown as WritableSignal<number>;
+    const leaf = tree.$.x as unknown as WritableCell<number>;
     const heldUpdate = leaf.update.bind(leaf);
 
     const got: number[] = [];
@@ -72,8 +72,8 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
     // open, and mixing it here would make this contract test unreadable.
     const tree = signalTree({ settings: { theme: 'light', units: 'metric' } });
     await flush();
-    const theme = tree.$.settings.theme as unknown as WritableSignal<string>;
-    const units = tree.$.settings.units as unknown as WritableSignal<string>;
+    const theme = tree.$.settings.theme as unknown as WritableCell<string>;
+    const units = tree.$.settings.units as unknown as WritableCell<string>;
     const heldTheme = theme.set.bind(theme);
     const heldUnits = units.update.bind(units);
 

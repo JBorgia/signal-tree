@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import type { WritableSignal } from '@angular/core';
+import type { WritableCell } from './internals/cell-runtime';
 
 import { getPathNotifier, resetPathNotifier } from './path-notifier';
 import { link, type Link } from './link';
@@ -34,7 +34,7 @@ describe('activation lifecycle', () => {
 
     const tree = signalTree({ x: 0 });
     await flush();
-    const leaf = tree.$.x as unknown as WritableSignal<number>;
+    const leaf = tree.$.x as unknown as WritableCell<number>;
     const heldSet = leaf.set.bind(leaf);
 
     expect(state(leaf).claims).toBe(0);
@@ -96,8 +96,8 @@ describe('claims compose by physical leaf', () => {
 
     const tree = signalTree({ settings: { theme: 'light', units: 'metric' } });
     await flush();
-    const theme = tree.$.settings.theme as unknown as WritableSignal<string>;
-    const units = tree.$.settings.units as unknown as WritableSignal<string>;
+    const theme = tree.$.settings.theme as unknown as WritableCell<string>;
+    const units = tree.$.settings.units as unknown as WritableCell<string>;
     const heldTheme = theme.set.bind(theme);
     const heldUnits = units.set.bind(units);
 
@@ -195,7 +195,7 @@ describe('construction and cleanup', () => {
   it('disposing during an unresolved send releases and silences the source', async () => {
     const tree = signalTree({ x: 0 });
     await flush();
-    const leaf = tree.$.x as unknown as WritableSignal<number>;
+    const leaf = tree.$.x as unknown as WritableCell<number>;
     const sends: number[] = [];
     let release!: () => void;
     let opened!: () => void;
@@ -234,7 +234,7 @@ describe('metadata fidelity', () => {
   } as const;
   const REALIZED = { intent: 'system', origin: 'external', participation: 'realized' } as const;
 
-  async function observe(run: (leaf: WritableSignal<number>) => void) {
+  async function observe(run: (leaf: WritableCell<number>) => void) {
     resetPathNotifier();
     const rows: Array<Record<string, unknown>> = [];
     const off = getPathNotifier().subscribe(
@@ -253,7 +253,7 @@ describe('metadata fidelity', () => {
     await flush();
     const l = track(link(tree.$.x, { set: () => undefined }));
     rows.length = 0;
-    run(tree.$.x as unknown as WritableSignal<number>);
+    run(tree.$.x as unknown as WritableCell<number>);
     await flush();
     await l.settled();
     off();

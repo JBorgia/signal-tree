@@ -161,15 +161,14 @@ export const used = [
 );
 
 writeFileSync(
-  join(proj, 'src', 'side-effect-install.ts'),
+  join(proj, 'src', 'bound-construction.ts'),
   `
-import '@signal-tree/angular';
 import { isSignal } from '@angular/core';
-import { signalTree } from '@signal-tree/kernel';
+import { signalTree } from '@signal-tree/angular';
 
 const tree = signalTree({ count: 1 });
 if (!isSignal(tree.$.count)) {
-  throw new Error('side-effect import did not install the Angular realization');
+  throw new Error('Angular-bound construction did not use the native realization');
 }
 tree.destroy();
 `
@@ -249,22 +248,22 @@ try {
     'npx',
     [
       'esbuild',
-      'src/side-effect-install.ts',
+      'src/bound-construction.ts',
       '--bundle',
       '--platform=node',
       '--format=esm',
-      '--outfile=side-effect-install.mjs',
+      '--outfile=bound-construction.mjs',
     ],
     { cwd: proj, stdio: 'pipe' }
   );
-  execFileSync('node', ['side-effect-install.mjs'], {
+  execFileSync('node', ['bound-construction.mjs'], {
     cwd: proj,
     stdio: 'pipe',
   });
 } catch (err) {
-  console.error('❌ Angular side-effect installation smoke failed:\n');
+  console.error('❌ Angular-bound construction smoke failed:\n');
   console.error(`${err.stdout || ''}${err.stderr || ''}`.trim());
   process.exit(1);
 }
 
-console.log('✅ Angular side-effect import installs the native realization.');
+console.log('✅ Angular package construction uses the native realization.');

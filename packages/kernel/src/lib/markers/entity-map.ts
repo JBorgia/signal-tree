@@ -1,5 +1,4 @@
 import { definePositionRegistry } from '../internals/position-registry';
-import { getDerivedRuntime } from '../internals/derived-runtime';
 import type { CarrierKind, EntitySignalOf, ReadonlyOf } from '../types';
 
 import { createEntitySignal } from '../entity-signal';
@@ -268,6 +267,8 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
             subjectMetadataEnabled: hasMutationCapture,
             positionMetadataEnabled: hasPositionTopology,
             ownerId: context.positionRegistry.id,
+            cellRuntime: context.cellRuntime,
+            derivedRuntime: context.derivedRuntime,
             // Immutable for the life of the tree — see RuntimeTreePlan. False
             // is what lets the retirement boundary release a retired subject's
             // value backing immediately.
@@ -301,7 +302,7 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
         const slices = marker.__computedSlices;
         if (slices) {
           for (const [name, sliceConfig] of Object.entries(slices)) {
-            const computedSignal = getDerivedRuntime().createDerived(() =>
+            const computedSignal = context.derivedRuntime.createDerived(() =>
               sliceConfig.compute(entitySignal.all())
             );
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

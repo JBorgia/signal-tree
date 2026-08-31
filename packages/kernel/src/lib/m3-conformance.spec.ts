@@ -1,4 +1,3 @@
-import { isSignal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
 import { entityMap, signalTree } from '../index';
@@ -25,31 +24,6 @@ import { entityMap, signalTree } from '../index';
 type Row = { id: string; n: number };
 
 describe('M3 — conformance', () => {
-  it('MEASURE — the collection accessor is a BARE OBJECT; every other position is a signal', () => {
-    const tree = signalTree({
-      rows: entityMap<Row, string>({ selectId: (r) => r.id }),
-      // ⚠️ WAS A MARKER. After `stored()`, `compared()` and the loading
-      // `entityMap` went, NO core marker materialises to a signal — so the
-      // contrast this row draws is now between a COLLECTION and ordinary
-      // leaves. That is the surviving form of the claim; the marker
-      // specimen has no subject left in core. (`form()` in
-      // @signaltree/ng-forms still carries the marker-with-methods case.)
-      theme: 'light',
-      plain: 1,
-    });
-
-    expect(isSignal(tree.$.plain as never)).toBe(true);
-    expect(isSignal(tree.$.theme as never)).toBe(true);
-    expect(typeof tree.$.theme).toBe('function');
-
-    // The collection satisfies neither guard, and is not even callable.
-    expect(isSignal(tree.$.rows as never)).toBe(false);
-    expect(typeof tree.$.rows).toBe('object');
-    expect(() => (tree.$.rows as unknown as () => unknown)()).toThrow(
-      /not a function/
-    );
-  });
-
   it('MEASURE — representation is NOT uniform: the collection publishes an ENVELOPE', () => {
     const tree = signalTree({
       rows: entityMap<Row, string>({ selectId: (r) => r.id }),

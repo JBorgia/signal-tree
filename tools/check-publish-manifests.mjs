@@ -174,10 +174,10 @@ function inspectManifest(json, path, versionByName) {
     );
   }
 
-  if (json.name === '@signal-tree/angular' && json.sideEffects === false) {
+  if (json.name === '@signal-tree/angular' && json.sideEffects !== false) {
     found.push(
-      `${path}: @signal-tree/angular declares sideEffects:false, so a consumer bundler may ` +
-        `erase a side-effect-only import before it installs the Angular realization.`
+      `${path}: @signal-tree/angular must declare sideEffects:false; realization is ` +
+        `bound to its exported factory and package import mutates no process-global state.`
     );
   }
 
@@ -246,10 +246,14 @@ function selfTest() {
     // does NOT admit a prerelease of the same version.
     peerDependencies: { '@signal-tree/kernel': '^15.0.0' },
   };
-  const withInertAngularImport = {
+  const cleanAngular = {
     name: '@signal-tree/angular',
     version: '15.0.0-rc.1',
     sideEffects: false,
+  };
+  const impureAngular = {
+    name: '@signal-tree/angular',
+    version: '15.0.0-rc.1',
   };
 
   const versions = new Map([['@signal-tree/kernel', '15.0.0-rc.1']]);
@@ -265,9 +269,12 @@ function selfTest() {
   if (check(withDeadRange).length === 0) {
     failures.push('accepted `^15.0.0` alongside a 15.0.0-rc.1 release');
   }
-  if (check(withInertAngularImport).length === 0) {
+  if (check(cleanAngular).length > 0) {
+    failures.push('rejected construction-bound Angular sideEffects:false');
+  }
+  if (check(impureAngular).length === 0) {
     failures.push(
-      'accepted sideEffects:false for the structural Angular initializer'
+      'accepted Angular without sideEffects:false after global installation removal'
     );
   }
   // And the comparator itself, since every range verdict rests on it.

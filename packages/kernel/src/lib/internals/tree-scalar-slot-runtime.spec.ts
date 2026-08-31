@@ -173,7 +173,7 @@ describe('tree scalar slot runtime', () => {
   });
 
   it('publishes leaf writes through the Angular adapter after kernel commit', () => {
-    const runtime = createTreeScalarSlotRuntime();
+    const runtime = createTreeScalarSlotRuntime(undefined);
     const stable = runtime.createLeaf('A', Object.is);
     const throwsOnChange = runtime.createLeaf('B', (current, next) => {
       if (!Object.is(current, next)) {
