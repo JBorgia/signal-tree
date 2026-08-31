@@ -667,6 +667,8 @@ whole-turn capture for writes without structural effects, and narrowing it to
 
 ### RESTORATION-REKEY-CLAIM-WIDTH-0 — closed
 
+Production checkpoint: `1bd52ed0`.
+
 `planRekey.commit()` and `planPreparedRekey.commit()` now set
 `lastSubjectIds = [subjectId]`, joining every sibling mutator. That is the only
 production change; `restoration.ts:660`, the claim registry, restoration-side
