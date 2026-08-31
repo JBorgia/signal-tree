@@ -93,8 +93,8 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
 
     const history = t.getRestorationHistory();
-    // INIT + 1 batch
-    expect(history.length).toBeGreaterThanOrEqual(2);
+    // The designated batch is the first retained entry; installation has no INIT.
+    expect(history.length).toBe(1);
     // Ensure the last entry reflects the latest value (not every PathNotifier will change tree, but restoration should snapshot tree.$())
     const last = history[history.length - 1];
     expect(last.state).toBeDefined();
@@ -505,8 +505,8 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
 
     expect(store.$()).toEqual({ x: 'C' });
-    expect(t.getRestorationHistory()).toHaveLength(2);
-    expect(t.getTurns()).toHaveLength(3);
+    expect(t.getRestorationHistory()).toHaveLength(1);
+    expect(t.getTurns()).toHaveLength(2);
 
     pending.rollback();
 
@@ -532,8 +532,8 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
 
     expect(store.$()).toEqual({ x: 25 });
-    expect(t.getRestorationHistory()).toHaveLength(2);
-    expect(t.getTurns()).toHaveLength(3);
+    expect(t.getRestorationHistory()).toHaveLength(1);
+    expect(t.getTurns()).toHaveLength(2);
     expect(t.getTurnStatus(t.getTurns().at(-2)?.id)).toBe('pending');
     expect(t.getTurnStatus(t.getTurns().at(-1)?.id)).toBe('applied');
 
@@ -2338,7 +2338,6 @@ describe('restoration enhancer', () => {
     expect(t.getTurn(secondTurn.id)).toBeUndefined();
     expect(t.getTurn(thirdTurn.id)).toBeUndefined();
     expect(t.getRestorationHistory().map((entry: { id: number }) => entry.id)).toEqual([
-      1,
       firstTurn.id,
       fourthTurn.id,
     ]);
@@ -3034,7 +3033,7 @@ describe('restoration enhancer', () => {
       .map((entry: { state: { count: number } }) => entry.state.count);
 
     expect(store.$().count).toBe(3);
-    expect(historyStates).toEqual([0, 1, 3]);
+    expect(historyStates).toEqual([1, 3]);
   });
 
   it('does not retain a user transition when a queued user write is undone in the same tick', async () => {

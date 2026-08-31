@@ -117,15 +117,12 @@ describe('never-claimed retirements', () => {
   it('measures category B across a churn run', async () => {
     const WINDOW = 5;
     const tree = makeTree(WINDOW);
-    const claims = getSubjectRestorationClaims(tree);
-    if (!claims) {
-      throw new Error('Expected a claim registry');
-    }
-
     const everClaimed = new Set<number>();
     const everRetired = new Set<number>();
     const observe = () => {
-      for (const id of claims.claimedSubjects()) everClaimed.add(id);
+      for (const id of getSubjectRestorationClaims(tree)?.claimedSubjects() ?? []) {
+        everClaimed.add(id);
+      }
       for (const id of retired(tree.$.rows)) everRetired.add(id);
     };
 
@@ -159,8 +156,6 @@ describe('never-claimed retirements', () => {
     // retires from it, and when it does, the same ambient capture claims them.
     const WINDOW = 4;
     const tree = makeTree(WINDOW);
-    const claims = getSubjectRestorationClaims(tree);
-
     undoable(() => tree.$.other.setAll([{ id: 'o1', name: 'x' }]));
     await tick();
     await tick();
@@ -172,7 +167,7 @@ describe('never-claimed retirements', () => {
     await tick();
 
     expect(retired(tree.$.other)).toContain(otherSubject);
-    expect(claims?.isClaimed(otherSubject)).toBe(true);
+    expect(getSubjectRestorationClaims(tree)?.isClaimed(otherSubject)).toBe(true);
   });
 
   it('subjects retired BY an undo are claimed too', async () => {

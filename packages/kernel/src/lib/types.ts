@@ -27,7 +27,7 @@ export interface RestorationConfig {
   /** Enable/disable time travel (default: true) */
   enabled?: boolean;
   /**
-   * Maximum number of history entries to keep
+    * Maximum number of completed history entries to keep. Zero retains none.
    * @default 50
    */
   maxHistorySize?: number;

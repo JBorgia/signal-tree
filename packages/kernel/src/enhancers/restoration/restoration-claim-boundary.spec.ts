@@ -59,13 +59,21 @@ function expectInvariant(tree: ReturnType<typeof makeTree>): {
 }
 
 describe('restoration claim boundary', () => {
-  it('attaches one registry per tree, reachable from the tree', () => {
-    const tree = makeTree(20);
-    expect(getSubjectRestorationClaims(tree)).toBeDefined();
-    // A second tree must not share it, or one tree's eviction frees another's
-    // backing.
-    expect(getSubjectRestorationClaims(makeTree(20))).not.toBe(
-      getSubjectRestorationClaims(tree)
+  it('attaches one lazy registry per tree after a retained turn claims a subject', async () => {
+    const first = makeTree(20);
+    const second = makeTree(20);
+    expect(getSubjectRestorationClaims(first)).toBeUndefined();
+    expect(getSubjectRestorationClaims(second)).toBeUndefined();
+
+    undoable(() => first.$.rows.addOne({ id: 'first', name: 'a', v: 1 }));
+    undoable(() => second.$.rows.addOne({ id: 'second', name: 'b', v: 2 }));
+    await tick();
+    await tick();
+
+    expect(getSubjectRestorationClaims(first)).toBeDefined();
+    expect(getSubjectRestorationClaims(second)).toBeDefined();
+    expect(getSubjectRestorationClaims(first)).not.toBe(
+      getSubjectRestorationClaims(second)
     );
   });
 

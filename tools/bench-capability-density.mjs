@@ -4,8 +4,8 @@
  *
  * Restoration is measured separately from physical storage and realization.
  * Each arm uses the public production API; internal claim inventory is read
- * without materializing entity facades. `maxHistorySize` is a buffer length,
- * so a buffer of N entries provides at most N-1 undo steps.
+ * without materializing entity facades. Positive `maxHistorySize` is the number
+ * of completed designated turns retained; zero retains none.
  *
  * Usage:
  *   node --expose-gc tools/bench-capability-density.mjs
@@ -148,7 +148,7 @@ const inspectCapability = (tree) => {
   }
   return {
     historyEntries: history.length,
-    undoSteps: Math.max(0, history.length - 1),
+    undoSteps: history.length,
     claimOwners: claims.owners,
     claimedSubjects: claims.claimedSubjects,
     descriptorOwners: descriptors.size,
@@ -208,7 +208,7 @@ const ARMS = {
     },
   },
   'requested-retention-zero': {
-    description: 'maxHistorySize 0 as shipped; ST2032 fallback is measured',
+    description: 'maxHistorySize 0; no completed entity history retained',
     build: async (count) => {
       const tree = await createTree(count, 0);
       await designatedWrites(tree, count, DESIGNATED_WRITES);
@@ -217,7 +217,7 @@ const ARMS = {
     },
   },
   'requested-retention-zero-scalar': {
-    description: 'maxHistorySize 0 fallback; scalar turns over shared entity subtree',
+    description: 'maxHistorySize 0; no completed scalar history retained',
     build: async (count) => {
       const tree = await createTree(count, 0);
       await designatedScalarWrites(tree, DESIGNATED_WRITES);
@@ -226,7 +226,7 @@ const ARMS = {
     },
   },
   'buffer-two': {
-    description: 'buffer length 2; at most one undo step',
+    description: 'capacity 2; at most two retained undo turns',
     build: async (count) => {
       const tree = await createTree(count, 2);
       await designatedWrites(tree, count, DESIGNATED_WRITES);
@@ -244,7 +244,7 @@ const ARMS = {
     },
   },
   'buffer-twenty': {
-    description: 'buffer length 20; at most 19 undo steps',
+    description: 'capacity 20; at most 20 retained undo turns',
     build: async (count) => {
       const tree = await createTree(count, 20);
       await designatedWrites(tree, count, DESIGNATED_WRITES);
@@ -262,7 +262,7 @@ const ARMS = {
     },
   },
   'buffer-large': {
-    description: `buffer length ${DESIGNATED_WRITES + 1}; all designated turns retained`,
+    description: `buffer capacity ${DESIGNATED_WRITES + 1}; all designated turns retained`,
     build: async (count) => {
       const tree = await createTree(count, DESIGNATED_WRITES + 1);
       await designatedWrites(tree, count, DESIGNATED_WRITES);
@@ -301,8 +301,6 @@ if (armIndex !== -1) {
     claimRegistryCollectable: result.claimRegistryCollectable,
     descriptorStoreCollectable: result.descriptorStoreCollectable,
     quiesceRounds: result.quiesceRounds,
-    expectedDiagnostic:
-      name.startsWith('requested-retention-zero') ? 'ST2032' : undefined,
   ...capability,
   }));
   process.exit(0);
@@ -333,20 +331,12 @@ const measureOnce = (name, n) => {
     throw new Error(result.stderr || `${name}@${n} exited ${String(result.status)}`);
   }
   const point = JSON.parse(result.stdout.trim().split('\n').at(-1));
-  const expectedSt2032 =
-    'SignalTree: restoration({ maxHistorySize: 0 }) cannot support undo. ' +
-    'maxHistorySize is a buffer LENGTH, so N entries give N-1 undo steps — ' +
-    'any value below 2 gives none, and a non-finite value is silently unbounded. ' +
-    'Falling back to the default of 50. Pass 2 or more, or omit it. [ST2032]';
-  const st2032Diagnostics = result.stderr
-    .split('\n')
-    .filter((line) => line.includes('[ST2032]'));
   if (
     name.startsWith('requested-retention-zero') &&
-    (st2032Diagnostics.length !== 1 || st2032Diagnostics[0] !== expectedSt2032)
+    result.stderr.includes('[ST2032]')
   ) {
     throw new Error(
-      `requested maxHistorySize 0 did not emit exactly one matching ST2032 diagnostic\nactual: ${JSON.stringify(st2032Diagnostics)}\nexpected: ${JSON.stringify(expectedSt2032)}`
+      `requested maxHistorySize 0 emitted obsolete ST2032 diagnostic: ${JSON.stringify(result.stderr)}`
     );
   }
   return point;
@@ -451,34 +441,39 @@ for (const row of rows) {
 if (Math.abs(derived.causalRuntimeSubjectSlope) > 32) {
   problems.push(`causal-runtime-only slope drifted to ${derived.causalRuntimeSubjectSlope.toFixed(1)} B/subject`);
 }
-if (derived.restorationConfiguredSubjectSlope < 300) {
-  problems.push(`configured-unused restoration falsifier disappeared at ${derived.restorationConfiguredSubjectSlope.toFixed(1)} B/subject`);
+if (Math.abs(derived.restorationConfiguredSubjectSlope) > 32) {
+  problems.push(`configured-unused restoration slope is ${derived.restorationConfiguredSubjectSlope.toFixed(1)} B/subject`);
 }
 if (Math.abs(derived.undesignatedWriteSubjectSlope) > 32) {
   problems.push(`undesignated writes accumulated ${derived.undesignatedWriteSubjectSlope.toFixed(1)} B/subject`);
 }
 for (const row of [byName.get('configured-unused'), byName.get('configured-undesignated')]) {
   for (const point of row.points) {
-    if (point.historyEntries !== 1 || point.claimedSubjects !== 0) {
+    if (
+      point.historyEntries !== 0 ||
+      point.claimedSubjects !== 0 ||
+      point.subjectDescriptors !== 0 ||
+      point.structuralEffects !== 0
+    ) {
       problems.push(`${row.arm}@${point.n} retained unexpected history or claims`);
     }
   }
 }
 const requestedZero = byName.get('requested-retention-zero').points.at(-1);
-const expectedRequestedZeroEntries = Math.min(DESIGNATED_WRITES + 1, 50);
+const expectedRequestedZeroEntries = 0;
 if (requestedZero.historyEntries !== expectedRequestedZeroEntries) {
   problems.push(
-    `requested maxHistorySize 0 retained ${requestedZero.historyEntries}, expected fallback-50 cap ${expectedRequestedZeroEntries}`
+    `requested maxHistorySize 0 retained ${requestedZero.historyEntries}, expected zero`
   );
 }
 for (const [name, expectedEntries] of [
   ['requested-retention-zero-scalar', expectedRequestedZeroEntries],
-  ['buffer-two', Math.min(DESIGNATED_WRITES + 1, 2)],
-  ['buffer-two-scalar', Math.min(DESIGNATED_WRITES + 1, 2)],
-  ['buffer-twenty', Math.min(DESIGNATED_WRITES + 1, 20)],
-  ['buffer-twenty-scalar', Math.min(DESIGNATED_WRITES + 1, 20)],
-  ['buffer-large', DESIGNATED_WRITES + 1],
-  ['buffer-large-scalar', DESIGNATED_WRITES + 1],
+  ['buffer-two', Math.min(DESIGNATED_WRITES, 2)],
+  ['buffer-two-scalar', Math.min(DESIGNATED_WRITES, 2)],
+  ['buffer-twenty', Math.min(DESIGNATED_WRITES, 20)],
+  ['buffer-twenty-scalar', Math.min(DESIGNATED_WRITES, 20)],
+  ['buffer-large', DESIGNATED_WRITES],
+  ['buffer-large-scalar', DESIGNATED_WRITES],
 ]) {
   const point = byName.get(name).points.at(-1);
   if (point.historyEntries !== expectedEntries) {
@@ -550,6 +545,6 @@ for (const name of ['requested-retention-zero', 'buffer-two', 'buffer-twenty', '
   );
 }
 console.log(
-  '\nHistory entry counts are reported exactly; maxHistorySize is a buffer length, not an undo-step count.\n' +
-    'Requested zero is measured as shipped and is expected to fall back to 50. E5 changes no production policy.'
+  '\nHistory entry counts are reported exactly; positive maxHistorySize is a retained-entry capacity.\n' +
+    'Requested zero retains no completed history, claims, or descriptors after settlement.'
 );

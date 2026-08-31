@@ -53,9 +53,9 @@ const makeRowsTree = () =>
     { enhancers: [ttDesignated()] }
   );
 
-/** History length excluding the INIT baseline, which is not an authored turn. */
+/** Every retained history entry is an authored designated turn. */
 const turns = (tree: { getRestorationHistory(): readonly unknown[] }) =>
-  tree.getRestorationHistory().length - 1;
+  tree.getRestorationHistory().length;
 
 describe('HIST-C2 door: turn-level eligibility', () => {
   it('1. an ordinary UNMARKED write records nothing', async () => {
@@ -268,14 +268,15 @@ describe('HIST-C2 door: the cost claim and the async contract', () => {
 
   it('and a designated turn does acquire them', async () => {
     const tree = makeRowsTree();
-    const claims = getSubjectRestorationClaims(tree);
 
     undoable(() => tree.$.rows.setAll([{ id: 'a', name: 'n' }]));
     await flush();
 
     // Control. Without this the zero above would prove nothing.
     expect(turns(tree)).toBe(1);
-    expect(claims?.snapshot().owners ?? 0).toBeGreaterThan(0);
+    expect(
+      getSubjectRestorationClaims(tree)?.snapshot().owners ?? 0
+    ).toBeGreaterThan(0);
   });
 
   it('an async designation scope is REFUSED, not silently ignored', () => {

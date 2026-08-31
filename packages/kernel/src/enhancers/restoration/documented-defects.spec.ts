@@ -139,11 +139,12 @@ describe('6d — maxHistorySize validation (FIXED in 14.1.1)', () => {
   };
 
   it('maxHistorySize N retains N undoable turns', async () => {
+    expect(await usableSteps(1)).toBe(1);
     expect(await usableSteps(2)).toBe(2);
     expect(await usableSteps(5)).toBe(5);
   });
 
-  it.each([0, 1, -1, Number.NaN, Number.POSITIVE_INFINITY])(
+  it.each([-1, Number.NaN, Number.POSITIVE_INFINITY])(
     'maxHistorySize %p no longer silently disables undo',
     async (bad) => {
       const spy = vi
@@ -159,7 +160,7 @@ describe('6d — maxHistorySize validation (FIXED in 14.1.1)', () => {
 
   it('reports ST2032 rather than failing silently', async () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    await usableSteps(1);
+    await usableSteps(-1);
     const said = spy.mock.calls.flat().join(' ');
     spy.mockRestore();
 
