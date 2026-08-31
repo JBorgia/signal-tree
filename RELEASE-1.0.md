@@ -269,6 +269,44 @@ fresh-key isolation, and multiple-consumer laws. Naive weak cells remain
 rejected; E4 attributes current ownership but authorizes no production retention
 change. E5 restoration/history capability density remains a separate row.
 
+`ENTITY-PHYSICAL-DENSITY-0 / E5` is **RED EVIDENCE / DIRECT FALSIFIERS
+FOUND** at `bc6ab836`. Raw and causal-runtime-only both measure 403.2 B/live
+subject, proving causal availability adds 0.0 subject slope. Restoration
+configured with zero designated writes measures 840.2 B/live subject: a
+437.0 B/live-subject failure, about 42 MB at 100k, with INIT history 1, claims 0,
+and 100,000 subject descriptors plus 100,000 structural-effect-by-subject
+entries. One thousand undesignated writes add -9.1 B/subject noise and no entry,
+claim, or descriptor accumulation. Requested `maxHistorySize: 0` emits exact
+ST2032 and falls back to 50; after 100 designated writes it retains 50 entries
+and 50 claims, so zero completed-history retention is not expressible. Buffer
+lengths 2/20/101 retain exact bounded cardinalities. Matched scalar histories
+stay near the idle slope; entity turns add a composite collection-pointer,
+effect, and claim cost of about 0.79-0.81 MB per added entry at 100k. Every fit,
+cardinality, claim/history invariant, and post-destroy owner/registry collection
+check passes. E5 is not closed green and authorizes no production change.
+
+`RESTORATION-IDLE-DENSITY-0 / R0` is **CLOSED ATTRIBUTION / DESIGN ROW
+OPEN** at `3013b735`. Extracted actual production descriptors plus INIT state
+measure 437.2 B/subject against the 437.0 B restoration-over-causal delta,
+closing at 100.0%. The graph is one materialized INIT entity snapshot, one
+subject address descriptor Map, and one cloned add effect indexed by operation
+and SubjectId per live subject. Standalone 80.0 / 116.3 / 304.7 B probes are
+non-additive diagnostics; extracted production artifacts are authoritative.
+Semantic necessity is unproven because inline effect addresses win and subject
+descriptors are fallback machinery. The active design row is lazy acquisition
+and release of subject-specific restoration representation under every frozen
+undo/redo, structural, transaction, atomicity, and address-fallback law.
+
+`ZERO-HISTORY-RETENTION-0` is **DECISION REQUIRED / NOT IMPLEMENTATION
+AUTHORIZED**: current 0 -> 50 behavior is a measured contract falsifier, but the
+target must decide INIT retention and buffer/cursor/reset/diagnostic semantics.
+
+`REALIZATION-OWNERSHIP-0` is **QUEUED AFTER E5 FOLLOW-UPS**. Reactive cells may
+be reclaimable only through explicit live-facade/cell/subscriber ownership; E4's
+forced-GC durability, same-subject undo, fresh-key isolation, shared-consumer,
+reacquisition, and repeated-cycle laws remain mandatory. Naive WeakRefs remain
+rejected.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
