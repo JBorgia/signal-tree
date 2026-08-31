@@ -7,7 +7,7 @@ import { batching, batchingWithConfig } from './batching';
 function createMockTree() {
   const state = { count: 0, name: '' } as Record<string, any>;
 
-  const tree = function (...args: any[]) {
+  const root = function (...args: any[]) {
     if (args.length === 0) return state;
     const arg = args[0];
     if (typeof arg === 'function') {
@@ -20,6 +20,7 @@ function createMockTree() {
       return;
     }
   } as any;
+  const tree = {} as any;
 
   // Create signal-like accessors for state properties
   tree.state = {
@@ -40,11 +41,15 @@ function createMockTree() {
       },
     },
   };
-  tree.$ = tree.state;
-  tree.bind =
-    (_: unknown) =>
-    (...a: unknown[]) =>
-      tree(...(a as any));
+  for (const [key, value] of Object.entries(tree.state)) {
+    Object.defineProperty(root, key, {
+      value,
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
+  }
+  tree.$ = root;
   tree.destroy = () => void 0;
 
   return tree as any;
@@ -75,7 +80,7 @@ describe('batching enhancer', () => {
       enhanced.$.count.set(5);
 
       // Value should be updated immediately - no waiting
-      expect(tree()).toEqual({ count: 5, name: '' });
+      expect(tree.$()).toEqual({ count: 5, name: '' });
     });
 
     it('should update signal value immediately via update()', () => {
@@ -85,7 +90,7 @@ describe('batching enhancer', () => {
       enhanced.$.count.update((c: number) => c + 10);
 
       // Value should be updated immediately - no waiting
-      expect(tree()).toEqual({ count: 10, name: '' });
+      expect(tree.$()).toEqual({ count: 10, name: '' });
     });
 
     it('should support read-after-write pattern', () => {
@@ -94,7 +99,7 @@ describe('batching enhancer', () => {
 
       // Write then immediately read - this is the critical pattern
       enhanced.$.count.set(42);
-      const value = tree().count;
+      const value = tree.$().count;
 
       expect(value).toBe(42); // Immediate, no waiting!
     });
@@ -104,14 +109,14 @@ describe('batching enhancer', () => {
         user: { name: 'Alice', settings: { theme: 'light' } },
       };
       const tree = createMockTree();
-      Object.assign(tree(), nestedState);
+      Object.assign(tree.$(), nestedState);
 
       // Create nested signal-like structure
       tree.$.user = {
         settings: {
           theme: {
             set: (v: string) => {
-              tree().user.settings.theme = v;
+              tree.$().user.settings.theme = v;
             },
           },
         },
@@ -121,7 +126,7 @@ describe('batching enhancer', () => {
 
       enhanced.$.user.settings.theme.set('dark');
 
-      expect(tree().user.settings.theme).toBe('dark');
+      expect(tree.$().user.settings.theme).toBe('dark');
     });
   });
 
@@ -136,13 +141,13 @@ describe('batching enhancer', () => {
 
       enhanced.batch(() => {
         enhanced.$.count.set(1);
-        expect(tree().count).toBe(1); // Immediate!
+        expect(tree.$().count).toBe(1); // Immediate!
 
         enhanced.$.name.set('test');
-        expect(tree().name).toBe('test'); // Immediate!
+        expect(tree.$().name).toBe('test'); // Immediate!
       });
 
-      expect(tree()).toEqual({ count: 1, name: 'test' });
+      expect(tree.$()).toEqual({ count: 1, name: 'test' });
     });
 
     it('should handle nested batches', () => {
@@ -154,11 +159,11 @@ describe('batching enhancer', () => {
 
         enhanced.batch(() => {
           enhanced.$.name.set('nested');
-          expect(tree().name).toBe('nested'); // Immediate even in nested batch
+          expect(tree.$().name).toBe('nested'); // Immediate even in nested batch
         });
 
-        expect(tree().count).toBe(1);
-        expect(tree().name).toBe('nested');
+        expect(tree.$().count).toBe(1);
+        expect(tree.$().name).toBe('nested');
       });
     });
 
@@ -174,7 +179,7 @@ describe('batching enhancer', () => {
       }).toThrow('test error');
 
       // State should still be updated
-      expect(tree().count).toBe(5);
+      expect(tree.$().count).toBe(5);
     });
   });
 
@@ -204,7 +209,7 @@ describe('batching enhancer', () => {
         enhanced.$.count.set(5);
       });
 
-      expect(tree().count).toBe(5);
+      expect(tree.$().count).toBe(5);
       expect(writeCount).toBe(1); // Only one actual write!
     });
 
@@ -221,8 +226,8 @@ describe('batching enhancer', () => {
         enhanced.$.name.set('c');
       });
 
-      expect(tree().count).toBe(3);
-      expect(tree().name).toBe('c');
+      expect(tree.$().count).toBe(3);
+      expect(tree.$().name).toBe('c');
     });
   });
 
@@ -236,13 +241,13 @@ describe('batching enhancer', () => {
       const enhanced = batching({ enabled: false })(tree) as any;
 
       enhanced.$.count.set(5);
-      expect(tree().count).toBe(5);
+      expect(tree.$().count).toBe(5);
 
       // batch() should still work (passthrough)
       enhanced.batch(() => {
         enhanced.$.count.set(10);
       });
-      expect(tree().count).toBe(10);
+      expect(tree.$().count).toBe(10);
     });
 
     it('should provide passthrough methods when disabled', () => {
@@ -276,7 +281,7 @@ describe('batching enhancer', () => {
       enhanced.$.count.set(5);
 
       // Value is immediate
-      expect(tree().count).toBe(5);
+      expect(tree.$().count).toBe(5);
 
       // Notification is delayed
       expect(notified).toBe(false);
@@ -299,7 +304,7 @@ describe('batching enhancer', () => {
       };
 
       enhanced.$.count.set(5);
-      expect(tree().count).toBe(5);
+      expect(tree.$().count).toBe(5);
 
       // With default (notificationDelayMs: 0), notification should happen on microtask
       await Promise.resolve();
@@ -348,7 +353,7 @@ describe('batching enhancer', () => {
     // `batchUpdate` was REMOVED in 14.1.1. It was a duplicate of the tree
     // callable: its body was `recursiveUpdate(signalState, arg)`, and with
     // `batching()` attached it wrapped that in `batch()` — so
-    // `tree.batchUpdate(x)` was exactly `tree.batch(() => tree(x))`.
+    // `tree.batchUpdate(x)` was exactly `tree.batch(() => tree.$(x))`.
     // MEASURED equivalent before removal: 0.921 vs 0.925 us at 10 fields,
     // 16.585 vs 16.475 us at 100 (medians of 9 x 2000, overlapping ranges).
     it('batchUpdate no longer exists on any tree shape', () => {

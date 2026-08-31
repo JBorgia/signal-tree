@@ -72,10 +72,10 @@ export const _clear: Promise<void> = persisted.clear();
 // ============================================================================
 // The row that catches a migration dropping half the intersection.
 // ⚠️ FOUR SPELLINGS DELETED by PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0. This pinned
-// six methods over two jobs. `toJSON()` measured EXACTLY EQUAL to `tree()`;
+// six methods over two jobs. `toJSON()` measured EXACTLY EQUAL to `tree.$()`;
 // `snapshot()`/`restore()` were its metadata-and-clone pair; `fromJSON()` is
 // internalized as the external-truth acquisition point. What survives is the one
-// job `tree()`/`tree(value)` cannot do — a type-preserving durable
+// job `tree.$()`/`tree.$(value)` cannot do — a type-preserving durable
 // representation — so the rows now assert ABSENCE as well as presence.
 export const _json: string = persisted.serialize();
 persisted.deserialize('{}');
@@ -99,8 +99,8 @@ export type _StateSurvives = [
 export const _count: number = persisted.$.count();
 export const _user: { name: string; age: number } = persisted.$.user();
 persisted.$.user({ name: 'Ada', age: 37 });
-export const _snapshotState: AppState = persisted();
-persisted({ count: 1 });
+export const _snapshotState: AppState = persisted.$();
+persisted.$({ count: 1, user: { name: 'Ada', age: 37 } });
 
 // ============================================================================
 // 4 — accumulation in BOTH orders, with BOTH halves surviving

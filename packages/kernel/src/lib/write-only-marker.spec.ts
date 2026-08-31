@@ -99,9 +99,9 @@ describe('ST2023 — snapshot without hydrate', () => {
     const tree = signalTree({ p: { [KEY]: true, init: 1 } as Mk });
 
     // It snapshots — so it reaches persistence, devtools and undo/redo...
-    expect((tree() as { p: unknown }).p).toBe(1);
+    expect((tree.$() as { p: unknown }).p).toBe(1);
     // ...and the write back is discarded, which is why the warning must exist.
-    tree({ p: 99 } as never);
+    tree.$({ p: 99 } as never);
     expect((tree.$.p as unknown as { get(): number }).get()).toBe(1);
   });
 

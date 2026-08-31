@@ -70,14 +70,14 @@ type LinkTarget<T> = NodeAccessor<T> | WritableCell<T>;
 declare function linkTarget<T>(x: LinkTarget<T>): void;
 
 // --- ACCEPTED: every writable location, despite three write spellings --------
-linkTarget(tree); // root — callable with a partial
+linkTarget(tree.$); // root state location
 linkTarget(tree.$.settings); // branch — callable with a partial
 linkTarget(tree.$.leaf); // leaf — .set()
 linkTarget(tree.$.settings.theme); // nested leaf
 
-// --- THE ONE REJECTION THE TYPE ACTUALLY MAKES ------------------------------
-// @ts-expect-error tree.$ is a TreeNode namespace, not a writable location
-linkTarget(tree.$);
+// --- THE CONTROLLER IS NOT A LOCATION ---------------------------------------
+// @ts-expect-error the controller is not callable or writable
+linkTarget(tree);
 
 // --- ACCEPTED, AND THEY SHOULD NOT BE ---------------------------------------
 // No `@ts-expect-error` on either line: adding one would fail `tsc` for the

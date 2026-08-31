@@ -76,18 +76,18 @@ describe('restoration enhancer', () => {
     const notifier = getPathNotifier();
     notifier.setBatchingEnabled(true);
 
-    // Simulate a subscriber updating the tree during flush (real systems
-    // typically have subscribers that apply state changes in response to
-    // PathNotifier events). This ensures restoration snapshots a changed
-    // state rather than deduping an identical snapshot.
-    notifier.subscribe('count', (v) => {
-      // Designated: this test asserts that a batched flush RECORDS a history
-      // entry, so the write it records has to be an undoable operation.
-      undoable(() => store({ count: v as number }));
+    // DISPOSITION OF THE FORMER REENTRANT TEST: direct notifier.notify(...)
+    // injection is an internal delivery mechanism, not an application write,
+    // and one-microtask completion is not part of its contract. Reentrant tree
+    // mutation remains supported and is characterized separately below using a
+    // real tree write plus flushSync().
+    //
+    // Two designated writes land in one notifier flush and therefore produce
+    // one history entry containing the final value.
+    undoable(() => {
+      store.$.count.set(1);
+      store.$.count.set(2);
     });
-
-    notifier.notify('count', 1, 0);
-    notifier.notify('count', 2, 0);
 
     // Allow microtask flush
     await Promise.resolve();
@@ -95,9 +95,40 @@ describe('restoration enhancer', () => {
     const history = t.getRestorationHistory();
     // INIT + 1 batch
     expect(history.length).toBeGreaterThanOrEqual(2);
-    // Ensure the last entry reflects the latest value (not every PathNotifier will change tree, but restoration should snapshot tree())
+    // Ensure the last entry reflects the latest value (not every PathNotifier will change tree, but restoration should snapshot tree.$())
     const last = history[history.length - 1];
     expect(last.state).toBeDefined();
+  });
+
+  it('records a reentrant subscriber mutation driven by a real tree write', async () => {
+    const store = (await import('../../lib/signal-tree')).signalTree(
+      { count: 0 },
+      { enhancers: [restoration()], capabilities: ['causal-runtime'] }
+    );
+    const restorationRuntime = (store as any).__restoration;
+    const { resetPathNotifier, getPathNotifier } = await import(
+      '../../lib/path-notifier'
+    );
+    resetPathNotifier();
+    const notifier = getPathNotifier();
+    const unsubscribe = notifier.subscribe('count', (value) => {
+      if (value === 1) {
+        undoable(() => store.$.count.set(2));
+      }
+    });
+
+    try {
+      undoable(() => store.$.count.set(1));
+      notifier.flushSync();
+
+      expect(store.$.count()).toBe(2);
+      expect(restorationRuntime.getRestorationHistory().at(-1)?.state).toEqual({
+        count: 2,
+      });
+    } finally {
+      unsubscribe();
+      store.destroy();
+    }
   });
 
   it('records history when a top-level leaf signal is written via .set()', async () => {
@@ -239,13 +270,13 @@ describe('restoration enhancer', () => {
       undoable(() => store.$.inside.set('grouped'));
     });
 
-    expect(store().inside).toBe('grouped');
+    expect(store.$().inside).toBe('grouped');
     expect(store.canUndo()).toBe(false);
     expect(t.getTurns()).toHaveLength(baseline + 1);
 
     pending.rollback();
 
-    expect(store()).toEqual({ inside: '', outside: '' });
+    expect(store.$()).toEqual({ inside: '', outside: '' });
     expect(store.canUndo()).toBe(false);
     expect(t.getRestorationHistory()).toHaveLength(baselineHistory);
     expect(t.getTurns()).toHaveLength(baseline);
@@ -276,7 +307,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(store()).toEqual({ inside: 'grouped', outside: 'later' });
+    expect(store.$()).toEqual({ inside: 'grouped', outside: 'later' });
     expect(store.canUndo()).toBe(true);
     expect(t.getRestorationHistory()).toHaveLength(baselineHistory + 1);
     expect(t.getTurns()).toHaveLength(baseline + 2);
@@ -346,7 +377,7 @@ describe('restoration enhancer', () => {
       })
     ).toThrow('boom');
 
-    expect(store()).toEqual({ left: '', right: '' });
+    expect(store.$()).toEqual({ left: '', right: '' });
     expect(applySpy).toHaveBeenCalledTimes(1);
 
     const turns = t.getTurns();
@@ -384,9 +415,9 @@ describe('restoration enhancer', () => {
 
     expect(store.canUndo()).toBe(true);
     store.undo();
-    expect(store()).toEqual({ x: 'pending', y: '' });
+    expect(store.$()).toEqual({ x: 'pending', y: '' });
     store.undo();
-    expect(store()).toEqual({ x: '', y: '' });
+    expect(store.$()).toEqual({ x: '', y: '' });
   });
 
   it('rolls back a pending scalar write through the realization port while preserving a later unrelated confirmed write', async () => {
@@ -417,7 +448,7 @@ describe('restoration enhancer', () => {
     pending.rollback();
 
     expect(applySpy).toHaveBeenCalledTimes(1);
-    expect(store()).toEqual({
+    expect(store.$()).toEqual({
       a: { x: 1 },
       b: { y: 20 },
     });
@@ -447,7 +478,7 @@ describe('restoration enhancer', () => {
 
     pending.rollback();
 
-    expect(store()).toEqual({
+    expect(store.$()).toEqual({
       profile: {
         name: '',
         email: 'new@example.com',
@@ -473,13 +504,13 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(store()).toEqual({ x: 'C' });
+    expect(store.$()).toEqual({ x: 'C' });
     expect(t.getRestorationHistory()).toHaveLength(2);
     expect(t.getTurns()).toHaveLength(3);
 
     pending.rollback();
 
-    expect(store()).toEqual({ x: 'C' });
+    expect(store.$()).toEqual({ x: 'C' });
   });
 
   it('keeps pending and later same-microtask scalar writes as separate causal turns', async () => {
@@ -500,7 +531,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(store()).toEqual({ x: 25 });
+    expect(store.$()).toEqual({ x: 25 });
     expect(t.getRestorationHistory()).toHaveLength(2);
     expect(t.getTurns()).toHaveLength(3);
     expect(t.getTurnStatus(t.getTurns().at(-2)?.id)).toBe('pending');
@@ -528,7 +559,7 @@ describe('restoration enhancer', () => {
 
     pending.rollback();
 
-    expect(store()).toEqual({ x: 25 });
+    expect(store.$()).toEqual({ x: 25 });
   });
 
   it('rejects rollback when a later same-microtask update derives from pending state', async () => {
@@ -551,7 +582,7 @@ describe('restoration enhancer', () => {
     expectRollbackError(() => pending.rollback(), {
       kind: 'later-confirmed-dependency',
     });
-    expect(store()).toEqual({ x: 25 });
+    expect(store.$()).toEqual({ x: 25 });
   });
 
   it('treats set then update in one later confirmed turn as replace for rollback classification', async () => {
@@ -574,7 +605,7 @@ describe('restoration enhancer', () => {
 
     pending.rollback();
 
-    expect(store()).toEqual({ x: 105 });
+    expect(store.$()).toEqual({ x: 105 });
   });
 
   it('treats update then set in one later confirmed turn as replace for rollback classification', async () => {
@@ -597,7 +628,7 @@ describe('restoration enhancer', () => {
 
     pending.rollback();
 
-    expect(store()).toEqual({ x: 100 });
+    expect(store.$()).toEqual({ x: 100 });
   });
 
   it('treats set then set in one later confirmed turn as replace for rollback classification', async () => {
@@ -620,7 +651,7 @@ describe('restoration enhancer', () => {
 
     pending.rollback();
 
-    expect(store()).toEqual({ x: 105 });
+    expect(store.$()).toEqual({ x: 105 });
   });
 
   it('treats update then update in one later confirmed turn as derive for rollback classification', async () => {
@@ -646,7 +677,7 @@ describe('restoration enhancer', () => {
       pendingEffect: { kind: 'set' },
       conflictingEffect: { kind: 'set', mutationIntent: 'derive' },
     });
-    expect(store()).toEqual({ x: 32 });
+    expect(store.$()).toEqual({ x: 32 });
   });
 
   it('rolls back callable partial writes at leaf precision', async () => {
@@ -659,7 +690,7 @@ describe('restoration enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store({
+      store.$({
         count: 20,
         title: 'Pending',
       });
@@ -671,7 +702,7 @@ describe('restoration enhancer', () => {
 
     pending.rollback();
 
-    expect(store()).toEqual({ count: 30, title: 'Original' });
+    expect(store.$()).toEqual({ count: 30, title: 'Original' });
   });
 
   it('rolls back a pending add while preserving later work on a different SubjectId', async () => {
@@ -1029,7 +1060,7 @@ describe('restoration enhancer', () => {
       })
     ).toThrow('boom');
 
-    expect(store()).toEqual({
+    expect(store.$()).toEqual({
       a: 1,
       rows: { all: [] },
     });
@@ -1463,14 +1494,14 @@ describe('restoration enhancer', () => {
     });
     confirmed.confirm();
     confirmed.confirm();
-    expect(store()).toEqual({ value: 'confirmed' });
+    expect(store.$()).toEqual({ value: 'confirmed' });
 
     const rolledBack = store.transaction(() => {
       undoable(() => store.$.value.set('rolled-back'));
     });
     rolledBack.rollback();
     rolledBack.rollback();
-    expect(store()).toEqual({ value: 'confirmed' });
+    expect(store.$()).toEqual({ value: 'confirmed' });
   });
 
   it('rejects mixed terminal transitions on a transaction handle', () => {
@@ -3002,7 +3033,7 @@ describe('restoration enhancer', () => {
       .getRestorationHistory()
       .map((entry: { state: { count: number } }) => entry.state.count);
 
-    expect(store().count).toBe(3);
+    expect(store.$().count).toBe(3);
     expect(historyStates).toEqual([0, 1, 3]);
   });
 
@@ -3033,7 +3064,7 @@ describe('restoration enhancer', () => {
       .getRestorationHistory()
       .map((entry: { state: { count: number } }) => entry.state.count);
 
-    expect(store().count).toBe(1);
+    expect(store.$().count).toBe(1);
     expect(historyStates).not.toContain(3);
     expect(historyStates.at(-1)).toBe(1);
   });
@@ -3884,7 +3915,7 @@ describe('restoration enhancer', () => {
 
     // Designated: this test undoes and redoes the root-callable update, so it
     // has to be an admitted turn.
-    undoable(() => store({ count: 2, title: 'B' }));
+    undoable(() => store.$({ count: 2, title: 'B' }));
     await Promise.resolve();
     await Promise.resolve();
 

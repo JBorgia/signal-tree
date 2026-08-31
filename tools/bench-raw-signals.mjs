@@ -138,11 +138,11 @@ function benchWriteWithConsumers(arm, round) {
 }
 
 // ── Workload 3: read the whole store ────────────────────────────────────────
-// Each arm's IDIOMATIC whole-state read: SignalTree's is `tree()` — the memoised
+// Each arm's IDIOMATIC whole-state read: SignalTree's is `tree.$()` — the memoised
 // materialisation with structural sharing — and raw's is reading its N signals.
 // Re-measured interleaved, the raw whole-read (N signal reads) is NOT slower
-// than `tree()`: the memo returns the identical object when nothing changed, so
-// an unchanged `tree()` is ~20ns on this shape. The row is measured because the
+// than `tree.$()`: the memo returns the identical object when nothing changed, so
+// an unchanged `tree.$()` is ~20ns on this shape. The row is measured because the
 // challenge says "read whole state" and a reader deserves to see both columns,
 // not because either side is expected to win it.
 function benchReadWhole(arm, round) {
@@ -177,7 +177,7 @@ const ARMS = {
     field: (t) => t.$.user.status,
     readField: (t, i) => (i % 2 ? t.$.prefs.locale : t.$.user.name),
     whole: (t) => {
-      const s = t();
+      const s = t.$();
       return `${s.user.name}:${s.user.role}:${s.user.status}:${s.prefs.theme}:${s.prefs.locale}:${s.counter}`;
     },
     lines: linesOf(makeTree),

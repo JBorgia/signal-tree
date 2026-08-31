@@ -1,4 +1,3 @@
-import { copyTreeProperties } from '../utils/copy-tree-properties';
 import { visitTree } from '../../lib/internals/visit-tree';
 
 import type {
@@ -301,69 +300,7 @@ export function batching(
       },
     };
 
-    // ========================================
-    // CREATE ENHANCED TREE
-    // ========================================
-
-    const originalTreeCall = tree.bind(tree);
-
-    // Create enhanced tree function that handles direct calls
-    const enhancedTree = function (
-      this: ISignalTree<T>,
-      ...args: unknown[]
-    ): T | void {
-      if (args.length === 0) {
-        return originalTreeCall();
-      } else {
-        // Direct tree updates - execute immediately
-        if (args.length === 1) {
-          const arg = args[0];
-          if (typeof arg === 'function') {
-            originalTreeCall(arg as (current: T) => T);
-          } else {
-            originalTreeCall(arg as T);
-          }
-        }
-        // Schedule notification after update
-        if (!inBatch) {
-          scheduleNotification();
-        }
-      }
-    } as unknown as ISignalTree<T>;
-
-    // Copy prototype chain
-    Object.setPrototypeOf(enhancedTree, Object.getPrototypeOf(tree));
-
-    // Copy enumerable properties
-    // copyTreeProperties, NOT Object.assign: `Object.assign` copies only
-    // ENUMERABLE own properties, and every tree method (`updateAndReport`,
-    // `batchUpdate`, `onPathChange`, `registerCleanup`, …) is defined
-    // `enumerable: false`. They were silently dropped, so the builder that
-    // wraps this enhanced tree found no method to forward to and returned an
-    // empty result — `updateAndReport({count:1})` returned [] and never wrote.
-    copyTreeProperties(
-      tree as unknown as object,
-      enhancedTree as unknown as object
-    );
-
-    // Copy non-enumerable properties
-    try {
-      copyTreeProperties(tree as object, enhancedTree as object);
-    } catch {
-      /* best-effort */
-    }
-
-    // Define new .with() method that passes enhancedTree (not the original tree)
-    // to subsequent enhancers. This is critical for preserving the enhancer chain.
-
-    // Define $ property
-    if ('$' in tree) {
-      Object.defineProperty(enhancedTree, '$', {
-        value: tree.$,
-        enumerable: false,
-        configurable: true,
-      });
-    }
+    const enhancedTree = tree;
 
     // Add batching methods
     Object.assign(enhancedTree, batchingMethods);

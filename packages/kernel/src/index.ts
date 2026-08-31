@@ -131,7 +131,7 @@ export {} from './lib/audit/audit';
 // decision toward itself without anyone choosing.
 //
 // Accumulation is three lines of composition over a plain leaf — and a leaf is
-// captured by restoration(), appears in tree(), and persists with no marker
+// captured by restoration(), appears in tree.$(), and persists with no marker
 // contract to satisfy, which a marker has to earn individually. See
 // docs/guides/streaming-accumulation.md. Git has the implementation if the
 // answer ever turns out to be "marker".

@@ -1,3 +1,5 @@
+import { isTraversableNode } from './node-shape';
+
 /**
  * SUBJECT RESTORATION CLAIMS — who still needs a retired subject's backing?
  *
@@ -232,7 +234,7 @@ export function getOrCreateSubjectRestorationClaims(
     return existing;
   }
   const host = ((node as { $?: unknown } | null)?.$ ?? node) as object | null;
-  if (host === null || typeof host !== 'object') {
+  if (!isTraversableNode(host)) {
     return undefined;
   }
   const claims = createSubjectRestorationClaims();
@@ -270,7 +272,7 @@ export function getSubjectRestorationClaims(
 }
 
 function read(node: unknown): SubjectRestorationClaims | undefined {
-  if (node === null || typeof node !== 'object') {
+  if (!isTraversableNode(node)) {
     return undefined;
   }
   return (

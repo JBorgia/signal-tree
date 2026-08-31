@@ -37,8 +37,8 @@ const computed = testRealization.derived.createDerived;
  *   MEMBERSHIP      add / remove stay dynamic post-construction
  *   GRANULARITY     watching byId('a') does not react to an update of 'b'
  *   CANONICALITY    writes participate in undo
- *   REPRESENTATION  tree() obtains it by the SAME generic rule as ordinary state
- *   RECONSTRUCTION  tree({rows:[...]}) writes by the SAME generic rule
+ *   REPRESENTATION  tree.$() obtains it by the SAME generic rule as ordinary state
+ *   RECONSTRUCTION  tree.$({rows:[...]}) writes by the SAME generic rule
  *   IDENTITY        deferred — rekey NECESSITY is withdrawn and unproven
  */
 type Row = { id: string; n: number };
@@ -201,7 +201,7 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     // engine, not of the two shapes.
   });
 
-  it('REPRESENTATION — tree() obtains it by the SAME generic rule as ordinary state', () => {
+  it('REPRESENTATION — tree.$() obtains it by the SAME generic rule as ordinary state', () => {
     const tree = signalTree({ rows: [] as Row[], n: 1, user: { name: 'Ada' } });
     const rows = collectionOver(tree.$.rows);
     undoable(() => rows.addOne({ id: 'a', n: 1 }));
@@ -210,7 +210,7 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     // NO ENVELOPE. The collection appears as its bare value, exactly like the
     // sibling leaf and the sibling branch, because the walk sees an ordinary
     // signal and M3's rule applies unmodified.
-    expect(tree()).toEqual({
+    expect(tree.$()).toEqual({
       rows: [
         { id: 'a', n: 1 },
         { id: 'b', n: 2 },
@@ -220,13 +220,13 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     });
   });
 
-  it('RECONSTRUCTION — tree(payload) restores it by the SAME generic rule', () => {
+  it('RECONSTRUCTION — tree.$(payload) restores it by the SAME generic rule', () => {
     const fresh = signalTree({ rows: [] as Row[], n: 0 });
     const rows = collectionOver(fresh.$.rows);
 
     // The ordinary root write path. No hydrate hook exists for this position,
     // because the position is an ordinary array leaf.
-    fresh({
+    fresh.$({
       rows: [
         { id: 'x', n: 10 },
         { id: 'y', n: 20 },
@@ -245,11 +245,11 @@ describe('CONFORMING COLLECTION — no marker, no hooks', () => {
     undoable(() => srcRows.addOne({ id: 'a', n: 1 }));
     undoable(() => srcRows.addOne({ id: 'b', n: 2 }));
 
-    const wire = JSON.parse(JSON.stringify(source())) as unknown;
+    const wire = JSON.parse(JSON.stringify(source.$())) as unknown;
 
     const target = signalTree({ rows: [] as Row[], n: 0 });
     const tgtRows = collectionOver(target.$.rows);
-    target(wire as never);
+    target.$(wire as never);
 
     expect(tgtRows.all()).toEqual([
       { id: 'a', n: 1 },

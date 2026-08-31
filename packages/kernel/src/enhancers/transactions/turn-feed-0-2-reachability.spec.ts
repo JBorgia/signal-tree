@@ -26,10 +26,13 @@ import { transactions } from './transactions';
  * ```
  *
  * `getTransactionLifecycleChannel()` was doing two jobs — "create if missing"
- * for the owner and "find" for an observer. The object an enhancer is handed is
- * not the object `signalTree()` returns, so an observer asking the public tree
+ * for the owner and "find" for an observer. An observer asking the wrong owner
  * silently got a brand-new channel that could never fire. Fail-open by
  * construction: no error, no warning, just silence.
+ *
+ * The canonical owner is the tree/controller because lifecycle and transaction
+ * authority are tree-level semantics. `$` is a state location; its callable or
+ * non-callable representation cannot decide lifecycle placement.
  *
  * Why TURN-FEED-0 missed it: every case that SUBSCRIBES composes
  * `restoration() + transactions()`. The one single-enhancer case asserts that
@@ -191,7 +194,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     // Break exactly the thing the repair installs — the channel on the canonical
     // host — while leaving the transaction authority in place. This is the state
     // the old code produced silently on every single-enhancer tree.
-    const host = (tree as unknown as { $: object }).$;
+    const host = tree as unknown as object;
     expect(
       Object.prototype.hasOwnProperty.call(host, LIFECYCLE)
     ).toBe(true);
@@ -209,7 +212,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
 
-    const host = (tree as unknown as { $: object }).$;
+    const host = tree as unknown as object;
     expect(Object.prototype.hasOwnProperty.call(host, LIFECYCLE)).toBe(true);
     delete (host as Record<symbol, unknown>)[LIFECYCLE];
 

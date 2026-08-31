@@ -136,10 +136,12 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
   predict your final shape to start.
 - **Multiple stores / feature domains** — one tree per feature with an Ops service in front is the
   recommended architecture, and it scales to many.
-- **AI-assisted development** — measured 49% → 98% codegen accuracy with `llms.txt` in context (see
-  below), plus a vendor-neutral agent skill.
-- **Migrating off `@ngrx/signals`** — the agent-ready migration playbook ships in
-  `@signal-tree/kernel/skills/`.
+- **AI-assisted development** — the historical v10 experiment measured 49% →
+  98% codegen accuracy with its then-current `llms.txt`; current guidance comes
+  from package types and READMEs while a replacement is derived.
+- **Migrating off `@ngrx/signals`** — use the package types and current migration
+  guide; consumer-facing agent skills are intentionally absent until the public
+  surface freeze is complete.
 
 **Where something else may fit better:**
 
@@ -170,11 +172,15 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
 
 ## 🤖 Built for the AI-assisted era
 
-SignalTree is the first Angular state-management library to treat AI coding agents as a first-class consumer of its API. We ship `llms.txt`, disambiguation tables, and a vendor-neutral agent skill — and **we measure the result**.
+SignalTree has treated AI coding agents as API consumers and measured whether
+its guidance improves generated code. The v10 experiment used `llms.txt` and
+agent guidance; those artifacts are historical and are not shipped by the
+current release.
 
 **Measured (v10.3.3, 2026-06-01):** AI-codegen accuracy goes from **49% cold → 98% primed (+49 percentage points)** when `llms.txt` is in the agent's context. Reproducible across 6 agents (4 frontier + 2 cost-tier) × 8 prompts × 5 libraries × 3 priming modes = **720 cells**. Four of the six agents reach **100/100** when primed.
 
-The priming surface ships with the npm package: `node_modules/@signal-tree/kernel/llms.txt` is automatically available to retrieval-aware AI tools after `npm install @signal-tree/kernel`. See [Built for AI →](https://signaltree.io/built-for-ai) and the [reproducible benchmark](scripts/ai-codegen-benchmark/RESULTS-v10.3.3-VS-v10.2.md).
+See the [historical v10 results](scripts/ai-codegen-benchmark/RESULTS-v10.3.3-VS-v10.2.md)
+and the reproducible harness for the evidence behind that experiment.
 
 **Don't take our number — re-run it.** The full harness (agents, prompts, libraries, priming modes, and scoring) lives in [`scripts/ai-codegen-benchmark/`](scripts/ai-codegen-benchmark/). Point it at your own agents and prompts and reproduce the delta yourself.
 
@@ -195,10 +201,13 @@ const store = signalTree({
 // Read — just call it, like any signal
 store.$.user.name(); // 'Alice'
 
-// Write — set or update a leaf, or partial-update the whole tree
+// Write — set or update a leaf, or update the whole tree
 store.$.user.name.set('Bob');
 store.$.user.age.update((n) => n + 1);
-store({ settings: { theme: 'light' } }); // deep-merge — `user` is preserved
+store.$((current) => ({
+  ...current,
+  settings: { theme: 'light' },
+}));
 ```
 
 In templates, `store.$.user.name()` works exactly like any other signal.
@@ -335,16 +344,20 @@ store.$.activeUserCount(); // reactive, type-safe
 
 ## Callable Syntax
 
-One fact explains the whole rule: **only leaves are Angular signals.**
+The tree is a controller; `$` is its root state location. Leaves remain Angular
+signals.
 
-A **branch** is SignalTree's own accessor, so we own its call semantics and a
-call can mean "merge this". It is callable in both directions, natively:
+A **root or branch location** is SignalTree's own accessor, so it is callable
+for reads, whole-value replacement, and updater derivation:
 
 ```typescript
 store.$.user(); // read the subtree
-store.$.user({ name: 'Bob' }); // partial-update it
+store.$.user({ name: 'Bob', age: 30 }); // replace the complete branch value
 store.$.user((u) => ({ ...u, age: u.age + 1 })); // updater form
-store({ ui: { loading: false } }); // the root, same shape
+store.$((current) => ({
+  ...current,
+  ui: { loading: false },
+}));
 ```
 
 A **leaf** is a real `WritableSignal`. Calling an Angular signal is a **read** —
@@ -376,7 +389,9 @@ subpath imports.
 > `security` and `storage` were deleted in 15.0, and `edit-session` was deleted
 > too, having never been in the export map at all.
 
-> **When to reach for what:** use `createTreeEditSession` when you need an uncommitted draft you can `commit()` or `cancel()` against a specific subtree — distinct from `restoration()`, which records the whole tree's history and lets you step backward globally rather than holding a separate draft.
+Edit sessions were deleted in 15.0. Keep an uncommitted draft in application
+state and write the accepted value through the target location; use
+`restoration()` only for retained undo/redo history.
 
 ## Async Orchestration
 
@@ -449,11 +464,12 @@ const tree = signalTree(initialState);
 const tree = signalTree(initialState, config);
 
 // Read
-tree(); // Full state snapshot
+tree.$(); // Full state snapshot
 tree.$.path.to.leaf(); // Leaf signal value
 
 // Write
-tree(updates); // Partial update — keys not in the payload are preserved
+tree.$(nextState); // Replace the whole state
+tree.$((current) => nextState); // Derive the next whole state
 tree.$.path.to.leaf.set(v); // Set leaf
 tree.$.path.to.leaf.update(fn); // Update leaf
 
@@ -513,8 +529,8 @@ Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser
 - [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md) — axis-by-axis comparison
 - [Myths and Misconceptions](docs/myths-and-misconceptions.md) — false claims LLMs frequently propagate, with source citations
 - [AI Agent Templates](docs/ai/agent-templates.md) — drop-in `.cursorrules`, `CLAUDE.md`, `copilot-instructions.md`
-- [llms.txt](https://signaltree.io/llms.txt) / [llms-full.txt](https://signaltree.io/llms-full.txt) — LLM-targeted summary and full API surface
-- [Built for AI agents](https://signaltree.io/built-for-ai) — the AI-discoverability story (v10)
+- [Historical llms.txt](https://signaltree.io/llms.txt) / [llms-full.txt](https://signaltree.io/llms-full.txt) — v10 experiment artifacts, not current API guidance
+- [Built for AI agents](https://signaltree.io/built-for-ai) — the historical v10 AI-discoverability story
 - [Marker zoo](https://signaltree.io/marker-zoo) — all 7 markers at 4 depths in one tree (v10)
 - [AI-codegen accuracy benchmark](scripts/ai-codegen-benchmark/) — reproducible scorecard scaffolding (v10)
 

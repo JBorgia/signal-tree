@@ -12,7 +12,7 @@ import { getChanges } from '@signaltree/shared';
  * @packageDocumentation
  */
 
-import type { NodeAccessor } from '../types';
+import { readCanonicalSnapshotInternal } from '../internals/canonical-snapshot';
 
 /**
  * Audit log entry recording state changes.
@@ -101,7 +101,7 @@ export interface AuditTrackerConfig<T> {
  * ```
  */
 export function createAuditTracker<T extends Record<string, unknown>>(
-  tree: NodeAccessor<T>,
+  tree: { readonly $: object },
   auditLog: AuditEntry<T>[],
   config: AuditTrackerConfig<T> = {}
 ): () => void {
@@ -112,13 +112,13 @@ export function createAuditTracker<T extends Record<string, unknown>>(
     maxEntries = 0,
   } = config;
 
-  let previousState = structuredClone(tree()) as T;
+  let previousState = structuredClone(readCanonicalSnapshotInternal<T>(tree));
   let isTracking = true;
 
   const handleChange = () => {
     if (!isTracking) return;
 
-    const currentState = tree() as T;
+    const currentState = readCanonicalSnapshotInternal<T>(tree);
     const changes = getChanges(previousState, currentState) as Partial<T>;
 
     if (Object.keys(changes).length > 0) {

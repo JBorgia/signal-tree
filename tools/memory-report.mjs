@@ -121,7 +121,7 @@ const SCENARIOS = {
     },
   },
   'entitymap-10k-snapshot': {
-    label: 'entityMap 10k + a held tree() snapshot',
+    label: 'entityMap 10k + a held tree.$() snapshot',
     n: 10_000,
     unit: 'entity',
     build: (n) => {
@@ -129,7 +129,7 @@ const SCENARIOS = {
       const data = [];
       for (let i = 0; i < n; i++) data.push({ id: i, name: 'n' + i, v: i });
       t.$.rows.setAll(data);
-      return { t, snap: t() };
+      return { t, snap: t.$() };
     },
   },
   /**
@@ -241,9 +241,9 @@ let readGrowth = 0;
     const data = [];
     for (let i = 0; i < 5000; i++) data.push({ id: i, name: 'n'+i, v: i });
     t.$.rows.setAll(data);
-    t();
+    t.$();
     const before = (await quiesce({ label: 'read-growth (baseline)' })).heapUsed;
-    for (let i = 0; i < 2000; i++) void t();
+    for (let i = 0; i < 2000; i++) void t.$();
     const after = (await quiesce({ label: 'read-growth (after reads)' })).heapUsed;
     console.log(((after - before) / (1024*1024)).toFixed(3));
   `.replace('QUIESCE_URL', quiescePath);
@@ -282,7 +282,7 @@ if (process.argv.includes('--json')) {
     );
   }
   console.log(
-    `\n  2,000 repeated tree() reads grew the heap by ${readGrowth.toFixed(
+    `\n  2,000 repeated tree.$() reads grew the heap by ${readGrowth.toFixed(
       3
     )} MB` +
       `\n  (a memo that grows per READ rather than per WRITE would be a leak in any` +

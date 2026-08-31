@@ -56,8 +56,8 @@ const makeTree = () =>
     { rows: entityMap<Row, string>({ selectId: (r) => r.id }) },
     { enhancers: [transactions()] }
   ) as never as {
-    (): { rows: { all: unknown[] } };
     $: {
+      (): { rows: { all: unknown[] } };
       rows: {
         addOne(row: Row): void;
         updateOne(id: string, patch: Partial<Row>): void;
@@ -88,7 +88,7 @@ describe('transactions — entity field rollback', () => {
     expect(tree.$.rows.byId('A')?.()).toEqual({ id: 'A', name: 'Alpha' });
     // The whole-tree snapshot too: the defect reached the physical value
     // backing, so a projection-only assertion would not have caught it.
-    expect(tree().rows.all).toEqual([{ id: 'A', name: 'Alpha' }]);
+    expect(tree.$().rows.all).toEqual([{ id: 'A', name: 'Alpha' }]);
   });
 
   it('restores EVERY field written in the transaction, not just the first', async () => {

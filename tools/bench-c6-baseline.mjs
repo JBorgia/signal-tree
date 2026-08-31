@@ -70,12 +70,12 @@ results.push(measure('scalar-write-leaf-set',
 
 results.push(measure('merge-write-same-leaf',
   () => ({ t: signalTree({ a: 0 }) }),
-  (ctx, n) => { for (let i = 0; i < n; i++) ctx.t({ a: i }); },
+  (ctx, n) => { for (let i = 0; i < n; i++) ctx.t.$({ a: i }); },
   (ctx) => ctx.t.$.a() > 0));
 
 results.push(measure('merge-write-many-leaves',
   () => ({ t: signalTree(wide(64)) }),
-  (ctx, n) => { for (let i = 0; i < Math.max(1, n / 64); i++) { const p = {}; for (let k = 0; k < 64; k++) p[`k${k}`] = i + k; ctx.t(p); } },
+  (ctx, n) => { for (let i = 0; i < Math.max(1, n / 64); i++) { const p = {}; for (let k = 0; k < 64; k++) p[`k${k}`] = i + k; ctx.t.$(p); } },
   (ctx) => ctx.t.$.k0() > 0));
 
 results.push(measure('causal-tree-write',

@@ -21,7 +21,7 @@ API, not a simplified stand-in:
 
 | arm            | implementation                                                                                        |
 | -------------- | ----------------------------------------------------------------------------------------------------- |
-| `signaltree`   | `entityMap({ selectId })`, `restoration()`                                                             |
+| `signaltree`   | `entityMap({ selectId })`, `restoration()`                                                            |
 | `ngrx-signals` | `signalState` + `@ngrx/signals/entities` (`setAllEntities`, `updateEntity`) — the official entity API |
 | `elf`          | `createStore` + `withEntities`, and **`@ngneat/elf-state-history`** for undo                          |
 | `raw-signals`  | a hand-rolled `Map` of per-entity signals + an id list — what you write with no library               |
@@ -93,7 +93,7 @@ Reproduce with `node --expose-gc tools/bench-compare.mjs --n 10000`.
 | arm          | median       | retained | history                      | 14.0.0 published |
 | ------------ | ------------ | -------- | ---------------------------- | ---------------- |
 | **elf**      | **1.09 ms**  | 4.88 MB  | built-in `elf-state-history` | 1.24 ms          |
-| signaltree   | **29.45 ms** | 29.70 MB | built-in `restoration()`      | 3.67 ms          |
+| signaltree   | **29.45 ms** | 29.70 MB | built-in `restoration()`     | 3.67 ms          |
 | ngrx-signals | 177.21 ms    | 1.08 MB  | hand-rolled                  | 179.84 ms        |
 | raw-signals  | 273.85 ms    | 6.31 MB  | hand-rolled                  | 278.44 ms        |
 
@@ -159,11 +159,11 @@ objects in DIRECTLY, since it already holds them — `upsertOne` routes to
 rather than reusing the one the snapshot is holding. Decomposing a 10,000 entity
 undo first:
 
-| component                                            | cost       | when it is paid            |
-| ---------------------------------------------------- | ---------- | -------------------------- |
-| `tree()` snapshot capture, cold (O(N) pointer array) | 38 µs      | on **record**, not on undo |
-| the reference diff walk over 10,000 rows             | 15 µs      | on undo                    |
-| `updateOne` for the one changed entity               | **< 1 µs** | on undo                    |
+| component                                              | cost       | when it is paid            |
+| ------------------------------------------------------ | ---------- | -------------------------- |
+| `tree.$()` snapshot capture, cold (O(N) pointer array) | 38 µs      | on **record**, not on undo |
+| the reference diff walk over 10,000 rows               | 15 µs      | on undo                    |
+| `updateOne` for the one changed entity                 | **< 1 µs** | on undo                    |
 
 > **This table previously stated a "total per undo" of ~110 µs, which its own
 > components do not sum to** (38 + 15 + <1 ≈ 54 µs) — and it counted the
@@ -181,7 +181,7 @@ than on taste.
 
 What remains is the O(N) pointer array, and it is inherent: a history entry has
 to hold a snapshot, and a snapshot of a changed collection is a new array of N
-pointers. A warm `tree()` costs 0 µs — the memo already covers the unchanged
+pointers. A warm `tree.$()` costs 0 µs — the memo already covers the unchanged
 case — so the cost only appears where the collection genuinely moved. For scale:
 the `structuredClone` a hand-rolled history performs on the same data is
 2,869 µs, ~75× more.
@@ -396,7 +396,7 @@ look.
   against "you would have to write this yourself", not against elf. The original
   "20× faster than elf" was an artefact of measuring an idle arm; the corrected
   measurement then exposed a real O(collection) defect in restore, now fixed.
-- ✅ **Snapshots are nearly free.** A held `tree()` of 10k entities costs 0.01 MB
+- ✅ **Snapshots are nearly free.** A held `tree.$()` snapshot of 10k entities costs 0.01 MB
   ([memory-profile.md](../architecture/memory-profile.md)) — one of the few
   claims here that survived re-measurement unchanged, and now on equal footing
   with its baseline rather than compared across settling points.

@@ -14,7 +14,7 @@ let tree = signalTree({
   held: { nested: { value: 2 } },
 });
 const held = tree.$.held.nested;
-void tree();
+void tree.$();
 
 let rootStore = tree.$;
 if (!rootStore || typeof rootStore !== 'object') {

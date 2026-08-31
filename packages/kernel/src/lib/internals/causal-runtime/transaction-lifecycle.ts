@@ -168,24 +168,11 @@ function createChannel(): TransactionLifecycleChannel {
 }
 
 /**
- * The CANONICAL host for a tree's lifecycle channel.
- *
- * TURN-FEED-0.2. The object an enhancer is handed is NOT the object
- * `signalTree()` returns — `applyEnhancers` runs first and `createBuilder`
- * produces the public tree afterwards — so a channel attached to the enhancer's
- * argument is unreachable from the tree an application holds. Measured across
- * both the enhancer input, the `applyEnhancers` output and the public tree,
- * `tree.$` is the one object identical at all three points, so it is the host.
- *
- * The fallback exists for the internal callers that pass a node directly.
- */
-function canonicalHost(tree: object): object {
-  const dollar = (tree as { $?: unknown }).$;
-  return dollar && typeof dollar === 'object' ? (dollar as object) : tree;
-}
-
-/**
  * Install the channel. **Owner side only.**
+ *
+ * The channel is attached to the tree/controller because transaction lifecycle
+ * is a tree-level capability. A state location does not own tree lifetime or
+ * transaction authority, regardless of whether its representation is callable.
  *
  * Idempotent: the second authority to set up on a tree gets the first one's
  * channel. Both `transactions()` and `restoration()` own transactions, so both
@@ -196,7 +183,7 @@ function canonicalHost(tree: object): object {
 export function installTransactionLifecycleChannel(
   tree: object
 ): TransactionLifecycleChannel {
-  const host = canonicalHost(tree);
+  const host = tree;
 
   // Marked BEFORE the early return, so a second owner installing onto an
   // existing channel still asserts the fact, and so the marker survives a
@@ -242,7 +229,7 @@ export function installTransactionLifecycleChannel(
  * kept the same defect and merely enumerated more of it.
  */
 function hasTransactionOwner(tree: object): boolean {
-  const host = canonicalHost(tree);
+  const host = tree;
   return !!(host as Record<symbol, unknown>)[TRANSACTION_LIFECYCLE_OWNER];
 }
 
@@ -255,7 +242,7 @@ function hasTransactionOwner(tree: object): boolean {
 export function tryGetTransactionLifecycleChannel(
   tree: object
 ): TransactionLifecycleChannel | undefined {
-  const host = canonicalHost(tree);
+  const host = tree;
   return (host as Record<symbol, unknown>)[TRANSACTION_LIFECYCLE] as
     | TransactionLifecycleChannel
     | undefined;

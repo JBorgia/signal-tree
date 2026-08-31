@@ -93,13 +93,13 @@ describe('E2 / P1 — unrelated later truth', () => {
     const tree = signalTree({ a: 0, b: 0 });
     const history: Turn[] = [];
 
-    const before = tree() as Root;
+    const before = tree.$() as Root;
     tree.$.a.set(1);
-    history.push({ id: 'T1', before, after: tree() as Root });
+    history.push({ id: 'T1', before, after: tree.$() as Root });
 
     tree.$.b.set(1); // independent later truth
 
-    for (const p of undoTurn(history[0], tree() as Root)) tree(p as never);
+    for (const p of undoTurn(history[0], tree.$() as Root)) tree.$(p as never);
 
     expect(tree.$.a()).toBe(0); // reverted
     expect(tree.$.b()).toBe(1); // SURVIVES
@@ -142,19 +142,19 @@ describe('E2 / P3 — a rolled-back speculative predecessor', () => {
     const tree = signalTree({ x: 'A' });
     const history: Turn[] = [];
 
-    let before = tree() as Root;
+    let before = tree.$() as Root;
     tree.$.x.set('B'); // T1, speculative
-    history.push({ id: 'T1', before, after: tree() as Root });
+    history.push({ id: 'T1', before, after: tree.$() as Root });
 
-    before = tree() as Root;
+    before = tree.$() as Root;
     tree.$.x.set('C'); // T2, confirmed
-    history.push({ id: 'T2', before, after: tree() as Root });
+    history.push({ id: 'T2', before, after: tree.$() as Root });
 
     // T1 is rolled back. Canonical truth stays 'C' because T2 owns the position.
     // The naive null does NOT touch retained history when this happens.
     expect(tree.$.x()).toBe('C');
 
-    for (const p of undoTurn(history[1], tree() as Root)) tree(p as never);
+    for (const p of undoTurn(history[1], tree.$() as Root)) tree.$(p as never);
 
     // WRONG. 'B' never legitimately existed.
     expect(tree.$.x()).toBe('B');
@@ -168,13 +168,13 @@ describe('E2 / P3 — a rolled-back speculative predecessor', () => {
     const tree = signalTree({ x: 'A' });
     const history: Turn[] = [];
 
-    let before = tree() as Root;
+    let before = tree.$() as Root;
     tree.$.x.set('B');
-    history.push({ id: 'T1', before, after: tree() as Root });
+    history.push({ id: 'T1', before, after: tree.$() as Root });
 
-    before = tree() as Root;
+    before = tree.$() as Root;
     tree.$.x.set('C');
-    history.push({ id: 'T2', before, after: tree() as Root });
+    history.push({ id: 'T2', before, after: tree.$() as Root });
 
     // THE ADDED CAPABILITY: rolling back T1 removes its contribution from every
     // successor's retained `before`. Successors keep their own contribution.
@@ -198,13 +198,13 @@ describe('E2 / P3 — a rolled-back speculative predecessor', () => {
     expect(tree.$.x()).toBe('C'); // canonical truth untouched by the rollback
 
     const t2 = history[0];
-    for (const p of undoTurn(t2, tree() as Root)) tree(p as never);
+    for (const p of undoTurn(t2, tree.$() as Root)) tree.$(p as never);
 
     expect(tree.$.x()).toBe('A'); // CORRECT
 
     // And redo returns to C.
     for (const p of writeSet(t2.before, t2.after)) {
-      tree(patch(p, get(t2.after, p)) as never);
+      tree.$(patch(p, get(t2.after, p)) as never);
     }
     expect(tree.$.x()).toBe('C');
   });

@@ -130,7 +130,7 @@ declare const rootTree: SignalTree<RootState>;
 // ============================================================================
 // A root IS a `NodeAccessor` and exposes the tree through `$` (Rule 0d).
 export type _RootAccessor = [
-  Expect<Equal<(typeof rootTree)['$'], TreeNode<RootState>>>
+  Expect<Equal<(typeof rootTree)['$'], AccessibleNode<RootState>>>
 ];
 
 // `$` is the ONLY accessor on the public tree type. `state` is a
@@ -158,13 +158,15 @@ export type _NoRootBranch = (typeof rootTree)['user'];
 export const _viaAccessor: number = rootTree.$.count();
 export const _viaAccessorBranch: RootState['user'] = rootTree.$.user();
 
-// Read returns the exact snapshot type; both write forms are callable.
-export const _rootRead: RootState = rootTree();
-rootTree({ count: 1, name: 'n', tags: ['t'], user: { name: 'Ada', age: 44, address: { city: 'Boise' } } });
-rootTree((current) => ({ ...current, count: current.count + 1 }));
+// The root state accessor returns the exact value and owns both write forms.
+export const _rootRead: RootState = rootTree.$();
+rootTree.$({ count: 1, name: 'n', tags: ['t'], user: { name: 'Ada', age: 44, address: { city: 'Boise' } } });
+rootTree.$((current) => ({ ...current, count: current.count + 1 }));
 
 // @ts-expect-error a root write must not accept a foreign key
-rootTree({ nope: 1 });
+rootTree.$({ nope: 1 });
+// @ts-expect-error the controller is not a state location
+rootTree();
 
 // ============================================================================
 // A2 — nested object access (Rule 0d, the at-risk contract)
@@ -206,10 +208,9 @@ rootTree.$.user.address({ city: 'Boise' });
 rootTree.$.user.set({ name: 'Bob', age: 1, address: { city: 'x' } });
 
 // ============================================================================
-// A3 — bind / destroy / registerCleanup lifecycle surface
+// A3 — destroy / registerCleanup lifecycle surface
 // ============================================================================
 export type _LifecycleSurface = [
-  Expect<Equal<(typeof rootTree)['bind'], (thisArg?: unknown) => NodeAccessor<RootState>>>,
   Expect<Equal<(typeof rootTree)['destroy'], () => void>>,
   Expect<Equal<(typeof rootTree)['destroyed'], ReadableCell<boolean>>>,
   Expect<Equal<(typeof rootTree)['registerCleanup'], (fn: () => void) => void>>,
@@ -222,13 +223,6 @@ export type _LifecycleSurface = [
     >
   >
 ];
-
-// `bind()` yields a plain node accessor — the three call forms, no `$`.
-const bound = rootTree.bind();
-export const _boundRead: RootState = bound();
-bound({ count: 2, name: 'n', tags: ['t'], user: { name: 'Ada', age: 44, address: { city: 'Boise' } } });
-// @ts-expect-error the bound accessor is not a tree; it has no `$`
-export type _BoundHasNoAccessor = (typeof bound)['$'];
 
 // ============================================================================
 // A4 — negative controls
@@ -261,17 +255,17 @@ const builtState = {
 
 const built = signalTree(builtState);
 
-// B1 — root call forms and `$`, on the constructed value.
+// B1 — root `$` call forms on the constructed value.
 export const _builtRead: {
   count: number;
   name: string;
   tags: string[];
   user: { name: string; age: number; address: { city: string } };
-} = built();
-built({ count: 1 });
-built((current) => ({ ...current, count: current.count + 1 }));
+} = built.$();
+built.$(builtState);
+built.$((current) => ({ ...current, count: current.count + 1 }));
 // @ts-expect-error a root write must not accept a foreign key
-built({ nope: 1 });
+built.$({ nope: 1 });
 
 // B2 — Rule 0d holds on the constructed value, at depth.
 export const _builtBranchRead: { name: string; age: number; address: { city: string } } =
@@ -415,7 +409,5 @@ const builtForAlignment = signalTree<RootState>({
 export const _constructorMatchesAnnotation: SignalTree<RootState> =
   builtForAlignment;
 
-// The aligned `bind()` is usable through the canonical annotation, with the
-// read form returning `RootState` rather than `RootState | void`.
-export const _boundThroughAnnotation: RootState =
-  _constructorMatchesAnnotation.bind()();
+export const _readThroughAnnotation: RootState =
+  _constructorMatchesAnnotation.$();

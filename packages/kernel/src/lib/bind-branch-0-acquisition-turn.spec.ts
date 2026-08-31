@@ -54,8 +54,9 @@ import { undoable } from './undoable';
  * observable per effect is its own `origin` / `participation`, which is exactly
  * what the boundary rule needs — and what these tests use instead.
  *
- * A branch node is callable with a partial (deep merge, `NodeAccessor<T>`). It
- * deliberately has no `.set()`; that is the Rule 0d line.
+ * A branch node's authored callable takes its complete value. External partial
+ * acquisition enters through `external()` instead of weakening
+ * `NodeAccessor<T>`. The branch deliberately has no `.set()`.
  */
 
 const flush = async () => {

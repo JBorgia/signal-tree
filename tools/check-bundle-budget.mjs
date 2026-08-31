@@ -126,7 +126,7 @@ const TARGETS = {
     // Measured 7.12KB; production 5.59KB.
     //
     // What it bought: `asyncSource`/`asyncStream` values reach
-    // snapshots at all — before this `tree()` dropped them entirely, the same
+    // snapshots at all — before this `tree.$()` dropped them entirely, the same
     // defect `form()` had — plus ST2022, which fires when a marker registers
     // without declaring what of it is state. That diagnostic is the guard
     // against a SEVENTH instance of this defect class, so its bytes are the
@@ -266,7 +266,7 @@ const TARGETS = {
     // Measured 10.30KB; production 8.24KB.
     //
     // What it bought: `asyncSource`/`asyncStream` values reach
-    // snapshots at all — before this `tree()` dropped them entirely, the same
+    // snapshots at all — before this `tree.$()` dropped them entirely, the same
     // defect `form()` had — plus ST2022, which fires when a marker registers
     // without declaring what of it is state. That diagnostic is the guard
     // against a SEVENTH instance of this defect class, so its bytes are the
@@ -284,7 +284,7 @@ const TARGETS = {
     // collection went from 4,149 to 844 B/entity, 39.6MB to 8.05MB
     // (docs/architecture/memory-profile.md), and a marker's snapshot wrapper
     // stopped being re-allocated on every UNRELATED write, which is what makes
-    // `computed(() => tree().rows)` stable for an OnPush consumer. On the axis
+    // `computed(() => tree.$().rows)` stable for an OnPush consumer. On the axis
     // that matters for a phone this is 90 bytes of download against 31MB of
     // heap — see docs/architecture/size-structure-review.md for why retained
     // heap is weighted above gzip here.

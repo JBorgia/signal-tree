@@ -30,10 +30,10 @@ describe('restoration records direct leaf writes', () => {
     await flush();
     undoable(() => tree.$.user.profile.name.set('c'));
     await flush();
-    expect(tree().user.profile.name).toBe('c');
+    expect(tree.$().user.profile.name).toBe('c');
 
     tree.undo();
-    expect(tree().user.profile.name).toBe('b');
+    expect(tree.$().user.profile.name).toBe('b');
   });
 
   it('undo restores a direct leaf .update()', async () => {
@@ -43,10 +43,10 @@ describe('restoration records direct leaf writes', () => {
     await flush();
     undoable(() => tree.$.count.update((n) => n + 1));
     await flush();
-    expect(tree().count).toBe(2);
+    expect(tree.$().count).toBe(2);
 
     tree.undo();
-    expect(tree().count).toBe(1);
+    expect(tree.$().count).toBe(1);
   });
 
   it('records leaf writes at depth', async () => {
@@ -57,10 +57,10 @@ describe('restoration records direct leaf writes', () => {
 
     undoable(() => tree.$.a.b.c.d.set(2));
     await flush();
-    expect(tree().a.b.c.d).toBe(2);
+    expect(tree.$().a.b.c.d).toBe(2);
 
     tree.undo();
-    expect(tree().a.b.c.d).toBe(1);
+    expect(tree.$().a.b.c.d).toBe(1);
   });
 
   it('redo replays a leaf write that undo rolled back', async () => {
@@ -69,10 +69,10 @@ describe('restoration records direct leaf writes', () => {
     undoable(() => tree.$.n.set(2));
     await flush();
     tree.undo();
-    expect(tree().n).toBe(1);
+    expect(tree.$().n).toBe(1);
 
     tree.redo();
-    expect(tree().n).toBe(2);
+    expect(tree.$().n).toBe(2);
   });
 
   it('does not grow history while restoring', async () => {
@@ -112,7 +112,7 @@ describe('restoration records direct leaf writes', () => {
     tree.undo();
     await flush();
 
-    const afterUndo = tree() as unknown as {
+    const afterUndo = tree.$() as unknown as {
       rows: { all: Array<{ id: number; name: string }> };
     };
 
@@ -121,7 +121,7 @@ describe('restoration records direct leaf writes', () => {
     expect(afterUndo.rows.all.map((row) => row.id)).toEqual([1, 2]);
 
     tree.redo();
-    const afterRedo = tree() as unknown as {
+    const afterRedo = tree.$() as unknown as {
       rows: { all: Array<{ id: number; name: string }> };
     };
     expect(afterRedo.rows.all.map((row) => row.id)).toEqual([1, 2, 3]);

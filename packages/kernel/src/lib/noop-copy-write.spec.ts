@@ -83,7 +83,7 @@ describe('ST2027 — a deep-equal copy write is reported', () => {
     // The same no-op through a MERGE write is reported.
     warn.mockClear();
     const current = tree.$.gapCase();
-    (tree as unknown as (v: object) => void)({ gapCase: current });
+    tree.$({ gapCase: current });
     expect(messages().join('\n')).toContain('ST2003');
   });
 
@@ -94,7 +94,7 @@ describe('ST2027 — a deep-equal copy write is reported', () => {
     void tree.$;
     warn.mockClear();
 
-    (tree as unknown as (v: object) => void)({ cfg: { a: 1, b: 2, c: 3 } });
+    tree.$({ cfg: { a: 1, b: 2, c: 3 } });
 
     expect(fired()).toBe(0);
   });

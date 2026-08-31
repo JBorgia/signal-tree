@@ -142,6 +142,6 @@ describe('E5 fork — canonical participation of the two candidate paths', () =>
     const tree = signalTree({ counter: 7, other: 'x' });
     const api = makeCounterApi(tree.$.counter);
     api.increment();
-    expect(tree()).toEqual({ counter: 8, other: 'x' });
+    expect(tree.$()).toEqual({ counter: 8, other: 'x' });
   });
 });

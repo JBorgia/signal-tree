@@ -177,7 +177,7 @@ const t3tree = () => {
   const s = process.hrtime.bigint();
   for (let i = 0; i < N3; i++) {
     t.$.n.set(i);
-    for (let k = 0; k < 10; k++) sink += Object.keys(t()).length;
+    for (let k = 0; k < 10; k++) sink += Object.keys(t.$()).length;
   }
   return Number(process.hrtime.bigint() - s) / 1000;
 };

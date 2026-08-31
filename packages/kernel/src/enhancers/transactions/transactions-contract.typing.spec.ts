@@ -75,8 +75,8 @@ export type _StateSurvives = [
 export const _count: number = txn.$.count();
 export const _user: { name: string; age: number } = txn.$.user();
 txn.$.user({ name: 'Ada', age: 37 });
-export const _snapshot: AppState = txn();
-txn({ count: 1 });
+export const _snapshot: AppState = txn.$();
+txn.$({ count: 1, user: { name: 'Ada', age: 37 } });
 
 // ============================================================================
 // 3 — accumulation in BOTH orders

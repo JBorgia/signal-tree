@@ -15,6 +15,7 @@ declare const ngDevMode: boolean | undefined;
 // codec, a key and a backend; the relationship is Link's.
 import type { HydrateMode } from '../../lib/internals/materialize-markers';
 import type { ReadableCell, WritableCell } from '../../lib/internals/cell-runtime';
+import { readCanonicalSnapshotInternal } from '../../lib/internals/canonical-snapshot';
 
 
 /**
@@ -30,9 +31,9 @@ import type { ReadableCell, WritableCell } from '../../lib/internals/cell-runtim
  *
  * Measured, per path:
  *
- *   ENCODE      `encodeSnapshot(tree(), …)` receives the MATERIALIZED snapshot,
+ *   ENCODE      `encodeSnapshot(tree.$(), …)` receives the MATERIALIZED snapshot,
  *               not the signal tree. Probed: a `.derived()` computed is absent
- *               from `tree()` (`["a","b"]`, no `sum`). No reactive value reaches
+ *               from `tree.$()` (`["a","b"]`, no `sum`). No reactive value reaches
  *               the replacer at all — the code's own comment already said so:
  *               "Skip signals - we already unwrapped them".
  *
@@ -317,12 +318,12 @@ interface SerializableSignalTree<T> extends ISignalTree<T> {
  * `PRE-RELEASE-PUBLIC-SURFACE-DEDUPE-0`:
  *
  * ```text
- * toJSON()    MEASURED EXACTLY EQUAL to `tree()`. Its one distinct job was
+ * toJSON()    MEASURED EXACTLY EQUAL to `tree.$()`. Its one distinct job was
  *             `JSON.stringify(tree)` protocol conformance — which worked ONLY
  *             with `persistence()` installed, so on a bare tree
  *             `JSON.stringify(tree)` returned `undefined`. A protocol hook that
  *             silently yields undefined in the DEFAULT case is a trap, not a
- *             contract. `JSON.stringify(tree())` works on every tree.
+ *             contract. `JSON.stringify(tree.$())` works on every tree.
  * snapshot()  toJSON() plus metadata plus a JSON deep clone. Diagnostic
  *             cloning survives privately; nothing public consumed it, and the
  *             only thing it paired with was restore().
@@ -333,8 +334,8 @@ interface SerializableSignalTree<T> extends ISignalTree<T> {
  *             function. DELETE THE PUBLIC SPELLING, NOT THE CAPABILITY.
  * ```
  *
- * What survives is the one job `tree()`/`tree(value)` genuinely cannot do:
- * a TYPE-PRESERVING DURABLE REPRESENTATION. `tree()` hands back live
+ * What survives is the one job `tree.$()`/`tree.$(value)` genuinely cannot do:
+ * a TYPE-PRESERVING DURABLE REPRESENTATION. `tree.$()` hands back live
  * Date/Map/Set/bigint instances and no version envelope; `serialize` encodes
  * them and stamps the snapshot format, and `deserialize` is its inverse.
  */
@@ -474,7 +475,7 @@ function createReplacer(config: InternalSerializationConfig) {
       circularPaths.set(value, currentPath);
     }
 
-    // Special-type handling happens in `tree()`'s walk, not here. (It used to
+    // Special-type handling happens in `tree.$()`'s walk, not here. (It used to
     // live in a private `unwrapObjectSafely`, deleted in 14.0.0.)
     return value;
   };
@@ -611,14 +612,14 @@ function encodeSpecials(v: unknown, preserveTypes: boolean): unknown {
 /**
  * THE CODEC, over a SUPPLIED VALUE.
  *
- * ⚠️ EXTRACTED AT THE SEAM `const raw = tree()` — the ONE line that bound
+ * ⚠️ EXTRACTED AT THE SEAM `const raw = tree.$()` — the ONE line that bound
  * encoding to "whatever the tree currently holds". Everything else here
  * (special types, circular refs, nodeMap, metadata, replacer) is pure encoding
  * over `raw` and always was.
  *
  * That binding is exactly what PERSISTENCE-AS-LINK-SWAP-0 had to break.
  * `persistence()` must encode the value Link says is EGRESS-ELIGIBLE, which is
- * not in general the value `tree()` returns — an inspection write moves the
+ * not in general the value `tree.$()` returns — an inspection write moves the
  * latter and deliberately leaves the former behind. The public
  * `serialize(config?)` signature is UNCHANGED and still means "encode current
  * state"; only an internal caller may name a different value.
@@ -630,14 +631,14 @@ function encodeSnapshot<T>(
 ): string {
   // ONE materialiser. `serialize()` used to walk the tree itself with a
   // private `unwrapObjectSafely`, three hundred lines from `toJSON()` which
-  // already delegated to `tree()` — so the enhancer disagreed with itself
+  // already delegated to `tree.$()` — so the enhancer disagreed with itself
   // about what a snapshot is, and the private copy never learned the marker
   // rule. That is why it emitted 17 keys for a `status()` node (2 state, 6
   // computeds, 9 SETTER METHODS) and then threw on restore when it tried to
   // `.set()` a computed back.
   //
   // The stated reason for keeping it — "we need type-preserving markers" —
-  // does not hold: `tree()` returns LIVE Date/Map/Set/RegExp/bigint
+  // does not hold: `tree.$()` returns LIVE Date/Map/Set/RegExp/bigint
   // instances (verified for all six, nested included) and `encodeSpecials`
   // below does the marking. It was never `unwrapObjectSafely` that
   // preserved the types.
@@ -968,7 +969,7 @@ export function serialization(
      * Serialize to JSON string
      */
     enhanced.serialize = (config?: SerializationConfig): string =>
-      encodeSnapshot(tree(), tree, {
+      encodeSnapshot(readCanonicalSnapshotInternal<T>(tree), tree, {
         ...DEFAULT_CONFIG,
         ...defaultConfig,
         ...config,
@@ -1159,7 +1160,7 @@ export function persistence(
     // WHAT LINK NOW OWNS — every one of these was hand-rolled here, and each
     // hand-rolled copy was WEAKER than the primitive that replaced it:
     //
-    //   change detection    was `tree() !== previousState` off `subscribe()`,
+    //   change detection    was `tree.$() !== previousState` off `subscribe()`,
     //                       with a 100ms POLLING FALLBACK outside Angular.
     //                       Now: the path notifier, per notification.
     //   turn coalescing     was a `debounceMs` timer doing double duty as both
@@ -1182,7 +1183,7 @@ export function persistence(
     // ⚠️ AND THE ONE THAT WAS NOT MERELY WEAKER — IT WAS ABSENT.
     //
     // Whole-tree reference identity cannot tell an AUTHORED write from an
-    // INSPECTION write, because both move `tree()`. That is structurally the
+    // INSPECTION write, because both move `tree.$()`. That is structurally the
     // same mechanism as LINK-ROOT-SOURCE-0's M3 mutation — "replace the
     // eligible projection with a current whole-tree re-read" — which passed six
     // rows and killed the inspection row ALONE. Measured here before the swap,
@@ -1216,13 +1217,13 @@ export function persistence(
     /**
      * The latest EGRESS-ELIGIBLE whole-tree value, as Link computed it.
      *
-     * Seeded from `tree()` at construction — the same read, at the same moment,
+     * Seeded from `tree.$()` at construction — the same read, at the same moment,
      * that Link makes for its own authority baseline — and advanced only by
      * Link handing a value to the endpoint. Deliberately never re-read from
-     * `tree()` afterwards: that re-read is precisely the mechanism that made
+     * `tree.$()` afterwards: that re-read is precisely the mechanism that made
      * inspection state durable.
      */
-    let latestEligible: T = tree();
+    let latestEligible: T = readCanonicalSnapshotInternal<T>(tree);
 
     /** Encode ONE egress-eligible whole-tree value and make it durable. */
     const persist = async (value: T): Promise<void> => {
@@ -1325,7 +1326,7 @@ export function persistence(
     /**
      * Save current state to storage.
      *
-     * Publishes the EGRESS-ELIGIBLE value, not `tree()` — that is the whole
+     * Publishes the EGRESS-ELIGIBLE value, not `tree.$()` — that is the whole
      * point of the swap and it must hold for the manual path too, or a devtools
      * scrub followed by an explicit `save()` would make the scrub durable.
      */
@@ -1334,7 +1335,7 @@ export function persistence(
       try {
         await flushPending();
         await relationship.settled();
-        // The eligible value, never `tree()`. On an untouched tree this is
+        // The eligible value, never `tree.$()`. On an untouched tree this is
         // still the baseline Link adopted at construction — which is the point:
         // an inspection write cannot have advanced it, so a devtools scrub
         // followed by an explicit `save()` cannot make the scrub durable.

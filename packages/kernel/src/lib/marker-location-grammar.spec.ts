@@ -18,7 +18,7 @@ import { signalTree } from './signal-tree';
  *
  * THE GRAMMAR, measured rather than assumed:
  *
- *   position                    types      runtime    ST2021    payload in tree()
+ *   position                    types      runtime    ST2021    payload in tree.$()
  *   ─────────────────────────── ────────── ────────── ───────── ─────────────────
  *   root object property        marker     marker     —         absent
  *   nested object property      marker     marker     —         absent
@@ -34,8 +34,8 @@ import { signalTree } from './signal-tree';
  * (`$.h.rows`).
  *
  * "data" means the value is NOT interpreted as a marker declaration: it stays
- * the raw builder object for the life of the tree. `tree()` then contains it
- * because it contains every leaf value — that is `tree()` being correct, not a
+ * the raw builder object for the life of the tree. `tree.$()` then contains it
+ * because it contains every leaf value — that is `tree.$()` being correct, not a
  * leak. `ST2021` (`signal-tree.ts`) states the rule the grammar encodes:
  * **markers belong at object positions.**
  *
@@ -88,15 +88,15 @@ describe('supported marker positions are payload-opaque', () => {
     }
   }
 
-  it('tree() — root and nested object positions', () => {
+  it('tree.$() — root and nested object positions', () => {
     const tree = signalTree({
       rows: entityMap<Row, number>(cfg()),
       nested: { rows: entityMap<Row, number>(cfg()) },
     });
     tree.$.rows.setAll([{ id: 1, name: 'a' }]);
 
-    const json = JSON.stringify(tree());
-    assertOpaque('tree()', json);
+    const json = JSON.stringify(tree.$());
+    assertOpaque('tree.$()', json);
     // CONTROL — the snapshot is not merely empty; it holds the real value.
     expect(JSON.parse(json)).toEqual({
       rows: { all: [{ id: 1, name: 'a' }] },
@@ -144,7 +144,7 @@ describe('supported marker positions are payload-opaque', () => {
         beforeRemove: () => true,
       },
     });
-    const json = JSON.stringify(signalTree({ list: [marker] })());
+    const json = JSON.stringify(signalTree({ list: [marker] }).$());
 
     expect(json).not.toContain(secret);
     // What survives is the empty husk of `hooks` — functions do not serialize.
@@ -158,7 +158,9 @@ describe('supported marker positions are payload-opaque', () => {
     // proves the test above is measuring absence of data, not absence of a path.
     const m = entityMap<Row, number>(cfg()) as unknown as Record<string, unknown>;
     (m['__entityMapConfig'] as Record<string, unknown>)['probe'] = { t: 'SECRET-CTL' };
-    expect(JSON.stringify(signalTree({ list: [m] } as never)())).toContain('SECRET-CTL');
+    expect(
+      JSON.stringify((signalTree({ list: [m] } as never) as any).$())
+    ).toContain('SECRET-CTL');
   });
 });
 
@@ -240,6 +242,6 @@ describe('marker-location grammar', () => {
     }
     const tree = signalTree({ h: new Holder() });
     expect(materialized(tree.$.h.rows)).toBe(true);
-    expect(JSON.stringify(tree())).not.toContain('__entityMapConfig');
+    expect(JSON.stringify(tree.$())).not.toContain('__entityMapConfig');
   });
 });

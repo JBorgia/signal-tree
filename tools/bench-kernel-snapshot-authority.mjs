@@ -50,7 +50,7 @@ if (arm === 'unread' || arm === 'read') {
   requireExposeGc('bench-kernel-snapshot-authority');
   const result = await measureRetained(() => {
     const tree = signalTree(makeWideState());
-    if (arm === 'read') void tree();
+    if (arm === 'read') void tree.$();
     return tree;
   }, { label: `KSA 10k ordinary branches ${arm}` });
   console.log(JSON.stringify({ arm, branches: BRANCHES, ...result }, null, 2));
@@ -59,7 +59,7 @@ if (arm === 'unread' || arm === 'read') {
     const tree = signalTree({ value: 0 });
     return {
       write: (value) => tree.$.value.set(value),
-      read: () => tree(),
+      read: () => tree.$(),
       destroy: () => tree.destroy(),
     };
   }, 100_000);
@@ -70,7 +70,7 @@ if (arm === 'unread' || arm === 'read') {
     for (let depth = 0; depth < 50; depth++) leaf = leaf.child;
     return {
       write: (value) => leaf.value.set(value),
-      read: () => tree(),
+      read: () => tree.$(),
       destroy: () => tree.destroy(),
     };
   }, 100_000);
@@ -85,11 +85,11 @@ if (arm === 'unread' || arm === 'read') {
         leaf.value.set(value);
         writes++;
         if (writes === 100) {
-          void tree();
+          void tree.$();
           writes = 0;
         }
       },
-      read: () => tree(),
+      read: () => tree.$(),
       destroy: () => tree.destroy(),
     };
   }, 100_000);

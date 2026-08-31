@@ -292,7 +292,7 @@ interface SignalTree<T> {
 }
 ```
 
-If you want a non-reactive snapshot of the underlying values, call `tree()` to get the full state snapshot, or read individual leaves via `tree.$.path.to.leaf()`.
+If you want a non-reactive snapshot of the underlying values, call `tree.$()` to get the full state snapshot, or read individual leaves via `tree.$.path.to.leaf()`.
 
 **Source:** [`packages/kernel/src/lib/types.ts`](../packages/kernel/src/lib/types.ts) — `$` is the only node accessor; `state` was removed in v11.
 

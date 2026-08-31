@@ -70,7 +70,7 @@ function measure(depth) {
 
 /**
  * The other plausible reading of "operation at depth N": a ROOT update that
- * walks the whole chain, i.e. `tree({ l1: { l2: { … value } } })`, which goes
+ * walks the whole chain, i.e. `tree.$({ l1: { l2: { … value } } })`, which goes
  * through `recursiveUpdate` rather than writing one leaf signal directly.
  *
  * Both are measured because the claim being checked never said which it meant,
@@ -87,14 +87,14 @@ function measureRootUpdate(depth) {
   const tree = signalTree(buildDeep(depth));
   const leaf = leafAt(tree, depth);
   for (let i = 0; i < BATCH; i++) {
-    tree(buildPatch(depth, i));
+    tree.$(buildPatch(depth, i));
     sink += leaf();
   }
   const perOp = [];
   for (let b = 0; b < BATCHES; b++) {
     const t = process.hrtime.bigint();
     for (let i = 0; i < BATCH; i++) {
-      tree(buildPatch(depth, i + b * BATCH));
+      tree.$(buildPatch(depth, i + b * BATCH));
       sink += leaf();
     }
     perOp.push(Number(process.hrtime.bigint() - t) / BATCH / 1e6);

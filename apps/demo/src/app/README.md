@@ -12,8 +12,9 @@ The one syntax reference. Every write goes through the API that actually works:
 
 - `tree.$.prop.set('value')` — write a leaf
 - `tree.$.prop.update(fn)` — transform a leaf
-- `tree.$.branch({ ... })` — partial-write a branch (callable, natively)
-- `tree({ ... })` — the root, same shape
+- `tree.$.branch({ ... })` — replace a complete branch value
+- `tree.$({ ... })` — replace the complete root value
+- `tree.$(current => ({ ...current, changed }))` — derive the next root value
 
 Nothing to install; nothing to configure.
 
@@ -79,16 +80,17 @@ npx ts-node apps/demo/src/app/sanity-checks/standard-syntax-examples.ts
 
 ## What is callable, and what is not
 
-This is the whole rule, and it follows from one fact: **only leaves are Angular
-signals.**
+This is the whole rule: the tree is a controller, `$` is its root state
+location, branches are state locations, and leaves are Angular signals.
 
-| Target     | Is it a signal?          | Read              | Write                          |
-| ---------- | ------------------------ | ----------------- | ------------------------------ |
-| **Root**   | no — SignalTree accessor | `tree()`          | `tree({ ... })` — merges       |
-| **Branch** | no — SignalTree accessor | `tree.$.user()`   | `tree.$.user({ ... })` — merges |
-| **Leaf**   | **yes** — real `WritableSignal` | `tree.$.count()` | `tree.$.count.set(5)`     |
+| Target     | Is it a signal?                 | Read             | Write                                    |
+| ---------- | ------------------------------- | ---------------- | ---------------------------------------- |
+| **Root**   | no — SignalTree accessor        | `tree.$()`       | `tree.$(value)` / `tree.$(fn)`           |
+| **Branch** | no — SignalTree accessor        | `tree.$.user()`  | `tree.$.user(value)` / `tree.$.user(fn)` |
+| **Leaf**   | **yes** — real `WritableSignal` | `tree.$.count()` | `tree.$.count.set(5)`                    |
 
-We own a branch's call semantics, so calling one can mean "merge this". We do
+We own a location's call semantics, so calling one can read, replace its complete
+value, or derive its next complete value. We do
 not own a signal's: calling an Angular signal is a read, and it ignores
 arguments. That is why `tree.$.count(5)` cannot work, and why in 14.0.0 it no
 longer type-checks instead of silently doing nothing.

@@ -274,20 +274,19 @@ export type ReadonlyOf<K extends CarrierKind, T> = LeafOf<T, K> extends {
  * Ordinary users never write a carrier: both roots expose `ISignalTree<T>`.
  * The canonical whole-tree NaturalValue reader returns the correct committed
  * snapshot. Repeated reads return the same root object while committed truth is
- * unchanged. SIC-B assigns no public callable syntax to that materialization;
- * the greenfield tree controller and root `$` facade are both non-callable.
- * After a change, identity of arbitrary unchanged descendants is not a public
- * contract; implementations may reuse them to materialize snapshots cheaply.
+ * unchanged. The greenfield tree controller is non-callable; its root `$`
+ * accessor owns the same read / whole-value replacement / updater grammar as
+ * every ordinary state node. After a change, identity of arbitrary unchanged
+ * descendants is not a public contract; implementations may reuse them to
+ * materialize snapshots cheaply.
  */
 export interface ISignalTreeOf<
   T,
   K extends CarrierKind,
   TAccum = TreeNodeOf<T, K>
-> extends NodeAccessor<T> {
-  /** Root writes merge a partial state payload; branch accessors assign whole values. */
-  (value: Partial<T>): void;
-  /** Reactive tree-node accessor — the canonical entry point. */
-  readonly $: TAccum;
+> {
+  /** Canonical root state accessor: read, whole-value replace, or derive. */
+  readonly $: NodeAccessor<T> & TAccum;
   /**
    * `with()` IS GONE, ON PURPOSE — this note is the tombstone.
    *
@@ -306,7 +305,6 @@ export interface ISignalTreeOf<
    * `assertEnhancerConfigurationValid` about the same configuration — which is
    * exactly the state 15.0 removed.
    */
-  bind(thisArg?: unknown): NodeAccessor<T>;
   destroy(): void;
   /** Whether this tree has been destroyed. */
   readonly destroyed: ReadonlyOf<K, boolean>;

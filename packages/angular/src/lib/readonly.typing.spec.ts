@@ -90,7 +90,6 @@ type RO = typeof ro;
 type RO$ = RO['$'];
 declare const realAccessor: NodeAccessor<number>;
 declare const emptyAccessor: NodeAccessor<Record<string, never>> & {};
-const boundAccessor = tree.bind();
 
 // Runtime-reachable member types used in assertions below.
 type ROUsers = RO$['users'];
@@ -109,12 +108,6 @@ export type _ReadonlyCallGrammarControls = [
   Expect<
     Equal<
       EffectiveParameters<typeof emptyAccessor> extends [] ? true : false,
-      false
-    >
-  >,
-  Expect<
-    Equal<
-      EffectiveParameters<typeof boundAccessor> extends [] ? true : false,
       false
     >
   >
@@ -143,8 +136,8 @@ export type _ReadonlyViewChecks = [
   // …and its children recurse into the readonly view.
   Expect<Equal<RO$['branch']['leaf'], Signal<string>>>,
   Expect<Equal<RO$['branch']['deep']['n'], Signal<number>>>,
-  // Root snapshot read stays; write overloads are gone.
-  Expect<Equal<Parameters<RO>, []>>,
+  // Root snapshot read stays on `$`; write overloads are gone.
+  Expect<Equal<Parameters<RO$>, []>>,
   // No write-adjacent tree API on the readonly store.
   Expect<NotOffered<RO, 'with'>>,
   Expect<NotOffered<RO, 'bind'>>,

@@ -166,7 +166,7 @@ describe('A2-5 retention: what does the capability hold?', () => {
   });
 
   it('B — persistence(), never destroyed: the payload is RETAINED', async () => {
-    // autoSave holds `previousState = tree()` — a full materialised snapshot —
+    // autoSave holds `previousState = tree.$()` — a full materialised snapshot —
     // for reference-identity change detection, so the capability really does
     // hold application values. Arm C therefore measures a RELEASE and not a
     // payload nothing was holding.

@@ -7,7 +7,7 @@ import { signalTree } from './signal-tree';
 /**
  * Incremental materialisation.
  *
- * `tree()` has to build a plain object out of a graph of signals — O(state).
+ * `tree.$()` has to build a plain object out of a graph of signals — O(state).
  * Doing that on every read, when a write touched ONE leaf, is the
  * full-state-work-per-change anti-pattern the library exists to avoid.
  *
@@ -37,14 +37,14 @@ describe('incremental materialisation', () => {
       { a: { x: 1 }, b: { y: 2 } },
       { capabilities: ['causal-runtime'] }
     );
-    expect(tree()).toBe(tree());
+    expect(tree.$()).toBe(tree.$());
   });
 
   it('shares untouched subtrees and replaces touched ones', () => {
     const tree = signalTree(grid(3, 3), { capabilities: ['causal-runtime'] });
-    const before = tree();
+    const before = tree.$();
     tree.$.r1.c1.set(42);
-    const after = tree();
+    const after = tree.$();
 
     expect(after).not.toBe(before);
     expect(after.r1).not.toBe(before.r1);
@@ -54,12 +54,12 @@ describe('incremental materialisation', () => {
 
   it('still observes every write', () => {
     const tree = signalTree(grid(3, 3), { capabilities: ['causal-runtime'] });
-    tree();
+    tree.$();
     tree.$.r1.c1.set(42);
-    expect(tree().r1.c1).toBe(42);
+    expect(tree.$().r1.c1).toBe(42);
     tree.$.r0.c0.set(7);
-    expect(tree().r0.c0).toBe(7);
-    expect(tree().r1.c1).toBe(42);
+    expect(tree.$().r0.c0).toBe(7);
+    expect(tree.$().r1.c1).toBe(42);
   });
 
   it('does not rebuild when a write is a no-op', () => {
@@ -67,9 +67,9 @@ describe('incremental materialisation', () => {
       { a: { x: 1 } },
       { capabilities: ['causal-runtime'] }
     );
-    const before = tree();
+    const before = tree.$();
     tree.$.a.x.set(1); // same value — equality short-circuits
-    expect(tree()).toBe(before);
+    expect(tree.$()).toBe(before);
   });
 
   it('keeps an old snapshot isolated from later writes', () => {
@@ -77,11 +77,11 @@ describe('incremental materialisation', () => {
       { cfg: { list: [1, 2, 3] } },
       { capabilities: ['causal-runtime'] }
     );
-    const snapshot = tree();
+    const snapshot = tree.$();
     tree.$.cfg.list.set([9]);
 
     expect(snapshot.cfg.list).toEqual([1, 2, 3]);
-    expect(tree().cfg.list).toEqual([9]);
+    expect(tree.$().cfg.list).toEqual([9]);
   });
 
   it('does not alias a leaf object value into the snapshot', () => {
@@ -92,7 +92,7 @@ describe('incremental materialisation', () => {
       { obj: { held: value } },
       { capabilities: ['causal-runtime'] }
     );
-    const snapshot = tree() as { obj: { held: typeof value } };
+    const snapshot = tree.$() as { obj: { held: typeof value } };
     expect(snapshot.obj.held).not.toBe(value);
     expect(snapshot.obj.held).toEqual(value);
   });
@@ -102,9 +102,9 @@ describe('incremental materialisation', () => {
       { a: { b: { c: { d: { e: 1 } } } } },
       { capabilities: ['causal-runtime'] }
     );
-    const before = tree();
+    const before = tree.$();
     tree.$.a.b.c.d.e.set(2);
-    const after = tree();
+    const after = tree.$();
 
     expect(after.a.b.c.d.e).toBe(2);
     expect(after.a).not.toBe(before.a);
@@ -116,14 +116,14 @@ describe('incremental materialisation', () => {
       { a: { x: 1 } },
       { capabilities: ['causal-runtime'] }
     );
-    const snapshot = tree();
+    const snapshot = tree.$();
     expect(Object.isFrozen(snapshot)).toBe(true);
     expect(Object.isFrozen(snapshot.a)).toBe(true);
     expect(() => {
       (snapshot as unknown as Record<string, unknown>)['a'] = 'nope';
     }).toThrow(TypeError);
     // The cache is intact.
-    expect(tree().a.x).toBe(1);
+    expect(tree.$().a.x).toBe(1);
   });
 
   it('reads the whole state in constant time while nothing changes', () => {
@@ -132,7 +132,7 @@ describe('incremental materialisation', () => {
     // it passed alone and failed when all 11 projects ran in parallel, which
     // is a property of the CI box rather than of the code.
     const tree = signalTree(grid(60, 60), { capabilities: ['causal-runtime'] });
-    tree();
+    tree.$();
 
     const dirtyAll = () => {
       for (let r = 0; r < 60; r++) tree.$['r' + r]['c0'].set(Math.random());
@@ -153,16 +153,20 @@ describe('incremental materialisation', () => {
     for (let sample = 0; sample < 3; sample++) {
       dirtyAll();
       const r0 = performance.now();
-      tree();
+      tree.$();
       oneRebuild = Math.min(oneRebuild, performance.now() - r0);
     }
 
-    const c0 = performance.now();
-    for (let i = 0; i < 2000; i++) tree();
-    const memoised = performance.now() - c0;
+    let memoised = Infinity;
+    for (let sample = 0; sample < 3; sample++) {
+      const c0 = performance.now();
+      for (let i = 0; i < 2000; i++) tree.$();
+      memoised = Math.min(memoised, performance.now() - c0);
+    }
 
     // 2,000 memoised reads must cost less than 5 full rebuilds. It fails only if
-    // memoisation stops working.
+    // memoisation stops working. Both sides use best-of-three so process
+    // scheduling cannot penalize only the much shorter cached-read sample.
     expect(memoised).toBeLessThan(oneRebuild * 5);
   });
 
@@ -182,9 +186,9 @@ describe('incremental materialisation', () => {
 
   it('rebuilds only the touched row of a wide grid', () => {
     const tree = signalTree(grid(50, 50), { capabilities: ['causal-runtime'] });
-    const before = tree();
+    const before = tree.$();
     tree.$.r25.c25.set(999);
-    const after = tree();
+    const after = tree.$();
 
     const shared = Object.keys(after).filter(
       (k) =>
@@ -227,7 +231,10 @@ describe('incremental materialisation', () => {
     tree.$.profile((current) => ({ ...current, firstName: 'Grace' }));
     expect(collect()).toEqual(before);
 
-    tree({ profile: { firstName: 'Katherine', lastName: 'Johnson' } });
+    tree.$((current) => ({
+      ...current,
+      profile: { firstName: 'Katherine', lastName: 'Johnson' },
+    }));
     expect(collect()).toEqual(before);
   });
 

@@ -80,10 +80,10 @@ export const _name: string = batched.$.user.name();
 export const _user: { name: string; age: number } = batched.$.user();
 batched.$.user({ name: 'Ada', age: 37 });
 
-// Root callable forms survive.
-export const _snapshot: AppState = batched();
-batched({ count: 1 });
-batched((current) => ({ ...current, count: current.count + 1 }));
+// Root state operations belong to `$`; the controller is not callable.
+export const _snapshot: AppState = batched.$();
+batched.$({ count: 1, user: { name: 'Ada', age: 37 } });
+batched.$((current) => ({ ...current, count: current.count + 1 }));
 
 // ============================================================================
 // 3 — accumulation, in BOTH orders

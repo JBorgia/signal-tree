@@ -34,7 +34,7 @@ describe('snapshots carry state, not derived views', () => {
         }),
       }
     );
-    expect(tree()).toEqual({ a: 2, b: 3 });
+    expect(tree.$()).toEqual({ a: 2, b: 3 });
   });
 
   it('recomputes a derived value after rehydrate', () => {
@@ -46,7 +46,7 @@ describe('snapshots carry state, not derived views', () => {
         }),
       }
     );
-    const snapshot = source();
+    const snapshot = source.$();
 
     const fresh = signalTree(
       { a: 0, b: 0 },
@@ -56,7 +56,7 @@ describe('snapshots carry state, not derived views', () => {
         }),
       }
     );
-    fresh(snapshot);
+    fresh.$(snapshot);
 
     expect(fresh.$.a()).toBe(2);
     expect(fresh.$.sum()).toBe(5);
@@ -65,7 +65,7 @@ describe('snapshots carry state, not derived views', () => {
   it('entityMap emits entities only', () => {
     const tree = signalTree({ rows: entityMap<{ id: number }, number>() });
     tree.$.rows.setAll([{ id: 1 }, { id: 2 }]);
-    expect(Object.keys(tree().rows)).toEqual(['all']);
+    expect(Object.keys(tree.$().rows)).toEqual(['all']);
   });
 
   it('entityMap round-trips through applyState', () => {
@@ -73,7 +73,7 @@ describe('snapshots carry state, not derived views', () => {
     source.$.rows.setAll([{ id: 1 }, { id: 2 }, { id: 3 }]);
 
     const fresh = signalTree({ rows: entityMap<{ id: number }, number>() });
-    applyState(fresh.$, source());
+    applyState(fresh.$, source.$());
 
     expect(fresh.$.rows.count()).toBe(3);
     expect(fresh.$.rows.byId(2)?.()).toEqual({ id: 2 });

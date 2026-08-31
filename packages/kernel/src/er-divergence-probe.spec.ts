@@ -11,7 +11,7 @@ import { signalTree, entityMap } from './index';
  * Every row reads THE SAME FACT through three different paths:
  *   collection projection : rows.all()
  *   per-entity cell       : rows.byIdOrFail(id).field()
- *   whole-value snapshot  : tree().users.all
+ *   whole-value snapshot  : tree.$().users.all
  */
 type U = { id: number; name: string; n: number };
 const make = () => {
@@ -21,7 +21,7 @@ const make = () => {
 const agree = (t: ReturnType<typeof make>['t'], rows: ReturnType<typeof make>['rows'], id: number) => {
   const fromAll = (rows.all() as U[]).find((r) => r.id === id);
   const fromCell = { id, name: rows.byIdOrFail(id).name(), n: rows.byIdOrFail(id).n() };
-  const snapUsers = (t() as { users: { all?: U[] } }).users;
+  const snapUsers = (t.$() as { users: { all?: U[] } }).users;
   const fromSnap = (snapUsers?.all ?? []).find((r) => r.id === id);
   expect(fromCell.name).toBe(fromAll?.name);
   expect(fromCell.n).toBe(fromAll?.n);

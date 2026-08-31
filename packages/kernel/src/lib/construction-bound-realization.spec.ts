@@ -134,13 +134,13 @@ describe('CONSTRUCTION-BOUND-REALIZATION-0', () => {
     );
 
     tree.$.count();
-    plainTree({ value: 2 });
+    plainTree.$({ value: 2 });
     tree.$.count.set(2);
     tree.$.doubled();
     tree.$.nested();
     tree.$.rows.addOne({ id: 'a', value: 1 });
     tree.$.rows.where((row) => row.value > 0)();
-    tree();
+    tree.$();
 
     const scalarRuntime = getTreeScalarSlotRuntime(tree.$);
     const countPosition = getOwnedPositionIds(tree.$.count)?.[0];
@@ -260,12 +260,12 @@ describe('CONSTRUCTION-BOUND-REALIZATION-0', () => {
     // Mutating the packet after factory binding cannot alter either factory.
     mutableA.cell = b.cell;
 
-    treeA({ nested: { value: 3 } });
-    treeB({ nested: { value: 4 } });
+    treeA.$((current) => ({ ...current, nested: { value: 3 } }));
+    treeB.$((current) => ({ ...current, nested: { value: 4 } }));
     const beforeA = derivedA;
     const beforeB = derivedB;
     treeA.$.nested();
-    treeA();
+    treeA.$();
 
     expect(identityOf(treeA.$.nested.value)).toBe('A');
     expect(identityOf(treeB.$.nested.value)).toBe('B');

@@ -58,7 +58,7 @@ describe('SignalTree-branded symbols never reach a snapshot', () => {
   it('a whole-tree snapshot carries no symbols at all', () => {
     const tree = signalTree({ a: 1, b: { c: 2 } });
     void tree.$;
-    expect(Object.getOwnPropertySymbols(tree() as object)).toEqual([]);
+    expect(Object.getOwnPropertySymbols(tree.$() as object)).toEqual([]);
   });
 
   it('a branded symbol is skipped BY IDENTITY, on a plain object', () => {

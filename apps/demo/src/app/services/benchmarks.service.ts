@@ -249,35 +249,35 @@ export class BenchmarkService {
       const smallState = BenchmarkService.generateNestedState(2, 2);
       results.small.time = BenchmarkService.measureTime(() => {
         const tree = signalTree(smallState);
-        tree(); // Force tree access
+        tree.$(); // Force tree access
       });
 
       // Medium tree (100 nodes)
       const mediumState = BenchmarkService.generateNestedState(3, 4);
       results.medium.time = BenchmarkService.measureTime(() => {
         const tree = signalTree(mediumState);
-        tree(); // Force tree access
+        tree.$(); // Force tree access
       });
 
       // Large tree (1000 nodes)
       const largeState = BenchmarkService.generateNestedState(5, 5);
       results.large.time = BenchmarkService.measureTime(() => {
         const tree = signalTree(largeState);
-        tree(); // Force tree access
+        tree.$(); // Force tree access
       });
 
       // XLarge tree (10,000 nodes)
       const xlargeState = BenchmarkService.generateNestedState(6, 6);
       results.xlarge.time = BenchmarkService.measureTime(() => {
         const tree = signalTree(xlargeState);
-        tree(); // Force tree access
+        tree.$(); // Force tree access
       });
 
       // XXLarge tree (100,000+ nodes, stress test)
       const xxlargeState = BenchmarkService.generateNestedState(7, 7);
       results.xxlarge.time = BenchmarkService.measureTime(() => {
         const tree = signalTree(xxlargeState);
-        tree(); // Force tree access
+        tree.$(); // Force tree access
       }, 10); // Fewer iterations for stress test
 
       return results;
@@ -311,13 +311,7 @@ export class BenchmarkService {
 
     // Shallow update (top level)
     results.shallow = BenchmarkService.measureTime(() => {
-      (
-        tree as unknown as {
-          update: (
-            fn: (state: Record<string, unknown>) => Record<string, unknown>
-          ) => void;
-        }
-      )['update']((state: Record<string, unknown>) => ({
+      tree.$((state: Record<string, unknown>) => ({
         ...state,
         topLevel: Math.random(),
       }));
@@ -325,13 +319,7 @@ export class BenchmarkService {
 
     // Medium depth update
     results.medium = BenchmarkService.measureTime(() => {
-      (
-        tree as unknown as {
-          update: (
-            fn: (state: Record<string, unknown>) => Record<string, unknown>
-          ) => void;
-        }
-      )['update']((state: Record<string, unknown>) => ({
+      tree.$((state: Record<string, unknown>) => ({
         ...state,
         level_4_item_0: {
           ...((state['level_4_item_0'] as Record<string, unknown>) || {}),
@@ -342,13 +330,7 @@ export class BenchmarkService {
 
     // Deep update
     results.deep = BenchmarkService.measureTime(() => {
-      (
-        tree as unknown as {
-          update: (
-            fn: (state: Record<string, unknown>) => Record<string, unknown>
-          ) => void;
-        }
-      )['update']((state: Record<string, unknown>) => {
+      tree.$((state: Record<string, unknown>) => {
         const newState = { ...state };
         let current = newState as Record<string, unknown>;
         for (let i = 4; i > 0; i--) {
@@ -367,8 +349,8 @@ export class BenchmarkService {
       const batchTree = signalTree(state, { enhancers: [batching()] });
 
       results.batch10 = BenchmarkService.measureTime(() => {
-        // `batch(() => tree(partial))` — explicit, and NOT `batchUpdate`, which was
-        // removed in 14.1.1 as a duplicate of the tree callable.
+        // `batch(() => tree.$(partial))` — explicit, and NOT `batchUpdate`, which was
+        // removed in 14.1.1 as a duplicate root write.
         //
         // This used to probe for `batchUpdate` and fall back to `tree.update(fn)`
         // inside a swallowing try/catch. MEASURED: `update` is not a function on the
@@ -376,7 +358,7 @@ export class BenchmarkService {
         // reported ~0us while measuring nothing at all.
         //
         // The replacement is equivalence-checked, not assumed: batchUpdate vs
-        // batch(() => tree(u)) measured 0.921 vs 0.925 us at 10 fields and 16.585 vs
+        // batch(() => tree.$(u)) measured 0.921 vs 0.925 us at 10 fields and 16.585 vs
         // 16.475 us at 100 (medians of 9 x 2000, overlapping ranges).
         const updates: Record<string, unknown> = {};
         for (let i = 0; i < 10; i++) {
@@ -385,18 +367,17 @@ export class BenchmarkService {
         (
           batchTree as unknown as {
             batch: (fn: () => void) => void;
-            (partial: Record<string, unknown>): void;
           }
         ).batch(() =>
-          (batchTree as unknown as (p: Record<string, unknown>) => void)(
+          (batchTree.$ as unknown as (p: Record<string, unknown>) => void)(
             updates
           )
         );
       });
 
       results.batch100 = BenchmarkService.measureTime(() => {
-        // `batch(() => tree(partial))` — explicit, and NOT `batchUpdate`, which was
-        // removed in 14.1.1 as a duplicate of the tree callable.
+        // `batch(() => tree.$(partial))` — explicit, and NOT `batchUpdate`, which was
+        // removed in 14.1.1 as a duplicate root write.
         //
         // This used to probe for `batchUpdate` and fall back to `tree.update(fn)`
         // inside a swallowing try/catch. MEASURED: `update` is not a function on the
@@ -404,7 +385,7 @@ export class BenchmarkService {
         // reported ~0us while measuring nothing at all.
         //
         // The replacement is equivalence-checked, not assumed: batchUpdate vs
-        // batch(() => tree(u)) measured 0.921 vs 0.925 us at 10 fields and 16.585 vs
+        // batch(() => tree.$(u)) measured 0.921 vs 0.925 us at 10 fields and 16.585 vs
         // 16.475 us at 100 (medians of 9 x 2000, overlapping ranges).
         const updates: Record<string, unknown> = {};
         for (let i = 0; i < 100; i++) {
@@ -413,10 +394,9 @@ export class BenchmarkService {
         (
           batchTree as unknown as {
             batch: (fn: () => void) => void;
-            (partial: Record<string, unknown>): void;
           }
         ).batch(() =>
-          (batchTree as unknown as (p: Record<string, unknown>) => void)(
+          (batchTree.$ as unknown as (p: Record<string, unknown>) => void)(
             updates
           )
         );
@@ -447,7 +427,7 @@ export class BenchmarkService {
       filter: { category: 'A', active: true },
     });
     const computedFn = computed(() => {
-      const state = regularTree();
+      const state = regularTree.$();
       return state.entities.filter(
         (e: Record<string, unknown>) =>
           (e as { category: string }).category ===
@@ -495,7 +475,7 @@ export class BenchmarkService {
     // SignalTree
     const stMemory = BenchmarkService.profileMemory(() => {
       const tree = signalTree(testData);
-      tree();
+      tree.$();
     });
     results.signalTree.memory = stMemory?.delta || 0;
 
@@ -505,7 +485,7 @@ export class BenchmarkService {
     });
 
     results.signalTree.update = BenchmarkService.measureTime(() => {
-      stTree((state: Record<string, unknown>) => ({
+      stTree.$((state: Record<string, unknown>) => ({
         ...state,
         value: Math.random(),
       }));
@@ -603,10 +583,11 @@ export class BenchmarkService {
       string,
       Record<string, number>
     >;
-    const avgInitTime =
+    const avgInitTime = (
       initialization['small']['time'] +
       initialization['medium']['time'] +
-      initialization['large']['time'] / 3;
+      initialization['large']['time']
+    ) / 3;
 
     if (avgInitTime < 5) {
       analysis.performance.grade = 'A+';

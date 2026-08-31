@@ -16,7 +16,7 @@ function createMockStorage(): Storage {
 }
 
 describe('W2: builder call path finalizes', () => {
-  it('tree() before any tree.$ access returns values, not raw markers', () => {
+  it('tree.$() before any tree.$ access returns values, not raw markers', () => {
     const mockStorage = createMockStorage();
     const tree = signalTree({
       rows: entityMap<{ id: string }, string>({ selectId: (r) => r.id }),
@@ -24,16 +24,16 @@ describe('W2: builder call path finalizes', () => {
     });
 
     // Deliberately the FIRST operation — no tree.$ touch beforehand.
-    const snap = tree() as Record<string, unknown>;
+    const snap = tree.$() as Record<string, unknown>;
 
     expect(snap['plain']).toBe(1);
     expect(JSON.stringify(snap)).not.toContain('selectId');
     expect(JSON.stringify(snap)).not.toContain('initialState');
   });
 
-  it('a write through tree() before finalization reaches real signals', () => {
+  it('a write through tree.$() before finalization reaches real signals', () => {
     const tree = signalTree({ nested: { count: 0 }, plain: 1 });
-    (tree as unknown as (v: object) => void)({ nested: { count: 5 } });
+    tree.$({ nested: { count: 5 } } as never);
     expect(tree.$.nested.count()).toBe(5);
   });
 });
@@ -53,7 +53,7 @@ describe('W1: diagnostics for writes that go nowhere', () => {
     const tree = signalTree({ known: 1 } as Record<string, unknown>);
     void tree.$;
 
-    (tree as unknown as (v: object) => void)({ neverDeclared: 'x' });
+    tree.$({ neverDeclared: 'x' } as never);
 
     const msg = errSpy.mock.calls.map((c) => String(c[0])).join('\n');
     expect(msg).toContain('ST2010');
@@ -63,7 +63,7 @@ describe('W1: diagnostics for writes that go nowhere', () => {
   it('stays silent for an ordinary write', () => {
     const tree = signalTree({ known: 1 });
     void tree.$;
-    (tree as unknown as (v: object) => void)({ known: 2 });
+    tree.$({ known: 2 });
 
     const msg = errSpy.mock.calls.map((c) => String(c[0])).join('\n');
     expect(msg).not.toContain('ST2010');
@@ -78,7 +78,7 @@ describe('W1: diagnostics for writes that go nowhere', () => {
     const tree = signalTree({ known: 1 } as Record<string, unknown>);
     void tree.$;
     for (let i = 0; i < 3; i++) {
-      (tree as unknown as (v: object) => void)({ repeatedlyMissing: i });
+      tree.$({ repeatedlyMissing: i } as never);
     }
     const hits = errSpy.mock.calls.filter((c) =>
       String(c[0]).includes('repeatedlyMissing')

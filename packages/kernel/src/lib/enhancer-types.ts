@@ -1,11 +1,8 @@
-import type { NodeAccessor } from './node-accessor';
-
 /** Symbol key for enhancer metadata (stable public export). */
 export const ENHANCER_META = Symbol('signaltree:enhancer:meta');
 
 interface EnhancerHost {
   readonly $: unknown;
-  bind(thisArg?: unknown): NodeAccessor<unknown>;
   destroy(): void;
   registerCleanup(fn: EnhancerCleanup): void;
 }

@@ -215,7 +215,7 @@ callableTree.$.user({ name: 'Bob', age: 30 });
 callableTree.$.ui((current) => ({ ...current, loading: !current.loading }));
 
 // Root — the same grammar, so the root also takes a whole value.
-callableTree({
+callableTree.$({
   user: { name: 'Bob', age: 30 },
   ui: { loading: false, error: null },
 });

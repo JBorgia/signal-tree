@@ -237,9 +237,8 @@ export type ReadonlyView<T> = ReadonlyViewOf<T, 'cell'>;
  * @typeParam TAccum - the accumulated `$` type; defaults to `TreeNode<TSource>`
  */
 export interface ReadonlyStoreOf<TSource, TAccum, C extends CarrierKind> {
-  /** Zero-arg snapshot read — the write overloads are not offered. */
-  (): TSource;
-  readonly $: ReadonlyViewOf<TAccum, C>;
+  /** Root snapshot read — the write overloads are not offered. */
+  readonly $: ReadonlyNodeAccessor<TSource> & ReadonlyViewOf<TAccum, C>;
   /** Whether this tree has been destroyed. */
   readonly destroyed: ReadonlyOf<C, boolean>;
   destroy(): void;

@@ -26,14 +26,14 @@ describe('E — can any tree API add a record key after construction?', () => {
 
   it('root callable merge: NO', () => {
     const tree = seed();
-    (tree as unknown as (v: object) => void)({ rows: { b: { n: 2 } } });
+    tree.$({ rows: { b: { n: 2 } } } as never);
     expect((tree.$.rows() as Record<string, unknown>)['b']).toBeUndefined();
   });
 
   it('updater form through the root: NO', () => {
     const tree = seed();
-    (tree as unknown as (f: (c: unknown) => unknown) => void)((current) => ({
-      ...(current as object),
+    tree.$((current) => ({
+      ...current,
       rows: { a: { n: 1 }, b: { n: 2 } },
     }));
     expect((tree.$.rows() as Record<string, unknown>)['b']).toBeUndefined();
@@ -41,15 +41,15 @@ describe('E — can any tree API add a record key after construction?', () => {
 
   it('a TOP-LEVEL record has the same constraint — it is not about nesting depth', () => {
     const tree = signalTree({ a: { n: 1 } } as Record<string, { n: number }>);
-    (tree as unknown as (v: object) => void)({ b: { n: 2 } });
-    expect((tree() as Record<string, unknown>)['b']).toBeUndefined();
+    tree.$({ b: { n: 2 } });
+    expect((tree.$() as Record<string, unknown>)['b']).toBeUndefined();
   });
 
   it('the granular positions that DO exist keep working', () => {
     const tree = seed();
     undoable(() => tree.$.rows.a.n.set(9));
     expect(tree.$.rows.a.n()).toBe(9);
-    expect(tree()).toEqual({ rows: { a: { n: 9 } }, other: 0 });
+    expect(tree.$()).toEqual({ rows: { a: { n: 9 } }, other: 0 });
   });
 });
 

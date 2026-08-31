@@ -268,7 +268,7 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
     op(tree as never);
     await tick();
     off();
-    return { notified, value: tree() };
+    return { notified, value: tree.$() };
   };
 
   it('DIRECT leaf .set()', async () => {
@@ -291,7 +291,7 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
 
   it('ROOT call form — the recursive update pipeline', async () => {
     const r = await capture((t) => {
-      undoable(() => (t as unknown as (v: object) => void)({ a: { n: 4 }, top: 7 }));
+      undoable(() => t.$({ a: { n: 4 }, top: 7 }));
     });
     // Only the LANDED leaves: `a.s` was rewritten with its own value and is
     // absent.
@@ -300,7 +300,7 @@ describe('MUT-1 — which WRITE PATHS reach the notifier?', () => {
 
   it('ROOT updater form', async () => {
     const r = await capture((t) => {
-      (t as unknown as (fn: (c: { top: number }) => object) => void)((c) => ({
+      t.$((c) => ({
         top: c.top + 5,
       }));
     });

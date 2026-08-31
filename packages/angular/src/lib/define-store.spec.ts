@@ -24,8 +24,8 @@ describe('defineStore()', () => {
     expect(store.$.count()).toBe(5);
     expect(store.$.user.name()).toBe('b');
 
-    // Callable snapshot is preserved (constructor returned the tree itself)
-    expect(store()).toEqual({ count: 5, user: { name: 'b' } });
+    // The constructor returned the tree controller itself.
+    expect(store.$()).toEqual({ count: 5, user: { name: 'b' } });
   });
 
   it('runs the factory in an injection context (inject() works inside it)', () => {

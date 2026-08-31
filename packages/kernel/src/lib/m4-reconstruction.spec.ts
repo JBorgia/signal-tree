@@ -38,7 +38,7 @@ describe('M4 — reconstruction', () => {
 
     // With NO loader attached there is no competing authority, and reconstruction
     // applies normally.
-    tree({ rows: [{ id: 'b', n: 2 }] } as never);
+    tree.$({ rows: [{ id: 'b', n: 2 }] } as never);
     expect(tree.$.rows.ids()).toEqual(['b']);
   });
 

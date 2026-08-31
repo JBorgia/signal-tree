@@ -94,7 +94,7 @@ describe('the callable contract', () => {
   it('the ROOT is callable too', () => {
     const tree = signalTree({ a: 1, b: { c: 2 } });
 
-    tree({ a: 9, b: { c: 8 } });
+    tree.$({ a: 9, b: { c: 8 } });
 
     expect(tree.$.a()).toBe(9);
     expect(tree.$.b.c()).toBe(8);

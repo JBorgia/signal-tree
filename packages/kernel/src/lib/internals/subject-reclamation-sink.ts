@@ -2,6 +2,7 @@ import {
   getSubjectRestorationClaims,
   type SubjectRestorationClaims,
 } from './subject-restoration-claims';
+import { isTraversableNode } from './node-shape';
 
 /**
  * THE RECLAMATION SINK — where a released claim becomes freed memory.
@@ -146,7 +147,7 @@ export function getOrCreateSubjectReclamationSink(
   node: unknown
 ): SubjectReclamationSink | undefined {
   const host = ((node as { $?: unknown } | null)?.$ ?? node) as object | null;
-  if (host === null || typeof host !== 'object') {
+  if (!isTraversableNode(host)) {
     return undefined;
   }
   const existing = (

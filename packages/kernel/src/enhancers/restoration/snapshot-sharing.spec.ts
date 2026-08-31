@@ -75,12 +75,12 @@ describe('restoration snapshot sharing', () => {
     await flush();
     undoable(() => tree.$.b.y.set(20));
     await flush();
-    expect(tree()).toMatchObject({ a: { x: 10 }, b: { y: 20 } });
+    expect(tree.$()).toMatchObject({ a: { x: 10 }, b: { y: 20 } });
 
     tree.undo();
-    expect(tree()).toMatchObject({ a: { x: 10 }, b: { y: 2 } });
+    expect(tree.$()).toMatchObject({ a: { x: 10 }, b: { y: 2 } });
     tree.undo();
-    expect(tree()).toMatchObject({ a: { x: 1 }, b: { y: 2 } });
+    expect(tree.$()).toMatchObject({ a: { x: 1 }, b: { y: 2 } });
   });
 
   it('an entry does not change when state moves on afterwards', async () => {
@@ -105,9 +105,9 @@ describe('restoration snapshot sharing', () => {
     // comparison, and an absolute threshold would be flaky under CI load.
     const run = (rows: number) => {
       const tree = signalTree(withRows(rows), { enhancers: [restoration()] });
-      tree();
+      tree.$();
       const t0 = performance.now();
-      for (let i = 0; i < 50; i++) tree({ counter: i } as never);
+      for (let i = 0; i < 50; i++) tree.$({ counter: i } as never);
       return performance.now() - t0;
     };
 

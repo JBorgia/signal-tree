@@ -239,7 +239,7 @@ export class DevtoolsDemoComponent {
   }
 
   getStateSize(): number {
-    const state = this.store();
+    const state = this.store.$();
     return Object.keys(state).length;
   }
 
@@ -260,7 +260,7 @@ export class DevtoolsDemoComponent {
 
   // Snapshot & Restore methods
   takeSnapshot() {
-    const currentState = JSON.parse(JSON.stringify(this.store()));
+    const currentState = JSON.parse(JSON.stringify(this.store.$()));
     this.snapshots.push({
       state: currentState,
       timestamp: Date.now(),

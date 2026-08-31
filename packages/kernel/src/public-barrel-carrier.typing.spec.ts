@@ -32,7 +32,7 @@ const tree = signalTree({ a: 1, b: { c: 'x' } });
 const ro = asReadonly(tree);
 
 /** The whole-tree read survives the projection. */
-export const _whole: unknown = ro();
+export const _whole: unknown = ro.$();
 /** Descendant reads stay correctly typed. */
 export const _leaf: number = ro.$.a();
 export const _nested: string = ro.$.b.c();

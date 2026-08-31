@@ -178,8 +178,8 @@ function accessorsFor<T>(x: unknown): {
   const rootTree = getRootTree(x);
   if (rootTree) {
     return {
-      read: () => rootTree() as T,
-      write: (v: T) => rootTree(v as unknown),
+      read: () => rootTree.read() as T,
+      write: (v: T) => rootTree.replace(v),
       collection: false,
     };
   }
@@ -368,7 +368,7 @@ export function link<S>(
   /** Write a nested collection's eligible value into the branch snapshot. */
   const advanceNested = (collectionPath: string, projection: EntityEgressProjection): void => {
     // The snapshot grammar for a collection is `{ all: Row[] }` — the same
-    // shape `tree()` produces, so the published branch value stays canonical.
+    // shape `tree.$()` produces, so the published branch value stays canonical.
     eligible = applyAtRelativePath(eligible, ownerPath, collectionPath, {
       all: projection.value(),
     });

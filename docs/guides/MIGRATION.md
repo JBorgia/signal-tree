@@ -1,5 +1,10 @@
 # Migration Guide: v4.0.0 Package Consolidation
 
+> **HISTORICAL v4-v13 GUIDE.** The package names, imports, and APIs below
+> describe their release at that time and are not current SignalTree 15 usage.
+> For the current breaking changes and package surface, use
+> [Migration v14 to v15](migration-v14-v15.md).
+
 > **SignalTree** — Reactive JSON for Angular. JSON branches, reactive leaves.
 
 ## Overview

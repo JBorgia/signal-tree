@@ -57,8 +57,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CONTAINMENTS = [
   {
     subset: 'entityMap, 10k entities',
-    superset: 'entityMap 10k + a held tree() snapshot',
-    because: 'the snapshot arm holds the same tree plus a tree() result',
+    superset: 'entityMap 10k + a held tree.$() snapshot',
+    because: 'the snapshot arm holds the same tree plus a tree.$() result',
   },
   {
     subset: 'entityMap, 10k entities',
@@ -110,7 +110,7 @@ if (process.argv.includes('--self-test')) {
   const impossible = [
     { scenario: 'entityMap, 1k entities', retainedMB: 1.34 },
     { scenario: 'entityMap, 10k entities', retainedMB: 59.95 },
-    { scenario: 'entityMap 10k + a held tree() snapshot', retainedMB: 59.96 },
+    { scenario: 'entityMap 10k + a held tree.$() snapshot', retainedMB: 59.96 },
     { scenario: 'entityMap 10k + byId() on EVERY row', retainedMB: 65.29 },
     // The real published number, from the real defect.
     {

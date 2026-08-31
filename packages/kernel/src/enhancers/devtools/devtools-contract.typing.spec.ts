@@ -76,8 +76,8 @@ export type _StateSurvives = [
 export const _count: number = devved.$.count();
 export const _user: { name: string; age: number } = devved.$.user();
 devved.$.user({ name: 'Ada', age: 37 });
-export const _snapshot: AppState = devved();
-devved({ count: 1 });
+export const _snapshot: AppState = devved.$();
+devved.$({ count: 1, user: { name: 'Ada', age: 37 } });
 
 // ============================================================================
 // 3 — accumulation in BOTH orders

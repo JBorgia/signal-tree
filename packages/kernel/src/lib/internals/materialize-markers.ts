@@ -235,10 +235,10 @@ export function getNodeProcessor(node: unknown): MarkerProcessor | undefined {
  * `unwrap` calls this on every parent rebuild, and `isMemoisable` cannot accept
  * a marker node (it recognises tree stores and node accessors only), so each
  * call re-ran `proc.snapshot(node)` and allocated a fresh `{ value }`. Measured:
- * after changing an unrelated leaf, `tree().rows !== previous.rows` even though
+ * after changing an unrelated leaf, `tree.$().rows !== previous.rows` even though
  * the collection had not changed — while the `all` array INSIDE it was
  * correctly stable. Only the wrapper churned, and that is enough to make a
- * `computed(() => tree().rows)` recompute and an OnPush component bound to the
+ * `computed(() => tree.$().rows)` recompute and an OnPush component bound to the
  * whole marker re-render on every unrelated write.
  *
  * A `computed` is the right memo here rather than a hand-rolled cache: the
@@ -451,7 +451,7 @@ function warnUndeclaredMarker(): void {
   console.warn(
     'SignalTree: a marker was registered without `snapshot` or ' +
       '`transient: true`. Its value will be DROPPED from every snapshot — ' +
-      'tree(), persistence(), devtools, audit and undo/redo — silently, ' +
+      'tree.$(), persistence(), devtools, audit and undo/redo — silently, ' +
       'except for an ST2008 report at read time. Declare what of your marker ' +
       'is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it ' +
       'deliberately has none. [ST2022]'
@@ -465,8 +465,8 @@ function warnUndeclaredMarker(): void {
  * asks "what of you is state?" and a `snapshot` hook answers it, so a processor
  * with `snapshot` and no `hydrate` passes registration cleanly — then serializes
  * perfectly and silently discards every write. Measured on a probe marker:
- * `tree()` emitted `{"p":1}`, `tree({p: 99})` left the node at `1`, and NOTHING
- * was reported. `tree(tree())` on such a marker loses data with no diagnostic
+ * `tree.$()` emitted `{"p":1}`, `tree.$({p: 99})` left the node at `1`, and NOTHING
+ * was reported. `tree.$(tree.$())` on such a marker loses data with no diagnostic
  * at either end.
  *
  * Why HERE and not at registration, and not on the write path:
@@ -476,7 +476,7 @@ function warnUndeclaredMarker(): void {
  *    it, no hook needed. Registration cannot know the node's shape, so a guard
  *    there would fire on correct code. That is precisely how the previous
  *    attempt at a write-shape diagnostic (the retired core ST2005) failed: it
- *    sat where ordinary writes reached it and cried wolf on `tree({known: 2})`
+ *    sat where ordinary writes reached it and cried wolf on `tree.$({known: 2})`
  *    and on type-legal `{ user: undefined }`.
  *  - **Not on the write path.** The write path is the thing this design
  *    protects; it should not grow a registry lookup to serve a third-party
@@ -513,9 +513,9 @@ function warnWriteOnlyMarker(
   warnedWriteOnly.add(processor as object);
   console.warn(
     'SignalTree: a marker declares `snapshot` but no `hydrate`, and its node ' +
-      'is not a writable signal. It will be captured by tree(), persistence(), ' +
+      'is not a writable signal. It will be captured by tree.$(), persistence(), ' +
       'devtools, audit and undo/redo — and every attempt to write it back is ' +
-      'SILENTLY DISCARDED, so tree(tree()) loses its value. Add a `hydrate` ' +
+      'SILENTLY DISCARDED, so tree.$(tree.$()) loses its value. Add a `hydrate` ' +
       'hook, or mark it `transient: true` if it is genuinely not restorable. ' +
       '[ST2023]'
   );
@@ -980,7 +980,7 @@ export function materializeMarkers(
           // A node accessor copies its store's properties, but its CALL path
           // closes over the original store. Writing only to the accessor
           // leaves that store holding the raw marker forever — which is why a
-          // nested marker used to surface as a raw marker object from `tree()`
+          // nested marker used to surface as a raw marker object from `tree.$()`
           // and why a merge write through a parent never reached it. Update
           // both so the two views agree.
           const backingStore = (node as Record<symbol, unknown>)[

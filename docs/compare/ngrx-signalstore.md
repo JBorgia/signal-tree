@@ -102,13 +102,13 @@ The walker (`materializeMarkers`) tracks the path during tree construction and s
 
 ### 1. Implementation model
 
-|                        | NgRx SignalStore                                             | SignalTree                                                                                          |
-| ---------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
-| **Mental model**       | Functional composition of `with*` features                   | Reactive JSON — the literal shape _is_ the API surface                                              |
-| **Feature attachment** | Store root only                                              | Any node, any depth                                                                                 |
-| **State definition**   | `withState({...})`                                           | First argument to `signalTree({...})`                                                               |
-| **Computed state**     | `withComputed(({ keys }) => ({ ... }))`                      | `.derived($ => ({ ... }))` — deep-merged into the tree                                              |
-| **Methods/mutations**  | `withMethods((store) => ({ ... }))`                          | Direct on leaf, or in an Ops service class (recommended)                                            |
+|                        | NgRx SignalStore                                             | SignalTree                                                                                            |
+| ---------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| **Mental model**       | Functional composition of `with*` features                   | Reactive JSON — the literal shape _is_ the API surface                                                |
+| **Feature attachment** | Store root only                                              | Any node, any depth                                                                                   |
+| **State definition**   | `withState({...})`                                           | First argument to `signalTree({...})`                                                                 |
+| **Computed state**     | `withComputed(({ keys }) => ({ ... }))`                      | `.derived($ => ({ ... }))` — deep-merged into the tree                                                |
+| **Methods/mutations**  | `withMethods((store) => ({ ... }))`                          | Direct on leaf, or in an Ops service class (recommended)                                              |
 | **Async/streaming**    | `rxMethod(pipeline)` — callable factory inside `withMethods` | no marker — the request pipeline is ordinary RxJS in a service, and results land through `external()` |
 
 ### 2. Read syntax
@@ -117,7 +117,7 @@ The walker (`materializeMarkers`) tracks the path during tree construction and s
 | ---------------------- | ------------------------------------ | ---------------------------------------------- |
 | **Read leaf**          | `store.user.name()` (via DeepSignal) | `store.$.user.name()`                          |
 | **Read derived**       | `store.fullName()`                   | `store.$.fullName()` or wherever you nested it |
-| **Read full snapshot** | Iterate via `entries()` or compose   | `store()` returns full snapshot                |
+| **Read full snapshot** | Iterate via `entries()` or compose   | `store.$()` returns full snapshot              |
 
 ### 3. Write syntax
 
@@ -161,22 +161,22 @@ The "any component can mutate" concern is overstated on both sides:
 
 ### 6. Async and RxJS interop
 
-|                                    | NgRx SignalStore                                                    | SignalTree                                                                   |
-| ---------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **Canonical async primitive**      | `rxMethod(pipeline)` — callable factory living inside `withMethods` | none — ordinary RxJS in a service, results landed through `external()`  |
-| **Status wiring**                  | Manual `tap(() => setLoading())` / `setLoaded()` inside pipeline    | **Automatic** — materializer derives `loading` / `error` signals             |
-| **Race conditions / cancellation** | `switchMap` in pipeline                                             | Standard RxJS `switchMap` — SignalTree owns no cancellation primitive                 |
-| **Input flexibility**              | Raw value, Signal, or Observable                                    | Your own Subject/signal drives the pipeline; you own re-fetching |
-| **Auto-cleanup**                   | `DestroyRef`                                                        | `DestroyRef` (same)                                                          |
-| **Event-bus pattern**              | `@ngrx/store` (classic) or community packages                       | `@signaltree/events` provides typed events                                   |
-| **WebSocket/SSE sync**             | Manual wiring                                                       | Manual wiring to entity-map operations                                       |
+|                                    | NgRx SignalStore                                                    | SignalTree                                                             |
+| ---------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Canonical async primitive**      | `rxMethod(pipeline)` — callable factory living inside `withMethods` | none — ordinary RxJS in a service, results landed through `external()` |
+| **Status wiring**                  | Manual `tap(() => setLoading())` / `setLoaded()` inside pipeline    | **Automatic** — materializer derives `loading` / `error` signals       |
+| **Race conditions / cancellation** | `switchMap` in pipeline                                             | Standard RxJS `switchMap` — SignalTree owns no cancellation primitive  |
+| **Input flexibility**              | Raw value, Signal, or Observable                                    | Your own Subject/signal drives the pipeline; you own re-fetching       |
+| **Auto-cleanup**                   | `DestroyRef`                                                        | `DestroyRef` (same)                                                    |
+| **Event-bus pattern**              | `@ngrx/store` (classic) or community packages                       | `@signaltree/events` provides typed events                             |
+| **WebSocket/SSE sync**             | Manual wiring                                                       | Manual wiring to entity-map operations                                 |
 
 **Honest take:** The async story is where SignalTree's marker philosophy shines compared to NgRx's `withMethods` composition. The marker pattern eliminates the entire `tap(() => setLoading())` / `setLoaded()` ceremony and co-locates the async behavior with the data:
 
 ```typescript
 // SignalTree (canonical):
 const store = signalTree({
-  users: [] as User[],   // written from the service through external()
+  users: [] as User[], // written from the service through external()
 });
 // .loading / .error / .data / .refresh derive automatically — no manual wiring.
 
@@ -203,19 +203,19 @@ For teams migrating NgRx `rxMethod` code: the SignalTree-native mapping is an or
 
 |                           | NgRx SignalStore                                                   | SignalTree                                                                                                                                                                                |
 | ------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Devtools integration**  | `withDevTools` from `@angular-architects/ngrx-toolkit` (community) | `devTools()` from `@signaltree/core`, declared in `enhancers`                                                                                                                                               |
+| **Devtools integration**  | `withDevTools` from `@angular-architects/ngrx-toolkit` (community) | `devTools()` from `@signaltree/core`, declared in `enhancers`                                                                                                                             |
 | **Action labels**         | Action name from method or explicit `withDevTools` config          | Path-based actions (e.g., `[users.profile.name]/set`)                                                                                                                                     |
-| **Time-travel undo/redo** | Via Redux DevTools timeline                                        | `restoration({ maxHistorySize: 50 })` in `enhancers` adds `tree.undo()` / `tree.redo()`                                                                                                            |
+| **Time-travel undo/redo** | Via Redux DevTools timeline                                        | `restoration({ maxHistorySize: 50 })` in `enhancers` adds `tree.undo()` / `tree.redo()`                                                                                                   |
 | **Scoped time-travel**    | Not built-in                                                       | `createEditSession(initial)` provides value-level undo/redo for draft-and-cancel flows (form wizards, multi-step editors). Independent of the tree; sync via effect when ready to commit. |
 
 ### 8. Persistence
 
-|                                   | NgRx SignalStore                              | SignalTree                                                                                                                                                                               |
-| --------------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **localStorage**                  | Community plugins or hand-roll in `withHooks` | The `persistence()` enhancer, tree-wide                                                                                                                                               |
-| **IndexedDB / custom adapters**   | Hand-roll                                     | Any object satisfying the three-method `StorageAdapter` interface, passed to `persistence({ storage })`                                                                                  |
-| **Versioning + migrations**       | Hand-roll                                     | Hand-roll — the payload carries a format version, but no migration hook is public                                                                                                        |
-| **Durability on background/kill** | Hand-roll                                     | Hand-roll — `persistence({ debounceMs: 0 })` writes synchronously; the automatic `visibilitychange`/`pagehide` drain went with the per-leaf marker                                       |
+|                                   | NgRx SignalStore                              | SignalTree                                                                                                                                         |
+| --------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **localStorage**                  | Community plugins or hand-roll in `withHooks` | The `persistence()` enhancer, tree-wide                                                                                                            |
+| **IndexedDB / custom adapters**   | Hand-roll                                     | Any object satisfying the three-method `StorageAdapter` interface, passed to `persistence({ storage })`                                            |
+| **Versioning + migrations**       | Hand-roll                                     | Hand-roll — the payload carries a format version, but no migration hook is public                                                                  |
+| **Durability on background/kill** | Hand-roll                                     | Hand-roll — `persistence({ debounceMs: 0 })` writes synchronously; the automatic `visibilitychange`/`pagehide` drain went with the per-leaf marker |
 
 ### 9. Forms
 
