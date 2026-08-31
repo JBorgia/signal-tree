@@ -236,7 +236,7 @@ abandoned renders, SSR/React Native requirements when earned, equality/cache
 policy, lifecycle ergonomics, and public naming. `@signal-tree/react` remains
 unfrozen until those package questions are adversarially closed.
 
-### REACT-API-DERIVATION-0 — BEHAVIOR FROZEN / PRODUCT PRESENTATION OPEN
+### REACT-API-DERIVATION-0 — SELECTOR INPUT FROZEN / PRODUCT PRESENTATION OPEN
 
 Product authority chooses a public `@signal-tree/react` package. Correctness
 premises alone did not establish package ownership: applications can compose a
@@ -257,9 +257,50 @@ state authority            remains SignalTree; no mirrored React state
 ```
 
 Selected reads outside the supplied owner's invalidation domain are invalid.
-Passing the typed root accessor to a selector improves inference and makes the
-intended scope auditable, but JavaScript capture means it cannot enforce this
-rule structurally.
+JavaScript capture means no function spelling can enforce this rule structurally;
+cross-owner capture therefore did not decide the selector-input row.
+
+The selector input model is frozen as the supplied owner's typed root accessor:
+
+```typescript
+(rootAccessor) => rootAccessor.orders.byId(id)();
+```
+
+The three candidates were scored from the frozen target state, with implementation
+effort, migration, current proof spelling, misuse prevention, and function count
+excluded:
+
+| Criterion                          | A: accessor root | N: NaturalValue  | C: closure reader  |
+| ---------------------------------- | ---------------- | ---------------- | ------------------ |
+| Long-term semantic fidelity        | strongest        | fails cost law   | adequate           |
+| Reusable selector definitions      | strongest        | strong           | weak               |
+| Composition                        | strongest        | strong           | adequate           |
+| TypeScript inference               | strongest        | strong           | local only         |
+| Isolated unit testability          | strongest        | strong           | weak               |
+| SSR / RSC / RN evolution           | explicit input   | value-shaped     | ambient binding    |
+| Future memoized selector primitive | natural key      | wrong read scope | bound-instance key |
+| Framework-independent reasoning    | explicit         | explicit         | implicit           |
+| Selected-read cost preservation    | yes              | no               | yes                |
+
+**A survives.** It names the capability selectors consume: a typed graph of
+synchronous canonical location readers. The selector is independent of a tree
+instance, React lifecycle, and ambient closure ownership, so the same definition
+can be composed, directly tested with a compatible accessor graph, and consumed by
+future selector-level memoization without changing its semantic input.
+
+**N is rejected.** Its plain-state presentation is reusable and easy to test, but
+the package would have to produce the whole NaturalValue before selector evaluation.
+After a dirty owner invalidation that is O(n), even when the selector asks for one
+O(1) location. That contradicts `SELECTOR-SNAPSHOT-COST-0`; laziness hidden behind
+a NaturalValue type would no longer be a NaturalValue selector.
+
+**C does not survive as the package selector model.** It preserves direct-read
+cost and remains valid application-level composition, but the selector definition
+is already bound to a particular tree and surrounding closure. Reuse requires a
+reader factory or rebinding, isolated tests require reconstructing or mocking that
+ambient binding, and future memoized selector primitives receive no explicit
+canonical-read input to compose around. Those are long-term semantic and tooling
+costs, not misuse-prevention arguments.
 
 The protocol rejected three overclaims:
 
@@ -270,12 +311,11 @@ The protocol rejected three overclaims:
   Equality support remains a possible convenience whose canonical-result,
   selector-change, and SSR interactions must be chosen explicitly.
 
-Still open by product authority: selector-first versus zero-argument reader;
-one selector-capable hook versus split root/selector hooks; initial custom
-equality support and spelling; changing-selector cache behavior; SSR/hydration;
-React Native requirements; cross-component subscription sharing; public names
-and package exports. No implementation begins until the materially different
-public presentations are chosen.
+Still open by product authority: one selector-capable hook versus split
+root/selector hooks; initial custom equality support and spelling;
+changing-selector cache behavior; SSR/RSC/hydration mechanics; React Native
+requirements; cross-component subscription sharing; public names and package
+exports. The selector input decision does not answer any of them.
 
 ## CONSTRUCTION-BOUND-REALIZATION-0
 
