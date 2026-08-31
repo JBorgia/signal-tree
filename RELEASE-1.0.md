@@ -61,6 +61,26 @@ controller shape. `CANONICAL-SNAPSHOT-HANDOFF-0` is closed at `3b572fe7`.
 The root-controller blocker on `@signal-tree/react` is discharged; React work
 may proceed when selected by the remaining Phase 5.5 sequence.
 
+`SELECTOR-SNAPSHOT-COST-0` is **OPEN / BLOCKS REACT API FREEZE, NOT ROOT OR
+KERNEL**. Measured cold whole-root materialization after one EntityMap mutation
+was about 245 us at 10k rows and 2.2 ms at 50k, while an entity update plus
+direct `byId()` reread was about 1.2-1.6 us. Therefore owner invalidation is only
+the wake-up fact for React selectors: selector `getSnapshot` must reread the
+selected location/value directly and must not be forced through whole-root
+NaturalValue materialization. Whole-root consumers may still read the whole
+root. This is a pre-freeze adapter constraint, not a hook spelling or new kernel
+port. The React reference carries unrelated-owner-wake/no-rerender and
+selected-mutation/rerender controls at `eea160b9`.
+
+Measurement provenance: `node --expose-gc
+scripts/benchmarks/data-model-profile.mjs entitymap` against the `1495f713`
+root-retirement build. The generator reports both `tree.$()` after one
+collection mutation and `updateOne + byId() read only` at 10k/50k rows in the
+same process and fixture family; quote the shape and range, not a multiplier.
+Validation: React reference 16/16, production reference build, both TypeScript
+passes, numeric/link checks, independent review, and the full release ladder at
+66/66 with zero known-red.
+
 `ROOT-READ-COST-0` is **CLOSED A / NO REGRESSION**. The production Rollup build
 was measured against a separately built `e243a569` pre-retirement artifact with
 `tools/bench-root-read-cost.mjs`: 1,000,000 cached reads per arm, 15 measured
@@ -107,6 +127,12 @@ memory scenario was collectable; bounded history plateaued (1.2x growth across
 16x rounds vs 13.7x control), retired-subject slope was unmeasurable, and live
 reactive identity survived forced GC. No performance result reopens the frozen
 root grammar.
+
+`CONSTRUCTION-DENSITY-0` is queued as a non-blocking optimization investigation,
+not attributed to root retirement: construction measured about 1,233-1,240
+B/scalar leaf and about 150 ms at 100k leaves, versus roughly 523 B for a raw
+Angular signal in the same decomposition. It does not block React, root
+retirement, or the current release phase unless a later product budget says so.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
