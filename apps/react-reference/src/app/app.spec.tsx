@@ -65,6 +65,36 @@ describe('greenfield React reference', () => {
 
   });
 
+  it('does not require descendant identity when selector equality is semantic', async () => {
+    const store = makeStore();
+    await settleKernel();
+
+    function ClonedQueue() {
+      const jobs = useSignalTree(
+        store,
+        () => store.$.jobs.all().map((job) => ({ ...job })),
+        (previous, next) =>
+          previous.length === next.length &&
+          previous.every(
+            (job, index) =>
+              job.id === next[index]?.id &&
+              job.status === next[index]?.status
+          )
+      );
+      return <output>{jobs.find((job) => job.id === 'J-104')?.status}</output>;
+    }
+
+    render(<ClonedQueue />);
+    expect(screen.getByText('active')).toBeTruthy();
+
+    await act(async () => {
+      store.$.jobs.updateOne('J-104', { status: 'done' });
+      await settleKernel();
+    });
+
+    await waitFor(() => expect(screen.getByText('done')).toBeTruthy());
+  });
+
   it('shares owner activation and releases every StrictMode observer', () => {
     const store = makeStore();
     const rendered = render(

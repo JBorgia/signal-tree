@@ -44,6 +44,14 @@ exposing partial state through synchronous realizations. Kernel, Angular,
 typecheck, lint, builds, package coexistence, independent review, and the
 release ladder pass at 66/66 with zero known-red.
 
+`SNAPSHOT-IDENTITY-CONTRACT-0` is **SIC-B / CLOSED GREEN**. As an explicit
+product-surface decision, `tree()` returns the same root while committed natural
+truth is unchanged. Correctness does not depend on snapshot identity, identity
+is never causal authority, and arbitrary unchanged descendants carry no public
+`===` promise after a change. KSA's current incremental subtree reuse remains
+an internal measured optimization. `@signal-tree/react` is now unblocked for
+greenfield derivation.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user

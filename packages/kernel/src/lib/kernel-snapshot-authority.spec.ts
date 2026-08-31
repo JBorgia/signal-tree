@@ -20,7 +20,7 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
     expect(tree()).not.toBe(initial);
   });
 
-  it('rebuilds only the changed path and retains an unchanged sibling', () => {
+  it('implementation control: rebuilds only the changed path and reuses an unchanged sibling', () => {
     const tree = signalTree({ left: { value: 1 }, right: { value: 2 } });
     const before = tree();
 
@@ -93,7 +93,7 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
     expect(rows.all.find((row) => row.id === 2)?.value).toBe(21);
   });
 
-  it('keeps independent EntityMap snapshots stable across unrelated marker writes', () => {
+  it('implementation control: reuses an independent EntityMap snapshot across unrelated writes', () => {
     const tree = signalTree({
       left: entityMap<Row, number>({ selectId: (row) => row.id }),
       right: entityMap<Row, number>({ selectId: (row) => row.id }),
