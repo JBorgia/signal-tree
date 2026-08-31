@@ -457,8 +457,9 @@ compact effects are the leading candidate, not the conclusion. Claim-registry
 representation is not a detour -- once the producer says 1, the ~241 B/subject
 registry cost is no longer pathological. `REALIZATION-OWNERSHIP-0` stays queued.
 
-`RESTORATION-REKEY-CLAIM-WIDTH-0` is **CLOSED GREEN**. `planRekey.commit()` and
-`planPreparedRekey.commit()` now set `lastSubjectIds = [subjectId]`, the sole
+`RESTORATION-REKEY-CLAIM-WIDTH-0` is **CLOSED GREEN** at `1bd52ed0`.
+`planRekey.commit()` and `planPreparedRekey.commit()` now set
+`lastSubjectIds = [subjectId]`, the sole
 production change; `restoration.ts:660`, the claim registry, restoration-side
 filtering, and public API are untouched. `bench-restoration-active-density.mjs
 --operation rekey` at 100k now reports `effects=1, claimedSubjects=1,
