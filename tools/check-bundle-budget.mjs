@@ -343,8 +343,18 @@ const TARGETS = {
     // 15.0.0 release hardening: plain entityMap() now pays for the same causal
     // runtime plus structural identity machinery. Measured after rebuilding
     // from source: prod 20.77KB, dev 23.45KB.
-    devKB: 23.7,
-    prodKB: 21.0,
+    //
+    // Post-RC declarative restoration closure moved the final measured floor to
+    // 21.49KB prod / 24.18KB dev. Before rebaselining, the closed active-index
+    // experiment's two shadow resolvers and public parity hooks were deleted;
+    // that recovered 0.17KB but left 21.49/24.18 stable across repeat builds.
+    // The remaining code is on the plain EntityMap path: owner-scoped target
+    // preparation, compact historical projection, and physical identity/order
+    // machinery. Dev foldability remains green (24.18 -> 21.48KB), so no
+    // diagnostic text leaked into production. Budgets retain about 0.2KB of
+    // headroom rather than rounding the measured values down.
+    devKB: 24.4,
+    prodKB: 21.7,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });
