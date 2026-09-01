@@ -96,7 +96,7 @@
     "validate:tarball-consumer": "node tools/verify-tarball-consumer.mjs",
     "validate:changelog-entry": "bash scripts/verify-changelog-entry.sh",
     "validate:types": "bash scripts/verify-no-broken-dts.sh",
-    "validate:budget": "node scripts/v9-budget-checks.js",
+    "validate:budget": "node tools/check-bundle-budget.mjs",
     "validate:tree-shaking": "node scripts/verify-tree-shaking.js",
     "validate:clean-release": "bash scripts/verify-clean-checkout-release-flow.sh",
     "validate:all": "npm run validate",
