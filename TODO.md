@@ -30,9 +30,10 @@ concrete shipping, build, API, documentation, or automation failure.
       `d32a1131`).** Live release/build/docs paths now use the v15 project and
       package names. Historical evidence is explicitly classified rather than
       rewritten as current guidance.
-- [ ] **Final executable rerun.** Re-run package discovery, builds, manifests,
-      declarations, exports, tarballs, consumer typechecks, tree-shaking, and
-      release gates after all audit corrections.
+- [x] **Final executable rerun (`109595e6`).** Package discovery, builds,
+      manifests, declarations, exports, tarballs, strict consumer typechecks,
+      tree-shaking, and all ordinary/release-only gates pass: 69/69, zero
+      known-red. Independent Gate F review found no blocker.
 
 ### Repository hygiene to disposition
 
