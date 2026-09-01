@@ -33,6 +33,10 @@ import { markOwnerInvalidated } from './internals/owner-invalidation-port';
 import { markSnapshotDirty } from './internals/snapshot-authority';
 import type { CellRuntime } from './internals/cell-runtime';
 import type { DerivedRuntime } from './internals/derived-runtime';
+import type {
+  CollectionTransitionTarget,
+  CollectionTransitionTargetBinding,
+} from './internals/causal-runtime/target-transition';
 
 // Angular's global dev-mode flag (defined by the Angular CLI; undefined in
 // plain test/node contexts, treated as dev there).
@@ -392,6 +396,85 @@ export function createEntitySignal<
 
   function createEntityMutationFrame(): EntityMutationFrame<K, E> {
     return new EntityMutationFrame(valueStore, structuralStore);
+  }
+
+  function prepareTransitionTarget(target: CollectionTransitionTarget): {
+    install(): void;
+    publish(options?: { advancePhysicalRevision?: boolean }): void;
+  } {
+    if (positionId === undefined || target.owner !== positionId) {
+      throw new Error('Collection transition target owner does not match the binding');
+    }
+
+    const currentSubjects = new Map<number, { key: K; value: E }>();
+    for (const key of structuralStore.activeKeysSnapshot()) {
+      const subjectId = structuralStore.subjectIdForKey(key);
+      const value =
+        subjectId === undefined
+          ? undefined
+          : valueStore.backingForSubject(subjectId);
+      if (subjectId !== undefined && value !== undefined) {
+        currentSubjects.set(subjectId, { key, value });
+      }
+    }
+
+    const preparedSubjects = target.subjects.map((subject) => {
+      if (
+        subject.value === null ||
+        typeof subject.value !== 'object' ||
+        Array.isArray(subject.value)
+      ) {
+        throw new Error(
+          `Collection target subject ${subject.subject} has no entity value`
+        );
+      }
+      return {
+        subjectId: subject.subject,
+        key: subject.key as K,
+        value: deepClone(subject.value) as E,
+      };
+    });
+    const structuralTarget = structuralStore.prepareTarget(
+      preparedSubjects,
+      target.order
+    );
+    const valueTarget = valueStore.prepareTargetValues(preparedSubjects);
+    const affectedSubjects = new Set([
+      ...currentSubjects.keys(),
+      ...preparedSubjects.map(({ subjectId }) => subjectId),
+    ]);
+    const preparedBySubject = new Map(
+      preparedSubjects.map((subject) => [subject.subjectId, subject])
+    );
+    const publications = [...affectedSubjects].map((subjectId) => {
+      const before = currentSubjects.get(subjectId);
+      const after = preparedBySubject.get(subjectId);
+      return {
+        valueSignal: entitySignals.get(subjectId),
+        stateSignal: subjectStateSignals.get(subjectId),
+        afterValue: after?.value,
+        bindingChanged: !before || !after || before.key !== after.key,
+      };
+    });
+
+    return {
+      install(): void {
+        structuralStore.installPreparedTarget(structuralTarget);
+        valueStore.installPreparedTargetValues(valueTarget);
+      },
+      publish(options): void {
+        for (const publication of publications) {
+          publication.valueSignal?.set(publication.afterValue);
+          if (publication.bindingChanged) {
+            publication.stateSignal?.update((value) => value + 1);
+          }
+        }
+        updateSignals();
+        if (options?.advancePhysicalRevision !== false) {
+          physicalCommitClock?.advance();
+        }
+      },
+    };
   }
 
   function commitAndProjectEntityMutationFrame(
@@ -3204,6 +3287,16 @@ export function createEntitySignal<
     enumerable: false,
     configurable: true,
   });
+  if (positionId !== undefined) {
+    Object.defineProperty(api, '__prepareTransitionTarget', {
+      value: {
+        owner: positionId,
+        prepareTarget: prepareTransitionTarget,
+      } satisfies CollectionTransitionTargetBinding,
+      enumerable: false,
+      configurable: true,
+    });
+  }
   Object.defineProperty(api, '__inspectSubjectResources', {
     value: inspectSubjectResources,
     enumerable: false,

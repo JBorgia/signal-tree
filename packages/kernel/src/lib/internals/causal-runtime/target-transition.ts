@@ -19,6 +19,60 @@ export type DeclarativeTransitionTarget = {
   readonly scalars: ReadonlyMap<PositionId, unknown>;
 };
 
+export type PreparedCollectionTransitionTarget = {
+  install(): void;
+  publish(): void;
+};
+
+export type CollectionTransitionTargetBinding = {
+  readonly owner: PositionId;
+  prepareTarget(
+    target: CollectionTransitionTarget
+  ): PreparedCollectionTransitionTarget;
+};
+
+export type ScalarTransitionTargetBinding = {
+  prepareTarget(
+    target: ReadonlyMap<PositionId, unknown>
+  ): PreparedCollectionTransitionTarget;
+};
+
+export function prepareDeclarativeTransitionInstallation(
+  target: DeclarativeTransitionTarget,
+  bindings: ReadonlyMap<PositionId, CollectionTransitionTargetBinding>,
+  scalarBinding?: ScalarTransitionTargetBinding
+): { install(): void } {
+  const prepared: PreparedCollectionTransitionTarget[] = [];
+  for (const [owner, collection] of target.collections) {
+    const binding = bindings.get(owner);
+    if (!binding || binding.owner !== owner) {
+      throw new Error(
+        `Declarative transition has no collection binding ${owner}`
+      );
+    }
+    prepared.push(binding.prepareTarget(collection));
+  }
+  if (target.scalars.size > 0) {
+    if (!scalarBinding) {
+      throw new Error(
+        'Declarative transition has scalar targets but no scalar binding'
+      );
+    }
+    prepared.push(scalarBinding.prepareTarget(target.scalars));
+  }
+
+  return {
+    install(): void {
+      for (const collection of prepared) {
+        collection.install();
+      }
+      for (const collection of prepared) {
+        collection.publish();
+      }
+    },
+  };
+}
+
 export type DeriveDeclarativeTransitionTargetOptions = {
   readonly collections: readonly CollectionTransitionSource[];
   readonly effects: readonly ReversalEffect[];

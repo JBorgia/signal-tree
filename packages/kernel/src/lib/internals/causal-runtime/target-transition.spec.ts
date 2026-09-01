@@ -4,6 +4,7 @@ import {
   applyCollectionOrderDelta,
   deriveDeclarativeTransitionTarget,
   deriveCollectionOrderDelta,
+  prepareDeclarativeTransitionInstallation,
   type CollectionOrderDelta,
   type CollectionTransitionSource,
 } from './target-transition';
@@ -364,5 +365,79 @@ describe('declarative target transition: whole-target compilation', () => {
         ]
       )
     ).toThrow('Subject value effect has no collection-relative address');
+  });
+
+  it('prepares every owner before installing any collection target', () => {
+    const installed: number[] = [];
+    const target = targetFor(
+      [source(7, [[1, 'a', {}]]), source(8, [[1, 'a', {}]])],
+      []
+    );
+    const bindings = new Map([
+      [
+        7,
+        {
+          owner: 7,
+          prepareTarget: () => ({
+            install: () => installed.push(7),
+            publish: () => installed.push(70),
+          }),
+        },
+      ],
+      [
+        8,
+        {
+          owner: 8,
+          prepareTarget: () => {
+            throw new Error('second owner refused');
+          },
+        },
+      ],
+    ]);
+
+    expect(() =>
+      prepareDeclarativeTransitionInstallation(target, bindings)
+    ).toThrow('second owner refused');
+    expect(installed).toEqual([]);
+  });
+
+  it('installs every prepared owner before publishing any of them', () => {
+    const events: string[] = [];
+    const target = targetFor(
+      [source(7, [[1, 'a', {}]]), source(8, [[1, 'a', {}]])],
+      []
+    );
+    const bindings = new Map(
+      [7, 8].map((owner) => [
+        owner,
+        {
+          owner,
+          prepareTarget: () => ({
+            install: () => events.push(`install:${owner}`),
+            publish: () => events.push(`publish:${owner}`),
+          }),
+        },
+      ])
+    );
+
+    prepareDeclarativeTransitionInstallation(target, bindings).install();
+
+    expect(events).toEqual([
+      'install:7',
+      'install:8',
+      'publish:7',
+      'publish:8',
+    ]);
+  });
+
+  it('requires scalar preparation inside the same aggregate boundary', () => {
+    const target = deriveDeclarativeTransitionTarget({
+      collections: [],
+      effects: [{ owner: 2, before: 0, after: 1 }],
+    });
+
+    expect(() =>
+      prepareDeclarativeTransitionInstallation(target, new Map())
+    ).toThrow('scalar targets but no scalar binding');
   });
 });
