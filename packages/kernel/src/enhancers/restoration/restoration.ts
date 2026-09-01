@@ -119,6 +119,14 @@ type CanonicalTurn<T> = RestorationHistoryEntry<T> & {
   __positionIds?: number[];
   __effects?: TurnEffect[];
   __orderDeltas?: CollectionOrderDelta[];
+  __eventOrdinal?: number;
+};
+
+type HistoricalEvent = {
+  readonly ordinal: number;
+  readonly effects: TurnEffect[];
+  readonly orderDeltas: CollectionOrderDelta[];
+  boundaryTurnId?: number;
 };
 
 type TurnEffectBase = {
@@ -325,6 +333,29 @@ function cloneCollectionOrderDelta(
   };
 }
 
+function setDetachedNaturalValue<T>(
+  source: T,
+  path: string,
+  value: unknown
+): T {
+  const segments = path === '' ? [] : path.split('.');
+  const setAt = (current: unknown, offset: number): unknown => {
+    if (offset === segments.length) {
+      return value;
+    }
+    const key = segments[offset];
+    const record =
+      current !== null && typeof current === 'object' && !Array.isArray(current)
+        ? (current as Record<string, unknown>)
+        : {};
+    return {
+      ...record,
+      [key]: setAt(record[key], offset + 1),
+    };
+  };
+  return setAt(source, 0) as T;
+}
+
 function combineScalarMutationIntent(
   left?: 'replace' | 'derive',
   right?: 'replace' | 'derive'
@@ -366,6 +397,8 @@ class RestorationManager<T> {
     ownerPaths: string[];
     recorded: boolean;
   }> = [];
+  private historicalEvents: HistoricalEvent[] = [];
+  private nextHistoricalOrdinal = 1;
 
   /**
    * The undo/redo position is a SIGNAL, because `canUndo()` bound in a template
@@ -414,6 +447,59 @@ class RestorationManager<T> {
 
   retainsCompletedHistory(): boolean {
     return this.maxHistorySize > 0;
+  }
+
+  appendHistoricalGap(
+    effects: TurnEffect[],
+    collectionOrders: PendingCollectionOrder[]
+  ): void {
+    if (
+      this.maxHistorySize === 0 ||
+      (this.history.length === 0 && this.pendingTurns.size === 0)
+    ) {
+      return;
+    }
+    const lastTurn = this.history.at(-1);
+    const lastEvent = this.historicalEvents.at(-1);
+    if (
+      lastTurn &&
+      lastEvent?.boundaryTurnId === lastTurn.id &&
+      lastTurn.state === snapshotState(this.tree.$ as unknown as TreeNode<T>) &&
+      collectionOrders.length === 0
+    ) {
+      lastEvent.effects.push(...effects.map(cloneTurnEffect));
+      return;
+    }
+    this.appendHistoricalEvent(effects, collectionOrders);
+  }
+
+  private appendHistoricalEvent(
+    effects: TurnEffect[],
+    collectionOrders: PendingCollectionOrder[],
+    boundaryTurnId?: number
+  ): number | undefined {
+    const orderDeltas = collectionOrders
+      .map((order) =>
+        deriveCollectionOrderDelta(
+          order.owner,
+          order.beforeSubjects,
+          order.afterSubjects,
+          order.beforeFrontier,
+          order.afterFrontier
+        )
+      )
+      .filter((delta) => delta.participants.length > 0);
+    if (effects.length === 0 && orderDeltas.length === 0) {
+      return undefined;
+    }
+    const ordinal = this.nextHistoricalOrdinal++;
+    this.historicalEvents.push({
+      ordinal,
+      effects: effects.map(cloneTurnEffect),
+      orderDeltas: orderDeltas.map(cloneCollectionOrderDelta),
+      boundaryTurnId,
+    });
+    return ordinal;
   }
 
   private maxHistorySize: number;
@@ -549,7 +635,11 @@ class RestorationManager<T> {
   }
 
   discardPendingTurn(turnId: number): boolean {
-    return this.pendingTurns.delete(turnId);
+    const discarded = this.pendingTurns.delete(turnId);
+    if (this.history.length === 0 && this.pendingTurns.size === 0) {
+      this.historicalEvents = [];
+    }
+    return discarded;
   }
 
   hasPendingTurn(turnId: number): boolean {
@@ -756,6 +846,15 @@ class RestorationManager<T> {
     // The reference-dedup above stays: it is O(1), structural rather than
     // semantic, and collapsing an identical snapshot loses nothing.
 
+    const eventOrdinal = this.appendHistoricalEvent(
+      effects ?? [],
+      collectionOrders ?? [],
+      turnId
+    );
+    if (eventOrdinal !== undefined) {
+      entry.__eventOrdinal = eventOrdinal;
+    }
+
     return entry;
   }
 
@@ -785,7 +884,21 @@ class RestorationManager<T> {
     }
 
     this.rebuildTurnIndexes();
+    this.pruneHistoricalEventsBeforeOldestBoundary();
     return true;
+  }
+
+  private pruneHistoricalEventsBeforeOldestBoundary(): void {
+    const oldestOrdinal = this.history[0]?.__eventOrdinal;
+    if (oldestOrdinal === undefined) {
+      if (this.pendingTurns.size === 0) {
+        this.historicalEvents = [];
+      }
+      return;
+    }
+    this.historicalEvents = this.historicalEvents.filter(
+      (event) => event.ordinal >= oldestOrdinal
+    );
   }
 
   observeBatch(action: string, ownerPaths: string[], recorded: boolean): void {
@@ -1473,7 +1586,103 @@ class RestorationManager<T> {
     // Snapshots are immutable by contract and frozen in dev, so the copy bought
     // nothing that the contract does not already give.
     this.historyVersion();
-    return this.history.map((entry) => ({ ...entry }));
+    const states = this.materializeHistoricalStates();
+    return this.history.map((entry, index) => ({
+      ...entry,
+      state: states[index] ?? entry.state,
+    }));
+  }
+
+  private materializeHistoricalStates(): T[] {
+    if (this.history.length === 0) {
+      return [];
+    }
+    if (
+      this.isTemporalViewActive ||
+      this.history.some((turn) => this.getTurnStatus(turn.id) !== 'applied')
+    ) {
+      return this.history.map((turn) => turn.state);
+    }
+
+    const bindings = new Map<number, CollectionTransitionTargetBinding>();
+    visitTree(this.tree.$, (node) => {
+      const binding = (
+        node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+      ).__prepareTransitionTarget;
+      if (binding) {
+        bindings.set(binding.owner, binding);
+      }
+      return undefined;
+    });
+    let natural = snapshotState(this.tree.$ as unknown as TreeNode<T>) as T;
+    const collections = new Map(
+      [...bindings].map(([owner, binding]) => [owner, binding.readSource()])
+    );
+    const states = new Array<T>(this.history.length);
+    const historyIndexByTurnId = new Map(
+      this.history.map((turn, index) => [turn.id, index])
+    );
+
+    for (let index = this.historicalEvents.length - 1; index >= 0; index -= 1) {
+      const event = this.historicalEvents[index];
+      if (event.boundaryTurnId !== undefined) {
+        const historyIndex = historyIndexByTurnId.get(event.boundaryTurnId);
+        if (historyIndex !== undefined) {
+          states[historyIndex] = natural;
+        }
+      }
+      const reversalEffects = [...event.effects]
+        .reverse()
+        .map((effect) => toReversalEffect(effect, 'undo'));
+      const collectionOwners = new Set([
+        ...event.orderDeltas.map(({ owner }) => owner),
+        ...reversalEffects
+          .filter(({ subjectId }) => typeof subjectId === 'number')
+          .map(({ owner }) => owner),
+      ]);
+      const collectionSources = [...collectionOwners].map((owner) => {
+        const source = collections.get(owner);
+        if (!source) {
+          throw new Error(`Historical materialization has no collection ${owner}`);
+        }
+        return source;
+      });
+      const target = deriveDeclarativeTransitionTarget({
+        collections: collectionSources,
+        effects: reversalEffects,
+        orderDeltas: event.orderDeltas,
+        orderEndpoint: 'before',
+      });
+      for (const [owner, collection] of target.collections) {
+        collections.set(owner, collection);
+        const binding = bindings.get(owner);
+        if (!binding) {
+          throw new Error(`Historical materialization has no binding ${owner}`);
+        }
+        natural = setDetachedNaturalValue(natural, binding.ownerPath, {
+          all: collection.order.map((subjectId) => {
+            const subject = collection.subjects.find(
+              (candidate) => candidate.subject === subjectId
+            );
+            if (!subject) {
+              throw new Error(`Historical materialization lost subject ${subjectId}`);
+            }
+            return subject.value;
+          }),
+        });
+      }
+      for (const effect of reversalEffects) {
+        if (effect.structural !== undefined || effect.subjectId !== undefined) {
+          continue;
+        }
+        if (typeof effect.path !== 'string') {
+          throw new Error('Historical scalar effect has no path');
+        }
+        natural = setDetachedNaturalValue(natural, effect.path, effect.after);
+      }
+    }
+
+    return states;
   }
 
   resetRestorationHistory(): void {
@@ -1486,6 +1695,8 @@ class RestorationManager<T> {
     this.pendingTurns.clear();
     this.positionTurnIds.clear();
     this.positionFrontiers.clear();
+    this.historicalEvents = [];
+    this.nextHistoricalOrdinal = 1;
     this.nextTurnId = 1;
     this.isTemporalViewActive = false;
     this.bumpRestorationHistory();
@@ -1906,10 +2117,17 @@ class RestorationManager<T> {
       );
     }
     this.history = surviving;
+    const discardedTurnIds = new Set(discarded.map(({ id }) => id));
+    this.historicalEvents = this.historicalEvents.filter(
+      (event) =>
+        event.boundaryTurnId === undefined ||
+        !discardedTurnIds.has(event.boundaryTurnId)
+    );
     this.releaseRetainedRestorationEntries(discarded);
     this.currentIndex = this.history.length - 1;
     this.bumpRestorationHistory();
     this.rebuildTurnIndexes();
+    this.pruneHistoricalEventsBeforeOldestBoundary();
   }
 }
 
@@ -3211,6 +3429,8 @@ export function restoration(
         getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.((capture) => {
           if (getWriteParticipation(capture.meta) === 'realized') {
             externalOrderOwners.add(capture.owner);
+            selfDirty = true;
+            captureCollectionOrderIntoBucket(pendingCapture, capture);
             return;
           }
           externalOrderOwners.delete(capture.owner);
@@ -3283,7 +3503,11 @@ export function restoration(
                   positionIds?.[0],
                   subjectIds?.[0]
                 );
-                externalTruthByPath.set(path, next);
+                if (next === undefined) {
+                  externalTruthByPath.delete(path);
+                } else {
+                  externalTruthByPath.set(path, next);
+                }
                 // Only a row-shaped payload is useful here; the collection also
                 // notifies at its own path with an undefined value.
                 if (
@@ -3291,11 +3515,26 @@ export function restoration(
                   next !== null &&
                   typeof next === 'object'
                 ) {
+                  const previousTruth = externalTruthBySubject.get(subjectKey);
+                  if (previousTruth && previousTruth.rowPath !== path) {
+                    externalTruthByPath.delete(previousTruth.rowPath);
+                  }
                   externalTruthBySubject.set(subjectKey, {
                     rowPath: path,
                     value: next,
                   });
                 }
+                selfDirty = true;
+                captureEffects(
+                  pendingCapture.effects,
+                  path,
+                  next,
+                  prev,
+                  meta,
+                  ownerPath,
+                  subjectIds,
+                  positionIds
+                );
                 return;
               }
               // An authored write returns this location to history's control.
@@ -3479,6 +3718,12 @@ export function restoration(
                     () => retainDescriptorInputs(descriptorInputs)
                   )
               : false;
+            if (!recorded) {
+              restorationManager.appendHistoricalGap(
+                effects,
+                collectionOrders
+              );
+            }
             restorationManager.observeBatch('batch', ownerPaths, recorded);
           });
         }
