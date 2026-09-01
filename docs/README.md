@@ -12,10 +12,11 @@ Use this index to navigate the documentation.
 
 ## 📚 Getting Started
 
-| Document                    | Description                                    |
-| --------------------------- | ---------------------------------------------- |
-| [Overview](overview.md)     | High-level project overview and specifications |
-| [Root README](../README.md) | Main project README                            |
+| Document                            | Description                                         |
+| ----------------------------------- | --------------------------------------------------- |
+| [Overview](overview.md)             | High-level project overview and specifications      |
+| [Root README](../README.md)         | Main project README                                 |
+| [Repository Map](repository-map.md) | Source, validation, history, and artifact ownership |
 
 ---
 
