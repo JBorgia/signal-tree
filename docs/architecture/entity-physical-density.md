@@ -4,6 +4,22 @@
 It does not renegotiate EntityMap, SubjectId identity, membership, ordering,
 held-reference behavior, restoration, causal behavior, or public API.
 
+## Final Disposition
+
+The architecture-selection investigation is **CLOSED**. E0-E5 attributed the
+physical, realization, and restoration costs; the subject-record, stable-slot,
+segmented, split-pool, checked-handle, and active-index alternatives were tested
+and dispositioned. No candidate beat the incumbent while preserving authority,
+independent lifetimes, point-operation latency, churn, and GC laws.
+
+The production representation is therefore retained by measurement, not claimed
+as a theoretical minimum or an architectural necessity. Future density work is
+post-RC refinement only: it must begin from a specific measured allocation and
+preserve the RC baseline for semantics, latency, lifecycle correctness, and GC
+behavior. It does not reopen this architecture-selection block or gate GA.
+
+> **Optimize ownership and lifetime boundaries, not bytes in isolation.**
+
 ## E0 — Byte Attribution
 
 Generator checkpoint: `82b487da`.
@@ -807,7 +823,7 @@ A key-swap effect also retained `path: "rows.__tmp"` after the temporary key had
 disappeared from both endpoint states. Structural path is therefore not identity
 authority. Collection owner, SubjectId, and transition facts are.
 
-## RESTORATION-POSITION-CAPTURE-0 — Open P0
+## RESTORATION-POSITION-CAPTURE-0 — Historical P0, Closed Below
 
 A designated pure reorder through `setAll` retains no causal turn or structural
 effect. Adding a field write admits the turn but retains only the field effect;
@@ -1416,3 +1432,25 @@ Together, the two rows establish a bounded result: the indexes each cost
 36.3 B/live subject, but neither is redundant under the current point-operation
 contract. This does not prove a dual-index representation universally optimal;
 it rejects deriving either direction through the other permanent indexes.
+
+## Architecture-Selection Closure
+
+The major physical-density hypotheses are now dispositioned:
+
+```text
+E0 attribution                         CLOSED
+E1/E2 decomposition                    CLOSED
+E3 segmented storage                   CLOSED / REJECTED
+E4 realization retention attribution  CLOSED
+E5 restoration/history density         CLOSED
+subject-record promotion               CLOSED / REJECTED
+stable-slot carrier                    CLOSED / REJECTED
+split-pool and checked-handle carriers CLOSED / REJECTED
+active-node index removal              CLOSED / REJECTED
+production representation              RETAINED BY MEASUREMENT
+```
+
+This closes replacement of the core storage architecture as the objective of
+`ENTITY-PHYSICAL-DENSITY-0`. Small allocation improvements remain admissible
+only as separately measured post-RC work. Candidate families do not remain open
+merely because the incumbent has not reached a theoretical byte minimum.

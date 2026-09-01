@@ -8,7 +8,24 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 2 — Public Release Surface (REOPENED — SATISFIED)`
+Current phase: `Phase 6 — Release Candidate (POST-RC STABILIZATION)`
+
+`15.0.0-rc.1` is live. The release-critical path is now bounded RC issue
+resolution and final public API review toward `GATE F`, followed by the Phase 7
+GA matrix. Architecture exploration is not on that path.
+
+`ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
+INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
+segmented, split-pool, checked-handle, and active-node-index rows have measured
+dispositions. The incumbent representation remains because no tested candidate
+improved density while preserving authority, independent lifetimes, hot-path
+latency, churn, and GC laws. This is not a theoretical-minimum claim.
+
+Future physical-density work is optional post-RC refinement. It must start from
+a specific measured allocation and beat the RC baseline without changing
+semantics or regressing point-operation latency, lifecycle correctness, churn,
+or GC behavior. It neither reopens `GATE A` nor blocks `GATE F` or GA absent a
+new deterministic release falsifier.
 
 `GATE B` is **SATISFIED AGAIN** as of `cf008545` / `b957f604`. Deterministic
 tarball/API evidence at `7c182798` / `ca8f6006` reopened the gate because
@@ -333,12 +350,14 @@ memory gates; net-zero, rollback, reset-before-confirm, destroy-before-confirm,
 throw-abort, transaction persistence, structural restoration, lazy claim
 registry, and exact cleanup controls; independent review clean. No full release
 66/66 claim is made because the previously recorded gate-10b pipeline
-prerequisite issue remains separate. `RESTORATION-ACTIVE-DENSITY-0` opens next
-as the retained-history scaling row (below); `REALIZATION-OWNERSHIP-0` re-queues
-behind it.
+prerequisite issue remains separate. The retained-history scaling row below is
+the historical preregistration that followed this checkpoint; its later
+declarative-restoration and lazy-materialization closure is authoritative.
+`REALIZATION-OWNERSHIP-0` is optional post-RC refinement, not a density or GA
+gate.
 
-`RESTORATION-ACTIVE-DENSITY-0` is **PRE-REGISTERED / ACTIVE NEXT**. `ea521d7e`
-closes the _idle_ restoration slope only. E5's own matrix still shows _retained_
+`RESTORATION-ACTIVE-DENSITY-0` was **PRE-REGISTERED HERE / CLOSED BELOW**.
+`ea521d7e` closes the _idle_ restoration slope only. E5's own matrix still shows _retained_
 history scaling with collection width rather than with reversible work: at 100k
 live subjects configured-unused is 39.10 MB, capacity 2 is 40.02 MB, capacity 20
 is 53.81 MB, and capacity 100 is 114.91 MB, while 100 retained _scalar_ turns
@@ -12413,6 +12432,10 @@ Exit condition: the greenfield public surface is frozen and its gates are green.
 
 RC1 is live. Phase 5.5's former block is discharged by the frozen greenfield
 surface and the exact-artifact release evidence above.
+
+This phase is stabilization, not architecture rescue. Further physical-density
+ideas belong to a separate optional post-RC optimization backlog and cannot
+delay `GATE F` or GA without a concrete release falsifier.
 
 > ⚠️ AND "1.0" HERE IS NOT A SEMVER LITERAL. The published line is `15.x` —
 > npm now holds `@signal-tree/kernel` and `@signal-tree/angular` at
