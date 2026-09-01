@@ -1254,3 +1254,39 @@ current production winner      NONE
 split-pool carrier             PRE-REGISTERED / UNPROVEN
 checked-allocator rival        PRE-REGISTERED / UNPROVEN
 ```
+
+### PHYSICAL-VALUE-ADDRESS-0 — Shared Prerequisite Green
+
+Checkpoint: `98f78a88`.
+
+Both non-incumbent carriers require safe physical value-address reuse, so that
+question is isolated before either carrier receives structural storage. The
+external `PhysicalValuePool` accepts only branded authority-prepared values,
+prepares backing and address off-store, and publishes them through one target
+assignment. Value release preflights every subject before producing a target.
+
+A physical handle carries SubjectId, slot, and generation. Resolution succeeds
+only when slot ownership and generation both match. Reusing a released slot for
+a fresh SubjectId or reacquiring value for the original SubjectId invalidates
+the old handle. Generation exhaustion at `Number.MAX_SAFE_INTEGER` refuses
+before reuse rather than allowing IEEE-754 repetition to reopen ABA. SubjectIds
+remain monotonic and never reused.
+
+The address directory is runtime immutable, not merely typed `ReadonlyMap`: a
+private-field view exposes lookup and iteration but no `set` or `delete` surface.
+Prepared values remain opaque references because EntityValueStore authority owns
+cloning before composition; the physical pool does not clone them twice.
+
+Eight focused controls cover immutable directory exposure, atomic publication,
+fresh-subject slot reuse, same-subject value reacquisition, stale-handle
+rejection, failed-release atomicity, duplicate authority input, opaque prepared
+value identity, and generation exhaustion. Full validation is 254 kernel files /
+2,086 passed / 3 expected failures / 13 skipped / 1 todo, with both TypeScript
+passes, kernel lint, formatting, and independent review green.
+
+This proves a reusable value-address primitive, not a carrier. It does not decide
+whether structural truth lives in a pool or authority-owned Map, whether a
+central directory survives, or whether either candidate beats the incumbent's
+density and latency. The next comparison must compose this exact freshness and
+publication contract with each structural carrier and run the already frozen
+dense, sparse-value, terminal-churn, lookup, and update gates.
