@@ -1107,14 +1107,13 @@ const GATES = [
     // package-hygiene checks presence. Comments now stay in both outputs and the
     // strip plugin in tools/build/create-rollup-config.mjs removes them from JS.
     //
-    // The declaration docs are now spread across many files, so blinding one
-    // declaration file can leave the package above the retention threshold.
-    // Temporarily raising the floor proves the aggregate gate still fails when
-    // shipped declaration documentation retention falls below policy.
+    // Kernel declarations are bundled to the public entry surface, so their
+    // source ratio intentionally excludes private docs. Raise the measured
+    // public-doc ratchet by one to prove the aggregate gate catches any loss.
     mutation: {
       file: 'tools/check-declaration-docs.mjs',
-      find: 'const FLOOR = 0.5;',
-      replace: 'const FLOOR = 0.99;',
+      find: 'kernel: 248,',
+      replace: 'kernel: 249,',
     },
   },
   {
@@ -1209,6 +1208,17 @@ const GATES = [
       file: 'dist/packages/kernel/package.json',
       find: '"files": [',
       replace: '"files": [\n    "this-entry-matches-nothing/**/*",',
+    },
+  },
+  {
+    name: 'consumer-types',
+    covers:
+      'packed kernel declarations compile with skipLibCheck=false under bundler and node16 resolution',
+    cmd: ['node', 'tools/verify-consumer-typecheck.mjs'],
+    needsBuild: true,
+    mutation: {
+      file: 'dist/packages/kernel/dist/adapter.d.ts',
+      append: '\nexport type __GateBrokenDeclaration = MissingDeclarationType;\n',
     },
   },
   {

@@ -55,12 +55,14 @@ for package in "${NX_PACKAGES[@]}"; do
         fi
     fi
 
-    # Check for TypeScript declarations
-    if [ ! -f "$DIST_DIR/src/index.d.ts" ]; then
-        echo -e "${RED}❌ Missing declaration entry: $DIST_DIR/src/index.d.ts${NC}"
+    # Check the declaration entry declared by the built manifest.
+    TYPES_ENTRY=$(node -p "require('./$DIST_DIR/package.json').types")
+    TYPES_PATH="$DIST_DIR/${TYPES_ENTRY#./}"
+    if [ ! -f "$TYPES_PATH" ]; then
+        echo -e "${RED}❌ Missing declaration entry: $TYPES_PATH${NC}"
         ((ERRORS++))
     else
-        echo -e "${GREEN}✓ src/index.d.ts found${NC}"
+        echo -e "${GREEN}✓ $TYPES_ENTRY found${NC}"
     fi
 
     echo -e "${GREEN}✅ $package verified${NC}\n"

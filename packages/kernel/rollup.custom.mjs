@@ -1,6 +1,8 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import typescript from '@rollup/plugin-typescript';
+import { dts } from 'rollup-plugin-dts';
 import { createLibraryRollupConfig } from '../../tools/build/create-rollup-config.mjs';
 
 const packageRoot = path.dirname(fileURLToPath(import.meta.url));
@@ -89,12 +91,45 @@ export default (config, options) => {
     ? [baseConfig.plugins]
     : [];
 
-  return {
+  const runtimePlugins = existingPlugins.filter(
+    (plugin) => plugin?.name !== 'typescript' && plugin?.name !== 'dts-bundle'
+  );
+
+  const runtimeConfig = {
     ...baseConfig,
     plugins: [
       productionStatsStubPlugin,
-      ...existingPlugins,
+      ...runtimePlugins,
+      typescript({
+        tsconfig: path.join(packageRoot, 'tsconfig.lib.prod.json'),
+        declaration: false,
+        declarationMap: false,
+        declarationDir: undefined,
+      }),
       stripProductionStatsCallsPlugin,
     ],
   };
+
+  return [
+    runtimeConfig,
+    {
+      input: path.join(packageRoot, 'src/index.ts'),
+      output: {
+        file: path.join(packageRoot, '../../dist/packages/kernel/dist/index.d.ts'),
+        format: 'es',
+      },
+      plugins: [dts({ respectExternal: true })],
+    },
+    {
+      input: path.join(packageRoot, 'src/adapter.ts'),
+      output: {
+        file: path.join(
+          packageRoot,
+          '../../dist/packages/kernel/dist/adapter.d.ts'
+        ),
+        format: 'es',
+      },
+      plugins: [dts({ respectExternal: true })],
+    },
+  ];
 };

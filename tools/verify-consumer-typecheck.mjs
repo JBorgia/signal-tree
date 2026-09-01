@@ -29,19 +29,6 @@ import { existsSync, mkdtempSync, mkdirSync, writeFileSync, readdirSync } from '
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-/**
- * `skipLibCheck: true` is the Angular CLI default and what essentially every
- * consumer runs, so it is what this gate enforces. `--strict-libs` flips it to
- * audit our own `.d.ts` — currently RED, and deliberately not gated: rollup's
- * declaration emitter drops several exported types while still referencing them
- * (`DefaultKey`, `EntityMapComputedSlices`, `EntityMapMarkerWithSlices`,
- * `PathNotifierHandler`, `HydrateMode`), and `isDev` is re-exported from
- * `lib/constants` which does not export it. Tracked, not hidden — see the note
- * in AGENTS.md. Re-exporting those names from the barrel does NOT fix it and
- * makes it worse (the barrel then points at declarations that still are not
- * emitted).
- */
-const STRICT_LIBS = process.argv.includes('--strict-libs');
 const ROOT = process.cwd();
 const CORE_DIST = join(ROOT, 'dist/packages/kernel');
 
@@ -86,6 +73,7 @@ import {
   restoration,
   batching,
 } from '@signal-tree/kernel';
+import { createSignalTreeFactory } from '@signal-tree/kernel/adapter';
 
 type User = { id: number; name: string; version: number };
 
@@ -110,7 +98,7 @@ tree.$.count.set(5);
 tree.$.count.update((c: number) => c + 1);
 
 // Branch + root state locations ARE callable
-tree.$.user({ name: 'Grace' });
+tree.$.user({ name: 'Grace', age: 36 });
 tree.$((current) => ({ ...current, count: 9 }));
 
 // Marker APIs
@@ -122,7 +110,7 @@ tree.undo();
 tree.redo();
 tree.batch(() => tree.$.count.set(0));
 
-export const _used = [n, whole, rows];
+export const _used = [n, whole, rows, createSignalTreeFactory];
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
 
@@ -158,7 +146,7 @@ for (const r of RESOLUTIONS) {
         compilerOptions: {
           strict: true,
           noEmit: true,
-          skipLibCheck: !STRICT_LIBS, // default matches Angular CLI; --strict-libs to audit our .d.ts
+          skipLibCheck: false,
           target: 'es2022',
           module: r.module,
           moduleResolution: r.moduleResolution,
