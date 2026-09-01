@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   assertPhysicalSubjectSlots,
   composePreparedSubjectUpdates,
+  preparePhysicalSubjectForget,
   preparePhysicalSubjectSlotTarget,
   preparePhysicalSubjectTarget,
+  preparePhysicalSubjectValueRelease,
 } from './subject-record-target';
 
 describe('composePreparedSubjectUpdates', () => {
@@ -295,5 +297,59 @@ describe('preparePhysicalSubjectSlotTarget', () => {
         values: [{ id: 1 }],
       })
     ).toThrow('Physical SubjectId 1 does not address slot 0');
+  });
+
+  it('releases value backing while preserving structural slot identity and revision', () => {
+    const live = current();
+
+    const target = preparePhysicalSubjectValueRelease(live, 1);
+
+    expect(live.values[0]).toEqual({ id: 1, name: 'before' });
+    expect(target.slotBySubject.get(1)).toBe(0);
+    expect(target.subjects[0]).toBe(1);
+    expect(target.revisions[0]).toBe(3);
+    expect(target.values[0]).toBeUndefined();
+    expect(() => assertPhysicalSubjectSlots(target)).not.toThrow();
+  });
+
+  it('updates structural revision after value backing has been released', () => {
+    const withoutValue = preparePhysicalSubjectValueRelease(current(), 1);
+
+    const target = preparePhysicalSubjectSlotTarget(
+      withoutValue,
+      composePreparedSubjectUpdates([{ subjectId: 1, revision: 4 }], [])
+    );
+
+    expect(target.revisions[0]).toBe(4);
+    expect(target.values[0]).toBeUndefined();
+  });
+
+  it('forgets terminal structural identity without reusing its physical slot', () => {
+    const live = current();
+    const forgotten = preparePhysicalSubjectForget(live, 1);
+    const target = preparePhysicalSubjectSlotTarget(
+      forgotten,
+      composePreparedSubjectUpdates(
+        [{ subjectId: 3, revision: 0 }],
+        [{ subjectId: 3, value: { id: 3, name: 'fresh' } }]
+      )
+    );
+
+    expect(forgotten.slotBySubject.has(1)).toBe(false);
+    expect(forgotten.subjects[0]).toBeUndefined();
+    expect(forgotten.revisions[0]).toBeUndefined();
+    expect(forgotten.values[0]).toBeUndefined();
+    expect(target.slotBySubject.get(3)).toBe(2);
+    expect(target.subjects).toEqual([undefined, 2, 3]);
+    expect(() => assertPhysicalSubjectSlots(target)).not.toThrow();
+  });
+
+  it('rejects releasing or forgetting a missing SubjectId', () => {
+    expect(() => preparePhysicalSubjectValueRelease(current(), 3)).toThrow(
+      'Physical SubjectId 3 has no slot'
+    );
+    expect(() => preparePhysicalSubjectForget(current(), 3)).toThrow(
+      'Physical SubjectId 3 has no slot'
+    );
   });
 });
