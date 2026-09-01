@@ -5,6 +5,7 @@ import {
 } from '../../lib/internals/subject-restoration-claims';
 import { NEUTRAL_CELL_RUNTIME } from '../../lib/internals/cell-runtime';
 import { getTreeRealization } from '../../lib/internals/tree-realization';
+import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
 
@@ -15,6 +16,15 @@ import {
 } from '../../lib/utils';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-runtime';
+import type { CollectionOrderCapture } from '../../lib/internals/mutation-capture-runtime';
+import {
+  deriveCollectionOrderDelta,
+  deriveDeclarativeTransitionTarget,
+  prepareDeclarativeTransitionInstallation,
+  type CollectionTransitionTargetBinding,
+  type CollectionOrderDelta,
+  type ScalarTransitionTargetBinding,
+} from '../../lib/internals/causal-runtime/target-transition';
 import {
   getPositionRegistry,
   type PositionRegistry,
@@ -107,6 +117,7 @@ type CanonicalTurn<T> = RestorationHistoryEntry<T> & {
   restorationSubjectIds?: number[];
   __positionIds?: number[];
   __effects?: TurnEffect[];
+  __orderDeltas?: CollectionOrderDelta[];
 };
 
 type TurnEffectBase = {
@@ -266,12 +277,14 @@ function toReversalEffect(
 // effects rather than from restoration history.
 
 type PendingEffectMap = Map<string, TurnEffect>;
+type PendingCollectionOrder = Omit<CollectionOrderCapture, 'meta'>;
 
 type CaptureBucket = {
   ownerPaths: Set<string>;
   subjectIds: Set<number>;
   positionIds: Set<number>;
   effects: PendingEffectMap;
+  collectionOrders: Map<number, PendingCollectionOrder>;
   descriptorInputs: Array<
     Omit<Parameters<typeof rememberTreeRealizationDescriptor>[0], 'descriptors'>
   >;
@@ -294,6 +307,15 @@ function cloneTurnEffect(effect: TurnEffect): TurnEffect {
     case 'rekey':
       return { ...effect };
   }
+}
+
+function cloneCollectionOrderDelta(
+  delta: CollectionOrderDelta
+): CollectionOrderDelta {
+  return {
+    ...delta,
+    participants: delta.participants.map((participant) => ({ ...participant })),
+  };
 }
 
 function combineScalarMutationIntent(
@@ -398,7 +420,8 @@ class RestorationManager<T> {
     private restoreStateFn?: (state: T) => void,
     private applyEffectsFn?: (
       effects: TurnEffect[],
-      direction: 'undo' | 'redo'
+      direction: 'undo' | 'redo',
+      orderDeltas: CollectionOrderDelta[]
     ) => void
   ) {
     const cellRuntime = getTreeRealization(tree)?.cell ?? NEUTRAL_CELL_RUNTIME;
@@ -448,6 +471,7 @@ class RestorationManager<T> {
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
+    collectionOrders?: PendingCollectionOrder[],
     explicitTurnId?: number,
     beforeInsert?: () => void
   ): boolean {
@@ -458,6 +482,7 @@ class RestorationManager<T> {
       subjectIds,
       positionIds,
       effects,
+      collectionOrders,
       explicitTurnId
     );
     if (!entry) {
@@ -475,6 +500,7 @@ class RestorationManager<T> {
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
+    collectionOrders?: PendingCollectionOrder[],
     explicitTurnId?: number
   ): CanonicalTurn<T> | undefined {
     const entry = this.buildTurn(
@@ -484,6 +510,7 @@ class RestorationManager<T> {
       subjectIds,
       positionIds,
       effects,
+      collectionOrders,
       explicitTurnId
     );
     if (!entry) {
@@ -498,6 +525,9 @@ class RestorationManager<T> {
       __positionIds: entry.__positionIds ? [...entry.__positionIds] : undefined,
       __effects: entry.__effects
         ? entry.__effects.map(cloneTurnEffect)
+        : undefined,
+      __orderDeltas: entry.__orderDeltas
+        ? entry.__orderDeltas.map(cloneCollectionOrderDelta)
         : undefined,
     };
   }
@@ -548,6 +578,7 @@ class RestorationManager<T> {
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
+    collectionOrders?: PendingCollectionOrder[],
     explicitTurnId?: number
   ): CanonicalTurn<T> | undefined {
     if (this.hasScopedRedoFuture()) {
@@ -652,6 +683,17 @@ class RestorationManager<T> {
       action: this.actionNames[action] || action,
       ...(this.includePayload && payload !== undefined && { payload }),
     };
+    const orderDeltas = (collectionOrders ?? [])
+      .map((order) =>
+        deriveCollectionOrderDelta(
+          order.owner,
+          order.beforeSubjects,
+          order.afterSubjects,
+          order.beforeFrontier,
+          order.afterFrontier
+        )
+      )
+      .filter((delta) => delta.participants.length > 0);
     const resolvedOwnerPaths =
       ownerPaths && ownerPaths.length > 0 ? ownerPaths : effectOwnerPaths;
     if (resolvedOwnerPaths.length > 0) {
@@ -670,6 +712,12 @@ class RestorationManager<T> {
     if (effects && effects.length > 0) {
       entry.__effects = effects.map(cloneTurnEffect);
     }
+    if (orderDeltas.length > 0) {
+      entry.__orderDeltas = orderDeltas;
+      entry.__positionIds = Array.from(
+        new Set([...(entry.__positionIds ?? []), ...orderDeltas.map(({ owner }) => owner)])
+      ).sort((left, right) => left - right);
+    }
 
     // Dedupe by REFERENCE. `tree.$()` returns the identical object when nothing
     // changed, so this is exact for the case that matters and O(1) — the
@@ -686,7 +734,8 @@ class RestorationManager<T> {
     // identical and referentially distinct, so a `prunedEqual` walk had to run
     // whenever anything had been pruned. Deleting the option deleted the need.
     const last = this.history[this.history.length - 1];
-    const isEffectEmpty = !effects || effects.length === 0;
+    const isEffectEmpty =
+      (!effects || effects.length === 0) && orderDeltas.length === 0;
     if (
       last &&
       (last.state === entry.state ||
@@ -767,6 +816,9 @@ class RestorationManager<T> {
         __effects: turn.__effects
           ? turn.__effects.map(cloneTurnEffect)
           : undefined,
+        __orderDeltas: turn.__orderDeltas
+          ? turn.__orderDeltas.map(cloneCollectionOrderDelta)
+          : undefined,
       }));
   }
 
@@ -783,6 +835,9 @@ class RestorationManager<T> {
       __positionIds: turn.__positionIds ? [...turn.__positionIds] : undefined,
       __effects: turn.__effects
         ? turn.__effects.map(cloneTurnEffect)
+        : undefined,
+      __orderDeltas: turn.__orderDeltas
+        ? turn.__orderDeltas.map(cloneCollectionOrderDelta)
         : undefined,
     };
   }
@@ -1546,12 +1601,14 @@ class RestorationManager<T> {
     }
 
     const effects: TurnEffect[] = [];
+    const orderDeltas: CollectionOrderDelta[] = [];
     for (const turnId of turnIds) {
       const turn = this.turns.get(turnId);
       if (!turn) {
         continue;
       }
       const turnEffects = turn.__effects ?? [];
+      orderDeltas.push(...(turn.__orderDeltas ?? []).map(cloneCollectionOrderDelta));
       recordProductionSubstrateStat(
         'publicUndoTurnEffectsExamined',
         turnEffects.length
@@ -1571,7 +1628,7 @@ class RestorationManager<T> {
       }
     }
 
-    this.applyEffectsFn(effects, direction);
+    this.applyEffectsFn(effects, direction, orderDeltas);
   }
 
   private isSupportedEffect(effect: TurnEffect): boolean {
@@ -2076,6 +2133,8 @@ export function restoration(
         tree: tree as unknown as ISignalTree<object>,
         descriptors: realizationDescriptors,
       });
+    const scalarSlotRuntime =
+      getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
     defineTreeRealizationPort(tree as unknown as object, realizationPort);
     defineTreeRealizationPort(
       (tree as ISignalTree<T>).$ as unknown as object,
@@ -2084,11 +2143,125 @@ export function restoration(
 
     const applyTurnEffectsThroughRealizationPort = (
       effects: TurnEffect[],
-      direction: 'undo' | 'redo'
+      direction: 'undo' | 'redo',
+      orderDeltas: CollectionOrderDelta[]
     ): void => {
       const reversalEffects = effects.map((effect) =>
         toReversalEffect(effect, direction)
       );
+      const usesDeclarativeTarget =
+        orderDeltas.length > 0 &&
+        reversalEffects.every(
+          (effect) =>
+            typeof effect.subjectId === 'number' ||
+            effect.structural === undefined
+        );
+      const applyDeclarativeTarget = (): void => {
+        const conflictingOrderOwner = orderDeltas.find(({ owner }) =>
+          externalOrderOwners.has(owner)
+        )?.owner;
+        if (conflictingOrderOwner !== undefined) {
+          throw new Error(
+            `ST1034: restoration refused — collection order ${conflictingOrderOwner} ` +
+              'changed after the operation being reversed. Nothing was changed; ' +
+              'the history position is unmoved.'
+          );
+        }
+        const bindings = new Map<number, CollectionTransitionTargetBinding>();
+        visitTree((tree as ISignalTree<T>).$, (node) => {
+          const binding = (
+            node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+          ).__prepareTransitionTarget;
+          if (binding) {
+            bindings.set(binding.owner, binding);
+          }
+          return undefined;
+        });
+        const deltaOwners = new Set(orderDeltas.map(({ owner }) => owner));
+        if (deltaOwners.size !== orderDeltas.length) {
+          throw new Error(
+            'Declarative order replay requires transition-level delta composition'
+          );
+        }
+        const targetOwners = new Set([
+          ...deltaOwners,
+          ...reversalEffects
+            .filter(({ subjectId }) => typeof subjectId === 'number')
+            .map(({ owner }) => owner),
+        ]);
+        const sources = [...targetOwners].map((owner) => {
+          const binding = bindings.get(owner);
+          if (!binding) {
+            throw new Error(`Declarative order replay has no binding ${owner}`);
+          }
+          return binding.readSource();
+        });
+        const target = deriveDeclarativeTransitionTarget({
+          collections: sources,
+          effects: reversalEffects,
+          orderDeltas,
+          orderEndpoint: direction === 'undo' ? 'before' : 'after',
+        });
+        const scalarBinding: ScalarTransitionTargetBinding | undefined =
+          scalarSlotRuntime
+            ? {
+                prepareTarget(scalars) {
+                  const frame = scalarSlotRuntime.beginFrame();
+                  for (const [owner, value] of scalars) {
+                    const slot = scalarSlotRuntime.resolveScalarSlot(owner);
+                    if (slot === undefined) {
+                      frame.discard();
+                      throw new Error(
+                        `Declarative scalar target has no slot ${owner}`
+                      );
+                    }
+                    frame.set(slot, value);
+                  }
+                  let result: ReturnType<typeof frame.commit> | undefined;
+                  return {
+                    install(): void {
+                      result = frame.commit({
+                        advanceRevision: false,
+                        publish: false,
+                      });
+                    },
+                    publish(): void {
+                      if (!result) {
+                        throw new Error(
+                          'Declarative scalar target published before installation'
+                        );
+                      }
+                      scalarSlotRuntime.publishPrepared(result);
+                    },
+                  };
+                },
+              }
+            : undefined;
+        const prepared = prepareDeclarativeTransitionInstallation(
+          target,
+          bindings,
+          scalarBinding
+        );
+        isRestoring = true;
+        try {
+          const apply = () =>
+            withWriteContext(
+              {
+                origin: 'restoration',
+                ownerId: getPositionRegistry(tree.$)?.id,
+              },
+              () => prepared.install()
+            );
+          const scalarRealization = getTreeRealization(tree.$)?.scalarLeaf;
+          if (scalarRealization) {
+            scalarRealization.runInvalidationGroup(apply);
+          } else {
+            apply();
+          }
+        } finally {
+          isRestoring = false;
+        }
+      };
       // RESTORE-P0 P0-C — world-relative validity, checked BEFORE any mutation
       // and before the cursor moves, so a refused restoration leaves the state
       // and the history position exactly as they were.
@@ -2161,7 +2334,10 @@ export function restoration(
       })();
 
       const refusal =
-        externalConflict ?? realizationPort.validateEffects(reversalEffects);
+        externalConflict ??
+        (usesDeclarativeTarget
+          ? undefined
+          : realizationPort.validateEffects(reversalEffects));
       if (refusal) {
         if (refusal.kind === 'value-drift') {
           // RESTORE-P0 P0-C. An undo either reverses the authored operation or
@@ -2182,6 +2358,11 @@ export function restoration(
           );
         }
         throw new Error(`Unsupported scoped undo effect at ${refusal.kind}`);
+      }
+
+      if (usesDeclarativeTarget) {
+        applyDeclarativeTarget();
+        return;
       }
 
       isRestoring = true;
@@ -2277,6 +2458,7 @@ export function restoration(
       subjectIds: new Set<number>(),
       positionIds: new Set<number>(),
       effects: new Map(),
+      collectionOrders: new Map(),
       descriptorInputs: [],
       designated: false,
     });
@@ -2320,6 +2502,7 @@ export function restoration(
       string,
       { readonly rowPath: string; readonly value: unknown }
     >();
+    const externalOrderOwners = new Set<number>();
     // Accepts `unknown` because `PositionId` is a branded type on the reversal
     // side and a plain number on the notification side; the key only needs the
     // two to stringify identically.
@@ -2366,6 +2549,7 @@ export function restoration(
       subjectIds: number[];
       positionIds: number[];
       effects: TurnEffect[];
+      collectionOrders: PendingCollectionOrder[];
       descriptorInputs: CaptureBucket['descriptorInputs'];
       designated: boolean;
     } => {
@@ -2381,6 +2565,14 @@ export function restoration(
       bucket.positionIds.clear();
       const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
       bucket.effects.clear();
+      const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
+        (order) => ({
+          ...order,
+          beforeSubjects: [...order.beforeSubjects],
+          afterSubjects: [...order.afterSubjects],
+        })
+      );
+      bucket.collectionOrders.clear();
       const descriptorInputs = bucket.descriptorInputs.splice(0);
       const designated = bucket.designated;
       bucket.designated = false;
@@ -2389,6 +2581,7 @@ export function restoration(
         subjectIds,
         positionIds,
         effects,
+        collectionOrders,
         descriptorInputs,
         designated,
       };
@@ -2741,6 +2934,25 @@ export function restoration(
         resolvedPositionIds
       );
     };
+    const captureCollectionOrderIntoBucket = (
+      bucket: CaptureBucket,
+      capture: CollectionOrderCapture
+    ): void => {
+      if (isMetaDesignated(capture.meta)) {
+        bucket.designated = true;
+      }
+      const existing = bucket.collectionOrders.get(capture.owner);
+      bucket.collectionOrders.set(capture.owner, {
+        owner: capture.owner,
+        ownerPath: capture.ownerPath,
+        beforeSubjects: existing?.beforeSubjects ?? [...capture.beforeSubjects],
+        afterSubjects: [...capture.afterSubjects],
+        beforeFrontier: existing?.beforeFrontier ?? capture.beforeFrontier,
+        afterFrontier: capture.afterFrontier,
+      });
+      bucket.ownerPaths.add(capture.ownerPath);
+      bucket.positionIds.add(capture.owner);
+    };
     const getTransactionBucket = (transactionId: number): CaptureBucket => {
       let bucket = pendingTransactions.get(transactionId);
       if (!bucket) {
@@ -2804,6 +3016,7 @@ export function restoration(
         subjectIds,
         positionIds,
         effects,
+        collectionOrders,
         descriptorInputs,
         designated,
       } =
@@ -2814,7 +3027,7 @@ export function restoration(
       if (!restorationManager.retainsCompletedHistory()) {
         return undefined;
       }
-      if (effects.length === 0) {
+      if (effects.length === 0 && collectionOrders.length === 0) {
         return undefined;
       }
       const entry = restorationManager.createPendingEntry(
@@ -2823,7 +3036,8 @@ export function restoration(
         ownerPaths.length > 0 ? ownerPaths : undefined,
         subjectIds.length > 0 ? subjectIds : undefined,
         positionIds.length > 0 ? positionIds : undefined,
-        effects.length > 0 ? effects : undefined
+        effects.length > 0 ? effects : undefined,
+        collectionOrders.length > 0 ? collectionOrders : undefined
       );
       if (entry) {
         pendingDescriptorInputs.set(entry.id, descriptorInputs);
@@ -2917,8 +3131,27 @@ export function restoration(
     let unsubscribeFlush: (() => void) | null = null;
     let unsubscribeNotifications: (() => void) | null = null;
     let unsubscribeReset: (() => void) | null = null;
+    let unsubscribeCollectionOrders: (() => void) | null = null;
     const releaseCapture = getMutationCaptureRuntime(tree)?.activateCapture();
     try {
+      unsubscribeCollectionOrders =
+        getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.((capture) => {
+          if (getWriteParticipation(capture.meta) === 'realized') {
+            externalOrderOwners.add(capture.owner);
+            return;
+          }
+          externalOrderOwners.delete(capture.owner);
+          const transactionId = resolveTransactionId(capture.meta);
+          if (transactionId !== undefined) {
+            captureCollectionOrderIntoBucket(
+              getTransactionBucket(transactionId),
+              capture
+            );
+            return;
+          }
+          selfDirty = true;
+          captureCollectionOrderIntoBucket(pendingCapture, capture);
+        }) ?? null;
       const notifier = getPathNotifier();
       if (notifier) {
         const treeOwnerId = getPositionRegistry(tree.$)?.id;
@@ -2994,6 +3227,10 @@ export function restoration(
               }
               // An authored write returns this location to history's control.
               externalTruthByPath.delete(path);
+              const authoredPosition = positionIds?.[0];
+              if (authoredPosition !== undefined) {
+                externalOrderOwners.delete(authoredPosition);
+              }
               const authoredSubjectKey = subjectTruthKey(
                 positionIds?.[0],
                 subjectIds?.[0]
@@ -3147,6 +3384,7 @@ export function restoration(
               subjectIds,
               positionIds,
               effects,
+              collectionOrders,
               descriptorInputs,
               designated,
             } =
@@ -3154,7 +3392,7 @@ export function restoration(
             const eligible =
               isTurnEligible(designated) &&
               restorationManager.retainsCompletedHistory() &&
-              effects.length > 0;
+              (effects.length > 0 || collectionOrders.length > 0);
             const recorded = eligible
               ? restorationManager.addEntry(
                     'batch',
@@ -3163,6 +3401,7 @@ export function restoration(
                     subjectIds.length > 0 ? subjectIds : undefined,
                     positionIds.length > 0 ? positionIds : undefined,
                     effects.length > 0 ? effects : undefined,
+                    collectionOrders.length > 0 ? collectionOrders : undefined,
                     undefined,
                     () => retainDescriptorInputs(descriptorInputs)
                   )
@@ -3218,6 +3457,9 @@ export function restoration(
       restorationManager.resetRestorationHistory();
       pendingDescriptorInputs.clear();
       stagedForeignTurns.clear();
+      externalTruthByPath.clear();
+      externalTruthBySubject.clear();
+      externalOrderOwners.clear();
     };
     (enhancedTree as ISignalTree<T> & RestorationMethods)['resetRestorationHistory'] =
       () => {
@@ -3294,6 +3536,11 @@ export function restoration(
           /* ignore */
         }
         try {
+          unsubscribeCollectionOrders?.();
+        } catch {
+          /* ignore */
+        }
+        try {
           restoreLeafInterceptors?.();
         } catch {
           /* ignore */
@@ -3301,6 +3548,7 @@ export function restoration(
         unsubscribeFlush = null;
         unsubscribeNotifications = null;
         unsubscribeReset = null;
+        unsubscribeCollectionOrders = null;
         restoreLeafInterceptors = null;
         releaseCapture?.();
         resetRestorationRetention();

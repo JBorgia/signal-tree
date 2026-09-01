@@ -2138,13 +2138,14 @@ function signalTreeImpl<T extends object>(
   const physicalCommitClock = buildPlan.has('causal-runtime')
     ? createPhysicalCommitClock()
     : undefined;
+  const captureRuntime = createMutationCaptureRuntime();
   const materializationContext = createMaterializationContext(
     buildPlan.has('position-topology'),
     (capability) => buildPlan.has(capability),
     physicalCommitClock,
     realization
   );
-  const captureRuntime = createMutationCaptureRuntime();
+  materializationContext.mutationCaptureRuntime = captureRuntime;
 
   const constructed = create(
     initialState,

@@ -33,6 +33,7 @@ import { markOwnerInvalidated } from './internals/owner-invalidation-port';
 import { markSnapshotDirty } from './internals/snapshot-authority';
 import type { CellRuntime } from './internals/cell-runtime';
 import type { DerivedRuntime } from './internals/derived-runtime';
+import type { MutationCaptureRuntime } from './internals/mutation-capture-runtime';
 import type {
   CollectionTransitionTarget,
   CollectionTransitionTargetBinding,
@@ -279,6 +280,7 @@ export function createEntitySignal<
   basePath: string,
   options?: {
     physicalCommitClock?: PhysicalCommitClock;
+    mutationCaptureRuntime?: MutationCaptureRuntime;
     positionIdAllocator?: EntityPositionIdAllocator;
     ownerMetadataEnabled?: boolean;
     subjectMetadataEnabled?: boolean;
@@ -436,7 +438,8 @@ export function createEntitySignal<
     });
     const structuralTarget = structuralStore.prepareTarget(
       preparedSubjects,
-      target.order
+      target.order,
+      target.orderFrontier
     );
     const valueTarget = valueStore.prepareTargetValues(preparedSubjects);
     const affectedSubjects = new Set([
@@ -474,6 +477,28 @@ export function createEntitySignal<
           physicalCommitClock?.advance();
         }
       },
+    };
+  }
+
+  function readTransitionSource(): CollectionTransitionTarget {
+    if (positionId === undefined) {
+      throw new Error('Collection transition binding has no owner PositionId');
+    }
+    const subjects = structuralStore.activeKeysSnapshot().map((key) => {
+      const subject = structuralStore.subjectIdForKey(key);
+      const value = subject === undefined
+        ? undefined
+        : valueStore.backingForSubject(subject);
+      if (subject === undefined || value === undefined) {
+        throw new Error('Collection transition source is missing active subject truth');
+      }
+      return { subject, key, value };
+    });
+    return {
+      owner: positionId,
+      subjects,
+      order: subjects.map(({ subject }) => subject),
+      orderFrontier: structuralStore.activeOrderFrontier(),
     };
   }
 
@@ -536,6 +561,7 @@ export function createEntitySignal<
   const hasRestorationAuthority = options?.hasRestorationAuthority ?? true;
   const ownerId = options?.ownerId;
   const physicalCommitClock = options?.physicalCommitClock;
+  const mutationCaptureRuntime = options?.mutationCaptureRuntime;
   const positionId = (
     options?.positionIdAllocator ??
     (positionMetadataEnabled
@@ -2890,6 +2916,10 @@ export function createEntitySignal<
 
     setAll(entities: E[], opts?: AddOptions<E, K>): void {
       const currentEntries = getProjectedEntries();
+      const beforeOrderFrontier = structuralStore.activeOrderFrontier();
+      const beforeSubjects = currentEntries
+        .map(([id]) => resolveSubjectId(id))
+        .filter((subjectId): subjectId is number => subjectId !== undefined);
       const currentIds = new Set(currentEntries.map(([id]) => id));
       const stagedIncomingIds: K[] = [];
       const stagedIncomingById = new Map<K, E>();
@@ -3082,6 +3112,28 @@ export function createEntitySignal<
         ...stagedUpdates.map(({ subjectId }) => subjectId),
         ...addedSubjectIds,
       ];
+
+      const afterSubjects = stagedIncomingIds
+        .map((id) => resolveSubjectId(id))
+        .filter((subjectId): subjectId is number => subjectId !== undefined);
+      if (
+        positionId !== undefined &&
+        beforeSubjects.length === afterSubjects.length &&
+        beforeSubjects.every((subjectId) => afterSubjects.includes(subjectId)) &&
+        beforeSubjects.some(
+          (subjectId, index) => subjectId !== afterSubjects[index]
+        )
+      ) {
+        mutationCaptureRuntime?.publishCollectionOrder?.({
+          owner: positionId,
+          ownerPath: basePath,
+          beforeSubjects,
+          afterSubjects,
+          beforeFrontier: beforeOrderFrontier,
+          afterFrontier: structuralStore.activeOrderFrontier(),
+          meta: ambientMeta(),
+        });
+      }
 
       const stagedAddStructuralEffects = stagedAdds.map(({ id, entity }, index) => {
         const subjectId = addedSubjectIds[index];
@@ -3291,6 +3343,7 @@ export function createEntitySignal<
     Object.defineProperty(api, '__prepareTransitionTarget', {
       value: {
         owner: positionId,
+        readSource: readTransitionSource,
         prepareTarget: prepareTransitionTarget,
       } satisfies CollectionTransitionTargetBinding,
       enumerable: false,

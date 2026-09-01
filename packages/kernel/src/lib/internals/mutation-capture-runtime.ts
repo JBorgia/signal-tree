@@ -1,4 +1,15 @@
 import { isTraversableNode } from '../utils';
+import type { WriteMetadata } from '../mutation-types';
+
+export type CollectionOrderCapture = {
+  readonly owner: number;
+  readonly ownerPath: string;
+  readonly beforeSubjects: readonly number[];
+  readonly afterSubjects: readonly number[];
+  readonly beforeFrontier: unknown;
+  readonly afterFrontier: unknown;
+  readonly meta?: WriteMetadata;
+};
 
 export const MUTATION_CAPTURE_RUNTIME = Symbol.for(
   'SignalTree:MutationCaptureRuntime'
@@ -7,10 +18,17 @@ export const MUTATION_CAPTURE_RUNTIME = Symbol.for(
 export interface MutationCaptureRuntime {
   isCaptureActive(): boolean;
   activateCapture(): () => void;
+  publishCollectionOrder?(capture: CollectionOrderCapture): void;
+  subscribeCollectionOrder?(
+    listener: (capture: CollectionOrderCapture) => void
+  ): () => void;
 }
 
 export function createMutationCaptureRuntime(): MutationCaptureRuntime {
   let activeCount = 0;
+  const collectionOrderListeners = new Set<
+    (capture: CollectionOrderCapture) => void
+  >();
 
   return {
     isCaptureActive(): boolean {
@@ -28,6 +46,18 @@ export function createMutationCaptureRuntime(): MutationCaptureRuntime {
         released = true;
         activeCount = Math.max(0, activeCount - 1);
       };
+    },
+    publishCollectionOrder(capture): void {
+      if (activeCount === 0) {
+        return;
+      }
+      for (const listener of [...collectionOrderListeners]) {
+        listener(capture);
+      }
+    },
+    subscribeCollectionOrder(listener): () => void {
+      collectionOrderListeners.add(listener);
+      return () => collectionOrderListeners.delete(listener);
     },
   };
 }

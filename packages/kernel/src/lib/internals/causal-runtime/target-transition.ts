@@ -10,6 +10,7 @@ export type CollectionTransitionSource = {
   readonly owner: PositionId;
   readonly subjects: readonly CollectionTargetSubject[];
   readonly order: readonly number[];
+  readonly orderFrontier: unknown;
 };
 
 export type CollectionTransitionTarget = CollectionTransitionSource;
@@ -26,6 +27,7 @@ export type PreparedCollectionTransitionTarget = {
 
 export type CollectionTransitionTargetBinding = {
   readonly owner: PositionId;
+  readSource(): CollectionTransitionSource;
   prepareTarget(
     target: CollectionTransitionTarget
   ): PreparedCollectionTransitionTarget;
@@ -77,7 +79,6 @@ export type DeriveDeclarativeTransitionTargetOptions = {
   readonly collections: readonly CollectionTransitionSource[];
   readonly effects: readonly ReversalEffect[];
   readonly orderDeltas?: readonly CollectionOrderDelta[];
-  readonly orderFrontiers?: ReadonlyMap<PositionId, unknown>;
   readonly orderEndpoint?: 'before' | 'after';
 };
 
@@ -159,7 +160,8 @@ export function deriveDeclarativeTransitionTarget(
           collection.order,
           delta,
           options.orderEndpoint ?? 'after',
-          options.orderFrontiers?.get(owner)
+          options.collections.find((source) => source.owner === owner)
+            ?.orderFrontier
         )
       : collection.order.filter((subject) => collection.subjects.has(subject));
     for (const subject of collection.subjects.keys()) {
@@ -175,6 +177,12 @@ export function deriveDeclarativeTransitionTarget(
         (left, right) => left.subject - right.subject
       ),
       order,
+      orderFrontier: delta
+        ? options.orderEndpoint === 'before'
+          ? delta.beforeFrontier
+          : delta.afterFrontier
+        : options.collections.find((source) => source.owner === owner)
+            ?.orderFrontier,
     });
   }
 

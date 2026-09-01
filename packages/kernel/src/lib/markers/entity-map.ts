@@ -244,6 +244,7 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
           path,
           {
             physicalCommitClock: context.physicalCommitClock,
+            mutationCaptureRuntime: context.mutationCaptureRuntime,
             // ADDRESS-REPAIR-1. The collection's own position is allocated
             // here, and `path` IS its canonical address — both facts are known
             // at exactly this point and nowhere later. Registering them makes
