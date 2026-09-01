@@ -14,6 +14,8 @@ while the packages shipped 13.x. Don't reintroduce it; link the changelog instea
 
 ## Overview
 
+- Causal transitions distinguish authored operations from external truth
+- Coherent multi-location commits with stable entity identity and explicit authority
 - Recursive typing with deep nesting and accurate type inference
 - Sub‑millisecond operations measured at 5–20+ levels
 - Memory efficiency via proportional causal history and explicit ownership lifetimes
@@ -23,6 +25,7 @@ while the packages shipped 13.x. Don't reintroduce it; link the changelog instea
 ## Core capabilities
 
 - Hierarchical signal trees with type-safe access and updates
+- Framework-neutral causal semantics realized by Angular and React packages
 - Deterministic resource release through `destroy()`
 - Tree-shakeable: unused enhancers are eliminated by modern bundlers
 

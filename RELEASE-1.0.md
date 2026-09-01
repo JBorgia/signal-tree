@@ -12532,7 +12532,7 @@ delay `GATE F` or GA without a concrete release falsifier.
 - [x] fix RC issues only — Angular's metadata finding was superseded by
       construction-bound realization; stale active `.with()` guidance and the
       declaration-gate package-universe defect closed at `78ea2ff6`
-- [ ] **Triage the full-tree repository audit before any next RC or GA
+- [x] **Triage the full-tree repository audit before any next RC or GA
       publish.** Treat the audit as hypotheses, not verdicts. Release-blocking
       until proved absent or fixed: phantom package aliases/directories,
       published-scope inconsistency, and live `core` -> `kernel` drift in build,
@@ -12584,7 +12584,10 @@ delay `GATE F` or GA without a concrete release falsifier.
       returned by the configured set rather than a deleted chain. Prettier,
       ESLint, kernel typing, diagnostics, `git diff --check`, and independent
       review passed.
-- [ ] final public API review
+- [x] **Final public API review.** The greenfield API is frozen at
+      `75c003c2`; `tools/api-baseline.json`, release claims, public
+      dispositions, package exports, and strict packed declarations are green.
+      No later stabilization work changed the public API.
 
 Exit condition: `GATE F`
 

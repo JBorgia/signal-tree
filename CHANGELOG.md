@@ -1,3 +1,21 @@
+## Unreleased
+
+- **Package consolidation:** the private `@signaltree/shared` workspace package
+  is removed. Its live utilities now belong to kernel internals, leaving the
+  publishable v15 set as `@signal-tree/kernel`, `@signal-tree/angular`, and
+  `@signal-tree/react`.
+- **Restoration history represents completed designated turns only.** There is
+  no synthetic INIT entry; a new or reset history is empty and
+  `getCurrentIndex()` is `-1`. `getRestorationHistory().length` is therefore the
+  number of completed designated turns retained by the configured capacity.
+- **Historical state is materialized lazily.** Canonical turns no longer retain
+  whole-state snapshots; `materializeHistoricalStates()` reconstructs public
+  history state from the retained event spine when history is read.
+- **Publishable kernel declarations are self-contained.** The Rollup build now
+  emits `dist/index.d.ts` and `dist/adapter.d.ts` directly, and packed consumers
+  compile both entry points with `skipLibCheck: false` under `bundler` and
+  `node16` resolution.
+
 ## 15.0.0-rc.1 (2026-08-30)
 
 First public candidate for the v15 package and API reset.
