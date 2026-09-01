@@ -120,14 +120,12 @@ const GATES = [
       '--skip-nx-cache',
     ],
     slow: true,
-    // Breaking the memo makes the wrapper churn again — marker-snapshot-memo.spec
-    // must catch it. Chosen over a trivially-broken function because it targets a
-    // fix whose whole risk is that it is INVISIBLE when it regresses.
+    // Break a React assertion to prove the all-project runner includes that
+    // package rather than merely compiling kernel.
     mutation: {
-      file: 'packages/kernel/src/lib/internals/materialize-markers.ts',
-      find: '  let memo = SNAPSHOT_MEMO.get(node as object);\n  if (!memo) {',
-      replace:
-        '  let memo = undefined as Signal<{ value: unknown }> | undefined;\n  if (!memo) {',
+      file: 'packages/react/src/use-signal-tree.spec.tsx',
+      find: 'expect(renders).toBe(initialRenders);',
+      replace: 'expect(renders).toBe(initialRenders + 1);',
     },
   },
   {
@@ -239,7 +237,7 @@ const GATES = [
     covers: 'every documented Angular-version claim matches peerDependencies',
     cmd: ['node', 'scripts/verify-version-claims.js'],
     mutation: {
-      file: 'packages/kernel/package.json',
+      file: 'packages/angular/package.json',
       find: '"@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0"',
       replace: '"@angular/core": "^19.0.0 || ^20.0.0 || ^21.0.0 || ^22.0.0"',
     },
@@ -330,8 +328,7 @@ const GATES = [
     // A baseline nothing verifies is a memo, not a gate.
     mutation: {
       file: 'packages/kernel/src/index.ts',
-      find: 'export { defineStore',
-      replace: 'export const __surfaceDrift = 1;\nexport { defineStore',
+      append: '\nexport const __surfaceDrift = 1;\n',
     },
   },
   {
@@ -390,8 +387,9 @@ const GATES = [
     cmd: ['node', 'tools/check-kernel-neutrality.mjs', '--self-test'],
     mutation: {
       file: 'tools/check-kernel-neutrality.mjs',
-      find: "const tainted = (file) => /@angular\\//.test(readFileSync(file, 'utf8'));",
-      replace: 'const tainted = () => false;',
+      find: 'const FRAMEWORK_IMPORT =',
+      replace:
+        'const FRAMEWORK_IMPORT = /(?!)/g; const __unusedFrameworkImport =',
     },
   },
   {
@@ -424,9 +422,7 @@ const GATES = [
     // the file an agent reads first.
     mutation: {
       file: 'docs/ai/LLM.md',
-      find: '### Pattern 3: Settings with Persistence',
-      replace:
-        '### Pattern 3: Settings with Persistence\n\n```ts\ntheme: stored("t", "light")\n```',
+      append: '\n```ts\nconst theme = stored("theme", "light");\n```\n',
     },
   },
   {
@@ -500,6 +496,11 @@ const GATES = [
       'packages/angular',
       'src/lib/angular-realization-invariants.spec.ts',
     ],
+    mutation: {
+      file: 'packages/angular/src/lib/angular-realization.ts',
+      find: '      signal(initial, equal ? { equal } : undefined),',
+      replace: '      ((() => initial) as any),',
+    },
   },
   {
     name: 'numeric-claims',
@@ -545,13 +546,11 @@ const GATES = [
     // symbol from an older release is invisible to it. `prependOne` shipped in
     // 14.0.0, which sat outside the window, so the previous mutation targeted
     // a symbol outside the window and the harness correctly reported this gate
-    // BLIND. `asMap` is in the delta and appears in the core README —
-    // occurrence count matters, because the harness uses String.replace, which
-    // substitutes only the FIRST match and would leave the symbol still present.
-    // Re-check this target whenever the base tag moves: `--list` prints the delta.
+    // BLIND. SignalTreeRollbackError is in the current delta and appears once
+    // in the kernel README. Re-check this target whenever the base tag moves.
     mutation: {
       file: 'packages/kernel/README.md',
-      find: 'asMap',
+      find: 'SignalTreeRollbackError',
       replace: '__gateRemovedFromPriming',
     },
   },
@@ -779,6 +778,11 @@ const GATES = [
       'maxHistorySize retains completed designated turns exactly: omitted defaults, zero retains none, and positive N retains N',
     cmd: ['node', 'tools/verify-restoration-capacity.mjs'],
     needsBuild: true,
+    mutation: {
+      file: 'tools/verify-restoration-capacity.mjs',
+      find: '  { capacity: 5, expected: 5 },',
+      replace: '  { capacity: 5, expected: 4 },',
+    },
   },
   {
     name: 'signal-identity-durability',
@@ -1020,6 +1024,11 @@ const GATES = [
       'vitest.retention.config.ts',
     ],
     env: { NODE_OPTIONS: '--expose-gc' },
+    mutation: {
+      file: 'packages/kernel/src/enhancers/serialization/a2-5-lifetime.spec.ts',
+      find: "    if (mode === 'destroyed') (tree as Persisted).destroy?.();",
+      replace: "    if (mode === 'destroyed') void tree;",
+    },
   },
   {
     name: 'documented-imports',
@@ -1032,6 +1041,11 @@ const GATES = [
     // README taught three subpaths that resolve to nothing. lint-readme-apis
     // could not see any of it — a specifier for a path that is not an entry
     // point is checked against nothing.
+    mutation: {
+      file: 'packages/kernel/README.md',
+      append:
+        "\n```ts\nimport { missing } from '@signal-tree/kernel/not-exported';\n```\n",
+    },
   },
   {
     name: 'documented-symbols',
@@ -1051,12 +1065,22 @@ const GATES = [
     covers:
       'the barrel-summary checker rejects an advertised-but-unexported symbol, accepts an exported one, and skips `.method` entries',
     cmd: ['node', 'tools/check-documented-symbols.mjs', '--self-test'],
+    mutation: {
+      file: 'tools/check-documented-symbols.mjs',
+      find: '  if (!scope) return claims;',
+      replace: '  return claims;',
+    },
   },
   {
     name: 'documented-imports:self',
     covers:
       'the documented-import checker accepts a real entry point and rejects both a bogus subpath and a bogus package',
     cmd: ['node', 'tools/check-documented-imports.mjs', '--self-test'],
+    mutation: {
+      file: 'tools/check-documented-imports.mjs',
+      find: 'const PACKAGES = packageDirsByName();',
+      replace: 'const PACKAGES = new Map();',
+    },
   },
   {
     name: 'error-codes',
