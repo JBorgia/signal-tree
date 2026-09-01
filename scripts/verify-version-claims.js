@@ -50,6 +50,30 @@ const CLAIM_SITES = [
   // It rotted precisely because it wasn't gated.
   'docs/overview.md',
 ];
+const RELEASE_CLAIM_SITE = 'docs/README.md';
+
+function checkReleaseClaim(text, site, version) {
+  const claims = [
+    ...text.matchAll(
+      /Current prerelease:\*{0,2}\s+(\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?)/gi
+    ),
+  ].map((match) => match[1]);
+  const violations = claims
+    .filter((claim) => claim !== version)
+    .map(
+      (claim) =>
+        `${site}: stale prerelease claim "${claim}"; expected "${version}" derived from package.json`
+    );
+  if (!claims.includes(version)) {
+    violations.push(
+      `${site}: missing current prerelease claim "${version}" derived from package.json`
+    );
+  }
+  if (claims.filter((claim) => claim === version).length > 1) {
+    violations.push(`${site}: duplicate current prerelease claim "${version}"`);
+  }
+  return violations;
+}
 
 // Lines matching any of these are excluded from drift scanning (see header).
 const LINE_EXCLUSIONS = [
@@ -71,7 +95,9 @@ function parseMajors(range) {
 function humanPhrase(majors) {
   if (majors.length === 1) return `Angular ${majors[0]}`;
   if (majors.length === 2) return `Angular ${majors[0]} or ${majors[1]}`;
-  return `Angular ${majors.slice(0, -1).join(', ')}, or ${majors[majors.length - 1]}`;
+  return `Angular ${majors.slice(0, -1).join(', ')}, or ${
+    majors[majors.length - 1]
+  }`;
 }
 
 function semverPhrase(majors) {
@@ -127,6 +153,15 @@ function checkSite(text, site, majors) {
       }
     }
 
+    const withoutCanonicalClaim = line.replaceAll(human, '');
+    for (const m of withoutCanonicalClaim.matchAll(
+      /\bAngular\s+(\d{1,2})(?!\d)(?!\+)(?!\.\d)/g
+    )) {
+      violations.push(
+        `${at}: unsupported single-major claim "Angular ${m[1]}" — authoritative range is "${human}"`
+      );
+    }
+
     // 3. Stale semver ranges tied to @angular/core or @angular/forms.
     //    (Single-caret ranges like `rxjs ^7.0.0` on the same line are ignored:
     //    only multi-alternative ranges following an @angular/* token count.)
@@ -166,7 +201,7 @@ function selfTest(majors) {
   // peerDependencies already said ^20 || ^21 || ^22).
   const drifted = [
     '- **Angular 20 or 21** — every Angular-consuming package declares',
-    "  `@angular/core: ^20.0.0 || ^21.0.0` in `peerDependencies`.",
+    '  `@angular/core: ^20.0.0 || ^21.0.0` in `peerDependencies`.',
   ].join('\n');
   const v1 = checkSite(drifted, 'fixture-install.md', majors);
   expect(
@@ -192,7 +227,7 @@ function selfTest(majors) {
     `The package supports ${humanPhrase(majors)}. See peerDependencies.`,
     'Native Signal Forms support (Angular 20.3+) via `connect()`.',
     'Fallback on Angular 20.0–20.2 where `connect()` is unavailable.',
-    "The `/signals` subpath requires `@angular/core ^22.0.0 || ^23.0.0`.",
+    'The `/signals` subpath requires `@angular/core ^22.0.0 || ^23.0.0`.',
     '@signaltree/events peers: `@angular/core ^18.0.0 || ^19.0.0 || ^20.0.0`.',
   ].join('\n');
   const v2 = checkSite(excluded, 'fixture-exclusions.md', majors);
@@ -202,12 +237,57 @@ function selfTest(majors) {
   );
 
   // Control: a clean site passes.
-  const clean = `Requires ${humanPhrase(majors)} (\`@angular/core ${semverPhrase(majors)}\`).`;
+  const clean = `Requires ${humanPhrase(
+    majors
+  )} (\`@angular/core ${semverPhrase(majors)}\`).`;
   const v3 = checkSite(clean, 'fixture-clean.md', majors);
   expect('passes a clean site (control)', v3.length === 0);
+  expect(
+    'flags a stale prerelease claim',
+    checkReleaseClaim(
+      '**Current prerelease:** 9.6.0.',
+      'fixture-docs.md',
+      '15.0.0-rc.1'
+    ).some((violation) => violation.includes('stale prerelease claim'))
+  );
+  expect(
+    'passes the authoritative prerelease claim',
+    checkReleaseClaim(
+      '**Current prerelease:** 15.0.0-rc.1.',
+      'fixture-docs.md',
+      '15.0.0-rc.1'
+    ).length === 0
+  );
+  expect(
+    'flags a stale prerelease claim beside the authoritative claim',
+    checkReleaseClaim(
+      '**Current prerelease:** 9.6.0.\n**Current prerelease:** 15.0.0-rc.1.',
+      'fixture-docs.md',
+      '15.0.0-rc.1'
+    ).some((violation) => violation.includes('stale prerelease claim'))
+  );
+  expect(
+    'flags an undecorated stale prerelease claim beside the authoritative claim',
+    checkReleaseClaim(
+      'Current prerelease: 14.9.0\n**Current prerelease:** 15.0.0-rc.1.',
+      'fixture-docs.md',
+      '15.0.0-rc.1'
+    ).some((violation) => violation.includes('stale prerelease claim'))
+  );
+  const contradictory = `${humanPhrase(
+    majors
+  )}. Another path requires Angular 22.`;
+  expect(
+    'flags a contradictory single-major claim beside the canonical range',
+    checkSite(contradictory, 'fixture-contradiction.md', majors).some((v) =>
+      v.includes('unsupported single-major claim')
+    )
+  );
 
   if (failed > 0) {
-    console.error(`\n❌ SELF-TEST FAILED (${failed}) — the gate cannot be trusted`);
+    console.error(
+      `\n❌ SELF-TEST FAILED (${failed}) — the gate cannot be trusted`
+    );
     process.exit(1);
   }
   console.log('\n✅ Self-test passed — gate demonstrably able to fail');
@@ -219,6 +299,9 @@ function selfTest(majors) {
 // ---------------------------------------------------------------------------
 
 function main() {
+  const workspacePkg = JSON.parse(
+    fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
+  );
   const angularPkgPath = path.join(ROOT, 'packages', 'angular', 'package.json');
   if (!fs.existsSync(angularPkgPath)) {
     console.error('Missing packages/angular/package.json');
@@ -227,7 +310,9 @@ function main() {
   const range = JSON.parse(fs.readFileSync(angularPkgPath, 'utf8'))
     .peerDependencies?.['@angular/core'];
   if (!range) {
-    console.error('packages/angular/package.json has no @angular/core peer dependency');
+    console.error(
+      'packages/angular/package.json has no @angular/core peer dependency'
+    );
     process.exit(2);
   }
   const majors = parseMajors(range);
@@ -237,7 +322,9 @@ function main() {
   }
 
   if (process.argv.includes('--self-test')) {
-    console.log('🧪 verify-version-claims --self-test (negative test, RFC 0004 §5 rule 2)\n');
+    console.log(
+      '🧪 verify-version-claims --self-test (negative test, RFC 0004 §5 rule 2)\n'
+    );
     selfTest(majors);
     return;
   }
@@ -254,15 +341,39 @@ function main() {
       violations.push(`${site}: canonical claim site is missing`);
       continue;
     }
-    const siteViolations = checkSite(fs.readFileSync(abs, 'utf8'), site, majors);
+    const siteViolations = checkSite(
+      fs.readFileSync(abs, 'utf8'),
+      site,
+      majors
+    );
     violations.push(...siteViolations);
     console.log(
-      siteViolations.length === 0 ? `  ✅ ${site}` : `  ❌ ${site} (${siteViolations.length})`
+      siteViolations.length === 0
+        ? `  ✅ ${site}`
+        : `  ❌ ${site} (${siteViolations.length})`
+    );
+  }
+  const releaseClaimPath = path.join(ROOT, RELEASE_CLAIM_SITE);
+  if (!fs.existsSync(releaseClaimPath)) {
+    violations.push(`${RELEASE_CLAIM_SITE}: canonical claim site is missing`);
+  } else {
+    const releaseViolations = checkReleaseClaim(
+      fs.readFileSync(releaseClaimPath, 'utf8'),
+      RELEASE_CLAIM_SITE,
+      workspacePkg.version
+    );
+    violations.push(...releaseViolations);
+    console.log(
+      releaseViolations.length === 0
+        ? `  ✅ ${RELEASE_CLAIM_SITE}`
+        : `  ❌ ${RELEASE_CLAIM_SITE} (${releaseViolations.length})`
     );
   }
 
   if (violations.length > 0) {
-    console.error(`\n❌ VERSION-CLAIM VERIFICATION FAILED (${violations.length} violation(s)):`);
+    console.error(
+      `\n❌ VERSION-CLAIM VERIFICATION FAILED (${violations.length} violation(s)):`
+    );
     for (const v of violations) console.error(`  - ${v}`);
     console.error(
       '\nFix the claim site(s) to match peerDependencies — never the other way ' +
