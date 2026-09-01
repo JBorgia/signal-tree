@@ -958,3 +958,81 @@ retained entity turns at 100k, with exactly 100 turns, claims, and subject
 descriptors. Tree, claim-registry, and descriptor-store lifecycle controls are
 collectable. Retained history now scales with causal work; requested exact
 output continues to scale with the output's collection width by contract.
+
+## SUBJECT-RECORD-PROMOTION-0 — Product Optimization Experiment
+
+**Frozen question:** Can the physical representation of a SubjectId-addressed
+entity be consolidated without changing any semantic authority boundary?
+
+> **Physical colocation is not authority ownership. A SubjectRecord may contain
+> facts from multiple authorities, but every mutation path must still route
+> through the authority that owns that fact.**
+
+The production-shaped rival is one allocation addressed by SubjectId, not one
+new semantic owner:
+
+```ts
+interface SubjectRecord<T, Key> {
+  // StructuralStore authority
+  key: Key;
+  revision: number;
+  activeNode?: OrderingNode;
+  lifecycle?: ExceptionalLifecycleState;
+
+  // EntityValueStore authority
+  value: T;
+}
+```
+
+`SubjectId` remains the Map key and is not duplicated in every record without a
+measured record-local traversal need. Restoration claims remain separate causal
+ownership and are not lifecycle state. Realization cells and facades remain out
+of this row.
+
+Adversarial confirmation does not establish colocation as a required kernel
+function. Frozen semantics permit a coherent rival with one
+`SubjectId -> stable slot` identity directory and separate authority-owned
+slot-indexed stores. Constant-hop access and removal of duplicate SubjectId Maps
+do not select between these arrangements. This is therefore a product-authorized
+representation comparison under E0's measured density objective, not an
+architecture-survival claim. A winning candidate remains one admissible physical
+representation, never a semantic necessity.
+
+Promotion proceeds in independently falsifiable stages:
+
+1. Colocate value and structural revision while retaining all current active
+   indexes and lifecycle representation.
+2. Prove `record.activeNode` parity with `activeNodesBySubject` across insert,
+   remove, reactivate, reorder, undo/redo, and destroy before removing that
+   index.
+3. Make the common active lifetime implicit while retaining exceptional
+   retired, tombstone, and restore-permission truth sparsely.
+4. Test `activeNodesByKey` independently. Keep it unless the new record path
+   preserves its algorithmic job without a material latency regression.
+
+Each stage must preserve stable non-reused SubjectIds, same-key isolation,
+constant-hop key and SubjectId lookup, ordering, rekey, remove/reactivate,
+declarative restoration, transaction rollback, later-authority refusal, held
+facade truth, released-realization collection, and owner destruction. Any
+semantic, atomicity, or lifecycle failure rejects the stage regardless of its
+memory result. Before facts share one allocation, the candidate must also prove
+reachability equivalence: retaining any colocated fact already requires the
+other colocated facts to remain alive for the same duration. Otherwise separate
+allocation lifetimes remain the correct representation.
+
+The physical gate measures construction and steady-state bytes per entity;
+lookup, update, rekey, remove, move, and restore latency; and high-water churn:
+create 100k, retire 90k, create 90k fresh subjects, and repeat while reporting
+live, peak, post-GC, and post-destroy bytes. Median latency regression below 5%
+is acceptable; 5-10% requires a material attributed density win; above 10% is
+rejected unless a separately frozen architecture requirement demands it.
+
+The evidence-backed target band is 256-300 B/entity. It is a measurement target,
+not an adoption condition or permission to combine stages. A candidate is
+admissible only when authority boundaries remain unchanged, identity and
+constant-hop access survive, lifecycle and GC laws remain true, declarative
+restoration remains unchanged, density improves materially, latency stays
+inside the preregistered tolerance, and high-water retention remains bounded.
+The row selects at most a physical representation for production; it cannot
+establish that colocation, slot-indexed separation, or the incumbent is required
+by SignalTree semantics.
