@@ -1086,3 +1086,39 @@ multi-authority facts through off-store preparation and one assignment. It does
 not wire production stores to that target, establish non-throwing private
 installation across the whole EntityMap binding, measure density or latency, or
 defeat the slot-indexed rival.
+
+### Value + Revision Layout Result
+
+Generator checkpoint: `e68b8c40`.
+
+```bash
+node --experimental-strip-types --expose-gc \
+  tools/bench-physical-target-layout.mjs --samples 5
+```
+
+The generator measures only the Phase 1 physical destination at
+0/1k/10k/100k subjects. It executes the exact experimental source without
+making the candidates reachable from package entry points, takes the median of
+five isolated samples, requires every sample to collect, and calibrates the
+incumbent against E0's 144 B/entity owner set: 72 B payload, 36 B value address,
+and 36 B revision address.
+
+| Physical destination                                       | Marginal bytes/entity | Delta from incumbent |
+| ---------------------------------------------------------- | --------------------: | -------------------: |
+| separate SubjectId revision and value Maps                 |               144.7 B |                0.0 B |
+| one SubjectId Map of revision + value objects              |               148.4 B |               +3.7 B |
+| SubjectId-to-stable-slot Map + subject/revision/value rows |               136.0 B |               -8.7 B |
+
+Candidate A is rejected for this narrow density objective: object colocation is
+3.7 B/entity larger than the split-Map incumbent despite removing one Map.
+Candidate B remains provisional: stable slots save 8.7 B/entity, but that result
+does not yet establish material product value or cover update latency,
+high-water churn, sparse retirement, or production integration. The ranking was
+identical in the three- and five-sample runs.
+
+This result does not reopen E3 or authorize segmented storage. Candidate B uses
+an explicit stable identity directory and tests only dense value/revision
+columns. It does not pack lifecycle, nodes, realization, or claims; assign slot
+reuse; or establish a final SubjectId representation. The next discriminator is
+the preregistered update-latency and high-water behavior of this exact narrow
+rival, not production wiring.

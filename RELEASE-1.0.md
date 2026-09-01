@@ -895,6 +895,20 @@ density result, or a verdict over slot-indexed separation. Phase 1 remains open
 for private EntityMap integration, one non-throwing prepared install, and the
 preregistered memory/latency comparison.
 
+The first Phase 1 density comparison is **CANDIDATE A REJECTED / CANDIDATE B
+PROVISIONAL** at generator `e68b8c40`. Five isolated samples at
+0/1k/10k/100k reproduce E0's value-plus-revision owner set: the split-Map
+incumbent measures 144.7 B/entity against the 144 B calibration, one
+SubjectId-to-object-record Map measures 148.4 B (+3.7), and one stable-slot
+directory plus subject/revision/value columns measures 136.0 B (-8.7). Every
+sample collects, and three- and five-sample rankings are identical. Object
+colocation therefore loses this narrow density arm. Stable slots remain only a
+provisional rival: the 8.7 B/entity saving has not passed update latency,
+high-water churn, sparse retirement, reachability, or production integration.
+This does not reopen E3, authorize segmented storage or slot reuse, or select
+lifecycle, node, realization, or claim representation. The next discriminator
+is latency and high-water behavior before any production wiring.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
