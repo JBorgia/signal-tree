@@ -54,9 +54,9 @@ const designatedTree = () =>
     }
   );
 
-/** History length excluding the INIT baseline. */
+/** Number of completed designated turns. */
 const turns = (tree: { getRestorationHistory(): readonly unknown[] }) =>
-  tree.getRestorationHistory().length - 1;
+  tree.getRestorationHistory().length;
 
 describe('HIST-C2 step 6: Angular Signal Forms over an ordinary branch', () => {
   it('C1 CONTROL — Signal Forms binds to a SignalTree branch at all', () => {

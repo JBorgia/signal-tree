@@ -59,7 +59,7 @@ class HostComponent {
 }
 
 const turns = (tree: { getRestorationHistory(): readonly unknown[] }) =>
-  tree.getRestorationHistory().length - 1;
+  tree.getRestorationHistory().length;
 
 const typeInto = (fixture: { nativeElement: HTMLElement }, value: string) => {
   const input = fixture.nativeElement.querySelector(
