@@ -578,6 +578,85 @@ into the structural effect that preceded it. Prove whether
 delete it rather than preserving an unexercised intermediate mechanism. Do
 not let this distract from `RESTORATION-TURN-STATE-0`.
 
+`RESTORATION-REPLAY-PLANNER-0` is **CLOSED ARCHITECTURE / IMPLEMENTATION NOT
+AUTHORIZED**. The incumbent restoration planner confuses causal transition
+semantics with mutation execution sequence: it validates structural effects
+against the pre-transition world, then replaces transition order with fixed
+mutation-category plan and commit orders, while restore placement greedily
+resolves anchors against whichever subjects happen to be live at that moment.
+Minimized add/remove composition, dependent restore placement, chained rekeys,
+vacated-key reuse, and key permutation cases reproduce the resulting refusal or
+wrong-order behavior through the real realization primitives.
+
+Historical turn order remains required to compose each subject's authored work
+into its net transition. After that composition, turn order is not a substitute
+for structural dependency or target reasoning. Sequential topological replay is
+**REJECTED as the target architecture**: key permutations require observable
+temporary keys or detach/attach machinery, and pure reorder has no existence or
+key edge to sort. The greenfield target is one declarative transition:
+
+```text
+retained causal work, composed in causal order
+    -> per affected collection owner:
+         SubjectId -> active/inactive
+         SubjectId -> target key
+         SubjectId -> target value
+         compact target order change
+       plus affected scalar target values
+    -> validate every target as a whole
+    -> prepare immutable, non-throwing commit instructions for every target
+    -> cross one atomic realization boundary only after all preparation succeeds
+```
+
+Identity is `(collection owner PositionId, SubjectId)`, never bare SubjectId:
+independent collections allocate the same numeric SubjectIds. `ownerPath` and
+structural `path` are addresses or diagnostics, not identity authority; a
+composed key-swap effect was measured with stale `path: "rows.__tmp"` even
+though neither endpoint target contains that key.
+
+Independent transaction and multi-collection falsifiers found no need to replay
+the original mutation sequence and no need for a full-tree snapshot. Prior and
+next targets are derivable from retained membership, key, value, scalar, and
+position facts. Transaction confirmation, speculative state, stale confirmation,
+dependency refusal, held references, and collection-local key ownership remain
+compatible with the target. Multi-collection atomicity requires global
+preparation followed by a non-throwing installation phase; grouped notification
+alone is insufficient, and install-then-rollback is rejected.
+
+Current failures are incumbent defects, not target falsifiers. Prepared
+realization context and pending rollback currently key some subject facts by
+bare SubjectId, so cross-collection numeric collisions can overwrite or coalesce
+unrelated effects. Current plan-all/commit-by-category replay also refuses
+same-collection remove/add/rekey permutations whose complete target is valid.
+No local repair of those mechanisms is authorized before the target planner is
+prototyped.
+
+`RESTORATION-POSITION-CAPTURE-0` is **OPEN P0 / ACTIVE NEXT WITHIN
+RESTORATION-TURN-STATE-0**. A designated pure `setAll([a,b,c]) ->
+setAll([c,b,a])` reorder emits no turn or structural effect; when a field write
+causes the same authored operation to be admitted, only the field effect is
+retained and undo leaves the reordered collection in place. The gap is effect
+capture, not turn admission. Frozen law: a designated authored transition that
+changes observable collection order retains positional causal information
+sufficient to reverse and reapply that order while preserving SubjectId
+identity. The representation must scale with positional work, not unrelated
+collection width: compare moved-subject anchors, affected intervals, ordered
+moved subsequences, and permutation deltas; a whole ordered SubjectId sequence
+is admissible only when the authored positional work is itself O(N).
+
+`STRUCTURAL-ADDRESS-AUTHORITY-0` is **QUEUED / NON-BLOCKING**. Structural
+authority comes from collection owner, SubjectId, and transition facts. Decide
+later whether structural `path` is deleted, diagnostic-only, or recomputed; do
+not design the target planner around repairing a stale path.
+
+This closure narrows, rather than completes, `RESTORATION-TURN-STATE-0`:
+`CanonicalTurn.state` remains disqualified as causal authority, current compact
+effects are complete for the causal work they represent, and represented causal
+work is incomplete for pure reorder. Final retained representation and production
+implementation remain blocked on compact positional capture and a target-planner
+prototype proving transaction and multi-collection atomicity without per-turn
+full snapshots. `REALIZATION-OWNERSHIP-0` remains queued.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user

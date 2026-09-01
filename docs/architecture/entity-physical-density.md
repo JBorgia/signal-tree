@@ -771,3 +771,62 @@ boundary, later realization truth after authored work); lifecycle (eviction,
 reset, destroy, descriptor/claim release). The later-realization-truth case is a
 killer falsifier: a naive before/after delta must not restore stale authored
 truth over later authoritative truth.
+
+## RESTORATION-REPLAY-PLANNER-0 — Architecture Closed
+
+The effect-sufficiency attack found one shared incumbent error: restoration
+answers intra-transition questions from the pre-transition world and fixed
+mutation-category schedules. A reversal may contain mutually dependent changes
+to subject existence, key occupancy, and collection position. Those facts must
+be resolved against the intended transition, not independently against the
+live tree before the transition starts.
+
+Turn order is still required to compose a subject's structural effects into its
+net transition. Once composed, historical turn order has no authority to order
+the normalized target. Sequential topological replay is rejected as the target:
+it turns a valid key permutation into a cycle requiring an observable temporary
+key, and it has no edge with which to represent pure reorder.
+
+The frozen greenfield architecture is a declarative transition target. For each
+affected collection it carries collection-scoped SubjectId membership, target
+keys, target values, and compact positional change; affected scalar target
+values join the same transition. The realization validates every collection and
+scalar target, prepares immutable non-throwing commit instructions for all of
+them, and installs only after global preparation succeeds. Install-then-rollback
+is not the atomicity model.
+
+Transaction and multi-collection falsifiers did not require the original
+mutation sequence or `CanonicalTurn.state`. Retained before/after structural,
+value, scalar, and positional facts derive both prior and next targets. The
+identity key is `(collection owner PositionId, SubjectId)`: two collections
+independently allocate the same numeric SubjectIds. Bare-SubjectId prepared and
+rollback indexes in the incumbent produce cross-collection overwrite and
+coalescing failures; those are implementation defects the owner-scoped target
+avoids, not evidence for snapshots.
+
+A key-swap effect also retained `path: "rows.__tmp"` after the temporary key had
+disappeared from both endpoint states. Structural path is therefore not identity
+authority. Collection owner, SubjectId, and transition facts are.
+
+## RESTORATION-POSITION-CAPTURE-0 — Open P0
+
+A designated pure reorder through `setAll` retains no causal turn or structural
+effect. Adding a field write admits the turn but retains only the field effect;
+undo restores the field and leaves the authored reorder untouched. This is a
+capture-completeness gap, not a turn-admission failure.
+
+Frozen law: a designated authored transition that changes observable collection
+order retains positional causal information sufficient to reverse and reapply
+that order while preserving SubjectId identity. The next derivation compares a
+moved SubjectId plus predecessor/successor, affected intervals, ordered moved
+subsequences, and permutation deltas. A full ordered SubjectId sequence is not
+the default: it is admissible only when the authored positional work is itself
+O(N), so retained cost continues to scale with causal work rather than unrelated
+collection width.
+
+`CanonicalTurn.state` remains disqualified as causal authority. The current
+effect record is sufficient for represented work but does not represent pure
+reorder. `RESTORATION-TURN-STATE-0` therefore remains open until compact
+positional capture and the declarative target planner are prototyped under the
+transaction, multi-collection, held-identity, external-authority, and lifecycle
+proof set.
