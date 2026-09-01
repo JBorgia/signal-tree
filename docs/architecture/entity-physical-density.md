@@ -474,14 +474,14 @@ The live E5 matrix after the correction is:
 
 | Capability state                                | Marginal bytes/live subject |    100k retained heap | History / claims / subject descriptors |
 | ----------------------------------------------- | --------------------------: | --------------------: | -------------------------------------- |
-| raw                                             |                     403.2 B |              38.92 MB | 0 / 0 / 0                              |
-| causal-runtime only                             |                     403.2 B |              38.94 MB | 0 / 0 / 0                              |
+| raw                                             |                     403.2 B |              38.93 MB | 0 / 0 / 0                              |
+| causal-runtime only                             |                     403.2 B |              38.95 MB | 0 / 0 / 0                              |
 | restoration configured, zero designated writes  |                     403.2 B |              39.10 MB | 0 / 0 / 0                              |
-| restoration plus 1,000 undesignated writes      |                     394.1 B |              38.33 MB | 0 / 0 / 0                              |
+| restoration plus 1,000 undesignated writes      |                     394.0 B |              38.33 MB | 0 / 0 / 0                              |
 | `maxHistorySize: 0` after 100 designated writes |         approximately 394 B | approximately 38.3 MB | 0 / 0 / 0                              |
-| capacity 2                                      |                     409.9 B |              40.02 MB | 2 / 2 / 2                              |
-| capacity 20                                     |                     554.3 B |              53.81 MB | 20 / 20 / 20                           |
-| configured capacity 101, 100 turns authored     |                   1,194.1 B |             114.91 MB | 100 / 100 / 100                        |
+| capacity 2                                      |                     394.0 B |              38.47 MB | 2 / 2 / 2                              |
+| capacity 20                                     |                     394.0 B |              38.49 MB | 20 / 20 / 20                           |
+| configured capacity 101, 100 turns authored     |                     394.0 B |              38.56 MB | 100 / 100 / 100                        |
 
 Configured-unused restoration falls from 840.2 to 403.2 B/live subject and
 80.88 to 39.10 MB at 100k, recovering approximately 41.8 MB. Its incremental
@@ -510,13 +510,12 @@ settlement, or public root semantics.
 
 ## RESTORATION-ACTIVE-DENSITY-0 (pre-registered)
 
-`ea521d7e` closes the idle slope. It does not close _retained_ history density.
-The matrix above still scales with collection width: capacity 2 / 20 / 100 cost
-40.02 / 53.81 / 114.91 MB at 100k live subjects, an increment of roughly
-771-795 KB per retained entity turn, while 100 retained scalar turns over the
-same subtree stay near 40 MB. Bounded cardinalities (100 / 100 / 100) are not
-bounded bytes; "positive capacities retain only participating subjects" is
-asserted, not yet demonstrated, for entity turns.
+`ea521d7e` closed the idle slope. The later declarative-transition and lazy
+historical-materialization work closes _retained_ history density: capacity
+2 / 20 / 100 now costs 38.47 / 38.49 / 38.56 MB at 100k live subjects. The old
+40.02 / 53.81 / 114.91 MB progression remains historical defect evidence, not
+the current production result. Bounded history cardinality now has bounded
+compact retention independent of unrelated collection width.
 
 Frozen target law: retained restoration cost scales with retained causal work
 and the subjects and positions needed to reverse it, not with unrelated live
@@ -946,9 +945,16 @@ starts from current canonical truth and owner-scoped collection targets, walks
 events backward, and emits immutable NaturalValue states at retained boundary
 ordinals without mutating the live tree.
 
-The first implementation keeps eager snapshots temporarily as an oracle and
-requires reconstructed equality across designated, undesignated, external,
-transaction, branch, and eviction cases. Eager retention is deleted only after
-that comparison and forced-GC durability pass. Calling public history may then
-allocate collection-width output because the caller explicitly requested full
-historical values; retaining small turns no longer pays that cost eagerly.
+The oracle sequence is complete through `62760a83` and `a0bf5716`. Reconstructed
+history is exact across designated, undesignated, external, transaction,
+branch, reset, and eviction cases. Confirmed turns no longer retain `state`,
+snapshot warming and snapshot-based dedupe are deleted, and public history is
+materialized synchronously only when requested.
+
+Final A0 at 100k attributes 32.3 KB to one compact retained turn and 813.6 KB to
+the matched canonical materialization; requesting public history allocates an
+additional 847.0 KB NaturalValue. The final E5 matrix reports 38.56 MB for 100
+retained entity turns at 100k, with exactly 100 turns, claims, and subject
+descriptors. Tree, claim-registry, and descriptor-store lifecycle controls are
+collectable. Retained history now scales with causal work; requested exact
+output continues to scale with the output's collection width by contract.

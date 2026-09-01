@@ -455,7 +455,8 @@ class RestorationManager<T> {
 
   appendHistoricalGap(
     effects: TurnEffect[],
-    collectionOrders: PendingCollectionOrder[]
+    collectionOrders: PendingCollectionOrder[],
+    designated: boolean
   ): void {
     if (
       this.maxHistorySize === 0 ||
@@ -468,7 +469,7 @@ class RestorationManager<T> {
     if (
       lastTurn &&
       lastEvent?.boundaryTurnId === lastTurn.id &&
-      lastTurn.state === snapshotState(this.tree.$ as unknown as TreeNode<T>) &&
+        designated &&
       collectionOrders.length === 0
     ) {
       lastEvent.effects.push(...effects.map(cloneTurnEffect));
@@ -3722,7 +3723,11 @@ export function restoration(
                 )
               : false;
             if (!recorded) {
-              restorationManager.appendHistoricalGap(effects, collectionOrders);
+              restorationManager.appendHistoricalGap(
+                effects,
+                collectionOrders,
+                designated
+              );
             }
             restorationManager.observeBatch('batch', ownerPaths, recorded);
           });

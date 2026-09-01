@@ -827,12 +827,21 @@ allocates none. Dense external replacement remains legitimately dense, but its
 facts are retained once between boundaries rather than as a full snapshot per
 turn.
 
-Implementation sequence is oracle-first: add the spine and detached projector
-while retaining eager `state`; compare reconstructed and eager values across
-scalar/entity/structural/transaction/gap/branch/eviction cases; route public and
-internal history reads through reconstruction; remove snapshot dedupe and
-warming; then delete internal `state` retention. Only after forced-GC durability
-and exact public-state tests pass may active-density/E5 run.
+`RESTORATION-HISTORICAL-MATERIALIZATION-0`, `RESTORATION-TURN-STATE-0`, and
+`RESTORATION-ACTIVE-DENSITY-0` are **CLOSED GREEN** through `62760a83` and
+`a0bf5716`. The oracle-first sequence completed: exact detached reconstruction
+is covered across scalar/entity/structural/transaction/gap/branch/reset/eviction
+cases; public and internal history reads use reconstruction; snapshot dedupe and
+warming are removed; and confirmed turns retain no strong `state`.
+
+Final A0 at 100k reports a 32.3 KB compact one-turn increment, 813.6 KB matched
+canonical materialization, and 847.0 KB caller-requested public-history output,
+with effects / claims / positions fixed at 1 / 1 / 1. Final E5 reports 38.56 MB
+for 100 retained entity turns over 100k live subjects, down from the historical
+114.91 MB defect, with exact 100 / 100 / 100 turn, claim, and descriptor
+cardinalities. All lifecycle collectability controls pass. Exact public `state`
+remains synchronous and unchanged; its collection-width allocation occurs only
+when the caller requests it.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public

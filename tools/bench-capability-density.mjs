@@ -133,7 +133,7 @@ const inspectCapability = (tree) => {
       structuralEffects,
     };
   }
-  const history = tree.getRestorationHistory();
+  const history = tree.__restoration?.history ?? [];
   const claims = getSubjectRestorationClaims(tree)?.snapshot() ?? {
     owners: 0,
     claimedSubjects: 0,
