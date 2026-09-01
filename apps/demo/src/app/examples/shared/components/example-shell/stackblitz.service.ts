@@ -51,7 +51,7 @@ export class StackblitzService {
             '@angular/forms': this.ngVersion,
             '@angular/platform-browser': this.ngVersion,
             '@angular/router': this.ngVersion,
-            '@signal-tree/kernel': 'latest',
+            '@signal-tree/angular': '15.0.0-rc.1',
             rxjs: '^7.8.0',
             tslib: '^2.6.0',
             'zone.js': '^0.15.0',
@@ -128,7 +128,7 @@ bootstrapApplication(AppComponent).catch((err) => console.error(err));
       'src/styles.css': `body { font-family: system-ui, sans-serif; margin: 2rem; }`,
       // Sensible placeholder; demos override src/app/app.component.ts.
       'src/app/app.component.ts': `import { Component } from '@angular/core';
-import { signalTree } from '@signal-tree/kernel';
+import { signalTree } from '@signal-tree/angular';
 
 @Component({
   selector: 'app-root',

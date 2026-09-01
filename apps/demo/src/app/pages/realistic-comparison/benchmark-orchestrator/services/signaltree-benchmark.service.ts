@@ -1,10 +1,11 @@
-import { computed, Injectable } from '@angular/core';
+import { computed, Injectable, OnDestroy } from '@angular/core';
 import {
   batching,
   entityMap,
-  signalTree,
   restoration,
-} from '@signal-tree/kernel';
+  signalTree,
+  undoable,
+} from '@signal-tree/angular';
 
 /**
  * The zero-delay batching preset, local to this benchmark.
@@ -79,7 +80,7 @@ import {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 @Injectable({ providedIn: 'root' })
-export class SignalTreeBenchmarkService {
+export class SignalTreeBenchmarkService implements OnDestroy {
   // Observability sink: benchmark loops write their final derived value here so
   // the JIT cannot dead-code-eliminate the measured work. Volatile by design.
   private observabilitySink: unknown;
@@ -103,6 +104,20 @@ export class SignalTreeBenchmarkService {
       notes,
     } as BenchmarkResult;
   }
+
+  private finishTreeBenchmark(
+    tree: { destroy(): void },
+    durationMs: number,
+    notes: string
+  ): BenchmarkResult {
+    tree.destroy();
+    return this.toResult(durationMs, undefined, notes);
+  }
+
+  ngOnDestroy(): void {
+    this._serverPayloadCache?.tree.destroy();
+    this._serverPayloadCache = undefined;
+  }
   // ==========================================
   // YIELD STRATEGY: HYBRID APPROACH
   // ==========================================
@@ -120,66 +135,15 @@ export class SignalTreeBenchmarkService {
 
   private yieldToUI = createYieldToUI();
 
-  /**
-   * Apply the set of enhancers requested by the orchestrator UI (if any).
-   * The orchestrator exposes an array of enhancer names on
-   * `window.__SIGNALTREE_ACTIVE_ENHANCERS` before invoking SignalTree
-   * benchmarks so the service can apply the exact same set programmatically.
-   */
-  private applyConfiguredEnhancers(tree: any, defaults?: any[]): any {
-    try {
-      const requested = window.__SIGNALTREE_ACTIVE_ENHANCERS__ as
-        | string[]
-        | undefined;
-
-      const enhancers: any[] = [];
-      if (requested && Array.isArray(requested) && requested.length > 0) {
-        for (const name of requested) {
-          switch (name) {
-            case 'batching':
-              enhancers.push(batching());
-              break;
-            case 'highPerformanceBatching':
-              enhancers.push(highPerformanceBatching());
-              break;
-            case 'restoration':
-              enhancers.push(restoration());
-              break;
-            default:
-              // Unknown enhancer name — ignore to maintain robustness
-              break;
-          }
-        }
-      }
-
-      if (enhancers.length > 0) {
-        try {
-          (window as any).__SIGNALTREE_ACTIVE_ENHANCERS__ = enhancers.map(
-            (enhancer: any) => enhancer?.metadata?.name || 'unknown'
-          );
-        } catch {
-          // ignore - diagnostic best-effort
-        }
-
-        let t = tree;
-        for (const enhancer of enhancers) {
-          t = t.with(enhancer);
-        }
-        return t;
-      }
-
-      // No requested enhancers — apply scenario defaults if provided
-      if (defaults && Array.isArray(defaults) && defaults.length > 0) {
-        let t = tree;
-        for (const e of defaults) {
-          t = t.with(e);
-        }
-        return t;
-      }
-    } catch {
-      // ignore errors and return tree unchanged
-    }
-    return tree;
+  /** Construct each scenario once with the exact capabilities it measures. */
+  private createConfiguredTree<T extends object>(
+    state: T,
+    defaults: any[] = []
+  ): any {
+    (window as any).__SIGNALTREE_ACTIVE_ENHANCERS__ = defaults.map(
+      (enhancer: any) => enhancer?.metadata?.name || 'unknown'
+    );
+    return signalTree(state, { enhancers: defaults });
   }
 
   async runDeepNestedBenchmark(
@@ -193,8 +157,7 @@ export class SignalTreeBenchmarkService {
 
     // ARCHITECTURAL ADVANTAGE: Surgical updates without parent rebuilding
     // Use case: Complex forms, nested configuration objects, tree-like data
-    const base = signalTree(createNested(depth));
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(createNested(depth), [batching()]);
 
     // Clock starts AFTER construction — every other library's arm excludes its
     // own store construction, and timing ours penalised SignalTree.
@@ -222,7 +185,11 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree deep nested updates');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree deep nested updates'
+    );
   }
 
   async runArrayBenchmark(dataSize: number): Promise<number | BenchmarkResult> {
@@ -250,14 +217,14 @@ export class SignalTreeBenchmarkService {
     // The array-leaf idiom is not deleted from the world — it is what a
     // developer gets if they model a collection as a plain array, which is why
     // core now warns about exactly that at construction (ST2018).
-    const base = signalTree({
-      items: entityMap<{ id: number; value: number }, number>({
-        selectId: (e) => e.id,
-      }),
-    });
-    const tree = this.applyConfiguredEnhancers(base, [
-      highPerformanceBatching(),
-    ]);
+    const tree = this.createConfiguredTree(
+      {
+        items: entityMap<{ id: number; value: number }, number>({
+          selectId: (e) => e.id,
+        }),
+      },
+      [highPerformanceBatching()]
+    );
     tree.$.items.setAll(
       Array.from({ length: dataSize }, (_, i) => ({
         id: i,
@@ -289,7 +256,7 @@ export class SignalTreeBenchmarkService {
     const duration = performance.now() - start;
     // Force the computed to recompute and assert the update propagated.
     this.observabilitySink = lastValue();
-    return this.toResult(duration, undefined, 'SignalTree array updates');
+    return this.finishTreeBenchmark(tree, duration, 'SignalTree array updates');
   }
 
   async runComputedBenchmark(
@@ -297,11 +264,13 @@ export class SignalTreeBenchmarkService {
   ): Promise<number | BenchmarkResult> {
     const start = performance.now();
 
-    const base: any = signalTree({
-      value: 0,
-      factors: Array.from({ length: 50 }, (_, i) => i + 1),
-    });
-    const tree: any = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree: any = this.createConfiguredTree(
+      {
+        value: 0,
+        factors: Array.from({ length: 50 }, (_, i) => i + 1),
+      },
+      [batching()]
+    );
 
     // FIX: Use Angular's computed() for proper memoization like NgRx SignalStore
     const compute = computed(() => {
@@ -325,7 +294,11 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree computed chains');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree computed chains'
+    );
   }
 
   async runBatchUpdatesBenchmark(
@@ -334,12 +307,12 @@ export class SignalTreeBenchmarkService {
   ): Promise<number | BenchmarkResult> {
     const start = performance.now();
 
-    const base = signalTree({
-      items: Array.from({ length: batchSize }, (_, i) => i),
-    });
-    const tree = this.applyConfiguredEnhancers(base, [
-      highPerformanceBatching(),
-    ]);
+    const tree = this.createConfiguredTree(
+      {
+        items: Array.from({ length: batchSize }, (_, i) => i),
+      },
+      [highPerformanceBatching()]
+    );
 
     for (let b = 0; b < batches; b++) {
       // New array reference so the signal actually notifies — same observable
@@ -354,7 +327,7 @@ export class SignalTreeBenchmarkService {
     const duration = performance.now() - start;
     // Read the array back so the work can't be dead-code-eliminated.
     this.observabilitySink = (tree.$ as any)['items']().length;
-    return this.toResult(duration, undefined, 'SignalTree batch updates');
+    return this.finishTreeBenchmark(tree, duration, 'SignalTree batch updates');
   }
 
   async runSelectorBenchmark(
@@ -362,15 +335,17 @@ export class SignalTreeBenchmarkService {
   ): Promise<number | BenchmarkResult> {
     const start = performance.now();
 
-    const base: any = signalTree({
-      items: Array.from({ length: dataSize }, (_, i) => ({
-        id: i,
-        flag: i % 2 === 0,
-        value: Math.random() * 100,
-        metadata: { category: i % 5, priority: i % 3 },
-      })),
-    });
-    const tree: any = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree: any = this.createConfiguredTree(
+      {
+        items: Array.from({ length: dataSize }, (_, i) => ({
+          id: i,
+          flag: i % 2 === 0,
+          value: Math.random() * 100,
+          metadata: { category: i % 5, priority: i % 3 },
+        })),
+      },
+      [batching()]
+    );
 
     // Angular's computed() provides memoization; SignalTree's signals integrate directly
     const selectEven = computed(
@@ -413,9 +388,9 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(
+    return this.finishTreeBenchmark(
+      tree,
       duration,
-      undefined,
       'SignalTree selector memoization'
     );
   }
@@ -450,6 +425,7 @@ export class SignalTreeBenchmarkService {
       !this._serverPayloadCache ||
       this._serverPayloadCache.dataSize !== size
     ) {
+      this._serverPayloadCache?.tree.destroy();
       const churn = Math.max(1, Math.floor(size * 0.1));
       const initial: Record<string, number> = {};
       const payload: Record<string, number> = {};
@@ -459,8 +435,7 @@ export class SignalTreeBenchmarkService {
         // ref-equal for 90%, mutated for 10%
         payload[k] = i < churn ? i + 1_000_000 : i;
       }
-      const base: any = signalTree(initial);
-      const tree: any = this.applyConfiguredEnhancers(base, []);
+      const tree: any = this.createConfiguredTree(initial);
       this._serverPayloadCache = {
         dataSize: size,
         initial,
@@ -480,13 +455,16 @@ export class SignalTreeBenchmarkService {
     cache.toggle = !cache.toggle;
 
     const start = performance.now();
-    tree(nextState);
+    tree.$(nextState);
     const duration = performance.now() - start;
+    if (tree.$.k0() !== nextState['k0']) {
+      throw new Error('Server-payload benchmark did not apply the selected payload');
+    }
 
     return this.toResult(
       duration,
       undefined,
-      'SignalTree server-payload sync (core ref-skip)'
+      `SignalTree server-payload sync (${cache.toggle ? 'payload' : 'initial'})`
     );
   }
 
@@ -516,10 +494,12 @@ export class SignalTreeBenchmarkService {
     concurrency = BENCHMARK_CONSTANTS.ITERATIONS.ASYNC_WORKFLOW,
     updatesPerWorker = 200
   ): Promise<number | BenchmarkResult> {
-    const base = signalTree({
-      counters: Array.from({ length: concurrency }, () => ({ value: 0 })),
-    });
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(
+      {
+        counters: Array.from({ length: concurrency }, () => ({ value: 0 })),
+      },
+      [batching()]
+    );
 
     const start = performance.now();
 
@@ -551,7 +531,11 @@ export class SignalTreeBenchmarkService {
       ]()[0].value === -1
     );
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree concurrent updates');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree concurrent updates'
+    );
   }
 
   async runMemoryEfficiencyBenchmark(
@@ -566,20 +550,22 @@ export class SignalTreeBenchmarkService {
     const groups = Math.max(10, Math.min(200, Math.floor(itemsCount / 250)));
 
     // SignalTree's memory trade-off: more wrappers, but efficient targeted updates
-    const base = signalTree({
-      groups: Array.from({ length: groups }, (_, g) => ({
-        id: g,
-        items: Array.from(
-          { length: Math.floor(itemsCount / groups) },
-          (_, i) => ({
-            id: g * 1_000_000 + i,
-            score: (i * 13) % 997,
-            tags: i % 7 === 0 ? ['hot', 'new'] : ['cold'],
-          })
-        ),
-      })),
-    });
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(
+      {
+        groups: Array.from({ length: groups }, (_, g) => ({
+          id: g,
+          items: Array.from(
+            { length: Math.floor(itemsCount / groups) },
+            (_, i) => ({
+              id: g * 1_000_000 + i,
+              score: (i * 13) % 997,
+              tags: i % 7 === 0 ? ['hot', 'new'] : ['cold'],
+            })
+          ),
+        })),
+      },
+      [batching()]
+    );
 
     const start = performance.now();
 
@@ -621,7 +607,11 @@ export class SignalTreeBenchmarkService {
 
     // Return operational time (memory measurement would be unreliable across environments)
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree memory efficiency');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree memory efficiency'
+    );
   }
 
   async runDataFetchingBenchmark(
@@ -656,13 +646,15 @@ export class SignalTreeBenchmarkService {
       })
     );
 
-    const base = signalTree({
-      items: [] as any[],
-      metadata: { total: 0, loaded: false, lastFetch: null as Date | null },
-      filters: { search: '', category: '', tags: [] as string[] },
-      pagination: { page: 1, size: 50, total: 0 },
-    });
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(
+      {
+        items: [] as any[],
+        metadata: { total: 0, loaded: false, lastFetch: null as Date | null },
+        filters: { search: '', category: '', tags: [] as string[] },
+        pagination: { page: 1, size: 50, total: 0 },
+      },
+      [batching()]
+    );
 
     // Simulate API response parsing and state hydration
     tree.$.metadata.loaded.set(false);
@@ -694,7 +686,7 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree data fetching');
+    return this.finishTreeBenchmark(tree, duration, 'SignalTree data fetching');
   }
 
   async runRealTimeUpdatesBenchmark(
@@ -704,22 +696,21 @@ export class SignalTreeBenchmarkService {
 
     // Simulate real-time dashboard or live data scenario
     // Use lightweight memoization for constantly changing real-time data
-    const base = signalTree({
-      liveMetrics: {
-        activeUsers: 0,
-        totalSessions: 0,
-        pageViews: 0,
-        serverLoad: 0.0,
-        responseTime: 0,
+    const tree = this.createConfiguredTree(
+      {
+        liveMetrics: {
+          activeUsers: 0,
+          totalSessions: 0,
+          pageViews: 0,
+          serverLoad: 0.0,
+          responseTime: 0,
+        },
+        recentEvents: [] as any[],
+        notifications: [] as any[],
+        alerts: [] as any[],
       },
-      recentEvents: [] as any[],
-      notifications: [] as any[],
-      alerts: [] as any[],
-    });
-    // Default enhancers only — no benchmark-only withLazyArrays injection.
-    const tree = this.applyConfiguredEnhancers(base, [
-      highPerformanceBatching(),
-    ]);
+      [highPerformanceBatching()]
+    );
 
     // Simulate real-time updates (like WebSocket messages)
     const updateFrequency = Math.min(
@@ -767,7 +758,11 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree real-time updates');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree real-time updates'
+    );
   }
 
   async runStateSizeScalingBenchmark(
@@ -799,14 +794,15 @@ export class SignalTreeBenchmarkService {
       })
     );
 
-    const base = signalTree({
-      entities: largeDataSet,
-      indices: {} as Record<string, number[]>,
-      cache: {} as Record<string, any>,
-      stats: { size: 0, lastUpdate: null as Date | null },
-    });
-    // Default enhancers only — no benchmark-only withLazyArrays injection.
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(
+      {
+        entities: largeDataSet,
+        indices: {} as Record<string, number[]>,
+        cache: {} as Record<string, any>,
+        stats: { size: 0, lastUpdate: null as Date | null },
+      },
+      [batching()]
+    );
 
     // Perform operations that test scaling
     tree.$.stats.size.set(largeDataSet.length);
@@ -849,7 +845,11 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree state size scaling');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree state size scaling'
+    );
   }
 
   // ================================
@@ -866,14 +866,14 @@ export class SignalTreeBenchmarkService {
       error: string | null;
     }
 
-    const base = signalTree<AsyncState>({
-      items: [] as any[],
-      loading: false,
-      error: null as string | null,
-    });
-    const tree = this.applyConfiguredEnhancers(base, [
-      highPerformanceBatching(),
-    ]);
+    const tree = this.createConfiguredTree<AsyncState>(
+      {
+        items: [] as any[],
+        loading: false,
+        error: null as string | null,
+      },
+      [highPerformanceBatching()]
+    );
 
     // Simulate async loading function that returns a small chunk per op
     const fetchChunk = async (chunkSize: number) => {
@@ -978,7 +978,7 @@ export class SignalTreeBenchmarkService {
     tree.$.loading.set(false);
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree async workflow');
+    return this.finishTreeBenchmark(tree, duration, 'SignalTree async workflow');
   }
 
   async runConcurrentAsyncBenchmark(
@@ -1013,7 +1013,11 @@ export class SignalTreeBenchmarkService {
     await Promise.all(promises);
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree concurrent async');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree concurrent async'
+    );
   }
 
   async runAsyncCancellationBenchmark(
@@ -1061,7 +1065,11 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree async cancellation');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree async cancellation'
+    );
   }
 
   // ================================
@@ -1072,86 +1080,117 @@ export class SignalTreeBenchmarkService {
     operations: number
   ): Promise<number | BenchmarkResult> {
     // Use actual SignalTree time-travel enhancer
-    const base = signalTree({
-      counter: 0,
-      data: { value: 'initial' },
-    });
-    const tree = this.applyConfiguredEnhancers(base, [restoration()]);
+    const tree = this.createConfiguredTree(
+      {
+        counter: 0,
+        data: { value: 'initial' },
+      },
+      [restoration()]
+    );
 
     const start = performance.now();
 
     // Make changes
     for (let i = 0; i < operations; i++) {
-      tree.$.counter.set(i);
-      tree.$.data({ value: `step_${i}` });
+      undoable(() => {
+        tree.$.counter.set(i);
+        tree.$.data({ value: `step_${i}` });
+      });
+      await Promise.resolve();
+    }
+    if (tree.getRestorationHistory().length === 0) {
+      throw new Error('Undo/redo benchmark admitted no restoration turns');
     }
 
-    // Undo half
-    for (let i = 0; i < operations / 2; i++) {
-      (tree as any).undo?.();
+    const undoCount = Math.floor(operations / 2);
+    const redoCount = Math.floor(operations / 4);
+    for (let i = 0; i < undoCount; i++) {
+      tree.undo();
     }
 
-    // Redo quarter
-    for (let i = 0; i < operations / 4; i++) {
-      (tree as any).redo?.();
+    for (let i = 0; i < redoCount; i++) {
+      tree.redo();
+    }
+    const expectedStep = operations - undoCount + redoCount - 1;
+    if (
+      tree.$.counter() !== expectedStep ||
+      tree.$.data().value !== `step_${expectedStep}`
+    ) {
+      throw new Error('Undo/redo benchmark did not realize the expected state');
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree undo/redo');
+    return this.finishTreeBenchmark(tree, duration, 'SignalTree undo/redo');
   }
 
   async runHistorySizeBenchmark(
     historySize: number
   ): Promise<number | BenchmarkResult> {
-    const base = signalTree({
-      value: 0,
-      data: { content: 'initial' },
-    });
-    const tree = this.applyConfiguredEnhancers(base, [
-      restoration({ maxHistorySize: historySize }),
-    ]);
+    const tree = this.createConfiguredTree(
+      {
+        value: 0,
+        data: { content: 'initial' },
+      },
+      [restoration({ maxHistorySize: historySize })]
+    );
 
     const start = performance.now();
 
     // Make changes to build history
-    for (let i = 0; i < historySize; i++) {
-      tree.$.value.set(i);
-      tree.$.data({ content: `step_${i}` });
-
-      // REMOVED: yielding during measurement for accuracy
+    for (let i = 1; i <= historySize; i++) {
+      undoable(() => {
+        tree.$.value.set(i);
+        tree.$.data({ content: `step_${i}` });
+      });
+      await Promise.resolve();
+    }
+    if (tree.getRestorationHistory().length !== historySize) {
+      throw new Error(
+        'History-size benchmark did not fill its retained buffer'
+      );
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree history size');
+    return this.finishTreeBenchmark(tree, duration, 'SignalTree history size');
   }
 
   async runJumpToStateBenchmark(
     operations: number
   ): Promise<number | BenchmarkResult> {
-    const base = signalTree({
-      currentState: 0,
-      data: { value: 'initial' },
-    });
-    const tree = this.applyConfiguredEnhancers(base, [restoration()]);
+    const tree = this.createConfiguredTree(
+      {
+        currentState: 0,
+        data: { value: 'initial' },
+      },
+      [restoration()]
+    );
 
     const start = performance.now();
 
     // Build history first
-    for (let i = 0; i < operations; i++) {
-      tree.$.currentState.set(i);
-      tree.$.data({ value: `state_${i}` });
+    for (let i = 1; i <= operations; i++) {
+      undoable(() => {
+        tree.$.currentState.set(i);
+        tree.$.data({ value: `state_${i}` });
+      });
+      await Promise.resolve();
     }
 
     // Now test jumping to random historical states
+    const retained = tree.getRestorationHistory().length;
+    if (retained === 0) {
+      throw new Error('Jump benchmark admitted no restoration turns');
+    }
     for (let i = 0; i < operations; i++) {
-      const randomStep = Math.floor(Math.random() * operations);
-      (tree as any).jumpToStep?.(randomStep);
-
-      // REMOVED: yielding during measurement for accuracy
+      const randomStep = Math.floor(Math.random() * retained);
+      tree.jumpTo(randomStep);
+      if (tree.getCurrentIndex() !== randomStep) {
+        throw new Error('Jump benchmark did not reach the selected turn');
+      }
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree jump-to-state');
+    return this.finishTreeBenchmark(tree, duration, 'SignalTree jump-to-state');
   }
 
   // ================================
@@ -1186,7 +1225,11 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree single middleware');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree single middleware'
+    );
   }
 
   async runMultipleMiddlewareBenchmark(
@@ -1216,7 +1259,11 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(duration, undefined, 'SignalTree multiple middleware');
+    return this.finishTreeBenchmark(
+      tree,
+      duration,
+      'SignalTree multiple middleware'
+    );
   }
 
   async runConditionalMiddlewareBenchmark(
@@ -1252,9 +1299,9 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(
+    return this.finishTreeBenchmark(
+      tree,
       duration,
-      undefined,
       'SignalTree conditional middleware'
     );
   }
@@ -1267,13 +1314,15 @@ export class SignalTreeBenchmarkService {
     dataSize: number
   ): Promise<number | BenchmarkResult> {
     // Combine all SignalTree features with proper typing
-    const base = signalTree({
-      data: [] as Array<{ id: number; value: number }>,
-      loading: false,
-      history: [] as Array<{ action: string; id: number }>,
-      middlewareLog: [] as string[],
-    });
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(
+      {
+        data: [] as Array<{ id: number; value: number }>,
+        loading: false,
+        history: [] as Array<{ action: string; id: number }>,
+        middlewareLog: [] as string[],
+      },
+      [batching()]
+    );
 
     const start = performance.now();
 
@@ -1312,9 +1361,9 @@ export class SignalTreeBenchmarkService {
     }
 
     const duration = performance.now() - start;
-    return this.toResult(
+    return this.finishTreeBenchmark(
+      tree,
       duration,
-      undefined,
       'SignalTree all features enabled'
     );
   }
@@ -1366,27 +1415,31 @@ export class SignalTreeBenchmarkService {
       options.minDurationMs = 10;
     }
 
-    const base = signalTree({
-      items: Array.from(
-        { length: isQuick ? Math.min(dataSize, 100) : dataSize },
-        (_, i) => ({
-          id: i,
-          value: Math.random() * 1000,
-        })
-      ),
-    });
-    const tree = this.applyConfiguredEnhancers(base, [
-      highPerformanceBatching(),
-    ]);
+    const tree = this.createConfiguredTree(
+      {
+        items: Array.from(
+          { length: isQuick ? Math.min(dataSize, 100) : dataSize },
+          (_, i) => ({
+            id: i,
+            value: Math.random() * 1000,
+          })
+        ),
+      },
+      [highPerformanceBatching()]
+    );
 
-    return runEnhancedBenchmark(async (iteration) => {
-      const idx = iteration % dataSize;
-      tree.$.items.update((items: any[]) => {
-        const newItems = [...items];
-        newItems[idx] = { ...newItems[idx], value: Math.random() * 1000 };
-        return newItems;
-      });
-    }, options);
+    try {
+      return await runEnhancedBenchmark(async (iteration) => {
+        const idx = iteration % dataSize;
+        tree.$.items.update((items: any[]) => {
+          const newItems = [...items];
+          newItems[idx] = { ...newItems[idx], value: Math.random() * 1000 };
+          return newItems;
+        });
+      }, options);
+    } finally {
+      tree.destroy();
+    }
   }
 
   async runEnhancedSelectorBenchmark(
@@ -1394,16 +1447,18 @@ export class SignalTreeBenchmarkService {
   ): Promise<EnhancedBenchmarkResult> {
     const isQuick = this._isQuickRun();
 
-    const base = signalTree({
-      items: Array.from(
-        { length: isQuick ? Math.min(dataSize, 100) : dataSize },
-        (_, i) => ({
-          id: i,
-          flag: i % 2 === 0,
-        })
-      ),
-    });
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(
+      {
+        items: Array.from(
+          { length: isQuick ? Math.min(dataSize, 100) : dataSize },
+          (_, i) => ({
+            id: i,
+            flag: i % 2 === 0,
+          })
+        ),
+      },
+      [batching()]
+    );
 
     // Create computed selector matching NgRx pattern
     const selectEven = computed(
@@ -1429,10 +1484,14 @@ export class SignalTreeBenchmarkService {
       options.removeOutliers = false;
     }
 
-    return runEnhancedBenchmark(async () => {
-      // This should hit memoization cache most of the time
-      selectEven();
-    }, options);
+    try {
+      return await runEnhancedBenchmark(async () => {
+        // This should hit memoization cache most of the time
+        selectEven();
+      }, options);
+    } finally {
+      tree.destroy();
+    }
   }
 
   async runEnhancedDeepNestedBenchmark(
@@ -1446,8 +1505,7 @@ export class SignalTreeBenchmarkService {
         ? { value: 0, data: 'test' }
         : { level: createNested(level - 1) };
 
-    const base = signalTree(createNested(depth));
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(createNested(depth), [batching()]);
 
     const options: EnhancedBenchmarkOptions = {
       operations: Math.min(dataSize, 1000),
@@ -1471,16 +1529,20 @@ export class SignalTreeBenchmarkService {
       options.minDurationMs = 10;
     }
 
-    return runEnhancedBenchmark(async (iteration) => {
-      // Use proper deep update method - access via bracket notation for signal tree
-      (tree as any)['update']((state: any) => {
-        const updateDeep = (obj: any, lvl: number): any =>
-          lvl === 0
-            ? { ...obj, value: iteration }
-            : { ...obj, level: updateDeep(obj.level ?? {}, lvl - 1) };
-        return updateDeep(state, depth - 1);
-      });
-    }, options);
+    try {
+      return await runEnhancedBenchmark(async (iteration) => {
+        // Use proper deep update method - access via bracket notation for signal tree
+        tree.$((state: any) => {
+          const updateDeep = (obj: any, lvl: number): any =>
+            lvl === 0
+              ? { ...obj, value: iteration }
+              : { ...obj, level: updateDeep(obj.level ?? {}, lvl - 1) };
+          return updateDeep(state, depth - 1);
+        });
+      }, options);
+    } finally {
+      tree.destroy();
+    }
   }
 
   // ==========================================
@@ -1492,15 +1554,15 @@ export class SignalTreeBenchmarkService {
    */
   async runPureArrayBenchmark(dataSize: number): Promise<number> {
     // Setup before measurement
-    const base = signalTree({
-      items: Array.from({ length: dataSize }, (_, i) => ({
-        id: i,
-        value: Math.random() * 1000,
-      })),
-    });
-    const tree = this.applyConfiguredEnhancers(base, [
-      highPerformanceBatching(),
-    ]);
+    const tree = this.createConfiguredTree(
+      {
+        items: Array.from({ length: dataSize }, (_, i) => ({
+          id: i,
+          value: Math.random() * 1000,
+        })),
+      },
+      [highPerformanceBatching()]
+    );
 
     const updates = Math.min(
       BENCHMARK_CONSTANTS.ITERATIONS.ARRAY_UPDATES,
@@ -1520,7 +1582,9 @@ export class SignalTreeBenchmarkService {
       // NO YIELDING during measurement
     }
 
-    return performance.now() - start;
+    const duration = performance.now() - start;
+    tree.destroy();
+    return duration;
   }
 
   /**
@@ -1528,13 +1592,15 @@ export class SignalTreeBenchmarkService {
    */
   async runPureSelectorBenchmark(dataSize: number): Promise<number> {
     // Setup before measurement
-    const base = signalTree({
-      items: Array.from({ length: dataSize }, (_, i) => ({
-        id: i,
-        flag: i % 2 === 0,
-      })),
-    });
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(
+      {
+        items: Array.from({ length: dataSize }, (_, i) => ({
+          id: i,
+          flag: i % 2 === 0,
+        })),
+      },
+      [batching()]
+    );
 
     const selectEven = computed(
       () => tree.$.items().filter((x: any) => x.flag).length
@@ -1548,7 +1614,9 @@ export class SignalTreeBenchmarkService {
       // NO YIELDING during measurement
     }
 
-    return performance.now() - start;
+    const duration = performance.now() - start;
+    tree.destroy();
+    return duration;
   }
 
   /**
@@ -1564,8 +1632,7 @@ export class SignalTreeBenchmarkService {
         ? { value: 0, data: 'test' }
         : { level: createNested(level - 1) };
 
-    const base = signalTree(createNested(depth));
-    const tree = this.applyConfiguredEnhancers(base, [batching()]);
+    const tree = this.createConfiguredTree(createNested(depth), [batching()]);
 
     const operations = Math.min(
       dataSize,
@@ -1576,7 +1643,7 @@ export class SignalTreeBenchmarkService {
     const start = performance.now();
 
     for (let i = 0; i < operations; i++) {
-      (tree as any)['update']((state: any) => {
+      tree.$((state: any) => {
         const updateDeep = (obj: any, lvl: number): any =>
           lvl === 0
             ? { ...obj, value: i }
@@ -1586,7 +1653,9 @@ export class SignalTreeBenchmarkService {
       // NO YIELDING during measurement
     }
 
-    return performance.now() - start;
+    const duration = performance.now() - start;
+    tree.destroy();
+    return duration;
   }
 
   /**
@@ -1771,11 +1840,13 @@ export class SignalTreeBenchmarkService {
     const start = performance.now();
 
     // Create a signal tree with a simple counter state
-    const base = signalTree({
-      counter: 0,
-      data: { value: 'initial' },
-    });
-    const tree = this.applyConfiguredEnhancers(base, [batching()]); // Use batching for efficient updates
+    const tree = this.createConfiguredTree(
+      {
+        counter: 0,
+        data: { value: 'initial' },
+      },
+      [batching()]
+    );
 
     // Create multiple computed subscribers that depend on the counter
     const subscribers: any[] = [];
@@ -1806,7 +1877,9 @@ export class SignalTreeBenchmarkService {
       // REMOVED: yielding during measurement for accuracy
     }
 
-    return performance.now() - start;
+    const duration = performance.now() - start;
+    tree.destroy();
+    return duration;
   }
 
   /**

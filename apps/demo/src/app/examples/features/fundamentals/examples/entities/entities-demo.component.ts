@@ -1,7 +1,6 @@
-
 import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { entityMap, signalTree } from '@signal-tree/kernel';
+import { entityMap, signalTree } from '@signal-tree/angular';
 
 import {
   generatePosts,

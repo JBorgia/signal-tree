@@ -12,7 +12,6 @@ export function ms(n: number): number {
 declare global {
   interface Window {
     __SIGNALTREE_ACTIVE_ENHANCERS__?: string[];
-    __SIGNALTREE_MEMO_MODE__?: 'off' | 'light' | 'shallow' | 'full';
     __LAST_COLDSTART_RESULTS__?: Record<string, BenchmarkResult>;
     __AKITA_LAST_COLDSTART_METRICS__?: BenchmarkResult;
     __ELF_LAST_COLDSTART_METRICS__?: BenchmarkResult;

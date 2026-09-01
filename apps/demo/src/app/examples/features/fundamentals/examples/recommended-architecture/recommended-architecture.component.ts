@@ -88,7 +88,7 @@ const tree = signalTree(createBaseState(), {
 
 /** Self-contained single-file version of the pattern for the StackBlitz playground. */
 const PLAYGROUND_APP = `import { Component, computed, effect, inject, Injectable } from '@angular/core';
-import { signalTree } from '@signal-tree/kernel';
+import { signalTree } from '@signal-tree/angular';
 
 // One tree per app, assembled once.
 const APP_TREE = signalTree(

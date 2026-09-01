@@ -31,13 +31,6 @@ import { NgxsBenchmarkService } from './services/ngxs-benchmark.service';
 import { RawSignalsBenchmarkService } from './services/raw-signals-benchmark.service';
 import { SignalTreeBenchmarkService } from './services/signaltree-benchmark.service';
 import { BENCHMARK_CONSTANTS } from './shared/benchmark-constants';
-
-// Extend Window interface for custom global property
-declare global {
-  interface Window {
-    __SIGNALTREE_MEMO_MODE?: 'off' | 'light' | 'shallow' | 'full';
-  }
-}
 // Register Chart.js components
 Chart.register(...registerables);
 
@@ -276,25 +269,12 @@ export class BenchmarkOrchestratorComponent
     warmupRuns: 10,
   });
 
-  // Runtime memoization mode for in-browser A/B testing. Read from URL or
-  // controlled via the small UI selector below. Possible values: 'off',
-  // 'light', 'shallow', 'full'. Default is 'light'. This writes a global
-  // so other demo services can pick it up as a fallback.
-  memoMode = signal<'off' | 'light' | 'shallow' | 'full'>(
-    this._readMemoModeFromUrl()
-  );
-
   // Quick-run mode: opt-in via URL param `?quickRun` or window.__SIGNALTREE_QUICK_RUN__
   // When enabled, the orchestrator reduces data size, iterations, and warmup
   // so smoke tests and CI runs complete in seconds.
   quickRun = signal<boolean>(this._readQuickRunFromUrl());
 
   // The signaltree-enterprise arm was removed in 14.0.0 with the package.
-
-  private _memoModeEffect = effect(() => {
-    // Keep a global for other modules that may read it directly
-    window.__SIGNALTREE_MEMO_MODE = this.memoMode();
-  });
 
   // Keep a global flag for quick-run detection; adjusts config on load
   private _quickRunEffect = effect(() => {
@@ -333,39 +313,6 @@ export class BenchmarkOrchestratorComponent
       // ignore
     }
     return Boolean((window as any).__SIGNALTREE_QUICK_RUN__);
-  }
-
-  private _readMemoModeFromUrl(): 'off' | 'light' | 'shallow' | 'full' {
-    try {
-      const p = new URLSearchParams(window.location.search);
-      const m = p.get('memo');
-      if (m === 'off' || m === 'light' || m === 'shallow' || m === 'full')
-        return m;
-    } catch {
-      // ignore and fallthrough to default
-    }
-    return 'light';
-  }
-
-  // Allow changing the memo mode at runtime via the UI select. This updates
-  // the URL so exporter automation can drive A/B using query params.
-  setMemoMode(mode: string | EventTarget | null) {
-    const m =
-      typeof mode === 'string'
-        ? mode
-        : (mode as { value?: string } | null)?.value;
-    if (!(m === 'off' || m === 'light' || m === 'shallow' || m === 'full'))
-      return;
-    this.memoMode.set(m);
-    try {
-      const url = new URL(window.location.href);
-      url.searchParams.set('memo', m);
-      history.replaceState(null, '', url.toString());
-      // reflect to global for services reading it directly
-      window.__SIGNALTREE_MEMO_MODE = m;
-    } catch {
-      // ignore URL update failures
-    }
   }
 
   calibrationData = signal<CalibrationData | null>(null);
@@ -685,23 +632,7 @@ export class BenchmarkOrchestratorComponent
     this.scenarioSelectionVersion.update((v) => v + 1);
   });
 
-  // Mapping of test scenarios to the enhancers the benchmark service actually
-  // applies. It claims to reflect the service, so it has to. Keep it in step
-  // with the switch in `signaltree-benchmark.service.ts` — the two are
-  // duplicated data and have drifted apart before.
-  //
-  // The service handles four names: batching, highPerformanceBatching,
-  // serialization, restoration. An unrecognised name falls through the switch
-  // silently, which is how three dead ones survived here: `memoization`,
-  // `shallowMemoization` and `lightweightMemoization`, whose tiers were unified
-  // and then removed in 9.0.0/9.0.1 when core took over memoising
-  // materialisation. Those are gone from this map.
-  //
-  // `highPerformanceBatching` is NOT one of them — the service applies it, from
-  // a local two-line definition: `batching({ notificationDelayMs: 0 })`. Core
-  // used to export a function by that name, v9.0.0 removed the export as an
-  // alias and left the body unreachable, and 14.0.0 deleted the body. Nothing
-  // is missing; the preset is its config.
+  // Mapping of scenarios to their construction-time capability declarations.
   /**
    * DERIVED from `ENHANCED_TEST_CASES`, not duplicated from it.
    *
@@ -793,7 +724,6 @@ export class BenchmarkOrchestratorComponent
 
     const enhancerDescriptions: Record<string, string> = {
       batching: 'groups multiple state updates for better performance',
-      serialization: 'state persistence and snapshot capabilities',
       restoration: 'undo/redo functionality with history management',
       // async removed — async behavior handled by middleware helpers
     };
@@ -3631,7 +3561,7 @@ export class BenchmarkOrchestratorComponent
       },
       enterprise: {
         serialization: 2.5, // Important for audit trails
-        'time-travel-debugging': 3.0, // Critical feature
+        'undo-redo': 3.0,
         'computed-chains': 2.0,
         'selector-memoization': 2.0,
         'large-array': 1.5,
@@ -3684,13 +3614,12 @@ export class BenchmarkOrchestratorComponent
      * comparison that does not depend on this judgement.
      */
     const maintainerEstimatedWeights: Record<string, number> = {
-      // Core operations - based on React DevTools Profiler data analysis
-      'selector-memoization': 2.9, // 89% of apps use computed/derived state heavily
-      'deep-nested': 2.7, // 82% of apps have complex nested state (forms, settings)
-      'computed-chains': 2.4, // 76% of apps use reactive computations
-      'large-array': 2.1, // 68% of apps manage lists/tables (but less frequent than selectors)
-      'batch-updates': 2.0, // 65% of apps batch updates (form submissions, bulk operations)
-      'subscriber-scaling': 2.2, // 71% of apps have multiple subscribers to state changes
+      'selector-memoization': 2.9,
+      'deep-nested': 2.7,
+      'computed-chains': 2.4,
+      'large-array': 2.1,
+      'batch-updates': 2.0,
+      'subscriber-scaling': 2.2,
       'async-via-middleware': 2.3, // 74% of apps heavily use async operations (APIs, loading states) - folded into middleware helpers
       'memory-efficiency': 1.8, // 58% of apps run on mobile/resource-constrained devices
 

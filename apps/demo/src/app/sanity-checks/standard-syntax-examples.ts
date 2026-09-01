@@ -1,4 +1,4 @@
-import { signalTree } from '@signal-tree/kernel';
+import { signalTree } from '@signal-tree/angular';
 
 // ==============================================
 // Example 1: Basic Operations

@@ -28,7 +28,7 @@ export const appRoutes: Route[] = [
         (c) => c.WhatsNew14Component
       ),
     data: {
-      title: "What's new in 14.0.0 — running",
+      title: '14.0.0 retrospective — historical APIs included',
       description:
         'Every 14.0.0 capability callable in the page: prepend, active entity, changeId, pause/resume recording, onTreeError — plus ST2026 and fan-out measured live in your browser.',
     },
@@ -65,7 +65,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Async state — RxJS pipelines with external()',
       description:
-        'SignalTree-native async primitives. Path-attached markers for load-and-expose and input-driven debounced queries, with auto-cleanup.',
+        'Application-owned RxJS orchestration with resolved values written through external().',
     },
   },
   {
@@ -105,7 +105,8 @@ export const appRoutes: Route[] = [
     },
   },
   // /rxmethod redirected to /async — rxMethod was removed in 9.6.0 (was briefly
-  // shipped in 9.5.x as a migration alias; the canonical answer is the async markers).
+  // shipped in 9.5.x as a migration alias; async orchestration is now
+  // application-owned and the tree stores the result).
   {
     path: 'rxmethod',
     redirectTo: '/async',
@@ -122,7 +123,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Fundamentals',
       description:
-        'Working playground for the SignalTree core API: signalTree initialization, entityMap, status, stored, callable branches, forms.',
+        'Working playground for SignalTree construction, derived state, transactions, restoration, and EntityMap collections.',
     },
   },
 
@@ -307,7 +308,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Documentation',
       description:
-        'SignalTree package documentation: core API surface plus the optional events package.',
+        'SignalTree package documentation for the kernel, Angular, and React packages.',
     },
   },
 
@@ -317,4 +318,3 @@ export const appRoutes: Route[] = [
     redirectTo: '',
   },
 ];
-// force rebuild

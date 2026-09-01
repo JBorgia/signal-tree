@@ -36,10 +36,22 @@ export class DocumentationComponent implements OnInit {
 
   packages: DocPackage[] = [
     {
-      id: 'core',
+      id: 'kernel',
       name: '@signal-tree/kernel',
-      description: 'Core tree, entities, enhancers, DevTools, and persistence primitives',
+      description: 'Framework-neutral state, EntityMap, causal turns, restoration, transactions, and DevTools',
       readmePath: 'assets/docs/core/README.md',
+    },
+    {
+      id: 'angular',
+      name: '@signal-tree/angular',
+      description: 'Angular-native signals, defineStore, and Angular lifecycle integration',
+      readmePath: 'assets/docs/angular/README.md',
+    },
+    {
+      id: 'react',
+      name: '@signal-tree/react',
+      description: 'Owner-bound React observation',
+      readmePath: 'assets/docs/react/README.md',
     },
   ];
 

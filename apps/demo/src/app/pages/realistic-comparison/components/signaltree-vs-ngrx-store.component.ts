@@ -6,7 +6,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { createSelector } from '@ngrx/store';
-import { batching, signalTree } from '@signal-tree/kernel';
+import { batching, signalTree } from '@signal-tree/angular';
 
 import { PerformanceGraphComponent } from '../../../shared/performance-graph/performance-graph.component';
 import { BenchmarkCalibrationService } from '../benchmark-calibration.service';
@@ -153,8 +153,8 @@ interface BenchmarkResult {
             <h4>SignalTree — 3-Pillar Pattern</h4>
             <ul>
               <li>
-                <strong>READ</strong> — all computed via
-                <code>.derived()</code> on the tree
+                <strong>READ</strong> — all computed via one config-level
+                <code>derived</code> factory
               </li>
               <li>
                 <strong>WRITE</strong> — Ops services: mutations + async only

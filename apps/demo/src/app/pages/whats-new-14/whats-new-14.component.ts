@@ -5,7 +5,12 @@ import {
   computed,
   signal,
 } from '@angular/core';
-import { entityMap, signalTree, restoration, undoable } from '@signal-tree/kernel';
+import {
+  entityMap,
+  signalTree,
+  restoration,
+  undoable,
+} from '@signal-tree/angular';
 
 /**
  * 14.0.0, running.

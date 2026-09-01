@@ -14,13 +14,13 @@
       </p>
       <p class="hero-supporting-copy">
         Reactive JSON means your state still looks like data. Keep one runtime
-        tree, compose typed slices, and add DevTools, time travel,
-        persistence, forms, realtime, and events when you need them.
+        tree, compose typed slices, and add EntityMap, DevTools, transactions,
+        or restoration when those capabilities earn their place.
       </p>
 
       <p class="hero-supporting-copy hero-disambiguation">
         <strong>SignalTree is not &#64;ngrx/signals.</strong> Different library,
-        different package (<code>&#64;signaltree/core</code>) — no
+        different package (<code>&#64;signal-tree/angular</code>) — no
         <code>withState</code>/<code>withMethods</code> wrappers, no actions, no
         reducers. Your state literal is the API: read and write any path
         directly, at any depth.
@@ -55,12 +55,11 @@
       <li>Optimistic UI with rollback (<code>updateAndReport</code>)</li>
       <li>Undo / redo (<code>restoration</code> enhancer)</li>
       <li>
-        Typed normalized collections with O(1) lookups
-        (<code>entityMap</code>)
+        Typed normalized collections with O(1) lookups (<code>entityMap</code>)
       </li>
       <li>
-        Reactive forms with validation, wizards, and persistence
-        (<code>form()</code> marker)
+        Angular-owned forms and application-owned persistence alongside one
+        typed state authority
       </li>
       <li>State that mirrors your data shape, not Redux ceremony</li>
     </ul>
@@ -109,8 +108,8 @@
   <section class="section quick-start-section">
     <h2 class="section-title">Quick start</h2>
     <p class="section-intro">
-      Start with the core package. In production, the recommended shape is one
-      root tree with typed branches for domain slices.
+      Angular applications start with the Angular realization package. In
+      production, use one owned tree with typed branches for domain slices.
     </p>
     <st-code-tabs [files]="quickStartCode"></st-code-tabs>
   </section>
@@ -166,7 +165,9 @@
 
   <section class="section extreme-depth-section">
     <div class="extreme-depth-copy">
-      <h2 class="section-title section-title-light">Deep typing still matters</h2>
+      <h2 class="section-title section-title-light">
+        Deep typing still matters
+      </h2>
       <p class="section-intro section-intro-light">
         SignalTree’s model stays readable even when the object graph gets deep.
         The extreme-depth demo is a proof point, not the primary pitch.
@@ -186,7 +187,10 @@
         </div>
       </div>
     </div>
-    <st-code-tabs class="extreme-depth-code" [files]="extremeDepthCode"></st-code-tabs>
+    <st-code-tabs
+      class="extreme-depth-code"
+      [files]="extremeDepthCode"
+    ></st-code-tabs>
   </section>
 
   <section class="section">

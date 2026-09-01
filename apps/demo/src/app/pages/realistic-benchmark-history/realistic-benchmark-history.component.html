@@ -9,22 +9,18 @@
     <div class="value-proposition">
       <h2>📈 Why Real-World Benchmarks Matter</h2>
       <p>
-        <strong
-          >Synthetic benchmarks lie. Real-world usage patterns tell the
-          truth.</strong
-        >
-        Most state management benchmarks test isolated operations (add item,
-        update field). SignalTree's benchmarks use
-        <strong>weighted frequency multipliers</strong> based on actual usage
-        data from 40,000+ developers.
+        Isolated operation timings answer only part of a performance question.
+        These comparisons combine multiple scenarios and expose the selected
+        <strong>frequency-weighting preset</strong>. Preset weights are
+        maintainer estimates; Equal Weighting removes that assumption.
       </p>
       <div class="methodology-highlights">
         <div class="highlight">
-          <h3>🎯 Weighted by Reality</h3>
+          <h3>🎯 Adjustable Weighting</h3>
           <p>
-            Reads happen 100x more than writes. Selectors run constantly.
-            Serialization is rare. Our benchmarks weight operations by
-            real-world frequency, not 1:1 like traditional tests.
+            Workloads differ. Choose a documented preset for exploration or
+            Equal Weighting for a comparison that does not depend on estimated
+            operation frequency.
           </p>
         </div>
         <div class="highlight">

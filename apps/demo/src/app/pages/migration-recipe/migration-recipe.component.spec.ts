@@ -15,19 +15,23 @@ describe('MigrationRecipeComponent', () => {
     const fixture = TestBed.createComponent(MigrationRecipeComponent);
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain(
-      'Migration Recipe'
+      'Move concepts, not syntax.'
     );
   });
 
-  it('covers multiple source libraries', () => {
+  it('teaches the v15 target architecture', () => {
     const fixture = TestBed.createComponent(MigrationRecipeComponent);
     fixture.detectChanges();
     const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('@ngrx/signals');
-    expect(text).toContain('Classic NgRx');
-    expect(text).toContain('NGXS');
-    expect(text).toContain('Elf');
-    expect(text).toContain('BehaviorSubject');
-    expect(text).toContain('AI-assisted migration');
+    expect(text).toContain('@signal-tree/angular');
+    expect(text).toContain(
+      'Construct state, capabilities, and derived values once'
+    );
+    expect(text).toContain('Move domain writes to explicit Ops services');
+    expect(text).toContain(
+      'Keep requests, cancellation, and persistence application-owned'
+    );
+    expect(text).toContain('Use EntityMap when keyed identity earns it');
+    expect(text).toContain('No .with() or fluent .derived()');
   });
 });

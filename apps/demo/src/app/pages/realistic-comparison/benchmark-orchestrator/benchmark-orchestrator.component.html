@@ -446,32 +446,6 @@
         <small>Warmup runs allow JIT optimization</small>
       </div>
 
-      <div class="config-group">
-        <label for="memo-mode"
-          >Memoization Mode
-          <span
-            class="tooltip"
-            title="Switch memoization strategy for in-browser A/B tests"
-          >
-            <i>?</i>
-          </span>
-        </label>
-        <select
-          id="memo-mode"
-          [ngModel]="memoMode()"
-          (ngModelChange)="setMemoMode($event)"
-          [disabled]="isRunning()"
-        >
-          <option value="light">Light (default)</option>
-          <option value="off">Off</option>
-          <option value="shallow">Shallow</option>
-          <option value="full">Full</option>
-        </select>
-        <small
-          >Toggle memoization strategy for exporter A/B testing (updates URL
-          param)</small
-        >
-      </div>
     </div>
 
     <div class="test-estimates">
@@ -508,16 +482,15 @@
       <h3>Quick Select Presets</h3>
       <div class="presets-grid">
         @for (preset of scenarioPresets; track preset.id) {
-        <div
+        <button
+          type="button"
           class="preset-card"
           (click)="applyScenarioPreset(preset.id)"
-          tabindex="0"
-          role="button"
         >
           <h4>{{ preset.name }}</h4>
           <p>{{ preset.description }}</p>
           <div class="preset-count">{{ presetCount(preset) }} tests</div>
-        </div>
+        </button>
         }
       </div>
     </div>
@@ -586,9 +559,9 @@
       <h3>🎯 Real-World Usage Weighting</h3>
       <p class="weighting-explanation">
         Different operations happen at different frequencies in real
-        applications. Our weighting system applies research-based multipliers to
-        benchmark results, reflecting actual usage patterns from 40,000+
-        developers and enterprise application analysis.
+        applications. These maintainer-estimated multipliers let you explore how
+        workload assumptions affect the result. Use Equal Weighting for a
+        comparison that does not depend on those estimates.
       </p>
 
       <div class="weighting-details">
@@ -626,10 +599,9 @@
         </div>
 
         <p class="methodology-note">
-          <strong>Research Methodology:</strong> Weights derived from State of
-          JS 2023 survey data, GitHub repository analysis of 10,000+
-          applications, enterprise profiling studies, and React DevTools usage
-          patterns.
+          <strong>Methodology:</strong> These presets are maintainer estimates,
+          not measurements of ecosystem-wide operation frequency. Results must
+          identify the selected preset so weighted rankings remain interpretable.
         </p>
       </div>
 
@@ -969,9 +941,9 @@
           >SignalTree</span
         >
         <span
-          >SignalTree core. The per-scenario enhancers listed above are the only
-          thing applied &mdash; there is no second SignalTree variant in this
-          run.</span
+          >SignalTree's Angular realization. Each scenario declares its exact
+          capability set during construction; there is no late enhancement or
+          second variant in this run.</span
         >
       </div>
     </div>
@@ -991,11 +963,10 @@
         💡 Understanding Selector/Memoization Performance
       </h4>
       <p style="margin: 0.5rem 0; color: #424242; font-size: 0.9rem">
-        <strong>Why SignalTree benchmarks use enhancers:</strong> SignalTree’s
-        performance story is tied to composable enhancers like memoization,
-        batching, serialization, and time travel. The benchmark configuration
-        keeps those capabilities visible because they are part of real usage,
-        not an afterthought.
+        <strong>Why SignalTree benchmarks declare capabilities:</strong> Bare
+        state, batching, and restoration have different costs. Each scenario
+        constructs the exact v15 capability set it measures so optional work is
+        visible rather than silently applied after construction.
       </p>
       <p style="margin: 0.5rem 0; color: #424242; font-size: 0.9rem">
         <strong>The trade-off:</strong> Angular's
