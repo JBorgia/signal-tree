@@ -14,6 +14,11 @@ export type PreparedSubjectUpdate<E extends Record<string, unknown>> = {
   readonly value?: E;
 };
 
+export type PhysicalSubjectRecord<E extends Record<string, unknown>> = {
+  readonly revision: number;
+  readonly value: E;
+};
+
 export function composePreparedSubjectUpdates<E extends Record<string, unknown>>(
   structural: readonly StructuralSubjectContribution[],
   values: readonly ValueSubjectContribution<E>[]
@@ -57,6 +62,45 @@ export function composePreparedSubjectUpdates<E extends Record<string, unknown>>
       .sort((left, right) => left.subjectId - right.subjectId)
       .map((update) => Object.freeze(update))
   );
+}
+
+export function preparePhysicalSubjectTarget<E extends Record<string, unknown>>(
+  current: ReadonlyMap<number, PhysicalSubjectRecord<E>>,
+  updates: readonly PreparedSubjectUpdate<E>[]
+): ReadonlyMap<number, PhysicalSubjectRecord<E>> {
+  const seenSubjects = new Set<number>();
+  const prepared: Array<readonly [number, PhysicalSubjectRecord<E>]> = [];
+  for (const update of updates) {
+    assertSubjectId(update.subjectId);
+    if (seenSubjects.has(update.subjectId)) {
+      throw new Error(
+        `Duplicate physical update for SubjectId ${String(update.subjectId)}`
+      );
+    }
+    seenSubjects.add(update.subjectId);
+
+    if (update.revision !== undefined) {
+      assertRevision(update.revision);
+    }
+    const currentRecord = current.get(update.subjectId);
+    const revision = update.revision ?? currentRecord?.revision;
+    const value = update.value ?? currentRecord?.value;
+    if (revision === undefined || value === undefined) {
+      throw new Error(
+        `New SubjectId ${String(update.subjectId)} requires revision and value contributions`
+      );
+    }
+    prepared.push([
+      update.subjectId,
+      Object.freeze({ revision, value }),
+    ]);
+  }
+
+  const target = new Map(current);
+  for (const [subjectId, record] of prepared) {
+    target.set(subjectId, record);
+  }
+  return target;
 }
 
 function assertSubjectId(subjectId: number): void {
