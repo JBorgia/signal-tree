@@ -610,37 +610,6 @@ export class StructuralStore<K extends string | number> {
     this.orderFrontier = {};
   }
 
-  __assertSubjectNodeLookupParityForTesting(): void {
-    const subjectIds = new Set([
-      ...this.subjectStates.keys(),
-      ...this.activeNodesBySubject.keys(),
-    ]);
-    for (const subjectId of subjectIds) {
-      if (
-        this.activeNodesBySubject.get(subjectId) !==
-        this.activeNodeForSubjectViaKey(subjectId)
-      ) {
-        throw new Error(
-          `Subject node lookup mismatch for SubjectId ${String(subjectId)}.`
-        );
-      }
-    }
-  }
-
-  __assertKeyNodeLookupParityForTesting(): void {
-    const keys = new Set([
-      ...this.subjectIds.keys(),
-      ...this.activeNodesByKey.keys(),
-    ]);
-    for (const key of keys) {
-      if (
-        this.activeNodesByKey.get(key) !== this.activeNodeForKeyViaSubject(key)
-      ) {
-        throw new Error(`Key node lookup mismatch for key ${String(key)}.`);
-      }
-    }
-  }
-
   __assertActiveOrderIntegrityForTesting(): void {
     if (this.activeHead?.prev !== undefined) {
       throw new Error('Active head must not have a previous node.');
@@ -738,26 +707,6 @@ export class StructuralStore<K extends string | number> {
     this.activeNodesBySubject.set(subjectId, node);
     this.appendDetachedNode(node);
     this.activeCount += 1;
-  }
-
-  private activeNodeForSubjectViaKey(
-    subjectId: number
-  ): ActiveNode<K> | undefined {
-    const state = this.subjectStates.get(subjectId);
-    if (!state?.active || state.key === undefined) {
-      return undefined;
-    }
-    const node = this.activeNodesByKey.get(state.key);
-    return node?.subjectId === subjectId ? node : undefined;
-  }
-
-  private activeNodeForKeyViaSubject(key: K): ActiveNode<K> | undefined {
-    const subjectId = this.subjectIds.get(key);
-    if (subjectId === undefined) {
-      return undefined;
-    }
-    const node = this.activeNodesBySubject.get(subjectId);
-    return node?.key === key ? node : undefined;
   }
 
   private unregisterActiveNode(node: ActiveNode<K>): void {

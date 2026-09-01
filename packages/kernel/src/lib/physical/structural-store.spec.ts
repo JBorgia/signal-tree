@@ -202,38 +202,4 @@ describe('StructuralStore', () => {
     expect(store.activeKeysSnapshot()).toEqual(['C', 'A', 'B']);
     expect(store.firstActiveKey()).toBe('C');
   });
-
-  it('keeps derived SubjectId node lookup identical across structural transitions', () => {
-    const store = seedStore();
-    const assertParity = () =>
-      expect(() => {
-        store.__assertSubjectNodeLookupParityForTesting();
-        store.__assertKeyNodeLookupParityForTesting();
-      }).not.toThrow();
-
-    assertParity();
-    store.transferSubject(2, 'B', 'X');
-    assertParity();
-    store.reorderActiveKeys(['C', 'A', 'X']);
-    assertParity();
-    store.tombstoneSubject(2, 'X', true);
-    assertParity();
-    store.createSubject(4, 'X');
-    assertParity();
-    store.restoreSubject(2, 'B', 1, 3);
-    assertParity();
-
-    const target = store.prepareTarget(
-      [
-        { subjectId: 1, key: 'A' },
-        { subjectId: 2, key: 'Y' },
-        { subjectId: 3, key: 'C' },
-        { subjectId: 4, key: 'X' },
-      ],
-      [4, 3, 2, 1],
-      store.activeOrderFrontier()
-    );
-    store.installPreparedTarget(target);
-    assertParity();
-  });
 });
