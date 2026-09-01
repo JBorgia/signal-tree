@@ -8,16 +8,28 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 7 — 1.0 Release`
+Current phase: `Phase 7 — TECHNICAL READINESS CLOSED / HUMAN GA DECISION`
 
 `GATE F` is **SATISFIED** at `109595e6`. Exact committed HEAD passed all 69
 ordinary and release-only gates with zero known-red. The independent Gate F
 review found no critical, major, or minor blocker. `15.0.0-rc.1` remains the
 published candidate; no later commit has been published or tagged.
 
-The remaining path is the clean-clone Phase 7 matrix, followed by the separately
-authorized official release and post-publication verification. Architecture
-exploration is not on that path.
+Phase 7 technical readiness is **CLOSED** against clean-clone commit `8d0108bc`:
+
+```text
+frozen-lockfile install       GREEN
+release matrix               69 / 69 GREEN
+gate mutation/self-tests     60 / 60 GREEN
+unproven / blind / errored   0 / 0 / 0
+known technical GA blockers  NONE
+```
+
+All 60 registered gate mutation/self-tests successfully demonstrated their
+associated gates can fail; this is distinct from the 69 release gates. The next
+step is a human GA disposition: publish another RC, promote to `15.0.0`, or hold
+for a specifically named non-engineering reason. Further engineering requires a
+new release falsifier strong enough to justify delaying release.
 
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
@@ -12595,12 +12607,18 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
 
 ## Phase 7 — 1.0 Release
 
-- [ ] clean-clone final release matrix
+- [x] **Clean-clone final release matrix (`8d0108bc`).** Frozen-lockfile install
+      green; release matrix 69/69 green; registered gate mutation/self-test
+      matrix 60/60 green with zero unproven, blind, or errored proofs. Known
+      technical GA blockers: none.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
 
-Exit condition: `GATE G`
+Technical readiness disposition: **CLOSED — human GA decision required.**
+
+Exit condition: `GATE G` remains open until an explicitly authorized official
+release and post-publication verification.
 
 ## Suggested Chat Boundaries
 
