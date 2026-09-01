@@ -8,7 +8,6 @@ on:
       - 'packages/kernel/**'
       - 'packages/angular/**'
       - 'packages/react/**'
-      - 'packages/shared/**'
       - '.github/workflows/test-packages.yml'
   pull_request:
     branches: [main, master]
@@ -16,7 +15,6 @@ on:
       - 'packages/kernel/**'
       - 'packages/angular/**'
       - 'packages/react/**'
-      - 'packages/shared/**'
       - '.github/workflows/test-packages.yml'
 
 jobs:
@@ -26,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [kernel, angular, react, shared]
+        package: [kernel, angular, react]
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -1,10 +1,10 @@
-import { getChanges } from '@signaltree/shared';
+import { getChanges } from '../internals/utilities/get-changes';
 
 /**
  * SignalTree Audit Tracker
  *
  * Tree-shakeable audit-logging utility for tracking state changes on any
- * SignalTree. Framework-agnostic (depends only on `@signaltree/shared` and the
+ * SignalTree. Framework-agnostic (depends only on kernel internals and the
  * core tree type), so it lives in `@signal-tree/kernel` — a within-tree mechanic,
  * not an Angular-forms concern (RFC 0007). Only included in the bundle if
  * explicitly imported.

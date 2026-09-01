@@ -28,13 +28,25 @@ import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 
 const ROOT = new URL('..', import.meta.url).pathname.replace(/\/$/, '');
-const sh = (c) => { try { return execSync(c, { cwd: ROOT, encoding: 'utf8' }).trim(); } catch { return ''; } };
+const sh = (c) => {
+  try {
+    return execSync(c, { cwd: ROOT, encoding: 'utf8' }).trim();
+  } catch {
+    return '';
+  }
+};
 
 // ── A: manifests ever present ─────────────────────────────────────────────
 const manifests = new Set([
-  ...sh(`git log --all --diff-filter=D --name-only --format="" -- 'packages/*/package.json' | sort -u`)
-    .split('\n').filter(Boolean).map((p) => p.split('/')[1]),
-  ...sh('ls -1 packages').split('\n').filter(Boolean)
+  ...sh(
+    `git log --all --diff-filter=D --name-only --format="" -- 'packages/*/package.json' | sort -u`
+  )
+    .split('\n')
+    .filter(Boolean)
+    .map((p) => p.split('/')[1]),
+  ...sh('ls -1 packages')
+    .split('\n')
+    .filter(Boolean)
     .filter((d) => existsSync(`${ROOT}/packages/${d}/package.json`)),
 ]);
 
@@ -72,8 +84,16 @@ const addNames = (raw) => {
 // synthetic entry.
 //
 //     A MEASUREMENT HARNESS MUST NOT APPEAR IN ITS OWN MEASUREMENT.
-addNames(sh(`grep -rhoE "@signaltree/[a-z0-9-]+" --include="*.json" --include="*.md" --include="*.ts" --include="*.mjs" --include="*.cjs" --include="*.html" --exclude-dir=node_modules --exclude=package-namespace-closure.mjs --exclude=package-generation-census.mjs . 2>/dev/null`));
-addNames(sh(`git grep -hoE "@signaltree/[a-z0-9-]+" $(git rev-list --all 2>/dev/null | head -4000) -- '*.json' '*.md' '*.ts' '*.mjs' '*.cjs' '*.html' 2>/dev/null`));
+addNames(
+  sh(
+    `grep -rhoE "@signaltree/[a-z0-9-]+" --include="*.json" --include="*.md" --include="*.ts" --include="*.mjs" --include="*.cjs" --include="*.html" --exclude-dir=node_modules --exclude=package-namespace-closure.mjs --exclude=package-generation-census.mjs . 2>/dev/null`
+  )
+);
+addNames(
+  sh(
+    `git grep -hoE "@signaltree/[a-z0-9-]+" $(git rev-list --all 2>/dev/null | head -4000) -- '*.json' '*.md' '*.ts' '*.mjs' '*.cjs' '*.html' 2>/dev/null`
+  )
+);
 
 // ── C: AUTHORITATIVE registry enumeration of the scope ────────────────────
 //
@@ -96,21 +116,31 @@ let scopeNames = [];
 try {
   const raw = sh(`curl -sS --max-time 60 ${SCOPE_ENUM_URL}`);
   const parsed = JSON.parse(raw);
-  scopeNames = Object.keys(parsed).map((n) => n.replace('@signaltree/', '')).sort();
+  scopeNames = Object.keys(parsed)
+    .map((n) => n.replace('@signaltree/', ''))
+    .sort();
 } catch (e) {
-  console.error('❌ scope enumeration FAILED — this is not an empty namespace.');
+  console.error(
+    '❌ scope enumeration FAILED — this is not an empty namespace.'
+  );
   console.error('   ' + String(e).slice(0, 120));
-  console.error('   Enumeration failure and an empty scope are different facts; refusing to conflate them.');
+  console.error(
+    '   Enumeration failure and an empty scope are different facts; refusing to conflate them.'
+  );
   process.exit(1);
 }
 if (!scopeNames.includes('core') || !scopeNames.includes('enterprise')) {
-  console.error('❌ scope enumeration missing a known positive (core / enterprise) — not trustworthy.');
+  console.error(
+    '❌ scope enumeration missing a known positive (core / enterprise) — not trustworthy.'
+  );
   process.exit(1);
 }
 /** Verified per name; `null` = enumerated but no installable version (unpublished). */
 const PUBLISHED = {};
 for (const n of scopeNames) {
-  const v = sh(`npm view @signaltree/${n} version 2>/dev/null | grep -v '^npm warn' | tail -1`);
+  const v = sh(
+    `npm view @signaltree/${n} version 2>/dev/null | grep -v '^npm warn' | tail -1`
+  );
   PUBLISHED[n] = v || null;
 }
 
@@ -132,34 +162,89 @@ for (const n of scopeNames) {
  * NON-PACKAGE in this census.
  */
 const NON_PACKAGE = {
-  authoring: ['NON-PACKAGE', '[PROPOSED-NOT-EARNED] RELEASE-1.0.md: "@signaltree/authoring — STOPPED. Package/form is UNPROVEN."'],
-  kernel: ['NON-PACKAGE', '[PROPOSED-FUTURE] the v15 kernel package identity; belongs to the @signal-tree generation, not this scope'],
-  angular: ['NON-PACKAGE', '[PROPOSED-FUTURE] the v15 Angular adapter package; belongs to the @signal-tree generation'],
-  storage: ['NON-PACKAGE', '[NEVER-EXISTED] docs/myths-and-misconceptions.md documents it as a MYTH: "No @signaltree/storage package exists"'],
-  source: ['NON-PACKAGE', '[NOT-A-PACKAGE] the Nx workspace root project name in project.json, never publishable'],
-  forms: ['NON-PACKAGE', '[PROSE-ONLY] TODO.md shorthand for the forms integration idea'],
-  validation: ['NON-PACKAGE', '[PROSE-ONLY] RELEASE-1.0.md prose about the retired validation surface'],
-  react: ['NON-PACKAGE', '[PROSE-ONLY] architecture prose about a possible future vertical'],
+  authoring: [
+    'NON-PACKAGE',
+    '[PROPOSED-NOT-EARNED] RELEASE-1.0.md: "@signaltree/authoring — STOPPED. Package/form is UNPROVEN."',
+  ],
+  kernel: [
+    'NON-PACKAGE',
+    '[PROPOSED-FUTURE] the v15 kernel package identity; belongs to the @signal-tree generation, not this scope',
+  ],
+  angular: [
+    'NON-PACKAGE',
+    '[PROPOSED-FUTURE] the v15 Angular adapter package; belongs to the @signal-tree generation',
+  ],
+  storage: [
+    'NON-PACKAGE',
+    '[NEVER-EXISTED] docs/myths-and-misconceptions.md documents it as a MYTH: "No @signaltree/storage package exists"',
+  ],
+  source: [
+    'NON-PACKAGE',
+    '[NOT-A-PACKAGE] the Nx workspace root project name in project.json, never publishable',
+  ],
+  forms: [
+    'NON-PACKAGE',
+    '[PROSE-ONLY] TODO.md shorthand for the forms integration idea',
+  ],
+  validation: [
+    'NON-PACKAGE',
+    '[PROSE-ONLY] RELEASE-1.0.md prose about the retired validation surface',
+  ],
+  react: [
+    'NON-PACKAGE',
+    '[PROSE-ONLY] architecture prose about a possible future vertical',
+  ],
   ai: ['NON-PACKAGE', '[PROSE-ONLY] CHANGELOG prose'],
   llm: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
-  data: ['NON-PACKAGE', '[PROSE-ONLY] ai-codegen benchmark scorer example text'],
-  queries: ['NON-PACKAGE', '[PROSE-ONLY] history prose'], indexing: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
-  security: ['NON-PACKAGE', '[PROSE-ONLY] history prose'], performance: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
-  openai: ['NON-PACKAGE', '[PROSE-ONLY] history prose'], supabase: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
-  monolith: ['NON-PACKAGE', '[PROSE-ONLY] history prose about a rejected packaging shape'],
-  computed: ['NON-PACKAGE', '[PROSE-ONLY] history prose'], restoration: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
-  diagnostics: ['NON-PACKAGE', '[PROSE-ONLY] history prose'], enhancers: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
-  'lazy-tree': ['NON-PACKAGE', '[PROSE-ONLY] history prose about the withdrawn lazy feature'],
-  'runtime-utils': ['NON-PACKAGE', '[PROSE-ONLY] history prose'], 'core-internal': ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
-  'batching-impl': ['NON-PACKAGE', '[PROSE-ONLY] history prose'], 'devtools-impl': ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  data: [
+    'NON-PACKAGE',
+    '[PROSE-ONLY] ai-codegen benchmark scorer example text',
+  ],
+  queries: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  indexing: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  security: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  performance: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  openai: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  supabase: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  monolith: [
+    'NON-PACKAGE',
+    '[PROSE-ONLY] history prose about a rejected packaging shape',
+  ],
+  computed: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  restoration: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  diagnostics: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  enhancers: ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  'lazy-tree': [
+    'NON-PACKAGE',
+    '[PROSE-ONLY] history prose about the withdrawn lazy feature',
+  ],
+  'runtime-utils': ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  'core-internal': ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  'batching-impl': ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
+  'devtools-impl': ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
   'guardrails-docs': ['NON-PACKAGE', '[PROSE-ONLY] history prose'],
-  workspace: ['NON-PACKAGE', '[PROSE-ONLY] the `workspace:*` protocol string, not a package name'],
+  workspace: [
+    'NON-PACKAGE',
+    '[PROSE-ONLY] the `workspace:*` protocol string, not a package name',
+  ],
   signaltree: ['NON-PACKAGE', '[PROSE-ONLY] self-reference in prose'],
-  'signal-tree': ['NON-PACKAGE', '[PROSE-ONLY] reference to the NEW generation scope'],
-  persist: ['NON-PACKAGE', '[NON-PACKAGE] appears only in historical revision text — absent from every manifest, from the live discussion record (RELEASE-1.0.md/TODO.md/docs), and from the registry (404). It corresponds to the persistence capability, which shipped as the in-core `persistence()` enhancer; the never-published `@signaltree/serialization` was its package-shaped ancestor. RESIDUAL: the exact originating commit was not pinpointed within the search budget, and that is stated rather than glossed'],
-  fake: ['NON-PACKAGE', '[TEST-FIXTURE] tools/verify-tarball-consumer.mjs — a deliberately bogus specifier'],
+  'signal-tree': [
+    'NON-PACKAGE',
+    '[PROSE-ONLY] reference to the NEW generation scope',
+  ],
+  persist: [
+    'NON-PACKAGE',
+    '[NON-PACKAGE] appears only in historical revision text — absent from every manifest, from the live discussion record (RELEASE-1.0.md/TODO.md/docs), and from the registry (404). It corresponds to the persistence capability, which shipped as the in-core `persistence()` enhancer; the never-published `@signaltree/serialization` was its package-shaped ancestor. RESIDUAL: the exact originating commit was not pinpointed within the search budget, and that is stated rather than glossed',
+  ],
+  fake: [
+    'NON-PACKAGE',
+    '[TEST-FIXTURE] tools/verify-tarball-consumer.mjs — a deliberately bogus specifier',
+  ],
   x: ['NON-PACKAGE', '[TEST-FIXTURE] scripts/lint-readme-apis.mjs fixture'],
-  'definitely-not-a-package': ['NON-PACKAGE', '[TEST-FIXTURE] tools/check-documented-imports.mjs known-negative control'],
+  'definitely-not-a-package': [
+    'NON-PACKAGE',
+    '[TEST-FIXTURE] tools/check-documented-imports.mjs known-negative control',
+  ],
 };
 
 // ── the registry probe must be PROVEN LIVE ────────────────────────────────
@@ -175,25 +260,46 @@ const NON_PACKAGE = {
 if (process.argv.includes('--verify-registry')) {
   const probe = (name) => {
     try {
-      const v = execSync(`npm view ${name} version 2>/dev/null`, { encoding: 'utf8' })
-        .split('\n').filter((l) => l && !l.startsWith('npm warn')).pop();
+      const v = execSync(`npm view ${name} version 2>/dev/null`, {
+        encoding: 'utf8',
+      })
+        .split('\n')
+        .filter((l) => l && !l.startsWith('npm warn'))
+        .pop();
       return { ok: true, version: v?.trim() || null };
     } catch (e) {
       const msg = String(e.stderr ?? e.message);
-      return { ok: /E404|404 Not Found/.test(msg), version: null, error: /E404|404/.test(msg) ? null : msg.slice(0, 80) };
+      return {
+        ok: /E404|404 Not Found/.test(msg),
+        version: null,
+        error: /E404|404/.test(msg) ? null : msg.slice(0, 80),
+      };
     }
   };
   const pos = probe('@signal-tree/kernel');
   const neg = probe('@signaltree/definitely-not-a-package-xyz');
   console.log('registry probe liveness:');
-  console.log(`  known-published  @signal-tree/kernel -> ${pos.version ?? '(none)'}`);
-  console.log(`  known-absent     bogus name       -> ${neg.version ?? '404 (correctly absent)'}`);
+  console.log(
+    `  known-published  @signal-tree/kernel -> ${pos.version ?? '(none)'}`
+  );
+  console.log(
+    `  known-absent     bogus name       -> ${
+      neg.version ?? '404 (correctly absent)'
+    }`
+  );
   if (!pos.version) {
-    console.error('\n❌ registry probe is NOT live — a known-published package returned nothing.');
-    console.error('   Every "never published" conclusion in this census would be unfounded.');
+    console.error(
+      '\n❌ registry probe is NOT live — a known-published package returned nothing.'
+    );
+    console.error(
+      '   Every "never published" conclusion in this census would be unfounded.'
+    );
     process.exit(1);
   }
-  if (neg.version) { console.error('\n❌ probe returned a version for a bogus name.'); process.exit(1); }
+  if (neg.version) {
+    console.error('\n❌ probe returned a version for a bogus name.');
+    process.exit(1);
+  }
   console.log('  ✅ probe discriminates: published != absent != failed\n');
 }
 
@@ -203,29 +309,58 @@ if (process.argv.includes('--verify-registry')) {
  */
 const GENERATION = {
   core: ['REBUILD', 'the v15 kernel; becomes @signal-tree/kernel'],
-  events: ['LEGACY-ONLY', 'published 14.1.3; old implementation deleted by EVT-DEL. A future event package is NOT earned'],
-  'ng-forms': ['LEGACY-ONLY', 'published 14.1.3; old implementation deleted by NGF-DEL. A future forms package is NOT earned'],
+  events: [
+    'LEGACY-ONLY',
+    'published 14.1.3; old implementation deleted by EVT-DEL. A future event package is NOT earned',
+  ],
+  'ng-forms': [
+    'LEGACY-ONLY',
+    'published 14.1.3; old implementation deleted by NGF-DEL. A future forms package is NOT earned',
+  ],
   guardrails: ['LEGACY-ONLY', 'published 14.1.3 against the v14 kernel'],
   realtime: ['LEGACY-ONLY', 'published 14.1.3 against the v14 kernel'],
-  schema: ['LEGACY-ONLY', 'published 14.1.3; SignalTree ships no validation API in v15'],
-  enterprise: ['LEGACY-ONLY', 'published 13.5.0; never reached the 14 generation'],
-  'callable-syntax': ['LEGACY-ONLY', 'published 13.5.0; the transform can never run'],
-  async: ['DELETE', 'was published and UNPUBLISHED 2025-09-16; asyncSource/asyncQuery are absent from the v15 surface'],
+  schema: [
+    'LEGACY-ONLY',
+    'published 14.1.3; SignalTree ships no validation API in v15',
+  ],
+  enterprise: [
+    'LEGACY-ONLY',
+    'published 13.5.0; never reached the 14 generation',
+  ],
+  'callable-syntax': [
+    'LEGACY-ONLY',
+    'published 13.5.0; the transform can never run',
+  ],
+  async: [
+    'DELETE',
+    'was published and UNPUBLISHED 2025-09-16; asyncSource/asyncQuery are absent from the v15 surface',
+  ],
   batching: ['ABSORB', 'now core/enhancers/batching; batching() is public'],
   devtools: ['ABSORB', 'now core/enhancers/devtools; devTools() is public'],
-  serialization: ['ABSORB', 'now core/enhancers/serialization; persistence() is public'],
+  serialization: [
+    'ABSORB',
+    'now core/enhancers/serialization; persistence() is public',
+  ],
   'time-travel': ['ABSORB', 'now core/enhancers/restoration'],
   entities: ['ABSORB', 'now the core entityMap marker and EntitySignal'],
-  types: ['ABSORB', 'folded into core type modules (TYPE-BARREL-CONVERGENCE-0)'],
-  utils: ['ABSORB', 'folded into core/lib/utils.ts and @signaltree/shared'],
-  shared: ['ABSORB', 'private workspace package; kernel utilities reachable from the bare bundle'],
-  memoization: ['DELETE', 'enhancer deleted in 9.0.1; Angular computed() is the answer'],
+  types: [
+    'ABSORB',
+    'folded into core type modules (TYPE-BARREL-CONVERGENCE-0)',
+  ],
+  utils: ['ABSORB', 'folded into kernel internals'],
+  shared: ['ABSORB', 'former private package folded into kernel internals'],
+  memoization: [
+    'DELETE',
+    'enhancer deleted in 9.0.1; Angular computed() is the answer',
+  ],
   middleware: ['DELETE', 'superseded by the enhancer contract'],
   presets: ['DELETE', 'bundles over an enhancer set that no longer exists'],
   'syntax-transform': ['DELETE', 'a build transform that cannot run'],
 };
 
-const union = [...new Set([...manifests, ...mentioned, ...Object.keys(PUBLISHED)])].sort();
+const union = [
+  ...new Set([...manifests, ...mentioned, ...Object.keys(PUBLISHED)]),
+].sort();
 
 const rows = union.map((name) => {
   const hadManifest = manifests.has(name);
@@ -247,16 +382,24 @@ console.log(`  C  names published (probed) ${Object.keys(PUBLISHED).length}`);
 console.log(`  U  union                    ${rows.length}\n`);
 
 const by = {};
-for (const r of rows) if (r.disposition) (by[r.disposition] ??= []).push(r.name);
+for (const r of rows)
+  if (r.disposition) (by[r.disposition] ??= []).push(r.name);
 for (const [d, ns] of Object.entries(by).sort()) {
   console.log(`  ${String(ns.length).padStart(3)}  ${d}`);
   if (d !== 'PROSE-ONLY') console.log(`       ${ns.join(', ')}`);
 }
-console.log(`\n  published names with NO manifest: ${orphanPublished.length}` +
-  (orphanPublished.length ? ` — ${orphanPublished.map((r) => r.name).join(', ')}` : ' (every published name had a manifest)'));
+console.log(
+  `\n  published names with NO manifest: ${orphanPublished.length}` +
+    (orphanPublished.length
+      ? ` — ${orphanPublished.map((r) => r.name).join(', ')}`
+      : ' (every published name had a manifest)')
+);
 console.log(`  unexplained: ${missing.length}`);
 if (missing.length) {
-  for (const m of missing) console.error(`  ‼ @signaltree/${m.name} has no disposition`);
+  for (const m of missing)
+    console.error(`  ‼ @signaltree/${m.name} has no disposition`);
   process.exit(1);
 }
-console.log('\n✅ namespace closure: every name in the union is dispositioned.');
+console.log(
+  '\n✅ namespace closure: every name in the union is dispositioned.'
+);

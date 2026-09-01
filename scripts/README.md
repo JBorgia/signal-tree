@@ -21,7 +21,6 @@ pnpm run typecheck
 
 The current package projects are:
 
-- `shared` (private build-time package)
 - `kernel`
 - `angular`
 - `react`

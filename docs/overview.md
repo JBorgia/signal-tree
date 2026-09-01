@@ -28,14 +28,12 @@ while the packages shipped 13.x. Don't reintroduce it; link the changelog instea
 
 ## Package ecosystem
 
-SignalTree 15 has three public packages and one private build-time package:
+SignalTree 15 has three public packages:
 
 - **`@signal-tree/kernel`**: framework-neutral state, EntityMap, links,
   restoration, batching, transactions, and DevTools
 - **`@signal-tree/angular`**: Angular-native realization and `defineStore`
 - **`@signal-tree/react`**: owner-bound React observation
-- **`@signaltree/shared`**: private implementation utilities bundled into the
-  public packages; never a consumer dependency
 
 ## Technical specifications
 

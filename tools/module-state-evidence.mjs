@@ -50,7 +50,8 @@ function enclosingFn(node) {
       return n.name?.getText?.() ?? '(anonymous fn)';
     if (ts.isFunctionExpression(n) || ts.isArrowFunction(n)) {
       const v = n.parent;
-      if (ts.isVariableDeclaration(v) && ts.isIdentifier(v.name)) return v.name.text;
+      if (ts.isVariableDeclaration(v) && ts.isIdentifier(v.name))
+        return v.name.text;
       return '(anonymous fn)';
     }
     // ⚠️ A CLASS PROPERTY INITIALIZER IS NOT MODULE TOP LEVEL. `readonly id =
@@ -61,12 +62,18 @@ function enclosingFn(node) {
     // module-load initialisation.
     if (ts.isPropertyDeclaration(n)) {
       const cls = n.parent;
-      const clsName = ts.isClassDeclaration(cls) ? cls.name?.text ?? '(anonymous class)' : '?';
-      return `${clsName}.${n.name?.getText?.() ?? '?'} (property initializer, per construction)`;
+      const clsName = ts.isClassDeclaration(cls)
+        ? cls.name?.text ?? '(anonymous class)'
+        : '?';
+      return `${clsName}.${
+        n.name?.getText?.() ?? '?'
+      } (property initializer, per construction)`;
     }
     if (ts.isConstructorDeclaration(n)) {
       const cls = n.parent;
-      const clsName = ts.isClassDeclaration(cls) ? cls.name?.text ?? '(anonymous class)' : '?';
+      const clsName = ts.isClassDeclaration(cls)
+        ? cls.name?.text ?? '(anonymous class)'
+        : '?';
       return `${clsName}.constructor`;
     }
     n = n.parent;
@@ -75,8 +82,22 @@ function enclosingFn(node) {
 }
 
 const MUTATORS = new Set([
-  'set', 'delete', 'clear', 'add', 'push', 'pop', 'shift', 'unshift',
-  'splice', 'sort', 'reverse', 'update', 'next', 'emit', 'fill', 'copyWithin',
+  'set',
+  'delete',
+  'clear',
+  'add',
+  'push',
+  'pop',
+  'shift',
+  'unshift',
+  'splice',
+  'sort',
+  'reverse',
+  'update',
+  'next',
+  'emit',
+  'fill',
+  'copyWithin',
 ]);
 
 /**
@@ -88,9 +109,8 @@ const MUTATORS = new Set([
  * Compiler options from the REAL project tsconfig.
  *
  * ⚠️ A HAND-INVENTED SUBSET IS NOT THE PRODUCTION COMPILER WORLD. The package
- * declares `paths` mappings (`@signaltree/shared` -> source), and a synthetic
- * program without them resolves those imports to nothing — so a legitimate
- * cross-file consumer disappears and the subject looks unclaimed. For an
+ * carries the production compiler world, and a synthetic program with a
+ * hand-written option subset can lose legitimate cross-file consumers. For an
  * ordinary analysis tool that is a rounding error; for "zero claimants ->
  * delete the capability" it is the whole verdict.
  */
@@ -100,7 +120,10 @@ export function productionProjectConfig(
   const read = ts.readConfigFile(configPath, ts.sys.readFile);
   if (read.error)
     throw new Error(
-      `cannot read ${configPath}: ${ts.flattenDiagnosticMessageText(read.error.messageText, ' ')}`
+      `cannot read ${configPath}: ${ts.flattenDiagnosticMessageText(
+        read.error.messageText,
+        ' '
+      )}`
     );
   const parsed = ts.parseJsonConfigFileContent(
     read.config,
@@ -133,7 +156,9 @@ export function productionProjectConfig(
  * One authority now, consumed by discovery, evidence and the consumer traces.
  */
 export function productionSourceFiles(configPath) {
-  return productionProjectConfig(configPath).fileNames.filter((f) => f.endsWith('.ts'));
+  return productionProjectConfig(configPath).fileNames.filter((f) =>
+    f.endsWith('.ts')
+  );
 }
 
 /** Back-compat shim for callers that only wanted options. */
@@ -142,7 +167,10 @@ export function productionCompilerOptions(configPath) {
 }
 
 export function analyseProgram(fileNames, options = undefined) {
-  const program = ts.createProgram(fileNames, options ?? productionCompilerOptions());
+  const program = ts.createProgram(
+    fileNames,
+    options ?? productionCompilerOptions()
+  );
   const checker = program.getTypeChecker();
   const sources = program
     .getSourceFiles()
@@ -177,19 +205,23 @@ export function analyseProgram(fileNames, options = undefined) {
         // discovery exactly, and `subject-set parity` is a control rather than
         // an assumption.
         for (const bound of boundNames(d.name)) {
-        subjects.set(bound.node, {
-          file: sf.fileName,
-          name: bound.name,
-          kind,
-          ambient,
-          exported,
-          retainedFact: d.initializer ? initShape(d.initializer) : 'uninitialised',
-          immutablePrimitive:
-            kind === 'const' && Boolean(d.initializer) && isLiteralPrimitive(d.initializer),
-          writes: [],
-          reads: [],
-          mutationCandidates: [],
-        });
+          subjects.set(bound.node, {
+            file: sf.fileName,
+            name: bound.name,
+            kind,
+            ambient,
+            exported,
+            retainedFact: d.initializer
+              ? initShape(d.initializer)
+              : 'uninitialised',
+            immutablePrimitive:
+              kind === 'const' &&
+              Boolean(d.initializer) &&
+              isLiteralPrimitive(d.initializer),
+            writes: [],
+            reads: [],
+            mutationCandidates: [],
+          });
         }
       }
     }
@@ -239,7 +271,8 @@ export function analyseProgram(fileNames, options = undefined) {
         }
       }
       if (
-        (ts.isPostfixUnaryExpression(node) || ts.isPrefixUnaryExpression(node)) &&
+        (ts.isPostfixUnaryExpression(node) ||
+          ts.isPrefixUnaryExpression(node)) &&
         ts.isIdentifier(node.operand) &&
         (node.operator === ts.SyntaxKind.PlusPlusToken ||
           node.operator === ts.SyntaxKind.MinusMinusToken)
@@ -247,7 +280,10 @@ export function analyseProgram(fileNames, options = undefined) {
         const d = resolveSubjectDecl(node.operand);
         if (d)
           subjects.get(d).writes.push({
-            kind: node.operator === ts.SyntaxKind.PlusPlusToken ? 'increment' : 'decrement',
+            kind:
+              node.operator === ts.SyntaxKind.PlusPlusToken
+                ? 'increment'
+                : 'decrement',
             where: enclosingFn(node),
             file: sf.fileName,
           });
@@ -277,7 +313,10 @@ export function analyseProgram(fileNames, options = undefined) {
         const isImportSpec = ts.isImportSpecifier(p) || ts.isImportClause(p);
         if (!isDeclName && !isAssignTarget && !isPropName && !isImportSpec) {
           const d = resolveSubjectDecl(node);
-          if (d) subjects.get(d).reads.push({ file: sf.fileName, where: enclosingFn(node) });
+          if (d)
+            subjects
+              .get(d)
+              .reads.push({ file: sf.fileName, where: enclosingFn(node) });
         }
       }
       ts.forEachChild(node, visit);
@@ -307,12 +346,16 @@ function isLiteralPrimitive(node) {
   );
 }
 function initShape(node) {
-  if (ts.isNewExpression(node)) return `new ${node.expression.getText?.() ?? '?'}`;
-  if (ts.isCallExpression(node)) return `${node.expression.getText?.() ?? '?'}()`;
+  if (ts.isNewExpression(node))
+    return `new ${node.expression.getText?.() ?? '?'}`;
+  if (ts.isCallExpression(node))
+    return `${node.expression.getText?.() ?? '?'}()`;
   if (ts.isObjectLiteralExpression(node)) return 'object literal';
   if (ts.isArrayLiteralExpression(node)) return 'array literal';
-  if (ts.isArrowFunction(node) || ts.isFunctionExpression(node)) return 'function';
-  if (isLiteralPrimitive(node)) return `literal ${node.getText?.() ?? ''}`.trim();
+  if (ts.isArrowFunction(node) || ts.isFunctionExpression(node))
+    return 'function';
+  if (isLiteralPrimitive(node))
+    return `literal ${node.getText?.() ?? ''}`.trim();
   if (node.kind === ts.SyntaxKind.NullKeyword) return 'null';
   return ts.SyntaxKind[node.kind];
 }
@@ -349,8 +392,14 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       ],
       symbolResolvedCrossFileReads: crossFileReads.length,
       symbolResolvedCrossFileWrites: crossFileWrites.length,
-      referencingFiles: [...new Set([...crossFileReads, ...crossFileWrites].map((r) => rel(r.file)))],
-      mutationCandidates: [...new Set(s.mutationCandidates.map((m) => m.method))],
+      referencingFiles: [
+        ...new Set(
+          [...crossFileReads, ...crossFileWrites].map((r) => rel(r.file))
+        ),
+      ],
+      mutationCandidates: [
+        ...new Set(s.mutationCandidates.map((m) => m.method)),
+      ],
     });
   }
   // ── ANOMALY SCORE ─────────────────────────────────────────────────────────
@@ -370,7 +419,10 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   for (const r of rows) {
     let score = 0;
     const why = [];
-    const add = (n, reason) => { score += n; why.push(`+${n} ${reason}`); };
+    const add = (n, reason) => {
+      score += n;
+      why.push(`+${n} ${reason}`);
+    };
 
     if (r.writerLocations.length > 1) add(3, 'multiple independent writers');
     // ⚠️ NAME/PATH SCORING IS A WEAK HINT, NOT A LANE DECIDER. Giving these +3
@@ -390,7 +442,11 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     // container type" error the collection pass exists to avoid, committed by
     // the triage tool itself.
     const reassignable = r.kind !== 'const' || r.writes.length > 0;
-    if (reassignable && (/^(uninitialised|null)$/.test(r.retainedFact) || r.retainedFact === 'function'))
+    if (
+      reassignable &&
+      (/^(uninitialised|null)$/.test(r.retainedFact) ||
+        r.retainedFact === 'function')
+    )
       add(2, 'installed runtime / mutable callback');
     if (!reassignable && r.retainedFact === 'function')
       add(-2, 'const function declaration, not state');
@@ -403,23 +459,45 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     // to avoid it.
     if (!reassignable && /^Symbol\.for\(\)$/.test(r.retainedFact))
       add(-4, 'Symbol.for() key, censused as a structural symbol');
-    if (r.mutationCandidates.length && !r.mutationCandidates.some((m) => /delete|clear|pop|shift|splice/.test(m)))
+    if (
+      r.mutationCandidates.length &&
+      !r.mutationCandidates.some((m) => /delete|clear|pop|shift|splice/.test(m))
+    )
       add(2, 'insertion with no removal path');
-    if (/^new (Map|Set)$/.test(r.retainedFact) || r.retainedFact === 'array literal')
-      add(2, 'strong collection — retention is not the key\'s lifetime');
-    if (CACHE.test(r.name)) add(2, 'cache — correctness depends on invalidation');
-    if (r.exported && r.symbolResolvedCrossFileReads === 0 && (r.importedBySpecCount ?? 0) > 0)
+    if (
+      /^new (Map|Set)$/.test(r.retainedFact) ||
+      r.retainedFact === 'array literal'
+    )
+      add(2, "strong collection — retention is not the key's lifetime");
+    if (CACHE.test(r.name))
+      add(2, 'cache — correctness depends on invalidation');
+    if (
+      r.exported &&
+      r.symbolResolvedCrossFileReads === 0 &&
+      (r.importedBySpecCount ?? 0) > 0
+    )
       add(2, 'exported, read only by specs');
     if (r.writerLocations.some((w) => /reset|clear/i.test(String(w))))
       add(2, 'has a reset path');
-    if (/ForTesting|Testing/.test(r.writerLocations.join(' '))) add(-1, 'test-only writer');
+    if (/ForTesting|Testing/.test(r.writerLocations.join(' ')))
+      add(-1, 'test-only writer');
 
     r.anomalyScore = Math.max(0, score);
     r.anomalyReasons = why;
-    r.lane = r.anomalyScore <= 1 ? 'FAST-LANE' : r.anomalyScore <= 3 ? 'REVIEW-TABLE' : 'DEEP';
+    r.lane =
+      r.anomalyScore <= 1
+        ? 'FAST-LANE'
+        : r.anomalyScore <= 3
+        ? 'REVIEW-TABLE'
+        : 'DEEP';
   }
 
-  writeFileSync(`${ROOT}/tools/module-state-evidence.json`, JSON.stringify(rows, null, 2));
+  writeFileSync(
+    `${ROOT}/tools/module-state-evidence.json`,
+    JSON.stringify(rows, null, 2)
+  );
   const mut = rows.filter((r) => r.mutableCandidate && !r.ambient);
-  console.log(`module-state evidence: ${rows.length} bindings, ${mut.length} mutable non-ambient`);
+  console.log(
+    `module-state evidence: ${rows.length} bindings, ${mut.length} mutable non-ambient`
+  );
 }

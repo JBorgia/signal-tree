@@ -230,15 +230,12 @@ pnpm nx build demo --configuration=production
 
 ### Bundle size limits (enforced in validation)
 
-| Package      | Max size | Max gzipped |
-| ------------ | -------- | ----------- |
-| `core`       | 15 KB    | 5.8 KB      |
-| `ng-forms`   | 10 KB    | 4 KB        |
-| `enterprise` | 8 KB     | 3 KB        |
-| `guardrails` | 12 KB    | 4 KB        |
-| `schema`     | 16 KB    | 6 KB        |
+| Target                | Prod budget | Dev budget |
+| --------------------- | ----------- | ---------- |
+| `signaltree-bare`     | 9.7 KB      | 11.9 KB    |
+| `signaltree-entities` | 21.7 KB     | 24.4 KB    |
 
-The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bundle-budget.mjs) — the single source of truth for library size claims; every other doc's numbers must trace back to it. Current measured (own-code only; `@angular`/`rxjs`/`tslib` external): bare `signalTree` **5.46 KB** (budget 5.8), a tree using a plain `entityMap()` **8.39 KB** (budget 8.6). A cache-aware `entityMap({ load: loader(...) })` pulls the loader machinery on top; a plain `entityMap()` tree-shakes it out entirely (v12, RFC 0005 §6). Check with `node tools/check-bundle-budget.mjs`.
+The authoritative gzip gate is [`tools/check-bundle-budget.mjs`](tools/check-bundle-budget.mjs) — the single source of truth for library size claims; every other doc's numbers must trace back to it. Current measured (own-code only; `@angular`/`rxjs`/`tslib` external): bare `signalTree` **9.56 KB** prod (budget 9.7), a tree using a plain `entityMap()` **21.49 KB** prod (budget 21.7). The v15 cost is attributed in the gate's own comments: the causal runtime and entity identity kernel are reachable from the default construction path, and declarative construction puts the enhancer resolver on every tree's mandatory path (+0.47 KB, a design cost — read the gate before bumping). Check with `node tools/check-bundle-budget.mjs`.
 
 ### Validation pipeline
 
@@ -275,9 +272,11 @@ Before signing off any release or size/perf change:
 - Rebuild the demo (`pnpm nx build demo --configuration=production`) against the current workspace.
 - Flag mismatches or failures — treat them as blocking.
 
-### Private packages
+### Internal utilities
 
-`@signaltree/shared` is `"private": true`, bundled at build time via Rollup, and must never appear in `dependencies` or `peerDependencies` of published packages. Use `devDependencies` only when needed for local development.
+Kernel-only utilities live under `packages/kernel/src/lib/internals/utilities/`.
+Do not recreate a private workspace package for them; they are implementation
+details emitted naturally with the kernel's preserved-module build.
 
 ### Release flow
 

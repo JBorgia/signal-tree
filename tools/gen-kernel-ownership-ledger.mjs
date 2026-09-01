@@ -142,10 +142,10 @@ const RULINGS = {
     'REIMPLEMENT',
     'BM-C: every adjudicated job in lib/internals/tree-scalar-slot-angular-runtime.ts is framework runtime yet it is bare-reachable — the C6 handoff',
   ],
-  'bare-module:shared/lib/deep-equal.ts': [
+  'bare-module:core/lib/internals/utilities/deep-equal.ts': [
     'KERNEL',
     'CONVERGED',
-    'BM-A: @signaltree/shared kernel utility; outside the CORE census file universe by construction, required by the bare tree',
+    'BM-A: kernel-internal equality utility required by the bare tree',
   ],
   'bare-module:core/lib/internals/owned-mutation.ts': [
     'KERNEL',
@@ -157,10 +157,10 @@ const RULINGS = {
     'CONVERGED',
     'BM-A: every adjudicated job in lib/internals/member-membership.ts is KERNEL; the bare tree requires it',
   ],
-  'bare-module:shared/lib/is-built-in-object.ts': [
+  'bare-module:core/lib/internals/utilities/is-built-in-object.ts': [
     'KERNEL',
     'CONVERGED',
-    'BM-A: @signaltree/shared kernel utility; outside the CORE census file universe by construction, required by the bare tree',
+    'BM-A: kernel-internal built-in-object utility required by the bare tree',
   ],
   'bare-module:core/enhancers/index.ts': [
     'KERNEL',
@@ -216,11 +216,6 @@ const RULINGS = {
     'KERNEL',
     'CONVERGED',
     'BM-A: every adjudicated job in lib/internals/path-observation-port.ts is KERNEL; the bare tree requires it',
-  ],
-  'bare-module:shared/lib/is-traversable-node.ts': [
-    'KERNEL',
-    'CONVERGED',
-    'BM-A: @signaltree/shared kernel utility; outside the CORE census file universe by construction, required by the bare tree',
   ],
   'bare-module:core/lib/internals/materialization-realization.ts': [
     'FRAMEWORK-ADAPTER',
@@ -495,6 +490,16 @@ const RULINGS = {
       'CONVERGED',
       'EXPLICIT: read by deriveSubjectAddress',
     ],
+  'state:lib/internals/utilities/deep-clone.ts:globalStructuredClone': [
+    'KERNEL',
+    'CONVERGED',
+    'EXPLICIT: private platform-capability capture used by kernel cloning; an implementation choice, not a required public semantic',
+  ],
+  'state:lib/internals/utilities/deep-equal.ts:CYCLE_GUARD_DEPTH': [
+    'KERNEL',
+    'CONVERGED',
+    'EXPLICIT: private measured threshold for lazy cycle tracking in the kernel equality hot path; an implementation choice, not a public contract',
+  ],
   'state:lib/internals/cell-runtime.ts:installed': [
     'KERNEL',
     'CONVERGED',

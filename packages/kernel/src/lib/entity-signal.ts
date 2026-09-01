@@ -1,7 +1,7 @@
 import { NEUTRAL_CELL_RUNTIME } from './internals/cell-runtime';
 import { NEUTRAL_DERIVED_RUNTIME } from './internals/derived-runtime';
 import type { ReadableCell, WritableCell } from './internals/cell-runtime';
-import { deepClone } from '@signaltree/shared';
+import { deepClone } from './internals/utilities/deep-clone';
 
 import {
   EntityMutationFrame,

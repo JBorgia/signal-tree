@@ -21,9 +21,7 @@ export default [
             '{projectRoot}/vitest.config.ts',
             '{projectRoot}/vitest.retention.config.ts',
           ],
-          // @signaltree/shared is bundled at build time via Rollup, not a runtime dependency
           ignoredDependencies: [
-            '@signaltree/shared',
             'tslib',
             // Build-time dependencies (not runtime peer dependencies)
             '@nx/rollup',

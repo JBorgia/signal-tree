@@ -48,7 +48,6 @@ const BASELINE = join(ROOT, 'tools', 'lint-budget.json');
 const PROJECTS = [
   'packages/kernel',
   'packages/react',
-  'packages/shared',
   'apps/demo',
   // tools/ and scripts/ are NOT nx projects, so `nx run-many -t lint` never
   // reaches them and this list did not either — it was written from the nx
@@ -80,7 +79,9 @@ for (const project of PROJECTS) {
     // eslint exits 1 when it reports errors, and still writes valid JSON.
     json = err.stdout ?? '';
     if (!json.trim()) {
-      console.error(`✗ eslint failed to run for ${project}:\n${err.stderr ?? err.message}`);
+      console.error(
+        `✗ eslint failed to run for ${project}:\n${err.stderr ?? err.message}`
+      );
       process.exit(1);
     }
   }
@@ -99,17 +100,23 @@ for (const project of PROJECTS) {
 const total = Object.values(counts).reduce((a, b) => a + b, 0);
 
 if (process.argv.includes('--update')) {
-  writeFileSync(BASELINE, `${JSON.stringify({ counts, total, filesLinted }, null, 2)}\n`);
+  writeFileSync(
+    BASELINE,
+    `${JSON.stringify({ counts, total, filesLinted }, null, 2)}\n`
+  );
   console.log(
     `Recorded baseline: ${total} warnings across ${filesLinted} files in ` +
       `${Object.keys(counts).length} projects.`
   );
-  for (const [k, v] of Object.entries(counts).sort()) console.log(`  ${String(v).padStart(4)}  ${k}`);
+  for (const [k, v] of Object.entries(counts).sort())
+    console.log(`  ${String(v).padStart(4)}  ${k}`);
   process.exit(0);
 }
 
 if (!existsSync(BASELINE)) {
-  console.error(`No baseline at tools/lint-budget.json — run with --update first.`);
+  console.error(
+    `No baseline at tools/lint-budget.json — run with --update first.`
+  );
   process.exit(1);
 }
 const base = JSON.parse(readFileSync(BASELINE, 'utf8'));
@@ -128,17 +135,27 @@ for (const p of [...projects].sort()) {
   const was = base.counts[p] ?? 0;
   if (now > was) {
     over++;
-    console.error(`  ✗ ${p.padEnd(22)} ${was} → ${now}  (+${now - was}) — new warnings are not allowed`);
+    console.error(
+      `  ✗ ${p.padEnd(22)} ${was} → ${now}  (+${
+        now - was
+      }) — new warnings are not allowed`
+    );
   } else if (now < was) {
     under++;
-    console.log(`  ↓ ${p.padEnd(22)} ${was} → ${now}  (-${was - now}) — run --update to lock this in`);
+    console.log(
+      `  ↓ ${p.padEnd(22)} ${was} → ${now}  (-${
+        was - now
+      }) — run --update to lock this in`
+    );
   } else {
     console.log(`  · ${p.padEnd(22)} ${now}`);
   }
 }
 
 if (errors) {
-  console.error(`\n${errors} eslint ERROR(s) — these fail regardless of the warning budget.`);
+  console.error(
+    `\n${errors} eslint ERROR(s) — these fail regardless of the warning budget.`
+  );
 }
 if (over) {
   console.error(
@@ -147,6 +164,8 @@ if (over) {
   );
 }
 if (under) {
-  console.log(`\n${under} project(s) below budget — \`--update\` to tighten the ratchet.`);
+  console.log(
+    `\n${under} project(s) below budget — \`--update\` to tighten the ratchet.`
+  );
 }
 process.exit(errors || over ? 1 : 0);

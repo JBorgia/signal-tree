@@ -8,11 +8,7 @@
     "declarationMap": true,
     "inlineSources": false,
     "module": "ESNext",
-    "types": ["node"],
-    "paths": {
-      "@signaltree/shared": ["packages/shared/src/index.ts"],
-      "@signaltree/shared/*": ["packages/shared/src/lib/*"]
-    }
+    "types": ["node"]
   },
   "exclude": [
     "src/**/*.spec.ts",
@@ -22,10 +18,5 @@
     "src/lib/experimental/**",
     "src/reactive-test-realization.ts"
   ],
-  "include": ["src/**/*.ts"],
-  "references": [
-    {
-      "path": "../shared/tsconfig.lib.json"
-    }
-  ]
+  "include": ["src/**/*.ts"]
 }

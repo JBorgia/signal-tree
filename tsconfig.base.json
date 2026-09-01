@@ -22,9 +22,7 @@
       "@signal-tree/angular": ["packages/angular/src/index.ts"],
       "@signal-tree/kernel/adapter": ["packages/kernel/src/adapter.ts"],
       "@signal-tree/kernel": ["packages/kernel/src/index.ts"],
-      "@signal-tree/react": ["packages/react/src/index.ts"],
-      "@signaltree/shared": ["packages/shared/src/index.ts"],
-      "@signaltree/shared/*": ["packages/shared/src/*"]
+      "@signal-tree/react": ["packages/react/src/index.ts"]
     },
     "strict": false,
     "noUncheckedSideEffectImports": false,

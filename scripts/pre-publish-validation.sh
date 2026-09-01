@@ -141,8 +141,7 @@ release_provenance_ok() {
 }
 
 # Release-managed manifests, EXACTLY the packages release-packages.sh publishes.
-# Deliberately excludes the private `packages/shared` (bundled, never published)
-# and any other package.json — the old
+# Deliberately excludes any other package.json — the old
 # `packages/[^/]+/package.json` wildcard tolerated dirt in non-released manifests.
 RELEASE_MANAGED_ALLOWLIST='^(package\.json|CHANGELOG\.md|packages/(kernel|angular|react)/package\.json|apps/demo/src/app/(version|library-versions)\.ts)$'
 

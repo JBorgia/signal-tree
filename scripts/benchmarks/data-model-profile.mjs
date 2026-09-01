@@ -30,7 +30,7 @@ import {
 } from '../../dist/packages/kernel/dist/index.js';
 import { createSignalTreeFactory } from '../../dist/packages/kernel/dist/adapter.js';
 import { ANGULAR_TREE_REALIZATION } from '../../dist/packages/angular/dist/lib/angular-realization.js';
-import { deepEqual } from '../../dist/packages/shared/dist/index.js';
+import { deepEqual } from '../../dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js';
 
 const angularSignalTree = createSignalTreeFactory(ANGULAR_TREE_REALIZATION);
 

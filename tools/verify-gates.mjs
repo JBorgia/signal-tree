@@ -116,7 +116,7 @@ const GATES = [
       // `nx test demo` by hand. It is also the app the demo-coverage gate holds
       // up as proof every export is demonstrated — so it breaking silently would
       // undermine that gate too.
-      '--projects=kernel,angular,react,shared,demo,react-reference',
+      '--projects=kernel,angular,react,demo,react-reference',
       '--skip-nx-cache',
     ],
     slow: true,
@@ -399,7 +399,8 @@ const GATES = [
     mutation: {
       file: 'tools/spec-type-baseline.json',
       find: '  "files": {',
-      replace: '  "files": {\n    "packages/kernel/src/lib/__gone__.spec.ts": 1,',
+      replace:
+        '  "files": {\n    "packages/kernel/src/lib/__gone__.spec.ts": 1,',
     },
   },
   {
@@ -422,7 +423,7 @@ const GATES = [
   {
     name: 'kernel-neutrality:self',
     covers:
-      "the closure walker itself — pointed at the known-tainted Angular " +
+      'the closure walker itself — pointed at the known-tainted Angular ' +
       'runtime, it must report taint',
     cmd: ['node', 'tools/check-kernel-neutrality.mjs', '--self-test'],
     mutation: {
@@ -518,7 +519,8 @@ const GATES = [
     cmd: ['node', 'tools/check-angular-coupling-budget.mjs'],
     mutation: {
       file: 'packages/kernel/src/lib/internals/tracking-suppression.ts',
-      append: "\nimport { untracked } from '@angular/core';\nexport const __gateCoupling = () => untracked(() => 1);\n",
+      append:
+        "\nimport { untracked } from '@angular/core';\nexport const __gateCoupling = () => untracked(() => 1);\n",
     },
   },
   {
@@ -528,8 +530,14 @@ const GATES = [
     // The DETERMINISTIC half of the C6 performance requirement. Wall-clock lives
     // in tools/bench-c6-baseline.mjs, which records and does not gate, because
     // timings move with the machine and these facts do not.
-        cmd: ['npx', 'vitest', 'run', '--root', 'packages/angular',
-          'src/lib/angular-realization-invariants.spec.ts'],
+    cmd: [
+      'npx',
+      'vitest',
+      'run',
+      '--root',
+      'packages/angular',
+      'src/lib/angular-realization-invariants.spec.ts',
+    ],
   },
   {
     name: 'numeric-claims',
@@ -747,11 +755,7 @@ const GATES = [
     //
     // Its threshold was also too weak once and briefly reported a false green
     // over a run that grew 6.8 -> 54 MB; see the note in the probe.
-    cmd: [
-      'node',
-      '--expose-gc',
-      'tools/probe-bounded-history-retention.mjs',
-    ],
+    cmd: ['node', '--expose-gc', 'tools/probe-bounded-history-retention.mjs'],
     slow: true,
     needsBuild: true,
     provenBy: 'bounded-history-retention:self',
@@ -1040,7 +1044,7 @@ const GATES = [
   {
     name: 'retention-gc',
     covers:
-      "the GC-requiring retention proofs: a diagnostic journal releases the values it described once its bounded record is evicted, and a persistence() tree is released by destroy() (both three-armed: control dies -> held lives -> released dies)",
+      'the GC-requiring retention proofs: a diagnostic journal releases the values it described once its bounded record is evicted, and a persistence() tree is released by destroy() (both three-armed: control dies -> held lives -> released dies)',
     // Runs outside `nx test kernel` because it needs --expose-gc, and it FAILS
     // rather than skips without it: a WeakRef that is merely eligible for
     // collection proves nothing, and a skipped retention test reads as evidence.
@@ -1058,7 +1062,7 @@ const GATES = [
   {
     name: 'documented-imports',
     covers:
-      "every import specifier a LIVE document teaches resolves against the published export map — the documented -> publishable edge no other gate checks",
+      'every import specifier a LIVE document teaches resolves against the published export map — the documented -> publishable edge no other gate checks',
     cmd: ['node', 'tools/check-documented-imports.mjs'],
     // Earned by RELEASE-RESIDUE-0: the shipped core README taught
     // `@signaltree/ng-forms` (deleted in 41373050) and
@@ -1351,7 +1355,7 @@ const selected = GATES.filter(
  * half-written `dist/` produce noise, and "the build is broken" is the finding,
  * not a footnote to twenty-three other failures.
  */
-const BUILD_PROJECTS = 'shared,kernel,angular,react';
+const BUILD_PROJECTS = 'kernel,angular,react';
 
 function buildOnceIfNeeded() {
   if (!selected.some((g) => g.needsBuild)) return;
