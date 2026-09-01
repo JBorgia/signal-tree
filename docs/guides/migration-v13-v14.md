@@ -1,5 +1,9 @@
 # Migrating from 13.x to 14.0.0
 
+> **Historical inter-version guide.** It covers 13.x → 14.0.0 under the old
+> `@signaltree/*` scope. The current target for every version is
+> [`@signaltree/*` → `@signal-tree/*` (v15)](./migration-v14-v15.md).
+
 Every breaking change, what it looks like when you hit it, and the fix.
 
 **Most of these fail at compile time.** That is deliberate: the one change that

@@ -3,7 +3,9 @@
 Framework-neutral SignalTree state, EntityMap, causal turns, links,
 restoration, transactions, batching, and DevTools.
 
-Angular applications should construct trees through `@signal-tree/angular`.
+Angular applications should construct trees through `@signal-tree/angular`
+(requires Angular 20, 21, or 22 — see `peerDependencies` in
+[`packages/angular/package.json`](../angular/package.json)).
 React applications should use `@signal-tree/react` for owner-bound observation.
 Use the kernel directly for framework-neutral runtimes, libraries, and tests.
 

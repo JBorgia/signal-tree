@@ -5,6 +5,22 @@ semantics. The public v15 construction model is
 `signalTree(initialState, { derived, enhancers })`; state is read through
 `tree.$`.
 
+v15 ships three packages under the hyphenated `@signal-tree/*` scope (the pre-15
+`@signaltree/*` scope, no hyphen, stopped at 14.1.1):
+
+- `@signal-tree/kernel` — framework-neutral tree, `entityMap()`, causal turns,
+  links, and the `restoration()` / `transactions()` / `batching()` / `devTools()`
+  enhancers. Also `@signal-tree/kernel/adapter`, the realization SDK.
+- `@signal-tree/angular` — the Angular realization. **Angular code imports
+  `signalTree` (and everything else) from here**, not the kernel: kernel leaves
+  are neutral cells, `@signal-tree/angular` leaves are native Angular signals.
+  Adds `defineStore()`.
+- `@signal-tree/react` — `useSignalTree(owner, selector)` observation.
+
+There is no v15 forms, persistence, validation, events, or realtime package;
+those are application-owned. `.with()`, positional `derived`, `stored()`, and
+the `asyncSource`/`asyncQuery`/`form`/`status` markers were removed.
+
 ## Migration Rule
 
 Never design SignalTree around a legacy application's intermediate state.
@@ -57,4 +73,6 @@ must remain meaningful to SignalTree or another reactive runtime.
 - `README.md` — public package overview
 - `packages/kernel/README.md` — kernel API and examples
 - `packages/angular/README.md` — Angular realization
+- `packages/react/README.md` — React observation
+- `docs/guides/migration-v14-v15.md` — `@signaltree/*` → `@signal-tree/*` migration (rename, consolidation, removed APIs)
 - `docs/migration/post-rc1-workstream.md` — greenfield-first post-RC program

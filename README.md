@@ -17,7 +17,10 @@
 
 ## SignalTree is not @ngrx/signals
 
-**Different library, different author, different package** — `@signal-tree/kernel` (no hyphen, not under `@ngrx/`). It's a typed reactive store where **your state literal is the API**: no `withState` / `withMethods` / `withComputed` wrappers, no actions, no reducers. You read and write any path directly — `tree.$.user.name()` to read, `tree.$.user.name.set(v)` to write — at any depth. If a doc or AI agent conflated this with NgRx SignalStore, that's the confusion to drop first; see [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md).
+**Different library, different author, different package** — the `@signal-tree/*` scope (hyphenated; not under `@ngrx/`). Angular apps install [`@signal-tree/angular`](packages/angular/README.md); the framework-neutral core is [`@signal-tree/kernel`](packages/kernel/README.md). It's a typed reactive store where **your state literal is the API**: no `withState` / `withMethods` / `withComputed` wrappers, no actions, no reducers. You read and write any path directly — `tree.$.user.name()` to read, `tree.$.user.name.set(v)` to write — at any depth. If a doc or AI agent conflated this with NgRx SignalStore, that's the confusion to drop first; see [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md).
+
+> **On `@signaltree/*` (no hyphen)?** That is the pre-15 line and it stops at
+> 14.1.1. See [Migration `@signaltree/*` → `@signal-tree/*` (v15)](docs/guides/migration-v14-v15.md).
 
 ## Why SignalTree
 
@@ -184,10 +187,10 @@ and the reproducible harness for the evidence behind that experiment.
 
 ## Mental Model
 
-A SignalTree turns a plain JSON object into a tree of Angular signals. Each leaf becomes a `WritableSignal`. Reads and writes use the same shape as any Angular signal — `node()` to read, `.set()` / `.update()` to write. Markers, enhancers, and derived tiers add capability on top, but they layer onto that base.
+A SignalTree turns a plain JSON object into a tree of Angular signals. Each leaf becomes a `WritableSignal`. Reads and writes use the same shape as any Angular signal — `node()` to read, `.set()` / `.update()` to write. Markers, enhancers, and derived state add capability on top, but they layer onto that base.
 
 ```typescript
-import { signalTree } from '@signal-tree/kernel';
+import { signalTree } from '@signal-tree/angular';
 
 const store = signalTree({
   user: { name: 'Alice', age: 30 },
@@ -211,17 +214,29 @@ In templates, `store.$.user.name()` works exactly like any other signal.
 ## Install
 
 ```bash
+# Angular application
+npm install @signal-tree/angular
+
+# framework-neutral core (libraries, tests, non-Angular runtimes)
 npm install @signal-tree/kernel
+
+# React application
+npm install @signal-tree/react
 ```
 
-Requires Angular 20, 21, or 22 (see `peerDependencies` in [`packages/angular/package.json`](packages/angular/package.json)).
+`@signal-tree/angular` requires Angular 20, 21, or 22 (see `peerDependencies` in
+[`packages/angular/package.json`](packages/angular/package.json)). Import
+`signalTree` and everything else from `@signal-tree/angular` in Angular code —
+its leaves are native Angular signals (`isSignal()` is `true`, so `toObservable`,
+`model()`, and `input()` accept them). The kernel's neutral cells are not
+interchangeable with `WritableSignal`.
 
 ## Entity Collections
 
 The `entityMap()` marker gives any node a normalized collection with full reactive CRUD:
 
 ```typescript
-import { signalTree, entityMap } from '@signal-tree/kernel';
+import { signalTree, entityMap } from '@signal-tree/angular';
 
 const store = signalTree({
   users: entityMap<User, number>({ selectId: (u) => u.id }),
@@ -242,7 +257,7 @@ store.$.users.count(); // Signal<number>
 store.$.users.where((u) => u.active); // Signal<User[]>
 ```
 
-Additional methods: `addMany`, `upsertOne`, `upsertMany`, `updateMany`, `updateWhere`, `removeMany`, `removeWhere`, `clear`, `has`, `ids`, `find`.
+Additional methods: `addMany`, `upsertOne`, `upsertMany`, `updateMany`, `updateWhere`, `replaceOne` (O(1) outright replacement — `updateOne` spreads and cannot remove a key), `removeMany`, `removeWhere`, `clear`, `has`, `ids`, `find`, `prependOne`/`prependMany` (insert at the head without invalidating any row), `changeId(from, to)` (in-place id migration preserving position and held `byId()` handles), and active-entity tracking: `activeId`/`activeEntity` reads plus `setActiveId`/`clearActiveId` — `activeEntity` resolves through `byId`, so it is O(1) and invalidates only when that row changes.
 
 Pass `sortComparer` to keep `all()`/`ids()` sorted on every read (`@ngrx/entity` parity): `entityMap<User>({ selectId, sortComparer: (a, b) => a.name.localeCompare(b.name) })`. Per-entity reads are body-granular — `byId(id).field()` re-runs only when that entity changes.
 
@@ -250,15 +265,18 @@ Pass `sortComparer` to keep `all()`/`ids()` sorted on every read (`@ngrx/entity`
 
 ## Markers
 
-Markers declare special node behavior at tree creation time:
+A **marker** is a call placed in the state literal that declares special node
+behavior at tree creation time. **`entityMap()` is the only marker in v15.**
+The historical stored, form, status, async-source, and async-query markers were
+removed. Everything else in the state literal is plain data:
 
 ```typescript
-import { signalTree, entityMap } from '@signal-tree/kernel';
+import { signalTree, entityMap } from '@signal-tree/angular';
 
 const store = signalTree({
-  users: entityMap<User>(), // Normalized entity collection (see above)
-  loadingState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
-  preference: 'light' as 'light' | 'dark',
+  users: entityMap<User>(), // marker — normalized entity collection (see above)
+  loadingState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error', // plain leaf
+  preference: 'light' as 'light' | 'dark', // plain leaf
 });
 
 store.$.loadingState.set('loading');
@@ -266,9 +284,10 @@ store.$.users.setAll(data); // entities written directly — loadingState is a s
 store.$.loadingState.set('loaded');
 ```
 
-The old cache-aware `entityMap({ load: loader(...) })` surface is not part of
-the current RC public API. Use plain `entityMap()` for normalized local
-membership and write resolved rows from app-owned services.
+The old cache-aware `entityMap({ load: loader(...) })` surface is also gone.
+Use plain `entityMap()` for normalized local membership and write resolved rows
+from app-owned services (an `@Injectable` Ops service that runs the fetch and
+lands results via `external()`).
 
 ## Composition model
 
@@ -297,7 +316,7 @@ the same enhancer twice throws a clear error before anything is built —
 fail-fast, no silent fallback.
 
 ```typescript
-import { signalTree, batching, devTools, restoration } from '@signal-tree/kernel';
+import { signalTree, batching, devTools, restoration } from '@signal-tree/angular';
 
 const store = signalTree(
   { count: 0, items: [] },
@@ -375,14 +394,18 @@ store.$.count.update((n) => n + 1); // transform
 
 ## Subpath Imports
 
-Everything ships from the single `@signal-tree/kernel` entry point. There are no
-subpath imports.
+Application code imports everything from one entry point — `@signal-tree/angular`
+(Angular), `@signal-tree/kernel` (framework-neutral), or `@signal-tree/react`
+(React). The kernel additionally exposes `@signal-tree/kernel/adapter`, the
+framework-neutral realization SDK; it is for authoring a runtime binding, not
+for application code.
 
-> ⚠️ **This section used to teach three of them** — `@signal-tree/kernel/security`,
-> `@signal-tree/kernel/edit-session` and `@signal-tree/kernel/storage` — and none
-> resolved. `package.json` exports only `.`. RELEASE-RESIDUE-0 found it;
-> `security` and `storage` were deleted in 15.0, and `edit-session` was deleted
-> too, having never been in the export map at all.
+> ⚠️ **This section used to teach three app-facing subpaths** —
+> `@signal-tree/kernel/security`, `@signal-tree/kernel/edit-session` and
+> `@signal-tree/kernel/storage` — and none resolved. `package.json` exports only
+> `.` and `./adapter`. RELEASE-RESIDUE-0 found it; `security` and `storage` were
+> deleted in 15.0, and `edit-session` was deleted too, having never been in the
+> export map at all.
 
 Edit sessions were deleted in 15.0. Keep an uncommitted draft in application
 state and write the accepted value through the target location; use
@@ -417,11 +440,17 @@ store.destroyed(); // true — all enhancer resources cleaned up
 store.registerCleanup(() => ws.close());
 ```
 
-## Optional Packages
+## Packages
 
-| Package              | Purpose                                                    |
-| -------------------- | ---------------------------------------------------------- |
-| `@signal-tree/react` | Owner-bound React observation through selector projections |
+| Package                | Purpose                                                                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@signal-tree/kernel`  | Framework-neutral tree, EntityMap, causal turns, links, `restoration()`, `transactions()`, `batching()`, `devTools()`. Plus `@signal-tree/kernel/adapter`, the realization SDK. |
+| `@signal-tree/angular` | The Angular realization — native Angular signals at every leaf. **Angular apps use this**; it re-exports the kernel's semantic API and adds `defineStore`.                      |
+| `@signal-tree/react`   | Owner-bound React observation through selector projections (`useSignalTree`).                                                                                                   |
+
+There is no `@signal-tree/ng-forms`, `/events`, `/realtime`, `/schema`,
+`/guardrails`, or persistence package in v15 — those capabilities are
+application-owned. Dev-mode misuse warnings (`[ST####]`) ship inside the kernel.
 
 ## Real-World Migration (Case Study)
 
@@ -429,12 +458,12 @@ store.registerCleanup(() => ws.close());
 
 Snapshot from one production Angular mobile app's NgRx Signal Store → SignalTree migration. Original migration measured ~11,700 → ~2,800 lines of state code (~76%) and ~50KB → ~27KB gzipped state bundle (~46%). Both codebases have continued to evolve; re-measuring today the same scope yields a 60–70% reduction depending on definition (apps-only vs apps+libs, narrow vs broad import filter). The directional finding is reproducible — the exact percentages are not. **YMMV** — your migration's reduction depends on app complexity, prior architecture, and how heavily the original code leaned on custom `withX` helpers. The most concretely-attributable single reduction was `entityMap()` replacing a 222-line `withEntityCrud` wrapper. The remaining bulk of the savings appears to come from cross-cutting concerns (devtools, error banners, telemetry, refresh handling) consolidating into tree-level enhancers, though we have not separately measured each category.
 
-| Metric                  | NgRx                      | SignalTree              | Change         |
-| ----------------------- | ------------------------- | ----------------------- | -------------- |
-| **App state code**      | 11,735 lines / 45 files   | 2,825 lines / 23 files  | **-76%**       |
-| **npm packages**        | 4 (@ngrx/\*)              | 1 (@signal-tree/kernel) | **-75%**       |
-| **State bundle (gzip)** | ~50KB                     | ~27KB                   | **-46%**       |
-| **Boilerplate files**   | 17 custom `withX` helpers | 0 (built-in)            | **Eliminated** |
+| Metric                  | NgRx                      | SignalTree               | Change         |
+| ----------------------- | ------------------------- | ------------------------ | -------------- |
+| **App state code**      | 11,735 lines / 45 files   | 2,825 lines / 23 files   | **-76%**       |
+| **npm packages**        | 4 (@ngrx/\*)              | 1 (@signal-tree/angular) | **-75%**       |
+| **State bundle (gzip)** | ~50KB                     | ~27KB                    | **-46%**       |
+| **Boilerplate files**   | 17 custom `withX` helpers | 0 (built-in)             | **Eliminated** |
 
 > 13 separate stores → 1 unified tree. `entityMap()` replaced a 222-line `withEntityCrud` wrapper. Derived tiers replaced scattered `withComputed` blocks.
 
@@ -493,20 +522,18 @@ tree.registerCleanup(fn); // Register custom cleanup
 Devtools replay is **forensic**: the point is to see what the app was actually
 doing, spinners and errors included.
 
-|                     | undo/redo (`restore`)                                        | cross-process (`rehydrate`)                          |
-| ------------------- | ------------------------------------------------------------ | ---------------------------------------------------- |
-| form values         | restored                                                     | restored                                             |
-| form `touched`      | **restored** — you go back to where you were, errors and all | **dropped** — Angular's own `form.value` omits it    |
-| form `submitting`   | never                                                        | never — a submit in flight then is not in flight now |
-| collection entries  | restored                                                     | restored                                             |
-| local loading flags | restored                                                     | restored                                             |
-
 The rule: **`restore` is exact, `rehydrate` is opinionated.** A cleaned-up undo
 is a lie about what the user did; a cleaned-up rehydrate is good manners.
 
-Undo/redo needs no configuration — it captures what a user edited (form values,
-collection entries, plain leaves) and skips in-flight state. Full reasoning in
-[undo-redo-vs-devtools.md](docs/architecture/undo-redo-vs-devtools.md).
+In v15, `restoration()` retains designated causal turns — mark the writes that
+should be reversible with `undoable()`, and everything else (loading flags,
+in-flight state) never enters the history at all.
+
+> The historical `restore`/`rehydrate` mode table that used to sit here —
+> including its form-marker rows — predates v15 and describes deleted markers:
+> `form()`, `status()`, and the async markers are not part of the current
+> public API. It is preserved as architecture evidence in
+> [undo-redo-vs-devtools.md](docs/architecture/undo-redo-vs-devtools.md).
 
 ## Debugging — `devTools()` enhancer
 
@@ -515,8 +542,9 @@ Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser
 ## Documentation
 
 - [Architecture Guide](docs/architecture/signaltree-architecture-guide.md)
+- [Migration `@signaltree/*` → `@signal-tree/*` (v15)](docs/guides/migration-v14-v15.md) — the current migration target for every earlier version
+- [Composition Recipes](docs/guides/composition-recipes.md) — Ops service, entity-CRUD base, optimistic UI
 - [Enhancer authoring removal](docs/guides/custom-enhancers.md)
-- [Migration Guide (v8 → v9)](docs/guides/migration-v8-v9.md)
 - [Performance Methodology](docs/performance/methodology.md)
 - [Performance Patterns](docs/performance/performance-patterns.md)
 - [SignalTree vs raw Angular signals](docs/compare/native-signals.md) — the comparison most adoption decisions hinge on; when to just use `signal`/`computed`/`linkedSignal`/`resource`
@@ -525,7 +553,7 @@ Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser
 - [AI Agent Templates](docs/ai/agent-templates.md) — drop-in `.cursorrules`, `CLAUDE.md`, `copilot-instructions.md`
 - [Historical llms.txt](https://signaltree.io/llms.txt) / [llms-full.txt](https://signaltree.io/llms-full.txt) — v10 experiment artifacts, not current API guidance
 - [Built for AI agents](https://signaltree.io/built-for-ai) — the historical v10 AI-discoverability story
-- [Marker zoo](https://signaltree.io/marker-zoo) — all 7 markers at 4 depths in one tree (v10)
+- [Marker zoo](https://signaltree.io/marker-zoo) — historical v10 demo of the multi-marker surface; v15 keeps only `entityMap()`
 - [AI-codegen accuracy benchmark](scripts/ai-codegen-benchmark/) — reproducible scorecard scaffolding (v10)
 
 ## AI Guidance

@@ -1,5 +1,9 @@
 # Migrating to SignalTree v12
 
+> **Historical inter-version guide.** It covers v11 → v12 under the old
+> `@signaltree/*` scope. The current target for every version is
+> [`@signaltree/*` → `@signal-tree/*` (v15)](./migration-v14-v15.md).
+
 v12 is an "earned major": it lands one real capability improvement (a smaller,
 tree-shakeable `entityMap` loader) and clears the entire backlog of APIs that
 were marked _"deprecated — removed next major"_. Most apps touch only one or two

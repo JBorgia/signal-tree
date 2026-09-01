@@ -80,7 +80,9 @@ function race(title, arms, reps = 1, { unit = 'ms', per = 1 } = {}) {
         ? `  ${(r.med / base).toFixed(2)}x vs ${rows[0].label}`
         : '';
     console.log(
-      `  ${r.label.padEnd(w)}  ${v.toFixed(v < 1 ? 4 : 3)}${unit}  (IQR ${iqr.toFixed(iqr < 1 ? 4 : 3)})${rel}`
+      `  ${r.label.padEnd(w)}  ${v.toFixed(
+        v < 1 ? 4 : 3
+      )}${unit}  (IQR ${iqr.toFixed(iqr < 1 ? 4 : 3)})${rel}`
     );
   }
   return rows;
@@ -97,15 +99,20 @@ function retained(build, { copies = 3, runs = 3 } = {}) {
   const samples = [];
   for (let r = 0; r < runs; r++) {
     KEEP.length = 0;
-    gc(); gc(); gc();
+    gc();
+    gc();
+    gc();
     const before = process.memoryUsage().heapUsed;
     for (let i = 0; i < copies; i++) KEEP.push(build());
-    gc(); gc(); gc();
+    gc();
+    gc();
+    gc();
     const after = process.memoryUsage().heapUsed;
     samples.push((after - before) / copies);
   }
   KEEP.length = 0;
-  gc(); gc();
+  gc();
+  gc();
   samples.sort((a, b) => a - b);
   return samples[Math.floor(samples.length / 2)];
 }
@@ -115,7 +122,8 @@ const kb = (b) => (b == null ? 'n/a' : `${(b / 1024).toFixed(1)}KB`);
 // --------------------------------------------------------------- fixtures ---
 
 /** Nested chain: { level: { level: … { value, data } } } */
-const nested = (d) => (d === 0 ? { value: 0, data: 'leaf' } : { level: nested(d - 1) });
+const nested = (d) =>
+  d === 0 ? { value: 0, data: 'leaf' } : { level: nested(d - 1) };
 const walk = (root, d) => {
   let cur = root;
   for (let j = 0; j < d; j++) cur = cur.level;
@@ -133,12 +141,15 @@ function wide(n) {
   return out;
 }
 
-const mkItems = (n) => Array.from({ length: n }, (_, i) => ({ id: i, value: i, name: `n${i}` }));
+const mkItems = (n) =>
+  Array.from({ length: n }, (_, i) => ({ id: i, value: i, name: `n${i}` }));
 
 // ================================================================== PART 1 ===
 
 if (want('write')) {
-  console.log('\n=== 1a. PARTIAL WRITE — walked path vs held leaf reference ===');
+  console.log(
+    '\n=== 1a. PARTIAL WRITE — walked path vs held leaf reference ==='
+  );
   // NOTE: a leaf with no live consumer skips notification entirely, so a
   // consumer arm is included at each depth — that is the shape real code has.
   const UPDATES = 10000;
@@ -196,7 +207,9 @@ if (want('write')) {
             return () => {
               for (let i = 0; i < UPDATES; i++) {
                 const up = (o, l) =>
-                  l === 0 ? { ...o, value: i } : { ...o, level: up(o.level, l - 1) };
+                  l === 0
+                    ? { ...o, value: i }
+                    : { ...o, level: up(o.level, l - 1) };
                 state = up(state, depth);
               }
             };
@@ -304,7 +317,10 @@ if (want('collection')) {
           [
             'ST leaf, useShallowComparison',
             mkArm(() => {
-              const t = signalTree({ items: mkItems(n) }, { useShallowComparison: true });
+              const t = signalTree(
+                { items: mkItems(n) },
+                { useShallowComparison: true }
+              );
               return {
                 write: (idx, v) =>
                   t.$.items.update((a) => {
@@ -372,9 +388,15 @@ if (want('construct')) {
       copies: n >= 100000 ? 1 : 3,
     });
     console.log(
-      `  retained: tree ${kb(treeBytes)} (${treeBytes ? (treeBytes / n).toFixed(0) : 'n/a'} B/leaf)` +
-        `   POJO ${kb(pojoBytes)} (${pojoBytes ? (pojoBytes / n).toFixed(0) : 'n/a'} B/leaf)` +
-        (treeBytes && pojoBytes ? `   ${(treeBytes / pojoBytes).toFixed(2)}x` : '')
+      `  retained: tree ${kb(treeBytes)} (${
+        treeBytes ? (treeBytes / n).toFixed(0) : 'n/a'
+      } B/leaf)` +
+        `   POJO ${kb(pojoBytes)} (${
+          pojoBytes ? (pojoBytes / n).toFixed(0) : 'n/a'
+        } B/leaf)` +
+        (treeBytes && pojoBytes
+          ? `   ${(treeBytes / pojoBytes).toFixed(2)}x`
+          : '')
     );
   }
 
@@ -382,24 +404,40 @@ if (want('construct')) {
   // how much is SignalTree's own per-node structure?
   {
     const N = 10000;
-    const bareSignals = retained(() => {
-      const a = new Array(N);
-      for (let i = 0; i < N; i++) a[i] = signal(i);
-      return a;
-    }, { copies: 1 });
-    const bareSignalsDeep = retained(() => {
-      const a = new Array(N);
-      for (let i = 0; i < N; i++) a[i] = signal(i, { equal: deepEqual });
-      return a;
-    }, { copies: 1 });
-    const arrayLeaf = retained(() => signalTree({ items: mkItems(N) }), { copies: 1 });
+    const bareSignals = retained(
+      () => {
+        const a = new Array(N);
+        for (let i = 0; i < N; i++) a[i] = signal(i);
+        return a;
+      },
+      { copies: 1 }
+    );
+    const bareSignalsDeep = retained(
+      () => {
+        const a = new Array(N);
+        for (let i = 0; i < N; i++) a[i] = signal(i, { equal: deepEqual });
+        return a;
+      },
+      { copies: 1 }
+    );
+    const arrayLeaf = retained(() => signalTree({ items: mkItems(N) }), {
+      copies: 1,
+    });
     const rawArray = retained(() => mkItems(N), { copies: 1 });
     console.log(
       `\n  decomposition @ ${N}:` +
-        `\n    ${N} bare Angular signals            ${kb(bareSignals)} (${bareSignals ? (bareSignals / N).toFixed(0) : 'n/a'} B each)` +
-        `\n    ${N} bare signals w/ equal:deepEqual ${kb(bareSignalsDeep)} (${bareSignalsDeep ? (bareSignalsDeep / N).toFixed(0) : 'n/a'} B each)` +
-        `\n    signalTree with ${N} leaves          ${kb(retained(() => signalTree(wide(N)), { copies: 1 }))}` +
-        `\n    signalTree with ONE array leaf of ${N} objects ${kb(arrayLeaf)}` +
+        `\n    ${N} bare Angular signals            ${kb(bareSignals)} (${
+          bareSignals ? (bareSignals / N).toFixed(0) : 'n/a'
+        } B each)` +
+        `\n    ${N} bare signals w/ equal:deepEqual ${kb(bareSignalsDeep)} (${
+          bareSignalsDeep ? (bareSignalsDeep / N).toFixed(0) : 'n/a'
+        } B each)` +
+        `\n    signalTree with ${N} leaves          ${kb(
+          retained(() => signalTree(wide(N)), { copies: 1 })
+        )}` +
+        `\n    signalTree with ONE array leaf of ${N} objects ${kb(
+          arrayLeaf
+        )}` +
         `\n    the same ${N} objects as a raw array ${kb(rawArray)}`
     );
   }
@@ -422,7 +460,8 @@ if (want('entitymap')) {
             const t = signalTree({ items: entityMap() });
             t.$.items.setAll(mkItems(n));
             return () => {
-              for (let i = 0; i < UPDATES; i++) t.$.items.updateOne(rand[i], { value: i });
+              for (let i = 0; i < UPDATES; i++)
+                t.$.items.updateOne(rand[i], { value: i });
             };
           },
         ],
@@ -445,7 +484,10 @@ if (want('entitymap')) {
         [
           'array leaf, shallow',
           () => {
-            const t = signalTree({ items: mkItems(n) }, { useShallowComparison: true });
+            const t = signalTree(
+              { items: mkItems(n) },
+              { useShallowComparison: true }
+            );
             return () => {
               for (let i = 0; i < UPDATES; i++) {
                 const idx = rand[i];
@@ -514,7 +556,10 @@ if (want('entitymap')) {
         [
           'array leaf (shallow) + read',
           () => {
-            const t = signalTree({ items: mkItems(n) }, { useShallowComparison: true });
+            const t = signalTree(
+              { items: mkItems(n) },
+              { useShallowComparison: true }
+            );
             return () => {
               for (let i = 0; i < 1000; i++) {
                 const idx = rand[i];
@@ -562,15 +607,26 @@ if (want('entitymap')) {
       countRuns++;
       return t.$.items.count();
     });
-    bField(); bNode(); allC(); countC();
+    bField();
+    bNode();
+    allC();
+    countC();
     const base = [bFieldRuns, bNodeRuns, allRuns, countRuns];
 
     // update a DIFFERENT entity 100 times
     for (let i = 0; i < 100; i++) {
       t.$.items.updateOne(1, { value: i });
-      bField(); bNode(); allC(); countC();
+      bField();
+      bNode();
+      allC();
+      countC();
     }
-    const afterOther = [bFieldRuns - base[0], bNodeRuns - base[1], allRuns - base[2], countRuns - base[3]];
+    const afterOther = [
+      bFieldRuns - base[0],
+      bNodeRuns - base[1],
+      allRuns - base[2],
+      countRuns - base[3],
+    ];
     console.log(
       `  100 updates to entity #1 → recomputes: byId(500).value=${afterOther[0]}  ` +
         `byId(500)()=${afterOther[1]}  all()=${afterOther[2]}  count()=${afterOther[3]}`
@@ -579,9 +635,17 @@ if (want('entitymap')) {
     const b2 = [bFieldRuns, bNodeRuns, allRuns, countRuns];
     for (let i = 0; i < 100; i++) {
       t.$.items.updateOne(500, { value: i });
-      bField(); bNode(); allC(); countC();
+      bField();
+      bNode();
+      allC();
+      countC();
     }
-    const afterSelf = [bFieldRuns - b2[0], bNodeRuns - b2[1], allRuns - b2[2], countRuns - b2[3]];
+    const afterSelf = [
+      bFieldRuns - b2[0],
+      bNodeRuns - b2[1],
+      allRuns - b2[2],
+      countRuns - b2[3],
+    ];
     console.log(
       `  100 updates to entity #500 → recomputes: byId(500).value=${afterSelf[0]}  ` +
         `byId(500)()=${afterSelf[1]}  all()=${afterSelf[2]}  count()=${afterSelf[3]}`
@@ -604,7 +668,11 @@ if (want('entitymap')) {
       });
       arrC();
     }
-    console.log(`  array leaf: 100 updates to element #1 → computed reading element #500 re-ran ${arrRuns - a0}x`);
+    console.log(
+      `  array leaf: 100 updates to element #1 → computed reading element #500 re-ran ${
+        arrRuns - a0
+      }x`
+    );
   }
 
   // ---- whole-collection read -----------------------------------------------
@@ -687,7 +755,9 @@ if (want('entitymap')) {
     const t = signalTree({ items: entityMap() });
     t.$.items.setAll(mkItems(3));
     const snap = t.$().items;
-    console.log(`  tree.$() emits for entityMap: keys=[${Object.keys(snap).join(', ')}]`);
+    console.log(
+      `  tree.$() emits for entityMap: keys=[${Object.keys(snap).join(', ')}]`
+    );
   }
 }
 
@@ -704,7 +774,9 @@ if (want('timetravel')) {
     for (let i = 0; i < 100; i++) undoable(() => t.$.g0.f0.set(i));
     await new Promise((r) => setTimeout(r, 5));
     console.log(
-      `  100 SYNCHRONOUS leaf writes → ${t.getRestorationHistory().length} history entries ` +
+      `  100 SYNCHRONOUS leaf writes → ${
+        t.getRestorationHistory().length
+      } history entries ` +
         `(INIT + flush-coalesced). Batching is per-microtask, not per-write.`
     );
     const t2 = signalTree(wide(1000), {
@@ -715,7 +787,11 @@ if (want('timetravel')) {
       await Promise.resolve();
       await Promise.resolve();
     }
-    console.log(`  100 writes, each awaiting a microtask → ${t2.getRestorationHistory().length} history entries`);
+    console.log(
+      `  100 writes, each awaiting a microtask → ${
+        t2.getRestorationHistory().length
+      } history entries`
+    );
   }
 
   // Per-entry recording cost as a function of STATE SIZE (addEntry snapshots
@@ -798,10 +874,14 @@ if (want('timetravel')) {
       return built.map(([label], i) => ({ label, ...stats(res[i]) }));
     })();
     const w = Math.max(...rows.map((r) => r.label.length));
-    console.log(`\n  recording one history entry, state = ${n} leaves (per entry)`);
+    console.log(
+      `\n  recording one history entry, state = ${n} leaves (per entry)`
+    );
     for (const r of rows)
       console.log(
-        `    ${r.label.padEnd(w)}  ${(r.med * 1000).toFixed(1)}us  (IQR ${(r.iqr * 1000).toFixed(1)})`
+        `    ${r.label.padEnd(w)}  ${(r.med * 1000).toFixed(1)}us  (IQR ${(
+          r.iqr * 1000
+        ).toFixed(1)})`
       );
 
     // undo() cost
@@ -820,7 +900,11 @@ if (want('timetravel')) {
       undoTimes.push(performance.now() - t0);
     }
     const u = stats(undoTimes);
-    console.log(`    undo() at ${n} leaves: ${u.med.toFixed(3)}ms (IQR ${u.iqr.toFixed(3)})`);
+    console.log(
+      `    undo() at ${n} leaves: ${u.med.toFixed(3)}ms (IQR ${u.iqr.toFixed(
+        3
+      )})`
+    );
 
     // Retained bytes per history entry. Entries must be forced apart: a
     // SYNCHRONOUS burst coalesces into one flush, and addEntry() also dedupes
@@ -829,7 +913,9 @@ if (want('timetravel')) {
     const bytesFor = async (k) => {
       if (!gc) return null;
       KEEP.length = 0;
-      gc(); gc(); gc();
+      gc();
+      gc();
+      gc();
       const before = process.memoryUsage().heapUsed;
       const tt = signalTree(structuredClone(shape), {
         enhancers: [restoration({ maxHistorySize: 100000 })],
@@ -841,11 +927,14 @@ if (want('timetravel')) {
       }
       await new Promise((r) => setTimeout(r, 0));
       KEEP.push(tt);
-      gc(); gc(); gc();
+      gc();
+      gc();
+      gc();
       const after = process.memoryUsage().heapUsed;
       const len = tt.getRestorationHistory().length;
       KEEP.length = 0;
-      gc(); gc();
+      gc();
+      gc();
       return { bytes: after - before, len };
     };
     const b1 = await bytesFor(1);
@@ -854,11 +943,12 @@ if (want('timetravel')) {
       console.log(
         `    retained per history entry (${n} leaves): ` +
           `${kb((b21.bytes - b1.bytes) / (b21.len - b1.len))}  ` +
-          `[entries ${b1.len} -> ${b21.len}, heap ${kb(b1.bytes)} -> ${kb(b21.bytes)}]`
+          `[entries ${b1.len} -> ${b21.len}, heap ${kb(b1.bytes)} -> ${kb(
+            b21.bytes
+          )}]`
       );
     else console.log('    retained per history entry: n/a (needs --expose-gc)');
   }
-
 }
 
 // restoration installs a GLOBAL PathNotifier onFlush listener per enhanced tree,
@@ -866,7 +956,9 @@ if (want('timetravel')) {
 // process — including flushes caused by an unrelated tree. So this must run in
 // its own process or the numbers are contaminated by trees created above.
 if (want('ttentity')) {
-  console.log('\n=== 1d-bis. entityMap under restoration (run in a CLEAN process) ===');
+  console.log(
+    '\n=== 1d-bis. entityMap under restoration (run in a CLEAN process) ==='
+  );
   const N = 5000;
   // Order matters: the no-enhancer baseline must be taken BEFORE any
   // restoration tree exists in the process (see ttleak below).
@@ -874,9 +966,7 @@ if (want('ttentity')) {
     const xs = [];
     for (let i = 0; i < 20; i++) {
       const t0 = performance.now();
-      undoable(() =>
-        t.$.items.updateOne(i, { value: -i - Math.random() })
-      );
+      undoable(() => t.$.items.updateOne(i, { value: -i - Math.random() }));
       await Promise.resolve();
       await Promise.resolve();
       xs.push(performance.now() - t0);
@@ -896,7 +986,11 @@ if (want('ttentity')) {
   t.$.items.setAll(mkItems(N));
   await new Promise((r) => setTimeout(r, 10));
   await measure(t, `entityMap(${N}) updateOne + flush, restoration(): `);
-  console.log(`  history after 20 distinct updates: ${t.getRestorationHistory().length} entries`);
+  console.log(
+    `  history after 20 distinct updates: ${
+      t.getRestorationHistory().length
+    } entries`
+  );
 }
 
 // Cross-tree isolation control. Restoration subscribes to the process-global
@@ -904,7 +998,9 @@ if (want('ttentity')) {
 // work to an entityMap flush. It must report the measurements rather than assume
 // the pre-fix global-snapshot behavior still exists.
 if (want('ttleak')) {
-  console.log('\n=== 1d-ter. cross-tree cost of a live restoration() tree (CLEAN process) ===');
+  console.log(
+    '\n=== 1d-ter. cross-tree cost of a live restoration() tree (CLEAN process) ==='
+  );
   const A = signalTree({ items: entityMap() });
   A.$.items.setAll(mkItems(2000));
   await new Promise((r) => setTimeout(r, 10));
@@ -919,7 +1015,11 @@ if (want('ttleak')) {
     }
     console.log(`  ${label} ${stats(xs).med.toFixed(3)}ms`);
   };
-  await probe('entityMap(2000).updateOne + flush, no restoration tree alive:      '.padEnd(70));
+  await probe(
+    'entityMap(2000).updateOne + flush, no restoration tree alive:      '.padEnd(
+      70
+    )
+  );
   const others = [];
   for (let k = 1; k <= 3; k++) {
     others.push(
@@ -928,10 +1028,16 @@ if (want('ttleak')) {
       })
     );
     await new Promise((r) => setTimeout(r, 10));
-    await probe(`same write, with ${k} unrelated 10000-leaf restoration tree(s) alive:`.padEnd(70));
+    await probe(
+      `same write, with ${k} unrelated 10000-leaf restoration tree(s) alive:`.padEnd(
+        70
+      )
+    );
   }
   console.log(
-    `  unrelated histories: ${others.map((t) => t.getRestorationHistory().length).join('/')} ` +
+    `  unrelated histories: ${others
+      .map((t) => t.getRestorationHistory().length)
+      .join('/')} ` +
       `(unchanged histories and flat timings indicate isolation).`
   );
 }
@@ -949,7 +1055,8 @@ if (want('equality')) {
   {
     const t = signalTree({ obj: { a: 1, b: { c: 2 } }, arr: [1, 2, 3] });
     console.log(
-      `  probe: typeof tree.$.obj.set = ${typeof t.$.obj.set} (undefined => branch, not a leaf); ` +
+      `  probe: typeof tree.$.obj.set = ${typeof t.$.obj
+        .set} (undefined => branch, not a leaf); ` +
         `typeof tree.$.arr.set = ${typeof t.$.arr.set} (function => leaf)`
     );
   }
@@ -964,14 +1071,19 @@ if (want('equality')) {
     }));
 
   // ---- 3a. suppression rate on a realistic re-fetch -------------------------
-  console.log('\n-- 3a. notification suppression on a polling re-fetch (500 polls, 200-row list) --');
+  console.log(
+    '\n-- 3a. notification suppression on a polling re-fetch (500 polls, 200-row list) --'
+  );
   for (const [label, changeEvery] of [
     ['identical payload every poll', 0],
     ['one row changes every 10th poll', 10],
     ['one row changes every poll', 1],
   ]) {
     const mk = (shallow) => {
-      const t = signalTree({ data: rows(200) }, shallow ? { useShallowComparison: true } : {});
+      const t = signalTree(
+        { data: rows(200) },
+        shallow ? { useShallowComparison: true } : {}
+      );
       let runs = 0;
       const c = computed(() => {
         runs++;
@@ -980,7 +1092,9 @@ if (want('equality')) {
       c();
       const start = runs;
       for (let i = 1; i <= 500; i++) {
-        t.$.data.set(rows(200, changeEvery && i % changeEvery === 0 ? i % 200 : -1));
+        t.$.data.set(
+          rows(200, changeEvery && i % changeEvery === 0 ? i % 200 : -1)
+        );
         c();
       }
       return runs - start;
@@ -990,7 +1104,9 @@ if (want('equality')) {
     const real = changeEvery === 0 ? 0 : Math.floor(500 / changeEvery);
     console.log(
       `  ${label.padEnd(33)} real changes=${String(real).padStart(3)}  ` +
-        `deepEqual notified=${String(deep).padStart(3)}  Object.is notified=${String(shallow).padStart(3)}  ` +
+        `deepEqual notified=${String(deep).padStart(
+          3
+        )}  Object.is notified=${String(shallow).padStart(3)}  ` +
         `→ ${shallow - deep} spurious notifications suppressed ` +
         `(${(((shallow - deep) / Math.max(1, shallow)) * 100).toFixed(0)}%)`
     );
@@ -998,7 +1114,9 @@ if (want('equality')) {
 
   // ---- 3b. cost per write as a function of leaf size ------------------------
   console.log('\n-- 3b. cost per write vs leaf size --');
-  console.log('   identical payload = worst case (no mismatch, so the walk runs to the end)');
+  console.log(
+    '   identical payload = worst case (no mismatch, so the walk runs to the end)'
+  );
   const WRITES = 200;
   for (const n of [1, 10, 100, 1000, 10000]) {
     const same = rows(n);
@@ -1017,7 +1135,10 @@ if (want('equality')) {
         [
           'Object.is (useShallowComparison)',
           () => {
-            const t = signalTree({ data: rows(n) }, { useShallowComparison: true });
+            const t = signalTree(
+              { data: rows(n) },
+              { useShallowComparison: true }
+            );
             return () => {
               for (let i = 0; i < WRITES; i++) t.$.data.set(same.slice());
             };
@@ -1030,16 +1151,25 @@ if (want('equality')) {
   }
 
   // ---- 3c. crossover: deep-compare cost vs the recompute it suppresses ------
-  console.log('\n-- 3c. crossover: deepEqual cost vs the downstream recompute it suppresses --');
-  console.log('   Workload: a poll that returns an IDENTICAL payload (the case deepEqual exists');
-  console.log('   for) plus D dependent selectors, each an O(leaf) pass. deepEqual pays for');
+  console.log(
+    '\n-- 3c. crossover: deepEqual cost vs the downstream recompute it suppresses --'
+  );
+  console.log(
+    '   Workload: a poll that returns an IDENTICAL payload (the case deepEqual exists'
+  );
+  console.log(
+    '   for) plus D dependent selectors, each an O(leaf) pass. deepEqual pays for'
+  );
   console.log('   itself when its walk is cheaper than D recomputes.');
   for (const D of [1, 2, 4]) {
     console.log(`\n   with ${D} dependent selector(s):`);
     for (const n of [10, 100, 1000, 10000]) {
       const same = rows(n);
       const mkArm = (shallow) => () => {
-        const t = signalTree({ data: rows(n) }, shallow ? { useShallowComparison: true } : {});
+        const t = signalTree(
+          { data: rows(n) },
+          shallow ? { useShallowComparison: true } : {}
+        );
         const sels = Array.from({ length: D }, () =>
           computed(() => {
             let acc = 0;
@@ -1066,13 +1196,17 @@ if (want('equality')) {
       );
       const delta = ((r[1].med - r[0].med) * 1000) / 100;
       console.log(
-        `       → deepEqual ${delta >= 0 ? 'WINS' : 'LOSES'} by ${Math.abs(delta).toFixed(2)}us/poll`
+        `       → deepEqual ${delta >= 0 ? 'WINS' : 'LOSES'} by ${Math.abs(
+          delta
+        ).toFixed(2)}us/poll`
       );
     }
   }
 
   // ---- 3d. raw deepEqual throughput vs value size ---------------------------
-  console.log('\n-- 3d. raw deepEqual throughput on equal arrays (full walk) --');
+  console.log(
+    '\n-- 3d. raw deepEqual throughput on equal arrays (full walk) --'
+  );
   for (const n of [10, 100, 1000, 10000, 100000]) {
     const a = rows(n);
     const b = rows(n);
@@ -1085,13 +1219,16 @@ if (want('equality')) {
     }
     const st = stats(times);
     console.log(
-      `  ${String(n).padStart(6)} rows: ${(st.med * 1000).toFixed(2)}us/call  ` +
-        `(${((st.med * 1e6) / n).toFixed(1)}ns per row)`
+      `  ${String(n).padStart(6)} rows: ${(st.med * 1000).toFixed(
+        2
+      )}us/call  ` + `(${((st.med * 1e6) / n).toFixed(1)}ns per row)`
     );
   }
 
   // ---- 3e. reference equality: what actually breaks -------------------------
-  console.log('\n-- 3e. what breaks under reference equality: updateAndReport on a re-fetch --');
+  console.log(
+    '\n-- 3e. what breaks under reference equality: updateAndReport on a re-fetch --'
+  );
   {
     const mk = (shallow) => {
       const t = signalTree(
@@ -1100,7 +1237,10 @@ if (want('equality')) {
       );
       let reported = 0;
       for (let i = 0; i < 100; i++) {
-        const changes = t.updateAndReport({ list: rows(200), meta: { total: 200, page: 1 } });
+        const changes = t.updateAndReport({
+          list: rows(200),
+          meta: { total: 200, page: 1 },
+        });
         reported += Array.isArray(changes) ? changes.length : 0;
       }
       return reported;

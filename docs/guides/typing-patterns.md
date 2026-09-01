@@ -4,60 +4,66 @@ This page documents the preferred pattern for typing initialized SignalTree stat
 
 ### ✅ PREFERRED: Type the initialized object, let inference handle the rest
 
-````typescript
+```typescript
+import { signalTree } from '@signal-tree/angular';
+
 type Themes = 'light' | 'dark' | 'system';
 
-// Type assertions on specific values in the initial state
+// Assert the type on the specific values in the initial state; inference
+// propagates the rest of the tree's typing from there.
 const store = signalTree({
   user: {
     name: '',
     email: '',
-    theme: 'system' as Themes, // Assert literal type here
+    theme: 'system' as Themes,
   },
   preferences: {
-    ## Single Source of Truth for Initial Value AND Type
+    density: 'comfortable' as 'comfortable' | 'compact',
+    pinned: [] as string[],
+  },
+});
+```
 
-    **Define what a field starts as AND what it can become in one place.**
+### Single Source of Truth for Initial Value AND Type
 
-    ```typescript
-    // ✅ PREFERRED: Initial value + type in one place
-    const tree = signalTree({
-      name: 'John' as string,           // Starts as 'John', can be any string
-      theme: 'dark' as Theme,           // Starts as 'dark', can be any Theme
-      count: 0 as number,               // Starts as 0, can be any number
-      items: [] as Item[],              // Starts empty, can hold Items
-    });
-    ```
+**Define what a field starts as AND what it can become in one place.**
 
-    ```typescript
-    // ❌ AVOID: Type in one place, value in another
-    interface State {
-      name: string;      // Type here...
-      theme: Theme;
-      count: number;
-      items: Item[];
-    }
+```typescript
+// ✅ PREFERRED: Initial value + type in one place
+const tree = signalTree({
+  name: 'John' as string, // Starts as 'John', can be any string
+  theme: 'dark' as Theme, // Starts as 'dark', can be any Theme
+  count: 0 as number, // Starts as 0, can be any number
+  items: [] as Item[], // Starts empty, can hold Items
+});
+```
 
-    const tree = signalTree<State>({
-      name: 'John',      // ...value here (now you have two places to maintain)
-      theme: 'dark',
-      count: 0,
-      items: [],
-    });
-    ```
+```typescript
+// ❌ AVOID: Type in one place, value in another
+interface State {
+  name: string; // Type here...
+  theme: Theme;
+  count: number;
+  items: Item[];
+}
 
-    ### Why?
+const tree = signalTree<State>({
+  name: 'John', // ...value here (now you have two places to maintain)
+  theme: 'dark',
+  count: 0,
+  items: [],
+});
+```
 
-    1. **Single source of debugging** - When a type error occurs, look at the field definition. The fix is right there.
+### Why?
 
-    2. **Co-located intent** - You immediately see "this starts as X and can become Y" without jumping between files/locations.
+1. **Single source of debugging** - When a type error occurs, look at the field definition. The fix is right there.
 
-    3. **Let inference work for you** - TypeScript propagates the type through the entire tree automatically. You only annotate at the leaves.
+2. **Co-located intent** - You immediately see "this starts as X and can become Y" without jumping between files/locations.
 
-    4. **Reduced maintenance** - Change the type in one place, not two. No interface to keep in sync.
+3. **Let inference work for you** - TypeScript propagates the type through the entire tree automatically. You only annotate at the leaves.
 
-    (Place these examples in code samples and `QUICK_REFERENCE.md` to teach contributors the pattern.)
-````
+4. **Reduced maintenance** - Change the type in one place, not two. No interface to keep in sync.
 
 ### Object leaves vs nested nodes (when `.set()` doesn't exist)
 

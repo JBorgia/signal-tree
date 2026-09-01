@@ -147,6 +147,7 @@ For non-trivial applications:
 
 ```typescript
 import { Injectable, inject } from '@angular/core';
+import { external } from '@signal-tree/angular';
 
 @Injectable({ providedIn: 'root' })
 export class UserOps {

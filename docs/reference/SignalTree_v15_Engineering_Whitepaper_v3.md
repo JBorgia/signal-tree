@@ -6,7 +6,7 @@
 
 **Engineering whitepaper - RC1 cut: August 30, 2026**
 
-**Document status:** RC1 engineering whitepaper. The v15 public API and construction/access surface are frozen. Candidate source `4020b7dd` has one constructor (`signalTree(initialState, config?)`), one recursive `$` facade, and one singular `config.derived` factory. The public package graph is `@signal-tree/kernel` plus `@signal-tree/angular`; kernel-only utilities now live under kernel internals rather than a private workspace package. The complete release matrix is green; later sections retain the chronology of hypotheses that were subsequently retired or moved across the package boundary.
+**Document status:** RC1 engineering whitepaper. The v15 public API and construction/access surface are frozen. Candidate source `4020b7dd` has one constructor (`signalTree(initialState, config?)`), one recursive `$` facade, and one singular `config.derived` factory. The public package graph is `@signal-tree/kernel`, `@signal-tree/angular`, and `@signal-tree/react`; kernel-only utilities now live under kernel internals rather than a private workspace package. The complete release matrix is green; later sections retain the chronology of hypotheses that were subsequently retired or moved across the package boundary.
 
 > This paper is reconstructed from the v15 engineering record: code audits, commit history, decision documents, benchmark outputs, falsification probes, type-contract tests, GC tests, and the latest lifecycle discriminator. The separately supplied `Signaltree15.pdf` was explicitly excluded as a source.
 

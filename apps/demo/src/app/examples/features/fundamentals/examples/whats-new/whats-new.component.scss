@@ -12,6 +12,14 @@
     color: $text-light;
   }
 
+  .historical-note {
+    background: var(--color-warning-50, #fffbeb);
+    border: 1px solid var(--color-warning-300, #fcd34d);
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    margin-bottom: $spacing-xl;
+  }
+
   .release-highlights {
     background: linear-gradient(135deg, var(--color-info-50) 0%, var(--color-info-100) 100%);
     border: 1px solid $primary;

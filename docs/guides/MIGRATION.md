@@ -2,8 +2,11 @@
 
 > **HISTORICAL v4-v13 GUIDE.** The package names, imports, and APIs below
 > describe their release at that time and are not current SignalTree 15 usage.
-> For the current breaking changes and package surface, use
-> [Migration v14 to v15](migration-v14-v15.md).
+> Everything under the old `@signaltree/*` (no hyphen) scope stopped at 14.1.1.
+> SignalTree 15 ships as `@signal-tree/kernel`, `@signal-tree/angular`, and
+> `@signal-tree/react`. **If you are on any `@signaltree/*` package, go straight
+> to [Migration `@signaltree/*` → `@signal-tree/*` (v15)](migration-v14-v15.md)** —
+> it is the single migration target for every earlier version.
 
 > **SignalTree** — Reactive JSON for Angular. JSON branches, reactive leaves.
 

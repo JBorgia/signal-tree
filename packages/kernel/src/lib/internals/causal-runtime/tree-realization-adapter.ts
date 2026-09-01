@@ -1,11 +1,13 @@
-import type { ISignalTree, PositionId, StructuralEffect, WriteMetadata } from '../../types';
+import type {
+  ISignalTree,
+  PositionId,
+  StructuralEffect,
+  WriteMetadata,
+} from '../../types';
 import { getPathNotifier } from '../../path-notifier';
 import { getActiveWriteContext, withWriteContext } from '../../write-context';
 import { deepClone } from '../utilities/deep-clone';
-import {
-  getOwnedOwnerPath,
-  getOwnedPositionIds,
-} from '../owned-mutation';
+import { getOwnedOwnerPath, getOwnedPositionIds } from '../owned-mutation';
 import { getPhysicalCommitClock } from '../physical-commit-clock';
 import {
   getPositionRegistry,
@@ -20,7 +22,10 @@ import { getTreeRealization } from '../tree-realization';
 import type { ReversalEffect, ReversalRefusal } from './causal-types';
 import { normalizeScopedValuePath } from './scoped-value-addressing';
 
-type StructuralDriftRefusal = Extract<ReversalRefusal, { readonly kind: 'structural-drift' }>;
+type StructuralDriftRefusal = Extract<
+  ReversalRefusal,
+  { readonly kind: 'structural-drift' }
+>;
 
 const TREE_REALIZATION_DESCRIPTORS = Symbol.for(
   'SignalTree:TreeRealizationDescriptors'
@@ -79,7 +84,9 @@ type CollectionNode = {
     publish(metaOverride?: WriteMetadata): void;
   };
   __findKeyBySubjectId?(subjectId: number): string | number | undefined;
-  __inspectSubjectResources?(subjectId: number): { state: 'active' | 'tombstoned' } | undefined;
+  __inspectSubjectResources?(
+    subjectId: number
+  ): { state: 'active' | 'tombstoned' } | undefined;
   __restoreOne?(
     key: string | number,
     entity: unknown,
@@ -139,7 +146,7 @@ class PreparedRealizationContext {
     subjectId: number,
     collectionPath: string,
     key: string | number,
-    value: unknown,
+    value: unknown
   ): void {
     this.subjects.set(subjectId, {
       collectionPath,
@@ -175,7 +182,7 @@ class PreparedRealizationContext {
     subjectId: number,
     collectionPath: string,
     key: string | number,
-    value: unknown,
+    value: unknown
   ): void {
     const existing = this.subjects.get(subjectId);
     const currentValue = existing?.value ?? value;
@@ -227,7 +234,10 @@ export interface TreeRealizationDescriptor {
   readonly fieldPathFromRow?: string;
   readonly structuralEffects?: ReadonlyMap<string, StructuralEffect>;
   readonly structuralEffectBySubject?: ReadonlyMap<string, StructuralEffect>;
-  readonly subjectDescriptors?: ReadonlyMap<string, SubjectRealizationDescriptor>;
+  readonly subjectDescriptors?: ReadonlyMap<
+    string,
+    SubjectRealizationDescriptor
+  >;
 }
 
 export interface RememberTreeRealizationDescriptorOptions {
@@ -286,7 +296,10 @@ export function rememberTreeRealizationDescriptor(
       : new Map(existing?.structuralEffectBySubject ?? []);
   const subjectDescriptors =
     existing?.subjectDescriptors instanceof Map
-      ? (existing.subjectDescriptors as Map<string, SubjectRealizationDescriptor>)
+      ? (existing.subjectDescriptors as Map<
+          string,
+          SubjectRealizationDescriptor
+        >)
       : new Map(existing?.subjectDescriptors ?? []);
   if (options.meta?.structuralEffect) {
     structuralEffects.set(
@@ -336,8 +349,7 @@ export function rememberTreeRealizationDescriptor(
   const nextPath = existing?.path ?? options.path;
   const nextOwnerPath = existing?.ownerPath ?? ownerPath;
   const nextCollectionPath = existing?.collectionPath ?? collectionPath;
-  const nextFieldPathFromRow =
-    existing?.fieldPathFromRow ?? fieldPathFromRow;
+  const nextFieldPathFromRow = existing?.fieldPathFromRow ?? fieldPathFromRow;
 
   if (
     existing?.path === nextPath &&
@@ -378,9 +390,11 @@ export function createTreeRealizationAdapter(
   options: CreateTreeRealizationAdapterOptions
 ): TreeRealizationPort {
   const scalarSlotRuntime =
-    getTreeScalarSlotRuntime(options.tree) ?? getTreeScalarSlotRuntime(options.tree.$);
+    getTreeScalarSlotRuntime(options.tree) ??
+    getTreeScalarSlotRuntime(options.tree.$);
   const physicalCommitClock =
-    getPhysicalCommitClock(options.tree) ?? getPhysicalCommitClock(options.tree.$);
+    getPhysicalCommitClock(options.tree) ??
+    getPhysicalCommitClock(options.tree.$);
   const structuralOwnerPaths = indexStructuralOwnerPaths(options.tree.$);
 
   return {
@@ -477,9 +491,12 @@ export function getTreeRealizationDescriptors(
     return undefined;
   }
 
-  return (node as Record<symbol, Map<PositionId, TreeRealizationDescriptor> | undefined>)[
-    TREE_REALIZATION_DESCRIPTORS
-  ];
+  return (
+    node as Record<
+      symbol,
+      Map<PositionId, TreeRealizationDescriptor> | undefined
+    >
+  )[TREE_REALIZATION_DESCRIPTORS];
 }
 
 export function defineTreeRealizationPort(
@@ -552,7 +569,10 @@ function planHeterogeneousFrame(
   for (const effect of effects) {
     const removeEffect =
       effect.structural === 'remove' && typeof effect.subjectId === 'number'
-        ? (effect as ReversalEffect & { structural: 'remove'; subjectId: number })
+        ? (effect as ReversalEffect & {
+            structural: 'remove';
+            subjectId: number;
+          })
         : undefined;
 
     if (removeEffect) {
@@ -619,14 +639,19 @@ function planHeterogeneousFrame(
       effect.structural === 'rekey'
   );
   const restoreEffects = effects.filter(
-    (effect): effect is ReversalEffect & { structural: 'add'; subjectId: number } =>
+    (
+      effect
+    ): effect is ReversalEffect & { structural: 'add'; subjectId: number } =>
       effect.structural === 'add' && typeof effect.subjectId === 'number'
   );
   const baseRevision = scalarSlotRuntime?.revision();
-  const scalarFrameRuntime = framedScalarEffects.length > 0 ? scalarSlotRuntime : undefined;
+  const scalarFrameRuntime =
+    framedScalarEffects.length > 0 ? scalarSlotRuntime : undefined;
 
   const scalarFrame =
-    framedScalarEffects.length > 0 ? scalarFrameRuntime?.beginFrame() : undefined;
+    framedScalarEffects.length > 0
+      ? scalarFrameRuntime?.beginFrame()
+      : undefined;
   if (framedScalarEffects.length > 0 && (!scalarFrameRuntime || !scalarFrame)) {
     return undefined;
   }
@@ -674,7 +699,9 @@ function planHeterogeneousFrame(
       structuralOwnerPaths,
       effect
     );
-    const subjectInventory = collectionNode?.__inspectSubjectResources?.(effect.subjectId);
+    const subjectInventory = collectionNode?.__inspectSubjectResources?.(
+      effect.subjectId
+    );
     const isFreshSubject = subjectInventory === undefined;
     if (
       !collectionNode ||
@@ -737,7 +764,9 @@ function planHeterogeneousFrame(
       return undefined;
     }
 
-    const slotIndex = resolvedScalarFrameRuntime.resolveScalarSlot(effect.owner);
+    const slotIndex = resolvedScalarFrameRuntime.resolveScalarSlot(
+      effect.owner
+    );
     if (slotIndex === undefined) {
       scalarFrame?.discard();
       return undefined;
@@ -767,7 +796,8 @@ function planHeterogeneousFrame(
         ? preparedContext.resolveSubject(effect.subjectId)
         : undefined;
     const plan =
-      preparedSubject && typeof collectionNode.__planPreparedRekey === 'function'
+      preparedSubject &&
+      typeof collectionNode.__planPreparedRekey === 'function'
         ? collectionNode.__planPreparedRekey(
             effect.before as string | number,
             effect.after as string | number,
@@ -775,11 +805,11 @@ function planHeterogeneousFrame(
             preparedSubject.value
           )
         : typeof collectionNode.__planRekey === 'function'
-          ? collectionNode.__planRekey(
-              effect.before as string | number,
-              effect.after as string | number
-            )
-          : undefined;
+        ? collectionNode.__planRekey(
+            effect.before as string | number,
+            effect.after as string | number
+          )
+        : undefined;
     if (!plan) {
       scalarFrame?.discard();
       return undefined;
@@ -799,7 +829,9 @@ function planHeterogeneousFrame(
   }
 
   const removeEffects = effects.filter(
-    (effect): effect is ReversalEffect & { structural: 'remove'; subjectId: number } =>
+    (
+      effect
+    ): effect is ReversalEffect & { structural: 'remove'; subjectId: number } =>
       effect.structural === 'remove' && typeof effect.subjectId === 'number'
   );
 
@@ -897,7 +929,10 @@ function planHeterogeneousFrame(
           });
         }
 
-        for (const effect of [...preparedSubjectScalarEffects, ...framedScalarEffects]) {
+        for (const effect of [
+          ...preparedSubjectScalarEffects,
+          ...framedScalarEffects,
+        ]) {
           const descriptor = descriptors.get(effect.owner);
           const notifyPath = resolveNotifyPath(
             tree,
@@ -914,7 +949,9 @@ function planHeterogeneousFrame(
             effect.after,
             effect.before,
             descriptor?.ownerPath ?? notifyPath,
-            typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
+            typeof effect.subjectId === 'number'
+              ? [effect.subjectId]
+              : undefined,
             [effect.owner],
             {
               ...(getActiveWriteContext() ?? {}),
@@ -1061,7 +1098,11 @@ function canApplyEffect(
 
   const currentSubjectKey =
     typeof effect.subjectId === 'number'
-      ? resolvePreparedOrLiveSubjectKey(ownerNode, preparedContext, effect.subjectId)
+      ? resolvePreparedOrLiveSubjectKey(
+          ownerNode,
+          preparedContext,
+          effect.subjectId
+        )
       : undefined;
   const collectionPath = resolveCollectionPath(
     descriptor,
@@ -1082,13 +1123,21 @@ function canApplyEffect(
     case 'remove': {
       const removeEffect =
         typeof effect.subjectId === 'number'
-          ? (effect as ReversalEffect & { structural: 'remove'; subjectId: number })
+          ? (effect as ReversalEffect & {
+              structural: 'remove';
+              subjectId: number;
+            })
           : undefined;
       return (
         (removeEffect
-          ? resolveEffectiveRemoveKey(ownerNode, preparedContext, removeEffect) !== undefined
+          ? resolveEffectiveRemoveKey(
+              ownerNode,
+              preparedContext,
+              removeEffect
+            ) !== undefined
           : hasCollectionKey(ownerNode, effect.before as string | number)) &&
-        (typeof effect.subjectId !== 'number' || currentSubjectKey !== undefined)
+        (typeof effect.subjectId !== 'number' ||
+          currentSubjectKey !== undefined)
       );
     }
     case 'rekey':
@@ -1096,7 +1145,8 @@ function canApplyEffect(
         (typeof effect.subjectId === 'number'
           ? currentSubjectKey === effect.before
           : hasCollectionKey(ownerNode, effect.before as string | number)) &&
-        (typeof effect.subjectId !== 'number' || currentSubjectKey === effect.before) &&
+        (typeof effect.subjectId !== 'number' ||
+          currentSubjectKey === effect.before) &&
         !destinationOccupied
       );
     case 'add': {
@@ -1129,7 +1179,9 @@ function applyEffect(
     !hasInlineSubjectAddress(effect) &&
     !hasInlineScopedAddress(effect)
   ) {
-    throw new Error(`Missing live descriptor for owner ${String(effect.owner)}`);
+    throw new Error(
+      `Missing live descriptor for owner ${String(effect.owner)}`
+    );
   }
 
   withWriteContext(
@@ -1157,7 +1209,9 @@ function applyEffect(
         }
 
         if (!isWritableLeaf(target)) {
-          throw new Error(`Missing live leaf for owner ${String(effect.owner)}`);
+          throw new Error(
+            `Missing live leaf for owner ${String(effect.owner)}`
+          );
         }
         return;
       }
@@ -1182,15 +1236,19 @@ function applyEffect(
         case 'remove': {
           const removeEffect =
             typeof effect.subjectId === 'number'
-              ? (effect as ReversalEffect & { structural: 'remove'; subjectId: number })
+              ? (effect as ReversalEffect & {
+                  structural: 'remove';
+                  subjectId: number;
+                })
               : undefined;
-          const effectiveRemoveKey =
-            removeEffect
-              ? resolveEffectiveRemoveKey(ownerNode, undefined, removeEffect)
-              : (effect.before as string | number);
+          const effectiveRemoveKey = removeEffect
+            ? resolveEffectiveRemoveKey(ownerNode, undefined, removeEffect)
+            : (effect.before as string | number);
           if (effectiveRemoveKey === undefined) {
             throw new Error(
-              `Missing live structural subject for owner ${String(effect.owner)}`
+              `Missing live structural subject for owner ${String(
+                effect.owner
+              )}`
             );
           }
 
@@ -1201,7 +1259,9 @@ function applyEffect(
           const structuralEffect = getStructuralAddEffect(descriptor, effect);
           if (!structuralEffect) {
             throw new Error(
-              `Missing structural restore metadata for owner ${String(effect.owner)}`
+              `Missing structural restore metadata for owner ${String(
+                effect.owner
+              )}`
             );
           }
 
@@ -1226,7 +1286,12 @@ function resolveLiveScalarNode(
   effect: ReversalEffect
 ): unknown {
   if (typeof effect.subjectId === 'number') {
-    return resolveCurrentSubjectTarget(tree, descriptor, effect.subjectId, effect);
+    return resolveCurrentSubjectTarget(
+      tree,
+      descriptor,
+      effect.subjectId,
+      effect
+    );
   }
 
   if (hasInlineScopedAddress(effect)) {
@@ -1270,15 +1335,21 @@ function canResolvePreparedSubjectTarget(
     return false;
   }
 
-  const fieldPathFromRow = resolveSubjectFieldPath(descriptor, effect, registry);
+  const fieldPathFromRow = resolveSubjectFieldPath(
+    descriptor,
+    effect,
+    registry
+  );
   if (!fieldPathFromRow) {
     return false;
   }
 
-  return resolveNodeAtPath(
-    preparedSubject.value as Record<string, unknown>,
-    fieldPathFromRow
-  ) !== undefined;
+  return (
+    resolveNodeAtPath(
+      preparedSubject.value as Record<string, unknown>,
+      fieldPathFromRow
+    ) !== undefined
+  );
 }
 
 function resolveCollectionNode(
@@ -1296,7 +1367,10 @@ function resolveCollectionNode(
     return undefined;
   }
 
-  const node = resolveNodeAtPath(tree.$ as Record<string, unknown>, collectionPath);
+  const node = resolveNodeAtPath(
+    tree.$ as Record<string, unknown>,
+    collectionPath
+  );
   return isCollectionNode(node) ? node : undefined;
 }
 
@@ -1305,9 +1379,11 @@ function resolveCollectionPath(
   structuralOwnerPaths: ReadonlyMap<PositionId, string>,
   effect: ReversalEffect
 ): string | undefined {
-  return descriptor?.collectionPath ??
+  return (
+    descriptor?.collectionPath ??
     (effect.structural ? descriptor?.ownerPath : undefined) ??
-    structuralOwnerPaths.get(effect.owner);
+    structuralOwnerPaths.get(effect.owner)
+  );
 }
 
 function isCollectionKeyOccupied(
@@ -1317,7 +1393,10 @@ function isCollectionKeyOccupied(
   preparedContext: PreparedRealizationContext | undefined
 ): boolean {
   if (collectionPath) {
-    const preparedOccupancy = preparedContext?.resolveOccupancy(collectionPath, key);
+    const preparedOccupancy = preparedContext?.resolveOccupancy(
+      collectionPath,
+      key
+    );
     if (preparedOccupancy === 'vacant') {
       return false;
     }
@@ -1347,7 +1426,11 @@ function resolveEffectiveRemoveKey(
   preparedContext: PreparedRealizationContext | undefined,
   effect: ReversalEffect & { structural: 'remove'; subjectId: number }
 ): string | number | undefined {
-  return resolvePreparedOrLiveSubjectKey(ownerNode, preparedContext, effect.subjectId);
+  return resolvePreparedOrLiveSubjectKey(
+    ownerNode,
+    preparedContext,
+    effect.subjectId
+  );
 }
 
 function snapshotCollectionEntityValue(
@@ -1368,9 +1451,17 @@ function updatePreparedRealizationContext(
   if (typeof effect.subjectId === 'number' && !effect.structural) {
     const descriptor = descriptors.get(effect.owner);
     const preparedSubject = preparedContext.resolveSubject(effect.subjectId);
-    const fieldPathFromRow = resolveSubjectFieldPath(descriptor, effect, getPositionRegistry(tree.$));
+    const fieldPathFromRow = resolveSubjectFieldPath(
+      descriptor,
+      effect,
+      getPositionRegistry(tree.$)
+    );
     if (preparedSubject && fieldPathFromRow) {
-      assignPreparedSubjectValue(preparedSubject.value, fieldPathFromRow, effect.after);
+      assignPreparedSubjectValue(
+        preparedSubject.value,
+        fieldPathFromRow,
+        effect.after
+      );
     }
     return;
   }
@@ -1506,9 +1597,12 @@ function resolveSubjectFieldPath(
   }
 
   const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect, registry);
-  return inlineFieldPathFromRow ??
-    descriptor?.subjectDescriptors?.get(String(effect.subjectId))?.fieldPathFromRow ??
-    descriptor?.fieldPathFromRow;
+  return (
+    inlineFieldPathFromRow ??
+    descriptor?.subjectDescriptors?.get(String(effect.subjectId))
+      ?.fieldPathFromRow ??
+    descriptor?.fieldPathFromRow
+  );
 }
 
 function assignPreparedSubjectValue(
@@ -1562,7 +1656,9 @@ function indexStructuralOwnerPaths(root: unknown): Map<PositionId, string> {
         return undefined;
       }
 
-      const positionId = getOwnedPositionIds(node)?.[0] as PositionId | undefined;
+      const positionId = getOwnedPositionIds(node)?.[0] as
+        | PositionId
+        | undefined;
       const ownerPath = getOwnedOwnerPath(node);
       if (positionId === undefined || ownerPath === undefined) {
         return undefined;
@@ -1575,7 +1671,8 @@ function indexStructuralOwnerPaths(root: unknown): Map<PositionId, string> {
       return undefined;
     },
     {
-      skipKey: (key) => key === 'set' || key === 'update' || key.startsWith('_'),
+      skipKey: (key) =>
+        key === 'set' || key === 'update' || key.startsWith('_'),
     }
   );
 
@@ -1591,7 +1688,9 @@ function resolveCurrentSubjectTarget(
   const registry = getPositionRegistry(tree.$);
   const inlineCollectionPath = deriveCollectionPathFromEffect(effect, registry);
   const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect, registry);
-  const subjectDescriptor = descriptor?.subjectDescriptors?.get(String(subjectId));
+  const subjectDescriptor = descriptor?.subjectDescriptors?.get(
+    String(subjectId)
+  );
   const collectionPath =
     inlineCollectionPath ??
     subjectDescriptor?.collectionPath ??
@@ -1627,7 +1726,10 @@ function resolveCurrentSubjectTarget(
     return undefined;
   }
 
-  return resolveNodeAtPath(rowNode as Record<string, unknown>, fieldPathFromRow);
+  return resolveNodeAtPath(
+    rowNode as Record<string, unknown>,
+    fieldPathFromRow
+  );
 }
 
 function resolveNotifyPath(
@@ -1649,7 +1751,8 @@ function resolveNotifyPath(
   const inlineFieldPathFromRow = deriveFieldPathFromEffect(effect, registry);
   const collectionPath =
     inlineCollectionPath ??
-    descriptor?.subjectDescriptors?.get(String(effect.subjectId))?.collectionPath ??
+    descriptor?.subjectDescriptors?.get(String(effect.subjectId))
+      ?.collectionPath ??
     descriptor?.collectionPath ??
     structuralOwnerPaths.get(effect.owner);
   if (collectionPath === undefined) {
@@ -1671,7 +1774,8 @@ function resolveNotifyPath(
 
   const fieldPathFromRow =
     inlineFieldPathFromRow ??
-    descriptor?.subjectDescriptors?.get(String(effect.subjectId))?.fieldPathFromRow ??
+    descriptor?.subjectDescriptors?.get(String(effect.subjectId))
+      ?.fieldPathFromRow ??
     descriptor?.fieldPathFromRow;
   const rowPath = `${collectionPath}.${String(currentKey)}`;
 
@@ -1796,7 +1900,6 @@ function resolveCurrentScopedTarget(
     normalizedRelativePath
   );
 }
-
 
 function resolveNodeAtPath(
   root: Record<string, unknown>,
@@ -1934,9 +2037,7 @@ function deriveSubjectAddress(
 
   // `collection.<key>.<rest>` — a coordinate inside the row.
   const fieldPath = relative.slice(firstDot + 1);
-  return fieldPath === ''
-    ? undefined
-    : { kind: 'field', path: fieldPath };
+  return fieldPath === '' ? undefined : { kind: 'field', path: fieldPath };
 }
 
 /**
@@ -2025,7 +2126,10 @@ function deriveRealizationAddress(
   subjectId: number | undefined,
   structuralEffect: StructuralEffect | undefined,
   canonicalCollectionPath: string | undefined
-): { collectionPath: string | undefined; fieldPathFromRow: string | undefined } {
+): {
+  collectionPath: string | undefined;
+  fieldPathFromRow: string | undefined;
+} {
   if (canonicalCollectionPath !== undefined) {
     return {
       collectionPath: canonicalCollectionPath,
@@ -2055,7 +2159,6 @@ function deriveRealizationAddress(
     ),
   };
 }
-
 
 function parentPath(path: string): string {
   const lastDot = path.lastIndexOf('.');
@@ -2148,7 +2251,9 @@ function toStructuralEffectKey(effect: StructuralEffect): string {
     case 'remove':
       return `${effect.kind}:${String(effect.subject)}:${String(effect.key)}`;
     case 'rekey':
-      return `rekey:${String(effect.subject)}:${String(effect.beforeKey)}:${String(effect.afterKey)}`;
+      return `rekey:${String(effect.subject)}:${String(
+        effect.beforeKey
+      )}:${String(effect.afterKey)}`;
   }
 }
 
@@ -2163,9 +2268,7 @@ function isWritableLeaf(value: unknown): value is WritableLeaf {
 
 function isWritableEntityNode(value: unknown): value is WritableEntityNode {
   return Boolean(
-    value &&
-      typeof value === 'function' &&
-      !('set' in (value as object))
+    value && typeof value === 'function' && !('set' in (value as object))
   );
 }
 
@@ -2189,10 +2292,7 @@ function isCollectionNode(value: unknown): value is CollectionNode {
   );
 }
 
-function hasCollectionKey(
-  node: CollectionNode,
-  key: string | number
-): boolean {
+function hasCollectionKey(node: CollectionNode, key: string | number): boolean {
   try {
     node.byIdOrFail(key);
     return true;

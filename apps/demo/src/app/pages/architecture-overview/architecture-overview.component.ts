@@ -29,7 +29,7 @@ export class ArchitectureOverviewComponent {
     {
       aspect: 'Dependencies',
       separate:
-        'Multiple packages (@signal-tree/kernel, @signaltree/entities, @signaltree/computed…)',
+        'Historically fragmented (@signaltree/core, @signaltree/entities, @signaltree/batching, @signaltree/devtools…)',
       consolidated:
         '@signal-tree/angular for Angular construction; kernel is an exact dependency',
       benefit: 'Framework ownership is explicit',

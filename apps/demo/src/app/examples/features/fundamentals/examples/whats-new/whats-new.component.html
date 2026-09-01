@@ -2,6 +2,96 @@
   <h2>🚀 What's New</h2>
 
   <h3>
+    🧩 v15.0.0-rc.1 — the package and API reset (August 2026)
+  </h3>
+  <div class="release-highlights">
+    <p>
+      The first public candidate for the v15 package and API reset. The
+      packages are now <code>&#64;signal-tree/kernel</code>,
+      <code>&#64;signal-tree/angular</code>, and
+      <code>&#64;signal-tree/react</code>.
+    </p>
+    <h4>💥 Breaking</h4>
+    <ul>
+      <li>
+        <strong>Framework realization is construction-bound.</strong> There is
+        no runtime package installation and no <code>.with()</code> builder.
+        <code>signalTree(state, config)</code> declares state, enhancers, and
+        one <code>derived</code> factory in a single construction call, and
+        each framework package binds its native carriers when it creates a
+        tree. Neutral and Angular trees can coexist in one process.
+      </li>
+      <li>
+        <strong><code>timeTravel(&#123; shouldSkip &#125;)</code> removed.</strong>
+        <code>undo()</code> and <code>redo()</code> move one turn.
+        <code>undoable(fn)</code> asks the admission question
+        <em>before</em> a turn exists: a cursor move is not designated, so
+        there is nothing to skip past and no per-transition predicate runs on
+        every recorded write.
+      </li>
+      <li>
+        <strong><code>entityMap(&#123; recordHistory: false &#125;)</code>
+        removed.</strong> It excluded a collection by location, so a turn
+        touching both it and ordinary state was only partially reversed.
+        Designate the operations that should be undoable with
+        <code>undoable()</code>; everything else costs no restoration at all.
+      </li>
+      <li>
+        <strong>Lazy signal creation removed.</strong> Large trees are cheap to
+        read because of incremental materialization on the default path —
+        measured 149µs for one changed leaf among 10k against 1808µs for a full
+        rebuild — and need no configuration.
+      </li>
+      <li>
+        <strong>The async markers, <code>form()</code>, <code>status()</code>,
+        <code>stored()</code>, and the persistence/edit-session packages are
+        not part of the v15 public surface.</strong> Orchestration, forms, and
+        storage live in application code and framework primitives; the tree
+        stores the results.
+      </li>
+    </ul>
+    <h4>✨ New</h4>
+    <ul>
+      <li>
+        <strong><code>&#64;signal-tree/react</code> ships.</strong>
+        <code>useSignalTree(owner, selector)</code> subscribes to owner
+        invalidation and rereads the selected canonical value without
+        mirroring state. Whole-root observation is the same hook with
+        <code>($) =&gt; $()</code>.
+      </li>
+      <li>
+        <strong><code>transactions()</code></strong> adds explicit tree-local
+        optimistic transaction grouping; rollback failures surface as
+        <code>SignalTreeRollbackError</code> so callers can reconcile or
+        refetch instead of silently corrupting state.
+      </li>
+      <li>
+        <strong>Restoration refuses rather than destroying later truth
+        (ST1034).</strong> An <code>undo()</code>/<code>redo()</code> either
+        reverses the authored operation atomically or does not happen.
+      </li>
+      <li>
+        <strong>Tree lifetime is a documented contract.</strong> A tree owns
+        runtime resources until <code>destroy()</code>; bounded-lifetime trees
+        (tests, SSR requests, route-owned stores) must be destroyed at their
+        ownership boundary.
+      </li>
+    </ul>
+  </div>
+
+  <p class="historical-note">
+    <strong>Everything below is release history.</strong> The v9–v14 sections
+    describe APIs as they were at each release — several were later removed
+    (the async markers, <code>form()</code>, <code>status()</code>,
+    <code>stored()</code>, <code>rxMethod</code>,
+    <code>&#64;signaltree/guardrails</code>, the
+    <code>&#64;signaltree/core</code> package name). They are kept so older
+    logs and migrations route correctly, not as current guidance. The
+    current surface is the package READMEs and
+    <code>CHANGELOG.md</code>.
+  </p>
+
+  <h3>
     🧩 v14.0.0 — a snapshot carries values, not machinery (August 2026)
   </h3>
   <div class="release-highlights">
