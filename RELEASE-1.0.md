@@ -12564,6 +12564,18 @@ delay `GATE F` or GA without a concrete release falsifier.
       leakage. Validation passed: linter self-test and production scan,
       documented imports/symbols, 310/310 links, numeric-claim ratchet,
       declaration-documentation gate, ESLint, and `git diff --check`.
+      **Scripts/release checkpoint:** `d32a1131` replaced the stale scripts
+      catalog with an authority-aware index and its review exposed two live
+      release defects. The dist-reading gate harness now builds the actual
+      `shared,kernel,angular,react` package set instead of nonexistent `core`,
+      and `release.sh` no longer rolls back local/tag state after npm publishing
+      begins, where immutable package versions may already exist. The registered
+      release-state gate now rejects any post-publish `rollback_versions` call;
+      killing fixtures cover standalone, inline, and chained shell forms.
+      Validation passed: release-state live/self-tests, built-barrels live and
+      mutation self-test (including the four-project build), shell syntax,
+      command/path existence checks, documentation links/API checks, and
+      `git diff --check`.
 - [ ] final public API review
 
 Exit condition: `GATE F`
