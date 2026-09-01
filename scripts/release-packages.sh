@@ -7,13 +7,7 @@ PUBLISHABLE_PACKAGES=(
     "react"
 )
 
-# Shared is private and bundled into public packages; it is built, never published.
-BUILD_PACKAGES=(
-    "shared"
-    "kernel"
-    "angular"
-    "react"
-)
+BUILD_PACKAGES=("${PUBLISHABLE_PACKAGES[@]}")
 
 node - "${PUBLISHABLE_PACKAGES[@]}" <<'NODE'
 const fs = require('node:fs');

@@ -50,8 +50,8 @@
  *
  * So every `@signaltree/*` named in an `npm install` line on a live surface must
  * be a directory under `packages/` whose manifest is not `private`. That rules
- * out both a removed package and `@signaltree/shared`, which is private and has
- * never been on the registry.
+ * out removed packages, including the former private `@signaltree/shared`,
+ * which was never on the registry.
  *
  *   node tools/check-doc-links.mjs
  *   node tools/check-doc-links.mjs --list        # every link it can see
@@ -89,7 +89,8 @@ const SKIP_DIR =
  * release instructions, package READMEs, examples — is unaffected and still
  * fully gated.
  */
-const SKIP_FILE = /(^|\/)(docs\/archive\/|docs\/ADSP\/|docs\/reference\/|CHANGELOG\.md$)/;
+const SKIP_FILE =
+  /(^|\/)(docs\/archive\/|docs\/ADSP\/|docs\/reference\/|CHANGELOG\.md$)/;
 
 /**
  * ⚠️ A DOCUMENT THAT DECLARES ITSELF HISTORICAL IS POINT-IN-TIME WHEREVER IT
@@ -121,7 +122,7 @@ function walk(dir, out = []) {
   return out;
 }
 
-/** Publishable `@signaltree/*` names, from the manifests npm reads. */
+/** Publishable `@signal-tree/*` names, from the manifests npm reads. */
 function publishable() {
   const out = new Set();
   for (const e of readdirSync(join(ROOT, 'packages'), {
@@ -136,13 +137,17 @@ function publishable() {
   return out;
 }
 
-/** `@signaltree/*` names in install instructions that cannot be installed. */
+/** `@signal-tree/*` names in install instructions that cannot be installed. */
 export function scanInstalls() {
   const ok = publishable();
   const bad = [];
   for (const abs of walk(ROOT)) {
     const rel = relative(ROOT, abs);
-    if (SKIP_FILE.test(rel) || HISTORICAL_MARKER.test(readFileSync(abs, 'utf8'))) continue;
+    if (
+      SKIP_FILE.test(rel) ||
+      HISTORICAL_MARKER.test(readFileSync(abs, 'utf8'))
+    )
+      continue;
     const lines = readFileSync(abs, 'utf8').split('\n');
     // Only inside fenced code — that is where an instruction a reader will COPY
     // lives. Prose that mentions a bad install in order to describe it is not an
@@ -157,7 +162,7 @@ export function scanInstalls() {
       }
       if (!inFence) return;
       if (!/\b(npm|pnpm|yarn|bun)\s+(install|add)\b/.test(line)) return;
-      for (const m of line.matchAll(/@signaltree\/[a-z0-9-]+/g)) {
+      for (const m of line.matchAll(/@signal-tree\/[a-z0-9-]+/g)) {
         if (!ok.has(m[0])) bad.push({ file: rel, line: i + 1, pkg: m[0] });
       }
     });
@@ -169,7 +174,11 @@ export function scan() {
   const links = [];
   for (const abs of walk(ROOT)) {
     const rel = relative(ROOT, abs);
-    if (SKIP_FILE.test(rel) || HISTORICAL_MARKER.test(readFileSync(abs, 'utf8'))) continue;
+    if (
+      SKIP_FILE.test(rel) ||
+      HISTORICAL_MARKER.test(readFileSync(abs, 'utf8'))
+    )
+      continue;
     const text = readFileSync(abs, 'utf8');
     const lines = text.split('\n');
     lines.forEach((line, i) => {

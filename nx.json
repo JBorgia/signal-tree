@@ -134,7 +134,7 @@
   },
   "release": {
     "version": {
-      "preVersionCommand": "pnpm nx run-many -t build --projects=shared,kernel,angular,react"
+      "preVersionCommand": "pnpm nx run-many -t build --projects=kernel,angular,react"
     }
   },
   "analytics": false

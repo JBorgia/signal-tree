@@ -25,8 +25,12 @@ import { execSync } from 'node:child_process';
 const ROOT = new URL('..', import.meta.url).pathname.replace(/\/$/, '');
 
 execSync(`node ${ROOT}/tools/kernel-ownership-census.mjs`, { stdio: 'pipe' });
-const census = JSON.parse(readFileSync(`${ROOT}/tools/kernel-ownership-census.json`, 'utf8'));
-const base = JSON.parse(readFileSync(`${ROOT}/tools/api-baseline.json`, 'utf8'));
+const census = JSON.parse(
+  readFileSync(`${ROOT}/tools/kernel-ownership-census.json`, 'utf8')
+);
+const base = JSON.parse(
+  readFileSync(`${ROOT}/tools/api-baseline.json`, 'utf8')
+);
 
 const censused = new Set([
   ...(census.publicSurface?.rootValueExports ?? []),
@@ -40,24 +44,41 @@ const censused = new Set([
 const EXCLUSIONS = new Map([]);
 
 const missing = [];
-for (const s of base.core.symbols) {
+for (const s of base.kernel.symbols) {
   if (censused.has(s.name)) continue;
   if (EXCLUSIONS.has(s.name)) continue;
   missing.push(s);
 }
 
-console.log(`api-baseline public symbols: ${base.core.symbols.length}`);
+console.log(`api-baseline public symbols: ${base.kernel.symbols.length}`);
 console.log(`ownership census public rows: ${censused.size}`);
 console.log(`documented exclusions:        ${EXCLUSIONS.size}`);
 console.log(`\nPUBLIC SYMBOLS WITH NO OWNERSHIP ROW: ${missing.length}`);
-for (const m of missing) console.log(`  ${m.name.padEnd(32)} ${m.kind.padEnd(11)} ${m.declFile.replace('packages/kernel/src/', '')}`);
+for (const m of missing)
+  console.log(
+    `  ${m.name.padEnd(32)} ${m.kind.padEnd(11)} ${m.declFile.replace(
+      'packages/kernel/src/',
+      ''
+    )}`
+  );
 
 // known-positive control: the census must contain something the baseline does
-const sample = base.core.symbols.find((s) => censused.has(s.name));
+const sample = base.kernel.symbols.find((s) => censused.has(s.name));
 if (!sample) {
-  console.error('\n❌ control failed: the two denominators share NO symbol — they are not comparable.');
+  console.error(
+    '\n❌ control failed: the two denominators share NO symbol — they are not comparable.'
+  );
   process.exit(1);
 }
-console.log(`\ncontrol: both denominators contain "${sample.name}" — comparable.`);
-if (missing.length) { console.error(`\n❌ ${missing.length} public symbol(s) outside the ownership denominator.`); process.exit(1); }
-console.log('✅ public-surface parity: every public symbol has an ownership row.');
+console.log(
+  `\ncontrol: both denominators contain "${sample.name}" — comparable.`
+);
+if (missing.length) {
+  console.error(
+    `\n❌ ${missing.length} public symbol(s) outside the ownership denominator.`
+  );
+  process.exit(1);
+}
+console.log(
+  '✅ public-surface parity: every public symbol has an ownership row.'
+);

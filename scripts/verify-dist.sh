@@ -10,7 +10,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-# Verify the private build dependency and the public release set.
+# Verify the public release set.
 # shellcheck source=release-packages.sh
 source "scripts/release-packages.sh"
 NX_PACKAGES=("${BUILD_PACKAGES[@]}")

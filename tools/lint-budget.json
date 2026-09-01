@@ -2,7 +2,6 @@
   "counts": {
     "packages/kernel": 0,
     "packages/react": 0,
-    "packages/shared": 0,
     "apps/demo": 9,
     "tools": 3,
     "scripts": 54

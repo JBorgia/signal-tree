@@ -43,12 +43,6 @@ const packages = [
     maxSize: 4000,
     claimed: 4000,
   },
-  {
-    name: 'shared',
-    path: 'dist/packages/shared/dist/index.js',
-    maxSize: 4200,
-    claimed: 2501,
-  },
 ];
 
 // MUST list every publishable package. `cleanAndBuild()` does `rm -rf dist`
@@ -57,7 +51,7 @@ const packages = [
 // pre-publish-validation.sh. `events` and `realtime` were never in this list,
 // so they were wiped and never rebuilt, and package-hygiene's skip-and-pass
 // meant a green release run had verified neither of them.
-const nxProjects = ['shared', 'kernel', 'angular', 'react'];
+const nxProjects = ['kernel', 'angular', 'react'];
 
 class BundleAnalyzer {
   constructor() {

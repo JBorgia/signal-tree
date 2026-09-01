@@ -63,7 +63,6 @@ Updated `package.json` `files` array in all affected packages to **explicitly ex
 **Not Affected**:
 
 - `@signaltree/ng-forms` - Uses `@nx/angular:package` (ng-packagr), not Rollup
-- `@signaltree/shared` - Private package, not published
 
 ### Why This Fix Is Complete
 

@@ -2,17 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { deepClone } from './deep-clone';
 import { getChanges } from './get-changes';
-import { isGlobKey, matchPath } from './match-path';
-import { mergeDeep } from './merge-deep';
 
 /**
- * `@signaltree/shared` was at 51% with three files at ZERO.
- *
- * These are the small pure functions the rest of the workspace is built on —
- * path matching decides which subscriber hears a change, `getChanges` decides
- * what a diff reports, `mergeDeep` decides what a partial write preserves. A
- * quiet wrong answer in any of them surfaces somewhere else entirely, which is
- * the worst kind to debug and the best kind to pin.
+ * These are small pure functions used by kernel production paths. A quiet wrong
+ * answer surfaces somewhere else entirely, so their edge cases stay pinned at
+ * the owning package boundary.
  */
 describe('deepClone', () => {
   it('clones nested objects by value', () => {
@@ -117,54 +111,6 @@ describe('deepClone', () => {
   });
 });
 
-describe('matchPath', () => {
-  it('matches an exact path', () => {
-    expect(matchPath('a.b.c', 'a.b.c')).toBe(true);
-  });
-
-  it('does not match a different path', () => {
-    expect(matchPath('a.b.c', 'a.b.d')).toBe(false);
-  });
-
-  it('a `*` matches any ONE segment', () => {
-    expect(matchPath('a.*.c', 'a.zzz.c')).toBe(true);
-  });
-
-  it('a `*` does NOT span multiple segments', () => {
-    // Segment-wise, not glob-wise — the distinction that keeps a subscriber on
-    // `users.*.name` from hearing `users.1.address.name`.
-    expect(matchPath('a.*.c', 'a.x.y.c')).toBe(false);
-  });
-
-  it('different segment counts never match', () => {
-    expect(matchPath('a.b', 'a.b.c')).toBe(false);
-    expect(matchPath('a.b.c', 'a.b')).toBe(false);
-  });
-
-  it('a bare `*` matches a single segment only', () => {
-    expect(matchPath('*', 'a')).toBe(true);
-    expect(matchPath('*', 'a.b')).toBe(false);
-  });
-});
-
-describe('isGlobKey', () => {
-  it('is true for a whole-segment wildcard', () => {
-    expect(isGlobKey('phones.*.value')).toBe(true);
-    expect(isGlobKey('*')).toBe(true);
-  });
-
-  it('is FALSE for a star inside a segment', () => {
-    // `weird*name` is a literal field name, and matchPath treats it as one.
-    // A substring test would disagree with matchPath, which is the bug this
-    // pins against.
-    expect(isGlobKey('weird*name')).toBe(false);
-  });
-
-  it('is false for an ordinary path', () => {
-    expect(isGlobKey('a.b.c')).toBe(false);
-  });
-});
-
 describe('getChanges', () => {
   it('reports only the keys that differ', () => {
     expect(getChanges({ a: 1, b: 2 }, { a: 1, b: 3 })).toEqual({ b: 3 });
@@ -182,34 +128,5 @@ describe('getChanges', () => {
     expect(getChanges({ a: 1 }, { a: undefined } as never)).toEqual({
       a: undefined,
     });
-  });
-});
-
-describe('mergeDeep', () => {
-  it('merges nested objects rather than replacing them', () => {
-    const merged = mergeDeep({ user: { name: 'a', age: 1 } }, {
-      user: { name: 'b' },
-    } as never);
-    expect(merged).toEqual({ user: { name: 'b', age: 1 } });
-  });
-
-  it('leaves untouched keys alone', () => {
-    const merged = mergeDeep({ a: 1, b: 2 }, { a: 9 } as never);
-    expect(merged.b).toBe(2);
-  });
-
-  it('REPLACES arrays rather than merging them elementwise', () => {
-    // The behaviour every deep-merge has to choose, and the one callers most
-    // often assume the other way round.
-    const merged = mergeDeep({ list: [1, 2, 3] }, { list: [9] } as never);
-    expect(merged.list).toEqual([9]);
-  });
-
-  it('adds a key that was not present', () => {
-    expect(mergeDeep({ a: 1 }, { b: 2 } as never)).toEqual({ a: 1, b: 2 });
-  });
-
-  it('an empty source changes nothing', () => {
-    expect(mergeDeep({ a: 1 }, {} as never)).toEqual({ a: 1 });
   });
 });

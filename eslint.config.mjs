@@ -70,7 +70,6 @@ export default [
     // stays ignored while internal call sites are migrated.
     ignores: [
       '**/*.spec.ts',
-      'packages/shared/src/lib/is-traversable-node.ts',
       'packages/kernel/src/lib/utils.ts',
       'packages/kernel/src/lib/internals/node-shape.ts',
     ],
@@ -81,7 +80,7 @@ export default [
           selector:
             'LogicalExpression:has(BinaryExpression[operator=/^[!=]==?$/]:has(UnaryExpression[operator="typeof"]) > Literal[value="object"]):has(BinaryExpression[operator=/^[!=]==?$/]:has(UnaryExpression[operator="typeof"]) > Literal[value="function"]) BinaryExpression[operator=/^[!=]==?$/]:has(UnaryExpression[operator="typeof"]) > Literal[value="object"]',
           message:
-            "Hand-rolled 'object or function' walker guard — use isTraversableNode() from @signaltree/shared instead. See docs/rfcs/0004-v12-optimal-iteration.md §3 V-P1.",
+            "Hand-rolled 'object or function' walker guard — use isTraversableNode() from kernel internals instead. See docs/rfcs/0004-v12-optimal-iteration.md §3 V-P1.",
         },
       ],
     },
@@ -139,9 +138,6 @@ export default [
             'tslib',
             // vitest is a test framework - should stay in devDependencies
             'vitest',
-            // @signaltree/shared is bundled at build time via Rollup, not a
-            // runtime dependency (matches the per-package eslint configs).
-            '@signaltree/shared',
             // @nx/devkit is build/tooling-only.
             '@nx/devkit',
             // @nx/rollup is required by each package's rollup.config.cjs

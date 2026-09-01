@@ -1,7 +1,7 @@
 import type { ISignalTree, PositionId, StructuralEffect, WriteMetadata } from '../../types';
 import { getPathNotifier } from '../../path-notifier';
 import { getActiveWriteContext, withWriteContext } from '../../write-context';
-import { deepClone } from '@signaltree/shared';
+import { deepClone } from '../utilities/deep-clone';
 import {
   getOwnedOwnerPath,
   getOwnedPositionIds,

@@ -50,7 +50,6 @@ const LIVE_DOCS = [
   'README.md',
   'packages/kernel/README.md',
   'packages/kernel/ENHANCERS.md',
-  'packages/shared/README.md',
   'packages/angular/README.md',
   'packages/react/README.md',
   'docs/guides',

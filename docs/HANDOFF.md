@@ -45,7 +45,7 @@ in §4.
 | New         | `compared()` / `byKeys()` — opt-in per-leaf equality                                                         |
 | New         | **ST2018** — warns when a collection is modelled as a plain array leaf                                       |
 | Fixed       | A held `byId()` reference died permanently across remove → re-add                                            |
-| Fixed       | `restoration()` deep-cloned itself whenever _any_ tree in the process flushed                                 |
+| Fixed       | `restoration()` deep-cloned itself whenever _any_ tree in the process flushed                                |
 | ⚠️ Breaking | `tree()` returns a memoised, dev-frozen object. Mutating a snapshot throws in dev                            |
 
 Release notes for the GitHub release page are written and staged at
@@ -111,7 +111,7 @@ working tree):
 | `snapshotState()`          | ❌ 8 keys     | ✅ 2         |
 | `JSON.stringify(tree())`   | ❌ `"map":{}` | ✅           |
 | **`serialization()`**      | ❌ THROWS     | ❌ THROWS    |
-| **`restoration` undo**      | ❌ silent     | ❌ silent    |
+| **`restoration` undo**     | ❌ silent     | ❌ silent    |
 | **`tree(partial)`**        | ❌ silent     | ❌ silent    |
 | **`tree()` — `form()`**    | ❌ absent     | ❌ absent    |
 | `applyState()` (devtools)  | ✅            | ✅           |
@@ -282,8 +282,8 @@ Recorded because each cost real time and several shipped before being caught.
   `.spec.ts` under `packages/`). Delete them when done — a stray
   `zz-dx-probe.spec.ts` was failing in the suite and is invisible to
   `git status`.
-- **`@signaltree/shared` is `private: true`** and bundled into core. Its version
-  lagging is NOT drift and needs no action. This was wrongly flagged twice.
+- **Kernel utilities are internal modules**, not a private workspace package.
+  They have no independent version or dependency edge to drift.
 - **Benchmark harnesses** need `scripts/benchmarks/dist-core` — a gitignored
   symlink. Recreate with
   `nx build core && ln -sfn ../../dist/packages/core scripts/benchmarks/dist-core`.

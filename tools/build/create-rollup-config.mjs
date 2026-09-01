@@ -22,7 +22,6 @@ export function createLibraryRollupConfig({
 
   const resolvedPackageRoot = path.resolve(packageRoot);
   const srcRoot = path.join(resolvedPackageRoot, 'src');
-  const sharedSrcRoot = path.join(workspaceRoot, 'packages', 'shared', 'src');
 
   const normalizeForOutput = (moduleId) => {
     if (!moduleId) {
@@ -32,26 +31,6 @@ export function createLibraryRollupConfig({
     const fromSrc = path.relative(srcRoot, moduleId);
     if (!fromSrc.startsWith('..')) {
       return fromSrc;
-    }
-
-    const fromShared = path.relative(sharedSrcRoot, moduleId);
-    if (!fromShared.startsWith('..')) {
-      return path.join('shared', fromShared);
-    }
-
-    // Also handle modules resolved from the shared build output
-    // (dist/packages/shared/dist/) so they land under shared/ in the
-    // consuming package's output.
-    const sharedBuildDir = path.join(
-      workspaceRoot,
-      'dist',
-      'packages',
-      'shared',
-      'dist'
-    );
-    const fromSharedBuild = path.relative(sharedBuildDir, moduleId);
-    if (!fromSharedBuild.startsWith('..')) {
-      return path.join('shared', fromSharedBuild);
     }
 
     // Fall back to module path relative to the package root to keep the layout stable.
@@ -125,156 +104,6 @@ export function createLibraryRollupConfig({
       preserveModulesRoot: srcRoot,
       sourcemap: false,
     }));
-
-    // Some published packages bundle @signaltree/shared at build-time (internal/private),
-    // but generated declaration files can still reference it. This plugin rewrites
-    // those imports so the published types remain self-contained.
-    const inlineSharedTypesPlugin = {
-      name: 'signaltree-inline-shared-types',
-      async writeBundle() {
-        if (!options?.outputPath) {
-          return;
-        }
-
-        const targetPackageRoot = path.join(workspaceRoot, options.outputPath);
-        const dtsRoot = path.join(targetPackageRoot, 'src');
-
-        const INLINE_DECLARATIONS = `
-// Inlined from @signaltree/shared (internal package)
-declare function deepEqual<T>(a: T, b: T): boolean;
-declare function deepClone<T>(obj: T): T;
-declare function isBuiltInObject(value: unknown): boolean;
-declare function parsePath(path: string): string[];
-declare function matchPath(path: string[], pattern: string[]): boolean;
-declare function mergeDeep<T>(target: T, source: unknown): T;
-declare function snapshotsEqual<T>(a: T, b: T): boolean;
-declare function getChanges<T>(prev: T, next: T): unknown;
-declare class LRUCache<K, V> {
-  constructor(maxSize: number);
-  get(key: K): V | undefined;
-  set(key: K, value: V): void;
-  has(key: K): boolean;
-  delete(key: K): boolean;
-  clear(): void;
-  get size(): number;
-}
-declare const DEFAULT_PATH_CACHE_SIZE: number;
-`;
-
-        const rewriteDts = (content) => {
-          if (!content.includes('@signaltree/shared')) {
-            return null;
-          }
-
-          let next = content;
-          let needsInlineDeclarations = false;
-
-          // Remove import statements from @signaltree/shared
-          const importRegex =
-            /import\s*\{[^}]+\}\s*from\s*['"]@signaltree\/shared['"];?\n?/g;
-          next = next.replace(importRegex, () => {
-            needsInlineDeclarations = true;
-            return '';
-          });
-
-          // Replace re-exports with local exports
-          const exportRegex =
-            /export\s*\{([^}]+)\}\s*from\s*['"]@signaltree\/shared['"];?\n?/g;
-          next = next.replace(exportRegex, (match, exports) => {
-            needsInlineDeclarations = true;
-            const exportList = exports
-              .split(',')
-              .map((e) => e.trim())
-              .join(', ');
-            return `export { ${exportList} };\n`;
-          });
-
-          if (needsInlineDeclarations) {
-            const lastImportIndex = next.lastIndexOf('import ');
-            if (lastImportIndex !== -1) {
-              const endOfImport = next.indexOf('\n', lastImportIndex);
-              next =
-                next.slice(0, endOfImport + 1) +
-                INLINE_DECLARATIONS +
-                next.slice(endOfImport + 1);
-            } else {
-              next = INLINE_DECLARATIONS + next;
-            }
-          }
-
-          return next === content ? null : next;
-        };
-
-        const walk = async (dir) => {
-          let entries;
-          try {
-            entries = await fs.readdir(dir, { withFileTypes: true });
-          } catch {
-            return;
-          }
-
-          await Promise.all(
-            entries.map(async (entry) => {
-              const fullPath = path.join(dir, entry.name);
-              if (entry.isDirectory()) {
-                if (entry.name === 'node_modules') {
-                  return;
-                }
-                await walk(fullPath);
-                return;
-              }
-
-              if (!entry.isFile() || !entry.name.endsWith('.d.ts')) {
-                return;
-              }
-
-              const content = await fs.readFile(fullPath, 'utf8');
-              const updated = rewriteDts(content);
-              if (updated) {
-                await fs.writeFile(fullPath, updated);
-              }
-            })
-          );
-        };
-
-        await walk(dtsRoot);
-      },
-    };
-
-    // Resolve @signaltree/shared imports to the compiled build output.
-    // shared:build outputs to dist/packages/shared/dist/ which contains
-    // plain JS that any Rollup plugin can process. Resolving to source .ts
-    // files fails because @rollup/plugin-typescript only processes files
-    // within the current package's include pattern.
-    const sharedBuildDist = path.join(
-      workspaceRoot,
-      'dist',
-      'packages',
-      'shared',
-      'dist'
-    );
-    const resolveSharedPlugin = {
-      name: 'signaltree-resolve-shared',
-      resolveId(source) {
-        if (source === '@signaltree/shared') {
-          return {
-            id: path.join(sharedBuildDist, 'index.js'),
-            external: false,
-          };
-        }
-        if (source.startsWith('@signaltree/shared/')) {
-          const rest = source.slice('@signaltree/shared/'.length);
-          return {
-            id: path.join(
-              sharedBuildDist,
-              rest.endsWith('.js') ? rest : `${rest}.js`
-            ),
-            external: false,
-          };
-        }
-        return null;
-      },
-    };
 
     const plugins = Array.isArray(config.plugins)
       ? config.plugins
@@ -350,10 +179,8 @@ declare const DEFAULT_PATH_CACHE_SIZE: number;
     return {
       ...config,
       plugins: [
-        resolveSharedPlugin,
         ...plugins,
         stripJsCommentsPlugin,
-        inlineSharedTypesPlugin,
         resolveWorkspaceManifestPlugin,
       ],
       // Entry barrels must keep their re-exports even when the module body is

@@ -5,7 +5,6 @@ const roots = [
   'packages/kernel/src',
   'packages/angular/src',
   'packages/react/src',
-  'packages/shared/src',
 ];
 const exts = [
   '.ts',

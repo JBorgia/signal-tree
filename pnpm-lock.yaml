@@ -198,9 +198,6 @@ importers:
       '@signal-tree/kernel':
         specifier: workspace:*
         version: link:packages/kernel
-      '@signaltree/shared':
-        specifier: workspace:*
-        version: link:packages/shared
       '@swc-node/register':
         specifier: 1.12.1
         version: 1.12.1(@swc/core@1.15.17(@swc/helpers@0.5.23))(@swc/types@0.1.25)(typescript@6.0.3)
@@ -377,12 +374,6 @@ importers:
         version: 19.2.8
       tslib:
         specifier: ^2.0.0
-        version: 2.8.1
-
-  packages/shared:
-    dependencies:
-      tslib:
-        specifier: ^2.3.0
         version: 2.8.1
 
 packages:

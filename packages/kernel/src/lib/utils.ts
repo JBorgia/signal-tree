@@ -3,9 +3,7 @@
 import type { ReadableCell } from './internals/cell-runtime';
 import { isTreeCell, markTreeCell } from './internals/cell-identity';
 import { NEUTRAL_MATERIALIZATION_REALIZATION } from './internals/materialization-realization';
-import {
-  getTreeRealization,
-} from './internals/tree-realization';
+import { getTreeRealization } from './internals/tree-realization';
 import {
   bindSnapshotParent,
   isSnapshotNode,
@@ -36,7 +34,8 @@ function isReactiveStateValue(value: unknown, owner: unknown = value): boolean {
     NEUTRAL_MATERIALIZATION_REALIZATION.isReactiveNode(value)
   );
 }
-import { deepEqual, isBuiltInObject, parsePath } from '@signaltree/shared';
+import { deepEqual } from './internals/utilities/deep-equal';
+import { isBuiltInObject } from './internals/utilities/is-built-in-object';
 import { dormantKeys, hasDormantMembers } from './internals/member-membership';
 import {
   hydrateMarkerNode,
@@ -100,10 +99,9 @@ function warnApplyStateOverwrite(key: string, target: unknown): void {
 
 export { deepEqual };
 // `export { deepEqual as equal }` was REMOVED in 14.1.1. See
-// shared/src/lib/deep-equal.ts for why: `equal` is the OPTION key throughout the
+// internals/utilities/deep-equal.ts for why: `equal` is the OPTION key throughout the
 // library and cannot also be a function export.
 export { isBuiltInObject };
-export { parsePath };
 
 /**
  * Check if a value is an EntityMapMarker
