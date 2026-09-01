@@ -3408,6 +3408,7 @@ export function createEntitySignal<
     Object.defineProperty(api, '__prepareTransitionTarget', {
       value: {
         owner: positionId,
+        ownerPath: basePath,
         readSource: readTransitionSource,
         prepareTarget: prepareTransitionTarget,
       } satisfies CollectionTransitionTargetBinding,

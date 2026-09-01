@@ -27,6 +27,7 @@ export type PreparedCollectionTransitionTarget = {
 
 export type CollectionTransitionTargetBinding = {
   readonly owner: PositionId;
+  readonly ownerPath: string;
   readSource(): CollectionTransitionSource;
   prepareTarget(
     target: CollectionTransitionTarget
@@ -511,6 +512,11 @@ function deriveStructuralTargetOrder(
       return !anchorMayBecomeLive;
     });
     if (readyIndex < 0) {
+      if (order.length === 0) {
+        order.push(...derivePendingAnchorOrder(pending));
+        pending.length = 0;
+        continue;
+      }
       throw new Error('Collection structural target contains an anchor cycle');
     }
     const effect = pending.splice(readyIndex, 1)[0];
@@ -547,6 +553,64 @@ function deriveStructuralTargetOrder(
   }
 
   return order;
+}
+
+function derivePendingAnchorOrder(effects: readonly ReversalEffect[]): number[] {
+  const subjects = effects.map((effect) => effect.subjectId as number);
+  const subjectSet = new Set(subjects);
+  const outgoing = new Map(subjects.map((subject) => [subject, new Set<number>()]));
+  const indegree = new Map(subjects.map((subject) => [subject, 0]));
+  const addEdge = (before: number, after: number): void => {
+    const edges = outgoing.get(before);
+    if (!edges || edges.has(after)) {
+      return;
+    }
+    edges.add(after);
+    indegree.set(after, (indegree.get(after) ?? 0) + 1);
+  };
+
+  for (const effect of effects) {
+    const subject = effect.subjectId as number;
+    const context = effect.structuralContext;
+    if (context?.kind !== 'add' && context?.kind !== 'remove') {
+      continue;
+    }
+    if (
+      context.beforeSubject !== undefined &&
+      subjectSet.has(context.beforeSubject)
+    ) {
+      addEdge(context.beforeSubject, subject);
+    }
+    if (
+      context.afterSubject !== undefined &&
+      subjectSet.has(context.afterSubject)
+    ) {
+      addEdge(subject, context.afterSubject);
+    }
+  }
+
+  const sourceRank = new Map(subjects.map((subject, index) => [subject, index]));
+  const ready = subjects.filter((subject) => indegree.get(subject) === 0);
+  const result: number[] = [];
+  while (ready.length > 0) {
+    ready.sort(
+      (left, right) =>
+        (sourceRank.get(left) ?? 0) - (sourceRank.get(right) ?? 0)
+    );
+    const subject = ready.shift() as number;
+    result.push(subject);
+    for (const after of outgoing.get(subject) ?? []) {
+      const nextIndegree = (indegree.get(after) ?? 0) - 1;
+      indegree.set(after, nextIndegree);
+      if (nextIndegree === 0) {
+        ready.push(after);
+      }
+    }
+  }
+  if (result.length !== subjects.length) {
+    throw new Error('Collection structural target contains an anchor cycle');
+  }
+  return result;
 }
 
 function applyValueEffect(
