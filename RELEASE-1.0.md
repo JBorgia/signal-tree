@@ -866,6 +866,21 @@ evidence-backed density target is 256-300 B/entity; semantics, reachability, and
 bounded high-water retention remain hard gates. A winner is an admissible
 production representation, not a semantic requirement.
 
+`PHYSICAL-TARGET-COMPOSITION-0` is **PREREQUISITE GREEN / INSTALLATION NEXT** at
+`02d2055c`. Production inspection falsified naive shared-Map installation:
+structural revisions and entity values are prepared independently, so two Map
+replacements against one backing would permit the later installer to discard the
+earlier authority's change. The layout-neutral composer now merges independent
+revision and value contributions by SubjectId into deterministic frozen
+envelopes, rejects duplicate same-authority facts and invalid identity/revision
+input, and treats value payloads as opaque authority-prepared truth rather than
+cloning them twice. Thirteen focused controls, kernel 253 files / 2,059 passed /
+3 expected failures / 13 skipped / 1 todo, both TypeScript passes, and kernel
+lint are green. No production representation changed. Object versus slot layout,
+reachability equivalence, and atomic installation remain unresolved; the next
+falsifier applies a composed same-subject revision-plus-value update through one
+candidate physical install.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
