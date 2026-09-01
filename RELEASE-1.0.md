@@ -8,11 +8,16 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 6 — Release Candidate (POST-RC STABILIZATION)`
+Current phase: `Phase 7 — 1.0 Release`
 
-`15.0.0-rc.1` is live. The release-critical path is now bounded RC issue
-resolution and final public API review toward `GATE F`, followed by the Phase 7
-GA matrix. Architecture exploration is not on that path.
+`GATE F` is **SATISFIED** at `109595e6`. Exact committed HEAD passed all 69
+ordinary and release-only gates with zero known-red. The independent Gate F
+review found no critical, major, or minor blocker. `15.0.0-rc.1` remains the
+published candidate; no later commit has been published or tagged.
+
+The remaining path is the clean-clone Phase 7 matrix, followed by the separately
+authorized official release and post-publication verification. Architecture
+exploration is not on that path.
 
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
@@ -12567,15 +12572,12 @@ delay `GATE F` or GA without a concrete release falsifier.
       **Scripts/release checkpoint:** `d32a1131` replaced the stale scripts
       catalog with an authority-aware index and its review exposed two live
       release defects. The dist-reading gate harness now builds the actual
-      `shared,kernel,angular,react` package set instead of nonexistent `core`,
-      and `release.sh` no longer rolls back local/tag state after npm publishing
-      begins, where immutable package versions may already exist. The registered
-      release-state gate now rejects any post-publish `rollback_versions` call;
-      killing fixtures cover standalone, inline, and chained shell forms.
-      Validation passed: release-state live/self-tests, built-barrels live and
-      mutation self-test (including the four-project build), shell syntax,
-      command/path existence checks, documentation links/API checks, and
-      `git diff --check`.
+      `kernel,angular,react` package set instead of nonexistent `core`. This was
+      superseded at `109595e6` by one Node release plan and one exact-candidate
+      publisher. `release.sh` now prepares signed tags and cannot publish;
+      manual and CI wrappers delegate to `publish-candidate.mjs`. Routing and
+      package order have killing mutations, and a dry run validates exact
+      tarballs without registry writes.
       **Source-comment checkpoint:** `aba7d92b` removed stale present-tense
       builder, enhancer-chain, deleted form-marker, and mirrored-overload
       language from `signal-tree.ts` while retaining the architectural reason
@@ -12589,7 +12591,7 @@ delay `GATE F` or GA without a concrete release falsifier.
       dispositions, package exports, and strict packed declarations are green.
       No later stabilization work changed the public API.
 
-Exit condition: `GATE F`
+Exit condition: `GATE F` — **SATISFIED at `109595e6`**
 
 ## Phase 7 — 1.0 Release
 
