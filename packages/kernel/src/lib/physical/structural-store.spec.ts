@@ -206,9 +206,10 @@ describe('StructuralStore', () => {
   it('keeps derived SubjectId node lookup identical across structural transitions', () => {
     const store = seedStore();
     const assertParity = () =>
-      expect(() =>
-        store.__assertSubjectNodeLookupParityForTesting()
-      ).not.toThrow();
+      expect(() => {
+        store.__assertSubjectNodeLookupParityForTesting();
+        store.__assertKeyNodeLookupParityForTesting();
+      }).not.toThrow();
 
     assertParity();
     store.transferSubject(2, 'B', 'X');

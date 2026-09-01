@@ -627,6 +627,20 @@ export class StructuralStore<K extends string | number> {
     }
   }
 
+  __assertKeyNodeLookupParityForTesting(): void {
+    const keys = new Set([
+      ...this.subjectIds.keys(),
+      ...this.activeNodesByKey.keys(),
+    ]);
+    for (const key of keys) {
+      if (
+        this.activeNodesByKey.get(key) !== this.activeNodeForKeyViaSubject(key)
+      ) {
+        throw new Error(`Key node lookup mismatch for key ${String(key)}.`);
+      }
+    }
+  }
+
   __assertActiveOrderIntegrityForTesting(): void {
     if (this.activeHead?.prev !== undefined) {
       throw new Error('Active head must not have a previous node.');
@@ -735,6 +749,15 @@ export class StructuralStore<K extends string | number> {
     }
     const node = this.activeNodesByKey.get(state.key);
     return node?.subjectId === subjectId ? node : undefined;
+  }
+
+  private activeNodeForKeyViaSubject(key: K): ActiveNode<K> | undefined {
+    const subjectId = this.subjectIds.get(key);
+    if (subjectId === undefined) {
+      return undefined;
+    }
+    const node = this.activeNodesBySubject.get(subjectId);
+    return node?.key === key ? node : undefined;
   }
 
   private unregisterActiveNode(node: ActiveNode<K>): void {
