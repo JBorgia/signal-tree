@@ -12532,6 +12532,18 @@ delay `GATE F` or GA without a concrete release falsifier.
 - [x] fix RC issues only — Angular's metadata finding was superseded by
       construction-bound realization; stale active `.with()` guidance and the
       declaration-gate package-universe defect closed at `78ea2ff6`
+- [ ] **Triage the full-tree repository audit before any next RC or GA
+      publish.** Treat the audit as hypotheses, not verdicts. Release-blocking
+      until proved absent or fixed: phantom package aliases/directories,
+      published-scope inconsistency, and live `core` -> `kernel` drift in build,
+      validation, publish, tree-shaking, documentation, or benchmark paths.
+      Also verify tracked scratch/backup/migration artifacts and stale shipped
+      documentation. Record each finding as confirmed, already superseded,
+      non-shipping hygiene, or rejected with an executable falsifier where one
+      exists. Broad root/docs/tools/scripts/spec relocation and package-layout
+      normalization are non-gating unless they produce a concrete package,
+      build, API, documentation, or release-automation failure. The detailed
+      inventory lives in `TODO.md` under `V15 pre-publish repository audit`.
 - [ ] final public API review
 
 Exit condition: `GATE F`
