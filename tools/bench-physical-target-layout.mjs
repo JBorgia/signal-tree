@@ -82,21 +82,63 @@ const buildStableSlots = (count) =>
     buildContributions(count)
   );
 
+const prepareIncumbentUpdate = (current, updates) => {
+  const revisions = new Map(current.revisions);
+  const values = new Map(current.values);
+  for (const update of updates) {
+    if (update.revision !== undefined) {
+      revisions.set(update.subjectId, update.revision);
+    }
+    if (update.value !== undefined) {
+      values.set(update.subjectId, update.value);
+    }
+  }
+  return { revisions, values };
+};
+
 const ARMS = {
   incumbent: {
     description: 'separate SubjectId revision and value Maps',
     build: buildIncumbent,
+    prepare: prepareIncumbentUpdate,
   },
   'object-record': {
     description: 'one SubjectId Map of revision + value records',
     build: buildObjectRecords,
+    prepare: preparePhysicalSubjectTarget,
   },
   'stable-slot': {
     description:
       'one SubjectId-to-slot Map plus subject/revision/value columns',
     build: buildStableSlots,
+    prepare: preparePhysicalSubjectSlotTarget,
   },
 };
+
+const latencyArmIndex = process.argv.indexOf('--latency-arm');
+if (latencyArmIndex !== -1) {
+  const name = process.argv[latencyArmIndex + 1];
+  const arm = ARMS[name];
+  if (arm === undefined) throw new Error(`unknown arm: ${String(name)}`);
+  if (size <= 0) throw new Error('latency size must be positive');
+
+  const current = arm.build(size);
+  const subjectId = Math.ceil(size / 2);
+  const updates = composePreparedSubjectUpdates(
+    [{ subjectId, revision: 1 }],
+    [{ subjectId, value: { ...valueFor(subjectId), value: -1 } }]
+  );
+  for (let iteration = 0; iteration < 3; iteration += 1) {
+    arm.prepare(current, updates);
+  }
+  global.gc();
+  const startedAt = performance.now();
+  const target = arm.prepare(current, updates);
+  const elapsedMs = performance.now() - startedAt;
+  if (target === current) throw new Error(`${name} did not prepare off-store`);
+  console.log(JSON.stringify({ arm: name, n: size, elapsedMs }));
+  process.exit(0);
+}
 
 const armIndex = process.argv.indexOf('--arm');
 if (armIndex !== -1) {
@@ -149,6 +191,80 @@ const measureArm = (name, count) => {
     collectable: samples.every((sample) => sample.collectable),
   };
 };
+
+const measureLatencyOnce = (name, count) => {
+  const output = execFileSync(
+    process.execPath,
+    [
+      '--expose-gc',
+      '--experimental-strip-types',
+      new URL(import.meta.url).pathname,
+      '--latency-arm',
+      name,
+      '--n',
+      String(count),
+    ],
+    {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 120_000,
+    }
+  );
+  return JSON.parse(output.trim().split('\n').at(-1));
+};
+
+const measureLatency = (name, count) => {
+  const samples = Array.from({ length: SAMPLES }, () =>
+    measureLatencyOnce(name, count)
+  );
+  samples.sort((left, right) => left.elapsedMs - right.elapsedMs);
+  return samples[Math.floor(samples.length / 2)];
+};
+
+if (process.argv.includes('--latency')) {
+  const sizes = SIZES.filter((count) => count > 0);
+  const latencyRows = Object.entries(ARMS).map(([name, arm]) => ({
+    arm: name,
+    description: arm.description,
+    points: sizes.map((count) => measureLatency(name, count)),
+  }));
+
+  if (process.argv.includes('--json')) {
+    console.log(
+      JSON.stringify({ sizes, samples: SAMPLES, rows: latencyRows }, null, 2)
+    );
+    process.exit(0);
+  }
+
+  const incumbent = latencyRows.find((row) => row.arm === 'incumbent');
+  console.log('\nSUBJECT-RECORD-PROMOTION-0 / prepared-target latency');
+  console.log(
+    `one revision + value update; ${String(
+      SAMPLES
+    )} isolated samples per arm and size\n`
+  );
+  console.log(
+    'arm'.padEnd(20) + sizes.map((count) => String(count).padStart(20)).join('')
+  );
+  console.log('-'.repeat(80));
+  for (const row of latencyRows) {
+    console.log(
+      row.arm.padEnd(20) +
+        row.points
+          .map((point, index) => {
+            const baseline = incumbent.points[index].elapsedMs;
+            const delta = ((point.elapsedMs - baseline) / baseline) * 100;
+            return `${point.elapsedMs.toFixed(3)}ms ${
+              delta >= 0 ? '+' : ''
+            }${delta.toFixed(1)}%`.padStart(20);
+          })
+          .join('')
+    );
+    console.log(`  ${row.description}`);
+  }
+  process.exit(0);
+}
 
 const linearFit = (points) => {
   const used = points.filter((point) => point.n > 0);

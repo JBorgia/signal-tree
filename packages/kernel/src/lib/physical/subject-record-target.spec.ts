@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  assertPhysicalSubjectSlots,
   composePreparedSubjectUpdates,
   preparePhysicalSubjectSlotTarget,
   preparePhysicalSubjectTarget,
@@ -54,6 +55,15 @@ describe('composePreparedSubjectUpdates', () => {
     expect(target[0].value).toBe(value);
   });
 
+  it('rejects undefined prepared values at the authority boundary', () => {
+    expect(() =>
+      composePreparedSubjectUpdates(
+        [],
+        [{ subjectId: 1, value: undefined as never }]
+      )
+    ).toThrow('Invalid prepared value for SubjectId 1');
+  });
+
   it('rejects duplicate contributions from one authority', () => {
     expect(() =>
       composePreparedSubjectUpdates(
@@ -66,10 +76,13 @@ describe('composePreparedSubjectUpdates', () => {
     ).toThrow('Duplicate structural contribution for SubjectId 1');
 
     expect(() =>
-      composePreparedSubjectUpdates([], [
-        { subjectId: 1, value: { id: 1 } },
-        { subjectId: 1, value: { id: 1 } },
-      ])
+      composePreparedSubjectUpdates(
+        [],
+        [
+          { subjectId: 1, value: { id: 1 } },
+          { subjectId: 1, value: { id: 1 } },
+        ]
+      )
     ).toThrow('Duplicate value contribution for SubjectId 1');
   });
 
@@ -96,8 +109,10 @@ describe('preparePhysicalSubjectTarget', () => {
   it('installs same-subject revision and value through one target assignment', () => {
     const beforeValue = { id: 1, name: 'before' };
     const afterValue = { id: 1, name: 'after' };
-    let live: ReadonlyMap<number, { readonly revision: number; readonly value: typeof beforeValue }> =
-      new Map([[1, Object.freeze({ revision: 3, value: beforeValue })]]);
+    let live: ReadonlyMap<
+      number,
+      { readonly revision: number; readonly value: typeof beforeValue }
+    > = new Map([[1, Object.freeze({ revision: 3, value: beforeValue })]]);
     const updates = composePreparedSubjectUpdates(
       [{ subjectId: 1, revision: 4 }],
       [{ subjectId: 1, value: afterValue }]
@@ -125,9 +140,10 @@ describe('preparePhysicalSubjectTarget', () => {
     );
     const valueTarget = preparePhysicalSubjectTarget(
       current,
-      composePreparedSubjectUpdates([], [
-        { subjectId: 1, value: { id: 1, name: 'changed' } },
-      ])
+      composePreparedSubjectUpdates(
+        [],
+        [{ subjectId: 1, value: { id: 1, name: 'changed' } }]
+      )
     );
 
     expect(revisionTarget.get(1)).toEqual({ revision: 4, value });
@@ -140,7 +156,10 @@ describe('preparePhysicalSubjectTarget', () => {
   });
 
   it('requires both authority facts before preparing a new subject', () => {
-    const current = new Map<number, { revision: number; value: { id: number } }>();
+    const current = new Map<
+      number,
+      { revision: number; value: { id: number } }
+    >();
 
     expect(() =>
       preparePhysicalSubjectTarget(
@@ -155,22 +174,13 @@ describe('preparePhysicalSubjectTarget', () => {
         composePreparedSubjectUpdates([], [{ subjectId: 1, value: { id: 1 } }])
       )
     ).toThrow('New SubjectId 1 requires revision and value contributions');
-
-    expect(() =>
-      preparePhysicalSubjectTarget(current, [
-        { subjectId: 1, revision: 0, value: undefined },
-      ])
-    ).toThrow('New SubjectId 1 requires revision and value contributions');
-
-    expect(() =>
-      preparePhysicalSubjectTarget(current, [
-        { subjectId: 1, revision: undefined, value: { id: 1 } },
-      ])
-    ).toThrow('New SubjectId 1 requires revision and value contributions');
   });
 
   it('prepares a complete new subject without mutating the current map', () => {
-    const current = new Map<number, { revision: number; value: { id: number } }>();
+    const current = new Map<
+      number,
+      { revision: number; value: { id: number } }
+    >();
     const updates = composePreparedSubjectUpdates(
       [{ subjectId: 1, revision: 0 }],
       [{ subjectId: 1, value: { id: 1 } }]
@@ -181,20 +191,6 @@ describe('preparePhysicalSubjectTarget', () => {
     expect(current.size).toBe(0);
     expect(target.get(1)).toEqual({ revision: 0, value: { id: 1 } });
     expect(Object.isFrozen(target.get(1))).toBe(true);
-  });
-
-  it('rejects duplicate physical updates before preparing the target', () => {
-    const current = new Map([
-      [1, Object.freeze({ revision: 1, value: { id: 1 } })],
-    ]);
-
-    expect(() =>
-      preparePhysicalSubjectTarget(current, [
-        { subjectId: 1, revision: 2 },
-        { subjectId: 1, value: { id: 1 } },
-      ])
-    ).toThrow('Duplicate physical update for SubjectId 1');
-    expect(current.get(1)).toEqual({ revision: 1, value: { id: 1 } });
   });
 });
 
@@ -269,46 +265,35 @@ describe('preparePhysicalSubjectSlotTarget', () => {
     expect(live.subjects).toEqual([1, 2]);
   });
 
-  it('rejects incomplete and duplicate updates before copying columns', () => {
+  it('rejects incomplete updates before copying columns', () => {
     const live = current();
 
     expect(() =>
-      preparePhysicalSubjectSlotTarget(live, [
-        { subjectId: 3, revision: 0 },
-      ])
+      preparePhysicalSubjectSlotTarget(
+        live,
+        composePreparedSubjectUpdates([{ subjectId: 3, revision: 0 }], [])
+      )
     ).toThrow('New SubjectId 3 requires revision and value contributions');
-    expect(() =>
-      preparePhysicalSubjectSlotTarget(live, [
-        { subjectId: 1, revision: 4 },
-        { subjectId: 1, value: { id: 1, name: 'changed' } },
-      ])
-    ).toThrow('Duplicate physical update for SubjectId 1');
     expect(live.revisions).toEqual([3, 7]);
   });
 
-  it('rejects inconsistent current slot columns before applying updates', () => {
+  it('exposes explicit integrity validation outside target preparation', () => {
     expect(() =>
-      preparePhysicalSubjectSlotTarget(
-        {
-          slotBySubject: new Map([[1, 0]]),
-          subjects: [1],
-          revisions: [],
-          values: [{ id: 1 }],
-        },
-        []
-      )
+      assertPhysicalSubjectSlots({
+        slotBySubject: new Map([[1, 0]]),
+        subjects: [1],
+        revisions: [],
+        values: [{ id: 1 }],
+      })
     ).toThrow('Physical subject slot columns are inconsistent');
 
     expect(() =>
-      preparePhysicalSubjectSlotTarget(
-        {
-          slotBySubject: new Map([[1, 1]]),
-          subjects: [1],
-          revisions: [0],
-          values: [{ id: 1 }],
-        },
-        []
-      )
+      assertPhysicalSubjectSlots({
+        slotBySubject: new Map([[1, 1]]),
+        subjects: [1],
+        revisions: [0],
+        values: [{ id: 1 }],
+      })
     ).toThrow('Physical SubjectId 1 does not address slot 0');
   });
 });
