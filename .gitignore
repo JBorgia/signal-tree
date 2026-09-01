@@ -40,7 +40,6 @@ yarn-error.log
 testem.log
 flat-structure
 /typings
-.npmrc
 
 # System Files
 .DS_Store
@@ -102,6 +101,7 @@ tmp/
 .nx/migrate-runs
 # Playwright route-smoke artifacts (scripts/playwright/route-smoke.config.ts)
 test-results/
+.playwright-mcp/
 
 # Throwaway probe/audit specs. Investigating a defect here means dropping a
 # scratch spec next to the code (vitest only picks up specs inside a package),
