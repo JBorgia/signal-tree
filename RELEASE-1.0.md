@@ -716,23 +716,49 @@ one owner fails and requires scalar targets to join the same boundary. Direct
 reorder and key-swap controls preserve held facades and permit writes through a
 held subject at its new key without ever creating a temporary public key.
 
-This is not restoration behavior closure. `position-capture-0.spec.ts` remains
-an expected failure because `setAll` does not yet contribute order facts to a
-causal turn, and `TreeRealizationPort` still routes retained effects through the
-rejected incumbent planner. The next slice is private capture and application:
-coalesce each collection owner's first-before/latest-after order inside the
-turn, derive one backbone delta at sealing, make collection order a frontier
-participant, resolve bindings by owner PositionId, prepare all collection and
-scalar targets, then install and publish through the existing invalidation
-group. Only that slice may turn the pure-reorder law green. Existing authored
-EntityMap mutations may continue using `EntityMutationFrame`; restoration must
-not expose or preserve two structural realization semantics after migration.
+`RESTORATION-POSITION-CAPTURE-0` is **CLOSED GREEN** at `0ff5d2db` for pure
+same-membership reorder. EntityMap publishes exact before/after SubjectId order
+and opaque physical order-frontier identity through a private capture channel.
+Restoration and transactions coalesce first-before/latest-after per collection,
+derive one backbone delta at settlement, and retain the collection owner as a
+causal participant. Undo/redo and pending rollback compile order, entity-field,
+and scalar facts into one aggregate target, prepare every collection and scalar
+before installation, install all physical targets, then publish through grouped
+invalidation.
+
+The former expected-failure law is now green for pure reorder, reorder plus an
+entity field, confirmed transaction reorder plus root scalar, explicit pending
+rollback, thrown-callback rollback, held SubjectId continuity, and undo/redo
+symmetry. A later realized reorder owns the physical frontier and causes ST1034
+refusal without changing collection state or the history cursor. The frontier
+token is owned by `StructuralStore`, captured at both mutation endpoints, read
+live by the binding, and restored with the target endpoint; caller-injected
+expected tokens are rejected as tautological validation.
+
+Capture is deliberately restricted to same-membership reorder. Add/remove/rekey
+continue through their established structural effects until the general target
+planner migration closes A/B/C and X1/X2/X3 in production. This avoids creating
+a second positional authority for membership changes and preserves existing
+structural diagnostics and notification provenance. Existing authored EntityMap
+mutations may continue using `EntityMutationFrame`; restoration must not preserve
+two structural realization semantics after the remaining migration.
 
 Validation through `e3dc446f`: target compiler 15 focused controls plus 4,225
 endpoint pairs; physical binding reorder, key-swap, held-facade, detached-value,
 all-owner preparation, install-before-publish, and scalar-boundary controls;
 kernel 250 files / 2,025 passed / 4 expected failures / 13 skipped / 1 todo;
 both TypeScript passes; kernel lint; independent review of changed files clean.
+Validation at `0ff5d2db`: kernel 250 files / 2,031 passed / 3 expected failures /
+13 skipped / 1 todo; both TypeScript passes; kernel lint; focused restoration,
+transaction, atomicity, external-authority, diagnostic, and link-collection
+families; independent adversarial review clean.
+
+`RESTORATION-TURN-STATE-0` remains open. Every admitted reorder turn still owns
+`CanonicalTurn.state`, so behavioral position closure does not itself improve
+active-history density. Next: migrate the remaining structural target shapes,
+then delete eager snapshot retention only after historical-state exposure and
+`jumpTo()` are supplied without making snapshots causal authority. E5
+remeasurement remains blocked until that deletion.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public

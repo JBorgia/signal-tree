@@ -886,10 +886,24 @@ publication of SubjectId-keyed cells follows only after all owners install.
 Reorder and key-swap controls preserve held facades, and prepared values do not
 alias caller-owned target objects.
 
-The prototype is deliberately not connected to restoration yet. Pure reorder
-still emits no causal order fact, so its expected-failure law stays red. The
-remaining gate is to capture one first-before/latest-after order transition per
-collection and turn, admit collection order as a causal participant, resolve
-physical bindings by owner PositionId, and send the compiled aggregate target
-through grouped install and publication. Until that gate passes, neither
-`CanonicalTurn.state` deletion nor active-density remeasurement is authorized.
+`0ff5d2db` connects pure same-membership reorder to restoration and transaction
+rollback. EntityMap sends exact endpoint SubjectId orders and opaque
+`StructuralStore` frontier identity through a private capture channel. One
+first-before/latest-after delta is retained per collection and turn. Undo/redo
+and rollback compile order, entity-field, and scalar facts into an aggregate
+target, prepare all collection and scalar bindings, install every target, then
+publish under grouped invalidation. Held subject facades survive. A later
+realized reorder changes the physical frontier and causes ST1034 refusal without
+moving state or cursor.
+
+Position capture is therefore green for pure reorder. It is intentionally not
+emitted for membership changes: add/remove/rekey retain their existing
+structural placement facts until the general target planner replaces that
+incumbent path. This keeps one positional authority per operation while A/B/C
+and X1/X2/X3 remain migration gates rather than being silently declared fixed.
+
+Every retained reorder turn still owns `CanonicalTurn.state`. Position behavior
+closure therefore does not close active-history density and does not authorize
+remeasurement. Remaining work is general structural target migration followed by
+historical-state and `jumpTo()` support that permits eager snapshot retention to
+be deleted without rehabilitating snapshots as causal authority.
