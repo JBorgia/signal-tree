@@ -258,7 +258,7 @@ export const EXAMPLES_REGISTRY: ExampleMeta[] = [
     id: 'whats-new',
     title: "What's New",
     description:
-      'Latest: SignalTree 15.0.0-rc.1 — construction-bound realization, undoable() designation, transactions(), and the @signal-tree package reset. Older sections are release history.',
+      'SignalTree 15.0.0-rc.1 — construction-bound realization, undoable() designation, transactions(), and the @signal-tree package reset. Pre-15 history moved to the Legacy changelog page.',
     category: 'General',
     focusAreas: ['news', 'changelog'],
     functionalUse: ['release-notes'],

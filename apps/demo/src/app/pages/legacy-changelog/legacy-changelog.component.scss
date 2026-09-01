@@ -1,0 +1,71 @@
+@use '../../examples/shared/styles' as *;
+
+.whats-new {
+  h2 {
+    margin-bottom: $spacing-md;
+  }
+  ul {
+    margin: 0 0 $spacing-md;
+    padding-left: $spacing-xl;
+  }
+  .next-steps {
+    color: $text-light;
+  }
+
+  .historical-note {
+    background: var(--color-warning-50, #fffbeb);
+    border: 1px solid var(--color-warning-300, #fcd34d);
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    margin-bottom: $spacing-xl;
+  }
+
+  .release-highlights {
+    background: linear-gradient(135deg, var(--color-info-50) 0%, var(--color-info-100) 100%);
+    border: 1px solid $primary;
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    margin-bottom: $spacing-xl;
+  }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-lg;
+    margin: $spacing-lg 0;
+
+    .metric {
+      background: $bg-white;
+      border-radius: $radius-lg;
+      padding: $spacing-lg;
+      text-align: center;
+      box-shadow: $shadow-md;
+
+      .value {
+        display: block;
+        font-size: $text-4xl;
+        font-weight: $font-bold;
+        color: $primary;
+      }
+
+      .label {
+        display: block;
+        font-weight: $font-semibold;
+        color: $dark;
+        margin: $spacing-xs 0;
+      }
+
+      .detail {
+        display: block;
+        font-size: $text-sm;
+        color: $text-light;
+      }
+    }
+  }
+
+  @include respond-to('sm') {
+    .metrics-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

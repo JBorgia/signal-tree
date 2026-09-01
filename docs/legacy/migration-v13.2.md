@@ -3,7 +3,7 @@
 > **Historical inter-version guide** for the old `@signaltree/*` scope. `signalForm()`
 > and the whole `@signaltree/ng-forms` package are **removed in v15** — SignalTree 15
 > publishes no forms capability. The current target for every version is
-> [`@signaltree/*` → `@signal-tree/*` (v15)](./migration-v14-v15.md).
+> [`@signaltree/*` → `@signal-tree/*` (v15)](../guides/migration-v14-v15.md).
 
 13.2 carries **one behavior change** plus one type-level improvement.
 
@@ -151,7 +151,7 @@ type now includes the slice members, so an _exact_-type assertion in your own co
 richer type. Ordinary assignments to `EntitySignal<E, K>` are unaffected — an
 intersection is assignable to its member.
 
-See the [entity-collection cookbook §2](entity-collection-cookbook.md) for the
+See the [entity-collection cookbook §2](../guides/entity-collection-cookbook.md) for the
 full slices / `find` / `where` surface.
 
 ## 4. Nothing else changed

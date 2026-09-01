@@ -2,7 +2,7 @@
 
 > **Historical inter-version guide.** It covers 14.0.0 → 14.1.1 under the old
 > `@signaltree/*` scope. The current target for every version — including 14.1.1 —
-> is [`@signaltree/*` → `@signal-tree/*` (v15)](./migration-v14-v15.md).
+> is [`@signaltree/*` → `@signal-tree/*` (v15)](../guides/migration-v14-v15.md).
 
 **Read this if you are landing on 14.1.1 from anywhere in 14.x.**
 [migration-v13-v14.md](./migration-v13-v14.md) covers 13.x → 14.0.0 and does **not**

@@ -34,7 +34,7 @@ Use this index to navigate the documentation.
 | ------------------------------------------------------------------ | --------------------------------------------------------- |
 | [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md) | **Current migration target for every earlier version** — rename, package consolidation, removed APIs |
 | [Composition Recipes](guides/composition-recipes.md)              | Ops-service patterns, entity-CRUD base, optimistic UI     |
-| [Historical migration guide](guides/MIGRATION.md)                  | Archived v4-v13 package/API migrations                    |
+| [Legacy docs (`@signaltree/*`, pre-15)](legacy/README.md)          | Per-version migration guides and the 14.0.0 capability audit, quarantined |
 | [Persistence and Security](guides/persistence-and-security.md)     | Withdrawn: its subject, the `stored()` marker, is deleted |
 | [Typing Patterns](guides/typing-patterns.md)                       | Preferred TypeScript typing patterns                      |
 | [Local Development Symlinks](guides/local-development-symlinks.md) | Troubleshooting dual Angular instance issues              |
