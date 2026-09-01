@@ -1151,3 +1151,46 @@ those operations for the benchmark would silently pull lifecycle semantics into
 the value-plus-revision row. Churn resumes only when the lifecycle stage provides
 real candidate deletion rules. Production storage integration, reachability,
 sparse retirement, and full operation latency remain open.
+
+### SUBJECT-SLOT-REACHABILITY-0 — Current Candidate Rejected
+
+Production-law checkpoint: `026ab694`. Generator checkpoint: `ee583ea7`.
+
+The real physical mutation path proves value and structural facts have different
+lifetimes. A retired subject may release EntityValueStore backing while retaining
+its StructuralStore lifetime record and revision. Only caller-approved terminal
+zero-owner retirement forgets both. `EntityMutationFrame` now rejects an active
+subject's lifetime forget during preparation, before any earlier staged mutation
+can commit; causal eligibility remains owned by the reclamation coordinator.
+
+Candidate B was extended only enough to express those production laws. An
+existing structural slot may have no value, revision updates remain legal after
+value release, and terminal forget removes the directory entry and clears all
+columns while leaving a vacant, non-reused physical slot. Batch release/forget
+preflights every SubjectId and copies each column once. Fresh subjects keep
+monotonic, never-reused SubjectIds and append new physical slots.
+
+The five-sample 100k / 90k reachability matrix reports:
+
+| Scenario                                   | Incumbent post-GC | Object post-GC | Stable-slot post-GC | Stable-slot capacity |
+| ------------------------------------------ | ----------------: | -------------: | ------------------: | -------------------: |
+| values released, structural truth retained |           4.80 MB |              — |             6.46 MB |              100,000 |
+| four terminal-forget + fresh rounds        |          10.88 MB |       11.22 MB |            20.12 MB |              460,000 |
+
+Every owner collects. Peak is the independently aggregated median of settled
+per-round heaps, not transient allocation. Incumbent and object Maps mutate in
+place so their actual high-water behavior is preserved; terminal forget assumes
+eligibility established externally and measures only physical layout capacity.
+
+The current stable-slot candidate is rejected. Its 8.7 B/entity dense-active
+saving depends on coupled occupancy that production semantics do not permit.
+Representing independent value lifetime costs 1.66 MB more than the incumbent
+at this population, and append-only terminal churn retains 9.24 MB more with
+4.6x live capacity. Candidate A remains rejected from the prior density arm.
+
+Authority composition remains green and representation-independent. This result
+does not authorize slot reuse, generational SubjectIds, a second value directory,
+packed lifecycle columns, or production integration. Any successor must enter as
+a new normalized physical candidate and independently prove stale SubjectId
+isolation, held-reference truth, restoration ownership, bounded sparse/high-water
+retention, and the existing latency gates.

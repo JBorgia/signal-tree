@@ -923,6 +923,24 @@ defines real retirement/deletion/reachability rules; inventing slot deletion in
 Phase 1 would contaminate the value-plus-revision result. Production integration,
 reachability, sparse retirement, and the full operation matrix remain open.
 
+`SUBJECT-SLOT-REACHABILITY-0` is **CURRENT STABLE-SLOT CANDIDATE REJECTED** at
+production-law checkpoint `026ab694` and generator `ee583ea7`. Production proves
+the lifetime split directly: retired value backing may disappear while structural
+lifetime/revision remains; only externally approved terminal retirement forgets
+both. The frame now rejects active-subject lifetime forget during preparation.
+The candidate models value release, structural-only revision updates, terminal
+holes, monotonic fresh SubjectIds, and no slot reuse. At 100k with 90k values
+released, five isolated samples retain 4.80 MB for incumbent Maps versus 6.46 MB
+for slots. After four terminal-forget/fresh rounds, incumbent is 10.88 MB,
+object records 11.22 MB, and slots 20.12 MB with 460,000 physical slots for
+100,000 live subjects. Every owner collects; repaired measurements exclude
+round temporaries, preserve in-place Map high-water behavior, aggregate peak
+independently, and treat terminal eligibility as external. Candidate B's prior
+-8.7 B/entity dense win is therefore not reachability-compatible; Candidate A
+remains rejected. Authority composition survives. No slot reuse, generational
+identity, split value directory, lifecycle packing, or production migration is
+authorized by this negative result.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
