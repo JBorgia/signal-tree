@@ -1295,3 +1295,58 @@ whether the component's directory survives, or whether either candidate beats
 the incumbent's density and latency. The next comparison must compose this exact
 contract with each structural carrier and run the already frozen dense,
 sparse-value, terminal-churn, lookup, and update gates.
+
+### Value-Handle Carrier Result — Both Candidates Rejected
+
+Generator checkpoint: `338aad21`.
+
+```bash
+pnpm exec tsx --expose-gc tools/bench-value-handle-carriers.mjs
+```
+
+The five-sample generator compares identical semantic owner sets and the same
+freshness/reuse contract. The incumbent uses independent revision and value
+Maps. The split-pool carrier adds a pool-owned SubjectId-to-handle directory.
+The checked carrier stores nullable handles in authority-owned structural
+records and uses the same directory-free value storage. Every transition
+prepares off-store; every sample and returned owner collects.
+
+| Workload                      | Incumbent | Split pool | Checked carrier |
+| ----------------------------- | --------: | ---------: | --------------: |
+| 100k dense active, post-GC    |  10.86 MB |   18.10 MB |        18.41 MB |
+| 90% values released, post-GC  |   4.80 MB |    8.04 MB |        10.74 MB |
+| four terminal rounds, post-GC |  10.89 MB |   18.52 MB |        18.82 MB |
+
+The handle-placement fork does not survive the memory gate. The checked carrier
+removes the pool's SubjectId directory but enlarges every structural Map value
+with an object record and nullable handle; it is slightly larger than the split
+pool in all three workloads. Both retain required generation/owner/free-list
+state and are 66-124% larger than the incumbent. Value-slot reuse keeps logical
+address units bounded at 100,000 through terminal churn, but bounded capacity is
+not sufficient when the retained representation itself is larger.
+
+No latency result can rescue a candidate that fails the hard density gate, so
+carrier latency is not measured. The incumbent independent Maps remain the
+current production winner for revision plus optional value backing. This does
+not prove Maps architecturally necessary or globally optimal; it rejects these
+two concrete checked-address carriers under the frozen workloads.
+
+`SUBJECT-RECORD-PROMOTION-0` is closed: object records and one stable slot are
+rejected. `SPLIT-POOL-PROMOTION-0` is closed for the preregistered split-pool and
+checked-allocator carriers: both are rejected, with no production integration.
+`composePreparedSubjectUpdates()` and the freshness/publication law remain
+reusable evidence. The concrete experimental carriers and value pool remain
+non-production and outside package entry points.
+
+Current disposition:
+
+```text
+authority composition          CLOSED GREEN / reusable
+physical freshness contract    CLOSED GREEN / reusable
+object-record carrier          REJECTED
+single stable-slot carrier     REJECTED
+directory split-pool carrier   REJECTED
+checked-handle carrier         REJECTED
+current production winner      INCUMBENT AUTHORITY MAPS
+production migration           NOT AUTHORIZED
+```

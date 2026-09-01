@@ -976,6 +976,23 @@ contract. This does not select a carrier, place structural truth, authorize
 production integration, or establish a density/latency win. Both carriers must
 consume the same contract in the frozen workload comparison.
 
+`SPLIT-POOL-PROMOTION-0` is **CLOSED NEGATIVE FOR BOTH PRE-REGISTERED
+CARRIERS / INCUMBENT REMAINS** at `338aad21`. Five isolated collectable samples
+compare off-store targets with identical identity/value cardinalities and the
+same generation-checked reuse law. At 100k dense active subjects, incumbent
+revision/value Maps retain 10.86 MB, directory split pools 18.10 MB, and checked
+structural-record handles 18.41 MB. With 90% of values released while all
+revisions remain, the result is 4.80 / 8.04 / 10.74 MB. After four terminal
+forget/fresh rounds, it is 10.89 / 18.52 / 18.82 MB; both value pools keep
+logical address units bounded at 100,000. Removing the pool directory does not
+pay for per-structural-record object/handle overhead. Both candidates fail the
+hard density gate before carrier latency matters, so no production integration
+is authorized. `SUBJECT-RECORD-PROMOTION-0` is also closed negative across its
+object-record and single-slot candidates. Incumbent authority Maps are the
+current production winner, not an architectural necessity. Authority composition
+and physical freshness/publication remain reusable green contracts; the
+experimental carriers stay outside package entry points.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
