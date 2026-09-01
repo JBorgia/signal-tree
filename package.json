@@ -48,6 +48,7 @@
     "publish": "node scripts/publish-candidate.mjs",
     "publish:dry-run": "node scripts/publish-candidate.mjs --dry-run",
     "release": "./scripts/release.sh patch",
+    "release:rc": "./scripts/release.sh rc",
     "release:minor": "./scripts/release.sh minor",
     "release:major": "./scripts/release.sh major",
     "release:patch": "./scripts/release.sh patch",

@@ -22,6 +22,7 @@ const expectedScripts = {
   'publish:dry-run': 'node scripts/publish-candidate.mjs --dry-run',
   'publish:ci': 'bash scripts/ci-publish.sh',
   release: './scripts/release.sh patch',
+  'release:rc': './scripts/release.sh rc',
   'release:patch': './scripts/release.sh patch',
   'release:minor': './scripts/release.sh minor',
   'release:major': './scripts/release.sh major',

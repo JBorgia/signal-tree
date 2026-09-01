@@ -13,7 +13,8 @@ not contain independent build, validation, or publish loops.
 ## Normal Flow
 
 1. Merge the intended source to the release branch.
-2. Run `pnpm run release:patch`, `release:minor`, or `release:major`.
+2. Run `pnpm run release:rc`, `release:patch`, `release:minor`, or
+   `release:major`.
 3. Confirm the pushed signed tag passes `.github/workflows/release.yml`.
 4. Dispatch `.github/workflows/publish.yml` for that tag.
 5. Verify npm and a fresh external installation.
