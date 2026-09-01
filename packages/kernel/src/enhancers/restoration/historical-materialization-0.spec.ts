@@ -4,6 +4,7 @@ import { signalTree } from '../../lib/signal-tree';
 import { undoable } from '../../lib/undoable';
 import { withWriteContext } from '../../lib/write-context';
 import { restoration } from './restoration';
+import { transactions } from '../transactions/transactions';
 
 const flush = async () => {
   await Promise.resolve();
@@ -11,6 +12,26 @@ const flush = async () => {
 };
 
 describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
+  it('retains no strong state on confirmed turns while public state remains exact', async () => {
+    const tree = signalTree(
+      { count: 0 },
+      { enhancers: [restoration({ maxHistorySize: 10 })] }
+    );
+    undoable(() => tree.$.count.set(1));
+    await flush();
+
+    const retained = (
+      tree as unknown as {
+        __restoration: { history: Array<{ state?: unknown }> };
+      }
+    ).__restoration.history;
+    expect(retained).toHaveLength(1);
+    expect(Object.prototype.hasOwnProperty.call(retained[0], 'state')).toBe(
+      false
+    );
+    expect(tree.getRestorationHistory()[0].state).toEqual({ count: 1 });
+  });
+
   it('keeps undesignated gap work out of the earlier retained boundary', async () => {
     const tree = signalTree(
       { designated: 0, ambient: 0 },
@@ -57,12 +78,14 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
     await flush();
     undoable(() => tree.$.right.set(1));
     await flush();
-    const manager = (tree as unknown as {
-      __restoration: {
-        history: Array<{ __positionIds?: number[] }>;
-        undoPosition(positionId: number): number[];
-      };
-    }).__restoration;
+    const manager = (
+      tree as unknown as {
+        __restoration: {
+          history: Array<{ __positionIds?: number[] }>;
+          undoPosition(positionId: number): number[];
+        };
+      }
+    ).__restoration;
     const leftPosition = manager.history[0].__positionIds?.[0];
     if (leftPosition === undefined) {
       throw new Error('Expected left position');
@@ -76,5 +99,19 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
       { left: 0, right: 1 },
       { left: 2, right: 1 },
     ]);
+  });
+
+  it('does not admit a pre-reset transaction when it confirms later', async () => {
+    const tree = signalTree(
+      { count: 0 },
+      { enhancers: [restoration(), transactions()] }
+    );
+    const pending = tree.transaction(() => undoable(() => tree.$.count.set(1)));
+
+    tree.resetRestorationHistory();
+    pending.confirm();
+    await flush();
+
+    expect(tree.getRestorationHistory()).toEqual([]);
   });
 });

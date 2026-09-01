@@ -3089,9 +3089,12 @@ describe('restoration enhancer', () => {
     const replayOwnerTokens: number[][] = [];
 
     const unsubscribe = notifier.subscribe(
-      'rows',
+      '**',
       (_next, _prev, _path, _ownerPath, source, subjectIds, positionIds) => {
         if (source === 'restoration') {
+          if (positionIds && positionIds.length > 0) {
+            replayOwnerTokens.push(positionIds);
+          }
           return;
         }
         if (subjectIds && subjectIds.length > 0) {
@@ -3099,21 +3102,6 @@ describe('restoration enhancer', () => {
         }
         if (positionIds && positionIds.length > 0) {
           liveOwnerTokens.push(positionIds);
-        }
-      }
-    );
-    const restoreReplayObserver = interceptLeafSignals(
-      (store as any).$,
-      // ⚠️ READS THE INTERCEPTOR'S OWN ARGUMENT, not `meta.positionIds` — that
-      // copy was deleted in 15.0, and this carrier staying green on the switch
-      // is what PROVED it duplicate. Contrast the subject carriers below, which
-      // could not make the same switch.
-      (_path, _next, _prev, meta, _ownerPath, _subjectIds, positionIds) => {
-        if (meta?.origin !== 'restoration') {
-          return;
-        }
-        if (Array.isArray(positionIds) && positionIds.length > 0) {
-          replayOwnerTokens.push(positionIds as number[]);
         }
       }
     );
@@ -3170,7 +3158,6 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    restoreReplayObserver();
     unsubscribe();
 
     expect(ownerAfterFirstAdd).toHaveLength(1);
