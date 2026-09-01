@@ -941,6 +941,24 @@ remains rejected. Authority composition survives. No slot reuse, generational
 identity, split value directory, lifecycle packing, or production migration is
 authorized by this negative result.
 
+`SPLIT-POOL-PROMOTION-0` is **CARRIER COMPETITION PRE-REGISTERED / NO WINNER**.
+The product property is independent physical lifetime for stable structural
+identity and optional value backing. Adversarial confirmation establishes the
+function but selects no carrier: incumbent authority Maps already provide it,
+and a coherent rival uses authority-owned structural records with nullable,
+freshness-checked handles into a general allocator. Compare that rival with a
+SubjectId directory over separate structural/value pools; neither is the target
+architecture. The directory and allocator are addressing machinery, never fact
+authority. Every recycled physical address must reject stale handles, and value
+backing plus its visible address must publish atomically after all expected
+failure. SubjectIds remain monotonic and never reused. The first external
+falsifier is release value / retain revision, recycle the physical value address
+for a fresh SubjectId, reject stale access, reacquire value for the original
+SubjectId, then terminally release both. Carrier survival requires a material
+win in dense, 90%-value-release, and four-round terminal-forget workloads while
+meeting existing latency, capacity, collectability, identity, restoration,
+transaction, and GC gates. Production integration remains forbidden.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user

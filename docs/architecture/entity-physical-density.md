@@ -1194,3 +1194,63 @@ packed lifecycle columns, or production integration. Any successor must enter as
 a new normalized physical candidate and independently prove stale SubjectId
 isolation, held-reference truth, restoration ownership, bounded sparse/high-water
 retention, and the existing latency gates.
+
+## SPLIT-POOL-PROMOTION-0 — Carrier Competition Pre-registered
+
+**Product decision:** physical value backing must be independently reclaimable
+from stable structural identity. No physical carrier is selected.
+
+Adversarial disposition: **FUNCTION SURVIVES; CARRIER NOT SELECTED**. Separate
+authority-owned SubjectId Maps already provide the required lifetime behavior,
+so split pools add no semantic capability. Stable SubjectId identity does not
+imply a stable physical address. A directory-mediated structural/value pool is
+one admissible candidate only if measurement defeats the incumbent and the
+normalized checked-allocator rival.
+
+The carrier competition is:
+
+1. **Incumbent:** authority-owned SubjectId Maps with independent entry
+   lifetimes.
+2. **Split pools:** a SubjectId directory addresses persistent structural
+   storage and optional independently reclaimable value storage.
+3. **Checked allocator:** authority-owned structural records hold nullable,
+   freshness-checked handles into a general value allocator without a central
+   split-pool directory.
+
+The directory, pool, allocator, and physical handles are addressing machinery,
+never mutation authorities. StructuralStore continues to own structural identity,
+revision, lifetime, membership, and order; EntityValueStore continues to own
+value truth. Restoration claims remain causal ownership outside all three.
+
+Every reusable physical address must carry or derive freshness evidence. Reads
+must distinguish absent backing, current backing for the same SubjectId, and a
+recycled location now owned by another subject. Prepared value publication must
+atomically install backing and its visible address after all expected failure;
+no observer may see a new address with old backing or old address with new
+backing. SubjectIds remain monotonic and never reused regardless of physical
+slot reuse.
+
+The smallest falsifier covers one active subject, value release with structural
+revision retained, physical value-slot reuse by a fresh SubjectId, stale-handle
+rejection, value reacquisition for the original SubjectId, and terminal release
+of both. It must prove held public references continue to resolve by SubjectId,
+not by cached physical address. Production integration is forbidden until this
+contract is green in an external candidate.
+
+Carrier survival requires a material win over the incumbent in the existing
+dense-active, 90%-value-release, and four-round terminal-forget workloads. It
+must preserve the preregistered latency bands, all-sample collectability, bounded
+physical capacity, and the full identity/restoration/transaction/GC laws. A
+directory that merely relocates SubjectId indexing or a reuse scheme that fixes
+terminal high-water while losing sparse value reclamation does not survive.
+
+Current disposition:
+
+```text
+authority composition          CLOSED GREEN
+object-record carrier          REJECTED
+single stable-slot carrier     REJECTED
+current production winner      NONE
+split-pool carrier             PRE-REGISTERED / UNPROVEN
+checked-allocator rival        PRE-REGISTERED / UNPROVEN
+```
