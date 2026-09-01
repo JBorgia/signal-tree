@@ -342,6 +342,7 @@ describe('declarative target transition: whole-target compilation', () => {
               { subject: 1, key: 'b', value: 2 },
             ],
             order: [1],
+            orderFrontier: '7:before',
           },
         ],
         []
@@ -378,6 +379,8 @@ describe('declarative target transition: whole-target compilation', () => {
         7,
         {
           owner: 7,
+          ownerPath: 'left',
+          readSource: () => source(7, [[1, 'a', {}]]),
           prepareTarget: () => ({
             install: () => installed.push(7),
             publish: () => installed.push(70),
@@ -388,6 +391,8 @@ describe('declarative target transition: whole-target compilation', () => {
         8,
         {
           owner: 8,
+          ownerPath: 'right',
+          readSource: () => source(8, [[1, 'a', {}]]),
           prepareTarget: () => {
             throw new Error('second owner refused');
           },
@@ -412,6 +417,8 @@ describe('declarative target transition: whole-target compilation', () => {
         owner,
         {
           owner,
+          ownerPath: `rows.${owner}`,
+          readSource: () => source(owner, [[1, 'a', {}]]),
           prepareTarget: () => ({
             install: () => events.push(`install:${owner}`),
             publish: () => events.push(`publish:${owner}`),
