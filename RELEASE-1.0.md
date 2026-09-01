@@ -881,6 +881,20 @@ reachability equivalence, and atomic installation remain unresolved; the next
 falsifier applies a composed same-subject revision-plus-value update through one
 candidate physical install.
 
+Candidate A's off-store application is **GREEN / PRODUCTION UNCHANGED** at
+`a800e663`. `preparePhysicalSubjectTarget()` fully preflights composed updates,
+preserves the other authority's fact for revision-only or value-only changes,
+requires both facts for a new subject, rejects duplicate updates and
+explicit-undefined bypasses, preserves untouched record identity, and produces
+complete frozen object records in a copied target Map. The same-subject killer
+case leaves revision 3 / old value live during preparation and exposes revision
+4 / new value after one assignment. Eighteen focused controls, kernel 253 files
+/ 2,064 passed / 3 expected failures / 13 skipped / 1 todo, both TypeScript
+passes, and kernel lint are green. This is not production installation, a
+density result, or a verdict over slot-indexed separation. Phase 1 remains open
+for private EntityMap integration, one non-throwing prepared install, and the
+preregistered memory/latency comparison.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
