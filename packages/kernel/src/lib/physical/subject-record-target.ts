@@ -28,9 +28,9 @@ export type PhysicalSubjectRecord<E extends Record<string, unknown>> = {
 
 export type PhysicalSubjectSlots<E extends Record<string, unknown>> = {
   readonly slotBySubject: ReadonlyMap<number, number>;
-  readonly subjects: readonly number[];
-  readonly revisions: readonly number[];
-  readonly values: readonly E[];
+  readonly subjects: readonly (number | undefined)[];
+  readonly revisions: readonly (number | undefined)[];
+  readonly values: readonly (E | undefined)[];
 };
 
 export function composePreparedSubjectUpdates<
@@ -125,7 +125,7 @@ export function preparePhysicalSubjectSlotTarget<
     readonly subjectId: number;
     readonly slot: number;
     readonly revision: number;
-    readonly value: E;
+    readonly value: E | undefined;
   }> = [];
   let nextSlot = current.subjects.length;
 
@@ -139,7 +139,10 @@ export function preparePhysicalSubjectSlotTarget<
     const value =
       update.value ??
       (existingSlot === undefined ? undefined : current.values[existingSlot]);
-    if (revision === undefined || value === undefined) {
+    if (
+      revision === undefined ||
+      (existingSlot === undefined && value === undefined)
+    ) {
       throw new Error(
         `New SubjectId ${String(
           update.subjectId
@@ -174,25 +177,77 @@ export function preparePhysicalSubjectSlotTarget<
   });
 }
 
+export function preparePhysicalSubjectValueRelease<
+  E extends Record<string, unknown>
+>(
+  current: PhysicalSubjectSlots<E>,
+  subjectId: number
+): PhysicalSubjectSlots<E> {
+  const slot = requirePhysicalSubjectSlot(current, subjectId);
+  const values = [...current.values];
+  values[slot] = undefined;
+  return Object.freeze({
+    ...current,
+    values: Object.freeze(values),
+  });
+}
+
+export function preparePhysicalSubjectForget<E extends Record<string, unknown>>(
+  current: PhysicalSubjectSlots<E>,
+  subjectId: number
+): PhysicalSubjectSlots<E> {
+  const slot = requirePhysicalSubjectSlot(current, subjectId);
+  const slotBySubject = new Map(current.slotBySubject);
+  const subjects = [...current.subjects];
+  const revisions = [...current.revisions];
+  const values = [...current.values];
+  slotBySubject.delete(subjectId);
+  subjects[slot] = undefined;
+  revisions[slot] = undefined;
+  values[slot] = undefined;
+  return Object.freeze({
+    slotBySubject,
+    subjects: Object.freeze(subjects),
+    revisions: Object.freeze(revisions),
+    values: Object.freeze(values),
+  });
+}
+
+function requirePhysicalSubjectSlot<E extends Record<string, unknown>>(
+  current: PhysicalSubjectSlots<E>,
+  subjectId: number
+): number {
+  assertSubjectId(subjectId);
+  const slot = current.slotBySubject.get(subjectId);
+  if (slot === undefined) {
+    throw new Error(`Physical SubjectId ${String(subjectId)} has no slot`);
+  }
+  return slot;
+}
+
 export function assertPhysicalSubjectSlots<E extends Record<string, unknown>>(
   slots: PhysicalSubjectSlots<E>
 ): void {
   if (
     slots.subjects.length !== slots.revisions.length ||
-    slots.subjects.length !== slots.values.length ||
-    slots.slotBySubject.size !== slots.subjects.length
+    slots.subjects.length !== slots.values.length
   ) {
     throw new Error('Physical subject slot columns are inconsistent');
   }
+  const reachableSubjects = new Set<number>();
   for (let slot = 0; slot < slots.subjects.length; slot += 1) {
     const subjectId = slots.subjects[slot];
-    assertSubjectId(subjectId);
-    assertRevision(slots.revisions[slot]);
-    if (slots.values[slot] === undefined) {
-      throw new Error(
-        `Physical subject slot ${String(slot)} is missing its value`
-      );
+    const revision = slots.revisions[slot];
+    if (subjectId === undefined) {
+      if (revision !== undefined || slots.values[slot] !== undefined) {
+        throw new Error(
+          `Vacant physical subject slot ${String(slot)} retains facts`
+        );
+      }
+      continue;
     }
+    assertSubjectId(subjectId);
+    assertRevision(revision as number);
     if (slots.slotBySubject.get(subjectId) !== slot) {
       throw new Error(
         `Physical SubjectId ${String(subjectId)} does not address slot ${String(
@@ -200,6 +255,12 @@ export function assertPhysicalSubjectSlots<E extends Record<string, unknown>>(
         )}`
       );
     }
+    reachableSubjects.add(subjectId);
+  }
+  if (reachableSubjects.size !== slots.slotBySubject.size) {
+    throw new Error(
+      'Physical subject slot directory contains unreachable subjects'
+    );
   }
 }
 

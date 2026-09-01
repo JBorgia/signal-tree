@@ -6,7 +6,7 @@ import {
 
 export type PreparedValueReplacement<
   K extends string | number,
-  E extends Record<string, unknown>,
+  E extends Record<string, unknown>
 > = {
   kind: 'replace-value';
   key: K;
@@ -44,7 +44,7 @@ export type PreparedSubjectTombstone<K extends string | number> = {
 
 export type PreparedFreshSubject<
   K extends string | number,
-  E extends Record<string, unknown>,
+  E extends Record<string, unknown>
 > = {
   kind: 'create-fresh-subject';
   key: K;
@@ -61,7 +61,7 @@ export type PreparedFreshSubject<
 
 export type PreparedSubjectRestore<
   K extends string | number,
-  E extends Record<string, unknown>,
+  E extends Record<string, unknown>
 > = {
   kind: 'restore-subject';
   key: K;
@@ -74,7 +74,7 @@ export type PreparedSubjectRestore<
 
 export type PreparedEntityPhysicalMutation<
   K extends string | number,
-  E extends Record<string, unknown>,
+  E extends Record<string, unknown>
 > =
   | PreparedValueReplacement<K, E>
   | PreparedRetainedValueRetirement
@@ -90,7 +90,7 @@ export type EntityMutationCommitResult = {
 
 type PreparedRestoreCommitInstruction<
   K extends string | number,
-  E extends Record<string, unknown>,
+  E extends Record<string, unknown>
 > = PreparedSubjectRestore<K, E> & {
   resolvedValue?: E;
   resolvedPlacement: ResolvedSubjectRestorePlacement<K>;
@@ -98,14 +98,14 @@ type PreparedRestoreCommitInstruction<
 
 type PreparedCommitInstruction<
   K extends string | number,
-  E extends Record<string, unknown>,
+  E extends Record<string, unknown>
 > =
   | Exclude<PreparedEntityPhysicalMutation<K, E>, PreparedSubjectRestore<K, E>>
   | PreparedRestoreCommitInstruction<K, E>;
 
 export class EntityMutationFrame<
   K extends string | number,
-  E extends Record<string, unknown>,
+  E extends Record<string, unknown>
 > {
   private readonly mutations: PreparedEntityPhysicalMutation<K, E>[] = [];
 
@@ -118,7 +118,9 @@ export class EntityMutationFrame<
     this.mutations.push(replacement);
   }
 
-  stageRetainedValueRetirement(retirement: PreparedRetainedValueRetirement): void {
+  stageRetainedValueRetirement(
+    retirement: PreparedRetainedValueRetirement
+  ): void {
     this.mutations.push(retirement);
   }
 
@@ -221,6 +223,19 @@ export class EntityMutationFrame<
 
   private prepareCommitInstructions(): PreparedCommitInstruction<K, E>[] {
     return this.mutations.map((mutation) => {
+      if (
+        mutation.kind === 'retire-retained-value' &&
+        mutation.forgetLifetime
+      ) {
+        const state = this.structuralStore.stateForSubject(mutation.subjectId);
+        if (!state || state.active) {
+          throw new Error(
+            `Subject ${String(
+              mutation.subjectId
+            )} must be tombstoned before forgetting its lifetime.`
+          );
+        }
+      }
       if (mutation.kind !== 'restore-subject') {
         return mutation;
       }
@@ -237,5 +252,4 @@ export class EntityMutationFrame<
       };
     });
   }
-
 }
