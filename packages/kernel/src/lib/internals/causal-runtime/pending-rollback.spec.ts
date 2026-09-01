@@ -46,7 +46,9 @@ describe('rollbackPendingTurnAt', () => {
         },
       ],
     });
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
 
     expect(
       rollbackPendingTurnAt({
@@ -90,7 +92,9 @@ describe('rollbackPendingTurnAt', () => {
         },
       ],
     });
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
 
     expect(
       rollbackPendingTurnAt({
@@ -120,7 +124,9 @@ describe('rollbackPendingTurnAt', () => {
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
 
     expect(
       rollbackPendingTurnAt({
@@ -154,7 +160,9 @@ describe('rollbackPendingTurnAt', () => {
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
 
     expect(
       rollbackPendingTurnAt({
@@ -209,7 +217,9 @@ describe('rollbackPendingTurnAt', () => {
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
 
     expect(
       rollbackPendingTurnAt({
@@ -261,7 +271,9 @@ describe('rollbackPendingTurnAt', () => {
       participants: [P_DRIVER_KEY],
       state: 'confirmed' as const,
     };
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
     const validateEffects = vi.fn();
     const store = {
       getPendingTurn: () => pendingRemove,
@@ -329,7 +341,9 @@ describe('rollbackPendingTurnAt', () => {
       participants: [P_DRIVER_KEY],
       state: 'pending' as const,
     };
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
     const validateEffects = vi.fn();
     const store = {
       getPendingTurn: () => pendingRekey,
@@ -375,7 +389,9 @@ describe('rollbackPendingTurnAt', () => {
       participants: [P_FIRST_NAME],
       state: 'pending' as const,
     };
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
     const store = {
       getPendingTurn: () => turn,
       getPendingTurns: () => [turn],
@@ -423,7 +439,9 @@ describe('rollbackPendingTurnAt', () => {
       participants: [P_DRIVER_KEY],
       state: 'pending' as const,
     };
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
     const store = {
       getPendingTurn: () => turn,
       getPendingTurns: () => [turn],
@@ -969,7 +987,9 @@ describe('rollbackPendingTurnAt', () => {
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
 
     expect(
       rollbackPendingTurnAt({
@@ -1023,7 +1043,9 @@ describe('rollbackPendingTurnAt', () => {
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
 
     expect(
       rollbackPendingTurnAt({
@@ -1076,7 +1098,9 @@ describe('rollbackPendingTurnAt', () => {
     const storeBefore = store.inspect();
     const pendingBefore = store.getPendingTurnIds();
     const appliedBefore = appliedTurns.inspect();
-    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+    const applyAtomically = vi.fn<
+      (effects: readonly ReversalEffect[]) => void
+    >();
 
     expect(
       rollbackPendingTurnAt({
