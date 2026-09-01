@@ -377,8 +377,9 @@ export type EnhancerCleanup = () => void;
  * That is invisible under `skipLibCheck` and a hard error without it. Inlining
  * makes the emitted signature self-contained without adding a public symbol.
  *
- * State inference is UNCHANGED for consumers: `getRestorationHistory()[0].state` is the
- * exact concrete state, through arbitrarily long `.with()` chains.
+ * State inference is preserved for consumers:
+ * `getRestorationHistory()[0].state` is the exact concrete state when
+ * restoration is supplied through the declarative enhancer tuple.
  */
 
 /**
