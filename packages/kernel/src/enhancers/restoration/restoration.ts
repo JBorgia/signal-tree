@@ -9,11 +9,7 @@ import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-p
 import { markOwnerInvalidatedFrom } from '../../lib/internals/owner-invalidation-port';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
 
-import {
-  deepEqual,
-  isTraversableNode,
-  snapshotState,
-} from '../../lib/utils';
+import { isTraversableNode, snapshotState } from '../../lib/utils';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
 import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-runtime';
 import type { CollectionOrderCapture } from '../../lib/internals/mutation-capture-runtime';
@@ -50,7 +46,10 @@ import {
 } from '../../lib/internals/restoration-eligibility';
 import { visitTree } from '../../lib/internals/visit-tree';
 import { recordProductionSubstrateStat } from '../../lib/internals/production-substrate-stats';
-import { getWriteParticipation, isInspectionWrite } from '../../lib/write-participation';
+import {
+  getWriteParticipation,
+  isInspectionWrite,
+} from '../../lib/write-participation';
 import { getPathNotifier } from '../../lib/path-notifier';
 import {
   getActiveWriteContext,
@@ -67,7 +66,10 @@ import type {
   EnhancerMeta,
   WriteMetadata,
 } from '../../lib/types';
-import type { RestorationHistoryEntry, RestorationMethods } from './restoration.types';
+import type {
+  RestorationHistoryEntry,
+  RestorationMethods,
+} from './restoration.types';
 
 // `SignalTreeRollbackError` is no longer imported here: rollback errors are
 // raised by `transactions()`, which owns rollback (TX-SURFACE-0).
@@ -92,7 +94,8 @@ export type { RestorationConfig, RestorationHistoryEntry };
  * Internal restoration state management
  */
 
-type CanonicalTurn<T> = RestorationHistoryEntry<T> & {
+type CanonicalTurn<T> = Omit<RestorationHistoryEntry<T>, 'state'> & {
+  state?: T;
   id: number;
   historyIndex: number;
   __turnId: number;
@@ -208,7 +211,6 @@ type TreeRealizationDescriptorStore = Map<
 //
 // Rollback is `transactions()`' concern and it declares its own equivalents,
 // built from its own captured effects rather than from restoration history.
-
 
 function toReversalEffect(
   effect: TurnEffect,
@@ -375,7 +377,9 @@ function normaliseMaxHistorySize(value: number | undefined): number {
   if (!Number.isFinite(value) || value < 0) {
     if (typeof ngDevMode === 'undefined' || ngDevMode) {
       console.error(
-        `SignalTree: restoration({ maxHistorySize: ${String(value)} }) cannot ` +
+        `SignalTree: restoration({ maxHistorySize: ${String(
+          value
+        )} }) cannot ` +
           `express a supported retention policy. Pass 0 to retain no completed ` +
           `history, a positive integer for bounded undo, or omit it for the default ` +
           `of 50. Falling back to 50. [ST2032]`
@@ -511,9 +515,7 @@ class RestorationManager<T> {
     private positionRegistry: PositionRegistry,
     private config: RestorationConfig = {},
     private restoreStateFn?: (state: T) => void,
-    private applyEffectsFn?: (
-      applications: DirectedTurnApplication[]
-    ) => void
+    private applyEffectsFn?: (applications: DirectedTurnApplication[]) => void
   ) {
     const cellRuntime = getTreeRealization(tree)?.cell ?? NEUTRAL_CELL_RUNTIME;
     this.indexSignal = cellRuntime.createCell(-1);
@@ -527,9 +529,6 @@ class RestorationManager<T> {
       batch: 'BATCH',
       ...config.actionNames,
     };
-    if (this.maxHistorySize > 0) {
-      snapshotState(this.tree.$ as unknown as TreeNode<T>);
-    }
   }
 
   /**
@@ -574,7 +573,8 @@ class RestorationManager<T> {
       positionIds,
       effects,
       collectionOrders,
-      explicitTurnId
+      explicitTurnId,
+      false
     );
     if (!entry) {
       return false;
@@ -602,7 +602,8 @@ class RestorationManager<T> {
       positionIds,
       effects,
       collectionOrders,
-      explicitTurnId
+      explicitTurnId,
+      true
     );
     if (!entry) {
       return undefined;
@@ -612,7 +613,9 @@ class RestorationManager<T> {
     return {
       ...entry,
       __ownerPaths: entry.__ownerPaths ? [...entry.__ownerPaths] : undefined,
-      restorationSubjectIds: entry.restorationSubjectIds ? [...entry.restorationSubjectIds] : undefined,
+      restorationSubjectIds: entry.restorationSubjectIds
+        ? [...entry.restorationSubjectIds]
+        : undefined,
       __positionIds: entry.__positionIds ? [...entry.__positionIds] : undefined,
       __effects: entry.__effects
         ? entry.__effects.map(cloneTurnEffect)
@@ -636,6 +639,11 @@ class RestorationManager<T> {
 
   discardPendingTurn(turnId: number): boolean {
     const discarded = this.pendingTurns.delete(turnId);
+    for (const event of this.historicalEvents) {
+      if (event.boundaryTurnId === turnId) {
+        event.boundaryTurnId = undefined;
+      }
+    }
     if (this.history.length === 0 && this.pendingTurns.size === 0) {
       this.historicalEvents = [];
     }
@@ -674,7 +682,8 @@ class RestorationManager<T> {
     positionIds?: number[],
     effects?: TurnEffect[],
     collectionOrders?: PendingCollectionOrder[],
-    explicitTurnId?: number
+    explicitTurnId?: number,
+    retainPendingState = false
   ): CanonicalTurn<T> | undefined {
     if (this.hasScopedRedoFuture()) {
       this.truncateScopedRedoFuture();
@@ -741,14 +750,9 @@ class RestorationManager<T> {
     // No pruning step. `recordHistory` is gone, so the recorded snapshot IS the
     // materialised snapshot and the reference-dedupe below is exact again —
     // which also removes the phantom-entry class that pruning created.
-    const plain = snapshotState(this.tree.$ as unknown as TreeNode<T>);
-
-    if (
-      (typeof ngDevMode === 'undefined' || ngDevMode) &&
-      this.history.length % RETENTION_CHECK_INTERVAL === 0
-    ) {
-      checkHistoryRetention(this.tree.$, this.history.length);
-    }
+    const pendingState = retainPendingState
+      ? (snapshotState(this.tree.$ as unknown as TreeNode<T>) as T)
+      : undefined;
 
     const turnId = explicitTurnId ?? this.nextTurnId;
     this.nextTurnId = Math.max(this.nextTurnId, turnId + 1);
@@ -773,7 +777,7 @@ class RestorationManager<T> {
       id: turnId,
       historyIndex: this.history.length,
       __turnId: turnId,
-      state: plain as T,
+      ...(pendingState === undefined ? {} : { state: pendingState }),
       timestamp: Date.now(),
       action: this.actionNames[action] || action,
       ...(this.includePayload && payload !== undefined && { payload }),
@@ -810,7 +814,10 @@ class RestorationManager<T> {
     if (orderDeltas.length > 0) {
       entry.__orderDeltas = orderDeltas;
       entry.__positionIds = Array.from(
-        new Set([...(entry.__positionIds ?? []), ...orderDeltas.map(({ owner }) => owner)])
+        new Set([
+          ...(entry.__positionIds ?? []),
+          ...orderDeltas.map(({ owner }) => owner),
+        ])
       ).sort((left, right) => left - right);
     }
 
@@ -828,14 +835,9 @@ class RestorationManager<T> {
     // `recordHistory` existed: pruning produced snapshots that were structurally
     // identical and referentially distinct, so a `prunedEqual` walk had to run
     // whenever anything had been pruned. Deleting the option deleted the need.
-    const last = this.history[this.history.length - 1];
     const isEffectEmpty =
       (!effects || effects.length === 0) && orderDeltas.length === 0;
-    if (
-      last &&
-      (last.state === entry.state ||
-        (isEffectEmpty && deepEqual(last.state, entry.state)))
-    ) {
+    if (isEffectEmpty) {
       return undefined;
     }
 
@@ -871,6 +873,8 @@ class RestorationManager<T> {
     this.currentIndex = this.history.length - 1;
     this.isTemporalViewActive = false;
 
+    delete entry.state;
+
     this.retainRestorationClaims(entry);
 
     // Enforce max history size
@@ -889,7 +893,14 @@ class RestorationManager<T> {
   }
 
   private pruneHistoricalEventsBeforeOldestBoundary(): void {
-    const oldestOrdinal = this.history[0]?.__eventOrdinal;
+    const oldestOrdinal = [
+      ...this.history.map(({ __eventOrdinal }) => __eventOrdinal),
+      ...[...this.pendingTurns.values()].map(
+        ({ __eventOrdinal }) => __eventOrdinal
+      ),
+    ]
+      .filter((ordinal): ordinal is number => ordinal !== undefined)
+      .sort((left, right) => left - right)[0];
     if (oldestOrdinal === undefined) {
       if (this.pendingTurns.size === 0) {
         this.historicalEvents = [];
@@ -924,12 +935,19 @@ class RestorationManager<T> {
   }
 
   getTurns(): Array<CanonicalTurn<T>> {
+    const states = this.materializeHistoricalStates();
+    const stateByTurnId = new Map(
+      this.history.map((turn, index) => [turn.id, states[index]])
+    );
     return [...this.turns.values(), ...this.pendingTurns.values()]
       .sort((left, right) => left.id - right.id)
       .map((turn) => ({
         ...turn,
+        state: turn.state ?? stateByTurnId.get(turn.id),
         __ownerPaths: turn.__ownerPaths ? [...turn.__ownerPaths] : undefined,
-        restorationSubjectIds: turn.restorationSubjectIds ? [...turn.restorationSubjectIds] : undefined,
+        restorationSubjectIds: turn.restorationSubjectIds
+          ? [...turn.restorationSubjectIds]
+          : undefined,
         __positionIds: turn.__positionIds ? [...turn.__positionIds] : undefined,
         __effects: turn.__effects
           ? turn.__effects.map(cloneTurnEffect)
@@ -946,10 +964,19 @@ class RestorationManager<T> {
       return undefined;
     }
 
+    const historyIndex = this.history.findIndex((entry) => entry.id === turnId);
+    const state =
+      turn.state ??
+      (historyIndex >= 0
+        ? this.materializeHistoricalStates()[historyIndex]
+        : undefined);
     return {
       ...turn,
+      state,
       __ownerPaths: turn.__ownerPaths ? [...turn.__ownerPaths] : undefined,
-      restorationSubjectIds: turn.restorationSubjectIds ? [...turn.restorationSubjectIds] : undefined,
+      restorationSubjectIds: turn.restorationSubjectIds
+        ? [...turn.restorationSubjectIds]
+        : undefined,
       __positionIds: turn.__positionIds ? [...turn.__positionIds] : undefined,
       __effects: turn.__effects
         ? turn.__effects.map(cloneTurnEffect)
@@ -1479,18 +1506,6 @@ class RestorationManager<T> {
     return earliestTurn;
   }
 
-  private undoBySnapshot(): boolean {
-    // ⚠️ `undoneEntry` WAS READ HERE ONLY TO FORWARD ITS IDENTITY FIELDS into
-    // `restoreState`, which stamped them into `WriteMetadata.positionIds` /
-    // `subjectIds` — both deleted in 15.0. The history entry itself is
-    // untouched; nothing here needs to look at it any more.
-    this.currentIndex = this.currentIndex - 1;
-    this.isTemporalViewActive = true;
-    const entry = this.history[this.currentIndex];
-    this.restoreState(entry.state);
-    return true;
-  }
-
   undoConfirmed(): boolean {
     if (!this.canUndoConfirmed()) {
       return false;
@@ -1510,11 +1525,7 @@ class RestorationManager<T> {
   }
 
   undo(): boolean {
-    if (!this.canUndo()) {
-      return false;
-    }
-
-    return this.undoBySnapshot();
+    return this.undoConfirmed();
   }
 
   // `skipsBackward()` / `skipsForward()` and `shouldSkip` were DELETED in 15.0.
@@ -1541,18 +1552,7 @@ class RestorationManager<T> {
   // touched X" — that is a different primitive and needs its own derivation.
 
   redo(): boolean {
-    if (!this.canRedo()) {
-      return false;
-    }
-
-    this.currentIndex = this.currentIndex + 1;
-    this.isTemporalViewActive = true;
-    const entry = this.history[this.currentIndex] as RestorationHistoryEntry<T> & {
-      restorationSubjectIds?: number[];
-      __positionIds?: number[];
-    };
-    this.restoreState(entry.state);
-    return true;
+    return this.redoConfirmed();
   }
 
   redoConfirmed(): boolean {
@@ -1587,27 +1587,27 @@ class RestorationManager<T> {
     // nothing that the contract does not already give.
     this.historyVersion();
     const states = this.materializeHistoricalStates();
-    return this.history.map((entry, index) => ({
-      ...entry,
-      state: states[index] ?? entry.state,
-    }));
+    return this.history.map((entry, index) => {
+      const state = states[index] ?? entry.state;
+      if (state === undefined) {
+        throw new Error(
+          `Historical state ${entry.id} could not be materialized`
+        );
+      }
+      return { ...entry, state };
+    });
   }
 
   private materializeHistoricalStates(): T[] {
     if (this.history.length === 0) {
       return [];
     }
-    if (
-      this.isTemporalViewActive ||
-      this.history.some((turn) => this.getTurnStatus(turn.id) !== 'applied')
-    ) {
-      return this.history.map((turn) => turn.state);
-    }
-
     const bindings = new Map<number, CollectionTransitionTargetBinding>();
     visitTree(this.tree.$, (node) => {
       const binding = (
-        node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+        node as {
+          __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+        }
       ).__prepareTransitionTarget;
       if (binding) {
         bindings.set(binding.owner, binding);
@@ -1622,6 +1622,77 @@ class RestorationManager<T> {
     const historyIndexByTurnId = new Map(
       this.history.map((turn, index) => [turn.id, index])
     );
+
+    const applyDetachedTurn = (
+      turn: CanonicalTurn<T>,
+      direction: 'undo' | 'redo'
+    ): void => {
+      const effects =
+        direction === 'undo'
+          ? [...(turn.__effects ?? [])].reverse()
+          : [...(turn.__effects ?? [])];
+      const reversalEffects = effects.map((effect) =>
+        toReversalEffect(effect, direction)
+      );
+      const collectionOwners = new Set([
+        ...(turn.__orderDeltas ?? []).map(({ owner }) => owner),
+        ...reversalEffects
+          .filter(({ subjectId }) => typeof subjectId === 'number')
+          .map(({ owner }) => owner),
+      ]);
+      const target = deriveDeclarativeTransitionTarget({
+        collections: [...collectionOwners].map((owner) => {
+          const source = collections.get(owner);
+          if (!source) {
+            throw new Error(
+              `Historical materialization has no collection ${owner}`
+            );
+          }
+          return source;
+        }),
+        effects: reversalEffects,
+        orderDeltas: turn.__orderDeltas,
+        orderEndpoint: direction === 'undo' ? 'before' : 'after',
+      });
+      for (const [owner, collection] of target.collections) {
+        collections.set(owner, collection);
+        const binding = bindings.get(owner);
+        if (!binding) {
+          throw new Error(`Historical materialization has no binding ${owner}`);
+        }
+        natural = setDetachedNaturalValue(natural, binding.ownerPath, {
+          all: collection.order.map((subjectId) => {
+            const subject = collection.subjects.find(
+              (candidate) => candidate.subject === subjectId
+            );
+            if (!subject) {
+              throw new Error(
+                `Historical materialization lost subject ${subjectId}`
+              );
+            }
+            return subject.value;
+          }),
+        });
+      }
+      for (const effect of reversalEffects) {
+        if (effect.structural !== undefined || effect.subjectId !== undefined) {
+          continue;
+        }
+        if (typeof effect.path !== 'string') {
+          throw new Error('Historical scalar effect has no path');
+        }
+        natural = setDetachedNaturalValue(natural, effect.path, effect.after);
+      }
+    };
+
+    const unappliedTail = this.history.filter((turn) =>
+      this.isTemporalViewActive
+        ? turn.historyIndex > this.currentIndex
+        : this.getTurnStatus(turn.id) === 'unapplied'
+    );
+    for (const turn of unappliedTail) {
+      applyDetachedTurn(turn, 'redo');
+    }
 
     for (let index = this.historicalEvents.length - 1; index >= 0; index -= 1) {
       const event = this.historicalEvents[index];
@@ -1643,7 +1714,9 @@ class RestorationManager<T> {
       const collectionSources = [...collectionOwners].map((owner) => {
         const source = collections.get(owner);
         if (!source) {
-          throw new Error(`Historical materialization has no collection ${owner}`);
+          throw new Error(
+            `Historical materialization has no collection ${owner}`
+          );
         }
         return source;
       });
@@ -1665,7 +1738,9 @@ class RestorationManager<T> {
               (candidate) => candidate.subject === subjectId
             );
             if (!subject) {
-              throw new Error(`Historical materialization lost subject ${subjectId}`);
+              throw new Error(
+                `Historical materialization lost subject ${subjectId}`
+              );
             }
             return subject.value;
           }),
@@ -1713,13 +1788,16 @@ class RestorationManager<T> {
 
     const turnIdsToUndo = this.history
       .filter(
-        (turn) => turn.historyIndex > index && this.getTurnStatus(turn.id) === 'applied'
+        (turn) =>
+          turn.historyIndex > index && this.getTurnStatus(turn.id) === 'applied'
       )
       .sort((left, right) => right.historyIndex - left.historyIndex)
       .map(({ id }) => id);
     const turnIdsToRedo = this.history
       .filter(
-        (turn) => turn.historyIndex <= index && this.getTurnStatus(turn.id) === 'unapplied'
+        (turn) =>
+          turn.historyIndex <= index &&
+          this.getTurnStatus(turn.id) === 'unapplied'
       )
       .sort((left, right) => left.historyIndex - right.historyIndex)
       .map(({ id }) => id);
@@ -1834,7 +1912,9 @@ class RestorationManager<T> {
         continue;
       }
       const turnEffects = turn.__effects ?? [];
-      orderDeltas.push(...(turn.__orderDeltas ?? []).map(cloneCollectionOrderDelta));
+      orderDeltas.push(
+        ...(turn.__orderDeltas ?? []).map(cloneCollectionOrderDelta)
+      );
       recordProductionSubstrateStat(
         'publicUndoTurnEffectsExamined',
         turnEffects.length
@@ -1980,7 +2060,9 @@ class RestorationManager<T> {
     }
     const newlyUnowned: number[] = [];
     for (const entry of entries) {
-      newlyUnowned.push(...claims.release(this.restorationClaimOwner(entry.id)));
+      newlyUnowned.push(
+        ...claims.release(this.restorationClaimOwner(entry.id))
+      );
     }
     if (newlyUnowned.length > 0) {
       const released =
@@ -2229,11 +2311,6 @@ class RestorationManager<T> {
  * collection with a long history and a big one with a short history are judged
  * by the same standard — a row-count threshold gets both wrong.
  */
-const HISTORY_RETAINED_POINTER_BUDGET = 500_000;
-
-/** @internal Records between retention checks. See `checkHistoryRetention`. */
-const RETENTION_CHECK_INTERVAL = 16;
-
 /**
  * @internal Cap on the `observedBatches` probe log. It exists so Phase 0A specs
  * can read what the flush hook recorded per batch; nothing reads it in
@@ -2242,93 +2319,6 @@ const RETENTION_CHECK_INTERVAL = 16;
  * last-N window preserves the probe's purpose.
  */
 const MAX_OBSERVED_BATCHES = 1_000;
-
-/** @internal One report per process. */
-let warnedHistoryRetention = false;
-
-/**
- * @internal ST2029 — history retention from included collections.
- *
- * Checked at RECORD time, not at attach. The first version of this checked once
- * when the enhancer attached, and that is the one moment it cannot work: an app
- * builds its tree, attaches `restoration()` in the same breath, and the rows
- * arrive later from a fetch. At attach the collection is empty, every time. The
- * check passed its own tests only because those tests populated the collection
- * first — test order chosen to suit the implementation rather than to match
- * what an app does.
- *
- * Sampled every `RETENTION_CHECK_INTERVAL` records so the walk is amortised to
- * nothing: collection width moves slowly, and this is a warning about a trend,
- * not a tripwire that must fire on an exact entry.
- */
-function checkHistoryRetention(root: unknown, entries: number): void {
-  if (
-    warnedHistoryRetention ||
-    !root ||
-    !isTraversableNode(root)
-  ) {
-    return;
-  }
-
-  let widest = 0;
-  let widestPath = '';
-  let total = 0;
-
-  const seen = new WeakSet<object>();
-  const visit = (node: Record<string, unknown>, path: string): void => {
-    if (seen.has(node)) return;
-    seen.add(node);
-
-    for (const key of Object.keys(node)) {
-      const child = node[key] as Record<string, unknown> | undefined;
-      if (!child || typeof child !== 'object') continue;
-      const childPath = path ? `${path}.${key}` : key;
-
-      const all = (child as { all?: () => unknown[] }).all;
-      const isCollection =
-        typeof all === 'function' &&
-        typeof (child as { setAll?: unknown }).setAll === 'function';
-
-      if (isCollection) {
-        let size = 0;
-        try {
-          size = all.call(child).length;
-        } catch {
-          continue;
-        }
-        total += size;
-        if (size > widest) {
-          widest = size;
-          widestPath = childPath;
-        }
-        continue;
-      }
-
-      visit(child, childPath);
-    }
-  };
-
-  try {
-    visit(root as Record<string, unknown>, '');
-  } catch {
-    return; // A diagnostic must never break a write.
-  }
-
-  const retained = total * entries;
-  if (retained < HISTORY_RETAINED_POINTER_BUDGET) return;
-
-  warnedHistoryRetention = true;
-  console.warn(
-    `SignalTree: restoration is retaining roughly ${Math.round(
-      retained / 1000
-    )}k entity pointers — ${entries} history entries, each holding a fresh ` +
-      `array for every collection it captures (widest: "${widestPath}" at ` +
-      `${widest}). Every write to those collections is O(collection), and the ` +
-      `history only grows. Reduce maxHistorySize, or reduce how many ` +
-      `operations are undoable() — an operation that is not undoable retains ` +
-      `nothing, whatever it touches. [ST2029]`
-  );
-}
 
 export function restoration(
   config: RestorationConfig = {}
@@ -2473,7 +2463,9 @@ export function restoration(
         const bindings = new Map<number, CollectionTransitionTargetBinding>();
         visitTree((tree as ISignalTree<T>).$, (node) => {
           const binding = (
-            node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+            node as {
+              __prepareTransitionTarget?: CollectionTransitionTargetBinding;
+            }
           ).__prepareTransitionTarget;
           if (binding) {
             bindings.set(binding.owner, binding);
@@ -2571,7 +2563,10 @@ export function restoration(
       };
 
       const externalConflict = ((): ReversalRefusal | undefined => {
-        if (externalTruthByPath.size === 0 && externalTruthBySubject.size === 0) {
+        if (
+          externalTruthByPath.size === 0 &&
+          externalTruthBySubject.size === 0
+        ) {
           return undefined;
         }
         for (const effect of reversalEffects) {
@@ -2697,7 +2692,10 @@ export function restoration(
       // reached. The consume-once marking that used to be needed here is gone —
       // see the tombstone at `externalTruthByPath`.
       for (const effect of reversalEffects) {
-        if (effect.structural === undefined && typeof effect.path === 'string') {
+        if (
+          effect.structural === undefined &&
+          typeof effect.path === 'string'
+        ) {
           externalTruthByPath.delete(effect.path);
         }
         const restoredSubjectKey = subjectTruthKey(
@@ -3198,14 +3196,14 @@ export function restoration(
               return fallback === undefined ? [] : [fallback];
             })();
 
-          bucket.descriptorInputs.push({
-            path,
-            ownerPath,
-            positionIds: resolvedPositionIds,
-            subjectIds,
-            meta,
-            registry: getPositionRegistry(tree.$),
-          });
+      bucket.descriptorInputs.push({
+        path,
+        ownerPath,
+        positionIds: resolvedPositionIds,
+        subjectIds,
+        meta,
+        registry: getPositionRegistry(tree.$),
+      });
 
       bucket.ownerPaths.add(ownerPath ?? path);
       for (const subjectId of subjectIds ?? []) {
@@ -3283,7 +3281,10 @@ export function restoration(
       if (meta.transactionOwner === transactionOwnerToken) {
         return meta.transactionId;
       }
-      if (typeof meta.transactionOwner !== 'object' || meta.transactionOwner === null) {
+      if (
+        typeof meta.transactionOwner !== 'object' ||
+        meta.transactionOwner === null
+      ) {
         return undefined;
       }
       // Only while the announcing owner says it is OPEN. A stale id from a
@@ -3310,8 +3311,7 @@ export function restoration(
         collectionOrders,
         descriptorInputs,
         designated,
-      } =
-        drainCaptureBucket(bucket);
+      } = drainCaptureBucket(bucket);
       if (!isTurnEligible(designated)) {
         return undefined;
       }
@@ -3396,9 +3396,11 @@ export function restoration(
       }
 
       if (event.kind === 'confirmed') {
-        const descriptorInputs = pendingDescriptorInputs.get(stagedTurnId) ?? [];
-        const confirmed = restorationManager.confirmPendingTurn(stagedTurnId, () =>
-          retainDescriptorInputs(descriptorInputs)
+        const descriptorInputs =
+          pendingDescriptorInputs.get(stagedTurnId) ?? [];
+        const confirmed = restorationManager.confirmPendingTurn(
+          stagedTurnId,
+          () => retainDescriptorInputs(descriptorInputs)
         );
         if (confirmed) {
           pendingDescriptorInputs.delete(stagedTurnId);
@@ -3413,7 +3415,6 @@ export function restoration(
       pendingDescriptorInputs.delete(stagedTurnId);
     });
 
-
     /** Set by this tree's own leaf interceptors; read by the global flush hook. */
     let restoreLeafInterceptors: (() => void) | null = null;
     /** Set by this tree's own notifier subscription; read by the global flush hook. */
@@ -3426,25 +3427,27 @@ export function restoration(
     const releaseCapture = getMutationCaptureRuntime(tree)?.activateCapture();
     try {
       unsubscribeCollectionOrders =
-        getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.((capture) => {
-          if (getWriteParticipation(capture.meta) === 'realized') {
-            externalOrderOwners.add(capture.owner);
+        getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.(
+          (capture) => {
+            if (getWriteParticipation(capture.meta) === 'realized') {
+              externalOrderOwners.add(capture.owner);
+              selfDirty = true;
+              captureCollectionOrderIntoBucket(pendingCapture, capture);
+              return;
+            }
+            externalOrderOwners.delete(capture.owner);
+            const transactionId = resolveTransactionId(capture.meta);
+            if (transactionId !== undefined) {
+              captureCollectionOrderIntoBucket(
+                getTransactionBucket(transactionId),
+                capture
+              );
+              return;
+            }
             selfDirty = true;
             captureCollectionOrderIntoBucket(pendingCapture, capture);
-            return;
           }
-          externalOrderOwners.delete(capture.owner);
-          const transactionId = resolveTransactionId(capture.meta);
-          if (transactionId !== undefined) {
-            captureCollectionOrderIntoBucket(
-              getTransactionBucket(transactionId),
-              capture
-            );
-            return;
-          }
-          selfDirty = true;
-          captureCollectionOrderIntoBucket(pendingCapture, capture);
-        }) ?? null;
+        ) ?? null;
       const notifier = getPathNotifier();
       if (notifier) {
         const treeOwnerId = getPositionRegistry(tree.$)?.id;
@@ -3593,7 +3596,9 @@ export function restoration(
               // `.set()`, and because handing `effectiveMeta` to `notify()` as a
               // metaOverride would otherwise bypass notify's own stamping.
               const effectiveMeta: WriteMetadata | undefined =
-                isRestorationDesignated() ? markMetaDesignated(ambient) : ambient;
+                isRestorationDesignated()
+                  ? markMetaDesignated(ambient)
+                  : ambient;
               if (isRestoring) return;
               // DEVTOOLS-JUMP-0.1. Notified but recorded nowhere, and
               // deliberately NOT deleting the external-truth marker below:
@@ -3665,8 +3670,7 @@ export function restoration(
                 ownerPath,
                 subjectIds,
                 positionIds,
-                effectiveMeta
-              ,
+                effectiveMeta,
                 treeOwnerId
               );
             }
@@ -3699,30 +3703,26 @@ export function restoration(
               collectionOrders,
               descriptorInputs,
               designated,
-            } =
-              drainCaptureBucket(pendingCapture);
+            } = drainCaptureBucket(pendingCapture);
             const eligible =
               isTurnEligible(designated) &&
               restorationManager.retainsCompletedHistory() &&
               (effects.length > 0 || collectionOrders.length > 0);
             const recorded = eligible
               ? restorationManager.addEntry(
-                    'batch',
-                    undefined,
-                    ownerPaths.length > 0 ? ownerPaths : undefined,
-                    subjectIds.length > 0 ? subjectIds : undefined,
-                    positionIds.length > 0 ? positionIds : undefined,
-                    effects.length > 0 ? effects : undefined,
-                    collectionOrders.length > 0 ? collectionOrders : undefined,
-                    undefined,
-                    () => retainDescriptorInputs(descriptorInputs)
-                  )
+                  'batch',
+                  undefined,
+                  ownerPaths.length > 0 ? ownerPaths : undefined,
+                  subjectIds.length > 0 ? subjectIds : undefined,
+                  positionIds.length > 0 ? positionIds : undefined,
+                  effects.length > 0 ? effects : undefined,
+                  collectionOrders.length > 0 ? collectionOrders : undefined,
+                  undefined,
+                  () => retainDescriptorInputs(descriptorInputs)
+                )
               : false;
             if (!recorded) {
-              restorationManager.appendHistoricalGap(
-                effects,
-                collectionOrders
-              );
+              restorationManager.appendHistoricalGap(effects, collectionOrders);
             }
             restorationManager.observeBatch('batch', ownerPaths, recorded);
           });
@@ -3769,20 +3769,24 @@ export function restoration(
     // NOT deleted: the `pendingTransactions` capture buckets, which record a
     // transaction confirmed by `transactions()` as one turn. That is
     // restoration's own job and the lifecycle observer drives it.
-    (enhancedTree as ISignalTree<T> & RestorationMethods)['getRestorationHistory'] = () =>
-      restorationManager.getRestorationHistory();
+    (enhancedTree as ISignalTree<T> & RestorationMethods)[
+      'getRestorationHistory'
+    ] = () => restorationManager.getRestorationHistory();
     const resetRestorationRetention = (): void => {
       restorationManager.resetRestorationHistory();
       pendingDescriptorInputs.clear();
       stagedForeignTurns.clear();
+      pendingTransactions.clear();
+      activeForeignTransactions.clear();
       externalTruthByPath.clear();
       externalTruthBySubject.clear();
       externalOrderOwners.clear();
     };
-    (enhancedTree as ISignalTree<T> & RestorationMethods)['resetRestorationHistory'] =
-      () => {
-        resetRestorationRetention();
-      };
+    (enhancedTree as ISignalTree<T> & RestorationMethods)[
+      'resetRestorationHistory'
+    ] = () => {
+      resetRestorationRetention();
+    };
     (enhancedTree as ISignalTree<T> & RestorationMethods)['jumpTo'] = (
       index: number
     ) => {

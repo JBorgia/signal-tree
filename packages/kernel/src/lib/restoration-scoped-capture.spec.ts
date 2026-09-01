@@ -27,7 +27,7 @@ const rows = (n: number): Row[] =>
 
 const flush = () => new Promise<void>((r) => setTimeout(r, 0));
 
-describe('ST2029 — history retention', () => {
+describe('compact restoration history retention', () => {
   let warn: ReturnType<typeof vi.spyOn>;
   const msg = () => warn.mock.calls.map((c) => String(c[0])).join('\n');
 
@@ -67,12 +67,11 @@ describe('ST2029 — history retention', () => {
     return tree;
   }
 
-  it('fires when the rows arrive AFTER the enhancer is attached', async () => {
+  it('does not emit the obsolete width-times-history warning', async () => {
     // 20,000 x ~35 entries = ~700k retained pointers, past the 500k budget.
     await appOrder({ selectId: (r) => r.id }, 20_000, 34);
 
-    expect(msg()).toContain('ST2029');
-    expect(msg()).toContain('rows');
+    expect(msg()).not.toContain('ST2029');
   });
 
   // The `recordHistory: false` arm was DELETED in 15.0 with the option. It
