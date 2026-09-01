@@ -1,809 +1,283 @@
-# SignalTree v7 - AI/Developer Guidance
+# SignalTree 15 AI Reference
 
-> **Purpose:** Comprehensive guidance for AI assistants and developers implementing SignalTree v7+.
-> **Last Updated:** February 2026 (v7.6.0)
+Current guidance for generating SignalTree 15 code. Package manifests, emitted
+types, and package READMEs are authoritative when this document and installed
+code disagree.
 
----
+## Identify The Library
 
-## ⚠️ Read This First — Two Layers, Two Contracts
+SignalTree is not NgRx SignalStore.
 
-SignalTree exposes two distinct usage layers. Picking the right one matters:
+- Angular: `@signal-tree/angular`
+- Framework-neutral kernel: `@signal-tree/kernel`
+- React observation: `@signal-tree/react`
 
-| Layer                                                                                                                                 | API surface                                                | Use when                                                           |
-| ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------ |
-| **Core API** (this file)                                                                                                              | `tree.$.path.set(...)`, `tree.$.users.addOne(...)`         | Prototypes, demos, single-file examples, library internals, tests. |
-| **Production architecture** ([architecture guide](../architecture/signaltree-architecture-guide.md#recommended-default-architecture)) | `store.$.path()` reads, `store.ops.domain.method()` writes | Anything in an app that will live longer than a sprint.            |
+Do not generate historical `@signaltree/*` package names or invent capability
+packages.
 
-The examples below use the **Core API** so they stay self-contained. In a real
-app, mutations like `store.$.users.addOne(user)` belong inside an `Ops` class
-(e.g. `UserOps.addUser(user)`) and components call the ops method instead.
-See the [Recommended Default Architecture](../architecture/signaltree-architecture-guide.md#recommended-default-architecture) section for the full pattern (`$ + ops` facade,
-derived tiers, folder layout, ESLint guard, decision matrix).
-
----
-
-## Quick Reference
-
-### Installation
+## Install For Angular
 
 ```bash
-npm install @signaltree/core@^7.0.0
+npm install @signal-tree/angular@15.0.0-rc.1
 ```
 
-### Minimal Example
+## Canonical Construction
+
+Declare state, every enhancer, and one derived factory in the initial
+`signalTree(...)` call.
 
 ```typescript
-import { signalTree, entityMap } from '@signaltree/core';
+import { computed } from '@angular/core';
+import { batching, defineStore, entityMap, signalTree } from '@signal-tree/angular';
 
-const store = signalTree({
-  users: entityMap<User, number>(),
-  settings: {
-    theme: 'light' as 'light' | 'dark',
-  },
-});
-
-// Read
-store.$.users.all(); // User[]
-store.$.settings.theme(); // 'light' | 'dark'
-
-// Write
-store.$.users.addOne(user);
-store.$.settings.theme.set('dark');
-```
-
----
-
-## v7 Breaking Changes
-
-### ❌ REMOVED: the `entities()` enhancer (v7 — remove the call)
-
-**v6 (old):**
-
-```typescript
-import { signalTree, entityMap } from '@signaltree/core';
-
-const store = signalTree({
-  users: entityMap<User, number>(),
-}, { enhancers: [entities()] }); // ❌ No longer needed
-```
-
-**v7 (new):**
-
-```typescript
-import { signalTree, entityMap } from '@signaltree/core';
-
-const store = signalTree({
-  users: entityMap<User, number>(),
-}); // ✅ entityMap auto-processed
-```
-
-### ✅ NEW: Markers
-
-v7 introduces **markers** - declarative placeholders that are auto-processed during tree creation:
-
-| Marker                 | Purpose                       | Example                               |
-| ---------------------- | ----------------------------- | ------------------------------------- |
-| `entityMap<E, K>()`    | Entity collection with CRUD   | `users: entityMap<User, number>()`    |
-
----
-
-## Markers Reference
-
-### `entityMap<Entity, Key>()`
-
-Creates a normalized entity collection with CRUD operations.
-
-```typescript
-import { entityMap } from '@signaltree/core';
-
-interface User {
+type User = {
   id: number;
   name: string;
-}
+  active: boolean;
+};
 
-const store = signalTree({
-  users: entityMap<User, number>(),
-});
+export const AppTree = defineStore(
+  () =>
+    signalTree(
+      {
+        users: entityMap<User, number>({
+          selectId: (user) => user.id,
+        }),
+        selectedId: null as number | null,
+        filter: '',
+      },
+      {
+        enhancers: [batching()],
+        derived: ($) => {
+          const selected = computed(() => {
+            const id = $.selectedId();
+            return id === null ? null : $.users.byId(id)?.() ?? null;
+          });
 
-// Available operations:
-store.$.users.all(); // User[]
-store.$.users.byId(1); // () => Signal<User | undefined>
-store.$.users.count(); // number
-store.$.users.addOne(user); // Add single entity
-store.$.users.addMany(users); // Add multiple entities
-store.$.users.setAll(users); // Replace all entities
-store.$.users.updateOne(id, changes);
-store.$.users.upsertOne(user);
-store.$.users.removeOne(id);
-store.$.users.removeMany(ids);
-store.$.users.clear();
-```
-
-### Loading state
-
-Use ordinary state for local loading flags, or `entityMap({ load: loader(...) })`
-for cache-aware loading collections.
-
-```typescript
-type LoadingState = 'not-loaded' | 'loading' | 'loaded' | 'error';
-
-interface ApiError {
-  code: string;
-  message: string;
-}
-
-const store = signalTree({
-  users: {
-    entities: entityMap<User, number>(),
-    loadStatus: 'not-loaded' as LoadingState,
-    error: null as ApiError | null,
-  },
-});
-
-store.$.users.loadStatus.set('loading');
-store.$.users.error.set(null);
-```
-
-### Persistence
-
-The old `stored(key, defaultValue, options?)` marker is DELETED. Persist with
-the `persistence()` enhancer over ordinary state, or keep browser persistence in
-an application-owned service and write resolved values in through `external()`.
-
----
-
-## Derived State
-
-Use `.derived()` to add computed state based on source state.
-
-```typescript
-import { signalTree, entityMap } from '@signaltree/core';
-import { computed } from '@angular/core';
-
-const store = signalTree({
-  users: entityMap<User, number>(),
-  selectedUserId: null as number | null,
-}).derived(($) => ({
-  // Nested under existing domain
-  users: {
-    selected: computed(() => {
-      const id = $.selectedUserId();
-      return id != null ? $.users.byId(id)?.() ?? null : null;
-    }),
-    activeCount: computed(() => $.users.all().filter((u) => u.isActive).length),
-  },
-  // Top-level derived
-  hasSelection: computed(() => $.selectedUserId() != null),
-}));
-
-// Access derived state same as source state
-store.$.users.selected(); // User | null
-store.$.users.activeCount(); // number
-store.$.hasSelection(); // boolean
-```
-
-### Derived Tier Best Practices
-
-1. **Use `computed()` from Angular** - It's the standard reactive primitive
-2. **Nest under domains** - Keep derived state co-located with source
-3. **Multiple tiers allowed** - Chain `.derived()` for complex dependencies
-4. **Avoid side effects** - Derived state should be pure computations
-
-**Composition note:** Enhancers are declared in `signalTree`'s config, not chained on afterwards; derived state can be declared there too (`derived: ($) => ({...})`) or added with `.derived(...)` after construction. Either way the derived factory runs once, after every enhancer, and its computed identity is stable.
-
-### Derived Tier Rules
-
-**Critical Rule**: Computed signals in a tier can only reference:
-
-- Base state signals
-- Computed signals from **previous** tiers
-
-```typescript
-// ✅ Tier 2 can use Tier 1's $.users.current()
-.derived($ => ({
-  users: {
-    current: computed(() => $.users.byId($.selected.userId())?.())  // Tier 1
-  }
-}))
-.derived($ => ({
-  users: {
-    isAdmin: computed(() => $.users.current()?.role === 'admin')  // Tier 2 uses Tier 1
-  }
-}))
-
-// ❌ WRONG - Cannot reference same-tier computed
-.derived($ => ({
-  users: {
-    current: computed(() => /* ... */),
-    isAdmin: computed(() => {
-      // ERROR: current doesn't exist yet in this tier!
-      return $.users.current()?.role === 'admin';
-    })
-  }
-}))
-```
-
-**Solution**: If computed B depends on computed A, move A to an earlier tier.
-
-### Tier Organization Pattern
-
-| Tier | Purpose           | Example Computeds                                               |
-| ---- | ----------------- | --------------------------------------------------------------- |
-| 1    | Entity Resolution | `users.current`, `selection.item`, `tickets.active`             |
-| 2    | Complex Logic     | `users.isAdmin`, `selection.isComplete`, `tickets.statusMap`    |
-| 3    | Workflow          | `workflow.steps`, `workflow.currentIndex`, `workflow.statusMap` |
-| 4    | Navigation        | `workflow.nextStatus`, `workflow.canAdvance`                    |
-| 5    | UI Aggregates     | `ui.isLoading`, `ui.hasError`, `ui.globalStatus`                |
-
----
-
-## Enhancers
-
-Enhancers add cross-cutting functionality to the tree.
-
-```typescript
-import {
-  signalTree,
-  devTools,
-  batching,
-  restoration
-} from '@signaltree/core';
-
-const store = signalTree(
-  { ... },
-  {
-    enhancers: [
-      devTools({ name: 'AppStore' }),   // Redux DevTools integration
-      batching(),                        // Batch multiple updates
-      restoration({ maxHistorySize: 50 }) // Undo/redo support
-    ]
-  }
+          return {
+            selected,
+            selectedName: computed(() => selected()?.name ?? 'None'),
+            visibleUsers: computed(() => {
+              const filter = $.filter().toLowerCase();
+              return $.users.all().filter((user) => user.name.toLowerCase().includes(filter));
+            }),
+          };
+        },
+      }
+    ),
+  { providedIn: 'root' }
 );
 ```
 
-> **9.0.1:** The `memoization()` enhancer was removed. Use Angular's built-in `computed()` for memoized derivations.
+Rules:
 
-### Available Enhancers
+- No `.with()` or fluent `.derived()` calls.
+- One derived factory; compose dependent values through local computeds.
+- Enhancer declaration order is not dependency order.
+- Configuration is validated before construction.
+- Angular applications construct through the Angular package, not the kernel.
 
-| Enhancer          | Purpose                       | When to Use               |
-| ----------------- | ----------------------------- | ------------------------- |
-| `devTools()`      | Redux DevTools integration    | Development/debugging     |
-| `batching()`      | Batch multiple signal updates | Performance optimization  |
-| `restoration()`    | Undo/redo functionality       | Form editing, canvas apps |
-| `persistence()`   | State persistence             | App reload persistence    |
+For an external derived factory, type `$` with `TreeNode<State>` from
+`@signal-tree/angular`. File organization does not create semantic derived tiers.
 
----
+## State Access
 
-## Modular Architecture (Recommended)
-
-For production Angular applications, we recommend a **modular architecture** with derived tiers and domain operations:
-
-### Folder Structure
-
-```
-store/
-├── app-store.ts                    # Thin facade - composes ops namespace
-├── tree/
-│   ├── index.ts                    # Re-exports
-│   ├── app-tree.ts                 # Tree assembly (imports domains)
-│   ├── app-tree.provider.ts        # DI setup
-│   │
-│   ├── state/                      # Initial state definitions
-│   │   ├── index.ts
-│   │   ├── tickets.state.ts
-│   │   ├── users.state.ts
-│   │   └── shared.state.ts         # loadingSlice(), etc.
-│   │
-│   └── derived/                    # Derived tier definitions
-│       ├── index.ts
-│       ├── tier-1.derived.ts       # Entity resolution
-│       ├── tier-2.derived.ts       # Complex logic
-│       ├── tier-3.derived.ts       # Workflow
-│       └── tier-4.derived.ts       # UI aggregates
-│
-└── ops/                            # Async operations by domain
-    ├── index.ts
-    ├── ticket.ops.ts
-    ├── user.ops.ts
-    └── auth.ops.ts
-```
-
-### The One Paradigm Rule
-
-**All state access uses `store.$.path.to.thing()`** - no aliases, no duplicate accessors.
-**All operations use `store.ops.domain.method()`** - domain ops handle mutations and async.
+`$` is the state facade.
 
 ```typescript
-// ✅ Correct - single access patterns
-const user = this._store.$.users.current();
-const isLoading = this._store.$.users.loading.state();
-this._store.ops.users.loadUsers$().subscribe();
-this._store.ops.users.setCurrentUser(user);
+// Leaf: call to read, use the native signal methods to write.
+tree.$.filter();
+tree.$.filter.set('active');
+tree.$.filter.update((filter) => filter.trim());
 
-// ❌ Wrong - aliases that duplicate tree paths
-readonly currentUser = this.$.users.current;  // Don't create aliases in AppStore
+// Branch: call with no argument to read; pass a value or updater to write.
+tree.$.profile();
+tree.$.profile({ name: 'Ada', timezone: 'UTC' });
+tree.$.profile((profile) => ({ ...profile, timezone: 'CST' }));
 
-// ❌ Wrong - old pattern without ops namespace
-this._store.users.loadUsers$().subscribe();  // Use store.ops.users instead
+// Root snapshot.
+tree.$();
 ```
 
-### State File Example
+Branch value calls assign the complete branch value; they are not patch
+operations. Derive a patched value with the updater form. There is no separate
+`.state` or `.unwrap()` API.
+
+## EntityMap
+
+Use `entityMap()` for normalized keyed collections. It may appear at any object
+path in initial state.
 
 ```typescript
-// tree/state/tickets.state.ts
-import { entityMap } from '@signaltree/core';
-import { LoadingState, Nullable, NotifyErrorModel, TicketDto } from '@models';
+const users = tree.$.users;
 
-export function loadingSlice() {
-  return {
-    state: LoadingState.NotLoaded as LoadingState,
-    error: null as Nullable<NotifyErrorModel>,
-  };
-}
+users.addOne(user);
+users.addMany(moreUsers);
+users.setAll(serverUsers);
+users.updateOne(user.id, { active: false });
+users.replaceOne(user.id, replacement);
+users.upsertOne(user);
+users.removeOne(user.id);
+users.removeMany(ids);
+users.clear();
 
-export function ticketsState() {
-  return {
-    entities: entityMap<TicketDto, number>(),
-    activeId: null as Nullable<number>,
-    startDate: new Date(),
-    endDate: new Date(),
-    loading: loadingSlice(),
-  };
-}
+users.byId(user.id)?.();
+users.byIdOrFail(user.id)();
+users.all();
+users.ids();
+users.count();
+users.empty();
+users.has(user.id)();
+users.where((candidate) => candidate.active)();
 ```
 
-### Derived Tier Example
+Store selected IDs and derive selected entities. Do not duplicate entity objects
+beside their EntityMap authority. Hoist frequently evaluated `where` and `find`
+predicates so their identity remains stable.
+
+## Application Architecture
+
+For non-trivial applications:
+
+- Components read a read-only `$` facade.
+- Injectable Ops services own domain writes and asynchronous orchestration.
+- Framework effects own routing, analytics, and storage synchronization.
+- Network services own fetching, retries, cancellation, and cache policy.
+- Angular forms own form control and validation.
 
 ```typescript
-// tree/derived/tier-1.derived.ts
-import { computed } from '@angular/core';
-import type { AppTreeBase } from '../app-tree';
-
-/**
- * Derived Tier 1: Entity Resolution
- *
- * Resolves IDs to actual entities.
- */
-export function tier1Derived($: AppTreeBase['$']) {
-  return {
-    users: {
-      current: computed(() => {
-        const userId = $.selected.userId();
-        return userId != null ? $.users.byId(userId)?.() ?? null : null;
-      }),
-    },
-    tickets: {
-      active: computed(() => {
-        const activeId = $.tickets.activeId();
-        return activeId != null ? $.tickets.entities.byId(activeId)?.() ?? null : null;
-      }),
-    },
-  };
-}
-```
-
-### Domain Ops Example
-
-```typescript
-// ops/ticket.ops.ts
-import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable, of, tap } from 'rxjs';
-import { LoadingState, Nullable, TicketDto } from '@models';
-import { TicketService } from '@services';
-import { APP_TREE } from '../tree/app-tree';
+import { Injectable, inject } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
-export class TicketOps {
-  private readonly _ticketApi = inject(TicketService);
-  private readonly _$ = inject(APP_TREE).$;
+export class UserOps {
+  private readonly tree = inject(AppTree);
+  private readonly api = inject(UserApi);
 
-  // Mutations
-  setActiveTicket(ticket: Nullable<TicketDto>): void {
-    if (ticket) {
-      this._$.tickets.entities.upsertOne(ticket, { selectId: (t: TicketDto) => t.id });
-      this._$.tickets.activeId.set(ticket.id);
-    } else {
-      this._$.tickets.activeId.set(null);
-    }
+  select(id: number | null): void {
+    this.tree.$.selectedId.set(id);
   }
 
-  // Async Operations
-  loadActiveTicket$(): Observable<void> {
-    this._setLoading();
-    return this._ticketApi.getActiveTicket$().pipe(
-      tap((ticket) => this.setActiveTicket(ticket ?? null)),
-      tap(() => this._setLoaded()),
-      map(() => void 0),
-      catchError((err) => {
-        this._setError(err, 'loadActiveTicket$');
-        return of(void 0);
-      })
-    );
-  }
-
-  private _setLoading(): void {
-    this._$.tickets.loading.state.set(LoadingState.Loading);
-    this._$.tickets.loading.error.set(null);
-  }
-
-  private _setLoaded(): void {
-    this._$.tickets.loading.state.set(LoadingState.Loaded);
-  }
-
-  private _setError(err: unknown, context: string): void {
-    this._$.tickets.loading.state.set(LoadingState.Error);
-    this._$.tickets.loading.error.set({ message: String(err), context });
+  async refresh(): Promise<void> {
+    const users = await this.api.list();
+    external(() => this.tree.$.users.setAll(users));
   }
 }
 ```
 
-### AppStore Example
+Use `asReadonly(tree)` or
+`defineStore(factory, { expose: 'readonly' })` when a consumer should not receive
+mutation methods. This is compile-time narrowing of the same runtime object, not
+a security boundary.
+
+## External Truth
+
+Use `external()` for a synchronous write whose authority came from outside the
+current authored operation:
 
 ```typescript
-// app-store.ts
-import { inject, Injectable } from '@angular/core';
-import { APP_TREE, AppTree } from './tree/app-tree';
-import { TicketOps } from './ops/ticket.ops';
-import { UserOps } from './ops/user.ops';
-import { AuthOps } from './ops/auth.ops';
+const tickets = await api.list();
+external(() => tree.$.tickets.setAll(tickets));
+```
 
-@Injectable({ providedIn: 'root' })
-export class AppStore {
-  readonly tree: AppTree = inject(APP_TREE);
-  readonly $ = this.tree.$;
+Acquire data first. Do not pass an async callback to `external()`; its causal
+classification scope is synchronous.
 
-  // Domain operations via ops namespace
-  readonly ops = {
-    tickets: inject(TicketOps),
-    users: inject(UserOps),
-    auth: inject(AuthOps),
-  };
+Use `link()` only for a genuine live synchronization relationship, not as a
+request wrapper.
 
-  // Cross-domain orchestration only (rare)
-  clearSelections(): void {
-    this.$.selected.userId.set(null);
-    this.$.selected.ticketId.set(null);
-  }
+## Built-In Capabilities
+
+Declare capabilities in `enhancers`:
+
+| API              | Purpose                                      |
+| ---------------- | -------------------------------------------- |
+| `batching()`     | Group notification work                      |
+| `restoration()`  | Retained undo/redo history                   |
+| `transactions()` | Pending confirm/rollback workflows           |
+| `devTools()`     | Redux DevTools and debug-session integration |
+
+### Restoration
+
+```typescript
+const tree = signalTree({ title: '' }, { enhancers: [restoration({ maxHistorySize: 50 })] });
+
+undoable(() => tree.$.title.set('Draft'));
+tree.undo();
+tree.redo();
+```
+
+`undoable()` designates a synchronous authored turn. It does not create an async
+scope. Writes classified with `external()` are observed but are not claimed as
+undoable authored history.
+
+### Transactions
+
+Use `transactions()` when an operation is pending and must later be confirmed or
+rolled back. Transactions and restoration are different authority models; do
+not use undo as a substitute for request reconciliation.
+
+## Persistence And SSR
+
+SignalTree 15 has no public persistence or serialization enhancer. Applications
+own payload format, migrations, storage errors, hydration validation, and
+durability.
+
+```typescript
+const saved = localStorage.getItem('settings');
+if (saved) tree.$.settings(JSON.parse(saved));
+
+effect(() => {
+  localStorage.setItem('settings', JSON.stringify(tree.$.settings()));
+});
+```
+
+For SSR, validate an application-defined payload and construct the client tree
+from it.
+
+## Forms
+
+SignalTree 15 has no form marker or forms companion package. Use Angular forms,
+or hold a bounded draft as ordinary application state. Use restoration only when
+retained undo/redo is a product requirement.
+
+## Lifetime
+
+Every tree owns resources until `destroy()` runs.
+
+- App-root trees may live for the application lifetime.
+- Component, route, SSR-request, test, and temporary trees have bounded owners.
+- `defineStore` binds destruction to Angular `DestroyRef`.
+- Directly constructed trees must be destroyed by their owner.
+
+```typescript
+const tree = signalTree({ value: 1 });
+try {
+  tree.$.value.set(2);
+} finally {
+  tree.destroy();
 }
 ```
 
-### Component Usage
-
-```typescript
-@Component({ ... })
-export class TicketListComponent {
-  private store = inject(AppStore);
-
-  // State access - always via $
-  readonly tickets = this.store.$.tickets.all;
-  readonly isLoading = this.store.$.tickets.loading.state;
-  readonly activeTicket = this.store.$.tickets.active;
-
-  // Operations - via ops.domain
-  loadTickets() {
-    this.store.ops.tickets.loadTickets$().subscribe();
-  }
-
-  selectTicket(ticket: TicketDto) {
-    this.store.ops.tickets.setActiveTicket(ticket);
-  }
-}
-```
-
-### Summary Table
-
-| Layer       | Responsibility       | Location                         |
-| ----------- | -------------------- | -------------------------------- |
-| **State**   | Initial state shape  | `tree/state/*.state.ts`          |
-| **Derived** | Computed signals     | `tree/derived/tier-*.derived.ts` |
-| **Tree**    | Assembly + enhancers | `tree/app-tree.ts`               |
-| **Ops**     | Mutations + async    | `ops/*.ops.ts`                   |
-| **Store**   | Thin facade          | `app-store.ts`                   |
-
----
-
-## Common Patterns
-
-### Pattern 1: Domain with Status
-
-```typescript
-const store = signalTree({
-  tickets: {
-    entities: entityMap<Ticket, number>(),
-    loadState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
-    loadError: null as NotifyError | null,
-    activeId: null as number | null,
-    filters: {
-      startDate: new Date(),
-      endDate: new Date(),
-    },
-  },
-}).derived(($) => ({
-  tickets: {
-    active: computed(() => {
-      const id = $.tickets.activeId();
-      return id != null ? $.tickets.entities.byId(id)?.() ?? null : null;
-    }),
-    isReady: computed(() => $.tickets.status.isLoaded()),
-  },
-}));
-```
-
-### Pattern 2: Selection State
-
-```typescript
-const store = signalTree({
-  haulers: entityMap<Hauler, number>(),
-  trucks: entityMap<Truck, number>(),
-  selected: {
-    haulerId: null as number | null,
-    truckId: null as number | null,
-  },
-}).derived(($) => ({
-  selection: {
-    hauler: computed(() => {
-      const id = $.selected.haulerId();
-      return id != null ? $.haulers.byId(id)?.() ?? null : null;
-    }),
-    truck: computed(() => {
-      const id = $.selected.truckId();
-      return id != null ? $.trucks.byId(id)?.() ?? null : null;
-    }),
-    isComplete: computed(() => $.selected.haulerId() != null && $.selected.truckId() != null),
-  },
-}));
-```
-
-### Pattern 3: Settings with Persistence
-
-Persistence is an ENHANCER over ordinary state, not a marker on a leaf. There is
-no `stored()`.
-
-```typescript
-const store = signalTree(
-  {
-    settings: {
-      theme: 'light' as 'light' | 'dark',
-      language: 'en',
-      notifications: true,
-      lastSyncDate: null as Date | null,
-    },
-  },
-  {
-    enhancers: [
-      persistence({ key: 'app-settings', storage: localStorage }),
-    ],
-  }
-);
-```
-
-### Pattern 4: Async Operations (with Angular resource)
-
-```typescript
-import { resource } from '@angular/core';
-
-@Injectable({ providedIn: 'root' })
-export class UsersResource {
-  private _tree = inject(APP_TREE);
-  private _api = inject(UserService);
-
-  readonly users = resource({
-    params: () => ({ filter: this._tree.$.users.filter() }),
-    loader: ({ params }) => firstValueFrom(this._api.list$(params)),
-  });
-
-  // Sync to tree when loaded
-  readonly _ = effect(() => {
-    if (this.users.hasValue()) {
-      this._tree.$.users.entities.setAll(this.users.value());
-    }
-  });
-}
-```
-
----
-
-## Anti-Patterns to Avoid
-
-### ❌ Don't use the `entities()` enhancer in v7+
-
-```typescript
-// ❌ Wrong - entities() is deprecated
-const store = signalTree({
-  users: entityMap<User, number>(),
-}, { enhancers: [entities()] });
-
-// ✅ Correct - entityMap auto-processed
-const store = signalTree({
-  users: entityMap<User, number>(),
-});
-```
-
-### ❌ Don't duplicate entity data
-
-```typescript
-// ❌ Wrong - duplicates data
-const store = signalTree({
-  users: entityMap<User, number>(),
-  activeUser: null as User | null, // Duplicates user data
-});
-
-// ✅ Correct - store ID, derive entity
-const store = signalTree({
-  users: entityMap<User, number>(),
-  activeUserId: null as number | null,
-}).derived(($) => ({
-  activeUser: computed(() => {
-    const id = $.activeUserId();
-    return id != null ? $.users.byId(id)?.() ?? null : null;
-  }),
-}));
-```
-
-### ✅ Keep local loading state explicit
-
-```typescript
-const store = signalTree({
-  users: {
-    entities: entityMap<User, number>(),
-    loadStatus: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
-    error: null as Error | null,
-  },
-});
-```
-
-### ❌ Don't mix Observable and Signal patterns unnecessarily
-
-```typescript
-// ❌ Wrong - mixing patterns
-readonly users$ = toObservable(this.tree.$.users.all);
-readonly activeUser$ = this.users$.pipe(
-  map(users => users.find(u => u.id === this.activeId()))
-);
-
-// ✅ Correct - stay in signal world
-readonly activeUser = computed(() => {
-  const id = this.activeId();
-  return this.tree.$.users.byId(id)?.() ?? null;
-});
-```
-
----
-
-## Testing
-
-### Unit Testing Trees
-
-```typescript
-import { signalTree, entityMap } from '@signaltree/core';
-
-describe('AppTree', () => {
-  let tree: ReturnType<typeof createAppTree>;
-
-  beforeEach(() => {
-    tree = createAppTree();
-  });
-
-  it('should add user', () => {
-    tree.$.users.addOne({ id: 1, name: 'Test' });
-    expect(tree.$.users.count()).toBe(1);
-  });
-
-  it('should derive active user', () => {
-    tree.$.users.addOne({ id: 1, name: 'Test' });
-    tree.$.activeUserId.set(1);
-    expect(tree.$.activeUser()?.name).toBe('Test');
-  });
-});
-```
-
-### Testing with Angular TestBed
-
-```typescript
-describe('UsersComponent', () => {
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [{ provide: APP_TREE, useFactory: () => createAppTree() }],
-    });
-  });
-
-  it('should render users', () => {
-    const tree = TestBed.inject(APP_TREE);
-    tree.$.users.setAll([
-      { id: 1, name: 'Alice' },
-      { id: 2, name: 'Bob' },
-    ]);
-    // ... test component rendering
-  });
-});
-```
-
----
-
-## Migration from v6
-
-### Step 1: Remove the `entities()` enhancer
-
-```diff
-- import { signalTree, entityMap } from '@signaltree/core';
-+ import { signalTree, entityMap } from '@signaltree/core';
-
-const store = signalTree({
-  users: entityMap<User, number>()
--}, { enhancers: [entities()] });
-+});
-```
-
-### Step 2: Keep loading state explicit
-
-```diff
-const store = signalTree({
-  users: {
-    entities: entityMap<User, number>(),
-+   loadState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error',
-+   loadError: null as Error | null,
-  }
-});
-
-// Usage stays ordinary — there is no status marker to learn:
-+ tree.$.users.loadState.set('loading');
-
-- tree.$.users.loading.state.set('loaded');
-+ tree.$.users.status.setLoaded();
-
-- tree.$.users.loading.error.set(error);
-+ tree.$.users.status.setError(error);
-```
-
-### Step 3: Keep persisted settings in an app service
-
-```diff
-const store = signalTree({
-  settings: {
-    theme: 'light' as 'light' | 'dark',
-  }
-});
-
-// Load/save settings in an application service, then write the resolved value.
-- localStorage.setItem('app-theme', theme);
-- const savedTheme = localStorage.getItem('app-theme');
-```
-
----
-
-## Type Safety
-
-SignalTree provides full TypeScript inference:
-
-```typescript
-const store = signalTree({
-  users: entityMap<User, number>(),
-  settings: {
-    theme: 'light' as 'light' | 'dark',
-  },
-});
-
-// Fully typed:
-store.$.users.addOne({ id: 1 }); // Error: missing 'name' property
-store.$.settings.theme.set('invalid'); // Error: not 'light' | 'dark'
-store.$.users.byId('1'); // Error: expected number key
-```
-
----
-
-## Performance Tips
-
-1. **Use `entityMap`** for collections > 10 items (O(1) lookups)
-2. **Use `batching()`** when updating multiple signals
-3. **Use Angular `computed()`** for expensive derived computations (memoization enhancer was removed in 9.0.1)
-4. **Avoid reading `.all()` when you need `.byId()`**
-5. **Keep derived computations shallow** - avoid deep nesting
-
----
-
-## Resources
-
-- [SignalTree GitHub](https://github.com/JBorgia/signal-tree)
-- [SignalTree npm](https://www.npmjs.com/package/@signaltree/core)
-- [Angular Signals Guide](https://angular.dev/guide/signals)
-- [Angular Resource Guide](https://angular.dev/guide/signals/resource)
+## Do Not Generate
+
+- Historical `@signaltree/*` package names.
+- `.with()`, fluent `.derived()`, `derivedFrom`, or a separate `.state` facade.
+- Async, status, persistence, serialization, storage, forms, or custom marker
+  capabilities that are not in current package types.
+- `tree.update`, `tree.unwrap`, `tree.effect`, or `tree.subscribe`.
+- One-argument `entityMap.updateOne(entity)`; use `updateOne(id, changes)`.
+- Callable leaf writes; use `.set()` or `.update()`.
+- Multiple trees without distinct state authority and lifetime ownership.
+
+## Historical Note
+
+SignalTree releases before v15 used different scopes and several APIs that no
+longer exist. Migration records may name them as evidence. They are not current
+fallbacks and should not be copied into generated code.
+
+## Further Reading
+
+- [Application architecture](../architecture/signaltree-architecture-guide.md#recommended-architecture-tldr)
+- [NgRx SignalStore comparison](../compare/ngrx-signalstore.md)
+- [Myths and misconceptions](../myths-and-misconceptions.md)
+- [Kernel README](../../packages/kernel/README.md)

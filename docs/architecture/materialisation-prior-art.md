@@ -1,5 +1,7 @@
 # Micro-materialisation: what we built, and what the field already knows
 
+<!-- @historical-api-examples -->
+
 **Status:** research, pre-14.0.0. Written to answer one question — _is the
 materialisation architecture we arrived at the right one, or should we pivot
 before 14.0.0 ships?_

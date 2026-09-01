@@ -1,5 +1,7 @@
 # SignalTree 15 — the four product decisions, and what they oblige
 
+<!-- @historical-api-examples -->
+
 **Status:** PRODUCT DECISION RECORD. The four items reserved by
 [the product-core map](signaltree-15-product-core-map.md) on 2026-08-21 were
 **decided the same day by the author on product/DX authority.** This file records

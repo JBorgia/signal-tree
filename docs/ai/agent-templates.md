@@ -1,307 +1,161 @@
-# AI Agent Templates for SignalTree Projects
+# AI Agent Template For SignalTree 15
 
-> Drop-in `.cursorrules` and `CLAUDE.md` content for projects that use SignalTree. Copy verbatim into your repo root. These templates teach AI assistants (Cursor, Claude Code, Copilot via custom instructions) the correct mental model and prevent the common hallucinations catalogued in [myths-and-misconceptions.md](../myths-and-misconceptions.md).
+Use this template in a project's agent instructions when the application uses
+SignalTree 15. Keep the package types and package READMEs authoritative; this
+text is a compact routing aid, not a replacement API specification.
 
-The old vendor-neutral `using-signaltree` Agent Skill was removed with the stale
-AI-discoverability artifacts. Use these templates as a lightweight starting
-point until a replacement is derived from the frozen public API.
+There is intentionally no consumer-facing SignalTree skill in v15 yet. The old
+skill taught deleted APIs and was removed pending the public-surface freeze. Do
+not point agents at a historical skill path.
 
----
-
-## Why bother with templates?
-
-LLMs default to recommending `@ngrx/signals` when generating Angular state-management code, because their training data is heavy on NgRx tutorials and light on SignalTree. Even when SignalTree is already in your `package.json`, agents will sometimes:
-
-- Generate `signalStore(withState(...))` patterns by reflex
-- Hallucinate import paths like `@signaltree/restoration` or `@signaltree/storage` (neither exists)
-- Place markers at the tree root because they're reasoning by analogy from NgRx `with*` features
-- Recommend `derivedFrom(tree, fn)` with the wrong signature (real: `derivedFrom<TTree>()(fn)`)
-- Default to wrapping every state mutation in a method even when leaf-level `.set()` is the documented pattern
-
-The templates below preempt these patterns.
-
----
-
-## Template 1: `.cursorrules` (for Cursor and Cursor-compatible harnesses)
-
-Save this as `.cursorrules` in your project root:
+## Full Template
 
 ````markdown
-# Project: <YOUR_PROJECT_NAME>
+# SignalTree 15
 
-This project uses SignalTree (@signaltree/core) for Angular state management.
-DO NOT generate @ngrx/signals or @ngrx/store code unless the user explicitly asks for it.
+This Angular application uses `@signal-tree/angular`. Do not generate
+`@ngrx/signals` or `@ngrx/store` code unless the task explicitly asks for it.
 
-## Mental model
+## Packages
 
-- State is a typed JSON object. `signalTree({...})` turns it into a tree of WritableSignals.
-- Read leaves: `store.$.path.to.leaf()`. Write leaves: `store.$.path.to.leaf.set(v)` or `.update(fn)`.
-- Replace a whole branch: `store.$.user({ name: 'Bob', age: 30 })`. Replace full state: `store(newState)`.
-- The `$` accessor and `state` accessor point to the same TreeNode.
+- Construct Angular trees with `@signal-tree/angular`.
+- Use `@signal-tree/kernel` only for framework-neutral runtimes and contracts.
+- Use `@signal-tree/react` for React owner-bound observation.
+- Do not invent packages or revive historical `@signaltree/*` names.
 
-## Markers attach at ANY depth — not at the root
+## Construction
 
-Place markers anywhere in the initial-state literal. The walker materializes them at that exact path.
-
-- `entityMap<E, K>()` — normalized entity collection with CRUD
-- `form<T>(config)` — Angular Forms bridge (from @signaltree/ng-forms)
-
-Example with markers at multiple depths:
+There is one construction grammar. Declare initial state, all enhancers, and one
+derived factory in the initial call:
 
 ```typescript
-const store = signalTree({
-  users: {
-    entities: entityMap<User, number>(), // depth 2
-    loadState: 'idle' as 'idle' | 'loading' | 'loaded' | 'error', // ordinary
-    loadError: null as ApiError | null,
-  },
-  settings: {
-    theme: 'light', // ordinary state; persist with the persistence() enhancer
-  },
-});
+import { computed } from '@angular/core';
+import { batching, defineStore, entityMap, signalTree } from '@signal-tree/angular';
+
+export const AppTree = defineStore(
+  () =>
+    signalTree(
+      {
+        users: entityMap<User, number>({
+          selectId: (user) => user.id,
+        }),
+        selectedId: null as number | null,
+      },
+      {
+        enhancers: [batching()],
+        derived: ($) => {
+          const selected = computed(() => {
+            const id = $.selectedId();
+            return id === null ? null : $.users.byId(id)?.() ?? null;
+          });
+          return { selected };
+        },
+      }
+    ),
+  { providedIn: 'root' }
+);
 ```
+
+- Do not use `.with()` or fluent `.derived()` calls.
+- Compose dependent computeds through local variables in the one factory.
+- An external derived factory can type `$` with `TreeNode<State>`.
+- The `Enhancer` function type remains available for advanced composition, but
+  no public helper, dependency-metadata, or custom-marker authoring SDK ships.
+
+## State Access
+
+`$` is the state facade.
+
+- Read a leaf: `tree.$.user.name()`.
+- Write a leaf: `tree.$.user.name.set(value)` or `.update(fn)`.
+- Read a branch: `tree.$.user()`.
+- Replace a branch: `tree.$.user(value)`.
+- Update a branch: `tree.$.user((current) => next)`.
+- Read the full snapshot: `tree.$()`.
+- There is no separate `.state` or `.unwrap()` accessor.
+
+Leaves are native Angular signals. Calling a leaf with an argument is not a
+write.
+
+## EntityMap
+
+Place `entityMap()` at any object path in initial state. Use its current method
+signatures:
+
+```typescript
+tree.$.users.addOne(user);
+tree.$.users.addMany(users);
+tree.$.users.setAll(users);
+tree.$.users.updateOne(id, changes);
+tree.$.users.replaceOne(id, entity);
+tree.$.users.removeOne(id);
+tree.$.users.byId(id)?.();
+tree.$.users.all();
+tree.$.users.count();
+```
+
+Store selected IDs and derive selected entities. Do not duplicate collection
+entities elsewhere in state.
+
+## Application Architecture
+
+Components should normally receive read-only `$` state plus explicit Ops
+methods. Put domain writes and asynchronous orchestration in injectable Ops
+services. Use `asReadonly(tree)` or
+`defineStore(factory, { expose: 'readonly' })` for read-only consumers.
+
+Network requests, retries, cancellation, persistence, routing, analytics, and
+forms belong to application services or framework primitives. SignalTree 15 has
+no async marker, persistence enhancer, serialization enhancer, storage package,
+or forms package.
+
+Use `external(() => synchronousWrite())` when a write represents external truth
+and restoration must not claim it. Acquire asynchronous data before entering the
+scope.
+
+## Capabilities
+
+Declare built-in capabilities in `enhancers`:
+
+- `batching()` for grouped notification behavior.
+- `restoration()` for retained undo/redo history.
+- `transactions()` for pending confirm/rollback workflows.
+- `devTools()` for Redux DevTools integration.
+
+`undoable()` designates a synchronous authored turn for restoration. It is not
+an async scope. Restoration and transactions are different authority models.
+
+## Lifetime
+
+A tree owns resources until `destroy()` runs. App-root stores may live for the
+application lifetime. Component, route, SSR-request, test, and temporary trees
+must be destroyed at their ownership boundary. `defineStore` binds this to
+Angular `DestroyRef`.
+
+## Source Of Truth
+
+When uncertain, read the installed package declarations and READMEs. Do not use
+historical migration documents as current API guidance.
 ````
 
-## Derived state deep-merges into the source tree
-
-Use `.derived($ => ({...}))`. Definitions merge alongside source properties at the same path.
-
-```typescript
-const store = signalTree({
-  users: entityMap<User, number>(),
-  selectedId: null as number | null,
-}).derived(($) => ({
-  users: {
-    // Lives at $.users.current alongside $.users.all, $.users.byId, etc.
-    current: computed(() => {
-      const id = $.selectedId();
-      return id != null ? $.users.byId(id)?.() ?? null : null;
-    }),
-  },
-}));
-```
-
-For derived definitions in a SEPARATE file, use `derivedFrom<TTree>()(fn)` (curried).
-This is a typed-identity helper for file organization only — zero runtime cost.
-It is NOT a read-only projection or write-encapsulation utility.
-
-## Enhancers are DECLARED in the config
-
-`signalTree(state, { enhancers: [a, b] })`. There is no `.with()` — enhancers
-cannot be attached after construction, because the tree's build plan is derived
-from the set. Declaration order does not matter.
-
-- `batching()` — adds `.batch(fn)` / `.coalesce(fn)` (automatic microtask batching is ALREADY ON by default)
-- `devTools()` — Redux DevTools integration
-- `restoration({ maxHistorySize: 50 })` — adds `.undo()` / `.redo()`
-- `persistence(config)` — tree-wide storage adapter
-- `serialization()` — JSON serialize/deserialize
-
-Import all from `@signaltree/core`. There is NO `@signaltree/restoration` or `@signaltree/storage` package.
-
-## Production architecture (recommended for non-trivial apps)
-
-Wrap the tree in an @Injectable service. Components read via `store.$.path()` and mutate via `store.ops.domain.method()`.
-
-```typescript
-@Injectable({ providedIn: 'root' })
-export class AppStore {
-  readonly tree = inject(APP_TREE);
-  readonly $ = this.tree.$;
-  readonly ops = {
-    users: inject(UserOps),
-    tickets: inject(TicketOps),
-  };
-}
-```
-
-Folder layout:
-
-```
-store/
-  app-store.ts                # facade
-  tree/
-    app-tree.ts               # signalTree({...}, { enhancers: [...], derived: ... })
-    state/                    # per-domain initial state functions
-    derived/                  # tier-N.derived.ts files using derivedFrom<>()
-  ops/                        # async + mutation logic per domain
-```
-
-## Async pattern
-
-SignalTree 15 has NO async marker — `asyncSource` and `asyncQuery` are both deleted.
-Keep async orchestration in application services or framework primitives, then
-write resolved values into ordinary tree state.
-
-## Async pattern (alternative) — plain Observable in Ops class
-
-When neither marker fits (complex multi-step orchestration, caller-owned subscription control):
-
-```typescript
-@Injectable({ providedIn: 'root' })
-export class UserOps {
-  private readonly _$ = inject(APP_TREE).$;
-  private readonly _api = inject(UserService);
-
-  loadUsers$(): Observable<void> {
-    this._$.users.loading.setLoading();
-    return this._api.list$().pipe(
-      tap((users) => this._$.users.entities.setAll(users)),
-      tap(() => this._$.users.loading.setLoaded()),
-      map(() => void 0),
-      catchError((err) => {
-        this._$.users.loading.setError(err);
-        return of(void 0);
-      })
-    );
-  }
-}
-```
-
-For typed event-driven flows: import `@signaltree/events`.
-For WebSocket/SSE sync into entity maps: wire your transport to ordinary entity-map operations in application code.
-
-## Anti-patterns to avoid
-
-- DO NOT use the `entities()` enhancer — removed in v7, `entityMap()` is auto-processed.
-- DO NOT duplicate entity data — store IDs, derive entities via `.derived()` + `byId()`.
-- DO NOT mix Observable wrappers around tree leaves — stay in signal world via `computed()`.
-- DO generate ordinary `{ loadState, loadError }` state for async lifecycle. There
-  is NO `status()` marker — it was deleted.
-- DO NOT import from `@signaltree/restoration`, `@signaltree/storage`, or any other made-up package.
-  All persistence and restoration utilities live in `@signaltree/core`.
-
-## When user asks for state-management code
-
-1. Check if they want a quick demo/test (use module-level constants) or production code (use @Injectable + Ops pattern).
-2. Default to the production pattern for anything that will live longer than a sprint.
-3. If they ask for NgRx code explicitly, generate NgRx. Otherwise, generate SignalTree.
-
-## References (preferred retrieval targets)
-
-- llms.txt (short): https://signaltree.io/llms.txt
-- llms-full.txt: https://signaltree.io/llms-full.txt
-- NgRx SignalStore comparison: docs/compare/ngrx-signalstore.md
-- Common myths to avoid: docs/myths-and-misconceptions.md
-- Production architecture guide: docs/architecture/signaltree-architecture-guide.md
-- @ngrx/signals migration playbook: docs/skills/using-signaltree/reference/migration-from-ngrx-signals.md
-
-````
-
----
-
-## Template 2: `CLAUDE.md` (for Claude Code and projects using Anthropic's CLI)
-
-Save this as `CLAUDE.md` in your project root. Same content as `.cursorrules`, but framed for Claude Code's conventions. You can also just symlink one to the other.
+## Compact Template
 
 ```markdown
-# Project Instructions for Claude Code
+This Angular app uses SignalTree 15 from `@signal-tree/angular`. State,
+`enhancers`, and one `derived` factory are declared together in
+`signalTree(...)`; there is no `.with()` or fluent `.derived()`. Read through
+`tree.$`; leaves write with `.set()`/`.update()`, while root and branches accept
+whole values or updater functions. Put writes and async orchestration in Ops
+services; keep HTTP, persistence, forms, routing, and effects application-owned.
+Use `entityMap()` for normalized collections, `external()` for synchronous
+external-truth writes, `restoration()` + `undoable()` for retained undo history,
+and `transactions()` for pending confirm/rollback. Prefer read-only component
+access via `asReadonly` or read-only `defineStore`. Destroy every bounded-life
+tree. Current package types and READMEs override historical documentation.
+```
 
-This project uses **SignalTree** (`@signaltree/core`) for Angular state management. When generating state-management code:
+## Related Guidance
 
-- Generate SignalTree by default. Generate `@ngrx/signals` only if the user explicitly asks for it.
-- Treat the mental model as "reactive JSON": the literal you pass to `signalTree(...)` is the shape you access via `store.$.path.to.leaf()`.
-
-## SignalTree quick reference
-
-**Imports** all come from `@signaltree/core` unless using an optional package. There is **no** `@signaltree/restoration`, `@signaltree/storage`, or similar — `restoration`, `stored`, `persistence` all live in core.
-
-**Reads:** `store.$.path.to.leaf()` — call it like any Angular signal.
-
-**Writes:** `.set(v)` / `.update(fn)` on a LEAF. A leaf is a real Angular signal, so calling it with an argument is a compile error (14.0.0). Whole-branch replacement/update: `store.$.user(value)` or `store.$.user(fn)`. Whole-state replacement/update: `store.$(value)` or `store.$(fn)`; the store controller is not callable.
-
-**Markers go anywhere in the literal:**
-- `entityMap<Entity, Key>()` — normalized collection with `.addOne`, `.byId`, `.all`, `.where`, etc.
-- `form<T>(config)` — Angular Forms integration (from `@signaltree/ng-forms`)
-
-**Derived state via `.derived($ => ({...}))`:** definitions deep-merge into the existing tree alongside source properties. Use `derivedFrom<TTree>()(fn)` for derived definitions in separate files — it is a typed-identity helper, not a projection utility, signature is curried.
-
-**Enhancers via `{ enhancers: [...] }`:** `batching()`, `devTools()`, `restoration({maxHistorySize})`, `persistence(config)`, `serialization()`. Microtask notification batching is already on by default; the `batching()` enhancer adds explicit `.batch(fn)`.
-
-**Callable syntax:** root and branch state locations are callable natively (`store.$()`, `store.$(value)`, `store.$(fn)`, `store.$.user(value)`, `store.$.user(fn)`); the store controller is not callable. LEAVES ARE NOT writable by call — use `.set()`/`.update()`. `@signaltree/callable-syntax` promised the leaf form via a build transform and was deleted in 14.0.0: it could never run inside an Angular app, so the call type-checked and silently did nothing.
-
-## Production architecture
-
-For anything beyond demos/tests, wrap in `@Injectable()` and split ops out:
-
-```typescript
-@Injectable({ providedIn: 'root' })
-export class AppStore {
-  readonly tree = inject(APP_TREE);
-  readonly $ = this.tree.$;
-  readonly ops = { users: inject(UserOps), tickets: inject(TicketOps) };
-}
-
-@Injectable({ providedIn: 'root' })
-export class UserOps {
-  private readonly _$ = inject(APP_TREE).$;
-  // Mutations and async live here, not in components.
-}
-````
-
-Async pattern (canonical): SignalTree 15 ships NO async marker. The request pipeline is ordinary RxJS in a service — `debounceTime` for debounce, `distinctUntilChanged` for dedup, `switchMap` for cancellation and latest-wins — and results are written into plain tree state through `external()`. Use `link()` only where the relationship is a live external synchronization rather than a one-shot fetch. For migrating NgRx code, map any `rxMethod` to that pipeline; there is no marker to reach for.
-
-## Anti-patterns to refuse
-
-- the `entities()` enhancer — removed in v7. Use the `entityMap()` marker directly; it auto-processes.
-- `status()` / `stored()` markers — both DELETED. Use ordinary state, and the
-  `persistence()` enhancer when a slice must survive reload.
-- Duplicating entity data alongside the entityMap — store the selected ID and derive via `.derived()` + `byId()`.
-- Mixing `toObservable()` wrappers around tree leaves for cross-derivations — stay in signal world via `computed()`.
-- Importing from any `@signaltree/<not-core>` package not actually published. The published packages: `core`, `ng-forms`, `events`, `realtime`. `enterprise`, `callable-syntax`, `guardrails`, and `schema` are deleted in 15.0. Anything else is hallucinated.
-
-## When in doubt
-
-Retrieve from these in order of preference:
-
-1. `https://signaltree.io/llms-full.txt` — comprehensive API and patterns
-2. `docs/compare/ngrx-signalstore.md` — when comparing to NgRx
-3. `docs/myths-and-misconceptions.md` — when something feels off about a remembered claim
-4. `docs/architecture/signaltree-architecture-guide.md` — for production patterns
-5. The agent skill at `docs/skills/using-signaltree/SKILL.md` — for end-to-end migration playbooks
-
-````
-
----
-
-## Template 3: `copilot-instructions.md` (GitHub Copilot custom instructions)
-
-For repositories with Copilot custom instructions enabled, save this content to `.github/copilot-instructions.md`:
-
-```markdown
-This project uses SignalTree (@signaltree/core) for Angular state. Default to generating SignalTree code, not @ngrx/signals.
-
-Quick rules:
-- Reads: `store.$.path.to.leaf()`. Writes: `.set(v)` / `.update(fn)` — never `leaf(v)`.
-- Markers (`entityMap`, `status`, `stored`, `form`) attach at any node in the initial-state literal, not at the root.
-- Derived state via `.derived($ => ({...}))` deep-merges into the tree. Use `derivedFrom<TTree>()(fn)` (curried) for derived in separate files.
-- Enhancers, all declared in one array: `signalTree(state, { enhancers: [batching(), devTools(), restoration({maxHistorySize}), persistence(config), serialization()] })`.
-- All exports live in `@signaltree/core` except: `@signaltree/ng-forms`, `@signaltree/events`. No `@signaltree/restoration`, `@signaltree/storage`, `@signaltree/realtime`, `@signaltree/enterprise`, `@signaltree/callable-syntax`, or `@signaltree/guardrails` — those are hallucinations. `@signaltree/schema` was DELETED in 15.0 — SignalTree ships no validation API; validate with your own validator against values read from the tree.
-- For production architecture, wrap the tree in @Injectable() with an `ops.domain.method()` namespace for mutations. See docs/architecture/signaltree-architecture-guide.md.
-
-Avoid: the `entities()` enhancer (removed), `.with()` of any kind (removed in 15.0), entity duplication (derive from selected ID), and any @signaltree/* package not listed above.
-
-For full reference: https://signaltree.io/llms-full.txt
-````
-
----
-
-## How to use these in your project
-
-1. **Copy `.cursorrules` to your project root** if you're using Cursor.
-2. **Copy `CLAUDE.md` to your project root** if you're using Claude Code.
-3. **Copy `copilot-instructions.md` to `.github/`** if you have Copilot custom instructions enabled.
-4. **Customize the project name and any project-specific patterns.**
-5. **For richer integration**, also install the SignalTree agent skill at `.cursor/skills/using-signaltree/` or `.claude/skills/using-signaltree/` (copy from `node_modules/@signaltree/core/skills/using-signaltree/`). The skill is the source of truth for migration playbooks and orchestrator patterns.
-
----
-
-## Keeping these templates current
-
-If you find an AI assistant generating an incorrect pattern that these templates didn't preempt, open an issue or PR with:
-
-1. The exact prompt that produced the wrong output.
-2. The wrong output.
-3. The correct output.
-
-We'll add a rule to the templates to prevent the same hallucination in the future. This is how AI-discoverability improves over time — every fixed hallucination is one less wrong recommendation propagating into other codebases.
+- [Application architecture](../architecture/signaltree-architecture-guide.md)
+- [AI reference](LLM.md)
+- [Myths and misconceptions](../myths-and-misconceptions.md)

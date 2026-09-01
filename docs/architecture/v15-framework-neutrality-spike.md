@@ -1,5 +1,7 @@
 # GREENFIELD-FRAMEWORK-NEUTRALITY-SPIKE-0
 
+<!-- @historical-api-examples -->
+
 Mode: DISCOVERY FOR IMPLEMENTATION. Frozen direction assumed, not re-litigated:
 **SignalTree owns truth, frameworks own observation.**
 

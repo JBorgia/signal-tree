@@ -224,8 +224,8 @@ would place it in core as an injected feature rather than a package — but the
 parts worth sharing are already shipped, and what's left is an `extend`-this base
 class plus your REST conventions. A base class you inherit from is the ceremony
 SignalTree defines itself against ("your state literal is the API"), so it stays
-yours. If a future version does ship this, it will compose `loader()` through the
-same branded-helper rule, not take a raw `load:` function.
+yours. Keep loading and REST policy in that application-owned layer; do not pass
+a raw `load:` function to EntityMap.
 
 ---
 

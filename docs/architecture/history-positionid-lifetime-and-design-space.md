@@ -1,5 +1,7 @@
 # Owner PositionId: lifetime contract and design space
 
+<!-- @historical-api-examples -->
+
 **Status:** Phase 1 design note, 2026-08-11.
 
 This note does two things, in order:

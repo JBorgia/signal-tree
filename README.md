@@ -25,7 +25,6 @@ State is modeled as the shape of your data, and the capabilities you'd otherwise
 
 - **`entityMap()`** → normalized collections with O(1) lookups and reactive CRUD
 - **`updateAndReport()`** → a changed-paths report for partial server-payload sync, audit trails, and targeted persistence
-- **`form()`** (`@signaltree/ng-forms`) → tree-integrated reactive forms with validation and wizards
 - **`derived`** → one computed-state factory deep-merged at any path
 - **`restoration()`** → undo/redo with configurable history depth
 
@@ -34,7 +33,6 @@ State is modeled as the shape of your data, and the capabilities you'd otherwise
 - Optimistic UI with rollback (snapshot → write → restore; see the [Ops recipe](docs/guides/composition-recipes.md#2-a-reusable-entity-crud-ops-base))
 - Undo / redo (`restoration` enhancer)
 - Typed normalized collections with O(1) lookups (`entityMap`)
-- Reactive forms with validation, wizards, and persistence (`form()` marker)
 - State that mirrors your data shape, not Redux ceremony
 
 ### Production architecture
@@ -97,18 +95,18 @@ Two columns, deliberately separated: **what the measurements say** is a differen
 collapsing them lets one masquerade as the other. The library measurements are ours; the mapping
 from a domain to a workload is judgment, so validate it against your own app.
 
-| Workload                                          | Typical domains                                                                                     | What the measurements say                                                                     | What teams usually pick              |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------ |
-| Streaming telemetry into many per-entity bindings | Fleet & logistics, grid/SCADA, telecom NOC, manufacturing MES, airline & rail ops, trading blotters | **SignalTree, decisively** — 448× at 1,000 consumers                                          | SignalTree                           |
-| Offline-first with server-owned collections       | Field service, mobile ops                                                                           | **Application-owned loading + `entityMap`** until a cache helper earns RC authority           | SignalTree                           |
-| Deep nested forms with audit and persistence      | Healthcare, claims, regulated workflows                                                             | **SignalTree** — `form()` and history are primitives here; persistence stays app-owned for RC | Toss-up; governance decides          |
-| CRUD over moderate lists, server round-trips      | CRM, ERP, admin consoles, insurance                                                                 | **SignalTree leans** — ~3× on the collection task, tens of × on undo                          | `@ngrx/signals`, on gravity          |
-| Drag-driven boards and schedules                  | Dispatch, Gantt, planning                                                                           | **SignalTree leans** — high write frequency, per-item bindings, moderate collections          | Toss-up                              |
-| Undo/redo over moderate state                     | Editors-in-a-panel, wizards, bulk edit                                                              | **SignalTree** — `@ngrx/signals` has no undo primitive at all                                 | Hand-rolled history (the 262 ms arm) |
-| Whole-dataset reads on every change               | BI and analytics explorers                                                                          | **Depends on modelling** — a plain array leaf is at parity; `entityMap` is the wrong tool     | Toss-up                              |
-| Deep undo over **large** collections              | Design tools, media timelines                                                                       | **An immutable root wins** — needs 10k+ rows _and_ deep history _and_ undo as a core feature  | elf, or immutable under NgRx         |
-| Concurrent editing of one document                | CMS authoring, co-editing                                                                           | **Not a store decision** — a CRDT goes underneath either way                                  | Yjs/Automerge + any store            |
-| Large teams, long-lived, hiring-driven            | Banking core, public sector                                                                         | **No technical winner at this altitude**                                                      | NgRx classic — legitimately so       |
+| Workload                                          | Typical domains                                                                                     | What the measurements say                                                                      | What teams usually pick              |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------ |
+| Streaming telemetry into many per-entity bindings | Fleet & logistics, grid/SCADA, telecom NOC, manufacturing MES, airline & rail ops, trading blotters | **SignalTree, decisively** — 448× at 1,000 consumers                                           | SignalTree                           |
+| Offline-first with server-owned collections       | Field service, mobile ops                                                                           | **Application-owned loading + `entityMap`** until a cache helper earns RC authority            | SignalTree                           |
+| Deep nested state with audit and undo             | Healthcare, claims, regulated workflows                                                             | **SignalTree leans** — nested leaves and restoration are built in; persistence stays app-owned | Toss-up; governance decides          |
+| CRUD over moderate lists, server round-trips      | CRM, ERP, admin consoles, insurance                                                                 | **SignalTree leans** — ~3× on the collection task, tens of × on undo                           | `@ngrx/signals`, on gravity          |
+| Drag-driven boards and schedules                  | Dispatch, Gantt, planning                                                                           | **SignalTree leans** — high write frequency, per-item bindings, moderate collections           | Toss-up                              |
+| Undo/redo over moderate state                     | Editors-in-a-panel, wizards, bulk edit                                                              | **SignalTree** — `@ngrx/signals` has no undo primitive at all                                  | Hand-rolled history (the 262 ms arm) |
+| Whole-dataset reads on every change               | BI and analytics explorers                                                                          | **Depends on modelling** — a plain array leaf is at parity; `entityMap` is the wrong tool      | Toss-up                              |
+| Deep undo over **large** collections              | Design tools, media timelines                                                                       | **An immutable root wins** — needs 10k+ rows _and_ deep history _and_ undo as a core feature   | elf, or immutable under NgRx         |
+| Concurrent editing of one document                | CMS authoring, co-editing                                                                           | **Not a store decision** — a CRDT goes underneath either way                                   | Yjs/Automerge + any store            |
+| Large teams, long-lived, hiring-driven            | Banking core, public sector                                                                         | **No technical winner at this altitude**                                                       | NgRx classic — legitimately so       |
 
 Where the two columns disagree, the honest reading is "a toss-up that gravity decides" — not
 "something else fits better."
@@ -121,8 +119,6 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
 - **Collections** — `entityMap()` gives you normalized membership and O(1)
   keyed reads. Keep server loading, freshness, and invalidation in application
   services until a v15 async/cache helper is derived.
-- **Forms** — `@signaltree/ng-forms` provides `createFormTree()` for Angular
-  `FormGroup` interop backed by SignalTree state.
 - **Optimistic UI** — snapshot with `byId()`, write eagerly, restore on failure; `entityMap`'s
   batch ops keep a burst to one notification. `updateAndReport()` tells you which **paths** changed
   (for partial server-payload sync, audit trails, targeted persistence). See the
@@ -278,12 +274,12 @@ membership and write resolved rows from app-owned services.
 
 A SignalTree store is composed from four distinct, type-safe mechanisms — each handles one concern, rather than funneling everything through a single primitive:
 
-| Concern           | Mechanism                                                                                                  | Example                                                                 |
-| ----------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap` | `signalTree({ users: entityMap<User>() })`                              |
-| **Derived state** | one config-level `derived` factory — computed signals deep-merged at any path                              | `signalTree(state, { derived: $ => ({ activeCount: computed(...) }) })` |
-| **Capabilities**  | the `enhancers` config array — opt-in, tree-shakeable, and reusable (author your own custom enhancers)     | `signalTree(state, { enhancers: [batching(), devTools()] })`            |
-| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes  | `ops.users.select(id)`                                                  |
+| Concern           | Mechanism                                                                                                                                    | Example                                                                 |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **State shape**   | the constructor object — state _is_ the JSON, including plain state and surviving markers like `entityMap`                                   | `signalTree({ users: entityMap<User>() })`                              |
+| **Derived state** | one config-level `derived` factory — computed signals deep-merged at any path                                                                | `signalTree(state, { derived: $ => ({ activeCount: computed(...) }) })` |
+| **Capabilities**  | the `enhancers` config array — construction-time capabilities; low-level `Enhancer` functions are accepted, but no helper/metadata SDK ships | `signalTree(state, { enhancers: [batching(), devTools()] })`            |
+| **Actions**       | a plain `@Injectable` Ops service that writes to tree paths — reads (`tree.$`) stay decoupled from writes                                    | `ops.users.select(id)`                                                  |
 
 This deliberately splits across four purpose-built tools what NgRx SignalStore unifies under one `with*` composition primitive (`withState` / `withComputed` / `withMethods` / `signalStoreFeature`). The closest analog to NgRx's reusable-feature primitive (`signalStoreFeature` / `withFeature`) is the `enhancers` array; state, derived state, and actions live in the other three mechanisms. For an honest, axis-by-axis comparison — including where NgRx wins — see [docs/compare/ngrx-signalstore.md](docs/compare/ngrx-signalstore.md).
 
@@ -315,12 +311,11 @@ const store = signalTree(
 );
 ```
 
-| Enhancer        | Purpose                                                                                                                   |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `batching()`    | Coalesce change-detection notifications into microtask batches                                                            |
-| `restoration()` | Undo/redo with configurable history depth                                                                                 |
-| `devTools()`    | Redux DevTools integration with path-based actions                                                                        |
-| `persistence()` | Auto-save/load to localStorage, IndexedDB, or custom adapters; includes JSON serialize/deserialize with type preservation |
+| Enhancer        | Purpose                                                        |
+| --------------- | -------------------------------------------------------------- |
+| `batching()`    | Coalesce change-detection notifications into microtask batches |
+| `restoration()` | Undo/redo with configurable history depth                      |
+| `devTools()`    | Redux DevTools integration with path-based actions             |
 
 > **9.0.1:** The `memoization()` enhancer was removed. Use Angular's built-in `computed()` — it memoizes its result and only re-runs when a tracked signal changes, with no extra cost over what Angular already provides.
 
@@ -409,7 +404,7 @@ artifacts; use the mapping above as the current guidance.
 
 ## Lifecycle
 
-Every tree has deterministic cleanup. `destroy()` runs every registered cleanup hook (in registration order), tearing down signals, enhancer timers, caches, and DevTools connections. Built-in enhancers register their own cleanup; custom enhancers must call `tree.registerCleanup(fn)` to participate:
+Every tree has deterministic cleanup. `destroy()` runs every registered cleanup hook (in registration order), tearing down signals, enhancer timers, caches, and DevTools connections. Built-in enhancers register their own cleanup; application-owned resources may use the same hook:
 
 ```typescript
 const store = signalTree({ data: null }, { enhancers: [batching(), devTools()] });
@@ -424,11 +419,9 @@ store.registerCleanup(() => ws.close());
 
 ## Optional Packages
 
-| Package                | Purpose                                                             |
-| ---------------------- | ------------------------------------------------------------------- |
-| `@signal-tree/react`   | Owner-bound React observation through selector projections          |
-| `@signaltree/ng-forms` | Two-way binding between SignalTree nodes and Angular reactive forms |
-| `@signaltree/events`   | Event-oriented helpers for reacting to state changes                |
+| Package              | Purpose                                                    |
+| -------------------- | ---------------------------------------------------------- |
+| `@signal-tree/react` | Owner-bound React observation through selector projections |
 
 ## Real-World Migration (Case Study)
 
@@ -522,7 +515,7 @@ Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser
 ## Documentation
 
 - [Architecture Guide](docs/architecture/signaltree-architecture-guide.md)
-- [Custom Enhancers](docs/guides/custom-enhancers.md)
+- [Enhancer authoring removal](docs/guides/custom-enhancers.md)
 - [Migration Guide (v8 → v9)](docs/guides/migration-v8-v9.md)
 - [Performance Methodology](docs/performance/methodology.md)
 - [Performance Patterns](docs/performance/performance-patterns.md)

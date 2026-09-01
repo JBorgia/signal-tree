@@ -17,7 +17,7 @@ The following convenience aliases were removed from `@signaltree/core`. Replace 
 | `selectorMemoization()`     | `memoization({ equality: 'deep', enableLRU: true })`                          |
 | `enableBatching()`          | `batching()`                                                                  |
 | `enableMemoization()`       | `memoization()`                                                               |
-| `enableTimeTravel()`        | `restoration()`                                                                |
+| `enableTimeTravel()`        | `restoration()`                                                               |
 | `enableEffects()`           | `effects()`                                                                   |
 | `enableDevTools()`          | `devTools()`                                                                  |
 | `fullDevTools()`            | `devTools({ enableBrowserDevTools: true, enableLogging: true })`              |
@@ -34,7 +34,7 @@ import { SecurityValidator, SecurityPresets } from '@signaltree/core';
 import { createEditSession } from '@signaltree/core';
 import { TREE_PRESETS } from '@signaltree/core';
 
-// @skip-lint — historical v9 import surface. `@signaltree/core/presets` was
+// @skip-lint-next-import — historical v9 import surface. `@signaltree/core/presets` was
 // later removed (see MIGRATION.md); this block documents what v9 looked like,
 // so it must not be resolved against today's d.ts files.
 // After (v9)

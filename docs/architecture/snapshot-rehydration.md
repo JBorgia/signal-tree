@@ -1,6 +1,9 @@
 # Snapshots are for rehydration, not reconstruction
 
-**Status:** investigation, with a proposed design in §8. Everything below marked
+<!-- @historical-api-examples -->
+
+**Status:** historical investigation, superseded by the v15 causal restoration
+architecture. Everything below marked
 MEASURED was run; everything marked UNVERIFIED was not. Read the "What I could
 not establish" section before acting on any of it.
 

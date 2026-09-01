@@ -469,7 +469,7 @@ onTreeError(listener: (event: TreeErrorEvent) => void): () => void;
 
 Two dead fields were removed before publication. `source` was a mostly unproduced taxonomy that duplicated `operation`; `detail` had one producer and zero consumers. They were deleted from the delivered object rather than merely hidden from TypeScript because listeners receive the same runtime object the reporter is given.
 
-`path` also received a final semantic repair before export: it now means the SignalTree state location for every producer. A `stored()` node reports its `ownerPath`, not its unrelated storage key. This lets `(treeId, path)` act as truthful runtime attribution without confusing location with identity.
+`path` also received a final semantic repair before export: it now means the SignalTree state location for every producer. The deleted `stored()` implementation reported its `ownerPath`, not its unrelated storage key. This lets `(treeId, path)` act as truthful runtime attribution without confusing location with identity.
 
 ---
 
@@ -1210,7 +1210,7 @@ This is the context for the later causal-realization work and Step 8. The goal i
 
 ## 14.5 History participation exposed semantic asymmetry
 
-An earlier audit also found that not every state feature participated symmetrically in time travel. In one measured state of the code, `form()` writes were not themselves recorded as history events, yet form values were present in later snapshots; an unrelated recorded write could therefore capture the then-current form value and a later undo could rewind it.
+An earlier audit also found that not every state feature participated symmetrically in time travel. In one measured state of the code, the since-deleted `form()` marker's writes were not themselves recorded as history events, yet form values were present in later snapshots; an unrelated recorded write could therefore capture the then-current form value and a later undo could rewind it.
 
 That finding was important even apart from its eventual implementation disposition because it established a release rule:
 

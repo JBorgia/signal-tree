@@ -167,7 +167,7 @@ class SignalTreeAdapter implements StateLibraryAdapter {
   }
 
   update(store: any, path: string[], value: any) {
-    store.deep.update(path, value);
+    store.updateAndReport(buildNestedUpdate(path, value));
   }
   // ... etc
 }

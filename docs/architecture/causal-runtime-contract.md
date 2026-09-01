@@ -69,9 +69,7 @@ The following is treated as proven at this checkpoint:
 - capability planner
 - canonical BuildPlan
 - tree-owned PositionTopology
-- plain producer
-- `status()` producer
-- `stored()` producer
+- ordinary leaf producer
 - `entityMap()` structural producer
 - derived non-authoring behavior
 - mixed-family canonical turns
@@ -143,8 +141,8 @@ for authorship or attribution.
 - what the resulting value was
 - optional structural identity when the operation is add/remove/rekey class work
 
-The runtime must not branch on whether an effect came from plain state,
-`status()`, `stored()`, `entityMap()`, or any future producer family.
+The runtime must not branch on whether an effect came from ordinary state,
+`entityMap()`, or any future producer family.
 
 ---
 
