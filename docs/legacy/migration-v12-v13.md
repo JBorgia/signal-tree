@@ -2,7 +2,7 @@
 
 > **Historical inter-version guide.** It covers v12 → v13 under the old
 > `@signaltree/*` scope. The current target for every version is
-> [`@signaltree/*` → `@signal-tree/*` (v15)](./migration-v14-v15.md).
+> [`@signaltree/*` → `@signal-tree/*` (v15)](../guides/migration-v14-v15.md).
 
 v13 applies RFC 0007's packaging principle — _independent dependency/runtime
 → its own package; a within-tree mechanic (needs only `@signaltree/core` +

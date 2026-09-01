@@ -553,7 +553,7 @@ Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser
 - [AI Agent Templates](docs/ai/agent-templates.md) — drop-in `.cursorrules`, `CLAUDE.md`, `copilot-instructions.md`
 - [Historical llms.txt](https://signaltree.io/llms.txt) / [llms-full.txt](https://signaltree.io/llms-full.txt) — v10 experiment artifacts, not current API guidance
 - [Built for AI agents](https://signaltree.io/built-for-ai) — the historical v10 AI-discoverability story
-- [Marker zoo](https://signaltree.io/marker-zoo) — historical v10 demo of the multi-marker surface; v15 keeps only `entityMap()`
+- [Marker zoo](https://signaltree.io/marker-zoo) — the surviving marker surface (`entityMap()`) shown at several tree depths in one tree
 - [AI-codegen accuracy benchmark](scripts/ai-codegen-benchmark/) — reproducible scorecard scaffolding (v10)
 
 ## AI Guidance

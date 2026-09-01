@@ -298,6 +298,20 @@ export const appRoutes: Route[] = [
   // Bundle Visualizer removed — Architecture page covers bundle data
   // Undo/Redo removed — Time Travel demo covers this with richer UX
 
+  // Pre-15 release history, split out of the "What's New" example
+  {
+    path: 'legacy-changelog',
+    loadComponent: () =>
+      import('./pages/legacy-changelog/legacy-changelog.component').then(
+        (c) => c.LegacyChangelogComponent
+      ),
+    data: {
+      title: 'Release history — v14.0.0 and earlier (@signaltree/*)',
+      description:
+        'Pre-15 SignalTree release history. Historical APIs, kept for provenance — not current guidance.',
+    },
+  },
+
   // Documentation
   {
     path: 'docs',

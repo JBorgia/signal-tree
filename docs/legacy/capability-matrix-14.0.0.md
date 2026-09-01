@@ -643,5 +643,5 @@ before treating any row of this document as a strategy.
   set is the broadest here and worth learning from, not because it is a live
   competitor.
 - **Nothing here is benchmarked.** Performance lives in
-  [real-implementations.md](./real-implementations.md); this document is about
+  [real-implementations.md](../compare/real-implementations.md); this document is about
   what exists, not what it costs.

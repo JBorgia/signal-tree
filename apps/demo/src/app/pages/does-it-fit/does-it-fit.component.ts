@@ -158,7 +158,7 @@ export class DoesItFitComponent {
   ];
 
   /**
-   * Capability grid, sourced from docs/compare/capability-matrix.md — which is
+   * Capability grid, sourced from docs/legacy/capability-matrix-14.0.0.md — which is
    * itself built by reading each library's INSTALLED `.d.ts`, not its README,
    * because a comparison written from docs measures documentation and flatters
    * whoever writes the better one. Reproduce with `node tools/api-surface.mjs`.

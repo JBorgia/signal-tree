@@ -2,7 +2,7 @@
 
 > **Historical inter-version guide.** It covers 13.x → 14.0.0 under the old
 > `@signaltree/*` scope. The current target for every version is
-> [`@signaltree/*` → `@signal-tree/*` (v15)](./migration-v14-v15.md).
+> [`@signaltree/*` → `@signal-tree/*` (v15)](../guides/migration-v14-v15.md).
 
 Every breaking change, what it looks like when you hit it, and the fix.
 
@@ -30,7 +30,7 @@ tree({ user: { name: 'Bob' } }); // ✅ still works
 > ⚠️ **True for 14.0, CHANGED in 15.0.** This guide documents the 13 → 14 step and
 > the statement above was accurate then. In 15.0 the value form takes a whole `T`
 > rather than a `Partial<T>` — see
-> [`migration-v14-v15.md`](migration-v14-v15.md). Patch with the updater form:
+> [`migration-v14-v15.md`](../guides/migration-v14-v15.md). Patch with the updater form:
 > `tree.$.user(current => ({ ...current, name: 'Bob' }))`.
 
 **Why it is a removal rather than a deprecation.** A leaf _is_ a real Angular

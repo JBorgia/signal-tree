@@ -5,7 +5,7 @@
 > Everything under the old `@signaltree/*` (no hyphen) scope stopped at 14.1.1.
 > SignalTree 15 ships as `@signal-tree/kernel`, `@signal-tree/angular`, and
 > `@signal-tree/react`. **If you are on any `@signaltree/*` package, go straight
-> to [Migration `@signaltree/*` → `@signal-tree/*` (v15)](migration-v14-v15.md)** —
+> to [Migration `@signaltree/*` → `@signal-tree/*` (v15)](../guides/migration-v14-v15.md)** —
 > it is the single migration target for every earlier version.
 
 > **SignalTree** — Reactive JSON for Angular. JSON branches, reactive leaves.
@@ -334,9 +334,9 @@ Module '"@signaltree/core"' has no exported member 'batching'.
 
 If you encounter issues during migration:
 
-1. **Check the changelog**: [CHANGELOG.md](./CHANGELOG.md)
+1. **Check the changelog**: [CHANGELOG.md](../../CHANGELOG.md)
 2. **Open an issue**: [GitHub Issues](https://github.com/JBorgia/signaltree/issues)
-3. **Review documentation**: [README.md](./README.md)
+3. **Review documentation**: [README.md](../../README.md)
 
 ---
 
