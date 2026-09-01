@@ -1,5 +1,9 @@
 # What it costs, and whether the structure is optimal — 14.0.0
 
+<!-- @historical-api-examples -->
+
+**API example status:** historical measurement record.
+
 **Status:** measurement, pre-14.0.0. Answers a narrower question than "is it
 small": _given what each feature costs, is anything structured wrong?_
 

@@ -1,5 +1,7 @@
 # SignalTree 15 — the product-core map
 
+<!-- @historical-api-examples -->
+
 **Status:** product architecture checkpoint, 2026-08-21. **Not a derivation row,
 not a gate series, and not a source of dispositions.**
 
@@ -372,12 +374,12 @@ document's provisional placement and carries no weight.
 
 ### H — Angular realization and extension
 
-| Feature                                      | Property | Kernel concepts  | Class | Ledger state                                                                                           |
-| -------------------------------------------- | -------- | ---------------- | ----- | ------------------------------------------------------------------------------------------------------ |
-| `defineStore()`                              | P-F      | observer adapter | KA    | Angular DI integration; owner Angular (realization)                                                    |
+| Feature                                      | Property | Kernel concepts  | Class | Ledger state                                                                                                                                                                                                                               |
+| -------------------------------------------- | -------- | ---------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `defineStore()`                              | P-F      | observer adapter | KA    | Angular DI integration; owner Angular (realization)                                                                                                                                                                                        |
 | enhancer protocol (declared `enhancers`)     | —        | —                | ⚠     | RESOLVED DIFFERENTLY: `.with()` is DELETED, not frozen. The single door is `signalTree(state, { enhancers })`, validated as a set before construction; post-exposure composition is unreachable rather than forbidden. **blocking GATE B** |
-| marker processor protocol / `core/authoring` | —        | —                | LC    | M1/M2 CLOSED — third-party extension NOT EARNED; no entitlement                                        |
-| `@signaltree/authoring`                      | —        | —                | ⚠     | **DOES NOT EXIST.** Package/form STOPPED and UNPROVEN; derive external implementer needs first         |
+| marker processor protocol / `core/authoring` | —        | —                | LC    | M1/M2 CLOSED — third-party extension NOT EARNED; no entitlement                                                                                                                                                                            |
+| `@signaltree/authoring`                      | —        | —                | ⚠     | **DOES NOT EXIST.** Package/form STOPPED and UNPROVEN; derive external implementer needs first                                                                                                                                             |
 
 ### I — packages
 

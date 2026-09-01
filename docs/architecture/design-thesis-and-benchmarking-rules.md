@@ -142,7 +142,7 @@ undo restores it correctly. It is now pinned by tests
 "restoring must not grow history" — because the property is invisible from the
 outside until it breaks, which is how the wrong claim survived being repeated.
 
-**`serialization()` change detection** polls with `JSON.stringify(tree())` —
+**The deleted `serialization()` enhancer's change detection** polled with `JSON.stringify(tree())` —
 materialise plus stringify the entire tree, on a timer, to discover whether
 anything changed.
 

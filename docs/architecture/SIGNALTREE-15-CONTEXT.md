@@ -1549,11 +1549,12 @@ map's own _"`dynamic structural store` alone or `+ SubjectId`"_ framing included
 must be re-read rather than translated.
 
 **NEW RESERVATION, produced by DR-4 — its SCOPE.** DR-4 names three carriers.
-Two (`asyncSource`, `asyncQuery`) are **frozen DELETE**; the third (`loader()`) is
+Two (`asyncSource`, `asyncQuery`) are **frozen DELETE**; the third (deleted `loader()`) is
 classed `AR` by T2 Outcome A. Two readings are available and they cost
 differently:
 
 ```text
+@skip-lint-block — historical carrier names under a rejected interpretation
 READING A  SCOPE-CONDITIONAL. The promise binds whichever SignalTree-owned async
            helper EXISTS in 15; the three names are cited as the v14 EXAMPLES OF
            THE CATEGORY. If none survives, the promise binds nothing.
@@ -2719,6 +2720,7 @@ mistake was made here once already.
 instances, distinct from published-surface drift:
 
 ```text
+@skip-lint-block — historical mechanism analysis
 M3 envelope   `{all:[...]}` exists so a bare array can be told apart from the
               snapshot shape — an ambiguity that exists only because it does
 stored        the debounce creates a non-durable window; flush() + page-hide

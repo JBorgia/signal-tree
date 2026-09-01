@@ -1,5 +1,7 @@
 # History: the current codebase, against the target
 
+<!-- @historical-api-examples -->
+
 **Status:** gap analysis, 2026-08-11. The "what exists today" map that the
 15.0.0 history design work needs before Phase 0: for each element of the
 position-attributed model, what is in `packages/core` today, what is partial,

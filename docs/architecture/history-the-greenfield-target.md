@@ -1,5 +1,9 @@
 # History: the greenfield target
 
+<!-- @historical-api-examples -->
+
+**API example status:** historical architecture record.
+
 **Status:** goal statement, 2026-08-10. This is the _what for_, derived from the
 research rather than from any implementation. The design space that could satisfy it
 is in [2026-08-history-greenfield-spike.md](../research/2026-08-history-greenfield-spike.md);

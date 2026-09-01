@@ -93,7 +93,7 @@ grid 20x1000 (20k leaves)   all 5066.4us | 1 leaf 311.6us | none 0.045us
 ```
 
 That is lazy READING, and it needs no configuration. Source:
-`packages/core/src/lib/incremental-materialization.spec.ts`.
+`packages/kernel/src/lib/incremental-materialization.spec.ts`.
 
 ## Diagnostics
 

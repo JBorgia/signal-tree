@@ -1,7 +1,7 @@
 # Entity Collection Cookbook
 
-This guide previously documented `entityMap({ load: loader(fn) })` and
-`invalidateTag()` as the cache-aware collection loading surface.
+This guide previously documented deleted `entityMap({ load: loader(fn) })` and
+deleted `invalidateTag()` APIs as the cache-aware collection loading surface.
 
 Those APIs are not part of the current RC public surface. Use plain
 `entityMap()` for normalized local membership, and keep HTTP caching, freshness,

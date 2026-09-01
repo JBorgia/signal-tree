@@ -162,42 +162,13 @@ Arbitrary branches cannot be scoped yet — only markers. That is
 
 </details>
 
-### 2b. `form()` now records under `restoration()`, but scoped form history is still the better UI default
+### 2b. Form drafts are application-owned
 
-The old guidance here is stale. Form field writes now announce back onto the form path,
-so a tree with `restoration()` attached records and undoes direct `form()` edits again.
-
-That does **not** make scoped form history obsolete. `form({ history: history() })`
-is still the cleaner choice when undo authority should stay inside the panel or draft
-being edited rather than join the app-wide stack.
-
-Today the practical rule is:
-
-- Use global `restoration()` when form edits should participate in the same global undo
-  stream as neighbouring tree writes.
-- Use `form({ history: history() })` when the form wants its own local undo model,
-  independent of unrelated app activity.
-
-The old defect harness was correct when it reported missing form participation. The
-current source has moved past that specific defect; what still deserves product-level
-judgement is global-vs-scoped undo semantics, not raw form invisibility.
-Use the form's **own** scoped stack when the form should undo locally rather than as
-part of the app-wide history stream:
-
-```ts
-signalTree(
-  {
-    rows: entityMap({ selectId: (r) => r.id }), // server-owned; nothing designates it
-    profile: form({ initial: { name: '' }, history: history() }), // undoable, scoped
-  },
-  { enhancers: [restoration({ maxHistorySize: 50 })] }
-); // covers plain branches only
-
-tree.$.profile.history?.undo(); // reverts the field — this is the working path
-```
-
-Global `restoration()` now records direct form writes too, so this is a UX boundary
-choice rather than a correctness escape hatch.
+SignalTree 15 has no form marker or scoped form-history API. Keep form control
+state in the framework, or model a bounded draft as ordinary tree state.
+Designate accepted draft edits with `undoable()` only when they should join the
+tree's retained undo stream. A panel that needs independent local undo owns that
+history outside SignalTree restoration.
 
 ### 3. ~~Make bulk work one step — `pauseRecording()`~~ — REMOVED in 14.1.1
 
@@ -252,19 +223,19 @@ record-then-filter step.
 <!-- measured: the 100 ms sampling interval is a source constant — `setInterval(handleChange, 100)` in packages/kernel/src/lib/audit/audit.ts. Cited rather than benchmarked on purpose: a constant breaks greppably when someone changes it, where a timing run only breaks when re-run. -->
 <!-- measured: node tools/verify-history-defects.mjs — reproduces the CONSEQUENCES by outcome (every check calls undo() and inspects state): the fixed form-coverage behaviour, that write-then-revert pairs are dropped, and the maxHistorySize fallback. It does NOT measure the 100 ms figure — its sleeps are chosen from the constant above. -->
 
-| What you are building                                 | Pattern                                                                                                      | Supported                                                                                                                            |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Editor undo over a small document                     | `maxHistorySize`; designate document edits with `undoable()` and leave caret/selection undesignated          | Yes                                                                                                                                  |
-| Bulk-edit grid with cancel                            | `transaction()` — `confirm()` or `rollback()`                                                                | Yes, and independent of `restoration`                                                                                                |
-| Undo one panel, not the whole app                     | designate only the panel's operations with `undoable()`                                                      | Yes                                                                                                                                  |
-| Large server collection + small editable **branch**   | apply the collection with `external()`; designate the branch's edits with `undoable()`                       | Yes — the headline pattern                                                                                                           |
-| Large server collection + small editable **`form()`** | `external()` for the collection beside `form({ history: history() })`                                        | Yes. Prefer scoped form history when the form should undo independently; global `restoration()` also records direct form writes now. |
-| Optimistic write, roll back on error                  | `undo()` in the error path, or `jumpTo(getCurrentIndex() - 1)`                                               | Yes — only if nothing else recorded in between                                                                                       |
-| Import/generate, then one undo                        | —                                                                                                            | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement                                                |
-| Audit trail rather than undo                          | `getRestorationHistory()` for retained undo entries; use an application event log for a complete audit trail | Restoration history is not a complete audit log                                                                                      |
-| Show the user how far they can go                     | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd                       | Yes — reactive since 14.0.0                                                                                                          |
-| Undo per entity, independently                        | —                                                                                                            | **No.** elf has this; we do not                                                                                                      |
-| Collaborative editing                                 | A CRDT (Yjs, Automerge) underneath — undo is per-user, not per-document                                      | **Not a store feature.** Don't                                                                                                       |
+| What you are building                               | Pattern                                                                                                      | Supported                                                                             |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| Editor undo over a small document                   | `maxHistorySize`; designate document edits with `undoable()` and leave caret/selection undesignated          | Yes                                                                                   |
+| Bulk-edit grid with cancel                          | `transaction()` — `confirm()` or `rollback()`                                                                | Yes, and independent of `restoration`                                                 |
+| Undo one panel, not the whole app                   | designate only the panel's operations with `undoable()`                                                      | Yes                                                                                   |
+| Large server collection + small editable **branch** | apply the collection with `external()`; designate the branch's edits with `undoable()`                       | Yes — the headline pattern                                                            |
+| Large server collection + small editable draft      | `external()` for the collection; ordinary draft state; designate accepted edits with `undoable()`            | Yes. Independent panel-local undo remains application-owned.                          |
+| Optimistic write, roll back on error                | `undo()` in the error path, or `jumpTo(getCurrentIndex() - 1)`                                               | Yes — only if nothing else recorded in between                                        |
+| Import/generate, then one undo                      | —                                                                                                            | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement |
+| Audit trail rather than undo                        | `getRestorationHistory()` for retained undo entries; use an application event log for a complete audit trail | Restoration history is not a complete audit log                                       |
+| Show the user how far they can go                   | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd                       | Yes — reactive since 14.0.0                                                           |
+| Undo per entity, independently                      | —                                                                                                            | **No.** elf has this; we do not                                                       |
+| Collaborative editing                               | A CRDT (Yjs, Automerge) underneath — undo is per-user, not per-document                                      | **Not a store feature.** Don't                                                        |
 
 ## Reactive readers, and why that mattered
 

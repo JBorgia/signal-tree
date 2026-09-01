@@ -1,5 +1,9 @@
 # TruckTrax × 15.0.0-rc.1 — production gap model, pass 1 (migration correctness)
 
+<!-- @historical-api-examples -->
+
+**API example status:** historical migration-findings record.
+
 Candidate A: the pristine-built tarballs from `a4c0b747`, installed into an
 isolated worktree of `calportland/truck-trax` (`wip/signaltree-15-rc1-eval`).
 Angular 22, pnpm 11, 22 workspace projects. The consumer's checkout was not
@@ -16,20 +20,20 @@ TruckTrax is on `@signaltree/core@13.3.0`, imports **only** that package, and
 uses **12 distinct symbols** across 29 files. Seven of the twelve are gone from
 the RC's public surface.
 
-| symbol | v3 import sites | status in 15.0.0-rc.1 | still implemented? |
-| --- | ---: | --- | --- |
-| `signalTree` | 9 | present | — |
-| `entityMap` | 7 | present | — |
-| `derivedFrom` | 5 | present | — |
-| `timeTravel` | 4 | present | — |
-| `status` | 6 | **deleted** (`4decd287`) | no |
-| `loader` | 6 | **withheld** — "UNRESOLVED cache-policy carrier" | **yes** |
-| `stored` | 2 | **withheld** — "NOT EARNED as RC public API" | **yes** |
-| `flushAllStoredSignals` | 2 | **withheld** | **yes** |
-| `asyncSource` | 2 | **deleted** — "named carrier removed" | no |
-| `form` | 1 | **deleted** (`b57ba293`, FORM-DEL) | no |
-| `history` | 1 | gone in an earlier major | no |
-| `WithDerived` | 2 | gone in an earlier major | no |
+| symbol                  | v3 import sites | status in 15.0.0-rc.1                            | still implemented? |
+| ----------------------- | --------------: | ------------------------------------------------ | ------------------ |
+| `signalTree`            |               9 | present                                          | —                  |
+| `entityMap`             |               7 | present                                          | —                  |
+| `derivedFrom`           |               5 | present                                          | —                  |
+| `timeTravel`            |               4 | present                                          | —                  |
+| `status`                |               6 | **deleted** (`4decd287`)                         | no                 |
+| `loader`                |               6 | **withheld** — "UNRESOLVED cache-policy carrier" | **yes**            |
+| `stored`                |               2 | **withheld** — "NOT EARNED as RC public API"     | **yes**            |
+| `flushAllStoredSignals` |               2 | **withheld**                                     | **yes**            |
+| `asyncSource`           |               2 | **deleted** — "named carrier removed"            | no                 |
+| `form`                  |               1 | **deleted** (`b57ba293`, FORM-DEL)               | no                 |
+| `history`               |               1 | gone in an earlier major                         | no                 |
+| `WithDerived`           |               2 | gone in an earlier major                         | no                 |
 
 The RC ships **34 public names total** — 26 from `.`, 6 from `./security`, 2
 from `./storage`. `check-rc-public-dispositions.mjs` withholds **57 symbols**.
@@ -62,18 +66,18 @@ the bundle agree.
 
 ## The 212 errors, by root cause
 
-| cause | errors | category | owner |
-| --- | ---: | --- | --- |
-| `status` / `StatusSignal` / `StatusMarker` absent | 36 | migration + product gap | both |
-| `loader` / `EntityLoaderSurface` / `LoadingEntityMapMarker` absent | 21 | **withheld surface** | SignalTree |
-| `form` / `FormSignal` absent | 14 | migration | TruckTrax |
-| `@signaltree/ng-forms/signals` subpath absent | 7 | packaging/migration | SignalTree |
-| `history` absent | 7 | migration | TruckTrax |
-| `.with()` removed | 5 | migration (deliberate, 15.0) | TruckTrax |
-| `EntitySignal.map` removed | 8 | migration | TruckTrax |
-| `DevToolsConfig.treeName` removed in 14.1.1 | 5 | migration | TruckTrax |
-| implicit-any cascade (`TS7006`/`TS7031`) | ~60 | consequence of the above | — |
-| remaining assorted | ~49 | to classify in pass 2 | — |
+| cause                                                              | errors | category                     | owner      |
+| ------------------------------------------------------------------ | -----: | ---------------------------- | ---------- |
+| `status` / `StatusSignal` / `StatusMarker` absent                  |     36 | migration + product gap      | both       |
+| `loader` / `EntityLoaderSurface` / `LoadingEntityMapMarker` absent |     21 | **withheld surface**         | SignalTree |
+| `form` / `FormSignal` absent                                       |     14 | migration                    | TruckTrax  |
+| `@signaltree/ng-forms/signals` subpath absent                      |      7 | packaging/migration          | SignalTree |
+| `history` absent                                                   |      7 | migration                    | TruckTrax  |
+| `.with()` removed                                                  |      5 | migration (deliberate, 15.0) | TruckTrax  |
+| `EntitySignal.map` removed                                         |      8 | migration                    | TruckTrax  |
+| `DevToolsConfig.treeName` removed in 14.1.1                        |      5 | migration                    | TruckTrax  |
+| implicit-any cascade (`TS7006`/`TS7031`)                           |    ~60 | consequence of the above     | —          |
+| remaining assorted                                                 |    ~49 | to classify in pass 2        | —          |
 
 The implicit-any errors are not independent findings. When an import fails, the
 symbol becomes an error type and inference collapses downstream — they will

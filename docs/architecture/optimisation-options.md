@@ -1,5 +1,9 @@
 # Optimisation options for SignalTree, surveyed and measured
 
+<!-- @historical-api-examples -->
+
+**API example status:** historical options record.
+
 Companion to [design-thesis-and-benchmarking-rules.md](./design-thesis-and-benchmarking-rules.md).
 That document says what the architecture is and what it costs. This one enumerates
 **what could be done about the costs** — deliberately broadly, so the obvious

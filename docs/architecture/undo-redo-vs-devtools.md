@@ -1,5 +1,11 @@
 # Undo/redo and devtools replay are different features
 
+<!-- @historical-api-examples -->
+
+**Status:** historical architecture evidence. The marker and hydration APIs in
+this document predate the v15 declarative restoration target; use the current
+restoration architecture documents for implementation guidance.
+
 They look like one feature — both "go back to an earlier state" — and treating
 them as one is what stalled the snapshot/rehydration work. They want different
 things, cost different amounts, and ship to different audiences.
@@ -112,7 +118,7 @@ did:
 
 - **The default column is a floor, not a worst case.** Changing one row costs the
   same as changing fifty different ones — the pointer array is rebuilt either way.
-  The third column is the ceiling: each *changed* row adds ~40 bytes on top of the
+  The third column is the ceiling: each _changed_ row adds ~40 bytes on top of the
   array, so at 50k the span between "touch it at all" and "rewrite all of it" is
   5.9x.
 - **The exclusion column does not scale with width.** `recordHistory: false` is

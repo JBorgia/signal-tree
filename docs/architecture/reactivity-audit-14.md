@@ -1,5 +1,7 @@
 # Reactivity audit — 14.0.0-rc.1
 
+<!-- @historical-api-examples -->
+
 **Status:** audit. Prompted by `canUndo()` turning out to be non-reactive, on the
 theory that a defect found once is rarely found only once.
 

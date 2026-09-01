@@ -236,7 +236,7 @@ Weighted results help answer:
 
 All weights are:
 
-- Research-backed with cited sources
+- Maintainer-estimated rather than presented as external research findings
 - Manually adjustable by users
 - Clearly documented with real-world context
 - Transparently applied to results

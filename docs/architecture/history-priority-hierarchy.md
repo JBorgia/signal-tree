@@ -1,5 +1,9 @@
 # History: the hierarchy of importance
 
+<!-- @historical-api-examples -->
+
+**API example status:** historical architecture record.
+
 **Status:** priority statement, 2026-08-11. Companion to
 [history-the-greenfield-target.md](./history-the-greenfield-target.md) (what we are
 building) and [2026-08-history-greenfield-spike.md](../research/2026-08-history-greenfield-spike.md)
@@ -256,13 +260,13 @@ snapshot stack in place" option died.
 one figure conveys. MEASURED at 50 steps over 50,000 rows
 (`tools/bench-retention-arms.mjs`, heap baselined after seeding):
 
-| what the 50 writes touch     | retained      |
-| ---------------------------- | ------------- |
-| scalar beside the collection | **0.30 MB**   |
-| one row                      | **19.38 MB**  |
+| what the 50 writes touch     | retained                            |
+| ---------------------------- | ----------------------------------- |
+| scalar beside the collection | **0.30 MB**                         |
+| one row                      | **19.38 MB**                        |
 | 50 different rows            | **19.38 MB** — identical to one row |
-| 400 rows                     | 20.20 MB      |
-| all 50,000 rows              | **114.77 MB** |
+| 400 rows                     | 20.20 MB                            |
+| all 50,000 rows              | **114.77 MB**                       |
 
 Two readings follow, and only the first was previously documented:
 
@@ -271,7 +275,7 @@ Two readings follow, and only the first was previously documented:
   a **64× spread** between the scalar arm and touching the collection at all.
 - **19.38 MB is a floor, not a worst case.** One changed row costs the same as
   fifty different ones, because the pointer array is rebuilt either way. Each
-  *changed* row adds ~40 bytes on top, which is a further **5.9×** to the
+  _changed_ row adds ~40 bytes on top, which is a further **5.9×** to the
   all-rows ceiling. The cost function has two terms, not one:
 
   ```

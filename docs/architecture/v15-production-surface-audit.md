@@ -1,5 +1,7 @@
 # v15 production surface audit
 
+<!-- @historical-api-examples -->
+
 **Engineering status updated August 30, 2026.** This is an append-only decision
 record. Historical measurements below remain dated evidence; the current RC1
 surface is `@signal-tree/kernel` plus `@signal-tree/angular`, and supersedes old
@@ -7073,8 +7075,11 @@ Both deleted. Replaced with `undoable()`, which is what actually does that job.
 ## ⚠️ FINDING 3 — THE README TAUGHT THREE SUBPATH IMPORTS, NONE OF WHICH RESOLVE
 
 ```typescript
+// @skip-lint-next-import — historical evidence of withdrawn subpath
 import { SecurityValidator, SecurityPresets } from '@signaltree/core/security';
+// @skip-lint-next-import — historical evidence of withdrawn subpath
 import { createEditSession, createTreeEditSession } from '@signaltree/core/edit-session';
+// @skip-lint-next-import — historical evidence of withdrawn subpath
 import { createStorageAdapter, createIndexedDBAdapter } from '@signaltree/core/storage';
 ```
 

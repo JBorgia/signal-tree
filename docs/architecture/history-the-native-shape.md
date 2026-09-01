@@ -1,5 +1,9 @@
 # History, in SignalTree's own shape
 
+<!-- @historical-api-examples -->
+
+**API example status:** historical architecture record.
+
 > ⚠️ **Read this as the argument for one option, not as the design.** It reads as
 > current and it is not. Its central premise is measured wrong: `notify()` does
 > **not** fire at every write site. Plain leaf writes reach it only via

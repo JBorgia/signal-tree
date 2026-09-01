@@ -1,5 +1,7 @@
 # The competitive position for position-attributed transactions
 
+<!-- @historical-api-examples -->
+
 **Status:** competitive analysis, 2026-08-11. Companion to
 [history-the-greenfield-target.md](./history-the-greenfield-target.md) (what is being
 built) and [history-priority-hierarchy.md](./history-priority-hierarchy.md) (what wins

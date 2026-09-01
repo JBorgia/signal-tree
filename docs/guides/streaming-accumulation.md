@@ -52,8 +52,8 @@ async function ask(prompt: string) {
 
 That is the whole thing. `chat.$.reply` is a signal, so templates track it,
 `computed()` derives from it, and — because it is an ordinary leaf — it is
-captured by `restoration()`, included in `tree.$()`, and persisted by
-`persistence()` with no marker contract to satisfy.
+captured by `restoration()` and included in `tree.$()`. Application-owned
+persistence may serialize that value without a marker contract to satisfy.
 
 ### Cancellation
 

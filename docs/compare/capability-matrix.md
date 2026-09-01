@@ -278,10 +278,10 @@ domain entity round-trips cleanly and the UI state has its own lifetime.
 its UI row, and elf does not do that for you automatically. It is a pattern with
 a sharp edge, not a free win.
 
-**Verdict: adopt the concept, not the API.** We already have the better
-mechanism: a sibling `entityMap` in the same tree, and `stored()` decides what
-persists. What we lack is the _guidance_ — this belongs in docs and possibly a
-thin helper, not a new primitive.
+**Verdict: adopt the concept, not the API.** Use a sibling `entityMap` in the
+same tree and keep persistence policy application-owned. What we lack is the
+_guidance_ — this belongs in docs and possibly a thin helper, not a new
+primitive.
 
 ### 3. Id migration — elf `updateEntitiesIds`
 
@@ -618,12 +618,10 @@ before treating any row of this document as a strategy.
   coarse outside its entity collection: change one field of a nested object and
   every consumer of that slice recomputes. This is the only row in the matrix
   where the answer is ✅/❌/❌/❌/❌, and it is the actual thesis of the library.
-- **Markers as one concept** — `entityMap()` and `form()` register through one
-  extension point, `registerMarkerProcessor`, rather than a differently-shaped
-  plugin each. (This bullet named six markers until 15.0; four of them were
-  never exported and one was deleted, so it now names what a user can reach.)
-- **Forms** — a form model with validators and a wizard, in the state library.
-  Akita persists an Angular form; nobody else models one.
+- **EntityMap at arbitrary paths** — normalized identity can live beside the
+  domain state it owns instead of flattening every collection to the root.
+- **Application-owned forms** — SignalTree does not compete with Angular forms
+  or claim validation and wizard ownership in v15.
 - **Diagnostics with stable codes** (ST2001–ST2024) that fold out of production
   builds. No competitor here ships numbered diagnostics.
 - **`updateAndReport`** — which paths changed, without a diff pass.

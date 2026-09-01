@@ -1,5 +1,9 @@
 # Frozen phase model — blast radius, classified
 
+<!-- @historical-api-examples -->
+
+**API example status:** historical decision-input record.
+
 **Status:** decision input. No implementation started.
 
 Adopting enhancer-aware planning and freezing configuration are **one change**:
@@ -93,16 +97,16 @@ the decision and the disposition is what makes it auditable. All eleven were
 rewritten rather than deleted; every guarantee they encoded survives in a form
 the phase model can express.
 
-| Spec                                     | Rows | Disposition                                                                                                                       |
-| ---------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `enhancer-metadata-authority.spec.ts`    | 6→10 | rewritten against the declared set; two rows ADDED for properties the chain could not have — order-independence, aggregated errors |
-| `enhancer-method-forwarding.spec.ts`     | 3    | "pre-enhancer reference" is taken by a probe enhancer declared first; one row added pinning declaration-order stability            |
-| `enhancer-protocol-continuity.spec.ts`   | 2    | D is now unreachable-by-construction rather than guarded; E is total rather than incremental                                       |
-| `entity-restoration-authority.spec.ts`   | 2    | the prospective rule became a STATIC one — see restoration-ownership-inventory.md, "AMENDMENT"                                     |
-| `batching.behavior.spec.ts`              | 2    | raw-setter counter installed by a probe enhancer ahead of `batching`                                                               |
-| `walker-conformance.spec.ts`             | 1    | same probe technique                                                                                                              |
-| `derived.spec.ts`                        | 2    | "identity across chaining" became "merged once, into the `$` the enhancers saw"                                                    |
-| `time-travel.spec.ts`                    | 2    | `.derived(...).with(...)` became `{ enhancers, derived }`                                                                          |
+| Spec                                   | Rows | Disposition                                                                                                                        |
+| -------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `enhancer-metadata-authority.spec.ts`  | 6→10 | rewritten against the declared set; two rows ADDED for properties the chain could not have — order-independence, aggregated errors |
+| `enhancer-method-forwarding.spec.ts`   | 3    | "pre-enhancer reference" is taken by a probe enhancer declared first; one row added pinning declaration-order stability            |
+| `enhancer-protocol-continuity.spec.ts` | 2    | D is now unreachable-by-construction rather than guarded; E is total rather than incremental                                       |
+| `entity-restoration-authority.spec.ts` | 2    | the prospective rule became a STATIC one — see restoration-ownership-inventory.md, "AMENDMENT"                                     |
+| `batching.behavior.spec.ts`            | 2    | raw-setter counter installed by a probe enhancer ahead of `batching`                                                               |
+| `walker-conformance.spec.ts`           | 1    | same probe technique                                                                                                               |
+| `derived.spec.ts`                      | 2    | "identity across chaining" became "merged once, into the `$` the enhancers saw"                                                    |
+| `time-travel.spec.ts`                  | 2    | `.derived(...).with(...)` became `{ enhancers, derived }`                                                                          |
 
 Two of these rewrites are weaker than what they replaced, and saying so is the
 point of this table:

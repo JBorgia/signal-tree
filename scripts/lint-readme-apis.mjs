@@ -52,11 +52,12 @@ function entryPoints(pkg) {
   for (const [subpath, value] of Object.entries(manifest.exports ?? {})) {
     if (subpath.endsWith('package.json') || subpath.includes('*')) continue;
     const declared =
-      typeof value === 'string' ? null : (value.types ?? value.default?.types);
+      typeof value === 'string' ? null : value.types ?? value.default?.types;
     if (typeof declared !== 'string') continue;
     const file = join(base, declared);
     if (existsSync(file)) {
-      const spec = subpath === '.' ? `@signaltree/${pkg}` : `@signaltree/${pkg}${subpath.slice(1)}`;
+      const spec =
+        subpath === '.' ? manifest.name : `${manifest.name}${subpath.slice(1)}`;
       out.set(spec, file);
     }
   }
@@ -67,9 +68,17 @@ function entryPoints(pkg) {
 function exportsOf(file, seen = new Set(), out = new Set()) {
   if (!file || seen.has(file) || !existsSync(file)) return out;
   seen.add(file);
-  const sf = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
+  const sf = ts.createSourceFile(
+    file,
+    readFileSync(file, 'utf8'),
+    ts.ScriptTarget.Latest,
+    true
+  );
   for (const s of sf.statements) {
-    const mods = ts.canHaveModifiers(s) ? (ts.getModifiers(s) ?? []) : [];
+    const mods = ts.canHaveModifiers(s) ? ts.getModifiers(s) ?? [] : [];
+    if (mods.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword)) {
+      out.add('default');
+    }
     if (mods.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) {
       if (ts.isVariableStatement(s)) {
         for (const d of s.declarationList.declarations)
@@ -85,7 +94,10 @@ function exportsOf(file, seen = new Set(), out = new Set()) {
       if (spec?.startsWith('.')) {
         const base = resolve(dirname(file), spec);
         for (const c of [`${base}.d.ts`, join(base, 'index.d.ts')])
-          if (existsSync(c)) { exportsOf(c, seen, out); break; }
+          if (existsSync(c)) {
+            exportsOf(c, seen, out);
+            break;
+          }
       }
     }
   }
@@ -94,7 +106,8 @@ function exportsOf(file, seen = new Set(), out = new Set()) {
 
 const SURFACE = new Map();
 for (const pkg of readdirSync(join(ROOT, 'dist/packages'))) {
-  for (const [spec, file] of entryPoints(pkg)) SURFACE.set(spec, exportsOf(file));
+  for (const [spec, file] of entryPoints(pkg))
+    SURFACE.set(spec, exportsOf(file));
 }
 if (SURFACE.size === 0) {
   console.error('✗ no built packages found — run `npm run build:all` first.');
@@ -126,7 +139,8 @@ function markdownUnder(dir, out = []) {
   for (const name of readdirSync(abs, { withFileTypes: true })) {
     const rel = `${dir}/${name.name}`;
     if (name.isDirectory()) {
-      if (HISTORICAL_DIRS.has(name.name) || name.name === 'node_modules') continue;
+      if (HISTORICAL_DIRS.has(name.name) || name.name === 'node_modules')
+        continue;
       markdownUnder(rel, out);
     } else if (name.name.endsWith('.md') && !HISTORICAL_FILE.test(rel)) {
       out.push(rel);
@@ -143,36 +157,188 @@ const READMES = [
   ...markdownUnder('docs'),
 ];
 
-/** `import { a, b as c } from '@signaltree/x';` inside a fenced block. */
-const IMPORT = /import\s+(?:type\s+)?\{([^}]*)\}\s*from\s*'(@signaltree\/[^']+)'/g;
+/** Static SignalTree imports inside examples: named, default, namespace, or side-effect. */
+const IMPORT =
+  /^[ \t]*import[ \t]+(?:type[ \t]+)?(\{[^}]*\}|\*[ \t]+as[ \t]+[$\w]+|[$\w]+(?:[ \t]*,[ \t]*(?:\{[^}]*\}|\*[ \t]+as[ \t]+[$\w]+))?)[ \t]+from[ \t]*['"](@(?:signal-tree|signaltree)\/[^'"]+)['"][ \t]*;?|^[ \t]*import[ \t]*['"](@(?:signal-tree|signaltree)\/[^'"]+)['"][ \t]*;?/gm;
 
-const problems = [];
-let checked = 0;
-
-for (const rel of READMES) {
-  const text = readFileSync(join(ROOT, rel), 'utf8');
+function inspectImports(text, rel) {
+  const problems = [];
+  let checked = 0;
   const lines = text.split('\n');
   for (const m of text.matchAll(IMPORT)) {
-    const spec = m[2];
+    const clause = m[1] ?? '';
+    const spec = m[2] ?? m[3];
     const surface = SURFACE.get(spec);
-    if (!surface) continue; // an entry point we do not build, e.g. a planned one
     const line = text.slice(0, m.index).split('\n').length;
-    // A block explicitly opted out is not our business.
+    const previousLine = lines[line - 2] ?? '';
     const context = lines.slice(Math.max(0, line - 4), line).join('\n');
-    if (/@skip-lint|```ts\s+(wrong|bad)/.test(context)) continue;
+    // One explicit marker exempts exactly the next import, never a whole block.
+    if (
+      /@skip-lint-next-import\b/.test(previousLine) ||
+      /```ts\s+(wrong|bad)/.test(context)
+    ) {
+      continue;
+    }
 
-    for (const raw of m[1].split(',')) {
-      const name = raw.trim().replace(/^type\s+/, '').split(/\s+as\s+/)[0].trim();
+    if (!surface) {
+      problems.push({ rel, line, name: '(package)', spec });
+      continue;
+    }
+
+    if (!clause) {
+      checked++;
+      continue;
+    }
+
+    if (/^\*[ \t]+as[ \t]+[$\w]+$/.test(clause.trim())) {
+      checked++;
+      continue;
+    }
+
+    const defaultBinding = clause
+      .trim()
+      .match(/^([$A-Z_a-z][$\w]*)\s*(?:,|$)/)?.[1];
+    if (defaultBinding) {
+      checked++;
+      if (!surface.has('default')) {
+        problems.push({ rel, line, name: '(default)', spec });
+      }
+    }
+
+    const named = clause.match(/\{([\s\S]*?)\}/)?.[1];
+    if (!named) continue;
+    for (const raw of named.split(',')) {
+      const name = raw
+        .trim()
+        .replace(/^type\s+/, '')
+        .split(/\s+as\s+/)[0]
+        .trim();
       if (!name) continue;
       checked++;
       if (!surface.has(name)) {
         const near = [...surface].find(
-          (s) => s.toLowerCase().includes(name.toLowerCase().slice(0, 6)) && s !== name
+          (s) =>
+            s.toLowerCase().includes(name.toLowerCase().slice(0, 6)) &&
+            s !== name
         );
         problems.push({ rel, line, name, spec, near });
       }
     }
   }
+  return { problems, checked };
+}
+
+if (process.argv.includes('--self-test')) {
+  const clean = inspectImports(
+    "import { signalTree } from '@signal-tree/kernel';",
+    '<clean-fixture>'
+  );
+  const cleanNamespace = inspectImports(
+    "import * as kernel from '@signal-tree/kernel';",
+    '<namespace-fixture>'
+  );
+  const cleanSideEffect = inspectImports(
+    "import '@signal-tree/kernel';",
+    '<side-effect-fixture>'
+  );
+  const invalidDefault = inspectImports(
+    "import kernel from '@signal-tree/kernel';",
+    '<default-fixture>'
+  );
+  const staleForms = [
+    "import { signalTree } from '@signaltree/core';",
+    "import legacy from '@signaltree/core';",
+    "import * as legacy from '@signaltree/core';",
+    "import '@signaltree/core';",
+  ];
+  const stale = staleForms.map((fixture) =>
+    inspectImports(fixture, '<stale-fixture>')
+  );
+  const narrowExemption = inspectImports(
+    '// @skip-lint-next-import — historical evidence\n' +
+      "import legacy from '@signaltree/core';\n" +
+      "import another from '@signaltree/core';",
+    '<exemption-fixture>'
+  );
+  if (clean.checked !== 1 || clean.problems.length !== 0) {
+    console.error('✗ self-test rejected a current kernel import.');
+    process.exit(1);
+  }
+  if (
+    cleanNamespace.checked !== 1 ||
+    cleanNamespace.problems.length !== 0 ||
+    cleanSideEffect.checked !== 1 ||
+    cleanSideEffect.problems.length !== 0
+  ) {
+    console.error('✗ self-test rejected a resolvable non-named import.');
+    process.exit(1);
+  }
+  if (
+    invalidDefault.checked !== 1 ||
+    invalidDefault.problems.length !== 1 ||
+    invalidDefault.problems[0].name !== '(default)'
+  ) {
+    console.error('✗ self-test accepted an unavailable default export.');
+    process.exit(1);
+  }
+  if (
+    stale.some(
+      (result) =>
+        result.problems.length !== 1 ||
+        result.problems[0].spec !== '@signaltree/core'
+    )
+  ) {
+    console.error('✗ self-test accepted a retired package import form.');
+    process.exit(1);
+  }
+  if (
+    narrowExemption.problems.length !== 1 ||
+    narrowExemption.problems[0].line !== 3
+  ) {
+    console.error(
+      '✗ self-test allowed an import exemption to escape its line.'
+    );
+    process.exit(1);
+  }
+  if (
+    !isHistoricalDocument(
+      '# Record\n<!-- @historical-api-examples -->\n**Status:** audit.'
+    ) ||
+    isHistoricalDocument(
+      '# Current guide\n<!-- @historical-api-examples -->\nCurrent guidance.'
+    ) ||
+    isHistoricalDocument(
+      `**Status:** audit.\n${'evidence\n'.repeat(
+        10
+      )}<!-- @historical-api-examples -->`
+    )
+  ) {
+    console.error(
+      '✗ self-test accepted an unscoped or late historical-document marker.'
+    );
+    process.exit(1);
+  }
+  if (
+    !teachingRegions('Current prose teaches `stored()` here.').some((region) =>
+      region.text.includes('stored()')
+    )
+  ) {
+    console.error('✗ self-test failed to inspect API-shaped prose.');
+    process.exit(1);
+  }
+  console.log(
+    '✓ self-test covers current, named, default, namespace, side-effect, and narrowly exempted imports.'
+  );
+  process.exit(0);
+}
+
+const problems = [];
+let checked = 0;
+
+for (const rel of READMES) {
+  const result = inspectImports(readFileSync(join(ROOT, rel), 'utf8'), rel);
+  checked += result.checked;
+  problems.push(...result.problems);
 }
 
 console.log(
@@ -181,11 +347,14 @@ console.log(
 );
 
 if (process.argv.includes('--list')) {
-  for (const [spec, names] of SURFACE) console.log(`  ${spec}: ${names.size} exports`);
+  for (const [spec, names] of SURFACE)
+    console.log(`  ${spec}: ${names.size} exports`);
 }
 
 if (problems.length) {
-  console.error(`\n✗ ${problems.length} symbol(s) named in a README do not exist:\n`);
+  console.error(
+    `\n✗ ${problems.length} symbol(s) named in a README do not exist:\n`
+  );
   for (const p of problems) {
     console.error(
       `    ${p.rel}:${p.line}  '${p.name}' is not exported by ${p.spec}` +
@@ -200,7 +369,9 @@ if (problems.length) {
   process.exit(1);
 }
 
-console.log('✓ every @signaltree symbol named in a README exists.');
+console.log(
+  '✓ every SignalTree package and symbol imported in current docs exists.'
+);
 
 /* ══════════════════════════════════════════════════════════════════════════
  * RETIRED APIs MAY NOT BE TAUGHT.        AI-DOC-SURFACE-GATE-0
@@ -248,11 +419,10 @@ console.log('✓ every @signaltree symbol named in a README exists.');
  * lack, and its "Markers as one concept" bullet named six markers of which five
  * were unreachable.
  */
-const WITHDRAWN = new Map([
-]);
+const WITHDRAWN = new Map([]);
 
 const RETIRED = new Map([
-  ['stored', 'deleted — use `persistence()` over ordinary state'],
+  ['stored', 'deleted — keep persistence application-owned'],
   ['flushAllStoredSignals', 'deleted with `stored()`'],
   ['createStoredSignal', 'deleted with `stored()`'],
   ['isStoredMarker', 'deleted with `stored()`'],
@@ -262,13 +432,20 @@ const RETIRED = new Map([
   ['asyncSource', 'deleted — application-owned async + `external()`'],
   ['asyncQuery', 'deleted — application-owned async + `external()`'],
   ['effects', 'removed years ago'],
-  ['withPersistence', 'removed in v12 — use `persistence()`'],
-  ['serialization', 'not exported — `persistence()` is the enhancer'],
-  ['loader', 'DELETED — link(tree.$.rows, endpoint); caching is the endpoint\'s job'],
+  ['withPersistence', 'deleted — keep persistence application-owned'],
+  ['persistence', 'deleted — keep persistence application-owned'],
+  ['serialization', 'deleted — keep serialization application-owned'],
+  [
+    'loader',
+    "DELETED — link(tree.$.rows, endpoint); caching is the endpoint's job",
+  ],
   ['invalidateTag', 'DELETED with `loader()`'],
   ['compared', 'DELETED — see PER-LOCATION-EQUALITY-0'],
   ['byKeys', 'DELETED with `compared()`'],
-  ['linked', "DELETED — call Angular's `linkedSignal()` inside `.derived()`"],
+  ['linked', "deleted — use Angular's `linkedSignal()` in the derived factory"],
+  ['derivedFrom', 'deleted — type an external derived factory with `TreeNode`'],
+  ['form', 'deleted — use framework forms or ordinary state'],
+  ['createEditSession', 'deleted — keep bounded drafts in application state'],
   ['onHydrateDecision', 'DELETED — nothing declines hydration any more'],
 ]);
 
@@ -276,16 +453,10 @@ const RETIRED = new Map([
  * ⚠️ `derived` IS DELIBERATELY ABSENT FROM BOTH LISTS, and the reason is a limit
  * of the technique rather than an oversight.
  *
- * The `derived()` MARKER was removed in v6.3.1 and is deleted outright now — but
- * the name cannot be gated. It collides with two live, correct usages:
- *
- *     tree.derived(fn)                       the live tree method
- *     const derived = derivedFrom<T>();      the idiomatic local binding,
- *     derived(($) => ({ … }))                which the root README teaches
- *
- * Excluding the method form is easy (`(?<![.\w])`). Excluding a LOCAL CONST is
- * not: `derived(($) => …)` is indistinguishable, by name alone, from the removed
- * free function it replaced. Both remaining hits were of exactly that kind.
+ * The old `derived()` MARKER and fluent `.derived()` method are both deleted,
+ * but a free call still collides with an ordinary application-local function
+ * named `derived`. This denylist therefore handles retired free functions while
+ * the explicit retired-method scan below handles `.derived()`.
  *
  *     A NAME-BASED GATE CANNOT OUTLIVE A NAME COLLISION. Listing it anyway would
  *     buy nothing and cost two false positives in the most-read docs — and a
@@ -299,7 +470,8 @@ const RETIRED = new Map([
  * gate fail loudly and demands the entry be removed on purpose.
  */
 const reachableNames = new Set();
-for (const names of SURFACE.values()) for (const n of names) reachableNames.add(n);
+for (const names of SURFACE.values())
+  for (const n of names) reachableNames.add(n);
 const stale = [...RETIRED.keys(), ...WITHDRAWN.keys()].filter((n) =>
   reachableNames.has(n)
 );
@@ -329,30 +501,49 @@ function teachingRegions(text) {
   // prose. A capability table is the most load-bearing kind of teaching there
   // is: it is what a prospective user compares libraries with.
   const lines = text.split('\n');
+  let inFence = false;
   lines.forEach((l, i) => {
-    if (l.trimStart().startsWith('|')) out.push({ text: l, line: i + 1 });
+    if (l.trimStart().startsWith('```')) {
+      inFence = !inFence;
+      return;
+    }
+    if (inFence) return;
+    if (l.trimStart().startsWith('|') || /`[$A-Z_a-z][$\w]*\s*[(<]/.test(l)) {
+      out.push({ text: l, line: i + 1 });
+    }
   });
   return out;
 }
 
 /**
- * ⚠️ A RECORD IS NOT A LESSON. `docs/architecture/**` and `docs/research/**` are
- * accounts of decisions already taken, and a record of a DELETION has to be able
- * to show what was deleted — in a fence, with its real call shape. Holding them
- * to "never name a retired API in an example" would force the audit trail to
- * paraphrase its own evidence, which is how a record stops being one.
+ * ⚠️ A RECORD IS NOT A LESSON. `docs/research/**` contains exploratory records.
+ * A document outside `docs/research` must opt in visibly near its title. The
+ * marker classifies API examples as evidence; it does not make prose override
+ * current manifests, types, or release decisions.
+ * A visible role such as audit, research, decision record, or historical is
+ * also required; adding the marker to a current guide is not sufficient.
  *
- * The import pass above still covers them: a record may SHOW a deleted call, but
- * it may not tell a reader to import something that does not exist.
+ * Architecture documents are current unless a local example is explicitly
+ * marked historical. A directory name may not exempt current architecture.
  */
-const RECORD_DIRS = /^docs\/(architecture|research)\//;
+const RECORD_DIRS = /^docs\/research\//;
+function isHistoricalDocument(text) {
+  const heading = text.split('\n').slice(0, 10).join('\n');
+  const role = heading.replace(/<!--\s*@historical-api-examples\s*-->/g, '');
+  return (
+    /<!--\s*@historical-api-examples\s*-->/.test(heading) &&
+    /\b(historical|audit|research|competitive analysis|gap analysis|design note|ledger|checkpoint|decision record|discovery|append-only)\b/i.test(
+      role
+    )
+  );
+}
 
 const taught = [];
 for (const rel of READMES) {
-  if (RECORD_DIRS.test(rel)) continue;
   const text = readFileSync(join(ROOT, rel), 'utf8');
+  if (RECORD_DIRS.test(rel) || isHistoricalDocument(text)) continue;
   for (const region of teachingRegions(text)) {
-    if (/@skip-lint/.test(region.text)) continue;
+    if (/@skip-lint-(?:block|line)\b/.test(region.text)) continue;
     // ⚠️ EXPLAINING IS NOT TEACHING, and widening to whole table rows made this
     // necessary immediately: a row reading "Withdrawn: its subject, the
     // `stored()` marker, is deleted" is the CORRECT thing for an index to say,
@@ -397,4 +588,3 @@ console.log(
   `✓ no live doc example teaches any of the ${RETIRED.size} retired or ` +
     `${WITHDRAWN.size} withdrawn API(s).`
 );
-
