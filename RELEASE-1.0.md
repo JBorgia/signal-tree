@@ -1083,11 +1083,16 @@ were published from the exact validated tarballs; registry downloads were
 byte-identical; normal npm install, strict typecheck, and runtime passed; and the
 GitHub release is marked prerelease.
 
-Two bounded post-RC findings are queued for the next candidate/GA without
-reopening v15 semantics: Angular's manifest incorrectly declared
-`sideEffects: false`, allowing a side-effect-only package import to be removed
-before realization installation; and emitted kernel JSDoc still taught deleted
-`.with()` construction. Both repository fixes have direct controls.
+The two bounded post-RC findings are closed without reopening v15 semantics.
+Angular's `sideEffects: false` finding was superseded by construction-bound
+realization at `23c6de5a`: the package root now binds
+`ANGULAR_TREE_REALIZATION` directly into its exported factory and performs no
+runtime registration side effect. The manifest and its direct control therefore
+remain correct. Emitted kernel JSDoc still taught deleted `.with()` construction;
+`78ea2ff6` replaces that active guidance with the declarative enhancer-tuple
+contract. The declaration-doc gate now discovers the actual non-private package
+set, checks emitted declarations, and self-tests both stripped documentation and
+the known retired-API guidance through the production predicates.
 
 Post-`84d39ae8` type/surface closure is checkpointed at `1c021fb6`.
 `READONLY-FOREIGN-REACTIVE-0` is **RF-A / CLOSED GREEN**: readonly projection
@@ -12524,7 +12529,9 @@ delay `GATE F` or GA without a concrete release falsifier.
       bundle, and runtime green
 - [x] collect RC packaging/DX/docs failures — Angular `sideEffects` metadata and
       stale emitted `.with()` JSDoc recorded; no semantic/API falsifier
-- [ ] fix RC issues only
+- [x] fix RC issues only — Angular's metadata finding was superseded by
+      construction-bound realization; stale active `.with()` guidance and the
+      declaration-gate package-universe defect closed at `78ea2ff6`
 - [ ] final public API review
 
 Exit condition: `GATE F`
