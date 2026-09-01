@@ -1,6 +1,10 @@
 # Capability matrix — what the others have that we do not
 
-**Status:** audit, 14.0.0.
+**Status:** audit, 14.0.0. Point-in-time evidence — package names and versions
+below are as-audited. In v15 `@signaltree/core` is `@signal-tree/kernel`, the
+`@signaltree/events` / `@signaltree/core/authoring` surfaces are gone, and
+`onTreeError` ships from `@signal-tree/kernel`. Re-run `node tools/api-surface.mjs`
+for the current surface.
 
 ## How this was built, and why that matters
 

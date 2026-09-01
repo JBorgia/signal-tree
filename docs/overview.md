@@ -17,14 +17,14 @@ while the packages shipped 13.x. Don't reintroduce it; link the changelog instea
 - Recursive typing with deep nesting and accurate type inference
 - Sub‑millisecond operations measured at 5–20+ levels
 - Memory efficiency via proportional causal history and explicit ownership lifetimes
-- Small, focused packages with strong TypeScript support
-- Extensible via enhancers and optional packages
+- Three focused packages with strong TypeScript support
+- Extensible via the declared `enhancers` set
 
 ## Core capabilities
 
 - Hierarchical signal trees with type-safe access and updates
 - Deterministic resource release through `destroy()`
-- Tree-shakeable: unused enhancers and optional packages are eliminated by modern bundlers
+- Tree-shakeable: unused enhancers are eliminated by modern bundlers
 
 ## Package ecosystem
 

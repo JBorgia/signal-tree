@@ -1,5 +1,10 @@
 # Upgrading to SignalTree 13.2
 
+> **Historical inter-version guide** for the old `@signaltree/*` scope. `signalForm()`
+> and the whole `@signaltree/ng-forms` package are **removed in v15** — SignalTree 15
+> publishes no forms capability. The current target for every version is
+> [`@signaltree/*` → `@signal-tree/*` (v15)](./migration-v14-v15.md).
+
 13.2 carries **one behavior change** plus one type-level improvement.
 
 > **Read this if you use `signalForm()`.** `nativeErrors` now defaults to `true`,

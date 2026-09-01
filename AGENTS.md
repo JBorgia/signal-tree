@@ -411,9 +411,10 @@ to the Angular version the consumer already chose, and our supported range spans
 Angular 20–22, whose own Node requirements differ. Declaring a range would
 either duplicate Angular's or contradict it, and being wrong here produces
 spurious install warnings for a valid setup. `@ngrx/signals` declares none
-either. The one arguable exception is `@signaltree/events`, which ships a NestJS
-subpath — but the same package also ships an Angular subpath, so a package-level
-`engines` would constrain browser consumers for a server-only reason.
+either. (The pre-15 `@signaltree/events` package shipped a NestJS subpath
+alongside an Angular one, which was the one arguable case for a package-level
+`engines` — it would still have constrained browser consumers for a server-only
+reason. That package has no v15 successor, so the exception is moot.)
 
 **`--strict-libs` on the consumer gate is RED and not gated.** Run
 `node tools/verify-consumer-typecheck.mjs --strict-libs` to see it.

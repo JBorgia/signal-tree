@@ -32,6 +32,8 @@ Use this index to navigate the documentation.
 
 | Document                                                           | Description                                               |
 | ------------------------------------------------------------------ | --------------------------------------------------------- |
+| [Migration `@signaltree/*` → `@signal-tree/*` (v15)](guides/migration-v14-v15.md) | **Current migration target for every earlier version** — rename, package consolidation, removed APIs |
+| [Composition Recipes](guides/composition-recipes.md)              | Ops-service patterns, entity-CRUD base, optimistic UI     |
 | [Historical migration guide](guides/MIGRATION.md)                  | Archived v4-v13 package/API migrations                    |
 | [Persistence and Security](guides/persistence-and-security.md)     | Withdrawn: its subject, the `stored()` marker, is deleted |
 | [Typing Patterns](guides/typing-patterns.md)                       | Preferred TypeScript typing patterns                      |
@@ -53,11 +55,14 @@ Use this index to navigate the documentation.
 
 ## 📦 Package Documentation
 
-| Document                                               | Description                                                                                     |
-| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [Kernel](../packages/kernel/README.md)                 | @signal-tree/kernel package                                                                     |
-| [Migration v13 → v14](guides/migration-v13-v14.md)     | `@signaltree/enterprise` was REMOVED in 14.0.0 — §6 has the migration                           |
-| [Migration v14 → v14.1](guides/migration-v14-v14.1.md) | 14.1.1 renames/removes API in a MINOR — `asMap`, `name`, `recordHistory`, `pauseRecording` gone |
+| Document                                       | Description                                                              |
+| ---------------------------------------------- | ---------------------------------------------------------------------- |
+| [Kernel](../packages/kernel/README.md)         | `@signal-tree/kernel` — framework-neutral tree, EntityMap, enhancers  |
+| [Angular](../packages/angular/README.md)       | `@signal-tree/angular` — the Angular realization (Angular apps use this) |
+| [React](../packages/react/README.md)           | `@signal-tree/react` — owner-bound React observation (`useSignalTree`) |
+
+Historical inter-version migration guides live in [Guides](#-guides); the
+[v15 migration guide](guides/migration-v14-v15.md) is the current target.
 
 ---
 
@@ -81,7 +86,7 @@ Use this index to navigate the documentation.
 
 | Document                                                                    | Description                                 |
 | --------------------------------------------------------------------------- | ------------------------------------------- |
-| [Events Improvement Grid](learnings/events-improvement-grid.md)             | Planned improvements for @signaltree/events |
+| [Events Improvement Grid](learnings/events-improvement-grid.md)             | Historical: planned improvements for the pre-15 `@signaltree/events` package (no v15 successor) |
 | [Swapacado Migration Learnings](learnings/swapacado-migration-learnings.md) | Learnings from real-world integration       |
 
 ---

@@ -18,49 +18,51 @@ concrete shipping, build, API, documentation, or automation failure.
 
 ### Release-contract checks
 
-- Resolve or reject the phantom-package finding: `packages/authoring/`,
-  `packages/events/`, and `packages/ng-forms/` reportedly have no tracked source
-  while `tsconfig.base.json` still advertises aliases. Remove dead aliases and
-  empty directories, or restore package sources only if the public disposition
-  and release set require them.
-- Resolve package-scope consistency across `@signal-tree/*` and
-  `@signaltree/*`. Private `shared` naming and public package names may have
-  different constraints; prove the intended split or normalize it. Do not
-  rename published packages as cleanup.
-- Complete the `core` -> `kernel` residue audit across root scripts, publish and
-  validation scripts, tree-shaking/performance harnesses, documentation checks,
-  generated baselines, path aliases, and agent instructions. A live command or
-  published reference to deleted `core` is blocking; an explicitly historical
-  reference is not.
-- Re-run package discovery, build, manifest, declaration, export, tarball,
-  consumer, tree-shaking, and release-gate checks after any correction.
+- [x] **Phantom packages — fixed (`424c6ff3`).** Removed dead aliases for
+      authoring/events/ng-forms and aligned release, validation, tree-shaking,
+      import-scanning, and bundle paths with shared/kernel/angular/react.
+- [x] **Package scopes — normalized.** Public packages use `@signal-tree/*`.
+      The former private `@signaltree/shared` package had only kernel production
+      consumers, so its live utilities and tests moved into kernel internals and
+      its package, build, declaration-rewrite, and workspace plumbing were
+      deleted. No public package or dependency edge replaces it.
+- [x] **`core` -> `kernel` residue — fixed and gated (`424c6ff3`, `2fbd51b2`,
+      `d32a1131`).** Live release/build/docs paths now use the v15 project and
+      package names. Historical evidence is explicitly classified rather than
+      rewritten as current guidance.
+- [ ] **Final executable rerun.** Re-run package discovery, builds, manifests,
+      declarations, exports, tarballs, consumer typechecks, tree-shaking, and
+      release gates after all audit corrections.
 
 ### Repository hygiene to disposition
 
-- Decide tracked-root artifacts individually: `pnpm-workspace.yaml.bak`,
-  `migrations.json`, and `.playwright-mcp/`. Remove only confirmed obsolete or
-  accidental artifacts; ignore generated local directories that are already
-  untracked.
-- Refresh `docs/README.md` release/version/index claims and validate its links.
-  Decide whether thin documentation buckets, `docs/ADSP/`, loose root docs,
-  `apps/demo-refinement.md`, and root `specs/` need relocation or only clearer
-  indexing. Preserve historical audit evidence when moving or archiving it.
-- Verify `packages/shared/index.js` and `packages/shared/index.d.ts` are obsolete
-  layout residue before removal. Check that
-  `packages/kernel/src/reactive-test-realization.ts` is excluded from published
-  output and move it under testing only if that improves ownership without
-  changing imports.
-- Compare package scaffolding intentionally: configs, changelogs, test/typecheck
-  variants, and lint ownership need not be byte-identical if package roles
-  differ. Normalize only inconsistencies that create a maintenance or release
-  failure.
-- Confirm whether demo Jest remains intentional while package tests use Vitest;
-  document the boundary or migrate under a separately validated task.
-- Add orientation only where absence is demonstrably costly: a short `api/`
-  README, an `ADSP` index, and a key for historical kernel spec prefixes are
-  candidates.
-- Reconcile `.npmrc` tracking with its dead ignore rule and verify
-  `.cursorrules` has not forked from canonical `AGENTS.md` instructions.
+- [x] **Tracked root artifacts — dispositioned (`fd153e9f`).** Removed the
+      backup workspace file and tracked Playwright snapshots; retained
+      `migrations.json` as Nx migration state. Generated local directories stay
+      untracked.
+- [x] **Documentation authority — fixed (`092db3c9`, `92a20af4`, `2fbd51b2`,
+      `d32a1131`).** Added the repository map, refreshed the docs index and
+      current v15 guidance, replaced the stale scripts index, and validated
+      links. ADSP already has an index; loose historical buckets and `specs/`
+      are classified evidence, so relocation is deferred.
+- [x] **Shared shims and test declarations — fixed (`fd153e9f`, `92a20af4`).**
+      Removed obsolete shared root shims and excluded
+      `reactive-test-realization.ts` from production declarations. Package
+      hygiene has killing fixtures for both regressions.
+- [x] **Package scaffolding — accepted by role.** Public realizations and the
+      neutral kernel need not have byte-identical config/test layouts. No build,
+      lint, typecheck, or package failure was reproduced from their differences.
+- [x] **Demo Jest — intentional.** `apps/demo/project.json` explicitly owns an
+      `@nx/jest:jest` target while packages use Vitest; the demo spec documents
+      that boundary. Migration is non-gating absent a failing workflow.
+- [x] **Orientation candidates — sufficient.** `docs/ADSP/README.md` exists;
+      `docs/repository-map.md` classifies `api/`, historical specs, scripts, and
+      tools. No concrete contributor-routing failure justifies more indexes or
+      a historical spec-prefix taxonomy before GA.
+- [x] **Workspace policy/instructions — fixed (`fd153e9f`, `92a20af4`).**
+      `.npmrc` is intentionally tracked and contains no credential; the dead
+      ignore rule was removed. `.cursorrules` is now a pointer to canonical
+      `AGENTS.md` instead of a divergent instruction fork.
 
 ### Deferred structural cleanup
 

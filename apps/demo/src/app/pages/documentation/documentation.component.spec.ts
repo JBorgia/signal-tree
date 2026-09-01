@@ -47,9 +47,9 @@ describe('DocumentationComponent', () => {
     httpMock.verify();
   });
 
-  it('creates and defaults to the first package (core)', () => {
+  it('creates and defaults to the first package (kernel)', () => {
     expect(component).toBeTruthy();
-    expect(component.selectedPackage().id).toBe('core');
+    expect(component.selectedPackage().id).toBe('kernel');
   });
 
   it('renders one sidebar button per entry in packages, and one quick-link per entry in quickLinks', () => {

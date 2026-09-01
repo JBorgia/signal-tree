@@ -1,25 +1,103 @@
-# Migration: v14 → v15
+# Migration: `@signaltree/*` → `@signal-tree/*` (v15)
 
 > **SignalTree** — Reactive JSON for Angular. JSON branches, reactive leaves.
 
-15.0 is an API-reduction release. Every change below removes something that was
-either a duplicate of an existing path or a type that described an API grammar
-the runtime did not have.
+**If you are on any `@signaltree/*` package, this is the migration you need.**
+`@signaltree/*` (no hyphen) is the pre-15 line. SignalTree 15 ships under the
+scoped, hyphenated `@signal-tree/*` name, and the multi-package surface is
+consolidated into three packages.
+
+15.0 is also an API-reduction release: every API change below removes something
+that was either a duplicate of an existing path or a type that described a
+grammar the runtime did not have.
 
 Every code sample in this guide is compiled against the shipped types before
 publication. If one does not compile for you, that is a bug — please report it.
 
 ---
 
-## At a glance
+## 0. Package rename and consolidation
+
+### The name changed: `@signaltree/*` → `@signal-tree/*`
+
+Every import specifier changes. There is no dist-tag or alias bridging the two
+names — `@signaltree/*` stops at 14.1.1.
+
+### Three packages, not eight
+
+| v14 package (`@signaltree/*`)                     | v15                                                              |
+| ------------------------------------------------- | --------------------------------------------------------------- |
+| `@signaltree/core`                               | **`@signal-tree/kernel`** — framework-neutral tree, EntityMap, causal turns, links, `restoration()`, `transactions()`, `batching()`, `devTools()` |
+| `@signaltree/angular`                            | **`@signal-tree/angular`** — the Angular realization; **Angular apps import `signalTree` from here**, not the kernel (kernel leaves are neutral cells: `isSignal()` is `false`, so `toObservable`/`model()`/`input()` reject them) |
+| _(new)_                                          | **`@signal-tree/react`** — owner-bound React observation (`useSignalTree`) |
+| `@signaltree/ng-forms`                           | **Removed.** SignalTree 15 does not publish a forms capability. Own form-control wiring and validation in the application. |
+| `@signaltree/schema`                             | **Removed.** No published validation capability; validate in application code. |
+| `@signaltree/events`                             | **Removed.** No published event-bus capability. |
+| `@signaltree/realtime`                           | **Removed.** No published transport/realtime capability; own the socket and write resolved values through ordinary paths or `entityMap`, wrapping external-origin writes in `external()`. |
+| `@signaltree/guardrails`                         | **Folded into the kernel.** Dev-mode misuse warnings ship in `@signal-tree/kernel` with stable `[ST####]` codes; there is nothing to install. |
+| `@signaltree/shared`                             | **Internal.** Not a published package. |
+
+Older standalone names retired before 14 (`@signaltree/batching`,
+`/devtools`, `/entities`, `/memoization`, `/presets`, `/time-travel`,
+`/middleware`, `/serialization`, `/callable-syntax`, `/enterprise`, `/async`,
+`/ai`) have no v15 successor package — their surviving capabilities are
+functions on `@signal-tree/kernel` (`batching()`, `devTools()`, `entityMap()`,
+`restoration()`), and the rest were deleted. See §"Also removed" below.
+
+### Steps
+
+```bash
+# 1. remove the old scope
+npm uninstall @signaltree/core @signaltree/angular @signaltree/ng-forms \
+              @signaltree/schema @signaltree/events @signaltree/realtime \
+              @signaltree/guardrails @signaltree/shared
+
+# 2. install the new one (Angular app)
+npm install @signal-tree/angular
+#   framework-neutral / library / test code: npm install @signal-tree/kernel
+#   React app:                                 npm install @signal-tree/react
+```
+
+```ts
+// before
+import { signalTree, entityMap } from '@signaltree/core';
+import { SignalTree } from '@signaltree/angular';
+
+// after — Angular app
+import { signalTree, entityMap, type SignalTree } from '@signal-tree/angular';
+
+// after — framework-neutral code
+import { signalTree, entityMap, type SignalTree } from '@signal-tree/kernel';
+```
+
+A repo-wide specifier rewrite (`@signaltree/core` → `@signal-tree/angular` in
+Angular code, `@signaltree/angular` → `@signal-tree/angular`) covers most of a
+codebase. What it will _not_ fix — the `.with()` chain, root-state access,
+positional `derived`, and the removed markers — is the rest of this guide.
+
+### Capabilities with no v15 package
+
+`ng-forms`, `schema`, `events`, `realtime`, persistence (`stored()`), the
+`asyncSource`/`asyncQuery` markers, and security are gone with no replacement
+export. SignalTree 15 owns state, identity, causal turns, links, restoration,
+transactions, batching, and DevTools; storage formats, migrations, fetching,
+cancellation, retries, validation, form-control behavior, and event routing are
+application concerns. Keep local loading flags as ordinary state, run RxJS
+pipelines in an `@Injectable` Ops service, and land results with `external()`.
+
+---
+
+## API changes at a glance
 
 | Removed                                             | Replacement                                 |
 | --------------------------------------------------- | ------------------------------------------- |
+| `@signaltree/*` imports                             | `@signal-tree/*` (see §0)                   |
 | `SignalTreeBase<T>`                                 | `SignalTree<T>`                             |
 | root state properties on the tree (`tree.count`)    | `tree.$.count()`                            |
 | `tree.with(a)` / `.with(a).with(b)`                 | `signalTree(state, { enhancers: [a, b] })`  |
 | `composeEnhancers(a, b)`                            | `signalTree(state, { enhancers: [a, b] })`  |
 | `signalTree(state, derivedFn)` / `tree.derived(fn)` | `signalTree(state, { derived: derivedFn })` |
+| `stored()`, `asyncSource()`, `asyncQuery()`, `form()`, `status()` markers | app-owned state + Ops service; `external()` to land results |
 
 ---
 
