@@ -1122,3 +1122,32 @@ columns. It does not pack lifecycle, nodes, realization, or claims; assign slot
 reuse; or establish a final SubjectId representation. The next discriminator is
 the preregistered update-latency and high-water behavior of this exact narrow
 rival, not production wiring.
+
+Prepared-target latency closes at `039173c3`. The composer now returns a branded
+validated envelope: identity, revision, uniqueness, and value presence are
+checked once at the authority boundary. Object and slot consumers trust that
+envelope and validate only destination-dependent completeness. Full slot-column
+integrity remains an explicit diagnostic boundary rather than an extra O(N)
+scan on every preparation.
+
+Nine isolated samples of one same-subject revision-plus-value update produce:
+
+| 100k physical destination | Median preparation | Delta from incumbent |
+| ------------------------- | -----------------: | -------------------: |
+| split revision/value Maps |           9.768 ms |                 0.0% |
+| object-record Map         |           4.328 ms |               -55.7% |
+| stable-slot columns       |           4.605 ms |               -52.9% |
+
+Both candidates pass the narrow full-target preparation latency gate because
+they copy one identity index rather than two. Candidate A remains rejected for
+this phase: its speed does not justify a representation that is 3.7 B/entity
+larger than the incumbent. Candidate B now passes the dense retained-memory and
+prepared-target latency discriminators, saving 8.7 B/entity while preparing
+52.9% faster at 100k. It remains provisional, not promoted.
+
+High-water churn is not yet a valid Phase 1 measurement. Neither narrow target
+defines retirement, deletion, reachability release, or slot reuse, and inventing
+those operations for the benchmark would silently pull lifecycle semantics into
+the value-plus-revision row. Churn resumes only when the lifecycle stage provides
+real candidate deletion rules. Production storage integration, reachability,
+sparse retirement, and full operation latency remain open.

@@ -909,6 +909,20 @@ This does not reopen E3, authorize segmented storage or slot reuse, or select
 lifecycle, node, realization, or claim representation. The next discriminator
 is latency and high-water behavior before any production wiring.
 
+Prepared-target latency is **GREEN FOR BOTH CANDIDATES / STABLE SLOT REMAINS
+PROVISIONAL** at `039173c3`. Validation now occurs once in a branded composed
+authority envelope; destination consumers trust it, and full slot integrity is
+an explicit diagnostic rather than an asymmetric timed O(N) scan. Nine isolated
+samples for one revision-plus-value update at 100k measure 9.768 ms for the
+two-Map incumbent, 4.328 ms for object records (-55.7%), and 4.605 ms for stable
+slots (-52.9%). Candidate A remains rejected because its speed does not offset
+its +3.7 B/entity density loss. Candidate B passes only the narrow dense-memory
+and full-target preparation-latency arms: -8.7 B/entity and -52.9% latency. It
+is not promoted. High-water churn remains blocked until the lifecycle stage
+defines real retirement/deletion/reachability rules; inventing slot deletion in
+Phase 1 would contaminate the value-plus-revision result. Production integration,
+reachability, sparse retirement, and the full operation matrix remain open.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
