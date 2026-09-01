@@ -23,7 +23,16 @@ import { AppliedTurnProjection } from '../../lib/internals/causal-runtime/applie
 import type {
   CausalEffect,
   PositionId as CausalPositionId,
+  ReversalEffect,
 } from '../../lib/internals/causal-runtime/causal-types';
+import {
+  deriveCollectionOrderDelta,
+  deriveDeclarativeTransitionTarget,
+  prepareDeclarativeTransitionInstallation,
+  type CollectionOrderDelta,
+  type CollectionTransitionTargetBinding,
+  type ScalarTransitionTargetBinding,
+} from '../../lib/internals/causal-runtime/target-transition';
 import { rollbackPendingTurnAt } from '../../lib/internals/causal-runtime/pending-rollback';
 import {
   getTransactionLifecycleChannel,
@@ -41,12 +50,18 @@ import {
 } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import { TurnStore } from '../../lib/internals/causal-runtime/turn-store';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
-import { getMutationCaptureRuntime } from '../../lib/internals/mutation-capture-runtime';
+import {
+  getMutationCaptureRuntime,
+  type CollectionOrderCapture,
+} from '../../lib/internals/mutation-capture-runtime';
 import { getOwnedPositionIds } from '../../lib/internals/owned-mutation';
 import { getPositionRegistry } from '../../lib/internals/position-registry';
 import { getPathNotifier } from '../../lib/path-notifier';
 import { isTraversableNode } from '../../lib/utils';
 import { getActiveWriteContext, withWriteContext } from '../../lib/write-context';
+import { visitTree } from '../../lib/internals/visit-tree';
+import { getTreeScalarSlotRuntime } from '../../lib/internals/tree-scalar-slot-port';
+import { getTreeRealization } from '../../lib/internals/tree-realization';
 
 type TurnEffectBase = {
   position: number;
@@ -129,6 +144,7 @@ type CaptureBucket = {
   positionIds: Set<number>;
   baselineValues: Map<number, unknown>;
   effects: PendingEffectMap;
+  collectionOrders: Map<number, Omit<CollectionOrderCapture, 'meta'>>;
 };
 
 export type TransactionTurnRecord = {
@@ -631,6 +647,7 @@ function createCaptureBucket(): CaptureBucket {
     positionIds: new Set<number>(),
     baselineValues: new Map(),
     effects: new Map(),
+    collectionOrders: new Map(),
   };
 }
 
@@ -673,9 +690,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
   let unsubscribeFlush: (() => void) | null = null;
   let unsubscribeNotifications: (() => void) | null = null;
   let unsubscribeReset: (() => void) | null = null;
+  let unsubscribeCollectionOrders: (() => void) | null = null;
   let restoreLeafInterceptors: (() => void) | null = null;
   const pendingCapture = createCaptureBucket();
   const pendingTransactions = new Map<number, CaptureBucket>();
+  const pendingOrderDeltas = new Map<number, CollectionOrderDelta[]>();
   const pendingCreatedListeners = new Set<TransactionLifecycleListener>();
   const pendingConfirmedListeners = new Set<TransactionLifecycleListener>();
   const pendingDiscardedListeners = new Set<TransactionLifecycleListener>();
@@ -741,6 +760,7 @@ export function getOrCreateInternalTransactionRuntime<T>(
     positionIds: number[];
     baselineValues: Map<number, unknown>;
     effects: TurnEffect[];
+    collectionOrders: Array<Omit<CollectionOrderCapture, 'meta'>>;
   } => {
     const ownerPaths = Array.from(bucket.ownerPaths).sort();
     bucket.ownerPaths.clear();
@@ -752,7 +772,22 @@ export function getOrCreateInternalTransactionRuntime<T>(
     bucket.baselineValues.clear();
     const effects = Array.from(bucket.effects.values()).map(cloneTurnEffect);
     bucket.effects.clear();
-    return { ownerPaths, subjectIds, positionIds, baselineValues, effects };
+    const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
+      (order) => ({
+        ...order,
+        beforeSubjects: [...order.beforeSubjects],
+        afterSubjects: [...order.afterSubjects],
+      })
+    );
+    bucket.collectionOrders.clear();
+    return {
+      ownerPaths,
+      subjectIds,
+      positionIds,
+      baselineValues,
+      effects,
+      collectionOrders,
+    };
   };
 
   const rememberBaselineValue = (
@@ -1044,6 +1079,26 @@ export function getOrCreateInternalTransactionRuntime<T>(
       ? meta.transactionId
       : undefined;
 
+  unsubscribeCollectionOrders =
+    getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.((capture) => {
+      const transactionId = resolveTransactionId(capture.meta);
+      if (transactionId === undefined) {
+        return;
+      }
+      const bucket = getTransactionBucket(transactionId);
+      const existing = bucket.collectionOrders.get(capture.owner);
+      bucket.collectionOrders.set(capture.owner, {
+        owner: capture.owner,
+        ownerPath: capture.ownerPath,
+        beforeSubjects: existing?.beforeSubjects ?? [...capture.beforeSubjects],
+        afterSubjects: [...capture.afterSubjects],
+        beforeFrontier: existing?.beforeFrontier ?? capture.beforeFrontier,
+        afterFrontier: capture.afterFrontier,
+      });
+      bucket.ownerPaths.add(capture.ownerPath);
+      bucket.positionIds.add(capture.owner);
+    }) ?? null;
+
   const materializePendingTransaction = (
     transactionId: number
   ): TransactionTurnRecord | undefined => {
@@ -1052,27 +1107,65 @@ export function getOrCreateInternalTransactionRuntime<T>(
     if (!bucket) {
       return undefined;
     }
-    const { ownerPaths, subjectIds, positionIds, effects, baselineValues } =
-      drainCaptureBucket(bucket);
-    return authority.createPending(
+    const {
+      ownerPaths,
+      subjectIds,
+      positionIds,
+      effects,
+      baselineValues,
+      collectionOrders,
+    } = drainCaptureBucket(bucket);
+    const pending = authority.createPending(
       ownerPaths.length > 0 ? ownerPaths : undefined,
       subjectIds.length > 0 ? subjectIds : undefined,
       positionIds.length > 0 ? positionIds : undefined,
       effects.length > 0 ? effects : undefined,
       baselineValues.size > 0 ? baselineValues : undefined
     );
+    if (pending && collectionOrders.length > 0) {
+      pendingOrderDeltas.set(
+        pending.id,
+        collectionOrders.map((order) =>
+          deriveCollectionOrderDelta(
+            order.owner,
+            order.beforeSubjects,
+            order.afterSubjects,
+            order.beforeFrontier,
+            order.afterFrontier
+          )
+        )
+      );
+    }
+    return pending;
   };
 
   const drainTransactionRollbackInput = (
     transactionId: number
-  ): { effects: TurnEffect[]; baselineValues: Map<number, unknown> } => {
+  ): {
+    effects: TurnEffect[];
+    baselineValues: Map<number, unknown>;
+    orderDeltas: CollectionOrderDelta[];
+  } => {
     const bucket = pendingTransactions.get(transactionId);
     pendingTransactions.delete(transactionId);
     if (!bucket) {
-      return { effects: [], baselineValues: new Map() };
+      return { effects: [], baselineValues: new Map(), orderDeltas: [] };
     }
-    const { effects, baselineValues } = drainCaptureBucket(bucket);
-    return { effects, baselineValues };
+    const { effects, baselineValues, collectionOrders } =
+      drainCaptureBucket(bucket);
+    return {
+      effects,
+      baselineValues,
+      orderDeltas: collectionOrders.map((order) =>
+        deriveCollectionOrderDelta(
+          order.owner,
+          order.beforeSubjects,
+          order.afterSubjects,
+          order.beforeFrontier,
+          order.afterFrontier
+        )
+      ),
+    };
   };
 
   const toCausalEffect = (effect: TurnEffect): CausalEffect => {
@@ -1141,13 +1234,112 @@ export function getOrCreateInternalTransactionRuntime<T>(
     }
   };
 
+  const toRollbackEffect = (effect: TurnEffect): ReversalEffect => {
+    const causal = toCausalEffect(effect);
+    return {
+      ...causal,
+      before: causal.after,
+      after: causal.before,
+      structural:
+        causal.structural === 'add'
+          ? 'remove'
+          : causal.structural === 'remove'
+            ? 'add'
+            : causal.structural,
+    };
+  };
+
+  const rollbackPendingTarget = (
+    effects: TurnEffect[],
+    orderDeltas: CollectionOrderDelta[]
+  ): void => {
+    const reversalEffects = effects.map(toRollbackEffect);
+    const bindings = new Map<number, CollectionTransitionTargetBinding>();
+    visitTree(tree.$, (node) => {
+      const binding = (
+        node as { __prepareTransitionTarget?: CollectionTransitionTargetBinding }
+      ).__prepareTransitionTarget;
+      if (binding) {
+        bindings.set(binding.owner, binding);
+      }
+      return undefined;
+    });
+    const collectionOwners = new Set([
+      ...orderDeltas.map(({ owner }) => owner),
+      ...reversalEffects
+        .filter(({ subjectId }) => typeof subjectId === 'number')
+        .map(({ owner }) => owner),
+    ]);
+    const collections = [...collectionOwners].map((owner) => {
+      const binding = bindings.get(owner);
+      if (!binding) {
+        throw new Error(`Transaction rollback has no collection binding ${owner}`);
+      }
+      return binding.readSource();
+    });
+    const target = deriveDeclarativeTransitionTarget({
+      collections,
+      effects: reversalEffects,
+      orderDeltas,
+      orderEndpoint: 'before',
+    });
+    const scalarSlotRuntime =
+      getTreeScalarSlotRuntime(tree) ?? getTreeScalarSlotRuntime(tree.$);
+    const scalarBinding: ScalarTransitionTargetBinding | undefined =
+      scalarSlotRuntime
+        ? {
+            prepareTarget(scalars) {
+              const frame = scalarSlotRuntime.beginFrame();
+              for (const [owner, value] of scalars) {
+                const slot = scalarSlotRuntime.resolveScalarSlot(owner);
+                if (slot === undefined) {
+                  frame.discard();
+                  throw new Error(`Transaction rollback has no scalar slot ${owner}`);
+                }
+                frame.set(slot, value);
+              }
+              let result: ReturnType<typeof frame.commit> | undefined;
+              return {
+                install(): void {
+                  result = frame.commit({ advanceRevision: false, publish: false });
+                },
+                publish(): void {
+                  if (!result) {
+                    throw new Error('Transaction scalar published before installation');
+                  }
+                  scalarSlotRuntime.publishPrepared(result);
+                },
+              };
+            },
+          }
+        : undefined;
+    const prepared = prepareDeclarativeTransitionInstallation(
+      target,
+      bindings,
+      scalarBinding
+    );
+    const apply = () => prepared.install();
+    const scalarRealization = getTreeRealization(tree.$)?.scalarLeaf;
+    if (scalarRealization) {
+      scalarRealization.runInvalidationGroup(apply);
+    } else {
+      apply();
+    }
+  };
+
   const rollbackPendingEffectsThroughRealizationPort = (
     transactionId: number,
     effects: TurnEffect[],
     baselineValues: ReadonlyMap<number, unknown>,
+    orderDeltas: CollectionOrderDelta[] = [],
     callbackError?: unknown
   ): void => {
-    if (effects.length === 0) {
+    if (effects.length === 0 && orderDeltas.length === 0) {
+      return;
+    }
+
+    if (orderDeltas.length > 0) {
+      rollbackPendingTarget(effects, orderDeltas);
       return;
     }
 
@@ -1455,9 +1647,8 @@ export function getOrCreateInternalTransactionRuntime<T>(
       } catch (error) {
         primaryError = error;
         notifier?.flushSync();
-        const { effects, baselineValues } = drainTransactionRollbackInput(
-          transactionId
-        );
+        const { effects, baselineValues, orderDeltas } =
+          drainTransactionRollbackInput(transactionId);
         const rollbackSubjectIds = effects
           .map((effect) => effect.subject)
           .filter((subjectId): subjectId is number => subjectId !== undefined);
@@ -1466,12 +1657,13 @@ export function getOrCreateInternalTransactionRuntime<T>(
         // compensated.
         let compensated = true;
         try {
-          if (effects.length > 0) {
+          if (effects.length > 0 || orderDeltas.length > 0) {
             try {
               rollbackPendingEffectsThroughRealizationPort(
                 transactionId,
                 effects,
                 baselineValues,
+                orderDeltas,
                 error
               );
             } catch (refusal) {
@@ -1570,6 +1762,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
               }
             }
           } finally {
+            if (pendingTurnId !== undefined) {
+              pendingOrderDeltas.delete(pendingTurnId);
+            }
             // The physical state this transaction authored is committed truth,
             // so its durable consequences run — last, so a throwing storage
             // backend cannot leave the turn unconfirmed, and in a `finally` so
@@ -1631,16 +1826,24 @@ export function getOrCreateInternalTransactionRuntime<T>(
           }
 
           const compensation = rollbackPlan.compensation;
+          const orderDeltas =
+            pendingTurnId === undefined
+              ? []
+              : pendingOrderDeltas.get(pendingTurnId) ?? [];
+          if (pendingTurnId !== undefined) {
+            pendingOrderDeltas.delete(pendingTurnId);
+          }
           // Starts true: "nothing to reverse" is a rollback that succeeded
           // trivially, NOT a refusal.
           let compensated = true;
           try {
-            if (compensation.length > 0) {
+            if (compensation.length > 0 || orderDeltas.length > 0) {
               try {
                 rollbackPendingEffectsThroughRealizationPort(
                   pendingTurnId as number,
                   [...compensation].reverse(),
-                  discardedTurn?.__baselineValues ?? new Map()
+                  discardedTurn?.__baselineValues ?? new Map(),
+                  orderDeltas
                 );
               } catch (error) {
                 compensated = false;
@@ -1740,6 +1943,11 @@ export function getOrCreateInternalTransactionRuntime<T>(
         reportCleanupFailure('reset unsubscription', error);
       }
       try {
+        unsubscribeCollectionOrders?.();
+      } catch (error) {
+        reportCleanupFailure('collection-order unsubscription', error);
+      }
+      try {
         restoreLeafInterceptors?.();
       } catch (error) {
         reportCleanupFailure('leaf interceptor teardown', error);
@@ -1747,7 +1955,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
       unsubscribeFlush = null;
       unsubscribeNotifications = null;
       unsubscribeReset = null;
+      unsubscribeCollectionOrders = null;
       restoreLeafInterceptors = null;
+      pendingOrderDeltas.clear();
     });
   }
 

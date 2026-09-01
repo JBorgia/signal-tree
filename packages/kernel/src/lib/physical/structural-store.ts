@@ -59,6 +59,7 @@ export type PreparedStructuralTarget<K extends string | number> = {
   readonly activeHead: ActiveNode<K> | undefined;
   readonly activeTail: ActiveNode<K> | undefined;
   readonly activeCount: number;
+  readonly orderFrontier: unknown;
 };
 
 export class StructuralStore<K extends string | number> {
@@ -72,6 +73,11 @@ export class StructuralStore<K extends string | number> {
   private activeHead: ActiveNode<K> | undefined;
   private activeTail: ActiveNode<K> | undefined;
   private activeCount = 0;
+  private orderFrontier: object = {};
+
+  activeOrderFrontier(): unknown {
+    return this.orderFrontier;
+  }
 
   planFreshSubjectIds(count: number): readonly number[] {
     return Array.from({ length: count }, (_, index) => this.nextSubjectId + index);
@@ -187,7 +193,8 @@ export class StructuralStore<K extends string | number> {
 
   prepareTarget(
     subjects: readonly StructuralTargetSubject<K>[],
-    order: readonly number[]
+    order: readonly number[],
+    orderFrontier: unknown
   ): PreparedStructuralTarget<K> {
     const subjectIds = new Map<K, number>();
     const targetBySubject = new Map<number, StructuralTargetSubject<K>>();
@@ -265,6 +272,7 @@ export class StructuralStore<K extends string | number> {
       activeHead,
       activeTail,
       activeCount: order.length,
+      orderFrontier,
     };
   }
 
@@ -277,6 +285,7 @@ export class StructuralStore<K extends string | number> {
     this.activeHead = target.activeHead;
     this.activeTail = target.activeTail;
     this.activeCount = target.activeCount;
+    this.orderFrontier = target.orderFrontier as object;
   }
 
   moveKeysToFront(keys: readonly K[]): void {
@@ -291,6 +300,7 @@ export class StructuralStore<K extends string | number> {
     for (let index = nodes.length - 1; index >= 0; index -= 1) {
       this.prependDetachedNode(nodes[index]);
     }
+    if (nodes.length > 0) this.orderFrontier = {};
   }
 
   reorderActiveKeys(keys: readonly K[]): void {
@@ -314,6 +324,7 @@ export class StructuralStore<K extends string | number> {
     }
 
     this.activeCount = nextCount;
+    this.orderFrontier = {};
   }
 
   restoreIndexForSubjects(
@@ -375,6 +386,7 @@ export class StructuralStore<K extends string | number> {
     this.activateSubject(subjectId, key);
     this.subjectRevisions.set(subjectId, 0);
     this.createAndAppendActiveNode(subjectId, key);
+    this.orderFrontier = {};
   }
 
   transferSubject(subjectId: number, from: K, to: K, restoreAllowed = true): void {
@@ -409,6 +421,7 @@ export class StructuralStore<K extends string | number> {
       active: false,
       restoreAllowed,
     });
+    this.orderFrontier = {};
   }
 
   restoreSubject(
@@ -503,6 +516,7 @@ export class StructuralStore<K extends string | number> {
     this.activeNodesByKey.set(key, node);
     this.activeNodesBySubject.set(subjectId, node);
     this.activeCount += 1;
+    this.orderFrontier = {};
 
     const beforeNode =
       placement.beforeSubject === undefined
@@ -572,6 +586,7 @@ export class StructuralStore<K extends string | number> {
     this.activeCount = 0;
     this.nextSubjectId = 1;
     this.collectionIncarnation += 1;
+    this.orderFrontier = {};
   }
 
   __assertActiveOrderIntegrityForTesting(): void {

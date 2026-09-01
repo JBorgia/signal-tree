@@ -140,6 +140,7 @@ const source = (
   owner,
   subjects: entries.map(([subject, key, value]) => ({ subject, key, value })),
   order,
+  orderFrontier: `${owner}:before`,
 });
 
 const targetFor = (
@@ -151,9 +152,6 @@ const targetFor = (
     collections,
     effects,
     orderDeltas,
-    orderFrontiers: new Map(
-      orderDeltas.map(({ owner }) => [owner, `${owner}:before`])
-    ),
   });
 
 describe('declarative target transition: whole-target compilation', () => {
@@ -218,9 +216,10 @@ describe('declarative target transition: whole-target compilation', () => {
       [order]
     );
 
-    expect(target.collections.get(7)).toEqual(
-      source(7, [[1, 'k', { value: 'original' }]])
-    );
+    expect(target.collections.get(7)).toEqual({
+      ...source(7, [[1, 'k', { value: 'original' }]]),
+      orderFrontier: '7:after',
+    });
   });
 
   it('rejects membership changes that omit positional truth', () => {

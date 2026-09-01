@@ -12,6 +12,7 @@ type TargetBinding = {
     id: string
   ): { subjectId: number } | undefined;
   __prepareTransitionTarget: {
+    readSource(): CollectionTransitionTarget;
     prepareTarget(target: CollectionTransitionTarget): {
       install(): void;
       publish(): void;
@@ -57,9 +58,15 @@ describe('declarative collection target binding', () => {
         { subject: subjectC, key: 'c', value: { id: 'c', value: 3 } },
       ],
       order: [subjectC, subjectB, subjectA],
+      orderFrontier: {},
     });
 
     expect(tree.$.rows.ids()).toEqual(['a', 'b', 'c']);
+    expect(binding.__prepareTransitionTarget.readSource().order).toEqual([
+      subjectA,
+      subjectB,
+      subjectC,
+    ]);
     prepared.install();
     prepared.publish();
 
@@ -104,6 +111,7 @@ describe('declarative collection target binding', () => {
         { subject: subjectB, key: 'a', value: { id: 'b', value: 2 } },
       ],
       order: [subjectA, subjectB],
+      orderFrontier: {},
     });
     prepared.install();
     prepared.publish();
@@ -136,6 +144,7 @@ describe('declarative collection target binding', () => {
       owner,
       subjects: [{ subject, key: 'a', value }],
       order: [subject],
+      orderFrontier: {},
     });
 
     value.value = 99;

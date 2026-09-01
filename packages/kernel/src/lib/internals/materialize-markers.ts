@@ -107,6 +107,7 @@ export interface MaterializationContext {
   positionRegistry: PositionRegistry;
   positionTopologyEnabled: boolean;
   physicalCommitClock?: PhysicalCommitClock;
+  mutationCaptureRuntime?: import('./mutation-capture-runtime').MutationCaptureRuntime;
   hasCapability: (capability: TreeCapability) => boolean;
   /**
    * The finalized build plan, as the runtime queries a materialized node makes
