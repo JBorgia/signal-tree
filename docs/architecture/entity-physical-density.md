@@ -869,3 +869,27 @@ by the collection. A later order turn must be reversed first or block the older
 transition; exact selective merge across it is not promised. This refusal rule
 is semantic, not an implementation workaround, and must be pinned before
 production promotion.
+
+### Target Prototype Checkpoints
+
+`e49f3d19` compiles reversal facts and compact order deltas into ephemeral
+owner-scoped targets without touching live stores. It treats a key swap as one
+valid final mapping, keeps same-numbered SubjectIds in different collection
+owners independent, applies key-derived values through SubjectId, requires
+positional truth for membership changes, and rejects stale order frontiers.
+Exhaustive partial-permutation controls reconstruct both endpoints.
+
+`e3dc446f` supplies the physical half of the prototype. Each EntityMap binding
+prepares complete structural and retained-value replacements off-store. Global
+preparation completes before installation; installation swaps prepared stores;
+publication of SubjectId-keyed cells follows only after all owners install.
+Reorder and key-swap controls preserve held facades, and prepared values do not
+alias caller-owned target objects.
+
+The prototype is deliberately not connected to restoration yet. Pure reorder
+still emits no causal order fact, so its expected-failure law stays red. The
+remaining gate is to capture one first-before/latest-after order transition per
+collection and turn, admit collection order as a causal participant, resolve
+physical bindings by owner PositionId, and send the compiled aggregate target
+through grouped install and publication. Until that gate passes, neither
+`CanonicalTurn.state` deletion nor active-density remeasurement is authorized.

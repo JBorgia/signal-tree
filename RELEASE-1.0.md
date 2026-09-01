@@ -696,6 +696,44 @@ implementation remain blocked on compact positional capture and a target-planner
 prototype proving transaction and multi-collection atomicity without per-turn
 full snapshots. `REALIZATION-OWNERSHIP-0` remains queued.
 
+`RESTORATION-TARGET-PROTOTYPE-0` is **PARTIALLY GREEN / CAPTURE INTEGRATION
+OPEN** at `e49f3d19` and `e3dc446f`. `e49f3d19` adds a pure owner-scoped
+compiler from reversal facts and compact order deltas to ephemeral collection
+and scalar targets. It validates final membership, key uniqueness, values,
+order, owner isolation, and collection-order frontier before changing physical
+state. Key swaps compile as simultaneous SubjectId-to-key mappings with no
+temporary key; fresh same-key occupants remain distinct; key-derived field
+writes resolve through SubjectId; local failure leaves every source untouched.
+All 4,225 pairs of partial permutations through four identities reconstruct both
+endpoints exactly under authoritative frontier tokens.
+
+`e3dc446f` adds the first production-shaped physical binding. `StructuralStore`
+and `EntityValueStore` prepare complete replacement state off-store; prepared
+values are detached from caller objects; assignment-only installation swaps the
+prepared stores; SubjectId-keyed entity and activation cells publish only after
+every collection installs. Aggregate preparation refuses before any install if
+one owner fails and requires scalar targets to join the same boundary. Direct
+reorder and key-swap controls preserve held facades and permit writes through a
+held subject at its new key without ever creating a temporary public key.
+
+This is not restoration behavior closure. `position-capture-0.spec.ts` remains
+an expected failure because `setAll` does not yet contribute order facts to a
+causal turn, and `TreeRealizationPort` still routes retained effects through the
+rejected incumbent planner. The next slice is private capture and application:
+coalesce each collection owner's first-before/latest-after order inside the
+turn, derive one backbone delta at sealing, make collection order a frontier
+participant, resolve bindings by owner PositionId, prepare all collection and
+scalar targets, then install and publish through the existing invalidation
+group. Only that slice may turn the pure-reorder law green. Existing authored
+EntityMap mutations may continue using `EntityMutationFrame`; restoration must
+not expose or preserve two structural realization semantics after migration.
+
+Validation through `e3dc446f`: target compiler 15 focused controls plus 4,225
+endpoint pairs; physical binding reorder, key-swap, held-facade, detached-value,
+all-owner preparation, install-before-publish, and scalar-boundary controls;
+kernel 250 files / 2,025 passed / 4 expected failures / 13 skipped / 1 todo;
+both TypeScript passes; kernel lint; independent review of changed files clean.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
