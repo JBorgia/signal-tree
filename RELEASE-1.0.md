@@ -760,6 +760,44 @@ then delete eager snapshot retention only after historical-state exposure and
 `jumpTo()` are supplied without making snapshots causal authority. E5
 remeasurement remains blocked until that deletion.
 
+`RESTORATION-STRUCTURAL-TARGET-0` is **CLOSED GREEN FOR THE DISCOVERED
+DEPENDENCY LANGUAGE** at `f2f34753` and `99c18b4f`. `f2f34753` routes
+same-owner key handoffs and permutations through the declarative compiler:
+X1 rekey plus fresh add into the vacated key, X2 remove plus rekey into the
+vacated key, and X3 key permutation all pass undo/redo without temporary replay
+keys. Held facades and active selection follow SubjectId, replay notifications
+name only final keys, and both transaction rollback authorities scope subject
+identity by collection owner rather than bare numeric SubjectId. Independent
+clear/add/remove turns remain on the mature path until their migration is
+semantically useful; the routing predicate is key dependency, not effect count.
+
+`99c18b4f` closes multi-turn A/B/C. Turn order controls composition into one net
+target; it is not used as target installation order. Cross-turn add/remove
+collapses to net existence, dependent multi-add restore reconstructs exact
+SubjectId order, and chained rekeys derive the historical mapping. `jumpTo()` no
+longer mutates `CanonicalTurn.state`: it reconciles any prior temporal view by
+effects, compiles all directed undo/redo work for the requested index into one
+aggregate target, prepares every target before installation, and preserves the
+confirmed frontier/status contract while exposing the requested temporal view.
+A mixed-direction invalid-target control proves neither leg installs when any
+leg refuses. Poisoning every retained `state` before case C does not affect the
+restored keys or SubjectIds.
+
+Validation: `f2f34753` kernel 251 files / 2,037 passed / 3 expected failures /
+13 skipped / 1 todo; `99c18b4f` kernel 251 files / 2,041 passed with the same
+expected-failure/skip/todo counts; both TypeScript passes, kernel lint, focused
+transaction/frontier/diagnostic/identity suites, and independent adversarial
+reviews are green.
+
+`RESTORATION-TURN-STATE-0` is now **READY FOR RETAINED-STATE REMOVAL DESIGN**.
+Undo, redo, transaction rollback, pure reorder, dependency-heavy structural
+transitions, and temporal `jumpTo()` no longer require snapshots as causal
+authority. Deletion is still blocked on the public `getRestorationHistory()`
+`state` promise and any remaining diagnostic/dedupe readers. Inventory those
+consumers, provide historical materialization without retaining one eager
+full-tree snapshot per turn, then remove `CanonicalTurn.state` retention and run
+the active-density/E5 gates. `REALIZATION-OWNERSHIP-0` remains queued.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
