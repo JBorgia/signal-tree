@@ -627,7 +627,8 @@ fi
 if [ ${#FAILED_PACKAGES[@]} -gt 0 ]; then
     print_warning "Failed or skipped ${#FAILED_PACKAGES[@]} package(s): ${FAILED_PACKAGES[*]}"
     print_warning "Publishing aborted; will not create or push git tags"
-    rollback_versions
+    print_error "Not rolling back versions automatically because npm publishing has started"
+    print_error "Some packages may already be published. Resolve manually and re-run with --keep-version."
     exit 1
 fi
 
