@@ -198,6 +198,11 @@ Quick-reference distilled from [`.cursorrules`](.cursorrules). That file remains
 - **Tests**: Vitest
 - **Node**: 18+ LTS
 
+Repository placement and authority are mapped in
+[`docs/repository-map.md`](docs/repository-map.md). Use it to distinguish
+production, validation, historical evidence, generated output, and experiments
+before adding or moving files.
+
 ### Common commands
 
 ```bash
