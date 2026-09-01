@@ -22,6 +22,11 @@ First public candidate for the v15 package and API reset.
   `readCanonicalSnapshot(owner)` rather than relying on callable controller or
   root-facade syntax.
 
+- **React observation ships as `@signal-tree/react`.**
+  `useSignalTree(owner, selector)` subscribes to owner invalidation and rereads
+  the selected canonical value without mirroring SignalTree state. Whole-root
+  observation uses the same hook with `($) => $()`.
+
 - **BREAKING: `timeTravel({ shouldSkip })` removed.** The comparator and the
   `skipsBackward()`/`skipsForward()` traversal it drove are gone; `undo()` and
   `redo()` move one turn. It looked like navigation and was not — the predicate

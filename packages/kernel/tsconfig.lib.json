@@ -19,7 +19,8 @@
     "vitest.config.ts",
     "src/**/*.test.ts",
     "src/**/*.d.ts",
-    "src/lib/experimental/**"
+    "src/lib/experimental/**",
+    "src/reactive-test-realization.ts"
   ],
   "include": ["src/**/*.ts"],
   "references": [

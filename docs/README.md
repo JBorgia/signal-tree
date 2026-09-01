@@ -6,7 +6,7 @@
 
 Use this index to navigate the documentation.
 
-**Latest release:** 9.6.0. See [CHANGELOG](../CHANGELOG.md).
+**Current prerelease:** 15.0.0-rc.1. See [CHANGELOG](../CHANGELOG.md).
 
 ---
 
@@ -100,7 +100,3 @@ Historical documents preserved for reference:
 | [Release Process](../.github/instructions/release-process.instructions.md) | How to release new versions  |
 | [Validation Guide](../.github/VALIDATION_GUIDE.md)                         | Pre-release validation steps |
 | [Scripts](../scripts/README.md)                                            | Build and utility scripts    |
-
-## Archive
-
-Historical documents moved to [archive/](archive/) for reference.

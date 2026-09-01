@@ -50,13 +50,20 @@ const FORBIDDEN = [
   { re: /\.spec\./, why: 'test spec' },
   { re: /\.test\./, why: 'test file' },
   { re: /\.map$/, why: 'source map' },
-  { re: /(?<!\.d)\.ts$/, why: 'raw .ts source (ship .js + .d.ts, not .ts)' },
+  {
+    re: /(?<!\.d)\.(?:ts|tsx|mts|cts)$/,
+    why: 'raw TypeScript source (ship .js + declarations)',
+  },
   { re: /tsconfig.*\.json$/, why: 'tsconfig' },
   { re: /\.tsbuildinfo$/, why: 'tsbuildinfo' },
   { re: /(?:^|\/)(?:jest|karma|vitest)\.config\./, why: 'test config' },
   { re: /(?:^|\/)__tests__\//, why: '__tests__ dir' },
   { re: /(?:^|\/)node_modules\//, why: 'node_modules' },
   { re: /(?:^|\/)(?:fixtures?|__mocks__)\//, why: 'test fixtures/mocks' },
+  {
+    re: /(?:^|\/)reactive-test-realization\.d\.ts$/,
+    why: 'test realization declaration',
+  },
 ];
 
 /** Read the real packed file list for a built package. */
@@ -67,6 +74,12 @@ function packedFiles(distDir) {
     stdio: ['ignore', 'pipe', 'ignore'],
   });
   return JSON.parse(out)[0].files.map((f) => f.path.replace(/\\/g, '/'));
+}
+
+function exportTargets(value) {
+  if (typeof value === 'string') return [value];
+  if (!value || typeof value !== 'object') return [];
+  return Object.values(value).flatMap(exportTargets);
 }
 
 /** Assert forbidden-absent + required-present for one package's file list. */
@@ -87,19 +100,18 @@ function checkPackage(files, distDir) {
   const pkg = JSON.parse(
     fs.readFileSync(path.join(distDir, 'package.json'), 'utf8')
   );
-  const main = (pkg.module || pkg.main || '').replace(/^\.\//, '');
-  if (main && !has(main))
-    violations.push(`main/module entry not packed: ${main}`);
+  for (const field of ['main', 'module', 'types']) {
+    const target = (pkg[field] || '').replace(/^\.\//, '');
+    if (target && !has(target)) {
+      violations.push(`${field} entry not packed: ${target}`);
+    }
+  }
   if (!files.some((f) => f.endsWith('.d.ts')))
     violations.push('no .d.ts types packed');
 
   // Every exports subpath target must be in the tarball.
   for (const [sub, cond] of Object.entries(pkg.exports || {})) {
-    const targets =
-      typeof cond === 'string'
-        ? [cond]
-        : Object.values(cond).filter((v) => typeof v === 'string');
-    for (const t of targets) {
+    for (const t of exportTargets(cond)) {
       const rel = t.replace(/^\.\//, '');
       if (rel && !has(rel))
         violations.push(`exports "${sub}" target not packed: ${rel}`);
@@ -184,6 +196,10 @@ function selfTest() {
     'dist/lib/foo.spec.js', // forbidden
     'dist/index.js.map', // forbidden
     'src/lib/foo.ts', // forbidden raw .ts
+    'src/lib/foo.tsx', // forbidden raw .tsx
+    'src/lib/foo.mts', // forbidden raw .mts
+    'src/lib/foo.cts', // forbidden raw .cts
+    'src/reactive-test-realization.d.ts', // forbidden test helper declaration
   ];
   const tmp = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'hyg-'));
   fs.writeFileSync(
@@ -200,8 +216,14 @@ function selfTest() {
     v.some((x) => x.includes('source map'))
   );
   expect(
-    'flags raw .ts source',
-    v.some((x) => x.includes('raw .ts'))
+    'flags raw TypeScript source variants',
+    ['foo.ts', 'foo.tsx', 'foo.mts', 'foo.cts'].every((name) =>
+      v.some((x) => x.includes(name))
+    )
+  );
+  expect(
+    'flags a test realization declaration',
+    v.some((x) => x.includes('test realization declaration'))
   );
 
   const clean = [
@@ -213,8 +235,36 @@ function selfTest() {
   ];
   expect('passes a clean package', checkPackage(clean, tmp).length === 0);
   expect(
-    'keeps .d.ts (not flagged as raw .ts)',
-    !checkPackage(clean, tmp).some((x) => x.includes('raw .ts'))
+    'keeps .d.ts (not flagged as raw TypeScript)',
+    !checkPackage(clean, tmp).some((x) => x.includes('raw TypeScript'))
+  );
+  fs.writeFileSync(
+    path.join(tmp, 'package.json'),
+    JSON.stringify({
+      main: './dist/index.js',
+      exports: { '.': { import: { development: './dist/missing.js' } } },
+    })
+  );
+  expect(
+    'rejects a missing nested conditional export target',
+    checkPackage(clean, tmp).some((x) => x.includes('dist/missing.js'))
+  );
+  fs.writeFileSync(
+    path.join(tmp, 'package.json'),
+    JSON.stringify({
+      main: './dist/missing-main.js',
+      module: './dist/index.js',
+      types: './dist/index.d.ts',
+      exports: {},
+    })
+  );
+  expect(
+    'rejects any missing declared entry field',
+    checkPackage(clean, tmp).some((x) => x.includes('main entry not packed'))
+  );
+  fs.writeFileSync(
+    path.join(tmp, 'package.json'),
+    JSON.stringify({ main: './dist/index.js', exports: {} })
   );
   expect(
     'requires LICENSE',
