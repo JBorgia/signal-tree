@@ -38,19 +38,35 @@ export type ResolvedSubjectHandle<K extends string | number> =
       acquiredRevision: number;
     };
 
-type ActiveNode<K extends string | number> = {
+export type StructuralTargetSubject<K extends string | number> = {
+  readonly subjectId: number;
+  readonly key: K;
+};
+
+export type ActiveNode<K extends string | number> = {
   key: K;
   subjectId: number;
   prev: ActiveNode<K> | undefined;
   next: ActiveNode<K> | undefined;
 };
 
+export type PreparedStructuralTarget<K extends string | number> = {
+  readonly subjectIds: Map<K, number>;
+  readonly subjectStates: Map<number, SubjectLifetimeRecord<K>>;
+  readonly subjectRevisions: Map<number, number>;
+  readonly activeNodesByKey: Map<K, ActiveNode<K>>;
+  readonly activeNodesBySubject: Map<number, ActiveNode<K>>;
+  readonly activeHead: ActiveNode<K> | undefined;
+  readonly activeTail: ActiveNode<K> | undefined;
+  readonly activeCount: number;
+};
+
 export class StructuralStore<K extends string | number> {
-  private readonly subjectIds = new Map<K, number>();
-  private readonly subjectStates = new Map<number, SubjectLifetimeRecord<K>>();
-  private readonly subjectRevisions = new Map<number, number>();
-  private readonly activeNodesByKey = new Map<K, ActiveNode<K>>();
-  private readonly activeNodesBySubject = new Map<number, ActiveNode<K>>();
+  private subjectIds = new Map<K, number>();
+  private subjectStates = new Map<number, SubjectLifetimeRecord<K>>();
+  private subjectRevisions = new Map<number, number>();
+  private activeNodesByKey = new Map<K, ActiveNode<K>>();
+  private activeNodesBySubject = new Map<number, ActiveNode<K>>();
   private nextSubjectId = 1;
   private collectionIncarnation = 0;
   private activeHead: ActiveNode<K> | undefined;
@@ -167,6 +183,100 @@ export class StructuralStore<K extends string | number> {
 
   lastActiveKey(): K | undefined {
     return this.activeTail?.key;
+  }
+
+  prepareTarget(
+    subjects: readonly StructuralTargetSubject<K>[],
+    order: readonly number[]
+  ): PreparedStructuralTarget<K> {
+    const subjectIds = new Map<K, number>();
+    const targetBySubject = new Map<number, StructuralTargetSubject<K>>();
+    for (const subject of subjects) {
+      if (targetBySubject.has(subject.subjectId) || subjectIds.has(subject.key)) {
+        throw new Error('Structural target contains duplicate identity or key');
+      }
+      const current = this.subjectStates.get(subject.subjectId);
+      if (!current || (!current.active && !current.restoreAllowed)) {
+        throw new Error(`Subject ${subject.subjectId} cannot enter the structural target`);
+      }
+      targetBySubject.set(subject.subjectId, subject);
+      subjectIds.set(subject.key, subject.subjectId);
+    }
+    if (
+      order.length !== targetBySubject.size ||
+      new Set(order).size !== order.length ||
+      order.some((subjectId) => !targetBySubject.has(subjectId))
+    ) {
+      throw new Error('Structural target order does not match its active subjects');
+    }
+
+    const subjectStates = new Map(this.subjectStates);
+    const subjectRevisions = new Map(this.subjectRevisions);
+    for (const [subjectId, current] of this.subjectStates) {
+      const target = targetBySubject.get(subjectId);
+      if (!target) {
+        if (current.active) {
+          subjectStates.set(subjectId, {
+            active: false,
+            restoreAllowed: current.restoreAllowed,
+          });
+          subjectRevisions.set(subjectId, this.subjectRevision(subjectId) + 1);
+        }
+        continue;
+      }
+      if (!current.active || current.key !== target.key) {
+        subjectRevisions.set(subjectId, this.subjectRevision(subjectId) + 1);
+      }
+      subjectStates.set(subjectId, {
+        active: true,
+        key: target.key,
+        restoreAllowed: current.restoreAllowed,
+      });
+    }
+
+    const activeNodesByKey = new Map<K, ActiveNode<K>>();
+    const activeNodesBySubject = new Map<number, ActiveNode<K>>();
+    let activeHead: ActiveNode<K> | undefined;
+    let activeTail: ActiveNode<K> | undefined;
+    for (const subjectId of order) {
+      const target = targetBySubject.get(subjectId) as StructuralTargetSubject<K>;
+      const node: ActiveNode<K> = {
+        key: target.key,
+        subjectId,
+        prev: activeTail,
+        next: undefined,
+      };
+      if (activeTail) {
+        activeTail.next = node;
+      } else {
+        activeHead = node;
+      }
+      activeTail = node;
+      activeNodesByKey.set(node.key, node);
+      activeNodesBySubject.set(node.subjectId, node);
+    }
+
+    return {
+      subjectIds,
+      subjectStates,
+      subjectRevisions,
+      activeNodesByKey,
+      activeNodesBySubject,
+      activeHead,
+      activeTail,
+      activeCount: order.length,
+    };
+  }
+
+  installPreparedTarget(target: PreparedStructuralTarget<K>): void {
+    this.subjectIds = target.subjectIds;
+    this.subjectStates = target.subjectStates;
+    this.subjectRevisions = target.subjectRevisions;
+    this.activeNodesByKey = target.activeNodesByKey;
+    this.activeNodesBySubject = target.activeNodesBySubject;
+    this.activeHead = target.activeHead;
+    this.activeTail = target.activeTail;
+    this.activeCount = target.activeCount;
   }
 
   moveKeysToFront(keys: readonly K[]): void {
