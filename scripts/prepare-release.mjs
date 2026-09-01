@@ -43,6 +43,7 @@ const manifestPaths = [
 const releaseOwnedPaths = [
   ...manifestPaths,
   join(ROOT, 'CHANGELOG.md'),
+  join(ROOT, 'docs', 'README.md'),
   join(ROOT, 'apps', 'demo', 'src', 'app', 'version.ts'),
   join(ROOT, 'apps', 'demo', 'src', 'app', 'library-versions.ts'),
 ];
@@ -50,6 +51,7 @@ const releaseOwnedPathspecs = [
   'package.json',
   ...packages.map((name) => `packages/${name}/package.json`),
   'CHANGELOG.md',
+  'docs/README.md',
   'apps/demo/src/app/version.ts',
   'apps/demo/src/app/library-versions.ts',
 ];
@@ -78,6 +80,16 @@ try {
     '--date',
     new Date().toISOString().slice(0, 10),
   ]);
+  const docsReadmePath = join(ROOT, 'docs', 'README.md');
+  const docsReadme = readFileSync(docsReadmePath, 'utf8');
+  const updatedDocsReadme = docsReadme.replace(
+    /(\*\*Current prerelease:\*\*\s+)\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?/,
+    `$1${next}`
+  );
+  if (updatedDocsReadme === docsReadme) {
+    throw new Error('docs/README.md has no current prerelease claim to update');
+  }
+  writeFileSync(docsReadmePath, updatedDocsReadme);
   run('npm', ['run', 'gates', '--', '--release']);
   run('git', ['add', ...releaseOwnedPathspecs]);
   run('git', ['commit', '-m', `chore(release): prepare ${next}`]);

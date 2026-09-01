@@ -278,6 +278,10 @@ compatibility layer or an application convenience surface.
 - `withRestorationDesignation(callback)` identifies framework-originated user
   writes that are eligible for restoration.
 
+A `ScalarLeafRealization` supplies `runInvalidationGroup(run)` so transactions
+and restoration can apply all scalar changes before framework observers are
+notified. It is an adapter coherence contract, not an application batching API.
+
 ## License
 
 Apache-2.0. See [LICENSE](../../LICENSE) and [NOTICE](../../NOTICE).
