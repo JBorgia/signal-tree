@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   composePreparedSubjectUpdates,
+  preparePhysicalSubjectSlotTarget,
   preparePhysicalSubjectTarget,
 } from './subject-record-target';
 
@@ -194,5 +195,120 @@ describe('preparePhysicalSubjectTarget', () => {
       ])
     ).toThrow('Duplicate physical update for SubjectId 1');
     expect(current.get(1)).toEqual({ revision: 1, value: { id: 1 } });
+  });
+});
+
+describe('preparePhysicalSubjectSlotTarget', () => {
+  const current = () => ({
+    slotBySubject: new Map([
+      [1, 0],
+      [2, 1],
+    ]),
+    subjects: [1, 2],
+    revisions: [3, 7],
+    values: [
+      { id: 1, name: 'before' },
+      { id: 2, name: 'untouched' },
+    ],
+  });
+
+  it('installs same-subject revision and value through one slot target assignment', () => {
+    const live = current();
+    const afterValue = { id: 1, name: 'after' };
+    const updates = composePreparedSubjectUpdates(
+      [{ subjectId: 1, revision: 4 }],
+      [{ subjectId: 1, value: afterValue }]
+    );
+
+    const target = preparePhysicalSubjectSlotTarget(live, updates);
+
+    expect(live.revisions[0]).toBe(3);
+    expect(live.values[0]).toEqual({ id: 1, name: 'before' });
+    expect(target.revisions[0]).toBe(4);
+    expect(target.values[0]).toBe(afterValue);
+    expect(target.slotBySubject.get(1)).toBe(0);
+  });
+
+  it('preserves the other authority column for partial updates', () => {
+    const live = current();
+
+    const revisionTarget = preparePhysicalSubjectSlotTarget(
+      live,
+      composePreparedSubjectUpdates([{ subjectId: 1, revision: 4 }], [])
+    );
+    const afterValue = { id: 1, name: 'changed' };
+    const valueTarget = preparePhysicalSubjectSlotTarget(
+      live,
+      composePreparedSubjectUpdates([], [{ subjectId: 1, value: afterValue }])
+    );
+
+    expect(revisionTarget.revisions).toEqual([4, 7]);
+    expect(revisionTarget.values[0]).toBe(live.values[0]);
+    expect(valueTarget.revisions).toEqual([3, 7]);
+    expect(valueTarget.values[0]).toBe(afterValue);
+  });
+
+  it('allocates stable monotonic slots for complete new subjects', () => {
+    const live = current();
+    const updates = composePreparedSubjectUpdates(
+      [
+        { subjectId: 4, revision: 0 },
+        { subjectId: 3, revision: 0 },
+      ],
+      [
+        { subjectId: 3, value: { id: 3, name: 'three' } },
+        { subjectId: 4, value: { id: 4, name: 'four' } },
+      ]
+    );
+
+    const target = preparePhysicalSubjectSlotTarget(live, updates);
+
+    expect(target.subjects).toEqual([1, 2, 3, 4]);
+    expect(target.slotBySubject.get(3)).toBe(2);
+    expect(target.slotBySubject.get(4)).toBe(3);
+    expect(live.subjects).toEqual([1, 2]);
+  });
+
+  it('rejects incomplete and duplicate updates before copying columns', () => {
+    const live = current();
+
+    expect(() =>
+      preparePhysicalSubjectSlotTarget(live, [
+        { subjectId: 3, revision: 0 },
+      ])
+    ).toThrow('New SubjectId 3 requires revision and value contributions');
+    expect(() =>
+      preparePhysicalSubjectSlotTarget(live, [
+        { subjectId: 1, revision: 4 },
+        { subjectId: 1, value: { id: 1, name: 'changed' } },
+      ])
+    ).toThrow('Duplicate physical update for SubjectId 1');
+    expect(live.revisions).toEqual([3, 7]);
+  });
+
+  it('rejects inconsistent current slot columns before applying updates', () => {
+    expect(() =>
+      preparePhysicalSubjectSlotTarget(
+        {
+          slotBySubject: new Map([[1, 0]]),
+          subjects: [1],
+          revisions: [],
+          values: [{ id: 1 }],
+        },
+        []
+      )
+    ).toThrow('Physical subject slot columns are inconsistent');
+
+    expect(() =>
+      preparePhysicalSubjectSlotTarget(
+        {
+          slotBySubject: new Map([[1, 1]]),
+          subjects: [1],
+          revisions: [0],
+          values: [{ id: 1 }],
+        },
+        []
+      )
+    ).toThrow('Physical SubjectId 1 does not address slot 0');
   });
 });

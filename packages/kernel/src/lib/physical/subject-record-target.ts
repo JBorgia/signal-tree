@@ -19,6 +19,13 @@ export type PhysicalSubjectRecord<E extends Record<string, unknown>> = {
   readonly value: E;
 };
 
+export type PhysicalSubjectSlots<E extends Record<string, unknown>> = {
+  readonly slotBySubject: ReadonlyMap<number, number>;
+  readonly subjects: readonly number[];
+  readonly revisions: readonly number[];
+  readonly values: readonly E[];
+};
+
 export function composePreparedSubjectUpdates<E extends Record<string, unknown>>(
   structural: readonly StructuralSubjectContribution[],
   values: readonly ValueSubjectContribution<E>[]
@@ -101,6 +108,100 @@ export function preparePhysicalSubjectTarget<E extends Record<string, unknown>>(
     target.set(subjectId, record);
   }
   return target;
+}
+
+export function preparePhysicalSubjectSlotTarget<
+  E extends Record<string, unknown>,
+>(
+  current: PhysicalSubjectSlots<E>,
+  updates: readonly PreparedSubjectUpdate<E>[]
+): PhysicalSubjectSlots<E> {
+  assertPhysicalSlots(current);
+
+  const seenSubjects = new Set<number>();
+  const prepared: Array<{
+    readonly subjectId: number;
+    readonly slot: number;
+    readonly revision: number;
+    readonly value: E;
+  }> = [];
+  let nextSlot = current.subjects.length;
+
+  for (const update of updates) {
+    assertSubjectId(update.subjectId);
+    if (seenSubjects.has(update.subjectId)) {
+      throw new Error(
+        `Duplicate physical update for SubjectId ${String(update.subjectId)}`
+      );
+    }
+    seenSubjects.add(update.subjectId);
+
+    if (update.revision !== undefined) {
+      assertRevision(update.revision);
+    }
+    const existingSlot = current.slotBySubject.get(update.subjectId);
+    const revision =
+      update.revision ??
+      (existingSlot === undefined ? undefined : current.revisions[existingSlot]);
+    const value =
+      update.value ??
+      (existingSlot === undefined ? undefined : current.values[existingSlot]);
+    if (revision === undefined || value === undefined) {
+      throw new Error(
+        `New SubjectId ${String(update.subjectId)} requires revision and value contributions`
+      );
+    }
+
+    prepared.push({
+      subjectId: update.subjectId,
+      slot: existingSlot ?? nextSlot++,
+      revision,
+      value,
+    });
+  }
+
+  const slotBySubject = new Map(current.slotBySubject);
+  const subjects = [...current.subjects];
+  const revisions = [...current.revisions];
+  const values = [...current.values];
+  for (const update of prepared) {
+    slotBySubject.set(update.subjectId, update.slot);
+    subjects[update.slot] = update.subjectId;
+    revisions[update.slot] = update.revision;
+    values[update.slot] = update.value;
+  }
+
+  return Object.freeze({
+    slotBySubject,
+    subjects: Object.freeze(subjects),
+    revisions: Object.freeze(revisions),
+    values: Object.freeze(values),
+  });
+}
+
+function assertPhysicalSlots<E extends Record<string, unknown>>(
+  slots: PhysicalSubjectSlots<E>
+): void {
+  if (
+    slots.subjects.length !== slots.revisions.length ||
+    slots.subjects.length !== slots.values.length ||
+    slots.slotBySubject.size !== slots.subjects.length
+  ) {
+    throw new Error('Physical subject slot columns are inconsistent');
+  }
+  for (let slot = 0; slot < slots.subjects.length; slot += 1) {
+    const subjectId = slots.subjects[slot];
+    assertSubjectId(subjectId);
+    assertRevision(slots.revisions[slot]);
+    if (slots.values[slot] === undefined) {
+      throw new Error(`Physical subject slot ${String(slot)} is missing its value`);
+    }
+    if (slots.slotBySubject.get(subjectId) !== slot) {
+      throw new Error(
+        `Physical SubjectId ${String(subjectId)} does not address slot ${String(slot)}`
+      );
+    }
+  }
 }
 
 function assertSubjectId(subjectId: number): void {
