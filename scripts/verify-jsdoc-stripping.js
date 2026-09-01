@@ -11,97 +11,92 @@ try {
   console.log('ℹ️  gzip-size not installed, showing raw file sizes only\n');
 }
 
-// Note: batching, middleware, entities, devtools, time-travel, serialization
-// were consolidated into @signaltree/core in v4.0.0.
-// Memoization & presets were removed in v10.0.0.
-const packages = ['core', 'ng-forms'];
+const packages = [
+  { name: 'kernel', public: true },
+  { name: 'angular', public: true },
+  { name: 'react', public: true },
+  { name: 'shared', public: false },
+];
+
+function collectFiles(dir, extension, out = []) {
+  if (!fs.existsSync(dir)) return out;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) collectFiles(full, extension, out);
+    else if (entry.isFile() && entry.name.endsWith(extension)) out.push(full);
+  }
+  return out;
+}
 
 console.log('🔍 Verifying JSDoc Stripping and Bundle Sizes\n');
 
 let allPassed = true;
 
 packages.forEach((pkg) => {
-  console.log(`📦 ${pkg}:`);
+  console.log(`📦 ${pkg.name}:`);
 
-  const jsCandidates = [
-    path.join(__dirname, `../dist/packages/${pkg}/dist/index.js`),
-    path.join(
-      __dirname,
-      `../dist/packages/${pkg}/fesm2022/signaltree-${pkg}.mjs`
-    ),
-  ];
-  const dtsCandidates = [
-    path.join(__dirname, `../dist/packages/${pkg}/src/index.d.ts`),
-    path.join(__dirname, `../dist/packages/${pkg}/index.d.ts`),
-  ];
+  const packageRoot = path.join(__dirname, `../dist/packages/${pkg.name}`);
+  const jsFiles = collectFiles(packageRoot, '.js');
+  const dtsFiles = collectFiles(packageRoot, '.d.ts');
 
-  const jsFile = jsCandidates.find((candidate) => fs.existsSync(candidate));
-  const dtsFile = dtsCandidates.find((candidate) => fs.existsSync(candidate));
-
-  let jsExists = false;
-  let dtsExists = false;
   let jsHasJSDoc = false;
   let dtsHasJSDoc = false;
   let jsSize = 0;
   let gzippedSize = 0;
 
-  // Check if files exist
   try {
-    if (jsFile && fs.existsSync(jsFile)) {
-      jsExists = true;
+    for (const jsFile of jsFiles) {
       const jsContent = fs.readFileSync(jsFile, 'utf8');
-      jsHasJSDoc = jsContent.includes('/**') && jsContent.includes('*/');
-      jsSize = jsContent.length;
-      gzippedSize = gzipSize ? gzipSize.sync(jsContent) : jsSize;
+      jsHasJSDoc ||= jsContent.includes('/**') && jsContent.includes('*/');
+      jsSize += jsContent.length;
+      gzippedSize += gzipSize ? gzipSize.sync(jsContent) : jsContent.length;
     }
   } catch (e) {
-    console.log(`   ⚠️  Could not read JS file: ${e.message}`);
+    console.log(`   ⚠️  Could not read JS files: ${e.message}`);
   }
 
   try {
-    if (dtsFile && fs.existsSync(dtsFile)) {
-      dtsExists = true;
+    for (const dtsFile of dtsFiles) {
       const dtsContent = fs.readFileSync(dtsFile, 'utf8');
-      dtsHasJSDoc = dtsContent.includes('/**') && dtsContent.includes('*/');
+      dtsHasJSDoc ||= dtsContent.includes('/**') && dtsContent.includes('*/');
     }
   } catch (e) {
-    console.log(`   ⚠️  Could not read .d.ts file: ${e.message}`);
+    console.log(`   ⚠️  Could not read .d.ts files: ${e.message}`);
   }
 
-  // Report results
-  if (jsExists) {
+  if (jsFiles.length > 0) {
     const gzipInfo = gzipSize
       ? `, ${(gzippedSize / 1024).toFixed(2)}KB gzipped`
       : '';
-    const rel = path.relative(process.cwd(), jsFile);
     console.log(
-      `   bundle file (${rel}): ${
+      `   runtime files (${jsFiles.length}): ${
         jsHasJSDoc ? '❌ Contains JSDoc' : '✅ No JSDoc'
       } (${(jsSize / 1024).toFixed(2)}KB raw${gzipInfo})`
     );
   } else {
-    console.log(`   bundle file: ⚠️  Not found`);
+    console.log(`   runtime files: ❌ Not found`);
+    allPassed = false;
   }
 
-  if (dtsExists) {
-    const relDts = path.relative(process.cwd(), dtsFile);
+  if (pkg.public && dtsFiles.length > 0) {
     console.log(
-      `   .d.ts file (${relDts}): ${
+      `   declaration files (${dtsFiles.length}): ${
         dtsHasJSDoc ? '✅ Has JSDoc' : '❌ Missing JSDoc'
       }`
     );
-  } else {
-    console.log(`   .d.ts file: ⚠️  Not found`);
+  } else if (pkg.public) {
+    console.log(`   declaration files: ❌ Not found`);
+    allPassed = false;
   }
 
-  // Validation
-  if (jsExists && jsHasJSDoc) {
+  if (jsHasJSDoc) {
     console.log(`   🚨 ERROR: JSDoc found in runtime bundle!`);
     allPassed = false;
   }
 
-  if (dtsExists && !dtsHasJSDoc) {
-    console.log(`   ⚠️  WARNING: No JSDoc in type definitions`);
+  if (pkg.public && !dtsHasJSDoc) {
+    console.log(`   🚨 ERROR: No JSDoc in public type definitions`);
+    allPassed = false;
   }
 
   console.log('');
@@ -118,5 +113,6 @@ console.log('\n🎯 Bundle size improvements from JSDoc stripping:');
 console.log(
   '   - Runtime bundles: Significantly smaller (no documentation overhead)'
 );
-console.log('   - Type definitions: Fully documented (perfect IDE experience)');
-console.log('   - Developer experience: Unchanged (all JSDoc visible in IDE)');
+console.log(
+  '   - Type definitions: Documentation remains available to consumers'
+);

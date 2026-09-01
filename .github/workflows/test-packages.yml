@@ -1,23 +1,21 @@
-name: Test - guardrails, realtime & schema
+name: Test library packages
 
 on:
   workflow_dispatch: {}
   push:
     branches: [main, master]
     paths:
-      - 'packages/guardrails/**'
-      - 'packages/realtime/**'
-      - 'packages/schema/**'
-      - 'packages/core/**'
+      - 'packages/kernel/**'
+      - 'packages/angular/**'
+      - 'packages/react/**'
       - 'packages/shared/**'
       - '.github/workflows/test-packages.yml'
   pull_request:
     branches: [main, master]
     paths:
-      - 'packages/guardrails/**'
-      - 'packages/realtime/**'
-      - 'packages/schema/**'
-      - 'packages/core/**'
+      - 'packages/kernel/**'
+      - 'packages/angular/**'
+      - 'packages/react/**'
       - 'packages/shared/**'
       - '.github/workflows/test-packages.yml'
 
@@ -28,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [guardrails, realtime, schema]
+        package: [kernel, angular, react, shared]
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { undoable } from '../lib/undoable';
 
 import { entityMap } from './types';
-import { form } from './markers/form';
 import { signalTree } from './signal-tree';
 import { restoration } from '../enhancers/restoration/restoration';
 

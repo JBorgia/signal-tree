@@ -443,7 +443,7 @@ fi
 # module silently leaks into every bundle (the v11 security-injection fix). Needs
 # the core build (step 7) present.
 print_header "10b. Bundle Budget Gate"
-print_step "Enforcing SignalTree gzip budgets (bare ≤5.8KB, with-entities ≤8.6KB)"
+print_step "Enforcing generated SignalTree production/development gzip budgets"
 if node tools/check-bundle-budget.mjs 2>&1 | tee /tmp/bundle-budget.log; then
     print_success "Bundle within budget"
 else

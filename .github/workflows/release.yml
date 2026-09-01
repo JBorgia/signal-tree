@@ -71,7 +71,7 @@ jobs:
         run: node scripts/verify-version-claims.js
 
       - name: Verify publish artifacts
-        run: node scripts/verify-publish-artifacts.mjs core events ng-forms
+        run: node scripts/verify-publish-artifacts.mjs kernel angular react
 
       - name: Tarball-consumer gate (self-test, then gate)
         run: |

@@ -449,6 +449,11 @@ print_success "Workspace specs resolved in dist manifests"
 # ships a tarball missing an unmatched glob without a word.
 node scripts/verify-publish-artifacts.mjs "${PACKAGES[@]}" || exit 1
 
+# npm publish is invoked directly below, so package lifecycle hooks are not the
+# authority for artifact documentation checks. Verify the exact dist bytes here.
+node scripts/verify-jsdoc-stripping.js || exit 1
+node tools/check-declaration-docs.mjs || exit 1
+
 # Step 4: Commit changes
 print_step "Committing version changes (if any)..."
 git add package.json packages/*/package.json

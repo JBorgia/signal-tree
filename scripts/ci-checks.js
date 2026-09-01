@@ -30,15 +30,26 @@ if (doJsdoc) {
       process.exit(1);
     }
   }
+  const declarationDocs = path.join(
+    __dirname,
+    '../tools/check-declaration-docs.mjs'
+  );
+  if (!fs.existsSync(declarationDocs)) {
+    console.error('   \u274c check-declaration-docs.mjs not found');
+    process.exit(1);
+  }
+  if (!run('node', [declarationDocs])) {
+    console.error('   \u274c Declaration documentation validation failed');
+    process.exit(1);
+  }
 }
 
 if (doSizes) {
-  console.log('\n\ud83d\udcca Running bundle size report...');
-  const sizeScript = path.join(__dirname, 'consolidated-bundle-analysis.js');
+  console.log('\n\ud83d\udcca Running consumer bundle size budget...');
+  const sizeScript = path.join(__dirname, '../tools/check-bundle-budget.mjs');
   if (!fs.existsSync(sizeScript)) {
-    console.warn(
-      '   \u26a0 consolidated-bundle-analysis.js not found, skipping'
-    );
+    console.error('   \u274c check-bundle-budget.mjs not found');
+    process.exit(1);
   } else {
     const ok = run('node', [sizeScript]);
     if (!ok) {

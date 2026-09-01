@@ -11,9 +11,9 @@
  * ⚠️ A HAND-WRITTEN ROOTS LIST IS THE SAME DEFECT IN ANOTHER FORM. The first
  * consumer trace searched `core`, `shared` and `demo` because I typed those
  * three, and reported "zero elsewhere" — a claim about the whole workspace
- * derived from a list nobody had checked. `tsconfig.base.json` also maps
- * `@signaltree/events` and `@signaltree/ng-forms`, so the omission was not
- * obviously harmless from the paths file either.
+ * derived from a list nobody had checked. Stale path mappings have also pointed
+ * at deleted packages, so filesystem discovery and alias validation remain
+ * independent requirements.
  */
 import { readdirSync, existsSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -38,20 +38,36 @@ export function discoverProjectRoots(root = ROOT) {
 }
 
 /** Buildable TS configs for a project root, most specific first. */
-const CONFIG_CANDIDATES = ['tsconfig.lib.json', 'tsconfig.app.json', 'tsconfig.json'];
+const CONFIG_CANDIDATES = [
+  'tsconfig.lib.json',
+  'tsconfig.app.json',
+  'tsconfig.json',
+];
 
 export function discoverProjects(root = ROOT) {
   const projects = [];
   for (const dir of discoverProjectRoots(root)) {
     const cfgName = CONFIG_CANDIDATES.find((c) => existsSync(join(dir, c)));
     if (!cfgName) {
-      projects.push({ dir, config: null, fileNames: [], options: null, note: 'no tsconfig' });
+      projects.push({
+        dir,
+        config: null,
+        fileNames: [],
+        options: null,
+        note: 'no tsconfig',
+      });
       continue;
     }
     const configPath = join(dir, cfgName);
     const read = ts.readConfigFile(configPath, ts.sys.readFile);
     if (read.error) {
-      projects.push({ dir, config: configPath, fileNames: [], options: null, note: 'unreadable' });
+      projects.push({
+        dir,
+        config: configPath,
+        fileNames: [],
+        options: null,
+        note: 'unreadable',
+      });
       continue;
     }
     const parsed = ts.parseJsonConfigFileContent(read.config, ts.sys, dir);
@@ -81,7 +97,8 @@ export function danglingPathMappings(root = ROOT) {
   const bad = [];
   for (const [spec, targets] of Object.entries(paths))
     for (const t of targets)
-      if (!t.includes('*') && !existsSync(join(root, t))) bad.push({ spec, target: t });
+      if (!t.includes('*') && !existsSync(join(root, t)))
+        bad.push({ spec, target: t });
   return bad;
 }
 
@@ -99,11 +116,18 @@ export function danglingPathMappings(root = ROOT) {
  */
 export function nxProjectNames(root = ROOT) {
   try {
-    const out = execSync('npx nx show projects', { cwd: root, encoding: 'utf8', stdio: 'pipe' });
+    const out = execSync('npx nx show projects', {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: 'pipe',
+    });
     const trimmed = out.trim();
     return trimmed.startsWith('[')
       ? JSON.parse(trimmed)
-      : trimmed.split('\n').map((s) => s.trim()).filter(Boolean);
+      : trimmed
+          .split('\n')
+          .map((s) => s.trim())
+          .filter(Boolean);
   } catch {
     return null; // reported as unavailable, never silently treated as agreement
   }
@@ -114,10 +138,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   console.log(`first-party projects: ${projects.length}`);
   for (const p of projects)
     console.log(
-      `  ${(p.name ?? p.dir).padEnd(20)} ${String(p.config ?? p.note).padEnd(28)} ${p.fileNames.length} .ts inputs`
+      `  ${(p.name ?? p.dir).padEnd(20)} ${String(p.config ?? p.note).padEnd(
+        28
+      )} ${p.fileNames.length} .ts inputs`
     );
   const nx = nxProjectNames();
-  if (nx === null) console.log('\n⚠️  Nx project graph unavailable — parity UNVERIFIED');
+  if (nx === null)
+    console.log('\n⚠️  Nx project graph unavailable — parity UNVERIFIED');
   else {
     // Nx names are short (`core`); ours are paths (`packages/kernel`).
     const short = new Set(projects.map((p) => (p.name ?? '').split('/').pop()));

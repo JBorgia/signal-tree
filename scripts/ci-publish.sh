@@ -152,6 +152,10 @@ fi
 PUBLISHED_PACKAGES=()
 FAILED_PACKAGES=()
 
+print_step "Verifying runtime and declaration documentation artifacts..."
+node scripts/verify-jsdoc-stripping.js || exit 1
+node tools/check-declaration-docs.mjs || exit 1
+
 for package in "${PACKAGES[@]}"; do
     DIST_PATH="./dist/packages/$package"
     print_step "Publishing @signal-tree/$package@$VERSION..."
