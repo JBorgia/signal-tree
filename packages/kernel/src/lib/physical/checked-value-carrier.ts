@@ -41,6 +41,16 @@ export class CheckedValueCarrier<E extends Record<string, unknown>> {
     return this.#records.size;
   }
 
+  valueSubjectCount(): number {
+    let count = 0;
+    for (const record of this.#records.values()) {
+      if (record.valueHandle !== undefined) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
   valueCapacity(): number {
     return this.#storage.subjects.length;
   }
@@ -118,9 +128,7 @@ export class CheckedValueCarrier<E extends Record<string, unknown>> {
     return new CheckedValueCarrier(records, storage);
   }
 
-  private requireDistinctRecords(
-    subjectIds: readonly number[]
-  ): Array<{
+  private requireDistinctRecords(subjectIds: readonly number[]): Array<{
     readonly subjectId: number;
     readonly record: CheckedStructuralRecord;
   }> {
