@@ -5,8 +5,8 @@ applyTo: '**'
 # SignalTree Release Process
 
 - Never run `nx release`, `npm version`, or package-local `npm publish`.
-- Prepare versions and signed tags only through `npm run release:patch`,
-  `release:minor`, or `release:major`.
+- Prepare versions and signed tags only through `npm run release:rc`,
+  `release:patch`, `release:minor`, or `release:major`.
 - `scripts/prepare-release.mjs` must remain incapable of npm publication.
 - Registry publication must route through `scripts/publish-candidate.mjs`.
 - Tagged CI is the sanctioned publisher and must validate and publish from one

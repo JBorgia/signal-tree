@@ -7,6 +7,7 @@ SignalTree separates release preparation from npm publication.
 From a clean branch that exactly matches its remote:
 
 ```bash
+pnpm run release:rc
 pnpm run release:patch
 pnpm run release:minor
 pnpm run release:major

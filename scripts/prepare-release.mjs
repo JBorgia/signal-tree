@@ -8,9 +8,9 @@ import { assertReleasePlan } from './release-plan.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..');
 const releaseType = process.argv[2] ?? 'patch';
-const allowed = new Set(['patch', 'minor', 'major']);
+const allowed = new Set(['rc', 'patch', 'minor', 'major']);
 if (!allowed.has(releaseType)) {
-  throw new Error(`Expected patch, minor, or major; received ${releaseType}`);
+  throw new Error(`Expected rc, patch, minor, or major; received ${releaseType}`);
 }
 const run = (command, args, options = {}) => {
   console.log(`> ${command} ${args.join(' ')}`);
@@ -57,7 +57,10 @@ const originals = new Map(
   releaseOwnedPaths.map((filePath) => [filePath, readFileSync(filePath, 'utf8')])
 );
 const current = JSON.parse(readFileSync(manifestPaths[0], 'utf8')).version;
-const next = semver.inc(current, releaseType);
+const next =
+  releaseType === 'rc'
+    ? semver.inc(current, 'prerelease', 'rc')
+    : semver.inc(current, releaseType);
 if (!next) throw new Error(`Cannot derive ${releaseType} version from ${current}`);
 if (output('git', ['tag', '--list', `v${next}`])) {
   throw new Error(`Tag v${next} already exists`);
