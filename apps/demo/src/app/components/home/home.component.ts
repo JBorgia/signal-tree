@@ -171,7 +171,7 @@ export class HomeComponent {
     {
       name: 'One runtime tree',
       description:
-        'The recommended architecture is one runtime tree with typed slices and root-level enhancers.',
+        'One authority keeps authored work, external truth, and multi-location operations coherent.',
     },
     {
       name: 'Invisible reactivity',
@@ -179,9 +179,9 @@ export class HomeComponent {
         'Think in data paths instead of subscriptions and state-management ceremony.',
     },
     {
-      name: 'Optional power, not required ceremony',
+      name: 'Restoration is optional evidence',
       description:
-        'Add DevTools, restoration, serialization, or forms only when you need them.',
+        'Designate reversible operations only where undo is a real product capability; the causal model remains useful without it.',
       highlight: true,
     },
     {
@@ -197,7 +197,7 @@ export class HomeComponent {
       items: [
         'Angular apps with deep or evolving nested state',
         'Teams that want state to look like data, not framework ceremony',
-        'Apps that benefit from root-level DevTools, restoration, serialization, and entity maps',
+        'Apps that must distinguish user edits from server truth and preserve entity identity',
       ],
     },
     {

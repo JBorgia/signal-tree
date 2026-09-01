@@ -1,8 +1,8 @@
 <div align="center">
   <img src="apps/demo/public/signaltree.svg" alt="SignalTree Logo" width="120" height="120" style="background: transparent;" />
   <h1>SignalTree</h1>
-  <p><strong>Reactive JSON for Angular</strong></p>
-  <p>State as shape. Signals at every path.</p>
+  <p><strong>Causal application state for Angular and React</strong></p>
+  <p>State as shape. Consequential transitions. Signals at every path.</p>
 
   <p>
     <a href="https://jborgia.github.io/signaltree/" target="_blank"><strong>Live Demo</strong></a>
@@ -24,19 +24,31 @@
 
 ## Why SignalTree
 
-State is modeled as the shape of your data, and the capabilities you'd otherwise hand-assemble ship as composable markers and enhancers:
+SignalTree models application state as consequential transitions, not just
+values in reactive containers. The kernel distinguishes authored work from
+external truth, preserves stable entity identity through structural change, and
+publishes one coherent result for operations that touch several locations.
+Framework packages realize those semantics without becoming another state
+authority.
+
+The capabilities applications opt into remain composable:
 
 - **`entityMap()`** → normalized collections with O(1) lookups and reactive CRUD
 - **`updateAndReport()`** → a changed-paths report for partial server-payload sync, audit trails, and targeted persistence
 - **`derived`** → one computed-state factory deep-merged at any path
-- **`restoration()`** → undo/redo with configurable history depth
+- **`restoration()`** → optional undo/redo over explicitly designated authored turns
 
 ### Use SignalTree if you need
 
-- Optimistic UI with rollback (snapshot → write → restore; see the [Ops recipe](docs/guides/composition-recipes.md#2-a-reusable-entity-crud-ops-base))
-- Undo / redo (`restoration` enhancer)
+- User edits and server truth to remain distinguishable
+- One logical operation across several entities to publish coherently
+- Stable identity across collection removal, rekey, reorder, and held references
 - Typed normalized collections with O(1) lookups (`entityMap`)
 - State that mirrors your data shape, not Redux ceremony
+
+Restoration is one optional consequence of that model. When enabled, a
+designated user operation remains one causal turn and can be restored atomically
+without overwriting newer external truth. Most applications need not enable it.
 
 ### Production architecture
 
@@ -66,21 +78,18 @@ Measured against elf at 100 fixed fields ([`tools/bench-state-scale.mjs`](tools/
 And write cost against state size, with zero consumers: at 1,024 root props SignalTree is
 **0.005 ms** and an immutable store is **20.741 ms**, because it copies the slice and we don't.
 
-**2. Do you read the whole collection on every change, or undo deeply over it?**
+**2. Do you read the whole collection on every change?**
 
-Either one hands the win back:
+That hands the granularity win back:
 
 - Over 10,000 rows, `update` + `byId()` is **2.13 µs**; `update` + `all()` is **9.91 µs**, because
   `all()` rebuilds the array on every change and there are no per-entity consumers to earn the
   granularity back. That gap widens with collection size and with how many per-entity nodes have
   been materialised.
-- Undo/redo over a 10,000-row collection measures **~3× behind elf** (3.67 ms against 1.24 ms). An immutable store restores
-  by swapping one reference; SignalTree writes values back into per-entity signals. That is the
-  price of granular reads, not a defect — see
-  [`docs/compare/real-implementations.md`](docs/compare/real-implementations.md).
+- Optional deep restoration over a 10,000-row collection also measures **~3× behind elf** (3.67 ms against 1.24 ms). An immutable store restores by swapping one reference; SignalTree writes values back into per-entity signals. That is the price of preserving granular identity, not the center of the SignalTree workload — see [`docs/compare/real-implementations.md`](docs/compare/real-implementations.md).
 
 **High write frequency × many per-entity bindings → SignalTree, by a wide margin. Whole-collection
-reads or deep undo → an immutable store fits better.**
+reads → an immutable store fits better. If deep undo is the product, benchmark that optional capability separately.**
 
 > Numbers are Node v24.3 / V8 on one machine. Browser transfer is not yet established — re-run the
 > harnesses rather than trusting the table.
@@ -128,8 +137,9 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
   [Ops recipe](docs/guides/composition-recipes.md#2-a-reusable-entity-crud-ops-base).
 - **Async data** — keep local loading flags as ordinary state and put
   orchestration in application services or framework primitives.
-- **Undo/redo and DevTools** — `restoration()` and Redux DevTools integration. Persistence stays in
-  application services until a new public contract earns the release surface.
+- **Explainable transitions and DevTools** — inspect why state changed and keep
+  user work distinct from external truth. Add `restoration()` only where users
+  genuinely need reversible operations.
 - **State that will grow.** Starting simple is fine — the shape _is_ the API, so adding a domain or
   attaching a marker at a new node doesn't restructure anything you already wrote. You don't need to
   predict your final shape to start.

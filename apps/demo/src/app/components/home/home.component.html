@@ -1,7 +1,7 @@
 <div class="home-container">
   <section class="hero-section">
     <div class="hero-copy">
-      <div class="hero-eyebrow">Reactive JSON for Angular</div>
+      <div class="hero-eyebrow">Causal application state</div>
       <div class="hero-logo-container">
         <img src="/signaltree.svg" alt="SignalTree Logo" class="hero-logo" />
       </div>
@@ -9,8 +9,9 @@
         Model nested state as data — not reducers, selectors, and ceremony.
       </h1>
       <p class="hero-subtitle">
-        SignalTree gives Angular apps a path-based, type-safe state model that
-        stays readable as your data gets deeper and your app gets bigger.
+        SignalTree keeps authored work, external truth, stable identity, and
+        multi-entity operations coherent as state gets deeper and applications
+        get larger.
       </p>
       <p class="hero-supporting-copy">
         Reactive JSON means your state still looks like data. Keep one runtime
@@ -44,7 +45,7 @@
         <span class="badge">Angular signals</span>
         <span class="badge">Type-safe paths</span>
         <span class="badge">One runtime tree</span>
-        <span class="badge">DevTools + time travel</span>
+        <span class="badge">Authored vs external truth</span>
       </div>
     </div>
   </section>
@@ -52,8 +53,8 @@
   <section class="section">
     <h2 class="section-title">Use SignalTree if you need</h2>
     <ul class="use-case-list">
-      <li>Optimistic UI with rollback (<code>updateAndReport</code>)</li>
-      <li>Undo / redo (<code>restoration</code> enhancer)</li>
+      <li>Coherent operations across several state locations</li>
+      <li>Stable EntityMap identity through structural changes</li>
       <li>
         Typed normalized collections with O(1) lookups (<code>entityMap</code>)
       </li>
@@ -62,6 +63,7 @@
         typed state authority
       </li>
       <li>State that mirrors your data shape, not Redux ceremony</li>
+      <li>Optional restoration for explicitly reversible operations</li>
     </ul>
   </section>
 

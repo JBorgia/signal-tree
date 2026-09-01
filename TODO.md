@@ -1171,7 +1171,11 @@ A long-lived `selectById(id)` closing over the old id breaks silently. Cheapest 
 the v3 asks, and it protects "diagnostics with stable codes", which is one of the
 six capabilities no competitor has.
 
-## 2. Settle the history REPRESENTATION — decision pending, do not pre-empt
+## ~~2. Settle the history representation~~ — CLOSED BY V15 ARCHITECTURE
+
+The declarative restoration architecture, completed-designated-turn history,
+and lazy historical materialization are frozen. The material below is retained
+as historical derivation evidence, not an open decision or implementation queue.
 
 **The goal is
 [history-the-greenfield-target.md](docs/architecture/history-the-greenfield-target.md):
@@ -1853,7 +1857,10 @@ distinguishes "not supplied" from "supplied as 0".
 leaf. The conversion and the ≤ 1 result are arithmetic on buffer length and should
 hold generally, but were not re-run across collection or form shapes.
 
-### 6f-b. OPEN QUESTION — does ST2029 fire on a collection that is never written?
+### ~~6f-b. Does ST2029 fire on a collection that is never written?~~ — MOOT
+
+ST2029 and the location-exclusion model it advised were retired from v15. The
+material below is historical evidence only and must not drive new work.
 
 Not a finding; not measured. The retention refinement showed that an untouched
 collection is shared by reference between entries, so a wide-but-never-written

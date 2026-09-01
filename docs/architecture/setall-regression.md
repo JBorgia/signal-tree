@@ -1,6 +1,14 @@
 # `setAll` bulk-population regression — attributed
 
-**Status:** PRIMARY MECHANISM DELETED. A second mechanism remains unattributed.
+**Status:** PRIMARY MECHANISM DELETED. The measured residual is an accepted
+known regression for v15, not a release blocker.
+
+The remaining roughly 7–10x constant-factor gap from 14.0.0 is intentionally
+not attributed before GA. Public behavior, asymptotic shape, bundle budgets,
+memory/retention gates, and the release matrix are green. Further attribution
+would reopen optional representation work without a correctness or release
+falsifier. Preserve the measurement as an honest tradeoff and investigate it
+only from a new deterministic budget or product requirement.
 
 The entity layer no longer derives subject positions. `deriveSubjectPositions`
 and `collectOwnedPositions` are gone, along with all nine call sites and the
