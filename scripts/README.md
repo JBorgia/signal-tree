@@ -1,377 +1,226 @@
-# 🛠️ SignalTree Build & Development Scripts
+# SignalTree Scripts
 
-This directory contains scripts and documentation for efficient development, testing, and publishing workflows for the SignalTree ecosystem.
+This directory contains release operations, validation wrappers, benchmark
+entry points, deployment helpers, and older one-off tooling.
 
-## 📦 Quick Start Commands
+A filename is not authority. A script affects release confidence only when it
+is invoked by `package.json`, a workflow, a direct publish path, or
+`tools/verify-gates.mjs`.
 
-### Most Common Development Tasks
+## Start Here
 
-```bash
-# Start development with demo app
-npm run dev
-
-# Build all packages for production
-npm run build:production
-
-# Run all tests across the workspace
-npm run test:all
-
-# Check code quality (lint + format + test)
-npm run quality:check
-
-# Fast quality check (core package only)
-npm run quality:simple
-
-# Test just the core performance metrics
-npm run perf:test
-```
-
-## 🚨 Troubleshooting Quick Reference
-
-### Linting Errors During Publishing
-
-If `npm run publish:all` fails with linting errors:
+Run workspace operations through the root package scripts:
 
 ```bash
-# Step 1: Auto-fix common issues
-npm run lint:fix:all
-
-# Step 2: Use simplified workflow for development
-npm run quality:simple    # Bypasses complex cross-package linting
-
-# Step 3: Manual fixes for peer dependencies (if needed)
-cd packages/[package-name]
-npm install @signal-tree/kernel --save-peer
+pnpm start
+pnpm run build:all
+pnpm run test:all
+pnpm run lint:all
+pnpm run typecheck
 ```
 
-### Build Cache Issues
+The current package projects are:
+
+- `shared` (private build-time package)
+- `kernel`
+- `angular`
+- `react`
+- `demo` and `react-reference` (consumer applications)
+
+Historical names such as `core`, `guardrails`, `enterprise`, `events`,
+`ng-forms`, and `schema` are not current package projects. Some npm script names
+retain `core` as a compatibility label, but their command targets `kernel`; for
+example, `pnpm run build:core` executes `nx build kernel`.
+
+## Validation
+
+The comprehensive pre-publish entry point is:
 
 ```bash
-npm run clean              # Clear Nx cache and node_modules cache
-npm run clean:build        # Full clean + reinstall + rebuild
+pnpm run validate
 ```
 
-### Release Script Issues
+This runs [pre-publish-validation.sh](pre-publish-validation.sh), which owns the
+ordered pre-publish checks. `FAST_VALIDATE=1 pnpm run validate` skips only the
+slow test, coverage, and performance stages; correctness and artifact checks
+remain enabled and the skipped stages are printed.
 
-If a release fails partway through:
+Useful focused commands:
 
 ```bash
-# The script automatically rolls back version changes for build/git failures
-# For npm publish failures after git push, you may need manual cleanup:
-
-# Check what was published
-npm view @signal-tree/kernel versions --json
-
-# If needed, unpublish specific versions (within 72 hours)
-npm unpublish @signal-tree/kernel@2.0.0
-
-# Or create a patch release to fix issues
-npm run release:patch
+pnpm run quality:check
+pnpm run typecheck
+pnpm run validate:dist
+pnpm run validate:exports
+pnpm run validate:docs
+pnpm run validate:version-claims
+pnpm run validate:release-state
+pnpm run validate:rc-surface
+pnpm run validate:tarball-consumer
+pnpm run validate:types
+pnpm run validate:tree-shaking
+pnpm run size:check
+pnpm run lint:readmes
 ```
 
-## 🏗️ Build Scripts
+## Gate Harness
 
-> **Note:** Every publishable SignalTree package (including `@signaltree/guardrails`) now builds through the shared Nx Rollup pipeline with `preserveModules`. Use `nx build <package>` or the workspace scripts below—no separate tsup step is required.
-
-### Core Package Building
+[`../tools/verify-gates.mjs`](../tools/verify-gates.mjs) is the gate registry.
+It runs gates and, in self-test mode, mutates the exact property each gate claims
+to protect and requires the gate to fail.
 
 ```bash
-npm run build:core              # Build just the core package
-npm run build:packages          # Build all feature packages
-npm run build:all              # Build everything (core + packages)
-npm run build:production       # Production builds with optimization
+pnpm run gates
+pnpm run gates:fast
+pnpm run gates:self-test
+pnpm run gates:list
+node tools/verify-gates.mjs --release
+node tools/verify-gates.mjs --only=<gate-name>
 ```
 
-### Development Builds
+The harness reports unproven gates. A green unregistered script or a gate
+without a killing mutation is evidence, not release authority.
+
+## Release And Publish
+
+Use only the root release scripts for versioned releases:
 
 ```bash
-npm run dev                     # Start demo app (auto-rebuilds core)
-npm run dev:build              # Build core first, then start demo
-npm run build:demo             # Build demo app only
+pnpm run release
+pnpm run release:patch
+pnpm run release:minor
+pnpm run release:major
 ```
 
-## 🧪 Testing Scripts
+All route through [release.sh](release.sh). It validates, updates versions,
+builds, tags, and publishes the manifest-defined package set. Failures before
+npm publishing begins roll back local release changes. Once publishing starts,
+the script preserves the release state because one or more immutable npm
+versions may already exist; reconcile the published set and resume with
+`--keep-version`.
 
-### Comprehensive Testing
+Direct package publishing routes through:
 
 ```bash
-npm run test:all               # Test all packages
-npm run test:core              # Test core package only
-npm run test:coverage          # Run tests with coverage reports
-npm run test:watch             # Watch mode for development
+pnpm run publish:all
+pnpm run publish:dry-run
+pnpm run publish:ci
 ```
 
-### Specialized Tests
+The direct authorities are:
+
+- [release.sh](release.sh)
+- [publish-all.sh](publish-all.sh)
+- [ci-publish.sh](ci-publish.sh)
+- [pre-publish-validation.sh](pre-publish-validation.sh)
+- [release-packages.sh](release-packages.sh), the shared package-order source
+
+Do not run `nx release`, `npm version`, or package-local `npm publish` as a
+substitute. Do not manually unpublish a partial release as routine recovery;
+stop after publishing begins, inspect which versions exist, and follow the
+repository release process.
+
+Release prerequisites and post-publish verification are in
+[`../RELEASE_PROCESS.md`](../RELEASE_PROCESS.md).
+
+## Artifact Preparation And Verification
+
+These scripts are on or adjacent to the publish path:
+
+| Script                                                 | Responsibility                                                      |
+| ------------------------------------------------------ | ------------------------------------------------------------------- |
+| `prepare-publish-artifacts.mjs`                        | Prepare publishable manifests and artifacts                         |
+| `resolve-workspace-specs.mjs`                          | Replace workspace dependency protocols and prove none remain        |
+| `verify-publish-artifacts.mjs`                         | Resolve every manifest file/export entry before publish             |
+| `verify-package-hygiene.js`                            | Reject source leaks, stale declarations, and invalid nested exports |
+| `verify-dist.sh`                                       | Validate built distribution layout                                  |
+| `verify-exports.js`                                    | Validate package export integrity                                   |
+| `verify-no-broken-dts.sh`                              | Validate declaration placement and references                       |
+| `verify-jsdoc-stripping.js`                            | Validate runtime JSDoc stripping behavior                           |
+| `verify-production-bundle-no-perf-instrumentation.mjs` | Reject instrumentation in production bundles                        |
+| `verify-tree-shaking.js` / `test-tree-shaking.js`      | Exercise consumer tree-shaking                                      |
+
+The final package layout comes from the Nx Rollup builds. Manual post-build
+source copying is not a supported packaging strategy.
+
+## Documentation And Version Checks
 
 ```bash
-npm run test:performance       # Core recursive typing performance tests
-npm run test:recursive         # Recursive typing functionality tests
-npm run perf:test             # Alias for performance testing
+node scripts/lint-readme-apis.mjs
+node scripts/lint-readme-apis.mjs --self-test
+bash scripts/validate-docs.sh
+node scripts/verify-version-claims.js
+bash scripts/verify-changelog-entry.sh
 ```
 
-## 🔍 Code Quality Scripts
+`lint-readme-apis.mjs` discovers built package exports from manifests and checks
+current documentation imports plus retired API teaching. Historical examples
+must use its explicit local or near-title evidence markers; directory placement
+alone does not exempt current guidance.
 
-### Linting & Formatting
+## Measurement Tools
+
+Published numeric claims must name the generator that produces them. The
+canonical measurement programs live under `tools/`, including:
 
 ```bash
-npm run lint:all               # Lint all packages
-npm run lint:core              # Lint core package only
-npm run lint:fix               # Auto-fix linting issues
-npm run format                 # Format code
-npm run format:check           # Check formatting
+node tools/check-bundle-budget.mjs
+node tools/size-report.mjs
+node tools/bench-compare.mjs
+node tools/bench-vs-signalstore.mjs
+node tools/bench-depth-latency.mjs
+node tools/bench-leaf-equality.mjs
+node tools/bench-ssr-payload.mjs
 ```
 
-### Quality Gates
+The root conveniences are:
 
 ```bash
-npm run quality:check          # Complete quality check (lint + format + test)
-npm run prepublish            # Pre-publication quality gate
+pnpm run perf:run
+pnpm run analyze:bundle
+pnpm run size:check
+pnpm run check:devmode-foldable
 ```
 
-## 📊 Analysis & Performance
+`artifacts/` is local scratch output. Never copy published metrics from an
+artifact file; rerun the named generator.
 
-### Bundle Analysis
+## Demo And Browser Automation
 
 ```bash
-npm run analyze:bundle         # Analyze bundle sizes
-npm run analyze:deps           # Visualize dependency graph
-npm run perf:build            # Build + analyze performance
+pnpm start
+pnpm run build:demo
+pnpm run smoke:routes
+pnpm run automation:export
 ```
 
-### Performance tools (consolidated)
-
-Location: `scripts/performance/`
-
-- `performance-runner.js` — runs the comprehensive performance suite
-- `recursive-performance.js` — benchmarks recursive typing at 5/10/15/20+ levels
-- `recursive-metrics.ts` — TypeScript performance analysis
-- `bundle-analysis.mjs` — bundle size analysis for recursive typing impact
-- `developer-experience.mjs` — developer productivity metrics
-
-Quick start:
-
-```bash
-# From repo root
-node scripts/performance/performance-runner.js
-
-# Individual analyses
-node scripts/performance/bundle-analysis.mjs
-node scripts/performance/developer-experience.mjs
-```
-
-### Performance Shell Scripts
-
-Location: `scripts/` (root level)
-
-- `comprehensive-performance-test.sh` — Complete performance test suite
-- `performance-analysis.sh` — Performance analysis and reporting
-- `performance-comparison.sh` — Branch-to-branch performance comparison
-
-```bash
-# Run comprehensive performance tests
-./scripts/comprehensive-performance-test.sh
-
-# Analyze performance metrics
-./scripts/performance-analysis.sh
-
-# Compare performance between branches
-./scripts/performance-comparison.sh
-```
-
-#### Perf suite (recommended)
-
-Run the unified suite that benchmarks recursive performance, measures callable Proxy overhead, and analyzes gzipped bundle sizes. It writes structured artifacts under `artifacts/` and enforces soft constraints.
-
-```bash
-# Fast path from repo root
-npm run perf:run
-
-# Or directly
-node scripts/perf-suite.js
-```
-
-Artifacts:
-
-- `artifacts/perf-summary.json` — latest run: perf means, proxy overhead, package gzip sizes, deltas vs baseline, and constraint pass/fail
-- `artifacts/perf-baseline.json` — stored baseline snapshot used for delta/constraint comparison
-
-Environment flags:
-
-- `PERF_UPDATE_BASELINE=1` — overwrite baseline with current results
-- `PERF_OVERHEAD_BUDGET_PCT=NN` — allowed regression percent vs baseline (default 25)
-- `PERF_ENFORCE_CLAIMS=1` — also fail constraints if any package exceeds its claimed size (not just max allowed)
-
-Typical workflow:
-
-```bash
-# Update baseline after an intentional perf/size improvement
-PERF_UPDATE_BASELINE=1 npm run perf:run
-
-# Tighten regression budget in CI
-PERF_OVERHEAD_BUDGET_PCT=15 npm run perf:run
-
-# Enforce claims in addition to hard caps
-PERF_ENFORCE_CLAIMS=1 npm run perf:run
-```
-
-Expected results (examples):
-
-```
-Recursive performance metrics:
-- 5 levels:    ~0.061–0.109ms
-- 10 levels:   ~0.061–0.109ms
-- 15 levels:   ~0.092–0.098ms
-- 20+ levels:  ~0.100–0.106ms
-```
-
-## 🧰 New helper scripts
-
-- `node scripts/ci-checks.js --jsdoc --sizes` — consolidated CI checks for JSDoc stripping and bundle-size reports. Used by `prepublish` and `postbuild` hooks.
-- `node scripts/sanity-checks.js` — quick workspace smoke/parity checks (core presence, enterprise build, demo integration).
-
-### Workspace Information
-
-```bash
-npm run workspace:info         # Nx workspace report
-npm run graph                  # View project dependency graph
-```
-
-## 🚀 Publishing & Release
-
-### Package Publishing
-
-```bash
-npm run publish:packages       # Build and prepare for publishing
-npm run publish:all           # Publish all packages to npm
-npm run publish:all -- --dry-run  # Test publishing without actual publish
-
-# Individual package publishing
-npm run publish:lib:dry-run    # Test publish single package
-npm run publish:lib           # Publish single package
-```
-
-### Release Management
-
-```bash
-npm run release               # Patch version release
-npm run release:patch         # Patch version (1.0.1)
-npm run release:minor         # Minor version (1.1.0)
-npm run release:major         # Major version (2.0.0)
-```
-
-## 🧹 Maintenance Scripts
-
-### Cleanup & Reset
-
-```bash
-npm run clean                 # Clean caches and dist
-npm run clean:build          # Full clean + install + build
-npm run update:deps          # Update Nx and dependencies
-```
-
-## 📋 Script Categories
-
-### 🎯 **Enhanced Build Scripts**
-
-- **`build:all`** - Build all packages in dependency order
-- **`build:core`** - Core package only (fastest for development)
-- **`build:packages`** - All feature packages (excludes core)
-- **`build:production`** - Optimized production builds
-
-### 🧪 **Comprehensive Testing**
-
-- **`test:all`** - Complete test suite across workspace
-- **`test:performance`** - Recursive typing performance validation
-- **`test:coverage`** - Full coverage reports
-- **`quality:check`** - Complete quality gate
-
-### ⚡ **Development Workflow**
-
-- **`dev`** - Start development server with hot reload
-- **`dev:build`** - Build core first, then start dev server
-- **`clean:build`** - Nuclear option: clean everything and rebuild
-
-### 📦 **Publishing & Release**
-
-- **`prepublish`** - Pre-publication quality checks
-- **`publish:all`** - Automated publishing in dependency order
-- **`release:*`** - Semantic versioning release workflows
-
-### 📊 **Performance & Analysis**
-
-- **`perf:test`** - Performance testing for recursive typing
-- **`perf:build`** - Build + bundle analysis
-- **`analyze:bundle`** - Webpack bundle analyzer
-- **`analyze:deps`** - Nx dependency graph visualization
-
-## 🔧 Nx Integration
-
-All scripts leverage Nx for:
-
-- **Incremental builds** - Only rebuild what changed
-- **Parallel execution** - Multiple packages built simultaneously
-- **Dependency awareness** - Correct build order automatically
-- **Caching** - Skip unchanged builds and tests
-
-### Nx-Specific Commands
-
-```bash
-nx graph                      # Interactive dependency graph
-nx run-many -t build         # Run build on multiple projects
-nx affected:build            # Build only affected projects
-nx reset                     # Clear Nx cache
-```
-
-## 🎯 Recommended Workflows
-
-### **Daily Development**
-
-```bash
-npm run dev                   # Start development
-npm run test:core            # Test your changes
-npm run quality:check        # Before committing
-```
-
-### **Feature Development**
-
-```bash
-npm run build:core           # Verify core builds
-npm run test:performance     # Verify performance impact
-npm run lint:fix            # Clean up code
-```
-
-### **Release Preparation**
-
-```bash
-npm run clean:build          # Clean slate build
-npm run quality:check        # Full quality gate
-npm run perf:build          # Performance verification
-npm run publish:all -- --dry-run  # Test publishing
-```
-
-### **Performance Testing**
-
-```bash
-npm run perf:test           # Quick performance check
-npm run test:recursive      # Deep recursive functionality
-npm run analyze:bundle      # Bundle size impact
-```
-
-## 💡 Tips
-
-- Use `--dry-run` flags for testing publishing workflows
-- Run `npm run quality:check` before any commits
-- Use `npm run clean:build` if you encounter strange build issues
-- Performance tests show the revolutionary recursive typing metrics
-- All builds use Nx caching for maximum efficiency
-
-## 🚀 Performance Metrics
-
-When you run `npm run perf:test`, you'll see the breakthrough recursive typing performance:
-
-- **Basic (5 levels)**: ~0.015ms ✅
-- **Medium (10 levels)**: ~0.020ms ✅
-- **Extreme (15 levels)**: ~0.025ms 🔥
-- **Unlimited (20+ levels)**: ~0.030ms 🚀
-
-These metrics demonstrate the ~50% bundle size reduction achieved through compile-time recursive typing while maintaining sub-millisecond performance at unlimited depths!
+Browser automation and benchmark-export helpers live under `scripts/playwright/`.
+Use their registered package scripts so configuration and output paths remain
+consistent.
+
+## Operational Helpers
+
+- `ci-checks.js`: consolidated JSDoc and size checks used by build/publish hooks.
+- `sanity-checks.js`: fast workspace consistency smoke checks.
+- `finalize-changelog.mjs`: release changelog finalization.
+- `deprecate-packages.sh`: explicit package deprecation workflow; use its
+  `--dry-run` route first.
+- `deploy-benchmark-site.sh`: benchmark-site deployment helper.
+- `run-devtools-smoke.mjs`: DevTools smoke runner.
+- `verify-clean-checkout-release-flow.sh`: clean-checkout release rehearsal.
+
+## Legacy And One-Off Scripts
+
+Some files under `scripts/`, `scripts/performance/`, and `scripts/benchmarks/`
+are historical experiments or wrappers retained for evidence. Before using one:
+
+1. Find a current caller in `package.json`, workflows, release scripts, or the
+   gate registry.
+2. Verify every referenced package, path, and output exists.
+3. Prefer a named `tools/bench-*`, `tools/measure-*`, `tools/check-*`, or
+   `tools/verify-*` program when it owns the current methodology.
+4. Treat an unregistered script's output as exploratory until a current document
+   and executable gate adopt it.
+
+Do not infer current behavior from comments that still use historical package
+names. Package manifests and executable release paths decide what ships.

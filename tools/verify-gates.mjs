@@ -1351,7 +1351,7 @@ const selected = GATES.filter(
  * half-written `dist/` produce noise, and "the build is broken" is the finding,
  * not a footnote to twenty-three other failures.
  */
-const BUILD_PROJECTS = 'core,shared';
+const BUILD_PROJECTS = 'shared,kernel,angular,react';
 
 function buildOnceIfNeeded() {
   if (!selected.some((g) => g.needsBuild)) return;

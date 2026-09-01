@@ -75,6 +75,22 @@ function check(changelogText, pkgVersion, tagExistsFn) {
   return errors;
 }
 
+function checkReleaseScript(scriptText) {
+  const errors = [];
+  const publishStart = scriptText.indexOf('PUBLISH_STARTED=true');
+  if (publishStart === -1) {
+    errors.push('release.sh does not mark when npm publishing starts.');
+    return errors;
+  }
+  const postPublish = scriptText.slice(publishStart);
+  if (/\brollback_versions\b/.test(postPublish)) {
+    errors.push(
+      'release.sh calls rollback_versions after npm publishing starts — partial npm publication must preserve local release state for reconciliation.'
+    );
+  }
+  return errors;
+}
+
 if (process.argv.includes('--self-test')) {
   const cases = [
     { cl: '## 1.2.3 (unreleased)\n', pkg: '1.2.3', tag: () => true, expectFail: true, name: 'unreleased + tagged → fires' },
@@ -97,6 +113,19 @@ if (process.argv.includes('--self-test')) {
     if (!pass) ok = false;
     console.log(`${pass ? '✅' : '❌'} self-test: ${c.name}`);
   }
+  const safeRelease = checkReleaseScript(
+    'PUBLISH_STARTED=false\nrollback_versions\nPUBLISH_STARTED=true\nexit 1\n'
+  );
+  const unsafeRelease = [
+    'PUBLISH_STARTED=true\nrollback_versions\n',
+    'PUBLISH_STARTED=true\nif failed; then rollback_versions; fi\n',
+    'PUBLISH_STARTED=true\nrollback_versions || true\n',
+  ].map(checkReleaseScript);
+  const safePass = safeRelease.length === 0;
+  const unsafePass = unsafeRelease.every((result) => result.length === 1);
+  if (!safePass || !unsafePass) ok = false;
+  console.log(`${safePass ? '✅' : '❌'} self-test: pre-publish rollback only → passes`);
+  console.log(`${unsafePass ? '✅' : '❌'} self-test: standalone, inline, and chained post-publish rollback → fire`);
   process.exit(ok ? 0 : 1);
 }
 
@@ -105,6 +134,8 @@ const pkg = JSON.parse(
   fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
 );
 const errors = check(changelog, pkg.version, gitTagExists);
+const releaseScript = fs.readFileSync(path.join(ROOT, 'scripts/release.sh'), 'utf8');
+errors.push(...checkReleaseScript(releaseScript));
 if (errors.length) {
   console.error('❌ Release-state check failed:');
   for (const e of errors) console.error('   - ' + e);
