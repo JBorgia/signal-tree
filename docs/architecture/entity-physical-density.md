@@ -1068,3 +1068,21 @@ shared target, change production storage, prove reachability equivalence, or
 choose object colocation over slot-indexed separation. Phase 1 remains active:
 the next falsifier is applying the composed update to a candidate physical target
 and proving the same-tick revision-plus-value case survives one atomic install.
+
+Candidate A reaches that next boundary at `a800e663`.
+`preparePhysicalSubjectTarget()` validates and normalizes every composed update
+before allocating the copied target Map. Existing subjects may receive either
+authority's fact while preserving the other; new subjects require both revision
+and value; duplicate physical updates and explicit-undefined bypasses reject
+before target mutation. Untouched records retain object identity. The killer
+same-subject case prepares revision 4 and a new value from revision 3 and an old
+value, leaves the live Map unchanged, then exposes both new facts after one
+target assignment.
+
+The focused suite now has 18 controls. Full validation is 253 kernel files /
+2,064 passed / 3 expected failures / 13 skipped / 1 todo, with both TypeScript
+passes and kernel lint green. This proves the object-record target can preserve
+multi-authority facts through off-store preparation and one assignment. It does
+not wire production stores to that target, establish non-throwing private
+installation across the whole EntityMap binding, measure density or latency, or
+defeat the slot-indexed rival.
