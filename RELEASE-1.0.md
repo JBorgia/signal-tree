@@ -843,6 +843,29 @@ cardinalities. All lifecycle collectability controls pass. Exact public `state`
 remains synchronous and unchanged; its collection-width allocation occurs only
 when the caller requests it.
 
+`SUBJECT-RECORD-PROMOTION-0` is **PRODUCT OPTIMIZATION EXPERIMENT / ACTIVE
+NEXT**. E0-E5 already attribute the physical, realization, and restoration
+owners; do not open another attribution row. Compare the split-store incumbent,
+one SubjectId-addressed record, and the normalized rival of one stable identity
+slot plus separate authority-owned slot stores. Adversarial confirmation finds
+no representation architecturally necessary: constant-hop access and duplicate
+SubjectId-index removal do not select one, and shared reachability must be proven
+before facts with potentially different lifetimes are colocated.
+
+The record candidate colocates EntityValueStore-owned value with
+StructuralStore-owned key, revision, active-node, and exceptional lifecycle
+facts without transferring mutation authority. Promotion is staged: value plus
+revision; active-by-subject parity and removal; common-active lifecycle
+compression; then an independent active-by-key decision. Restoration claims and
+realization cells are excluded. Each stage must preserve constant-hop access and
+the frozen identity, order, restoration, transaction, external-authority,
+held-facade, GC, and churn laws. The preregistered latency bands are <5%
+acceptable, 5-10% requiring a material attributed density win, and >10%
+rejected absent a separately frozen architecture requirement. The
+evidence-backed density target is 256-300 B/entity; semantics, reachability, and
+bounded high-water retention remain hard gates. A winner is an admissible
+production representation, not a semantic requirement.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
