@@ -3,9 +3,11 @@ import {
   assertPhysicalSubjectSlots,
   composePreparedSubjectUpdates,
   preparePhysicalSubjectForget,
+  preparePhysicalSubjectForgets,
   preparePhysicalSubjectSlotTarget,
   preparePhysicalSubjectTarget,
   preparePhysicalSubjectValueRelease,
+  preparePhysicalSubjectValueReleases,
 } from './subject-record-target';
 
 describe('composePreparedSubjectUpdates', () => {
@@ -351,5 +353,35 @@ describe('preparePhysicalSubjectSlotTarget', () => {
     expect(() => preparePhysicalSubjectForget(current(), 3)).toThrow(
       'Physical SubjectId 3 has no slot'
     );
+  });
+
+  it('prepares batch value release and terminal forget atomically', () => {
+    const live = current();
+
+    const released = preparePhysicalSubjectValueReleases(live, [1, 2]);
+    const forgotten = preparePhysicalSubjectForgets(live, [1, 2]);
+
+    expect(released.values).toEqual([undefined, undefined]);
+    expect(released.revisions).toEqual([3, 7]);
+    expect(forgotten.slotBySubject.size).toBe(0);
+    expect(forgotten.subjects).toEqual([undefined, undefined]);
+    expect(forgotten.revisions).toEqual([undefined, undefined]);
+    expect(forgotten.values).toEqual([undefined, undefined]);
+    expect(live.values).toEqual([
+      { id: 1, name: 'before' },
+      { id: 2, name: 'untouched' },
+    ]);
+  });
+
+  it('rejects an invalid batch before copying physical columns', () => {
+    const live = current();
+
+    expect(() => preparePhysicalSubjectValueReleases(live, [1, 3])).toThrow(
+      'Physical SubjectId 3 has no slot'
+    );
+    expect(() => preparePhysicalSubjectForgets(live, [1, 1])).toThrow(
+      'Duplicate physical SubjectId 1'
+    );
+    expect(live.values[0]).toEqual({ id: 1, name: 'before' });
   });
 });

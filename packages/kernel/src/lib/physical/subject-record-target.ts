@@ -183,9 +183,20 @@ export function preparePhysicalSubjectValueRelease<
   current: PhysicalSubjectSlots<E>,
   subjectId: number
 ): PhysicalSubjectSlots<E> {
-  const slot = requirePhysicalSubjectSlot(current, subjectId);
+  return preparePhysicalSubjectValueReleases(current, [subjectId]);
+}
+
+export function preparePhysicalSubjectValueReleases<
+  E extends Record<string, unknown>
+>(
+  current: PhysicalSubjectSlots<E>,
+  subjectIds: readonly number[]
+): PhysicalSubjectSlots<E> {
+  const slots = requireDistinctPhysicalSubjectSlots(current, subjectIds);
   const values = [...current.values];
-  values[slot] = undefined;
+  for (const slot of slots) {
+    values[slot] = undefined;
+  }
   return Object.freeze({
     ...current,
     values: Object.freeze(values),
@@ -196,15 +207,26 @@ export function preparePhysicalSubjectForget<E extends Record<string, unknown>>(
   current: PhysicalSubjectSlots<E>,
   subjectId: number
 ): PhysicalSubjectSlots<E> {
-  const slot = requirePhysicalSubjectSlot(current, subjectId);
+  return preparePhysicalSubjectForgets(current, [subjectId]);
+}
+
+export function preparePhysicalSubjectForgets<
+  E extends Record<string, unknown>
+>(
+  current: PhysicalSubjectSlots<E>,
+  subjectIds: readonly number[]
+): PhysicalSubjectSlots<E> {
+  const slots = requireDistinctPhysicalSubjectSlots(current, subjectIds);
   const slotBySubject = new Map(current.slotBySubject);
   const subjects = [...current.subjects];
   const revisions = [...current.revisions];
   const values = [...current.values];
-  slotBySubject.delete(subjectId);
-  subjects[slot] = undefined;
-  revisions[slot] = undefined;
-  values[slot] = undefined;
+  for (let index = 0; index < subjectIds.length; index += 1) {
+    slotBySubject.delete(subjectIds[index]);
+    subjects[slots[index]] = undefined;
+    revisions[slots[index]] = undefined;
+    values[slots[index]] = undefined;
+  }
   return Object.freeze({
     slotBySubject,
     subjects: Object.freeze(subjects),
@@ -223,6 +245,20 @@ function requirePhysicalSubjectSlot<E extends Record<string, unknown>>(
     throw new Error(`Physical SubjectId ${String(subjectId)} has no slot`);
   }
   return slot;
+}
+
+function requireDistinctPhysicalSubjectSlots<E extends Record<string, unknown>>(
+  current: PhysicalSubjectSlots<E>,
+  subjectIds: readonly number[]
+): number[] {
+  const seenSubjects = new Set<number>();
+  return subjectIds.map((subjectId) => {
+    if (seenSubjects.has(subjectId)) {
+      throw new Error(`Duplicate physical SubjectId ${String(subjectId)}`);
+    }
+    seenSubjects.add(subjectId);
+    return requirePhysicalSubjectSlot(current, subjectId);
+  });
 }
 
 export function assertPhysicalSubjectSlots<E extends Record<string, unknown>>(
