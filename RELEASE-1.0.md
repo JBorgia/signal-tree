@@ -798,6 +798,42 @@ consumers, provide historical materialization without retaining one eager
 full-tree snapshot per turn, then remove `CanonicalTurn.state` retention and run
 the active-density/E5 gates. `REALIZATION-OWNERSHIP-0` remains queued.
 
+`RESTORATION-HISTORICAL-MATERIALIZATION-0` is **CONTRACT RESOLVED / ORACLE
+IMPLEMENTATION NEXT**. Public `RestorationHistoryEntry<T>.state: T` promises
+exact historical state availability; no public type, test, or documentation
+promises eager settlement-time storage. `CanonicalTurn<T>` inheriting the
+public entry shape, constructor snapshot warming, snapshot-reference/deep-equal
+dedupe, and internal snapshot undo/redo are incumbent mechanisms. Public
+undo/redo and `jumpTo()` are effect/target based and case C stays green after
+every retained `state` is poisoned.
+
+Exact lazy materialization requires a compact event spine in addition to
+admitted causal turns. Undesignated and externally realized writes between two
+retained boundaries affect the later public state but not the earlier one; they
+cannot be recovered from admitted turns alone. The spine records compact facts
+for every committed historical event while at least one retained boundary needs
+them, but creates no undo turn, frontier, claim, or `canUndo()` step for
+undesignated/external work. Inspection and restoration-origin writes remain
+views, not historical truth.
+
+The detached synchronous materializer starts from current canonical truth and
+owner-scoped collection targets, walks the compact spine backward, applies
+scalar/structural/order facts to detached data only, and emits exact NaturalValue
+states at retained boundary ordinals. It never invokes live mutation ports,
+notifications, claims, or external-authority refusal. Eviction drops facts older
+than the oldest retained boundary; branching drops the discarded branch while
+preserving surviving gap events; reset/destroy clear the spine; zero capacity
+allocates none. Dense external replacement remains legitimately dense, but its
+facts are retained once between boundaries rather than as a full snapshot per
+turn.
+
+Implementation sequence is oracle-first: add the spine and detached projector
+while retaining eager `state`; compare reconstructed and eager values across
+scalar/entity/structural/transaction/gap/branch/eviction cases; route public and
+internal history reads through reconstruction; remove snapshot dedupe and
+warming; then delete internal `state` retention. Only after forced-GC durability
+and exact public-state tests pass may active-density/E5 run.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user
