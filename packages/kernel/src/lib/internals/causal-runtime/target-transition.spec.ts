@@ -222,27 +222,28 @@ describe('declarative target transition: whole-target compilation', () => {
     });
   });
 
-  it('rejects membership changes that omit positional truth', () => {
-    expect(() =>
-      targetFor(
-        [source(7, [[1, 'a', {}]])],
-        [
-          {
-            owner: 7,
-            subjectId: 2,
-            before: undefined,
-            after: 'b',
-            structural: 'add',
-            structuralContext: {
-              kind: 'add',
-              subject: 2,
-              key: 'b',
-              value: {},
-            },
+  it('derives membership order from retained structural anchors', () => {
+    const target = targetFor(
+      [source(7, [[1, 'a', {}]])],
+      [
+        {
+          owner: 7,
+          subjectId: 2,
+          before: undefined,
+          after: 'b',
+          structural: 'add',
+          structuralContext: {
+            kind: 'add',
+            subject: 2,
+            key: 'b',
+            value: {},
+            beforeSubject: 1,
           },
-        ]
-      )
-    ).toThrow('changes membership without positional truth');
+        },
+      ]
+    );
+
+    expect(target.collections.get(7)?.order).toEqual([1, 2]);
   });
 
   it('applies a key-derived field value by SubjectId before changing its key', () => {

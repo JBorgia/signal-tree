@@ -103,13 +103,13 @@ function createPendingRollbackEffects(
   turn: CausalTurn,
   realizationContext: RealizationContext
 ): readonly ReversalEffect[] {
-  const dominantStructuralEffectsBySubject = new Map<unknown, CausalTurn['effects'][number]>();
+  const dominantStructuralEffects: CausalTurn['effects'][number][] = [];
   for (const effect of turn.effects) {
     if (
       effect.subjectId !== undefined &&
       (effect.structural === 'add' || effect.structural === 'remove')
     ) {
-      dominantStructuralEffectsBySubject.set(effect.subjectId, effect);
+      dominantStructuralEffects.push(effect);
     }
   }
 
@@ -127,8 +127,8 @@ function createPendingRollbackEffects(
     .filter(
       (effect, index) => {
         if (effect.subjectId !== undefined) {
-          const dominantStructuralEffect = dominantStructuralEffectsBySubject.get(
-            effect.subjectId
+          const dominantStructuralEffect = dominantStructuralEffects.find(
+            (candidate) => sameSubjectScope(candidate, effect)
           );
           if (dominantStructuralEffect) {
             return dominantStructuralEffect === effect;
@@ -266,7 +266,10 @@ function hasLaterStructuralDependency(
 
     if (pendingEffect.structural === 'add') {
       return laterTurns.some((turn) =>
-        turn.effects.some((effect) => effect.subjectId === pendingEffect.subjectId)
+        turn.effects.some(
+          (effect) =>
+            sameSubjectScope(effect, pendingEffect)
+        )
       );
     }
 
@@ -275,7 +278,9 @@ function hasLaterStructuralDependency(
       restoredStructuralResource !== undefined &&
       laterTurns.some((turn) =>
         turn.effects.some(
-          (effect) => getAcquiredStructuralResource(effect) === restoredStructuralResource
+          (effect) =>
+            getAcquiredStructuralResource(effect) === restoredStructuralResource &&
+            sameStructuralScope(effect, pendingEffect)
         )
       )
     ) {
@@ -285,10 +290,35 @@ function hasLaterStructuralDependency(
     return laterTurns.some((turn) =>
       turn.effects.some(
         (effect) =>
-          effect.subjectId === pendingEffect.subjectId && effect.structural !== undefined
+          effect.structural !== undefined && sameSubjectScope(effect, pendingEffect)
       )
     );
   });
+}
+
+function sameSubjectScope(
+  left: CausalTurn['effects'][number],
+  right: CausalTurn['effects'][number]
+): boolean {
+  if (left.subjectId !== right.subjectId) {
+    return false;
+  }
+  const leftOwnerPath = (left as { ownerPath?: unknown }).ownerPath;
+  const rightOwnerPath = (right as { ownerPath?: unknown }).ownerPath;
+  return typeof leftOwnerPath === 'string' && typeof rightOwnerPath === 'string'
+    ? leftOwnerPath === rightOwnerPath
+    : true;
+}
+
+function sameStructuralScope(
+  left: CausalTurn['effects'][number],
+  right: CausalTurn['effects'][number]
+): boolean {
+  const leftOwnerPath = (left as { ownerPath?: unknown }).ownerPath;
+  const rightOwnerPath = (right as { ownerPath?: unknown }).ownerPath;
+  return typeof leftOwnerPath === 'string' && typeof rightOwnerPath === 'string'
+    ? leftOwnerPath === rightOwnerPath
+    : left.owner === right.owner;
 }
 
 function getRestoredStructuralResource(

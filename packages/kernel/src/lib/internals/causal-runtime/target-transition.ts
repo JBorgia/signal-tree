@@ -97,6 +97,33 @@ export type CollectionOrderDelta = {
   readonly participants: readonly CollectionOrderParticipant[];
 };
 
+export function requiresDeclarativeStructuralTarget(
+  effects: readonly ReversalEffect[]
+): boolean {
+  const structural = effects.filter(
+    (effect) => effect.structural !== undefined
+  );
+  return structural.some((vacating, vacatingIndex) => {
+    const vacatedKey =
+      vacating.structural === 'remove' || vacating.structural === 'rekey'
+        ? vacating.before
+        : undefined;
+    if (vacatedKey === undefined) {
+      return false;
+    }
+    return structural.some((occupying, occupyingIndex) => {
+      if (vacatingIndex === occupyingIndex || vacating.owner !== occupying.owner) {
+        return false;
+      }
+      const occupiedKey =
+        occupying.structural === 'add' || occupying.structural === 'rekey'
+          ? occupying.after
+          : undefined;
+      return occupiedKey !== undefined && Object.is(vacatedKey, occupiedKey);
+    });
+  });
+}
+
 export function deriveDeclarativeTransitionTarget(
   options: DeriveDeclarativeTransitionTargetOptions
 ): DeclarativeTransitionTarget {
@@ -147,14 +174,6 @@ export function deriveDeclarativeTransitionTarget(
   const targets = new Map<PositionId, CollectionTransitionTarget>();
   for (const [owner, collection] of collections) {
     const delta = orderDeltas.get(owner);
-    if (
-      !delta &&
-      !sameSubjects(collection.sourceSubjects, collection.subjects)
-    ) {
-      throw new Error(
-        `Collection transition target ${owner} changes membership without positional truth`
-      );
-    }
     const order = delta
       ? applyCollectionOrderDelta(
           collection.order,
@@ -163,12 +182,11 @@ export function deriveDeclarativeTransitionTarget(
           options.collections.find((source) => source.owner === owner)
             ?.orderFrontier
         )
-      : collection.order.filter((subject) => collection.subjects.has(subject));
-    for (const subject of collection.subjects.keys()) {
-      if (!order.includes(subject)) {
-        order.push(subject);
-      }
-    }
+      : deriveStructuralTargetOrder(
+          collection.order,
+          collection.subjects,
+          options.effects.filter((effect) => effect.owner === owner)
+        );
     assertCollectionOrderMatchesSubjects(order, collection.subjects);
     assertUniqueTargetKeys(collection.subjects);
     targets.set(owner, {
@@ -182,7 +200,11 @@ export function deriveDeclarativeTransitionTarget(
           ? delta.beforeFrontier
           : delta.afterFrontier
         : options.collections.find((source) => source.owner === owner)
-            ?.orderFrontier,
+            ?.orderFrontier === undefined ||
+            sameSubjects(collection.sourceSubjects, collection.subjects)
+          ? options.collections.find((source) => source.owner === owner)
+              ?.orderFrontier
+          : {},
     });
   }
 
@@ -402,15 +424,100 @@ function applyStructuralEffect(
     );
   }
   if (effect.structural === 'remove') {
+    if (existing.key !== effect.before) {
+      throw new Error(`Subject ${subject} is not at its expected source key`);
+    }
     collection.subjects.delete(subject);
     return;
   }
 
+  if (existing.key !== effect.before) {
+    throw new Error(`Subject ${subject} is not at its expected source key`);
+  }
   const key = effect.after;
   if (typeof key !== 'string' && typeof key !== 'number') {
     throw new Error(`Rekeyed subject ${subject} has no target key`);
   }
   collection.subjects.set(subject, { ...existing, key });
+}
+
+function deriveStructuralTargetOrder(
+  sourceOrder: readonly number[],
+  subjects: ReadonlyMap<number, CollectionTargetSubject>,
+  effects: readonly ReversalEffect[]
+): number[] {
+  const order = sourceOrder.filter((subject) => subjects.has(subject));
+  const additions = effects.filter(
+    (effect) => effect.structural === 'add' && typeof effect.subjectId === 'number'
+  );
+  const pending = [...additions];
+
+  while (pending.length > 0) {
+    const pendingSubjects = new Set(
+      pending.map((effect) => effect.subjectId as number)
+    );
+    const readyIndex = pending.findIndex((effect) => {
+      const context = effect.structuralContext;
+      if (context?.kind !== 'add' && context?.kind !== 'remove') {
+        return true;
+      }
+      const beforeLive =
+        context.beforeSubject !== undefined &&
+        order.includes(context.beforeSubject);
+      const afterLive =
+        context.afterSubject !== undefined && order.includes(context.afterSubject);
+      if (beforeLive || afterLive) {
+        return true;
+      }
+      const hasNoAnchors =
+        context.beforeSubject === undefined && context.afterSubject === undefined;
+      if (hasNoAnchors) {
+        return true;
+      }
+      const anchorMayBecomeLive =
+        (context.beforeSubject !== undefined &&
+          pendingSubjects.has(context.beforeSubject)) ||
+        (context.afterSubject !== undefined &&
+          pendingSubjects.has(context.afterSubject));
+      return !anchorMayBecomeLive;
+    });
+    if (readyIndex < 0) {
+      throw new Error('Collection structural target contains an anchor cycle');
+    }
+    const effect = pending.splice(readyIndex, 1)[0];
+    const subject = effect.subjectId as number;
+    const context = effect.structuralContext;
+    const beforeSubject =
+      context?.kind === 'add' || context?.kind === 'remove'
+        ? context.beforeSubject
+        : undefined;
+    const afterSubject =
+      context?.kind === 'add' || context?.kind === 'remove'
+        ? context.afterSubject
+        : undefined;
+    const afterIndex =
+      afterSubject === undefined ? -1 : order.indexOf(afterSubject);
+    const beforeIndex =
+      beforeSubject === undefined ? -1 : order.indexOf(beforeSubject);
+    if (beforeIndex >= 0 && afterIndex >= 0 && beforeIndex >= afterIndex) {
+      throw new Error('Collection structural target contains contradictory anchors');
+    }
+    if (afterIndex >= 0) {
+      order.splice(afterIndex, 0, subject);
+      continue;
+    }
+    if (beforeIndex >= 0) {
+      order.splice(beforeIndex + 1, 0, subject);
+      continue;
+    }
+    if (beforeSubject === undefined && afterSubject === undefined) {
+      order.push(subject);
+      continue;
+    }
+    throw new Error('Collection structural target has no live placement anchor');
+  }
+
+  return order;
 }
 
 function applyValueEffect(
