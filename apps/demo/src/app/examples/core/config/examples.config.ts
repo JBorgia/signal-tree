@@ -145,13 +145,13 @@ export const devtoolsExampleMeta: ExampleMeta = {
  */
 export const serializationExampleMeta: ExampleMeta = {
   id: 'serialization',
-  title: 'Serialization',
+  title: 'Application-Owned Serialization',
   description:
-    'Export and import state as JSON with automatic type preservation for Date, Set, Map, and more.',
+    'Why v15 removed the serialization enhancer and where applications now own payload formats, migrations, and hydration.',
   category: 'Data Management',
   focusAreas: ['serialization', 'json', 'type-preservation'],
   functionalUse: ['state-export', 'state-import', 'data-transfer'],
-  enhancers: ['serialization'],
+  enhancers: [],
   route: '/serialization',
   component: SerializationDemoComponent,
   difficulty: 'intermediate',
@@ -195,9 +195,9 @@ export const restorationExampleMeta: ExampleMeta = {
  */
 export const formsExampleMeta: ExampleMeta = {
   id: 'forms-integration',
-  title: 'Forms Integration',
+  title: 'Angular-Owned Forms',
   description:
-    'Signal-based form validation with real-time feedback and password strength.',
+    'Angular form validation with ordinary SignalTree state at the application boundary.',
   category: 'Signals',
   focusAreas: ['forms', 'validation', 'computed'],
   functionalUse: ['form-handling', 'validation', 'user-input'],
@@ -258,7 +258,7 @@ export const EXAMPLES_REGISTRY: ExampleMeta[] = [
     id: 'whats-new',
     title: "What's New",
     description:
-      'Latest: SignalTree 15 retires the async markers — debounce, dedup and\n      latest-wins are RxJS, and the tree stores the result.',
+      'Latest: SignalTree 15.0.0-rc.1 — construction-bound realization, undoable() designation, transactions(), and the @signal-tree package reset. Older sections are release history.',
     category: 'General',
     focusAreas: ['news', 'changelog'],
     functionalUse: ['release-notes'],

@@ -6,7 +6,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { patchState, signalState } from '@ngrx/signals';
-import { batching, signalTree } from '@signal-tree/kernel';
+import { batching, signalTree } from '@signal-tree/angular';
 
 import { PerformanceGraphComponent } from '../../../shared/performance-graph/performance-graph.component';
 import { BenchmarkCalibrationService } from '../benchmark-calibration.service';

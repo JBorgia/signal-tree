@@ -1,6 +1,11 @@
-
-import { Component, computed, effect, signal, ChangeDetectionStrategy } from '@angular/core';
-import { entityMap, signalTree } from '@signal-tree/kernel';
+import {
+  Component,
+  computed,
+  effect,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import { entityMap, signalTree } from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 

@@ -1,5 +1,12 @@
-import { Component, effect, inject, Injector, signal, ChangeDetectionStrategy } from '@angular/core';
-import { batching, signalTree } from '@signal-tree/kernel';
+import {
+  Component,
+  effect,
+  inject,
+  Injector,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import { batching, signalTree } from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../../shared/components/example-shell';
 
@@ -80,20 +87,22 @@ export class BatchingComparisonComponent {
       },
       { injector: this.injector }
     );
+    try {
+      const n = this.ops();
+      const start = performance.now();
+      for (let i = 0; i < n; i++) {
+        tree.$.counter.set(i + 1);
+      }
+      const elapsed = performance.now() - start;
 
-    const n = this.ops();
-    const start = performance.now();
-    for (let i = 0; i < n; i++) {
-      tree.$.counter.set(i + 1);
+      await this.settle();
+      this.unbatchedTime.set(elapsed);
+      this.unbatchedWrites.set(appliedWrites());
+      this.unbatchedRenders.set(renders);
+    } finally {
+      ref.destroy();
+      tree.destroy();
     }
-    const elapsed = performance.now() - start;
-
-    await this.settle();
-    ref.destroy();
-
-    this.unbatchedTime.set(elapsed);
-    this.unbatchedWrites.set(appliedWrites());
-    this.unbatchedRenders.set(renders);
   }
 
   private async runBatched(): Promise<void> {
@@ -119,24 +128,26 @@ export class BatchingComparisonComponent {
       },
       { injector: this.injector }
     );
+    try {
+      const n = this.ops();
+      const start = performance.now();
+      // coalesce() dedupes same-path writes — only the final value is applied
+      // to the underlying signal when the callback completes.
+      tree.coalesce(() => {
+        for (let i = 0; i < n; i++) {
+          tree.$.counter.set(i + 1);
+        }
+      });
+      const elapsed = performance.now() - start;
 
-    const n = this.ops();
-    const start = performance.now();
-    // coalesce() dedupes same-path writes — only the final value is applied
-    // to the underlying signal when the callback completes.
-    tree.coalesce(() => {
-      for (let i = 0; i < n; i++) {
-        tree.$.counter.set(i + 1);
-      }
-    });
-    const elapsed = performance.now() - start;
-
-    await this.settle(this.batchNotificationDelayMs());
-    ref.destroy();
-
-    this.batchedTime.set(elapsed);
-    this.batchedWrites.set(appliedWrites());
-    this.batchedRenders.set(renders);
+      await this.settle(this.batchNotificationDelayMs());
+      this.batchedTime.set(elapsed);
+      this.batchedWrites.set(appliedWrites());
+      this.batchedRenders.set(renders);
+    } finally {
+      ref.destroy();
+      tree.destroy();
+    }
   }
 
   /** Wait long enough for effects (and any delayed notification) to flush. */

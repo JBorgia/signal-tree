@@ -1,6 +1,8 @@
 import {
   Component,
   computed,
+  DestroyRef,
+  inject,
   signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
@@ -12,7 +14,7 @@ import {
   signalTree,
   restoration,
   undoable,
-} from '@signal-tree/kernel';
+} from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
@@ -57,6 +59,8 @@ interface RestorationHistoryEntry {
   styleUrl: './restoration-demo.component.scss',
 })
 export class RestorationDemoComponent {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly timers = new Set<ReturnType<typeof setTimeout>>();
   newTodoText = '';
 
   // ===========================================================================
@@ -111,7 +115,24 @@ export class RestorationDemoComponent {
   // awaits `flush()` between writes: without it, several writes collapse into
   // one history entry and an undo appears to do nothing.)
   private refreshMarkerState(action?: string) {
-    setTimeout(() => this.commitMarkerState(action), 0);
+    this.schedule(() => this.commitMarkerState(action), 0);
+  }
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      for (const timer of this.timers) clearTimeout(timer);
+      this.timers.clear();
+      this.markerTree.destroy();
+      this.tree.destroy();
+    });
+  }
+
+  private schedule(action: () => void, delay: number): void {
+    const timer = setTimeout(() => {
+      this.timers.delete(timer);
+      action();
+    }, delay);
+    this.timers.add(timer);
   }
 
   private commitMarkerState(action?: string) {
@@ -408,7 +429,7 @@ export class RestorationDemoComponent {
     this.tree.resetRestorationHistory();
 
     // Create a sequence of actions with delays for better history visualization
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         message: 'Starting demo...',
@@ -416,7 +437,7 @@ export class RestorationDemoComponent {
       this.refreshTimeTravelState();
     }, 100);
 
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         counter: 1,
@@ -424,7 +445,7 @@ export class RestorationDemoComponent {
       this.refreshTimeTravelState();
     }, 200);
 
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         todos: [{ id: Date.now(), title: 'First task', completed: false }],
@@ -432,7 +453,7 @@ export class RestorationDemoComponent {
       this.refreshTimeTravelState();
     }, 300);
 
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         counter: 5,
@@ -440,7 +461,7 @@ export class RestorationDemoComponent {
       this.refreshTimeTravelState();
     }, 400);
 
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         message: 'Making more changes...',
@@ -448,7 +469,7 @@ export class RestorationDemoComponent {
       this.refreshTimeTravelState();
     }, 500);
 
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         todos: [
@@ -459,7 +480,7 @@ export class RestorationDemoComponent {
       this.refreshTimeTravelState();
     }, 600);
 
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         counter: 10,
@@ -467,7 +488,7 @@ export class RestorationDemoComponent {
       this.refreshTimeTravelState();
     }, 700);
 
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         todos: state.todos.map((todo, i) =>
@@ -477,7 +498,7 @@ export class RestorationDemoComponent {
       this.refreshTimeTravelState();
     }, 800);
 
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         message: 'Demo complete! Try undo/redo now.',
@@ -485,7 +506,7 @@ export class RestorationDemoComponent {
       this.refreshTimeTravelState();
     }, 900);
 
-    setTimeout(() => {
+    this.schedule(() => {
       this.updateTree((state: AppState) => ({
         ...state,
         counter: 15,

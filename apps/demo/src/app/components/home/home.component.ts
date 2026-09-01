@@ -70,7 +70,7 @@ export class HomeComponent {
     {
       title: 'Read package docs',
       description:
-        'Browse the core package first, then optional packages like events and forms.',
+        'Browse the Angular realization, framework-neutral kernel, and React observation packages.',
       route: '/docs',
       cta: 'Browse documentation →',
     },
@@ -92,12 +92,26 @@ export class HomeComponent {
 
   readonly packageCards: HomeLinkCard[] = [
     {
-      title: '@signal-tree/kernel',
+      title: '@signal-tree/angular',
       description:
-        'The main package: state tree, entity maps, batching, DevTools, restoration, and serialization.',
+        'Angular-native construction, signals, dependency injection, and lifecycle.',
       route: '/docs',
-      cta: 'Read core docs →',
-      queryParams: { package: 'core' },
+      cta: 'Read Angular docs →',
+      queryParams: { package: 'angular' },
+    },
+    {
+      title: '@signal-tree/kernel',
+      description: 'Framework-neutral state and causal semantics.',
+      route: '/docs',
+      cta: 'Read kernel docs →',
+      queryParams: { package: 'kernel' },
+    },
+    {
+      title: '@signal-tree/react',
+      description: 'Owner-bound React observation.',
+      route: '/docs',
+      cta: 'Read React docs →',
+      queryParams: { package: 'react' },
     },
   ];
 
@@ -200,8 +214,8 @@ export class HomeComponent {
     {
       label: 'install.sh',
       language: 'bash',
-      source: `# Install the core package
-npm install @signal-tree/kernel
+      source: `# Install the Angular realization
+    npm install @signal-tree/angular@15.0.0-rc.1
 `,
     },
     {
@@ -213,7 +227,7 @@ import {
   batching,
   devTools,
   restoration
-} from '@signal-tree/kernel';
+} from '@signal-tree/angular';
 
 const appTree = signalTree({
   user: {
@@ -282,7 +296,7 @@ appTree.$.user.profile.name.set('Grace Hopper');`,
     {
       label: 'extreme-depth.ts',
       language: 'typescript',
-      source: `import { signalTree } from '@signal-tree/kernel';
+      source: `import { signalTree } from '@signal-tree/angular';
 
 // Deep nested state with strong type inference
 const extremeDepth = signalTree({

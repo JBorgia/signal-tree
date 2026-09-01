@@ -1,6 +1,6 @@
 import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { devTools, signalTree } from '@signal-tree/kernel';
+import { devTools, signalTree } from '@signal-tree/angular';
 
 import {
   type CodeFile,
@@ -34,7 +34,7 @@ interface ActionRecord {
 }
 
 // Source shown in the st-example code panel (mirrors the store setup below).
-const STORE_SOURCE = `import { devTools, signalTree } from '@signal-tree/kernel';
+const STORE_SOURCE = `import { devTools, signalTree } from '@signal-tree/angular';
 
 const store = signalTree(
   {

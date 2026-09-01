@@ -32,7 +32,7 @@ export class AsyncDemoComponent {
     {
       label: 'store.ts',
       language: 'typescript',
-      source: `import { signalTree, external } from '@signal-tree/kernel';
+      source: `import { signalTree, external } from '@signal-tree/angular';
 import { Subject, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs';
 

@@ -1,8 +1,7 @@
-
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { entityMap, signalTree } from '@signal-tree/kernel';
+import { entityMap, signalTree } from '@signal-tree/angular';
 
 import { CodeTabsComponent } from '../../examples/shared/components/example-shell';
 import type { CodeFile } from '../../examples/shared/components/example-shell';

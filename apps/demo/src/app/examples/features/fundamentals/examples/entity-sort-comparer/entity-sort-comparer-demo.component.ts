@@ -1,6 +1,5 @@
-
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { entityMap, signalTree } from '@signal-tree/kernel';
+import { entityMap, signalTree } from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
@@ -29,7 +28,10 @@ interface LeaderboardState {
   standalone: true,
   imports: [ExampleComponent],
   template: `
-    <st-example heading="Auto-sorted collection — sortComparer" [headingLevel]="1">
+    <st-example
+      heading="Auto-sorted collection — sortComparer"
+      [headingLevel]="1"
+    >
       <p intro class="muted">
         <code
           >entityMap&lt;Player&gt;({{ '{' }} sortComparer: (a, b) =&gt; b.score

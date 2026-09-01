@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import { batching, signalTree } from '@signal-tree/kernel';
+import { batching, signalTree } from '@signal-tree/angular';
 
 /**
  * @fileoverview Comprehensive benchmarking suite for SignalTree Demo
@@ -583,11 +583,11 @@ export class BenchmarkService {
       string,
       Record<string, number>
     >;
-    const avgInitTime = (
-      initialization['small']['time'] +
-      initialization['medium']['time'] +
-      initialization['large']['time']
-    ) / 3;
+    const avgInitTime =
+      (initialization['small']['time'] +
+        initialization['medium']['time'] +
+        initialization['large']['time']) /
+      3;
 
     if (avgInitTime < 5) {
       analysis.performance.grade = 'A+';

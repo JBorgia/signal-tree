@@ -1,6 +1,12 @@
-
-import { Component, computed, signal, Signal, ChangeDetectionStrategy } from '@angular/core';
-import { entityMap, signalTree } from '@signal-tree/kernel';
+import {
+  Component,
+  computed,
+  signal,
+  Signal,
+  ChangeDetectionStrategy,
+  OnDestroy,
+} from '@angular/core';
+import { entityMap, signalTree } from '@signal-tree/angular';
 
 import type { EntityMapMarker } from '@signal-tree/kernel';
 
@@ -35,45 +41,51 @@ interface Row {
   standalone: true,
   imports: [ExampleComponent],
   template: `
-    <st-example heading="Granular reactivity — how many derivations re-run?" [headingLevel]="1">
+    <st-example
+      heading="Granular reactivity — how many derivations re-run?"
+      [headingLevel]="1"
+    >
       <p intro class="muted">
-        Both columns isolate <em>renders</em> (Angular <code>computed()</code>
-        equality). Watch <strong>derivations re-run per change</strong> instead:
-        SignalTree re-runs only the touched entity's; the naive single signal
-        re-runs all {{ n }}.
+        Both columns isolate <em>renders</em> (Angular
+        <code>computed()</code> equality). Watch
+        <strong>derivations re-run per change</strong> instead: SignalTree
+        re-runs only the touched entity's; the naive single signal re-runs all
+        {{ n }}.
       </p>
 
       <section class="demo">
-      <div class="cols">
-        <div class="col">
-          <h3>SignalTree <code>entityMap</code></h3>
-          <button type="button" (click)="bumpTree()">Bump a random row</button>
-          <p class="metric">
-            derivations re-run on last change:
-            <strong [class.good]="treeDelta() <= 1">{{ treeDelta() }}</strong>
-            / {{ n }}
-          </p>
-          <p class="muted total">total since load: {{ treeTotal() }}</p>
+        <div class="cols">
+          <div class="col">
+            <h3>SignalTree <code>entityMap</code></h3>
+            <button type="button" (click)="bumpTree()">
+              Bump a random row
+            </button>
+            <p class="metric">
+              derivations re-run on last change:
+              <strong [class.good]="treeDelta() <= 1">{{ treeDelta() }}</strong>
+              / {{ n }}
+            </p>
+            <p class="muted total">total since load: {{ treeTotal() }}</p>
+          </div>
+
+          <div class="col">
+            <h3>Naive <code>signal(object)</code></h3>
+            <button type="button" (click)="bumpRaw()">Bump a random row</button>
+            <p class="metric">
+              derivations re-run on last change:
+              <strong [class.bad]="rawDelta() > 1">{{ rawDelta() }}</strong>
+              / {{ n }}
+            </p>
+            <p class="muted total">total since load: {{ rawTotal() }}</p>
+          </div>
         </div>
 
-        <div class="col">
-          <h3>Naive <code>signal(object)</code></h3>
-          <button type="button" (click)="bumpRaw()">Bump a random row</button>
-          <p class="metric">
-            derivations re-run on last change:
-            <strong [class.bad]="rawDelta() > 1">{{ rawDelta() }}</strong>
-            / {{ n }}
-          </p>
-          <p class="muted total">total since load: {{ rawTotal() }}</p>
-        </div>
-      </div>
-
-      <p class="muted">
-        After a few bumps the SignalTree side stays at <strong>1</strong>; the
-        naive side re-runs all {{ n }} every time. Renders look identical — the
-        difference is the wasted derivation work the naive pattern can't avoid
-        without hand-rolling a signal per field.
-      </p>
+        <p class="muted">
+          After a few bumps the SignalTree side stays at <strong>1</strong>; the
+          naive side re-runs all {{ n }} every time. Renders look identical —
+          the difference is the wasted derivation work the naive pattern can't
+          avoid without hand-rolling a signal per field.
+        </p>
       </section>
     </st-example>
   `,
@@ -114,7 +126,7 @@ interface Row {
     `,
   ],
 })
-export class GranularReactivityDemoComponent {
+export class GranularReactivityDemoComponent implements OnDestroy {
   readonly n = 6;
 
   // Body-execution counters incremented INSIDE each row's derivation.
@@ -165,6 +177,10 @@ export class GranularReactivityDemoComponent {
     // Prime both (initial body run for each).
     this.flush(this.treeDerivations);
     this.flush(this.rawDerivations);
+  }
+
+  ngOnDestroy(): void {
+    this.tree.destroy();
   }
 
   private flush(derivs: Signal<number>[]): void {

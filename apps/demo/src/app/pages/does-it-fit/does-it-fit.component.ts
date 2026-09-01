@@ -309,14 +309,14 @@ export class DoesItFitComponent {
         },
         {
           capability: 'Loading / error status',
-          signaltree: 'yes',
+          signaltree: 'no',
           ngrxSignals: 'partial',
           elf: 'partial',
           ngxs: 'partial',
         },
         {
           capability: 'Async source / query primitive',
-          signaltree: 'yes',
+          signaltree: 'no',
           ngrxSignals: 'partial',
           elf: 'no',
           ngxs: 'no',
@@ -324,7 +324,7 @@ export class DoesItFitComponent {
         {
           capability:
             'Request caching / single-flight dedup / tag invalidation',
-          signaltree: 'yes',
+          signaltree: 'no',
           ngrxSignals: 'no',
           elf: 'no',
           ngxs: 'no',
@@ -339,14 +339,14 @@ export class DoesItFitComponent {
         },
         {
           capability: 'Form model + validators',
-          signaltree: 'yes',
+          signaltree: 'no',
           ngrxSignals: 'no',
           elf: 'no',
           ngxs: 'no',
         },
         {
           capability: 'Form wizard',
-          signaltree: 'yes',
+          signaltree: 'no',
           ngrxSignals: 'no',
           elf: 'no',
           ngxs: 'no',
@@ -358,7 +358,7 @@ export class DoesItFitComponent {
       rows: [
         {
           capability: 'Persistence',
-          signaltree: 'yes',
+          signaltree: 'no',
           ngrxSignals: 'no',
           elf: 'yes',
           ngxs: 'yes',
@@ -494,14 +494,14 @@ export class DoesItFitComponent {
       workload: 'Offline-first with server-owned collections',
       domains: 'Field service, mobile operations',
       fit: 'signaltree',
-      best: 'SignalTree — loader + hydrateThenRevalidate ship as one config key',
+      best: 'SignalTree — EntityMap owns local identity; application services own loading, freshness, and offline policy',
       usual: 'SignalTree',
     },
     {
       workload: 'Deep nested forms with audit and persistence',
       domains: 'Healthcare, claims, regulated workflows',
-      fit: 'signaltree',
-      best: 'SignalTree — form(), history(), stored() are primitives here and assembly elsewhere',
+      fit: 'neutral',
+      best: 'Use Angular forms and application-owned persistence; SignalTree contributes nested state and designated restoration only when those earn their place',
       usual: 'Toss-up; governance and procurement often decide',
     },
     {

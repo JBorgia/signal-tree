@@ -94,7 +94,7 @@ export class CartView {
       audience: "I'm ready to build",
       title: 'Run the fundamentals',
       description:
-        'Open a working playground with the core APIs in one page — entityMap, status, stored, callable branches, and forms.',
+        'Open a working playground with v15 construction, EntityMap, callable branches, external truth, transactions, and restoration.',
       route: '/examples/fundamentals',
       cta: 'Open fundamentals →',
     },
@@ -110,7 +110,7 @@ export class CartView {
       audience: 'I want the full reference',
       title: 'Browse package docs',
       description:
-        'Core API surface, plus the optional events package. Every type, every signature.',
+        'Browse the kernel, Angular realization, and React observation package surfaces.',
       route: '/docs',
       cta: 'Open docs →',
     },

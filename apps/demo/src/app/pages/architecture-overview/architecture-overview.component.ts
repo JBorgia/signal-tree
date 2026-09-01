@@ -30,8 +30,9 @@ export class ArchitectureOverviewComponent {
       aspect: 'Dependencies',
       separate:
         'Multiple packages (@signal-tree/kernel, @signaltree/entities, @signaltree/computed…)',
-      consolidated: '@signal-tree/kernel (includes all enhancers)',
-      benefit: 'Simplified dependency management',
+      consolidated:
+        '@signal-tree/angular for Angular construction; kernel is an exact dependency',
+      benefit: 'Framework ownership is explicit',
     },
     {
       aspect: 'Type Safety',
@@ -69,8 +70,8 @@ export class ArchitectureOverviewComponent {
     },
     {
       label: 'Dependency Count',
-      value: '1 package',
-      description: 'One versioned package for all enhancers',
+      value: '3 public packages',
+      description: 'Kernel semantics plus Angular and React realizations',
     },
     {
       label: 'Type Conflicts',
@@ -98,13 +99,13 @@ export class ArchitectureOverviewComponent {
     {
       label: 'consolidated.ts',
       language: 'typescript',
-      source: `// Current approach - all enhancers in core
+      source: `// Angular applications construct through the Angular realization
 import {
   signalTree,
   batching,
   devTools,
   entityMap,
-} from '@signal-tree/kernel';`,
+    } from '@signal-tree/angular';`,
     },
   ];
 

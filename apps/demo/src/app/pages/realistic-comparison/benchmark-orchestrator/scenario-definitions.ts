@@ -185,33 +185,6 @@ export const ENHANCED_TEST_CASES: BenchmarkTestCase[] = [
     },
   },
   {
-    id: 'serialization',
-    name: 'Serialization (Snapshot + JSON)',
-    description: 'Convert state to plain JSON (unwrap + stringify)',
-    operations: 'Per iteration',
-    complexity: 'Medium',
-    selected: false,
-    category: 'core',
-    purpose: 'Measures serialization overhead and JSON conversion performance',
-    frequencyWeight: 0.8, // Below normal - Only needed for persistence, debugging, SSR
-    realWorldFrequency:
-      'Low - State persistence, debugging, server-side rendering',
-    architecturalTradeOffs:
-      'Direct JSON serialization vs complex immutable structure traversal',
-    enhancers: {
-      required: ['serialization', 'highPerformanceBatching'],
-      optional: [],
-      rationale:
-        "Testing serialization feature; memoization and batching stabilize signal read patterns before snapshot. Serialization enhancer performs unwrap + JSON conversion; memoization ensures dependent computed signals aren't re-evaluated spuriously.",
-    },
-    dataRequirements: {
-      minSize: 100,
-      maxSize: 10000,
-      defaultSize: 1000,
-      scalesWith: 'exponential',
-    },
-  },
-  {
     id: 'concurrent-updates',
     name: 'Rapid Sequential Updates',
     description: 'High-frequency sequential modifications',
