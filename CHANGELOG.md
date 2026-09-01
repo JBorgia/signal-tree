@@ -1,4 +1,4 @@
-## Unreleased
+## 15.0.0-rc.2 (2026-09-01)
 
 - **Package consolidation:** the private `@signaltree/shared` workspace package
   is removed. Its live utilities now belong to kernel internals, leaving the
