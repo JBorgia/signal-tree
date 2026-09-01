@@ -141,11 +141,11 @@ function barrelsFor(pkgDir) {
   const { exports: map } = JSON.parse(readFileSync(pkgJson, 'utf8'));
   if (!map) return [];
   const out = new Set();
-  for (const entry of Object.values(map)) {
+  for (const [subpath, entry] of Object.entries(map)) {
     const types = typeof entry === 'object' ? entry?.types : entry;
     if (typeof types !== 'string' || !types.endsWith('.d.ts')) continue;
-    // ./src/index.d.ts -> <pkg>/src/index.ts
-    const src = join(pkgDir, types.replace(/\.d\.ts$/, '.ts'));
+    const sourceEntry = subpath === '.' ? 'index' : subpath.replace(/^\.\//, '');
+    const src = join(pkgDir, 'src', `${sourceEntry}.ts`);
     out.add(relative(ROOT, src));
   }
   return [...out];
@@ -306,12 +306,12 @@ function codesAt(rev) {
  */
 const SURFACES = [
   {
-    name: 'core README',
+    name: 'kernel README',
     files: ['packages/kernel/README.md'],
     applies: (r) =>
       !r.isCode &&
       (r.kind === 'value' || r.kind === 'member') &&
-      r.pkg === 'core',
+      r.pkg === 'kernel',
   },
   {
     name: 'error registry',

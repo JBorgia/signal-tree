@@ -13,10 +13,10 @@
     ],
     "paths": {
       "@signal-tree/kernel": [
-        "packages/kernel/src/index.ts"
+        "dist/packages/kernel/dist/index.d.ts"
       ],
       "@signal-tree/kernel/adapter": [
-        "packages/kernel/src/adapter.ts"
+        "dist/packages/kernel/dist/adapter.d.ts"
       ]
     }
   },

@@ -6,6 +6,14 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/apps/react-reference',
+  resolve: {
+    alias: {
+      '@signal-tree/kernel/adapter': new URL(
+        '../../packages/kernel/src/adapter.ts',
+        import.meta.url
+      ).pathname,
+    },
+  },
   server: {
     port: 4200,
     host: 'localhost',

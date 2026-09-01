@@ -28,11 +28,6 @@ const options = {
       glob: 'package.json',
       output: '.',
     },
-    {
-      input: 'packages/kernel/src',
-      glob: '**/*.d.ts',
-      output: './src',
-    },
   ],
   deleteOutputPath: true,
   buildLibsFromSource: true,

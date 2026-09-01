@@ -256,6 +256,10 @@ resource reclamation.
 Angular's `defineStore` binds tree destruction to `DestroyRef`. Direct kernel
 construction remains the caller's responsibility.
 
+Failed pending-transaction rollback throws `SignalTreeRollbackError`, whose
+stable `code` and structured `cause` distinguish refusal from application
+errors.
+
 ## Exports
 
 The package publishes two code entry points:
@@ -265,6 +269,14 @@ The package publishes two code entry points:
 
 The adapter entry point is the framework-neutral realization SDK. It is not a
 compatibility layer or an application convenience surface.
+
+- `createSignalTreeFactory(realization)` binds a framework realization to tree
+  construction.
+- `observeOwnerInvalidation(owner, callback)` wakes a framework observer so it
+  can reread canonical truth.
+- `readCanonicalSnapshot(owner)` reads the owner-qualified whole-tree snapshot.
+- `withRestorationDesignation(callback)` identifies framework-originated user
+  writes that are eligible for restoration.
 
 ## License
 

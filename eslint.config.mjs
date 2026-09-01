@@ -144,6 +144,8 @@ export default [
             // (`withNx`) since the convert-to-inferred migration in a9774f01.
             // Build-time only — never a runtime peer.
             '@nx/rollup',
+            '@rollup/plugin-typescript',
+            'rollup-plugin-dts',
           ],
         },
       ],

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# Verify that .d.ts files in dist follow the expected structure
-# TypeScript declarations should be in src/ subdirectory, with re-exports in dist/
-# This ensures proper module resolution for consumers.
+# Verify that every package's manifest-declared type entry exists.
 
 set -e
 
@@ -16,24 +14,19 @@ for pkg in dist/packages/*; do
 
   PKG_NAME=$(basename "$pkg")
 
-  # Check that src/ declarations exist
-  if [ ! -d "$pkg/src" ]; then
-    echo "⚠️  WARNING: $PKG_NAME has no src/ directory for declarations"
-    continue
-  fi
-
-  # Check for main index.d.ts in src/
-  if [ ! -f "$pkg/src/index.d.ts" ]; then
-    echo "❌ ERROR: Missing $PKG_NAME/src/index.d.ts"
+  TYPES_ENTRY=$(node -p "require('./$pkg/package.json').types")
+  TYPES_PATH="$pkg/${TYPES_ENTRY#./}"
+  if [ ! -f "$TYPES_PATH" ]; then
+    echo "❌ ERROR: Missing $PKG_NAME declaration entry $TYPES_ENTRY"
     EXIT_CODE=1
   else
-    echo "✅ $PKG_NAME: declarations found in src/"
+    echo "✅ $PKG_NAME: declaration entry $TYPES_ENTRY exists"
   fi
 done
 
 if [ $EXIT_CODE -eq 0 ]; then
   echo ""
-  echo "✅ All packages have properly structured TypeScript declarations"
+  echo "✅ All packages have their manifest-declared TypeScript entry"
 fi
 
 exit $EXIT_CODE

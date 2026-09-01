@@ -416,34 +416,12 @@ alongside an Angular one, which was the one arguable case for a package-level
 `engines` — it would still have constrained browser consumers for a server-only
 reason. That package has no v15 successor, so the exception is moot.)
 
-**`--strict-libs` on the consumer gate is RED and not gated.** Run
-`node tools/verify-consumer-typecheck.mjs --strict-libs` to see it.
+Kernel declarations are bundled from the two public entry points directly to
+`dist/index.d.ts` and `dist/adapter.d.ts` within the package's single Rollup
+invocation. Nx's per-source declaration and dts-bundle plugins are removed from
+the kernel runtime configuration; `rollup-plugin-dts` emits the final public
+declaration surface without a post-build rewrite or copy step.
 
-_Effect (measured):_ the emitted per-file `.d.ts` reference several names they
-never declare — `DefaultKey`, `EntityMapComputedSlices`,
-`EntityMapMarkerWithSlices`, `PathNotifierHandler`, `HydrateMode` — and
-`index.d.ts` re-exports `isDev` from `lib/constants`, whose emitted declaration
-does not contain it. A consumer compiling with `skipLibCheck: false` sees
-`TS2304`/`TS2305`.
-
-_Cause:_ `@nx/rollup:rollup` bundles declarations per ENTRY POINT (there are six:
-the barrel plus `security`, `lazy`, `edit-session`, `storage`, `authoring`) and
-omits declarations it judges unreachable from those exports — while the per-file
-`.d.ts` it also emits still reference them.
-
-_Impact:_ none for `skipLibCheck: true`, which is the Angular CLI default and
-effectively universal. That is the configuration the gate enforces.
-
-_Two fixes that DO NOT work — both tried, both reverted, recorded so the next
-person does not spend the afternoon I did:_
-
-1. **Re-exporting the missing names from the barrel makes it WORSE.** The barrel
-   then points at declarations that still are not emitted, turning five `TS2304`s
-   into those plus four `TS2305`s.
-2. **`stripInternal` is not the cause.** Three of the five names carry
-   `@internal`, which makes it a compelling theory. Removing every one of those
-   tags and rebuilding clean changed the error list by exactly nothing.
-
-The real fix is in the declaration build — most likely emitting declarations from
-`tsc` rather than from the rollup dts bundler. Tracked debt, not a hidden
-failure.
+`node tools/verify-consumer-typecheck.mjs` packs that artifact and compiles a
+real consumer with `skipLibCheck: false` under both `bundler` and `node16`
+resolution. This is a release gate, not an optional audit.
