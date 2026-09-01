@@ -23,61 +23,31 @@ const { execSync } = require('child_process');
 
 const packages = [
   {
-    name: 'core',
+    name: 'kernel',
     path: [
       'dist/packages/kernel/dist/index.js',
       'dist/packages/kernel/src/index.js',
-      'dist/packages/kernel/fesm2022/signaltree-core.mjs',
     ],
     maxSize: 30000,
-    // v13.1.0: core grew ~2.36KB (history()/audit/trackHistory; audit moved in
-    // from ng-forms). Honest claim = measured packed size.
-    claimed: 44677,
+    claimed: 30000,
   },
   {
-    name: 'ng-forms',
-    path: [
-      'dist/packages/ng-forms/dist/index.js',
-      'dist/packages/ng-forms/fesm2022/signaltree-ng-forms.mjs',
-    ],
+    name: 'angular',
+    path: 'dist/packages/angular/dist/index.js',
     maxSize: 8000,
-    claimed: 7300,
+    claimed: 8000,
+  },
+  {
+    name: 'react',
+    path: 'dist/packages/react/dist/index.js',
+    maxSize: 4000,
+    claimed: 4000,
   },
   {
     name: 'shared',
     path: 'dist/packages/shared/dist/index.js',
     maxSize: 4200,
     claimed: 2501,
-  },
-  {
-    name: 'core/enhancers/batching',
-    path: 'dist/packages/kernel/dist/enhancers/batching/lib/batching.js',
-    maxSize: 1400,
-    claimed: 1280,
-  },
-  {
-    name: 'core/enhancers/restoration',
-    path: 'dist/packages/kernel/dist/enhancers/restoration/lib/time-travel.js',
-    maxSize: 1950,
-    claimed: 1350,
-  },
-  {
-    name: 'core/enhancers/middleware',
-    path: 'dist/packages/kernel/dist/enhancers/middleware/lib/middleware.js',
-    maxSize: 2000,
-    claimed: 1360,
-  },
-  {
-    name: 'core/enhancers/devtools',
-    path: 'dist/packages/kernel/dist/enhancers/devtools/lib/devtools.js',
-    maxSize: 2600,
-    claimed: 2470,
-  },
-  {
-    name: 'core/enhancers/serialization',
-    path: 'dist/packages/kernel/dist/enhancers/serialization/lib/serialization.js',
-    maxSize: 5200,
-    claimed: 4860,
   },
 ];
 
@@ -87,11 +57,7 @@ const packages = [
 // pre-publish-validation.sh. `events` and `realtime` were never in this list,
 // so they were wiped and never rebuilt, and package-hygiene's skip-and-pass
 // meant a green release run had verified neither of them.
-const nxProjects = [
-  'core',
-  'shared',
-  'ng-forms',
-];
+const nxProjects = ['shared', 'kernel', 'angular', 'react'];
 
 class BundleAnalyzer {
   constructor() {
@@ -201,7 +167,7 @@ class BundleAnalyzer {
 
     this.log('🔨 Building all packages...');
     const packageNames = nxProjects.join(',');
-    const buildCommand = `pnpm nx run-many --target=build --projects=${packageNames} --configuration=production --verbose --output-style=static --no-daemon`;
+    const buildCommand = `NX_DAEMON=false pnpm nx run-many --target=build --projects=${packageNames} --configuration=production --verbose --output-style=static`;
     const packagesBuilt = this.execCommand(
       buildCommand,
       'Building SignalTree packages',
@@ -269,7 +235,8 @@ class BundleAnalyzer {
       const distPath = this.resolvePackagePath(pkg);
 
       if (!distPath || !fs.existsSync(distPath)) {
-        this.log(`${pkg.name}: Build not found at ${distPath}`, 'warning');
+        this.log(`${pkg.name}: Build output not found`, 'error');
+        totalFailed += 1;
         return;
       }
 
@@ -323,13 +290,9 @@ class BundleAnalyzer {
         }`
       );
 
-      if (pkg.name === 'core') {
-        console.log('   Note: Core package entry is a re-export façade');
-      } else if (pkg.name.startsWith('core/enhancers/')) {
-        console.log('   Note: Individual enhancer implementation size');
-      } else if (pkg.name === 'ng-forms') {
-        console.log('   Note: Complete ng-forms package bundle');
-      }
+      console.log(
+        '   Note: Entry-module report; consumer budgets run separately'
+      );
 
       console.log();
     });
@@ -364,7 +327,7 @@ class BundleAnalyzer {
     this.log('\n📊 Full Package Analysis (All Files)');
     console.log('==========================================\n');
 
-    const packageDirs = ['core', 'shared'];
+    const packageDirs = ['kernel', 'angular', 'react'];
 
     const fullSizes = [];
 
@@ -796,7 +759,6 @@ class BundleAnalyzer {
 
       const packageSummary = this.analyzePackages();
       const fullPackageSummary = this.analyzeFullPackages();
-      this.showArchitectureComparison();
       this.analyzeDemoApp();
       this.generateRecommendations();
 
@@ -811,34 +773,6 @@ class BundleAnalyzer {
           packageSummary.totalActualSize
         )} gzipped`
       );
-      const architectureSummary = this.results.architecture;
-      if (architectureSummary) {
-        const { savings, legacyTotal } = architectureSummary;
-        const pct =
-          legacyTotal > 0
-            ? ((Math.abs(savings) / legacyTotal) * 100).toFixed(1)
-            : '0.0';
-
-        if (savings > 0) {
-          console.log(
-            `📊 Architecture Savings: ${this.formatSize(
-              savings
-            )} (${pct}% reduction) vs old separate packages`
-          );
-        } else if (savings < 0) {
-          console.log(
-            `⚠️  Architecture Regression: +${this.formatSize(
-              Math.abs(savings)
-            )} (${pct}% increase) vs old separate packages`
-          );
-        } else {
-          console.log(
-            'ℹ️  Architecture footprint unchanged vs old separate packages'
-          );
-        }
-      } else {
-        console.log('📊 Architecture impact unavailable');
-      }
       if (this.results.demoApp) {
         console.log(
           `🎯 Demo App Total: ${this.formatSize(
@@ -855,57 +789,16 @@ class BundleAnalyzer {
         );
       }
 
-      console.log('\n🏗️  Architecture Assessment:');
-      console.log('===========================');
-      console.log('✅ Consolidated architecture successfully implemented');
-      console.log('✅ All enhancers co-located under core/src/enhancers/');
-      console.log('✅ Secondary entry points configured for tree-shaking');
-      let architectureLine = '📊 Architecture impact summary unavailable';
-      if (architectureSummary) {
-        const pct =
-          architectureSummary.legacyTotal > 0
-            ? (
-                (Math.abs(architectureSummary.savings) /
-                  architectureSummary.legacyTotal) *
-                100
-              ).toFixed(1)
-            : '0.0';
-
-        if (architectureSummary.savings > 0) {
-          architectureLine = `📊 Architecture savings: ${this.formatSize(
-            architectureSummary.savings
-          )} (${pct}% reduction) vs separate packages`;
-        } else if (architectureSummary.savings < 0) {
-          architectureLine = `⚠️  Architecture regression: +${this.formatSize(
-            Math.abs(architectureSummary.savings)
-          )} (${pct}% increase) vs separate packages`;
-        } else {
-          architectureLine =
-            'ℹ️  Architecture footprint unchanged vs separate packages';
-        }
-      }
-      console.log(architectureLine);
-      console.log('🎯 Applications benefit from eliminated duplication');
+      console.log('\n🏗️  Package Assessment:');
+      console.log('======================');
       console.log(
-        (() => {
-          const coreFacade = this.results.packages.find(
-            (pkg) => pkg.name === 'core'
-          );
-          const coreFull = this.results.fullPackages.find(
-            (pkg) => pkg.name === 'core'
-          );
-          if (!coreFacade) {
-            return '🔍 Core package: measurement unavailable';
-          }
-          const facadeSize = this.formatSize(coreFacade.gzipSize);
-          const fullSize = coreFull
-            ? this.formatSize(coreFull.gzipSize)
-            : 'n/a';
-          return `🔍 Core barrel facade: ${facadeSize} (full publishable package ${fullSize})`;
-        })()
+        '✅ Current kernel, Angular, React, and shared artifacts built'
       );
       console.log(
-        '📦 Individual enhancers: Shared dependencies remove duplication compared to separate packages'
+        '✅ Public package outputs measured without missing-artifact skips'
+      );
+      console.log(
+        '📊 Consumer bundle budgets are enforced by check-bundle-budget.mjs'
       );
 
       const exitCode = packageSummary.totalFailed > 0 ? 1 : 0;

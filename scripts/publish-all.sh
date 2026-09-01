@@ -160,6 +160,10 @@ publish_package() {
 }
 
 # Main publishing loop
+print_status "Verifying runtime and declaration documentation artifacts..."
+node scripts/verify-jsdoc-stripping.js || exit 1
+node tools/check-declaration-docs.mjs || exit 1
+
 print_status "Starting to publish ${#PACKAGES[@]} packages..."
 
 FAILED_PACKAGES=()

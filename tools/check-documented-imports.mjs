@@ -51,9 +51,8 @@ const LIVE_DOCS = [
   'packages/kernel/README.md',
   'packages/kernel/ENHANCERS.md',
   'packages/shared/README.md',
-  'packages/events/README.md',
-  'packages/ng-forms/README.md',
-  'packages/authoring/README.md',
+  'packages/angular/README.md',
+  'packages/react/README.md',
   'docs/guides',
   'docs/ai',
   'docs/overview.md',
@@ -118,7 +117,9 @@ function packageDirsByName() {
     try {
       const pkg = JSON.parse(readFileSync(manifest, 'utf8'));
       if (pkg.name) out.set(pkg.name, pkg);
-    } catch { /* unparseable manifest is not a package */ }
+    } catch {
+      /* unparseable manifest is not a package */
+    }
   }
   return out;
 }
@@ -159,7 +160,9 @@ function check(files) {
         problems.push({
           rel,
           specifier: m[1],
-          why: `'${subpath}' is not in ${pkgName}'s exports (${Object.keys(map).join(', ')})`,
+          why: `'${subpath}' is not in ${pkgName}'s exports (${Object.keys(
+            map
+          ).join(', ')})`,
         });
       }
     }
@@ -190,7 +193,9 @@ if (process.argv.includes('--self-test')) {
     const pass = resolves === shouldResolve;
     ok &&= pass;
     console.log(
-      `  ${pass ? 'ok  ' : 'FAIL'}  ${spec} -> ${resolves ? 'resolves' : 'rejected'} (expected ${shouldResolve ? 'resolves' : 'rejected'})`
+      `  ${pass ? 'ok  ' : 'FAIL'}  ${spec} -> ${
+        resolves ? 'resolves' : 'rejected'
+      } (expected ${shouldResolve ? 'resolves' : 'rejected'})`
     );
   }
   console.log(
@@ -215,7 +220,9 @@ if (problems.length === 0) {
   process.exit(0);
 }
 
-console.error(`\n✗ ${problems.length} documented import(s) a user cannot write:\n`);
+console.error(
+  `\n✗ ${problems.length} documented import(s) a user cannot write:\n`
+);
 for (const p of problems) {
   console.error(`    ${p.rel}\n      ${p.specifier}\n      ${p.why}\n`);
 }

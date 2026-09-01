@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { undoable } from '../../lib/undoable';
 
 import { createAuditTracker } from '../../lib/audit/audit';
-import { history } from '../../lib/form-history/form-history';
 import { signalTree } from '../../lib/signal-tree';
 import { serialization } from '../serialization/serialization';
 import { restoration } from './restoration';

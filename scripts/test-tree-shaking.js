@@ -4,7 +4,7 @@
  * Tree-Shaking Verification Test
  * ================================
  *
- * Tests whether importing from the barrel (@signaltree/core) brings in
+ * Tests whether importing from the barrel (@signal-tree/kernel) brings in
  * only the requested code or pulls in all enhancers.
  *
  * Simulates different import patterns and measures the bundled result.
@@ -33,7 +33,7 @@ const SELF_TEST = process.argv.includes('--self-test');
 const SELF_TEST_CASE = {
   name: 'SELF-TEST — deliberately imports what it forbids',
   code: `
-      import { signalTree, devTools } from '@signaltree/core';
+      import { signalTree, devTools } from '@signal-tree/kernel';
       const tree = signalTree({ count: 0 }, { enhancers: [devTools()] });
     `,
   expectedFiles: ['signal-tree.js'],
@@ -44,9 +44,9 @@ const SELF_TEST_CASE = {
 
 const testCases = [
   {
-    name: 'Core only (signalTree + basic utils)',
+    name: 'Kernel only (signalTree + basic utils)',
     code: `
-      import { signalTree } from '@signaltree/core';
+      import { signalTree } from '@signal-tree/kernel';
       const tree = signalTree({ count: 0 });
       tree.$.count.set(5);
       console.log(tree.$.count());
@@ -55,19 +55,9 @@ const testCases = [
     shouldNotInclude: ['batching', 'devtools'],
   },
   {
-    name: 'Core + one enhancer (batching)',
+    name: 'Kernel + one enhancer (batching)',
     code: `
-      import { signalTree, batching } from '@signaltree/core';
-      const tree = signalTree({ count: 0 }, { enhancers: [batching()] });
-    `,
-    expectedFiles: ['signal-tree.js', 'batching.js'],
-    shouldNotInclude: ['devtools', 'serialization'],
-  },
-  {
-    name: 'Subpath import (avoids barrel)',
-    code: `
-      import { signalTree } from '@signaltree/core';
-      import { batching } from '@signaltree/core/enhancers/batching';
+      import { signalTree, batching } from '@signal-tree/kernel';
       const tree = signalTree({ count: 0 }, { enhancers: [batching()] });
     `,
     expectedFiles: ['signal-tree.js', 'batching.js'],
@@ -102,8 +92,7 @@ function analyzeBundle(testCase) {
       skipLibCheck: true,
       baseUrl: '..',
       paths: {
-        '@signaltree/core': ['packages/kernel/src/index.ts'],
-        '@signaltree/core/*': ['packages/kernel/src/*'],
+        '@signal-tree/kernel': ['packages/kernel/src/index.ts'],
       },
     },
     include: ['test.ts'],
@@ -235,16 +224,14 @@ console.log('\n' + '='.repeat(70));
 if (allPassed) {
   console.log('\n✅ Tree-shaking is EFFECTIVE across all import patterns');
   console.log('\nKey findings:');
-  console.log('  • Barrel imports (from @signaltree/core) are tree-shakeable');
+  console.log(
+    '  • Barrel imports (from @signal-tree/kernel) are tree-shakeable'
+  );
   console.log('  • Only requested code is bundled');
-  console.log('  • Subpath imports offer no additional benefit');
-  console.log('  • ESLint rule preventing barrel imports may be unnecessary');
 } else {
   console.log('\n❌ Tree-shaking has ISSUES');
   console.log('\nProblems detected:');
   console.log('  • Barrel imports pull in unrequested code');
-  console.log('  • Users MUST use subpath imports for optimal bundles');
-  console.log('  • ESLint rule is necessary to enforce subpath imports');
 }
 
 console.log();

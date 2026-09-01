@@ -128,21 +128,24 @@ async function main() {
 
   // Run proxy callable overhead microbench
   console.log('\n⏱ Running proxy-call-overhead microbench');
-  // Ensure core ESM bundle exists for the microbench import
-  const coreEsm = path.join(process.cwd(), 'dist/packages/kernel/dist/index.js');
-  if (!fs.existsSync(coreEsm)) {
+  // Ensure the kernel ESM bundle exists for the microbench import
+  const kernelEsm = path.join(
+    process.cwd(),
+    'dist/packages/kernel/dist/index.js'
+  );
+  if (!fs.existsSync(kernelEsm)) {
     const buildMsg =
-      '  ⏳ building @signaltree/core (production) for microbench...';
+      '  ⏳ building @signal-tree/kernel (production) for microbench...';
     console.log(buildMsg);
     const b = run('pnpm', [
       'nx',
       'build',
-      'core',
+      'kernel',
       '--configuration=production',
     ]);
     if (b.code !== 0) {
       console.warn(
-        '  ⚠ core build failed, microbench may fail too:',
+        '  ⚠ kernel build failed, microbench may fail too:',
         b.err || b.out
       );
     }

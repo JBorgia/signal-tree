@@ -1,8 +1,12 @@
-
 const fs = require('fs');
 const path = require('path');
 
-const roots = ['packages/kernel/src', 'packages/ng-forms/src'];
+const roots = [
+  'packages/kernel/src',
+  'packages/angular/src',
+  'packages/react/src',
+  'packages/shared/src',
+];
 const exts = [
   '.ts',
   '.tsx',
@@ -31,7 +35,10 @@ function walk(dir, out = []) {
       continue;
     }
 
-    if (entry.isFile() && /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/.test(entry.name)) {
+    if (
+      entry.isFile() &&
+      /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/.test(entry.name)
+    ) {
       out.push(full);
     }
   }
@@ -42,9 +49,16 @@ function walk(dir, out = []) {
 function findExistingTarget(baseDir, spec) {
   const absBase = path.resolve(baseDir, spec);
   const candidates = [];
+  const explicitExtension = exts.find((ext) => absBase.endsWith(ext));
 
-  if (path.extname(absBase)) {
+  if (explicitExtension) {
     candidates.push(absBase);
+    if (['.js', '.jsx', '.mjs', '.cjs'].includes(explicitExtension)) {
+      const withoutExtension = absBase.slice(0, -explicitExtension.length);
+      for (const ext of ['.ts', '.tsx', '.mts', '.cts', '.d.ts']) {
+        candidates.push(withoutExtension + ext);
+      }
+    }
   } else {
     for (const ext of exts) candidates.push(absBase + ext);
     for (const ext of exts) candidates.push(path.join(absBase, 'index' + ext));
@@ -120,8 +134,7 @@ function checkSpecifier(importerFile, spec) {
 
 function extractSpecifiers(code) {
   const specs = [];
-  const re1 =
-    /(?:import|export)\s+(?:type\s+)?[^;]*?from\s*['"]([^'"]+)['"]/g;
+  const re1 = /(?:import|export)\s+(?:type\s+)?[^;]*?from\s*['"]([^'"]+)['"]/g;
   const re2 = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
   const re3 = /require\(\s*['"]([^'"]+)['"]\s*\)/g;
 
@@ -152,7 +165,9 @@ console.log(`Case mismatches: ${casing.length}`);
 if (missing.length) {
   console.log('\nMissing relative imports:');
   for (const m of missing.slice(0, 120)) {
-    console.log(`- ${path.relative(process.cwd(), m.importerFile)} -> ${m.spec}`);
+    console.log(
+      `- ${path.relative(process.cwd(), m.importerFile)} -> ${m.spec}`
+    );
   }
   if (missing.length > 120) console.log(`... and ${missing.length - 120} more`);
 }
@@ -161,7 +176,9 @@ if (casing.length) {
   console.log('\nCase mismatches:');
   for (const c of casing.slice(0, 200)) {
     console.log(
-      `- ${path.relative(process.cwd(), c.importerFile)} -> ${c.spec} (segment '${c.segment}' should be '${c.actual}')`
+      `- ${path.relative(process.cwd(), c.importerFile)} -> ${
+        c.spec
+      } (segment '${c.segment}' should be '${c.actual}')`
     );
   }
   if (casing.length > 200) console.log(`... and ${casing.length - 200} more`);
