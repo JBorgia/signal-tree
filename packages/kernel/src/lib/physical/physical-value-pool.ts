@@ -6,12 +6,29 @@ export type PhysicalValueHandle = {
   readonly generation: number;
 };
 
-export type PhysicalValuePool<E extends Record<string, unknown>> = {
-  readonly handlesBySubject: ReadonlyMap<number, PhysicalValueHandle>;
+export type PhysicalValueStorage<E extends Record<string, unknown>> = {
   readonly subjects: readonly (number | undefined)[];
   readonly generations: readonly number[];
   readonly values: readonly (E | undefined)[];
   readonly freeSlots: readonly number[];
+};
+
+export type PhysicalValuePool<E extends Record<string, unknown>> =
+  PhysicalValueStorage<E> & {
+    readonly handlesBySubject: ReadonlyMap<number, PhysicalValueHandle>;
+  };
+
+export type PhysicalValueAllocation<E extends Record<string, unknown>> = {
+  readonly subjectId: number;
+  readonly value: E;
+  readonly currentHandle?: PhysicalValueHandle;
+};
+
+export type PreparedPhysicalValueAllocations<
+  E extends Record<string, unknown>
+> = {
+  readonly storage: PhysicalValueStorage<E>;
+  readonly handles: readonly PhysicalValueHandle[];
 };
 
 class ImmutableMapView<K, V> implements ReadonlyMap<K, V> {
@@ -65,10 +82,18 @@ export function emptyPhysicalValuePool<
 >(): PhysicalValuePool<E> {
   return Object.freeze({
     handlesBySubject: new ImmutableMapView<number, PhysicalValueHandle>(),
-    subjects: Object.freeze([]),
-    generations: Object.freeze([]),
-    values: Object.freeze([]),
-    freeSlots: Object.freeze([]),
+    ...emptyPhysicalValueStorage<E>(),
+  });
+}
+
+export function emptyPhysicalValueStorage<
+  E extends Record<string, unknown>
+>(): PhysicalValueStorage<E> {
+  return freezeStorage({
+    subjects: [],
+    generations: [],
+    values: [],
+    freeSlots: [],
   });
 }
 
@@ -77,35 +102,24 @@ export function preparePhysicalValueTarget<E extends Record<string, unknown>>(
   updates: PreparedSubjectUpdates<E>
 ): PhysicalValuePool<E> {
   const handlesBySubject = new Map(current.handlesBySubject);
-  const subjects = [...current.subjects];
-  const generations = [...current.generations];
-  const values = [...current.values];
-  const freeSlots = [...current.freeSlots];
-
-  for (const update of updates) {
-    if (update.value === undefined) {
-      continue;
-    }
-    const currentHandle = current.handlesBySubject.get(update.subjectId);
-    const slot = currentHandle?.slot ?? freeSlots.pop() ?? subjects.length;
-    const generation = nextGeneration(generations[slot], slot);
-    const handle = Object.freeze({
+  const allocations = updates
+    .filter(
+      (update): update is typeof update & { readonly value: E } =>
+        update.value !== undefined
+    )
+    .map((update) => ({
       subjectId: update.subjectId,
-      slot,
-      generation,
-    });
-    handlesBySubject.set(update.subjectId, handle);
-    subjects[slot] = update.subjectId;
-    generations[slot] = generation;
-    values[slot] = update.value;
+      value: update.value,
+      currentHandle: current.handlesBySubject.get(update.subjectId),
+    }));
+  const prepared = preparePhysicalValueAllocations(current, allocations);
+  for (const handle of prepared.handles) {
+    handlesBySubject.set(handle.subjectId, handle);
   }
 
   return freezePool({
     handlesBySubject,
-    subjects,
-    generations,
-    values,
-    freeSlots,
+    ...prepared.storage,
   });
 }
 
@@ -115,29 +129,115 @@ export function preparePhysicalValueRelease<E extends Record<string, unknown>>(
 ): PhysicalValuePool<E> {
   const handles = requireDistinctHandles(current, subjectIds);
   const handlesBySubject = new Map(current.handlesBySubject);
+  for (const handle of handles) {
+    handlesBySubject.delete(handle.subjectId);
+  }
+  const storage = preparePhysicalValueStorageRelease(current, handles);
+
+  return freezePool({
+    handlesBySubject,
+    ...storage,
+  });
+}
+
+export function preparePhysicalValueAllocations<
+  E extends Record<string, unknown>
+>(
+  current: PhysicalValueStorage<E>,
+  allocations: readonly PhysicalValueAllocation<E>[]
+): PreparedPhysicalValueAllocations<E> {
+  const seenSubjects = new Set<number>();
+  for (const allocation of allocations) {
+    assertSubjectId(allocation.subjectId);
+    if (seenSubjects.has(allocation.subjectId)) {
+      throw new Error(
+        `Duplicate physical value for SubjectId ${String(allocation.subjectId)}`
+      );
+    }
+    seenSubjects.add(allocation.subjectId);
+    if (
+      allocation.currentHandle !== undefined &&
+      resolvePhysicalValue(current, allocation.currentHandle) === undefined
+    ) {
+      throw new Error(
+        `Stale physical value handle for SubjectId ${String(
+          allocation.subjectId
+        )}`
+      );
+    }
+    if (
+      allocation.currentHandle !== undefined &&
+      allocation.currentHandle.subjectId !== allocation.subjectId
+    ) {
+      throw new Error(
+        `Physical value handle does not belong to SubjectId ${String(
+          allocation.subjectId
+        )}`
+      );
+    }
+  }
+
   const subjects = [...current.subjects];
   const generations = [...current.generations];
   const values = [...current.values];
   const freeSlots = [...current.freeSlots];
+  const handles: PhysicalValueHandle[] = [];
+  for (const allocation of allocations) {
+    const slot =
+      allocation.currentHandle?.slot ?? freeSlots.pop() ?? subjects.length;
+    const generation = nextGeneration(generations[slot], slot);
+    const handle = Object.freeze({
+      subjectId: allocation.subjectId,
+      slot,
+      generation,
+    });
+    subjects[slot] = allocation.subjectId;
+    generations[slot] = generation;
+    values[slot] = allocation.value;
+    handles.push(handle);
+  }
 
+  return Object.freeze({
+    storage: freezeStorage({ subjects, generations, values, freeSlots }),
+    handles: Object.freeze(handles),
+  });
+}
+
+export function preparePhysicalValueStorageRelease<
+  E extends Record<string, unknown>
+>(
+  current: PhysicalValueStorage<E>,
+  handles: readonly PhysicalValueHandle[]
+): PhysicalValueStorage<E> {
+  const seenSubjects = new Set<number>();
   for (const handle of handles) {
-    handlesBySubject.delete(handle.subjectId);
+    if (seenSubjects.has(handle.subjectId)) {
+      throw new Error(
+        `Duplicate physical SubjectId ${String(handle.subjectId)}`
+      );
+    }
+    seenSubjects.add(handle.subjectId);
+    if (resolvePhysicalValue(current, handle) === undefined) {
+      throw new Error(
+        `Stale physical value handle for SubjectId ${String(handle.subjectId)}`
+      );
+    }
+  }
+
+  const subjects = [...current.subjects];
+  const generations = [...current.generations];
+  const values = [...current.values];
+  const freeSlots = [...current.freeSlots];
+  for (const handle of handles) {
     subjects[handle.slot] = undefined;
     values[handle.slot] = undefined;
     freeSlots.push(handle.slot);
   }
-
-  return freezePool({
-    handlesBySubject,
-    subjects,
-    generations,
-    values,
-    freeSlots,
-  });
+  return freezeStorage({ subjects, generations, values, freeSlots });
 }
 
 export function resolvePhysicalValue<E extends Record<string, unknown>>(
-  pool: PhysicalValuePool<E>,
+  pool: PhysicalValueStorage<E>,
   handle: PhysicalValueHandle
 ): E | undefined {
   return pool.subjects[handle.slot] === handle.subjectId &&
@@ -172,19 +272,31 @@ function requireDistinctHandles<E extends Record<string, unknown>>(
   });
 }
 
-function freezePool<E extends Record<string, unknown>>(pool: {
-  handlesBySubject: Map<number, PhysicalValueHandle>;
+function freezePool<E extends Record<string, unknown>>(
+  pool: PhysicalValueStorage<E> & {
+    handlesBySubject: Map<number, PhysicalValueHandle>;
+  }
+): PhysicalValuePool<E> {
+  return Object.freeze({
+    handlesBySubject: new ImmutableMapView(pool.handlesBySubject),
+    subjects: pool.subjects,
+    generations: pool.generations,
+    values: pool.values,
+    freeSlots: pool.freeSlots,
+  });
+}
+
+function freezeStorage<E extends Record<string, unknown>>(storage: {
   subjects: (number | undefined)[];
   generations: number[];
   values: (E | undefined)[];
   freeSlots: number[];
-}): PhysicalValuePool<E> {
+}): PhysicalValueStorage<E> {
   return Object.freeze({
-    handlesBySubject: new ImmutableMapView(pool.handlesBySubject),
-    subjects: Object.freeze(pool.subjects),
-    generations: Object.freeze(pool.generations),
-    values: Object.freeze(pool.values),
-    freeSlots: Object.freeze(pool.freeSlots),
+    subjects: Object.freeze(storage.subjects),
+    generations: Object.freeze(storage.generations),
+    values: Object.freeze(storage.values),
+    freeSlots: Object.freeze(storage.freeSlots),
   });
 }
 
