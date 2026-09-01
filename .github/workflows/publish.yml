@@ -22,8 +22,8 @@ name: Publish to npm (CI)
 # normal flow is: push signed tag → release.yml verifies + creates the
 # release → dispatch this workflow with the tag.
 #
-# scripts/release.sh remains available for emergency local publishes, but CI
-# publish is the sanctioned path. See docs/guides/releasing.md.
+# scripts/release.sh prepares and pushes signed tags; it cannot publish npm
+# packages. Tagged CI is the sanctioned registry path.
 
 on:
   workflow_dispatch:
@@ -37,9 +37,12 @@ on:
 
 jobs:
   verify:
-    name: Verify tagged commit (full gate set)
+    name: Verify and publish tagged commit
     runs-on: ubuntu-latest
     if: github.repository == 'JBorgia/signaltree'
+    permissions:
+      contents: read
+      id-token: write
     outputs:
       tag_name: ${{ steps.release_tag.outputs.tag_name }}
     steps:
@@ -101,8 +104,8 @@ jobs:
       - name: Build all packages
         run: pnpm run build:all
 
-      - name: All gates (lint budget, typecheck, tests, barrels, exports, docs, budgets, harnesses)
-        run: pnpm run gates
+      - name: All release gates (including benchmark, memory, and package harnesses)
+        run: pnpm run gates -- --release
 
       - name: Prove every gate can still fail
         run: pnpm run gates:self-test
@@ -122,44 +125,7 @@ jobs:
           bash scripts/verify-changelog-entry.sh --self-test
           bash scripts/verify-changelog-entry.sh "$VERSION"
 
-  publish:
-    name: Publish all packages
-    needs: verify
-    runs-on: ubuntu-latest
-    if: github.repository == 'JBorgia/signaltree'
-    permissions:
-      contents: read
-      id-token: write # npm --provenance
-
-    steps:
-      - name: Checkout tagged commit
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.verify.outputs.tag_name }}
-          # `fetch-tags` + full depth: release-claims diffs the public API
-          # against the last STABLE version tag. A shallow, tagless checkout made
-          # it exit 1 with "No prior version tag found" — a CI-only failure that
-          # passed on every laptop, which is the worst shape a gate failure can
-          # have.
-          fetch-depth: 0
-          fetch-tags: true
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Build all packages (production)
-        run: pnpm run build:production
-
       - name: Publish to npm
         env:
           NPM_CONFIG_PROVENANCE: 'true'
-        run: bash scripts/ci-publish.sh
+        run: node scripts/publish-candidate.mjs --ci --prebuilt

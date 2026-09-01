@@ -1,92 +1,66 @@
 # Release Process
 
-SignalTree releases require **signed git tags**. `scripts/release.sh` creates
-the release tag with `git tag -s` and then runs `git tag -v` before `npm
-publish`. If verification fails, the release is aborted and versions are rolled
-back. An already-configured developer does not need to do anything special —
-the script uses whatever signing key `git` is configured to use.
+SignalTree separates release preparation from npm publication.
 
-This document covers signing setup for developers cutting releases for the
-first time.
+## Prepare A Release
 
-## One-time GPG setup
+From a clean branch that exactly matches its remote:
 
-1. Generate a key (skip if you already have one):
-
-   ```sh
-   gpg --full-generate-key
-   # Choose RSA 4096 or Ed25519; set an expiration that fits your policy.
-   ```
-
-2. List keys and copy the long key ID:
-
-   ```sh
-   gpg --list-secret-keys --keyid-format=long
-   ```
-
-3. Make sure the key's UID email matches the email on your git commits
-   (`git config user.email`). If not, add a UID or regenerate.
-
-4. Tell git which key to use:
-
-   ```sh
-   git config --global user.signingkey <KEYID>
-   # Optional: sign every commit (tags are signed by the release script either way)
-   git config --global commit.gpgsign true
-   ```
-
-5. (Optional) Publish the public key to GitHub under Settings → SSH and GPG
-   keys so GitHub marks your tags as "Verified":
-
-   ```sh
-   gpg --armor --export <KEYID>
-   ```
-
-## Alternative: SSH signing
-
-If you'd rather sign with SSH (git 2.34+), use your existing SSH key instead of
-GPG:
-
-```sh
-git config --global gpg.format ssh
-git config --global user.signingkey ~/.ssh/id_ed25519.pub
-# Optional:
-git config --global commit.gpgsign true
+```bash
+pnpm run release:patch
+pnpm run release:minor
+pnpm run release:major
 ```
 
-For `git tag -v` to verify locally you also need an `allowed_signers` file:
+`scripts/prepare-release.mjs`:
 
-```sh
-mkdir -p ~/.config/git
-echo "you@example.com $(cat ~/.ssh/id_ed25519.pub)" >> ~/.config/git/allowed_signers
-git config --global gpg.ssh.allowedSignersFile ~/.config/git/allowed_signers
+1. verifies the clean synchronized branch and canonical package set;
+2. updates workspace and package versions;
+3. updates generated demo versions and finalizes the changelog;
+4. runs every ordinary and release-only gate;
+5. commits the release preparation;
+6. creates and validates the exact candidate tarballs;
+7. creates and verifies a signed `v<version>` tag;
+8. pushes the branch and tag.
+
+It does not publish to npm. Failures before the release commit restore every
+release-owned file. Failures after the commit leave local state intact for
+deliberate recovery.
+
+## Publish A Tagged Candidate
+
+The sanctioned registry path is `.github/workflows/publish.yml`. It checks out
+the tagged commit once, installs dependencies, builds once, runs the release
+matrix and gate self-tests, then calls:
+
+```bash
+node scripts/publish-candidate.mjs --ci --prebuilt
 ```
 
-## Verify your setup locally
+The engine prepares manifests, runs package/declaration/consumer checks, packs
+the ordered `kernel`, `angular`, and `react` artifacts, records SHA-512
+integrity, and publishes those tarballs with provenance. A rerun skips an
+existing version only when registry integrity matches exactly; any mismatch or
+registry lookup failure aborts.
 
-Before your first release, confirm end-to-end signing works. **Do this in a
-throwaway repo**, not in `signaltree`:
+Exercise the same path without registry writes:
 
-```sh
-cd /tmp && git init signing-check && cd signing-check
-git commit --allow-empty -m "init"
-git tag -s -m "test" test
-git tag -v test        # must exit 0
-git tag -d test
+```bash
+pnpm run publish:dry-run
 ```
 
-If `git tag -v test` exits 0, you're good. If it fails, re-check the config
-above (especially that the signing key exists and the email matches).
+Do not run `nx release`, `npm version`, or package-local `npm publish`.
 
-## What the release script does
+## Signing Setup
 
-`scripts/release.sh`:
+Release tags must be signed and locally verifiable. Configure either GPG or SSH
+signing with Git, then verify the setup in a throwaway repository before release
+preparation. For SSH signing, configure `gpg.format=ssh`, `user.signingkey`, and
+`gpg.ssh.allowedSignersFile`.
 
-1. Creates `v<version>` with `git tag -s -m "Release v<version>"`.
-2. Runs `git tag -v "v<version>"` — **this must exit 0**.
-3. Only then proceeds to `npm publish` and pushes the tag.
+## After Publication
 
-If signing or verification fails, the script aborts before any package is
-published and the existing rollback path restores package.json files and
-deletes the local tag. An unsigned tag (or a tag signed by a key the system
-can't verify) will never reach `npm publish`.
+Verify all three npm versions and dist-tags, install the exact version into a
+fresh external project, confirm runtime and strict typechecking, then create or
+verify the GitHub release notes. Never unpublish a partial release as routine
+recovery; inspect candidate and registry integrity and resume the same version.

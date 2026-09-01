@@ -77,16 +77,11 @@ function check(changelogText, pkgVersion, tagExistsFn) {
 
 function checkReleaseScript(scriptText) {
   const errors = [];
-  const publishStart = scriptText.indexOf('PUBLISH_STARTED=true');
-  if (publishStart === -1) {
-    errors.push('release.sh does not mark when npm publishing starts.');
-    return errors;
+  if (!scriptText.includes('scripts/prepare-release.mjs')) {
+    errors.push('release.sh does not delegate to the preparation-only release orchestrator.');
   }
-  const postPublish = scriptText.slice(publishStart);
-  if (/\brollback_versions\b/.test(postPublish)) {
-    errors.push(
-      'release.sh calls rollback_versions after npm publishing starts — partial npm publication must preserve local release state for reconciliation.'
-    );
+  if (/npm\s+publish/.test(scriptText)) {
+    errors.push('release.sh must not publish registry packages directly.');
   }
   return errors;
 }
@@ -114,18 +109,18 @@ if (process.argv.includes('--self-test')) {
     console.log(`${pass ? '✅' : '❌'} self-test: ${c.name}`);
   }
   const safeRelease = checkReleaseScript(
-    'PUBLISH_STARTED=false\nrollback_versions\nPUBLISH_STARTED=true\nexit 1\n'
+    'exec node scripts/prepare-release.mjs "$@"\n'
   );
   const unsafeRelease = [
-    'PUBLISH_STARTED=true\nrollback_versions\n',
-    'PUBLISH_STARTED=true\nif failed; then rollback_versions; fi\n',
-    'PUBLISH_STARTED=true\nrollback_versions || true\n',
+    'npm publish\n',
+    'node scripts/prepare-release.mjs\nnpm publish\n',
+    'echo legacy release\n',
   ].map(checkReleaseScript);
   const safePass = safeRelease.length === 0;
-  const unsafePass = unsafeRelease.every((result) => result.length === 1);
+  const unsafePass = unsafeRelease.every((result) => result.length > 0);
   if (!safePass || !unsafePass) ok = false;
-  console.log(`${safePass ? '✅' : '❌'} self-test: pre-publish rollback only → passes`);
-  console.log(`${unsafePass ? '✅' : '❌'} self-test: standalone, inline, and chained post-publish rollback → fire`);
+  console.log(`${safePass ? '✅' : '❌'} self-test: preparation-only release wrapper → passes`);
+  console.log(`${unsafePass ? '✅' : '❌'} self-test: direct or bypassed publication paths → fire`);
   process.exit(ok ? 0 : 1);
 }
 

@@ -91,12 +91,9 @@ pnpm run release:minor
 pnpm run release:major
 ```
 
-All route through [release.sh](release.sh). It validates, updates versions,
-builds, tags, and publishes the manifest-defined package set. Failures before
-npm publishing begins roll back local release changes. Once publishing starts,
-the script preserves the release state because one or more immutable npm
-versions may already exist; reconcile the published set and resume with
-`--keep-version`.
+All route through [release.sh](release.sh), a thin wrapper around
+`prepare-release.mjs`. Preparation validates, updates versions, commits, creates
+and verifies a signed tag, and pushes it. It never publishes npm packages.
 
 Direct package publishing routes through:
 
@@ -106,13 +103,14 @@ pnpm run publish:dry-run
 pnpm run publish:ci
 ```
 
-The direct authorities are:
+The authorities are:
 
-- [release.sh](release.sh)
-- [publish-all.sh](publish-all.sh)
-- [ci-publish.sh](ci-publish.sh)
-- [pre-publish-validation.sh](pre-publish-validation.sh)
-- [release-packages.sh](release-packages.sh), the shared package-order source
+- [prepare-release.mjs](prepare-release.mjs), release preparation
+- [publish-candidate.mjs](publish-candidate.mjs), the only registry publisher
+- [release-plan.mjs](release-plan.mjs), the ordered package set
+
+`release.sh`, `publish-all.sh`, and `ci-publish.sh` are compatibility wrappers.
+`release-packages.sh` adapts the Node release plan for older shell validators.
 
 Do not run `nx release`, `npm version`, or package-local `npm publish` as a
 substitute. Do not manually unpublish a partial release as routine recovery;

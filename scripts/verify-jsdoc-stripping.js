@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 // Try to load gzip-size, fallback gracefully if not available
 let gzipSize;
@@ -11,12 +12,12 @@ try {
   console.log('ℹ️  gzip-size not installed, showing raw file sizes only\n');
 }
 
-const packages = [
-  { name: 'kernel', public: true },
-  { name: 'angular', public: true },
-  { name: 'react', public: true },
-  { name: 'shared', public: false },
-];
+const packages = JSON.parse(
+  execFileSync('node', ['scripts/release-plan.mjs', '--json'], {
+    cwd: path.join(__dirname, '..'),
+    encoding: 'utf8',
+  })
+).map((name) => ({ name, public: true }));
 
 function collectFiles(dir, extension, out = []) {
   if (!fs.existsSync(dir)) return out;
