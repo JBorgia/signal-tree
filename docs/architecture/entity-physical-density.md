@@ -1255,15 +1255,16 @@ split-pool carrier             PRE-REGISTERED / UNPROVEN
 checked-allocator rival        PRE-REGISTERED / UNPROVEN
 ```
 
-### PHYSICAL-VALUE-ADDRESS-0 — Shared Prerequisite Green
+### PHYSICAL-VALUE-ADDRESS-0 — Freshness Contract Green
 
 Checkpoint: `98f78a88`.
 
 Both non-incumbent carriers require safe physical value-address reuse, so that
-question is isolated before either carrier receives structural storage. The
-external `PhysicalValuePool` accepts only branded authority-prepared values,
-prepares backing and address off-store, and publishes them through one target
-assignment. Value release preflights every subject before producing a target.
+contract is isolated before either carrier receives structural storage. The
+external `PhysicalValuePool` candidate component accepts only branded
+authority-prepared values, prepares backing and address off-store, and publishes
+them through one target assignment. Value release preflights every subject
+before producing a target.
 
 A physical handle carries SubjectId, slot, and generation. Resolution succeeds
 only when slot ownership and generation both match. Reusing a released slot for
@@ -1284,9 +1285,13 @@ value identity, and generation exhaustion. Full validation is 254 kernel files /
 2,086 passed / 3 expected failures / 13 skipped / 1 todo, with both TypeScript
 passes, kernel lint, formatting, and independent review green.
 
-This proves a reusable value-address primitive, not a carrier. It does not decide
-whether structural truth lives in a pool or authority-owned Map, whether a
-central directory survives, or whether either candidate beats the incumbent's
-density and latency. The next comparison must compose this exact freshness and
-publication contract with each structural carrier and run the already frozen
-dense, sparse-value, terminal-churn, lookup, and update gates.
+This proves the reusable value-address freshness and publication contract, not a
+carrier. The concrete component includes its own SubjectId-to-handle directory
+and is therefore directly usable by a directory-mediated split-pool candidate.
+The checked-allocator rival may instead store the same checked handles in
+authority-owned structural records and reuse only the contract. This checkpoint
+does not decide whether structural truth lives in a pool or authority-owned Map,
+whether the component's directory survives, or whether either candidate beats
+the incumbent's density and latency. The next comparison must compose this exact
+contract with each structural carrier and run the already frozen dense,
+sparse-value, terminal-churn, lookup, and update gates.
