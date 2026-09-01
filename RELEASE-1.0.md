@@ -959,8 +959,8 @@ win in dense, 90%-value-release, and four-round terminal-forget workloads while
 meeting existing latency, capacity, collectability, identity, restoration,
 transaction, and GC gates. Production integration remains forbidden.
 
-`PHYSICAL-VALUE-ADDRESS-0` is **SHARED PREREQUISITE GREEN / CARRIER UNSELECTED**
-at `98f78a88`. A carrier-neutral external value pool accepts branded
+`PHYSICAL-VALUE-ADDRESS-0` is **FRESHNESS CONTRACT GREEN / CARRIER UNSELECTED**
+at `98f78a88`. An external value-pool candidate component accepts branded
 authority-prepared values, atomically prepares backing plus visible address,
 releases backing independently, and reuses physical slots without reusing
 SubjectIds. Handles carry SubjectId / slot / generation; both fresh-subject and
@@ -969,10 +969,12 @@ exhaustion refuses before IEEE-754 repetition. The directory has a runtime
 immutable private-field view rather than a mutable Map exposed as ReadonlyMap.
 Eight focused controls and kernel 254 files / 2,086 passed / 3 expected failures
 / 13 skipped / 1 todo, both TypeScript passes, lint, formatting, and independent
-review are green. This does not select split pools or checked allocator handles,
-place structural truth, authorize production integration, or establish a
-density/latency win. Both carriers must consume this same freshness/publication
-contract in the frozen workload comparison.
+review are green. The concrete component owns a SubjectId-to-handle directory;
+the checked-allocator rival may instead keep equivalent handles in
+authority-owned structural records and reuse only the freshness/publication
+contract. This does not select a carrier, place structural truth, authorize
+production integration, or establish a density/latency win. Both carriers must
+consume the same contract in the frozen workload comparison.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
