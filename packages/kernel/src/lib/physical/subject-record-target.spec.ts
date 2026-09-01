@@ -133,7 +133,13 @@ describe('preparePhysicalSubjectTarget', () => {
 
   it('preserves the other authority fact for a partial update', () => {
     const value = { id: 1, name: 'same' };
-    const current = new Map([
+    const current: ReadonlyMap<
+      number,
+      { readonly revision: number; readonly value: { id: number; name: string } }
+    > = new Map<
+      number,
+      { readonly revision: number; readonly value: { id: number; name: string } }
+    >([
       [1, Object.freeze({ revision: 3, value })],
       [2, Object.freeze({ revision: 7, value: { id: 2, name: 'untouched' } })],
     ]);

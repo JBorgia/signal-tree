@@ -27,7 +27,9 @@ const makeTree = (maxHistorySize: number) =>
     }
   );
 
-const descriptorInventory = (tree: ReturnType<typeof makeTree>) => {
+const descriptorInventory = (
+  tree: Parameters<typeof getTreeRealizationDescriptors>[0]
+) => {
   const descriptors = getTreeRealizationDescriptors(tree) ?? new Map();
   let subjects = 0;
   let structuralEffects = 0;
@@ -39,7 +41,9 @@ const descriptorInventory = (tree: ReturnType<typeof makeTree>) => {
   return { owners: descriptors.size, subjects, structuralEffects };
 };
 
-const claimInventory = (tree: ReturnType<typeof makeTree>) =>
+const claimInventory = (
+  tree: Parameters<typeof getSubjectRestorationClaims>[0]
+) =>
   getSubjectRestorationClaims(tree)?.snapshot() ?? {
     owners: 0,
     claimedSubjects: 0,

@@ -6,6 +6,10 @@ import {
   createPositionRegistry,
   type PositionRegistry,
 } from '../position-registry';
+import {
+  getOwnedPositionIds,
+  getOwnedSubjectIds,
+} from '../owned-metadata';
 import { createRealizationContextSource } from './realization-context';
 import { runPhysicalMaintenance } from './subject-reclamation-coordinator';
 import { TurnStore } from './turn-store';
@@ -21,7 +25,7 @@ const SUBJECT_DRIVER = 'driver-1';
 const SUBJECT_DRIVER_TWO = 'driver-2';
 
 describe('rollbackPendingTurnAt', () => {
-  it('keeps same-numbered structural subjects in different owners independent', () => {
+  it('keeps distinct structural subjects in different owners independent', () => {
     const { store, appliedTurns, topology } = createPendingRollbackContext();
     const pending = store.admitPending({
       id: 1,
@@ -32,15 +36,13 @@ describe('rollbackPendingTurnAt', () => {
           after: 'shared',
           subjectId: 1,
           structural: 'add',
-          ownerPath: 'left',
         },
         {
           owner: P_DRIVER_NAME,
           before: undefined,
           after: 'shared',
-          subjectId: 1,
+          subjectId: 2,
           structural: 'add',
-          ownerPath: 'right',
         },
       ],
     });
@@ -62,7 +64,7 @@ describe('rollbackPendingTurnAt', () => {
     expect(applyAtomically.mock.calls[0][0]).toHaveLength(2);
   });
 
-  it('does not infer structural dependency from another owner with the same subject and key', () => {
+  it('treats one SubjectId as the same identity across owners', () => {
     const { store, appliedTurns, topology } = createPendingRollbackContext();
     const pending = store.admitPending({
       id: 1,
@@ -73,7 +75,6 @@ describe('rollbackPendingTurnAt', () => {
           after: 'next',
           subjectId: 1,
           structural: 'rekey',
-          ownerPath: 'left',
         },
       ],
     });
@@ -86,7 +87,6 @@ describe('rollbackPendingTurnAt', () => {
           after: 'shared',
           subjectId: 1,
           structural: 'add',
-          ownerPath: 'right',
         },
       ],
     });
@@ -104,8 +104,8 @@ describe('rollbackPendingTurnAt', () => {
           appliedTurns,
         }),
       })
-    ).toEqual({ ok: true, turnId: pending.id });
-    expect(applyAtomically).toHaveBeenCalledTimes(1);
+    ).toEqual({ ok: false, refusal: { kind: 'dependency-conflict' } });
+    expect(applyAtomically).not.toHaveBeenCalled();
   });
 
   it('leaves all state untouched when the pending turn is missing', () => {
@@ -522,7 +522,7 @@ describe('rollbackPendingTurnAt', () => {
     owner.addOne({ id: 1, name: 'Alice', active: true });
     owner.addOne({ id: 2, name: 'Bob', active: false });
     const heldName = owner.byIdOrFail(1).name;
-    const subjectId = heldName.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(heldName)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -635,7 +635,7 @@ describe('rollbackPendingTurnAt', () => {
       activationToken: true,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldName.__positionIds,
+      positionIds: getOwnedPositionIds(heldName),
       retainedValueBacking: undefined,
     });
     expect(notify.mock.calls).toHaveLength(notifyCountBefore);
@@ -657,7 +657,7 @@ describe('rollbackPendingTurnAt', () => {
 
     owner.addOne({ id: 1, name: 'Alice', active: true });
     const heldName = owner.byIdOrFail(1).name;
-    const subjectId = heldName.__subjectIds?.[0];
+    const subjectId = getOwnedSubjectIds(heldName)?.[0];
     if (subjectId === undefined) {
       throw new Error('Expected subject metadata for held field');
     }
@@ -711,7 +711,7 @@ describe('rollbackPendingTurnAt', () => {
       activationToken: false,
       nodeFacadeMaterialized: true,
       fieldFacadesMaterialized: ['active', 'id', 'name'],
-      positionIds: heldName.__positionIds,
+      positionIds: getOwnedPositionIds(heldName),
       retainedValueBacking: {
         kind: 'retained-entity-signal',
       },
