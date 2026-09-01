@@ -21,6 +21,7 @@ import {
   deriveCollectionOrderDelta,
   deriveDeclarativeTransitionTarget,
   prepareDeclarativeTransitionInstallation,
+  requiresDeclarativeStructuralTarget,
   type CollectionTransitionTargetBinding,
   type CollectionOrderDelta,
   type ScalarTransitionTargetBinding,
@@ -2150,16 +2151,29 @@ export function restoration(
         toReversalEffect(effect, direction)
       );
       const usesDeclarativeTarget =
-        orderDeltas.length > 0 &&
+        (orderDeltas.length > 0 ||
+          requiresDeclarativeStructuralTarget(reversalEffects)) &&
         reversalEffects.every(
           (effect) =>
             typeof effect.subjectId === 'number' ||
             effect.structural === undefined
         );
       const applyDeclarativeTarget = (): void => {
-        const conflictingOrderOwner = orderDeltas.find(({ owner }) =>
+        const deltaOwners = new Set(orderDeltas.map(({ owner }) => owner));
+        if (deltaOwners.size !== orderDeltas.length) {
+          throw new Error(
+            'Declarative order replay requires transition-level delta composition'
+          );
+        }
+        const targetOwners = new Set([
+          ...deltaOwners,
+          ...reversalEffects
+            .filter(({ subjectId }) => typeof subjectId === 'number')
+            .map(({ owner }) => owner),
+        ]);
+        const conflictingOrderOwner = [...targetOwners].find((owner) =>
           externalOrderOwners.has(owner)
-        )?.owner;
+        );
         if (conflictingOrderOwner !== undefined) {
           throw new Error(
             `ST1034: restoration refused — collection order ${conflictingOrderOwner} ` +
@@ -2177,18 +2191,6 @@ export function restoration(
           }
           return undefined;
         });
-        const deltaOwners = new Set(orderDeltas.map(({ owner }) => owner));
-        if (deltaOwners.size !== orderDeltas.length) {
-          throw new Error(
-            'Declarative order replay requires transition-level delta composition'
-          );
-        }
-        const targetOwners = new Set([
-          ...deltaOwners,
-          ...reversalEffects
-            .filter(({ subjectId }) => typeof subjectId === 'number')
-            .map(({ owner }) => owner),
-        ]);
         const sources = [...targetOwners].map((owner) => {
           const binding = bindings.get(owner);
           if (!binding) {

@@ -2,7 +2,10 @@ import { createEntitySignal } from '../../entity-signal';
 import type { PositionId, ReversalEffect } from './causal-types';
 import { AppliedTurnProjection } from './applied-turn-projection';
 import { rollbackPendingTurnAt } from './pending-rollback';
-import { createPositionRegistry, type PositionRegistry } from '../position-registry';
+import {
+  createPositionRegistry,
+  type PositionRegistry,
+} from '../position-registry';
 import { createRealizationContextSource } from './realization-context';
 import { runPhysicalMaintenance } from './subject-reclamation-coordinator';
 import { TurnStore } from './turn-store';
@@ -18,6 +21,93 @@ const SUBJECT_DRIVER = 'driver-1';
 const SUBJECT_DRIVER_TWO = 'driver-2';
 
 describe('rollbackPendingTurnAt', () => {
+  it('keeps same-numbered structural subjects in different owners independent', () => {
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
+    const pending = store.admitPending({
+      id: 1,
+      effects: [
+        {
+          owner: P_DRIVER_KEY,
+          before: undefined,
+          after: 'shared',
+          subjectId: 1,
+          structural: 'add',
+          ownerPath: 'left',
+        },
+        {
+          owner: P_DRIVER_NAME,
+          before: undefined,
+          after: 'shared',
+          subjectId: 1,
+          structural: 'add',
+          ownerPath: 'right',
+        },
+      ],
+    });
+    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+
+    expect(
+      rollbackPendingTurnAt({
+        authority: P_ROOT,
+        turnId: pending.id,
+        store,
+        topology,
+        port: { applyAtomically },
+        realizationContext: createRealizationContextSource({
+          store,
+          appliedTurns,
+        }),
+      })
+    ).toEqual({ ok: true, turnId: pending.id });
+    expect(applyAtomically.mock.calls[0][0]).toHaveLength(2);
+  });
+
+  it('does not infer structural dependency from another owner with the same subject and key', () => {
+    const { store, appliedTurns, topology } = createPendingRollbackContext();
+    const pending = store.admitPending({
+      id: 1,
+      effects: [
+        {
+          owner: P_DRIVER_KEY,
+          before: 'shared',
+          after: 'next',
+          subjectId: 1,
+          structural: 'rekey',
+          ownerPath: 'left',
+        },
+      ],
+    });
+    store.admitConfirmed({
+      id: 2,
+      effects: [
+        {
+          owner: P_DRIVER_NAME,
+          before: undefined,
+          after: 'shared',
+          subjectId: 1,
+          structural: 'add',
+          ownerPath: 'right',
+        },
+      ],
+    });
+    const applyAtomically = vi.fn<void, [readonly ReversalEffect[]]>();
+
+    expect(
+      rollbackPendingTurnAt({
+        authority: P_ROOT,
+        turnId: pending.id,
+        store,
+        topology,
+        port: { applyAtomically },
+        realizationContext: createRealizationContextSource({
+          store,
+          appliedTurns,
+        }),
+      })
+    ).toEqual({ ok: true, turnId: pending.id });
+    expect(applyAtomically).toHaveBeenCalledTimes(1);
+  });
+
   it('leaves all state untouched when the pending turn is missing', () => {
     const { store, appliedTurns, topology } = createPendingRollbackContext();
 

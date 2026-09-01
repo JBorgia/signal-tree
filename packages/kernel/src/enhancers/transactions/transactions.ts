@@ -29,6 +29,7 @@ import {
   deriveCollectionOrderDelta,
   deriveDeclarativeTransitionTarget,
   prepareDeclarativeTransitionInstallation,
+  requiresDeclarativeStructuralTarget,
   type CollectionOrderDelta,
   type CollectionTransitionTargetBinding,
   type ScalarTransitionTargetBinding,
@@ -333,6 +334,9 @@ function buildPendingRollbackPlan(
     | undefined => {
     for (const laterEntry of laterEffects) {
       const laterEffect = laterEntry.effect;
+      if (laterEffect.ownerPath !== effect.ownerPath) {
+        continue;
+      }
       if (laterEffect.kind === 'set') {
         if (laterEffect.subject === effect.subject && effect.kind !== 'rekey') {
           return {
@@ -1338,7 +1342,10 @@ export function getOrCreateInternalTransactionRuntime<T>(
       return;
     }
 
-    if (orderDeltas.length > 0) {
+    if (
+      orderDeltas.length > 0 ||
+      requiresDeclarativeStructuralTarget(effects.map(toRollbackEffect))
+    ) {
       rollbackPendingTarget(effects, orderDeltas);
       return;
     }

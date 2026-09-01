@@ -409,6 +409,11 @@ export function createEntitySignal<
     }
 
     const currentSubjects = new Map<number, { key: K; value: E }>();
+    const activeIdBefore = activeIdSignal();
+    const activeSubjectBefore =
+      activeIdBefore === undefined
+        ? undefined
+        : structuralStore.subjectIdForKey(activeIdBefore);
     for (const key of structuralStore.activeKeysSnapshot()) {
       const subjectId = structuralStore.subjectIdForKey(key);
       const value =
@@ -449,14 +454,32 @@ export function createEntitySignal<
     const preparedBySubject = new Map(
       preparedSubjects.map((subject) => [subject.subjectId, subject])
     );
+    const activeIdAfter =
+      activeSubjectBefore === undefined
+        ? undefined
+        : preparedBySubject.get(activeSubjectBefore)?.key;
+    const targetNeighborBySubject = new Map(
+      target.order.map((subjectId, index) => [
+        subjectId,
+        {
+          beforeSubject: target.order[index - 1],
+          afterSubject: target.order[index + 1],
+        },
+      ])
+    );
     const publications = [...affectedSubjects].map((subjectId) => {
       const before = currentSubjects.get(subjectId);
       const after = preparedBySubject.get(subjectId);
       return {
+        subjectId,
+        beforeKey: before?.key,
+        afterKey: after?.key,
+        beforeValue: before?.value,
         valueSignal: entitySignals.get(subjectId),
         stateSignal: subjectStateSignals.get(subjectId),
         afterValue: after?.value,
         bindingChanged: !before || !after || before.key !== after.key,
+        targetNeighbors: targetNeighborBySubject.get(subjectId),
       };
     });
 
@@ -471,6 +494,48 @@ export function createEntitySignal<
           if (publication.bindingChanged) {
             publication.stateSignal?.update((value) => value + 1);
           }
+          const key = publication.afterKey ?? publication.beforeKey;
+          if (key === undefined) {
+            continue;
+          }
+          const structuralEffect: StructuralEffect | undefined =
+            publication.beforeKey === undefined
+              ? {
+                  kind: 'add',
+                  subject: publication.subjectId,
+                  key,
+                  value: publication.afterValue,
+                  ...publication.targetNeighbors,
+                }
+              : publication.afterKey === undefined
+                ? {
+                    kind: 'remove',
+                    subject: publication.subjectId,
+                    key,
+                    value: publication.beforeValue,
+                  }
+                : publication.beforeKey !== publication.afterKey
+                  ? {
+                      kind: 'rekey',
+                      subject: publication.subjectId,
+                      beforeKey: publication.beforeKey,
+                      afterKey: publication.afterKey,
+                    }
+                  : undefined;
+          pathNotifier.notify(
+            `${basePath}.${String(key)}`,
+            publication.afterValue,
+            publication.beforeValue,
+            basePath,
+            [publication.subjectId],
+            getPositionIdsForNotify(),
+            structuralEffect
+              ? createStructuralEffectMeta(structuralEffect)
+              : ambientMeta()
+          );
+        }
+        if (activeIdBefore !== activeIdAfter) {
+          activeIdSignal.set(activeIdAfter);
         }
         updateSignals();
         if (options?.advancePhysicalRevision !== false) {
