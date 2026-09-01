@@ -994,18 +994,29 @@ and physical freshness/publication remain reusable green contracts; the
 experimental carriers stay outside package entry points.
 
 `ACTIVE-NODE-SUBJECT-INDEX-0` is **CLOSED NEGATIVE / INDEX RETAINED BY
-MEASUREMENT** at shadow checkpoint `0d8a051b` and generator `36ff01a2`. A guarded
+MEASUREMENT** at shadow checkpoint `0d8a051b`, with final dual-index generator
+`d6e3a294`. A guarded
 derived route (`SubjectId -> lifetime active key -> activeNodesByKey -> node`)
 preserves exact node identity across create, rekey, reorder, tombstone, fresh
 same-key occupation, restore, and prepared-target installation. Exact E0-shaped
-ablation saves 36.3 B/entity, reproducing the frozen index attribution. It fails
-the latency gate: nine samples measure 17.8 ns direct versus 31.6 ns derived
-(+77.7%); 15 samples with twice the work reproduce 17.3 versus 30.7 ns (+77.3%).
-The >10% hard threshold rejects removal despite the material memory win. Full
+ablation saves 36.3 B/entity, reproducing the frozen index attribution. The final
+interleaved 15-sample exact-checksum run measures 19.9 ns direct versus 32.5 ns
+derived (+63.2%). The >10% hard threshold rejects removal despite the material
+memory win. Full
 kernel validation at the shadow checkpoint is 255 files / 2,092 passed / 3
 expected failures / 13 skipped / 1 todo, with typecheck, lint, formatting, and
 independent review green. `activeNodesBySubject` remains production state by
 evidence, not semantic necessity; no removal is authorized.
+
+`ACTIVE-NODE-KEY-INDEX-0` is likewise **CLOSED NEGATIVE / INDEX RETAINED BY
+MEASUREMENT** at `d6e3a294`. The guarded inverse route (`key -> subjectIds ->
+activeNodesBySubject -> node`) preserves exact identity across the same shadow
+matrix and independently saves 36.3 B/entity. Its interleaved 15-sample timing is
+23.2 ns direct versus 41.9 ns derived (+80.5%), with exact lookup checksums. Both
+active-node indexes therefore earn their measured allocation under the current
+point-operation latency contract. Neither result establishes semantic necessity
+or global optimality; both reject deriving one permanent lookup direction through
+the other. No production index removal is authorized.
 
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public

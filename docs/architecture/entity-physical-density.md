@@ -1379,12 +1379,40 @@ E0 attribution:
 | **`activeNodesBySubject` saving** |               |            **36.3 B** |
 
 The memory win is material, but lookup latency fails the preregistered hard
-gate. Nine isolated samples measured 17.8 ns direct versus 31.6 ns derived
-(+77.7%). A 15-sample repeat with twice the lookup work measured 17.3 ns versus
-30.7 ns (+77.3%). Independent review found no benchmark or parity blocker.
+gate. The final 15-sample run alternates direct/derived child order and requires
+an exact identity checksum for every warmup and timed lookup. It measured
+19.9 ns direct versus 32.5 ns derived (+63.2%). Independent review found no
+benchmark or parity blocker.
 
 `activeNodesBySubject` is retained by measurement. Removing it would save the
 expected 36.3 B/entity but nearly double its defining point operation, far above
 the >10% rejection threshold. The result does not prove the index semantically
 necessary or irreducible; it rejects this two-hop derivation under the current
 latency contract. No production index removal is authorized.
+
+## ACTIVE-NODE-KEY-INDEX-0 — Rejected
+
+Checkpoint: `d6e3a294`.
+
+The symmetric candidate removes only `activeNodesByKey` and derives a node as:
+
+```text
+key -> subjectIds -> SubjectId -> activeNodesBySubject -> node
+```
+
+The final node must still carry the requested key. Shadow parity uses the same
+create, rekey, reorder, tombstone, fresh same-key occupation, restore, and
+prepared-target installation matrix as the SubjectId route. The exact E0-shaped
+ablation again saves 36.3 B/entity: both one-index shapes measure 249.3 B/entity
+against 285.7 B/entity with both indexes.
+
+The final interleaved 15-sample timing measured 23.2 ns for direct key lookup and
+41.9 ns for the guarded derived route, an 80.5% regression. Exact checksums prove
+every lookup returned the expected SubjectId. This is well beyond the >10% hard
+latency threshold, so `activeNodesByKey` is also retained by measurement. No
+production index removal is authorized.
+
+Together, the two rows establish a bounded result: the indexes each cost
+36.3 B/live subject, but neither is redundant under the current point-operation
+contract. This does not prove a dual-index representation universally optimal;
+it rejects deriving either direction through the other permanent indexes.
