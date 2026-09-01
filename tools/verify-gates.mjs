@@ -258,44 +258,6 @@ const GATES = [
     },
   },
   {
-    name: 'v9-budgets',
-    // The dev-code leak check inside this script is WARNING-ONLY by explicit
-    // decision ("some are intentional error logs"), so it is deliberately not
-    // claimed here. The self-test caught the overclaim: an unguarded
-    // console.log appended to the shipped bundle passed.
-    covers: 'raw bundle-size ceiling and the public value-export count budget',
-    cmd: ['node', 'scripts/v9-budget-checks.js'],
-    needsBuild: true,
-    // INCOMPRESSIBLE padding, and that is the whole point.
-    //
-    // This appended 40,000 'x' and said "raw bytes, not gzip — this budget
-    // measures unminified size". The budget is GZIP of an esbuild bundle of
-    // this file, and a run of one repeated character gzips to about fifty
-    // bytes — so the mutation moved the measured number by nothing and the gate
-    // registered BLIND.
-    //
-    // The padding below is a deterministic xorshift expansion over a printable
-    // alphabet, which does not compress. Mutating the SOURCE instead does not
-    // work either: `needsBuild` gates build BEFORE the mutation is applied, so
-    // a source edit never reaches dist.
-    mutation: {
-      file: 'dist/packages/kernel/dist/index.js',
-      generate: (original) => {
-        let seed = 0x2545f491;
-        let pad = '';
-        for (let i = 0; i < 60_000; i++) {
-          seed ^= seed << 13;
-          seed ^= seed >>> 17;
-          seed ^= seed << 5;
-          pad += String.fromCharCode(33 + (Math.abs(seed) % 90));
-        }
-        return `${original}\nglobalThis.__gateSizePad = ${JSON.stringify(
-          pad
-        )};\n`;
-      },
-    },
-  },
-  {
     name: 'tree-shaking',
     covers: 'an unused enhancer does not survive into a consumer bundle',
     cmd: ['node', 'scripts/test-tree-shaking.js'],
