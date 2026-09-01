@@ -12551,6 +12551,19 @@ delay `GATE F` or GA without a concrete release falsifier.
       ambiguity, broken consumer workflow, or consumer-facing stale guidance
       remains. Once those conditions hold, close this item; discovering more
       aesthetically desirable cleanup is not a reason to extend it.
+      **Current-guidance checkpoint:** `2fbd51b2` replaced the stale kernel
+      README, AI reference/templates, application architecture guide, and
+      Angular/native comparison surfaces with the v15 package and ownership
+      model. It corrected current whitepaper, error, restoration, collection,
+      and performance prose, while visibly classifying historical API examples
+      in audit/decision/history records. `lint-readme-apis.mjs` now discovers
+      package names from built manifests; validates named, default, namespace,
+      and side-effect imports; scans fenced examples, API tables, and API-shaped
+      prose; requires line/block-local exemptions or a near-title historical
+      evidence role; and has killing self-tests for import-form and exemption
+      leakage. Validation passed: linter self-test and production scan,
+      documented imports/symbols, 310/310 links, numeric-claim ratchet,
+      declaration-documentation gate, ESLint, and `git diff --check`.
 - [ ] final public API review
 
 Exit condition: `GATE F`
