@@ -993,6 +993,20 @@ current production winner, not an architectural necessity. Authority composition
 and physical freshness/publication remain reusable green contracts; the
 experimental carriers stay outside package entry points.
 
+`ACTIVE-NODE-SUBJECT-INDEX-0` is **CLOSED NEGATIVE / INDEX RETAINED BY
+MEASUREMENT** at shadow checkpoint `0d8a051b` and generator `36ff01a2`. A guarded
+derived route (`SubjectId -> lifetime active key -> activeNodesByKey -> node`)
+preserves exact node identity across create, rekey, reorder, tombstone, fresh
+same-key occupation, restore, and prepared-target installation. Exact E0-shaped
+ablation saves 36.3 B/entity, reproducing the frozen index attribution. It fails
+the latency gate: nine samples measure 17.8 ns direct versus 31.6 ns derived
+(+77.7%); 15 samples with twice the work reproduce 17.3 versus 30.7 ns (+77.3%).
+The >10% hard threshold rejects removal despite the material memory win. Full
+kernel validation at the shadow checkpoint is 255 files / 2,092 passed / 3
+expected failures / 13 skipped / 1 todo, with typecheck, lint, formatting, and
+independent review green. `activeNodesBySubject` remains production state by
+evidence, not semantic necessity; no removal is authorized.
+
 `DERIVED-ONE-WAY-0` is **DOW-A / CLOSED GREEN** at `75c003c2`. A production
 Angular consumer falsified the previous freeze by exposing multiple public
 construction models and a staged-derived abstraction with no surviving user

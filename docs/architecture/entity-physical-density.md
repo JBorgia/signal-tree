@@ -1350,3 +1350,41 @@ checked-handle carrier         REJECTED
 current production winner      INCUMBENT AUTHORITY MAPS
 production migration           NOT AUTHORIZED
 ```
+
+## ACTIVE-NODE-SUBJECT-INDEX-0 — Rejected
+
+Shadow checkpoint: `0d8a051b`. Generator checkpoint: `36ff01a2`.
+
+The surgical candidate removes only `activeNodesBySubject` and derives a node
+through existing authorities:
+
+```text
+SubjectId -> subjectStates -> active key -> activeNodesByKey -> node
+```
+
+The derived resolver requires the final node's SubjectId to match the requested
+identity, so a fresh same-key occupant cannot retarget an old subject. Shadow
+parity is green across create, rekey, reorder, tombstone, fresh same-key
+occupation, restore, and declarative prepared-target installation. No production
+lookup changed during characterization.
+
+The exact-shape generator reuses E0's structural field shapes and removes only
+the subject-node index. Five isolated collectable memory samples reproduce the
+E0 attribution:
+
+| Structural shape                  | 100k retained | Marginal bytes/entity |
+| --------------------------------- | ------------: | --------------------: |
+| both active-node indexes          |      27.44 MB |               285.7 B |
+| derived SubjectId-to-node lookup  |      23.94 MB |               249.3 B |
+| **`activeNodesBySubject` saving** |               |            **36.3 B** |
+
+The memory win is material, but lookup latency fails the preregistered hard
+gate. Nine isolated samples measured 17.8 ns direct versus 31.6 ns derived
+(+77.7%). A 15-sample repeat with twice the lookup work measured 17.3 ns versus
+30.7 ns (+77.3%). Independent review found no benchmark or parity blocker.
+
+`activeNodesBySubject` is retained by measurement. Removing it would save the
+expected 36.3 B/entity but nearly double its defining point operation, far above
+the >10% rejection threshold. The result does not prove the index semantically
+necessary or irreducible; it rejects this two-hop derivation under the current
+latency contract. No production index removal is authorized.
