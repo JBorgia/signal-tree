@@ -12544,6 +12544,13 @@ delay `GATE F` or GA without a concrete release falsifier.
       normalization are non-gating unless they produce a concrete package,
       build, API, documentation, or release-automation failure. The detailed
       inventory lives in `TODO.md` under `V15 pre-publish repository audit`.
+      **Exit condition:** every audit finding has one recorded disposition:
+      confirmed and fixed, already superseded, explicitly accepted/deferred as
+      non-shipping hygiene, or rejected by evidence. No confirmed package
+      contract mismatch, generated-artifact mismatch, publish-surface
+      ambiguity, broken consumer workflow, or consumer-facing stale guidance
+      remains. Once those conditions hold, close this item; discovering more
+      aesthetically desirable cleanup is not a reason to extend it.
 - [ ] final public API review
 
 Exit condition: `GATE F`
