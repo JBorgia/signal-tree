@@ -90,9 +90,7 @@ import {
   type OrdinaryStateMaterializer,
 } from './internals/materialize-markers';
 import { installDormantObservation } from './internals/observation-substrate';
-import {
-  terminateOwnerInvalidation,
-} from './internals/owner-invalidation-port';
+import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
 import { defineRootTree } from './internals/root-source';
 import {
   definePositionRegistry,
@@ -477,7 +475,13 @@ function makeNodeAccessor<T>(
       if (typeof arg === 'function') {
         const updater = arg as (current: T) => T;
         const current = unwrap(store) as T;
-        recursiveUpdate(store, updater(current), undefined, '', suppressTracking);
+        recursiveUpdate(
+          store,
+          updater(current),
+          undefined,
+          '',
+          suppressTracking
+        );
         return;
       }
 
@@ -772,8 +776,8 @@ function warnDiscardedBranchWrite(path: string, value: unknown): void {
 }
 
 /**
- * @internal Dev-mode notice that a builder could not forward a method to its
- * base tree — which means an enhancer in the chain returned a tree missing it.
+ * @internal Dev-mode notice that a configured tree could not forward a method
+ * to its base tree because an enhancer returned a replacement missing it.
  *
  * The cause every time so far has been `Object.assign(newTree, tree)` inside an
  * enhancer: it copies only ENUMERABLE own properties, and every tree method is
@@ -785,7 +789,7 @@ function warnMissingForward(method: string): void {
   if (typeof ngDevMode === 'undefined' || ngDevMode) {
     console.error(
       `SignalTree: "${method}" could not be forwarded — an enhancer in the ` +
-        `chain returned a tree without it, so this call did NOTHING. An ` +
+        `configured set returned a tree without it, so this call did NOTHING. An ` +
         `enhancer that builds a new tree object must copy own property ` +
         `DESCRIPTORS, not Object.assign, which skips ` +
         `non-enumerable methods. [ST2017]`
@@ -1563,7 +1567,9 @@ function createSignalStore<T>(
     // framework, which is the same question `merge-derived` asks of
     // `.derived()`. With no realization installed there is, correctly, no such
     // node to preserve.
-    if (materializationContext.materializationRealization.isReactiveNode(value)) {
+    if (
+      materializationContext.materializationRealization.isReactiveNode(value)
+    ) {
       store[key] = value;
       continue;
     }
@@ -1674,7 +1680,7 @@ function createSignalStore<T>(
  * `signalTree` owns the marker dispatcher. That worked, but it made the runtime
  * object an incidental capability transport — and `create` has exactly ONE
  * caller, so the private return shape costs nothing. The authority stops being
- * reachable once the dispatcher and builder closures have captured it.
+ * reachable once the dispatcher and configured-tree closures have captured it.
  *
  * ⚠️ Do NOT promote this to a runtime tree capability. If dynamic key creation
  * later needs branch materialization for the tree's LIFETIME, that is a new
@@ -1881,8 +1887,7 @@ function create<T extends object>(
   defineRootTree(rootAccessor as object, {
     read: () => rootAccessor(),
     replace: (value) => rootAccessor(value as T),
-    derive: (update) =>
-      rootAccessor(update as (current: T) => T),
+    derive: (update) => rootAccessor(update as (current: T) => T),
   });
 
   if (materializationContext.physicalCommitClock) {
@@ -2038,16 +2043,14 @@ function create<T extends object>(
 /**
  * Apply the resolved enhancer list, adopting identity replacements.
  *
- * THE ONLY PLACE AN ENHANCER IS EVER INVOKED. There used to be two: this loop
- * and `tree.with()`, which carried its own copy of duplicate detection and
- * requirement checking. Two engines meant two answers — `.with()` validated
- * against enhancers applied SO FAR, `signalTree` validates the declared SET —
- * and the pair could disagree on the same configuration. `with` is gone from
- * the tree and from `ISignalTree`; `assertEnhancerConfigurationValid` above is
- * the single authority, and it runs before this function is reached.
+ * THE ONLY PLACE AN ENHANCER IS EVER INVOKED. The former incremental
+ * composition path carried separate duplicate and requirement checks, so two
+ * construction engines could disagree on one configuration. Declarative
+ * construction validates the complete set once before this function is
+ * reached.
  *
- * What survives from `with` is the part that was never about validation:
- * ADOPTING A REPLACEMENT. `batching`, `restoration` and `devTools` each return a
+ * Enhancer application still has to ADOPT A REPLACEMENT. `batching`,
+ * `restoration` and `devTools` each return a
  * NEW callable rather than mutating the tree they were given, and everything
  * after must see that one — hence the reassignment rather than a fixed
  * receiver. `enhancer-protocol-continuity.spec.ts` row F is the falsifier.
@@ -2100,18 +2103,16 @@ function applyEnhancers<T extends object>(
  * ```
  */
 /**
- * THE RETURN TYPE IS WHERE `.with()` WENT.
+ * THE RETURN TYPE ACCUMULATES DECLARED ENHANCER SURFACES.
  *
- * A chain accumulated enhancer surfaces one link at a time (`this & TAdded`).
- * A declared array has to recover the same information from a tuple, which is
+ * A declared array recovers that information from its tuple, which is
  * what `AccumulatedEnhancerAdditions` does — and it only works if the tuple
  * survives inference, which is what `const E` is for. Without `const`, the
  * argument widens to `Enhancer<unknown>[]` and every added method is lost,
- * silently, exactly the failure `enhancer-chain.typing.spec.ts` was written
- * against.
+ * silently.
  *
- * The four overloads are the cross-product of the two optional fields that
- * change the result type, most specific first.
+ * The overloads cover the optional fields that change the result type, most
+ * specific first.
  */
 
 // Implementation
@@ -2121,11 +2122,8 @@ function signalTreeImpl<T extends object>(
   realization: TreeRealization = NEUTRAL_TREE_REALIZATION
 ): ISignalTree<T> {
   // CONFIGURE -> FINALIZE. The whole enhancer set is known here, so the plan
-  // can be truthful. The chained builder could not do this: `.with()` had to
-  // materialize before applying each enhancer, so the plan was fixed before the
-  // first enhancer was seen and every tree got LEGACY_TREE_BUILD_PLAN -- which
-  // declares causal-runtime and therefore resolves to every capability, on
-  // every tree, whether or not anything consumed it.
+  // can be truthful. Incremental composition had to materialize before the
+  // complete enhancer set was known, forcing a maximal plan onto every tree.
   const declared = (config.enhancers ?? []) as EnhancerWithMeta<unknown>[];
 
   const ordered = resolveEnhancerOrder(
@@ -2157,16 +2155,15 @@ function signalTreeImpl<T extends object>(
   let tree: ISignalTree<T> = constructed.tree;
   const authority = constructed.authority;
 
-  // Markers must exist before enhancers run -- entityMap(), form() and friends
-  // are what enhancers attach to. `.with()` used to do this per call, which is
-  // precisely why the plan could never see an enhancer. Doing it once, here, is
-  // what makes the plan knowable.
+  // Markers such as entityMap() must exist before enhancers run because
+  // enhancers attach to their materialized surfaces. Doing this once, after the
+  // complete configuration is known, keeps the plan truthful.
   //
   // Only when there is something to attach, though. With no enhancers there is
   // nothing that needs markers up front, and materializing anyway would make
   // construction eager for every tree and destroy incremental materialization
   // -- markers are supposed to realize on the access path that first needs
-  // them. The builder still materializes lazily in that case.
+  // them. The configured tree still materializes lazily in that case.
   const hasEnhancers = ordered.length > 0;
   if (hasEnhancers) {
     materializeTreeMarkers(tree, materializationContext, authority);
@@ -2224,7 +2221,7 @@ function createConfiguredTree<
   materializationContext: MaterializationContext,
   /**
    * signalTree() materializes before applying enhancers, because enhancers
-   * attach to markers. Telling the builder so keeps `materializeOnly()`
+   * attach to markers. Telling the wrapper so keeps `materializeOnly()`
    * idempotent instead of walking an already-materialized tree again.
    */
   alreadyMaterialized = false,
@@ -2313,12 +2310,11 @@ function createConfiguredTree<
 /**
  * THE CANONICAL PUBLIC SIGNATURE LIVES IN `SignalTreeFactoryOf`.
  *
- * The five public overloads used to be declared here AND mirrored in the
- * carrier-parametric factory type, which is two declaration authorities for one
- * semantic signature — they can drift. `SignalTreeFactoryOf<C>` is now the only
- * place the overload set is written; this binds the implementation to it at the
- * kernel's carrier. `@signal-tree/angular` binds the SAME implementation to
- * `'angular'`.
+ * A prior implementation duplicated the public signatures here and in the
+ * carrier-parametric factory type, creating two declaration authorities that
+ * could drift. `SignalTreeFactoryOf<C>` is the sole signature authority; this
+ * binds the implementation to the kernel carrier, while `@signal-tree/angular`
+ * binds the same implementation to `'angular'`.
  */
 export const signalTree: SignalTreeFactoryOf<'cell'> =
   signalTreeImpl as unknown as SignalTreeFactoryOf<'cell'>;
