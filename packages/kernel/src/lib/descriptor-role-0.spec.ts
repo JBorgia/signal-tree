@@ -134,13 +134,15 @@ describe('DESCRIPTOR-ROLE-0: the consumer shape', () => {
   });
 
   it('subject field resolution is keyed by subjectId, never by path shape', () => {
-    // The resolution chain, which is what makes both fields subject-scoped.
-    expect(ADAPTER).toContain(
-      "descriptor?.subjectDescriptors?.get(String(effect.subjectId))?.fieldPathFromRow"
+    // The helper resolves the descriptor from the subject ID before consulting
+    // either subject-scoped path. Path shape never chooses the subject.
+    const resolver = ADAPTER.slice(
+      ADAPTER.indexOf('function resolveCurrentSubjectTarget'),
+      ADAPTER.indexOf('function resolveCurrentSubjectTarget') + 2400
     );
-    expect(ADAPTER).toContain(
-      "subjectDescriptor?.collectionPath ??"
-    );
+    expect(resolver).toContain('String(subjectId)');
+    expect(resolver).toContain('subjectDescriptor?.collectionPath ??');
+    expect(resolver).toContain('subjectDescriptor?.fieldPathFromRow ??');
   });
 
   it('ordinary scalar resolution falls back to descriptor.path, not collectionPath', () => {

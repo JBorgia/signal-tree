@@ -124,7 +124,7 @@ describe('Angular restoration observation', () => {
     tree.resetRestorationHistory();
     await flush();
 
-    expect(length()).toBe(1);
+    expect(length()).toBe(0);
     tree.destroy();
   });
 });

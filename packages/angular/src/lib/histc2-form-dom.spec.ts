@@ -55,7 +55,7 @@ class HostComponent {
 }
 
 const turns = (tree: { getRestorationHistory(): readonly unknown[] }) =>
-  tree.getRestorationHistory().length - 1;
+  tree.getRestorationHistory().length;
 
 describe('HIST-C2 step 6: the DOM-driven write', () => {
   it('CONTROL — a DOM edit really does reach the tree', async () => {
