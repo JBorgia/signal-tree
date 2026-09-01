@@ -22,12 +22,13 @@ const size = Number(argument('--n', 100_000));
 const LOOKUP_ROUNDS = Number(argument('--lookup-rounds', 20));
 const E0_SUBJECT_INDEX_SLOPE = 36;
 
-const buildStructuralShape = (count, includeSubjectIndex) => {
+const buildStructuralShape = (count, omittedIndex) => {
   const subjectIds = new Map();
   const subjectStates = new Map();
   const subjectRevisions = new Map();
-  const activeNodesByKey = new Map();
-  const activeNodesBySubject = includeSubjectIndex ? new Map() : undefined;
+  const activeNodesByKey = omittedIndex === 'key' ? undefined : new Map();
+  const activeNodesBySubject =
+    omittedIndex === 'subject' ? undefined : new Map();
   let activeHead;
   let activeTail;
 
@@ -49,7 +50,7 @@ const buildStructuralShape = (count, includeSubjectIndex) => {
       restoreAllowed: true,
     });
     subjectRevisions.set(subjectId, 0);
-    activeNodesByKey.set(index, node);
+    activeNodesByKey?.set(index, node);
     activeNodesBySubject?.set(subjectId, node);
   }
 
@@ -70,12 +71,17 @@ const buildStructuralShape = (count, includeSubjectIndex) => {
 const memoryArmIndex = process.argv.indexOf('--memory-arm');
 if (memoryArmIndex !== -1) {
   const arm = process.argv[memoryArmIndex + 1];
-  const includeSubjectIndex = arm === 'both-indexes';
-  if (!includeSubjectIndex && arm !== 'derived-subject') {
+  const omittedIndex =
+    arm === 'derived-subject'
+      ? 'subject'
+      : arm === 'derived-key'
+      ? 'key'
+      : undefined;
+  if (arm !== 'both-indexes' && omittedIndex === undefined) {
     throw new Error(`unknown memory arm: ${String(arm)}`);
   }
   const result = await measureRetained(
-    () => buildStructuralShape(size, includeSubjectIndex),
+    () => buildStructuralShape(size, omittedIndex),
     { label: arm }
   );
   console.log(
@@ -92,26 +98,36 @@ if (memoryArmIndex !== -1) {
 const latencyArmIndex = process.argv.indexOf('--latency-arm');
 if (latencyArmIndex !== -1) {
   const arm = process.argv[latencyArmIndex + 1];
-  if (arm !== 'direct' && arm !== 'derived') {
+  if (!['direct', 'derived', 'key-direct', 'key-derived'].includes(arm)) {
     throw new Error(`unknown latency arm: ${String(arm)}`);
   }
   if (size <= 0) throw new Error('latency size must be positive');
-  const store = buildStructuralShape(size, true);
+  const store = buildStructuralShape(size);
   const lookup =
     arm === 'direct'
       ? (subjectId) => store.activeNodesBySubject.get(subjectId)
-      : (subjectId) => {
+      : arm === 'derived'
+      ? (subjectId) => {
           const state = store.subjectStates.get(subjectId);
           if (!state?.active || state.key === undefined) return undefined;
           const node = store.activeNodesByKey.get(state.key);
           return node?.subjectId === subjectId ? node : undefined;
+        }
+      : arm === 'key-direct'
+      ? (key) => store.activeNodesByKey.get(key)
+      : (key) => {
+          const subjectId = store.subjectIds.get(key);
+          if (subjectId === undefined) return undefined;
+          const node = store.activeNodesBySubject.get(subjectId);
+          return node?.key === key ? node : undefined;
         };
 
   let checksum = 0;
   const run = () => {
     for (let round = 0; round < LOOKUP_ROUNDS; round += 1) {
-      for (let subjectId = 1; subjectId <= size; subjectId += 1) {
-        checksum += lookup(subjectId)?.subjectId ?? 0;
+      for (let index = 0; index < size; index += 1) {
+        const address = arm.startsWith('key-') ? index : index + 1;
+        checksum += lookup(address)?.subjectId ?? 0;
       }
     }
   };
@@ -119,7 +135,14 @@ if (latencyArmIndex !== -1) {
   const startedAt = process.hrtime.bigint();
   run();
   const elapsedNs = Number(process.hrtime.bigint() - startedAt);
-  if (checksum === 0) throw new Error(`${arm} lookup produced no subjects`);
+  const expectedChecksum = ((size * (size + 1)) / 2) * LOOKUP_ROUNDS * 2;
+  if (checksum !== expectedChecksum) {
+    throw new Error(
+      `${arm} lookup checksum ${String(checksum)} did not match ${String(
+        expectedChecksum
+      )}`
+    );
+  }
   console.log(
     JSON.stringify({
       arm,
@@ -179,15 +202,19 @@ const linearSlope = (points) => {
   return numerator / denominator;
 };
 
-const memoryRows = ['both-indexes', 'derived-subject'].map((arm) => {
-  const points = SIZES.map((count) => measureMemory(arm, count));
-  return { arm, points, bytesPerEntity: linearSlope(points) };
-});
+const memoryRows = ['both-indexes', 'derived-subject', 'derived-key'].map(
+  (arm) => {
+    const points = SIZES.map((count) => measureMemory(arm, count));
+    return { arm, points, bytesPerEntity: linearSlope(points) };
+  }
+);
 if (memoryRows.some((row) => row.points.some((point) => !point.collectable))) {
   throw new Error('active-node subject-index memory owner did not collect');
 }
 const savedBytesPerEntity =
   memoryRows[0].bytesPerEntity - memoryRows[1].bytesPerEntity;
+const keySavedBytesPerEntity =
+  memoryRows[0].bytesPerEntity - memoryRows[2].bytesPerEntity;
 if (
   savedBytesPerEntity < E0_SUBJECT_INDEX_SLOPE * 0.9 ||
   savedBytesPerEntity > E0_SUBJECT_INDEX_SLOPE * 1.1
@@ -200,23 +227,48 @@ if (
     )} B/entity within 10%`
   );
 }
-
-const latencyRows = ['direct', 'derived'].map((arm) => {
-  const samples = Array.from({ length: LATENCY_SAMPLES }, () =>
-    runChild([
-      '--latency-arm',
-      arm,
-      '--n',
-      String(size),
-      '--lookup-rounds',
-      String(LOOKUP_ROUNDS),
-    ])
+if (
+  keySavedBytesPerEntity < E0_SUBJECT_INDEX_SLOPE * 0.9 ||
+  keySavedBytesPerEntity > E0_SUBJECT_INDEX_SLOPE * 1.1
+) {
+  throw new Error(
+    `key index ablation ${keySavedBytesPerEntity.toFixed(
+      1
+    )} B/entity does not reproduce E0 ${E0_SUBJECT_INDEX_SLOPE.toFixed(
+      1
+    )} B/entity within 10%`
   );
-  return {
+}
+
+const measureLatencyPair = (arms) => {
+  const samplesByArm = new Map(arms.map((arm) => [arm, []]));
+  for (let sample = 0; sample < LATENCY_SAMPLES; sample += 1) {
+    const orderedArms = sample % 2 === 0 ? arms : [...arms].reverse();
+    for (const arm of orderedArms) {
+      samplesByArm
+        .get(arm)
+        .push(
+          runChild([
+            '--latency-arm',
+            arm,
+            '--n',
+            String(size),
+            '--lookup-rounds',
+            String(LOOKUP_ROUNDS),
+          ])
+        );
+    }
+  }
+  return arms.map((arm) => ({
     arm,
-    nsPerLookup: median(samples.map((sample) => sample.nsPerLookup)),
-  };
-});
+    nsPerLookup: median(
+      samplesByArm.get(arm).map((sample) => sample.nsPerLookup)
+    ),
+  }));
+};
+
+const latencyRows = measureLatencyPair(['direct', 'derived']);
+const keyLatencyRows = measureLatencyPair(['key-direct', 'key-derived']);
 const latencyDelta =
   ((latencyRows[1].nsPerLookup - latencyRows[0].nsPerLookup) /
     latencyRows[0].nsPerLookup) *
@@ -230,8 +282,10 @@ if (process.argv.includes('--json')) {
         latencySamples: LATENCY_SAMPLES,
         memoryRows,
         savedBytesPerEntity,
+        keySavedBytesPerEntity,
         latencyRows,
         latencyDelta,
+        keyLatencyRows,
       },
       null,
       2
@@ -261,6 +315,7 @@ for (const row of memoryRows) {
 console.log(
   `\nsubject index saving: ${savedBytesPerEntity.toFixed(1)} B/entity`
 );
+console.log(`key index saving: ${keySavedBytesPerEntity.toFixed(1)} B/entity`);
 console.log(
   '\nlookup arm'.padEnd(20) +
     'ns/lookup'.padStart(14) +
@@ -279,5 +334,22 @@ for (const row of latencyRows) {
   );
 }
 console.log(
-  '\nThe memory arm removes only activeNodesBySubject from E0 exact structural shapes. The derived lookup is SubjectId -> lifetime active key -> activeNodesByKey with a final SubjectId identity guard.'
+  '\nkey lookup arm'.padEnd(20) +
+    'ns/lookup'.padStart(14) +
+    'vs direct'.padStart(14)
+);
+console.log('-'.repeat(48));
+for (const row of keyLatencyRows) {
+  const delta =
+    ((row.nsPerLookup - keyLatencyRows[0].nsPerLookup) /
+      keyLatencyRows[0].nsPerLookup) *
+    100;
+  console.log(
+    row.arm.padEnd(20) +
+      row.nsPerLookup.toFixed(1).padStart(14) +
+      `${delta >= 0 ? '+' : ''}${delta.toFixed(1)}%`.padStart(14)
+  );
+}
+console.log(
+  '\nEach memory arm removes one active-node index from E0 exact structural shapes. Derived lookups traverse the surviving identity index and require a final key or SubjectId identity guard.'
 );
