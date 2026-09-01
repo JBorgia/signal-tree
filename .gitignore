@@ -95,6 +95,7 @@ tmp/
 *.tgz
 .version_backup
 .release_backup/
+.release/
 
 .nx/polygraph
 .nx/self-healing

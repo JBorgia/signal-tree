@@ -27,12 +27,15 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, mkdirSync, writeFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 const ROOT = process.cwd();
 const CORE_DIST = join(ROOT, 'dist/packages/kernel');
+const suppliedTarball = process.argv
+  .find((arg) => arg.startsWith('--tarball='))
+  ?.slice('--tarball='.length);
 
-if (!existsSync(CORE_DIST)) {
+if (!suppliedTarball && !existsSync(CORE_DIST)) {
   console.error('❌ dist/packages/kernel not found — run the build first.');
   process.exit(1);
 }
@@ -40,15 +43,24 @@ if (!existsSync(CORE_DIST)) {
 const work = mkdtempSync(join(tmpdir(), 'st-consumer-tsc-'));
 console.log('📦 Packing @signal-tree/kernel and type-checking a real consumer\n');
 
-// --- pack -------------------------------------------------------------------
-execFileSync('npm', ['pack', '--pack-destination', work], {
-  cwd: CORE_DIST,
-  stdio: 'pipe',
-});
-const tarball = readdirSync(work).find((f) => f.endsWith('.tgz'));
-if (!tarball) {
-  console.error('❌ npm pack produced no tarball.');
-  process.exit(1);
+let tarballPath;
+if (suppliedTarball) {
+  tarballPath = resolve(ROOT, suppliedTarball);
+  if (!existsSync(tarballPath)) {
+    console.error(`❌ supplied tarball does not exist: ${tarballPath}`);
+    process.exit(1);
+  }
+} else {
+  execFileSync('npm', ['pack', '--pack-destination', work], {
+    cwd: CORE_DIST,
+    stdio: 'pipe',
+  });
+  const tarball = readdirSync(work).find((file) => file.endsWith('.tgz'));
+  if (!tarball) {
+    console.error('❌ npm pack produced no tarball.');
+    process.exit(1);
+  }
+  tarballPath = join(work, tarball);
 }
 
 // --- consumer project -------------------------------------------------------
@@ -123,7 +135,7 @@ execFileSync(
     '--no-audit',
     '--no-fund',
     '--silent',
-    join(work, tarball),
+    tarballPath,
     `@angular/core@${process.env['NG_VERSION'] || '^22.0.0'}`,
     'rxjs@^7.0.0',
     'typescript@^5.6.0',

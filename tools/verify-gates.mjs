@@ -1263,6 +1263,28 @@ const GATES = [
       },
     },
   },
+  {
+    name: 'publish-architecture',
+    covers:
+      'every shell and CI registry path delegates to the canonical candidate publisher',
+    cmd: ['node', 'scripts/verify-publish-architecture.mjs'],
+    mutation: {
+      file: 'scripts/ci-publish.sh',
+      find: 'scripts/publish-candidate.mjs',
+      replace: 'scripts/legacy-publisher.mjs',
+    },
+  },
+  {
+    name: 'release-plan',
+    covers:
+      'the canonical release set matches publishable manifests and orders kernel before adapters',
+    cmd: ['node', 'scripts/release-plan.mjs', '--json'],
+    mutation: {
+      file: 'scripts/release-plan.mjs',
+      find: "['kernel', 'angular', 'react']",
+      replace: "['angular', 'kernel', 'react']",
+    },
+  },
 ];
 
 const args = process.argv.slice(2);

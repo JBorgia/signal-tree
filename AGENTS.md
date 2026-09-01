@@ -286,7 +286,9 @@ npm run release:minor   # minor
 npm run release:major   # major
 ```
 
-The release script runs `validate`, bumps versions, builds, tags, and publishes — with automatic rollback (restores versions, cleans artifacts, removes local and remote tags) on any failure. See [`RELEASE_PROCESS.md`](RELEASE_PROCESS.md).
+The release command prepares the version, runs the release matrix, commits, and
+pushes a signed tag. Tagged CI publishes exact candidate tarballs through the
+single canonical publisher. See [`RELEASE_PROCESS.md`](RELEASE_PROCESS.md).
 
 ### Commit conventions
 
@@ -386,10 +388,8 @@ a time rather than in one sweep.
 
 ## Publishing to npm
 
-Gates that run immediately before `npm publish`, in this order — all three
-publish paths (`ci-publish.sh`, `publish-all.sh`, `release.sh`) call the same
-scripts, because two copies and one hole is what caused the drift they exist to
-prevent:
+The canonical candidate publisher runs these gates before packing and registry
+publication. Compatibility wrappers contain no independent publish logic:
 
 1. `scripts/resolve-workspace-specs.mjs` — rewrites `workspace:*` to a real
    range and proves none survive. A published `workspace:*` is not valid semver
