@@ -12576,6 +12576,14 @@ delay `GATE F` or GA without a concrete release falsifier.
       mutation self-test (including the four-project build), shell syntax,
       command/path existence checks, documentation links/API checks, and
       `git diff --check`.
+      **Source-comment checkpoint:** `aba7d92b` removed stale present-tense
+      builder, enhancer-chain, deleted form-marker, and mirrored-overload
+      language from `signal-tree.ts` while retaining the architectural reason
+      declarative construction validates one complete enhancer set. Production
+      behavior is unchanged except that ST2017 now describes a replacement
+      returned by the configured set rather than a deleted chain. Prettier,
+      ESLint, kernel typing, diagnostics, `git diff --check`, and independent
+      review passed.
 - [ ] final public API review
 
 Exit condition: `GATE F`
