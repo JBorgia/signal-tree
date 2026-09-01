@@ -166,6 +166,12 @@ type TurnEffect =
   | CollectionRemoveEffect
   | CollectionRekeyEffect;
 
+type DirectedTurnApplication = {
+  readonly effects: TurnEffect[];
+  readonly orderDeltas: CollectionOrderDelta[];
+  readonly direction: 'undo' | 'redo';
+};
+
 type TreeRealizationDescriptorStore = Map<
   PositionId,
   {
@@ -420,9 +426,7 @@ class RestorationManager<T> {
     private config: RestorationConfig = {},
     private restoreStateFn?: (state: T) => void,
     private applyEffectsFn?: (
-      effects: TurnEffect[],
-      direction: 'undo' | 'redo',
-      orderDeltas: CollectionOrderDelta[]
+      applications: DirectedTurnApplication[]
     ) => void
   ) {
     const cellRuntime = getTreeRealization(tree)?.cell ?? NEUTRAL_CELL_RUNTIME;
@@ -1144,7 +1148,10 @@ class RestorationManager<T> {
     const turnIdsToRedo: number[] = [];
 
     for (const turn of this.history) {
-      if (!turn.__effects || turn.__effects.length === 0) {
+      if (
+        (!turn.__effects || turn.__effects.length === 0) &&
+        (!turn.__orderDeltas || turn.__orderDeltas.length === 0)
+      ) {
         continue;
       }
 
@@ -1158,12 +1165,7 @@ class RestorationManager<T> {
       }
     }
 
-    if (turnIdsToUndo.length > 0) {
-      this.applyTurnEffects(turnIdsToUndo, 'undo');
-    }
-    if (turnIdsToRedo.length > 0) {
-      this.applyTurnEffects(turnIdsToRedo, 'redo');
-    }
+    this.applyDirectedTurnTransition(turnIdsToUndo, turnIdsToRedo);
 
     this.isTemporalViewActive = false;
   }
@@ -1496,13 +1498,25 @@ class RestorationManager<T> {
       return false;
     }
 
+    this.restoreVisibleStateToConfirmed();
+
+    const turnIdsToUndo = this.history
+      .filter(
+        (turn) => turn.historyIndex > index && this.getTurnStatus(turn.id) === 'applied'
+      )
+      .sort((left, right) => right.historyIndex - left.historyIndex)
+      .map(({ id }) => id);
+    const turnIdsToRedo = this.history
+      .filter(
+        (turn) => turn.historyIndex <= index && this.getTurnStatus(turn.id) === 'unapplied'
+      )
+      .sort((left, right) => left.historyIndex - right.historyIndex)
+      .map(({ id }) => id);
+
+    this.applyDirectedTurnTransition(turnIdsToUndo, turnIdsToRedo);
+
     this.currentIndex = index;
     this.isTemporalViewActive = true;
-    const entry = this.history[index] as RestorationHistoryEntry<T> & {
-      restorationSubjectIds?: number[];
-      __positionIds?: number[];
-    };
-    this.restoreState(entry.state);
     return true;
   }
 
@@ -1629,7 +1643,46 @@ class RestorationManager<T> {
       }
     }
 
-    this.applyEffectsFn(effects, direction, orderDeltas);
+    this.applyEffectsFn([{ effects, direction, orderDeltas }]);
+  }
+
+  private applyDirectedTurnTransition(
+    turnIdsToUndo: number[],
+    turnIdsToRedo: number[]
+  ): void {
+    if (!this.applyEffectsFn) {
+      return;
+    }
+    const applications: DirectedTurnApplication[] = [];
+    for (const [turnIds, direction] of [
+      [turnIdsToUndo, 'undo'],
+      [turnIdsToRedo, 'redo'],
+    ] as const) {
+      if (turnIds.length === 0) {
+        continue;
+      }
+      const effects: TurnEffect[] = [];
+      const orderDeltas: CollectionOrderDelta[] = [];
+      for (const turnId of turnIds) {
+        const turn = this.turns.get(turnId);
+        if (!turn) {
+          continue;
+        }
+        const turnEffects = turn.__effects ?? [];
+        if (direction === 'undo') {
+          effects.push(...[...turnEffects].reverse());
+        } else {
+          effects.push(...turnEffects);
+        }
+        orderDeltas.push(
+          ...(turn.__orderDeltas ?? []).map(cloneCollectionOrderDelta)
+        );
+      }
+      applications.push({ effects, orderDeltas, direction });
+    }
+    if (applications.length > 0) {
+      this.applyEffectsFn(applications);
+    }
   }
 
   private isSupportedEffect(effect: TurnEffect): boolean {
@@ -2143,15 +2196,33 @@ export function restoration(
     );
 
     const applyTurnEffectsThroughRealizationPort = (
-      effects: TurnEffect[],
-      direction: 'undo' | 'redo',
-      orderDeltas: CollectionOrderDelta[]
+      applications: DirectedTurnApplication[]
     ): void => {
-      const reversalEffects = effects.map((effect) =>
-        toReversalEffect(effect, direction)
+      const reversalEffects = applications.flatMap((application) =>
+        application.effects.map((effect) =>
+          toReversalEffect(effect, application.direction)
+        )
       );
+      const orderDeltas = applications.flatMap(
+        (application) => application.orderDeltas
+      );
+      const orderEndpoints = new Map<number, 'before' | 'after'>();
+      for (const application of applications) {
+        for (const delta of application.orderDeltas) {
+          const endpoint =
+            application.direction === 'undo' ? 'before' : 'after';
+          const existing = orderEndpoints.get(delta.owner);
+          if (existing && existing !== endpoint) {
+            throw new Error(
+              'Declarative transition cannot apply both order endpoints for one owner'
+            );
+          }
+          orderEndpoints.set(delta.owner, endpoint);
+        }
+      }
       const usesDeclarativeTarget =
-        (orderDeltas.length > 0 ||
+        (applications.length > 1 ||
+          orderDeltas.length > 0 ||
           requiresDeclarativeStructuralTarget(reversalEffects)) &&
         reversalEffects.every(
           (effect) =>
@@ -2202,7 +2273,7 @@ export function restoration(
           collections: sources,
           effects: reversalEffects,
           orderDeltas,
-          orderEndpoint: direction === 'undo' ? 'before' : 'after',
+          orderEndpoints,
         });
         const scalarBinding: ScalarTransitionTargetBinding | undefined =
           scalarSlotRuntime

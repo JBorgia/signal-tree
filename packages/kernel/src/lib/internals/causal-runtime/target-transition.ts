@@ -80,6 +80,7 @@ export type DeriveDeclarativeTransitionTargetOptions = {
   readonly effects: readonly ReversalEffect[];
   readonly orderDeltas?: readonly CollectionOrderDelta[];
   readonly orderEndpoint?: 'before' | 'after';
+  readonly orderEndpoints?: ReadonlyMap<PositionId, 'before' | 'after'>;
 };
 
 export type CollectionOrderParticipant = {
@@ -103,7 +104,7 @@ export function requiresDeclarativeStructuralTarget(
   const structural = effects.filter(
     (effect) => effect.structural !== undefined
   );
-  return structural.some((vacating, vacatingIndex) => {
+  const hasKeyHandoff = structural.some((vacating, vacatingIndex) => {
     const vacatedKey =
       vacating.structural === 'remove' || vacating.structural === 'rekey'
         ? vacating.before
@@ -121,6 +122,29 @@ export function requiresDeclarativeStructuralTarget(
           : undefined;
       return occupiedKey !== undefined && Object.is(vacatedKey, occupiedKey);
     });
+  });
+  if (hasKeyHandoff) {
+    return true;
+  }
+
+  const additions = structural.filter(
+    (effect) => effect.structural === 'add' && typeof effect.subjectId === 'number'
+  );
+  if (additions.length < 2) {
+    return false;
+  }
+  const addedSubjects = new Set(additions.map(({ subjectId }) => subjectId));
+  return additions.some((effect) => {
+    const context = effect.structuralContext;
+    if (context?.kind !== 'add' && context?.kind !== 'remove') {
+      return false;
+    }
+    return (
+      (context.beforeSubject !== undefined &&
+        !addedSubjects.has(context.beforeSubject)) ||
+      (context.afterSubject !== undefined &&
+        !addedSubjects.has(context.afterSubject))
+    );
   });
 }
 
@@ -174,11 +198,13 @@ export function deriveDeclarativeTransitionTarget(
   const targets = new Map<PositionId, CollectionTransitionTarget>();
   for (const [owner, collection] of collections) {
     const delta = orderDeltas.get(owner);
+    const orderEndpoint =
+      options.orderEndpoints?.get(owner) ?? options.orderEndpoint ?? 'after';
     const order = delta
       ? applyCollectionOrderDelta(
           collection.order,
           delta,
-          options.orderEndpoint ?? 'after',
+          orderEndpoint,
           options.collections.find((source) => source.owner === owner)
             ?.orderFrontier
         )
@@ -196,7 +222,7 @@ export function deriveDeclarativeTransitionTarget(
       ),
       order,
       orderFrontier: delta
-        ? options.orderEndpoint === 'before'
+        ? orderEndpoint === 'before'
           ? delta.beforeFrontier
           : delta.afterFrontier
         : options.collections.find((source) => source.owner === owner)
@@ -448,7 +474,10 @@ function deriveStructuralTargetOrder(
 ): number[] {
   const order = sourceOrder.filter((subject) => subjects.has(subject));
   const additions = effects.filter(
-    (effect) => effect.structural === 'add' && typeof effect.subjectId === 'number'
+    (effect) =>
+      effect.structural === 'add' &&
+      typeof effect.subjectId === 'number' &&
+      subjects.has(effect.subjectId)
   );
   const pending = [...additions];
 
