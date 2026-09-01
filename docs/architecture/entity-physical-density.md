@@ -907,3 +907,25 @@ closure therefore does not close active-history density and does not authorize
 remeasurement. Remaining work is general structural target migration followed by
 historical-state and `jumpTo()` support that permits eager snapshot retention to
 be deleted without rehabilitating snapshots as causal authority.
+
+### Structural Target Closure
+
+`f2f34753` closes X1/X2/X3 through the declarative target path. Same-owner key
+handoffs and permutations compile as final SubjectId membership/key/value/order
+targets. Undo and redo preserve held facade and active-selection identity,
+publish only final keys, and expose no temporary replay key. Transaction and
+pending rollback dependency identity is collection-scoped.
+
+`99c18b4f` closes multi-turn A/B/C. Causal turn order composes net structural
+truth; target installation remains order-independent. Cross-turn add/remove
+collapses correctly, dependent restores reconstruct exact SubjectId order, and
+chained rekeys derive their endpoint mapping. `jumpTo()` now applies one
+effect-based aggregate temporal transition and leaves confirmed frontiers and
+turn status unchanged. Its mixed undo/redo legs prepare together, so one invalid
+target prevents either leg from installing. Case C remains green after every
+retained `CanonicalTurn.state` is poisoned.
+
+The planner blocker is therefore removed. `CanonicalTurn.state` is still stored
+only because the public history shape and remaining materialization/dedupe
+consumers have not yet been replaced. Active-density remeasurement remains
+premature until that retained owner is physically removed.
