@@ -9,6 +9,71 @@ Work that is decided and not yet done. **This is not an RFC list.**
   This is documentation/source hygiene only; do not reopen the one-way public
   construction surface while cleaning it.
 
+## V15 pre-publish repository audit
+
+Triage the 1,225-file full-tree audit before any next RC or GA publish. Audit
+claims are hypotheses until reproduced against tracked source and built
+artifacts. Do not turn repository tidiness into a release blocker without a
+concrete shipping, build, API, documentation, or automation failure.
+
+### Release-contract checks
+
+- Resolve or reject the phantom-package finding: `packages/authoring/`,
+  `packages/events/`, and `packages/ng-forms/` reportedly have no tracked source
+  while `tsconfig.base.json` still advertises aliases. Remove dead aliases and
+  empty directories, or restore package sources only if the public disposition
+  and release set require them.
+- Resolve package-scope consistency across `@signal-tree/*` and
+  `@signaltree/*`. Private `shared` naming and public package names may have
+  different constraints; prove the intended split or normalize it. Do not
+  rename published packages as cleanup.
+- Complete the `core` -> `kernel` residue audit across root scripts, publish and
+  validation scripts, tree-shaking/performance harnesses, documentation checks,
+  generated baselines, path aliases, and agent instructions. A live command or
+  published reference to deleted `core` is blocking; an explicitly historical
+  reference is not.
+- Re-run package discovery, build, manifest, declaration, export, tarball,
+  consumer, tree-shaking, and release-gate checks after any correction.
+
+### Repository hygiene to disposition
+
+- Decide tracked-root artifacts individually: `pnpm-workspace.yaml.bak`,
+  `migrations.json`, and `.playwright-mcp/`. Remove only confirmed obsolete or
+  accidental artifacts; ignore generated local directories that are already
+  untracked.
+- Refresh `docs/README.md` release/version/index claims and validate its links.
+  Decide whether thin documentation buckets, `docs/ADSP/`, loose root docs,
+  `apps/demo-refinement.md`, and root `specs/` need relocation or only clearer
+  indexing. Preserve historical audit evidence when moving or archiving it.
+- Verify `packages/shared/index.js` and `packages/shared/index.d.ts` are obsolete
+  layout residue before removal. Check that
+  `packages/kernel/src/reactive-test-realization.ts` is excluded from published
+  output and move it under testing only if that improves ownership without
+  changing imports.
+- Compare package scaffolding intentionally: configs, changelogs, test/typecheck
+  variants, and lint ownership need not be byte-identical if package roles
+  differ. Normalize only inconsistencies that create a maintenance or release
+  failure.
+- Confirm whether demo Jest remains intentional while package tests use Vitest;
+  document the boundary or migrate under a separately validated task.
+- Add orientation only where absence is demonstrably costly: a short `api/`
+  README, an `ADSP` index, and a key for historical kernel spec prefixes are
+  candidates.
+- Reconcile `.npmrc` tracking with its dead ignore rule and verify
+  `.cursorrules` has not forked from canonical `AGENTS.md` instructions.
+
+### Deferred structural cleanup
+
+- Grouping the flat `tools/` and `scripts/` families, defining their boundary,
+  reorganizing hundreds of kernel specs, consolidating documentation buckets,
+  and normalizing package directory templates are post-GA refactors by default.
+  They may move onto the release path only when a current command, package,
+  generated artifact, or contributor workflow is concretely broken.
+- Any accepted move must update all command registries, Nx targets, CI/release
+  scripts, documentation links, numeric-claim generator annotations, and
+  self-tests in the same change. Do not perform a bulk directory shuffle before
+  publish merely to improve aesthetics.
+
 ## CONSTRUCTION-DENSITY-0
 
 Investigate scalar-tree construction density without attributing it to the root
@@ -29,29 +94,41 @@ continues to own key, identity/lifetime, revision, and membership; EntityValueSt
 continues to own value even if both address fields in one physical record.
 
 1. **E0 — byte attribution.** Measure fixed and marginal retained bytes at
-  0/1k/10k/100k for key-to-subject, lifetime, revision, active-by-key,
-  active-by-subject, ordering, value storage, and fixed collection machinery.
-  Explain at least 90-95% of the current marginal physical bytes before changing
-  production representation.
+   0/1k/10k/100k for key-to-subject, lifetime, revision, active-by-key,
+   active-by-subject, ordering, value storage, and fixed collection machinery.
+   Explain at least 90-95% of the current marginal physical bytes before changing
+   production representation.
 2. **E1 — record consolidation prototype.** Compare the current stores with
-  `key -> SubjectId` plus `SubjectId -> SubjectRecord`. Both active-node indexes
-  must prove an independent algorithmic job. Preserve authority boundaries;
-  no unowned mutable record bag.
+   `key -> SubjectId` plus `SubjectId -> SubjectRecord`. Both active-node indexes
+   must prove an independent algorithmic job. Preserve authority boundaries;
+   no unowned mutable record bag.
 3. **E2 — active/retired compaction.** Derive minimum facts for active,
-  retired-unclaimed, retired-claimed, and held subjects under no restoration,
-  bounded restoration, rekey history, and fresh occupation of an old key.
+   retired-unclaimed, retired-claimed, and held subjects under no restoration,
+   bounded restoration, rekey history, and fresh occupation of an old key.
 4. **E3 — segmented subject storage.** Compare consolidated numeric-key Map
-  storage with monotonic-ID segments/slabs. No SubjectId reuse or generational
-  identity change in this row; reclaim only whole segments proven disposable.
+   storage with monotonic-ID segments/slabs. No SubjectId reuse or generational
+   identity change in this row; reclaim only whole segments proven disposable.
 5. **E4 — ENTITY-REALIZATION-RETENTION-0.** Independently attribute the
-  untouched -> realize-all -> release-all -> forced-GC residual. Canonical truth
-  stays strong; unheld facades/cells/publication resources should be reclaimable
-  where semantics permit; held facades remain durable and truthful.
+   untouched -> realize-all -> release-all -> forced-GC residual. Canonical truth
+   stays strong; unheld facades/cells/publication resources should be reclaimable
+   where semantics permit; held facades remain durable and truthful.
 6. **E5 — featured-memory decomposition.** Measure raw, batching, transactions,
-  restoration-unused, restoration-designated at bounded history sizes,
-  observation, realization, and combinations. Separate fixed/tree,
-  live-subject, participating-subject, realized-subject, retained-turn, and
-  history-entry slopes.
+   restoration-unused, restoration-designated at bounded history sizes,
+   observation, realization, and combinations. Separate fixed/tree,
+   live-subject, participating-subject, realized-subject, retained-turn, and
+   history-entry slopes.
+7. **SUBJECT-RECORD-PROMOTION-0.** Compare the E1/E2 consolidated
+   `Map<SubjectId, SubjectRecord>` candidate with the split-authority incumbent
+   and a normalized SubjectId-to-stable-slot rival. Run independently
+   attributable stages: value plus structural revision colocation;
+   `activeNodesBySubject` parity and removal; common-active lifecycle
+   compression; then an independent decision on `activeNodesByKey`. Physical
+   colocation does not transfer mutation authority: StructuralStore continues
+   to own key, revision, lifecycle, membership, and ordering; EntityValueStore
+   continues to own value. Prove shared reachability is equivalent before
+   colocating facts with potentially different lifetimes. Do not fold
+   restoration claims or realization cells into this row, and do not report a
+   winning representation as architecturally necessary.
 
 Every candidate runs add/update/replace/remove/reactivate/fresh-key-occupant/
 rekey/order/held-GC/released-GC/undo-redo/rollback/external-ingress/
