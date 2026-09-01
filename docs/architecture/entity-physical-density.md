@@ -830,3 +830,42 @@ reorder. `RESTORATION-TURN-STATE-0` therefore remains open until compact
 positional capture and the declarative target planner are prototyped under the
 transaction, multi-collection, held-identity, external-authority, and lifecycle
 proof set.
+
+### P0 Carrier Derivation
+
+The compact winner is a canonical backbone delta:
+
+```text
+collection owner PositionId
+before length / after length
+participants outside a deterministic maximum common subsequence:
+  SubjectId
+  optional before rank
+  optional after rank
+```
+
+The maximum common subsequence is the implicit stable backbone. Applying toward
+either endpoint removes participants that have a rank at that endpoint, places
+them at those ranks, then fills all remaining ranks from the current backbone
+order. Added subjects carry only an after rank, removed subjects only a before
+rank, and moved survivors both. Rekey does not change position identity.
+
+For unique SubjectIds, normalization reduces to a longest-increasing-subsequence
+problem after coordinate compression and runs in O(N log N) time with O(N)
+working memory. A stable total SubjectId order and lexicographically smallest
+maximum subsequence tie rule make the chosen backbone direction-symmetric. The
+retained participant count is minimal for that endpoint pair.
+
+A one-item move retains one participant rather than every shifted subject. Dense
+permutations remain dense because their information content is dense: k sparse
+moves require O(k log N) positional bits, while an arbitrary permutation requires
+Theta(N log N). A full vector or packed permutation is therefore admissible only
+for authored work whose positional change is itself O(N).
+
+The carrier has one hard boundary. It cannot merge an old sparse order delta
+through an arbitrary later reorder because that later operation may permute the
+unretained backbone. Order is therefore a first-class causal participant owned
+by the collection. A later order turn must be reversed first or block the older
+transition; exact selective merge across it is not promised. This refusal rule
+is semantic, not an implementation workaround, and must be pinned before
+production promotion.

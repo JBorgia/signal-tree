@@ -649,6 +649,45 @@ authority comes from collection owner, SubjectId, and transition facts. Decide
 later whether structural `path` is deleted, diagnostic-only, or recomputed; do
 not design the target planner around repairing a stale path.
 
+`RESTORATION-POSITION-CAPTURE-0 / P0` has a **RED LAW CONTROL / CARRIER
+DERIVED / PRODUCTION NOT AUTHORIZED**. The expected-failure control
+`position-capture-0.spec.ts` proves the current pure-reorder operation creates no
+history entry before testing undo or redo. The compact carrier is a canonical
+backbone delta. Given before and after orders expressed as collection-scoped
+SubjectIds, choose a deterministic maximum common subsequence as the implicit
+stable backbone. Retain only subjects outside that backbone, each with optional
+before and after absolute ranks, plus endpoint lengths and the collection owner.
+Added subjects have only an after rank; removed subjects only a before rank;
+rekeys preserve subject identity and require no position record unless moved.
+
+The carrier reconstructs both exact endpoints by removing endpoint participants,
+placing them at their retained ranks, and filling remaining ranks from the
+backbone's current order. Exhaustive external derivation found no collision or
+directional mismatch across partial permutations through five identities. A
+one-item move retains one subject and two ranks; a rotation retains the smaller
+moved side; arbitrary reversal or permutation is necessarily dense. This matches
+the information bound: sparse k-subject positional work needs O(k log N) bits,
+while an arbitrary permutation requires Theta(N log N) bits. Dense retention is
+therefore admissible only for dense authored positional work.
+
+Adversarial attack found one mandatory enrichment. The omitted backbone is exact
+only at the transition's causal endpoint. An arbitrary later reorder can permute
+that backbone, so applying an older sparse delta directly would be ambiguous.
+Collection order must therefore be a first-class participant coordinate: later
+order work is reversed first by ordinary frontier traversal or causes dependency
+refusal. The carrier does not promise selective merge through an unrelated later
+reorder. This is consistent with current frontier ownership; production must pin
+it directly before promotion.
+
+Canonical normalization uses a maximum common subsequence over unique SubjectIds,
+implemented as an O(N log N) longest-increasing-subsequence problem after
+coordinate compression. Ties require a stable total SubjectId order and select
+the lexicographically smallest maximum subsequence so undo and redo choose the
+same backbone. At turn sealing, normalize the first order directly to the final
+order; do not concatenate mutation-level moves. The target-planner prototype must
+consume this carrier together with membership/key/value targets before the red
+law may be repaired.
+
 This closure narrows, rather than completes, `RESTORATION-TURN-STATE-0`:
 `CanonicalTurn.state` remains disqualified as causal authority, current compact
 effects are complete for the causal work they represent, and represented causal
