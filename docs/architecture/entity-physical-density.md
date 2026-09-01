@@ -1036,3 +1036,35 @@ inside the preregistered tolerance, and high-water retention remains bounded.
 The row selects at most a physical representation for production; it cannot
 establish that colocation, slot-indexed separation, or the incumbent is required
 by SignalTree semantics.
+
+### PHYSICAL-TARGET-COMPOSITION-0 — Prerequisite Green
+
+Checkpoint: `02d2055c`.
+
+The first production read falsified the naive shared-Map candidate before any
+storage migration. `StructuralStore.prepareTarget()` prepares structural
+revision truth while `EntityValueStore.prepareTargetValues()` independently
+prepares value truth; their installs currently replace separate prepared Maps.
+Pointing both at one mutable Map would create last-installer-wins behavior and
+could discard either authority's prepared change.
+
+The replacement prerequisite is layout-neutral. Structural and value
+authorities contribute independently prepared facts keyed by SubjectId;
+`composePreparedSubjectUpdates()` merges them into deterministic frozen update
+envelopes. Duplicate contributions from one authority, invalid SubjectIds, and
+invalid revisions are rejected. Values remain opaque references because value
+preparation owns cloning; the physical composer must not clone them again.
+
+Thirteen focused controls prove revision-only, value-only, same-subject
+revision-plus-value, multiple-subject ordering, input preservation, envelope
+immutability, opaque value identity, duplicate-authority refusal, and identity
+and revision validation. The full kernel result is 253 files / 2,059 passed / 3
+expected failures / 13 skipped / 1 todo; both TypeScript passes and kernel lint
+are green.
+
+This checkpoint proves that multiple authorities can contribute without losing
+facts before one physical destination is selected. It does not yet install a
+shared target, change production storage, prove reachability equivalence, or
+choose object colocation over slot-indexed separation. Phase 1 remains active:
+the next falsifier is applying the composed update to a candidate physical target
+and proving the same-tick revision-plus-value case survives one atomic install.
