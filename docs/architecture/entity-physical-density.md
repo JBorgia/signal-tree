@@ -929,3 +929,26 @@ The planner blocker is therefore removed. `CanonicalTurn.state` is still stored
 only because the public history shape and remaining materialization/dedupe
 consumers have not yet been replaced. Active-density remeasurement remains
 premature until that retained owner is physically removed.
+
+### Historical Materialization Contract
+
+Public history promises exact `state: T` availability, not eager per-turn
+storage. Removing internal `CanonicalTurn.state` therefore needs no public API
+change, but exact reconstruction needs more than admitted turns. An undesignated
+or externally realized write between retained boundaries belongs to the later
+historical state even though it is not undoable.
+
+The replacement is a compact historical event spine plus a detached synchronous
+projector. The spine records scalar/value/structural/order facts for committed
+events while retained boundaries need them. Gap events create no restoration
+turn, frontier, claim, or navigation step. On history access, the projector
+starts from current canonical truth and owner-scoped collection targets, walks
+events backward, and emits immutable NaturalValue states at retained boundary
+ordinals without mutating the live tree.
+
+The first implementation keeps eager snapshots temporarily as an oracle and
+requires reconstructed equality across designated, undesignated, external,
+transaction, branch, and eviction cases. Eager retention is deleted only after
+that comparison and forced-GC durability pass. Calling public history may then
+allocate collection-width output because the caller explicitly requested full
+historical values; retaining small turns no longer pays that cost eagerly.
