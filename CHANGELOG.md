@@ -15,6 +15,10 @@
   emits `dist/index.d.ts` and `dist/adapter.d.ts` directly, and packed consumers
   compile both entry points with `skipLibCheck: false` under `bundler` and
   `node16` resolution.
+- **Adapter invalidation groups preserve coherent publication.**
+  `ScalarLeafRealization.runInvalidationGroup(run)` lets a framework realization
+  defer observer invalidation until one multi-location restoration or
+  transaction has applied completely.
 
 ## 15.0.0-rc.1 (2026-08-30)
 
