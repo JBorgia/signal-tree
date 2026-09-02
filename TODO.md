@@ -2310,13 +2310,19 @@ first), `agent-authored-work.md` / `collaborative-state.md` / `offline-editing.m
    via `link()`, all three PULL/PUSH-IN/PUSH-OUT directions), anchored to
    `link-0-three-directions.spec.ts`'s own design-provenance mapping (the
    literal table the four retired markers collapsed into) and
-   `link-1-relationship.spec.ts`. **Still open**: causal-explanation-as-
-   projection (§8) — not started this pass.
-5. Once `composition-recipes.md` covers the canonical set, check whether the
-   demo site / top-level docs nav links it already (`grep -r
-composition-recipes` across `apps/demo` and any docs index) — add a link
-   if not, as its own small pass (the demo site's own currency/measurement
-   rules in `AGENTS.md` § "Docs & demo currency" apply to anything it links).
+   `link-1-relationship.spec.ts`.
+5. ~~Causal-explanation-as-projection~~ — DONE (`43994750`): §8, diffing
+   consecutive `RestorationHistoryEntry.state` snapshots, cited to
+   `restoration.spec.ts`. `undoable()` has no payload parameter — verified
+   against `undoable.ts`/`restoration.ts` before writing the example, after an
+   initial draft wrongly assumed one.
+6. ~~Demo site linking~~ — DONE (`97a67f06`): both guides copied as
+   `apps/demo` build assets and added to the Documentation page's existing
+   package-README viewer. **Still open, deliberately deferred, not a doc-wiring
+   fix**: `transactions()` (optimistic/reconciliation), staged/draft editing,
+   and the causal-explanation pattern have no demo-app *component* of their
+   own — only `link()`/`external()` do, via `async-demo` and
+   `restoration-demo`. Real new-component work; scope and schedule separately.
 
 ## 13. Re-wire `llms.txt` into the publish pipeline — precondition now met
 
