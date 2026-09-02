@@ -2504,6 +2504,21 @@ history data. `RestorationHistoryEntry` remains public because the state
 snapshot has an established restoration-inspection job; its broader deletion is
 not implied by this contraction.
 
+`TURN-IDENTITY-0` is closed: `CanonicalTurn.__turnId` duplicated `id` exactly,
+had no production reader beyond its declaration and construction, and is
+deleted. Internal tests now retrieve canonical identity from `getTurns()` rather
+than leaking it through the public history projection. The restoration suite
+(106 tests) and source/contract typecheck pass. The accompanying carrier audit
+classifies `restorationSubjectIds` as reclamation authority; `__positionIds` as
+the index, containment, and prefix-frontier authority; `__effects` and
+`__orderDeltas` as reversible facts; `historyIndex` as temporal ordering; and
+`__eventOrdinal` as the historical-event retention boundary. Per-effect
+`ownerPath` remains a reversal address, while capture-bucket `ownerPaths` has
+only settlement-bounded diagnostic lifetime. No further simple carrier deletion
+is justified before the required baseline identifies a material allocation or
+density problem; packed headers, sparse pools, and arenas remain alternatives,
+not a selected design.
+
 ### Sequence
 
 1. Finish immutable RC9 verification.

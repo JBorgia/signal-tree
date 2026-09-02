@@ -98,7 +98,6 @@ type CanonicalTurn<T> = Omit<RestorationHistoryEntry<T>, 'state'> & {
   state?: T;
   id: number;
   historyIndex: number;
-  __turnId: number;
   /**
    * RESTORATION CLAIM SET — the subjects whose backing must conservatively
    * remain available while this record is retained.
@@ -744,7 +743,6 @@ class RestorationManager<T> {
     const entry: CanonicalTurn<T> = {
       id: turnId,
       historyIndex: this.history.length,
-      __turnId: turnId,
       ...(pendingState === undefined ? {} : { state: pendingState }),
     };
     const orderDeltas = (collectionOrders ?? [])

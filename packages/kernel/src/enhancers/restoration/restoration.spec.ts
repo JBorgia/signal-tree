@@ -1528,17 +1528,13 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const entry = t.getRestorationHistory().at(-1) as {
-      __turnId?: number;
-      __positionIds?: number[];
-    };
-    const turnId = entry.__turnId;
-    const positionIds = [...(entry.__positionIds ?? [])].sort((a, b) => a - b);
     const turn = t.getTurns().at(-1) as {
       id: number;
       __positionIds?: number[];
       historyIndex: number;
     };
+    const turnId = turn.id;
+    const positionIds = [...(turn.__positionIds ?? [])].sort((a, b) => a - b);
 
     expect(turnId).toBeDefined();
     expect(positionIds).toHaveLength(3);
@@ -1622,12 +1618,12 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const entry = t.getRestorationHistory().at(-1) as {
-      __turnId?: number;
+    const turn = t.getTurns().at(-1) as {
+      id: number;
       __positionIds?: number[];
     };
-    const turnId = entry.__turnId as number;
-    const [leftPositionId, rightPositionId] = entry.__positionIds ?? [];
+    const turnId = turn.id;
+    const [leftPositionId, rightPositionId] = turn.__positionIds ?? [];
 
     expect(t.getTurnIdsForPosition(leftPositionId)).toEqual([turnId]);
     expect(t.getTurnIdsForPosition(rightPositionId)).toEqual([turnId]);
@@ -1658,7 +1654,7 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
 
     const historyIndex = t.getRestorationHistory().length - 1;
-    const turnId = t.getRestorationHistory().at(-1).__turnId as number;
+    const turnId = t.getTurns().at(-1).id as number;
 
     expect(t.getTurnRef(turnId)).toBe(t.getRestorationHistoryRef(historyIndex));
   });
