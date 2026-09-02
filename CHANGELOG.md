@@ -1,4 +1,4 @@
-## Unreleased (15.0.0-rc.4)
+## 15.0.0-rc.4 (2026-09-02)
 
 - **Kernel tests use a bounded CI worker pool.** Vitest now runs at most two
   kernel workers on CI runners, preventing the 260-file suite from exhausting
