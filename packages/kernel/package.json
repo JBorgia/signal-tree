@@ -1,6 +1,6 @@
 {
   "name": "@signal-tree/kernel",
-  "version": "15.0.0-rc.10",
+  "version": "15.0.0-rc.11",
   "description": "SignalTree: framework-neutral reactive application state with causal semantics.",
   "license": "Apache-2.0",
   "type": "module",
