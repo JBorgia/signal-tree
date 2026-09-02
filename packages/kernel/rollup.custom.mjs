@@ -3,11 +3,64 @@ import { fileURLToPath } from 'node:url';
 
 import typescript from '@rollup/plugin-typescript';
 import { dts } from 'rollup-plugin-dts';
+import ts from 'typescript';
 import { createLibraryRollupConfig } from '../../tools/build/create-rollup-config.mjs';
 
 const packageRoot = path.dirname(fileURLToPath(import.meta.url));
 
 const baseConfigFactory = createLibraryRollupConfig({ packageRoot });
+
+const adapterEntityMarkerIdentityPlugin = {
+  name: 'signaltree-adapter-entity-marker-identity',
+  renderChunk(code, chunk) {
+    if (!chunk.fileName.endsWith('adapter.d.ts')) {
+      return null;
+    }
+
+    const source = ts.createSourceFile(
+      chunk.fileName,
+      code,
+      ts.ScriptTarget.Latest,
+      false,
+      ts.ScriptKind.TS
+    );
+    const brandDeclarations = source.statements.filter(
+      (statement) =>
+        ts.isVariableStatement(statement) &&
+        statement.declarationList.declarations.some(
+          (declaration) =>
+            ts.isIdentifier(declaration.name) &&
+            declaration.name.text === 'ENTITY_MAP_BRAND'
+        )
+    );
+    const markerDeclarations = source.statements.filter(
+      (statement) =>
+        ts.isInterfaceDeclaration(statement) &&
+        statement.name.text === 'EntityMapMarker'
+    );
+
+    if (brandDeclarations.length !== 1 || markerDeclarations.length !== 1) {
+      this.error(
+        'adapter declaration must contain exactly one local EntityMapMarker definition.'
+      );
+    }
+
+    let transformed = code;
+    for (const declaration of [
+      ...brandDeclarations,
+      ...markerDeclarations,
+    ].sort((left, right) => right.getFullStart() - left.getFullStart())) {
+      transformed =
+        transformed.slice(0, declaration.getFullStart()) +
+        transformed.slice(declaration.getEnd());
+    }
+
+    return {
+      code: `import type { EntityMapMarker } from './index.js';\n${transformed}`,
+      map: null,
+    };
+  },
+};
 
 export default (config, options) => {
   const baseConfig = baseConfigFactory(config, options);
@@ -115,7 +168,10 @@ export default (config, options) => {
     {
       input: path.join(packageRoot, 'src/index.ts'),
       output: {
-        file: path.join(packageRoot, '../../dist/packages/kernel/dist/index.d.ts'),
+        file: path.join(
+          packageRoot,
+          '../../dist/packages/kernel/dist/index.d.ts'
+        ),
         format: 'es',
       },
       plugins: [dts({ respectExternal: true })],
@@ -128,6 +184,7 @@ export default (config, options) => {
           '../../dist/packages/kernel/dist/adapter.d.ts'
         ),
         format: 'es',
+        plugins: [adapterEntityMarkerIdentityPlugin],
       },
       plugins: [dts({ respectExternal: true })],
     },
