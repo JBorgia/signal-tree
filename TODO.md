@@ -2136,3 +2136,170 @@ Consumers/projections after the kernel:
 
 Preserve the semantic distinction between speculative rollback, historical
 undo, and temporal rewind even if they share representation under the kernel.
+
+## 12. Document composition patterns on top of the v15 kernel
+
+Not a kernel-API proposal. A recurring question in consumer migrations
+(TruckTrax v3's, most recently) is "how do I build staged editing / server
+reconciliation / optimistic UI / a loading indicator on v15" when the answer
+is "compose existing primitives," not "wait for a new marker." Some consumers
+misread a deliberate retirement (`loader()`, `asyncSource()`, `stored()`,
+`status()` — all closed, see `STORED-RETIRE-0`/`LOADER-RETIRE-0` and the
+`status()` A3-0 disposition in `docs/architecture/v15-production-surface-audit.md`)
+as a gap rather than a decided design.
+
+**⚠️ CORRECTED after writing this item, before acting on it — read this first.**
+[`docs/guides/composition-recipes.md`](docs/guides/composition-recipes.md)
+already exists, is already titled "patterns that need no new API", and ALREADY
+covers 3 of the topics below: a standard enhancer policy (§1), a reusable
+entity-CRUD Ops base (§2), and a selection read-model (§3). Its provenance note
+traces to the SAME real consumer this item's motivating discussion was about
+(three apps, twelve admin domains — `docs/audits/2026-07/v3-consumer-reuse-audit.md`).
+Do **not** create a new `docs/patterns/` directory — it would duplicate this
+file. Add the genuinely new patterns (staged editing, server reconciliation,
+one-shot vs. persistent loading, optimistic UI, causal explanation) as NEW
+NUMBERED SECTIONS in `composition-recipes.md`, following its established
+format (`## N. Title`, **The need:**, **The recipe**, code blocks, an
+optional "Why this isn't in core" close) — not the PROBLEM/OWNS/COMPOSITION
+template floated below, which was designed before this file was found. Treat
+the template as source material for section CONTENT, not a file-structure
+mandate.
+
+**Also found while checking for overlap:** `docs/guides/persistence-guide.md`
+is stale — four lines, says only "keep persistence in application-owned
+services... through ordinary state or `entityMap()`", and never mentions
+`link()` at all, despite `link()` being the kernel's own recorded successor
+for the persistence half of `stored()`'s retirement (`STORED-RETIRE-0`'s
+decomposition: state + `link()` + persistence policy). This is the same class
+of doc-staleness already flagged for `migration-v14-v15.md` elsewhere in this
+repo's history — fix it in the same pass as writing the new
+`composition-recipes.md` sections, since the new "Persistence" section and
+this file will otherwise say two different things.
+
+**Design filter — apply this before adding anything else to the catalog below,
+and before any future kernel API discussion prompted by an unmet pattern:**
+
+> If an important application problem can be expressed cleanly from existing
+> SignalTree semantics, document the composition before inventing a new API.
+> A pattern should become a kernel capability only if repeated implementations
+> reveal a semantic property that applications cannot safely own themselves.
+
+This is the same ownership-ratchet logic that already closed `status()`/
+`loader()`/`stored()` (ordinary state + Ops/endpoint + `external()`/`link()`),
+generalized into a standing rule for the next ten patterns instead of
+re-litigating it per-marker.
+
+### Fixed page structure (every `docs/patterns/*.md` file)
+
+```text
+PROBLEM
+WHAT SIGNALTREE OWNS
+WHAT THE APPLICATION / ENDPOINT OWNS
+COMPOSITION                    (plain before/after or layered diagram, no code)
+WHY THE CAUSAL MODEL HELPS
+WHAT SIGNALTREE DOES NOT GUARANTEE
+COMPLETE EXECUTABLE EXAMPLE    (a real spec/demo citation — never invented code)
+```
+
+The last section is load-bearing: a pattern doc whose example doesn't run as
+a real test is aspiration, not architecture evidence. Cite an existing spec
+where one already demonstrates the shape; where none exists yet, that's its
+own TODO item (add a real spec first), not a reason to write fabricated
+example code.
+
+### Catalog and disposition
+
+| Pattern | Document? | New kernel API? |
+| --- | --- | --- |
+| Staged/draft editing | Yes — canonical | No |
+| Server reconciliation | Yes — canonical | No |
+| One-shot async loading | Yes — canonical | No |
+| Persistent remote relationship | Yes — canonical | No (existing `link()`) |
+| Persistence | Yes — canonical | No (existing `link()`) |
+| Optimistic UI | Yes — canonical, worded carefully | No |
+| Human-readable causal explanation | Yes — canonical (projection) | No (tooling, not kernel) |
+| Agent/human attribution | Experimental pattern only | Not until attribution ownership is settled |
+| Cross-tree atomic transactions | No canonical claim yet | Unproven |
+| Generic reconciliation framework | No | No |
+| v14 compatibility layer | Migration docs only | No |
+
+### Per-pattern content notes
+
+File names below (`staged-editing.md` etc.) are the ORIGINAL, now-superseded
+plan — read them as "the staged-editing section", "the server-reconciliation
+section", each landing as a new `## N.` section in `composition-recipes.md`
+(current sections: 1 enhancer policy, 2 entity-CRUD Ops base, 3 selection
+read-model — already written, do not duplicate). Everything else below
+(anchors, wording cautions) still applies verbatim to the section content.
+
+- **`staged-editing.md`** — canonical state → application-owned draft →
+  validation/review/edits → one intentional commit into canonical state →
+  optional restoration designation. SignalTree does not need to understand
+  "draft" as a concept; it needs the eventual commit coherently classified
+  (an authored turn) once it lands. Do **not** propose a `beginStage()`/session
+  API — the entire point of the doc is that this is expressible today without
+  one. Executable-example candidate: `transactions()`'s pending/confirm/
+  rollback shape (`packages/kernel/src/enhancers/transactions/transactions.spec.ts`)
+  demonstrates the "held, then one commit" half; the pure UI-level draft half
+  (no kernel involvement until commit) has no dedicated spec yet — write one
+  before/alongside the doc rather than inventing the example inline.
+- **`server-reconciliation.md`** — remote/server truth → endpoint/domain
+  reconciliation policy (server wins / client wins / merge / conflict
+  detection / rebase / retry / staleness / auth — all application-owned) →
+  accepted external truth → tree via `external()`/`link()`. SignalTree's only
+  job: accepted truth is never confused with authored application work.
+  Executable-example anchors: `packages/kernel/src/lib/internals/causal-runtime/pending-rollback-composition.spec.ts`
+  and `structural-pending-rollback-composition.spec.ts` (rejection/rollback
+  half), `link-persistence-conformance.spec.ts` (accepted-truth landing half).
+- **`one-shot-loading.md`** vs **`persistent-remote-state.md`** — two
+  separate recipes specifically so neither `loader()` nor `asyncSource()`
+  reads as "missing" (both were deliberately retired with no replacement
+  primitive — see `v15-production-surface-audit.md`'s final disposition
+  ledger). One-shot: request → fetch → accepted external result → tree, no
+  `link()` required merely because HTTP exists. Persistent: tree ↔ `link()` ↔
+  endpoint ↔ HTTP/storage/websocket, with loading/error/freshness/retry/
+  caching/SWR named explicitly as application/framework/endpoint policy unless
+  they are themselves domain state. Executable-example anchors:
+  `packages/kernel/src/lib/link-0-three-directions.spec.ts`,
+  `link-1-relationship.spec.ts`.
+- **`persistence.md`** — same `link()` shape as `persistent-remote-state.md`,
+  endpoint = storage. Executable-example anchors (already exist, direct hit):
+  `packages/kernel/src/enhancers/serialization/persistence-as-link-swap-0.spec.ts`,
+  `packages/kernel/src/lib/link-persistence-conformance.spec.ts`,
+  `persistence-decompose-0.spec.ts`.
+- **`optimistic-update.md`** — word this carefully: teach the authority
+  separation (user intent → authored local transition → external request →
+  server acceptance/correction → external truth enters tree). Do **not**
+  promise an "automatic optimistic rollback" primitive that doesn't exist —
+  what happens on rejection is domain policy. `transactions()`'s own doc
+  already says as much ("pending authority, not a synonym for retained undo
+  history"); this page is the applied version of that warning.
+- **`causal-explanation.md`** — compact causal facts → resolve stable
+  identities → application/domain metadata → projector → human-readable
+  sentence. Core teaching point, stated explicitly: human/AI-readable
+  explanation is a PROJECTION of causal truth, not the kernel's physical
+  storage model — the kernel does not store names, prose, timestamps, actors,
+  or event objects internally. Defensive value: tells an AI reader not to
+  assume that shape exists inside the kernel.
+
+Deferred (record here, do not create files yet): `websocket-server-truth.md`
+(experimental — SSE/WS-as-`link().subscribe` needs its own worked example
+first), `agent-authored-work.md` / `collaborative-state.md` / `offline-editing.md`
+(no canonical claim yet per the disposition table above).
+
+### Sequencing
+
+1. Staged editing and server reconciliation sections first (highest-leverage
+   pair, per the design discussion that produced this item) — append to
+   `composition-recipes.md` as `## 4.`/`## 5.`.
+2. Confirm or write the missing executable-example specs named above before
+   or alongside each section — never publish a section whose example is
+   invented.
+3. Fix `persistence-guide.md`'s staleness (see the correction note at the top
+   of this item) in the same pass as the persistence section, so the two
+   files agree.
+4. Once `composition-recipes.md` covers the canonical set, check whether the
+   demo site / top-level docs nav links it already (`grep -r
+   composition-recipes` across `apps/demo` and any docs index) — add a link
+   if not, as its own small pass (the demo site's own currency/measurement
+   rules in `AGENTS.md` § "Docs & demo currency" apply to anything it links).
