@@ -2514,10 +2514,14 @@ the index, containment, and prefix-frontier authority; `__effects` and
 `__orderDeltas` as reversible facts; `historyIndex` as temporal ordering; and
 `__eventOrdinal` as the historical-event retention boundary. Per-effect
 `ownerPath` remains a reversal address, while capture-bucket `ownerPaths` has
-only settlement-bounded diagnostic lifetime. No further simple carrier deletion
-is justified before the required baseline identifies a material allocation or
-density problem; packed headers, sparse pools, and arenas remain alternatives,
-not a selected design.
+only settlement-bounded diagnostic lifetime. `WRITE-METADATA-ANNOTATIONS-0`
+then closed the only other simple carrier deletion: public ambient
+`correlationId` and write-level `timestamp` had neither writers nor production
+readers, while persisted audit/devtools clocks are separate facts and survive.
+The type contract rejects both fields; the pinned source/contract typecheck
+passes. No further retained-turn carrier deletion is justified before the
+required baseline identifies a material allocation or density problem; packed
+headers, sparse pools, and arenas remain alternatives, not a selected design.
 
 ### Sequence
 

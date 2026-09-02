@@ -108,10 +108,6 @@ export interface WriteMetadata {
     | 'transaction-rollback';
   /** Suppress guardrails for this update. */
   suppressGuardrails?: boolean;
-  /** Optional correlation ID for related updates. */
-  correlationId?: string;
-  /** Optional timestamp. */
-  timestamp?: number;
   /**
    * ⚠️ `positionIds` WAS DELETED FROM `WriteMetadata` IN 15.0 —
    * SUBJECT-IDENTITY-OWNERSHIP-0, an intentional pre-freeze public contraction.
