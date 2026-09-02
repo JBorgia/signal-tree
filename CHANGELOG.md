@@ -1,4 +1,4 @@
-## Unreleased (15.0.0-rc.7)
+## 15.0.0-rc.7 (2026-09-02)
 
 - **Framework declarations resolve under strict Node module rules.** Angular
   and React declarations now emit `.js` relative specifiers, preserving Angular
