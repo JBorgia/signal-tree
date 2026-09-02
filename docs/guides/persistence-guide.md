@@ -1,14 +1,14 @@
 # Persistence Guide
 
-The old `stored(key, default, options?)` marker, storage-key helpers, and
-cache-aware loader persistence path are gone (`STORED-RETIRE-0`, closed —
-see `docs/architecture/v15-production-surface-audit.md`'s final disposition
-ledger). This is not an open question waiting on a future contract; it is a
-decided decomposition:
+The old `stored(key, default, options?)` marker is deleted, along with its
+storage-key helpers and cache-aware loader persistence path (`STORED-RETIRE-0`,
+closed — see `docs/architecture/v15-production-surface-audit.md`'s final
+disposition ledger). This is not an open question waiting on a future
+contract; it is a decided decomposition:
 
 ```text
 BEFORE                          AFTER
-stored()                         ordinary state location
+stored() [deleted]               ordinary state location
   state                            + Link              (relationship authority)
   persistence                      + persistence policy (endpoint, codec, key,
   authority                                              lifecycle)
@@ -16,8 +16,8 @@ stored()                         ordinary state location
 ```
 
 `link()` is the general successor for external acquisition/synchronization —
-the same primitive `loader()` decomposed into for collections. Persistence is
-just the case where the endpoint is storage instead of HTTP:
+the same primitive the removed `loader()` decomposed into for collections.
+Persistence is just the case where the endpoint is storage instead of HTTP:
 
 ```typescript
 import { link, type Link } from '@signal-tree/kernel';
@@ -33,7 +33,7 @@ function attachLocalStorageSync<T>(
     },
     set: (value) => localStorage.setItem(key, JSON.stringify(value)),
   });
-  void connection.retrieve(); // stored()'s marker hydrated synchronously at
+  void connection.retrieve(); // the deleted marker hydrated synchronously at
   // construction; link() only reads on retrieve(), so pull once to match.
   return connection;
 }
@@ -49,7 +49,7 @@ site right after, the same shape §2's Ops base uses for its own acquisition).
 
 ### What SignalTree owns vs. what you own
 
-Same split `loader()` resolved into:
+Same split the removed `loader()` resolved into:
 
 ```text
 the relationship (does this location have a live sync to an external

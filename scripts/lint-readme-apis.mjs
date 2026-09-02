@@ -151,6 +151,10 @@ function markdownUnder(dir, out = []) {
 
 const READMES = [
   'README.md',
+  // llms.txt ships inside the core tarball (prepare-publish-artifacts.mjs) and
+  // is the AI-facing surface an agent reads first — it gets the same
+  // dead-import and retired-API scan as every shipped README, not a pass.
+  'llms.txt',
   ...readdirSync(join(ROOT, 'packages'))
     .map((p) => `packages/${p}/README.md`)
     .filter((f) => existsSync(join(ROOT, f))),
