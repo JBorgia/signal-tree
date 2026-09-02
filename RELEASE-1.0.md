@@ -53,6 +53,16 @@ failures, and retains 100 KB of failed-gate diagnostics. Under Node 22 with
 and its mutation proof passed, and the complete release matrix passed 69/69.
 This release-system correction earns RC4; the RC3 tag is not moved.
 
+`15.0.0-rc.4` is **IMMUTABLE / NOT PUBLISHED** at `2aee7f27`. Tagged CI run
+`33577413658` proved the worker correction: the complete 69-gate release matrix,
+including `kernel:test`, passed. The separate mutation matrix then reported
+59/60 because the `release-claims` proof still removed a symbol outside its
+moving RC3-to-RC4 delta. Commit `980d1933` gives mutation proofs an optional
+proof-specific command and pins this proof to the RC1-to-v15 delta where
+`runInvalidationGroup` is genuinely new. The production gate keeps its moving
+base. Under Node 22, all 60 mutation proofs and all 69 release gates pass. This
+release-system correction earns RC5; the RC4 tag is not moved.
+
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
 segmented, split-pool, checked-handle, and active-node-index rows have measured

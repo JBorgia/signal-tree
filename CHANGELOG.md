@@ -1,3 +1,10 @@
+## Unreleased (15.0.0-rc.5)
+
+- **Release-claim mutation proof remains non-vacuous across candidates.** The
+  production gate still compares each candidate with its immediate predecessor,
+  while its falsifier uses the stable RC1-to-v15 API delta where the removed
+  documentation claim is known to be release-added.
+
 ## 15.0.0-rc.4 (2026-09-02)
 
 - **Kernel tests use a bounded CI worker pool.** Vitest now runs at most two
