@@ -2603,6 +2603,15 @@ events, and `hasObservedBatchLog` is false. The former 1,000-turn result was
 bounded restorable window, not total past designated writes. This removes 437
 raw and 144 gzip bytes from the restoration module; the separately measured
 exercised `restoration()` feature delta falls from +18.38 KB to +18.26 KB gzip.
+Implemented in `6ae10bd0` (`perf: remove retained restoration diagnostics`).
+Validation: direct restoration suite 106/106; kernel suite 2,157 passed (3
+expected failures, 13 skipped, 1 todo); focused ESLint; `npm run typecheck`;
+fresh `pnpm nx build kernel`; five-sample 30-arm causal matrix; exercised
+feature-size report; `npm run validate:docs`; and clean staged diff. Ownership
+census/ledger regeneration removes the stale cap row. The ownership checker
+still stops first at its unrelated census-family mutation proof (22 existing
+public-symbol rows absent from ownership rows), not a stale diagnostic subject;
+keep that infrastructure failure separate from this completed retention fix.
 
 `TURN-BOUNDARY-GROUP-0` is **ACTIVE ATTRIBUTION, NO CARRIER SUBSTITUTION
 AUTHORIZED**. Current reader classification: `history[]` owns bounded temporal
