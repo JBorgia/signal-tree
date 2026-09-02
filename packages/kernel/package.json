@@ -32,7 +32,8 @@
     "dist/**/*.d.ts",
     "README.md",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "llms.txt"
   ],
   "repository": {
     "type": "git",

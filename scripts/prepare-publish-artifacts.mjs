@@ -62,12 +62,12 @@ const PACKAGES = readdirSync(join(ROOT, 'packages'), { withFileTypes: true })
 /**
  * Source → destination, relative to the repo root. Both must exist.
  *
- * EMPTY as of 15.0. The llms.txt / llms-full.txt entries were removed with the
- * artifacts themselves — see RELEASE-1.0.md, "AI DISCOVERABILITY". The
- * hard-fail below is deliberately kept for whatever gets added next: a missing
- * source must never be skipped silently.
+ * `llms.txt` moved to the repo root (AI-SEMANTIC-DISCOVERABILITY-0) and is
+ * copied into the core tarball here, the one place a missing source hard-fails
+ * instead of silently shipping without it. There is no `llms-full.txt`; do not
+ * add an entry for one until it exists.
  */
-const COPIES = [];
+const COPIES = [['llms.txt', 'dist/packages/kernel/llms.txt']];
 
 function run(label, argv) {
   process.stdout.write(`  · ${label} ... `);
