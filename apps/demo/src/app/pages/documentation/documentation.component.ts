@@ -53,6 +53,19 @@ export class DocumentationComponent implements OnInit {
       description: 'Owner-bound React observation',
       readmePath: 'assets/docs/react/README.md',
     },
+    {
+      id: 'composition-recipes',
+      name: 'Composition Recipes',
+      description:
+        'Patterns built from existing primitives, no new API: staged editing, optimistic writes, one-shot loading, link()-based relationships, causal explanation',
+      readmePath: 'assets/docs/guides/composition-recipes.md',
+    },
+    {
+      id: 'persistence-guide',
+      name: 'Persistence Guide',
+      description: 'The link()-as-storage recipe that replaced stored()',
+      readmePath: 'assets/docs/guides/persistence-guide.md',
+    },
   ];
 
   readonly quickLinks: DocQuickLink[] = [

@@ -36,6 +36,16 @@
             "glob": "README.md",
             "input": "packages/react",
             "output": "assets/docs/react"
+          },
+          {
+            "glob": "composition-recipes.md",
+            "input": "docs/guides",
+            "output": "assets/docs/guides"
+          },
+          {
+            "glob": "persistence-guide.md",
+            "input": "docs/guides",
+            "output": "assets/docs/guides"
           }
         ],
         "styles": ["apps/demo/src/styles.scss"]

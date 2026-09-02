@@ -9,7 +9,7 @@ import { entityMap, signalTree } from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
-import type { EntityMapMarker } from '@signal-tree/kernel';
+import type { EntityMapMarker } from '@signal-tree/angular';
 
 /**
  * Effect Reactivity Test Component

@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { entityMap, signalTree } from '@signal-tree/angular';
 
-import type { EntityMapMarker } from '@signal-tree/kernel';
+import type { EntityMapMarker } from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
