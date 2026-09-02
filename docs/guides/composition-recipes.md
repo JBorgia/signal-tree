@@ -559,9 +559,9 @@ tests, not incidental behavior).
 
 `staleTime`, SWR, retry, request dedup, caching, auth, and URL construction
 all live inside your `get`/`set`/`subscribe` implementations — none of them
-are SignalTree concepts. If you need staleness-aware refetching (`loader()`'s
-old `staleTime`/`swr` options), that's a small stateful wrapper around
-`connection.retrieve()` you own, not something to look for on `Link` itself.
+are SignalTree concepts. If you need staleness-aware refetching (the removed `loader()`'s old `staleTime`/`swr` options), that's a small stateful wrapper
+around `connection.retrieve()` you own, not something to look for on `Link`
+itself.
 
 ---
 

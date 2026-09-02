@@ -42,8 +42,8 @@ including reusable domain libraries. Framework facades forward the neutral
 kernel surface by canonical identity; they do not duplicate semantic authority.
 
 There is no v15 forms, persistence, validation, events, or realtime package;
-those are application-owned. `.with()`, positional `derived`, `stored()`, and
-the `asyncSource`/`asyncQuery`/`form`/`status` markers were removed.
+those are application-owned. `.with()`, positional `derived`, and the
+`stored`/`asyncSource`/`asyncQuery`/`form`/`status` markers were all removed.
 
 ## Migration Rule
 
