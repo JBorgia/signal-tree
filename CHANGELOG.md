@@ -1,3 +1,9 @@
+## Unreleased (15.0.0-rc.9)
+
+- **Release gate mutation coverage follows the canonical declaration-doc
+  baseline.** The mutation proof now raises the current baseline after the
+  duplicate entity-marker declaration was removed.
+
 ## 15.0.0-rc.8 (2026-09-02)
 
 - **Angular entity-map declarations retain nominal identity across package entry
