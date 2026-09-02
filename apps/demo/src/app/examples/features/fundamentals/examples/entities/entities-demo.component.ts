@@ -9,7 +9,7 @@ import {
   User,
 } from '../../../../../shared/models';
 
-import type { EntityMapMarker } from '@signal-tree/kernel';
+import type { EntityMapMarker } from '@signal-tree/angular';
 
 interface EntitiesState {
   users: EntityMapMarker<User, number>;

@@ -7,7 +7,7 @@ import {
   ExampleComponent,
 } from '../../../../../shared/components/example-shell';
 
-import type { DevToolsDebugSession } from '@signal-tree/kernel';
+import type { DevToolsDebugSession } from '@signal-tree/angular';
 
 interface DevtoolsState {
   counter: number;

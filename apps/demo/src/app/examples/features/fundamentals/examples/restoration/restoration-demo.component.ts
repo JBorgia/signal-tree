@@ -18,7 +18,7 @@ import {
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
-import type { RestorationMethods } from '@signal-tree/kernel';
+import type { RestorationMethods } from '@signal-tree/angular';
 
 interface Todo {
   id: number;
