@@ -1,4 +1,4 @@
-## Unreleased (15.0.0-rc.9)
+## 15.0.0-rc.9 (2026-09-02)
 
 - **Release gate mutation coverage follows the canonical declaration-doc
   baseline.** The mutation proof now raises the current baseline after the
