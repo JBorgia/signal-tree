@@ -2632,6 +2632,25 @@ entry objects with state by reference. F0/F1 remain latency controls; their
 post-GC retained cost must not be attributed to a projection cache unless a
 future measurement demonstrates a retained owner.
 
+Pre-registered disposition: if removing or collapsing one derived accelerator
+saves less than a material retained-heap amount, or causes more than a 5%
+regression in restoration/navigation workloads, it remains intentionally
+retained implementation state. `USED BY ALGORITHM` is not causal authority;
+the objective is the best measured speed-and-density tradeoff, not maximum
+normalization.
+
+#### `OWNERSHIP-CENSUS-GATE-0` — ACTIVE, SEPARATE PRE-GA GATE INFRASTRUCTURE
+
+`node tools/check-kernel-ownership.mjs` currently stops in its census-family
+mutation proof because 22 existing public-symbol rows have no ownership rows.
+This did not falsify `OBSERVED-BATCH-DIAGNOSTIC-RETENTION-0`: regenerated census
+and ledger evidence remove that deleted subject cleanly. Establish whether the
+checker encodes a stale/incomplete census domain or those symbols require real
+ownership declarations; repair the checker or ledger accordingly, then
+mutation-prove the result. Do not manufacture classifications merely to satisfy
+the mutation machinery, and do not mix this gate work with causal attribution
+or `KERNEL-TYPESCRIPT-PEER-POLICY-0`.
+
 #### `KERNEL-TYPESCRIPT-PEER-POLICY-0` — QUEUED, SEPARATE PACKAGE POLICY
 
 `pnpm nx lint kernel` is red because dependency-check asserts that the kernel
