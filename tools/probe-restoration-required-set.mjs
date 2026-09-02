@@ -63,17 +63,19 @@ if (!existsSync(CORE)) {
 const { signalTree, entityMap, restoration, undoable, external } = await import(CORE);
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
-const WIDTH = 5;
 const HISTORY_SIZES = [4, 6, 10, 24];
+const SCRIPTED_TURNS = 30;
+const WIDTH = SCRIPTED_TURNS;
 let HISTORY = HISTORY_SIZES.at(-1);
 
 /**
  * One scripted operation. `apply` mutates, `label` names the operation class so
  * the table can report per-class rather than per-step.
  */
-const SCRIPT = [
-  { label: 'removeOne', apply: (rows) => rows.removeOne('a-2') },
-];
+const SCRIPT = Array.from({ length: SCRIPTED_TURNS }, (_, index) => ({
+  label: 'removeOne',
+  apply: (rows) => rows.removeOne(`a-${index}`),
+}));
 
 function seed(prefix) {
   const out = [];
