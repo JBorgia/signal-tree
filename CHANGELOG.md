@@ -1,4 +1,4 @@
-## Unreleased (15.0.0-rc.5)
+## 15.0.0-rc.5 (2026-09-02)
 
 - **Release-claim mutation proof remains non-vacuous across candidates.** The
   production gate still compares each candidate with its immediate predecessor,
