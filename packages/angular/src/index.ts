@@ -13,8 +13,8 @@
  *     REALIZATION IS SELECTED AT CONSTRUCTION AND OWNED FOR THE TREE LIFETIME.
  */
 // Registers the Angular leaf carrier with the kernel's type registry (TA-B).
-import './lib/carrier';
-import { ANGULAR_TREE_REALIZATION } from './lib/angular-realization';
+import './lib/carrier.js';
+import { ANGULAR_TREE_REALIZATION } from './lib/angular-realization.js';
 import { createSignalTreeFactory } from '@signal-tree/kernel/adapter';
 import type {
   EntityNodeOf,
@@ -132,5 +132,5 @@ export type EntitySignalWithSlices<
 export type SignalTree<T> = ISignalTreeOf<T, 'angular'>;
 
 // Angular-owned API, which the kernel deliberately does not export.
-export { defineStore, type DefineStoreConfig } from './lib/define-store';
-export { toWritableSignal } from './lib/to-writable-signal';
+export { defineStore, type DefineStoreConfig } from './lib/define-store.js';
+export { toWritableSignal } from './lib/to-writable-signal.js';

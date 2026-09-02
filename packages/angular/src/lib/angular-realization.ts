@@ -3,7 +3,7 @@ import {
   type TreeRealization,
 } from '@signal-tree/kernel/adapter';
 
-import { ANGULAR_SCALAR_LEAF_REALIZATION } from './scalar-leaf-realization';
+import { ANGULAR_SCALAR_LEAF_REALIZATION } from './scalar-leaf-realization.js';
 
 /**
  * Immutable Angular mechanisms captured by this package's bound tree factory.

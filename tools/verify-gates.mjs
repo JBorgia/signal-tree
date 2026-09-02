@@ -1244,12 +1244,13 @@ const GATES = [
   {
     name: 'consumer-types',
     covers:
-      'packed kernel declarations compile with skipLibCheck=false under bundler and node16 resolution',
+      'packed kernel and framework declarations compile with skipLibCheck=false under bundler and node16 resolution',
     cmd: ['node', 'tools/verify-consumer-typecheck.mjs'],
     needsBuild: true,
     mutation: {
-      file: 'dist/packages/kernel/dist/adapter.d.ts',
-      append: '\nexport type __GateBrokenDeclaration = MissingDeclarationType;\n',
+      file: 'dist/packages/angular/src/index.d.ts',
+      find: "import './lib/carrier.js';",
+      replace: "import './lib/carrier';",
     },
   },
   {

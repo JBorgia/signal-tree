@@ -100,11 +100,11 @@ const candidate = {
 };
 writeFileSync(journalPath, `${JSON.stringify(candidate, null, 2)}\n`);
 console.log(`Validated immutable candidate: ${journalPath}`);
-const kernelArtifact = artifacts.find((artifact) => artifact.package === 'kernel');
-if (!kernelArtifact) throw new Error('Candidate has no kernel artifact');
 run('node', [
   'tools/verify-consumer-typecheck.mjs',
-  `--tarball=${join(candidateRoot, kernelArtifact.tarball)}`,
+  ...artifacts.map(
+    (artifact) => `--tarball=${join(candidateRoot, artifact.tarball)}`
+  ),
 ]);
 run('node', ['scripts/verify-publish-candidate.mjs']);
 

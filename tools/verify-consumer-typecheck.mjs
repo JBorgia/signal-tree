@@ -30,37 +30,51 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
 const ROOT = process.cwd();
-const CORE_DIST = join(ROOT, 'dist/packages/kernel');
-const suppliedTarball = process.argv
-  .find((arg) => arg.startsWith('--tarball='))
-  ?.slice('--tarball='.length);
+const PACKAGE_NAMES = ['kernel', 'angular', 'react'];
+const suppliedTarballs = process.argv
+  .filter((arg) => arg.startsWith('--tarball='))
+  .map((arg) => resolve(ROOT, arg.slice('--tarball='.length)));
 
-if (!suppliedTarball && !existsSync(CORE_DIST)) {
-  console.error('❌ dist/packages/kernel not found — run the build first.');
+if (
+  suppliedTarballs.length === 0 &&
+  PACKAGE_NAMES.some((name) => !existsSync(join(ROOT, 'dist/packages', name)))
+) {
+  console.error('❌ publishable package dist folders not found — run the build first.');
   process.exit(1);
 }
 
 const work = mkdtempSync(join(tmpdir(), 'st-consumer-tsc-'));
-console.log('📦 Packing @signal-tree/kernel and type-checking a real consumer\n');
+console.log('📦 Packing SignalTree packages and type-checking a real consumer\n');
 
-let tarballPath;
-if (suppliedTarball) {
-  tarballPath = resolve(ROOT, suppliedTarball);
-  if (!existsSync(tarballPath)) {
-    console.error(`❌ supplied tarball does not exist: ${tarballPath}`);
+const tarballPaths = [];
+if (suppliedTarballs.length > 0) {
+  for (const tarballPath of suppliedTarballs) {
+    if (!existsSync(tarballPath)) {
+      console.error(`❌ supplied tarball does not exist: ${tarballPath}`);
+      process.exit(1);
+    }
+    tarballPaths.push(tarballPath);
+  }
+  if (tarballPaths.length !== PACKAGE_NAMES.length) {
+    console.error(`❌ expected ${PACKAGE_NAMES.length} supplied tarballs, got ${tarballPaths.length}.`);
     process.exit(1);
   }
 } else {
-  execFileSync('npm', ['pack', '--pack-destination', work], {
-    cwd: CORE_DIST,
-    stdio: 'pipe',
-  });
-  const tarball = readdirSync(work).find((file) => file.endsWith('.tgz'));
-  if (!tarball) {
-    console.error('❌ npm pack produced no tarball.');
-    process.exit(1);
+  for (const name of PACKAGE_NAMES) {
+    const before = new Set(readdirSync(work));
+    execFileSync('npm', ['pack', '--pack-destination', work], {
+      cwd: join(ROOT, 'dist/packages', name),
+      stdio: 'pipe',
+    });
+    const tarball = readdirSync(work).find(
+      (file) => file.endsWith('.tgz') && !before.has(file)
+    );
+    if (!tarball) {
+      console.error(`❌ npm pack produced no tarball for ${name}.`);
+      process.exit(1);
+    }
+    tarballPaths.push(join(work, tarball));
   }
-  tarballPath = join(work, tarball);
 }
 
 // --- consumer project -------------------------------------------------------
@@ -86,6 +100,8 @@ import {
   batching,
 } from '@signal-tree/kernel';
 import { createSignalTreeFactory } from '@signal-tree/kernel/adapter';
+import { defineStore } from '@signal-tree/angular';
+import { useSignalTree } from '@signal-tree/react';
 
 type User = { id: number; name: string; version: number };
 
@@ -122,7 +138,7 @@ tree.undo();
 tree.redo();
 tree.batch(() => tree.$.count.set(0));
 
-export const _used = [n, whole, rows, createSignalTreeFactory];
+export const _used = [n, whole, rows, createSignalTreeFactory, defineStore, useSignalTree];
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
 
@@ -135,9 +151,11 @@ execFileSync(
     '--no-audit',
     '--no-fund',
     '--silent',
-    tarballPath,
+    ...tarballPaths,
     `@angular/core@${process.env['NG_VERSION'] || '^22.0.0'}`,
     'rxjs@^7.0.0',
+    'react@^19.0.0',
+    '@types/react@^19.0.0',
     'typescript@^5.6.0',
   ],
   { cwd: proj, stdio: 'pipe' }
