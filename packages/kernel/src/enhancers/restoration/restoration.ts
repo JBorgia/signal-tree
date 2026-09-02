@@ -3251,7 +3251,6 @@ export function restoration(
         return undefined;
       }
       const {
-        ownerPaths,
         subjectIds,
         positionIds,
         effects,
