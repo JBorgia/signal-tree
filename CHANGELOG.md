@@ -1,3 +1,10 @@
+## Unreleased (15.0.0-rc.6)
+
+- **Trusted npm publication runs in the canonical repository.** The workflow
+  guard now matches `JBorgia/signal-tree`, and the publication-architecture
+  gate recreates that exact typo so a silently skipped publish job cannot pass
+  release validation again.
+
 ## 15.0.0-rc.5 (2026-09-02)
 
 - **Release-claim mutation proof remains non-vacuous across candidates.** The

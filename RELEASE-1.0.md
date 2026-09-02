@@ -63,6 +63,16 @@ proof-specific command and pins this proof to the RC1-to-v15 delta where
 base. Under Node 22, all 60 mutation proofs and all 69 release gates pass. This
 release-system correction earns RC5; the RC4 tag is not moved.
 
+`15.0.0-rc.5` is **IMMUTABLE / NOT PUBLISHED** at `73bbce0f`. Tagged CI run
+`33579690478` passed the complete release workflow, including 69/69 release
+gates and 60/60 mutation proofs. The subsequent canonical publish dispatch
+`33580357302` was skipped before executing any step because `publish.yml`
+guarded `JBorgia/signaltree` instead of the repository's actual
+`JBorgia/signal-tree` name. Commit `f8a15e75` corrects and gates that repository
+guard; its mutation proof recreates the exact skipped-job typo. Under Node 22,
+all 60 mutation proofs and all 69 release gates pass. This deterministic
+registry-path correction earns RC6; the RC5 tag is not moved.
+
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
 segmented, split-pool, checked-handle, and active-node-index rows have measured
