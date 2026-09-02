@@ -31,6 +31,17 @@ step is a human GA disposition: publish another RC, promote to `15.0.0`, or hold
 for a specifically named non-engineering reason. Further engineering requires a
 new release falsifier strong enough to justify delaying release.
 
+`15.0.0-rc.2` is **IMMUTABLE / NOT PUBLISHED** at `e58f9459`. Local preparation
+passed 69/69 and produced a signed tag plus validated exact tarballs. Tagged CI
+failed `test:all` twice while 68/69 other gates passed on the second run. The
+same shallow tag checkout passed all five projects under Node 22 when run through
+the root sequential `test:all` command. `RC2-TEST-ALL-CI-0` identified the
+release-gate mismatch: its Nx aggregate omitted `--parallel=1`, unlike the root
+authority, allowing all memory-heavy suites to contend on the GitHub runner.
+The gate is now sequential and failed-gate stdout/stderr is preserved. This
+release-system correction earns RC3; RC2 remains historical evidence and its
+tag is not moved.
+
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
 segmented, split-pool, checked-handle, and active-node-index rows have measured
