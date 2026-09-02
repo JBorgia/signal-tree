@@ -1,1 +1,1 @@
-export { useSignalTree } from './use-signal-tree';
+export { useSignalTree } from './use-signal-tree.js';
