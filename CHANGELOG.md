@@ -1,3 +1,12 @@
+## Unreleased (15.0.0-rc.7)
+
+- **Framework declarations resolve under strict Node module rules.** Angular
+  and React declarations now emit `.js` relative specifiers, preserving Angular
+  carrier augmentation under `node16` and `nodenext` resolution.
+- **Packed consumer validation covers every public package.** Release candidates
+  install kernel, Angular, and React tarballs together and compile their taught
+  APIs with `skipLibCheck: false` under both `bundler` and `node16`.
+
 ## 15.0.0-rc.6 (2026-09-02)
 
 - **Trusted npm publication runs in the canonical repository.** The workflow
