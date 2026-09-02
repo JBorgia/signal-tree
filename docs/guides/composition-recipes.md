@@ -2,8 +2,9 @@
 
 Several capabilities get asked for often enough that they look like missing
 features: a standard enhancer policy, a reusable entity-CRUD Ops base, a
-selection read-model, optimistic writes with server reconciliation, and
-staged/draft editing. All five are **compositions of primitives that already
+selection read-model, optimistic writes with server reconciliation,
+staged/draft editing, one-shot loading, and a persistent relationship with an
+external authority. All seven are **compositions of primitives that already
 ship**, and each is deliberately _not_ in `@signal-tree/kernel`.
 
 They live here because a recipe is the better answer when the composition is
@@ -16,14 +17,14 @@ it earns a recipe here, not a new kernel API. A pattern becomes a kernel
 capability only when repeated real implementations reveal a semantic property
 applications cannot safely own themselves — see [TODO §12](../../TODO.md) for
 the fuller catalog of patterns considered against this filter, including the
-ones still pending a section here (one-shot vs. persistent async acquisition,
-persistence, causal explanation).
+one still pending a section here (a human-readable explanation projected from
+the causal record).
 
 > **Provenance.** §1–3 are the resolved forms of findings A, B and C from
 > [`docs/audits/2026-07/v3-consumer-reuse-audit.md`](../audits/2026-07/v3-consumer-reuse-audit.md),
 > which came out of auditing a large real consumer (three apps, twelve admin
 > domains). Every snippet in those three sections is the shape that consumer
-> arrived at, with the corrections the audit produced. §4–5 came out of a
+> arrived at, with the corrections the audit produced. §4–7 came out of a
 > later design discussion applying the same "recipe, not API" filter to
 > patterns that consumer (and others) asked about next.
 
@@ -447,3 +448,107 @@ at later — in restoration history, in DevTools, or in a human-readable
 explanation projected from the causal record (see [TODO §12](../../TODO.md)
 for that pattern, not yet written up here) — regardless of how many
 keystrokes produced it.
+
+---
+
+## 6. One-shot loading — no `link()` needed
+
+**The need:** fetch a record, land it, done. No ongoing relationship, no
+refetch policy to think about.
+
+`loader()` and `asyncSource()` were both retired with no direct successor,
+which reads as a gap until you notice neither one was ever required for
+this case. The whole thing is three steps, none of them SignalTree's job
+until the last:
+
+```typescript
+async function loadDriver(id: string) {
+  const driver = await api.getDriver(id); // request + fetch: entirely yours
+  external(() => tree.$.driver.set(driver)); // land it, classified correctly
+}
+```
+
+`external()` is the only SignalTree-specific line. It exists so this write is
+correctly attributed as "authoritative from outside the current authored
+operation" rather than looking like the user typed it — which matters for
+restoration history (an external write is not something `undo()` should hand
+back to the user as if they'd made it) and for anything downstream that reads
+causal origin (§4/§5's commit-classification story, a causal-explanation
+projection). Loading, error state, retry, and caching are ordinary
+application/framework concerns — a `resource()`, an RxJS pipe, a signal you
+set yourself — exactly as if SignalTree weren't involved at all until the
+`external()` line.
+
+### When you'd reach for `link()` instead
+
+Only when there's an ONGOING relationship to an endpoint, not a single fetch
+— see §7. A `link()` for something you're going to read once and never
+resync is a `Link` handle you have to remember to `dispose()` for nothing.
+
+---
+
+## 7. A persistent relationship with an external authority
+
+**The need:** a tree location that stays synchronized with something outside
+the tree — polling, a live push feed, or two-way sync (edit locally, persist
+outward) — as an ongoing relationship, not a one-off fetch.
+
+This is `link()`, unspecialized — the same primitive [the persistence
+guide](persistence-guide.md) uses for storage, generalized to any endpoint.
+Three independent directions, compose whichever you need:
+
+```text
+PULL       Y.get()         -> X     on demand, via connection.retrieve()
+PUSH-IN    Y.subscribe()   -> X     pushed, live
+PUSH-OUT   committed X     -> Y.set()   after every settled authored write
+```
+
+```typescript
+import { link } from '@signal-tree/kernel';
+
+const connection = link(tree.$.rows, {
+  get: () => api.load(), // PULL — on demand
+  set: (rows) => api.save(rows), // PUSH-OUT — every settled write
+  subscribe: (next) => socket.on('rows', next), // PUSH-IN — live
+});
+
+await connection.retrieve(); // triggers get() once, now
+// ... later, on teardown:
+connection.dispose();
+```
+
+Supply only the directions you need — `loader`-shaped persistent polling is
+`get` alone; a read-only live feed is `subscribe` alone; two-way sync uses
+both `get`/`subscribe` and `set`. `X` (the tree location `link()` is given)
+must be an OWNED SignalTree location — a bare `signal()` or `computed()` is
+refused, because there is no tree to settle a write against.
+
+### This is the actual mapping the four retired markers collapsed into
+
+Not an assertion — this is literally the design record the kernel's own
+`link()` behavioral spec opens with:
+
+```text
+loader / HTTP GET / localStorage read     PULL
+asyncSource / socket / GPS                PUSH-IN
+stored write / HTTP PUT / SQLite UPDATE   PUSH-OUT
+persistence                               PULL + PUSH-OUT
+live synchronization                      PUSH-IN + PUSH-OUT
+```
+
+See [`packages/kernel/src/lib/link-0-three-directions.spec.ts`](../../packages/kernel/src/lib/link-0-three-directions.spec.ts)
+(the design-provenance comment at the top of that file is the source of the
+table above) and [`link-1-relationship.spec.ts`](../../packages/kernel/src/lib/link-1-relationship.spec.ts)
+for the relationship contract itself — including the two refusals worth
+knowing up front: a rejected `set()` is captured and reported once through
+`onTreeError` rather than left as an unhandled rejection, and a `get()` that
+resolves AFTER `dispose()` must not resurrect the location (both pinned
+tests, not incidental behavior).
+
+### What SignalTree does not decide for you
+
+`staleTime`, SWR, retry, request dedup, caching, auth, and URL construction
+all live inside your `get`/`set`/`subscribe` implementations — none of them
+are SignalTree concepts. If you need staleness-aware refetching (`loader()`'s
+old `staleTime`/`swr` options), that's a small stateful wrapper around
+`connection.retrieve()` you own, not something to look for on `Link` itself.
