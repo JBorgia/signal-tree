@@ -26,15 +26,13 @@ problem can be expressed cleanly by composing primitives that already ship,
 it earns a recipe here, not a new kernel API. A pattern becomes a kernel
 capability only when repeated real implementations reveal a semantic property
 applications cannot safely own themselves — see [TODO §12](../../TODO.md) for
-the fuller catalog of patterns considered against this filter, including the
-one still pending a section here (a human-readable explanation projected from
-the causal record).
+the fuller catalog of patterns considered against this filter.
 
 > **Provenance.** §1–3 are the resolved forms of findings A, B and C from
 > [`docs/audits/2026-07/v3-consumer-reuse-audit.md`](../audits/2026-07/v3-consumer-reuse-audit.md),
 > which came out of auditing a large real consumer (three apps, twelve admin
 > domains). Every snippet in those three sections is the shape that consumer
-> arrived at, with the corrections the audit produced. §4–7 came out of a
+> arrived at, with the corrections the audit produced. §4–8 came out of a
 > later design discussion applying the same "recipe, not API" filter to
 > patterns that consumer (and others) asked about next.
 
@@ -576,7 +574,7 @@ itself.
 
 ## 8. A human-readable explanation, projected from causal facts
 
-**The need:** show a user or an AI agent *why* the tree looks the way it
+**The need:** show a user or an AI agent _why_ the tree looks the way it
 does — "who changed this, and what happened" — without teaching the kernel
 what a sentence is.
 
@@ -593,8 +591,8 @@ That's it. No actor name, business-action label, timestamp, arbitrary payload,
 prose, or per-field diff. The one thing every entry reliably gives you is
 `state`: a whole-tree snapshot at that turn's boundary. This is deliberate,
 not an omission to fill in later: a name, clock, sentence, or actor kept "for
-the explanation" would make presentation data intrinsic to every retained turn,
-despite being needed only by an application, projector, or future tooling.
+the explanation" would make presentation data intrinsic to every retained
+turn, despite being needed only by an application, projector, or future tooling.
 
 ### The composition
 
@@ -632,9 +630,7 @@ function explainLastChange(tree: MyTree): string | null {
   const changedTicketId = findChangedTicketId(previous?.state, last.state);
   const ticket = changedTicketId ? tree.$.tickets.byId(changedTicketId)?.() : undefined;
 
-  return ticket
-    ? `Ticket #${ticket.ticketNumber} was reassigned to ${describeDriver(ticket.driverId)}`
-    : 'A change occurred';
+  return ticket ? `Ticket #${ticket.ticketNumber} was reassigned to ${describeDriver(ticket.driverId)}` : 'A change occurred';
 }
 ```
 
