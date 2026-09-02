@@ -2467,14 +2467,17 @@ layout, or retained encoding. Classify the readers before proposing a replacemen
 
 `probe-restoration-required-set.mjs` previously ran a 13-operation mixed script
 without `undoable()` designation, then reported zero retained entries as if they
-were retention evidence. It now uses one pre-registered designated removal over
-ordinary seeded state, asserts its expected non-zero retention, and has explicit
-ordinary/designated/bounded/external self-controls. The release-only
-`restoration-required-set` gate is mutation-proven by removing the fixture's
-designation and requiring the probe to fail. The former mixed sequence throws
-`Collection structural target contains contradictory anchors` when actually
-designated; it is a separate causal-correctness candidate, not a representation
-baseline or a reason to change the causal carrier.
+were retention evidence. It now uses 30 designated removals over ordinary seeded
+state against 4/6/10/24-turn windows, asserts exact `min(turns, capacity)`
+retention, and has explicit ordinary/designated/bounded/external self-controls.
+The latest forced-GC oracle run found exact claim sets at every capacity: 4/4,
+6/6, 10/10, and 24/24 named/required retired subjects, with correct full
+undo/redo traversal. The release-only `restoration-required-set` gate is
+mutation-proven by removing the fixture's designation and requiring the probe to
+fail. The former mixed sequence throws `Collection structural target contains
+contradictory anchors` when actually designated; it is a separate
+causal-correctness candidate, not a representation baseline or a reason to
+change the causal carrier.
 
 `__ownerPaths` had no production semantic reader: it was retained turn metadata
 written once and forwarded through restoration/transaction clones, while
