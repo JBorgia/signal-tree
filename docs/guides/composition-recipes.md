@@ -455,9 +455,18 @@ canonical value, because the draft was never IN the tree. The causal model
 does the real work here indirectly: because an authored turn is a first-class
 concept, "the user's edit became real" is always one coherent fact to point
 at later — in restoration history, in DevTools, or in a human-readable
-explanation projected from the causal record (see [TODO §12](../../TODO.md)
-for that pattern, not yet written up here) — regardless of how many
-keystrokes produced it.
+explanation projected from the causal record (§8, below) — regardless of how
+many keystrokes produced it.
+
+### Executable example (already in this repo, not invented)
+
+[`packages/kernel/src/lib/staged-draft-editing-0.spec.ts`](../../packages/kernel/src/lib/staged-draft-editing-0.spec.ts)
+measures the two halves of this claim rather than asserting them: accumulating
+draft edits produces zero tree writes and zero restoration growth: a discard
+before commit leaves restoration history exactly as it was, because nothing
+was ever authored; and one commit of a multi-field draft — three field writes
+wrapped in one `undoable()` call — is exactly one restoration entry holding
+the complete committed state, not three.
 
 ---
 

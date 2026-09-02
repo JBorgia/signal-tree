@@ -2241,8 +2241,10 @@ read-model — already written, do not duplicate). Everything else below
   one. Executable-example candidate: `transactions()`'s pending/confirm/
   rollback shape (`packages/kernel/src/enhancers/transactions/transactions.spec.ts`)
   demonstrates the "held, then one commit" half; the pure UI-level draft half
-  (no kernel involvement until commit) has no dedicated spec yet — write one
-  before/alongside the doc rather than inventing the example inline.
+  (no kernel involvement until commit) is now proven by
+  `packages/kernel/src/lib/staged-draft-editing-0.spec.ts` — zero tree
+  writes/zero restoration growth while drafting, discard leaves history
+  untouched, and a multi-field commit is exactly one restoration entry.
 - **`server-reconciliation.md`** — remote/server truth → endpoint/domain
   reconciliation policy (server wins / client wins / merge / conflict
   detection / rebase / retry / staleness / auth — all application-owned) →
@@ -2294,13 +2296,10 @@ first), `agent-authored-work.md` / `collaborative-state.md` / `offline-editing.m
    server reconciliation, anchored to `transactions.spec.ts`'s pinned
    rollback-isolation case) and §5 (staged/draft editing — no new API,
    explicitly declined a `beginStage()` session).
-2. Executable-example specs: confirmed existing for §4 (already-pinned
-   `transactions.spec.ts` case) and for persistence (see below). **Still
-   open**: §5's pure UI-level draft half (draft state that never touches the
-   tree until one commit) has no dedicated spec — the section's code sample
-   is illustrative, not spec-cited, unlike every other section on the page.
-   Write one alongside `entity-collection-cookbook.md`'s style before this
-   is fully "canonical, not just asserted."
+2. ~~Executable-example specs~~ — DONE. §4: already-pinned
+   `transactions.spec.ts` case. §5's pure UI-level draft half: DONE
+   (`packages/kernel/src/lib/staged-draft-editing-0.spec.ts`), and the
+   section now cites it. Persistence: see below.
 3. ~~Fix `persistence-guide.md`'s staleness~~ — DONE (`6909e2b2`): rewritten
    with the real `link()` decomposition and cited to
    `persistence-as-link-swap-0.spec.ts`/`link-persistence-conformance.spec.ts`/
