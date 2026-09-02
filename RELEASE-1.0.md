@@ -13,7 +13,8 @@ Current phase: `Phase 7 — TECHNICAL READINESS CLOSED / HUMAN GA DECISION`
 `GATE F` is **SATISFIED** at `109595e6`. Exact committed HEAD passed all 69
 ordinary and release-only gates with zero known-red. The independent Gate F
 review found no critical, major, or minor blocker. `15.0.0-rc.1` remains the
-only published candidate; RC2 and RC3 are immutable unpublished tags.
+first published candidate; RC6 is published but superseded by the strict
+framework declaration failure recorded below.
 
 Phase 7 technical readiness is **CLOSED** against clean-clone commit `8d0108bc`:
 
@@ -73,21 +74,29 @@ guard; its mutation proof recreates the exact skipped-job typo. Under Node 22,
 all 60 mutation proofs and all 69 release gates pass. This deterministic
 registry-path correction earns RC6; the RC5 tag is not moved.
 
-`15.0.0-rc.6` is **VERIFIED / NOT PUBLISHED** at `e720d509`. Tagged CI run
+`15.0.0-rc.6` is **PUBLISHED / SUPERSEDED** at `e720d509`. Tagged CI run
 `33581113391` passed every release and mutation gate and created the GitHub
 Release. A non-publishing dispatch canary proved `publish.yml` now admits the
 canonical repository and rejects an invalid tag before checkout. Live publish
 run `33583551981` then passed every safeguard through exact candidate creation
-but npm rejected the first `@signal-tree/kernel` PUT with 404/permission denied.
-The registry still contains RC1 for kernel and Angular, no React package, and no
-RC6 artifact. This is an external npm authorization/configuration blocker:
-configure each existing package's trusted publisher for GitHub user `JBorgia`,
-repository `signal-tree`, workflow `publish.yml`, and allowed action
-`npm publish`; bootstrap the new React package with an authenticated first
-publish if npm cannot attach trust before the package exists. Retry the same
-immutable RC6 publish workflow afterward; the publisher skips any artifact only
-when registry and candidate SHA-512 integrity match, so no RC7 is required for
-an npm-side configuration correction.
+but npm rejected the first `@signal-tree/kernel` PUT until authenticated local
+publication was authorized. The canonical publisher then published kernel,
+Angular, and the new React package from the exact RC6 candidate. Kernel and
+Angular registry SHA-512 integrities equal the candidate; React's package index
+and public tarball exist, and the downloaded tarball is byte-identical while its
+public metadata endpoint propagates.
+
+The post-publish clean consumer produced a deterministic release falsifier:
+Angular and React declarations retained extensionless relative imports, so
+`skipLibCheck: false` consumers using `node16` or `nodenext` failed. The former
+consumer gate packed only kernel and therefore could not see framework
+declaration defects. Commit `c7f7c9d1` emits `.js` specifiers from Angular and
+React source entry points, expands strict packed-consumer verification to all
+three exact tarballs under both `bundler` and `node16`, and changes the gate
+mutation to recreate the Angular carrier-import failure. Framework tests,
+three-package dry-run publication, 60/60 mutation proofs, and 69/69 release
+gates pass under Node 22. This declaration correction earns RC7; RC6 remains
+immutable and published.
 
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
