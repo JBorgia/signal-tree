@@ -2317,3 +2317,44 @@ first), `agent-authored-work.md` / `collaborative-state.md` / `offline-editing.m
    composition-recipes` across `apps/demo` and any docs index) — add a link
    if not, as its own small pass (the demo site's own currency/measurement
    rules in `AGENTS.md` § "Docs & demo currency" apply to anything it links).
+
+## 13. Re-wire `llms.txt` into the publish pipeline — precondition now met
+
+`RELEASE-1.0.md` § "AI DISCOVERABILITY" deleted the old `apps/demo/public/llms.txt`
+mid-v15 on purpose (`7696225d`): stale AI guidance teaching deleted APIs is
+worse than none, so it was greenfielded only after the surviving public
+surface freezes — an explicit `DEFERRED OBLIGATION`, not a permanent removal.
+Phase 7's gate closed this session (`GATE F` satisfied, surface frozen) —
+that precondition is now met.
+
+A **new** `llms.txt` (repo root, not the old `apps/demo/public/` path) already
+exists and is being kept current alongside real feature commits (edited
+today). It is NOT wired to publish: `scripts/prepare-publish-artifacts.mjs`'s
+`COPIES` array is deliberately `[]` (with a hard-fail guard specifically
+written to catch a silent skip like the one that motivated this script in the
+first place — see its own doc comment). Nothing currently copies the new
+`llms.txt` into `dist/packages/kernel` before `npm pack`, and
+`packages/kernel/package.json`'s `files` whitelist (`dist/**/*.js`,
+`dist/**/*.d.ts`, `README.md`, `LICENSE`, `NOTICE`) has no entry for it
+either — both need an entry, matching the old three-copies-of-a-conditional
+shape this script replaced.
+
+**Concrete motivating evidence, not hypothetical:** a consumer-migration
+session (TruckTrax v3, this session) spent real time chasing a `computed()`
+staleness bug that traced back to constructing the tree via
+`@signal-tree/kernel`'s `signalTree()` instead of `@signal-tree/angular`'s —
+exactly the fact `llms.txt` states and `packages/kernel/README.md` also
+already states (line 6: "Angular applications should construct trees through
+`@signal-tree/angular`"). The README fact WAS shipped and wasn't consulted
+closely enough; `llms.txt` is written for exactly this retrieval-aware-agent
+case and currently isn't shipped at all. Also worth deciding in the same
+pass: should `docs/guides/composition-recipes.md`/`persistence-guide.md`
+(TODO §12) ship the same way, or stay repo-only? They're a different class
+(prose recipes, not a machine-oriented manifest) — needs its own call, not an
+assumed "yes" just because `llms.txt` gets wired back up.
+
+Do this as its own release-discipline slice per `AGENTS.md`'s normal
+per-item procedure (characterize → smallest fix → focused validation via
+`scripts/verify-publish-artifacts.mjs`/`node tools/verify-tarball-consumer.mjs`
+→ one commit) — not folded into unrelated work, given `prepare-publish-artifacts.mjs`'s
+own history of exactly that kind of change going unnoticed.
