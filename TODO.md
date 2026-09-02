@@ -2319,7 +2319,7 @@ first), `agent-authored-work.md` / `collaborative-state.md` / `offline-editing.m
    `apps/demo` build assets and added to the Documentation page's existing
    package-README viewer. **Still open, deliberately deferred, not a doc-wiring
    fix**: `transactions()` (optimistic/reconciliation), staged/draft editing,
-   and the causal-explanation pattern have no demo-app *component* of their
+   and the causal-explanation pattern have no demo-app _component_ of their
    own — only `link()`/`external()` do, via `async-demo` and
    `restoration-demo`. Real new-component work; scope and schedule separately.
 
