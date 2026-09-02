@@ -2526,6 +2526,33 @@ passes. No further retained-turn carrier deletion is justified before the
 required baseline identifies a material allocation or density problem; packed
 headers, sparse pools, and arenas remain alternatives, not a selected design.
 
+`CAUSAL-REPRESENTATION-0` incumbent baseline is established, not yet a
+representation-selection result. `node --expose-gc
+tools/bench-causal-representation.mjs --samples 5` runs the A0-A1, B0-B2,
+C0-C5, D0-D4, E0-E3, and F0-F1 causal workloads. Each arm proves its semantic
+postcondition, times its operation separately, then takes five quiesced
+retained-heap measurements while holding 20 equivalent live trees and divides
+the median by 20. Every measured tree releases after `destroy()`; high-water is
+intentionally omitted because allocation is not retained heap. The exact run
+at `04049e01` plus this uncommitted harness measured scalar capacity 0/1/20/100
+at 26.5/30.1/41.0/96.8 KB per live tree. Matched D0 controls attribute 3.6 KB
+for the first retained turn, then 723 B/turn at capacity 20 and 703 B/turn at
+capacity 100. Churning 130 turns through a 20-turn window retains 11.8 KB more
+than the steady 20-turn arm, despite the same 20 logical turns; that is an
+unattributed retained capacity/index candidate, not evidence for an encoding.
+One- and 100-turn public history projections measure 26.8 KB and 97.0 KB; the
+100-turn scalar arm is 96.5 KB, so this fixture shows no material additional
+retained projection/cache cost. Structural, entity mutation, rekey, omission,
+reactivation, mixed, reversal, undo/redo, external, and scoped-containment arms
+all complete and retain the expected turn/claim counts. `node
+tools/size-report.mjs --json` measures the exercised production `restoration()`
+bundle delta as +18.38 KB gzip over bare construction; the harness's 12,132 B
+restoration-module gzip is only an artifact upper bound, not the consumer delta.
+Next, attribute the retained window and churn deltas separately to turn
+header/index, position participation, subject claims, effects/order deltas,
+reversal descriptors, history materialization, and Map/Set capacity before any
+one-variable alternative is admitted.
+
 ### Sequence
 
 1. Finish immutable RC9 verification.
