@@ -2649,6 +2649,23 @@ provides an ordered bounded sequence; identity-addressed turn resolution is a
 different job. A future compact carrier may realize both physically, but must
 not equate `TurnId` with current array position.
 
+`TURNS-MAP-OWNERSHIP-ATTRIBUTION-0` is **CLOSED — RETAIN CURRENT MAP
+CARRIER**. A disposable production-shaped candidate removed only the confirmed
+`turns` Map and resolved its IDs from the same retained `history[]`; pending
+turns, effects, historical events, position indexes, and frontier state stayed
+unchanged. The full 2,158-pass kernel suite proved behavior before measurement.
+Matched five-sample, 20-tree quiesced retained-heap controls measured 38,040.8
+B/tree incumbent versus 37,064.8 B/tree candidate at 20 retained turns, and
+85,214.8 B/tree versus 82,313.6 B/tree at 100: 976.0 B (48.8 B/turn) and
+2,901.2 B (29.0 B/turn) respectively. Every held tree released after
+`destroy()`. Because both carriers reference the exact same `CanonicalTurn`
+objects from `history[]`, those objects are deliberately excluded from the
+delta: it is Map/table/key/value-edge ownership only. The exclusive cost is
+tens of bytes per retained turn, only about 7-12% of the roughly 415 B
+independent turn-boundary group, and therefore not material. No Map carrier
+prototype is authorized; keep `Map<TurnId, CanonicalTurn>` for its proven
+identity lookup job.
+
 History projection has no retained cache in the current implementation:
 `getRestorationHistory()` materializes a transient projection and returns copied
 entry objects with state by reference. F0/F1 remain latency controls; their
