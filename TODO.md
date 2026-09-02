@@ -2588,17 +2588,34 @@ controls. Holding 20 effects and 20 positions constant, 19 extra independent
 turns cost 7,878.4 B, or 414.7 B each: a combined turn
 header/history/index/event group, not an effect-only measurement.
 
-The churn ladder is a pre-GA retention finding. D5/D6/D4/D7 retain exactly 20
-causal turns after 20/40/130/1,000 writes, but retain 40.3/42.1/53.1/156.4 KB
-per live tree. At 1,000 writes, all causal containers remain bounded: 20
-history entries, 20 turn-index entries, 20 effects, 20 position references, and
-20 historical events. Only `observedBatches` grows from 20 to 40 to 130 to
-1,000. It is an internal Phase 0A diagnostic log with no production reader, its
-specification reads only the last two entries, and its independent 1,000-entry
-cap is therefore the measured retained owner. This is not evidence against
-`CanonicalTurn`, its effects, or position indexes. First decide the correct
-diagnostic lifetime/capacity under the frozen causal contract; do not fold that
-decision into a representation redesign.
+`OBSERVED-BATCH-DIAGNOSTIC-RETENTION-0` is **CLOSED GREEN**. The only writer
+ran after each capture-bucket flush; the only reader was one restoration spec
+that already observes the published structural paths through `PathNotifier`.
+`observedBatches`, its 1,000-entry cap, writer, reader, reset path, and stale
+`ownerPaths` capture destructure are deleted from the shipped runtime. The spec
+now asserts publication at its real observer boundary rather than reading a
+per-tree circular diagnostic log. After a fresh kernel build, the exact
+capacity-20 ladder at 20/40/130/1,000 writes retains 38.0/37.9/40.0/43.9 KB
+per live tree. The quiesced ranges overlap, all arms retain exactly 20 history
+entries, turn-index entries, effects, position references, and historical
+events, and `hasObservedBatchLog` is false. The former 1,000-turn result was
+156.4 KB with 1,000 diagnostic records. Retained cost now scales with the
+bounded restorable window, not total past designated writes. This removes 437
+raw and 144 gzip bytes from the restoration module; the separately measured
+exercised `restoration()` feature delta falls from +18.38 KB to +18.26 KB gzip.
+
+`TURN-BOUNDARY-GROUP-0` is **ACTIVE ATTRIBUTION, NO CARRIER SUBSTITUTION
+AUTHORIZED**. Current reader classification: `history[]` owns bounded temporal
+order and ordered public history projection; `turns: Map<TurnId, Turn>` owns
+O(1) identity lookup used by status and scoped undo/redo closure resolution;
+`historyIndex` is a derived/rebuilt performance index, not an independent causal
+fact; `historicalEvents` owns reversal/gap facts used to materialize historical
+states and cannot yet be derived solely from retained turn order and event
+ordinal. Both `history[]` and `turns` therefore have distinct current jobs, but
+that does not freeze two independent JS collections as their final encoding.
+The next experiment may replace exactly one carrier only after its lookup and
+history-order contracts are independently controlled; no packed/arena/slab or
+multi-carrier rewrite is authorized.
 
 History projection has no retained cache in the current implementation:
 `getRestorationHistory()` materializes a transient projection and returns copied

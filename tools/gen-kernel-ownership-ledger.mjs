@@ -305,11 +305,6 @@ const RULINGS = {
       'CONVERGED',
       'EXPLICIT: read by checkHistoryRetention — history retention bound',
     ],
-  'state:enhancers/restoration/restoration.ts:MAX_OBSERVED_BATCHES': [
-    'OPTIONAL-CAPABILITY',
-    'CONVERGED',
-    'EXPLICIT: read by observeBatch — observation bound',
-  ],
   'state:enhancers/restoration/restoration.ts:RETENTION_CHECK_INTERVAL': [
     'OPTIONAL-CAPABILITY',
     'CONVERGED',

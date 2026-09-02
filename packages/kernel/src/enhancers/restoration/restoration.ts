@@ -394,11 +394,6 @@ class RestorationManager<T> {
   private positionTurnIds = new Map<number, number[]>();
   private positionFrontiers = new Map<number, number>();
   private nextTurnId = 1;
-  private observedBatches: Array<{
-    action: string;
-    ownerPaths: string[];
-    recorded: boolean;
-  }> = [];
   private historicalEvents: HistoricalEvent[] = [];
   private nextHistoricalOrdinal = 1;
 
@@ -868,28 +863,6 @@ class RestorationManager<T> {
     this.historicalEvents = this.historicalEvents.filter(
       (event) => event.ordinal >= oldestOrdinal
     );
-  }
-
-  observeBatch(action: string, ownerPaths: string[], recorded: boolean): void {
-    if (this.observedBatches.length >= MAX_OBSERVED_BATCHES) {
-      this.observedBatches.shift();
-    }
-    this.observedBatches.push({
-      action,
-      ownerPaths: [...ownerPaths],
-      recorded,
-    });
-  }
-
-  getObservedBatches(): Array<{
-    action: string;
-    ownerPaths: string[];
-    recorded: boolean;
-  }> {
-    return this.observedBatches.map((batch) => ({
-      ...batch,
-      ownerPaths: [...batch.ownerPaths],
-    }));
   }
 
   getTurns(): Array<CanonicalTurn<T>> {
@@ -1731,7 +1704,6 @@ class RestorationManager<T> {
     this.isTemporalViewActive = false;
     this.bumpRestorationHistory();
     this.currentIndex = -1;
-    this.observedBatches = [];
   }
 
   jumpTo(index: number): boolean {
@@ -2258,15 +2230,6 @@ class RestorationManager<T> {
  * collection with a long history and a big one with a short history are judged
  * by the same standard — a row-count threshold gets both wrong.
  */
-/**
- * @internal Cap on the `observedBatches` probe log. It exists so Phase 0A specs
- * can read what the flush hook recorded per batch; nothing reads it in
- * production. Without a cap a long-lived tree accumulates one entry per flush
- * forever. The spec only ever reads the last two entries, so a bounded
- * last-N window preserves the probe's purpose.
- */
-const MAX_OBSERVED_BATCHES = 1_000;
-
 export function restoration(
   config: RestorationConfig = {}
 ): Enhancer<RestorationMethods> {
@@ -3639,7 +3602,6 @@ export function restoration(
             if (!selfDirty) return;
             selfDirty = false;
             const {
-              ownerPaths,
               subjectIds,
               positionIds,
               effects,
@@ -3668,7 +3630,6 @@ export function restoration(
                 designated
               );
             }
-            restorationManager.observeBatch('batch', ownerPaths, recorded);
           });
         }
       }
