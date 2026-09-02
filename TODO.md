@@ -2305,9 +2305,13 @@ first), `agent-authored-work.md` / `collaborative-state.md` / `offline-editing.m
    with the real `link()` decomposition and cited to
    `persistence-as-link-swap-0.spec.ts`/`link-persistence-conformance.spec.ts`/
    `persistence-decompose-0.spec.ts`.
-4. **Still open**: one-shot vs. persistent async acquisition, and
-   causal-explanation-as-projection, as further `composition-recipes.md`
-   sections (§6/§7) — not started this pass.
+4. ~~One-shot vs. persistent async acquisition~~ — DONE: `composition-recipes.md`
+   §6 (one-shot loading, no `link()` needed) and §7 (persistent relationship
+   via `link()`, all three PULL/PUSH-IN/PUSH-OUT directions), anchored to
+   `link-0-three-directions.spec.ts`'s own design-provenance mapping (the
+   literal table the four retired markers collapsed into) and
+   `link-1-relationship.spec.ts`. **Still open**: causal-explanation-as-
+   projection (§8) — not started this pass.
 5. Once `composition-recipes.md` covers the canonical set, check whether the
    demo site / top-level docs nav links it already (`grep -r
    composition-recipes` across `apps/demo` and any docs index) — add a link
