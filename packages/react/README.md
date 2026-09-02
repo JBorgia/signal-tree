@@ -6,16 +6,24 @@ to canonical SignalTree reads without copying state into React.
 ## Install
 
 ```bash
-npm install @signal-tree/react @signal-tree/kernel
+npm install @signal-tree/react
 ```
 
-React 18 or 19 is required as a peer dependency.
+React 18 or 19 is required as a peer dependency. `@signal-tree/react` installs
+the framework-neutral kernel as its dependency, so React applications should
+construct and enhance trees through this package:
+
+```tsx
+import { entityMap, signalTree, useSignalTree } from '@signal-tree/react';
+
+const tree = signalTree({ orders: entityMap<{ id: string; status: string }>() });
+```
+
+Framework-neutral libraries may import from `@signal-tree/kernel` directly.
 
 ## Observe A Projection
 
 ```tsx
-import { useSignalTree } from '@signal-tree/react';
-
 function OrderStatus({ tree, orderId }) {
   const status = useSignalTree(tree, ($) => $.orders.byIdOrFail(orderId).status());
 

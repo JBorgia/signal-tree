@@ -98,6 +98,14 @@ export type {
   DevToolsMethods,
   DevToolsLogEntry,
   TransactionMethods,
+  PendingTransaction,
+  DevToolsConfig,
+  EntityConfig,
+  RestorationConfig,
+  MutationOptions,
+  TreeCapability,
+  EnhancerWithMeta,
+  DevToolsDebugSession,
 } from '@signal-tree/kernel';
 
 // --- carrier-SENSITIVE: same semantic names, bound to Angular's carrier ---

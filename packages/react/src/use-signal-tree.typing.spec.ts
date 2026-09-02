@@ -1,5 +1,4 @@
-import { signalTree } from '@signal-tree/kernel';
-import { useSignalTree } from './use-signal-tree';
+import { signalTree, useSignalTree } from './index';
 
 const tree = signalTree({ count: 1, user: { name: 'Ada' } });
 
