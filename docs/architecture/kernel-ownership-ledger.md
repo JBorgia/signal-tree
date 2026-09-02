@@ -228,7 +228,6 @@ Owners: `KERNEL` · `FRAMEWORK-ADAPTER` · `OPTIONAL-CAPABILITY` ·
 | `state:enhancers/devtools/devtools.ts:ngDevMode` | moduleState | EXPLICIT: build-tool global declaration | FRAMEWORK-ADAPTER | CONVERGED |
 | `state:enhancers/devtools/devtools.ts:devToolsImpl` | moduleState | EXPLICIT: lazily-held devTools implementation | DIAGNOSTIC | CONVERGED |
 | `state:enhancers/restoration/restoration.ts:ngDevMode` | moduleState | ?? not yet ruled (moduleState, uninitialised) | UNKNOWN | REVIEW |
-| `state:enhancers/restoration/restoration.ts:MAX_OBSERVED_BATCHES` | moduleState | EXPLICIT: read by observeBatch — observation bound | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:enhancers/restoration/restoration.ts:withRestoration` | moduleState | EXPLICIT: the restoration enhancer itself | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:enhancers/serialization/constants.ts:TYPE_MARKERS` | moduleState | EXPLICIT: serialization type markers, read at 27 sites | OPTIONAL-CAPABILITY | CONVERGED |
 | `state:enhancers/serialization/serialization.ts:ngDevMode` | moduleState | EXPLICIT: build-tool global declaration | FRAMEWORK-ADAPTER | CONVERGED |

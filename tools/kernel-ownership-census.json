@@ -180,15 +180,6 @@
     },
     {
       "file": "packages/kernel/src/enhancers/restoration/restoration.ts",
-      "name": "MAX_OBSERVED_BATCHES",
-      "kind": "const",
-      "init": "literal 1_000",
-      "ambient": false,
-      "immutablePrimitive": true,
-      "mutableCandidate": false
-    },
-    {
-      "file": "packages/kernel/src/enhancers/restoration/restoration.ts",
       "name": "withRestoration",
       "kind": "const",
       "init": "Object.assign()",
@@ -2400,11 +2391,6 @@
       "category": "moduleState",
       "key": "state:enhancers/restoration/restoration.ts:ngDevMode",
       "init": "uninitialised"
-    },
-    {
-      "category": "moduleState",
-      "key": "state:enhancers/restoration/restoration.ts:MAX_OBSERVED_BATCHES",
-      "init": "literal 1_000"
     },
     {
       "category": "moduleState",

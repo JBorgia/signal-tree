@@ -105,6 +105,7 @@ const retainedStats = (tree) => {
     positionParticipationEntries: countEntries('__positionIds'),
     effectEntries: countEntries('__effects'),
     orderDeltaEntries: countEntries('__orderDeltas'),
+    hasObservedBatchLog: Object.hasOwn(manager ?? {}, 'observedBatches'),
     observedBatchEntries: manager?.observedBatches?.length ?? 0,
     historicalEventEntries: manager?.historicalEvents?.length ?? 0,
     bytesPerRetainedTurn:
@@ -485,6 +486,9 @@ for (const [id, arm] of Object.entries(arms)) {
         await arm.setup?.(tree);
         await arm.run(tree);
         stats ??= retainedStats(tree);
+        if (stats.hasObservedBatchLog) {
+          throw new Error(`${id}: observed batch diagnostics must not be retained by a production tree`);
+        }
         trees.push(tree);
       }
       return trees;
@@ -519,6 +523,7 @@ for (const [id, arm] of Object.entries(arms)) {
     positionParticipationEntries: stats.positionParticipationEntries,
     effectEntries: stats.effectEntries,
     orderDeltaEntries: stats.orderDeltaEntries,
+    hasObservedBatchLog: stats.hasObservedBatchLog,
     observedBatchEntries: stats.observedBatchEntries,
     historicalEventEntries: stats.historicalEventEntries,
     bytesPerRetainedTurn: stats.retainedTurns === 0 ? 0 : +(retainedBytes / stats.retainedTurns).toFixed(1),

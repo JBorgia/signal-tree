@@ -2943,41 +2943,29 @@ describe('restoration enhancer', () => {
       },
       { enhancers: [restoration()], capabilities: ['causal-runtime'] }
     );
-    const t = (store as any).__restoration;
-    const initial = t.getRestorationHistory().length;
     const seenPaths: string[] = [];
+    const seenOwnerPaths: string[] = [];
     const notifier = getPathNotifier();
-    const unsubscribe = notifier.subscribe('rows.*', (_next, _prev, path) => {
+    const unsubscribe = notifier.subscribe('rows.*', (_next, _prev, path, ownerPath) => {
       seenPaths.push(path);
+      seenOwnerPaths.push(ownerPath);
     });
 
     undoable(() => store.$.rows.addOne({ id: -1, name: 'temp' }));
     await Promise.resolve();
     await Promise.resolve();
-    const addEntry = t.getRestorationHistory().at(-1);
-    expect(t.getRestorationHistory().length).toBeGreaterThan(initial);
 
     undoable(() => store.$.rows.changeId(-1, 42));
     await Promise.resolve();
     await Promise.resolve();
-    const changeIdEntry = t.getRestorationHistory().at(-1);
-    const observed = t.getObservedBatches();
 
     unsubscribe();
 
-    expect(observed.at(-2)).toEqual({
-      action: 'batch',
-      ownerPaths: ['rows'],
-      recorded: true,
-    });
-    expect(observed.at(-1)).toEqual({
-      action: 'batch',
-      ownerPaths: ['rows'],
-      recorded: true,
-    });
     // Same-reference rekeys still carry canonical structural metadata through
     // PathNotifier transport, so generic subscribers observe the rekey path.
     expect(seenPaths).toEqual(['rows.-1', 'rows.42']);
+    expect(seenOwnerPaths).toEqual(['rows', 'rows']);
+    expect(store.getRestorationHistory()).toHaveLength(2);
   });
 
   it('records the user branch, not the replay branch, when undo and a user write share a tick', async () => {
