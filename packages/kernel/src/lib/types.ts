@@ -32,12 +32,6 @@ export interface RestorationConfig {
    */
   maxHistorySize?: number;
 
-  /**
-   * Whether to include payload information in history entries
-   * @default true
-   */
-  includePayload?: boolean;
-
   // `restorationEligibility` was DELETED in 15.0, having done its only job.
   //
   // It existed to execute the opt-in default flip: 'all' kept the pre-15.0
@@ -49,15 +43,6 @@ export interface RestorationConfig {
   //
   // Restoration admission has exactly one public door: `undoable()`.
 
-  /**
-   * Custom action names for different operations
-   */
-  actionNames?: {
-    update?: string;
-    set?: string;
-    batch?: string;
-    [key: string]: string | undefined;
-  };
 }
 // Core v6 types — type-safe enhancer architecture
 

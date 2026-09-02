@@ -108,8 +108,5 @@ export interface RestorationMethods {
 }
 
 export interface RestorationHistoryEntry<T> {
-  action: string;
-  timestamp: number;
   state: T;
-  payload?: unknown;
 }

@@ -580,37 +580,28 @@ itself.
 does — "who changed this, and what happened" — without teaching the kernel
 what a sentence is.
 
-Look at what a causal fact actually IS at the kernel boundary. `restoration()`'s
-own retained entry shape:
+At the kernel boundary, restoration history exposes the snapshot that a retained
+turn can restore:
 
 ```typescript
 export interface RestorationHistoryEntry<T> {
-  action: string;
-  timestamp: number;
   state: T;
-  payload?: unknown;
 }
 ```
 
-That's it. No actor name, no human-readable label, no prose, no per-field
-diff. `action` and `payload` are kernel-internal bookkeeping (`action` is
-generic — resolved through an internal name table, not something you supply
-via `undoable()`, which takes only the operation callback: `undoable(() =>
-{...})`, nothing else) — treat them as opaque. The one thing every entry
-reliably gives you is `state`: a whole-tree snapshot at that turn's boundary.
-This is deliberate, not an omission to fill in later: a name/sentence/actor
-kept "for the explanation" is exactly the kind of field that would sit in the
-hot causal path forever, paid by every write, for a need only the rare
-DevTools-open or support-ticket moment actually has.
+That's it. No actor name, business-action label, timestamp, arbitrary payload,
+prose, or per-field diff. The one thing every entry reliably gives you is
+`state`: a whole-tree snapshot at that turn's boundary. This is deliberate,
+not an omission to fill in later: a name, clock, sentence, or actor kept "for
+the explanation" would make presentation data intrinsic to every retained turn,
+despite being needed only by an application, projector, or future tooling.
 
 ### The composition
 
 ```text
-compact causal facts              (RestorationHistoryEntry.state — a whole-
+restoration snapshot              (RestorationHistoryEntry.state — a whole-
                                     tree snapshot at each authored turn
-                                    boundary; external()'s origin
-                                    classification — what the kernel actually
-                                    retains)
+                                    boundary)
       ↓
 diff consecutive snapshots        (what changed between this entry's state
                                     and the previous one — ordinary object
@@ -647,10 +638,11 @@ function explainLastChange(tree: MyTree): string | null {
 }
 ```
 
-`findChangedTicketId`/`describeDriver` and the diff strategy are entirely
-yours — the kernel gives you a stable, whole-tree snapshot at every authored
-turn boundary and nothing more; deriving "what changed" from two snapshots
-is application code, same as it would be diffing any two plain objects.
+`findChangedTicketId`/`describeDriver`, timestamps, actors, payloads, and the
+diff strategy are entirely yours. The kernel gives you a stable whole-tree
+snapshot at every authored turn boundary and nothing more; deriving "what
+changed" from two snapshots is application code, same as it would be diffing
+any two plain objects.
 
 `RestorationHistoryEntry`'s exact shape and `getRestorationHistory()`'s
 behavior (one entry per designated turn, `state` always a full snapshot) are

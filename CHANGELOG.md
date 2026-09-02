@@ -1,3 +1,11 @@
+## Unreleased
+
+- **Restoration history is state-only.** `RestorationHistoryEntry` no longer
+  exposes `timestamp`, `action`, or arbitrary `payload`, and restoration no
+  longer accepts presentation-label/payload configuration. Human and AI
+  timelines should project labels, clocks, actors, and prose from application
+  context rather than retaining them as kernel restoration facts.
+
 ## 15.0.0-rc.12 (2026-09-02)
 
 - **Framework package manifests are npm-provenance compatible.** Angular and
