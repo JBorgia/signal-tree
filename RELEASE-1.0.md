@@ -110,6 +110,27 @@ entry point, and exercised a kernel scalar write successfully. The temporary
 npm configuration was removed. The live registry path and strict framework
 declaration correction are closed; no technical GA blocker remains.
 
+`DECLARATION-IDENTITY-0` is **CLOSED LOCALLY / REQUIRES RC8 REGISTRY AND
+CONSUMER CONFIRMATION** at `9b955ffe`. A real V3 Scaletrax migration exposed a
+second deterministic declaration defect in the already-published RC7 artifacts:
+Rollup emitted `kernel/dist/index.d.ts` and `kernel/dist/adapter.d.ts` as
+independent declaration bundles, each declaring `EntityMapMarker`'s private
+`unique symbol`. `entityMap()` came from the root declaration while Angular's
+carrier-bound factory consumed `TreeNodeOf` from the adapter declaration, so
+the conditional could not recognize the marker and a strict consumer lost
+`.all()` / `.setAll()` and entity-loader typing. Runtime semantics, public API
+intent, and the source type algebra are unchanged. The kernel Rollup output
+transform now parses `adapter.d.ts`, fails closed unless it finds exactly one
+local marker brand and interface, removes only those duplicate declarations,
+and imports the canonical marker from `./index.js`. The packed consumer gate
+constructs `@signal-tree/angular`'s `signalTree` with `entityMap()` and proves
+the native `.all` signal and `.setAll()` under both `bundler` and `node16`.
+Local validation: kernel 2,154 passed; Angular 90 passed; workspace typecheck;
+kernel lint; production package builds; artifact and hygiene checks; and packed
+consumer typecheck under both resolutions. RC8 publication must confirm npm
+integrity equals the candidate and V3 must compile Scaletrax against the exact
+registry artifacts before this defect is fully closed.
+
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
 segmented, split-pool, checked-handle, and active-node-index rows have measured
