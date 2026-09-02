@@ -398,16 +398,21 @@ for (const [id, turns] of [
   };
 }
 
-ARMS.D8 = {
-  label: '20 designated scalar writes with zero retained history',
-  create: () => scalarTree(0),
-  run: async (tree) => {
-    await addIndependentScalarTurns(tree, 20);
-    if (tree.getRestorationHistory().length !== 0 || tree.$.value() !== 20) {
-      throw new Error('D8 postcondition failed');
-    }
-  },
-};
+for (const [id, turns] of [
+  ['D8', 20],
+  ['D9', 100],
+]) {
+  ARMS[id] = {
+    label: `${turns} designated scalar writes with zero retained history`,
+    create: () => scalarTree(0),
+    run: async (tree) => {
+      await addIndependentScalarTurns(tree, turns);
+      if (tree.getRestorationHistory().length !== 0 || tree.$.value() !== turns) {
+        throw new Error(`${id} postcondition failed`);
+      }
+    },
+  };
+}
 
 for (const [id, capacity, independently] of [
   ['G0', 20, true],

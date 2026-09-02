@@ -2697,6 +2697,25 @@ deltas, and turn objects, so it attributes only their carrier layout. The
 separate manager array is the lower-density representation under this real
 workload; no more historical-event carrier variants are authorized.
 
+`TURN-BOUNDARY-AGGREGATE-0` is **CLOSED — MATERIAL RESIDUAL, NO NEW CARRIER
+SELECTED**. D8/D9 are matched zero-retention controls for 20/100 independently
+designated scalar writes; D5/D3 retain those same 20/100 turns. Five-sample,
+20-tree quiesced comparisons measured 23,197.2 B/tree D8 versus 38,040.8 B/tree
+D5, a 14,843.6 B aggregate (742.2 B/retained turn), and 23,419.6 B/tree D9
+versus 85,208.8 B/tree D3, a 61,789.2 B aggregate (617.9 B/retained turn). The
+20-to-100 marginal retained boundary is 46,945.6 B across 80 turns, or 586.8
+B/turn. Each zero-retention control proves zero retained turns, events,
+indexes, effects, and order deltas; every held tree releases after `destroy()`.
+This is deliberately an aggregate result, not field-size arithmetic: it covers
+the `CanonicalTurn` object/header, `history[]` membership, necessary primitive
+turn fields, effects, position participation/index references, and required
+event boundaries as one real independent operation boundary. With Map exclusive
+ownership only 29-49 B/turn and the separate event array already denser than
+its candidate, no independent carrier dominates. The residual is material, but
+an arena/ring/slab has not been selected or authorized; preserve stable `TurnId`
+identity independent of any physical slot if an explicitly authorized compact
+carrier experiment follows.
+
 History projection has no retained cache in the current implementation:
 `getRestorationHistory()` materializes a transient projection and returns copied
 entry objects with state by reference. F0/F1 remain latency controls; their
