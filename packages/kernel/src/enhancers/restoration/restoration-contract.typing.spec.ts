@@ -81,6 +81,16 @@ export type _HistoryStateIsConcrete = [
 export const _stateCount: number = entries[0].state.count;
 export const _stateName: string = entries[0].state.user.name;
 
+// Human-facing explanation belongs to an application/projector. The kernel
+// history contract exposes restoration snapshots, not labels, clocks, or
+// arbitrary caller context.
+// @ts-expect-error restoration history has no human-facing action label
+export type _NoHistoryAction = (typeof entries)[number]['action'];
+// @ts-expect-error restoration history has no wall-clock timestamp
+export type _NoHistoryTimestamp = (typeof entries)[number]['timestamp'];
+// @ts-expect-error restoration history has no arbitrary explanatory payload
+export type _NoHistoryPayload = (typeof entries)[number]['payload'];
+
 // Negative control — proves the row above is not vacuously true because
 // `RestorationHistoryEntry<never>` happens to satisfy it.
 export type _HistoryIsNotNever = ExpectFalse<
@@ -168,6 +178,8 @@ export type _ConfigDoesNotChangeSurface = [
 ];
 // @ts-expect-error config is checked, not `any`
 signalTree(initial, { enhancers: [restoration({ nope: true }), transactions()] });
+// @ts-expect-error history projection configuration was removed with its fields
+signalTree(initial, { enhancers: [restoration({ includePayload: false }), transactions()] });
 
 // ============================================================================
 // 7 — negative controls

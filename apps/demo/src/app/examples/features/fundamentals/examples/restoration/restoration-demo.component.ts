@@ -18,7 +18,10 @@ import {
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
-import type { RestorationMethods } from '@signal-tree/angular';
+import type {
+  RestorationHistoryEntry,
+  RestorationMethods,
+} from '@signal-tree/angular';
 
 interface Todo {
   id: number;
@@ -41,13 +44,6 @@ interface AppState {
   counter: number;
   message: string;
   todos: Todo[];
-}
-
-interface RestorationHistoryEntry {
-  action: string;
-  timestamp: number;
-  state: AppState;
-  payload?: unknown;
 }
 
 @Component({
@@ -513,11 +509,6 @@ export class RestorationDemoComponent {
       }));
       this.refreshTimeTravelState();
     }, 1000);
-  }
-
-  formatTimestamp(timestamp: number): string {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString();
   }
 
   getStatePreview(state: AppState): string {

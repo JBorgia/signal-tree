@@ -507,8 +507,6 @@ class RestorationManager<T> {
   }
 
   private maxHistorySize: number;
-  private includePayload: boolean;
-  private actionNames: Record<string, string>;
 
   constructor(
     private tree: ISignalTree<T>,
@@ -522,13 +520,6 @@ class RestorationManager<T> {
     this.historyVersion = cellRuntime.createCell(0);
     this.frontierVersion = cellRuntime.createCell(0);
     this.maxHistorySize = normaliseMaxHistorySize(config.maxHistorySize);
-    this.includePayload = config.includePayload ?? true;
-    this.actionNames = {
-      update: 'UPDATE',
-      set: 'SET',
-      batch: 'BATCH',
-      ...config.actionNames,
-    };
   }
 
   /**
@@ -555,8 +546,6 @@ class RestorationManager<T> {
   // built for. Rebuilding ~20 lines beats reasoning about which of its
   // assumptions still hold. See docs/architecture/history-the-greenfield-target.md.
   addEntry(
-    action: string,
-    payload?: unknown,
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
@@ -565,8 +554,6 @@ class RestorationManager<T> {
     beforeInsert?: () => void
   ): boolean {
     const entry = this.buildTurn(
-      action,
-      payload,
       subjectIds,
       positionIds,
       effects,
@@ -583,8 +570,6 @@ class RestorationManager<T> {
   }
 
   createPendingEntry(
-    action: string,
-    payload?: unknown,
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
@@ -592,8 +577,6 @@ class RestorationManager<T> {
     explicitTurnId?: number
   ): CanonicalTurn<T> | undefined {
     const entry = this.buildTurn(
-      action,
-      payload,
       subjectIds,
       positionIds,
       effects,
@@ -670,8 +653,6 @@ class RestorationManager<T> {
   // history: the dependency ledger and the undo stack are not the same thing.
 
   private buildTurn(
-    action: string,
-    payload?: unknown,
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
@@ -765,9 +746,6 @@ class RestorationManager<T> {
       historyIndex: this.history.length,
       __turnId: turnId,
       ...(pendingState === undefined ? {} : { state: pendingState }),
-      timestamp: Date.now(),
-      action: this.actionNames[action] || action,
-      ...(this.includePayload && payload !== undefined && { payload }),
     };
     const orderDeltas = (collectionOrders ?? [])
       .map((order) =>
@@ -1554,8 +1532,7 @@ class RestorationManager<T> {
   }
 
   getRestorationHistory(): RestorationHistoryEntry<T>[] {
-    // The entry OBJECTS are copied so a caller cannot rewrite history metadata,
-    // but the STATE is handed over by reference.
+    // Entry objects are copied, but STATE is handed over by reference.
     //
     // This used to `deepClone` every entry's state on every call — O(state x
     // entries) each time you asked, which is brutal for a devtools panel that
@@ -2244,22 +2221,14 @@ class RestorationManager<T> {
  * const store = signalTree({
  *   document: { title: '', content: '' },
  *   settings: { theme: 'light' }
- * }, { enhancers: [restoration({
- *   maxHistorySize: 50,        // Limit memory usage
- *   includePayload: true,      // Store action metadata
- *   actionNames: {             // Custom action names
- *     'update_title': 'Update Document Title',
- *     'change_theme': 'Change Theme'
- *   }
- * })] });
+ * }, { enhancers: [restoration({ maxHistorySize: 50 })]});
  *
  * // Named actions with metadata
  * store.update(() => ({ document: { title: 'New Title' } }), 'update_title');
  *
- * // View detailed history
+ * // View restoration snapshots
  * const history = store.__restoration.getRestorationHistory();
- * console.log(history[0].action); // 'Update Document Title'
- * console.log(history[0].timestamp); // Date when change occurred
+ * console.log(history[0].state);
  * ```
  */
 
@@ -3302,8 +3271,6 @@ export function restoration(
         return undefined;
       }
       const entry = restorationManager.createPendingEntry(
-        'transaction',
-        undefined,
         subjectIds.length > 0 ? subjectIds : undefined,
         positionIds.length > 0 ? positionIds : undefined,
         effects.length > 0 ? effects : undefined,
@@ -3689,8 +3656,6 @@ export function restoration(
               (effects.length > 0 || collectionOrders.length > 0);
             const recorded = eligible
               ? restorationManager.addEntry(
-                  'batch',
-                  undefined,
                   subjectIds.length > 0 ? subjectIds : undefined,
                   positionIds.length > 0 ? positionIds : undefined,
                   effects.length > 0 ? effects : undefined,
@@ -3914,8 +3879,8 @@ function restorationHistory(
 export const withRestoration = Object.assign(
   (config: RestorationConfig = {}) => restoration(config),
   {
-    minimal: () => restoration({ maxHistorySize: 20, includePayload: false }),
-    debug: () => restoration({ maxHistorySize: 200, includePayload: true }),
+    minimal: () => restoration({ maxHistorySize: 20 }),
+    debug: () => restoration({ maxHistorySize: 200 }),
     history: restorationHistory,
   }
 );

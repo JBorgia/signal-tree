@@ -2489,6 +2489,21 @@ retained turn. The kernel's restoration and transaction modules also fell by
 the next carrier review is `HISTORY-PROJECTION-FIELDS-0` for `timestamp`,
 `action`, `payload`, and `RestorationHistoryEntry` ownership.
 
+`HISTORY-PROJECTION-FIELDS-0` is now closed by product authority. The public
+`RestorationHistoryEntry` retains only its restorable `state`; `timestamp`,
+human-facing `action`, and optional arbitrary `payload` are deleted alongside
+`RestorationConfig.includePayload` and `actionNames`. Internal operation
+classification and bounded observed-batch diagnostics remain separate from the
+history contract. The type-level public-surface regression rejects all three
+former fields and the removed configuration. In three forced-GC comparisons of
+5,000 independently flushed designated turns, median retained heap fell from
+19,112,896 B to 18,711,104 B: 401,792 B total, or 80.4 B per retained turn.
+The restoration module fell another 956 B before compression. Human/AI history
+explanation is application/projector/future-tooling work, not retained kernel
+history data. `RestorationHistoryEntry` remains public because the state
+snapshot has an established restoration-inspection job; its broader deletion is
+not implied by this contraction.
+
 ### Sequence
 
 1. Finish immutable RC9 verification.
