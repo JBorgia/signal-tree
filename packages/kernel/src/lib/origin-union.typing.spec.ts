@@ -60,4 +60,15 @@ describe('origin union: only owners survive', () => {
 
     expect(tree.$.n()).toBe(3);
   });
+
+  it('rejects unowned correlation and clock annotations', () => {
+    const tree = signalTree({ n: 0 });
+
+    // @ts-expect-error correlation has no kernel reader or semantic owner
+    withWriteContext({ correlationId: 'related-updates' }, () => tree.$.n.set(1));
+    // @ts-expect-error write-time clock data has no kernel reader or semantic owner
+    withWriteContext({ timestamp: 0 }, () => tree.$.n.set(2));
+
+    expect(tree.$.n()).toBe(2);
+  });
 });
