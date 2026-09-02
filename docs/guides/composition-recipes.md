@@ -11,6 +11,15 @@ They live here because a recipe is the better answer when the composition is
 short and the opinions are yours: it costs no API surface, it can't be
 half-right for your app, and you can read the whole thing.
 
+### Import rule
+
+These recipes are framework-neutral, so their reusable helpers import from
+`@signal-tree/kernel`. At an Angular or React application construction site,
+import the same primitives from `@signal-tree/angular` or `@signal-tree/react`
+respectively. A framework application should use its framework package as its
+complete SignalTree facade; direct kernel imports are for helpers that are
+intentionally runtime-independent.
+
 The filter for what belongs on this page, going forward: if an application
 problem can be expressed cleanly by composing primitives that already ship,
 it earns a recipe here, not a new kernel API. A pattern becomes a kernel
@@ -314,7 +323,7 @@ const tree = signalTree(
     order: { status: 'open' as 'open' | 'assigned' },
     driver: { orderId: null as number | null },
   },
-  { enhancers: [transactions()] },
+  { enhancers: [transactions()] }
 );
 
 const pending = tree.transaction(() => {

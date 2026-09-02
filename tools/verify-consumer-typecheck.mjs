@@ -168,6 +168,42 @@ export const _used = [n, whole, rows, angularUsers, createSignalTreeFactory, def
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
 
+const FACADE_IDENTITY_PROBE = `
+import * as kernel from '@signal-tree/kernel';
+import * as angular from '@signal-tree/angular';
+import * as react from '@signal-tree/react';
+
+const sharedRuntimeSymbols = [
+  'entityMap',
+  'link',
+  'restoration',
+  'undoable',
+  'external',
+  'asReadonly',
+  'batching',
+  'devTools',
+  'transactions',
+  'onTreeError',
+  'SignalTreeRollbackError',
+];
+
+for (const packageName of ['angular', 'react']) {
+  const facade = packageName === 'angular' ? angular : react;
+  for (const symbol of sharedRuntimeSymbols) {
+    if (facade[symbol] !== kernel[symbol]) {
+      throw new Error(
+        '@signal-tree/' + packageName + ' does not forward kernel ' + symbol + ' by identity.'
+      );
+    }
+  }
+}
+
+if (react.signalTree !== kernel.signalTree) {
+  throw new Error('@signal-tree/react does not forward kernel signalTree by identity.');
+}
+`;
+writeFileSync(join(proj, 'src', 'facade-identity.mjs'), FACADE_IDENTITY_PROBE);
+
 // --- install ----------------------------------------------------------------
 console.log('  installing tarball...');
 execFileSync(
@@ -186,6 +222,15 @@ execFileSync(
   ],
   { cwd: proj, stdio: 'pipe' }
 );
+
+try {
+  execFileSync('node', ['src/facade-identity.mjs'], { cwd: proj, stdio: 'pipe' });
+  console.log('  ✅ framework facade runtime identities');
+} catch (err) {
+  const out = `${err.stdout || ''}${err.stderr || ''}`.trim();
+  console.error(`  ❌ framework facade runtime identities\n       ${out}`);
+  process.exit(1);
+}
 
 // --- typecheck under both resolutions ---------------------------------------
 const RESOLUTIONS = [

@@ -11,7 +11,10 @@ npm install @signal-tree/angular
 ```
 
 `@signal-tree/angular` installs `@signal-tree/kernel` as an exact dependency.
-Angular itself remains a peer dependency supplied by the application.
+Angular itself remains a peer dependency supplied by the application. This is
+the complete SignalTree facade for Angular applications: import `signalTree`,
+markers, enhancers, and types from this package rather than mixing kernel
+imports into Angular application code.
 
 Angular applications should construct state through this package, not through
 the neutral kernel package:

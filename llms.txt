@@ -11,11 +11,17 @@ v15 ships three packages under the hyphenated `@signal-tree/*` scope (the pre-15
 - `@signal-tree/kernel` — framework-neutral tree, `entityMap()`, causal turns,
   links, and the `restoration()` / `transactions()` / `batching()` / `devTools()`
   enhancers. Also `@signal-tree/kernel/adapter`, the realization SDK.
-- `@signal-tree/angular` — the Angular realization. **Angular code imports
-  `signalTree` (and everything else) from here**, not the kernel: kernel leaves
-  are neutral cells, `@signal-tree/angular` leaves are native Angular signals.
-  Adds `defineStore()`.
-- `@signal-tree/react` — `useSignalTree(owner, selector)` observation.
+- `@signal-tree/angular` — the complete Angular application facade. **Angular
+  code imports `signalTree` and all other SignalTree APIs from here**, not the
+  kernel: kernel leaves are neutral cells, `@signal-tree/angular` leaves are
+  native Angular signals. Adds `defineStore()` and `toWritableSignal()`.
+- `@signal-tree/react` — the complete React application facade. **React code
+  imports `signalTree`, markers, enhancers, and `useSignalTree(owner, selector)`
+  from here**; React observes the canonical kernel tree without copying it.
+
+Use `@signal-tree/kernel` directly only for framework-neutral TypeScript,
+including reusable domain libraries. Framework facades forward the neutral
+kernel surface by canonical identity; they do not duplicate semantic authority.
 
 There is no v15 forms, persistence, validation, events, or realtime package;
 those are application-owned. `.with()`, positional `derived`, `stored()`, and

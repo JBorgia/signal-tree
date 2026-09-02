@@ -296,6 +296,20 @@ Conventional commits: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, 
 
 ## For Agents Consuming SignalTree
 
+### Framework facade rule
+
+Use one SignalTree import root for application code:
+
+- Angular applications: `@signal-tree/angular`
+- React applications: `@signal-tree/react`
+- Framework-neutral TypeScript and reusable libraries: `@signal-tree/kernel`
+
+The framework packages are complete application facades over the neutral
+kernel. Do not mix application imports between a framework package and the
+kernel; direct kernel imports are for code that intentionally has no framework
+runtime. The facades forward kernel symbols rather than reimplementing them, so
+there remains one semantic and nominal type authority.
+
 **There is currently no consumer-facing skill, and that is deliberate.** The
 `using-signaltree` skill, its per-package sub-skills, and the harness shims were
 deleted in `7696225d` along with the rest of the AI-discoverability artifacts.
