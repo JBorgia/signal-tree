@@ -1103,7 +1103,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
       return undefined;
     }
     const {
-      ownerPaths,
       subjectIds,
       positionIds,
       effects,
