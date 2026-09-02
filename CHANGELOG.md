@@ -1,3 +1,10 @@
+## 15.0.0-rc.12 (2026-09-02)
+
+- **Framework package manifests are npm-provenance compatible.** Angular and
+  React now identify the canonical Git repository and package directory, and
+  the built-manifest gate rejects missing or incompatible provenance metadata
+  before any registry write.
+
 ## 15.0.0-rc.11 (2026-09-02)
 
 - **Canonical CI publication has a managed-token fallback.** The publisher uses

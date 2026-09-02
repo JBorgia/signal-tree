@@ -146,6 +146,18 @@ correction earns RC11. RC11 publication must confirm npm integrity equals the
 candidate and V3 must compile Scaletrax against the exact registry artifacts
 before this defect is fully closed.
 
+`15.0.0-rc.11` is **IMMUTABLE / PARTIALLY PUBLISHED** at `e2c597789`. Tagged
+verification passed the full release matrix. The canonical publisher proved the
+managed-token fallback by publishing `@signal-tree/kernel@15.0.0-rc.11` with
+provenance, then npm rejected Angular before its registry write because the
+packed framework manifest omitted `repository.url`. Angular and React manifests
+now carry the canonical repository URL and their package directories; the built
+manifest gate rejects any missing or incompatible provenance identity. RC11
+cannot be reused because kernel is already published. This provenance repair
+earns RC12, whose tagged publisher must publish all three exact candidate
+tarballs and whose registry integrities and V3 Scaletrax consumer proof close
+`DECLARATION-IDENTITY-0`.
+
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
 segmented, split-pool, checked-handle, and active-node-index rows have measured

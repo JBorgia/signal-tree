@@ -63,6 +63,7 @@ const PUBLISHABLE = readdirSync(join(process.cwd(), 'packages'), {
 
 const BAD_PROTOCOLS = ['workspace:', 'file:', 'link:', 'portal:'];
 const DEP_BLOCKS = ['dependencies', 'peerDependencies', 'optionalDependencies'];
+const CANONICAL_REPOSITORY_URL = 'git+https://github.com/JBorgia/signal-tree.git';
 
 /**
  * Minimal semver satisfaction, prerelease-aware, no dependency.
@@ -181,6 +182,18 @@ function inspectManifest(json, path, versionByName) {
     );
   }
 
+  const packageDirectory = typeof json.name === 'string'
+    ? `packages/${json.name.replace('@signal-tree/', '')}`
+    : undefined;
+  if (
+    json.repository?.url !== CANONICAL_REPOSITORY_URL ||
+    json.repository?.directory !== packageDirectory
+  ) {
+    found.push(
+      `${path}: repository must identify ${CANONICAL_REPOSITORY_URL} and ${packageDirectory ?? 'its package directory'} for npm provenance verification.`
+    );
+  }
+
   for (const block of DEP_BLOCKS) {
     for (const [dep, range] of Object.entries(json[block] ?? {})) {
       if (typeof range !== 'string') continue;
@@ -229,18 +242,22 @@ function inspectManifest(json, path, versionByName) {
  */
 function selfTest() {
   const clean = {
-    name: '@signaltree/events',
+    name: '@signal-tree/events',
     version: '15.0.0-rc.1',
     peerDependencies: { '@signal-tree/kernel': '^15.0.0-rc.1' },
+    repository: {
+      url: CANONICAL_REPOSITORY_URL,
+      directory: 'packages/events',
+    },
   };
   const withProtocol = {
-    name: '@signaltree/events',
+    name: '@signal-tree/events',
     version: '15.0.0-rc.1',
     // The exact string the 15.0 rehearsal found in dist/.
     peerDependencies: { '@signal-tree/kernel': 'workspace:*' },
   };
   const withDeadRange = {
-    name: '@signaltree/events',
+    name: '@signal-tree/events',
     version: '15.0.0-rc.1',
     // Valid semver, admits nothing being shipped — a caret on a stable version
     // does NOT admit a prerelease of the same version.
@@ -250,10 +267,23 @@ function selfTest() {
     name: '@signal-tree/angular',
     version: '15.0.0-rc.1',
     sideEffects: false,
+    repository: {
+      url: CANONICAL_REPOSITORY_URL,
+      directory: 'packages/angular',
+    },
   };
   const impureAngular = {
     name: '@signal-tree/angular',
     version: '15.0.0-rc.1',
+    repository: {
+      url: CANONICAL_REPOSITORY_URL,
+      directory: 'packages/angular',
+    },
+  };
+  const withoutProvenance = {
+    name: '@signal-tree/angular',
+    version: '15.0.0-rc.1',
+    sideEffects: false,
   };
 
   const versions = new Map([['@signal-tree/kernel', '15.0.0-rc.1']]);
@@ -276,6 +306,9 @@ function selfTest() {
     failures.push(
       'accepted Angular without sideEffects:false after global installation removal'
     );
+  }
+  if (check(withoutProvenance).length === 0) {
+    failures.push('accepted Angular without npm provenance repository metadata');
   }
   // And the comparator itself, since every range verdict rests on it.
   if (satisfies('15.0.0-rc.1', '^15.0.0-rc.1') !== true) {
@@ -300,7 +333,7 @@ function selfTest() {
     process.exit(1);
   }
   console.log(
-    '✅ the manifest checker rejects `workspace:*`, dead ranges and inert Angular initialization,\n' +
+    '✅ the manifest checker rejects `workspace:*`, dead ranges, inert Angular initialization, and missing provenance metadata,\n' +
       '   accepts a clean manifest, and its comparator handles prerelease ranges'
   );
   process.exit(0);
