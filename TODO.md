@@ -2559,6 +2559,10 @@ one-variable alternative is admitted.
 
 #### `CAUSAL-REPRESENTATION-0 / ATTRIBUTION` — ACTIVE, NO PROTOTYPE AUTHORIZED
 
+Checkpoint: `71bf7246`. Validation: full five-sample attribution matrix,
+restoration suite 106/106, workspace typecheck, direct harness ESLint, and docs
+validation pass.
+
 Questions:
 
 ```text
