@@ -2664,7 +2664,25 @@ delta: it is Map/table/key/value-edge ownership only. The exclusive cost is
 tens of bytes per retained turn, only about 7-12% of the roughly 415 B
 independent turn-boundary group, and therefore not material. No Map carrier
 prototype is authorized; keep `Map<TurnId, CanonicalTurn>` for its proven
-identity lookup job.
+identity lookup job. The disposable candidate also exposed one incidental
+second job: after `history[]` mutates, `rebuildTurnIndexes()` needs the prior
+confirmed-ID set to restore frontiers. The Map had supplied it only by
+accident; reconstructing that bounded set from the pre-rebuild position indexes
+kept all behavior green. Production readers prove a required job, not that the
+current carrier intrinsically owns every incidental use.
+
+`HISTORICAL-EVENT-OWNERSHIP-0` is **ACTIVE ATTRIBUTION, ONE CARRIER EXPERIMENT
+AUTHORIZED**. `historicalEvents` holds ordered reversal/gap boundaries for
+historical state materialization; the fact is independently required and is
+not eligible for semantic deletion. Measure only its exclusive carriage by
+co-locating each retained boundary event and its following gap events with the
+retained turn that bounds them, preserving ordinal order, every effect and
+order delta, and a distinct fallback for an event with no retained boundary.
+The candidate must pass the full kernel suite, then use matched five-sample,
+20-tree quiesced D5 (20-turn) and D3 (100-turn) heap controls. Exclude shared
+effects, deltas, and turn objects from the result. Retain the incumbent and
+stop if the exclusive carrier delta is not material; no turn-header or
+arena/ring work is authorized by this row.
 
 History projection has no retained cache in the current implementation:
 `getRestorationHistory()` materializes a transient projection and returns copied
