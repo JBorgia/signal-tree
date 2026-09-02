@@ -2639,6 +2639,23 @@ retained implementation state. `USED BY ALGORITHM` is not causal authority;
 the objective is the best measured speed-and-density tradeoff, not maximum
 normalization.
 
+`HISTORY-INDEX-ATTRIBUTION-0` is **CLOSED — RETAINED DERIVED ACCELERATOR**.
+`historyIndex` is rebuilt solely from `history[]` and holds no independent
+causal fact. A disposable real-runtime candidate removed the stored per-turn
+field, deriving temporal order through `history.indexOf(turn)` for scoped
+closure selection, confirmed undo/redo selection, temporal restoration,
+historical materialization, and `jumpTo`; it kept `history[]`, `turns`, and
+`historicalEvents` unchanged. Kernel typecheck and 2,157-test suite passed
+with the candidate. Matched five-sample D5/G0/H0/H1/H2/E3 controls found only
+about 160 B saved for a 20-turn tree and 0.8-1.2 KB for 100 turns. The
+decisive 15-sample H2 navigation rerun measured 126.333 us incumbent versus
+124.917 us derived, a -1.1% difference within the noisy harness range. The
+candidate has no material density win and no demonstrated navigation gain;
+retain the O(1) stored index as intentional implementation state. H0-H2 now
+permanently cover 100-turn undo, redo, and temporal jump paths; E3 remains the
+scoped-containment control. This result does not promote `historyIndex` to
+causal authority or freeze its physical carrier.
+
 #### `OWNERSHIP-CENSUS-GATE-0` — ACTIVE, SEPARATE PRE-GA GATE INFRASTRUCTURE
 
 `node tools/check-kernel-ownership.mjs` currently stops in its census-family
