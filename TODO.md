@@ -2684,6 +2684,19 @@ effects, deltas, and turn objects from the result. Retain the incumbent and
 stop if the exclusive carrier delta is not material; no turn-header or
 arena/ring work is authorized by this row.
 
+**CLOSED — RETAIN THE SEPARATE EVENT ARRAY.** The disposable candidate
+co-located each boundary event and following gap events on the retained turn,
+kept event ordinals/effects/order deltas unchanged, and used a distinct fallback
+for unbound events. It passed the complete 2,158-test kernel suite. Matched
+five-sample, 20-tree quiesced controls instead found the incumbent denser:
+38,040.8 B/tree versus 39,477.2 B/tree at 20 turns, and 85,214.8 B/tree versus
+93,159.6 B/tree at 100. The candidate cost an additional 1,436.4 B (71.8
+B/turn) and 7,944.8 B (79.4 B/turn), respectively; all held trees released
+after `destroy()`. This comparison retains the same event facts, effects,
+deltas, and turn objects, so it attributes only their carrier layout. The
+separate manager array is the lower-density representation under this real
+workload; no more historical-event carrier variants are authorized.
+
 History projection has no retained cache in the current implementation:
 `getRestorationHistory()` materializes a transient projection and returns copied
 entry objects with state by reference. F0/F1 remain latency controls; their
