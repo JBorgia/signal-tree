@@ -2716,6 +2716,27 @@ an arena/ring/slab has not been selected or authorized; preserve stable `TurnId`
 identity independent of any physical slot if an explicitly authorized compact
 carrier experiment follows.
 
+`COMPACT-TURN-STORE-0` is **AUTHORIZED — EXACTLY ONE DISPOSABLE PROTOTYPE**.
+Replace only confirmed-turn header/order storage (`history[]` plus its
+`TurnId -> CanonicalTurn` index) with a bounded slotted struct-of-arrays store:
+primitive columns hold stable turn IDs, temporal order, and event ordinals;
+reference columns retain the existing effects, positions, claims, order deltas,
+and optional materialization state. Keep the identity lookup requirement,
+separate `historicalEvents` array, existing effect/position/claim/delta
+representations, and all causal facts. A physical slot is never a `TurnId` or
+temporal order; eviction must not let a reused slot resolve an evicted ID.
+Add a stale-slot falsifier. Before any production adoption, require the full
+kernel suite; retained 20/100-turn D5/D3 and 20->100 marginal controls;
+capacity-20 1,000-write eviction; structural/rekey/scoped undo-redo/history
+projection; the six-lookup ordinary undo and 199-lookup temporal jump controls;
+and production instrumentation absence. Accept only a minimum 100 B/retained
+turn or 15% retained-history saving at 100 turns, with no meaningful navigation
+regression beyond 5% unless the density win is substantially larger. Also
+compare 20 effects in one turn against 20 effects in 20 turns: the independent
+boundary gap must shrink materially. Otherwise close `TURN-BOUNDARY-GROUP-0`
+with the incumbent and proceed directly to `AUXILIARY-RETENTION-SLOPE-0`; no
+second carrier experiment is authorized.
+
 History projection has no retained cache in the current implementation:
 `getRestorationHistory()` materializes a transient projection and returns copied
 entry objects with state by reference. F0/F1 remain latency controls; their
