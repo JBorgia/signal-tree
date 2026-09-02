@@ -25,7 +25,13 @@
  *        (requires dist/packages/kernel — run the build first)
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, mkdirSync, writeFileSync, readdirSync } from 'node:fs';
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  writeFileSync,
+  readdirSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
@@ -39,12 +45,16 @@ if (
   suppliedTarballs.length === 0 &&
   PACKAGE_NAMES.some((name) => !existsSync(join(ROOT, 'dist/packages', name)))
 ) {
-  console.error('❌ publishable package dist folders not found — run the build first.');
+  console.error(
+    '❌ publishable package dist folders not found — run the build first.'
+  );
   process.exit(1);
 }
 
 const work = mkdtempSync(join(tmpdir(), 'st-consumer-tsc-'));
-console.log('📦 Packing SignalTree packages and type-checking a real consumer\n');
+console.log(
+  '📦 Packing SignalTree packages and type-checking a real consumer\n'
+);
 
 const tarballPaths = [];
 if (suppliedTarballs.length > 0) {
@@ -56,7 +66,9 @@ if (suppliedTarballs.length > 0) {
     tarballPaths.push(tarballPath);
   }
   if (tarballPaths.length !== PACKAGE_NAMES.length) {
-    console.error(`❌ expected ${PACKAGE_NAMES.length} supplied tarballs, got ${tarballPaths.length}.`);
+    console.error(
+      `❌ expected ${PACKAGE_NAMES.length} supplied tarballs, got ${tarballPaths.length}.`
+    );
     process.exit(1);
   }
 } else {
@@ -100,7 +112,12 @@ import {
   batching,
 } from '@signal-tree/kernel';
 import { createSignalTreeFactory } from '@signal-tree/kernel/adapter';
-import { defineStore } from '@signal-tree/angular';
+import { Signal } from '@angular/core';
+import {
+  defineStore,
+  entityMap as angularEntityMap,
+  signalTree as angularSignalTree,
+} from '@signal-tree/angular';
 import { useSignalTree } from '@signal-tree/react';
 
 type User = { id: number; name: string; version: number };
@@ -133,12 +150,21 @@ tree.$((current) => ({ ...current, count: 9 }));
 tree.$.users.addOne({ id: 1, name: 'a', version: 1 });
 tree.$.users.updateOne(1, { name: 'b' });
 
+// Angular realization: the root entity marker and adapter factory declarations
+// must share marker identity, so entity APIs remain available and read surfaces
+// are native Angular signals in a packed consumer.
+const angularTree = angularSignalTree({
+  users: angularEntityMap<User, number>({ selectId: (u: User) => u.id }),
+});
+const angularUsers: Signal<User[]> = angularTree.$.users.all;
+angularTree.$.users.setAll([]);
+
 // Enhancer methods
 tree.undo();
 tree.redo();
 tree.batch(() => tree.$.count.set(0));
 
-export const _used = [n, whole, rows, createSignalTreeFactory, defineStore, useSignalTree];
+export const _used = [n, whole, rows, angularUsers, createSignalTreeFactory, defineStore, useSignalTree];
 `;
 writeFileSync(join(proj, 'src', 'main.ts'), SAMPLE);
 
