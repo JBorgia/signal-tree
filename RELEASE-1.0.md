@@ -132,9 +132,14 @@ consumer typecheck under both resolutions. RC8 (`66a7484d`, signed tag
 set, then correctly failed its mutation proof because the declaration-docs
 self-test still searched for the superseded `kernel: 248` baseline. The RC9
 candidate updates that anchor to the canonical `243 -> 244` mutation. RC9
-publication must confirm npm integrity equals the candidate and V3 must compile
-Scaletrax against the exact registry artifacts before this defect is fully
-closed.
+(`51b9837f`, signed tag `v15.0.0-rc.9`) is immutable but unpublished: its tagged
+verification passed the full 69-gate set, while the independently dispatched
+canonical publisher timed out this full-size logical-work control at Vitest's
+default five seconds. The control remains logically green under CI settings and
+now receives the same 20-second budget as the neighboring large-harness audits
+at `be652320`. This release-system correction earns RC10. RC10 publication must
+confirm npm integrity equals the candidate and V3 must compile Scaletrax against
+the exact registry artifacts before this defect is fully closed.
 
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
