@@ -3,6 +3,8 @@ import { undoable } from '../lib/undoable';
 import { batching } from './batching/batching';
 import { restoration } from './restoration/restoration';
 import { devTools } from './devtools/devtools';
+import { transactions } from './transactions/transactions';
+import { getPathNotifier } from '../lib/path-notifier';
 import { signalTree } from '../lib/signal-tree';
 
 /**
@@ -144,6 +146,28 @@ describe('destroy() clears enhancer resources', () => {
     if (history) {
       expect(history).toEqual([]);
     }
+  });
+
+  it('composed causal enhancers release global PathNotifier subscriptions on destroy', () => {
+    const notifier = getPathNotifier();
+    const initialSubscriberCount = notifier.getSubscriberCount();
+    const tree = signalTree(
+      { count: 0 },
+      {
+        enhancers: [
+          restoration(),
+          transactions(),
+          devTools({ enableBrowserDevTools: false }),
+        ],
+        capabilities: ['causal-runtime'],
+      }
+    );
+
+    expect(notifier.getSubscriberCount()).toBe(initialSubscriberCount + 3);
+
+    tree.destroy();
+
+    expect(notifier.getSubscriberCount()).toBe(initialSubscriberCount);
   });
 });
 

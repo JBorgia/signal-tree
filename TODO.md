@@ -2787,7 +2787,7 @@ permanently cover 100-turn undo, redo, and temporal jump paths; E3 remains the
 scoped-containment control. This result does not promote `historyIndex` to
 causal authority or freeze its physical carrier.
 
-#### `AUXILIARY-RETENTION-SLOPE-0` — QUEUED AFTER TURN-BOUNDARY ATTRIBUTION
+#### `AUXILIARY-RETENTION-SLOPE-0` — CLOSED: NO UNBOUNDED AUXILIARY SLOPE
 
 **Property:** when retained causal work is bounded, no kernel-owned auxiliary
 structure associated solely with that work may retain a material slope with
@@ -2813,6 +2813,27 @@ Do not rewrite correctly bounded state, manufacture a broad benchmark, or
 promote a derived index to semantic authority merely because an algorithm reads
 it. This is the cross-kernel guardrail generalized from
 `OBSERVED-BATCH-DIAGNOSTIC-RETENTION-0`.
+
+**Closed provenance inventory.** `historicalEvents` is authoritative temporal
+reconstruction state, with growth bounded by the oldest retained or pending
+turn event ordinal; eviction calls `pruneHistoricalEventsBeforeOldestBoundary`,
+redo truncation filters discarded events, and history reset clears it. Its
+separate carrier already won `HISTORICAL-EVENT-OWNERSHIP-0`, so no duplicate
+slope benchmark was justified. Global `PathNotifier` subscribers, flush
+callbacks, and reset callbacks are scoped to their subscribing owner:
+`restoration()` and `transactions()` unsubscribe every registration through
+`tree.registerCleanup`, `devTools()` does the same through
+`disconnectDevTools`, and explicit `link()` / diagnostic-journal resources own
+their public `dispose()` handles. The composed cleanup characterization proves
+that restoration + transactions + DevTools add three subscribers and return to
+the prior global count after `tree.destroy()`. DevTools' global group and
+connection registries delete both entries when the last registered tree leaves.
+Other process-level diagnostics are either explicitly owner-disposed
+(`onTreeError`), registration-time extension state (`MARKER_PROCESSORS`),
+WeakMap metadata, or bounded (`ENTITY_ARRAY_WARNED`, cap 256). None grows with
+past causal activity or outlives its stated owner, so the 20 -> 100 -> 1,000
+heap falsifier did not apply. `OBSERVED-BATCH-DIAGNOSTIC-RETENTION-0` remains
+the only identified auxiliary retention defect in this closure.
 
 #### `OWNERSHIP-CENSUS-GATE-0` — ACTIVE, SEPARATE PRE-GA GATE INFRASTRUCTURE
 
