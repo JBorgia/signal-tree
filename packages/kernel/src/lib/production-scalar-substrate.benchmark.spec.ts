@@ -88,6 +88,7 @@ type EntityFrameTimingRow = {
 type PublicUndoLogicalWorkRow = {
   positions: number;
   publicUndoPositionEntriesExamined: number;
+  turnIndexLookups: number;
   publicUndoTurnEffectsExamined: number;
 };
 
@@ -1073,6 +1074,7 @@ function measurePublicUndoLogicalWorkRows(
         positions: size,
         publicUndoPositionEntriesExamined:
           stats.publicUndoPositionEntriesExamined,
+        turnIndexLookups: stats.turnIndexLookups,
         publicUndoTurnEffectsExamined: stats.publicUndoTurnEffectsExamined,
       });
     } finally {
@@ -1134,6 +1136,7 @@ describe('Complexity guard: production scalar substrate', () => {
           publicAddPreviousTailReads: 0,
           publicAddExistingKeysCopied: 0,
           publicUndoPositionEntriesExamined: 0,
+          turnIndexLookups: 0,
           publicUndoTurnEffectsExamined: 0,
         });
 
@@ -1157,6 +1160,7 @@ describe('Complexity guard: production scalar substrate', () => {
           publicAddPreviousTailReads: 0,
           publicAddExistingKeysCopied: 0,
           publicUndoPositionEntriesExamined: 0,
+          turnIndexLookups: 0,
           publicUndoTurnEffectsExamined: 0,
         });
       } finally {
@@ -1190,6 +1194,7 @@ describe('Complexity guard: production scalar substrate', () => {
             publicAddPreviousTailReads: 0,
             publicAddExistingKeysCopied: 0,
             publicUndoPositionEntriesExamined: 0,
+            turnIndexLookups: 0,
             publicUndoTurnEffectsExamined: 0,
           });
         } finally {
@@ -1371,6 +1376,7 @@ describe('Complexity audit: public undo-of-remove realization', () => {
       expect(row).toEqual({
         positions: size,
         publicUndoPositionEntriesExamined: 2,
+        turnIndexLookups: 6,
         publicUndoTurnEffectsExamined: 1,
       });
     }

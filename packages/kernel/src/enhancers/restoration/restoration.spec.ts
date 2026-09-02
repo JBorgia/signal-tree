@@ -4,6 +4,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { getTreeRealizationPort } from '../../lib/internals/causal-runtime/tree-realization-adapter';
 import { entityMap } from '../../lib/markers/entity-map';
 import { interceptLeafSignals } from '../../lib/internals/intercept-leaf-signals';
+import {
+  clearProductionSubstrateStatsForTesting,
+  installProductionSubstrateStatsForTesting,
+  resetProductionSubstrateStatsForTesting,
+} from '../../lib/internals/production-substrate-stats';
 import { signalTree } from '../../lib/signal-tree';
 import { SignalTreeRollbackError } from '../../lib/types';
 import { transactions } from '../transactions/transactions';
@@ -4846,6 +4851,31 @@ describe('restoration enhancer', () => {
     expect(t.getTurnStatus(secondTurn.id)).toBe('applied');
     expect(store.canUndo()).toBe(true);
     expect(store.canRedo()).toBe(true);
+  });
+
+  it('resolves each retained turn by identity during a temporal jump', async () => {
+    const stats = installProductionSubstrateStatsForTesting();
+    const store = signalTree(
+      { value: 0 },
+      { enhancers: [restoration({ maxHistorySize: 100 })] }
+    );
+
+    try {
+      for (let value = 1; value <= 100; value++) {
+        undoable(() => store.$.value.set(value));
+        await Promise.resolve();
+        await Promise.resolve();
+      }
+
+      resetProductionSubstrateStatsForTesting(stats);
+  store.jumpTo(0);
+      expect(store.$.value()).toBe(1);
+  expect(store.getCurrentIndex()).toBe(0);
+      expect(stats.turnIndexLookups).toBe(199);
+    } finally {
+      clearProductionSubstrateStatsForTesting();
+      store.destroy();
+    }
   });
 
   it('preserves confirmed frontiers and turn status across repeated temporal jumpTo excursions', async () => {

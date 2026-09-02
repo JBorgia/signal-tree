@@ -16,6 +16,7 @@ export interface ProductionSubstrateStats {
   publicAddPreviousTailReads: number;
   publicAddExistingKeysCopied: number;
   publicUndoPositionEntriesExamined: number;
+  turnIndexLookups: number;
   publicUndoTurnEffectsExamined: number;
 }
 
@@ -55,6 +56,7 @@ export function resetProductionSubstrateStatsForTesting(
   stats.publicAddPreviousTailReads = 0;
   stats.publicAddExistingKeysCopied = 0;
   stats.publicUndoPositionEntriesExamined = 0;
+  stats.turnIndexLookups = 0;
   stats.publicUndoTurnEffectsExamined = 0;
   return stats;
 }
@@ -89,6 +91,7 @@ function createProductionSubstrateStats(): ProductionSubstrateStats {
     publicAddPreviousTailReads: 0,
     publicAddExistingKeysCopied: 0,
     publicUndoPositionEntriesExamined: 0,
+    turnIndexLookups: 0,
     publicUndoTurnEffectsExamined: 0,
   };
 }

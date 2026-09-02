@@ -2626,6 +2626,22 @@ The next experiment may replace exactly one carrier only after its lookup and
 history-order contracts are independently controlled; no packed/arena/slab or
 multi-carrier rewrite is authorized.
 
+`TURNS-MAP-READER-FREQUENCY-0` is **ACTIVE ATTRIBUTION, NO ALTERNATE CARRIER
+AUTHORIZED**. `turns: Map<TurnId, CanonicalTurn>` is the bounded confirmed-turn
+identity resolver, not an ordered traversal store: status, containment,
+undo/redo closure expansion and sorting, scoped entry selection, global
+undo/redo seed selection, and transition-effect application dereference it;
+`getTurns()` is projection traversal and rebuild repopulates the index from
+`history[]`. `pendingTurns` is a distinct pending-lifetime resolver. Test-only
+production-substrate instrumentation records only confirmed-turn dereferences:
+public undo-of-remove performs exactly six at every collection size, while a
+100-turn `jumpTo(0)` performs exactly 199 (100 status reads plus 99 transition
+effect reads). The lookup job and workload frequency are therefore real and
+bounded by active navigation work. First attribute the Map's retained ownership
+against these controls; admit one production-shaped alternate only if its
+material density cost is proven without collapsing the independent ordered
+`history[]` job.
+
 History projection has no retained cache in the current implementation:
 `getRestorationHistory()` materializes a transient projection and returns copied
 entry objects with state by reference. F0/F1 remain latency controls; their
@@ -2655,6 +2671,33 @@ retain the O(1) stored index as intentional implementation state. H0-H2 now
 permanently cover 100-turn undo, redo, and temporal jump paths; E3 remains the
 scoped-containment control. This result does not promote `historyIndex` to
 causal authority or freeze its physical carrier.
+
+#### `AUXILIARY-RETENTION-SLOPE-0` — QUEUED AFTER TURN-BOUNDARY ATTRIBUTION
+
+**Property:** when retained causal work is bounded, no kernel-owned auxiliary
+structure associated solely with that work may retain a material slope with
+total past activity unless that history is an explicit semantic capability with
+an independently stated contract. A bound unrelated to the semantic owner is
+not sufficient evidence of a correct lifetime.
+
+Inventory every long-lived kernel `Map`, `Set`, array, cache, registry, index,
+and journal. For each record: semantic job (if any); growth axis (live subjects,
+retained turns, current positions, observers, active links, or total past
+activity); bound; eviction/reclamation trigger; `destroy()` release behavior;
+production REACH/READ/DISCRIMINATE evidence; classification as authoritative
+state, derived accelerator, diagnostics, or projection; and whether its
+lifetime can be shorter than its current owner. Use existing ownership census
+evidence where applicable; do not turn the inventory into a second registry.
+
+Only a suspicious total-past-activity axis or an independent cap tied to a
+different lifetime earns a targeted real-workload 20 -> 100 -> 1,000 quiesced
+retained-heap falsifier. Diagnostics, tracing, devtools, mutation evidence,
+and human/AI explanation data receive the same test: retain on demand or under
+their own active capability, never merely because the causal manager lives.
+Do not rewrite correctly bounded state, manufacture a broad benchmark, or
+promote a derived index to semantic authority merely because an algorithm reads
+it. This is the cross-kernel guardrail generalized from
+`OBSERVED-BATCH-DIAGNOSTIC-RETENTION-0`.
 
 #### `OWNERSHIP-CENSUS-GATE-0` — ACTIVE, SEPARATE PRE-GA GATE INFRASTRUCTURE
 
