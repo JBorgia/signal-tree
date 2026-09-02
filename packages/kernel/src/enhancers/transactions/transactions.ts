@@ -150,7 +150,6 @@ type CaptureBucket = {
 
 export type TransactionTurnRecord = {
   id: number;
-  __ownerPaths?: string[];
   /**
    * RESTORATION CLAIM SET — the subjects whose backing must conservatively
    * remain available while this record is retained.
@@ -456,14 +455,12 @@ class TransactionAuthority {
   ) {}
 
   private buildTurn(
-    ownerPaths?: string[],
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
     baselineValues?: ReadonlyMap<number, unknown>
   ): TransactionTurnRecord | undefined {
     if (
-      (ownerPaths?.length ?? 0) === 0 &&
       (subjectIds?.length ?? 0) === 0 &&
       (positionIds?.length ?? 0) === 0 &&
       (effects?.length ?? 0) === 0
@@ -473,7 +470,6 @@ class TransactionAuthority {
 
     return {
       id: this.nextTurnId++,
-      __ownerPaths: ownerPaths ? [...ownerPaths] : undefined,
       restorationSubjectIds: subjectIds ? [...subjectIds] : undefined,
       __positionIds: positionIds ? [...positionIds] : undefined,
       __effects: effects ? effects.map(cloneTurnEffect) : undefined,
@@ -482,12 +478,11 @@ class TransactionAuthority {
   }
 
   recordConfirmed(
-    ownerPaths?: string[],
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[]
   ): TransactionTurnRecord | undefined {
-    const turn = this.buildTurn(ownerPaths, subjectIds, positionIds, effects);
+    const turn = this.buildTurn(subjectIds, positionIds, effects);
     if (!turn) {
       return undefined;
     }
@@ -496,14 +491,12 @@ class TransactionAuthority {
   }
 
   createPending(
-    ownerPaths?: string[],
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
     baselineValues?: ReadonlyMap<number, unknown>
   ): TransactionTurnRecord | undefined {
     const turn = this.buildTurn(
-      ownerPaths,
       subjectIds,
       positionIds,
       effects,
@@ -634,7 +627,6 @@ class TransactionAuthority {
 function cloneTurnRecord(turn: TransactionTurnRecord): TransactionTurnRecord {
   return {
     ...turn,
-    __ownerPaths: turn.__ownerPaths ? [...turn.__ownerPaths] : undefined,
     restorationSubjectIds: turn.restorationSubjectIds ? [...turn.restorationSubjectIds] : undefined,
     __positionIds: turn.__positionIds ? [...turn.__positionIds] : undefined,
     __effects: turn.__effects ? turn.__effects.map(cloneTurnEffect) : undefined,
@@ -1056,10 +1048,9 @@ export function getOrCreateInternalTransactionRuntime<T>(
   };
 
   const recordConfirmedBucket = (bucket: CaptureBucket): TransactionTurnRecord | undefined => {
-    const { ownerPaths, subjectIds, positionIds, effects } =
+    const { subjectIds, positionIds, effects } =
       drainCaptureBucket(bucket);
     return authority.recordConfirmed(
-      ownerPaths.length > 0 ? ownerPaths : undefined,
       subjectIds.length > 0 ? subjectIds : undefined,
       positionIds.length > 0 ? positionIds : undefined,
       effects.length > 0 ? effects : undefined
@@ -1120,7 +1111,6 @@ export function getOrCreateInternalTransactionRuntime<T>(
       collectionOrders,
     } = drainCaptureBucket(bucket);
     const pending = authority.createPending(
-      ownerPaths.length > 0 ? ownerPaths : undefined,
       subjectIds.length > 0 ? subjectIds : undefined,
       positionIds.length > 0 ? positionIds : undefined,
       effects.length > 0 ? effects : undefined,

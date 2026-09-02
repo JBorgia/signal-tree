@@ -2458,7 +2458,7 @@ slope; configured but unused restoration adds no material subject slope; bounded
 history scales with retained restorable work; rare semantics allocate rarely; and
 no causal fact exists solely for a human or AI explanation.
 
-#### Current characterization — carrier remains open
+#### Current characterization — owner-path carrier deleted
 
 `PositionId` is a required semantic fact. Current restoration readers establish
 that targeting, attribution, and authority need position identity; they do not
@@ -2476,10 +2476,18 @@ designation and requiring the probe to fail. The former mixed sequence throws
 designated; it is a separate causal-correctness candidate, not a representation
 baseline or a reason to change the causal carrier.
 
-`__ownerPaths` remains the first derivability candidate. Its disposition depends
-on whether post-commit readers require historical addressing, current targeting,
-or only a human-readable projection; current position authority cannot be used
-to reconstruct a historical address after rekey or relocation without proof.
+`__ownerPaths` had no production semantic reader: it was retained turn metadata
+written once and forwarded through restoration/transaction clones, while
+per-effect `ownerPath` remains the distinct causal/reversal addressing fact.
+The deletion prototype removed the retained field, all forwarding paths, and
+inspection-only test assertions. Restoration, transaction, full kernel, retention
+oracle, source typecheck, and packed-consumer checks stayed green. Across three
+forced-GC runs of 5,000 independently flushed designated turns, median retained
+heap fell from 19,399,224 B to 19,112,736 B: 286,488 B total, or 57.3 B per
+retained turn. The kernel's restoration and transaction modules also fell by
+754 B and 363 B respectively before compression. `__ownerPaths` is deleted;
+the next carrier review is `HISTORY-PROJECTION-FIELDS-0` for `timestamp`,
+`action`, `payload`, and `RestorationHistoryEntry` ownership.
 
 ### Sequence
 
