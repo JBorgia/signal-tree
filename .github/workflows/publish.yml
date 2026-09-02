@@ -8,7 +8,7 @@ name: Publish to npm (CI)
 #
 # Owner setup (one-time):
 #   1. Configure npm trusted publishing for each publishable package:
-#      owner/repo `JBorgia/signaltree`, workflow filename `publish.yml`, allowed
+#      owner/repo `JBorgia/signal-tree`, workflow filename `publish.yml`, allowed
 #      action `npm publish`.
 #   2. Protect tags: Settings → Rules → Rulesets → new tag ruleset matching
 #      `v*` restricting who can create tags; and require the "Verify tagged
