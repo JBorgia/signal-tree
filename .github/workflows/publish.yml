@@ -10,7 +10,10 @@ name: Publish to npm (CI)
 #   1. Configure npm trusted publishing for each publishable package:
 #      owner/repo `JBorgia/signal-tree`, workflow filename `publish.yml`, allowed
 #      action `npm publish`.
-#   2. Protect tags: Settings → Rules → Rulesets → new tag ruleset matching
+#   2. Add a granular npm automation token with publish access to every release
+#      package as the `NPM_TOKEN` repository secret. This is the supported
+#      fallback while npm package-level trusted publishing is unavailable.
+#   3. Protect tags: Settings → Rules → Rulesets → new tag ruleset matching
 #      `v*` restricting who can create tags; and require the "Verify tagged
 #      commit (full gate set)" check on main via branch protection so no
 #      unverified commit can be tagged for release.
@@ -127,5 +130,6 @@ jobs:
 
       - name: Publish to npm
         env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
         run: node scripts/publish-candidate.mjs --ci --prebuilt

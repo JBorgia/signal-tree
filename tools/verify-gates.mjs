@@ -1307,6 +1307,17 @@ const GATES = [
     },
   },
   {
+    name: 'publish-authorization',
+    covers:
+      'the canonical publisher retains its managed npm credential fallback',
+    cmd: ['node', 'scripts/verify-publish-architecture.mjs'],
+    mutation: {
+      file: '.github/workflows/publish.yml',
+      find: 'NPM_TOKEN: ${{ secrets.NPM_TOKEN }}',
+      replace: 'NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}',
+    },
+  },
+  {
     name: 'release-plan',
     covers:
       'the canonical release set matches publishable manifests and orders kernel before adapters',
