@@ -1556,7 +1556,7 @@ if (has('--self-test')) {
     if (!ok && result.output.trim()) {
       const diagnostic = result.output.trim();
       console.log(
-        `\n${diagnostic.slice(Math.max(0, diagnostic.length - 12000))}\n`
+        `\n${diagnostic.slice(Math.max(0, diagnostic.length - 100000))}\n`
       );
     }
   }
