@@ -2289,16 +2289,26 @@ first), `agent-authored-work.md` / `collaborative-state.md` / `offline-editing.m
 
 ### Sequencing
 
-1. Staged editing and server reconciliation sections first (highest-leverage
-   pair, per the design discussion that produced this item) — append to
-   `composition-recipes.md` as `## 4.`/`## 5.`.
-2. Confirm or write the missing executable-example specs named above before
-   or alongside each section — never publish a section whose example is
-   invented.
-3. Fix `persistence-guide.md`'s staleness (see the correction note at the top
-   of this item) in the same pass as the persistence section, so the two
-   files agree.
-4. Once `composition-recipes.md` covers the canonical set, check whether the
+1. ~~Staged editing and server reconciliation sections first~~ — DONE
+   (`72574f2c`, `6909e2b2`): `composition-recipes.md` §4 (optimistic writes +
+   server reconciliation, anchored to `transactions.spec.ts`'s pinned
+   rollback-isolation case) and §5 (staged/draft editing — no new API,
+   explicitly declined a `beginStage()` session).
+2. Executable-example specs: confirmed existing for §4 (already-pinned
+   `transactions.spec.ts` case) and for persistence (see below). **Still
+   open**: §5's pure UI-level draft half (draft state that never touches the
+   tree until one commit) has no dedicated spec — the section's code sample
+   is illustrative, not spec-cited, unlike every other section on the page.
+   Write one alongside `entity-collection-cookbook.md`'s style before this
+   is fully "canonical, not just asserted."
+3. ~~Fix `persistence-guide.md`'s staleness~~ — DONE (`6909e2b2`): rewritten
+   with the real `link()` decomposition and cited to
+   `persistence-as-link-swap-0.spec.ts`/`link-persistence-conformance.spec.ts`/
+   `persistence-decompose-0.spec.ts`.
+4. **Still open**: one-shot vs. persistent async acquisition, and
+   causal-explanation-as-projection, as further `composition-recipes.md`
+   sections (§6/§7) — not started this pass.
+5. Once `composition-recipes.md` covers the canonical set, check whether the
    demo site / top-level docs nav links it already (`grep -r
    composition-recipes` across `apps/demo` and any docs index) — add a link
    if not, as its own small pass (the demo site's own currency/measurement
