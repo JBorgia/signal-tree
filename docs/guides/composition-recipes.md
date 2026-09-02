@@ -1,19 +1,31 @@
 # Composition recipes: patterns that need no new API
 
-Three capabilities get asked for often enough that they look like missing features:
-a standard enhancer policy, a reusable entity-CRUD Ops base, and a selection
-read-model. All three are **compositions of primitives that already ship**, and
-each is deliberately _not_ in `@signal-tree/kernel`.
+Several capabilities get asked for often enough that they look like missing
+features: a standard enhancer policy, a reusable entity-CRUD Ops base, a
+selection read-model, optimistic writes with server reconciliation, and
+staged/draft editing. All five are **compositions of primitives that already
+ship**, and each is deliberately _not_ in `@signal-tree/kernel`.
 
 They live here because a recipe is the better answer when the composition is
 short and the opinions are yours: it costs no API surface, it can't be
 half-right for your app, and you can read the whole thing.
 
-> **Provenance.** These are the resolved forms of findings A, B and C from
+The filter for what belongs on this page, going forward: if an application
+problem can be expressed cleanly by composing primitives that already ship,
+it earns a recipe here, not a new kernel API. A pattern becomes a kernel
+capability only when repeated real implementations reveal a semantic property
+applications cannot safely own themselves — see [TODO §12](../../TODO.md) for
+the fuller catalog of patterns considered against this filter, including the
+ones still pending a section here (one-shot vs. persistent async acquisition,
+persistence, causal explanation).
+
+> **Provenance.** §1–3 are the resolved forms of findings A, B and C from
 > [`docs/audits/2026-07/v3-consumer-reuse-audit.md`](../audits/2026-07/v3-consumer-reuse-audit.md),
 > which came out of auditing a large real consumer (three apps, twelve admin
-> domains). Every snippet below is the shape that consumer arrived at, with the
-> corrections the audit produced.
+> domains). Every snippet in those three sections is the shape that consumer
+> arrived at, with the corrections the audit produced. §4–5 came out of a
+> later design discussion applying the same "recipe, not API" filter to
+> patterns that consumer (and others) asked about next.
 
 ---
 
@@ -279,3 +291,159 @@ rejects a `computed()` your code created, and the configured tier drops every va
 Since 13.2.0 this warns as `[ST2007]`; before that it failed silently. Fix the
 duplication in your bundler (Vite: `resolve: { dedupe: ['@angular/core'] }`;
 Jest: `moduleNameMapper`).
+
+---
+
+## 4. Optimistic writes with server reconciliation
+
+**The need:** apply a change to the UI immediately, send it to the server, and
+either confirm it or cleanly revert it — without losing whatever else the user
+did while the request was in flight.
+
+This is a full match for `transactions()`, not something to hand-roll. A
+transaction's pending writes are excluded from confirmed causal turns until you
+say otherwise, and rolling one back reverts **only its own writes** — later,
+unrelated activity survives:
+
+```typescript
+import { signalTree, transactions } from '@signal-tree/kernel';
+
+const tree = signalTree(
+  {
+    order: { status: 'open' as 'open' | 'assigned' },
+    driver: { orderId: null as number | null },
+  },
+  { enhancers: [transactions()] },
+);
+
+const pending = tree.transaction(() => {
+  tree.$.order.status.set('assigned');
+  tree.$.driver.orderId.set(17);
+});
+
+api.assignOrder(17).subscribe({
+  next: () => pending.confirm(),
+  error: () => pending.rollback(),
+});
+```
+
+If the request fails, `pending.rollback()` puts `order.status`/`driver.orderId`
+back to their pre-transaction values — and if something else in the tree
+changed in the meantime (a live telemetry feed landing a new row, say), that
+change is untouched. This is a pinned, tested guarantee, not an assumption:
+see `transactions enhancer › supports an optimistic workflow where rollback
+reverts optimistic state but preserves later unrelated activity` in
+[`packages/kernel/src/enhancers/transactions/transactions.spec.ts`](../../packages/kernel/src/enhancers/transactions/transactions.spec.ts).
+
+### What `transactions()` does not decide for you
+
+`transactions()` gives you the **pending → confirm/rollback lifecycle**. It
+does not decide your reconciliation POLICY — server-wins vs. client-wins vs.
+merge, whether a rejected write retries, or how staleness is judged. Those are
+yours, same as the REST conventions in §2's Ops base:
+
+```typescript
+api.assignOrder(17).subscribe({
+  next: (serverOrder) => {
+    pending.confirm();
+    // Server truth may differ from what you assumed (a different assignee,
+    // say) — land it as external(), same as any other server-accepted value.
+    external(() => tree.$.order.set(serverOrder));
+  },
+  error: (err) => {
+    if (isRetryable(err)) return retry();
+    pending.rollback();
+  },
+});
+```
+
+`external()` classifies that final write as **authoritative from outside the
+current authored operation** — the correct label whether it happens to equal
+what you optimistically set or not. A rejected server write is a domain
+decision (retry, rollback, or surface a conflict for the user), not something
+`transactions()` guesses at.
+
+### Why not just `set()` and `catchError` a manual snapshot?
+
+You can — §2's `EntityCrudOps.update$` does exactly that, by hand, because it
+predates a cross-cutting need for `transactions()` in that recipe. The
+difference `transactions()` earns is **isolation**: a hand-rolled snapshot/
+restore reverts your own field to what YOU remembered, which is wrong the
+moment something else touched the tree while your request was in flight (see
+§2's own "roll back the whole of what you touched" warning — this is the same
+bug at a different scope). `transactions()` reverts exactly its own turn's
+writes, nothing else, unconditionally.
+
+---
+
+## 5. Staged / draft editing
+
+**The need:** let a user accumulate several edits — a multi-field form, a
+batch of row changes — reviewable before anything becomes real, discardable
+without a trace if they back out.
+
+SignalTree does not need a `beginStage()`/draft-session API for this, and one
+is deliberately not planned (see [TODO §12](../../TODO.md)). The shape is:
+
+```text
+canonical state
+      ↓
+application-owned draft            (plain component/service state — a form
+                                     model, a local signal, whatever your
+                                     framework already gives you for "values
+                                     the user is looking at but hasn't saved")
+      ↓
+validation / review / edits        (entirely your domain's business)
+      ↓
+one intentional commit             (writes the draft into canonical state —
+                                     `transactions()` if the commit itself
+                                     needs atomic all-or-nothing, undoable()
+                                     if it should be one entry in restoration
+                                     history, or a plain set()/upsertOne()
+                                     if neither)
+```
+
+**What SignalTree owns:** that the eventual commit is coherently classified —
+one authored turn (undoable, if you designate it so), not silently smeared
+across however many writes your draft's field-by-field edits happened to
+produce. **What your application owns:** everything about the draft itself —
+its shape, its validation, whether it lives in a form library's model, a
+plain component field, or its own tiny `signalTree()` you never merge with
+the main one.
+
+```typescript
+// The draft never touches the tree — it's just state your form/component owns.
+const draft = signal<Partial<Ticket>>({});
+
+function reviewField(key: keyof Ticket, value: Ticket[typeof key]) {
+  draft.update((d) => ({ ...d, [key]: value }));
+}
+
+function commit(id: string) {
+  // One write, one authored turn — not one turn per field the user touched.
+  tree.$.tickets.updateOne(id, draft());
+  draft.set({});
+}
+
+function discard() {
+  draft.set({}); // Nothing to undo — nothing was ever authored.
+}
+```
+
+If the commit itself needs multi-location atomicity (several tree paths must
+land together or not at all), wrap it in `transactions()` per §4 above — the
+transaction body **is** the commit, and `confirm()` fires once validation
+passes.
+
+### Why this earns "canonical," not just "possible"
+
+Committing a draft is functionally identical to any other authored write from
+SignalTree's side — there's no special-cased "draft commit" concept to get
+wrong, and nothing to keep in sync between a draft-tracking marker and the
+canonical value, because the draft was never IN the tree. The causal model
+does the real work here indirectly: because an authored turn is a first-class
+concept, "the user's edit became real" is always one coherent fact to point
+at later — in restoration history, in DevTools, or in a human-readable
+explanation projected from the causal record (see [TODO §12](../../TODO.md)
+for that pattern, not yet written up here) — regardless of how many
+keystrokes produced it.
