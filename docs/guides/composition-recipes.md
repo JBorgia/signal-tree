@@ -3,9 +3,10 @@
 Several capabilities get asked for often enough that they look like missing
 features: a standard enhancer policy, a reusable entity-CRUD Ops base, a
 selection read-model, optimistic writes with server reconciliation,
-staged/draft editing, one-shot loading, and a persistent relationship with an
-external authority. All seven are **compositions of primitives that already
-ship**, and each is deliberately _not_ in `@signal-tree/kernel`.
+staged/draft editing, one-shot loading, a persistent relationship with an
+external authority, and a human-readable explanation projected from causal
+facts. All eight are **compositions of primitives that already ship**, and
+each is deliberately _not_ in `@signal-tree/kernel`.
 
 They live here because a recipe is the better answer when the composition is
 short and the opinions are yours: it costs no API surface, it can't be
@@ -561,3 +562,107 @@ all live inside your `get`/`set`/`subscribe` implementations — none of them
 are SignalTree concepts. If you need staleness-aware refetching (`loader()`'s
 old `staleTime`/`swr` options), that's a small stateful wrapper around
 `connection.retrieve()` you own, not something to look for on `Link` itself.
+
+---
+
+## 8. A human-readable explanation, projected from causal facts
+
+**The need:** show a user or an AI agent *why* the tree looks the way it
+does — "who changed this, and what happened" — without teaching the kernel
+what a sentence is.
+
+Look at what a causal fact actually IS at the kernel boundary. `restoration()`'s
+own retained entry shape:
+
+```typescript
+export interface RestorationHistoryEntry<T> {
+  action: string;
+  timestamp: number;
+  state: T;
+  payload?: unknown;
+}
+```
+
+That's it. No actor name, no human-readable label, no prose, no per-field
+diff. `action` and `payload` are kernel-internal bookkeeping (`action` is
+generic — resolved through an internal name table, not something you supply
+via `undoable()`, which takes only the operation callback: `undoable(() =>
+{...})`, nothing else) — treat them as opaque. The one thing every entry
+reliably gives you is `state`: a whole-tree snapshot at that turn's boundary.
+This is deliberate, not an omission to fill in later: a name/sentence/actor
+kept "for the explanation" is exactly the kind of field that would sit in the
+hot causal path forever, paid by every write, for a need only the rare
+DevTools-open or support-ticket moment actually has.
+
+### The composition
+
+```text
+compact causal facts              (RestorationHistoryEntry.state — a whole-
+                                    tree snapshot at each authored turn
+                                    boundary; external()'s origin
+                                    classification — what the kernel actually
+                                    retains)
+      ↓
+diff consecutive snapshots        (what changed between this entry's state
+                                    and the previous one — ordinary object
+                                    comparison, entirely your code)
+      ↓
+resolve stable identities         (an id the diff touched -> the entity/user
+                                    it names, via entityMap().byId() or your
+                                    own lookup — the kernel never stored the
+                                    display name, only the id)
+      ↓
+application/domain metadata       (what "assigned" means for a ticket, what
+                                    a driver's display name is — yours)
+      ↓
+projector                         (a plain function: the diff + your metadata
+                                    -> a sentence, a diff view, an agent-facing
+                                    JSON summary — whatever the consumer needs)
+      ↓
+"Ticket 482 was reassigned to Driver 17."
+```
+
+```typescript
+function explainLastChange(tree: MyTree): string | null {
+  const entries = tree.getRestorationHistory();
+  const [previous, last] = entries.slice(-2);
+  if (!last) return null;
+
+  // Diffing is ordinary code — the kernel gives you the two snapshots, not the diff.
+  const changedTicketId = findChangedTicketId(previous?.state, last.state);
+  const ticket = changedTicketId ? tree.$.tickets.byId(changedTicketId)?.() : undefined;
+
+  return ticket
+    ? `Ticket #${ticket.ticketNumber} was reassigned to ${describeDriver(ticket.driverId)}`
+    : 'A change occurred';
+}
+```
+
+`findChangedTicketId`/`describeDriver` and the diff strategy are entirely
+yours — the kernel gives you a stable, whole-tree snapshot at every authored
+turn boundary and nothing more; deriving "what changed" from two snapshots
+is application code, same as it would be diffing any two plain objects.
+
+`RestorationHistoryEntry`'s exact shape and `getRestorationHistory()`'s
+behavior (one entry per designated turn, `state` always a full snapshot) are
+proven in [`packages/kernel/src/enhancers/restoration/restoration.spec.ts`](../../packages/kernel/src/enhancers/restoration/restoration.spec.ts) —
+not asserted here.
+
+### Why the causal model helps here
+
+Because an authored turn is a first-class kernel concept (not something your
+application has to reconstruct from a stream of individual `set()` calls),
+"one coherent thing happened" is already true before you write a single line
+of projection code — you're formatting a fact that already has clean
+boundaries, not inferring where one user action ended and the next began from
+raw write noise.
+
+### What SignalTree does not guarantee
+
+It does not guarantee your explanation is HUMAN-READABLE, correct, localized,
+or complete — that's the projector's job, entirely application code, and it
+can be wrong the way any application code can be wrong. What the kernel
+guarantees is narrower and more load-bearing: that each entry's `state`
+corresponds to a REAL authored turn boundary (not a partial write, not an
+external write mislabeled as authored), so the projector is never explaining
+a change that didn't causally happen the way the snapshots say it did.
