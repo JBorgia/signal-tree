@@ -21,7 +21,8 @@
     "src/**/*.d.ts",
     "README.md",
     "LICENSE",
-    "NOTICE"
+    "NOTICE",
+    "llms.txt"
   ],
   "dependencies": {
     "@signal-tree/kernel": "workspace:*"

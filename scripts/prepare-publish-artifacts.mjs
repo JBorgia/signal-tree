@@ -63,11 +63,19 @@ const PACKAGES = readdirSync(join(ROOT, 'packages'), { withFileTypes: true })
  * Source → destination, relative to the repo root. Both must exist.
  *
  * `llms.txt` moved to the repo root (AI-SEMANTIC-DISCOVERABILITY-0) and is
- * copied into the core tarball here, the one place a missing source hard-fails
- * instead of silently shipping without it. There is no `llms-full.txt`; do not
- * add an entry for one until it exists.
+ * copied into all three primary package tarballs here, the one place a
+ * missing source hard-fails instead of silently shipping without it — kernel
+ * alone left it unreachable from an application that installed only
+ * `@signal-tree/angular` or `@signal-tree/react`, which is what the AI
+ * discoverability row's "every primary package surface" requirement actually
+ * means for a real consumer. There is no `llms-full.txt`; do not add an entry
+ * for one until it exists.
  */
-const COPIES = [['llms.txt', 'dist/packages/kernel/llms.txt']];
+const COPIES = [
+  ['llms.txt', 'dist/packages/kernel/llms.txt'],
+  ['llms.txt', 'dist/packages/angular/llms.txt'],
+  ['llms.txt', 'dist/packages/react/llms.txt'],
+];
 
 function run(label, argv) {
   process.stdout.write(`  · ${label} ... `);

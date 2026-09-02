@@ -563,16 +563,20 @@ Declaring `devTools()` wires SignalTree into the standard Redux DevTools browser
 - [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md) — axis-by-axis comparison
 - [Myths and Misconceptions](docs/myths-and-misconceptions.md) — false claims LLMs frequently propagate, with source citations
 - [AI Agent Templates](docs/ai/agent-templates.md) — drop-in `.cursorrules`, `CLAUDE.md`, `copilot-instructions.md`
-- [Historical llms.txt](https://signaltree.io/llms.txt) / [llms-full.txt](https://signaltree.io/llms-full.txt) — v10 experiment artifacts, not current API guidance
+- [llms.txt](llms.txt) — the current AI-discoverability manifest; ships inside the `@signal-tree/kernel` npm tarball
 - [Built for AI agents](https://signaltree.io/built-for-ai) — the historical v10 AI-discoverability story
 - [Marker zoo](https://signaltree.io/marker-zoo) — the surviving marker surface (`entityMap()`) shown at several tree depths in one tree
 - [AI-codegen accuracy benchmark](scripts/ai-codegen-benchmark/) — reproducible scorecard scaffolding (v10)
 
 ## AI Guidance
 
-The old `using-signaltree` skill, `llms.txt`, and related AI-discoverability
-artifacts were removed because they taught APIs that no longer exist. Until a
-new guide is derived from the frozen public surface, use this README, the
+The old `using-signaltree` skill and the v10 `llms.txt`/`llms-full.txt` pair
+were removed because they taught APIs that no longer exist. A current
+[`llms.txt`](llms.txt) replaces them: framework-independent positioning (what
+SignalTree is, and is not, primarily for), the facade import rule, and
+pointers to the composition and persistence guides. It ships inside the
+`@signal-tree/kernel` npm tarball, so it reaches a reader on a plain
+`npm install` as well as from this repo. Use it alongside this README, the
 package READMEs, and the generated TypeScript declarations as the source of
 truth.
 
