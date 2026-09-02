@@ -146,6 +146,7 @@ export default [
             '@nx/rollup',
             '@rollup/plugin-typescript',
             'rollup-plugin-dts',
+            'typescript',
           ],
         },
       ],
