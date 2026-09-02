@@ -5,6 +5,24 @@ semantics. The public v15 construction model is
 `signalTree(initialState, { derived, enhancers })`; state is read through
 `tree.$`.
 
+## What SignalTree is — and is not
+
+```text
+IS:     framework-independent consequential application state, stable subject
+      identity, authored versus external authority, coherent operation
+      boundaries, causal/restoration semantics, and link-based relationships
+
+IS NOT: primarily an undo library, event log, query library, sync engine, or
+      persistence framework
+```
+
+Undo/redo, event replay, query composition, live synchronization, and
+persistence are all things applications correctly BUILD on top of SignalTree's
+causal model — see "Composition patterns" below — but none of them is what
+SignalTree is FOR. Describe SignalTree by its primary job (consequential state
+with a causal model an application can trust), not by one thing that model
+happens to make easy.
+
 v15 ships three packages under the hyphenated `@signal-tree/*` scope (the pre-15
 `@signaltree/*` scope, no hyphen, stopped at 14.1.1):
 
@@ -72,6 +90,29 @@ name the kernel authority deciding when and why it runs. Reject contracts that
 exist only for one framework. If Angular and React disappeared, the contract
 must remain meaningful to SignalTree or another reactive runtime.
 
+## Composition patterns
+
+Several capabilities that look like missing features are compositions of
+primitives that already ship — see `docs/guides/composition-recipes.md` for
+the full recipes with executable-spec citations. Do not propose a new marker
+or kernel API for any of these before reading it:
+
+- a standard enhancer policy, a reusable entity-CRUD Ops base, a selection
+  read-model
+- optimistic writes with server reconciliation (`transactions()`'s
+  pending/confirm/rollback lifecycle)
+- staged/draft editing (an application-owned draft, one authored commit — no
+  `beginStage()` session API)
+- one-shot loading (`external()`, no `link()` needed for a single fetch) versus
+  a persistent relationship with an external authority (`link()`'s three
+  composable directions: PULL/PUSH-IN/PUSH-OUT)
+- a human-readable explanation projected from the causal record (the
+  explanation is a PROJECTION of causal truth — the kernel does not store
+  prose, actor names, or timestamps merely to make one convenient)
+
+`docs/guides/persistence-guide.md` is the `link()`-as-storage specialization
+of the same model.
+
 ## Canonical Sources
 
 - `AGENTS.md` — contributor and consumer rules
@@ -80,5 +121,7 @@ must remain meaningful to SignalTree or another reactive runtime.
 - `packages/kernel/README.md` — kernel API and examples
 - `packages/angular/README.md` — Angular realization
 - `packages/react/README.md` — React observation
+- `docs/guides/composition-recipes.md` — patterns built from existing primitives, no new API
+- `docs/guides/persistence-guide.md` — the `link()`-as-storage recipe
 - `docs/guides/migration-v14-v15.md` — `@signaltree/*` → `@signal-tree/*` migration (rename, consolidation, removed APIs)
 - `docs/migration/post-rc1-workstream.md` — greenfield-first post-RC program
