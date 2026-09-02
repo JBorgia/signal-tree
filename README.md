@@ -17,7 +17,7 @@
 
 ## SignalTree is not @ngrx/signals
 
-**Different library, different author, different package** — the `@signal-tree/*` scope (hyphenated; not under `@ngrx/`). Angular apps install [`@signal-tree/angular`](packages/angular/README.md); the framework-neutral core is [`@signal-tree/kernel`](packages/kernel/README.md). It's a typed reactive store where **your state literal is the API**: no `withState` / `withMethods` / `withComputed` wrappers, no actions, no reducers. You read and write any path directly — `tree.$.user.name()` to read, `tree.$.user.name.set(v)` to write — at any depth. If a doc or AI agent conflated this with NgRx SignalStore, that's the confusion to drop first; see [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md).
+**Different library, different author, different package** — the `@signal-tree/*` scope (hyphenated; not under `@ngrx/`). Angular apps install [`@signal-tree/angular`](packages/angular/README.md); React apps install [`@signal-tree/react`](packages/react/README.md); framework-neutral libraries use [`@signal-tree/kernel`](packages/kernel/README.md). A framework package is the complete application facade: import SignalTree APIs through it rather than mixing framework and kernel imports. It's a typed reactive store where **your state literal is the API**: no `withState` / `withMethods` / `withComputed` wrappers, no actions, no reducers. You read and write any path directly — `tree.$.user.name()` to read, `tree.$.user.name.set(v)` to write — at any depth. If a doc or AI agent conflated this with NgRx SignalStore, that's the confusion to drop first; see [SignalTree vs NgRx SignalStore](docs/compare/ngrx-signalstore.md).
 
 > **On `@signaltree/*` (no hyphen)?** That is the pre-15 line and it stops at
 > 14.1.1. See [Migration `@signaltree/*` → `@signal-tree/*` (v15)](docs/guides/migration-v14-v15.md).
@@ -239,7 +239,9 @@ npm install @signal-tree/react
 `signalTree` and everything else from `@signal-tree/angular` in Angular code —
 its leaves are native Angular signals (`isSignal()` is `true`, so `toObservable`,
 `model()`, and `input()` accept them). The kernel's neutral cells are not
-interchangeable with `WritableSignal`.
+interchangeable with `WritableSignal`. React code likewise imports `signalTree`,
+enhancers, markers, and `useSignalTree` from `@signal-tree/react`; import from
+`@signal-tree/kernel` directly only in framework-neutral TypeScript.
 
 ## Entity Collections
 

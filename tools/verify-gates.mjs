@@ -1242,15 +1242,15 @@ const GATES = [
     },
   },
   {
-    name: 'consumer-types',
+    name: 'framework-facade-closure',
     covers:
-      'packed kernel and framework declarations compile with skipLibCheck=false under bundler and node16 resolution',
+      'packed Angular and React facades forward every intended neutral runtime symbol by identity, while consumer declarations compile with skipLibCheck=false under bundler and node16 resolution',
     cmd: ['node', 'tools/verify-consumer-typecheck.mjs'],
     needsBuild: true,
     mutation: {
-      file: 'dist/packages/angular/src/index.d.ts',
-      find: "import './lib/carrier.js';",
-      replace: "import './lib/carrier';",
+      file: 'dist/packages/react/dist/index.js',
+      find: 'entityMap',
+      replace: 'entityMapBrokenByGate',
     },
   },
   {

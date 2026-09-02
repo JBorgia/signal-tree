@@ -6,8 +6,11 @@ restoration, transactions, batching, and DevTools.
 Angular applications should construct trees through `@signal-tree/angular`
 (requires Angular 20, 21, or 22 — see `peerDependencies` in
 [`packages/angular/package.json`](../angular/package.json)).
-React applications should use `@signal-tree/react` for owner-bound observation.
-Use the kernel directly for framework-neutral runtimes, libraries, and tests.
+React applications should construct and observe trees through
+`@signal-tree/react`. Use the kernel directly for framework-neutral runtimes,
+libraries, and tests. Framework packages forward this neutral surface by
+identity, so an application should use its framework package as its one
+SignalTree import root.
 
 ## Install
 
