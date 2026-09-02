@@ -2557,7 +2557,7 @@ header/index, position participation, subject claims, effects/order deltas,
 reversal descriptors, history materialization, and Map/Set capacity before any
 one-variable alternative is admitted.
 
-#### `CAUSAL-REPRESENTATION-0 / ATTRIBUTION` — ACTIVE, NO PROTOTYPE AUTHORIZED
+#### `CAUSAL-REPRESENTATION-0 / ATTRIBUTION` — CLOSED: INCUMBENT SELECTED
 
 Checkpoint: `71bf7246`. Validation: full five-sample attribution matrix,
 restoration suite 106/106, workspace typecheck, direct harness ESLint, and docs
@@ -2834,6 +2834,17 @@ WeakMap metadata, or bounded (`ENTITY_ARRAY_WARNED`, cap 256). None grows with
 past causal activity or outlives its stated owner, so the 20 -> 100 -> 1,000
 heap falsifier did not apply. `OBSERVED-BATCH-DIAGNOSTIC-RETENTION-0` remains
 the only identified auxiliary retention defect in this closure.
+
+**Final disposition (`8aa9591d`).** The frozen causal interface now has a
+measured incumbent selection: retain the current bounded object/array turn
+carrier, confirmed-turn `Map`, stored `historyIndex`, and separate
+`historicalEvents` array. The only unbounded sidecar was
+`observedBatches`, which is deleted. No alternate carrier crossed the
+pre-registered material density and hot-path thresholds: the one authorized
+compact-store experiment saved only 15.4 B/turn at 100 turns, lost at 20 turns,
+and regressed bounded churn by about 65%. The retention provenance audit found
+no additional total-past-activity slope. `CAUSAL-REPRESENTATION-0` is closed;
+the remaining Phase 7 hold is `AI-SEMANTIC-DISCOVERABILITY-0`.
 
 #### `OWNERSHIP-CENSUS-GATE-0` — ACTIVE, SEPARATE PRE-GA GATE INFRASTRUCTURE
 

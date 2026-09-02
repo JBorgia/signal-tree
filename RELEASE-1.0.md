@@ -12749,15 +12749,16 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       proof. Do not independently maintain three `llms.txt` documents. Demo and
       TruckTrax are controls for teachability and real Angular composition;
       neither may define kernel semantics.
-- [ ] **`CAUSAL-REPRESENTATION-0`.** Inventory causal facts rather than object
-      fields: semantic job, authority, frequency, lifetime, retention need,
-      derivability, current carriers, and reader reach/read/discriminate roles.
-      A production reader proves a fact is live, not that its current carrier is
-      frozen. Repair and mutation-prove the retention baseline with known
-      designated and undesignated fixtures before comparing bounded alternatives
-      behind the same semantic interface. Preserve all frozen causal laws. A
-      replacement requires a material Pareto improvement in density or hot-path
-      latency; otherwise freeze the incumbent.
+- [x] **`CAUSAL-REPRESENTATION-0` (`8aa9591d`).** The fact inventory, mutation-
+  proven baseline, one-owner attribution controls, bounded carrier tests,
+  and auxiliary-retention audit preserve all frozen causal laws and select
+  the incumbent. `observedBatches` was removed as the sole unbounded
+  diagnostic sidecar; `historyIndex`, the confirmed-turn Map, and the
+  separate historical-event array remain measured derived or causal state.
+  The sole compact-store experiment was semantically green but missed its
+  density floor and regressed churn materially, so no replacement is
+  selected. Full kernel validation is green; no second carrier experiment
+  is authorized.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
