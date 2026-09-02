@@ -117,6 +117,7 @@ const GATES = [
       // up as proof every export is demonstrated — so it breaking silently would
       // undermine that gate too.
       '--projects=kernel,angular,react,demo,react-reference',
+      '--parallel=1',
       '--skip-nx-cache',
     ],
     slow: true,
@@ -1399,17 +1400,21 @@ buildOnceIfNeeded();
 
 function run(gate) {
   try {
-    execFileSync(gate.cmd[0], gate.cmd.slice(1), {
+    const output = execFileSync(gate.cmd[0], gate.cmd.slice(1), {
       cwd: ROOT,
       stdio: 'pipe',
+      encoding: 'utf8',
       // A gate may need its own environment — `retention-gc` needs
       // --expose-gc to reach vitest's forked workers, which a `node --expose-gc`
       // command line would NOT do.
       env: gate.env ? { ...process.env, ...gate.env } : process.env,
     });
-    return 0;
+    return { code: 0, output };
   } catch (err) {
-    return err.status ?? 1;
+    return {
+      code: err.status ?? 1,
+      output: `${err.stdout ?? ''}${err.stderr ?? ''}`,
+    };
   }
 }
 
@@ -1511,17 +1516,17 @@ if (has('--self-test')) {
     process.stdout.write(
       `  · ${gate.name.padEnd(20)} mutating ${gate.mutation.file} ... `
     );
-    let code;
+    let result;
     try {
-      code = withMutation(gate.mutation, () => run(gate));
+      result = withMutation(gate.mutation, () => run(gate));
     } catch (err) {
       results.push({ gate, state: 'error' });
       console.log(`ERROR\n      ${err.message}`);
       continue;
     }
-    if (code !== 0) {
+    if (result.code !== 0) {
       results.push({ gate, state: 'proven' });
-      console.log(`caught it (exit ${code}) ✓`);
+      console.log(`caught it (exit ${result.code}) ✓`);
     } else {
       results.push({ gate, state: 'blind' });
       console.log(
@@ -1535,8 +1540,8 @@ if (has('--self-test')) {
   console.log(`\nRunning ${selected.length} gates\n`);
   for (const gate of selected) {
     process.stdout.write(`  · ${gate.name.padEnd(20)} `);
-    const code = run(gate);
-    const ok = code === 0;
+    const result = run(gate);
+    const ok = result.code === 0;
     results.push({
       gate,
       state: ok ? 'pass' : gate.knownFailing ? 'known' : 'fail',
@@ -1546,8 +1551,14 @@ if (has('--self-test')) {
         ? `pass ✓  (${gate.covers})`
         : gate.knownFailing
         ? `RED, known ✗  ${gate.knownFailing}`
-        : `FAIL (exit ${code}) ✗  ${gate.covers}`
+        : `FAIL (exit ${result.code}) ✗  ${gate.covers}`
     );
+    if (!ok && result.output.trim()) {
+      const diagnostic = result.output.trim();
+      console.log(
+        `\n${diagnostic.slice(Math.max(0, diagnostic.length - 12000))}\n`
+      );
+    }
   }
 }
 

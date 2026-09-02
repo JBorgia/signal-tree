@@ -1,3 +1,12 @@
+## Unreleased
+
+- **Release CI runs the full project test aggregate sequentially.** RC2's tagged
+  verification failed `test:all` twice while the same tag passed all five
+  projects under Node 22 outside the gate harness. The gate had omitted the
+  root script's `--parallel=1`, causing the memory-heavy package and application
+  suites to contend on the smaller GitHub runner. Failed gates now print their
+  captured stdout/stderr so future CI failures identify the project and spec.
+
 ## 15.0.0-rc.2 (2026-09-01)
 
 - **Package consolidation:** the private `@signaltree/shared` workspace package
