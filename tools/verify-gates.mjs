@@ -1143,8 +1143,8 @@ const GATES = [
     // public-doc ratchet by one to prove the aggregate gate catches any loss.
     mutation: {
       file: 'tools/check-declaration-docs.mjs',
-      find: 'kernel: 248,',
-      replace: 'kernel: 249,',
+      find: 'kernel: 243,',
+      replace: 'kernel: 244,',
     },
   },
   {

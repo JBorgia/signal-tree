@@ -110,7 +110,7 @@ entry point, and exercised a kernel scalar write successfully. The temporary
 npm configuration was removed. The live registry path and strict framework
 declaration correction are closed; no technical GA blocker remains.
 
-`DECLARATION-IDENTITY-0` is **CLOSED LOCALLY / REQUIRES RC8 REGISTRY AND
+`DECLARATION-IDENTITY-0` is **CLOSED LOCALLY / REQUIRES RC9 REGISTRY AND
 CONSUMER CONFIRMATION** at `9b955ffe`. A real V3 Scaletrax migration exposed a
 second deterministic declaration defect in the already-published RC7 artifacts:
 Rollup emitted `kernel/dist/index.d.ts` and `kernel/dist/adapter.d.ts` as
@@ -127,9 +127,14 @@ constructs `@signal-tree/angular`'s `signalTree` with `entityMap()` and proves
 the native `.all` signal and `.setAll()` under both `bundler` and `node16`.
 Local validation: kernel 2,154 passed; Angular 90 passed; workspace typecheck;
 kernel lint; production package builds; artifact and hygiene checks; and packed
-consumer typecheck under both resolutions. RC8 publication must confirm npm
-integrity equals the candidate and V3 must compile Scaletrax against the exact
-registry artifacts before this defect is fully closed.
+consumer typecheck under both resolutions. RC8 (`66a7484d`, signed tag
+`v15.0.0-rc.8`) is immutable but unpublished: tagged CI passed its full 69-gate
+set, then correctly failed its mutation proof because the declaration-docs
+self-test still searched for the superseded `kernel: 248` baseline. The RC9
+candidate updates that anchor to the canonical `243 -> 244` mutation. RC9
+publication must confirm npm integrity equals the candidate and V3 must compile
+Scaletrax against the exact registry artifacts before this defect is fully
+closed.
 
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
