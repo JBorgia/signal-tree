@@ -2737,6 +2737,26 @@ boundary gap must shrink materially. Otherwise close `TURN-BOUNDARY-GROUP-0`
 with the incumbent and proceed directly to `AUXILIARY-RETENTION-SLOPE-0`; no
 second carrier experiment is authorized.
 
+**CLOSED — INCUMBENT WINS; NO SECOND CARRIER EXPERIMENT.** The one disposable
+column-backed `CompactTurnStore` held primitive turn ID/order/event-ordinal
+columns, existing reference facts in aligned columns, and stable `TurnId ->
+slot` lookup. It retained the separate `historicalEvents` array and every
+existing effect, claim, position, order-delta, and pending-turn representation.
+The new capacity-one stale-slot law proved an evicted ID cannot resolve to a
+reused physical slot; all 2,159 kernel tests then passed, and production output
+contained no lookup-characterization counter. Five-sample, 20-tree D5/D3
+controls measured 39,125.6 B/tree and 83,672.8 B/tree versus the incumbent's
+38,040.8 B/tree and 85,208.8 B/tree: the 100-turn saving is only 1,536.0
+B/tree (15.4 B/turn, 1.8%), far below both acceptance floors, while the
+20-turn case costs 1,084.8 B/tree. Capacity-20 D7 churn saves 3,227.2 B/tree
+but its operation median regresses from 6,881.750 us to 11,369.500 us (65%).
+The required 20-effects comparison also worsens: one-turn G2 to 20-turn G0 is
+7,019.2 B (369.4 B/additional boundary) incumbent versus 7,133.6 B (375.5
+B) compact. H0/H1/H2 and E3 remained semantically green in the candidate, but
+the density and churn failures are decisive. Retain the current object/array
+carrier; `TURN-BOUNDARY-GROUP-0` is closed and compact arena/ring/slab work is
+not authorized. Proceed to `AUXILIARY-RETENTION-SLOPE-0`.
+
 History projection has no retained cache in the current implementation:
 `getRestorationHistory()` materializes a transient projection and returns copied
 entry objects with state by reference. F0/F1 remain latency controls; their
