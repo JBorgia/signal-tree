@@ -889,7 +889,7 @@ class RestorationManager<T> {
   }
 
   getTurn(turnId: number): CanonicalTurn<T> | undefined {
-    const turn = this.turns.get(turnId) ?? this.pendingTurns.get(turnId);
+    const turn = this.lookupTurn(turnId) ?? this.pendingTurns.get(turnId);
     if (!turn) {
       return undefined;
     }
@@ -917,7 +917,12 @@ class RestorationManager<T> {
   }
 
   getTurnRef(turnId: number): CanonicalTurn<T> | undefined {
-    return this.turns.get(turnId);
+    return this.lookupTurn(turnId);
+  }
+
+  private lookupTurn(turnId: number | undefined): CanonicalTurn<T> | undefined {
+    recordProductionSubstrateStat('turnIndexLookups');
+    return turnId === undefined ? undefined : this.turns.get(turnId);
   }
 
   getRestorationHistoryRef(index: number): CanonicalTurn<T> | undefined {
@@ -939,7 +944,7 @@ class RestorationManager<T> {
   }
 
   turnIsContainedBy(turnId: number, authorityPositionId: number): boolean {
-    const turn = this.turns.get(turnId) ?? this.pendingTurns.get(turnId);
+    const turn = this.lookupTurn(turnId) ?? this.pendingTurns.get(turnId);
     if (!turn) {
       return false;
     }
@@ -974,7 +979,7 @@ class RestorationManager<T> {
         continue;
       }
 
-      const candidateTurn = this.turns.get(turnIds[frontier - 1]);
+      const candidateTurn = this.lookupTurn(turnIds[frontier - 1]);
       if (
         candidateTurn &&
         (!seedTurn ||
@@ -1010,7 +1015,7 @@ class RestorationManager<T> {
         continue;
       }
 
-      const candidateTurn = this.turns.get(turnIds[frontier]);
+      const candidateTurn = this.lookupTurn(turnIds[frontier]);
       if (
         candidateTurn &&
         (!seedTurn ||
@@ -1051,7 +1056,7 @@ class RestorationManager<T> {
       return 'pending';
     }
 
-    const turn = this.turns.get(turnId);
+    const turn = this.lookupTurn(turnId);
     if (!turn) {
       return undefined;
     }
@@ -1105,7 +1110,7 @@ class RestorationManager<T> {
       const closureTurnIds = [...closure];
 
       for (const candidateTurnId of closureTurnIds) {
-        const turn = this.turns.get(candidateTurnId);
+        const turn = this.lookupTurn(candidateTurnId);
         if (!turn) {
           continue;
         }
@@ -1139,8 +1144,8 @@ class RestorationManager<T> {
     }
 
     return [...closure].sort((left, right) => {
-      const leftTurn = this.turns.get(left);
-      const rightTurn = this.turns.get(right);
+      const leftTurn = this.lookupTurn(left);
+      const rightTurn = this.lookupTurn(right);
       return (rightTurn?.historyIndex ?? -1) - (leftTurn?.historyIndex ?? -1);
     });
   }
@@ -1161,7 +1166,7 @@ class RestorationManager<T> {
       const closureTurnIds = [...closure];
 
       for (const candidateTurnId of closureTurnIds) {
-        const turn = this.turns.get(candidateTurnId);
+        const turn = this.lookupTurn(candidateTurnId);
         if (!turn) {
           continue;
         }
@@ -1201,8 +1206,8 @@ class RestorationManager<T> {
     }
 
     return [...closure].sort((left, right) => {
-      const leftTurn = this.turns.get(left);
-      const rightTurn = this.turns.get(right);
+      const leftTurn = this.lookupTurn(left);
+      const rightTurn = this.lookupTurn(right);
       return (leftTurn?.historyIndex ?? -1) - (rightTurn?.historyIndex ?? -1);
     });
   }
@@ -1248,7 +1253,7 @@ class RestorationManager<T> {
     const frontierUpdates = new Map<number, number>();
 
     for (const turnId of closure) {
-      const turn = this.turns.get(turnId);
+      const turn = this.lookupTurn(turnId);
       if (!turn) {
         continue;
       }
@@ -1290,7 +1295,7 @@ class RestorationManager<T> {
     const frontierUpdates = new Map<number, number>();
 
     for (const turnId of closure) {
-      const turn = this.turns.get(turnId);
+      const turn = this.lookupTurn(turnId);
       if (!turn) {
         continue;
       }
@@ -1348,8 +1353,7 @@ class RestorationManager<T> {
       this.undoPosition(
         closure[0] === undefined
           ? positionId
-          : this.turns
-              .get(closure[0])
+          : this.lookupTurn(closure[0])
               ?.__positionIds?.find((candidatePositionId) =>
                 this.containsPosition(positionId, candidatePositionId)
               ) ?? positionId
@@ -1372,8 +1376,7 @@ class RestorationManager<T> {
       this.redoPosition(
         closure[0] === undefined
           ? positionId
-          : this.turns
-              .get(closure[0])
+          : this.lookupTurn(closure[0])
               ?.__positionIds?.find((candidatePositionId) =>
                 this.containsPosition(positionId, candidatePositionId)
               ) ?? positionId
@@ -1392,7 +1395,7 @@ class RestorationManager<T> {
       }
 
       const turnId = turnIds[frontier - 1];
-      const turn = this.turns.get(turnId);
+      const turn = this.lookupTurn(turnId);
       if (!turn) {
         continue;
       }
@@ -1418,7 +1421,7 @@ class RestorationManager<T> {
       }
 
       const turnId = turnIds[frontier];
-      const turn = this.turns.get(turnId);
+      const turn = this.lookupTurn(turnId);
       if (!turn) {
         continue;
       }
@@ -1834,7 +1837,7 @@ class RestorationManager<T> {
     const effects: TurnEffect[] = [];
     const orderDeltas: CollectionOrderDelta[] = [];
     for (const turnId of turnIds) {
-      const turn = this.turns.get(turnId);
+      const turn = this.lookupTurn(turnId);
       if (!turn) {
         continue;
       }
@@ -1882,7 +1885,7 @@ class RestorationManager<T> {
       const effects: TurnEffect[] = [];
       const orderDeltas: CollectionOrderDelta[] = [];
       for (const turnId of turnIds) {
-        const turn = this.turns.get(turnId);
+        const turn = this.lookupTurn(turnId);
         if (!turn) {
           continue;
         }
