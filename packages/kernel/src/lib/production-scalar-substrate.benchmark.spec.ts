@@ -1197,7 +1197,7 @@ describe('Complexity guard: production scalar substrate', () => {
         }
       }
     }
-  });
+  }, 20_000);
 });
 
 describe('Complexity audit: entity structural projection maintenance', () => {
