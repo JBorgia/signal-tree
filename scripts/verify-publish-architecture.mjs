@@ -39,6 +39,9 @@ for (const [name, expected] of Object.entries(expectedScripts)) {
 }
 
 const workflow = readFileSync('.github/workflows/publish.yml', 'utf8');
+if (!workflow.includes("if: github.repository == 'JBorgia/signal-tree'")) {
+  violations.push('.github/workflows/publish.yml#repository-guard');
+}
 const workflowPublishCommands = workflow
   .split('\n')
   .map((line) => line.trim())
