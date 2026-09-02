@@ -2557,6 +2557,61 @@ header/index, position participation, subject claims, effects/order deltas,
 reversal descriptors, history materialization, and Map/Set capacity before any
 one-variable alternative is admitted.
 
+#### `CAUSAL-REPRESENTATION-0 / ATTRIBUTION` — ACTIVE, NO PROTOTYPE AUTHORIZED
+
+Questions:
+
+```text
+1. Which real retained owners account for the approximately 700 B scalar turn?
+2. Why did a 20-turn window retain more after 130 turns of churn?
+```
+
+Measure one logical owner at a time through legitimate production workloads:
+turn header/history bookkeeping; position participation and indexes; subject
+claims; effects/reversal representation; order deltas; historical projection;
+Map/Set backing capacity; and eviction/index residue. Do not construct a fake
+surrogate, change production representation, or admit a packed/arena/slab
+prototype until a dominant owner is proven.
+
+`5aa7b3f2` plus the attribution controls identify the first two owners. D8
+performs 20 designated scalar writes at capacity zero; D5 performs the identical
+work at capacity 20. Their matched median is 14,869.6 B, or 743.5 B per
+retained turn. D5 retains exactly 20 headers/history and turn-index entries, 20
+effects, 20 positions/index references, and 20 historical events; it retains no
+claims or order deltas. G0/G1 and G2/G3 repeat the same 20 scalar positions
+with independent versus coalesced turn boundaries and their matched zero-history
+controls. Holding 20 effects and 20 positions constant, 19 extra independent
+turns cost 7,878.4 B, or 414.7 B each: a combined turn
+header/history/index/event group, not an effect-only measurement.
+
+The churn ladder is a pre-GA retention finding. D5/D6/D4/D7 retain exactly 20
+causal turns after 20/40/130/1,000 writes, but retain 40.3/42.1/53.1/156.4 KB
+per live tree. At 1,000 writes, all causal containers remain bounded: 20
+history entries, 20 turn-index entries, 20 effects, 20 position references, and
+20 historical events. Only `observedBatches` grows from 20 to 40 to 130 to
+1,000. It is an internal Phase 0A diagnostic log with no production reader, its
+specification reads only the last two entries, and its independent 1,000-entry
+cap is therefore the measured retained owner. This is not evidence against
+`CanonicalTurn`, its effects, or position indexes. First decide the correct
+diagnostic lifetime/capacity under the frozen causal contract; do not fold that
+decision into a representation redesign.
+
+History projection has no retained cache in the current implementation:
+`getRestorationHistory()` materializes a transient projection and returns copied
+entry objects with state by reference. F0/F1 remain latency controls; their
+post-GC retained cost must not be attributed to a projection cache unless a
+future measurement demonstrates a retained owner.
+
+#### `KERNEL-TYPESCRIPT-PEER-POLICY-0` — QUEUED, SEPARATE PACKAGE POLICY
+
+`pnpm nx lint kernel` is red because dependency-check asserts that the kernel
+package should list TypeScript in `peerDependencies`. First determine whether a
+consumer actually requires a compatible TypeScript installation for the shipped
+runtime and declaration contract to function. If not, repair the dependency
+check policy or allowlist; `.d.ts` files alone do not create a runtime-neutral
+peer dependency. If yes, prove the consumer requirement before changing the
+published manifest. This row must not be mixed with causal attribution.
+
 ### Sequence
 
 1. Finish immutable RC9 verification.
