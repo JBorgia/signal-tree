@@ -1,3 +1,12 @@
+## Unreleased (15.0.0-rc.4)
+
+- **Kernel tests use a bounded CI worker pool.** Vitest now runs at most two
+  kernel workers on CI runners, preventing the 260-file suite from exhausting
+  the smaller tagged-release runner while preserving local concurrency.
+- **Test-process failures remain diagnosable.** The kernel wrapper reports
+  startup errors and terminating signals, and failed release gates retain
+  enough child output for an early project failure to survive later logs.
+
 ## 15.0.0-rc.3 (2026-09-02)
 
 - **Release CI runs the full project test aggregate sequentially.** RC2's tagged
