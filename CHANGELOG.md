@@ -1,4 +1,4 @@
-## Unreleased (15.0.0-rc.6)
+## 15.0.0-rc.6 (2026-09-02)
 
 - **Trusted npm publication runs in the canonical repository.** The workflow
   guard now matches `JBorgia/signal-tree`, and the publication-architecture
