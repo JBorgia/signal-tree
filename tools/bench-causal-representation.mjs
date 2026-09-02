@@ -45,6 +45,12 @@ const scalarTree = (capacity = 100) =>
     { enhancers: [restoration({ maxHistorySize: capacity })] }
   );
 
+const scalarFieldsTree = (capacity = 100) =>
+  signalTree(
+    Object.fromEntries(Array.from({ length: 20 }, (_, index) => [`field${index}`, 0])),
+    { enhancers: [restoration({ maxHistorySize: capacity })] }
+  );
+
 const rowsTree = (capacity = 100) =>
   signalTree(
     { rows: entityMap({ selectId: (row) => row.id }), value: 0 },
@@ -60,15 +66,47 @@ const addIndependentScalarTurns = async (tree, count) => {
   }
 };
 
+const writeScalarFields = async (tree, independently) => {
+  const writeAll = () => {
+    for (let index = 0; index < 20; index++) tree.$[`field${index}`].set(index + 1);
+  };
+  if (!independently) {
+    undoable(writeAll);
+    await flush();
+    return;
+  }
+  for (let index = 0; index < 20; index++) {
+    undoable(() => tree.$[`field${index}`].set(index + 1));
+    await flush();
+  }
+};
+
 const retainedStats = (tree) => {
   const history = tree.getRestorationHistory();
-  const turns = tree.__restoration?.getTurns?.() ?? [];
+  const manager = tree.__restoration;
+  const turns = manager?.getTurns?.() ?? [];
   const claims = new Set(
     turns.flatMap((turn) => turn.restorationSubjectIds ?? [])
+  );
+  const countEntries = (field) => turns.reduce(
+    (total, turn) => total + (turn[field]?.length ?? 0),
+    0
   );
   return {
     retainedTurns: history.length,
     retainedClaims: claims.size,
+    historyEntries: manager?.history?.length ?? 0,
+    turnIndexEntries: manager?.turns?.size ?? 0,
+    pendingTurnEntries: manager?.pendingTurns?.size ?? 0,
+    positionTurnIndexEntries: manager?.positionTurnIds?.size ?? 0,
+    positionTurnIndexReferences: [...(manager?.positionTurnIds?.values?.() ?? [])]
+      .reduce((total, turnIds) => total + turnIds.length, 0),
+    positionFrontierEntries: manager?.positionFrontiers?.size ?? 0,
+    positionParticipationEntries: countEntries('__positionIds'),
+    effectEntries: countEntries('__effects'),
+    orderDeltaEntries: countEntries('__orderDeltas'),
+    observedBatchEntries: manager?.observedBatches?.length ?? 0,
+    historicalEventEntries: manager?.historicalEvents?.length ?? 0,
     bytesPerRetainedTurn:
       history.length === 0 ? 0 : undefined,
     bytesPerRetainedClaim:
@@ -340,6 +378,57 @@ ARMS.D4 = {
   },
 };
 
+for (const [id, turns] of [
+  ['D5', 20],
+  ['D6', 40],
+  ['D7', 1_000],
+]) {
+  ARMS[id] = {
+    label: turns === 20
+      ? 'steady 20-turn history window'
+      : `churn ${turns} turns through a 20-turn history window`,
+    create: () => scalarTree(20),
+    run: async (tree) => {
+      await addIndependentScalarTurns(tree, turns);
+      if (tree.getRestorationHistory().length !== Math.min(20, turns) || tree.$.value() !== turns) {
+        throw new Error(`${id} postcondition failed`);
+      }
+    },
+  };
+}
+
+ARMS.D8 = {
+  label: '20 designated scalar writes with zero retained history',
+  create: () => scalarTree(0),
+  run: async (tree) => {
+    await addIndependentScalarTurns(tree, 20);
+    if (tree.getRestorationHistory().length !== 0 || tree.$.value() !== 20) {
+      throw new Error('D8 postcondition failed');
+    }
+  },
+};
+
+for (const [id, capacity, independently] of [
+  ['G0', 20, true],
+  ['G1', 0, true],
+  ['G2', 20, false],
+  ['G3', 0, false],
+]) {
+  ARMS[id] = {
+    label: capacity === 0
+      ? `20 scalar positions with ${independently ? 'independent' : 'one'} designated turn and zero retained history`
+      : `20 scalar positions with ${independently ? 'independent' : 'one'} retained designated turn${independently ? 's' : ''}`,
+    create: () => scalarFieldsTree(capacity),
+    run: async (tree) => {
+      await writeScalarFields(tree, independently);
+      const expectedTurns = capacity === 0 ? 0 : independently ? 20 : 1;
+      if (tree.getRestorationHistory().length !== expectedTurns || tree.$.field19() !== 20) {
+        throw new Error(`${id} postcondition failed`);
+      }
+    },
+  };
+}
+
 ARMS.E3 = {
   label: 'scoped undo through collection containment',
   create: () => rowsTree(),
@@ -421,6 +510,17 @@ for (const [id, arm] of Object.entries(arms)) {
     ).toFixed(1),
     retainedClaims: stats.retainedClaims,
     retainedTurns: stats.retainedTurns,
+    historyEntries: stats.historyEntries,
+    turnIndexEntries: stats.turnIndexEntries,
+    pendingTurnEntries: stats.pendingTurnEntries,
+    positionTurnIndexEntries: stats.positionTurnIndexEntries,
+    positionTurnIndexReferences: stats.positionTurnIndexReferences,
+    positionFrontierEntries: stats.positionFrontierEntries,
+    positionParticipationEntries: stats.positionParticipationEntries,
+    effectEntries: stats.effectEntries,
+    orderDeltaEntries: stats.orderDeltaEntries,
+    observedBatchEntries: stats.observedBatchEntries,
+    historicalEventEntries: stats.historicalEventEntries,
     bytesPerRetainedTurn: stats.retainedTurns === 0 ? 0 : +(retainedBytes / stats.retainedTurns).toFixed(1),
     bytesPerRetainedClaim: stats.retainedClaims === 0 ? 0 : +(retainedBytes / stats.retainedClaims).toFixed(1),
     releasedAfterDestroy: true,
@@ -430,7 +530,7 @@ for (const [id, arm] of Object.entries(arms)) {
 
 const capacityZeroBytes = report.arms.D0?.retainedBytesPerLiveTree;
 if (capacityZeroBytes !== undefined) {
-  for (const id of ['D1', 'D2', 'D3', 'D4']) {
+  for (const id of ['D1', 'D2', 'D3', 'D5']) {
     const arm = report.arms[id];
     if (arm === undefined) continue;
     const retainedBytesOverCapacity0 = arm.retainedBytesPerLiveTree - capacityZeroBytes;
@@ -439,9 +539,40 @@ if (capacityZeroBytes !== undefined) {
       ? 0
       : +(retainedBytesOverCapacity0 / arm.retainedTurns).toFixed(1);
   }
-  if (report.arms.D2 !== undefined && report.arms.D4 !== undefined) {
-    report.arms.D4.retainedBytesOverSteady20TurnWindow = +(
-      report.arms.D4.retainedBytesPerLiveTree - report.arms.D2.retainedBytesPerLiveTree
+  const steady20Bytes = report.arms.D5?.retainedBytesPerLiveTree;
+  if (steady20Bytes !== undefined) {
+    for (const id of ['D4', 'D6', 'D7']) {
+      const arm = report.arms[id];
+      if (arm === undefined) continue;
+      arm.retainedBytesOverSteady20TurnWindow = +(
+        arm.retainedBytesPerLiveTree - steady20Bytes
+      ).toFixed(1);
+    }
+  }
+  const zeroHistory20Bytes = report.arms.D8?.retainedBytesPerLiveTree;
+  if (steady20Bytes !== undefined && zeroHistory20Bytes !== undefined) {
+    report.arms.D5.retainedCausalWindowBytesOverZeroHistoryControl = +(
+      steady20Bytes - zeroHistory20Bytes
+    ).toFixed(1);
+    report.arms.D5.incrementalCausalWindowBytesPerRetainedTurn = +(
+      (steady20Bytes - zeroHistory20Bytes) / report.arms.D5.retainedTurns
+    ).toFixed(1);
+  }
+
+  for (const [retainedId, controlId] of [['G0', 'G1'], ['G2', 'G3']]) {
+    const retained = report.arms[retainedId];
+    const control = report.arms[controlId];
+    if (retained === undefined || control === undefined) continue;
+    retained.retainedCausalWindowBytesOverMatchedZeroHistoryControl = +(
+      retained.retainedBytesPerLiveTree - control.retainedBytesPerLiveTree
+    ).toFixed(1);
+  }
+  const independent = report.arms.G0?.retainedCausalWindowBytesOverMatchedZeroHistoryControl;
+  const coalesced = report.arms.G2?.retainedCausalWindowBytesOverMatchedZeroHistoryControl;
+  if (independent !== undefined && coalesced !== undefined) {
+    report.arms.G0.additionalIndependentTurnBookkeepingBytes = +(independent - coalesced).toFixed(1);
+    report.arms.G0.additionalIndependentTurnBookkeepingBytesPerExtraTurn = +(
+      (independent - coalesced) / 19
     ).toFixed(1);
   }
 }
