@@ -1,4 +1,4 @@
-## Unreleased (15.0.0-rc.8)
+## 15.0.0-rc.8 (2026-09-02)
 
 - **Angular entity-map declarations retain nominal identity across package entry
   points.** The adapter declaration now references the root-owned
