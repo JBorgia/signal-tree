@@ -39,7 +39,7 @@ jobs:
   verify:
     name: Verify and publish tagged commit
     runs-on: ubuntu-latest
-    if: github.repository == 'JBorgia/signaltree'
+    if: github.repository == 'JBorgia/signal-tree'
     permissions:
       contents: read
       id-token: write

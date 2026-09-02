@@ -1300,9 +1300,9 @@ const GATES = [
       'every shell and CI registry path delegates to the canonical candidate publisher',
     cmd: ['node', 'scripts/verify-publish-architecture.mjs'],
     mutation: {
-      file: 'scripts/ci-publish.sh',
-      find: 'scripts/publish-candidate.mjs',
-      replace: 'scripts/legacy-publisher.mjs',
+      file: '.github/workflows/publish.yml',
+      find: "if: github.repository == 'JBorgia/signal-tree'",
+      replace: "if: github.repository == 'JBorgia/signaltree'",
     },
   },
   {
