@@ -13,7 +13,7 @@ Current phase: `Phase 7 — TECHNICAL READINESS CLOSED / HUMAN GA DECISION`
 `GATE F` is **SATISFIED** at `109595e6`. Exact committed HEAD passed all 69
 ordinary and release-only gates with zero known-red. The independent Gate F
 review found no critical, major, or minor blocker. `15.0.0-rc.1` remains the
-published candidate; no later commit has been published or tagged.
+only published candidate; RC2 and RC3 are immutable unpublished tags.
 
 Phase 7 technical readiness is **CLOSED** against clean-clone commit `8d0108bc`:
 
@@ -41,6 +41,17 @@ authority, allowing all memory-heavy suites to contend on the GitHub runner.
 The gate is now sequential and failed-gate stdout/stderr is preserved. This
 release-system correction earns RC3; RC2 remains historical evidence and its
 tag is not moved.
+
+`15.0.0-rc.3` is **IMMUTABLE / NOT PUBLISHED** at `145ec3fa`. Local preparation
+passed 69/69, but tagged CI run `33576006919` failed `kernel:test` while every
+other project and 68/69 release gates passed. The kernel wrapper collapsed a
+signal termination to exit 1 and the release harness retained too little output
+to identify the signal after later project logs displaced it. Commit `a6c4e0cf`
+bounds kernel Vitest to two CI workers, reports child-process startup and signal
+failures, and retains 100 KB of failed-gate diagnostics. Under Node 22 with
+`CI=true`, kernel passed 2,154 tests plus three expected failures, `test:all`
+and its mutation proof passed, and the complete release matrix passed 69/69.
+This release-system correction earns RC4; the RC3 tag is not moved.
 
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
