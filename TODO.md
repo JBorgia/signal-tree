@@ -2209,19 +2209,19 @@ example code.
 
 ### Catalog and disposition
 
-| Pattern | Document? | New kernel API? |
-| --- | --- | --- |
-| Staged/draft editing | Yes — canonical | No |
-| Server reconciliation | Yes — canonical | No |
-| One-shot async loading | Yes — canonical | No |
-| Persistent remote relationship | Yes — canonical | No (existing `link()`) |
-| Persistence | Yes — canonical | No (existing `link()`) |
-| Optimistic UI | Yes — canonical, worded carefully | No |
-| Human-readable causal explanation | Yes — canonical (projection) | No (tooling, not kernel) |
-| Agent/human attribution | Experimental pattern only | Not until attribution ownership is settled |
-| Cross-tree atomic transactions | No canonical claim yet | Unproven |
-| Generic reconciliation framework | No | No |
-| v14 compatibility layer | Migration docs only | No |
+| Pattern                           | Document?                         | New kernel API?                            |
+| --------------------------------- | --------------------------------- | ------------------------------------------ |
+| Staged/draft editing              | Yes — canonical                   | No                                         |
+| Server reconciliation             | Yes — canonical                   | No                                         |
+| One-shot async loading            | Yes — canonical                   | No                                         |
+| Persistent remote relationship    | Yes — canonical                   | No (existing `link()`)                     |
+| Persistence                       | Yes — canonical                   | No (existing `link()`)                     |
+| Optimistic UI                     | Yes — canonical, worded carefully | No                                         |
+| Human-readable causal explanation | Yes — canonical (projection)      | No (tooling, not kernel)                   |
+| Agent/human attribution           | Experimental pattern only         | Not until attribution ownership is settled |
+| Cross-tree atomic transactions    | No canonical claim yet            | Unproven                                   |
+| Generic reconciliation framework  | No                                | No                                         |
+| v14 compatibility layer           | Migration docs only               | No                                         |
 
 ### Per-pattern content notes
 
@@ -2314,7 +2314,7 @@ first), `agent-authored-work.md` / `collaborative-state.md` / `offline-editing.m
    projection (§8) — not started this pass.
 5. Once `composition-recipes.md` covers the canonical set, check whether the
    demo site / top-level docs nav links it already (`grep -r
-   composition-recipes` across `apps/demo` and any docs index) — add a link
+composition-recipes` across `apps/demo` and any docs index) — add a link
    if not, as its own small pass (the demo site's own currency/measurement
    rules in `AGENTS.md` § "Docs & demo currency" apply to anything it links).
 
@@ -2358,3 +2358,130 @@ per-item procedure (characterize → smallest fix → focused validation via
 `scripts/verify-publish-artifacts.mjs`/`node tools/verify-tarball-consumer.mjs`
 → one commit) — not folded into unrelated work, given `prepare-publish-artifacts.mjs`'s
 own history of exactly that kind of change going unnoticed.
+
+## 14. Pre-GA v15 closure: semantic discoverability and causal representation
+
+`RELEASE-1.0.md` Phase 7 holds GA for these two bounded rows. RC9 verification
+remains immutable evidence; neither row may add public API, causal facts,
+compatibility layers, framework abstractions, speculative agent metadata, or
+Studio/Relay concepts to the kernel.
+
+### `AI-SEMANTIC-DISCOVERABILITY-0`
+
+Close the shipped teaching surface before first GA from one canonical source
+reachable through every primary package surface. It may be deterministically
+copied/generated into package artifacts or reached through package READMEs, but
+must not become three independently maintained `llms.txt` documents. Make the
+root, kernel, Angular, and React READMEs teach the canonical model and facade
+rule; complete composition, persistence/`link()`, and causal-explanation-as-
+projection guidance; and prove packed documents and documented imports with
+permanent gates. The demo tests teachability. TruckTrax tests that the prescribed
+Angular composition is natural in a real consumer; it does not define kernel
+semantics.
+
+The canonical positioning must make all of the following unambiguous:
+
+```text
+IS:     framework-independent consequential application state, stable subject
+      identity, authored versus external authority, coherent operation
+      boundaries, causal/restoration semantics, and link-based relationships
+
+IS NOT: primarily an undo library, event log, query library, sync engine, or
+      persistence framework
+
+Angular application             -> @signal-tree/angular
+React application               -> @signal-tree/react
+framework-neutral TypeScript    -> @signal-tree/kernel
+```
+
+The deterministic documentation assertions must reject these false readings:
+SignalTree is primarily undo/history; `link()` is a generic internal linking
+engine; persistence was removed entirely; every causal turn stores actor,
+timestamp, or prose; all external writes are history; or framework applications
+should mix kernel and adapter imports.
+
+### `CAUSAL-REPRESENTATION-0`
+
+**Property:** retain only authoritative causal facts, represented by their
+lifetime and access pattern. Human and AI explanations are projections and must
+not determine hot-kernel representation.
+
+1. Inventory every FACT, not merely current object fields: its semantic job,
+   authority, frequency, lifetime, required retention, derivability, and hot/cold
+   access. Record every current carrier and every reader as **REACH**, **READ**,
+   or **DISCRIMINATE**. A production reader proves that the fact is live; it does
+   not freeze the current carrier. Classify each carrier as semantic,
+   restoration-only, delivery-only, cold diagnostic/explanation projection, or
+   duplicate authority.
+
+`PositionId` is a **REQUIRED FACT** for restoration targeting, mutation
+attribution, and authority. The current per-turn `__positionIds` array is
+**NOT FROZEN**: determine whether each reader needs that retained array or
+only position identity. Include write context, authored/external
+classification, operation/turn identity, mutation intent, SubjectId,
+PositionId, structural/entity facts, restoration claims/descriptors, retained
+reversal facts, and the causal intersection of `link()`/external ingress.
+Exclude observation, snapshot caching, framework realization, and ordinary
+structural state unless they carry a causal fact. 2. Repair and mutation-prove `probe-restoration-required-set.mjs` before using it
+as baseline evidence. Its fixture must distinguish ordinary undesignated
+writes (zero retained restoration turns), one designated turn (one retained
+turn), bounded designated turns (exactly `min(N, capacity)`), and external
+realization (zero retained turns). It must fail if the fixture's intended
+causal work is not retained. Until then, its count/size output is invalid for
+representation comparison. 3. Establish the incumbent baseline under the frozen semantic interface. Cover
+plain undesignated writes, external realization, designated scalar and
+multi-scalar turns, entity mutation/rekey/omission/reactivation, mixed scalar
+plus structural operations, retention 0/1/20/100, churn/eviction, undo/redo,
+and one- and 100-turn projections. Measure write/operation/undo/projection
+latency; bytes per retained turn and claim; high-water and post-GC memory;
+observable allocation; and bundle delta. 4. First classify every production reader of retained `__ownerPaths`: whether it
+needs stable identity/targeting, a human-readable projection, transient
+operation routing, or an historical address after rekey/relocation. Current
+location may not reconstruct a correct historical address. Only a proof that
+later semantics can resolve the required address without the retained path
+makes it a removal candidate. 5. Build small isolated alternatives only where the baseline exposes a plausible
+duplication or allocation problem. Candidates share the same semantic
+interface and may include compact headers with sparse pools, arenas/indexes,
+or numeric carriers. No representation is preferred before measurement. 6. Replace the incumbent only for a material Pareto improvement: a density win
+with under 5% hot-path regression, a hot-path win without meaningful density
+loss, or a simultaneous gain. A 5-10% regression requires a substantial
+density gain; above 10% rejects the candidate unless a frozen semantic law
+requires it. "Current wins" is a successful closure result.
+
+Hard controls remain: no restoration means zero restoration-specific subject
+slope; configured but unused restoration adds no material subject slope; bounded
+history scales with retained restorable work; rare semantics allocate rarely; and
+no causal fact exists solely for a human or AI explanation.
+
+#### Current characterization — carrier remains open
+
+`PositionId` is a required semantic fact. Current restoration readers establish
+that targeting, attribution, and authority need position identity; they do not
+establish that `CanonicalTurn.__positionIds` is the final carrier, duplication
+layout, or retained encoding. Classify the readers before proposing a replacement.
+
+`probe-restoration-required-set.mjs` previously ran a 13-operation mixed script
+without `undoable()` designation, then reported zero retained entries as if they
+were retention evidence. It now uses one pre-registered designated removal over
+ordinary seeded state, asserts its expected non-zero retention, and has explicit
+ordinary/designated/bounded/external self-controls. The release-only
+`restoration-required-set` gate is mutation-proven by removing the fixture's
+designation and requiring the probe to fail. The former mixed sequence throws
+`Collection structural target contains contradictory anchors` when actually
+designated; it is a separate causal-correctness candidate, not a representation
+baseline or a reason to change the causal carrier.
+
+`__ownerPaths` remains the first derivability candidate. Its disposition depends
+on whether post-commit readers require historical addressing, current targeting,
+or only a human-readable projection; current position authority cannot be used
+to reconstruct a historical address after rekey or relocation without proof.
+
+### Sequence
+
+1. Finish immutable RC9 verification.
+2. Complete `AI-SEMANTIC-DISCOVERABILITY-0`.
+3. Complete `CAUSAL-REPRESENTATION-0`.
+4. Run demo, TruckTrax, and existing semantic/performance/memory controls.
+5. Freeze the selected representation, cut a final RC, and repeat strict real
+   npm-consumer proof.
+6. Request the explicit human decision to publish `15.0.0` GA.

@@ -8,7 +8,7 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 7 — TECHNICAL READINESS CLOSED / HUMAN GA DECISION`
+Current phase: `Phase 7 — PRE-GA CLOSURE / HUMAN GA DECISION HELD`
 
 `GATE F` is **SATISFIED** at `109595e6`. Exact committed HEAD passed all 69
 ordinary and release-only gates with zero known-red. The independent Gate F
@@ -27,10 +27,14 @@ known technical GA blockers  NONE
 ```
 
 All 60 registered gate mutation/self-tests successfully demonstrated their
-associated gates can fail; this is distinct from the 69 release gates. The next
-step is a human GA disposition: publish another RC, promote to `15.0.0`, or hold
-for a specifically named non-engineering reason. Further engineering requires a
-new release falsifier strong enough to justify delaying release.
+associated gates can fail; this is distinct from the 69 release gates. GA is
+held for two bounded v15-closure rows recorded in `TODO.md`:
+`AI-SEMANTIC-DISCOVERABILITY-0` and `CAUSAL-REPRESENTATION-0`. They may clarify
+the shipped model and select its physical representation, but may not add public
+APIs, causal facts, compatibility layers, framework abstractions, or speculative
+agent metadata. RC9 verification remains immutable evidence; after both rows
+close, publish one final RC and repeat the real npm-consumer proof before the
+human GA disposition.
 
 `15.0.0-rc.2` is **IMMUTABLE / NOT PUBLISHED** at `e58f9459`. Local preparation
 passed 69/69 and produced a signed tag plus validated exact tarballs. Tagged CI
@@ -12738,6 +12742,22 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       green; release matrix 69/69 green; registered gate mutation/self-test
       matrix 60/60 green with zero unproven, blind, or errored proofs. Known
       technical GA blockers: none.
+- [ ] **`AI-SEMANTIC-DISCOVERABILITY-0`.** Close the shipped semantic teaching
+      surface from one canonical source reachable through every primary package
+      surface: README/package/facade guidance, composition and `link()` patterns,
+      causal explanation as projection, and packed-document/documented-import
+      proof. Do not independently maintain three `llms.txt` documents. Demo and
+      TruckTrax are controls for teachability and real Angular composition;
+      neither may define kernel semantics.
+- [ ] **`CAUSAL-REPRESENTATION-0`.** Inventory causal facts rather than object
+      fields: semantic job, authority, frequency, lifetime, retention need,
+      derivability, current carriers, and reader reach/read/discriminate roles.
+      A production reader proves a fact is live, not that its current carrier is
+      frozen. Repair and mutation-prove the retention baseline with known
+      designated and undesignated fixtures before comparing bounded alternatives
+      behind the same semantic interface. Preserve all frozen causal laws. A
+      replacement requires a material Pareto improvement in density or hot-path
+      latency; otherwise freeze the incumbent.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness

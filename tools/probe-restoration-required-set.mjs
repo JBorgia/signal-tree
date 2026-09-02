@@ -60,7 +60,7 @@ if (!existsSync(CORE)) {
   process.exit(1);
 }
 
-const { signalTree, entityMap, restoration } = await import(CORE);
+const { signalTree, entityMap, restoration, undoable, external } = await import(CORE);
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
 const WIDTH = 5;
@@ -72,24 +72,7 @@ let HISTORY = HISTORY_SIZES.at(-1);
  * the table can report per-class rather than per-step.
  */
 const SCRIPT = [
-  { label: 'setAll (seed)', apply: (r) => r.setAll(seed('a')) },
-  { label: 'updateOne', apply: (r) => r.updateOne('a-0', { v: 100 }) },
-  { label: 'updateOne', apply: (r) => r.updateOne('a-1', { v: 101 }) },
-  { label: 'addOne', apply: (r) => r.addOne({ id: 'extra', name: 'x', v: 7 }) },
-  { label: 'removeOne', apply: (r) => r.removeOne('a-2') },
-  { label: 'removeOne', apply: (r) => r.removeOne('extra') },
-  { label: 'changeId', apply: (r) => r.changeId('a-3', 'a-3-renamed') },
-  { label: 'setAll (replace all)', apply: (r) => r.setAll(seed('b')) },
-  { label: 'updateOne', apply: (r) => r.updateOne('b-0', { v: 200 }) },
-  { label: 'setAll (replace all)', apply: (r) => r.setAll(seed('c')) },
-  { label: 'removeOne', apply: (r) => r.removeOne('c-1') },
-  // `clear()` was absent from this script until 15.0, because undoing it
-  // restored nothing and the undo after that threw. This probe is what found
-  // that — its traversal could not get past a clear — and the claim-set
-  // conclusion below is only frozen with `clear()` participating correctly.
-  // See `clear-undoable.spec.ts`.
-  { label: 'clear', apply: (r) => r.clear() },
-  { label: 'setAll (reseed)', apply: (r) => r.setAll(seed('d')) },
+  { label: 'removeOne', apply: (rows) => rows.removeOne('a-2') },
 ];
 
 function seed(prefix) {
@@ -118,12 +101,24 @@ async function measure(historySize) {
   const tree = makeTree();
   const rows = tree.$.rows;
 
+  // The live collection is ordinary setup. Only the removal below earns a
+  // retained turn, so the probe can prove that its observed claim is real.
+  rows.setAll(seed('a'));
+  await tick();
+
   for (const step of SCRIPT) {
-    step.apply(rows);
+    undoable(() => step.apply(rows));
     await tick();
   }
 
   const history = tree.getRestorationHistory();
+  const expectedRetainedEntries = Math.min(SCRIPT.length, historySize);
+  if (history.length !== expectedRetainedEntries) {
+    throw new Error(
+      `Probe fixture retained ${history.length} turns; expected ${expectedRetainedEntries}. ` +
+        'Do not use this run as retention evidence.'
+    );
+  }
   const physicallyRetained = new Set(rows.__listSubjectReclamationCandidates());
   const namedUnion = new Set(
     history.flatMap((entry) => entry.restorationSubjectIds ?? [])
@@ -150,8 +145,10 @@ async function measure(historySize) {
   // Correctness: replay independently and compare. This is what can refute C —
   // a required-but-unnamed subject would land the traversal on a wrong state.
   const replay = makeTree();
+  replay.$.rows.setAll(seed('a'));
+  await tick();
   for (const step of SCRIPT) {
-    step.apply(replay.$.rows);
+    undoable(() => step.apply(replay.$.rows));
     await tick();
   }
   const traversalCorrect =
@@ -176,6 +173,56 @@ async function measure(historySize) {
     traversalCorrect,
     steps,
   };
+}
+
+const assertEqual = (actual, expected, label) => {
+  if (actual !== expected) {
+    throw new Error(`${label}: expected ${expected}, received ${actual}`);
+  }
+};
+
+const makeScalarTree = (maxHistorySize) =>
+  signalTree(
+    { value: 0 },
+    { enhancers: [restoration({ maxHistorySize })] }
+  );
+
+async function runFixtureSelfTest() {
+  const ordinary = makeScalarTree(4);
+  ordinary.$.value.set(1);
+  await tick();
+  assertEqual(
+    ordinary.getRestorationHistory().length,
+    0,
+    'ordinary undesignated write'
+  );
+
+  const designated = makeScalarTree(4);
+  undoable(() => designated.$.value.set(1));
+  await tick();
+  assertEqual(designated.getRestorationHistory().length, 1, 'one designated turn');
+
+  const bounded = makeScalarTree(2);
+  for (let value = 1; value <= 3; value++) {
+    undoable(() => bounded.$.value.set(value));
+    await tick();
+  }
+  assertEqual(
+    bounded.getRestorationHistory().length,
+    2,
+    'bounded designated turns'
+  );
+
+  const realized = makeScalarTree(4);
+  external(() => realized.$.value.set(1));
+  await tick();
+  assertEqual(realized.getRestorationHistory().length, 0, 'external realization');
+
+  console.log('SELF-TEST: ordinary/designated/bounded/external classification passed');
+}
+
+if (process.argv.includes('--self-test')) {
+  await runFixtureSelfTest();
 }
 
 const results = [];

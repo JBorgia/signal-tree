@@ -792,6 +792,19 @@ const GATES = [
     },
   },
   {
+    name: 'restoration-required-set',
+    covers:
+      'the restoration claim-set oracle exercises designated retained work and distinguishes ordinary, bounded, and external classifications',
+    cmd: ['node', 'tools/probe-restoration-required-set.mjs', '--self-test'],
+    releaseOnly: true,
+    needsBuild: true,
+    mutation: {
+      file: 'tools/probe-restoration-required-set.mjs',
+      find: '    undoable(() => step.apply(rows));',
+      replace: '    step.apply(rows);',
+    },
+  },
+  {
     name: 'signal-identity-durability',
     covers:
       'a live consumer keeps receiving updates across garbage collection — the property the test suite structurally cannot check',
