@@ -889,7 +889,8 @@ class RestorationManager<T> {
   }
 
   getTurn(turnId: number): CanonicalTurn<T> | undefined {
-    const turn = this.lookupTurn(turnId) ?? this.pendingTurns.get(turnId);
+    recordProductionSubstrateStat('turnIndexLookups');
+    const turn = this.turns.get(turnId) ?? this.pendingTurns.get(turnId);
     if (!turn) {
       return undefined;
     }
@@ -917,12 +918,8 @@ class RestorationManager<T> {
   }
 
   getTurnRef(turnId: number): CanonicalTurn<T> | undefined {
-    return this.lookupTurn(turnId);
-  }
-
-  private lookupTurn(turnId: number | undefined): CanonicalTurn<T> | undefined {
     recordProductionSubstrateStat('turnIndexLookups');
-    return turnId === undefined ? undefined : this.turns.get(turnId);
+    return this.turns.get(turnId);
   }
 
   getRestorationHistoryRef(index: number): CanonicalTurn<T> | undefined {
@@ -944,7 +941,8 @@ class RestorationManager<T> {
   }
 
   turnIsContainedBy(turnId: number, authorityPositionId: number): boolean {
-    const turn = this.lookupTurn(turnId) ?? this.pendingTurns.get(turnId);
+    recordProductionSubstrateStat('turnIndexLookups');
+    const turn = this.turns.get(turnId) ?? this.pendingTurns.get(turnId);
     if (!turn) {
       return false;
     }
@@ -979,7 +977,8 @@ class RestorationManager<T> {
         continue;
       }
 
-      const candidateTurn = this.lookupTurn(turnIds[frontier - 1]);
+      recordProductionSubstrateStat('turnIndexLookups');
+      const candidateTurn = this.turns.get(turnIds[frontier - 1]);
       if (
         candidateTurn &&
         (!seedTurn ||
@@ -1015,7 +1014,8 @@ class RestorationManager<T> {
         continue;
       }
 
-      const candidateTurn = this.lookupTurn(turnIds[frontier]);
+      recordProductionSubstrateStat('turnIndexLookups');
+      const candidateTurn = this.turns.get(turnIds[frontier]);
       if (
         candidateTurn &&
         (!seedTurn ||
@@ -1056,7 +1056,8 @@ class RestorationManager<T> {
       return 'pending';
     }
 
-    const turn = this.lookupTurn(turnId);
+    recordProductionSubstrateStat('turnIndexLookups');
+    const turn = this.turns.get(turnId);
     if (!turn) {
       return undefined;
     }
@@ -1110,7 +1111,8 @@ class RestorationManager<T> {
       const closureTurnIds = [...closure];
 
       for (const candidateTurnId of closureTurnIds) {
-        const turn = this.lookupTurn(candidateTurnId);
+        recordProductionSubstrateStat('turnIndexLookups');
+        const turn = this.turns.get(candidateTurnId);
         if (!turn) {
           continue;
         }
@@ -1144,8 +1146,9 @@ class RestorationManager<T> {
     }
 
     return [...closure].sort((left, right) => {
-      const leftTurn = this.lookupTurn(left);
-      const rightTurn = this.lookupTurn(right);
+      recordProductionSubstrateStat('turnIndexLookups', 2);
+      const leftTurn = this.turns.get(left);
+      const rightTurn = this.turns.get(right);
       return (rightTurn?.historyIndex ?? -1) - (leftTurn?.historyIndex ?? -1);
     });
   }
@@ -1166,7 +1169,8 @@ class RestorationManager<T> {
       const closureTurnIds = [...closure];
 
       for (const candidateTurnId of closureTurnIds) {
-        const turn = this.lookupTurn(candidateTurnId);
+        recordProductionSubstrateStat('turnIndexLookups');
+        const turn = this.turns.get(candidateTurnId);
         if (!turn) {
           continue;
         }
@@ -1206,8 +1210,9 @@ class RestorationManager<T> {
     }
 
     return [...closure].sort((left, right) => {
-      const leftTurn = this.lookupTurn(left);
-      const rightTurn = this.lookupTurn(right);
+      recordProductionSubstrateStat('turnIndexLookups', 2);
+      const leftTurn = this.turns.get(left);
+      const rightTurn = this.turns.get(right);
       return (leftTurn?.historyIndex ?? -1) - (rightTurn?.historyIndex ?? -1);
     });
   }
@@ -1253,7 +1258,8 @@ class RestorationManager<T> {
     const frontierUpdates = new Map<number, number>();
 
     for (const turnId of closure) {
-      const turn = this.lookupTurn(turnId);
+      recordProductionSubstrateStat('turnIndexLookups');
+      const turn = this.turns.get(turnId);
       if (!turn) {
         continue;
       }
@@ -1295,7 +1301,8 @@ class RestorationManager<T> {
     const frontierUpdates = new Map<number, number>();
 
     for (const turnId of closure) {
-      const turn = this.lookupTurn(turnId);
+      recordProductionSubstrateStat('turnIndexLookups');
+      const turn = this.turns.get(turnId);
       if (!turn) {
         continue;
       }
@@ -1349,15 +1356,18 @@ class RestorationManager<T> {
       return false;
     }
 
+    const seedTurnId = closure[0];
+    if (seedTurnId === undefined) {
+      return this.undoPosition(positionId).length > 0;
+    }
+    recordProductionSubstrateStat('turnIndexLookups');
+    const seedPositionId = this.turns
+      .get(seedTurnId)
+      ?.__positionIds?.find((candidatePositionId) =>
+        this.containsPosition(positionId, candidatePositionId)
+      ) ?? positionId;
     return (
-      this.undoPosition(
-        closure[0] === undefined
-          ? positionId
-          : this.lookupTurn(closure[0])
-              ?.__positionIds?.find((candidatePositionId) =>
-                this.containsPosition(positionId, candidatePositionId)
-              ) ?? positionId
-      ).length > 0
+      this.undoPosition(seedPositionId).length > 0
     );
   }
 
@@ -1372,15 +1382,18 @@ class RestorationManager<T> {
       return false;
     }
 
+    const seedTurnId = closure[0];
+    if (seedTurnId === undefined) {
+      return this.redoPosition(positionId).length > 0;
+    }
+    recordProductionSubstrateStat('turnIndexLookups');
+    const seedPositionId = this.turns
+      .get(seedTurnId)
+      ?.__positionIds?.find((candidatePositionId) =>
+        this.containsPosition(positionId, candidatePositionId)
+      ) ?? positionId;
     return (
-      this.redoPosition(
-        closure[0] === undefined
-          ? positionId
-          : this.lookupTurn(closure[0])
-              ?.__positionIds?.find((candidatePositionId) =>
-                this.containsPosition(positionId, candidatePositionId)
-              ) ?? positionId
-      ).length > 0
+      this.redoPosition(seedPositionId).length > 0
     );
   }
 
@@ -1395,7 +1408,8 @@ class RestorationManager<T> {
       }
 
       const turnId = turnIds[frontier - 1];
-      const turn = this.lookupTurn(turnId);
+      recordProductionSubstrateStat('turnIndexLookups');
+      const turn = this.turns.get(turnId);
       if (!turn) {
         continue;
       }
@@ -1421,7 +1435,8 @@ class RestorationManager<T> {
       }
 
       const turnId = turnIds[frontier];
-      const turn = this.lookupTurn(turnId);
+      recordProductionSubstrateStat('turnIndexLookups');
+      const turn = this.turns.get(turnId);
       if (!turn) {
         continue;
       }
@@ -1837,7 +1852,8 @@ class RestorationManager<T> {
     const effects: TurnEffect[] = [];
     const orderDeltas: CollectionOrderDelta[] = [];
     for (const turnId of turnIds) {
-      const turn = this.lookupTurn(turnId);
+      recordProductionSubstrateStat('turnIndexLookups');
+      const turn = this.turns.get(turnId);
       if (!turn) {
         continue;
       }
@@ -1885,7 +1901,8 @@ class RestorationManager<T> {
       const effects: TurnEffect[] = [];
       const orderDeltas: CollectionOrderDelta[] = [];
       for (const turnId of turnIds) {
-        const turn = this.lookupTurn(turnId);
+        recordProductionSubstrateStat('turnIndexLookups');
+        const turn = this.turns.get(turnId);
         if (!turn) {
           continue;
         }

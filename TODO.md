@@ -2640,7 +2640,14 @@ effect reads). The lookup job and workload frequency are therefore real and
 bounded by active navigation work. First attribute the Map's retained ownership
 against these controls; admit one production-shaped alternate only if its
 material density cost is proven without collapsing the independent ordered
-`history[]` job.
+`history[]` job. `LOOKUP-INSTRUMENTATION-NEUTRALITY` is proven before any
+authoritative speed comparison: the stats call is a standalone expression that
+the kernel Rollup plugin strips, and a fresh production artifact contains none
+of `turnIndexLookups`, `recordProductionSubstrateStat`, or the former
+`lookupTurn` wrapper. The separate requirements remain frozen: `history[]`
+provides an ordered bounded sequence; identity-addressed turn resolution is a
+different job. A future compact carrier may realize both physically, but must
+not equate `TurnId` with current array position.
 
 History projection has no retained cache in the current implementation:
 `getRestorationHistory()` materializes a transient projection and returns copied
