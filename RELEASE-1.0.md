@@ -73,6 +73,22 @@ guard; its mutation proof recreates the exact skipped-job typo. Under Node 22,
 all 60 mutation proofs and all 69 release gates pass. This deterministic
 registry-path correction earns RC6; the RC5 tag is not moved.
 
+`15.0.0-rc.6` is **VERIFIED / NOT PUBLISHED** at `e720d509`. Tagged CI run
+`33581113391` passed every release and mutation gate and created the GitHub
+Release. A non-publishing dispatch canary proved `publish.yml` now admits the
+canonical repository and rejects an invalid tag before checkout. Live publish
+run `33583551981` then passed every safeguard through exact candidate creation
+but npm rejected the first `@signal-tree/kernel` PUT with 404/permission denied.
+The registry still contains RC1 for kernel and Angular, no React package, and no
+RC6 artifact. This is an external npm authorization/configuration blocker:
+configure each existing package's trusted publisher for GitHub user `JBorgia`,
+repository `signal-tree`, workflow `publish.yml`, and allowed action
+`npm publish`; bootstrap the new React package with an authenticated first
+publish if npm cannot attach trust before the package exists. Retry the same
+immutable RC6 publish workflow afterward; the publisher skips any artifact only
+when registry and candidate SHA-512 integrity match, so no RC7 is required for
+an npm-side configuration correction.
+
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
 segmented, split-pool, checked-handle, and active-node-index rows have measured
