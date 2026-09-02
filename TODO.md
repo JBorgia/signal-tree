@@ -2526,8 +2526,8 @@ passes. No further retained-turn carrier deletion is justified before the
 required baseline identifies a material allocation or density problem; packed
 headers, sparse pools, and arenas remain alternatives, not a selected design.
 
-`CAUSAL-REPRESENTATION-0` incumbent baseline is established, not yet a
-representation-selection result. `node --expose-gc
+`CAUSAL-REPRESENTATION-0` incumbent baseline is established at `5aa7b3f2`, not
+yet a representation-selection result. `node --expose-gc
 tools/bench-causal-representation.mjs --samples 5` runs the A0-A1, B0-B2,
 C0-C5, D0-D4, E0-E3, and F0-F1 causal workloads. Each arm proves its semantic
 postcondition, times its operation separately, then takes five quiesced
@@ -2548,6 +2548,10 @@ all complete and retain the expected turn/claim counts. `node
 tools/size-report.mjs --json` measures the exercised production `restoration()`
 bundle delta as +18.38 KB gzip over bare construction; the harness's 12,132 B
 restoration-module gzip is only an artifact upper bound, not the consumer delta.
+Validation: fresh `pnpm nx build kernel`, full five-sample baseline, restoration
+suite 106/106, workspace typecheck, direct harness ESLint, and docs validation
+pass. The kernel lint target remains independently red because its unchanged
+package manifest omits `typescript` from `peerDependencies`.
 Next, attribute the retained window and churn deltas separately to turn
 header/index, position participation, subject claims, effects/order deltas,
 reversal descriptors, history materialization, and Map/Set capacity before any
