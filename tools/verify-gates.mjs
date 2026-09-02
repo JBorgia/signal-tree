@@ -547,11 +547,17 @@ const GATES = [
     // symbol from an older release is invisible to it. `prependOne` shipped in
     // 14.0.0, which sat outside the window, so the previous mutation targeted
     // a symbol outside the window and the harness correctly reported this gate
-    // BLIND. SignalTreeRollbackError is in the current delta and appears once
-    // in the kernel README. Re-check this target whenever the base tag moves.
+    // BLIND. runInvalidationGroup is in the RC1-to-v15 delta and appears once
+    // in the kernel README. The production gate's base advances with each RC,
+    // so its proof pins that historical delta.
+    mutationCmd: [
+      'node',
+      'tools/check-release-claims.mjs',
+      '--base=v15.0.0-rc.1',
+    ],
     mutation: {
       file: 'packages/kernel/README.md',
-      find: 'SignalTreeRollbackError',
+      find: 'runInvalidationGroup',
       replace: '__gateRemovedFromPriming',
     },
   },
@@ -1518,7 +1524,9 @@ if (has('--self-test')) {
     );
     let result;
     try {
-      result = withMutation(gate.mutation, () => run(gate));
+      result = withMutation(gate.mutation, () =>
+        run(gate.mutationCmd ? { ...gate, cmd: gate.mutationCmd } : gate)
+      );
     } catch (err) {
       results.push({ gate, state: 'error' });
       console.log(`ERROR\n      ${err.message}`);
