@@ -1,3 +1,10 @@
+## 15.0.0-rc.10 (2026-09-02)
+
+- **Full-size scalar complexity control has an explicit CI budget.** The
+  logical-work assertions now receive the same 20-second timeout as neighboring
+  large-harness audits, preventing infrastructure timing variance from blocking
+  canonical publication.
+
 ## 15.0.0-rc.9 (2026-09-02)
 
 - **Release gate mutation coverage follows the canonical declaration-doc
