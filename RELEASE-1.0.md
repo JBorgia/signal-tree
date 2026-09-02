@@ -98,6 +98,18 @@ three-package dry-run publication, 60/60 mutation proofs, and 69/69 release
 gates pass under Node 22. This declaration correction earns RC7; RC6 remains
 immutable and published.
 
+`15.0.0-rc.7` is **PUBLISHED / REGISTRY VERIFIED** at `e3fc10fb`. Tagged CI run
+`33587339921` completed successfully with 69/69 release gates, 60/60 mutation
+proofs, and no failed job step. The canonical publisher published kernel,
+Angular, and React in release-plan order from the exact validated candidate.
+For all three packages, npm `dist.integrity` equals the candidate SHA-512 and
+the `rc` dist-tag points to `15.0.0-rc.7`. A clean external project installed
+all three packages by registry version, compiled their public APIs under
+`moduleResolution: node16` with `skipLibCheck: false`, imported every public
+entry point, and exercised a kernel scalar write successfully. The temporary
+npm configuration was removed. The live registry path and strict framework
+declaration correction are closed; no technical GA blocker remains.
+
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
 segmented, split-pool, checked-handle, and active-node-index rows have measured
