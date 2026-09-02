@@ -449,6 +449,55 @@ ARMS.E3 = {
   },
 };
 
+ARMS.H0 = {
+  label: 'undo newest scalar turn in a 100-turn retained window',
+  create: () => scalarTree(100),
+  setup: async (tree) => {
+    await addIndependentScalarTurns(tree, 100);
+  },
+  run: async (tree) => {
+    tree.undo();
+    await flush();
+    if (tree.$.value() !== 99 || !tree.canRedo()) {
+      throw new Error('H0 postcondition failed');
+    }
+  },
+};
+
+ARMS.H1 = {
+  label: 'redo oldest scalar turn in a 100-turn retained window',
+  create: () => scalarTree(100),
+  setup: async (tree) => {
+    await addIndependentScalarTurns(tree, 100);
+    for (let count = 0; count < 100; count++) {
+      tree.undo();
+      await flush();
+    }
+  },
+  run: async (tree) => {
+    tree.redo();
+    await flush();
+    if (tree.$.value() !== 1 || !tree.canUndo()) {
+      throw new Error('H1 postcondition failed');
+    }
+  },
+};
+
+ARMS.H2 = {
+  label: 'jump to first scalar turn in a 100-turn retained window',
+  create: () => scalarTree(100),
+  setup: async (tree) => {
+    await addIndependentScalarTurns(tree, 100);
+  },
+  run: async (tree) => {
+    tree.jumpTo(0);
+    await flush();
+    if (tree.$.value() !== 1 || tree.getCurrentIndex() !== 0) {
+      throw new Error('H2 postcondition failed');
+    }
+  },
+};
+
 const arms = requestedArm ? { [requestedArm]: ARMS[requestedArm] } : ARMS;
 if (Object.values(arms).some((arm) => arm === undefined)) {
   throw new Error(`Unknown arm: ${requestedArm}`);
