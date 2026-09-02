@@ -1,4 +1,4 @@
-## Unreleased
+## 15.0.0-rc.3 (2026-09-02)
 
 - **Release CI runs the full project test aggregate sequentially.** RC2's tagged
   verification failed `test:all` twice while the same tag passed all five
