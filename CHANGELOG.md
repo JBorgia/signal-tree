@@ -1,3 +1,10 @@
+## 15.0.0-rc.11 (2026-09-02)
+
+- **Canonical CI publication has a managed-token fallback.** The publisher uses
+  GitHub's `NPM_TOKEN` repository secret when package-level npm trusted
+  publishing is unavailable, while preserving provenance and validating that
+  the credential mapping remains configured.
+
 ## 15.0.0-rc.10 (2026-09-02)
 
 - **Full-size scalar complexity control has an explicit CI budget.** The

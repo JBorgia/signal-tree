@@ -137,9 +137,14 @@ verification passed the full 69-gate set, while the independently dispatched
 canonical publisher timed out this full-size logical-work control at Vitest's
 default five seconds. The control remains logically green under CI settings and
 now receives the same 20-second budget as the neighboring large-harness audits
-at `be652320`. This release-system correction earns RC10. RC10 publication must
-confirm npm integrity equals the candidate and V3 must compile Scaletrax against
-the exact registry artifacts before this defect is fully closed.
+at `be652320`. RC10 (`f12628c5`, signed tag `v15.0.0-rc.10`) is immutable but
+unpublished: both its tag verification and publisher matrix passed, but npm
+rejected the kernel PUT because per-package trusted-publishing setup is absent.
+The canonical publisher now accepts GitHub's managed `NPM_TOKEN` fallback and a
+mutation proof fails if that mapping is removed (`c2cdb26a`). This release-system
+correction earns RC11. RC11 publication must confirm npm integrity equals the
+candidate and V3 must compile Scaletrax against the exact registry artifacts
+before this defect is fully closed.
 
 `ENTITY-PHYSICAL-DENSITY-0` is **CLOSED AS AN ARCHITECTURE-SELECTION
 INVESTIGATION** at `14302192`. E0-E5 and the subject-record, stable-slot,
