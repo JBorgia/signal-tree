@@ -99,7 +99,6 @@ type CanonicalTurn<T> = Omit<RestorationHistoryEntry<T>, 'state'> & {
   id: number;
   historyIndex: number;
   __turnId: number;
-  __ownerPaths?: string[];
   /**
    * RESTORATION CLAIM SET — the subjects whose backing must conservatively
    * remain available while this record is retained.
@@ -558,7 +557,6 @@ class RestorationManager<T> {
   addEntry(
     action: string,
     payload?: unknown,
-    ownerPaths?: string[],
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
@@ -569,7 +567,6 @@ class RestorationManager<T> {
     const entry = this.buildTurn(
       action,
       payload,
-      ownerPaths,
       subjectIds,
       positionIds,
       effects,
@@ -588,7 +585,6 @@ class RestorationManager<T> {
   createPendingEntry(
     action: string,
     payload?: unknown,
-    ownerPaths?: string[],
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
@@ -598,7 +594,6 @@ class RestorationManager<T> {
     const entry = this.buildTurn(
       action,
       payload,
-      ownerPaths,
       subjectIds,
       positionIds,
       effects,
@@ -613,7 +608,6 @@ class RestorationManager<T> {
     this.pendingTurns.set(entry.id, entry);
     return {
       ...entry,
-      __ownerPaths: entry.__ownerPaths ? [...entry.__ownerPaths] : undefined,
       restorationSubjectIds: entry.restorationSubjectIds
         ? [...entry.restorationSubjectIds]
         : undefined,
@@ -678,7 +672,6 @@ class RestorationManager<T> {
   private buildTurn(
     action: string,
     payload?: unknown,
-    ownerPaths?: string[],
     subjectIds?: number[],
     positionIds?: number[],
     effects?: TurnEffect[],
@@ -757,13 +750,6 @@ class RestorationManager<T> {
 
     const turnId = explicitTurnId ?? this.nextTurnId;
     this.nextTurnId = Math.max(this.nextTurnId, turnId + 1);
-    const effectOwnerPaths = Array.from(
-      new Set(
-        (effects ?? [])
-          .map((effect) => effect.ownerPath)
-          .filter((value): value is string => typeof value === 'string')
-      )
-    ).sort();
     const effectSubjectIds = Array.from(
       new Set(
         (effects ?? [])
@@ -794,11 +780,6 @@ class RestorationManager<T> {
         )
       )
       .filter((delta) => delta.participants.length > 0);
-    const resolvedOwnerPaths =
-      ownerPaths && ownerPaths.length > 0 ? ownerPaths : effectOwnerPaths;
-    if (resolvedOwnerPaths.length > 0) {
-      entry.__ownerPaths = [...resolvedOwnerPaths];
-    }
     const resolvedSubjectIds =
       subjectIds && subjectIds.length > 0 ? subjectIds : effectSubjectIds;
     if (resolvedSubjectIds.length > 0) {
@@ -945,7 +926,6 @@ class RestorationManager<T> {
       .map((turn) => ({
         ...turn,
         state: turn.state ?? stateByTurnId.get(turn.id),
-        __ownerPaths: turn.__ownerPaths ? [...turn.__ownerPaths] : undefined,
         restorationSubjectIds: turn.restorationSubjectIds
           ? [...turn.restorationSubjectIds]
           : undefined,
@@ -974,7 +954,6 @@ class RestorationManager<T> {
     return {
       ...turn,
       state,
-      __ownerPaths: turn.__ownerPaths ? [...turn.__ownerPaths] : undefined,
       restorationSubjectIds: turn.restorationSubjectIds
         ? [...turn.restorationSubjectIds]
         : undefined,
@@ -3325,7 +3304,6 @@ export function restoration(
       const entry = restorationManager.createPendingEntry(
         'transaction',
         undefined,
-        ownerPaths.length > 0 ? ownerPaths : undefined,
         subjectIds.length > 0 ? subjectIds : undefined,
         positionIds.length > 0 ? positionIds : undefined,
         effects.length > 0 ? effects : undefined,
@@ -3713,7 +3691,6 @@ export function restoration(
               ? restorationManager.addEntry(
                   'batch',
                   undefined,
-                  ownerPaths.length > 0 ? ownerPaths : undefined,
                   subjectIds.length > 0 ? subjectIds : undefined,
                   positionIds.length > 0 ? positionIds : undefined,
                   effects.length > 0 ? effects : undefined,

@@ -233,7 +233,6 @@ describe('restoration enhancer', () => {
         trucks: { all: { id: number; driverId: number | null }[] };
         orders: { all: { id: number; status: string }[] };
       };
-      __ownerPaths?: string[];
       __positionIds?: number[];
     };
     expect(confirmedTurn.state).toEqual({
@@ -241,11 +240,6 @@ describe('restoration enhancer', () => {
       trucks: { all: [{ id: 12, driverId: 7 }] },
       orders: { all: [{ id: 99, status: 'dispatched' }] },
     });
-    expect([...(confirmedTurn.__ownerPaths ?? [])].sort()).toEqual([
-      'drivers',
-      'orders',
-      'trucks',
-    ]);
     expect(confirmedTurn.__positionIds).toHaveLength(3);
     expect(t.getTurnStatus(confirmedTurn.id)).toBe('applied');
   });
@@ -320,17 +314,13 @@ describe('restoration enhancer', () => {
     const pendingTurn = turns.at(-2) as {
       id: number;
       state: { inside: string; outside: string };
-      __ownerPaths?: string[];
     };
     const laterTurn = turns.at(-1) as {
       state: { inside: string; outside: string };
-      __ownerPaths?: string[];
     };
     expect(pendingTurn.state).toEqual({ inside: 'grouped', outside: '' });
-    expect(pendingTurn.__ownerPaths).toEqual(['inside']);
     expect(t.getTurnStatus(pendingTurn.id)).toBe('applied');
     expect(laterTurn.state).toEqual({ inside: 'grouped', outside: 'later' });
-    expect(laterTurn.__ownerPaths).toEqual(['outside']);
   });
 
   it('rejects nested explicit transactions', () => {
@@ -993,11 +983,9 @@ describe('restoration enhancer', () => {
     expect(turns).toHaveLength(baseline + 3);
 
     const beforeTurn = turns.at(-3) as {
-      __ownerPaths?: string[];
       state: { status: string; other: string; rows: { all: unknown[] } };
     };
     const pendingTurn = turns.at(-2) as {
-      __ownerPaths?: string[];
       state: {
         status: string;
         other: string;
@@ -1005,27 +993,22 @@ describe('restoration enhancer', () => {
       };
     };
     const afterTurn = turns.at(-1) as {
-      __ownerPaths?: string[];
       state: {
         status: string;
         other: string;
         rows: { all: Array<{ id: number; name: string }> };
       };
     };
-
-    expect(beforeTurn.__ownerPaths).toEqual(['status']);
     expect(beforeTurn.state).toEqual({
       status: 'queued-before',
       other: 'before',
       rows: { all: [] },
     });
-    expect(pendingTurn.__ownerPaths).toEqual(['rows']);
     expect(pendingTurn.state).toEqual({
       status: 'queued-before',
       other: 'before',
       rows: { all: [{ id: 17, name: 'pending' }] },
     });
-    expect(afterTurn.__ownerPaths).toEqual(['other']);
     expect(afterTurn.state).toEqual({
       status: 'queued-before',
       other: 'queued-after',
@@ -1068,10 +1051,8 @@ describe('restoration enhancer', () => {
     expect(t.getTurns()).toHaveLength(baseline + 1);
 
     const survivingTurn = t.getTurns().at(-1) as {
-      __ownerPaths?: string[];
       state: { a: number; rows: { all: unknown[] } };
     };
-    expect(survivingTurn.__ownerPaths).toEqual(['a']);
     expect(survivingTurn.state).toEqual({ a: 1, rows: { all: [] } });
   });
 
@@ -2988,8 +2969,6 @@ describe('restoration enhancer', () => {
 
     unsubscribe();
 
-    expect(addEntry?.__ownerPaths).toEqual(['rows']);
-    expect(changeIdEntry?.__ownerPaths).toEqual(['rows']);
     expect(observed.at(-2)).toEqual({
       action: 'batch',
       ownerPaths: ['rows'],
@@ -3816,7 +3795,6 @@ describe('restoration enhancer', () => {
 
     const turn = t.getTurns().at(-1) as {
       id: number;
-      __ownerPaths?: string[];
       __positionIds?: number[];
       __effects?: Array<{
         kind: string;
@@ -3831,7 +3809,6 @@ describe('restoration enhancer', () => {
     expect(fullName()).toBe('Jon Borgia');
     expect(t.getRestorationHistory()).toHaveLength(baselineRestorationCount + 1);
     expect(t.getTurns()).toHaveLength(baselineTurnCount + 1);
-    expect(turn.__ownerPaths).toEqual(['profile.firstName']);
     expect(turn.__positionIds).toHaveLength(1);
     expect(turn.__effects).toHaveLength(1);
     expect(turn.__effects?.[0]).toMatchObject({
