@@ -33,6 +33,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
+    maxWorkers: process.env['CI'] ? 2 : undefined,
     include: [
       '**/*.spec.ts',
       'tests/**/*.spec.ts',

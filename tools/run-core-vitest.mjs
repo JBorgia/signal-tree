@@ -73,4 +73,10 @@ const result = spawnSync(
   }
 );
 
+if (result.error) {
+  console.error(`Kernel Vitest process failed to start: ${result.error.message}`);
+}
+if (result.signal) {
+  console.error(`Kernel Vitest process terminated by signal ${result.signal}`);
+}
 process.exit(result.status ?? 1);
