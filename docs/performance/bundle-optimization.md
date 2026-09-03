@@ -18,8 +18,9 @@ under `ngDevMode: false`. The `devmode-foldable` gate proves they actually do,
 rather than assuming it.
 
 **Do not pitch SignalTree on bundle size.** Measured against the field it sits
-near the top of the range — NgRx SignalStore is roughly 1.9 KB and Elf roughly
-2.1 KB. The trade is capability per KB, not KB.
+near the top of the range — the matched NgRx Signals slices in
+`tools/size-compare.mjs` are substantially smaller. The trade is capability per
+KB, not KB.
 
 ## Canonical tools
 

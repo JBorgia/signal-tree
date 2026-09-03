@@ -361,7 +361,7 @@ survives" against the cascade baseline.
 
 Claims of the form _"no other state system provides this"_ are **not licensed**. The
 Angular set was audited by probing installed declarations — `@ngrx/signals` 21.1.1,
-elf 2.5.1 / elf-state-history 1.4.0, `@ngxs/store` 20.1.0 — and none ships scoped
+the surveyed state libraries — and none ships scoped
 history. **MobX-State-Tree's patch/UndoManager and Yjs's `UndoManager`
 (`trackedOrigins`) have not been audited** and are the real prior art. Required
 before a public claim, not before building.

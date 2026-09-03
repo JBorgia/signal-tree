@@ -172,14 +172,15 @@ if (process.argv.includes('--json')) {
   out.subpaths.forEach((r) => console.log(row(r)));
   console.log('\nREALISTIC COMBINATIONS');
   out.combos.forEach((r) => console.log(row(r)));
-  // The "everything" combo uses entityMap WITH a loader, so summing both
-  // entityMap rows would double-count it and overstate the sharing.
+  // The widest current combo uses plain entityMap plus batching and restoration.
+  // Add exactly those individual deltas; omitting entityMap made the measured
+  // combo look larger than its own supposed additive total.
   const additive =
     out.markers
-      .filter((r) => r.feature !== 'entityMap (plain)')
+      .filter((r) => r.feature === 'entityMap (plain)')
       .reduce((a, r) => a + r.deltaKB, 0) +
     out.enhancers
-      .filter((r) => ['batching', 'restoration', 'serialization'].includes(r.feature))
+      .filter((r) => ['batching', 'restoration'].includes(r.feature))
       .reduce((a, r) => a + r.deltaKB, 0);
   // PRE-EXISTING: this looked up a combo named 'everything' that COMBOS has not
   // contained for some time, so the reporter crashed on its own last line with

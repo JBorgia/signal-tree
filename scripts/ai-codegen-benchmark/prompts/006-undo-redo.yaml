@@ -22,7 +22,8 @@ prompt: |
 expected_patterns:
   signaltree:
     must_include: ['signalTree(']
-    should_include_one_of: ['createEditSession', 'createTreeEditSession', 'restoration']
+    should_include_one_of:
+      ['createEditSession', 'createTreeEditSession', 'restoration']
     must_not_include: ['signalStore(', 'createStore', 'BehaviorSubject']
   ngrx-signals:
     must_include: ['signalStore(']
@@ -31,9 +32,6 @@ expected_patterns:
     must_include: ['Store']
   akita:
     must_include: ['Store']
-  elf:
-    must_include: ['createStore']
-    should_include_one_of: ['stateHistory', 'historyPlugin', 'getStateHistory']
 
 behavior_test: |
   const service = TestBed.inject(DrawingService);

@@ -15,7 +15,8 @@ module.exports = {
     // resolves subpaths that ARE directories (e.g. `enhancers`).
     '^@signal-tree/kernel/(authoring)$':
       '<rootDir>/../../packages/kernel/src/$1.ts',
-    '^@signal-tree/kernel/(.*)$': '<rootDir>/../../packages/kernel/src/$1/index.ts',
+    '^@signal-tree/kernel/(.*)$':
+      '<rootDir>/../../packages/kernel/src/$1/index.ts',
     '^@signaltree/(.*)$': '<rootDir>/../../packages/$1/src/index.ts',
     '^@app/(.*)$': '<rootDir>/src/app/$1',
     '^@benchmark/(.*)$': '<rootDir>/src/app/services/benchmark/$1',
@@ -48,7 +49,7 @@ module.exports = {
     // via `.*`, so it matches regardless of nesting depth — `marked` needs
     // the same nesting-agnostic treatment since its bundle is `.esm.js`, not
     // `.mjs`. Both the bare and the nesting-agnostic form are required.
-      'node_modules/(?!(@ngrx|@ngxs|@datorama|@reduxjs|elf|zustand|mobx|valtio|@signaltree|marked|.*\\.mjs$|@angular|@angular/.*|.*node_modules/(marked|@datorama|@reduxjs|zustand|mobx|valtio)/))',
+    'node_modules/(?!(@ngrx|@ngxs|@datorama|@reduxjs|zustand|mobx|valtio|@signaltree|marked|.*\\.mjs$|@angular|@angular/.*|.*node_modules/(marked|@datorama|@reduxjs|zustand|mobx|valtio)/))',
   ],
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',

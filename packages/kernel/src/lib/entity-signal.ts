@@ -62,7 +62,7 @@ const WRONG_ENTITY_METHODS: Record<string, string> = {
   selectEntity: 'byId(id)',
   addEntities: 'addMany(entities)',
   setEntities: 'setAll(entities)',
-  setProps: 'set leaves directly — entityMap has no props (Elf pattern)',
+  setProps: 'set leaves directly — entityMap has no props object',
   next: 'set leaves directly — not an RxJS Subject',
   asObservable: 'use the signal directly — not an RxJS Subject',
 };

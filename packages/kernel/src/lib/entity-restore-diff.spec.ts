@@ -11,8 +11,8 @@ import { signalTree } from './signal-tree';
  * Restoring used to call `setAll` unconditionally — rebuilding the storage map,
  * the id index and every per-entity signal on every undo. Measured at 10,000
  * entities that was 3.62 ms per restore, and it made undo/redo over a large
- * collection ~150x slower than elf's state-history, which restores by swapping
- * one immutable reference.
+ * collection ~150x slower than an immutable-root history that restores by
+ * swapping one reference.
  *
  * A snapshot SHARES its entity objects with the live tree (measured 499/500
  * identical after a single-entity edit), so a reference walk finds exactly the
@@ -190,7 +190,9 @@ describe('undo/redo end to end still reverts a large collection', () => {
     const N = 300;
     const rows: Row[] = [];
     for (let i = 0; i < N; i++) rows.push({ id: i, v: i });
-    const { restoration } = await import('../enhancers/restoration/restoration');
+    const { restoration } = await import(
+      '../enhancers/restoration/restoration'
+    );
     const tree = signalTree(
       {
         rows: entityMap<Row, number>({ selectId: (r) => r.id }),

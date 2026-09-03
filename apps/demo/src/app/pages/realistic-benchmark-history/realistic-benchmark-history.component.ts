@@ -5,7 +5,7 @@ import {
   OnInit,
   signal,
   ViewEncapsulation,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -16,6 +16,21 @@ import {
   RealisticBenchmarkService,
   RealisticBenchmarkSubmission,
 } from '../../services/realistic-benchmark.service';
+
+const SUPPORTED_LIBRARY_IDS = new Set([
+  'signaltree',
+  'ngrx',
+  'ngrx-store',
+  'ngrx-signals',
+  'akita',
+  'ngxs',
+]);
+
+const libraryId = (library: string): string =>
+  library.toLowerCase().replaceAll(' ', '-');
+
+const isSupportedLibrary = (library: string): boolean =>
+  SUPPORTED_LIBRARY_IDS.has(libraryId(library));
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 @Component({
@@ -85,7 +100,9 @@ export class RealisticBenchmarkHistoryComponent implements OnInit {
   }
 
   get filteredBenchmarks() {
-    let filtered = this.benchmarks();
+    let filtered = this.benchmarks().filter((benchmark) =>
+      isSupportedLibrary(benchmark.summary.winnerLibrary)
+    );
 
     // Apply library filter
     if (this.selectedLibrary() !== 'all') {
@@ -126,7 +143,9 @@ export class RealisticBenchmarkHistoryComponent implements OnInit {
 
   get uniqueLibraries() {
     const libraries = new Set(
-      this.benchmarks().map((b) => b.summary.winnerLibrary)
+      this.benchmarks()
+        .map((benchmark) => benchmark.summary.winnerLibrary)
+        .filter(isSupportedLibrary)
     );
     return Array.from(libraries).sort();
   }
@@ -174,7 +193,6 @@ export class RealisticBenchmarkHistoryComponent implements OnInit {
       ngrx: 'secondary',
       'ngrx-signals': 'info',
       akita: 'warning',
-      elf: 'success',
       ngxs: 'purple',
     };
     return colors[library.toLowerCase()] || 'default';
@@ -241,6 +259,7 @@ export class RealisticBenchmarkHistoryComponent implements OnInit {
 
     // First pass: collect all scenarios and their library results
     Object.entries(data.results.libraries).forEach(([libName, libData]) => {
+      if (!isSupportedLibrary(libName)) return;
       Object.entries(libData.scenarios).forEach(
         ([scenarioId, scenarioData]) => {
           if (!scenarioMap.has(scenarioId)) {
@@ -324,6 +343,7 @@ export class RealisticBenchmarkHistoryComponent implements OnInit {
 
   getWeightedResultsArray(libraries: Record<string, any>): Array<any> {
     return Object.entries(libraries)
+      .filter(([name]) => isSupportedLibrary(name))
       .map(([name, data]) => ({
         name,
         ...data,
@@ -343,7 +363,6 @@ export class RealisticBenchmarkHistoryComponent implements OnInit {
         'NgRx Store': 'ngrx-store',
         'NgRx Signals': 'ngrx-signals',
         Akita: 'akita',
-        Elf: 'elf',
         NGXS: 'ngxs',
       };
       const libraryId = libraryIdMap[libraryName] || libraryName.toLowerCase();

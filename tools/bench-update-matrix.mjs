@@ -31,8 +31,8 @@
  * ## Fairness rules, inherited from bench-compare.mjs
  *
  * Every arm implements the same CAPABILITY using that library's own documented
- * API — `entityMap`, `@ngrx/signals/entities`, `elf` + `withEntities`, and a
- * hand-rolled Map-of-signals for "no library". Where a library has no
+ * API — `entityMap`, `@ngrx/signals/entities`, and a hand-rolled
+ * Map-of-signals for "no library". Where a library has no
  * equivalent primitive the cell reports `n/a` and says why; it never reports a
  * hand-rolled substitute as if it were the library's own, and it never omits
  * the row to avoid an unflattering number.
@@ -183,59 +183,6 @@ const IMPLS = {
     };
   },
 
-  elf: async (featured) => {
-    const { createStore, withProps } = await import('@ngneat/elf');
-    const {
-      withEntities,
-      setEntities,
-      updateEntities,
-      addEntities,
-      deleteEntities,
-      getEntity,
-      getEntitiesCount,
-      selectEntity,
-    } = await import('@ngneat/elf-entities');
-    const { stateHistory } = await import('@ngneat/elf-state-history');
-    const store = createStore(
-      { name: 'bench' },
-      withProps({}),
-      withEntities({ initialValue: [] })
-    );
-    // Attached in the featured config so its per-update recording cost is IN
-    // the measurement, which is the whole point of the featured arm. Never read
-    // here — `undo()` belongs to bench-compare.mjs, not to an update matrix.
-    const elfHistory = featured ? stateHistory(store, { maxAge: 200 }) : null;
-    void elfHistory;
-    const subscriptions = [];
-    return {
-      setAll: (d) => store.update(setEntities(d)),
-      updateOne: (id, changes) => store.update(updateEntities(id, changes)),
-      replaceOne: (id, row) => store.update(updateEntities(id, () => row)),
-      addOne: (row) => store.update(addEntities(row)),
-      removeOne: (id) => store.update(deleteEntities(id)),
-      readOne: (id) => store.query(getEntity(id)),
-      count: () => store.query(getEntitiesCount()),
-      makeConsumer: (id) => {
-        let last;
-        const sub = store.pipe(selectEntity(id)).subscribe((e) => {
-          last = e?.value;
-        });
-        subscriptions.push(sub);
-        return () => last;
-      },
-      teardown: () => {
-        for (const sub of subscriptions) sub.unsubscribe();
-        store.destroy();
-      },
-      // elf has no batching primitive that coalesces N separate `update` calls;
-      // its unit of atomicity is the single `update`.
-      batch: null,
-      // and no transaction/rollback primitive either. `stateHistory().undo()`
-      // is history, not a transaction boundary, so it is NOT substituted here.
-      rollback: null,
-    };
-  },
-
   'raw-signals': async (featured) => {
     const { signal, computed } = await import('@angular/core');
     const byId = new Map();
@@ -294,8 +241,7 @@ const OPS = {
     setup: (impl, n) => impl.setAll(seed(n)),
     run: (impl, n, i) => impl.updateOne(i % n, { value: 900000 + i }),
     check: (impl, n, iterations) =>
-      impl.readOne((iterations - 1) % n)?.value ===
-      900000 + (iterations - 1),
+      impl.readOne((iterations - 1) % n)?.value === 900000 + (iterations - 1),
     iterations: REPEATS,
   },
 
@@ -320,7 +266,8 @@ const OPS = {
     // Capped at 10k. This axis varies FIELD count, not row count, and seeding
     // 100k rows x 100 fields nine times per cell measures the seed loop.
     sizes: [1_000, 10_000],
-    setup: (impl, n) => impl.setAll(seed(n).map((r) => ({ ...r, ...widePatch(10, 'init') }))),
+    setup: (impl, n) =>
+      impl.setAll(seed(n).map((r) => ({ ...r, ...widePatch(10, 'init') }))),
     run: (impl, n, i) => impl.updateOne(i % n, widePatch(10, 'w' + i)),
     check: (impl, n, iterations) =>
       impl.readOne((iterations - 1) % n)?.f9 === `w${iterations - 1}-9`,
@@ -354,8 +301,8 @@ const OPS = {
     unit: 'batch of 100',
     sizes: [1_000, 10_000],
     // Only for arms that HAVE one. ngrx-signals composes updaters into a single
-    // patchState, which is its own equivalent and is measured as such; elf and
-    // raw signals have neither and report n/a.
+    // patchState, which is its own equivalent and is measured as such; raw
+    // signals have neither and report n/a.
     setup: (impl, n) => impl.setAll(seed(n)),
     run: (impl, n, i) => {
       if (impl.batch) {
@@ -368,7 +315,9 @@ const OPS = {
       }
       const updaters = [];
       for (let k = 0; k < BATCH; k++) {
-        updaters.push(impl.makeUpdater(k % n, { value: 800000 + i * BATCH + k }));
+        updaters.push(
+          impl.makeUpdater(k % n, { value: 800000 + i * BATCH + k })
+        );
       }
       impl.batchUpdaters(updaters);
     },
@@ -439,7 +388,9 @@ if (cellFlag !== -1) {
   }
 
   const emit = (payload) => {
-    console.log(JSON.stringify({ lib, config, op: opName, n, consumers, ...payload }));
+    console.log(
+      JSON.stringify({ lib, config, op: opName, n, consumers, ...payload })
+    );
     process.exit(0);
   };
 
@@ -524,7 +475,6 @@ if (cellFlag !== -1) {
     sample = undefined;
   }
 
-
   samples.sort((a, b) => a - b);
   emit({
     medianUs: +(samples[Math.floor(samples.length / 2)] * 1000).toFixed(3),
@@ -538,13 +488,21 @@ if (cellFlag !== -1) {
 // ---------------------------------------------------------------------------
 // DRIVER
 // ---------------------------------------------------------------------------
-const LIBS = ['signaltree', 'ngrx-signals', 'elf', 'raw-signals'];
+const LIBS = ['signaltree', 'ngrx-signals', 'raw-signals'];
 const CONFIGS = ['raw', 'featured'];
 const axis = arg('--axis', 'all');
 
 const REDUCED_SAMPLES = 3;
 
-function runCell(lib, config, op, n, consumers, memory = false, samples = SAMPLES) {
+function runCell(
+  lib,
+  config,
+  op,
+  n,
+  consumers,
+  memory = false,
+  samples = SAMPLES
+) {
   const argv = [
     '--expose-gc',
     // Applied to EVERY cell equally, so it is a resource setting and not a
@@ -634,7 +592,9 @@ const cell = (row) => {
   if (row.skip) return 'n/a';
   if (row.error) return 'OOM';
   if (row.retainedMB !== undefined) return `${row.retainedMB.toFixed(2)}MB`;
-  const marks = `${row.handRolled ? '*' : ''}${row.reducedSamples ? '\u2020' : ''}`;
+  const marks = `${row.handRolled ? '*' : ''}${
+    row.reducedSamples ? '\u2020' : ''
+  }`;
   return `${row.medianUs.toFixed(2)}${marks}`;
 };
 
@@ -650,7 +610,9 @@ const table = (title, subtitle, columns, rows) => {
   console.log('  ' + '─'.repeat(width + columns.length * 12));
   for (const row of rows) {
     console.log(
-      '  ' + row.label.padEnd(width) + row.cells.map((c) => c.padStart(12)).join('')
+      '  ' +
+        row.label.padEnd(width) +
+        row.cells.map((c) => c.padStart(12)).join('')
     );
   }
 };
@@ -661,7 +623,8 @@ const notes = new Set();
 function collectSkips(rows) {
   for (const row of rows) {
     if (row.skip) notes.add(`${row.lib} / ${row.op}: ${row.skip}`);
-    if (row.error) notes.add(`${row.lib} / ${row.op} @ n=${row.n}: ${row.error}`);
+    if (row.error)
+      notes.add(`${row.lib} / ${row.op} @ n=${row.n}: ${row.error}`);
     if (row.reducedSamples) {
       notes.add(
         `${row.lib} / ${row.op} @ n=${row.n}: reduced to ${row.reducedSamples} ` +
@@ -698,7 +661,9 @@ if (axis === 'operations' || axis === 'all') {
       collectSkips(raw);
       report.axes[`operations/${config}/${opName}`] = raw;
       table(
-        `${opName.toUpperCase()} — ${config}  (µs per ${OPS[opName].unit ?? 'operation'}, median of ${SAMPLES})`,
+        `${opName.toUpperCase()} — ${config}  (µs per ${
+          OPS[opName].unit ?? 'operation'
+        }, median of ${SAMPLES})`,
         OPS[opName].detail,
         opSizes.map((n) => `${n / 1000}k rows`),
         rows
@@ -729,7 +694,9 @@ if (axis === 'consumers' || axis === 'all') {
     collectSkips(raw);
     report.axes[`consumers/${config}`] = raw;
     table(
-      `CONSUMER FAN-OUT — ${config}  (µs per update, ${CONSUMER_SIZE / 1000}k rows)`,
+      `CONSUMER FAN-OUT — ${config}  (µs per update, ${
+        CONSUMER_SIZE / 1000
+      }k rows)`,
       'every consumer watches the row being written; they are read inside the timed region',
       CONSUMER_COUNTS.map((c) => `${c} cons`),
       rows
@@ -786,7 +753,9 @@ const errored = Object.values(report.axes)
   .filter((row) => row.error);
 
 if (errored.length > 0) {
-  console.error(`\n\u274c ${errored.length} cell(s) failed to produce a measurement:`);
+  console.error(
+    `\n\u274c ${errored.length} cell(s) failed to produce a measurement:`
+  );
   for (const row of errored) {
     console.error(
       `   - ${row.lib} / ${row.config} / ${row.op} @ n=${row.n}, ` +

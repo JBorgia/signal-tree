@@ -144,7 +144,7 @@ const RESULTS_DIR =
       new Date().toISOString().replace(/[:.]/g, '-')
   );
 
-const ALL_LIBRARIES = ['signaltree', 'ngrx-signals', 'ngrx-store', 'akita', 'elf'];
+const ALL_LIBRARIES = ['signaltree', 'ngrx-signals', 'ngrx-store', 'akita'];
 // Frontier-tier agents always present. Smaller-tier comparison agents (haiku,
 // gpt-mini) opt in via --agent. The runner supports any agent alias that maps
 // to a model slug in the OpenRouter adapter.
@@ -246,7 +246,7 @@ for (const file of promptFiles) {
       try {
         // Substitute <LIBRARY> token in the prompt text
         const libName =
-          { signaltree: 'SignalTree', 'ngrx-signals': '@ngrx/signals', 'ngrx-store': '@ngrx/store', akita: 'Akita', elf: 'Elf' }[lib] ?? lib;
+          { signaltree: 'SignalTree', 'ngrx-signals': '@ngrx/signals', 'ngrx-store': '@ngrx/store', akita: 'Akita' }[lib] ?? lib;
         const promptText = prompt.prompt.replaceAll('<LIBRARY>', libName);
         const generated = await adapters[agent](promptText, { library: lib });
 

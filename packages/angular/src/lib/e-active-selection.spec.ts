@@ -10,7 +10,7 @@ import { entityMap, signalTree } from '../index';
  * `activeId` / `activeEntity` / `setActiveId` / `clearActiveId` are 4 of the 31
  * public members. The source records why they exist:
  *
- *   "Added in 14.0.0 after a capability audit found elf and Akita both ship it
+ *   "Added in 14.0.0 after a capability audit found peer stores ship it
  *    and every team otherwise hand-rolls `activeId: null` plus a derived
  *    lookup. `activeEntity` resolves through `byId`, so it is O(1) and
  *    invalidates only when THAT row changes."

@@ -32,8 +32,6 @@ expected_patterns:
     must_include: ['createSelector', 'Store']
   akita:
     must_include: ['Query']
-  elf:
-    must_include: ['createStore', 'select']
 
 behavior_test: |
   const service = TestBed.inject(CartService);

@@ -30,8 +30,6 @@ expected_patterns:
     must_include: ['createReducer', 'Store']
   akita:
     must_include: ['Store']
-  elf:
-    must_include: ['createStore']
 
 behavior_test: |
   const service = TestBed.inject(LoginFormService);

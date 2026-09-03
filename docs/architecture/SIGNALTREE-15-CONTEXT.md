@@ -2232,7 +2232,7 @@ collections FORM              **DERIVED — E CLOSED.** All 31 public members
                               membership) — so `prepend*` are membership ops and
                               ordering belongs to the application. activeId /
                               activeEntity / setActiveId / clearActiveId: NO
-                              FUNCTION — the docblock records them as elf/Akita
+                              FUNCTION — the docblock records them as competitor
                               feature parity and names its own alternative, and a
                               plain position + byId gives IDENTICAL granularity.
                               tap: DELETION WITHDRAWN. Event identity is NOT

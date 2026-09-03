@@ -34,9 +34,6 @@ expected_patterns:
   akita:
     must_include: ['Store']
     should_include_one_of: ['persistState', 'persistStorage']
-  elf:
-    must_include: ['createStore']
-    should_include_one_of: ['persistState', 'localStorageStrategy']
 
 behavior_test: |
   TestBed.overrideProvider(ProfileApi, { useValue: { save$: () => of({ ok: true }) }});

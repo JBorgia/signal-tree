@@ -298,7 +298,7 @@ const TARGETS = {
     // its ~500 characters of message text are absent from the prod figure, and
     // `check-devmode-foldable` passes.
     //
-    // What it bought: three capabilities the audit found in elf and Akita and
+    // What it bought: three capabilities the audit found in peer stores and
     // not here, and a diagnostic for a 75x cost (0.27ms hoisted against 20.54ms
     // inline over 1,000 entities) that is otherwise symptomless — the cache is
     // weak, so nothing leaks and nothing breaks; the app is just slow forever.

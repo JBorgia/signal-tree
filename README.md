@@ -65,18 +65,11 @@ whole tree.** Two questions decide whether that trade is in your favour.
 **1. How many live consumers are bound _below the top level_, and how often do you write?**
 
 Only leaves are signals, so a write goes to one leaf and dirties only that leaf's consumers. An
-immutable store re-runs every subscriber's projection on every emission and filters downstream.
-Measured against elf at 100 fixed fields ([`tools/bench-state-scale.mjs`](tools/bench-state-scale.mjs),
-200 writes, median of 11):
-
-| live consumers | SignalTree | elf       |
-| -------------- | ---------- | --------- |
-| 0              | 0.007 ms   | 0.380 ms  |
-| 1,000          | 0.045 ms   | 20.175 ms |
-| 5,000          | 0.195 ms   | 95.730 ms |
-
-And write cost against state size, with zero consumers: at 1,024 root props SignalTree is
-**0.005 ms** and an immutable store is **20.741 ms**, because it copies the slice and we don't.
+immutable store re-runs subscriber projections on emission and filters downstream.
+[`tools/bench-state-scale.mjs`](tools/bench-state-scale.mjs) compares SignalTree
+with `@ngrx/signals` on separate state-size and consumer axes. SignalTree's leaf
+write stays flat as unrelated state grows; quote the measured shape, never a
+bare multiplier.
 
 **2. Do you read the whole collection on every change?**
 
@@ -86,7 +79,11 @@ That hands the granularity win back:
   `all()` rebuilds the array on every change and there are no per-entity consumers to earn the
   granularity back. That gap widens with collection size and with how many per-entity nodes have
   been materialised.
-- Optional deep restoration over a 10,000-row collection also measures **~3× behind elf** (3.67 ms against 1.24 ms). An immutable store restores by swapping one reference; SignalTree writes values back into per-entity signals. That is the price of preserving granular identity, not the center of the SignalTree workload — see [`docs/compare/real-implementations.md`](docs/compare/real-implementations.md).
+- Restoration writes affected values back through stable subjects rather than
+  swapping one immutable root. Treat simple scalar undo as a hot-path question:
+  `RESTORATION-HOT-PATH-0` in [`TODO.md`](TODO.md) separates retained-effect
+  application from lookup, causal bookkeeping, and publication before any
+  representation change.
 
 **High write frequency × many per-entity bindings → SignalTree, by a wide margin. Whole-collection
 reads → an immutable store fits better. If deep undo is the product, benchmark that optional capability separately.**
@@ -107,18 +104,18 @@ Two columns, deliberately separated: **what the measurements say** is a differen
 collapsing them lets one masquerade as the other. The library measurements are ours; the mapping
 from a domain to a workload is judgment, so validate it against your own app.
 
-| Workload                                          | Typical domains                                                                                     | What the measurements say                                                                      | What teams usually pick              |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------ |
-| Streaming telemetry into many per-entity bindings | Fleet & logistics, grid/SCADA, telecom NOC, manufacturing MES, airline & rail ops, trading blotters | **SignalTree, decisively** — 448× at 1,000 consumers                                           | SignalTree                           |
-| Offline-first with server-owned collections       | Field service, mobile ops                                                                           | **Application-owned loading + `entityMap`** until a cache helper earns RC authority            | SignalTree                           |
-| Deep nested state with audit and undo             | Healthcare, claims, regulated workflows                                                             | **SignalTree leans** — nested leaves and restoration are built in; persistence stays app-owned | Toss-up; governance decides          |
-| CRUD over moderate lists, server round-trips      | CRM, ERP, admin consoles, insurance                                                                 | **SignalTree leans** — ~3× on the collection task, tens of × on undo                           | `@ngrx/signals`, on gravity          |
-| Drag-driven boards and schedules                  | Dispatch, Gantt, planning                                                                           | **SignalTree leans** — high write frequency, per-item bindings, moderate collections           | Toss-up                              |
-| Undo/redo over moderate state                     | Editors-in-a-panel, wizards, bulk edit                                                              | **SignalTree** — `@ngrx/signals` has no undo primitive at all                                  | Hand-rolled history (the 262 ms arm) |
-| Whole-dataset reads on every change               | BI and analytics explorers                                                                          | **Depends on modelling** — a plain array leaf is at parity; `entityMap` is the wrong tool      | Toss-up                              |
-| Deep undo over **large** collections              | Design tools, media timelines                                                                       | **An immutable root wins** — needs 10k+ rows _and_ deep history _and_ undo as a core feature   | elf, or immutable under NgRx         |
-| Concurrent editing of one document                | CMS authoring, co-editing                                                                           | **Not a store decision** — a CRDT goes underneath either way                                   | Yjs/Automerge + any store            |
-| Large teams, long-lived, hiring-driven            | Banking core, public sector                                                                         | **No technical winner at this altitude**                                                       | NgRx classic — legitimately so       |
+| Workload                                          | Typical domains                                                                                     | What the measurements say                                                                        | What teams usually pick              |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------ |
+| Streaming telemetry into many per-entity bindings | Fleet & logistics, grid/SCADA, telecom NOC, manufacturing MES, airline & rail ops, trading blotters | **SignalTree leans** — keyed writes stay flat as unrelated state grows                           | SignalTree                           |
+| Offline-first with server-owned collections       | Field service, mobile ops                                                                           | **Application-owned loading + `entityMap`** until a cache helper earns RC authority              | SignalTree                           |
+| Deep nested state with audit and undo             | Healthcare, claims, regulated workflows                                                             | **SignalTree leans** — nested leaves and restoration are built in; persistence stays app-owned   | Toss-up; governance decides          |
+| CRUD over moderate lists, server round-trips      | CRM, ERP, admin consoles, insurance                                                                 | **Depends on access shape** — compare keyed reads separately from complete projection            | `@ngrx/signals`, on gravity          |
+| Drag-driven boards and schedules                  | Dispatch, Gantt, planning                                                                           | **SignalTree leans** — high write frequency, per-item bindings, moderate collections             | Toss-up                              |
+| Undo/redo over moderate state                     | Editors-in-a-panel, wizards, bulk edit                                                              | **SignalTree** — `@ngrx/signals` has no undo primitive at all                                    | Hand-rolled history (the 262 ms arm) |
+| Whole-dataset reads on every change               | BI and analytics explorers                                                                          | **Depends on modelling** — a plain array leaf is at parity; `entityMap` is the wrong tool        | Toss-up                              |
+| Deep undo over **large** collections              | Design tools, media timelines                                                                       | **Measure the edit shape** — immutable-root swap and granular subject replay pay different costs | Purpose-built history                |
+| Concurrent editing of one document                | CMS authoring, co-editing                                                                           | **Not a store decision** — a CRDT goes underneath either way                                     | Yjs/Automerge + any store            |
+| Large teams, long-lived, hiring-driven            | Banking core, public sector                                                                         | **No technical winner at this altitude**                                                         | NgRx classic — legitimately so       |
 
 Where the two columns disagree, the honest reading is "a toss-up that gravity decides" — not
 "something else fits better."
@@ -160,8 +157,8 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
   the fan-out benefit — measured at 97.47 µs against 1.90 µs for the per-entity path. Model it as a
   plain array leaf, or use a store that returns its state by reference.
 - **Deep undo over large collections.** Restoring writes values back into per-entity signals rather
-  than swapping a reference — ~2.5× behind elf at 10,000 rows. If the undo stack _is_ the product
-  (design tools, timeline editors), that ratio is the wrong way round for you. If you just need undo
+  than swapping an immutable root reference. If the undo stack _is_ the product
+  (design tools, timeline editors), profile that exact edit shape. If you just need undo
   over a big grid, `undoable()` is the lever: designate only the operations that should be
   reversible, and the rest of the grid's churn never enters the undo stack at all.
 - **Collaborative document editing.** Merge semantics belong in a CRDT (Yjs, Automerge) underneath

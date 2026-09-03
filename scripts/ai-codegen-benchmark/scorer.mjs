@@ -48,12 +48,6 @@ const VALID_PACKAGES = new Set([
   '@datorama/akita',
   '@datorama/akita-ng-router-store',
   '@datorama/akita-ngdevtools',
-  // Elf
-  '@ngneat/elf',
-  '@ngneat/elf-entities',
-  '@ngneat/elf-requests',
-  '@ngneat/elf-devtools',
-  '@ngneat/elf-pagination',
   // Standard browser/Node
   'zone.js',
 ]);

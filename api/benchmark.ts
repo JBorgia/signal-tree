@@ -9,7 +9,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * This endpoint is kept for backward compatibility to access any existing historical data.
  *
  * For NEW benchmark data, see /api/realistic-benchmark.ts which handles the
- * "Realistic Comparison" benchmarks (SignalTree vs NgRx vs Akita vs Elf vs NgXs).
+ * "Realistic Comparison" benchmarks (SignalTree vs NgRx vs Akita vs NgXs).
  */
 
 interface BenchmarkSubmission {

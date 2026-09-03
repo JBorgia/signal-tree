@@ -35,10 +35,7 @@ ai-codegen-benchmark/
 │   └── perplexity.mjs       # Perplexity API
 ├── libraries/               # one config per Angular state library
 │   ├── signaltree.json
-│   ├── ngrx-signals.json
-│   ├── ngrx-store.json
-│   ├── akita.json
-│   └── elf.json
+│   └── ngrx-signals.json
 ├── runner.mjs               # main runner — dispatches across prompts × libs × agents
 ├── scorer.mjs               # compile + behavior + idiomatic scoring
 └── results/                 # one timestamped run output per execution
@@ -115,11 +112,11 @@ Outputs to `results/<timestamp>/`:
 
 The audit's central question — **"Why does an AI agent reach for NgRx instead of SignalTree?"** — is testable. If we publish a reproducible scorecard showing:
 
-| Library | Compile success | Behavioral correctness | Idiomatic adherence | Overall |
-|---|---|---|---|---|
-| SignalTree | 92% | 87% | 84% | **88%** |
-| @ngrx/signals | 78% | 71% | 80% | 76% |
-| @ngrx/store (classic) | 65% | 52% | 78% | 65% |
+| Library               | Compile success | Behavioral correctness | Idiomatic adherence | Overall |
+| --------------------- | --------------- | ---------------------- | ------------------- | ------- |
+| SignalTree            | 92%             | 87%                    | 84%                 | **88%** |
+| @ngrx/signals         | 78%             | 71%                    | 80%                 | 76%     |
+| @ngrx/store (classic) | 65%             | 52%                    | 78%                 | 65%     |
 
 …that's a developer-experience headline no other Angular state library has earned. Bundle-size charts are easy to dispute ("my app is different"). AI-correctness percentages are auditable and reproducible.
 

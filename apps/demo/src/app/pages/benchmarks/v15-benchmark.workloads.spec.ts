@@ -11,7 +11,6 @@ const expectedKeyedArms = [
   'signaltree-angular',
   'signaltree-kernel',
   'ngrx-signals',
-  'elf',
   'akita',
   'redux-toolkit',
 ];
@@ -19,7 +18,6 @@ const expectedKeyedArms = [
 const expectedHistoryArms = [
   'signaltree-angular',
   'signaltree-kernel',
-  'elf',
   'akita',
 ];
 
@@ -85,7 +83,8 @@ describe('v15 browser benchmark workloads', () => {
         .featureSource
     ).toContain('Built-in');
     expect(
-      restoration.arms.find((arm) => arm.id === 'elf')?.comparison.featureSource
+      restoration.arms.find((arm) => arm.id === 'akita')?.comparison
+        .featureSource
     ).toContain('First-party');
     expect(
       suites
@@ -113,7 +112,7 @@ describe('v15 browser benchmark workloads', () => {
       settle: async () => undefined,
     });
 
-    expect(report.results).toHaveLength(6);
+    expect(report.results).toHaveLength(5);
     expect(report.results.every((result) => result.medianMs >= 0)).toBe(true);
     expect(destroyed).toEqual([true, true]);
   });
@@ -138,7 +137,7 @@ describe('v15 browser benchmark workloads', () => {
     });
 
     expect(report.workload.id).toBe('projection');
-    expect(report.results).toHaveLength(6);
+    expect(report.results).toHaveLength(5);
     expect(report.results.every((result) => result.medianMs >= 0)).toBe(true);
     expect(destroyed).toEqual([true, true]);
   });
@@ -162,7 +161,7 @@ describe('v15 browser benchmark workloads', () => {
       settle: async () => undefined,
     });
 
-    expect(report.results).toHaveLength(4);
+    expect(report.results).toHaveLength(3);
     expect(report.workload.operations).toBe(4);
     expect(report.results.every((result) => result.medianMs >= 0)).toBe(true);
     expect(destroyed).toEqual([true, true]);

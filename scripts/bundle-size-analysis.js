@@ -22,12 +22,6 @@ const libraryEstimates = {
     reasoning: 'Full-featured state management with entity support',
     confidence: 'High - package analysis shows larger size',
   },
-  '@ngneat/elf': {
-    reported: '2KB',
-    estimate: '3-8KB',
-    reasoning: 'Minimal modular approach, but still needs runtime',
-    confidence: 'Medium - depends on which modules are used',
-  },
 };
 
 console.log('📊 Bundle Size Analysis Summary');
@@ -45,5 +39,4 @@ Object.entries(libraryEstimates).forEach(([pkg, data]) => {
 console.log('🎯 Recommendations:');
 console.log('- Akita: Update reported size from 20KB to ~40KB');
 console.log('- NgRx Signals: Verify 12KB is accurate for typical usage');
-console.log('- Elf: Consider that 2KB might be minimal import only');
 console.log('- All: Add disclaimer that sizes depend on usage patterns');

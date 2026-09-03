@@ -234,7 +234,7 @@ record-then-filter step.
 | Import/generate, then one undo                      | —                                                                                                            | **No.** `pauseRecording()` was removed in 14.1.1 (see lever 3) and has no replacement |
 | Audit trail rather than undo                        | `getRestorationHistory()` for retained undo entries; use an application event log for a complete audit trail | Restoration history is not a complete audit log                                       |
 | Show the user how far they can go                   | `getCurrentIndex()` back, `getRestorationHistory().length - 1 - getCurrentIndex()` fwd                       | Yes — reactive since 14.0.0                                                           |
-| Undo per entity, independently                      | —                                                                                                            | **No.** elf has this; we do not                                                       |
+| Undo per entity, independently                      | —                                                                                                            | **No.** Keep independent edit scopes in application-owned state                       |
 | Collaborative editing                               | A CRDT (Yjs, Automerge) underneath — undo is per-user, not per-document                                      | **Not a store feature.** Don't                                                        |
 
 ## Reactive readers, and why that mattered
