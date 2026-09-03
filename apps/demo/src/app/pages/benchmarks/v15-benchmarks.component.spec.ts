@@ -61,7 +61,6 @@ describe('V15BenchmarksComponent', () => {
 
     expect(rendered).toContain('Recurring application-state performance');
     expect(rendered).not.toContain('Initialize and populate keyed state');
-    expect(rendered).toContain('Update and read standalone scalar state');
     expect(rendered).toContain('Update and read one keyed record');
     expect(rendered).toContain('Update one record and re-read the collection');
     expect(rendered).toContain('Consequential authored work: record and undo');
@@ -69,7 +68,6 @@ describe('V15BenchmarksComponent', () => {
     expect(rendered).toContain('SignalTree Kernel');
     expect(rendered).toContain('NgRx Signals');
     expect(rendered).toContain('Redux Toolkit');
-    expect(rendered).toContain('TanStack Store');
     expect(rendered).toContain('Zustand');
     expect(rendered).toContain('MobX');
     expect(rendered).toContain('Valtio');
@@ -87,7 +85,6 @@ describe('V15BenchmarksComponent', () => {
     expect(rendered).toContain('How each result is calculated');
     expect(rendered).toContain('Calculation and timer boundaries');
     expect(rendered).toContain('First-party keyed entity state');
-    expect(rendered).toContain('Framework-neutral frontend scalar state');
     expect(rendered).toContain('First-party linear undo over keyed state');
     expect(rendered).toContain(
       'Only implementations meeting every requirement receive a timing'
@@ -114,7 +111,6 @@ describe('V15BenchmarksComponent', () => {
     );
     expect(rendered).toContain('@ngrx/signals 21.1.1');
     expect(rendered).toContain('@reduxjs/toolkit 2.12.0');
-    expect(rendered).toContain('@tanstack/store 0.11.1');
     expect(rendered).toContain('Reproduce and inspect');
     expect(rendered).toContain('Ten-year architecture bet');
     expect(rendered).toContain(
@@ -143,10 +139,10 @@ describe('V15BenchmarksComponent', () => {
     ).toBeGreaterThan(0);
     expect(
       fixture.nativeElement.querySelectorAll('.evidence-line a')
-    ).toHaveLength(12);
+    ).toHaveLength(9);
     expect(
       fixture.nativeElement.querySelectorAll('.planned-arm .source-links a')
-    ).toHaveLength(15);
+    ).toHaveLength(13);
     expect(rendered).not.toContain('Middleware');
     expect(rendered).not.toContain('Async enhancer');
     expect(rendered).not.toContain('Time travel');
