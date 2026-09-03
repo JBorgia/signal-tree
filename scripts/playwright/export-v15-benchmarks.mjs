@@ -276,7 +276,7 @@ try {
   }
 
   if (
-    report.workloads.length !== 4 ||
+    report.workloads.length !== 3 ||
     !Number.isInteger(report.measurementPlan.measuredRounds) ||
     report.measurementPlan.measuredRounds < 1 ||
     !Number.isInteger(report.measurementPlan.warmupRounds) ||

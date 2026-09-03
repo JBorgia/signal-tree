@@ -1,5 +1,4 @@
 export type BenchmarkWorkloadId =
-  | 'scalar'
   | 'collection'
   | 'projection'
   | 'restoration';

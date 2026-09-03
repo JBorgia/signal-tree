@@ -15,8 +15,6 @@ const expectedKeyedArms = [
   'redux-toolkit',
 ];
 
-const expectedScalarArms = ['signaltree-kernel', 'tanstack-store'];
-
 const expectedHistoryArms = [
   'signaltree-angular',
   'signaltree-kernel',
@@ -38,7 +36,7 @@ describe('v15 browser benchmark workloads', () => {
     expect(Number.isNaN(projectedValueById(reversedRows, 2))).toBe(true);
   });
 
-  it('uses four recurring checked tasks across real library stores', () => {
+  it('uses three recurring checked tasks across real library stores', () => {
     const suites = createV15BenchmarkSuites({
       collectionSize: 12,
       collectionUpdates: 6,
@@ -47,15 +45,13 @@ describe('v15 browser benchmark workloads', () => {
     });
 
     expect(suites.map((suite) => suite.workload.id)).toEqual([
-      'scalar',
       'collection',
       'projection',
       'restoration',
     ]);
-    expect(suites[0].arms.map((arm) => arm.id)).toEqual(expectedScalarArms);
+    expect(suites[0].arms.map((arm) => arm.id)).toEqual(expectedKeyedArms);
     expect(suites[1].arms.map((arm) => arm.id)).toEqual(expectedKeyedArms);
-    expect(suites[2].arms.map((arm) => arm.id)).toEqual(expectedKeyedArms);
-    expect(suites[3].arms.map((arm) => arm.id)).toEqual(expectedHistoryArms);
+    expect(suites[2].arms.map((arm) => arm.id)).toEqual(expectedHistoryArms);
 
     for (const suite of suites) {
       expect(Object.values(suite.calculation).every(Boolean)).toBe(true);
@@ -77,24 +73,11 @@ describe('v15 browser benchmark workloads', () => {
       expect(suite.relatedSourceUrl).toMatch(/^https:\/\//);
     }
 
-    expect(suites[1].arms.find((arm) => arm.id === 'ngrx-signals')?.label).toBe(
+    expect(suites[0].arms.find((arm) => arm.id === 'ngrx-signals')?.label).toBe(
       'NgRx Signals'
     );
-    expect(
-      suites[0].arms.find((arm) => arm.id === 'tanstack-store')?.label
-    ).toBe('TanStack Store');
-    expect(
-      suites[1].capability.exclusions.find(
-        (exclusion) => exclusion.label === 'TanStack Store'
-      )?.reason
-    ).toContain('not a first-party entity abstraction');
 
-    const restoration = suites[3];
-    expect(
-      restoration.capability.exclusions.find((exclusion) =>
-        exclusion.label.includes('TanStack Store')
-      )?.reason
-    ).toContain('history');
+    const restoration = suites[2];
     expect(
       restoration.arms.find((arm) => arm.id === 'signaltree-kernel')?.comparison
         .featureSource
@@ -110,39 +93,9 @@ describe('v15 browser benchmark workloads', () => {
     ).toBe(false);
   });
 
-  it('updates and reads standalone scalar state through both neutral cores', async () => {
-    const destroyed: boolean[] = [];
-    const [suite] = createV15BenchmarkSuites(
-      {
-        collectionSize: 12,
-        collectionUpdates: 6,
-        restorationSize: 12,
-        restorationWrites: 4,
-      },
-      { onSignalTreeDestroyed: (value) => destroyed.push(value) }
-    );
-
-    const report = await runInterleavedBenchmark({
-      ...suite,
-      rounds: 2,
-      warmupRounds: 0,
-      settle: async () => undefined,
-    });
-
-    expect(report.workload.id).toBe('scalar');
-    expect(report.results.map((result) => result.armId)).toEqual(
-      expectedScalarArms
-    );
-    expect(report.results.every((result) => result.medianMs >= 0)).toBe(true);
-    expect(report.results.every((result) => result.samples.length === 2)).toBe(
-      true
-    );
-    expect(destroyed).toEqual([true]);
-  });
-
   it('seeds before measuring equivalent keyed updates and reads', async () => {
     const destroyed: boolean[] = [];
-    const [, suite] = createV15BenchmarkSuites(
+    const [suite] = createV15BenchmarkSuites(
       {
         collectionSize: 12,
         collectionUpdates: 6,
@@ -169,7 +122,7 @@ describe('v15 browser benchmark workloads', () => {
 
   it('measures the conditional recurring update plus complete read', async () => {
     const destroyed: boolean[] = [];
-    const [, , suite] = createV15BenchmarkSuites(
+    const [, suite] = createV15BenchmarkSuites(
       {
         collectionSize: 12,
         collectionUpdates: 6,
@@ -197,7 +150,7 @@ describe('v15 browser benchmark workloads', () => {
 
   it('makes every restoration arm record writes and restore the seed value', async () => {
     const destroyed: boolean[] = [];
-    const [, , , suite] = createV15BenchmarkSuites(
+    const [, , suite] = createV15BenchmarkSuites(
       {
         collectionSize: 12,
         collectionUpdates: 6,
