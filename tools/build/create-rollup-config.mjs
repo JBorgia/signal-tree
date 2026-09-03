@@ -156,8 +156,8 @@ export function createLibraryRollupConfig({
       },
     };
 
-    const resolveWorkspaceManifestPlugin = {
-      name: 'signaltree-resolve-workspace-manifest',
+    const finalizePublishLayoutPlugin = {
+      name: 'signaltree-finalize-publish-layout',
       async closeBundle() {
         const manifestPath = path.join(targetRoot, 'package.json');
         let content;
@@ -173,6 +173,12 @@ export function createLibraryRollupConfig({
             `${JSON.stringify(manifest, null, 2)}\n`
           );
         }
+        if (manifest.files?.includes('llms.txt')) {
+          await fs.copyFile(
+            path.join(workspaceRoot, 'llms.txt'),
+            path.join(targetRoot, 'llms.txt')
+          );
+        }
       },
     };
 
@@ -181,7 +187,7 @@ export function createLibraryRollupConfig({
       plugins: [
         ...plugins,
         stripJsCommentsPlugin,
-        resolveWorkspaceManifestPlugin,
+        finalizePublishLayoutPlugin,
       ],
       // Entry barrels must keep their re-exports even when the module body is
       // empty after bundling (pure re-export barrels).

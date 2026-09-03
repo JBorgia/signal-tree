@@ -1,0 +1,1119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://signaltree.io/adsp/v2/run-state.schema.json",
+  "title": "ADSP 2.0 Run State",
+  "description": "Portable state for one proportional, evidence-driven ADSP run. Schema validity proves structural completeness, not truth of claims.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "run",
+    "orientation",
+    "question",
+    "claims",
+    "nonClaims",
+    "falsifiers",
+    "controls",
+    "evidence",
+    "invariants",
+    "validations",
+    "events"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "2.0"
+    },
+    "run": {
+      "$ref": "#/$defs/run"
+    },
+    "orientation": {
+      "$ref": "#/$defs/orientation"
+    },
+    "question": {
+      "$ref": "#/$defs/question"
+    },
+    "budget": {
+      "$ref": "#/$defs/budget"
+    },
+    "hypotheses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hypothesis"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "nonClaims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonClaim"
+      }
+    },
+    "falsifiers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/falsifier"
+      }
+    },
+    "controls": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/control"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/review"
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/decision"
+      }
+    },
+    "invariants": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/invariant"
+      }
+    },
+    "freeze": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/freeze"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reopen": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/reopen"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "implementation": {
+      "$ref": "#/$defs/implementation"
+    },
+    "migration": {
+      "$ref": "#/$defs/migration"
+    },
+    "release": {
+      "$ref": "#/$defs/release"
+    },
+    "validations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/validation"
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+    },
+    "stringList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "refList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/identifier"
+      },
+      "uniqueItems": true
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "profile": {
+      "enum": ["P0", "P1", "P2", "P3"]
+    },
+    "mode": {
+      "enum": [
+        "DISCOVERY",
+        "SOLIDIFICATION",
+        "IMPLEMENTATION",
+        "REOPEN",
+        "RELEASE"
+      ]
+    },
+    "stage": {
+      "enum": [
+        "INTAKE",
+        "ORIENTED",
+        "FRAMED",
+        "PREREGISTERED",
+        "CONTROLLED",
+        "OBSERVED",
+        "INTERPRETED",
+        "DECIDED",
+        "IMPLEMENTING",
+        "CONFORMANT",
+        "FROZEN",
+        "MIGRATING",
+        "RELEASE_READY",
+        "RELEASED",
+        "CLOSED",
+        "QUARANTINED",
+        "STOPPED",
+        "BLOCKED"
+      ]
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "protocolVersion",
+        "profile",
+        "profileRationale",
+        "mode",
+        "stage",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "decisionOwner"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "protocolVersion": {
+          "const": "2.0"
+        },
+        "profile": {
+          "$ref": "#/$defs/profile"
+        },
+        "profileRationale": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "mode": {
+          "$ref": "#/$defs/mode"
+        },
+        "stage": {
+          "$ref": "#/$defs/stage"
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "IN_PROGRESS",
+            "QUARANTINED",
+            "STOPPED",
+            "BLOCKED",
+            "CLOSED",
+            "SUPERSEDED"
+          ]
+        },
+        "createdAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "decisionOwner": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "humanAuthorities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/authority"
+          }
+        },
+        "tags": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain", "identity"],
+      "properties": {
+        "domain": {
+          "enum": [
+            "PRODUCT",
+            "ARCHITECTURE",
+            "SECURITY",
+            "LEGAL",
+            "RISK",
+            "RELEASE"
+          ]
+        },
+        "identity": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "orientation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "revision",
+        "dirtyState",
+        "currentArtifacts",
+        "controllersRead",
+        "capturedAt"
+      ],
+      "properties": {
+        "repository": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "revision": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "branch": {
+          "type": ["string", "null"]
+        },
+        "dirtyState": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "ownedPaths", "foreignPaths"],
+          "properties": {
+            "status": {
+              "enum": ["CLEAN", "DIRTY"]
+            },
+            "patchHash": {
+              "type": ["string", "null"]
+            },
+            "ownedPaths": {
+              "$ref": "#/$defs/stringList"
+            },
+            "foreignPaths": {
+              "$ref": "#/$defs/stringList"
+            }
+          }
+        },
+        "currentArtifacts": {
+          "$ref": "#/$defs/stringList"
+        },
+        "controllersRead": {
+          "$ref": "#/$defs/stringList"
+        },
+        "environmentGuards": {
+          "$ref": "#/$defs/stringList"
+        },
+        "capturedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["property", "ownerQuestion", "scope", "prohibitedChanges"],
+      "properties": {
+        "property": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "ownerQuestion": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["include", "exclude"],
+          "properties": {
+            "include": {
+              "$ref": "#/$defs/stringList"
+            },
+            "exclude": {
+              "$ref": "#/$defs/stringList"
+            }
+          }
+        },
+        "prohibitedChanges": {
+          "$ref": "#/$defs/stringList"
+        },
+        "inheritedFraming": {
+          "type": ["string", "null"]
+        },
+        "proposedMechanism": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxReviewRounds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "maxOpenHypotheses": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "deadline": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "stopConditions": {
+          "$ref": "#/$defs/stringList"
+        },
+        "requiredArtifacts": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement", "status"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "statement": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status": {
+          "enum": ["OPEN", "SUPPORTED", "FALSIFIED", "SUPERSEDED"]
+        },
+        "dependsOn": {
+          "$ref": "#/$defs/refList"
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement", "scope", "status", "evidenceRefs", "nonClaimRefs"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "statement": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "scope": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status": {
+          "enum": [
+            "OPEN",
+            "OBSERVED",
+            "INFERRED",
+            "DECIDED_BY_AUTHORITY",
+            "FROZEN",
+            "FALSIFIED",
+            "QUARANTINED",
+            "SUPERSEDED",
+            "RETIRED_HISTORICAL_ONLY"
+          ]
+        },
+        "owner": {
+          "type": ["string", "null"]
+        },
+        "evidenceRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "counterEvidenceRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "falsifierRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "nonClaimRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "supersedes": {
+          "$ref": "#/$defs/refList"
+        },
+        "supersededBy": {
+          "$ref": "#/$defs/refList"
+        }
+      }
+    },
+    "nonClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "statement": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "falsifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "hypothesisRef",
+        "observation",
+        "expectedIfSupported",
+        "expectedIfFalsified",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "hypothesisRef": {
+          "$ref": "#/$defs/identifier"
+        },
+        "observation": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "expectedIfSupported": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "expectedIfFalsified": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "absenceClaim": {
+          "type": "boolean",
+          "default": false
+        },
+        "positiveControlRef": {
+          "type": ["string", "null"]
+        },
+        "status": {
+          "enum": ["PLANNED", "CONTROLLED", "EXECUTED", "FIRED", "DID_NOT_FIRE", "INVALID"]
+        },
+        "evidenceRefs": {
+          "$ref": "#/$defs/refList"
+        }
+      }
+    },
+    "control": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "description", "status"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": [
+            "POSITIVE",
+            "NEGATIVE",
+            "MUTATION",
+            "AA",
+            "TEMPORAL_AUTHORITY",
+            "SUCCESSOR",
+            "PUBLIC_BOUNDARY",
+            "KNOWN_BAD"
+          ]
+        },
+        "description": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status": {
+          "enum": ["PLANNED", "PASSED", "FAILED", "BLIND", "ERRORED", "NOT_APPLICABLE"]
+        },
+        "evidenceRefs": {
+          "$ref": "#/$defs/refList"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "revision",
+        "observation",
+        "interpretation",
+        "integrity",
+        "limitations",
+        "observedAt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": [
+            "TEST",
+            "TYPECHECK",
+            "RUNTIME_PROBE",
+            "CONSUMER",
+            "PACKAGE_ARTIFACT",
+            "BENCHMARK",
+            "MEMORY",
+            "SOURCE_AUDIT",
+            "GREP",
+            "MUTATION",
+            "REVIEW",
+            "RELEASE",
+            "PRODUCT"
+          ]
+        },
+        "claimRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "revision": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "dirtyPatchHash": {
+          "type": ["string", "null"]
+        },
+        "commandOrTool": {
+          "type": ["string", "null"]
+        },
+        "inputs": {
+          "$ref": "#/$defs/stringList"
+        },
+        "artifactHashes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "rawResultRef": {
+          "type": ["string", "null"]
+        },
+        "observation": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "interpretation": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "integrity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reach", "read", "discriminate"],
+          "properties": {
+            "reach": {
+              "enum": ["PROVEN", "NOT_PROVEN", "NOT_APPLICABLE"]
+            },
+            "read": {
+              "enum": ["PROVEN", "NOT_PROVEN", "NOT_APPLICABLE"]
+            },
+            "discriminate": {
+              "enum": ["PROVEN", "NOT_PROVEN", "NOT_APPLICABLE"]
+            }
+          }
+        },
+        "positiveControlRef": {
+          "type": ["string", "null"]
+        },
+        "limitations": {
+          "$ref": "#/$defs/stringList"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "seat", "inputDigest", "outputRef", "status"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "seat": {
+          "enum": ["KILLER", "ABSENCE_ARCHITECT", "DEFENDER", "INTERPRETER", "CODE_REVIEWER"]
+        },
+        "inputDigest": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "forbiddenContext": {
+          "$ref": "#/$defs/stringList"
+        },
+        "modelOrReviewer": {
+          "type": ["string", "null"]
+        },
+        "outputRef": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status": {
+          "enum": ["COMPLETE", "ERRORED", "CONTAMINATED", "NOT_APPLICABLE"]
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "statement", "authority", "evidenceRefs", "nonClaimRefs"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "status": {
+          "enum": [
+            "SURVIVAL_ESTABLISHED",
+            "FUNCTION_NOT_ESTABLISHED",
+            "UNDERDETERMINED_TERMINAL_AS_POSED",
+            "NOT_OPENABLE_AS_WORDED",
+            "ASSIGNED_TO_OWNER",
+            "DECIDED_BY_AUTHORITY",
+            "FROZEN",
+            "SUPERSEDED"
+          ]
+        },
+        "statement": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "authority": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "owner": {
+          "type": ["string", "null"]
+        },
+        "evidenceRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "nonClaimRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "rejectedRivals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rival"
+          }
+        }
+      }
+    },
+    "rival": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim", "premises", "capability", "falsifier", "nonClaims"],
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "premises": {
+          "$ref": "#/$defs/stringList"
+        },
+        "capability": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "falsifier": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "nonClaims": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "statement", "carrierState"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "statement": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "carrierState": {
+          "enum": ["CARRIED", "VACUOUS", "ORPHANED"]
+        },
+        "carrierRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "vacuousReason": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "freeze": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claimRefs",
+        "owner",
+        "evidenceRefs",
+        "conformanceRefs",
+        "nonClaimRefs",
+        "rejectedAlternatives",
+        "reopenOnlyIf",
+        "frozenAt"
+      ],
+      "properties": {
+        "claimRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "owner": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "evidenceRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "conformanceRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "nonClaimRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "rejectedAlternatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rival"
+          }
+        },
+        "reopenOnlyIf": {
+          "$ref": "#/$defs/stringList"
+        },
+        "frozenAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "reopen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "admittedRequirement",
+        "deterministicDiscriminator",
+        "frozenOwner",
+        "compliantAttempts",
+        "architectureFalsification",
+        "incompatibleFrozenClaims",
+        "disposition"
+      ],
+      "properties": {
+        "admittedRequirement": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "deterministicDiscriminator": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "frozenOwner": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "compliantAttempts": {
+          "$ref": "#/$defs/stringList"
+        },
+        "architectureFalsification": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "incompatibleFrozenClaims": {
+          "$ref": "#/$defs/refList"
+        },
+        "disposition": {
+          "enum": ["REOPENED", "RETURN_TO_IMPLEMENTATION", "TERMINAL_AS_POSED"]
+        }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decisionRef": {
+          "type": ["string", "null"]
+        },
+        "frozenOwner": {
+          "type": ["string", "null"]
+        },
+        "requirementRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "changedPaths": {
+          "$ref": "#/$defs/stringList"
+        },
+        "architectureOverrideWarnings": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "OLD_OWNER_PRESERVATION",
+              "REPRESENTATION_VETO",
+              "TEST_LED_DESIGN",
+              "PARALLEL_OWNER_CREATION",
+              "RELOCATION_NOT_RETIREMENT",
+              "COMPATIBILITY_BY_INERTIA",
+              "DIFFICULTY_AS_FALSIFICATION",
+              "MECHANISM_BEFORE_OWNER",
+              "ABSENCE_AS_REQUIREMENT_LOSS",
+              "PRESENCE_AS_REQUIREMENT"
+            ]
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "migration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "targetDecisionRef": {
+          "type": ["string", "null"]
+        },
+        "callers": {
+          "$ref": "#/$defs/stringList"
+        },
+        "compatibilityOwnersAdded": {
+          "$ref": "#/$defs/stringList"
+        },
+        "currentGuidanceUpdated": {
+          "type": "boolean"
+        },
+        "historicalRecordsPreserved": {
+          "type": "boolean"
+        }
+      }
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "candidateId": {
+          "type": ["string", "null"]
+        },
+        "revision": {
+          "type": ["string", "null"]
+        },
+        "tag": {
+          "type": ["string", "null"]
+        },
+        "immutable": {
+          "type": "boolean"
+        },
+        "authorizedBy": {
+          "type": ["string", "null"]
+        },
+        "oneCheckoutOneBuild": {
+          "type": "boolean"
+        },
+        "gateRegisterEvidenceRef": {
+          "type": ["string", "null"]
+        },
+        "candidateArtifactHashes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "registryArtifactHashes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "packedConsumerEvidenceRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "publicationStatus": {
+          "enum": ["NOT_REQUESTED", "AUTHORIZED", "PUBLISHED", "FAILED", "SUPERSEDED"]
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "status"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": [
+            "FOCUSED_TEST",
+            "TYPECHECK",
+            "LINT",
+            "BUILD",
+            "GATE",
+            "GATE_SELF_TEST",
+            "CONSUMER",
+            "PACKAGE",
+            "BROWSER",
+            "REVIEW"
+          ]
+        },
+        "command": {
+          "type": ["string", "null"]
+        },
+        "status": {
+          "enum": ["PASSED", "FAILED", "BLIND", "ERRORED", "NOT_APPLICABLE"]
+        },
+        "evidenceRef": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sequence", "timestamp", "actor", "action", "fromStage", "toStage"],
+      "properties": {
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timestamp": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "actor": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "action": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "fromStage": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/stage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "toStage": {
+          "$ref": "#/$defs/stage"
+        },
+        "evidenceRefs": {
+          "$ref": "#/$defs/refList"
+        },
+        "note": {
+          "type": ["string", "null"]
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "run": {
+            "properties": {
+              "profile": {
+                "enum": ["P1", "P2", "P3"]
+              }
+            },
+            "required": ["profile"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "falsifiers": {
+            "minItems": 1
+          },
+          "controls": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "run": {
+            "properties": {
+              "profile": {
+                "const": "P3"
+              }
+            },
+            "required": ["profile"]
+          }
+        }
+      },
+      "then": {
+        "required": ["release"],
+        "properties": {
+          "reviews": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "run": {
+            "properties": {
+              "mode": {
+                "const": "REOPEN"
+              }
+            },
+            "required": ["mode"]
+          }
+        }
+      },
+      "then": {
+        "required": ["reopen"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "run": {
+            "properties": {
+              "stage": {
+                "enum": ["FROZEN", "MIGRATING", "RELEASE_READY", "RELEASED", "CLOSED"]
+              }
+            },
+            "required": ["stage"]
+          }
+        }
+      },
+      "then": {
+        "required": ["freeze"]
+      }
+    },
+    {
+      "not": {
+        "properties": {
+          "invariants": {
+            "contains": {
+              "properties": {
+                "carrierState": {
+                  "const": "ORPHANED"
+                }
+              },
+              "required": ["carrierState"]
+            }
+          },
+          "run": {
+            "properties": {
+              "status": {
+                "const": "CLOSED"
+              }
+            },
+            "required": ["status"]
+          }
+        },
+        "required": ["invariants", "run"]
+      }
+    }
+  ]
+}
