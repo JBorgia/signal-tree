@@ -12787,6 +12787,29 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       comparator has no manifest, lockfile, installed, executable, current-doc,
       package-source, demo, or built-artifact presence; point-in-time audit and
       comparison evidence remains explicitly historical.
+- [x] **Bounded restoration and bundle performance closure (`e9adaabc`).**
+      `RESTORATION-HOT-PATH-0` attributed the production undo pathology to
+      `assertTurnStatusConsistency()` scanning retained history after every
+      reversal. At 1,000 retained turns, that scan raised the batch from about
+      4 ms without the assertion to about 119 ms. It now runs only when Angular
+      reports development mode or `NODE_ENV` is explicitly `development` or
+      `test`; production and unknown-browser paths retain exact restoration
+      behavior without the diagnostic scan. The rebuilt production path takes
+      about 4-6 ms for 1,000 root undos; the manager effect pipeline is about
+      1.9 ms and precomputed physical application about 1.1 ms. The probe pins
+      values, entity identity, frontiers, retained history, redo state, one
+      atomic application per turn, and zero production consistency scans.
+      `BUNDLE-REACHABILITY-0` found no accidental optional-feature import edge;
+      corrected generators exercise a real `undoable()` turn and measure bare,
+      EntityMap, and restoration at 9.55 KB, 21.49 KB, and 28.11 KB gzip.
+      Density remains closed, construction and bulk population remain
+      regression ceilings, and mixed restoration lifetime profiling is
+      post-GA/non-public. Validation: restoration `114` passing / `1` existing
+      todo; strict typecheck; kernel lint; production demo build and benchmark
+      Playwright `5/5`; bundled Angular, React-style, partial-process, unknown-
+      browser, and development policy probes; release gates `74/74`; release-
+      inclusive mutation proofs `74/74` with zero unproven, blind, or errored
+      gates; final independent review clean.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
