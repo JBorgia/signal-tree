@@ -6,8 +6,8 @@ Each concept includes:
 
 - `*.web.svg` — responsive, themeable desktop composition
 - `*.mobile.svg` — recomposed narrow-screen layout
-- `*.docs.svg` — detailed visual with semantic checks and evidence
-- `*.slide.svg` — 1920 x 1080 presentation composition
+- `*.docs.svg` — detailed visual with plain-language guidance, a real app example, financial impact, semantic checks, and evidence
+- `*.slide.svg` — 1920 x 1080 presentation composition with a compact teaching strip
 - `semantic-spec.json` — nodes, edges, groups, copy, accessibility description, and source evidence
 
 Regenerate with `pnpm architecture:assets`; verify drift with `pnpm architecture:assets:check`.

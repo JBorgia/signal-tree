@@ -130,8 +130,7 @@
     transition: all $transition-fast;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+      border-color: var(--color-primary-500);
     }
   }
 }
@@ -359,8 +358,7 @@
   transition: all $transition-fast;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: $shadow-lg;
+    border-color: var(--color-primary-300);
   }
 
   .stat-value {

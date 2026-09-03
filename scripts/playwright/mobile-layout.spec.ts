@@ -134,3 +134,33 @@ for (const viewport of MOBILE_VIEWPORTS) {
     }
   });
 }
+
+test('open navigation dims the page without blocking it', async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 720 });
+  await page.goto('/docs', { waitUntil: 'load' });
+
+  await page.locator('.navigation-toggle').click();
+  await expect(page.locator('.site-navigation')).toHaveClass(/site-navigation--open/);
+  await expect(page.locator('.navigation-backdrop')).toBeVisible();
+  await expect(page.locator('.navigation-backdrop')).toHaveCSS(
+    'pointer-events',
+    'none'
+  );
+
+  const packageButton = page.locator('.package-button').nth(1);
+  await packageButton.click();
+  await expect(packageButton).toHaveClass(/active/);
+  await expect(page.locator('.site-navigation')).toHaveClass(/site-navigation--open/);
+
+  const initialScroll = await page.evaluate(() => window.scrollY);
+  await page.mouse.move(740, 680);
+  await page.mouse.wheel(0, 600);
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(initialScroll);
+
+  await page.locator('.drawer-close').click();
+  await expect(page.locator('.site-navigation')).not.toHaveClass(
+    /site-navigation--open/
+  );
+});

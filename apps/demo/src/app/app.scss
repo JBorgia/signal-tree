@@ -51,6 +51,10 @@
   text-decoration: none;
 }
 
+.topbar-brand:hover .topbar-brand-name {
+  color: var(--color-primary-700);
+}
+
 .topbar-logo {
   width: 2.35rem;
   height: 2.35rem;

@@ -45,9 +45,7 @@ export const appRoutes: Route[] = [
     loadComponent: () =>
       import(
         './examples/features/fundamentals/examples/async/async-demo.component'
-      ).then(
-        (c) => c.AsyncDemoComponent
-      ),
+      ).then((c) => c.AsyncDemoComponent),
     data: {
       title: 'External truth & Link',
       description:
@@ -71,7 +69,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'benchmark',
-    redirectTo: 'legacy-changelog',
+    redirectTo: 'benchmarks',
     pathMatch: 'full',
   },
   // rxMethod was removed; application orchestration now lands resolved truth
@@ -216,13 +214,20 @@ export const appRoutes: Route[] = [
   // Performance comparisons
   {
     path: 'benchmarks',
-    redirectTo: 'architecture-overview',
-    pathMatch: 'full',
+    loadComponent: () =>
+      import('./pages/benchmarks/v15-benchmarks.component').then(
+        (component) => component.V15BenchmarksComponent
+      ),
+    data: {
+      title: 'Browser performance spot-check',
+      description:
+        'Separate checked initialization, keyed-update, and history workloads across Angular and framework-neutral state-library cores.',
+    },
   },
   // Redirect old route to new one
   {
     path: 'realistic-comparison',
-    redirectTo: 'architecture-overview',
+    redirectTo: 'benchmarks',
     pathMatch: 'full',
   },
 

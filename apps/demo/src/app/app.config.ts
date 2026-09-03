@@ -1,7 +1,6 @@
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
-import { provideStore } from '@ngxs/store';
 import { LineChart } from 'echarts/charts';
 import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
@@ -9,7 +8,6 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { provideEchartsCore } from 'ngx-echarts';
 
 import { appRoutes } from './app.routes';
-import { BenchmarkState } from './pages/realistic-comparison/benchmark-orchestrator/services/ngxs-benchmark.service';
 import { provideRouteMetadata } from './shared/route-metadata';
 import { provideAppTree } from './store';
 
@@ -38,8 +36,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withXhr()),
     // Provide ECharts core for ngx-echarts
     provideEchartsCore({ echarts }),
-    // Provide NgXs store for state management benchmarks
-    provideStore([BenchmarkState]),
     // Provide the canonical SignalTree application tree (see store/)
     ...provideAppTree(),
   ],

@@ -67,8 +67,19 @@
   .notes { box-sizing: border-box; height: 100%; padding: 22px 28px; color: var(--st-ink); border: 1px solid var(--st-line); background: var(--st-neutral); font: 15px/1.5 'IBM Plex Sans', 'Avenir Next', sans-serif; }
   .notes-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 32px; }
   .notes h2 { margin: 0 0 8px; font-size: 15px; text-transform: uppercase; }
+  .notes p { margin: 0; }
   .notes ul { margin: 0; padding-left: 20px; }
   .notes code { font-size: 13px; overflow-wrap: anywhere; }
+  .story-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--st-line); background: var(--st-line); gap: 1px; }
+  .story-item { min-width: 0; padding: 14px 16px; background: var(--st-surface); }
+  .story-item--plain { background: var(--st-authored); }
+  .story-item--example { background: var(--st-framework); }
+  .story-item--money { background: var(--st-restoration); }
+  .story-item h2 { margin-bottom: 6px; font-size: 12px; }
+  .story-item p { font-size: 14px; line-height: 1.45; }
+  .slide-story { box-sizing: border-box; height: 100%; color: var(--st-ink); font: 18px/1.4 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .slide-story .story-item { padding: 16px 18px; }
+  .slide-story .story-item h2 { font-size: 13px; }
   @media (prefers-reduced-motion: reduce) { .node rect { transition: none; } }
 </style>
   <defs>
@@ -79,5 +90,10 @@
   <rect width="1920" height="1080" fill="url(#accessor-grammar-slide-grid)"/>
   <text class="slide-title" x="120" y="120">The API follows the shape of the location</text>
   <text class="slide-takeaway" x="120" y="180">Root and branch accessors are callable in both directions; leaves retain their reactive cell API.</text>
-  <g transform="translate(217.1428571428571 315) scale(1.4285714285714286)"><g></g><g><g class="node node--kernel"><title>Root accessor</title><rect x="25" y="70" width="235" height="295" rx="0"/><text class="node-title" x="142.5" y="223.5" text-anchor="middle"><tspan x="142.5" dy="0">Root accessor</tspan></text></g><g class="node node--authored"><title>Branch accessor</title><rect x="275" y="70" width="235" height="295" rx="0"/><text class="node-title" x="392.5" y="223.5" text-anchor="middle"><tspan x="392.5" dy="0">Branch accessor</tspan></text></g><g class="node node--framework"><title>Leaf signal</title><rect x="525" y="70" width="235" height="295" rx="0"/><text class="node-title" x="642.5" y="223.5" text-anchor="middle"><tspan x="642.5" dy="0">Leaf signal</tspan></text></g><g class="node node--identity"><title>EntityMap collection</title><rect x="775" y="70" width="240" height="295" rx="0"/><text class="node-title" x="895" y="223.5" text-anchor="middle"><tspan x="895" dy="0">EntityMap collection</tspan></text></g></g></g>
+  <g transform="translate(342.8571428571429 220) scale(1.1868131868131868)"><g class="edge-paths"></g><g class="nodes"><g class="node node--kernel"><title>Root accessor</title><rect x="25" y="70" width="235" height="295" rx="0"/><text class="node-title" x="142.5" y="223.5" text-anchor="middle"><tspan x="142.5" dy="0">Root accessor</tspan></text></g><g class="node node--authored"><title>Branch accessor</title><rect x="275" y="70" width="235" height="295" rx="0"/><text class="node-title" x="392.5" y="223.5" text-anchor="middle"><tspan x="392.5" dy="0">Branch accessor</tspan></text></g><g class="node node--framework"><title>Leaf signal</title><rect x="525" y="70" width="235" height="295" rx="0"/><text class="node-title" x="642.5" y="223.5" text-anchor="middle"><tspan x="642.5" dy="0">Leaf signal</tspan></text></g><g class="node node--identity"><title>EntityMap collection</title><rect x="775" y="70" width="240" height="295" rx="0"/><text class="node-title" x="895" y="223.5" text-anchor="middle"><tspan x="895" dy="0">EntityMap collection</tspan></text></g></g><g class="edge-labels"></g></g>
+  <foreignObject x="120" y="790" width="1680" height="220">
+    <section xmlns="http://www.w3.org/1999/xhtml" class="slide-story">
+      <div class="story-grid"><div class="story-item story-item--plain"><h2>In plain words</h2><p>The way you read or change state matches what you are touching: the whole tree, one object, one simple value, or a keyed collection.</p></div><div class="story-item story-item--example"><h2>Real app example</h2><p>A checkout replaces a complete shipping address, increments an item quantity, and looks up products by ID through their matching APIs.</p></div><div class="story-item story-item--money"><h2>Why money cares</h2><p>The type system catches accidental partial replacements that could erase an address field, drop an item, or calculate an order from incomplete data.</p></div></div>
+    </section>
+  </foreignObject>
 </svg>

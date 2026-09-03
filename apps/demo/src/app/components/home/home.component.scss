@@ -10,15 +10,12 @@
 
 .content-shell,
 .hero-inner {
-  width: min(100%, var(--layout-wide-max));
   min-width: 0;
-  margin: 0 auto;
 }
 
 .home-hero {
   min-height: min(49rem, calc(100svh - 5rem));
-  padding: clamp(5rem, 11vh, 8rem) var(--layout-gutter)
-    clamp(4.5rem, 9vh, 7rem);
+  padding: var(--layout-hero-block) var(--layout-gutter);
   border-bottom: 1px solid rgb(23 33 26 / 0.14);
   background-color: var(--color-paper);
   background-image: var(--pattern-grid);
@@ -28,7 +25,7 @@
 .hero-inner {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(17rem, 0.6fr);
-  gap: clamp(3rem, 9vw, 9rem);
+  gap: var(--layout-section-gap);
   align-items: center;
 }
 
@@ -115,7 +112,7 @@ h1 {
 }
 
 .authority-band {
-  padding: 4.5rem var(--layout-gutter);
+  padding: var(--layout-band-block) var(--layout-gutter);
   border-bottom: 1px solid rgb(23 33 26 / 0.14);
   background: var(--color-surface);
 }
@@ -123,13 +120,13 @@ h1 {
 .section-heading {
   display: grid;
   grid-template-columns: minmax(0, 0.82fr) minmax(22rem, 1.18fr);
-  column-gap: clamp(2rem, 6vw, 7rem);
+  column-gap: var(--layout-section-gap);
   align-items: end;
-  margin-bottom: clamp(3rem, 7vw, 5rem);
+  margin-bottom: var(--layout-heading-gap);
 }
 
 .section-heading-compact {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--layout-heading-gap);
 }
 
 .section-heading > p {
@@ -160,7 +157,7 @@ h1 {
 
 .authority-item {
   min-height: 15rem;
-  padding: 1.6rem;
+  padding: var(--layout-panel-inset);
 }
 
 .authority-item + .authority-item {
@@ -190,7 +187,7 @@ h1 {
 .authority-item h3,
 .path-card h3,
 .package-row h3 {
-  margin: 2.5rem 0 0.65rem;
+  margin: var(--layout-heading-gap) 0 0.65rem;
   font-size: 1.2rem;
 }
 
@@ -209,7 +206,7 @@ h1 {
 }
 
 .home-section {
-  padding: clamp(5rem, 10vw, 9rem) var(--layout-gutter);
+  padding: var(--layout-band-block) var(--layout-gutter);
 }
 
 .path-grid {
@@ -221,14 +218,14 @@ h1 {
 
 .path-card {
   min-height: 17rem;
-  padding: 1.7rem;
+  padding: var(--layout-panel-inset);
   border-right: 1px solid var(--color-neutral-300);
   border-bottom: 1px solid var(--color-neutral-300);
   background: var(--color-surface);
 }
 
 .path-card h3 {
-  margin-top: 3rem;
+  margin-top: var(--layout-heading-gap);
   font-size: 1.45rem;
 }
 
@@ -241,6 +238,14 @@ h1 {
   color: var(--color-primary-700);
   font-weight: 750;
   text-decoration: none;
+}
+
+.path-card a:hover,
+.package-row a:hover,
+.grammar-copy a:hover {
+  color: var(--color-primary-900);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 
 .path-card:hover {
@@ -257,7 +262,7 @@ h1 {
 .grammar-layout {
   display: grid;
   grid-template-columns: minmax(18rem, 0.72fr) minmax(0, 1.28fr);
-  gap: clamp(3rem, 8vw, 8rem);
+  gap: var(--layout-section-gap);
   align-items: center;
 }
 
@@ -285,10 +290,10 @@ h1 {
 .package-row {
   display: grid;
   grid-template-columns: 3rem minmax(14rem, 0.8fr) minmax(18rem, 1.2fr) auto;
-  gap: 1.5rem;
+  gap: var(--layout-panel-inset);
   align-items: center;
   min-height: 8rem;
-  padding: 1.4rem 0;
+  padding: var(--layout-panel-inset) 0;
   border-bottom: 1px solid var(--color-neutral-300);
 }
 
@@ -313,7 +318,7 @@ h1 {
 }
 
 .closing-band {
-  padding: 5rem var(--layout-gutter);
+  padding: var(--layout-band-block) var(--layout-gutter);
   border-top: 1px solid rgb(23 33 26 / 0.14);
   background: var(--color-accent);
 }
@@ -322,7 +327,7 @@ h1 {
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 3rem;
+  gap: var(--layout-section-gap);
 }
 
 .closing-inner > div > p {
@@ -359,7 +364,8 @@ h1 {
 @media (max-width: 680px) {
   .home-hero {
     min-height: calc(100svh - 7rem);
-    padding: 3rem var(--layout-gutter) 1.5rem;
+    padding: var(--layout-hero-block) var(--layout-gutter)
+      var(--layout-panel-inset);
   }
 
   .hero-inner {

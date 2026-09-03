@@ -57,7 +57,13 @@ export const SYSTEM_BOUNDARY_DIAGRAM: ArchitectureDiagramSpec = {
     'Frameworks realize canonical truth; the kernel remains the state authority.',
   description:
     'Application policy chooses the work. Angular and React connect that work to their observation runtimes. The framework-neutral kernel owns the state and causal model beneath both.',
-  desktopViewBox: '0 0 1040 430',
+  plainLanguage:
+    'Your app decides what should happen, the framework updates the screen, and SignalTree keeps the one official answer underneath.',
+  realWorldExample:
+    'A shopper changes an item quantity. The checkout rule accepts the change, SignalTree stores it, and Angular or React redraws the total.',
+  financialImpact:
+    'If the screen and store keep separate answers, a shopper can see one total and be charged another. One authority keeps those numbers together.',
+  desktopViewBox: '0 0 1040 720',
   mobileViewBox: '0 0 360 720',
   nodes: [
     node(
@@ -65,7 +71,7 @@ export const SYSTEM_BOUNDARY_DIAGRAM: ArchitectureDiagramSpec = {
       ['Application policy'],
       ['decides product work'],
       'application',
-      box(40, 140, 210, 110),
+      box(200, 30, 640, 105),
       box(24, 30, 312, 110)
     ),
     node(
@@ -73,7 +79,7 @@ export const SYSTEM_BOUNDARY_DIAGRAM: ArchitectureDiagramSpec = {
       ['Angular / React', 'realization'],
       ['observe · render · clean up'],
       'framework',
-      box(310, 125, 240, 140),
+      box(200, 190, 640, 115),
       box(24, 195, 312, 125)
     ),
     node(
@@ -81,7 +87,7 @@ export const SYSTEM_BOUNDARY_DIAGRAM: ArchitectureDiagramSpec = {
       ['SignalTree', 'causal kernel'],
       ['framework-neutral authority'],
       'kernel',
-      box(610, 105, 380, 180),
+      box(200, 360, 640, 140),
       box(24, 375, 312, 140)
     ),
     node(
@@ -89,7 +95,7 @@ export const SYSTEM_BOUNDARY_DIAGRAM: ArchitectureDiagramSpec = {
       ['state · identity · authority'],
       ['causal turns · operation boundaries'],
       'neutral',
-      box(650, 325, 300, 75),
+      box(200, 560, 640, 110),
       box(24, 570, 312, 105)
     ),
   ],
@@ -117,6 +123,12 @@ export const PACKAGE_OWNERSHIP_DIAGRAM: ArchitectureDiagramSpec = {
     'Applications import their framework facade; framework-neutral code imports the kernel.',
   description:
     'Angular and React add native observation and lifecycle integration around the same kernel types and runtime. The adapter subpath exists for realization authors, not ordinary application imports.',
+  plainLanguage:
+    'Choose the package that matches your app. It includes the shared SignalTree engine plus the connection your framework needs.',
+  realWorldExample:
+    'An Angular checkout imports only @signal-tree/angular. A framework-free pricing library imports only @signal-tree/kernel.',
+  financialImpact:
+    'One import path avoids duplicate integration code and competing state copies, reducing maintenance work and costly checkout defects.',
   desktopViewBox: '0 0 1040 500',
   mobileViewBox: '0 0 360 590',
   nodes: [
@@ -199,6 +211,12 @@ export const ACCESSOR_GRAMMAR_DIAGRAM: ArchitectureDiagramSpec = {
     'Root and branch accessors are callable in both directions; leaves retain their reactive cell API.',
   description:
     'The controller itself is not callable. Its root $ accessor and branch accessors support read, whole-value replacement, and updater calls. Leaf signals read with () and write with set() or update(). EntityMap exposes collection operations.',
+  plainLanguage:
+    'The way you read or change state matches what you are touching: the whole tree, one object, one simple value, or a keyed collection.',
+  realWorldExample:
+    'A checkout replaces a complete shipping address, increments an item quantity, and looks up products by ID through their matching APIs.',
+  financialImpact:
+    'The type system catches accidental partial replacements that could erase an address field, drop an item, or calculate an order from incomplete data.',
   desktopViewBox: '0 0 1040 455',
   mobileViewBox: '0 0 360 900',
   nodes: [
@@ -268,7 +286,13 @@ export const CAUSAL_AUTHORITY_DIAGRAM: ArchitectureDiagramSpec = {
     'Ordinary application writes are authored; undoable() designates authored work for restoration.',
   description:
     'external() means another authority owned the decision. Transactions can group authored work and defer settlement, but they are not a third authority class.',
-  desktopViewBox: '0 0 1040 610',
+  plainLanguage:
+    'SignalTree records who chose a change. Your user chose authored changes; a server or device chose external changes. Only chosen authored work belongs in undo history.',
+  realWorldExample:
+    'A clerk edits an invoice note while the server sends a new tax rate. Undo reverses the note edit without pretending the clerk chose the tax rate.',
+  financialImpact:
+    'Undoing an authoritative tax, price, or payment update could produce the wrong total. Separating authority protects business truth from a user undo.',
+  desktopViewBox: '0 0 1040 760',
   mobileViewBox: '0 0 360 850',
   groups: [
     {
@@ -342,7 +366,7 @@ export const CAUSAL_AUTHORITY_DIAGRAM: ArchitectureDiagramSpec = {
       ['Eligible for retained', 'restoration history'],
       ['bounded by restoration policy'],
       'restoration',
-      box(720, 510, 295, 80),
+      box(365, 660, 310, 80),
       box(184, 700, 164, 120),
       false,
       ['Eligible for', 'retained', 'restoration history'],
@@ -378,7 +402,13 @@ export const COHERENT_OPERATION_DIAGRAM: ArchitectureDiagramSpec = {
     'A transaction may span multiple private commits without exposing a partial state.',
   description:
     'SignalTree defines atomicity by externally observable coherence, not by counting internal revision increments. Publication happens only after the operation can be observed as a complete state.',
-  desktopViewBox: '0 0 1040 500',
+  plainLanguage:
+    'Several related changes may happen inside, but everyone watching sees them arrive together as one complete result.',
+  realWorldExample:
+    'Moving $20 from checking to savings changes both balances. The screen never sees the debit without the matching credit.',
+  financialImpact:
+    'A half-finished transfer can trigger a false overdraft, fee, or alert. Coherent publication prevents decisions based on that temporary state.',
+  desktopViewBox: '0 0 1040 520',
   mobileViewBox: '0 0 360 915',
   nodes: [
     node(
@@ -458,6 +488,12 @@ export const ENTITY_IDENTITY_DIAGRAM: ArchitectureDiagramSpec = {
     'A held entity facade follows SubjectId through reorder, rekey, and supported restoration.',
   description:
     'EntityMap separates stable subject identity from lookup key and collection position. A fresh occupant that later reuses an old key receives a different subject identity.',
+  plainLanguage:
+    'A record stays the same thing even when it moves in a list or swaps a temporary ID for the server ID.',
+  realWorldExample:
+    'A new order starts as tmp-1, moves after sorting, and later becomes order-8492. A held row reference still points to that same order.',
+  financialImpact:
+    'Losing identity can duplicate an order, apply a refund to the wrong row, or charge twice when a temporary key becomes permanent.',
   desktopViewBox: '0 0 1040 500',
   mobileViewBox: '0 0 360 940',
   nodes: [
@@ -466,7 +502,7 @@ export const ENTITY_IDENTITY_DIAGRAM: ArchitectureDiagramSpec = {
       ['Subject S42'],
       ['key tmp-1 · position A'],
       'identity',
-      box(25, 135, 185, 110),
+      box(20, 90, 220, 110),
       box(24, 20, 312, 105)
     ),
     node(
@@ -474,7 +510,7 @@ export const ENTITY_IDENTITY_DIAGRAM: ArchitectureDiagramSpec = {
       ['Subject S42'],
       ['key tmp-1 · position B'],
       'identity',
-      box(230, 135, 185, 110),
+      box(410, 90, 220, 110),
       box(24, 175, 312, 105)
     ),
     node(
@@ -482,7 +518,7 @@ export const ENTITY_IDENTITY_DIAGRAM: ArchitectureDiagramSpec = {
       ['Subject S42'],
       ['key server-99 · position B'],
       'identity',
-      box(435, 135, 210, 110),
+      box(800, 90, 220, 110),
       box(24, 330, 312, 105)
     ),
     node(
@@ -490,7 +526,7 @@ export const ENTITY_IDENTITY_DIAGRAM: ArchitectureDiagramSpec = {
       ['Subject S42'],
       ['inactive · restoration-owned'],
       'restoration',
-      box(665, 135, 190, 110),
+      box(800, 360, 220, 110),
       box(24, 485, 312, 105)
     ),
     node(
@@ -498,7 +534,7 @@ export const ENTITY_IDENTITY_DIAGRAM: ArchitectureDiagramSpec = {
       ['Subject S42'],
       ['reactivated at exact target'],
       'identity',
-      box(875, 135, 145, 110),
+      box(410, 360, 220, 110),
       box(24, 640, 312, 105)
     ),
     node(
@@ -506,7 +542,7 @@ export const ENTITY_IDENTITY_DIAGRAM: ArchitectureDiagramSpec = {
       ['held facade'],
       ['same logical subject'],
       'kernel',
-      box(735, 340, 270, 105),
+      box(20, 360, 220, 110),
       box(24, 795, 312, 105)
     ),
   ],
@@ -539,8 +575,14 @@ export const LINK_DIAGRAM: ArchitectureDiagramSpec = {
     'The kernel owns the relationship semantics; endpoint code owns transport and durability choices.',
   description:
     'A Link can pull endpoint truth, push settled tree truth, or subscribe to live endpoint truth. Inbound values are applied as external authority. The endpoint decides storage, transport, codec, retry, cache, and scheduling policy.',
+  plainLanguage:
+    'Link keeps a state location connected to something outside. Your application still decides how to fetch, save, retry, and store that data.',
+  realWorldExample:
+    'A saved cart loads from an API, sends settled edits back, and listens for stock changes. The API service owns HTTP and retry rules.',
+  financialImpact:
+    'Keeping retry and durability policy in endpoint code makes duplicate charges and lost saves easier to prevent, test, and audit.',
   desktopViewBox: '0 0 1040 465',
-  mobileViewBox: '0 0 360 560',
+  mobileViewBox: '0 0 360 840',
   nodes: [
     node(
       'tree-location',
@@ -548,7 +590,10 @@ export const LINK_DIAGRAM: ArchitectureDiagramSpec = {
       ['canonical authored truth'],
       'kernel',
       box(35, 145, 245, 120),
-      box(24, 20, 312, 105)
+      box(120, 20, 120, 120),
+      false,
+      ['SignalTree', 'location'],
+      ['canonical', 'authored truth']
     ),
     node(
       'link-primitive',
@@ -556,7 +601,7 @@ export const LINK_DIAGRAM: ArchitectureDiagramSpec = {
       ['retrieve() · settled() · dispose()'],
       'restoration',
       box(390, 125, 260, 160),
-      box(12, 190, 164, 130),
+      box(228, 220, 120, 140),
       true,
       undefined,
       ['retrieve()', 'settled()', 'dispose()']
@@ -567,7 +612,7 @@ export const LINK_DIAGRAM: ArchitectureDiagramSpec = {
       ['get · set · subscribe'],
       'external',
       box(760, 145, 245, 120),
-      box(12, 390, 164, 120)
+      box(228, 460, 120, 130)
     ),
     node(
       'policy',
@@ -575,7 +620,7 @@ export const LINK_DIAGRAM: ArchitectureDiagramSpec = {
       ['HTTP · storage · socket', 'codec · retry · cache · durability'],
       'application',
       box(715, 340, 335, 100),
-      box(184, 390, 164, 120),
+      box(228, 680, 120, 140),
       false,
       undefined,
       ['HTTP · storage', 'socket · codec', 'retry · cache', 'durability']
@@ -586,7 +631,7 @@ export const LINK_DIAGRAM: ArchitectureDiagramSpec = {
       ['applied through external()'],
       'external',
       box(35, 340, 300, 100),
-      box(184, 190, 164, 130),
+      box(12, 220, 120, 140),
       true,
       undefined,
       ['applied through', 'external()']
@@ -631,6 +676,12 @@ export const EXPLANATION_PROJECTION_DIAGRAM: ArchitectureDiagramSpec = {
     'Human and AI narratives belong above compact causal facts, not inside retained turn metadata.',
   description:
     'The kernel retains the facts required by shipped causal and restoration behavior. Product-specific context can be combined with those stable identities to produce explanations without making prose part of state authority.',
+  plainLanguage:
+    'Keep small, reliable facts as truth. Turn those facts into friendly explanations only when a person or tool needs them.',
+  realWorldExample:
+    'An audit log keeps who changed an invoice and which fields changed. The UI can explain, “Mina corrected the quantity,” without storing that sentence as truth.',
+  financialImpact:
+    'Stable facts support audits and disputes. Generated wording can improve later without rewriting the financial record it explains.',
   desktopViewBox: '0 0 1040 500',
   mobileViewBox: '0 0 360 700',
   groups: [

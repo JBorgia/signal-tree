@@ -109,7 +109,7 @@ export class DocumentationComponent implements OnInit {
 
     // Configure marked
     marked.setOptions({
-      breaks: true,
+      breaks: false,
       gfm: true,
     });
   }

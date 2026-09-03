@@ -94,9 +94,7 @@ const seed = (n) => {
 // ---------------------------------------------------------------------------
 const IMPLS = {
   signaltree: async (withHistory) => {
-    const { signalTree, entityMap, restoration, undoable } = await import(
-      CORE
-    );
+    const { signalTree, entityMap, restoration, undoable } = await import(CORE);
     // v15: the enhancer is DECLARED, so the two arms differ in their build
     // plan as well as their history. That is the real shape now — a tree with
     // no restoration no longer pays for the causal runtime — and it is exactly
@@ -124,7 +122,6 @@ const IMPLS = {
           : tree.$.rows.updateOne(id, changes),
       readAll: () => tree.$.rows.all(),
       readOne: (id) => tree.$.rows.byId(id)?.(),
-      historyLength: () => tree.getRestorationHistory().length,
       // Built-in. History entries are snapshot REFERENCES, not clones.
       hasBuiltInHistory: true,
       undo: () => tree.undo(),
@@ -145,7 +142,6 @@ const IMPLS = {
         patchState(store, updateEntity({ id, changes })),
       readAll: () => store.ids().map((i) => store.entityMap()[i]),
       readOne: (id) => store.entityMap()[id],
-      historyLength: () => history.length + 1,
       hasBuiltInHistory: false,
       // No history primitive exists for a SignalStore; this is the hand-rolled
       // equivalent a user has to write.
@@ -181,7 +177,6 @@ const IMPLS = {
       updateOne: (id, changes) => store.update(updateEntities(id, changes)),
       readAll: () => store.query(getAllEntities()),
       readOne: (id) => store.query(getEntity(id)),
-      historyLength: () => (history ? history.history.past.length + 1 : 0),
       hasBuiltInHistory: true,
       undo: () => history?.undo(),
     };
@@ -209,7 +204,6 @@ const IMPLS = {
       },
       readAll: snapshot,
       readOne: (id) => byId.get(id)?.(),
-      historyLength: () => history.length + 1,
       hasBuiltInHistory: false,
       record: () => history.push(structuredClone(snapshot())),
       undo: () => {
@@ -239,7 +233,7 @@ const WORKLOADS = {
     const t1 = performance.now();
     if (all.length !== n)
       throw new Error(`readAll returned ${all.length}, expected ${n}`);
-    return t1 - t0;
+    return { durationMs: t1 - t0 };
   },
 
   'undo-redo': async (impl, n) => {
@@ -260,20 +254,17 @@ const WORKLOADS = {
       await tick();
     }
     const afterWrites = impl.readOne(probeId);
-    // Capture history HERE, not after the undos. Stack-based arms (ngrx, elf,
-    // raw) DRAIN their history as they undo, while SignalTree keeps entries and
-    // moves a pointer — checking afterwards failed three arms for a difference
-    // in semantics rather than for doing no work.
-    const historyAfterWrites = impl.historyLength ? impl.historyLength() : null;
+    const recordEnd = performance.now();
+    const valuesAfterUndo = [];
     for (let i = 0; i < HISTORY_WRITES; i++) {
       impl.undo();
       await tick();
+      valuesAfterUndo.push(impl.readOne(probeId)?.value);
     }
     const t1 = performance.now();
 
     // POSTCONDITIONS — every arm, not just ours. A benchmark that cannot detect
     // it did nothing is the same defect class it exists to expose.
-    const afterUndos = impl.readOne(probeId);
     if (afterWrites?.value !== 900_000 + HISTORY_WRITES - 1) {
       throw new Error(
         `writes did not land: expected ${900_000 + HISTORY_WRITES - 1}, got ${
@@ -281,16 +272,25 @@ const WORKLOADS = {
         }`
       );
     }
-    if (afterUndos?.value === afterWrites?.value) {
-      throw new Error('undo restored NOTHING — value unchanged after 50 undos');
+    for (let i = 0; i < HISTORY_WRITES; i++) {
+      const expected =
+        i === HISTORY_WRITES - 1 ? 0 : 900_000 + HISTORY_WRITES - i - 2;
+      if (valuesAfterUndo[i] !== expected) {
+        throw new Error(
+          `undo ${i + 1} restored ${
+            valuesAfterUndo[i]
+          }, expected ${expected} — ` +
+            `the arm did not retain every write as a distinct history step`
+        );
+      }
     }
-    if (historyAfterWrites !== null && historyAfterWrites < HISTORY_WRITES) {
-      throw new Error(
-        `history held ${historyAfterWrites} entries after ${HISTORY_WRITES} writes — ` +
-          `nothing was recorded, so the undos below measured idling`
-      );
-    }
-    return t1 - t0;
+    return {
+      durationMs: t1 - t0,
+      phases: {
+        recordMs: recordEnd - t0,
+        undoMs: t1 - recordEnd,
+      },
+    };
   },
 };
 
@@ -318,18 +318,29 @@ if (armName) {
   const phase = arg('--phase', 'timing');
 
   if (phase === 'timing') {
-    const times = [];
+    const measurements = [];
     for (let i = 0; i < 5; i++) {
       const impl = await make(withHistory);
-      times.push(await run(impl, N));
+      measurements.push(await run(impl, N));
     }
+    const times = measurements.map(({ durationMs }) => durationMs);
     times.sort((a, b) => a - b);
+    const phaseMedians = Object.fromEntries(
+      Object.keys(measurements[0]?.phases ?? {}).map((phaseName) => {
+        const samples = measurements
+          .map(({ phases }) => phases?.[phaseName])
+          .filter((value) => typeof value === 'number')
+          .sort((left, right) => left - right);
+        return [phaseName, +samples[Math.floor(samples.length / 2)].toFixed(2)];
+      })
+    );
     console.log(
       JSON.stringify({
         arm: armName,
         workload,
         phase,
         medianMs: +times[2].toFixed(2),
+        phaseMedians,
         builtInHistory: (await make(withHistory)).hasBuiltInHistory,
       })
     );
@@ -481,8 +492,8 @@ if (process.argv.includes('--json')) {
   }
   console.log(
     "\n  Every arm implements the same capability using that library's own entity\n" +
-      '  API. Undo/redo has no primitive outside SignalTree for this store shape,\n' +
-      '  so those arms snapshot state per change — which is what its absence forces.'
+      '  API. SignalTree and elf use their own history primitives; ngrx-signals\n' +
+      '  and raw signals snapshot state per change because they have none.'
   );
 }
 

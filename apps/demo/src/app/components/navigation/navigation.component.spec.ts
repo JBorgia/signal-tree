@@ -27,6 +27,7 @@ describe('NavigationComponent', () => {
       ],
       ['/docs', '/docs', '/docs'],
       [
+        '/benchmarks',
         '/devtools',
         '/deep-typing',
         '/architecture-overview',

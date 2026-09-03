@@ -4,6 +4,12 @@
 }
 
 .whats-new {
+  .release-example,
+  .release-note {
+    display: block;
+    margin-top: var(--layout-panel-inset);
+  }
+
   h2 {
     margin: 0 0 $spacing-md;
   }

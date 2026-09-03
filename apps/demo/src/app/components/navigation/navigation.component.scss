@@ -115,14 +115,6 @@
   overflow-wrap: anywhere;
 }
 
-.navigation-group--archive .navigation-link {
-  background: var(--color-paper);
-}
-
-.navigation-group--archive .navigation-link__title {
-  font-weight: 600;
-}
-
 .mobile-navigation-bar,
 .navigation-backdrop {
   display: none;
@@ -181,6 +173,12 @@
 .drawer-close {
   font-size: 1.35rem;
   line-height: 1;
+}
+
+.drawer-close:hover,
+.navigation-toggle:hover {
+  border-color: var(--color-primary-700);
+  background: var(--color-accent-soft);
 }
 
 .version-label {
@@ -266,6 +264,7 @@
     border-radius: 0;
     background: rgb(23 33 26 / 0.5);
     backdrop-filter: blur(3px);
+    pointer-events: none;
   }
 
   .mobile-navigation-bar {

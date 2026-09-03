@@ -62,7 +62,7 @@
       </g>
       }
 
-      <g class="diagram-edges">
+      <g class="diagram-edge-paths">
         @for (currentEdge of desktop().edges; track currentEdge.id) {
         <path
           [attr.d]="currentEdge.path"
@@ -82,33 +82,7 @@
               : null
           "
         />
-        @if (currentEdge.label) {
-        <g class="edge-label-group">
-          <rect
-            [attr.x]="currentEdge.labelPlateX"
-            [attr.y]="currentEdge.labelPlateY"
-            [attr.width]="currentEdge.labelWidth"
-            [attr.height]="currentEdge.labelHeight"
-            rx="0"
-            class="edge-label-plate"
-          />
-        <text
-          [attr.x]="currentEdge.labelX"
-          [attr.y]="currentEdge.labelY"
-          class="edge-label"
-          text-anchor="middle"
-        >
-          @for (line of currentEdge.labelLines; track $index) {
-          <tspan
-            [attr.x]="currentEdge.labelX"
-            [attr.dy]="$index === 0 ? 0 : currentEdge.labelLineHeight"
-          >
-            {{ line }}
-          </tspan>
-          }
-        </text>
-        </g>
-        } }
+        }
       </g>
 
       @for (currentNode of desktop().nodes; track currentNode.id) {
@@ -156,6 +130,37 @@
         }
       </g>
       }
+
+      <g class="diagram-edge-labels">
+        @for (currentEdge of desktop().edges; track currentEdge.id) {
+        @if (currentEdge.label) {
+        <g class="edge-label-group">
+          <rect
+            [attr.x]="currentEdge.labelPlateX"
+            [attr.y]="currentEdge.labelPlateY"
+            [attr.width]="currentEdge.labelWidth"
+            [attr.height]="currentEdge.labelHeight"
+            rx="0"
+            class="edge-label-plate"
+          />
+          <text
+            [attr.x]="currentEdge.labelX"
+            [attr.y]="currentEdge.labelY"
+            class="edge-label"
+            text-anchor="middle"
+          >
+            @for (line of currentEdge.labelLines; track $index) {
+            <tspan
+              [attr.x]="currentEdge.labelX"
+              [attr.dy]="$index === 0 ? 0 : currentEdge.labelLineHeight"
+            >
+              {{ line }}
+            </tspan>
+            }
+          </text>
+        </g>
+        } }
+      </g>
     </svg>
 
     <svg
@@ -210,7 +215,7 @@
       </g>
       }
 
-      <g class="diagram-edges">
+      <g class="diagram-edge-paths">
         @for (currentEdge of mobile().edges; track currentEdge.id) {
         <path
           [attr.d]="currentEdge.path"
@@ -230,33 +235,7 @@
               : null
           "
         />
-        @if (currentEdge.label) {
-        <g class="edge-label-group">
-          <rect
-            [attr.x]="currentEdge.labelPlateX"
-            [attr.y]="currentEdge.labelPlateY"
-            [attr.width]="currentEdge.labelWidth"
-            [attr.height]="currentEdge.labelHeight"
-            rx="0"
-            class="edge-label-plate"
-          />
-        <text
-          [attr.x]="currentEdge.labelX"
-          [attr.y]="currentEdge.labelY"
-          class="edge-label"
-          text-anchor="middle"
-        >
-          @for (line of currentEdge.labelLines; track $index) {
-          <tspan
-            [attr.x]="currentEdge.labelX"
-            [attr.dy]="$index === 0 ? 0 : currentEdge.labelLineHeight"
-          >
-            {{ line }}
-          </tspan>
-          }
-        </text>
-        </g>
-        } }
+        }
       </g>
 
       @for (currentNode of mobile().nodes; track currentNode.id) {
@@ -304,10 +283,56 @@
         }
       </g>
       }
+
+      <g class="diagram-edge-labels">
+        @for (currentEdge of mobile().edges; track currentEdge.id) {
+        @if (currentEdge.label) {
+        <g class="edge-label-group">
+          <rect
+            [attr.x]="currentEdge.labelPlateX"
+            [attr.y]="currentEdge.labelPlateY"
+            [attr.width]="currentEdge.labelWidth"
+            [attr.height]="currentEdge.labelHeight"
+            rx="0"
+            class="edge-label-plate"
+          />
+          <text
+            [attr.x]="currentEdge.labelX"
+            [attr.y]="currentEdge.labelY"
+            class="edge-label"
+            text-anchor="middle"
+          >
+            @for (line of currentEdge.labelLines; track $index) {
+            <tspan
+              [attr.x]="currentEdge.labelX"
+              [attr.dy]="$index === 0 ? 0 : currentEdge.labelLineHeight"
+            >
+              {{ line }}
+            </tspan>
+            }
+          </text>
+        </g>
+        } }
+      </g>
     </svg>
   </div>
 
   <figcaption>{{ diagram().description }}</figcaption>
+
+  <div class="explanation-grid" aria-label="Plain-language explanation">
+    <section class="explanation-item explanation-item--plain">
+      <h3>In plain words</h3>
+      <p>{{ diagram().plainLanguage }}</p>
+    </section>
+    <section class="explanation-item explanation-item--example">
+      <h3>Real app example</h3>
+      <p>{{ diagram().realWorldExample }}</p>
+    </section>
+    <section class="explanation-item explanation-item--money">
+      <h3>Why money cares</h3>
+      <p>{{ diagram().financialImpact }}</p>
+    </section>
+  </div>
 
   <details class="accuracy-notes">
     <summary>Semantic accuracy</summary>

@@ -193,7 +193,12 @@ pnpm run automation:export
 
 Browser automation and benchmark-export helpers live under `scripts/playwright/`.
 Use their registered package scripts so configuration and output paths remain
-consistent.
+consistent. `automation:export` runs all capability-admitted v15 browser rows
+and writes `artifacts/benchmark-results-automated.json`, including each
+workload's capability contract, exclusions, calculation boundaries, and arm
+provenance. It refuses development-mode timings unless
+`ALLOW_DEV_BENCHMARKS=1` is set for diagnostic output; set
+`BENCHMARK_MODE=steady` for the seven-round plan.
 
 ## Operational Helpers
 

@@ -65,18 +65,17 @@
   --shadow-quiet: none;
 
   /* Layout: outer gutter and inner panel inset are separate, never duplicated. */
-  --layout-wide-max: 80rem;
-  --layout-content-max: 72rem;
-  --layout-reading-max: 58rem;
   --layout-rail-width: 17rem;
   --layout-bar-height: 4rem;
-  --layout-gutter: clamp(1rem, 1.5vw, 1.25rem);
-  --layout-panel-inset: clamp(1rem, 1.5vw, 1.25rem);
-  --layout-page-start: clamp(1.5rem, 3vw, 2.25rem);
-  --layout-page-end: clamp(3rem, 5vw, 4rem);
-  --layout-section-gap: clamp(2rem, 3.5vw, 3rem);
+  --layout-gutter: 1rem;
+  --layout-panel-inset: 1rem;
+  --layout-page-start: clamp(1rem, 2vw, 1.5rem);
+  --layout-page-end: clamp(2rem, 3vw, 2.5rem);
+  --layout-section-gap: clamp(1.5rem, 2.5vw, 2rem);
+  --layout-band-block: clamp(2rem, 4vw, 3rem);
+  --layout-hero-block: clamp(2.5rem, 6vh, 4rem);
+  --layout-heading-gap: clamp(1.25rem, 2vw, 1.75rem);
   --layout-rule: 1px solid var(--color-neutral-300);
-  --content-width: var(--layout-wide-max);
 
   /* Primary Colors */
   --color-primary-50: #f7fbe9;
@@ -285,12 +284,9 @@ code {
 
 /* ===== FLAT SURFACE INVARIANT ===== */
 .layout-frame {
-  width: min(
-    calc(100% - var(--layout-gutter) - var(--layout-gutter)),
-    var(--layout-wide-max)
-  ) !important;
-  max-width: var(--layout-wide-max) !important;
-  margin-inline: auto !important;
+  width: auto !important;
+  max-width: none !important;
+  margin-inline: var(--layout-gutter) !important;
 }
 
 .layout-frame:not(.layout-frame--panel) {
@@ -336,6 +332,27 @@ body :is(.section-decide, .explanation-card) {
 
 body .feature-tag {
   background-color: var(--color-accent-soft) !important;
+}
+
+main a:not([class]):hover {
+  color: var(--color-primary-800);
+  text-decoration-color: currentColor;
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+}
+
+body .primary-command:hover:not(:disabled) {
+  border-color: var(--color-primary-800) !important;
+  background-color: var(--color-primary-800) !important;
+}
+
+body :is(input:not([type='checkbox']), select, textarea):hover:not(:disabled) {
+  border-color: var(--color-primary-600) !important;
+}
+
+body input[type='checkbox']:hover:not(:disabled) {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
 }
 
 body .release-highlights {
@@ -1283,8 +1300,7 @@ select {
   transition: all 0.2s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--color-primary-300);
   }
 }
 
@@ -1306,12 +1322,6 @@ select {
   &:hover:not(:disabled) {
     background-color: $hover-color;
     border-color: $hover-color;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
   }
 
   &:disabled {

@@ -76,12 +76,12 @@ supersedes an earlier ~1,710 B/entity figure.
 
 1,000 live rows held constant, 50 full key generations.
 
-| arm                 | per retired | note                                |
-| ------------------- | ----------: | ----------------------------------- |
-| `no-history`        |         6 B | zero-owner retirement forgets it all |
+| arm                 | per retired | note                                   |
+| ------------------- | ----------: | -------------------------------------- |
+| `no-history`        |         6 B | zero-owner retirement forgets it all   |
 | `no-history-reads`  |         6 B | observation costs nothing once retired |
-| `time-travel`       |     1,310 B | a restorer exists                   |
-| `time-travel-reads` |     1,859 B | restorer plus observation           |
+| `time-travel`       |     1,310 B | a restorer exists                      |
+| `time-travel-reads` |     1,859 B | restorer plus observation              |
 
 At 150 rounds the two `no-history` arms read **-6 B/retired** — the quiescence
 noise floor, not memory being created. Tripling the retirements does not scale
@@ -144,14 +144,13 @@ Each arm implements the same capability with that library own entity API.
 
 | arm            | collection | undo/redo | history     |
 | -------------- | ---------: | --------: | ----------- |
-| `raw-signals`  |    0.10 ms |   5.87 ms | hand-rolled |
-| `elf`          |    0.26 ms |   0.14 ms | BUILT-IN    |
-| `ngrx-signals` |    0.51 ms |   3.97 ms | hand-rolled |
-| `signaltree`   |    0.74 ms |   2.96 ms | BUILT-IN    |
+| `raw-signals`  |    0.11 ms |   5.70 ms | hand-rolled |
+| `elf`          |    0.26 ms |   0.31 ms | BUILT-IN    |
+| `ngrx-signals` |    0.72 ms |   4.38 ms | hand-rolled |
+| `signaltree`   |    0.62 ms |   1.45 ms | BUILT-IN    |
 
 **elf wins both arms at this size and is not a weak reference** — it is the
-fastest competitor in this repo benchmarks. SignalTree is last on the
-200-entity collection arm. The claim this repo makes is about how cost scales
+fastest built-in-history competitor in this repo benchmarks. The claim this repo makes is about how cost scales
 with collection size, not about winning at n=200, and the table above is kept
 unflattering on purpose so that distinction stays visible.
 

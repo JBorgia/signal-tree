@@ -1580,10 +1580,10 @@ At `n=200`, a cross-library benchmark measured:
 
 | implementation      | collection arm | undo/redo arm | history mechanism |
 | ------------------- | -------------: | ------------: | ----------------- |
-| raw Angular signals |        0.10 ms |       5.87 ms | hand-rolled       |
-| Elf                 |        0.26 ms |       0.14 ms | built-in          |
-| NgRx Signals        |        0.51 ms |       3.97 ms | hand-rolled       |
-| SignalTree          |        0.74 ms |       2.96 ms | built-in          |
+| raw Angular signals |        0.11 ms |       5.70 ms | hand-rolled       |
+| Elf                 |        0.26 ms |       0.31 ms | built-in          |
+| NgRx Signals        |        0.72 ms |       4.38 ms | hand-rolled       |
+| SignalTree          |        0.62 ms |       1.45 ms | built-in          |
 
 ![Figure 22. Small-N cross-library comparison](figures/fig22_smalln_crosslibrary.png)
 
@@ -1591,7 +1591,7 @@ At `n=200`, a cross-library benchmark measured:
 > **Comparison:** Elf wins both measured arms; raw Angular signals win the simple collection arm but pay much more in the hand-rolled history arm.
 > **Takeaway:** v15 deliberately preserves evidence that is unfavorable when it helps separate fixed semantic cost from large-N scaling behavior.
 
-Elf wins both arms at this size. SignalTree is last on the 200-entity collection arm. The repo intentionally keeps this result because the v15 claim is not "SignalTree wins every microbenchmark." The claim is that its architecture keeps local mutation cost from scaling with unrelated collection width while carrying richer semantics such as subject lifetime, transactions, history, and reclamation.
+Elf has the lowest built-in-history median at this size. The repo intentionally keeps this result because the v15 claim is not "SignalTree wins every microbenchmark." The claim is that its architecture keeps local mutation cost from scaling with unrelated collection width while carrying richer semantics such as subject lifetime, transactions, history, and reclamation.
 
 ## 19.4 Raw signals are a useful floor, not a fair feature-equivalent competitor
 

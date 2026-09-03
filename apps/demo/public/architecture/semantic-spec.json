@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": "apps/demo/src/app/pages/architecture-overview/architecture-diagrams.ts",
-  "sourceSha256": "6831f93b7fcc9e8ef8e3988e66eabed9a6d21591823729d3b1c8ade40bbcfad5",
+  "sourceSha256": "a2a6092c6de144a40cbabbc7de16c9edf05f75900aba322f5b6dabc38446343f",
   "diagrams": [
     {
       "id": "system-boundary",
@@ -9,7 +9,10 @@
       "title": "SignalTree in one picture",
       "takeaway": "Frameworks realize canonical truth; the kernel remains the state authority.",
       "description": "Application policy chooses the work. Angular and React connect that work to their observation runtimes. The framework-neutral kernel owns the state and causal model beneath both.",
-      "desktopViewBox": "0 0 1040 430",
+      "plainLanguage": "Your app decides what should happen, the framework updates the screen, and SignalTree keeps the one official answer underneath.",
+      "realWorldExample": "A shopper changes an item quantity. The checkout rule accepts the change, SignalTree stores it, and Angular or React redraws the total.",
+      "financialImpact": "If the screen and store keep separate answers, a shopper can see one total and be charged another. One authority keeps those numbers together.",
+      "desktopViewBox": "0 0 1040 720",
       "mobileViewBox": "0 0 360 720",
       "nodes": [
         {
@@ -23,10 +26,10 @@
           "tone": "application",
           "position": {
             "desktop": {
-              "x": 40,
-              "y": 140,
-              "width": 210,
-              "height": 110
+              "x": 200,
+              "y": 30,
+              "width": 640,
+              "height": 105
             },
             "mobile": {
               "x": 24,
@@ -49,10 +52,10 @@
           "tone": "framework",
           "position": {
             "desktop": {
-              "x": 310,
-              "y": 125,
-              "width": 240,
-              "height": 140
+              "x": 200,
+              "y": 190,
+              "width": 640,
+              "height": 115
             },
             "mobile": {
               "x": 24,
@@ -75,10 +78,10 @@
           "tone": "kernel",
           "position": {
             "desktop": {
-              "x": 610,
-              "y": 105,
-              "width": 380,
-              "height": 180
+              "x": 200,
+              "y": 360,
+              "width": 640,
+              "height": 140
             },
             "mobile": {
               "x": 24,
@@ -100,10 +103,10 @@
           "tone": "neutral",
           "position": {
             "desktop": {
-              "x": 650,
-              "y": 325,
-              "width": 300,
-              "height": 75
+              "x": 200,
+              "y": 560,
+              "width": 640,
+              "height": 110
             },
             "mobile": {
               "x": 24,
@@ -154,6 +157,9 @@
       "title": "Three public entry surfaces, one semantic authority",
       "takeaway": "Applications import their framework facade; framework-neutral code imports the kernel.",
       "description": "Angular and React add native observation and lifecycle integration around the same kernel types and runtime. The adapter subpath exists for realization authors, not ordinary application imports.",
+      "plainLanguage": "Choose the package that matches your app. It includes the shared SignalTree engine plus the connection your framework needs.",
+      "realWorldExample": "An Angular checkout imports only @signal-tree/angular. A framework-free pricing library imports only @signal-tree/kernel.",
+      "financialImpact": "One import path avoids duplicate integration code and competing state copies, reducing maintenance work and costly checkout defects.",
       "desktopViewBox": "0 0 1040 500",
       "mobileViewBox": "0 0 360 590",
       "nodes": [
@@ -350,6 +356,9 @@
       "title": "The API follows the shape of the location",
       "takeaway": "Root and branch accessors are callable in both directions; leaves retain their reactive cell API.",
       "description": "The controller itself is not callable. Its root $ accessor and branch accessors support read, whole-value replacement, and updater calls. Leaf signals read with () and write with set() or update(). EntityMap exposes collection operations.",
+      "plainLanguage": "The way you read or change state matches what you are touching: the whole tree, one object, one simple value, or a keyed collection.",
+      "realWorldExample": "A checkout replaces a complete shipping address, increments an item quantity, and looks up products by ID through their matching APIs.",
+      "financialImpact": "The type system catches accidental partial replacements that could erase an address field, drop an item, or calculate an order from incomplete data.",
       "desktopViewBox": "0 0 1040 455",
       "mobileViewBox": "0 0 360 900",
       "nodes": [
@@ -480,7 +489,10 @@
       "title": "Authority and restoration are separate axes",
       "takeaway": "Ordinary application writes are authored; undoable() designates authored work for restoration.",
       "description": "external() means another authority owned the decision. Transactions can group authored work and defer settlement, but they are not a third authority class.",
-      "desktopViewBox": "0 0 1040 610",
+      "plainLanguage": "SignalTree records who chose a change. Your user chose authored changes; a server or device chose external changes. Only chosen authored work belongs in undo history.",
+      "realWorldExample": "A clerk edits an invoice note while the server sends a new tax rate. Undo reverses the note edit without pretending the clerk chose the tax rate.",
+      "financialImpact": "Undoing an authoritative tax, price, or payment update could produce the wrong total. Separating authority protects business truth from a user undo.",
+      "desktopViewBox": "0 0 1040 760",
       "mobileViewBox": "0 0 360 850",
       "groups": [
         {
@@ -689,9 +701,9 @@
           "tone": "restoration",
           "position": {
             "desktop": {
-              "x": 720,
-              "y": 510,
-              "width": 295,
+              "x": 365,
+              "y": 660,
+              "width": 310,
               "height": 80
             },
             "mobile": {
@@ -767,7 +779,10 @@
       "title": "One semantic operation, one coherent observed state",
       "takeaway": "A transaction may span multiple private commits without exposing a partial state.",
       "description": "SignalTree defines atomicity by externally observable coherence, not by counting internal revision increments. Publication happens only after the operation can be observed as a complete state.",
-      "desktopViewBox": "0 0 1040 500",
+      "plainLanguage": "Several related changes may happen inside, but everyone watching sees them arrive together as one complete result.",
+      "realWorldExample": "Moving $20 from checking to savings changes both balances. The screen never sees the debit without the matching credit.",
+      "financialImpact": "A half-finished transfer can trigger a false overdraft, fee, or alert. Coherent publication prevents decisions based on that temporary state.",
+      "desktopViewBox": "0 0 1040 520",
       "mobileViewBox": "0 0 360 915",
       "nodes": [
         {
@@ -972,6 +987,9 @@
       "title": "Keys and positions can change without changing the subject",
       "takeaway": "A held entity facade follows SubjectId through reorder, rekey, and supported restoration.",
       "description": "EntityMap separates stable subject identity from lookup key and collection position. A fresh occupant that later reuses an old key receives a different subject identity.",
+      "plainLanguage": "A record stays the same thing even when it moves in a list or swaps a temporary ID for the server ID.",
+      "realWorldExample": "A new order starts as tmp-1, moves after sorting, and later becomes order-8492. A held row reference still points to that same order.",
+      "financialImpact": "Losing identity can duplicate an order, apply a refund to the wrong row, or charge twice when a temporary key becomes permanent.",
       "desktopViewBox": "0 0 1040 500",
       "mobileViewBox": "0 0 360 940",
       "nodes": [
@@ -986,9 +1004,9 @@
           "tone": "identity",
           "position": {
             "desktop": {
-              "x": 25,
-              "y": 135,
-              "width": 185,
+              "x": 20,
+              "y": 90,
+              "width": 220,
               "height": 110
             },
             "mobile": {
@@ -1011,9 +1029,9 @@
           "tone": "identity",
           "position": {
             "desktop": {
-              "x": 230,
-              "y": 135,
-              "width": 185,
+              "x": 410,
+              "y": 90,
+              "width": 220,
               "height": 110
             },
             "mobile": {
@@ -1036,9 +1054,9 @@
           "tone": "identity",
           "position": {
             "desktop": {
-              "x": 435,
-              "y": 135,
-              "width": 210,
+              "x": 800,
+              "y": 90,
+              "width": 220,
               "height": 110
             },
             "mobile": {
@@ -1061,9 +1079,9 @@
           "tone": "restoration",
           "position": {
             "desktop": {
-              "x": 665,
-              "y": 135,
-              "width": 190,
+              "x": 800,
+              "y": 360,
+              "width": 220,
               "height": 110
             },
             "mobile": {
@@ -1086,9 +1104,9 @@
           "tone": "identity",
           "position": {
             "desktop": {
-              "x": 875,
-              "y": 135,
-              "width": 145,
+              "x": 410,
+              "y": 360,
+              "width": 220,
               "height": 110
             },
             "mobile": {
@@ -1111,10 +1129,10 @@
           "tone": "kernel",
           "position": {
             "desktop": {
-              "x": 735,
-              "y": 340,
-              "width": 270,
-              "height": 105
+              "x": 20,
+              "y": 360,
+              "width": 220,
+              "height": 110
             },
             "mobile": {
               "x": 24,
@@ -1181,8 +1199,11 @@
       "title": "Link owns synchronization, not backend policy",
       "takeaway": "The kernel owns the relationship semantics; endpoint code owns transport and durability choices.",
       "description": "A Link can pull endpoint truth, push settled tree truth, or subscribe to live endpoint truth. Inbound values are applied as external authority. The endpoint decides storage, transport, codec, retry, cache, and scheduling policy.",
+      "plainLanguage": "Link keeps a state location connected to something outside. Your application still decides how to fetch, save, retry, and store that data.",
+      "realWorldExample": "A saved cart loads from an API, sends settled edits back, and listens for stock changes. The API service owns HTTP and retry rules.",
+      "financialImpact": "Keeping retry and durability policy in endpoint code makes duplicate charges and lost saves easier to prevent, test, and audit.",
       "desktopViewBox": "0 0 1040 465",
-      "mobileViewBox": "0 0 360 560",
+      "mobileViewBox": "0 0 360 840",
       "nodes": [
         {
           "id": "tree-location",
@@ -1191,6 +1212,14 @@
           ],
           "detail": [
             "canonical authored truth"
+          ],
+          "mobileTitle": [
+            "SignalTree",
+            "location"
+          ],
+          "mobileDetail": [
+            "canonical",
+            "authored truth"
           ],
           "tone": "kernel",
           "position": {
@@ -1201,10 +1230,10 @@
               "height": 120
             },
             "mobile": {
-              "x": 24,
+              "x": 120,
               "y": 20,
-              "width": 312,
-              "height": 105
+              "width": 120,
+              "height": 120
             }
           },
           "code": false
@@ -1231,10 +1260,10 @@
               "height": 160
             },
             "mobile": {
-              "x": 12,
-              "y": 190,
-              "width": 164,
-              "height": 130
+              "x": 228,
+              "y": 220,
+              "width": 120,
+              "height": 140
             }
           },
           "code": true
@@ -1257,10 +1286,10 @@
               "height": 120
             },
             "mobile": {
-              "x": 12,
-              "y": 390,
-              "width": 164,
-              "height": 120
+              "x": 228,
+              "y": 460,
+              "width": 120,
+              "height": 130
             }
           },
           "code": false
@@ -1289,10 +1318,10 @@
               "height": 100
             },
             "mobile": {
-              "x": 184,
-              "y": 390,
-              "width": 164,
-              "height": 120
+              "x": 228,
+              "y": 680,
+              "width": 120,
+              "height": 140
             }
           },
           "code": false
@@ -1318,10 +1347,10 @@
               "height": 100
             },
             "mobile": {
-              "x": 184,
-              "y": 190,
-              "width": 164,
-              "height": 130
+              "x": 12,
+              "y": 220,
+              "width": 120,
+              "height": 140
             }
           },
           "code": true
@@ -1383,6 +1412,9 @@
       "title": "Explanation is a projection over causal truth",
       "takeaway": "Human and AI narratives belong above compact causal facts, not inside retained turn metadata.",
       "description": "The kernel retains the facts required by shipped causal and restoration behavior. Product-specific context can be combined with those stable identities to produce explanations without making prose part of state authority.",
+      "plainLanguage": "Keep small, reliable facts as truth. Turn those facts into friendly explanations only when a person or tool needs them.",
+      "realWorldExample": "An audit log keeps who changed an invoice and which fields changed. The UI can explain, “Mina corrected the quantity,” without storing that sentence as truth.",
+      "financialImpact": "Stable facts support audits and disputes. Generated wording can improve later without rewriting the financial record it explains.",
       "desktopViewBox": "0 0 1040 500",
       "mobileViewBox": "0 0 360 700",
       "groups": [

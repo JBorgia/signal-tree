@@ -1,4 +1,4 @@
-# @signal-tree/angular
+# `@signal-tree/angular`
 
 Angular realization for SignalTree. It uses native Angular `Signal` and
 `WritableSignal` carriers while keeping state, entity, and causal semantics in

@@ -1,4 +1,4 @@
-# @signal-tree/react
+# `@signal-tree/react`
 
 React observation for SignalTree. It connects React's external-store lifecycle
 to canonical SignalTree reads without copying state into React.

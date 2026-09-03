@@ -38,7 +38,6 @@
 
       &:hover {
         color: color-mix(in srgb, $primary 90%, black);
-        transform: translateX(4px);
       }
 
       &:focus-visible {

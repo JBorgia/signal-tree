@@ -95,8 +95,8 @@ describe('AppComponent', () => {
       ['rxmethod', 'external-truth'],
       ['batching/compare', 'batching'],
       ['entity-collection', 'entities'],
-      ['benchmark', 'legacy-changelog'],
-      ['benchmarks', 'architecture-overview'],
+      ['benchmark', 'benchmarks'],
+      ['realistic-comparison', 'benchmarks'],
       ['extreme-depth', 'deep-typing'],
       ['whats-new-14', 'legacy-changelog'],
       ['marker-zoo', 'markers'],
@@ -110,6 +110,7 @@ describe('AppComponent', () => {
     }
 
     expect(routes.get('external-truth')?.loadComponent).toBeDefined();
+    expect(routes.get('benchmarks')?.loadComponent).toBeDefined();
   });
 
 });

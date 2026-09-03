@@ -136,6 +136,13 @@ export class NavigationComponent {
       label: 'Advanced',
       items: [
         {
+          id: 'benchmarks',
+          title: 'Browser benchmarks',
+          description:
+            'Capability-matched v15 tasks across real implementations',
+          route: '/benchmarks',
+        },
+        {
           id: 'devtools',
           title: 'DevTools',
           description: 'State inspection integration',

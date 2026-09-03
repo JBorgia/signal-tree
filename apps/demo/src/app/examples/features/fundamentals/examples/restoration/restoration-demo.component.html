@@ -60,7 +60,7 @@
               -1 Decrement
             </button>
             <button (click)="reset()" class="btn-secondary btn-sm">
-              Reset to 0
+              Set to 0
             </button>
           </div>
         </div>
@@ -134,21 +134,17 @@
             (click)="undo()"
             [disabled]="!canUndo()"
             class="btn-warning"
-            [attr.aria-label]="'Undo, ' + undosAvailable() + ' available'"
+            aria-label="Undo the latest reversible operation"
           >
-            Undo @if (undosAvailable() > 0) {
-            <span class="tt-count">({{ undosAvailable() }})</span>
-            }
+            Undo
           </button>
           <button
             (click)="redo()"
             [disabled]="!canRedo()"
             class="btn-success"
-            [attr.aria-label]="'Redo, ' + redosAvailable() + ' available'"
+            aria-label="Redo the next reversible operation"
           >
-            Redo @if (redosAvailable() > 0) {
-            <span class="tt-count">({{ redosAvailable() }})</span>
-            }
+            Redo
           </button>
           <button (click)="generateSampleActions()" class="btn-primary btn-sm">
             Generate designated turns
@@ -164,17 +160,12 @@
             <span class="value">{{ historyLength() }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Current boundary:</span>
-            <span class="value"
-              >{{ currentIndex() + 1 }} / {{ historyLength() }}</span
-            >
+            <span class="label">Undo available:</span>
+            <span class="value">{{ canUndo() ? 'Yes' : 'No' }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Available moves:</span>
-            <span class="value"
-              >⏴ {{ undosAvailable() }} undo · {{ redosAvailable() }} redo
-              ⏵</span
-            >
+            <span class="label">Redo available:</span>
+            <span class="value">{{ canRedo() ? 'Yes' : 'No' }}</span>
           </div>
         </div>
 
@@ -183,12 +174,11 @@
           @for (state of history(); track $index) {
           <div
             class="history-item"
-            [class.active]="$index === currentIndex()"
             (click)="goToState($index)"
             tabindex="0"
             (keyup)="onHistoryItemKeyup($event, $index)"
             role="button"
-            [attr.aria-pressed]="$index === currentIndex()"
+            [attr.aria-label]="'Show retained boundary ' + ($index + 1)"
           >
             <div class="history-index">{{ $index + 1 }}</div>
             <div class="history-content">
