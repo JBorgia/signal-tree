@@ -72,6 +72,17 @@ function showAt(rev, relPath) {
   }
 }
 
+/** Compare stable v<major>.<minor>.<patch> tags without Git sort settings. */
+function compareStableTags(left, right) {
+  const leftParts = left.slice(1).split('.').map(Number);
+  const rightParts = right.slice(1).split('.').map(Number);
+  for (let index = 0; index < leftParts.length; index++) {
+    const difference = rightParts[index] - leftParts[index];
+    if (difference !== 0) return difference;
+  }
+  return 0;
+}
+
 /**
  * The release to diff against: the newest version tag that is NOT the version
  * currently in package.json. Derived rather than pinned, so this keeps working
@@ -83,7 +94,7 @@ function resolveBase() {
   const current = JSON.parse(
     readFileSync(join(ROOT, 'package.json'), 'utf8')
   ).version;
-  const tags = git('tag', '--sort=-v:refname')
+  const tags = git('tag')
     .split('\n')
     .map((t) => t.trim())
     .filter((t) => /^v\d+\.\d+\.\d+/.test(t));
@@ -119,7 +130,7 @@ function resolveBase() {
   const candidates = isPrerelease
     ? tags.filter((t) => t !== `v${current}`)
     : tags.filter((t) => t !== `v${current}` && !/-/.test(t));
-  const base = candidates[0];
+  const base = candidates.sort(compareStableTags)[0];
   if (!base) {
     console.error(
       'No prior version tag found to diff against.\n' +
