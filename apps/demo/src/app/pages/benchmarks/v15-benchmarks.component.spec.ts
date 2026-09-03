@@ -1,10 +1,46 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BenchmarkReport } from './v15-benchmark.engine';
+import { BenchmarkArmResult, BenchmarkReport } from './v15-benchmark.engine';
 import { V15BenchmarksComponent } from './v15-benchmarks.component';
 
 const text = (fixture: ComponentFixture<V15BenchmarksComponent>): string =>
   (fixture.nativeElement.textContent as string).replace(/\s+/g, ' ').trim();
+
+const result = (
+  armId: string,
+  label: string,
+  medianMs: number,
+  minMs: number,
+  maxMs: number
+): BenchmarkArmResult => ({
+  armId,
+  label,
+  color: '#000000',
+  medianMs,
+  minMs,
+  maxMs,
+  spreadMs: maxMs - minMs,
+  microsecondsPerOperation: medianMs * 1000,
+  samples: [minMs, medianMs, maxMs],
+  phases: [],
+});
+
+const recurringReport = (
+  id: 'collection' | 'projection' | 'restoration',
+  operations: number,
+  results: readonly BenchmarkArmResult[]
+): BenchmarkReport => ({
+  workload: {
+    id,
+    title: id,
+    description: id,
+    operations,
+    expectedChecksum: 'ok',
+  },
+  rounds: 3,
+  warmupRounds: 1,
+  results,
+});
 
 describe('V15BenchmarksComponent', () => {
   let fixture: ComponentFixture<V15BenchmarksComponent>;
@@ -23,10 +59,11 @@ describe('V15BenchmarksComponent', () => {
   it('presents only checked v15 browser workloads', () => {
     const rendered = text(fixture);
 
-    expect(rendered).toContain('Browser performance spot-check');
-    expect(rendered).toContain('Initialize and populate keyed state');
+    expect(rendered).toContain('Recurring application-state performance');
+    expect(rendered).not.toContain('Initialize and populate keyed state');
     expect(rendered).toContain('Update and read one keyed record');
-    expect(rendered).toContain('Record and undo authored changes');
+    expect(rendered).toContain('Update one record and re-read the collection');
+    expect(rendered).toContain('Consequential authored work: record and undo');
     expect(rendered).toContain('SignalTree Angular');
     expect(rendered).toContain('SignalTree Kernel');
     expect(rendered).toContain('NgRx Signals');
@@ -34,10 +71,12 @@ describe('V15BenchmarksComponent', () => {
     expect(rendered).toContain('Zustand');
     expect(rendered).toContain('MobX');
     expect(rendered).toContain('Valtio');
-    expect(rendered).toContain('One-time cost');
+    expect(rendered).not.toContain('One-time cost');
+    expect(rendered).toContain('Recurring work is the product benchmark');
     expect(rendered).toContain(
-      'For short-lived or read-once data, the trade may not pay back.'
+      'Initialization is a budget, not an optimization target'
     );
+    expect(rendered).toContain('it receives no public rank and no value score');
     expect(rendered).not.toContain('Raw Angular');
     expect(rendered).toContain('Application impact');
     expect(rendered).toContain('not statistical significance tests');
@@ -48,7 +87,10 @@ describe('V15BenchmarksComponent', () => {
     expect(rendered).toContain('First-party keyed entity state');
     expect(rendered).toContain('First-party linear undo over keyed state');
     expect(rendered).toContain(
-      'Only implementations meeting every requirement below receive a timing'
+      'Only implementations meeting every requirement receive a timing'
+    );
+    expect(rendered).toContain(
+      'does not disqualify a storage strategy from internal speed or density experiments'
     );
     expect(rendered).toContain(
       'choosing a Map schema and copy strategy would benchmark the harness design'
@@ -56,7 +98,52 @@ describe('V15BenchmarksComponent', () => {
     expect(rendered).toContain(
       'not the history capability required by this chart'
     );
+    expect(rendered).toContain(
+      'Sub-millisecond browser gaps near the timer floor are diagnostic'
+    );
+    expect(rendered).toContain(
+      'overlapping observed ranges mean no clear difference in that run'
+    );
     expect(rendered).not.toContain('Harness-supplied history outcome');
+    expect(rendered).toContain('Source rule:');
+    expect(rendered).toContain(
+      'it does not claim that no community add-on exists'
+    );
+    expect(rendered).toContain('@ngrx/signals 21.1.1');
+    expect(rendered).toContain('@reduxjs/toolkit 2.12.0');
+    expect(rendered).toContain('@ngneat/elf-state-history 1.4.0');
+    expect(rendered).toContain('Reproduce and inspect');
+    expect(rendered).toContain('Ten-year architecture bet');
+    expect(rendered).toContain(
+      'Typed dot notation survives representation changes'
+    );
+    expect(rendered).toContain(
+      'Optimistic and causal work avoids a future state-model rewrite'
+    );
+    expect(rendered).toContain(
+      'every reproducible deficit is an optimization target'
+    );
+    expect(rendered).toContain(
+      'Retained subject-density cost is pay-for-participation'
+    );
+    expect(
+      fixture.nativeElement.querySelectorAll('.foundation-evidence a')
+    ).toHaveLength(15);
+    expect(rendered).toContain(
+      'Front-load work when it makes recurring speed, density, allocation, GC, restoration, or churn better'
+    );
+    expect(rendered).not.toContain('Does recurring benefit repay setup cost?');
+    expect(rendered).not.toContain('crossover');
+    expect(rendered).not.toContain('lifetime advantage');
+    expect(
+      fixture.nativeElement.querySelectorAll('.capability-admission a').length
+    ).toBeGreaterThan(0);
+    expect(
+      fixture.nativeElement.querySelectorAll('.evidence-line a')
+    ).toHaveLength(9);
+    expect(
+      fixture.nativeElement.querySelectorAll('.planned-arm .source-links a')
+    ).toHaveLength(16);
     expect(rendered).not.toContain('Middleware');
     expect(rendered).not.toContain('Async enhancer');
     expect(rendered).not.toContain('Time travel');
@@ -198,6 +285,54 @@ describe('V15BenchmarksComponent', () => {
     ).toHaveLength(2);
   });
 
+  it('normalizes three independent recurring workloads without a setup score', () => {
+    component.reports.set(
+      new Map([
+        [
+          'collection',
+          recurringReport('collection', 10, [
+            result('signaltree-angular', 'SignalTree Angular', 1, 0.8, 1.2),
+            result('signaltree-kernel', 'SignalTree Kernel', 2, 1.8, 2.2),
+            result('elf', 'Elf', 3, 2.8, 3.2),
+          ]),
+        ],
+        [
+          'projection',
+          recurringReport('projection', 10, [
+            result('signaltree-angular', 'SignalTree Angular', 2, 1.8, 2.2),
+            result('signaltree-kernel', 'SignalTree Kernel', 3, 2.8, 3.2),
+            result('elf', 'Elf', 5, 4.8, 5.2),
+          ]),
+        ],
+        [
+          'restoration',
+          recurringReport('restoration', 10, [
+            result('elf', 'Elf', 1, 0.8, 1.2),
+            result('signaltree-kernel', 'SignalTree Kernel', 3, 2.8, 3.2),
+            result('signaltree-angular', 'SignalTree Angular', 4, 3.8, 4.2),
+          ]),
+        ],
+      ])
+    );
+    fixture.detectChanges();
+
+    expect(component.steadyStateProfiles()).toHaveLength(3);
+    expect(text(fixture)).toContain('What compounds after construction');
+    expect(text(fixture)).toContain('100.00 ms');
+    expect(text(fixture)).toContain('200.00 ms');
+    expect(text(fixture)).toContain('400.00 ms');
+    expect(text(fixture)).toContain(
+      'No workload is pooled into an aggregate score'
+    );
+
+    component.setProfileArm('signaltree-kernel');
+    fixture.detectChanges();
+    expect(
+      component.steadyStateProfiles().map((profile) => profile.position)
+    ).toEqual([2, 2, 2]);
+    expect(text(fixture)).toContain('300.00 ms');
+  });
+
   it('explains the first-party capability used by each admitted history arm', () => {
     const suite = component
       .suites()
@@ -214,12 +349,18 @@ describe('V15BenchmarksComponent', () => {
     expect(dialog.hasAttribute('open')).toBe(true);
     expect(rendered).toContain('First-party history add-on');
     expect(rendered).toContain('First-party Elf history add-on');
+    expect(rendered).toContain('@ngneat/elf-state-history 1.4.0');
     expect(rendered).toContain('What was added');
     expect(rendered).toContain(
       'installs @ngneat/elf-state-history on the real Elf entity store'
     );
     expect(rendered).toContain('What was not included');
     expect(rendered).not.toContain('Harness-supplied history outcome');
+    expect(
+      dialog.querySelector(
+        'a[href="https://unpkg.com/@ngneat/elf-state-history@1.4.0/index.js"]'
+      )
+    ).not.toBeNull();
 
     component.closeComparison();
     expect(dialog.hasAttribute('open')).toBe(false);

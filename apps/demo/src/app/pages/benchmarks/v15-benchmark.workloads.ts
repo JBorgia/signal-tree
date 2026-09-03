@@ -78,9 +78,22 @@ export interface BenchmarkCalculationNotes {
   readonly notCompared: string;
 }
 
+export interface BenchmarkSource {
+  readonly label: string;
+  readonly url: string;
+  readonly path?: string;
+}
+
+export interface BenchmarkPackageReference {
+  readonly name: string;
+  readonly versionKey: string;
+}
+
 export interface BenchmarkArmComparison {
   readonly featureSource: string;
   readonly kind: string;
+  readonly packages: readonly BenchmarkPackageReference[];
+  readonly sources: readonly BenchmarkSource[];
   readonly addedForComparison: string;
   readonly whyItWasAdded: string;
   readonly notIncluded: string;
@@ -97,6 +110,7 @@ export interface BenchmarkCapabilityContract {
   readonly exclusions: readonly {
     readonly label: string;
     readonly reason: string;
+    readonly sources: readonly BenchmarkSource[];
   }[];
 }
 
@@ -110,7 +124,21 @@ export interface V15BenchmarkSuite {
   readonly costContext: string;
   readonly calculation: BenchmarkCalculationNotes;
   readonly relatedCommand: string;
+  readonly relatedSourceUrl: string;
+  readonly relatedSourcePath: string;
 }
+
+const SIGNALTREE_REPOSITORY_URL = 'https://github.com/JBorgia/signal-tree';
+
+export const V15_BENCHMARK_SOURCE_URLS = {
+  engine: SIGNALTREE_REPOSITORY_URL,
+  workloads: SIGNALTREE_REPOSITORY_URL,
+} as const;
+
+export const V15_BENCHMARK_SOURCE_PATHS = {
+  engine: 'apps/demo/src/app/pages/benchmarks/v15-benchmark.engine.ts',
+  workloads: 'apps/demo/src/app/pages/benchmarks/v15-benchmark.workloads.ts',
+} as const;
 
 export const DEFAULT_V15_BENCHMARK_CONFIG: V15BenchmarkConfig = {
   collectionSize: 2_000,
@@ -141,6 +169,77 @@ const DIRECT_STATE_NOT_INCLUDED =
 const HISTORY_NOT_INCLUDED =
   'No redo, branching history, persistence, serialization, UI rendering, or attempt to make the different history contracts semantically equivalent is timed.';
 
+const SOURCES = {
+  signaltreeEntityMap: {
+    label: 'SignalTree entityMap source',
+    url: SIGNALTREE_REPOSITORY_URL,
+    path: 'packages/kernel/src/lib/markers/entity-map.ts',
+  },
+  signaltreeRestoration: {
+    label: 'SignalTree restoration source',
+    url: SIGNALTREE_REPOSITORY_URL,
+    path: 'packages/kernel/src/enhancers/restoration/restoration.ts',
+  },
+  ngrxEntities: {
+    label: 'NgRx Signal Store entity management',
+    url: 'https://ngrx.io/guide/signals/signal-store/entity-management',
+  },
+  elfEntities: {
+    label: 'Elf entities 5.0.2 implementation',
+    url: 'https://unpkg.com/@ngneat/elf-entities@5.0.2/index.esm.js',
+  },
+  elfHistory: {
+    label: 'Elf state-history 1.4.0 implementation',
+    url: 'https://unpkg.com/@ngneat/elf-state-history@1.4.0/index.js',
+  },
+  akitaEntities: {
+    label: 'Akita EntityStore documentation',
+    url: 'https://opensource.salesforce.com/akita/docs/entities/entity-store/',
+  },
+  akitaHistory: {
+    label: 'Akita StateHistoryPlugin documentation',
+    url: 'https://opensource.salesforce.com/akita/docs/plugins/state-history/',
+  },
+  reduxEntities: {
+    label: 'Redux Toolkit createEntityAdapter documentation',
+    url: 'https://redux-toolkit.js.org/api/createEntityAdapter',
+  },
+  zustandStore: {
+    label: 'Zustand official store API',
+    url: 'https://github.com/pmndrs/zustand#readme',
+  },
+  mobxObservable: {
+    label: 'MobX observable-state documentation',
+    url: 'https://mobx.js.org/observable-state.html',
+  },
+  valtioMap: {
+    label: 'Valtio proxyMap documentation',
+    url: 'https://valtio.dev/docs/api/utils/proxyMap',
+  },
+} satisfies Record<string, BenchmarkSource>;
+
+const PACKAGES = {
+  signaltreeAngular: [
+    { name: '@signal-tree/angular', versionKey: 'signaltree' },
+  ],
+  signaltreeKernel: [{ name: '@signal-tree/kernel', versionKey: 'signaltree' }],
+  ngrxSignals: [{ name: '@ngrx/signals', versionKey: 'ngrx-signals' }],
+  elfEntities: [
+    { name: '@ngneat/elf', versionKey: 'elf' },
+    { name: '@ngneat/elf-entities', versionKey: 'elf-entities' },
+  ],
+  elfHistory: [
+    { name: '@ngneat/elf', versionKey: 'elf' },
+    { name: '@ngneat/elf-entities', versionKey: 'elf-entities' },
+    {
+      name: '@ngneat/elf-state-history',
+      versionKey: 'elf-state-history',
+    },
+  ],
+  akita: [{ name: '@datorama/akita', versionKey: 'akita' }],
+  reduxToolkit: [{ name: '@reduxjs/toolkit', versionKey: 'redux-toolkit' }],
+} satisfies Record<string, readonly BenchmarkPackageReference[]>;
+
 const KEYED_ENTITY_CAPABILITY: BenchmarkCapabilityContract = {
   title: 'First-party keyed entity state',
   requirements: [
@@ -153,16 +252,19 @@ const KEYED_ENTITY_CAPABILITY: BenchmarkCapabilityContract = {
       label: 'Zustand',
       reason:
         'Zustand supplies a store primitive, not a first-party entity abstraction; choosing a Map schema and copy strategy would benchmark the harness design.',
+      sources: [SOURCES.zustandStore],
     },
     {
       label: 'MobX',
       reason:
         'MobX supplies reactive primitives, not a first-party entity-store contract; the observable Map schema and action policy would be harness choices.',
+      sources: [SOURCES.mobxObservable],
     },
     {
       label: 'Valtio',
       reason:
         'Valtio supplies proxy primitives, not a first-party entity abstraction; choosing proxyMap() and its update recipe would be harness work.',
+      sources: [SOURCES.valtioMap],
     },
   ],
 };
@@ -179,16 +281,23 @@ const FIRST_PARTY_HISTORY_CAPABILITY: BenchmarkCapabilityContract = {
       label: 'NgRx Signals',
       reason:
         'The measured first-party packages supply keyed entities but not the history capability required by this chart.',
+      sources: [SOURCES.ngrxEntities],
     },
     {
       label: 'Redux Toolkit',
       reason:
         'The measured first-party package supplies keyed entities but not an integrated history capability.',
+      sources: [SOURCES.reduxEntities],
     },
     {
       label: 'Zustand, MobX, and Valtio',
       reason:
         'These packages would require both a harness-chosen entity recipe and a harness- or third-party history implementation.',
+      sources: [
+        SOURCES.zustandStore,
+        SOURCES.mobxObservable,
+        SOURCES.valtioMap,
+      ],
     },
   ],
 };
@@ -196,6 +305,8 @@ const FIRST_PARTY_HISTORY_CAPABILITY: BenchmarkCapabilityContract = {
 const KEYED_COMPARISON_NOTES = {
   'signaltree-angular': {
     kind: 'Library keyed API',
+    packages: PACKAGES.signaltreeAngular,
+    sources: [SOURCES.signaltreeEntityMap],
     featureSource: 'Native SignalTree Angular keyed state',
     addedForComparison:
       'Only a thin adapter maps the shared set-all, update-by-ID, and read contract to entityMap().',
@@ -207,6 +318,8 @@ const KEYED_COMPARISON_NOTES = {
   },
   'signaltree-kernel': {
     kind: 'Library keyed API',
+    packages: PACKAGES.signaltreeKernel,
+    sources: [SOURCES.signaltreeEntityMap],
     featureSource: 'Native framework-neutral SignalTree keyed state',
     addedForComparison:
       'Only a thin adapter maps the shared set-all, update-by-ID, and read contract to entityMap().',
@@ -216,6 +329,8 @@ const KEYED_COMPARISON_NOTES = {
   },
   'ngrx-signals': {
     kind: 'First-party entity API',
+    packages: PACKAGES.ngrxSignals,
+    sources: [SOURCES.ngrxEntities],
     featureSource: 'First-party NgRx Signals entity utilities',
     addedForComparison:
       'A thin adapter maps the task to signalState(), setAllEntities(), and updateEntity().',
@@ -225,6 +340,8 @@ const KEYED_COMPARISON_NOTES = {
   },
   elf: {
     kind: 'First-party entity add-on',
+    packages: PACKAGES.elfEntities,
+    sources: [SOURCES.elfEntities],
     featureSource: 'First-party Elf entities package',
     addedForComparison:
       'The benchmark includes @ngneat/elf-entities and a thin adapter around its public entity operations.',
@@ -234,6 +351,8 @@ const KEYED_COMPARISON_NOTES = {
   },
   akita: {
     kind: 'Library keyed API',
+    packages: PACKAGES.akita,
+    sources: [SOURCES.akitaEntities],
     featureSource: 'Native Akita EntityStore and QueryEntity',
     addedForComparison:
       'Only a thin adapter maps the task to EntityStore writes and QueryEntity reads.',
@@ -243,6 +362,8 @@ const KEYED_COMPARISON_NOTES = {
   },
   'redux-toolkit': {
     kind: 'First-party entity API',
+    packages: PACKAGES.reduxToolkit,
+    sources: [SOURCES.reduxEntities],
     featureSource: 'First-party Redux Toolkit entity adapter',
     addedForComparison:
       'The harness configures a Redux store and createEntityAdapter(); development-only immutable and serializable checks are disabled.',
@@ -257,6 +378,8 @@ const KEYED_COMPARISON_NOTES = {
 const RESTORATION_COMPARISON_NOTES = {
   'signaltree-angular': {
     kind: 'Built-in history',
+    packages: PACKAGES.signaltreeAngular,
+    sources: [SOURCES.signaltreeRestoration],
     featureSource: 'Built-in SignalTree restoration',
     addedForComparison:
       'Nothing beyond the task adapter. restoration() records designated undoable() causal turns.',
@@ -266,6 +389,8 @@ const RESTORATION_COMPARISON_NOTES = {
   },
   'signaltree-kernel': {
     kind: 'Built-in history',
+    packages: PACKAGES.signaltreeKernel,
+    sources: [SOURCES.signaltreeRestoration],
     featureSource: 'Built-in framework-neutral SignalTree restoration',
     addedForComparison:
       'Nothing beyond the task adapter. Kernel restoration records designated undoable() causal turns.',
@@ -275,6 +400,8 @@ const RESTORATION_COMPARISON_NOTES = {
   },
   elf: {
     kind: 'First-party history add-on',
+    packages: PACKAGES.elfHistory,
+    sources: [SOURCES.elfHistory],
     featureSource: 'First-party Elf history add-on',
     addedForComparison:
       'The benchmark installs @ngneat/elf-state-history on the real Elf entity store.',
@@ -284,6 +411,8 @@ const RESTORATION_COMPARISON_NOTES = {
   },
   akita: {
     kind: 'First-party history add-on',
+    packages: PACKAGES.akita,
+    sources: [SOURCES.akitaHistory],
     featureSource: 'First-party Akita StateHistoryPlugin',
     addedForComparison:
       'The benchmark attaches StateHistoryPlugin to the real Akita QueryEntity.',
@@ -301,17 +430,27 @@ const seedRows = (size: number): BenchmarkRow[] =>
     active: id % 2 === 0,
   }));
 
-const initializationChecksum = (rows: readonly BenchmarkRow[]): string => {
+const collectionChecksum = (rows: readonly BenchmarkRow[]): string => {
   const valueSum = rows.reduce((total, row) => total + row.value, 0);
   return `${rows.length}:${valueSum}`;
 };
 
-const expectedInitializationChecksum = (size: number): string =>
-  `${size}:${(size * (size - 1)) / 2}`;
+export const projectedValueById = (
+  rows: readonly { readonly id: number; readonly value: number }[],
+  id: number
+): number => rows.find((row) => row.id === id)?.value ?? Number.NaN;
 
 const expectedUpdateChecksum = (size: number, updates: number): string => {
   const observedSum = updates * UPDATE_BASE + (updates * (updates - 1)) / 2;
   return `${size}:${observedSum}:${UPDATE_BASE + updates - 1}`;
+};
+
+const expectedProjectionChecksum = (size: number, updates: number): string => {
+  const observedValueSum =
+    updates * UPDATE_BASE + (updates * (updates - 1)) / 2;
+  const finalValue = UPDATE_BASE + updates - 1;
+  const finalCollectionSum = (size * (size - 1)) / 2 + finalValue;
+  return `${size * updates}:${observedValueSum}:${size}:${finalCollectionSum}`;
 };
 
 const expectedRestorationChecksum = (writes: number): string => {
@@ -328,47 +467,6 @@ const validateConfig = (config: V15BenchmarkConfig): void => {
     }
   }
 };
-
-const createInitializationArm = (
-  id: BenchmarkLibraryId,
-  label: string,
-  color: string,
-  description: string,
-  config: V15BenchmarkConfig,
-  createImplementation: (instanceId?: string) => CollectionImplementation
-): V15BenchmarkArm => ({
-  id,
-  label,
-  color,
-  description,
-  comparison: KEYED_COMPARISON_NOTES[id],
-  createSample: (workload) => {
-    if (workload.id !== 'initialization') {
-      throw new Error(`${id} received unsupported workload ${workload.id}`);
-    }
-
-    const rows = seedRows(config.collectionSize);
-    const instanceId = `${id}-${crypto.randomUUID()}`;
-    let resultRows: readonly BenchmarkRow[] = [];
-    let implementation: CollectionImplementation | undefined;
-
-    return {
-      measure: () => {
-        const startedAt = performance.now();
-        implementation = createImplementation(instanceId);
-        implementation.setAll(rows);
-        resultRows = implementation.readAll();
-
-        return {
-          durationMs: performance.now() - startedAt,
-          operations: workload.operations,
-        };
-      },
-      checksum: () => initializationChecksum(resultRows),
-      dispose: () => implementation?.dispose(),
-    };
-  },
-});
 
 const createCollectionArm = (
   id: BenchmarkLibraryId,
@@ -415,6 +513,55 @@ const createCollectionArm = (
           implementation.readAll().length
         }:${observedSum}:${checkedValue}`;
       },
+      dispose: implementation.dispose,
+    };
+  },
+});
+
+const createProjectionArm = (
+  id: BenchmarkLibraryId,
+  label: string,
+  color: string,
+  description: string,
+  config: V15BenchmarkConfig,
+  createImplementation: (instanceId?: string) => CollectionImplementation
+): V15BenchmarkArm => ({
+  id,
+  label,
+  color,
+  description,
+  comparison: KEYED_COMPARISON_NOTES[id],
+  createSample: async (workload) => {
+    if (workload.id !== 'projection') {
+      throw new Error(`${id} received unsupported workload ${workload.id}`);
+    }
+
+    const implementation = createImplementation(`${id}-${crypto.randomUUID()}`);
+    implementation.setAll(seedRows(config.collectionSize));
+    implementation.readAll();
+    await Promise.resolve();
+    let observedLength = 0;
+    let observedValueSum = 0;
+
+    return {
+      measure: () => {
+        const startedAt = performance.now();
+        for (let index = 0; index < config.collectionUpdates; index += 1) {
+          implementation.updateOne(0, UPDATE_BASE + index);
+          const rows = implementation.readAll();
+          observedLength += rows.length;
+          observedValueSum += projectedValueById(rows, 0);
+        }
+
+        return {
+          durationMs: performance.now() - startedAt,
+          operations: workload.operations,
+        };
+      },
+      checksum: () =>
+        `${observedLength}:${observedValueSum}:${collectionChecksum(
+          implementation.readAll()
+        )}`,
       dispose: implementation.dispose,
     };
   },
@@ -741,13 +888,6 @@ export const createV15BenchmarkSuites = (
 ): readonly V15BenchmarkSuite[] => {
   validateConfig(config);
 
-  const initializationWorkload: BenchmarkWorkload = {
-    id: 'initialization',
-    title: 'Initialize and populate keyed state',
-    description: `Create the state container, populate ${config.collectionSize.toLocaleString()} keyed records, then verify the complete collection.`,
-    operations: 1,
-    expectedChecksum: expectedInitializationChecksum(config.collectionSize),
-  };
   const collection: BenchmarkWorkload = {
     id: 'collection',
     title: 'Update and read one keyed record',
@@ -758,87 +898,25 @@ export const createV15BenchmarkSuites = (
       config.collectionUpdates
     ),
   };
+  const projectionWorkload: BenchmarkWorkload = {
+    id: 'projection',
+    title: 'Update one record and re-read the collection',
+    description: `Seed ${config.collectionSize.toLocaleString()} records before timing, then update one record and realize the complete collection ${config.collectionUpdates.toLocaleString()} times.`,
+    operations: config.collectionUpdates,
+    expectedChecksum: expectedProjectionChecksum(
+      config.collectionSize,
+      config.collectionUpdates
+    ),
+  };
   const restorationWorkload: BenchmarkWorkload = {
     id: 'restoration',
-    title: 'Record and undo authored changes',
+    title: 'Consequential authored work: record and undo',
     description: `Apply ${config.restorationWrites} separate changes to one record, retain each change, then undo all ${config.restorationWrites}.`,
-    operations: 1,
+    operations: config.restorationWrites,
     expectedChecksum: expectedRestorationChecksum(config.restorationWrites),
   };
 
   return [
-    {
-      workload: initializationWorkload,
-      capability: KEYED_ENTITY_CAPABILITY,
-      applicationExample:
-        'A dispatcher opens an order board and the app creates and loads its keyed state.',
-      financialImpact:
-        'Initialization affects first-use wait time, but it should not be charged to every later order update.',
-      costLabel: 'One-time cost',
-      costContext:
-        'SignalTree performs more construction work in this checked initialization task, including creating its keyed identity and reactive state substrate. That upfront cost may be worthwhile when later updates amortize it in a long-lived store. For short-lived or read-once data, the trade may not pay back.',
-      calculation: {
-        timedCalculation: `One sample is the elapsed time around container construction, set-all of ${config.collectionSize.toLocaleString()} records, and one complete read. It is reported as one task.`,
-        outsideTimer:
-          'Seed-row creation, unique store names, module loading, round settling, and discarded warmup rounds stay outside the timer.',
-        correctnessCheck:
-          'After timing, the harness checks both the complete row count and the sum of every row value.',
-        notCompared:
-          'This does not measure application startup, JavaScript download or parsing, first render, subscriptions, retained memory, or garbage collection.',
-      },
-      relatedCommand:
-        'node --expose-gc tools/bench-public-collection-layers.mjs --samples 9',
-      arms: [
-        createInitializationArm(
-          'signaltree-angular',
-          'SignalTree Angular',
-          '#527d14',
-          'Angular realization: signalTree(), entityMap(), setAll(), and all()',
-          config,
-          () => createAngularSignalTreeCollection(hooks)
-        ),
-        createInitializationArm(
-          'signaltree-kernel',
-          'SignalTree Kernel',
-          '#79a51e',
-          'Framework-neutral @signal-tree/kernel realization',
-          config,
-          () => createKernelSignalTreeCollection(hooks)
-        ),
-        createInitializationArm(
-          'ngrx-signals',
-          'NgRx Signals',
-          '#325ea8',
-          'Initialization: signalState() with setAllEntities()',
-          config,
-          createNgRxCollection
-        ),
-        createInitializationArm(
-          'elf',
-          'Elf',
-          '#8b5b17',
-          'createStore(), withEntities(), and setEntities()',
-          config,
-          createElfCollection
-        ),
-        createInitializationArm(
-          'akita',
-          'Akita',
-          '#8554a3',
-          'EntityStore(), set(), and QueryEntity.getAll()',
-          config,
-          createAkitaCollection
-        ),
-        createInitializationArm(
-          'redux-toolkit',
-          'Redux Toolkit',
-          '#a13d62',
-          'Configured Redux store with createEntityAdapter()',
-          config,
-          createReduxToolkitCollection
-        ),
-      ],
-    },
     {
       workload: collection,
       capability: KEYED_ENTITY_CAPABILITY,
@@ -846,9 +924,9 @@ export const createV15BenchmarkSuites = (
         'A price feed updates one order by ID and the screen immediately reads that same order.',
       financialImpact:
         'This is the repeated cost paid on price, status, and quantity changes after the state is already loaded.',
-      costLabel: 'Ongoing cost',
+      costLabel: 'Primary recurring hot path',
       costContext:
-        'Construction and population finish before this timer starts. This is the cost paid again and again as an existing record changes, which is where SignalTree can amortize its more expensive setup.',
+        'Construction and population finish before this timer starts. This is the repeated point-access cost paid throughout a long-lived store; the public recurring comparison begins here.',
       calculation: {
         timedCalculation: `One sample is the elapsed time around ${config.collectionUpdates.toLocaleString()} repetitions of one public update-by-ID followed immediately by one public read of that ID. The chart ranks total task time.`,
         outsideTimer: `Container construction, population of ${config.collectionSize.toLocaleString()} records, one priming read, module loading, round settling, and discarded warmups stay outside the timer.`,
@@ -858,6 +936,8 @@ export const createV15BenchmarkSuites = (
           'No rendering, subscriber notification work, derived selectors, persistence, middleware side effects, retained memory, or feature weighting is added.',
       },
       relatedCommand: 'node tools/bench-vs-signalstore.mjs',
+      relatedSourceUrl: SIGNALTREE_REPOSITORY_URL,
+      relatedSourcePath: 'tools/bench-vs-signalstore.mjs',
       arms: [
         createCollectionArm(
           'signaltree-angular',
@@ -910,6 +990,78 @@ export const createV15BenchmarkSuites = (
       ],
     },
     {
+      workload: projectionWorkload,
+      capability: KEYED_ENTITY_CAPABILITY,
+      applicationExample:
+        'An order update invalidates a table, dropdown, or derived projection that immediately reads the complete collection again.',
+      financialImpact:
+        'Whole-state projection matters when a screen or derived model repeatedly needs one coherent complete value. Applications dominated by keyed point reads may have a different result, or no projection workload at all.',
+      costLabel: 'Conditional recurring workload',
+      costContext:
+        'Each timed cycle performs one keyed update and one complete collection read. It is included because some applications repeatedly need that coherent value, not because every SignalTree application should perform whole-state work after every mutation.',
+      calculation: {
+        timedCalculation: `One sample is the elapsed time around ${config.collectionUpdates.toLocaleString()} repetitions of one public update-by-ID followed by one complete public collection read. The chart ranks total task time.`,
+        outsideTimer: `Container construction, population of ${config.collectionSize.toLocaleString()} records, one priming complete read, module loading, round settling, and discarded warmups stay outside the timer.`,
+        correctnessCheck:
+          'After timing, the harness checks every observed collection length, every updated value read through the complete collection, and the final collection count and value sum.',
+        notCompared:
+          'No component rendering, derived business calculation, subscriber fan-out, retained memory, or assumed real-world execution frequency is added.',
+      },
+      relatedCommand: 'node tools/bench-workload-classes.mjs',
+      relatedSourceUrl: SIGNALTREE_REPOSITORY_URL,
+      relatedSourcePath: 'tools/bench-workload-classes.mjs',
+      arms: [
+        createProjectionArm(
+          'signaltree-angular',
+          'SignalTree Angular',
+          '#527d14',
+          'Angular realization: updateOne() followed by all()',
+          config,
+          () => createAngularSignalTreeCollection(hooks)
+        ),
+        createProjectionArm(
+          'signaltree-kernel',
+          'SignalTree Kernel',
+          '#79a51e',
+          'Neutral kernel: updateOne() followed by all()',
+          config,
+          () => createKernelSignalTreeCollection(hooks)
+        ),
+        createProjectionArm(
+          'ngrx-signals',
+          'NgRx Signals',
+          '#325ea8',
+          'updateEntity() followed by complete entity-map enumeration',
+          config,
+          createNgRxCollection
+        ),
+        createProjectionArm(
+          'elf',
+          'Elf',
+          '#8b5b17',
+          'updateEntities() followed by getAllEntities()',
+          config,
+          createElfCollection
+        ),
+        createProjectionArm(
+          'akita',
+          'Akita',
+          '#8554a3',
+          'EntityStore.update() followed by QueryEntity.getAll()',
+          config,
+          createAkitaCollection
+        ),
+        createProjectionArm(
+          'redux-toolkit',
+          'Redux Toolkit',
+          '#a13d62',
+          'Redux updateOne() dispatch followed by selectAll()',
+          config,
+          createReduxToolkitCollection
+        ),
+      ],
+    },
+    {
       workload: restorationWorkload,
       capability: FIRST_PARTY_HISTORY_CAPABILITY,
       applicationExample: `An invoice editor keeps ${config.restorationWrites} user changes so the clerk can undo them in order.`,
@@ -917,7 +1069,7 @@ export const createV15BenchmarkSuites = (
         'A broken undo can restore the wrong price or quantity. The checksum refuses to publish a timing unless every arm returns to the seeded value.',
       costLabel: 'Optional ongoing feature cost',
       costContext:
-        'This task ranks only first-party history implementations. SignalTree applies retained causal reversal facts while preserving its identity and coherent-publication semantics; Elf and Akita use their official history facilities. Their broader contracts differ, so the chart measures the shared linear-undo capability floor rather than claiming complete semantic equivalence.',
+        'This task ranks only first-party history implementations. SignalTree applies retained causal reversal facts while preserving its identity and coherent-publication semantics; Elf and Akita use their official history facilities. Their broader contracts differ, so the chart measures the shared linear-undo capability floor rather than claiming complete semantic equivalence. Sub-millisecond browser gaps near the timer floor are diagnostic, not proof of irreducible semantic overhead; overlapping observed ranges mean no clear difference in that run.',
       calculation: {
         timedCalculation: `One sample measures ${config.restorationWrites} record-and-update steps plus ${config.restorationWrites} undo-and-read steps. Total time determines rank; record and undo phase medians are also shown.`,
         outsideTimer: `Creation and seeding of ${config.restorationSize.toLocaleString()} records, history initialization/reset, module loading, round settling, and discarded warmups stay outside the timer.`,
@@ -927,6 +1079,8 @@ export const createV15BenchmarkSuites = (
           'The rows reach the same tested outcome but do not claim equivalent history semantics. Redo, branching, grouping, identity preservation, causal metadata, persistence, and UI rendering are not normalized.',
       },
       relatedCommand: 'node --expose-gc tools/bench-compare.mjs --n 10000',
+      relatedSourceUrl: SIGNALTREE_REPOSITORY_URL,
+      relatedSourcePath: 'tools/bench-compare.mjs',
       arms: [
         createRestorationArm(
           'signaltree-angular',

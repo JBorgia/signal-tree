@@ -34,7 +34,7 @@ try {
   }
 
   const expectedRows = await page.locator('.planned-arms > span').count();
-  await page.getByRole('button', { name: 'Run browser spot-check' }).click();
+  await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
   await page.waitForFunction(
     (expected) =>
       document.querySelectorAll('.result-row').length === expected ||
@@ -52,7 +52,7 @@ try {
 
   const report = await page.evaluate(
     ({ selectedMode, isDevelopment }) => ({
-      schemaVersion: 2,
+      schemaVersion: 4,
       generatedAt: new Date().toISOString(),
       source: '/benchmarks',
       mode: selectedMode,
@@ -68,11 +68,15 @@ try {
         title:
           workload.querySelector('.workload-heading h2')?.textContent?.trim() ??
           '',
-        costContext:
-          workload
-            .querySelector('.cost-context')
-            ?.textContent?.replace(/\s+/g, ' ')
-            .trim() ?? '',
+        costContext: {
+          label:
+            workload
+              .querySelector('.cost-context strong')
+              ?.textContent?.trim() ?? '',
+          body:
+            workload.querySelector('.cost-context p')?.textContent?.trim() ??
+            '',
+        },
         capability: {
           title:
             workload
@@ -85,7 +89,20 @@ try {
             workload.querySelectorAll('.capability-columns dl > div')
           ).map((exclusion) => ({
             label: exclusion.querySelector('dt')?.textContent?.trim() ?? '',
-            reason: exclusion.querySelector('dd')?.textContent?.trim() ?? '',
+            reason:
+              exclusion
+                .querySelector('dd > span:first-child')
+                ?.textContent?.trim() ?? '',
+            sources: Array.from(exclusion.querySelectorAll('a')).map(
+              (source) => ({
+                label: source.textContent?.trim() ?? '',
+                url: source.href,
+                path:
+                  source.nextElementSibling?.tagName === 'CODE'
+                    ? source.nextElementSibling.textContent?.trim() ?? ''
+                    : '',
+              })
+            ),
           })),
         },
         calculation: Object.fromEntries(
@@ -108,6 +125,19 @@ try {
               '',
             capabilityKind:
               row.querySelector('.comparison-kind')?.textContent?.trim() ?? '',
+            packages: Array.from(
+              row.querySelectorAll('.package-versions code')
+            ).map((packageReference) => packageReference.textContent?.trim()),
+            sources: Array.from(
+              row.querySelectorAll('.implementation-source-links a')
+            ).map((source) => ({
+              label: source.textContent?.trim() ?? '',
+              url: source.href,
+              path:
+                source.nextElementSibling?.tagName === 'CODE'
+                  ? source.nextElementSibling.textContent?.trim() ?? ''
+                  : '',
+            })),
             medianMs: Number(row.getAttribute('data-median-ms')),
             minMs: Number(row.getAttribute('data-min-ms')),
             maxMs: Number(row.getAttribute('data-max-ms')),
@@ -123,6 +153,70 @@ try {
             ),
           })
         ),
+        reproduction: {
+          sources: Array.from(
+            workload.querySelectorAll('.evidence-line a')
+          ).map((source) => ({
+            label: source.textContent?.trim() ?? '',
+            url: source.href,
+            path:
+              source.nextElementSibling?.tagName === 'CODE'
+                ? source.nextElementSibling.textContent?.trim() ?? ''
+                : '',
+          })),
+          command:
+            workload.querySelector('.evidence-command')?.textContent?.trim() ??
+            '',
+        },
+      })),
+      steadyStateProfile: (() => {
+        const profile = document.querySelector('.steady-state-value');
+        if (!profile) return null;
+
+        return {
+          signalTreeArmId: profile.getAttribute('data-profile-arm-id'),
+          normalization:
+            'Measured median / measured operations * requested operation count',
+          workloads: Array.from(
+            profile.querySelectorAll('.steady-state-row')
+          ).map((row) => ({
+            workloadId: row.getAttribute('data-profile-workload'),
+            title:
+              row
+                .querySelector('.steady-workload strong')
+                ?.textContent?.trim() ?? '',
+            unit:
+              row
+                .querySelector('.steady-workload small')
+                ?.textContent?.trim() ?? '',
+            measuredMedianMs: Number(
+              row.getAttribute('data-measured-median-ms')
+            ),
+            measuredOperations: Number(
+              row.getAttribute('data-measured-operations')
+            ),
+            perThousandMs: Number(row.getAttribute('data-per-thousand-ms')),
+            perTenThousandMs: Number(
+              row.getAttribute('data-per-ten-thousand-ms')
+            ),
+            perHundredThousandMs: Number(
+              row.getAttribute('data-per-hundred-thousand-ms')
+            ),
+            position: Number(row.getAttribute('data-position')),
+            cohortSize: Number(row.getAttribute('data-cohort-size')),
+          })),
+        };
+      })(),
+      foundations: Array.from(
+        document.querySelectorAll('.foundation-grid article')
+      ).map((foundation) => ({
+        status:
+          foundation.querySelector('.foundation-status')?.textContent?.trim() ??
+          '',
+        title: foundation.querySelector('h3')?.textContent?.trim() ?? '',
+        evidence: Array.from(
+          foundation.querySelectorAll('.foundation-evidence code')
+        ).map((source) => source.textContent?.trim() ?? ''),
       })),
     }),
     { selectedMode: mode, isDevelopment: developmentBuild }
@@ -141,14 +235,24 @@ try {
   }
 
   const invalidCapability = report.workloads.find(
-    ({ capability, calculation, results }) =>
+    ({ costContext, capability, calculation, results, reproduction }) =>
+      !costContext.label ||
+      !costContext.body ||
       !capability.title ||
       capability.requirements.length === 0 ||
-      capability.exclusions.some(({ label, reason }) => !label || !reason) ||
+      capability.exclusions.some(
+        ({ label, reason, sources }) =>
+          !label || !reason || sources.length === 0
+      ) ||
       Object.values(calculation).some((value) => !value) ||
+      !reproduction.command ||
+      reproduction.sources.length !== 3 ||
       results.some(
-        ({ capabilityKind }) =>
-          !capabilityKind || capabilityKind.startsWith('Harness')
+        ({ capabilityKind, packages, sources }) =>
+          !capabilityKind ||
+          capabilityKind.startsWith('Harness') ||
+          packages.length === 0 ||
+          sources.length === 0
       )
   );
   if (invalidCapability) {
@@ -157,6 +261,52 @@ try {
         invalidCapability.id ?? 'unknown workload'
       }`
     );
+  }
+
+  if (
+    report.workloads.length !== 3 ||
+    report.workloads.reduce(
+      (total, workload) => total + workload.results.length,
+      0
+    ) !== expectedRows ||
+    !report.steadyStateProfile ||
+    !report.steadyStateProfile.signalTreeArmId ||
+    !report.steadyStateProfile.normalization ||
+    report.steadyStateProfile.workloads.length !== 3 ||
+    report.steadyStateProfile.workloads.some(
+      ({
+        workloadId,
+        title,
+        unit,
+        measuredMedianMs,
+        measuredOperations,
+        perThousandMs,
+        perTenThousandMs,
+        perHundredThousandMs,
+        position,
+        cohortSize,
+      }) =>
+        !workloadId ||
+        !title ||
+        !unit ||
+        !Number.isFinite(measuredMedianMs) ||
+        !Number.isFinite(measuredOperations) ||
+        measuredOperations <= 0 ||
+        !Number.isFinite(perThousandMs) ||
+        !Number.isFinite(perTenThousandMs) ||
+        !Number.isFinite(perHundredThousandMs) ||
+        !Number.isInteger(position) ||
+        position < 1 ||
+        !Number.isInteger(cohortSize) ||
+        position > cohortSize
+    ) ||
+    report.foundations.length !== 4 ||
+    report.foundations.some(
+      ({ status, title, evidence }) =>
+        !status || !title || evidence.length === 0
+    )
+  ) {
+    throw new Error('Invalid recurring benchmark profile');
   }
 
   mkdirSync(dirname(outputPath), { recursive: true });

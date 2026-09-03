@@ -87,6 +87,41 @@ each. Determine where the additional roughly 700 B/leaf belongs before proposing
 an optimization. This is non-blocking for root retirement and React selector
 work; preserve behavior, public types, and construction-bound ownership.
 
+## RESTORATION-HOT-PATH-0
+
+Determine the irreducible recurring CPU cost of reversing one already-retained
+scalar causal turn, and identify work performed during `undo()` that can be
+prepaid when the designated turn is retained. This is a bounded, non-gating
+internal investigation: the browser's 20-change totals are sub-millisecond,
+quantized near its timer floor, and observed ranges can overlap. Do not change
+the public benchmark cohort or replace the retained-turn representation before
+attribution.
+
+Use one production tree, one entity, one scalar field, 20 sequential designated
+changes, then 20 sequential undos. Exclude structural mutation, external truth,
+conflicting later work, rendering, and module/setup cost. Compare the same
+already-known scalar reversal through the production realization port with the
+full public `undo()` path; the direct arm is internal calibration, not a product
+comparator.
+
+Instrument and report high-resolution Node timings and counters for:
+
+1. turn, position, frontier, and restoration-index lookup;
+2. undo-closure and affected-position resolution;
+3. reversal-effect materialization and refusal validation;
+4. atomic reversal mutation;
+5. causal/frontier bookkeeping and consistency checks;
+6. observation invalidation and coherent publication;
+7. redo/history cursor maintenance.
+
+The first falsifier is duplicated planning. `undoAt()` currently resolves the
+contained closure through `canUndoAt()`, resolves it again before selecting the
+seed position, and `undoPosition()` resolves the closure again. Measure those
+passes independently before changing them. Every arm must verify the value after
+each undo, final seeded state, retained/redo position, stable entity identity,
+and one coherent publication. Any proposed recording-time prepayment must report
+its retained-byte and designation-time cost beside the recurring undo gain.
+
 ## ENTITY-PHYSICAL-DENSITY-0
 
 Optimize representation under frozen semantics. ER-A membership, public API,

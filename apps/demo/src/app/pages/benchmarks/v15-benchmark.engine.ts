@@ -1,7 +1,4 @@
-export type BenchmarkWorkloadId =
-  | 'initialization'
-  | 'collection'
-  | 'restoration';
+export type BenchmarkWorkloadId = 'collection' | 'projection' | 'restoration';
 
 export interface BenchmarkWorkload {
   readonly id: BenchmarkWorkloadId;

@@ -59,6 +59,9 @@ const demoLibraryVersions = {
   'ngrx-signals': readInstalledPackageVersion('@ngrx/signals'),
   akita: readInstalledPackageVersion('@datorama/akita'),
   elf: readInstalledPackageVersion('@ngneat/elf'),
+  'elf-entities': readInstalledPackageVersion('@ngneat/elf-entities'),
+  'elf-state-history': readInstalledPackageVersion('@ngneat/elf-state-history'),
+  'redux-toolkit': readInstalledPackageVersion('@reduxjs/toolkit'),
   ngxs: readInstalledPackageVersion('@ngxs/store'),
 };
 

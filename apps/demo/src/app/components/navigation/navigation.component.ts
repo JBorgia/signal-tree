@@ -138,8 +138,7 @@ export class NavigationComponent {
         {
           id: 'benchmarks',
           title: 'Browser benchmarks',
-          description:
-            'Capability-matched v15 tasks across real implementations',
+          description: 'Capability-matched recurring costs and foundations',
           route: '/benchmarks',
         },
         {
