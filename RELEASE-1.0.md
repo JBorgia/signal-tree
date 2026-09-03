@@ -12762,11 +12762,12 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       density floor and regressed churn materially, so no replacement is
       selected. Full kernel validation is green; no second carrier experiment
       is authorized.
-- [x] **Final v15 demo and recurring benchmark surface (`af8c0c75`).** The
+- [x] **Final v15 demo and recurring benchmark surface (`af8c0c75`, comparator
+      retirement `2dd94c15`).** The
       public comparison starts after construction and keeps three independent
       recurring workloads: keyed update plus point read, conditional keyed
       update plus complete projection, and designated change plus undo. Their
-      capability-admitted cohorts contain `6 / 6 / 4` first-party arms (`16`
+      capability-admitted cohorts contain `5 / 5 / 3` first-party arms (`13`
       checked rows); initialization has no public rank or value score, and no
       crossover, payback, or aggregate score survives. Schema 4 exports raw
       timings, structured calculation context, exact package/source provenance,
@@ -12779,10 +12780,13 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       demo tests `140` passing / `4` intentionally skipped; strict typecheck;
       production AOT; demo lint with zero errors and one pre-existing warning;
       focused benchmark Playwright `5/5`; complete production route/layout/
-      hover matrix `126/126`; schema-4 production export `16` rows; development
-      export refusal; numeric claims `150/150`; complete comparison, update,
+      hover matrix `126/126`; schema-4 production export `13` rows; development
+      export refusal; numeric claims `138/138`; complete comparison, update,
       and 12-arm capability-density generators; benchmark gate and its
-      undo-removal mutation proof; final independent review clean.
+      undo-removal mutation proof; final independent review clean. The retired
+      comparator has no manifest, lockfile, installed, executable, current-doc,
+      package-source, demo, or built-artifact presence; point-in-time audit and
+      comparison evidence remains explicitly historical.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
