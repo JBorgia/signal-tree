@@ -77,7 +77,7 @@ concrete shipping, build, API, documentation, or automation failure.
   self-tests in the same change. Do not perform a bulk directory shuffle before
   publish merely to improve aesthetics.
 
-## CONSTRUCTION-DENSITY-0
+## CONSTRUCTION-DENSITY-0 — POST-GA / NON-GATING
 
 Investigate scalar-tree construction density without attributing it to the root
 accessor migration. Current generator evidence measures approximately
@@ -86,8 +86,14 @@ leaves; raw Angular signals in the same decomposition retain about 523 bytes
 each. Determine where the additional roughly 700 B/leaf belongs before proposing
 an optimization. This is non-blocking for root retirement and React selector
 work; preserve behavior, public types, and construction-bound ownership.
+Construction time is a regression ceiling, not an optimization target. Reopen
+retained scalar density only from a specific newly attributed allocation or
+ownership hypothesis, not from the headline bytes-per-leaf gap alone.
 
 ## RESTORATION-HOT-PATH-0
+
+**CLOSED — one production defect removed; no retained-plan redesign earned.**
+Reproduce with `node tools/bench-restoration-hot-path.mjs --production`.
 
 Determine the irreducible recurring CPU cost of reversing one already-retained
 scalar causal turn, and identify work performed during `undo()` that can be
@@ -122,7 +128,79 @@ each undo, final seeded state, retained/redo position, stable entity identity,
 and one coherent publication. Any proposed recording-time prepayment must report
 its retained-byte and designation-time cost beside the recurring undo gain.
 
-## ENTITY-PHYSICAL-DENSITY-0
+Result: root `tree.undo()` does not use scoped `undoAt()`. It resolves one
+ordinary closure per undo. The scoped manager path resolves the contained
+closure twice and an ordinary closure three times, but it is not the browser
+workload and is a post-GA local-refactor candidate only.
+
+The removable production cost was `assertTurnStatusConsistency()`: it scanned
+every retained turn after every undo and redo. With 1,000 retained scalar turns,
+the production batch measured about 119 ms while a reversible no-assertion arm
+measured about 4 ms. The refined controls separate the manager effect pipeline
+(about 1.9 ms) from precomputed physical application (about 1.1 ms). The
+scan now follows the shared production policy: `ngDevMode` when defined, with
+explicit `NODE_ENV=development`/`test` as the framework-neutral fallback.
+Explicit development and test environments retain the invariant; production
+and unknown browser environments skip it. A
+rebuilt production runs measure about 4-6 ms for 1,000 undos. At the
+browser-shaped 20 turns, production remains sub-millisecond and direct physical
+application is roughly 46 us in one run. Every profiled arm performs exactly one
+atomic realization application per turn. The remaining root overhead is only a
+few microseconds per undo and does not earn a retained representation change
+before GA.
+
+## BUNDLE-REACHABILITY-0
+
+**CLOSED — no accidental optional edge found.** Reproduce with
+`node tools/bundle-reachability.mjs`.
+
+The production audit measures 9.55 KB gzip bare, 21.49 KB with `entityMap`, and
+28.11 KB with exercised restoration. `entityMap` adds its entity runtime,
+structural/value stores, mutation frame, marker, projection seed, and structural
+effect cloning. Restoration adds its manager, realization adapter, transition
+planner, notifier/interceptor, restoration claims and reclamation, transaction
+lifecycle, position traversal, and structural effect cloning.
+
+`deep-clone` is not an accidental edge in either arm: `entityMap` snapshots
+structural add/remove/rekey payloads, and restoration prepares structural values
+for replay. Splitting scalar and structural restoration would be a packaging and
+runtime redesign, not import cleanup. Correcting the generators to designate a
+real turn puts restoration at about +18.6 KB over bare; the old arm called
+`undo()` on empty history and understated the reachable feature. No module can
+be removed without deleting a currently supported semantic job, so bundle
+reachability closes with no production change. Angular and React facade-only
+costs remain small and are not optimization targets.
+
+## RESTORATION-LIFETIME-0
+
+**POST-GA, NON-PUBLIC, NON-GATING.** If performance work reopens, run a
+long-duration production profile with 100k authored operations, a bounded
+restoration window, periodic undo/redo, mixed scalar and structural changes, and
+interspersed external realizations. Report CPU/op by time window, allocation/op,
+GC, retained-heap slope, history/index cardinality, and coherent publication
+cost. The governing question is whether recurring CPU and allocation remain
+flat as lifetime operation count grows. This is not another public comparator
+workload and does not block v15.
+
+## BULK-POPULATION-0
+
+**REGRESSION CEILING ONLY.** Current `entityMap.setAll(10k)` is about 23 ms after
+the transient-facade defect was reduced from roughly 90 ms. Do not optimize this
+path merely to improve construction. Reopen only for an algorithmic regression,
+a repeated same-machine material regression without a recurring benefit, or a
+pathological application startup falsifier. A slower `setAll` remains an
+acceptable trade when it buys measured recurring speed, density, allocation,
+GC, or restoration improvements.
+
+## ENTITY-PHYSICAL-DENSITY-0 — CLOSED
+
+The architecture-selection investigation is closed at `14302192`. Do not reopen
+Map/object/slot/pool variants because 487 B/entity looks unattractive. Reopen
+only with a materially new ownership or access hypothesis that represents a
+currently repeated fact once per collection or derives it implicitly from an
+existing authority. Any new candidate must beat the incumbent on retained bytes
+without regressing point latency, lifecycle, identity, restoration, churn, or
+GC.
 
 Optimize representation under frozen semantics. ER-A membership, public API,
 stable SubjectId behavior, held-reference correctness, rekey/remove/reactivation,

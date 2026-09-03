@@ -75,10 +75,29 @@ import type {
 // raised by `transactions()`, which owns rollback (TX-SURFACE-0).
 import { ENHANCER_META } from '../../lib/types';
 
-// Build-time dev flag. Declared locally rather than inherited from
-// `@angular/core`'s ambient types: it is a bundler convention, not a framework
-// API, and the kernel's declarations must not depend on Angular for it.
+// Angular's build-time flag takes precedence. Framework-neutral runtimes use an
+// explicit Node environment when available; unknown browser environments take
+// the production-safe path for this expensive internal invariant assertion.
 declare const ngDevMode: boolean | undefined;
+declare const process:
+  | { readonly env?: { readonly NODE_ENV?: string } }
+  | undefined;
+
+export function shouldRunRestorationConsistencyChecks(
+  angularDevMode: boolean | undefined,
+  nodeEnvironment: string | undefined
+): boolean {
+  return (
+    angularDevMode ??
+    (nodeEnvironment === 'development' || nodeEnvironment === 'test')
+  );
+}
+
+const RUN_RESTORATION_CONSISTENCY_CHECKS =
+  shouldRunRestorationConsistencyChecks(
+    typeof ngDevMode === 'undefined' ? undefined : Boolean(ngDevMode),
+    typeof process === 'undefined' ? undefined : process.env?.NODE_ENV
+  );
 
 import type {
   ReversalEffect,
@@ -1283,7 +1302,9 @@ class RestorationManager<T> {
     }
     this.bumpFrontiers();
 
-    this.assertTurnStatusConsistency();
+    if (RUN_RESTORATION_CONSISTENCY_CHECKS) {
+      this.assertTurnStatusConsistency();
+    }
     return closure;
   }
 
@@ -1326,7 +1347,9 @@ class RestorationManager<T> {
     }
     this.bumpFrontiers();
 
-    this.assertTurnStatusConsistency();
+    if (RUN_RESTORATION_CONSISTENCY_CHECKS) {
+      this.assertTurnStatusConsistency();
+    }
     return closure;
   }
 

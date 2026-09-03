@@ -60,7 +60,12 @@ const MARKERS = [
 
 const ENHANCERS = [
   ['batching', 'batching', 'batching()', 't.batch(() => t.$.count.set(2));'],
-  ['restoration', 'restoration', 'restoration()', 't.undo(); t.redo();'],
+  [
+    'restoration',
+    'restoration, undoable',
+    'restoration()',
+    'undoable(() => t.$.count.set(2)); t.undo(); t.redo();',
+  ],
   ['devTools', 'devTools', 'devTools()', 't.connectDevTools();'],
 
 ];
@@ -122,12 +127,15 @@ const COMBOS = [
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
   ['current public surface mix', `
     import { signalTree, entityMap,
-             batching, restoration } from ${C};
+             batching, restoration, undoable } from ${C};
     const t = signalTree({
       rows: entityMap({ selectId: (r) => r.id }),
       count: 0,
     }, { enhancers: [batching(), restoration()] });
-    t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.count.set(1); }); t.undo();
+    undoable(() => t.batch(() => {
+      t.$.rows.addOne({ id: 1 }); t.$.count.set(1);
+    }));
+    t.undo(); t.redo();
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
 ];
 out.combos = [];
