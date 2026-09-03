@@ -11,7 +11,7 @@
  *   2. pre-publish validation passed having checked 5 of 7 packages;
  *   3. `typecheck` passed reading only the typing specs, never the sources;
  *   4. a property test passed while the code under it dropped data;
- *   5. a benchmark published SignalTree as 20x faster than elf while SignalTree
+ *   5. a benchmark published SignalTree as 20x faster than a competitor while SignalTree
  *      was idle and doing no work at all;
  *   6. a granularity timing "measured" granularity with a loop that forced every
  *      consumer to re-read, which flatters the LEAST granular store;
@@ -616,12 +616,12 @@ const GATES = [
     name: 'bench-harness',
     releaseOnly: true,
     covers:
-      'all 4 benchmark arms construct, run, and satisfy their postconditions',
+      'all 3 benchmark arms construct, run, and satisfy their postconditions',
     cmd: ['node', '--expose-gc', 'tools/bench-compare.mjs', '--n', '200'],
     needsBuild: true,
     // The postconditions live in the child. Breaking the undo call makes the
     // signaltree arm restore nothing — exactly the idle-arm bug that was
-    // published once as "20x faster than elf".
+    // published once as a false competitor win.
     mutation: {
       file: 'tools/bench-compare.mjs',
       find: '      impl.undo();',
@@ -667,7 +667,7 @@ const GATES = [
     name: 'memory-compare',
     releaseOnly: true,
     covers:
-      'all 4 cross-library memory arms construct and measure a marginal slope',
+      'all 3 cross-library memory arms construct and measure a marginal slope',
     cmd: ['node', '--expose-gc', 'tools/memory-compare.mjs', '--n', '1000'],
     needsBuild: true,
     // Anchored on the child's dispatch, NOT on its unknown-arm branch: the
@@ -677,7 +677,8 @@ const GATES = [
     mutation: {
       file: 'tools/memory-compare.mjs',
       find: '  const build = ARMS[name];',
-      replace: "  const build = name === 'elf' ? null : ARMS[name];",
+      replace:
+        "  const build = name === 'raw-angular-signals' ? null : ARMS[name];",
     },
   },
   {
@@ -685,7 +686,7 @@ const GATES = [
     covers:
       'every arm of the cross-library update matrix constructs, runs and satisfies its postconditions',
     // NOT a performance budget and must not become one — timings move with
-    // machine load far more than with code. What this proves is that all four
+    // machine load far more than with code. What this proves is that all three
     // arms still BUILD and that every operation's postcondition fires, so a
     // silently dropped write cannot be reported as the fastest arm in the
     // table. The numbers are read by a human from
@@ -929,7 +930,7 @@ const GATES = [
     name: 'state-scale',
     releaseOnly: true,
     covers:
-      'the O(1)-write thesis, measured against @ngrx/signals and elf on both axes',
+      'the O(1)-write thesis, measured against @ngrx/signals on state-size and consumer axes',
     cmd: ['node', 'tools/bench-state-scale.mjs', '--quick'],
     needsBuild: true,
     // Every arm asserts its write landed. Breaking the signaltree write makes
@@ -937,9 +938,9 @@ const GATES = [
     // idle arm, which this repo has published once already.
     mutation: {
       file: 'tools/bench-state-scale.mjs',
-      find: '    for (let w = 0; w < WRITES; w++) tree.$.k0.v.set(w);\n  });\n\n  const store = createStore({ name: `flat${size}` }',
+      find: '  const st = median(() => {\n    for (let w = 0; w < WRITES; w++) tree.$.k0.v.set(w);\n  });\n\n  const state = signalState(flat(size));',
       replace:
-        '    for (let w = 0; w < WRITES; w++) void w;\n  });\n\n  const store = createStore({ name: `flat${size}` }',
+        '  const st = median(() => {\n    for (let w = 0; w < WRITES; w++) void w;\n  });\n\n  const state = signalState(flat(size));',
     },
   },
   {
@@ -977,9 +978,9 @@ const GATES = [
     // a table with the inconvenient row silently missing is the risk.
     mutation: {
       file: 'tools/size-compare.mjs',
-      find: "  import { createStore, withProps, select } from '@ngneat/elf';",
+      find: "      import { signalState, patchState } from '@ngrx/signals';\n      const store = signalState({ count: 0, user: { name: 'a' } });",
       replace:
-        "  import { nothing } from '@ngneat/this-package-does-not-exist';",
+        "      import { nothing } from '@ngrx/this-package-does-not-exist';\n      const store = signalState({ count: 0, user: { name: 'a' } });",
     },
   },
   {

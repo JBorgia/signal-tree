@@ -14,7 +14,6 @@
  *   signaltree     entityMap({ selectId })
  *   ngrx-signals   signalState + @ngrx/signals/entities updaters (setAllEntities,
  *                  updateEntity) — the official entity API
- *   elf            createStore + withEntities + setEntities/updateEntities
  *   raw-signals    a hand-rolled Map-of-signals store, which is what you write
  *                  when you have no library
  *
@@ -24,9 +23,8 @@
  *   undo-redo   50 writes recorded to history, then 50 undos
  *
  * Undo/redo is where the libraries genuinely differ. SignalTree ships
- * `restoration()`; elf ships `@ngneat/elf-state-history`, which is installed here
- * and used — testing elf WITHOUT its own history primitive would have been a
- * strawman, and the first run of this file did exactly that.
+ * `restoration()`; the other measured libraries have no matching history
+ * primitive in this harness and therefore use explicit snapshot restoration.
  *
  * @ngrx/signals has no history primitive for a SignalStore, so its arm does the
  * idiomatic hand-rolled thing: snapshot state per change. That is not a
@@ -49,7 +47,7 @@
  * AND ONE SETTLING RULE FOR ALL ARMS. Retention is read through
  * `tools/lib/heap-quiescence.mjs`, which drains turn boundaries until the heap
  * stops moving. This matters more than it sounds: adding that boundary moves
- * signaltree by ~54 MB and moves elf, ngrx-signals and raw-signals by 0.00 MB
+ * signaltree by ~54 MB and moves ngrx-signals and raw-signals by 0.00 MB
  * each, because signaltree is the only arm here with a microtask-deferred
  * notifier, weak caches and a FinalizationRegistry. A protocol that only one
  * arm is sensitive to is not a comparison, and the old table was one.
@@ -151,34 +149,6 @@ const IMPLS = {
         if (prev) patchState(store, () => prev);
       },
       history,
-    };
-  },
-
-  elf: async (withHistory) => {
-    const { createStore, withProps } = await import('@ngneat/elf');
-    const {
-      withEntities,
-      setEntities,
-      updateEntities,
-      getAllEntities,
-      getEntity,
-    } = await import('@ngneat/elf-entities');
-    // elf's OWN history primitive — the fair comparison for this library.
-    const { stateHistory } = await import('@ngneat/elf-state-history');
-    const store = createStore(
-      { name: 'bench' },
-      withProps({}),
-      withEntities({ initialValue: [] })
-    );
-    const history = withHistory ? stateHistory(store, { maxAge: 200 }) : null;
-    return {
-      store,
-      setAll: (d) => store.update(setEntities(d)),
-      updateOne: (id, changes) => store.update(updateEntities(id, changes)),
-      readAll: () => store.query(getAllEntities()),
-      readOne: (id) => store.query(getEntity(id)),
-      hasBuiltInHistory: true,
-      undo: () => history?.undo(),
     };
   },
 
@@ -306,9 +276,9 @@ if (armName) {
   }
 
   // History is ON only for the undo/redo workload. Leaving it on during the
-  // collection workload confounded the first run: signaltree and elf paid for
-  // recording while ngrx-signals and raw-signals did not, because they have no
-  // primitive to enable. Each workload now isolates one thing.
+  // collection workload confounded the first run: signaltree paid for recording
+  // while ngrx-signals and raw-signals did not, because they have no primitive
+  // to enable. Each workload now isolates one thing.
   const withHistory = workload === 'undo-redo';
 
   // ONE PHASE PER PROCESS. `--phase timing` never reads the heap and
@@ -358,7 +328,7 @@ if (armName) {
     // library's module graph to the collection. That is not a rounding error
     // and it is not equal across arms: @signal-tree/kernel (which pulls Angular)
     // retains 6.67 MB of module graph, @ngrx/signals 5.88 MB, @angular/core
-    // alone 5.75 MB, @ngneat/elf 2.18 MB. Charging each arm its own library's
+    // alone 5.75 MB. Charging each arm its own library's
     // load made SignalTree read 18.12 MB against an isolated-probe 11.41 MB for
     // the identical collection, and made the cross-arm gap look 4x smaller than
     // it is by padding every competitor with its own import cost.
@@ -491,9 +461,9 @@ if (process.argv.includes('--json')) {
     );
   }
   console.log(
-    "\n  Every arm implements the same capability using that library's own entity\n" +
-      '  API. SignalTree and elf use their own history primitives; ngrx-signals\n' +
-      '  and raw signals snapshot state per change because they have none.'
+    "\n  Every arm implements the same keyed capability using that library's own\n" +
+      '  API. SignalTree uses its restoration primitive; ngrx-signals and raw\n' +
+      '  signals snapshot state per change because they have none.'
   );
 }
 

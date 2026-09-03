@@ -12,9 +12,8 @@
  * `docs/compare/capability-matrix.md` is built from this output, so every ✅ in
  * it traces to a symbol in a shipped declaration file.
  *
- * Reading the types found the defect that prompted the whole exercise: elf's
- * `StateHistory` exposes `hasPast$`/`hasFuture$` as OBSERVABLES, which raised
- * the question of whether our `canUndo()` was reactive at all. It was not.
+ * Reading the types found reactive capability differences that documentation
+ * alone had obscured, including whether history status can drive a view.
  *
  * ## What this does NOT tell you
  *
@@ -26,7 +25,7 @@
  * Usage:
  *   node tools/api-surface.mjs                 # all libraries
  *   node tools/api-surface.mjs --json
- *   node tools/api-surface.mjs --only=elf      # substring match on the name
+ *   node tools/api-surface.mjs --only=ngrx     # substring match on the name
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -53,9 +52,6 @@ const PACKAGES = [
   { name: '@signal-tree/kernel', dir: 'dist/packages/kernel' },
   { name: '@ngrx/signals', dir: 'node_modules/@ngrx/signals' },
   { name: '@ngrx/store', dir: 'node_modules/@ngrx/store' },
-  { name: '@ngneat/elf', dir: 'node_modules/@ngneat/elf' },
-  { name: '@ngneat/elf-entities', dir: 'node_modules/@ngneat/elf-entities' },
-  { name: '@ngneat/elf-state-history', dir: 'node_modules/@ngneat/elf-state-history' },
   { name: '@ngxs/store', dir: 'node_modules/@ngxs/store' },
   { name: '@datorama/akita', dir: 'node_modules/@datorama/akita' },
 ];
@@ -184,7 +180,7 @@ function collect(file, seen = new Set(), out = new Set()) {
         // including everything internal. Our count came out at 214 where the
         // barrel names 154, and the inflation was uneven across libraries:
         // @ngrx and @ngxs ship single-file rolled-up bundles with nothing to
-        // recurse into, so they were counted honestly while we and elf were not.
+        // recurse into, so they were counted honestly while multi-file packages were not.
         //
         // The headline number was therefore comparing our internals against
         // their public API. Reported as "248 vs 56", which is exactly the kind

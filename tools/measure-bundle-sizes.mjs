@@ -76,12 +76,6 @@ const ENTRIES = {
     s.add({ id: 1, name: 'a' }); s.update(1, { name: 'b' });
     globalThis.__sink = [q.selectAll(), Store, Query, StoreConfig];
   `,
-  elf: `
-    import { createStore, withProps, select, setProp } from '@ngneat/elf';
-    import { withEntities, setEntities, updateEntities, selectAllEntities } from '@ngneat/elf-entities';
-    const store = createStore({ name: 'app' }, withProps({ count: 0 }), withEntities());
-    globalThis.__sink = [store, select, setProp, setEntities, updateEntities, selectAllEntities];
-  `,
 };
 
 const EXTERNAL = ['@angular/*', 'rxjs', 'rxjs/*', 'tslib'];
@@ -114,8 +108,8 @@ for (const [id, code] of Object.entries(ENTRIES)) {
       // carries far more ngDevMode-guarded material than the others (ST-coded
       // diagnostics, construction-time shape warnings), so it was paying the
       // largest phantom bill. Adding the define moves signaltree 11.63 -> 9.21
-      // KB, ngxs 8.91 -> 7.44 and ngrx-signals 2.35 -> 1.92, while elf, akita
-      // and ngrx-store do not move at all.
+      // KB, ngxs 8.91 -> 7.44 and ngrx-signals 2.35 -> 1.92, while akita and
+      // ngrx-store do not move at all.
       //
       // The corroboration that this is right rather than merely flattering:
       // tools/size-compare.mjs has always set it, and independently measures
@@ -145,7 +139,11 @@ const outPath = new URL('../artifacts/bundle-sizes.json', import.meta.url)
 writeFileSync(
   outPath,
   JSON.stringify(
-    { measuredAt: process.env.MEASURED_AT || null, external: EXTERNAL, results },
+    {
+      measuredAt: process.env.MEASURED_AT || null,
+      external: EXTERNAL,
+      results,
+    },
     null,
     2
   )

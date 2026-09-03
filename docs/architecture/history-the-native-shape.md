@@ -39,11 +39,11 @@ snapshots navigated by index**:
 
 Also notice the vocabulary: `maxHistorySize`, `shouldSkip`, `pauseRecording`,
 `jumpTo`. Every one is a snapshot-stack concept, and three of them arrived in
-14.0.0 from a capability audit whose stated motivation was "elf and Akita ship
+14.0.0 from a capability audit whose stated motivation was "peer stores ship
 pause and a comparator; we shipped neither."
 
 **That is the mistake.** A snapshot stack is the only architecture available to an
-immutable-root store. Redux, elf and Akita capture the root reference because the
+immutable-root store. Redux-style stores capture the root reference because the
 root reference is the only thing they can capture cheaply — every write already
 produced a new one. Their history design is downstream of their write design.
 
@@ -84,7 +84,7 @@ So the native currency of a SignalTree change is not a state. It is:
   note it is only expressible _because_ entries are retained, which is why moving
   `shouldSkip` to read time was a prerequisite rather than a separate fix.
 - **Scope** = filter by path prefix. `undo` over `$.draft` cannot see `$.rows`.
-  Gaps E and F, gone. **Per-entity undo — the thing elf has and we "cannot do" —
+  Gaps E and F, gone. **Per-entity undo — the thing a peer store had and we "cannot do" —
   is `path.startsWith('$.rows.' + id)`.** It falls out.
 - **Authorship** = a field on the entry. A server push carries `author: 'server'`
   and a user's undo filters it out. The failure where Ctrl+Z reverts a change the

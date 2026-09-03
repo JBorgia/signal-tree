@@ -111,7 +111,6 @@ describe('V15BenchmarksComponent', () => {
     );
     expect(rendered).toContain('@ngrx/signals 21.1.1');
     expect(rendered).toContain('@reduxjs/toolkit 2.12.0');
-    expect(rendered).toContain('@ngneat/elf-state-history 1.4.0');
     expect(rendered).toContain('Reproduce and inspect');
     expect(rendered).toContain('Ten-year architecture bet');
     expect(rendered).toContain(
@@ -143,7 +142,7 @@ describe('V15BenchmarksComponent', () => {
     ).toHaveLength(9);
     expect(
       fixture.nativeElement.querySelectorAll('.planned-arm .source-links a')
-    ).toHaveLength(16);
+    ).toHaveLength(13);
     expect(rendered).not.toContain('Middleware');
     expect(rendered).not.toContain('Async enhancer');
     expect(rendered).not.toContain('Time travel');
@@ -293,7 +292,7 @@ describe('V15BenchmarksComponent', () => {
           recurringReport('collection', 10, [
             result('signaltree-angular', 'SignalTree Angular', 1, 0.8, 1.2),
             result('signaltree-kernel', 'SignalTree Kernel', 2, 1.8, 2.2),
-            result('elf', 'Elf', 3, 2.8, 3.2),
+            result('akita', 'Akita', 3, 2.8, 3.2),
           ]),
         ],
         [
@@ -301,13 +300,13 @@ describe('V15BenchmarksComponent', () => {
           recurringReport('projection', 10, [
             result('signaltree-angular', 'SignalTree Angular', 2, 1.8, 2.2),
             result('signaltree-kernel', 'SignalTree Kernel', 3, 2.8, 3.2),
-            result('elf', 'Elf', 5, 4.8, 5.2),
+            result('akita', 'Akita', 5, 4.8, 5.2),
           ]),
         ],
         [
           'restoration',
           recurringReport('restoration', 10, [
-            result('elf', 'Elf', 1, 0.8, 1.2),
+            result('akita', 'Akita', 1, 0.8, 1.2),
             result('signaltree-kernel', 'SignalTree Kernel', 3, 2.8, 3.2),
             result('signaltree-angular', 'SignalTree Angular', 4, 3.8, 4.2),
           ]),
@@ -339,7 +338,7 @@ describe('V15BenchmarksComponent', () => {
       .find((candidate) => candidate.workload.id === 'restoration');
     if (!suite) throw new Error('Expected restoration benchmark suite');
 
-    component.openComparison(suite, 'elf');
+    component.openComparison(suite, 'akita');
     fixture.detectChanges();
 
     const dialog = fixture.nativeElement.querySelector(
@@ -348,17 +347,17 @@ describe('V15BenchmarksComponent', () => {
     const rendered = text(fixture);
     expect(dialog.hasAttribute('open')).toBe(true);
     expect(rendered).toContain('First-party history add-on');
-    expect(rendered).toContain('First-party Elf history add-on');
-    expect(rendered).toContain('@ngneat/elf-state-history 1.4.0');
+    expect(rendered).toContain('First-party Akita StateHistoryPlugin');
+    expect(rendered).toContain('@datorama/akita 8.0.1');
     expect(rendered).toContain('What was added');
     expect(rendered).toContain(
-      'installs @ngneat/elf-state-history on the real Elf entity store'
+      'attaches StateHistoryPlugin to the real Akita QueryEntity'
     );
     expect(rendered).toContain('What was not included');
     expect(rendered).not.toContain('Harness-supplied history outcome');
     expect(
       dialog.querySelector(
-        'a[href="https://unpkg.com/@ngneat/elf-state-history@1.4.0/index.js"]'
+        'a[href="https://opensource.salesforce.com/akita/docs/plugins/state-history/"]'
       )
     ).not.toBeNull();
 

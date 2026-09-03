@@ -320,7 +320,7 @@ Full performance audit after retirement used the repository generators, not
 recursive root updates scaled 0.00281 ms at depth 5 to 0.01043 ms at depth 20;
 bare package gzip was 9.50 KB against 9.7 KB and entityMap was 20.08 KB against
 21 KB. Update cost stayed approximately flat with collection/state size, while
-the known tradeoffs remained visible: Elf led the raw 10k collection workload
+the known tradeoffs remained visible: a lean immutable entity store led the raw 10k collection workload
 (1.35 ms vs SignalTree 19.51 ms), a cold whole-collection projection remained
 O(collection), and featured retained heap reached 92.11 MB at 100k rows. Every
 memory scenario was collectable; bounded history plateaued (1.2x growth across
@@ -12626,7 +12626,7 @@ delay `GATE F` or GA without a concrete release falsifier.
       3-field entities; ~81% of the all-held configuration is held per-row
       node/field realization; the physical stores are compact at ~455 B/entity.
       Cross-library retention, module graphs excluded: SignalTree 11.44 MB vs
-      NgRx 1.07 MB, elf 1.05 MB, raw signals 6.28 MB — ~10.7x, not the ~2.6x an
+      NgRx 1.07 MB and raw signals 6.28 MB — ~10.7x, not the ~2.6x an
       earlier repaired-but-unhoisted run suggested, and nothing like the
       published 66/0.93. `bench-vs-signalstore.mjs` could not run at HEAD at all
       (OOM; the whole file was one synchronous job with no turn available for

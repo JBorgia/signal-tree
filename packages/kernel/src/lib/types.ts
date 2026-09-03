@@ -27,7 +27,7 @@ export interface RestorationConfig {
   /** Enable/disable time travel (default: true) */
   enabled?: boolean;
   /**
-    * Maximum number of completed history entries to keep. Zero retains none.
+   * Maximum number of completed history entries to keep. Zero retains none.
    * @default 50
    */
   maxHistorySize?: number;
@@ -42,7 +42,6 @@ export interface RestorationConfig {
   // its time deleting elsewhere.
   //
   // Restoration admission has exactly one public door: `undoable()`.
-
 }
 // Core v6 types — type-safe enhancer architecture
 
@@ -761,7 +760,7 @@ export interface EntitySignalOf<
 
   // Active entity — the master/detail primitive.
   //
-  // Added in 14.0.0 after a capability audit found elf and Akita both ship it
+  // Added in 14.0.0 after a capability audit found peer stores ship it
   // and every team otherwise hand-rolls `activeId: null` plus a derived lookup.
   // `activeEntity` resolves through `byId`, so it is O(1) and invalidates only
   // when THAT row changes — finer-grained than the filtered-stream versions the

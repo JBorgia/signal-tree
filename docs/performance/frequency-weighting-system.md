@@ -38,7 +38,7 @@ same goes for React DevTools Profiler data in an Angular library's benchmark.
 
 The multipliers feed `weightedTotalScore` in the orchestrator, which produces
 the per-library ranking. So the weights that decide how SignalTree scores
-against NgRx, Akita, Elf and the rest are chosen by SignalTree's maintainer.
+against NgRx, Akita and the rest are chosen by SignalTree's maintainer.
 
 That is a conflict, and it is why the honest framing matters more here than in
 an ordinary doc. **Use the `equal` preset — every weight 1.0 — for any

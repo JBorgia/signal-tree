@@ -27,7 +27,7 @@
  * `bench-compare.mjs` publish a difference of two contaminated readings. It
  * matters most HERE, in the one file whose entire purpose is cross-library
  * comparison: the boundary is worth ~54 MB to the SignalTree arm and 0.00 MB to
- * elf, ngrx-signals and raw-signals, so measuring without it does not make
+ * ngrx-signals and raw-signals, so measuring without it does not make
  * every arm equally wrong, it makes exactly one arm wrong. Slope-of-two-sizes
  * does not rescue it either, because the un-reclaimed garbage scales with N and
  * so lands in the slope rather than cancelling out of it.
@@ -92,20 +92,6 @@ const ARMS = {
     const s = signalState({ rows: rows(n) });
     void s.rows();
     return s;
-  },
-  elf: async (n) => {
-    const { createStore, withProps } = await import('@ngneat/elf');
-    const { withEntities, setEntities, selectAllEntities } = await import(
-      '@ngneat/elf-entities'
-    );
-    const store = createStore(
-      { name: 'bench' },
-      withProps({}),
-      withEntities({ initialValue: [] })
-    );
-    store.update(setEntities(rows(n)));
-    const sub = store.pipe(selectAllEntities()).subscribe(() => undefined);
-    return { store, sub };
   },
 };
 

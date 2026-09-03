@@ -5,12 +5,12 @@ import { signalTree } from './signal-tree';
 
 /**
  * Three collection capabilities added in 14.0.0 after a capability audit against
- * elf, Akita, `@ngrx/signals` and NGXS.
+ * Akita, `@ngrx/signals` and NGXS.
  *
  * - **prepend** — every other library in that audit had it; we were the only one
  *   without. `setAll([entity, ...existing])` is the workaround and it rebuilds
  *   every per-entity signal.
- * - **active entity** — elf and Akita both ship it, and every team otherwise
+ * - **active entity** — peer stores ship it, and every team otherwise
  *   hand-rolls `activeId` plus a derived lookup. Ours resolves through the
  *   per-entity signal rather than through the collection, so it is granular;
  *   that property is the point and is pinned below with recompute counts.

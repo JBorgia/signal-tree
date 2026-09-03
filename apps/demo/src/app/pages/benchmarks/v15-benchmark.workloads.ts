@@ -9,15 +9,6 @@ import {
   createEntityAdapter,
   createSlice,
 } from '@reduxjs/toolkit';
-import { createStore, withProps } from '@ngneat/elf';
-import {
-  getAllEntities,
-  getEntity,
-  setEntities,
-  updateEntities,
-  withEntities,
-} from '@ngneat/elf-entities';
-import { stateHistory } from '@ngneat/elf-state-history';
 import { patchState, signalState } from '@ngrx/signals';
 import { setAllEntities, updateEntity } from '@ngrx/signals/entities';
 import {
@@ -154,15 +145,10 @@ type BenchmarkLibraryId =
   | 'signaltree-angular'
   | 'signaltree-kernel'
   | 'ngrx-signals'
-  | 'elf'
   | 'akita'
   | 'redux-toolkit';
 
-type HistoryLibraryId =
-  | 'signaltree-angular'
-  | 'signaltree-kernel'
-  | 'elf'
-  | 'akita';
+type HistoryLibraryId = 'signaltree-angular' | 'signaltree-kernel' | 'akita';
 
 const DIRECT_STATE_NOT_INCLUDED =
   'No component rendering, subscriptions, effects, persistence, DevTools, bundle loading, retained memory, or feature-completeness weighting is timed.';
@@ -183,14 +169,6 @@ const SOURCES = {
   ngrxEntities: {
     label: 'NgRx Signal Store entity management',
     url: 'https://ngrx.io/guide/signals/signal-store/entity-management',
-  },
-  elfEntities: {
-    label: 'Elf entities 5.0.2 implementation',
-    url: 'https://unpkg.com/@ngneat/elf-entities@5.0.2/index.esm.js',
-  },
-  elfHistory: {
-    label: 'Elf state-history 1.4.0 implementation',
-    url: 'https://unpkg.com/@ngneat/elf-state-history@1.4.0/index.js',
   },
   akitaEntities: {
     label: 'Akita EntityStore documentation',
@@ -224,18 +202,6 @@ const PACKAGES = {
   ],
   signaltreeKernel: [{ name: '@signal-tree/kernel', versionKey: 'signaltree' }],
   ngrxSignals: [{ name: '@ngrx/signals', versionKey: 'ngrx-signals' }],
-  elfEntities: [
-    { name: '@ngneat/elf', versionKey: 'elf' },
-    { name: '@ngneat/elf-entities', versionKey: 'elf-entities' },
-  ],
-  elfHistory: [
-    { name: '@ngneat/elf', versionKey: 'elf' },
-    { name: '@ngneat/elf-entities', versionKey: 'elf-entities' },
-    {
-      name: '@ngneat/elf-state-history',
-      versionKey: 'elf-state-history',
-    },
-  ],
   akita: [{ name: '@datorama/akita', versionKey: 'akita' }],
   reduxToolkit: [{ name: '@reduxjs/toolkit', versionKey: 'redux-toolkit' }],
 } satisfies Record<string, readonly BenchmarkPackageReference[]>;
@@ -338,17 +304,6 @@ const KEYED_COMPARISON_NOTES = {
       'The adapter invokes the documented keyed-state mechanism and adds no history or caching.',
     notIncluded: DIRECT_STATE_NOT_INCLUDED,
   },
-  elf: {
-    kind: 'First-party entity add-on',
-    packages: PACKAGES.elfEntities,
-    sources: [SOURCES.elfEntities],
-    featureSource: 'First-party Elf entities package',
-    addedForComparison:
-      'The benchmark includes @ngneat/elf-entities and a thin adapter around its public entity operations.',
-    whyItWasAdded:
-      'Elf exposes keyed collection behavior through its first-party entities package.',
-    notIncluded: DIRECT_STATE_NOT_INCLUDED,
-  },
   akita: {
     kind: 'Library keyed API',
     packages: PACKAGES.akita,
@@ -396,17 +351,6 @@ const RESTORATION_COMPARISON_NOTES = {
       'Nothing beyond the task adapter. Kernel restoration records designated undoable() causal turns.',
     whyItWasAdded:
       'This measures the same SignalTree feature without an Angular realization.',
-    notIncluded: HISTORY_NOT_INCLUDED,
-  },
-  elf: {
-    kind: 'First-party history add-on',
-    packages: PACKAGES.elfHistory,
-    sources: [SOURCES.elfHistory],
-    featureSource: 'First-party Elf history add-on',
-    addedForComparison:
-      'The benchmark installs @ngneat/elf-state-history on the real Elf entity store.',
-    whyItWasAdded:
-      'Elf publishes history as a separate first-party package rather than in its base store.',
     notIncluded: HISTORY_NOT_INCLUDED,
   },
   akita: {
@@ -693,25 +637,6 @@ const createNgRxCollection = (): CollectionImplementation => {
   };
 };
 
-const createElfCollection = (instanceId?: string): CollectionImplementation => {
-  const store = createStore(
-    { name: `v15-browser-collection-${instanceId ?? crypto.randomUUID()}` },
-    withProps({}),
-    withEntities<BenchmarkRow>()
-  );
-
-  return {
-    setAll: (rows) => store.update(setEntities([...rows])),
-    updateOne: (id, value) =>
-      store.update(
-        updateEntities(id, (row: BenchmarkRow) => ({ ...row, value }))
-      ),
-    readAll: () => store.query(getAllEntities()),
-    readOne: (id) => store.query(getEntity(id)),
-    dispose: () => store.destroy(),
-  };
-};
-
 const createAkitaCollection = (
   instanceId?: string
 ): CollectionImplementation => {
@@ -830,31 +755,6 @@ const createKernelSignalTreeRestoration = async (
   };
 };
 
-const createElfRestoration = (
-  rows: readonly BenchmarkRow[]
-): RestorationImplementation => {
-  const store = createStore(
-    { name: `v15-browser-restoration-${crypto.randomUUID()}` },
-    withProps({}),
-    withEntities<BenchmarkRow>()
-  );
-  store.update(setEntities([...rows]));
-  const history = stateHistory(store, { maxAge: rows.length + 100 });
-
-  return {
-    updateOne: (id, value) =>
-      store.update(
-        updateEntities(id, (row: BenchmarkRow) => ({ ...row, value }))
-      ),
-    readOne: (id) => store.query(getEntity(id)),
-    undo: () => history.undo(),
-    dispose: () => {
-      history.destroy({ clearHistory: true });
-      store.destroy();
-    },
-  };
-};
-
 const createAkitaRestoration = (
   rows: readonly BenchmarkRow[]
 ): RestorationImplementation => {
@@ -964,14 +864,6 @@ export const createV15BenchmarkSuites = (
           createNgRxCollection
         ),
         createCollectionArm(
-          'elf',
-          'Elf',
-          '#8b5b17',
-          'updateEntities() followed by getEntity()',
-          config,
-          createElfCollection
-        ),
-        createCollectionArm(
           'akita',
           'Akita',
           '#8554a3',
@@ -1036,14 +928,6 @@ export const createV15BenchmarkSuites = (
           createNgRxCollection
         ),
         createProjectionArm(
-          'elf',
-          'Elf',
-          '#8b5b17',
-          'updateEntities() followed by getAllEntities()',
-          config,
-          createElfCollection
-        ),
-        createProjectionArm(
           'akita',
           'Akita',
           '#8554a3',
@@ -1069,7 +953,7 @@ export const createV15BenchmarkSuites = (
         'A broken undo can restore the wrong price or quantity. The checksum refuses to publish a timing unless every arm returns to the seeded value.',
       costLabel: 'Optional ongoing feature cost',
       costContext:
-        'This task ranks only first-party history implementations. SignalTree applies retained causal reversal facts while preserving its identity and coherent-publication semantics; Elf and Akita use their official history facilities. Their broader contracts differ, so the chart measures the shared linear-undo capability floor rather than claiming complete semantic equivalence. Sub-millisecond browser gaps near the timer floor are diagnostic, not proof of irreducible semantic overhead; overlapping observed ranges mean no clear difference in that run.',
+        'This task ranks only first-party history implementations. SignalTree applies retained causal reversal facts while preserving its identity and coherent-publication semantics; Akita uses its official history facility. Their broader contracts differ, so the chart measures the shared linear-undo capability floor rather than claiming complete semantic equivalence. Sub-millisecond browser gaps near the timer floor are diagnostic, not proof of irreducible semantic overhead; overlapping observed ranges mean no clear difference in that run.',
       calculation: {
         timedCalculation: `One sample measures ${config.restorationWrites} record-and-update steps plus ${config.restorationWrites} undo-and-read steps. Total time determines rank; record and undo phase medians are also shown.`,
         outsideTimer: `Creation and seeding of ${config.restorationSize.toLocaleString()} records, history initialization/reset, module loading, round settling, and discarded warmups stay outside the timer.`,
@@ -1097,14 +981,6 @@ export const createV15BenchmarkSuites = (
           'Built-in framework-neutral kernel restoration',
           config,
           (rows) => createKernelSignalTreeRestoration(rows, hooks)
-        ),
-        createRestorationArm(
-          'elf',
-          'Elf',
-          '#8b5b17',
-          'The first-party @ngneat/elf-state-history package',
-          config,
-          createElfRestoration
         ),
         createRestorationArm(
           'akita',

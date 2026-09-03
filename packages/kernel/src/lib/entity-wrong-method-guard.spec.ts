@@ -4,7 +4,7 @@ import { signalTree } from './signal-tree';
 
 /**
  * #2 agent-correctness guardrail: AI agents frequently call entity methods from
- * other libraries (Akita `.upsert`, Elf `.addEntities`/`.setProps`, RxJS
+ * other libraries (Akita `.upsert`, entity-store `.addEntities`/`.setProps`, RxJS
  * `.next`). Accessing them returns undefined → cryptic "undefined is not a
  * function". Dev mode now emits an actionable hint naming the real method.
  */
@@ -33,7 +33,7 @@ describe('entityMap wrong-method guard (dev mode)', () => {
     expect(hintFor('upsert')?.[0]).toContain('upsertOne');
   });
 
-  it('hints addMany when .addEntities is accessed (Elf)', () => {
+  it('hints addMany when .addEntities is accessed', () => {
     void rows().addEntities;
     expect(hintFor('addEntities')?.[0]).toContain('addMany');
   });

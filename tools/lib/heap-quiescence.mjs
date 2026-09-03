@@ -22,7 +22,7 @@
  * pair is 12.65 -> 18.01, monotone, and the 42 MB was never there.
  *
  * The same missing boundary made the cross-library table invalid rather than
- * merely wrong. Adding the boundary moves SignalTree by ~54 MB and moves elf,
+ * merely wrong. Adding the boundary moves SignalTree by ~54 MB and moves peer arms
  * ngrx-signals and raw-signals by 0.00 MB each — because SignalTree is the only
  * arm with a microtask-deferred notifier, weak caches and a
  * FinalizationRegistry. A protocol that is not neutral across arms is not a

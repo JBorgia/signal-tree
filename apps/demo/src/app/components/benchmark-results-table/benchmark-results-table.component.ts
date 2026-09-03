@@ -1,4 +1,3 @@
-
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 export interface BenchmarkResult {
@@ -17,6 +16,18 @@ export interface BenchmarkResult {
   libraryVersions?: Record<string, string>;
 }
 
+const SUPPORTED_LIBRARY_IDS = new Set([
+  'signaltree',
+  'ngrx',
+  'ngrx-store',
+  'ngrx-signals',
+  'akita',
+  'ngxs',
+]);
+
+const isSupportedLibrary = (library: string): boolean =>
+  SUPPORTED_LIBRARY_IDS.has(library.toLowerCase().replaceAll(' ', '-'));
+
 @Component({
   selector: 'app-benchmark-results-table',
   standalone: true,
@@ -34,7 +45,9 @@ export class BenchmarkResultsTableComponent {
     const libraries = new Set<string>();
     this.results.forEach((result) => {
       if (result.libraryResults) {
-        Object.keys(result.libraryResults).forEach((lib) => libraries.add(lib));
+        Object.keys(result.libraryResults)
+          .filter(isSupportedLibrary)
+          .forEach((library) => libraries.add(library));
       }
     });
     const libsArray = Array.from(libraries).sort();
@@ -55,7 +68,6 @@ export class BenchmarkResultsTableComponent {
       ngrx: '#7b1fa2',
       'ngrx-signals': '#0097a7',
       akita: '#ef6c00',
-      elf: '#2e7d32',
       ngxs: '#6a1b9a',
     };
     return colorMap[library.toLowerCase()] || '#757575';
@@ -71,6 +83,7 @@ export class BenchmarkResultsTableComponent {
   getLibraryRank(result: BenchmarkResult, library: string): number {
     if (!result.libraryResults) return 999;
     const libs = Object.entries(result.libraryResults)
+      .filter(([name]) => isSupportedLibrary(name))
       .map(([name, data]) => ({
         name,
         ops: data.opsPerSec || 0,

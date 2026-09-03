@@ -138,21 +138,20 @@ SignalStore is LINEAR in collection size; SignalTree is FLAT. **Quote the shape,
 never a multiplier** — the multiplier is a function of n (~10x at 1k, ~1,500x at
 50k), so any single value describes the fixture rather than either library.
 
-## Against elf, @ngrx/signals and raw signals — `tools/bench-compare.mjs --n 200`
+## Against @ngrx/signals and raw signals — `tools/bench-compare.mjs --n 200`
 
 Each arm implements the same capability with that library own entity API.
 
 | arm            | collection | undo/redo | history     |
 | -------------- | ---------: | --------: | ----------- |
-| `raw-signals`  |    0.11 ms |   5.70 ms | hand-rolled |
-| `elf`          |    0.26 ms |   0.31 ms | BUILT-IN    |
-| `ngrx-signals` |    0.72 ms |   4.38 ms | hand-rolled |
-| `signaltree`   |    0.62 ms |   1.45 ms | BUILT-IN    |
+| `raw-signals`  |    0.11 ms |   6.76 ms | hand-rolled |
+| `ngrx-signals` |    0.63 ms |   4.17 ms | hand-rolled |
+| `signaltree`   |    1.22 ms |   1.62 ms | BUILT-IN    |
 
-**elf wins both arms at this size and is not a weak reference** — it is the
-fastest built-in-history competitor in this repo benchmarks. The claim this repo makes is about how cost scales
-with collection size, not about winning at n=200, and the table above is kept
-unflattering on purpose so that distinction stays visible.
+The collection row includes population, updates, and a complete read, so it is
+not a point-update result. SignalTree's built-in restoration is separately
+visible from the snapshot histories required by the other two arms. Quote the
+shape and absolute values, not one ratio from the smoke size.
 
 ## Bundle — `tools/check-bundle-budget.mjs`, `tools/size-report.mjs`
 

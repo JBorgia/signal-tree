@@ -5,9 +5,6 @@ export const DEMO_LIBRARY_VERSIONS: Record<string, string> = {
   'ngrx-store': '21.1.1',
   'ngrx-signals': '21.1.1',
   akita: '8.0.1',
-  elf: '2.5.1',
-  'elf-entities': '5.0.2',
-  'elf-state-history': '1.4.0',
   'redux-toolkit': '2.12.0',
   ngxs: '20.1.0',
 };

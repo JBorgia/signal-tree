@@ -2003,7 +2003,7 @@ minifier strips comments regardless, and `bundle-budget` is unchanged.
 
 ## 7. Delete the parity framing from time-travel guidance
 
-Nothing in our docs should reason from what elf or Akita do. Their constraint was
+Nothing in our docs should reason from what competitor libraries do. Their constraint was
 snapshot cost per write, which 13.5.0 removed. That framing is how `pauseRecording`
 arrived with a rationale that does not work.
 

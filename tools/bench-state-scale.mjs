@@ -4,11 +4,9 @@
  *
  * ## Why this exists
  *
- * `tools/bench-compare.mjs` measures entity collections, and elf wins there.
- * That is elf's optimised path — a Map plus one array — and it was the ONLY
- * thing this repo benchmarked cross-library, which meant every published
- * comparison was fought on the competitor's best ground and on the one shape
- * where SignalTree's design gives it no advantage.
+ * `tools/bench-compare.mjs` measures entity collections. This file tests the
+ * separate claim that leaf writes remain stable as unrelated state and live
+ * consumers grow.
  *
  * The library's actual thesis is a different claim: **only leaves are signals,
  * branches are plain accessors, and a write is O(1) regardless of how large the
@@ -16,26 +14,19 @@
  *
  * ## The two axes, and why they must be separated
  *
- * A first attempt varied both at once and produced a table where elf cost 145 ms
- * with ZERO subscribers attached — which is not selector cost at all, it is the
- * immutable spread over a large object. Conflated, the two effects tell you
- * nothing about either.
+ * A first attempt varied both at once and conflated immutable state-copy cost
+ * with selector fan-out. Separated, the two effects answer different questions.
  *
  *   - **Axis 1, state size, 0 consumers.** Isolates the store write itself.
  *   - **Axis 2, consumer count, fixed state.** Isolates selector fan-out.
  *
  * ## Fairness rules, learned the hard way
  *
- * 1. **Use the competitor's own idiomatic API.** A first pass wrote elf state as
- *    `store.update(s => ({...s, k0: v}))`; elf ships `setProp`, which is what a
- *    user writes and is far cheaper at moderate sizes. Benchmarking elf without
- *    `elf-state-history` already produced one strawman in this repo — this is
- *    the same error and it is measured with `setProp` now.
- * 2. **Both a FLAT and a NESTED shape.** elf's write cost is proportional to the
- *    slice it copies, so 1,000 root props is its worst case and is NOT how an
- *    app is written. The nested shape — few sections, many fields each — is the
- *    realistic one and is much kinder to elf. Reporting only the flat number
- *    would be a strawman with extra steps.
+ * 1. **Use the competitor's own idiomatic API.** NgRx Signals is measured with
+ *    `signalState` and `patchState`, not a harness-owned store abstraction.
+ * 2. **Both a FLAT and a NESTED shape.** Immutable patch cost tracks the width
+ *    of the patched level. The nested shape — few sections, many fields each —
+ *    is the realistic complement to a wide root.
  * 3. **Warm up before measuring.** Un-warmed, the same 1,000-field measurement
  *    read 0.31 ms in one script and 23.23 ms in another — a 75x swing that was
  *    pure JIT state. Five discarded rounds per arm.
@@ -68,7 +59,6 @@ const SENTINEL = -99999;
 
 const { signalTree } = await import(CORE);
 const { computed } = await import('@angular/core');
-const { createStore, withProps, setProp, select } = await import('@ngneat/elf');
 const { signalState, patchState } = await import('@ngrx/signals');
 
 function median(fn, rounds = 11) {
@@ -99,7 +89,7 @@ const nested = (sections, per) => {
 
 const results = { axis1Flat: [], axis1Nested: [], axis2: [] };
 
-// ── Axis 1a: FLAT state, elf's worst case ───────────────────────────────────
+// ── Axis 1a: FLAT state ─────────────────────────────────────────────────────
 for (const size of QUICK ? [64, 512] : [64, 128, 256, 512, 1024]) {
   const tree = signalTree(flat(size));
   for (let r = 0; r < WARMUP; r++)
@@ -109,19 +99,25 @@ for (const size of QUICK ? [64, 512] : [64, 128, 256, 512, 1024]) {
     for (let w = 0; w < WRITES; w++) tree.$.k0.v.set(w);
   });
 
-  const store = createStore({ name: `flat${size}` }, withProps(flat(size)));
-  const write = (w) => store.update(setProp('k0', { v: w }));
-  for (let r = 0; r < WARMUP; r++) for (let w = 0; w < WRITES; w++) write(w);
+  const state = signalState(flat(size));
+  const write = (w) => patchState(state, { k0: { v: w } });
+  for (let r = 0; r < WARMUP; r++) {
+    for (let w = 0; w < WRITES; w++) write(w);
+  }
   write(SENTINEL);
-  const elf = median(() => {
+  const ngrxSignals = median(() => {
     for (let w = 0; w < WRITES; w++) write(w);
   });
 
   if (tree.$.k0.v() !== WRITES - 1)
     throw new Error(`signaltree write did not land at ${size}`);
-  if (store.getValue().k0.v !== WRITES - 1)
-    throw new Error(`elf write did not land at ${size}`);
-  results.axis1Flat.push({ size, signaltreeMs: st, elfMs: elf });
+  if (state.k0.v() !== WRITES - 1)
+    throw new Error(`@ngrx/signals write did not land at ${size}`);
+  results.axis1Flat.push({
+    size,
+    signaltreeMs: st,
+    ngrxSignalsMs: ngrxSignals,
+  });
 }
 
 // ── Axis 1b: NESTED state, the realistic shape ──────────────────────────────
@@ -141,29 +137,26 @@ for (const [sections, per] of QUICK
     for (let w = 0; w < WRITES; w++) tree.$.s0.f0.set(w);
   });
 
-  const store = createStore(
-    { name: `n${sections}x${per}` },
-    withProps(nested(sections, per))
-  );
-  // Idiomatic elf for a deep field: replace the SECTION immutably.
-  const write = (w) =>
-    store.update(setProp('s0', (sec) => ({ ...sec, f0: w })));
-  for (let r = 0; r < WARMUP; r++) for (let w = 0; w < WRITES; w++) write(w);
+  const state = signalState(nested(sections, per));
+  const write = (w) => patchState(state, { s0: { ...state.s0(), f0: w } });
+  for (let r = 0; r < WARMUP; r++) {
+    for (let w = 0; w < WRITES; w++) write(w);
+  }
   write(SENTINEL);
-  const elf = median(() => {
+  const ngrxSignals = median(() => {
     for (let w = 0; w < WRITES; w++) write(w);
   });
 
   if (tree.$.s0.f0() !== WRITES - 1)
     throw new Error('signaltree nested write did not land');
-  if (store.getValue().s0.f0 !== WRITES - 1)
-    throw new Error('elf nested write did not land');
+  if (state.s0.f0() !== WRITES - 1)
+    throw new Error('@ngrx/signals nested write did not land');
   results.axis1Nested.push({
     sections,
     per,
     total: sections * per,
     signaltreeMs: st,
-    elfMs: elf,
+    ngrxSignalsMs: ngrxSignals,
   });
 }
 
@@ -187,44 +180,10 @@ for (const n of QUICK ? [0, 1000] : [0, 100, 1000, 5000]) {
     consumers.forEach((c) => c());
   });
 
-  const store = createStore({ name: `fan${n}` }, withProps(flat(100)));
-  const subs = [];
-  let projections = 0;
-  for (let i = 0; i < n; i++) {
-    subs.push(
-      store
-        .pipe(
-          select((s) => {
-            projections++;
-            return s['k' + (i % 100)].v;
-          })
-        )
-        .subscribe(() => undefined)
-    );
-  }
-  const write = (w) => store.update(setProp('k0', { v: w }));
-  for (let r = 0; r < WARMUP; r++) for (let w = 0; w < WRITES; w++) write(w);
-  write(SENTINEL);
-  const before = projections;
-  const elf = median(() => {
-    for (let w = 0; w < WRITES; w++) write(w);
-  });
-  const ran = projections - before;
-  subs.forEach((s) => s.unsubscribe());
-
-  if (store.getValue().k0.v !== WRITES - 1)
-    throw new Error('elf fan-out write did not land');
-
-  // ── @ngrx/signals, the actual primary competitor ──────────────────────────
-  //
-  // elf was measured here first, and that skewed the headline: this axis was
-  // quoted as "469x at 1,000 live consumers", which is an ELF number, while
-  // @ngrx/signals is what a team actually chooses between. elf is in this file
-  // to LEARN from — it is the immutable-root design, and its cost curve is what
-  // makes the O(1)-write thesis legible — not because it is the rival.
-  //
+  // ── @ngrx/signals, the primary competitor ─────────────────────────────────
   // `signalState` exposes DEEP signals, so a consumer reading `st.k0.v()` is
-  // already granular on this shape. Expect a much closer result than elf's, and
+  // already granular on this shape. Expect a much closer result than an
+  // immutable selector store, and
   // report it: a fan-out claim that only holds against the library nobody picks
   // is not a claim worth making.
   const ss = signalState(flat(100));
@@ -250,9 +209,7 @@ for (const n of QUICK ? [0, 1000] : [0, 100, 1000, 5000]) {
   results.axis2.push({
     consumers: n,
     signaltreeMs: st,
-    elfMs: elf,
     ngrxSignalsMs: ngrx,
-    elfProjectionsPerWrite: n ? Math.round(ran / (WRITES * 11)) : 0,
   });
 }
 
@@ -267,22 +224,20 @@ console.log(
   `\n${WRITES} writes, median of 11, ${WARMUP} warmup rounds discarded per arm.\n`
 );
 
-console.log(
-  "AXIS 1a — FLAT state (elf's worst case: every field a root prop)\n"
-);
+console.log('AXIS 1a — FLAT state (every field a root property)\n');
 console.log(
   '  root props'.padEnd(14) +
     'SignalTree'.padStart(12) +
-    'elf'.padStart(12) +
+    '@ngrx/signals'.padStart(15) +
     '   ratio'
 );
 for (const r of results.axis1Flat) {
   console.log(
     ('  ' + r.size).padEnd(14) +
       r.signaltreeMs.toFixed(3).padStart(12) +
-      r.elfMs.toFixed(3).padStart(12) +
+      r.ngrxSignalsMs.toFixed(3).padStart(15) +
       '   ' +
-      ratio(r.signaltreeMs, r.elfMs)
+      ratio(r.signaltreeMs, r.ngrxSignalsMs)
   );
 }
 
@@ -291,7 +246,7 @@ console.log(
   '  shape'.padEnd(14) +
     'fields'.padStart(8) +
     'SignalTree'.padStart(12) +
-    'elf'.padStart(12) +
+    '@ngrx/signals'.padStart(15) +
     '   ratio'
 );
 for (const r of results.axis1Nested) {
@@ -299,9 +254,9 @@ for (const r of results.axis1Nested) {
     ('  ' + r.sections + ' x ' + r.per).padEnd(14) +
       String(r.total).padStart(8) +
       r.signaltreeMs.toFixed(3).padStart(12) +
-      r.elfMs.toFixed(3).padStart(12) +
+      r.ngrxSignalsMs.toFixed(3).padStart(15) +
       '   ' +
-      ratio(r.signaltreeMs, r.elfMs)
+      ratio(r.signaltreeMs, r.ngrxSignalsMs)
   );
 }
 
@@ -310,35 +265,27 @@ console.log(
   '  consumers'.padEnd(13) +
     'SignalTree'.padStart(12) +
     '@ngrx/signals'.padStart(15) +
-    'vs ngrx'.padStart(10) +
-    'elf'.padStart(11) +
-    'vs elf'.padStart(10)
+    'vs ngrx'.padStart(10)
 );
 for (const r of results.axis2) {
   console.log(
     ('  ' + r.consumers).padEnd(13) +
       r.signaltreeMs.toFixed(3).padStart(12) +
       r.ngrxSignalsMs.toFixed(3).padStart(15) +
-      ratio(r.signaltreeMs, r.ngrxSignalsMs).padStart(10) +
-      r.elfMs.toFixed(3).padStart(11) +
-      ratio(r.signaltreeMs, r.elfMs).padStart(10)
+      ratio(r.signaltreeMs, r.ngrxSignalsMs).padStart(10)
   );
 }
 
 console.log(
-  '\n  Every arm asserted its write landed. elf is measured with its own setProp,\n' +
-    '  and on BOTH a flat and a nested shape — the nested one is realistic and is\n' +
-    '  far kinder to it. The claim this supports is narrow and specific: a write\n' +
-    '  costs SignalTree the same at any state size, and costs a store that copies\n' +
-    '  or re-walks on write in proportion to what it touches.'
+  '\n  Every arm asserted its write landed on BOTH a flat and nested shape. The\n' +
+    '  narrow claim is whether write cost stays stable as unrelated state grows.'
 );
 
 console.log(
   '\n  ⚠️ AXIS 2 RATIOS ARE SHAPE-SPECIFIC — do not quote one bare.\n' +
     '\n  Axis 2 fixes the state at flat(100): one hundred SIBLING keys. That is the\n' +
     '  worst case for any store that patches or copies at the level you wrote to,\n' +
-    '  which is why fairness rule 2 exists for elf — and it applies identically to\n' +
-    '  @ngrx/signals here. `patchState` measures ~220 µs/write on this shape, and\n' +
+    '  @ngrx/signals here. `patchState` measures differently on a wide root and\n' +
     '  ~1 µs on the deep-but-narrow shape in bench-vs-signalstore.mjs. Both are\n' +
     '  real; they differ because the cost tracks keys at the patched level, not\n' +
     '  total state size.\n' +
@@ -348,22 +295,4 @@ console.log(
     '  0.176 µs/write, which was dead-code elimination — nothing read the state\n' +
     '  back, so the write was unobservable. Every arm here now reads its value and\n' +
     '  asserts the final one, and the corrected figure is 1000x the artifact.'
-);
-
-console.log(
-  '\n  Why BOTH columns, and why elf is not the soft option.\n' +
-    '\n  elf is the FASTEST competitor in this repo\x27s benchmarks, not a weak\n' +
-    '  reference. bench-compare.mjs has it at 1.80 ms against @ngrx/signals\x27 15.95\n' +
-    '  on the collection task (8.9x) and 3.05 ms against 301.28 on undo (99x) — and\n' +
-    '  it beats SignalTree on both. So it stays: a write-cost thesis tested against\n' +
-    '  the fastest opponent means something, and dropping it for the slower one\n' +
-    '  would be ducking.\n' +
-    '\n  @ngrx/signals is here because it is what teams actually choose between, and\n' +
-    '  a fan-out figure against it was simply missing. The two disagree in both\n' +
-    '  directions: elf is far cheaper at 0-100 consumers, and far more expensive at\n' +
-    '  5,000, because its select/pipe model re-projects per consumer while\n' +
-    '  patchState pays state width regardless of who listens.\n' +
-    '\n  Positioning is a separate question from measurement. For "which should I\n' +
-    '  pick", lead with @ngrx/signals then NGXS — elf is not in most decision sets.\n' +
-    '  For "is the thesis true", quote the hardest arm.'
 );

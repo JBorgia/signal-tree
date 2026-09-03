@@ -147,34 +147,27 @@ is how that bug announced itself.
 `node --expose-gc tools/memory-compare.mjs`. Same 10,000 entity objects in each
 library's idiomatic collection, one process per arm.
 
-| arm                        | @10k     | **marginal**       | fixed   |
-| -------------------------- | -------- | ------------------ | ------- |
-| elf                        | 3.13 MB  | **94 B/entity**    | 2.23 MB |
-| raw Angular signals        | 6.57 MB  | **89 B/entity**    | 5.72 MB |
-| `@ngrx/signals`            | 6.66 MB  | **89 B/entity**    | 5.81 MB |
-| **SignalTree `entityMap`** | 18.03 MB | **1,172 B/entity** | 6.84 MB |
+| arm                        | @10k    | **marginal**     | fixed   |
+| -------------------------- | ------- | ---------------- | ------- |
+| raw Angular signals        | 6.57 MB | **89 B/entity**  | 5.72 MB |
+| `@ngrx/signals`            | 6.66 MB | **89 B/entity**  | 5.81 MB |
+| **SignalTree `entityMap`** | 5.93 MB | **487 B/entity** | 1.29 MB |
 
 The `fixed` column is essentially each library's module graph, measured
-independently at 6.67 / 5.75 / 5.88 / 2.18 MB — which is why the marginal slope,
-not the `@10k` absolute, is the comparable number. The three competitor arms
-moved by ~2 B/entity when the harness was repaired. SignalTree's marginal went
-from a published **134 B/entity to 1,172** — because
-the boundary the old protocol omitted is worth ~54 MB to this arm and 0.00 MB to
-the other three. A protocol only one arm is sensitive to is not a comparison.
-The corrected figure agrees with `memory-report.mjs` independently: 1,172 B
-marginal against 1,190 B per entity at 10k, from a different tool.
+independently at 1.29 / 5.72 / 5.81 MB — which is why the marginal slope, not
+the `@10k` absolute, is the comparable number. SignalTree's fixed module cost is
+lower here, but its per-entity slope is materially higher.
 
 **MARGINAL is the slope between 1k and 10k**, so every fixed cost — module load,
 Angular init, the harness — cancels. It is the only column that answers "what
 does one more row cost". The entity objects are ~89 B of it and no library
 controls that part.
 
-**SignalTree is the most expensive per entity of the four**: ~45 B/row over a
-raw signal, ~43 B over `@ngrx/signals`. That is the id index and the entity
-storage map, and it is the price of `byId()` being O(1) and per-entity writes
-not touching the array. It buys something; it is not free; and the honest
-statement is "granular reactivity costs ~50 % more per row than holding an
-array", not "we use less memory".
+**SignalTree is the most expensive marginally**: 487 B/entity versus 89 B/entity
+for both comparator arms in this run. The additional indexes and subject
+metadata make `byId()` and unrelated keyed writes independent of collection
+size. They buy something, but the roughly 398 B/entity delta remains a physical
+representation optimization target.
 
 ### The number that actually matters for a large list
 
@@ -269,10 +262,9 @@ reproduce with `node --expose-gc tools/bench-entity-churn-retention.mjs`.
 
 | arm          | 10k collection retained |
 | ------------ | ----------------------- |
-| elf          | 1.05 MB                 |
 | ngrx-signals | 1.07 MB                 |
 | raw signals  | 6.28 MB                 |
-| SignalTree   | 11.44 MB                |
+| SignalTree   | 4.78 MB                 |
 
 ### Two separate memory problems, not one
 
@@ -281,28 +273,17 @@ harder question:
 
 ```text
 A. UNOBSERVED COLLECTION BASE
-   SignalTree ~1,176 B/member marginal   vs   @ngrx/signals ~89 B
-   ~13x, before a single byId() node exists.
+  SignalTree ~487 B/member marginal   vs   @ngrx/signals ~89 B
+  ~5.5x, before a single byId() node exists.
    Why does merely EXISTING in an entityMap cost this much?
 
 B. MATERIALIZED OBSERVATION
-   base ~11.4 MB  ->  all nodes held ~59.6 MB
-   ~48 MB incremental, largely understood: per-field computeds,
-   closures, property descriptors, metadata accessors.
+  Held facades, cells, and publication resources are a separate cost.
+  They must remain reclaimable when no consumer holds them.
 ```
 
-B is increasingly explained. **A is not**, and it is the one that contradicts
-the intended separation — an untouched member should be paying for its canonical
-value, its membership/indexing, and whatever lifetime facts are independently
-earned, not for observation machinery it has never been observed through. 13×
-does not have to become 89 B/member — SignalTree owns more semantics than
-`@ngrx/signals` does — but at that ratio every major component has to justify
-itself individually.
-
-**This is the honest cross-library retention comparison and it is harsher than
-the absolutes suggested.** An earlier repaired-but-unhoisted run read 18.12 /
-6.92 / 11.99 / 3.36 MB, which put SignalTree at ~2.6x `@ngrx/signals`; that gap
-was compressed by charging every arm its own import cost. Excluding it,
-SignalTree is ~10.7x, and the independent marginal slope agrees at ~13x
-(1,176 B/entity against 89 B). The 11.44 MB figure also agrees with the isolated
-layer probe's 11.41 MB to 0.03 MB, from a different tool.
+These remain separate optimization questions. The unobserved base should pay
+only for canonical value, membership/indexing, and independently earned lifetime
+facts. Materialized observation may add resources, but released facades must not
+become permanent collection cost. `ENTITY-PHYSICAL-DENSITY-0` and
+`ENTITY-REALIZATION-RETENTION-0` keep those proofs independent.

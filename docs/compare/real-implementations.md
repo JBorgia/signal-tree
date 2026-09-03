@@ -1,7 +1,9 @@
 # Cross-library, real implementations
 
-**Status:** re-measured 2026-08-21 on a repaired harness. Reproduce with
-`node --expose-gc tools/bench-compare.mjs`.
+**Status: HISTORICAL** — retained as point-in-time evidence for the former
+comparison and the harness defects it exposed. The named competitor is no longer
+a workspace dependency or current benchmark arm. Do not use these tables as
+current product guidance.
 
 > ⚠️ **The 14.0.0 revision of this page published an invalid comparison and both
 > of its tables have been replaced.** Two independent defects: the memory column

@@ -11,24 +11,25 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
   await expect(page.locator('.build-notice')).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
-  await expect(page.locator('.result-row')).toHaveCount(16, {
+  await expect(page.locator('.result-row')).toHaveCount(13, {
     timeout: 30_000,
   });
 
   await expect(page.locator('.run-error')).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText(/\bElf\b/i);
   await expect(page.locator('.benchmarks-page')).toHaveAttribute(
     'aria-busy',
     'false'
   );
   await expect(page.locator('.result-table')).toHaveCount(3);
   await expect(page.locator('.development-badge')).toHaveCount(0);
-  await expect(page.locator('.range-label')).toHaveCount(16);
-  await expect(page.locator('.result-visual-track')).toHaveCount(16);
-  await expect(page.locator('.result-row .comparison-kind')).toHaveCount(16);
-  await expect(page.locator('.comparison-command')).toHaveCount(16);
-  await expect(page.locator('.implementation-source-links a')).toHaveCount(16);
+  await expect(page.locator('.range-label')).toHaveCount(13);
+  await expect(page.locator('.result-visual-track')).toHaveCount(13);
+  await expect(page.locator('.result-row .comparison-kind')).toHaveCount(13);
+  await expect(page.locator('.comparison-command')).toHaveCount(13);
+  await expect(page.locator('.implementation-source-links a')).toHaveCount(13);
   await expect(page.locator('.evidence-line a')).toHaveCount(9);
-  await expect(page.locator('.phase-breakdown')).toHaveCount(4);
+  await expect(page.locator('.phase-breakdown')).toHaveCount(3);
   await expect(
     page.locator('.result-row .comparison-kind', { hasText: 'Harness' })
   ).toHaveCount(0);
@@ -57,7 +58,6 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
     'SignalTree Angular': 3,
     'SignalTree Kernel': 3,
     'NgRx Signals': 2,
-    Elf: 3,
     Akita: 3,
     'Redux Toolkit': 2,
   })) {
@@ -79,10 +79,6 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
   ).toHaveCount(1);
   await expect(page.getByText('@ngrx/signals 21.1.1')).toHaveCount(2);
   await expect(page.getByText('@reduxjs/toolkit 2.12.0')).toHaveCount(2);
-  await expect(page.getByText('@ngneat/elf-state-history 1.4.0')).toHaveCount(
-    1
-  );
-
   await expect(page.getByText('One-time cost', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Ongoing cost', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Raw Angular', { exact: false })).toHaveCount(0);
@@ -225,7 +221,6 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
   const restorationProvenance = {
     'signaltree-angular': 'Built-in history',
     'signaltree-kernel': 'Built-in history',
-    elf: 'First-party history add-on',
     akita: 'First-party history add-on',
   };
   for (const [armId, provenance] of Object.entries(restorationProvenance)) {
@@ -237,22 +232,23 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
   }
 
   const comparisonTrigger = page.locator(
-    '[data-workload-id="restoration"] [data-arm-id="elf"] .comparison-command'
+    '[data-workload-id="restoration"] [data-arm-id="akita"] .comparison-command'
   );
   await comparisonTrigger.click();
   const comparisonDialog = page.locator('.comparison-dialog');
   await expect(comparisonDialog).toBeVisible();
   await expect(comparisonDialog).toContainText('First-party history add-on');
-  await expect(comparisonDialog).toContainText(
-    '@ngneat/elf-state-history 1.4.0'
-  );
+  await expect(comparisonDialog).toContainText('@datorama/akita 8.0.1');
   await expect(
     comparisonDialog.getByRole('link', {
-      name: 'Elf state-history 1.4.0 implementation',
+      name: 'Akita StateHistoryPlugin documentation',
     })
-  ).toHaveAttribute('href', /unpkg\.com\/.*elf-state-history/);
+  ).toHaveAttribute(
+    'href',
+    'https://opensource.salesforce.com/akita/docs/plugins/state-history/'
+  );
   await expect(comparisonDialog).toContainText(
-    'installs @ngneat/elf-state-history on the real Elf entity store'
+    'attaches StateHistoryPlugin to the real Akita QueryEntity'
   );
   await page.keyboard.press('Escape');
   await expect(comparisonDialog).not.toBeVisible();
@@ -287,7 +283,7 @@ test('ranked result displays stack without overflow on mobile', async ({
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
   await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
-  await expect(page.locator('.result-row')).toHaveCount(16, {
+  await expect(page.locator('.result-row')).toHaveCount(13, {
     timeout: 30_000,
   });
 
@@ -336,7 +332,7 @@ test('ranked result displays retain visual tracks at the tablet breakpoint', asy
   await page.setViewportSize({ width: 768, height: 900 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
   await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
-  await expect(page.locator('.result-row')).toHaveCount(16, {
+  await expect(page.locator('.result-row')).toHaveCount(13, {
     timeout: 30_000,
   });
 

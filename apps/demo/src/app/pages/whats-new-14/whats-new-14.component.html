@@ -210,10 +210,10 @@ protected readonly notDone = (r: Row) =&gt; !r.done;
     <p class="section-aside">
       <strong>What this does not prove.</strong> This is an approximation of the
       cross-library harness in <code>tools/bench-state-scale.mjs</code>, which
-      measures against elf's own <code>setProp</code> on both a flat and a
-      nested shape. A single browser run is noisier than a median of eleven in
-      an isolated process — treat it as directional confirmation that the shape
-      holds here, not as a replacement for the harness.
+      measures against a peer library's own <code>setProp</code> on both a flat
+      and a nested shape. A single browser run is noisier than a median of
+      eleven in an isolated process — treat it as directional confirmation that
+      the shape holds here, not as a replacement for the harness.
     </p>
   </section>
 </div>

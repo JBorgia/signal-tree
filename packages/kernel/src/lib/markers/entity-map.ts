@@ -364,9 +364,8 @@ export function entityMap<E, K extends string | number = DefaultKey<E>>(
             // `setAll` rebuilds the storage map, the id index and every
             // per-entity signal — O(collection) on EVERY restore. Measured at
             // 10k entities that is 3.62 ms per undo, and it is why undo/redo
-            // over a large collection was ~150x slower than elf's
-            // state-history, which restores by swapping one immutable
-            // reference (docs/compare/real-implementations.md).
+            // over a large collection was ~150x slower than an immutable-root
+            // history, which restores by swapping one reference.
             //
             // A snapshot SHARES its entity objects with the live tree —
             // measured 499/500 identical after a single-entity change — so a

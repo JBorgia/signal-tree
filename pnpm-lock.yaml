@@ -35,12 +35,6 @@ importers:
       '@datorama/akita':
         specifier: ^8.0.1
         version: 8.0.1(rxjs@7.8.2)(tslib@2.8.1)
-      '@ngneat/elf':
-        specifier: ^2.5.1
-        version: 2.5.1(rxjs@7.8.2)
-      '@ngneat/elf-entities':
-        specifier: ^5.0.0
-        version: 5.0.2(@ngneat/elf@2.5.1(rxjs@7.8.2))(rxjs@7.8.2)
       '@ngrx/effects':
         specifier: 21.1.1
         version: 21.1.1(@angular/core@22.0.7(@angular/compiler@22.0.7)(rxjs@7.8.2)(zone.js@0.16.2))(@ngrx/store@21.1.1(@angular/core@22.0.7(@angular/compiler@22.0.7)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(rxjs@7.8.2)
@@ -135,9 +129,6 @@ importers:
       '@microsoft/api-extractor':
         specifier: ^7.55.0
         version: 7.55.0(@types/node@22.18.1)
-      '@ngneat/elf-state-history':
-        specifier: ^1.4.0
-        version: 1.4.0(@ngneat/elf-entities@5.0.2(@ngneat/elf@2.5.1(rxjs@7.8.2))(rxjs@7.8.2))
       '@nx/angular':
         specifier: 23.1.0
         version: 23.1.0(89c75ccbd814acde08a4b145f5516b65)
@@ -3152,22 +3143,6 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
-
-  '@ngneat/elf-entities@5.0.2':
-    resolution: {integrity: sha512-G4ag51lvM3tOSgpxVVFYAgsh/bOL5BkNb4Z0VtosaM/CTWTHoNrf8UdvcaeJ3+sP1RS3bmEdZ9xUE8ifnVxssA==}
-    peerDependencies:
-      '@ngneat/elf': '>=2.5.0'
-      rxjs: '>=7.0.0'
-
-  '@ngneat/elf-state-history@1.4.0':
-    resolution: {integrity: sha512-tjKGVfd96npOyxQUgMSzfeybtRxSlvCcIWCeMTeWOfwYyPO2Z3FjGIzDupDUZdV0MY/6jWOiCxP4aNhj0z6YRQ==}
-    peerDependencies:
-      '@ngneat/elf-entities': '*'
-
-  '@ngneat/elf@2.5.1':
-    resolution: {integrity: sha512-13BItNZFgHglTiXuP9XhisNczwQ5QSzH+imAv9nAPsdbCq/3ortqkIYRnlxB8DGPVcuIjLujQ4OcZa+9QWgZtw==}
-    peerDependencies:
-      rxjs: '>=7.0.0'
 
   '@ngrx/effects@21.1.1':
     resolution: {integrity: sha512-JQUv2tYyjkbdsE40WYtJDsiI+3qtn4V5m0Ybr2CYw9zKpVQshDV5MLLAni+SuijlHAWJkw8x4wwnYmNyG/Rmng==}
@@ -13893,19 +13868,6 @@ snapshots:
       '@emnapi/runtime': 1.11.3
       '@tybys/wasm-util': 0.10.3
     optional: true
-
-  '@ngneat/elf-entities@5.0.2(@ngneat/elf@2.5.1(rxjs@7.8.2))(rxjs@7.8.2)':
-    dependencies:
-      '@ngneat/elf': 2.5.1(rxjs@7.8.2)
-      rxjs: 7.8.2
-
-  '@ngneat/elf-state-history@1.4.0(@ngneat/elf-entities@5.0.2(@ngneat/elf@2.5.1(rxjs@7.8.2))(rxjs@7.8.2))':
-    dependencies:
-      '@ngneat/elf-entities': 5.0.2(@ngneat/elf@2.5.1(rxjs@7.8.2))(rxjs@7.8.2)
-
-  '@ngneat/elf@2.5.1(rxjs@7.8.2)':
-    dependencies:
-      rxjs: 7.8.2
 
   '@ngrx/effects@21.1.1(@angular/core@22.0.7(@angular/compiler@22.0.7)(rxjs@7.8.2)(zone.js@0.16.2))(@ngrx/store@21.1.1(@angular/core@22.0.7(@angular/compiler@22.0.7)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(rxjs@7.8.2)':
     dependencies:

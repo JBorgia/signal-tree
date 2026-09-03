@@ -16,7 +16,8 @@ prompt: |
 expected_patterns:
   signaltree:
     must_include: ['signalTree(', '@Injectable']
-    must_not_include: ['signalStore(', 'patchState(', 'BehaviorSubject', 'createStore']
+    must_not_include:
+      ['signalStore(', 'patchState(', 'BehaviorSubject', 'createStore']
   ngrx-signals:
     must_include: ['signalStore(', 'withState', 'withMethods']
     must_not_include: ['signalTree(', 'BehaviorSubject', 'createStore']
@@ -24,8 +25,6 @@ expected_patterns:
     must_include: ['createReducer(', 'createAction(', 'Store']
   akita:
     must_include: ['Store', 'StoreConfig']
-  elf:
-    must_include: ['createStore', 'withProps']
 
 behavior_test: |
   const service = TestBed.inject(CounterService);
