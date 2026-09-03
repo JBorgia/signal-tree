@@ -253,14 +253,6 @@
             }
           </h3>
           <p>{{ lib.description }}</p>
-          @if (lib.stats) {
-          <div class="library-stats">
-            <span class="stat">Bundle: {{ lib.stats.bundleSize }}</span>
-            <span class="stat"
-              >Stars: {{ lib.stats.githubStars | number }}</span
-            >
-          </div>
-          }
         </div>
         @if (lib.id === 'signaltree') {
         <div class="library-badge">Baseline</div>
@@ -271,80 +263,13 @@
       }
     </div>
 
-    <!-- Bundle Size Disclaimer -->
-    <div class="bundle-disclaimer">
+    <div class="measurement-scope">
       <p>
-        <strong>Note:</strong> Sizes are <strong>gzipped, own-code only</strong>,
-        measured with esbuild (production minify) by
-        <code>tools/measure-bundle-sizes.mjs</code>. <code>&#64;angular/*</code>,
-        <code>rxjs</code>, and <code>tslib</code> are treated as ambient peers
-        (external), so rxjs-based libraries (NgRx, NgXs, Akita, Elf) show their
-        <em>marginal</em> cost assuming rxjs is already present — NgRx Store is
-        ~10.6KB if it isn't. All arms are built with
-        <code>ngDevMode</code> defined false, as a production Angular build
-        does, so dev-only warnings and diagnostics are excluded on every side.
-        SignalTree numbers reflect a tree that actually uses
-        <code>entityMap</code> (~9.2KB); a bare store of a few fields is ~5.7KB,
-        and adding undo/redo takes it to ~11.0KB. SignalTree does not win on
-        bundle size — it is the largest library in this table, and it trades
-        those KB for built-in granularity, entity maps, and depth-attached
-        markers.
+        <strong>Scope:</strong> this page measures only the selected runtime
+        workloads in the current browser. It makes no package-size or adoption
+        claim. Published SignalTree size figures come from the repository's
+        release generators and enforced bundle-budget gate.
       </p>
-    </div>
-
-    <!-- Performance Trade-offs Section -->
-    <div class="performance-tradeoffs">
-      <h3>📊 Performance Notes</h3>
-      <div class="tradeoff-grid">
-        <div class="tradeoff-item advantage">
-          <h4>✅ Areas SignalTree tends to do well</h4>
-          <ul>
-            <li>
-              Targeted updates and reads perform well in many scenarios
-            </li>
-            <li>
-              Lazy signal creation can reduce memory overhead in large trees
-            </li>
-            <li>
-              Composable enhancers help tune reactive computation behavior
-            </li>
-            <li>
-              Fine-grained reactivity helps avoid broad invalidation
-            </li>
-            <li>
-              Optional DX layers can be added without changing the core model
-            </li>
-            <li>
-              Deep nested updates stay path-oriented instead of requiring parent
-              object rebuilding
-            </li>
-            <li>
-              Direct access patterns reduce selector/reducer ceremony
-            </li>
-            <li>
-              Batching can reduce thrash in high-frequency update scenarios
-            </li>
-          </ul>
-        </div>
-        <div class="tradeoff-item known-limitation">
-          <h4>⚠️ Known Trade-off</h4>
-          <p>
-            <strong>Serialization can be slower</strong> than libraries storing
-            plain objects directly.
-          </p>
-          <p class="explanation">
-            SignalTree stores reactive signals that must be "unwrapped" during
-            serialization, while other libraries can serialize plain objects
-            directly. This is part of the model trade-off rather than an
-            accident. In many applications serialization happens relatively
-            infrequently compared with reads and updates.
-          </p>
-          <div class="mitigation">
-            <strong>Mitigation:</strong> Caching and debounced persistence can
-            reduce how often serialization is paid in practice.
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -937,7 +862,7 @@
       <div style="display: flex; align-items: center; gap: 0.4rem">
         <span
           class="library-badge"
-          style="background: #3b82f6; position: static"
+          style="background: #527d14; position: static"
           >SignalTree</span
         >
         <span

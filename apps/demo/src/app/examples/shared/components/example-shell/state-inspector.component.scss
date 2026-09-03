@@ -13,9 +13,10 @@
   &__pre {
     margin: 0;
     padding: $spacing-lg;
-    background: var(--color-neutral-900);
+    border: 1px solid rgb(255 255 255 / 0.12);
+    background: var(--color-ink);
     color: var(--color-neutral-100);
-    border-radius: $radius-md;
+    border-radius: var(--radius-lg);
     font-family: var(--font-mono, 'SFMono-Regular', Consolas, monospace);
     font-size: $text-sm;
     line-height: 1.6;

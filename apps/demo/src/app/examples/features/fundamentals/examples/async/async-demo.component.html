@@ -1,44 +1,124 @@
-<div class="demo-container">
-  <st-example heading="⚡ Async Operations" [code]="codeFiles">
-    <div intro>
-      <p>
-        Async state in SignalTree is a <strong>marker family</strong>, not a
-        free-standing service method. Two markers cover the two main shapes:
-      </p>
-      <ul>
-        <li>
-          <strong>Load-and-expose</strong> — no SignalTree marker. Fetch in a
-          service, keep <code>data</code>/<code>loading</code>/<code>error</code>
-          as plain tree state, and land the result through
-          <code>external()</code>. Use <code>link()</code> only when the external
-          value stays synchronized rather than being fetched once.
-        </li>
-        <li>
-          <strong>Input-driven debounced search</strong> — no SignalTree marker.
-          The pipeline is ordinary RxJS in your service:
-          <code>debounceTime → filter → distinctUntilChanged → switchMap</code>.
-          <code>switchMap</code> already gives cancellation and latest-wins, and
-          <code>distinctUntilChanged</code> already gives dedup — SignalTree adds
-          no causal authority over any of them, so it owns none of them. Results
-          land in plain tree state through <code>external()</code>.
-        </li>
-      </ul>
-      <p>
-        Both markers attach <strong>at any tree depth</strong> alongside
-        <code>entityMap</code> and app-owned loading/freshness services.
-        Auto-clean on the surrounding
-        <code>DestroyRef</code>. <strong>No manual
-        <code>tap()</code> / <code>setLoading()</code> wiring.</strong>
-      </p>
-    </div>
+<div class="external-page layout-frame">
+  <header class="external-hero">
+    <p class="eyebrow">Core concept / authority at the boundary</p>
+    <h1>External truth & Link</h1>
+    <p class="hero-copy">
+      Values decided elsewhere enter through <code>external()</code>. When a
+      state location and an endpoint must remain synchronized, a
+      <code>link()</code> owns that persistent relationship without becoming a
+      request framework.
+    </p>
 
-    <div class="callout">
-      <p>
-        <strong>👉 Full interactive demo:</strong>
-        <a routerLink="/async">/async</a> — exercise both markers end-to-end
-        with simulated network latency, debounced search, and live counters
-        showing how cancellation and dedup work in practice.
-      </p>
+    <div class="authority-path" aria-label="External authority path">
+      <div>
+        <span>One-shot</span>
+        <strong>Acquire value</strong>
+      </div>
+      <div class="path-arrow" aria-hidden="true">&rarr;</div>
+      <div>
+        <span>Authority</span>
+        <strong>external()</strong>
+      </div>
+      <div class="path-arrow" aria-hidden="true">&rarr;</div>
+      <div>
+        <span>Owned state</span>
+        <strong>tree.$.location</strong>
+      </div>
     </div>
-  </st-example>
+  </header>
+
+  <section class="concept-strip" aria-label="External synchronization choices">
+    <article>
+      <span>01</span>
+      <h2>One-shot realization</h2>
+      <p>Acquire first, then synchronously classify only the resolved truth.</p>
+    </article>
+    <article>
+      <span>02</span>
+      <h2>Persistent relationship</h2>
+      <p>Link connects one owned state location to endpoint directions.</p>
+    </article>
+    <article>
+      <span>03</span>
+      <h2>Application policy</h2>
+      <p>Loading, retries, cancellation, cache, and migration stay outside.</p>
+    </article>
+  </section>
+
+  <section class="examples-grid">
+    <st-example
+      heading="One-shot external realization"
+      [headingLevel]="2"
+      [code]="ingressCode"
+    >
+      <div intro>
+        <p>
+          Fetching is application-owned. Once the endpoint resolves, wrap the
+          synchronous state write in <code>external()</code> to state that
+          another authority decided the value.
+        </p>
+        <p>
+          Request bookkeeping is different: loading indicators, retry counts,
+          error presentation, and cancellation are authored application policy,
+          not external truth.
+        </p>
+      </div>
+      <div class="direction-ledger">
+        <div><span>Application</span><strong>fetch / switchMap / retry</strong></div>
+        <div><span>Boundary</span><strong>external(() =&gt; write)</strong></div>
+        <div><span>SignalTree</span><strong>records external ingress</strong></div>
+      </div>
+    </st-example>
+
+    <st-example
+      heading="Persistent relationship through Link"
+      [headingLevel]="2"
+      [code]="linkCode"
+    >
+      <div intro>
+        <p>
+          Use <code>link()</code> when synchronization continues after one
+          request. The source must be an owned SignalTree location; the endpoint
+          supplies at least one direction.
+        </p>
+      </div>
+      <div class="link-map" aria-label="Link directions">
+        <div><strong>State location</strong><code>tree.$.preferences</code></div>
+        <div class="link-node"><strong>Link</strong><span>authority-preserving</span></div>
+        <div><strong>Endpoint</strong><code>API / storage / socket</code></div>
+      </div>
+      <dl class="link-directions">
+        <div><dt>get</dt><dd>endpoint &rarr; state through <code>retrieve()</code></dd></div>
+        <div><dt>set</dt><dd>state &rarr; endpoint after settled turns</dd></div>
+        <div><dt>subscribe</dt><dd>endpoint &rarr; state as live pushes arrive</dd></div>
+      </dl>
+      <p class="handle-contract">
+        The Link handle is deliberately small: <code>retrieve()</code>,
+        <code>settled()</code>, and <code>dispose()</code>. Retry, backoff, and
+        status APIs are not part of it.
+      </p>
+    </st-example>
+  </section>
+
+  <section class="orchestration-section" aria-labelledby="orchestration-heading">
+    <header>
+      <p class="eyebrow">Application-owned orchestration</p>
+      <h2 id="orchestration-heading">HTTP policy does not move into the tree.</h2>
+      <p>
+        Debounce, deduplication, cancellation, latest-wins behavior, retries,
+        loading state, and error presentation remain application concerns.
+        Angular services, resources, or RxJS can own them; SignalTree receives
+        the resulting state transition.
+      </p>
+    </header>
+    <st-example heading="Input-driven search" [headingLevel]="2" [code]="orchestrationCode">
+      <div class="pipeline" aria-label="Search ownership pipeline">
+        <span>User input</span>
+        <span>debounceTime</span>
+        <span>distinctUntilChanged</span>
+        <span>switchMap</span>
+        <span>external write</span>
+      </div>
+    </st-example>
+  </section>
 </div>

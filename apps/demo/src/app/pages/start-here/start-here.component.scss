@@ -1,7 +1,4 @@
 .start-container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: var(--space-8);
 }
 
 .page-header {
@@ -151,6 +148,7 @@
 }
 
 .compare-grid {
+  min-width: 0;
   display: grid;
   gap: var(--space-5);
   grid-template-columns: 1fr;
@@ -158,6 +156,11 @@
   @media (min-width: 960px) {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+.compare-grid > *,
+.compare-pane {
+  min-width: 0;
 }
 
 .compare-pane-title {
@@ -185,12 +188,28 @@
 }
 
 .next-step-card {
+  min-width: 0;
   padding: var(--space-5);
   background: var(--color-white);
   border: 1px solid var(--color-neutral-200);
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
+}
+
+@media (max-width: 640px) {
+  .start-container {
+    padding: var(--space-5);
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .section-alt,
+  .section-decide {
+    padding: var(--space-5);
+  }
 }
 
 .next-step-audience {

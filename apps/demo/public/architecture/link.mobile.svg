@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 360 560" role="img" aria-labelledby="link-mobile-title link-mobile-description" data-diagram="link" data-variant="mobile">
+  <title id="link-mobile-title">Link owns synchronization, not backend policy</title>
+  <desc id="link-mobile-description">A Link can pull endpoint truth, push settled tree truth, or subscribe to live endpoint truth. Inbound values are applied as external authority. The endpoint decides storage, transport, codec, retry, cache, and scheduling policy.</desc>
+  <style>
+  :root {
+    --st-ink: #17211a;
+    --st-muted: #55615a;
+    --st-surface: #fbfcf8;
+    --st-grid: rgba(23, 33, 26, 0.055);
+    --st-line: #526158;
+    --st-application: #fff0c7;
+    --st-framework: #dbe8ff;
+    --st-kernel: #d9f66f;
+    --st-authored: #d9f0df;
+    --st-external: #ffe0d5;
+    --st-restoration: #f8d66d;
+    --st-identity: #d6eee9;
+    --st-projection: #e9e0f7;
+    --st-neutral: #edf0eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --st-ink: #eef4e9;
+      --st-muted: #b6c1b8;
+      --st-surface: #17211a;
+      --st-grid: rgba(238, 244, 233, 0.055);
+      --st-line: #a9b6ac;
+      --st-application: #544a2d;
+      --st-framework: #30435f;
+      --st-kernel: #4c641f;
+      --st-authored: #31513a;
+      --st-external: #653f35;
+      --st-restoration: #624f1e;
+      --st-identity: #31534c;
+      --st-projection: #493d5c;
+      --st-neutral: #303a33;
+    }
+  }
+  text { fill: var(--st-ink); }
+  .group-box { fill: color-mix(in srgb, var(--st-neutral) 55%, transparent); stroke: var(--st-line); stroke-width: 1.5; }
+  .group-box--projection { fill: color-mix(in srgb, var(--st-projection) 42%, transparent); }
+  .dashed { stroke-dasharray: 8 7; }
+  .group-label, .node-detail { fill: var(--st-muted); }
+  .group-label, .node-title, .edge-label { font-family: 'Space Grotesk', 'Avenir Next', sans-serif; }
+  .group-label { font-size: 12px; font-weight: 700; }
+  .edge { fill: none; stroke: var(--st-line); stroke-width: 2; }
+  .edge-label-group { pointer-events: none; }
+  .edge-label-plate { fill: var(--st-surface); stroke: color-mix(in srgb, var(--st-line) 42%, transparent); stroke-width: 1; }
+  .edge-label { fill: var(--st-ink); font-size: 11px; font-weight: 700; }
+  .node { outline: none; }
+  .node rect { stroke: color-mix(in srgb, var(--st-ink) 42%, transparent); stroke-width: 1.4; transition: stroke-width 180ms ease; }
+  .node:hover rect { stroke-width: 2.5; }
+  .node--application rect { fill: var(--st-application); }
+  .node--framework rect { fill: var(--st-framework); }
+  .node--kernel rect { fill: var(--st-kernel); }
+  .node--authored rect { fill: var(--st-authored); }
+  .node--external rect { fill: var(--st-external); }
+  .node--restoration rect { fill: var(--st-restoration); }
+  .node--identity rect { fill: var(--st-identity); }
+  .node--projection rect { fill: var(--st-projection); }
+  .node--neutral rect { fill: var(--st-neutral); }
+  .node-title { font-size: 16px; font-weight: 730; }
+  .node-detail { font-family: 'IBM Plex Sans', 'Avenir Next', sans-serif; font-size: 12px; font-weight: 520; }
+  .node-detail--code { font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace; font-size: 10.5px; }
+  .slide-title { font: 700 62px 'Space Grotesk', 'Avenir Next', sans-serif; }
+  .slide-takeaway { fill: var(--st-muted); font: 500 28px 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .notes { box-sizing: border-box; height: 100%; padding: 22px 28px; color: var(--st-ink); border: 1px solid var(--st-line); background: var(--st-neutral); font: 15px/1.5 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .notes-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 32px; }
+  .notes h2 { margin: 0 0 8px; font-size: 15px; text-transform: uppercase; }
+  .notes ul { margin: 0; padding-left: 20px; }
+  .notes code { font-size: 13px; overflow-wrap: anywhere; }
+  @media (prefers-reduced-motion: reduce) { .node rect { transition: none; } }
+</style>
+  <defs>
+  <marker id="link-mobile-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--st-line)"/></marker>
+  <pattern id="link-mobile-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="var(--st-grid)" stroke-width="1"/></pattern>
+</defs>
+  <rect width="360" height="560" fill="var(--st-surface)"/>
+  <rect width="360" height="560" fill="url(#link-mobile-grid)"/>
+  <g><g><path class="edge" d="M 155.26027397260273 125 L 124.63013698630137 190" marker-end="url(#link-mobile-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="96.44520547945206" y="138" width="87" height="23" rx="0"/><text class="edge-label" x="139.94520547945206" y="152.9" text-anchor="middle"><tspan x="139.94520547945206" dy="0">settled set</tspan></text></g></g><g><path class="edge" d="M 94 320 L 94 390" marker-start="url(#link-mobile-arrow)" marker-end="url(#link-mobile-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="52" y="322.5" width="84" height="49" rx="0"/><text class="edge-label" x="94" y="337.4" text-anchor="middle"><tspan x="94" dy="0">get</tspan><tspan x="94" dy="13">set</tspan><tspan x="94" dy="13">subscribe</tspan></text></g></g><g><path class="edge" d="M 176 450 L 184 450" marker-end="url(#link-mobile-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="127.5" y="430.5" width="105" height="23" rx="0"/><text class="edge-label" x="180" y="445.4" text-anchor="middle"><tspan x="180" dy="0">implemented by</tspan></text></g></g><g><path class="edge dashed" d="M 176 255 L 184 255" marker-end="url(#link-mobile-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="138" y="235.5" width="84" height="23" rx="0"/><text class="edge-label" x="180" y="250.4" text-anchor="middle"><tspan x="180" dy="0">classifies</tspan></text></g></g><g><path class="edge dashed" d="M 235.36986301369862 190 L 204.73972602739727 125" marker-end="url(#link-mobile-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="178.05479452054794" y="138" width="84" height="23" rx="0"/><text class="edge-label" x="220.05479452054794" y="152.9" text-anchor="middle"><tspan x="220.05479452054794" dy="0">realizes</tspan></text></g></g></g><g><g class="node node--kernel"><title>SignalTree location canonical authored truth</title><rect x="24" y="20" width="312" height="105" rx="0"/><text class="node-title" x="180" y="65.5" text-anchor="middle"><tspan x="180" dy="0">SignalTree location</tspan></text><text class="node-detail" x="180" y="90.5" text-anchor="middle"><tspan x="180" dy="0">canonical authored truth</tspan></text></g><g class="node node--restoration"><title>Link retrieve() settled() dispose()</title><rect x="12" y="190" width="164" height="130" rx="0"/><text class="node-title" x="94" y="230" text-anchor="middle"><tspan x="94" dy="0">Link</tspan></text><text class="node-detail node-detail--code" x="94" y="255" text-anchor="middle"><tspan x="94" dy="0">retrieve()</tspan><tspan x="94" dy="18">settled()</tspan><tspan x="94" dy="18">dispose()</tspan></text></g><g class="node node--external"><title>Application endpoint get · set · subscribe</title><rect x="12" y="390" width="164" height="120" rx="0"/><text class="node-title" x="94" y="432" text-anchor="middle"><tspan x="94" dy="0">Application</tspan><tspan x="94" dy="22">endpoint</tspan></text><text class="node-detail" x="94" y="479" text-anchor="middle"><tspan x="94" dy="0">get · set · subscribe</tspan></text></g><g class="node node--application"><title>Backend / policy HTTP · storage socket · codec retry · cache durability</title><rect x="184" y="390" width="164" height="120" rx="0"/><text class="node-title" x="266" y="416" text-anchor="middle"><tspan x="266" dy="0">Backend / policy</tspan></text><text class="node-detail" x="266" y="441" text-anchor="middle"><tspan x="266" dy="0">HTTP · storage</tspan><tspan x="266" dy="18">socket · codec</tspan><tspan x="266" dy="18">retry · cache</tspan><tspan x="266" dy="18">durability</tspan></text></g><g class="node node--external"><title>inbound truth applied through external()</title><rect x="184" y="190" width="164" height="130" rx="0"/><text class="node-title" x="266" y="239" text-anchor="middle"><tspan x="266" dy="0">inbound truth</tspan></text><text class="node-detail node-detail--code" x="266" y="264" text-anchor="middle"><tspan x="266" dy="0">applied through</tspan><tspan x="266" dy="18">external()</tspan></text></g></g>
+</svg>

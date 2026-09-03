@@ -1,585 +1,218 @@
-<div class="container">
-  <h1>🗂️ SignalTree Entities Demo</h1>
-
-  <!-- Explanation Section -->
-  <div class="explanation-card">
-    <h2>📖 What This Demo Shows</h2>
-    <p class="intro-text">
-      This demo showcases
-      <strong>SignalTree's entity management</strong> capabilities for building
-      complex data-driven applications. It demonstrates how to manage related
-      entities (Users, Posts) with computed relationships, filtering, sorting,
-      and pagination.
+<div class="entity-page layout-frame">
+  <header class="entity-hero">
+    <p class="eyebrow">@signal-tree/kernel / entityMap()</p>
+    <h1>EntityMap keeps each entity fact under one authority.</h1>
+    <p class="hero-copy">
+      A normalized collection owns keyed identity, order, structural mutation,
+      and reactive queries. Store selection as an ID, then resolve the entity
+      from the map instead of duplicating its value elsewhere.
     </p>
 
-    <!-- Marker-Based Entity API -->
-    <div class="new-feature-callout">
-      <h3>🎉 Built-in: Marker-Based Entity API</h3>
-      <p>
-        SignalTree's entity system uses marker types and
-        EntitySignal for cleaner, type-safe management.
-      </p>
-      <p>
-        Define your state with <code>entityMap()</code> markers in your initial state,
-        then use reactive EntitySignal methods like <code>setAll()</code>, <code>addOne()</code>,
-        <code>byId()</code>, and <code>count()</code>.
-      </p>
-      <p>
-        <strong>Benefits:</strong> Full type safety, reactive entity CRUD,
-        computed selectors, and observable query patterns with minimal overhead.
-      </p>
-    </div>
-
-    <div class="how-to-use">
-      <h3>🎯 How to Use This Demo:</h3>
-      <ol class="instruction-list">
-        <li>
-          <strong>Load Data:</strong> Click "Load Users" to populate with sample
-          users
-        </li>
-        <li>
-          <strong>Select a User:</strong> Click any user card in the left panel
-          to view their posts
-        </li>
-        <li>
-          <strong>Manage Posts:</strong> The middle panel shows posts for the
-          selected user - you can filter, sort, and select multiple posts
-        </li>
-        <li>
-          <strong>View Stats:</strong> The right panel displays statistics for
-          the selected user and performance metrics
-        </li>
-        <li>
-          <strong>Edit & Create:</strong> Use the edit buttons or "Add Random"
-          buttons to modify data
-        </li>
-      </ol>
-    </div>
-
-    <div class="key-features">
-      <h3>✨ Key Features:</h3>
-      <div class="feature-tags">
-        <span class="feature-tag">Entity Relationships</span>
-        <span class="feature-tag">Computed Queries</span>
-        <span class="feature-tag">Multi-Criteria Filtering</span>
-        <span class="feature-tag">Pagination</span>
-        <span class="feature-tag">Bulk Operations</span>
-        <span class="feature-tag">Live Statistics</span>
+    <div class="entity-facts" aria-label="EntityMap guarantees demonstrated here">
+      <div>
+        <span>Collection order</span>
+        <strong>Preserved</strong>
+      </div>
+      <div>
+        <span>Ordinary updates</span>
+        <strong>Stable handle</strong>
+      </div>
+      <div>
+        <span>Query result</span>
+        <strong>Reactive signal</strong>
       </div>
     </div>
-  </div>
+  </header>
 
-  <div class="demo-grid-3col">
-    <!-- Users Panel -->
-    <div class="card users-panel">
-      <div class="panel-header">
-        <h2>👥 Users ({{ userCount() }})</h2>
-        <button
-          (click)="loadUsers()"
-          class="btn-primary btn-sm"
-          title="Load sample users from API"
-        >
-          📥 Load Sample Users
-        </button>
+  <section class="authority-strip" aria-label="EntityMap ownership model">
+    <div>
+      <span class="strip-index">01</span>
+      <h2>One map owns the facts</h2>
+      <p><code>entityMap()</code> normalizes records at one state path.</p>
+    </div>
+    <div>
+      <span class="strip-index">02</span>
+      <h2>Selection keeps only identity</h2>
+      <p>The selected product is derived from its ID with <code>byId()</code>.</p>
+    </div>
+    <div>
+      <span class="strip-index">03</span>
+      <h2>Queries stay live</h2>
+      <p><code>where()</code>, <code>all</code>, and <code>count</code> remain signals.</p>
+    </div>
+  </section>
+
+  <section class="workbench" aria-labelledby="workbench-heading">
+    <header class="workbench-header">
+      <div>
+        <p class="eyebrow">Live map</p>
+        <h2 id="workbench-heading">Inventory workbench</h2>
       </div>
-
-      @if (userCount() === 0) {
-      <div class="help-text">👆 Click "Load Sample Users" to get started</div>
-      }
-
-      <div class="search-section">
-        <input
-          type="text"
-          [(ngModel)]="searchTerm"
-          (input)="updateSearchTerm($event)"
-          placeholder="Search users..."
-          class="input-field"
-        />
-      </div>
-
-      <!-- Sort & Items per page -->
-      <div class="controls-row">
-        <select
-          [value]="store.$.usersSortBy()"
-          (change)="setUsersSortBy($any($event.target).value)"
-          class="select-field"
-          title="Choose how to sort users"
-        >
-          <option value="name" selected>Sort by Name</option>
-          <option value="email">Sort by Email</option>
-          <option value="id">Sort by ID</option>
-        </select>
-        <button
-          (click)="store.$.usersSortAsc.set(!store.$.usersSortAsc())"
-          class="btn-secondary btn-sm"
-          title="Toggle sort direction"
-        >
-          {{ store.$.usersSortAsc() ? '↑' : '↓' }}
-        </button>
-        <select
-          [value]="store.$.usersPerPage()"
-          (change)="setUsersPerPage(+$any($event.target).value)"
-          class="select-field per-page"
-          title="Items per page"
-        >
-          <option [value]="5">5/page</option>
-          <option [value]="10" selected>10/page</option>
-          <option [value]="25">25/page</option>
-          <option [value]="50">50/page</option>
-        </select>
-      </div>
-
-      <div class="users-grid">
-        @for (user of paginatedUsers(); track user.id) {
-        <div
-          [class]="getUserClass(user.id)"
-          class="user-card"
-          [class.selected]="store.$.selectedUserId() === user.id"
-        >
-          <!-- Edit Mode -->
-          @if (editingUserId === user.id) {
-          <div class="edit-mode">
-            <input
-              type="text"
-              [(ngModel)]="editingUserName"
-              class="input-field"
-              placeholder="Name"
-            />
-            <input
-              type="email"
-              [(ngModel)]="editingUserEmail"
-              class="input-field input-sm"
-              placeholder="Email"
-            />
-            <div class="button-group">
-              <button (click)="saveUser()" class="btn-success btn-sm">
-                ✓ Save
-              </button>
-              <button (click)="cancelEditUser()" class="btn-secondary btn-sm">
-                ✗ Cancel
-              </button>
-            </div>
-          </div>
-          }
-
-          <!-- View Mode -->
-          @if (editingUserId !== user.id) {
-          <div class="view-mode">
-            <div
-              (click)="selectUser(user.id)"
-              (keyup.enter)="selectUser(user.id)"
-              (keyup.space)="selectUser(user.id)"
-              class="user-info"
-              tabindex="0"
-              role="button"
-            >
-              <div class="user-details">
-                <img [src]="user.avatar" [alt]="user.name" class="avatar" />
-                <div class="user-text">
-                  <div class="user-name">{{ user.name }}</div>
-                  <div class="user-email">{{ user.email }}</div>
-                </div>
-              </div>
-            </div>
-            <button
-              (click)="startEditingUser(user)"
-              class="btn-info btn-sm full-width"
-              title="Edit user"
-            >
-              ✏️ Edit
-            </button>
-          </div>
-          }
+      <dl class="workbench-counts">
+        <div>
+          <dt>Records</dt>
+          <dd>{{ store.$.products.count() }}</dd>
         </div>
-        } @if (paginatedUsers().length === 0) {
-        <div class="empty-state">No users found</div>
-        }
-      </div>
+        <div>
+          <dt>Available</dt>
+          <dd>{{ availableCount() }}</dd>
+        </div>
+      </dl>
+    </header>
 
-      <!-- Pagination Controls -->
-      <div class="pagination">
+    <div class="command-band">
+      <div class="filter-control" role="group" aria-label="Filter products">
+        <span>Query</span>
         <button
-          (click)="prevUsersPage()"
-          [disabled]="store.$.usersPage() === 1"
-          class="btn-secondary btn-sm"
+          type="button"
+          [class.active]="filter() === 'all'"
+          [attr.aria-pressed]="filter() === 'all'"
+          (click)="setFilter('all')"
         >
-          ← Prev
+          All
         </button>
-        <span class="page-info">
-          Page {{ store.$.usersPage() }} of {{ totalUserPages() }}
-        </span>
         <button
-          (click)="nextUsersPage()"
-          [disabled]="store.$.usersPage() >= totalUserPages()"
-          class="btn-secondary btn-sm"
+          type="button"
+          [class.active]="filter() === 'available'"
+          [attr.aria-pressed]="filter() === 'available'"
+          (click)="setFilter('available')"
         >
-          Next →
+          Available
         </button>
-      </div>
-
-      <div class="add-section">
         <button
-          (click)="addRandomUser()"
-          class="btn-success full-width"
-          title="Generate and add a new random user"
+          type="button"
+          [class.active]="filter() === 'reserved'"
+          [attr.aria-pressed]="filter() === 'reserved'"
+          (click)="setFilter('reserved')"
         >
-          ➕ Add Random User
-        </button>
-      </div>
-    </div>
-
-    <!-- Posts Panel -->
-    <div class="card posts-panel">
-      <div class="panel-header">
-        <h2>
-          📝 Posts @if (selectedUser()) {
-          <span class="subtitle"> by {{ selectedUser()?.name }} </span>
-          } ({{ sortedPosts().length }})
-        </h2>
-        <button
-          (click)="loadPosts()"
-          class="btn-primary btn-sm"
-          title="Load sample posts from API"
-        >
-          📥 Load Sample Posts
+          Reserved
         </button>
       </div>
 
-      @if (sortedPosts().length === 0) {
-      <div class="help-text">
-        👈 Select a user from the left panel, then click "Load Sample Posts"
-      </div>
-      }
-
-      <!-- Multi-Criteria Filters -->
-      <div class="filter-panel">
-        <div class="filter-title">🔍 Advanced Filters (Multi-Criteria)</div>
-        <p class="filter-description">
-          Combine multiple filters to find specific posts
-        </p>
-        <div class="filter-controls">
-          <!-- Tag Filter -->
+      <div class="add-command">
+        <label for="new-product-name">Add one record</label>
+        <div>
           <input
+            id="new-product-name"
             type="text"
-            [(ngModel)]="tagFilter"
-            placeholder="Filter by tag..."
-            class="input-field input-sm"
+            [(ngModel)]="newProductName"
+            placeholder="Product name"
           />
+          <button
+            type="button"
+            class="primary-command"
+            [disabled]="!newProductName.trim()"
+            (click)="addProduct()"
+          >
+            Add product
+          </button>
+          <button type="button" (click)="resetCatalog()">Reset</button>
+        </div>
+      </div>
+    </div>
 
-          <!-- Status Filter -->
-          <select [(ngModel)]="statusFilter" class="select-field select-sm">
-            <option value="" disabled selected>Filter by popularity...</option>
-            <option value="all">All Posts</option>
-            <option value="popular">Popular (10+ likes)</option>
-            <option value="unpopular">Unpopular (&lt;10 likes)</option>
-          </select>
+    <div class="workbench-grid">
+      <section class="collection-pane" aria-label="Product collection">
+        <div class="collection-labels" aria-hidden="true">
+          <span>Identity and value</span>
+          <span>Status</span>
+          <span>Operation</span>
+        </div>
 
-          <!-- Date Range Filter -->
-          <div class="date-filter">
-            <select
-              [(ngModel)]="dateRangeFilter"
-              class="select-field select-sm flex-1"
-            >
-              <option value="" disabled selected>Filter by date...</option>
-              <option value="all">All time</option>
-              <option value="today">Today</option>
-              <option value="week">Last 7 days</option>
-              <option value="month">Last 30 days</option>
-            </select>
-            <button
-              (click)="clearAllFilters()"
-              class="btn-secondary btn-sm"
-              title="Clear all filters"
-            >
-              ✕
+        @for (product of visibleProducts(); track product.id) {
+        <article
+          class="entity-row"
+          [class.selected]="selectedProductId() === product.id"
+        >
+          <button
+            type="button"
+            class="entity-select"
+            [attr.aria-pressed]="selectedProductId() === product.id"
+            (click)="selectProduct(product.id)"
+          >
+            <span class="entity-key">#{{ product.id }} / {{ product.sku }}</span>
+            <strong>{{ product.name }}</strong>
+            <span>{{ product.location }}</span>
+          </button>
+          <span class="availability" [class.reserved]="product.availability === 'reserved'">
+            {{ product.availability }}
+          </span>
+          <div class="row-operations">
+            <button type="button" (click)="toggleAvailability(product.id)">
+              {{ product.availability === 'available' ? 'Reserve' : 'Release' }}
             </button>
+            @if (product.id !== 1) {
+            <button type="button" class="remove-command" (click)="removeProduct(product.id)">
+              Remove
+            </button>
+            } @else {
+            <span class="held-label">Held handle</span>
+            }
           </div>
-        </div>
-      </div>
+        </article>
+        } @empty {
+        <p class="empty-state">No records match this query.</p>
+        }
+      </section>
 
-      <!-- Sort & Items per page -->
-      <div class="controls-row">
-        <select
-          [value]="store.$.postsSortBy()"
-          (change)="setPostsSortBy($any($event.target).value)"
-          class="select-field"
-          title="Choose how to sort posts"
-        >
-          <option value="title" selected>Sort by Title</option>
-          <option value="likes">Sort by Likes</option>
-          <option value="id">Sort by ID</option>
-        </select>
-        <button
-          (click)="store.$.postsSortAsc.set(!store.$.postsSortAsc())"
-          class="btn-secondary btn-sm"
-          title="Toggle sort direction"
-        >
-          {{ store.$.postsSortAsc() ? '↑' : '↓' }}
-        </button>
-        <select
-          [value]="store.$.postsPerPage()"
-          (change)="setPostsPerPage(+$any($event.target).value)"
-          class="select-field per-page"
-          title="Items per page"
-        >
-          <option [value]="5">5/page</option>
-          <option [value]="10" selected>10/page</option>
-          <option [value]="25">25/page</option>
-          <option [value]="50">50/page</option>
-        </select>
-      </div>
+      <aside class="inspection-pane" aria-label="EntityMap inspection">
+        <section class="inspection-section held-inspection">
+          <p class="eyebrow">Stable ordinary identity</p>
+          <h3>Held handle</h3>
+          <code>const held = products.byIdOrFail(1)</code>
+          <output>{{ heldProduct().name }}</output>
+          <p>
+            <code>updateOne()</code> changes the value while the held signal
+            object remains stable.
+          </p>
+          <button type="button" class="primary-command" (click)="renameAnchorProduct()">
+            Update through the map
+          </button>
+        </section>
 
-      <!-- Bulk Actions -->
-      @if (selectedPostIds.size > 0) {
-      <div class="bulk-actions">
-        <span class="bulk-count"
-          >✓ {{ selectedPostIds.size }} post{{
-            selectedPostIds.size === 1 ? '' : 's'
-          }}
-          selected</span
-        >
-        <div class="bulk-buttons">
-          <button
-            (click)="selectAllPosts()"
-            class="btn-primary btn-sm"
-            title="Select all visible posts"
-          >
-            ☑️ Select All
-          </button>
-          <button
-            (click)="exportSelectedPosts()"
-            class="btn-success btn-sm"
-            title="Export selected posts as JSON"
-          >
-            💾 Export JSON
-          </button>
-          <button
-            (click)="confirmDeleteSelected()"
-            class="btn-danger btn-sm"
-            title="Delete all selected posts"
-          >
-            🗑️ Delete Selected
-          </button>
-          <button
-            (click)="deselectAllPosts()"
-            class="btn-secondary btn-sm"
-            title="Clear selection"
-          >
-            ✕ Clear Selection
-          </button>
-        </div>
-      </div>
-      }
-
-      <div class="posts-list">
-        @for (post of paginatedPosts(); track trackPost($index, post)) {
-        <div class="post-card" [class.selected]="selectedPostIds.has(post.id)">
-          <!-- Edit Mode -->
-          @if (editingPostId === post.id) {
-          <div class="edit-mode">
-            <input
-              type="text"
-              [(ngModel)]="editingPostTitle"
-              class="input-field"
-              placeholder="Title"
-            />
-            <textarea
-              [(ngModel)]="editingPostContent"
-              class="textarea-field"
-              rows="3"
-              placeholder="Body"
-            ></textarea>
-            <div class="button-group">
-              <button (click)="savePost()" class="btn-success btn-sm">
-                ✓ Save
-              </button>
-              <button (click)="cancelEditPost()" class="btn-secondary btn-sm">
-                ✗ Cancel
-              </button>
-            </div>
-          </div>
+        <section class="inspection-section selected-inspection">
+          <p class="eyebrow">Derived selection</p>
+          <h3>Selected record</h3>
+          @if (selectedProduct(); as product) {
+          <dl class="selected-record">
+            <div><dt>ID</dt><dd>{{ product.id }}</dd></div>
+            <div><dt>SKU</dt><dd>{{ product.sku }}</dd></div>
+            <div><dt>Location</dt><dd>{{ product.location }}</dd></div>
+          </dl>
+          } @else {
+          <p>No record selected.</p>
           }
+        </section>
 
-          <!-- View Mode -->
-          @if (editingPostId !== post.id) {
-          <div class="view-mode">
-            <div class="post-header">
-              <input
-                type="checkbox"
-                [checked]="selectedPostIds.has(post.id)"
-                (change)="togglePostSelection(post.id)"
-                class="checkbox"
-              />
-              <h3 class="post-title">
-                {{ post.title }}
-              </h3>
-            </div>
-            <p class="post-body">{{ post.content }}</p>
-            <div class="post-meta">
-              <span>{{ getPostAuthor(post.authorId)?.name || 'Unknown' }}</span>
-              <div class="post-actions">
-                <button
-                  (click)="likePost(post.id)"
-                  class="btn-like"
-                  title="Like this post"
-                >
-                  ❤️ {{ post.likes }}
-                </button>
-                <button
-                  (click)="startEditingPost(post)"
-                  class="btn-info btn-sm"
-                  title="Edit post"
-                >
-                  ✏️ Edit
-                </button>
-              </div>
-            </div>
-            <div class="tag-list">
-              @for (tag of post.tags; track tag) {
-              <span class="tag">{{ tag }}</span>
-              }
-            </div>
-          </div>
+        <section class="inspection-section boundary-inspection">
+          <p class="eyebrow">Mutation boundary</p>
+          <h3>Intercept before, tap after</h3>
+          <output class="event-output" aria-live="polite">{{ lastEvent() }}</output>
+          @if (blockedOperation()) {
+          <output class="blocked-output" aria-live="polite">{{ blockedOperation() }}</output>
           }
-        </div>
-        } @if (paginatedPosts().length === 0) {
-        <div class="empty-state">No posts found</div>
-        }
-      </div>
-
-      <!-- Pagination Controls -->
-      <div class="pagination">
-        <button
-          (click)="prevPostsPage()"
-          [disabled]="store.$.postsPage() === 1"
-          class="btn-secondary btn-sm"
-        >
-          ← Prev
-        </button>
-        <span class="page-info">
-          Page {{ store.$.postsPage() }} of {{ totalPostPages() }}
-        </span>
-        <button
-          (click)="nextPostsPage()"
-          [disabled]="store.$.postsPage() >= totalPostPages()"
-          class="btn-secondary btn-sm"
-        >
-          Next →
-        </button>
-      </div>
-
-      <div class="add-section">
-        <button
-          (click)="addRandomPost()"
-          class="btn-success full-width"
-          title="Generate and add a new random post for the selected user"
-          [disabled]="!selectedUser()"
-        >
-          ➕ Add Random Post
-        </button>
-        @if (!selectedUser()) {
-        <div class="help-text-small">Select a user first to add posts</div>
-        }
-      </div>
-    </div>
-
-    <!-- Comments/Stats Panel -->
-    <div class="card stats-panel">
-      <h2>📊 User Statistics & Operations</h2>
-
-      <!-- Comments Section -->
-      <!-- Comments Panel - Feature not yet implemented -->
-      <!-- <div class="panel comments-panel">
-        <div class="panel-header">
-          <h3>
-            Comments
-          </h3>
-        </div>
-
-        <div class="comments-list">
-          <div class="empty-state">
-            Comments feature coming soon
-          </div>
-        </div>
-      </div> -->
-
-      <!-- User Stats -->
-      <div class="stats-section">
-        <h3>📈 Selected User Statistics</h3>
-        @if (selectedUser()) {
-        <div class="stats-content">
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-value stat-blue">
-                {{ getUserPostsCount() }}
-              </div>
-              <div class="stat-label">Posts</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value stat-pink">
-                {{ userTotalLikes() }}
-              </div>
-              <div class="stat-label">Total Likes</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value stat-purple">
-                {{ getUserAvgPostLength() }}
-              </div>
-              <div class="stat-label">Avg Length</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-status" [class]="getUserActivityClass()">
-                {{ getUserActivityStatus() }}
-              </div>
-              <div class="stat-label">Status</div>
-            </div>
-          </div>
-
-          <!-- Export Button -->
-          <button
-            (click)="exportUserData()"
-            class="btn-primary btn-sm full-width export-btn"
-          >
-            💾 Export User Data (JSON)
+          <button type="button" (click)="tryRejectedAdd()">
+            Attempt a blank-name add
           </button>
-        </div>
-        } @else {
-        <div class="empty-state">No user selected</div>
-        }
-      </div>
-
-      <!-- Performance Section -->
-      <div class="performance-section">
-        <h3>⚡ Performance Tracking</h3>
-        <div class="info-panel">
-          <div>
-            <strong>Last Action:</strong> {{ lastOperation || 'None yet' }}
-          </div>
-          <div><strong>Total Operations:</strong> {{ operationCount }}</div>
-          <div>
-            <strong>Active Search:</strong>
-            {{ searchTerm.length > 0 ? 'Yes (' + searchTerm + ')' : 'No' }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Entity Operations -->
-      <div class="operations-section">
-        <h3>🔧 Bulk Operations</h3>
-        <div class="operation-buttons">
-          <button
-            (click)="bulkUpdatePosts()"
-            class="btn-warning btn-sm full-width"
-            title="Update all posts at once to demonstrate batch operations"
-          >
-            🔄 Batch Update All Posts
-          </button>
-          <!-- Reset feature not yet implemented -->
-          <!-- <button (click)="resetAllData()" class="btn-danger btn-sm full-width">
-            ♻️ Reset All Data
-          </button> -->
-        </div>
-      </div>
+        </section>
+      </aside>
     </div>
-  </div>
+  </section>
+
+  <section class="api-ledger" aria-labelledby="api-ledger-heading">
+    <header>
+      <p class="eyebrow">Public surface in use</p>
+      <h2 id="api-ledger-heading">One structural API, signal-shaped reads.</h2>
+    </header>
+    <div>
+      <code>addMany()</code>
+      <code>addOne()</code>
+      <code>updateOne()</code>
+      <code>removeOne()</code>
+      <code>byId()</code>
+      <code>where()</code>
+      <code>count()</code>
+      <code>all()</code>
+    </div>
+  </section>
 </div>

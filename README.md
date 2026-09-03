@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="apps/demo/public/signaltree.svg" alt="SignalTree Logo" width="120" height="120" style="background: transparent;" />
+  <img src="apps/demo/public/signaltree-mark-192.png" alt="SignalTree ST leaf mark" width="120" height="120" />
   <h1>SignalTree</h1>
   <p><strong>Causal application state for Angular and React</strong></p>
   <p>State as shape. Consequential transitions. Signals at every path.</p>
@@ -146,8 +146,9 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
 - **Multiple stores / feature domains** — one tree per feature with an Ops service in front is the
   recommended architecture, and it scales to many.
 - **AI-assisted development** — the historical v10 experiment measured 49% →
-  98% codegen accuracy with its then-current `llms.txt`; current guidance comes
-  from package types and READMEs while a replacement is derived.
+  98% codegen accuracy with its then-current `llms.txt`. Current v15 guidance
+  is the shipped [`llms.txt`](llms.txt) manifest, alongside package types and
+  READMEs.
 - **Migrating off `@ngrx/signals`** — use the package types and current migration
   guide; consumer-facing agent skills are intentionally absent until the public
   surface freeze is complete.
@@ -182,9 +183,9 @@ Where the two columns disagree, the honest reading is "a toss-up that gravity de
 ## 🤖 Built for the AI-assisted era
 
 SignalTree has treated AI coding agents as API consumers and measured whether
-its guidance improves generated code. The v10 experiment used `llms.txt` and
-agent guidance; those artifacts are historical and are not shipped by the
-current release.
+its guidance improves generated code. The v10 experiment used earlier
+`llms.txt` and agent-guidance artifacts; those historical materials are not
+shipped by the current release. The current v15 manifest is [`llms.txt`](llms.txt).
 
 **Measured (v10.3.3, 2026-06-01):** AI-codegen accuracy goes from **49% cold → 98% primed (+49 percentage points)** when `llms.txt` is in the agent's context. Reproducible across 6 agents (4 frontier + 2 cost-tier) × 8 prompts × 5 libraries × 3 priming modes = **720 cells**. Four of the six agents reach **100/100** when primed.
 

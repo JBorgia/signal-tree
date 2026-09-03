@@ -3706,13 +3706,19 @@ describe('restoration enhancer', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const firstTurn = t.getTurns().at(-1) as { __positionIds?: number[] };
+    const firstTurn = t.getTurns().at(-1) as {
+      id: number;
+      __positionIds?: number[];
+    };
 
     undoable(() => store.$.title.set('B'));
     await Promise.resolve();
     await Promise.resolve();
 
-    const secondTurn = t.getTurns().at(-1) as { __positionIds?: number[] };
+    const secondTurn = t.getTurns().at(-1) as {
+      id: number;
+      __positionIds?: number[];
+    };
     const firstPositionId = firstTurn.__positionIds?.[0] as number;
     const secondPositionId = secondTurn.__positionIds?.[0] as number;
 

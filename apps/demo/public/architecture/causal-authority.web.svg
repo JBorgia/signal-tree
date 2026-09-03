@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 1040 610" role="img" aria-labelledby="causal-authority-web-title causal-authority-web-description" data-diagram="causal-authority" data-variant="web">
+  <title id="causal-authority-web-title">Authority and restoration are separate axes</title>
+  <desc id="causal-authority-web-description">external() means another authority owned the decision. Transactions can group authored work and defer settlement, but they are not a third authority class.</desc>
+  <style>
+  :root {
+    --st-ink: #17211a;
+    --st-muted: #55615a;
+    --st-surface: #fbfcf8;
+    --st-grid: rgba(23, 33, 26, 0.055);
+    --st-line: #526158;
+    --st-application: #fff0c7;
+    --st-framework: #dbe8ff;
+    --st-kernel: #d9f66f;
+    --st-authored: #d9f0df;
+    --st-external: #ffe0d5;
+    --st-restoration: #f8d66d;
+    --st-identity: #d6eee9;
+    --st-projection: #e9e0f7;
+    --st-neutral: #edf0eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --st-ink: #eef4e9;
+      --st-muted: #b6c1b8;
+      --st-surface: #17211a;
+      --st-grid: rgba(238, 244, 233, 0.055);
+      --st-line: #a9b6ac;
+      --st-application: #544a2d;
+      --st-framework: #30435f;
+      --st-kernel: #4c641f;
+      --st-authored: #31513a;
+      --st-external: #653f35;
+      --st-restoration: #624f1e;
+      --st-identity: #31534c;
+      --st-projection: #493d5c;
+      --st-neutral: #303a33;
+    }
+  }
+  text { fill: var(--st-ink); }
+  .group-box { fill: color-mix(in srgb, var(--st-neutral) 55%, transparent); stroke: var(--st-line); stroke-width: 1.5; }
+  .group-box--projection { fill: color-mix(in srgb, var(--st-projection) 42%, transparent); }
+  .dashed { stroke-dasharray: 8 7; }
+  .group-label, .node-detail { fill: var(--st-muted); }
+  .group-label, .node-title, .edge-label { font-family: 'Space Grotesk', 'Avenir Next', sans-serif; }
+  .group-label { font-size: 12px; font-weight: 700; }
+  .edge { fill: none; stroke: var(--st-line); stroke-width: 2; }
+  .edge-label-group { pointer-events: none; }
+  .edge-label-plate { fill: var(--st-surface); stroke: color-mix(in srgb, var(--st-line) 42%, transparent); stroke-width: 1; }
+  .edge-label { fill: var(--st-ink); font-size: 11px; font-weight: 700; }
+  .node { outline: none; }
+  .node rect { stroke: color-mix(in srgb, var(--st-ink) 42%, transparent); stroke-width: 1.4; transition: stroke-width 180ms ease; }
+  .node:hover rect { stroke-width: 2.5; }
+  .node--application rect { fill: var(--st-application); }
+  .node--framework rect { fill: var(--st-framework); }
+  .node--kernel rect { fill: var(--st-kernel); }
+  .node--authored rect { fill: var(--st-authored); }
+  .node--external rect { fill: var(--st-external); }
+  .node--restoration rect { fill: var(--st-restoration); }
+  .node--identity rect { fill: var(--st-identity); }
+  .node--projection rect { fill: var(--st-projection); }
+  .node--neutral rect { fill: var(--st-neutral); }
+  .node-title { font-size: 16px; font-weight: 730; }
+  .node-detail { font-family: 'IBM Plex Sans', 'Avenir Next', sans-serif; font-size: 12px; font-weight: 520; }
+  .node-detail--code { font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace; font-size: 10.5px; }
+  .slide-title { font: 700 62px 'Space Grotesk', 'Avenir Next', sans-serif; }
+  .slide-takeaway { fill: var(--st-muted); font: 500 28px 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .notes { box-sizing: border-box; height: 100%; padding: 22px 28px; color: var(--st-ink); border: 1px solid var(--st-line); background: var(--st-neutral); font: 15px/1.5 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .notes-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 32px; }
+  .notes h2 { margin: 0 0 8px; font-size: 15px; text-transform: uppercase; }
+  .notes ul { margin: 0; padding-left: 20px; }
+  .notes code { font-size: 13px; overflow-wrap: anywhere; }
+  @media (prefers-reduced-motion: reduce) { .node rect { transition: none; } }
+</style>
+  <defs>
+  <marker id="causal-authority-web-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--st-line)"/></marker>
+  <pattern id="causal-authority-web-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="var(--st-grid)" stroke-width="1"/></pattern>
+</defs>
+  <rect width="1040" height="610" fill="var(--st-surface)"/>
+  <rect width="1040" height="610" fill="url(#causal-authority-web-grid)"/>
+  <g><rect class="group-box group-box--neutral dashed" x="185" y="20" width="670" height="120" rx="0"/><text class="group-label" x="201" y="42">Orthogonal operation boundary · transaction()</text></g><g><g><path class="edge dashed" d="M 520 120 L 520 185" marker-end="url(#causal-authority-web-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="478" y="132.5" width="84" height="24" rx="0"/><text class="edge-label" x="520" y="148.24" text-anchor="middle"><tspan x="520" dy="0">groups</tspan></text></g></g><g><path class="edge" d="M 448.80597014925377 275 L 345.97014925373134 340" marker-end="url(#causal-authority-web-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="340.3880597014926" y="287.5" width="114" height="24" rx="0"/><text class="edge-label" x="397.3880597014926" y="303.24" text-anchor="middle"><tspan x="397.3880597014926" dy="0">this operation</tspan></text></g></g><g><path class="edge" d="M 591.1940298507462 275 L 694.0298507462687 340" marker-end="url(#causal-authority-web-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="575.6119402985075" y="287.5" width="134" height="24" rx="0"/><text class="edge-label" x="642.6119402985075" y="303.24" text-anchor="middle"><tspan x="642.6119402985075" dy="0">another authority</tspan></text></g></g><g><path class="edge" d="M 223.89344262295083 455 L 194.13934426229508 510" marker-end="url(#causal-authority-web-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="167.01639344262296" y="462.5" width="84" height="24" rx="0"/><text class="edge-label" x="209.01639344262296" y="478.24" text-anchor="middle"><tspan x="209.01639344262296" dy="0">ordinary</tspan></text></g></g><g><path class="edge" d="M 354.91803278688525 455 L 433.11475409836066 500" marker-end="url(#causal-authority-web-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="352.016393442623" y="457.5" width="84" height="24" rx="0"/><text class="edge-label" x="394.016393442623" y="473.24" text-anchor="middle"><tspan x="394.016393442623" dy="0">optional</tspan></text></g></g><g><path class="edge" d="M 675 550 L 720 550" marker-end="url(#causal-authority-web-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="655.5" y="530" width="84" height="24" rx="0"/><text class="edge-label" x="697.5" y="545.74" text-anchor="middle"><tspan x="697.5" dy="0">eligible</tspan></text></g></g></g><g><g class="node node--neutral"><title>operation may be pending until confirm / rollback</title><rect x="315" y="55" width="410" height="65" rx="0"/><text class="node-title" x="520" y="80.5" text-anchor="middle"><tspan x="520" dy="0">operation</tspan></text><text class="node-detail" x="520" y="105.5" text-anchor="middle"><tspan x="520" dy="0">may be pending until confirm / rollback</tspan></text></g><g class="node node--kernel"><title>WRITE classify who owned the decision</title><rect x="365" y="185" width="310" height="90" rx="0"/><text class="node-title" x="520" y="223" text-anchor="middle"><tspan x="520" dy="0">WRITE</tspan></text><text class="node-detail" x="520" y="248" text-anchor="middle"><tspan x="520" dy="0">classify who owned the decision</tspan></text></g><g class="node node--authored"><title>Authored ordinary application writes including transaction work</title><rect x="80" y="340" width="350" height="115" rx="0"/><text class="node-title" x="255" y="381.5" text-anchor="middle"><tspan x="255" dy="0">Authored</tspan></text><text class="node-detail" x="255" y="406.5" text-anchor="middle"><tspan x="255" dy="0">ordinary application writes</tspan><tspan x="255" dy="18">including transaction work</tspan></text></g><g class="node node--external"><title>External external(() =&gt; applyTruth()) never an authored turn</title><rect x="610" y="340" width="350" height="115" rx="0"/><text class="node-title" x="785" y="381.5" text-anchor="middle"><tspan x="785" dy="0">External</tspan></text><text class="node-detail node-detail--code" x="785" y="406.5" text-anchor="middle"><tspan x="785" dy="0">external(() =&gt; applyTruth())</tspan><tspan x="785" dy="18">never an authored turn</tspan></text></g><g class="node node--neutral"><title>Undesignated by default no restoration retention</title><rect x="25" y="510" width="295" height="80" rx="0"/><text class="node-title" x="172.5" y="532" text-anchor="middle"><tspan x="172.5" dy="0">Undesignated</tspan><tspan x="172.5" dy="22">by default</tspan></text><text class="node-detail" x="172.5" y="579" text-anchor="middle"><tspan x="172.5" dy="0">no restoration retention</tspan></text></g><g class="node node--restoration"><title>Restoration designation undoable(() =&gt; authoredWork())</title><rect x="365" y="500" width="310" height="100" rx="0"/><text class="node-title" x="520" y="532" text-anchor="middle"><tspan x="520" dy="0">Restoration</tspan><tspan x="520" dy="22">designation</tspan></text><text class="node-detail node-detail--code" x="520" y="579" text-anchor="middle"><tspan x="520" dy="0">undoable(() =&gt; authoredWork())</tspan></text></g><g class="node node--restoration"><title>Eligible for retained restoration history bounded by restoration policy</title><rect x="720" y="510" width="295" height="80" rx="0"/><text class="node-title" x="867.5" y="532" text-anchor="middle"><tspan x="867.5" dy="0">Eligible for retained</tspan><tspan x="867.5" dy="22">restoration history</tspan></text><text class="node-detail" x="867.5" y="579" text-anchor="middle"><tspan x="867.5" dy="0">bounded by restoration policy</tspan></text></g></g>
+</svg>

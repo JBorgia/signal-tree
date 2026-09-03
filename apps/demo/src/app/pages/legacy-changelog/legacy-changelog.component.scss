@@ -1,8 +1,14 @@
 @use '../../examples/shared/styles' as *;
 
+.legacy-changelog {
+}
+
 .whats-new {
   h2 {
-    margin-bottom: $spacing-md;
+    margin: 0 0 $spacing-md;
+  }
+  h3 {
+    margin: $spacing-xl 0 $spacing-md;
   }
   ul {
     margin: 0 0 $spacing-md;
@@ -17,7 +23,7 @@
     border: 1px solid var(--color-warning-300, #fcd34d);
     border-radius: $radius-md;
     padding: $spacing-md;
-    margin-bottom: $spacing-xl;
+    margin: 0 0 $spacing-xl;
   }
 
   .release-highlights {
@@ -25,7 +31,7 @@
     border: 1px solid $primary;
     border-radius: $radius-lg;
     padding: $spacing-lg;
-    margin-bottom: $spacing-xl;
+    margin: 0 0 $spacing-xl;
   }
 
   .metrics-grid {

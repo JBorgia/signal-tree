@@ -1,344 +1,110 @@
-<div class="extreme-depth-container">
-  <div class="header">
-    <h1>🔥 Extreme Depth Testing</h1>
-    <p class="subtitle">
-      Experience recursive typing at 15+ levels with perfect type inference
+<div class="typing-page layout-frame">
+  <header class="typing-hero">
+    <p class="eyebrow">Build-enforced proof</p>
+    <h1>Fifteen declared branches. One exact writable leaf.</h1>
+    <p class="hero-copy">
+      This route makes one bounded claim: a concrete 15-branch state path
+      compiles to the expected Angular <code>WritableLeaf</code> type without
+      degrading to <code>any</code>, and that same path reads and writes at
+      runtime.
     </p>
-  </div>
 
-  <!-- Explanation Section -->
-  <div class="explanation-section">
-    <h2>📖 What This Page Tests</h2>
-    <div class="explanation-content">
-      <p class="intro">
-        This page demonstrates SignalTree's ability to maintain
-        <strong>perfect TypeScript type inference</strong> at extreme nesting
-        depths (15+ levels) without degrading to <code>'any'</code> types. This
-        is a critical capability for real-world enterprise applications with
-        deeply nested data structures.
-      </p>
-
-      <div class="concept-card">
-        <h3>🎯 The Challenge: Type Inference at Depth</h3>
-        <p>
-          Most state management libraries struggle with deep nesting. After 3-7
-          levels, TypeScript either:
-        </p>
-        <ul>
-          <li>❌ Degrades to <code>'any'</code> types (losing type safety)</li>
-          <li>❌ Requires manual type annotations at every level (poor DX)</li>
-          <li>❌ Hits TypeScript's recursion limits (compilation errors)</li>
-        </ul>
-        <p>
-          <strong>SignalTree solves this</strong> using advanced recursive type
-          definitions that maintain full type inference at unlimited depth while
-          staying within TypeScript's capabilities.
-        </p>
+    <dl class="proof-strip">
+      <div>
+        <dt>Declared branches</dt>
+        <dd>{{ pathSegments.length }}</dd>
       </div>
-
-      <div class="concept-card">
-        <h3>🔬 How This Demo Works</h3>
-        <p>
-          This page runs <strong>live in your browser</strong> against a real
-          signal tree. As you interact with it, you can confirm:
-        </p>
-        <ol>
-          <li>
-            <strong>Type Safety:</strong> TypeScript compiler confirms exact
-            types at every level (no <code>'any'</code>, no type assertions)
-          </li>
-          <li>
-            <strong>Runtime Functionality:</strong> Signals can be read,
-            written, and observed at maximum depth
-          </li>
-          <li>
-            <strong>Performance:</strong> Operations complete in sub-millisecond
-            timeframes even at 15+ levels
-          </li>
-          <li>
-            <strong>Reactivity:</strong> Updates propagate correctly through
-            deeply nested structures
-          </li>
-        </ol>
+      <div>
+        <dt>Exact type equality</dt>
+        <dd>{{ compilerChecks.exactWritableLeaf }}</dd>
       </div>
+      <div>
+        <dt><code>IsAny</code> result</dt>
+        <dd>{{ compilerChecks.isAny }}</dd>
+      </div>
+    </dl>
+  </header>
 
-      <div class="concept-card">
-        <h3>✅ What "Passing" Means</h3>
-        <div class="passing-criteria">
-          <div class="criteria-item">
-            <strong>TypeScript Compilation:</strong> Code compiles without
-            errors or type warnings
-          </div>
-          <div class="criteria-item">
-            <strong>Runtime Execution:</strong> All CRUD operations succeed at
-            declared depth
-          </div>
-          <div class="criteria-item">
-            <strong>Performance Threshold:</strong> Operations complete in &lt;
-            1ms on standard hardware
-          </div>
-          <div class="criteria-item">
-            <strong>Type Accuracy:</strong> IDE IntelliSense shows correct types
-            (verified via <code>expectType&lt;T&gt;()</code> assertions)
-          </div>
+  <section class="path-section" aria-labelledby="path-heading">
+    <header>
+      <p class="eyebrow">The declared model</p>
+      <h2 id="path-heading">The path the compiler sees</h2>
+    </header>
+    <ol class="path-ledger">
+      @for (segment of pathSegments; track segment; let index = $index) {
+      <li>
+        <span>{{ index + 1 }}</span>
+        <code>{{ segment }}</code>
+      </li>
+      }
+    </ol>
+  </section>
+
+  <section class="runtime-lab" aria-labelledby="runtime-heading">
+    <div class="live-result">
+      <header>
+        <p class="eyebrow">Live deepest branch</p>
+        <h2 id="runtime-heading">Read and update level 15</h2>
+      </header>
+
+      <dl class="result-values">
+        <div>
+          <dt>Status</dt>
+          <dd>{{ result.status() }}</dd>
         </div>
-        <p class="note">
-          💡 <strong>Try it yourself:</strong> Use the buttons below to update
-          values at 15+ levels deep. Notice how TypeScript provides perfect
-          autocomplete and type checking at every step.
-        </p>
-      </div>
-    </div>
-  </div>
+        <div>
+          <dt>Revision</dt>
+          <dd>{{ result.revision() }}</dd>
+        </div>
+        <div>
+          <dt>Owner</dt>
+          <dd>{{ result.owner() }}</dd>
+        </div>
+      </dl>
 
-  <div class="demo-section">
-    <h2>🏗️ Live Enterprise Structure</h2>
-    <div class="structure-demo">
-      <div class="path-display">
-        <h3>Current Depth: {{ currentDepth }} levels</h3>
-        <p class="depth-description">{{ depthDescription }}</p>
-      </div>
-
-      <div class="controls">
-        <button
-          class="btn primary"
-          (click)="updateStatus()"
-          [disabled]="isUpdating"
-        >
-          {{ isUpdating ? 'Updating...' : '🔄 Update Status' }}
+      <div class="runtime-controls">
+        <button type="button" class="primary-command" (click)="toggleStatus()">
+          Toggle deepest status
         </button>
-
-        <button class="btn secondary highlight" (click)="incrementDepth()">
-          ➕ Increase Depth (+1)
-        </button>
-
-        <button class="btn secondary" (click)="updatePerformance()">
-          ⚡ Update Performance
-        </button>
-
-        @if (extensionPath.length > 0) {
-        <button class="btn tertiary" (click)="resetDepth()">
-          🔄 Reset to Base (15 levels)
-        </button>
-        }
+        <button type="button" (click)="reset()">Reset</button>
       </div>
-
-      <div class="depth-input-section">
-        <label for="depth-input" class="depth-label">
-          🎯 Jump to Specific Depth:
-        </label>
-        <div class="input-group">
-          <input
-            id="depth-input"
-            type="number"
-            [(ngModel)]="targetDepth"
-            min="15"
-            class="depth-input"
-            placeholder="Enter depth (15+)"
-          />
-          <button class="btn primary" (click)="setDepthToTarget()">
-            Go to {{ targetDepth | number }} Levels
-          </button>
-        </div>
-        <p class="input-hint">
-          Enter any depth from 15 onwards - SignalTree handles unlimited
-          nesting!
-        </p>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-value">
-            {{
-              extremeTree.$.enterprise.divisions.technology.departments.engineering.teams.frontend.projects.signaltree.releases.v1.features.recursiveTyping.validation.tests.extreme.depth()
-            }}
-          </div>
-          <div class="stat-label">Current Depth</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-value">
-            {{
-              extremeTree.$.enterprise.divisions.technology.departments.engineering.teams.frontend.projects.signaltree.releases.v1.features.recursiveTyping.validation.tests.extreme.status()
-            }}
-          </div>
-          <div class="stat-label">Status</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-value">
-            {{
-              extremeTree.$.enterprise.divisions.technology.departments.engineering.teams.frontend.projects.signaltree.releases.v1.features.recursiveTyping.validation.tests.extreme.performance()
-            }}
-          </div>
-          <div class="stat-label">Performance</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-value">
-            {{
-              extremeTree.$.enterprise.divisions.technology.departments.engineering.teams.frontend.projects.signaltree.releases.v1.features.recursiveTyping.validation.tests.extreme.metadata.confidence()
-            }}%
-          </div>
-          <div class="stat-label">Confidence</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="code-section">
-    <h2>💻 Perfect Type Inference</h2>
-    <div class="code-block">
-      <h3>TypeScript knows this is a string signal at 15+ levels:</h3>
-      <st-code-tabs [files]="typeInferenceExample"></st-code-tabs>
+      <output aria-live="polite">{{ lastOperation() }}</output>
     </div>
 
-    <div class="code-block">
-      <h3>Update operations maintain full type safety:</h3>
-      <st-code-tabs [files]="updateExample"></st-code-tabs>
-    </div>
-  </div>
-
-  <div class="performance-section">
-    <h2>⚡ Performance Metrics</h2>
-    <div class="performance-grid">
-      <div class="perf-card">
-        <h3>Tree Creation</h3>
-        <div class="perf-value">{{ performanceMetrics.creation }}ms</div>
-        <div class="perf-desc">Time to create 15+ level structure</div>
+    <div class="code-proof">
+      <header>
+        <p class="eyebrow">Compiled with this route</p>
+        <h2>Signal-shaped access</h2>
+      </header>
+      <div>
+        <span>Read</span>
+        <pre><code>{{ readExample }}</code></pre>
       </div>
-
-      <div class="perf-card">
-        <h3>Deep Access</h3>
-        <div class="perf-value">{{ performanceMetrics.access }}ms</div>
-        <div class="perf-desc">Time to access deepest signal</div>
-      </div>
-
-      <div class="perf-card">
-        <h3>Deep Update</h3>
-        <div class="perf-value">{{ performanceMetrics.update }}ms</div>
-        <div class="perf-desc">Time to update at max depth</div>
+      <div>
+        <span>Write</span>
+        <pre><code>{{ updateExample }}</code></pre>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="validation-section">
-    <h2>✅ Capabilities This Demo Exercises</h2>
-    <div class="test-results">
-      <div class="test-summary">
-        <span class="test-count">{{ testCategories.length }} capability groups</span>
-        <span class="test-coverage"
-          >Exercised live in your browser — not CI output</span
-        >
-        <span class="current-depth-badge">
-          Target Depth: {{ targetDepth }} Levels ({{ depthCategory }})
-        </span>
-        <span class="test-status-message">
-          {{ testStatusMessage }}
-        </span>
-      </div>
-
-      <div class="test-explanation">
-        <h3>📋 Capability Categories</h3>
-        <p>
-          This interactive demo exercises SignalTree's recursive typing across
-          multiple depth ranges directly in the running app.
-          <strong>Target depth: {{ targetDepth }} levels</strong> -
-          {{ depthDescription }}
-        </p>
-        <p class="performance-note">
-          ✅ <strong>Live, not CI:</strong> Every depth change updates the real
-          signal tree in this page. Type inference is enforced by the TypeScript
-          compiler at build time; reactivity and timings below are observed live
-          as you interact. The checkmarks indicate supported capabilities, not a
-          count of passing test cases.
-        </p>
-      </div>
-
-      <div class="test-categories">
-        @for (category of testCategories; track category.name) {
-        <div class="test-category detailed" [class.inactive]="!category.active">
-          <div class="category-header">
-            <span class="category-name">{{ category.name }}</span>
-            <span class="category-status">{{ category.status }}</span>
-          </div>
-          <div class="category-details">
-            <p><strong>What we test:</strong></p>
-            <ul>
-              @for (test of category.tests; track test) {
-              <li>{{ test }}</li>
-              }
-            </ul>
-            <p><strong>Why it matters:</strong> {{ category.relevance }}</p>
-          </div>
-        </div>
-        }
-      </div>
-
-      <div class="technical-details">
-        <h3>🔧 How This Demo Works</h3>
-        <p>
-          Everything on this page runs in the browser against a live
-          <code>signalTree</code>. There is no hidden CI run behind these
-          numbers:
-        </p>
-        <ul>
-          <li>
-            <strong>Compile-Time:</strong> TypeScript's <code>tsc</code> infers
-            the exact signal type at every level when the demo is built — if it
-            degraded to <code>'any'</code>, this page would not compile
-          </li>
-          <li>
-            <strong>Runtime:</strong> The buttons above read and write signals at
-            the displayed depth, so you can confirm functional correctness
-            yourself
-          </li>
-          <li>
-            <strong>Performance:</strong> The timings shown are single
-            <code>performance.now()</code> samples measured on your machine, not
-            statistical CI benchmarks
-          </li>
-        </ul>
-      </div>
+  <section class="claim-boundary" aria-label="Proof boundary">
+    <div class="established">
+      <p class="eyebrow">Established here</p>
+      <h2>Concrete type and runtime behavior</h2>
+      <ul>
+        <li>The deepest status path is exactly <code>WritableLeaf&lt;DeepStatus&gt;</code>.</li>
+        <li>The production-source <code>IsAny</code> detector resolves to <code>false</code>.</li>
+        <li>The level-15 branch is callable and its leaves support <code>set()</code> and <code>update()</code>.</li>
+      </ul>
     </div>
-  </div>
-
-  <div class="real-world-section">
-    <h2>🌍 Real-World Applications</h2>
-    <div class="use-cases">
-      <div class="use-case-card">
-        <h3>Enterprise Org Charts</h3>
-        <p>
-          Manage complex organizational hierarchies with multiple divisions,
-          departments, teams, and employees while maintaining type safety at
-          every level.
-        </p>
-        <code
-          >company.divisions.tech.departments.engineering.teams.frontend.members[0]</code
-        >
-      </div>
-
-      <div class="use-case-card">
-        <h3>E-Commerce Catalogs</h3>
-        <p>
-          Navigate deeply nested product categories with full type inference for
-          filters, variants, and specifications.
-        </p>
-        <code
-          >catalog.categories.electronics.subcategories.computers.products[0].variants</code
-        >
-      </div>
-
-      <div class="use-case-card">
-        <h3>Configuration Systems</h3>
-        <p>
-          Handle complex application settings with nested feature flags, user
-          preferences, and environment-specific overrides.
-        </p>
-        <code
-          >config.environments.production.features.payments.providers.stripe.settings</code
-        >
-      </div>
+    <div class="not-established">
+      <p class="eyebrow">Not established here</p>
+      <h2>No unbounded or performance claim</h2>
+      <ul>
+        <li>This does not claim unlimited nesting beyond the declared model.</li>
+        <li>It does not publish browser timing, memory, or compiler-limit numbers.</li>
+        <li>It does not generalize from one path to every possible TypeScript shape.</li>
+      </ul>
     </div>
-  </div>
+  </section>
 </div>

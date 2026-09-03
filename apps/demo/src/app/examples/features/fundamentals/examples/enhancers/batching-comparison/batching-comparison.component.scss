@@ -1,12 +1,39 @@
 .controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   align-items: center;
 }
+.controls > * {
+  min-width: 0;
+}
+.controls label {
+  display: grid;
+  flex: 1 1 12rem;
+  gap: 0.35rem;
+}
+.controls input {
+  width: 100%;
+}
 .results {
   margin-top: 1rem;
+  overflow-x: auto;
+}
+.results table {
+  min-width: 34rem;
 }
 .note {
   color: var(--color-neutral-500);
   font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  .controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .controls > * {
+    width: 100%;
+  }
 }

@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 
 import { AsyncDemoComponent } from './async-demo.component';
 
-describe('AsyncDemoComponent (fundamentals tour pointer)', () => {
+describe('AsyncDemoComponent', () => {
   let fixture: ComponentFixture<AsyncDemoComponent>;
 
   beforeEach(async () => {
@@ -15,19 +15,25 @@ describe('AsyncDemoComponent (fundamentals tour pointer)', () => {
     fixture.detectChanges();
   });
 
-  it('renders the fundamentals-tour pointer card without errors', () => {
+  it('teaches one-shot external ingress and persistent Link separately', () => {
     const host: HTMLElement = fixture.nativeElement;
-    expect(host.textContent).toContain('Async Operations');
+    expect(host.textContent).toContain('External truth & Link');
     expect(host.textContent).toContain('external()');
-    // The lesson survived the primitive: this example now teaches the RxJS
-    // pipeline that always owned debounce, dedup and latest-wins.
+    expect(host.textContent).toContain('link()');
+    expect(host.textContent).toContain('retrieve()');
+    expect(host.textContent).toContain('settled()');
+    expect(host.textContent).toContain('dispose()');
     expect(host.textContent).toContain('switchMap');
+    expect(host.textContent).toContain('application concerns');
+    expect(host.textContent).not.toContain('loader()');
+    expect(host.textContent).not.toContain('marker family');
   });
 
-  it('includes a routerLink pointing at the canonical /async demo page', () => {
-    const links = (fixture.nativeElement as HTMLElement).querySelectorAll(
-      'a[routerLink="/async"]'
-    );
-    expect(links.length).toBeGreaterThan(0);
+  it('does not render a self-referential pointer link', () => {
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector(
+        'a[routerLink="/external-truth"]'
+      )
+    ).toBeNull();
   });
 });

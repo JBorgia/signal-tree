@@ -52,12 +52,29 @@ describe('DocumentationComponent', () => {
     expect(component.selectedPackage().id).toBe('kernel');
   });
 
-  it('renders one sidebar button per entry in packages, and one quick-link per entry in quickLinks', () => {
+  it('renders one in-flow document switcher without a second page aside', () => {
     const buttons = fixture.nativeElement.querySelectorAll('.package-button');
     expect(buttons.length).toBe(component.packages.length);
 
     const links = fixture.nativeElement.querySelectorAll('.doc-quick-link');
     expect(links.length).toBe(component.quickLinks.length);
+    expect(fixture.nativeElement.querySelector('aside')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.package-list')).toBeTruthy();
+  });
+
+  it('indexes current v15 docs and current demo routes only', () => {
+    const descriptions = component.packages
+      .map((pkg) => pkg.description)
+      .join(' ');
+
+    expect(descriptions).not.toContain('stored()');
+    expect(descriptions).not.toContain('lifecycle integration');
+    expect(component.quickLinks.map((link) => link.route)).toEqual([
+      '/architecture-overview',
+      '/examples/fundamentals',
+      '/migrate',
+      '/restoration',
+    ]);
   });
 
   it('selectPackage() updates selectedPackage() and re-issues the README fetch', () => {

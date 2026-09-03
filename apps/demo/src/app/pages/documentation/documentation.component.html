@@ -1,66 +1,49 @@
-<div class="documentation-container">
-  <div class="documentation-sidebar">
-    <div class="documentation-header">
-      <h1>📚 SignalTree Documentation</h1>
-      <div class="value-proposition">
-        <h3>Choose the realization that owns your runtime.</h3>
-        <p>
-          Angular applications construct through
-          <code>&#64;signal-tree/angular</code>, React applications observe through
-          <code>&#64;signal-tree/react</code>, and framework-neutral runtimes use
-          <code>&#64;signal-tree/kernel</code> directly.
-        </p>
-        <ul class="doc-benefits">
-          <li>
-            <strong>Learn:</strong> fundamentals, architecture, and package
-            docs use the same construction-bound state model.
-          </li>
-          <li>
-            <strong>Reference:</strong> each package entry explains what it is
-            for and where to go next.
-          </li>
-          <li>
-            <strong>Examples:</strong> use the demo routes to inspect runtime
-            behavior after reading the docs.
-          </li>
-        </ul>
-        <p class="quick-start">
-          👉 Pick a package on the left to open its README in-app.
-        </p>
-        <div class="doc-quick-links">
-          @for (link of quickLinks; track link.label) {
-          <a [routerLink]="link.route" class="doc-quick-link">{{ link.label }}</a>
-          }
-        </div>
-      </div>
-    </div>
+<div class="documentation-container layout-frame">
+  <header class="documentation-header">
+    <p class="eyebrow">Current v15 sources</p>
+    <h1 id="docs-heading">Documentation</h1>
+    <p class="docs-orientation">
+      Choose the realization that owns your runtime, then read the source
+      documentation shipped with that package.
+    </p>
+  </header>
 
-    <div class="package-list">
-      @for (pkg of packages; track pkg.id) {
-      <button
-        class="package-button"
-        [class.active]="selectedPackage().id === pkg.id"
-        (click)="selectPackage(pkg)"
-      >
-        <div class="package-name">{{ pkg.name }}</div>
-        <div class="package-description">{{ pkg.description }}</div>
-      </button>
-      }
-    </div>
-  </div>
+  <nav class="package-list" aria-label="Documentation index">
+    @for (pkg of packages; track pkg.id) {
+    <button
+      type="button"
+      class="package-button"
+      [class.active]="selectedPackage().id === pkg.id"
+      [attr.aria-pressed]="selectedPackage().id === pkg.id"
+      (click)="selectPackage(pkg)"
+    >
+      <span class="package-name">{{ pkg.name }}</span>
+      <span class="package-description">{{ pkg.description }}</span>
+    </button>
+    }
+  </nav>
 
-  <div class="documentation-content">
+  <nav class="doc-quick-links" aria-label="Related demo routes">
+    <p>Inspect the runtime</p>
+    @for (link of quickLinks; track link.label) {
+    <a [routerLink]="link.route" class="doc-quick-link">
+      {{ link.label }} <span aria-hidden="true">&rarr;</span>
+    </a>
+    }
+  </nav>
+
+  <section class="documentation-content" [attr.aria-busy]="loading()">
     @if (loading()) {
-    <div class="loading-spinner">
-      <div class="spinner"></div>
+    <div class="loading-spinner" role="status">
+      <div class="spinner" aria-hidden="true"></div>
       <p>Loading documentation...</p>
     </div>
     } @else if (error()) {
-    <div class="error-message">
+    <div class="error-message" role="alert">
       <p>{{ error() }}</p>
     </div>
     } @else {
-    <div class="markdown-content" [innerHTML]="markdownContent()"></div>
+    <article class="markdown-content" [innerHTML]="markdownContent()"></article>
     }
-  </div>
+  </section>
 </div>

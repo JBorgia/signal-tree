@@ -18,10 +18,7 @@ import {
 
 import { ExampleComponent } from '../../../../shared/components/example-shell';
 
-import type {
-  RestorationHistoryEntry,
-  RestorationMethods,
-} from '@signal-tree/angular';
+import type { RestorationMethods } from '@signal-tree/angular';
 
 interface Todo {
   id: number;
@@ -59,25 +56,7 @@ export class RestorationDemoComponent {
   private readonly timers = new Set<ReturnType<typeof setTimeout>>();
   newTodoText = '';
 
-  // ===========================================================================
-  // MARKERS + UNDO — the 14.0.0 fix, demonstrated
-  // ===========================================================================
-  //
-  // Before 14.0.0 this section could not exist. `restoration()` captured a
-  // snapshot by walking the tree, and a marker emitted its API surface rather
-  // than its state — so an undo left the marker at its POST-change value and
-  // reported success, landing the user in a state that never existed.
-  //
-  // Measured before the fix: `n=3 rows=3` -> undo -> `n=2 rows=3`. The counter
-  // rolled back, the collection did not, and nothing said so.
-  //
-  // The plain-leaf section below always worked, which is exactly why this one
-  // is here: a demo that only exercises the passing path is how the defect
-  // survived four releases.
-  // Inference does the work here: `$` keeps its full marker types
-  // (EntitySignal, StatusSignal, FormSignal). Only the restoration methods need
-  // a cast, and casting the WHOLE tree — as the plain-leaf section above does —
-  // would erase exactly the marker types this section exists to exercise.
+  // EntityMap and ordinary state participate in the same restoration model.
   private markerTree = signalTree(
     {
       people: entityMap<Person, number>({ selectId: (p) => p.id }),
@@ -114,6 +93,11 @@ export class RestorationDemoComponent {
     this.schedule(() => this.commitMarkerState(action), 0);
   }
 
+  private designateMarker(operation: () => void, action: string): void {
+    undoable(operation);
+    this.refreshMarkerState(action);
+  }
+
   constructor() {
     this.destroyRef.onDestroy(() => {
       for (const timer of this.timers) clearTimeout(timer);
@@ -148,35 +132,46 @@ export class RestorationDemoComponent {
 
   addPerson() {
     const id = this.nextPersonId++;
-    this.markerTree.$.people.addOne({ id, name: `Person ${id}` });
-    this.refreshMarkerState(`add person ${id}`);
+    this.designateMarker(
+      () => this.markerTree.$.people.addOne({ id, name: `Person ${id}` }),
+      `add person ${id}`
+    );
   }
 
   removeLastPerson() {
     const all = this.people();
     if (!all.length) return;
     const last = all[all.length - 1];
-    this.markerTree.$.people.removeOne(last.id);
-    this.refreshMarkerState(`remove person ${last.id}`);
+    this.designateMarker(
+      () => this.markerTree.$.people.removeOne(last.id),
+      `remove person ${last.id}`
+    );
   }
 
   markJobLoaded() {
-    this.markerTree.$.job.set('LOADED');
-    this.refreshMarkerState('job → LOADED');
+    this.designateMarker(
+      () => this.markerTree.$.job.set('LOADED'),
+      'job → LOADED'
+    );
   }
 
   markJobFailed() {
-    this.markerTree.$.job.set('ERROR');
-    this.refreshMarkerState('job → ERROR');
+    this.designateMarker(
+      () => this.markerTree.$.job.set('ERROR'),
+      'job → ERROR'
+    );
   }
 
   editProfile() {
     const n = this.people().length;
-    this.markerTree.$.profile({
-      name: `Editor ${n}`,
-      email: `e${n}@x.io`,
-    });
-    this.refreshMarkerState('edit profile');
+    this.designateMarker(
+      () =>
+        this.markerTree.$.profile({
+          name: `Editor ${n}`,
+          email: `e${n}@x.io`,
+        }),
+      'edit profile'
+    );
   }
 
   undoMarkers() {
@@ -203,36 +198,39 @@ export class RestorationDemoComponent {
       message: 'Hello SignalTree!',
       todos: [
         { id: 1, title: 'Learn SignalTree', completed: true },
-        { id: 2, title: 'Try Time Travel', completed: false },
-        { id: 3, title: 'Build Something Amazing', completed: false },
+        { id: 2, title: 'Try restoration', completed: false },
+        { id: 3, title: 'Inspect causal turns', completed: false },
       ],
     } as AppState,
     { enhancers: [restoration({ maxHistorySize: 50 })] }
   );
-
-  // Type-safe tree updater
-  private updateTree = (updater: (state: AppState) => AppState) => {
-    this.tree.$(updater);
-  };
 
   // State signals
   counter = this.tree.$.counter;
   message = this.tree.$.message;
   todos = this.tree.$.todos;
 
-  // Time travel signals - derive from the tree (preserves generics)
+  // Restoration view state derives from the tree.
   history = signal(this.tree.getRestorationHistory());
   currentIndex = signal(this.tree.getCurrentIndex());
   canUndo = signal(this.tree.canUndo());
   canRedo = signal(this.tree.canRedo());
   rollbackMessage = signal<string | null>(null);
 
-  // Helper to refresh time travel state
-  private refreshTimeTravelState() {
+  private refreshRestorationState() {
     this.history.set(this.tree.getRestorationHistory());
     this.currentIndex.set(this.tree.getCurrentIndex());
     this.canUndo.set(this.tree.canUndo());
     this.canRedo.set(this.tree.canRedo());
+  }
+
+  private queueRestorationStateRefresh(): void {
+    this.schedule(() => this.refreshRestorationState(), 0);
+  }
+
+  private designate(operation: () => void): void {
+    undoable(operation);
+    this.queueRestorationStateRefresh();
   }
 
   // Computed signals
@@ -255,43 +253,27 @@ export class RestorationDemoComponent {
    * number of steps back is the index itself, and the steps forward are whatever
    * sits after it. Clamped because an empty history parks the index at -1.
    */
-  undosAvailable = computed(() => Math.max(0, this.currentIndex()));
+  undosAvailable = computed(() => Math.max(0, this.currentIndex() + 1));
   redosAvailable = computed(() =>
     Math.max(0, this.historyLength() - 1 - this.currentIndex())
   );
 
   // Counter actions
   increment() {
-    this.updateTree((state: AppState) => ({
-      ...state,
-      counter: state.counter + 1,
-    }));
-    this.refreshTimeTravelState();
+    this.designate(() => this.counter.update((value) => value + 1));
   }
 
   decrement() {
-    this.updateTree((state: AppState) => ({
-      ...state,
-      counter: state.counter - 1,
-    }));
-    this.refreshTimeTravelState();
+    this.designate(() => this.counter.update((value) => value - 1));
   }
 
   reset() {
-    this.updateTree((state: AppState) => ({
-      ...state,
-      counter: 0,
-    }));
-    this.refreshTimeTravelState();
+    this.designate(() => this.counter.set(0));
   }
 
   // Message actions
   updateMessage(value: string) {
-    this.updateTree((state: AppState) => ({
-      ...state,
-      message: value,
-    }));
-    this.refreshTimeTravelState();
+    this.designate(() => this.message.set(value));
   }
 
   // Todo actions
@@ -311,14 +293,10 @@ export class RestorationDemoComponent {
     //
     // It does NOT create a turn boundary: anything else written in this same
     // tick belongs to the same operation and reverses with it.
-    undoable(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        todos: [...state.todos, newTodo],
-      }));
-    });
+    this.designate(() =>
+      this.todos.update((todos) => [...todos, newTodo])
+    );
     this.newTodoText = '';
-    this.refreshTimeTravelState();
   }
 
   /**
@@ -344,27 +322,25 @@ export class RestorationDemoComponent {
     ];
 
     external(() => {
-      this.updateTree((state: AppState) => ({ ...state, todos: serverTodos }));
+      this.todos.set(serverTodos);
     });
-    this.refreshTimeTravelState();
+    this.queueRestorationStateRefresh();
   }
 
   toggleTodo(id: number) {
-    this.updateTree((state: AppState) => ({
-      ...state,
-      todos: state.todos.map((todo) =>
+    this.designate(() =>
+      this.todos.update((todos) =>
+        todos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      ),
-    }));
-    this.refreshTimeTravelState();
+        )
+      )
+    );
   }
 
   deleteTodo(id: number) {
-    this.updateTree((state: AppState) => ({
-      ...state,
-      todos: state.todos.filter((t) => t.id !== id),
-    }));
-    this.refreshTimeTravelState();
+    this.designate(() =>
+      this.todos.update((todos) => todos.filter((todo) => todo.id !== id))
+    );
   }
 
   // Time travel actions
@@ -372,7 +348,7 @@ export class RestorationDemoComponent {
     try {
       this.rollbackMessage.set(null);
       this.tree.undo();
-      this.refreshTimeTravelState();
+      this.queueRestorationStateRefresh();
     } catch (error) {
       this.handleRollbackError(error);
     }
@@ -382,7 +358,7 @@ export class RestorationDemoComponent {
     try {
       this.rollbackMessage.set(null);
       this.tree.redo();
-      this.refreshTimeTravelState();
+      this.queueRestorationStateRefresh();
     } catch (error) {
       this.handleRollbackError(error);
     }
@@ -392,7 +368,7 @@ export class RestorationDemoComponent {
     try {
       this.rollbackMessage.set(null);
       this.tree.jumpTo(index);
-      this.refreshTimeTravelState();
+      this.queueRestorationStateRefresh();
     } catch (error) {
       this.handleRollbackError(error);
     }
@@ -404,7 +380,7 @@ export class RestorationDemoComponent {
     }
 
     this.rollbackMessage.set(error.message);
-    this.refreshTimeTravelState();
+    this.queueRestorationStateRefresh();
   }
 
   onHistoryItemKeyup(event: KeyboardEvent, index: number) {
@@ -416,98 +392,71 @@ export class RestorationDemoComponent {
 
   clearHistory() {
     this.tree.resetRestorationHistory();
-    this.refreshTimeTravelState();
+    this.refreshRestorationState();
   }
 
   // Generate sample actions for easy testing
   generateSampleActions() {
     // Reset history first
     this.tree.resetRestorationHistory();
+    this.refreshRestorationState();
 
     // Create a sequence of actions with delays for better history visualization
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        message: 'Starting demo...',
-      }));
-      this.refreshTimeTravelState();
+      this.designate(() => this.message.set('Starting demo...'));
     }, 100);
 
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        counter: 1,
-      }));
-      this.refreshTimeTravelState();
+      this.designate(() => this.counter.set(1));
     }, 200);
 
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        todos: [{ id: Date.now(), title: 'First task', completed: false }],
-      }));
-      this.refreshTimeTravelState();
+      this.designate(() =>
+        this.todos.set([
+          { id: Date.now(), title: 'First task', completed: false },
+        ])
+      );
     }, 300);
 
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        counter: 5,
-      }));
-      this.refreshTimeTravelState();
+      this.designate(() => this.counter.set(5));
     }, 400);
 
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        message: 'Making more changes...',
-      }));
-      this.refreshTimeTravelState();
+      this.designate(() => this.message.set('Making more changes...'));
     }, 500);
 
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        todos: [
-          ...state.todos,
+      this.designate(() =>
+        this.todos.update((todos) => [
+          ...todos,
           { id: Date.now() + 1, title: 'Second task', completed: false },
-        ],
-      }));
-      this.refreshTimeTravelState();
+        ])
+      );
     }, 600);
 
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        counter: 10,
-      }));
-      this.refreshTimeTravelState();
+      this.designate(() => this.counter.set(10));
     }, 700);
 
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        todos: state.todos.map((todo, i) =>
-          i === 0 ? { ...todo, completed: true } : todo
-        ),
-      }));
-      this.refreshTimeTravelState();
+      this.designate(() =>
+        this.todos.update((todos) =>
+          todos.map((todo, index) =>
+            index === 0 ? { ...todo, completed: true } : todo
+          )
+        )
+      );
     }, 800);
 
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        message: 'Demo complete! Try undo/redo now.',
-      }));
-      this.refreshTimeTravelState();
+      this.designate(() =>
+        this.message.set('Demo complete. Try undo and redo now.')
+      );
     }, 900);
 
     this.schedule(() => {
-      this.updateTree((state: AppState) => ({
-        ...state,
-        counter: 15,
-      }));
-      this.refreshTimeTravelState();
+      this.designate(() => this.counter.set(15));
     }, 1000);
   }
 

@@ -1,4 +1,38 @@
-<!--
-	App shell is defined inline in app.ts.
-	This file remains only so stale placeholder content does not mislead future work.
--->
+<a class="skip-link" href="#main-content">Skip to content</a>
+
+<div class="app-shell">
+	<header class="app-topbar">
+		<a routerLink="/" class="topbar-brand" aria-label="SignalTree home">
+			<img
+				src="/signaltree-mark.png"
+				alt=""
+				class="topbar-logo"
+				data-brand-mark
+			/>
+			<span class="topbar-brand-name">SignalTree</span>
+			<span class="topbar-brand-tagline">Causal application state</span>
+		</a>
+
+		<nav class="topbar-actions" aria-label="Project links">
+			<span class="topbar-version">{{ versionSummary }}</span>
+			<a
+				href="https://github.com/JBorgia/signal-tree"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="topbar-link"
+			>GitHub <span aria-hidden="true">↗</span></a>
+			<a
+				href="https://www.npmjs.com/org/signaltree"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="topbar-link"
+			>npm <span aria-hidden="true">↗</span></a>
+		</nav>
+	</header>
+
+	<app-navigation />
+
+	<main id="main-content" class="main-content">
+		<router-outlet />
+	</main>
+</div>

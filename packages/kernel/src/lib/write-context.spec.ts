@@ -98,8 +98,7 @@ describe('withWriteContext / getActiveWriteContext', () => {
     const meta: WriteMetadata = {
       intent: 'migration',
       origin: 'devtools',
-      correlationId: 'abc-123',
-      timestamp: 1700000000,
+      suppressGuardrails: true,
     };
 
     withWriteContext(meta, () => {

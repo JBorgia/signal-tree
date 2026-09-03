@@ -23,27 +23,13 @@ export const appRoutes: Route[] = [
 
   {
     path: 'whats-new-14',
-    loadComponent: () =>
-      import('./pages/whats-new-14/whats-new-14.component').then(
-        (c) => c.WhatsNew14Component
-      ),
-    data: {
-      title: '14.0.0 retrospective — historical APIs included',
-      description:
-        'Every 14.0.0 capability callable in the page: prepend, active entity, changeId, pause/resume recording, onTreeError — plus ST2026 and fan-out measured live in your browser.',
-    },
+    redirectTo: 'legacy-changelog',
+    pathMatch: 'full',
   },
   {
     path: 'does-it-fit',
-    loadComponent: () =>
-      import('./pages/does-it-fit/does-it-fit.component').then(
-        (c) => c.DoesItFitComponent
-      ),
-    data: {
-      title: 'Does SignalTree fit?',
-      description:
-        'The architectural trade, measured in both directions: where SignalTree wins by 469x, where it loses, what each library provides, and which workloads land where.',
-    },
+    redirectTo: 'architecture-overview',
+    pathMatch: 'full',
   },
 
   // =========================================================================
@@ -51,65 +37,48 @@ export const appRoutes: Route[] = [
   // =========================================================================
   {
     path: 'stored-versioning',
-    loadComponent: () =>
-      import(
-        './pages/stored-versioning-demo/stored-versioning-demo.component'
-      ).then((c) => c.StoredVersioningDemoComponent),
+    redirectTo: 'docs',
+    pathMatch: 'full',
   },
   {
-    path: 'async',
+    path: 'external-truth',
     loadComponent: () =>
-      import('./pages/async-demo/async-demo.component').then(
+      import(
+        './examples/features/fundamentals/examples/async/async-demo.component'
+      ).then(
         (c) => c.AsyncDemoComponent
       ),
     data: {
-      title: 'Async state — RxJS pipelines with external()',
+      title: 'External truth & Link',
       description:
-        'Application-owned RxJS orchestration with resolved values written through external().',
+        'One-shot external ingress, persistent endpoint relationships through Link, and application-owned request policy.',
     },
+  },
+  {
+    path: 'async',
+    redirectTo: 'external-truth',
+    pathMatch: 'full',
   },
   {
     path: 'marker-zoo',
-    loadComponent: () =>
-      import('./pages/marker-zoo/marker-zoo.component').then(
-        (c) => c.MarkerZooComponent
-      ),
-    data: {
-      title: 'Marker zoo — surviving markers at nested depths',
-      description:
-        'Surviving SignalTree markers in one tree at nested paths. Demonstrates path-attached composition without root-level feature assembly.',
-    },
+    redirectTo: 'markers',
+    pathMatch: 'full',
   },
   {
     path: 'entity-collection',
-    loadComponent: () =>
-      import('./pages/entity-collection/entity-collection.component').then(
-        (c) => c.EntityCollectionShowcaseComponent
-      ),
-    data: {
-      title: 'entityMap — normalized collections, visualized',
-      description:
-        'Interactive showcase of the surviving entityMap surface: normalized membership, keyed reads, and app-owned loading/freshness.',
-    },
+    redirectTo: 'entities',
+    pathMatch: 'full',
   },
   {
     path: 'benchmark',
-    loadComponent: () =>
-      import('./pages/benchmark/benchmark.component').then(
-        (c) => c.BenchmarkComponent
-      ),
-    data: {
-      title: 'AI-codegen accuracy benchmark — measured scorecard',
-      description:
-        'Reproducible 720-cell benchmark measuring how reliably each major AI agent generates correct SignalTree, NgRx, Akita, and Elf code. v10.3.3: SignalTree 49% cold → 98% primed with llms.txt + myths.md (+49pp).',
-    },
+    redirectTo: 'legacy-changelog',
+    pathMatch: 'full',
   },
-  // /rxmethod redirected to /async — rxMethod was removed in 9.6.0 (was briefly
-  // shipped in 9.5.x as a migration alias; async orchestration is now
-  // application-owned and the tree stores the result).
+  // rxMethod was removed; application orchestration now lands resolved truth
+  // through external() or maintains an ongoing relationship through Link.
   {
     path: 'rxmethod',
-    redirectTo: '/async',
+    redirectTo: 'external-truth',
     pathMatch: 'full',
   },
 
@@ -144,13 +113,16 @@ export const appRoutes: Route[] = [
       import(
         './examples/features/fundamentals/examples/enhancers/batching-demo/batching-demo.component'
       ).then((c) => c.BatchingDemoComponent),
+    data: {
+      title: 'Batching — coherent publication',
+      description:
+        'Three synchronous writes compared across separate and grouped framework publication boundaries.',
+    },
   },
   {
     path: 'batching/compare',
-    loadComponent: () =>
-      import(
-        './examples/features/fundamentals/examples/enhancers/batching-comparison/batching-comparison.component'
-      ).then((c) => c.BatchingComparisonComponent),
+    redirectTo: 'batching',
+    pathMatch: 'full',
   },
   {
     path: 'entities',
@@ -158,6 +130,11 @@ export const appRoutes: Route[] = [
       import(
         './examples/features/fundamentals/examples/entities/entities-demo.component'
       ).then((c) => c.EntitiesDemoComponent),
+    data: {
+      title: 'EntityMap',
+      description:
+        'Normalized keyed identity, stable ordinary-update handles, reactive queries, and structural mutation boundaries.',
+    },
   },
   {
     path: 'entity-sort-comparer',
@@ -175,17 +152,13 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'linked-derived',
-    loadComponent: () =>
-      import(
-        './examples/features/fundamentals/examples/linked-derived/linked-derived-demo.component'
-      ).then((c) => c.LinkedDerivedDemoComponent),
+    redirectTo: 'examples/fundamentals',
+    pathMatch: 'full',
   },
   {
     path: 'serialization',
-    loadComponent: () =>
-      import(
-        './examples/features/fundamentals/examples/enhancers/serialization-demo/serialization-demo.component'
-      ).then((c) => c.SerializationDemoComponent),
+    redirectTo: 'docs',
+    pathMatch: 'full',
   },
   {
     path: 'restoration',
@@ -243,30 +216,33 @@ export const appRoutes: Route[] = [
   // Performance comparisons
   {
     path: 'benchmarks',
-    loadComponent: () =>
-      import(
-        './pages/realistic-comparison/realistic-comparison.component'
-      ).then((c) => c.RealisticComparisonComponent),
-    data: {
-      title: 'Benchmarks',
-      description:
-        'Live cross-library benchmarks against @ngrx/signals, Akita, and Elf — runs in your browser with frequency-weighted realistic scenarios.',
-    },
+    redirectTo: 'architecture-overview',
+    pathMatch: 'full',
   },
   // Redirect old route to new one
   {
     path: 'realistic-comparison',
-    redirectTo: 'benchmarks',
+    redirectTo: 'architecture-overview',
     pathMatch: 'full',
   },
 
   // Existing pages
   {
-    path: 'extreme-depth',
+    path: 'deep-typing',
     loadComponent: () =>
       import('./components/extreme-depth/extreme-depth.component').then(
         (c) => c.ExtremeDepthComponent
       ),
+    data: {
+      title: 'Deep typing',
+      description:
+        'A compile-backed exact writable leaf and runtime update through one declared 15-branch state path.',
+    },
+  },
+  {
+    path: 'extreme-depth',
+    redirectTo: 'deep-typing',
+    pathMatch: 'full',
   },
   {
     path: 'realistic-benchmark-history',
@@ -274,6 +250,11 @@ export const appRoutes: Route[] = [
       import(
         './pages/realistic-benchmark-history/realistic-benchmark-history.component'
       ).then((c) => c.RealisticBenchmarkHistoryComponent),
+    data: {
+      title: 'Benchmark history — archived pre-v15 submissions',
+      description:
+        'Submitted results from the retired realistic-comparison harness, preserved for provenance and not current performance guidance.',
+    },
   },
 
   // Architecture overview (renamed from /architecture for clarity vs. /examples/.../recommended-architecture)
@@ -286,7 +267,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Architecture overview',
       description:
-        'Single-package SignalTree architecture and the measured savings from migrating an NgRx app: ~76% less state code, ~46% smaller state bundle.',
+        'Verified SignalTree v15 ownership, state grammar, causal authority, operation coherence, entity identity, Link, and explanation boundaries.',
     },
   },
   // Backwards-compat redirect from the old path

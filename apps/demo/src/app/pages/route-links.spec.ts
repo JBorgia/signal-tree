@@ -6,7 +6,6 @@ import { By } from '@angular/platform-browser';
 import { provideRouter, RouterLink } from '@angular/router';
 
 import { appRoutes } from '../app.routes';
-import { BenchmarkComponent } from './benchmark/benchmark.component';
 import { DocumentationComponent } from './documentation/documentation.component';
 import { StartHereComponent } from './start-here/start-here.component';
 
@@ -64,7 +63,6 @@ describe('demo content pages: every routerLink resolves to a real route', () => 
   // so this case would trip the non-vacuity guard rather than test anything.
   // RESTORE IT when the greenfielded discoverability surface gives the page an
   // internal destination again.
-
 
   it('documentation', async () => {
     await TestBed.configureTestingModule({

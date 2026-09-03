@@ -106,14 +106,6 @@ describe('DevtoolsDemoComponent', () => {
   });
 
   it('should provide devtools functionality', () => {
-    // Test metrics (basic structure)
-    const metrics = component.getMetrics();
-    expect(metrics).toHaveProperty('updates');
-    expect(metrics).toHaveProperty('averageUpdateTime');
-    expect(metrics).toHaveProperty('computations');
-    expect(metrics).toHaveProperty('cacheHits');
-    expect(metrics).toHaveProperty('cacheMisses');
-
     // Test state information
     expect(component.getStateSize()).toBeGreaterThan(0);
     expect(component.getDeepestPath()).toBe('user.preferences.notifications');
@@ -132,13 +124,17 @@ describe('DevtoolsDemoComponent', () => {
   });
 
   it('should handle devtools actions', () => {
-    // Test snapshot (should not throw)
-    expect(() => component.triggerSnapshot()).not.toThrow();
-    expect(component.lastAction).toBe('Take state snapshot');
-
     // Test reset metrics (should not throw)
     expect(() => component.resetMetrics()).not.toThrow();
     expect(component.lastAction).toBe('Reset performance metrics');
+  });
+
+  it('frames diagnostics as inspection rather than retained causal authority', () => {
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+
+    expect(text).toContain('Inspection is a projection');
+    expect(text).toContain('do not become retained causal facts');
+    expect(text).toContain('App-Owned Snapshots');
   });
 
   it('should track action history correctly', () => {

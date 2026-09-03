@@ -1,0 +1,1613 @@
+{
+  "schemaVersion": 1,
+  "source": "apps/demo/src/app/pages/architecture-overview/architecture-diagrams.ts",
+  "sourceSha256": "6831f93b7fcc9e8ef8e3988e66eabed9a6d21591823729d3b1c8ade40bbcfad5",
+  "diagrams": [
+    {
+      "id": "system-boundary",
+      "eyebrow": "01 · System boundary",
+      "title": "SignalTree in one picture",
+      "takeaway": "Frameworks realize canonical truth; the kernel remains the state authority.",
+      "description": "Application policy chooses the work. Angular and React connect that work to their observation runtimes. The framework-neutral kernel owns the state and causal model beneath both.",
+      "desktopViewBox": "0 0 1040 430",
+      "mobileViewBox": "0 0 360 720",
+      "nodes": [
+        {
+          "id": "policy",
+          "title": [
+            "Application policy"
+          ],
+          "detail": [
+            "decides product work"
+          ],
+          "tone": "application",
+          "position": {
+            "desktop": {
+              "x": 40,
+              "y": 140,
+              "width": 210,
+              "height": 110
+            },
+            "mobile": {
+              "x": 24,
+              "y": 30,
+              "width": 312,
+              "height": 110
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "realization",
+          "title": [
+            "Angular / React",
+            "realization"
+          ],
+          "detail": [
+            "observe · render · clean up"
+          ],
+          "tone": "framework",
+          "position": {
+            "desktop": {
+              "x": 310,
+              "y": 125,
+              "width": 240,
+              "height": 140
+            },
+            "mobile": {
+              "x": 24,
+              "y": 195,
+              "width": 312,
+              "height": 125
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "kernel",
+          "title": [
+            "SignalTree",
+            "causal kernel"
+          ],
+          "detail": [
+            "framework-neutral authority"
+          ],
+          "tone": "kernel",
+          "position": {
+            "desktop": {
+              "x": 610,
+              "y": 105,
+              "width": 380,
+              "height": 180
+            },
+            "mobile": {
+              "x": 24,
+              "y": 375,
+              "width": 312,
+              "height": 140
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "facts",
+          "title": [
+            "state · identity · authority"
+          ],
+          "detail": [
+            "causal turns · operation boundaries"
+          ],
+          "tone": "neutral",
+          "position": {
+            "desktop": {
+              "x": 650,
+              "y": 325,
+              "width": 300,
+              "height": 75
+            },
+            "mobile": {
+              "x": 24,
+              "y": 570,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        }
+      ],
+      "edges": [
+        {
+          "id": "policy-realization",
+          "from": "policy",
+          "to": "realization",
+          "label": "product intent",
+          "direction": "forward"
+        },
+        {
+          "id": "realization-kernel",
+          "from": "realization",
+          "to": "kernel",
+          "label": "writes + rereads",
+          "direction": "forward"
+        },
+        {
+          "id": "kernel-facts",
+          "from": "kernel",
+          "to": "facts",
+          "label": "owns",
+          "direction": "forward"
+        }
+      ],
+      "checks": [
+        "The framework layer is observation and realization, not a second store.",
+        "The kernel contract contains no Angular or React runtime dependency."
+      ],
+      "evidence": [
+        "packages/kernel/src/adapter.ts",
+        "packages/angular/src/index.ts",
+        "packages/react/src/use-signal-tree.ts"
+      ]
+    },
+    {
+      "id": "package-ownership",
+      "eyebrow": "02 · Package ownership",
+      "title": "Three public entry surfaces, one semantic authority",
+      "takeaway": "Applications import their framework facade; framework-neutral code imports the kernel.",
+      "description": "Angular and React add native observation and lifecycle integration around the same kernel types and runtime. The adapter subpath exists for realization authors, not ordinary application imports.",
+      "desktopViewBox": "0 0 1040 500",
+      "mobileViewBox": "0 0 360 590",
+      "nodes": [
+        {
+          "id": "angular",
+          "title": [
+            "@signal-tree/angular"
+          ],
+          "detail": [
+            "Angular signals · DI · DestroyRef"
+          ],
+          "mobileTitle": [
+            "@signal-tree/",
+            "angular"
+          ],
+          "mobileDetail": [
+            "Angular signals",
+            "DI · DestroyRef"
+          ],
+          "tone": "framework",
+          "position": {
+            "desktop": {
+              "x": 35,
+              "y": 45,
+              "width": 285,
+              "height": 105
+            },
+            "mobile": {
+              "x": 12,
+              "y": 20,
+              "width": 164,
+              "height": 105
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "react",
+          "title": [
+            "@signal-tree/react"
+          ],
+          "detail": [
+            "useSignalTree(owner, selector)"
+          ],
+          "mobileTitle": [
+            "@signal-tree/",
+            "react"
+          ],
+          "mobileDetail": [
+            "useSignalTree",
+            "(owner, selector)"
+          ],
+          "tone": "framework",
+          "position": {
+            "desktop": {
+              "x": 35,
+              "y": 195,
+              "width": 285,
+              "height": 105
+            },
+            "mobile": {
+              "x": 184,
+              "y": 20,
+              "width": 164,
+              "height": 105
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "neutral-libraries",
+          "title": [
+            "Framework-neutral",
+            "TypeScript"
+          ],
+          "detail": [
+            "no realization runtime"
+          ],
+          "tone": "application",
+          "position": {
+            "desktop": {
+              "x": 35,
+              "y": 345,
+              "width": 285,
+              "height": 105
+            },
+            "mobile": {
+              "x": 12,
+              "y": 410,
+              "width": 164,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "kernel-package",
+          "title": [
+            "@signal-tree/kernel"
+          ],
+          "detail": [
+            "state · identity · causal turns",
+            "Link · restoration · invalidation"
+          ],
+          "tone": "kernel",
+          "position": {
+            "desktop": {
+              "x": 585,
+              "y": 145,
+              "width": 410,
+              "height": 190
+            },
+            "mobile": {
+              "x": 24,
+              "y": 195,
+              "width": 312,
+              "height": 140
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "adapter",
+          "title": [
+            "kernel/adapter"
+          ],
+          "detail": [
+            "realization SDK"
+          ],
+          "tone": "neutral",
+          "position": {
+            "desktop": {
+              "x": 650,
+              "y": 385,
+              "width": 280,
+              "height": 80
+            },
+            "mobile": {
+              "x": 184,
+              "y": 410,
+              "width": 164,
+              "height": 80
+            }
+          },
+          "code": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "angular-kernel",
+          "from": "angular",
+          "to": "kernel-package",
+          "label": "forwards + realizes",
+          "direction": "forward"
+        },
+        {
+          "id": "react-kernel",
+          "from": "react",
+          "to": "kernel-package",
+          "label": "forwards + observes",
+          "direction": "forward"
+        },
+        {
+          "id": "neutral-kernel",
+          "from": "neutral-libraries",
+          "to": "kernel-package",
+          "label": "imports",
+          "direction": "forward"
+        },
+        {
+          "id": "adapter-kernel",
+          "from": "adapter",
+          "to": "kernel-package",
+          "label": "narrow contract",
+          "direction": "both",
+          "dashed": true
+        }
+      ],
+      "checks": [
+        "The current package set is kernel, Angular, and React; v15 is not a single-package release.",
+        "Framework packages do not create independent state authority.",
+        "Bounded owners release resources with destroy(); Angular defineStore binds that to DestroyRef."
+      ],
+      "evidence": [
+        "scripts/release-plan.mjs",
+        "packages/kernel/src/adapter.ts",
+        "packages/angular/src/lib/define-store.ts",
+        "packages/react/src/use-signal-tree.ts"
+      ]
+    },
+    {
+      "id": "accessor-grammar",
+      "eyebrow": "03 · Public state grammar",
+      "title": "The API follows the shape of the location",
+      "takeaway": "Root and branch accessors are callable in both directions; leaves retain their reactive cell API.",
+      "description": "The controller itself is not callable. Its root $ accessor and branch accessors support read, whole-value replacement, and updater calls. Leaf signals read with () and write with set() or update(). EntityMap exposes collection operations.",
+      "desktopViewBox": "0 0 1040 455",
+      "mobileViewBox": "0 0 360 900",
+      "nodes": [
+        {
+          "id": "root",
+          "title": [
+            "Root accessor"
+          ],
+          "detail": [
+            "tree.$()",
+            "tree.$(next)",
+            "tree.$(current => next)"
+          ],
+          "tone": "kernel",
+          "position": {
+            "desktop": {
+              "x": 25,
+              "y": 70,
+              "width": 235,
+              "height": 295
+            },
+            "mobile": {
+              "x": 24,
+              "y": 20,
+              "width": 312,
+              "height": 180
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "branch",
+          "title": [
+            "Branch accessor"
+          ],
+          "detail": [
+            "tree.$.profile()",
+            "tree.$.profile(next)",
+            "tree.$.profile(current => next)"
+          ],
+          "tone": "authored",
+          "position": {
+            "desktop": {
+              "x": 275,
+              "y": 70,
+              "width": 235,
+              "height": 295
+            },
+            "mobile": {
+              "x": 24,
+              "y": 230,
+              "width": 312,
+              "height": 195
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "leaf",
+          "title": [
+            "Leaf signal"
+          ],
+          "detail": [
+            "tree.$.count()",
+            "tree.$.count.set(5)",
+            "tree.$.count.update(n => n + 1)"
+          ],
+          "tone": "framework",
+          "position": {
+            "desktop": {
+              "x": 525,
+              "y": 70,
+              "width": 235,
+              "height": 295
+            },
+            "mobile": {
+              "x": 24,
+              "y": 455,
+              "width": 312,
+              "height": 195
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "entity-map",
+          "title": [
+            "EntityMap collection"
+          ],
+          "detail": [
+            "rows.all()",
+            "rows.setAll(next)",
+            "rows.changeId(from, to)"
+          ],
+          "tone": "identity",
+          "position": {
+            "desktop": {
+              "x": 775,
+              "y": 70,
+              "width": 240,
+              "height": 295
+            },
+            "mobile": {
+              "x": 24,
+              "y": 680,
+              "width": 312,
+              "height": 195
+            }
+          },
+          "code": true
+        }
+      ],
+      "edges": [],
+      "checks": [
+        "tree is a controller and is not callable.",
+        "A branch call replaces a whole branch value; partial objects do not compile.",
+        "Leaf argument calls do not compile; leaves use set() and update()."
+      ],
+      "evidence": [
+        "packages/kernel/src/lib/callable-contract.typing.spec.ts",
+        "packages/kernel/src/lib/root-accessor-contract.typing.spec.ts",
+        "packages/kernel/src/lib/signal-tree.ts"
+      ]
+    },
+    {
+      "id": "causal-authority",
+      "eyebrow": "04 · Causal write model",
+      "title": "Authority and restoration are separate axes",
+      "takeaway": "Ordinary application writes are authored; undoable() designates authored work for restoration.",
+      "description": "external() means another authority owned the decision. Transactions can group authored work and defer settlement, but they are not a third authority class.",
+      "desktopViewBox": "0 0 1040 610",
+      "mobileViewBox": "0 0 360 850",
+      "groups": [
+        {
+          "id": "transaction-boundary",
+          "label": "Orthogonal operation boundary · transaction()",
+          "tone": "neutral",
+          "position": {
+            "desktop": {
+              "x": 185,
+              "y": 20,
+              "width": 670,
+              "height": 120
+            },
+            "mobile": {
+              "x": 12,
+              "y": 15,
+              "width": 336,
+              "height": 115
+            }
+          },
+          "dashed": true
+        }
+      ],
+      "nodes": [
+        {
+          "id": "operation",
+          "title": [
+            "operation"
+          ],
+          "detail": [
+            "may be pending until confirm / rollback"
+          ],
+          "tone": "neutral",
+          "position": {
+            "desktop": {
+              "x": 315,
+              "y": 55,
+              "width": 410,
+              "height": 65
+            },
+            "mobile": {
+              "x": 24,
+              "y": 45,
+              "width": 312,
+              "height": 65
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "write",
+          "title": [
+            "WRITE"
+          ],
+          "detail": [
+            "classify who owned the decision"
+          ],
+          "tone": "kernel",
+          "position": {
+            "desktop": {
+              "x": 365,
+              "y": 185,
+              "width": 310,
+              "height": 90
+            },
+            "mobile": {
+              "x": 24,
+              "y": 180,
+              "width": 312,
+              "height": 95
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "authored",
+          "title": [
+            "Authored"
+          ],
+          "detail": [
+            "ordinary application writes",
+            "including transaction work"
+          ],
+          "tone": "authored",
+          "position": {
+            "desktop": {
+              "x": 80,
+              "y": 340,
+              "width": 350,
+              "height": 115
+            },
+            "mobile": {
+              "x": 12,
+              "y": 330,
+              "width": 164,
+              "height": 125
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "external",
+          "title": [
+            "External"
+          ],
+          "detail": [
+            "external(() => applyTruth())",
+            "never an authored turn"
+          ],
+          "mobileDetail": [
+            "external(() =>",
+            "applyTruth())",
+            "never an authored turn"
+          ],
+          "tone": "external",
+          "position": {
+            "desktop": {
+              "x": 610,
+              "y": 340,
+              "width": 350,
+              "height": 115
+            },
+            "mobile": {
+              "x": 184,
+              "y": 330,
+              "width": 164,
+              "height": 125
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "undesignated",
+          "title": [
+            "Undesignated",
+            "by default"
+          ],
+          "detail": [
+            "no restoration retention"
+          ],
+          "tone": "neutral",
+          "position": {
+            "desktop": {
+              "x": 25,
+              "y": 510,
+              "width": 295,
+              "height": 80
+            },
+            "mobile": {
+              "x": 12,
+              "y": 520,
+              "width": 164,
+              "height": 100
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "designation",
+          "title": [
+            "Restoration",
+            "designation"
+          ],
+          "detail": [
+            "undoable(() => authoredWork())"
+          ],
+          "mobileDetail": [
+            "undoable(() =>",
+            "authoredWork())"
+          ],
+          "tone": "restoration",
+          "position": {
+            "desktop": {
+              "x": 365,
+              "y": 500,
+              "width": 310,
+              "height": 100
+            },
+            "mobile": {
+              "x": 184,
+              "y": 510,
+              "width": 164,
+              "height": 120
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "history",
+          "title": [
+            "Eligible for retained",
+            "restoration history"
+          ],
+          "detail": [
+            "bounded by restoration policy"
+          ],
+          "mobileTitle": [
+            "Eligible for",
+            "retained",
+            "restoration history"
+          ],
+          "mobileDetail": [
+            "bounded by",
+            "restoration policy"
+          ],
+          "tone": "restoration",
+          "position": {
+            "desktop": {
+              "x": 720,
+              "y": 510,
+              "width": 295,
+              "height": 80
+            },
+            "mobile": {
+              "x": 184,
+              "y": 700,
+              "width": 164,
+              "height": 120
+            }
+          },
+          "code": false
+        }
+      ],
+      "edges": [
+        {
+          "id": "operation-write",
+          "from": "operation",
+          "to": "write",
+          "label": "groups",
+          "direction": "forward",
+          "dashed": true
+        },
+        {
+          "id": "write-authored",
+          "from": "write",
+          "to": "authored",
+          "label": "this operation",
+          "direction": "forward"
+        },
+        {
+          "id": "write-external",
+          "from": "write",
+          "to": "external",
+          "label": "another authority",
+          "direction": "forward"
+        },
+        {
+          "id": "authored-default",
+          "from": "authored",
+          "to": "undesignated",
+          "label": "ordinary",
+          "direction": "forward"
+        },
+        {
+          "id": "authored-designated",
+          "from": "authored",
+          "to": "designation",
+          "label": "optional",
+          "direction": "forward"
+        },
+        {
+          "id": "designation-history",
+          "from": "designation",
+          "to": "history",
+          "label": "eligible",
+          "direction": "forward"
+        }
+      ],
+      "checks": [
+        "undoable() does not make a write authored and does not create a turn boundary.",
+        "external() classifies provenance; it does not make a write invisible or consequence-free.",
+        "Transactions are grouping and settlement machinery, not authority classification."
+      ],
+      "evidence": [
+        "packages/kernel/src/lib/external.ts",
+        "packages/kernel/src/lib/undoable.ts",
+        "packages/kernel/src/enhancers/transactions/transactions.ts",
+        "packages/angular/src/lib/public-surface.spec.ts"
+      ]
+    },
+    {
+      "id": "coherent-operation",
+      "eyebrow": "05 · Atomic observation",
+      "title": "One semantic operation, one coherent observed state",
+      "takeaway": "A transaction may span multiple private commits without exposing a partial state.",
+      "description": "SignalTree defines atomicity by externally observable coherence, not by counting internal revision increments. Publication happens only after the operation can be observed as a complete state.",
+      "desktopViewBox": "0 0 1040 500",
+      "mobileViewBox": "0 0 360 915",
+      "nodes": [
+        {
+          "id": "transaction",
+          "title": [
+            "transaction(() => …)"
+          ],
+          "detail": [
+            "one semantic operation"
+          ],
+          "tone": "application",
+          "position": {
+            "desktop": {
+              "x": 30,
+              "y": 175,
+              "width": 190,
+              "height": 100
+            },
+            "mobile": {
+              "x": 24,
+              "y": 20,
+              "width": 312,
+              "height": 100
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "mutations",
+          "title": [
+            "multiple mutations"
+          ],
+          "detail": [
+            "scalar + structural"
+          ],
+          "tone": "authored",
+          "position": {
+            "desktop": {
+              "x": 265,
+              "y": 175,
+              "width": 190,
+              "height": 100
+            },
+            "mobile": {
+              "x": 24,
+              "y": 170,
+              "width": 312,
+              "height": 100
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "commits",
+          "title": [
+            "private substrate",
+            "commits"
+          ],
+          "detail": [
+            "one or more"
+          ],
+          "tone": "neutral",
+          "position": {
+            "desktop": {
+              "x": 500,
+              "y": 175,
+              "width": 190,
+              "height": 100
+            },
+            "mobile": {
+              "x": 24,
+              "y": 320,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "publication",
+          "title": [
+            "coherent publication"
+          ],
+          "detail": [
+            "no heterogeneous midpoint"
+          ],
+          "tone": "kernel",
+          "position": {
+            "desktop": {
+              "x": 735,
+              "y": 175,
+              "width": 270,
+              "height": 100
+            },
+            "mobile": {
+              "x": 24,
+              "y": 475,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "invalidation",
+          "title": [
+            "framework invalidation"
+          ],
+          "detail": [
+            "request to reread truth"
+          ],
+          "tone": "framework",
+          "position": {
+            "desktop": {
+              "x": 600,
+              "y": 350,
+              "width": 270,
+              "height": 100
+            },
+            "mobile": {
+              "x": 24,
+              "y": 630,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "observer",
+          "title": [
+            "observer"
+          ],
+          "detail": [
+            "sees only the final state"
+          ],
+          "tone": "identity",
+          "position": {
+            "desktop": {
+              "x": 230,
+              "y": 350,
+              "width": 270,
+              "height": 100
+            },
+            "mobile": {
+              "x": 24,
+              "y": 785,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        }
+      ],
+      "edges": [
+        {
+          "id": "transaction-mutations",
+          "from": "transaction",
+          "to": "mutations",
+          "direction": "forward"
+        },
+        {
+          "id": "mutations-commits",
+          "from": "mutations",
+          "to": "commits",
+          "direction": "forward"
+        },
+        {
+          "id": "commits-publication",
+          "from": "commits",
+          "to": "publication",
+          "direction": "forward"
+        },
+        {
+          "id": "publication-invalidation",
+          "from": "publication",
+          "to": "invalidation",
+          "direction": "forward"
+        },
+        {
+          "id": "invalidation-observer",
+          "from": "invalidation",
+          "to": "observer",
+          "label": "reread",
+          "direction": "forward"
+        }
+      ],
+      "checks": [
+        "Physical revisions are implementation stamps, not transaction identities.",
+        "Observers cannot see scalar-only or structural-only intermediate transaction state.",
+        "Owner invalidation carries no value or path; the framework rereads canonical truth."
+      ],
+      "evidence": [
+        "packages/kernel/src/lib/heterogeneous-atomicity.spec.ts",
+        "packages/kernel/src/adapter.ts",
+        "packages/kernel/src/lib/owner-invalidation.spec.ts"
+      ]
+    },
+    {
+      "id": "entity-identity",
+      "eyebrow": "06 · Entity identity",
+      "title": "Keys and positions can change without changing the subject",
+      "takeaway": "A held entity facade follows SubjectId through reorder, rekey, and supported restoration.",
+      "description": "EntityMap separates stable subject identity from lookup key and collection position. A fresh occupant that later reuses an old key receives a different subject identity.",
+      "desktopViewBox": "0 0 1040 500",
+      "mobileViewBox": "0 0 360 940",
+      "nodes": [
+        {
+          "id": "initial",
+          "title": [
+            "Subject S42"
+          ],
+          "detail": [
+            "key tmp-1 · position A"
+          ],
+          "tone": "identity",
+          "position": {
+            "desktop": {
+              "x": 25,
+              "y": 135,
+              "width": 185,
+              "height": 110
+            },
+            "mobile": {
+              "x": 24,
+              "y": 20,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "reordered",
+          "title": [
+            "Subject S42"
+          ],
+          "detail": [
+            "key tmp-1 · position B"
+          ],
+          "tone": "identity",
+          "position": {
+            "desktop": {
+              "x": 230,
+              "y": 135,
+              "width": 185,
+              "height": 110
+            },
+            "mobile": {
+              "x": 24,
+              "y": 175,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "rekeyed",
+          "title": [
+            "Subject S42"
+          ],
+          "detail": [
+            "key server-99 · position B"
+          ],
+          "tone": "identity",
+          "position": {
+            "desktop": {
+              "x": 435,
+              "y": 135,
+              "width": 210,
+              "height": 110
+            },
+            "mobile": {
+              "x": 24,
+              "y": 330,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "inactive",
+          "title": [
+            "Subject S42"
+          ],
+          "detail": [
+            "inactive · restoration-owned"
+          ],
+          "tone": "restoration",
+          "position": {
+            "desktop": {
+              "x": 665,
+              "y": 135,
+              "width": 190,
+              "height": 110
+            },
+            "mobile": {
+              "x": 24,
+              "y": 485,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "restored",
+          "title": [
+            "Subject S42"
+          ],
+          "detail": [
+            "reactivated at exact target"
+          ],
+          "tone": "identity",
+          "position": {
+            "desktop": {
+              "x": 875,
+              "y": 135,
+              "width": 145,
+              "height": 110
+            },
+            "mobile": {
+              "x": 24,
+              "y": 640,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "held",
+          "title": [
+            "held facade"
+          ],
+          "detail": [
+            "same logical subject"
+          ],
+          "tone": "kernel",
+          "position": {
+            "desktop": {
+              "x": 735,
+              "y": 340,
+              "width": 270,
+              "height": 105
+            },
+            "mobile": {
+              "x": 24,
+              "y": 795,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        }
+      ],
+      "edges": [
+        {
+          "id": "initial-reordered",
+          "from": "initial",
+          "to": "reordered",
+          "label": "reorder",
+          "direction": "forward"
+        },
+        {
+          "id": "reordered-rekeyed",
+          "from": "reordered",
+          "to": "rekeyed",
+          "label": "changeId()",
+          "direction": "forward"
+        },
+        {
+          "id": "rekeyed-inactive",
+          "from": "rekeyed",
+          "to": "inactive",
+          "label": "designated remove",
+          "direction": "forward"
+        },
+        {
+          "id": "inactive-restored",
+          "from": "inactive",
+          "to": "restored",
+          "label": "undo",
+          "direction": "forward"
+        },
+        {
+          "id": "restored-held",
+          "from": "restored",
+          "to": "held",
+          "label": "still resolves",
+          "direction": "forward",
+          "dashed": true
+        }
+      ],
+      "checks": [
+        "PositionId, SubjectId, storage slot, and key/path are distinct coordinates.",
+        "changeId() preserves the held subject and rejects occupied target keys.",
+        "Key reuse never aliases a fresh member to the retired subject."
+      ],
+      "evidence": [
+        "packages/kernel/src/lib/e-subject-identity-audit.spec.ts",
+        "packages/kernel/src/lib/e-ordering-rekey.spec.ts",
+        "packages/kernel/src/lib/entity-restoration-authority.spec.ts"
+      ]
+    },
+    {
+      "id": "link",
+      "eyebrow": "07 · External relationship",
+      "title": "Link owns synchronization, not backend policy",
+      "takeaway": "The kernel owns the relationship semantics; endpoint code owns transport and durability choices.",
+      "description": "A Link can pull endpoint truth, push settled tree truth, or subscribe to live endpoint truth. Inbound values are applied as external authority. The endpoint decides storage, transport, codec, retry, cache, and scheduling policy.",
+      "desktopViewBox": "0 0 1040 465",
+      "mobileViewBox": "0 0 360 560",
+      "nodes": [
+        {
+          "id": "tree-location",
+          "title": [
+            "SignalTree location"
+          ],
+          "detail": [
+            "canonical authored truth"
+          ],
+          "tone": "kernel",
+          "position": {
+            "desktop": {
+              "x": 35,
+              "y": 145,
+              "width": 245,
+              "height": 120
+            },
+            "mobile": {
+              "x": 24,
+              "y": 20,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "link-primitive",
+          "title": [
+            "Link"
+          ],
+          "detail": [
+            "retrieve() · settled() · dispose()"
+          ],
+          "mobileDetail": [
+            "retrieve()",
+            "settled()",
+            "dispose()"
+          ],
+          "tone": "restoration",
+          "position": {
+            "desktop": {
+              "x": 390,
+              "y": 125,
+              "width": 260,
+              "height": 160
+            },
+            "mobile": {
+              "x": 12,
+              "y": 190,
+              "width": 164,
+              "height": 130
+            }
+          },
+          "code": true
+        },
+        {
+          "id": "endpoint",
+          "title": [
+            "Application",
+            "endpoint"
+          ],
+          "detail": [
+            "get · set · subscribe"
+          ],
+          "tone": "external",
+          "position": {
+            "desktop": {
+              "x": 760,
+              "y": 145,
+              "width": 245,
+              "height": 120
+            },
+            "mobile": {
+              "x": 12,
+              "y": 390,
+              "width": 164,
+              "height": 120
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "policy",
+          "title": [
+            "Backend / policy"
+          ],
+          "detail": [
+            "HTTP · storage · socket",
+            "codec · retry · cache · durability"
+          ],
+          "mobileDetail": [
+            "HTTP · storage",
+            "socket · codec",
+            "retry · cache",
+            "durability"
+          ],
+          "tone": "application",
+          "position": {
+            "desktop": {
+              "x": 715,
+              "y": 340,
+              "width": 335,
+              "height": 100
+            },
+            "mobile": {
+              "x": 184,
+              "y": 390,
+              "width": 164,
+              "height": 120
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "authority-door",
+          "title": [
+            "inbound truth"
+          ],
+          "detail": [
+            "applied through external()"
+          ],
+          "mobileDetail": [
+            "applied through",
+            "external()"
+          ],
+          "tone": "external",
+          "position": {
+            "desktop": {
+              "x": 35,
+              "y": 340,
+              "width": 300,
+              "height": 100
+            },
+            "mobile": {
+              "x": 184,
+              "y": 190,
+              "width": 164,
+              "height": 130
+            }
+          },
+          "code": true
+        }
+      ],
+      "edges": [
+        {
+          "id": "tree-link",
+          "from": "tree-location",
+          "to": "link-primitive",
+          "label": "settled set",
+          "direction": "forward"
+        },
+        {
+          "id": "link-endpoint",
+          "from": "link-primitive",
+          "to": "endpoint",
+          "label": "get · set · subscribe",
+          "direction": "both"
+        },
+        {
+          "id": "endpoint-policy",
+          "from": "endpoint",
+          "to": "policy",
+          "label": "implemented by",
+          "direction": "forward"
+        },
+        {
+          "id": "link-inbound",
+          "from": "link-primitive",
+          "to": "authority-door",
+          "label": "classifies",
+          "direction": "forward",
+          "dashed": true
+        },
+        {
+          "id": "inbound-tree",
+          "from": "authority-door",
+          "to": "tree-location",
+          "label": "realizes",
+          "direction": "forward",
+          "dashed": true
+        }
+      ],
+      "checks": [
+        "Link has exactly retrieve(), settled(), and dispose() on its handle.",
+        "The endpoint interface supplies optional get(), set(), and subscribe() directions.",
+        "Retry, backoff, status, codec, and transport are not kernel Link APIs."
+      ],
+      "evidence": [
+        "packages/kernel/src/lib/link.ts",
+        "packages/kernel/src/lib/link-bare-contract.spec.ts",
+        "packages/kernel/src/lib/link-persistence-conformance.spec.ts"
+      ]
+    },
+    {
+      "id": "explanation-projection",
+      "eyebrow": "08 · Explanation boundary",
+      "title": "Explanation is a projection over causal truth",
+      "takeaway": "Human and AI narratives belong above compact causal facts, not inside retained turn metadata.",
+      "description": "The kernel retains the facts required by shipped causal and restoration behavior. Product-specific context can be combined with those stable identities to produce explanations without making prose part of state authority.",
+      "desktopViewBox": "0 0 1040 500",
+      "mobileViewBox": "0 0 360 700",
+      "groups": [
+        {
+          "id": "projection-boundary",
+          "label": "Product projection · not a public API",
+          "tone": "projection",
+          "position": {
+            "desktop": {
+              "x": 330,
+              "y": 185,
+              "width": 680,
+              "height": 285
+            },
+            "mobile": {
+              "x": 12,
+              "y": 165,
+              "width": 336,
+              "height": 515
+            }
+          },
+          "dashed": true
+        }
+      ],
+      "nodes": [
+        {
+          "id": "causal-facts",
+          "title": [
+            "Minimal",
+            "causal truth"
+          ],
+          "detail": [
+            "turns · participants · effects"
+          ],
+          "tone": "kernel",
+          "position": {
+            "desktop": {
+              "x": 30,
+              "y": 75,
+              "width": 280,
+              "height": 115
+            },
+            "mobile": {
+              "x": 12,
+              "y": 20,
+              "width": 164,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "identities",
+          "title": [
+            "Stable identities"
+          ],
+          "detail": [
+            "owner · position · subject"
+          ],
+          "tone": "identity",
+          "position": {
+            "desktop": {
+              "x": 30,
+              "y": 285,
+              "width": 280,
+              "height": 115
+            },
+            "mobile": {
+              "x": 184,
+              "y": 20,
+              "width": 164,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "context",
+          "title": [
+            "Application context"
+          ],
+          "detail": [
+            "domain metadata · user intent"
+          ],
+          "tone": "application",
+          "position": {
+            "desktop": {
+              "x": 380,
+              "y": 230,
+              "width": 260,
+              "height": 105
+            },
+            "mobile": {
+              "x": 24,
+              "y": 205,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "projection",
+          "title": [
+            "Projection"
+          ],
+          "detail": [
+            "interprets; never becomes authority"
+          ],
+          "tone": "projection",
+          "position": {
+            "desktop": {
+              "x": 705,
+              "y": 230,
+              "width": 260,
+              "height": 105
+            },
+            "mobile": {
+              "x": 24,
+              "y": 365,
+              "width": 312,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "human",
+          "title": [
+            "Human",
+            "explanation"
+          ],
+          "detail": [
+            "product-facing narrative"
+          ],
+          "tone": "authored",
+          "position": {
+            "desktop": {
+              "x": 450,
+              "y": 375,
+              "width": 235,
+              "height": 80
+            },
+            "mobile": {
+              "x": 12,
+              "y": 535,
+              "width": 164,
+              "height": 105
+            }
+          },
+          "code": false
+        },
+        {
+          "id": "ai",
+          "title": [
+            "AI",
+            "explanation"
+          ],
+          "detail": [
+            "same facts · different projection"
+          ],
+          "mobileDetail": [
+            "same facts",
+            "different projection"
+          ],
+          "tone": "external",
+          "position": {
+            "desktop": {
+              "x": 735,
+              "y": 375,
+              "width": 235,
+              "height": 80
+            },
+            "mobile": {
+              "x": 184,
+              "y": 535,
+              "width": 164,
+              "height": 105
+            }
+          },
+          "code": false
+        }
+      ],
+      "edges": [
+        {
+          "id": "facts-context",
+          "from": "causal-facts",
+          "to": "context",
+          "direction": "forward"
+        },
+        {
+          "id": "identities-context",
+          "from": "identities",
+          "to": "context",
+          "direction": "forward"
+        },
+        {
+          "id": "context-projection",
+          "from": "context",
+          "to": "projection",
+          "direction": "forward"
+        },
+        {
+          "id": "projection-human",
+          "from": "projection",
+          "to": "human",
+          "direction": "forward"
+        },
+        {
+          "id": "projection-ai",
+          "from": "projection",
+          "to": "ai",
+          "direction": "forward"
+        }
+      ],
+      "checks": [
+        "No shipped public API returns human or AI explanations.",
+        "Narrative text is not retained causal authority.",
+        "The projection boundary may add application context without changing kernel truth."
+      ],
+      "evidence": [
+        "packages/kernel/src/lib/internals/causal-runtime/causal-types.ts",
+        "packages/kernel/src/lib/audit/audit.ts",
+        "RELEASE-1.0.md · AI-SEMANTIC-DISCOVERABILITY-0"
+      ]
+    }
+  ]
+}

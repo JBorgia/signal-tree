@@ -12,6 +12,13 @@ libraries, and tests. Framework packages forward this neutral surface by
 identity, so an application should use its framework package as its one
 SignalTree import root.
 
+## Semantic Guidance
+
+The canonical v15 model and composition guidance ships with this package as
+[llms.txt](llms.txt). It explains the facade rule, `link()` relationships,
+persistence composition, and why human-readable causal explanations are
+projections rather than retained kernel facts.
+
 ## Install
 
 ```bash

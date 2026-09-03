@@ -115,12 +115,12 @@ export class CartView {
       cta: 'Open docs →',
     },
     {
-      audience: 'I want proof, not promises',
-      title: 'Inspect the benchmarks',
+      audience: 'I need architecture evidence',
+      title: 'Inspect the verified boundaries',
       description:
-        'Live cross-library benchmarks against @ngrx/signals, Akita, and Elf — runs in your browser with frequency-weighted scenarios.',
-      route: '/benchmarks',
-      cta: 'Run benchmarks →',
+        'Trace package ownership, causal authority, restoration designation, EntityMap identity, and Link to their source evidence.',
+      route: '/architecture-overview',
+      cta: 'Open architecture →',
     },
   ];
 }

@@ -1,79 +1,125 @@
-<!-- Desktop: persistent sidebar / Mobile: off-canvas drawer -->
 <aside
-  id="sidebar"
-  class="sidebar"
-  [class.sidebar-open]="mobileMenuOpen()"
-  aria-label="Main navigation"
+  id="site-navigation"
+  class="site-navigation"
+  [class.site-navigation--open]="mobileMenuOpen()"
+  aria-label="SignalTree navigation"
 >
-  <div class="sidebar-header">
-    <a routerLink="/" class="brand" title="SignalTree home" (click)="closeMobileMenu()">
-      <img src="/signaltree.svg" alt="SignalTree Logo" class="brand-logo" />
-      <div class="brand-text">
-        <span class="brand-name">SignalTree</span>
-        <span class="brand-tagline">Reactive JSON</span>
-      </div>
+  <header class="navigation-brand">
+    <a
+      routerLink="/"
+      class="brand-link"
+      aria-label="SignalTree home"
+      (click)="closeMobileMenu()"
+    >
+      <img
+        src="/signaltree-mark.png"
+        alt=""
+        class="brand-mark"
+        data-brand-mark
+      />
+      <span>
+        <strong>SignalTree</strong>
+        <small>Causal application state</small>
+      </span>
     </a>
-  </div>
+    <button
+      type="button"
+      class="drawer-close"
+      aria-label="Close navigation menu"
+      (click)="closeMobileMenu()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </header>
 
-  <nav class="sidebar-nav" aria-label="Site sections">
-    @for (category of categories; track category) {
-      <div class="nav-section">
-        <p class="nav-section-label">{{ getCategoryLabel(category) }}</p>
-        @for (example of getExamplesByCategory(category); track example.id) {
-          <a
-            [routerLink]="example.route"
-            [queryParams]="example.queryParams || null"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-            class="nav-item"
-            [title]="example.description"
-            (click)="closeMobileMenu()"
-          >
-            {{ example.title }}
-          </a>
+  <nav class="navigation-groups" aria-label="Site sections">
+    @for (section of sections; track section.id; let sectionIndex = $index) {
+    <section
+      class="navigation-group"
+      [class.navigation-group--archive]="section.id === 'archive'"
+      [attr.aria-labelledby]="section.id + '-label'"
+    >
+      <h2 class="group-label" [id]="section.id + '-label'">
+        <span>0{{ sectionIndex + 1 }}</span>
+        {{ section.label }}
+      </h2>
+      <div class="group-links">
+        @for (item of section.items; track item.id) {
+        <a
+          [routerLink]="item.route"
+          [queryParams]="item.queryParams ?? null"
+          [fragment]="item.fragment ?? undefined"
+          routerLinkActive="navigation-link--active"
+          [routerLinkActiveOptions]="{
+            paths: 'exact',
+            queryParams: 'exact',
+            matrixParams: 'ignored',
+            fragment: 'exact'
+          }"
+          class="navigation-link nav-item"
+          [title]="item.description"
+          (click)="closeMobileMenu()"
+        >
+          <span class="navigation-link__title">{{ item.title }}</span>
+          <span class="navigation-link__description">{{ item.description }}</span>
+        </a>
         }
       </div>
+    </section>
     }
   </nav>
 
-  <div class="sidebar-footer">
-    <div class="version-badge">{{ versionSummary }}</div>
-    <div class="external-links">
+  <footer class="navigation-footer">
+    <span class="version-label">{{ versionSummary }}</span>
+    <nav class="project-links" aria-label="Project links">
       @for (link of externalLinks; track link.url) {
-        <a
-          [href]="link.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="external-link"
-          [title]="link.title"
-        >
-          <span aria-hidden="true">{{ link.icon }}</span>
-          <span>{{ link.label }}</span>
-        </a>
+      <a
+        [href]="link.url"
+        target="_blank"
+        rel="noopener noreferrer"
+        [title]="link.title"
+      >
+        {{ link.label }} <span aria-hidden="true">&nearr;</span>
+      </a>
       }
-    </div>
-  </div>
+    </nav>
+  </footer>
 </aside>
 
-<!-- Mobile backdrop -->
 @if (mobileMenuOpen()) {
-  <div class="sidebar-backdrop" (click)="closeMobileMenu()" aria-hidden="true"></div>
+<button
+  type="button"
+  class="navigation-backdrop"
+  aria-label="Close navigation menu"
+  (click)="closeMobileMenu()"
+></button>
 }
 
-<!-- Mobile top bar (hidden on desktop) -->
-<header class="mobile-topbar" role="banner">
-  <a routerLink="/" class="brand-mobile" title="SignalTree home" (click)="closeMobileMenu()">
-    <img src="/signaltree.svg" alt="SignalTree Logo" class="brand-logo-mobile" />
-    <span class="brand-name-mobile">SignalTree</span>
+<header class="mobile-navigation-bar">
+  <a
+    routerLink="/"
+    class="mobile-brand"
+    aria-label="SignalTree home"
+    (click)="closeMobileMenu()"
+  >
+    <img
+      src="/signaltree-mark.png"
+      alt=""
+      class="mobile-brand__mark"
+      data-brand-mark
+    />
+    <span>SignalTree</span>
   </a>
   <button
     type="button"
-    class="menu-toggle"
+    class="navigation-toggle"
     [attr.aria-expanded]="mobileMenuOpen()"
-    aria-controls="sidebar"
-    [attr.aria-label]="mobileMenuOpen() ? 'Close navigation menu' : 'Open navigation menu'"
-    (click)="toggleMobileMenu()"
+    aria-controls="site-navigation"
+    aria-label="Open navigation menu"
+    (click)="openMobileMenu()"
   >
-    <span aria-hidden="true">{{ mobileMenuOpen() ? '✕' : '☰' }}</span>
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
   </button>
 </header>

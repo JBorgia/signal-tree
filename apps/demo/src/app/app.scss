@@ -1,0 +1,133 @@
+:host {
+  display: block;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 0.75rem;
+  z-index: 1000;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-md);
+  background: var(--color-ink);
+  color: var(--color-white);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-160%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--layout-rail-width) minmax(0, 1fr);
+  grid-template-rows: var(--layout-bar-height) minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--color-paper);
+}
+
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 0 1.4rem 0 1rem;
+  border-bottom: 1px solid rgb(23 33 26 / 0.16);
+  background: rgb(251 252 248 / 0.94);
+  backdrop-filter: blur(14px);
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.topbar-logo {
+  width: 2.35rem;
+  height: 2.35rem;
+  margin-right: 0.65rem;
+  object-fit: contain;
+}
+
+.topbar-brand-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 760;
+}
+
+.topbar-brand-tagline {
+  margin-left: 0.8rem;
+  padding-left: 0.8rem;
+  border-left: 1px solid var(--color-neutral-300);
+  color: var(--color-neutral-500);
+  font-size: 0.75rem;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.topbar-version {
+  margin-right: 0.65rem;
+  color: var(--color-neutral-500);
+  font-family: var(--font-family-mono);
+  font-size: 0.7rem;
+}
+
+.topbar-link {
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-md);
+  color: var(--color-neutral-700);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.topbar-link:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-ink);
+}
+
+app-navigation {
+  grid-column: 1;
+  grid-row: 2;
+  min-height: 0;
+}
+
+.main-content {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+@media (max-width: 1023px) {
+  .app-shell {
+    display: block;
+  }
+
+  .app-topbar {
+    display: none;
+  }
+
+  .main-content {
+    padding-top: var(--layout-bar-height);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}

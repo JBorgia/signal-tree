@@ -111,6 +111,19 @@ const HISTORICAL_MARKER =
 /** A link target we deliberately do not resolve on disk. */
 const IGNORE_TARGET = /^(https?:|mailto:|tel:|data:|#|<|\{)/;
 
+/**
+ * Package READMEs are authored beside their sources but rendered at a tarball
+ * root, where declared package assets such as `llms.txt` are adjacent to them.
+ */
+function packagedReadmeAsset(abs, target) {
+  const rel = relative(ROOT, abs).replaceAll('\\', '/');
+  const match = /^packages\/([^/]+)\/README\.md$/.exec(rel);
+  if (!match || target.includes('/') || target.includes('..')) return false;
+  const manifest = join(ROOT, 'packages', match[1], 'package.json');
+  if (!existsSync(manifest) || !existsSync(join(ROOT, target))) return false;
+  return JSON.parse(readFileSync(manifest, 'utf8')).files?.includes(target) ?? false;
+}
+
 function walk(dir, out = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const abs = join(dir, entry.name);
@@ -192,7 +205,7 @@ export function scan() {
           file: rel,
           line: i + 1,
           target,
-          ok: existsSync(resolved),
+          ok: existsSync(resolved) || packagedReadmeAsset(abs, target),
         });
       }
     });

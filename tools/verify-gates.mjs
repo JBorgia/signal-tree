@@ -1068,6 +1068,28 @@ const GATES = [
     },
   },
   {
+    name: 'semantic-discoverability',
+    covers:
+      'the canonical manifest states the v15 model, facade rule, link/persistence, external-authority, and causal-projection boundaries, and each primary package README reaches its co-packed manifest',
+    cmd: ['node', 'tools/check-semantic-discoverability.mjs'],
+    mutation: {
+      file: 'packages/angular/README.md',
+      find: '[llms.txt](llms.txt)',
+      replace: 'llms.txt',
+    },
+  },
+  {
+    name: 'semantic-discoverability:self',
+    covers:
+      'the semantic-discoverability checker accepts complete guidance and rejects a missing causal-projection rule',
+    cmd: ['node', 'tools/check-semantic-discoverability.mjs', '--self-test'],
+    mutation: {
+      file: 'tools/check-semantic-discoverability.mjs',
+      find: 'const REQUIRED = [',
+      replace: 'const REQUIRED = []; const __semanticDiscoverabilityRequired = [',
+    },
+  },
+  {
     name: 'documented-symbols',
     covers:
       "a package barrel's own API-SUMMARY list does not advertise a symbol the barrel fails to export — the symbol-level complement to documented-imports' specifier-level check",
