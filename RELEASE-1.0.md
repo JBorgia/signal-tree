@@ -12763,25 +12763,32 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       selected. Full kernel validation is green; no second carrier experiment
       is authorized.
 - [x] **Final v15 demo and recurring benchmark surface (`af8c0c75`, comparator
-      retirement `2dd94c15`).** The
+      retirement `2dd94c15`, sampling/lifecycle `4046ebfb`, final comparator
+      removal `217ccd107`, documentation `ee08645e`).** The
       public comparison starts after construction and keeps three independent
       recurring workloads: keyed update plus point read, conditional keyed
       update plus complete projection, and designated change plus undo. Their
       capability-admitted cohorts contain `5 / 5 / 3` first-party arms (`13`
       checked rows); initialization has no public rank or value score, and no
-      crossover, payback, or aggregate score survives. Schema 4 exports raw
-      timings, structured calculation context, exact package/source provenance,
-      capability contracts, and three independent per-1k/10k/100k
-      normalizations. Projection correctness is order-independent. Browser copy
+      crossover, payback, or aggregate score survives. Schema 5 exports the
+      measured/warmup plan, raw timings, structured calculation context, exact
+      package/source provenance, capability contracts, and three independent
+      per-1k/10k/100k normalizations. Quick defaults to 25 measured rounds,
+      Steady to 100, and users may select 1 through 1,000. One prepared store per
+      arm remains live across warmup and measured rounds; accumulators reset and
+      correctness is checked after every round, every disposer is attempted,
+      and execution plus cleanup failures remain visible. Projection correctness
+      is order-independent. Browser copy
       treats sub-millisecond restoration gaps near the timer floor as diagnostic
       and overlapping ranges as no clear difference, while
       `RESTORATION-HOT-PATH-0` records a bounded, non-gating Node attribution
       experiment before any retained-turn representation change. Validation:
-      demo tests `140` passing / `4` intentionally skipped; strict typecheck;
+      demo tests `143` passing / `4` intentionally skipped; strict typecheck;
       production AOT; demo lint with zero errors and one pre-existing warning;
       focused benchmark Playwright `5/5`; complete production route/layout/
-      hover matrix `126/126`; schema-4 production export `13` rows; development
-      export refusal; numeric claims `138/138`; complete comparison, update,
+      hover matrix `126/126`; schema-5 Steady production export `100` measured / `5`
+      warmup rounds and `13` rows; development export refusal; numeric claims
+      `138/138`; complete comparison, update,
       and 12-arm capability-density generators; benchmark gate and its
       undo-removal mutation proof; final independent review clean. The retired
       comparator has no manifest, lockfile, installed, executable, current-doc,
