@@ -1345,13 +1345,13 @@ const GATES = [
     //   left the gate "proven" by a check of the compiler, not of the budget.
     //   The cast is what makes the proof mean what it says.
     mutation: {
-      file: 'packages/kernel/src/lib/utils.ts',
+      file: 'dist/packages/kernel/dist/lib/utils.js',
       generate: (original) => {
         const parts = [];
         for (let i = 0; i < 900; i++) {
           parts.push(`gateBloat_${i.toString(36)}_${(i * 2654435761) % 1e9}`);
         }
-        return `${original}\n(globalThis as any).__gateBloat = ${JSON.stringify(
+        return `${original}\nglobalThis.__gateBloat = ${JSON.stringify(
           parts
         )};\n`;
       },
@@ -1552,18 +1552,38 @@ function withMutation(mutation, fn) {
     // That is the ORIGINAL stale-dist bug wearing new clothes — dist no longer
     // matching source, with nothing noticing — reintroduced by the fix for it.
     // A mutation harness has to restore DERIVED artifacts too, not just the
-    // files it edited.
-    if (mutation.file.startsWith('packages/')) {
+    // files it edited. Only gates marked `writesDist` rebuild mutated source;
+    // rebuilding after every package-source mutation exhausts Node's heap.
+    if (mutation.writesDist) {
       try {
         execFileSync(
           'npx',
-          ['nx', 'run-many', '-t', 'build', `--projects=${BUILD_PROJECTS}`],
-          { cwd: ROOT, stdio: 'pipe', env: process.env }
+          [
+            'nx',
+            'run-many',
+            '-t',
+            'build',
+            `--projects=${BUILD_PROJECTS}`,
+            '--parallel=1',
+            '--skip-nx-cache',
+            '--output-style=static',
+          ],
+          {
+            cwd: ROOT,
+            stdio: 'pipe',
+            maxBuffer: 10 * 1024 * 1024,
+            env: {
+              ...process.env,
+              NX_DAEMON: 'false',
+              NX_ISOLATE_PLUGINS: 'false',
+            },
+          }
         );
-      } catch {
+      } catch (err) {
         console.error(
           `\n  FATAL: restored ${mutation.file} but could not rebuild dist/. ` +
-            `Built output still contains the mutation — run \`npm run build\`.`
+            `Built output still contains the mutation — run \`npm run build\`.\n\n` +
+            String(err.stderr ?? err.stdout ?? err.message).slice(-2000)
         );
         process.exit(2);
       }
