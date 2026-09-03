@@ -2,16 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ArchitectureOverviewComponent } from './architecture-overview.component';
 
-/**
- * This page is static marketing/reference copy — no signals, no methods, no
- * routerLinks (verified by inspection of architecture-overview.component.html).
- * Kept deliberately thin per review guidance: a render check plus one
- * consistency assertion tying the two places the same headline number
- * ("~76% less app code") is quoted (the savingsMetrics data array and the
- * hero prose), so the two can't silently drift apart.
- */
+const renderedText = (
+  fixture: ComponentFixture<ArchitectureOverviewComponent>
+): string =>
+  (fixture.nativeElement.textContent as string).replace(/\s+/g, ' ').trim();
+
 describe('ArchitectureOverviewComponent', () => {
-  let component: ArchitectureOverviewComponent;
   let fixture: ComponentFixture<ArchitectureOverviewComponent>;
 
   beforeEach(async () => {
@@ -20,33 +16,87 @@ describe('ArchitectureOverviewComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(ArchitectureOverviewComponent);
-    component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('creates and renders the hero heading', () => {
-    expect(component).toBeTruthy();
-    expect(fixture.nativeElement.textContent).toContain(
-      'SignalTree: Reactive JSON'
-    );
+  it('renders the verified v15 architecture story', () => {
+    const text = renderedText(fixture);
+
+    expect(text).toContain('SignalTree v15 architecture');
+    expect(text).toContain('@signal-tree/kernel');
+    expect(text).toContain('@signal-tree/angular');
+    expect(text).toContain('@signal-tree/react');
+    expect(text).toContain('Authored');
+    expect(text).toContain('External');
+    expect(text).toContain('Restoration designation');
+    expect(text).toContain('Orthogonal operation boundary');
   });
 
-  it('renders one comparison row per entry in comparisons, and one savings card per entry in savingsMetrics', () => {
-    const rows = fixture.nativeElement.querySelectorAll('.comparison-row');
-    expect(rows.length).toBe(component.comparisons.length);
+  it('shows the actual root, branch, and leaf write grammars', () => {
+    const text = renderedText(fixture);
 
-    const cards = fixture.nativeElement.querySelectorAll('.savings-card');
-    expect(cards.length).toBe(component.savingsMetrics.length);
+    expect(text).toContain('tree.$(next)');
+    expect(text).toContain('tree.$(current => next)');
+    expect(text).toContain('tree.$.profile(next)');
+    expect(text).toContain('tree.$.count.set(5)');
+    expect(text).toContain('tree.$.count.update(n => n + 1)');
   });
 
-  it('the "76% less app code" figure is the same in the savingsMetrics data and the hero prose', () => {
-    const codeReduction = component.savingsMetrics.find(
-      (m) => m.label === 'App Code Reduction'
-    );
-    expect(codeReduction?.value).toBe('76%');
+  it('does not repeat superseded or unsupported marketing claims', () => {
+    const text = renderedText(fixture);
 
-    const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('76% fewer lines of state code');
-    expect(text).toContain('~76% less app code');
+    expect(text).not.toContain('single package');
+    expect(text).not.toContain('8.5KB');
+    expect(text).not.toContain('76%');
+    expect(text).not.toContain('No selectors');
+  });
+
+  it('renders each architecture diagram as an accessible SVG figure', () => {
+    const figures = fixture.nativeElement.querySelectorAll(
+      'figure[data-architecture-diagram]'
+    );
+
+    expect(figures).toHaveLength(8);
+    for (const figure of figures) {
+      const variants = figure.querySelectorAll('svg');
+      expect(variants).toHaveLength(2);
+
+      for (const svg of variants) {
+        const labelledBy =
+          svg.getAttribute('aria-labelledby')?.trim().split(/\s+/) ?? [];
+        const title = svg.querySelector('title');
+        const description = svg.querySelector('desc');
+
+        expect(svg.getAttribute('role')).toBe('img');
+        expect(labelledBy).toHaveLength(2);
+        expect(title?.getAttribute('id')).toBe(labelledBy[0]);
+        expect(description?.getAttribute('id')).toBe(labelledBy[1]);
+        expect(title?.textContent?.trim()).toBeTruthy();
+        expect(description?.textContent?.trim()).toBeTruthy();
+      }
+
+      expect(figure.querySelectorAll('.diagram-node[tabindex]')).toHaveLength(
+        0
+      );
+    }
+  });
+
+  it('wraps every connector label onto an explicit backing plate', () => {
+    const labelGroups = Array.from(
+      fixture.nativeElement.querySelectorAll('.edge-label-group')
+    ) as SVGGElement[];
+
+    expect(labelGroups.length).toBeGreaterThan(0);
+    for (const group of labelGroups) {
+      const plate = group.querySelector('.edge-label-plate');
+
+      expect(Number(plate?.getAttribute('width'))).toBeGreaterThanOrEqual(84);
+      expect(Number(plate?.getAttribute('height'))).toBeGreaterThanOrEqual(23);
+    }
+
+    const wrappedLabels = labelGroups.filter(
+      (group) => group.querySelectorAll('.edge-label tspan').length > 1
+    );
+    expect(wrappedLabels.length).toBeGreaterThanOrEqual(4);
   });
 });

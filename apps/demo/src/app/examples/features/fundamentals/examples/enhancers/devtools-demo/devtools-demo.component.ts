@@ -7,8 +7,6 @@ import {
   ExampleComponent,
 } from '../../../../../shared/components/example-shell';
 
-import type { DevToolsDebugSession } from '@signal-tree/angular';
-
 interface DevtoolsState {
   counter: number;
   user: {
@@ -208,28 +206,8 @@ export class DevtoolsDemoComponent {
     this.lastAction = 'Remove todo';
   }
 
-  // DevTools methods
-  getMetrics() {
-    return {
-      updates: 0,
-      computations: 0,
-      cacheHits: 0,
-      cacheMisses: 0,
-      averageUpdateTime: 0,
-    };
-  }
-
   logState() {
     this.lastAction = 'Log state to console';
-  }
-
-  triggerSnapshot() {
-    // Export current debug session as a snapshot. Annotated so the demo names
-    // the public return type rather than relying on inference — the type is
-    // part of the API surface `devTools()` promises.
-    const session: DevToolsDebugSession = this.store.exportDebugSession();
-    void session;
-    this.lastAction = 'Take state snapshot';
   }
 
   resetMetrics() {

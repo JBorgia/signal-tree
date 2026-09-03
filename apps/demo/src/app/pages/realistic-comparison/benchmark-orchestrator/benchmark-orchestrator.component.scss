@@ -3,15 +3,15 @@
 // Local color variables — hex values aligned to design system tokens in styles.scss.
 // These exist to allow SCSS compile-time functions (color.adjust, rgba).
 // All direct property values use var(--color-*) tokens instead.
-$primary:   #3b82f6;  // --color-primary-500
-$secondary: #a855f7;  // --color-purple-500
-$success:   #22c55e;  // --color-secondary-500
-$info:      #06b6d4;  // --color-info-500
-$warning:   #eab308;  // --color-warning-500
-$danger:    #ef4444;  // --color-error-500
-$dark:      #1f2937;  // --color-dark
-$light:     #f9fafb;  // --color-light
-$border:    #e5e7eb;  // --color-border
+$primary: #527d14;
+$secondary: #78649a;
+$success: #2f7d4d;
+$info: #5879a1;
+$warning: #b7800b;
+$danger: #b9473f;
+$dark: #17211a;
+$light: #f7f8f3;
+$border: #dfe4dc;
 
 // Shared placeholders (use @extend to reduce emitted CSS duplication)
 %card {

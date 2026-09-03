@@ -1,35 +1,38 @@
-<div class="container">
-  <h1>Time Travel Demo</h1>
-
-  <st-example heading="What is Time Travel?">
+<div class="container layout-frame">
+  <st-example
+    heading="Restoration: designated authored operations"
+    [headingLevel]="1"
+  >
     <div intro>
       <p class="intro-text">
-        <strong>Time Travel</strong> allows you to
-        <em>undo and redo state changes</em>, navigate through your
-        application's history, and replay user actions. Perfect for debugging,
-        testing, and providing undo/redo functionality.
+        <strong>Restoration retains only explicitly designated authored work.</strong>
+        Ordinary writes remain authored but do not enter restoration history.
+        Wrap a synchronous product operation in <code>undoable()</code> when
+        undo and redo are part of that operation's contract.
       </p>
       <div class="how-it-works">
-        <h3>How It Works</h3>
+        <h3>The v15 model</h3>
         <ol class="instruction-list">
           <li>
-            <strong>Automatic Tracking:</strong> Every state change is recorded
-            in history
+            <strong>Authority first:</strong> application decisions are authored;
+            values decided elsewhere are applied through <code>external()</code>.
           </li>
           <li>
-            <strong>Navigate History:</strong> Move backward and forward through
-            state snapshots
+            <strong>Designation is separate:</strong> <code>undoable()</code>
+            marks the authored causal turn containing its writes. It does not
+            create a turn boundary.
           </li>
           <li>
-            <strong>Jump to State:</strong> Click any history item to instantly
-            restore that state
+            <strong>Settlement retains the turn:</strong> accepted designated
+            work enters bounded restoration history after the causal turn settles.
           </li>
           <li>
-            <strong>Undo/Redo:</strong> Built-in undo and redo functionality
+            <strong>Undo and redo preserve authority:</strong> restoration may
+            refuse rather than discard later external truth.
           </li>
           <li>
-            <strong>Quick Test:</strong> Click "Generate Sample Actions" to see
-            time travel in action instantly!
+            <strong>Tooling can navigate:</strong> <code>jumpTo()</code> moves to
+            another retained boundary without making snapshots causal authority.
           </li>
         </ol>
       </div>
@@ -37,17 +40,17 @@
 
     <div class="demo-grid">
       <div class="card actions-card">
-        <h2>Make State Changes</h2>
+        <h2>Author designated operations</h2>
         <p class="card-description">
-          Each action below creates a new entry in history. Click "Generate
-          Sample Actions" to quickly populate history, then use Undo/Redo to
-          navigate!
+          Each control below wraps one product operation in
+          <code>undoable()</code>. The server refresh uses
+          <code>external()</code> and creates no undo step.
         </p>
 
         <div class="control-section">
           <h3>Counter: {{ counter() }}</h3>
-          <p style="font-size: 0.875rem; color: #6b7280; margin: 0.5rem 0">
-            Increment or decrement to add history entries
+          <p class="card-description control-description">
+            Increment or decrement to retain one designated turn.
           </p>
           <div class="button-group">
             <button (click)="increment()" class="btn-primary btn-sm">
@@ -116,9 +119,11 @@
         </div>
       </div>
 
-      <div class="card time-travel-card">
-        <h2>Time Travel Controls</h2>
-        <p class="card-description">Navigate through state history</p>
+      <div class="card restoration-card">
+        <h2>Restoration controls</h2>
+        <p class="card-description">
+          Move across retained designated turns.
+        </p>
 
         @if (rollbackMessage(); as message) {
         <p class="error-message">{{ message }}</p>
@@ -146,7 +151,7 @@
             }
           </button>
           <button (click)="generateSampleActions()" class="btn-primary btn-sm">
-            🎬 Generate Sample Actions
+            Generate designated turns
           </button>
           <button (click)="clearHistory()" class="btn-danger btn-sm">
             Clear History
@@ -155,17 +160,17 @@
 
         <div class="history-info">
           <div class="info-item">
-            <span class="label">History Length:</span>
+            <span class="label">Retained turns:</span>
             <span class="value">{{ historyLength() }}</span>
           </div>
           <div class="info-item">
-            <span class="label">Current Position:</span>
+            <span class="label">Current boundary:</span>
             <span class="value"
               >{{ currentIndex() + 1 }} / {{ historyLength() }}</span
             >
           </div>
           <div class="info-item">
-            <span class="label">Frames Available:</span>
+            <span class="label">Available moves:</span>
             <span class="value"
               >⏴ {{ undosAvailable() }} undo · {{ redosAvailable() }} redo
               ⏵</span
@@ -174,7 +179,7 @@
         </div>
 
         <div class="history-list">
-          <h3>State History</h3>
+          <h3>Retained designated turns</h3>
           @for (state of history(); track $index) {
           <div
             class="history-item"
@@ -198,30 +203,24 @@
     </div>
   </st-example>
 
-  <st-example heading="Undo/redo across MARKERS (new in 14.0.0)">
+  <st-example heading="EntityMap shares the same restoration model">
     <div intro>
       <p class="intro-text">
-        Everything above is plain leaves, and undo has always worked for those.
-        <strong>Markers were a different story.</strong>
-        Until 14.0.0 a snapshot captured a marker&#39;s API surface instead of
-        its state, so an undo left the marker at its
-        <em>post-change</em>
-        value and reported success — landing you in a state that never existed.
+        <strong>EntityMap structural work and ordinary state use the same
+        designation door.</strong> Each control below authors one designated
+        causal turn. Held entity identity, collection membership, scalar state,
+        and branch state remain coherent through undo and redo.
       </p>
       <p class="intro-text">
-        Measured before the fix:
-        <code>n=3 rows=3</code>
-        → undo →
-        <code>n=2 rows=3</code>
-        . The counter rolled back; the collection did not; nothing said so. Add
-        people, change the job status, edit the profile, then undo — all three
-        roll back together now.
+        Restoration retains the causal work required to reverse the operation;
+        public historical state is materialized when requested rather than
+        stored as causal authority.
       </p>
     </div>
 
     <div class="demo-grid">
       <div class="card actions-card">
-        <h2>Change marker state</h2>
+        <h2>Author one designated turn</h2>
         <div class="button-group">
           <button class="btn btn-primary" (click)="addPerson()">
             Add person
@@ -253,7 +252,7 @@
       </div>
 
       <div class="card">
-        <h2>Live marker state</h2>
+        <h2>Live state</h2>
         <ul>
           <li>
             <strong>entityMap</strong>
@@ -270,8 +269,9 @@
           </li>
         </ul>
         <p class="intro-text">
-          EntityMap and ordinary branches participate in the same designated
-          causal turn. The former status and form markers were removed in v15.
+          EntityMap and ordinary branches participate through the same causal
+          runtime. Their different access shapes do not create separate history
+          authorities.
         </p>
       </div>
 

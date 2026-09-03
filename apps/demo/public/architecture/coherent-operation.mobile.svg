@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 360 915" role="img" aria-labelledby="coherent-operation-mobile-title coherent-operation-mobile-description" data-diagram="coherent-operation" data-variant="mobile">
+  <title id="coherent-operation-mobile-title">One semantic operation, one coherent observed state</title>
+  <desc id="coherent-operation-mobile-description">SignalTree defines atomicity by externally observable coherence, not by counting internal revision increments. Publication happens only after the operation can be observed as a complete state.</desc>
+  <style>
+  :root {
+    --st-ink: #17211a;
+    --st-muted: #55615a;
+    --st-surface: #fbfcf8;
+    --st-grid: rgba(23, 33, 26, 0.055);
+    --st-line: #526158;
+    --st-application: #fff0c7;
+    --st-framework: #dbe8ff;
+    --st-kernel: #d9f66f;
+    --st-authored: #d9f0df;
+    --st-external: #ffe0d5;
+    --st-restoration: #f8d66d;
+    --st-identity: #d6eee9;
+    --st-projection: #e9e0f7;
+    --st-neutral: #edf0eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --st-ink: #eef4e9;
+      --st-muted: #b6c1b8;
+      --st-surface: #17211a;
+      --st-grid: rgba(238, 244, 233, 0.055);
+      --st-line: #a9b6ac;
+      --st-application: #544a2d;
+      --st-framework: #30435f;
+      --st-kernel: #4c641f;
+      --st-authored: #31513a;
+      --st-external: #653f35;
+      --st-restoration: #624f1e;
+      --st-identity: #31534c;
+      --st-projection: #493d5c;
+      --st-neutral: #303a33;
+    }
+  }
+  text { fill: var(--st-ink); }
+  .group-box { fill: color-mix(in srgb, var(--st-neutral) 55%, transparent); stroke: var(--st-line); stroke-width: 1.5; }
+  .group-box--projection { fill: color-mix(in srgb, var(--st-projection) 42%, transparent); }
+  .dashed { stroke-dasharray: 8 7; }
+  .group-label, .node-detail { fill: var(--st-muted); }
+  .group-label, .node-title, .edge-label { font-family: 'Space Grotesk', 'Avenir Next', sans-serif; }
+  .group-label { font-size: 12px; font-weight: 700; }
+  .edge { fill: none; stroke: var(--st-line); stroke-width: 2; }
+  .edge-label-group { pointer-events: none; }
+  .edge-label-plate { fill: var(--st-surface); stroke: color-mix(in srgb, var(--st-line) 42%, transparent); stroke-width: 1; }
+  .edge-label { fill: var(--st-ink); font-size: 11px; font-weight: 700; }
+  .node { outline: none; }
+  .node rect { stroke: color-mix(in srgb, var(--st-ink) 42%, transparent); stroke-width: 1.4; transition: stroke-width 180ms ease; }
+  .node:hover rect { stroke-width: 2.5; }
+  .node--application rect { fill: var(--st-application); }
+  .node--framework rect { fill: var(--st-framework); }
+  .node--kernel rect { fill: var(--st-kernel); }
+  .node--authored rect { fill: var(--st-authored); }
+  .node--external rect { fill: var(--st-external); }
+  .node--restoration rect { fill: var(--st-restoration); }
+  .node--identity rect { fill: var(--st-identity); }
+  .node--projection rect { fill: var(--st-projection); }
+  .node--neutral rect { fill: var(--st-neutral); }
+  .node-title { font-size: 16px; font-weight: 730; }
+  .node-detail { font-family: 'IBM Plex Sans', 'Avenir Next', sans-serif; font-size: 12px; font-weight: 520; }
+  .node-detail--code { font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace; font-size: 10.5px; }
+  .slide-title { font: 700 62px 'Space Grotesk', 'Avenir Next', sans-serif; }
+  .slide-takeaway { fill: var(--st-muted); font: 500 28px 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .notes { box-sizing: border-box; height: 100%; padding: 22px 28px; color: var(--st-ink); border: 1px solid var(--st-line); background: var(--st-neutral); font: 15px/1.5 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .notes-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 32px; }
+  .notes h2 { margin: 0 0 8px; font-size: 15px; text-transform: uppercase; }
+  .notes ul { margin: 0; padding-left: 20px; }
+  .notes code { font-size: 13px; overflow-wrap: anywhere; }
+  @media (prefers-reduced-motion: reduce) { .node rect { transition: none; } }
+</style>
+  <defs>
+  <marker id="coherent-operation-mobile-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--st-line)"/></marker>
+  <pattern id="coherent-operation-mobile-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="var(--st-grid)" stroke-width="1"/></pattern>
+</defs>
+  <rect width="360" height="915" fill="var(--st-surface)"/>
+  <rect width="360" height="915" fill="url(#coherent-operation-mobile-grid)"/>
+  <g><g><path class="edge" d="M 180 120 L 180 170" marker-end="url(#coherent-operation-mobile-arrow)"/></g><g><path class="edge" d="M 180 270 L 180 320" marker-end="url(#coherent-operation-mobile-arrow)"/></g><g><path class="edge" d="M 180 425 L 180 475" marker-end="url(#coherent-operation-mobile-arrow)"/></g><g><path class="edge" d="M 180 580 L 180 630" marker-end="url(#coherent-operation-mobile-arrow)"/></g><g><path class="edge" d="M 180 735 L 180 785" marker-end="url(#coherent-operation-mobile-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="138" y="740.5" width="84" height="23" rx="0"/><text class="edge-label" x="180" y="755.4" text-anchor="middle"><tspan x="180" dy="0">reread</tspan></text></g></g></g><g><g class="node node--application"><title>transaction(() =&gt; …) one semantic operation</title><rect x="24" y="20" width="312" height="100" rx="0"/><text class="node-title" x="180" y="63" text-anchor="middle"><tspan x="180" dy="0">transaction(() =&gt; …)</tspan></text><text class="node-detail node-detail--code" x="180" y="88" text-anchor="middle"><tspan x="180" dy="0">one semantic operation</tspan></text></g><g class="node node--authored"><title>multiple mutations scalar + structural</title><rect x="24" y="170" width="312" height="100" rx="0"/><text class="node-title" x="180" y="213" text-anchor="middle"><tspan x="180" dy="0">multiple mutations</tspan></text><text class="node-detail" x="180" y="238" text-anchor="middle"><tspan x="180" dy="0">scalar + structural</tspan></text></g><g class="node node--neutral"><title>private substrate commits one or more</title><rect x="24" y="320" width="312" height="105" rx="0"/><text class="node-title" x="180" y="354.5" text-anchor="middle"><tspan x="180" dy="0">private substrate</tspan><tspan x="180" dy="22">commits</tspan></text><text class="node-detail" x="180" y="401.5" text-anchor="middle"><tspan x="180" dy="0">one or more</tspan></text></g><g class="node node--kernel"><title>coherent publication no heterogeneous midpoint</title><rect x="24" y="475" width="312" height="105" rx="0"/><text class="node-title" x="180" y="520.5" text-anchor="middle"><tspan x="180" dy="0">coherent publication</tspan></text><text class="node-detail" x="180" y="545.5" text-anchor="middle"><tspan x="180" dy="0">no heterogeneous midpoint</tspan></text></g><g class="node node--framework"><title>framework invalidation request to reread truth</title><rect x="24" y="630" width="312" height="105" rx="0"/><text class="node-title" x="180" y="675.5" text-anchor="middle"><tspan x="180" dy="0">framework invalidation</tspan></text><text class="node-detail" x="180" y="700.5" text-anchor="middle"><tspan x="180" dy="0">request to reread truth</tspan></text></g><g class="node node--identity"><title>observer sees only the final state</title><rect x="24" y="785" width="312" height="105" rx="0"/><text class="node-title" x="180" y="830.5" text-anchor="middle"><tspan x="180" dy="0">observer</tspan></text><text class="node-detail" x="180" y="855.5" text-anchor="middle"><tspan x="180" dy="0">sees only the final state</tspan></text></g></g>
+</svg>

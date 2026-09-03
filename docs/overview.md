@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="../apps/demo/public/signaltree.svg" alt="SignalTree Logo" width="80" height="80" style="background: transparent;" />
+  <img src="../apps/demo/public/signaltree-mark-192.png" alt="SignalTree ST leaf mark" width="80" height="80" />
 </div>
 
 # SignalTree Overview and Specifications
@@ -17,7 +17,7 @@ while the packages shipped 13.x. Don't reintroduce it; link the changelog instea
 - Causal transitions distinguish authored operations from external truth
 - Coherent multi-location commits with stable entity identity and explicit authority
 - Recursive typing with deep nesting and accurate type inference
-- Sub‑millisecond operations measured at 5–20+ levels
+- Compile-backed exact leaf typing through the declared 15-branch demo model
 - Memory efficiency via proportional causal history and explicit ownership lifetimes
 - Three focused packages with strong TypeScript support
 - Extensible via the declared `enhancers` set

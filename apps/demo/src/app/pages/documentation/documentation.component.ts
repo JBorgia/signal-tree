@@ -1,6 +1,13 @@
 
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import hljs from 'highlight.js/lib/core';
 import bash from 'highlight.js/lib/languages/bash';
@@ -28,6 +35,7 @@ interface DocQuickLink {
   imports: [RouterModule],
   templateUrl: './documentation.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
   styleUrl: './documentation.component.scss',
 })
 export class DocumentationComponent implements OnInit {
@@ -38,52 +46,52 @@ export class DocumentationComponent implements OnInit {
     {
       id: 'kernel',
       name: '@signal-tree/kernel',
-      description: 'Framework-neutral state, EntityMap, causal turns, restoration, transactions, and DevTools',
+      description:
+        'Framework-neutral state, EntityMap, causal turns, links, restoration, transactions, batching, and DevTools',
       readmePath: 'assets/docs/core/README.md',
     },
     {
       id: 'angular',
       name: '@signal-tree/angular',
-      description: 'Angular-native signals, defineStore, and Angular lifecycle integration',
+      description: 'Native Angular Signal carriers and defineStore ownership',
       readmePath: 'assets/docs/angular/README.md',
     },
     {
       id: 'react',
       name: '@signal-tree/react',
-      description: 'Owner-bound React observation',
+      description: 'React external-store observation of canonical tree reads',
       readmePath: 'assets/docs/react/README.md',
     },
     {
       id: 'composition-recipes',
       name: 'Composition Recipes',
-      description:
-        'Patterns built from existing primitives, no new API: staged editing, optimistic writes, one-shot loading, link()-based relationships, causal explanation',
+      description: 'Application patterns composed from existing v15 primitives',
       readmePath: 'assets/docs/guides/composition-recipes.md',
     },
     {
       id: 'persistence-guide',
       name: 'Persistence Guide',
-      description: 'The link()-as-storage recipe that replaced stored()',
+      description: 'External storage acquisition and synchronization through link()',
       readmePath: 'assets/docs/guides/persistence-guide.md',
     },
   ];
 
   readonly quickLinks: DocQuickLink[] = [
     {
+      label: 'Architecture',
+      route: '/architecture-overview',
+    },
+    {
       label: 'Fundamentals',
       route: '/examples/fundamentals',
     },
     {
-      label: 'Recommended Architecture',
-      route: '/examples/fundamentals/recommended-architecture',
+      label: 'Migration',
+      route: '/migrate',
     },
     {
-      label: 'Migration Recipe',
-      route: '/examples/fundamentals/migration-recipe',
-    },
-    {
-      label: 'Benchmarks',
-      route: '/benchmarks',
+      label: 'Restoration',
+      route: '/restoration',
     },
   ];
 

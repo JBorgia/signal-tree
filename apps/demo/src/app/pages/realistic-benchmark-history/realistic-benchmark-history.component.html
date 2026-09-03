@@ -1,50 +1,22 @@
-<div class="history-container">
+<div class="history-container layout-frame">
   <div class="header">
-    <h1>📊 Benchmark History</h1>
+    <p class="archive-eyebrow">Archived evidence</p>
+    <h1>Retired benchmark history</h1>
     <p class="subtitle">
-      Historical results from realistic comparison benchmarks across different
-      machines
+      Submitted results from the pre-v15 realistic-comparison harness,
+      preserved for provenance rather than current performance guidance.
     </p>
 
-    <div class="value-proposition">
-      <h2>📈 Why Real-World Benchmarks Matter</h2>
+    <div class="archive-notice">
+      <h2>Read these records in their captured context.</h2>
       <p>
-        Isolated operation timings answer only part of a performance question.
-        These comparisons combine multiple scenarios and expose the selected
-        <strong>frequency-weighting preset</strong>. Preset weights are
-        maintainer estimates; Equal Weighting removes that assumption.
+        Library versions, browser details, machine data, workload weights, and
+        harness behavior belong to each submission. Results from this retired
+        harness do not establish performance for SignalTree v15.
       </p>
-      <div class="methodology-highlights">
-        <div class="highlight">
-          <h3>🎯 Adjustable Weighting</h3>
-          <p>
-            Workloads differ. Choose a documented preset for exploration or
-            Equal Weighting for a comparison that does not depend on estimated
-            operation frequency.
-          </p>
-        </div>
-        <div class="highlight">
-          <h3>🔬 Statistical Rigor</h3>
-          <p>
-            Every result includes reliability scores (60-100%), environment
-            calibration, and P-values. Understand measurement confidence, not
-            just raw numbers.
-          </p>
-        </div>
-        <div class="highlight">
-          <h3>🌍 Cross-Platform</h3>
-          <p>
-            Results from MacBook M1, Intel i7, AMD Ryzen, low-end laptops. See
-            how your library performs on actual user hardware, not just
-            developer workstations.
-          </p>
-        </div>
-      </div>
-      <p class="transparency">
-        <strong>Full transparency:</strong> All benchmarks include machine
-        specs, browser version, test configuration, and raw data exports.
-        Compare NgRx, Akita, Elf, NgXs, and SignalTree with complete
-        reproducibility.
+      <p>
+        For the current ownership and runtime model, review the
+        <a routerLink="/architecture-overview">verified v15 architecture</a>.
       </p>
     </div>
   </div>
@@ -207,9 +179,9 @@
     <h3>No Benchmarks Found</h3>
     @if (benchmarks().length === 0) {
     <p>
-      No benchmark results have been submitted yet. Run the
-      <a routerLink="/benchmarks">realistic comparison benchmarks</a> to
-      contribute!
+      No archived submissions are available. Review the
+      <a routerLink="/architecture-overview">current architecture evidence</a>
+      instead.
     </p>
     } @if (benchmarks().length > 0) {
     <p>

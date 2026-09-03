@@ -12,7 +12,12 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: '.',
-  testMatch: 'route-smoke.spec.ts',
+  testMatch: [
+    'route-smoke.spec.ts',
+    'mobile-layout.spec.ts',
+    'layout-system.spec.ts',
+    'visual-language.spec.ts',
+  ],
   timeout: 60_000,
   retries: process.env['CI'] ? 1 : 0,
   reporter: [['list']],
@@ -23,6 +28,7 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4173',
     browserName: 'chromium',
     trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   webServer: {
     command: 'node scripts/playwright/serve-dist.mjs 4173',

@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 1040 730" role="img" aria-labelledby="system-boundary-docs-title system-boundary-docs-description" data-diagram="system-boundary" data-variant="docs">
+  <title id="system-boundary-docs-title">SignalTree in one picture</title>
+  <desc id="system-boundary-docs-description">Application policy chooses the work. Angular and React connect that work to their observation runtimes. The framework-neutral kernel owns the state and causal model beneath both.</desc>
+  <style>
+  :root {
+    --st-ink: #17211a;
+    --st-muted: #55615a;
+    --st-surface: #fbfcf8;
+    --st-grid: rgba(23, 33, 26, 0.055);
+    --st-line: #526158;
+    --st-application: #fff0c7;
+    --st-framework: #dbe8ff;
+    --st-kernel: #d9f66f;
+    --st-authored: #d9f0df;
+    --st-external: #ffe0d5;
+    --st-restoration: #f8d66d;
+    --st-identity: #d6eee9;
+    --st-projection: #e9e0f7;
+    --st-neutral: #edf0eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --st-ink: #eef4e9;
+      --st-muted: #b6c1b8;
+      --st-surface: #17211a;
+      --st-grid: rgba(238, 244, 233, 0.055);
+      --st-line: #a9b6ac;
+      --st-application: #544a2d;
+      --st-framework: #30435f;
+      --st-kernel: #4c641f;
+      --st-authored: #31513a;
+      --st-external: #653f35;
+      --st-restoration: #624f1e;
+      --st-identity: #31534c;
+      --st-projection: #493d5c;
+      --st-neutral: #303a33;
+    }
+  }
+  text { fill: var(--st-ink); }
+  .group-box { fill: color-mix(in srgb, var(--st-neutral) 55%, transparent); stroke: var(--st-line); stroke-width: 1.5; }
+  .group-box--projection { fill: color-mix(in srgb, var(--st-projection) 42%, transparent); }
+  .dashed { stroke-dasharray: 8 7; }
+  .group-label, .node-detail { fill: var(--st-muted); }
+  .group-label, .node-title, .edge-label { font-family: 'Space Grotesk', 'Avenir Next', sans-serif; }
+  .group-label { font-size: 12px; font-weight: 700; }
+  .edge { fill: none; stroke: var(--st-line); stroke-width: 2; }
+  .edge-label-group { pointer-events: none; }
+  .edge-label-plate { fill: var(--st-surface); stroke: color-mix(in srgb, var(--st-line) 42%, transparent); stroke-width: 1; }
+  .edge-label { fill: var(--st-ink); font-size: 11px; font-weight: 700; }
+  .node { outline: none; }
+  .node rect { stroke: color-mix(in srgb, var(--st-ink) 42%, transparent); stroke-width: 1.4; transition: stroke-width 180ms ease; }
+  .node:hover rect { stroke-width: 2.5; }
+  .node--application rect { fill: var(--st-application); }
+  .node--framework rect { fill: var(--st-framework); }
+  .node--kernel rect { fill: var(--st-kernel); }
+  .node--authored rect { fill: var(--st-authored); }
+  .node--external rect { fill: var(--st-external); }
+  .node--restoration rect { fill: var(--st-restoration); }
+  .node--identity rect { fill: var(--st-identity); }
+  .node--projection rect { fill: var(--st-projection); }
+  .node--neutral rect { fill: var(--st-neutral); }
+  .node-title { font-size: 16px; font-weight: 730; }
+  .node-detail { font-family: 'IBM Plex Sans', 'Avenir Next', sans-serif; font-size: 12px; font-weight: 520; }
+  .node-detail--code { font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace; font-size: 10.5px; }
+  .slide-title { font: 700 62px 'Space Grotesk', 'Avenir Next', sans-serif; }
+  .slide-takeaway { fill: var(--st-muted); font: 500 28px 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .notes { box-sizing: border-box; height: 100%; padding: 22px 28px; color: var(--st-ink); border: 1px solid var(--st-line); background: var(--st-neutral); font: 15px/1.5 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .notes-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 32px; }
+  .notes h2 { margin: 0 0 8px; font-size: 15px; text-transform: uppercase; }
+  .notes ul { margin: 0; padding-left: 20px; }
+  .notes code { font-size: 13px; overflow-wrap: anywhere; }
+  @media (prefers-reduced-motion: reduce) { .node rect { transition: none; } }
+</style>
+  <defs>
+  <marker id="system-boundary-docs-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--st-line)"/></marker>
+  <pattern id="system-boundary-docs-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M 24 0 L 0 0 0 24" fill="none" stroke="var(--st-grid)" stroke-width="1"/></pattern>
+</defs>
+  <rect width="1040" height="730" fill="var(--st-surface)"/>
+  <rect width="1040" height="430" fill="url(#system-boundary-docs-grid)"/>
+  <g><g><path class="edge" d="M 250 195 L 310 195" marker-end="url(#system-boundary-docs-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="223" y="175" width="114" height="24" rx="0"/><text class="edge-label" x="280" y="190.74" text-anchor="middle"><tspan x="280" dy="0">product intent</tspan></text></g></g><g><path class="edge" d="M 550 195 L 610 195" marker-end="url(#system-boundary-docs-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="516" y="175" width="128" height="24" rx="0"/><text class="edge-label" x="580" y="190.74" text-anchor="middle"><tspan x="580" dy="0">writes + rereads</tspan></text></g></g><g><path class="edge" d="M 800 285 L 800 325" marker-end="url(#system-boundary-docs-arrow)"/><g class="edge-label-group"><rect class="edge-label-plate" x="758" y="285" width="84" height="24" rx="0"/><text class="edge-label" x="800" y="300.74" text-anchor="middle"><tspan x="800" dy="0">owns</tspan></text></g></g></g><g><g class="node node--application"><title>Application policy decides product work</title><rect x="40" y="140" width="210" height="110" rx="0"/><text class="node-title" x="145" y="188" text-anchor="middle"><tspan x="145" dy="0">Application policy</tspan></text><text class="node-detail" x="145" y="213" text-anchor="middle"><tspan x="145" dy="0">decides product work</tspan></text></g><g class="node node--framework"><title>Angular / React realization observe · render · clean up</title><rect x="310" y="125" width="240" height="140" rx="0"/><text class="node-title" x="430" y="177" text-anchor="middle"><tspan x="430" dy="0">Angular / React</tspan><tspan x="430" dy="22">realization</tspan></text><text class="node-detail" x="430" y="224" text-anchor="middle"><tspan x="430" dy="0">observe · render · clean up</tspan></text></g><g class="node node--kernel"><title>SignalTree causal kernel framework-neutral authority</title><rect x="610" y="105" width="380" height="180" rx="0"/><text class="node-title" x="800" y="177" text-anchor="middle"><tspan x="800" dy="0">SignalTree</tspan><tspan x="800" dy="22">causal kernel</tspan></text><text class="node-detail" x="800" y="224" text-anchor="middle"><tspan x="800" dy="0">framework-neutral authority</tspan></text></g><g class="node node--neutral"><title>state · identity · authority causal turns · operation boundaries</title><rect x="650" y="325" width="300" height="75" rx="0"/><text class="node-title" x="800" y="355.5" text-anchor="middle"><tspan x="800" dy="0">state · identity · authority</tspan></text><text class="node-detail" x="800" y="380.5" text-anchor="middle"><tspan x="800" dy="0">causal turns · operation boundaries</tspan></text></g></g>
+  <foreignObject x="24" y="448" width="992" height="264">
+    <section xmlns="http://www.w3.org/1999/xhtml" class="notes">
+      <div class="notes-grid"><div><h2>Semantic checks</h2><ul><li>The framework layer is observation and realization, not a second store.</li><li>The kernel contract contains no Angular or React runtime dependency.</li></ul></div><div><h2>Code evidence</h2><ul><li><code>packages/kernel/src/adapter.ts</code></li><li><code>packages/angular/src/index.ts</code></li><li><code>packages/react/src/use-signal-tree.ts</code></li></ul></div></div>
+    </section>
+  </foreignObject>
+</svg>

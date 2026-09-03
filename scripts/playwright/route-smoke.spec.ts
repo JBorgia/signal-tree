@@ -20,23 +20,7 @@
  */
 import { expect, test } from '@playwright/test';
 
-const ROUTES = [
-  '/', // home
-  '/start', // 5-minute evaluation path
-  '/whats-new-14', // 14.0.0 running capability page
-  '/does-it-fit', // fit/positioning page
-  '/entity-collection', // entityMap cache-aware loading showcase
-  '/async', // async state via RxJS + external()
-  '/marker-zoo', // all 6 markers at 4 depths
-  '/benchmarks', // live cross-library benchmarks
-  '/migrate', // NgRx migration recipe
-  '/docs', // package documentation
-  '/stored-versioning', // stored() versioning + durability + 13.4 reload status
-  '/architecture-overview', // recommended architecture overview
-  '/examples/fundamentals/recommended-architecture', // application-store consumer
-  '/examples/fundamentals', // embedded fundamentals examples
-  '/serialization', // snapshot payload shape (changed in 14.0.0)
-];
+import { DEMO_ROUTES } from './demo-routes';
 
 // Noise that is not a product bug and would make the gate flaky.
 const IGNORED_ERROR_PATTERNS = [/favicon/i];
@@ -52,7 +36,7 @@ function pathnameOf(urlOrPath: string): string {
   return path;
 }
 
-for (const route of ROUTES) {
+for (const route of DEMO_ROUTES) {
   test(`route ${route} resolves (no redirect) and renders with no console errors`, async ({
     page,
   }) => {
@@ -123,4 +107,29 @@ test('/examples/fundamentals/recommended-architecture: ops update nested state',
   await expect(toggle).toContainText('light', { timeout: 20_000 });
   await toggle.click();
   await expect(toggle).toContainText('dark');
+});
+
+test('/batching: grouped writes publish once without intermediate observations', async ({
+  page,
+}) => {
+  await page.goto('/batching', { waitUntil: 'load' });
+
+  await page.getByRole('button', { name: 'Run unbatched' }).click();
+  await expect(page.locator('.timeline-entry')).toHaveCount(3);
+  await expect(page.locator('.run-metrics > div').nth(1).locator('dd')).toHaveText(
+    '3'
+  );
+  await expect(page.locator('.run-metrics > div').nth(2).locator('dd')).toHaveText(
+    '2'
+  );
+
+  await page.getByRole('button', { name: 'Run batched' }).click();
+  await expect(page.locator('.timeline-entry')).toHaveCount(1);
+  await expect(page.locator('.timeline-entry')).toHaveClass(/--coherent/);
+  await expect(page.locator('.run-metrics > div').nth(1).locator('dd')).toHaveText(
+    '1'
+  );
+  await expect(page.locator('.run-metrics > div').nth(2).locator('dd')).toHaveText(
+    '0'
+  );
 });

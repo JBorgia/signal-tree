@@ -1,16 +1,18 @@
 @use '../../styles' as *;
 
 .code-tabs {
-  border-radius: $radius-md;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--color-neutral-900);
+  background: var(--color-ink);
 
   &__bar {
     display: flex;
     flex-wrap: wrap;
-    gap: 2px;
+    gap: 0;
     padding: $spacing-sm $spacing-sm 0;
-    background: var(--color-neutral-900);
+    border-bottom: 1px solid rgb(255 255 255 / 0.12);
+    background: var(--color-ink);
   }
 
   &__tab {
@@ -22,7 +24,8 @@
     color: var(--color-neutral-400);
     background: transparent;
     padding: $spacing-sm $spacing-md;
-    border-radius: $radius-sm $radius-sm 0 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
     transition: color 0.15s ease, background 0.15s ease;
 
     &:hover {
@@ -30,8 +33,9 @@
     }
 
     &--active {
+      border-bottom-color: var(--color-accent);
+      background: rgb(255 255 255 / 0.06);
       color: var(--color-white);
-      background: rgba(255, 255, 255, 0.08);
     }
   }
 
@@ -54,8 +58,8 @@
     font-family: inherit;
     font-size: $text-xs;
     color: var(--color-neutral-300);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgb(255 255 255 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.18);
     border-radius: $radius-sm;
     padding: $spacing-xs $spacing-sm;
     transition: background 0.15s ease, color 0.15s ease;

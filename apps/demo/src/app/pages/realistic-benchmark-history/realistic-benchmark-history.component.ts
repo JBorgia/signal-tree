@@ -8,6 +8,7 @@ import {
   ChangeDetectionStrategy
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 import { BenchmarkResultsTableComponent } from '../../components/benchmark-results-table/benchmark-results-table.component';
 import {
@@ -20,7 +21,12 @@ import {
 @Component({
   selector: 'app-realistic-benchmark-history',
   standalone: true,
-  imports: [CommonModule, FormsModule, BenchmarkResultsTableComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    BenchmarkResultsTableComponent,
+  ],
   templateUrl: './realistic-benchmark-history.component.html',
   styleUrl: './realistic-benchmark-history.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

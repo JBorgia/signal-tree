@@ -11,58 +11,57 @@
 
 // ─── Color Palette (values match apps/demo/src/styles.scss :root tokens) ──────
 
-// Primary (blue — --color-primary-*)
-$primary: #3b82f6;         // --color-primary-500
-$primary-light: #93c5fd;   // --color-primary-300
-$primary-dark: #1d4ed8;    // --color-primary-700
+// SignalTree brand and semantic fact colors.
+$primary: #527d14;
+$primary-light: #c9e34e;
+$primary-dark: #304d12;
 
-// Secondary (green — --color-secondary-*)
-// NOTE: secondary = green in this design system. Use $purple for purple/violet.
-$secondary: #22c55e;       // --color-secondary-500
-$success: #22c55e;         // --color-secondary-500 (alias)
-$success-light: #dcfce7;   // --color-secondary-100
-$success-dark: #166534;    // --color-secondary-800
+// Secondary and success remain functional, not decorative brand gradients.
+$secondary: #2f6f4e;
+$success: #2f7d4d;
+$success-light: #d9f0df;
+$success-dark: #1f5a38;
 
-// Purple (violet — --color-purple-*)
-$purple: #a855f7;          // --color-purple-500
+// Projection / interpretation.
+$purple: #78649a;
 
 // Warning (yellow — --color-warning-*)
-$warning: #f59e0b;         // warning-500 (amber-500, closest semantic match)
-$warning-light: #fef9c3;   // --color-warning-100
-$warning-dark: #a16207;    // --color-warning-700
+$warning: #b7800b;
+$warning-light: #fff0c7;
+$warning-dark: #76530a;
 
 // Danger/Error (red — --color-error-*)
-$danger: #ef4444;          // --color-error-500
-$danger-light: #fee2e2;    // --color-error-100
-$danger-dark: #991b1b;     // --color-error-800
+$danger: #b9473f;
+$danger-light: #ffe0d5;
+$danger-dark: #7f2925;
 
-// Info (cyan — --color-info-*)
-$info: #06b6d4;            // --color-info-500
+// Framework realization / observation.
+$info: #5879a1;
 
 // ─── Neutral Colors (values match --color-neutral-* / shortcut tokens) ────────
 
-$dark: #1f2937;            // --color-dark (exact match)
-$medium: #737373;          // --color-neutral-500
-$light: #f9fafb;           // --color-light (exact match)
-$border: #e5e7eb;          // --color-border (exact match)
-$border-dark: #d4d4d4;     // --color-neutral-300
+$dark: #17211a;
+$medium: #6d796f;
+$light: #f7f8f3;
+$border: #dfe4dc;
+$border-dark: #c8d0c9;
 
-$gray-100: #f5f5f5;        // --color-neutral-100
-$gray-700: #404040;        // --color-neutral-700
+$gray-100: #eef1eb;
+$gray-700: #39443d;
 
-$text: #404040;            // --color-neutral-700
-$text-primary: #404040;    // --color-neutral-700
-$text-secondary: #737373;  // --color-neutral-500
-$text-tertiary: #a3a3a3;   // --color-neutral-400
-$text-light: #737373;      // --color-neutral-500
+$text: #39443d;
+$text-primary: #17211a;
+$text-secondary: #515d54;
+$text-tertiary: #96a298;
+$text-light: #6d796f;
 
 // ─── Background Colors ───────────────────────────────────────────────────────
 
-$background: #ffffff;           // --color-white
-$bg-white: #ffffff;             // --color-white
-$bg-light: #f9fafb;             // --color-light
-$bg-dark: #171717;              // --color-neutral-900
-$background-secondary: #f9fafb; // --color-light
+$background: #fbfcf8;
+$bg-white: #fbfcf8;
+$bg-light: #f7f8f3;
+$bg-dark: #17211a;
+$background-secondary: #f7f8f3;
 
 // ─── Spacing (matches --space-* tokens) ──────────────────────────────────────
 
@@ -80,15 +79,15 @@ $spacing-3xl: 3rem;      // --space-12
 $radius-sm: 0.125rem;    // --radius-sm
 $radius-md: 0.375rem;    // --radius-md
 $radius-lg: 0.5rem;      // --radius-lg
-$radius-xl: 0.75rem;     // --radius-xl
+$radius-xl: 0.5rem;
 $radius-full: 9999px;    // --radius-full
 
 // ─── Shadows (matches --shadow-* tokens) ─────────────────────────────────────
 
 $shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);                                                    // --shadow-sm
-$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);               // --shadow-md
-$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);             // --shadow-lg
-$shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);            // --shadow-xl
+$shadow-md: 0 1px 2px rgb(23 33 26 / 0.08), 0 8px 24px rgb(23 33 26 / 0.05);
+$shadow-lg: 0 2px 4px rgb(23 33 26 / 0.1), 0 14px 32px rgb(23 33 26 / 0.07);
+$shadow-xl: 0 3px 6px rgb(23 33 26 / 0.12), 0 20px 44px rgb(23 33 26 / 0.08);
 
 // ─── Transitions (matches --transition-* tokens) ─────────────────────────────
 
@@ -98,10 +97,8 @@ $transition-slow: 350ms ease-in-out;    // --transition-slow
 
 // ─── Typography (matches CSS font tokens) ────────────────────────────────────
 
-$font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-  'Helvetica Neue', Arial, sans-serif;
-$font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-  'Liberation Mono', 'Courier New', monospace;
+$font-family: 'IBM Plex Sans', 'Avenir Next', 'Trebuchet MS', sans-serif;
+$font-family-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
 
 $text-xs: 0.75rem;    // --text-xs
 $text-sm: 0.875rem;   // --text-sm
@@ -126,27 +123,6 @@ $z-tooltip: 2000;
 
 // ─── Breakpoints ──────────────────────────────────────────────────────────────
 
-$breakpoint-sm: 640px;
-
-$text-lg: 1.125rem;
-$text-xl: 1.25rem;
-$text-2xl: 1.5rem;
-$text-3xl: 2rem;
-$text-4xl: 2.5rem;
-
-// Font Weights
-$font-normal: 400;
-$font-medium: 500;
-$font-semibold: 600;
-$font-bold: 700;
-
-// Z-index Scale
-$z-base: 1;
-$z-dropdown: 100;
-$z-modal: 1000;
-$z-tooltip: 2000;
-
-// Breakpoints
 $breakpoint-sm: 640px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;

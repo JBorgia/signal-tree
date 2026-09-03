@@ -4,6 +4,13 @@ Angular realization for SignalTree. It uses native Angular `Signal` and
 `WritableSignal` carriers while keeping state, entity, and causal semantics in
 `@signal-tree/kernel`.
 
+## Semantic Guidance
+
+The canonical v15 model and composition guidance ships with this package as
+[llms.txt](llms.txt). It explains the Angular facade rule, `link()`
+relationships, persistence composition, and causal explanations as projections
+rather than retained kernel facts.
+
 ## Install
 
 ```bash

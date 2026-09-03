@@ -106,6 +106,8 @@ or kernel API for any of these before reading it:
 - one-shot loading (`external()`, no `link()` needed for a single fetch) versus
   a persistent relationship with an external authority (`link()`'s three
   composable directions: PULL/PUSH-IN/PUSH-OUT)
+- accepted external truth is distinct from authored application work, so an
+  external write is not automatically a retained causal-history turn
 - a human-readable explanation projected from the causal record (the
   explanation is a PROJECTION of causal truth — the kernel does not store
   prose, actor names, or timestamps merely to make one convenient)

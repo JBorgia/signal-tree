@@ -1,0 +1,293 @@
+:host {
+  --diagram-ink: var(--color-ink);
+  --diagram-muted: #55615a;
+  --diagram-surface: var(--color-surface);
+  --diagram-grid: rgba(23, 33, 26, 0.055);
+  --diagram-line: #526158;
+  --diagram-application: #fff0c7;
+  --diagram-framework: var(--color-framework);
+  --diagram-kernel: #d9f66f;
+  --diagram-authored: var(--color-authored);
+  --diagram-external: var(--color-external);
+  --diagram-restoration: var(--color-restoration);
+  --diagram-identity: var(--color-identity);
+  --diagram-projection: var(--color-projection);
+  --diagram-neutral: #edf0eb;
+  display: block;
+}
+
+.architecture-figure {
+  margin: 0;
+  scroll-margin-top: 6rem;
+}
+
+.figure-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 0.72fr) minmax(20rem, 1.28fr);
+  column-gap: clamp(2rem, 6vw, 7rem);
+  align-items: end;
+  margin-bottom: 1.5rem;
+}
+
+.figure-eyebrow {
+  grid-column: 1 / -1;
+  margin: 0 0 0.65rem;
+  color: var(--color-primary-600);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', 'Avenir Next', sans-serif;
+  font-size: clamp(1.75rem, 3vw, 2.65rem);
+  font-weight: 680;
+  line-height: 1.08;
+}
+
+.figure-takeaway {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  line-height: 1.55;
+}
+
+.diagram-frame {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--diagram-ink) 18%, transparent);
+  background-color: var(--diagram-surface);
+  background-image: linear-gradient(var(--diagram-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--diagram-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.diagram-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--diagram-ink);
+}
+
+.diagram-svg--mobile {
+  display: none;
+}
+
+marker path {
+  fill: var(--diagram-line);
+}
+
+.group-box {
+  fill: color-mix(in srgb, var(--diagram-neutral) 55%, transparent);
+  stroke: color-mix(in srgb, var(--diagram-line) 58%, transparent);
+  stroke-width: 1.5;
+}
+
+.group-box--projection {
+  fill: color-mix(in srgb, var(--diagram-projection) 35%, transparent);
+}
+
+.group-box--dashed {
+  stroke-dasharray: 8 7;
+}
+
+.group-label {
+  fill: var(--diagram-muted);
+  font-family: 'Space Grotesk', 'Avenir Next', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.diagram-edge {
+  fill: none;
+  stroke: var(--diagram-line);
+  stroke-width: 2;
+}
+
+.diagram-edge--dashed {
+  stroke-dasharray: 6 6;
+}
+
+.edge-label-group {
+  pointer-events: none;
+}
+
+.edge-label-plate {
+  fill: var(--diagram-surface);
+  stroke: color-mix(in srgb, var(--diagram-line) 42%, transparent);
+  stroke-width: 1;
+}
+
+.edge-label {
+  fill: var(--diagram-ink);
+  font-family: 'Space Grotesk', 'Avenir Next', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.diagram-node {
+  outline: none;
+}
+
+.diagram-node rect {
+  stroke: color-mix(in srgb, var(--diagram-ink) 42%, transparent);
+  stroke-width: 1.4;
+  transition: stroke-width 180ms ease;
+}
+
+.diagram-node:hover rect {
+  stroke-width: 2.5;
+}
+
+.diagram-node--application rect {
+  fill: var(--diagram-application);
+}
+
+.diagram-node--framework rect {
+  fill: var(--diagram-framework);
+}
+
+.diagram-node--kernel rect {
+  fill: var(--diagram-kernel);
+}
+
+.diagram-node--authored rect {
+  fill: var(--diagram-authored);
+}
+
+.diagram-node--external rect {
+  fill: var(--diagram-external);
+}
+
+.diagram-node--restoration rect {
+  fill: var(--diagram-restoration);
+}
+
+.diagram-node--identity rect {
+  fill: var(--diagram-identity);
+}
+
+.diagram-node--projection rect {
+  fill: var(--diagram-projection);
+}
+
+.diagram-node--neutral rect {
+  fill: var(--diagram-neutral);
+}
+
+.node-title,
+.node-detail {
+  pointer-events: none;
+  fill: var(--diagram-ink);
+}
+
+.node-title {
+  font-family: 'Space Grotesk', 'Avenir Next', sans-serif;
+  font-size: 16px;
+  font-weight: 730;
+}
+
+.node-detail {
+  fill: var(--diagram-muted);
+  font-family: 'IBM Plex Sans', 'Avenir Next', sans-serif;
+  font-size: 12px;
+  font-weight: 520;
+}
+
+.node-detail--code {
+  font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 10.5px;
+}
+
+figcaption {
+  max-width: 68rem;
+  margin: 1.15rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.94rem;
+  line-height: 1.65;
+}
+
+.accuracy-notes {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.accuracy-notes summary {
+  width: fit-content;
+  padding: 0.85rem 0;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 720;
+}
+
+.accuracy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  padding: 0.25rem 0 1rem;
+}
+
+.accuracy-grid h3 {
+  margin: 0 0 0.6rem;
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.accuracy-grid ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.evidence-list code {
+  overflow-wrap: anywhere;
+  color: var(--text-primary);
+  font-size: 0.76rem;
+}
+
+@media (max-width: 720px) {
+  .figure-heading {
+    display: block;
+  }
+
+  .figure-eyebrow {
+    margin-bottom: 0.55rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  .figure-takeaway {
+    margin-top: 0.85rem;
+  }
+
+  .diagram-svg--desktop {
+    display: none;
+  }
+
+  .diagram-svg--mobile {
+    display: block;
+  }
+
+  .accuracy-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .edge-label {
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagram-node rect {
+    transition: none;
+  }
+}

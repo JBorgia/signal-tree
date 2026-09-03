@@ -1,211 +1,107 @@
-<div class="architecture-overview">
-  <div class="hero-section">
-    <h1 class="hero-title">SignalTree: Reactive JSON</h1>
-    <p class="hero-description">
-      <strong>JSON branches, reactive leaves.</strong> No actions. No reducers.
-      No selectors.
-    </p>
-
-    <div class="value-proposition">
-      <h2>🎯 Why Consolidation Matters</h2>
-      <p>
-        <strong>Model state as data, not framework ceremony.</strong>
-        SignalTree ships a single package where entities, batching, DevTools,
-        time travel, and persistence are enhancers you opt into — unused ones
-        tree-shake away.
-      </p>
-      <div class="architecture-benefits">
-        <div class="benefit-card">
-          <h3>📦 Less State Code</h3>
-          <p>
-            Snapshot from one production Angular app's migration off
-            <code>&#64;ngrx/signals</code> (SignalStore): its shipped
-            state-code bundle went ~50KB → ~27KB gzipped, driven mostly by
-            writing ~76% fewer lines of state code. This is the migrated app's
-            state bundle, not the SignalTree library size (core is ~8.5KB
-            gzipped). YMMV.
-          </p>
-        </div>
-        <div class="benefit-card">
-          <h3>🔧 One Package, One Version</h3>
-          <p>
-            SignalTree is a single versioned package: no cross-package peer
-            ranges to reconcile. (Classic NgRx splits @ngrx/store,
-            @ngrx/effects, @ngrx/entity… across separate installs, but that
-            sprawl is not what the measurement above came from.)
-          </p>
-        </div>
-        <div class="benefit-card">
-          <h3>⚡ Optimized Together</h3>
-          <p>
-            All enhancers are designed as a unified system, so SignalTree's
-            batching and lazy evaluation work across every feature without
-            cross-package integration seams.
-          </p>
-        </div>
-      </div>
-      <p class="comparison">
-        <strong>One production-app snapshot (migration off
-        <code>&#64;ngrx/signals</code>):</strong> the app's shipped state-code
-        bundle went ~50KB → ~27KB gzipped.
-        <strong
-          >~46% state-bundle reduction, ~76% less app code.</strong
-        >
-        These are one app's numbers, not the library's — the SignalTree core
-        library is ~8.5KB gzipped.
-      </p>
-      <p class="disclaimer">
-        <em
-          >*Snapshot from one production Angular mobile app's NgRx Signal Store
-          (<code>&#64;ngrx/signals</code>) → SignalTree migration. Both
-          codebases have continued to evolve;
-          re-measuring today yields a 60–70% reduction depending on scope. The
-          directional finding is reproducible — the exact percentages are not.
-          <strong>YMMV</strong> — results depend on app complexity, prior
-          architecture, and how heavily the original code leaned on custom
-          <code>withX</code> helpers. The biggest driver of savings is
-          cross-cutting concerns (devtools, error banners, telemetry) moving
-          from per-store composition to tree-level enhancers.</em
-        >
+<main class="architecture-overview">
+  <header class="architecture-hero">
+    <div class="hero-copy">
+      <p class="hero-eyebrow">Verified architecture · v15</p>
+      <h1>SignalTree v15 architecture</h1>
+      <p class="hero-lede">
+        A framework-neutral causal state kernel with framework-native
+        observation. State authority stays in one place while Angular, React,
+        and plain TypeScript meet it on their own terms.
       </p>
     </div>
-  </div>
 
-  <div class="content-section">
-    <div class="comparison-section">
-      <h2 class="section-title">Separate vs Consolidated Architecture</h2>
-      <div class="comparison-table">
-        <div class="table-header">
-          <div class="aspect-column">Aspect</div>
-          <div class="separate-column">Separate Packages (legacy, pre-v4)</div>
-          <div class="consolidated-column">Consolidated (current)</div>
-          <div class="benefit-column">Key Benefit</div>
-        </div>
-        <div class="table-body">
-          @for (comparison of comparisons; track comparison.aspect) {
-          <div class="comparison-row">
-            <div class="aspect-column">{{ comparison.aspect }}</div>
-            <div class="separate-column">{{ comparison.separate }}</div>
-            <div class="consolidated-column">{{ comparison.consolidated }}</div>
-            <div class="benefit-column">{{ comparison.benefit }}</div>
-          </div>
-          }
-        </div>
-      </div>
+    <nav class="architecture-nav" aria-label="Architecture sections">
+      <a href="#package-ownership">Ownership</a>
+      <a href="#accessor-grammar">State grammar</a>
+      <a href="#causal-authority">Causality</a>
+      <a href="#entity-identity">Identity</a>
+      <a href="#link">Link</a>
+    </nav>
+  </header>
+
+  <section class="architecture-band architecture-band--opening">
+    <div class="content-shell">
+      <app-architecture-diagram [diagram]="boundary" />
     </div>
+  </section>
 
-    <div class="savings-section">
-      <h2 class="section-title">Measurable Benefits</h2>
-      <div class="savings-grid">
-        @for (metric of savingsMetrics; track metric.label) {
-        <div class="savings-card">
-          <div class="metric-value">{{ metric.value }}</div>
-          <div class="metric-label">{{ metric.label }}</div>
-          <div class="metric-description">{{ metric.description }}</div>
-        </div>
+  <section class="architecture-band" aria-labelledby="foundation-heading">
+    <div class="content-shell">
+      <header class="chapter-heading">
+        <p>Foundation</p>
+        <h2 id="foundation-heading">One kernel, native edges</h2>
+        <span>
+          Package ownership and the public state grammar are separate questions:
+          where semantics live, and how each kind of state location behaves.
+        </span>
+      </header>
+
+      <div class="diagram-stack">
+        @for (diagram of foundations; track diagram.id) {
+        <app-architecture-diagram [diagram]="diagram" />
         }
       </div>
     </div>
+  </section>
 
-    <div class="import-section">
-      <h2 class="section-title">Simplified Imports</h2>
-      <div class="import-comparison">
-        <div class="import-example">
-          <h3 class="import-title">Separate Packages (legacy, pre-v4)</h3>
-          <st-code-tabs [files]="importSeparate" />
-        </div>
-        <div class="import-arrow">→</div>
-        <div class="import-example">
-          <h3 class="import-title">Consolidated (current)</h3>
-          <st-code-tabs [files]="importConsolidated" />
-        </div>
+  <section
+    class="architecture-band architecture-band--ink"
+    aria-labelledby="causality-heading"
+  >
+    <div class="content-shell">
+      <header class="chapter-heading chapter-heading--light">
+        <p>Causality</p>
+        <h2 id="causality-heading">Who decided, what can be restored</h2>
+        <span>
+          Authority classification, restoration designation, and transaction
+          settlement answer different questions. The diagrams keep them apart.
+        </span>
+      </header>
+
+      <div class="diagram-stack">
+        @for (diagram of causality; track diagram.id) {
+        <app-architecture-diagram [diagram]="diagram" />
+        }
       </div>
     </div>
+  </section>
 
-    <div class="pillars-section">
-      <h2 class="section-title">The 3-Pillar Pattern</h2>
-      <p class="pillars-intro">
-        The recommended multi-domain architecture follows one rule — and once
-        you know it, the pattern is obvious everywhere:
-      </p>
-      <div class="pillars-grid">
-        <div class="pillar-card pillar-read">
-          <div class="pillar-label">READ</div>
-          <h3 class="pillar-title"><code>config.derived</code></h3>
-          <p class="pillar-desc">
-            All computed state lives on the tree — never inside Ops services or
-            component classes. Components read directly from <code>tree.$</code>.
-          </p>
-          <st-code-tabs [files]="pillarReadCode" />
-        </div>
-        <div class="pillar-card pillar-write">
-          <div class="pillar-label">WRITE</div>
-          <h3 class="pillar-title">Ops services</h3>
-          <p class="pillar-desc">
-            Mutations and async live in thin <code>&#64;Injectable</code> services.
-            No computed properties belong here.
-          </p>
-          <st-code-tabs [files]="pillarWriteCode" />
-        </div>
-        <div class="pillar-card pillar-react">
-          <div class="pillar-label">REACT</div>
-          <h3 class="pillar-title"><code>effect()</code></h3>
-          <p class="pillar-desc">
-            State changes are the events. No actions, no dispatch, no effects
-            registry — just react to state.
-          </p>
-          <st-code-tabs [files]="pillarReactCode" />
-        </div>
+  <section class="architecture-band" aria-labelledby="continuity-heading">
+    <div class="content-shell">
+      <header class="chapter-heading">
+        <p>Continuity</p>
+        <h2 id="continuity-heading">Identity inside, relationships outside</h2>
+        <span>
+          EntityMap preserves logical subjects through structural change. Link
+          connects owned state to external endpoints without absorbing backend
+          policy into the kernel.
+        </span>
+      </header>
+
+      <div class="diagram-stack">
+        @for (diagram of continuity; track diagram.id) {
+        <app-architecture-diagram [diagram]="diagram" />
+        }
       </div>
     </div>
+  </section>
 
-    <div class="features-section">
-      <h2 class="section-title">All Features Included</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🌳</div>
-          <h3 class="feature-title">JSON Branches</h3>
-          <p class="feature-description">
-            Dot-notation paths to your state like a JSON document
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🍃</div>
-          <h3 class="feature-title">Reactive Leaves</h3>
-          <p class="feature-description">
-            Read and write signals at every path in the tree
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">📊</div>
-          <h3 class="feature-title">Entity Management</h3>
-          <p class="feature-description">
-            CRUD operations for entity collections with type safety
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🔧</div>
-          <h3 class="feature-title">Middleware</h3>
-          <p class="feature-description">
-            Extensible hooks for logging, persistence, and more
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">⏰</div>
-          <h3 class="feature-title">Time Travel</h3>
-          <p class="feature-description">
-            Undo/redo functionality with state history
-          </p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🎯</div>
-          <h3 class="feature-title">DevTools</h3>
-          <p class="feature-description">
-            Auto-connected Redux DevTools with path-based actions and
-            restoration support
-          </p>
-        </div>
-      </div>
+  <section
+    class="architecture-band architecture-band--projection"
+    aria-labelledby="projection-heading"
+  >
+    <div class="content-shell">
+      <header class="chapter-heading">
+        <p>Interpretation</p>
+        <h2 id="projection-heading">Truth first, explanation second</h2>
+        <span>
+          This is an architectural boundary, not a shipped explanation API.
+          Product narratives may interpret causal facts; they do not become
+          retained causal authority.
+        </span>
+      </header>
+
+      <app-architecture-diagram [diagram]="projection" />
     </div>
-  </div>
-</div>
+  </section>
+</main>

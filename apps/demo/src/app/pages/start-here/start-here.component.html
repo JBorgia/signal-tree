@@ -1,4 +1,4 @@
-<div class="start-container">
+<div class="start-container layout-frame">
   <header class="page-header">
     <p class="page-eyebrow">Start here · 5 minutes</p>
     <h1 class="page-title">Evaluate SignalTree in five minutes.</h1>
@@ -24,7 +24,8 @@
       <code>.set</code> or <code>.update</code>. Every branch (any non-leaf
       node) is callable too: call it to read the subtree, or call it with the
       complete next value. Use its updater form to derive a changed branch.
-      There are no actions, reducers, selectors, or registration steps.
+      SignalTree adds no action or reducer layer. Angular uses computed signals;
+      React observes through <code>useSignalTree(owner, selector)</code>.
       Path-based access stays type-safe at any depth.
     </p>
     <pre class="code-example"><code>{{ mentalModelCode }}</code></pre>
@@ -56,10 +57,9 @@
       </div>
     </div>
     <p class="section-aside">
-      For a counter the difference is small. For a real app — 50 features,
-      nested entity collections, async loading states — the gap compounds. One
-      measured migration shipped <strong>76% less state code</strong>; see the
-      README for caveats.
+      For a counter the difference is small. Evaluate larger applications by
+      ownership boundaries and day-to-day modeling ergonomics, then use the
+      reproducible workload lab for performance questions.
     </p>
   </section>
 

@@ -41,6 +41,7 @@ interface Row {
   standalone: true,
   imports: [ExampleComponent],
   template: `
+    <div class="layout-frame">
     <st-example
       heading="Granular reactivity — how many derivations re-run?"
       [headingLevel]="1"
@@ -88,6 +89,7 @@ interface Row {
         </p>
       </section>
     </st-example>
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [

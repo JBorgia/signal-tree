@@ -43,10 +43,6 @@ interface Library {
   selected: boolean;
   /** Marks an effectively-unmaintained library so results are read in context. */
   legacy?: boolean;
-  stats?: {
-    bundleSize: string;
-    githubStars: number;
-  };
 }
 
 interface BenchmarkConfig {
@@ -401,83 +397,55 @@ export class BenchmarkOrchestratorComponent
       id: 'signaltree',
       name: 'SignalTree',
       description: 'Granular reactive state with direct mutation',
-      color: '#3b82f6',
+      color: '#527d14',
       selected: true,
-      stats: {
-        bundleSize: '9.2KB', // gzip, with entityMap in use, ngDevMode stripped — tools/measure-bundle-sizes.mjs (14.0.0)
-        githubStars: 2800,
-      },
     },
     {
       id: 'raw-signals',
       name: 'Raw Angular Signals',
       description:
         'Native signal() + computed() with immutable updates — the "just use signals" baseline',
-      color: '#0ea5e9',
+      color: '#5879a1',
       selected: true,
-      stats: {
-        bundleSize: '0.2KB', // gzip — measured baseline
-        githubStars: 0,
-      },
     },
     {
       id: 'ngrx-store',
       name: 'NgRx (reducer-only)',
       description:
         'Redux pattern with immutable updates — measures createReducer() calls directly, not a live Store/dispatch/action-stream round trip (see ngrx-benchmark.service.ts header comment)',
-      color: '#ef4444',
+      color: '#b9473f',
       selected: false,
-      stats: {
-        bundleSize: '5.4KB', // gzip, own code (rxjs external; ~10.6KB if rxjs absent) — measured
-        githubStars: 7900,
-      },
     },
     {
       id: 'ngrx-signals',
       name: 'NgRx SignalStore',
       description: 'Signal-based store with immutable patterns',
-      color: '#10b981',
+      color: '#2f7d4d',
       selected: false,
-      stats: {
-        bundleSize: '1.9KB', // gzip, with withEntities — measured
-        githubStars: 7900,
-      },
     },
     {
       id: 'akita',
       name: 'Akita',
       description:
         'Entity-focused state management (legacy — effectively unmaintained; author moved to Elf)',
-      color: '#f59e0b',
+      color: '#b7800b',
       selected: false,
       legacy: true,
-      stats: {
-        bundleSize: '7.8KB', // gzip — measured
-        githubStars: 3500,
-      },
     },
     {
       id: 'elf',
       name: 'Elf',
       description: 'Modular reactive state',
-      color: '#8b5cf6',
+      color: '#78649a',
       selected: false,
-      stats: {
-        bundleSize: '2.1KB', // gzip, with elf-entities — measured
-        githubStars: 1500,
-      },
     },
     {
       id: 'ngxs',
       name: 'NgXs',
       description:
         'CQRS-inspired state management with actions, reducers, and selectors',
-      color: '#f97316',
+      color: '#ad6541',
       selected: false,
-      stats: {
-        bundleSize: '7.4KB', // gzip — measured
-        githubStars: 3400,
-      },
     },
   ];
 

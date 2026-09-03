@@ -1,223 +1,143 @@
-<div class="home-container">
-  <section class="hero-section">
-    <div class="hero-copy">
-      <div class="hero-eyebrow">Causal application state</div>
-      <div class="hero-logo-container">
-        <img src="/signaltree.svg" alt="SignalTree Logo" class="hero-logo" />
+<div class="home">
+  <section class="home-hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <p class="hero-eyebrow">SignalTree v15</p>
+        <h1>State authority without state ceremony</h1>
+        <p class="hero-lede">
+          A framework-neutral causal state kernel with native Angular and React
+          observation. Keep state, identity, authority, and coherent operations
+          in one model without making a framework adapter another store.
+        </p>
+        <div class="hero-actions">
+          <a routerLink="/start" class="action action-primary">Start building</a>
+          <a routerLink="/architecture-overview" class="action action-secondary">
+            Explore the architecture
+          </a>
+        </div>
       </div>
-      <h1 class="hero-title">
-        Model nested state as data — not reducers, selectors, and ceremony.
-      </h1>
-      <p class="hero-subtitle">
-        SignalTree keeps authored work, external truth, stable identity, and
-        multi-entity operations coherent as state gets deeper and applications
-        get larger.
-      </p>
-      <p class="hero-supporting-copy">
-        Reactive JSON means your state still looks like data. Keep one runtime
-        tree, compose typed slices, and add EntityMap, DevTools, transactions,
-        or restoration when those capabilities earn their place.
-      </p>
 
-      <p class="hero-supporting-copy hero-disambiguation">
-        <strong>SignalTree is not &#64;ngrx/signals.</strong> Different library,
-        different package (<code>&#64;signal-tree/angular</code>) — no
-        <code>withState</code>/<code>withMethods</code> wrappers, no actions, no
-        reducers. Your state literal is the API: read and write any path
-        directly, at any depth.
-      </p>
+      <div class="hero-mark" aria-hidden="true">
+        <img src="/signaltree-mark.png" alt="SignalTree" data-brand-mark />
+      </div>
+    </div>
+  </section>
 
-      <div class="hero-actions">
-        @for (cta of primaryCtas; track cta.label) {
-        <a
-          [routerLink]="cta.route"
-          class="hero-action"
-          [class.hero-action-primary]="cta.variant === 'primary'"
-          [class.hero-action-secondary]="cta.variant === 'secondary'"
-          [class.hero-action-ghost]="cta.variant === 'ghost'"
-        >
-          {{ cta.label }}
-        </a>
+  <section class="authority-band" aria-labelledby="authority-title">
+    <div class="content-shell">
+      <header class="section-heading section-heading-compact">
+        <p>One state authority, three distinct questions</p>
+        <h2 id="authority-title">Know who decided and what observes</h2>
+      </header>
+
+      <div class="authority-grid">
+        <article class="authority-item authority-item-authored">
+          <p class="item-number">01</p>
+          <h3>Authored work</h3>
+          <p>
+            Ordinary application writes belong to the operation that made the
+            decision. Restoration designation is optional and separate.
+          </p>
+        </article>
+        <article class="authority-item authority-item-external">
+          <p class="item-number">02</p>
+          <h3>External truth</h3>
+          <p>
+            <code>external()</code> marks values whose decision belonged to
+            another authority. They remain visible and causally relevant.
+          </p>
+        </article>
+        <article class="authority-item authority-item-framework">
+          <p class="item-number">03</p>
+          <h3>Framework-native observation</h3>
+          <p>
+            Angular and React receive invalidation and reread canonical truth.
+            They realize the kernel; they do not mirror its state.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-section" aria-labelledby="paths-title">
+    <div class="content-shell">
+      <header class="section-heading">
+        <p>Choose an entry point</p>
+        <h2 id="paths-title">Move from model to evidence</h2>
+        <span>
+          Start with the question you need answered. Current guidance stays
+          separate from historical release material.
+        </span>
+      </header>
+
+      <div class="path-grid">
+        @for (path of paths; track path.title) {
+          <article class="path-card">
+            <p class="path-eyebrow">{{ path.eyebrow }}</p>
+            <h3>{{ path.title }}</h3>
+            <p>{{ path.description }}</p>
+            <a [routerLink]="path.route">{{ path.action }} <span aria-hidden="true">→</span></a>
+          </article>
         }
       </div>
+    </div>
+  </section>
 
-      <div class="hero-badges">
-        <span class="badge">Angular signals</span>
-        <span class="badge">Type-safe paths</span>
-        <span class="badge">One runtime tree</span>
-        <span class="badge">Authored vs external truth</span>
+  <section class="home-section home-section-ink" aria-labelledby="grammar-title">
+    <div class="content-shell grammar-layout">
+      <div class="grammar-copy">
+        <p class="section-kicker">The public state grammar</p>
+        <h2 id="grammar-title">Location shape determines access shape</h2>
+        <p>
+          The tree is a controller. Root and branch accessors are callable for
+          reads, whole-value replacements, and updater functions. Reactive
+          leaves read with <code>()</code> and write through
+          <code>.set()</code> or <code>.update()</code>.
+        </p>
+        <a routerLink="/architecture-overview#accessor-grammar">
+          See the complete state grammar <span aria-hidden="true">→</span>
+        </a>
+      </div>
+      <st-code-tabs [files]="stateGrammar" />
+    </div>
+  </section>
+
+  <section class="home-section" aria-labelledby="packages-title">
+    <div class="content-shell">
+      <header class="section-heading">
+        <p>Package ownership</p>
+        <h2 id="packages-title">Use one facade for application code</h2>
+        <span>
+          Framework packages forward kernel APIs and add their native
+          observation boundary. Framework-neutral libraries import the kernel.
+        </span>
+      </header>
+
+      <div class="package-list">
+        @for (entry of packages; track entry.name; let index = $index) {
+          <article class="package-row">
+            <span class="package-index">0{{ index + 1 }}</span>
+            <div>
+              <h3><code>{{ entry.name }}</code></h3>
+              <p class="package-role">{{ entry.role }}</p>
+            </div>
+            <p>{{ entry.detail }}</p>
+            <a routerLink="/docs" [queryParams]="{ package: entry.package }">
+              Read docs <span aria-hidden="true">→</span>
+            </a>
+          </article>
+        }
       </div>
     </div>
   </section>
 
-  <section class="section">
-    <h2 class="section-title">Use SignalTree if you need</h2>
-    <ul class="use-case-list">
-      <li>Coherent operations across several state locations</li>
-      <li>Stable EntityMap identity through structural changes</li>
-      <li>
-        Typed normalized collections with O(1) lookups (<code>entityMap</code>)
-      </li>
-      <li>
-        Angular-owned forms and application-owned persistence alongside one
-        typed state authority
-      </li>
-      <li>State that mirrors your data shape, not Redux ceremony</li>
-      <li>Optional restoration for explicitly reversible operations</li>
-    </ul>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">Start here</h2>
-    <p class="section-intro">
-      The fastest way to evaluate SignalTree is to learn the model, inspect the
-      architecture, read the package docs, and then use benchmarks as proof.
-    </p>
-
-    <div class="card-grid card-grid-2">
-      @for (card of evaluationCards; track card.title) {
-      <article class="link-card">
-        <h3 class="link-card-title">{{ card.title }}</h3>
-        <p class="link-card-description">{{ card.description }}</p>
-        <a [routerLink]="card.route" class="link-card-cta">{{ card.cta }}</a>
-      </article>
-      }
-    </div>
-  </section>
-
-  <section class="section compare-section">
-    <div class="compare-header">
-      <h2 class="section-title">Why this feels simpler</h2>
-      <p class="section-intro">
-        The point is not that SignalTree introduces a new abstraction to learn.
-        The point is that your state continues to look like your data.
-      </p>
-    </div>
-
-    <div class="compare-grid">
-      <article class="compare-card">
-        <h3 class="compare-title">Typical ceremony</h3>
-        <st-code-tabs [files]="beforeCode"></st-code-tabs>
-      </article>
-
-      <article class="compare-card compare-card-highlight">
-        <h3 class="compare-title">SignalTree</h3>
-        <st-code-tabs [files]="afterCode"></st-code-tabs>
-      </article>
-    </div>
-  </section>
-
-  <section class="section quick-start-section">
-    <h2 class="section-title">Quick start</h2>
-    <p class="section-intro">
-      Angular applications start with the Angular realization package. In
-      production, use one owned tree with typed branches for domain slices.
-    </p>
-    <st-code-tabs [files]="quickStartCode"></st-code-tabs>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">What you get</h2>
-    <div class="feature-grid">
-      @for (feature of coreFeatures; track feature.name) {
-      <article
-        class="feature-card"
-        [class.feature-card-highlight]="feature.highlight"
-      >
-        <h3 class="feature-name">{{ feature.name }}</h3>
-        <p class="feature-description">{{ feature.description }}</p>
-      </article>
-      }
-    </div>
-  </section>
-
-  <section class="section fit-section">
-    <h2 class="section-title">Who it’s for</h2>
-    <div class="card-grid card-grid-2">
-      @for (group of fitGuidance; track group.title) {
-      <article class="fit-card">
-        <h3 class="fit-title">{{ group.title }}</h3>
-        <ul class="fit-list">
-          @for (item of group.items; track item) {
-          <li>{{ item }}</li>
-          }
-        </ul>
-      </article>
-      }
-    </div>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">Package entry points</h2>
-    <div class="card-grid card-grid-2">
-      @for (card of packageCards; track card.title) {
-      <article class="link-card">
-        <h3 class="link-card-title">{{ card.title }}</h3>
-        <p class="link-card-description">{{ card.description }}</p>
-        <a
-          [routerLink]="card.route"
-          [queryParams]="card.queryParams || null"
-          class="link-card-cta"
-          >{{ card.cta }}</a
-        >
-      </article>
-      }
-    </div>
-  </section>
-
-  <section class="section extreme-depth-section">
-    <div class="extreme-depth-copy">
-      <h2 class="section-title section-title-light">
-        Deep typing still matters
-      </h2>
-      <p class="section-intro section-intro-light">
-        SignalTree’s model stays readable even when the object graph gets deep.
-        The extreme-depth demo is a proof point, not the primary pitch.
-      </p>
-      <div class="extreme-depth-stats">
-        <div class="stat-card">
-          <span class="stat-value">15+</span>
-          <span class="stat-label">Nested levels</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">0.036ms</span>
-          <span class="stat-label">Example deep-access result</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">0</span>
-          <span class="stat-label">Selectors needed at any depth</span>
-        </div>
+  <section class="closing-band">
+    <div class="content-shell closing-inner">
+      <div>
+        <p>Build from verified semantics</p>
+        <h2>Start with one tree. Add only the capabilities the product needs.</h2>
       </div>
-    </div>
-    <st-code-tabs
-      class="extreme-depth-code"
-      [files]="extremeDepthCode"
-    ></st-code-tabs>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">More to explore</h2>
-    <div class="card-grid card-grid-2">
-      @for (card of advancedRoutes; track card.title) {
-      <article class="link-card">
-        <h3 class="link-card-title">{{ card.title }}</h3>
-        <p class="link-card-description">{{ card.description }}</p>
-        <a [routerLink]="card.route" class="link-card-cta">{{ card.cta }}</a>
-      </article>
-      }
-    </div>
-  </section>
-
-  <section class="section">
-    <h2 class="section-title">Proof and inspection</h2>
-    <div class="card-grid card-grid-2">
-      @for (card of proofCards; track card.title) {
-      <article class="link-card">
-        <h3 class="link-card-title">{{ card.title }}</h3>
-        <p class="link-card-description">{{ card.description }}</p>
-        <a [routerLink]="card.route" class="link-card-cta">{{ card.cta }}</a>
-      </article>
-      }
+      <a routerLink="/start" class="action action-primary">Take the tour</a>
     </div>
   </section>
 </div>

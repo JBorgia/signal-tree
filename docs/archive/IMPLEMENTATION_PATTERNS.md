@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="../apps/demo/public/signaltree.svg" alt="SignalTree Logo" width="80" height="80" style="background: transparent;" />
+  <img src="../../apps/demo/public/signaltree-mark-192.png" alt="SignalTree ST leaf mark" width="80" height="80" />
 </div>
 
 # SignalTree-First Implementation Patterns

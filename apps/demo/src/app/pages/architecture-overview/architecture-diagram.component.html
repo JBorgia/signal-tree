@@ -1,0 +1,335 @@
+<figure
+  class="architecture-figure"
+  [attr.data-architecture-diagram]="diagram().id"
+  [attr.id]="diagram().id"
+>
+  <header class="figure-heading">
+    <p class="figure-eyebrow">{{ diagram().eyebrow }}</p>
+    <h2>{{ diagram().title }}</h2>
+    <p class="figure-takeaway">{{ diagram().takeaway }}</p>
+  </header>
+
+  <div class="diagram-frame">
+    <svg
+      class="diagram-svg diagram-svg--desktop"
+      [attr.viewBox]="diagram().desktopViewBox"
+      role="img"
+      [attr.aria-labelledby]="
+        diagram().id + '-desktop-title ' + diagram().id + '-desktop-description'
+      "
+    >
+      <title [attr.id]="diagram().id + '-desktop-title'">
+        {{ diagram().title }}
+      </title>
+      <desc [attr.id]="diagram().id + '-desktop-description'">
+        {{ diagram().description }}
+      </desc>
+      <defs>
+        <marker
+          [attr.id]="diagram().id + '-desktop-arrow'"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      @for (group of diagram().groups ?? []; track group.id) {
+      <g class="diagram-group">
+        <rect
+          [attr.x]="group.position.desktop.x"
+          [attr.y]="group.position.desktop.y"
+          [attr.width]="group.position.desktop.width"
+          [attr.height]="group.position.desktop.height"
+          rx="0"
+          [attr.class]="
+            'group-box group-box--' +
+            group.tone +
+            (group.dashed ? ' group-box--dashed' : '')
+          "
+        />
+        <text
+          [attr.x]="group.position.desktop.x + 16"
+          [attr.y]="group.position.desktop.y + 22"
+          class="group-label"
+        >
+          {{ group.label }}
+        </text>
+      </g>
+      }
+
+      <g class="diagram-edges">
+        @for (currentEdge of desktop().edges; track currentEdge.id) {
+        <path
+          [attr.d]="currentEdge.path"
+          [attr.class]="
+            'diagram-edge diagram-edge--' +
+            (currentEdge.tone ?? 'neutral') +
+            (currentEdge.dashed ? ' diagram-edge--dashed' : '')
+          "
+          [attr.marker-start]="
+            currentEdge.direction === 'both'
+              ? 'url(#' + diagram().id + '-desktop-arrow)'
+              : null
+          "
+          [attr.marker-end]="
+            currentEdge.direction !== 'none'
+              ? 'url(#' + diagram().id + '-desktop-arrow)'
+              : null
+          "
+        />
+        @if (currentEdge.label) {
+        <g class="edge-label-group">
+          <rect
+            [attr.x]="currentEdge.labelPlateX"
+            [attr.y]="currentEdge.labelPlateY"
+            [attr.width]="currentEdge.labelWidth"
+            [attr.height]="currentEdge.labelHeight"
+            rx="0"
+            class="edge-label-plate"
+          />
+        <text
+          [attr.x]="currentEdge.labelX"
+          [attr.y]="currentEdge.labelY"
+          class="edge-label"
+          text-anchor="middle"
+        >
+          @for (line of currentEdge.labelLines; track $index) {
+          <tspan
+            [attr.x]="currentEdge.labelX"
+            [attr.dy]="$index === 0 ? 0 : currentEdge.labelLineHeight"
+          >
+            {{ line }}
+          </tspan>
+          }
+        </text>
+        </g>
+        } }
+      </g>
+
+      @for (currentNode of desktop().nodes; track currentNode.id) {
+      <g [attr.class]="'diagram-node diagram-node--' + currentNode.tone">
+        <rect
+          [attr.x]="currentNode.x"
+          [attr.y]="currentNode.y"
+          [attr.width]="currentNode.width"
+          [attr.height]="currentNode.height"
+          rx="0"
+        />
+        <text
+          [attr.x]="currentNode.centerX"
+          [attr.y]="currentNode.titleY"
+          class="node-title"
+          text-anchor="middle"
+        >
+          @for (line of currentNode.title; track $index) {
+          <tspan
+            [attr.x]="currentNode.centerX"
+            [attr.dy]="$index === 0 ? 0 : 22"
+          >
+            {{ line }}
+          </tspan>
+          }
+        </text>
+        @if (currentNode.detail?.length) {
+        <text
+          [attr.x]="currentNode.centerX"
+          [attr.y]="currentNode.detailY"
+          [attr.class]="
+            currentNode.code ? 'node-detail node-detail--code' : 'node-detail'
+          "
+          text-anchor="middle"
+        >
+          @for (line of currentNode.detail ?? []; track $index) {
+          <tspan
+            [attr.x]="currentNode.centerX"
+            [attr.dy]="$index === 0 ? 0 : 18"
+          >
+            {{ line }}
+          </tspan>
+          }
+        </text>
+        }
+      </g>
+      }
+    </svg>
+
+    <svg
+      class="diagram-svg diagram-svg--mobile"
+      [attr.viewBox]="diagram().mobileViewBox"
+      role="img"
+      [attr.aria-labelledby]="
+        diagram().id + '-mobile-title ' + diagram().id + '-mobile-description'
+      "
+    >
+      <title [attr.id]="diagram().id + '-mobile-title'">
+        {{ diagram().title }}
+      </title>
+      <desc [attr.id]="diagram().id + '-mobile-description'">
+        {{ diagram().description }}
+      </desc>
+      <defs>
+        <marker
+          [attr.id]="diagram().id + '-mobile-arrow'"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="7"
+          markerHeight="7"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+
+      @for (group of diagram().groups ?? []; track group.id) {
+      <g class="diagram-group">
+        <rect
+          [attr.x]="group.position.mobile.x"
+          [attr.y]="group.position.mobile.y"
+          [attr.width]="group.position.mobile.width"
+          [attr.height]="group.position.mobile.height"
+          rx="0"
+          [attr.class]="
+            'group-box group-box--' +
+            group.tone +
+            (group.dashed ? ' group-box--dashed' : '')
+          "
+        />
+        <text
+          [attr.x]="group.position.mobile.x + 12"
+          [attr.y]="group.position.mobile.y + 18"
+          class="group-label"
+        >
+          {{ group.label }}
+        </text>
+      </g>
+      }
+
+      <g class="diagram-edges">
+        @for (currentEdge of mobile().edges; track currentEdge.id) {
+        <path
+          [attr.d]="currentEdge.path"
+          [attr.class]="
+            'diagram-edge diagram-edge--' +
+            (currentEdge.tone ?? 'neutral') +
+            (currentEdge.dashed ? ' diagram-edge--dashed' : '')
+          "
+          [attr.marker-start]="
+            currentEdge.direction === 'both'
+              ? 'url(#' + diagram().id + '-mobile-arrow)'
+              : null
+          "
+          [attr.marker-end]="
+            currentEdge.direction !== 'none'
+              ? 'url(#' + diagram().id + '-mobile-arrow)'
+              : null
+          "
+        />
+        @if (currentEdge.label) {
+        <g class="edge-label-group">
+          <rect
+            [attr.x]="currentEdge.labelPlateX"
+            [attr.y]="currentEdge.labelPlateY"
+            [attr.width]="currentEdge.labelWidth"
+            [attr.height]="currentEdge.labelHeight"
+            rx="0"
+            class="edge-label-plate"
+          />
+        <text
+          [attr.x]="currentEdge.labelX"
+          [attr.y]="currentEdge.labelY"
+          class="edge-label"
+          text-anchor="middle"
+        >
+          @for (line of currentEdge.labelLines; track $index) {
+          <tspan
+            [attr.x]="currentEdge.labelX"
+            [attr.dy]="$index === 0 ? 0 : currentEdge.labelLineHeight"
+          >
+            {{ line }}
+          </tspan>
+          }
+        </text>
+        </g>
+        } }
+      </g>
+
+      @for (currentNode of mobile().nodes; track currentNode.id) {
+      <g [attr.class]="'diagram-node diagram-node--' + currentNode.tone">
+        <rect
+          [attr.x]="currentNode.x"
+          [attr.y]="currentNode.y"
+          [attr.width]="currentNode.width"
+          [attr.height]="currentNode.height"
+          rx="0"
+        />
+        <text
+          [attr.x]="currentNode.centerX"
+          [attr.y]="currentNode.titleY"
+          class="node-title"
+          text-anchor="middle"
+        >
+          @for (line of currentNode.title; track $index) {
+          <tspan
+            [attr.x]="currentNode.centerX"
+            [attr.dy]="$index === 0 ? 0 : 22"
+          >
+            {{ line }}
+          </tspan>
+          }
+        </text>
+        @if (currentNode.detail?.length) {
+        <text
+          [attr.x]="currentNode.centerX"
+          [attr.y]="currentNode.detailY"
+          [attr.class]="
+            currentNode.code ? 'node-detail node-detail--code' : 'node-detail'
+          "
+          text-anchor="middle"
+        >
+          @for (line of currentNode.detail ?? []; track $index) {
+          <tspan
+            [attr.x]="currentNode.centerX"
+            [attr.dy]="$index === 0 ? 0 : 18"
+          >
+            {{ line }}
+          </tspan>
+          }
+        </text>
+        }
+      </g>
+      }
+    </svg>
+  </div>
+
+  <figcaption>{{ diagram().description }}</figcaption>
+
+  <details class="accuracy-notes">
+    <summary>Semantic accuracy</summary>
+    <div class="accuracy-grid">
+      <div>
+        <h3>Checks</h3>
+        <ul>
+          @for (check of diagram().checks; track check) {
+          <li>{{ check }}</li>
+          }
+        </ul>
+      </div>
+      <div>
+        <h3>Code evidence</h3>
+        <ul class="evidence-list">
+          @for (source of diagram().evidence; track source) {
+          <li>
+            <code>{{ source }}</code>
+          </li>
+          }
+        </ul>
+      </div>
+    </div>
+  </details>
+</figure>

@@ -1,25 +1,27 @@
-import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-import {
-  SIGNALTREE_CORE_VERSION,
-  SIGNALTREE_VERSION_SUMMARY,
-} from '../../version';
+import { SIGNALTREE_VERSION_SUMMARY } from '../../version';
 
-export interface DemoExample {
-  id: string;
-  title: string;
-  description: string;
-  route: string;
-  queryParams?: Record<string, string>;
-  category: 'learn' | 'packages' | 'examples' | 'advanced' | 'benchmarks';
+interface DemoLink {
+  readonly id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly route: string;
+  readonly queryParams?: Readonly<Record<string, string>>;
+  readonly fragment?: string;
 }
 
-export interface ExternalLink {
-  label: string;
-  url: string;
-  icon: string;
-  title: string;
+interface NavigationSection {
+  readonly id: string;
+  readonly label: string;
+  readonly items: readonly DemoLink[];
+}
+
+interface ExternalLink {
+  readonly label: string;
+  readonly url: string;
+  readonly title: string;
 }
 
 @Component({
@@ -27,227 +29,175 @@ export interface ExternalLink {
   standalone: true,
   imports: [RouterModule],
   templateUrl: './navigation.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './navigation.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavigationComponent {
-  readonly coreVersion: string;
-  readonly versionSummary: string;
+  readonly versionSummary = SIGNALTREE_VERSION_SUMMARY;
   readonly mobileMenuOpen = signal(false);
 
-  constructor() {
-    this.coreVersion = SIGNALTREE_CORE_VERSION;
-    this.versionSummary = SIGNALTREE_VERSION_SUMMARY;
-  }
-
-  examples: DemoExample[] = [
+  readonly sections: readonly NavigationSection[] = [
     {
-      id: 'whats-new-14',
-      title: '14.0.0 retrospective',
-      description: 'Historical release page; not current v15 API guidance',
-      route: '/whats-new-14',
-      category: 'learn',
+      id: 'learn',
+      label: 'Learn',
+      items: [
+        {
+          id: 'start',
+          title: 'Start here',
+          description: 'A five-minute tour of the current v15 model',
+          route: '/start',
+        },
+        {
+          id: 'architecture',
+          title: 'Architecture',
+          description: 'Verified ownership, causality, identity, and Link',
+          route: '/architecture-overview',
+        },
+        {
+          id: 'fundamentals',
+          title: 'Fundamentals',
+          description: 'Interactive construction and state grammar',
+          route: '/examples/fundamentals',
+        },
+        {
+          id: 'migration',
+          title: 'Migration',
+          description: 'Move application ownership toward the v15 model',
+          route: '/migrate',
+        },
+      ],
     },
     {
-      id: 'does-it-fit',
-      title: 'Does SignalTree fit?',
-      description:
-        'The trade, measured both ways — where it wins, where it loses, and what each library provides',
-      route: '/does-it-fit',
-      category: 'learn',
+      id: 'core',
+      label: 'Core concepts',
+      items: [
+        {
+          id: 'state-derived',
+          title: 'State & derived',
+          description: 'Shape, $ access, writes, and computed state',
+          route: '/examples/fundamentals',
+          fragment: 'signals-basics',
+        },
+        {
+          id: 'batching',
+          title: 'Coherent operations',
+          description: 'Batching and grouped publication',
+          route: '/batching',
+        },
+        {
+          id: 'entities',
+          title: 'EntityMap',
+          description: 'Keyed identity and queries',
+          route: '/entities',
+        },
+        {
+          id: 'restoration',
+          title: 'Restoration',
+          description: 'Designated undo and redo',
+          route: '/restoration',
+        },
+        {
+          id: 'external',
+          title: 'External truth & Link',
+          description: 'Ingress authority and persistent relationships',
+          route: '/external-truth',
+        },
+      ],
     },
     {
-      id: 'docs',
-      title: 'Documentation',
-      description: 'Browse package docs and READMEs',
-      route: '/docs',
-      category: 'learn',
+      id: 'frameworks',
+      label: 'Frameworks',
+      items: [
+        {
+          id: 'angular',
+          title: 'Angular',
+          description: 'Native signals, DI, and owned construction',
+          route: '/docs',
+          queryParams: { package: 'angular' },
+        },
+        {
+          id: 'react',
+          title: 'React',
+          description: 'Owner-bound external-store observation',
+          route: '/docs',
+          queryParams: { package: 'react' },
+        },
+        {
+          id: 'kernel',
+          title: 'Kernel / Plain TypeScript',
+          description: 'Framework-neutral state and causal semantics',
+          route: '/docs',
+          queryParams: { package: 'kernel' },
+        },
+      ],
     },
     {
-      id: 'fundamentals',
-      title: 'Fundamentals',
-      description: 'Interactive core examples and mental model',
-      route: '/examples/fundamentals',
-      category: 'learn',
+      id: 'advanced',
+      label: 'Advanced',
+      items: [
+        {
+          id: 'devtools',
+          title: 'DevTools',
+          description: 'State inspection integration',
+          route: '/devtools',
+        },
+        {
+          id: 'depth',
+          title: 'Type system',
+          description: 'Compiled 15-branch proof',
+          route: '/deep-typing',
+        },
+        {
+          id: 'adapter-sdk',
+          title: 'Adapter SDK',
+          description: 'Kernel authority and framework realization',
+          route: '/architecture-overview',
+          fragment: 'foundation-heading',
+        },
+      ],
     },
     {
-      id: 'recommended-architecture',
-      title: 'Recommended Architecture',
-      description: 'One runtime tree, typed slices, root-level enhancers',
-      route: '/examples/fundamentals/recommended-architecture',
-      category: 'learn',
-    },
-    {
-      id: 'migration-recipe',
-      title: 'Migration Recipe',
-      description: 'Practical path from more ceremonial state patterns',
-      route: '/examples/fundamentals/migration-recipe',
-      category: 'learn',
-    },
-    {
-      id: 'angular-package',
-      title: 'Angular Package',
-      description: 'Angular-native construction, DI, and lifecycle',
-      route: '/docs',
-      queryParams: { package: 'angular' },
-      category: 'packages',
-    },
-    {
-      id: 'kernel-package',
-      title: 'Kernel Package',
-      description: 'Framework-neutral state and causal semantics',
-      route: '/docs',
-      queryParams: { package: 'kernel' },
-      category: 'packages',
-    },
-    {
-      id: 'react-package',
-      title: 'React Package',
-      description: 'Owner-bound React observation',
-      route: '/docs',
-      queryParams: { package: 'react' },
-      category: 'packages',
-    },
-    {
-      id: 'batching',
-      title: 'Batching',
-      description: 'Batch multiple updates without losing clarity',
-      route: '/batching',
-      category: 'examples',
-    },
-    {
-      id: 'entities',
-      title: 'Entities',
-      description: 'CRUD ergonomics for collection-heavy state',
-      route: '/entities',
-      category: 'examples',
-    },
-    {
-      id: 'serialization',
-      title: 'Application-Owned Serialization',
-      description: 'Why v15 leaves payloads and hydration to applications',
-      route: '/serialization',
-      category: 'examples',
-    },
-    {
-      id: 'restoration',
-      title: 'Restoration',
-      description: 'Designated undo/redo and retained history',
-      route: '/restoration',
-      category: 'examples',
-    },
-    {
-      id: 'async-markers',
-      title: 'Async state (RxJS + external)',
-      description:
-        'Application-owned requests with external-truth writes',
-      route: '/async',
-      category: 'examples',
-    },
-    {
-      id: 'marker-zoo',
-      title: 'Marker zoo (surviving markers)',
-      description:
-        'EntityMap and current marker behavior at nested paths',
-      route: '/marker-zoo',
-      category: 'examples',
-    },
-    {
-      id: 'entity-collection',
-      title: 'EntityMap collections',
-      description:
-        'Normalized local identity with application-owned loading',
-      route: '/entity-collection',
-      category: 'examples',
-    },
-    {
-      id: 'benchmark',
-      title: 'AI-codegen benchmark scorecard',
-      description:
-        '720-cell measured result — SignalTree 49% cold → 98% primed (+49pp). Per-library, per-agent breakdowns.',
-      route: '/benchmark',
-      category: 'learn',
-    },
-    {
-      id: 'devtools',
-      title: 'DevTools',
-      description: 'Redux DevTools integration',
-      route: '/devtools',
-      category: 'examples',
-    },
-    {
-      id: 'markers',
-      title: 'Markers',
-      description: 'Understand the marker model and built-in primitives',
-      route: '/markers',
-      category: 'advanced',
-    },
-    {
-      id: 'extreme-depth',
-      title: 'Extreme Depth',
-      description: 'Test recursive typing at 15+ levels',
-      route: '/extreme-depth',
-      category: 'advanced',
-    },
-    {
-      id: 'benchmarks',
-      title: 'Library Comparison',
-      description: 'Compare SignalTree with other Angular state approaches',
-      route: '/benchmarks',
-      category: 'benchmarks',
-    },
-    {
-      id: 'benchmark-history',
-      title: 'Benchmark History',
-      description: 'View historical results across machines',
-      route: '/realistic-benchmark-history',
-      category: 'benchmarks',
+      id: 'archive',
+      label: 'Archive',
+      items: [
+        {
+          id: 'legacy-changelog',
+          title: 'Pre-v15 releases',
+          description: 'Historical APIs and release notes',
+          route: '/legacy-changelog',
+        },
+        {
+          id: 'benchmark-history',
+          title: 'Benchmark history',
+          description: 'Archived harness submissions',
+          route: '/realistic-benchmark-history',
+        },
+      ],
     },
   ];
 
-  categories: DemoExample['category'][] = [
-    'learn',
-    'packages',
-    'examples',
-    'advanced',
-    'benchmarks',
-  ];
-
-  externalLinks: ExternalLink[] = [
+  readonly externalLinks: readonly ExternalLink[] = [
     {
       label: 'GitHub',
       url: 'https://github.com/JBorgia/signal-tree',
-      icon: '🔗',
       title: 'View source code on GitHub',
     },
     {
       label: 'npm',
       url: 'https://www.npmjs.com/org/signaltree',
-      icon: '📦',
       title: 'View packages on npm',
     },
   ];
-
-  getExamplesByCategory(category: DemoExample['category']): DemoExample[] {
-    return this.examples.filter((example) => example.category === category);
-  }
 
   toggleMobileMenu(): void {
     this.mobileMenuOpen.update((isOpen) => !isOpen);
   }
 
-  closeMobileMenu(): void {
-    this.mobileMenuOpen.set(false);
+  openMobileMenu(): void {
+    this.mobileMenuOpen.set(true);
   }
 
-  getCategoryLabel(category: DemoExample['category']): string {
-    const labels: Record<DemoExample['category'], string> = {
-      learn: '🚀 Learn',
-      packages: '📦 Reference',
-      examples: '🧪 Examples',
-      advanced: '🔧 Advanced',
-      benchmarks: '📊 Benchmarks',
-    };
-    return labels[category];
+  closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
   }
 }

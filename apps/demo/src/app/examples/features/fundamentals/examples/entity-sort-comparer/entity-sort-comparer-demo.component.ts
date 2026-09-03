@@ -28,6 +28,7 @@ interface LeaderboardState {
   standalone: true,
   imports: [ExampleComponent],
   template: `
+    <div class="layout-frame">
     <st-example
       heading="Auto-sorted collection — sortComparer"
       [headingLevel]="1"
@@ -61,6 +62,7 @@ interface LeaderboardState {
         </p>
       </div>
     </st-example>
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
@@ -74,8 +76,12 @@ interface LeaderboardState {
       }
       .controls {
         display: flex;
+        flex-wrap: wrap;
         gap: 0.5rem;
         margin: 0.75rem 0;
+      }
+      .controls button {
+        flex: 1 1 7rem;
       }
       .board {
         list-style: none;

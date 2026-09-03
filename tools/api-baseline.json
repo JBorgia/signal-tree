@@ -113,6 +113,24 @@
         "internalDecl": false
       },
       {
+        "name": "DevToolsConfig",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsDebugSession",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "DevToolsLogEntry",
         "subpath": ".",
         "kind": "runtime",
@@ -141,6 +159,24 @@
       },
       {
         "name": "EnhancerCleanup",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EnhancerWithMeta",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityConfig",
         "subpath": ".",
         "kind": "runtime",
         "declFile": "(unresolved)",
@@ -257,6 +293,15 @@
         "internalDecl": false
       },
       {
+        "name": "MutationOptions",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "NodeAccessor",
         "subpath": ".",
         "kind": "runtime",
@@ -267,6 +312,15 @@
       },
       {
         "name": "onTreeError",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "PendingTransaction",
         "subpath": ".",
         "kind": "runtime",
         "declFile": "(unresolved)",
@@ -294,6 +348,15 @@
       },
       {
         "name": "restoration",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "RestorationConfig",
         "subpath": ".",
         "kind": "runtime",
         "declFile": "(unresolved)",
@@ -366,6 +429,15 @@
       },
       {
         "name": "transactions",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeCapability",
         "subpath": ".",
         "kind": "runtime",
         "declFile": "(unresolved)",
@@ -1100,10 +1172,460 @@
     ],
     "symbols": [
       {
+        "name": "AccessibleNode",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "AddManyOptions",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "AddOptions",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "asReadonly",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "batching",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "BatchingConfig",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "BatchingMethods",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ComputedSliceConfig",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DefaultKey",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "devTools",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsConfig",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsDebugSession",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsLogEntry",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "DevToolsMethods",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "Enhancer",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EnhancerCleanup",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EnhancerWithMeta",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityConfig",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "entityMap",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityMapBuilder",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityMapComputedSlices",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityMapMarker",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntityMapMarkerWithSlices",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntitySignal",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "EntitySignalWithSlices",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "external",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "link",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "Link",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "LinkEndpoint",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "MutationOptions",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "NodeAccessor",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "onTreeError",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "PendingTransaction",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "Primitive",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "ReadonlyStore",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "restoration",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "RestorationHistoryEntry",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "RestorationMethods",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "signalTree",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "SignalTree",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "SignalTreeRollbackError",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TransactionMethods",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "transactions",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeCapability",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeConfig",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeErrorEvent",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeId",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "TreeNode",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "undoable",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "useSignalTree",
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/react/src/use-signal-tree.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "WritableLeaf",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "(unresolved)",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false

@@ -3,6 +3,13 @@
 React observation for SignalTree. It connects React's external-store lifecycle
 to canonical SignalTree reads without copying state into React.
 
+## Semantic Guidance
+
+The canonical v15 model and composition guidance ships with this package as
+[llms.txt](llms.txt). It explains the React facade rule, `link()`
+relationships, persistence composition, and causal explanations as projections
+rather than retained kernel facts.
+
 ## Install
 
 ```bash

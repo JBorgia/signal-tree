@@ -1,11 +1,9 @@
 import { AsyncDemoComponent } from '../../features/fundamentals/examples/async/async-demo.component';
 import { BatchingDemoComponent } from '../../features/fundamentals/examples/enhancers/batching-demo/batching-demo.component';
 import { DevtoolsDemoComponent } from '../../features/fundamentals/examples/enhancers/devtools-demo/devtools-demo.component';
-import { SerializationDemoComponent } from '../../features/fundamentals/examples/enhancers/serialization-demo/serialization-demo.component';
 import { EntitiesDemoComponent } from '../../features/fundamentals/examples/entities/entities-demo.component';
 import { EntitySortComparerDemoComponent } from '../../features/fundamentals/examples/entity-sort-comparer/entity-sort-comparer-demo.component';
 import { GranularReactivityDemoComponent } from '../../features/fundamentals/examples/granular-reactivity/granular-reactivity-demo.component';
-import { LinkedDerivedDemoComponent } from '../../features/fundamentals/examples/linked-derived/linked-derived-demo.component';
 import { FormsDemoComponent } from '../../features/fundamentals/examples/forms/forms-demo.component';
 import { RecommendedArchitectureComponent } from '../../features/fundamentals/examples/recommended-architecture/recommended-architecture.component';
 import { SignalsExamplesComponent } from '../../features/fundamentals/examples/signals/signals-examples.component';
@@ -48,7 +46,7 @@ export const entitiesExampleMeta: ExampleMeta = {
   category: 'Entities',
   focusAreas: ['entities', 'crud', 'collections'],
   functionalUse: ['data-management', 'pagination', 'sorting'],
-  enhancers: ['entities'],
+  enhancers: [],
   route: '/entities',
   component: EntitiesDemoComponent,
   difficulty: 'intermediate',
@@ -63,7 +61,7 @@ export const entitySortComparerExampleMeta: ExampleMeta = {
   category: 'Entities',
   focusAreas: ['entities', 'collections'],
   functionalUse: ['data-management', 'sorting'],
-  enhancers: ['entities'],
+  enhancers: [],
   route: '/entity-sort-comparer',
   component: EntitySortComparerDemoComponent,
   difficulty: 'beginner',
@@ -78,26 +76,11 @@ export const granularReactivityExampleMeta: ExampleMeta = {
   category: 'Performance',
   focusAreas: ['reactivity', 'performance'],
   functionalUse: ['performance', 'change-detection'],
-  enhancers: ['entities'],
+  enhancers: [],
   route: '/granular-reactivity',
   component: GranularReactivityDemoComponent,
   difficulty: 'beginner',
   tags: ['reactivity', 'fan-out', 'OnPush', 'performance', 'entities'],
-};
-
-export const linkedDerivedExampleMeta: ExampleMeta = {
-  id: 'linked-derived',
-  title: 'Derived-but-writable (linked)',
-  description:
-    "Sticky selection: a value derived from a source that is also writable and re-derives on change. SignalTree's `linked()` wrapper is deleted — call Angular's `linkedSignal()` inside the configured derived factory.",
-  category: 'Fundamentals',
-  focusAreas: ['derived', 'reactivity'],
-  functionalUse: ['derived-state', 'selection'],
-  enhancers: [],
-  route: '/linked-derived',
-  component: LinkedDerivedDemoComponent,
-  difficulty: 'intermediate',
-  tags: ['linked', 'derived', 'writable', 'linkedSignal', 'withLinkedState'],
 };
 
 /**
@@ -105,17 +88,17 @@ export const linkedDerivedExampleMeta: ExampleMeta = {
  */
 export const batchingExampleMeta: ExampleMeta = {
   id: 'batching-updates',
-  title: 'Batching Updates',
+  title: 'Coherent Publication',
   description:
-    'Learn how to batch multiple state updates for optimal performance.',
-  category: 'Performance',
-  focusAreas: ['batching', 'performance', 'optimization'],
-  functionalUse: ['bulk-updates', 'performance'],
+    'Compare three synchronous writes across separate and grouped publication boundaries.',
+  category: 'Operations',
+  focusAreas: ['batching', 'publication', 'coherence'],
+  functionalUse: ['multi-location-writes', 'framework-observation'],
   enhancers: ['batching'],
   route: '/batching',
   component: BatchingDemoComponent,
   difficulty: 'intermediate',
-  tags: ['batching', 'performance', 'optimization', 'bulk-updates'],
+  tags: ['batching', 'publication', 'coherence', 'operations'],
 };
 
 /**
@@ -143,21 +126,6 @@ export const devtoolsExampleMeta: ExampleMeta = {
 /**
  * Serialization Examples
  */
-export const serializationExampleMeta: ExampleMeta = {
-  id: 'serialization',
-  title: 'Application-Owned Serialization',
-  description:
-    'Why v15 removed the serialization enhancer and where applications now own payload formats, migrations, and hydration.',
-  category: 'Data Management',
-  focusAreas: ['serialization', 'json', 'type-preservation'],
-  functionalUse: ['state-export', 'state-import', 'data-transfer'],
-  enhancers: [],
-  route: '/serialization',
-  component: SerializationDemoComponent,
-  difficulty: 'intermediate',
-  tags: ['serialization', 'json', 'type-preservation', 'export', 'import'],
-};
-
 /**
  * Memoization Examples (removed in 9.0.1 — use Angular `computed()` directly)
  */
@@ -213,17 +181,17 @@ export const formsExampleMeta: ExampleMeta = {
  */
 export const asyncExampleMeta: ExampleMeta = {
   id: 'async-operations',
-  title: 'Async Operations',
+  title: 'External Truth & Link',
   description:
-    'Handle async data loading, debounced search, and optimistic updates.',
-  category: 'API',
-  focusAreas: ['async', 'loading-states', 'error-handling'],
-  functionalUse: ['data-fetching', 'search', 'optimistic-updates'],
+    'Separate one-shot external ingress, ongoing Link relationships, and application-owned request policy.',
+  category: 'Authority',
+  focusAreas: ['external', 'link', 'orchestration'],
+  functionalUse: ['data-ingress', 'synchronization', 'data-fetching'],
   enhancers: [],
-  route: FUNDAMENTALS_ROUTE,
+  route: '/external-truth',
   component: AsyncDemoComponent,
   difficulty: 'intermediate',
-  tags: ['async', 'loading', 'debounce', 'search', 'errors'],
+  tags: ['external', 'link', 'authority', 'synchronization'],
 };
 
 /**
@@ -237,7 +205,7 @@ export const recommendedArchitectureExampleMeta: ExampleMeta = {
   category: 'Architecture',
   focusAreas: ['architecture', 'global-tree', 'facades', 'api-separation'],
   functionalUse: ['state-management', 'orchestration', 'data-flow'],
-  enhancers: ['entities', 'batching'],
+  enhancers: [],
   route: RECOMMENDED_ARCHITECTURE_ROUTE,
   component: RecommendedArchitectureComponent,
   difficulty: 'advanced',
@@ -272,10 +240,8 @@ export const EXAMPLES_REGISTRY: ExampleMeta[] = [
   entitiesExampleMeta,
   entitySortComparerExampleMeta,
   granularReactivityExampleMeta,
-  linkedDerivedExampleMeta,
   batchingExampleMeta,
   devtoolsExampleMeta,
-  serializationExampleMeta,
   restorationExampleMeta,
   formsExampleMeta,
   asyncExampleMeta,
