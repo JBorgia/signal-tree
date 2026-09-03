@@ -1,4 +1,4 @@
-## Unreleased
+## 15.0.0 (2026-09-03)
 
 - **Restoration history is state-only.** `RestorationHistoryEntry` no longer
   exposes `timestamp`, `action`, or arbitrary `payload`, and restoration no
