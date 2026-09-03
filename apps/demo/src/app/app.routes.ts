@@ -241,7 +241,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Deep typing',
       description:
-        'A compile-backed exact writable leaf and runtime update through one declared 15-branch state path.',
+        'Generate and runtime-test a selected depth from the strict compile-backed exact-leaf catalog.',
     },
   },
   {

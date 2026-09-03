@@ -17,7 +17,7 @@ while the packages shipped 13.x. Don't reintroduce it; link the changelog instea
 - Causal transitions distinguish authored operations from external truth
 - Coherent multi-location commits with stable entity identity and explicit authority
 - Recursive typing with deep nesting and accurate type inference
-- Compile-backed exact leaf typing through the declared 15-branch demo model
+- Generated exact-leaf inference proofs for every selectable demo depth from 1 through 40
 - Memory efficiency via proportional causal history and explicit ownership lifetimes
 - Three focused packages with strong TypeScript support
 - Extensible via the declared `enhancers` set

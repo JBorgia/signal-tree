@@ -150,7 +150,7 @@ export class NavigationComponent {
         {
           id: 'depth',
           title: 'Type system',
-          description: 'Compiled 15-branch proof',
+          description: 'Adjustable compile-backed depth proof',
           route: '/deep-typing',
         },
         {

@@ -9,7 +9,7 @@
     "build": {
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
-      "dependsOn": ["generate-versions"],
+      "dependsOn": ["generate-versions", "generate-deep-typing-proofs"],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/demo",
@@ -105,6 +105,7 @@
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "dependsOn": ["generate-deep-typing-proofs"],
       "options": {
         "jestConfig": "apps/demo/jest.config.ts",
         "passWithNoTests": true,
@@ -115,6 +116,13 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "node tools/generate-version-env.cjs"
+      }
+    },
+    "generate-deep-typing-proofs": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node tools/generate-deep-typing-proofs.mjs"
       }
     },
     "serve-static": {
