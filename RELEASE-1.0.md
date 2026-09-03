@@ -12742,13 +12742,16 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       green; release matrix 69/69 green; registered gate mutation/self-test
       matrix 60/60 green with zero unproven, blind, or errored proofs. Known
       technical GA blockers: none.
-- [ ] **`AI-SEMANTIC-DISCOVERABILITY-0`.** Close the shipped semantic teaching
-      surface from one canonical source reachable through every primary package
-      surface: README/package/facade guidance, composition and `link()` patterns,
-      causal explanation as projection, and packed-document/documented-import
-      proof. Do not independently maintain three `llms.txt` documents. Demo and
-      TruckTrax are controls for teachability and real Angular composition;
-      neither may define kernel semantics.
+- [x] **`AI-SEMANTIC-DISCOVERABILITY-0`.** The root `llms.txt` is the one
+  canonical v15 teaching source, copied deterministically into kernel,
+  Angular, and React tarballs; their package READMEs link the co-packed
+  manifest. The manifest and permanent mutation-proven gate pin positioning,
+  facade imports, `link()`/persistence composition, external authority, and
+  causal explanation as projection. Root v10 guidance is historical only.
+  Packed artifacts, documentation/import/symbol checks, strict `bundler` and
+  `node16` consumers, demo test/build, and V3's 79-project gate are green.
+  Independent phase-boundary review found no blocker; the exact final
+  release matrix passed 73/73 with zero known-red.
 - [x] **`CAUSAL-REPRESENTATION-0` (`8aa9591d`).** The fact inventory, mutation-
       proven baseline, one-owner attribution controls, bounded carrier tests,
       and auxiliary-retention audit preserve all frozen causal laws and select

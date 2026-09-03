@@ -43,9 +43,13 @@ try {
     {
       label: 'persistent-relationship.ts',
       language: 'typescript',
-      source: `import { link, signalTree } from '@signal-tree/angular';
+      source: `import { link, onTreeError, signalTree } from '@signal-tree/angular';
 
 const store = signalTree({ preferences: { density: 'compact' } });
+
+const stopReporting = onTreeError(({ error, operation, treeId, path }) => {
+  errorReporter.capture(error, { operation, treeId, path });
+});
 
 const connection = link(store.$.preferences, {
   get: () => preferencesApi.load(),
@@ -56,7 +60,8 @@ const connection = link(store.$.preferences, {
 await connection.retrieve(); // endpoint -> state, on demand
 store.$.preferences.density.set('comfortable'); // state -> endpoint
 await connection.settled();  // outbound writes acknowledged
-connection.dispose();        // release the relationship`,
+connection.dispose();        // release the relationship
+stopReporting();             // release diagnostic reporting`,
     },
   ];
 

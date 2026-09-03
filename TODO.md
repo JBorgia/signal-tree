@@ -2371,7 +2371,7 @@ remains immutable evidence; neither row may add public API, causal facts,
 compatibility layers, framework abstractions, speculative agent metadata, or
 Studio/Relay concepts to the kernel.
 
-### `AI-SEMANTIC-DISCOVERABILITY-0`
+### `AI-SEMANTIC-DISCOVERABILITY-0` — CLOSED
 
 Close the shipped teaching surface before first GA from one canonical source
 reachable through every primary package surface. It may be deterministically
@@ -2404,6 +2404,17 @@ SignalTree is primarily undo/history; `link()` is a generic internal linking
 engine; persistence was removed entirely; every causal turn stores actor,
 timestamp, or prose; all external writes are history; or framework applications
 should mix kernel and adapter imports.
+
+**Final disposition (Phase 7).** The root `llms.txt` is the sole canonical
+semantic manifest and is deterministically copied into all three primary
+tarballs. Each package README links its co-packed artifact. The permanent
+`semantic-discoverability` gate and its self-test enforce canonical positioning,
+facade imports, `link()`/persistence composition, external authority, causal
+projection, package reachability, and the absence of stale v10-current guidance
+contradictions. Packed-document/import/symbol checks, strict `bundler` and
+`node16` consumers, demo test/build, V3's 79-project gate, and the exact
+73/73 release matrix are green. Independent phase-boundary review found no
+blocker. `AI-SEMANTIC-DISCOVERABILITY-0` is closed; Phase 7 is complete.
 
 ### `CAUSAL-REPRESENTATION-0`
 
