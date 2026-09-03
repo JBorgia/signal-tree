@@ -3,20 +3,10 @@
  * Measure what each enhancer actually ADDS to a production bundle, so the
  * per-enhancer numbers in the README are derived rather than remembered.
  *
- * Three of the four figures in `packages/kernel/README.md` were wrong when this
- * was written, and the errors ran in both directions:
- *
- *     enhancer         claimed    measured (prod main bundle)
- *     batching         +1.27 KB   +0.98 KB
- *     devTools         +2.49 KB   +0.10 KB  (impl is LAZY — 8.25 KB chunk)
- *     restoration       +1.75 KB   +1.68 KB  ✓
- *     serialization    +0.84 KB   +1.85 KB  ← understated by 2.2x
- *
- * `serialization` is the one that matters: understating a cost is the direction
- * that misleads someone making a budget decision. `devTools` was wrong the other
- * way — the figure appears to be the implementation's own size, which is real
- * but is NOT what a consumer's main bundle pays, because the implementation is
- * behind a dynamic import.
+ * Historical figures ran in both directions: devTools was overstated by
+ * charging its lazy implementation to the main bundle, while restoration was
+ * understated by applying the enhancer without designating a real turn. Every
+ * current arm is exercised through its public runtime path.
  *
  * Everything here is measured with `ngDevMode: false` — the production build,
  * which is what a consumer ships. The same code measured in dev mode is ~1.8 KB
@@ -80,8 +70,12 @@ const BASE = `
  */
 const ENHANCERS = [
   { name: 'batching', imports: 'batching', apply: 'batching()', use: 't.batch(() => t.$.count.set(2));' },
-  { name: 'restoration', imports: 'restoration', apply: 'restoration()', use: 't.undo(); t.redo();' },
-  { name: 'serialization', imports: 'serialization', apply: 'serialization()', use: 'globalThis.__s = t.serialize();' },
+  {
+    name: 'restoration',
+    imports: 'restoration, undoable',
+    apply: 'restoration()',
+    use: 'undoable(() => t.$.count.set(2)); t.undo(); t.redo();',
+  },
   { name: 'devTools', imports: 'devTools', apply: 'devTools()', use: 't.connectDevTools();' },
 ];
 

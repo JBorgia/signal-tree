@@ -629,6 +629,31 @@ const GATES = [
     },
   },
   {
+    name: 'restoration-hot-path',
+    releaseOnly: true,
+    covers:
+      'root, scoped-manager, and direct retained-effect restoration arms run and satisfy exact value, identity, frontier, history, and redo postconditions',
+    cmd: [
+      'node',
+      'tools/bench-restoration-hot-path.mjs',
+      '--production',
+      '--samples',
+      '3',
+      '--warmups',
+      '1',
+      '--json',
+    ],
+    needsBuild: true,
+    // Corrupt the expected value after every undo. A timing harness that does
+    // not reject this mutation is not proving that restoration happened.
+    mutation: {
+      file: 'tools/bench-restoration-hot-path.mjs',
+      find: 'const expectedValueAfterUndo = (index) => TURN_COUNT - index - 1;',
+      replace:
+        'const expectedValueAfterUndo = (index) => TURN_COUNT - index + 1;',
+    },
+  },
+  {
     name: 'history-ownership-bench',
     releaseOnly: true,
     covers:

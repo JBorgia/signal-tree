@@ -12,7 +12,12 @@ import {
 import { signalTree } from '../../lib/signal-tree';
 import { SignalTreeRollbackError } from '../../lib/types';
 import { transactions } from '../transactions/transactions';
-import { enableRestoration, restoration, withRestoration } from './restoration';
+import {
+  enableRestoration,
+  restoration,
+  shouldRunRestorationConsistencyChecks,
+  withRestoration,
+} from './restoration';
 
 type ScopedAuthorityNode = {
   __positionIds?: number[];
@@ -63,6 +68,51 @@ describe('restoration enhancer', () => {
     expect(typeof restoration()).toBe('function');
     expect(typeof withRestoration).toBe('function');
     expect(typeof enableRestoration).toBe('function');
+  });
+
+  it.each([
+    { devMode: true, nodeEnvironment: 'production', expected: true },
+    { devMode: false, nodeEnvironment: 'development', expected: false },
+    { devMode: undefined, nodeEnvironment: 'production', expected: false },
+    { devMode: undefined, nodeEnvironment: 'development', expected: true },
+    { devMode: undefined, nodeEnvironment: 'test', expected: true },
+    { devMode: undefined, nodeEnvironment: undefined, expected: false },
+  ])(
+    'classifies consistency checks for devMode=$devMode and NODE_ENV=$nodeEnvironment',
+    ({ devMode, nodeEnvironment, expected }) => {
+      expect(
+        shouldRunRestorationConsistencyChecks(devMode, nodeEnvironment)
+      ).toBe(expected);
+    }
+  );
+
+  it('runs full turn consistency checks in the test environment', async () => {
+    const tree = signalTree(
+      { value: 0 },
+      { enhancers: [restoration({ maxHistorySize: 2 })] }
+    );
+
+    try {
+      undoable(() => tree.$.value.set(1));
+      await Promise.resolve();
+      const manager = (
+        tree as unknown as {
+          __restoration: { assertTurnStatusConsistency(): void };
+        }
+      ).__restoration;
+      const consistencyCheck = vi.spyOn(
+        manager,
+        'assertTurnStatusConsistency'
+      );
+
+      tree.undo();
+      expect(tree.$.value()).toBe(0);
+      tree.redo();
+      expect(tree.$.value()).toBe(1);
+      expect(consistencyCheck).toHaveBeenCalledTimes(2);
+    } finally {
+      tree.destroy();
+    }
   });
 
   it('records a single restoration history entry per PathNotifier flush when batching is enabled', async () => {
