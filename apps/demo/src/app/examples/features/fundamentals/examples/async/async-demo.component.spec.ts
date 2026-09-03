@@ -23,6 +23,9 @@ describe('AsyncDemoComponent', () => {
     expect(host.textContent).toContain('retrieve()');
     expect(host.textContent).toContain('settled()');
     expect(host.textContent).toContain('dispose()');
+    expect(host.textContent).toContain('onTreeError');
+    expect(host.textContent).toContain('operation, treeId, path');
+    expect(host.textContent).toContain('stopReporting()');
     expect(host.textContent).toContain('switchMap');
     expect(host.textContent).toContain('application concerns');
     expect(host.textContent).not.toContain('loader()');
