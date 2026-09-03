@@ -8,6 +8,7 @@
   "exclude": [
     "vitest.config.ts",
     "src/test-setup.ts",
+    "src/**/*.typecheck.ts",
     "src/**/*.test.ts",
     "src/**/*.spec.ts"
   ],

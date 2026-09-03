@@ -116,20 +116,53 @@ test('/batching: grouped writes publish once without intermediate observations',
 
   await page.getByRole('button', { name: 'Run unbatched' }).click();
   await expect(page.locator('.timeline-entry')).toHaveCount(3);
-  await expect(page.locator('.run-metrics > div').nth(1).locator('dd')).toHaveText(
-    '3'
-  );
-  await expect(page.locator('.run-metrics > div').nth(2).locator('dd')).toHaveText(
-    '2'
-  );
+  await expect(
+    page.locator('.run-metrics > div').nth(1).locator('dd')
+  ).toHaveText('3');
+  await expect(
+    page.locator('.run-metrics > div').nth(2).locator('dd')
+  ).toHaveText('2');
 
   await page.getByRole('button', { name: 'Run batched' }).click();
   await expect(page.locator('.timeline-entry')).toHaveCount(1);
   await expect(page.locator('.timeline-entry')).toHaveClass(/--coherent/);
-  await expect(page.locator('.run-metrics > div').nth(1).locator('dd')).toHaveText(
-    '1'
+  await expect(
+    page.locator('.run-metrics > div').nth(1).locator('dd')
+  ).toHaveText('1');
+  await expect(
+    page.locator('.run-metrics > div').nth(2).locator('dd')
+  ).toHaveText('0');
+});
+
+test('/deep-typing: selected compiled depth generates and passes runtime checks', async ({
+  page,
+}) => {
+  await page.goto('/deep-typing', { waitUntil: 'load' });
+
+  const depth = page.getByRole('spinbutton', {
+    name: 'Depth to generate and test',
+  });
+  const generate = page.getByRole('button', { name: 'Generate and test' });
+
+  await expect(depth).toHaveValue('15');
+  await depth.fill('32');
+  await generate.click();
+
+  await expect(
+    page.getByRole('heading', { name: 'The depth 32 path' })
+  ).toBeVisible();
+  await expect(page.locator('.path-ledger li')).toHaveCount(32);
+  await expect(page.locator('.live-result output')).toContainText(
+    'Depth 32 generated from a compiled fixture; runtime read/write passed.'
   );
-  await expect(page.locator('.run-metrics > div').nth(2).locator('dd')).toHaveText(
-    '0'
+
+  await page.getByRole('button', { name: 'Toggle deepest status' }).click();
+  await expect(page.locator('.result-values dd').first()).toHaveText('review');
+
+  await depth.fill('41');
+  await expect(depth).toHaveAttribute('aria-invalid', 'true');
+  await expect(generate).toBeDisabled();
+  await expect(page.locator('#typing-depth-help')).toHaveText(
+    'Enter a whole number from 1 to 40.'
   );
 });

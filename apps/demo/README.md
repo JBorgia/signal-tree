@@ -23,7 +23,7 @@ and focused tests decide whether a capability or example is current.
 | Restoration    | `/restoration`                                                         | Explicitly designated authored turns                                                                       |
 | External truth | `/external-truth`                                                      | External ingress, Link relationships, and application-owned orchestration                                  |
 | DevTools       | `/devtools`                                                            | State inspection integration                                                                               |
-| Deep typing    | `/deep-typing`                                                         | Compile-backed exact leaf typing through one declared 15-branch path                                       |
+| Deep typing    | `/deep-typing`                                                         | User-selected runtime depth backed by generated exact-leaf compiler proofs for depths 1–40                 |
 | Migration      | `/migrate`                                                             | Concept-first migration toward v15 ownership                                                               |
 | Benchmarks     | `/benchmarks`                                                          | Capability-matched recurring work; construction, density, GC, and churn remain authoritative Node concerns |
 

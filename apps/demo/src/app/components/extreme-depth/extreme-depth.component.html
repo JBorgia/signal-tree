@@ -1,19 +1,51 @@
 <div class="typing-page layout-frame">
   <header class="typing-hero">
     <p class="eyebrow">Build-enforced proof</p>
-    <h1>Type safety<br>at any depth.</h1>
+    <h1>Type safety<br />at any depth.</h1>
     <p class="hero-copy">
-      This route makes one bounded claim: type safety at any depth.
-      ST infers type from the object passed to initialize the state and
-      compiles to the expected Angular <code>WritableLeaf</code> type without
-      degrading to <code>any</code>, and that same path reads and writes at
-      runtime.
+      Choose a depth that this repository generated and compiled. For every
+      offered value, TypeScript infers the tree from an explicit nested object
+      literal and must preserve the deepest status as exactly
+      <code>WritableLeaf&lt;DeepTypingStatus&gt;</code>, never <code>any</code>.
+      The button also creates that shape in the browser and verifies a deepest
+      read, write, snapshot, and reset.
     </p>
+
+    <form
+      class="depth-control"
+      (submit)="$event.preventDefault(); generateAndTest()"
+    >
+      <label for="typing-depth">Depth to generate and test</label>
+      <div>
+        <input
+          #depth
+          id="typing-depth"
+          type="number"
+          inputmode="numeric"
+          [min]="minimumDepth"
+          [max]="maximumDepth"
+          step="1"
+          [value]="depthInput()"
+          [attr.aria-invalid]="depthInputError() !== null"
+          aria-describedby="typing-depth-help"
+          (input)="setDepthInput(depth.value)"
+        />
+        <button type="submit" [disabled]="!canGenerate()">
+          Generate and test
+        </button>
+      </div>
+      <small id="typing-depth-help">
+        {{
+          depthInputError() ??
+            'Every selectable depth already passed the generated compiler checks.'
+        }}
+      </small>
+    </form>
 
     <dl class="proof-strip">
       <div>
-        <dt>Declared branches</dt>
-        <dd>{{ pathSegments.length }}</dd>
+        <dt>Selected depth</dt>
+        <dd>{{ selectedDepth() }}</dd>
       </div>
       <div>
         <dt>Exact type equality</dt>
@@ -28,11 +60,11 @@
 
   <section class="path-section" aria-labelledby="path-heading">
     <header>
-      <p class="eyebrow">The declared model</p>
-      <h2 id="path-heading">The path the compiler sees</h2>
+      <p class="eyebrow">Generated model</p>
+      <h2 id="path-heading">The depth {{ selectedDepth() }} path</h2>
     </header>
     <ol class="path-ledger">
-      @for (segment of pathSegments; track segment; let index = $index) {
+      @for (segment of pathSegments(); track segment; let index = $index) {
       <li>
         <span>{{ index + 1 }}</span>
         <code>{{ segment }}</code>
@@ -45,21 +77,23 @@
     <div class="live-result">
       <header>
         <p class="eyebrow">Live deepest branch</p>
-        <h2 id="runtime-heading">Read and update level 15</h2>
+        <h2 id="runtime-heading">
+          Read and update level {{ selectedDepth() }}
+        </h2>
       </header>
 
       <dl class="result-values">
         <div>
           <dt>Status</dt>
-          <dd>{{ result.status() }}</dd>
+          <dd>{{ result().status() }}</dd>
         </div>
         <div>
           <dt>Revision</dt>
-          <dd>{{ result.revision() }}</dd>
+          <dd>{{ result().revision() }}</dd>
         </div>
         <div>
           <dt>Owner</dt>
-          <dd>{{ result.owner() }}</dd>
+          <dd>{{ result().owner() }}</dd>
         </div>
       </dl>
 
@@ -79,12 +113,37 @@
       </header>
       <div>
         <span>Read</span>
-        <pre><code>{{ readExample }}</code></pre>
+        <pre><code>{{ readExample() }}</code></pre>
       </div>
       <div>
         <span>Write</span>
-        <pre><code>{{ updateExample }}</code></pre>
+        <pre><code>{{ updateExample() }}</code></pre>
       </div>
+    </div>
+  </section>
+
+  <section class="type-loss" aria-labelledby="type-loss-heading">
+    <header>
+      <p class="eyebrow">Why this test exists</p>
+      <h2 id="type-loss-heading">
+        Deep runtime data can outlive its useful type
+      </h2>
+    </header>
+    <div>
+      <p>
+        A JavaScript object can nest far deeper than TypeScript can always
+        describe ergonomically. Libraries commonly map a state type recursively
+        into readers and writers. At greater depths, an unsafe shortcut can
+        widen a leaf to <code>any</code> or <code>unknown</code>, while a very
+        complex recursive type can hit TypeScript’s instantiation limit.
+      </p>
+      <p>
+        Runtime clicks cannot detect that loss. This page’s generated source is
+        compiled by the normal strict typecheck. Each offered depth fails the
+        build unless the deepest leaf remains exact and the
+        <code>IsAny</code> detector stays <code>false</code>. The browser test
+        is separate evidence that the generated path also works at runtime.
+      </p>
     </div>
   </section>
 
@@ -93,18 +152,39 @@
       <p class="eyebrow">Established here</p>
       <h2>Concrete type and runtime behavior</h2>
       <ul>
-        <li>The deepest status path is exactly <code>WritableLeaf&lt;DeepStatus&gt;</code>.</li>
-        <li>The production-source <code>IsAny</code> detector resolves to <code>false</code>.</li>
-        <li>The level-15 branch is callable and its leaves support <code>set()</code> and <code>update()</code>.</li>
+        <li>
+          Depths {{ minimumDepth }} through {{ maximumDepth }} have generated
+          initializer-inference proofs.
+        </li>
+        <li>
+          The deepest status path is exactly
+          <code>WritableLeaf&lt;DeepTypingStatus&gt;</code>.
+        </li>
+        <li>
+          The generated <code>IsAny</code> detector resolves to
+          <code>false</code> at every offered depth.
+        </li>
+        <li>
+          The selected branch is callable and its leaves pass
+          <code>set()</code> and <code>update()</code> runtime checks.
+        </li>
       </ul>
     </div>
     <div class="not-established">
       <p class="eyebrow">Not established here</p>
       <h2>No unbounded or performance claim</h2>
       <ul>
-        <li>This does not claim unlimited nesting beyond the declared model.</li>
-        <li>It does not publish browser timing, memory, or compiler-limit numbers.</li>
-        <li>It does not generalize from one path to every possible TypeScript shape.</li>
+        <li>
+          This does not claim unlimited nesting beyond the generated
+          {{ maximumDepth }}-branch catalog.
+        </li>
+        <li>
+          It does not publish browser timing, memory, or compiler-limit numbers.
+        </li>
+        <li>
+          It does not generalize these object-literal fixtures to every possible
+          generic TypeScript shape.
+        </li>
       </ul>
     </div>
   </section>
