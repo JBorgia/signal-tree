@@ -11,6 +11,7 @@ import {
 } from '@reduxjs/toolkit';
 import { patchState, signalState } from '@ngrx/signals';
 import { setAllEntities, updateEntity } from '@ngrx/signals/entities';
+import { Store as TanStackStore } from '@tanstack/store';
 import {
   entityMap as angularEntityMap,
   restoration as angularRestoration,
@@ -48,6 +49,12 @@ interface RestorationImplementation {
   readonly updateOne: (id: number, value: number) => void;
   readonly readOne: (id: number) => BenchmarkRow | undefined;
   readonly undo: () => void;
+  readonly dispose: () => void;
+}
+
+interface ScalarImplementation {
+  readonly update: (value: number) => void;
+  readonly read: () => number;
   readonly dispose: () => void;
 }
 
@@ -140,6 +147,8 @@ export const DEFAULT_V15_BENCHMARK_CONFIG: V15BenchmarkConfig = {
 
 const UPDATE_BASE = 1_000_000;
 const RESTORATION_BASE = 900_000;
+const SCALAR_BASE = 800_000;
+const SCALAR_UPDATE_FACTOR = 100;
 
 type BenchmarkLibraryId =
   | 'signaltree-angular'
@@ -148,6 +157,7 @@ type BenchmarkLibraryId =
   | 'akita'
   | 'redux-toolkit';
 
+type ScalarLibraryId = 'signaltree-kernel' | 'tanstack-store';
 type HistoryLibraryId = 'signaltree-angular' | 'signaltree-kernel' | 'akita';
 
 const DIRECT_STATE_NOT_INCLUDED =
@@ -165,6 +175,15 @@ const SOURCES = {
     label: 'SignalTree restoration source',
     url: SIGNALTREE_REPOSITORY_URL,
     path: 'packages/kernel/src/enhancers/restoration/restoration.ts',
+  },
+  signaltreeKernel: {
+    label: 'SignalTree kernel source',
+    url: SIGNALTREE_REPOSITORY_URL,
+    path: 'packages/kernel/src/lib/signal-tree.ts',
+  },
+  tanstackStore: {
+    label: 'TanStack Store frontend state API',
+    url: 'https://tanstack.com/store/latest/docs/reference/classes/store',
   },
   ngrxEntities: {
     label: 'NgRx Signal Store entity management',
@@ -204,7 +223,25 @@ const PACKAGES = {
   ngrxSignals: [{ name: '@ngrx/signals', versionKey: 'ngrx-signals' }],
   akita: [{ name: '@datorama/akita', versionKey: 'akita' }],
   reduxToolkit: [{ name: '@reduxjs/toolkit', versionKey: 'redux-toolkit' }],
+  tanstackStore: [{ name: '@tanstack/store', versionKey: 'tanstack-store' }],
 } satisfies Record<string, readonly BenchmarkPackageReference[]>;
+
+const NEUTRAL_SCALAR_CAPABILITY: BenchmarkCapabilityContract = {
+  title: 'Framework-neutral frontend scalar state',
+  requirements: [
+    'The measured package supplies a standalone framework-neutral state container.',
+    'Its public API can update one scalar value and read the committed value immediately.',
+    'The adapter maps those direct calls without adding a selector, entity model, subscription, or history layer.',
+  ],
+  exclusions: [
+    {
+      label: 'Framework bindings',
+      reason:
+        'This direct core comparison stops before rendering integration. Framework observation adapters require their own matched lifecycle and publication contract.',
+      sources: [SOURCES.signaltreeKernel, SOURCES.tanstackStore],
+    },
+  ],
+};
 
 const KEYED_ENTITY_CAPABILITY: BenchmarkCapabilityContract = {
   title: 'First-party keyed entity state',
@@ -214,6 +251,12 @@ const KEYED_ENTITY_CAPABILITY: BenchmarkCapabilityContract = {
     'The benchmark adapter may translate calls, but it may not invent the entity model or update algorithm.',
   ],
   exclusions: [
+    {
+      label: 'TanStack Store',
+      reason:
+        'TanStack Store supplies a generic reactive frontend store, not a first-party entity abstraction; choosing an ID index and collection update recipe would benchmark the harness design.',
+      sources: [SOURCES.tanstackStore],
+    },
     {
       label: 'Zustand',
       reason:
@@ -244,6 +287,12 @@ const FIRST_PARTY_HISTORY_CAPABILITY: BenchmarkCapabilityContract = {
   ],
   exclusions: [
     {
+      label: 'TanStack Store',
+      reason:
+        'The measured first-party frontend package supplies a generic reactive store but not an integrated history capability.',
+      sources: [SOURCES.tanstackStore],
+    },
+    {
       label: 'NgRx Signals',
       reason:
         'The measured first-party packages supply keyed entities but not the history capability required by this chart.',
@@ -267,6 +316,33 @@ const FIRST_PARTY_HISTORY_CAPABILITY: BenchmarkCapabilityContract = {
     },
   ],
 };
+
+const SCALAR_COMPARISON_NOTES = {
+  'signaltree-kernel': {
+    kind: 'Framework-neutral store core',
+    packages: PACKAGES.signaltreeKernel,
+    sources: [SOURCES.signaltreeKernel],
+    featureSource: 'Framework-neutral SignalTree scalar state',
+    addedForComparison:
+      'A thin adapter invokes one scalar setter and the corresponding committed-value reader.',
+    whyItWasAdded:
+      'This is the smallest standalone state contract shared directly with TanStack Store.',
+    notIncluded:
+      'Entity identity, causal designation, restoration, subscriptions, derivation, batching, and framework bindings are not exercised.',
+  },
+  'tanstack-store': {
+    kind: 'Framework-neutral frontend store',
+    packages: PACKAGES.tanstackStore,
+    sources: [SOURCES.tanstackStore],
+    featureSource: 'Native TanStack Store frontend scalar state',
+    addedForComparison:
+      'A thin adapter invokes Store.setState() and reads Store.state.',
+    whyItWasAdded:
+      'Those are TanStack Store’s native standalone write and committed-read APIs; no entity or history recipe is added.',
+    notIncluded:
+      'Subscriptions, derived atoms, batching, async atoms, and framework bindings are not exercised.',
+  },
+} satisfies Record<ScalarLibraryId, BenchmarkArmComparison>;
 
 const KEYED_COMPARISON_NOTES = {
   'signaltree-angular': {
@@ -389,6 +465,11 @@ const expectedUpdateChecksum = (size: number, updates: number): string => {
   return `${size}:${observedSum}:${UPDATE_BASE + updates - 1}`;
 };
 
+const expectedScalarChecksum = (updates: number): string => {
+  const observedSum = updates * SCALAR_BASE + (updates * (updates - 1)) / 2;
+  return `${observedSum}:${SCALAR_BASE + updates - 1}`;
+};
+
 const expectedProjectionChecksum = (size: number, updates: number): string => {
   const observedValueSum =
     updates * UPDATE_BASE + (updates * (updates - 1)) / 2;
@@ -411,6 +492,52 @@ const validateConfig = (config: V15BenchmarkConfig): void => {
     }
   }
 };
+
+const createScalarArm = (
+  id: ScalarLibraryId,
+  label: string,
+  color: string,
+  description: string,
+  updates: number,
+  createImplementation: () => ScalarImplementation
+): V15BenchmarkArm => ({
+  id,
+  label,
+  color,
+  description,
+  comparison: SCALAR_COMPARISON_NOTES[id],
+  createSample: async (workload) => {
+    if (workload.id !== 'scalar') {
+      throw new Error(`${id} received unsupported workload ${workload.id}`);
+    }
+
+    const implementation = createImplementation();
+    implementation.read();
+    await Promise.resolve();
+    let observedSum = 0;
+    let lastValue = Number.NaN;
+
+    return {
+      measure: () => {
+        observedSum = 0;
+        lastValue = Number.NaN;
+        const startedAt = performance.now();
+        for (let index = 0; index < updates; index += 1) {
+          implementation.update(SCALAR_BASE + index);
+          lastValue = implementation.read();
+          observedSum += lastValue;
+        }
+
+        return {
+          durationMs: performance.now() - startedAt,
+          operations: workload.operations,
+        };
+      },
+      checksum: () => `${observedSum}:${lastValue}`,
+      dispose: implementation.dispose,
+    };
+  },
+});
 
 const createCollectionArm = (
   id: BenchmarkLibraryId,
@@ -439,6 +566,8 @@ const createCollectionArm = (
 
     return {
       measure: () => {
+        observedSum = 0;
+        lastValue = undefined;
         const startedAt = performance.now();
         for (let index = 0; index < config.collectionUpdates; index += 1) {
           implementation.updateOne(0, UPDATE_BASE + index);
@@ -489,6 +618,8 @@ const createProjectionArm = (
 
     return {
       measure: () => {
+        observedLength = 0;
+        observedValueSum = 0;
         const startedAt = performance.now();
         for (let index = 0; index < config.collectionUpdates; index += 1) {
           implementation.updateOne(0, UPDATE_BASE + index);
@@ -540,6 +671,9 @@ const createRestorationArm = (
 
     return {
       measure: async () => {
+        afterWrites = undefined;
+        afterUndos = undefined;
+        undoValues.length = 0;
         const startedAt = performance.now();
         const recordStartedAt = startedAt;
         for (let index = 0; index < config.restorationWrites; index += 1) {
@@ -597,6 +731,31 @@ const createAngularSignalTreeCollection = (
       tree.destroy();
       hooks.onSignalTreeDestroyed?.(tree.destroyed());
     },
+  };
+};
+
+const createKernelSignalTreeScalar = (
+  hooks: V15BenchmarkHooks
+): ScalarImplementation => {
+  const tree = kernelSignalTree({ value: 0 });
+
+  return {
+    update: (value) => tree.$.value.set(value),
+    read: () => tree.$.value(),
+    dispose: () => {
+      tree.destroy();
+      hooks.onSignalTreeDestroyed?.(tree.destroyed());
+    },
+  };
+};
+
+const createTanStackScalar = (): ScalarImplementation => {
+  const store = new TanStackStore(0);
+
+  return {
+    update: (value) => store.setState(() => value),
+    read: () => store.state,
+    dispose: () => undefined,
   };
 };
 
@@ -788,6 +947,15 @@ export const createV15BenchmarkSuites = (
 ): readonly V15BenchmarkSuite[] => {
   validateConfig(config);
 
+  const scalarUpdates = config.collectionUpdates * SCALAR_UPDATE_FACTOR;
+  const scalarWorkload: BenchmarkWorkload = {
+    id: 'scalar',
+    title: 'Update and read standalone scalar state',
+    description: `Update one already-created scalar store ${scalarUpdates.toLocaleString()} times and read the committed value after every write.`,
+    operations: scalarUpdates,
+    expectedChecksum: expectedScalarChecksum(scalarUpdates),
+  };
+
   const collection: BenchmarkWorkload = {
     id: 'collection',
     title: 'Update and read one keyed record',
@@ -818,6 +986,49 @@ export const createV15BenchmarkSuites = (
 
   return [
     {
+      workload: scalarWorkload,
+      capability: NEUTRAL_SCALAR_CAPABILITY,
+      applicationExample:
+        'A long-lived application store updates one frequently read status, counter, or selection value.',
+      financialImpact:
+        'This isolates the recurring state-container floor before entity indexing, history, rendering, or derived work changes the result.',
+      costLabel: 'Direct neutral-core comparison',
+      costContext:
+        'SignalTree Kernel and the @tanstack/store frontend state package both supply this standalone primitive directly. This chart answers only that shared question; richer state semantics stay in their own capability cohorts.',
+      calculation: {
+        timedCalculation: `One sample is the elapsed time around ${scalarUpdates.toLocaleString()} repetitions of one public scalar update followed immediately by one public committed-value read.`,
+        outsideTimer:
+          'One store per arm is constructed and primed once, then retained across warmup and measured rounds. Module loading, round settling, and discarded warmups stay outside the timer.',
+        correctnessCheck:
+          'After timing, the harness checks the sum of every observed value and the final committed scalar value.',
+        notCompared:
+          'Subscriber delivery, derived recomputation, batching, async state, framework rendering, keyed entities, and history need separate matched contracts and are not inferred from this result.',
+      },
+      relatedCommand:
+        'pnpm nx test demo --testFile=apps/demo/src/app/pages/benchmarks/v15-benchmark.workloads.spec.ts',
+      relatedSourceUrl: SIGNALTREE_REPOSITORY_URL,
+      relatedSourcePath:
+        'apps/demo/src/app/pages/benchmarks/v15-benchmark.workloads.spec.ts',
+      arms: [
+        createScalarArm(
+          'signaltree-kernel',
+          'SignalTree Kernel',
+          '#79a51e',
+          'Neutral kernel scalar set() followed by read',
+          scalarUpdates,
+          () => createKernelSignalTreeScalar(hooks)
+        ),
+        createScalarArm(
+          'tanstack-store',
+          'TanStack Store',
+          '#c44b25',
+          'Store.setState() followed by Store.state',
+          scalarUpdates,
+          createTanStackScalar
+        ),
+      ],
+    },
+    {
       workload: collection,
       capability: KEYED_ENTITY_CAPABILITY,
       applicationExample:
@@ -829,7 +1040,7 @@ export const createV15BenchmarkSuites = (
         'Construction and population finish before this timer starts. This is the repeated point-access cost paid throughout a long-lived store; the public recurring comparison begins here.',
       calculation: {
         timedCalculation: `One sample is the elapsed time around ${config.collectionUpdates.toLocaleString()} repetitions of one public update-by-ID followed immediately by one public read of that ID. The chart ranks total task time.`,
-        outsideTimer: `Container construction, population of ${config.collectionSize.toLocaleString()} records, one priming read, module loading, round settling, and discarded warmups stay outside the timer.`,
+        outsideTimer: `One container per arm is constructed, populated with ${config.collectionSize.toLocaleString()} records, and primed once, then retained across warmup and measured rounds. Module loading, round settling, and discarded warmups stay outside the timer.`,
         correctnessCheck:
           'After timing, the harness checks row count, the sum of every observed update value, and the final value of the updated row.',
         notCompared:
@@ -893,7 +1104,7 @@ export const createV15BenchmarkSuites = (
         'Each timed cycle performs one keyed update and one complete collection read. It is included because some applications repeatedly need that coherent value, not because every SignalTree application should perform whole-state work after every mutation.',
       calculation: {
         timedCalculation: `One sample is the elapsed time around ${config.collectionUpdates.toLocaleString()} repetitions of one public update-by-ID followed by one complete public collection read. The chart ranks total task time.`,
-        outsideTimer: `Container construction, population of ${config.collectionSize.toLocaleString()} records, one priming complete read, module loading, round settling, and discarded warmups stay outside the timer.`,
+        outsideTimer: `One container per arm is constructed, populated with ${config.collectionSize.toLocaleString()} records, and primed once, then retained across warmup and measured rounds. Module loading, round settling, and discarded warmups stay outside the timer.`,
         correctnessCheck:
           'After timing, the harness checks every observed collection length, every updated value read through the complete collection, and the final collection count and value sum.',
         notCompared:
@@ -956,7 +1167,7 @@ export const createV15BenchmarkSuites = (
         'This task ranks only first-party history implementations. SignalTree applies retained causal reversal facts while preserving its identity and coherent-publication semantics; Akita uses its official history facility. Their broader contracts differ, so the chart measures the shared linear-undo capability floor rather than claiming complete semantic equivalence. Sub-millisecond browser gaps near the timer floor are diagnostic, not proof of irreducible semantic overhead; overlapping observed ranges mean no clear difference in that run.',
       calculation: {
         timedCalculation: `One sample measures ${config.restorationWrites} record-and-update steps plus ${config.restorationWrites} undo-and-read steps. Total time determines rank; record and undo phase medians are also shown.`,
-        outsideTimer: `Creation and seeding of ${config.restorationSize.toLocaleString()} records, history initialization/reset, module loading, round settling, and discarded warmups stay outside the timer.`,
+        outsideTimer: `One container per arm is created, seeded with ${config.restorationSize.toLocaleString()} records, and has history initialized/reset once, then remains live across warmup and measured rounds. Module loading, round settling, and discarded warmups stay outside the timer.`,
         correctnessCheck:
           'After timing, the harness checks the value after all writes, the exact value after every undo, and the final return to the seeded value.',
         notCompared:

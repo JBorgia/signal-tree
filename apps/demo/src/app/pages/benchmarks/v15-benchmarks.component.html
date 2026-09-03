@@ -1,19 +1,28 @@
-<div class="benchmarks-page layout-frame" [attr.aria-busy]="isRunning()">
+<div
+  class="benchmarks-page layout-frame"
+  [attr.aria-busy]="isRunning()"
+  [attr.data-benchmark-mode]="mode()"
+  [attr.data-measured-rounds]="rounds()"
+  [attr.data-warmup-rounds]="warmupRounds()"
+>
   <header class="benchmark-hero">
     <p class="eyebrow">Long-lived consequential state</p>
     <h1>Recurring application-state performance</h1>
     <p class="hero-copy">
-      Three recurring v15 tasks run across Angular and framework-neutral state
-      library cores after construction and population are complete. Every timed
-      run must produce the expected final state or the comparison fails instead
-      of publishing a number.
+      Four recurring v15 tasks run across framework-specific and
+      framework-neutral frontend state-library runtimes after construction and
+      population are complete. Every timed run must produce the expected final
+      state or the comparison fails instead of publishing a number.
     </p>
     <p class="comparability-note">
       Every ranked row satisfies the same capability floor through the measured
       library or an official first-party package. Implementations requiring a
       benchmark-invented entity model or history feature are excluded. A shared
       floor does not make broader semantics identical, and these browser
-      spot-checks are not statistical significance tests.
+      spot-checks are not statistical significance tests. Primitive stores can
+      still meet narrower contracts: the scalar chart compares the native
+      SignalTree and TanStack cores without pretending either supplies the
+      other’s richer features.
     </p>
     <p class="source-note">
       <strong>Source rule:</strong> exact installed versions and official API or
@@ -26,7 +35,8 @@
       <section>
         <h2>What this page measures</h2>
         <p>
-          Keyed access, coherent complete reads, and reversible user changes.
+          Standalone scalar state, keyed access, coherent complete reads, and
+          reversible user changes.
         </p>
       </section>
       <section>
@@ -116,7 +126,7 @@
           (click)="setMode('quick')"
         >
           Quick
-          <span>3 measured rounds</span>
+          <span>25 measured rounds</span>
         </button>
         <button
           type="button"
@@ -125,13 +135,33 @@
           (click)="setMode('steady')"
         >
           Steady
-          <span>7 measured rounds</span>
+          <span>100 measured rounds</span>
         </button>
       </div>
+      <label class="round-control" [class.invalid]="roundInputError()">
+        <span>Measured rounds</span>
+        <input
+          #roundsInput
+          id="measured-rounds"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          max="1000"
+          step="1"
+          [value]="roundInput()"
+          [disabled]="isRunning()"
+          [attr.aria-invalid]="roundInputError() !== null"
+          aria-describedby="measured-rounds-help"
+          (input)="setRoundInput(roundsInput.value)"
+        />
+        <small id="measured-rounds-help">
+          {{ roundInputError() ?? 'Custom range: 1–1,000' }}
+        </small>
+      </label>
       <button
         type="button"
         class="run-command"
-        [disabled]="isRunning()"
+        [disabled]="isRunning() || roundInputError() !== null"
         (click)="runBenchmarks()"
       >
         {{
@@ -712,7 +742,8 @@
       </li>
       <li>The final state is checked before a timing enters the report.</li>
       <li>
-        Every SignalTree created for a sample is destroyed after that sample.
+        One store per arm remains live across warmup and measured rounds. Every
+        SignalTree is destroyed when its workload run completes.
       </li>
     </ol>
     <aside class="methodology-correction">

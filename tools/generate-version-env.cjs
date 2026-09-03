@@ -59,6 +59,7 @@ const demoLibraryVersions = {
   'ngrx-signals': readInstalledPackageVersion('@ngrx/signals'),
   akita: readInstalledPackageVersion('@datorama/akita'),
   'redux-toolkit': readInstalledPackageVersion('@reduxjs/toolkit'),
+  'tanstack-store': readInstalledPackageVersion('@tanstack/store'),
   ngxs: readInstalledPackageVersion('@ngxs/store'),
 };
 

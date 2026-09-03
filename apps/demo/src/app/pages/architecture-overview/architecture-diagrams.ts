@@ -56,11 +56,11 @@ export const SYSTEM_BOUNDARY_DIAGRAM: ArchitectureDiagramSpec = {
   takeaway:
     'Frameworks realize canonical truth; the kernel remains the state authority.',
   description:
-    'Application policy chooses the work. Angular and React connect that work to their observation runtimes. The framework-neutral kernel owns the state and causal model beneath both.',
+    'Application policy chooses the work. Framework realizations connect that work to their observation runtimes. The framework-neutral kernel owns the state and causal model beneath them.',
   plainLanguage:
     'Your app decides what should happen, the framework updates the screen, and SignalTree keeps the one official answer underneath.',
   realWorldExample:
-    'A shopper changes an item quantity. The checkout rule accepts the change, SignalTree stores it, and Angular or React redraws the total.',
+    'A shopper changes an item quantity. The checkout rule accepts the change, SignalTree stores it, and the application’s framework realization redraws the total.',
   financialImpact:
     'If the screen and store keep separate answers, a shopper can see one total and be charged another. One authority keeps those numbers together.',
   desktopViewBox: '0 0 1040 720',
@@ -76,7 +76,7 @@ export const SYSTEM_BOUNDARY_DIAGRAM: ArchitectureDiagramSpec = {
     ),
     node(
       'realization',
-      ['Angular / React', 'realization'],
+      ['Framework', 'realization'],
       ['observe · render · clean up'],
       'framework',
       box(200, 190, 640, 115),
@@ -106,7 +106,7 @@ export const SYSTEM_BOUNDARY_DIAGRAM: ArchitectureDiagramSpec = {
   ],
   checks: [
     'The framework layer is observation and realization, not a second store.',
-    'The kernel contract contains no Angular or React runtime dependency.',
+    'The kernel contract contains no framework runtime dependency.',
   ],
   evidence: [
     'packages/kernel/src/adapter.ts',
@@ -122,7 +122,7 @@ export const PACKAGE_OWNERSHIP_DIAGRAM: ArchitectureDiagramSpec = {
   takeaway:
     'Applications import their framework facade; framework-neutral code imports the kernel.',
   description:
-    'Angular and React add native observation and lifecycle integration around the same kernel types and runtime. The adapter subpath exists for realization authors, not ordinary application imports.',
+    'Framework packages add native observation and lifecycle integration around the same kernel types and runtime. The adapter subpath exists for realization authors, not ordinary application imports.',
   plainLanguage:
     'Choose the package that matches your app. It includes the shared SignalTree engine plus the connection your framework needs.',
   realWorldExample:

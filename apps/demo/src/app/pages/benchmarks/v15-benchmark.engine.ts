@@ -1,4 +1,8 @@
-export type BenchmarkWorkloadId = 'collection' | 'projection' | 'restoration';
+export type BenchmarkWorkloadId =
+  | 'scalar'
+  | 'collection'
+  | 'projection'
+  | 'restoration';
 
 export interface BenchmarkWorkload {
   readonly id: BenchmarkWorkloadId;
@@ -77,13 +81,32 @@ const median = (values: readonly number[]): number => {
 const spread = (values: readonly number[]): number =>
   Math.max(...values) - Math.min(...values);
 
-const defaultSettle = (): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, 0));
+export const yieldToBrowserTask = (
+  MessageChannelType:
+    | typeof MessageChannel
+    | undefined = globalThis.MessageChannel
+): Promise<void> => {
+  if (!MessageChannelType) {
+    return new Promise((resolve) => setTimeout(resolve, 0));
+  }
+
+  return new Promise((resolve) => {
+    const channel = new MessageChannelType();
+    channel.port1.onmessage = () => {
+      channel.port1.close();
+      channel.port2.close();
+      resolve();
+    };
+    channel.port2.postMessage(undefined);
+  });
+};
+
+const defaultSettle = (): Promise<void> => yieldToBrowserTask();
 
 export const runInterleavedBenchmark = async ({
   workload,
   arms,
-  rounds = 7,
+  rounds = 25,
   warmupRounds = 2,
   settle = defaultSettle,
 }: RunInterleavedBenchmarkOptions): Promise<BenchmarkReport> => {
@@ -106,20 +129,33 @@ export const runInterleavedBenchmark = async ({
     arms.map((currentArm) => [currentArm.id, new Map<string, number[]>()])
   );
   const totalRounds = warmupRounds + rounds;
+  const preparedSamples = new Map<string, PreparedBenchmarkSample>();
+  let benchmarkFailed = false;
+  let benchmarkFailure: unknown;
 
-  for (let round = 0; round < totalRounds; round += 1) {
-    await settle();
-    const offset = Math.floor(round / 2) % arms.length;
-    const rotatedArms = [...arms.slice(offset), ...arms.slice(0, offset)];
-    const orderedArms =
-      round % 2 === 0 ? rotatedArms : [...rotatedArms].reverse();
+  try {
+    for (const currentArm of arms) {
+      preparedSamples.set(
+        currentArm.id,
+        await currentArm.createSample(workload)
+      );
+    }
 
-    for (const currentArm of orderedArms) {
-      const sample = await currentArm.createSample(workload);
-      let measurement: BenchmarkMeasurement;
+    for (let round = 0; round < totalRounds; round += 1) {
+      await settle();
+      const offset = Math.floor(round / 2) % arms.length;
+      const rotatedArms = [...arms.slice(offset), ...arms.slice(0, offset)];
+      const orderedArms =
+        round % 2 === 0 ? rotatedArms : [...rotatedArms].reverse();
 
-      try {
-        measurement = await sample.measure();
+      for (const currentArm of orderedArms) {
+        const sample = preparedSamples.get(currentArm.id);
+        if (!sample) {
+          throw new Error(
+            `${currentArm.id} did not prepare a benchmark sample`
+          );
+        }
+        const measurement: BenchmarkMeasurement = await sample.measure();
         if (
           !Number.isFinite(measurement.durationMs) ||
           measurement.durationMs < 0 ||
@@ -146,22 +182,46 @@ export const runInterleavedBenchmark = async ({
               `expected "${workload.expectedChecksum}"`
           );
         }
-      } finally {
-        sample.dispose();
-      }
 
-      if (round >= warmupRounds) {
-        samplesByArm.get(currentArm.id)?.push(measurement.durationMs);
-        const phaseSamples = phaseSamplesByArm.get(currentArm.id);
-        for (const [phaseId, durationMs] of Object.entries(
-          measurement.phases ?? {}
-        )) {
-          const samples = phaseSamples?.get(phaseId) ?? [];
-          samples.push(durationMs);
-          phaseSamples?.set(phaseId, samples);
+        if (round >= warmupRounds) {
+          samplesByArm.get(currentArm.id)?.push(measurement.durationMs);
+          const phaseSamples = phaseSamplesByArm.get(currentArm.id);
+          for (const [phaseId, durationMs] of Object.entries(
+            measurement.phases ?? {}
+          )) {
+            const samples = phaseSamples?.get(phaseId) ?? [];
+            samples.push(durationMs);
+            phaseSamples?.set(phaseId, samples);
+          }
         }
       }
     }
+  } catch (error) {
+    benchmarkFailed = true;
+    benchmarkFailure = error;
+  }
+
+  const disposalFailures: unknown[] = [];
+  for (const sample of preparedSamples.values()) {
+    try {
+      sample.dispose();
+    } catch (error) {
+      disposalFailures.push(error);
+    }
+  }
+
+  if (benchmarkFailed) {
+    if (disposalFailures.length === 0) throw benchmarkFailure;
+    throw new AggregateError(
+      [benchmarkFailure, ...disposalFailures],
+      'Benchmark execution and sample disposal failed'
+    );
+  }
+  if (disposalFailures.length > 0) {
+    throw new AggregateError(
+      disposalFailures,
+      'Benchmark sample disposal failed'
+    );
   }
 
   return {
