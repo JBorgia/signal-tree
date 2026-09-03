@@ -12762,13 +12762,27 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       density floor and regressed churn materially, so no replacement is
       selected. Full kernel validation is green; no second carrier experiment
       is authorized.
-- [x] **Final v15 demo and benchmark surface.** Retired comparison machinery
-  is replaced with checked browser workloads, current routes and navigation,
-  responsive architecture assets, and source-backed benchmark evidence.
-  The comparison CLI accurately identifies SignalTree and elf as native
-  history implementations while the ngrx-signals and raw-signal arms use
-  explicit snapshots. Demo tests (`138` passing), its production build, the
-  benchmark harness, and the full release matrix (`73/73`) are green.
+- [x] **Final v15 demo and recurring benchmark surface (`af8c0c75`).** The
+      public comparison starts after construction and keeps three independent
+      recurring workloads: keyed update plus point read, conditional keyed
+      update plus complete projection, and designated change plus undo. Their
+      capability-admitted cohorts contain `6 / 6 / 4` first-party arms (`16`
+      checked rows); initialization has no public rank or value score, and no
+      crossover, payback, or aggregate score survives. Schema 4 exports raw
+      timings, structured calculation context, exact package/source provenance,
+      capability contracts, and three independent per-1k/10k/100k
+      normalizations. Projection correctness is order-independent. Browser copy
+      treats sub-millisecond restoration gaps near the timer floor as diagnostic
+      and overlapping ranges as no clear difference, while
+      `RESTORATION-HOT-PATH-0` records a bounded, non-gating Node attribution
+      experiment before any retained-turn representation change. Validation:
+      demo tests `140` passing / `4` intentionally skipped; strict typecheck;
+      production AOT; demo lint with zero errors and one pre-existing warning;
+      focused benchmark Playwright `5/5`; complete production route/layout/
+      hover matrix `126/126`; schema-4 production export `16` rows; development
+      export refusal; numeric claims `150/150`; complete comparison, update,
+      and 12-arm capability-density generators; benchmark gate and its
+      undo-removal mutation proof; final independent review clean.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
