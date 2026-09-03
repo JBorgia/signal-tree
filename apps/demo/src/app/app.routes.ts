@@ -219,9 +219,9 @@ export const appRoutes: Route[] = [
         (component) => component.V15BenchmarksComponent
       ),
     data: {
-      title: 'Browser performance spot-check',
+      title: 'Recurring application-state performance',
       description:
-        'Separate checked initialization, keyed-update, and history workloads across Angular and framework-neutral state-library cores.',
+        'Checked point access, conditional complete projection, and restoration workloads across capability-matched state libraries.',
     },
   },
   // Redirect old route to new one

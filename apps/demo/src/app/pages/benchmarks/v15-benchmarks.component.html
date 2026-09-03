@@ -1,29 +1,40 @@
 <div class="benchmarks-page layout-frame" [attr.aria-busy]="isRunning()">
   <header class="benchmark-hero">
-    <p class="eyebrow">Measured in this browser</p>
-    <h1>Browser performance spot-check</h1>
+    <p class="eyebrow">Long-lived consequential state</p>
+    <h1>Recurring application-state performance</h1>
     <p class="hero-copy">
-      Three small v15 tasks run across Angular and framework-neutral state
-      library cores. React rendering is not measured. Every timed run must
-      produce the expected final state or the comparison fails instead of
-      publishing a number.
+      Three recurring v15 tasks run across Angular and framework-neutral state
+      library cores after construction and population are complete. Every timed
+      run must produce the expected final state or the comparison fails instead
+      of publishing a number.
     </p>
     <p class="comparability-note">
-      Every ranked row satisfies the same stated capability floor through the
-      measured library or an official first-party package. Implementations that
-      need a benchmark-invented entity model or history feature are excluded. A
-      shared floor does not make broader semantics identical, and these browser
+      Every ranked row satisfies the same capability floor through the measured
+      library or an official first-party package. Implementations requiring a
+      benchmark-invented entity model or history feature are excluded. A shared
+      floor does not make broader semantics identical, and these browser
       spot-checks are not statistical significance tests.
+    </p>
+    <p class="source-note">
+      <strong>Source rule:</strong> exact installed versions and official API or
+      source links appear beside every implementation. “Not ranked” means the
+      required capability was not established in the cited first-party package
+      surface; it does not claim that no community add-on exists.
     </p>
 
     <div class="scope-strip">
       <section>
         <h2>What this page measures</h2>
-        <p>State initialization, keyed updates, and reversible user changes.</p>
+        <p>
+          Keyed access, coherent complete reads, and reversible user changes.
+        </p>
       </section>
       <section>
         <h2>What stays in Node</h2>
-        <p>Bundle size, startup, retained memory, GC, and release claims.</p>
+        <p>
+          Construction ceilings, retained density, GC, churn, and release
+          claims.
+        </p>
       </section>
       <section>
         <h2>How to read results</h2>
@@ -35,12 +46,67 @@
     </div>
   </header>
 
+  <section class="benchmark-philosophy" aria-labelledby="philosophy-heading">
+    <header>
+      <p class="eyebrow">Benchmark philosophy</p>
+      <h2 id="philosophy-heading">Recurring work is the product benchmark</h2>
+      <p>
+        For long-lived application state, the relevant question is what the
+        application repeatedly pays while retaining typed access, stable
+        identity, authority rules, rollback correctness, and framework-neutral
+        semantics.
+      </p>
+    </header>
+    <div class="performance-priorities">
+      <section>
+        <h3>Primary recurring targets</h3>
+        <p>
+          Point reads and writes, structural mutation, observation and
+          publication, long-running churn, retained density, restoration, and
+          rollback.
+        </p>
+      </section>
+      <section>
+        <h3>Important recurring targets</h3>
+        <p>
+          Coherent complete-value projection, framework realization overhead,
+          and the runtime substrate shipped to consumers.
+        </p>
+      </section>
+      <section>
+        <h3>Hard gate</h3>
+        <p>
+          Faster or denser underpinnings must preserve typed dot notation,
+          identity, lifecycle, causal authority, transaction, restoration, and
+          GC laws.
+        </p>
+      </section>
+    </div>
+    <aside class="construction-budget">
+      <div>
+        <strong>Initialization is a budget, not an optimization target</strong>
+        <p>
+          SignalTree may spend construction work to make recurring operations
+          faster or denser. Construction remains an internal regression ceiling
+          for pathological startup behavior; it receives no public rank and no
+          value score.
+        </p>
+      </div>
+      <a
+        [href]="repositorySourceUrl('tools/bench-public-collection-layers.mjs')"
+        target="_blank"
+        rel="noreferrer"
+      >
+        <code>tools/bench-public-collection-layers.mjs</code>
+      </a>
+    </aside>
+  </section>
+
   <section class="run-bar" aria-labelledby="run-heading">
     <div>
       <p class="eyebrow">Measurement plan</p>
       <h2 id="run-heading">Choose the run depth</h2>
     </div>
-
     <div class="run-controls">
       <div class="mode-control" role="group" aria-labelledby="run-heading">
         <button
@@ -62,7 +128,6 @@
           <span>7 measured rounds</span>
         </button>
       </div>
-
       <button
         type="button"
         class="run-command"
@@ -70,7 +135,7 @@
         (click)="runBenchmarks()"
       >
         {{
-          isRunning() ? 'Running checked tasks...' : 'Run browser spot-check'
+          isRunning() ? 'Running checked tasks...' : 'Run recurring spot-check'
         }}
       </button>
     </div>
@@ -95,37 +160,37 @@
       <h2 id="calculation-heading">How each result is calculated</h2>
       <p>
         Each chart ranks only implementations admitted by the same capability
-        contract. Open a row's comparison details to see whether that capability
-        is built in or supplied by an official first-party add-on.
+        contract. Open method details to see whether that capability is built in
+        or supplied by an official first-party add-on.
       </p>
     </header>
     <div class="calculation-grid">
       <section>
         <h3>Median</h3>
         <p>
-          Sort the measured round durations and use the middle value. With an
-          even count, average the two middle values.
+          Sort measured round durations and use the middle value. With an even
+          count, average the two middle values.
         </p>
       </section>
       <section>
         <h3>Observed range</h3>
         <p>
           Show the smallest and largest measured durations. Warmup rounds are
-          discarded before this calculation.
+          discarded first.
         </p>
       </section>
       <section>
         <h3>Result order</h3>
         <p>
-          Within one capability-matched cohort, sort by median task time, lowest
-          first. Order is not a winner claim when observed ranges overlap.
+          Within one matched cohort, sort by median task time. Order is not a
+          winner claim when observed ranges overlap.
         </p>
       </section>
       <section>
         <h3>Visual scale</h3>
         <p>
-          Plot each range and median from zero to that task's slowest observed
-          maximum. Scales are not shared between different tasks.
+          Plot each range and median from zero to that task’s slowest observed
+          maximum. Different tasks do not share a scale.
         </p>
       </section>
     </div>
@@ -141,7 +206,9 @@
     >
       <header class="workload-heading">
         <div>
-          <p class="workload-index">0{{ workloadIndex + 1 }} / checked task</p>
+          <p class="workload-index">
+            0{{ workloadIndex + 1 }} / recurring task
+          </p>
           <h2 [id]="suite.workload.id + '-heading'">
             {{ suite.workload.title }}
           </h2>
@@ -175,8 +242,10 @@
             {{ suite.capability.title }}
           </h3>
           <p>
-            Only implementations meeting every requirement below receive a
-            timing or position in this chart.
+            Only implementations meeting every requirement receive a timing or
+            position in this product chart. Exclusion here does not disqualify a
+            storage strategy from internal speed or density experiments beneath
+            SignalTree’s public contract.
           </p>
         </header>
         <div class="capability-columns">
@@ -196,7 +265,18 @@
               exclusion.label) {
               <div>
                 <dt>{{ exclusion.label }}</dt>
-                <dd>{{ exclusion.reason }}</dd>
+                <dd>
+                  <span>{{ exclusion.reason }}</span>
+                  <span class="source-links">
+                    @for (source of exclusion.sources; track source.url) {
+                    <a [href]="source.url" target="_blank" rel="noreferrer">
+                      {{ source.label }}
+                    </a>
+                    @if (source.path) {
+                    <code>{{ source.path }}</code>
+                    } }
+                  </span>
+                </dd>
               </div>
               }
             </dl>
@@ -232,9 +312,9 @@
           <div>
             <h3>Capability-matched results, fastest median first</h3>
             @if (isDevBuild) {
-            <strong class="development-badge">
-              Development / non-representative
-            </strong>
+            <strong class="development-badge"
+              >Development / non-representative</strong
+            >
             }
           </div>
           <p>
@@ -283,8 +363,27 @@
             <div class="implementation" role="cell">
               <strong>{{ result.label }}</strong>
               <span>{{ armDescription(suite.arms, result.armId) }}</span>
+              <span class="package-versions">
+                @for (package of armPackages(suite.arms, result.armId); track
+                package.name) {
+                <code
+                  >{{ package.name }}
+                  {{ packageVersion(package.versionKey) }}</code
+                >
+                }
+              </span>
               <span class="comparison-kind">
                 {{ armComparisonKind(suite.arms, result.armId) }}
+              </span>
+              <span class="source-links implementation-source-links">
+                @for (source of armSources(suite.arms, result.armId); track
+                source.url) {
+                <a [href]="source.url" target="_blank" rel="noreferrer">
+                  {{ source.label }}
+                </a>
+                @if (source.path) {
+                <code>{{ source.path }}</code>
+                } }
               </span>
               <button
                 type="button"
@@ -298,7 +397,7 @@
                 "
                 (click)="openComparison(suite, result.armId)"
               >
-                Comparison details
+                Method details
               </button>
             </div>
             <div class="timing" role="cell">
@@ -341,9 +440,9 @@
                 <span class="result-range-mark"></span>
                 <span class="result-median-mark"></span>
               </div>
-              <span class="range-label">
-                {{ formatRange(result.minMs, result.maxMs) }}
-              </span>
+              <span class="range-label">{{
+                formatRange(result.minMs, result.maxMs)
+              }}</span>
             </div>
             <span class="interpretation" role="cell">
               {{ resultInterpretation(result, report) }}
@@ -353,9 +452,9 @@
         </div>
         <div class="result-scale" aria-hidden="true">
           <span>0 ms</span>
-          <span>
-            {{ formatMilliseconds(resultScaleMaximum(report)) }} ms scale
-          </span>
+          <span
+            >{{ formatMilliseconds(resultScaleMaximum(report)) }} ms scale</span
+          >
         </div>
       </div>
       } @else {
@@ -368,21 +467,230 @@
         </header>
         <div class="planned-arms">
           @for (arm of suite.arms; track arm.id) {
-          <span
-            ><strong>{{ arm.label }}</strong> · {{ arm.description }}</span
-          >
+          <span class="planned-arm">
+            <strong>{{ arm.label }}</strong>
+            <span>{{ arm.description }}</span>
+            <span class="package-versions">
+              @for (package of arm.comparison.packages; track package.name) {
+              <code
+                >{{ package.name }}
+                {{ packageVersion(package.versionKey) }}</code
+              >
+              }
+            </span>
+            <span class="source-links">
+              @for (source of arm.comparison.sources; track source.url) {
+              <a [href]="source.url" target="_blank" rel="noreferrer">
+                {{ source.label }}
+              </a>
+              }
+            </span>
+          </span>
           }
         </div>
       </div>
       }
 
       <footer class="evidence-line">
-        <span>Related Node generator</span>
-        <code>{{ suite.relatedCommand }}</code>
+        <span>Reproduce and inspect</span>
+        <div>
+          <a
+            [href]="benchmarkSourceUrls.workloads"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Benchmark repository
+          </a>
+          <code>{{ benchmarkSourcePaths.workloads }}</code>
+          <a
+            [href]="benchmarkSourceUrls.engine"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Benchmark repository
+          </a>
+          <code>{{ benchmarkSourcePaths.engine }}</code>
+          <a [href]="suite.relatedSourceUrl" target="_blank" rel="noreferrer">
+            Related Node generator source
+          </a>
+          <code>{{ suite.relatedSourcePath }}</code>
+          <code class="evidence-command">{{ suite.relatedCommand }}</code>
+        </div>
       </footer>
     </section>
     }
   </div>
+
+  @if (steadyStateProfiles().length > 0) {
+  <section
+    class="steady-state-value"
+    aria-labelledby="steady-state-heading"
+    [attr.data-profile-arm-id]="profileArmId()"
+  >
+    <header class="steady-state-heading">
+      <div>
+        <p class="eyebrow">Steady-state value</p>
+        <h2 id="steady-state-heading">What compounds after construction</h2>
+      </div>
+      <p>
+        Each workload remains independent. Normalized columns scale the measured
+        median arithmetically; they are not a forecast of application frequency,
+        elapsed wall time, or business value.
+      </p>
+    </header>
+    <div class="steady-state-controls">
+      <span>SignalTree realization</span>
+      <div
+        class="profile-realization"
+        role="group"
+        aria-label="SignalTree realization"
+      >
+        <button
+          type="button"
+          [attr.aria-pressed]="profileArmId() === 'signaltree-angular'"
+          (click)="setProfileArm('signaltree-angular')"
+        >
+          Angular realization
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="profileArmId() === 'signaltree-kernel'"
+          (click)="setProfileArm('signaltree-kernel')"
+        >
+          Kernel realization
+        </button>
+      </div>
+    </div>
+    <div
+      class="steady-state-table"
+      role="table"
+      aria-label="SignalTree recurring performance profile"
+    >
+      <div class="steady-state-table-header" role="row">
+        <span role="columnheader">Recurring workload</span>
+        <span role="columnheader">Measured batch</span>
+        <span role="columnheader">Per 1k</span>
+        <span role="columnheader">Per 10k</span>
+        <span role="columnheader">Per 100k</span>
+        <span role="columnheader">Observed standing</span>
+      </div>
+      @for (profile of steadyStateProfiles(); track profile.workloadId) {
+      <div
+        class="steady-state-row"
+        role="row"
+        [attr.data-profile-workload]="profile.workloadId"
+        [attr.data-measured-median-ms]="profile.result.medianMs"
+        [attr.data-measured-operations]="profile.operations"
+        [attr.data-per-thousand-ms]="normalizedRecurringCost(profile, 1000)"
+        [attr.data-per-ten-thousand-ms]="
+          normalizedRecurringCost(profile, 10000)
+        "
+        [attr.data-per-hundred-thousand-ms]="
+          normalizedRecurringCost(profile, 100000)
+        "
+        [attr.data-position]="profile.position"
+        [attr.data-cohort-size]="profile.cohortSize"
+      >
+        <span class="steady-workload" role="cell">
+          <strong>{{ profile.title }}</strong>
+          <small>{{ profile.unit }}</small>
+        </span>
+        <span role="cell">
+          <strong>{{ formatMilliseconds(profile.result.medianMs) }} ms</strong>
+          <small>{{ profile.operations }} measured operations</small>
+        </span>
+        <strong role="cell">
+          {{ formatMilliseconds(normalizedRecurringCost(profile, 1000)) }} ms
+        </strong>
+        <strong role="cell">
+          {{ formatMilliseconds(normalizedRecurringCost(profile, 10000)) }} ms
+        </strong>
+        <strong role="cell">
+          {{ formatMilliseconds(normalizedRecurringCost(profile, 100000)) }} ms
+        </strong>
+        <span class="steady-standing" role="cell">
+          <strong>{{ profile.position }} of {{ profile.cohortSize }}</strong>
+          <small>{{
+            formatRange(profile.result.minMs, profile.result.maxMs)
+          }}</small>
+        </span>
+      </div>
+      }
+    </div>
+    <aside class="projection-condition">
+      <strong>Projection is conditional</strong>
+      <p>
+        Whole-state projection is included because some applications repeatedly
+        need a coherent complete value. Applications dominated by keyed point
+        reads may have a different profile, or no projection cost at all. No
+        workload is pooled into an aggregate score.
+      </p>
+    </aside>
+  </section>
+  }
+
+  <section class="foundation-ledger" aria-labelledby="foundation-heading">
+    <header>
+      <p class="eyebrow">Ten-year architecture bet</p>
+      <h2 id="foundation-heading">What must survive underneath the numbers</h2>
+      <p>
+        The target is not one frozen implementation. It is a durable typed API
+        over a substrate that keeps getting faster and denser while preserving
+        optimistic and causal correctness. Each dimension has its own evidence,
+        and none compensates numerically for another.
+      </p>
+    </header>
+    <aside class="foundation-verdict">
+      <strong>Current verdict</strong>
+      <p>
+        SignalTree fixes the semantic contract and keeps the implementation
+        replaceable. Speed and density are measured independently, and every
+        reproducible deficit is an optimization target—not a price users should
+        accept for architecture.
+      </p>
+    </aside>
+    <div class="foundation-grid">
+      @for (foundation of valueFoundations; track foundation.title) {
+      <article>
+        <p class="foundation-status">{{ foundation.status }}</p>
+        <h3>{{ foundation.title }}</h3>
+        <dl>
+          <div>
+            <dt>Durable value</dt>
+            <dd>{{ foundation.durableValue }}</dd>
+          </div>
+          <div>
+            <dt>Cost or constraint</dt>
+            <dd>{{ foundation.currentCost }}</dd>
+          </div>
+          <div>
+            <dt>Repository evidence</dt>
+            <dd class="foundation-evidence">
+              @for (source of foundation.evidence; track source) {
+              <a
+                [href]="repositorySourceUrl(source)"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <code>{{ source }}</code>
+              </a>
+              }
+            </dd>
+          </div>
+        </dl>
+      </article>
+      }
+    </div>
+    <aside class="foundation-decision">
+      <strong>Release decision rule</strong>
+      <p>
+        Keep typed dot notation and causal correctness fixed. Front-load work
+        when it makes recurring speed, density, allocation, GC, restoration, or
+        churn better. Replace any underpinning that loses reproducibly while
+        preserving the same semantic laws.
+      </p>
+    </aside>
+  </section>
 
   <section class="methodology" aria-labelledby="methodology-heading">
     <header>
@@ -398,14 +706,11 @@
         Each history arm uses built-in or official first-party history; packages
         requiring benchmark-owned snapshots are excluded.
       </li>
+      <li>Construction and population remain outside every public timer.</li>
       <li>
-        Arm order rotates and reverses across rounds to reduce position and
-        warmup bias.
+        Arm order rotates and reverses to reduce position and warmup bias.
       </li>
-      <li>
-        A task boundary separates rounds and is outside every timed region.
-      </li>
-      <li>The final state is checked before a timing can enter the report.</li>
+      <li>The final state is checked before a timing enters the report.</li>
       <li>
         Every SignalTree created for a sample is destroyed after that sample.
       </li>
@@ -413,10 +718,9 @@
     <aside class="methodology-correction">
       <strong>Methodology correction</strong>
       <p>
-        An earlier harness revision included
-        <code>getRestorationHistory()</code> state materialization only in the
-        SignalTree arm. Current results exclude that asymmetric inspection and
-        verify the exact value after every undo instead.
+        An earlier harness included <code>getRestorationHistory()</code> state
+        materialization only in the SignalTree arm. Current results exclude that
+        asymmetric inspection and verify the exact value after every undo.
       </p>
     </aside>
   </section>
@@ -444,12 +748,10 @@
         Close
       </button>
     </header>
-
     <p class="comparison-operation">
       <strong>Operation timed</strong>
       {{ comparison.arm.description }}
     </p>
-
     <dl class="comparison-facts">
       <div>
         <dt>Calculation</dt>
@@ -458,10 +760,33 @@
       <div>
         <dt>Feature source</dt>
         <dd>
-          <strong class="comparison-kind">
-            {{ comparison.arm.comparison.kind }}
-          </strong>
+          <strong class="comparison-kind">{{
+            comparison.arm.comparison.kind
+          }}</strong>
           {{ comparison.arm.comparison.featureSource }}
+        </dd>
+      </div>
+      <div>
+        <dt>Measured packages</dt>
+        <dd class="dialog-package-list">
+          @for (package of comparison.arm.comparison.packages; track
+          package.name) {
+          <code
+            >{{ package.name }} {{ packageVersion(package.versionKey) }}</code
+          >
+          }
+        </dd>
+      </div>
+      <div>
+        <dt>Official sources</dt>
+        <dd class="source-links dialog-source-links">
+          @for (source of comparison.arm.comparison.sources; track source.url) {
+          <a [href]="source.url" target="_blank" rel="noreferrer">{{
+            source.label
+          }}</a>
+          @if (source.path) {
+          <code>{{ source.path }}</code>
+          } }
         </dd>
       </div>
       <div>

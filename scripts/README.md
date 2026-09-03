@@ -196,7 +196,10 @@ Use their registered package scripts so configuration and output paths remain
 consistent. `automation:export` runs all capability-admitted v15 browser rows
 and writes `artifacts/benchmark-results-automated.json`, including each
 workload's capability contract, exclusions, calculation boundaries, and arm
-provenance. It refuses development-mode timings unless
+provenance. Schema 4 also carries three independent recurring-workload
+normalizations, observed cohort positions, and the sourced typed DX, speed,
+density, and causal-foundation ledger. Construction has no public rank or value
+score. The exporter refuses development-mode timings unless
 `ALLOW_DEV_BENCHMARKS=1` is set for diagnostic output; set
 `BENCHMARK_MODE=steady` for the seven-round plan.
 
