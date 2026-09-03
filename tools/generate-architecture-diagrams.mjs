@@ -144,6 +144,18 @@ const validateLayouts = (diagrams) => {
   }
 };
 
+const validateExplanations = (diagrams) => {
+  const fields = ['plainLanguage', 'realWorldExample', 'financialImpact'];
+
+  for (const diagram of diagrams) {
+    for (const field of fields) {
+      if (typeof diagram[field] !== 'string' || diagram[field].trim() === '') {
+        throw new Error(`${diagram.id}: missing ${field}`);
+      }
+    }
+  }
+};
+
 const svgStyles = `
   :root {
     --st-ink: #17211a;
@@ -210,8 +222,19 @@ const svgStyles = `
   .notes { box-sizing: border-box; height: 100%; padding: 22px 28px; color: var(--st-ink); border: 1px solid var(--st-line); background: var(--st-neutral); font: 15px/1.5 'IBM Plex Sans', 'Avenir Next', sans-serif; }
   .notes-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 32px; }
   .notes h2 { margin: 0 0 8px; font-size: 15px; text-transform: uppercase; }
+  .notes p { margin: 0; }
   .notes ul { margin: 0; padding-left: 20px; }
   .notes code { font-size: 13px; overflow-wrap: anywhere; }
+  .story-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--st-line); background: var(--st-line); gap: 1px; }
+  .story-item { min-width: 0; padding: 14px 16px; background: var(--st-surface); }
+  .story-item--plain { background: var(--st-authored); }
+  .story-item--example { background: var(--st-framework); }
+  .story-item--money { background: var(--st-restoration); }
+  .story-item h2 { margin-bottom: 6px; font-size: 12px; }
+  .story-item p { font-size: 14px; line-height: 1.45; }
+  .slide-story { box-sizing: border-box; height: 100%; color: var(--st-ink); font: 18px/1.4 'IBM Plex Sans', 'Avenir Next', sans-serif; }
+  .slide-story .story-item { padding: 16px 18px; }
+  .slide-story .story-item h2 { font-size: 13px; }
   @media (prefers-reduced-motion: reduce) { .node rect { transition: none; } }
 `;
 
@@ -351,9 +374,13 @@ const renderBody = (diagram, viewport, markerId, includeDetails = true) => {
             )}</text></g>`;
           })()
         : '';
-      return `<g><path class="${classes}" d="${connection.path}"${markerStart}${markerEnd}/>${label}</g>`;
-    })
-    .join('');
+      return {
+        path: `<path class="${classes}" d="${connection.path}"${markerStart}${markerEnd}/>`,
+        label,
+      };
+    });
+  const edgePaths = edges.map((current) => current.path).join('');
+  const edgeLabels = edges.map((current) => current.label).join('');
 
   const renderedNodes = nodes
     .map((current) => {
@@ -383,7 +410,7 @@ const renderBody = (diagram, viewport, markerId, includeDetails = true) => {
     })
     .join('');
 
-  return `${groups}<g>${edges}</g><g>${renderedNodes}</g>`;
+  return `${groups}<g class="edge-paths">${edgePaths}</g><g class="nodes">${renderedNodes}</g><g class="edge-labels">${edgeLabels}</g>`;
 };
 
 const parseViewBox = (value) => value.split(' ').map(Number);
@@ -403,7 +430,9 @@ const renderStandardSvg = (diagram, viewport, variant) => {
     diagram.id
   }" data-variant="${variant}">
   <title id="${id}-title">${xml(diagram.title)}</title>
-  <desc id="${id}-description">${xml(diagram.description)}</desc>
+  <desc id="${id}-description">${xml(
+    `${diagram.description} In plain words: ${diagram.plainLanguage} Real app example: ${diagram.realWorldExample} Why money cares: ${diagram.financialImpact}`
+  )}</desc>
   <style>${svgStyles}</style>
   ${renderDefinitions(id)}
   <rect width="${width}" height="${height}" fill="var(--st-surface)"/>
@@ -415,7 +444,7 @@ const renderStandardSvg = (diagram, viewport, variant) => {
 
 const renderDocsSvg = (diagram) => {
   const [, , width, diagramHeight] = parseViewBox(diagram.desktopViewBox);
-  const notesHeight = 300;
+  const notesHeight = 430;
   const height = diagramHeight + notesHeight;
   const id = `${diagram.id}-docs`;
   const checks = diagram.checks
@@ -439,6 +468,13 @@ const renderDocsSvg = (diagram) => {
     width - 48
   }" height="${notesHeight - 36}">
     <section xmlns="http://www.w3.org/1999/xhtml" class="notes">
+      <div class="story-grid"><div class="story-item story-item--plain"><h2>In plain words</h2><p>${xml(
+        diagram.plainLanguage
+      )}</p></div><div class="story-item story-item--example"><h2>Real app example</h2><p>${xml(
+        diagram.realWorldExample
+      )}</p></div><div class="story-item story-item--money"><h2>Why money cares</h2><p>${xml(
+        diagram.financialImpact
+      )}</p></div></div>
       <div class="notes-grid"><div><h2>Semantic checks</h2><ul>${checks}</ul></div><div><h2>Code evidence</h2><ul>${evidence}</ul></div></div>
     </section>
   </foreignObject>
@@ -448,11 +484,11 @@ const renderDocsSvg = (diagram) => {
 
 const renderSlideSvg = (diagram) => {
   const [, , sourceWidth, sourceHeight] = parseViewBox(diagram.desktopViewBox);
-  const scale = Math.min(1680 / sourceWidth, 650 / sourceHeight);
+  const scale = Math.min(1680 / sourceWidth, 540 / sourceHeight);
   const renderedWidth = sourceWidth * scale;
   const renderedHeight = sourceHeight * scale;
   const offsetX = (1920 - renderedWidth) / 2;
-  const offsetY = 315 + (650 - renderedHeight) / 2;
+  const offsetY = 220 + (540 - renderedHeight) / 2;
   const id = `${diagram.id}-slide`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="${id}-title ${id}-description" data-diagram="${
@@ -472,11 +508,23 @@ const renderSlideSvg = (diagram) => {
     `${id}-arrow`,
     false
   )}</g>
+  <foreignObject x="120" y="790" width="1680" height="220">
+    <section xmlns="http://www.w3.org/1999/xhtml" class="slide-story">
+      <div class="story-grid"><div class="story-item story-item--plain"><h2>In plain words</h2><p>${xml(
+        diagram.plainLanguage
+      )}</p></div><div class="story-item story-item--example"><h2>Real app example</h2><p>${xml(
+        diagram.realWorldExample
+      )}</p></div><div class="story-item story-item--money"><h2>Why money cares</h2><p>${xml(
+        diagram.financialImpact
+      )}</p></div></div>
+    </section>
+  </foreignObject>
 </svg>
 `;
 };
 
 const { diagrams, source } = compileSpecifications();
+validateExplanations(diagrams);
 validateLayouts(diagrams);
 const sourceHash = createHash('sha256').update(source).digest('hex');
 const outputs = new Map();
@@ -511,7 +559,7 @@ for (const diagram of diagrams) {
 
 outputs.set(
   'README.md',
-  `# SignalTree architecture diagrams\n\nGenerated from the audited semantic source at \`apps/demo/src/app/pages/architecture-overview/architecture-diagrams.ts\`. Do not edit generated files by hand.\n\nEach concept includes:\n\n- \`*.web.svg\` — responsive, themeable desktop composition\n- \`*.mobile.svg\` — recomposed narrow-screen layout\n- \`*.docs.svg\` — detailed visual with semantic checks and evidence\n- \`*.slide.svg\` — 1920 x 1080 presentation composition\n- \`semantic-spec.json\` — nodes, edges, groups, copy, accessibility description, and source evidence\n\nRegenerate with \`pnpm architecture:assets\`; verify drift with \`pnpm architecture:assets:check\`.\n`
+  `# SignalTree architecture diagrams\n\nGenerated from the audited semantic source at \`apps/demo/src/app/pages/architecture-overview/architecture-diagrams.ts\`. Do not edit generated files by hand.\n\nEach concept includes:\n\n- \`*.web.svg\` — responsive, themeable desktop composition\n- \`*.mobile.svg\` — recomposed narrow-screen layout\n- \`*.docs.svg\` — detailed visual with plain-language guidance, a real app example, financial impact, semantic checks, and evidence\n- \`*.slide.svg\` — 1920 x 1080 presentation composition with a compact teaching strip\n- \`semantic-spec.json\` — nodes, edges, groups, copy, accessibility description, and source evidence\n\nRegenerate with \`pnpm architecture:assets\`; verify drift with \`pnpm architecture:assets:check\`.\n`
 );
 
 const mismatches = [];

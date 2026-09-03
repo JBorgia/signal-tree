@@ -16,7 +16,7 @@
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
-    padding: clamp(1.25rem, 4vw, 2rem);
+    padding: var(--layout-panel-inset);
     border-bottom: 1px solid var(--color-neutral-200);
     background-color: var(--color-paper);
     background-image: var(--pattern-grid);
@@ -53,7 +53,7 @@
     flex-direction: column;
     gap: $spacing-lg;
     min-width: 0;
-    padding: clamp(1.25rem, 4vw, 2rem);
+    padding: var(--layout-panel-inset);
   }
 
   &__reactive {
@@ -70,7 +70,7 @@
 
   &__panel {
     min-width: 0;
-    padding: clamp(1rem, 3vw, 1.5rem);
+    padding: var(--layout-panel-inset);
   }
 
   &__panel + &__panel {
@@ -96,7 +96,7 @@
 
   &__code {
     min-width: 0;
-    padding: clamp(1.25rem, 4vw, 2rem);
+    padding: var(--layout-panel-inset);
   }
 
   &__code-title {

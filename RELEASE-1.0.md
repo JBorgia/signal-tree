@@ -12743,15 +12743,15 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       matrix 60/60 green with zero unproven, blind, or errored proofs. Known
       technical GA blockers: none.
 - [x] **`AI-SEMANTIC-DISCOVERABILITY-0`.** The root `llms.txt` is the one
-  canonical v15 teaching source, copied deterministically into kernel,
-  Angular, and React tarballs; their package READMEs link the co-packed
-  manifest. The manifest and permanent mutation-proven gate pin positioning,
-  facade imports, `link()`/persistence composition, external authority, and
-  causal explanation as projection. Root v10 guidance is historical only.
-  Packed artifacts, documentation/import/symbol checks, strict `bundler` and
-  `node16` consumers, demo test/build, and V3's 79-project gate are green.
-  Independent phase-boundary review found no blocker; the exact final
-  release matrix passed 73/73 with zero known-red.
+      canonical v15 teaching source, copied deterministically into kernel,
+      Angular, and React tarballs; their package READMEs link the co-packed
+      manifest. The manifest and permanent mutation-proven gate pin positioning,
+      facade imports, `link()`/persistence composition, external authority, and
+      causal explanation as projection. Root v10 guidance is historical only.
+      Packed artifacts, documentation/import/symbol checks, strict `bundler` and
+      `node16` consumers, demo test/build, and V3's 79-project gate are green.
+      Independent phase-boundary review found no blocker; the exact final
+      release matrix passed 73/73 with zero known-red.
 - [x] **`CAUSAL-REPRESENTATION-0` (`8aa9591d`).** The fact inventory, mutation-
       proven baseline, one-owner attribution controls, bounded carrier tests,
       and auxiliary-retention audit preserve all frozen causal laws and select
@@ -12762,6 +12762,13 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       density floor and regressed churn materially, so no replacement is
       selected. Full kernel validation is green; no second carrier experiment
       is authorized.
+- [x] **Final v15 demo and benchmark surface.** Retired comparison machinery
+  is replaced with checked browser workloads, current routes and navigation,
+  responsive architecture assets, and source-backed benchmark evidence.
+  The comparison CLI accurately identifies SignalTree and elf as native
+  history implementations while the ngrx-signals and raw-signal arms use
+  explicit snapshots. Demo tests (`138` passing), its production build, the
+  benchmark harness, and the full release matrix (`73/73`) are green.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness

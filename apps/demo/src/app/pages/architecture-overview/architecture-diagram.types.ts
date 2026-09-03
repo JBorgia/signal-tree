@@ -60,6 +60,9 @@ export interface ArchitectureDiagramSpec {
   readonly title: string;
   readonly takeaway: string;
   readonly description: string;
+  readonly plainLanguage: string;
+  readonly realWorldExample: string;
+  readonly financialImpact: string;
   readonly desktopViewBox: string;
   readonly mobileViewBox: string;
   readonly nodes: readonly ArchitectureDiagramNode[];

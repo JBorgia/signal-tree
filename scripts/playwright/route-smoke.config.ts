@@ -14,6 +14,9 @@ export default defineConfig({
   testDir: '.',
   testMatch: [
     'route-smoke.spec.ts',
+    'architecture-connectors.spec.ts',
+    'benchmarks.spec.ts',
+    'hover-language.spec.ts',
     'mobile-layout.spec.ts',
     'layout-system.spec.ts',
     'visual-language.spec.ts',

@@ -87,12 +87,7 @@
 </aside>
 
 @if (mobileMenuOpen()) {
-<button
-  type="button"
-  class="navigation-backdrop"
-  aria-label="Close navigation menu"
-  (click)="closeMobileMenu()"
-></button>
+<div class="navigation-backdrop" aria-hidden="true"></div>
 }
 
 <header class="mobile-navigation-bar">

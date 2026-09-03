@@ -77,6 +77,28 @@ describe('DocumentationComponent', () => {
     ]);
   });
 
+  it('renders wrapped Markdown prose without forced line breaks', async () => {
+    const request = httpMock.expectOne('assets/docs/core/README.md');
+    request.flush(
+      'A sentence wrapped in source\ncontinues as normal prose.\n\nA new paragraph.'
+    );
+    await fixture.whenStable();
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    fixture.detectChanges();
+
+    expect(component.markdownContent()).not.toContain('<br>');
+    const content: HTMLElement = fixture.nativeElement.querySelector(
+      '.markdown-content'
+    );
+    expect(content.querySelector('br')).toBeNull();
+    expect(content.querySelectorAll('p')).toHaveLength(2);
+    expect(
+      content.querySelector('p')?.textContent?.replace(/\s+/g, ' ').trim()
+    ).toContain(
+      'A sentence wrapped in source continues as normal prose.'
+    );
+  });
+
   it('selectPackage() updates selectedPackage() and re-issues the README fetch', () => {
     // Package-agnostic on purpose. This named `events` and broke when that
     // package was deleted, exactly as an earlier version named `ng-forms` and

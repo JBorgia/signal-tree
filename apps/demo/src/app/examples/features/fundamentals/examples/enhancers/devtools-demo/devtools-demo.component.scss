@@ -35,8 +35,7 @@ $text-light: #6d796f;
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-color: currentColor;
   }
 
   &:disabled {
@@ -154,8 +153,7 @@ $text-light: #6d796f;
     transition: all 0.2s;
 
     &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+      border-color: var(--color-primary-500);
     }
   }
 }
@@ -576,8 +574,7 @@ $text-light: #6d796f;
   }
 
   &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
+    border-color: var(--color-neutral-400);
   }
 }
 
@@ -615,7 +612,7 @@ $text-light: #6d796f;
 .no-history {
   text-align: center;
   color: $text-light;
-  padding: 3rem 1rem;
+  padding: var(--layout-section-gap) var(--layout-panel-inset);
   font-size: 0.875rem;
 }
 

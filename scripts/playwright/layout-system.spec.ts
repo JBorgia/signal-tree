@@ -13,6 +13,7 @@ const FRAME_ROUTES = [
   '/devtools',
   '/examples/fundamentals/recommended-architecture',
   '/migrate',
+  '/benchmarks',
   '/deep-typing',
   '/realistic-benchmark-history',
   '/legacy-changelog',
@@ -56,19 +57,17 @@ for (const viewport of VIEWPORTS) {
             position: fixed;
             visibility: hidden;
             width: var(--layout-gutter);
-            height: var(--layout-wide-max);
             padding-left: var(--layout-panel-inset);
           `;
           document.body.appendChild(probe);
           const probeStyle = getComputedStyle(probe);
           const gutter = probe.getBoundingClientRect().width;
-          const maxWidth = probe.getBoundingClientRect().height;
           const panelInset = Number.parseFloat(probeStyle.paddingLeft);
           probe.remove();
 
           const mainBox = main.getBoundingClientRect();
           const frameBox = element.getBoundingClientRect();
-          const expectedWidth = Math.min(mainBox.width - 2 * gutter, maxWidth);
+          const expectedWidth = mainBox.width - 2 * gutter;
 
           return {
             expectedWidth,
@@ -111,7 +110,7 @@ test('Docs keeps its document switcher in flow instead of adding a second aside'
   await expect(page.locator('main aside')).toHaveCount(0);
 });
 
-test('full-width bands align their inner content to the shared width system', async ({
+test('full-width bands align their inner content to the shared gutter', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1000 });
@@ -129,17 +128,15 @@ test('full-width bands align their inner content to the shared width system', as
       const style = getComputedStyle(element);
       const probe = document.createElement('div');
       probe.style.cssText =
-        'position:fixed;visibility:hidden;width:var(--layout-wide-max)';
+        'position:fixed;visibility:hidden;width:var(--layout-gutter)';
       document.body.appendChild(probe);
-      const maxWidth = probe.getBoundingClientRect().width;
+      const gutter = probe.getBoundingClientRect().width;
       probe.remove();
       const leftContentEdge = box.left + Number.parseFloat(style.paddingLeft);
       const rightContentEdge = box.right - Number.parseFloat(style.paddingRight);
-      const contentWidth = Math.min(rightContentEdge - leftContentEdge, maxWidth);
-      const expectedGap = (mainBox.width - contentWidth) / 2;
 
       return {
-        expectedGap,
+        expectedGap: gutter,
         leftGap: leftContentEdge - mainBox.left,
         rightGap: mainBox.right - rightContentEdge,
       };
@@ -147,5 +144,33 @@ test('full-width bands align their inner content to the shared width system', as
 
     expect(alignment.leftGap).toBeCloseTo(alignment.expectedGap, 0);
     expect(alignment.rightGap).toBeCloseTo(alignment.expectedGap, 0);
+  }
+});
+
+test('architecture hero is content-driven and reveals the opening section', async ({
+  page,
+}) => {
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 910, height: 768 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/architecture-overview', { waitUntil: 'load' });
+
+    const geometry = await page
+      .locator('.architecture-hero')
+      .evaluate((hero) => {
+        const opening = document.querySelector('.architecture-band--opening');
+        if (!opening) throw new Error('Missing opening architecture section');
+
+        return {
+          minHeight: getComputedStyle(hero).minHeight,
+          openingTop: opening.getBoundingClientRect().top,
+        };
+      });
+
+    expect(geometry.minHeight).toBe('0px');
+    expect(geometry.openingTop).toBeLessThan(viewport.height);
   }
 });

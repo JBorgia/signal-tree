@@ -18,13 +18,15 @@
 
 .architecture-figure {
   margin: 0;
-  scroll-margin-top: 6rem;
+  scroll-margin-top: calc(
+    var(--layout-bar-height) + var(--layout-panel-inset)
+  );
 }
 
 .figure-heading {
   display: grid;
   grid-template-columns: minmax(0, 0.72fr) minmax(20rem, 1.28fr);
-  column-gap: clamp(2rem, 6vw, 7rem);
+  column-gap: var(--layout-section-gap);
   align-items: end;
   margin-bottom: 1.5rem;
 }
@@ -209,6 +211,49 @@ figcaption {
   line-height: 1.65;
 }
 
+.explanation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: var(--layout-panel-inset);
+  border-top: var(--layout-rule);
+  border-left: var(--layout-rule);
+}
+
+.explanation-item {
+  min-width: 0;
+  padding: var(--layout-panel-inset);
+  border-right: var(--layout-rule);
+  border-bottom: var(--layout-rule);
+  background: var(--color-surface);
+}
+
+.explanation-item--plain {
+  background: var(--color-authored);
+}
+
+.explanation-item--example {
+  background: var(--color-framework);
+}
+
+.explanation-item--money {
+  background: var(--color-restoration);
+}
+
+.explanation-item h3 {
+  margin: 0 0 0.45rem;
+  color: var(--diagram-ink);
+  font-family: var(--font-family-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.explanation-item p {
+  margin: 0;
+  color: var(--diagram-ink);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
 .accuracy-notes {
   margin-top: 1rem;
   border-top: 1px solid var(--border-color);
@@ -222,6 +267,10 @@ figcaption {
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 720;
+}
+
+.accuracy-notes summary:hover {
+  color: var(--color-primary-700);
 }
 
 .accuracy-grid {
@@ -279,6 +328,10 @@ figcaption {
   .accuracy-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
+  }
+
+  .explanation-grid {
+    grid-template-columns: 1fr;
   }
 
   .edge-label {

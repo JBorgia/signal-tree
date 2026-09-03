@@ -22,10 +22,6 @@ module.exports = {
     '^@api/(.*)$': '<rootDir>/../../api/$1',
     '^@packages/(.*)$': '<rootDir>/../../packages/$1',
     '^@types/(.*)$': '<rootDir>/../../types/$1',
-    '^(akita-benchmark-service|elf-benchmark-service|ngrx-benchmark-service|ngrx-signals-benchmark-service|ngxs-benchmark-service|signaltree-benchmark-service|realistic-benchmark-service)$':
-      '<rootDir>/src/app/tests/__mocks__/$1.ts',
-    '^\\.\\./services/realistic-benchmark\\.service$':
-      '<rootDir>/src/app/tests/__mocks__/realistic-benchmark.service.ts',
   },
   transform: {
     '^.+\\.(ts|mjs|js|html)$': [
@@ -52,7 +48,7 @@ module.exports = {
     // via `.*`, so it matches regardless of nesting depth — `marked` needs
     // the same nesting-agnostic treatment since its bundle is `.esm.js`, not
     // `.mjs`. Both the bare and the nesting-agnostic form are required.
-    'node_modules/(?!(@ngrx|@ngxs|elf|@signaltree|marked|.*\\.mjs$|@angular|@angular/.*|.*node_modules/marked/))',
+      'node_modules/(?!(@ngrx|@ngxs|@datorama|@reduxjs|elf|zustand|mobx|valtio|@signaltree|marked|.*\\.mjs$|@angular|@angular/.*|.*node_modules/(marked|@datorama|@reduxjs|zustand|mobx|valtio)/))',
   ],
   snapshotSerializers: [
     'jest-preset-angular/build/serializers/no-ng-attributes',

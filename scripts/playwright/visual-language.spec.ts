@@ -110,6 +110,9 @@ for (const route of DEMO_ROUTES) {
         })
         .map(label)
         .slice(0, 40);
+      const forcedLineBreaks = Array.from(
+        document.querySelectorAll('main br')
+      ).map(label);
 
       return {
         legacyColorUses,
@@ -117,6 +120,7 @@ for (const route of DEMO_ROUTES) {
         roundedRectangles,
         floatingShadows,
         decorativeGradients,
+        forcedLineBreaks,
       };
     }, [...LEGACY_COLORS]);
 
@@ -140,5 +144,108 @@ for (const route of DEMO_ROUTES) {
       audit.decorativeGradients,
       `${route} renders decorative gradients outside the grid-field language`
     ).toEqual([]);
+    expect(
+      audit.forcedLineBreaks,
+      `${route} uses forced line breaks instead of semantic blocks or wrapping`
+    ).toEqual([]);
   });
 }
+
+test('package docs share one responsive package-heading treatment', async ({
+  page,
+}) => {
+  for (const viewport of [
+    { width: 1400, height: 800 },
+    { width: 320, height: 740 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/docs', { waitUntil: 'load' });
+
+    const headings = [];
+    for (const [index, packageName] of [
+      [0, '@signal-tree/kernel'],
+      [1, '@signal-tree/angular'],
+      [2, '@signal-tree/react'],
+    ] as const) {
+      if (index > 0) await page.locator('.package-button').nth(index).click();
+      const heading = page.locator('.markdown-content h1 > code:only-child');
+      await expect(heading).toHaveText(packageName);
+
+      headings.push(
+        await heading.evaluate((element) => {
+          const box = element.getBoundingClientRect();
+          const article = element.closest('.markdown-content')?.getBoundingClientRect();
+          const style = getComputedStyle(element);
+
+          return {
+            fontFamily: style.fontFamily,
+            fontSize: style.fontSize,
+            border: style.border,
+            height: Math.round(box.height),
+            insideArticle:
+              !!article && box.left >= article.left && box.right <= article.right,
+          };
+        })
+      );
+    }
+
+    const diagnostic = JSON.stringify({ viewport, headings });
+    expect(
+      new Set(headings.map((heading) => heading.fontFamily)).size,
+      diagnostic
+    ).toBe(1);
+    expect(new Set(headings.map((heading) => heading.fontSize)).size).toBe(1);
+    expect(new Set(headings.map((heading) => heading.border)).size).toBe(1);
+    expect(new Set(headings.map((heading) => heading.height)).size).toBe(1);
+    expect(headings.every((heading) => heading.insideArticle)).toBe(true);
+  }
+});
+
+test('every idle sidebar destination uses one row treatment', async ({ page }) => {
+  for (const viewport of [
+    { width: 1400, height: 900 },
+    { width: 558, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/docs', { waitUntil: 'load' });
+    if (viewport.width < 1024) {
+      await page.locator('.navigation-toggle').click();
+      await expect(page.locator('.site-navigation')).toHaveClass(
+        /site-navigation--open/
+      );
+    }
+
+    const rows = await page.locator('.navigation-link').evaluateAll((links) =>
+      links.map((link) => {
+        const style = getComputedStyle(link);
+        const title = link.querySelector<HTMLElement>(
+          '.navigation-link__title'
+        );
+        if (!title) throw new Error('Navigation link is missing its title');
+        const box = link.getBoundingClientRect();
+
+        return {
+          background: style.backgroundColor,
+          border: style.border,
+          padding: style.padding,
+          titleInset: Math.round(title.getBoundingClientRect().left - box.left),
+          titleWeight: getComputedStyle(title).fontWeight,
+        };
+      })
+    );
+    const diagnostic = JSON.stringify({ viewport, rows });
+
+    for (const property of [
+      'background',
+      'border',
+      'padding',
+      'titleInset',
+      'titleWeight',
+    ] as const) {
+      expect(
+        new Set(rows.map((row) => row[property])).size,
+        `${property}: ${diagnostic}`
+      ).toBe(1);
+    }
+  }
+});

@@ -16,14 +16,9 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(16rem, 0.65fr);
-  gap: clamp(2rem, 8vw, 9rem);
+  gap: var(--layout-section-gap);
   align-items: end;
-  min-height: min(47rem, calc(100vh - 4rem));
-  padding: clamp(6rem, 12vh, 9rem)
-    max(
-      var(--layout-gutter),
-      calc((100% - var(--layout-wide-max)) / 2)
-    );
+  padding: var(--layout-hero-block) var(--layout-gutter);
   background-color: #f4f6ef;
   background-image: linear-gradient(
       rgba(23, 33, 26, 0.055) 1px,
@@ -36,11 +31,8 @@
 
 .architecture-hero::after {
   position: absolute;
-  right: max(
-    var(--layout-gutter),
-    calc((100% - var(--layout-wide-max)) / 2)
-  );
-  top: clamp(5rem, 10vh, 8rem);
+  right: var(--layout-gutter);
+  top: var(--layout-hero-block);
   width: clamp(4rem, 9vw, 8rem);
   height: 0.6rem;
   background: var(--page-accent);
@@ -98,7 +90,7 @@ h1 {
   font-size: 0.9rem;
   font-weight: 670;
   text-decoration: none;
-  transition: padding 160ms ease, background 160ms ease;
+  transition: background 160ms ease, color 160ms ease;
 }
 
 .architecture-nav a::after {
@@ -108,18 +100,17 @@ h1 {
 
 .architecture-nav a:hover,
 .architecture-nav a:focus-visible {
-  padding-inline: 0.7rem;
   background: rgba(183, 229, 31, 0.28);
   outline: none;
 }
 
 .architecture-band {
-  padding: clamp(5rem, 10vw, 9rem) var(--layout-gutter);
+  padding: var(--layout-band-block) var(--layout-gutter);
   background: var(--page-paper);
 }
 
 .architecture-band--opening {
-  padding-top: clamp(3.5rem, 7vw, 6rem);
+  padding-top: var(--layout-band-block);
 }
 
 .architecture-band--ink {
@@ -146,16 +137,15 @@ h1 {
 }
 
 .content-shell {
-  width: min(100%, var(--layout-wide-max));
-  margin: 0 auto;
+  min-width: 0;
 }
 
 .chapter-heading {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(22rem, 1.2fr);
-  column-gap: clamp(2rem, 6vw, 7rem);
+  column-gap: var(--layout-section-gap);
   align-items: end;
-  margin-bottom: clamp(4rem, 8vw, 7rem);
+  margin-bottom: var(--layout-heading-gap);
 }
 
 .chapter-heading > p {
@@ -182,19 +172,18 @@ h1 {
 
 .diagram-stack {
   display: grid;
-  gap: clamp(6rem, 12vw, 11rem);
+  gap: var(--layout-section-gap);
 }
 
 @media (max-width: 760px) {
   .architecture-hero {
     grid-template-columns: 1fr;
-    align-content: end;
-    min-height: calc(100svh - 8.5rem);
-    padding: 6.5rem var(--layout-gutter) 2.5rem;
+    padding: var(--layout-hero-block) var(--layout-gutter)
+      var(--layout-panel-inset);
   }
 
   .architecture-hero::after {
-    top: 5rem;
+    top: var(--layout-hero-block);
     right: var(--layout-gutter);
     width: 4rem;
   }
@@ -219,20 +208,20 @@ h1 {
 
   .architecture-nav a:hover,
   .architecture-nav a:focus-visible {
-    padding-inline: 0.45rem;
+    color: var(--color-primary-900);
   }
 
   .architecture-band {
-    padding: 4.5rem var(--layout-gutter);
+    padding: var(--layout-band-block) var(--layout-gutter);
   }
 
   .architecture-band--opening {
-    padding-top: 3rem;
+    padding-top: var(--layout-band-block);
   }
 
   .chapter-heading {
     display: block;
-    margin-bottom: 3.5rem;
+    margin-bottom: var(--layout-heading-gap);
   }
 
   .chapter-heading h2 {
@@ -245,7 +234,7 @@ h1 {
   }
 
   .diagram-stack {
-    gap: 5.5rem;
+    gap: var(--layout-section-gap);
   }
 }
 

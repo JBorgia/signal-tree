@@ -33,7 +33,6 @@ app-documentation {
 }
 
 .docs-orientation {
-  max-width: var(--layout-reading-max);
   margin: 1rem 0 0;
   color: var(--color-neutral-600);
   font-size: 0.9rem;
@@ -185,15 +184,14 @@ app-documentation {
 }
 
 .markdown-content {
-  width: min(100%, var(--layout-reading-max));
-  margin: 0 auto;
+  margin: 0;
   color: var(--color-neutral-700);
   font-size: 1rem;
   line-height: 1.75;
 }
 
 .markdown-content div[align='center'] {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--layout-section-gap);
   text-align: left;
 }
 
@@ -215,7 +213,7 @@ app-documentation {
 }
 
 .markdown-content h2 {
-  margin: 3rem 0 1.2rem;
+  margin: var(--layout-section-gap) 0 1rem;
   padding-bottom: 0.65rem;
   border-bottom: 1px solid var(--color-neutral-300);
   font-size: 1.75rem;
@@ -339,6 +337,11 @@ app-documentation {
   text-underline-offset: 0.18em;
 }
 
+.markdown-content a:hover {
+  color: var(--color-primary-900);
+  text-decoration-thickness: 2px;
+}
+
 .markdown-content table {
   display: block;
   width: 100%;
@@ -388,6 +391,12 @@ app-documentation {
   .documentation-header h1,
   .markdown-content h1 {
     font-size: 2rem;
+  }
+
+  .markdown-content h1 > code:only-child {
+    display: inline-block;
+    font-size: 0.7em;
+    white-space: nowrap;
   }
 }
 

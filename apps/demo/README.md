@@ -12,19 +12,20 @@ and focused tests decide whether a capability or example is current.
 
 ## Current surface
 
-| Area           | Route                                    | What it establishes                                                                   |
-| -------------- | ---------------------------------------- | ------------------------------------------------------------------------------------- |
-| Start          | `/`                                      | Evaluation path and package choice                                                    |
-| Architecture   | `/architecture-overview`                 | Verified ownership, authority, restoration, identity, Link, and projection boundaries |
-| Fundamentals   | `/examples/fundamentals`                 | Construction, callable reads, leaf writes, derived state, and transactions            |
-| Package guides | `/angular`, `/kernel`, `/react`, `/docs` | Framework facade and source documentation                                             |
-| Batching       | `/batching`                              | Grouped publication                                                                   |
-| EntityMap      | `/entities`                              | Keyed identity, stable ordinary-update handles, queries, and mutation boundaries      |
-| Restoration    | `/restoration`                           | Explicitly designated authored turns                                                  |
-| External truth | `/external-truth`                        | External ingress, Link relationships, and application-owned orchestration             |
-| DevTools       | `/devtools`                              | State inspection integration                                                          |
-| Deep typing    | `/deep-typing`                           | Compile-backed exact leaf typing through one declared 15-branch path                  |
-| Migration      | `/migrate`                               | Concept-first migration toward v15 ownership                                          |
+| Area           | Route                                                                  | What it establishes                                                                        |
+| -------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Start          | `/`                                                                    | Evaluation path and package choice                                                         |
+| Architecture   | `/architecture-overview`                                               | Verified ownership, authority, restoration, identity, Link, and projection boundaries      |
+| Fundamentals   | `/examples/fundamentals`                                               | Construction, callable reads, leaf writes, derived state, and transactions                 |
+| Package guides | `/docs?package=angular`, `/docs?package=kernel`, `/docs?package=react` | Framework facade and source documentation                                                  |
+| Batching       | `/batching`                                                            | Grouped publication                                                                        |
+| EntityMap      | `/entities`                                                            | Keyed identity, stable ordinary-update handles, queries, and mutation boundaries           |
+| Restoration    | `/restoration`                                                         | Explicitly designated authored turns                                                       |
+| External truth | `/external-truth`                                                      | External ingress, Link relationships, and application-owned orchestration                  |
+| DevTools       | `/devtools`                                                            | State inspection integration                                                               |
+| Deep typing    | `/deep-typing`                                                         | Compile-backed exact leaf typing through one declared 15-branch path                       |
+| Migration      | `/migrate`                                                             | Concept-first migration toward v15 ownership                                               |
+| Benchmarks     | `/benchmarks`                                                          | Capability-matched browser tasks; Node generators remain authoritative for release figures |
 
 Pre-v15 release notes and retired benchmark submissions are kept under the
 navigation's Archive section and are not current API guidance.

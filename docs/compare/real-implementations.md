@@ -45,7 +45,7 @@ Reproduce with `node --expose-gc tools/bench-compare.mjs --n 10000`.
 
 `retained` is the COLLECTION's cost. Each arm's library module graph is loaded
 before the measured window, because it is not equal across arms and it is not
-what this column is asking about: `@signaltree/core` (which pulls Angular)
+what this column is asking about: `@signal-tree/kernel`
 retains 6.67 MB of modules, `@ngrx/signals` 5.88 MB, `@ngneat/elf` 2.18 MB.
 Charging each arm its own import padded every number and compressed the gap
 between them by ~4x. This figure agrees with the isolated layer probe in
@@ -90,18 +90,24 @@ Reproduce with `node --expose-gc tools/bench-compare.mjs --n 10000`.
 > all — see "The retraction" below. These numbers are the corrected ones, and
 > they are verified by postconditions every arm must satisfy.
 
-| arm          | median       | retained | history                      | 14.0.0 published |
-| ------------ | ------------ | -------- | ---------------------------- | ---------------- |
-| **elf**      | **1.09 ms**  | 4.88 MB  | built-in `elf-state-history` | 1.24 ms          |
-| signaltree   | **29.45 ms** | 29.70 MB | built-in `restoration()`     | 3.67 ms          |
-| ngrx-signals | 177.21 ms    | 1.08 MB  | hand-rolled                  | 179.84 ms        |
-| raw-signals  | 273.85 ms    | 6.31 MB  | hand-rolled                  | 278.44 ms        |
+| arm          | median      | retained | history                      |    record |      undo |
+| ------------ | ----------- | -------- | ---------------------------- | --------: | --------: |
+| **elf**      | **1.37 ms** | 4.90 MB  | built-in `elf-state-history` |   1.22 ms |   0.08 ms |
+| signaltree   | **2.54 ms** | 5.11 MB  | built-in `restoration()`     |   1.11 ms |   1.48 ms |
+| ngrx-signals | 190.81 ms   | 1.08 MB  | hand-rolled                  | 190.73 ms |   0.15 ms |
+| raw-signals  | 304.29 ms   | 6.31 MB  | hand-rolled                  | 186.80 ms | 111.29 ms |
 
-**SignalTree is ~27× behind elf and ~6× ahead of a hand-rolled history.** The
-same regression pattern as the collection workload and almost certainly the same
-cause: elf, `@ngrx/signals` and raw-signals reproduce their published timings,
-SignalTree went from 3.67 ms to 29.45 ms. The published "~49× ahead of
-hand-rolled" no longer holds; ~6× does.
+SignalTree recording and elf recording are at parity on this run. The remaining
+gap is undo: SignalTree replays causal effects through position frontiers,
+authority-conflict checks, entity subject identity, and coherent publication;
+elf replaces the store with a prior state from linear history.
+
+The former **29.45 ms** SignalTree result was a harness defect. The entry-count
+postcondition called `getRestorationHistory()` inside the timer only for
+SignalTree. In v15 that inspection API reconstructs historical states, so the
+table charged SignalTree for a separate 50-state projection that no other arm
+performed. The harness now proves every retained step by checking the exact
+value after each undo instead.
 
 elf remains ahead for a structural reason worth naming: it is an immutable
 store, so an undo swaps ONE state reference — 3 µs, independent of collection
@@ -142,12 +148,10 @@ silently corrupt a restore.
 > it as "tens of µs", not a precise figure.
 >
 > **Quote the whole-workload table at the top of this section, not this
-> figure.** That one comes straight out of
+> figure.** The total and phase medians now come straight out of
 > `node --expose-gc tools/bench-compare.mjs --n 10000`, so anyone can re-derive
-> it; a per-undo cost divided out of a combined workload is exactly how one
-> measurement became three published numbers. An independent run of that harness
-> while writing this note gave 3.97 ms / 1.64 ms against the 4.32 / 1.76 above —
-> same ordering, same ratio, ordinary run-to-run spread.
+> them. The JSON output includes `recordMs` and `undoMs`; they are measured
+> boundaries, not values divided out of a combined total.
 
 ### Where the remaining undo cost actually is, and what is NOT worth optimising
 
@@ -210,10 +214,9 @@ for **every** arm:
 
 - the writes actually landed (`value === 900_049`);
 - the undos actually reverted it (`value !== afterWrites`);
-- history held ≥ 50 entries **after the writes** — captured there, because
-  stack-based arms drain their history as they undo while SignalTree keeps
-  entries and moves a pointer, and checking afterwards failed three arms for a
-  difference in semantics rather than for doing no work.
+- every undo restored the exact preceding value, through all 50 writes and back
+  to the seed value. This is stronger and neutral across stack- and
+  frontier-based history implementations.
 
 A benchmark that cannot detect it did nothing is the same defect class it exists
 to expose. This is the fifth instance of that pattern in this repo, after
@@ -342,19 +345,19 @@ same framework, same signals-first premise, same problem.
 
 Against that one comparison, measured here:
 
-|                                                         | SignalTree   | `@ngrx/signals` |           |
-| ------------------------------------------------------- | ------------ | --------------- | --------- |
-| consumers invalidated by a 1-entity change (1,000 rows) | **1**        | 1,000           | **1000×** |
-| collection: build 10k + 200 updates + read all          | 107.04 ms    | **10.22 ms**    | 0.10×     |
-| undo/redo: 50 writes + 50 undos over 10k                | **29.45 ms** | 177.21 ms       | **6.0×**  |
-| collection retained (10k, module graph excluded)        | 11.44 MB     | **1.07 MB**     | 0.09×     |
-| retained per entity (marginal)                          | 1,176 B      | **89 B**        | 0.08×     |
-| history primitive                                       | built in     | hand-rolled     |           |
+|                                                         | SignalTree  | `@ngrx/signals` |           |
+| ------------------------------------------------------- | ----------- | --------------- | --------- |
+| consumers invalidated by a 1-entity change (1,000 rows) | **1**       | 1,000           | **1000×** |
+| collection: build 10k + 200 updates + read all          | 107.04 ms   | **10.22 ms**    | 0.10×     |
+| undo/redo: 50 writes + 50 undos over 10k                | **2.54 ms** | 190.81 ms       | **75×**   |
+| collection retained (10k, module graph excluded)        | 11.44 MB    | **1.07 MB**     | 0.09×     |
+| retained per entity (marginal)                          | 1,176 B     | **89 B**        | 0.08×     |
+| history primitive                                       | built in    | hand-rolled     |           |
 
 **This is materially worse than the 14.0.0 version of this table claimed**, which
 read 3.2× / 49× / 0.67×. One win survives intact and is still the one that
 matters most (granularity, and it is not a benchmark result — see below); undo/
-redo remains a win at 6.1× rather than 49×; collection throughput and per-entity
+redo remains a large win over hand-rolled snapshots; collection throughput and per-entity
 memory are now losses of 10× and 13× rather than a win and a 1.5× loss.
 
 The memory line moved for harness reasons — `@ngrx/signals` reads 89 B/entity

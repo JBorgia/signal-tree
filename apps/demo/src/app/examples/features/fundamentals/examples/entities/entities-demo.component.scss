@@ -256,6 +256,11 @@ code {
   color: var(--color-white) !important;
 }
 
+.primary-command:hover:not(:disabled) {
+  border-color: var(--color-primary-800) !important;
+  background: var(--color-primary-800) !important;
+}
+
 button:disabled {
   opacity: 0.45;
   cursor: not-allowed;

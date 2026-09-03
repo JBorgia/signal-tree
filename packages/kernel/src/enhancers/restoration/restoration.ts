@@ -704,9 +704,9 @@ class RestorationManager<T> {
     // This is why undo/redo over a large collection is not where SignalTree
     // wins: elf's state-history swaps ONE reference on undo, because it is an
     // immutable store. Measured at ~2.5x behind elf on 50 writes + 50 undos over
-    // 10k entities (3.97ms vs 1.64ms) — and ~54x AHEAD of a hand-rolled
-    // snapshot history, which is what every library without the primitive
-    // forces. `node --expose-gc tools/bench-compare.mjs --n 10000`.
+    // 10k entities (2.54ms vs 1.37ms in one current run) — and far ahead of a
+    // hand-rolled snapshot history, which is what every library without the
+    // primitive forces. `node --expose-gc tools/bench-compare.mjs --n 10000`.
     //
     // The ~150x figure this comment used to quote was the PRE-FIX number, from
     // before restore diffed instead of calling setAll unconditionally — and it

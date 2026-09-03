@@ -227,22 +227,23 @@
         is the right default and the wrong answer for a few positions: it cannot
         know which fields matter, or that a <code>version</code> field already
         answers the question.
-        <br />
-        <code
-          >user: compared(initialUser, byKeys&lt;User&gt;('id',
-          'version'))</code
-        >
-        <br />
+        <span class="release-example">
+          <code
+            >user: compared(initialUser, byKeys&lt;User&gt;('id',
+            'version'))</code
+          >
+        </span>
         On an object leaf that is <strong>53.8ns → 8.9ns</strong>, and on the same
         object re-fetched over HTTP (equivalent value, new identity)
         <strong>110.3ns → 9.0ns</strong>. The point is not the speed: a
         comparator reaches the reference-equality floor
         <em>while keeping re-fetch correctness</em>, which is exactly why
         defaulting leaves to <code>Object.is</code> stays wrong.
-        <br />
-        <strong>Not for primitives.</strong> <code>deepEqual</code>'s first line
-        is already the fast path — on a changing number it beats
-        <code>Object.is</code> 6.5ns to 8.1ns. There is nothing to specialise.
+        <span class="release-note">
+          <strong>Not for primitives.</strong> <code>deepEqual</code>'s first
+          line is already the fast path — on a changing number it beats
+          <code>Object.is</code> 6.5ns to 8.1ns. There is nothing to specialise.
+        </span>
       </li>
       <li>
         <strong>[ST2018] — a warning when a collection is stored as a plain array
@@ -318,10 +319,11 @@
         <code>persistence()</code>, devtools or <code>createAuditTracker</code>
         was emitting that storage's contents into those payloads. The default
         path was never affected.
-        <br />
-        <strong>Still open:</strong> a marker inside an <em>array</em> or a
-        <code>Map</code> is not traversed, so it still leaks. Don't put markers
-        in arrays or Maps.
+        <span class="release-note">
+          <strong>Still open:</strong> a marker inside an <em>array</em> or a
+          <code>Map</code> is not traversed, so it still leaks. Don't put
+          markers in arrays or Maps.
+        </span>
       </li>
     </ul>
     <h4>✨ Fixed</h4>

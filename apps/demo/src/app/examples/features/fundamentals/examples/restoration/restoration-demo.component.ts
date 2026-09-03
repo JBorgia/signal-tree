@@ -54,6 +54,7 @@ interface AppState {
 export class RestorationDemoComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly timers = new Set<ReturnType<typeof setTimeout>>();
+  private readonly sampleTimers = new Set<ReturnType<typeof setTimeout>>();
   newTodoText = '';
 
   // EntityMap and ordinary state participate in the same restoration model.
@@ -101,7 +102,9 @@ export class RestorationDemoComponent {
   constructor() {
     this.destroyRef.onDestroy(() => {
       for (const timer of this.timers) clearTimeout(timer);
+      for (const timer of this.sampleTimers) clearTimeout(timer);
       this.timers.clear();
+      this.sampleTimers.clear();
       this.markerTree.destroy();
       this.tree.destroy();
     });
@@ -113,6 +116,19 @@ export class RestorationDemoComponent {
       action();
     }, delay);
     this.timers.add(timer);
+  }
+
+  private scheduleSample(action: () => void, delay: number): void {
+    const timer = setTimeout(() => {
+      this.sampleTimers.delete(timer);
+      action();
+    }, delay);
+    this.sampleTimers.add(timer);
+  }
+
+  private cancelSampleActions(): void {
+    for (const timer of this.sampleTimers) clearTimeout(timer);
+    this.sampleTimers.clear();
   }
 
   private commitMarkerState(action?: string) {
@@ -212,14 +228,12 @@ export class RestorationDemoComponent {
 
   // Restoration view state derives from the tree.
   history = signal(this.tree.getRestorationHistory());
-  currentIndex = signal(this.tree.getCurrentIndex());
   canUndo = signal(this.tree.canUndo());
   canRedo = signal(this.tree.canRedo());
   rollbackMessage = signal<string | null>(null);
 
   private refreshRestorationState() {
     this.history.set(this.tree.getRestorationHistory());
-    this.currentIndex.set(this.tree.getCurrentIndex());
     this.canUndo.set(this.tree.canUndo());
     this.canRedo.set(this.tree.canRedo());
   }
@@ -240,23 +254,6 @@ export class RestorationDemoComponent {
   );
 
   historyLength = computed(() => this.history().length);
-  currentState = computed(() => this.history()[this.currentIndex()]);
-
-  /**
-   * How many frames you can actually travel, each way.
-   *
-   * `canUndo()`/`canRedo()` answer "is there anything?" — a disabled button.
-   * They do not answer "how far?", which is the question you have when you are
-   * hunting for a state you passed three actions ago.
-   *
-   * Both fall straight out of the position: `canUndo()` is `index > 0`, so the
-   * number of steps back is the index itself, and the steps forward are whatever
-   * sits after it. Clamped because an empty history parks the index at -1.
-   */
-  undosAvailable = computed(() => Math.max(0, this.currentIndex() + 1));
-  redosAvailable = computed(() =>
-    Math.max(0, this.historyLength() - 1 - this.currentIndex())
-  );
 
   // Counter actions
   increment() {
@@ -391,26 +388,28 @@ export class RestorationDemoComponent {
   }
 
   clearHistory() {
+    this.cancelSampleActions();
     this.tree.resetRestorationHistory();
     this.refreshRestorationState();
   }
 
   // Generate sample actions for easy testing
   generateSampleActions() {
+    this.cancelSampleActions();
     // Reset history first
     this.tree.resetRestorationHistory();
     this.refreshRestorationState();
 
     // Create a sequence of actions with delays for better history visualization
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() => this.message.set('Starting demo...'));
     }, 100);
 
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() => this.counter.set(1));
     }, 200);
 
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() =>
         this.todos.set([
           { id: Date.now(), title: 'First task', completed: false },
@@ -418,15 +417,15 @@ export class RestorationDemoComponent {
       );
     }, 300);
 
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() => this.counter.set(5));
     }, 400);
 
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() => this.message.set('Making more changes...'));
     }, 500);
 
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() =>
         this.todos.update((todos) => [
           ...todos,
@@ -435,11 +434,11 @@ export class RestorationDemoComponent {
       );
     }, 600);
 
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() => this.counter.set(10));
     }, 700);
 
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() =>
         this.todos.update((todos) =>
           todos.map((todo, index) =>
@@ -449,13 +448,13 @@ export class RestorationDemoComponent {
       );
     }, 800);
 
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() =>
         this.message.set('Demo complete. Try undo and redo now.')
       );
     }, 900);
 
-    this.schedule(() => {
+    this.scheduleSample(() => {
       this.designate(() => this.counter.set(15));
     }, 1000);
   }

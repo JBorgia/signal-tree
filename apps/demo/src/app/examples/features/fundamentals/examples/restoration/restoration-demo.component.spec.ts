@@ -43,4 +43,36 @@ describe('RestorationDemoComponent', () => {
 
     expect(component.historyLength()).toBe(1);
   });
+
+  it('reports undo and redo availability without inventing exact move counts', async () => {
+    const fixture = TestBed.createComponent(RestorationDemoComponent);
+    const component = fixture.componentInstance;
+
+    component.increment();
+    await settle();
+    component.increment();
+    await settle();
+    component.undo();
+    await settle();
+
+    expect(component.canRedo()).toBe(true);
+    expect(component.canUndo()).toBe(true);
+  });
+
+  it('clear history cancels pending generated sample actions', async () => {
+    jest.useFakeTimers();
+    try {
+      const fixture = TestBed.createComponent(RestorationDemoComponent);
+      const component = fixture.componentInstance;
+
+      component.generateSampleActions();
+      component.clearHistory();
+      await jest.advanceTimersByTimeAsync(1_100);
+
+      expect(component.historyLength()).toBe(0);
+      expect(component.canUndo()).toBe(false);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });

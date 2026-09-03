@@ -139,8 +139,10 @@
             tabindex="0"
             role="button"
           >
-            <strong>{{ user.name }}</strong> ({{ user.role }})
-            <br /><small>{{ user.email }}</small>
+            <span class="item__identity">
+              <strong>{{ user.name }}</strong> ({{ user.role }})
+            </span>
+            <small>{{ user.email }}</small>
           </div>
         }
       </div>

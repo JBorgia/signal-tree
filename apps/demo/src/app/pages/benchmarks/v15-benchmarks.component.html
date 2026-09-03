@@ -1,0 +1,486 @@
+<div class="benchmarks-page layout-frame" [attr.aria-busy]="isRunning()">
+  <header class="benchmark-hero">
+    <p class="eyebrow">Measured in this browser</p>
+    <h1>Browser performance spot-check</h1>
+    <p class="hero-copy">
+      Three small v15 tasks run across Angular and framework-neutral state
+      library cores. React rendering is not measured. Every timed run must
+      produce the expected final state or the comparison fails instead of
+      publishing a number.
+    </p>
+    <p class="comparability-note">
+      Every ranked row satisfies the same stated capability floor through the
+      measured library or an official first-party package. Implementations that
+      need a benchmark-invented entity model or history feature are excluded. A
+      shared floor does not make broader semantics identical, and these browser
+      spot-checks are not statistical significance tests.
+    </p>
+
+    <div class="scope-strip">
+      <section>
+        <h2>What this page measures</h2>
+        <p>State initialization, keyed updates, and reversible user changes.</p>
+      </section>
+      <section>
+        <h2>What stays in Node</h2>
+        <p>Bundle size, startup, retained memory, GC, and release claims.</p>
+      </section>
+      <section>
+        <h2>How to read results</h2>
+        <p>
+          Compare absolute task time with its observed range. Overlap means no
+          clear difference.
+        </p>
+      </section>
+    </div>
+  </header>
+
+  <section class="run-bar" aria-labelledby="run-heading">
+    <div>
+      <p class="eyebrow">Measurement plan</p>
+      <h2 id="run-heading">Choose the run depth</h2>
+    </div>
+
+    <div class="run-controls">
+      <div class="mode-control" role="group" aria-labelledby="run-heading">
+        <button
+          type="button"
+          [attr.aria-pressed]="mode() === 'quick'"
+          [disabled]="isRunning()"
+          (click)="setMode('quick')"
+        >
+          Quick
+          <span>3 measured rounds</span>
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="mode() === 'steady'"
+          [disabled]="isRunning()"
+          (click)="setMode('steady')"
+        >
+          Steady
+          <span>7 measured rounds</span>
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="run-command"
+        [disabled]="isRunning()"
+        (click)="runBenchmarks()"
+      >
+        {{
+          isRunning() ? 'Running checked tasks...' : 'Run browser spot-check'
+        }}
+      </button>
+    </div>
+
+    @if (isDevBuild) {
+    <p class="build-notice">
+      Development build detected. Results below are diagnostic only. Use the
+      production demo for representative browser measurements.
+    </p>
+    } @if (error()) {
+    <p class="run-error" role="alert">{{ error() }}</p>
+    } @else if (isRunning()) {
+    <p class="run-status" role="status">
+      Running {{ activeWorkload() }}. Arms rotate and reverse between rounds.
+    </p>
+    }
+  </section>
+
+  <section class="calculation-guide" aria-labelledby="calculation-heading">
+    <header>
+      <p class="eyebrow">Reading the display</p>
+      <h2 id="calculation-heading">How each result is calculated</h2>
+      <p>
+        Each chart ranks only implementations admitted by the same capability
+        contract. Open a row's comparison details to see whether that capability
+        is built in or supplied by an official first-party add-on.
+      </p>
+    </header>
+    <div class="calculation-grid">
+      <section>
+        <h3>Median</h3>
+        <p>
+          Sort the measured round durations and use the middle value. With an
+          even count, average the two middle values.
+        </p>
+      </section>
+      <section>
+        <h3>Observed range</h3>
+        <p>
+          Show the smallest and largest measured durations. Warmup rounds are
+          discarded before this calculation.
+        </p>
+      </section>
+      <section>
+        <h3>Result order</h3>
+        <p>
+          Within one capability-matched cohort, sort by median task time, lowest
+          first. Order is not a winner claim when observed ranges overlap.
+        </p>
+      </section>
+      <section>
+        <h3>Visual scale</h3>
+        <p>
+          Plot each range and median from zero to that task's slowest observed
+          maximum. Scales are not shared between different tasks.
+        </p>
+      </section>
+    </div>
+  </section>
+
+  <div class="workload-list">
+    @for (suite of suites(); track suite.workload.id; let workloadIndex =
+    $index) {
+    <section
+      class="workload"
+      [attr.data-workload-id]="suite.workload.id"
+      [attr.aria-labelledby]="suite.workload.id + '-heading'"
+    >
+      <header class="workload-heading">
+        <div>
+          <p class="workload-index">0{{ workloadIndex + 1 }} / checked task</p>
+          <h2 [id]="suite.workload.id + '-heading'">
+            {{ suite.workload.title }}
+          </h2>
+        </div>
+        <p>{{ suite.workload.description }}</p>
+      </header>
+
+      <div class="meaning-strip">
+        <section>
+          <h3>Real app example</h3>
+          <p>{{ suite.applicationExample }}</p>
+        </section>
+        <section>
+          <h3>Application impact</h3>
+          <p>{{ suite.financialImpact }}</p>
+        </section>
+      </div>
+
+      <aside class="cost-context">
+        <strong>{{ suite.costLabel }}</strong>
+        <p>{{ suite.costContext }}</p>
+      </aside>
+
+      <section
+        class="capability-admission"
+        [attr.aria-labelledby]="suite.workload.id + '-capability-heading'"
+      >
+        <header>
+          <p class="eyebrow">Capability admission</p>
+          <h3 [id]="suite.workload.id + '-capability-heading'">
+            {{ suite.capability.title }}
+          </h3>
+          <p>
+            Only implementations meeting every requirement below receive a
+            timing or position in this chart.
+          </p>
+        </header>
+        <div class="capability-columns">
+          <section>
+            <h4>Required for ranking</h4>
+            <ul>
+              @for (requirement of suite.capability.requirements; track
+              requirement) {
+              <li>{{ requirement }}</li>
+              }
+            </ul>
+          </section>
+          <section>
+            <h4>Not ranked</h4>
+            <dl>
+              @for (exclusion of suite.capability.exclusions; track
+              exclusion.label) {
+              <div>
+                <dt>{{ exclusion.label }}</dt>
+                <dd>{{ exclusion.reason }}</dd>
+              </div>
+              }
+            </dl>
+          </section>
+        </div>
+      </section>
+
+      <details class="calculation-details">
+        <summary>Calculation and timer boundaries</summary>
+        <div class="calculation-details-grid">
+          <section data-calculation-field="timedCalculation">
+            <h3>Timed calculation</h3>
+            <p>{{ suite.calculation.timedCalculation }}</p>
+          </section>
+          <section data-calculation-field="outsideTimer">
+            <h3>Outside the timer</h3>
+            <p>{{ suite.calculation.outsideTimer }}</p>
+          </section>
+          <section data-calculation-field="correctnessCheck">
+            <h3>Correctness gate</h3>
+            <p>{{ suite.calculation.correctnessCheck }}</p>
+          </section>
+          <section data-calculation-field="notCompared">
+            <h3>Not compared</h3>
+            <p>{{ suite.calculation.notCompared }}</p>
+          </section>
+        </div>
+      </details>
+
+      @if (reportFor(suite.workload.id); as report) {
+      <div class="results" aria-live="polite">
+        <div class="results-heading">
+          <div>
+            <h3>Capability-matched results, fastest median first</h3>
+            @if (isDevBuild) {
+            <strong class="development-badge">
+              Development / non-representative
+            </strong>
+            }
+          </div>
+          <p>
+            Median of {{ report.rounds }} rounds after
+            {{ report.warmupRounds }} warmup
+            {{ report.warmupRounds === 1 ? 'round' : 'rounds' }}.
+          </p>
+        </div>
+
+        <div class="result-key" aria-label="Visual result key">
+          <span class="result-key-range">Observed min–max</span>
+          <span class="result-key-median">Median</span>
+          <span class="result-key-direction">Lower task time is faster</span>
+        </div>
+
+        <div
+          class="result-table"
+          role="table"
+          [attr.aria-label]="suite.workload.title + ' results'"
+        >
+          <div class="result-header" role="row">
+            <span role="columnheader">Order</span>
+            <span role="columnheader">Implementation</span>
+            <span role="columnheader">Median task</span>
+            <span role="columnheader">Relative task time</span>
+            <span role="columnheader">Interpretation</span>
+          </div>
+          @for (result of rankedResults(report); track result.armId; let rank =
+          $index) {
+          <div
+            class="result-row"
+            role="row"
+            [attr.data-rank]="rank + 1"
+            [attr.data-arm-id]="result.armId"
+            [attr.data-median-ms]="result.medianMs"
+            [attr.data-min-ms]="result.minMs"
+            [attr.data-max-ms]="result.maxMs"
+          >
+            <span
+              class="result-rank"
+              role="cell"
+              [attr.aria-label]="'Order ' + (rank + 1)"
+            >
+              {{ rank + 1 }}
+            </span>
+            <div class="implementation" role="cell">
+              <strong>{{ result.label }}</strong>
+              <span>{{ armDescription(suite.arms, result.armId) }}</span>
+              <span class="comparison-kind">
+                {{ armComparisonKind(suite.arms, result.armId) }}
+              </span>
+              <button
+                type="button"
+                class="comparison-command"
+                aria-haspopup="dialog"
+                [attr.aria-label]="
+                  'Explain ' +
+                  result.label +
+                  ' comparison for ' +
+                  suite.workload.title
+                "
+                (click)="openComparison(suite, result.armId)"
+              >
+                Comparison details
+              </button>
+            </div>
+            <div class="timing" role="cell">
+              <strong>{{ formatMilliseconds(result.medianMs) }} ms</strong>
+              @if (result.phases.length > 0) {
+              <span class="phase-breakdown">
+                @for (phase of result.phases; track phase.id) {
+                <span
+                  [attr.data-phase-id]="phase.id"
+                  [attr.data-phase-median-ms]="phase.medianMs"
+                  [attr.data-phase-min-ms]="phase.minMs"
+                  [attr.data-phase-max-ms]="phase.maxMs"
+                >
+                  {{ phase.id }} {{ formatMilliseconds(phase.medianMs) }} ms ({{
+                    formatRange(phase.minMs, phase.maxMs)
+                  }})
+                </span>
+                }
+              </span>
+              }
+            </div>
+            <div class="result-visual" role="cell">
+              <div
+                class="result-visual-track"
+                role="img"
+                [attr.aria-label]="
+                  result.label +
+                  ': median ' +
+                  formatMilliseconds(result.medianMs) +
+                  ' milliseconds; observed range ' +
+                  formatRange(result.minMs, result.maxMs)
+                "
+                [style.--result-color]="result.color"
+                [style.--range-start]="resultPosition(result.minMs, report)"
+                [style.--range-end]="resultPosition(result.maxMs, report)"
+                [style.--median-position]="
+                  resultPosition(result.medianMs, report)
+                "
+              >
+                <span class="result-range-mark"></span>
+                <span class="result-median-mark"></span>
+              </div>
+              <span class="range-label">
+                {{ formatRange(result.minMs, result.maxMs) }}
+              </span>
+            </div>
+            <span class="interpretation" role="cell">
+              {{ resultInterpretation(result, report) }}
+            </span>
+          </div>
+          }
+        </div>
+        <div class="result-scale" aria-hidden="true">
+          <span>0 ms</span>
+          <span>
+            {{ formatMilliseconds(resultScaleMaximum(report)) }} ms scale
+          </span>
+        </div>
+      </div>
+      } @else {
+      <div class="ready-state">
+        <header>
+          <p>Ready to measure</p>
+          <span
+            >All {{ suite.arms.length }} arms must pass the same checksum.</span
+          >
+        </header>
+        <div class="planned-arms">
+          @for (arm of suite.arms; track arm.id) {
+          <span
+            ><strong>{{ arm.label }}</strong> · {{ arm.description }}</span
+          >
+          }
+        </div>
+      </div>
+      }
+
+      <footer class="evidence-line">
+        <span>Related Node generator</span>
+        <code>{{ suite.relatedCommand }}</code>
+      </footer>
+    </section>
+    }
+  </div>
+
+  <section class="methodology" aria-labelledby="methodology-heading">
+    <header>
+      <p class="eyebrow">Methodology</p>
+      <h2 id="methodology-heading">What makes a number admissible</h2>
+    </header>
+    <ol>
+      <li>
+        Each keyed-state arm uses a first-party entity abstraction; the harness
+        does not invent its data model.
+      </li>
+      <li>
+        Each history arm uses built-in or official first-party history; packages
+        requiring benchmark-owned snapshots are excluded.
+      </li>
+      <li>
+        Arm order rotates and reverses across rounds to reduce position and
+        warmup bias.
+      </li>
+      <li>
+        A task boundary separates rounds and is outside every timed region.
+      </li>
+      <li>The final state is checked before a timing can enter the report.</li>
+      <li>
+        Every SignalTree created for a sample is destroyed after that sample.
+      </li>
+    </ol>
+    <aside class="methodology-correction">
+      <strong>Methodology correction</strong>
+      <p>
+        An earlier harness revision included
+        <code>getRestorationHistory()</code> state materialization only in the
+        SignalTree arm. Current results exclude that asymmetric inspection and
+        verify the exact value after every undo instead.
+      </p>
+    </aside>
+  </section>
+
+  <dialog
+    #comparisonDialog
+    class="comparison-dialog"
+    aria-labelledby="comparison-dialog-heading"
+    (close)="activeComparison.set(null)"
+  >
+    @if (activeComparison(); as comparison) {
+    <header class="comparison-dialog-heading">
+      <div>
+        <p class="eyebrow">{{ comparison.suite.workload.title }}</p>
+        <h2 id="comparison-dialog-heading">
+          {{ comparison.arm.label }} comparison
+        </h2>
+      </div>
+      <button
+        type="button"
+        class="dialog-close"
+        aria-label="Close comparison details"
+        (click)="closeComparison()"
+      >
+        Close
+      </button>
+    </header>
+
+    <p class="comparison-operation">
+      <strong>Operation timed</strong>
+      {{ comparison.arm.description }}
+    </p>
+
+    <dl class="comparison-facts">
+      <div>
+        <dt>Calculation</dt>
+        <dd>{{ comparison.suite.calculation.timedCalculation }}</dd>
+      </div>
+      <div>
+        <dt>Feature source</dt>
+        <dd>
+          <strong class="comparison-kind">
+            {{ comparison.arm.comparison.kind }}
+          </strong>
+          {{ comparison.arm.comparison.featureSource }}
+        </dd>
+      </div>
+      <div>
+        <dt>What was added</dt>
+        <dd>{{ comparison.arm.comparison.addedForComparison }}</dd>
+      </div>
+      <div>
+        <dt>Why it was added</dt>
+        <dd>{{ comparison.arm.comparison.whyItWasAdded }}</dd>
+      </div>
+      <div>
+        <dt>Correctness gate</dt>
+        <dd>{{ comparison.suite.calculation.correctnessCheck }}</dd>
+      </div>
+      <div>
+        <dt>What was not included</dt>
+        <dd>{{ comparison.arm.comparison.notIncluded }}</dd>
+      </div>
+    </dl>
+    }
+  </dialog>
+</div>

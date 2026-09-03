@@ -26,12 +26,7 @@
   gap: $spacing-sm;
 
   &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: $shadow-lg;
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
+    border-color: color-mix(in srgb, currentColor 35%, transparent);
   }
 
   &:disabled {

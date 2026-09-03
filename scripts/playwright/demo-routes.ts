@@ -12,6 +12,7 @@ export const DEMO_ROUTES = [
   '/devtools',
   '/examples/fundamentals/recommended-architecture',
   '/migrate',
+  '/benchmarks',
   '/deep-typing',
   '/realistic-benchmark-history',
   '/architecture-overview',

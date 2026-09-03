@@ -310,6 +310,8 @@ $react-accent: var(--color-info-500);
   }
 
   small {
+    display: block;
+    margin-top: $spacing-xs;
     color: $text-tertiary;
   }
 }
