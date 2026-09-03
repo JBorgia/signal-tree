@@ -1086,7 +1086,8 @@ const GATES = [
     mutation: {
       file: 'tools/check-semantic-discoverability.mjs',
       find: 'const REQUIRED = [',
-      replace: 'const REQUIRED = []; const __semanticDiscoverabilityRequired = [',
+      replace:
+        'const REQUIRED = []; const __semanticDiscoverabilityRequired = [',
     },
   },
   {
@@ -1223,7 +1224,7 @@ const GATES = [
     // `:self` gate exists to rule out.
     mutation: {
       file: 'tools/check-doc-links.mjs',
-      find: 'ok: existsSync(resolved),',
+      find: 'ok: existsSync(resolved) || packagedReadmeAsset(abs, target),',
       replace: 'ok: true,',
     },
   },
