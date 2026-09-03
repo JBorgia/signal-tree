@@ -9,6 +9,19 @@ Work that is decided and not yet done. **This is not an RFC list.**
   This is documentation/source hygiene only; do not reopen the one-way public
   construction surface while cleaning it.
 
+## DEEP-TYPING-DEPTH-0 — DEMO FOLLOW-UP
+
+- Let users increase the demonstrated depth on `/deep-typing` within a bounded
+  set of compile-backed fixtures. A runtime depth control alone is not evidence
+  of TypeScript inference: each selectable proof depth must be generated or
+  declared in source and pass exact `WritableLeaf<T>` and `IsAny` checks during
+  the repository typecheck before the page may label it supported.
+- Explain what the page is testing and why it matters. Many users have not seen
+  deeply recursive mapped/conditional types silently widen, lose exact leaf
+  types, leak `any`, or reach TypeScript instantiation limits. Distinguish those
+  compile-time failures from the separate runtime read/write demonstration, and
+  keep the claim bounded to the concrete shapes and depths actually compiled.
+
 ## V15 pre-publish repository audit
 
 Triage the 1,225-file full-tree audit before any next RC or GA publish. Audit
@@ -168,7 +181,7 @@ runtime redesign, not import cleanup. Correcting the generators to designate a
 real turn puts restoration at about +18.6 KB over bare; the old arm called
 `undo()` on empty history and understated the reachable feature. No module can
 be removed without deleting a currently supported semantic job, so bundle
-reachability closes with no production change. Angular and React facade-only
+reachability closes with no production change. Current framework facade-only
 costs remain small and are not optimization targets.
 
 ## RESTORATION-LIFETIME-0

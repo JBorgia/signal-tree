@@ -145,9 +145,11 @@ h1 {
 }
 
 .run-controls {
-  display: flex;
+  display: grid;
+  grid-template-columns:
+    minmax(17rem, 1fr) minmax(8.5rem, 0.45fr)
+    minmax(12rem, 0.7fr);
   min-width: 0;
-  justify-content: flex-end;
   gap: var(--layout-panel-inset);
 }
 
@@ -204,6 +206,55 @@ h1 {
   height: 4px;
   background: var(--color-primary-700);
   content: '';
+}
+
+.round-control {
+  display: grid;
+  min-width: 0;
+  padding: 0.4rem 0.55rem;
+  border: var(--layout-rule);
+  background: var(--color-surface);
+}
+
+.round-control > span {
+  color: var(--color-primary-700);
+  font-family: var(--font-family-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.round-control input {
+  width: 100%;
+  min-width: 0;
+  margin-top: 0.2rem;
+  border: 0;
+  border-bottom: 2px solid var(--color-neutral-300);
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 700;
+}
+
+.round-control input:focus-visible {
+  border-bottom-color: var(--color-primary-700);
+  outline: 2px solid var(--color-primary-700);
+  outline-offset: 2px;
+}
+
+.round-control small {
+  min-height: 0.8rem;
+  margin-top: 0.15rem;
+  color: var(--color-neutral-500);
+  font-size: 0.56rem;
+}
+
+.round-control.invalid {
+  border-color: var(--color-error-600);
+}
+
+.round-control.invalid small {
+  color: var(--color-error-800);
 }
 
 .run-command {
@@ -1418,12 +1469,11 @@ button:disabled {
   }
 
   .run-controls {
-    justify-content: stretch;
+    grid-template-columns: minmax(0, 1fr) minmax(8.5rem, 0.5fr);
   }
 
-  .mode-control,
   .run-command {
-    flex: 1;
+    grid-column: 1 / -1;
   }
 
   .result-header,
@@ -1477,6 +1527,14 @@ button:disabled {
   .evidence-line {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .run-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .run-command {
+    grid-column: auto;
   }
 
   .mode-control {

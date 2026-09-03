@@ -1,7 +1,7 @@
 <div align="center">
   <img src="apps/demo/public/signaltree-mark-192.png" alt="SignalTree ST leaf mark" width="120" height="120" />
   <h1>SignalTree</h1>
-  <p><strong>Causal application state for Angular and React</strong></p>
+  <p><strong>Framework-neutral causal application state</strong></p>
   <p>State as shape. Consequential transitions. Signals at every path.</p>
 
   <p>

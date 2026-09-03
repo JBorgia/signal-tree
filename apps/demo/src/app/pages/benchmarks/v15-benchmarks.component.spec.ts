@@ -61,6 +61,7 @@ describe('V15BenchmarksComponent', () => {
 
     expect(rendered).toContain('Recurring application-state performance');
     expect(rendered).not.toContain('Initialize and populate keyed state');
+    expect(rendered).toContain('Update and read standalone scalar state');
     expect(rendered).toContain('Update and read one keyed record');
     expect(rendered).toContain('Update one record and re-read the collection');
     expect(rendered).toContain('Consequential authored work: record and undo');
@@ -68,6 +69,7 @@ describe('V15BenchmarksComponent', () => {
     expect(rendered).toContain('SignalTree Kernel');
     expect(rendered).toContain('NgRx Signals');
     expect(rendered).toContain('Redux Toolkit');
+    expect(rendered).toContain('TanStack Store');
     expect(rendered).toContain('Zustand');
     expect(rendered).toContain('MobX');
     expect(rendered).toContain('Valtio');
@@ -85,6 +87,7 @@ describe('V15BenchmarksComponent', () => {
     expect(rendered).toContain('How each result is calculated');
     expect(rendered).toContain('Calculation and timer boundaries');
     expect(rendered).toContain('First-party keyed entity state');
+    expect(rendered).toContain('Framework-neutral frontend scalar state');
     expect(rendered).toContain('First-party linear undo over keyed state');
     expect(rendered).toContain(
       'Only implementations meeting every requirement receive a timing'
@@ -111,6 +114,7 @@ describe('V15BenchmarksComponent', () => {
     );
     expect(rendered).toContain('@ngrx/signals 21.1.1');
     expect(rendered).toContain('@reduxjs/toolkit 2.12.0');
+    expect(rendered).toContain('@tanstack/store 0.11.1');
     expect(rendered).toContain('Reproduce and inspect');
     expect(rendered).toContain('Ten-year architecture bet');
     expect(rendered).toContain(
@@ -139,10 +143,10 @@ describe('V15BenchmarksComponent', () => {
     ).toBeGreaterThan(0);
     expect(
       fixture.nativeElement.querySelectorAll('.evidence-line a')
-    ).toHaveLength(9);
+    ).toHaveLength(12);
     expect(
       fixture.nativeElement.querySelectorAll('.planned-arm .source-links a')
-    ).toHaveLength(13);
+    ).toHaveLength(15);
     expect(rendered).not.toContain('Middleware');
     expect(rendered).not.toContain('Async enhancer');
     expect(rendered).not.toContain('Time travel');
@@ -150,16 +154,41 @@ describe('V15BenchmarksComponent', () => {
 
   it('switches between quick and steady measurement plans', () => {
     expect(component.mode()).toBe('quick');
-    expect(component.rounds()).toBe(3);
+    expect(component.rounds()).toBe(25);
+    expect(component.warmupRounds()).toBe(2);
 
     component.setMode('steady');
     fixture.detectChanges();
 
     expect(component.mode()).toBe('steady');
-    expect(component.rounds()).toBe(7);
+    expect(component.rounds()).toBe(100);
+    expect(component.warmupRounds()).toBe(5);
     expect(
       fixture.nativeElement.querySelector('[aria-pressed="true"]')?.textContent
     ).toContain('Steady');
+  });
+
+  it('accepts a bounded custom measured-round count', () => {
+    component.setRoundInput('73');
+    fixture.detectChanges();
+
+    expect(component.rounds()).toBe(73);
+    expect(component.roundInputError()).toBeNull();
+    expect(
+      fixture.nativeElement.querySelector<HTMLInputElement>('#measured-rounds')
+        ?.value
+    ).toBe('73');
+
+    component.setRoundInput('0');
+    fixture.detectChanges();
+
+    expect(component.roundInputError()).toBe(
+      'Enter a whole number from 1 to 1,000.'
+    );
+    expect(
+      fixture.nativeElement.querySelector<HTMLButtonElement>('.run-command')
+        ?.disabled
+    ).toBe(true);
   });
 
   it('does not turn overlapping observed ranges into a winner claim', () => {

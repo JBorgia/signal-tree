@@ -14,6 +14,7 @@ import {
   BenchmarkReport,
   BenchmarkWorkloadId,
   runInterleavedBenchmark,
+  yieldToBrowserTask,
 } from './v15-benchmark.engine';
 import {
   BenchmarkPackageReference,
@@ -81,6 +82,20 @@ const QUICK_CONFIG: V15BenchmarkConfig = {
   collectionUpdates: 50,
   restorationSize: 250,
   restorationWrites: 10,
+};
+
+const QUICK_ROUNDS = 25;
+const STEADY_ROUNDS = 100;
+const MAX_CUSTOM_ROUNDS = 1_000;
+
+const parseRoundCount = (value: string): number | undefined => {
+  const rounds = Number(value);
+  return value.trim() !== '' &&
+    Number.isInteger(rounds) &&
+    rounds >= 1 &&
+    rounds <= MAX_CUSTOM_ROUNDS
+    ? rounds
+    : undefined;
 };
 
 @Component({
@@ -163,8 +178,14 @@ export class V15BenchmarksComponent {
   readonly activeComparison = signal<ActiveComparison | null>(null);
   readonly profileArmId = signal<SignalTreeProfileArmId>('signaltree-angular');
 
-  readonly rounds = computed(() => (this.mode() === 'quick' ? 3 : 7));
-  readonly warmupRounds = computed(() => (this.mode() === 'quick' ? 1 : 2));
+  readonly rounds = signal(QUICK_ROUNDS);
+  readonly roundInput = signal(String(QUICK_ROUNDS));
+  readonly roundInputError = computed(() =>
+    parseRoundCount(this.roundInput()) === undefined
+      ? 'Enter a whole number from 1 to 1,000.'
+      : null
+  );
+  readonly warmupRounds = computed(() => (this.mode() === 'quick' ? 2 : 5));
   readonly config = computed(() =>
     this.mode() === 'quick' ? QUICK_CONFIG : DEFAULT_V15_BENCHMARK_CONFIG
   );
@@ -197,6 +218,18 @@ export class V15BenchmarksComponent {
   setMode(mode: BenchmarkMode): void {
     if (this.isRunning()) return;
     this.mode.set(mode);
+    const rounds = mode === 'quick' ? QUICK_ROUNDS : STEADY_ROUNDS;
+    this.rounds.set(rounds);
+    this.roundInput.set(String(rounds));
+    this.reports.set(new Map());
+    this.error.set(null);
+  }
+
+  setRoundInput(value: string): void {
+    if (this.isRunning()) return;
+    this.roundInput.set(value);
+    const rounds = parseRoundCount(value);
+    if (rounds !== undefined) this.rounds.set(rounds);
     this.reports.set(new Map());
     this.error.set(null);
   }
@@ -206,7 +239,7 @@ export class V15BenchmarksComponent {
   }
 
   async runBenchmarks(): Promise<void> {
-    if (this.isRunning()) return;
+    if (this.isRunning() || this.roundInputError()) return;
 
     this.reports.set(new Map());
     this.error.set(null);
@@ -214,7 +247,7 @@ export class V15BenchmarksComponent {
     try {
       for (const suite of this.suites()) {
         this.activeWorkload.set(suite.workload.id);
-        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        await yieldToBrowserTask();
         const report = await runInterleavedBenchmark({
           workload: suite.workload,
           arms: suite.arms,

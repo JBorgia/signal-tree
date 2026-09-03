@@ -2,6 +2,7 @@ import {
   BenchmarkArm,
   BenchmarkWorkload,
   runInterleavedBenchmark,
+  yieldToBrowserTask,
 } from './v15-benchmark.engine';
 
 const workload: BenchmarkWorkload = {
@@ -35,6 +36,16 @@ const arm = (
 });
 
 describe('v15 browser benchmark engine', () => {
+  it('yields to a timer task when MessageChannel is unavailable', async () => {
+    let timerRan = false;
+    setTimeout(() => {
+      timerRan = true;
+    }, 0);
+
+    await expect(yieldToBrowserTask(undefined)).resolves.toBeUndefined();
+    expect(timerRan).toBe(true);
+  });
+
   it('interleaves arms, discards warmup, and reports median plus spread', async () => {
     const events: string[] = [];
 
@@ -67,21 +78,19 @@ describe('v15 browser benchmark engine', () => {
       }),
     ]);
     expect(events.filter((event) => event === 'settle')).toHaveLength(4);
-    expect(events.slice(1, 7)).toEqual([
-      'create:tree',
+    expect(events.filter((event) => event === 'create:tree')).toHaveLength(1);
+    expect(events.filter((event) => event === 'create:store')).toHaveLength(1);
+    expect(events.filter((event) => event === 'dispose:tree')).toHaveLength(1);
+    expect(events.filter((event) => event === 'dispose:store')).toHaveLength(1);
+    expect(events.filter((event) => event.startsWith('measure:'))).toEqual([
       'measure:tree',
-      'dispose:tree',
-      'create:store',
       'measure:store',
-      'dispose:store',
-    ]);
-    expect(events.slice(8, 14)).toEqual([
-      'create:store',
       'measure:store',
-      'dispose:store',
-      'create:tree',
       'measure:tree',
-      'dispose:tree',
+      'measure:store',
+      'measure:tree',
+      'measure:tree',
+      'measure:store',
     ]);
   });
 
@@ -114,8 +123,8 @@ describe('v15 browser benchmark engine', () => {
     });
 
     const order = events
-      .filter((event) => event.startsWith('create:'))
-      .map((event) => event.slice('create:'.length));
+      .filter((event) => event.startsWith('measure:'))
+      .map((event) => event.slice('measure:'.length));
     expect(order).toEqual([
       'a',
       'b',
@@ -158,5 +167,48 @@ describe('v15 browser benchmark engine', () => {
       })
     ).rejects.toThrow('invalid/collection returned an invalid measurement');
     expect(events).toEqual(['disposed']);
+  });
+
+  it('disposes every prepared arm without masking the benchmark failure', async () => {
+    const events: string[] = [];
+    const brokenBase = arm('broken', 1, events, 'wrong');
+    const later = arm('later', 1, events);
+    const broken: BenchmarkArm = {
+      ...brokenBase,
+      createSample: async (currentWorkload) => {
+        const sample = await brokenBase.createSample(currentWorkload);
+        return {
+          ...sample,
+          dispose: () => {
+            events.push('dispose:broken');
+            throw new Error('dispose failed');
+          },
+        };
+      },
+    };
+
+    let failure: unknown;
+    try {
+      await runInterleavedBenchmark({
+        workload,
+        arms: [broken, later],
+        rounds: 1,
+        warmupRounds: 0,
+        settle: async () => undefined,
+      });
+    } catch (error) {
+      failure = error;
+    }
+
+    expect(failure).toBeInstanceOf(AggregateError);
+    expect((failure as AggregateError).errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          'broken/collection produced checksum "wrong"'
+        ),
+      }),
+      expect.objectContaining({ message: 'dispose failed' }),
+    ]);
+    expect(events).toContain('dispose:later');
   });
 });

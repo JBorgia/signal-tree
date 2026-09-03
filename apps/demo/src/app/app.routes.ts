@@ -221,7 +221,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Recurring application-state performance',
       description:
-        'Checked point access, conditional complete projection, and restoration workloads across capability-matched state libraries.',
+        'Checked scalar state, point access, conditional complete projection, and restoration workloads across capability-matched state libraries.',
     },
   },
   // Redirect old route to new one

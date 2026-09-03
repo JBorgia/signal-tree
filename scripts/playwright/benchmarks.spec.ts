@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('v15 browser spot-check completes every checked arm', async ({ page }) => {
+  test.setTimeout(120_000);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
   await expect(
@@ -10,9 +11,34 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
   ).toBeVisible();
   await expect(page.locator('.build-notice')).toHaveCount(0);
 
-  await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
-  await expect(page.locator('.result-row')).toHaveCount(13, {
-    timeout: 30_000,
+  const measuredRounds = page.locator('#measured-rounds');
+  const runButton = page.getByRole('button', {
+    name: 'Run recurring spot-check',
+  });
+  await expect(measuredRounds).toHaveValue('25');
+  await expect(page.locator('.benchmarks-page')).toHaveAttribute(
+    'data-measured-rounds',
+    '25'
+  );
+  await measuredRounds.fill('37');
+  await expect(runButton).toBeEnabled();
+  await expect(page.locator('.benchmarks-page')).toHaveAttribute(
+    'data-measured-rounds',
+    '37'
+  );
+  await measuredRounds.fill('0');
+  await expect(measuredRounds).toHaveAttribute('aria-invalid', 'true');
+  await expect(runButton).toBeDisabled();
+  await page
+    .getByRole('button', { name: /Steady 100 measured rounds/ })
+    .click();
+  await expect(measuredRounds).toHaveValue('100');
+  await page.getByRole('button', { name: /Quick 25 measured rounds/ }).click();
+  await expect(measuredRounds).toHaveValue('25');
+
+  await runButton.click();
+  await expect(page.locator('.result-row')).toHaveCount(15, {
+    timeout: 60_000,
   });
 
   await expect(page.locator('.run-error')).toHaveCount(0);
@@ -21,14 +47,14 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
     'aria-busy',
     'false'
   );
-  await expect(page.locator('.result-table')).toHaveCount(3);
+  await expect(page.locator('.result-table')).toHaveCount(4);
   await expect(page.locator('.development-badge')).toHaveCount(0);
-  await expect(page.locator('.range-label')).toHaveCount(13);
-  await expect(page.locator('.result-visual-track')).toHaveCount(13);
-  await expect(page.locator('.result-row .comparison-kind')).toHaveCount(13);
-  await expect(page.locator('.comparison-command')).toHaveCount(13);
-  await expect(page.locator('.implementation-source-links a')).toHaveCount(13);
-  await expect(page.locator('.evidence-line a')).toHaveCount(9);
+  await expect(page.locator('.range-label')).toHaveCount(15);
+  await expect(page.locator('.result-visual-track')).toHaveCount(15);
+  await expect(page.locator('.result-row .comparison-kind')).toHaveCount(15);
+  await expect(page.locator('.comparison-command')).toHaveCount(15);
+  await expect(page.locator('.implementation-source-links a')).toHaveCount(15);
+  await expect(page.locator('.evidence-line a')).toHaveCount(12);
   await expect(page.locator('.phase-breakdown')).toHaveCount(3);
   await expect(
     page.locator('.result-row .comparison-kind', { hasText: 'Harness' })
@@ -56,10 +82,11 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
 
   for (const [expected, count] of Object.entries({
     'SignalTree Angular': 3,
-    'SignalTree Kernel': 3,
+    'SignalTree Kernel': 4,
     'NgRx Signals': 2,
     Akita: 3,
     'Redux Toolkit': 2,
+    'TanStack Store': 1,
   })) {
     await expect(
       page.locator('.result-row .implementation strong', {
@@ -68,7 +95,12 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
     ).toHaveCount(count);
   }
 
-  await expect(page.locator('.capability-admission')).toHaveCount(3);
+  await expect(page.locator('.capability-admission')).toHaveCount(4);
+  await expect(
+    page.getByRole('heading', {
+      name: 'Framework-neutral frontend scalar state',
+    })
+  ).toHaveCount(1);
   await expect(
     page.getByRole('heading', { name: 'First-party keyed entity state' })
   ).toHaveCount(2);
@@ -79,6 +111,7 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
   ).toHaveCount(1);
   await expect(page.getByText('@ngrx/signals 21.1.1')).toHaveCount(2);
   await expect(page.getByText('@reduxjs/toolkit 2.12.0')).toHaveCount(2);
+  await expect(page.getByText('@tanstack/store 0.11.1')).toHaveCount(1);
   await expect(page.getByText('One-time cost', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Ongoing cost', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Raw Angular', { exact: false })).toHaveCount(0);
@@ -280,11 +313,12 @@ test('v15 browser spot-check completes every checked arm', async ({ page }) => {
 test('ranked result displays stack without overflow on mobile', async ({
   page,
 }) => {
+  test.setTimeout(120_000);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
   await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
-  await expect(page.locator('.result-row')).toHaveCount(13, {
-    timeout: 30_000,
+  await expect(page.locator('.result-row')).toHaveCount(15, {
+    timeout: 60_000,
   });
 
   const firstRow = page.locator('.result-row').first();
@@ -329,11 +363,12 @@ test('ranked result displays stack without overflow on mobile', async ({
 test('ranked result displays retain visual tracks at the tablet breakpoint', async ({
   page,
 }) => {
+  test.setTimeout(120_000);
   await page.setViewportSize({ width: 768, height: 900 });
   await page.goto('/benchmarks', { waitUntil: 'load' });
   await page.getByRole('button', { name: 'Run recurring spot-check' }).click();
-  await expect(page.locator('.result-row')).toHaveCount(13, {
-    timeout: 30_000,
+  await expect(page.locator('.result-row')).toHaveCount(15, {
+    timeout: 60_000,
   });
 
   const firstRow = page.locator('.result-row').first();

@@ -40,7 +40,7 @@ try {
       document.querySelectorAll('.result-row').length === expected ||
       document.querySelector('.run-error') !== null,
     expectedRows,
-    { timeout: 60_000 }
+    { timeout: 180_000 }
   );
 
   const errorLocator = page.locator('.run-error');
@@ -52,11 +52,23 @@ try {
 
   const report = await page.evaluate(
     ({ selectedMode, isDevelopment }) => ({
-      schemaVersion: 4,
+      schemaVersion: 5,
       generatedAt: new Date().toISOString(),
       source: '/benchmarks',
       mode: selectedMode,
       developmentBuild: isDevelopment,
+      measurementPlan: {
+        measuredRounds: Number(
+          document
+            .querySelector('.benchmarks-page')
+            ?.getAttribute('data-measured-rounds')
+        ),
+        warmupRounds: Number(
+          document
+            .querySelector('.benchmarks-page')
+            ?.getAttribute('data-warmup-rounds')
+        ),
+      },
       environment: {
         userAgent: navigator.userAgent,
         hardwareConcurrency: navigator.hardwareConcurrency,
@@ -264,7 +276,11 @@ try {
   }
 
   if (
-    report.workloads.length !== 3 ||
+    report.workloads.length !== 4 ||
+    !Number.isInteger(report.measurementPlan.measuredRounds) ||
+    report.measurementPlan.measuredRounds < 1 ||
+    !Number.isInteger(report.measurementPlan.warmupRounds) ||
+    report.measurementPlan.warmupRounds < 0 ||
     report.workloads.reduce(
       (total, workload) => total + workload.results.length,
       0

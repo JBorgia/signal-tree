@@ -6,5 +6,6 @@ export const DEMO_LIBRARY_VERSIONS: Record<string, string> = {
   'ngrx-signals': '21.1.1',
   akita: '8.0.1',
   'redux-toolkit': '2.12.0',
+  'tanstack-store': '0.11.1',
   ngxs: '20.1.0',
 };
