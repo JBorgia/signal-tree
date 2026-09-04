@@ -57,7 +57,7 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
     const { seen, off } = observe();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
     off();
 
@@ -69,7 +69,7 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
     await flush();
     const { seen, off } = observe();
     withWriteContext({ intent: 'system', participation: 'realized' }, () => {
-      tree.$.n.set(9);
+      tree.$.n(9);
     });
     await flush();
     off();
@@ -80,7 +80,7 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
   it('restoration — restoration origin, realization participation', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
 
     const { seen, off } = observe();
@@ -106,7 +106,7 @@ describe('SEMANTICS-NAMES-0: the measured combination space', () => {
     // rather than driven through the Redux bridge, so the combination is
     // measured without a browser extension.
     withWriteContext({ intent: 'system', origin: 'devtools' }, () => {
-      tree.$.n.set(42);
+      tree.$.n(42);
     });
     await flush();
     off();

@@ -67,7 +67,7 @@ describe('A2-1 arm B: COMPOSITION, adapter reads AFTER construction', () => {
 
     // …then the adapter hydrates.
     const raw = adapter.getItem('a2-theme-b');
-    if (raw) tree.$.theme.set(JSON.parse(raw).data as string);
+    if (raw) tree.$.theme(JSON.parse(raw).data as string);
     await flush();
     off();
 

@@ -30,7 +30,7 @@
  *     caching, and snapshot semantics).
  */
 import { computed, signal } from '@angular/core';
-import { entityMap, signalTree } from '@signal-tree/angular';
+import { entityMap, signalTree, type Location } from '@signal-tree/angular';
 
 const N = 100;
 const TARGET = 42; // the single index we mutate
@@ -60,7 +60,7 @@ describe('granular-reactivity fan-out', () => {
     const tree = signalTree({ nodes: initial });
     const nodes = tree.$.nodes as Record<
       string,
-      { v: { (): number; set: (n: number) => void } }
+      { v: Location<number> }
     >;
 
     const { counters, readAll } = instrument((i) => nodes[`n${i}`].v());
@@ -68,7 +68,7 @@ describe('granular-reactivity fan-out', () => {
     readAll(); // prime
     expect(counters.every((c) => c === 1)).toBe(true);
 
-    nodes[`n${TARGET}`].v.set(999); // touch exactly one leaf
+    nodes[`n${TARGET}`].v(999); // touch exactly one leaf
     readAll();
 
     expect(counters[TARGET]).toBe(2); // touched leaf recomputed

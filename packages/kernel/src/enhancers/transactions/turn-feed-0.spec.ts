@@ -170,13 +170,13 @@ describe('TURN-FEED-0 case 4: surrounding writes', () => {
 
     // All three designated: the case is about three DISTINCT admitted turns and
     // the absence of cross-bucket contamination between them.
-    undoable(() => tree.$.status.set('queued-before'));
+    undoable(() => tree.$.status('queued-before'));
     const pending = undoable(() =>
       tree.transaction(() => {
         tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
       })
     );
-    undoable(() => tree.$.other.set('queued-after'));
+    undoable(() => tree.$.other('queued-after'));
     await flush();
 
     // TWO entries while pending — the before-write and the after-write. The

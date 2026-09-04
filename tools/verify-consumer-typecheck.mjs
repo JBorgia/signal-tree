@@ -110,6 +110,7 @@ const SAMPLE = `
 import {
   signalTree,
   entityMap,
+  leaf,
   restoration,
   batching,
   type ReadonlyLocation,
@@ -132,6 +133,8 @@ const tree = signalTree(
   {
     count: 0,
     user: { name: 'Ada', age: 36 },
+    bounds: leaf({ min: 0, max: 10 }),
+    callback: leaf((value: number) => value),
     users: entityMap<User, number>({ selectId: (u: User) => u.id })
       .computed('names', (all) => all.map((user) => user.name)),
   },
@@ -147,9 +150,11 @@ const currentNames: string[] = names.peek();
 const unsubscribeNames = names.subscribe(() => undefined);
 unsubscribeNames();
 
-// Leaf writes — .set()/.update(), NOT leaf(value)
-tree.$.count.set(5);
-tree.$.count.update((c: number) => c + 1);
+// Every location uses the same callable read/replace/derive grammar.
+tree.$.count(5);
+tree.$.count((count: number) => count + 1);
+tree.$.bounds({ min: 1, max: 9 });
+tree.$.callback(leaf((value: number) => value + 1));
 
 // Branch + root state locations ARE callable
 tree.$.user({ name: 'Grace', age: 36 });
@@ -179,7 +184,7 @@ const vueDoubled: ComputedRef<number> = computed(() => vueTree.$.doubled());
 // Enhancer methods
 tree.undo();
 tree.redo();
-tree.batch(() => tree.$.count.set(0));
+tree.batch(() => tree.$.count(0));
 
 export const _used = [n, whole, rows, names, currentNames, angularUsers, vueDoubled, createSignalTreeFactory, defineStore, useSignalTree];
 `;
@@ -229,7 +234,7 @@ if (vue.signalTree === kernel.signalTree) {
 }
 const vueTree = vue.signalTree({ count: 1 });
 const vueDoubled = vueComputed(() => vueTree.$.count() * 2);
-vueTree.$.count.set(2);
+vueTree.$.count(2);
 if (vueDoubled.value !== 4) {
   throw new Error('@signal-tree/vue did not observe a direct location write.');
 }

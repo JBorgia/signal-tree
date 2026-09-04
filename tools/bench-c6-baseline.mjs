@@ -63,9 +63,9 @@ results.push(measure('scalar-read',
   (ctx, n) => { for (let i = 0; i < n; i++) ctx.sum += ctx.t.$.a(); },
   (ctx) => ctx.sum > 0));
 
-results.push(measure('scalar-write-leaf-set',
+results.push(measure('scalar-write-location',
   () => ({ t: signalTree({ a: 0 }) }),
-  (ctx, n) => { for (let i = 0; i < n; i++) ctx.t.$.a.set(i); },
+  (ctx, n) => { for (let i = 0; i < n; i++) ctx.t.$.a(i); },
   (ctx) => ctx.t.$.a() > 0));
 
 results.push(measure('merge-write-same-leaf',
@@ -80,7 +80,7 @@ results.push(measure('merge-write-many-leaves',
 
 results.push(measure('causal-tree-write',
   () => ({ t: signalTree({ a: 0 }, { capabilities: ['causal-runtime'] }) }),
-  (ctx, n) => { for (let i = 0; i < n; i++) ctx.t.$.a.set(i); },
+  (ctx, n) => { for (let i = 0; i < n; i++) ctx.t.$.a(i); },
   (ctx) => ctx.t.$.a() > 0));
 
 const out = {

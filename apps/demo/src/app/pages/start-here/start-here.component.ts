@@ -29,9 +29,9 @@ tree.$.user.name();          // 'Ada'  (leaf: an Angular signal)
 tree.$.user();               // { name: 'Ada', age: 36 }  (branch: callable)
 tree.$.count();              // 0
 
-// 3. Leaves are signals — write with .set / .update
-tree.$.user.name.set('Bo');
-tree.$.count.update((n) => n + 1);
+// 3. Every location uses the same callable write grammar
+tree.$.user.name('Bo');
+tree.$.count((count) => count + 1);
 
 // 4. Branches are callable — the value form supplies the WHOLE next value
 tree.$.user({ name: 'Bo', age: 37 });
@@ -68,8 +68,8 @@ export const counterTree = signalTree({ count: 0 });
 @Component({ /* ... */ })
 export class CounterComponent {
   count = counterTree.$.count;
-  inc() { counterTree.$.count.update((n) => n + 1); }
-  reset() { counterTree.$.count.set(0); }
+  inc() { counterTree.$.count((count) => count + 1); }
+  reset() { counterTree.$.count(0); }
 }`;
 
   readonly architectureCode = `// app.tree.ts — one runtime tree, typed slices
@@ -102,7 +102,7 @@ export class CartView {
       audience: "I'm migrating from NgRx",
       title: 'Read the migration recipe',
       description:
-        'Mechanical mapping: actions → setters, reducers → updates, selectors → computed signals. With a phased rollout playbook.',
+        'Mechanical mapping: actions → operations, reducers → callable derivations, selectors → computed values. With a phased rollout playbook.',
       route: '/migrate',
       cta: 'Open migration recipe →',
     },

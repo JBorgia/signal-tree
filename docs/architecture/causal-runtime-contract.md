@@ -24,11 +24,11 @@ construction, not any particular construction or builder API.
 What must remain stable:
 
 - `tree.$.a.b.c()` reads reactive state
-- `tree.$.a.b.c.set(value)` writes reactive state where writable
-- `tree.$.a.b.c.update(fn)` updates reactive state where writable
+- `tree.$.a.b.c(value)` replaces reactive state where writable
+- `tree.$.a.b.c(fn)` derives reactive state where writable
 - tree shape remains naturally navigable through JavaScript and TypeScript
   property access
-- reactive semantics remain Angular-signal-friendly
+- framework facades can observe the same kernel-owned locations
 
 What is explicitly not architecturally frozen here:
 

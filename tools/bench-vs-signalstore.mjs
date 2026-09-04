@@ -111,7 +111,7 @@ const t1tree = () => {
   const t = signalTree(deep(0));
   const leaf = t.$.l1.l2.l3.l4.l5.l6.l7.l8.l9.l10;
   const s = process.hrtime.bigint();
-  for (let i = 0; i < N1; i++) leaf.set(i);
+  for (let i = 0; i < N1; i++) leaf(i);
   sink += leaf();
   return Number(process.hrtime.bigint() - s) / 1000; // µs
 };
@@ -176,7 +176,7 @@ const t3tree = () => {
   t.$.rows.setAll(rows(1_000));
   const s = process.hrtime.bigint();
   for (let i = 0; i < N3; i++) {
-    t.$.n.set(i);
+    t.$.n(i);
     for (let k = 0; k < 10; k++) sink += Object.keys(t.$()).length;
   }
   return Number(process.hrtime.bigint() - s) / 1000;

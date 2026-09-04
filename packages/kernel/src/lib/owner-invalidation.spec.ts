@@ -25,7 +25,7 @@ describe('OWNER INVALIDATION LAW', () => {
     const callback = vi.fn();
     const cleanup = observeOwnerInvalidation(tree, callback);
 
-    tree.$.count.set(1);
+    tree.$.count(1);
     await flush();
 
     expect(callback).toHaveBeenCalledTimes(1);
@@ -40,7 +40,7 @@ describe('OWNER INVALIDATION LAW', () => {
     const callback = vi.fn();
     const cleanup = observeOwnerInvalidation(tree, callback);
 
-    tree.$.settings.theme.set('dark');
+    tree.$.settings.theme('dark');
     await flush();
 
     expect(callback).toHaveBeenCalledTimes(1);
@@ -124,7 +124,7 @@ describe('OWNER INVALIDATION LAW', () => {
         origin: 'devtools',
         participation: 'inspection',
       },
-      () => tree.$.count.set(7)
+      () => tree.$.count(7)
     );
     await flush();
 
@@ -146,8 +146,8 @@ describe('OWNER INVALIDATION LAW', () => {
     });
 
     tree.transaction(() => {
-      tree.$.left.set(1);
-      tree.$.right.set(1);
+      tree.$.left(1);
+      tree.$.right(1);
     }).confirm();
     await flush();
 
@@ -162,7 +162,7 @@ describe('OWNER INVALIDATION LAW', () => {
     const callback = vi.fn();
     const cleanup = observeOwnerInvalidation(tree, callback);
 
-    tree.$.value.set(1);
+    tree.$.value(1);
     await flush();
 
     expect(callback).not.toHaveBeenCalled();
@@ -182,8 +182,8 @@ describe('OWNER INVALIDATION LAW', () => {
     });
 
     tree.transaction(() => {
-      tree.$.left.set(1);
-      tree.$.right.set(1);
+      tree.$.left(1);
+      tree.$.right(1);
     }).rollback();
     await flush();
 
@@ -201,7 +201,7 @@ describe('OWNER INVALIDATION LAW', () => {
     const cleanupFirst = observeOwnerInvalidation(first, firstCallback);
     const cleanupSecond = observeOwnerInvalidation(second, secondCallback);
 
-    first.$.value.set(1);
+    first.$.value(1);
     await flush();
 
     expect(firstCallback).toHaveBeenCalledTimes(1);
@@ -218,8 +218,8 @@ describe('OWNER INVALIDATION LAW', () => {
     const callback = vi.fn();
     const cleanup = observeOwnerInvalidation(tree, callback);
 
-    tree.$.left.set(1);
-    tree.$.right.set(1);
+    tree.$.left(1);
+    tree.$.right(1);
     await flush();
 
     expect(tree.$.left()).toBe(1);
@@ -246,7 +246,7 @@ describe('OWNER INVALIDATION LAW', () => {
 
     cleanupFirst();
     cleanupFirst();
-    tree.$.value.set(1);
+    tree.$.value(1);
     await flush();
 
     expect(first).not.toHaveBeenCalled();
@@ -271,7 +271,7 @@ describe('OWNER INVALIDATION LAW', () => {
     const cleanupSecond = observeOwnerInvalidation(tree, callback);
 
     cleanupFirst();
-    tree.$.value.set(1);
+    tree.$.value(1);
     await flush();
 
     expect(callback).toHaveBeenCalledTimes(1);
@@ -288,7 +288,7 @@ describe('OWNER INVALIDATION LAW', () => {
     });
     const cleanupLater = observeOwnerInvalidation(tree, later);
 
-    tree.$.value.set(1);
+    tree.$.value(1);
     await flush();
 
     expect(later).toHaveBeenCalledTimes(1);
@@ -306,7 +306,7 @@ describe('OWNER INVALIDATION LAW', () => {
     const seen: number[] = [];
     const cleanup = observeOwnerInvalidation(tree, () => seen.push(tree.$.value()));
 
-    const pending = tree.transaction(() => tree.$.value.set(1));
+    const pending = tree.transaction(() => tree.$.value(1));
     await flush();
     expect(seen).toEqual([]);
 
@@ -324,9 +324,9 @@ describe('OWNER INVALIDATION LAW', () => {
     const cleanup = observeOwnerInvalidation(tree, callback);
     const owner = {};
 
-    tree.$.value.set(1);
+    tree.$.value(1);
     openCommitScope(owner, 1, tree.$);
-    tree.$.value.set(2);
+    tree.$.value(2);
     await flush();
 
     expect(callback).not.toHaveBeenCalled();
@@ -347,7 +347,7 @@ describe('OWNER INVALIDATION LAW', () => {
     const seen: boolean[] = [];
     const cleanup = observeOwnerInvalidation(tree, () => seen.push(tree.canUndo()));
 
-    undoable(() => tree.$.value.set(1));
+    undoable(() => tree.$.value(1));
     await flush();
 
     expect(seen).toEqual([true]);
@@ -370,7 +370,7 @@ describe('OWNER INVALIDATION LAW', () => {
       seen.push(tree.hasPendingNotifications())
     );
 
-    tree.batch(() => tree.$.value.set(1));
+    tree.batch(() => tree.$.value(1));
     await flush();
     expect(seen).toEqual([true]);
 
@@ -435,7 +435,7 @@ describe('OWNER INVALIDATION LAW', () => {
     expect(observationStateForTesting(tree.$.value).claims).toBe(0);
     expect(ownerInvalidationStateForTesting(tree).active).toBe(false);
 
-    tree.$.value.set(1);
+    tree.$.value(1);
     await flush();
     expect(callback).not.toHaveBeenCalled();
 
@@ -448,7 +448,7 @@ describe('OWNER INVALIDATION LAW', () => {
     const callback = vi.fn();
 
     const cleanup = observeOwnerInvalidation(tree, callback);
-    tree.$.value.set(1);
+    tree.$.value(1);
     await flush();
 
     expect(callback).not.toHaveBeenCalled();

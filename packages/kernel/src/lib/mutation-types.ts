@@ -70,7 +70,7 @@ export type WriteParticipation = 'authored' | 'realized' | 'inspection';
 /**
  * Metadata describing the intent and source of a tree update.
  *
- * Set ambient context for enhancers using `withWriteContext({...}, () => tree.$.x.set(y))`
+ * Set ambient context for enhancers using `withWriteContext({...}, () => tree.$.x(y))`
  * from `@signal-tree/kernel`. Enhancers read the active context via `getActiveWriteContext()`.
  */
 export interface WriteMetadata {

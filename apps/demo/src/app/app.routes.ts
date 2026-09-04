@@ -208,7 +208,7 @@ export const appRoutes: Route[] = [
     data: {
       title: 'Migrate from NgRx',
       description:
-        'How to migrate an NgRx codebase to SignalTree: actions become setters, reducers become updates, selectors become computed signals.',
+        'How to migrate an NgRx codebase to SignalTree: actions become operations, reducers become callable derivations, selectors become computed values.',
     },
   },
   // Performance comparisons

@@ -71,7 +71,7 @@ describe('DEVTOOLS-JUMP-0: interaction with a PENDING transaction', () => {
 
     // A scrub landing mid-transaction. Nobody authored it; the developer moved a
     // slider.
-    asAuthoredDevtools(() => tree.$.n.set(42));
+    asAuthoredDevtools(() => tree.$.n(42));
     await flush();
 
     pending.rollback();
@@ -134,11 +134,11 @@ describe('DEVTOOLS-JUMP-0: interaction with restoration', () => {
   it('does a devtools application become an undo step?', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
     const historyAfterAuthored = tree.getRestorationHistory().length;
 
-    asAuthoredDevtools(() => tree.$.n.set(99));
+    asAuthoredDevtools(() => tree.$.n(99));
     await flush();
 
     // Under opt-in it cannot be admitted — it was never designated — so this

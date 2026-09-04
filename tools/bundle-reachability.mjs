@@ -28,7 +28,7 @@ const scenarios = {
   bare: `
     import { signalTree } from ${JSON.stringify(INDEX)};
     const tree = signalTree({ count: 0, user: { name: 'a' } });
-    tree.$.count.set(1);
+    tree.$.count(1);
     globalThis.__sink = [tree.$.count(), tree.$.user.name()];
   `,
   entityMap: `
@@ -44,7 +44,7 @@ const scenarios = {
       { count: 0 },
       { enhancers: [restoration({ maxHistorySize: 20 })] }
     );
-    undoable(() => tree.$.count.set(1));
+    undoable(() => tree.$.count(1));
     tree.undo();
     tree.redo();
     globalThis.__sink = [tree.$.count(), tree.canUndo(), tree.canRedo()];

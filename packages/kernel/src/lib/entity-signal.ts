@@ -1,6 +1,12 @@
-import type { ReadableCell, WritableCell } from './internals/cell-runtime';
+import type {
+  Location,
+  ReadableCell,
+} from './internals/cell-runtime';
 import {
+  createWritableProjection,
+  deriveLocation,
   NEUTRAL_LOCATION_RUNTIME,
+  replaceLocation,
   type LocationRuntime,
 } from './internals/location-runtime';
 import { deepClone } from './internals/utilities/deep-clone';
@@ -339,7 +345,7 @@ export function createEntitySignal<
    */
   const version = locations.createCell(0);
   const pendingEntitySignalValues = new Map<
-    WritableCell<E | undefined>,
+    Location<E | undefined>,
     E | undefined
   >();
 
@@ -490,9 +496,13 @@ export function createEntitySignal<
       },
       publish(options): void {
         for (const publication of publications) {
-          publication.valueSignal?.set(publication.afterValue);
+          if (publication.valueSignal) {
+            replaceLocation(publication.valueSignal, publication.afterValue);
+          }
           if (publication.bindingChanged) {
-            publication.stateSignal?.update((value) => value + 1);
+            if (publication.stateSignal) {
+              deriveLocation(publication.stateSignal, (value) => value + 1);
+            }
           }
           const key = publication.afterKey ?? publication.beforeKey;
           if (key === undefined) {
@@ -535,7 +545,7 @@ export function createEntitySignal<
           );
         }
         if (activeIdBefore !== activeIdAfter) {
-          activeIdSignal.set(activeIdAfter);
+          replaceLocation(activeIdSignal, activeIdAfter);
         }
         updateSignals();
         if (options?.advancePhysicalRevision !== false) {
@@ -604,9 +614,9 @@ export function createEntitySignal<
   /**
    * Per-entity signals — the body-granular reactivity layer.
    *
-   * Each entity that is read via `byId()`/node access gets its own
-   * `WritableCell<E | undefined>`. Per-entity field reads and `node()`
-   * depend ONLY on this signal, not on the whole-collection `mapSignal`, so
+  * Each entity that is read via `byId()`/node access gets its own
+  * `Location<E | undefined>`. Per-entity field reads and `node()` depend ONLY
+  * on this location, not on the whole-collection `mapSignal`, so
    * updating one entity dirties only that entity's readers (fan-out 1) instead
    * of every entity's computeds (fan-out N). Collection queries (`all`, `map`,
    * `count`, `ids`, `where`, `find`, computed slices) still depend on the
@@ -615,10 +625,10 @@ export function createEntitySignal<
    * Materialized lazily (on first `byId`/node access) and kept O(1) per
    * mutation by only syncing the entities that actually changed.
    */
-  const entitySignals = new Map<number, WritableCell<E | undefined>>();
+  const entitySignals = new Map<number, Location<E | undefined>>();
   const structuralStore = new StructuralStore<K>();
   const valueStore = new EntityValueStore<E>();
-  const subjectStateSignals = new Map<number, WritableCell<number>>();
+  const subjectStateSignals = new Map<number, Location<number>>();
   const ownerMetadataEnabled = options?.ownerMetadataEnabled ?? true;
   const subjectMetadataEnabled =
     options?.subjectMetadataEnabled ?? ownerMetadataEnabled;
@@ -811,7 +821,7 @@ export function createEntitySignal<
         lastSubjectIds = [subjectId];
 
         if (activeIdSignal() === from) {
-          activeIdSignal.set(to);
+          replaceLocation(activeIdSignal, to);
         }
 
         syncEntitySignal(to);
@@ -889,7 +899,7 @@ export function createEntitySignal<
         lastSubjectIds = [subjectId];
 
         if (activeIdSignal() === from) {
-          activeIdSignal.set(to);
+          replaceLocation(activeIdSignal, to);
         }
 
         syncEntitySignal(to);
@@ -949,7 +959,7 @@ export function createEntitySignal<
   }
 
   /** Get (or lazily create) the per-entity signal, seeded from storage. */
-  function getEntitySignal(id: K): WritableCell<E | undefined> {
+  function getEntitySignal(id: K): Location<E | undefined> {
     const subjectId = resolveSubjectId(id);
     if (subjectId === undefined) {
       return locations.createCell<E | undefined>(getProjectedEntity(id));
@@ -963,7 +973,7 @@ export function createEntitySignal<
     return s;
   }
 
-  function getSubjectStateSignal(subjectId: number): WritableCell<number> {
+  function getSubjectStateSignal(subjectId: number): Location<number> {
     let s = subjectStateSignals.get(subjectId);
     if (!s) {
       s = locations.createCell(0);
@@ -976,7 +986,8 @@ export function createEntitySignal<
     // Publish only to an activation token that already exists. Interning here
     // would recreate eager realization through the write path: any subject that
     // is ever mutated would acquire a token whether or not anything observes it.
-    subjectStateSignals.get(subjectId)?.update((value) => value + 1);
+    const signal = subjectStateSignals.get(subjectId);
+    if (signal) deriveLocation(signal, (value) => value + 1);
   }
 
   function publishSubjectPhysicalChange(subjectId: number): void {
@@ -1494,9 +1505,9 @@ export function createEntitySignal<
     pendingEntitySignalValues.clear();
     locations.runInvalidationGroup(() => {
       for (const [signal, value] of pending) {
-        signal.set(value);
+        replaceLocation(signal, value);
       }
-      version.update((v) => v + 1);
+      deriveLocation(version, (value) => value + 1);
       markOwnerInvalidated(ownerId);
     });
   }
@@ -1581,29 +1592,17 @@ export function createEntitySignal<
     // Writes delegate to api.updateOne so interceptors and tap handlers still run.
     for (const key of Object.keys(entity)) {
       const fieldKey = key as keyof E;
-      const fieldSignal = locations.createDerived(() => entitySig()?.[fieldKey]);
-
-      Object.assign(fieldSignal, {
-        set: (value: E[typeof fieldKey]) => {
+      const fieldRead = locations.createDerived(() => entitySig()?.[fieldKey]);
+      const fieldSignal = createWritableProjection(
+        fieldRead,
+        (value: E[typeof fieldKey] | undefined) => {
           const key = currentKey();
           if (key === undefined) {
             throw new Error(`Entity with subject ${String(subjectId)} not found`);
           }
           api.updateOne(key, { [fieldKey]: value } as Partial<E>);
-        },
-        update: (
-          fn: (current: E[typeof fieldKey] | undefined) => E[typeof fieldKey]
-        ) => {
-          const key = currentKey();
-          if (key === undefined) {
-            throw new Error(`Entity with subject ${String(subjectId)} not found`);
-          }
-          api.updateOne(key, {
-            [fieldKey]: fn(entitySig()?.[fieldKey]),
-          } as Partial<E>);
-        },
-        asReadonly: () => fieldSignal,
-      });
+        }
+      );
 
       if (ownerMetadataEnabled) {
         Object.defineProperty(fieldSignal, '__ownerPath', {
@@ -2000,13 +1999,13 @@ export function createEntitySignal<
       // row (a delete arriving from a socket while a detail pane is open), and
       // `activeEntity` already resolves to undefined in that case.
       const previous = activeIdSignal();
-      activeIdSignal.set(id);
+      replaceLocation(activeIdSignal, id);
       if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
     },
 
     clearActiveId(): void {
       const previous = activeIdSignal();
-      activeIdSignal.set(undefined);
+      replaceLocation(activeIdSignal, undefined);
       if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
     },
 
@@ -2946,7 +2945,7 @@ export function createEntitySignal<
       reclaimRetiredSubjectsWithoutOwner(
         activeSubjects.map(({ subjectId }) => subjectId)
       );
-      activeIdSignal.set(undefined);
+      replaceLocation(activeIdSignal, undefined);
       lastSubjectIds = activeSubjects.map(({ subjectId }) => subjectId);
       updateSignals();
 

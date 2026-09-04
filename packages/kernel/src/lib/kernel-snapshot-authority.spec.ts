@@ -13,10 +13,10 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
 
     expect(tree.$()).toBe(initial);
 
-    tree.$.count.set(1);
+    tree.$.count(1);
     expect(tree.$()).toBe(initial);
 
-    tree.$.count.set(2);
+    tree.$.count(2);
     expect(tree.$()).not.toBe(initial);
   });
 
@@ -24,7 +24,7 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
     const tree = signalTree({ left: { value: 1 }, right: { value: 2 } });
     const before = tree.$();
 
-    tree.$.left.value.set(3);
+    tree.$.left.value(3);
     const after = tree.$();
 
     expect(after).not.toBe(before);
@@ -39,10 +39,10 @@ describe('KERNEL-SNAPSHOT-AUTHORITY-0', () => {
     });
     const before = tree.$();
 
-    tree.$.branch.nested.value.set(3);
+    tree.$.branch.nested.value(3);
     expect(tree.$.branch.nested()).toEqual({ value: 3 });
 
-    tree.$.branch.nested.value.set(4);
+    tree.$.branch.nested.value(4);
     const after = tree.$();
 
     expect(after.branch.nested.value).toBe(4);

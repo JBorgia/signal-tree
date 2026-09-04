@@ -128,7 +128,7 @@ describe('AFTER-COMMIT-1: the consequence belongs to the OPERATION', () => {
     const ran: number[] = [];
 
     const p = tree.transaction(() => {
-      tree.$.n.set(2);
+      tree.$.n(2);
       afterCommit(() => ran.push(tree.$.n()));
     });
     await flush();
@@ -145,7 +145,7 @@ describe('AFTER-COMMIT-1: the consequence belongs to the OPERATION', () => {
     const ran: number[] = [];
 
     const p = tree.transaction(() => {
-      tree.$.n.set(9);
+      tree.$.n(9);
       afterCommit(() => ran.push(tree.$.n()));
     });
     await flush();
@@ -165,7 +165,7 @@ describe('AFTER-COMMIT-1: the consequence belongs to the OPERATION', () => {
     const p = a.transaction(() => {
       // A write to a DIFFERENT tree. `scopeOwns` exists to stop this write
       // becoming speculative under A — and it does, which is right.
-      b.$.n.set(7);
+      b.$.n(7);
       // The registration, however, is explicit and happens inside A.
       afterCommit(() => ran.push('effect'));
     });
@@ -190,11 +190,11 @@ describe('AFTER-COMMIT-1: the consequence belongs to the OPERATION', () => {
     const ran: string[] = [];
 
     const pb = b.transaction(() => {
-      b.$.n.set(5);
+      b.$.n(5);
       afterCommit(() => ran.push('B'));
     });
     const pa = a.transaction(() => {
-      a.$.n.set(7);
+      a.$.n(7);
       afterCommit(() => ran.push('A'));
     });
     await flush();
@@ -213,7 +213,7 @@ describe('AFTER-COMMIT-1: the consequence belongs to the OPERATION', () => {
     const charge = () => void charges++;
 
     const p = tree.transaction(() => {
-      tree.$.n.set(1);
+      tree.$.n(1);
       afterCommit(charge);
       afterCommit(charge);
     });
@@ -246,7 +246,7 @@ describe('AFTER-COMMIT-1: the consequence belongs to the OPERATION', () => {
     await flush();
     const ran: string[] = [];
 
-    tree.$.n.set(1);
+    tree.$.n(1);
     afterCommit(() => ran.push('effect'));
 
     // The contract choice AFTER-COMMIT-0 recorded as open, now made: uniform
@@ -265,7 +265,7 @@ describe('AFTER-COMMIT-1 case 7: the claimant route still fails', () => {
     const ran: string[] = [];
 
     const p = tree.transaction(() => {
-      tree.$.n.set(2);
+      tree.$.n(2);
       // `transactionOwner` as a tree claimant — the falsified form.
       afterCommitViaClaimant(getActiveWriteContext()?.transactionOwner, () =>
         ran.push('leaked')

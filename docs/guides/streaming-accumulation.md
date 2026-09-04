@@ -28,8 +28,7 @@ reply: '' as string, // written from streamTokens() through external()
 
 ## The pattern
 
-A plain leaf plus a loop. The leaf is a `WritableSignal`, so `update()` is the
-accumulator:
+A plain terminal location plus a loop. The updater call is the accumulator:
 
 ```ts
 const chat = signalTree({
@@ -38,20 +37,21 @@ const chat = signalTree({
 });
 
 async function ask(prompt: string) {
-  chat.$.reply.set('');
-  chat.$.streaming.set(true);
+  chat.$.reply('');
+  chat.$.streaming(true);
   try {
     for await (const chunk of llm.stream(prompt)) {
-      chat.$.reply.update((text) => text + chunk);
+      chat.$.reply((text) => text + chunk);
     }
   } finally {
-    chat.$.streaming.set(false);
+    chat.$.streaming(false);
   }
 }
 ```
 
-That is the whole thing. `chat.$.reply` is a signal, so templates track it,
-`computed()` derives from it, and — because it is an ordinary leaf — it is
+That is the whole thing. `chat.$.reply` is a location, so framework adapters
+track it, `computed()` derives from it in Angular, and — because it is an
+ordinary terminal — it is
 captured by `restoration()` and included in `tree.$()`. Application-owned
 persistence may serialize that value without a marker contract to satisfy.
 
@@ -63,25 +63,25 @@ Hold the controller in a plain leaf too:
 const chat = signalTree({
   reply: '',
   streaming: false,
-  controller: null as AbortController | null,
+  controller: leaf<AbortController | null>(null),
 });
 
 async function ask(prompt: string) {
   chat.$.controller()?.abort();
   const controller = new AbortController();
-  chat.$.controller.set(controller);
-  chat.$.reply.set('');
-  chat.$.streaming.set(true);
+  chat.$.controller(controller);
+  chat.$.reply('');
+  chat.$.streaming(true);
   try {
     for await (const chunk of llm.stream(prompt, {
       signal: controller.signal,
     })) {
-      chat.$.reply.update((text) => text + chunk);
+      chat.$.reply((text) => text + chunk);
     }
   } catch (err) {
     if ((err as Error).name !== 'AbortError') throw err;
   } finally {
-    chat.$.streaming.set(false);
+    chat.$.streaming(false);
   }
 }
 
@@ -103,11 +103,11 @@ const chat = signalTree({
 async function ask(prompt: string) {
   const id = crypto.randomUUID();
   chat.$.messages.addOne({ id, role: 'user', text: prompt });
-  chat.$.draft.set('');
-  chat.$.streaming.set(true);
+  chat.$.draft('');
+  chat.$.streaming(true);
 
   for await (const chunk of llm.stream(prompt)) {
-    chat.$.draft.update((text) => text + chunk);
+    chat.$.draft((text) => text + chunk);
   }
 
   chat.$.messages.addOne({
@@ -115,8 +115,8 @@ async function ask(prompt: string) {
     role: 'assistant',
     text: chat.$.draft(),
   });
-  chat.$.draft.set('');
-  chat.$.streaming.set(false);
+  chat.$.draft('');
+  chat.$.streaming(false);
 }
 ```
 
@@ -132,10 +132,10 @@ Identical shape — only the producer changes:
 const feed = signalTree({ events: [] as FeedEvent[], connected: false });
 
 const source = new EventSource('/api/feed');
-source.onopen = () => feed.$.connected.set(true);
-source.onerror = () => feed.$.connected.set(false);
+source.onopen = () => feed.$.connected(true);
+source.onerror = () => feed.$.connected(false);
 source.onmessage = (e) => {
-  feed.$.events.update((list) => [...list, JSON.parse(e.data)]);
+  feed.$.events((list) => [...list, JSON.parse(e.data)]);
 };
 ```
 
@@ -154,8 +154,8 @@ Every marker has to earn those individually — and the four bugs behind
 
 **Accumulation is not one policy.** Concatenating strings, appending to a list,
 merging partial objects and reducing to a running total are all "accumulate",
-and a marker has to pick or grow an options bag. `update()` is the accumulator,
-and it is already general.
+and a marker has to pick or grow an options bag. The updater call is already a
+general accumulator.
 
 **Streams are not restorable.** A half-received stream cannot be resumed from a
 snapshot — the connection is gone. That is why the removed marker could capture

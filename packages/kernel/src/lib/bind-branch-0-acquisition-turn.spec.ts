@@ -166,7 +166,7 @@ describe('BIND-BRANCH-0: what belongs to an external acquisition?', () => {
     // Application logic reacting to metric units. Storage never said the
     // precision was 1 — the application rule did. Same tick, deliberately: if
     // provenance were contagious, timing would be what leaked it.
-    tree.$.settings.distancePrecision.set(1);
+    tree.$.settings.distancePrecision(1);
     await flush();
     const effects = drain(journal);
 
@@ -216,9 +216,9 @@ describe('BIND-BRANCH-0: the limits of the current turn model', () => {
     await flush();
     const before = tree.getRestorationHistory().length;
 
-    undoable(() => tree.$.settings.theme.set('dark'));
-    undoable(() => tree.$.settings.units.set('metric'));
-    undoable(() => tree.$.settings.distancePrecision.set(1));
+    undoable(() => tree.$.settings.theme('dark'));
+    undoable(() => tree.$.settings.units('metric'));
+    undoable(() => tree.$.settings.distancePrecision(1));
     await flush();
 
     // Three explicit designations, one entry. So history-entry count is a
@@ -237,7 +237,7 @@ describe('BIND-BRANCH-0: the limits of the current turn model', () => {
       PAYLOAD,
       EXTERNAL_ACQUISITION
     );
-    tree.$.settings.distancePrecision.set(1);
+    tree.$.settings.distancePrecision(1);
     await flush();
     const turns = journal.turns();
     const turnCount = turns.length;

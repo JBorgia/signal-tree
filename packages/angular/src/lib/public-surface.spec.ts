@@ -15,7 +15,9 @@ import { describe, expect, it } from 'vitest';
 import {
   asReadonly,
   restoration,
+  SignalTreeRollbackError,
   signalTree,
+  transactions,
   undoable,
 } from '../index';
 // PHYSICAL-PACKAGE-SPLIT-0: `toWritableSignal` and `defineStore` are
@@ -51,10 +53,75 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
     host.model.set('Grace');
     expect(host.tree.$.name()).toBe('Grace');
 
-    host.tree.$.name.set('Lin');
+    host.tree.$.name('Lin');
     TestBed.flushEffects();
     await flush();
     expect(host.model()).toBe('Lin');
+  });
+
+  it('derives updates from canonical tree state before effects flush', () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree({ count: 0 });
+      readonly model = toWritableSignal(this.tree.$.count, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+
+    host.tree.$.count(5);
+    host.model.update((current) => current + 1);
+
+    expect(host.tree.$.count()).toBe(6);
+    expect(host.model()).toBe(6);
+  });
+
+  it('preserves derive intent when adapting WritableSignal.update()', async () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree(
+        { count: 0 },
+        { enhancers: [transactions()] }
+      );
+      readonly model = toWritableSignal(this.tree.$.count, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+    const pending = host.tree.transaction(() => host.tree.$.count(1));
+
+    host.model.update((current) => current + 1);
+    await flush();
+
+    expect(() => pending.rollback()).toThrow(SignalTreeRollbackError);
+    expect(host.tree.$.count()).toBe(2);
+  });
+
+  it('keeps adapted set() as a superseding replacement', async () => {
+    @Component({ standalone: true, template: '' })
+    class Host {
+      private readonly injector = inject(Injector);
+      readonly tree = signalTree(
+        { count: 0 },
+        { enhancers: [transactions()] }
+      );
+      readonly model = toWritableSignal(this.tree.$.count, this.injector);
+    }
+
+    const fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    const host = fixture.componentInstance;
+    const pending = host.tree.transaction(() => host.tree.$.count(1));
+
+    host.model.set(2);
+    await flush();
+
+    expect(() => pending.rollback()).not.toThrow();
+    expect(host.tree.$.count()).toBe(2);
   });
 
   it('adapts a branch whose state contains a set key', () => {
@@ -122,14 +189,14 @@ describe('PUBLIC CARRIER — toWritableSignal is reachable from @signal-tree/ang
     await flush();
     const before = tree.getRestorationHistory().length;
 
-    tree.$.editForm.name.set('plain');
+    tree.$.editForm.name('plain');
     await flush();
 
     expect(tree.getRestorationHistory().length).toBe(before);
 
     // ...and the same write DOES record when designated, so the mechanism is
     // provably exercised in both directions.
-    undoable(() => tree.$.editForm.name.set('designated'));
+    undoable(() => tree.$.editForm.name('designated'));
     await flush();
     expect(tree.getRestorationHistory().length).toBeGreaterThan(before);
   });
@@ -170,7 +237,7 @@ describe('PUBLIC CARRIER — defineStore (Angular package) provides a tree throu
     // providedIn: 'root' means one instance for the injector.
     expect(a).toBe(b);
     expect(a.$.n()).toBe(1);
-    a.$.n.set(2);
+    a.$.n(2);
     expect(a.$.n()).toBe(2);
   });
 });

@@ -13,8 +13,9 @@
         <input
           id="username"
           type="text"
-          [(ngModel)]="username"
-          (blur)="usernameTouched.set(true)"
+          [ngModel]="username()"
+          (ngModelChange)="username($event)"
+          (blur)="usernameTouched(true)"
           [class.invalid]="usernameTouched() && !usernameValid()"
           [class.valid]="usernameTouched() && usernameValid()"
           placeholder="Enter username (3-20 chars, alphanumeric)"
@@ -36,8 +37,9 @@
         <input
           id="email"
           type="email"
-          [(ngModel)]="email"
-          (blur)="emailTouched.set(true)"
+          [ngModel]="email()"
+          (ngModelChange)="email($event)"
+          (blur)="emailTouched(true)"
           [class.invalid]="emailTouched() && !emailValid()"
           [class.valid]="emailTouched() && emailValid()"
           placeholder="your.email@example.com"
@@ -57,8 +59,9 @@
         <input
           id="password"
           type="password"
-          [(ngModel)]="password"
-          (blur)="passwordTouched.set(true)"
+          [ngModel]="password()"
+          (ngModelChange)="password($event)"
+          (blur)="passwordTouched(true)"
           [class.invalid]="passwordTouched() && !passwordValid()"
           [class.valid]="passwordTouched() && passwordValid()"
           placeholder="Enter a strong password"
@@ -92,8 +95,9 @@
         <input
           id="confirmPassword"
           type="password"
-          [(ngModel)]="confirmPassword"
-          (blur)="confirmPasswordTouched.set(true)"
+          [ngModel]="confirmPassword()"
+          (ngModelChange)="confirmPassword($event)"
+          (blur)="confirmPasswordTouched(true)"
           [class.invalid]="confirmPasswordTouched() && !passwordsMatch()"
           [class.valid]="confirmPasswordTouched() && passwordsMatch()"
           placeholder="Re-enter your password"
@@ -112,7 +116,8 @@
         <label class="checkbox-label">
           <input
             type="checkbox"
-            [(ngModel)]="agreeToTerms"
+            [ngModel]="agreeToTerms()"
+            (ngModelChange)="agreeToTerms($event)"
             name="agreeToTerms"
             class="checkbox-input"
           />

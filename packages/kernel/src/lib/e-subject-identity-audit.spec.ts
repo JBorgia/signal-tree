@@ -129,11 +129,11 @@ describe('SUBJ-AUDIT — the hazards the docblocks imply', () => {
     tree.$.rows.addOne({ id: 'tmp-1', n: 5 });
     await tick();
 
-    tree.$.draft.set('before');
+    tree.$.draft('before');
     await tick();
     tree.$.rows.changeId('tmp-1', 'server-99');
     await tick();
-    tree.$.draft.set('after');
+    tree.$.draft('after');
     await tick();
 
     expect(tree.$.rows.ids()).toEqual(['server-99']);

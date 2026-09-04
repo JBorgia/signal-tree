@@ -113,7 +113,7 @@ describe('TX-LEDGER-0 case 6: rollback safety without restoration()', () => {
     });
     await flush();
 
-    tree.$.unrelated.set(1);
+    tree.$.unrelated(1);
     await flush();
 
     // Without this control, "refuses when a later write exists" could be

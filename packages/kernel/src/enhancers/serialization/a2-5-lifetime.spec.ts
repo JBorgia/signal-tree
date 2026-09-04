@@ -77,7 +77,9 @@ const recordingStorage = () => {
 const settleTimers = () => new Promise((r) => setTimeout(r, 260));
 
 type Persisted = {
-  $: { a: { (): string; set(v: string): void } };
+  $: {
+    a: { (value: string): void; (update: (current: string) => string): void; (): string };
+  };
   destroy?: () => void;
 };
 
@@ -102,7 +104,7 @@ describe('A2-5 behaviour: destroy() stops pending durable work', () => {
     const rec = recordingStorage();
     const tree = makeTree(rec.adapter, 'a2-5-live');
 
-    tree.$.a.set('a1');
+    tree.$.a('a1');
     await settleTimers();
 
     // Without this arm, "destroy suppressed the write" is satisfied by a
@@ -115,7 +117,7 @@ describe('A2-5 behaviour: destroy() stops pending durable work', () => {
     const rec = recordingStorage();
     const tree = makeTree(rec.adapter, 'a2-5-destroy');
 
-    tree.$.a.set('a1');
+    tree.$.a('a1');
     // Destroy INSIDE the debounce window, which is the only interval in which
     // the question has content.
     tree.destroy?.();
@@ -145,7 +147,7 @@ describe('A2-5 retention: what does the capability hold?', () => {
         ? signalTree({ a: 'a0', obj: null as unknown })
         : makeTree(rec.adapter, `a2-5-${mode}`);
 
-    (tree as { $: { obj: { set(v: unknown): void } } }).$.obj.set(payload);
+    (tree as { $: { obj(value: unknown): void } }).$.obj(payload);
     payload = null;
     await settleTimers();
 

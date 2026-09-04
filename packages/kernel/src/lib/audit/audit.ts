@@ -96,7 +96,7 @@ export interface AuditTrackerConfig<T> {
  *   includePreviousValues: true,
  * });
  *
- * tree.$.name.set('John');
+ * tree.$.name('John');
  * stopTracking();
  * ```
  */

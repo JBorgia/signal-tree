@@ -223,9 +223,9 @@ export const ACCESSOR_GRAMMAR_DIAGRAM: ArchitectureDiagramSpec = {
   eyebrow: '03 · Public state grammar',
   title: 'The API follows the shape of the location',
   takeaway:
-    'Root and branch accessors use collision-free callable writes; leaves use the universal location API.',
+    'Root, branches, and terminal leaves share one callable grammar; leaf(value) declares where topology stops.',
   description:
-    'The controller itself is not callable. Its root $ accessor and branch accessors support read, whole-value replacement, and updater calls, preserving user keys named set or update. Leaf locations read with () and write with set() or update(). EntityMap exposes collection operations.',
+    'The controller itself is not callable. Its root $, branch accessors, and terminal locations support read, whole-value replacement, and updater calls. leaf(value) makes an object or callable terminal instead of traversable; wrapping a callable again at write time distinguishes data from an updater. EntityMap exposes collection operations.',
   plainLanguage:
     'The way you read or change state matches what you are touching: the whole tree, one object, one simple value, or a keyed collection.',
   realWorldExample:
@@ -259,11 +259,12 @@ export const ACCESSOR_GRAMMAR_DIAGRAM: ArchitectureDiagramSpec = {
     ),
     node(
       'leaf',
-      ['Leaf location'],
+      ['Terminal location'],
       [
-        'tree.$.count()',
-        'tree.$.count.set(5)',
-        'tree.$.count.update(n => n + 1)',
+        'leaf({ start, end })',
+        'location() / location(next)',
+        'location(current => next)',
+        'location(leaf(callback))',
       ],
       'framework',
       box(525, 70, 235, 295),
@@ -284,7 +285,8 @@ export const ACCESSOR_GRAMMAR_DIAGRAM: ArchitectureDiagramSpec = {
   checks: [
     'tree is a controller and is not callable.',
     'A branch call replaces a whole branch value; partial objects do not compile.',
-    'Leaf argument calls do not compile; leaves use set() and update().',
+    'Terminal leaves use the same read, replace, and derive grammar.',
+    'leaf(callable) distinguishes callable data from an updater.',
   ],
   evidence: [
     'packages/kernel/src/lib/callable-contract.typing.spec.ts',

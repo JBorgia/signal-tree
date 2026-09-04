@@ -3,6 +3,10 @@
 import type { ReadableCell } from './internals/cell-runtime';
 import { isTreeCell, markTreeCell } from './internals/cell-identity';
 import {
+  isWritableLocation,
+  replaceLocation,
+} from './internals/location-runtime';
+import {
   bindSnapshotParent,
   isSnapshotNode,
   materializeSnapshotNode,
@@ -128,7 +132,7 @@ import type { NodeAccessor, TreeNode } from './types';
  * Checks if a value is a non-null object or function — the permissive
  * "can this have own enumerable children worth recursing into" test that
  * every hand-written tree walker in this codebase needs. Node accessors and
- * leaf signals are callable (`typeof === 'function'`); plain nested state
+ * locations are callable (`typeof === 'function'`); plain nested state
  * literals are plain objects (`typeof === 'object'`) — a walker that only
  * accepts one of the two silently skips half the tree.
  *
@@ -386,8 +390,8 @@ function buildFromStore<T>(node: object): T {
 
     const value = (node as Record<string, unknown>)[key];
 
-    // NOTE: there was a name-based skip for `set`/`update` here. A leaf signal
-    // IS a function, so it dropped state stored under those keys — `set` and
+    // NOTE: there was a name-based skip for `set`/`update` here. A location IS
+    // a function, so it dropped state stored under those keys — `set` and
     // `update` are ordinary words (permission sets, an `update` timestamp) and
     // they vanished from every snapshot, every persisted payload and every
     // structuredClone, silently. The general plain-function skip below already
@@ -665,7 +669,13 @@ export function applyState<T>(stateNode: TreeNode<T>, snapshot: T): void {
     // was built to catch, and did.
     if (hydrateMarkerNode(target, val, 'restore')) continue;
 
-    if (isNodeAccessor(target)) {
+    if (isWritableLocation(target)) {
+      try {
+        replaceLocation(target, val);
+      } catch {
+        // ignore
+      }
+    } else if (isNodeAccessor(target)) {
       if (val && typeof val === 'object') {
         try {
           applyState(
@@ -687,15 +697,9 @@ export function applyState<T>(stateNode: TreeNode<T>, snapshot: T): void {
         }
       }
     } else if (isReactiveStateValue(target)) {
-      try {
-        (target as CallableTarget).set?.(val);
-      } catch {
-        try {
-          (target as CallableTarget)(val);
-        } catch {
-          // ignore
-        }
-      }
+      // Readonly derived state is recomputed from source truth and is not a
+      // replay target.
+      continue;
     } else if (
       target &&
       typeof target === 'object' &&

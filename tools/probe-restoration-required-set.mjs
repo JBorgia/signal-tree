@@ -191,7 +191,7 @@ const makeScalarTree = (maxHistorySize) =>
 
 async function runFixtureSelfTest() {
   const ordinary = makeScalarTree(4);
-  ordinary.$.value.set(1);
+  ordinary.$.value(1);
   await tick();
   assertEqual(
     ordinary.getRestorationHistory().length,
@@ -200,13 +200,13 @@ async function runFixtureSelfTest() {
   );
 
   const designated = makeScalarTree(4);
-  undoable(() => designated.$.value.set(1));
+  undoable(() => designated.$.value(1));
   await tick();
   assertEqual(designated.getRestorationHistory().length, 1, 'one designated turn');
 
   const bounded = makeScalarTree(2);
   for (let value = 1; value <= 3; value++) {
-    undoable(() => bounded.$.value.set(value));
+    undoable(() => bounded.$.value(value));
     await tick();
   }
   assertEqual(
@@ -216,7 +216,7 @@ async function runFixtureSelfTest() {
   );
 
   const realized = makeScalarTree(4);
-  external(() => realized.$.value.set(1));
+  external(() => realized.$.value(1));
   await tick();
   assertEqual(realized.getRestorationHistory().length, 0, 'external realization');
 

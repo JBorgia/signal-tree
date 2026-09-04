@@ -9,22 +9,22 @@
     <div intro>
       <p class="intro-text">
         This test replicates the exact pattern from the v3 trax-mobile app.
-        It verifies that <code>effect()</code> correctly re-runs when SignalTree signals change,
-        exactly as it does for regular Angular signals.
+        It verifies that <code>effect()</code> correctly re-runs when kernel-owned
+        SignalTree locations change through the Angular adapter.
       </p>
 
       <div class="success-callout">
         <h3>✅ What This Verifies</h3>
         <p>
-          SignalTree signals <strong>do</strong> trigger Angular's <code>effect()</code> re-execution.
+          SignalTree locations <strong>do</strong> trigger Angular's <code>effect()</code> re-execution.
           Click the buttons below and watch every effect counter increment — nested primitives and
-          entity signals behave identically to regular Angular signals.
+          entity locations participate in the same Angular dependency graph.
         </p>
         <p class="caveat">
           <strong>Local-dev caveat:</strong> Under <code>pnpm link</code> local development you may hit a
-          "dual Angular instance" issue where SignalTree's signals are created with a different
-          <code>&#64;angular/core</code> than the consuming app, causing <code>isSignal()</code> to return
-          false and breaking effect reactivity. This never affects npm installs. See
+          "dual Angular instance" issue where the adapter's observation token is created with a
+          different <code>&#64;angular/core</code> than the consuming app, breaking effect reactivity.
+          This never affects npm installs. See
           <code>docs/guides/local-development-symlinks.md</code>.
         </p>
       </div>
@@ -150,7 +150,7 @@
         <li><strong>SignalTree Entity Effect</strong> counter increments with each change ✅</li>
       </ul>
       <p>
-        <strong>This confirms SignalTree signals integrate correctly with Angular's reactive effect scheduling.</strong>
+        <strong>This confirms SignalTree locations integrate correctly with Angular's reactive effect scheduling.</strong>
         The only exception is <code>pnpm link</code> local development, where a dual <code>&#64;angular/core</code>
         instance can break <code>isSignal()</code> — see <code>docs/guides/local-development-symlinks.md</code>.
       </p>

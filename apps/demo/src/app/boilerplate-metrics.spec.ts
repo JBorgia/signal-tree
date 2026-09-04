@@ -30,7 +30,7 @@ describe('SignalTree Boilerplate & Code Metrics', () => {
 
       const tree = signalTree({ count: 0 });
       // Access: tree.$.count()
-      // Update: tree.$.count.set(5)`,
+      // Update: tree.$.count(5)`,
       },
       {
         framework: 'NgRx',

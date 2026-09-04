@@ -87,7 +87,7 @@ describe('ENTITY-LINK-0: what identity does a collection already carry?', () => 
     });
     await flush();
     undoable(() => {
-      tree.$.data.page.set(2);
+      tree.$.data.page(2);
     });
     await flush();
 
@@ -128,9 +128,9 @@ describe('ENTITY-LINK-0: is parent-branch linking the SAME thing?', () => {
     });
 
     // A purely presentational change, unrelated to the collection.
-    tree.$.data.page.set(2);
+    tree.$.data.page(2);
     await flush();
-    tree.$.data.selectedId.set('a');
+    tree.$.data.selectedId('a');
     await flush();
     off();
 
@@ -145,7 +145,7 @@ describe('ENTITY-LINK-0: is parent-branch linking the SAME thing?', () => {
     const tree = appTree();
     await flush();
     tree.$.data.rows.addOne({ id: 'a', n: 1 });
-    tree.$.data.page.set(3);
+    tree.$.data.page(3);
     await flush();
 
     const branchValue = tree.$.data() as Record<string, unknown>;

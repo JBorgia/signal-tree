@@ -38,8 +38,9 @@ describe('ArchitectureOverviewComponent', () => {
     expect(text).toContain('tree.$(next)');
     expect(text).toContain('tree.$(current => next)');
     expect(text).toContain('tree.$.profile(next)');
-    expect(text).toContain('tree.$.count.set(5)');
-    expect(text).toContain('tree.$.count.update(n => n + 1)');
+    expect(text).toContain('location() / location(next)');
+    expect(text).toContain('location(current => next)');
+    expect(text).toContain('location(leaf(callback))');
   });
 
   it('does not repeat superseded or unsupported marketing claims', () => {

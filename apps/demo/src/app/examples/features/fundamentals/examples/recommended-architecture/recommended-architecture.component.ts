@@ -49,7 +49,7 @@ export class PostOps {
   private readonly _$ = inject(APP_TREE).$;
 
   setSearch(term: string): void {
-    this._$.posts.filters.search.set(term);
+    this._$.posts.filters.search(term);
   }
 
   // Business rule enforced in ops — not the component, not the tree.
@@ -57,7 +57,7 @@ export class PostOps {
     const post = this._$.posts.entities.byId(postId)?.();
     const author = this._$.users.entities.byId(post?.authorId)?.();
     if (author?.role !== 'admin') {
-      this._$.posts.loading.error.set('Only admins can publish posts');
+      this._$.posts.loading.error('Only admins can publish posts');
       return of(void 0);
     }
     return this._api.publishPost$(postId).pipe(
@@ -103,8 +103,8 @@ const APP_TREE = signalTree(
 @Injectable({ providedIn: 'root' })
 class CounterOps {
   private $ = APP_TREE.$;
-  increment() { this.$.count.update((n) => n + 1); }
-  reset() { this.$.count.set(0); }
+  increment() { this.$.count((count) => count + 1); }
+  reset() { this.$.count(0); }
 }
 
 @Component({
@@ -125,7 +125,7 @@ export class AppComponent {
     // REACT — the state change IS the event. No actions, no dispatch.
     effect(() => {
       const n = this.$.count();
-      this.$.history.update((h) => [...h, n].slice(-5));
+      this.$.history((history) => [...history, n].slice(-5));
     });
   }
 }`;

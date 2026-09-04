@@ -27,14 +27,14 @@ const store = signalTree({
   error: null as unknown,
 });
 
-store.$.loading.set(true); // application-owned request state
+store.$.loading(true); // application-owned request state
 try {
   const users = await api.search('alice');
-  external(() => store.$.results.set(users));
+  external(() => store.$.results(users));
 } catch (error) {
-  store.$.error.set(error); // application-owned presentation policy
+  store.$.error(error); // application-owned presentation policy
 } finally {
-    store.$.loading.set(false);
+  store.$.loading(false);
 }`,
     },
   ];
@@ -58,7 +58,7 @@ const connection = link(store.$.preferences, {
 });
 
 await connection.retrieve(); // endpoint -> state, on demand
-store.$.preferences.density.set('comfortable'); // state -> endpoint
+store.$.preferences.density('comfortable'); // state -> endpoint
 await connection.settled();  // outbound writes acknowledged
 connection.dispose();        // release the relationship
 stopReporting();             // release diagnostic reporting`,
@@ -76,7 +76,7 @@ stopReporting();             // release diagnostic reporting`,
     switchMap((query) => api.search$(query))
   )
   .subscribe((users) =>
-    external(() => store.$.results.set(users))
+    external(() => store.$.results(users))
   );
 
 // Cancellation, retries, loading, errors, and cache policy

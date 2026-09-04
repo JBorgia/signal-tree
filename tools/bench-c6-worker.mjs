@@ -14,9 +14,9 @@ const { signalTree } = await import(buildPath);
 
 /** The forbidden architecture, used ONLY as a harness sensitivity control. */
 const wrap = (leaf) => {
-  const w = () => leaf();
-  w.set = (v) => leaf.set(v);
-  return w;
+  return function (value) {
+    return arguments.length === 0 ? leaf() : leaf(value);
+  };
 };
 
 const wide = (n) => { const o = {}; for (let i = 0; i < n; i++) o[`k${i}`] = i; return o; };
@@ -51,7 +51,7 @@ const OPS = {
   'scalar-write': (n) => {
     const t = signalTree({ a: 0 });
     const leaf = mode === 'wrapped' ? wrap(t.$.a) : t.$.a;
-    for (let i = 0; i < n; i++) leaf.set(i);
+    for (let i = 0; i < n; i++) leaf(i);
     return leaf();
   },
   'merge-write-many': (n) => {
@@ -60,7 +60,7 @@ const OPS = {
     for (let i = 0; i < rounds; i++) {
       const p = {};
       for (let k = 0; k < 64; k++) p[`k${k}`] = i + k;
-      t(p);
+      t.$(p);
     }
     return t.$.k0();
   },

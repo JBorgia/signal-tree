@@ -18,11 +18,11 @@ describe('LocationRuntime', () => {
     expect(isEmpty()).toBe(false);
     expect(doubled()).toBe(4);
 
-    source.set(0);
+    source(0);
     expect(isEmpty()).toBe(true);
     expect(doubled()).toBe(0);
 
-    source.set(5);
+    source(5);
     expect(isEmpty()).toBe(false);
     expect(doubled()).toBe(10);
   });
@@ -34,11 +34,11 @@ describe('LocationRuntime', () => {
     const releaseFirst = location.subscribe(first);
     const releaseSecond = location.subscribe(second);
 
-    location.set('b');
+    location('b');
     releaseFirst();
-    location.set('c');
+    location('c');
     releaseSecond();
-    location.set('d');
+    location('d');
 
     expect(first).toHaveBeenCalledTimes(1);
     expect(second).toHaveBeenCalledTimes(2);
@@ -56,15 +56,15 @@ describe('LocationRuntime', () => {
     });
 
     expect(selected()).toBe(1);
-    chooseLeft.set(false);
+    chooseLeft(false);
     expect(selected()).toBe(10);
     const afterSwitch = runs;
 
-    left.set(2);
+    left(2);
     expect(selected()).toBe(10);
     expect(runs).toBe(afterSwitch);
 
-    right.set(11);
+    right(11);
     expect(selected()).toBe(11);
     expect(runs).toBe(afterSwitch + 1);
   });
@@ -86,7 +86,7 @@ describe('LocationRuntime', () => {
     expect(downstream()).toBe(1);
     const initialRuns = downstreamRuns;
 
-    rows.update((current) =>
+    rows((current) =>
       current.map((row) =>
         row.id === 'b' ? { ...row, value: 3 } : row
       )
@@ -109,11 +109,11 @@ describe('LocationRuntime', () => {
     broken.subscribe(() => undefined);
     stable.subscribe(() => seen.push(stable.peek()));
 
-    expect(() => source.set(1)).toThrow('derived exploded');
+    expect(() => source(1)).toThrow('derived exploded');
     expect(stable.peek()).toBe(2);
     expect(seen).toEqual([2]);
 
-    expect(() => source.set(2)).not.toThrow();
+    expect(() => source(2)).not.toThrow();
     expect(broken.peek()).toBe(2);
   });
 
@@ -127,12 +127,12 @@ describe('LocationRuntime', () => {
     });
 
     expect(derived()).toBe(0);
-    source.set(1);
+    source(1);
 
     expect(() => derived()).toThrow('derived exploded');
     expect(() => derived()).toThrow('derived exploded');
 
-    source.set(2);
+    source(2);
     expect(derived()).toBe(2);
   });
 
@@ -150,9 +150,9 @@ describe('LocationRuntime', () => {
     const seen: number[] = [];
     broken.subscribe(() => undefined);
     observedSecond.subscribe(() => seen.push(observedSecond.peek()));
-    first.subscribe(() => second.set(1));
+    first.subscribe(() => second(1));
 
-    expect(() => first.set(1)).toThrow('first runtime exploded');
+    expect(() => first(1)).toThrow('first runtime exploded');
     expect(observedSecond.peek()).toBe(1);
     expect(seen).toEqual([1]);
   });
@@ -186,7 +186,18 @@ describe('LocationRuntime', () => {
     location();
     location.subscribe(() => seen.push(location.peek()));
 
-    expect(() => location.set(1)).toThrow('framework token exploded');
+    expect(() => location(1)).toThrow('framework token exploded');
     expect(seen).toEqual([1]);
+  });
+
+  it('uses one callable grammar without Angular-shaped writer methods', () => {
+    const location = NEUTRAL_LOCATION_RUNTIME.createCell(1);
+
+    location(2);
+    location((current) => current + 3);
+
+    expect(location()).toBe(5);
+    expect('set' in location).toBe(false);
+    expect('update' in location).toBe(false);
   });
 });

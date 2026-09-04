@@ -96,8 +96,9 @@ that set.
 
 ### Read
 
-Components read from `$`. A root or branch location is callable; a leaf remains
-a native framework signal.
+Components read from `$`. Root, branch, and terminal locations share one
+callable grammar; framework facades make those reads observable without changing
+their canonical identity.
 
 ```typescript
 const selected = tree.$.selected();
@@ -123,7 +124,7 @@ export class TicketOps {
   private readonly api = inject(TicketApi);
 
   select(id: number | null): void {
-    this.tree.$.selectedId.set(id);
+    this.tree.$.selectedId(id);
   }
 
   async refresh(): Promise<void> {

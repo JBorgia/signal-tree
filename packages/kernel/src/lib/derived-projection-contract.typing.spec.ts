@@ -71,9 +71,9 @@ type IsAny<T> = 0 extends 1 & T ? true : false;
 type AnyProj = (...a: any[]) => any;
 
 interface StoreAccessor<T> {
+  (value: T): void;
+  (update: (current: T) => T): void;
   (): T;
-  set(value: T): void;
-  update(fn: (current: T) => T): void;
 }
 interface DerivedAccessor<T> {
   (): T;
@@ -251,14 +251,14 @@ type _c_no_any = Expect<
 >;
 
 // A store leaf stays writable through the composed facade.
-kernel.$.customer.firstName.set('Grace');
-kernel.store.quantity.update((n) => n + 1);
+kernel.$.customer.firstName('Grace');
+kernel.store.quantity((quantity) => quantity + 1);
 
 // A derived leaf is read-only on both surfaces.
-// @ts-expect-error derived projections have no `set`
-kernel.$.subtotal.set(4);
-// @ts-expect-error derived projections have no `set`
-kernel.derived.subtotal.set(4);
+// @ts-expect-error derived projections do not accept replacement values
+kernel.$.subtotal(4);
+// @ts-expect-error derived projections do not accept replacement values
+kernel.derived.subtotal(4);
 
 // =============================================================================
 // SECTION D — what the kernel REJECTS rather than silently widening

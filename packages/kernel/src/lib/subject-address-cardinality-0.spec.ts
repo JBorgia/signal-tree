@@ -108,8 +108,8 @@ type Rows = {
   updateOne(id: string, patch: Partial<Row>): void;
   changeId(from: string, to: string): void;
   byIdOrFail(id: string): {
-    name: { (): string; set(v: string): void };
-    enabled: { (): boolean; set(v: boolean): void };
+    name: { (value: string): void; (update: (current: string) => string): void; (): string };
+    enabled: { (value: boolean): void; (update: (current: boolean) => boolean): void; (): boolean };
   };
   ids(): string[];
 };
@@ -140,8 +140,8 @@ describe('SUBJECT-ADDRESS-CARDINALITY-0: two coordinates, one slot', () => {
     await flush();
 
     const p = tree.transaction(() => {
-      tree.$.rows.byIdOrFail('r1').name.set('after');
-      tree.$.rows.byIdOrFail('r1').enabled.set(true);
+      tree.$.rows.byIdOrFail('r1').name('after');
+      tree.$.rows.byIdOrFail('r1').enabled(true);
     });
     await flush();
 
@@ -170,8 +170,8 @@ describe('SUBJECT-ADDRESS-CARDINALITY-0: two coordinates, one slot', () => {
     await flush();
 
     const p = tree.transaction(() => {
-      tree.$.rows.byIdOrFail('r1').enabled.set(true);
-      tree.$.rows.byIdOrFail('r1').name.set('after');
+      tree.$.rows.byIdOrFail('r1').enabled(true);
+      tree.$.rows.byIdOrFail('r1').name('after');
     });
     await flush();
     p.rollback();
@@ -189,9 +189,9 @@ describe('SUBJECT-ADDRESS-CARDINALITY-0: two coordinates, one slot', () => {
     await flush();
 
     const p = tree.transaction(() => {
-      tree.$.rows.byIdOrFail('r1').name.set('after');
+      tree.$.rows.byIdOrFail('r1').name('after');
       tree.$.rows.changeId('r1', 'r9');
-      tree.$.rows.byIdOrFail('r9').enabled.set(true);
+      tree.$.rows.byIdOrFail('r9').enabled(true);
     });
     await flush();
     expect(tree.$.rows.ids()).toEqual(['r9']);

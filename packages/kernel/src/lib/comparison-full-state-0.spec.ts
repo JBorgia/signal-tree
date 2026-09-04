@@ -150,7 +150,7 @@ describe('COMPARISON-FULL-STATE-0: every admitted source exchanges COMPLETE valu
     const sent: unknown[] = [];
     const l = link(tree.$.cfg, { set: (v) => void sent.push(v) });
 
-    tree.$.cfg.a.set(5);
+    tree.$.cfg.a(5);
     await flush();
     await l.settled();
 
@@ -277,7 +277,7 @@ describe('COMPARISON-FULL-STATE-0: equality is STRUCTURAL', () => {
     expect(sent).toEqual([]);
 
     // A genuinely different value DOES send.
-    tree.$.cfg.a.set(8);
+    tree.$.cfg.a(8);
     await flush();
     await l.settled();
     expect(sent).toEqual([{ a: 8 }]);
@@ -307,12 +307,12 @@ describe('COMPARISON-FULL-STATE-0: equality is STRUCTURAL', () => {
       },
     });
 
-    tree.$.cfg.a.set(2);
+    tree.$.cfg.a(2);
     await flush();
     expect(sent).toEqual([{ a: 2 }]);
 
     // Authored while the first send is still in flight.
-    tree.$.cfg.a.set(3);
+    tree.$.cfg.a(3);
     await flush();
 
     release();
@@ -332,13 +332,13 @@ describe('COMPARISON-FULL-STATE-0: equality is STRUCTURAL', () => {
     const sent: unknown[] = [];
     const l = link(tree.$.cfg, { set: (v) => void sent.push(v) });
 
-    tree.$.cfg.a.set(2);
+    tree.$.cfg.a(2);
     await flush();
     await l.settled();
     expect(sent).toHaveLength(1);
 
     // Same value again — structurally equal to what Y acknowledged.
-    tree.$.cfg.a.set(2);
+    tree.$.cfg.a(2);
     await flush();
     await l.settled();
     expect(sent).toHaveLength(1);

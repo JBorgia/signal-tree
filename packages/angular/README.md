@@ -60,6 +60,17 @@ declared together in `signalTree(...)`. Derived values are zero-argument recipes
 that SignalTree memoizes as universal readonly locations.
 
 Use `defineStore` for Angular dependency injection and `toWritableSignal` when a
-branch must cross an Angular writable-signal boundary. Application components
+location must cross an Angular writable-signal boundary. Canonical writes stay
+callable; the explicit view has native Angular methods:
+
+```ts
+tree.$.selectedId(42);
+
+const selectedIdSignal = toWritableSignal(tree.$.selectedId);
+selectedIdSignal.set(7);
+selectedIdSignal.update((id) => id + 1);
+```
+
+Application components
 should normally receive a read-only `$` plus explicit operation services for
 writes and asynchronous work.

@@ -1,7 +1,10 @@
 declare const ngDevMode: boolean | undefined;
 import type { ReadableCell } from '../../lib/internals/cell-runtime';
-import { NEUTRAL_LOCATION_RUNTIME } from '../../lib/internals/location-runtime';
-import { getLocationRuntime } from '../../lib/internals/location-runtime';
+import {
+  deriveLocation,
+  getLocationRuntime,
+  NEUTRAL_LOCATION_RUNTIME,
+} from '../../lib/internals/location-runtime';
 import { rootAuthorityFor } from '../../lib/internals/root-source';
 
 import { applyState } from '../../lib/utils';
@@ -277,10 +280,10 @@ function createModularMetrics(tree: object) {
   return {
     signal: metricsSignal.asReadonly(),
     updateMetrics: (updates: Partial<ModularPerformanceMetrics>) => {
-      metricsSignal.update((current) => ({ ...current, ...updates }));
+      deriveLocation(metricsSignal, (current) => ({ ...current, ...updates }));
     },
     trackModuleUpdate: (module: string, duration: number) => {
-      metricsSignal.update((current) => ({
+      deriveLocation(metricsSignal, (current) => ({
         ...current,
         totalUpdates: current.totalUpdates + 1,
         moduleUpdates: {
@@ -1707,7 +1710,7 @@ export function createDevToolsEnhancer(
       }
     };
 
-    // Always populate keys so we can intercept leaf signals and filter
+    // Always populate keys so we can observe owned locations and filter
     // PathNotifier events by tree ownership.
     refreshTreeTopKeys();
 
@@ -1721,11 +1724,10 @@ export function createDevToolsEnhancer(
       return treeTopKeys.has(root);
     };
 
-    // Intercept plain signal .set()/.update() throughout the tree to emit
+    // Observe intrinsic location mutations throughout the tree to emit
     // PathNotifier notifications. Entity collections already notify via their
-    // own internals, but plain Angular signals (counter, flags, nested fields,
-    // etc.) do not. We recurse through NodeAccessor nodes so nested leaf
-    // writes like `tree.$.user.profile.name.set(...)` are also captured.
+    // own internals. We recurse through location nodes so nested writes like
+    // `tree.$.user.profile.name(...)` are also captured.
     const notifier = getPathNotifier();
     const restoreInterceptors: Array<() => void> = [];
 
@@ -1783,18 +1785,18 @@ export function createDevToolsEnhancer(
       }
     });
 
-    // Capture leaf signal updates (e.g. $.count.set()) via the recursive
-    // interceptor above (interceptLeafSignals). PathNotifier flush is then
+    // Capture direct location updates (e.g. $.count(1)) via the recursive
+    // observer above (interceptLeafSignals). PathNotifier flush is then
     // the sole trigger that schedules sends to Redux DevTools (both standalone
     // and aggregated). Angular effect() was removed because:
     // 1. tree.$ may contain computed signals (entity collections) that produce
     //    new object references on every read, causing infinite effect re-runs.
     // 2. the legacy controller read does not reliably create signal dependencies when
     //    the tree is wrapped by enhancers like batching().
-    // NOTE: The signalTree mutation pipeline (recursiveUpdate) writes to leaf
-    // signals directly and does NOT call PathNotifier.notify itself — only
-    // entity collections do. The interceptor above is what makes leaf writes
-    // observable to this enhancer; do not remove it without a replacement.
+    // NOTE: The signalTree mutation pipeline (recursiveUpdate) writes to
+    // locations directly and does NOT call PathNotifier.notify itself — only
+    // entity collections do. The observer above is what makes direct writes
+    // visible to this enhancer; do not remove it without a replacement.
 
     // Always return the enhanced tree with DevTools methods (only those required by DevToolsMethods)
     const result = Object.assign(enhancedTree, {

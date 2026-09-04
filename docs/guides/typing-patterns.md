@@ -65,45 +65,55 @@ const tree = signalTree<State>({
 
 4. **Reduced maintenance** - Change the type in one place, not two. No interface to keep in sync.
 
-### Object leaves vs nested nodes (when `.set()` doesn't exist)
+### Terminal values vs nested nodes
 
-The leaf-vs-node decision comes from the initial **value**, not from the annotation. A plain object
-initializer becomes a **nested node** — its fields are individually reactive leaves — so there is no
-`.set()` on the object itself:
-
-```typescript
-const tree = signalTree({
-  firmware: {} as FirmwareDto, // → NodeAccessor<FirmwareDto>, no .set()
-});
-
-tree.$.firmware.set(dto);
-// ✗ TS2339: Property 'set' does not exist on type 'NodeAccessor<FirmwareDto>'
-```
-
-When the object is something you swap **wholesale** (a DTO off the wire, a snapshot) rather than edit
-field-by-field, initialize it `null` with the object type so it materializes as a single settable
-leaf:
+A plain object initializer becomes a **nested node** whose fields are individual
+locations:
 
 ```typescript
 const tree = signalTree({
-  firmware: null as FirmwareDto | null, // → CallableWritableSignal<FirmwareDto | null>
+  firmware: { version: '1.0', channel: 'stable' },
 });
 
-tree.$.firmware.set(dto); // ✓
-const fw = tree.$.firmware() ?? ({} as FirmwareDto); // default at the read site
+tree.$.firmware.version();
+tree.$.firmware({ version: '1.1', channel: 'stable' });
 ```
 
-This follows the same principle as the rest of this page — **annotate at the leaf and let inference
-do the rest** — with the addition that the _initial value_ also chooses the leaf/node shape. Pick
-deliberately:
+When an object is one atomic value rather than traversable topology, declare that
+fact with `leaf(value)`:
 
-| Intent                                           | Initialize as          | Result        |
-| ------------------------------------------------ | ---------------------- | ------------- |
-| Per-field reactivity (`tree.$.settings.theme()`) | `{ theme: 'dark', … }` | Nested node   |
-| Replace the whole object atomically              | `null as Dto \| null`  | Settable leaf |
+```typescript
+import { leaf, signalTree } from '@signal-tree/angular';
 
-There is no `leaf()`/value marker for this — the `null`-init idiom is the canonical answer. See
+const tree = signalTree({
+  firmware: leaf<FirmwareDto>({ version: '1.0', channel: 'stable' }),
+});
+
+tree.$.firmware(dto);
+tree.$.firmware((firmware) => ({ ...firmware, version: '1.1' }));
+```
+
+Callable values always use `leaf()` because an unwrapped function argument is the
+updater grammar:
+
+```typescript
+const tree = signalTree({
+  onSave: leaf((id: string) => console.log(id)),
+});
+
+tree.$.onSave(leaf((id) => persist(id)));
+tree.$.onSave()('ticket-42');
+```
+
+Pick topology deliberately:
+
+| Intent                                           | Initialize as                  | Result             |
+| ------------------------------------------------ | ------------------------------ | ------------------ |
+| Per-field reactivity (`tree.$.settings.theme()`) | `{ theme: 'dark', ... }`       | Traversable branch |
+| Replace one object atomically                    | `leaf({ theme: 'dark', ... })` | Terminal location  |
+| Store a function or constructor                  | `leaf(callable)`               | Terminal location  |
+
+The wrapper is consumed at construction or invocation. The raw value, not the
+wrapper, appears in reads, snapshots, persistence, restoration, and links. See
 [Myth 19](../myths-and-misconceptions.md#myth-19-any-object-i-put-in-the-initial-state-becomes-one-settable-value)
-for the longer discussion and
-[`docs/errors/README.md`](../errors/README.md#compile-time-symptoms-not-st-codes) for the error-message
-route in.
+for the longer discussion.

@@ -104,7 +104,7 @@ const tree = signalTree({
 }, { enhancers: [restoration(), batching()] });
 
 tree.$.users.addOne({ id: 1, name: 'Ada' });
-tree.batch(() => tree.$.count.set(1));
+tree.batch(() => tree.$.count(1));
 
 const derivedTree = signalTree(
   { count: 1 },
@@ -167,7 +167,7 @@ if (isSignal(tree.$.count)) {
 }
 const doubled = computed(() => tree.$.count() * 2);
 if (doubled() !== 2) throw new Error('Angular computed could not read a location');
-tree.$.count.set(2);
+tree.$.count(2);
 if (doubled() !== 4) throw new Error('Angular computed did not observe a location write');
 tree.destroy();
 `

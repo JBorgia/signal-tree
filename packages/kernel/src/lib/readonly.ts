@@ -258,7 +258,7 @@ export interface ReadonlyStore<TSource, TAccum = TreeNode<TSource>> {
  * const reader = asReadonly(tree);
  * reader.$.count();        // ✅ read
  * reader.$.doubled();      // ✅ derived computeds survive
- * // reader.$.count.set(1) // ❌ compile error — not offered
+ * // reader.$.count(1)     // ❌ compile error — replacement not offered
  * ```
  */
 /**

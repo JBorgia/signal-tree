@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import type { WritableCell } from './internals/cell-runtime';
 
 import { entityMap } from './types';
 import { link, type Link } from './link';
@@ -46,12 +45,12 @@ describe('link(tree.$) on an ordinary tree', () => {
     const got: unknown[] = [];
     const l = track(link(tree.$, { set: (v: unknown) => void got.push(v) } as never));
 
-    tree.$.a.set(3);
+    tree.$.a(3);
     await flush();
     await l.settled();
     expect(got[got.length - 1]).toEqual({ a: 3, b: { c: 2 } });
 
-    tree.$.b.c.set(4);
+    tree.$.b.c(4);
     await flush();
     await l.settled();
     expect(got[got.length - 1]).toEqual({ a: 3, b: { c: 4 } });
@@ -60,8 +59,7 @@ describe('link(tree.$) on an ordinary tree', () => {
   it('R4 a descendant setter retained BEFORE the link still reaches it', async () => {
     const tree = signalTree({ a: 1, b: { c: 2 } });
     await flush();
-    const leaf = tree.$.b.c as unknown as WritableCell<number>;
-    const held = leaf.set.bind(leaf); // escapes before the link exists
+    const held = tree.$.b.c; // escapes before the link exists
 
     const got: unknown[] = [];
     const l = track(link(tree.$, { set: (v: unknown) => void got.push(v) } as never));
@@ -78,12 +76,12 @@ describe('link(tree.$) on an ordinary tree', () => {
     const got: unknown[] = [];
     const l = track(link(a.$, { set: (v: unknown) => void got.push(v) } as never));
 
-    b.$.a.set(99); // identical path, different tree
+    b.$.a(99); // identical path, different tree
     await flush();
     await l.settled();
     expect(got).toEqual([]);
 
-    a.$.a.set(7);
+    a.$.a(7);
     await flush();
     await l.settled();
     expect(got[got.length - 1]).toEqual({ a: 7, b: { c: 2 } });
@@ -95,18 +93,18 @@ describe('link(tree.$) on an ordinary tree', () => {
     const got: unknown[] = [];
     const l = track(link(tree.$, { set: (v: unknown) => void got.push(v) } as never));
 
-    tree.$.a.set(10);
+    tree.$.a(10);
     await flush();
     await l.settled();
     const beforeInspection = got.length;
 
-    withWriteContext(INSPECTION, () => tree.$.b.c.set(999));
+    withWriteContext(INSPECTION, () => tree.$.b.c(999));
     await flush();
     await l.settled();
     expect(got.length).toBe(beforeInspection);
 
     // A later unrelated authored write must not carry the scrub outward.
-    tree.$.a.set(11);
+    tree.$.a(11);
     await flush();
     await l.settled();
     expect(got[got.length - 1]).toEqual({ a: 11, b: { c: 2 } });
@@ -120,7 +118,7 @@ describe('link(tree.$) on an ordinary tree', () => {
     const l = track(link(tree.$, { set: (v: unknown) => void got.push(v) } as never));
     withWriteContext(
       { intent: 'system', origin: 'external', participation: 'realized' },
-      () => tree.$.b.c.set(5)
+      () => tree.$.b.c(5)
     );
     await flush();
     await l.settled();
@@ -158,12 +156,12 @@ describe('link(tree.$) on an ordinary tree', () => {
     await flush();
     const got: unknown[] = [];
     const l = link(tree.$, { set: (v: unknown) => void got.push(v) } as never);
-    tree.$.a.set(2);
+    tree.$.a(2);
     await flush();
     await l.settled();
     const at = got.length;
     l.dispose();
-    tree.$.a.set(3);
+    tree.$.a(3);
     await flush();
     expect(got.length).toBe(at);
     expect(tree.$.a()).toBe(3);

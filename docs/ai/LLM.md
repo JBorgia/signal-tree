@@ -28,7 +28,7 @@ Declare state, every enhancer, and one derived factory in the initial
 
 ```typescript
 import { computed } from '@angular/core';
-import { batching, defineStore, entityMap, signalTree } from '@signal-tree/angular';
+import { batching, defineStore, entityMap, leaf, signalTree } from '@signal-tree/angular';
 
 type User = {
   id: number;
@@ -85,10 +85,10 @@ For an external derived factory, type `$` with `TreeNode<State>` from
 `$` is the state facade.
 
 ```typescript
-// Leaf: call to read, use the native signal methods to write.
+// Every location: call to read, replace, or derive.
 tree.$.filter();
-tree.$.filter.set('active');
-tree.$.filter.update((filter) => filter.trim());
+tree.$.filter('active');
+tree.$.filter((filter) => filter.trim());
 
 // Branch: call with no argument to read; pass a value or updater to write.
 tree.$.profile();
@@ -102,6 +102,22 @@ tree.$();
 Branch value calls assign the complete branch value; they are not patch
 operations. Derive a patched value with the updater form. There is no separate
 `.state` or `.unwrap()` API.
+
+Use `leaf(value)` to make a plain object terminal instead of traversable, and to
+store callable data without confusing it with an updater:
+
+```typescript
+const tree = signalTree({
+  range: leaf({ start: 0, end: 10 }),
+  callback: leaf((value: number) => console.log(value)),
+});
+
+tree.$.range({ start: 5, end: 15 });
+tree.$.callback(leaf((value) => persist(value)));
+```
+
+Angular's `toWritableSignal(location)` is an explicit native-signal adapter.
+Only that returned view uses Angular's `.set()` and `.update()` methods.
 
 ## EntityMap
 
@@ -155,7 +171,7 @@ export class UserOps {
   private readonly api = inject(UserApi);
 
   select(id: number | null): void {
-    this.tree.$.selectedId.set(id);
+    this.tree.$.selectedId(id);
   }
 
   async refresh(): Promise<void> {
@@ -202,7 +218,7 @@ Declare capabilities in `enhancers`:
 ```typescript
 const tree = signalTree({ title: '' }, { enhancers: [restoration({ maxHistorySize: 50 })] });
 
-undoable(() => tree.$.title.set('Draft'));
+undoable(() => tree.$.title('Draft'));
 tree.undo();
 tree.redo();
 ```
@@ -253,7 +269,7 @@ Every tree owns resources until `destroy()` runs.
 ```typescript
 const tree = signalTree({ value: 1 });
 try {
-  tree.$.value.set(2);
+  tree.$.value(2);
 } finally {
   tree.destroy();
 }
@@ -267,7 +283,8 @@ try {
   capabilities that are not in current package types.
 - `tree.update`, `tree.unwrap`, `tree.effect`, or `tree.subscribe`.
 - One-argument `entityMap.updateOne(entity)`; use `updateOne(id, changes)`.
-- Callable leaf writes; use `.set()` or `.update()`.
+- Canonical `.set()` or `.update()` calls; invoke locations with values or updaters.
+- Bare callable state; declare and replace it with `leaf(callable)`.
 - Multiple trees without distinct state authority and lifetime ownership.
 
 ## Historical Note

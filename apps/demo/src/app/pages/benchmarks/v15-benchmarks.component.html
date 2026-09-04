@@ -108,6 +108,85 @@
     </aside>
   </section>
 
+  <section
+    class="callable-location-comparison"
+    aria-labelledby="callable-location-heading"
+  >
+    <header>
+      <div>
+        <p class="eyebrow">Before vs now</p>
+        <h2 id="callable-location-heading">Callable location cost</h2>
+      </div>
+      <p>
+        The archived method-shaped API and current callable API run as production
+        builds in isolated persistent workers. Samples are paired, call order
+        alternates, artifact-to-worker assignment is mirrored, and an
+        identical-current A/A run exposes the protocol's own noise.
+      </p>
+    </header>
+
+    <div class="callable-run-facts">
+      <span>{{ callableLocationBenchmark.samples }} paired samples</span>
+      <span>{{ callableLocationBenchmark.warmups }} warmups</span>
+      <span>{{ callableLocationBenchmark.trials }} trials per paired arm</span>
+      <span>Mirrored worker assignment</span>
+      <span>{{ callableLocationBenchmark.runtime }}</span>
+    </div>
+
+    <div
+      class="callable-result-table"
+      role="table"
+      aria-label="Method-shaped versus callable location performance"
+    >
+      <div class="callable-result-header" role="row">
+        <span role="columnheader">Operation</span>
+        <span role="columnheader">Previous</span>
+        <span role="columnheader">Callable</span>
+        <span role="columnheader">Paired median</span>
+        <span role="columnheader">Paired p10-p90</span>
+        <span role="columnheader">A/A p10-p90</span>
+        <span role="columnheader">Reading</span>
+      </div>
+      @for (row of callableLocationRows; track row.operation) {
+      <div
+        class="callable-result-row"
+        role="row"
+        [attr.data-disposition]="row.disposition"
+      >
+        <strong role="cell" data-label="Operation">{{ row.operation }}</strong>
+        <span role="cell" data-label="Previous">{{ row.previous }}</span>
+        <span role="cell" data-label="Callable">{{ row.current }}</span>
+        <span role="cell" data-label="Paired median">{{ row.pairedDelta }}</span>
+        <span role="cell" data-label="Paired p10-p90">{{ row.pairedRange }}</span>
+        <span role="cell" data-label="A/A p10-p90">{{ row.controlRange }}</span>
+        <span role="cell" data-label="Reading">{{ row.interpretation }}</span>
+      </div>
+      }
+    </div>
+
+    <footer>
+      <p>
+        A row is called different only when its paired p10-p90 interval stays on
+        one side of zero. The A/A interval is shown beside it; medians alone are
+        not treated as a win.
+      </p>
+      <nav aria-label="Callable location benchmark evidence">
+        <a
+          [href]="repositorySourceUrl('tools/bench-callable-locations.mjs')"
+          target="_blank"
+          rel="noreferrer"
+        >Harness source</a>
+        <a
+          [href]="repositorySourceUrl('docs/performance/callable-locations.md')"
+          target="_blank"
+          rel="noreferrer"
+        >Method and interpretation</a>
+        <a href="benchmarks/callable-locations.json">Raw comparison JSON</a>
+        <a href="benchmarks/callable-locations-aa.json">Raw A/A JSON</a>
+      </nav>
+    </footer>
+  </section>
+
   <section class="run-bar" aria-labelledby="run-heading">
     <div>
       <p class="eyebrow">Measurement plan</p>

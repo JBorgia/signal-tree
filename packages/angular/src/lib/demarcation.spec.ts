@@ -36,7 +36,7 @@ describe('Angular demarcation', () => {
     TestBed.tick();
 
     const pending = tree.transaction(() =>
-      tree.$.theme.set('speculative')
+      tree.$.theme('speculative')
     );
     TestBed.tick();
     await flush();

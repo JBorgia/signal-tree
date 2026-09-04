@@ -104,7 +104,7 @@ store.selected();
 SignalTree exposes path-addressed reads and writes:
 
 ```typescript
-tree.$.selectedId.set(42);
+tree.$.selectedId(42);
 tree.$.selected();
 ```
 
@@ -118,7 +118,7 @@ export class TicketOps {
   private readonly tree = inject(AppTree);
 
   select(id: number | null): void {
-    this.tree.$.selectedId.set(id);
+    this.tree.$.selectedId(id);
   }
 }
 ```

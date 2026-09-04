@@ -15,7 +15,7 @@ describe('construction-bound Angular realization', () => {
     expect(typeof tree.$.count.subscribe).toBe('function');
     expect(typeof tree.$.doubled).toBe('function');
 
-    tree.$.count.set(2);
+    tree.$.count(2);
     expect(tree.$.doubled()).toBe(4);
     tree.destroy();
   });

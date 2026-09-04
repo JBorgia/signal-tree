@@ -163,13 +163,15 @@ describe('transactions — entity field rollback', () => {
       { count: 0 },
       { enhancers: [transactions()] }
     ) as never as {
-      $: { count: { set(v: number): void; (): number } };
+      $: {
+        count: { (value: number): void; (update: (current: number) => number): void; (): number };
+      };
       transaction: (fn: () => void) => { rollback(): void };
     };
-    tree.$.count.set(1);
+    tree.$.count(1);
     await settle();
 
-    const pending = tree.transaction(() => tree.$.count.set(99));
+    const pending = tree.transaction(() => tree.$.count(99));
     expect(tree.$.count()).toBe(99);
 
     pending.rollback();

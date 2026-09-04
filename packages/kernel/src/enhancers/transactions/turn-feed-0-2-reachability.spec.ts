@@ -69,7 +69,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     await flush();
     const w = watch(tree);
 
-    tree.transaction(() => tree.$.n.set(1)).confirm();
+    tree.transaction(() => tree.$.n(1)).confirm();
     await flush();
     w.off();
 
@@ -103,7 +103,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     await flush();
     const w = watch(tree);
 
-    tree.transaction(() => tree.$.n.set(1)).confirm();
+    tree.transaction(() => tree.$.n(1)).confirm();
     await flush();
     w.off();
 
@@ -123,7 +123,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
       );
       await flush();
       const w = watch(tree);
-      tree.transaction(() => tree.$.n.set(1)).confirm();
+      tree.transaction(() => tree.$.n(1)).confirm();
       await flush();
       w.off();
       return w.seen;
@@ -141,7 +141,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     const wa = watch(a);
     const wb = watch(b);
 
-    a.transaction(() => a.$.n.set(1)).confirm();
+    a.transaction(() => a.$.n(1)).confirm();
     await flush();
     wa.off();
     wb.off();
@@ -159,7 +159,7 @@ describe('TURN-FEED-0.2: reachable from the tree the application holds', () => {
     const w = watch(tree);
     await flush();
 
-    tree.transaction(() => tree.$.n.set(1)).confirm();
+    tree.transaction(() => tree.$.n(1)).confirm();
     await flush();
     w.off();
 

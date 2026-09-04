@@ -310,15 +310,15 @@ export class DerivedTiersExampleComponent {
 
   // Actions
   selectUser(id: number) {
-    this.inlineTree.$.selectedUserId.set(id);
+    this.inlineTree.$.selectedUserId(id);
   }
 
   selectProduct(id: number) {
-    this.externalTree.$.selectedProductId.set(id);
+    this.externalTree.$.selectedProductId(id);
   }
 
   addToCart(product: Product) {
-    this.externalTree.$.cart.items.update((items) => [
+    this.externalTree.$.cart.items((items) => [
       ...items,
       {
         productId: product.id,

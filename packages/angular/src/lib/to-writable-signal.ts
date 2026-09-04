@@ -10,6 +10,7 @@ import type { Location, NodeAccessor } from '@signal-tree/kernel';
 // See the ruling note at the bottom of `@signal-tree/kernel/adapter`.
 import {
   isNodeAccessor,
+  replaceLocation,
   withRestorationDesignation,
 } from '@signal-tree/kernel/adapter';
 
@@ -101,28 +102,32 @@ export function toWritableSignal<T>(
     }
   }
 
-  // Override set to write back to the NodeAccessor, then update local signal
-  sig.set = (value: T) => {
-    const write = () => {
-      if (isNodeAccessor(node)) (node as NodeAccessor<T>)(value);
-      else (node as Location<T>).set(value);
-    };
+  const applyWrite = (write: () => void): void => {
     if (options?.undoable) {
       // Synchronous by construction with the write itself, which is what the
       // designation contract requires. Measured: the directive's write happens
       // inside the DOM dispatch, so there is no scheduling gap to lose it in.
-      withRestorationDesignation(() => {
-        write();
-      });
+      withRestorationDesignation(write);
     } else {
       write();
     }
     originalSet(node());
   };
 
-  // Override update to write back using set pathway
+  sig.set = (value: T) => {
+    applyWrite(() => {
+      if (isNodeAccessor(node)) (node as NodeAccessor<T>)(value);
+      else replaceLocation(node as Location<T>, value);
+    });
+  };
+
+  // Forward the updater itself so the canonical location both reads current
+  // truth and preserves derive intent; the mirror effect may not have flushed.
   sig.update = (updater: (current: T) => T) => {
-    sig.set(updater(sig()));
+    applyWrite(() => {
+      if (isNodeAccessor(node)) (node as NodeAccessor<T>)(updater);
+      else (node as Location<T>)(updater);
+    });
   };
 
   return sig;

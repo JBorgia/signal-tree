@@ -26,7 +26,7 @@ describe('TX-SURFACE-0 typing: transaction() belongs to transactions()', () => {
 
     // @ts-expect-error transaction() belongs to transactions(), not restoration()
     tree.transaction(() => {
-      tree.$.n.set(1);
+      tree.$.n(1);
     });
 
     // Restoration is still restoration's, and still typed.
@@ -42,7 +42,7 @@ describe('TX-SURFACE-0 typing: transaction() belongs to transactions()', () => {
 
     // Both present, from their own owners, with no cast.
     const pending = tree.transaction(() => {
-      tree.$.n.set(1);
+      tree.$.n(1);
     });
     pending.confirm();
     await Promise.resolve();

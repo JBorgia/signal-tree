@@ -14,6 +14,8 @@
  * @see {@link signalTree}
  */
 export { signalTree } from './lib/signal-tree';
+export { leaf } from './lib/leaf';
+export type { LeafDefinition } from './lib/leaf';
 
 /**
  * Type-only read-only narrowing of a tree — same runtime object, no write
@@ -325,7 +327,7 @@ export { devTools } from './enhancers/devtools/devtools';
  * const tree = signalTree({ count: 0, user: { name: 'John' } });
  * tree.$.count();          // 0
  * tree.$.user.name();      // 'John'
- * tree.$.count.set(5);     // Update
+ * tree.$.count(5);         // Replace
  * ```
  *
  * @example With Enhancers

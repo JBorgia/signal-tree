@@ -95,8 +95,8 @@ describe('DIAG-JOURNAL-1 F1: does a flush-bounded entry equal one causal turn?',
     const p = probe(tree);
 
     undoable(() => {
-      tree.$.a.set(1);
-      tree.$.b.set(2);
+      tree.$.a(1);
+      tree.$.b(2);
     });
     await flush();
     p.stop();
@@ -114,9 +114,9 @@ describe('DIAG-JOURNAL-1 F1: does a flush-bounded entry equal one causal turn?',
     await flush();
     const p = probe(tree);
 
-    undoable(() => tree.$.a.set(1));
+    undoable(() => tree.$.a(1));
     await flush();
-    undoable(() => tree.$.b.set(2));
+    undoable(() => tree.$.b(2));
     await flush();
     p.stop();
 
@@ -134,7 +134,7 @@ describe('DIAG-JOURNAL-1 F1: does a flush-bounded entry equal one causal turn?',
 
     const pending = tree.transaction(() => {
       tree.$.rows.addOne({ id: 'a', name: 'Alpha' });
-      tree.$.n.set(1);
+      tree.$.n(1);
     });
     await flush();
     pending.confirm();
@@ -182,14 +182,14 @@ describe('DIAG-JOURNAL-1 F2: the two axes survive observation', () => {
   it('inspection, restoration and external truth stay distinct', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
     await flush();
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
 
     const p = probe(tree);
 
     withWriteContext(
       { intent: 'system', origin: 'devtools', participation: 'inspection' },
-      () => tree.$.n.set(42)
+      () => tree.$.n(42)
     );
     await flush();
     // Undo BEFORE the ingress: measured in A1 case 6, external truth at this
@@ -197,7 +197,7 @@ describe('DIAG-JOURNAL-1 F2: the two axes survive observation', () => {
     // observation rather than about re-measuring P0-C.
     tree.undo();
     await flush();
-    external(() => tree.$.n.set(7));
+    external(() => tree.$.n(7));
     await flush();
     p.stop();
 

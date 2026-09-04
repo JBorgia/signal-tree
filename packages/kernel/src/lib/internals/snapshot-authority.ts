@@ -1,7 +1,8 @@
-import type { ReadableCell, WritableCell } from './cell-runtime';
+import type { Location, ReadableCell } from './cell-runtime';
 import { isNodeAccessor, snapshotNodeKey } from './node-shape';
 import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
 import {
+  deriveLocation,
   getLocationRuntime,
   NEUTRAL_LOCATION_RUNTIME,
   type LocationRuntime,
@@ -17,7 +18,7 @@ const MATERIALIZED = new WeakMap<object, MaterializedSnapshot<unknown>>();
 const SNAPSHOT_PARENT = new WeakMap<object, WeakRef<object>>();
 const TREE_STORES = new WeakSet<object>();
 const VOLATILE_SNAPSHOTS = new WeakSet<object>();
-const MEMBERSHIP_REVISION = new WeakMap<object, WritableCell<number>>();
+const MEMBERSHIP_REVISION = new WeakMap<object, Location<number>>();
 export function markTreeStore(store: object): void {
   TREE_STORES.add(store);
 }
@@ -44,7 +45,7 @@ export function markSnapshotVolatile(node: object): void {
 function membershipRevisionFor(
   key: object,
   locations: LocationRuntime
-): WritableCell<number> {
+): Location<number> {
   let revision = MEMBERSHIP_REVISION.get(key);
   if (!revision) {
     revision = locations.createCell(0);
@@ -56,7 +57,7 @@ function membershipRevisionFor(
 export function publishMembershipChange(node: object): void {
   const key = snapshotNodeKey(node);
   const locations = getLocationRuntime(node) ?? NEUTRAL_LOCATION_RUNTIME;
-  membershipRevisionFor(key, locations).update((value) => value + 1);
+  deriveLocation(membershipRevisionFor(key, locations), (value) => value + 1);
   markOwnerInvalidatedFrom(node);
 }
 

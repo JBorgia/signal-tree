@@ -14,8 +14,14 @@ declare const ngDevMode: boolean | undefined;
 // Persistence no longer reaches for causal primitives at all. It supplies a
 // codec, a key and a backend; the relationship is Link's.
 import type { HydrateMode } from '../../lib/internals/materialize-markers';
-import type { ReadableCell, WritableCell } from '../../lib/internals/cell-runtime';
+import type { Location, ReadableCell } from '../../lib/internals/cell-runtime';
 import { readCanonicalSnapshotInternal } from '../../lib/internals/canonical-snapshot';
+import { isTreeCell } from '../../lib/internals/cell-identity';
+import {
+  isWritableLocation,
+  replaceLocation,
+} from '../../lib/internals/location-runtime';
+import { isNodeAccessor } from '../../lib/internals/node-shape';
 
 
 /**
@@ -56,9 +62,8 @@ import { readCanonicalSnapshotInternal } from '../../lib/internals/canonical-sna
  *
  *     OPTIONAL DOES NOT MEAN FRAMEWORK-DEPENDENT.
  */
-const isSignal = (v: unknown): v is ReadableCell<unknown> =>
-  typeof v === 'function' && 'set' in (v as object) &&
-  typeof (v as { set?: unknown }).set === 'function';
+const isSignal = (value: unknown): value is ReadableCell<unknown> =>
+  isTreeCell(value);
 
 import { hydrateMarkerNode } from '../../lib/internals/materialize-markers';
 import { external } from '../../lib/external';
@@ -654,23 +659,15 @@ function encodeSnapshot<T>(
     data: state,
   };
 
-  // Build a compact nodeMap by traversing the callable proxy alias (tree.$)
-  // and marking any signal-like branch node we encounter. Also mark a
-  // root-as-signal marker ('r') if the root alias exposes a .set().
+  // Build a compact nodeMap by traversing the callable root and recording
+  // canonical writable locations and branch accessors.
   const nodeMap: Record<string, 'b' | 'r'> = {};
   try {
-    type Alias = { set?: (v: unknown) => void } & Record<string, unknown>;
-    const rootAlias = (tree as unknown as { $?: Alias }).$;
-    if (rootAlias && typeof rootAlias.set === 'function') {
-      nodeMap[''] = 'r';
-    }
+    const rootAlias = tree.$;
 
     const visited = new WeakSet<object>();
     const isBranch = (v: unknown): boolean =>
-      isSignal(v) ||
-      (typeof v === 'function' &&
-        'set' in (v as object) &&
-        typeof (v as { set?: unknown }).set === 'function');
+      isWritableLocation(v) || isNodeAccessor(v);
 
     const walkAlias = (obj: unknown, path = '') => {
       if (!isTraversableNode(obj)) return;
@@ -772,8 +769,8 @@ export function serialization(
           }
         }
         const candidate = node?.[key] as unknown;
-        return isSignal(candidate)
-          ? (candidate as WritableCell<unknown>)
+        return isWritableLocation(candidate)
+          ? (candidate as Location<unknown>)
           : undefined;
       }
 
@@ -803,31 +800,24 @@ export function serialization(
           if (hydrateMarkerNode(direct, sourceValue, hydrateMode)) continue;
 
           // Prefer the real signal if present; otherwise resolve from root alias
-          const targetSignal = isSignal(direct)
-            ? (direct as WritableCell<unknown>)
-            : // Check if it's a callable signal (function with set method)
-            typeof direct === 'function' &&
-              'set' in direct &&
-              typeof (direct as { set?: unknown }).set === 'function'
-            ? (direct as { set: (value: unknown) => void })
+          const targetSignal = isWritableLocation(direct)
+            ? direct
             : resolveAliasSignal(path, key);
 
           if (targetSignal) {
-            targetSignal.set(sourceValue);
+            replaceLocation(targetSignal, sourceValue);
             continue;
           }
 
-          // Recurse only into a traversable target that isn't a writable
-          // leaf: a callable carrying `set` is a leaf signal (handled above
-          // via targetSignal), never a branch to descend into.
-          const isWritableCallable = (v: object): boolean =>
-            typeof v === 'function' && 'set' in v;
+          // Recurse only into a traversable target that is not a nominal
+          // writable location. Locations are handled above via targetSignal,
+          // never mistaken for branches to descend into.
           if (
             sourceValue &&
             typeof sourceValue === 'object' &&
             !Array.isArray(sourceValue) &&
             isTraversableNode(direct) &&
-            !isWritableCallable(direct) &&
+            !isWritableLocation(direct) &&
             !isSignal(direct)
           ) {
             updateSignals(
@@ -850,10 +840,9 @@ export function serialization(
       if (nodeMap && Object.keys(nodeMap).length > 0) {
         // Root marker
         if (nodeMap[''] === 'r') {
-          type Alias = { set?: (v: unknown) => void } & Record<string, unknown>;
-          const rootAlias = (tree as unknown as { $?: Alias }).$;
-          if (rootAlias && typeof rootAlias.set === 'function') {
-            (rootAlias as unknown as WritableCell<unknown>).set(restoredData);
+          const rootAlias = tree.$;
+          if (isWritableLocation(rootAlias)) {
+            replaceLocation(rootAlias, restoredData);
             // Don't return; still perform targeted updates below to ensure
             // type-preserving restoration for all branches.
           }
@@ -866,22 +855,14 @@ export function serialization(
 
           // Navigate to path and set the node if a WritableSignal is found
           const parts = path.split(/\.|\[|\]/).filter(Boolean);
-          type Alias = Record<string, unknown> & { set?: (v: unknown) => void };
-          let node: Record<string, unknown> | undefined = (
-            tree as unknown as { $?: Alias }
-          ).$;
+          let node: unknown = tree.$;
           for (const p of parts) {
-            if (!node) break;
-            node =
-              (node[p] as Record<string, unknown> | undefined) ?? undefined;
+            if (!isTraversableNode(node)) break;
+            node = (node as Record<string, unknown>)[p];
           }
 
           if (
-            node &&
-            (isSignal(node) ||
-              (typeof node === 'function' &&
-                'set' in node &&
-                typeof (node as { set?: unknown }).set === 'function'))
+            isWritableLocation(node) || isNodeAccessor(node)
           ) {
             // Extract the corresponding value from restoredData
             let current: unknown = restoredData as unknown;
@@ -906,7 +887,8 @@ export function serialization(
               // touched:{…}}`. Two writers, same key, and the wrong one ran
               // first.
               if (!hydrateMarkerNode(node, current, hydrateMode)) {
-                (node as unknown as WritableCell<unknown>).set(current);
+                if (isWritableLocation(node)) replaceLocation(node, current);
+                else node(current as never);
               }
             } catch {
               /* ignore per-path failures */

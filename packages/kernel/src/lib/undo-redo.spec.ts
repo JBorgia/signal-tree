@@ -42,7 +42,7 @@ describe('undo/redo restores what the user edited', () => {
     );
 
     for (let i = 1; i <= 3; i++) {
-      undoable(() => tree.$.n.set(i));
+      undoable(() => tree.$.n(i));
       undoable(() => tree.$.rows.addOne({ id: i }));
       await flush();
     }

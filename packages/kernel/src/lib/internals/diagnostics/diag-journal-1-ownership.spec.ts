@@ -36,7 +36,10 @@ type Rows = {
 };
 
 type Store = {
-  $: { rows: Rows; n: { (): number; set(v: number): void } };
+  $: {
+    rows: Rows;
+    n: { (value: number): void; (update: (current: number) => number): void; (): number };
+  };
   getRestorationHistory(): unknown[];
   canUndo(): boolean;
   canRedo(): boolean;
@@ -106,7 +109,7 @@ describe('DIAG-JOURNAL-1 F3: the journal grants zero restoration rights', () => 
   const sequence = async (tree: Store) => {
     undoable(() => tree.$.rows.addOne({ id: 'a', name: 'Alpha' }));
     await flush();
-    tree.$.n.set(9); // undesignated: must stay unadmitted, watched or not
+    tree.$.n(9); // undesignated: must stay unadmitted, watched or not
     await flush();
     undoable(() => tree.$.rows.addOne({ id: 'b', name: 'Beta' }));
     await flush();
@@ -139,7 +142,7 @@ describe('DIAG-JOURNAL-1 F3: the journal grants zero restoration rights', () => 
     const tree = makeTree();
     await flush();
     const journal = createDiagnosticJournal(tree as unknown as object);
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await flush();
 
     // A read-only projection has exactly three members, all read or teardown.
@@ -282,7 +285,7 @@ describe('DIAG-JOURNAL-1 F4b: disposal ends observation and changes nothing', ()
     expect(journal.turns()).toEqual([]);
     undoable(() => tree.$.rows.addOne({ id: 'b', name: 'Beta' }));
     await flush();
-    const pending = tree.transaction(() => tree.$.n.set(5));
+    const pending = tree.transaction(() => tree.$.n(5));
     await flush();
     pending.rollback();
     await flush();

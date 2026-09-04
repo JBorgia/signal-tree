@@ -24,7 +24,7 @@
  *    recursive materialization machinery
  */
 import { entityMap } from './types';
-import type { WritableCell } from './internals/cell-runtime';
+import type { Location } from './internals/cell-runtime';
 import type { EntityMapBuilder } from './markers/entity-map';
 import type { EntitySignal } from './types';
 import type { NodeAccessor } from './node-accessor';
@@ -48,7 +48,7 @@ type NaturalValue<S> =
     ? R[]
     : S extends NodeAccessor<infer T>
       ? T
-      : S extends WritableCell<infer T>
+      : S extends Location<infer T>
         ? T
         : never;
 

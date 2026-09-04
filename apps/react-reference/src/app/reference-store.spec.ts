@@ -10,7 +10,7 @@ describe('greenfield reference state', () => {
     try {
       const first = readCanonicalSnapshot(store);
       expect(readCanonicalSnapshot(store)).toBe(first);
-      store.$.filters.team.set('South');
+      store.$.filters.team('South');
       expect(readCanonicalSnapshot(store)).not.toBe(first);
     } finally {
       store.destroy();

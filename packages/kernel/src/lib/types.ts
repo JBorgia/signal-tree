@@ -7,6 +7,7 @@ export type { Location, ReadonlyLocation } from './internals/cell-runtime';
 
 import type { WriteMetadata } from './mutation-types';
 import type { NodeAccessor } from './node-accessor';
+import type { CallableSyntax, LeafDefinition } from './leaf';
 
 import type { EnhancerWithMeta, TreeCapability } from './enhancer-types';
 
@@ -73,47 +74,19 @@ export type Primitive =
 // supported way to make a raw Angular signal callable-as-setter.
 
 /**
- * A branch (non-leaf) node in the tree.
+ * Every canonical SignalTree location has one callable grammar:
  *
- * ## READ THIS BEFORE "FIXING" ANYTHING THAT TOUCHES NODES
+ * | operation | spelling |
+ * |---|---|
+ * | read | `location()` |
+ * | replace | `location(value)` |
+ * | derive from current | `location(current => next)` |
+ * | replace with callable data | `location(leaf(callable))` |
  *
- * The single fact that explains SignalTree's shape:
- * **only LEAVES are Angular signals.** A node is not a signal at all — it is a
- * plain function built by `makeNodeAccessor` with its child keys hung off it
- * as properties.
- *
- * That gives the two halves of the tree different, deliberate surfaces:
- *
- * | | leaf (`WritableCell<T>`) | node (`NodeAccessor<T>`) |
- * |---|---|---|
- * | read | `leaf()` | `node()` — unwraps the whole subtree |
- * | write a value | `leaf.set(v)` | `node({ partial })` — deep merge |
- * | write from current | `leaf.update(fn)` | `node(fn)` — fn gets the unwrapped value |
- * | has `.set` / `.update` | yes | **no — and it needs none** |
- *
- * Nodes are callable *by nature*: the three signatures below are the complete
- * write surface, and `node({ a: 1 })` merges — keys you don't pass are left
- * untouched, at every depth. Leaves are the opposite: calling a leaf with an
- * argument does **nothing at all**, because an Angular signal getter ignores
- * extra arguments.
- *
- * As of 14.0.0 that is a COMPILE ERROR rather than a silent no-op:
- * `WritableLeaf` no longer declares setter overloads.
- * `@signaltree/callable-syntax` used to promise the leaf form via a build
- * transform and was deleted — it could not run inside an Angular app at all.
- *
- * Two mistakes this comment exists to prevent:
- *
- * 1. **Do not add `.set()`/`.update()` to `NodeAccessor`.** It is not a
- *    missing feature. The call signatures already do both writes, and adding
- *    methods would collide with any state key literally named `set`/`update`.
- * 2. **Do not describe node call-syntax as depending on a build transform,** or
- *    as something to avoid. It is core behaviour and needs zero build tooling.
- *    (A transform once existed for LEAF calls only; it is gone.)
- *
- * Runtime, if you want to confirm rather than trust this comment:
- * `typeof node === 'function'`, `node.set === undefined`,
- * `node.update === undefined`, while `leaf.set` / `leaf.update` are functions.
+ * Branch writes replace a complete value; they do not infer a partial merge.
+ * There are deliberately no `.set()` or `.update()` methods because state may
+ * legally contain keys with those names. `leaf(value)` marks a terminal
+ * topology boundary and disambiguates callable data from an updater.
  */
 /**
  * The literal (declared) keys of `S`, discarding any `string`/`number` index
@@ -201,7 +174,9 @@ type ApplyComputedSlices<TMarker, TBase> = TMarker extends {
  * Universal recursive shape law shared by every framework facade.
  */
 export type TreeNode<T> = {
-  [K in keyof T]: T[K] extends EntityMapMarker<infer E, infer Key>
+  [K in keyof T]: T[K] extends LeafDefinition<infer Value>
+    ? Location<Value>
+    : T[K] extends EntityMapMarker<infer E, infer Key>
     ? ApplyComputedSlices<T[K], EntitySignal<E, Key>>
     : T[K] extends Primitive
     ? Location<T[K]>
@@ -216,9 +191,27 @@ export type TreeNode<T> = {
         | ((...args: unknown[]) => unknown)
     ? Location<T[K]> // Built-in objects → treat as atomic values
     : T[K] extends object
-    ? NodeAccessor<T[K]> & TreeNode<T[K]>
+    ? NodeAccessor<ResolveLeafDefinitions<T[K]>> & TreeNode<T[K]>
     : Location<T[K]>;
 };
+
+export type ResolveLeafDefinitions<T> = T extends LeafDefinition<infer Value>
+  ? Value
+  : T extends EntityMapMarker<infer _Entity, infer _Key>
+  ? T
+  : T extends readonly unknown[]
+  ? T
+  : T extends
+      | Date
+      | RegExp
+      | Map<unknown, unknown>
+      | Set<unknown>
+      | Error
+      | CallableSyntax
+  ? T
+  : T extends object
+  ? { [K in keyof T]: ResolveLeafDefinitions<T[K]> }
+  : T;
 
 // NOTE: The read-only view types (`ReadonlyView`, `ReadonlyStore`,
 // `ReadonlyNodeAccessor`, the per-marker `Readonly*Signal` views and their
@@ -279,13 +272,13 @@ export interface ISignalTree<
    */
   registerCleanup(fn: EnhancerCleanup): void;
   /**
-   * Apply a partial update and return the dot-paths of leaf signals that
+  * Apply a partial update and return the dot-paths of locations that
    * actually changed.
    *
-   * "Actually changed" is literal: a path appears only if the leaf signal
-   * accepted the write. Values that are ref-equal to the current value are
-   * skipped before the `set()`, and values that are a NEW reference but
-   * DEEP-EQUAL are rejected by the leaf's own `equal` — a re-fetched server
+  * "Actually changed" is literal: a path appears only if the location
+  * accepted the write. Values that are ref-equal to the current value are
+  * skipped before replacement, and values that are a NEW reference but
+  * DEEP-EQUAL are rejected by the location's own equality policy — a re-fetched server
    * payload that matches what you already hold reports `[]`, not every key
    * in the payload.
    *
@@ -973,15 +966,10 @@ type PathInterceptor = (
 // These are intentionally simple aliases or fallbacks to keep the public API stable
 // while allowing internal refactors of the type system.
 
-// `WritableLeaf<T>` is declared as an interface (not an
-// intersection) so TypeScript's overload-resolution picks the getter
-// `(): T` first when `ReadableCell<T>` inference walks the call signatures —
-// e.g. for `toObservable(tree.$.x)`. Prior to 9.2.0 the global
-// `declare module '@angular/core'` augmentation in core also added
-// these overloads to the base `WritableCell<T>` and incidentally
-// masked the ordering issue; the interface form makes the contract
-// self-contained.
-/** Public writable state location shared by every framework package. */
+/**
+ * Compatibility alias for the public writable location shared by every
+ * framework package. New declarations should prefer `Location<T>`.
+ */
 export type WritableLeaf<T> = Location<T>;
 
 export type AccessibleNode<T> = NodeAccessor<T> & TreeNode<T>;
@@ -1052,7 +1040,10 @@ export interface SignalTreeFactory {
       enhancers?: E;
       derived: ($: TreeNode<T>) => TDerived;
     }
-  ): ISignalTree<T, TreeNode<T> & ProcessDerivedOf<TDerived>> &
+  ): ISignalTree<
+    ResolveLeafDefinitions<T>,
+    TreeNode<T> & ProcessDerivedOf<TDerived>
+  > &
     AccumulatedEnhancerAdditions<E>;
   <T extends object, const E extends readonly Enhancer<unknown>[]>(
     initialState: T,
@@ -1060,12 +1051,13 @@ export interface SignalTreeFactory {
       enhancers: E;
       derived?: never;
     }
-  ): ISignalTree<T> & AccumulatedEnhancerAdditions<E>;
+  ): ISignalTree<ResolveLeafDefinitions<T>, TreeNode<T>> &
+    AccumulatedEnhancerAdditions<E>;
   <T extends object>(
     initialState: T,
     config?: Omit<TreeConfig, 'enhancers' | 'derived'> & {
       enhancers?: never;
       derived?: never;
     }
-  ): ISignalTree<T>;
+  ): ISignalTree<ResolveLeafDefinitions<T>, TreeNode<T>>;
 }

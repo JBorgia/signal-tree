@@ -1,7 +1,7 @@
 import { computed, signal, type Signal } from '@angular/core';
 import { describe, expect, it } from 'vitest';
 
-import { signalTree } from '../index';
+import { signalTree, type Location } from '../index';
 
 /**
  * ⚠️ ANGULAR REALIZATION EVIDENCE — NOT KERNEL SEMANTICS.
@@ -45,7 +45,7 @@ function collectionBPrime(leaf: { (): Row[] }) {
 // B — keyed observation WITH invalidation, built from ordinary code: a per-key
 // generation counter. No SubjectId, no reclamation coordinator, no effect log.
 // ---------------------------------------------------------------------------
-function collectionB(leaf: { (): Row[]; set(v: Row[]): void }) {
+function collectionB(leaf: Location<Row[]>) {
   const generation = new Map<string, number>();
   // Generations must be REACTIVE. A first draft kept them in a bare Map and
   // short-circuited the read when the generation mismatched — so the computed
@@ -62,17 +62,17 @@ function collectionB(leaf: { (): Row[]; set(v: Row[]): void }) {
   return {
     add(row: Row): void {
       bump(row.id);
-      leaf.set([...leaf(), row]);
+      leaf([...leaf(), row]);
     },
     remove(id: string): void {
       bump(id); // a removed key's next occupant is a NEW generation
-      leaf.set(leaf().filter((r) => r.id !== id));
+      leaf(leaf().filter((r) => r.id !== id));
     },
     /** Restore a whole membership snapshot, advancing generations for arrivals. */
     restore(rows: Row[]): void {
       const present = new Set(leaf().map((r) => r.id));
       for (const r of rows) if (!present.has(r.id)) bump(r.id);
-      leaf.set(rows);
+      leaf(rows);
     },
     /**
      * A handle is bound to (key, generation) at acquisition time.
@@ -111,14 +111,14 @@ describe('E2-S0 / Q1 — is the identity-free contract harmful?', () => {
     const tree = signalTree({ rows: [] as Row[] });
     const c = collectionBPrime(tree.$.rows);
 
-    tree.$.rows.set([{ id: 'tmp-1', n: 111 }]);
+    tree.$.rows([{ id: 'tmp-1', n: 111 }]);
     const held = c.byId('tmp-1');
     expect(held()?.n).toBe(111);
 
     // The optimistic-creation cycle this library documents: a temp id is retired
     // and later reused by a different member.
-    tree.$.rows.set([]);
-    tree.$.rows.set([{ id: 'tmp-1', n: 999 }]);
+    tree.$.rows([]);
+    tree.$.rows([{ id: 'tmp-1', n: 999 }]);
 
     // WRONG-ROW READ. Not stale — WRONG. The handle reports another member's data
     // with no error and no signal that anything happened.
@@ -138,10 +138,10 @@ describe('E2-S0 / Q2 — can invalidation be derived from values?', () => {
     const tree = signalTree({ rows: [] as Row[] });
 
     const before = tree.$.rows();
-    tree.$.rows.set([{ id: 'a', n: 1 }]);
+    tree.$.rows([{ id: 'a', n: 1 }]);
     const afterFirstAdd = tree.$.rows();
-    tree.$.rows.set([]);
-    tree.$.rows.set([{ id: 'a', n: 1 }]); // SAME key, SAME value
+    tree.$.rows([]);
+    tree.$.rows([{ id: 'a', n: 1 }]); // SAME key, SAME value
     const afterReAdd = tree.$.rows();
 
     // Value-wise the two occupancies are identical, so no value-only rule can

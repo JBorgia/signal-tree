@@ -47,7 +47,7 @@ const C = JSON.stringify(CORE);
 const BASE = `
   import { signalTree } from ${C};
   const t = signalTree({ count: 0, user: { name: 'a' } });
-  t.$.count.set(1); t.$.user({ name: 'b' });
+  t.$.count(1); t.$.user({ name: 'b' });
   globalThis.__sink = [t.$.count(), t.$()];
 `;
 
@@ -59,12 +59,12 @@ const MARKERS = [
 ];
 
 const ENHANCERS = [
-  ['batching', 'batching', 'batching()', 't.batch(() => t.$.count.set(2));'],
+  ['batching', 'batching', 'batching()', 't.batch(() => t.$.count(2));'],
   [
     'restoration',
     'restoration, undoable',
     'restoration()',
-    'undoable(() => t.$.count.set(2)); t.undo(); t.redo();',
+    'undoable(() => t.$.count(2)); t.undo(); t.redo();',
   ],
   ['devTools', 'devTools', 'devTools()', 't.connectDevTools();'],
 
@@ -100,7 +100,7 @@ for (const [label, imports, apply, use] of ENHANCERS) {
   const code = `
     import { signalTree, ${imports} } from ${C};
     const t = signalTree({ count: 0 }, { enhancers: [${apply}] });
-    t.$.count.set(1); ${use}
+    t.$.count(1); ${use}
     globalThis.__sink = [t.$.count()];`;
   const k = await kb(code, 'enh_' + label);
   out.enhancers.push({ feature: label, totalKB: +k.toFixed(2), deltaKB: +(k - base).toFixed(2) });
@@ -123,7 +123,7 @@ const COMBOS = [
       rows: entityMap({ selectId: (r) => r.id }),
       count: 0,
     }, { enhancers: [batching()] });
-    t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.count.set(1); });
+    t.batch(() => { t.$.rows.addOne({ id: 1 }); t.$.count(1); });
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],
   ['current public surface mix', `
     import { signalTree, entityMap,
@@ -133,7 +133,7 @@ const COMBOS = [
       count: 0,
     }, { enhancers: [batching(), restoration()] });
     undoable(() => t.batch(() => {
-      t.$.rows.addOne({ id: 1 }); t.$.count.set(1);
+      t.$.rows.addOne({ id: 1 }); t.$.count(1);
     }));
     t.undo(); t.redo();
     globalThis.__sink = [t.$.rows.all(), t.$.count()];`],

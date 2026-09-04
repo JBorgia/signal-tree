@@ -22,6 +22,8 @@ import { of } from 'rxjs';
 
 import { batching, entityMap, signalTree } from '../index';
 import { serialization } from '../enhancers/serialization/serialization';
+import type { Location } from './internals/cell-runtime';
+import { interceptLocationWrites } from './internals/location-runtime';
 import { getPathNotifier, resetPathNotifier } from './path-notifier';
 
 interface Member extends Record<string, unknown> {
@@ -68,7 +70,7 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
   });
 
   it('batching setter interception wraps leaves five branches deep', () => {
-    // Count RAW writes by wrapping the setter BEFORE the enhancer; if the
+    // Count RAW writes by intercepting the location BEFORE the enhancer; if the
     // enhancer's walker skips callable branches, coalesce() applies every
     // write instead of one and this counter exposes it. The wrapper is
     // installed by a probe enhancer declared ahead of `batching`, which is the
@@ -84,14 +86,14 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
             };
           };
         }
-      ).$.org.teams.alpha.lead.profile.score as unknown as {
-        set(v: number): void;
-      };
-      const rawSet = leaf.set.bind(leaf);
-      leaf.set = (v: number) => {
+      ).$.org.teams.alpha.lead.profile.score as Location<number>;
+      const release = interceptLocationWrites(leaf, (_operation, proceed) => {
         applied++;
-        rawSet(v);
-      };
+        proceed();
+      });
+      (t as unknown as { registerCleanup(fn: () => void): void }).registerCleanup(
+        release
+      );
       return t;
     };
 
@@ -103,9 +105,9 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
       ],
     });
     tree.coalesce(() => {
-      tree.$.org.teams.alpha.lead.profile.score.set(10);
-      tree.$.org.teams.alpha.lead.profile.score.set(20);
-      tree.$.org.teams.alpha.lead.profile.score.set(30);
+      tree.$.org.teams.alpha.lead.profile.score(10);
+      tree.$.org.teams.alpha.lead.profile.score(20);
+      tree.$.org.teams.alpha.lead.profile.score(30);
     });
 
     expect(tree.$.org.teams.alpha.lead.profile.score()).toBe(30);
@@ -121,9 +123,9 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
     // Corrupt deep state, then restore — deserialize must recurse through
     // callable branch accessors (not bail on typeof 'function') to reach
     // the depth-5 leaves and the built-in Date leaf.
-    tree.$.org.teams.alpha.lead.profile.display.set('WRONG');
-    tree.$.org.teams.alpha.lead.profile.score.set(-1);
-    tree.$.org.meta.founded.set(new Date(0));
+    tree.$.org.teams.alpha.lead.profile.display('WRONG');
+    tree.$.org.teams.alpha.lead.profile.score(-1);
+    tree.$.org.meta.founded(new Date(0));
 
     tree.deserialize(json);
 
@@ -147,7 +149,7 @@ describe('walker conformance — core subsystems on a deep callable-branch tree'
       }
     );
 
-    tree.$.org.teams.alpha.lead.profile.score.set(42);
+    tree.$.org.teams.alpha.lead.profile.score(42);
     await Promise.resolve();
 
     expect(paths).toContain('org.teams.alpha.lead.profile.score');

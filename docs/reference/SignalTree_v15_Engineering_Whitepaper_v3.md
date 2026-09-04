@@ -338,19 +338,19 @@ const tree = signalTree({
 });
 
 const name = tree.$.user.profile.name();
-tree.$.user.profile.name.set('Grace');
+tree.$.user.profile.name('Grace');
 ```
 
 The public hierarchy is tree-shaped even though the reactive dependency topology is a graph. Derived computations may depend on multiple branches; one leaf may have many consumers. "Tree" is therefore a product and state-namespace description, not a graph-theoretic claim about all runtime dependencies.
 
-## 3.2 Branches and leaves are intentionally different
+## 3.2 Topology is explicit and the location grammar is uniform
 
-The v15 type-characterization matrix protects a subtle but important rule sometimes referred to in the engineering notes as **Rule 0d**:
+The v15 type-characterization matrix protects four related rules:
 
-- a leaf is a callable writable reactive value;
-- a branch remains a structurally navigable accessor;
-- branches support whole-branch read/write/update call forms;
-- a branch does not become an Angular signal merely because its descendants are reactive leaves.
+- root, branch, and terminal locations all read, replace, and derive through the same callable object;
+- a plain object becomes a structurally navigable branch whose fields are locations;
+- `leaf(value)` explicitly terminates topology for atomic objects and callable data;
+- framework packages observe kernel-owned locations rather than replacing them with framework primitives.
 
 This is exactly the sort of type semantic that can disappear during API cleanup while every runtime test remains green. The type matrix therefore uses exact type equality and negative controls, not broad assignability alone.
 
@@ -1637,8 +1637,8 @@ Current performance documentation records approximately:
 
 | target          | production gzip |  budget |
 | --------------- | --------------: | ------: |
-| bare SignalTree |         9.92 KB | 10.0 KB |
-| entity-enabled  |        20.27 KB | 21.0 KB |
+| bare SignalTree |         9.93 KB | 10.0 KB |
+| entity-enabled  |        21.97 KB | 22.1 KB |
 
 ![Figure 24. Measured production gzip versus v15 budgets](figures/fig24_bundle_budget.png)
 

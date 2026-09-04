@@ -45,6 +45,39 @@ Use `@signal-tree/kernel` directly only for framework-neutral TypeScript,
 including reusable domain libraries. Framework facades forward the neutral
 kernel surface by canonical identity; they do not duplicate semantic authority.
 
+## Location grammar and terminal values
+
+Every canonical state location uses one callable grammar:
+
+```typescript
+location();                       // read
+location(nextValue);              // replace the complete value
+location((current) => nextValue); // derive the next complete value
+```
+
+This grammar applies at the root (`tree.$`), branches, scalar leaves, array
+leaves, and EntityMap fields. Canonical locations do not expose `.set()` or
+`.update()`. Angular code uses `toWritableSignal(location)` only when an Angular
+API requires native `WritableSignal` identity; Vue adapts a location with a
+writable `computed` when an API requires a ref.
+
+Plain objects normally become traversable branches. `leaf(value)` explicitly
+ends topology so an object remains one atomic location. Callable values always
+use `leaf()` because a bare function argument is the updater syntax:
+
+```typescript
+const tree = signalTree({
+  range: leaf({ start: 0, end: 10 }),
+  callback: leaf((value: number) => console.log(value)),
+});
+
+tree.$.range({ start: 5, end: 15 });
+tree.$.callback(leaf((value) => persist(value)));
+```
+
+The wrapper is consumed at construction or invocation and never enters state,
+snapshots, persistence, restoration, links, or causal payloads.
+
 There is no v15 forms, persistence, validation, events, or realtime package;
 those are application-owned. `.with()`, positional `derived`, and the
 `stored`/`asyncSource`/`asyncQuery`/`form`/`status` markers were all removed.

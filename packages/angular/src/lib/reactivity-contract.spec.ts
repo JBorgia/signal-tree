@@ -56,11 +56,11 @@ describe('SignalTree reactivity contract', () => {
       expect(sum()).toBe(3);
       expect(computeCount).toBe(1);
 
-      tree.$.unrelated.set(99);
+      tree.$.unrelated(99);
       expect(sum()).toBe(3);
       expect(computeCount).toBe(1);
 
-      tree.$.a.set(10);
+      tree.$.a(10);
       expect(sum()).toBe(12);
       expect(computeCount).toBe(2);
 
@@ -80,11 +80,11 @@ describe('SignalTree reactivity contract', () => {
       expect(doubled()).toBe(10);
       expect(computeCount).toBe(1);
 
-      tree.$.x.set(5);
+      tree.$.x(5);
       expect(doubled()).toBe(10);
       expect(computeCount).toBe(1);
 
-      tree.$.x.set(7);
+      tree.$.x(7);
       expect(doubled()).toBe(14);
       expect(computeCount).toBe(2);
 
@@ -107,7 +107,7 @@ describe('SignalTree reactivity contract', () => {
     expect(total()).toBe(11);
     expect(runs).toBe(1);
 
-    tree.$.a.x.set(5);
+    tree.$.a.x(5);
     expect(total()).toBe(15);
     expect(runs).toBe(2);
   });
@@ -119,7 +119,7 @@ describe('SignalTree reactivity contract', () => {
     const first = snapshot();
     expect(first).toEqual({ left: { value: 1 }, right: { value: 2 } });
 
-    tree.$.left.value.set(3);
+    tree.$.left.value(3);
     const second = snapshot();
 
     expect(second).toEqual({ left: { value: 3 }, right: { value: 2 } });
@@ -133,7 +133,7 @@ describe('SignalTree reactivity contract', () => {
       const t = track(() => tree.$.a.v());
       t.read();
       expect(t.runs()).toBe(1);
-      tree.$.b.v.set(1); // unrelated sibling
+      tree.$.b.v(1); // unrelated sibling
       t.read();
       expect(t.runs()).toBe(1);
     });
@@ -142,7 +142,7 @@ describe('SignalTree reactivity contract', () => {
       const tree = signalTree({ x: { y: { z: 0 } }, p: { q: { r: 0 } } });
       const t = track(() => tree.$.x.y.z());
       t.read();
-      tree.$.p.q.r.set(5); // unrelated deep path
+      tree.$.p.q.r(5); // unrelated deep path
       t.read();
       expect(t.runs()).toBe(1);
     });
@@ -159,10 +159,10 @@ describe('SignalTree reactivity contract', () => {
       const t = track(() => (tree.$ as { da: () => number }).da());
       t.read();
       expect(t.runs()).toBe(1);
-      tree.$.b.set(1); // not a source of `da`
+      tree.$.b(1); // not a source of `da`
       t.read();
       expect(t.runs()).toBe(1);
-      tree.$.a.set(1); // actual source
+      tree.$.a(1); // actual source
       t.read();
       expect(t.runs()).toBe(2);
     });

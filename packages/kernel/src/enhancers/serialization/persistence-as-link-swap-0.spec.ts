@@ -101,7 +101,7 @@ describe('P1 — an authored write reaches the durable endpoint complete', () =>
     await flush();
     writes.length = 0;
 
-    tree.$.a.set('AUTHORED');
+    tree.$.a('AUTHORED');
     await flush();
 
     const durable = lastDurable<S>(writes);
@@ -122,7 +122,7 @@ describe('P2 — an inspection write changes state but not durable truth', () =>
     const tree = makeTree(adapter, 'p2a');
     await flush();
 
-    withWriteContext(INSPECTION, () => tree.$.b.set('SCRUBBED'));
+    withWriteContext(INSPECTION, () => tree.$.b('SCRUBBED'));
     expect(tree.$.b()).toBe('SCRUBBED');
   });
 
@@ -132,7 +132,7 @@ describe('P2 — an inspection write changes state but not durable truth', () =>
     await flush();
     writes.length = 0;
 
-    withWriteContext(INSPECTION, () => tree.$.b.set('SCRUBBED'));
+    withWriteContext(INSPECTION, () => tree.$.b('SCRUBBED'));
     await flush();
 
     const durable = lastDurable<S>(writes);
@@ -148,11 +148,11 @@ describe('P2 — an inspection write changes state but not durable truth', () =>
     const tree = makeTree(adapter, 'p2c');
     await flush();
 
-    tree.$.a.set('AUTHORED');
+    tree.$.a('AUTHORED');
     await tree.save();
     writes.length = 0;
 
-    withWriteContext(INSPECTION, () => tree.$.b.set('SCRUBBED'));
+    withWriteContext(INSPECTION, () => tree.$.b('SCRUBBED'));
     await tree.save();
     await flush();
 
@@ -171,11 +171,11 @@ describe('P3 — an inspection value never rides out on a later authored write',
     await flush();
     writes.length = 0;
 
-    tree.$.a.set('A1'); // authored
+    tree.$.a('A1'); // authored
     await flush();
-    withWriteContext(INSPECTION, () => tree.$.b.set('B1')); // inspection
+    withWriteContext(INSPECTION, () => tree.$.b('B1')); // inspection
     await flush();
-    tree.$.c.set('C1'); // authored, unrelated
+    tree.$.c('C1'); // authored, unrelated
     await flush();
 
     const durable = lastDurable<S>(writes);
@@ -216,7 +216,7 @@ describe('P4 — durable truth loaded from storage is realized, not inspection',
     await flush();
     writes.length = 0;
 
-    tree.$.a.set('a0'); // authored, back to the pre-load value
+    tree.$.a('a0'); // authored, back to the pre-load value
     await flush();
 
     expect(lastDurable<S>(writes)?.a).toBe('a0');
@@ -233,7 +233,7 @@ describe('P5 — external acquisition moves eligible authority with no local mut
     await flush();
 
     // eligible baseline = a0; observable state becomes INSPECTED via inspection
-    withWriteContext(INSPECTION, () => tree.$.a.set('INSPECTED'));
+    withWriteContext(INSPECTION, () => tree.$.a('INSPECTED'));
     await flush();
     expect(tree.$.a()).toBe('INSPECTED');
 
@@ -252,7 +252,7 @@ describe('P5 — external acquisition moves eligible authority with no local mut
     // ...BUT ELIGIBLE AUTHORITY MUST HAVE MOVED. Writing back to the baseline
     // is therefore a real change and must reach the endpoint.
     writes.length = 0;
-    tree.$.a.set('a0');
+    tree.$.a('a0');
     await flush();
     expect(lastDurable<S>(writes)?.a).toBe('a0');
   });
@@ -294,7 +294,7 @@ describe('P5 — external acquisition moves eligible authority with no local mut
         transaction(fn: () => void): { confirm(): void; rollback(): void };
       }
     ).transaction(() => {
-      tree.$.a.set('SPECULATIVE');
+      tree.$.a('SPECULATIVE');
     });
     await tree.load();
     pending.rollback();
@@ -407,7 +407,7 @@ describe('P8 — one tree never persists because a same-shaped sibling changed',
     a.writes.length = 0;
     b.writes.length = 0;
 
-    treeB.$.a.set('ONLY_B');
+    treeB.$.a('ONLY_B');
     await flush();
 
     expect(b.writes.length).toBeGreaterThan(0);
@@ -428,7 +428,7 @@ describe('P9 — a disposed persistence relationship produces no durable consequ
     await flush();
     writes.length = 0;
 
-    tree.$.a.set('AFTER_DISPOSE');
+    tree.$.a('AFTER_DISPOSE');
     await flush();
 
     expect(tree.$.a()).toBe('AFTER_DISPOSE');

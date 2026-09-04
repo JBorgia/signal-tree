@@ -44,7 +44,7 @@ describe('STAGED-DRAFT-EDITING-0: a draft that never touches the tree', () => {
     const before = t.getRestorationHistory().length;
 
     // The draft is a PLAIN application-owned value — this file's stand-in for
-    // a form model or a component signal, per §5. It is never `tree.$...set()`.
+    // a form model or a component signal, per §5. It is never a direct tree write.
     let draft: Partial<Ticket> = {};
     const reviewField = <K extends keyof Ticket>(key: K, value: Ticket[K]) => {
       draft = { ...draft, [key]: value };
@@ -80,9 +80,9 @@ describe('STAGED-DRAFT-EDITING-0: a draft that never touches the tree', () => {
       // unwrapped loop of per-field sets each producing its own turn.
       const d = draft as Ticket;
       undoable(() => {
-        store.$.ticket.title.set(d.title);
-        store.$.ticket.priority.set(d.priority);
-        store.$.ticket.assignee.set(d.assignee);
+        store.$.ticket.title(d.title);
+        store.$.ticket.priority(d.priority);
+        store.$.ticket.assignee(d.assignee);
       });
     };
 

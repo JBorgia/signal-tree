@@ -105,7 +105,7 @@ describe('PRODUCTION-LINK-CONFORMANCE-0: retrieve participates in settlement', (
     const settling = l.settled();
     get.resolve('acquired');
     await retrieving;
-    tree.$.leaf.set('typed');
+    tree.$.leaf('typed');
     await settling;
     l.dispose();
 
@@ -206,7 +206,7 @@ describe('PRODUCTION-LINK-CONFORMANCE-0: settlement, echo, reconciliation', () =
     // any flush. That tests something STRONGER than was earned — no observation
     // had reached the authority yet — and it failed for that reason rather than
     // for the WEAK-reading defect this pins.
-    const p = tree.transaction(() => tree.$.leaf.set('B'));
+    const p = tree.transaction(() => tree.$.leaf('B'));
     await flush();
 
     const waiting = l.settled();
@@ -261,12 +261,12 @@ describe('PRODUCTION-LINK-CONFORMANCE-0: settlement, echo, reconciliation', () =
       },
     });
 
-    tree.$.leaf.set('a');
+    tree.$.leaf('a');
     await flush();
     expect(sent).toEqual(['a']);
 
     // Lands while the first send is still open.
-    tree.$.leaf.set('b');
+    tree.$.leaf('b');
     await flush();
 
     first.resolve();
@@ -300,7 +300,7 @@ describe('PRODUCTION-LINK-CONFORMANCE-0: the chosen error contract', () => {
       },
     });
 
-    tree.$.leaf.set('doomed');
+    tree.$.leaf('doomed');
     await flush();
 
     // ⚠️ LINK-2 is the later public contract and it retires the older
@@ -320,7 +320,7 @@ describe('PRODUCTION-LINK-CONFORMANCE-0: the chosen error contract', () => {
 
     // And the queue survives: one rejection must not wedge the link forever.
     fail = false;
-    tree.$.leaf.set('recovered');
+    tree.$.leaf('recovered');
     await flush();
     await l.settled();
     expect(sent).toEqual(['recovered']);

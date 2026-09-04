@@ -31,7 +31,7 @@ describe('@signal-tree/angular public root', () => {
     const tree = signalTree({ count: 0 });
     expect(typeof tree.$.count.peek).toBe('function');
     expect(typeof tree.$.count.subscribe).toBe('function');
-    tree.$.count.set(3);
+    tree.$.count(3);
     expect(tree.$.count()).toBe(3);
   });
 });

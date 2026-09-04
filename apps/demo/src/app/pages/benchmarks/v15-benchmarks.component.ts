@@ -27,6 +27,8 @@ import {
   V15_BENCHMARK_SOURCE_URLS,
   V15BenchmarkSuite,
 } from './v15-benchmark.workloads';
+import { CALLABLE_LOCATION_AA_BENCHMARK } from './callable-locations-aa.generated';
+import { CALLABLE_LOCATION_BENCHMARK } from './callable-locations.generated';
 
 type BenchmarkMode = 'quick' | 'steady';
 type SignalTreeProfileArmId = 'signaltree-angular' | 'signaltree-kernel';
@@ -54,6 +56,74 @@ interface SteadyStateProfile {
   readonly position: number;
   readonly cohortSize: number;
 }
+
+interface CallableLocationComparisonRow {
+  readonly operation: string;
+  readonly previous: string;
+  readonly current: string;
+  readonly pairedDelta: string;
+  readonly pairedRange: string;
+  readonly controlRange: string;
+  readonly disposition: 'overhead' | 'improvement' | 'neutral';
+  readonly interpretation: string;
+}
+
+const CALLABLE_OPERATION_LABELS = {
+  'scalar-read': 'Scalar read',
+  'scalar-replace': 'Scalar replacement',
+  'scalar-derive': 'Scalar derivation',
+  'tree-construction': 'Tree construction',
+} as const;
+
+const formatNanoseconds = (value: number): string =>
+  value < 1_000
+    ? `${value.toFixed(2)} ns`
+    : `${(value / 1_000).toFixed(2)} us`;
+
+const formatPercent = (value: number): string =>
+  `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+
+const formatPercentRange = (low: number, high: number): string =>
+  `${formatPercent(low)} to ${formatPercent(high)}`;
+
+const createCallableLocationRows = (): readonly CallableLocationComparisonRow[] =>
+  CALLABLE_LOCATION_BENCHMARK.results.map((result) => {
+    const control = CALLABLE_LOCATION_AA_BENCHMARK.results.find(
+      (candidate) => candidate.operation === result.operation
+    );
+    if (!control) {
+      throw new Error(`Missing A/A control for ${result.operation}`);
+    }
+
+    const disposition =
+      result.pairedDeltaPct.p10 > 0
+        ? 'overhead'
+        : result.pairedDeltaPct.p90 < 0
+        ? 'improvement'
+        : 'neutral';
+
+    return {
+      operation: CALLABLE_OPERATION_LABELS[result.operation],
+      previous: formatNanoseconds(result.a.medianNsPerOperation),
+      current: formatNanoseconds(result.b.medianNsPerOperation),
+      pairedDelta: formatPercent(result.pairedDeltaPct.median),
+      pairedRange: formatPercentRange(
+        result.pairedDeltaPct.p10,
+        result.pairedDeltaPct.p90
+      ),
+      controlRange: formatPercentRange(
+        control.pairedDeltaPct.p10,
+        control.pairedDeltaPct.p90
+      ),
+      disposition,
+      interpretation:
+        disposition === 'overhead'
+          ? 'Measured overhead in this run'
+          : disposition === 'improvement'
+          ? 'Measured improvement in this run'
+          : 'No clear difference',
+    };
+  });
 
 const RECURRING_PROFILES: readonly {
   readonly workloadId: RecurringWorkloadId;
@@ -112,6 +182,16 @@ export class V15BenchmarksComponent {
   readonly isDevBuild = isDevMode();
   readonly benchmarkSourcePaths = V15_BENCHMARK_SOURCE_PATHS;
   readonly benchmarkSourceUrls = V15_BENCHMARK_SOURCE_URLS;
+  readonly callableLocationRows = createCallableLocationRows();
+  readonly callableLocationBenchmark = {
+    method: CALLABLE_LOCATION_BENCHMARK.method,
+    samples: CALLABLE_LOCATION_BENCHMARK.config.samples,
+    warmups: CALLABLE_LOCATION_BENCHMARK.config.warmups,
+    trials: CALLABLE_LOCATION_BENCHMARK.config.trialsPerArm,
+    previous: CALLABLE_LOCATION_BENCHMARK.arms.a.label,
+    current: CALLABLE_LOCATION_BENCHMARK.arms.b.label,
+    runtime: `${CALLABLE_LOCATION_BENCHMARK.runtime.node} / ${CALLABLE_LOCATION_BENCHMARK.runtime.platform}-${CALLABLE_LOCATION_BENCHMARK.runtime.architecture}`,
+  };
   readonly valueFoundations: readonly ValueFoundation[] = [
     {
       status: 'Public contract',

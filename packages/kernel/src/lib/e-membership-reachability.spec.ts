@@ -47,7 +47,7 @@ describe('E — can any tree API add a record key after construction?', () => {
 
   it('the granular positions that DO exist keep working', () => {
     const tree = seed();
-    undoable(() => tree.$.rows.a.n.set(9));
+    undoable(() => tree.$.rows.a.n(9));
     expect(tree.$.rows.a.n()).toBe(9);
     expect(tree.$()).toEqual({ rows: { a: { n: 9 } }, other: 0 });
   });

@@ -102,8 +102,8 @@ describe('ERROR-SURFACE-2 A: two same-shaped trees are now distinguishable', () 
     const la = link(a.$.settings.theme, { set: failing });
     const lb = link(b.$.settings.theme, { set: failing });
 
-    a.$.settings.theme.set('dark');
-    b.$.settings.theme.set('dark');
+    a.$.settings.theme('dark');
+    b.$.settings.theme('dark');
     await flush();
     await la.settled();
     await lb.settled();
@@ -132,10 +132,10 @@ describe('ERROR-SURFACE-2 A: two same-shaped trees are now distinguishable', () 
     await flush();
     const l = link(a.$.settings.theme, { set: failing });
 
-    a.$.settings.theme.set('one');
+    a.$.settings.theme('one');
     await flush();
     await l.settled();
-    a.$.settings.theme.set('two');
+    a.$.settings.theme('two');
     await flush();
     await l.settled();
 
@@ -158,7 +158,7 @@ describe('ERROR-SURFACE-2 B: path names the linked source location', () => {
     const tree = makeTree();
     await flush();
     const l = link(tree.$.top, { set: failing });
-    tree.$.top.set('x');
+    tree.$.top('x');
     await flush();
     await l.settled();
 
@@ -173,7 +173,7 @@ describe('ERROR-SURFACE-2 B: path names the linked source location', () => {
     const tree = makeTree();
     await flush();
     const l = link(tree.$.settings.theme, { set: failing });
-    tree.$.settings.theme.set('x');
+    tree.$.settings.theme('x');
     await flush();
     await l.settled();
 
@@ -233,7 +233,7 @@ describe('ERROR-SURFACE-2: the delivered object is exactly the contract', () => 
     const tree = makeTree();
     await flush();
     const l = link(tree.$.settings.theme, { set: failing });
-    tree.$.settings.theme.set('dark');
+    tree.$.settings.theme('dark');
     await flush();
     await l.settled();
 
@@ -329,7 +329,7 @@ describe('TREE ERROR: the TreeId contract', () => {
     await flush();
     const before = getPositionRegistry(tree.$)?.id;
 
-    tree.$.settings.theme.set('dark');
+    tree.$.settings.theme('dark');
     tree.$.rows.addOne({ id: 'r1', n: 1 });
     await flush();
     tree.$.rows.changeId('r1', 'r9');

@@ -347,7 +347,7 @@ describe('S-6 — what the serializer adds', () => {
 
     const cyclic: Node = { label: 'b' };
     cyclic.self = cyclic;
-    tree.$.items.set([cyclic]);
+    tree.$.items([cyclic]);
 
     // Reachable — but scoped carefully. This establishes only that CURRENT
     // canonical admission permits a cyclic object inside an array leaf. Value

@@ -959,7 +959,7 @@ const GATES = [
     // idle arm, which this repo has published once already.
     mutation: {
       file: 'tools/bench-state-scale.mjs',
-      find: '  const st = median(() => {\n    for (let w = 0; w < WRITES; w++) tree.$.k0.v.set(w);\n  });\n\n  const state = signalState(flat(size));',
+      find: '  const st = median(() => {\n    for (let w = 0; w < WRITES; w++) tree.$.k0.v(w);\n  });\n\n  const state = signalState(flat(size));',
       replace:
         '  const st = median(() => {\n    for (let w = 0; w < WRITES; w++) void w;\n  });\n\n  const state = signalState(flat(size));',
     },

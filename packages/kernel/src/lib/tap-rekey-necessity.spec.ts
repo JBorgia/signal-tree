@@ -127,7 +127,7 @@ describe('REKEY — necessity, not difference', () => {
     expect(selected()?.n).toBe(5);
 
     tree.$.rows.changeId('tmp-1', 'server-99');
-    tree.$.selectedId.set('server-99');
+    tree.$.selectedId('server-99');
 
     expect(selected()?.n).toBe(5);
     // The null WORKS, provided the holder knows the new key.

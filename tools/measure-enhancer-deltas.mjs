@@ -58,7 +58,7 @@ async function gzipKB(code, id) {
 const BASE = `
   import { signalTree } from ${JSON.stringify(CORE)};
   const t = signalTree({ count: 0, user: { name: 'a' } });
-  t.$.count.set(1);
+  t.$.count(1);
   globalThis.__sink = [t.$.count()];
 `;
 
@@ -69,12 +69,12 @@ const BASE = `
  * the safer default.
  */
 const ENHANCERS = [
-  { name: 'batching', imports: 'batching', apply: 'batching()', use: 't.batch(() => t.$.count.set(2));' },
+  { name: 'batching', imports: 'batching', apply: 'batching()', use: 't.batch(() => t.$.count(2));' },
   {
     name: 'restoration',
     imports: 'restoration, undoable',
     apply: 'restoration()',
-    use: 'undoable(() => t.$.count.set(2)); t.undo(); t.redo();',
+    use: 'undoable(() => t.$.count(2)); t.undo(); t.redo();',
   },
   { name: 'devTools', imports: 'devTools', apply: 'devTools()', use: 't.connectDevTools();' },
 ];
@@ -86,7 +86,7 @@ for (const e of ENHANCERS) {
   const code = `
     import { signalTree, ${e.imports} } from ${JSON.stringify(CORE)};
     const t = signalTree({ count: 0, user: { name: 'a' } }, { enhancers: [${e.apply}] });
-    t.$.count.set(1);
+    t.$.count(1);
     ${e.use}
     globalThis.__sink = [t.$.count()];
   `;

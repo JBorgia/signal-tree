@@ -254,7 +254,7 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
     const sent: string[] = [];
     const l = userlandLink<string>(tree.$.theme, { set: (v) => void sent.push(v) });
 
-    tree.$.theme.set('typed');
+    tree.$.theme('typed');
     await flush();
     await l.settled();
     l.dispose();
@@ -296,10 +296,10 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
     await l.retrieve();
     await flush();
     await l.settled();
-    tree.$.theme.set('dark');
+    tree.$.theme('dark');
     await flush();
     await l.settled();
-    tree.$.theme.set('light');
+    tree.$.theme('light');
     await flush();
     await l.settled();
     l.dispose();
@@ -330,7 +330,7 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
     const sent: string[] = [];
     const l = userlandLink<string>(tree.$.theme, { set: (v) => void sent.push(v) });
 
-    const pending = tree.transaction(() => tree.$.theme.set('doomed'));
+    const pending = tree.transaction(() => tree.$.theme('doomed'));
     await flush();
     expect(sent).toEqual([]);
 
@@ -359,9 +359,9 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
         ),
     });
 
-    tree.$.theme.set('A');
+    tree.$.theme('A');
     await flush();
-    tree.$.theme.set('B');
+    tree.$.theme('B');
     await flush();
     await l.settled();
     l.dispose();
@@ -375,7 +375,7 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
     const sent: string[] = [];
     const l = userlandLink<string>(tree.$.theme, { set: (v) => void sent.push(v) });
 
-    const pending = tree.transaction(() => tree.$.theme.set('held'));
+    const pending = tree.transaction(() => tree.$.theme('held'));
     await flush();
     l.dispose();
     pending.confirm();
@@ -398,7 +398,7 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
       },
     });
 
-    tree.$.theme.set('dark');
+    tree.$.theme('dark');
     await flush();
     await l.settled();
     expect(l.failures).toHaveLength(1);
@@ -406,7 +406,7 @@ describe('EGRESS-0: the whole battery, against a USER-LAND link', () => {
     expect(tree.$.theme()).toBe('dark'); // a failed egress does not un-author X
 
     fail = false;
-    tree.$.theme.set('light');
+    tree.$.theme('light');
     await flush();
     await l.settled();
     l.dispose();
@@ -505,7 +505,7 @@ describe('LINK-RACE-0/1: cross-direction concurrency', () => {
     );
 
     // The authored write that starts the chain.
-    tree.$.theme.set('B');
+    tree.$.theme('B');
     await flush();
 
     // Each inbound value arrives while the PREVIOUS outbound write is still in

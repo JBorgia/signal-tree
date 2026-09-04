@@ -90,11 +90,13 @@ export class HomeComponent {
     {
       label: 'state-grammar.ts',
       language: 'typescript',
-      source: `import { signalTree } from '@signal-tree/angular';
+      source: `import { leaf, signalTree } from '@signal-tree/angular';
 
 const tree = signalTree({
   count: 0,
-  profile: { name: 'Ada', role: 'engineer' }
+  profile: { name: 'Ada', role: 'engineer' },
+  range: leaf({ start: 0, end: 10 }),
+  onCount: leaf((count: number) => console.log(count)),
 });
 
 tree.$();                              // read root
@@ -107,18 +109,23 @@ tree.$.profile(current => ({
 }));                                   // update branch
 
 tree.$.count();                        // read leaf
-tree.$.count.set(5);                   // replace leaf
-tree.$.count.update(n => n + 1);       // update leaf`,
+tree.$.count(5);                       // replace leaf
+tree.$.count(n => n + 1);              // update leaf
+
+tree.$.range({ start: 5, end: 15 });   // replace terminal object
+tree.$.onCount(leaf((count) => {        // replace callable data
+  console.info(count);
+}));`,
     },
     {
       label: 'causal-writes.ts',
       language: 'typescript',
       source: `import { external, undoable } from '@signal-tree/angular';
 
-tree.$.count.set(1);                   // authored, undesignated
+tree.$.count(1);                       // authored, undesignated
 
 undoable(() => {
-  tree.$.profile.role.set('architect');
+  tree.$.profile.role('architect');
 });                                   // authored + restoration-designated
 
 const profile = await api.loadProfile();

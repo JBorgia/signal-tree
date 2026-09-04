@@ -134,7 +134,7 @@ import { signalTree } from '@signal-tree/angular';
   selector: 'app-root',
   standalone: true,
   template: \`<h1>SignalTree playground</h1><p>Count: {{ tree.$.count() }}</p>
-    <button (click)="tree.$.count.update((n) => n + 1)">+1</button>\`,
+    <button (click)="tree.$.count((n) => n + 1)">+1</button>\`,
 })
 export class AppComponent {
   tree = signalTree({ count: 0 });

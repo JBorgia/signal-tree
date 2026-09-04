@@ -68,16 +68,16 @@ export class FundamentalsPageComponent implements OnDestroy {
   ];
 
   addItem(): void {
-    this.tree.$.cart.itemCount.update((count) => count + 1);
+    this.tree.$.cart.itemCount((count) => count + 1);
   }
 
   removeItem(): void {
-    this.tree.$.cart.itemCount.update((count) => Math.max(0, count - 1));
+    this.tree.$.cart.itemCount((count) => Math.max(0, count - 1));
   }
 
   setUnitPrice(value: number): void {
     if (Number.isFinite(value) && value >= 0) {
-      this.tree.$.cart.unitPrice.set(value);
+      this.tree.$.cart.unitPrice(value);
     }
   }
 

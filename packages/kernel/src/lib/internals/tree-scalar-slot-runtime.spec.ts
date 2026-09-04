@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import { signalTree } from '../signal-tree';
-import type { ISignalTree } from '../types';
 
 import { getOwnedPositionIds } from './owned-mutation';
 import {
@@ -16,22 +15,16 @@ import { observeIntrinsicMutations } from './intrinsic-mutation';
 describe('tree scalar slot runtime', () => {
   it('exposes a framework-independent subscribable scalar location', () => {
     const runtime = createTreeScalarSlotRuntime(undefined);
-    const location = runtime.createLeaf('A', Object.is) as {
-      (): string;
-      set(value: string): void;
-      update(update: (value: string) => string): void;
-      peek(): string;
-      subscribe(listener: () => void): () => void;
-    };
+    const location = runtime.createLeaf('A', Object.is);
     const values: string[] = [];
     const unsubscribe = location.subscribe(() => values.push(location.peek()));
 
     expect(location.peek()).toBe('A');
-    location.set('B');
-    location.set('B');
-    location.update((value) => `${value}2`);
+    location('B');
+    location('B');
+    location((value) => `${value}2`);
     unsubscribe();
-    location.set('C');
+    location('C');
 
     expect(location()).toBe('C');
     expect(values).toEqual(['B', 'B2']);
@@ -46,7 +39,7 @@ describe('tree scalar slot runtime', () => {
     });
     location.subscribe(() => seen.push(location.peek()));
 
-    expect(() => location.set('B')).not.toThrow();
+    expect(() => location('B')).not.toThrow();
     expect(location.peek()).toBe('B');
     expect(seen).toEqual(['B']);
   });
@@ -55,12 +48,7 @@ describe('tree scalar slot runtime', () => {
     const tree = signalTree(
       { profile: { name: 'Alice', enabled: true } },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      profile: {
-        name: { (): string; set(value: string): void };
-        enabled: { (): boolean; set(value: boolean): void };
-      };
-    }>;
+    );
 
     const runtime = getTreeScalarSlotRuntime(tree.$);
     if (!runtime) {
@@ -73,8 +61,8 @@ describe('tree scalar slot runtime', () => {
     }
 
     const before = runtime.resolveScalarSlot(positionId);
-    tree.$.profile.name.set('Alicia');
-    tree.$.profile.name.set('Ally');
+    tree.$.profile.name('Alicia');
+    tree.$.profile.name('Ally');
     const after = runtime.resolveScalarSlot(positionId);
 
     expect(before).toBeDefined();
@@ -85,14 +73,7 @@ describe('tree scalar slot runtime', () => {
     const tree = signalTree(
       { profile: { name: 'Alice' }, settings: { enabled: true } },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      profile: {
-        name: { (): string; set(value: string): void };
-      };
-      settings: {
-        enabled: { (): boolean; set(value: boolean): void };
-      };
-    }>;
+    );
 
     const runtime = getTreeScalarSlotRuntime(tree.$);
     if (!runtime) {
@@ -114,13 +95,7 @@ describe('tree scalar slot runtime', () => {
     const tree = signalTree(
       { profile: { name: 'Alice', enabled: true } },
       { capabilities: ['causal-runtime'] }
-    ) as ISignalTree<{
-      profile: {
-        (): { name: string; enabled: boolean };
-        name: { (): string; set(value: string): void };
-        enabled: { (): boolean; set(value: boolean): void };
-      };
-    }>;
+    );
 
     const runtime = getTreeScalarSlotRuntime(tree.$);
     if (!runtime) {

@@ -11,7 +11,7 @@ describe('@signal-tree/vue observation', () => {
     expect(isRef(tree.$.profile.name)).toBe(false);
     expect(name.value).toBe('Ada');
 
-    tree.$.profile.name.set('Grace');
+    tree.$.profile.name('Grace');
 
     expect(name.value).toBe('Grace');
   });
@@ -25,11 +25,11 @@ describe('@signal-tree/vue observation', () => {
     });
 
     expect(selected.value).toBe(1);
-    tree.$.unrelated.set(2);
+    tree.$.unrelated(2);
     expect(selected.value).toBe(1);
     expect(runs).toBe(1);
 
-    tree.$.selected.set(2);
+    tree.$.selected(2);
     expect(selected.value).toBe(2);
     expect(runs).toBe(2);
   });
@@ -42,7 +42,7 @@ describe('@signal-tree/vue observation', () => {
     const doubled = computed(() => tree.$.doubled());
 
     expect(doubled.value).toBe(4);
-    tree.$.count.set(3);
+    tree.$.count(3);
     expect(doubled.value).toBe(6);
   });
 
@@ -54,11 +54,11 @@ describe('@signal-tree/vue observation', () => {
     const stop = watchEffect(() => {
       tree.$.source();
       runs += 1;
-      tree.$.target.set(runs);
+      tree.$.target(runs);
     });
     await nextTick();
 
-    tree.$.target.set(10);
+    tree.$.target(10);
     await nextTick();
 
     expect(runs).toBe(1);

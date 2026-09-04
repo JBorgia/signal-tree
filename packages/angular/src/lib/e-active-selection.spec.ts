@@ -76,7 +76,7 @@ describe('E — is `activeEntity` granularity reachable by ordinary composition?
     expect(runs).toBe(base); // IDENTICAL granularity
 
     // And selection is ordinary canonical state, so it composes normally.
-    tree.$.selectedId.set('b');
+    tree.$.selectedId('b');
     expect(watch()).toBe(99);
   });
 });
