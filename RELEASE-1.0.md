@@ -8,15 +8,39 @@ bound autonomous agent work, checkpoint decisions, and prevent context drift.
 
 ## Current Phase
 
-Current phase: `Phase 7 — PRE-GA CLOSURE / HUMAN GA DECISION HELD`
+Current phase: `Phase 7 — PRE-GA CLOSURE / FINAL RC VERIFICATION OWED`
 
-`GATE F` is **SATISFIED** at `109595e6`. Exact committed HEAD passed all 69
+`UNIVERSAL-LOCATIONS-0` is **CLOSED IN SOURCE** at `5efeb7f5`. The canonical
+reactive value is now a kernel-owned `Location` / `ReadonlyLocation`; Angular,
+React, and Vue observe that truth through construction-bound adapters. Dot-path
+DX, whole-value root/branch grammar, EntityMap identity, causal turns, grouped
+publication, restoration, and explicit owner teardown remain intact. Obsolete
+carrier specialization, framework-owned scalar realization, duplicate derived
+runtime, tracking suppression, and tree-location wrappers are deleted.
+
+This breaking architecture correction supersedes the former clean-clone
+technical-readiness checkpoint. Current ordinary evidence is green: strict
+source and public typecheck; kernel `259` files / `2,169` passing tests; Angular
+`92`; React `6`; Vue `4`; demo `145`; React reference `16`; spec-type ratchet at
+`233` known diagnostics with none worse; lint `19/19` with zero errors; forced-GC
+retention; `55/55` fast gates; all five slow non-release runtime gates; packed
+consumer typecheck under `bundler` and `node16`; facade runtime identity;
+architecture assets; production demo build; and bundle budgets at `9.77/9.8 KB`
+bare and `21.65/21.7 KB` EntityMap production gzip. Independent final review
+found no blocker.
+
+The full release-only matrix, exact candidate, registry write, tag, and publish
+remain intentionally unrun. They belong to the next explicitly authorized final
+RC boundary; GA remains held until that evidence and the human disposition.
+
+`GATE F` was **SATISFIED** at `109595e6` for the superseded representation. Exact committed HEAD passed all 69
 ordinary and release-only gates with zero known-red. The independent Gate F
 review found no critical, major, or minor blocker. `15.0.0-rc.1` remains the
 first published candidate; RC6 is published but superseded by the strict
 framework declaration failure recorded below.
 
-Phase 7 technical readiness is **CLOSED** against clean-clone commit `8d0108bc`:
+The prior Phase 7 technical-readiness checkpoint was **CLOSED** against
+clean-clone commit `8d0108bc`:
 
 ```text
 frozen-lockfile install       GREEN
@@ -12817,6 +12841,18 @@ Exit condition: `GATE F` — **SATISFIED at `109595e6`**
       browser, and development policy probes; release gates `74/74`; release-
       inclusive mutation proofs `74/74` with zero unproven, blind, or errored
       gates; final independent review clean.
+    - [x] **Kernel-owned universal locations and first-party Vue facade
+      (`5efeb7f5`).** Canonical values, dependency propagation, equality,
+      subscriptions, derived memoization, and grouped publication moved behind
+      the framework-neutral location runtime. Angular, React, and Vue retain one
+      facade import each and observe the same nominal locations without creating
+      another state authority. Transaction and EntityMap publication are
+      coherent; failed derived reads retry; owner invalidation waits through
+      reopened commit scopes; `updateAndReport` preserves its shallow
+      `Partial<T>` scope; arbitrary dot-path keys remain legal; computed
+      EntityMap slices expose full `ReadonlyLocation`; packed facade identities
+      and both strict module-resolution modes are mutation-proven. Validation is
+      recorded under Current Phase above. Final RC verification remains owed.
 - [ ] publish `1.0.0`
 - [ ] verify npm/docs/install instructions from scratch
 - [ ] post-release operational readiness
