@@ -83,8 +83,8 @@ function makeTree(recorder: Recorder, key: string) {
     }
   ) as unknown as {
     $: {
-      a: { (): string; set(v: string): void };
-      b: { (): string; set(v: string): void };
+      a: { (value: string): void; (update: (current: string) => string): void; (): string };
+      b: { (value: string): void; (update: (current: string) => string): void; (): string };
     };
     transaction: (fn: () => void) => { confirm(): void; rollback(): void };
   };
@@ -96,8 +96,8 @@ describe('persistence() autoSave respects the commit boundary', () => {
     const tree = makeTree(rec, 'pco-open');
 
     const pending = tree.transaction(() => {
-      tree.$.a.set('a1');
-      tree.$.b.set('b1');
+      tree.$.a('a1');
+      tree.$.b('b1');
     });
 
     await settleTimers();
@@ -115,8 +115,8 @@ describe('persistence() autoSave respects the commit boundary', () => {
     const tree = makeTree(rec, 'pco-confirm');
 
     const pending = tree.transaction(() => {
-      tree.$.a.set('a1');
-      tree.$.b.set('b1');
+      tree.$.a('a1');
+      tree.$.b('b1');
     });
     await settleTimers();
     expect(rec.writes).toEqual([]);
@@ -137,7 +137,7 @@ describe('persistence() autoSave respects the commit boundary', () => {
     const tree = makeTree(rec, 'pco-rollback');
 
     const pending = tree.transaction(() => {
-      tree.$.a.set('doomed');
+      tree.$.a('doomed');
     });
     await settleTimers();
 
@@ -158,7 +158,7 @@ describe('persistence() autoSave respects the commit boundary', () => {
 
     expect(() =>
       tree.transaction(() => {
-        tree.$.a.set('doomed');
+        tree.$.a('doomed');
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -182,11 +182,11 @@ describe('persistence() autoSave respects the commit boundary', () => {
     const free = makeTree(recFree, 'pco-free');
 
     const pending = blocked.transaction(() => {
-      blocked.$.a.set('a1');
+      blocked.$.a('a1');
     });
 
     // A perfectly ordinary write on an unrelated tree.
-    free.$.a.set('free1');
+    free.$.a('free1');
 
     await settleTimers();
 
@@ -231,7 +231,7 @@ describe('persistence() autoSave survives a refused rollback', () => {
     }
 
     const pending = tree.transaction(() => {
-      tree.$.a.set('a1');
+      tree.$.a('a1');
     });
 
     try {
@@ -246,7 +246,7 @@ describe('persistence() autoSave survives a refused rollback', () => {
 
     // An ordinary, entirely unrelated write on a settled tree must still
     // reach storage. If the scope leaked, autoSave never fires again.
-    tree.$.b.set('after-refusal');
+    tree.$.b('after-refusal');
     await settleTimers();
 
     expect(rec.writes.length).toBeGreaterThan(0);
@@ -290,10 +290,10 @@ describe('persistence() autoSave survives a REFUSED ROLLBACK PLAN', () => {
       }
     ) as unknown as {
       $: {
-        note: { (): string; set(v: string): void };
+        note: { (value: string): void; (update: (current: string) => string): void; (): string };
         rows: {
           addOne(r: { id: string; name: string }): void;
-          byIdOrFail(id: string): { name: { set(v: string): void } };
+          byIdOrFail(id: string): { name(value: string): void };
         };
       };
       transaction: (fn: () => void) => { confirm(): void; rollback(): void };
@@ -307,7 +307,7 @@ describe('persistence() autoSave survives a REFUSED ROLLBACK PLAN', () => {
     // The two microtask turns are required for the dependent write to be
     // captured before the plan is built — same idiom as the shipped
     // "application refetch fallback" case in transactions.spec.ts.
-    tree.$.rows.byIdOrFail('r1').name.set('Alicia');
+    tree.$.rows.byIdOrFail('r1').name('Alicia');
     await Promise.resolve();
     await Promise.resolve();
 
@@ -322,7 +322,7 @@ describe('persistence() autoSave survives a REFUSED ROLLBACK PLAN', () => {
     // scope staying open forever afterwards.
     expect(refused).toBe(true);
 
-    tree.$.note.set('after-refusal');
+    tree.$.note('after-refusal');
     await settleTimers();
 
     expect(rec.writes.length).toBeGreaterThan(0);

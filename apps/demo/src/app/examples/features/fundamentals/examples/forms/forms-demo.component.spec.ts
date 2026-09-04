@@ -37,42 +37,42 @@ describe('FormsDemoComponent', () => {
 
   describe('Username Validation', () => {
     it('should validate minimum length', () => {
-      component.username.set('ab');
+      component.username('ab');
       fixture.detectChanges();
 
       expect(component.usernameValid()).toBe(false);
     });
 
     it('should validate valid username', () => {
-      component.username.set('validuser');
+      component.username('validuser');
       fixture.detectChanges();
 
       expect(component.usernameValid()).toBe(true);
     });
 
     it('should handle empty username', () => {
-      component.username.set('');
+      component.username('');
       fixture.detectChanges();
 
       expect(component.usernameValid()).toBe(false);
     });
 
     it('should validate username with allowed characters', () => {
-      component.username.set('user_name123');
+      component.username('user_name123');
       fixture.detectChanges();
 
       expect(component.usernameValid()).toBe(true);
     });
 
     it('should reject username with special characters', () => {
-      component.username.set('user@name');
+      component.username('user@name');
       fixture.detectChanges();
 
       expect(component.usernameValid()).toBe(false);
     });
 
     it('should reject username that is too long', () => {
-      component.username.set('a'.repeat(21));
+      component.username('a'.repeat(21));
       fixture.detectChanges();
 
       expect(component.usernameValid()).toBe(false);
@@ -81,21 +81,21 @@ describe('FormsDemoComponent', () => {
 
   describe('Email Validation', () => {
     it('should validate valid email format', () => {
-      component.email.set('test@example.com');
+      component.email('test@example.com');
       fixture.detectChanges();
 
       expect(component.emailValid()).toBe(true);
     });
 
     it('should reject invalid email format', () => {
-      component.email.set('invalid-email');
+      component.email('invalid-email');
       fixture.detectChanges();
 
       expect(component.emailValid()).toBe(false);
     });
 
     it('should handle empty email', () => {
-      component.email.set('');
+      component.email('');
       fixture.detectChanges();
 
       expect(component.emailValid()).toBe(false);
@@ -110,7 +110,7 @@ describe('FormsDemoComponent', () => {
       ];
 
       validEmails.forEach((email) => {
-        component.email.set(email);
+        component.email(email);
         fixture.detectChanges();
         expect(component.emailValid()).toBe(true);
       });
@@ -126,7 +126,7 @@ describe('FormsDemoComponent', () => {
       ];
 
       invalidEmails.forEach((email) => {
-        component.email.set(email);
+        component.email(email);
         fixture.detectChanges();
         expect(component.emailValid()).toBe(false);
       });
@@ -135,7 +135,7 @@ describe('FormsDemoComponent', () => {
 
   describe('Password Validation', () => {
     it('should reject short password', () => {
-      component.password.set('Short');
+      component.password('Short');
       fixture.detectChanges();
 
       expect(component.passwordStrength()).toBeLessThan(3);
@@ -143,14 +143,14 @@ describe('FormsDemoComponent', () => {
     });
 
     it('should require mixed case', () => {
-      component.password.set('lowercase123');
+      component.password('lowercase123');
       fixture.detectChanges();
 
       expect(component.passwordStrength()).toBeLessThan(3);
     });
 
     it('should validate strong password', () => {
-      component.password.set('StrongPass123!');
+      component.password('StrongPass123!');
       fixture.detectChanges();
 
       expect(component.passwordValid()).toBe(true);
@@ -158,7 +158,7 @@ describe('FormsDemoComponent', () => {
     });
 
     it('should handle empty password', () => {
-      component.password.set('');
+      component.password('');
       fixture.detectChanges();
 
       expect(component.passwordValid()).toBe(false);
@@ -168,14 +168,14 @@ describe('FormsDemoComponent', () => {
 
   describe('Password Strength Indicator', () => {
     it('should calculate strength score 0 for empty password', () => {
-      component.password.set('');
+      component.password('');
       fixture.detectChanges();
 
       expect(component.passwordStrength()).toBe(0);
     });
 
     it('should calculate maximum strength score', () => {
-      component.password.set('StrongPass123!');
+      component.password('StrongPass123!');
       fixture.detectChanges();
 
       expect(component.passwordStrength()).toBe(4);
@@ -191,14 +191,14 @@ describe('FormsDemoComponent', () => {
       ];
 
       testCases.forEach(({ password, expected }) => {
-        component.password.set(password);
+        component.password(password);
         fixture.detectChanges();
         expect(component.getPasswordStrengthText()).toBe(expected);
       });
     });
 
     it('should provide correct strength color', () => {
-      component.password.set('StrongPass123!');
+      component.password('StrongPass123!');
       fixture.detectChanges();
 
       expect(component.getPasswordStrengthColor()).toBe('#10b981');
@@ -207,24 +207,24 @@ describe('FormsDemoComponent', () => {
 
   describe('Password Match Validation', () => {
     it('should validate matching passwords', () => {
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('StrongPass123!');
+      component.password('StrongPass123!');
+      component.confirmPassword('StrongPass123!');
       fixture.detectChanges();
 
       expect(component.passwordsMatch()).toBe(true);
     });
 
     it('should reject non-matching passwords', () => {
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('DifferentPass123!');
+      component.password('StrongPass123!');
+      component.confirmPassword('DifferentPass123!');
       fixture.detectChanges();
 
       expect(component.passwordsMatch()).toBe(false);
     });
 
     it('should reject empty confirm password', () => {
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('');
+      component.password('StrongPass123!');
+      component.confirmPassword('');
       fixture.detectChanges();
 
       expect(component.passwordsMatch()).toBe(false);
@@ -237,44 +237,44 @@ describe('FormsDemoComponent', () => {
     });
 
     it('should be valid with all fields correctly filled', () => {
-      component.username.set('testuser');
-      component.email.set('test@example.com');
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('StrongPass123!');
-      component.agreeToTerms.set(true);
+      component.username('testuser');
+      component.email('test@example.com');
+      component.password('StrongPass123!');
+      component.confirmPassword('StrongPass123!');
+      component.agreeToTerms(true);
       fixture.detectChanges();
 
       expect(component.formValid()).toBe(true);
     });
 
     it('should be invalid if any field is invalid', () => {
-      component.username.set('testuser');
-      component.email.set('invalid-email');
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('StrongPass123!');
-      component.agreeToTerms.set(true);
+      component.username('testuser');
+      component.email('invalid-email');
+      component.password('StrongPass123!');
+      component.confirmPassword('StrongPass123!');
+      component.agreeToTerms(true);
       fixture.detectChanges();
 
       expect(component.formValid()).toBe(false);
     });
 
     it('should be invalid if passwords do not match', () => {
-      component.username.set('testuser');
-      component.email.set('test@example.com');
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('DifferentPass123!');
-      component.agreeToTerms.set(true);
+      component.username('testuser');
+      component.email('test@example.com');
+      component.password('StrongPass123!');
+      component.confirmPassword('DifferentPass123!');
+      component.agreeToTerms(true);
       fixture.detectChanges();
 
       expect(component.formValid()).toBe(false);
     });
 
     it('should be invalid if terms not agreed', () => {
-      component.username.set('testuser');
-      component.email.set('test@example.com');
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('StrongPass123!');
-      component.agreeToTerms.set(false);
+      component.username('testuser');
+      component.email('test@example.com');
+      component.password('StrongPass123!');
+      component.confirmPassword('StrongPass123!');
+      component.agreeToTerms(false);
       fixture.detectChanges();
 
       expect(component.formValid()).toBe(false);
@@ -283,11 +283,11 @@ describe('FormsDemoComponent', () => {
 
   describe('Form Submission', () => {
     it('should submit valid form', () => {
-      component.username.set('testuser');
-      component.email.set('test@example.com');
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('StrongPass123!');
-      component.agreeToTerms.set(true);
+      component.username('testuser');
+      component.email('test@example.com');
+      component.password('StrongPass123!');
+      component.confirmPassword('StrongPass123!');
+      component.agreeToTerms(true);
       fixture.detectChanges();
 
       component.submitForm();
@@ -298,11 +298,11 @@ describe('FormsDemoComponent', () => {
     });
 
     it('should not submit invalid form', () => {
-      component.username.set('ab'); // Too short
-      component.email.set('test@example.com');
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('StrongPass123!');
-      component.agreeToTerms.set(true);
+      component.username('ab'); // Too short
+      component.email('test@example.com');
+      component.password('StrongPass123!');
+      component.confirmPassword('StrongPass123!');
+      component.agreeToTerms(true);
       fixture.detectChanges();
 
       component.submitForm();
@@ -312,11 +312,11 @@ describe('FormsDemoComponent', () => {
     });
 
     it('should reset form after submission', () => {
-      component.username.set('testuser');
-      component.email.set('test@example.com');
-      component.password.set('StrongPass123!');
-      component.confirmPassword.set('StrongPass123!');
-      component.agreeToTerms.set(true);
+      component.username('testuser');
+      component.email('test@example.com');
+      component.password('StrongPass123!');
+      component.confirmPassword('StrongPass123!');
+      component.agreeToTerms(true);
       component.submitForm();
       fixture.detectChanges();
 
@@ -332,8 +332,8 @@ describe('FormsDemoComponent', () => {
     });
 
     it('should mark fields as touched on invalid submission', () => {
-      component.username.set('ab');
-      component.email.set('test@example.com');
+      component.username('ab');
+      component.email('test@example.com');
       component.submitForm();
       fixture.detectChanges();
 
@@ -347,11 +347,11 @@ describe('FormsDemoComponent', () => {
   describe('Integration', () => {
     it('should handle complete user flow', () => {
       // User fills form
-      component.username.set('johndoe');
-      component.email.set('john@example.com');
-      component.password.set('SecurePass456!');
-      component.confirmPassword.set('SecurePass456!');
-      component.agreeToTerms.set(true);
+      component.username('johndoe');
+      component.email('john@example.com');
+      component.password('SecurePass456!');
+      component.confirmPassword('SecurePass456!');
+      component.agreeToTerms(true);
       fixture.detectChanges();
 
       // Verify all validations

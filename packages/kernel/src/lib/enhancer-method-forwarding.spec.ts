@@ -110,7 +110,7 @@ describe.each(ENHANCERS)('%s — writes survive the enhancer', (_name, make) => 
 
     // A write through the PRE-enhancer leaf reference must be visible through
     // the enhanced tree.
-    (seenLeaf as { set: (v: number) => void }).set(42);
+    (seenLeaf as (value: number) => void)(42);
     expect(tree.$().count).toBe(42);
   });
 

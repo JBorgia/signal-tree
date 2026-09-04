@@ -326,8 +326,8 @@ const tree = signalTree(
 );
 
 const pending = tree.transaction(() => {
-  tree.$.order.status.set('assigned');
-  tree.$.driver.orderId.set(17);
+  tree.$.order.status('assigned');
+  tree.$.driver.orderId(17);
 });
 
 api.assignOrder(17).subscribe({
@@ -357,7 +357,7 @@ api.assignOrder(17).subscribe({
     pending.confirm();
     // Server truth may differ from what you assumed (a different assignee,
     // say) — land it as external(), same as any other server-accepted value.
-    external(() => tree.$.order.set(serverOrder));
+    external(() => tree.$.order(serverOrder));
   },
   error: (err) => {
     if (isRetryable(err)) return retry();
@@ -372,7 +372,7 @@ what you optimistically set or not. A rejected server write is a domain
 decision (retry, rollback, or surface a conflict for the user), not something
 `transactions()` guesses at.
 
-### Why not just `set()` and `catchError` a manual snapshot?
+### Why not just write and `catchError` a manual snapshot?
 
 You can — §2's `EntityCrudOps.update$` does exactly that, by hand, because it
 predates a cross-cutting need for `transactions()` in that recipe. The
@@ -408,7 +408,7 @@ one intentional commit             (writes the draft into canonical state —
                                      `transactions()` if the commit itself
                                      needs atomic all-or-nothing, undoable()
                                      if it should be one entry in restoration
-                                     history, or a plain set()/upsertOne()
+                                     history, or a plain location()/upsertOne()
                                      if neither)
 ```
 
@@ -481,7 +481,7 @@ until the last:
 ```typescript
 async function loadDriver(id: string) {
   const driver = await api.getDriver(id); // request + fetch: entirely yours
-  external(() => tree.$.driver.set(driver)); // land it, classified correctly
+  external(() => tree.$.driver(driver)); // land it, classified correctly
 }
 ```
 

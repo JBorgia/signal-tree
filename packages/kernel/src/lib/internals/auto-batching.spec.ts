@@ -31,7 +31,7 @@ describe('auto-batching in signalTree callable', () => {
     });
 
     // Primitives use .set() method, not callable
-    tree.$.count.set(1);
+    tree.$.count(1);
 
     expect(tree.$.count()).toBe(1);
   });
@@ -42,7 +42,7 @@ describe('auto-batching in signalTree callable', () => {
     });
 
     // Arrays use .set() method for full replacement
-    tree.$.items.set(['x', 'y', 'z']);
+    tree.$.items(['x', 'y', 'z']);
     expect(tree.$.items()).toEqual(['x', 'y', 'z']);
   });
 

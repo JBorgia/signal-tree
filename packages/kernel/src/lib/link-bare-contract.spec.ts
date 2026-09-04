@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import type { WritableCell } from './internals/cell-runtime';
 
 import { entityMap } from './types';
 import { link, type Link } from './link';
@@ -13,10 +12,9 @@ import { signalTree } from './signal-tree';
  * nothing required them to predict that when the tree was built.
  *
  * Every case retains the writable callable BEFORE the relationship exists,
- * because that is the shape that broke every alternative design: a `set` or
- * `update` reference that escaped to application code keeps whatever write path
- * it captured, and `WritableLeaf` extends Angular's `WritableSignal`,
- * so holding one is ordinary use of a public object.
+ * because that is the shape that broke every alternative design: a location
+ * that escaped to application code keeps whatever write path it captured, so
+ * holding one is ordinary use of a public object.
  *
  * ⚠️ HISTORY. Before the observation substrate, on a plain tree:
  *   - a scalar source THREW "X must be an owned SignalTree location", rejecting
@@ -40,13 +38,12 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
   it('BARE-LINK-SCALAR — a retained setter reaches the endpoint', async () => {
     const tree = signalTree({ x: 0 });
     await flush();
-    const leaf = tree.$.x as unknown as WritableCell<number>;
-    const heldSet = leaf.set.bind(leaf); // escapes BEFORE the link exists
+    const heldWrite = tree.$.x; // escapes BEFORE the link exists
 
     const got: number[] = [];
     const l = track(link(tree.$.x, { set: (v: number) => void got.push(v) }));
 
-    heldSet(1);
+    heldWrite(1);
     await flush();
     await l.settled();
     expect(got).toEqual([1]);
@@ -55,13 +52,12 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
   it('BARE-LINK-SCALAR — a retained updater reaches the endpoint', async () => {
     const tree = signalTree({ x: 0 });
     await flush();
-    const leaf = tree.$.x as unknown as WritableCell<number>;
-    const heldUpdate = leaf.update.bind(leaf);
+    const heldWrite = tree.$.x;
 
     const got: number[] = [];
     const l = track(link(tree.$.x, { set: (v: number) => void got.push(v) }));
 
-    heldUpdate((v) => v + 5);
+    heldWrite((value) => value + 5);
     await flush();
     await l.settled();
     expect(got).toEqual([5]);
@@ -72,10 +68,8 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
     // open, and mixing it here would make this contract test unreadable.
     const tree = signalTree({ settings: { theme: 'light', units: 'metric' } });
     await flush();
-    const theme = tree.$.settings.theme as unknown as WritableCell<string>;
-    const units = tree.$.settings.units as unknown as WritableCell<string>;
-    const heldTheme = theme.set.bind(theme);
-    const heldUnits = units.update.bind(units);
+    const heldTheme = tree.$.settings.theme;
+    const heldUnits = tree.$.settings.units;
 
     const got: unknown[] = [];
     const l = track(link(tree.$.settings, { set: (v: unknown) => void got.push(v) }));
@@ -95,12 +89,12 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
     const got: unknown[] = [];
     const l = track(link(tree.$.linked, { set: (v: unknown) => void got.push(v) }));
 
-    tree.$.unrelated.b.set(99);
+    tree.$.unrelated.b(99);
     await flush();
     await l.settled();
     expect(got).toEqual([]);
 
-    tree.$.linked.a.set(7);
+    tree.$.linked.a(7);
     await flush();
     await l.settled();
     expect(got).toEqual([{ a: 7 }]);
@@ -130,8 +124,8 @@ describe('link() on a tree built with no enhancers and no capabilities', () => {
     // it must be invisible.
     const tree = signalTree({ x: 0, s: { n: 1 } });
     await flush();
-    tree.$.x.set(5);
-    tree.$.s.n.update((v) => v + 1);
+    tree.$.x(5);
+    tree.$.s.n((v) => v + 1);
     expect(tree.$.x()).toBe(5);
     expect(tree.$.s.n()).toBe(2);
     expect(tree.$()).toEqual({ x: 5, s: { n: 2 } });

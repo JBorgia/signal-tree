@@ -105,13 +105,13 @@ describe('tree physical substrate', () => {
     expect(reads).toBe(1);
 
     const beforeRevision = runtime.revision();
-    tree.$.a.set('A');
+    tree.$.a('A');
 
     expect(runtime.revision()).toBe(beforeRevision);
     expect(observed()).toBe('A');
     expect(reads).toBe(1);
 
-    tree.$.a.set('A2');
+    tree.$.a('A2');
     expect(runtime.revision()).toBe(beforeRevision + 1);
     expect(observed()).toBe('A2');
     expect(reads).toBe(2);

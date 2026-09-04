@@ -14,7 +14,10 @@ import { signalTree, batching, restoration, undoable } from './index';
  */
 const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 type Tree = {
-  $: { a: { (): number; set(v: number): void }; b: { (): number; set(v: number): void } };
+  $: {
+    a: { (value: number): void; (update: (current: number) => number): void; (): number };
+    b: { (value: number): void; (update: (current: number) => number): void; (): number };
+  };
   batch(fn: () => void): void;
   canUndo(): boolean;
   undo(): void;
@@ -28,10 +31,10 @@ const make = () =>
 describe('batching does not own causal truth', () => {
   it('final authoritative value agrees, batched vs unbatched', async () => {
     const plain = make();
-    plain.$.a.set(1); plain.$.b.set(2); await tick();
+    plain.$.a(1); plain.$.b(2); await tick();
 
     const batched = make();
-    batched.batch(() => { batched.$.a.set(1); batched.$.b.set(2); });
+    batched.batch(() => { batched.$.a(1); batched.$.b(2); });
     await tick();
 
     expect([batched.$.a(), batched.$.b()]).toEqual([plain.$.a(), plain.$.b()]);
@@ -42,7 +45,7 @@ describe('batching does not own causal truth', () => {
     await tick();
     // undesignated work inside a batch stays undesignated: batching must not
     // manufacture the authored-activity fact the kernel alone owns.
-    t.batch(() => { t.$.a.set(1); t.$.b.set(2); });
+    t.batch(() => { t.$.a(1); t.$.b(2); });
     await tick();
     expect(t.canUndo()).toBe(false);
   });
@@ -50,7 +53,7 @@ describe('batching does not own causal truth', () => {
   it('batching cannot strip restoration eligibility', async () => {
     const t = make();
     await tick();
-    undoable(() => { t.batch(() => { t.$.a.set(5); }); });
+    undoable(() => { t.batch(() => { t.$.a(5); }); });
     await tick();
     expect(t.canUndo()).toBe(true);
     t.undo(); await tick();

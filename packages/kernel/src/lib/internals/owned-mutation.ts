@@ -1,4 +1,4 @@
-import type { WritableCell } from './cell-runtime';
+import type { Location } from './cell-runtime';
 
 import type { MutationCaptureRuntime } from './mutation-capture-runtime';
 import { hasPathObservers, pathObservation } from './path-observation-port';
@@ -220,24 +220,8 @@ export function emitOwnedMutation(
   );
 }
 
-export function runOwnedMutation<TValue>(
-  read: () => TValue,
-  apply: () => void,
-  options: OwnedMutationOptions,
-  mutationIntent: OwnedMutationIntent
-): { before: TValue; after: TValue; changed: boolean } {
-  const before = read();
-  apply();
-  const after = read();
-  const changed = !Object.is(before, after);
-  if (changed) {
-    emitOwnedMutation(options, before, after, mutationIntent);
-  }
-  return { before, after, changed };
-}
-
 export function wrapOwnedWritableSignal<TValue>(
-  leaf: WritableCell<TValue>,
+  leaf: Location<TValue>,
   options: OwnedMutationOptions,
   hooks: OwnedWriteHooks<TValue> = {}
 ): void {
@@ -282,32 +266,7 @@ export function wrapOwnedWritableSignal<TValue>(
       }
     }
   );
-  if (releaseIntrinsicObserver) {
-    return;
+  if (!releaseIntrinsicObserver) {
+    throw new Error('SignalTree location has no intrinsic mutation source');
   }
-
-  const originalSet = leaf.set.bind(leaf);
-  const originalUpdate = leaf.update.bind(leaf);
-
-  leaf.set = (value: TValue) => {
-    const { before, after, changed } = runOwnedMutation(
-      leaf,
-      () => originalSet(value),
-      options,
-      'replace'
-    );
-
-    hooks.afterSet?.(value, before, after, changed);
-  };
-
-  leaf.update = (updater: (value: TValue) => TValue) => {
-    const { before, after, changed } = runOwnedMutation(
-      leaf,
-      () => originalUpdate(updater),
-      options,
-      'derive'
-    );
-
-    hooks.afterUpdate?.(before, after, changed);
-  };
 }

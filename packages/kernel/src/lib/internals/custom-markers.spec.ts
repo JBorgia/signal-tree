@@ -61,10 +61,10 @@ function createCounterSignal(marker: CounterMarker): CounterSignal {
   const valueSignal = signal(marker.initial);
 
   const counterSignal = (() => valueSignal()) as CounterSignal;
-  counterSignal.increment = () => valueSignal.update((v) => v + marker.step);
-  counterSignal.decrement = () => valueSignal.update((v) => v - marker.step);
-  counterSignal.reset = () => valueSignal.set(marker.initial);
-  counterSignal.set = (value: number) => valueSignal.set(value);
+  counterSignal.increment = () => valueSignal((v) => v + marker.step);
+  counterSignal.decrement = () => valueSignal((v) => v - marker.step);
+  counterSignal.reset = () => valueSignal(marker.initial);
+  counterSignal.set = (value: number) => valueSignal(value);
 
   return counterSignal;
 }
@@ -110,7 +110,7 @@ function createSelectionSignal<T>(): SelectionSignal<T> {
   selectionSignal.hasSelection = () => selectedSignal().size > 0;
 
   selectionSignal.toggle = (item: T) => {
-    selectedSignal.update((set) => {
+    selectedSignal((set) => {
       const next = new Set(set);
       if (next.has(item)) {
         next.delete(item);
@@ -121,7 +121,7 @@ function createSelectionSignal<T>(): SelectionSignal<T> {
     });
   };
 
-  selectionSignal.clear = () => selectedSignal.set(new Set());
+  selectionSignal.clear = () => selectedSignal(new Set());
 
   return selectionSignal;
 }
@@ -369,7 +369,7 @@ describe('Custom Marker Registration', () => {
 
       // Regular state works
       expect(tree.$.regularValue()).toBe('hello');
-      tree.$.regularValue.set('world');
+      tree.$.regularValue('world');
       expect(tree.$.regularValue()).toBe('world');
 
       // Top-level counter works
@@ -495,7 +495,7 @@ describe('Standalone Signal Factories (Alternative Pattern)', () => {
     expect(selection()).toEqual(new Set([1, 2]));
 
     // Use tree state
-    tree.$.userName.set('Alice');
+    tree.$.userName('Alice');
     expect(tree.$.userName()).toBe('Alice');
 
     // Combine: filter tasks by selection

@@ -32,12 +32,12 @@ class SignalTreeTestComponent {
 
   addTodo(todo: Todo) {
     const currentTodos = this.tree.$.todos();
-    this.tree.$.todos.set([...currentTodos, todo]);
+    this.tree.$.todos([...currentTodos, todo]);
   }
 
   toggleTodo(id: number) {
     const currentTodos = this.tree.$.todos();
-    this.tree.$.todos.set(
+    this.tree.$.todos(
       currentTodos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
@@ -46,7 +46,7 @@ class SignalTreeTestComponent {
 
   updateTodo(id: number, changes: Partial<Todo>) {
     const currentTodos = this.tree.$.todos();
-    this.tree.$.todos.set(
+    this.tree.$.todos(
       currentTodos.map((todo) =>
         todo.id === id ? { ...todo, ...changes } : todo
       )
@@ -55,11 +55,11 @@ class SignalTreeTestComponent {
 
   deleteTodo(id: number) {
     const currentTodos = this.tree.$.todos();
-    this.tree.$.todos.set(currentTodos.filter((todo) => todo.id !== id));
+    this.tree.$.todos(currentTodos.filter((todo) => todo.id !== id));
   }
 
   setFilter(filter: TodoState['filter']) {
-    this.tree.$.filter.set(filter);
+    this.tree.$.filter(filter);
   }
 
   getTodoCount() {

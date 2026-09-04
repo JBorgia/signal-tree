@@ -14,17 +14,16 @@ import type { EntityMapMarker } from '@signal-tree/angular';
 /**
  * Effect Reactivity Test Component
  *
- * This component verifies that SignalTree signals properly trigger Angular's effect() re-runs.
+ * This component verifies that SignalTree locations trigger Angular effects.
  * It replicates the pattern used in the v3 trax-mobile app.
  *
  * VERIFIED BEHAVIOR (when installed via npm):
  * - Regular Angular signals: Effects RE-RUN ✅
- * - SignalTree signals: Effects RE-RUN ✅
+ * - SignalTree locations through the Angular adapter: Effects RE-RUN ✅
  *
  * NOTE: When using pnpm link for local development, you may encounter a "dual Angular
- * instance" issue where SignalTree's signals are created with a different @angular/core
- * than the consuming app. This causes Angular's isSignal() to return false for SignalTree
- * signals, breaking effect() reactivity. The solution is to:
+ * instance" issue where the adapter's observation tokens use a different
+ * @angular/core than the consuming app, breaking effect() reactivity. The solution is to:
  *   1. Install from npm (recommended)
  *   2. Match Angular versions between workspaces
  *   3. Use pnpm overrides to force resolution
@@ -181,7 +180,7 @@ export class EffectReactivityTestComponent {
     console.log(
       `\n>>> UPDATING SignalTree $.loading.state: ${current} -> ${next}`
     );
-    this.store.$.loading.state.set(next);
+    this.store.$.loading.state(next);
     console.log(
       `>>> After set, $.loading.state() = ${this.store.$.loading.state()}`
     );
@@ -230,7 +229,7 @@ export class EffectReactivityTestComponent {
 
     // Step 1: Set loading state
     console.log('Step 1: Setting loading state to "loading"');
-    this.store.$.loading.state.set('loading');
+    this.store.$.loading.state('loading');
 
     // Step 2: Wait for "API response"
     await new Promise((resolve) => setTimeout(resolve, 500));
@@ -245,7 +244,7 @@ export class EffectReactivityTestComponent {
 
     // Step 4: Set loaded state
     console.log('Step 3: Setting loading state to "loaded"');
-    this.store.$.loading.state.set('loaded');
+    this.store.$.loading.state('loaded');
 
     console.log('>>> DATA LOAD COMPLETE');
     console.log(

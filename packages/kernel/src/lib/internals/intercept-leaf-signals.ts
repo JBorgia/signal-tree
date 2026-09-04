@@ -8,16 +8,18 @@ import {
   hasIntrinsicMutationEmitter,
 } from './owned-metadata';
 import { getActiveWriteContext } from '../write-context';
+import { isWritableLocation } from './location-runtime';
+import { observeIntrinsicMutations } from './intrinsic-mutation';
 
 import { visitTree } from './visit-tree';
 
 /**
- * Recursively walk a NodeAccessor tree and wrap every plain writable leaf
- * signal's `.set()` / `.update()` so callers can observe direct leaf writes.
+ * Recursively walk a location tree and observe every writable location's
+ * intrinsic mutation channel so callers can observe direct writes.
  *
- * Background: SignalTree's recursive update pipeline writes to leaf signals
+ * Background: SignalTree's recursive update pipeline writes to locations
  * directly without invoking PathNotifier. Entity collections notify through
- * their own internals, but a direct call like `tree.$.user.profile.name.set(x)`
+ * their own internals, but a direct call like `tree.$.user.profile.name(x)`
  * never produces a PathNotifier event by itself. Enhancers that need to
  * observe every mutation (DevTools, restoration, etc.) must intercept those
  * leaf writes themselves — this helper centralizes that traversal.
@@ -32,8 +34,7 @@ import { visitTree } from './visit-tree';
  *   - Built-ins (Date, Map, Set) and arrays — they aren't NodeAccessors.
  *   - Already-visited nodes (cycle protection via WeakSet).
  *
- * The returned cleanup function restores all wrapped signals to their
- * original methods.
+ * The returned cleanup function removes every installed observer.
  *
  * @public — Enhancer-author API. Used by `@signal-tree/kernel`'s built-in
  *   devtools / restoration enhancers. Application code should not use this
@@ -135,6 +136,26 @@ export function interceptLeafSignals(
     };
   };
 
+  const observeLocation = (
+    node: object,
+    path: string,
+    ownerPathOverride?: string
+  ): void => {
+    const release = observeIntrinsicMutations(node, (mutation) => {
+      if (!mutation.changed) return;
+      onWrite(
+        path,
+        mutation.after,
+        mutation.before,
+        withMutationIntent(getActiveWriteContext(), mutation.intent),
+        ownerPathOverride ?? getOwnerPath(node, path),
+        getSubjectIds(node),
+        getPositionIds(node)
+      );
+    });
+    if (release) restorers.push(release);
+  };
+
   const wrapOwnedFieldAccessors = (
     node: unknown,
     basePath: string,
@@ -223,6 +244,13 @@ export function interceptLeafSignals(
       (node, path) => {
         // The root is always a branch here (tree.$); never treat it as a leaf.
         if (path === '') return true;
+
+        if (isWritableLocation(node)) {
+          if (!hasIntrinsicMutationEmitter(node)) {
+            observeLocation(node as object, path);
+          }
+          return false;
+        }
 
         const isWritableSignal =
           typeof node === 'function' &&

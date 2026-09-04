@@ -140,7 +140,7 @@ describe('HIST-C2 step 6: Angular Signal Forms over an ordinary branch', () => {
     undoable(() => {
       f.name().value.set('grace');
     });
-    tree.$.ui.panel.set('inspector');
+    tree.$.ui.panel('inspector');
     await flush();
 
     expect(turns(tree)).toBe(1);
@@ -164,7 +164,7 @@ describe('HIST-C2 step 6: Angular Signal Forms over an ordinary branch', () => {
     runInInjectionContext(injector, () => form(model));
     await flush();
 
-    tree.$.editForm.name.set('written-directly');
+    tree.$.editForm.name('written-directly');
     await flush();
 
     // Eligibility follows the OPERATION, never the branch. A form-bound branch

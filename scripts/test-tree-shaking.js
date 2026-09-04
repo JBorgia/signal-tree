@@ -48,7 +48,7 @@ const testCases = [
     code: `
       import { signalTree } from '@signal-tree/kernel';
       const tree = signalTree({ count: 0 });
-      tree.$.count.set(5);
+      tree.$.count(5);
       console.log(tree.$.count());
     `,
     expectedFiles: ['signal-tree.js', 'utils.js', 'constants.js'],

@@ -266,6 +266,24 @@
         "internalDecl": false
       },
       {
+        "name": "leaf",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/leaf.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "LeafDefinition",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/leaf.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "link",
         "subpath": ".",
         "kind": "runtime",
@@ -769,6 +787,24 @@
         "internalDecl": false
       },
       {
+        "name": "leaf",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/leaf.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "LeafDefinition",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/leaf.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
         "name": "link",
         "subpath": ".",
         "kind": "runtime",
@@ -1075,6 +1111,15 @@
         "internalDecl": false
       },
       {
+        "name": "replaceLocation",
+        "subpath": "./adapter",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/internals/location-runtime.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": true
+      },
+      {
         "name": "SignalTreeFactory",
         "subpath": "./adapter",
         "kind": "type-only",
@@ -1338,6 +1383,24 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/external.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "leaf",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/leaf.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "LeafDefinition",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/leaf.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false
@@ -1840,6 +1903,24 @@
         "subpath": ".",
         "kind": "runtime",
         "declFile": "packages/kernel/src/lib/external.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "leaf",
+        "subpath": ".",
+        "kind": "runtime",
+        "declFile": "packages/kernel/src/lib/leaf.ts",
+        "angularInDecl": false,
+        "angularInType": false,
+        "internalDecl": false
+      },
+      {
+        "name": "LeafDefinition",
+        "subpath": ".",
+        "kind": "type-only",
+        "declFile": "packages/kernel/src/lib/leaf.ts",
         "angularInDecl": false,
         "angularInType": false,
         "internalDecl": false

@@ -20,12 +20,9 @@ the same primitive the removed `loader()` decomposed into for collections.
 Persistence is just the case where the endpoint is storage instead of HTTP:
 
 ```typescript
-import { link, type Link } from '@signal-tree/kernel';
+import { link, type Link, type Location } from '@signal-tree/kernel';
 
-function attachLocalStorageSync<T>(
-  location: WritableSignal<T>,
-  key: string,
-): Link {
+function attachLocalStorageSync<T>(location: Location<T>, key: string): Link {
   const connection = link(location, {
     get: () => {
       const raw = localStorage.getItem(key);

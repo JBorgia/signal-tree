@@ -50,7 +50,7 @@ describe('LocationRuntime retention', () => {
     await applyPressure();
 
     expect(captured.deref()).toBeUndefined();
-    source.set(1);
+    source(1);
     expect(runs).toBe(1);
   });
 });

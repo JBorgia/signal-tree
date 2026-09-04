@@ -19,9 +19,9 @@ describe('restoration — replay writes carry source: restoration (PR1)', () => 
     const store = signalTree({ count: 0 }, { enhancers: [restoration()] });
 
     // Drive the tree forward so we have history to undo into.
-    undoable(() => (store as any).$.count.set(1));
+    undoable(() => (store as any).$.count(1));
     await Promise.resolve();
-    undoable(() => (store as any).$.count.set(2));
+    undoable(() => (store as any).$.count(2));
     await Promise.resolve();
 
     const captured: Array<{ path: string; meta?: WriteMetadata }> = [];
@@ -72,11 +72,11 @@ describe('restoration — replay writes carry source: restoration (PR1)', () => 
       { enhancers: [restoration()] }
     );
 
-    undoable(() => (store as any).$.count.set(1));
+    undoable(() => (store as any).$.count(1));
     await Promise.resolve();
-    undoable(() => (store as any).$.label.set('b'));
+    undoable(() => (store as any).$.label('b'));
     await Promise.resolve();
-    undoable(() => (store as any).$.count.set(2));
+    undoable(() => (store as any).$.count(2));
     await Promise.resolve();
 
     const captured: Array<{ path: string; meta?: WriteMetadata }> = [];
@@ -134,7 +134,7 @@ describe('restoration — replay writes carry source: restoration (PR1)', () => 
       }
     );
 
-    undoable(() => (store as any).$.count.set(5));
+    undoable(() => (store as any).$.count(5));
     await Promise.resolve();
 
     unsubscribe();

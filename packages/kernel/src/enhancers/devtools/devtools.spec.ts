@@ -219,7 +219,7 @@ describe('devTools enhancer (v6 API)', () => {
     }
   });
 
-  it('sends updates when nested leaf signals change via direct .set()', async () => {
+  it('sends updates when nested locations change via direct replacement', async () => {
     resetPathNotifier();
 
     const originalWindow = (globalThis as any).window;
@@ -248,7 +248,7 @@ describe('devTools enhancer (v6 API)', () => {
 
       send.mockClear();
 
-      tree.$.user.profile.name.set('Grace');
+      tree.$.user.profile.name('Grace');
 
       await Promise.resolve();
       await Promise.resolve();

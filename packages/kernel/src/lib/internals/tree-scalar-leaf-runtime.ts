@@ -23,10 +23,6 @@ import type {
   TreeScalarLeafRuntime,
 } from './tree-scalar-slot-port';
 import type { Location } from './cell-runtime';
-import {
-  getIntrinsicMutationObserver,
-  registerIntrinsicMutationSource,
-} from './intrinsic-mutation';
 
 /**
  * TREE-FACING SCALAR LEAF ORCHESTRATION — kernel-owned.
@@ -127,13 +123,8 @@ function createScalarLeaf<T>(
 
     return kernel.readSlot<T>(slotIndex);
   };
-  const binding = locations.createWritable(read, (value, intent) => {
+  const binding = locations.createWritable(read, (value) => {
     const leaf = holder.leaf as Location<T>;
-    const dormant = isDormantMember(leaf);
-    const observer = dormant
-      ? undefined
-      : getIntrinsicMutationObserver<T>(leaf as object);
-    const before = observer ? read() : undefined;
     const result = kernel.commitSlot(slotIndex, value);
     const reactivated = reactivateOnWrite(leaf);
     const changed = publication.prepareSlot(
@@ -141,23 +132,10 @@ function createScalarLeaf<T>(
       result.changed,
       reactivated
     );
-    if (observer) {
-      try {
-        observer({
-          intent,
-          before: before as T,
-          after: result.changed ? value : (before as T),
-          changed: result.changed,
-        });
-      } catch {
-        // Intrinsic bookkeeping cannot hide truth that the slot already committed.
-      }
-    }
     return changed;
   });
   const leaf = binding.location as Location<T>;
   holder.leaf = leaf;
-  registerIntrinsicMutationSource(leaf as object);
   return { leaf, binding };
 }
 

@@ -106,7 +106,7 @@ describe('a 14.0.0 payload round-trips completely (the control)', () => {
   // (entityMap) remain, so the round-trip property keeps a marker specimen.
   it('every marker survives serialize → deserialize', () => {
     const a = mkTree();
-    a.$.count.set(7);
+    a.$.count(7);
     a.$.rows.addMany([
       { id: 1, n: 'x' },
       { id: 2, n: 'y' },

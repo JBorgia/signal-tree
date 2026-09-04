@@ -222,13 +222,9 @@ describe('change reporting — defects found by adversarial audit', () => {
 });
 
 describe('change reporting — second-round audit findings', () => {
-  // A leaf NEVER invokes a function value. Updaters are a branch/root form;
-  // `tree.$.count.update(fn)` is the leaf form, mirroring Angular's signal API.
-  //
-  // A revision of this suite once asserted the opposite — that a function at a
-  // leaf is resolved as an updater — guarded on "the current value is not a
-  // function". That predicate is unknowable at runtime, and the tests below are
-  // the states it got wrong. All of them are ordinary callback fields.
+  // Structural application already knows these functions are replacement
+  // values, so it uses raw ingress instead of the authored location grammar
+  // where a naked function means updater. All cases below are callback fields.
   it('stores a handler assigned to a callback leaf sitting at null', () => {
     let ran = 0;
     const handler = () => {

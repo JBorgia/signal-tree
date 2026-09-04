@@ -25,7 +25,7 @@ describe('E — is granular write/observation obtainable without a collection pr
     });
     const beforeA = tree.$.rows.a();
 
-    tree.$.rows.b.n.set(42);
+    tree.$.rows.b.n(42);
 
     // `a` is untouched, by identity — not merely by value.
     expect(tree.$.rows.a()).toBe(beforeA);
@@ -44,10 +44,10 @@ describe('E — the 2x2: membership vs granularity', () => {
   it('ARRAY: dynamic membership YES (add and remove both work)', () => {
     const tree = signalTree({ rows: [{ id: 'a', n: 1 }] as Row[] });
 
-    tree.$.rows.set([...tree.$.rows(), { id: 'b', n: 2 }]);
+    tree.$.rows([...tree.$.rows(), { id: 'b', n: 2 }]);
     expect(tree.$.rows().map((r) => r.id)).toEqual(['a', 'b']);
 
-    tree.$.rows.set(tree.$.rows().filter((r) => r.id !== 'a'));
+    tree.$.rows(tree.$.rows().filter((r) => r.id !== 'a'));
     expect(tree.$.rows().map((r) => r.id)).toEqual(['b']);
   });
 });

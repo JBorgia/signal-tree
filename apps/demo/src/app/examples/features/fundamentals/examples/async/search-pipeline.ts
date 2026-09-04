@@ -45,8 +45,8 @@ export function createSearchPipeline<T>(
       distinctUntilChanged(),
       switchMap((q) => {
         external(() => {
-          tree.$.loading.set(true);
-          tree.$.error.set(null);
+          tree.$.loading(true);
+          tree.$.error(null);
         });
         // ⚠️ CAUGHT INSIDE switchMap, PER QUERY, and mapped to an outcome.
         //
@@ -68,12 +68,12 @@ export function createSearchPipeline<T>(
     .subscribe((outcome) =>
       external(() => {
         if (outcome.ok) {
-          tree.$.results.set(outcome.results as never);
-          tree.$.error.set(null);
+          tree.$.results(outcome.results as never);
+          tree.$.error(null);
         } else {
-          tree.$.error.set(outcome.error);
+          tree.$.error(outcome.error);
         }
-        tree.$.loading.set(false);
+        tree.$.loading(false);
       })
     );
 

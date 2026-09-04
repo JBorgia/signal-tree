@@ -1074,7 +1074,7 @@ describe('greenfield transactions', () => {
     expect(store.getPendingTurnIds()).toEqual([]);
 
     harness.write(() => {
-      tree.$.theme.set('dark');
+      tree.$.theme('dark');
     });
     harness.flush();
 
@@ -1130,8 +1130,8 @@ describe('greenfield transactions', () => {
     const harness = createLiveDraftHarness(draft, 1);
 
     harness.write(() => {
-      tree.$.theme.set('B');
-      tree.$.theme.set('C');
+      tree.$.theme('B');
+      tree.$.theme('C');
     });
     harness.flush();
 
@@ -1175,17 +1175,17 @@ describe('greenfield transactions', () => {
     const secondHarness = createLiveDraftHarness(secondDraft, 2);
 
     firstHarness.write(() => {
-      tree.$.a.set('A1');
+      tree.$.a('A1');
     });
     firstHarness.flush();
 
     secondHarness.write(() => {
-      tree.$.b.set('B1');
+      tree.$.b('B1');
     });
     secondHarness.flush();
 
     firstHarness.write(() => {
-      tree.$.c.set('C1');
+      tree.$.c('C1');
     });
     firstHarness.flush();
 
@@ -1249,8 +1249,9 @@ describe('greenfield transactions', () => {
           };
         };
         preference: {
+          (value: string): void;
+          (update: (current: string) => string): void;
           (): string;
-          set(value: string): void;
         };
     };
       destroy(): void;
@@ -1290,9 +1291,9 @@ describe('greenfield transactions', () => {
       tree.$.users.byIdOrFail('u1').name.__subjectIds?.[0];
 
     liveHarness.write(() => {
-      tree.$.profile.firstName.set('Jane');
+      tree.$.profile.firstName('Jane');
       tree.$.users.changeId('u1', 'u2');
-      tree.$.preference.set('spacious');
+      tree.$.preference('spacious');
     });
     liveHarness.flush();
 
@@ -1592,7 +1593,7 @@ describe('greenfield transactions', () => {
       { capabilities: ['causal-runtime'] }
     ) as unknown as {
       $: {
-        count: { set(value: number): void; (): number };
+        count: { (value: number): void; (update: (current: number) => number): void; (): number };
         users: {
           addOne(user: { id: string; name: string }): void;
           removeOne(id: string): void;
@@ -1641,12 +1642,12 @@ describe('greenfield transactions', () => {
 
     let freshSubject: number | undefined;
     liveHarness.write(() => {
-      tree.$.count.set(1);
+      tree.$.count(1);
       tree.$.users.removeOne('u1');
       tree.$.users.addOne({ id: 'u2', name: 'Bran' });
       freshSubject = tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0];
       tree.$.users.changeId('u2', 'u3');
-      tree.$.users.byIdOrFail('u3').name.set('Cora');
+      tree.$.users.byIdOrFail('u3').name('Cora');
     });
     liveHarness.flush();
 
@@ -1740,7 +1741,7 @@ describe('greenfield transactions', () => {
     liveHarness.write(() => {
       tree.$.users.addOne({ id: 'u2', name: 'Bran' });
       freshSubject = tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0];
-      tree.$.users.byIdOrFail('u2').name.set('Cora');
+      tree.$.users.byIdOrFail('u2').name('Cora');
     });
     liveHarness.flush();
 
@@ -1955,7 +1956,7 @@ describe('greenfield transactions', () => {
       tree.$.users.addOne({ id: 'u2', name: 'Bran' });
       freshSubject = tree.$.users.byIdOrFail('u2').name.__subjectIds?.[0];
       tree.$.users.changeId('u2', 'u3');
-      tree.$.users.byIdOrFail('u3').name.set('Cora');
+      tree.$.users.byIdOrFail('u3').name('Cora');
     });
     liveHarness.flush();
 

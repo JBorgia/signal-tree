@@ -76,8 +76,8 @@ type Rows = {
   removeOne(id: string): void;
   changeId(from: string, to: string): void;
   byIdOrFail(id: string): {
-    name: { (): string; set(v: string): void };
-    n: { (): number; set(v: number): void };
+    name: { (value: string): void; (update: (current: string) => string): void; (): string };
+    n: { (value: number): void; (update: (current: number) => number): void; (): number };
   };
   ids(): string[];
   all(): Row[];
@@ -93,7 +93,10 @@ const nestedTree = () =>
     { data: { rows: em() }, other: 0 },
     { enhancers: [restoration(), transactions()] }
   ) as unknown as {
-    $: { data: { rows: Rows }; other: { (): number; set(v: number): void } };
+    $: {
+      data: { rows: Rows };
+      other: { (value: number): void; (update: (current: number) => number): void; (): number };
+    };
     transaction: (fn: () => void) => { rollback(): void; confirm(): void };
     undo?: () => void;
   };
@@ -157,8 +160,8 @@ describe('ADDRESS-REPAIR-1: nested rollback batteries', () => {
     const tree = await seededNested();
 
     const p = tree.transaction(() => {
-      tree.$.data.rows.byIdOrFail('r1').name.set('changed');
-      tree.$.data.rows.byIdOrFail('r1').n.set(99);
+      tree.$.data.rows.byIdOrFail('r1').name('changed');
+      tree.$.data.rows.byIdOrFail('r1').n(99);
     });
     await flush();
     expect(tree.$.data.rows.byIdOrFail('r1').n()).toBe(99);
@@ -174,9 +177,9 @@ describe('ADDRESS-REPAIR-1: nested rollback batteries', () => {
     const tree = await seededNested();
 
     const p = tree.transaction(() => {
-      tree.$.data.rows.byIdOrFail('r1').name.set('changed');
+      tree.$.data.rows.byIdOrFail('r1').name('changed');
       tree.$.data.rows.changeId('r1', 'r9');
-      tree.$.data.rows.byIdOrFail('r9').n.set(99);
+      tree.$.data.rows.byIdOrFail('r9').n(99);
     });
     await flush();
     expect(tree.$.data.rows.ids()).toEqual(['r9']);
@@ -195,8 +198,8 @@ describe('ADDRESS-REPAIR-1: nested rollback batteries', () => {
     const tree = await seededNested();
 
     const p = tree.transaction(() => {
-      tree.$.other.set(42);
-      tree.$.data.rows.byIdOrFail('r1').n.set(99);
+      tree.$.other(42);
+      tree.$.data.rows.byIdOrFail('r1').n(99);
       tree.$.data.rows.addOne({ id: 'r2', name: 'added', n: 2 });
     });
     await flush();
@@ -251,9 +254,9 @@ describe('ADDRESS-REPAIR-1: the owner ping establishes NO subject address', () =
     const p = tree.transaction(() => {
       if (pingFirst) {
         rows.addOne({ id: 'r2', name: 'ping', n: 2 });
-        rows.byIdOrFail('r1').n.set(99);
+        rows.byIdOrFail('r1').n(99);
       } else {
-        rows.byIdOrFail('r1').n.set(99);
+        rows.byIdOrFail('r1').n(99);
         rows.addOne({ id: 'r2', name: 'ping', n: 2 });
       }
     });

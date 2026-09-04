@@ -32,8 +32,8 @@ describe('HIST-0 case 4: mixed writes in ONE untransacted turn', () => {
     const before = tree.getRestorationHistory().length;
 
     // No flush between them — one tick, therefore one turn.
-    undoable(() => tree.$.document.title.set('edited'));
-    undoable(() => tree.$.ui.panel.set('inspector'));
+    undoable(() => tree.$.document.title('edited'));
+    undoable(() => tree.$.ui.panel('inspector'));
     await flush();
 
     const turnsAdded = tree.getRestorationHistory().length - before;
@@ -85,10 +85,10 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     );
     await flush();
 
-    undoable(() => tree.$.document.title.set('A'));
+    undoable(() => tree.$.document.title('A'));
     await flush();
 
-    realization(() => tree.$.document.title.set('SERVER'));
+    realization(() => tree.$.document.title('SERVER'));
     await flush();
 
     expect(() => tree.undo()).toThrow(/ST1034/);
@@ -104,9 +104,9 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     );
     await flush();
 
-    undoable(() => tree.$.document.title.set('A'));
+    undoable(() => tree.$.document.title('A'));
     await flush();
-    realization(() => tree.$.document.body.set('SERVER'));
+    realization(() => tree.$.document.body('SERVER'));
     await flush();
 
     tree.undo();
@@ -147,9 +147,9 @@ describe('HIST-0 case 6: authored write, then realization to the SAME location',
     );
     await flush();
 
-    undoable(() => tree.$.document.title.set('A'));
+    undoable(() => tree.$.document.title('A'));
     await flush();
-    realization(() => tree.$.document.title.set('SERVER'));
+    realization(() => tree.$.document.title('SERVER'));
     await flush();
 
     // The undo is refused, so there is nothing to redo — which resolves the
@@ -220,7 +220,7 @@ describe('HIST-0 case 9: does observability create restoration ownership?', () =
     await flush();
     const before = tree.getRestorationHistory().length;
 
-    realization(() => tree.$.document.title.set('SERVER'));
+    realization(() => tree.$.document.title('SERVER'));
     await flush();
 
     // The two consequences separate cleanly:

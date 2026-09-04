@@ -92,7 +92,7 @@ describe('A2-3 arm B: persister given ONLY the leaf node', () => {
     const p = makePersister(tree.$.theme, 'theme', store);
 
     const pending = tree.transaction(() => {
-      tree.$.theme.set('dark');
+      tree.$.theme('dark');
     });
     await flush();
     const duringPending = store.get('theme');
@@ -128,7 +128,7 @@ describe('A2-3 arm C: persister given the TREE as claimant', () => {
     const p = makePersister(tree, 'theme', store);
 
     const pending = tree.transaction(() => {
-      tree.$.theme.set('dark');
+      tree.$.theme('dark');
     });
     await flush();
     const duringPending = store.get('theme');
@@ -167,7 +167,7 @@ describe('A2-3 arm C: persister given the TREE as claimant', () => {
     const p = makePersister(tree, 'theme', store);
 
     const pending = tree.transaction(() => {
-      tree.$.theme.set('dark');
+      tree.$.theme('dark');
     });
     await flush();
     const duringPending = store.get('theme');
@@ -189,7 +189,7 @@ describe('A2-3 arm C: persister given the TREE as claimant', () => {
     await flush();
 
     const p = makePersister(tree, 'theme', store);
-    tree.$.theme.set('dark');
+    tree.$.theme('dark');
     await flush();
     p.off();
 

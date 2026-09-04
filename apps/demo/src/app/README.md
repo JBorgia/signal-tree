@@ -10,21 +10,30 @@ This directory contains comprehensive examples demonstrating SignalTree usage pa
 
 The one syntax reference. Every write goes through the API that actually works:
 
-- `tree.$.prop.set('value')` — write a leaf
-- `tree.$.prop.update(fn)` — transform a leaf
+- `tree.$.prop('value')` — replace a leaf
+- `tree.$.prop(fn)` — derive a leaf
 - `tree.$.branch({ ... })` — replace a complete branch value
 - `tree.$({ ... })` — replace the complete root value
 - `tree.$(current => ({ ...current, changed }))` — derive the next root value
 
 Nothing to install; nothing to configure.
 
-> **`callable-syntax-examples.ts` was deleted in 14.0.0.** It demonstrated
-> `tree.$.leaf('value')`, which never worked at runtime: a leaf IS an Angular
-> signal, so calling it is a READ that discards the argument. The file had no
-> assertions, so roughly 90% of it had been silently doing nothing. The build
-> transform meant to make it real cannot run in an Angular app at all, and the
-> type overloads that permitted it are gone. The contract is now pinned by
-> tests in core (`callable-contract.spec.ts` and its `.typing` sibling).
+> **v15 callable locations are kernel behavior.** This is not the retired
+> `@signaltree/callable-syntax` build transform. The same runtime object reads,
+> replaces, and derives without framework-specific write methods.
+
+Use `leaf(value)` when a plain object should remain terminal instead of becoming
+a branch, or when a callable is data rather than an updater:
+
+```typescript
+const tree = signalTree({
+  range: leaf({ start: 0, end: 10 }),
+  callback: leaf((value: number) => console.log(value)),
+});
+
+tree.$.range({ start: 5, end: 15 });
+tree.$.callback(leaf((value) => console.info(value)));
+```
 
 ## Example Categories
 
@@ -80,24 +89,18 @@ npx ts-node apps/demo/src/app/sanity-checks/standard-syntax-examples.ts
 
 ## What is callable, and what is not
 
-This is the whole rule: the tree is a controller, `$` is its root state
-location, branches are state locations, and leaves are Angular signals.
+This is the whole rule: the tree is a controller and every state location uses
+the same callable grammar. `leaf(value)` controls topology; framework-native
+signals are explicit adapter views.
 
-| Target     | Is it a signal?                 | Read             | Write                                    |
-| ---------- | ------------------------------- | ---------------- | ---------------------------------------- |
-| **Root**   | no — SignalTree accessor        | `tree.$()`       | `tree.$(value)` / `tree.$(fn)`           |
-| **Branch** | no — SignalTree accessor        | `tree.$.user()`  | `tree.$.user(value)` / `tree.$.user(fn)` |
-| **Leaf**   | **yes** — real `WritableSignal` | `tree.$.count()` | `tree.$.count.set(5)`                    |
+| Target     | Canonical shape        | Read             | Write                                    |
+| ---------- | ---------------------- | ---------------- | ---------------------------------------- |
+| **Root**   | root location          | `tree.$()`       | `tree.$(value)` / `tree.$(fn)`           |
+| **Branch** | branch location        | `tree.$.user()`  | `tree.$.user(value)` / `tree.$.user(fn)` |
+| **Leaf**   | terminal `Location<T>` | `tree.$.count()` | `tree.$.count(5)` / `tree.$.count(fn)`   |
 
-We own a location's call semantics, so calling one can read, replace its complete
-value, or derive its next complete value. We do
-not own a signal's: calling an Angular signal is a read, and it ignores
-arguments. That is why `tree.$.count(5)` cannot work, and why in 14.0.0 it no
-longer type-checks instead of silently doing nothing.
-
-Leaves stay real signals on purpose. Wrapping them to make the sugar work was
-measured — the speed cost was negligible (~4%, inside noise), but a wrapper is
-not a signal: `isSignal()` returns `false` and `Symbol(SIGNAL)` disappears,
-which would break `toObservable`, `model()`/`input()` interop, and every
-third-party tool that guards on `isSignal`. The interop guarantee is worth more
-than the shorter call.
+Calling a location with no argument reads it. Calling it with a complete value
+replaces it. Calling it with an updater derives the next value. A callable value
+is wrapped for that invocation as `location(leaf(callable))`, so argument shape
+never has to guess intent. Angular code that specifically needs a
+`WritableSignal` creates an explicit `toWritableSignal(location)` view.

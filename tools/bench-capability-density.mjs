@@ -87,7 +87,7 @@ const settle = async (label) => {
 
 const ordinaryWrites = (tree, count, writes) => {
   for (let index = 0; index < writes; index++) {
-    if (count === 0) tree.$.counter.set(index + 1);
+    if (count === 0) tree.$.counter(index + 1);
     else tree.$.rows.updateOne(index % count, { value: index + 1 });
   }
 };
@@ -95,7 +95,7 @@ const ordinaryWrites = (tree, count, writes) => {
 const designatedWrites = async (tree, count, writes) => {
   for (let index = 0; index < writes; index++) {
     undoable(() => {
-      if (count === 0) tree.$.counter.set(index + 1);
+      if (count === 0) tree.$.counter(index + 1);
       else tree.$.rows.updateOne(index % count, { value: index + 1 });
     });
     await Promise.resolve();
@@ -105,7 +105,7 @@ const designatedWrites = async (tree, count, writes) => {
 
 const designatedScalarWrites = async (tree, writes) => {
   for (let index = 0; index < writes; index++) {
-    undoable(() => tree.$.counter.set(index + 1));
+    undoable(() => tree.$.counter(index + 1));
     await Promise.resolve();
     await Promise.resolve();
   }

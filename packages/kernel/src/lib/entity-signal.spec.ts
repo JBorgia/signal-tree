@@ -70,18 +70,18 @@ describe('EntityNode field writes (Option B+ computed-based shim)', () => {
     expect(api.byId(1)!.name()).toBe('Alice');
   });
 
-  it('.set() updates a field and is reflected in reactive queries', () => {
+  it('a value call updates a field and is reflected in reactive queries', () => {
     const api = makeApi();
     api.addOne({ id: 1, name: 'Alice', active: true });
-    api.byId(1)!.name.set('Bob');
+    api.byId(1)!.name('Bob');
     expect(api.byId(1)!.name()).toBe('Bob');
     expect(api.all()[0].name).toBe('Bob');
   });
 
-  it('.update() applies an updater function to a field', () => {
+  it('an updater call derives the next field value', () => {
     const api = makeApi();
     api.addOne({ id: 1, name: 'alice', active: true });
-    api.byId(1)!.name.update((n) => n!.toUpperCase());
+    api.byId(1)!.name((name) => name!.toUpperCase());
     expect(api.byId(1)!.name()).toBe('ALICE');
   });
 
@@ -93,7 +93,7 @@ describe('EntityNode field writes (Option B+ computed-based shim)', () => {
     expect(ro()).toBe('Alice');
   });
 
-  it('interceptors still fire on field .set()', () => {
+  it('interceptors still fire on a field value call', () => {
     const api = makeApi();
     const intercepted: string[] = [];
     api.intercept({
@@ -102,7 +102,7 @@ describe('EntityNode field writes (Option B+ computed-based shim)', () => {
       },
     });
     api.addOne({ id: 1, name: 'Alice', active: true });
-    api.byId(1)!.name.set('Bob');
+    api.byId(1)!.name('Bob');
     expect(intercepted).toContain('1');
   });
 
@@ -133,12 +133,12 @@ describe('EntityNode field writes (Option B+ computed-based shim)', () => {
     expect(api.byId(1)!.active()).toBe(true);
   });
 
-  it('field .set() throws on stale node (entity removed)', () => {
+  it('a field value call throws on a stale node (entity removed)', () => {
     const api = makeApi();
     api.addOne({ id: 1, name: 'Alice', active: true });
     const node = api.byId(1)!;
     api.removeOne(1);
-    expect(() => node.name.set('Bob')).toThrow('not found');
+    expect(() => node.name('Bob')).toThrow('not found');
   });
 
   it('entity-level callable write throws on stale node (entity removed)', () => {

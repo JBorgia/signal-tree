@@ -46,8 +46,6 @@ const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 /** The subject-free null: an ordinary array leaf, byId as a memoised computed. */
 function collectionOver(leaf: {
   (): Row[];
-  set(v: Row[]): void;
-  update(fn: (c: Row[]) => Row[]): void;
 }) {
   const cache = new Map<string, ReadableCell<Row | undefined>>();
   return {
@@ -183,15 +181,15 @@ describe('E2-S2 — key reuse across undo', () => {
     const tree = signalTree({ rows: [] as Row[] });
     const rows = collectionOver(tree.$.rows);
 
-    undoable(() => tree.$.rows.set([{ id: 'k', n: 111 }]));
-    tree.$.rows.set([]); // remove
-    tree.$.rows.set([{ id: 'k', n: 999 }]); // a different subject reuses the key
+    undoable(() => tree.$.rows([{ id: 'k', n: 111 }]));
+    tree.$.rows([]); // remove
+    tree.$.rows([{ id: 'k', n: 999 }]); // a different subject reuses the key
 
     const heldNew = rows.byId('k');
     expect(heldNew()?.n).toBe(999);
 
     // Restore the ORIGINAL value — the best a value-only representation can do.
-    undoable(() => tree.$.rows.set([{ id: 'k', n: 111 }]));
+    undoable(() => tree.$.rows([{ id: 'k', n: 111 }]));
 
     // ALIASED. The reference held to the second subject now reports the FIRST
     // subject's data, because a value-keyed lookup cannot tell them apart.

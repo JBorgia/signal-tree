@@ -1,3 +1,9 @@
+import type {
+  CallablePart,
+  LeafDefinition,
+  NonCallableValue,
+} from '../leaf';
+
 /** Internal callable read contract shared by locations and legacy plumbing. */
 export interface ReadableCell<T> {
   (): T;
@@ -17,6 +23,14 @@ export interface ReadonlyLocation<T> extends ReadableCell<T> {
 }
 
 /** Kernel-owned public write contract for one state leaf. */
-export interface Location<T> extends WritableCell<T>, ReadonlyLocation<T> {
+export interface Location<T> extends ReadonlyLocation<T> {
+  /** Replace the complete value. Callable values require {@link leaf}. */
+  (value: NonCallableValue<T>): void;
+  /** Derive the next complete value from the current value. */
+  (update: (current: T) => T): void;
+  /** Replace callable or constructable state without invoking it. */
+  (value: LeafDefinition<CallablePart<T>>): void;
+  /** Read the current value. Kept last so generic inference resolves `T`. */
+  (): T;
   asReadonly(): ReadonlyLocation<T>;
 }

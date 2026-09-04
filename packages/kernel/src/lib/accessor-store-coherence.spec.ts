@@ -122,7 +122,7 @@ describe('accessor/store membership coherence', () => {
     expect(accessorKeys(users)).toEqual(['bob', 'seed']);
   });
 
-  it('a leaf waking through its own set() agrees on both halves', () => {
+  it('a leaf waking through its own write agrees on both halves', () => {
     // `reactivateOnWrite` is the third transition path, and it reaches
     // membership from the CHILD rather than from either half of the parent.
     const tree = signalTree({ user: { name: 'A', age: 1 } }, CAPS) as unknown as {
@@ -133,7 +133,7 @@ describe('accessor/store membership coherence', () => {
     user({ name: 'A' });
     expect(accessorKeys(user)).toEqual(['name']);
 
-    (user['age'] as { set(v: number): void }).set(99);
+    (user['age'] as (value: number) => void)(99);
     expect(snapshotKeys(user)).toEqual(['age', 'name']);
     expect(accessorKeys(user)).toEqual(['age', 'name']);
   });

@@ -6,7 +6,11 @@ import {
   signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { batching, signalTree } from '@signal-tree/angular';
+import {
+  batching,
+  signalTree,
+  type Location,
+} from '@signal-tree/angular';
 
 import { ExampleComponent } from '../../../../../shared/components/example-shell';
 
@@ -48,28 +52,27 @@ export class BatchingComparisonComponent {
   }
 
   /**
-   * Creates a tree whose counter tracks how many writes actually reach the
-   * underlying signal. The wrap is applied BEFORE any enhancer, so a batched
+    * Creates a tree whose counter tracks how many writes actually reach the
+    * canonical location. The subscription is installed BEFORE batching, so a
+    * batched
    * tree's coalesced writes are counted after deduplication.
    */
   /**
    * A probe enhancer that counts RAW writes to `counter`.
    *
-   * It has to wrap the setter before `batching` wraps it, or it counts the
-   * coalesced write instead of the real one — and the whole comparison is that
-   * difference. v15 builds a tree and its enhancers in one call, so "before the
-   * enhancer" means "earlier in the declared array".
+    * It subscribes before `batching` intercepts writes. Unbatched writes publish
+    * individually; coalescing lets only the final same-path write reach the
+    * location.
    */
   private makeWriteCounter() {
     let applied = 0;
     const probe = <T>(t: T): T => {
       const counter = (t as unknown as { $: { counter: unknown } }).$
-        .counter as unknown as { set(v: number): void };
-      const rawSet = counter.set.bind(counter);
-      counter.set = (v: number) => {
-        applied++;
-        rawSet(v);
-      };
+        .counter as Location<number>;
+      const release = counter.subscribe(() => applied++);
+      (t as unknown as { registerCleanup(fn: () => void): void }).registerCleanup(
+        release
+      );
       return t;
     };
     return { probe, appliedWrites: () => applied };
@@ -91,7 +94,7 @@ export class BatchingComparisonComponent {
       const n = this.ops();
       const start = performance.now();
       for (let i = 0; i < n; i++) {
-        tree.$.counter.set(i + 1);
+        tree.$.counter(i + 1);
       }
       const elapsed = performance.now() - start;
 
@@ -135,7 +138,7 @@ export class BatchingComparisonComponent {
       // to the underlying signal when the callback completes.
       tree.coalesce(() => {
         for (let i = 0; i < n; i++) {
-          tree.$.counter.set(i + 1);
+          tree.$.counter(i + 1);
         }
       });
       const elapsed = performance.now() - start;

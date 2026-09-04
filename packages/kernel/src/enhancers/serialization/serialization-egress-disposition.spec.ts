@@ -102,7 +102,7 @@ describe('SER-1 — serialize() encodes observable state, inspection included', 
     const tree = makeTree(adapter, 'ser1');
     await flush();
 
-    withWriteContext(INSPECTION, () => tree.$.b.set('SCRUBBED'));
+    withWriteContext(INSPECTION, () => tree.$.b('SCRUBBED'));
 
     // ⚠️ DO NOT "FIX" THIS. A caller asked what the tree currently holds.
     expect(tree.serialize()).toContain('SCRUBBED');
@@ -114,9 +114,9 @@ describe('SER-1 — serialize() encodes observable state, inspection included', 
     await flush();
     writes.length = 0;
 
-    withWriteContext(INSPECTION, () => tree.$.b.set('SCRUBBED'));
+    withWriteContext(INSPECTION, () => tree.$.b('SCRUBBED'));
     await flush();
-    tree.$.c.set('AUTHORED'); // an unrelated authored write, later
+    tree.$.c('AUTHORED'); // an unrelated authored write, later
     await flush();
 
     // The two halves of the invariant, side by side: visible to an encoder,
@@ -223,9 +223,9 @@ describe('SER-4 — an inspection value does not hitchhike out through deseriali
     await flush();
     writes.length = 0;
 
-    tree.$.a.set('A1');
+    tree.$.a('A1');
     await flush();
-    withWriteContext(INSPECTION, () => tree.$.b.set('SCRUB'));
+    withWriteContext(INSPECTION, () => tree.$.b('SCRUB'));
     await flush();
     tree.deserialize(JSON.stringify({ data: { a: 'A1', b: 'b0', c: 'C1' } }));
     await flush();

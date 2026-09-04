@@ -35,7 +35,7 @@ describe('entity representation cannot observably diverge', () => {
     rows.addOne({ id: 2, name: 'Bob', n: 2 });
     agree(t, rows, 1); agree(t, rows, 2);
 
-    rows.byIdOrFail(1).name.set('Grace');
+    rows.byIdOrFail(1).name('Grace');
     agree(t, rows, 1);
 
     rows.updateOne?.(2, { n: 99 });

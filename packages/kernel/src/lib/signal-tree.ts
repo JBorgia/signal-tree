@@ -1,8 +1,10 @@
-import type { WritableCell } from './internals/cell-runtime';
+import type { Location, WritableCell } from './internals/cell-runtime';
 import type { SignalTreeFactory } from './types';
 
 import {
   bindLocationRuntime,
+  isWritableLocation,
+  replaceLocation,
   type LocationRuntime,
 } from './internals/location-runtime';
 import {
@@ -29,9 +31,9 @@ const isWritableCell = (
   'set' in (v as object) &&
   typeof (v as { set?: unknown }).set === 'function';
 
-const readWritableCell = <T>(cell: WritableCell<T>): T =>
+const readWritableCell = <T>(cell: Location<T> | WritableCell<T>): T =>
   'peek' in cell && typeof cell.peek === 'function'
-    ? (cell as WritableCell<T> & { peek(): T }).peek()
+    ? cell.peek()
     : cell();
 
 import { SIGNAL_TREE_MESSAGES } from './constants';
@@ -88,6 +90,10 @@ import {
 import type { MaterializationContext } from './internals/materialize-markers';
 import { applyDerivedFactory } from './internals/merge-derived';
 import { hydrateMarkerNode } from './internals/materialize-markers';
+import {
+  isLeafDefinition,
+  leafDefinitionValue,
+} from './leaf';
 import {
   deepEqual,
   isBuiltInObject,
@@ -178,7 +184,7 @@ function createTreeBuildPlan(
 // fundamentally different scalar storage implementations.
 
 function finalizeLeafSignal<TValue>(
-  leaf: WritableCell<TValue>,
+  leaf: Location<TValue>,
   path: string,
   positionIds: readonly number[] | undefined,
   buildPlan: TreeBuildPlan,
@@ -996,27 +1002,15 @@ function recursiveUpdate(
       } else {
         warnDiscardedBranchWrite(childPath, value);
       }
-    } else if (isWritableCell(prop)) {
-      const sig = prop as WritableCell<unknown>;
-      // NOTE: a function value is STORED, never invoked. Updaters are supported
-      // at branches and at the root, NOT at leaves — `tree.$.count.update(fn)`
-      // is the leaf form, mirroring Angular's own signal API.
-      //
-      // A previous revision tried to resolve leaf updaters, guarded on "the
-      // current value is not a function". That predicate is unknowable at
-      // runtime: the right question is whether the leaf's DECLARED TYPE is a
-      // function, and a leaf typed `null | (() => void)` sitting at `null` is
-      // the ordinary callback field. Assigning a handler to one then INVOKED it
-      // (running `() => this.submit()` at write time), stored its return value,
-      // and reported the path as landed; a class constructor threw out of the
-      // middle of the write loop, committing earlier keys and dropping later
-      // ones while reporting nothing. Strictly worse than the inert
-      // stored-function it replaced, so it is gone.
-      // Ref-equality short-circuit: skip the .set() entirely when the
-      // incoming value is identical to the current value. Saves the
-      // function-call + Angular's internal equality check + any glitch
-      // tracking. `peek()` asks the universal location for the value without
-      // enrolling the write path as a reactive consumer.
+    } else if (isWritableLocation(prop) || isWritableCell(prop)) {
+      const sig = prop as Location<unknown> | WritableCell<unknown>;
+      // Recursive structural application already knows this is a replacement,
+      // so callable values are stored through the raw ingress rather than
+      // re-entering the authored grammar where a function means updater.
+      // Ref-equality short-circuit: skip the write entirely when the incoming
+      // value is identical to the current value. `peek()` asks the universal
+      // location for the value without enrolling the write path as a reactive
+      // consumer.
       const current = readWritableCell(sig);
       if (current === value) {
         // Dev-mode footgun guard: a merge write whose value is reference-
@@ -1041,7 +1035,8 @@ function recursiveUpdate(
         }
         continue;
       }
-      sig.set(value);
+      if (isWritableLocation(sig)) replaceLocation(sig, value);
+      else sig.set(value);
 
       if (out) {
         // Report only what LANDED. Leaves are created with a deep `equal`, so
@@ -1165,7 +1160,7 @@ function recursiveUpdate(
  * it. In dev it wraps `base` to catch ST2027.
  *
  * Why here rather than in `recursiveUpdate`, where ST2003 lives: a direct
- * `tree.$.rows.set(v)` goes STRAIGHT to the Angular signal and never enters
+ * `tree.$.rows(v)` goes straight to the canonical location and never enters
  * `recursiveUpdate` at all. That is the most common write form, and it is the
  * one the corrupted benchmarks used — a diagnostic that only covers merge
  * writes would have missed the case that motivated it. The comparator is the
@@ -1284,7 +1279,7 @@ function createSignalStore<T>(
     value: TValue,
     leafPositionIds: readonly number[] | undefined,
     equal: (a: unknown, b: unknown) => boolean
-  ): WritableCell<TValue> => {
+  ): Location<TValue> => {
     if (scalarSlotRuntime) {
       // The scalar substrate retains causal slot storage while exposing the
       // same universal writable-location contract as ordinary leaves.
@@ -1292,13 +1287,13 @@ function createSignalStore<T>(
         value,
         equal as (current: TValue, next: TValue) => boolean,
         leafPositionIds?.[0]
-      ) as unknown as WritableCell<TValue>;
+      );
     }
 
     return materializationContext.locationRuntime.createCell(
       value,
       equal
-    ) as unknown as WritableCell<TValue>;
+    );
   };
 
   // Primitives, null, undefined
@@ -1358,8 +1353,22 @@ function createSignalStore<T>(
   // Regular object - recursive
   const store: Record<string, unknown> = {};
 
-  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+  for (const [key, definedValue] of Object.entries(
+    obj as Record<string, unknown>
+  )) {
     const childPath = path ? `${path}.${key}` : key;
+    const terminal = isLeafDefinition(definedValue);
+    const value = terminal
+      ? leafDefinitionValue(definedValue)
+      : definedValue;
+    if (
+      terminal &&
+      (isEntityMapMarker(value) || isRegisteredMarker(value))
+    ) {
+      throw new Error(
+        `SignalTree: leaf() cannot wrap a semantic marker at "${childPath}".`
+      );
+    }
     let childPositionIds: number[] | undefined;
     const getChildPositionIds = (): number[] | undefined => {
       if (!materializationContext.positionTopologyEnabled) {
@@ -1418,6 +1427,7 @@ function createSignalStore<T>(
     // This catches the common mistake of forgetting to register before tree creation
     if (typeof ngDevMode === 'undefined' || ngDevMode) {
       if (
+        !terminal &&
         value !== null &&
         typeof value === 'object' &&
         !Array.isArray(value) &&
@@ -1432,7 +1442,12 @@ function createSignalStore<T>(
     }
 
     // Null, undefined, primitives
-    if (value === null || value === undefined || typeof value !== 'object') {
+    if (
+      terminal ||
+      value === null ||
+      value === undefined ||
+      typeof value !== 'object'
+    ) {
       const childPositionIds = getChildPositionIds();
       const equal =
         typeof ngDevMode === 'undefined' || ngDevMode
@@ -1763,7 +1778,7 @@ function create<T extends object>(
   Object.defineProperty(tree, 'destroy', {
     value: function (): void {
       if (destroyedSig()) return; // Already destroyed
-      destroyedSig.set(true);
+      replaceLocation(destroyedSig, true);
       terminateOwnerInvalidation(tree as object);
       // Run registered cleanup functions (enhancers, subscriptions, etc.)
       for (const fn of cleanupFns) {

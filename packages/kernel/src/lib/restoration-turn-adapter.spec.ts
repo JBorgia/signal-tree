@@ -8,9 +8,9 @@ const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 type HistoryStepStore = {
   $: {
-    left: { (): string; set(value: string): void };
-    right: { (): string; set(value: string): void };
-    later: { (): string; set(value: string): void };
+    left: { (value: string): void; (update: (current: string) => string): void; (): string };
+    right: { (value: string): void; (update: (current: string) => string): void; (): string };
+    later: { (value: string): void; (update: (current: string) => string): void; (): string };
   };
   transaction(fn: () => void): { confirm(): void; rollback(): void };
   undo(): void;
@@ -59,8 +59,8 @@ describe('restoration turn adapter seam', () => {
     const initialHistoryLength = store.getRestorationHistory().length;
 
     const step = store.transaction(() => {
-      undoable(() => store.$.left.set('L1'));
-      undoable(() => store.$.right.set('R1'));
+      undoable(() => store.$.left('L1'));
+      undoable(() => store.$.right('R1'));
     });
 
     expect(store.$.left()).toBe('L1');
@@ -84,14 +84,14 @@ describe('restoration turn adapter seam', () => {
   it('keeps ordinary writes outside the demarcated step as separate undo steps', async () => {
     const store = createStore();
     const step = store.transaction(() => {
-      undoable(() => store.$.left.set('L1'));
-      undoable(() => store.$.right.set('R1'));
+      undoable(() => store.$.left('L1'));
+      undoable(() => store.$.right('R1'));
     });
     step.confirm();
     await tick();
     const afterConfirmedStep = store.getRestorationHistory().length;
 
-    undoable(() => store.$.later.set('Z1'));
+    undoable(() => store.$.later('Z1'));
     await tick();
 
     expect(store.getRestorationHistory()).toHaveLength(afterConfirmedStep + 1);
@@ -116,8 +116,8 @@ describe('restoration turn adapter seam', () => {
 
     expect(() =>
       store.transaction(() => {
-        undoable(() => store.$.left.set('L1'));
-        undoable(() => store.$.right.set('R1'));
+        undoable(() => store.$.left('L1'));
+        undoable(() => store.$.right('R1'));
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -134,9 +134,9 @@ describe('restoration turn adapter seam', () => {
     const store = createStore();
     const initialHistoryLength = store.getRestorationHistory().length;
     const step = store.transaction(() => {
-      undoable(() => store.$.left.set('L1'));
+      undoable(() => store.$.left('L1'));
       void Promise.resolve().then(() =>
-        undoable(() => store.$.right.set('R1'))
+        undoable(() => store.$.right('R1'))
       );
     });
 
@@ -163,8 +163,8 @@ describe('restoration turn adapter seam', () => {
 
     expect(() =>
       store.transaction(() => {
-        undoable(() => store.$.left.set('L1'));
-        store.transaction(() => store.$.right.set('R1'));
+        undoable(() => store.$.left('L1'));
+        store.transaction(() => store.$.right('R1'));
       })
     ).toThrow(/nested transaction/i);
   });

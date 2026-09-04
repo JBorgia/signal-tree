@@ -71,9 +71,9 @@ const check = (name, reproduced, detail) => {
   const stop = createAuditTracker(t, log);
   await sleep(120);
   const base = log.length;
-  t.$.n.set(1);
+  t.$.n(1);
   await sleep(0); // both writes inside one sampling window
-  t.$.n.set(2);
+  t.$.n(2);
   await sleep(250);
   const collapsed = log.length - base;
   stop();
@@ -89,9 +89,9 @@ const check = (name, reproduced, detail) => {
   const stop = createAuditTracker(t, log);
   await sleep(120);
   const base = log.length;
-  t.$.name.set('TEMP');
+  t.$.name('TEMP');
   await sleep(0);
-  t.$.name.set('a'); // reverted inside the same window
+  t.$.name('a'); // reverted inside the same window
   await sleep(250);
   const seen = log.length - base;
   stop();

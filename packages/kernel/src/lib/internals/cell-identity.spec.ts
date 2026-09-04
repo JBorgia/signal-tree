@@ -48,7 +48,7 @@ describe('CELL-IDENTITY-CARRIER-0 — neutral cell identity', () => {
     const rt = NEUTRAL_LOCATION_RUNTIME;
     const cell = markTreeCell(rt.createCell(7));
     expect(cell()).toBe(7);
-    cell.set(9);
+    cell(9);
     expect(cell()).toBe(9);
     // identity is preserved through classification
     expect(isTreeCell(cell)).toBe(true);

@@ -92,8 +92,8 @@ interface Endpoint<T> {
  * does. A bare `signal()` has a `.set` but no owner, no settlement authority and
  * no location identity; a `computed` has neither.
  *
- * The three write spellings differ internally (`leaf.set(v)` vs `branch(v)`) and
- * the abstraction erases that difference.
+ * Root, branch and leaf locations share one callable write grammar; the
+ * abstraction preserves that uniformity.
  */
 const linkableWrite = <T>(x: unknown): ((value: T) => void) => {
   if (!getPositionRegistry(x)) {
@@ -193,7 +193,7 @@ describe('LINK-1 cases 3 & 4: echo suppression is LINK-LOCAL, not provenance-bas
       set: (v) => void writes.push(v),
     });
 
-    tree.$.leaf.set('typed');
+    tree.$.leaf('typed');
     await flush();
     await link.settled();
     link.dispose();
@@ -259,9 +259,9 @@ describe('LINK-1 case 5: Y may not finish stale because completions reordered', 
     const y = adversarial();
     const link = makeLink<string>(tree.$.leaf, { set: y.set });
 
-    tree.$.leaf.set('A');
+    tree.$.leaf('A');
     await flush();
-    tree.$.leaf.set('B');
+    tree.$.leaf('B');
     await flush();
     await link.settled();
     link.dispose();
@@ -303,7 +303,7 @@ describe('LINK-1 case 6: where does a rejected outbound write go?', () => {
       set: () => Promise.reject(new Error('endpoint down')),
     });
 
-    tree.$.leaf.set('doomed');
+    tree.$.leaf('doomed');
     await flush();
     await link.settled();
 
@@ -347,11 +347,11 @@ describe('LINK-1 case 6: where does a rejected outbound write go?', () => {
       },
     });
 
-    tree.$.leaf.set('first');
+    tree.$.leaf('first');
     await flush();
     await link.settled();
     fail = false;
-    tree.$.leaf.set('second');
+    tree.$.leaf('second');
     await flush();
     await link.settled();
     link.dispose();
@@ -376,12 +376,12 @@ describe('LINK-1 case 2: dispose() stops NEW activity, and claims nothing more',
     const sent: string[] = [];
     const link = makeLink<string>(tree.$.leaf, { set: (v) => void sent.push(v) });
 
-    tree.$.leaf.set('before');
+    tree.$.leaf('before');
     await flush();
     await link.settled();
     link.dispose();
 
-    tree.$.leaf.set('after');
+    tree.$.leaf('after');
     await flush();
     await link.settled();
 
@@ -439,7 +439,7 @@ describe('LINK-1 case 2: dispose() stops NEW activity, and claims nothing more',
     const link = makeLink<string>(tree.$.leaf, { set: (v) => void sent.push(v) });
 
     // The write is observed and its consequence is HELD by the open scope.
-    const pendingTx = tree.transaction(() => tree.$.leaf.set('held'));
+    const pendingTx = tree.transaction(() => tree.$.leaf('held'));
     await flush();
     expect(sent).toEqual([]);
 
@@ -459,7 +459,7 @@ describe('LINK-1 case 2: dispose() stops NEW activity, and claims nothing more',
     const sent: string[] = [];
     const link = makeLink<string>(tree.$.leaf, { set: (v) => void sent.push(v) });
 
-    const pendingTx = tree.transaction(() => tree.$.leaf.set('held'));
+    const pendingTx = tree.transaction(() => tree.$.leaf('held'));
     await flush();
     expect(sent).toEqual([]);
 

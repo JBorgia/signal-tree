@@ -173,12 +173,23 @@ const TARGETS = {
     // edges so abandoned derived recipes collect. After removing duplicate
     // dispatch and notification code, the generator measures 9.76KB prod and
     // 11.91KB dev. Raised by 0.1KB rather than weakening those invariants.
-    devKB: 12.0,
-    prodKB: 9.8,
+    //
+    // Callable terminal locations replace `.set`/`.update` with one read /
+    // replace / derive grammar and add `leaf(value)` as explicit topology.
+    // After moving entity projections off the mandatory runtime object,
+    // restoring scalar-owned mutation emission, deleting the legacy setter
+    // fallback, and consolidating terminal construction, the final floor is
+    // 9.93KB prod / 12.09KB dev. Against archived 84837fb3, equivalent runnable
+    // bundles differ by 430 minified bytes: location-runtime +503, signal-tree
+    // +158, leaf +133, intrinsic observers +35, offset by owned-mutation -268
+    // and scalar-runtime -126. This is the callable contract, not an optional
+    // module leak.
+    devKB: 12.2,
+    prodKB: 10.0,
     code: `
       import { signalTree } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, user: { name: 'a' } });
-      t.$.count.set(1); t.$.user.name.set('b');
+      t.$.count(1); t.$.user.name('b');
       globalThis.__sink = [t.$.count(), t.$.user.name()];
     `,
   },
@@ -330,8 +341,12 @@ const TARGETS = {
     // machinery. Dev foldability remains green (24.18 -> 21.48KB), so no
     // diagnostic text leaked into production. Budgets retain about 0.2KB of
     // headroom rather than rounding the measured values down.
-    devKB: 24.4,
-    prodKB: 21.7,
+    // Callable EntityMap fields add writable projections over stable entity
+    // identity. With the shared callable kernel included, the measured floor is
+    // 21.96KB prod / 24.60KB dev. The ceilings retain narrow headroom without
+    // weakening field identity, raw ingress, or terminal topology.
+    devKB: 24.8,
+    prodKB: 22.1,
     code: `
       import { signalTree, entityMap } from ${JSON.stringify(CORE)};
       const t = signalTree({ count: 0, users: entityMap() });

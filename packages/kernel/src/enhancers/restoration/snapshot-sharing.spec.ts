@@ -40,9 +40,9 @@ describe('restoration snapshot sharing', () => {
       { enhancers: [restoration()] }
     );
 
-    undoable(() => tree.$.a.x.set(10));
+    undoable(() => tree.$.a.x(10));
     await flush();
-    undoable(() => tree.$.a.x.set(20));
+    undoable(() => tree.$.a.x(20));
     await flush();
 
     const history = tree.getRestorationHistory();
@@ -55,11 +55,11 @@ describe('restoration snapshot sharing', () => {
 
   it('does not record a write that changed nothing', async () => {
     const tree = signalTree({ n: 1 }, { enhancers: [restoration()] });
-    undoable(() => tree.$.n.set(2));
+    undoable(() => tree.$.n(2));
     await flush();
     const before = tree.getRestorationHistory().length;
 
-    tree.$.n.set(2); // same value — no new object, so nothing to record
+    tree.$.n(2); // same value — no new object, so nothing to record
     await flush();
 
     expect(tree.getRestorationHistory().length).toBe(before);
@@ -71,9 +71,9 @@ describe('restoration snapshot sharing', () => {
       { enhancers: [restoration()] }
     );
 
-    undoable(() => tree.$.a.x.set(10));
+    undoable(() => tree.$.a.x(10));
     await flush();
-    undoable(() => tree.$.b.y.set(20));
+    undoable(() => tree.$.b.y(20));
     await flush();
     expect(tree.$()).toMatchObject({ a: { x: 10 }, b: { y: 20 } });
 
@@ -88,13 +88,13 @@ describe('restoration snapshot sharing', () => {
     // must stay put. It does because a write builds NEW objects along the
     // changed path rather than mutating the old ones.
     const tree = signalTree({ n: 1 }, { enhancers: [restoration()] });
-    undoable(() => tree.$.n.set(2));
+    undoable(() => tree.$.n(2));
     await flush();
 
     const recorded = tree.getRestorationHistory().at(-1)?.state as { n: number };
     expect(recorded.n).toBe(2);
 
-    undoable(() => tree.$.n.set(3));
+    undoable(() => tree.$.n(3));
     await flush();
     expect(recorded.n).toBe(2);
   });

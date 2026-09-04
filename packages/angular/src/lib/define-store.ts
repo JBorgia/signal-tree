@@ -68,7 +68,7 @@ export interface DefineStoreConfig {
  * @Component({ providers: [CounterStore] })
  * export class Counter {
  *   readonly store = inject(CounterStore);
- *   inc() { this.store.$.count.update((n) => n + 1); }
+ *   inc() { this.store.$.count((n) => n + 1); }
  * }
  * ```
  *
@@ -83,7 +83,7 @@ export interface DefineStoreConfig {
  * export class Display {
  *   readonly store = inject(CounterStore);
  *   read() { return this.store.$.count(); } // ✅ read-only
- *   // this.store.$.count.set(1);           // ❌ type error — not on ReadonlyStore
+ *   // this.store.$.count(1);               // ❌ type error — not on ReadonlyStore
  * }
  * ```
  */

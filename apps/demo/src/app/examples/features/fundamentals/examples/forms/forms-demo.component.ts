@@ -123,17 +123,17 @@ export class FormsDemoComponent {
   submitForm() {
     if (!this.formValid()) {
       // Mark all fields as touched to show errors
-      this.usernameTouched.set(true);
-      this.emailTouched.set(true);
-      this.passwordTouched.set(true);
-      this.confirmPasswordTouched.set(true);
+      this.usernameTouched(true);
+      this.emailTouched(true);
+      this.passwordTouched(true);
+      this.confirmPasswordTouched(true);
       return;
     }
 
     // Store submitted data and mark as submitted
     const fields = this.formStore.$.fields();
-    this.submittedData.set({ ...fields });
-    this.submitted.set(true);
+    this.submittedData({ ...fields });
+    this.submitted(true);
   }
 
   resetForm() {
@@ -151,8 +151,8 @@ export class FormsDemoComponent {
       password: false,
       confirmPassword: false,
     });
-    this.submitted.set(false);
-    this.submittedData.set(null);
+    this.submitted(false);
+    this.submittedData(null);
   }
 
   getPasswordStrengthText(): string {

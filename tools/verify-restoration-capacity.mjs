@@ -37,7 +37,7 @@ for (const { capacity, expected } of cases) {
     }
   );
   for (let value = 1; value <= 10; value++) {
-    undoable(() => tree.$.n.set(value));
+    undoable(() => tree.$.n(value));
     await flush();
   }
   let spent = 0;

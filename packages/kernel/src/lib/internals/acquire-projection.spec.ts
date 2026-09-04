@@ -87,7 +87,7 @@ describe('non-authored flat-scalar ingress', () => {
     );
     // Deliberately the SAME TICK. If provenance were contagious, timing is what
     // would leak it.
-    tree.$.box.b.set(2);
+    tree.$.box.b(2);
     await flush();
     const byPath = Object.fromEntries(drain(journal).map((e) => [e.path, e]));
 

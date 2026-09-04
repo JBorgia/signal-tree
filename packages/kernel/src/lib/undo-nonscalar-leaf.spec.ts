@@ -34,9 +34,9 @@ const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 describe('undo — scalar leaves work', () => {
   it('CONTROL — a number leaf undoes correctly', async () => {
     const tree = signalTree({ n: 0 }, { enhancers: [restoration()] });
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await tick();
-    undoable(() => tree.$.n.set(2));
+    undoable(() => tree.$.n(2));
     await tick();
     tree.undo();
     await tick();
@@ -45,9 +45,9 @@ describe('undo — scalar leaves work', () => {
 
   it('CONTROL — a string leaf undoes correctly', async () => {
     const tree = signalTree({ s: '' }, { enhancers: [restoration()] });
-    undoable(() => tree.$.s.set('a'));
+    undoable(() => tree.$.s('a'));
     await tick();
-    undoable(() => tree.$.s.set('b'));
+    undoable(() => tree.$.s('b'));
     await tick();
     tree.undo();
     await tick();
@@ -61,9 +61,9 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       { rows: [] as number[] },
       { enhancers: [restoration()] }
     );
-    undoable(() => tree.$.rows.set([1]));
+    undoable(() => tree.$.rows([1]));
     await tick();
-    undoable(() => tree.$.rows.set([1, 2]));
+    undoable(() => tree.$.rows([1, 2]));
     await tick();
     expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect at rows/);
   });
@@ -75,9 +75,9 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       },
       { enhancers: [restoration()] }
     );
-    undoable(() => tree.$.when.set(new Date('2021-01-01T00:00:00.000Z')));
+    undoable(() => tree.$.when(new Date('2021-01-01T00:00:00.000Z')));
     await tick();
-    undoable(() => tree.$.when.set(new Date('2022-01-01T00:00:00.000Z')));
+    undoable(() => tree.$.when(new Date('2022-01-01T00:00:00.000Z')));
     await tick();
     expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect at when/);
   });
@@ -89,9 +89,9 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       },
       { enhancers: [restoration()] }
     );
-    undoable(() => tree.$.lookup.set(new Map([['a', 1]])));
+    undoable(() => tree.$.lookup(new Map([['a', 1]])));
     await tick();
-    undoable(() => tree.$.lookup.set(new Map([['a', 2]])));
+    undoable(() => tree.$.lookup(new Map([['a', 2]])));
     await tick();
     expect(() => tree.undo()).toThrow(
       /Unsupported scoped undo effect at lookup/
@@ -103,9 +103,9 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       { seen: new Set<string>() },
       { enhancers: [restoration()] }
     );
-    undoable(() => tree.$.seen.set(new Set(['a'])));
+    undoable(() => tree.$.seen(new Set(['a'])));
     await tick();
-    undoable(() => tree.$.seen.set(new Set(['a', 'b'])));
+    undoable(() => tree.$.seen(new Set(['a', 'b'])));
     await tick();
     expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect at seen/);
   });
@@ -118,10 +118,10 @@ describe('undo — every NON-SCALAR leaf throws, one tree, no marker', () => {
       { n: 0, rows: [] as number[] },
       { enhancers: [restoration()] }
     );
-    undoable(() => tree.$.n.set(1));
+    undoable(() => tree.$.n(1));
     await tick();
-    undoable(() => tree.$.n.set(2));
-    undoable(() => tree.$.rows.set([9]));
+    undoable(() => tree.$.n(2));
+    undoable(() => tree.$.rows([9]));
     await tick();
 
     expect(() => tree.undo()).toThrow(/Unsupported scoped undo effect/);

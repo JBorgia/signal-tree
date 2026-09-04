@@ -41,7 +41,7 @@ if (
   writeFileSync(
     e,
     `import { signalTree } from ${JSON.stringify(CORE)};
-  const t = signalTree({ a: 0, u: { n: 'x' } }); t.$.a.set(1); globalThis.__s=[t.$.a(),t.$.u.n()];`,
+  const t = signalTree({ a: 0, u: { n: 'x' } }); t.$.a(1); globalThis.__s=[t.$.a(),t.$.u.n()];`,
     'utf8'
   );
   const o = await build({

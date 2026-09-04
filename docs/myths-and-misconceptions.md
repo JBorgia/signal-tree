@@ -134,25 +134,39 @@ as ordinary application state.
 `restoration()` is appropriate only when undo/redo history is a product
 requirement. It is not a general form-state dependency.
 
-## Myth 8: Every `$` Location Has The Same Call Syntax
+## Myth 8: Leaves Need Framework-Specific Write Methods
 
-**Claim:** Every location is callable for both reads and writes.
+**Claim:** Root and branch accessors are callable, but terminal leaves require
+`.set()` or `.update()` from a framework primitive.
 
-**Correction:** Root and branch locations are SignalTree accessors. They support
-whole-value reads, assignments, and updater functions. A value call is never a
-patch; derive a patched value through the updater form. Leaves remain native
-kernel locations: call to read, use `.set()` or `.update()` to write. Framework
-facades connect those same locations to their native dependency graphs.
+**Correction:** Root, branch, and terminal locations all use the same kernel
+grammar: call with no arguments to read, a complete value to replace, or an
+updater to derive. A value call is never a patch. Framework facades connect
+those same locations to native dependency graphs without changing their API.
 
 ```typescript
 tree.$.user();
 tree.$.user({ name: 'Grace', active: true });
 tree.$.user.name();
-tree.$.user.name.set('Grace');
+tree.$.user.name('Grace');
+tree.$.user.name((name) => name.toUpperCase());
 ```
 
-The old callable-leaf write transform was removed because the apparent write
-could type-check while doing nothing at runtime.
+`leaf(value)` controls where topology stops. It keeps an object atomic instead
+of traversable and disambiguates callable data from an updater:
+
+```typescript
+const tree = signalTree({
+  bounds: leaf({ min: 0, max: 100 }),
+  onSave: leaf((id: string) => console.log(id)),
+});
+
+tree.$.bounds({ min: 10, max: 90 });
+tree.$.onSave(leaf((id) => persist(id)));
+```
+
+Angular's `toWritableSignal(location)` creates an explicit native view when an
+Angular API requires `.set()` and `.update()`.
 
 ## Myth 9: SignalTree Has A Separate `.state` Property
 

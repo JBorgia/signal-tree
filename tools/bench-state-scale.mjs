@@ -93,10 +93,10 @@ const results = { axis1Flat: [], axis1Nested: [], axis2: [] };
 for (const size of QUICK ? [64, 512] : [64, 128, 256, 512, 1024]) {
   const tree = signalTree(flat(size));
   for (let r = 0; r < WARMUP; r++)
-    for (let w = 0; w < WRITES; w++) tree.$.k0.v.set(w);
-  tree.$.k0.v.set(SENTINEL);
+    for (let w = 0; w < WRITES; w++) tree.$.k0.v(w);
+  tree.$.k0.v(SENTINEL);
   const st = median(() => {
-    for (let w = 0; w < WRITES; w++) tree.$.k0.v.set(w);
+    for (let w = 0; w < WRITES; w++) tree.$.k0.v(w);
   });
 
   const state = signalState(flat(size));
@@ -131,10 +131,10 @@ for (const [sections, per] of QUICK
     ]) {
   const tree = signalTree(nested(sections, per));
   for (let r = 0; r < WARMUP; r++)
-    for (let w = 0; w < WRITES; w++) tree.$.s0.f0.set(w);
-  tree.$.s0.f0.set(SENTINEL);
+    for (let w = 0; w < WRITES; w++) tree.$.s0.f0(w);
+  tree.$.s0.f0(SENTINEL);
   const st = median(() => {
-    for (let w = 0; w < WRITES; w++) tree.$.s0.f0.set(w);
+    for (let w = 0; w < WRITES; w++) tree.$.s0.f0(w);
   });
 
   const state = signalState(nested(sections, per));
@@ -170,11 +170,11 @@ for (const n of QUICK ? [0, 1000] : [0, 100, 1000, 5000]) {
     consumers.push(c);
   }
   for (let r = 0; r < WARMUP; r++) {
-    for (let w = 0; w < WRITES; w++) tree.$.k0.v.set(w);
+    for (let w = 0; w < WRITES; w++) tree.$.k0.v(w);
     consumers.forEach((c) => c());
   }
   const st = median(() => {
-    for (let w = 0; w < WRITES; w++) tree.$.k0.v.set(w);
+    for (let w = 0; w < WRITES; w++) tree.$.k0.v(w);
     // Reading every consumer is what a change-detection pass does; the ones that
     // were not invalidated return a cached value and cost a pointer check.
     consumers.forEach((c) => c());

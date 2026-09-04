@@ -60,7 +60,7 @@ describe('persistence(): save / load / clear', () => {
       }
     );
 
-    tree.$.count.set(7);
+    tree.$.count(7);
     await tree.save();
 
     expect(map.has('app')).toBe(true);
@@ -77,7 +77,7 @@ describe('persistence(): save / load / clear', () => {
     };
 
     const a = signalTree({ count: 0 }, { enhancers: [persistence(cfg)] });
-    a.$.count.set(42);
+    a.$.count(42);
     await a.save();
 
     const b = signalTree({ count: 0 }, { enhancers: [persistence(cfg)] });
@@ -146,7 +146,7 @@ describe('persistence(): autoLoad', () => {
         ],
       }
     );
-    seed.$.count.set(99);
+    seed.$.count(99);
     await seed.save();
 
     const fresh = signalTree(
@@ -182,7 +182,7 @@ describe('persistence(): autoLoad', () => {
         ],
       }
     );
-    seed.$.count.set(99);
+    seed.$.count(99);
     await seed.save();
 
     const fresh = signalTree(
@@ -222,7 +222,7 @@ describe('persistence(): autoSave', () => {
       }
     );
 
-    tree.$.count.set(3);
+    tree.$.count(3);
 
     // ⚠️ ORDERING, measured: `__flushAutoSave()` called SYNCHRONOUSLY after a
     // write does not flush that write — the debounce timer has not been
@@ -255,7 +255,7 @@ describe('persistence(): autoSave', () => {
       }
     );
 
-    tree.$.count.set(4);
+    tree.$.count(4);
     await new Promise((r) => setTimeout(r, 250));
 
     expect(JSON.parse(map.get('as2') as string).data.count).toBe(4);
@@ -277,7 +277,7 @@ describe('persistence(): autoSave', () => {
       }
     );
 
-    tree.$.count.set(5);
+    tree.$.count(5);
     await new Promise((r) => setTimeout(r, 250));
 
     expect(map.has('off')).toBe(false);

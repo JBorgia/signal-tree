@@ -103,7 +103,7 @@ describe('HIST-C2 step 6: the earned mutation-ingress adapter', () => {
     const before = turns(tree);
 
     // Same state, same branch, different entrance.
-    tree.$.editForm.name.set('written-directly');
+    tree.$.editForm.name('written-directly');
     await flush();
 
     // If this recorded a turn, the adapter would be location scoping wearing a
@@ -125,7 +125,7 @@ describe('HIST-C2 step 6: the earned mutation-ingress adapter', () => {
     // application write can join it.
     expect(turns(tree)).toBe(1);
 
-    tree.$.ui.panel.set('inspector');
+    tree.$.ui.panel('inspector');
     fixture.detectChanges();
     await flush();
 

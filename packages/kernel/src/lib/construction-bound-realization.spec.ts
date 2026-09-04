@@ -80,7 +80,7 @@ describe('CONSTRUCTION-BOUND-REALIZATION-0', () => {
 
     const tree = signalTreeBound({ value: 0 });
     tree.$.value();
-    tree.$.value.set(1);
+    tree.$.value(1);
 
     expect(adapter.tokenCalls).toBe(1);
     expect(adapter.groupCalls).toBeGreaterThan(0);
@@ -107,7 +107,7 @@ describe('CONSTRUCTION-BOUND-REALIZATION-0', () => {
 
     tree.$.count();
     plainTree.$({ value: 2 });
-    tree.$.count.set(2);
+    tree.$.count(2);
     tree.$.doubled();
     tree.$.nested();
     tree.$.rows.addOne({ id: 'a', value: 1 });
@@ -174,8 +174,8 @@ describe('CONSTRUCTION-BOUND-REALIZATION-0', () => {
     treeA2.$.count();
     treeA1.$.rows.byIdOrFail('a').value();
     treeB.$.rows.byIdOrFail('b').value();
-    treeA1.$.count.set(4);
-    treeB.$.count.set(5);
+    treeA1.$.count(4);
+    treeB.$.count(5);
 
     expect(callsA.token).toBeGreaterThan(0);
     expect(callsB.token).toBeGreaterThan(0);

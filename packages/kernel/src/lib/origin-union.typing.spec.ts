@@ -26,13 +26,13 @@ describe('origin union: only owners survive', () => {
   it('accepts the three origins that have an owner', () => {
     const tree = signalTree({ n: 0 });
 
-    withWriteContext({ origin: 'restoration' }, () => tree.$.n.set(1));
-    withWriteContext({ origin: 'devtools' }, () => tree.$.n.set(2));
-    withWriteContext({ origin: 'external' }, () => tree.$.n.set(3));
+    withWriteContext({ origin: 'restoration' }, () => tree.$.n(1));
+    withWriteContext({ origin: 'devtools' }, () => tree.$.n(2));
+    withWriteContext({ origin: 'external' }, () => tree.$.n(3));
     // Added by DIAG-JOURNAL-1.1, under the same rule the others live by: a
     // compensation write is a realization whose reason to exist is a withdrawn
     // transaction, and a diagnostic reader could not tell it from external truth.
-    withWriteContext({ origin: 'transaction-rollback' }, () => tree.$.n.set(4));
+    withWriteContext({ origin: 'transaction-rollback' }, () => tree.$.n(4));
 
     expect(tree.$.n()).toBe(4);
   });
@@ -43,7 +43,7 @@ describe('origin union: only owners survive', () => {
     // Ordinary authored application work records no origin at all, and this is
     // the represention — not an omission to be filled in later with
     // `'application'`. A1-N.
-    withWriteContext({ intent: 'user' }, () => tree.$.n.set(1));
+    withWriteContext({ intent: 'user' }, () => tree.$.n(1));
 
     expect(tree.$.n()).toBe(1);
   });
@@ -52,11 +52,11 @@ describe('origin union: only owners survive', () => {
     const tree = signalTree({ n: 0 });
 
     // @ts-expect-error 'system' was fabricated provenance; absence is the truthful value
-    withWriteContext({ origin: 'system' }, () => tree.$.n.set(1));
+    withWriteContext({ origin: 'system' }, () => tree.$.n(1));
     // @ts-expect-error 'user' duplicated the meaningful absence of an origin
-    withWriteContext({ origin: 'user' }, () => tree.$.n.set(2));
+    withWriteContext({ origin: 'user' }, () => tree.$.n(2));
     // @ts-expect-error 'serialization' claimed a provenance nothing stamps
-    withWriteContext({ origin: 'serialization' }, () => tree.$.n.set(3));
+    withWriteContext({ origin: 'serialization' }, () => tree.$.n(3));
 
     expect(tree.$.n()).toBe(3);
   });
@@ -65,9 +65,9 @@ describe('origin union: only owners survive', () => {
     const tree = signalTree({ n: 0 });
 
     // @ts-expect-error correlation has no kernel reader or semantic owner
-    withWriteContext({ correlationId: 'related-updates' }, () => tree.$.n.set(1));
+    withWriteContext({ correlationId: 'related-updates' }, () => tree.$.n(1));
     // @ts-expect-error write-time clock data has no kernel reader or semantic owner
-    withWriteContext({ timestamp: 0 }, () => tree.$.n.set(2));
+    withWriteContext({ timestamp: 0 }, () => tree.$.n(2));
 
     expect(tree.$.n()).toBe(2);
   });

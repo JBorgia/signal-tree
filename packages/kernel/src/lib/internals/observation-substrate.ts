@@ -1,4 +1,4 @@
-import type { WritableCell } from './cell-runtime';
+import type { Location } from './cell-runtime';
 
 import { emitOwnedMutation } from './owned-mutation';
 import { getOwnedOwnerPath } from './owned-metadata';
@@ -62,7 +62,7 @@ const OBSERVATION = new WeakMap<object, LeafObservation>();
  * `set` or `update`. The functions installed here are the ones that must live
  * for the leaf's lifetime.
  */
-export function installDormantObservation<T>(leaf: WritableCell<T>): void {
+export function installDormantObservation<T>(leaf: Location<T>): void {
   OBSERVATION.set(leaf as object, {
     claims: 0,
     positionId: undefined,

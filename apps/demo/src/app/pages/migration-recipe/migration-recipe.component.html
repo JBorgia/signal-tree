@@ -13,9 +13,9 @@
     <strong>Angular applications install and construct through:</strong>
     <pre><code>npm install &#64;signal-tree/angular&#64;{{ signalTreeVersion }}</code></pre>
     <p>
-      <code>&#64;signal-tree/angular</code> owns Angular signals, injection, and
-      lifecycle. It installs <code>&#64;signal-tree/kernel</code> as an exact
-      dependency. React observation lives in
+      <code>&#64;signal-tree/angular</code> owns Angular observation, injection,
+      lifecycle, and explicit native-signal views. It installs
+      <code>&#64;signal-tree/kernel</code> as an exact dependency. React observation lives in
       <code>&#64;signal-tree/react</code>.
     </p>
   </section>
@@ -114,7 +114,7 @@ export class UserOps &#123;
   private readonly tree = inject(AppTree);
 
   select(id: number | null): void &#123;
-    this.tree.$.selectedId.set(id);
+    this.tree.$.selectedId(id);
   &#125;
 
   rename(id: number, name: string): void &#123;
@@ -125,7 +125,7 @@ export class UserOps &#123;
       Components normally receive a read-only <code>$</code> facade and Ops
       methods. Use <code>asReadonly()</code> or read-only
       <code>defineStore</code> exposure when consumers should not see mutation
-      methods.
+      access.
     </p>
   </section>
 

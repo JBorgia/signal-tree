@@ -70,6 +70,7 @@ export type {
   ObservationToken,
 } from './lib/internals/observation-adapter';
 export { createSignalTreeFactory } from './lib/signal-tree';
+export { replaceLocation } from './lib/internals/location-runtime';
 
 /**
  * SEMANTIC INGRESS — the one export here that is not a realization contract.

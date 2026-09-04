@@ -4,6 +4,7 @@ import { undoable } from './undoable';
 import { signalTree } from './signal-tree';
 import { restoration } from '../enhancers/restoration/restoration';
 import { transactions } from '../enhancers/transactions/transactions';
+import type { Location } from './internals/cell-runtime';
 
 /**
  * M1+M2-E5 — THE EQUIVALENCE FORK.
@@ -20,10 +21,10 @@ import { transactions } from '../enhancers/transactions/transactions';
  * tests "do custom markers work".
  */
 
-function makeCounterApi(accessor: { (): number; set(v: number): void }) {
+function makeCounterApi(accessor: Location<number>) {
   return {
     read: () => accessor(),
-    increment: () => accessor.set(accessor() + 1),
+    increment: () => accessor(accessor() + 1),
     doubled: () => accessor() * 2,
   };
 }

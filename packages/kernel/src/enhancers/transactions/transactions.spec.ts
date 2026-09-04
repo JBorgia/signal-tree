@@ -54,7 +54,7 @@ describe('transactions enhancer', () => {
     };
 
     const pending = store.transaction(() => {
-      store.$.count.set(1);
+      store.$.count(1);
     });
 
     expect(store.$.count()).toBe(1);
@@ -78,8 +78,8 @@ describe('transactions enhancer', () => {
     });
 
     store.transaction(() => {
-      store.$.left.set(1);
-      store.$.right.set(1);
+      store.$.left(1);
+      store.$.right(1);
     });
 
     expect(seen).toEqual([[1, 1]]);
@@ -96,10 +96,10 @@ describe('transactions enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.inside.set('grouped');
+      store.$.inside('grouped');
     });
 
-    store.$.outside.set('later');
+    store.$.outside('later');
 
     await Promise.resolve();
     await Promise.resolve();
@@ -134,8 +134,8 @@ describe('transactions enhancer', () => {
 
     expect(() =>
       store.transaction(() => {
-        store.$.left.set('L');
-        store.$.right.set('R');
+        store.$.left('L');
+        store.$.right('R');
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -193,13 +193,13 @@ describe('transactions enhancer', () => {
 
     expect(() =>
       store.transaction(() => {
-        store.$.count.set(1);
+        store.$.count(1);
         store.$.rows.removeOne('b');
         store.$.rows.addOne({ id: 'a', name: 'Alpha' });
         abortedFreshSubject =
           store.$.rows.byIdOrFail('a').name.__subjectIds?.[0];
         store.$.rows.changeId('a', 'c');
-        store.$.rows.byIdOrFail('c').name.set('Charlie');
+        store.$.rows.byIdOrFail('c').name('Charlie');
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -277,7 +277,7 @@ describe('transactions enhancer', () => {
 
     try {
       store.transaction(() => {
-        store.$.count.set(1);
+        store.$.count(1);
         store.$.rows.removeOne('b');
         store.$.rows.addOne({ id: 'a', name: 'Alpha' });
         store.$.rows.changeId('a', 'c');
@@ -354,11 +354,11 @@ describe('transactions enhancer', () => {
       .__subjectIds?.[0] as number | undefined;
 
     const pending = store.transaction(() => {
-      store.$.count.set(1);
+      store.$.count(1);
       store.$.rows.removeOne('b');
       store.$.rows.addOne({ id: 'a', name: 'Alpha' });
       store.$.rows.changeId('a', 'c');
-      store.$.rows.byIdOrFail('c').name.set('Charlie');
+      store.$.rows.byIdOrFail('c').name('Charlie');
     });
 
     const pendingFreshSubject =
@@ -432,7 +432,7 @@ describe('transactions enhancer', () => {
 
     expect(() =>
       runtime.transaction(() => {
-        store.$.left.set('L');
+        store.$.left('L');
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -468,7 +468,7 @@ describe('transactions enhancer', () => {
 
     expect(() =>
       runtime.transaction(() => {
-        store.$.count.set(1);
+        store.$.count(1);
       })
     ).toThrow('cleanup failed');
   });
@@ -494,7 +494,7 @@ describe('transactions enhancer', () => {
       store.$.rows.changeId(7, 42);
     });
 
-    store.$.rows.byIdOrFail(42).name.set('later');
+    store.$.rows.byIdOrFail(42).name('later');
     await Promise.resolve();
     await Promise.resolve();
 
@@ -521,7 +521,7 @@ describe('transactions enhancer', () => {
       store.$.rows.addOne({ id: 17, name: 'pending' });
     });
 
-    store.$.rows.byIdOrFail(17).name.set('later');
+    store.$.rows.byIdOrFail(17).name('later');
     await Promise.resolve();
     await Promise.resolve();
 
@@ -550,8 +550,8 @@ describe('transactions enhancer', () => {
     );
 
     const pending = store.transaction(() => {
-      store.$.order.status.set('assigned');
-      store.$.driver.orderId.set(17);
+      store.$.order.status('assigned');
+      store.$.driver.orderId(17);
     });
 
     store.$.telemetry.addOne({ id: 9, lat: 42 });
@@ -584,7 +584,7 @@ describe('transactions enhancer', () => {
       store.$.rows.addOne({ id: 17, name: 'optimistic' });
     });
 
-    store.$.rows.byIdOrFail(17).name.set('dependent-later');
+    store.$.rows.byIdOrFail(17).name('dependent-later');
     await Promise.resolve();
     await Promise.resolve();
 

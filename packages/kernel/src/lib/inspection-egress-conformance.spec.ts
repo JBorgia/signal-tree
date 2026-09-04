@@ -110,12 +110,12 @@ describe('the axis: participation, not provenance', () => {
     await flush();
     const l = track(link(tree.$.s, r.endpoint));
 
-    tree.$.s.theme.set('authored');
+    tree.$.s.theme('authored');
     await flush();
     await l.settled();
     expect(r.themes()).toEqual(['authored']); // CONTROL
 
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('SCRUBBED'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('SCRUBBED'));
     await flush();
     await l.settled();
 
@@ -133,7 +133,7 @@ describe('the axis: participation, not provenance', () => {
     const l = track(link(tree.$.s, r.endpoint));
 
     withWriteContext({ intent: 'system', origin: 'devtools' }, () =>
-      tree.$.s.theme.set('devtools-authored')
+      tree.$.s.theme('devtools-authored')
     );
     await flush();
     await l.settled();
@@ -148,7 +148,7 @@ describe('the axis: participation, not provenance', () => {
     const l = track(link(tree.$.s, r.endpoint));
 
     withWriteContext({ intent: 'system', origin: 'restoration' }, () => {
-      undoable(() => tree.$.s.theme.set('undone'));
+      undoable(() => tree.$.s.theme('undone'));
     });
     await flush();
     await l.settled();
@@ -164,12 +164,12 @@ describe('the axis: participation, not provenance', () => {
       link(tree.$.n, { set: (v: number) => void got.push(v) })
     );
 
-    tree.$.n.set(5);
+    tree.$.n(5);
     await flush();
     await l.settled();
     expect(got).toEqual([5]); // CONTROL
 
-    withWriteContext(INSPECTION, () => tree.$.n.set(99));
+    withWriteContext(INSPECTION, () => tree.$.n(99));
     await flush();
     await l.settled();
 
@@ -188,12 +188,12 @@ describe('RELATIONSHIP-CREATION ADOPTION — the creation boundary', () => {
     const tree = makeTree();
     await flush();
 
-    tree.$.s.theme.set('A');
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    tree.$.s.theme('A');
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
 
     const l = track(link(tree.$.s, r.endpoint)); // ← the adoption boundary
-    tree.$.s.density.set(9);
+    tree.$.s.density(9);
     await flush();
     await l.settled();
 
@@ -206,10 +206,10 @@ describe('RELATIONSHIP-CREATION ADOPTION — the creation boundary', () => {
     await flush();
     const l = track(link(tree.$.s, r.endpoint)); // ← created FIRST
 
-    tree.$.s.theme.set('A');
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    tree.$.s.theme('A');
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
-    tree.$.s.density.set(9);
+    tree.$.s.density(9);
     await flush();
     await l.settled();
 
@@ -227,8 +227,8 @@ describe('ordering within one delivery batch', () => {
     await flush();
     const l = track(link(tree.$.s, r.endpoint));
 
-    tree.$.s.theme.set('A');
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    tree.$.s.theme('A');
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
     await l.settled();
 
@@ -241,9 +241,9 @@ describe('ordering within one delivery batch', () => {
     await flush();
     const l = track(link(tree.$.s, r.endpoint));
 
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
-    tree.$.s.theme.set('C');
+    tree.$.s.theme('C');
     await flush();
     await l.settled();
 
@@ -259,9 +259,9 @@ describe('ordering within one delivery batch', () => {
     await flush();
     const l = track(link(tree.$.s, r.endpoint));
 
-    tree.$.s.theme.set('A');
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
-    tree.$.s.theme.set('C');
+    tree.$.s.theme('A');
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
+    tree.$.s.theme('C');
     await flush();
     await l.settled();
 
@@ -277,13 +277,13 @@ describe('ordering within one delivery batch', () => {
     await flush();
     const l = track(link(tree.$.s, r.endpoint));
 
-    tree.$.s.theme.set('A');
+    tree.$.s.theme('A');
     await flush();
     await l.settled();
 
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
-    tree.$.s.density.set(9);
+    tree.$.s.density(9);
     await flush();
     await l.settled();
 
@@ -300,12 +300,12 @@ describe('the in-flight race', () => {
     await flush();
     const l = track(link(tree.$.s, g.endpoint));
 
-    tree.$.s.theme.set('A');
+    tree.$.s.theme('A');
     await flush();
     await g.inFlight;
     expect(g.themes()).toEqual(['A']); // CONTROL: A is genuinely in flight
 
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
     g.release();
     await l.settled();
@@ -321,11 +321,11 @@ describe('the in-flight race', () => {
     await flush();
     const l = track(link(tree.$.s, g.endpoint));
 
-    tree.$.s.theme.set('A');
+    tree.$.s.theme('A');
     await flush();
     await g.inFlight;
 
-    tree.$.s.theme.set('C');
+    tree.$.s.theme('C');
     await flush();
     g.release();
     await l.settled();
@@ -339,12 +339,12 @@ describe('the in-flight race', () => {
     await flush();
     const l = track(link(tree.$.s, r.endpoint));
 
-    tree.$.s.theme.set('A');
+    tree.$.s.theme('A');
     await flush();
     await l.settled();
     const baseline = r.got.length;
 
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
     const settled = await Promise.race([
       l.settled().then(() => true),
@@ -367,10 +367,10 @@ describe('inbound external truth is authoritative', () => {
       link(tree.$.s, { ...r.endpoint, get: (): S => ({ ...external }) })
     );
 
-    tree.$.s.theme.set('A');
+    tree.$.s.theme('A');
     await flush();
     await l.settled();
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
 
     await l.retrieve();
@@ -380,7 +380,7 @@ describe('inbound external truth is authoritative', () => {
 
     // A later unrelated authored write carries the INBOUND truth, not A or B.
     r.got.length = 0;
-    tree.$.s.density.set(9);
+    tree.$.s.density(9);
     await flush();
     await l.settled();
     expect(r.got[r.got.length - 1]).toEqual({ theme: 'C-EXTERNAL', density: 9 });
@@ -401,14 +401,14 @@ describe('inbound external truth is authoritative', () => {
       })
     );
 
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
     push({ theme: 'C-EXTERNAL', density: 4 });
     await flush();
     await l.settled();
 
     r.got.length = 0;
-    tree.$.s.density.set(9);
+    tree.$.s.density(9);
     await flush();
     await l.settled();
     expect(r.got[r.got.length - 1]).toEqual({ theme: 'C-EXTERNAL', density: 9 });
@@ -441,10 +441,10 @@ describe('inbound external truth is authoritative', () => {
       })
     );
 
-    tree.$.s.theme.set('A');
+    tree.$.s.theme('A');
     await flush();
     await l.settled();
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
 
     // Inbound truth agrees with the scrubbed value on `theme`, differs on density.
@@ -453,7 +453,7 @@ describe('inbound external truth is authoritative', () => {
     await l.settled();
 
     r.got.length = 0;
-    tree.$.s.density.set(9);
+    tree.$.s.density(9);
     await flush();
     await l.settled();
 
@@ -480,10 +480,10 @@ describe('inbound external truth is authoritative', () => {
     await flush();
     await l.settled();
 
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
     r.got.length = 0;
-    tree.$.s.density.set(9);
+    tree.$.s.density(9);
     await flush();
     await l.settled();
 
@@ -514,13 +514,13 @@ describe('failure recovery participates correctly', () => {
       })
     );
 
-    tree.$.s.theme.set('A');
+    tree.$.s.theme('A');
     await flush();
     await l.settled();
 
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
-    tree.$.s.theme.set('C');
+    tree.$.s.theme('C');
     await flush();
     await l.settled();
 
@@ -546,13 +546,13 @@ describe('failure recovery participates correctly', () => {
       })
     );
 
-    tree.$.s.theme.set('A');
+    tree.$.s.theme('A');
     await flush();
     await l.settled();
 
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
-    tree.$.s.density.set(9);
+    tree.$.s.density(9);
     await flush();
     await l.settled();
 
@@ -570,11 +570,11 @@ describe('the boundary stays complete-value', () => {
     await flush();
     const l = track(link(tree.$.s, r.endpoint));
 
-    tree.$.s.theme.set('A');
+    tree.$.s.theme('A');
     await flush();
-    withWriteContext(INSPECTION, () => tree.$.s.theme.set('B-INSPECTION'));
+    withWriteContext(INSPECTION, () => tree.$.s.theme('B-INSPECTION'));
     await flush();
-    tree.$.s.density.set(9);
+    tree.$.s.density(9);
     await flush();
     await l.settled();
 

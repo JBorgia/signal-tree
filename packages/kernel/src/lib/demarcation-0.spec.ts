@@ -223,9 +223,9 @@ describe('DEMARCATION-0: same-turn coalescing to the FINAL settled value', () =>
     const seen: string[] = [];
     const off = observeCommitted<string>(tree.$.theme, (v) => seen.push(v));
 
-    tree.$.theme.set('a');
-    tree.$.theme.set('b');
-    tree.$.theme.set('c');
+    tree.$.theme('a');
+    tree.$.theme('b');
+    tree.$.theme('c');
     await flush();
     off();
 
@@ -240,9 +240,9 @@ describe('DEMARCATION-0: same-turn coalescing to the FINAL settled value', () =>
     const seen: string[] = [];
     const off = observeCommitted<string>(tree.$.theme, (v) => seen.push(v));
 
-    tree.$.theme.set('a');
+    tree.$.theme('a');
     await flush();
-    tree.$.theme.set('b');
+    tree.$.theme('b');
     await flush();
     off();
 
@@ -283,11 +283,11 @@ describe('DEMARCATION-0: the observer sees every cause link needs', () => {
     const seen: string[] = [];
     const off = observeCommitted<string>(tree.$.theme, (v) => seen.push(v));
 
-    tree.$.theme.set('authored');
+    tree.$.theme('authored');
     await flush();
-    external(() => tree.$.theme.set('acquired'));
+    external(() => tree.$.theme('acquired'));
     await flush();
-    const p = tree.transaction(() => tree.$.theme.set('speculative'));
+    const p = tree.transaction(() => tree.$.theme('speculative'));
     await flush();
     const duringPending = [...seen];
     p.rollback();
@@ -324,7 +324,7 @@ describe('DEMARCATION-0: what an ordinary Angular effect sees', () => {
     // The remedy is not a public observer. It is that an irreversible action
     // belongs to WHOEVER OWNS TRANSACTION CONFIRMATION, which the same code
     // already has, because it is the code holding `p`.
-    const p = tree.transaction(() => tree.$.theme.set('dark'));
+    const p = tree.transaction(() => tree.$.theme('dark'));
     await flush();
     expect(charges).toEqual([]);
 
@@ -425,7 +425,7 @@ describe('DEMARCATION-0 Q1: does public link work on PRIVATE machinery?', () => 
     expect(tree.$.theme()).toBe('from-Y');
     expect(sent).toEqual([]);
 
-    tree.$.theme.set('typed');
+    tree.$.theme('typed');
     await flush();
     await l.settled();
     l.dispose();
@@ -438,7 +438,7 @@ describe('DEMARCATION-0 Q1: does public link work on PRIVATE machinery?', () => 
     const sent: string[] = [];
     const l = link<string>(tree.$.theme, { set: (v) => void sent.push(v) });
 
-    const p = tree.transaction(() => tree.$.theme.set('doomed'));
+    const p = tree.transaction(() => tree.$.theme('doomed'));
     await flush();
     expect(sent).toEqual([]);
 
@@ -480,12 +480,12 @@ describe('DEMARCATION-0 Q1: does public link work on PRIVATE machinery?', () => 
     const sent: string[] = [];
     const l = link<string>(tree.$.theme, { set: (v) => void sent.push(v) });
 
-    tree.$.theme.set('before');
+    tree.$.theme('before');
     await flush();
     await l.settled();
     l.dispose();
 
-    tree.$.theme.set('after');
+    tree.$.theme('after');
     await flush();
     await l.settled();
 
@@ -514,12 +514,12 @@ describe('DEMARCATION-0: guarantees the first draft under-tested', () => {
     // Same path, same local positionId, different tree. Without the namespace
     // filter in the internal observer, B's write drives A's link and sends A's
     // (unchanged) value to A's endpoint.
-    b.$.theme.set('from-B');
+    b.$.theme('from-B');
     await flush();
     await l.settled();
     expect(sent).toEqual([]);
 
-    a.$.theme.set('from-A');
+    a.$.theme('from-A');
     await flush();
     await l.settled();
     l.dispose();
@@ -553,7 +553,7 @@ describe('DEMARCATION-0: guarantees the first draft under-tested', () => {
       },
     });
 
-    tree.$.theme.set('B'); // authored; set(B) begins and blocks
+    tree.$.theme('B'); // authored; set(B) begins and blocks
     await flush();
     emit?.('C'); // Y pushes newer truth while B is in flight
     await flush();

@@ -17,7 +17,7 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
       { count: 0 },
       { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
-    undoable(() => tree.$.count.set(1));
+    undoable(() => tree.$.count(1));
     await flush();
 
     const retained = (
@@ -38,11 +38,11 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
       { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
 
-    undoable(() => tree.$.designated.set(1));
+    undoable(() => tree.$.designated(1));
     await flush();
-    tree.$.ambient.set(1);
+    tree.$.ambient(1);
     await flush();
-    undoable(() => tree.$.designated.set(2));
+    undoable(() => tree.$.designated(2));
     await flush();
 
     expect(tree.getRestorationHistory().map(({ state }) => state)).toEqual([
@@ -57,10 +57,10 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
       { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
 
-    undoable(() => tree.$.designated.set(1));
+    undoable(() => tree.$.designated(1));
     await flush();
     withWriteContext({ participation: 'realized' }, () =>
-      tree.$.external.set(1)
+      tree.$.external(1)
     );
     await flush();
 
@@ -74,9 +74,9 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
       { left: 0, right: 0 },
       { enhancers: [restoration({ maxHistorySize: 10 })] }
     );
-    undoable(() => tree.$.left.set(1));
+    undoable(() => tree.$.left(1));
     await flush();
-    undoable(() => tree.$.right.set(1));
+    undoable(() => tree.$.right(1));
     await flush();
     const manager = (
       tree as unknown as {
@@ -92,7 +92,7 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
     }
     manager.undoPosition(leftPosition);
 
-    undoable(() => tree.$.left.set(2));
+    undoable(() => tree.$.left(2));
     await flush();
 
     expect(tree.getRestorationHistory().map(({ state }) => state)).toEqual([
@@ -106,7 +106,7 @@ describe('RESTORATION-HISTORICAL-MATERIALIZATION-0', () => {
       { count: 0 },
       { enhancers: [restoration(), transactions()] }
     );
-    const pending = tree.transaction(() => undoable(() => tree.$.count.set(1)));
+    const pending = tree.transaction(() => undoable(() => tree.$.count(1)));
 
     tree.resetRestorationHistory();
     pending.confirm();

@@ -30,7 +30,7 @@ derived factory in the initial call:
 
 ```typescript
 import { computed } from '@angular/core';
-import { batching, defineStore, entityMap, signalTree } from '@signal-tree/angular';
+import { batching, defineStore, entityMap, leaf, signalTree } from '@signal-tree/angular';
 
 export const AppTree = defineStore(
   () =>
@@ -67,16 +67,34 @@ export const AppTree = defineStore(
 `$` is the state facade.
 
 - Read a leaf: `tree.$.user.name()`.
-- Write a leaf: `tree.$.user.name.set(value)` or `.update(fn)`.
+- Replace a leaf: `tree.$.user.name(value)`.
+- Derive a leaf: `tree.$.user.name((current) => next)`.
 - Read a branch: `tree.$.user()`.
 - Replace a branch: `tree.$.user(value)`.
 - Update a branch: `tree.$.user((current) => next)`.
 - Read the full snapshot: `tree.$()`.
 - There is no separate `.state` or `.unwrap()` accessor.
 
-Leaves are universal locations. Calling a leaf with an argument is not a write;
-use `.set(value)` or `.update(fn)`. In Angular, direct reads participate in
-dependency tracking without making the location an Angular `Signal`.
+Root, branch, and terminal leaves are universal locations with the same callable
+grammar. In Angular, direct reads participate in dependency tracking without
+making the location an Angular `Signal`.
+
+Use `leaf(value)` when a plain object should remain one atomic terminal instead
+of becoming a branch. Callable data always needs the wrapper, including when it
+is replaced, because a bare function argument means "derive":
+
+```typescript
+const tree = signalTree({
+  bounds: leaf({ min: 0, max: 100 }),
+  onSave: leaf((id: number) => console.log(id)),
+});
+
+tree.$.bounds({ min: 10, max: 90 });
+tree.$.onSave(leaf((id) => persist(id)));
+```
+
+Use `toWritableSignal(location)` only at an Angular API boundary that requires
+native `WritableSignal` identity; the returned view has `.set()` and `.update()`.
 
 ## EntityMap
 
@@ -145,8 +163,8 @@ historical migration documents as current API guidance.
 This Angular app uses SignalTree 15 from `@signal-tree/angular`. State,
 `enhancers`, and one `derived` factory are declared together in
 `signalTree(...)`; there is no `.with()` or fluent `.derived()`. Read through
-`tree.$`; leaves write with `.set()`/`.update()`, while root and branches accept
-whole values or updater functions. Put writes and async orchestration in Ops
+`tree.$`; every location accepts whole values or updater functions. Use
+`leaf(value)` for atomic objects and callable data. Put writes and async orchestration in Ops
 services; keep HTTP, persistence, forms, routing, and effects application-owned.
 Use `entityMap()` for normalized collections, `external()` for synchronous
 external-truth writes, `restoration()` + `undoable()` for retained undo history,

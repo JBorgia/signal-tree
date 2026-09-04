@@ -6,7 +6,7 @@
       Choose a depth that this repository generated and compiled. For every
       offered value, TypeScript infers the tree from an explicit nested object
       literal and must preserve the deepest status as exactly
-      <code>WritableLeaf&lt;DeepTypingStatus&gt;</code>, never <code>any</code>.
+      <code>Location&lt;DeepTypingStatus&gt;</code>, never <code>any</code>.
       The button also creates that shape in the browser and verifies a deepest
       read, write, snapshot, and reset.
     </p>
@@ -49,7 +49,7 @@
       </div>
       <div>
         <dt>Exact type equality</dt>
-        <dd>{{ compilerChecks.exactWritableLeaf }}</dd>
+        <dd>{{ compilerChecks.exactLocation }}</dd>
       </div>
       <div>
         <dt><code>IsAny</code> result</dt>
@@ -158,7 +158,7 @@
         </li>
         <li>
           The deepest status path is exactly
-          <code>WritableLeaf&lt;DeepTypingStatus&gt;</code>.
+          <code>Location&lt;DeepTypingStatus&gt;</code>.
         </li>
         <li>
           The generated <code>IsAny</code> detector resolves to

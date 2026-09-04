@@ -90,7 +90,7 @@ describe('enhancer cleanup registration', () => {
       { enhancers: [restoration()] }
     );
 
-    undoable(() => tree.$.count.set(1));
+    undoable(() => tree.$.count(1));
     await flush();
     expect(tree.getRestorationHistory().length).toBe(1);
 
@@ -110,18 +110,20 @@ describe('enhancer cleanup registration', () => {
 describe('destroy() clears enhancer resources', () => {
   it('batching: clears pending timeout on destroy', () => {
     vi.useFakeTimers();
-    const tree = createMockTree();
-    const enhanced = batching({ notificationDelayMs: 100 })(tree);
+    try {
+      const tree = signalTree(
+        { count: 0 },
+        { enhancers: [batching({ notificationDelayMs: 100 })] }
+      );
 
-    // Trigger a batched notification
-    undoable(() => enhanced.$.count.set(42));
+      tree.$.count(42);
+      expect(vi.getTimerCount()).toBe(1);
 
-    // Destroy should clear the timer
-    tree.destroy();
-
-    // Advance time — should not throw
-    vi.advanceTimersByTime(200);
-    vi.useRealTimers();
+      tree.destroy();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('memoization: clears cache on destroy', () => {
@@ -136,8 +138,8 @@ describe('destroy() clears enhancer resources', () => {
     );
 
     // Make some changes
-    undoable(() => enhanced.$.count.set(1));
-    undoable(() => enhanced.$.count.set(2));
+    undoable(() => enhanced.$.count(1));
+    undoable(() => enhanced.$.count(2));
 
     enhanced.destroy();
 

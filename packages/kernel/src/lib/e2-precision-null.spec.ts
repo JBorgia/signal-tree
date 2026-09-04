@@ -70,7 +70,7 @@ const applyTargetedWrite = (
   for (const [path] of Object.entries(update)) {
     const value = get(update, path);
     const location = tree.$[path as 'a' | 'b'];
-    location.set(value as number);
+    location(value as number);
   }
 };
 
@@ -105,10 +105,10 @@ describe('E2 / P1 — unrelated later truth', () => {
     const history: Turn[] = [];
 
     const before = tree.$() as Root;
-    tree.$.a.set(1);
+    tree.$.a(1);
     history.push({ id: 'T1', before, after: tree.$() as Root });
 
-    tree.$.b.set(1); // independent later truth
+    tree.$.b(1); // independent later truth
 
     for (const update of undoTurn(history[0], tree.$() as Root)) {
       applyTargetedWrite(tree, update);
@@ -156,11 +156,11 @@ describe('E2 / P3 — a rolled-back speculative predecessor', () => {
     const history: Turn[] = [];
 
     let before = tree.$() as Root;
-    tree.$.x.set('B'); // T1, speculative
+    tree.$.x('B'); // T1, speculative
     history.push({ id: 'T1', before, after: tree.$() as Root });
 
     before = tree.$() as Root;
-    tree.$.x.set('C'); // T2, confirmed
+    tree.$.x('C'); // T2, confirmed
     history.push({ id: 'T2', before, after: tree.$() as Root });
 
     // T1 is rolled back. Canonical truth stays 'C' because T2 owns the position.
@@ -182,11 +182,11 @@ describe('E2 / P3 — a rolled-back speculative predecessor', () => {
     const history: Turn[] = [];
 
     let before = tree.$() as Root;
-    tree.$.x.set('B');
+    tree.$.x('B');
     history.push({ id: 'T1', before, after: tree.$() as Root });
 
     before = tree.$() as Root;
-    tree.$.x.set('C');
+    tree.$.x('C');
     history.push({ id: 'T2', before, after: tree.$() as Root });
 
     // THE ADDED CAPABILITY: rolling back T1 removes its contribution from every

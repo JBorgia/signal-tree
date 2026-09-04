@@ -22,7 +22,7 @@ describe('React observation discriminator: public link()', () => {
         origin: 'devtools',
         participation: 'inspection',
       },
-      () => tree.$.count.set(1)
+      () => tree.$.count(1)
     );
     await flush();
     await connection.settled();

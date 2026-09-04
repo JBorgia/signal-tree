@@ -91,9 +91,9 @@
         <h2 id="grammar-title">Location shape determines access shape</h2>
         <p>
           The tree is a controller. Root and branch accessors are callable for
-          reads, whole-value replacements, and updater functions. Reactive
-          leaves read with <code>()</code> and write through
-          <code>.set()</code> or <code>.update()</code>.
+          reads, whole-value replacements, and updater functions. Terminal
+          leaves use that same callable grammar; <code>leaf(value)</code>
+          declares where traversal stops.
         </p>
         <a routerLink="/architecture-overview#accessor-grammar">
           See the complete state grammar <span aria-hidden="true">→</span>

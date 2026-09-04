@@ -18,7 +18,7 @@ describe('Angular realization invariants', () => {
     const tree = signalTree({ a: 1, nested: { b: 2 } });
 
     expect(isSignal(tree.$.a)).toBe(false);
-    expect(typeof tree.$.a.set).toBe('function');
+    expect('set' in tree.$.a).toBe(false);
     expect(typeof tree.$.a.peek).toBe('function');
     expect(typeof tree.$.a.subscribe).toBe('function');
     expect(tree.$.a()).toBe(1);
@@ -39,7 +39,7 @@ describe('Angular realization invariants', () => {
 
     expect(doubled()).toBe(2);
     const before = runs;
-    tree.$.a.set(5);
+    tree.$.a(5);
     expect(doubled()).toBe(10);
     expect(runs).toBeGreaterThan(before);
     tree.destroy();
@@ -63,7 +63,7 @@ describe('Angular realization invariants', () => {
     const leaf = tree.$.a;
 
     expect(isSignal(leaf)).toBe(false);
-    expect(typeof leaf.set).toBe('function');
+    expect('set' in leaf).toBe(false);
     expect(tree.$.a).toBe(leaf);
     expect(tree.$.a).not.toBe(tree.$.b);
     untracked(() => tree.$.a());
@@ -92,7 +92,7 @@ describe('Angular realization invariants', () => {
     await fixture.whenStable();
     expect(fixture.nativeElement.textContent.trim()).toBe('0');
 
-    fixture.componentInstance.tree.$.count.set(1);
+    fixture.componentInstance.tree.$.count(1);
     await fixture.whenStable();
 
     expect(fixture.nativeElement.textContent.trim()).toBe('1');
@@ -110,7 +110,7 @@ describe('Angular realization invariants', () => {
 
     expect(untracked(() => doubled())).toBe(2);
     const before = runs;
-    tree.$.a.set(5);
+    tree.$.a(5);
     expect(untracked(() => doubled())).toBe(10);
     expect(runs).toBeGreaterThan(before);
     tree.destroy();

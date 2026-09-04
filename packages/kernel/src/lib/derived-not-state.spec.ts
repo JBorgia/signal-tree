@@ -52,7 +52,7 @@ describe('derived state never reaches a snapshot', () => {
 
   it('writing through $ first — what every real app does', () => {
     const tree = mk();
-    tree.$.a.set(7);
+    tree.$.a(7);
     expect(tree.$()).toEqual({ a: 7, b: 3 });
   });
 
@@ -67,7 +67,7 @@ describe('derived state never reaches a snapshot', () => {
     const touched = mk();
     void touched.$;
     const written = mk();
-    written.$.a.set(2); // same value, but through `$`
+    written.$.a(2); // same value, but through `$`
 
     expect(untouched.$()).toEqual(touched.$());
     expect(touched.$()).toEqual(written.$());
@@ -76,7 +76,7 @@ describe('derived state never reaches a snapshot', () => {
   it('the derived still WORKS and still recomputes', () => {
     const tree = mk();
     expect(tree.$.sum()).toBe(5);
-    tree.$.a.set(100);
+    tree.$.a(100);
     expect(tree.$.sum()).toBe(103);
   });
 
@@ -84,7 +84,7 @@ describe('derived state never reaches a snapshot', () => {
     const tree = mk();
     void tree.$;
     const before = tree.$() as Record<string, unknown>;
-    tree.$.a.set(100);
+    tree.$.a(100);
 
     // Previously `before.sum` was 5 while the live value had become 103 — a
     // number that was true once, sitting in storage.
@@ -112,7 +112,7 @@ describe('derived state never reaches a snapshot', () => {
   it('a snapshot round-trips and the derived recomputes from it', () => {
     const src = mk();
     void src.$;
-    src.$.a.set(10);
+    src.$.a(10);
     const snap = src.$();
 
     const dst = mk();

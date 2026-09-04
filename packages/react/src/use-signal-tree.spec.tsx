@@ -45,7 +45,7 @@ describe('useSignalTree', () => {
     collectionComparisons = 0;
 
     await act(async () => {
-      tree.$.unrelated.set(1);
+      tree.$.unrelated(1);
       await settleKernel();
     });
 
@@ -54,7 +54,7 @@ describe('useSignalTree', () => {
     expect(collectionComparisons).toBe(0);
 
     await act(async () => {
-      tree.$.count.set(2);
+      tree.$.count(2);
       await settleKernel();
     });
 
@@ -73,7 +73,7 @@ describe('useSignalTree', () => {
 
     render(<WholeRoot />);
     await act(async () => {
-      tree.$.count.set(2);
+      tree.$.count(2);
       await settleKernel();
     });
 
@@ -105,8 +105,8 @@ describe('useSignalTree', () => {
     expect(screen.getByText('second')).toBeTruthy();
 
     await act(async () => {
-      first.$.count.set(3);
-      second.$.label.set('updated');
+      first.$.count(3);
+      second.$.label('updated');
       await settleKernel();
     });
 
@@ -155,7 +155,7 @@ describe('useSignalTree', () => {
     const readsAfterUnmount = reads;
 
     await act(async () => {
-      tree.$.count.set(2);
+      tree.$.count(2);
       await settleKernel();
     });
 

@@ -43,7 +43,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.tripled()).toBe(15);
 
       // Update source state
-      tree.$.count.set(10);
+      tree.$.count(10);
 
       // Derived should update
       expect(tree.$.doubled()).toBe(20);
@@ -73,7 +73,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.fullName()).toBe('John Doe');
 
       // Update nested state
-      tree.$.user.firstName.set('Jane');
+      tree.$.user.firstName('Jane');
       expect(tree.$.fullName()).toBe('Jane Doe');
     });
   });
@@ -97,7 +97,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.quadrupled()).toBe(8);
 
       // Update source
-      tree.$.value.set(5);
+      tree.$.value(5);
       expect(tree.$.doubled()).toBe(10);
       expect(tree.$.quadrupled()).toBe(20);
     });
@@ -124,7 +124,7 @@ describe('derived() marker pattern', () => {
       const initialCount = computeCount;
 
       // Update a - should recompute sum
-      tree.$.a.set(10);
+      tree.$.a(10);
       expect(tree.$.sum()).toBe(12);
       expect(tree.$.doubleSum()).toBe(24);
       expect(computeCount).toBeGreaterThan(initialCount);
@@ -151,7 +151,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.stats.count()).toBe(3);
       expect(tree.$.stats.sum()).toBe(6);
 
-      tree.$.items.set([1, 2, 3, 4, 5]);
+      tree.$.items([1, 2, 3, 4, 5]);
       expect(tree.$.stats.count()).toBe(5);
       expect(tree.$.stats.sum()).toBe(15);
     });
@@ -206,7 +206,7 @@ describe('derived() marker pattern', () => {
 
       // Verify mutations still work through source properties
       tree.$.tickets.entities.addOne({ id: 1, status: 'pending' });
-      tree.$.tickets.activeId.set(1);
+      tree.$.tickets.activeId(1);
 
       // Verify derived signals reflect the mutations
       expect(tree.$.tickets.all().length).toBe(1);
@@ -214,7 +214,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.tickets.active()?.status).toBe('pending');
 
       // Verify source signal mutations work
-      tree.$.tickets.startDate.set(new Date('2024-06-01'));
+      tree.$.tickets.startDate(new Date('2024-06-01'));
       expect(tree.$.tickets.startDate()).toEqual(new Date('2024-06-01'));
     });
 
@@ -266,7 +266,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.items.selected()).toBe(null);
 
       // Select and verify
-      tree.$.items.selectedId.set(1);
+      tree.$.items.selectedId(1);
       expect(tree.$.items.selected()?.name).toBe('First');
     });
   });
@@ -487,7 +487,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.areHaulerAndTruckSelected()).toBe(false);
 
       // Set an internal driver
-      tree.$.driver.current.set({
+      tree.$.driver.current({
         id: 1,
         name: 'John',
         isExternal: false,
@@ -500,30 +500,30 @@ describe('derived() marker pattern', () => {
       expect(tree.$.selectableTrucks().length).toBe(2); // All trucks for internal driver
 
       // Select a truck
-      tree.$.selected.truckId.set(1);
+      tree.$.selected.truckId(1);
       expect(tree.$.selectedTruck()?.name).toBe('Truck A');
       expect(tree.$.selectedProductLine()).toBe('Concrete');
       expect(tree.$.areHaulerAndTruckSelected()).toBe(true);
 
       // Switch to external driver
-      tree.$.driver.current.set({
+      tree.$.driver.current({
         id: 2,
         name: 'Jane',
         isExternal: true,
         url: '/drivers/2',
       });
-      tree.$.selected.truckId.set(null);
+      tree.$.selected.truckId(null);
 
       expect(tree.$.isExternalDriver()).toBe(true);
       expect(tree.$.selectableTrucks()).toEqual([]); // No hauler selected
       expect(tree.$.areHaulerAndTruckSelected()).toBe(false);
 
       // Select hauler for external driver
-      tree.$.selected.haulerId.set(10);
+      tree.$.selected.haulerId(10);
       expect(tree.$.selectableTrucks().length).toBe(2); // Both trucks have hauler 10
 
       // Select specific truck
-      tree.$.selected.truckId.set(2);
+      tree.$.selected.truckId(2);
       expect(tree.$.selectedTruck()?.name).toBe('Truck B');
       expect(tree.$.areHaulerAndTruckSelected()).toBe(true);
     });
@@ -574,7 +574,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.ticketWorkflow()).toEqual(['Loading', 'Complete']);
 
       // Select concrete truck
-      tree.$.selected.truckId.set(1);
+      tree.$.selected.truckId(1);
       expect(tree.$.activeProductLine()).toBe('Concrete');
       expect(tree.$.ticketWorkflow()).toEqual([
         'Batching',
@@ -585,7 +585,7 @@ describe('derived() marker pattern', () => {
       ]);
 
       // Switch to asphalt truck
-      tree.$.selected.truckId.set(2);
+      tree.$.selected.truckId(2);
       expect(tree.$.activeProductLine()).toBe('Asphalt');
       expect(tree.$.ticketWorkflow()).toEqual([
         'Loading',
@@ -670,7 +670,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.adminUsers()[0].name).toBe('Alice');
 
       // Select a user
-      tree.$.selectedUserId.set(2);
+      tree.$.selectedUserId(2);
       expect(tree.$.selectedUser()?.name).toBe('Bob');
 
       // Update user status
@@ -678,7 +678,7 @@ describe('derived() marker pattern', () => {
       expect(tree.$.activeUsers().length).toBe(3);
 
       // Select non-existent user
-      tree.$.selectedUserId.set(999);
+      tree.$.selectedUserId(999);
       expect(tree.$.selectedUser()).toBe(null);
     });
 
@@ -751,13 +751,13 @@ describe('derived() marker pattern', () => {
       expect(tree.$.totalPendingRevenue()).toBe(150); // 100 + 50
 
       // Select Alice
-      tree.$.selectedUserId.set(1);
+      tree.$.selectedUserId(1);
       expect(tree.$.selectedUserOrders().length).toBe(2);
       expect(tree.$.selectedUserOrderCount()).toBe(2);
       expect(tree.$.selectedUserTotalSpent()).toBe(300);
 
       // Select Bob
-      tree.$.selectedUserId.set(2);
+      tree.$.selectedUserId(2);
       expect(tree.$.selectedUserOrders().length).toBe(2);
       expect(tree.$.selectedUserOrderCount()).toBe(2);
       expect(tree.$.selectedUserTotalSpent()).toBe(125);
@@ -837,7 +837,7 @@ describe('derived() marker pattern', () => {
       );
 
       // Set id first (entity not present yet)
-      tree.$.activeProductId.set('1');
+      tree.$.activeProductId('1');
       expect(tree.$.activeProduct()).toBeUndefined();
 
       // Now load entities - derived should update without extra deps
@@ -966,13 +966,13 @@ describe('derived() marker pattern', () => {
         const initialCallCount = derivedCallCount;
 
         // Change unrelated value - should NOT trigger recalculation
-        tree.$.unrelatedValue.set('world');
+        tree.$.unrelatedValue('world');
         // Access derived again - should use cached value
         expect(tree.$.doubledRelated()).toBe(2);
         expect(derivedCallCount).toBe(initialCallCount); // No new call
 
         // Change related value - SHOULD trigger recalculation
-        tree.$.relatedValue.set(5);
+        tree.$.relatedValue(5);
         expect(tree.$.doubledRelated()).toBe(10);
         expect(derivedCallCount).toBe(initialCallCount + 1); // One new call
       });

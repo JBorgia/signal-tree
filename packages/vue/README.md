@@ -23,7 +23,7 @@ import { signalTree } from '@signal-tree/vue';
 const tree = signalTree({ profile: { name: 'Ada' } });
 const name = computed(() => tree.$.profile.name());
 
-tree.$.profile.name.set('Grace');
+tree.$.profile.name('Grace');
 ```
 
 Locations are not Vue refs. For a Vue API such as `v-model` that requires a
@@ -32,7 +32,7 @@ writable ref, use Vue's native writable `computed`:
 ```ts
 const nameModel = computed({
   get: () => tree.$.profile.name(),
-  set: (value: string) => tree.$.profile.name.set(value),
+  set: (value: string) => tree.$.profile.name(value),
 });
 ```
 

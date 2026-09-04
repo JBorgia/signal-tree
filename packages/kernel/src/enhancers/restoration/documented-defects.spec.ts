@@ -49,8 +49,8 @@ describe('6b — createAuditTracker samples on a timer', () => {
     await new Promise((r) => setTimeout(r, 120));
     const base = log.length;
 
-    undoable(() => tree.$.n.set(1));
-    tree.$.n.set(2); // same window
+    undoable(() => tree.$.n(1));
+    tree.$.n(2); // same window
     await new Promise((r) => setTimeout(r, 250));
     stop();
 
@@ -66,8 +66,8 @@ describe('6b — createAuditTracker samples on a timer', () => {
     await new Promise((r) => setTimeout(r, 120));
     const base = log.length;
 
-    undoable(() => tree.$.name.set('TEMP'));
-    tree.$.name.set('a'); // reverted in the same window
+    undoable(() => tree.$.name('TEMP'));
+    tree.$.name('a'); // reverted in the same window
     await new Promise((r) => setTimeout(r, 250));
     stop();
 
@@ -93,7 +93,7 @@ describe('6c — undo() after deserialize() (REPAIRED by opt-in eligibility)', (
       signalTree({ n: 0 }, { enhancers: [serialization(), restoration({})] });
 
     const source = make();
-    undoable(() => source.$.n.set(7));
+    undoable(() => source.$.n(7));
     await flush();
     const payload = source.serialize();
 
@@ -126,7 +126,7 @@ describe('6d — maxHistorySize validation (FIXED in 14.1.1)', () => {
     );
     await flush();
     for (let i = 1; i <= 10; i++) {
-      undoable(() => tree.$.n.set(i));
+      undoable(() => tree.$.n(i));
       await flush();
     }
     let spent = 0;

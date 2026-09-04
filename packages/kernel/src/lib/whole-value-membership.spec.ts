@@ -106,7 +106,7 @@ describe('whole-value membership', () => {
     (tree.$.user as unknown as (v: object) => void)({ name: 'Dave' });
     expect(tree.$.user()).toEqual({ name: 'Dave' });
 
-    tree.$.user.age.set(50);
+    tree.$.user.age(50);
 
     // WRITING AN ABSENT DESCENDANT REACTIVATES ITS MEMBERSHIP — otherwise the
     // write would mutate hidden storage while the parent kept omitting it, which
@@ -152,7 +152,7 @@ describe('whole-value membership', () => {
     expect(observed()).toBeUndefined();
 
     // Writing the dormant slot's OWN value back through the child.
-    tree.$.user.age.set(42);
+    tree.$.user.age(42);
 
     expect(observed()).toBe(42);
     expect(tree.$.user()).toEqual({ name: 'Dave', age: 42 });
@@ -197,7 +197,7 @@ describe('whole-value membership', () => {
 
     // The SAME value the dormant slot still holds — no value inequality to lean
     // on, in either the child's publication or the parent's dependency graph.
-    tree.$.user.age.set(42);
+    tree.$.user.age(42);
     expect(childObserved()).toBe(42);
     expect(parentObserved()).toEqual({ name: 'Dave', age: 42 });
   });
@@ -230,7 +230,7 @@ describe('whole-value membership', () => {
     // The physical slot still holds 42; the member is semantically absent.
 
     const seen: Array<number | undefined> = [];
-    tree.$.user.age.update((current) => {
+    tree.$.user.age((current) => {
       seen.push(current);
       return 50;
     });
@@ -250,7 +250,7 @@ describe('whole-value membership', () => {
     );
     const seen: Array<number | undefined> = [];
 
-    tree.$.user.age.update((current) => {
+    tree.$.user.age((current) => {
       seen.push(current);
       return (current ?? 0) + 1;
     });
@@ -295,7 +295,7 @@ describe('whole-value membership', () => {
 
     // A — membership only, via the child, same value
     const a = make(); dormant(a);
-    expect(measure(() => a.tree.$.user.age.set(42))).toBe(1);
+    expect(measure(() => a.tree.$.user.age(42))).toBe(1);
 
     // B — membership only, via the parent, same value
     const b = make(); dormant(b);
@@ -438,7 +438,7 @@ describe('whole-value membership', () => {
     const afterFirst = rebuilds;
 
     // A value write must reach the snapshot through ordinary slot publication.
-    tree.$.box.keep.v.set(5);
+    tree.$.box.keep.v(5);
     expect(JSON.parse(held())).toEqual({ keep: { v: 5 }, other: { v: 2 } });
     const afterValueWrite = rebuilds;
 
@@ -496,7 +496,7 @@ describe('whole-value membership — PUBLIC DEFAULT PATH', () => {
     expect(parent()).toEqual({ name: 'Dave' });
     expect(child()).toBeUndefined();
 
-    tree.$.user.age.set(42); // the same value the dormant slot holds
+    tree.$.user.age(42); // the same value the dormant slot holds
     expect(child()).toBe(42);
     expect(parent()).toEqual({ name: 'Dave', age: 42 });
   });

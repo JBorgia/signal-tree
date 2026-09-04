@@ -79,7 +79,7 @@ describe('the durable commit boundary, carried by persistence()', () => {
     await flush();
     writes.length = 0;
 
-    tree.$.a.set('dark');
+    tree.$.a('dark');
     await flush();
 
     // Without this control, "nothing speculative was written" would be
@@ -95,9 +95,9 @@ describe('the durable commit boundary, carried by persistence()', () => {
     writes.length = 0;
 
     const pending = tree.transaction(() => {
-      tree.$.a.set('a1');
-      tree.$.a.set('a2'); // superseded — must never be durable
-      tree.$.b.set('b1');
+      tree.$.a('a1');
+      tree.$.a('a2'); // superseded — must never be durable
+      tree.$.b('b1');
     });
     await flush();
 
@@ -124,7 +124,7 @@ describe('the durable commit boundary, carried by persistence()', () => {
 
     expect(() =>
       tree.transaction(() => {
-        tree.$.a.set('doomed');
+        tree.$.a('doomed');
         throw new Error('boom');
       })
     ).toThrow();
@@ -140,8 +140,8 @@ describe('the durable commit boundary, carried by persistence()', () => {
     await flush();
     writes.length = 0;
 
-    const first = tree.transaction(() => tree.$.a.set('FIRST'));
-    const second = tree.transaction(() => tree.$.a.set('SECOND'));
+    const first = tree.transaction(() => tree.$.a('FIRST'));
+    const second = tree.transaction(() => tree.$.a('SECOND'));
 
     // Confirmed in the WRONG order: the later transaction settles first.
     second.confirm();
@@ -164,10 +164,10 @@ describe('the durable commit boundary, carried by persistence()', () => {
     mine.writes.length = 0;
     theirs.writes.length = 0;
 
-    const foreignPending = foreign.transaction(() => foreign.$.a.set('THEIRS'));
+    const foreignPending = foreign.transaction(() => foreign.$.a('THEIRS'));
 
     // My write is not inside anybody's scope, so it must be durable now.
-    tree.$.a.set('MINE');
+    tree.$.a('MINE');
     await flush();
 
     expect(durable(mine.writes).at(-1)?.a).toBe('MINE');
